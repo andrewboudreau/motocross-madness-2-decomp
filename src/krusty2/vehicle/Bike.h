@@ -388,15 +388,15 @@ public:
     BikeWheel* rearWheel;       // +0x5f4 rear wheel (smallest config z, 0x408728); tier 3
     BikeA5F8* leftBarContact;      // +0x5f8 cleared in the ctor (0x00407700); LoadBike adds it at (-1.305, 0.225, -0.228) on the "Handlebars" node; Method_0x0040a520 reads it
     BikeA5F8* rightBarContact;     // +0x5fc cleared in the ctor; the mirror point (+1.305, 0.225, -0.228) on the "Handlebars" node
-    int field_0x600;               // +0x600 cleared in the ctor
+    int tailContact;                          // +0x600  the loader's contact point at the tail (0, 3.345, -3.206) on modelNode, beside the handlebar contacts
     BikeA604* wrecker;  // +0x604  Wrecker (SetupWrecker with rider.col, StartAnimatedWreck); RaceView/BikeRace +0x604 wrecker
     Vehicle* linkedVehicle;  // +0x608 cleared in ctor and reset (lines near linkedVehicle = 0), set reciprocally in the slot 38 pairing code: linkedVehicle = other; ((Bike*)other)->linkedVehicle = this
     BikeA60C* handlebars;          // +0x60c BikeA60C("Handlebars", model, steerState); the steer axis runs from the front wheel to its node; cleared in the ctor; ~Bike calls 0x00464e90 on it, then operator delete
     Vec3 steerTorqueGains;  // +0x610  per-axis gains of the steering torque integrator (Method_0x0040a520)
     Vec3 steerTorque;  // +0x61C  integrated steering torque (Method_0x0040a520); decays by 0.99 (or -0.02/-0.1 at the limit) per step
-    float field_0x628;
-    float field_0x62c;
-    int field_0x630;
+    float driveSlideAngle;                    // +0x628  slot 61: rear-wheel drive term while all wheels touch and the bike leans, decayed to 0 over 0.75 s; returned to slot 49, which hands it to slot 46 (provisional)
+    float driveSlideAngleStep;                // +0x62C  slot 61: per-step decay of driveSlideAngle (-1.333 * fixedStepTime * angle)
+    int driveSlideStepsLeft;                  // +0x630  slot 61: steps left in the 0.75 s decay ((int)(0.75 / fixedStepTime - 0.5))
     int field_0x634;
     int field_0x638;
     float crossupScale;                       // +0x63C  KrustyBike slot 96: CrossupSlider (TrackGame+0xfe4) pct * 0.4 + 0.8, 1.0 for AI bikes
@@ -409,21 +409,21 @@ public:
     int poseState;  // +0x658 slot 89/61: paired with poseIndex (10 = lean pose); compared against 10 in slot 61 and set to idx*2+4
     float poseParam;  // +0x65c slot 61: passed as time/weight arg to Method_0x004a8c50 and Method_0x004a8bf0; slot 89 state machine writes it from the smoothed value (x = t * -0.25)
     float poseLeanBlend;  // +0x660 slot 89: (lean - min)/(max - min) pose lean blend; slot 61: (speed*0.0310559+1)*0.5
-    float field_0x664;                // retail does fld/fcomp on it (KrustyBike request)
-    float field_0x668;  // KrustyBike slot 102: per-frame advance of field_0x664 (pose 17 time)
+    float backUpPhase;                        // +0x664  KrustyBike slot 102 advances it mod 1 as the BackUpBottom pose time (riderPoseHandles[17]); slot 86 ramps the back-up push off it
+    float backUpPhaseRate;                    // +0x668  KrustyBike slot 102: per-frame advance of backUpPhase, max(|forwardSpeed|, 1) * dt * 0.55371
     int riderPoseHandles[18];  // +0x66c slot 61: riderPoseHandles[idx], riderPoseHandles[next] passed to riderCharacter->Method_0x004a8c50 (rider-side pose ids, 18 entries)
     int bikePoseHandles[18];  // +0x6b4 slot 61: bikePoseHandles[idx], [next] passed to D3DIMSoultreeCharacter::Method_0x004a8c50 (bike-side pose ids, 18 entries)
-    int field_0x6fc;
-    int field_0x700;
-    float field_0x704;
+    int crossoverPose;                        // +0x6FC  slot 89 sets it while airborne with both wheels clear and picks poses 11..13 (CrosOv1..3); slot 41 clears it when slot 89 leaves that branch (tier 2)
+    int frontWheelLifted;                     // +0x700  = wheelsInContact > 0 and frontWheel->penetration < -2.5 (front wheel clear while another touches); slot 62 returns 2 on it
+    float poseSmoothTime;                     // +0x704  0.55; the poseSmoother's smoothing time (constructor argument, reloaded when the crossover pose starts)
     float sideLieThreshold;  // +0x708 slot 38 tail: compared with |dot(kVec3YAxis, field_0xa0)|; if smaller 'bike is lying on its side' branch
     float field_0x70c;             // +0x70c loader: 0.85f
-    float field_0x710;
+    float crashGraceTime;                     // +0x710  the loader sets crashTimerReload - 0.5; slot 39 clears wrecker +0xac while crashTimer is still above it (provisional)
     float wobbleTime;  // +0x714 slot 91 wobble: wobbleTime += field_0x13c each frame, cubed (t*t*t*0.3578) to cap amplitude, halved on sign flip, zeroed by slot 71
     float wobbleSign;  // +0x718 slot 91 wobble: sign of field_0x2c; compared with new sign to detect flip; set in slot 71 from sign of field_0x48
     float wobbleOffset;  // +0x71c slot 91 wobble: added into field_0xd8.z, decays *0.9 per frame, reloaded from field_0xd8.z on flip/slot 71
     int wobbleStage;  // +0x720 slot 91 wobble: cycles 1..2 on each sign flip, loop active only while 1..2; slot 71 sets to 1
-    float field_0x724;
+    float leanSpeedThreshold;                 // +0x724  32.0; slot 57 returns savedRoll as the lean while not crashed and prevSpeed is below it (provisional)
     BikeDustEmitter* dustEmitter;  // +0x728  BikeDustEmitter built by the loader (Bike.cpp new line 0x70f), attached as type 1 on the rear wheel
     BikeDirtChunkEmitter* dirtChunkEmitter;  // +0x72C  BikeDirtChunkEmitter built by the loader (line 0x710), attached as type 2 on the rear wheel
     BikeSteamEmitter* steamEmitter;  // +0x730  BikeSteamEmitter built by the loader (line 0x711), attached as type 4 at (0, 2.5, -2.75); own data ends at 0x734, the compiler places the vtordisp there

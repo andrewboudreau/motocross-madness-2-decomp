@@ -1986,7 +1986,7 @@
     "target_va": "0x00491b70",
     "target_size": 298,
     "expect": "exact",
-    "notes": "Exact. Wheel-force step: ramp from field_0x664 (float in retail), wheel query call, halve force when g_kbGame flag set. Needs KbFloat identity inline to get fld/fstp [esp] arg pattern.",
+    "notes": "Exact. Wheel-force step: ramp from backUpPhase (float in retail), wheel query call, halve force when g_kbGame flag set. Needs KbFloat identity inline to get fld/fstp [esp] arg pattern.",
     "bindings": "KrustyBike.bindings.json"
   },
   {

@@ -611,7 +611,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
         UnknownVirtualSlot34();
         OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
                                      &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
-        if (!field_0x6fc && !field_0x430) {
+        if (!crossoverPose && !field_0x430) {
             savedForward = bodyForward;
             savedUp = bodyUp;
             savedYaw = bodyYaw;
@@ -783,11 +783,11 @@ void KrustyBike::Fn_00493660(float dt, int a)
             int prevCrash;
             poseIndex = states[0]->poseIndex;
             lean = poseIndex == 11 || poseIndex == 12;
-            if (field_0x6fc && !lean) {
+            if (crossoverPose && !lean) {
                 UnknownVirtualSlot41();
                 field_0x431 = 0;
             }
-            field_0x6fc = lean;
+            crossoverPose = lean;
             poseState = states[0]->poseState;
             if (g_kbGame->bajaEnduroEvent) {
                 if (lapGate == states[0]->lapGate - 1 || (lapGate == ((KbTrack*)g_kbGame->bajaEnduroEvent)->field_0xac - 1 && states[0]->lapGate == 0))
@@ -878,11 +878,11 @@ void KrustyBike::Fn_00493660(float dt, int a)
             int prevCrash;
             poseIndex = interpSource->poseIndex;
             lean = poseIndex == 11 || poseIndex == 12;
-            if (field_0x6fc && !lean) {
+            if (crossoverPose && !lean) {
                 UnknownVirtualSlot41();
                 field_0x431 = 0;
             }
-            field_0x6fc = lean;
+            crossoverPose = lean;
             poseState = interpSource->poseState;
             if (g_kbGame->bajaEnduroEvent) {
                 if (lapGate == interpSource->lapGate - 1 || (lapGate == ((KbTrack*)g_kbGame->bajaEnduroEvent)->field_0xac - 1 && interpSource->lapGate == 0))
@@ -1262,7 +1262,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
             ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);
         }
         if (hasFinished > 2) {
-            if (field_0x6fc)
+            if (crossoverPose)
                 UnknownVirtualSlot41();
             field_0x431 = 0;
         }
@@ -1272,7 +1272,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
         int next;
         int other;
         int blend;
-        if (field_0x6fc) {
+        if (crossoverPose) {
             next = idx + 1;
             if (next > 13)
                 next = 13;
@@ -1299,19 +1299,19 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
         if (idx > 2)
             blend = 0;
         if (poseIndex == 16) {
-            if (field_0x664 < 0.45f) {
+            if (backUpPhase < 0.45f) {
                 float lean = forwardSpeed;
                 if (lean < 0.0f)
                     lean = -lean;
                 float minimum = dt * 0.55371f;
                 float rate = lean * dt * 0.55371f;
-                field_0x668 = (rate > minimum) ? rate : minimum;
+                backUpPhaseRate = (rate > minimum) ? rate : minimum;
             }
-            field_0x664 += field_0x668;
-            if (field_0x664 > 1.0f)
-                field_0x664 -= 1.0f;
+            backUpPhase += backUpPhaseRate;
+            if (backUpPhase > 1.0f)
+                backUpPhase -= 1.0f;
             ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[16], poseParam);
-            ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[17], field_0x664);
+            ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[17], backUpPhase);
         } else if (blend) {
             ((Character*)riderCharacter)->Method_0x004a9050(riderPoseHandles[idx], riderPoseHandles[next],
                 riderPoseHandles[cnt], riderPoseHandles[other], poseParam, w, poseLeanBlend);

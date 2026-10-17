@@ -101,8 +101,8 @@ void KrustyBike::UnknownVirtualSlot4(const Vec3* a0, Vec3* a1, const Vec3* a2,
 void KrustyBike::UnknownVirtualSlot8()
 {
     Bike::UnknownVirtualSlot8();
-    if (aiKind && field_0x700)
-        field_0x700 = 0;
+    if (aiKind && frontWheelLifted)
+        frontWheelLifted = 0;
 }
 
 int KrustyBike::UnknownVirtualSlot12(int a)
@@ -306,7 +306,7 @@ int KrustyBike::UnknownVirtualSlot82()
             if (!UnknownVirtualSlot77(engineState->throttleFraction == 0.0f))
                 return 1;
         }
-        field_0x664 = 0;
+        backUpPhase = 0;
     }
     return 0;
 }
@@ -452,7 +452,7 @@ void KrustyBike::UnknownVirtualSlot48()
 }
 
 // Slot 86: per-frame wheel-contact update (provisional semantics).  When the race context
-// flag (field_0x740+0x18a) is set, a lookup ramp derived from field_0x664 (0.12..0.4762,
+// flag (field_0x740+0x18a) is set, a lookup ramp derived from backUpPhase (0.12..0.4762,
 // scaled by 360 / 0.3562 = 1010.66815f, the float retail holds, so 360 at 0.12) feeds the
 // wheel's helper object, and in one game mode the wheel's two force accumulators are
 // halved; the wheel is then always updated.
@@ -463,8 +463,8 @@ void KrustyBike::UnknownVirtualSlot86()
         return;
     if (race->isRacing) {
         float ramp;
-        if (backingUp && field_0x664 >= 0.12f && field_0x664 < 0.4762f)
-            ramp = (0.4762f - field_0x664) * (360.0f / 0.3562f);
+        if (backingUp && backUpPhase >= 0.12f && backUpPhase < 0.4762f)
+            ramp = (0.4762f - backUpPhase) * (360.0f / 0.3562f);
         else
             ramp = 0;
         if (w->aux)
@@ -658,12 +658,12 @@ void KrustyBike::UnknownVirtualSlot94()
 }
 
 // Slot 29: refresh the previous/current orientation angles (0x48..0x60 from 0x2c..0x44).
-// Normally they are recomputed from the node's world axes; while neither field_0x6fc nor
+// Normally they are recomputed from the node's world axes; while neither crossoverPose nor
 // field_0x430 is set the old values are just copied.  Then the bike's matrix is mirrored
 // onto the 0x5c4 node when the wrecker's mode is 0 or 1, and the 0x141c timer is advanced.
 void KrustyBike::UnknownVirtualSlot29(int a)
 {
-    if (!field_0x6fc && !field_0x430) {
+    if (!crossoverPose && !field_0x430) {
         savedForward = bodyForward;
         savedUp = bodyUp;
         savedYaw = bodyYaw;
