@@ -141,7 +141,7 @@ struct UnknownTrackGameModeOptions6ac {       // TrackGameMode+0x6ac, 0x374 byte
     int playerIndicator;                      // +0x24 ChkPlayerIndicator
     int toolTips;                             // +0x28 ChkToolTips
     int wreckResetOnTrack;                    // +0x2c ChkWreckResetOnTrack
-    int field_0x30;
+    int maxAIBikes;                           // +0x30  (TrackGameMode +0x6dc maxAIBikes, EditMaxAIBikes); 0x00522720 resets it to 2
     int field_0x34;
     int field_0x38;
     int field_0x3c;

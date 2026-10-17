@@ -172,7 +172,7 @@ void TrackGameMode::ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* option
     options->showRiderNames = 1;
     options->showRiderPositions = 1;
     options->showPodiums = 1;
-    options->field_0x30 = 2;
+    options->maxAIBikes = 2;
     options->field_0x34 = 0;
     options->field_0x38 = 0;
     options->field_0x3c = 0;
