@@ -186,7 +186,7 @@ public:
     int fontHeight;                           // +0x160
     unsigned char field_0x164[0x210 - 0x164];
     char* acceptedCharacters;                 // +0x210: accepted characters
-    RECT field_0x214;
+    RECT caretRect;                           // +0x214  UIEditBox +0x214 caretRect (GameUi.h); EnableImeInput places the IME composition window at its top left
 };
 
 // RTTI: UIDlgContainer : GameObject (vtable 0x00553fb0; 0x2c bytes, the
@@ -405,8 +405,8 @@ public:
 // 0x0067b468 (initializer 0x00488340) prints timer rows on a DebugOverlay
 // page.
 struct UnknownHiResMeterEntry {
-    float field_0x00;
-    float field_0x04;
+    float startStampLow;                      // +0x0  low dword of the rdtsc stamp the timed code stores at its start (0x00468712) and subtracts at its end (0x004686a0)
+    float startStampHigh;                     // +0x4  high dword of that stamp (the sbb operand)
     // Named after slot 10's "MS Timers [CallsThisTick-->TotMSThisTick
     // (AvgMSPerTick)] : (Per-call Peak/Avg)" columns.
     float calls;                              // +0x08
