@@ -358,8 +358,8 @@ int BikeRace::Tick(float frameTime) {
                         if (appliedReplayMode != 4) {
                             appliedReplayMode = 4;
                             if (g_TrackGame->mode.soundOn) {
-                                if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c != 0) {
-                                    g_TrackGame->eventManager->FindRaceMode()->field_0x9c->Enable();
+                                if (g_TrackGame->eventManager->FindRaceMode()->auralScape != 0) {
+                                    g_TrackGame->eventManager->FindRaceMode()->auralScape->Enable();
                                 }
                                 ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->EnableByClassName("SoundGroup");
                             }
@@ -378,8 +378,8 @@ int BikeRace::Tick(float frameTime) {
                         }
                     } else if (appliedReplayMode != replayMode) {
                         appliedReplayMode = replayMode;
-                        if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c != 0) {
-                            g_TrackGame->eventManager->FindRaceMode()->field_0x9c->Disable();
+                        if (g_TrackGame->eventManager->FindRaceMode()->auralScape != 0) {
+                            g_TrackGame->eventManager->FindRaceMode()->auralScape->Disable();
                         }
                         ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->DisableByClassName("SoundGroup");
                         ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->DisableByClassName("ParticleManager");
@@ -539,20 +539,20 @@ int BikeRace::Tick(float frameTime) {
                         }
                         switch (g_TrackGame->mode.raceSettings.eventType) {
                         case 2:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->nationalEvent->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->nationalEvent->chatOverlay;
                             break;
                         case 3:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->supercrossEvent->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->supercrossEvent->chatOverlay;
                             break;
                         case 0:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->quarryEvent->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->quarryEvent->chatOverlay;
                             break;
                         case 1:
                         case 5:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->bajaEnduroEvent->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->bajaEnduroEvent->chatOverlay;
                             break;
                         case 4:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->tagEvent->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->tagEvent->chatOverlay;
                             break;
                         }
                     }

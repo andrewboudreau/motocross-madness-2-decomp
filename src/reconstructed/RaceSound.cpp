@@ -867,16 +867,16 @@ int RaceSound::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* ent
                     field_0x40->SetPaused(0);
                 if (effectsGroup)
                     effectsGroup->SetPaused(0);
-                if (g_TrackGame->eventManager->FindRaceMode()->field_0x2c->soundGroup)
-                    g_TrackGame->eventManager->FindRaceMode()->field_0x2c->soundGroup->SetPaused(0);
+                if (g_TrackGame->eventManager->FindRaceMode()->eventScene->soundGroup)
+                    g_TrackGame->eventManager->FindRaceMode()->eventScene->soundGroup->SetPaused(0);
                 if (g_TrackGame->mode.networkGame)
                     PlayIfEnabled(crowdLoop, 1, 1, 1, 0);
                 if (listenerRacer) {
                     lastListenerGate = listenerRacer->lapGate;
                     lastListenerLap = listenerRacer->lapCount;
                 }
-                if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c)
-                    g_TrackGame->eventManager->FindRaceMode()->field_0x9c->Enable();
+                if (g_TrackGame->eventManager->FindRaceMode()->auralScape)
+                    g_TrackGame->eventManager->FindRaceMode()->auralScape->Enable();
             } else {
                 g_TrackGame->childRoot->DisableByClassName("SoundGroup");
                 if (engineGroup)
@@ -885,10 +885,10 @@ int RaceSound::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* ent
                     field_0x40->SetPaused(1);
                 if (effectsGroup)
                     effectsGroup->SetPaused(1);
-                if (g_TrackGame->eventManager->FindRaceMode()->field_0x2c->soundGroup)
-                    g_TrackGame->eventManager->FindRaceMode()->field_0x2c->soundGroup->SetPaused(1);
-                if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c)
-                    g_TrackGame->eventManager->FindRaceMode()->field_0x9c->Disable();
+                if (g_TrackGame->eventManager->FindRaceMode()->eventScene->soundGroup)
+                    g_TrackGame->eventManager->FindRaceMode()->eventScene->soundGroup->SetPaused(1);
+                if (g_TrackGame->eventManager->FindRaceMode()->auralScape)
+                    g_TrackGame->eventManager->FindRaceMode()->auralScape->Disable();
             }
             if (owner)
                 owner->ShowOnOffMessage(0x1429, g_TrackGame->mode.soundOn);

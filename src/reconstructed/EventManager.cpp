@@ -882,14 +882,14 @@ void EventManager::CloseRace(int mode) {
     g_TrackGame->mode.SaveProfile();
     if (mode == 1) {
         if (owner) {
-            if (owner->field_0x60)
-                owner->field_0x60->Disable();
-            if (owner->field_0x5c)
-                owner->field_0x5c->Disable();
-            if (owner->field_0x68)
-                owner->field_0x68->Disable();
-            if (owner->field_0x64)
-                owner->field_0x64->Disable();
+            if (owner->radarOverlay)
+                owner->radarOverlay->Disable();
+            if (owner->statsOverlay)
+                owner->statsOverlay->Disable();
+            if (owner->instrumentOverlay)
+                owner->instrumentOverlay->Disable();
+            if (owner->chatOverlay)
+                owner->chatOverlay->Disable();
         }
         view->raceCamera->Disable();
         if (view->raceSound)
