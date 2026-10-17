@@ -525,17 +525,33 @@ static inline CollisionVec3 TireScaledCtor(const CollisionVec3& v, float s)
 // Returning form of TireNormalizeOrInPlace, on a copy of v.
 static inline CollisionVec3 TireNormalizeOr(CollisionVec3 v, const CollisionVec3& fallback)
 {
-    if (v.x == 0.0f && v.y == 0.0f && v.z == 0.0f)
-        return fallback;
-    float lenSq = TireDot(&v, &v);
-    if (lenSq == 0.0f)
-        return kVec3Zero;
-    float inv = FastInvSqrt(lenSq);
-    CollisionVec3 r;
-    r.x = v.x * inv;
-    r.y = v.y * inv;
-    r.z = v.z * inv;
-    return r;
+    if (v.x == 0.0f && v.y == 0.0f && v.z == 0.0f) {
+        v = fallback;
+    } else {
+        float lenSq = TireDot(&v, &v);
+        if (lenSq == 0.0f) {
+            v = kVec3Zero;
+        } else {
+            float inv = FastInvSqrt(lenSq);
+            v.x *= inv;
+            v.y *= inv;
+            v.z *= inv;
+        }
+    }
+    return v;
+}
+
+// Componentwise equality, compared in y, x, z order like retail.
+static inline int TireSameVec(const CollisionVec3& a, const CollisionVec3& b)
+{
+    return a.y == b.y && a.x == b.x && a.z == b.z;
+}
+
+// TireSameVec against the tire's surface normal; going through the tire pointer keeps the
+// member addressed directly off esi instead of through a reference register.
+static inline int TireNormalSame(Tire* tire, const CollisionVec3& n)
+{
+    return tire->CollisionPoint::surfaceNormal.y == n.y && tire->CollisionPoint::surfaceNormal.x == n.x && tire->CollisionPoint::surfaceNormal.z == n.z;
 }
 
 void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity, float angle,
@@ -646,14 +662,13 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     CollisionVec3 n3;
     world->QueryGround(&pt, &n3, 0, &kind);
     float delta = pt.y - r.y;
-    float score = delta * n3.y;
-    if (score > this->CollisionPoint::penetration) {
+    if (delta * n3.y > this->CollisionPoint::penetration) {
+        lateral = lateral2;
         this->CollisionPoint::worldPosition = r;
-        this->CollisionPoint::penetration = score;
+        this->CollisionPoint::penetration = delta * n3.y;
         this->CollisionPoint::surfacePosition = pt;
         *TireSurfaceByte(this) = kind & 7;
-        lateral = lateral2;
-        if (n2.y != n3.y || n2.x != n3.x || n2.z != n3.z) {
+        if (!TireSameVec(n2, n3)) {
             this->CollisionPoint::surfaceNormal = n3;
             rollDirection = TireNormalizeOr(TireCross(n3, sideAxis), wheelUpAxis);
         } else {
@@ -663,7 +678,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
         }
     } else {
         *TireSurfaceByte(this) = *TireSurfaceByte(this) & 7;
-        if (this->CollisionPoint::surfaceNormal.y != n1.y || this->CollisionPoint::surfaceNormal.x != n1.x || this->CollisionPoint::surfaceNormal.z != n1.z) {
+        if (!TireNormalSame(this, n1)) {
             this->CollisionPoint::surfaceNormal = n1;
             rollDirection = TireNormalizeOr(TireCross(n1, sideAxis), wheelUpAxis);
         } else {
