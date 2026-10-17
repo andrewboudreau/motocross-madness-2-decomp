@@ -537,6 +537,14 @@ static inline int TireNormalSame(Tire* tire, const CollisionVec3& n)
     return tire->CollisionPoint::surfaceNormal.y == n.y && tire->CollisionPoint::surfaceNormal.x == n.x && tire->CollisionPoint::surfaceNormal.z == n.z;
 }
 
+// Negates v in place (each component times -1, as retail multiplies).
+static inline void TireNegateInPlace(CollisionVec3& v)
+{
+    v.x = v.x * -1.0f;
+    v.y = v.y * -1.0f;
+    v.z = v.z * -1.0f;
+}
+
 void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity, float angle,
                                  float radiusScale, float a5, const CollisionVec3* a6,
                                  const CollisionVec3* a7, TireNode* a8)
@@ -569,14 +577,13 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
 
     rollDirection = TireNormalizeOr(TireCross(this->CollisionPoint::surfaceNormal, sideAxis), wheelUpAxis);
 
-    CollisionVec3 lateral = CollisionCross(rollDirection, sideAxis);
+    CollisionVec3 lateral;
+    lateral = CollisionCross(rollDirection, sideAxis);
     if (TireDotInline(lateral, this->CollisionPoint::surfaceNormal) > 0.0f) {
         lateral.x = lateral.x * -1.0f;
         lateral.y = lateral.y * -1.0f;
         lateral.z = lateral.z * -1.0f;
-        sideAxis.x = sideAxis.x * -1.0f;
-        sideAxis.y = sideAxis.y * -1.0f;
-        sideAxis.z = sideAxis.z * -1.0f;
+        TireNegateInPlace(sideAxis);
     }
 
     // First probe: the wheel centre pushed out along the lateral axis by field_0x274.

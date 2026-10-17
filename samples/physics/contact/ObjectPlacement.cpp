@@ -35,13 +35,23 @@ Vec3 g_PlacementAxisX(1.0f, 0.0f, 0.0f);  // 0x00688758
 Vec3 g_PlacementAxisY(0.0f, 1.0f, 0.0f);  // 0x00688768
 Vec3 g_PlacementAxisZ(0.0f, 0.0f, 1.0f);  // 0x00688738
 
-static void PlacementNormalizeInPlace(Vec3* v)
+static inline void PlacementNormalizeInPlace(Vec3* v)
 {
-    float lenSq = DotProduct(*v, *v);
+    float lenSq = v->z * v->z + (v->x * v->x + v->y * v->y);
     if (lenSq == 0.0f)
         *v = g_PlacementZero;
     else
         *v *= FastInvSqrt(lenSq);
+}
+
+// v scaled by 1/sqrt(lenSq) through 0x005015b0, or v itself when lenSq is exactly 1.
+static inline Vec3 PlacementRescale(const Vec3& v, float lenSq)
+{
+    if (lenSq == 1.0f)
+        return v;
+    float inv = FastInvSqrt(lenSq);
+    Vec3 t;
+    return *Vec3ScaleCall(&t, &v, inv);
 }
 
 int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int f, int g, int h,
@@ -63,10 +73,9 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
 
     for (;;) {
         Vec3 plusAOff = g_PlacementAxisZ * radius;
-        float negRadius = -radius;
-        Vec3 minusAOff = g_PlacementAxisZ * negRadius;
+        Vec3 minusAOff = g_PlacementAxisZ * -radius;
         Vec3 plusCOff = g_PlacementAxisX * radius;
-        Vec3 minusCOff = g_PlacementAxisX * negRadius;
+        Vec3 minusCOff = g_PlacementAxisX * -radius;
 
         if (firstPass) {
             centerPt = *c;
@@ -93,20 +102,16 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
 
                 // orthonormal basis from the axes
                 Vec3 forward = g_PlacementAxisZ;
-                Vec3 upRef = g_PlacementAxisY;
-                Vec3 side = CrossProduct(upRef, forward);
-                Vec3 t = CrossProductCall(forward, side);
-                float tLenSq = Vec3DotCall(&t, &t);
-                Vec3 up;
-                if (tLenSq == 1.0f)
-                    up = upRef;
-                else
-                    up = *Vec3ScaleCall(&t, &upRef, FastInvSqrt(tLenSq));
+                Vec3 up = g_PlacementAxisY;
+                Vec3 side = CrossProduct(g_PlacementAxisY, g_PlacementAxisZ);
+                side = CrossProductCall(forward, side);
+                float lenSq = Vec3DotCall(&side, &side);
+                up = PlacementRescale(up, lenSq);
                 forward = Vec3Normalize(forward);
-                Vec3 right = CrossProductCall(up, forward);
+                side = CrossProductCall(up, forward);
 
                 Matrix4 xf;
-                xf._11 = right.x;   xf._12 = right.y;   xf._13 = right.z;   xf._14 = 0.0f;
+                xf._11 = side.x;    xf._12 = side.y;    xf._13 = side.z;   xf._14 = 0.0f;
                 xf._21 = up.x;      xf._22 = up.y;      xf._23 = up.z;      xf._24 = 0.0f;
                 xf._31 = forward.x; xf._32 = forward.y; xf._33 = forward.z; xf._34 = 0.0f;
                 xf._41 = c->x;      xf._42 = c->y;      xf._43 = c->z;      xf._44 = 1.0f;
@@ -126,7 +131,9 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
                         *p = *(Vec3*)(rec + 2);
                     *q = 1;
                     obj->BaseObjectVirtualSlot2();
-                    return 0;   // TODO: retail leaves the slot-2 call's eax in place
+                    // Retail returns no value here: it jumps to the epilogue with the slot-2
+                    // call's eax, as do the k-without-o and no-l paths below.
+                    goto done;
                 }
                 obj->BaseObjectVirtualSlot2();
             }
@@ -234,31 +241,28 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
     *n = *bestPt;
 
     if (k) {
-        if (!o)
-            return 0;
-        if (m && nextPt) {
-            // horizontal direction between the two worst points, flipped to face k
-            Vec3 w;
-            w.x = nextPt->x - bestPt->x;
-            w.y = nextPt->y - bestPt->y;
-            w.z = nextPt->z - bestPt->z;
-            w.y = 0.0f;
-            if (w.x * k->x + w.z * k->z < 0.0f) {
-                o->x = -w.x;
-                o->y = 0.0f;
-                o->z = -w.z;
-            } else {
-                *o = w;
+        if (o) {
+            if (m && nextPt) {
+                // horizontal direction between the two worst points, flipped to face k
+                Vec3 w = *nextPt - *bestPt;
+                w.y = 0.0f;
+                if (w.x * k->x + w.z * k->z < 0.0f) {
+                    *o = Vec3(-w.x, 0.0f, -w.z);
+                } else {
+                    *o = w;
+                }
+                PlacementNormalizeInPlace(o);
+            } else if (e == 0) {
+                *o = *k;
             }
-            PlacementNormalizeInPlace(o);
-        } else if (e == 0) {
-            *o = *k;
+            return Fn_4b0b80(a, b, c, d, e, f, g, l, n, o);
         }
-    } else {
-        if (!l)
-            return 0;
+    } else if (l) {
         *o = *l - *bestPt;
         PlacementNormalizeInPlace(o);
+        return Fn_4b0b80(a, b, c, d, e, f, g, l, n, o);
     }
-    return Fn_4b0b80(a, b, c, d, e, f, g, l, n, o);
+    // No return statement on these paths (retail leaves eax unset; VC6 warns C4715).
+done:
+    ;
 }

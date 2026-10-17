@@ -146,6 +146,24 @@ static inline ShadowVec3 ShadowDifference(const ShadowVec3& a, const ShadowVec3&
 static inline ShadowVec3 ShadowSum(const ShadowVec3& a, const ShadowVec3& b) { return ShadowConstVec3(a.x + b.x, a.y + b.y, a.z + b.z); }
 static inline float AbsF(float v) { return v < 0.0f ? -v : v; }
 
+static inline ShadowVec3 ShadowTransformExtents(ShadowVec3 h, const ShadowMatrix& m)
+{
+    float a00 = h.x * m.m[0][0];
+    float a01 = h.x * m.m[0][1];
+    float a02 = h.x * m.m[0][2];
+    float a10 = h.y * m.m[1][0];
+    float a11 = h.y * m.m[1][1];
+    float a12 = h.y * m.m[1][2];
+    float a20 = h.z * m.m[2][0];
+    float a21 = h.z * m.m[2][1];
+    float a22 = h.z * m.m[2][2];
+    ShadowVec3 r;
+    r.x = AbsF(a00) + AbsF(a10) + AbsF(a20);
+    r.y = AbsF(a01) + AbsF(a11) + AbsF(a21);
+    r.z = AbsF(a02) + AbsF(a12) + AbsF(a22);
+    return r;
+}
+
 // 0x004db0d0 (2020 B): recomputes the light-space bounds of all casters and derives the shadow
 // camera set-up.  Each caster's local bounds (centre c, half extents h) are carried through the
 // caster's world matrix at +0xf8 (extents by the sum of absolute row contributions, centre as a
@@ -156,7 +174,8 @@ static inline float AbsF(float v) { return v < 0.0f ? -v : v; }
 // local scale/translate matrix, goes to lightMatrix (+0xd8).  PARTIAL: the FPU scheduling of the
 // inlined vector helpers differs from retail.  The lengths go through a Vec3Normalize-shaped
 // magnitude helper and the normalisation through ShadowNormalize; the centre is transformed by
-// a by-value helper whose argument copy (the result is written back to c) matches retail's.
+// a by-value helper whose argument copy (the result is written back to c) matches retail's,
+// and the extents likewise go through ShadowTransformExtents with the result written back.
 // Left: frame size and slot assignment (retail's locals sit 0x14..0x3c higher), and the
 // fov/look-at block of mode 1.
 void ProjectedShadow::ComputeBounds()
@@ -169,20 +188,8 @@ void ProjectedShadow::ComputeBounds()
     for (int i = 0; i < casterCount; i++) {
         ShadowVec3 c, ext;
         casters[i]->GetBounds(&c, &ext);
-        const ShadowMatrix& M = casters[i]->world;
-        float a00 = ext.x * M.m[0][0];
-        float a01 = ext.x * M.m[0][1];
-        float a02 = ext.x * M.m[0][2];
-        float a10 = ext.y * M.m[1][0];
-        float a11 = ext.y * M.m[1][1];
-        float a12 = ext.y * M.m[1][2];
-        float a20 = ext.z * M.m[2][0];
-        float a21 = ext.z * M.m[2][1];
-        float a22 = ext.z * M.m[2][2];
-        ext.x = AbsF(a00) + AbsF(a10) + AbsF(a20);
-        ext.y = AbsF(a01) + AbsF(a11) + AbsF(a21);
-        ext.z = AbsF(a02) + AbsF(a12) + AbsF(a22);
-        c = ShadowTransformCoord(c, M);
+        ext = ShadowTransformExtents(ext, casters[i]->world);
+        c = ShadowTransformCoord(c, casters[i]->world);
         ShadowVec3 lo = ShadowDifference(c, ext);
         ShadowVec3 hi = ShadowSum(c, ext);
         if (lo.x < mn.x) mn.x = lo.x;
@@ -238,9 +245,54 @@ void ProjectedShadow::ComputeBounds()
 // vertexBuffer (ortho for mode 3, projective otherwise), culls back-facing triangles by the
 // signed screen area, requires all three projected points to lie inside (1, size-1), grows
 // clipRect and minDepth, and rasterises the triangle with the height word shadowPixel.
-// PARTIAL: retail's 16-bit clear is an unrolled dword fill through a 15-entry jump table and
-// the vertex helpers are inlined differently.  Verified exclusion: retail 0x004dbb5c and
+// PARTIAL: the 16-bit clear goes through FillShortsUnrolled (retail's 15-entry jump table) and
+// the size matches; the vertex helpers are inlined differently.  Verified exclusion: retail 0x004dbb5c and
 // 0x004dbb8b are bare `fistp dword ptr [eax]` in an ebp frame (inline-asm rounding).
+// Fills count shorts at p with value: one short to reach dword alignment, then dword pairs
+// (pair = value in both halves) unrolled 16 per pass with a Duff's device, then the last
+// odd short.
+static inline void FillShortsUnrolled(short* p, int count, short value, unsigned int pair)
+{
+    if (count > 0) {
+        short* q = p;
+        if ((int)p & 2) {
+            *p = value;
+            q = p + 1;
+            count--;
+        }
+        int pairs = count >> 1;
+        if (pairs > 0) {
+            unsigned int* d = (unsigned int*)q;
+            int k = pairs - 1;
+            unsigned int passes = (unsigned int)(pairs + 15) >> 4;
+            do {
+                switch (k) {
+                default: d[15] = pair;
+                case 14: d[14] = pair;
+                case 13: d[13] = pair;
+                case 12: d[12] = pair;
+                case 11: d[11] = pair;
+                case 10: d[10] = pair;
+                case 9: d[9] = pair;
+                case 8: d[8] = pair;
+                case 7: d[7] = pair;
+                case 6: d[6] = pair;
+                case 5: d[5] = pair;
+                case 4: d[4] = pair;
+                case 3: d[3] = pair;
+                case 2: d[2] = pair;
+                case 1: d[1] = pair;
+                case 0: d[0] = pair;
+                }
+                k -= 16;
+                d += 16;
+            } while (--passes);
+        }
+        if (count & 1)
+            q[count - 1] = value;
+    }
+}
+
 void ProjectedShadow::RenderShadow()
 {
     int vertexBase = 0;
@@ -251,9 +303,7 @@ void ProjectedShadow::RenderShadow()
     if (clipRect.right >= clipRect.left) {
         short* row = heightMap + clipRect.top * texture->size + clipRect.left;
         for (int y = clipRect.top; y <= clipRect.bottom; y++) {
-            int n = clipRect.right - clipRect.left + 1;
-            for (int i = 0; i < n; i++)
-                row[i] = (short)colorKeyLow;
+            FillShortsUnrolled(row, clipRect.right - clipRect.left + 1, colorKeyLow, colorKeyPair);
             row += texture->size;
         }
     }
@@ -330,51 +380,6 @@ void ProjectedShadow::RenderShadow()
 // Near miss: block structure, the fill expansions and the counted inner loops match; left:
 // register assignment of the clip fields and of the format-9 constants (retail computes the
 // nibble masks with byte operations on the low byte of shadowPixel).
-// Fills count shorts at p with value: one short to reach dword alignment, then dword pairs
-// (pair = value in both halves) unrolled 16 per pass with a Duff's device, then the last
-// odd short.
-static inline void FillShortsUnrolled(short* p, int count, short value, unsigned int pair)
-{
-    if (count > 0) {
-        short* q = p;
-        if ((int)p & 2) {
-            *p = value;
-            q = p + 1;
-            count--;
-        }
-        int pairs = count >> 1;
-        if (pairs > 0) {
-            unsigned int* d = (unsigned int*)q;
-            int k = pairs - 1;
-            unsigned int passes = (unsigned int)(pairs + 15) >> 4;
-            do {
-                switch (k) {
-                default: d[15] = pair;
-                case 14: d[14] = pair;
-                case 13: d[13] = pair;
-                case 12: d[12] = pair;
-                case 11: d[11] = pair;
-                case 10: d[10] = pair;
-                case 9: d[9] = pair;
-                case 8: d[8] = pair;
-                case 7: d[7] = pair;
-                case 6: d[6] = pair;
-                case 5: d[5] = pair;
-                case 4: d[4] = pair;
-                case 3: d[3] = pair;
-                case 2: d[2] = pair;
-                case 1: d[1] = pair;
-                case 0: d[0] = pair;
-                }
-                k -= 16;
-                d += 16;
-            } while (--passes);
-        }
-        if (count & 1)
-            q[count - 1] = value;
-    }
-}
-
 void ProjectedShadow::Present()
 {
     if (surfaceFormat == 0x613)

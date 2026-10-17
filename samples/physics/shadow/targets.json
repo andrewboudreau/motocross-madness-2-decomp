@@ -96,7 +96,7 @@
     "target_va": "0x004db0d0",
     "target_size": 2020,
     "expect": "partial",
-    "notes": "Near miss: lengths through a Vec3Normalize-shaped magnitude helper, the mode-1 normalisation through ShadowNormalize and the centre through a by-value transform helper as retail; frame size/slot assignment and the mode-1 fov block differ.",
+    "notes": "Near miss: lengths through a Vec3Normalize-shaped magnitude helper, the mode-1 normalisation through ShadowNormalize and the centre and extents through by-value transform helpers (results written back) as retail; frame size/slot assignment and the mode-1 fov block differ.",
     "bindings": "../../../src/krusty2/shadow/ProjectedShadow.bindings.json"
   },
   {
@@ -106,7 +106,7 @@
     "target_va": "0x004db8c0",
     "target_size": 1136,
     "expect": "partial",
-    "notes": "Verified exclusion (inline asm): retail rounds with bare fistp dword ptr [eax] at 0x4dbb5c/0x4dbb8b in an ebp frame; kept as a partial with the C++ (int) casts.",
+    "notes": "Verified exclusion (inline asm): retail rounds with bare fistp dword ptr [eax] at 0x4dbb5c/0x4dbb8b in an ebp frame; kept as a partial with the C++ (int) casts. The 16-bit clear goes through the shared Duff's-device fill (retail's 15-entry jump table), giving the full 1136 B.",
     "bindings": "../../../src/krusty2/shadow/ProjectedShadow.bindings.json"
   },
   {
