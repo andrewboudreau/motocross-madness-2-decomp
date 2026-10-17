@@ -440,8 +440,8 @@ public:
     virtual void UnknownVirtualSlot17();
     virtual void UnknownVirtualSlot18();
     virtual void UnknownVirtualSlot19();
-    virtual int UnknownVirtualSlot20(const char* name, int defaultValue); // registry integer (Game slot 20)
-    virtual void UnknownVirtualSlot21();
+    virtual int GetRegistryInt(const char* name, int defaultValue);       // Game.h slot 20
+    virtual float GetRegistryFloat(const char* name, float defaultValue); // Game.h slot 21
     virtual int GetRegistryFlag(const char* name, int defaultValue); // registry value (Game slot 22)
 
     unsigned char field_0x004[0x10 - 4];
