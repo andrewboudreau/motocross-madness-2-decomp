@@ -136,13 +136,13 @@ extern UnknownWreckerQuadTree* g_collisionQuadTree;
 // copies a Vector3 struct (a Matrix4 element-wise copy would use the FPU).
 struct UnknownWreckerFrame {
     Vector3 right;
-    float field_0x0c;
+    float rightW;                             // +0xC  fourth column of the right row (the 4x4's _14)
     Vector3 up;
-    float field_0x1c;
+    float upW;                                // +0x1C  _24
     Vector3 forward;
-    float field_0x2c;
+    float forwardW;                           // +0x2C  _34
     Vector3 position;
-    float field_0x3c;
+    float positionW;                          // +0x3C  _44
 };
 
 // A 4x4 transform with D3DMATRIX element names (row-vector convention,
@@ -275,7 +275,7 @@ public:
     explicit UnknownWreckerGravityModel(int flags);                // 0x004f9760
     virtual void UnknownVirtualSlot27(UnknownWreckerRigidBody* body);
     unsigned char field_0x02c[0x38 - 0x2c];
-    int field_0x38;
+    int manualStep;                           // +0x38  SelectiveGravityModel slot 10 0x004f9860 calls slot 11 itself only while this is 0; Wrecker sets it like the collision model's manualStep
 };
 
 // One particle of the manager below (the layout src/krusty2/effects/
@@ -304,7 +304,7 @@ public:
                               float lifetime, float growth, unsigned int flags, int color);
 
     int activeCount;           // +0x2c live particle count (the next free index)
-    int field_0x30;
+    int visibleCount;                         // +0x30  ParticleManager +0x30 (src/krusty2/effects/ParticleManager.h); not read here
     unsigned char field_0x34[0x40 - 0x34];
     UnknownWreckerParticle* particles[1000]; // +0x40
     unsigned char field_0xfe0[0x1f98 - 0xfe0];

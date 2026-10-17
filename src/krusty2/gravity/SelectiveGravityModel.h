@@ -44,7 +44,7 @@ public:
     float gravity;          // +0x2c ctor 32.2f; slot 11 pushes mass * gravity along -Y
     GravityBody** bodies;   // +0x30 array grown by slot 27 (debug realloc, line 0x18); freed by the dtor (line 0x12)
     int bodyCount;          // +0x34 slot 27 appends here
-    int field_0x38;         // +0x38 ctor 0; slot 10 runs slot 11 itself while it is 0
+    int manualStep;         // +0x38 ctor 0; slot 10 runs slot 11 itself while it is 0 (Wrecker sets it and steps the model itself)
 };
 
 #endif

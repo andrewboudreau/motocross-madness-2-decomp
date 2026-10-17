@@ -106,7 +106,7 @@ void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
     poseNode = character->skeleton->firstChild;
     collisionModel->manualStep = 1;
     rigidBody->stepDisabled = 1;
-    gravityModel->field_0x38 = 1;
+    gravityModel->manualStep = 1;
     boxCenter = Vector3(0.0f, 0.0f, 0.0f);
     boxHalfExtents = Vector3(0.0f, 0.0f, 0.0f);
     boxFrame = 0;
