@@ -63,7 +63,7 @@ void KrustyVCR::SaveRecording(float duration, char* description, int flag)
 // 0x0049c070
 void KrustyVCR::SetRacer(int id, char ai, int slot, char* name, char* model,
                                       char* rider, char* bikeName, char* riderName,
-                                      int engineSize, int engineKind, int value)
+                                      int engineSize, int fourStroke, int value)
 {
     racers[slot].networkId = id;
     racers[slot].aiIndex = ai;
@@ -73,14 +73,14 @@ void KrustyVCR::SetRacer(int id, char ai, int slot, char* name, char* model,
     COPY_TRUNCATED(racers[slot].bikeName, bikeName)
     COPY_TRUNCATED(racers[slot].riderName, riderName)
     racers[slot].engineSize = engineSize;
-    racers[slot].engineKind = engineKind;
+    racers[slot].fourStroke = fourStroke;
     racers[slot].plateNumber = value;
 }
 
 // 0x0049c1e0
 void KrustyVCR::GetRacer(int* id, char* ai, int index, char* name, char* model,
                                       char* rider, char* bikeName, char* riderName,
-                                      int* engineSize, int* engineKind, int* value)
+                                      int* engineSize, int* fourStroke, int* value)
 {
     *id = racers[index].networkId;
     *ai = racers[index].aiIndex;
@@ -90,6 +90,6 @@ void KrustyVCR::GetRacer(int* id, char* ai, int index, char* name, char* model,
     strcpy(bikeName, racers[index].bikeName);
     strcpy(riderName, racers[index].riderName);
     *engineSize = racers[index].engineSize;
-    *engineKind = racers[index].engineKind;
+    *fourStroke = racers[index].fourStroke;
     *value = racers[index].plateNumber;
 }

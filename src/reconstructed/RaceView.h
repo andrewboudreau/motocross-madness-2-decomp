@@ -136,7 +136,7 @@ struct UnknownEventRacer : virtual public GameObject {
     char aiKind;  // +0x734  KrustyBike +0x734 aiKind; RaceStatus estimates finish times only for racers with it set
     unsigned char isRemote;  // +0x735  KrustyBike isRemote; passed as CountLap/AdvanceGate skipTest; selects ClosestPointOnTrack over PlaceNear
     unsigned char isGhost;  // +0x736  KrustyBike +0x736 isGhost (loader kind 0xff)
-    char engineKind;                          // +0x737 selects engine 2 over 1 (racesnd.cpp 0x004e3430)
+    char fourStroke;                          // +0x737 selects engine 2 over 1 (racesnd.cpp 0x004e3430)
     int engineSize;                           // +0x738 engine size; below 250 uses engine 0
     unsigned char field_0x73c[0x740 - 0x73c];
     UnknownKrustyBikeView* bikeView;          // +0x740 the view (RaceStatus.cpp compares its +0x38 and +0x50)
