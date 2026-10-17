@@ -1791,10 +1791,10 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
             GhostBike()->receivedStates[0]->fresh = 1;
             GhostBike()->position = record->position;
             GhostBike()->field_0x5e0 = record->field_0x04;
-            GhostBike()->field_0x5ec = record->field_0x1c;
-            GhostBike()->field_0x5f8 = record->field_0x10;
-            GhostBike()->field_0x5fc = record->field_0x14;
-            GhostBike()->field_0x600 = record->field_0x18;
+            GhostBike()->angularVelocity = record->angularVelocity;
+            GhostBike()->roll = record->roll;
+            GhostBike()->pitch = record->pitch;
+            GhostBike()->yaw = record->yaw;
             GhostBike()->runningTime = replayMode == 11 ? time : record->runningTime;
             *keep = 1;
             if (replayMode == 11) {

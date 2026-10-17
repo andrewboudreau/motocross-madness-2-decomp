@@ -750,12 +750,12 @@ struct UnknownBikeRaceVcrTick {
 struct UnknownBikeRaceGhostRecord {
     short field_0x00;
     unsigned short timeStep;                  // +0x02 time step (0x004a9aa0)
-    Vector3 field_0x04;                       // ghost +0x5e0
-    float field_0x10;                         // ghost +0x5f8
-    float field_0x14;                         // ghost +0x5fc
-    float field_0x18;                         // ghost +0x600
-    Vector3 field_0x1c;                       // ghost +0x5ec
-    Vector3 position;                         // +0x28 ghost +0x5d4
+    Vector3 field_0x04;                       // ghost +0x5e0; delta1, KrustyBike's deltaBasePosition slot (unconfirmed)
+    float roll;                               // +0x10  ghost +0x5f8; delta3[0] x pi/64, as KrustyBike's deltaBaseRoll (0x004933e0). Tier 3
+    float pitch;                              // +0x14  ghost +0x5fc; delta3[1], as KrustyBike's deltaBasePitch. Tier 3
+    float yaw;                                // +0x18  ghost +0x600; delta3[2], as KrustyBike's deltaBaseYaw. Tier 3
+    Vector3 angularVelocity;                  // +0x1C  ghost +0x5ec; delta2 x pi/64, as KrustyBike's deltaBaseAngularVelocity. Tier 3
+    Vector3 position;                         // +0x28 ghost +0x5d4; delta0 feeds it, which KrustyBike 0x004933e0 adds to deltaBaseVelocity, so the name is unconfirmed
     int runningTime;                          // +0x34 ghost +0x604
     int field_0x38;
 };
@@ -801,10 +801,10 @@ public:
     unsigned char field_0x50c[0x5d4 - 0x50c];
     Vector3 position;                         // +0x5d4 position
     Vector3 field_0x5e0;
-    Vector3 field_0x5ec;
-    float field_0x5f8;
-    float field_0x5fc;
-    float field_0x600;
+    Vector3 angularVelocity;                  // +0x5EC  record +0x1c (see UnknownBikeRaceGhostRecord). Tier 3
+    float roll;                               // +0x5F8  record +0x10. Tier 3
+    float pitch;                              // +0x5FC  record +0x14. Tier 3
+    float yaw;                                // +0x600  record +0x18. Tier 3
     int runningTime;                          // +0x604 running time
 };
 
