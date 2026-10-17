@@ -113,7 +113,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
     Vector3 result = position;
     result.y = position.y + offset;
     if (vehicle->riderCount > 0) {
-        if (vehicle->UnknownInlineRider()->field_0x150 > -0.5f) {
+        if (vehicle->UnknownInlineRider()->penetration > -0.5f) {
             float reach = (float)(FollowCameraAbs(followPitch) * 0.63661975f) * 1.2f + 0.3f;
             Vector3 ahead = Add(direction * reach, targetPoint);
             Vector3 ground = ahead;

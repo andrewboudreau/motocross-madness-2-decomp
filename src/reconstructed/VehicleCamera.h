@@ -25,7 +25,7 @@ public:
 // An entry of the vehicle's +0x53c list (VehicleCamera slot 35).
 struct UnknownCameraRider {
     unsigned char field_0x000[0x150];
-    float field_0x150;                   // slot 35 lifts the camera above -0.5
+    float penetration;                        // +0x150  VehicleWheel penetration (CollisionPoint+0x98, reset to -999); slot 35 lifts the camera while it is above -0.5
     unsigned char field_0x154[0x2a8 - 0x154];
     int aux;  // +0x2A8  element of Vehicle+0x53c wheelList = VehicleWheel, whose +0x2a8 is aux (counted by auxWheelCount)
 };
