@@ -10,8 +10,8 @@ struct UnknownDisplayMode {
     int bitDepth;
     int refreshRate;          // the field PCGame slot 34's duplicate test ignores
     int field_0x10;
-    int field_0x14;           // usable; PCGame slot 34 and 0x004c0760 clear it
-    int field_0x18;           // usable; PCGame slot 34 clears it
+    int hardwareUsable;       // +0x14 listed for the Direct3D renderer (OptGraphicsDlg, ChooseDisplayMode); FilterDisplayModes and 0x004c0760 clear it
+    int bladeUsable;          // +0x18 listed when bladeRenderer is set; FilterDisplayModes clears it when two surfaces exceed video memory
     int textureMemory;        // +0x1c PCGame slot 31 copies it to Display textureMemory (+0x58)
     int nonLocalTextureMemory; // +0x20 and this to nonLocalTextureMemory (+0x5c)
 };

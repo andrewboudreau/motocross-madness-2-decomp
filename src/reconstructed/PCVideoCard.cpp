@@ -79,8 +79,8 @@ static long __stdcall EnumDisplayModeCallback(UnknownSurfaceDesc* desc, void* co
         display->displayModes[display->displayModeCount].height = desc->height;
         display->displayModes[display->displayModeCount].bitDepth = desc->pixelFormat.bitCount;
         display->displayModes[display->displayModeCount].refreshRate = desc->refreshRate;
-        display->displayModes[display->displayModeCount].field_0x14 = 1;
-        display->displayModes[display->displayModeCount].field_0x18 = 1;
+        display->displayModes[display->displayModeCount].hardwareUsable = 1;
+        display->displayModes[display->displayModeCount].bladeUsable = 1;
         display->displayModes[display->displayModeCount].textureMemory = 0;
         display->displayModes[display->displayModeCount].nonLocalTextureMemory = 0;
         display->displayModes[display->displayModeCount].field_0x10 = 2;

@@ -330,13 +330,13 @@ void TrackGameMode::ChooseDisplayMode(const void* guid, int* mode) {
         return;
     if (game->displayProfilesStale || !guid ||
         memcmp(guid, &game->display->driverGuid, sizeof(UnknownGuid)) ||
-        !game->display->displayModes[*mode].field_0x14) {
+        !game->display->displayModes[*mode].hardwareUsable) {
         *mode = 0;
         if (g_TrackGame->bladeRenderer) {
             for (i = 0; i < g_TrackGame->display->displayModeCount; i++) {
                 UnknownDisplayMode* entry = &g_TrackGame->display->displayModes[i];
                 if (entry->width == 640 && entry->height == 480 && entry->bitDepth == 16 &&
-                    entry->field_0x18) {
+                    entry->bladeUsable) {
                     *mode = i;
                     break;
                 }
@@ -344,7 +344,7 @@ void TrackGameMode::ChooseDisplayMode(const void* guid, int* mode) {
             if (!*mode) {
                 for (i = 0; i < g_TrackGame->display->displayModeCount; i++) {
                     if (!*mode ||
-                        (g_TrackGame->display->displayModes[i].field_0x18 &&
+                        (g_TrackGame->display->displayModes[i].bladeUsable &&
                          g_TrackGame->display->displayModes[i].bitDepth == 16 &&
                          g_TrackGame->display->displayModes[i].height >
                              g_TrackGame->display->displayModes[*mode].height))
@@ -355,7 +355,7 @@ void TrackGameMode::ChooseDisplayMode(const void* guid, int* mode) {
             for (i = 0; i < g_TrackGame->display->displayModeCount; i++) {
                 UnknownDisplayMode* entry = &g_TrackGame->display->displayModes[i];
                 if (entry->width == 640 && entry->height == 480 && entry->bitDepth == 16 &&
-                    entry->field_0x14) {
+                    entry->hardwareUsable) {
                     *mode = i;
                     break;
                 }
@@ -363,7 +363,7 @@ void TrackGameMode::ChooseDisplayMode(const void* guid, int* mode) {
             if (!*mode) {
                 for (i = 0; i < g_TrackGame->display->displayModeCount; i++) {
                     if (!*mode ||
-                        (g_TrackGame->display->displayModes[i].field_0x14 &&
+                        (g_TrackGame->display->displayModes[i].hardwareUsable &&
                          g_TrackGame->display->displayModes[i].bitDepth == 16 &&
                          g_TrackGame->display->displayModes[i].height >
                              g_TrackGame->display->displayModes[*mode].height))

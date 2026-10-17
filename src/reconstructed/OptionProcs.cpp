@@ -136,7 +136,7 @@ void OptGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
             if (g_TrackGame->bladeRenderer) {
                 for (; i < g_TrackGame->display->displayModeCount; i++) {
                     UnknownDisplayMode* mode = &g_TrackGame->display->displayModes[i];
-                    if (mode->field_0x18 == 1) {
+                    if (mode->bladeUsable == 1) {
                         sprintf(text, "%d X %d", mode->width, mode->height);
                         list->AddRow(text, i, 0);
                     }
@@ -144,7 +144,7 @@ void OptGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
             } else {
                 for (; i < g_TrackGame->display->displayModeCount; i++) {
                     UnknownDisplayMode* mode = &g_TrackGame->display->displayModes[i];
-                    int usable = g_TrackGame->display->displayModes[i].field_0x14;
+                    int usable = g_TrackGame->display->displayModes[i].hardwareUsable;
                     if (usable == 1) {
                         sprintf(text, "%d X %d", mode->width, mode->height);
                         list->AddRow(text, i, 0);

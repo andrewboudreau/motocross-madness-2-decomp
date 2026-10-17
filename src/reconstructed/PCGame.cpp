@@ -357,8 +357,8 @@ int PCGame::FilterDisplayModes(UnknownDisplay* display) {
                     display->displayModes[i].height == display->displayModes[i - 1].height &&
                     display->displayModes[i].bitDepth == display->displayModes[i - 1].bitDepth &&
                     display->displayModes[i].field_0x10 == display->displayModes[i - 1].field_0x10) {
-                    display->displayModes[i - 1].field_0x14 = 0;
-                    display->displayModes[i - 1].field_0x18 = 0;
+                    display->displayModes[i - 1].hardwareUsable = 0;
+                    display->displayModes[i - 1].bladeUsable = 0;
                 }
             }
         } else {
@@ -367,25 +367,25 @@ int PCGame::FilterDisplayModes(UnknownDisplay* display) {
                     display->displayModes[i].height == display->displayModes[i - 1].height &&
                     display->displayModes[i].bitDepth == display->displayModes[i - 1].bitDepth &&
                     display->displayModes[i].field_0x10 == display->displayModes[i - 1].field_0x10) {
-                    display->displayModes[i].field_0x14 = 0;
-                    display->displayModes[i].field_0x18 = 0;
+                    display->displayModes[i].hardwareUsable = 0;
+                    display->displayModes[i].bladeUsable = 0;
                 }
             }
         }
         for (i = 0; i < display->displayModeCount; i++) {
             if (display->displayModes[i].bitDepth != 16) {
-                display->displayModes[i].field_0x14 = 0;
-                display->displayModes[i].field_0x18 = 0;
+                display->displayModes[i].hardwareUsable = 0;
+                display->displayModes[i].bladeUsable = 0;
             }
-            if (display->displayModes[i].field_0x14 &&
+            if (display->displayModes[i].hardwareUsable &&
                 display->totalVideoMemory - display->displayModes[i].bitDepth / 8 *
                     display->displayModes[i].height * display->displayModes[i].width * 3 < reserve &&
                 display->displayModes[i].width > 640)
-                display->displayModes[i].field_0x14 = 0;
-            if (display->displayModes[i].field_0x18 &&
+                display->displayModes[i].hardwareUsable = 0;
+            if (display->displayModes[i].bladeUsable &&
                 display->totalVideoMemory < display->displayModes[i].bitDepth / 8 *
                     display->displayModes[i].height * display->displayModes[i].width * 2)
-                display->displayModes[i].field_0x18 = 0;
+                display->displayModes[i].bladeUsable = 0;
         }
     }
     return 1;
@@ -452,7 +452,7 @@ int PCGame::LimitDisplayModes(UnknownDisplay* display, int width, int height) {
         for (int i = 0; i < display->displayModeCount; i++) {
             UnknownDisplayMode* mode = &display->displayModes[i];
             if (mode->width > width || mode->height > height)
-                mode->field_0x14 = 0;
+                mode->hardwareUsable = 0;
         }
     }
     return 1;
@@ -620,8 +620,8 @@ int PCGame::LoadDisplayProfile(UnknownDisplay* display) {
     int remaining;
     for (remaining = count; remaining > 0; remaining--) {
         int index = count - remaining;
-        display->displayModes[index].field_0x14 = saved[index].field_0x14;
-        display->displayModes[index].field_0x18 = saved[index].field_0x18;
+        display->displayModes[index].hardwareUsable = saved[index].hardwareUsable;
+        display->displayModes[index].bladeUsable = saved[index].bladeUsable;
         display->displayModes[index].textureMemory = saved[index].textureMemory;
         display->displayModes[index].nonLocalTextureMemory = saved[index].nonLocalTextureMemory;
     }
