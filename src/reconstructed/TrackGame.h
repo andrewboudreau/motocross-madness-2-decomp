@@ -188,10 +188,12 @@ struct UnknownTrackGameModeOptionsA68 {       // TrackGameMode+0xa68, 0x30 bytes
 struct UnknownTrackGameModeOptionsFd8 {
     int engineSize;                           // +0x00
     int fourStroke;                           // +0x04
-    int field_0x08;
+    int weight;                               // +0x08 KrustyUI "Weight" (OptionProcs.h)
     float suspension[6];                      // +0x0c
     int eqBands[11];                          // +0x24 from KrustyUI's +0xec table
-    unsigned char field_0x50[0x5c - 0x50];
+    int firstBand;                            // +0x50 KrustyUI "RPMLowerLimit" (OptionProcs.h)
+    int lastBand;                             // +0x54 KrustyUI "RPMUpperLimit"
+    int bandStep;                             // +0x58 a tenth of their range
 };
 
 // Eight of these at +0x14c in each UnknownTrackGameModeSettings. TrackGameMode's
