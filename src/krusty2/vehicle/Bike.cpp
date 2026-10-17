@@ -941,12 +941,12 @@ void Bike::UnknownVirtualSlot65(float arg)
     t = t * arg * 5.0f;
     t = BikeMin(t, 10000.0f);
     if (rear->shockEngaged && rear->tangentSpeed > 30.0f) {
-        rear->secondaryAux->q_0x94 = t;
+        rear->secondaryAux->impulseScale = t;
         return;
     }
     BikeWheel* front = frontWheel;
     if (front->shockEngaged && front->tangentSpeed > 30.0f)
-        front->primaryAux->q_0x94 = t;
+        front->primaryAux->impulseScale = t;
 }
 
 void Bike::UnknownVirtualSlot8()

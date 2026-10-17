@@ -277,7 +277,7 @@ struct BikeA644 {
 // in samples/physics/suspension/Suspension.h.
 struct BikeQ {
     char pad_0x000[148];
-    float q_0x94;
+    float impulseScale;                       // VehicleShock +0x94 impulseScale; slot 65 stores min(min(0.6 * smoothedVerticalAccel, 100) * rate * 5, 10000)
     float q_0x98;             // KrustyBike 0x00413200 stores the rear travel here
     char pad_0x09c[0x24];
     Vec3 q_0xc0;              // InlineShock::axis

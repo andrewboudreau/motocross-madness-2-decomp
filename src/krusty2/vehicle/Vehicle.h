@@ -271,9 +271,9 @@ struct VehicleShock {
     char pad_0x48[0x10];
     Vec3 spring;                     // +0x58 spring force (Suspension.h name); Method_00529450 projects it on the ground normal
     char pad_0x64[0x10];
-    Vec3 displacement;               // +0x74 Suspension.h name; scaled by field_0x94 and projected on the Y axis
+    Vec3 displacement;               // +0x74 Suspension.h name; scaled by impulseScale and projected on the Y axis
     char pad_0x80[0x14];
-    float field_0x94;                // scale of the displacement impulse, consumed (zeroed) by Method_00529450
+    float impulseScale;              // +0x94 one-shot scale of the displacement impulse: Bike slot 65 sets it on a fast pitch-input rise; Method_00529450 adds the Y part of displacement * it (times leanCos) and zeroes it
     void ClearForces();                                         // 0x004f9c70
     // 0x004f9d30 (ret 0x10): Suspension.h's Shock::ApplyDamping; Method_005293E0 passes the
     // wheel's load weight, Vehicle+0x4dc suspensionMass, the last step time and its speed output.
@@ -392,7 +392,7 @@ struct VehicleWheel {
     float driveShareComplement;  // +0x2BC UpdateDriveShare (0x00513f90) stores 1 - driveShare here (0 on the other path)
     void UpdateRoll(float a, float b, int c, int d, int e, float f);   // 0x005143d0
     void UpdateContactPatch(Vec3* origin, Vec3 position, Vec3 velocity, float speed, float* outA, int* outB);   // 0x005135f0 (Tire.h name)
-    void Method_00513C70(float bias, int flag, int crashState, float speed, Vec3* velocity, Vec3* anchor);   // 0x00513c70
+    void UpdateShock(float bias, int flag, int crashState, float speed, Vec3* velocity, Vec3* anchor);   // 0x00513c70 (Tire.h UpdateShock, tier 3 name; sets shockEngaged/shockExtending)
     void UpdateDriveShare(Vehicle* owner);       // 0x00513f90, Tire.h: drive share +0x2b8 from the vehicle speed
     void UpdateAttachment();                    // 0x00515660, called per wheel by Bike slot 41 (0x0040cbd0)
     // 0x00514170 (ret 0x1c): per-wheel drive/brake step called by Method_00527A20 with the

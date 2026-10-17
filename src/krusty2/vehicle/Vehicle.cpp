@@ -1786,7 +1786,7 @@ static inline Vec3 VehProjectFirst(const Vec3& v, const Vec3& onto)
 // 0x00529450: folds each wheel's shock forces into the accumulators.  For a wheel with a
 // shock (primary first, else the rotating one) the spring force projected on the ground
 // normal, scaled by leanCos, becomes scratchVector; a pending displacement impulse
-// (field_0x94 * displacement, projected on the Y axis and scaled the same way) is added to
+// (impulseScale * displacement, projected on the Y axis and scaled the same way) is added to
 // *up and consumed.  Then scratchVector is added to the wheel's applied share and to *up,
 // and its moment about relativePosition (in body space, x only) to *zero.
 void Vehicle::Method_00529450(Vec3* up, Vec3* zero)
@@ -1798,25 +1798,25 @@ void Vehicle::Method_00529450(Vec3* up, Vec3* zero)
         if (wheel->primaryAux) {
             Vec3 p = VehProjectFirst(((VehicleShock*)wheel->primaryAux)->spring, wheel->groundNormal);
             scratchVector = p * leanCos;
-            if (((VehicleShock*)wheel->primaryAux)->field_0x94 != 0.0f) {
-                Vec3 v = ((VehicleShock*)wheel->primaryAux)->field_0x94
+            if (((VehicleShock*)wheel->primaryAux)->impulseScale != 0.0f) {
+                Vec3 v = ((VehicleShock*)wheel->primaryAux)->impulseScale
                          * ((VehicleShock*)wheel->primaryAux)->displacement;
                 Vec3 q = VehProjectTail(v, kVec3YAxis);
                 scratchVector2 = VehScaleCtorCall(q, leanCos);
                 *up += scratchVector2;
-                ((VehicleShock*)wheel->primaryAux)->field_0x94 = 0.0f;
+                ((VehicleShock*)wheel->primaryAux)->impulseScale = 0.0f;
             }
         } else if (wheel->secondaryAux) {
             Vec3 p = VehProjectTail(((VehicleShock*)wheel->secondaryAux)->spring, wheel->groundNormal);
             scratchVector = VehScaleCtorCall(p, leanCos);
-            if (((VehicleShock*)wheel->secondaryAux)->field_0x94 != 0.0f) {
+            if (((VehicleShock*)wheel->secondaryAux)->impulseScale != 0.0f) {
                 Vec3 v = VehScaleCtorCall(((VehicleShock*)wheel->secondaryAux)->displacement,
-                                          ((VehicleShock*)wheel->secondaryAux)->field_0x94);
+                                          ((VehicleShock*)wheel->secondaryAux)->impulseScale);
                 Vec3 q = VehProjectTail(v, kVec3YAxis);
                 Vec3& impulse = scratchVector2;
                 impulse = VehScaleCtorCall(q, leanCos);
                 *up += impulse;   // through the reference: loads impulse.x first (byte-exact)
-                ((VehicleShock*)wheel->secondaryAux)->field_0x94 = 0.0f;
+                ((VehicleShock*)wheel->secondaryAux)->impulseScale = 0.0f;
             }
         }
         wheel->appliedShare += scratchVector;
@@ -1868,7 +1868,7 @@ void Vehicle::UpdateWheelsInContact()
         VehicleWheel* wheel = wheelList[i];
         if (wheel->inContact) {
             wheel->UpdateContactPatch(&centerOfMass, worldAngularVelocity, velocity, linearSpeed, &forwardSpeed, &movingForward);
-            wheel->Method_00513C70(lastStepTime, (unsigned char)pointsTouching, crashState, linearSpeed, &velocity, &savedForward);
+            wheel->UpdateShock(lastStepTime, (unsigned char)pointsTouching, crashState, linearSpeed, &velocity, &savedForward);
             if (wheel->pointInContact)
                 wheelPointInContact = 1;
         } else if (wheel->primaryAux) {

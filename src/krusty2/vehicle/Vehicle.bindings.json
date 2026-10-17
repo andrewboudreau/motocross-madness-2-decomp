@@ -44,7 +44,7 @@
   "?UpdateThrottle@VehicleSpeedState@@QAEXMH_N@Z": "0x004d2f50",
   "?AutoShift@VehicleSpeedState@@QAEXHM@Z": "0x004d3030",
   "?DriveForce@VehicleWheelAux@@QAEXMPAUVec3@@M_NM00@Z": "0x004d31b0",
-  "?Method_00513C70@VehicleWheel@@QAEXMHHMPAUVec3@@0@Z": "0x00513c70",
+  "?UpdateShock@VehicleWheel@@QAEXMHHMPAUVec3@@0@Z": "0x00513c70",
   "?Method_00527A20@Vehicle@@QAEXPAMPAUVec3@@1@Z": "0x00527a20",
   "?Method_005293E0@Vehicle@@QAEXPAM@Z": "0x005293e0",
   "?Method_00529450@Vehicle@@QAEXPAUVec3@@0@Z": "0x00529450",
