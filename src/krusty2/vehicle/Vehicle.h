@@ -152,7 +152,7 @@ struct VehicleSpeedState {
     char pad_0x88[0x15c];           // the object is 0x1e4 bytes (LoadVehicle's allocation)
     ~VehicleSpeedState();                           // 0x00464e90, the shared empty out-of-line destructor (~Vehicle)
     // 0x004d2940 (ret 0x24): the gearbox constructor (src/reconstructed/GearRatios.h names the
-    // parameters); LoadVehicle passes 0.02f, the table/rpm arguments or zeros, and field_0x524[2..3].
+    // parameters); LoadVehicle passes 0.02f, the table/rpm arguments or zeros, and controlResponse[2..3] (PressThrottle/ReleaseThrottle).
     VehicleSpeedState(const char* name, float unused, int* torqueTable, int rpmLow, int rpmHigh,
                       int rpmStep, float a6, float riseRate, float fallRate);
     void UpdateThrottle(float dt, int throttleOn, bool cutDrive);  // 0x004d2f50, GearRatios.h UnknownEngineGearbox::UpdateThrottle (cutDrive: one byte pushed)
@@ -596,9 +596,9 @@ public:
     VehicleAxis* throttleAxis;  // +0x500 slot 63 reads its value into throttleInput (dead zone 0.2)
     Vec3 controlInput;  // +0x504 slot 63 writes x = steer (cubed for axis kinds 2/3), y = -lean axis; slot 64 zeroes it when crashed
     Vec3 prevControlInput;  // +0x510 slot 49 copies controlInput here before slot 64 refreshes it
-    float field_0x51c;
+    float forceFeedbackGain;                  // +0x51C  slot 93 sets 0.5; KrustyBike slot 93 sets FeedbackSlider (TrackGame+0xffc) * 0.04; KrustyBike slot 94 scales the pad force smoothedForwardAccel * it * 180
     int field_0x520;
-    float field_0x524[6];
+    float controlResponse[6];                 // +0x524  KrustyBike slot 96 maps the response sliders (pct * 0.4 + 0.8; [0] steering pct * 0.2 + 0.575): [0] Steering, [1] Pitch, [2] PressThrottle, [3] ReleaseThrottle, [4] PressBrakes, [5] ReleaseBrakes; [2..3] are the gearbox rise/fall rates
     VehicleWheel** wheelList;  // +0x53c array of VehicleWheel*, iterated up to wheelCount in slots 7/54/72/75/85/86
     int wheelCapacity;               // +0x540 wheel capacity (AddWheel)
     int wheelCount;  // +0x544 loop bound over wheelList in every wheel loop
@@ -672,9 +672,9 @@ VEH_CHECK_OFFSET(Vehicle, leanAxis, 0x4FC);
 VEH_CHECK_OFFSET(Vehicle, throttleAxis, 0x500);
 VEH_CHECK_OFFSET(Vehicle, controlInput, 0x504);
 VEH_CHECK_OFFSET(Vehicle, prevControlInput, 0x510);
-VEH_CHECK_OFFSET(Vehicle, field_0x51c, 0x51C);
+VEH_CHECK_OFFSET(Vehicle, forceFeedbackGain, 0x51C);
 VEH_CHECK_OFFSET(Vehicle, field_0x520, 0x520);
-VEH_CHECK_OFFSET(Vehicle, field_0x524, 0x524);
+VEH_CHECK_OFFSET(Vehicle, controlResponse, 0x524);
 VEH_CHECK_OFFSET(Vehicle, wheelList, 0x53C);
 VEH_CHECK_OFFSET(Vehicle, wheelCount, 0x544);
 VEH_CHECK_OFFSET(Vehicle, primaryWheel, 0x548);

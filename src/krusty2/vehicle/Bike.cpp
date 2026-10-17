@@ -215,13 +215,13 @@ float Bike::UnknownVirtualSlot53()
 
 void Bike::UnknownVirtualSlot96()
 {
-    field_0x524[0] = 0.675f;
-    field_0x63c = 1.0f;
-    field_0x524[1] = 1.0f;
-    field_0x524[2] = 1.0f;
-    field_0x524[3] = 1.0f;
-    field_0x524[4] = 1.0f;
-    field_0x524[5] = 1.0f;
+    controlResponse[0] = 0.675f;
+    crossupScale = 1.0f;
+    controlResponse[1] = 1.0f;
+    controlResponse[2] = 1.0f;
+    controlResponse[3] = 1.0f;
+    controlResponse[4] = 1.0f;
+    controlResponse[5] = 1.0f;
 }
 
 static inline float BikeAbsRef(const float& x)
@@ -623,8 +623,8 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
         }
         float grip[2] = { 0.5f, 1.0f };
         float roll[2] = { 0.1f, 1.0f };
-        float a12 = field_0x524[4] * 10.0f;
-        float a13 = field_0x524[5] * 25.0f;
+        float a12 = controlResponse[4] * 10.0f;
+        float a13 = controlResponse[5] * 25.0f;
         VehicleWheel* wheel = new(__FILE__, 0x6b8) VehicleWheel(partName, modelNode, 0.15f, 2.0f, kind5[i],
                                                                 steered[i] ? steerState : 0, 45.0f, 1.0f,
                                                                 roll[i], 255.0f, grip[i], a12, a13, 0.5f, trackObject);
@@ -1544,7 +1544,7 @@ void Bike::UnknownVirtualSlot7(const Vec3* dir)
 void Bike::UnknownVirtualSlot91()
 {
     float dt = stepTime * 0.83f;
-    float f = field_0x524[1] * controlInput.y * dt;
+    float f = controlResponse[1] * controlInput.y * dt;
     Vec3 force;
     if (field_0x430)
         force = Vec3(f * 0.5f, 0.0f, 0.0f);

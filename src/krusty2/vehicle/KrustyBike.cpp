@@ -478,57 +478,57 @@ void KrustyBike::UnknownVirtualSlot86()
     rearWheel->UpdateDriveShare(this);
 }
 
-// Slot 96: tuning constants derived from the game-settings integers (0xfe0..0xff8).
+// Slot 96: control responses derived from the Options sliders (TrackGame 0xfe0..0xff8).
 void KrustyBike::UnknownVirtualSlot96()
 {
     if (aiKind)
-        field_0x524[0] = 0.675f;
+        controlResponse[0] = 0.675f;
     else
         {
-            float pct = g_kbGame->field_0xfe0 * 0.01f;
-            field_0x524[0] = pct * 0.2f + 0.575f;
+            float pct = g_kbGame->steeringSlider * 0.01f;
+            controlResponse[0] = pct * 0.2f + 0.575f;
         }
     if (aiKind)
-        field_0x63c = 1.0f;
+        crossupScale = 1.0f;
     else
         {
-            float pct = g_kbGame->field_0xfe4 * 0.01f;
-            field_0x63c = pct * 0.4f + 0.8f;
+            float pct = g_kbGame->crossupSlider * 0.01f;
+            crossupScale = pct * 0.4f + 0.8f;
         }
     if (aiKind)
-        field_0x524[1] = 1.0f;
+        controlResponse[1] = 1.0f;
     else
         {
-            float pct = g_kbGame->field_0xfe8 * 0.01f;
-            field_0x524[1] = pct * 0.4f + 0.8f;
+            float pct = g_kbGame->pitchSlider * 0.01f;
+            controlResponse[1] = pct * 0.4f + 0.8f;
         }
     if (aiKind)
-        field_0x524[2] = 1.0f;
+        controlResponse[2] = 1.0f;
     else
         {
-            float pct = g_kbGame->field_0xfec * 0.01f;
-            field_0x524[2] = pct * 0.4f + 0.8f;
+            float pct = g_kbGame->pressThrottleSlider * 0.01f;
+            controlResponse[2] = pct * 0.4f + 0.8f;
         }
     if (aiKind)
-        field_0x524[3] = 1.0f;
+        controlResponse[3] = 1.0f;
     else
         {
-            float pct = g_kbGame->field_0xff4 * 0.01f;
-            field_0x524[3] = pct * 0.4f + 0.8f;
+            float pct = g_kbGame->releaseThrottleSlider * 0.01f;
+            controlResponse[3] = pct * 0.4f + 0.8f;
         }
     if (aiKind)
-        field_0x524[4] = 1.0f;
+        controlResponse[4] = 1.0f;
     else
         {
-            float pct = g_kbGame->field_0xff0 * 0.01f;
-            field_0x524[4] = pct * 0.4f + 0.8f;
+            float pct = g_kbGame->pressBrakesSlider * 0.01f;
+            controlResponse[4] = pct * 0.4f + 0.8f;
         }
     if (aiKind)
-        field_0x524[5] = 1.0f;
+        controlResponse[5] = 1.0f;
     else
         {
-            float pct = g_kbGame->field_0xff8 * 0.01f;
-            field_0x524[5] = pct * 0.4f + 0.8f;
+            float pct = g_kbGame->releaseBrakesSlider * 0.01f;
+            controlResponse[5] = pct * 0.4f + 0.8f;
         }
 }
 
@@ -614,19 +614,19 @@ int KrustyBike::UnknownVirtualSlot99(float a, float b, int c, float d)
 }
 
 // Slot 93: when the pad device (input map +0x0c) is in mode 3, reset one effect channel and
-// re-arm another with a time-scaled value, then derive field_0x51c from the same game value.
+// re-arm another with a time-scaled value, then derive forceFeedbackGain from the same FeedbackSlider value.
 void KrustyBike::UnknownVirtualSlot93()
 {
     KbPad* pad = (KbPad*)inputMap->valueSource;
     if (pad && pad->field_0xc == 3) {
         pad->UnknownVirtualSlot6(1, 10000, -1);
         pad = (KbPad*)inputMap->valueSource;
-        pad->UnknownVirtualSlot6(0, (int)(g_kbGame->field_0xffc * 83.333336f), 70000);
-        field_0x51c = g_kbGame->field_0xffc * 0.04f;
+        pad->UnknownVirtualSlot6(0, (int)(g_kbGame->feedbackSlider * 83.333336f), 70000);
+        forceFeedbackGain = g_kbGame->feedbackSlider * 0.04f;
     }
 }
 
-// Slot 94: pad effect update; the force term is field_0x590 * field_0x51c * 180 clamped to
+// Slot 94: pad effect update; the force term is smoothedForwardAccel * forceFeedbackGain * 180 clamped to
 // [-10000, 10000] while not in state 1, then the effect is toggled on slot 80's result.
 void KrustyBike::UnknownVirtualSlot94()
 {
@@ -634,7 +634,7 @@ void KrustyBike::UnknownVirtualSlot94()
     if (pad && pad->field_0xc == 3) {
         if (crashState != 1) {
             KbEffectParams params = { 0x4650, 0 };
-            int force = (int)(smoothedForwardAccel * field_0x51c * 180.0f);
+            int force = (int)(smoothedForwardAccel * forceFeedbackGain * 180.0f);
             if (force <= -10000)
                 force = -10000;
             else if (force >= 10000)

@@ -51,16 +51,16 @@ int Vehicle::UnknownVirtualSlot89(float arg)
     return UnknownVirtualSlot66();
 }
 
-void Vehicle::UnknownVirtualSlot93() { field_0x51c = 0.5f; }
+void Vehicle::UnknownVirtualSlot93() { forceFeedbackGain = 0.5f; }
 
 void Vehicle::UnknownVirtualSlot96()
 {
-    field_0x524[0] = 1.0f;
-    field_0x524[1] = 1.0f;
-    field_0x524[2] = 1.0f;
-    field_0x524[3] = 1.0f;
-    field_0x524[4] = 1.0f;
-    field_0x524[5] = 1.0f;
+    controlResponse[0] = 1.0f;
+    controlResponse[1] = 1.0f;
+    controlResponse[2] = 1.0f;
+    controlResponse[3] = 1.0f;
+    controlResponse[4] = 1.0f;
+    controlResponse[5] = 1.0f;
 }
 
 void Vehicle::UnknownVirtualSlot21()
@@ -2025,11 +2025,11 @@ GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3,
     UnknownVirtualSlot96();
     if (defaultEngine)
         engineState = new(__FILE__, 0x1aa) VehicleSpeedState(engineName, 0.02f, 0, 0, 0, 0, gearArg,
-                                                             field_0x524[2], field_0x524[3]);
+                                                             controlResponse[2], controlResponse[3]);
     else
         engineState = new(__FILE__, 0x1b5) VehicleSpeedState(engineName, 0.02f, torqueTable, rpmLow,
                                                              rpmHigh, rpmStep, gearArg,
-                                                             field_0x524[2], field_0x524[3]);
+                                                             controlResponse[2], controlResponse[3]);
     SoultreePhysicsCharacter::UnknownVirtualSlot40(a1, 0, a3, a4, a5, a6, a7, a8, a9, a10, a11,
                                                    wheelCap + extraContacts, a13, a14, 0.02f,
                                                    100, 0.001f, 0.1f, 3,
@@ -2039,7 +2039,7 @@ GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3,
         sparkEmitter = new(__FILE__, 0x1dc) VehicleSparkEmitter(1);
         GameObject::AppendChild(sparkEmitter->UnknownVirtualSlot27(renderContext, field_0x124), -1);
     }
-    steerState = new(__FILE__, 0x1e0) VehicleSteerState(steerScale, field_0x524[0], &a7, &a8);
+    steerState = new(__FILE__, 0x1e0) VehicleSteerState(steerScale, controlResponse[0], &a7, &a8);
     Vec3 down = a8 * -1.0f;
     steerState->SetAxisFromDirection(&down, modelNode);
     steerState->SetAngle(0, modelNode);

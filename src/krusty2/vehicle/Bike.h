@@ -399,7 +399,7 @@ public:
     int field_0x630;
     int field_0x634;
     int field_0x638;
-    float field_0x63c;
+    float crossupScale;                       // +0x63C  KrustyBike slot 96: CrossupSlider (TrackGame+0xfe4) pct * 0.4 + 0.8, 1.0 for AI bikes
     BikeA640* steerAxis;  // +0x640 slot 41 region: steer = (steerAxis->l_0x0 - 0.5f) * 4.0f; slot 89 maps (0.75 - l_0x0)*3.99 to a pose index
     BikeA644* poseSmoother;  // +0x644 slot 1 and slot 89: object with value/rate/ratio/limits that is advanced toward field_0x504 each frame with rate limiting (see BikeA644)
     float leanPoseMin;  // +0x648 slot 89: lean > leanPoseMin selects pose; poseLeanBlend = (lean - leanPoseMin) / (leanPoseMax - leanPoseMin)

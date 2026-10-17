@@ -283,14 +283,14 @@ struct KbGame {
     char pad_0x0610[0x640];
     int field_0xc50; // 0xC50
     char pad_0x0C54[0x38C];
-    int field_0xfe0; // 0xFE0
-    int field_0xfe4; // 0xFE4
-    int field_0xfe8; // 0xFE8
-    int field_0xfec; // 0xFEC
-    int field_0xff0; // 0xFF0
-    int field_0xff4; // 0xFF4
-    int field_0xff8; // 0xFF8
-    int field_0xffc; // 0xFFC
+    int steeringSlider;                       // +0xFE0  OptionProcs.h UnknownOptControlSettings (TrackGame+0xfe0) +0x00: SteeringSlider
+    int crossupSlider;                        // +0xFE4  UnknownOptControlSettings +0x04: CrossupSlider
+    int pitchSlider;                          // +0xFE8  UnknownOptControlSettings +0x08: PitchSlider
+    int pressThrottleSlider;                  // +0xFEC  UnknownOptControlSettings +0x0c: PressThrottleSlider
+    int pressBrakesSlider;                    // +0xFF0  UnknownOptControlSettings +0x10: PressBrakesSlider
+    int releaseThrottleSlider;                // +0xFF4  UnknownOptControlSettings +0x14: ReleaseThrottleSlider
+    int releaseBrakesSlider;                  // +0xFF8  UnknownOptControlSettings +0x18: ReleaseBrakesSlider
+    int feedbackSlider;                       // +0xFFC  UnknownOptControlSettings +0x1c: FeedbackSlider
     char pad_0x1000[0x1D70];
     int raceMode;  // +0x2D70  TrackGame mode.raceSettings.raceMode (+0x578 + 0x27f8)
     int eventType;  // +0x2D74  TrackGame mode.raceSettings.eventType: 3 SX, 4 Tag
