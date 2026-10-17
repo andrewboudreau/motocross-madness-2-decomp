@@ -620,7 +620,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
 
     for (i = 0; i < channelsInUse; i++) {
         streamChannel = &engineChannels[i];
-        if (streamChannel->channelRacer->field_0x479)
+        if (streamChannel->channelRacer->driveDisengaged)
             streamChannel->field_0x48 = 0;
         else
             streamChannel->field_0x48 = 1;

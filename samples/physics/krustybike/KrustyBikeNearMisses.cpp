@@ -302,7 +302,7 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                         message.motion = 0;
                                     }
                                     message.flag7 = throttleOn;
-                                    message.flag8 = field_0x479;
+                                    message.flag8 = driveDisengaged;
                                     message.flag9 = trickPoseHeld;
                                     message.crashDirection = crashDirection;
                                     message.crashed = crashState;
@@ -837,7 +837,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
             prevCrash = crashState;
             crashState = states[0]->crashed;
             throttleOn = states[0]->flag7;
-            field_0x479 = states[0]->flag8;
+            driveDisengaged = states[0]->flag8;
             trickPoseHeld = states[0]->flag9;
             if (crashState && !prevCrash) {
                 field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);
@@ -935,7 +935,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 throttleOn = interpSource->flag7;
             else
                 throttleOn = 0;
-            field_0x479 = interpSource->flag8;
+            driveDisengaged = interpSource->flag8;
             trickPoseHeld = interpSource->flag9;
             if (crashState && !prevCrash) {
                 field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);

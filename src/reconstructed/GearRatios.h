@@ -25,8 +25,8 @@ public:
     void UpdateThrottle(float dt, int engaged, unsigned char arg2);   // 0x004d2f50
     void AutoShift(int arg0, float arg1);                        // 0x004d3030
     // 0x004d31b0: drive force along `direction` and its magnitude.
-    void DriveForce(float speedRatio, const Vector3* direction, float scale, bool braking,
-                               float brakeValue, Vector3* force, float* magnitude);
+    void DriveForce(float speedRatio, const Vector3* direction, float scale, bool reversing,
+                               float reverseForce, Vector3* force, float* magnitude);
 
     // Curve lookups at the current rpm (field_0x04); inline in retail.
     float UnknownTorque() const {
@@ -46,7 +46,7 @@ public:
 
     float throttleFraction;                   // +0x00 throttle fraction, clamped to [0, 1]
     float currentRpm;                         // +0x04 current rpm
-    int driveCut;                             // +0x8  set off the throttle and on a shift; else UpdateThrottle's third argument (Vehicle slot 49 passes its +0x479 flag: no crash and backing up or slot 81); DriveForce gives no engine torque while set
+    int driveCut;                             // +0x8  set off the throttle and on a shift; else UpdateThrottle's third argument (Vehicle slot 49 passes its driveDisengaged flag +0x479); DriveForce gives no engine torque while set
     float shiftTimer;                         // +0x0c shift timer
     unsigned char currentGear;                // +0x10 current gear
     char pad_0x11[3];

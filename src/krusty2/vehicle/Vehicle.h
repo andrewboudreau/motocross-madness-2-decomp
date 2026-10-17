@@ -562,8 +562,8 @@ public:
     float throttleInput;  // +0x470 slot 63 latches axis 0x500 value (dead zone 0.2, else -1 when no device); slot 80 tests it > 0.33
     float steerInput;  // +0x474 slot 63: = -axis(0x4f8).value; slot 88 classifies it with 0x504.y into 8 stick sectors; slot 64 zeroes it when crashed
     bool throttleOn;  // +0x478  racesnd.cpp throttle-on flag (RaceView +0x478); Bike's gas gyro acts only while set
-    bool field_0x479;
-    bool field_0x47a;
+    bool driveDisengaged;                     // +0x479  slot 49: = no crash and (backingUp or slot 81); passed as the gearbox's driveCut, so DriveForce gives no engine torque; Bike's gas gyro and racesnd.cpp's engine channel test it (tier 2)
+    bool backingUp;                           // +0x47A  slot 49: = slot 82 (KrustyBike: forwardSpeed < 6 and the back-up input); DriveForce pushes backwards while set; KrustyBike slot 86 ramps that push off the BackUpBottom pose phase +0x664 (tier 2)
     char pad_0x47B[0x1];
     VehicleSteerState* steerState;  // +0x47c VehicleSteerState*: node plus steer angle; slots 53/60/73/36 use it
     VehicleSpeedState* engineState;  // +0x480 VehicleSpeedState*: 6-entry per-gear tables, advanced by UpdateThrottle/AutoShift with throttle/brake flags and speed in slot 49 (provisional)
@@ -640,8 +640,8 @@ VEH_CHECK_OFFSET(Vehicle, inputDevice, 0x46C);
 VEH_CHECK_OFFSET(Vehicle, throttleInput, 0x470);
 VEH_CHECK_OFFSET(Vehicle, steerInput, 0x474);
 VEH_CHECK_OFFSET(Vehicle, throttleOn, 0x478);
-VEH_CHECK_OFFSET(Vehicle, field_0x479, 0x479);
-VEH_CHECK_OFFSET(Vehicle, field_0x47a, 0x47A);
+VEH_CHECK_OFFSET(Vehicle, driveDisengaged, 0x479);
+VEH_CHECK_OFFSET(Vehicle, backingUp, 0x47A);
 VEH_CHECK_OFFSET(Vehicle, steerState, 0x47C);
 VEH_CHECK_OFFSET(Vehicle, engineState, 0x480);
 VEH_CHECK_OFFSET(Vehicle, justLanded, 0x484);

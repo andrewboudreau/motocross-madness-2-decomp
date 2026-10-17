@@ -1548,8 +1548,8 @@ int KrustyBike::Fn_00413200(float dt)
         throttleOn = crashState == 0 && UnknownVirtualSlot80() && race->isRacing;
     else
         throttleOn = 0;
-    field_0x479 = crashState == 0 && UnknownVirtualSlot81();
-    engineState->UpdateThrottle(stepTime, throttleOn, field_0x479);
+    driveDisengaged = crashState == 0 && UnknownVirtualSlot81();
+    engineState->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
     engineState->AutoShift(throttleOn, linearSpeed);
     if (hit) {
         Vec3 b;

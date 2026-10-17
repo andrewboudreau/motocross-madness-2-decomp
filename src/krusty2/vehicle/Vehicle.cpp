@@ -199,7 +199,7 @@ void Vehicle::UnknownVirtualSlot86()
             if (w->aux) {
                 float sp = linearSpeed;
                 float dt = field_0x4a4;
-                w->aux->Method_004D31B0(sp, &w->rollDirection, dt, field_0x47a, 100.0f,
+                w->aux->Method_004D31B0(sp, &w->rollDirection, dt, backingUp, 100.0f,
                                                 &w->field_0x248, &w->field_0x280);
             }
             w->UpdateDriveShare(this);
@@ -961,10 +961,10 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             if (UnknownVirtualSlot10())
                 UnknownVirtualSlot0(0.0f);
         }
-        field_0x47a = UnknownVirtualSlot82() != 0;
-        field_0x479 = crashState == 0 && (field_0x47a || UnknownVirtualSlot81());
+        backingUp = UnknownVirtualSlot82() != 0;
+        driveDisengaged = crashState == 0 && (backingUp || UnknownVirtualSlot81());
         throttleOn = crashState == 0 && UnknownVirtualSlot80();
-        engineState->UpdateThrottle(stepTime, throttleOn, field_0x479);
+        engineState->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
         engineState->AutoShift(throttleOn, linearSpeed);
         if (hit) {
             Vec3 hitA, hitB, hitC;
@@ -1528,8 +1528,8 @@ void Vehicle::UnknownVirtualSlot1(float value)
     throttleInput = 0.0f;
     prevControlInput = kVec3Zero;
     throttleOn = false;
-    field_0x479 = false;
-    field_0x47a = false;
+    driveDisengaged = false;
+    backingUp = false;
     VehicleSpeedState* s = engineState;
     if (s) {
         s->gear = 0;

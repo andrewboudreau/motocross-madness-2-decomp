@@ -120,7 +120,7 @@ struct UnknownEventRacer : virtual public GameObject {
     int crashReason;                          // +0x460 racesnd.cpp tests 12
     unsigned char field_0x464[0x478 - 0x464];
     bool throttleOn;                          // +0x478 racesnd.cpp: throttle on
-    bool field_0x479;
+    bool driveDisengaged;                     // +0x479  Vehicle +0x479 driveDisengaged; racesnd.cpp 0x004e39b0 picks the engine sound off it
     unsigned char field_0x47a[0x484 - 0x47a];
     int justLanded;                           // +0x484 racesnd.cpp 0x004e39b0
     unsigned char field_0x488[0x4a0 - 0x488];

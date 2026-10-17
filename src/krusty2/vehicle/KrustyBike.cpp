@@ -282,7 +282,7 @@ Vec3 KrustyBike::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
 
 int KrustyBike::UnknownVirtualSlot80()
 {
-    if (!race->isRacing && !field_0x479)
+    if (!race->isRacing && !driveDisengaged)
         return 0;
     if (field_0x804 > 0.0f || (inputDevice && throttleInput > 0.33f) ||
         (UnknownVirtualSlot84(4, 0x3f) && !UnknownVirtualSlot77(engineState->throttleFraction == 0.0f)))
@@ -293,7 +293,7 @@ int KrustyBike::UnknownVirtualSlot80()
 int KrustyBike::UnknownVirtualSlot81()
 {
     if (!aiKind && !isRemote && !isGhost && UnknownVirtualSlot84(12, 0x3f)) {
-        if (!UnknownVirtualSlot77(!field_0x479))
+        if (!UnknownVirtualSlot77(!driveDisengaged))
             return 1;
     }
     return 0;
@@ -463,12 +463,12 @@ void KrustyBike::UnknownVirtualSlot86()
         return;
     if (race->isRacing) {
         float ramp;
-        if (field_0x47a && field_0x664 >= 0.12f && field_0x664 < 0.4762f)
+        if (backingUp && field_0x664 >= 0.12f && field_0x664 < 0.4762f)
             ramp = (0.4762f - field_0x664) * (360.0f / 0.3562f);
         else
             ramp = 0;
         if (w->aux)
-            w->aux->Fn_004D31B0(KbFloat(linearSpeed), &w->rollDirection, KbFloat(field_0x4a4), field_0x47a, ramp,
+            w->aux->Fn_004D31B0(KbFloat(linearSpeed), &w->rollDirection, KbFloat(field_0x4a4), backingUp, ramp,
                                     &w->w_0x248, &w->w_0x280);
         if (g_kbGame->raceMode && !onTrack) {
             rearWheel->w_0x248 *= 0.5f;
@@ -1552,7 +1552,7 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
         message.motion = 0;
     }
     message.flag7 = throttleOn;
-    message.flag8 = field_0x479;
+    message.flag8 = driveDisengaged;
     message.flag9 = trickPoseHeld;
     message.crashDirection = crashDirection;
     message.crashed = crashState;
