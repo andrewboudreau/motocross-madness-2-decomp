@@ -84,11 +84,11 @@ struct UnknownKrustyUISlot {
 // track list row; SelectGamePicProcs.cpp passes the scene number, series and
 // .env name.
 struct UnknownKrustyUIEntry {
-    int field_0x00;
+    int directoryIndex;                       // +0x0  the track directory entry (SelectGamePicProcs.cpp passes it to GetEntryStem)
     int scene;                                // +0x04: scene number; copied to the settings' trackNumber
     int series;                               // +0x08
-    int field_0x0c;
-    int field_0x10;
+    int trackFileTime;                        // +0xC  copied to the race settings' trackFileTime (SelectGamePicProcs.cpp); the host passes ReadSceneName's x
+    int trackFileSize;                        // +0x10  copied to the race settings' trackFileSize; the host passes ReadSceneName's y
     char fileName[64];                        // +0x14: the track's .env name
 };
 
@@ -124,7 +124,7 @@ public:
     // racers (bikes near the player's class).
     void PickRandomRacers(int* bikeChoices, int count, int* riderChoices);
     // 0x0049ba70: appends an entry to +0x60; returns its index.
-    int AddEntry(int a, int scene, int series, const char* name, int d, int e);
+    int AddEntry(int directoryIndex, int scene, int series, const char* name, int fileTime, int fileSize);
     void Shutdown();             // 0x004999b0: shutdown (the destructor's first step)
     void ClearEntries();             // 0x0049bb80: frees +0x60
     void LoadGarageTables();             // 0x0049a540: loads the garage tables
