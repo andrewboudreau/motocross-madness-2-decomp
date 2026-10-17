@@ -49,7 +49,7 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     totalTagRun = 0;
     ghostMod = 0;
     debugPage = -1;
-    field_0x15e6 = 0;
+    spawnProtectForced = 0;
     spawnProtectEndPending = 0;
     isGhost = 0;
     repairDamage = 0;

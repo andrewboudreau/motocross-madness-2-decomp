@@ -222,16 +222,16 @@ void KrustyBike::UnknownVirtualSlot63(float a)
         Fn_00414370(a);
         return;
     }
-    field_0x804 = 0;
-    field_0x808 = 0;
+    aiThrottleRequest = 0;
+    aiBrakeRequest = 0;
     Bike::UnknownVirtualSlot63(a);
 }
 
 void KrustyBike::UnknownVirtualSlot64(float a)
 {
     if (crashState) {
-        field_0x804 = 0;
-        field_0x808 = 0;
+        aiThrottleRequest = 0;
+        aiBrakeRequest = 0;
     }
     Bike::UnknownVirtualSlot64(a);
 }
@@ -254,7 +254,7 @@ int KrustyBike::UnknownVirtualSlot68(int* out)
 void KrustyBike::UnknownVirtualSlot69()
 {
     if (crashDirection == 2) {
-        crashTimer = field_0x7a8;
+        crashTimer = airCrashTimerReload;
         return;
     }
     float t = crashTimerReload;
@@ -284,7 +284,7 @@ int KrustyBike::UnknownVirtualSlot80()
 {
     if (!race->isRacing && !driveDisengaged)
         return 0;
-    if (field_0x804 > 0.0f || (inputDevice && throttleInput > 0.33f) ||
+    if (aiThrottleRequest > 0.0f || (inputDevice && throttleInput > 0.33f) ||
         (UnknownVirtualSlot84(4, 0x3f) && !UnknownVirtualSlot77(engineState->throttleFraction == 0.0f)))
         return 1;
     return 0;
@@ -314,7 +314,7 @@ int KrustyBike::UnknownVirtualSlot82()
 int KrustyBike::UnknownVirtualSlot83(VehicleWheel* wheel)
 {
     BikeWheel* input = (BikeWheel*)wheel;
-    if (field_0x808 > 0.0f ||
+    if (aiBrakeRequest > 0.0f ||
         (UnknownVirtualSlot84(5, 0x3f) && !UnknownVirtualSlot77(input->rampLevel == 0.0f)))
         return 1;
     return 0;
@@ -710,18 +710,18 @@ void KrustyBike::UnknownVirtualSlot50(int a, float b, int c)
                 }
                 Fn_00496E30(1);
             }
-            field_0x15e6 = 1;
+            spawnProtectForced = 1;
             spawnProtected = 1;
             spawnProtectTimer = 0;
         } else {
-            field_0x15e6 = 0;
+            spawnProtectForced = 0;
             if (spawnProtected)
                 spawnProtectEndPending = 1;
         }
         Vehicle::UnknownVirtualSlot50(a, 0, 0);
         return;
     }
-    if (field_0x15e6)
+    if (spawnProtectForced)
         return;
     if (a) {
         if (!spawnProtected) {
@@ -768,8 +768,8 @@ void KrustyBike::UnknownVirtualSlot43()
     poseLeanBlendLatched = 0;
     latchedPoseParam = 0;
     latchedPoseLeanBlend = 0;
-    field_0x804 = 0;
-    field_0x808 = 0;
+    aiThrottleRequest = 0;
+    aiBrakeRequest = 0;
     lapGate = 0;
     forceGatePass = 0;
     nextLapGate = 1;
@@ -1715,7 +1715,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         gasGyro = 0;
         brakeGyro = 0;
     }
-    field_0x7a8 = 3.5f;
+    airCrashTimerReload = 3.5f;
     trickClipTime = 0;
     chainedTrickTime = 0;
     trickHoldTime = 0;

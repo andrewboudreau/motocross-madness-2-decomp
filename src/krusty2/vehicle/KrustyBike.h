@@ -148,7 +148,7 @@ public:
     char hasFinished;  // +0x7A4  RaceView +0x7a4 finished (BikeRace racer +0x7a4 finished)
     char spawnProtectEndPending;              // +0x7A5  slot 50 sets it on an off request while spawnProtected; cleared with Fn_00496E30(0) once the bike is clear (tier 3)
     char pad_0x07A6[0x2];
-    float field_0x7a8; // 0x7A8
+    float airCrashTimerReload;  // +0x7A8  the loader sets 3.5; slot 69 reloads crashTimer from it for crashDirection 2 (input action 8 with both wheels > 3.5 off the ground) (tier 3)
     float repairDamage;                       // +0x7AC  slot 28 adds rand x 0.667 (AI 0.15) per new crash; PayOutRace reads it via the result +0x34 as repairs x 500 (tier 3)
     float injuryDamage;                       // +0x7B0  slot 28 adds rand x 0.667 (AI 0.15) per new crash; result +0x38, medical x 250 (tier 3)
     float stuntEarnings;                      // +0x7B4  0x00495ff0 adds the pro-circuit trick step, capped at purse x StuntCapPct / 400; result +0x3c, stunts x 400 (tier 3)
@@ -167,8 +167,8 @@ public:
     float lookAheadFrontTravel;  // +0x7F8  front suspension travel of the look-ahead model (0x00413200)
     float lookAheadRearTravel;  // +0x7FC  rear suspension travel of the look-ahead model
     char pad_0x0800[0x4];
-    float field_0x804; // 0x804
-    float field_0x808; // 0x808
+    float aiThrottleRequest;  // +0x804  BikeAI 0x00414370 sets 1 on the ground below the racing-line speed, else 0; slot 80 reports throttle while > 0 (tier 3)
+    float aiBrakeRequest;  // +0x808  BikeAI 0x00414370 sets 1 when 20 over the racing-line speed, else 0; slot 83 reports brake while > 0 (tier 3)
     float startRunUpTime;  // +0x80C  seconds of the start-gate run-up (0x00414370)
     char field_0x810; // 0x810  set with aiTricksEnabled for an AI (aiKind) bike, cleared otherwise
     char pad_0x0811[0x3];
@@ -241,7 +241,7 @@ public:
     CollisionObject* probeSegment;  // +0x15E0  AI bike's vertical probe segment (0,4,0)-(0,-1,0)
     char aiTricksEnabled;  // +0x15E4 the loader sets it for an AI bike (aiKind) and clears it otherwise; gates BikeAI's trick roll
     char field_0x15e5; // 0x15E5
-    char field_0x15e6; // 0x15E6
+    char spawnProtectForced;  // +0x15E6  slot 50's forced (c != 0) path sets/clears it; unforced slot 50 calls return early while it is set (tier 3)
     char pad_0x15E7[0x1];
     KbObj128* ghostMod;  // +0x15E8  KbGhostMod the loader creates for a ghost (isGhost)
     float stateIntervalElapsed;  // +0x15EC  seconds into the current state interval (0x00493660)

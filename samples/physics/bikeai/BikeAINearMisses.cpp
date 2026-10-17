@@ -1615,15 +1615,15 @@ int KrustyBike::Fn_00413200(float dt)
         }
         float speedGap = aiPath.field_0x96c - linearSpeed;
         if (!airborne && speedGap > 0.0f) {
-            field_0x804 = 1.0f;
-            field_0x808 = 0.0f;
+            aiThrottleRequest = 1.0f;
+            aiBrakeRequest = 0.0f;
             throttleOn = 1;
         } else {
-            field_0x804 = 0.0f;
+            aiThrottleRequest = 0.0f;
             if (speedGap < -20.0f)
-                field_0x808 = 1.0f;
+                aiBrakeRequest = 1.0f;
             else
-                field_0x808 = 0.0f;
+                aiBrakeRequest = 0.0f;
             throttleOn = 0;
         }
     }
