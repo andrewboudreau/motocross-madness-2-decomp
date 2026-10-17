@@ -136,6 +136,7 @@ public:
 };
 
 // RenderTarget.h: the view at GameObject+0x18 and its Camera (+0x08).
+// Slots 27-32 carry Camera.h's names (Camera introduces slots 27-32).
 class UnknownEcoCamera {
 public:
     virtual void UnknownVirtualSlot0();
@@ -165,12 +166,12 @@ public:
     virtual void UnknownVirtualSlot24();
     virtual void UnknownVirtualSlot25();
     virtual void UnknownVirtualSlot26();
-    virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28();
-    virtual void UnknownVirtualSlot29();
-    virtual int UnknownVirtualSlot30(const Matrix4* value); // world matrix
-    virtual int UnknownVirtualSlot31(const Matrix4* value); // view matrix
-    virtual int UnknownVirtualSlot32(const Matrix4* value); // projection matrix
+    virtual void TakeScreenshot();
+    virtual void UpdateMatrices();
+    virtual void LookAt();
+    virtual int SetWorldMatrix(const Matrix4* value);
+    virtual int SetViewMatrix(const Matrix4* value);
+    virtual int SetProjectionMatrix(const Matrix4* value);
 
     unsigned char field_0x004[0xac - 4];
     Matrix4 viewMatrix;                       // +0xac
@@ -188,26 +189,26 @@ public:
 class UnknownEcoRenderTarget {
 public:
     virtual void UnknownVirtualSlot0();
-    virtual int UnknownVirtualSlot1();
-    virtual int UnknownVirtualSlot2();
-    virtual int UnknownVirtualSlot3(void* a, void* b, void* c, int d);
-    virtual void* UnknownVirtualSlot4(void* rect, long* pitch, int flags);
-    virtual int UnknownVirtualSlot5(void* rect);
+    virtual int BeginScene();
+    virtual int EndScene();
+    virtual int Blit(void* a, void* b, void* c, int d);
+    virtual void* LockSurface(void* rect, long* pitch, int flags);
+    virtual int UnlockSurface(void* rect);
     virtual long GetTextureStageState(int stage, int type, int* value);
     virtual long SetTextureStageState(int stage, int type, int value);
     virtual void SetRenderState(int state, int value, int force);
     virtual long GetRenderState(int state, int* value);
-    virtual void UnknownVirtualSlot10(int mode, int flag);
-    virtual long UnknownVirtualSlot11(int stage);
-    virtual int UnknownVirtualSlot12(const void* rect, int flags);
-    virtual int UnknownVirtualSlot13(int a);
-    virtual int UnknownVirtualSlot14(void* viewport);
+    virtual void SetTextureBlend(int mode, int flag);
+    virtual long ClearTexture(int stage);
+    virtual int Clear(const void* rect, int flags);
+    virtual int SupportsTextureFormat(int a);
+    virtual int SetViewport(void* viewport);
     virtual int DrawIndexedPrimitive(int primitive, int format, void* vertices, int vertexCount,
                                      void* indices, int indexCount, int flags);
-    virtual int UnknownVirtualSlot16(int a, int b, int c, int d, int e);
-    virtual int UnknownVirtualSlot17(int a, int b, int c, int d, int e, int f, int g);
+    virtual int DrawPrimitive(int a, int b, int c, int d, int e);
+    virtual int DrawIndexedPrimitiveVB(int a, int b, int c, int d, int e, int f, int g);
     virtual void SetAlphaReference(int value);
-    virtual void UnknownVirtualSlot19();
+    virtual void DisableAlphaTest();
 
     unsigned char field_0x04[4];
     UnknownEcoCamera* camera;                 // +0x08
@@ -218,29 +219,30 @@ public:
     int trianglesDrawn;                       // +0x44
 };
 
-// TextureMap.h: the texture objects the definitions hold.
+// TextureMap.h: the texture objects the definitions hold (0x0050a590, Texmap.cpp,
+// returns a TextureMap). Slots 1-3 are BaseObject's and 4-19 TextureMap.h's.
 class UnknownEcoTexture {
 public:
     virtual void UnknownVirtualSlot0();
-    virtual int UnknownVirtualSlot1();
-    virtual int UnknownVirtualSlot2();        // release
-    virtual int UnknownVirtualSlot3();
-    virtual int UnknownVirtualSlot4();
-    virtual int UnknownVirtualSlot5();
-    virtual int UnknownVirtualSlot6();
-    virtual int UnknownVirtualSlot7();        // whether the load failed
-    virtual int UnknownVirtualSlot8(int a, int b, int c);
-    virtual int UnknownVirtualSlot9();
-    virtual int UnknownVirtualSlot10();
-    virtual int UnknownVirtualSlot11();
-    virtual int UnknownVirtualSlot12();
-    virtual int UnknownVirtualSlot13();
-    virtual int UnknownVirtualSlot14();
-    virtual int UnknownVirtualSlot15();
-    virtual int UnknownVirtualSlot16();
-    virtual int UnknownVirtualSlot17();
-    virtual int UnknownVirtualSlot18(unsigned int key);
-    virtual int UnknownVirtualSlot19();       // selects the texture
+    virtual int AddRef();
+    virtual int Release();
+    virtual int GetRefCount();
+    virtual int CreateSurface();
+    virtual int LoadSurface();
+    virtual int Clone();
+    virtual int IsResident();
+    virtual int CreateTextureSurface(int a, int b, int c);
+    virtual int Upload();
+    virtual int ReleaseTextureSurface();
+    virtual int SetAsTexture();
+    virtual int RecreateIfLost();
+    virtual int LockSurface();
+    virtual int UnlockSurface();
+    virtual int BuildMipLevels();
+    virtual int LockLevel();
+    virtual int UnlockLevel();
+    virtual int ApplyColorKey(unsigned int key);
+    virtual int Bind();
     unsigned char field_0x04[0x20 - 4];
     int pixelFormat;                          // +0x20
 };

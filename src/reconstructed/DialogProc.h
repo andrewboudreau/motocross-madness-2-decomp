@@ -34,9 +34,9 @@ struct UnknownDialogEvent {
 #define UNKNOWN_APPLY_BIKE_CLASS(bikeClass, band)                                                     \
     {                                                                                                 \
         UNKNOWN_GARAGE_SETTINGS->firstBand = g_TrackGame->ui->rpmLowerLimit[bikeClass];      \
-        UNKNOWN_GARAGE_SETTINGS->field_0x54 = g_TrackGame->ui->rpmUpperLimit[bikeClass];      \
+        UNKNOWN_GARAGE_SETTINGS->lastBand = g_TrackGame->ui->rpmUpperLimit[bikeClass];      \
         UNKNOWN_GARAGE_SETTINGS->bandStep = g_TrackGame->ui->rpmStep[bikeClass];      \
-        UNKNOWN_GARAGE_SETTINGS->field_0x08 = g_TrackGame->ui->weight[bikeClass];      \
+        UNKNOWN_GARAGE_SETTINGS->weight = g_TrackGame->ui->weight[bikeClass];      \
         int curve = g_TrackGame->mode.garageCurveChoice[bikeClass];                              \
         for (band = 0; band < 11; band++) {                                                           \
             if (curve < 3)                                                                            \

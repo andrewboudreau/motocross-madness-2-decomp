@@ -73,11 +73,11 @@ struct UnknownOptControlSettings {            // 0x30 bytes (TrackGame+0xfe0)
 struct UnknownOptGarageSettings {             // 0x5c bytes (TrackGame+0x1550)
     int engineSize;                           // +0x00: engine size in cc ("%dcc")
     int fourStroke;                           // +0x04: 4-stroke engine (the 400cc and 600cc DDLEngineSize rows)
-    int field_0x08;
+    int weight;                               // +0x08: KrustyUI "Weight" for the bike class
     float suspension[6];                      // +0x0c: suspension sliders (SldFrontComp ...)
     int eqBands[11];                          // +0x24: SldEQ1..11
     int firstBand;                            // +0x50: first band ("%2.1fk" after * 0.001)
-    int field_0x54;
+    int lastBand;                             // +0x54: KrustyUI "RPMUpperLimit" (firstBand + 10 * bandStep)
     int bandStep;                             // +0x58: band step
 };
 

@@ -103,14 +103,14 @@ UnknownEcoDefinition::UnknownEcoDefinition() {
 UnknownEcoDefinition::~UnknownEcoDefinition() {
     int i;
     if (billboardTexture) {
-        billboardTexture->UnknownVirtualSlot2();
+        billboardTexture->Release();
         if (g_UnknownGlobal59aefc)
-            billboardTexture->UnknownVirtualSlot2();
+            billboardTexture->Release();
     }
     if (modelTexture) {
-        modelTexture->UnknownVirtualSlot2();
+        modelTexture->Release();
         if (g_UnknownGlobal59aefc)
-            modelTexture->UnknownVirtualSlot2();
+            modelTexture->Release();
     }
     for (i = 0; i < lodCount; i++) {
         if (modelVertices[i])
@@ -154,8 +154,8 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
     char section[0x80];
     if (billboardName[0]) {
         billboardTexture = TerrainLoadTexture(textures, billboardName, modelFlags, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
-        if (!billboardTexture->UnknownVirtualSlot7())
-            billboardTexture->UnknownVirtualSlot8(1, 0, 0);
+        if (!billboardTexture->IsResident())
+            billboardTexture->CreateTextureSurface(1, 0, 0);
     }
     if (name[0]) {
         int nameLength = strlen(name);
@@ -175,11 +175,11 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
                 && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
                 format = g_TrackGame->display->colorKeyFormat;
             modelTexture = TerrainLoadTexture(textures, path, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
-            if (!modelTexture->UnknownVirtualSlot7()) {
+            if (!modelTexture->IsResident()) {
                 int loaded = modelTexture->pixelFormat;
                 if (loaded == 555 || loaded == 565 || loaded == 888 || loaded == 1555)
-                    modelTexture->UnknownVirtualSlot18(keyColor);
-                modelTexture->UnknownVirtualSlot8(1, 0, 0);
+                    modelTexture->ApplyColorKey(keyColor);
+                modelTexture->CreateTextureSurface(1, 0, 0);
             }
             block->SelectSection("LOD Information");
             block->GetInt("NumberOfLOD", 0, &lodCount);
@@ -462,7 +462,7 @@ void Vegetation::SetBillboard(int billboard, int fade) {
 // 0x00457000
 void Vegetation::DrawGeometry(UnknownEcoRenderTarget* target) {
     UnknownEcoDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
-    definition->modelTexture->UnknownVirtualSlot19();
+    definition->modelTexture->Bind();
     int vertexCount = definition->modelVertexCount[isBillboard];
     int indexCount = definition->modelIndexCount[isBillboard];
     target->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, geometryBlock, vertexCount, (UnknownEcoVertex*)geometryBlock + vertexCount,
@@ -1211,8 +1211,8 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStre
             if (billboardNames[i][0]) {
                 UnknownEcoTexture* texture = TerrainLoadTexture(textures, billboardNames[i], modelFlags, 0, 2, 5, 6, 0, 0x80,
                                                                    0xff00ff, 1, 1);
-                if (!texture->UnknownVirtualSlot7()) {
-                    texture->UnknownVirtualSlot8(1, 0, 0);
+                if (!texture->IsResident()) {
+                    texture->CreateTextureSurface(1, 0, 0);
                     g_UnknownGlobal59af10++;
                 }
             }
@@ -1230,12 +1230,12 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStre
                         && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
                         format = g_TrackGame->display->colorKeyFormat;
                     UnknownEcoTexture* texture = TerrainLoadTexture(textures, sltName, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
-                    if (!texture->UnknownVirtualSlot7()) {
+                    if (!texture->IsResident()) {
                         g_UnknownGlobal59af10++;
                         int loaded = texture->pixelFormat;
                         if (loaded == 555 || loaded == 565 || loaded == 888 || loaded == 1555)
-                            texture->UnknownVirtualSlot18(keyColors[i]);
-                        texture->UnknownVirtualSlot8(1, 0, 0);
+                            texture->ApplyColorKey(keyColors[i]);
+                        texture->CreateTextureSurface(1, 0, 0);
                     }
                     if (block)
                         delete block;
