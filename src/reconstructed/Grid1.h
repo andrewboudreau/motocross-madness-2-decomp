@@ -18,7 +18,7 @@
 
 class BaseObject;
 
-// Grid1.cpp's view of the per-block records at GridNodeExtra::field_0x38
+// Grid1.cpp's view of the per-block records at GridNodeExtra::blockRecords
 // (0x2c bytes, the same records Griddraw.h calls GridBlockRecord): +0 packs
 // the texture reference, +4 the texture, +8 its AgeManager entry (0x0047d370
 // passes record+8 and tests record+0x18, the entry's size).
@@ -27,9 +27,9 @@ struct Grid1BlockTexture {
     int index : 15;                            // +0x00 bits 1..15: table index (-1: none)
     ManagedTexture* texture;                   // +0x04
     GridAgeEntry ageEntry;                     // +0x08
-    float field_0x1c;
-    float field_0x20;
-    float field_0x24;
+    float mappingScale;                        // +0x1c Griddraw.h's GridBlockRecord names (RemapTexCoordsIfMoved)
+    float mappingOffsetU;                      // +0x20
+    float mappingOffsetV;                      // +0x24
     float detail;                              // +0x28 (0x0047d160)
 };
 
@@ -38,16 +38,16 @@ struct Grid1BlockTexture {
 // +0x10, its AgeManager entry at +0x14 and texture flags at +0x3c (bit 16:
 // whole node, bit n: block n).
 struct Grid1NodeExtra {
-    int field_0x00;
-    void* field_0x04;
+    int byteCount;                             // +0x00 Griddraw.h's GridNodeExtra names
+    void* data;                                // +0x04 the run-length texture indices BuildNodeTexture reads
     ManagedTexture* texture;                   // +0x08
     unsigned int own : 1;                      // +0x0c packed like Grid1BlockTexture
     int index : 15;
     BaseObject* builtTexture;                 // +0x10  the node's own texture from Terrain's pool, built by BuildNodeTexture; EvictNodeTexture 0x0047ca00 hands it back
     GridAgeEntry ageEntry;                     // +0x14
-    float field_0x28;
-    float field_0x2c;
-    float field_0x30;
+    float mappingScale;                        // +0x28 slot 3 resets these to 1, 0, 0 on a texture change
+    float mappingOffsetU;                      // +0x2c
+    float mappingOffsetV;                      // +0x30
     float detail;                              // +0x34
     Grid1BlockTexture* blocks;                 // +0x38 sixteen records or null
     int textureFlags;                          // +0x3c
@@ -73,10 +73,11 @@ struct Grid1Terrain {
 };
 
 // Grid1.cpp's view of the host object at Terrain+0x18 (Terrain.h: its +8
-// is a PCCamera); slot 3 tests the camera's float at +0x200.
+// is a PCCamera); slot 3 caps the stage at 2 for a root node while the
+// camera's +0x200 (Camera.h lastMoveDistance) exceeds 0.5.
 struct Grid1Camera {
     unsigned char field_0x000[0x200];
-    float field_0x200;
+    float lastMoveDistance;                    // +0x200 Camera::lastMoveDistance
 };
 struct Grid1RenderHost {
     int field_0x00;
