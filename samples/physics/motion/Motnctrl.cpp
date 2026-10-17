@@ -331,7 +331,7 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
         } else {
             for (int i = 0; i < from->count; i++) {
                 CharacterPose* a = &from->poses[i];
-                int flag = nodeNames[a->nodeIndex].field_0x38;
+                int flag = nodeNames[a->nodeIndex].applyTranslation;
                 float t = chr_field_0x10;
                 int fps = currentMotion->fps;
                 CharacterPose* b = &to->poses[i];
@@ -386,7 +386,7 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
                 InterpolatePose(&from2->poses[j], &to2->poses[j], &pose2, weight2);
             } else {
                 CharacterPose* a = &from2->poses[j];
-                int flag = nodeNames[a->nodeIndex].field_0x38;
+                int flag = nodeNames[a->nodeIndex].applyTranslation;
                 float t = lastFrameTime;
                 int fps = blendFromMotion->fps;
                 CharacterPose* b = &to2->poses[j];
@@ -410,7 +410,7 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
                 }
             }
             InterpolatePose(&pose2, &out, &result, w);
-            if (nodeNames[pose2.nodeIndex].field_0x38)
+            if (nodeNames[pose2.nodeIndex].applyTranslation)
                 result = pose2;
             else
                 InterpolatePose(&pose2, &out, &result, w);

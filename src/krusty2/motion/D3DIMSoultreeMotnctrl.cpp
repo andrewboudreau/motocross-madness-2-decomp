@@ -23,8 +23,8 @@ extern "C" char* _strupr(char*);   // 0x00535d3d (case-maps with 0x20; locale-aw
 int FillNodeNames(int index, NodeNameEntry* table, SoultreeObject* node)
 {
     table[index].node = node;
-    table[index].field_0x38 = 0;
-    table[index].field_0x3c = 0;
+    table[index].applyTranslation = 0;
+    table[index].applyRotation = 0;
     _strupr(node->name);
     int len = strlen(node->name);
     int count = len > 0x31 ? 0x31 : len;
@@ -38,8 +38,8 @@ int FillNodeNames(int index, NodeNameEntry* table, SoultreeObject* node)
         count = len > 0x31 ? 0x31 : len;
         strncpy(table[index].name, n->name, count);
         table[index].name[count] = 0;
-        table[index].field_0x38 = 0;
-        table[index].field_0x3c = 0;
+        table[index].applyTranslation = 0;
+        table[index].applyRotation = 0;
         index++;
     }
     if (node->firstChild)
@@ -103,7 +103,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot3(int a)
     }
 }
 
-// slot 4 (0x00446210, ret 8): like slot 6 but honours the per-row field_0x3c / field_0x38 enables.
+// slot 4 (0x00446210, ret 8): like slot 6 but honours the per-row applyRotation / applyTranslation enables.
 void D3DIMSoultreeCharacter::CharacterVirtualSlot4(int a, int b)
 {
     const CharacterPose* pose = (const CharacterPose*)a;
@@ -112,14 +112,14 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot4(int a, int b)
         return;
     SoultreeObject* node = nodeNames[pose->nodeIndex].node;
     if (pose->hasPose) {
-        if (nodeNames[pose->nodeIndex].field_0x3c)
+        if (nodeNames[pose->nodeIndex].applyRotation)
             node->SetAxesPtr(&pose->axisZ, &pose->axisY, 0, 1);
-        if (nodeNames[pose->nodeIndex].field_0x38)
+        if (nodeNames[pose->nodeIndex].applyTranslation)
             node->SetPositionVec3(pose->position);
     } else {
-        if (nodeNames[pose->nodeIndex].field_0x3c)
+        if (nodeNames[pose->nodeIndex].applyRotation)
             node->SetAxesIn(modelNode, &pose->axisZ, &pose->axisY, 0, 1);
-        if (nodeNames[pose->nodeIndex].field_0x38)
+        if (nodeNames[pose->nodeIndex].applyTranslation)
             node->TranslateIn(modelNode, pose->position);
     }
 }
@@ -145,9 +145,9 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot5(int a, int b)
     axisY.y = pose->axisY.y;
     axisY.z = pose->axisY.z;
     if (pose->hasPose) {
-        if (table[pose->nodeIndex].field_0x3c)
+        if (table[pose->nodeIndex].applyRotation)
             node->SetAxesPtr(&axisZ, &axisY, 0, 1);
-        if (nodeNames[pose->nodeIndex].field_0x38) {
+        if (nodeNames[pose->nodeIndex].applyTranslation) {
             Vec3 position;
             position.x = -pose->position.x;
             position.y = pose->position.y;
@@ -155,9 +155,9 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot5(int a, int b)
             node->TranslateIn(modelNode, position);
         }
     } else {
-        if (table[pose->nodeIndex].field_0x3c)
+        if (table[pose->nodeIndex].applyRotation)
             node->SetAxesIn(modelNode, &axisZ, &axisY, 0, 1);
-        if (nodeNames[pose->nodeIndex].field_0x38) {
+        if (nodeNames[pose->nodeIndex].applyTranslation) {
             Vec3 position;
             position.x = -pose->position.x;
             position.y = pose->position.y;

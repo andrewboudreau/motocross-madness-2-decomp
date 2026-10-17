@@ -52,8 +52,8 @@ struct MotionPoseList {
 struct NodeNameEntry {
     char name[0x34];          // +0x00 upper-cased copy of the node name, at most 0x31 chars
     SoultreeObject* node;     // +0x34 the scene node this row describes
-    int field_0x38;           // +0x38 cleared when the row is written; D3DIM slots 4/5 test it before writing the node position
-    int field_0x3c;           // +0x3c cleared when the row is written; D3DIM slots 4/5 test it before writing the node axes
+    int applyTranslation;                     // +0x38  LoadVut clears it, then sets it for a 'T' flag after the node name; D3DIM slots 4/5 write the node position only when it is set
+    int applyRotation;                        // +0x3C  FillNodeNames clears it and LoadVut sets it for each listed node; D3DIM slots 4/5 write the node axes only when it is set
 };
 
 class Character : public virtual GameObject {

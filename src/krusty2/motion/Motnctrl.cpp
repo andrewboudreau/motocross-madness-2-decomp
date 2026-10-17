@@ -252,13 +252,13 @@ void Character::LoadVut()
             int count = nameLen > 0x31 ? 0x31 : nameLen;
             strncpy(nodeNames[node].name, name, count);
             nodeNames[node].name[count] = 0;
-            nodeNames[node].field_0x38 = 0;
-            nodeNames[node].field_0x3c = 1;
+            nodeNames[node].applyTranslation = 0;
+            nodeNames[node].applyRotation = 1;
             char* flag = strtok(0, "=, \n");
             if (flag) {
                 _strupr(flag);
                 if (*flag == 'T')
-                    nodeNames[node].field_0x38 = 1;
+                    nodeNames[node].applyTranslation = 1;
             }
         }
     }
