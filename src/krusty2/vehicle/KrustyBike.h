@@ -116,7 +116,7 @@ public:
     char aiKind;  // +0x734  loader kind (0 for a ghost); nonzero bikes take the BikeAI step 0x00413200 and racing line 0x00414370
     char isRemote;  // +0x735  Load's a13: BikeRace's loader passes 1 for network/remote racers, 0 for the local player; RaceStatus skips the gate test
     char isGhost;  // +0x736  set for loader kind 0xff (a ghost); the loader then creates the KbGhostMod at +0x15e8
-    char engineKind;  // +0x737  KbBikeSetup+4; racesnd.cpp selects engine 2 over 1 by it (RaceView +0x737)
+    char fourStroke;  // +0x737  KbBikeSetup+4; racesnd.cpp selects engine 2 over 1 by it (RaceView +0x737)
     int engineSize;  // +0x738  KbBikeSetup+0 (250 without a setup); +0x79c classes it (<=125, <500); racesnd below 250 uses engine 0
     int plateNumber;  // +0x73C  0x65 from the constructor; BikeRace racer +0x73c plate number (the setup paints it)
     KbRace* race;  // +0x740  loader race argument

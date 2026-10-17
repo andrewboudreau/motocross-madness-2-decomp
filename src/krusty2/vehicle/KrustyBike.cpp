@@ -1679,12 +1679,12 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     float setupFloat;
     engineSize = 250;
     setupFloat = 0.0f;
-    engineKind = 0;
+    fourStroke = 0;
     if (setup) {
         KbBikeSetup copy = *setup;
         setupFloat = (float)copy.field_0x8;
         engineSize = copy.field_0x0;
-        engineKind = copy.field_0x4;
+        fourStroke = copy.field_0x4;
     }
     if (isGhost) {
         ghostMod = (KbObj128*)new(__FILE__, 0x690) KbGhostMod(1);

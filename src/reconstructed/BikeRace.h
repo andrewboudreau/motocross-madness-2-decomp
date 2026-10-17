@@ -75,7 +75,7 @@ struct UnknownKrustyVcrRacer {
     char bikeName[0x40];  // +0x95  bike name; the loader passes it back to KrustyUI::ResolveBikeFile
     char riderName[0x40];  // +0xD5  rider name; the loader passes it back to KrustyUI::ResolveRiderFile
     int engineSize;                           // +0x118 engine size
-    int engineKind;                           // +0x11c engine kind
+    int fourStroke;                           // +0x11c four-stroke flag (KrustyUI "BikeFourStroke_%02d")
     int plateNumber;  // +0x120  SetRacer's last argument is TrackGameMode plateNumber / slots[j].plateNumber; read back into plate
 };
 
@@ -99,13 +99,13 @@ public:
     void SaveRecording(float length, char* description, int flag);
     // 0x0049c070: describes a racer of the recording: its network id, AI
     // index (a char), record slot, name, model files, bike and rider names,
-    // engine size and kind and plate number. GetRacer (0x0049c1e0) copies
+    // engine size, four-stroke flag and plate number. GetRacer (0x0049c1e0) copies
     // record `index`'s fields back out.
     void SetRacer(int id, char ai, int slot, char* name, char* model,
                                char* rider, char* bikeName, char* riderName, int engineSize,
-                               int engineKind, int value);
+                               int fourStroke, int value);
     void GetRacer(int* id, char* ai, int index, char* name, char* model, char* rider,
-                               char* bikeName, char* riderName, int* engineSize, int* engineKind,
+                               char* bikeName, char* riderName, int* engineSize, int* fourStroke,
                                int* value);
 
     float replayLength;                       // +0x0d8 SetReplayLength (BikeRace slot 10 each frame)
@@ -250,7 +250,7 @@ struct UnknownBikeRaceRacerPart604 {
 // the bike class of the engine size.
 struct UnknownBikeRaceBikeSetup {
     int engineSize;                           // +0x00 engine size (racer +0x738)
-    int engineKind;                           // +0x04 engine kind (racer +0x737)
+    int fourStroke;                           // +0x04 four-stroke flag (KrustyUI "BikeFourStroke_%02d") (racer +0x737)
     int weight;                               // +0x08 KrustyUI "Weight"
     unsigned char field_0x0c[0x24 - 0x0c];
     int presetCurve[11];                      // +0x24 KrustyUI's preset 0 curve
@@ -266,7 +266,7 @@ struct UnknownBikeRaceEventAi {
     char bikeTexture[0x40];                   // +0x40 bike texture name
     char bikeModelPath[0x40];                 // +0x80 bike model path
     int engineSize;                           // +0xc0 engine size
-    int engineKind;                           // +0xc4 engine kind
+    int fourStroke;                           // +0xc4 four-stroke flag (KrustyUI "BikeFourStroke_%02d")
     float skill;                              // +0xc8 skill
 };
 
@@ -439,7 +439,7 @@ public:
     unsigned char netIndex;                   // +0x734 racer index in network messages
     char isRemote;  // +0x735  KrustyBike loader's remote argument (1 for other players' bikes); gates the +0x1414/+0x1418 pairing
     unsigned char isGhost;  // +0x736  KrustyBike+0x736 isGhost (KrustyBike.h: set for loader kind 0xff)
-    char engineKind;                          // +0x737 engine kind
+    char fourStroke;                          // +0x737 four-stroke flag (KrustyUI "BikeFourStroke_%02d")
     int engineSize;                           // +0x738 engine size
     int plateNumber;                          // +0x73c plate number (the setup paints it)
     UnknownBikeRaceRacerInfo* bikeView;       // +0x740 the racer's view (RaceView.h)
@@ -821,7 +821,7 @@ struct UnknownBikeRaceUiChoice {
     unsigned char field_0x04[0x48 - 0x04];
     char bikeName[0x44];                      // +0x48 bike name (the loader's AI racers)
     int engineSize;                           // +0x8c engine size
-    int engineKind;                           // +0x90 engine kind
+    int fourStroke;                           // +0x90 four-stroke flag (KrustyUI "BikeFourStroke_%02d")
 };
 
 // Game+0x34, the second root object, seen for GameObject's name switches

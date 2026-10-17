@@ -1438,7 +1438,7 @@ void BikeRace::RestartReplay() {
                                                      bikeName, 0x3f);
     replayVcr->SetRacer(0, 0, 0, g_TrackGame->mode.profileName, model, rider,
                                        riderName, bikeName, aiRacers[0]->engineSize,
-                                       (unsigned char)aiRacers[0]->engineKind,
+                                       (unsigned char)aiRacers[0]->fourStroke,
                                        g_TrackGame->mode.plateNumber);
     AppendChild(replayVcr, -1);
     localRacer->UnknownFunction496e20(replayVcr);
