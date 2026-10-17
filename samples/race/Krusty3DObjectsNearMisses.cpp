@@ -127,7 +127,7 @@ int BonusObjectManager::Tick(float frameTime) {
             isResizePending = 0;
             sizeFactor = (cameraDistance = Length(delta)) * targetScreenWidth / (CameraZoom(camera) * frameWidth);
         }
-        position += raceView->localRacer->rearWheel->field_0x230 * 5.0f;
+        position += raceView->localRacer->rearWheel->rollDirection * 5.0f;
         if (keyAngleChange == 0.0f && keyAngle == 0.0f) {
             eyeToFrame = position - camera->eyePosition;
             Vector3 forward = eyeToFrame;
@@ -259,13 +259,13 @@ int VisualCue::Tick(float frameTime) {
         UNKNOWN_PLACE_CUE();
         if (g_UnknownKrustyGame56e26c->tagBall) {
             Vector3 target;
-            g_UnknownKrustyGame56e26c->tagEvent->ball->field_0x21c.GetPosition(&target);
+            g_UnknownKrustyGame56e26c->tagEvent->ball->sceneObject.GetPosition(&target);
             Vector3 direction = target - arcadeView->cameraPosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         } else {
             UnknownVisualCueRacer* followed = 0;
-            if (g_UnknownKrustyGame56e26c->tagEvent->raceCamera->field_0x25 & 1)
+            if (g_UnknownKrustyGame56e26c->tagEvent->raceCamera->statusFlags & 1)
                 followed = g_UnknownKrustyGame56e26c->tagEvent->raceCamera->followedRacer;
             if (!g_UnknownKrustyGame56e26c->tagEvent->followedRacer)
                 return 1;

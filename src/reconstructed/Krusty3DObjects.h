@@ -216,7 +216,7 @@ struct UnknownBonusRacerPart {
 
 struct UnknownBonusRacerModel {
     unsigned char field_0x000[0x230];
-    Vector3 field_0x230;
+    Vector3 rollDirection;                    // +0x230  Bike.h BikeWheel rollDirection (this is the localRacer's rearWheel, Bike +0x5f4)
 };
 
 struct UnknownBonusRacerState {
@@ -280,14 +280,14 @@ struct UnknownKrustyCourse {
 
 struct UnknownKrustyFollowed {
     unsigned char field_0x000[0x25];
-    unsigned char field_0x25;
+    unsigned char statusFlags;                // +0x25  GameObject statusFlags; bit 0 is tested here
     unsigned char field_0x026[0x3b4 - 0x26];
     UnknownVisualCueRacer* followedRacer;     // +0x3b4 (RaceSound.h)
 };
 
 struct UnknownKrustyNode {
     unsigned char field_0x000[0x21c];
-    UnknownBonusRacerPart field_0x21c;
+    UnknownBonusRacerPart sceneObject;        // +0x21C  the SoultreeObject subobject; SoultreePhysicsBaseObject's own part ends at 0x21c, and GetPosition is SoultreeObject's 0x004fc970. Tier 2
 };
 
 struct UnknownKrustyPlayer {
