@@ -1422,7 +1422,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 // the candidate keeps it on the FPU stack (a reference clamp helper does not change it).
 // Shapes that mattered: the gearbox timer as an inline taking dt (fld dt; fsubr), the
 // filter step as `step = tc; if (dt < step) step = dt` (tc loaded first),
-// VehicleSpeedState::Method_004D2F50's third parameter as bool (retail pushes eax unmasked),
+// VehicleSpeedState::UpdateThrottle's third parameter as bool (retail pushes eax unmasked),
 // the x/y-grouped dot product, dot(normal, forward) in both AI branches, and
 // `(controlInput.y + 1) + 1` through a named temporary (one expression folds to + 2.0).
 //
@@ -1548,9 +1548,9 @@ int KrustyBike::Fn_00413200(float dt)
         throttleOn = crashState == 0 && UnknownVirtualSlot80() && race->isRacing;
     else
         throttleOn = 0;
-    field_0x479 = crashState == 0 && UnknownVirtualSlot81();
-    engineState->Method_004D2F50(stepTime, throttleOn, field_0x479);
-    engineState->Method_004D3030(throttleOn, linearSpeed);
+    driveDisengaged = crashState == 0 && UnknownVirtualSlot81();
+    engineState->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
+    engineState->AutoShift(throttleOn, linearSpeed);
     if (hit) {
         Vec3 b;
         int dummy = 0;

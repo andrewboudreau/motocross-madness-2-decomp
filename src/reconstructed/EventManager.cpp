@@ -49,9 +49,9 @@ struct UnknownEventRacerMessage {                  // type 0x86
     float totalRunningTime;                        // +0x0c: racer +0x754
     float fastestLap;                              // +0x10: racer +0x750
     int largestStuntPoints;                        // +0x14: racer +0x788
-    int field_0x18;
-    float field_0x1c;
-    float field_0x20;
+    int totalTrickTime;                            // +0x18: racer +0x758
+    float bestTagRun;                              // +0x1c: racer bestTagRun
+    float totalTagRun;                             // +0x20: racer totalTagRun
 };
 
 // 0x0045c830
@@ -69,7 +69,7 @@ void UnknownEventEntry::Reset() {
     score = 0;
     aiIndex = 0;
     largestStuntPoints = 0;
-    field_0x10 = 0;
+    totalTrickTime = 0;
     bestTagRun = 0;
     totalTagRun = 0;
     finished = 0;
@@ -96,7 +96,7 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
         fastestLap = racer->fastestLap;
         totalRunningTime = racer->totalRunningTime;
         largestStuntPoints = racer->largestStuntPoints;
-        field_0x10 = racer->field_0x758;
+        totalTrickTime = racer->totalTrickTime;
         bestTagRun = racer->bestTagRun;
         totalTagRun = racer->totalTagRun;
         aiIndex = racer->aiIndex;
@@ -113,7 +113,7 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
         fastestLap = 0;
         totalRunningTime = 0;
         largestStuntPoints = 0;
-        field_0x10 = 0;
+        totalTrickTime = 0;
         bestTagRun = 0;
         totalTagRun = 0;
         aiIndex = 0;
@@ -435,9 +435,9 @@ int EventManager::OnNetworkMessage(int type, void* data, int from, int to, int f
                         view->racerSlots[i]->fastestLap = update->fastestLap;
                         view->racerSlots[i]->hasFinished = update->finished;
                         view->racerSlots[i]->largestStuntPoints = update->largestStuntPoints;
-                        view->racerSlots[i]->field_0x758 = update->field_0x18;
-                        view->racerSlots[i]->bestTagRun = update->field_0x1c;
-                        view->racerSlots[i]->totalTagRun = update->field_0x20;
+                        view->racerSlots[i]->totalTrickTime = update->totalTrickTime;
+                        view->racerSlots[i]->bestTagRun = update->bestTagRun;
+                        view->racerSlots[i]->totalTagRun = update->totalTagRun;
                         if (view->racerSlots[i]->hasFinished) {
                             view->racerSlots[i]->totalRunningTime = update->totalRunningTime;
                             // Always false here; retail still tests it.
@@ -556,9 +556,9 @@ void EventManager::SendRacerResults() {
     message.fastestLap = view->localRacer->fastestLap;
     message.finished = view->localRacer->hasFinished;
     message.largestStuntPoints = view->localRacer->largestStuntPoints;
-    message.field_0x18 = view->localRacer->field_0x758;
-    message.field_0x1c = view->localRacer->bestTagRun;
-    message.field_0x20 = view->localRacer->totalTagRun;
+    message.totalTrickTime = view->localRacer->totalTrickTime;
+    message.bestTagRun = view->localRacer->bestTagRun;
+    message.totalTagRun = view->localRacer->totalTagRun;
     message.racerIndex = 0;
     g_TrackGame->network->Send(
         0x86, &message, sizeof(message), g_TrackGame->network->localPlayer, 0);
@@ -572,9 +572,9 @@ void EventManager::SendRacerResults() {
         message.fastestLap = view->aiRacers[i]->fastestLap;
         message.finished = view->aiRacers[i]->hasFinished;
         message.largestStuntPoints = view->aiRacers[i]->largestStuntPoints;
-        message.field_0x18 = view->aiRacers[i]->field_0x758;
-        message.field_0x1c = view->aiRacers[i]->bestTagRun;
-        message.field_0x20 = view->aiRacers[i]->totalTagRun;
+        message.totalTrickTime = view->aiRacers[i]->totalTrickTime;
+        message.bestTagRun = view->aiRacers[i]->bestTagRun;
+        message.totalTagRun = view->aiRacers[i]->totalTagRun;
         message.racerIndex = view->aiRacers[i]->aiIndex;
         g_TrackGame->network->Send(
             0x86, &message, sizeof(message), g_TrackGame->network->localPlayer, 0);

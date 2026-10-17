@@ -225,10 +225,10 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     isBlending = 0;
     recordsPerSecond = 15.0f;
     frameTime = 0;
-    heightFovMinimum = 10.0f;
-    heightForMinimumFov = 280.0f;
-    heightFovMaximum = 70.0f;
-    heightForMaximumFov = 20.0f;
+    distanceFovMinimum = 10.0f;
+    distanceForMinimumFov = 280.0f;
+    distanceFovMaximum = 70.0f;
+    distanceForMaximumFov = 20.0f;
 }
 
 // 0x004650e0: each "CAMERA" line holds two skipped words, three skipped
@@ -526,12 +526,12 @@ int FollowCamera::Tick(float dt) {
     }
     if (cameraState == 5) {
         if (!overrideActive) {
-            targetFieldOfView = (heightForMinimumFov - targetDistance) / (heightForMinimumFov - heightForMaximumFov) *
-                              (heightFovMaximum - heightFovMinimum) + heightFovMinimum;
-            if (targetFieldOfView < heightFovMinimum)
-                targetFieldOfView = heightFovMinimum;
-            if (targetFieldOfView > heightFovMaximum)
-                targetFieldOfView = heightFovMaximum;
+            targetFieldOfView = (distanceForMinimumFov - targetDistance) / (distanceForMinimumFov - distanceForMaximumFov) *
+                              (distanceFovMaximum - distanceFovMinimum) + distanceFovMinimum;
+            if (targetFieldOfView < distanceFovMinimum)
+                targetFieldOfView = distanceFovMinimum;
+            if (targetFieldOfView > distanceFovMaximum)
+                targetFieldOfView = distanceFovMaximum;
             if (moved)
                 targetFieldOfView = (targetFieldOfView - fieldOfView) * 0.75f + fieldOfView;
         }

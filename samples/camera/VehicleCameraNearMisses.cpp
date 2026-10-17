@@ -78,7 +78,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
         if (a) {
             offset = 0.0f;
         } else {
-            float speed = vehicleMode ? vehicle->field_0x438 : 180.0f;
+            float speed = vehicleMode ? vehicle->referenceSpeed : 180.0f;
             offset = (float)((1.0f - followDistance * 0.0016666667f) * 1.8f) * (scale * scale * along / speed);
         }
         float length = vehicleMode ? vehicle->linearSpeed : Length(velocity);

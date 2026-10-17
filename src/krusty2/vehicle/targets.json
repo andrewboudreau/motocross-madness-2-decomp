@@ -86,7 +86,7 @@
     "target_va": "0x00406ae0",
     "target_size": 2396,
     "expect": "partial",
-    "notes": "5.0% (1984 vs 2359). Rider-pose blend state machine (field_0x520 states 1..5, field_0x65c output, field_0x644 smoothing). Retail uses an ebp frame with [ebp-4]/[ebp-8] temps and fistp stores (inlined fistp float-to-int helper, i.e. inline asm in the original, out of reach under the no-asm rule); plain (int) calls __ftol here. Clamp/branch layout also differs. Extent 0x00406ae0..0x0040743c includes the nop and the 9-entry jump table after the last ret.",
+    "notes": "5.0% (1984 vs 2359). Rider-pose blend state machine (steerPoseState states 1..5, field_0x65c output, field_0x644 smoothing). Retail uses an ebp frame with [ebp-4]/[ebp-8] temps and fistp stores (inlined fistp float-to-int helper, i.e. inline asm in the original, out of reach under the no-asm rule); plain (int) calls __ftol here. Clamp/branch layout also differs. Extent 0x00406ae0..0x0040743c includes the nop and the 9-entry jump table after the last ret.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -1986,7 +1986,7 @@
     "target_va": "0x00491b70",
     "target_size": 298,
     "expect": "exact",
-    "notes": "Exact. Wheel-force step: ramp from field_0x664 (float in retail), wheel query call, halve force when g_kbGame flag set. Needs KbFloat identity inline to get fld/fstp [esp] arg pattern.",
+    "notes": "Exact. Wheel-force step: ramp from backUpPhase (float in retail), wheel query call, halve force when g_kbGame flag set. Needs KbFloat identity inline to get fld/fstp [esp] arg pattern.",
     "bindings": "KrustyBike.bindings.json"
   },
   {

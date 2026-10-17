@@ -68,12 +68,12 @@ void KrustyBike::UnknownVirtualSlot1(float a)
     Bike::UnknownVirtualSlot1(a);
     Fn_0048D8B0();
     field_0x152c = 0;
-    field_0x154d = 0;
-    field_0x154e = 0;
+    headTurningToRival = 0;
+    headTurningBack = 0;
     nearestRival = 0;
-    field_0x141c = 0;
+    trickLandTimer = 0;
     offTrackTime = 0;
-    field_0x153e = 0;
+    trickPoseHeldPrev = 0;
     contactTime = 0;
 }
 
@@ -101,8 +101,8 @@ void KrustyBike::UnknownVirtualSlot4(const Vec3* a0, Vec3* a1, const Vec3* a2,
 void KrustyBike::UnknownVirtualSlot8()
 {
     Bike::UnknownVirtualSlot8();
-    if (aiKind && field_0x700)
-        field_0x700 = 0;
+    if (aiKind && frontWheelLifted)
+        frontWheelLifted = 0;
 }
 
 int KrustyBike::UnknownVirtualSlot12(int a)
@@ -143,7 +143,7 @@ int KrustyBike::UnknownVirtualSlot24()
             return 1;
         return 0;
     }
-    if (field_0x5b0 < engineState->field_0x00 && !crashState && linearSpeed < 22.0f)
+    if (prevThrottleFraction < engineState->throttleFraction && !crashState && linearSpeed < 22.0f)
         return 1;
     return 0;
 }
@@ -154,7 +154,7 @@ int KrustyBike::UnknownVirtualSlot25()
         if (prevSpeed > linearSpeed && !crashState && linearSpeed < 22.0f)
             return 1;
     } else {
-        if (field_0x5b0 < engineState->field_0x00 && !crashState && linearSpeed < 22.0f)
+        if (prevThrottleFraction < engineState->throttleFraction && !crashState && linearSpeed < 22.0f)
             return 1;
     }
     return 0;
@@ -164,7 +164,7 @@ int KrustyBike::UnknownVirtualSlot33(const Vec3* a0, const Vec3* a1, const Vec3*
                                      const Vec3* a3, int a4, float a5)
 {
     int result = Bike::UnknownVirtualSlot33(a0, a1, a2, a3, a4, a5);
-    field_0x1540 = position;
+    lastFramePosition = position;
     wrecker->a_0x52c = 1;
     return result;
 }
@@ -182,15 +182,15 @@ int KrustyBike::UnknownVirtualSlot39(float a)
 int KrustyBike::UnknownVirtualSlot42()
 {
     if (!crashState && field_0x433 >= 0 && field_0x430 && riderCharacter->c_0xc) {
-        float sum = field_0x1528 + field_0x1520;
-        field_0x1520 = 0;
-        field_0x153d++;
-        field_0x1528 = 0;
-        sum += field_0x1524;
-        field_0x1524 = 0;
-        field_0x1530 += sum * 2500.0f;
-        field_0x1538 = (float)field_0x153d;
-        field_0x758 += sum;
+        float sum = trickHoldTime + trickClipTime;
+        trickClipTime = 0;
+        trickCount++;
+        trickHoldTime = 0;
+        sum += chainedTrickTime;
+        chainedTrickTime = 0;
+        trickPoints += sum * 2500.0f;
+        trickMultiplier = (float)trickCount;
+        totalTrickTime += sum;
         return 1;
     }
     return 0;
@@ -266,9 +266,9 @@ void KrustyBike::UnknownVirtualSlot69()
 void KrustyBike::UnknownVirtualSlot71(int a)
 {
     if (crashState) {
-        field_0x141c = 0;
-    } else if (airborne && !a && !landingLatched && field_0x431 && field_0x141c <= 0.0f) {
-        field_0x141c = 0.3f;
+        trickLandTimer = 0;
+    } else if (airborne && !a && !landingLatched && field_0x431 && trickLandTimer <= 0.0f) {
+        trickLandTimer = 0.3f;
     }
     Bike::UnknownVirtualSlot71(a);
 }
@@ -282,10 +282,10 @@ Vec3 KrustyBike::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
 
 int KrustyBike::UnknownVirtualSlot80()
 {
-    if (!race->isRacing && !field_0x479)
+    if (!race->isRacing && !driveDisengaged)
         return 0;
     if (field_0x804 > 0.0f || (inputDevice && throttleInput > 0.33f) ||
-        (UnknownVirtualSlot84(4, 0x3f) && !UnknownVirtualSlot77(engineState->field_0x00 == 0.0f)))
+        (UnknownVirtualSlot84(4, 0x3f) && !UnknownVirtualSlot77(engineState->throttleFraction == 0.0f)))
         return 1;
     return 0;
 }
@@ -293,7 +293,7 @@ int KrustyBike::UnknownVirtualSlot80()
 int KrustyBike::UnknownVirtualSlot81()
 {
     if (!aiKind && !isRemote && !isGhost && UnknownVirtualSlot84(12, 0x3f)) {
-        if (!UnknownVirtualSlot77(!field_0x479))
+        if (!UnknownVirtualSlot77(!driveDisengaged))
             return 1;
     }
     return 0;
@@ -303,10 +303,10 @@ int KrustyBike::UnknownVirtualSlot82()
 {
     if (!aiKind && !isRemote && !isGhost) {
         if (forwardSpeed < 6.0f && UnknownVirtualSlot84(13, 0x3f)) {
-            if (!UnknownVirtualSlot77(engineState->field_0x00 == 0.0f))
+            if (!UnknownVirtualSlot77(engineState->throttleFraction == 0.0f))
                 return 1;
         }
-        field_0x664 = 0;
+        backUpPhase = 0;
     }
     return 0;
 }
@@ -370,18 +370,18 @@ void KrustyBike::Fn_00496E20(KbRecorder* a)
 // ---- non-virtual state reset (0x0048D8B0) ----
 void KrustyBike::Fn_0048D8B0()
 {
-    field_0x1538 = 1.0f;
-    field_0x1530 = 0;
-    field_0x1520 = 0;
-    field_0x1528 = 0;
-    field_0x1524 = 0;
+    trickMultiplier = 1.0f;
+    trickPoints = 0;
+    trickClipTime = 0;
+    trickHoldTime = 0;
+    chainedTrickTime = 0;
     landingLatched = 0;
     field_0x431 = 0;
-    field_0x141c = 0;
-    field_0x153d = 0;
+    trickLandTimer = 0;
+    trickCount = 0;
     field_0x1534 = 0;
-    field_0x153c = 0;
-    field_0x153f = 0;
+    trickPoseHeld = 0;
+    trickChained = 0;
     field_0x15e5 = 0;
 }
 
@@ -447,12 +447,12 @@ void KrustyBike::UnknownVirtualSlot48()
     Vec3 v = velocity * 3.0f;
     Vec3 d = (v - prevVelocity) * 0.5f;
     position += d * stepTime;
-    rearWheel->w_0x248 = g_kbZeroVec;
-    rearWheel->w_0x280 = 0;
+    rearWheel->driveForce = g_kbZeroVec;
+    rearWheel->driveForceMagnitude = 0;
 }
 
 // Slot 86: per-frame wheel-contact update (provisional semantics).  When the race context
-// flag (field_0x740+0x18a) is set, a lookup ramp derived from field_0x664 (0.12..0.4762,
+// flag (field_0x740+0x18a) is set, a lookup ramp derived from backUpPhase (0.12..0.4762,
 // scaled by 360 / 0.3562 = 1010.66815f, the float retail holds, so 360 at 0.12) feeds the
 // wheel's helper object, and in one game mode the wheel's two force accumulators are
 // halved; the wheel is then always updated.
@@ -463,72 +463,72 @@ void KrustyBike::UnknownVirtualSlot86()
         return;
     if (race->isRacing) {
         float ramp;
-        if (field_0x47a && field_0x664 >= 0.12f && field_0x664 < 0.4762f)
-            ramp = (0.4762f - field_0x664) * (360.0f / 0.3562f);
+        if (backingUp && backUpPhase >= 0.12f && backUpPhase < 0.4762f)
+            ramp = (0.4762f - backUpPhase) * (360.0f / 0.3562f);
         else
             ramp = 0;
         if (w->aux)
-            w->aux->Fn_004D31B0(KbFloat(linearSpeed), &w->rollDirection, KbFloat(field_0x4a4), field_0x47a, ramp,
-                                    &w->w_0x248, &w->w_0x280);
+            w->aux->DriveForce(KbFloat(linearSpeed), &w->rollDirection, KbFloat(driveForceScale), backingUp, ramp,
+                                    &w->driveForce, &w->driveForceMagnitude);
         if (g_kbGame->raceMode && !onTrack) {
-            rearWheel->w_0x248 *= 0.5f;
-            rearWheel->w_0x280 *= 0.5f;
+            rearWheel->driveForce *= 0.5f;
+            rearWheel->driveForceMagnitude *= 0.5f;
         }
     }
     rearWheel->UpdateDriveShare(this);
 }
 
-// Slot 96: tuning constants derived from the game-settings integers (0xfe0..0xff8).
+// Slot 96: control responses derived from the Options sliders (TrackGame 0xfe0..0xff8).
 void KrustyBike::UnknownVirtualSlot96()
 {
     if (aiKind)
-        field_0x524[0] = 0.675f;
+        controlResponse[0] = 0.675f;
     else
         {
-            float pct = g_kbGame->field_0xfe0 * 0.01f;
-            field_0x524[0] = pct * 0.2f + 0.575f;
+            float pct = g_kbGame->steeringSlider * 0.01f;
+            controlResponse[0] = pct * 0.2f + 0.575f;
         }
     if (aiKind)
-        field_0x63c = 1.0f;
+        crossupScale = 1.0f;
     else
         {
-            float pct = g_kbGame->field_0xfe4 * 0.01f;
-            field_0x63c = pct * 0.4f + 0.8f;
+            float pct = g_kbGame->crossupSlider * 0.01f;
+            crossupScale = pct * 0.4f + 0.8f;
         }
     if (aiKind)
-        field_0x524[1] = 1.0f;
+        controlResponse[1] = 1.0f;
     else
         {
-            float pct = g_kbGame->field_0xfe8 * 0.01f;
-            field_0x524[1] = pct * 0.4f + 0.8f;
+            float pct = g_kbGame->pitchSlider * 0.01f;
+            controlResponse[1] = pct * 0.4f + 0.8f;
         }
     if (aiKind)
-        field_0x524[2] = 1.0f;
+        controlResponse[2] = 1.0f;
     else
         {
-            float pct = g_kbGame->field_0xfec * 0.01f;
-            field_0x524[2] = pct * 0.4f + 0.8f;
+            float pct = g_kbGame->pressThrottleSlider * 0.01f;
+            controlResponse[2] = pct * 0.4f + 0.8f;
         }
     if (aiKind)
-        field_0x524[3] = 1.0f;
+        controlResponse[3] = 1.0f;
     else
         {
-            float pct = g_kbGame->field_0xff4 * 0.01f;
-            field_0x524[3] = pct * 0.4f + 0.8f;
+            float pct = g_kbGame->releaseThrottleSlider * 0.01f;
+            controlResponse[3] = pct * 0.4f + 0.8f;
         }
     if (aiKind)
-        field_0x524[4] = 1.0f;
+        controlResponse[4] = 1.0f;
     else
         {
-            float pct = g_kbGame->field_0xff0 * 0.01f;
-            field_0x524[4] = pct * 0.4f + 0.8f;
+            float pct = g_kbGame->pressBrakesSlider * 0.01f;
+            controlResponse[4] = pct * 0.4f + 0.8f;
         }
     if (aiKind)
-        field_0x524[5] = 1.0f;
+        controlResponse[5] = 1.0f;
     else
         {
-            float pct = g_kbGame->field_0xff8 * 0.01f;
-            field_0x524[5] = pct * 0.4f + 0.8f;
+            float pct = g_kbGame->releaseBrakesSlider * 0.01f;
+            controlResponse[5] = pct * 0.4f + 0.8f;
         }
 }
 
@@ -559,11 +559,11 @@ int KrustyBike::UnknownVirtualSlot28(int a)
     int r = Vehicle::UnknownVirtualSlot28(a);
     if (crashState && !prevCrashState) {
         if (aiKind) {
-            field_0x7ac += KbRandUnit() * 0.15f;
-            field_0x7b0 += KbRandUnit() * 0.15f;
+            repairDamage += KbRandUnit() * 0.15f;
+            injuryDamage += KbRandUnit() * 0.15f;
         } else {
-            field_0x7ac += KbRandUnit() * 0.667f;
-            field_0x7b0 += KbRandUnit() * 0.667f;
+            repairDamage += KbRandUnit() * 0.667f;
+            injuryDamage += KbRandUnit() * 0.667f;
         }
     }
     return r;
@@ -614,19 +614,19 @@ int KrustyBike::UnknownVirtualSlot99(float a, float b, int c, float d)
 }
 
 // Slot 93: when the pad device (input map +0x0c) is in mode 3, reset one effect channel and
-// re-arm another with a time-scaled value, then derive field_0x51c from the same game value.
+// re-arm another with a time-scaled value, then derive forceFeedbackGain from the same FeedbackSlider value.
 void KrustyBike::UnknownVirtualSlot93()
 {
     KbPad* pad = (KbPad*)inputMap->valueSource;
     if (pad && pad->field_0xc == 3) {
         pad->UnknownVirtualSlot6(1, 10000, -1);
         pad = (KbPad*)inputMap->valueSource;
-        pad->UnknownVirtualSlot6(0, (int)(g_kbGame->field_0xffc * 83.333336f), 70000);
-        field_0x51c = g_kbGame->field_0xffc * 0.04f;
+        pad->UnknownVirtualSlot6(0, (int)(g_kbGame->feedbackSlider * 83.333336f), 70000);
+        forceFeedbackGain = g_kbGame->feedbackSlider * 0.04f;
     }
 }
 
-// Slot 94: pad effect update; the force term is field_0x590 * field_0x51c * 180 clamped to
+// Slot 94: pad effect update; the force term is smoothedForwardAccel * forceFeedbackGain * 180 clamped to
 // [-10000, 10000] while not in state 1, then the effect is toggled on slot 80's result.
 void KrustyBike::UnknownVirtualSlot94()
 {
@@ -634,7 +634,7 @@ void KrustyBike::UnknownVirtualSlot94()
     if (pad && pad->field_0xc == 3) {
         if (crashState != 1) {
             KbEffectParams params = { 0x4650, 0 };
-            int force = (int)(smoothedForwardAccel * field_0x51c * 180.0f);
+            int force = (int)(smoothedForwardAccel * forceFeedbackGain * 180.0f);
             if (force <= -10000)
                 force = -10000;
             else if (force >= 10000)
@@ -658,12 +658,12 @@ void KrustyBike::UnknownVirtualSlot94()
 }
 
 // Slot 29: refresh the previous/current orientation angles (0x48..0x60 from 0x2c..0x44).
-// Normally they are recomputed from the node's world axes; while neither field_0x6fc nor
+// Normally they are recomputed from the node's world axes; while neither crossoverPose nor
 // field_0x430 is set the old values are just copied.  Then the bike's matrix is mirrored
 // onto the 0x5c4 node when the wrecker's mode is 0 or 1, and the 0x141c timer is advanced.
 void KrustyBike::UnknownVirtualSlot29(int a)
 {
-    if (!field_0x6fc && !field_0x430) {
+    if (!crossoverPose && !field_0x430) {
         savedForward = bodyForward;
         savedUp = bodyUp;
         savedYaw = bodyYaw;
@@ -685,11 +685,11 @@ void KrustyBike::UnknownVirtualSlot29(int a)
         riderCharacter->c_0x1a0->SetMatrixIn(0, &m);
     }
     if (field_0x431 && !hasFinished && landingLatched) {
-        if (field_0x141c < 0.0f) {
+        if (trickLandTimer < 0.0f) {
             score += Fn_00495FF0();
             return;
         }
-        field_0x141c -= stepTime;
+        trickLandTimer -= stepTime;
     }
 }
 
@@ -716,7 +716,7 @@ void KrustyBike::UnknownVirtualSlot50(int a, float b, int c)
         } else {
             field_0x15e6 = 0;
             if (spawnProtected)
-                field_0x7a5 = 1;
+                spawnProtectEndPending = 1;
         }
         Vehicle::UnknownVirtualSlot50(a, 0, 0);
         return;
@@ -735,7 +735,7 @@ void KrustyBike::UnknownVirtualSlot50(int a, float b, int c)
         spawnProtected = 1;
         spawnProtectTimer = b;
     } else if (spawnProtected) {
-        field_0x7a5 = 1;
+        spawnProtectEndPending = 1;
     }
 }
 
@@ -748,7 +748,7 @@ void KrustyBike::UnknownVirtualSlot43()
     onTrack = 1;
     offTrackTime = 0;
     lapCount = 0;
-    field_0x7a2 = 0;
+    prevLapCount = 0;
     gatesPassed = 0;
     lastLapTime = 0;
     lapStartTime = 0;
@@ -758,16 +758,16 @@ void KrustyBike::UnknownVirtualSlot43()
     fastestLap = 0;
     totalRunningTime = 0;
     largestStuntPoints = 0;
-    field_0x758 = 0;
+    totalTrickTime = 0;
     bestTagRun = 0;
     totalTagRun = 0;
     field_0x794 = 0;
     field_0x798 = 0;
     score = 0;
-    field_0x1400 = 0;
-    field_0x1404 = 0;
-    field_0x1408 = 0;
-    field_0x140c = 0;
+    poseParamLatched = 0;
+    poseLeanBlendLatched = 0;
+    latchedPoseParam = 0;
+    latchedPoseLeanBlend = 0;
     field_0x804 = 0;
     field_0x808 = 0;
     lapGate = 0;
@@ -798,7 +798,7 @@ void KrustyBike::UnknownVirtualSlot43()
     }
     netState.timer = g_kbGame->fullNetPacketIntervalSec;
     shortMessageTimer = g_kbGame->shortNetPacketIntervalSec;
-    field_0x138c = 0;
+    stallHoldTimer = 0;
     recordState.timer = 1.7014117e38f;
 }
 
@@ -843,7 +843,7 @@ void KrustyBike::UnknownVirtualSlot97()
 // takes over.
 void KrustyBike::UnknownVirtualSlot49(float dt)
 {
-    if (field_0x154c) {
+    if (drawnAtLastPosition) {
         modelNode->SetPosition(position);
         ((SoultreeObject*)riderCharacter->c_0x1a0)->SetPosition(position);
     }
@@ -862,7 +862,7 @@ void KrustyBike::UnknownVirtualSlot49(float dt)
                     sink->ReplaceHeadMessage(msg);
                     delete msg;
                 }
-            } else if (lapCount != field_0x7a2 && lapCount == 1 && race->startBeforeFinish) {
+            } else if (lapCount != prevLapCount && lapCount == 1 && race->startBeforeFinish) {
                 g_kbGame->GetStringText(0x14d7, text, 0x80);
                 msg = new(__FILE__, 0x11d0) KbMessage(text, 3.25f);
                 if (msg) {
@@ -933,19 +933,19 @@ void KrustyBike::UnknownVirtualSlot49(float dt)
         Bike::UnknownVirtualSlot49(dt);
     }
     if (race->raceCamera->cameraState == 3 && race->raceCamera->followedBike == this) {
-        modelNode->SetPosition(field_0x1540);
-        ((SoultreeObject*)riderCharacter->c_0x1a0)->SetPosition(field_0x1540);
-        field_0x154c = 1;
+        modelNode->SetPosition(lastFramePosition);
+        ((SoultreeObject*)riderCharacter->c_0x1a0)->SetPosition(lastFramePosition);
+        drawnAtLastPosition = 1;
     } else {
-        field_0x154c = 0;
+        drawnAtLastPosition = 0;
     }
-    field_0x1540 = position;
-    field_0x153e = field_0x153c;
-    field_0x7a2 = lapCount;
+    lastFramePosition = position;
+    trickPoseHeldPrev = trickPoseHeld;
+    prevLapCount = lapCount;
 }
 
-// 0x00495ff0: ends a trick. The angle (+0x1530) drops its part below 100, the
-// score is angle x multiplier (+0x1538, +0.5 for a +0x153f landing); the race
+// 0x00495ff0: ends a trick. trickPoints (+0x1530) drops its part below 100, the
+// score is points x trickMultiplier (+0x1538, +0.5 when trickChained); the race
 // handler hears of it. In game mode 0 (or 4 with +0x2eb8 for the +0x568 racer's
 // bike) the score is kept in +0x788 and returned; otherwise the bonus rules
 // (+0x3444) turn it into a capped bonus, shown to the +0x50 racer's bike.
@@ -954,17 +954,17 @@ void KrustyBike::UnknownVirtualSlot49(float dt)
 // (docs/VC6_OPERAND_ORDER.md section 3); without them the load follows it.
 float KrustyBike::Fn_00495FF0()
 {
-    field_0x1530 -= ((float)fmod(field_0x1530, 100.0));
-    if (field_0x153f)
-        field_0x1538 += 0.5f;
-    float score = field_0x1530 * field_0x1538;
+    trickPoints -= ((float)fmod(trickPoints, 100.0));
+    if (trickChained)
+        trickMultiplier += 0.5f;
+    float score = trickPoints * trickMultiplier;
     if (race->localRacer == this && race->handler)
         race->handler->ReportTrickScore(this, score);
     if (!g_kbGame->eventType ||
         (g_kbGame->eventType == 4 && g_kbGame->stuntMode && g_kbGame->tagEvent->field_0xa8 == this)) {
         if (race->localRacer == this) {
             if (race->scoreBoard)
-                race->scoreBoard->ShowValue(field_0x1530, field_0x1538);
+                race->scoreBoard->ShowValue(trickPoints, trickMultiplier);
             int points = (int)score;
             if (largestStuntPoints > points)
                 points = largestStuntPoints;
@@ -975,19 +975,19 @@ float KrustyBike::Fn_00495FF0()
     }
     KbBonusTable* rules = g_kbGame->proCircuit;
     if (rules) {
-        float step = field_0x1530 * 0.000016f;
+        float step = trickPoints * 0.000016f;
         if (!(step < 1.0f))
             step = 1.0f;
         int base = rules->base[rules->index];
         int points = (int)(base * rules->baseScale);
         float gain = 0.0f;
         float limit = points * rules->limitScale;
-        if (field_0x7b4 * 400.0f < limit) {
-            float total = step + field_0x7b4;
+        if (stuntEarnings * 400.0f < limit) {
+            float total = step + stuntEarnings;
             if (total * 400.0f > limit) {
-                field_0x7b4 = limit * 0.0025f;
+                stuntEarnings = limit * 0.0025f;
             } else {
-                field_0x7b4 = total;
+                stuntEarnings = total;
                 gain = step * 400.0f;
             }
         }
@@ -1234,9 +1234,9 @@ void KrustyBike::Fn_0048D910(int idx)
     field_0x430 = 1;
     field_0x431 = 0;
     field_0x432 = 1;
-    field_0x1520 = 0;
-    field_0x1524 = 0;
-    field_0x1528 = 0;
+    trickClipTime = 0;
+    chainedTrickTime = 0;
+    trickHoldTime = 0;
     field_0x433 = (char)idx;
     ((KbA5C4*)riderCharacter)->SetMotion(animSetA[idx]);
     ((KbA5C4*)riderCharacter)->field_0x10 = 0;
@@ -1245,16 +1245,16 @@ void KrustyBike::Fn_0048D910(int idx)
 }
 
 // owner: bracket only (0x48d990; callers 0x48eff2, 0x48f115, 0x49562c are KrustyBike methods)
-// Variant of Fn_0048D910 that keeps the pending score in field_0x1524 and uses animSetC/animSetD.
+// Variant of Fn_0048D910 that banks trickClipTime in chainedTrickTime and uses animSetC/animSetD.
 void KrustyBike::Fn_0048D990(int idx)
 {
     field_0x430 = 1;
-    field_0x1524 = field_0x1520;
-    field_0x1520 = 0;
+    chainedTrickTime = trickClipTime;
+    trickClipTime = 0;
     field_0x433 = (char)(idx + 0x10);
     ((KbA5C4*)riderCharacter)->SetMotion(animSetC[idx]);
     D3DIMSoultreeCharacter::SetMotion((Motion*)animSetD[idx]);
-    field_0x153f = 1;
+    trickChained = 1;
 }
 
 // owner: bracket only (0x48dcd0; referenced by pointer from the collision setup, not called)
@@ -1371,7 +1371,7 @@ void KrustyBike::Fn_0048E280()
     field_0x431 = 0;
     field_0x430 = 1;
     field_0x432 = 1;
-    field_0x154d = 1;
+    headTurningToRival = 1;
     field_0x433 = (char)0xff;
     if (rivalBearing > 2.7f) {
         rivalBearing = 2.7f;
@@ -1467,7 +1467,7 @@ int KrustyBike::Tick(float dt)
                 Fn_004925A0(0, 1);
         }
     }
-    if (field_0x7a5 && !isRemote && race->isRacing) {
+    if (spawnProtectEndPending && !isRemote && race->isRacing) {
         int cursor = 0;
         int overlap = 0;
         KrustyBike* bike;
@@ -1480,7 +1480,7 @@ int KrustyBike::Tick(float dt)
         }
         if (!overlap) {
             spawnProtected = 0;
-            field_0x7a5 = 0;
+            spawnProtectEndPending = 0;
             if (isGhost) {
                 ((KbXform*)modelNode)->RemoveModifier(ghostMod);
                 ((KbXform*)riderCharacter->c_0x1a0)->RemoveModifier(ghostMod);
@@ -1552,8 +1552,8 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
         message.motion = 0;
     }
     message.flag7 = throttleOn;
-    message.flag8 = field_0x479;
-    message.flag9 = field_0x153c;
+    message.flag8 = driveDisengaged;
+    message.flag9 = trickPoseHeld;
     message.crashDirection = crashDirection;
     message.crashed = crashState;
     message.flag4 = UnknownVirtualSlot51();
@@ -1716,9 +1716,9 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         brakeGyro = 0;
     }
     field_0x7a8 = 3.5f;
-    field_0x1520 = 0;
-    field_0x1524 = 0;
-    field_0x1528 = 0;
+    trickClipTime = 0;
+    chainedTrickTime = 0;
+    trickHoldTime = 0;
     rivalBearingScaled = 0;
     headTurnAngle = 0;
     crashTimer = 0;
@@ -1875,14 +1875,14 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         ((CollisionObject*)altBodyA)->onHitByCallback = KrustyCollisionCallbackB;
     }
     wrecker->EndWreck();
-    field_0x1540 = position;
+    lastFramePosition = position;
     if (isRemote) {
         BikeA640* axis = steerAxis;
         axis->steerValue = 0.5f;
         axis->l_0x4 = 0.42210004f;
         axis->l_0x8 = 1.0f;
     }
-    field_0x154c = 0;
+    drawnAtLastPosition = 0;
     field_0x15cc = 0;
     clockOffset = 0;
 

@@ -120,7 +120,7 @@ struct UnknownEventRacer : virtual public GameObject {
     int crashReason;                          // +0x460 racesnd.cpp tests 12
     unsigned char field_0x464[0x478 - 0x464];
     bool throttleOn;                          // +0x478 racesnd.cpp: throttle on
-    bool field_0x479;
+    bool driveDisengaged;                     // +0x479  Vehicle +0x479 driveDisengaged; racesnd.cpp 0x004e39b0 picks the engine sound off it
     unsigned char field_0x47a[0x484 - 0x47a];
     int justLanded;                           // +0x484 racesnd.cpp 0x004e39b0
     unsigned char field_0x488[0x4a0 - 0x488];
@@ -145,7 +145,7 @@ struct UnknownEventRacer : virtual public GameObject {
     float lastLapTime;                        // +0x74c last lap time (RaceStatus.cpp)
     float fastestLap;                         // +0x750 EventManager 0x0045c8b0 copies it to ZoneReport's "FastestLap" (TrackRecord reads it)
     float totalRunningTime;                   // +0x754 FLT_MAX until finished; ZoneReport "TotalrunningTime" (0x0045c8b0)
-    int field_0x758;                          // +0x758
+    int totalTrickTime;                       // +0x758  KrustyBike::totalTrickTime (an int view of the float)
     float tagRun;                             // +0x75c the current run as the followed racer in tag (mode 4); banked by
                                               // TrackGameViewOwner 0x004a9e80 and EventManager 0x0045eef0
     float bestTagRun;                         // +0x760 best banked run

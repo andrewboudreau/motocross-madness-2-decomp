@@ -125,7 +125,7 @@ public:
     float lastLapTime;  // +0x74C  RaceView/BikeRace +0x74c last lap time; FormatLapTime (0x00518690) takes it as a float
     float fastestLap;  // +0x750  RaceView/BikeRace +0x750; EventManager copies it to ZoneReport "FastestLap"; FormatLapTime float
     float totalRunningTime;  // +0x754  RaceView +0x754: FLT_MAX until finished; ZoneReport "TotalrunningTime"
-    float field_0x758; // 0x758
+    float totalTrickTime;                     // +0x758  slot 42 adds each finished trick's seconds; slot 43 clears it per race; sent in message 0x86 (tier 3)
     float tagRun;  // +0x75C  RaceView +0x75c: current run as the followed racer in tag (mode 4)
     float bestTagRun;  // +0x760  RaceView +0x760 best banked tag run
     float totalTagRun;  // +0x764  RaceView +0x764 sum of the banked tag runs
@@ -144,14 +144,14 @@ public:
     int field_0x798; // 0x798
     int engineClass;  // +0x79C loader: 0 for engineSize <= 125, 1 below 500, else 2; BikeAI indexes its speed table (0x00566f74) with it
     short lapCount;  // +0x7A0  RaceView/BikeRace +0x7a0 laps
-    short field_0x7a2; // 0x7A2
+    short prevLapCount;                       // +0x7A2  lapCount of the previous frame (slot 49); compared for the first-lap check (tier 3)
     char hasFinished;  // +0x7A4  RaceView +0x7a4 finished (BikeRace racer +0x7a4 finished)
-    char field_0x7a5; // 0x7A5
+    char spawnProtectEndPending;              // +0x7A5  slot 50 sets it on an off request while spawnProtected; cleared with Fn_00496E30(0) once the bike is clear (tier 3)
     char pad_0x07A6[0x2];
     float field_0x7a8; // 0x7A8
-    float field_0x7ac; // 0x7AC
-    float field_0x7b0; // 0x7B0
-    float field_0x7b4; // 0x7B4  bonus accumulated by 0x00495ff0
+    float repairDamage;                       // +0x7AC  slot 28 adds rand x 0.667 (AI 0.15) per new crash; PayOutRace reads it via the result +0x34 as repairs x 500 (tier 3)
+    float injuryDamage;                       // +0x7B0  slot 28 adds rand x 0.667 (AI 0.15) per new crash; result +0x38, medical x 250 (tier 3)
+    float stuntEarnings;                      // +0x7B4  0x00495ff0 adds the pro-circuit trick step, capped at purse x StuntCapPct / 400; result +0x3c, stunts x 400 (tier 3)
     int lapGate;  // +0x7B8  RaceView/BikeRace +0x7b8 gate of the lap (AdvanceGate's gateIndex)
     int nextLapGate;  // +0x7BC  RaceView/BikeRace +0x7bc lapGate + 1 wrapped by the gate count
     int forceGatePass;  // +0x7C0  RaceStatus passes it as CountLap/AdvanceGate `forced`: with isRemote the gate/lap counts only when set
@@ -197,36 +197,36 @@ public:
     float deltaBasePitch;  // +0x1380  message 13 delta base, set from message 1 pitch
     float deltaBaseYaw;  // +0x1384  message 13 delta base, set from message 1 yaw
     int deltaBaseTime;  // +0x1388  message 13 delta base ms time (message 1 +0x4c)
-    float field_0x138c; // 0x138C  seconds left of the slot-50 hold 0x00493660 starts
+    float stallHoldTimer;                     // +0x138C  set to g_kbStallHoldSec with slot 50(1) when stateIntervalElapsed reaches g_kbStallThreshold; counts down by frameTime (tier 3)
     KbBikeState recordState; // 0x1390  last state recorded (0x00492ad0 with record set)
     KbRecorder* netRecorder; // 0x13FC
-    int field_0x1400; // 0x1400
-    int field_0x1404; // 0x1404
-    int field_0x1408; // 0x1408
-    int field_0x140c; // 0x140C
+    int poseParamLatched;                     // +0x1400  set when the received poseParam jumps by 0x40..0x7c; holds poseParam at latchedPoseParam until the target is near 0 or the centre (tier 3)
+    int poseLeanBlendLatched;                 // +0x1404  the same latch for poseLeanBlend (tier 3)
+    int latchedPoseParam;                     // +0x1408  poseParam byte frozen by poseParamLatched; retail also stores the lean byte here (tier 3)
+    int latchedPoseLeanBlend;                 // +0x140C  read as the frozen poseLeanBlend byte; retail stores that byte at +0x1408, so only the reset writes it (tier 3)
     int debugPage; // 0x1410  -1 from the constructor; the "KrustyBike" debug-overlay page (Tick 0x004977a0 takes the next line)
     KbObj128* altBodyA; // 0x1414
     KbObj128* altBodyB; // 0x1418
-    float field_0x141c; // 0x141C
+    float trickLandTimer;                     // +0x141C  slot 71 sets 0.3 on landing with a trick pending; slot 29 scores via 0x00495ff0 when it runs out (tier 3)
     int animSetA[16]; // 0x1420  Fn_0048D910 indexes it with the argument (rider handle for riderCharacter); tier 3 name
     int animSetB[16]; // 0x1460  Fn_0048D910: same index, handle for the D3DIMSoultreeCharacter base
     int animSetC[16]; // 0x14A0  Fn_0048D990: handle for riderCharacter
     int animSetD[16]; // 0x14E0  Fn_0048D990: handle for the base character
-    float field_0x1520; // 0x1520
-    float field_0x1524; // 0x1524
-    float field_0x1528; // 0x1528
+    float trickClipTime;                      // +0x1520  seconds into the trick clip; slot 102 adds dt up to s_kbTrickLength[trick]; summed by slot 42 (tier 3)
+    float chainedTrickTime;                   // +0x1524  clip time banked by the chain start 0x0048d990; summed by slot 42 (tier 3)
+    float trickHoldTime;                      // +0x1528  seconds the player holds the pose in the s_kbTrickFrame window; summed by slot 42 (tier 3)
     float field_0x152c; // 0x152C
-    float field_0x1530; // 0x1530
+    float trickPoints;                        // +0x1530  slot 42 adds 2500 per trick second; 0x00495ff0 rounds it to 100 and shows it with the multiplier (tier 3)
     float field_0x1534; // 0x1534
-    float field_0x1538; // 0x1538
-    char field_0x153c; // 0x153C
-    unsigned char field_0x153d; // 0x153D
-    char field_0x153e; // 0x153E
-    char field_0x153f; // 0x153F
-    Vec3 field_0x1540; // 0x1540
-    char field_0x154c; // 0x154C
-    char field_0x154d; // 0x154D
-    char field_0x154e; // 0x154E
+    float trickMultiplier;                    // +0x1538  slot 42 sets it to trickCount, +0.5 when chained; multiplies trickPoints (tier 3)
+    char trickPoseHeld;                       // +0x153C  set while the trick pose is held in the s_kbTrickFrame window; sent as message flag9 (tier 3)
+    unsigned char trickCount;                 // +0x153D  tricks finished since the last score (slot 42 increments it) (tier 3)
+    char trickPoseHeldPrev;                   // +0x153E  trickPoseHeld of the previous frame (slot 49) (tier 3)
+    char trickChained;                        // +0x153F  set by the chain start 0x0048d990; +0.5 multiplier in 0x00495ff0 (tier 3)
+    Vec3 lastFramePosition;                   // +0x1540  position copied at the end of slot 49; the followed bike is drawn there in camera state 3 (tier 3)
+    char drawnAtLastPosition;                 // +0x154C  slot 49 sets it when the model was moved to lastFramePosition (tier 3)
+    char headTurningToRival;                  // +0x154D  set by 0x0048e280; slot 102 turns headTurnAngle towards the rival and clears it on arrival (tier 3)
+    char headTurningBack;                     // +0x154E  set when the head-turn hold runs out; cleared back at 0 (tier 3)
     char pad_0x154F[0x1];
     float rivalBearingScaled;  // +0x1550  Fn_0048E280 stores a clamped, scaled bearing to the nearest rival
     float headTurnAngle;  // +0x1554  head angle of the turn towards the rival (slot 102); Fn_0048E280 clears it

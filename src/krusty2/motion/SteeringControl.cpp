@@ -30,7 +30,7 @@ SteeringControl::SteeringControl(float scale, float t, const Vec3* axisZ, const 
     float s = t > 0.0f ? t : 0.0f;
     if (s >= 1.0f)
         s = 1.0f;
-    field_0x08 = scale * s;
+    maxAngle = scale * s;
     node = new(__FILE__, 0x17) SoultreeObject(1);
     node->SetPosition(0.0f, 0.0f, 0.0f);
     node->SetAxesPtr(axisZ, axisY, 1, 0);

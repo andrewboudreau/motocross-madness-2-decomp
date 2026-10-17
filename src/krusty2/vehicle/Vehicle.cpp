@@ -10,7 +10,7 @@
 void Vehicle::UnknownVirtualSlot0(float dt)
 {
     SoultreePhysicsCharacter::UnknownVirtualSlot0(dt);
-    field_0x4dc = (field_0x4d8 * baseWeight + dt) * 0.0310558993f;   // 1/32.2
+    suspensionMass = (suspensionWeightScale * baseWeight + dt) * 0.0310558993f;   // 1/32.2
 }
 
 int Vehicle::UnknownVirtualSlot42()
@@ -38,7 +38,7 @@ Vec3* Vehicle::UnknownVirtualSlot55(Vec3* out, Vec3* pos)
 }
 
 float Vehicle::UnknownVirtualSlot57() { return leanAngle; }
-float Vehicle::UnknownVirtualSlot59() { return steerState->field_0x08; }
+float Vehicle::UnknownVirtualSlot59() { return steerState->maxSteerAngle; }
 float Vehicle::UnknownVirtualSlot61(float arg) { return 0.0f; }
 
 int Vehicle::UnknownVirtualSlot62(float arg)
@@ -51,22 +51,22 @@ int Vehicle::UnknownVirtualSlot89(float arg)
     return UnknownVirtualSlot66();
 }
 
-void Vehicle::UnknownVirtualSlot93() { field_0x51c = 0.5f; }
+void Vehicle::UnknownVirtualSlot93() { forceFeedbackGain = 0.5f; }
 
 void Vehicle::UnknownVirtualSlot96()
 {
-    field_0x524[0] = 1.0f;
-    field_0x524[1] = 1.0f;
-    field_0x524[2] = 1.0f;
-    field_0x524[3] = 1.0f;
-    field_0x524[4] = 1.0f;
-    field_0x524[5] = 1.0f;
+    controlResponse[0] = 1.0f;
+    controlResponse[1] = 1.0f;
+    controlResponse[2] = 1.0f;
+    controlResponse[3] = 1.0f;
+    controlResponse[4] = 1.0f;
+    controlResponse[5] = 1.0f;
 }
 
 void Vehicle::UnknownVirtualSlot21()
 {
     SoultreePhysicsCharacter::UnknownVirtualSlot21();
-    field_0x5b0 = engineState->field_0x00;
+    prevThrottleFraction = engineState->throttleFraction;
 }
 
 int Vehicle::UnknownVirtualSlot82()
@@ -198,9 +198,9 @@ void Vehicle::UnknownVirtualSlot86()
         if (w->inContact) {
             if (w->aux) {
                 float sp = linearSpeed;
-                float dt = field_0x4a4;
-                w->aux->Method_004D31B0(sp, &w->rollDirection, dt, field_0x47a, 100.0f,
-                                                &w->field_0x248, &w->field_0x280);
+                float scale = driveForceScale;
+                w->aux->DriveForce(sp, &w->rollDirection, scale, backingUp, 100.0f,
+                                                &w->driveForce, &w->field_0x280);
             }
             w->UpdateDriveShare(this);
         }
@@ -336,7 +336,7 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
     }
     if (field_0x430) {
         for (i = 0; i < wheelCount; i++) {
-            wheelList[i]->loadWeight = wheelList[i]->field_0x294;
+            wheelList[i]->loadWeight = wheelList[i]->restLoadWeight;
             float w = wheelList[i]->loadWeight;
             wheelList[i]->appliedShare = *arg * w;
         }
@@ -705,7 +705,7 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
     if (wheelCount > 0) do {
         VehicleWheel* w = wheelList[i];
         if (w->aux && w->inContact && !w->impactPosted &&
-            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + w->surfaceMaterial])) {
+            (!track || ((VehicleMaterialSet*)track)->environment[0x400 + w->surfaceMaterial])) {
             w->impactPosted = 1;
             float v = w->driveShareComplement * 20.0f;
             ev->impactSink->SetPosition(w->groundPoint, (v > 1.0f) ? v : 1.0f);
@@ -717,7 +717,7 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
     if (wheelCount > 0) do {
         VehicleWheel* w = wheelList[i];
         if (w->inContact && !w->impactPosted &&
-            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + w->surfaceMaterial])) {
+            (!track || ((VehicleMaterialSet*)track)->environment[0x400 + w->surfaceMaterial])) {
             w->impactPosted = 1;
             ev->impactSink->SetPosition(w->groundPoint, 0.0f);
             VehCommitImpact(ev, &ev->impactSink);
@@ -728,7 +728,7 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
     if (collisionPointCount > 0) do {
         VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
         if (c->contactActive && !c->impactPosted &&
-            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + c->surfaceMaterial])) {
+            (!track || ((VehicleMaterialSet*)track)->environment[0x400 + c->surfaceMaterial])) {
             c->impactPosted = 1;
             ev->impactSink->SetPosition(c->impactPosition, 0.0f);
             VehCommitImpact(ev, &ev->impactSink);
@@ -746,7 +746,7 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
     if (wheelCount > 0) do {
         VehicleWheel* w = wheelList[i];
         if (w->aux && w->inContact && !w->slidePosted &&
-            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x408 + w->surfaceMaterial])) {
+            (!track || ((VehicleMaterialSet*)track)->environment[0x408 + w->surfaceMaterial])) {
             if (!(w->driveShare < 0.95f))
                 return;
             w->slidePosted = 1;
@@ -757,7 +757,7 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
             scratchVector2.z = -w->tangentCos;
             scratchVector = modelNode->LocalToWorldDirection(scratchVector2);
             scratchVector.y = w->driveShareComplement * 3.0f;
-            scratchVector *= w->field_0x290 * invStepTime;
+            scratchVector *= w->driveDistance * invStepTime;
             scratchVector.x = VehMinF(scratchVector.x, 15.0f);
             scratchVector.y = VehMinF(scratchVector.y, 18.0f);
             scratchVector.z = VehMinF(scratchVector.z, 15.0f);
@@ -769,7 +769,7 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
     if (wheelCount > 0) do {
         VehicleWheel* w = wheelList[i];
         if (w->inContact && !w->slidePosted &&
-            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x408 + w->surfaceMaterial])) {
+            (!track || ((VehicleMaterialSet*)track)->environment[0x408 + w->surfaceMaterial])) {
             w->slidePosted = 1;
             if (w->field_0x280.z > 0.2f) {
                 VehCommitImpact(ev, &ev->slideSink);
@@ -798,7 +798,7 @@ void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* arg)
             scratchVector2.z = -w->tangentCos;
             scratchVector = modelNode->LocalToWorldDirection(scratchVector2);
             scratchVector.y = w->driveShareComplement * 3.0f;
-            scratchVector *= w->field_0x290 * invStepTime;
+            scratchVector *= w->driveDistance * invStepTime;
             scratchVector.x = VehMinF(scratchVector.x, 15.0f);
             scratchVector.y = VehMinF(scratchVector.y, 18.0f);
             scratchVector.z = VehMinF(scratchVector.z, 15.0f);
@@ -956,16 +956,16 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         Vec3 zero = kVec3Zero;
         if (crashState == 0) {
             if (UpdateWheelRampLevels())
-                engineState->field_0x08 = 1;
+                engineState->driveCut = 1;
         } else if (totalWeight != baseWeight) {
             if (UnknownVirtualSlot10())
                 UnknownVirtualSlot0(0.0f);
         }
-        field_0x47a = UnknownVirtualSlot82() != 0;
-        field_0x479 = crashState == 0 && (field_0x47a || UnknownVirtualSlot81());
+        backingUp = UnknownVirtualSlot82() != 0;
+        driveDisengaged = crashState == 0 && (backingUp || UnknownVirtualSlot81());
         throttleOn = crashState == 0 && UnknownVirtualSlot80();
-        engineState->Method_004D2F50(stepTime, throttleOn, field_0x479);
-        engineState->Method_004D3030(throttleOn, linearSpeed);
+        engineState->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
+        engineState->AutoShift(throttleOn, linearSpeed);
         if (hit) {
             Vec3 hitA, hitB, hitC;
             int dummy = 0;
@@ -1005,7 +1005,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         UnknownVirtualSlot8();
         UnknownVirtualSlot6(&up, &speed);
         UnknownVirtualSlot7(&up);
-        field_0x4b4 = UnknownVirtualSlot75();
+        wheelForwardAlignment = UnknownVirtualSlot75();
         int settled = 0;
         if (!anyWheelInContact && !pointsTouching)
             settled = 1;
@@ -1277,7 +1277,7 @@ int Vehicle::UnknownVirtualSlot80()
 {
     if ((inputDevice && throttleInput > 0.33f)
         || (inputMap->UnknownVirtualSlot3(0, 2, 0x3f, 0)
-            && !UnknownVirtualSlot77(engineState->field_0x00 == 0.0f)))
+            && !UnknownVirtualSlot77(engineState->throttleFraction == 0.0f)))
         return 1;
     return inputMap->UnknownVirtualSlot3(200, 0, 0x3f, 0) != 0;
 }
@@ -1521,25 +1521,25 @@ void Vehicle::UnknownVirtualSlot1(float value)
     steerRate = 0.0f;
     leanAngle = 0.0f;
     leanCos = 1.0f;
-    field_0x4b4 = 1.0f;
+    wheelForwardAlignment = 1.0f;
     targetLeanAngle = 0.0f;
     contactTotal = 0;
-    field_0x520 = 1;
+    steerPoseState = 1;
     throttleInput = 0.0f;
     prevControlInput = kVec3Zero;
     throttleOn = false;
-    field_0x479 = false;
-    field_0x47a = false;
+    driveDisengaged = false;
+    backingUp = false;
     VehicleSpeedState* s = engineState;
     if (s) {
         s->gear = 0;
-        s->field_0x04 = 0;
-        s->field_0x84 = 0;
-        s->field_0x00 = 0.0f;
+        s->currentRpm = 0;
+        s->lastUpdateRpm = 0;
+        s->throttleFraction = 0.0f;
         s->gearTimer = 0.0f;
-        s->field_0x08 = 1;
+        s->driveCut = 1;
         float unit = (float)rand() * 3.05175781e-05f;
-        s->randomStart = unit * s->field_0x60[s->gear] + s->field_0x30[s->gear].a;
+        s->randomStart = unit * s->shiftWindowWidths[s->gear] + s->shiftRanges[s->gear].a;
     }
     RunTickers();
     ResetWheelContacts();
@@ -1727,10 +1727,10 @@ void Vehicle::Method_005293E0(float* speed)
 {
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* wheel = wheelList[i];
-        if (wheel->field_0x268) {
+        if (wheel->shockEngaged) {
             VehicleShock* shock = (VehicleShock*)(wheel->primaryAux ? wheel->primaryAux : wheel->secondaryAux);
             if (shock)
-                shock->ApplyDamping(wheel->loadWeight, field_0x4dc, lastStepTime, speed);
+                shock->ApplyDamping(wheel->loadWeight, suspensionMass, lastStepTime, speed);
         }
     }
 }
@@ -1786,37 +1786,37 @@ static inline Vec3 VehProjectFirst(const Vec3& v, const Vec3& onto)
 // 0x00529450: folds each wheel's shock forces into the accumulators.  For a wheel with a
 // shock (primary first, else the rotating one) the spring force projected on the ground
 // normal, scaled by leanCos, becomes scratchVector; a pending displacement impulse
-// (field_0x94 * displacement, projected on the Y axis and scaled the same way) is added to
+// (impulseScale * displacement, projected on the Y axis and scaled the same way) is added to
 // *up and consumed.  Then scratchVector is added to the wheel's applied share and to *up,
 // and its moment about relativePosition (in body space, x only) to *zero.
 void Vehicle::Method_00529450(Vec3* up, Vec3* zero)
 {
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* wheel = wheelList[i];
-        if (!wheel->field_0x268 || wheel->pointInContact)
+        if (!wheel->shockEngaged || wheel->pointInContact)
             continue;
         if (wheel->primaryAux) {
             Vec3 p = VehProjectFirst(((VehicleShock*)wheel->primaryAux)->spring, wheel->groundNormal);
             scratchVector = p * leanCos;
-            if (((VehicleShock*)wheel->primaryAux)->field_0x94 != 0.0f) {
-                Vec3 v = ((VehicleShock*)wheel->primaryAux)->field_0x94
+            if (((VehicleShock*)wheel->primaryAux)->impulseScale != 0.0f) {
+                Vec3 v = ((VehicleShock*)wheel->primaryAux)->impulseScale
                          * ((VehicleShock*)wheel->primaryAux)->displacement;
                 Vec3 q = VehProjectTail(v, kVec3YAxis);
                 scratchVector2 = VehScaleCtorCall(q, leanCos);
                 *up += scratchVector2;
-                ((VehicleShock*)wheel->primaryAux)->field_0x94 = 0.0f;
+                ((VehicleShock*)wheel->primaryAux)->impulseScale = 0.0f;
             }
         } else if (wheel->secondaryAux) {
             Vec3 p = VehProjectTail(((VehicleShock*)wheel->secondaryAux)->spring, wheel->groundNormal);
             scratchVector = VehScaleCtorCall(p, leanCos);
-            if (((VehicleShock*)wheel->secondaryAux)->field_0x94 != 0.0f) {
+            if (((VehicleShock*)wheel->secondaryAux)->impulseScale != 0.0f) {
                 Vec3 v = VehScaleCtorCall(((VehicleShock*)wheel->secondaryAux)->displacement,
-                                          ((VehicleShock*)wheel->secondaryAux)->field_0x94);
+                                          ((VehicleShock*)wheel->secondaryAux)->impulseScale);
                 Vec3 q = VehProjectTail(v, kVec3YAxis);
                 Vec3& impulse = scratchVector2;
                 impulse = VehScaleCtorCall(q, leanCos);
                 *up += impulse;   // through the reference: loads impulse.x first (byte-exact)
-                ((VehicleShock*)wheel->secondaryAux)->field_0x94 = 0.0f;
+                ((VehicleShock*)wheel->secondaryAux)->impulseScale = 0.0f;
             }
         }
         wheel->appliedShare += scratchVector;
@@ -1868,7 +1868,7 @@ void Vehicle::UpdateWheelsInContact()
         VehicleWheel* wheel = wheelList[i];
         if (wheel->inContact) {
             wheel->UpdateContactPatch(&centerOfMass, worldAngularVelocity, velocity, linearSpeed, &forwardSpeed, &movingForward);
-            wheel->Method_00513C70(lastStepTime, (unsigned char)pointsTouching, crashState, linearSpeed, &velocity, &savedForward);
+            wheel->UpdateShock(lastStepTime, (unsigned char)pointsTouching, crashState, linearSpeed, &velocity, &savedForward);
             if (wheel->pointInContact)
                 wheelPointInContact = 1;
         } else if (wheel->primaryAux) {
@@ -1896,8 +1896,8 @@ void Vehicle::AccumulateWheelContacts(Vec3* up, Vec3* zero, float d)
                     wheel->field_0x16c = 0;
                 }
                 if (wheel->aux) {
-                    *up += wheel->field_0x248;
-                    scratchVector2 = UnknownVirtualSlot76(&wheel->relativePosition, &wheel->field_0x248);
+                    *up += wheel->driveForce;
+                    scratchVector2 = UnknownVirtualSlot76(&wheel->relativePosition, &wheel->driveForce);
                     scratchVector = modelNode->WorldToLocalDirection(scratchVector2);
                     *zero += scratchVector;
                 }
@@ -1913,19 +1913,19 @@ void Vehicle::ResetWheelContacts()
         VehicleWheel* wheel = wheelList[i];
         wheel->field_0x2a4 = 1.0f;
         wheel->slipVector = kVec3Zero;
-        wheel->field_0x248 = kVec3Zero;
+        wheel->driveForce = kVec3Zero;
         wheel->field_0x280.x = 0.0f;
         wheel->field_0x254 = kVec3Zero;
         wheel->driveShare = 1.0f;
         wheel->field_0x280.z = 1.0f;
         wheel->driveShareComplement = 0.0f;
         wheel->rampLevel = 0.0f;
-        wheel->field_0x290 = 0.0f;
+        wheel->driveDistance = 0.0f;
         wheel->rollAngle = 0;
         wheel->slipSpeed = 0;
         wheel->inContact = 0;
         wheel->tangentCos = 0.0f;
-        wheel->field_0x26c = 0;
+        wheel->shockExtending = 0;
         wheel->sceneNode->GetPositionIn(0, &wheel->nodePosition);
         wheel->field_0x16c = 0;
         wheel->frictionDirection = kVec3Zero;
@@ -1935,10 +1935,10 @@ void Vehicle::ResetWheelContacts()
         wheel->spinSpeed = 0;
         wheel->appliedShare = kVec3Zero;
         wheel->pointInContact = 0;
-        wheel->field_0x13c = 0.0f;
+        wheel->frictionMagnitude = 0.0f;
         wheel->frictionForce = kVec3Zero;
-        wheel->field_0x12c = 0;
-        wheel->field_0x120 = kVec3Zero;
+        wheel->normalLoad = 0;
+        wheel->normalLoadVector = kVec3Zero;
     }
 }
 
@@ -1992,7 +1992,7 @@ GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3,
     steerAxis = steer;
     leanAxis = lean;
     throttleAxis = throttle;
-    field_0x4d8 = arg18;
+    suspensionWeightScale = arg18;
     inputDevice = device;
     wheelCapacity = wheelCap;
     if (wheelCapacity > 0) {
@@ -2014,22 +2014,22 @@ GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3,
     }
     crashReason = 0;
     justLanded = 0;
-    field_0x438 = 180.0f;
+    referenceSpeed = 180.0f;
     maxLeanAngle = 40.0f * 0.01745329f;
     maxLeanRate = 120.0f * 0.01745329f;
     crashTimerReload = 2.0f;
-    field_0x44c = 200.0f;
+    impactAccelLimit = 200.0f;
     speedGainLimit = -1000.0f;
     verticalAccelSmoother = new(__FILE__, 0x19d) VehicleSmoother(0.14f);
     forwardAccelSmoother = new(__FILE__, 0x1a0) VehicleSmoother(0.5f);
     UnknownVirtualSlot96();
     if (defaultEngine)
         engineState = new(__FILE__, 0x1aa) VehicleSpeedState(engineName, 0.02f, 0, 0, 0, 0, gearArg,
-                                                             field_0x524[2], field_0x524[3]);
+                                                             controlResponse[2], controlResponse[3]);
     else
         engineState = new(__FILE__, 0x1b5) VehicleSpeedState(engineName, 0.02f, torqueTable, rpmLow,
                                                              rpmHigh, rpmStep, gearArg,
-                                                             field_0x524[2], field_0x524[3]);
+                                                             controlResponse[2], controlResponse[3]);
     SoultreePhysicsCharacter::UnknownVirtualSlot40(a1, 0, a3, a4, a5, a6, a7, a8, a9, a10, a11,
                                                    wheelCap + extraContacts, a13, a14, 0.02f,
                                                    100, 0.001f, 0.1f, 3,
@@ -2039,7 +2039,7 @@ GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3,
         sparkEmitter = new(__FILE__, 0x1dc) VehicleSparkEmitter(1);
         GameObject::AppendChild(sparkEmitter->UnknownVirtualSlot27(renderContext, field_0x124), -1);
     }
-    steerState = new(__FILE__, 0x1e0) VehicleSteerState(steerScale, field_0x524[0], &a7, &a8);
+    steerState = new(__FILE__, 0x1e0) VehicleSteerState(steerScale, controlResponse[0], &a7, &a8);
     Vec3 down = a8 * -1.0f;
     steerState->SetAxisFromDirection(&down, modelNode);
     steerState->SetAngle(0, modelNode);
@@ -2065,7 +2065,7 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     forwardAccelSmoother = 0;
     weightForce = kVec3Zero;
     leanCos = 1.0f;
-    field_0x4b4 = 1.0f;
+    wheelForwardAlignment = 1.0f;
     field_0x124 = 0;
     sparkEmitter = 0;
     inShadow = 0;
@@ -2091,7 +2091,7 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     attachmentCount = 0;
     attachmentCapacity = 0;
     steerAxis = 0;
-    field_0x4a4 = 1.0f;
+    driveForceScale = 1.0f;
     terrainScale = 1.0f;
     throttleAxis = 0;
     inputMap = 0;
@@ -2111,7 +2111,7 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     lastStepTime = 0.025f;
     allWheelsInContact = 0;
     prevCrashState = 0;
-    field_0x5b0 = 0;
+    prevThrottleFraction = 0;
     controlInput = kVec3Zero;
     prevControlInput = kVec3Zero;
     steerInput = 0;
@@ -2120,7 +2120,7 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     track = 0;
     inputDevice = 0;
     throttleInput = 0;
-    field_0x520 = 1;
+    steerPoseState = 1;
     *(int*)&pad_0x5B8 = 0;
     Vehicle::UnknownVirtualSlot1(165.0f);
     spawnProtected = 0;
@@ -2264,19 +2264,19 @@ void Vehicle::Method_00527A20(float* speed, Vec3* torque, Vec3* force)
         if (!w->inContact)
             continue;
         float d = VehDotG(w->appliedShare, w->groundNormal);
-        w->field_0x12c = d;
+        w->normalLoad = d;
         if (d >= 0.0f) {
-            w->field_0x120 = Vec3(0.0f, 0.0f, 0.0f);
-            w->field_0x12c = 0.0f;
+            w->normalLoadVector = Vec3(0.0f, 0.0f, 0.0f);
+            w->normalLoad = 0.0f;
         } else {
             Vec3 t;
             d = -d;
-            w->field_0x12c = d;
-            w->field_0x120 = *Vec3ScaleCall(&t, &w->groundNormal, d);
+            w->normalLoad = d;
+            w->normalLoadVector = *Vec3ScaleCall(&t, &w->groundNormal, d);
         }
         w->contactPoint.UnknownVirtualSlot1();
         float budget = w->spinSpeed + w->tangentSpeed;
-        float timeScale = w->field_0x13c;
+        float timeScale = w->frictionMagnitude;
         if (timeScale > 0.0f && budget != 0.0f) {
             float dt = stepTime;
             float mass = bodyMass;

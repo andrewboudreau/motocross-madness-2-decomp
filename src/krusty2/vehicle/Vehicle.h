@@ -109,10 +109,11 @@ struct VehicleContact {              // elements of Vehicle+0x12c
     char pad_0xAC[0x10];
     unsigned char surfaceMaterial;        // +0xbc surface material id
 };
-// Table object at Vehicle+0x1f0: field_0xa4 points at a byte table (+0x400) indexed by material id.
+// Object at Vehicle+0x1f0, viewed as the Scene (SceneManager.h): environment points at the
+// "Environment" section, whose generateDust/generateDirt bytes are indexed by material id.
 struct VehicleMaterialSet {
     char pad_0x00[0xA4];
-    char* field_0xa4;
+    char* environment;                        // +0xA4  Scene +0xa4 environment (SceneManager.h UnknownSceneEnvironment, byte view): slot 18 tests generateDust (+0x400), slot 19 generateDirt (+0x408) per surface material
 };
 // Sink at VehicleImpactEvent+0x04 (provisional): fields 0x44/0x50/0x60 are touched by slot 18.
 struct VehicleImpactSink {
@@ -134,28 +135,29 @@ struct VehicleImpactEvent {          // argument of slots 18..20 (provisional)
     char pad_0x10[0x14];
     char field_0x24;
 };
-// Object at Vehicle+0x480 (provisional): lean/speed state; field_0x00 is read by slots 42/57 as a float.
+// Object at Vehicle+0x480: the engine gearbox (ctor 0x004d2940, 0x1e4 bytes), the same object as
+// src/reconstructed/GearRatios.h's UnknownEngineGearbox; slots 42/57 read throttleFraction.
 struct VehicleSpeedEntry { float a; float b; };   // 8-byte table entry (slot 1 reads .a)
 struct VehicleSpeedState {
-    float field_0x00;
-    int field_0x04;
-    int field_0x08;
+    float throttleFraction;                   // +0x0  UnknownEngineGearbox +0x00 (GearRatios.h); UpdateThrottle ramps it in [0, 1]
+    int currentRpm;                           // +0x4  UnknownEngineGearbox +0x04 current rpm (an int view of the float)
+    int driveCut;                             // +0x8  UnknownEngineGearbox +0x08; DriveForce gives no engine torque while set
     float gearTimer;                // +0x0c countdown timer
     unsigned char gear;        // +0x10 table index (slot 1)
     char pad_0x11[0x1F];
-    VehicleSpeedEntry field_0x30[6];
-    float field_0x60[6];
+    VehicleSpeedEntry shiftRanges[6];         // +0x30  UnknownEngineGearbox +0x30 shift ranges (.a = lower rpm)
+    float shiftWindowWidths[6];               // +0x60  UnknownEngineGearbox +0x60 shift window widths
     float randomStart;                // +0x78 randomised start value (slot 1)
     char pad_0x7C[0x8];
-    int field_0x84;
+    int lastUpdateRpm;                        // +0x84  UnknownEngineGearbox +0x84 rpm at the last update
     char pad_0x88[0x15c];           // the object is 0x1e4 bytes (LoadVehicle's allocation)
     ~VehicleSpeedState();                           // 0x00464e90, the shared empty out-of-line destructor (~Vehicle)
     // 0x004d2940 (ret 0x24): the gearbox constructor (src/reconstructed/GearRatios.h names the
-    // parameters); LoadVehicle passes 0.02f, the table/rpm arguments or zeros, and field_0x524[2..3].
+    // parameters); LoadVehicle passes 0.02f, the table/rpm arguments or zeros, and controlResponse[2..3] (PressThrottle/ReleaseThrottle).
     VehicleSpeedState(const char* name, float unused, int* torqueTable, int rpmLow, int rpmHigh,
                       int rpmStep, float a6, float riseRate, float fallRate);
-    void Method_004D2F50(float dt, int a, bool b);  // 0x004d2f50, purpose unknown (b: one byte pushed)
-    void Method_004D3030(int a, float speed);       // 0x004d3030, purpose unknown
+    void UpdateThrottle(float dt, int throttleOn, bool cutDrive);  // 0x004d2f50, GearRatios.h UnknownEngineGearbox::UpdateThrottle (cutDrive: one byte pushed)
+    void AutoShift(int throttleOn, float speed);   // 0x004d3030, GearRatios.h UnknownEngineGearbox::AutoShift
     // Inline in Vehicle slot 49: counts the timer down to zero (retail loads dt before the
     // timer, the inline-parameter order).
     void TickGearTimer(float dt)
@@ -199,7 +201,7 @@ struct VehicleContactSet;            // object at SoultreePhysicsCharacter+0x128
 struct VehicleSteerState {
     SoultreeObject* steerNode;  // +0x00 scene node positioned/oriented in slots 36/58
     float steerAngle;  // +0x04 slot 60 subtracts it; slot 73 uses sin(it) and |it|
-    float field_0x08;
+    float maxSteerAngle;                      // +0x8  SteeringControl +0x08 = scale * clamp01(t); LoadVehicle passes steerScale (Bike: 40 degrees) and controlResponse[0]; slot 59 returns it, Bike divides steerAngle by it
     char pad_0x0c[0xc];              // 0x18 bytes (LoadVehicle's allocation)
     ~VehicleSteerState();                                      // 0x00504c50 (~Vehicle deletes it)
     // 0x00504b60 / 0x00504c70: SteeringControl's constructor and SetAxisFromDirection
@@ -269,12 +271,12 @@ struct VehicleShock {
     char pad_0x48[0x10];
     Vec3 spring;                     // +0x58 spring force (Suspension.h name); Method_00529450 projects it on the ground normal
     char pad_0x64[0x10];
-    Vec3 displacement;               // +0x74 Suspension.h name; scaled by field_0x94 and projected on the Y axis
+    Vec3 displacement;               // +0x74 Suspension.h name; scaled by impulseScale and projected on the Y axis
     char pad_0x80[0x14];
-    float field_0x94;                // scale of the displacement impulse, consumed (zeroed) by Method_00529450
+    float impulseScale;              // +0x94 one-shot scale of the displacement impulse: Bike slot 65 sets it on a fast pitch-input rise; Method_00529450 adds the Y part of displacement * it (times leanCos) and zeroes it
     void ClearForces();                                         // 0x004f9c70
     // 0x004f9d30 (ret 0x10): Suspension.h's Shock::ApplyDamping; Method_005293E0 passes the
-    // wheel's load weight, Vehicle+0x4dc, the last step time and its speed output.
+    // wheel's load weight, Vehicle+0x4dc suspensionMass, the last step time and its speed output.
     void ApplyDamping(float weight, float a, float dt, float* speed);
 };
 struct VehicleInlineShock : VehicleShock {
@@ -299,11 +301,14 @@ struct VehicleRotatingShock : VehicleShock {
     float armLengthSq;               // +0xcc armLength squared
     char pad_0xd0[0x14];             // 0xe4 bytes (the loader's allocation)
 };
-struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisional)
+// Object at VehicleWheel+0x2a8: Bike's loader passes engineState (the gearbox) for driven wheels.
+struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisional view)
     char pad_0x00[0x8C];
     int field_0x8c;
     int field_0x90;
-    void Method_004D31B0(float a, Vec3* b, float c, bool d, float e, Vec3* f, Vec3* g);
+    // 0x004d31b0: GearRatios.h UnknownEngineGearbox::DriveForce (the last argument is its float* magnitude).
+    void DriveForce(float speedRatio, Vec3* direction, float scale, bool reversing, float reverseForce,
+                    Vec3* force, Vec3* magnitude);
 };
 // The wheel's collision point (VehicleWheel+0xb8, the CollisionPoint base of Tire): only its
 // virtual slot 1 (friction update) is called here, by Method_00527A20.  Provisional view.
@@ -329,10 +334,10 @@ struct VehicleWheel {
     Vec3 appliedShare;              // +0xfc per-wheel share of the applied vector
     Vec3 frictionDirection;  // +0x108 CollisionPoint+0x50 frictionDirection (base at +0xb8)
     Vec3 field_0x114;
-    Vec3 field_0x120;
-    float field_0x12c;  // Method_00527A20: -(appliedShare . groundNormal) when that is negative, else 0
+    Vec3 normalLoadVector;                    // +0x120  CollisionPoint+0x68 (base at +0xb8); Method_00527A20: = groundNormal * normalLoad, zero when appliedShare points away from the ground
+    float normalLoad;                         // +0x12C  CollisionPoint+0x74 (named frictionCoefficient in the base); = -(appliedShare . groundNormal) when negative, else 0 (Method_00527A20, before the contact point's slot 1)
     Vec3 frictionForce;  // +0x130 CollisionPoint+0x78 frictionForce (base at +0xb8)
-    float field_0x13c;  // Method_00527A20: contact time scale (the impulse is limited by it)
+    float frictionMagnitude;                  // +0x13C  CollisionPoint+0x84 frictionMagnitude (base at +0xb8); Method_00527A20 limits the friction impulse by it
     char pad_0x140[4];
     float contactLoad;  // +0x144 slot 72 accumulates it over wheels and averages by the contact count
     float tangentSpeed;  // +0x148 CollisionPoint+0x90 tangentSpeed (base at +0xb8); Method_00527A20 adds it to spinSpeed for the available load
@@ -362,19 +367,19 @@ struct VehicleWheel {
     char pad_0x22C[4];
     Vec3 rollDirection;              // +0x230 Tire.h: normalise(cross(normal, side))
     Vec3 sideAxis;                   // +0x23c Tire.h: wheel axle direction
-    Vec3 field_0x248;
+    Vec3 driveForce;                          // +0x248  DriveForce's force output (slot 86); AccumulateWheelContacts adds it and its moment; ResetWheelContacts clears it
     Vec3 field_0x254;
     int inContact;  // +0x260 selects wheels touching the ground (slots 7, 54, 72, 75-86); count equals Vehicle::wheelsInContact
     int reportContactOutputs;  // +0x264 (Tire.h name) PlaceWheels sets it on the first in-contact wheel without field_0x1c0 (else on wheel 0)
-    int field_0x268;
-    int field_0x26c;
+    int shockEngaged;                         // +0x268  Tire 0x00513c70 sets it after a shock solve; Method_005293E0 damps and Method_00529450 applies the spring only while set
+    int shockExtending;                       // +0x26C  Tire 0x00513c70 copies the shock's extending flag here (Tire.h); ResetWheelContacts clears it
     char pad_0x270[8];
     int rollAngle;  // +0x278 Tire.h rollAngle (float there; only cleared here)
     int slipSpeed;  // +0x27C Tire.h slipSpeed (float there; only cleared here)
     Vec3 field_0x280;
     float tangentCos;              // +0x28c Tire.h: |tangent . rollDirection| clamped to 1
-    float field_0x290;
-    float field_0x294;
+    float driveDistance;                      // +0x290  Tire 0x005143d0: driveShareComplement * drive magnitude * dt * scale; slots 19/20 turn it into a speed with invStepTime
+    float restLoadWeight;                     // +0x294  Tire ctor argument a14; Bike's loader stores the static weight split (rear = share / wheelBase, front = 1 - rear); loadWeight is reset to it
     char pad_0x298[0x4];
     float rampLevel;               // +0x29c 0 selects a flag passed to slot 77 (slot 83)
     float driveStrength;           // +0x2a0 Tire.h ctor arg a10, read by 0x00514170; Method_00527A20 counts the in-contact wheels where it is nonzero
@@ -387,7 +392,7 @@ struct VehicleWheel {
     float driveShareComplement;  // +0x2BC UpdateDriveShare (0x00513f90) stores 1 - driveShare here (0 on the other path)
     void UpdateRoll(float a, float b, int c, int d, int e, float f);   // 0x005143d0
     void UpdateContactPatch(Vec3* origin, Vec3 position, Vec3 velocity, float speed, float* outA, int* outB);   // 0x005135f0 (Tire.h name)
-    void Method_00513C70(float bias, int flag, int crashState, float speed, Vec3* velocity, Vec3* anchor);   // 0x00513c70
+    void UpdateShock(float bias, int flag, int crashState, float speed, Vec3* velocity, Vec3* anchor);   // 0x00513c70 (Tire.h UpdateShock, tier 3 name; sets shockEngaged/shockExtending)
     void UpdateDriveShare(Vehicle* owner);       // 0x00513f90, Tire.h: drive share +0x2b8 from the vehicle speed
     void UpdateAttachment();                    // 0x00515660, called per wheel by Bike slot 41 (0x0040cbd0)
     // 0x00514170 (ret 0x1c): per-wheel drive/brake step called by Method_00527A20 with the
@@ -542,12 +547,12 @@ public:
     // bytes, Bike slot 8 lost its exact match), so the casts are written out.
 
     float forwardSpeed;  // +0x434  velocity along bodyForward (BikeAI dot; UpdateContactPatch out); KrustyBike compares it with 60 mph in ft/s
-    float field_0x438;        // read by Bike slot 59 (0x0040a330) as a float divisor
+    float referenceSpeed;                     // +0x438  LoadVehicle sets 180; Bike slot 59 scales the steer limit by prevSpeed / referenceSpeed; the bike cameras use it in place of 180 (tier 2)
     float turnRate;  // +0x43c = turnAngle * field_0x140 (1/dt) in slot 72: velocity deflection angle per second; reset to 0 whenever no wheel drives it
     int movingForward;  // +0x440 slot 85 passes +dt when set and -dt when clear to every wheel; slot 74 flips the sign of its result on it; slot 1 resets it to 1
     int crashState;  // +0x444 nonzero disables input (slots 52/62/64/60 test ==0), switches solver vectors (+0xf0, 0.1 scale, 1,1,1 mask); Bike slot 99 writes it and runs the crash timer 0x454 while set
     int crashDirection;          // +0x448 Bike slot 99 (0x00409b30) stores small codes (1..5)
-    float field_0x44c;        // Bike slot 99 (0x00409b30) multiplies it (float)
+    float impactAccelLimit;                   // +0x44C  LoadVehicle sets 200; Bike slot 99 reports a crash when impulse * invMass > a * impactAccelLimit (tier 2)
     float speedGainLimit;  // +0x450 slot 70: true when (speed field_0xbc - previous speed field_0xb8) < arg * speedGainLimit
     // 0x454/0x458: Bike slot 39 (0x0040a1f0) decrements 0x454 by the frame time and
     // compares it with 0.0f/-2.0f, so both are floats (tier 2; slot 69 copies 0x458).
@@ -561,26 +566,26 @@ public:
     float throttleInput;  // +0x470 slot 63 latches axis 0x500 value (dead zone 0.2, else -1 when no device); slot 80 tests it > 0.33
     float steerInput;  // +0x474 slot 63: = -axis(0x4f8).value; slot 88 classifies it with 0x504.y into 8 stick sectors; slot 64 zeroes it when crashed
     bool throttleOn;  // +0x478  racesnd.cpp throttle-on flag (RaceView +0x478); Bike's gas gyro acts only while set
-    bool field_0x479;
-    bool field_0x47a;
+    bool driveDisengaged;                     // +0x479  slot 49: = no crash and (backingUp or slot 81); passed as the gearbox's driveCut, so DriveForce gives no engine torque; Bike's gas gyro and racesnd.cpp's engine channel test it (tier 2)
+    bool backingUp;                           // +0x47A  slot 49: = slot 82 (KrustyBike: forwardSpeed < 6 and the back-up input); DriveForce pushes backwards while set; KrustyBike slot 86 ramps that push off the BackUpBottom pose phase +0x664 (tier 2)
     char pad_0x47B[0x1];
     VehicleSteerState* steerState;  // +0x47c VehicleSteerState*: node plus steer angle; slots 53/60/73/36 use it
-    VehicleSpeedState* engineState;  // +0x480 VehicleSpeedState*: 6-entry per-gear tables, advanced by Method_004D2F50/004D3030 with throttle/brake flags and speed in slot 49 (provisional)
+    VehicleSpeedState* engineState;  // +0x480 VehicleSpeedState*: 6-entry per-gear tables, advanced by UpdateThrottle/AutoShift with throttle/brake flags and speed in slot 49 (provisional)
     int justLanded;  // +0x484 slot 49 clears it per frame; slot 71 sets it to 1 when the airborne flag 0x108 drops (landing)
     Vec3 takeoffPosition;  // +0x488 slot 71 copies position field_0x0c here when the vehicle leaves the ground
     Vec3 takeoffVelocity;  // +0x494 slot 71 copies velocity field_0x64 here when the vehicle leaves the ground
     int outOfRace;  // +0x4A0  set to 1 by slot 44; EventManager counts the racer done, KrustyBike's nearest-bike search skips it
-    float field_0x4a4;
+    float driveForceScale;                    // +0x4A4  the constructor sets 1.0; slot 86 (and KrustyBike's) passes it as the gearbox DriveForce scale
     int wheelsInContact;  // +0x4a8 slot 54 divides the wheel normal sum by it; slot 49: 0x5a8 = (it == wheel count), 0x5a4 = (it != 0); slots 46/7 branch on 0/1/2
     float leanAngle;  // +0x4ac slot 56 stores asin(...) of the ground normal against the forward axis; slot 57 returns it; Bike rotates the body by it
     float leanCos;  // +0x4b0 slot 56 stores cos(leanAngle) there
-    float field_0x4b4;
+    float wheelForwardAlignment;              // +0x4B4  slot 49: = slot 75, |dot(mean wheel rollDirection, savedForward)| (1 with no wheels); Bike slot 99 (nose-over test) and slot 92 (lean target) use it (tier 2)
     float turnAngle;  // +0x4b8 result of slot 74 (signed deflection angle of the velocity), see turnRate
     float steerRate;  // +0x4bc slot 60: -(a*b) - steerAngle divided by (c*dt+...); slot 53 feeds steerRate*dt to the steer state
     Vec3 tiltAxisLocal;  // +0x4c0 slot 49: WorldToLocalDirection of the lift axis, used as the RotateAboutPoint axis
     Vec3 sideAxis;  // +0x4cc slots 34/35: cross product of the two basis vectors field_0x88 and field_0x94
-    float field_0x4d8;
-    float field_0x4dc;
+    float suspensionWeightScale;              // +0x4D8  LoadVehicle's float argument after the weight (Bike passes 0.9); slot 0 multiplies baseWeight by it (provisional)
+    float suspensionMass;                     // +0x4DC  slot 0: = (suspensionWeightScale * baseWeight + arg) / 32.2 (weight to slugs); Method_005293E0 passes it to Shock::ApplyDamping as the mass factor of the critical damping (tier 2)
     float targetLeanAngle;  // +0x4e0 Bike clamps it to +-maxLeanAngle and subtracts it from the current lean (slot 57)
     float leanError;        // +0x4e4 Bike slot 92 (0x0040ba30): _finite()/fabs on it (float, tier 2)
     float field_0x4e8;
@@ -592,9 +597,9 @@ public:
     VehicleAxis* throttleAxis;  // +0x500 slot 63 reads its value into throttleInput (dead zone 0.2)
     Vec3 controlInput;  // +0x504 slot 63 writes x = steer (cubed for axis kinds 2/3), y = -lean axis; slot 64 zeroes it when crashed
     Vec3 prevControlInput;  // +0x510 slot 49 copies controlInput here before slot 64 refreshes it
-    float field_0x51c;
-    int field_0x520;
-    float field_0x524[6];
+    float forceFeedbackGain;                  // +0x51C  slot 93 sets 0.5; KrustyBike slot 93 sets FeedbackSlider (TrackGame+0xffc) * 0.04; KrustyBike slot 94 scales the pad force smoothedForwardAccel * it * 180
+    int steerPoseState;                       // +0x520  Bike sets 1..5 from controlInput.x (|x| > 0.9 hard, < 0.032 centre, else partial, by side); Bike slot 89 runs its 5-state pose machine on it (provisional)
+    float controlResponse[6];                 // +0x524  KrustyBike slot 96 maps the response sliders (pct * 0.4 + 0.8; [0] steering pct * 0.2 + 0.575): [0] Steering, [1] Pitch, [2] PressThrottle, [3] ReleaseThrottle, [4] PressBrakes, [5] ReleaseBrakes; [2..3] are the gearbox rise/fall rates
     VehicleWheel** wheelList;  // +0x53c array of VehicleWheel*, iterated up to wheelCount in slots 7/54/72/75/85/86
     int wheelCapacity;               // +0x540 wheel capacity (AddWheel)
     int wheelCount;  // +0x544 loop bound over wheelList in every wheel loop
@@ -622,7 +627,7 @@ public:
     int anyWheelInContact;  // +0x5a4 slot 49: = (wheelsInContact != 0)
     int allWheelsInContact;  // +0x5a8 slot 49: = (wheelsInContact == wheelCount)
     VehicleSparkEmitter* sparkEmitter;  // +0x5AC  VehicleSparkEmitter built by LoadVehicle (Vehicle.cpp line 0x1dc); impact handlers cast it to VehicleImpactSink
-    float field_0x5b0;
+    float prevThrottleFraction;               // +0x5B0  slot 21 copies engineState->throttleFraction here; KrustyBike's tests compare it with the current throttle fraction (rising/falling)
     int prevCrashState;  // +0x5b4 slot 49 stores crashState there at the end of each step; slots 1/67 clear it
     char pad_0x5B8[0x4];      // own data ends at 0x5bc; the compiler places the vtordisp there
 };
@@ -639,24 +644,24 @@ VEH_CHECK_OFFSET(Vehicle, inputDevice, 0x46C);
 VEH_CHECK_OFFSET(Vehicle, throttleInput, 0x470);
 VEH_CHECK_OFFSET(Vehicle, steerInput, 0x474);
 VEH_CHECK_OFFSET(Vehicle, throttleOn, 0x478);
-VEH_CHECK_OFFSET(Vehicle, field_0x479, 0x479);
-VEH_CHECK_OFFSET(Vehicle, field_0x47a, 0x47A);
+VEH_CHECK_OFFSET(Vehicle, driveDisengaged, 0x479);
+VEH_CHECK_OFFSET(Vehicle, backingUp, 0x47A);
 VEH_CHECK_OFFSET(Vehicle, steerState, 0x47C);
 VEH_CHECK_OFFSET(Vehicle, engineState, 0x480);
 VEH_CHECK_OFFSET(Vehicle, justLanded, 0x484);
 VEH_CHECK_OFFSET(Vehicle, takeoffPosition, 0x488);
 VEH_CHECK_OFFSET(Vehicle, takeoffVelocity, 0x494);
-VEH_CHECK_OFFSET(Vehicle, field_0x4a4, 0x4A4);
+VEH_CHECK_OFFSET(Vehicle, driveForceScale, 0x4A4);
 VEH_CHECK_OFFSET(Vehicle, wheelsInContact, 0x4A8);
 VEH_CHECK_OFFSET(Vehicle, leanAngle, 0x4AC);
 VEH_CHECK_OFFSET(Vehicle, leanCos, 0x4B0);
-VEH_CHECK_OFFSET(Vehicle, field_0x4b4, 0x4B4);
+VEH_CHECK_OFFSET(Vehicle, wheelForwardAlignment, 0x4B4);
 VEH_CHECK_OFFSET(Vehicle, turnAngle, 0x4B8);
 VEH_CHECK_OFFSET(Vehicle, steerRate, 0x4BC);
 VEH_CHECK_OFFSET(Vehicle, tiltAxisLocal, 0x4C0);
 VEH_CHECK_OFFSET(Vehicle, sideAxis, 0x4CC);
-VEH_CHECK_OFFSET(Vehicle, field_0x4d8, 0x4D8);
-VEH_CHECK_OFFSET(Vehicle, field_0x4dc, 0x4DC);
+VEH_CHECK_OFFSET(Vehicle, suspensionWeightScale, 0x4D8);
+VEH_CHECK_OFFSET(Vehicle, suspensionMass, 0x4DC);
 VEH_CHECK_OFFSET(Vehicle, targetLeanAngle, 0x4E0);
 VEH_CHECK_OFFSET(Vehicle, leanError, 0x4E4);
 VEH_CHECK_OFFSET(Vehicle, field_0x4e8, 0x4E8);
@@ -668,9 +673,9 @@ VEH_CHECK_OFFSET(Vehicle, leanAxis, 0x4FC);
 VEH_CHECK_OFFSET(Vehicle, throttleAxis, 0x500);
 VEH_CHECK_OFFSET(Vehicle, controlInput, 0x504);
 VEH_CHECK_OFFSET(Vehicle, prevControlInput, 0x510);
-VEH_CHECK_OFFSET(Vehicle, field_0x51c, 0x51C);
-VEH_CHECK_OFFSET(Vehicle, field_0x520, 0x520);
-VEH_CHECK_OFFSET(Vehicle, field_0x524, 0x524);
+VEH_CHECK_OFFSET(Vehicle, forceFeedbackGain, 0x51C);
+VEH_CHECK_OFFSET(Vehicle, steerPoseState, 0x520);
+VEH_CHECK_OFFSET(Vehicle, controlResponse, 0x524);
 VEH_CHECK_OFFSET(Vehicle, wheelList, 0x53C);
 VEH_CHECK_OFFSET(Vehicle, wheelCount, 0x544);
 VEH_CHECK_OFFSET(Vehicle, primaryWheel, 0x548);
@@ -686,7 +691,7 @@ VEH_CHECK_OFFSET(Vehicle, wheelPointInContact, 0x5A0);
 VEH_CHECK_OFFSET(Vehicle, anyWheelInContact, 0x5A4);
 VEH_CHECK_OFFSET(Vehicle, allWheelsInContact, 0x5A8);
 VEH_CHECK_OFFSET(Vehicle, sparkEmitter, 0x5AC);
-VEH_CHECK_OFFSET(Vehicle, field_0x5b0, 0x5B0);
+VEH_CHECK_OFFSET(Vehicle, prevThrottleFraction, 0x5B0);
 VEH_CHECK_OFFSET(Vehicle, prevCrashState, 0x5B4);
 typedef char veh_assert_sizeof[(sizeof(Vehicle) == 0x5ec) ? 1 : -1];
 

@@ -81,12 +81,12 @@ int Vehicle::UnknownVirtualSlot23()
 
 int Vehicle::UnknownVirtualSlot24()
 {
-    return field_0x5b0 < engineState->field_0x00 && crashState == 0 && linearSpeed < 22.0f;
+    return prevThrottleFraction < engineState->throttleFraction && crashState == 0 && linearSpeed < 22.0f;
 }
 
 int Vehicle::UnknownVirtualSlot25()
 {
-    return field_0x5b0 > engineState->field_0x00 && crashState == 0 && linearSpeed < 22.0f;
+    return prevThrottleFraction > engineState->throttleFraction && crashState == 0 && linearSpeed < 22.0f;
 }
 
 int Vehicle::UnknownVirtualSlot78()
