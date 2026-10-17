@@ -76,7 +76,7 @@ CarProcedural::CarProcedural(int flags) : GraphicsTest(flags)
     wheelNodes = 0;
     sensorCollider = 0;
     bodyCollider = 0;
-    field_0x5c = 1;
+    skipSmoothing = 1;
 }
 
 // 0x0042f590 (scalar deleting wrapper 0x0042f570)
