@@ -349,7 +349,7 @@ void GUIManager::AttachDialog(UIDialog* dialog, int a, int wait) {
     int visible = dialog->isEnabled;
 
     dialog->SetShown(0);
-    if (dialog->parentDialog && (dialog->field_0x144 & 1))
+    if (dialog->parentDialog && (dialog->showFlags & 1))
         dialog->parentDialog->controlContainer->AppendSibling(dialog, -1);
     else
         dialogContainer->AppendChild(dialog, -1);

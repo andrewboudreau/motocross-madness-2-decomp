@@ -1836,7 +1836,7 @@ UIDialog::UIDialog(int flags, const char* resource) : GameObject(flags) {
     controlContainer = 0;
     previousModalDialog = 0;
     screenGrab = 0;
-    field_0x144 = 0;
+    showFlags = 0;
     isClosing = 0;
     grabRegion = -1;
 }
@@ -1853,7 +1853,7 @@ UIDialog::~UIDialog() {
         }
         if (isModal && parentDialog)
             parentDialog->SetModalPause(0, 0, 0);
-        if ((field_0x144 & 4) && (field_0x144 & 0x10))
+        if ((showFlags & 4) && (showFlags & 0x10))
             guiManager->ReleaseBackgroundGrab();
     }
     if (dialogBackground && !g_TrackGame->shuttingDown)
