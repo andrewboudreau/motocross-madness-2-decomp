@@ -485,14 +485,14 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
             }
         }
         if (g_TrackGame->texturesCached) {
-            field_0x94 = (GameObject*)g_TrackGame->textureManager->CreateGroup(
+            opaqueTextureGroup = (GameObject*)g_TrackGame->textureManager->CreateGroup(
                 ((PCRenderTarget*)renderContext)->surfacePixelFormat, 0, 2, 1);
-            field_0x98 = (GameObject*)g_TrackGame->textureManager->CreateGroup(0x115c, 0, 2, 1);
+            alphaTextureGroup = (GameObject*)g_TrackGame->textureManager->CreateGroup(0x115c, 0, 2, 1);
         }
     }
     modelTextures.manager = skyTextures.manager = terrainTextures.manager = g_TrackGame->textureManager;
-    modelTextures.opaqueGroup = skyTextures.opaqueGroup = terrainTextures.opaqueGroup = (ManagedTextureGroup*)field_0x94;
-    modelTextures.alphaGroup = skyTextures.alphaGroup = terrainTextures.alphaGroup = (ManagedTextureGroup*)field_0x98;
+    modelTextures.opaqueGroup = skyTextures.opaqueGroup = terrainTextures.opaqueGroup = (ManagedTextureGroup*)opaqueTextureGroup;
+    modelTextures.alphaGroup = skyTextures.alphaGroup = terrainTextures.alphaGroup = (ManagedTextureGroup*)alphaTextureGroup;
     modelTextures.opaqueFormat = skyTextures.opaqueFormat = terrainTextures.opaqueFormat = ((PCRenderTarget*)renderContext)->surfacePixelFormat;
     modelTextures.alphaFormat = skyTextures.alphaFormat = terrainTextures.alphaFormat = 0x115c;
     if (progress)
@@ -524,7 +524,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     }
     if (progress)
         progress(0);
-    UnknownVirtualSlot29();
+    CreateOverlays();
 
     g_MemTagStack->Push("Particles");
     particleManager = new(__FILE__, 613) UnknownQuarryParticles(g_TrackGame->mode.particlesOn);
@@ -603,13 +603,13 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         progress(0);
 
     g_MemTagStack->Push("Terrain");
-    if (!g_TrackGame->sceneObject->OpenArchiveFile(field_0x44, eventScene->environment->terrainFile, "rb",
+    if (!g_TrackGame->sceneObject->OpenArchiveFile(terrainStream, eventScene->environment->terrainFile, "rb",
                                                                    (int)terrainPath)) {
         sprintf(text, "No Terrain found in env file.  Terrain not created.\n");
         return 0;
     }
     eventTerrain = (new(__FILE__, 799) UnknownQuarryTerrainObject(1))
-                     ->Load(renderContext, field_0x44, 1, &terrainTextures,
+                     ->Load(renderContext, terrainStream, 1, &terrainTextures,
                                              g_TrackGame->mode.videoSettings[3], 0,
                                              eventScene->environment->detailTexture, 0);
     if (!AppendChild((GameObject*)eventTerrain, -1)) {
@@ -766,7 +766,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     UnknownVirtualSlot32((int)raceView);
     AppendChild((GameObject*)particleManager, -1);
     UnknownVirtualSlot28();
-    UnknownVirtualSlot30();
+    AttachOverlays();
 
     g_MemTagStack->Push("3DObjects");
     int kind = g_TrackGame->mode.GetSelectedSeries();
@@ -859,7 +859,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         DisableByClassName("D3DIMSoultreeShadow");
     }
     ((RenderTarget*)renderContext)->clearTarget = !(skyCube && g_TrackGame->mode.skyCubeOn);
-    field_0x50 = (void*)1;
+    loaded = 1;
     if (g_TrackGame->texturesCached) {
         g_MemTagStack->Push("TextureCache");
         g_TrackGame->textureManager->ShareCacheLimit();

@@ -88,8 +88,8 @@ bool KrustyBikeCamera::UnknownVirtualSlot56() {
     }
     if (cameraState == 7)
         return pressed;
-    if (pressed && (!vehicleMode || (krustyBike->field_0x108 &&
-                                     krustyBike->field_0x5f4->field_0x150 < -2.0f &&
+    if (pressed && (!vehicleMode || (krustyBike->airborne &&
+                                     krustyBike->rearWheel->penetration < -2.0f &&
                                      !krustyBike->isRemote)))
         return true;
     return false;
@@ -100,12 +100,12 @@ void KrustyBikeCamera::UnknownVirtualSlot42(bool flag) {
     float ratio = fieldOfView / maxFieldOfView;
     if (cameraState != 3) {
         if (vehicleMode && !flag &&
-            (!krustyBike->field_0x7a4 || g_TrackGame->playerCount > 1))
-            turnYaw = ratio * krustyBike->field_0x43c * 0.42f;
+            (!krustyBike->hasFinished || g_TrackGame->playerCount > 1))
+            turnYaw = ratio * krustyBike->turnRate * 0.42f;
         else
             turnYaw = 0.0f;
     } else {
-        turnYaw = ratio * krustyBike->field_0x43c * 0.55f;
+        turnYaw = ratio * krustyBike->turnRate * 0.55f;
     }
 }
 

@@ -7,21 +7,22 @@
 
 struct UnknownKrustyBikeAxis {
     unsigned char field_0x000[0x150];
-    float field_0x150;                   // slot 56 tests < -2
+    float penetration;                        // +0x150  BikeWheel penetration (CollisionPoint+0x98; reset to -999)
 };
 
-// Object at KrustyBikeCamera+0x3b4; its class is not established.
+// Object at KrustyBikeCamera+0x3b4. Every member below sits at a KrustyBike offset with a
+// matching use, so it is read as the followed KrustyBike (tier 2).
 struct UnknownKrustyBike {
     unsigned char field_0x000[0x108];
-    bool field_0x108;
+    bool airborne;                            // +0x108  SoultreePhysicsBaseObject airborne (Vehicle slot 49)
     unsigned char field_0x109[0x43c - 0x109];
-    float field_0x43c;                   // slot 42 scale
+    float turnRate;                           // +0x43C  Vehicle turnRate (velocity deflection per second, slot 72)
     unsigned char field_0x440[0x5f4 - 0x440];
-    UnknownKrustyBikeAxis* field_0x5f4;
+    UnknownKrustyBikeAxis* rearWheel;         // +0x5F4  Bike rearWheel (a BikeWheel)
     unsigned char field_0x5f8[0x735 - 0x5f8];
     bool isRemote;  // +0x735  KrustyBike +0x735 isRemote
     unsigned char field_0x736[0x7a4 - 0x736];
-    bool field_0x7a4;
+    bool hasFinished;                         // +0x7A4  KrustyBike/RaceView hasFinished
 };
 
 // RTTI: KrustyBikeCamera : BikeCamera. Its code (0x00497cb0..0x004987ec) follows

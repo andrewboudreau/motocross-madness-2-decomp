@@ -146,7 +146,7 @@ FollowCamera* FollowCamera::SetupFollowCamera(void* value, float rate294, float 
 // 0x00463600
 void FollowCamera::SetSubject(UnknownFollowCameraSubject* newSubject) {
     subject = newSubject;
-    field_0x2ec = newSubject->field_0x40;
+    subjectCellSize = newSubject->gridCellSize;
 }
 
 // Inlined by slot 38: the yaw turns and wraps to [-pi, pi]; the pitch tilts

@@ -41,7 +41,7 @@ BaseQuarryEvent::BaseQuarryEvent(int flags) : GameObject(flags) {
     eventTerrain = 0;
     ecoSystem = 0;
     field_0x4c = 0;
-    field_0x50 = 0;
+    loaded = 0;
     terrainShadow = 0;
     projectedShadow = 0;
     clockMinutes = 0;
@@ -49,8 +49,8 @@ BaseQuarryEvent::BaseQuarryEvent(int flags) : GameObject(flags) {
     particleManager = 0;
     lightManager = 0;
     visualCue = 0;
-    field_0x94 = 0;
-    field_0x98 = 0;
+    opaqueTextureGroup = 0;
+    alphaTextureGroup = 0;
     auralScape = 0;
     auralScapeListener = 0;
     radarOverlay = 0;
@@ -59,8 +59,8 @@ BaseQuarryEvent::BaseQuarryEvent(int flags) : GameObject(flags) {
     instrumentOverlay = 0;
     textQueue = 0;
     eventFog = 0;
-    field_0x44 = new(__FILE__, 92) UnknownTextureStream((int)g_ResourceManager);
-    if (!field_0x44)
+    terrainStream = new(__FILE__, 92) UnknownTextureStream((int)g_ResourceManager);
+    if (!terrainStream)
         return;
 }
 
@@ -90,7 +90,7 @@ int BaseQuarryEvent::Tick(float frameTime) {
     if (g_TrackGame->uiInteractionBlocked)
         return 1;
     if (radarOverlay && visualCue && statsOverlay) {
-        visualCue->field_0xc8 = radarOverlay->followedIndex;
+        visualCue->skippedRacer = radarOverlay->followedIndex;
         int index = visualCue->NextCueIndex();
         if (index != -1) {
             radarOverlay->cueIndex = index;
@@ -138,16 +138,15 @@ int BaseQuarryEvent::EstimateModelTextureBytes(int* counts) {
     return counts[0] * 0x80000 / 3 + counts[1] * 0x20000 / 3 + counts[2] * 0x8000 / 3 + counts[3] * 0x2000 / 3;
 }
 
-// The bike model table at KrustyUI+0x48 (0xc8-byte records) and the choices
-// at +0x50 (0x94 bytes, a model index first); +0x58 holds more 0xc8-byte
-// model records.
+// KrustyUI's manufacturers (+0x48) and riders (+0x58), 0xc8-byte records,
+// and its bikes (+0x50, 0x94 bytes, the manufacturer index first).
 struct UnknownQuarryBikeModel {
     unsigned char field_0x00[0xc4];
-    int field_0xc4;                           // model kind
+    int availability;                         // +0xc4 KrustyUI.cpp's UnknownKrustyUIModelEntry: "Availability"
 };
 
 struct UnknownQuarryBikeChoice {
-    int field_0x00;                           // model index
+    int manufacturer;                         // +0x00 KrustyUI.cpp's UnknownKrustyUIBikeEntry: index into +0x48
     unsigned char field_0x04[0x94 - 0x04];
 };
 
@@ -162,11 +161,11 @@ int BaseQuarryEvent::EstimateRaceBytes() {
     if (g_TrackGame->InProCircuitCareer()) {
         int i;
         for (i = 0; i < g_TrackGame->ui->bikeCount; i++) {
-            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->manufacturers)[((UnknownQuarryBikeChoice*)g_TrackGame->ui->bikes)[i].field_0x00].field_0xc4 <= g_TrackGame->proCircuit->maxModelKind)
+            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->manufacturers)[((UnknownQuarryBikeChoice*)g_TrackGame->ui->bikes)[i].manufacturer].availability <= g_TrackGame->proCircuit->maxModelKind)
                 players++;
         }
         for (i = 0; i < g_TrackGame->ui->riderCount; i++) {
-            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->riders)[i].field_0xc4 <= g_TrackGame->proCircuit->maxModelKind)
+            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->riders)[i].availability <= g_TrackGame->proCircuit->maxModelKind)
                 opponents++;
         }
         if (players >= g_TrackGame->proCircuit->racerCount)
@@ -207,7 +206,7 @@ int BaseQuarryEvent::UnknownVirtualSlot27(int value) {
 }
 
 // 0x004e07c0
-void BaseQuarryEvent::UnknownVirtualSlot29() {
+void BaseQuarryEvent::CreateOverlays() {
     char message[388];
     char name[0x40];
     UnknownOverlayRect screen;
@@ -231,8 +230,8 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     screen.top = 0;
     screen.left = 0;
     if (visualCue) {
-        cue.top = (int)((visualCue->field_0x4c + 0.06f) * screen.bottom);
-        cue.left = (int)((visualCue->field_0x48 - 0.04f) * screen.right);
+        cue.top = (int)((visualCue->screenY + 0.06f) * screen.bottom);
+        cue.left = (int)((visualCue->screenX - 0.04f) * screen.right);
     } else {
         cue.top = 0;
         cue.left = 0;
@@ -281,7 +280,7 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
 }
 
 // 0x004e0be0
-void BaseQuarryEvent::UnknownVirtualSlot30() {
+void BaseQuarryEvent::AttachOverlays() {
     AppendChild(instrumentOverlay, -1);
     AppendChild(chatOverlay, -1);
     AppendChild(radarOverlay, -1);
@@ -541,11 +540,11 @@ void BaseQuarryEvent::ResetClock() {
 
 // 0x004e1f10
 BaseQuarryEvent::~BaseQuarryEvent() {
-    delete field_0x44;
+    delete terrainStream;
     Release();
     if (g_TrackGame->texturesCached) {
-        field_0x94->Release();
-        field_0x98->Release();
+        opaqueTextureGroup->Release();
+        alphaTextureGroup->Release();
     }
     ((RenderTarget*)renderContext)->currentCamera = 0;
 }

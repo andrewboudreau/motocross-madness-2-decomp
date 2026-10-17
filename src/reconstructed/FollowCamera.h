@@ -83,13 +83,14 @@ struct UnknownFollowCameraPoint {
     Vector3 screenPoint;  // +0x20  slot 38: ProjectPoint writes the screen point; nearest two by z go to slot 73
 };
 
-// Object at FollowCamera+0x240; slots 43/44 test its +0xbe8.
+// Object at FollowCamera+0x240: the Terrain (QueryGround is Terrain::QueryGround 0x00507c10);
+// slots 43/44 test its +0xbe8, which Terrain::Load reads from the file header.
 struct UnknownFollowCameraSubject {
     // 0x00507c10: adjusts *point (KrustyBikeCamera slot 52 reads its new y).
     void QueryGround(Vector3* point, int a, int b, int c);
 
     unsigned char field_0x000[0x40];
-    float field_0x40;           // copied to FollowCamera+0x2ec by 0x00463600
+    float gridCellSize;                       // +0x40  Terrain gridCellSize; SetSubject 0x00463600 copies it to subjectCellSize
     unsigned char field_0x044[0xbe8 - 0x44];
     int field_0xbe8;
 };
@@ -270,7 +271,7 @@ protected:
     int pointCount;                  // +0x2e0, number of entries in points
     UnknownFollowCameraPoint* points; // +0x2e4, owned table
     float yawOffset;                 // +0x2e8, yaw offset (0x00463140, slot 49)
-    float field_0x2ec;          // 3.0f
+    float subjectCellSize;                    // +0x2EC  ctor 3.0f; SetSubject copies the Terrain's gridCellSize here. No reader found in retail
     float state4FieldOfView;         // +0x2f0 state-4 saved targetFieldOfView (slot 71)
     // State 5 maps targetDistance (+0x2c0) linearly from +0x300 .. +0x2f8 onto
     // +0x2fc .. +0x2f4: the FOV narrows to 10 at distance 280 and widens to 70

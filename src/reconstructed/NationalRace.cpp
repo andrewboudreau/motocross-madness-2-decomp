@@ -65,11 +65,11 @@ int NationalRace::UnknownVirtualSlot27(int value) {
 }
 
 // 0x004aa970
-void NationalRace::UnknownVirtualSlot29() {
+void NationalRace::CreateOverlays() {
     char name[128];
     char message[128];
 
-    BaseQuarryEvent::UnknownVirtualSlot29();
+    BaseQuarryEvent::CreateOverlays();
     g_TrackGame->LoadResourceString(0x913, name, sizeof(name));
     finishText = new (__FILE__, 71) DropTextOverlay(1);
     finishText = finishText->Setup(renderContext, g_TrackGame->textureManager, 3.0f, 0, sizeof(name), name);
@@ -78,8 +78,8 @@ void NationalRace::UnknownVirtualSlot29() {
 }
 
 // 0x004aaa50
-void NationalRace::UnknownVirtualSlot30() {
-    BaseQuarryEvent::UnknownVirtualSlot30();
+void NationalRace::AttachOverlays() {
+    BaseQuarryEvent::AttachOverlays();
     AppendChild(finishText, -1);
 }
 

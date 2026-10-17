@@ -90,7 +90,7 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
     if (dialog->UnknownVirtualSlot27(renderContext, (CameraRect*)b, a, flags, guiSoundGroup, guiTextures, dialogDirectory,
                                      parent, guiBackground, dialogFontName, dialogFontSize, this, users[0],
                                      (const char*)d)) {
-        dialog->field_0x144 = flags;
+        dialog->showFlags = flags;
         AttachDialog(dialog, a, wait);
         return dialog;
     }

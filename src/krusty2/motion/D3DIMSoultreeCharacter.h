@@ -43,7 +43,7 @@ struct CharacterPose;   // 0x2c-byte pose record; defined by users that need the
 // Motion (0xc-byte elements of Motion::frames).  field_0x00 is the frame number in motion frames
 // (the advance helpers 0x004a56d0/0x004a5750 read it).  Names tier 3.
 struct MotionPoseList {
-    int field_0x00;              // +0x00 frame number
+    int frameIndex;                           // +0x0  the frame's index in Motion::frames (LoadMot 0x004a5c30 stores i); AdvanceLooping/AdvanceClamped step from it and AdvanceMotion 0x004a6bb0 returns it
     CharacterPose* poses;        // +0x04 array of 0x2c-byte records
     int count;                   // +0x08 element count
 };
@@ -52,8 +52,8 @@ struct MotionPoseList {
 struct NodeNameEntry {
     char name[0x34];          // +0x00 upper-cased copy of the node name, at most 0x31 chars
     SoultreeObject* node;     // +0x34 the scene node this row describes
-    int field_0x38;           // +0x38 cleared when the row is written; D3DIM slots 4/5 test it before writing the node position
-    int field_0x3c;           // +0x3c cleared when the row is written; D3DIM slots 4/5 test it before writing the node axes
+    int applyTranslation;                     // +0x38  LoadVut clears it, then sets it for a 'T' flag after the node name; D3DIM slots 4/5 write the node position only when it is set
+    int applyRotation;                        // +0x3C  FillNodeNames clears it and LoadVut sets it for each listed node; D3DIM slots 4/5 write the node axes only when it is set
 };
 
 class Character : public virtual GameObject {
@@ -83,7 +83,7 @@ public:
     void SortPoseList(void* poseList);
     // 0x004a6910, thiscall, ret 8: calls GameObject slot 8's body (0x004692f0, stores its argument in
     // field_0x18) with the first argument; the second argument is unused (tier 1 decode).
-    void Method_0x004a6910(int a, int b);
+    void SetCharacterRenderContext(int renderContext, int unused);  // name tier 2 (decoded body)
     // 0x004a62d0 and 0x004a6500, thiscall, no arguments (plain ret). Both reference Motnctrl.cpp's
     // __FILE__ (0x0056e034) with debug new (lines 0x26b, 0x29d) and use the name strings at +0x8c / +0xdc /
     // +0x12c, so they belong to a different TU than D3DIMSoultreeMotnctrl.cpp (tier 1 decode).
@@ -111,8 +111,8 @@ public:
     // Offsets are tier 1 (ctor 0x004a6780 stores, slot 8 0x004a98b0 copies, Motnctrl.cpp users);
     // names are tier 3.  See src/krusty2/motion/Motnctrl.cpp.
     SltFile* sltFile;               // +0x008 set by D3DIM slot 11 around the slot 1 call; slot 1 reads the "General info" keys through it
-    int chr_field_0x0c;             // +0x00c ctor 1; SetMotion (0x004a8b40) clears it
-    float chr_field_0x10;           // +0x010 copied to blendFromTime by BlendToMotion (0x004a8b80)
+    int motionStopped;              // +0x00c ctor 1; AdvanceMotion sets it when a non-looping motion ends (and then returns 0); SetMotion (0x004a8b40) clears it
+    float chr_field_0x10;           // +0x010 the motion clock (src/krusty2/vehicle reads it under this name): AdvanceMotion adds dt and steps the frames by it; slot 7 adds its time argument; copied to blendFromTime by BlendToMotion (0x004a8b80)
     int motionCount;                // +0x014 "NumberOfMotions" (slot 1); loop bound of LoadMotions and the dtor
     Motion* currentMotion;          // +0x018 SetMotion stores the motion; cleared by LoadMotions and the dtor
     MotionPoseList* currentFrame;   // +0x01c SetMotion stores the motion's first frame; cleared by the dtor

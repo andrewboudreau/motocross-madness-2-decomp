@@ -492,7 +492,7 @@
   {
     "class": "Motnctrl",
     "source": "Motnctrl.cpp",
-    "candidate_symbol_contains": "?Method_0x004a6910@Character@@",
+    "candidate_symbol_contains": "?SetCharacterRenderContext@Character@@",
     "target_va": "0x004a6910",
     "target_size": 23,
     "expect": "exact",

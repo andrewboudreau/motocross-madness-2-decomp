@@ -87,7 +87,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot3(float distance)
         stage = 3;
 
     int wanted = stage;
-    if (((Grid1RenderHost*)Terrain()->renderer)->camera->field_0x200 > 0.5f && level == 0)
+    if (((Grid1RenderHost*)Terrain()->renderer)->camera->lastMoveDistance > 0.5f && level == 0)
         wanted = stage > 2 ? 2 : stage;
 
     float scale;
@@ -247,9 +247,9 @@ ownTexture:
 done:
     if (Extra()->texture != previous && !keep) {
         data->b1 = 1;
-        Extra()->field_0x28 = 1.0f;
-        Extra()->field_0x2c = 0.0f;
-        Extra()->field_0x30 = 0.0f;
+        Extra()->mappingScale = 1.0f;
+        Extra()->mappingOffsetU = 0.0f;
+        Extra()->mappingOffsetV = 0.0f;
     }
     Extra()->detail = detail / scale;
 }
@@ -282,7 +282,7 @@ int DrawableGridNodeSharedTextures::BuildNodeTexture(ManagedTexture* texture)
     unsigned char* out = texture->textureWidth == 0x100 ? bits : g_grid1TextureBuffer;
     int bpp = PixelFormatBytesPerPixel(texture->mapFormat);
     int tileStride = bpp << 4;
-    unsigned char* runs = (unsigned char*)Extra()->field_0x04 + index * 2;
+    unsigned char* runs = (unsigned char*)Extra()->data + index * 2;
     do {
         int id = *runs++;
         int length = *runs++ + 1;
@@ -364,7 +364,7 @@ int DrawableGridNodeSharedTextures::BuildBlockTexture(int block, ManagedTexture*
     int bpp = PixelFormatBytesPerPixel(texture->mapFormat);
     int pitch = bpp * width;
     int tileStride = bpp * tileSize;
-    unsigned char* runs = (unsigned char*)Extra()->field_0x04 + index * 2;
+    unsigned char* runs = (unsigned char*)Extra()->data + index * 2;
     int done = 0;
     while (y < width) {
         int id = *runs++;

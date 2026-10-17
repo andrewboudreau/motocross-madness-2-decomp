@@ -143,7 +143,7 @@ public:
     SoundGroup* soundGroup;                   // +0x114
     unsigned int textColors[10];              // +0x118: the text colors "~0".."~9" select
     void* dialogPalette;                      // +0x140
-    int field_0x144;                          // flags from GUIManager 0x00485a70
+    int showFlags;                            // +0x144  GUIManager::ShowDialog 0x00485a70 stores its flags (2/4 modal, 8 dim, 0x10 grab the screen) after a successful load; 1 makes AttachDialog add it beside the parent's controls
     int isModal;                              // +0x148 flags & 6: takes the input first (GUIManager 0x00485df0)
     int previousModalDialog;                  // +0x14c GUIManager::SwapModalDialog's previous value, restored on close
     int field_0x150;

@@ -214,7 +214,7 @@ void TrackRecordDlg::HandleEvent(UnknownDialogEvent* event)
         g_TrackGame->mode.SelectSeries(0);
         ShowTab(event, selectedSeries);
         FillLists(event, selectedSeries);
-        field_0x7f5c = 0;
+        selectedSubTab = 0;
         g_TrackGame->highScores->extensionIndex = 0;
         control = static_cast<UIMultiState*>(FindControl("TabQuarry", 4));
         control->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1423);
@@ -260,15 +260,15 @@ void TrackRecordDlg::HandleEvent(UnknownDialogEvent* event)
             selectedSeries = 4;
             FillLists(event, 4);
         } else if (!_stricmp("TabLeft", event->controlName)) {
-            field_0x7f5c = 0;
+            selectedSubTab = 0;
             g_TrackGame->highScores->extensionIndex = 0;
             FillLists(event, selectedSeries);
         } else if (!_stricmp("TabMiddle", event->controlName)) {
-            field_0x7f5c = 1;
+            selectedSubTab = 1;
             g_TrackGame->highScores->extensionIndex = 1;
             FillLists(event, selectedSeries);
         } else if (!_stricmp("TabRight", event->controlName)) {
-            field_0x7f5c = 2;
+            selectedSubTab = 2;
             g_TrackGame->highScores->extensionIndex = 2;
             FillLists(event, selectedSeries);
         } else if (!_stricmp("Help", event->controlName)) {
@@ -287,7 +287,7 @@ void TrackRecordDlg::HandleEvent(UnknownDialogEvent* event)
                 static_cast<UIListBox*>(FindControl("LstStats2", 3))->RemoveAllRows();
                 g_TrackGame->mode.CopySeriesDirectory((short)selectedSeries, 0, path);
                 ShowTrackScores(event, selectedSeries,
-                                      rows[static_cast<UIListBox*>(event->control)->GetRowData(-1)]->field_0x00);
+                                      rows[static_cast<UIListBox*>(event->control)->GetRowData(-1)]->fileName);
             }
         }
         break;
@@ -330,7 +330,7 @@ void TrackRecordDlg::LabelTabs(int series)
         tab->SetStateText(0, text);
         tab->SetStateText(1, text);
     }
-    switch (field_0x7f5c) {
+    switch (selectedSubTab) {
     case 1:
         static_cast<UIRadioButton*>(FindControl("TabMiddle", 4))->SelectInGroup(0);
         break;
@@ -371,7 +371,7 @@ void TrackRecordDlg::FreeRows()
 {
     if (rows) {
         for (int i = 0; i < rowCount; i++) {
-            DebugFree(rows[i]->field_0x00, __FILE__, 467);
+            DebugFree(rows[i]->fileName, __FILE__, 467);
             DebugFree(rows[i], __FILE__, 468);
         }
         DebugFree(rows, __FILE__, 470);
@@ -399,7 +399,7 @@ void TrackRecordDlg::FillLists(UnknownDialogEvent* event, int series)
     control = static_cast<UIListBox*>(FindControl("LstTrack", 3));
     control->RemoveAllRows();
     ListHighScoreTracks(control, g_TrackGame->mode.highScoreDirectoryList, series);
-    ((UnknownTrackRecordListBox*)control)->UnknownVirtualSlot66(0);
+    ((UnknownTrackRecordListBox*)control)->ReportClick(0);
 }
 
 void TrackRecordDlg::AddStatsRow(UnknownDialogEvent* event, const char* name, float value,
