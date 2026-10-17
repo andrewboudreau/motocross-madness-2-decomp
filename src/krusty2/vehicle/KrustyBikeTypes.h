@@ -23,7 +23,6 @@ struct KbXform;
 struct KbChild;
 struct KbObj128;
 struct KbGhost;
-struct KbCollider;
 struct KbBonusTable;
 class KrustyBike;
 
@@ -347,7 +346,7 @@ struct KbWheel { void SetRollDistance(float d); };
 
 // Part table at Vehicle+0x1f0 -> +0xb4 (tier 3): count at +0, 0x44-byte records at +4.  A record
 // with flag bit 3 clear owns a collision object at record+8 -> +0x3c.
-struct KbPartObj { char pad_0x00[0x3C]; KbCollider* collider; };
+struct KbPartObj { char pad_0x00[0x3C]; CollisionObject* collider; };  // +0x3c: AddIgnoredOwner 0x00439410 is called on it
 struct KbPart { unsigned char flags; char pad_0x01[7]; KbPartObj* obj; char pad_0x0C[0x38]; };
 struct KbPartList { int count; KbPart* items; };
 struct KbTrackA {
@@ -509,12 +508,6 @@ struct KbChild {
     int field_0xa4;
 };
 // CollisionObject (collision/) viewed by address: ignore list at +0x78/+0x7c.
-struct KbCollider {
-    void AddIgnoredOwner(void* owner);      // 0x00439410
-    void RemoveIgnoredOwner(void* owner);   // 0x00439490
-    void SetIgnoreListMode(int mode);       // 0x00439400
-    void SetUseBroadphase(int enable);      // 0x00432120
-};
 struct KbObj128 {
     void StartFade(float a);   // 0x0047BBF0 (tier 3)
 };
