@@ -296,7 +296,6 @@ static inline float VehDistance(const Vec3& a, const Vec3& b)
 void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
 {
     float total;
-    Vec3 share;
     float dist[128];
     int i;
     int active;
@@ -365,10 +364,7 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
     } else if (wheelsInContact == 1) {
         for (i = 0; i < wheelCount; i++) {
             wheelList[i]->loadWeight = 0.0f;
-            share.z = 0.0f;
-            share.y = 0.0f;
-            share.x = 0.0f;
-            wheelList[i]->appliedShare = share;
+            wheelList[i]->appliedShare = Vec3(0.0f, 0.0f, 0.0f);
         }
         primaryWheel->loadWeight = 1.0f;
         primaryWheel->appliedShare = *arg;
