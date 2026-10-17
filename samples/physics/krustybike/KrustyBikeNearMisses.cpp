@@ -1114,7 +1114,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                         CharacterVirtualSlot7(dt, 0, 0);
                     }
                 } else {
-                    int frame = D3DIMSoultreeCharacter::currentFrame->field_0x00;
+                    int frame = D3DIMSoultreeCharacter::currentFrame->frameIndex;
                     if (frame > s_kbTrickFrame[field_0x433] && frame < s_kbTrickFrame[field_0x433] + 3) {
                         trickPoseHeld = 1;
                         if (aiKind) {

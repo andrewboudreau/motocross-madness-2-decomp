@@ -52,7 +52,7 @@ int MotionManager::LoadVue(Character* character, const char* path, Motion* motio
         strtok(line, " ");
         MotionPoseList* list = &motion->frames[frame];
         list->poses = (CharacterPose*)DebugMalloc(poses * sizeof(CharacterPose), __FILE__, 0x1f9);
-        list->field_0x00 = frame;
+        list->frameIndex = frame;
         list->count = poses;
         int k = 0;
         for (int t = 0; t < transforms; t++) {
@@ -434,5 +434,5 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
         lastFrameTime = 0.0f;
         return 0;
     }
-    return currentFrame->field_0x00;
+    return currentFrame->frameIndex;
 }

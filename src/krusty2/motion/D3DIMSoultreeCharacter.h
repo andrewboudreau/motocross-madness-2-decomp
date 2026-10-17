@@ -43,7 +43,7 @@ struct CharacterPose;   // 0x2c-byte pose record; defined by users that need the
 // Motion (0xc-byte elements of Motion::frames).  field_0x00 is the frame number in motion frames
 // (the advance helpers 0x004a56d0/0x004a5750 read it).  Names tier 3.
 struct MotionPoseList {
-    int field_0x00;              // +0x00 frame number
+    int frameIndex;                           // +0x0  the frame's index in Motion::frames (LoadMot 0x004a5c30 stores i); AdvanceLooping/AdvanceClamped step from it and AdvanceMotion 0x004a6bb0 returns it
     CharacterPose* poses;        // +0x04 array of 0x2c-byte records
     int count;                   // +0x08 element count
 };

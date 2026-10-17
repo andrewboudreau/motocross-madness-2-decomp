@@ -45,7 +45,7 @@ int ComparePoses(const void* a, const void* b)
 // remainder in *time.  Returns 0 when the cursor wrapped past the last frame.
 int AdvanceLooping(Motion* motion, MotionPoseList** cursor, float* time)
 {
-    int frame = (*cursor)->field_0x00;
+    int frame = (*cursor)->frameIndex;
     int next = frame + (int)(motion->fps * *time);
     *time -= (next - frame) * motion->frameTime;
     if (next >= motion->frameCount) {
@@ -65,7 +65,7 @@ int AdvanceLooping(Motion* motion, MotionPoseList** cursor, float* time)
 int AdvanceClamped(Motion* motion, MotionPoseList** cursor, MotionPoseList** from, MotionPoseList** to,
                    float* time, float* weight)
 {
-    int frame = (*cursor)->field_0x00;
+    int frame = (*cursor)->frameIndex;
     int next = frame + (int)(motion->fps * *time);
     if (next >= motion->frameCount - 1) {
         *time -= (motion->frameCount - frame - 1) * motion->frameTime;
@@ -202,7 +202,7 @@ int MotionManager::LoadMot(Character* character, const char* path, Motion* motio
     for (int i = 0; i < motion->frameCount; i++) {
         MotionPoseList* frame = &motion->frames[i];
         frame->poses = (CharacterPose*)DebugMalloc(motion->posesPerFrame * sizeof(CharacterPose), __FILE__, 0x1b6);
-        frame->field_0x00 = i;
+        frame->frameIndex = i;
         frame->count = motion->posesPerFrame;
         for (int j = 0; j < motion->posesPerFrame; j++) {
             CharacterPose* pose = &frame->poses[j];
@@ -336,7 +336,7 @@ Character::Character(int a)
     strcpy(mirFilename, "");
     strcpy(contentDirectory, "");
     poseList.poses = 0;
-    poseList.field_0x00 = 0;
+    poseList.frameIndex = 0;
     lastFrame = 0;
     vutLoaded = 0;
     motions = 0;
@@ -540,7 +540,7 @@ int Character::AdvanceMotion(float dt, int mirror, int mask)
         if (blendFromTime >= blendDuration)
             blendActive = 0;
     }
-    return currentFrame->field_0x00;
+    return currentFrame->frameIndex;
 }
 
 // owner: bracket only
