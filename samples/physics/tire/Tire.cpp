@@ -498,31 +498,14 @@ static inline void TireNormalizeInPlace(CollisionVec3& v)
     }
 }
 
-// Normalises v; an all-zero vector yields the fallback, a zero squared length the zero vector.
-static inline void TireNormalizeOrInPlace(CollisionVec3& v, const CollisionVec3& fallback)
-{
-    if (v.x == 0.0f && v.y == 0.0f && v.z == 0.0f) {
-        v = fallback;
-    } else {
-        float lenSq = TireDot(&v, &v);
-        if (lenSq == 0.0f) {
-            v = kVec3Zero;
-        } else {
-            float inv = FastInvSqrt(lenSq);
-            v.x *= inv;
-            v.y *= inv;
-            v.z *= inv;
-        }
-    }
-}
-
 // v scaled by s through the out-of-line constructor (s is read once).
 static inline CollisionVec3 TireScaledCtor(const CollisionVec3& v, float s)
 {
     return CollisionVec3(v.x * s, v.y * s, v.z * s);
 }
 
-// Returning form of TireNormalizeOrInPlace, on a copy of v.
+// Normalised copy of v: an all-zero v yields the fallback, a zero squared length the zero
+// vector. The copy is scaled in place and returned once, as retail keeps the result in it.
 static inline CollisionVec3 TireNormalizeOr(CollisionVec3 v, const CollisionVec3& fallback)
 {
     if (v.x == 0.0f && v.y == 0.0f && v.z == 0.0f) {
@@ -572,15 +555,16 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
         sideAxis = TireCross(wheelUpAxis, b);
         TireNormalizeInPlace(sideAxis);
     } else {
+        CollisionVec3& side = sideAxis;
         wheelUpAxis = *a6;
         if (a7 == 0) {
             CollisionVec3 t;
             CollisionVec3 b = *a8->LocalToWorldDirection(&t, &kVec3YAxis);
-            sideAxis = TireCross(*a6, b);
+            side = TireCross(*a6, b);
         } else {
-            sideAxis = TireCross(*a6, *a7);
+            side = TireCross(*a6, *a7);
         }
-        TireNormalizeInPlace(sideAxis);
+        TireNormalizeInPlace(side);
     }
 
     rollDirection = TireNormalizeOr(TireCross(this->CollisionPoint::surfaceNormal, sideAxis), wheelUpAxis);
@@ -646,8 +630,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     CollisionVec3 n2;
     unsigned char kind;
     world->QueryGround(&pt, &n2, 0, &kind);
-    CollisionVec3 v = TireCross(n2, sideAxis);
-    TireNormalizeOrInPlace(v, wheelUpAxis);
+    CollisionVec3 v = TireNormalizeOr(TireCross(n2, sideAxis), wheelUpAxis);
     CollisionVec3 u = CollisionCross(v, sideAxis);
     CollisionVec3 lateral2 = u;
     if (u.x * n2.x + u.y * n2.y + u.z * n2.z > 0.0f) {
