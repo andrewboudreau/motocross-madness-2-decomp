@@ -153,7 +153,7 @@ public:
     int steersFrontWheels;                    // +0x50 wheels 0 and 1 steer (slot 27's a9)
     int started;                              // +0x54 set once slot 10 has run its first update
     int field_0x58;
-    int skipSmoothing;                        // +0x5C  provisional: while set slot 10 takes the raw back direction and ground normal; the constructor sets it and nothing in this unit clears it
+    int skipSmoothing;                        // +0x5C  provisional: while set slot 10 takes the raw back direction and ground normal; the constructor sets it and Scene::RestartEntry (0x004eb040) rewrites it (0 when the restart time was clamped)
     unsigned int numWheels;                   // +0x60 wheel count
     unsigned int currentPathKey;              // +0x64 current path key
     int field_0x68;

@@ -46,7 +46,7 @@ public:
     int AdvanceMotion(float time, int a, int b); // 0x004a6bb0: advances the motion
 
     unsigned char field_0x008[0x0c - 0x08];
-    int field_0x0c;                       // cleared by 0x004a8b40
+    int motionStopped;                        // +0xC  Character +0x0c (D3DIMSoultreeCharacter.h chr_field_0x0c): set when a non-looping motion ends, cleared by SetMotion 0x004a8b40; AdvanceMotion returns 0 while set
     int motionTime;  // +0x10  Character +0x10: motion time (slot 7 adds time to it); RestartEntry zeroes it before AdvanceMotion
     unsigned char field_0x014[0x1a0 - 0x14];
     UnknownSceneLodObject* modelNode;         // +0x1a0
@@ -74,7 +74,7 @@ public:
     void* sensorCollider;  // +0x38  CarProcedural +0x38 sensorCollider (QuarryStuntEvent sets collision ignore lists)
     void* bodyCollider;  // +0x3C  CarProcedural +0x3c bodyCollider
     unsigned char field_0x40[0x5c - 0x40];
-    int field_0x5c;
+    int skipSmoothing;                        // +0x5C  CarProcedural +0x5c; RestartEntry sets it unless the restart time was clamped
     unsigned char field_0x60[0x194 - 0x60];
     float pathTime;  // +0x194  CarProcedural +0x194 pathTime; RestartEntry (0x004eb040) sets it to the restart time
     // +0x20c (the terrain) stays unnamed here: naming it together with
@@ -92,12 +92,12 @@ struct UnknownSceneEntry {
     unsigned char automaticSequence : 1;      // +0x00 bit 2: the "AutomaticSequence" parameter; EnableAutomaticSequence sets it
     unsigned char keyFramed : 1;              // +0x00 key-framed character (else a procedural car)
     unsigned char excludeFromCameraIteration : 1; // +0x00 bit 4: the "ExcludeFromCameraIteration" parameter; bikerace.cpp's camera (0x0041f1d0) skips it
-    unsigned char field_0x00_bit5 : 1;        // +0x00 bit 5: cleared by 0x004edfe0
+    unsigned char animatesWhileHeld : 1;      // +0x00 bit 5 (provisional): Scene slot 10 still advances the entry while holdAnimations is set; cleared by 0x004edfe0, bikerace.cpp sets it for the 30SecMan
     unsigned char field_0x01[3];
     UnknownSceneObject* character;            // +0x04 key-framed (bit 3)
     UnknownSceneAnimatedObject* proceduralObject; // +0x08 procedural
     Vector3 position;                     // "Position" (or "Offset")
-    int field_0x18;                       // 0x004eb040: the motion advance result
+    int motionFrame;                          // +0x18  the frame number AdvanceMotion 0x004a6bb0 returned (RestartEntry, Scene slot 10 0x004eae7d)
     int motionCount;                      // "NumberOfMotions" (1 for procedural entries)
     void** motions;
     char currentMotion;                   // index into motions
@@ -357,7 +357,7 @@ public:
     Vector3 stadiumPosition;                         // Stadium "Position"
     char stadiumFile[0x100];              // Stadium "FileName"
     int visible;                          // slot 14 draws only while set; control 5 toggles it
-    int field_0x7c0;
+    int holdAnimations;                       // +0x7C0  provisional: while set slot 10 (0x004eab65) advances only key-framed entries with animatesWhileHeld and skips the random sets; BikeRace sets it on restart and clears it when the race starts
     FILE* logFile;                        // "scnmgr.log"
     char scenePath[0x104];
 };

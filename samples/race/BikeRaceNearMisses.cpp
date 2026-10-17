@@ -635,7 +635,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 thirtySecondMan = (UnknownBikeRaceView6c*)raceScene->FindEntryByFileName("30SecMan.slt", &thirtySecondManEntry);
                 if (thirtySecondMan) {
                     raceScene->RestartEntry(thirtySecondManEntry, 0, 0, 0);
-                    raceScene->animationTable->entries[thirtySecondManEntry].field_0x00_bit5 = 1;
+                    raceScene->animationTable->entries[thirtySecondManEntry].animatesWhileHeld = 1;
                     if (thirtySecondMan->collisionObject) {
                         thirtySecondMan->collisionObject->Release();
                         thirtySecondMan->collisionObject = 0;
@@ -757,7 +757,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     g_TrackGame->ui->StepProgressBar();
 
     SetSceneTime(0.0f);
-    raceScene->field_0x7c0 = 1;
+    raceScene->holdAnimations = 1;
     if (g_TrackGame->mode.raceSettings.raceMode) {
         NumberObjectManager* numbers = new(__FILE__, 0x29b) NumberObjectManager(1);
         digitCounter = (int)numbers->SetupDigits(renderContext, (int)textures, (UnknownNumberRacer*)this, 0x1e,

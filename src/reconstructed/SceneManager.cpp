@@ -305,7 +305,7 @@ Scene::Scene(int flags) : GameObject(flags)
     stadiumFile[0] = 0;
     logFile = 0;
     visible = 1;
-    field_0x7c0 = 0;
+    holdAnimations = 0;
 }
 
 // 0x004ea7e0
@@ -441,7 +441,7 @@ int Scene::RestartEntry(int index, float time, int force, int motion)
         UnknownSceneEntry* entry = &animationTable->entries[index];
         if (entry->keyFramed) {
             UnknownSceneObject* object = entry->character;
-            if (object->field_0x0c || force) {
+            if (object->motionStopped || force) {
                 if (motion >= entry->sequenceLength)
                     entry->sequenceIndex = 0;
                 else
@@ -451,13 +451,13 @@ int Scene::RestartEntry(int index, float time, int force, int motion)
                 object->SetMotion(
                     animationTable->entries[index].motions[animationTable->entries[index].currentMotion]);
                 object->motionTime = 0;
-                animationTable->entries[index].field_0x18 = object->AdvanceMotion(time, 0, 0);
+                animationTable->entries[index].motionFrame = object->AdvanceMotion(time, 0, 0);
                 return 1;
             }
         } else {
             UnknownSceneAnimatedObject* object = (UnknownSceneAnimatedObject*)entry->proceduralObject;
             object->pathTime = time;
-            object->field_0x5c = running;
+            object->skipSmoothing = running;
             if (running)
                 ((UnknownSceneAnimatedObject*)animationTable->entries[index].proceduralObject)
                     ->Tick(0.0001f);

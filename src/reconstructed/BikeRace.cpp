@@ -507,7 +507,7 @@ int BikeRace::Tick(float frameTime) {
                     if (startCountdown <= 0.0f || AnyRacerRemote()) {
                         startCountdown = 0;
                         isRacing = true;
-                        raceScene->field_0x7c0 = 0;
+                        raceScene->holdAnimations = 0;
                         if (startGate != 0) {
                             raceScene->EnableAutomaticSequence(startGateEntry);
                             startGateTimer = 5.0f;
@@ -1338,7 +1338,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         flagGirlState = 0;
     }
     SetSceneTime(0.0001f);
-    raceScene->field_0x7c0 = 1;
+    raceScene->holdAnimations = 1;
     for (UnknownBikeRaceRacer* racer = NextBike(&iterator); racer != 0;
          racer = NextBike(&iterator)) {
         racer->UnknownRacerVirtualSlot43();
