@@ -176,7 +176,7 @@
   "target_va": "0x00504210",
   "target_size": 77,
   "expect": "exact",
-  "notes": "GameObject slot 10 override: if slot 42 (vcall +0xa8) then field_0x430 = 0, field_0x431 = 1; then SoultreePhysicsBaseObject::Tick (0x005036f0) and GameObject::Tick (0x004693d0, result returned). 77 bytes + 3 padding.",
+  "notes": "GameObject slot 10 override: if slot 42 (vcall +0xa8) then motionActive = 0, motionCompleted = 1; then SoultreePhysicsBaseObject::Tick (0x005036f0) and GameObject::Tick (0x004693d0, result returned). 77 bytes + 3 padding.",
   "bindings": "LayoutProbe.bindings.json"
  },
  {

@@ -70,10 +70,10 @@ public:
     virtual int UnknownVirtualSlot42();                           // 0x00504470
 
     SoultreeObject* poseNode;  // +0x42c slot 40 sets it to the model node (same as sceneNode); Bike reads the rider/pose axes from it
-    char field_0x430;
-    char field_0x431;
+    char motionActive;     // +0x430 set when a motion starts (KrustyBike 0x0048d910/0x0048d990/0x0048e280 SetMotion); slot 41 clears it with the rest pose (tier 3)
+    char motionCompleted;  // +0x431 Vehicle::Tick sets it when slot 42 reports the motion done; KrustyBike slot 71 arms the landing timer on it (tier 3)
     char field_0x432;
-    char field_0x433;
+    char motionIndex;      // +0x433 signed: trick index, +0x10 for a chained trick, -1 for the head turn; network message motion = index + 1 (17 when negative) (tier 3)
 };
 
 #endif

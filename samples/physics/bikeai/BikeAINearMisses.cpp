@@ -1736,8 +1736,8 @@ int KrustyBike::Fn_00413200(float dt)
         crashReason = 4;
         UnknownVirtualSlot41();
         field_0x574 = Vec3(savedForward.x, 0.0f, savedForward.z);
-        field_0x431 = 0;
-        field_0x433 = 0;
+        motionCompleted = 0;
+        motionIndex = 0;
         crashedUpsideDown = savedUp.y < 0.0f ? 1 : 0;
         crashYaw = savedYaw;
         wrecker->StartAnimatedWreck(crashDirection);
@@ -2056,7 +2056,7 @@ int KrustyBike::Fn_00414370(float dt)
             field_0x11b0 = 0;
     }
     if (aiTricksEnabled && !(trickDelay > trickTimer)) {
-        if (!field_0x430 && airborne) {
+        if (!motionActive && airborne) {
             PredictLanding(position, velocity, &predictedLandingTime, 0, 0, (Terrain*)terrain);
             if (BikeAIRandUnit() * 100.0f <= aiStuntChance) {
                 for (n = 5.0f; n >= 1.0f; n -= 1.0f) {

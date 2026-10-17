@@ -32,14 +32,14 @@ int Bike::UnknownVirtualSlot98()
 
 int Bike::UnknownVirtualSlot42()
 {
-    if (crashState == 0 && field_0x433 >= 0 && field_0x430 && riderCharacter->c_0xc)
+    if (crashState == 0 && motionIndex >= 0 && motionActive && riderCharacter->c_0xc)
         return 1;
     return 0;
 }
 
 int Bike::UnknownVirtualSlot66()
 {
-    if (crashState || field_0x430)
+    if (crashState || motionActive)
         return 1;
     return 0;
 }
@@ -846,14 +846,14 @@ int Bike::UnknownVirtualSlot100(float a, int b, float c)
     crashState = UnknownVirtualSlot99(a, thr, b, c);
     if (crashState) {
         field_0x574 = Vec3(savedForward.x, 0.0f, savedForward.z);
-        field_0x433 = 0;
+        motionIndex = 0;
         int neg = savedUp.y < 0.0f;
         crashYaw = savedYaw;
         crashedUpsideDown = neg;
         field_0x138 = 1;
         UnknownVirtualSlot69();
         UnknownVirtualSlot41();
-        field_0x431 = 0;
+        motionCompleted = 0;
     }
     return crashState;
 }
@@ -991,7 +991,7 @@ Vec3 Bike::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
 
 void Bike::UnknownVirtualSlot29(int)
 {
-    if (crossoverPose == 0 && field_0x430 == 0) {
+    if (crossoverPose == 0 && motionActive == 0) {
         savedForward = bodyForward;
         savedUp = bodyUp;
         savedYaw = bodyYaw;
@@ -1016,12 +1016,12 @@ void Bike::UnknownVirtualSlot29(int)
 
 void Bike::UnknownVirtualSlot41()
 {
-    if (crossoverPose == 0 && field_0x430 == 0)
+    if (crossoverPose == 0 && motionActive == 0)
         return;
     poseNode->GetAxesIn(0, &savedForward, &savedUp);
     modelNode->SetAxesIn(0, &savedForward, &savedUp, 1, 0);
     D3DIMSoultreeCharacter::ApplyRestPose();
-    field_0x430 = 0;
+    motionActive = 0;
     UnknownVirtualSlot34();
     OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
                         &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
@@ -1065,7 +1065,7 @@ void Bike::UnknownVirtualSlot102(float)
         D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[1], t);
         return;
     }
-    if (field_0x430)
+    if (motionActive)
         return;
     int cnt = poseState;
     int step = crossoverPose;
@@ -1498,7 +1498,7 @@ void Bike::UnknownVirtualSlot7(const Vec3* dir)
         }
         return;
     }
-    if (field_0x430) {
+    if (motionActive) {
         BikeSteerToward(steerAxis, 0.5f, stepTime);
         rearWheel->loadWeight = rearWheel->restLoadWeight;
         rearWheel->appliedShare = *dir * rearWheel->loadWeight;
@@ -1546,7 +1546,7 @@ void Bike::UnknownVirtualSlot91()
     float dt = stepTime * 0.83f;
     float f = controlResponse[1] * controlInput.y * dt;
     Vec3 force;
-    if (field_0x430)
+    if (motionActive)
         force = Vec3(f * 0.5f, 0.0f, 0.0f);
     else
         force = Vec3(f, controlInput.x * stepTime * -0.2f, 0.0f);

@@ -55,7 +55,7 @@ KrustyBike::~KrustyBike()
 
 void KrustyBike::UnknownVirtualSlot27()
 {
-    if (crashReason == 9 || field_0x430) {
+    if (crashReason == 9 || motionActive) {
         wrecker->StartTumble();
     } else {
         wrecker->StartAnimatedWreck(crashDirection);
@@ -181,7 +181,7 @@ int KrustyBike::UnknownVirtualSlot39(float a)
 
 int KrustyBike::UnknownVirtualSlot42()
 {
-    if (!crashState && field_0x433 >= 0 && field_0x430 && riderCharacter->c_0xc) {
+    if (!crashState && motionIndex >= 0 && motionActive && riderCharacter->c_0xc) {
         float sum = trickHoldTime + trickClipTime;
         trickClipTime = 0;
         trickCount++;
@@ -238,7 +238,7 @@ void KrustyBike::UnknownVirtualSlot64(float a)
 
 int KrustyBike::UnknownVirtualSlot66()
 {
-    if (crashState || field_0x430)
+    if (crashState || motionActive)
         return 1;
     return hasFinished != 0 && hasFinished < 3;
 }
@@ -267,7 +267,7 @@ void KrustyBike::UnknownVirtualSlot71(int a)
 {
     if (crashState) {
         trickLandTimer = 0;
-    } else if (airborne && !a && !landingLatched && field_0x431 && trickLandTimer <= 0.0f) {
+    } else if (airborne && !a && !landingLatched && motionCompleted && trickLandTimer <= 0.0f) {
         trickLandTimer = 0.3f;
     }
     Bike::UnknownVirtualSlot71(a);
@@ -376,7 +376,7 @@ void KrustyBike::Fn_0048D8B0()
     trickHoldTime = 0;
     chainedTrickTime = 0;
     landingLatched = 0;
-    field_0x431 = 0;
+    motionCompleted = 0;
     trickLandTimer = 0;
     trickCount = 0;
     field_0x1534 = 0;
@@ -592,14 +592,14 @@ int KrustyBike::UnknownVirtualSlot99(float a, float b, int c, float d)
         crashReason = 12;
         return 1;
     }
-    if (!field_0x430 && inputMap && inputMap->UnknownVirtualSlot2(8, 0x3f)) {
+    if (!motionActive && inputMap && inputMap->UnknownVirtualSlot2(8, 0x3f)) {
         if (airborne && !crashState && frontWheel->penetration < -3.5f && rearWheel->penetration < -3.5f) {
             crashDirection = 2;
             crashReason = 1;
             return 1;
         }
     }
-    if (!airborne && field_0x430) {
+    if (!airborne && motionActive) {
         if (frontWheel->inContact) {
             if (linearSpeed > 30.0f) crashDirection = 1;
             else if (angularVelocity.z > 0.0f) crashDirection = 4;
@@ -659,11 +659,11 @@ void KrustyBike::UnknownVirtualSlot94()
 
 // Slot 29: refresh the previous/current orientation angles (0x48..0x60 from 0x2c..0x44).
 // Normally they are recomputed from the node's world axes; while neither crossoverPose nor
-// field_0x430 is set the old values are just copied.  Then the bike's matrix is mirrored
+// motionActive is set the old values are just copied.  Then the bike's matrix is mirrored
 // onto the 0x5c4 node when the wrecker's mode is 0 or 1, and the 0x141c timer is advanced.
 void KrustyBike::UnknownVirtualSlot29(int a)
 {
-    if (!crossoverPose && !field_0x430) {
+    if (!crossoverPose && !motionActive) {
         savedForward = bodyForward;
         savedUp = bodyUp;
         savedYaw = bodyYaw;
@@ -684,7 +684,7 @@ void KrustyBike::UnknownVirtualSlot29(int a)
         modelNode->GetMatrixIn(0, &m);
         riderCharacter->c_0x1a0->SetMatrixIn(0, &m);
     }
-    if (field_0x431 && !hasFinished && landingLatched) {
+    if (motionCompleted && !hasFinished && landingLatched) {
         if (trickLandTimer < 0.0f) {
             score += Fn_00495FF0();
             return;
@@ -910,19 +910,19 @@ void KrustyBike::UnknownVirtualSlot49(float dt)
             if (finishPosition == 1) {
                 if (g_kbGame->eventType) {
                     UnknownVirtualSlot41();
-                    field_0x431 = 0;
+                    motionCompleted = 0;
                     ((KbA5C4*)riderCharacter)->SetMotion(riderPoseHandles[15]);
                     ((KbA5C4*)riderCharacter)->field_0x10 = 0;
                     hasFinished = 3;
                 } else {
                     hasFinished = 3;
                     UnknownVirtualSlot41();
-                    field_0x431 = 0;
+                    motionCompleted = 0;
                 }
             } else {
                 hasFinished = 3;
                 UnknownVirtualSlot41();
-                field_0x431 = 0;
+                motionCompleted = 0;
             }
         }
     }
@@ -1231,13 +1231,13 @@ void KrustyBike::Fn_00496E30(int a)
 void KrustyBike::Fn_0048D910(int idx)
 {
     UnknownVirtualSlot41();
-    field_0x430 = 1;
-    field_0x431 = 0;
+    motionActive = 1;
+    motionCompleted = 0;
     field_0x432 = 1;
     trickClipTime = 0;
     chainedTrickTime = 0;
     trickHoldTime = 0;
-    field_0x433 = (char)idx;
+    motionIndex = (char)idx;
     ((KbA5C4*)riderCharacter)->SetMotion(animSetA[idx]);
     ((KbA5C4*)riderCharacter)->field_0x10 = 0;
     D3DIMSoultreeCharacter::SetMotion((Motion*)animSetB[idx]);
@@ -1248,10 +1248,10 @@ void KrustyBike::Fn_0048D910(int idx)
 // Variant of Fn_0048D910 that banks trickClipTime in chainedTrickTime and uses animSetC/animSetD.
 void KrustyBike::Fn_0048D990(int idx)
 {
-    field_0x430 = 1;
+    motionActive = 1;
     chainedTrickTime = trickClipTime;
     trickClipTime = 0;
-    field_0x433 = (char)(idx + 0x10);
+    motionIndex = (char)(idx + 0x10);
     ((KbA5C4*)riderCharacter)->SetMotion(animSetC[idx]);
     D3DIMSoultreeCharacter::SetMotion((Motion*)animSetD[idx]);
     trickChained = 1;
@@ -1368,11 +1368,11 @@ void KrustyBike::Fn_0048E280()
     if (angle <= 0.698f)
         return;
     UnknownVirtualSlot41();
-    field_0x431 = 0;
-    field_0x430 = 1;
+    motionCompleted = 0;
+    motionActive = 1;
     field_0x432 = 1;
     headTurningToRival = 1;
-    field_0x433 = (char)0xff;
+    motionIndex = (char)0xff;
     if (rivalBearing > 2.7f) {
         rivalBearing = 2.7f;
         rivalBearingScaled = 0.7f;
@@ -1543,9 +1543,9 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
     message.poseParam = poseParam * 255.0f;
     message.poseLeanBlend = poseLeanBlend * 255.0f;
     message.poseBlend = poseBlend * 255.0f;
-    if (field_0x430) {
-        if (field_0x433 >= 0)
-            message.motion = field_0x433 + 1;
+    if (motionActive) {
+        if (motionIndex >= 0)
+            message.motion = motionIndex + 1;
         else
             message.motion = 17;
     } else {

@@ -15,7 +15,7 @@ void Vehicle::UnknownVirtualSlot0(float dt)
 
 int Vehicle::UnknownVirtualSlot42()
 {
-    return crashState == 0 && field_0x433 >= 0 && field_0x430;
+    return crashState == 0 && motionIndex >= 0 && motionActive;
 }
 
 void Vehicle::UnknownVirtualSlot50(int a, float b, int c)
@@ -268,7 +268,7 @@ void Vehicle::UnknownVirtualSlot43()
 // Distributes the vector *arg (a force/impulse, tier 3) over the active contacts (or wheels).
 // One active contact takes all of it; several share it by inverse-distance blending:
 // weight = 1 - dist_i / sum(dist), so the nearest contact takes the biggest share.
-// Wheel mode: field_0x430 gives every wheel its stored weight (+0x294); otherwise the same
+// Wheel mode: motionActive gives every wheel its stored weight (+0x294); otherwise the same
 // blending as for contacts using the wheels' contact points, or a single lead wheel.
 // Retail leaves `last` uninitialised (its slot is the squared-distance temporary), declares
 // the running total before the share temporary, and the single-wheel branch zeroes the share
@@ -333,7 +333,7 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
         }
         return;
     }
-    if (field_0x430) {
+    if (motionActive) {
         for (i = 0; i < wheelCount; i++) {
             wheelList[i]->loadWeight = wheelList[i]->restLoadWeight;
             float w = wheelList[i]->loadWeight;
@@ -1658,9 +1658,9 @@ int Vehicle::CheckCrash()
     crashState = crashed;
     if (crashed) {
         Vec3 heading(bodyForward.x, 0.0f, bodyForward.z);
-        field_0x430 = 0;
-        field_0x431 = 0;
-        field_0x433 = 0;
+        motionActive = 0;
+        motionCompleted = 0;
+        motionIndex = 0;
         field_0x574 = heading;
         crashedUpsideDown = savedUp.y < 0.0f;
         crashYaw = savedYaw;
@@ -2157,15 +2157,15 @@ Vehicle::~Vehicle()
     }
 }
 
-// 0x0052a830 (GameObject slot 10 via the vtordisp thunk 0x0052b690): when the vehicle is
-// controllable (slot 42) the character flags 0x430/0x431 are reset, then the per-frame step
+// 0x0052a830 (GameObject slot 10 via the vtordisp thunk 0x0052b690): when the current
+// motion is finished (slot 42) motionActive is cleared and motionCompleted set, then the per-frame step
 // (slot 49) runs and GameObject's own slot 10 is called directly, bypassing
 // SoultreePhysicsCharacter's version (0x00504210).
 int Vehicle::Tick(float dt)
 {
     if (UnknownVirtualSlot42()) {
-        field_0x430 = 0;
-        field_0x431 = 1;
+        motionActive = 0;
+        motionCompleted = 1;
     }
     UnknownVirtualSlot49(dt);
     return GameObject::Tick(dt);

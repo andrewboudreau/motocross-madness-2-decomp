@@ -66,7 +66,7 @@ HIER_CHECK(spbo_size, sizeof(SoultreePhysicsBaseObject) == 0x220 + 0x2c);
 HIER_CHECK(spbo_last, offsetof(SoultreePhysicsBaseObject, centerNode) == 0x218);
 // SoultreePhysicsCharacter: D3DIM at 540 (0x21c) ends at 0x42c, own fields, GameObject at 1080.
 HIER_CHECK(spc_node, offsetof(SoultreePhysicsCharacter, poseNode) == 0x42c);
-HIER_CHECK(spc_flags, offsetof(SoultreePhysicsCharacter, field_0x433) == 0x433);
+HIER_CHECK(spc_flags, offsetof(SoultreePhysicsCharacter, motionIndex) == 0x433);
 HIER_CHECK(spc_d3d, offsetof(SoultreePhysicsCharacter, modelNode) == 0x3bc);
 HIER_CHECK(spc_size, sizeof(SoultreePhysicsCharacter) == 1080 + 0x2c);
 HIER_CHECK(veh_block, offsetof(Vehicle, veh_block_0x434) == 0x434);
@@ -110,14 +110,14 @@ SoultreePhysicsCharacter::~SoultreePhysicsCharacter()
 }
 
 // GameObject slot 10 override (0x00504210, reached through the vtordisp thunk 0x00504350).
-// When slot 42 reports true, field_0x430 is cleared and field_0x431 set (both are cleared by
+// When slot 42 reports true, motionActive is cleared and motionCompleted set (both are cleared by
 // slot 1); then the physics update (SoultreePhysicsBaseObject, 0x005036f0) and the plain
 // GameObject update (0x004693d0) run with the same frame time.  Tier 1 control flow.
 int SoultreePhysicsCharacter::Tick(float dt)
 {
     if (UnknownVirtualSlot42()) {
-        field_0x430 = 0;
-        field_0x431 = 1;
+        motionActive = 0;
+        motionCompleted = 1;
     }
     SoultreePhysicsBaseObject::Tick(dt);
     return GameObject::Tick(dt);

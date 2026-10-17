@@ -13,10 +13,10 @@
 void SoultreePhysicsCharacter::UnknownVirtualSlot1(float value)
 {
     SoultreePhysicsBaseObject::UnknownVirtualSlot1(value);
-    field_0x430 = 0;
-    field_0x431 = 0;
+    motionActive = 0;
+    motionCompleted = 0;
     field_0x432 = 0;
-    field_0x433 = 0;
+    motionIndex = 0;
 }
 
 // slot 8 (0x005041c0)
@@ -28,7 +28,7 @@ void SoultreePhysicsCharacter::UnknownVirtualSlot8()
 // slot 42 (0x00504470)
 int SoultreePhysicsCharacter::UnknownVirtualSlot42()
 {
-    if (field_0x433 >= 0 && field_0x430) {
+    if (motionIndex >= 0 && motionActive) {
         return 1;
     }
     return 0;
@@ -64,7 +64,7 @@ void SoultreePhysicsCharacter::UnknownVirtualSlot41()
     poseNode->GetAxesIn(0, &savedForward, &savedUp);
     modelNode->SetAxesIn(0, &savedForward, &savedUp, 1, 0);
     ApplyRestPose();
-    field_0x430 = 0;
+    motionActive = 0;
     UnknownVirtualSlot34();
     OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll, &bodySinRoll,
               &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
