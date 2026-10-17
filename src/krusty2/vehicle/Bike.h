@@ -112,7 +112,7 @@ struct BikeWheel {
     Vec3 appliedShare;
     Vec3 frictionDirection;  // +0x108 CollisionPoint+0x50 frictionDirection (VehicleWheel name)
     char pad_0x114[12];
-    Vec3 w_0x120;             // Method_0x0040a520 crosses the wheel offset with it while in contact
+    Vec3 normalLoadVector;                    // VehicleWheel +0x120 normalLoadVector; Method_0x0040a520 crosses the wheel offset with it while in contact
     char pad_0x12c[24];
     float contactLoad;
     float tangentSpeed;  // +0x148 CollisionPoint+0x90 tangentSpeed (VehicleWheel name)
@@ -131,20 +131,20 @@ struct BikeWheel {
     char pad_0x218[24];
     Vec3 rollDirection;  // +0x230 Tire.h/VehicleWheel rollDirection
     Vec3 sideAxis;  // +0x23c Tire.h/VehicleWheel sideAxis (wheel axle direction)
-    Vec3 w_0x248;             // KrustyBike slot 48 (0x004964e0) zeroes it
+    Vec3 driveForce;                          // VehicleWheel +0x248 driveForce (DriveForce's force output); KrustyBike slots 48/86 zero or halve it
     char pad_0x254[12];
     int inContact;
     char pad_0x264[4];
-    int w_0x268;
+    int shockEngaged;                         // VehicleWheel +0x268 shockEngaged; Bike slot 65 kicks the shock only while set
     char pad_0x26c[8];
     float wheelRadius;  // +0x274 Tire.h wheelRadius (ctor: y extent of the node)
     char pad_0x278[4];
     float slipSpeed;  // +0x27c Tire.h slipSpeed (written by UpdateContactPatch)
-    float w_0x280;
+    float driveForceMagnitude;                // DriveForce's magnitude output (slot 86); Bike slot 61 and Tire's UpdateRoll scale by it
     char pad_0x284[4];
     float tangentSin;  // +0x288 Tire.h tangentSin
     char pad_0x28c[8];
-    float w_0x294;
+    float restLoadWeight;                     // VehicleWheel +0x294 restLoadWeight; Bike's loader splits the weight by the wheel base
     char pad_0x298[4];
     float rampLevel;  // +0x29c Tire.h/VehicleWheel rampLevel
     char pad_0x2a0[4];

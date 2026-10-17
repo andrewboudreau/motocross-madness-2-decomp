@@ -333,10 +333,10 @@ struct VehicleWheel {
     Vec3 appliedShare;              // +0xfc per-wheel share of the applied vector
     Vec3 frictionDirection;  // +0x108 CollisionPoint+0x50 frictionDirection (base at +0xb8)
     Vec3 field_0x114;
-    Vec3 field_0x120;
-    float field_0x12c;  // Method_00527A20: -(appliedShare . groundNormal) when that is negative, else 0
+    Vec3 normalLoadVector;                    // +0x120  CollisionPoint+0x68 (base at +0xb8); Method_00527A20: = groundNormal * normalLoad, zero when appliedShare points away from the ground
+    float normalLoad;                         // +0x12C  CollisionPoint+0x74 (named frictionCoefficient in the base); = -(appliedShare . groundNormal) when negative, else 0 (Method_00527A20, before the contact point's slot 1)
     Vec3 frictionForce;  // +0x130 CollisionPoint+0x78 frictionForce (base at +0xb8)
-    float field_0x13c;  // Method_00527A20: contact time scale (the impulse is limited by it)
+    float frictionMagnitude;                  // +0x13C  CollisionPoint+0x84 frictionMagnitude (base at +0xb8); Method_00527A20 limits the friction impulse by it
     char pad_0x140[4];
     float contactLoad;  // +0x144 slot 72 accumulates it over wheels and averages by the contact count
     float tangentSpeed;  // +0x148 CollisionPoint+0x90 tangentSpeed (base at +0xb8); Method_00527A20 adds it to spinSpeed for the available load
@@ -366,19 +366,19 @@ struct VehicleWheel {
     char pad_0x22C[4];
     Vec3 rollDirection;              // +0x230 Tire.h: normalise(cross(normal, side))
     Vec3 sideAxis;                   // +0x23c Tire.h: wheel axle direction
-    Vec3 field_0x248;
+    Vec3 driveForce;                          // +0x248  DriveForce's force output (slot 86); AccumulateWheelContacts adds it and its moment; ResetWheelContacts clears it
     Vec3 field_0x254;
     int inContact;  // +0x260 selects wheels touching the ground (slots 7, 54, 72, 75-86); count equals Vehicle::wheelsInContact
     int reportContactOutputs;  // +0x264 (Tire.h name) PlaceWheels sets it on the first in-contact wheel without field_0x1c0 (else on wheel 0)
-    int field_0x268;
-    int field_0x26c;
+    int shockEngaged;                         // +0x268  Tire 0x00513c70 sets it after a shock solve; Method_005293E0 damps and Method_00529450 applies the spring only while set
+    int shockExtending;                       // +0x26C  Tire 0x00513c70 copies the shock's extending flag here (Tire.h); ResetWheelContacts clears it
     char pad_0x270[8];
     int rollAngle;  // +0x278 Tire.h rollAngle (float there; only cleared here)
     int slipSpeed;  // +0x27C Tire.h slipSpeed (float there; only cleared here)
     Vec3 field_0x280;
     float tangentCos;              // +0x28c Tire.h: |tangent . rollDirection| clamped to 1
-    float field_0x290;
-    float field_0x294;
+    float driveDistance;                      // +0x290  Tire 0x005143d0: driveShareComplement * drive magnitude * dt * scale; slots 19/20 turn it into a speed with invStepTime
+    float restLoadWeight;                     // +0x294  Tire ctor argument a14; Bike's loader stores the static weight split (rear = share / wheelBase, front = 1 - rear); loadWeight is reset to it
     char pad_0x298[0x4];
     float rampLevel;               // +0x29c 0 selects a flag passed to slot 77 (slot 83)
     float driveStrength;           // +0x2a0 Tire.h ctor arg a10, read by 0x00514170; Method_00527A20 counts the in-contact wheels where it is nonzero

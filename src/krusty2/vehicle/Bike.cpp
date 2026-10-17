@@ -82,7 +82,7 @@ Vec3 BikeVec3Scale(const Vec3& v, float s);
 float BikeVec3Dot(const Vec3& a, const Vec3& b);
 
 // 0x0040a520 (tier 3 reading).  Builds a world-space steering torque `torque`: a quarter of
-// the force accumulator weightForce, turned by the front wheel's contact (offset x w_0x120) and by each
+// the force accumulator weightForce, turned by the front wheel's contact (offset x normalLoadVector) and by each
 // active +0x5f8/+0x5fc contact (offset x the contact's axis scaled by the negative
 // projection), or by wheelRadius * wheelUpAxis while airborne.  Its body-space direction
 // (projected on the wheel frame's axis, normalised) scales the per-axis gains into the
@@ -111,7 +111,7 @@ float Bike::Method_0x0040a520()
         if (frontWheel->inContact) {
             offset = BikeVec3Sub(frontWheel->wheelPosition, frontWheel->nodePosition);
             driven = 1;
-            torque = CrossProduct(offset, frontWheel->w_0x120);
+            torque = CrossProduct(offset, frontWheel->normalLoadVector);
             frontWheel->w_0x16c = 2;
             if (leftBarContact->active) {
                 torque = BikeVec3Sub(leftBarContact->point, frontWheel->nodePosition);
@@ -710,8 +710,8 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     float share = scratchVector.z - localCenterOfMass.z;
     if (share < 0.0f)
         share = -share;
-    rearWheel->w_0x294 = share / wheelBase;
-    frontWheel->w_0x294 = 1.0f - rearWheel->w_0x294;
+    rearWheel->restLoadWeight = share / wheelBase;
+    frontWheel->restLoadWeight = 1.0f - rearWheel->restLoadWeight;
     UnknownVirtualSlot8();
 
     // Box inertia of the bike (length from the model, width/height from the rider), of the
@@ -800,7 +800,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     riderCharacter->Method_0x004a8bf0(riderPoseHandles[1], 0.5f);
     verticalAccelSmoother->Reset(fixedStepTime * 7.0f);
     forwardAccelSmoother->Reset(0.5f);
-    steerAxis = new(__FILE__, 0x7df) BikeA640(frontWheel->w_0x294, fixedStepTime * 6.3f);
+    steerAxis = new(__FILE__, 0x7df) BikeA640(frontWheel->restLoadWeight, fixedStepTime * 6.3f);
     poseSmoother = new(__FILE__, 0x7e0) BikeA644(poseSmoothTime, 1.0f, -1.0f);
     return this;
 }
@@ -931,7 +931,7 @@ void Bike::UnknownVirtualSlot65(float arg)
     if (smoothedVerticalAccel <= 5.0f || arg == 0.0f)
         return;
     BikeWheel* rear = rearWheel;
-    if (rear->w_0x268 == 0 && frontWheel->w_0x268 == 0)
+    if (rear->shockEngaged == 0 && frontWheel->shockEngaged == 0)
         return;
     arg = (controlInput.y - prevControlInput.y) / arg;
     if (controlInput.y <= 0.4f || arg <= 11.0f)
@@ -940,12 +940,12 @@ void Bike::UnknownVirtualSlot65(float arg)
     t = BikeMin(t, 100.0f);
     t = t * arg * 5.0f;
     t = BikeMin(t, 10000.0f);
-    if (rear->w_0x268 && rear->tangentSpeed > 30.0f) {
+    if (rear->shockEngaged && rear->tangentSpeed > 30.0f) {
         rear->secondaryAux->q_0x94 = t;
         return;
     }
     BikeWheel* front = frontWheel;
-    if (front->w_0x268 && front->tangentSpeed > 30.0f)
+    if (front->shockEngaged && front->tangentSpeed > 30.0f)
         front->primaryAux->q_0x94 = t;
 }
 
@@ -1187,9 +1187,9 @@ float Bike::UnknownVirtualSlot61(float threshold)
     bool decay = false;
     if (allWheelsInContact) {
         BikeWheel* rear = rearWheel;
-        if (rear->driveShare < 0.9f && rear->w_0x280 > 0.0f) {
+        if (rear->driveShare < 0.9f && rear->driveForceMagnitude > 0.0f) {
             float t = wheelBase * 0.5f;
-            float u = (t + t * rear->driveShareComplement) * invInertia.y * stepTime * rear->driveShareComplement * rear->w_0x280;
+            float u = (t + t * rear->driveShareComplement) * invInertia.y * stepTime * rear->driveShareComplement * rear->driveForceMagnitude;
             float a = leanAngle;
             if (a < 0.0f)
                 a = -a;
@@ -1500,9 +1500,9 @@ void Bike::UnknownVirtualSlot7(const Vec3* dir)
     }
     if (field_0x430) {
         BikeSteerToward(steerAxis, 0.5f, stepTime);
-        rearWheel->loadWeight = rearWheel->w_0x294;
+        rearWheel->loadWeight = rearWheel->restLoadWeight;
         rearWheel->appliedShare = *dir * rearWheel->loadWeight;
-        frontWheel->loadWeight = frontWheel->w_0x294;
+        frontWheel->loadWeight = frontWheel->restLoadWeight;
         frontWheel->appliedShare = *dir * frontWheel->loadWeight;
         return;
     }

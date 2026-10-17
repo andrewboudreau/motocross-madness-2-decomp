@@ -447,8 +447,8 @@ void KrustyBike::UnknownVirtualSlot48()
     Vec3 v = velocity * 3.0f;
     Vec3 d = (v - prevVelocity) * 0.5f;
     position += d * stepTime;
-    rearWheel->w_0x248 = g_kbZeroVec;
-    rearWheel->w_0x280 = 0;
+    rearWheel->driveForce = g_kbZeroVec;
+    rearWheel->driveForceMagnitude = 0;
 }
 
 // Slot 86: per-frame wheel-contact update (provisional semantics).  When the race context
@@ -469,10 +469,10 @@ void KrustyBike::UnknownVirtualSlot86()
             ramp = 0;
         if (w->aux)
             w->aux->DriveForce(KbFloat(linearSpeed), &w->rollDirection, KbFloat(driveForceScale), backingUp, ramp,
-                                    &w->w_0x248, &w->w_0x280);
+                                    &w->driveForce, &w->driveForceMagnitude);
         if (g_kbGame->raceMode && !onTrack) {
-            rearWheel->w_0x248 *= 0.5f;
-            rearWheel->w_0x280 *= 0.5f;
+            rearWheel->driveForce *= 0.5f;
+            rearWheel->driveForceMagnitude *= 0.5f;
         }
     }
     rearWheel->UpdateDriveShare(this);
