@@ -65,8 +65,8 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     rivalBearing = 0;
     field_0x15d4 = 0;
     lastCollisionType = 0;
-    altBodyB = 0;
-    altBodyA = 0;
+    bikeCollision = 0;
+    bikeAndRiderCollision = 0;
 }
 
 // Slot 70: threshold test against a per-mode table; a[] and b[][] are static-init'd locals.

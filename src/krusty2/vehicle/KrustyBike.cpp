@@ -19,6 +19,7 @@
 #include "vehicle/KrustyBike.h"
 #include "math/FastMath.h"
 #include "collision/CollisionObject.h"
+#include "broadphase/Quadtree.h"
 #include "core/MemTag.h"
 
 // KbFloat: identity inline standing in for the original inline float getters (tier 3).
@@ -1048,94 +1049,94 @@ void KrustyBike::UnknownVirtualSlot101()
 }
 
 // owner: bracket only (0x496d20 sits between slot 101 and Fn_00496DA0)
-// 0x00496d20 (exact): the real body of slot 101, switching the active scene object from
-// altBodyA to altBodyB.  The mode test is a nested if with the 0x2d84 test written
-// positively: VC6 then computes &obj->field_0xc in the second test block, calls through ecx
+// 0x00496d20 (exact): the real body of slot 101, switching collisionObject from
+// bikeAndRiderCollision to bikeCollision.  The mode test is a nested if with the 0x2d84 test written
+// positively: VC6 then computes the GraphicsTest base (+0xc) in the second test block, calls through ecx
 // and cross-jumps the outer else into the inner slot-5 tail as retail does (the flat
 // `x18 > 1 && !x2d84` form and the nested `!x2d84` form do not).
 void KrustyBike::Fn_00496D20()
 {
-    altBodyA->field_0xc.UnknownVirtualSlot4();
-    g_kbDirector->Remove(altBodyA, altBodyA->field_0x84);
-    collisionObject = (CollisionObject*)altBodyB;
+    bikeAndRiderCollision->Disable();
+    g_collisionQuadTree->Remove(bikeAndRiderCollision, bikeAndRiderCollision->quadtreeCell);
+    collisionObject = bikeCollision;
     if (g_kbGame->playerCount > 1) {
         if (g_kbGame->riderCollision)
-            ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot5();
+            collisionObject->Enable();
         else
-            ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot4();
+            collisionObject->Disable();
     } else
-        ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot5();
-    ((KbObj128*)collisionObject)->Fn_00435FE0();
+        collisionObject->Enable();
+    collisionObject->SnapPlacement();
 }
 
 // owner: bracket only (0x496da0, directly after Fn_00496D20)
 // 0x00496da0 (exact): back-camera swap, Fn_00496D20 with the two scene objects exchanged.
 void KrustyBike::Fn_00496DA0()
 {
-    altBodyB->field_0xc.UnknownVirtualSlot4();
-    g_kbDirector->Remove(altBodyB, altBodyB->field_0x84);
-    collisionObject = (CollisionObject*)altBodyA;
+    bikeCollision->Disable();
+    g_collisionQuadTree->Remove(bikeCollision, bikeCollision->quadtreeCell);
+    collisionObject = bikeAndRiderCollision;
     if (g_kbGame->playerCount > 1) {
         if (g_kbGame->riderCollision)
-            ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot5();
+            collisionObject->Enable();
         else
-            ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot4();
+            collisionObject->Disable();
     } else
-        ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot5();
-    ((KbObj128*)collisionObject)->Fn_00435FE0();
+        collisionObject->Enable();
+    collisionObject->SnapPlacement();
 }
 
 // 0x00496F90: both bikes' collision objects ignore each other (AddIgnoredOwner = 0x00439410).
 void KrustyBike::Fn_00496F90(KrustyBike* other)
 {
-    if (altBodyB) {
-        ((KbCollider*)other->altBodyB)->AddIgnoredOwner((void*)altBodyB);
-        ((KbCollider*)other->altBodyB)->AddIgnoredOwner((void*)altBodyA);
-        ((KbCollider*)other->altBodyB)->AddIgnoredOwner((void*)frontWheel);
-        ((KbCollider*)other->altBodyB)->AddIgnoredOwner((void*)rearWheel);
-        ((KbCollider*)other->altBodyB)->AddIgnoredOwner((void*)wrecker->a_0x38);
-        ((KbCollider*)other->altBodyA)->AddIgnoredOwner((void*)altBodyB);
-        ((KbCollider*)other->altBodyA)->AddIgnoredOwner((void*)altBodyA);
-        ((KbCollider*)other->altBodyA)->AddIgnoredOwner((void*)frontWheel);
-        ((KbCollider*)other->altBodyA)->AddIgnoredOwner((void*)rearWheel);
-        ((KbCollider*)other->altBodyA)->AddIgnoredOwner((void*)wrecker->a_0x38);
-        ((KbCollider*)other->frontWheel)->AddIgnoredOwner((void*)altBodyB);
-        ((KbCollider*)other->frontWheel)->AddIgnoredOwner((void*)altBodyA);
+    if (bikeCollision) {
+        other->bikeCollision->AddIgnoredOwner(bikeCollision);
+        other->bikeCollision->AddIgnoredOwner(bikeAndRiderCollision);
+        other->bikeCollision->AddIgnoredOwner((void*)frontWheel);
+        other->bikeCollision->AddIgnoredOwner((void*)rearWheel);
+        other->bikeCollision->AddIgnoredOwner((void*)wrecker->a_0x38);
+        other->bikeAndRiderCollision->AddIgnoredOwner(bikeCollision);
+        other->bikeAndRiderCollision->AddIgnoredOwner(bikeAndRiderCollision);
+        other->bikeAndRiderCollision->AddIgnoredOwner((void*)frontWheel);
+        other->bikeAndRiderCollision->AddIgnoredOwner((void*)rearWheel);
+        other->bikeAndRiderCollision->AddIgnoredOwner((void*)wrecker->a_0x38);
+        ((KbCollider*)other->frontWheel)->AddIgnoredOwner(bikeCollision);
+        ((KbCollider*)other->frontWheel)->AddIgnoredOwner(bikeAndRiderCollision);
         ((KbCollider*)other->frontWheel)->AddIgnoredOwner((void*)frontWheel);
         ((KbCollider*)other->frontWheel)->AddIgnoredOwner((void*)rearWheel);
         ((KbCollider*)other->frontWheel)->AddIgnoredOwner((void*)wrecker->a_0x38);
-        ((KbCollider*)other->rearWheel)->AddIgnoredOwner((void*)altBodyB);
-        ((KbCollider*)other->rearWheel)->AddIgnoredOwner((void*)altBodyA);
+        ((KbCollider*)other->rearWheel)->AddIgnoredOwner(bikeCollision);
+        ((KbCollider*)other->rearWheel)->AddIgnoredOwner(bikeAndRiderCollision);
         ((KbCollider*)other->rearWheel)->AddIgnoredOwner((void*)frontWheel);
         ((KbCollider*)other->rearWheel)->AddIgnoredOwner((void*)rearWheel);
         ((KbCollider*)other->rearWheel)->AddIgnoredOwner((void*)wrecker->a_0x38);
-        ((KbCollider*)other->wrecker->a_0x38)->AddIgnoredOwner((void*)altBodyB);
-        ((KbCollider*)other->wrecker->a_0x38)->AddIgnoredOwner((void*)altBodyA);
+        ((KbCollider*)other->wrecker->a_0x38)->AddIgnoredOwner(bikeCollision);
+        ((KbCollider*)other->wrecker->a_0x38)->AddIgnoredOwner(bikeAndRiderCollision);
         ((KbCollider*)other->wrecker->a_0x38)->AddIgnoredOwner((void*)frontWheel);
         ((KbCollider*)other->wrecker->a_0x38)->AddIgnoredOwner((void*)rearWheel);
         ((KbCollider*)other->wrecker->a_0x38)->AddIgnoredOwner((void*)wrecker->a_0x38);
-        ((KbCollider*)altBodyB)->AddIgnoredOwner((void*)other->altBodyB);
-        ((KbCollider*)altBodyB)->AddIgnoredOwner((void*)other->altBodyA);
-        ((KbCollider*)altBodyB)->AddIgnoredOwner((void*)other->frontWheel);
-        ((KbCollider*)altBodyB)->AddIgnoredOwner((void*)other->rearWheel);
-        ((KbCollider*)altBodyB)->AddIgnoredOwner((void*)other->wrecker->a_0x38);
-        ((KbCollider*)altBodyA)->AddIgnoredOwner((void*)other->altBodyB);
-        ((KbCollider*)altBodyA)->AddIgnoredOwner((void*)other->altBodyA);
-        ((KbCollider*)altBodyA)->AddIgnoredOwner((void*)other->frontWheel);
-        ((KbCollider*)altBodyA)->AddIgnoredOwner((void*)other->rearWheel);
-        ((KbCollider*)altBodyA)->AddIgnoredOwner((void*)other->wrecker->a_0x38);
-        ((KbCollider*)frontWheel)->AddIgnoredOwner((void*)other->altBodyB);
-        ((KbCollider*)frontWheel)->AddIgnoredOwner((void*)other->altBodyA);
+        bikeCollision->AddIgnoredOwner(other->bikeCollision);
+        bikeCollision->AddIgnoredOwner(other->bikeAndRiderCollision);
+        bikeCollision->AddIgnoredOwner((void*)other->frontWheel);
+        bikeCollision->AddIgnoredOwner((void*)other->rearWheel);
+        bikeCollision->AddIgnoredOwner((void*)other->wrecker->a_0x38);
+        bikeAndRiderCollision->AddIgnoredOwner(other->bikeCollision);
+        bikeAndRiderCollision->AddIgnoredOwner(other->bikeAndRiderCollision);
+        bikeAndRiderCollision->AddIgnoredOwner((void*)other->frontWheel);
+        bikeAndRiderCollision->AddIgnoredOwner((void*)other->rearWheel);
+        bikeAndRiderCollision->AddIgnoredOwner((void*)other->wrecker->a_0x38);
+        ((KbCollider*)frontWheel)->AddIgnoredOwner(other->bikeCollision);
+        ((KbCollider*)frontWheel)->AddIgnoredOwner(other->bikeAndRiderCollision);
         ((KbCollider*)frontWheel)->AddIgnoredOwner((void*)other->frontWheel);
         ((KbCollider*)frontWheel)->AddIgnoredOwner((void*)other->rearWheel);
         ((KbCollider*)frontWheel)->AddIgnoredOwner((void*)other->wrecker->a_0x38);
-        ((KbCollider*)rearWheel)->AddIgnoredOwner((void*)other->altBodyB);
-        ((KbCollider*)rearWheel)->AddIgnoredOwner((void*)other->altBodyA);
+        ((KbCollider*)rearWheel)->AddIgnoredOwner(other->bikeCollision);
+        ((KbCollider*)rearWheel)->AddIgnoredOwner(other->bikeAndRiderCollision);
         ((KbCollider*)rearWheel)->AddIgnoredOwner((void*)other->frontWheel);
         ((KbCollider*)rearWheel)->AddIgnoredOwner((void*)other->rearWheel);
         ((KbCollider*)rearWheel)->AddIgnoredOwner((void*)other->wrecker->a_0x38);
-        ((KbCollider*)wrecker->a_0x38)->AddIgnoredOwner((void*)other->altBodyB);
-        ((KbCollider*)wrecker->a_0x38)->AddIgnoredOwner((void*)other->altBodyA);
+        ((KbCollider*)wrecker->a_0x38)->AddIgnoredOwner(other->bikeCollision);
+        ((KbCollider*)wrecker->a_0x38)->AddIgnoredOwner(other->bikeAndRiderCollision);
         ((KbCollider*)wrecker->a_0x38)->AddIgnoredOwner((void*)other->frontWheel);
         ((KbCollider*)wrecker->a_0x38)->AddIgnoredOwner((void*)other->rearWheel);
         ((KbCollider*)wrecker->a_0x38)->AddIgnoredOwner((void*)other->wrecker->a_0x38);
@@ -1215,8 +1216,8 @@ void KrustyBike::Fn_00496E30(int a)
                 if (!(((KbTrackA*)track)->field_0xb4->items[i].flags & 8)) {
                     KbPart* part = ((KbTrackA*)track)->field_0xb4->items + i;
                     KbPartObj* obj = part->obj;
-                    obj->collider->AddIgnoredOwner((void*)altBodyB);
-                    obj->collider->AddIgnoredOwner((void*)altBodyA);
+                    obj->collider->AddIgnoredOwner(bikeCollision);
+                    obj->collider->AddIgnoredOwner(bikeAndRiderCollision);
                 }
             }
         }
@@ -1832,47 +1833,47 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     animSetC[14] = 0;
     animSetC[15] = (int)((KbA5C4*)riderCharacter)->FindMotion("DCanCanAlt", 1);
 
-    altBodyA = (KbObj128*)new(__FILE__, 0x77e) CollisionObject(1);
-    ((CollisionObject*)altBodyA)->Configure(a1, 1, 1, 1);
-    ((CollisionObject*)altBodyA)->LoadShape(modelNode->firstChild, "BikeAndRider.col");
-    GameObject::AppendChild((GraphicsTest*)(CollisionObject*)altBodyA, -1);
-    altBodyB = (KbObj128*)new(__FILE__, 0x784) CollisionObject(1);
-    ((CollisionObject*)altBodyB)->Configure(a1, 1, 1, 1);
-    ((CollisionObject*)altBodyB)->LoadShape(modelNode->firstChild, "Bike.col");
-    GameObject::AppendChild((GraphicsTest*)(CollisionObject*)altBodyB, -1);
-    altBodyB->field_0xc.UnknownVirtualSlot4();
-    ((CollisionObject*)altBodyA)->ownerType = 100;
-    ((CollisionObject*)altBodyB)->ownerType = 100;
-    ((CollisionObject*)altBodyA)->ownerObject = this;
-    ((CollisionObject*)altBodyB)->ownerObject = this;
-    collisionObject = (CollisionObject*)altBodyA;
+    bikeAndRiderCollision = new(__FILE__, 0x77e) CollisionObject(1);
+    bikeAndRiderCollision->Configure(a1, 1, 1, 1);
+    bikeAndRiderCollision->LoadShape(modelNode->firstChild, "BikeAndRider.col");
+    GameObject::AppendChild((GraphicsTest*)bikeAndRiderCollision, -1);
+    bikeCollision = new(__FILE__, 0x784) CollisionObject(1);
+    bikeCollision->Configure(a1, 1, 1, 1);
+    bikeCollision->LoadShape(modelNode->firstChild, "Bike.col");
+    GameObject::AppendChild((GraphicsTest*)bikeCollision, -1);
+    bikeCollision->Disable();
+    bikeAndRiderCollision->ownerType = 100;
+    bikeCollision->ownerType = 100;
+    bikeAndRiderCollision->ownerObject = this;
+    bikeCollision->ownerObject = this;
+    collisionObject = bikeAndRiderCollision;
     collisionObject->SnapPlacement();
-    ((KbA604*)wrecker)->AddIgnoredObject(altBodyA);
-    ((KbA604*)wrecker)->AddIgnoredObject(altBodyB);
+    ((KbA604*)wrecker)->AddIgnoredObject(bikeAndRiderCollision);
+    ((KbA604*)wrecker)->AddIgnoredObject(bikeCollision);
     ((CollisionHullShape*)collisionObject->shape)->sceneNode = (int)modelNode->firstChild;
     ((KbCollider*)frontWheel)->SetUseBroadphase(1);
     ((KbCollider*)rearWheel)->SetUseBroadphase(1);
     ((KbCollider*)wrecker->a_0x38)->SetUseBroadphase(1);
     if (isRemote) {
         if (g_kbGame->riderCollision) {
-            ((CollisionObject*)altBodyB)->onHitCallback = 0;
-            ((CollisionObject*)altBodyB)->onHitByCallback = 0;
-            ((CollisionObject*)altBodyA)->onHitCallback = 0;
-            ((CollisionObject*)altBodyA)->onHitByCallback = 0;
+            bikeCollision->onHitCallback = 0;
+            bikeCollision->onHitByCallback = 0;
+            bikeAndRiderCollision->onHitCallback = 0;
+            bikeAndRiderCollision->onHitByCallback = 0;
         } else {
-            ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot4();
-            altBodyB->field_0xc.UnknownVirtualSlot4();
-            altBodyA->field_0xc.UnknownVirtualSlot4();
+            collisionObject->Disable();
+            bikeCollision->Disable();
+            bikeAndRiderCollision->Disable();
         }
     } else if (g_kbGame->playerCount > 1 && !g_kbGame->riderCollision) {
-        ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot4();
-        altBodyB->field_0xc.UnknownVirtualSlot4();
-        altBodyA->field_0xc.UnknownVirtualSlot4();
+        collisionObject->Disable();
+        bikeCollision->Disable();
+        bikeAndRiderCollision->Disable();
     } else {
-        ((CollisionObject*)altBodyB)->onHitCallback = KrustyCollisionCallbackA;
-        ((CollisionObject*)altBodyB)->onHitByCallback = KrustyCollisionCallbackB;
-        ((CollisionObject*)altBodyA)->onHitCallback = KrustyCollisionCallbackA;
-        ((CollisionObject*)altBodyA)->onHitByCallback = KrustyCollisionCallbackB;
+        bikeCollision->onHitCallback = KrustyCollisionCallbackA;
+        bikeCollision->onHitByCallback = KrustyCollisionCallbackB;
+        bikeAndRiderCollision->onHitCallback = KrustyCollisionCallbackA;
+        bikeAndRiderCollision->onHitByCallback = KrustyCollisionCallbackB;
     }
     wrecker->EndWreck();
     lastFramePosition = position;
@@ -1938,8 +1939,8 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         points[1].y = -1.0f;
         probeSegment->SetMeshShape(1, points);
         probeSegment->SetIgnoreListMode(1);
-        probeSegment->AddIgnoredOwner(altBodyB);
-        probeSegment->AddIgnoredOwner(altBodyA);
+        probeSegment->AddIgnoredOwner(bikeCollision);
+        probeSegment->AddIgnoredOwner(bikeAndRiderCollision);
         probeSegment->AddIgnoredOwner(rearWheel);
         probeSegment->AddIgnoredOwner(frontWheel);
         g_MemTagStack->Pop(prevTag);
@@ -1969,19 +1970,19 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     lookAheadFrontTravel = 0;
     lookAheadRearTravel = 0;
     ((KbCollider*)frontWheel)->SetIgnoreListMode(1);
-    ((KbCollider*)frontWheel)->AddIgnoredOwner(altBodyB);
-    ((KbCollider*)frontWheel)->AddIgnoredOwner(altBodyA);
+    ((KbCollider*)frontWheel)->AddIgnoredOwner(bikeCollision);
+    ((KbCollider*)frontWheel)->AddIgnoredOwner(bikeAndRiderCollision);
     ((KbCollider*)frontWheel)->AddIgnoredOwner(rearWheel);
     ((KbCollider*)rearWheel)->SetIgnoreListMode(1);
-    ((KbCollider*)rearWheel)->AddIgnoredOwner(altBodyB);
-    ((KbCollider*)rearWheel)->AddIgnoredOwner(altBodyA);
+    ((KbCollider*)rearWheel)->AddIgnoredOwner(bikeCollision);
+    ((KbCollider*)rearWheel)->AddIgnoredOwner(bikeAndRiderCollision);
     ((KbCollider*)rearWheel)->AddIgnoredOwner(frontWheel);
-    ((KbCollider*)altBodyB)->SetIgnoreListMode(1);
-    ((KbCollider*)altBodyB)->AddIgnoredOwner(frontWheel);
-    ((KbCollider*)altBodyB)->AddIgnoredOwner(rearWheel);
-    ((KbCollider*)altBodyA)->SetIgnoreListMode(1);
-    ((KbCollider*)altBodyA)->AddIgnoredOwner(frontWheel);
-    ((KbCollider*)altBodyA)->AddIgnoredOwner(rearWheel);
+    bikeCollision->SetIgnoreListMode(1);
+    bikeCollision->AddIgnoredOwner(frontWheel);
+    bikeCollision->AddIgnoredOwner(rearWheel);
+    bikeAndRiderCollision->SetIgnoreListMode(1);
+    bikeAndRiderCollision->AddIgnoredOwner(frontWheel);
+    bikeAndRiderCollision->AddIgnoredOwner(rearWheel);
     if (this->race->forceHighLod) {
         ((KbXform*)modelNode)->SetLowestLod(0);
         ((KbXform*)riderCharacter->c_0x1a0)->SetLowestLod(0);
@@ -1995,7 +1996,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     }
     if (isGhost) {
         UnknownVirtualSlot50(1, 0.0f, 1);
-        ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot4();
+        collisionObject->Disable();
     }
     if (withRider) {
         ((KbA5C4*)riderCharacter)->ApplyRestPose();

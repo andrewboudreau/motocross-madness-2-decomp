@@ -205,8 +205,8 @@ public:
     int latchedPoseParam;                     // +0x1408  poseParam byte frozen by poseParamLatched; retail also stores the lean byte here (tier 3)
     int latchedPoseLeanBlend;                 // +0x140C  read as the frozen poseLeanBlend byte; retail stores that byte at +0x1408, so only the reset writes it (tier 3)
     int debugPage; // 0x1410  -1 from the constructor; the "KrustyBike" debug-overlay page (Tick 0x004977a0 takes the next line)
-    KbObj128* altBodyA; // 0x1414
-    KbObj128* altBodyB; // 0x1418
+    CollisionObject* bikeAndRiderCollision;  // +0x1414  Load: CollisionObject(1) with "BikeAndRider.col"; the default collisionObject (Fn_00496DA0 swaps back to it)
+    CollisionObject* bikeCollision;          // +0x1418  Load: CollisionObject(1) with "Bike.col", disabled at load; Fn_00496D20 swaps collisionObject to it
     float trickLandTimer;                     // +0x141C  slot 71 sets 0.3 on landing with a trick pending; slot 29 scores via 0x00495ff0 when it runs out (tier 3)
     int animSetA[16]; // 0x1420  Fn_0048D910 indexes it with the argument (rider handle for riderCharacter); tier 3 name
     int animSetB[16]; // 0x1460  Fn_0048D910: same index, handle for the D3DIMSoultreeCharacter base

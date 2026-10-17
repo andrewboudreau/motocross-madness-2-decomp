@@ -516,17 +516,8 @@ struct KbCollider {
     void SetUseBroadphase(int enable);      // 0x00432120
 };
 struct KbObj128 {
-    char pad_0[0xc];
-    KbSink field_0xc;
-    char pad_10[0x74];
-    int field_0x84;
-    void Fn_00435FE0();
     void StartFade(float a);   // 0x0047BBF0 (tier 3)
 };
-struct KbDirector {
-    void Remove(KbObj128* who, int a);
-};
-extern KbDirector* g_kbDirector; // pointer global at 0x0068ABA4
 
 
 // Pad/force-feedback-like device at VehicleInputMap+0x0c (tier 3 name).  Vtable slots used
@@ -566,7 +557,7 @@ struct KbA604 {
     void AddRandomAnimation(KbAnim* a);
     void AddIndexedAnimation(KbAnim* a);
     void AddIgnoredObject(BikeWheel* w);
-    void AddIgnoredObject(KbObj128* body);   // same 0x00530680 with one of the two collision bodies
+    void AddIgnoredObject(CollisionObject* body);   // same 0x00530680 with one of the two collision bodies
     void SetPushBox(SoultreeObject* node, Vec3 a, Vec3 b);
 };
 

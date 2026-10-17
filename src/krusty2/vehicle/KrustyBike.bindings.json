@@ -143,7 +143,7 @@
   "?AddRandomAnimation@KbA604@@QAEXPAUKbAnim@@@Z": "0x005305f0",
   "?AddIndexedAnimation@KbA604@@QAEXPAUKbAnim@@@Z": "0x00530630",
   "?AddIgnoredObject@KbA604@@QAEXPAUBikeWheel@@@Z": "0x00530680",
-  "?AddIgnoredObject@KbA604@@QAEXPAUKbObj128@@@Z": "0x00530680",
+  "?AddIgnoredObject@KbA604@@QAEXPAVCollisionObject@@@Z": "0x00530680",
   "?SetPushBox@KbA604@@QAEXPAVSoultreeObject@@UVec3@@1@Z": "0x005328b0",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "?Tick@KrustyBike@@$4PPPPPPPM@A@AEHM@Z": "0x00497ca0",
@@ -356,9 +356,8 @@
   "_s_kbTimeTo60": "0x0067c3b0",
   "_s_kbTimeTo60Armed": "0x0056d0a0",
   "_sprintf": "0x00534aaf",
-  "?g_kbDirector@@3PAUKbDirector@@A": "0x0068aba4",
-  "?Remove@KbDirector@@QAEXPAUKbObj128@@H@Z": "0x004dcf20",
-  "?Fn_00435FE0@KbObj128@@QAEXXZ": "0x00435fe0",
   "?UnknownVirtualSlot14@SoultreePhysicsBaseObject@@UAEXPAUVec3@@PBU2@1@Z": "0x00502080",
-  "__real@4@3ffeffbe770000000000": "0x00554744"
+  "__real@4@3ffeffbe770000000000": "0x00554744",
+  "?Remove@QuadTree@@QAEXPAVQuadTreeObject@@I@Z": "0x004dcf20",
+  "?g_collisionQuadTree@@3PAVQuadTree@@A": "0x0068aba4"
 }
