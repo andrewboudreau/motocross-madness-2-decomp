@@ -1335,7 +1335,7 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
     }
     // front wheel planted, rear wheel not: nose-over crash
     if ((airborne || field_0x6fc == 0) && frontWheel->inContact && !rearWheel->inContact
-        && field_0x4b4 < b && angularVelocity.x > 0.0f) {
+        && wheelForwardAlignment < b && angularVelocity.x > 0.0f) {
         crashDirection = 1;
         crashReason = 7;
         return 1;
@@ -1706,7 +1706,7 @@ static inline Vec3 BikeScale92(const Vec3& v, float k)
 // BikeScale92.  Tried: BikeAbsRef in the condition, az/ay/ax locals, explicit t/r scale.
 void Bike::UnknownVirtualSlot92(const Vec3* worldDir, const Vec3* point)
 {
-    float target = (steerState->steerAngle * 0.05f + turnRate * 0.2f) * field_0x4b4;
+    float target = (steerState->steerAngle * 0.05f + turnRate * 0.2f) * wheelForwardAlignment;
     targetLeanAngle = target;
     if (target < 0.0f)
         target = -target;

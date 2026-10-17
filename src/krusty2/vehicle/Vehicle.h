@@ -275,7 +275,7 @@ struct VehicleShock {
     float field_0x94;                // scale of the displacement impulse, consumed (zeroed) by Method_00529450
     void ClearForces();                                         // 0x004f9c70
     // 0x004f9d30 (ret 0x10): Suspension.h's Shock::ApplyDamping; Method_005293E0 passes the
-    // wheel's load weight, Vehicle+0x4dc, the last step time and its speed output.
+    // wheel's load weight, Vehicle+0x4dc suspensionMass, the last step time and its speed output.
     void ApplyDamping(float weight, float a, float dt, float* speed);
 };
 struct VehicleInlineShock : VehicleShock {
@@ -578,13 +578,13 @@ public:
     int wheelsInContact;  // +0x4a8 slot 54 divides the wheel normal sum by it; slot 49: 0x5a8 = (it == wheel count), 0x5a4 = (it != 0); slots 46/7 branch on 0/1/2
     float leanAngle;  // +0x4ac slot 56 stores asin(...) of the ground normal against the forward axis; slot 57 returns it; Bike rotates the body by it
     float leanCos;  // +0x4b0 slot 56 stores cos(leanAngle) there
-    float field_0x4b4;
+    float wheelForwardAlignment;              // +0x4B4  slot 49: = slot 75, |dot(mean wheel rollDirection, savedForward)| (1 with no wheels); Bike slot 99 (nose-over test) and slot 92 (lean target) use it (tier 2)
     float turnAngle;  // +0x4b8 result of slot 74 (signed deflection angle of the velocity), see turnRate
     float steerRate;  // +0x4bc slot 60: -(a*b) - steerAngle divided by (c*dt+...); slot 53 feeds steerRate*dt to the steer state
     Vec3 tiltAxisLocal;  // +0x4c0 slot 49: WorldToLocalDirection of the lift axis, used as the RotateAboutPoint axis
     Vec3 sideAxis;  // +0x4cc slots 34/35: cross product of the two basis vectors field_0x88 and field_0x94
-    float field_0x4d8;
-    float field_0x4dc;
+    float suspensionWeightScale;              // +0x4D8  LoadVehicle's float argument after the weight (Bike passes 0.9); slot 0 multiplies baseWeight by it (provisional)
+    float suspensionMass;                     // +0x4DC  slot 0: = (suspensionWeightScale * baseWeight + arg) / 32.2 (weight to slugs); Method_005293E0 passes it to Shock::ApplyDamping as the mass factor of the critical damping (tier 2)
     float targetLeanAngle;  // +0x4e0 Bike clamps it to +-maxLeanAngle and subtracts it from the current lean (slot 57)
     float leanError;        // +0x4e4 Bike slot 92 (0x0040ba30): _finite()/fabs on it (float, tier 2)
     float field_0x4e8;
@@ -654,13 +654,13 @@ VEH_CHECK_OFFSET(Vehicle, driveForceScale, 0x4A4);
 VEH_CHECK_OFFSET(Vehicle, wheelsInContact, 0x4A8);
 VEH_CHECK_OFFSET(Vehicle, leanAngle, 0x4AC);
 VEH_CHECK_OFFSET(Vehicle, leanCos, 0x4B0);
-VEH_CHECK_OFFSET(Vehicle, field_0x4b4, 0x4B4);
+VEH_CHECK_OFFSET(Vehicle, wheelForwardAlignment, 0x4B4);
 VEH_CHECK_OFFSET(Vehicle, turnAngle, 0x4B8);
 VEH_CHECK_OFFSET(Vehicle, steerRate, 0x4BC);
 VEH_CHECK_OFFSET(Vehicle, tiltAxisLocal, 0x4C0);
 VEH_CHECK_OFFSET(Vehicle, sideAxis, 0x4CC);
-VEH_CHECK_OFFSET(Vehicle, field_0x4d8, 0x4D8);
-VEH_CHECK_OFFSET(Vehicle, field_0x4dc, 0x4DC);
+VEH_CHECK_OFFSET(Vehicle, suspensionWeightScale, 0x4D8);
+VEH_CHECK_OFFSET(Vehicle, suspensionMass, 0x4DC);
 VEH_CHECK_OFFSET(Vehicle, targetLeanAngle, 0x4E0);
 VEH_CHECK_OFFSET(Vehicle, leanError, 0x4E4);
 VEH_CHECK_OFFSET(Vehicle, field_0x4e8, 0x4E8);

@@ -10,7 +10,7 @@
 void Vehicle::UnknownVirtualSlot0(float dt)
 {
     SoultreePhysicsCharacter::UnknownVirtualSlot0(dt);
-    field_0x4dc = (field_0x4d8 * baseWeight + dt) * 0.0310558993f;   // 1/32.2
+    suspensionMass = (suspensionWeightScale * baseWeight + dt) * 0.0310558993f;   // 1/32.2
 }
 
 int Vehicle::UnknownVirtualSlot42()
@@ -1005,7 +1005,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         UnknownVirtualSlot8();
         UnknownVirtualSlot6(&up, &speed);
         UnknownVirtualSlot7(&up);
-        field_0x4b4 = UnknownVirtualSlot75();
+        wheelForwardAlignment = UnknownVirtualSlot75();
         int settled = 0;
         if (!anyWheelInContact && !pointsTouching)
             settled = 1;
@@ -1521,7 +1521,7 @@ void Vehicle::UnknownVirtualSlot1(float value)
     steerRate = 0.0f;
     leanAngle = 0.0f;
     leanCos = 1.0f;
-    field_0x4b4 = 1.0f;
+    wheelForwardAlignment = 1.0f;
     targetLeanAngle = 0.0f;
     contactTotal = 0;
     field_0x520 = 1;
@@ -1730,7 +1730,7 @@ void Vehicle::Method_005293E0(float* speed)
         if (wheel->field_0x268) {
             VehicleShock* shock = (VehicleShock*)(wheel->primaryAux ? wheel->primaryAux : wheel->secondaryAux);
             if (shock)
-                shock->ApplyDamping(wheel->loadWeight, field_0x4dc, lastStepTime, speed);
+                shock->ApplyDamping(wheel->loadWeight, suspensionMass, lastStepTime, speed);
         }
     }
 }
@@ -1992,7 +1992,7 @@ GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3,
     steerAxis = steer;
     leanAxis = lean;
     throttleAxis = throttle;
-    field_0x4d8 = arg18;
+    suspensionWeightScale = arg18;
     inputDevice = device;
     wheelCapacity = wheelCap;
     if (wheelCapacity > 0) {
@@ -2065,7 +2065,7 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     forwardAccelSmoother = 0;
     weightForce = kVec3Zero;
     leanCos = 1.0f;
-    field_0x4b4 = 1.0f;
+    wheelForwardAlignment = 1.0f;
     field_0x124 = 0;
     sparkEmitter = 0;
     inShadow = 0;
