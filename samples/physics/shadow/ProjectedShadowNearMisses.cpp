@@ -146,6 +146,24 @@ static inline ShadowVec3 ShadowDifference(const ShadowVec3& a, const ShadowVec3&
 static inline ShadowVec3 ShadowSum(const ShadowVec3& a, const ShadowVec3& b) { return ShadowConstVec3(a.x + b.x, a.y + b.y, a.z + b.z); }
 static inline float AbsF(float v) { return v < 0.0f ? -v : v; }
 
+static inline ShadowVec3 ShadowTransformExtents(ShadowVec3 h, const ShadowMatrix& m)
+{
+    float a00 = h.x * m.m[0][0];
+    float a01 = h.x * m.m[0][1];
+    float a02 = h.x * m.m[0][2];
+    float a10 = h.y * m.m[1][0];
+    float a11 = h.y * m.m[1][1];
+    float a12 = h.y * m.m[1][2];
+    float a20 = h.z * m.m[2][0];
+    float a21 = h.z * m.m[2][1];
+    float a22 = h.z * m.m[2][2];
+    ShadowVec3 r;
+    r.x = AbsF(a00) + AbsF(a10) + AbsF(a20);
+    r.y = AbsF(a01) + AbsF(a11) + AbsF(a21);
+    r.z = AbsF(a02) + AbsF(a12) + AbsF(a22);
+    return r;
+}
+
 // 0x004db0d0 (2020 B): recomputes the light-space bounds of all casters and derives the shadow
 // camera set-up.  Each caster's local bounds (centre c, half extents h) are carried through the
 // caster's world matrix at +0xf8 (extents by the sum of absolute row contributions, centre as a
@@ -156,7 +174,8 @@ static inline float AbsF(float v) { return v < 0.0f ? -v : v; }
 // local scale/translate matrix, goes to lightMatrix (+0xd8).  PARTIAL: the FPU scheduling of the
 // inlined vector helpers differs from retail.  The lengths go through a Vec3Normalize-shaped
 // magnitude helper and the normalisation through ShadowNormalize; the centre is transformed by
-// a by-value helper whose argument copy (the result is written back to c) matches retail's.
+// a by-value helper whose argument copy (the result is written back to c) matches retail's,
+// and the extents likewise go through ShadowTransformExtents with the result written back.
 // Left: frame size and slot assignment (retail's locals sit 0x14..0x3c higher), and the
 // fov/look-at block of mode 1.
 void ProjectedShadow::ComputeBounds()
@@ -169,20 +188,8 @@ void ProjectedShadow::ComputeBounds()
     for (int i = 0; i < casterCount; i++) {
         ShadowVec3 c, ext;
         casters[i]->GetBounds(&c, &ext);
-        const ShadowMatrix& M = casters[i]->world;
-        float a00 = ext.x * M.m[0][0];
-        float a01 = ext.x * M.m[0][1];
-        float a02 = ext.x * M.m[0][2];
-        float a10 = ext.y * M.m[1][0];
-        float a11 = ext.y * M.m[1][1];
-        float a12 = ext.y * M.m[1][2];
-        float a20 = ext.z * M.m[2][0];
-        float a21 = ext.z * M.m[2][1];
-        float a22 = ext.z * M.m[2][2];
-        ext.x = AbsF(a00) + AbsF(a10) + AbsF(a20);
-        ext.y = AbsF(a01) + AbsF(a11) + AbsF(a21);
-        ext.z = AbsF(a02) + AbsF(a12) + AbsF(a22);
-        c = ShadowTransformCoord(c, M);
+        ext = ShadowTransformExtents(ext, casters[i]->world);
+        c = ShadowTransformCoord(c, casters[i]->world);
         ShadowVec3 lo = ShadowDifference(c, ext);
         ShadowVec3 hi = ShadowSum(c, ext);
         if (lo.x < mn.x) mn.x = lo.x;
