@@ -294,16 +294,16 @@ public:
     // 0x0043f4b0, ret 0x14: loads the model; slot 0 passes (field_0x18, name, descriptor words, 1).
     virtual void Load(void* a1, const char* a2, int a3, int a4, int a5);
     char pad_0x38[0x240 - 0x38];
-    int field_0x240;                             // +0x240 copied by CopyFrom, passed to SceneItem::Init
-    int field_0x244;                             // +0x244 copied by CopyFrom, passed to SceneItem::Init
-    char field_0x248[0x274 - 0x248];             // +0x248 passed by address to SceneItem::Init
-    int field_0x274;                             // +0x274 moved from the temporary model in slot 0
+    int textureManager;                          // +0x240 D3DIMSoulTree.h names: copied by CopyFrom, passed to SceneItem::Init
+    int textureFormat;                           // +0x244 copied by CopyFrom, passed to SceneItem::Init
+    char textureOptions[0x274 - 0x248];          // +0x248 the six option dwords, then the modifier lists; passed by address to SceneItem::Init
+    int lodCount;                                // +0x274 moved from the temporary model in slot 0
     char pad_0x278[0x280 - 0x278];
-    int field_0x280;                             // +0x280 moved (and cleared in the source) in slot 0
+    int autoLodDistances;                        // +0x280 moved (and cleared in the source) in slot 0
     int pad_0x284;
-    int field_0x288;                             // +0x288 moved in slot 0
-    int field_0x28c;                             // +0x28c moved (and cleared in the source) in slot 0
-    SceneItem** items;                           // +0x290 array of field_0x294 SceneItem pointers
+    int useAutoLod;                              // +0x288 moved in slot 0
+    int lodTable;                                // +0x28c moved (and cleared in the source) in slot 0
+    SceneItem** items;                           // +0x290 array of itemCount SceneItem pointers (D3DIMSoulTree.h materialTable)
     int itemCount;                               // +0x294
     char pad_0x298[0x2d8 - 0x298];
 };
@@ -371,20 +371,20 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
         (SceneItem**)DebugMalloc(((ModelObject*)modelNode)->itemCount << 2, __FILE__, 0xeb);
     for (int i = 0; i < ((ModelObject*)modelNode)->itemCount; i++) {
         ((ModelObject*)modelNode)->items[i] = new(__FILE__, 0xed) SceneItem(1);
-        ((ModelObject*)modelNode)->items[i]->Init(renderContext, ((ModelObject*)modelNode)->field_0x248,
-                                                  ((ModelObject*)modelNode)->field_0x240,
-                                                  ((ModelObject*)modelNode)->field_0x244);
+        ((ModelObject*)modelNode)->items[i]->Init(renderContext, ((ModelObject*)modelNode)->textureOptions,
+                                                  ((ModelObject*)modelNode)->textureManager,
+                                                  ((ModelObject*)modelNode)->textureFormat);
         AppendChild(((ModelObject*)modelNode)->items[i], -1);
         ((ModelObject*)modelNode)->items[i]->CopyFrom(loaded->items[i]);
         loaded->items[i]->BaseObjectVirtualSlot2();
     }
-    ((ModelObject*)modelNode)->field_0x28c = loaded->field_0x28c;
-    loaded->field_0x28c = 0;
+    ((ModelObject*)modelNode)->lodTable = loaded->lodTable;
+    loaded->lodTable = 0;
     modelNode->AddChild((SoultreeObject*)loaded);
-    ((ModelObject*)modelNode)->field_0x274 = loaded->field_0x274;
-    ((ModelObject*)modelNode)->field_0x280 = loaded->field_0x280;
-    ((ModelObject*)modelNode)->field_0x288 = loaded->field_0x288;
-    loaded->field_0x280 = 0;
+    ((ModelObject*)modelNode)->lodCount = loaded->lodCount;
+    ((ModelObject*)modelNode)->autoLodDistances = loaded->autoLodDistances;
+    ((ModelObject*)modelNode)->useAutoLod = loaded->useAutoLod;
+    loaded->autoLodDistances = 0;
     nodeCount = modelNode->CountNodes();
     nodeNames = (NodeNameEntry*)operator new(nodeCount << 6, __FILE__, 0x100);
     FillNodeNames(0, nodeNames, modelNode);
