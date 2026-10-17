@@ -241,7 +241,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | render/TextService | `0x0050b700` | 398/758 | b | 31 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
 | render/TextService | `0x0050ba00` | 770/802 | b | scheduling of the v3.sx and v5.sx stores |
 | render/Tgafile | `0x00512990` | 354/982 (masked) | c | 49 code diffs |
-| track/SceneManager | `0x004ecd60` | 4534/4536 | c | the name terminator adds the count before the element offset (`add edx, esi`; retail `add edx, ebx`) |
+| track/SceneManager | `0x004ecd60` | 4534/4536 | c | the name terminator adds the count before the element offset (`add edx, esi`; retail `add edx, ebx`); ReadAnimations' identical terminator matches. Only deleting the whole later `if (auralScape)` block flips it; declaration shifts 0-63, 0-33 dead locals, count/length forms, aliases and pointer arithmetic do not |
 | track/SceneManager | `0x004edfe0` | 4372/5346 | b | scalar frame slots, the NumberOfMotions count kept in a register, one shared `Cannot find %s` sprintf tail where retail keeps two, random-set loop-end load order |
 | track/Track | `0x00515ed0` | 117/2400 (masked) | b | draft: frame 0x64 vs retail 0x48 and retail keeps `this` in ebp, so every frame offset differs; dispatch, calls and arithmetic follow retail |
 | track/Track | `0x00516ef0` | 1032/1042 | c | edge 6 of the crossing test computes `b.z - a.z` before `p.x - a.x` in retail; edge 2 matches with the helper's first factor written `((b->x - a->x))` ; retail orders edges 2, 5, 6 one way and 1, 3, 4 the other; ~5,500 parenthesis/cast/struct/local forms give 1032 at best |
