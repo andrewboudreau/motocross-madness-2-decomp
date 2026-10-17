@@ -200,7 +200,7 @@ struct VehicleContactSet;            // object at SoultreePhysicsCharacter+0x128
 struct VehicleSteerState {
     SoultreeObject* steerNode;  // +0x00 scene node positioned/oriented in slots 36/58
     float steerAngle;  // +0x04 slot 60 subtracts it; slot 73 uses sin(it) and |it|
-    float field_0x08;
+    float maxSteerAngle;                      // +0x8  SteeringControl +0x08 = scale * clamp01(t); LoadVehicle passes steerScale (Bike: 40 degrees) and controlResponse[0]; slot 59 returns it, Bike divides steerAngle by it
     char pad_0x0c[0xc];              // 0x18 bytes (LoadVehicle's allocation)
     ~VehicleSteerState();                                      // 0x00504c50 (~Vehicle deletes it)
     // 0x00504b60 / 0x00504c70: SteeringControl's constructor and SetAxisFromDirection

@@ -300,11 +300,11 @@ void Bike::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
 float Bike::UnknownVirtualSlot59()
 {
     if (poseState == 10)
-        return steerState->field_0x08;
-    float r = steerState->field_0x08 -
-              FastSqrt(prevSpeed / referenceSpeed * (steerState->field_0x08 * steerState->field_0x08));
+        return steerState->maxSteerAngle;
+    float r = steerState->maxSteerAngle -
+              FastSqrt(prevSpeed / referenceSpeed * (steerState->maxSteerAngle * steerState->maxSteerAngle));
     r = (0.0f > r) ? 0.0f : r;
-    float m = steerState->field_0x08;
+    float m = steerState->maxSteerAngle;
     return (m < r) ? m : r;
 }
 
@@ -1057,7 +1057,7 @@ void Bike::UnknownVirtualSlot41()
 void Bike::UnknownVirtualSlot102(float)
 {
     if (crashState) {
-        float t = -(steerState->steerAngle / steerState->field_0x08);
+        float t = -(steerState->steerAngle / steerState->maxSteerAngle);
         t = (t + 1.0f) * 0.25f;
         t += 0.25f;
         t = BikeMin(BikeMaxF(t, 0.25f), 0.75f);

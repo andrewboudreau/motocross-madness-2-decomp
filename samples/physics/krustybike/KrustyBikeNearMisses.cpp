@@ -1068,7 +1068,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
 {
     if (crashState || *(int*)pad_0x5B8) {
         if (!isRemote && !g_kbGame->playingReplay) {
-            float t = -(steerState->steerAngle / steerState->field_0x08);
+            float t = -(steerState->steerAngle / steerState->maxSteerAngle);
             t = (t + 1.0f) * 0.25f;
             t += 0.25f;
             poseParam = (t > 0.25f) ? KbMinF(t, 0.75f) : 0.25f;

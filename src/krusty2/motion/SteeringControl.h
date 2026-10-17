@@ -14,7 +14,7 @@ public:
 
     SoultreeObject* node; // +0x00 scene node allocated by the ctor (0x1a4 bytes, line 0x17)
     float angle;          // +0x04 zeroed by the ctor; set/accumulated by 0x00504e20/0x00504ec0, flushed to 0 below 1e-3
-    float field_0x08;     // +0x08 ctor: scale * clamp01(t); not read in this TU
+    float maxAngle;                           // +0x8  +0x08 ctor: scale * clamp01(t); Vehicle reads it as the steer limit (VehicleSteerState::maxSteerAngle)
     Vec3 axis;            // +0x0c ctor copies a static zero vector; the axis functions store a local-space direction
 };
 

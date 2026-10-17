@@ -38,7 +38,7 @@ Vec3* Vehicle::UnknownVirtualSlot55(Vec3* out, Vec3* pos)
 }
 
 float Vehicle::UnknownVirtualSlot57() { return leanAngle; }
-float Vehicle::UnknownVirtualSlot59() { return steerState->field_0x08; }
+float Vehicle::UnknownVirtualSlot59() { return steerState->maxSteerAngle; }
 float Vehicle::UnknownVirtualSlot61(float arg) { return 0.0f; }
 
 int Vehicle::UnknownVirtualSlot62(float arg)
