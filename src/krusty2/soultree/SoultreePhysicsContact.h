@@ -58,7 +58,7 @@ public:
     char field_0x64[0x10];
     int renderFlags;                          // +0x74 flag word (slot 21 sets/clears bit 0x800)
     void SetPosition(Vec3 v, int a);   // 0x004b8d90 emitter position setter (ParticleEmitters.h: float intensity); thiscall, callee pops 0x10
-    void Fn_4b8dd0(int a, int b, int c);     // thiscall, callee pops 0xc (slot 21: 0x40/0xff tint)
+    void SetColor(int r, int g, int b);      // 0x004b8dd0 DustParticleEmitter::SetColor (ParticleEmitters.h): +0x7c = (r << 16) | (g << 8) | (b & 0xff); slot 21 tints 0x40/0xff
 };
 
 // Object at SoultreeAttachment::field_0x10 (slot 17 sums its Vec3 at +0x20).
