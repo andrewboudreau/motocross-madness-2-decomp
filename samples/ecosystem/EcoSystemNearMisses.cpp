@@ -513,7 +513,7 @@ int EcoSystem::GenerateObjects(int checkCodes) {
             count++;
         }
     }
-    int mode = g_TrackGame->UnknownVirtualSlot20("EcoGen", 0);
+    int mode = g_TrackGame->GetRegistryInt("EcoGen", 0);
     rangeX = g_collisionQuadTree->extentX;
     rangeZ = g_collisionQuadTree->extentZ;
     if (mode == 5) {

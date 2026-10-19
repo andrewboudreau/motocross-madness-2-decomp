@@ -2056,7 +2056,7 @@
     "target_va": "0x00496d20",
     "target_size": 119,
     "expect": "exact",
-    "notes": "real body of slot 101 (whose entry at 0x496d10 tail-jumps here): swap the active scene object to altBodyB. Exact with the mode test as a nested if testing 0x2d84 positively (VC6 computes &obj->field_0xc in the second test block and cross-jumps the outer else into the slot-5 tail).",
+    "notes": "real body of slot 101 (whose entry at 0x496d10 tail-jumps here): swap the active scene object to bikeCollision. Exact with the mode test as a nested if testing 0x2d84 positively (VC6 computes &obj->field_0xc in the second test block and cross-jumps the outer else into the slot-5 tail).",
     "bindings": "KrustyBike.bindings.json"
   },
   {

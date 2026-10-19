@@ -119,8 +119,8 @@ struct UnknownQuarryRacer {
     unsigned char field_0x736[0x740 - 0x736];
     UnknownQuarryRaceView* race;  // +0x740  KrustyBike +0x740 race
     unsigned char field_0x744[0x1414 - 0x744];
-    UnknownQuarryCollision* altBodyA;  // +0x1414  KrustyBike +0x1414 altBodyA; the loader adds it as an ignored collision owner
-    UnknownQuarryCollision* altBodyB;  // +0x1418  KrustyBike +0x1418 altBodyB; the loader adds it as an ignored collision owner
+    UnknownQuarryCollision* bikeAndRiderCollision;  // +0x1414  KrustyBike +0x1414 bikeAndRiderCollision; the loader adds it as an ignored collision owner
+    UnknownQuarryCollision* bikeCollision;  // +0x1418  KrustyBike +0x1418 bikeCollision; the loader adds it as an ignored collision owner
 };
 
 // BikeRace (0x400 bytes, constructor 0x00417c30) as the loader uses it.
@@ -712,8 +712,8 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                         for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator);
                              racer; racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator)) {
                             if (!racer->isRemote) {
-                                ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->altBodyB);
-                                ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->altBodyA);
+                                ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->bikeCollision);
+                                ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->bikeAndRiderCollision);
                                 ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->frontWheel);
                                 ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->rearWheel);
                                 ((UnknownQuarryCollision*)character->collisionObject)
@@ -743,8 +743,8 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                 for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator); racer;
                      racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator)) {
                     if (!racer->isRemote) {
-                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->altBodyB);
-                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->altBodyA);
+                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->bikeCollision);
+                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->bikeAndRiderCollision);
                         ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->frontWheel);
                         ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->rearWheel);
                         ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->wrecker->field_0x38);
