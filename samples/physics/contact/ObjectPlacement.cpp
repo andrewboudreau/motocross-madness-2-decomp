@@ -66,6 +66,7 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
         *q = 0;
 
     int firstPass = 1;
+    Vec3 w;   // the k/o branch below; declared here, VC6 schedules its fchs as retail does
     int canPlace = 1;
     unsigned char centerHit, plusAHit, minusAHit, plusCHit, minusCHit;
     Vec3 centerPt, plusAPt, minusAPt, plusCPt, minusCPt;
@@ -101,8 +102,8 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
                 obj->SetMeshShape(1, sweep);
 
                 // orthonormal basis from the axes
-                Vec3 forward = g_PlacementAxisZ;
                 Vec3 up = g_PlacementAxisY;
+                Vec3 forward = g_PlacementAxisZ;
                 Vec3 side = CrossProduct(g_PlacementAxisY, g_PlacementAxisZ);
                 side = CrossProductCall(forward, side);
                 float lenSq = Vec3DotCall(&side, &side);
@@ -230,7 +231,7 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
         }
         if (!plusCHit) {
             if (!(plusCOut.y <= bestOut->y)) { nextOut = bestOut; nextPt = bestPt; bestOut = &plusCOut; bestPt = &plusCPt; }
-            else if (!(plusCOut.y <= nextOut->y)) { nextOut = &plusCOut; nextPt = &plusCPt; }
+            else if (!(plusCOut.y <= nextOut->y)) { nextPt = &plusCPt; nextOut = &plusCOut; }
         }
         if (!minusCHit) {
             if (!(minusCOut.y <= bestOut->y)) { nextOut = bestOut; nextPt = bestPt; bestOut = &minusCOut; bestPt = &minusCPt; }
@@ -244,7 +245,7 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
         if (o) {
             if (m && nextPt) {
                 // horizontal direction between the two worst points, flipped to face k
-                Vec3 w = *nextPt - *bestPt;
+                w = *nextPt - *bestPt;
                 w.y = 0.0f;
                 if (w.x * k->x + w.z * k->z < 0.0f) {
                     *o = Vec3(-w.x, 0.0f, -w.z);
