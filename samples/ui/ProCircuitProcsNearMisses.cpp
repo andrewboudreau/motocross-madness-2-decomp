@@ -38,6 +38,15 @@
 //   local and `self = this` are worse or the same, and no typedef count
 //   (0..63) ahead of the TU makes 0x004d8c40, 0x004d8fc0 or 0x004d9860
 //   exact, so it is not a symbol-arena tie-break.
+//   Session 14 for 0x004d9860, base 1068: a `switch (circuit = ..., kind)`
+//   comma form, an event pointer copy, `event[0].kind`, `char text` ahead
+//   of the circuit, a const circuit with `switch (int kind = ...)` and a
+//   series local are 1068. A leading `kind` local, also with a TrackGame
+//   local, keeps kind in eax and moves TrackGame to ecx (108). The fee
+//   stored first, before or after the cash load, gives retail's first store
+//   but not its registers (135-141); `int fee = entryFee = ...` chains and
+//   member-only arithmetic give 225. Loading debt after fee or cash gives
+//   1048-1054.
 // PCCentralBikeRiderDlg::Tick (0x004d72c0, 1291 bytes, 1233
 //   match): as SPBikeRiderDlg slot 10 (DlgProcsNearMisses.cpp), only the
 //   scheduling of the by-value Vector3 copies for the camera call differs.
