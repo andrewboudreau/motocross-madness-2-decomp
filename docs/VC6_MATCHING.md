@@ -513,3 +513,16 @@ none of them is missing or adding a try block or a destructible local:
 python tools/eh_funcinfo.py 0x004e9030 --obj X.obj --symbol '?AddArchive@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z'
 python tools/eh_funcinfo.py --scan work/rank.json
 ```
+
+Scheduling and register allocation move references but do not add or remove
+them. `tools/reference_diff.py` compiles each index row's candidate as the
+ranker does and compares, as multisets, the call targets, the absolute data
+and string addresses (unbound candidate symbols matched by string text,
+float value or import name), the non-zero immediates and the jump-table
+entry counts. It ranks rows by what retail has and the candidate lacks: a
+missing call, string, global or switch case means missing source, not
+scheduling (the DirectInput reporter `0x004bf6a0` lacked `case 2`):
+
+```powershell
+python tools/reference_diff.py --lane shell --json work/ref.json --md work/ref.md
+```
