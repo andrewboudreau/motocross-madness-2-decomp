@@ -22,7 +22,7 @@
 //
 // 0x0040e510 (1936 bytes, AI path steering direction): every branch, call and
 // constant is reconstructed; the candidate is 1935 bytes (retail's extent ends in one
-// nop) and aligns 1:1 except three instructions and frame slots.  The walk along the
+// nop) and aligns 1:1 except the y product's operand order and frame slots.  The walk along the
 // path uses its own index (`index = best`): with one variable for the nearest search
 // and the walk, VC6 swaps esi/edi against retail (path in esi, index in edi).  The
 // three perpendiculars are built component-wise (`n.x = seg.z; n.y = 0; n.z =
@@ -37,9 +37,12 @@
 // seg.y before t (retail t first; z already loads t first, seg.z having an older x87
 // leaf from `n.x = seg.z`; operand order, the y/z store order, the step declaration's
 // position, a dead `seg.y = 0` after the segment differences and component-wise
-// segment differences do not change it), two `faddp`/`fld` orders in the segment
-// lengths and the slots of the segment / perpendicular temporaries (retail
-// +0x30/+0x50, candidate +0x3c/+0x38).  Declaration order of the Vec3 locals does not
+// segment differences do not change it) and the slots of the segment / perpendicular
+// temporaries (retail +0x30/+0x50, candidate +0x3c/+0x38).  The walk's two segment
+// lengths use BikeAISegmentLength, as 0x0040d200 does: its `(x*x)` parentheses issue
+// the named copy's z store after the z*z product like retail (BikeAILength issues it
+// before the first faddp; `(y*y)` parentheses do the same as `(x*x)`, `(z*z)`, a flat
+// sum, z first or y first change nothing; 1846 -> 1865).  Declaration order of the Vec3 locals does not
 // change VC6's frame (all 24 permutations tried); declaring bestT before best fixed
 // the immediate store of bestT = 0.  Also inert on the slots (session 14): a
 // per-block `seg`, a `seg` reference alias and splitting the walk direction's
@@ -145,6 +148,23 @@ inline float BikeAILength(const Vec3& v)
     return 1.0f / FastInvSqrt(lenSq);
 }
 
+// Length of a path segment, in 0x0040d200 (seg.y is 0 there, so VC6 folds the y*y
+// term) and at 0x0040e510's walk.  Same result as BikeAILength; the redundant
+// parentheses around x*x are a source-form difference (docs/VC6_OPERAND_ORDER.md
+// section 3): with them VC6 emits the preceding store (`seg.y = 0` in 0x0040d200, the
+// named copy's z in 0x0040e510) after the x*x product, as retail does at all four
+// segment sites, while the takeoff-speed and nearest-point sites (BikeAILength) need the
+// plain form.
+inline float BikeAISegmentLength(const Vec3& v)
+{
+    float lenSq = ((v.x * v.x) + v.y * v.y) + v.z * v.z;
+    if (lenSq == 0.0f)
+        return 0.0f;
+    if (lenSq == 1.0f)
+        return 1.0f;
+    return 1.0f / FastInvSqrt(lenSq);
+}
+
 // 0x0040e510, 1936 bytes, cdecl: steering direction along an AI path.  The fourth
 // argument is the bike's speed (0x0040eca0 pushes it as a float); it is not read.  Finds the
 // path point nearest to 'pos', refines the segment by intersecting the perpendicular
@@ -210,7 +230,7 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         if (kind == 2 || kind == 3)
             ahead += (offset < 0.0f ? -offset : offset);
         seg = path->points[index + 1] - path->points[index];
-        float len = (1.0f - bestT) * BikeAILength(seg);
+        float len = (1.0f - bestT) * BikeAISegmentLength(seg);
         while (ahead > 0.0f) {
             if (!(len < ahead) || index >= path->count - 1)
                 break;
@@ -219,7 +239,7 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
             bestT = 0.0f;
             if (index < path->count - 1) {
                 seg = path->points[index + 1] - path->points[index];
-                len = BikeAILength(seg);
+                len = BikeAISegmentLength(seg);
             }
         }
         Vec3 n;
@@ -263,21 +283,6 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
 // Debug line endpoints at 0x00578dc0 drawn by BikeRace (BikeRace.h declares the same
 // array as Vector3 g_PathTargetDebugLine[2]).
 extern Vec3 g_PathTargetDebugLine[2];
-
-// Length of a path segment in 0x0040d200 (seg.y is 0 there, so VC6 folds the y*y
-// term).  Same result as BikeAILength; the redundant parentheses around x*x are a
-// source-form difference (docs/VC6_OPERAND_ORDER.md section 3): with them VC6 emits
-// the preceding `seg.y = 0` store between the x*x and z*z products, as retail does at
-// both segment sites, while the takeoff-speed site (BikeAILength) needs the plain form.
-inline float BikeAISegmentLength(const Vec3& v)
-{
-    float lenSq = ((v.x * v.x) + v.y * v.y) + v.z * v.z;
-    if (lenSq == 0.0f)
-        return 0.0f;
-    if (lenSq == 1.0f)
-        return 1.0f;
-    return 1.0f / FastInvSqrt(lenSq);
-}
 
 // Dot product in the operand order retail 0x0040d200 evaluates: (y + x) + z.  The
 // parentheses around y*y place the ground-branch `p.y = ground.y` store after the

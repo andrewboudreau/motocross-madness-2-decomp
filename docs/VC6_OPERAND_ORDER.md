@@ -407,6 +407,10 @@ where the product of the choices is large).
   1023 -> 1032 (a doubly parenthesised factor `((b->x - a->x))` reorders one
   of six inlined edges), TrackOverlay `0x0051c4f0` 321 -> 334 (masked),
   Wrecker `0x00531740` 768 -> 772, BikeRace `0x00417ed0` 2800 -> 2804.
+  BikeAI `0x0040e510` 1846 -> 1865: the walk's segment lengths through the
+  `((x*x) + y*y) + z*z` helper already needed by `0x0040d200` move the named
+  segment copy's z store from before the first faddp to after the z*z product;
+  `(y*y)` gives the same, `(z*z)`, a flat sum and z- or y-first sums do not.
 - No change: Camera slot 29 `0x0042eb10`, MatrixUtil `0x004a1a50` (6208
   forms), Wrecker `0x00531da0`, `0x00532580` and slot 10 `0x005306e0`,
   FollowCamera `0x00465720` and `0x004650e0`, Griddraw `0x0047e600`,

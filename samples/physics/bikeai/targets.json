@@ -16,7 +16,7 @@
     "target_va": "0x0040e510",
     "target_size": 1936,
     "expect": "partial",
-    "notes": "AI path steering direction; full control flow and arithmetic reconstructed, 1935 vs 1936 bytes (retail ends in a nop), 1846 strict positions, 3 differing instructions. A separate walk index gives retail's path=esi/index=edi, the perpendiculars are built component-wise the walk reuses seg and the final step is written per component with t assigned in the x product; left: the y product's load order, two segment-length faddp orders and the frame slots of the segment/perpendicular temporaries; see the file header.",
+    "notes": "AI path steering direction; full control flow and arithmetic reconstructed, 1935 vs 1936 bytes (retail ends in a nop), 1865 strict positions, code identical but for the y product's operand order. A separate walk index gives retail's path=esi/index=edi, the perpendiculars are built component-wise the walk reuses seg and the final step is written per component with t assigned in the x product; the walk's segment lengths use BikeAISegmentLength like 0x0040d200; left: the y product's load order and the frame slots of the segment/perpendicular temporaries; see the file header.",
     "bindings": "BikeAINearMisses.bindings.json"
   },
   {
