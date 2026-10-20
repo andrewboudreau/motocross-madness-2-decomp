@@ -136,6 +136,9 @@ class ReferenceDiffTests(unittest.TestCase):
         s = score(m)
         self.assertEqual((s['missing_calls'], s['missing_addrs'], s['missing_switch']), (1, 1, 1))
         self.assertEqual(s['missing'], 3)
+        # 0x510000 and the float are used nowhere in the candidate; one 0x500000 call is only a shortfall
+        self.assertEqual(sorted(x['va'] for x in m['call']['absent']), [0x510000])
+        self.assertEqual(s['absent'], 0 + 1)   # one absent call less one unbound call, plus the absent float
 
 
 if __name__ == '__main__':

@@ -33,9 +33,12 @@ Skipped on both sides: jump/index tables, the C++ EH handler pushed after
 `push -1`, absolute symbols such as __except_list, and candidate symbols in the
 function's own section.
 
-Rows are ranked by what retail has that the candidate lacks (calls and
-addresses net of unbound candidate references of the same kind, plus switch
-entries), then by missing immediates.
+Rows are ranked by retail references whose target the candidate never uses
+(`absent`), then by the multiset shortfall (`missing`: calls and addresses net
+of unbound candidate references of the same kind, plus switch entries), then
+by missing immediates. A shortfall alone can be codegen: VC6 may load an
+import pointer into a register for several calls, or reuse one load of a
+global.
 """
 from __future__ import annotations
 
@@ -384,7 +387,10 @@ def match_refs(retail: dict, cand: dict) -> dict:
                 matched_alt[x['alt']] -= 1
             else:
                 c_final.append(x)
-        out[kind] = dict(missing=r_final, extra=[x for x in c_final if x['va'] is not None or x['alt']],
+        keys = {x['va'] for x in c if x['va'] is not None} | {x['alt'] for x in c if x['alt']}
+        absent = [x for x in r_final if x['va'] not in keys and not (x['alt'] and x['alt'] in keys)]
+        out[kind] = dict(missing=r_final, absent=absent,
+                         extra=[x for x in c_final if x['va'] is not None or x['alt']],
                          unbound=[x for x in c_final if x['va'] is None and not x['alt']])
     ri = Counter(x['value'] for x in retail['refs'] if x['kind'] == 'imm')
     ci = Counter(x['value'] for x in cand['refs'] if x['kind'] == 'imm')
@@ -402,7 +408,8 @@ def score(m: dict) -> dict:
     targets = sum(t[1] for t in sw['retail']) - sum(t[1] for t in sw['cand'])
     tables = len(sw['retail']) - len(sw['cand'])
     switch = max(0, entries) + max(0, targets) + max(0, tables) * 4
-    return dict(missing_calls=calls, missing_addrs=addrs, missing_switch=switch,
+    absent = max(0, len(m['call']['absent']) - len(m['call']['unbound'])) +         max(0, len(m['addr']['absent']) - len(m['addr']['unbound']))
+    return dict(absent=absent, missing_calls=calls, missing_addrs=addrs, missing_switch=switch,
                 missing_imm=len(m['imm']['missing']), extra_calls=len(m['call']['extra']),
                 extra_addrs=len(m['addr']['extra']), extra_imm=len(m['imm']['extra']),
                 unbound=len(m['call']['unbound']) + len(m['addr']['unbound']),
@@ -552,21 +559,24 @@ def main(argv=None) -> int:
 
 
 def sort_key(r: dict):
-    return (r.get('missing') is None, -(r.get('missing') or 0), -(r.get('missing_imm') or 0), r['va'])
+    return (r.get('missing') is None, -(r.get('absent') or 0), -(r.get('missing') or 0),
+            -(r.get('missing_imm') or 0), r['va'])
 
 
 def render_md(rows: list[dict]) -> str:
     lines = ['# Near misses ranked by references retail has and the candidate lacks', '',
-             'tools/reference_diff.py. calls/addrs are net of unbound candidate references of the same kind;',
+             'tools/reference_diff.py. absent: retail references whose target the candidate never uses;',
+             'missing: the multiset shortfall (a cached import pointer or a reused global load also count);',
+             'calls/addrs are net of unbound candidate references of the same kind;',
              'switch counts missing table entries, distinct targets and tables (x4).', '']
     for ln in sorted({r['lane'] for r in rows}):
         lr = sorted((r for r in rows if r['lane'] == ln), key=sort_key)
         lines += ['## %s' % ln, '',
-                  '| TU | VA | missing | calls | addrs | switch | imm -/+ | extra calls/addrs | unbound | detail |',
-                  '|---|---|---|---|---|---|---|---|---|---|']
+                  '| TU | VA | absent | missing | calls | addrs | switch | imm -/+ | extra calls/addrs | unbound | detail |',
+                  '|---|---|---|---|---|---|---|---|---|---|---|']
         for r in lr:
             if r.get('kind') == 'unmeasured':
-                lines.append('| %s | `0x%08x` | unmeasured | | | | | | | |' % (r['tu'], r['va']))
+                lines.append('| %s | `0x%08x` | unmeasured | | | | | | | | |' % (r['tu'], r['va']))
                 continue
             d = r['detail']
             bits = []
@@ -583,8 +593,8 @@ def render_md(rows: list[dict]) -> str:
             if sw['retail'] != sw['cand'] or sw['retail_byte_tables'] != sw['cand_byte_tables']:
                 bits.append('switch r%s/%d c%s/%d' % (sw['retail'], sw['retail_byte_tables'], sw['cand'],
                                                       sw['cand_byte_tables']))
-            lines.append('| %s | `0x%08x` | %d | %d | %d | %d | %d/%d | %d/%d | %d | %s |' % (
-                r['tu'], r['va'], r['missing'], r['missing_calls'], r['missing_addrs'], r['missing_switch'],
+            lines.append('| %s | `0x%08x` | %d | %d | %d | %d | %d | %d/%d | %d/%d | %d | %s |' % (
+                r['tu'], r['va'], r['absent'], r['missing'], r['missing_calls'], r['missing_addrs'], r['missing_switch'],
                 r['missing_imm'], r['extra_imm'], r['extra_calls'], r['extra_addrs'], r['unbound'],
                 '; '.join(bits).replace('|', '\\|')))
         lines.append('')
