@@ -2,10 +2,14 @@
 // until they match. The canonical file is included first so the TU-local
 // declarations and globals are the same.
 //
-// 0x004e9030 (802 bytes, opens an "RS2" archive and adds its items): every
+// 0x004e9030 (804 bytes, opens an "RS2" archive and adds its items): every
 // instruction matches except that retail also keeps `archive` in the stack
 // slot of the `new` temporary ([esp+0x14], stored right after the EH state
-// reset) and returns it from there; VC6 here keeps it in ebx only. Tried
+// reset) and returns it from there; VC6 here keeps it in ebx only. Those
+// are the 6 missing bytes: `mov [esp+0x14], ebx` (4) at 0x004e9094 and
+// `mov eax, [esp+0x14]` (4, for `mov eax, ebx`'s 2) at 0x004e9309, which
+// also moves the `itemCount` store ahead of `pop edi`. ([esp+0x14] is not
+// `magic`, which lives at frame offset 0.) Tried
 // without effect: declaration order, separate declaration and assignment,
 // a second `result` variable (declared at the top or at the `new`, assigned
 // from `archive` or receiving the `new` and copied to `archive`; all 95 of
@@ -19,7 +23,9 @@
 // Also inert (s14 corpus pass): `archive = 0;` then the `new` assignment,
 // and the failure `delete`s without the `if (archive)`. Inverting the
 // Open test into an early return is worse (12 differing lines against
-// 6).
+// 6). Also inert (s14 batch 3): the loop's `new ResourceItem` through an
+// `item` local, and a `result` declared at the top and assigned from
+// `archive` before the success return.
 
 #include "../../src/reconstructed/ResourceManager.cpp"
 

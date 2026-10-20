@@ -56,6 +56,7 @@ REG = re.compile(r'\b(e?[abcd]x|[abcd][lh]|e?si|e?di|e?bp|sil|dil)\b')
 FRAME = re.compile(r'\b(esp|ebp) ([+-]) (0x[0-9a-f]+|\d+)')
 ADDR = re.compile(r'\b0x[0-9a-f]{6,}\b')
 SENTINEL = 0x00600000
+ABSOLUTE_EXTERNALS = {'__except_list'}   # undefined in the object, linked as absolute 0
 JUMP_TABLE = re.compile(r'\[e[a-z]{2}\*4 \+ (0x[0-9a-f]+)\]')
 MARKER = re.compile(r'^// 0x([0-9a-fA-F]{8})\s*$', re.M)   # a `// 0xVA` line above a definition
 
@@ -295,8 +296,8 @@ def symbol_insns(o, sym):
     for r in rel:
         off = r.virtual_address - base
         target = o.symbol_by_index.get(r.symbol_index)
-        if target is not None and target.section_number == -1:            # absolute (__except_list)
-            continue
+        if target is not None and (target.section_number == -1 or target.name in ABSOLUTE_EXTERNALS):
+            continue                    # absolute symbols, e.g. fs:[0] through __except_list
         if r.type in (0x0006, 0x0007) and 0 <= off <= len(code) - 4:      # DIR32 / DIR32NB
             code[off:off + 4] = SENTINEL.to_bytes(4, 'little')
     return disassemble(bytes(code), base), len(raw)

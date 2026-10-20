@@ -58,7 +58,7 @@ the integration temporary. When only displacement sizes differ, read the
 | camera/FollowCamera | `0x004650e0` | 509/937 | b | retail keeps the two cross products in memory temporaries (frame 0x18c vs 0x180); branch targets of the two `je` tests |
 | camera/FollowCamera | `0x00465c20` | 3659/3672 | b | 4 code diffs: retail adds `lea ecx, [esp + N]`; retail lacks `lea ecx, [esp + N]`; slots differ |
 | camera/KrustyBikeCamera | `0x00497e20` | 337/376 | c | 10 code diffs: `mov ecx, [A]` vs `mov edx, [A]`; retail lacks `lea eax, [esp + N] ; mov edx, [ecx + 0x~` |
-| camera/VehicleCamera | `0x0052c510` | 817/1261 | c | slot 35: frame and slots match; `(x*x) + y*y + z*z` gives retail's x*x-first squared length; retail duplicates the x scaling into both range branches (`fld x; fmul st(1)` / `fld st(0); fmul x`) where VC6 shares one block ; writing the scaling out in the body (slot 41's lever) gives 798..824 |
+| camera/VehicleCamera | `0x0052c510` | 1262/1267 | c | slot 35: frame, slots and size match; x scaled in each range branch with y/z through one ScaleYZ helper per branch reproduces retail's cross-jumped tail; left: direction * reach x is `fld st(0); fmul x` vs retail `fld x; fmul st(1)` |
 | control/ControlInterface | `0x004bf4f0` | 76/104 (inside ControlInterface.cpp) | c | tails merged as in retail; retail places the mouse pointer load after the shared block's `ret` and jumps back, VC6 places it after the keyboard load |
 | control/ControlInterface | `0x004bf6a0` | 438/726 (masked) | c | 58 code diffs: `jne @158` vs `jne @165 ; lea eax, [esp + N]`; `jmp @169 ; lea ecx, [esp + N]` vs `push eax ; jmp @178` |
 | ecosystem/EcoSystem | `0x00456890` | 356/369 | c | 2 code diffs: retail lacks `fmul [eax + 0x5a8]`; retail adds `fmul [eax + 0x5a8]`; redundant parentheses on the differences, products and detail-band casts (225 combinations) do not move it |
@@ -226,7 +226,7 @@ the integration temporary. When only displacement sizes differ, read the
 | render/Pixtrans | `0x004ce420` | 280/458 | b | frame 0x10 and the x loop match; VC6 loads `source` into ebp at entry (ebp pushed before the height guard) and forms the next source row in ebp where retail uses eax and copies it at the row head; first pixel's zero extension in ecx (retail edi) |
 | render/Pixtrans | `0x004cee30` | 1121/1125 masked | b | after the keyed x loop retail reloads the source stride before the width |
 | render/Pixtrans | `0x004cf2a0` | 242/1735 | b | draft: format, pixel size and palette in ebx/esi/edi where retail uses edi/ebx/esi; frame 0x50 vs 0x54 |
-| render/ResourceManager | `0x004e9030` | 100/798 | b | 5 code diffs: `jne @35` vs `mov [esp + N], ebx ; jne @36`; `je @250` vs `je A`; slots differ |
+| render/ResourceManager | `0x004e9030` | 100/804 | b | 5 code diffs, all from retail homing `archive` in the `new` temporary's slot: `mov [esp+0x14], ebx` after the EH state reset and `mov eax, [esp+0x14]` for the success return (the 6 missing bytes) |
 | render/TextService | `0x0050ade0` | 117/125 | c | 1 code diffs: `mov eax, [ebp + N] ; mov edx, edi ; mov~` vs `mov ecx, [ebp + N] ; mov eax, edi ; mov~` |
 | render/TextService | `0x0050b080` | 530/890 | b | 30 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
 | render/TextService | `0x0050b400` | 398/758 | b | 31 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |

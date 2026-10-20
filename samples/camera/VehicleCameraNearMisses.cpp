@@ -5,17 +5,18 @@
 //
 // VehicleCamera::UnknownVirtualSlot41 (0x0052c030) is exact in src/reconstructed/VehicleCamera.cpp.
 //
-// VehicleCamera::UnknownVirtualSlot35 (0x0052c510, 1267 bytes, 817/1261):
-// frame (0x48) and slot assignment match retail. The squared length loads
-// x*x first as in retail when written `(x*x) + y*y + z*z` (all 144
-// bracketings tried). Left: retail duplicates the
-// x scaling into both range branches (`fld x; fmul st(1)` after
-// distance * field_0x228, `fld st(0); fmul x` after the -0.25 range) where
-// VC6 here shares one block. Tried without effect: the four groupings of
-// Length's terms and of `along`, `direction * range`, `range * direction`
-// and per-component scaling in the range branch. Writing the scaling out in
-// the body (either branch, both, or one shared range variable) as slot 41's
-// normalisations are is worse (798..824).
+// VehicleCamera::UnknownVirtualSlot35 (0x0052c510, 1267 bytes): frame
+// (0x48), slot assignment and size match retail; 2 instructions differ
+// (rank_near_misses). The squared length loads x*x first as in retail when
+// written `(x*x) + y*y + z*z` (all 144 bracketings tried). Retail scales x
+// inside each range branch and cross-jumps the shared y/z tail; scaling x
+// in the branch and y/z through one ScaleYZ helper per branch reproduces
+// that (a whole ScaleInPlace per branch merges all three components, and
+// y/z written out per branch do not merge, 14..22 diffs). Left: the
+// direction * reach x component is `fld st(0); fmul x` where retail has
+// `fld x; fmul st(1)`. The written order of either branch's x product, the
+// reach expression's spelling (operator*, friend operator*, component-wise,
+// a named product) and inline vs named scale/range temporaries do not fix it.
 // `a` is tested as a byte (FollowCamera.h declares it unsigned char).
 #include "../../src/reconstructed/VehicleCamera.h"
 
@@ -26,6 +27,11 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 static inline Vector3 Add(const Vector3& a, const Vector3& b) {
     return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+static inline void ScaleYZ(Vector3* v, float s) {
+    v->y *= s;
+    v->z *= s;
 }
 
 static inline void ScaleInPlace(Vector3* v, float s) {
@@ -103,11 +109,14 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
         D3DRMVectorRotate(&direction, &followHeading, (Vector3*)&kVec3YAxis, turnYaw * 0.7f);
     }
     if (cameraState != 6) {
-        ScaleInPlace(&direction, distance * lookAheadDistance);
+        float scale = distance * lookAheadDistance;
+        direction.x *= scale;
+        ScaleYZ(&direction, scale);
     } else {
         float range = -lookAheadDistance;
         range *= 0.25f;
-        ScaleInPlace(&direction, range);
+        direction.x *= range;
+        ScaleYZ(&direction, range);
     }
     Vector3 position = Add(direction, targetPoint);
     Vector3 result = position;
