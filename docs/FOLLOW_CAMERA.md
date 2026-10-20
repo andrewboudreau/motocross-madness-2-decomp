@@ -233,6 +233,7 @@ references. All bodies below are strict exact under the default profile.
 | VehicleCamera 57 | `0x0052ca10` | 356 | `0x0052bb60` plus slot 33 × min(dt, 0.2) unless state 7, game +0x1c4 or vehicle +0x444 |
 | VehicleCamera `$E` | `0x0052ced0..0x0052d00b` | 8 × 5/60 | `.CRT$XCU` 336-339: zero, x, y, z axes at `0x0068a728`, `0x0068a738`, `0x0068a748`, `0x0068a718` |
 | VehicleCamera 42 | `0x0052cc00` | 122 | +0x308 = fov/zoom ratio × vehicle +0x43c × 0.3 (0.4 in state 3), 0 otherwise |
+| VehicleCamera 35 | `0x0052c510` | 1267 | Chase position: heading turned by +0x308 × 0.7 about y (pitched by −vehicle +0x4c in state 3) through `D3DRMVectorRotate`, scaled by the preset distance; lift eased in +0x2d8 over the first rider (see below) |
 | VehicleCamera 36 | `0x0052cc80` | 573 | Settle check with tolerance 10 (vehicle +0x434 > 0.1) or 0.01; records the check in +0x277; `bool result` joins (see below) |
 | VehicleCamera 39 | `0x0052cbd0` | 41 | Returns vehicle +0x45c; +0x23c += π when vehicle +0x464 is set |
 | VehicleCamera 50 | `0x0052cb80` | 73 | Vehicle part position 0, raised by 5 |
@@ -315,17 +316,15 @@ target's model, or the z axis. Two source facts:
 The weights `0x00558d64`/`0x00558d68` are literals (`__real` constants
 placed after the vtable).
 
-Also a near miss in the same samples file:
-
-- Slot 35 (`0x0052c510`, 1267 bytes, 1262/1267): the chase position
-  (heading turned by +0x308 × 0.7 about y, pitched by −vehicle +0x4c in
-  state 3, through `D3DRMVectorRotate`; distance from the preset angles,
-  zoom and speed; lift eased in +0x2d8 over the vehicle's first rider
-  with +0x2a8 set). Its `a` argument is tested as a byte, so FollowCamera.h
-  declares it `unsigned char` (slot 48's int argument still passes without
-  conversion code); +0x2d8 is a float. Frame, slots and size match; the
-  one difference left is the x87 operand form of `direction * reach`'s x
-  component (see the samples file).
+Slot 35 (`0x0052c510`) tests its `a` argument as a byte, so FollowCamera.h
+declares it `unsigned char` (slot 48's int argument still passes without
+conversion code); +0x2d8 is a float. It matches when `direction` is
+scaled through one pointer in both range arms and the short range is
+written `scaled->x *= (range *= 0.25f)`. Retail's reach product takes x as
+`fld x; fmul st(1)`, which VC6 emits only when nothing stored
+`direction.x` directly earlier in the function. The short range takes x as
+`fld st(0); fmul x`, the form of an assignment expression's first use
+(docs/VC6_PATTERN_CORPUS.md section 6, rules 5 and 6).
 
 ## KrustyBikeCamera
 

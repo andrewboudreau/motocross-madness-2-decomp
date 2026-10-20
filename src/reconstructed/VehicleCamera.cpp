@@ -277,6 +277,113 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
     return heading;
 }
 
+// 1 - |angle| / (pi / 2), at least 0.
+static inline float AngleWeight(float angle) {
+    float weight = 1.0f - FollowCameraAbs(angle) * 0.63661975f;
+    if (0.0f > weight)
+        weight = 0.0f;
+    return weight;
+}
+
+// |v|, exact when it is 1.
+static inline float Length(const Vector3& v) {
+    float squared = (v.x * v.x) + v.y * v.y + v.z * v.z;
+    if (squared == 1.0f)
+        return 1.0f;
+    return FastSqrt(squared);
+}
+
+// `value` scaled down while climbing or diving faster than 5.
+static inline float ClimbScale(float y, float length, float value) {
+    if (length != 0.0f) {
+        if (y < -5.0f)
+            return (y / length + 1.0f) * value;
+        if (y > 5.0f)
+            return (1.0f - y / length) * value;
+    }
+    return value;
+}
+
+// 0x0052c510: the chase position: behind the vehicle along the heading
+// (+0x29c) turned by +0x308 (and, in state 3, pitched by the vehicle's
+// +0x4c), at a distance scaled by the preset angles, zoom and speed, raised
+// by a share of the climb and eased up over the rider when the subject
+// lifts the point. Both range arms scale through one pointer, and the
+// short range applies its 0.25 inside the first product: retail never
+// stores `direction` directly before the reach product, and its short
+// range takes x with `fld st(0)` (docs/VC6_PATTERN_CORPUS.md section 6,
+// rules 5 and 6). The squared length is written `(x*x) + y*y + z*z` and
+// `a` is tested as a byte, as retail does.
+Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
+    float distance;
+    float offset;
+    if (cameraState != 3) {
+        Vector3 velocity = UnknownVirtualSlot33();
+        float along = velocity.z * followHeading.z + (velocity.x * followHeading.x + velocity.y * followHeading.y);
+        distance = AngleWeight(followYaw) * AngleWeight(followPitch);
+        float zoom = fieldOfView / maxFieldOfView;
+        float scale = (float)(followDistance * 0.0111f) * zoom + 1.0f;
+        if (a) {
+            offset = 0.0f;
+        } else {
+            float speed = vehicleMode ? vehicle->referenceSpeed : 180.0f;
+            offset = (float)((1.0f - followDistance * 0.0016666667f) * 1.8f) * (scale * scale * along / speed);
+        }
+        float length = vehicleMode ? vehicle->linearSpeed : Length(velocity);
+        distance = zoom * distance + ClimbScale(velocity.y, length, offset);
+        offset = (1.0f - zoom) * (velocity.y * 0.25f);
+    } else {
+        distance = 1.0f;
+        offset = 0.0f;
+    }
+    if (isCrashView)
+        distance *= 0.8f;
+    Vector3 direction;
+    if (cameraState == 3) {
+        Vector3 side;
+        side.x = followHeading.z;
+        side.y = 0.0f;
+        side.z = -followHeading.x;
+        Vector3 pitched;
+        D3DRMVectorRotate(&pitched, &followHeading, &side, -vehicle->savedPitch);
+        D3DRMVectorRotate(&direction, &pitched, (Vector3*)&kVec3YAxis, turnYaw * 0.7f);
+    } else {
+        D3DRMVectorRotate(&direction, &followHeading, (Vector3*)&kVec3YAxis, turnYaw * 0.7f);
+    }
+    Vector3* scaled = &direction;
+    if (cameraState != 6) {
+        float scale = distance * lookAheadDistance;
+        scaled->x *= scale;
+        scaled->y *= scale;
+        scaled->z *= scale;
+    } else {
+        float range = -lookAheadDistance;
+        scaled->x *= (range *= 0.25f);
+        scaled->y *= range;
+        scaled->z *= range;
+    }
+    Vector3 position = Add(direction, targetPoint);
+    Vector3 result = position;
+    result.y = position.y + offset;
+    if (vehicle->riderCount > 0) {
+        if (vehicle->UnknownInlineRider()->penetration > -0.5f) {
+            float reach = (float)(FollowCameraAbs(followPitch) * 0.63661975f) * 1.2f + 0.3f;
+            Vector3 ahead = Add(direction * reach, targetPoint);
+            Vector3 ground = ahead;
+            subject->QueryGround(&ground, 0, 0, 0);
+            if (ground.y > ahead.y)
+                lift = (ground.y - ahead.y) * 0.6f;
+            else
+                lift *= 0.01f;
+        } else {
+            lift *= 0.01f;
+        }
+        result.y += lift;
+    }
+    result.y += 3.0f;
+    return result;
+}
+
 // 0x0052cb80: the vehicle's position 0, raised by 5.
 Vector3 VehicleCamera::UnknownVirtualSlot50() {
     Vector3 position;
