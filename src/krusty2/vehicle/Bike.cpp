@@ -103,6 +103,11 @@ float BikeVec3Dot(const Vec3& a, const Vec3& b);
 // parenthesisations of a local cross helper compile the same), and the `test al, al` of the airborne test is scheduled earlier.
 // Inert: the declaration order of push/base/torque/offset and len/result; push declared
 // per branch (1555); spin, d or lenSq at function scope.
+// Per component (session 14f, against VC6_PATTERN_CORPUS section 6): in the airborne
+// cross retail loads spin.y before torque.z and torque.x but spin.x after torque.z and
+// torque.y, so only spin.x acts like a directly stored frame word (rule 6). A
+// component-wise or constructed spin gives 269, `torque = weightForce * 0.25f` 238, and
+// `axis * radius` the base bytes.
 float Bike::Method_0x0040a520()
 {
     Vec3 push;
