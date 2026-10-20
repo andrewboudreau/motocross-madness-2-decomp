@@ -15,6 +15,15 @@
 // epilogue into that block and the success path; retail keeps one
 // epilogue that both `xor eax, eax; jmp` blocks and `mov eax, 1` reach.
 // goto/result-variable/if-else forms of the tail compile identically.
+// Synthetic VC6 tests (2026-10-20): the EH epilogue is copied into
+// constant-return blocks when it is short (frame below 0x80, so disp8
+// operands, and a bare `ret`) and shared with a larger frame or `ret N`;
+// a register saved only around a region (ebp here, as in retail) brings
+// the copies back even with the 0x278 frame. Unchanged here: the `!Create
+// goto` tail (retail's block order, three copies), `?:`, `!= 0`, Release
+// via goto, `return (int)handle`, an else arm for the Release block, the
+// GDI section in its own scope or behind `if (handle)`. A returned
+// variable (not a constant) keeps one epilogue but loads it from a register.
 //
 #include <windows.h>
 #include <string.h>
