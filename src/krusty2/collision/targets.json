@@ -86,7 +86,7 @@
     "target_va": "0x00432260",
     "target_size": 458,
     "expect": "partial",
-    "notes": "96.2%: t1=m1*inv(m2), t2=m1*inv(m3), out=CollisionRelativeTransform; inverse p.y sum order fixed; remaining diff is one store-schedule move",
+    "notes": "96.2%: t1=m1*inv(m2), t2=m1*inv(m3), out=CollisionRelativeTransform; inverse p.y sum order fixed; remaining diff is one store-schedule move Session 14: all eight parenthesisations of the second inverse's p.x products (through a separate helper): unchanged or worse.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -456,7 +456,7 @@
     "target_va": "0x00437c20",
     "target_size": 716,
     "expect": "partial",
-    "notes": "703/716: rel = inverse(model+0x88) * hull+0x48 with the inverse written into the product's own local (one Matrix4 slot, frame 0x60 like retail); zero sum via a Vec3 temporary; mean written per component as mean.x = sum.x * (s = 1.0f / count), then sum.y * s, sum.z * s (matches retail fld st(0); fmul sum.x). Left: two argument-push schedules (before 0x424730 and before HullVsHull) and the mean copy registers (retail eax/ecx/edx).",
+    "notes": "703/716: rel = inverse(model+0x88) * hull+0x48 with the inverse written into the product's own local (one Matrix4 slot, frame 0x60 like retail); zero sum via a Vec3 temporary; mean written per component as mean.x = sum.x * (s = 1.0f / count), then sum.y * s, sum.z * s (matches retail fld st(0); fmul sum.x). Left: two argument-push schedules (before 0x424730 and before HullVsHull) and the mean copy registers (retail eax/ecx/edx). Session 14 (the SweptBoxOverlap push schedule, push ecx before add eax,4): a Vec3 prototype with casts, a POD or copy-constructor argument type, reference parameters, (*tree).center, tree[0], bCenter/bHalf/rel pointer locals (bHalf/bCenter locals cost 40 bytes): unchanged. The swept callers 0x4376f0/0x437ef0/0x438550 show the same kind of copy-schedule difference around this call.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -476,7 +476,7 @@
     "target_va": "0x00438280",
     "target_size": 710,
     "expect": "partial",
-    "notes": "699/710: as ModelVsHull with ModelVsHull per element of b (frame 0x60 like retail), same per-component mean. Left: one push schedule (sub esp,0xc placement) and the mean copy registers.",
+    "notes": "699/710: as ModelVsHull with ModelVsHull per element of b (frame 0x60 like retail), same per-component mean. Left: one push schedule (sub esp,0xc placement) and the mean copy registers. Session 14: hit declared later, rel before hit, bracketed address-of, the result in a local, != 0, a model alias, a b->center pointer local, a cast of xfA: unchanged (hit in the inner block: 203).",
     "bindings": "CollisionObject.bindings.json"
   },
   {
