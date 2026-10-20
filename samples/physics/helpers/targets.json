@@ -99,7 +99,7 @@
     "target_va": "0x4fc050",
     "target_size": 1171,
     "expect": "partial",
-    "notes": "partial (~69% sim): this/frame register assignment swapped (retail this=ebp, frame=ebx) and z/y/r temp slot placement differs.",
+    "notes": "1121/1171, 4 differing instructions (fsubp scheduling in the inline cross); see the comment above SetAxesIn. Frame slots from esp: retail z, y, r (shared with the RotateByRowsTo delta copy), cross temporary, pos; ours z (shared with d), y, cross temporary, pos, r. Removing the z/y/x block makes r and d share as in retail (r in the orthogonalize block and d in the parent block become sibling scopes), but z then drops below the cross temporary and y (1093). On that form, a constructor-return cross, assigning r after its declaration, y read before z and x declared at its first use do not reorder them.",
     "bindings": "SoultreeMatrix.bindings.json"
   },
   {

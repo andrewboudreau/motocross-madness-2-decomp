@@ -416,7 +416,7 @@
     "target_va": "0x00436e50",
     "target_size": 2205,
     "expect": "partial",
-    "notes": "2109/2205: same instructions, registers and call sequence as retail (the out-of-line 0x0042a4b0/0x0042a450/0x0042a510/0x00428060 COMDATs, a in ebx, b in ebp). The x87 tail of the inlined product (rel._43/_44) is scheduled after the first SweptBoxOverlap pushes instead of before them.",
+    "notes": "2109/2205: same instructions, registers and call sequence as retail (the out-of-line 0x0042a4b0/0x0042a450/0x0042a510/0x00428060 COMDATs, a in ebx, b in ebp). The x87 tail of the inlined product (rel._43/_44) is scheduled after the first SweptBoxOverlap pushes instead of before them. Not moved by: no tree local, the tree local before the product (worse), the overlap result in a local, motion or b->center pointer locals, b's matrix copied to a named local first; a separate inverse local makes the product write rel directly (180).",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -766,7 +766,7 @@
     "target_va": "0x00434eb0",
     "target_size": 1885,
     "expect": "partial",
-    "notes": "1666/1885: model bounds refit: inverse of field_0x88 inline, per enabled element the three axis half extents rotated twice (element matrix, then the inverse) and summed as |x|+|y|+|z|, the tree root centre through two out-of-line 0x42a510 calls, Min/Max out of line. Retail's call pattern, size and frame 0x134 come from the natural budget: a named lo = center - extent for Min (its constructor is called), the continue for disabled elements, a toModel pointer to the inverse and a guarded do-while (390 -> 1666). Left: retail clears i before the guard (a for loop does, but its entry test is cmp [ebx],0 where retail loads the count; i declared before the guard turns the do-while back into that for loop), ax/az slots swapped and minBound/maxBound placed among the temporaries.",
+    "notes": "1666/1885: model bounds refit: inverse of field_0x88 inline, per enabled element the three axis half extents rotated twice (element matrix, then the inverse) and summed as |x|+|y|+|z|, the tree root centre through two out-of-line 0x42a510 calls, Min/Max out of line. Retail's call pattern, size and frame 0x134 come from the natural budget: a named lo = center - extent for Min (its constructor is called), the continue for disabled elements, a toModel pointer to the inverse and a guarded do-while (390 -> 1666). Left: retail clears i before the guard (a for loop does, but its entry test is cmp [ebx],0 where retail loads the count; i declared before the guard turns the do-while back into that for loop; also with a count local, >= 1, 0 < count, count > i or a goto guard), ax/az slots swapped and minBound/maxBound placed among the temporaries.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -786,7 +786,7 @@
     "target_va": "0x00439820",
     "target_size": 1493,
     "expect": "partial",
-    "notes": "1309/1493 strict, same size and instructions as retail: the closest-point pre-test is an inline helper (SegmentPointDistance), which gives retail's 0xa8 frame; the empty case 2 leaves retail's lone dec eax; case 0 rotates the normal in place, case 1 adds through the by-value 0x421cb0. Remaining: several temporaries (the helper's constructor/add/subtract results, case 1's loop locals, case 0's inversion temps) sit in other frame slots, and add esp,0x14 is scheduled after mov esi,eax.",
+    "notes": "1309/1493 strict, same size and instructions as retail: the closest-point pre-test is an inline helper (SegmentPointDistance), which gives retail's 0xa8 frame; the empty case 2 leaves retail's lone dec eax; case 0 rotates the normal in place, case 1 adds through the by-value 0x421cb0. Remaining: several temporaries (the helper's constructor/add/subtract results, case 1's loop locals, case 0's inversion temps) sit in other frame slots, and add esp,0x14 is scheduled after mov esi,eax (result declared at case scope or assigned after declaration: no change; != 0 or a vertices local: worse).",
     "bindings": "CollisionObject.bindings.json"
   },
   {
