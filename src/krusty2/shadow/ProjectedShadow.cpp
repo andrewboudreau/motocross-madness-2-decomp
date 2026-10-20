@@ -72,11 +72,11 @@ ProjectedShadow::ProjectedShadow(int flags)
 ProjectedShadow::~ProjectedShadow()
 {
     if (camera)
-        camera->BaseObjectVirtualSlot2();
+        camera->Release();
     if (texture) {
         if (texture->surface)
             texture->surface->PageUnlock(0);
-        texture->BaseObjectVirtualSlot2();
+        texture->Release();
     }
     if (vertexBuffer)
         DebugFree(vertexBuffer, __FILE__, 0x5e);

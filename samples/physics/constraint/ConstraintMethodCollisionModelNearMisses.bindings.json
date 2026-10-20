@@ -19,7 +19,7 @@
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
   "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?Tick@CollisionObject@@UAEHM@Z": "0x00499ae0",
-  "?GameObjectVirtualSlot14@CollisionObject@@UAEHXZ": "0x00434540",
+  "?UnknownVirtualSlot14@CollisionObject@@UAEHXZ": "0x00434540",
   "?GetPositionIn@ConNode@@QAEXPAV1@PAUConVec3@@@Z": "0x004fc9a0",
   "?LoadShape@CollisionObject@@QAEXPAXPBD@Z": "0x00432800",
   "?LocalToWorldPoint@ConNode@@QAE?AUConVec3@@ABU2@@Z": "0x004fd660",

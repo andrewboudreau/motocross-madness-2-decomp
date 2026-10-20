@@ -462,7 +462,7 @@
   {
     "class": "SoultreeQuadTreeRenderer",
     "source": "SoultreeQuadTreeRenderer.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot14@SoultreeQuadTreeRenderer",
+    "candidate_symbol_contains": "UnknownVirtualSlot14@SoultreeQuadTreeRenderer",
     "target_va": "0x00504570",
     "target_size": 166,
     "expect": "exact",
@@ -982,7 +982,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?AttachRenderContext@SoultreeObject@@UAEHH@Z",
+    "candidate_symbol_contains": "?AttachRenderContext@SoultreeObject@@UAEHPAX@Z",
     "target_va": "0x004fec30",
     "target_size": 53,
     "expect": "exact",

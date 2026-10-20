@@ -348,7 +348,7 @@
   "?Tick@UIListBox@@UAEHM@Z": "0x00476020",
   "?Tick@UIScrollBar@@UAEHM@Z": "0x00474cf0",
   "?Tick@UIVideoStatic@@UAEHM@Z": "0x0047af90",
-  "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
+  "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?RenderPre3D@GameObject@@UAEHXZ": "0x00469330",
   "?RenderPre3D@UIControl@@UAEHXZ": "0x00471140",

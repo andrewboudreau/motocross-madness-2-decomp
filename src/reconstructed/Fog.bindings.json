@@ -25,7 +25,7 @@
   "?SetDetailLevel@Fog@@QAEXH@Z": "0x00462db0",
   "?Tick@Fog@@UAEHM@Z": "0x004627f0",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
-  "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
+  "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@Fog@@UAEHXZ": "0x00462800",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?RenderPre3D@GameObject@@UAEHXZ": "0x00469330",

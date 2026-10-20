@@ -48,7 +48,7 @@
   "?Method_00527A20@Vehicle@@QAEXPAMPAUVec3@@1@Z": "0x00527a20",
   "?Method_005293E0@Vehicle@@QAEXPAM@Z": "0x005293e0",
   "?Method_00529450@Vehicle@@QAEXPAUVec3@@0@Z": "0x00529450",
-  "?AppendChild@GameObject@@QAEHPAXH@Z": "0x00469190",
+  "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?PlaceWheels@Vehicle@@QAEXXZ": "0x00528eb0",
   "?QueryCollisions@CollisionObject@@QAEHXZ": "0x00438e70",
   "?ResetWheelContacts@Vehicle@@QAEXXZ": "0x00525a90",

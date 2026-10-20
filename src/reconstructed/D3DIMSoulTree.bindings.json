@@ -109,7 +109,7 @@
   "?RecordUse@ManagedTexture@@QAEXM@Z": "0x00510820",
   "?Tick@D3DIMSoultreeObject@@UAEHM@Z": "0x00443490",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
-  "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
+  "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?RenderPre3D@GameObject@@UAEHXZ": "0x00469330",
   "?UnknownVirtualSlot14@D3DIMSoultreeObject@@UAEHXZ": "0x00444030",
   "?UnknownVirtualSlot14@GameObject@@UAEHXZ": "0x00469360",

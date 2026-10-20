@@ -42,7 +42,7 @@
   {
     "class": "VisibilityQuadTree",
     "source": "VisibilityQuadTree.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot1",
+    "candidate_symbol_contains": "UnknownVirtualSlot1@VisibilityQuadTree",
     "target_va": "0x0052d4b0",
     "target_size": 94,
     "expect": "exact",
@@ -92,7 +92,7 @@
   {
     "class": "VisibilityQuadTree",
     "source": "VisibilityQuadTree.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot14",
+    "candidate_symbol_contains": "UnknownVirtualSlot14",
     "target_va": "0x0052e3b0",
     "target_size": 148,
     "expect": "exact",

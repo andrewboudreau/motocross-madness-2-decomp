@@ -16,7 +16,7 @@
 // ebp and spills height; VC6 here spills width), 841 bytes against 842.
 ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* textureOwner)
 {
-    GameObject::SetRenderContext((int)target);
+    GameObject::SetRenderContext((void*)target);
     field_0x5c = (int)target;
 
     char name[0x100];
@@ -36,7 +36,7 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
             formatA = 0xc;
             formatB = 2;
         } else {
-            BaseObjectVirtualSlot2();
+            Release();
             return 0;
         }
     }
@@ -47,7 +47,7 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
         surfaceFormat = 0x613;
         field_0x98 = 0;
     } else {
-        BaseObjectVirtualSlot2();
+        Release();
         return 0;
     }
 
@@ -69,7 +69,7 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
             ShadowOwner* owner = Host()->owner;
 
             camera = new(__FILE__, 0xcd) ShadowCameraProxy(1);
-            if (camera && camera->SetRenderContext((int)Host())) {
+            if (camera && camera->SetRenderContext((void*)Host())) {
                 Host()->surface = savedSurface;
                 Host()->width = savedWidth;
                 Host()->height = savedHeight;
@@ -86,7 +86,7 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
             }
         }
     }
-    BaseObjectVirtualSlot2();
+    Release();
     return 0;
 }
 

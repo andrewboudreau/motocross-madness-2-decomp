@@ -6,6 +6,20 @@ overrides slot 2 (`Release`). Its constructor (`0x00468ca0`) cites
 `src/reconstructed/GameObject.h` and `.cpp`; call/data bindings in
 `src/reconstructed/GameObject.bindings.json`. Names are provisional.
 
+The physics include `src/krusty2/core/GameObject.h` now forwards to this
+canonical declaration. Its former duplicate classes gave identical slots
+different symbol names and incompatible pointer/float signatures, preventing
+the implementations from satisfying physics objects at link time. Slot 11's
+float timestep is supported by physics overrides `0x0043ba70` and
+`0x004f9890`; the base's shared return-one body does not establish the type
+by itself. All existing virtual and secondary-base offsets remain intact.
+
+`GameObject.cpp` also supplies the iterator count at `0x0065b548`, confirmed
+as four bytes of PE zero-fill. The native VC6 integration test
+`tests/test_gameobject_link.py` links BaseObject, GameObject and MemTag with a
+derived test object, exercising the 8/0x2c-byte layouts, float/input virtual
+dispatch, child/context propagation and mutation guards during iteration.
+
 GameObjects form a tree. Most introduced slots walk the children and forward
 the same virtual call, gated by bits of the flag word at +0x20 and by each
 child's bit flags at +0x25.

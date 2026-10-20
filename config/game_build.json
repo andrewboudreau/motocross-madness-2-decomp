@@ -1,6 +1,14 @@
 {
   "profile": "vc6_o2_mt",
   "source_roots": ["src"],
+  "candidate_sources": [
+    {
+      "path": "samples/game/DeviceSetupNearMisses.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete DirectX startup probe; VC6 emits 1006 bytes versus 1011 retail bytes due to register allocation and spill differences.",
+      "evidence": "docs/DEVICESETUP.md#functional-build-review"
+    }
+  ],
   "includes": ["src/krusty2", "src/reconstructed"],
   "import_definitions": ["config/game-imports/blade.def", "config/game-imports/dinput.def"],
   "libraries": [

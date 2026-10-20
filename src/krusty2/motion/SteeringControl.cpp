@@ -40,7 +40,7 @@ void SteeringControl::Release()
 {
     if (node) {
         GameObject* base = (GameObject*)((char*)node + 0xc);
-        base->BaseObjectVirtualSlot2();
+        base->Release();
         node = 0;
     }
 }

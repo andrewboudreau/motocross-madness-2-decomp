@@ -630,7 +630,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
 {
     if (!attachmentCount)
         return;
-    if (!field_0x124 || !(field_0x124->statusFlags & 1))
+    if (!field_0x124 || !(field_0x124->isEnabled))
         return;
     if (!shadowLight) {
         SoultreeLightList* list = *(SoultreeLightList**)((char*)sceneNode + 0x1bc);

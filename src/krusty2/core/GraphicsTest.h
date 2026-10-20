@@ -28,7 +28,7 @@ public:
     explicit GraphicsTest(int flags);           // 0x0047bc70, forwards flags to GameObject(int)
     virtual ~GraphicsTest();                    // slot 0: deleting 0x0047bce0, core 0x0047bd00
 
-    // Non-virtual GraphicsTest methods used by CollisionObject::GameObjectVirtualSlot14.
+    // Non-virtual GraphicsTest methods used by CollisionObject::UnknownVirtualSlot14.
     // 0x0047c6c0 (ret 0x10): drawColor = a<<24 | r<<16 | g<<8 | b (decoded); SetDrawColor with alpha.
     void SetDrawRGBA(int r, int g, int b, int a);
     // 0x0047c6f0: no texture, diffuse alpha stage states, alpha blending on (render state 0x1b).

@@ -1688,7 +1688,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     }
     if (isGhost) {
         ghostMod = (KbObj128*)new(__FILE__, 0x690) KbGhostMod(1);
-        GameObject::AppendChild(ghostMod, -1);
+        GameObject::AppendChild((GameObject*)ghostMod, -1);
     }
     statusNode = 0;
     ((KbBikeLoader*)this)->Fn_004079C0(a1, a2, name, desc, a5, a6, a7, a8, a9, a10, map, a15, a16,
@@ -2006,7 +2006,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         ((SoultreeObject*)riderCharacter->c_0x1a0)->SetAxesIn(0, &axisZ, &axisY, 0, 1);
         KbMorphMod* morph = new(__FILE__, 0x891) KbMorphMod(1);
         morph->LoadParameterFile((void*)a1, "RiderMorph.mbf", (SoultreeObject*)riderCharacter->c_0x1a0);
-        GameObject::AppendChild(morph, -1);
+        GameObject::AppendChild((GameObject*)morph, -1);
         ((KbXform*)riderCharacter->c_0x1a0)->AddSecondModifier(morph);
     }
     UnknownVirtualSlot102(0.001f);

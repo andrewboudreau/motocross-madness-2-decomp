@@ -244,7 +244,7 @@
   "?OpenHelp@TrackGameMode@@QAEHPBD0@Z": "0x00523d30",
   "?SelectSeries@TrackGameMode@@QAEXH@Z": "0x005240e0",
   "?Tick@UIDialog@@UAEHM@Z": "0x0046ef00",
-  "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
+  "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?RenderPre3D@PCCentralBikeRiderDlg@@UAEHXZ": "0x004d77d0",
   "?RenderPre3D@UIDialog@@UAEHXZ": "0x0046f1c0",

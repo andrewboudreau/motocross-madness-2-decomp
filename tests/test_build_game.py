@@ -43,6 +43,27 @@ class GameBuildTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, r'no C\+\+ sources'):
                 source_files(Path(tmp), {'source_roots': ['missing']})
 
+    def test_only_explicit_reviewed_candidates_are_added(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'samples').mkdir()
+            (root / 'samples/approved.cpp').write_text('')
+            (root / 'samples/unreviewed.cpp').write_text('')
+            candidate = {'path': 'samples/approved.cpp', 'status': 'reviewed-nonexact',
+                         'reason': 'Complete implementation with different allocation',
+                         'evidence': 'docs/review.md'}
+            spec = {'source_roots': [], 'candidate_sources': [candidate]}
+            self.assertEqual(source_files(root, spec), [root / candidate['path']])
+            candidate['status'] = 'partial'
+            with self.assertRaisesRegex(ValueError, 'review evidence'):
+                source_files(root, spec)
+            candidate['path'] = 'samples/missing.cpp'
+            with self.assertRaisesRegex(ValueError, 'existing samples'):
+                source_files(root, spec)
+            candidate['path'] = '../outside.cpp'
+            with self.assertRaisesRegex(ValueError, 'escapes repository'):
+                source_files(root, spec)
+
     def test_failed_link_does_not_accept_existing_executable(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

@@ -6,7 +6,7 @@ SurfaceMap::SurfaceMap(SurfaceTexture* tex, const SurfaceMaterial* mat)
 {
     texture = tex;
     if (tex)
-        tex->BaseObjectVirtualSlot1();
+        tex->AddRef();
     if (mat) {
         material = *mat;
     } else {
@@ -34,16 +34,16 @@ SurfaceMap::SurfaceMap(SurfaceTexture* tex, const SurfaceMaterial* mat)
 SurfaceMap::~SurfaceMap()
 {
     if (texture)
-        texture->BaseObjectVirtualSlot2();
+        texture->Release();
 }
 
 void SurfaceMap::SetTexture(SurfaceTexture* tex)
 {
     if (texture)
-        texture->BaseObjectVirtualSlot2();
+        texture->Release();
     texture = tex;
     if (tex)
-        tex->BaseObjectVirtualSlot1();
+        tex->AddRef();
     Apply();
 }
 

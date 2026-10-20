@@ -43,14 +43,14 @@ int SelectiveGravityModel::Tick(float dt)
 {
     GameObject::Tick(dt);
     if (!manualStep)
-        GameObjectVirtualSlot11(dt);
+        UnknownVirtualSlot11(dt);
     return 1;
 }
 
 // slot 11, 0x004f9890: pushes each body down along -Y with its weight.  The scaled unit
 // vector (Math3D operator*) is what makes VC6 load 0.0f once from memory and store it to
 // both x and z; a literal Vec3(0, -w, 0) folds those into integer stores instead.
-int SelectiveGravityModel::GameObjectVirtualSlot11(float dt)
+int SelectiveGravityModel::UnknownVirtualSlot11(float dt)
 {
     for (int i = 0; i < bodyCount; i++) {
         GravityBody* b = bodies[i];

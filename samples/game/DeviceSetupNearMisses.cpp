@@ -1,6 +1,7 @@
 // DeviceSetupNearMisses.cpp -- near miss for the DirectX probe 0x00448560
-// (1011 bytes; this candidate is 1006), the first function of the DeviceSetup.cpp unit
-// (src/reconstructed/DeviceSetup.cpp, docs/DEVICESETUP.md).
+// (1011 bytes; this candidate is 1006), before the control-layout code in
+// src/reconstructed/DeviceSetup.cpp. Shared TU ownership is unproven; see
+// docs/DEVICESETUP.md.
 //
 // Status: same instruction sequence, branch layout and frame layout except
 // for one register swap (18% masked). Retail keeps the zero constant in edi,
@@ -16,6 +17,10 @@
 // report whether "Blade.dll" loads (on NT 5 and in place of DDRAW.DLL on
 // Windows 9x), to free the input library before testing its entry point and
 // to report 0x501 for builds after 0x549.
+//
+// Functional-build admission is explicit in config/game_build.json. The
+// private differential test covers 720 startup scenarios against retail;
+// see docs/DEVICESETUP.md. This remains a nonexact candidate in samples.
 
 #include <windows.h>
 #include <ddraw.h>

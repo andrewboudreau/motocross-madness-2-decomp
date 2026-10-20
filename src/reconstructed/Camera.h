@@ -13,7 +13,7 @@
 
 // .rdata floats just before Camera's vtable: the constructor's near and far
 // planes, which ClampLimits also keeps as the closest near and farthest far
-// plane.
+// plane. Storage is supplied by GraphicsState.cpp.
 extern const float g_DefaultNearPlane; // 0x00550f6c 1.0f
 extern const float g_DefaultFarPlane;  // 0x00550f70 100000.0f
 

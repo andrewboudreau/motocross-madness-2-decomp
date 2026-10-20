@@ -219,9 +219,9 @@ public:
     VisibilityView* View() const { return (VisibilityView*)renderContext; }
 
     virtual int PrepareGeometry();            // 0x0052ef50 (secondary vtable)
-    virtual int GameObjectVirtualSlot14();    // 0x0052e3b0
+    virtual int UnknownVirtualSlot14();    // 0x0052e3b0
     virtual int RenderPost3D();               // 0x0052f050
-    virtual int OnControlPress(int a, int b);            // 0x0052eec0
+    virtual int OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b);            // 0x0052eec0
 };
 
 #endif

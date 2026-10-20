@@ -71,7 +71,7 @@
   "?GetSelectedSeries@TrackGameMode@@QAEHXZ": "0x00524100",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "?Tick@RaceSound@@UAEHM@Z": "0x004e3730",
-  "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
+  "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?RenderPre3D@GameObject@@UAEHXZ": "0x00469330",
   "?UnknownVirtualSlot14@GameObject@@UAEHXZ": "0x00469360",

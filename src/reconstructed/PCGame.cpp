@@ -77,7 +77,7 @@ extern "C" const UnknownGuid IID_IDirect3DHALDevice;    // 0x005561b0
 extern "C" const UnknownGuid IID_IDirect3DMMXDevice;    // 0x005561c0
 extern "C" const UnknownGuid IID_IDirect3DRefDevice;    // 0x005561d0
 extern "C" const UnknownGuid IID_IDirect3DNullDevice;   // 0x005561e0
-extern const UnknownGuid g_BladeDeviceGuid;   // 0x00556040: the "Blade" renderer's device
+extern const UnknownGuid g_BladeDeviceGuid;   // 0x00556040: storage in GraphicsState.cpp
 
 // Display set-up outside PCGame (cdecl; names provisional).
 int EnumerateDisplays(void* window);                // 0x004c9600: enumerates the displays

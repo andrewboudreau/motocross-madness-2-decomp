@@ -11,9 +11,8 @@ struct UnknownInputEntry;
 extern int g_ActiveGameObjectIterators;
 
 // RTTI: GameObject : BaseObject. GameObject introduces primary slots 4-26.
-// Only signatures needed by reconstructed derived classes are refined; the rest
-// keep placeholder void() declarations so slot numbering matches the retail
-// vtable. Reconstructed bodies are in GameObject.cpp.
+// Signatures are shared with the physics hierarchy so overrides keep the retail
+// slots in every translation unit. Reconstructed bodies are in GameObject.cpp.
 class GameObject : public BaseObject {
 public:
     // 0x00468ca0 (gameobj.cpp); only the low bit of the argument is used.
@@ -49,7 +48,9 @@ public:
     virtual GameObject* SetRenderContext(void* value);
     virtual int UnknownVirtualSlot9(int value);
     virtual int Tick(float frameTime);
-    virtual int UnknownVirtualSlot11(int value);
+    // Physics overrides 0x0043ba70 and 0x004f9890 consume a float timestep;
+    // the shared base body 0x004da540 ignores its four-byte argument.
+    virtual int UnknownVirtualSlot11(float frameTime);
     virtual int PrepareGeometry();
     virtual int RenderPre3D();
     virtual int UnknownVirtualSlot14();
@@ -67,6 +68,7 @@ public:
     virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);
     virtual int AttachRenderContext(void* value);
     virtual void MarkPendingRelease();
+
 
     // 0x00469190: appends `child` (and its later siblings) to the children,
     // sets their parent and `child`'s +0x1c; returns `child`.
@@ -127,7 +129,10 @@ protected:
     GameObject* prevSibling;                  // +0x08 previous sibling
     GameObject* nextSibling;                  // +0x0c next sibling
     GameObject* firstChild;                   // +0x10 first child
+public:
+    // Shared hierarchy readers access the ancestor link; original access is unknown.
     GameObject* parent;                       // +0x14 parent
+protected:
     void* renderContext;                      // +0x18 set by SetRenderContext and AttachRenderContext (slots 8, 25); the render target the object draws with (cast to RenderTarget/PCRenderTarget by its users)
     int ownFlags;                             // +0x1c flags this object adds to its parent's childFlags (0x004690c0, 0x00469100)
     unsigned int childFlags;                  // +0x20 OR of the children's ownFlags and childFlags; gates slots 12-18 (0x00469100)
@@ -136,7 +141,10 @@ protected:
     // four low bits is VC6's bitfield code shape. Bit 0 enables the gated child
     // walks, bit 3 excludes a child from every walk; bit 2 is set by slot 16
     // and also excludes a child from slots 9 and 10.
+public:
+    // Read directly by non-member collision queries; original access is unknown.
     unsigned char isEnabled : 1;              // +0x25 bit 0: cleared by Disable (slot 4), set by Enable (slot 5)
+protected:
     unsigned char field_0x25_bit1 : 1;        // +0x25 bit 1: set and cleared with bit 0; gates OnNetworkMessage (slot 24)
     unsigned char isPaused : 1;               // +0x25 bit 2: stored by SetPaused (slot 16)
     unsigned char pendingRelease : 1;         // +0x25 bit 3: set by MarkPendingRelease (slot 26); ReleaseDetached releases the marked children

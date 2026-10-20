@@ -28,6 +28,19 @@ from mcm2tool.vc6_runtime import executable_command, runner_kind, windows_path
 def source_files(root: Path, spec: dict) -> list[Path]:
     sources = {p.resolve() for name in spec['source_roots']
                for p in (root / name).rglob('*.cpp')}
+    for candidate in spec.get('candidate_sources', []):
+        path = (root / candidate['path']).resolve()
+        try:
+            relative = path.relative_to(root.resolve())
+        except ValueError:
+            raise ValueError('candidate source escapes repository') from None
+        if (relative.parts[0] != 'samples' or path.suffix != '.cpp'
+                or not path.is_file()):
+            raise ValueError(f'candidate must name an existing samples C++ file: {relative}')
+        if (candidate.get('status') != 'reviewed-nonexact'
+                or not candidate.get('reason') or not candidate.get('evidence')):
+            raise ValueError(f'candidate lacks nonexact review evidence: {relative}')
+        sources.add(path)
     if not sources:
         raise ValueError('no C++ sources found')
     # Original source xrefs support alphabetical unit order. Relative paths
@@ -152,6 +165,7 @@ def build_game(vc6: Path, jobs: int, compile_only: bool = False) -> tuple[dict, 
         sources = source_files(ROOT, spec)
         includes = [ROOT / name for name in spec['includes']]
         report['profile'] = spec['profile']
+        report['candidate_sources'] = spec.get('candidate_sources', [])
         report['profile_sha256'] = sha256_file(ROOT / 'config/compile_profiles.json')
         report['headers'] = {p.relative_to(ROOT).as_posix(): sha256_file(p)
                              for p in sorted((ROOT / 'src').rglob('*'))

@@ -7,6 +7,10 @@
 #include <string.h>
 #include <typeinfo.h>
 
+// 0x0065b548: zero-filled retail storage. Every active iterator increments this
+// count, and exhaustion/Stop decrements it; mutation methods test it before work.
+int g_ActiveGameObjectIterators;
+
 // Object at owner(field_0x18)+0x04 used by slot 10: byte +0x70 bit 2 gates a
 // call to its virtual slot 4.
 class UnknownGameObjectOwnerPart {
@@ -335,7 +339,7 @@ void GameObject::AppendClassName(GameObject* object) {
 }
 
 // 0x004da540: shared by many classes (identical-code folding).
-int GameObject::UnknownVirtualSlot11(int) {
+int GameObject::UnknownVirtualSlot11(float) {
     return 1;
 }
 

@@ -312,7 +312,7 @@
   {
     "class": "Terrain",
     "source": "Terrain.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot19@Terrain",
+    "candidate_symbol_contains": "UnknownVirtualSlot19@Terrain",
     "target_va": "0x00507920",
     "target_size": 5,
     "expect": "exact",
@@ -762,7 +762,7 @@
   {
     "class": "Terrain",
     "source": "Terrain.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot14@Terrain@@",
+    "candidate_symbol_contains": "?UnknownVirtualSlot14@Terrain@@",
     "target_va": "0x00506220",
     "target_size": 3173,
     "expect": "exact",

@@ -41,7 +41,7 @@ D3DIMSoultreeShadow::D3DIMSoultreeShadow(int flags)
 D3DIMSoultreeShadow* D3DIMSoultreeShadow::Attach(int host, ShadowCaster* c, ProjectedShadow* s)
 {
     if (s) {
-        GameObject::SetRenderContext(host);
+        GameObject::SetRenderContext((void*)host);
         if (this) {
             shadow = s;
             s->AddReceiver(this);
@@ -221,7 +221,7 @@ public:
 // with the shadow texture, an identity world matrix and modulating texture stages; the address
 // mode and render state 4 are restored afterwards.  Format 0x613 textures also switch render
 // state 0x21 on around the draw.
-int D3DIMSoultreeShadow::GameObjectVirtualSlot14()
+int D3DIMSoultreeShadow::UnknownVirtualSlot14()
 {
     if (inCameraView && inShadowView && vertexCount) {
         ShadowMatrix world;

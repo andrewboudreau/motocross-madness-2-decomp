@@ -89,7 +89,7 @@
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?Tick@BaseQuarryEvent@@UAEHM@Z": "0x004de410",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
-  "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
+  "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@BaseQuarryEvent@@UAEHXZ": "0x004e14a0",
   "?RenderPre3D@GameObject@@UAEHXZ": "0x00469330",
   "?UnknownVirtualSlot14@BaseQuarryEvent@@UAEHXZ": "0x004de400",

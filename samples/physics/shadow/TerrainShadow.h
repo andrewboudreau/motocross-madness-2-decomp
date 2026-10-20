@@ -28,7 +28,7 @@ class TerrainShadow : public ShadowReceiver {
 public:
     explicit TerrainShadow(int flags);                                                  // 0x00508ae0
     TerrainShadow* Attach(int host, Terrain* terrain, ProjectedShadow* shadow);     // 0x00508b80
-    virtual int GameObjectVirtualSlot14();                                              // 0x0050a1a0 (render)
+    virtual int UnknownVirtualSlot14();                                              // 0x0050a1a0 (render)
     virtual int UnknownVirtualSlot27();                                                 // 0x00508bc0
     virtual int UnknownVirtualSlot28();                                                 // 0x005097d0
     virtual int UnknownVirtualSlot29();                                                 // 0x005099c0

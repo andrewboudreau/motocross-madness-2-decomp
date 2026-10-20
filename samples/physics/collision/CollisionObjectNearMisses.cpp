@@ -22,7 +22,7 @@ inline float CapsuleSegmentDot(const CollisionVec3& a, const CollisionVec3& b)
 // (+0x40) must lie within radius + boundRadius before the hull / model tests run.
 int Fn_00439600(CollisionVec3* ends, float radius, float radiusSq, CollisionObject* object)
 {
-    if (object->statusFlags & 1) {
+    if (object->isEnabled) {
         const CollisionVec3* center = (const CollisionVec3*)&object->field_0x34;
         CollisionVec3 d = ends[1] - ends[0];
         CollisionVec3 v = *center - ends[0];

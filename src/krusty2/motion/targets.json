@@ -1082,7 +1082,7 @@
   {
     "class": "CollisionCharacter",
     "source": "CollisionCharacter.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot14@CollisionCharacter@@$4PPPPPPPM@A@AEHXZ",
+    "candidate_symbol_contains": "UnknownVirtualSlot14@CollisionCharacter@@$4PPPPPPPM@A@AEHXZ",
     "target_va": "0x00431d90",
     "target_size": 8,
     "expect": "exact",
@@ -1092,7 +1092,7 @@
   {
     "class": "CollisionCharacter",
     "source": "CollisionCharacter.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot14@CollisionCharacter@@UAEHXZ",
+    "candidate_symbol_contains": "UnknownVirtualSlot14@CollisionCharacter@@UAEHXZ",
     "target_va": "0x00431cf0",
     "target_size": 21,
     "expect": "exact",

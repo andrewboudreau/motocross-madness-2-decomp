@@ -659,7 +659,7 @@ void CollisionObject::SyncTransformFromNode()
 int CheckKey(int code, int sub, void* event, int mask);
 
 // 0x00434970: debug-key handling for the collision-tree overlay, then the GameObject base.
-int CollisionObject::OnControlPress(int a, int b)
+int CollisionObject::OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b)
 {
     if (CheckKey(10, 0, (void*)a, 0x80)) {
         debugTreeDepth--;
@@ -1220,7 +1220,7 @@ struct CollisionCapsuleView {
 // shared transform for both ends retail's operand orders are out of reach (1054-1058).
 // The ring step is d / 10.0f: VC6 turns it into a multiply by the reciprocal constant
 // 0x005511cc, a separate pool entry from the literal 0.1f at 0x005507d0.
-int CollisionObject::GameObjectVirtualSlot14()
+int CollisionObject::UnknownVirtualSlot14()
 {
     ((CollisionDebugDevice*)renderContext)->UnknownVirtualSlot8(0x1b, 0, 0);
     ((CollisionDebugDevice*)renderContext)->UnknownVirtualSlot10(7, 0);
@@ -1273,7 +1273,7 @@ int CollisionObject::GameObjectVirtualSlot14()
         }
     }
     field_0x98 = 0;
-    return GameObject::GameObjectVirtualSlot14();
+    return GameObject::UnknownVirtualSlot14();
 }
 
 // 0x00432d30 (ret 0xc).  Draws one hull's trees; `mode` (1..7) picks the view.  Mode 4
@@ -1551,7 +1551,7 @@ int CollisionObject::TestAgainst(CollisionObject* other)
         return 0;
     if (other->collidable == 0)
         return 0;
-    if ((other->field_0x1c[9] & 1) == 0)
+    if ((other->isEnabled) == 0)
         return 0;
 
     // The partner list is re-read inside the loop (retail loads +0x78 after the count
@@ -2396,7 +2396,7 @@ void SetCollisionBoxResult(CollisionBoxResult* result)
 // case 2 in the dispatch (the second `dec ecx`).
 int SphereTouchesObject(const CollisionVec3* center, float radius, float radiusSq, CollisionObject* object)
 {
-    if (!(object->statusFlags & 1))
+    if (!(object->isEnabled))
         return 0;
     switch (object->shapeType) {
     case 0: {
@@ -2688,7 +2688,7 @@ static inline float SegmentPointDistance(const Vec3* p, const Vec3& center)
 int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, CollisionVec3* outPoint,
                          CollisionVec3* outNormal)
 {
-    if (object->statusFlags & 1) {
+    if (object->isEnabled) {
         const Vec3* p = (const Vec3*)ends;
         if (SegmentPointDistance(p, *(const Vec3*)&object->field_0x34) < object->boundRadius) {
             switch (object->shapeType) {

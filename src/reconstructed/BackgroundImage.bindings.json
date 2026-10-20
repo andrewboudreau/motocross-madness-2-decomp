@@ -29,7 +29,7 @@
   "?BlitTo@PCTextureMap@@QAEHPAXPAUUnknownSurfaceInterface@@0HH@Z": "0x004c7b00",
   "?CopyRectTo@PCTextureMap@@QAEHKKPAUUnknownSurfaceInterface@@PAUUnknownRect@@HPAE@Z": "0x004c7b40",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
-  "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
+  "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?RenderPre3D@BackgroundImage@@UAEHXZ": "0x00403dc0",
   "?UnknownVirtualSlot14@GameObject@@UAEHXZ": "0x00469360",

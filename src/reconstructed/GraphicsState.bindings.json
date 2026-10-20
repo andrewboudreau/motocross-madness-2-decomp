@@ -1,0 +1,14 @@
+{
+  "?g_DefaultNearPlane@@3MB": "0x00550f6c",
+  "?g_DefaultFarPlane@@3MB": "0x00550f70",
+  "?g_BladeDeviceGuid@@3UUnknownGuid@@B": "0x00556040",
+  "?g_GammaRamp@@3PAY0BAA@GA": "0x00570570",
+  "?g_DebugCountTextureMemory@@3HA": "0x00689964",
+  "?g_SharedMipTextureSurfaces@@3PAPAUUnknownSurfaceInterface@@A": "0x0068a36c",
+  "?g_SharedTextureSurfaces@@3PAPAUUnknownSurfaceInterface@@A": "0x0068a394",
+  "?g_Displays@@3PAPAUUnknownDisplay@@A": "0x0068a754",
+  "?g_DisplayCount@@3HA": "0x0068a764",
+  "?g_NonBladeLodSettings@@3PAUSoultreeLodSetting@@A": "0x00574428",
+  "?g_BladeLodSettings@@3PAUSoultreeLodSetting@@A": "0x005744c8",
+  "?g_ActiveLodSettings@@3PAUSoultreeLodSetting@@A": "0x00689f18"
+}

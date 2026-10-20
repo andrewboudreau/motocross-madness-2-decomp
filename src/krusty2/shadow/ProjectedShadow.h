@@ -256,12 +256,12 @@ class ShadowReceiver : public GameObject {
 public:
     explicit ShadowReceiver(int flags) : GameObject(flags) {}
     virtual ~ShadowReceiver() {}
-    virtual GameObject* SetRenderContext(int a)
+    virtual GameObject* SetRenderContext(void* a)
     {
         GameObject::SetRenderContext(a);
         return this;
     }
-    virtual int GameObjectVirtualSlot14() { return 1; }
+    virtual int UnknownVirtualSlot14() { return 1; }
     virtual int UnknownVirtualSlot27() { return 1; }
     virtual int UnknownVirtualSlot28() { return 0; }
     virtual int UnknownVirtualSlot29() { return 1; }

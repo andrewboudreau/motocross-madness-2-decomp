@@ -17,6 +17,10 @@
 int g_AppActive = 1;
 HWND g_MainWindow;
 int g_MainWindowShown;
+// Confirmed initialized DWORD at 0x0056e270, read by WinMainBody. Its
+// original defining translation unit is unproven; keep the source provider
+// beside the startup check rather than infer ownership from data adjacency.
+unsigned long g_RequiredDXVersion = 0x700;
 
 // Copies at most 127 characters of `src` into the 128-byte `dst` and ends it.
 #define COPY_NAME(dst, src)                \

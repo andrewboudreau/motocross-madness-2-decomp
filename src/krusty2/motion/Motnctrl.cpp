@@ -350,7 +350,7 @@ Character::Character(int a)
 // 0x004a6910: GameObject slot 8's body on the virtual base; the second argument is unused.
 void Character::SetCharacterRenderContext(int renderContext, int unused)
 {
-    GameObject::SetRenderContext(renderContext);
+    GameObject::SetRenderContext((void*)renderContext);
 }
 
 // owner: bracket only (Character slot 1, contiguous with the Motnctrl.cpp methods)
