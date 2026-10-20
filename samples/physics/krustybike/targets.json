@@ -36,7 +36,7 @@
     "target_va": "0x00493660",
     "target_size": 8545,
     "expect": "partial",
-    "notes": "remote-bike network update; 23.5% bytes, aligned instruction ratio 0.88 with the retail frame 0x58 and slots; remaining: 1-in-ebp/0-in-edi allocation from the second SetAxesPtr call on, limitSq store before the AllowWarping test (a named lim or limitSq *= limitSq stores the sum and re-squares after the branch, 22.89%), velocity y/z fmul operand order, pose lerp c-b recompute",
+    "notes": "remote-bike network update; 2305/8545 strict, candidate 8558 B, aligned 2183 instructions (77 differing) with the retail frame 0x58 and slots. Session 14e: the pose-param and lean lerps subtract the member read (c - interpSource->poseParam), so VC6 negates d in place and recomputes c - b as retail does; that also gives retail's constant registers (1 in ebp from the second SetAxesPtr call, 0 in edi up to the pose section, no zero register in the tail; aligned 2052 -> 2183, strict 2688 -> 2305 because the candidate is now 13 bytes long instead of 79 short). Left: the c byte is widened through its stack home (12 of the 13 bytes); the no-local, const-reference and both-member-read lerp forms widen in registers but return the old allocation (aligned 2090, 2035, 2070). Earlier remaining items: limitSq store before the AllowWarping test (a named lim or limitSq *= limitSq stores the sum and re-squares after the branch, 22.89%), velocity y/z fmul operand order, pose lerp c-b recompute",
     "bindings": "KrustyBikeNearMisses.bindings.json"
   },
   {
