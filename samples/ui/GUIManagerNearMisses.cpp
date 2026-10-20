@@ -60,6 +60,11 @@
 //   (6-18/52): `owner = 0; if (device) owner = ...` with nested tests, a
 //   `result` or `same` local, `return owner == this;` after a zero test, a
 //   nested ternary and a `while (owner)` wrapper.
+//   Session 14, all threaded (6-17/52): `if (owner) { if (owner != this)
+//   return 0; return 1; }` before the store block, `if (!owner) {...} else
+//   if (owner != this) return 0;`, a `result` local over if/else, and
+//   `owner && owner != this` followed by a second `if (!owner)` store block
+//   (the duplicated test that matches 0x004705d0 does not help here).
 
 #include "../../src/reconstructed/GUIManager.cpp"
 
