@@ -924,3 +924,8 @@ try on similar code. None is a rule.
   and spills it to a temporary before the clamp compare. That is `VehSmooth(s, target,
   dt)` returning the new value. With `(s, dt, target)` the target stays on the stack and
   `dt` is loaded after it (225 to 211 differing instructions).
+- **A non-virtual call loads its object last unless it is a local.** VisibilityQuadTree
+  Traverse `0x0052d610`: `((Node*)children[i])->Traverse(...)` pushes every argument and
+  then loads `ecx`. Retail loads `children[i]` first and interleaves it with the pushes, which
+  `Node* child = (Node*)children[i]; return child->Traverse(...);` reproduces (358 to 23
+  differing instructions). Virtual calls already load the object first.
