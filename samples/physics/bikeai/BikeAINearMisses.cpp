@@ -37,8 +37,14 @@
 // seg.y before t (retail t first; z already loads t first, seg.z having an older x87
 // leaf from `n.x = seg.z`; operand order, the y/z store order, the step declaration's
 // position, a dead `seg.y = 0` after the segment differences and component-wise
-// segment differences do not change it) and the slots of the segment / perpendicular
-// temporaries (retail +0x30/+0x50, candidate +0x3c/+0x38).  The walk's two segment
+// segment differences do not change it) and frame slots.  One perpendicular `n` at the
+// enclosing scope serves both intersection blocks and the final shift, which puts it at
+// retail's +0x14 (block-local `n`s in the two blocks: 1865; hoisting one of them: 1872;
+// all three as one: 1884).  Left in the frame: retail pairs `seg` with `step` at +0x20
+// and the segment difference temporary with `target` at +0x2c; here `seg` shares
+// `target`'s slot and the temporary takes +0x20, with `step` alone at +0x38 (hoisting
+// `step`, `target` or `dist`, block-local segments and n/seg declaration order are
+// inert or lose a byte).  The walk's two segment
 // lengths use BikeAISegmentLength, as 0x0040d200 does: its `(x*x)` parentheses issue
 // the named copy's z store after the z*z product like retail (BikeAILength issues it
 // before the first faddp; `(y*y)` parentheses do the same as `(x*x)`, `(z*z)`, a flat
@@ -193,9 +199,9 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         float t;
         float offset;
         Vec3 seg;
+        Vec3 n;
         if (nearest > 0) {
             seg = path->points[nearest] - path->points[nearest - 1];
-            Vec3 n;
             n.x = seg.z;
             n.y = 0.0f;
             n.z = -seg.x;
@@ -211,7 +217,6 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         }
         if (nearest < path->count - 1) {
             seg = path->points[nearest + 1] - path->points[nearest];
-            Vec3 n;
             n.x = seg.z;
             n.y = 0.0f;
             n.z = -seg.x;
@@ -242,7 +247,6 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
                 len = BikeAISegmentLength(seg);
             }
         }
-        Vec3 n;
         n.x = seg.z;
         n.y = 0.0f;
         n.z = -seg.x;
