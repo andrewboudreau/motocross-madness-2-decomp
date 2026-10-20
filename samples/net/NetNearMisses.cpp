@@ -26,6 +26,12 @@
 // Also unchanged or worse: `value` reused as `last`, an inverted head test
 // (326), a `NetMessage* base` local (83), `++index >= 0x100`, a split
 // increment with `== 0x100` (360) and an `== 0xff` reset (318/372).
+// Session 14: `messages + index`, `&(messages[index])` and `(int*)(..)`
+// spellings keep 361. `&MessageAt(messages, offset)` for the pointer with
+// `message->from` (or a reference) gives retail's ebx/ebp and the system
+// pushes but forms the pointer with `mov; add` (368 bytes, 3 code diffs);
+// testing `MessageAt(messages, offset).from` instead gives retail's
+// load+lea with the ebx/ebp swap (197), with or without the system local.
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
