@@ -346,7 +346,9 @@ static inline CollisionVec3 TireScaleCopy(const CollisionVec3& v, float s)
 // (1571), a named lever or projection local (1575), a pointer or reference alias of
 // the lever member (767), a TireScaleCopy that copies all three components or none (1548..1555),
 // the d-path dot through a helper with copied or swapped x operands (1575..1582),
-// a named scaled vector or the TireSum operands swapped.
+// a named scaled vector or the TireSum operands swapped, or any parenthesisation of the
+// six products of either cross (64 forms each through a local helper; only the
+// unparenthesised form keeps 1588).
 void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, CollisionVec3 ref,
                               float minLength, float* outValue, int* outSign)
 {
