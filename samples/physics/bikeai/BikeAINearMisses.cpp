@@ -34,7 +34,9 @@
 // the slots of the segment / perpendicular temporaries (retail +0x30/+0x50, candidate
 // +0x3c/+0x38) and of the walk direction.  Declaration order of the Vec3 locals does
 // not change VC6's frame (all 24 permutations tried); declaring bestT before best
-// fixed the immediate store of bestT = 0.
+// fixed the immediate store of bestT = 0.  Also inert on the slots (session 14): a
+// per-block `seg`, a `seg` reference alias and splitting the walk direction's
+// declaration from its first assignment.
 //
 // The inline length helper used here has the same body as the out-of-line copy at
 // 0x00413190 (matched in the canonical file as a plain function).  Retail's
@@ -59,7 +61,9 @@
 // length blocks and an inline `*outPush += BikeAIVec3Call(...)` instead of the named
 // step (32-variant sweep: function-scope `p` 6051, function-scope outPoint
 // temporary worse, the others identical).
-// 0..17 dead initialised int locals at the top change nothing.
+// 0..17 dead initialised int locals at the top change nothing; nor do the single-value
+// `Vec3(0.0f)` zero (same z, y, x stores as the chained form) or block versus function
+// scope for the `p` and the operator temporaries' named copies (session 14).
 // Source forms that mattered: unsigned char type-id statics with an unsigned compare
 // (`mov bl, 0xff`), the max/min helpers with by-value arguments (two spellings,
 // see BikeAIMaxR), the squared distance and k dot product grouped z + ((x) + y)
@@ -1443,6 +1447,8 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 // VehicleSpeedState::UpdateThrottle's third parameter as bool (retail pushes eax unmasked),
 // the x/y-grouped dot product, dot(normal, forward) in both AI branches, and
 // `(controlInput.y + 1) + 1` through a named temporary (one expression folds to + 2.0).
+// Not kept: `Vec3(0.0f)` zero temporaries (2033 strict but 27 differing instructions
+// against 17).
 //
 // 0x00414370 (4802 bytes): block order, calls and constants match (1279 vs 1302
 // instructions).  Retail's race-kind test lays out the default (free-roam) block first,

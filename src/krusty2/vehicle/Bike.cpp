@@ -89,6 +89,8 @@ float BikeVec3Dot(const Vec3& a, const Vec3& b);
 // integrator steerTorque; the integrator's length, signed by that axis, is the angle fed to
 // the steer state unless the limit (0.785 rad) is reached, in which case the angle is
 // clamped and the integrator reversed.  Returns the normalised projection.
+// Near miss (447/2272 strict): declaring spin, d or lenSq at function scope leaves the frame
+// and the 144 differing instructions unchanged.
 float Bike::Method_0x0040a520()
 {
     Vec3 push;
