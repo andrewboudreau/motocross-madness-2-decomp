@@ -46,6 +46,19 @@ at least two *counted* uses:
   and compares or tests. With `*dc = 0; *a = 0;` plus displaced stores,
   only the displaced stores count. Pushes inside a loop do not count
   either.
+- Not counted, and not served by the register even when it exists: stores
+  to locals the optimizer keeps in memory. Three cases were probed:
+  - a scalar whose address escapes to a call (`gp(&i)`);
+  - a local struct passed by address (`Vector3 zero(0.0f, 0.0f, 0.0f);
+    Length(zero)`);
+  - a float scalar local (`float best = 0.0f`).
+
+  Only the address-escape case matters for the call threshold. An escaped
+  `i` with `i = 1` and one member store of 1 stays immediate where a
+  register `i` (or a spilled one) caches.
+- Still counted: an int array local indexed in place (`loc[1] = 0;`),
+  `volatile` locals, and the home slot of a register local that was
+  spilled.
 
 Constant 1 behaves exactly like 0. Retail also caches -1 (`or ebp,
 0xffffffff` in CubeDraw `0x0043dc60`), but that case was not probed.
@@ -129,6 +142,13 @@ value in one function:
     that path. The reorders of `surface`'s initialisation (declaration
     initialiser, before or between the `*dc`/`*a` clears) leave the
     caching in place.
+  - Diagnostic only, not a source candidate: letting `&surface` escape to
+    a call on a dead path makes both zero stores immediate, as in retail.
+    It also drives `surface` fully into memory (masked 108 to 375/606,
+    but 692 bytes instead of 678). Retail keeps a final register piece
+    (`mov edi, [esp + 8]` at the join and `edi` after the `ReleaseDc` call),
+    so retail's `surface` is not address-escaped. The search for the second
+    counted store stays open.
 - EcoSystem ReadEst `0x00457480`: the index row's direction is VC6
   caching 1 in `edi` and retail storing immediates, not the reverse.
   - The two counted stores are `method = 1` (`[esi + 0x30]`) and `i = 1`
@@ -142,6 +162,12 @@ value in one function:
     change it. Collecting the branch value in a local (`m = 1 / 2; s->b =
     m;`) removes the cache but moves the store out of the branches, which
     is not retail's shape.
+  - Diagnostic only: letting `&i` escape on a dead path makes `method = 1`
+    immediate, as in retail, but it moves `this` to `ebx` and retail
+    passes `i` by value everywhere, so retail's `i` is not address-escaped
+    either. A loop-scoped `int i` is a register variable in the probes, and
+    the 1 is coalesced into it. Retail reloads `i` from `[esp + 0x18]` on
+    every use.
   - So both "bracketing" rows are the same direction (VC6 over-caches with
     two counted stores and an already-pushed register). Neither is solved.
 - Griddraw DrawVisibleBlock `0x00480ad0`: retail's `xor eax, eax` at the
@@ -154,7 +180,18 @@ value in one function:
     top initialiser) gives retail's esi/edi roles: 14 instead of 28
     differing instructions. It is one byte short (60/438 strict, offsets
     shift), and the zero stays in the branch.
-  - No form found yet. Variants are in `work/s14/cz/gd/`.
+  - The missing byte is a scheduling change, not a zero encoding. In the
+    `block != 0` arm, the in-branch form loads `vertexStart` after `lea
+    esi, [esi + edx*4]` as `movsx eax, word ptr [esi - 0xc]` (no SIB, 4
+    bytes). Retail loads it before the `lea` as `movsx eax, word ptr
+    [esi + edx*4 - 0xc]` (5 bytes).
+  - The in-branch form also holds `ranges` in `eax` with `test eax, eax`,
+    because no zero lives at the top. Both effects come from the zero web
+    starting inside the branch.
+  - Reordering the four `block != 0` assignments or adding a `prev` pointer
+    does not restore the order: 374 and 378 of 438 with 19 and 16 diffs.
+  - Swapping the arms and `block == vertexStart` compares do not help
+    either. No form found yet. Variants are in `work/s14/cz/gd/`.
 - Griddraw RebuildBlockBuffers `0x0047f210` and CubeDraw BuildFaceGeometry
   `0x0043dc60`: both functions allocate the constant as retail does. The
   rows differ in which register it gets (`esi`/`edi` swapped with a pointer
@@ -166,6 +203,19 @@ value in one function:
   (`[esp + 0x84]` inside the pushes) that the candidate makes after the
   call into another slot. The register is the same, so this row is store
   placement and frame layout, not caching.
+- D3DIMSoulTree UpdateMaterialTexelRatios `0x00440810`: both have the
+  entry zero register `ebx`. The `best = 0.0f` and `Vector3 zero` stores
+  stay immediate in both, as the memory-local rule predicts.
+  - The candidate's extra `xor esi, esi` / `mov [esp + 0x20], esi` is a
+    separate face counter (frame 0x84 vs 0x80). Retail starts the face
+    offset from the zero register (`mov esi, ebx`) and steps `ebx` by 6.
+  - So this is an induction-variable difference, not constant caching.
+- PCTextureMap Clone `0x004c71c0`: the 1 is cached in both. Retail puts
+  it in `ebx` and a pointer in `ebp`; VC6 here swaps them, which is web
+  priority. The candidate is 590 bytes against retail's 538, so the extent
+  has to be fixed first.
+- GridNode `0x00484d70`: its `xor ecx, ecx ; mov cx, ...` is the
+  zero-extension idiom for an unsigned short load, not a cached constant.
 - KrustyBike `0x00493660`: the choice is function wide (a diagnostic early
   `return` moves even the entry zero register to `ebx`). See the
   KrustyBike near-miss sample header.
