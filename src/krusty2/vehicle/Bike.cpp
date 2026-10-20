@@ -769,12 +769,11 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     ((Vec3*)field_0xfc)->z = 1.0f / (riderMk * wh2);
     float wheelMass = baseWeight * 0.05f;
     wheelMass = wheelMass * 0.0310559f;
-    float wheelMk = wheelMass * (1.0f / 12.0f);
     float r = frontWheel->wheelRadius * 2.0f;
     float r2 = r * r;
-    steerTorqueGains.x = 1.0f / ((r2 + h2) * wheelMk);
-    steerTorqueGains.y = 1.0f / ((w2 + r2) * wheelMk);
-    steerTorqueGains.z = 1.0f / (wheelMk * wh2);
+    steerTorqueGains.x = 1.0f / ((r2 + h2) * (wheelMass * (1.0f / 12.0f)));
+    steerTorqueGains.y = 1.0f / ((w2 + r2) * (wheelMass * (1.0f / 12.0f)));
+    steerTorqueGains.z = 1.0f / ((wheelMass * (1.0f / 12.0f)) * wh2);
     UnknownVirtualSlot43();
 
     bodyForward = forward;

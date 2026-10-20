@@ -1027,3 +1027,12 @@ try on similar code. None is a rule.
   breaks) gives retail's order and the same instructions otherwise. Changing Math3D.h's
   CrossProduct to that spelling loses five exact physics functions, so it is a per-site
   choice (`PlacementCross` in the sample).
+- **A factor repeated in several rows becomes one spilled common subexpression.**
+  Bike::LoadBike (`0x004079c0`, 5268 to 6224 of 6745): retail computes the wheel mass
+  (`baseWeight * 0.05f * 0.0310559f`) into a register, then the diameter square (spilled to
+  a frame home), and only then the `* (1.0f / 12.0f)` factor, stored once with `fstp` and
+  read by the three gain rows. Writing `(wheelMass * (1.0f / 12.0f))` in every row gives
+  that order; a named `wheelMk` computed before or after the diameter does not (VC6
+  computes a named factor at its statement, and moves the whole mass product after the
+  diameter when the statement follows it). The factor's home also joins the wheelPos/rider
+  factor slot, which put the loop spills back into retail's frame order.
