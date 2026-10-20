@@ -65,9 +65,16 @@
 // - BoxCapsuleOverlap 0x00425900 (4314 bytes, 4237 here): first draft with the decoded
 //   structure (box axes, axes crossed with the segment direction, three corner directions).
 //   The segment transform, the midpoint/half-segment constructor calls and the box-axis tests
-//   match; the inline budget differs from retail from the fifth normalisation on (retail
-//   calls DotProduct in all seven, and both squared-corner constructors), and the sums of the
-//   projected radii are accumulated in another x87 order.
+//   match.  The corner distances as six float locals (retail keeps the first corner's on
+//   the x87 stack and stores the second's) squared through QuerySquares bring the instruction
+//   stream in line with retail's (normalised diff 1552 -> 377 instructions; the seventh
+//   normalisation then calls operator* as retail does).  Left: retail calls DotProduct in the
+//   fifth to seventh normalisations and both squared-corner constructors (VC6 here expands
+//   them: retail spent more inline budget), and in each separating-axis test retail sums the
+//   three projected radii before the segment's half-length projection (as `(r = ...) + D`
+//   would) and orders the z axis's dot product (0 + 0) + l.z * hz.  A projected-radius inline
+//   helper (4430+ bytes) or DotProduct for both the mid and the half-segment projections
+//   (4543) spends too much budget.
 #include "bvh/BoundingBoxTreeQuery.h"
 
 // The unit's file statics (bound to the same addresses as in the src file).
@@ -145,6 +152,12 @@ inline Vec3 Vec3NormalizeInline(const Vec3& v)
     return v * inv;
 }
 
+// Component-wise squares of the corner distances (BoxCapsuleOverlap).
+inline Vec3 QuerySquares(float x, float y, float z)
+{
+    return Vec3(x * x, y * y, z * z);
+}
+
 // 0x00425900.  Box (center, halfExtents) against a capsule (segment ends[0]..ends[1] moved
 // by the inverse of xf, radius): the box axes, the three axes crossed with the normalised
 // segment direction, then for the xy, xz and yz planes the direction towards the corner
@@ -184,12 +197,14 @@ int BoxCapsuleOverlap(const Vec3* center, const Vec3* halfExtents, const Vec3* e
     if (QueryAbs(l.z * mid.z + (l.x * mid.x + l.y * mid.y)) > QueryAbs(DotProduct(l, a[0])) + QueryAbs(DotProduct(l, a[1])) + QueryAbs(DotProduct(l, a[2])) +
                                          QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
         return 0;
-    Vec3 c0(QueryAbs(halfExtents->x) - QueryAbs(p0.x), QueryAbs(halfExtents->y) - QueryAbs(p0.y),
-            QueryAbs(halfExtents->z) - QueryAbs(p0.z));
-    Vec3 c1(QueryAbs(halfExtents->x) - QueryAbs(p1.x), QueryAbs(halfExtents->y) - QueryAbs(p1.y),
-            QueryAbs(halfExtents->z) - QueryAbs(p1.z));
-    Vec3 s0 = Vec3(c0.x * c0.x, c0.y * c0.y, c0.z * c0.z);
-    Vec3 s1 = Vec3(c1.x * c1.x, c1.y * c1.y, c1.z * c1.z);
+    float c0x = QueryAbs(halfExtents->x) - QueryAbs(p0.x);
+    float c0y = QueryAbs(halfExtents->y) - QueryAbs(p0.y);
+    float c0z = QueryAbs(halfExtents->z) - QueryAbs(p0.z);
+    float c1x = QueryAbs(halfExtents->x) - QueryAbs(p1.x);
+    float c1y = QueryAbs(halfExtents->y) - QueryAbs(p1.y);
+    float c1z = QueryAbs(halfExtents->z) - QueryAbs(p1.z);
+    Vec3 s0 = QuerySquares(c0x, c0y, c0z);
+    Vec3 s1 = QuerySquares(c1x, c1y, c1z);
     Vec3 w;
     if (s0.x + s0.y < s1.x + s1.y) {
         w.x = p0.x < 0.0f ? -s0.x : s0.x;
