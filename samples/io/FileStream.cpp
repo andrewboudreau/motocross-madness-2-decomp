@@ -357,8 +357,12 @@ static inline int PutHeader(UnknownTextureStream* stream)
 
 // 0x00461b90: writes the header and seeds the key from the file name (name plus
 // extension). Near miss (90%): the loop body matches with the name byte in a
-// temporary; retail stores the 0xfa seed inside the inlined strcat and sets up
-// the name pointer right after strlen, where VC6 here schedules both later.
+// temporary. Seeding the key after `p = name` sets up the name pointer right
+// after strlen as retail does (seeding before strlen hoists the pointer into
+// the strlen); retail still stores the 0xfa seed inside the inlined strcat,
+// where VC6 here stores it before the loop. Seeding before strcat or before
+// _splitpath moves the store to the start of the strcat or ahead of the call;
+// `name[i]`, a count-down loop and `length` in the for-init are no closer.
 int UnknownTextureStream::WriteHeader(const char* path)
 {
     char drive[_MAX_DRIVE];
@@ -374,9 +378,9 @@ int UnknownTextureStream::WriteHeader(const char* path)
     stream->headerSize = 4;
     _splitpath(path, drive, directory, name, extension);
     strcat(name, extension);
-    stream->textMode = (char)0xfa;
     int length = strlen(name);
     char* p = name;
+    stream->textMode = (char)0xfa;
     for (int i = 0; i < length; i++) {
         char c = *p++;
         stream->textMode = ((stream->textMode + 3) ^ c) + stream->textMode;
