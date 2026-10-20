@@ -59,6 +59,13 @@ calibration-vc6: ensure-work
 status:
 	PYTHONPATH=. $(PYTHON) tools/status.py
 
+.PHONY: game game-compile
+game:
+	$(PYTHON) tools/build_game.py $(if $(VC6_ROOT),--vc6-root "$(VC6_ROOT)",)
+
+game-compile:
+	$(PYTHON) tools/build_game.py --compile-only $(if $(VC6_ROOT),--vc6-root "$(VC6_ROOT)",)
+
 progress:
 	PYTHONPATH=. $(PYTHON) tools/decompilation_progress.py
 
