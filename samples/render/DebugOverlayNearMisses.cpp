@@ -24,6 +24,10 @@
 // via goto, `return (int)handle`, an else arm for the Release block, the
 // GDI section in its own scope or behind `if (handle)`. A returned
 // variable (not a constant) keeps one epilogue but loads it from a register.
+// Early-failure forms (s14, the ConnectUsingLobby lever): the GetDC and
+// ReleaseDC failures as their own `return 0` with the tail written
+// `if (!Create) return 0; return 1;`, `if (Create) return 1; return 0;` or
+// `?:` give 33, and also testing a loaded texture first gives 43.
 //
 #include <windows.h>
 #include <string.h>

@@ -1,14 +1,22 @@
 // Near-miss CacheTexture candidates, kept out of src/reconstructed until they
 // match. See docs/TEXTUREMAPMANAGER.md.
 //
-// CacheTexture::CopyMipLevels (0x005102d0, 558 bytes): blits the
-// occupant's mip levels into its region. Everything lines up except that
-// retail places the shared `return 0` block between the second loop and the
-// overlay check (its loop ends `jle; jmp top`); VC6 here puts it after the
-// final returns. The halvings are written sourceSide, side, levelWidth,
-// left, right, top, bottom (the best of all 5040 orders, 450 -> 462 of
-// 558, which matches retail's loads); what is left is the jump targets
-// and the loop end.
+// CacheTexture::CopyMipLevels (0x005102d0, 558 bytes; ours 569): blits the
+// occupant's mip levels into its region. Retail places the shared `return 0`
+// block between the second loop and the overlay check (its loop ends
+// `jle; jmp top`). Both failures as one early-failure test after the loops
+// (the Blt result kept in `result` and `break`, then `if (result) return 0;`
+// in place of the else arm) gives that block order: 16 -> 5 differing
+// instructions (s14). Left: VC6 keeps `result` in a frame slot and tests
+// it again at the loop's normal exit, where retail jumps straight to the
+// overlay check. Unchanged at 5: `(result = Blt) != 0`, `int result`,
+// `!= 0`. Worse: a separate Blt variable (16-17), `!result` in the loop
+// condition (38-57), the early test without the Blt in `result` (16), the
+// first loop returning directly (18). The tries below were made on the
+// earlier form with the Blt `return 0` in the loop (16 diffs). The
+// halvings are written sourceSide, side, levelWidth, left, right, top,
+// bottom (the best of all 5040 orders, 450 -> 462 of 558, which matches
+// retail's loads).
 // Tried (s14, 450 at the old shift order): the Blt failure as `break`
 // (the else's `return 0` still goes last), the else without braces,
 // `goto failed` with `failed:` placed right after the loop and the
@@ -79,8 +87,9 @@ int CacheTexture::CopyMipLevels(UnknownTextureRegion* region, int level) {
     }
     if (!result) {
         while (sourceSide > 0) {
-            if (destination->Blt(&rect, source, 0, 0x1000000, 0))
-                return 0;
+            result = destination->Blt(&rect, source, 0, 0x1000000, 0);
+            if (result)
+                break;
             ownerGroup->texelsBlitted += (rect.bottom - rect.top) * (rect.right - rect.left);
             long sourceResult = source->GetAttachedSurface(&caps, &nextSource);
             long destinationResult = destination->GetAttachedSurface(&caps, &nextDestination);
@@ -96,9 +105,9 @@ int CacheTexture::CopyMipLevels(UnknownTextureRegion* region, int level) {
             rect.top >>= 1;
             rect.bottom >>= 1;
         }
-    } else {
-        return 0;
     }
+    if (result)
+        return 0;
     if (g_TrackGame->display->partialTextureUploadResult > 0)
         Upload(&whole, -1);
     else

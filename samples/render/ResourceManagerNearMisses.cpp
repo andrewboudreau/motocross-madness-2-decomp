@@ -26,6 +26,18 @@
 // 6). Also inert (s14 batch 3): the loop's `new ResourceItem` through an
 // `item` local, and a `result` declared at the top and assigned from
 // `archive` before the success return.
+// EH tables (confirmed, tools/eh_funcinfo.py): retail FuncInfo 0x005632f8
+// has 2 unwind states, both to -1 (funclets 0x0054daa0 deleting [ebp-0x10],
+// the line-212 `new`, and 0x0054dab7 deleting [ebp+8], the line-261 `new`
+// homed in the `path` slot) and no try blocks; ours is the same, funclets
+// included. A `try { } catch (...) { delete archive; throw; }` round the
+// body gives 4 states and 1 try block, and a holder local with a destructor
+// gives 3 states, so neither is the retail source.
+// Early-failure forms (the ConnectUsingLobby lever): the Open failure
+// and the RS2 header failure as separate early `delete archive; return 0`
+// tests give 60 (11 with `if (archive)`), and one combined early test gives
+// 8. Ours already has retail's two failure tails (`test ebx; je; jmp` and
+// `test ebx; je`), so the nested form stays.
 
 #include "../../src/reconstructed/ResourceManager.cpp"
 

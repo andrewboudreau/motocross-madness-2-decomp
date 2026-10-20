@@ -47,7 +47,9 @@
 //   490 base): `if (!target) {loop} else render = target` (77), `render !=
 //   target` or plain `!target` before each delete (65-85), `*value = 0`
 //   after the `render` declaration, `render = target` as the initialiser;
-//   none puts `target` in a register.
+//   none puts `target` in a register. Early-failure forms (s14, 70 base):
+//   the CreateSurface failure tested first, with its delete and a goto to
+//   `failed` (67, retail's block order lost) or its own `return 0` (94).
 // float MeanTextureChannelDifference (0x004cb330, 628 bytes): register allocation
 //   (retail: ebp = first, esi/edi = pixel pointers) and the x87 sequence for
 //   the three channel sums (retail keeps the green difference on the stack

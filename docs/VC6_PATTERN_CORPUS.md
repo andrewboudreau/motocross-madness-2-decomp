@@ -19,6 +19,8 @@ Counts are of functions whose retail bytes contain the shape at least once.
 | by-value push, source word loaded before `sub esp, 0xc` | 37 | 22 |
 | by-value push, `sub esp, 0xc` before the first load | 51 | 26 |
 | a load hoisted above the first branch, unused before it | 31 | 5 |
+| x87 `fld st(0) ; fop m` (section 6) | 112 | 63 |
+| x87 `fld m ; fop st(1)` (section 6) | 68 | 52 |
 
 ## 1. A compare against a zero register
 
@@ -91,8 +93,11 @@ the end.
 CacheTexture::CopyMipLevels `0x005102d0` (render) has the exit first, and
 retail does not copy its head. Its guarded do-while forms place the exit as
 retail does, but they copy the head (294 of 586). The `while` form keeps 462
-of 558. The construct that places the exit after the loop without copying
-the head is not known yet.
+of 558. Testing both failures once after the loops (the `Blt` result in
+`result`, `break`, then `if (result) return 0;`) places the exit after the
+loop without copying the head (5 differing instructions). It also keeps
+`result` in a frame slot and tests it at the loop's normal exit, which
+retail does not.
 
 ## 3. A load hoisted above the first branch
 
@@ -157,6 +162,158 @@ follows a call's stack cleanup. Load-first examples:
 - BikeRace::UpdateTrackSeparation `0x0041d1e0` (`lea eax, [esi + 0xf8] ; sub esp, 0xc`);
 - LightEmitter::SetPosition `0x0049e150`.
 
+## 6. x87 operand form: `fld st(0) ; fop m` or `fld m ; fop st(1)`
+
+A value on the x87 stack that is used more than once is combined with a
+memory operand in one of two ways. Both take two instructions and leave the
+value below the result:
+- dup form: `fld st(0) ; fmul m` (the copy is duplicated, memory is the operand);
+- load form: `fld m ; fmul st(1)` (memory is loaded, the stack value is the operand).
+
+In the exact functions of the 2026-10-20 gates (calibration 2969, physics
+1072, 4019 functions), with the operand kind of the memory word:
+
+| form | functions | sites | commutative op: frame / indirect / global |
+|---|---|---|---|
+| dup `fld st(0) ; fop m` | 112 | 292 | 77 / 189 / 16 |
+| load `fld m ; fop st(1)` | 68 | 165 | 112 / 2 / 2 |
+| `fld st(N)`, N >= 1 | 103 | 304 | |
+| `fxch` | 47 | 122 | |
+
+"Frame" is an `esp`/`ebp` slot: a local, or a field of a local struct or of
+a by-value parameter. The load form is almost always a frame word (112 of
+116 commutative sites). The four others are a constant, a global and two
+products in ManagedTextureGroup::DrawSelection.
+
+**Rules (VC6 SP3 `vc6_o2_mt` probes; `work/s14/x87/p1.cpp` to `pd.cpp`):**
+1. Written operand order never matters for a stack value against memory:
+   `t * a->x` and `a->x * t`, and `v->x *= t`, `v->x = v->x * t` and
+   `v->x = t * v->x`, compile the same.
+2. A named float local against an indirect word (`p->x`, `this->m`) or a
+   global takes the dup form for each use. The last use consumes the value
+   (`fmul m` with no duplicate).
+3. A named float local against a frame word takes the load form for each
+   use. The local is then popped with `fstp st(0)`, or the last product
+   keeps it when it feeds a further sum. This includes an inline helper's
+   by-value float parameter (`Scale(d, a * b)`) and a call result
+   (`float s = Ext(a)`).
+4. A repeated expression with no named local (`d.x * (a * b)` three times)
+   takes the dup form even against frame words.
+5. An assignment expression as the operand (`v.x *= (s = e)`) takes the
+   dup form for that use only. Later uses of `s` follow rule 3:
+   `fld st(0) ; fmul x`, then `fld y ; fmul st(1)`, `fld z ; fmul st(1)`,
+   `fstp st(0)`.
+6. A frame word that the function stores to directly at an earlier point
+   in the source becomes an ordinary memory operand: the dup form, against
+   a named local. The store does not have to reach the use. A store in the
+   other arm of an `if`, or on an early-return path, also counts.
+   - Stores after the use do not count. Stores through a pointer
+     (`V* p = &d; p->x = ...`, or an inline helper taking `&d`) do not count.
+   - The store made by the use's own statement (`d.x *= s`) does not count.
+   - In the probes this changes only the stored component: storing `d.y`
+     in the other arm gives the dup form for `y` and keeps the load form
+     for `x` and `z`.
+7. A non-commutative op with the stack value on the right (`v.x -= s`)
+   always takes `fld m ; fsub st(1)` and ends with `fstp st(0)`. With the
+   stack value on the left (`s - v.x`), it takes the dup form `fsub m`.
+
+**Two memory operands (`fld a ; fmul b` or `fld b ; fmul a`):**
+- A frame word against an indirect word: the frame word is loaded first, in
+  either written order.
+- Two indirect words, or a global against an indirect word: the order is
+  fixed whatever the written order. Even the declaration order of pointer
+  locals does not move it. A larger field offset on the same base loads
+  first. Otherwise the probes do not determine the order: two parameter
+  pointers load `p` first, but two member pointers load `b` first.
+- Two frame words that are never stored to (fields of one by-value struct,
+  or two by-value parameters): written order decides. The right operand is
+  loaded and the left one is the memory operand.
+- Two frame words where one is stored to earlier (as in rule 6): the
+  word that is never stored to is loaded first, in either written order.
+- Inside longer sums of products the written order of each product had no
+  effect in the cases tried (SoultreeBounds `0x004fd340`: 14 diffs either way).
+
+The probes are direct observations of VC6 output; applying them to other
+shapes is strong inference. The 77 frame dup sites in exact functions
+include rule-6 cases such as ObjectPicker::PickAt `0x004b066f`, where
+`direction` is stored component by component before it is scaled.
+SafeNormalize `0x0040d1b0` (dup on a by-value parameter after a call) is not
+explained by these rules.
+
+**Near misses where a form is the remaining difference** (ranked hunks of
+the 2026-10-20 ranking, `work/s14/x87/nearmiss.py`):
+
+| form | lane | row | hunks of that form / all |
+|---|---|---|---|
+| ours dup, retail load | render | VehicleCamera slot 35 `0x0052c510` | 1 / 1 |
+| | shell | Krusty3DObjects `0x0048b100` | 4 / 102 |
+| | shell | CarProcedural `0x0042fd80` | 1 / 138 |
+| ours load, retail dup | body | Vehicle slot 74 `0x005281b0` | 1 / 3 |
+| two memory operands swapped, frame and frame | body | SoultreeTransform `0x004fd710` | 1 / 1 |
+| | body | SoultreeBounds `0x004fd340` | 4 / 6 |
+| | body | GraphicsTest `0x0047bd10` | 9 / 16 |
+| | body | SoultreeMatrix `0x004fb8c0` | 2 / 37 |
+| | rider | Tire `0x00515880` | 2 / 4 |
+| | rider | BikeAI `0x0040e510` | 2 / 23 |
+| | rider | Bike `0x0040a520` | 6 / 67 |
+| two memory operands swapped, frame and indirect | body | SoulTreePhysics `0x00501600` | 1 / 13 |
+| two memory operands swapped, indirect | render | MatrixUtil `0x004a1a50` | 1 / 1 |
+| | render | Griddraw `0x0047e600` | 2 / 2 |
+| | render | MorphBastard `0x004a33b0` | 2 / 61 |
+| | body | Vehicle `0x005286a0` | 2 / 7 |
+| | body | SoulTreePhysics `0x00501e90` | 1 / 9 |
+| | body | Vehicle `0x005265d0` | 2 / 16 |
+| | body | SoulTreePhysics `0x00500220` | 2 / 31 |
+| | body | CollisionObject `0x00435830` | 3 / 58 |
+| | rider | Motnctrl `0x004a7fd0` | 3 / 3 |
+| | rider | Tire `0x00514550` | 1 / 18 |
+| | rider | Bike `0x0040c000` | 1 / 40 |
+| | rider | ContactImpulse `0x005004a0` | 2 / 71 |
+| `fxch` only | body | BoundingBoxTreeQuery `0x00425900` | 6 / 161 |
+| | rider | Bike `0x0040c000` | 1 / 40 |
+| `fld st(N)` against a reload | body | Vehicle `0x00527a20` | 1 / 17 |
+
+Rows whose remaining hunks are all x87 (operand form or scheduling):
+- body: `0x004fd710`, `0x005281b0`, `0x0040b410`, `0x004fd340`,
+  `0x00436720`, `0x00436e50`, `0x00446c30`;
+- render: `0x0052c510`, `0x00456890`, `0x004a1a50`, `0x0047e600`, `0x00443aa0`;
+- rider: `0x00504d30`, `0x00515880`, `0x004a7fd0`;
+- shell: `0x00516ef0`.
+
+Across all ranked rows, 295 hunks are x87 instructions moved past other code
+(such as `fcom` placed after `fst ; fld st(0)` in Vehicle slot 74), 1427
+are other x87 differences and 7418 are not x87.
+
+Leads from the rules:
+- **Vehicle slot 74.** The `u = t * s` after the `s` clamp has retail's
+  rule-5 shape. The form below takes the row from 4 to 2 differing
+  instructions; the two left are the `fcom` placement:
+
+  ```
+  u.x = t.x * (s = (s < 1.0f) ? s : 1.0f);
+  u.y = t.y * s;
+  u.z = t.z * s;
+  ```
+
+  `t * (s < 1 ? s : 1)` without the assignment, `VehScale(t, s)` and a
+  component-wise form all stay at 4.
+- **VehicleCamera slot 35.** The `reach` x product follows rule 6. Our
+  range branches store `direction.x` directly in both arms, so `reach`
+  takes the dup form; retail takes the load form.
+  - Retail has the load form in the first arm (`!= 6`) and the dup form in
+    the second, with a shared `fstp` tail.
+  - Scaling x through a pointer helper in both arms gives retail's `reach`.
+    The second arm then loads x too and merges with the first (4
+    differing instructions).
+  - A pointer helper in the first arm only gives 6; in the second arm only,
+    2 with `reach` still in the dup form.
+  - Retail needs a dup form in the second arm without a direct x store
+    that `reach` sees, which no tried spelling gives.
+- **SoultreeTransform `0x004fd710`.** The two memory operands are frame
+  words. Rule 6 predicts the earlier finding that a store to `m._11` gives
+  209/209: retail's `m._11` has a direct store, such as a transpose or
+  copy that writes every element.
+
 ## Reproduction
 
 The scan is an untracked script (`work/s14/corpus/scan.py` in the render
@@ -165,4 +322,7 @@ outputs (`tools/run_calibration.py`, `tools/run_physics_samples.py
 --json-out`) and the near-miss index with capstone, and matches the shapes
 above instruction by instruction. To build a probe, compile a small `.cpp`
 with `tools/compile.py --compiler vc6 --profile vc6_o2_mt` and disassemble
-the object's function symbols.
+the object's function symbols. The x87 study scripts are
+`work/s14/x87/scan.py` (form counts), `lines.py` (maps exact-function sites
+to source lines through the `/Z7` COFF line numbers) and `nearmiss.py`
+(classifies the ranked near-miss hunks); they are untracked work scripts.

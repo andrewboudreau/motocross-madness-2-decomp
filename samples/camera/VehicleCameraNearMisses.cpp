@@ -17,6 +17,12 @@
 // `fld x; fmul st(1)`. The written order of either branch's x product, the
 // reach expression's spelling (operator*, friend operator*, component-wise,
 // a named product) and inline vs named scale/range temporaries do not fix it.
+// Mechanism (VC6_PATTERN_CORPUS section 6, rule 6): the direct direction.x
+// stores in the range branches make x a memory operand at reach. Scaling x
+// through a pointer helper in both branches gives retail's reach, but the
+// second branch (retail's dup form) then loads x too and merges with the
+// first (4 diffs). Pointer in the first branch only: 6; in the second only: 2,
+// reach still dup.
 // `a` is tested as a byte (FollowCamera.h declares it unsigned char).
 #include "../../src/reconstructed/VehicleCamera.h"
 
