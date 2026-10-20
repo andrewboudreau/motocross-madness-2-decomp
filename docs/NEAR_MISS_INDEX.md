@@ -215,7 +215,7 @@ retail does; grouping the x row's first two products does the same for that row.
 | render/MorphBastardModifier | `0x004a4c60` | 185/1570 | c | object/channel loop registers: retail keeps the object offset in esi, reloads the index from +0x28 and keeps the channel in ebp |
 | render/Overlay | `0x004b6710` | 63/361 | b | retail keeps `whole` and the byte count on the stack (6 slots), the destination in ebp and the row count in eax; VC6 keeps `whole` in edi, the byte count in ebp and the destination and row count on the stack |
 | render/PCTextureMap | `0x004c69c0` | 429/894 (masked) | c | 31 code diffs: `jne @390` vs `jne A`; `jne @120` vs `jne @116 ; lea edx, [esp + N]` |
-| render/PCTextureMap | `0x004c71c0` | 286/538 (masked) | c | 27 code diffs: `mov ebp, 1` vs `mov ebx, 1`; `and eax, ebp` vs `and eax, ebx` |
+| render/PCTextureMap | `0x004c71c0` | 286/538 (masked) | c | retail extent 600 (538 is the masked comparable count), candidate 590; 43 code diffs, all in the 8-bit colour-key block: retail builds the key in edx with ebx as the byte scratch and loads the vtable late; the ebx/ebp swap of the cached 1 and the pointer |
 | render/PCTextureMap | `0x004c7b40` | 257/767 | b | rect read in retail order; the row pointers swap esi/ecx in the loop nest |
 | render/PCVideoCard | `0x004ca520` | 26/124 | c | 13 code diffs: `mov ebx, [esp + N]` vs `push ebp`; retail adds `mov ebp, [ecx + 0x74]` |
 | render/PCVideoCard | `0x004ca5a0` | 66/490 | c | retail keeps `target` in ebp outside the mode loop and 480 in ebp inside it; VC6 here never pushes ebp |
