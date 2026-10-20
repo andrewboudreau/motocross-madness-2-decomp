@@ -396,7 +396,7 @@
     "target_va": "0x00436720",
     "target_size": 962,
     "expect": "partial",
-    "notes": "932/962: inline 0x42a4b0/0x42a450/0x42a510 forms, matrix read directly or through xf per retail leaf order, products-first scale; same size, frame and registers; two rotation rows sum in another order",
+    "notes": "936/962: inline 0x42a4b0/0x42a450/0x42a510 forms, matrix read directly or through xf per retail leaf order, scratch loop rows grouped (x + z first), products-first scale; same size, frame and registers; the second forward rotation's x row sums in another order",
     "bindings": "CollisionObject.bindings.json"
   },
   {
