@@ -110,10 +110,17 @@
 // ghost and AI racers, the collision pairing and the 10 EH states); 194 of
 // retail's 195 calls in the same order (call-sequence ratio 0.967: retail
 // keeps one more stream destructor tail and lays the failure tail out
-// between the AI loops). Instruction ratio 0.747 with esp offsets
-// normalised: retail's 0xab0-byte frame orders the locals differently from
-// this candidate's 0xac4 (register choice follows), so only 1380 of 13322
-// positions match.
+// between the AI loops). The frame is retail's 0xab0 bytes and every buffer
+// from 0xcc up sits at retail's offset except bikeFile/riderFile (swapped;
+// 20 and 21 accesses each). Three retail facts fixed it: the 0x40-byte own
+// texture names are function-scope (they never share with the network
+// block's), `ranking` is function-scope, and the `used` memset (rep stosd at
+// 0x41a456) sits inside the multiplayer block. UnknownRandomSkill takes
+// `const float&` because retail reads base and range from memory after the
+// rand() calls (fmul [ebp+0x94]; by-value parameters are copied to temps).
+// The small scalars below 0xcc still order differently and retail's 0x2c
+// (the operator-new temp), 0x44 (fromEvent and the network k counter) and
+// 0x4c (the spilled stream) have no counterpart, so 1848 of 13428 bytes match.
 
 #include "../../src/reconstructed/BikeRace.cpp"
 
@@ -919,7 +926,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
 
 // A racer's skill: `base` moved up or down by at most `range`, closer to
 // `base` more often.
-static inline float UnknownRandomSkill(float base, float range) {
+static inline float UnknownRandomSkill(const float& base, const float& range) {
     float r = rand() * (1.0f / 32768.0f);
     float offset = (float)((1.0 - exp(-r * r)) * range);
     if (rand() * (1.0f / 32768.0f) > 0.5f)
@@ -937,8 +944,11 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
     char bikeTexture[0x40];
     char riderTexture[0x40];
     char name[0x10];
+    char ownBikeTexture[0x40];
+    char ownRiderTexture[0x40];
     char empty[0x104];
     int order[11];
+    int ranking[11];
     Vector3 position;
     Vector3 direction;
     UnknownBikeRaceBikeSetup setup;
@@ -978,7 +988,6 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
     }
     if (g_TrackGame->playingReplay || g_TrackGame->playerCount == 1) {
         if (g_TrackGame->mode.raceSettings.raceMode == 2) {
-            int ranking[11];
             RankByPoints(ranking);
             for (int i = 0; i < racerCount; i++) {
                 for (int j = 0; j < racerCount; j++) {
@@ -1036,11 +1045,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                                            g_TrackGame->mode.brakeGyro, particleManager, raceScene,
                                            replayVcr, 0, !(circuit->careerFlags & 2));
         AppendChild(localRacer, -1);
-        char ownBikeTexture[0x40];
         g_TrackGame->ui->ResolveBikeFile(circuit->racers[0].bikeName, ownBikeTexture, 0x3f);
         localRacer->modelNode->ReplaceMaterialTexture(0, ownBikeTexture, (int)textures);
         if (!(circuit->careerFlags & 2)) {
-            char ownRiderTexture[0x40];
             g_TrackGame->ui->ResolveRiderFile(circuit->racers[0].riderModel, ownRiderTexture,
                                                              0x3f);
             localRacer->riderCharacter->modelNode->ReplaceMaterialTexture(0, ownRiderTexture, (int)textures);
@@ -1088,11 +1095,11 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         return 1;
     }
 
+    int used[8];
     if (!g_TrackGame->playingReplay && g_TrackGame->playerCount > 1) {
         racerSlots = new(__FILE__, 0x4a3) UnknownBikeRaceRacer*[racerCount];
+        memset(used, 0, sizeof(used));
     }
-    int used[8];
-    memset(used, 0, sizeof(used));
     g_TrackGame->ui->StepProgressBar();
     char ai = 0;
     int* bikes = (int*)DebugCalloc(racerCount, 4, __FILE__, 0x4af);
@@ -1101,8 +1108,6 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
     int plate;
     int engineSize;
     int fourStroke;
-    char ownRiderTexture[0x40];
-    char ownBikeTexture[0x40];
     if (g_TrackGame->playingReplay) {
         // A replay: the recorded player.
         char recordedBike[0x40];
