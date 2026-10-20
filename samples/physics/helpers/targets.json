@@ -128,7 +128,7 @@
     "target_va": "0x4fd1f0",
     "target_size": 334,
     "expect": "partial",
-    "notes": "partial 88.5%: final SetPosition lea/push of &p scheduled earlier than retail; z store slot differs. Retail builds both positions in the pushed temporary.",
+    "notes": "partial 88.5%: final SetPosition lea/push of &p scheduled earlier than retail; z store slot differs. Retail builds both positions in the pushed temporary. Session 14: redundant brackets on any subset of the y and z rows' products (63 forms) do not move the &p push (9 to 25 differing lines).",
     "bindings": "SoultreeRotate.bindings.json"
   },
   {

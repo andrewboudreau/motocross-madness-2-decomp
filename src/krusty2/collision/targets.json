@@ -86,7 +86,7 @@
     "target_va": "0x00432260",
     "target_size": 458,
     "expect": "partial",
-    "notes": "96.2%: t1=m1*inv(m2), t2=m1*inv(m3), out=CollisionRelativeTransform; inverse p.y sum order fixed; remaining diff is one store-schedule move Session 14: all eight parenthesisations of the second inverse's p.x products (through a separate helper): unchanged or worse.",
+    "notes": "96.2%: t1=m1*inv(m2), t2=m1*inv(m3), out=CollisionRelativeTransform; inverse p.y sum order fixed; remaining diff is one store-schedule move Session 14: all eight parenthesisations of the second inverse's p.x products (through a separate helper): unchanged or worse. Session 14: brackets on any subset of p.x's products (with and without the inner sum bracket) or of p.y's or p.z's in a separate helper for the second copy leave the mov [esp+0x30], eax store where it is.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -396,7 +396,7 @@
     "target_va": "0x00436720",
     "target_size": 962,
     "expect": "partial",
-    "notes": "936/962: inline 0x42a4b0/0x42a450/0x42a510 forms, matrix read directly or through xf per retail leaf order, scratch loop rows grouped (x + z first), products-first scale; same size, frame and registers; the second forward rotation's x row sums in another order",
+    "notes": "936/962: inline 0x42a4b0/0x42a450/0x42a510 forms, matrix read directly or through xf per retail leaf order, scratch loop rows grouped (x + z first), products-first scale; same size, frame and registers; the second forward rotation's x row sums in another order; Session 14: bracketing the x row's products of CollisionRotateRowsTo (15 subsets and groupings) changes the inlined code shape (890 bytes)",
     "bindings": "CollisionObject.bindings.json"
   },
   {

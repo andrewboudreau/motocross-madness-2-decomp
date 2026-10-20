@@ -96,7 +96,7 @@
     "target_va": "0x0043ad80",
     "target_size": 615,
     "expect": "partial",
-    "notes": "Near miss (CollisionPoint.cpp extent). Body, both paths and the owner reload match; The if/else with one trailing return lets VC6 delay the callee-saved pushes past the null-a1 return as retail does; a pointer local behind an if (count > 0) guard gives retail's loop header and counter home (604/615); left: one vector-copy store (w.y after the fstp of w.z).",
+    "notes": "Near miss (CollisionPoint.cpp extent). Body, both paths and the owner reload match; The if/else with one trailing return lets VC6 delay the callee-saved pushes past the null-a1 return as retail does; a pointer local behind an if (count > 0) guard gives retail's loop header and counter home (604/615); left: one vector-copy store (w.y after the fstp of w.z). Session 14: brackets around the operator product or the whole sum of w, (-k), and bracketed component-wise sums (which recompute -k) do not move the w.y store.",
     "bindings": "../../../src/krusty2/collision/CollisionPoint.bindings.json"
   },
   {
