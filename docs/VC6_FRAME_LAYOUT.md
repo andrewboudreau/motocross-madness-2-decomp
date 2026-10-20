@@ -321,6 +321,10 @@ exact:
   The same holds for a 12-byte vector: `RotateByRowsTo(&d, d, m)` (a by-value `Vec3 v` and an
   out pointer to `d`) copies `d` first, its first row still reading the original, as retail's
   SoultreeObject::GetMatrixIn `0x004fca80` does; a helper that returns the vector does not.
+- Small struct locals declared in a loop body put the first-declared one nearest esp, in any
+  declaration order; declared once in the enclosing block and assigned in the loops, the first
+  one lands farthest from esp, as in retail. Pixtrans Halve8 `0x004cee30`'s four 3-byte
+  palette-entry copies went from 1087 to 1129 of 1133 strict this way; scalars do not move.
 - A struct assigned from an inline-constructed value (`sum = Vec3(0, 0, 0)`, `dst = sum * s`
   with an operator that returns `Vec3(...)`) goes through a 12-byte temporary that copies
   field by field; `Vec3 sum(0, 0, 0)` or per-component stores build in place and leave that
