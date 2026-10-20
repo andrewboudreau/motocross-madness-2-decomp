@@ -204,7 +204,10 @@ void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 // strict but esi/edi exchanged, not kept).  Also no gain: a const Vec3& alias of a->axisZ or
 // b->axisZ (in the cross or in the test, 1069..1097), a Vec3 copy (188..198), a pointer alias
 // (1097), an inline PoseAxisDiffers test by reference or by value (23..130), or reordered or
-// swapped component comparisons in the axisZ test (1004..1006).
+// swapped component comparisons in the axisZ test (1004..1006).  Retail holds a in edi and b in
+// esi.  Nor from a PoseAxisRotation inline for either path or both (326..334 differing lines),
+// a cross wrapper (173), the axisZ test negated as `!(... == ... && ...)` (inert) or with
+// swapped operands (the test changes, the cross does not).
 void PoseRotation(CharacterPose* a, CharacterPose* b, Vec3* axis, float* angle)
 {
     if (a->axisY.x != b->axisY.x || a->axisY.y != b->axisY.y || a->axisY.z != b->axisY.z) {
