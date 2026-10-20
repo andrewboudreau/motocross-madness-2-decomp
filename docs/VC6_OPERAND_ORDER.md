@@ -971,3 +971,8 @@ try on similar code. None is a rule.
   inline transpose does not write. `m._11 = m._11;` at the end of the transpose emits
   nothing but creates that leaf later (section 1.2), and the function is exact.
   Self-stores of the matrix operands do not fix SoultreeBounds Scale (`0x004fd340`).
+- **A guarded pointer-local loop moves the loop counter's home.** SoultreeRefreshContacts
+  (`0x0043ad80`, 597 to 604 of 615): `for (; count > 0; count--, points++)` homes the
+  counter in a1's dead argument slot; retail uses points' slot and loads points after the
+  count test. `if (count > 0) { CollisionPoint** pp = points; for (; count > 0; count--,
+  pp++) ... }` gives both. Without the guard, the `pp = points` load moves above the test.

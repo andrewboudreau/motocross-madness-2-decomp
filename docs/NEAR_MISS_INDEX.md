@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 125, c 98, total 225. The three class (a) functions of the
+Counts: a 2, b 124, c 99, total 225. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -138,7 +138,7 @@ as retail does. When a product's untouched operand loads first, give it a store.
 | physics/bvh/BoundingBoxTreeQuery | `0x004280e0` | 453/2228 | b | inline BoxOverlap copy: one constructor still expanded and the recursion tails cross-jumped differently |
 | physics/bvh/BoundingBoxTreeQuery | `0x0042a640` | 41/1428 | b | retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80); cross-product operand order of the x term |
 | physics/collision/CollisionPoint | `0x0043aa30` | 820/845 | c | frame, blocks and the y, x, z accumulated squared normal length match (samples/physics/collision/CollisionPointNearMisses.cpp); sum * (1/merged) loads y component-first in retail, one push fstp scheduled later |
-| physics/collision/CollisionPoint | `0x0043ad80` | 597/615 | b | if/else with one exit gives retail's delayed pushes; one vector-copy store and the `points`/`frame` loads are swapped |
+| physics/collision/CollisionPoint | `0x0043ad80` | 604/615 | c | if/else with one exit gives retail's delayed pushes; a `pp` pointer local behind `if (count > 0)` gives the loop header and counter home; retail stores the copy's w.y after the fstp of w.z |
 | physics/constraint/ConstraintMethodCollisionModel | `0x0043bdb0` | 2499/2619 | c | ApplyContactImpulse, frame 0xb8, slot order and size match; termB's dot (ConDotGroupedY) and vA's cross (ConCrossGrouped) are grouped; left: scheduling of the LocalToWorldPoint and rl struct copies, one dword move, the `test edi` of `if (other)` and one fld/fmul order in termB's cross |
 | physics/contact/ContactImpulse | `0x005004a0` | 874/1062 | b | size and frame 0x60 exact (torque blocks at function scope, `(y*y') + x*x'`); torque cross loads r before n (leaf age; n aliases inert), one tail mov/push schedule |
 | physics/contact/ObjectPlacement | `0x004b0df0` | 3537/3971 | b | 2 differing instructions (two lea esi one slot apart); frame: only margin (0x28 vs 0x1c) after a function-scope `forward`; declaration order and margin forms inert |
