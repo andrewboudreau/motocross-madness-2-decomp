@@ -317,8 +317,9 @@ struct KbGame {
 extern KbGame* g_kbGame;
 // 0x004BFA80: millisecond clock (timeGetTime-based; tier 3).
 unsigned int ReadClock();
-// 0x004B5D00 (cdecl): forward/up axes from roll, pitch and yaw (tier 3 names).
-void OrientationAxesFromAngles(Vec3* forward, Vec3* up, float roll, float pitch, float yaw);
+// 0x004B5D00 (cdecl): forward/up axes from yaw, pitch and roll (tier 3 names; 0x00493660
+// pushes the message +0x14 angle last).
+void OrientationAxesFromAngles(Vec3* forward, Vec3* up, float yaw, float pitch, float roll);
 // 0x00460C70: 1/sqrt estimate (name from src/reconstructed/FastMath.bindings.json).
 float FastInvSqrtEstimate(float v);
 // Network smoothing settings 0x00493660 reads; 0x0048fc80 loads them from the game config.

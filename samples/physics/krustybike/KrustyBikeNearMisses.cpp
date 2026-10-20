@@ -218,6 +218,8 @@ static inline void KbSub(Vec3* out, const Vec3& a, const Vec3& b)
 // a copied local, `record != 0 ? record : 1`), per-copy inline helpers, `if (0) goto`,
 // dead statements, an explicit end return, `if (!record)` order and `goto deltas` forms
 // leave the home there.  So retail's end block was home at the merge; the cause is open.
+// One end call taking an `int arg` that each path sets (record, or 0 on the network
+// path) is worse: 30-127 differing instructions against 11.
 // Shapes that mattered: `KbSub` through an out-pointer keeps `diff` a 12-byte slot (the
 // operator form is scalar-replaced and repacks the frame); one `ping` next to `message`
 // overlays the dead `d` slots; the angular-velocity and angle limits are 2 pi, not 30;
@@ -388,6 +390,13 @@ static inline int KbWithinWarpBand(float dist2, float frame, float warp)
     return dist2 > frame * frame && dist2 < warp * warp;
 }
 
+// The same band for a change against a squared limit; dividing inside the helper (rather
+// than passing the quotient) keeps limitSq a stored local ahead of the AllowWarping test.
+static inline int KbWithinWarpBandOf(float dist2, float limitSq, float frame, float warp)
+{
+    return dist2 / limitSq > frame * frame && dist2 / limitSq < warp * warp;
+}
+
 // 0x00493660: the network update of a remote bike. Places the bike from the received
 // states (states[0] newest): either interpolating between the two states around the
 // current time (g_kbInterpolate) or extrapolating the newest one, with optional latency
@@ -395,29 +404,36 @@ static inline int KbWithinWarpBand(float dist2, float frame, float warp)
 // lap and crash flags of the state and runs the physics bookkeeping of a step.
 // `dt` is unused; `a` is set for the live game (lap and race fields are taken over).
 //
-// Partial (8545 bytes retail): the instruction streams align block for block with the
-// retail frame (0x58) and stack slots. What fixed the shape so far: 4-byte locals are
-// declared at function scope in retail slot order (ratio, dist2, len, reset) ahead of the
-// 12-byte vectors (step, delta, savedPos, localFwd, localUp); `float clock` hoists the
-// race clock read above the replay-mode test; `float ff = f * f` keeps VC6 from
-// refactoring `f*f*50 + len*f`; the named `scale` stays FPU resident across the three
-// `delta * scale` products; the pose clamps follow both modes; KB_ABS on a variable
-// gives the copying `jns; neg`; `states[0]->` is re-read after every call and store
-// (no `s` alias); the lap/pose flags are 1/0 if-else stores; the crash-flip test reads
-// bodyUp.y; `char m` keeps the motion compare byte sized.
+// Partial (8545 bytes retail; 2688 strict, 249 differing instructions): the frame (0x58)
+// and stack slots match retail (tools/frame_layout.py). What fixed the shape so far: 4-byte
+// locals are declared at function scope in retail slot order (ratio, dist2, len, reset)
+// ahead of the 12-byte vectors (step, delta, savedPos, localFwd, localUp); an `int k`
+// state index (not a `cur` pointer) gives retail's registers through the live-game
+// interval code; `float clock` hoists the race clock read above the replay-mode test;
+// dividing by limitSq inside KbWithinWarpBandOf stores limitSq before the AllowWarping
+// test as retail does; both orientation calls written in each branch (VC6 cross-jumps the
+// second, retail's single deferred `add esp, 0x28`), with the angles passed yaw, pitch,
+// roll (+0x1c pushed first); `float ff = f * f` keeps VC6 from refactoring
+// `f*f*50 + len*f`; the named `scale` stays FPU resident across the three `delta * scale`
+// products; the pose clamps follow both modes; KB_ABS on a variable gives the copying
+// `jns; neg`; `states[0]->` is re-read after every call and store (no alias); the
+// lap/pose flags are 1/0 if-else stores; the crash-flip test reads bodyUp.y; `char m`
+// keeps the motion compare byte sized.
 // Still different: retail keeps 1 in ebp from the second SetAxesPtr call on and 0 in edi
-// (candidate: 0 in ebp, 1 in ebx, and a zero register through the tail where retail
-// uses `test`/`push 0`), which also forces `c` through a stack byte; retail stores
-// `(len+50)*(len+50)` before the AllowWarping test (a named `lim` or `limitSq *= limitSq`
-// stores the unsquared sum instead and re-squares after the branch, 22.89% vs 23.46%);
-// the velocity y/z `fld s; fmul` order;
-// retail recomputes `c - b` for the pose lerps while the candidate reuses `d`. The
-// 100.0f here is 0x5505ec; 0x492670/0x492ad0 scale the message-1 pose bytes by 255.0f (0x551420),
-// which the bindings used to give the 100.0f key.
+// up to the pose section (candidate: 0 in ebp, 1 in ebx, and a zero register through the
+// tail where retail uses `test`/`push 0`), which also forces `c` through a stack byte.
+// Writing the rider placement in both orientation-save branches, extra `= 1` stores
+// before PlaceWheels, moving `movingForward = 1` or an int `settled` do not move it; a
+// probe third SetAxesPtr call removes the middle zero register and the tail then matches
+// (233). Also: the replay-branch entry registers (g/race in edx/ecx for retail's ecx/edx),
+// the Vec3 copy scheduling of the interpolated velocity and position, the velocity
+// AllowWarping load (`cmp mem` for retail's `mov eax`; a local, `!= 0` and an inline test
+// do not change it), the velocity y/z `fld s; fmul` order, and retail recomputing `c - b`
+// for the pose lerps while the candidate reuses `d`. The 100.0f here is 0x5505ec;
+// 0x492670/0x492ad0 scale the message-1 pose bytes by 255.0f (0x551420), which the
+// bindings used to give the 100.0f key.
 void KrustyBike::Fn_00493660(float dt, int a)
 {
-    KbBikeNetState* cur;
-    KbBikeNetState* s;
     Vec3 step;
     Vec3 delta;
     Vec3 savedPos;
@@ -433,8 +449,9 @@ void KrustyBike::Fn_00493660(float dt, int a)
     reset = 0;
     if (g_kbGame->frameTime <= 0.0f)
         return;
-    cur = states[g_kbGame->playingReplay ? 3 : 2];
-    if (cur->position.x != 0.0f && cur->position.y != 0.0f && cur->position.z != 0.0f) {
+    // the newest state that is old enough to be complete (3 in a replay)
+    int k = g_kbGame->playingReplay ? 3 : 2;
+    if (states[k]->position.x != 0.0f && states[k]->position.y != 0.0f && states[k]->position.z != 0.0f) {
         if (g_kbGame->playingReplay == 0 && g_kbGame->raceMode != 4) {
             if (lastTimeReceived != states[0]->timeReceived) {
                 lastTimeReceived = states[0]->timeReceived;
@@ -566,14 +583,10 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     delta = states[0]->velocity * stateIntervalElapsed + states[0]->position - position;
                 if (g_kbRateLimiting) {
                     dist2 = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
-                    // the position may move at speed + 50 per second; retail stores limitSq
-                    // before the AllowWarping test (fld st0; fmul st1; fstp; fstp st0), VC6
-                    // forward-substitutes it into the division. `float lim = len + 50; lim*lim`
-                    // and `limitSq = len + 50; limitSq *= limitSq` both store lim instead and
-                    // re-square it after the branch (22.89% vs 23.46%).
+                    // the position may move at speed + 50 per second
                     float limitSq = (len + 50.0f) * (len + 50.0f);
                     if (g_kbAllowWarping
-                        && !KbWithinWarpBand(dist2 / limitSq, g_kbGame->frameTime, g_kbWarpThreshold)) {
+                        && !KbWithinWarpBandOf(dist2, limitSq, g_kbGame->frameTime, g_kbWarpThreshold)) {
                         position += delta;
                     } else {
                         float ff = g_kbGame->frameTime * g_kbGame->frameTime;
@@ -593,13 +606,12 @@ void KrustyBike::Fn_00493660(float dt, int a)
 
         // orientation
         if (!g_kbInterpolate) {
-            OrientationAxesFromAngles(&bodyForward, &bodyUp, states[0]->roll, states[0]->pitch, states[0]->yaw);
-            s = states[1];
+            OrientationAxesFromAngles(&bodyForward, &bodyUp, states[0]->yaw, states[0]->pitch, states[0]->roll);
+            OrientationAxesFromAngles(&localFwd, &localUp, states[1]->yaw, states[1]->pitch, states[1]->roll);
         } else {
-            OrientationAxesFromAngles(&bodyForward, &bodyUp, interpTarget->roll, interpTarget->pitch, interpTarget->yaw);
-            s = interpSource;
+            OrientationAxesFromAngles(&bodyForward, &bodyUp, interpTarget->yaw, interpTarget->pitch, interpTarget->roll);
+            OrientationAxesFromAngles(&localFwd, &localUp, interpSource->yaw, interpSource->pitch, interpSource->roll);
         }
-        OrientationAxesFromAngles(&localFwd, &localUp, s->roll, s->pitch, s->yaw);
         if (!g_kbInterpolate) {
             if (g_kbLatencyHiding) {
                 if (g_kbUseLatencyThreshold && stateIntervalElapsed > g_kbLatencyThreshold) {
