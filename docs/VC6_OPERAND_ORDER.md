@@ -100,6 +100,10 @@ of a call (in `st(0)`):
   (`0x005135f0`) scales its slip vector through a helper that copies `v.x`
   and `v.y` into locals (`fld mem; fmul st(1)` for both, `fmul v.z` last);
   copying all three components or none gives the scalar-first form.
+  ManagedTextureGroup `0x0050ef70` needs a local for each member that must
+  load first: `u` for `width * u` and a per-axis `uScale` copy for
+  `(uScale + pageOffsetU) * width` (one shared `scale` local is CSEd and
+  breaks the frame).
   A freshly computed scalar is the newest leaf and is duplicated for the first
   product (`fld st(0); fmul v.x`): Tire's ApplyDrive (`0x00514170`, 560 to
   565) writes `r.x = a / b * v.x;` and then multiplies copies of `v.y` and

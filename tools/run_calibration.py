@@ -4135,6 +4135,15 @@ CASES = [
         'reason': 'negated float difference; descending address tie-break',
     },
     {
+        'name': 'ManagedTextureGroup debug selection display',
+        'bindings': 'src/reconstructed/ManagedTextureGroup.bindings.json',
+        'source': 'src/reconstructed/ManagedTextureGroup.cpp',
+        'symbol': '?DrawSelection@ManagedTextureGroup@@QAEHPAVPCRenderTarget@@@Z',
+        'target_va': '0x0050ef70',
+        'target_size': 1834,
+        'reason': 'block-scoped page tail, single exit, fresh outline locals as newer x87 leaves',
+    },
+    {
         'name': 'ManagedTextureGroup fit list 0x50d800',
         'bindings': 'src/reconstructed/ManagedTextureGroup.bindings.json',
         'source': 'src/reconstructed/ManagedTextureGroup.cpp',
