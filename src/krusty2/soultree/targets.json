@@ -196,7 +196,7 @@
     "target_va": "0x00501e90",
     "target_size": 483,
     "expect": "partial",
-    "notes": "33.97% under vc6_o2_ml (size 487 vs 483; the low % is mostly misalignment). Retail stores both field_0x68 copies directly to [esi+0x68..0x70] where VC6 emits lea + [reg]; a member-wise copy helper fixes the else branch (485 bytes, 34.8%) but constant-folds the zero branch, so it is not applied. The cross of field_0x38 x field_0x78 and *a1 += field_0x78 get different fmul/fadd operand loads (source permutations are canonicalised; the result changes only with unrelated edits).",
+    "notes": "169/483 strict, 487 B. SoultreeCrossCtor passed straight to WorldToLocalDirection reproduces the cross-product copy/push schedule. Remaining: retail stores both normalForce copies directly to [esi+0x68..0x70] where VC6 emits lea + [reg] (a by-reference member-wise helper fixes the else branch but constant-folds the zero branch); the x component loads leverArm first (retail frictionForce; written operand order is canonicalised) and *a2 += loads *a2 first.",
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {

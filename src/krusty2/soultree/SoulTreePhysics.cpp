@@ -478,8 +478,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot13(Vec3* a1, Vec3* a2, float a
         }
         c->UnknownVirtualSlot1();
         *a1 += c->frictionForce;
-        Vec3 cr = SoultreeCross(c->leverArm, c->frictionForce);
-        *a2 += sceneNode->WorldToLocalDirection(cr);
+        *a2 += sceneNode->WorldToLocalDirection(SoultreeCrossCtor(c->leverArm, c->frictionForce));
         if (c->contactState == 2) {
             *a2 *= a3;
             c->contactState = 0;
