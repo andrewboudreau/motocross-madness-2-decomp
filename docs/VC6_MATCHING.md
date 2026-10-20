@@ -440,7 +440,7 @@ or extra `xor reg, reg` zero register follows the number of zero stores; see
 [VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md). Callee-saved pushes ahead of an
 early guard follow the number of exits; see [VC6_SHRINK_WRAP](VC6_SHRINK_WRAP.md).
 Retail shapes looked up in exact functions (zero compares, loop bottoms,
-`sub esp` placement, by-value push order) are in
+`sub esp` placement, by-value push order, x87 operand forms) are in
 [VC6_PATTERN_CORPUS](VC6_PATTERN_CORPUS.md). Defer
 large routines until their callees, member layouts and smaller
 surrounding methods are represented. This keeps a
