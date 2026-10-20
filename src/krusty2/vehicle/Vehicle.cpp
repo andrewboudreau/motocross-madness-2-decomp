@@ -1258,9 +1258,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         scratchVector.x = rel.z * t.y - rel.y * t.z;
         scratchVector.y = rel.x * t.z - rel.z * t.x;
         scratchVector.z = rel.y * t.x - rel.x * t.y;
-        p.x = velocity.x + scratchVector.x;
-        p.y = velocity.y + scratchVector.y;
-        p.z = velocity.z + scratchVector.z;
+        p = velocity + scratchVector;
         UnknownVirtualSlot3(&((VehicleContactSet*)collisionObject)->contactNormal, &p, &rel, &s, b, 0, &l10);
     }
     if (prevSpeed < 0.001f && linearSpeed < 0.1f) {

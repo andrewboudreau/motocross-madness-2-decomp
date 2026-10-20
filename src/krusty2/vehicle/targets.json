@@ -616,7 +616,7 @@
     "target_va": "0x5268d0",
     "target_size": 1578,
     "expect": "partial",
-    "notes": "223/1578 strict (1530 B; ratio 0.59). Collision-response dispatch as a switch: cases 0/1 (event body), 0x66/0x6a (spark emitter: SetPosition 0x004b9dc0, launchVelocity +0x78 = (0, 12, 0), +0x60 = 1; was wrongly stored at +0x74 before), 0x69, 0x2711, 0x3e9, default returns without the tail. First divergence +0x35: hasBody is in ebp/otherVel in ebx in retail, swapped in ours; retail builds s=(1,1,1) through a struct temp.",
+    "notes": "394/1578 strict (1554 B). The else-branch sum p = velocity + scratchVector as a Math3D operator lifted 309 -> 394 (retail goes through a temp, then copies to p). Collision-response dispatch as a switch: cases 0/1 (event body), 0x66/0x6a (spark emitter: SetPosition 0x004b9dc0, launchVelocity +0x78 = (0, 12, 0), +0x60 = 1; was wrongly stored at +0x74 before), 0x69, 0x2711, 0x3e9, default returns without the tail. First divergence +0x35: hasBody is in ebp/otherVel in ebx in retail, swapped in ours; retail builds s=(1,1,1) through a struct temp.",
     "bindings": "Vehicle.bindings.json"
   },
   {
