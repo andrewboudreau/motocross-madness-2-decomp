@@ -59,12 +59,14 @@ static inline Vec3 TranslationOf(const Matrix4& m) { return Vec3(m._41, m._42, m
 // TU calls it instead of expanding the inline helper.
 
 // (y x z) written as retail orders it: the first vector's components are the left factors.
+// Bracketed products: unbracketed, VC6 stores the y/z copies before the r.y and r.z fsubp
+// where retail stores them after (Session 14).
 static inline Vec3 CrossOfYAndZ(const Vec3& z, const Vec3& y)
 {
     Vec3 r;
-    r.x = z.z * y.y - z.y * y.z;
-    r.y = z.x * y.z - z.z * y.x;
-    r.z = z.y * y.x - z.x * y.y;
+    r.x = (z.z * y.y) - (z.y * y.z);
+    r.y = (z.x * y.z) - (z.z * y.x);
+    r.z = (z.y * y.x) - (z.x * y.y);
     return r;
 }
 
@@ -80,7 +82,7 @@ static inline void RotateByRowsTo(Vec3* r, Vec3 v, const Matrix4& m)
 // 0x004fc050. Inverse of GetAxesIn: builds a rotation whose row 2 is *axisZ and row 1 is
 // *axisY (both given in 'frame' space), row 0 = cross(row1, row2), and stores it into
 // localMatrix, keeping the old local translation. See SoultreeObject.h for the data flow.
-// PARTIAL 1073/1171 (was 392): same instructions and length as retail once the row-0 cross
+// PARTIAL 1089/1171 (was 392): same instructions, order and length as retail once the row-0 cross
 // product goes through a named Vec3, the frame == this product passes localMatrix as a and m
 // as b (retail copies m into the last argument first), localMatrix is reached through a
 // pointer held across the parent branch and the delta is rotated into itself (GetMatrixIn's

@@ -981,3 +981,8 @@ try on similar code. None is a rule.
   counter in a1's dead argument slot; retail uses points' slot and loads points after the
   count test. `if (count > 0) { CollisionPoint** pp = points; for (; count > 0; count--,
   pp++) ... }` gives both. Without the guard, the `pp = points` load moves above the test.
+- **Bracketed products move integer stores past an fsubp.** SoultreeObject SetAxesIn
+  (`0x004fc050`, 1073 to 1089 of 1123 comparable): in the inline cross
+  `r.y = z.x * y.z - z.z * y.x` VC6 put the next dword copy store before the fsubp; retail
+  puts it after. `r.y = (z.x * y.z) - (z.z * y.x)` (any bracketing of the first product of the
+  y and z rows) gives retail's order; bracketing only the second products does not.
