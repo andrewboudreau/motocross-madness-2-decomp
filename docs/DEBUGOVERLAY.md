@@ -32,7 +32,8 @@ including the 748-byte text drawer `0x00448200` and slot 14.
 Shadow's data.
 
 Near miss (`samples/render/DebugOverlayNearMisses.cpp`): the GDI glyph
-builder `0x00447a00` (`LoadFont`), which differs in register assignment. The
+builder `0x00447a00` (`LoadFont`), whose body matches; only the return
+epilogues differ (VC6 copies the epilogue into the returns, retail shares one). The
 set-up `0x00447de0` matches once `i` is initialised before `y = e`.
 
 Not attributed: `0x00448560..0x00449e5f` has no source literal and no RTTI.
