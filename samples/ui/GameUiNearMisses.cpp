@@ -2,30 +2,6 @@
 // included below for its types and matched functions). Check: compile this
 // file and compare each function with GameUiNearMisses.bindings.json.
 //
-// 0x004705d0 UIControl slot 49 (91/101) and 0x004733a0 UIButton slot 49
-//   (85/99): the value loaded for each call lands in another register
-//   (retail: ecx/edx, VC6 here: edx/eax); an int SetFontColor, a local for the
-//   state, `if (enabled)` and the inverted branch order give the same bytes;
-//   so do an `enabled != enable` block, one colour local for both calls,
-//   inline wrappers for both calls, inline accessors for every operand (32
-//   combinations) and an int-returning slot 29/SetFontColor. An extra member
-//   copy in the first branch moves the second branch's registers, so the
-//   choice is function-wide. Swept with no gain (576 + 128 forms for
-//   UIControl, 64+ for UIButton): early return or one block, inverted
-//   branches, `!enable`, locals for the old state/savedState/currentState/
-//   currentTextColor/textColor/stateImages[4] (also as `UIAnim*`), `!= 0`
-//   image tests, parentheses on each operand and per-branch `enabled`
-//   stores. Retail UIControl and UIButton pick opposite registers for the
-//   same fragments, so the choice is an allocation tie-break. A
-//   `UIControl* self = this;` copy used for any subset of the 13 member
-//   accesses (120 of 8192 sampled with tools/sweep_variants.py) is folded
-//   away: every form gives 91. Also 91/85: casts on the colours and on
-//   `enabled` in the comparison (18 forms), template inline helpers taking
-//   `T*` (10), 1-8 extern ints or 1-5 forward structs declared before the
-//   functions (54), dead statements at the start of the function and of each
-//   branch (125), function order, and in a standalone TU every int/unsigned/
-//   long type for the states, `enabled` and the colours (char and short
-//   `enabled` are worse).
 // 0x00477e90 UIListBox slot 55 (322/342): an `int height` local for the
 //   first GetRowHeight call gives retail's ebx (point) and ebp (row offset);
 //   without it (155/344) the two are swapped. With the local, retail still
@@ -152,42 +128,6 @@
 #include "../../src/reconstructed/Palette8.h"
 #include "../../src/reconstructed/Parameterblocks.h"
 #include "../../src/reconstructed/Tgafile.h"
-
-// 0x004705d0
-void UIControl::SetEnabled(int enable) {
-    if (enabled == enable)
-        return;
-    enabled = enable;
-    if (enable) {
-        SetState(savedState);
-        SetFontColor(currentTextColor);
-    } else {
-        if (stateImages[4]) {
-            savedState = currentState;
-            SetState(4);
-        }
-        currentTextColor = textColor;
-        SetFontColor(0x999999);
-    }
-}
-
-// 0x004733a0
-void UIButton::SetEnabled(int enable) {
-    if (enabled == enable)
-        return;
-    enabled = enable;
-    if (enable) {
-        SetState(0);
-        SetFontColor(currentTextColor);
-    } else {
-        if (stateImages[4]) {
-            savedState = currentState;
-            SetState(4);
-        }
-        currentTextColor = textColor;
-        SetFontColor(0x999999);
-    }
-}
 
 // 0x00477e90
 int UIListBox::ButtonDown(int a, int b) {

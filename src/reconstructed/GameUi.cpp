@@ -118,6 +118,29 @@ int UIControl::GetHeight() {
     return screenArea[3] - screenArea[1];
 }
 
+// 0x004705d0: slot 49. Enabling restores the saved state and text colour;
+// disabling shows the disabled image (state 4) when there is one and greys
+// the text. The two `enable` tests are separate statements: VC6 threads the
+// second into the first, and only this form gives retail's registers (one
+// if/else block keeps the colour load in another register).
+void UIControl::SetEnabled(int enable) {
+    if (enabled == enable)
+        return;
+    enabled = enable;
+    if (enable) {
+        SetState(savedState);
+    } else if (stateImages[4]) {
+        savedState = currentState;
+        SetState(4);
+    }
+    if (enable) {
+        SetFontColor(currentTextColor);
+    } else {
+        currentTextColor = textColor;
+        SetFontColor(0x999999);
+    }
+}
+
 // 0x00470640
 void UIControl::RequestRedraw() {
     needsRedraw = 0;
@@ -385,6 +408,26 @@ void UIButton::SetDisabledImage(UIAnim* image) {
 // 0x00473390
 void UIButton::SetSortList(UIListBox* list) {
     sortList = list;
+}
+
+// 0x004733a0: slot 49, as UIControl's (0x004705d0) but enabling returns to
+// state 0; the same two `enable` tests.
+void UIButton::SetEnabled(int enable) {
+    if (enabled == enable)
+        return;
+    enabled = enable;
+    if (enable) {
+        SetState(0);
+    } else if (stateImages[4]) {
+        savedState = currentState;
+        SetState(4);
+    }
+    if (enable) {
+        SetFontColor(currentTextColor);
+    } else {
+        currentTextColor = textColor;
+        SetFontColor(0x999999);
+    }
 }
 
 // ---------------------------------------------------------------------------
