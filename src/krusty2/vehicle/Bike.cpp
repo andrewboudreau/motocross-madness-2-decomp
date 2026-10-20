@@ -95,12 +95,12 @@ float BikeVec3Dot(const Vec3& a, const Vec3& b);
 // The gain products are float locals gx/gy/gz, which VC6 keeps on the x87 stack while it
 // scales each by the stored k, and the increment is a named `delta` (retail's copy through
 // a temporary before the adds); `(len * stepTime) * sign` keeps retail's left-to-right
-// product. 1671 -> 2080 and retail's 2272 bytes.
+// product. 1671 -> 2080 and retail's 2272 bytes. In the left-contact-only arm `driven = 1`
+// comes before the subtraction (retail sets ebx ahead of the call), 2112.
 // Left: the return temporary of the out-of-line operators and base swap slots (retail base
 // 0x38, temporary 0x44), every cross product loads the multiplicand stored first (spin.x,
 // push.x) second where VC6 loads it first (all 64 operand orders of a local cross helper
-// compile the same), the `test al, al` of the airborne test and one `driven = 1` are
-// scheduled differently.
+// compile the same), and the `test al, al` of the airborne test is scheduled earlier.
 // Inert: the declaration order of push/base/torque/offset and len/result; push declared
 // per branch (1555); spin, d or lenSq at function scope.
 float Bike::Method_0x0040a520()
@@ -148,8 +148,8 @@ float Bike::Method_0x0040a520()
                 rightBarContact->state = 2;
             }
         } else if (leftBarContact->active) {
-            torque = BikeVec3Sub(leftBarContact->point, frontWheel->nodePosition);
             driven = 1;
+            torque = BikeVec3Sub(leftBarContact->point, frontWheel->nodePosition);
             const Vec3& axis = leftBarContact->axis;
             float d = BikeVec3Dot(torque, axis);
             if (d >= 0.0f)
