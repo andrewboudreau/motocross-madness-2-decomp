@@ -111,6 +111,10 @@ int KrustyBike::UnknownVirtualSlot70(float arg)
 // cross-jumped into the shared case 0/4 call; case 0 jumps to a call homed in case 4 in
 // retail (here case 4 jumps into case 0's).  `d != 0` first, a Vec3 ternary, `*a3 * inv`
 // and an inv local do not help (494-523).
+// Measured (s14g): a return per arm of the 2/3 normalise gives retail's arm layout (the zero
+// arm falls into the call, the invsqrt arm jumps back to it), but the call's register
+// choice then differs from case 4's tail, so it is not cross-jumped (1392 B; 271 aligned
+// instructions against 275, 341 strict against 523).
 int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* a5)
 {
     int flag;
