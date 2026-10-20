@@ -26,6 +26,12 @@
 // Also unchanged or worse: `value` reused as `last`, an inverted head test
 // (326), a `NetMessage* base` local (83), `++index >= 0x100`, a split
 // increment with `== 0x100` (360) and an `== 0xff` reset (318/372).
+// Testing `MessageAt(messages, offset).from` and taking the pointer inside
+// the `if` (or using no pointer) is identical to retail once registers are
+// masked (0 hunks, 139 aligned): only the ebx/ebp swap is left, so VC6 here
+// weights the index above the message web, where retail weights it below.
+// Pointer scope, `register`, const, a reference, per-use MessageAt and a
+// pointer shared with the 0x40 block do not change the weights.
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
