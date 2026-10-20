@@ -53,8 +53,7 @@
 //   read orders keep the fwrite tail at 136; the same for the encoded call
 //   (with a `char* key` local) gives 75.
 // - 0x00461340: retail loads the decoded position (+0x0c) once and keeps the next
-//   pointer in a different register; the `position` ternary, an explicit if/else
-//   and assigning position before the zero test all give the same or worse code.
+//   pointer in a different register (see the function's note).
 // - /G6 makes every one of these worse.
 
 #include <io.h>
@@ -145,15 +144,18 @@ static inline void RestartKey(UnknownTextureStream* stream)
 // 0x00461340: seeks to `offset` (origin as fseek). An encoded file cannot
 // fseek into the middle of its key stream, so with `flag` it rewinds (or keeps
 // the decoded position +0x0c) and decodes forward through a scratch buffer.
-// Near miss (286 of 702; candidate 705 bytes): the control flow and the inner
-// loop match, but retail keeps the next pointer and the zero in other registers
-// and swaps the origin/offset registers (ebp/ebx), so most instructions differ
-// by register. The 0x418-byte buffer reproduces retail's 0x41c-byte frame;
-// `result = 0` inside the loop reproduces retail's store (the source was likely
-// tail recursion). The decoded position (+0x0c) read once into `position` and
-// cleared when not below `offset` gives retail's load-compare-clear (201 with
-// the ternary, which reads +0x0c twice); retail also threads the SEEK_CUR
-// test into the clear, which VC6 here repeats. A `decoded` local (194), a
+// Near miss (300 of 652 masked; same 702 bytes): the control flow and the
+// inner loop match, but retail keeps the next pointer and the zero in other
+// registers and swaps the origin/offset registers (ebp/ebx), so most
+// instructions differ by register. The 0x418-byte buffer reproduces
+// retail's 0x41c-byte frame; `result = 0` inside the loop reproduces
+// retail's store (the source was likely tail recursion). Reading the
+// decoded position (+0x0c) inside the condition, with SEEK_CUR and a
+// position not below `offset` sharing one clear, gives retail's single
+// load and its SEEK_CUR branch threaded into the clear (705 -> 702 bytes,
+// 41 -> 32 hunks). Retail puts the position in ebx, which held `offset`,
+// and reloads `offset`; VC6 here uses edi. The nested-if form (286), the
+// ternary (201), an if/else on the position, a `decoded` local (194), a
 // `next` pointer for the chain walk (194), if/else-if origin checks (196 to
 // 208) and a goto past the decoded read (206) are worse.
 int UnknownTextureStream::Seek(int offset, int origin, int flag)
@@ -177,12 +179,9 @@ int UnknownTextureStream::Seek(int offset, int origin, int flag)
     if (stream->fileEncoded && flag) {
         if ((origin == SEEK_END && offset != 0) || (origin == SEEK_CUR && offset < 0))
             return 1;
-        int position = 0;
-        if (origin != SEEK_CUR) {
-            position = stream->keyStartOffset;
-            if (position >= offset)
-                position = 0;
-        }
+        int position;
+        if (origin == SEEK_CUR || (position = stream->keyStartOffset) >= offset)
+            position = 0;
         if (origin == SEEK_SET || origin == SEEK_END) {
             result = fseek(stream->fileHandle, stream->headerSize + position, SEEK_SET);
             if (result) {
