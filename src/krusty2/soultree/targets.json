@@ -1185,8 +1185,8 @@
     "candidate_symbol_contains": "?RunSteps@SoultreePhysicsBaseObject@@QAEXHHH@Z",
     "target_va": "0x00502f60",
     "target_size": 1921,
-    "expect": "partial",
-    "notes": "1366/1942; all calls, branches and x87 sequences in retail order; residue is stack-slot packing.",
+    "expect": "exact",
+    "notes": "sub-step loop; exact with the merge output o2 at loop scope (frame sharing: respawn b/c pair with touching o3/o1, a with the integration temporary).",
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {

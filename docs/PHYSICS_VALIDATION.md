@@ -467,22 +467,19 @@ Strict exact under `vc6_o2_ml` with `SoulTreePhysics.bindings.json`:
   `.col` file object with `new(SP_FILE, 0x84e/0x8cd)`, and retail pushes this TU's
   `__FILE__` string `0x00574320` at `0x00503b13`/`0x00503f87`, so they belong here and
   bind strictly through `__FILE__:soultreephysics.cpp`.
-
-Still partial in SoulTreePhysics.cpp:
-
-- The sub-step loop `RunSteps` `0x00502f60` (1921 bytes) is now written out:
-  1804/1930 bytes, every instruction in retail order (speed clamp and angular damping as
-  `Vec3 *= float`).  What was learned:
+- The sub-step loop `RunSteps` `0x00502f60` (1921 bytes) is exact.  Levers:
   `prevSpeed = linearSpeed;` followed by a test of `prevSpeed` (not `linearSpeed`) gives
   retail's single `fld`/`fst`/`fcom`; the loop is `if (steps <= 0) return; do { ... } while
   (steps > 0);` (the rematerialised `xor ebx,ebx` sits on the back edge); the leftover
   remainder block reads `stepRemainder` once into a local (`stepTime = t; invStepTime =
-  1.0f / t;`).  The residue is stack-slot packing: retail packs the integration
-  temporary into the slot of the respawn path's first vector and keeps the merge outputs
-  `o3`/`o1` in the slots of its other two, with `impulse` below `o2`; VC6 here packs the
-  respawn vectors into the merge outputs instead (frame size and every other slot agree).
-  Declaration order and block scoping of the locals do not move the packing; sharing the
-  vectors between the two paths or hoisting them to function scope makes it worse.
+  1.0f / t;`); the speed clamp and angular damping are `Vec3 *= float`.  The frame needs the
+  merge output `o2` at loop scope: VC6 then pairs the respawn block's `b`/`c` with the
+  touching block's `o3`/`o1` and leaves `a` free for the integration temporary, as retail
+  does (with all three outputs in the touching block it pairs a/o3, b/o1, c/o2 and the
+  respawn block needs 9 bytes of disp32 displacements).
+
+Still partial in SoulTreePhysics.cpp:
+
 - Slot 4 `0x005013d0`: retail loads the a3 component first in all six products of the
   first cross product; VC6 loads a4 first in the term it evaluates second (87.5%).
 - SteeringControl::SetAxisFromPoints `0x00504d30` (samples/physics/motion): only the
