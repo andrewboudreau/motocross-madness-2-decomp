@@ -16,6 +16,7 @@
 // view of VisualCue (it reads the cue's +0x48/+0x4c as floats); the two
 // headers are never included together.
 
+#include "TrackGameGlobal.h"
 #include "ArcadeObject.h"
 #include "D3DIMSoulTree.h"
 #include "GameObject.h"
@@ -313,7 +314,6 @@ struct UnknownKrustyGame {
     unsigned char field_0x2eb8[0x3430 - 0x2eb8];
     int uiInteractionBlocked;                 // +0x3430 (TrackGame.h)
 };
-extern UnknownKrustyGame* g_UnknownKrustyGame56e26c;
 
 // One 0x30-byte key of the bonus animation table at 0x0056c820 (seven
 // keys); plain floats, as the table is static data.

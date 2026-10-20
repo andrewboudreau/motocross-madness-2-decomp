@@ -48,7 +48,7 @@
   "?g_frozenCamera@@3UVisibilityCamera@@A": "0x68a968",
   "?g_memoryStats@@3PAVVisibilityMemoryStats@@A": "0x56df04",
   "?g_pQuadTree@@3PAVQuadTree@@A": "0x00689b78",
-  "?g_profiler@@3PAUVisibilityProfiler@@A": "0x56e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x56e26c",
   "?g_quadTreeInvScale@@3MA": "0x689b74",
   "?g_visibilityBoxVertices@@3PAUVisibilityBoxVertex@@A": "0x68a768",
   "?g_visibilityClipper@@3PAVVisibilityClipper@@A": "0x575a98",

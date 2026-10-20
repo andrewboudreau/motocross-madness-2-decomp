@@ -30,7 +30,7 @@
   "?ShadowTransformPointsOrtho@@YAXPAUShadowVec3@@PBXPBUShadowMatrix@@HHH@Z": "0x004a1b00",
   "?ShadowTransformPointsProjective@@YAXPAUShadowVec3@@PBXPBUShadowMatrix@@HHH@Z": "0x004a1a50",
   "?TintCasterVertices@ProjectedShadow@@QAEXXZ": "0x004dc2b0",
-  "?g_pShadowSettings@@3PAVShadowSettings@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "_$E1": "0x004dc4e0",
   "_$E10": "0x004dc5d0",
   "_$E11": "0x004dc5c0",

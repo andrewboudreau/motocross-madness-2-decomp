@@ -163,7 +163,7 @@
   "?g_CollisionScratchPoints@@3PAUCollisionVec3@@A": "0x00579068",
   "?g_CollisionVec3_5797b0@@3UCollisionVec3@@A": "0x005797b0",
   "?g_TypeRegistry@@3PAVTypeRegistry@@A": "0x00575744",
-  "?g_collisionGameContext@@3PAUCollisionGameContext@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_collisionQuadTree@@3PAVQuadTree@@A": "0x0068aba4",
   "?g_vegetationGrid@@3PAUCollisionVegetationGrid@@A": "0x0059aebc",
   "_$E1": "0x00435700",

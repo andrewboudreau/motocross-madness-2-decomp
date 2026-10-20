@@ -41,7 +41,7 @@ extern Vec3 g_VehZeroVec3_005778c8;
 
 // ---- provisional collaborator types (layout only what the code touches) ----
 
-// The scene node (d3d_field_0x1a0, field_0x218, VehicleSteerState::field_0x00) is
+// The scene node (d3d_field_0x1a0, field_0x218, SteeringControl::node) is
 // SoultreeObject (../common/SoultreeObject.h).
 // Free helpers (cdecl) used by the vehicle code. Retail addresses; names are tier 3.
 // 0x005004a0 (slot 4's solver helper) is ContactSolveImpulse, declared in
@@ -199,21 +199,11 @@ struct VehicleSmoother {
     float maxValue;                   // +0x10 -FLT_MAX at construction
 };
 struct VehicleContactSet;            // object at SoultreePhysicsCharacter+0x128
-// Object at Vehicle+0x47c (provisional layout: only what Vehicle touches).
-struct VehicleSteerState {
-    SoultreeObject* steerNode;  // +0x00 scene node positioned/oriented in slots 36/58
-    float steerAngle;  // +0x04 slot 60 subtracts it; slot 73 uses sin(it) and |it|
-    float maxSteerAngle;                      // +0x8  SteeringControl +0x08 = scale * clamp01(t); LoadVehicle passes steerScale (Bike: 40 degrees) and controlResponse[0]; slot 59 returns it, Bike divides steerAngle by it
-    char pad_0x0c[0xc];              // 0x18 bytes (LoadVehicle's allocation)
-    ~VehicleSteerState();                                      // 0x00504c50 (~Vehicle deletes it)
-    // 0x00504b60 / 0x00504c70: SteeringControl's constructor and SetAxisFromDirection
-    // (motion/SteeringControl.h); LoadVehicle builds the object with its two axes.
-    VehicleSteerState(float scale, float t, const Vec3* axisZ, const Vec3* axisY);
-    int SetAxisFromDirection(const Vec3* worldDir, SoultreeObject* frame);
-    int SetAxisFromPoints(SoultreeObject* from, SoultreeObject* to, SoultreeObject* frame);   // 0x00504d30 (SteeringControl::SetAxisFromPoints)
-    void AddAngle(float value, SoultreeObject* node);   // 0x00504ec0, purpose unknown
-    void SetAngle(float a, SoultreeObject* node);       // 0x00504e20 (SteeringControl::SetAngle)
-};
+// Vehicle+0x47c owns the SteeringControl allocated at 0x00504b60 (0x18 bytes).
+// Keep the vehicle-side name as an alias; the five shared call targets and fields
+// belong to the canonical declaration in motion/SteeringControl.h.
+#include "motion/SteeringControl.h"
+typedef SteeringControl VehicleSteerState;
 struct VehicleAxisSource {           // object at VehicleAxis+0x00 (provisional)
     char pad_0x00[0xC];
     int kindCode;                  // +0x0c kind code (2 and 3 are tested by slot 63)

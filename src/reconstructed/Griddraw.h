@@ -10,6 +10,7 @@
 // it again and calls the GridNode destructor 0x004838a0.
 // Member, method and type names are provisional (tier 3) unless noted.
 
+#include "TrackGameGlobal.h"
 #include "Gridbase.h"
 
 class UnknownTextureStream;
@@ -93,7 +94,6 @@ struct GridGameSettings {
     int minFilter;
     int mipFilter;
 };
-extern GridGameSettings* g_gridGameSettings;          // 0x0056e26c
 
 // Object at Terrain+0xc40; 0x0049e4a0 is called with (&Terrain+0xc44, count,
 // buffer + 0xc, buffer, 0x20, 0) after a node rebuilds its vertex buffer.

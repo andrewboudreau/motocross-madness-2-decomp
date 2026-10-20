@@ -1,8 +1,8 @@
 // DustParticleEmitter.cpp -- ownership uncertain, see ParticleEmitters.h.
+#include "../../../src/reconstructed/TrackGameGlobal.h"
 #include "ParticleEmitters.h"
 #include "math/FastMath.h"
 
-extern ParticleGameContext* g_gameContext;   // 0x0056e26c
 
 DustParticleEmitter::DustParticleEmitter(int flags) : GameObject(flags)
 {
@@ -56,7 +56,7 @@ void DustParticleEmitter::SetColor(unsigned char r, unsigned char g, int b)
 // emission rate follow the speed (distance / dt, scaled by intensity when it is nonzero).
 int DustParticleEmitter::Tick(float dt)
 {
-    if (g_gameContext->frozen == 0) {
+    if (reinterpret_cast<ParticleGameContext*>(g_TrackGame)->frozen == 0) {
         if (field_0x60 == 0) {
             field_0x68 = 0;
             field_0x6c = 0;

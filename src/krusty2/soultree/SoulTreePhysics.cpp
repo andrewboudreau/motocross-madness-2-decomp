@@ -2,6 +2,7 @@
 // confirmed by __FILE__ xrefs at 0x00500d6c/0x00500dbd/0x00500fe2/0x0050117c).
 // Translation-unit ownership of the neighbouring functions is tier 2 (proximity
 // plus the same __FILE__ string).
+#include "../../reconstructed/TrackGameGlobal.h"
 #include <math.h>
 #include <string.h>
 #include <float.h>
@@ -1100,7 +1101,6 @@ struct SoultreeGlobals {
     char field_0x000[0x574];
     SoultreeFileFinder* field_0x574;
 };
-extern SoultreeGlobals* g_0056e26c;
 extern int g_00572b44;          // passed by value to the SoultreeFile constructor
 
 // SoultreePhysicsObject slot 40 (0x00503970, `ret 0x70`).  Loads the model through the
@@ -1136,7 +1136,7 @@ GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int a1, const char* a2,
     strcpy(strrchr(name, '.'), ".col");
 
     SoultreeFile* file = new(SP_FILE, 0x84e) SoultreeFile(g_00572b44);
-    if (!g_0056e26c->field_0x574->OpenArchiveFile(file, name, "rb", colPath)) {
+    if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->field_0x574->OpenArchiveFile(file, name, "rb", colPath)) {
         colPath[0] = 0;
     }
     delete file;
@@ -1187,7 +1187,7 @@ GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int a1, int a2, const
     strcpy(strrchr(name, '.'), ".col");
 
     SoultreeFile* file = new(SP_FILE, 0x8cd) SoultreeFile(g_00572b44);
-    if (!g_0056e26c->field_0x574->OpenArchiveFile(file, name, "rb", colPath)) {
+    if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->field_0x574->OpenArchiveFile(file, name, "rb", colPath)) {
         colPath[0] = 0;
     }
     delete file;

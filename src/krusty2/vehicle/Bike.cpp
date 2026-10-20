@@ -1,4 +1,5 @@
 // Bike.cpp: reconstruction of the motorcycle physics layer (see Bike.h).
+#include "../../reconstructed/TrackGameGlobal.h"
 #include <float.h>
 #include <math.h>
 #include <string.h>
@@ -210,13 +211,13 @@ integrate:
     else
         len = (float)sqrt(lenSq);
     float angle = (len * stepTime) * sign;
-    if (BikeAbs(angle + steerState->steerAngle) < 0.785f) {
+    if (BikeAbs(angle + steerState->angle) < 0.785f) {
         steerState->AddAngle(angle, poseNode);
         *(BikeVec3ScaleAssign*)&steerTorque *= 0.99f;
         return result;
     }
-    if (BikeAbs(steerState->steerAngle) < 0.785f) {
-        steerState->SetAngle((steerState->steerAngle < 0.0f ? -1.0f : 1.0f) * 0.7851f, poseNode);
+    if (BikeAbs(steerState->angle) < 0.785f) {
+        steerState->SetAngle((steerState->angle < 0.0f ? -1.0f : 1.0f) * 0.7851f, poseNode);
         float decay = -0.02f;
         if (!driven)
             decay = -0.1f;
@@ -305,7 +306,7 @@ float Bike::UnknownVirtualSlot57()
 {
     if (crashState == 0 && prevSpeed < leanSpeedThreshold)
         return savedRoll;
-    float t = steerState->steerAngle;
+    float t = steerState->angle;
     float a = (t < 0.0f) ? -t : t;
     float r = leanAngle;
     if (a < 0.52359878f)
@@ -325,11 +326,11 @@ void Bike::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
 float Bike::UnknownVirtualSlot59()
 {
     if (poseState == 10)
-        return steerState->maxSteerAngle;
-    float r = steerState->maxSteerAngle -
-              FastSqrt(prevSpeed / referenceSpeed * (steerState->maxSteerAngle * steerState->maxSteerAngle));
+        return steerState->maxAngle;
+    float r = steerState->maxAngle -
+              FastSqrt(prevSpeed / referenceSpeed * (steerState->maxAngle * steerState->maxAngle));
     r = (0.0f > r) ? 0.0f : r;
-    float m = steerState->maxSteerAngle;
+    float m = steerState->maxAngle;
     return (m < r) ? m : r;
 }
 
@@ -939,7 +940,7 @@ int Bike::UnknownVirtualSlot39(float arg)
         return r;
     if (crashState) {
         if (crashTimer != 0.0f && wrecker->a_0xac) {
-            crashTimer -= g_Bike_0056e26c->g_0x2f0;
+            crashTimer -= reinterpret_cast<BikeGlobal_0056e26c*>(g_TrackGame)->g_0x2f0;
             if (crashTimer > crashGraceTime) {
                 wrecker->a_0xac = 0;
             } else if (crashTimer <= 0.0f) {
@@ -1094,7 +1095,7 @@ void Bike::UnknownVirtualSlot41()
 void Bike::UnknownVirtualSlot102(float)
 {
     if (crashState) {
-        float t = -(steerState->steerAngle / steerState->maxSteerAngle);
+        float t = -(steerState->angle / steerState->maxAngle);
         t = (t + 1.0f) * 0.25f;
         t += 0.25f;
         t = BikeMin(BikeMaxF(t, 0.25f), 0.75f);
@@ -1755,7 +1756,7 @@ static inline Vec3 BikeScale92(const Vec3& v, float k)
 // BikeScale92.  Tried: BikeAbsRef in the condition, az/ay/ax locals, explicit t/r scale.
 void Bike::UnknownVirtualSlot92(const Vec3* worldDir, const Vec3* point)
 {
-    float target = (steerState->steerAngle * 0.05f + turnRate * 0.2f) * wheelForwardAlignment;
+    float target = (steerState->angle * 0.05f + turnRate * 0.2f) * wheelForwardAlignment;
     targetLeanAngle = target;
     if (target < 0.0f)
         target = -target;

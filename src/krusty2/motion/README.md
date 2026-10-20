@@ -21,13 +21,19 @@ that follow live in `samples/physics/motion/`.
 
 ## SteeringControl.cpp
 - `__FILE__` string at `0x005745ac`; one use (debug `new`, line 0x17) in the ctor.
-- Owns `0x00504b60..0x005051ec`: ctor, Release, SetAxisFromDirection, SetAngle, AddAngle, SetAxisFromPoints and
+- Owns `0x00504b60..0x005051ec`: ctor, destructor, SetAxisFromDirection, SetAngle, AddAngle, SetAxisFromPoints and
   eight `$E` pairs. Retail has two sets of the four `Vec3` constants here; `Math3D.h` supplies the first and
   `SteeringControl.cpp` declares the second locally (`kSecondVec3*`).
 - SteeringControl has no RTTI (no virtuals). Layout: `node` +0 (SoultreeObject*), `angle` +4, `field_0x08`, `axis` +0xc.
 - Promoted to `src/krusty2/motion/SteeringControl.cpp` with `SteeringControl.bindings.json`: 21 strict exact
   (5 methods + 16 `$E`). SetAxisFromPoints `0x00504d30` stays a near miss in
   `samples/physics/motion/SteeringControl.cpp` (y spilled to a stack slot in retail).
+- Vehicle's provisional `VehicleSteerState` is now an alias of this 24-byte
+  class. Its constructor and four other supplied bodies satisfy the existing
+  vehicle/bike calls directly. The cleanup at `0x00504c50` is a destructor:
+  `Vehicle::~Vehicle` calls it at `0x00526429`, then passes the same pointer to
+  `operator delete`. The existing body was renamed from `Release` without
+  adding a wrapper. Field names and original access levels remain provisional.
 
 ## Not attributed
 The keyboard-hook functions `0x005053b0..0x00505480` and the `$E` at `0x00505480` have no `__FILE__` reference and

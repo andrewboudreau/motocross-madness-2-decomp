@@ -1,6 +1,7 @@
 // Griddraw.cpp -- reconstruction of part of D:\aardvark\VC\krusty2\Griddraw.cpp.
 // See Griddraw.h and docs/GRIDDRAW.md.
 
+#include "TrackGameGlobal.h"
 #include "Griddraw.h"
 
 #include <float.h>
@@ -684,7 +685,7 @@ void DrawableGridNode::SubmitUnlitRange(int a5, GridVertex* vertices, int vertex
         detail = extra->detail;
     else
         detail = extra->blockRecords[block].detail;
-    if (g_gridGameSettings->softwareRenderer) {
+    if (reinterpret_cast<GridGameSettings*>(g_TrackGame)->softwareRenderer) {
         if (terrain->qualityParamB < detail)
             terrain->renderer->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 1, 0);
         else
@@ -771,7 +772,7 @@ void DrawableGridNode::SubmitUnlitRange(int a5, GridVertex* vertices, int vertex
 void DrawableGridNode::SubmitLitRange(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                             int indexCount, int block)
 {
-    if (g_gridGameSettings->softwareRenderer || !a5)
+    if (reinterpret_cast<GridGameSettings*>(g_TrackGame)->softwareRenderer || !a5)
         return;
     float detail;
     if (block == -1)
@@ -799,8 +800,8 @@ void DrawableGridNode::SubmitLitRange(int a5, GridVertex* vertices, int vertexCo
             terrain->closeUpStateSet = 1;
         }
     } else if (terrain->closeUpStateSet != 0) {
-        terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MINFILTER, g_gridGameSettings->minFilter);
-        terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MIPFILTER, g_gridGameSettings->mipFilter);
+        terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MINFILTER, reinterpret_cast<GridGameSettings*>(g_TrackGame)->minFilter);
+        terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MIPFILTER, reinterpret_cast<GridGameSettings*>(g_TrackGame)->mipFilter);
         terrain->closeUpStateSet = 0;
     }
     terrain->ageManager->MarkUsed(&data->ageEntry);

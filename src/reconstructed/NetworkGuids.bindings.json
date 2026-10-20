@@ -1,0 +1,8 @@
+{
+  "?g_ZoneScoreInterfaceGuid@@3U_GUID@@B": "0x00556d80",
+  "?g_ZoneScoreClassGuid@@3U_GUID@@B": "0x00556da0",
+  "?g_LobbyQueryPlayerGuid@@3U_GUID@@B": "0x00556db0",
+  "?g_NetApplicationGuid@@3U_GUID@@B": "0x00556dc0",
+  "?g_LobbyPresetPropertyGuid@@3U_GUID@@B": "0x00556dd0",
+  "?g_LobbyRankPropertyGuid@@3U_GUID@@B": "0x00556de0"
+}

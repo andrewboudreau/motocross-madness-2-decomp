@@ -119,7 +119,7 @@
   "?UnknownVirtualSlot2@SoultreePhysicsBaseObject@@UAEPAVGameObject@@HHUVec3@@00PAX1MHHPAVSoultreeSlot1f0@@MHMMMHHEH@Z": "0x00500c50",
   "?UnknownVirtualSlot40@SoultreePhysicsCharacter@@UAEPAVGameObject@@HHPBDPBUSoultreeLoadDesc@@HUVec3@@22PAX3MHHPAVSoultreeSlot1f0@@MHMMHEH@Z$ehhandler": "0x0054e47a",
   "?UnknownVirtualSlot40@SoultreePhysicsObject@@UAEPAVGameObject@@HPBDPBUSoultreeLoadDesc@@HUVec3@@22PAX3MHHPAVSoultreeSlot1f0@@MHMMMHHEH@Z$ehhandler": "0x0054e3ea",
-  "?g_0056e26c@@3PAUSoultreeGlobals@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_00572b44@@3HA": "0x00572b44",
   "_strncpy": "0x00534b10",
   "_strrchr": "0x00534a60",

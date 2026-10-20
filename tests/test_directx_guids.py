@@ -1,4 +1,4 @@
-"""Verify missing SDK identifier providers against private retail data."""
+"""Verify DirectX and network identifier providers against private retail data."""
 from __future__ import annotations
 
 import json
@@ -22,15 +22,21 @@ EXE = Path(os.environ.get('MCM2_EXE', ROOT / 'work/game/mcm2.exe'))
                      'requires VC6_ROOT and the private retail EXE')
 class DirectXGuidTests(unittest.TestCase):
     def test_sdk_compatible_symbols_sizes_readonly_storage_and_values(self):
+        self.assert_guid_provider('DirectXGuids')
+
+    def test_network_symbols_sizes_readonly_storage_and_values(self):
+        self.assert_guid_provider('NetworkGuids')
+
+    def assert_guid_provider(self, stem):
         expected = json.loads((ROOT / 'config/private_bundle_expected.json').read_text())
         self.assertEqual(sha256_file(EXE), expected['mcm2_sha256'])
-        bindings = json.loads((ROOT / 'src/reconstructed/DirectXGuids.bindings.json').read_text())
+        bindings = json.loads((ROOT / f'src/reconstructed/{stem}.bindings.json').read_text())
         retail = PEImage(EXE)
         with tempfile.TemporaryDirectory(prefix='mcm2-guids-') as tmp:
-            path = Path(tmp) / 'DirectXGuids.obj'
+            path = Path(tmp) / f'{stem}.obj'
             result = subprocess.run([
                 sys.executable, str(ROOT / 'tools/compile.py'),
-                str(ROOT / 'src/reconstructed/DirectXGuids.cpp'), '-o', str(path),
+                str(ROOT / f'src/reconstructed/{stem}.cpp'), '-o', str(path),
                 '--vc6-root', os.environ['VC6_ROOT'], '--profile', 'vc6_o2_mt',
             ], cwd=ROOT, capture_output=True, text=True, encoding='latin-1',
                 env={**os.environ, 'PYTHONPATH': str(ROOT)})

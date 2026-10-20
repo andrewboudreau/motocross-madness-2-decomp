@@ -84,7 +84,7 @@
   "?g_gridDrawMemory@@3HA": "0x0068a300",
   "?g_gridDrawMemoryPeak@@3HA": "0x0068a2fc",
   "?g_pTerrainQualityTable@@3PAUTerrainQualityEntry@@A": "0x0068a32c",
-  "?g_terrainGame@@3PAUTerrainGameSettings@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_terrainAgeTime0Peak@@3VUnknownPeakHold@@A": "0x0068a008",
   "?g_terrainAgeTime1Peak@@3VUnknownPeakHold@@A": "0x0068a038",
   "?g_terrainSetupPeak@@3VUnknownPeakHold@@A": "0x0068a2e0",

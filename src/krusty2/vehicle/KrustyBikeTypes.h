@@ -27,6 +27,7 @@ struct KbBonusTable;
 class KrustyBike;
 
 // Vectors use the shared Math3D Vec3 (12 bytes: x,y,z at +0,+4,+8; tier 1 layout).
+#include "../../reconstructed/TrackGameGlobal.h"
 #include "vehicle/Bike.h"
 #include "contact/ObjectPlacement.h"
 
@@ -314,7 +315,6 @@ struct KbGame {
     char pad_0x342C[0x3444 - 0x342c];
     KbBonusTable* proCircuit;  // +0x3444  TrackGame +0x3444 proCircuit (ProCircuit.h)
 };
-extern KbGame* g_kbGame;
 // 0x004BFA80: millisecond clock (timeGetTime-based; tier 3).
 unsigned int ReadClock();
 // 0x004B5D00 (cdecl): forward/up axes from yaw, pitch and roll (tier 3 names; 0x00493660

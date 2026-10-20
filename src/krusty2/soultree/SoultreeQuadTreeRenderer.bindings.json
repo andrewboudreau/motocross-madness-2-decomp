@@ -42,7 +42,7 @@
   "?g_quadTree@@3PAVQuadTree@@A": "0x0068aba4",
   "?g_soultreeNodeCount@@3HA": "0x00689ec8",
   "?g_soultreeNodes@@3PAPAVSoultreeObject@@A": "0x00689ec4",
-  "?g_soultreeStats@@3PAUSoultreeStats@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__FILE__:soultreequadtreerenderer.cpp": "0x005743f4",
   "___RTDynamicCast": "0x005355be"
 }

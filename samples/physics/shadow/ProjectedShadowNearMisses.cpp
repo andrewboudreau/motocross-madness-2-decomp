@@ -2,6 +2,7 @@
 // out of src/krusty2/shadow/ProjectedShadow.cpp until they match.  The canonical file is included
 // first so the vector set and the class are the same.  Each function's note records what still
 // differs; the scores are in targets.json and docs/NEAR_MISS_INDEX.md.
+#include "../../../src/reconstructed/TrackGameGlobal.h"
 #include "shadow/ProjectedShadow.cpp"
 
 // 0x004da7b0: binds the shadow to its render target, picks a surface format from the device
@@ -21,7 +22,7 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
 
     char name[0x100];
     sprintf(name, "DriverInfo\\%s\\DestColorShadow", Host()->display->driverName);
-    if (g_pShadowSettings->QueryFlag(name, 0) && (Host()->capsA & 0x100) && (Host()->capsB & 1)) {
+    if (reinterpret_cast<ShadowSettings*>(g_TrackGame)->QueryFlag(name, 0) && (Host()->capsA & 0x100) && (Host()->capsB & 1)) {
         formatA = 9;
         formatB = 1;
     } else {

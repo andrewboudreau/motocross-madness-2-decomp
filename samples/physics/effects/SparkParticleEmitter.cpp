@@ -1,8 +1,8 @@
 // SparkParticleEmitter.cpp -- ownership uncertain, see ParticleEmitters.h.
+#include "../../../src/reconstructed/TrackGameGlobal.h"
 #include "ParticleEmitters.h"
 #include <stdlib.h>
 
-extern ParticleGameContext* g_gameContext;   // 0x0056e26c
 
 SparkParticleEmitter::SparkParticleEmitter(int flags) : GameObject(flags)
 {
@@ -60,7 +60,7 @@ void SparkParticleEmitter::SetPosition(ParticleVec3 p)
 // 0x004b99a0.  Like DirtChunk, but fires once while burstPending is set and then switches itself off.
 int SparkParticleEmitter::Tick(float dt)
 {
-    if (g_gameContext->frozen == 0) {
+    if (reinterpret_cast<ParticleGameContext*>(g_TrackGame)->frozen == 0) {
         if (firstUpdate) {
             firstUpdate = 0;
             previousPosition = position;

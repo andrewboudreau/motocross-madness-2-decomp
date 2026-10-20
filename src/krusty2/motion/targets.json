@@ -152,7 +152,7 @@
   {
     "class": "SteeringControl",
     "source": "SteeringControl.cpp",
-    "candidate_symbol_contains": "?Release@SteeringControl@@QAEXXZ",
+    "candidate_symbol_contains": "??1SteeringControl@@QAE@XZ",
     "target_va": "0x00504c50",
     "target_size": 26,
     "expect": "exact",

@@ -12,6 +12,7 @@
 // 0x00455de0 and the loaders. Member names are provisional (tier 3) unless
 // a literal names them ("NumberOfLOD", "MeanHeight", ...).
 
+#include "TrackGameGlobal.h"
 #include <stdio.h>
 #include <float.h>
 
@@ -455,7 +456,6 @@ public:
     int minFilter;                            // +0x550  PCGame minFilter
     int mipFilter;                            // +0x554  PCGame mipFilter
 };
-extern UnknownEcoTrackGame* g_TrackGame;   // 0x0056e26c (local view of TrackGame)
 unsigned int ReadClock();                     // 0x004bfa80
 int TestInputEvent(int control, int kind, const UnknownControlEvent* event, int modifier); // 0x0043caa0
 

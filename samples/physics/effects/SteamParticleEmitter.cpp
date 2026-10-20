@@ -1,9 +1,9 @@
 // SteamParticleEmitter.cpp -- ownership uncertain, see ParticleEmitters.h.
+#include "../../../src/reconstructed/TrackGameGlobal.h"
 #include "ParticleEmitters.h"
 #include <stdlib.h>
 #include "math/FastMath.h"
 
-extern ParticleGameContext* g_gameContext;   // 0x0056e26c
 
 SteamParticleEmitter::SteamParticleEmitter(int flags) : GameObject(flags)
 {
@@ -83,7 +83,7 @@ void SteamParticleEmitter::SetColor(unsigned char r, unsigned char g, int b)
 // 0x004ba070.  Emits a trail of puffs between the previous and the current position each tick.
 int SteamParticleEmitter::Tick(float dt)
 {
-    if (g_gameContext->frozen == 0 && emitting != 0 && field_0x6c != 0) {
+    if (reinterpret_cast<ParticleGameContext*>(g_TrackGame)->frozen == 0 && emitting != 0 && field_0x6c != 0) {
         if (field_0x44 <= 0.0f) {
             field_0x44 = 0;
             field_0x6c = 0;

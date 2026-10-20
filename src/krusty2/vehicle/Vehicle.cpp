@@ -38,7 +38,7 @@ Vec3* Vehicle::UnknownVirtualSlot55(Vec3* out, Vec3* pos)
 }
 
 float Vehicle::UnknownVirtualSlot57() { return leanAngle; }
-float Vehicle::UnknownVirtualSlot59() { return steerState->maxSteerAngle; }
+float Vehicle::UnknownVirtualSlot59() { return steerState->maxAngle; }
 float Vehicle::UnknownVirtualSlot61(float arg) { return 0.0f; }
 
 int Vehicle::UnknownVirtualSlot62(float arg)
@@ -94,12 +94,12 @@ int Vehicle::UnknownVirtualSlot70(float arg)
 float Vehicle::UnknownVirtualSlot73(const Vec3* a, const Vec3* b)
 {
     VehicleSteerState* s = steerState;
-    float m = s->steerAngle;
+    float m = s->angle;
     if (m < 0.0f)
         m = -m;
     if (m == 0.0f)
         return 0.0f;
-    return wheelBase / sinf(s->steerAngle);
+    return wheelBase / sinf(s->angle);
 }
 
 // Clears the per-contact flag at +0xa4 for contacts whose +4 field is set, then resets state.
@@ -167,7 +167,7 @@ void Vehicle::UnknownVirtualSlot90(int* a, float b)
 void Vehicle::UnknownVirtualSlot60(float a, float b, int c)
 {
     if (crashState == 0) {
-        steerRate = -(a * b) - steerState->steerAngle;
+        steerRate = -(a * b) - steerState->angle;
         float m = steerRate;
         if (m < 0.0f) m = -m;
         if (m < 0.00001f) {
@@ -520,7 +520,7 @@ void Vehicle::UnknownVirtualSlot58(Vec3* a, int b)
             }
         }
     }
-    steerState->steerNode->SetAxesIn(0, &bodyForward, &bodyUp, 0, 1);
+    steerState->node->SetAxesIn(0, &bodyForward, &bodyUp, 0, 1);
     airborne = false;
     VehBasisToBlock(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
                     &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);

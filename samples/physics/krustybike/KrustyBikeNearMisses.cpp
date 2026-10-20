@@ -3,6 +3,7 @@
 // included first so the TU-local statics, helpers and the Math3D vector set are the
 // same.  Each function's note records what still differs; the scores are in
 // targets.json and docs/NEAR_MISS_INDEX.md.
+#include "../../../src/reconstructed/TrackGameGlobal.h"
 #include "vehicle/KrustyBike.cpp"
 
 // 0x0048fa60 (near miss, 86.36%, 532 of 532 bytes): the GameObject virtual base is
@@ -90,11 +91,11 @@ int KrustyBike::UnknownVirtualSlot70(float arg)
     float a[3] = { 1.15f, 1.05f, 1.0f };
     if (aiKind) {
         float speedGain = linearSpeed - prevSpeed;
-        if (speedGain * b[g_kbGame->eventType != 3][g_kbGame->difficulty - 1] < arg * speedGainLimit)
+        if (speedGain * b[reinterpret_cast<KbGame*>(g_TrackGame)->eventType != 3][reinterpret_cast<KbGame*>(g_TrackGame)->difficulty - 1] < arg * speedGainLimit)
             return 1;
         return 0;
     }
-    if (linearSpeed - prevSpeed < a[g_kbGame->difficulty - 1] * speedGainLimit * arg)
+    if (linearSpeed - prevSpeed < a[reinterpret_cast<KbGame*>(g_TrackGame)->difficulty - 1] * speedGainLimit * arg)
         return 1;
     return 0;
 }
@@ -118,19 +119,19 @@ int KrustyBike::UnknownVirtualSlot70(float arg)
 int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* a5)
 {
     int flag;
-    if (g_kbGame->mode.GetSelectedSeries() == 3 || g_kbGame->mode.GetSelectedSeries() == 4)
+    if (reinterpret_cast<KbGame*>(g_TrackGame)->mode.GetSelectedSeries() == 3 || reinterpret_cast<KbGame*>(g_TrackGame)->mode.GetSelectedSeries() == 4)
         flag = 1;
     else
         flag = 0;
     int lim;
-    if (g_kbGame->mode.GetSelectedSeries() == 5 || g_kbGame->mode.GetSelectedSeries() == 4)
+    if (reinterpret_cast<KbGame*>(g_TrackGame)->mode.GetSelectedSeries() == 5 || reinterpret_cast<KbGame*>(g_TrackGame)->mode.GetSelectedSeries() == 4)
         lim = 0x7fffffff;
     else
         lim = 0x66;
     unsigned char hit = 0;
-    if (g_kbGame->mode.GetSelectedSeries() == 5)
+    if (reinterpret_cast<KbGame*>(g_TrackGame)->mode.GetSelectedSeries() == 5)
         hit = Kb_004B0AC0(&position, 2.0f, 2.0f, 2.0f, terrainScale, 0, 0, 0, 0);
-    KbGame* g = g_kbGame;
+    KbGame* g = reinterpret_cast<KbGame*>(g_TrackGame);
     switch (g->eventType) {
     case 2:
     case 3:
@@ -237,22 +238,22 @@ static inline void KbSub(Vec3* out, const Vec3& a, const Vec3& b)
 // read-modify-write order instead).
 void KrustyBike::Fn_00492AD0(float dt, int record)
 {
-    if (!g_kbGame->network && (!record || !netRecorder))
+    if (!reinterpret_cast<KbGame*>(g_TrackGame)->network && (!record || !netRecorder))
         return;
     KbBikeState* state;
     if (record) {
         state = &recordState;
-        state->timer += g_kbGame->frameTime;
-        if (state->timer > g_kbGame->fullRecordPacketIntervalSec)
+        state->timer += reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
+        if (state->timer > reinterpret_cast<KbGame*>(g_TrackGame)->fullRecordPacketIntervalSec)
             goto sendFull;
     } else {
         state = &netState;
-        state->timer += g_kbGame->frameTime;
-        shortMessageTimer += g_kbGame->frameTime;
-        if (shortMessageTimer < g_kbGame->shortNetPacketIntervalSec)
+        state->timer += reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
+        shortMessageTimer += reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
+        if (shortMessageTimer < reinterpret_cast<KbGame*>(g_TrackGame)->shortNetPacketIntervalSec)
             return;
         shortMessageTimer = 0;
-        if (state->timer > g_kbGame->fullNetPacketIntervalSec)
+        if (state->timer > reinterpret_cast<KbGame*>(g_TrackGame)->fullNetPacketIntervalSec)
             goto sendFull;
     }
     {
@@ -333,13 +334,13 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                     message.flag4 = UnknownVirtualSlot51();
                                     message.flag5 = hasFinished != 0;
                                     message.flag6 = onTrack;
-                                    if (g_kbGame->eventType == 2 || g_kbGame->eventType == 3)
+                                    if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 2 || reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 3)
                                         message.field_0x11 = (unsigned char)lapCount;
                                     else
                                         message.field_0x11 = lapGate;
                                     if (!record) {
-                                        if (g_kbGame->network)
-                                            g_kbGame->network->Send(13, &message, sizeof(message), netId, record);
+                                        if (reinterpret_cast<KbGame*>(g_TrackGame)->network)
+                                            reinterpret_cast<KbGame*>(g_TrackGame)->network->Send(13, &message, sizeof(message), netId, record);
                                     } else if (netRecorder) {
                                         netRecorder->QueueRecord(13, netId, &message, sizeof(message));
                                     }
@@ -352,13 +353,13 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                     state->angularVelocity.y += turnRate;
                                     state->time = now;
                                     if (!record) {
-                                        if (g_kbGame->network &&
-                                            (!g_kbGame->eventType || (g_kbGame->eventType == 4 && g_kbGame->stuntMode))) {
-                                            pingTimer -= g_kbGame->frameTime;
+                                        if (reinterpret_cast<KbGame*>(g_TrackGame)->network &&
+                                            (!reinterpret_cast<KbGame*>(g_TrackGame)->eventType || (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4 && reinterpret_cast<KbGame*>(g_TrackGame)->stuntMode))) {
+                                            pingTimer -= reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
                                             if (pingTimer < 0.0f) {
                                                 ping.field_0x04 = score;
                                                 ping.field_0x01 = loaderKind;
-                                                g_kbGame->network->Send(10, &ping, sizeof(ping), netId, 0);
+                                                reinterpret_cast<KbGame*>(g_TrackGame)->network->Send(10, &ping, sizeof(ping), netId, 0);
                                                 pingTimer = 2.0f;
                                             }
                                         }
@@ -373,15 +374,15 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                         }
                     }
                 }
-                Fn_00492670(state, g_kbGame->frameTime, record);
+                Fn_00492670(state, reinterpret_cast<KbGame*>(g_TrackGame)->frameTime, record);
                 return;
             }
-            Fn_00492670(state, g_kbGame->frameTime, record);
+            Fn_00492670(state, reinterpret_cast<KbGame*>(g_TrackGame)->frameTime, record);
             return;
         }
     }
 sendFull:
-    Fn_00492670(state, g_kbGame->frameTime, record);
+    Fn_00492670(state, reinterpret_cast<KbGame*>(g_TrackGame)->frameTime, record);
 }
 
 // Byte-coded pose values of message 1 are 0..255 (tier 3: 1/255 constant at 0x005511e4).
@@ -471,12 +472,12 @@ void KrustyBike::Fn_00493660(float dt, int a)
     justLanded = 0;
     justReset = 0;
     reset = 0;
-    if (g_kbGame->frameTime <= 0.0f)
+    if (reinterpret_cast<KbGame*>(g_TrackGame)->frameTime <= 0.0f)
         return;
     // the newest state that is old enough to be complete (3 in a replay)
-    int k = g_kbGame->playingReplay ? 3 : 2;
+    int k = reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay ? 3 : 2;
     if (states[k]->position.x != 0.0f && states[k]->position.y != 0.0f && states[k]->position.z != 0.0f) {
-        if (g_kbGame->playingReplay == 0 && g_kbGame->raceMode != 4) {
+        if (reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay == 0 && reinterpret_cast<KbGame*>(g_TrackGame)->raceMode != 4) {
             if (lastTimeReceived != states[0]->timeReceived) {
                 lastTimeReceived = states[0]->timeReceived;
                 if (firstPacketLatch == 0) {
@@ -506,7 +507,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
         } else {
             // replay: the race clock, less a fixed lag, picks the state interval
             float clock = this->race->replayTime;
-            if (g_kbGame->raceMode == 4) {
+            if (reinterpret_cast<KbGame*>(g_TrackGame)->raceMode == 4) {
                 float adj;
                 stateIntervalElapsed = (clock - 0.17f) - (float)states[2]->time * 0.001f;
                 adj = this->race->replayTime - 0.17f;
@@ -578,10 +579,10 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     // warp when the change (in units of the 100/s rate) is below a frame's
                     // worth or beyond the warp threshold; otherwise move at the rate
                     if (g_kbAllowWarping
-                        && !KbWithinWarpBand(dist2 * 0.0001f, g_kbGame->frameTime, g_kbWarpThreshold)) {
+                        && !KbWithinWarpBand(dist2 * 0.0001f, reinterpret_cast<KbGame*>(g_TrackGame)->frameTime, g_kbWarpThreshold)) {
                         velocity += delta;
                     } else {
-                        step = delta * 100.0f * g_kbGame->frameTime;
+                        step = delta * 100.0f * reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
                         velocity += step * FastInvSqrtEstimate(dist2);
                     }
                 } else {
@@ -593,7 +594,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
         } else {
             velocity = (interpTarget->velocity - interpSource->velocity) * ratio + interpSource->velocity;
         }
-        smoothedVerticalAccel = (velocity.y - prevVelocity.y) / g_kbGame->frameTime;
+        smoothedVerticalAccel = (velocity.y - prevVelocity.y) / reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
         prevSpeed = linearSpeed;
         len = KbLength(velocity);
         linearSpeed = len;
@@ -610,11 +611,11 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     // the position may move at speed + 50 per second
                     float limitSq = (len + 50.0f) * (len + 50.0f);
                     if (g_kbAllowWarping
-                        && !KbWithinWarpBandOf(dist2, limitSq, g_kbGame->frameTime, g_kbWarpThreshold)) {
+                        && !KbWithinWarpBandOf(dist2, limitSq, reinterpret_cast<KbGame*>(g_TrackGame)->frameTime, g_kbWarpThreshold)) {
                         position += delta;
                     } else {
-                        float ff = g_kbGame->frameTime * g_kbGame->frameTime;
-                        float scale = ff * 50.0f + len * g_kbGame->frameTime;
+                        float ff = reinterpret_cast<KbGame*>(g_TrackGame)->frameTime * reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
+                        float scale = ff * 50.0f + len * reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
                         step = delta * scale;
                         position += step * FastInvSqrtEstimate(dist2);
                     }
@@ -705,8 +706,8 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 roll = 1.0f;
             else
                 roll = FastSqrt(d);
-            ((KbWheel*)frontWheel)->SetRollDistance(roll * g_kbGame->frameTime);
-            ((KbWheel*)rearWheel)->SetRollDistance(roll * g_kbGame->frameTime);
+            ((KbWheel*)frontWheel)->SetRollDistance(roll * reinterpret_cast<KbGame*>(g_TrackGame)->frameTime);
+            ((KbWheel*)rearWheel)->SetRollDistance(roll * reinterpret_cast<KbGame*>(g_TrackGame)->frameTime);
         }
         if (!g_kbInterpolate)
             turnRate = states[0]->angularVelocity.y;
@@ -811,7 +812,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 v = (float)((int)((float)(c - b) * ratio) + b);
             v *= KB_BYTE_SCALE;
             lim = steerAxis->l_0x4;
-            t = g_kbGame->frameTime;
+            t = reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
             if (t >= lim)
                 t = lim;
             r = t / steerAxis->l_0x4;
@@ -838,8 +839,8 @@ void KrustyBike::Fn_00493660(float dt, int a)
             }
             crossoverPose = lean;
             poseState = states[0]->poseState;
-            if (g_kbGame->bajaEnduroEvent) {
-                if (lapGate == states[0]->lapGate - 1 || (lapGate == ((KbTrack*)g_kbGame->bajaEnduroEvent)->field_0xac - 1 && states[0]->lapGate == 0))
+            if (reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent) {
+                if (lapGate == states[0]->lapGate - 1 || (lapGate == ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->field_0xac - 1 && states[0]->lapGate == 0))
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
@@ -849,9 +850,9 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     if (prev != lapGate) {
                         if (lapGate == 0)
                             lapCount++;
-                        nextLapGate = (lapGate + 1) % ((KbTrack*)g_kbGame->bajaEnduroEvent)->field_0xac;
+                        nextLapGate = (lapGate + 1) % ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->field_0xac;
                         if (this == this->race->raceCamera->followedRacer)
-                            ((KbTrack*)g_kbGame->bajaEnduroEvent)->SelectLapGates(lapGate, nextLapGate, this);
+                            ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->SelectLapGates(lapGate, nextLapGate, this);
                     }
                 }
             } else {
@@ -933,8 +934,8 @@ void KrustyBike::Fn_00493660(float dt, int a)
             }
             crossoverPose = lean;
             poseState = interpSource->poseState;
-            if (g_kbGame->bajaEnduroEvent) {
-                if (lapGate == interpSource->lapGate - 1 || (lapGate == ((KbTrack*)g_kbGame->bajaEnduroEvent)->field_0xac - 1 && interpSource->lapGate == 0))
+            if (reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent) {
+                if (lapGate == interpSource->lapGate - 1 || (lapGate == ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->field_0xac - 1 && interpSource->lapGate == 0))
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
@@ -944,9 +945,9 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     if (prev != lapGate) {
                         if (lapGate == 0)
                             lapCount++;
-                        nextLapGate = (lapGate + 1) % ((KbTrack*)g_kbGame->bajaEnduroEvent)->field_0xac;
+                        nextLapGate = (lapGate + 1) % ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->field_0xac;
                         if (this == this->race->raceCamera->followedRacer)
-                            ((KbTrack*)g_kbGame->bajaEnduroEvent)->SelectLapGates(lapGate, nextLapGate, this);
+                            ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->SelectLapGates(lapGate, nextLapGate, this);
                     }
                 }
             } else {
@@ -1027,33 +1028,33 @@ void KrustyBike::Fn_00493660(float dt, int a)
         attachmentResetPending = reset;
         UnknownVirtualSlot21();
         prevCrashState = crashState;
-        UnknownVirtualSlot102(g_kbGame->frameTime);
+        UnknownVirtualSlot102(reinterpret_cast<KbGame*>(g_TrackGame)->frameTime);
     } else {
         savedPos = position;
     }
 
     if (g_kbInterpolate)
-        stateIntervalElapsed = g_kbGame->frameTime + stateIntervalElapsed;
+        stateIntervalElapsed = reinterpret_cast<KbGame*>(g_TrackGame)->frameTime + stateIntervalElapsed;
     if (!a && !hasFinished) {
         if (stateIntervalElapsed >= g_kbStallThreshold) {
             stallHoldTimer = g_kbStallHoldSec;
             UnknownVirtualSlot50(1, 0.0f, 0);
         } else if (stallHoldTimer > 0.0f) {
-            stallHoldTimer -= g_kbGame->frameTime;
+            stallHoldTimer -= reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
             if (stallHoldTimer < 0.0f)
                 stallHoldTimer = 0.0f;
         } else if (!isGhost) {
             UnknownVirtualSlot50(0, 0.0f, 0);
         }
     }
-    if (!g_kbGame->playingReplay) {
+    if (!reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay) {
         collisionObject->UpdatePlacement();
-        if (g_kbGame->eventType == 4)
+        if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4)
             UnknownVirtualSlot28(1);
     }
     prevVelocity = velocity;
     position = savedPos;
-    lastStepTime = g_kbGame->frameTime;
+    lastStepTime = reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
 }
 
 // 0x0048eea0, KrustyBike slot 102 (overrides Bike 0x00407440): the rider/bike pose update.
@@ -1116,8 +1117,8 @@ static inline float KbMinF(float a, float b) { return a < b ? a : b; }
 void KrustyBike::UnknownVirtualSlot102(float dt)
 {
     if (crashState || *(int*)pad_0x5B8) {
-        if (!isRemote && !g_kbGame->playingReplay) {
-            float t = -(steerState->steerAngle / steerState->maxSteerAngle);
+        if (!isRemote && !reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay) {
+            float t = -(steerState->angle / steerState->maxAngle);
             t = (t + 1.0f) * 0.25f;
             t += 0.25f;
             poseParam = (t > 0.25f) ? KbMinF(t, 0.75f) : 0.25f;
@@ -1133,7 +1134,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                 ((Character*)riderCharacter)->CharacterVirtualSlot7(0, 0, 0);
                 CharacterVirtualSlot7(0, 0, 0);
             } else {
-                int remote = isRemote || g_kbGame->playingReplay;
+                int remote = isRemote || reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay;
                 int held;
                 if (!aiKind && !remote && (UnknownVirtualSlot84(6, 0x3f) || UnknownVirtualSlot84(7, 0x3f)))
                     held = 1;

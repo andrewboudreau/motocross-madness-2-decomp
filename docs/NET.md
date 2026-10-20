@@ -133,6 +133,22 @@ Function and member names in `Net.h` are provisional (tier 3) unless noted:
 - `0x004ac830`: an if/else-if chain with one final `return 1` keeps the
   separate calls. A combined expression collapses into neg/sbb.
 
+## Network identifiers
+
+`src/reconstructed/NetworkGuids.cpp` supplies the six 16-byte GUIDs read by
+Net and MSZoneInterface. The score interface (`0x00556d80`) and class
+(`0x00556da0`) are passed to `CoCreateInstance`; the player tag
+(`0x00556db0`) and preset/rank tags (`0x00556dd0`, `0x00556de0`) identify the
+lobby property queries. The application tag (`0x00556dc0`) is shared by
+DirectPlay session setup, connection enumeration and Zone score reporting.
+
+The values, sizes and readonly storage match retail. Their descriptive names
+and original defining TU remain unproven. `tests/test_directx_guids.py`
+compiles both identifier providers with VC6 SP3 and checks exported symbol
+names, extents, storage flags and every byte against the hash-pinned private
+EXE. Supplying these constants resolves linker dependencies; it does not
+establish that the original external lobby service is operational.
+
 ## Reproduce
 
 ```bash

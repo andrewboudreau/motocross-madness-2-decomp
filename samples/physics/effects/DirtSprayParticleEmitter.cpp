@@ -1,8 +1,8 @@
 // DirtSprayParticleEmitter.cpp -- ownership uncertain, see ParticleEmitters.h.
+#include "../../../src/reconstructed/TrackGameGlobal.h"
 #include "ParticleEmitters.h"
 #include <stdlib.h>
 
-extern ParticleGameContext* g_gameContext;   // 0x0056e26c
 
 DirtSprayParticleEmitter::DirtSprayParticleEmitter(int flags) : GameObject(flags)
 {
@@ -54,7 +54,7 @@ int DirtSprayParticleEmitter::UnknownVirtualSlot27(void* a, ParticleManager* m)
 // remainder) times the rate is the number of particles, spread along the segment moved this tick.
 int DirtSprayParticleEmitter::Tick(float dt)
 {
-    if (g_gameContext->frozen == 0) {
+    if (reinterpret_cast<ParticleGameContext*>(g_TrackGame)->frozen == 0) {
         if (firstUpdate) {
             firstUpdate = 0;
             previousPosition = position;

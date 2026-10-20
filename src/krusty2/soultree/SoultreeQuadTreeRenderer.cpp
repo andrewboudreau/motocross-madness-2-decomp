@@ -3,6 +3,7 @@
 // between SoulTreePhysics.cpp and the next file).  Every function below is either a direct
 // referrer of that string (InsertNodesInQuadtree, RemoveNodesFromQuadtree) or a method of the same class laid out
 // contiguously with them, so the promotion rule is met.
+#include "../../reconstructed/TrackGameGlobal.h"
 #include "SoultreeQuadTreeRenderer.h"
 #include "core/DebugAlloc.h"
 #include "broadphase/Quadtree.h"
@@ -14,7 +15,6 @@ public:
 };
 extern TypeRegistry* g_TypeRegistry;             // 0x00575744
 
-extern SoultreeStats* g_soultreeStats;           // 0x0056e26c
 extern QuadTree* g_quadTree;                     // 0x0068aba4
 extern SoultreeObject** g_soultreeNodes;     // 0x00689ec4 node array (RegisterNode 0x4fedb0)
 extern int g_soultreeNodeCount;                  // 0x00689ec8
@@ -40,16 +40,16 @@ SoultreeQuadTreeRenderer::~SoultreeQuadTreeRenderer()
 // slot 14, 0x00504570: publishes the node counters on the statistics overlay.
 int SoultreeQuadTreeRenderer::UnknownVirtualSlot14()
 {
-    SoultreeStatsLog* log = g_soultreeStats->log;
+    SoultreeStatsLog* log = reinterpret_cast<SoultreeStats*>(g_TrackGame)->log;
     if (log) {
         if (statsId < 0) {
             int line = log->nextLineIndex++;
             statsId = line;
         }
-        SoultreeSetLineName(g_soultreeStats->log, statsId, "SoultreeQuadTreeRenderer");
-        SoultreeLogLine(g_soultreeStats->log, statsId, "Total Objects in scene : %i\n", field_0x34);
-        SoultreeLogLine(g_soultreeStats->log, statsId, "Objects Visible        : %i\n", visibleCount);
-        SoultreeLogLine(g_soultreeStats->log, statsId, "Objects in list        : %i\n", g_soultreeNodeCount);
+        SoultreeSetLineName(reinterpret_cast<SoultreeStats*>(g_TrackGame)->log, statsId, "SoultreeQuadTreeRenderer");
+        SoultreeLogLine(reinterpret_cast<SoultreeStats*>(g_TrackGame)->log, statsId, "Total Objects in scene : %i\n", field_0x34);
+        SoultreeLogLine(reinterpret_cast<SoultreeStats*>(g_TrackGame)->log, statsId, "Objects Visible        : %i\n", visibleCount);
+        SoultreeLogLine(reinterpret_cast<SoultreeStats*>(g_TrackGame)->log, statsId, "Objects in list        : %i\n", g_soultreeNodeCount);
     }
     return GraphicsTest::UnknownVirtualSlot14();
 }
@@ -127,7 +127,7 @@ void SoultreeQuadTreeRenderer::RemoveNodesFromQuadtree()
 // node on (InsertNodesInQuadtree) or, when some are on, off again (RemoveNodesFromQuadtree).
 int SoultreeQuadTreeRenderer::OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b)
 {
-    if ((g_soultreeStats->debugFlags & 4) && CheckKey(0x2d, 0, (int)a, 0x80)) {
+    if ((reinterpret_cast<SoultreeStats*>(g_TrackGame)->debugFlags & 4) && CheckKey(0x2d, 0, (int)a, 0x80)) {
         if (!field_0x34)
             InsertNodesInQuadtree();
         else

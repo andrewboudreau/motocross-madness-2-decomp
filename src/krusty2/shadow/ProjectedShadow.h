@@ -15,6 +15,7 @@
 #ifndef SHADOW_PROJECTEDSHADOW_H
 #define SHADOW_PROJECTEDSHADOW_H
 
+#include "../../reconstructed/TrackGameGlobal.h"
 #include "core/GameObject.h"
 #include "math/FastMath.h"
 #include "core/DebugAlloc.h"
@@ -156,7 +157,6 @@ public:
     virtual void Slot21();
     virtual int QueryFlag(const char* name, int defaultValue);   // slot 22 (0x58), ret 8 (tier 3)
 };
-extern ShadowSettings* g_pShadowSettings;   // 0x0056e26c
 
 // Direct3D-style device at the render target's +0x50.  PROVISIONAL: only slot 13 (0x34).
 class ShadowDevice {

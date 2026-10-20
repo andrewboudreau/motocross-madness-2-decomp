@@ -263,7 +263,7 @@
   "?g_kbAllowNegative@@3HA": "0x0056cb5c",
   "?g_kbAllowWarping@@3HA": "0x0056cb44",
   "?g_kbExtrapLimit@@3MA": "0x0056cb4c",
-  "?g_kbGame@@3PAUKbGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_kbInterpolate@@3HA": "0x0056cb60",
   "?g_kbLatencyHiding@@3HA": "0x0056cb3c",
   "?g_kbLatencyThreshold@@3MA": "0x0056cb50",

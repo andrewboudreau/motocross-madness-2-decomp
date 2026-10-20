@@ -10,6 +10,7 @@
 #ifndef SAMPLES_MOTION_SURFACEMAP_H
 #define SAMPLES_MOTION_SURFACEMAP_H
 
+#include "../../../src/reconstructed/TrackGameGlobal.h"
 #include "core/GameObject.h"
 
 // 17 dwords copied at +0x0c..+0x4f.  Tier 2: the size and the 0x40-byte-offset SetMaterial call
@@ -90,7 +91,6 @@ public:
     SurfaceDisplay* display;   // +0x10
 };
 
-extern SurfaceGame* g_pGame;   // 0x0056e26c (g_TrackGame in src/reconstructed, a TrackGame*)
 
 // Local copy of BaseObject's shape with the out-of-line constructor (0x00405120, called from
 // SurfaceMap's ctor) declared.  core/GameObject.h's BaseObject has no declared constructor, so a

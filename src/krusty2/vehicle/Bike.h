@@ -18,6 +18,7 @@
 #ifndef MCM2_PHYSICS_BIKE_H
 #define MCM2_PHYSICS_BIKE_H
 
+#include "../../reconstructed/TrackGameGlobal.h"
 #include "vehicle/Vehicle.h"
 #include "core/DebugAlloc.h"
 
@@ -297,7 +298,6 @@ struct BikeA38 {
 // (../common/SoultreeObject.h).
 
 struct BikeGlobal_0056e26c { char pad_0x000[0x2f0]; float g_0x2f0; };
-extern BikeGlobal_0056e26c* g_Bike_0056e26c;    // pointer read at 0x0056e26c (frame delta / time step; provisional)
 extern char g_BikeString_00577738[];
 extern Vec3 g_BikeVec3_005778a8;
 

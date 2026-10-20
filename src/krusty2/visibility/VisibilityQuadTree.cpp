@@ -1,4 +1,5 @@
 // VisibilityQuadTree.cpp -- reconstruction of D:\aardvark\VC\krusty2\VisibilityQuadTree.cpp.
+#include "../../reconstructed/TrackGameGlobal.h"
 #include "visibility/VisibilityQuadTree.h"
 
 // The unit's file statics, in .CRT$XCU order (entries 340-347): an empty
@@ -38,7 +39,6 @@ int ReadClock();                                        // 0x004bfa80
 int CheckKey(int key, int a, int b, int flags);         // 0x0043caa0 (cdecl, 4 args)
 void SetLineName(VisibilityLog* log, int line, const char* name);                    // 0x00447fa0
 void LogLine(VisibilityLog* log, int line, const char* format, ...);                 // 0x00447f40
-extern VisibilityProfiler* g_profiler;     // 0x0056e26c
 extern VisibilityMemoryStats* g_memoryStats; // 0x0056df04
 
 VisibilityQuadTreeNode::VisibilityQuadTreeNode()
@@ -128,16 +128,16 @@ int VisibilityQuadTree::PrepareGeometry()
         cam = View()->camera;
     Query(cam->worldX, cam->worldZ, cam);
     g_visibilityQueryTicks = ReadClock() - start;
-    if (g_profiler->log) {
+    if (reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log) {
         if (statsId < 0) {
-            VisibilityLog* log = g_profiler->log;
+            VisibilityLog* log = reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log;
             int line = log->nextLineIndex++;
             statsId = line;
         }
         g_visibilityTickStat.AddSample(g_visibilityQueryTicks);
-        SetLineName(g_profiler->log, statsId, "QuadTree");
-        LogLine(g_profiler->log, statsId, "Memory %d", g_memoryStats->GetBytes("QuadTree"));
-        LogLine(g_profiler->log, statsId, "PrepareGeometry %d %d", g_visibilityQueryTicks,
+        SetLineName(reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log, statsId, "QuadTree");
+        LogLine(reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log, statsId, "Memory %d", g_memoryStats->GetBytes("QuadTree"));
+        LogLine(reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log, statsId, "PrepareGeometry %d %d", g_visibilityQueryTicks,
                 g_visibilityTickStat.GetValue());
     }
     return 1;

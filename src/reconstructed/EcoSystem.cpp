@@ -3,6 +3,7 @@
 // match state. Line numbers in the allocation calls are the retail
 // __LINE__ values.
 
+#include "TrackGameGlobal.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -171,9 +172,9 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
             block->SelectSection("Material - 0");
             block->ReadString("TextureMap", path, -1);
             int format = 1555;
-            if (!g_TrackGame->bladeRenderer && (g_TrackGame->display->capabilityBits & 8)
-                && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
-                format = g_TrackGame->display->colorKeyFormat;
+            if (!reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer && (reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display->capabilityBits & 8)
+                && reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->GetRegistryFlag("KeyColorTrees", 0))
+                format = reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display->colorKeyFormat;
             modelTexture = TerrainLoadTexture(textures, path, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
             if (!modelTexture->IsResident()) {
                 int loaded = modelTexture->pixelFormat;
@@ -795,7 +796,7 @@ EcoSystem* EcoSystem::Create(void* view, TextureMapManager* textures, UnknownEco
                                             int textureFormat, int collisions, int level) {
     int i;
     GameObject::SetRenderContext(view);
-    g_UnknownGlobal59af14 = g_TrackGame->bladeRenderer ? g_UnknownGlobal56a600 : g_UnknownGlobal56a740;
+    g_UnknownGlobal59af14 = reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer ? g_UnknownGlobal56a600 : g_UnknownGlobal56a740;
     SetDetailLevel(level);
     groundTerrain = terrain;
     textureManager = textures;
@@ -1055,7 +1056,7 @@ int EcoSystem::PrepareGeometry() {
 void EcoSystem::SetRenderStates(int format) {
     float alphaReference;
     if (format == 1555) {
-        alphaReference = (float)(g_TrackGame->bladeRenderer ? 0 : 0xc0);
+        alphaReference = (float)(reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer ? 0 : 0xc0);
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
     } else if (format == 4444 || format == 8888) {
@@ -1100,7 +1101,7 @@ void EcoSystem::SetRenderStates(int format) {
     }
     if (format == 1555) {
         ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
-        if (g_TrackGame->bladeRenderer) {
+        if (reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer) {
             ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
             ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         } else {
@@ -1226,9 +1227,9 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStre
                     block->SelectSection("Material - 0");
                     block->ReadString("TextureMap", sltName, -1);
                     int format = 1555;
-                    if (!g_TrackGame->bladeRenderer && (g_TrackGame->display->capabilityBits & 8)
-                        && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
-                        format = g_TrackGame->display->colorKeyFormat;
+                    if (!reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer && (reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display->capabilityBits & 8)
+                        && reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->GetRegistryFlag("KeyColorTrees", 0))
+                        format = reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display->colorKeyFormat;
                     UnknownEcoTexture* texture = TerrainLoadTexture(textures, sltName, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
                     if (!texture->IsResident()) {
                         g_UnknownGlobal59af10++;

@@ -1,5 +1,6 @@
 // SurfaceMap.cpp -- SurfaceMap (0x005051f0..0x00505350), a texture plus material wrapper.
 // Placement and ownership: see SurfaceMap.h.
+#include "../../../src/reconstructed/TrackGameGlobal.h"
 #include "SurfaceMap.h"
 
 SurfaceMap::SurfaceMap(SurfaceTexture* tex, const SurfaceMaterial* mat)
@@ -49,7 +50,7 @@ void SurfaceMap::SetTexture(SurfaceTexture* tex)
 
 int SurfaceMap::Apply()
 {
-    return g_pGame->display->device->SetMaterial(&material) == 0;
+    return reinterpret_cast<SurfaceGame*>(g_TrackGame)->display->device->SetMaterial(&material) == 0;
 }
 
 void SurfaceMap::Select()
@@ -59,6 +60,6 @@ void SurfaceMap::Select()
         texture->Bind();
         return;
     }
-    g_pGame->display->Slot7(0, 1, 1);
-    g_pGame->display->Slot7(0, 4, 1);
+    reinterpret_cast<SurfaceGame*>(g_TrackGame)->display->Slot7(0, 1, 1);
+    reinterpret_cast<SurfaceGame*>(g_TrackGame)->display->Slot7(0, 4, 1);
 }

@@ -67,6 +67,7 @@
 // macro restores retail's two constants (candidate 2784 -> 2808 bytes of
 // 2796, same-mnemonic alignment 653 -> 657 of 752 instructions).
 
+#include "../../src/reconstructed/TrackGameGlobal.h"
 #include <math.h>
 
 #include "../../src/reconstructed/Krusty3DObjects.h"
@@ -121,7 +122,7 @@ int BonusObjectManager::Tick(float frameTime) {
     int digit;
     int place;
 
-    if (currentKey == -1 || g_UnknownKrustyGame56e26c->uiInteractionBlocked)
+    if (currentKey == -1 || reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->uiInteractionBlocked)
         return 1;
     if (raceView->localRacer->crashState && elapsed > 2.0f) {
         HideDigits();
@@ -136,9 +137,9 @@ int BonusObjectManager::Tick(float frameTime) {
         raceView->localRacer->modelNode->GetPosition(&position);
         position += t * keyPositionChange + keyPosition;
         baseFrame->TranslateIn(0, position);
-        if (camera != g_UnknownKrustyGame56e26c->renderTarget->currentCamera || camera->fieldOfView != placedFieldOfView ||
+        if (camera != reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->renderTarget->currentCamera || camera->fieldOfView != placedFieldOfView ||
             isResizePending) {
-            camera = g_UnknownKrustyGame56e26c->renderTarget->currentCamera;
+            camera = reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->renderTarget->currentCamera;
             placedFieldOfView = camera->fieldOfView;
             Vector3 delta = position - camera->eyePosition;
             isResizePending = 0;
@@ -220,7 +221,7 @@ int VisualCue::Tick(float frameTime) {
             return 1;
         }
     }
-    switch (g_UnknownKrustyGame56e26c->cameraMode) {
+    switch (reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->cameraMode) {
     case 2:
     case 3: {
         if (!cueView->raceTrack)
@@ -246,11 +247,11 @@ int VisualCue::Tick(float frameTime) {
     case 1:
     case 5: {
         UNKNOWN_PLACE_CUE();
-        UnknownKrustyRacerRef* ref = g_UnknownKrustyGame56e26c->bajaEnduroEvent->raceView->raceCamera->followedRacer;
+        UnknownKrustyRacerRef* ref = reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->bajaEnduroEvent->raceView->raceCamera->followedRacer;
         if (!ref)
             return 1;
         direction =
-            g_UnknownKrustyGame56e26c->bajaEnduroEvent->gates[ref->gateIndex].position - arcadeView->cameraPosition;
+            reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->bajaEnduroEvent->gates[ref->gateIndex].position - arcadeView->cameraPosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         break;
@@ -275,21 +276,21 @@ int VisualCue::Tick(float frameTime) {
     }
     case 4: {
         UNKNOWN_PLACE_CUE();
-        if (g_UnknownKrustyGame56e26c->tagBall) {
+        if (reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->tagBall) {
             Vector3 target;
-            g_UnknownKrustyGame56e26c->tagEvent->ball->sceneObject.GetPosition(&target);
+            reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->tagEvent->ball->sceneObject.GetPosition(&target);
             direction = target - arcadeView->cameraPosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         } else {
             UnknownVisualCueRacer* followed = 0;
-            if (g_UnknownKrustyGame56e26c->tagEvent->raceCamera->statusFlags & 1)
-                followed = g_UnknownKrustyGame56e26c->tagEvent->raceCamera->followedRacer;
-            if (!g_UnknownKrustyGame56e26c->tagEvent->followedRacer)
+            if (reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->tagEvent->raceCamera->statusFlags & 1)
+                followed = reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->tagEvent->raceCamera->followedRacer;
+            if (!reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->tagEvent->followedRacer)
                 return 1;
-            if (followed == g_UnknownKrustyGame56e26c->tagEvent->followedRacer)
+            if (followed == reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->tagEvent->followedRacer)
                 { isVisible = 0; return 1; }
-            direction = g_UnknownKrustyGame56e26c->tagEvent->followedRacer->position - arcadeView->cameraPosition;
+            direction = reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->tagEvent->followedRacer->position - arcadeView->cameraPosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         }

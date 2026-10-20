@@ -4,6 +4,7 @@
 // __FILE__ references (0x00431dd8..0x0043a124) in link order, and the allocations of the
 // shape setters pass that string.  The sections below were separate sample files during
 // matching; the section banners keep their original notes.
+#include "../../reconstructed/TrackGameGlobal.h"
 #include "collision/CollisionObject.h"
 #include "collision/CollisionShapeTests.h"
 #include "broadphase/Quadtree.h"
@@ -1450,7 +1451,6 @@ struct CollisionGameContext {      // object at *0x0056e26c (tier 3; root of the
     char field_0x00[0x34];
     GameObject* root;              // +0x34
 };
-extern CollisionGameContext* g_collisionGameContext;   // 0x0056e26c
 // gameobj.cpp's iterator (src/reconstructed/GameObjectIterator.h; local stand-in, 0x94 bytes).
 class GameObjectIterator {
 public:
@@ -1521,7 +1521,7 @@ int CollisionObject::QueryCollisions()
         g_collisionQuadTree->EndQuery();
     } else {
         field_0x98 = 1;
-        GameObjectIterator* it = new(__FILE__, 0x7da) GameObjectIterator(g_collisionGameContext->root, 1, "");
+        GameObjectIterator* it = new(__FILE__, 0x7da) GameObjectIterator(reinterpret_cast<CollisionGameContext*>(g_TrackGame)->root, 1, "");
         // Retail null-checks the CollisionObject* and then the GameObject* again (three tests
         // per step), which is this round trip through the derived pointer type.
         GameObject* object;

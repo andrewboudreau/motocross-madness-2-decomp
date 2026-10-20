@@ -35,9 +35,9 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-20 build compiles 162 C++ files (161 canonical sources and one
-reviewed candidate) and reaches LINK with 811 unresolved external symbols,
-down from 855 before the shared-class, startup-provider and rendering integration.
+The 2026-10-20 build compiles 163 C++ files (162 canonical sources and one
+reviewed candidate) and reaches LINK with 790 unresolved external symbols,
+down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
@@ -53,8 +53,8 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
-the change retains all 1,061 previously strict-exact physics targets and all
-2,959 strict-exact calibration rows. A native link/runtime regression checks
+the current composition retains all 1,076 strict-exact physics targets and all
+2,971 strict-exact calibration rows. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 
@@ -65,6 +65,16 @@ The [DirectX startup probe](DEVICESETUP.md#functional-build-review) remains a
 nonexact candidate in `samples/`, explicitly included after a native
 720-scenario differential test against retail. This is behavioral evidence;
 its 1006 emitted bytes still differ from the 1011-byte retail body.
+
+Fourteen [provisional views](TRACKGAME_GLOBAL.md) now read the same `g_TrackGame` pointer defined by
+MSZoneInterface, eliminating ten unresolved names in the current build. The
+views still describe only the offsets each caller uses; their consolidation
+does not establish complete class layouts. Vehicle's steering state now uses
+the existing `SteeringControl` class and its five supplied bodies, including
+the destructor confirmed by Vehicle's delete sequence. `SetAxisFromPoints`
+remains a separate unresolved partial reconstruction. Six [network GUIDs](NET.md#network-identifiers)
+also have verified source definitions. These three integrations remove 21
+unresolved symbols from the preceding 811-symbol build.
 
 The source still lacks `Game::Tick` at `0x004685d0`, called by
 `TrackGame::Tick`; its retail timing uses `rdtsc` (see [Game](GAME.md)).

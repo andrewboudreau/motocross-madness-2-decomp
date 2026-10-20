@@ -19,7 +19,7 @@ static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
-// The GUIDs at 0x00556d80..0x00556def (not defined here; names follow their
+// The GUIDs at 0x00556d80..0x00556def (defined in NetworkGuids.cpp; names follow their
 // use below; the Windows SDK headers lack the values): the score object's interface
 // and class (CoCreateInstance), the player GUID sent with both queries, the
 // application GUID (also used by Net.cpp) and the two property tags.

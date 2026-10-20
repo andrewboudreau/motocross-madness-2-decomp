@@ -81,7 +81,7 @@
   "?g_gridEdges@@3PAUGridEdge@@A": "0x006754e0",
   "?g_gridEdgesBuilt@@3HA": "0x0067b418",
   "?g_gridExtraBytes@@3HA": "0x0067b424",
-  "?g_gridGameSettings@@3PAUGridGameSettings@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_gridIndices@@3PAGA": "0x0067a68c",
   "?g_gridLevels@@3HA": "0x0056c200",
   "?g_gridOriginX@@3HA": "0x006754dc",

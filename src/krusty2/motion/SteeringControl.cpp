@@ -1,7 +1,7 @@
 // SteeringControl.cpp -- reconstruction of D:\aardvark\VC\krusty2\SteeringControl.cpp.
 // owner: SteeringControl.cpp (retail __FILE__ 0x005745ac, the constructor's debug new at
 // line 0x17; code 0x00504b60..0x005051ec after Spheres.cpp). Strict exact under the physics
-// profile: the constructor, Release, SetAxisFromDirection, SetAngle, AddAngle and the
+// profile: the constructor, destructor, SetAxisFromDirection, SetAngle, AddAngle and the
 // sixteen $E (two sets of four vectors). SetAxisFromPoints (0x00504d30) is a near miss in
 // samples/physics/motion/SteeringControl.cpp.
 #include "core/GameObject.h"
@@ -36,7 +36,7 @@ SteeringControl::SteeringControl(float scale, float t, const Vec3* axisZ, const 
     node->SetAxesPtr(axisZ, axisY, 1, 0);
 }
 
-void SteeringControl::Release()
+SteeringControl::~SteeringControl()
 {
     if (node) {
         GameObject* base = (GameObject*)((char*)node + 0xc);
