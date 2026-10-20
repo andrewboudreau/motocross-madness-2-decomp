@@ -615,8 +615,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot38@Vehicle",
     "target_va": "0x5268d0",
     "target_size": 1578,
-    "expect": "partial",
-    "notes": "1577/1578 strict, size and frame exact. Session 14: the static-body branch scales a named copy of worldAngularVelocity in place (t.x *= s.x ...) before CrossProduct(t, rel), as in its twin 0x00501600; the 0x69/0x2711 blocks store l10 = 0 first, zero v3c, v48, v30 in that order and set s = VehOnes() last; otherVel is declared before other (xor order). Three semantic fixes came with it: slot 4 takes otherVel, &v48, &v3c, &v30, (Vec3*)c in that order; the 0x69/0x2711 otherVel comes from the body, not from ctx; and the other-body branch writes the other body's linearSpeed and worldAngularVelocity. Remaining byte: at the join of the hasBody = 0 cases VC6 loads the unset ctx from b's slot (retail [esp+0x74]) instead of c's ([esp+0x78]); declaration position (all 11) and type (int, long, unsigned) of ctx do not move it, and a ctx = b store is a different function (203).",
+    "expect": "exact",
+    "notes": "Exact under vc6_o2_ml (session 14; was 394/1578 at 1554 bytes). The static-body branch scales a named copy of worldAngularVelocity in place (t.x *= s.x ...) before CrossProduct(t, rel), as in its twin 0x00501600; the 0x69/0x2711 blocks store l10 = 0 first, zero v3c, v48, v30 in that order and set s = VehOnes() last; otherVel is declared before other (xor order). The other body's angular-velocity pointer is its own local otherAngVel: reusing the c argument for it made VC6 give the unset ctx c's home instead of b's at the join of the hasBody = 0 cases (the last byte). Three semantic fixes came with it: slot 4 takes otherVel, &v48, &v3c, &v30, otherAngVel in that order; the 0x69/0x2711 otherVel comes from the body, not from ctx; and the other-body branch writes the other body's linearSpeed and worldAngularVelocity.",
     "bindings": "Vehicle.bindings.json"
   },
   {

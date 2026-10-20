@@ -339,6 +339,13 @@ Strict exact under `vc6_o2_ml` with `Vehicle.bindings.json` / `Bike.bindings.jso
   stored (retail stores `leanError` before reserving `_finite`'s double argument);
   RotateAboutPoint takes the pivot first; the lean-axis scales go through a by-value helper;
   the cancel deltas are read by reference and the negative-side clamp is `0.0f > n`.
+- Vehicle.cpp slot 38 `0x005268d0` (collision response dispatch, 1578 bytes): the static
+  arm scales a local copy of `worldAngularVelocity` in place before the cross, as its
+  SoultreePhysicsBaseObject twin `0x00501600` does; the 0x69/0x2711 blocks store `l10 = 0`
+  first; and the other body's angular-velocity pointer is its own local (`otherAngVel`),
+  not the reused `c` argument. Matching it also fixed the slot 4 argument order, took
+  `otherVel` from the other body and made the other-body branch update that body's speed and
+  angular velocity.
 
 x87 operand order facts measured on these targets (they add to the list below):
 
