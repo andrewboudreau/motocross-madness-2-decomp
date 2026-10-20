@@ -73,6 +73,12 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 // Same bytes (151/230): level/row int locals, a flat
 // (&b[0][0])[row * 3 + level - 1] index, swapped products, an else arm. A KbGame*
 // local for both arms drops to 22.
+// Measured (s14): the else arm gets retail's registers (g in eax, index in edx) when the
+// true arm binds `KbGame&` (100/229), uses `i += eventType != 3 ? 3 : 0`, or comes second
+// (`if (!aiKind)`, wrong layout); the true arm then still loads +0x60c after the cmp into
+// the eventType register, where retail loads it into the g register before the xor/cmp.
+// Index spellings (level-first sums, pointer rows, inline accessors, top-level locals)
+// all compile to the base bytes.
 int KrustyBike::UnknownVirtualSlot70(float arg)
 {
     float b[2][3] = { { 4.0f, 3.25f, 2.5f }, { 3.75f, 3.25f, 2.5f } };
@@ -205,6 +211,13 @@ static inline void KbSub(Vec3* out, const Vec3& a, const Vec3& b)
 // keeps the first copy (record branch, inline) as the home and drops the end block
 // (2295 B, 78 differing instructions); `goto deltas` + inline calls move the block inline
 // after the record branch and the network copy to the end (2337-2348 B).
+// Measured (s14): with the network copy passing 0, a record copy passing a constant (`1`)
+// leaves one differing instruction (`push 1; jmp end+1` for retail's `jmp end`, 2317 B);
+// with `record` the record copy and the end block are identical and VC6 keeps the record
+// copy as home, early returns included (2295 B). Equal-value spellings (`record + 0`, casts,
+// a copied local, `record != 0 ? record : 1`), per-copy inline helpers, `if (0) goto`,
+// dead statements, an explicit end return, `if (!record)` order and `goto deltas` forms
+// leave the home there.  So retail's end block was home at the merge; the cause is open.
 // Shapes that mattered: `KbSub` through an out-pointer keeps `diff` a 12-byte slot (the
 // operator form is scalar-replaced and repacks the frame); one `ping` next to `message`
 // overlays the dead `d` slots; the angular-velocity and angle limits are 2 pi, not 30;
