@@ -962,3 +962,7 @@ try on similar code. None is a rule.
   both loops always gives n then n - 1 calls. Two inlines with the same body and three and
   five unused poses give 2/4. A wrapper that adds poses and calls the first inline is
   called out of line instead.
+- **Bracketed products of the last statement move the return-value load.** OrientationAxes
+  (`0x004b5d00`, 265 to 274 of 274): retail loads `mov eax, 1` before the last `faddp`. With
+  `t = c * f->z - (s * f->x); f->x = (c * f->x) + s * f->z;` VC6 schedules it there; unbracketed,
+  or with only one of those two products bracketed, it lands between the closing `fstp`s.

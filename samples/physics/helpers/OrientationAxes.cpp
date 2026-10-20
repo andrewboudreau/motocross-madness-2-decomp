@@ -2,17 +2,16 @@
 // 0x004b5a60, in the same unit between OptionProcs.cpp (last literal
 // reference 0x004b5119) and overlay.cpp (0x004b60a2); ownership tier 3.
 //
-// Near miss: 265/274 bytes, 91 of 91 instructions in order. The only
-// difference is where VC6 schedules `mov eax, 1`: retail puts it before the
-// last faddp, this build puts it between the two closing fstps. The split
-// `t = s * z; t += c * y;` in the pitch step is load-bearing (one expression
-// multiplies by c first); an early `if (!up || !forward) return 0;`, a nested
-// `if (up && forward)` and splitting the last yaw product the same way do not
-// move the mov. Neither do an `int result = 1` local (declared at the top or
-// just before the last block), returning `forward != 0`, `up != 0`, their
-// conjunction or `true`, a block-scoped last temporary, the last sum with
-// its operands swapped, or the /G6 and /ML profiles; a result flag set inside
-// a nested `if (up && forward)` loses 240 bytes.
+// Exact (274/274 with relocations resolved). The split `t = s * z;
+// t += c * y;` in the pitch step is load-bearing (one expression multiplies
+// by c first). Retail schedules the closing `mov eax, 1` before the last
+// faddp only when the last yaw step brackets its products, as written
+// below; without the brackets VC6 puts the mov between the two closing
+// fstps (265/274). Bracketing only `(s * forward->x)` and `(c * forward->x)`
+// is enough; bracketing either one alone, or `(s * forward->z)` alone, is
+// not. Earlier forms that do not move the mov: an early or nested null
+// test, an `int result` local, other return expressions, a block-scoped or
+// split last temporary, swapped sum operands, and the /G6 and /ML profiles.
 #include <math.h>
 
 #include "../../../src/reconstructed/MatrixUtil.h"
@@ -54,8 +53,8 @@ int OrientationAxesFromAngles(Vector3* forward, Vector3* up, float yaw, float pi
     t = c * up->z - s * up->x;
     up->x = c * up->x + s * up->z;
     up->z = t;
-    t = c * forward->z - s * forward->x;
-    forward->x = c * forward->x + s * forward->z;
+    t = c * forward->z - (s * forward->x);
+    forward->x = (c * forward->x) + (s * forward->z);
     forward->z = t;
     return 1;
 }
