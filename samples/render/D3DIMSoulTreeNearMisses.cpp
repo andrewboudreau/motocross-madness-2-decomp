@@ -28,6 +28,10 @@
 // Dead initialised int locals (2026-10-11): 0..33 at the top and 0..31 just before row 1
 // give the same scores by count (799 at 0 and 29..33, otherwise 706..776), so the count
 // moves all rows together and no count gives retail's row 1.
+// One term per statement (2026-10-20, 625 forms: row 1 summed into the
+// field or into a float local, terms t0 up or t3 down): only `_24` summed
+// into a local from t3 down moves it (805); the same form on _21.._23 gives
+// 739..741, so no uniform form exists and none is kept.
 //
 // DrawCurrentLod (0x00440f30..0x00442dd8, 7848 bytes): the drawing
 // function. A nine-way switch on the material mapping type (+0xc8; source

@@ -9,7 +9,11 @@
 // (the candidate emits the opposite operand order). Rewriting the OR tree,
 // an inline swap helper and declaration order had no effect; `32 - count`
 // written at each use (no carryShift) is worse, assigned after the
-// declarations unchanged.
+// declarations unchanged. Also 343 in all 864 forms of a 2026-10-20 sweep:
+// count copied into a local, the fillWord test inverted, `*dst = *dst | `
+// either way round, the first swap stored through `value`, `i > 0` and
+// `while (i--)` loops, and the six orders of the dst/words/carryShift
+// declarations.
 //
 // 0x00423b70 (442 bytes; sub-word shift toward the back): as 0x004239c0;
 // in addition retail rotates the source-pointer decrement to the loop head

@@ -13,6 +13,9 @@
 // unchanged or worse: `* 65536`/`* 0x10000` of the x difference, the shifts
 // distributed over x and the origin, unsigned short casts, and `|` instead of
 // `+` (the `|` form gives z retail's edi but not the x/index registers, 1084).
+// dx/dz locals shared by the u, ny and packed terms give 744; the operand
+// order of the index and origin sums, and ten more packed-word spellings
+// (`* 65536` distributed or not, `- gz + z`, `x + -gx`), leave 1069.
 //
 // DrawableGridNode 0x0047e600 (node loader, 1617 bytes; 1091 of 1630): the
 // stream reads, both allocations, the bit fields and the child creation
