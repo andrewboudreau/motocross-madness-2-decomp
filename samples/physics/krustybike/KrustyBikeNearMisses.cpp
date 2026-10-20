@@ -79,6 +79,11 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 // the eventType register, where retail loads it into the g register before the xor/cmp.
 // Index spellings (level-first sums, pointer rows, inline accessors, top-level locals)
 // all compile to the base bytes.
+// Measured (s14f): a true-arm `KbGame*` local gives the else arm retail's registers but
+// holds the game in eax with `setne dl` (100/230). Type/level int locals in either
+// order, flat sums, `== 3 ? 0 : 1`, `!(== 3)`, `3 !=`, `else` arms and a scale local
+// give the base bytes or fewer; a `>` compare, a shared speedGain or limit local and a
+// conditional row pointer lose more (123, 59, 26, 22).
 int KrustyBike::UnknownVirtualSlot70(float arg)
 {
     float b[2][3] = { { 4.0f, 3.25f, 2.5f }, { 3.75f, 3.25f, 2.5f } };

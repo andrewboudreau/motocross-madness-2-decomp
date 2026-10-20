@@ -10,6 +10,9 @@
 // (copied before or after the length, read in any operand order; all 145), and dir, d
 // or len declared at function scope or len computed through an if/else (all 145), and a
 // 512-variant sweep of single-product brackets and operand orders (all 145).
+// Scaling a copy in place (`Vec3 dir = d; dir.x *= inv; ...`, the SoultreePhysics slot 38
+// lever), in any component order, copied before the length or scaling d itself, gives
+// 55-60: retail consumes d.x and d.z in place but keeps the product temporaries.
 // The promoted file supplies the rest of the unit.
 #include "motion/SteeringControl.cpp"
 
