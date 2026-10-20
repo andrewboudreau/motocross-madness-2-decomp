@@ -78,6 +78,9 @@ static inline CollisionVec3 TireNormalizeZ(const CollisionVec3& v)
 // product, negated c.y, declaring y and z apart from their copies (either order),
 // member-wise copies of y and z (53-55 slot lines), and a cross helper taking y and z
 // by reference, pointer or value in either order (y then loads first everywhere).
+// A 256-variant sweep bracketing each single product of the cross (the OrientationAxes
+// lever) with both operand orders of the two y.x products tops out at 695: only the
+// bracket on c.x's first product changes the code, and not towards retail.
 void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const CollisionVec3* zAxis,
                            const CollisionVec3* yAxis, int orthogonalize, int keepZ)
 {
@@ -329,19 +332,23 @@ static inline CollisionVec3 TireScaleCopy(const CollisionVec3& v, float s)
 // also zeroes field_0x90) field_0x1e8 = field_0x218.
 // field_0x50 is field_0x1e8 normalised, field_0x94 its length, and the outputs report
 // |field_0x50 . field_0x230| scaled by that length in field_0x27c plus its sign.
-// Near miss, 1584 of 1664 bytes. `tangent` is a local so VC6 homes it (and the
+// Near miss, 1588 of 1664 bytes. `tangent` is a local so VC6 homes it (and the
 // projection) in the dead `axis` argument slot like retail; `(-c) * x` keeps retail's
 // fchs-then-fmul where `-c * x` lets VC6 hoist c * x above the branch. The slip
 // vector is scaled through TireScaleCopy (retail's `fld mem; fmul st(1)`) and summed
 // and normalised through TireSum/TireScaled (retail's copy-store schedule). Left:
 // the lever's `lea edi` and store are scheduled later, the second TireDot push comes
-// before the y product instead of after it (the d-path dot's x term is written
-// `ref.x * tangent.x`, which loads retail's operand first).
+// before the y product instead of after it, and the cross temporaries' frame slots.
+// The d-path dot is written `ref.z * tangent.z + ref.x * tangent.x + ref.y * tangent.y`:
+// VC6 emits a three-term chain in reverse source order with each product's operands
+// swapped, which gives retail's `t.y * ref.y`, `t.x * ref.x`, `t.z * ref.z` (1584 -> 1588).
 // No gain from a products-first cross or projection for the lever
 // (1571), a named lever or projection local (1575), a pointer or reference alias of
 // the lever member (767), a TireScaleCopy that copies all three components or none (1548..1555),
-// or the d-path dot written out in any order (1133..1137) or through a helper with
-// copied or swapped x operands (1575..1582).
+// the d-path dot through a helper with copied or swapped x operands (1575..1582),
+// a named scaled vector or the TireSum operands swapped, or any parenthesisation of the
+// six products of either cross (64 forms each through a local helper; only the
+// unparenthesised form keeps 1588).
 void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, CollisionVec3 ref,
                               float minLength, float* outValue, int* outSign)
 {
@@ -362,7 +369,7 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
             CollisionVec3 n;
             tangent = *Vec3Normalize(&n, &tangent);
         }
-        float d = tangent.y * ref.y + ref.x * tangent.x + tangent.z * ref.z;
+        float d = ref.z * tangent.z + ref.x * tangent.x + ref.y * tangent.y;
         this->CollisionPoint::tangentSpeed = d;
         if (d > 0.001f) {
             if (reportContactOutputs)

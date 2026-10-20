@@ -36,7 +36,7 @@
     "target_va": "0x004060c0",
     "target_size": 1678,
     "expect": "partial",
-    "notes": "slot 7: 1677/1678 strict; the only difference is the second contact loop's load, which addresses [eax + ecx] where retail has [ecx + eax] (Vehicle slot 7 gets retail's order from the same loop)",
+    "notes": "slot 7: 1677/1678 strict; the only difference is the second contact loop's load, which addresses [eax + ecx] where retail has [ecx + eax] (Vehicle slot 7 gets retail's order from the same loop). Also inert: the weighting loop as a while loop, with `continue`, with its own `int j`, or with `active--` first (worse), and the share stored before the weight (worse).",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -96,7 +96,7 @@
     "target_va": "0x00407440",
     "target_size": 485,
     "expect": "partial",
-    "notes": "474/485, 131/135 instructions align. Both clamps are nested BikeMin/BikeMaxF calls: the crash pose is BikeMin(BikeMaxF(t, 0.25), 0.75) (the head through the first return now matches) and the vertical-accel lean is BikeMaxF(BikeMin(a, 32.2), -32.2) (retail tests 32.2 first, from the helper's by-value copy at [esp+0x10]). Left: (1) retail keeps the dead `cnt += 2` (add ecx, 2; mov [esp+0x10], ecx) in the idx<=2 arm; (2) register roles: retail idx=edi, next=ebx, step=eax, cnt=ecx; ours reversed, declaration order has no effect; (3) the 0.0310559 factor is read from 0x00550790 (the copy VehicleCamera binds) while the rest of Bike.cpp uses 0x00550ad0, and 1.0f/32.2f folds to the same __real symbol.",
+    "notes": "474/485, 131/135 instructions align. Both clamps are nested BikeMin/BikeMaxF calls: the crash pose is BikeMin(BikeMaxF(t, 0.25), 0.75) (the head through the first return now matches) and the vertical-accel lean is BikeMaxF(BikeMin(a, 32.2), -32.2) (retail tests 32.2 first, from the helper's by-value copy at [esp+0x10]). Left: (1) retail keeps the dead `cnt += 2` (add ecx, 2; mov [esp+0x10], ecx) in the idx<=2 arm; (2) register roles: retail idx=edi, next=ebx, step=eax, cnt=ecx; ours reversed, declaration order has no effect; (3) the 0.0310559 factor is read from 0x00550790 (the copy VehicleCamera binds) while the rest of Bike.cpp uses 0x00550ad0, and 1.0f/32.2f folds to the same __real symbol. Tried: dropping the cnt local (reads poseState in the test; no store, other bytes unchanged), `cnt += 2` before `next = idx + 1`, `if (crossoverPose)` without the step local, and `next` initialised at its declaration (all inert or worse).",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -1606,7 +1606,7 @@
     "target_va": "0x0040a520",
     "target_size": 2272,
     "expect": "partial",
-    "notes": "1671/2272 strict (candidate 2232 bytes). Same call sequence and control flow; the axis references and zero-first if (d >= 0) arms give retail's edi axis pointer and branch layout. Left: the operator return temporary and base swap slots (retail base 0x38, temps 0x44), cross products load the first-stored multiplicand first where retail loads it second, the airborne test al, al is issued earlier and the steerTorque update (retail stores result and k and copies the constructed Vec3 through a temporary before the adds). Declaration order does not move the slots.",
+    "notes": "2112/2272 strict (candidate 2272 bytes). Same call sequence and control flow; the axis references and zero-first if (d >= 0) arms give retail's edi axis pointer and branch layout; the gain products as float locals and a named delta give retail's steerTorque update, and (len * stepTime) * sign its angle product; driven = 1 precedes the left-contact subtraction as in retail. Left: the operator return temporary and base swap slots (retail base 0x38, temps 0x44), cross products load the first-stored multiplicand first where retail loads it second, and the airborne test al, al is scheduled earlier. Declaration order does not move the slots.",
     "bindings": "Bike.bindings.json"
   },
   {

@@ -8,7 +8,8 @@
 // first, 1 / len argument), copies of d or of d.x/d.z for the length or the scale
 // (all 145; component stores 109), and an explicit `float dx` held across the scale
 // (copied before or after the length, read in any operand order; all 145), and dir, d
-// or len declared at function scope or len computed through an if/else (all 145).
+// or len declared at function scope or len computed through an if/else (all 145), and a
+// 512-variant sweep of single-product brackets and operand orders (all 145).
 // The promoted file supplies the rest of the unit.
 #include "motion/SteeringControl.cpp"
 

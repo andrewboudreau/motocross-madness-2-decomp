@@ -81,6 +81,20 @@ static inline ConVec3 ConCrossGrouped(const ConVec3& a, const ConVec3& b)
     return r;
 }
 
+// ConCross with every product parenthesised (d3dvec's CrossProduct spelling), for termA's
+// rl x nl: the extra nodes move the `test edi, edi` of `if (other)` up into termA's rotation,
+// three instructions from retail's position (2499 -> 2515). A scheduling tie-break: every
+// form with four or six parenthesised products gives these bytes; none, one, two, three or
+// five give 2495..2511.
+static inline ConVec3 ConCrossParen(const ConVec3& a, const ConVec3& b)
+{
+    ConVec3 r;
+    r.x = (a.y * b.z) - (a.z * b.y);
+    r.y = (a.z * b.x) - (a.x * b.z);
+    r.z = (a.x * b.y) - (a.y * b.x);
+    return r;
+}
+
 // ConDot with the y product parenthesised: the extra node makes VC6 accumulate termB's dot
 // in the register of the cross product's y, as retail does (fld c.y; fmulp st(2)).
 static inline float ConDotGroupedY(const ConVec3& a, const ConVec3& b)
@@ -103,7 +117,7 @@ static inline float ConDotGroupedY(const ConVec3& a, const ConVec3& b)
 // Retail recomputes local(J) twice into the same local and converts rA to the local frame in
 // place (both written that way below); wA is reloaded from slot 43 at the end.
 //
-// NEAR MISS: 2499/2619 strict positions (candidate size exact), 11 differing runs.
+// NEAR MISS: 2515/2619 strict positions (candidate size exact), 11 differing runs.
 // The frame (0xb8) and its slot order match, as do the call sequence and every operand.
 // Session 14: termB's dot through ConDotGroupedY (y product parenthesised) makes VC6
 // accumulate it in the cross product's y register as retail does (removes the extra
@@ -113,11 +127,13 @@ static inline float ConDotGroupedY(const ConVec3& a, const ConVec3& b)
 //    (0x43beb4..0x43bf02);
 //  - the rl copy's last two dwords and one fsubp of the wA x rA cross (0x43bff5);
 //  - one dword move against an fld in the 'other' path (0x43c1ce);
-//  - the `test edi, edi` of `if (other)` (retail issues it inside the termA rotation);
+//  - the `test edi, edi` of `if (other)`: retail issues it inside the termA rotation, three
+//    instructions before the candidate (rl x nl through ConCrossParen; it was eight);
 //  - one fld/fmul st(2) pair of termB's cross that VC6 forms as fld st(1); fmul (0x43c3ea).
 // Session 14 also tried: num and termA's dots with every grouping (inert once termB is
 // grouped); every parenthesisation of the six products in vA's cross (64 forms, the kept
-// one is best; A=0 fewer runs (10) but 2495).
+// one is best; A=0 fewer runs (10) but 2495); every parenthesisation of termB's two
+// crosses, wB x rB and axisA x rl (64 forms each, all 2499 or lower).
 // Forms tried without reaching those (about 35): dot product as by-reference or by-value
 // helper with every grouping of the three terms (x+y)+z, flat, z+(x+y), (y+x)+z, x+(y+z),
 // (x+z)+y, y+(x+z), both argument orders, written out with a named cross local; termB through
@@ -161,7 +177,7 @@ void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t
     float num = -((restitution + 1.0f) * ConDot(c, vRel));
 
     float invMassA = 1.0f / body->mass;
-    ConVec3 axisA = ConRotate(ConCross(rl, nl), body->invInertia);
+    ConVec3 axisA = ConRotate(ConCrossParen(rl, nl), body->invInertia);
     float termA = ConDot(ConCross(axisA, rl), nl);
     float invMassB = 0.0f;
     float termB = 0.0f;

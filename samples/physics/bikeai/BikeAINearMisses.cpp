@@ -39,7 +39,9 @@
 // position, a dead `seg.y = 0` after the segment differences and component-wise
 // segment differences do not change it; nor do the walk lengths written out in the
 // body, by-value or by-pointer length helpers, `seg` read through a reference or
-// `(&seg)->y`, or by-reference scale helpers for y or y and z) and frame slots.  One perpendicular `n` at the
+// `(&seg)->y`, by-reference scale helpers for y or y and z, or brackets around single
+// products of the step rows, `ahead / len`, the length-helper terms and the outDir sum,
+// all 1884) and frame slots.  One perpendicular `n` at the
 // enclosing scope serves both intersection blocks and the final shift, which puts it at
 // retail's +0x14 (block-local `n`s in the two blocks: 1865; hoisting one of them: 1872;
 // all three as one: 1884).  Left in the frame: retail pairs `seg` with `step` at +0x20
