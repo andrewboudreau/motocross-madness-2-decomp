@@ -568,7 +568,12 @@ static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
 // min(1.5*c, 1); the new velocity is renormalised to the old speed (field_0xbc) and the signed
 // deflection angle is returned (0 when the change is negligible or not finite).  The angle is
 // its own local: written back into `sign`, its home moved to the d argument slot and len/sign
-// traded the point/dir slots (retail: sign, len, angle in point, dir, c).
+// traded the point/dir slots (retail: sign, len, angle in point, dir, c).  The Math3D
+// operator sum (`u + velocity`) schedules scratchVector's y store as retail (512 -> 523/539).
+// Left: retail stores field_0x4e8 before the abs compare (fst; fld st(0); fcom), and u.x loads
+// s first (fld st(0); fmul [t.x]).  No gain from component-wise, constructor, VehScale or
+// *= forms of u, a pointer to t, or assigning k through field_0x4e8, ?: or a nested store;
+// VehAbs or an if-negated copy costs 6 bytes.
 float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
 {
     float k = UnknownVirtualSlot73(point, dir) * d;
@@ -581,11 +586,8 @@ float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
         float s = c * 1.5f;
         if (!(s < 1.0f))
             s = 1.0f;
-        Vec3 u;
-        u.x = s * t.x;
-        u.y = t.y * s;
-        u.z = t.z * s;
-        scratchVector = VehSum(u, velocity);
+        Vec3 u = t * s;
+        scratchVector = u + velocity;
         Vec3* nv = &scratchVector;
         float len2 = VehLen2(*nv);
         float len;
