@@ -635,7 +635,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
             AddLateTicker((VehicleTicker*)rotShock);
         } else {
             lineShock = new(__FILE__, 0x696) VehicleInlineShock(partName, modelNode, handlebars->node, 1.0f,
-                                                                spring[i], damper[i], ratio[i], limit[i], 0.25f);
+                                                                damper[i], spring[i], ratio[i], limit[i], 0.25f);
             AddEarlyTicker((VehicleTicker*)lineShock);
         }
         int driven[2] = { 0, 1 };
@@ -647,8 +647,8 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
             BaseObjectVirtualSlot2();
             return 0;
         }
-        float grip[2] = { 0.5f, 1.0f };
         float roll[2] = { 0.1f, 1.0f };
+        float grip[2] = { 0.5f, 1.0f };
         float a12 = controlResponse[4] * 10.0f;
         float a13 = controlResponse[5] * 25.0f;
         VehicleWheel* wheel = new(__FILE__, 0x6b8) VehicleWheel(partName, modelNode, 0.15f, 2.0f, kind5[i],
