@@ -569,6 +569,16 @@ static inline CollisionVec3 TireSumGroupedZ(const CollisionVec3& a, const Collis
     return r;
 }
 
+// TireScaledCtor through local copies of v.y and v.z: the constructor's arguments are
+// evaluated z, y, x, and the copies make VC6 load z and y first and multiply by the held s
+// (`fld mem; fmul st(1)`), with x as `fmul mem`, as retail does for the refined probe.
+static inline CollisionVec3 TireScaledCtorCopyYZ(const CollisionVec3& v, float s)
+{
+    float y = v.y;
+    float z = v.z;
+    return CollisionVec3(v.x * s, y * s, z * s);
+}
+
 void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity, float angle,
                                  float radiusScale, float a5, const CollisionVec3* a6,
                                  const CollisionVec3* a7, TireNode* a8)
@@ -664,22 +674,25 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     CollisionVec3 v = TireNormalizeOr(TireCross(n2, sideAxis), wheelUpAxis);
     CollisionVec3 u = TireCrossGrouped(v, sideAxis);
     CollisionVec3 lateral2 = u;
-    if (u.x * n2.x + u.y * n2.y + u.z * n2.z > 0.0f) {
+    if (u.z * n2.z + (u.y * n2.y + u.x * n2.x) > 0.0f) {
         lateral2.x = u.x * -1.0f;
         lateral2.y = u.y * -1.0f;
         lateral2.z = u.z * -1.0f;
     }
 
-    CollisionVec3 scaled = TireScaledCtor(lateral2, wheelRadius);
+    CollisionVec3 scaled = TireScaledCtorCopyYZ(lateral2, wheelRadius);
     CollisionVec3 r = CollisionVec3(scaled.x + origin.x, scaled.y + origin.y, scaled.z + origin.z);
     pt = r;
     CollisionVec3 n3;
     world->QueryGround(&pt, &n3, 0, &kind);
-    float delta = pt.y - r.y;
-    if (delta * n3.y > this->CollisionPoint::penetration) {
+    // delta and the score are assigned inside the test: retail keeps delta with `fst` and
+    // the score on the x87 stack for the penetration store.
+    float delta;
+    float score;
+    if ((score = (delta = pt.y - r.y) * n3.y) > this->CollisionPoint::penetration) {
         lateral = lateral2;
         this->CollisionPoint::worldPosition = r;
-        this->CollisionPoint::penetration = delta * n3.y;
+        this->CollisionPoint::penetration = score;
         this->CollisionPoint::surfacePosition = pt;
         *TireSurfaceByte(this) = kind & 7;
         if (!TireSameVec(n2, n3)) {
