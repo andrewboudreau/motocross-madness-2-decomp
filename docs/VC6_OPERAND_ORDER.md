@@ -747,3 +747,11 @@ try on similar code. None is a rule.
   `(-side) * scale * tangentSin * mu` first and the stacked sqrt last. With
   `float s = sqrt(...); tangentSin = s;` and the product still reading `tangentSin`,
   the sqrt register is used in its source position, as in retail.
+- **Self-copies of a parameter mean a new local coalesced into its slot.** Bike slot 99
+  (`0x00409b30`): retail `mov ecx,[a]; mov [a],ecx` on the pass-through arms of a clamp
+  comes from `float step; if (a < k) step = m > a ? m : a; else step = a;` with later
+  code reading `step`: VC6 gives step the parameter's slot but keeps the copies.
+  Clamping `a` in place, with any if/ternary form, drops them.
+- **A branch straight to the epilogue past `xor eax, eax` returns the tested value.**
+  Retail `test eax,eax; jne <pop edi>` after `mov eax,[field]` is
+  `if (field != 0) return field;`, not `return 0`.
