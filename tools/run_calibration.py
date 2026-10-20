@@ -25731,7 +25731,7 @@ CASES = [
         'symbol': '?OrientationAxesFromAngles@@YAHPAUVector3@@0MMM@Z',
         'target_va': '0x004b5d00',
         'target_size': 274,
-        'reason': 'near miss (96.7%): forward/up axes from roll, pitch and yaw; VC6 schedules the `mov eax, 1` between the closing fstps instead of before the last faddp',
+        'reason': 'forward/up axes from roll, pitch and yaw; the bracketed products of the last yaw step give the retail `mov eax, 1` schedule (between OptionProcs.cpp and overlay.cpp; ownership tier 3)',
     },
     {
         'name': 'GameUiHelpers.cpp 0x47b670 CrossesGate',

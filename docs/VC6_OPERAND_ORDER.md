@@ -977,3 +977,27 @@ try on similar code. None is a rule.
   both loops always gives n then n - 1 calls. Two inlines with the same body and three and
   five unused poses give 2/4. A wrapper that adds poses and calls the first inline is
   called out of line instead.
+- **Bracketed products of the last statement move the return-value load.** OrientationAxes
+  (`0x004b5d00`, 265 to 274 of 274): retail loads `mov eax, 1` before the last `faddp`. With
+  `t = c * f->z - (s * f->x); f->x = (c * f->x) + s * f->z;` VC6 schedules it there; unbracketed,
+  or with only one of those two products bracketed, it lands between the closing `fstp`s.
+- **Non-source probe: a no-op store ages an untouched operand.** SoultreeObject
+  WorldToLocalDirection (`0x004fd710`, 207 of 209): retail loads `v.x` before `m._11` in
+  the last x product, where `m._11` is the only element of the product the inline
+  transpose does not write. As a probe only, `m._11 = m._11;` (or `m._11 *= 1.0f`) at the
+  end of the transpose emits nothing yet gives 209/209, which supports section 1.2 (the
+  store makes `m._11` the newer leaf). It is a matching-only distortion and is not kept in
+  the sample. Natural shapes that write the diagonal (a loop over `j <= i`, a SwapF helper,
+  a full copy back, a nine-entry transpose into a destination matrix, a by-value
+  `Matrix3 Transposed()`) change the code shape (50 or more lines differ). The same
+  probe on the matrix operands of SoultreeBounds Scale (`0x004fd340`) does not move s13.
+- **A guarded pointer-local loop moves the loop counter's home.** SoultreeRefreshContacts
+  (`0x0043ad80`, 597 to 604 of 615): `for (; count > 0; count--, points++)` homes the
+  counter in a1's dead argument slot; retail uses points' slot and loads points after the
+  count test. `if (count > 0) { CollisionPoint** pp = points; for (; count > 0; count--,
+  pp++) ... }` gives both. Without the guard, the `pp = points` load moves above the test.
+- **Bracketed products move integer stores past an fsubp.** SoultreeObject SetAxesIn
+  (`0x004fc050`, 1073 to 1089 of 1123 comparable): in the inline cross
+  `r.y = z.x * y.z - z.z * y.x` VC6 put the next dword copy store before the fsubp; retail
+  puts it after. `r.y = (z.x * y.z) - (z.z * y.x)` (any bracketing of the first product of the
+  y and z rows) gives retail's order; bracketing only the second products does not.

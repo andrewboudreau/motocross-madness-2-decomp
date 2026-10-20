@@ -38,6 +38,10 @@ static inline Vec3 RotateVectorRetail(Vec3 v, const Matrix4& m)
 // helper, block-scoped or three temporaries, the matrix by value into a helper that
 // transposes it (both parameter orders, one or two helper levels), and the copy and
 // transpose written inline. The constructor and copy-in-helper forms reorder y (199).
+// Session 14: transposes that also write the diagonal (a j <= i loop, a swap helper
+// with a diagonal self-swap, a full copy assigned back, a nine-entry transpose into a
+// destination matrix, a by-value Matrix3 Transposed()) change the code shape (50+ lines).
+// Only a no-op store to m._11 (a non-source probe, not kept) gives 209/209.
 Vec3 SoultreeObject::WorldToLocalDirection(const Vec3& v)
 {
     UpdateWorldMatrix();

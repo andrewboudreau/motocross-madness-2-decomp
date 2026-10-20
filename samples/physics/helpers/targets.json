@@ -90,7 +90,7 @@
     "target_size": 209,
     "expect": "partial",
     "bindings": "SoultreeTransform.bindings.json",
-    "notes": "207/209 bytes: retail loads v.x before m._11 in the last x product"
+    "notes": "207/209 bytes: retail loads v.x before m._11 in the last x product. Session 14: a no-op m._11 store gives 209/209 as a non-source probe only (VC6_OPERAND_ORDER.md); a nine-entry transpose into a destination matrix, a by-value Matrix3 Transposed() and a j <= i loop transpose all change the code shape."
   },
   {
     "class": "SoultreeObject",
@@ -99,7 +99,7 @@
     "target_va": "0x4fc050",
     "target_size": 1171,
     "expect": "partial",
-    "notes": "1121/1171, 4 differing instructions (fsubp scheduling in the inline cross); see the comment above SetAxesIn. Frame slots from esp: retail z, y, r (shared with the RotateByRowsTo delta copy), cross temporary, pos; ours z (shared with d), y, cross temporary, pos, r. Removing the z/y/x block makes r and d share as in retail (r in the orthogonalize block and d in the parent block become sibling scopes), but z then drops below the cross temporary and y (1093). On that form, a constructor-return cross, assigning r after its declaration, y read before z and x declared at its first use do not reorder them.",
+    "notes": "1137/1171 masked (1089 of 1123 comparable bytes), same instructions and order: bracketing every product of the inline cross (CrossOfYAndZ) moves the y/z copy stores after the fsubp as in retail (was 1121, 4 differing instructions); see the comment above SetAxesIn. Frame slots from esp: retail z, y, r (shared with the RotateByRowsTo delta copy), cross temporary, pos; ours z (shared with d), y, cross temporary, pos, r. Removing the z/y/x block makes r and d share as in retail (r in the orthogonalize block and d in the parent block become sibling scopes), but z then drops below the cross temporary and y (1093). On that form, a constructor-return cross, assigning r after its declaration, y read before z and x declared at its first use do not reorder them. Session 14 (/FAs): retail's r slot also holds x, and the call results of the cross and normalise steps share one slot with the inline cross's r; x or r hoisted to block or function scope (r hoisted: 363), x braced with or without the normalise lines, the normalise order and pos after m do not regroup them.",
     "bindings": "SoultreeMatrix.bindings.json"
   },
   {
@@ -128,7 +128,7 @@
     "target_va": "0x4fd1f0",
     "target_size": 334,
     "expect": "partial",
-    "notes": "partial 88.5%: final SetPosition lea/push of &p scheduled earlier than retail; z store slot differs. Retail builds both positions in the pushed temporary.",
+    "notes": "partial 88.5%: final SetPosition lea/push of &p scheduled earlier than retail; z store slot differs. Retail builds both positions in the pushed temporary. Session 14: redundant brackets on any subset of the y and z rows' products (63 forms) do not move the &p push (9 to 25 differing lines).",
     "bindings": "SoultreeRotate.bindings.json"
   },
   {
@@ -288,7 +288,7 @@
     "target_va": "0x004fd340",
     "target_size": 630,
     "expect": "partial",
-    "notes": "618/630: rows _11.._13 written k = 1,3,2,4 and _14 k = 3,1,2,4; the s13 product of each of _11.._14 loads its operands in the other order (retail m3j first) and two _44 products differ; prologue, frame and rows 2-3 match. See SoultreeBounds.cpp.",
+    "notes": "618/630: rows _11.._13 written k = 1,3,2,4 and _14 k = 3,1,2,4; the s13 product of each of _11.._14 loads its operands in the other order (retail m3j first) and two _44 products differ; prologue, frame and rows 2-3 match. See SoultreeBounds.cpp. Session 14: parenthesising any term of _11.._14 or _44 (uniformly or per row), the s13 factor order, and no-op self-stores of m._3j or s._13 (non-source probes) leave the s13 operand order.",
     "bindings": "SoultreeBounds.bindings.json"
   },
   {

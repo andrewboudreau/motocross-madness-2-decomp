@@ -86,7 +86,7 @@
     "target_va": "0x00432260",
     "target_size": 458,
     "expect": "partial",
-    "notes": "96.2%: t1=m1*inv(m2), t2=m1*inv(m3), out=CollisionRelativeTransform; inverse p.y sum order fixed; remaining diff is one store-schedule move",
+    "notes": "96.2%: t1=m1*inv(m2), t2=m1*inv(m3), out=CollisionRelativeTransform; inverse p.y sum order fixed; remaining diff is one store-schedule move Session 14: all eight parenthesisations of the second inverse's p.x products (through a separate helper): unchanged or worse. Session 14: brackets on any subset of p.x's products (with and without the inner sum bracket) or of p.y's or p.z's in a separate helper for the second copy leave the mov [esp+0x30], eax store where it is.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -396,7 +396,7 @@
     "target_va": "0x00436720",
     "target_size": 962,
     "expect": "partial",
-    "notes": "936/962: inline 0x42a4b0/0x42a450/0x42a510 forms, matrix read directly or through xf per retail leaf order, scratch loop rows grouped (x + z first), products-first scale; same size, frame and registers; the second forward rotation's x row sums in another order",
+    "notes": "936/962: inline 0x42a4b0/0x42a450/0x42a510 forms, matrix read directly or through xf per retail leaf order, scratch loop rows grouped (x + z first), products-first scale; same size, frame and registers; the second forward rotation's x row sums in another order; Session 14: bracketing the x row's products of CollisionRotateRowsTo (15 subsets and groupings) changes the inlined code shape (890 bytes)",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -456,7 +456,7 @@
     "target_va": "0x00437c20",
     "target_size": 716,
     "expect": "partial",
-    "notes": "703/716: rel = inverse(model+0x88) * hull+0x48 with the inverse written into the product's own local (one Matrix4 slot, frame 0x60 like retail); zero sum via a Vec3 temporary; mean written per component as mean.x = sum.x * (s = 1.0f / count), then sum.y * s, sum.z * s (matches retail fld st(0); fmul sum.x). Left: two argument-push schedules (before 0x424730 and before HullVsHull) and the mean copy registers (retail eax/ecx/edx).",
+    "notes": "703/716: rel = inverse(model+0x88) * hull+0x48 with the inverse written into the product's own local (one Matrix4 slot, frame 0x60 like retail); zero sum via a Vec3 temporary; mean written per component as mean.x = sum.x * (s = 1.0f / count), then sum.y * s, sum.z * s (matches retail fld st(0); fmul sum.x). Left: two argument-push schedules (before 0x424730 and before HullVsHull) and the mean copy registers (retail eax/ecx/edx). Session 14 (the SweptBoxOverlap push schedule, push ecx before add eax,4): a Vec3 prototype with casts, a POD or copy-constructor argument type, reference parameters, (*tree).center, tree[0], bCenter/bHalf/rel pointer locals (bHalf/bCenter locals cost 40 bytes): unchanged. The swept callers 0x4376f0/0x437ef0/0x438550 show the same kind of copy-schedule difference around this call. Session 14 scan: retail's lea ecx,[t+0x10]; push; add t,4; push ecx; push t order is VC6's usual one (five retail sites, among them the exact DrawTree 0x433240 and DrawBoxTree 0x434040 DrawBox calls; no retail site has the candidate's push ecx; add t,4 order), so this row is an outlier of the candidate, not of retail.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -476,7 +476,7 @@
     "target_va": "0x00438280",
     "target_size": 710,
     "expect": "partial",
-    "notes": "699/710: as ModelVsHull with ModelVsHull per element of b (frame 0x60 like retail), same per-component mean. Left: one push schedule (sub esp,0xc placement) and the mean copy registers.",
+    "notes": "699/710: as ModelVsHull with ModelVsHull per element of b (frame 0x60 like retail), same per-component mean. Left: one push schedule (sub esp,0xc placement) and the mean copy registers. Session 14: hit declared later, rel before hit, bracketed address-of, the result in a local, != 0, a model alias, a b->center pointer local, a cast of xfA: unchanged (hit in the inner block: 203). Session 14 (copy schedule, retail loads aHalf.x before the second sub esp,0xc): argument types for the prototype (POD, unioned D3DVECTOR-like, float[3], user operator=, double+float; user copy constructors are called out of line), CollisionVec3(...) temporaries, ac/ah value, pointer and reference locals, const-reference accessors, a ModelBoxesOverlap(a, b, rel, xf) wrapper, by-value and reference forwarding wrappers, sum/count/i/e reshapes and /G5 /G6 /GB: unchanged (or worse). The candidate's order is VC6's usual one: seven other retail sites with the same lea; sub; mov edx,esp; sub; load shape (0x4134c8, 0x415516, 0x428175, 0x42a0e0, 0x4e64d1, 0x50360e, 0x52b46c) use it, and 0x438401 is the only retail site with the load first, so the shared argument type is not the cause.",
     "bindings": "CollisionObject.bindings.json"
   },
   {

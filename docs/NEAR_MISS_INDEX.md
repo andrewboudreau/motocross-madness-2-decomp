@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 125, c 96, total 223. The three class (a) functions of the
+Counts: a 2, b 124, c 97, total 223. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -134,7 +134,7 @@ the integration temporary. When only displacement sizes differ, read the
 | physics/bvh/BoundingBoxTreeQuery | `0x004280e0` | 453/2228 | b | inline BoxOverlap copy: one constructor still expanded and the recursion tails cross-jumped differently |
 | physics/bvh/BoundingBoxTreeQuery | `0x0042a640` | 41/1428 | b | retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80); cross-product operand order of the x term |
 | physics/collision/CollisionPoint | `0x0043aa30` | 820/845 | c | frame, blocks and the y, x, z accumulated squared normal length match (samples/physics/collision/CollisionPointNearMisses.cpp); sum * (1/merged) loads y component-first in retail, one push fstp scheduled later |
-| physics/collision/CollisionPoint | `0x0043ad80` | 597/615 | b | if/else with one exit gives retail's delayed pushes; one vector-copy store and the `points`/`frame` loads are swapped |
+| physics/collision/CollisionPoint | `0x0043ad80` | 604/615 | c | if/else with one exit gives retail's delayed pushes; a `pp` pointer local behind `if (count > 0)` gives the loop header and counter home; retail stores the copy's w.y after the fstp of w.z |
 | physics/constraint/ConstraintMethodCollisionModel | `0x0043bdb0` | 2499/2619 | c | ApplyContactImpulse, frame 0xb8, slot order and size match; termB's dot (ConDotGroupedY) and vA's cross (ConCrossGrouped) are grouped; left: scheduling of the LocalToWorldPoint and rl struct copies, one dword move, the `test edi` of `if (other)` and one fld/fmul order in termB's cross |
 | physics/contact/ContactImpulse | `0x005004a0` | 874/1062 | b | size and frame 0x60 exact (torque blocks at function scope, `(y*y') + x*x'`); torque cross loads r before n (leaf age; n aliases inert), one tail mov/push schedule |
 | physics/contact/ObjectPlacement | `0x004b0df0` | 3537/3971 | b | 2 differing instructions (two lea esi one slot apart); frame: only margin (0x28 vs 0x1c) after a function-scope `forward`; declaration order and margin forms inert |
@@ -142,7 +142,7 @@ the integration temporary. When only displacement sizes differ, read the
 | physics/helpers/SoultreeBounds | `0x004fd340` | 618/630 | c | rows _11.._13 written k = 1,3,2,4 and _14 k = 3,1,2,4; the s13 product of _11.._14 loads its operands the other way (retail m3j first) and two _44 products differ (samples/physics/helpers/SoultreeBounds.cpp) |
 | physics/helpers/SoultreeBounds | `0x004fe8a0` | 541/610 | b | frame slot order (retail c, e, w, a) and the hi = w + ext tail |
 | physics/helpers/SoultreeMatrix | `0x004fb8c0` | 262/1096 | b | 13 code diffs: `mov ecx, [esp + N] ; mov edx, [esp + N]~` vs `lea ecx, [esp + N] ; push ecx`; `fld [esp + N] ; mov [esp + N], ecx ; le~` vs `call A`; slot order differs |
-| physics/helpers/SoultreeMatrix | `0x004fc050` | 1121/1171 | b | same instructions and length; three 12-byte slots ordered temporaries, pos, r where retail has r (shared with the delta copy), temporaries, pos; dropping the z/y/x block gives the r/d sharing but demotes z (1093) |
+| physics/helpers/SoultreeMatrix | `0x004fc050` | 1137/1171 | b | same instructions, order and length (bracketed products in the inline cross); three 12-byte slots ordered temporaries, pos, r where retail has r (shared with the delta copy), temporaries, pos; dropping the z/y/x block gives the r/d sharing but demotes z (1093) |
 | physics/helpers/SoultreeRotate | `0x004fd1f0` | 302/334 | c | x87 order matches; retail pushes `&p` for the second SetPosition after the z row's products, VC6 here before the y row's store |
 | physics/helpers/SoultreeTransform | `0x004fd710` | 203/205 (masked) | c | FPU operand order: one `fld/fmul` pair loads the other operand first (2 bytes) ; x-row, transpose-order, y/z-order and ~10k structural forms (constructor return, reference plus copy, pointer/by-value matrix, out pointer, Swap helper, inline transpose) do not move `v.x * m._11` |
 | physics/krustybike/KrustyBike | `0x0048eea0` | 608/2952 | c | slot 102, frame 0x50 exact; VC6 cross-jumps the head-turn arms differently (retail keeps the + side hold block and the - side retarget tail), `jne call ; jmp skip` vs retail `je skip ; jmp call` in the trick-chain switch, the `+0x153c = 0` else block before the shared advance, and the crash clamp keeps t on the x87 stack where retail spills it to the dt slot |
