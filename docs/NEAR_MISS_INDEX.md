@@ -188,7 +188,7 @@ retail does; grouping the x row's first two products does the same for that row.
 | render/CacheTexture | `0x005102d0` | 426/529 (masked) | b | 13 code diffs; slots differ |
 | render/CubeDraw | `0x0043dc60` | 121/1064 | b | 53 code diffs: `xor ebp, ebp` vs `xor edx, edx`; `mov [esp + N], ebp ; mov edi, 0x100 ; o~` vs `mov [esp + N], edx ; mov ebx, 0x100 ; o~`; slots differ |
 | render/CubeDraw | `0x0043e0b0` | 30/352 | c | 22 code diffs: retail adds `push ebx`; retail adds `mov ecx, [esp + N]` |
-| render/D3DIMSoulTree | `0x00440f30` | 657/7296 | b | DrawCurrentLod: static-local and `$E` bindings fixed, all relocations bound; mode 8/2 normalisations call the out-of-line Vector3 constructor 0x00404e60 as retail (525 differing insns, was 548); frame (0x940 vs 0x9e8) and register allocation left |
+| render/D3DIMSoulTree | `0x00440f30` | 696/7268 | b | DrawCurrentLod: all relocations bound; mode 8/2 normalisations call the out-of-line Vector3 constructor 0x00404e60 as retail; mode 5 `lines[8]` closes retail's untouched 0x80 gap; sweeps over declarations, references and one-term-per-statement sums: 484 differing insns (was 507); frame (0x9a8 vs 0x9e8), temporaries and register allocation left |
 | render/D3DIMSoulTree | `0x00443aa0` | 799/832 | c | 11 code diffs: retail lacks `fmul [eax + 0x10] ; fld [esp + N]`; retail lacks `faddp st(1)` |
 | render/DebugOverlay | `0x00447a00` | 460/999 | b | body matches; VC6 copies the epilogue into the failure and success returns (retail: one shared epilogue) |
 | render/DirectoryList | `0x0044a600` | 74/109 | c | 6 code diffs: `jne @31 ; mov al, byte ptr [esp + N]` vs `jne @32 ; mov eax, [esp + N]` |
