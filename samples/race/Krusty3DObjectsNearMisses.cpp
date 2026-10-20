@@ -41,10 +41,11 @@
 // matrix column with integer moves into a stack vector, where VC6 keeps two
 // of its components on the x87 stack (member-wise copies in either order,
 // a by-value column helper: same); retail keeps 0 in edi (pushing ebp)
-// and gives the two explicit early returns their own epilogues, where this
-// candidate caches no zero and jumps to one shared return (writing every
-// `goto hide` as an explicit return makes VC6 cache 0 in ebx but still
-// shares the epilogue). The half field of view goes through a macro: as an
+// and gives the two explicit early returns their own epilogues. Every hide
+// path is written as an explicit `isVisible = 0; return 1;`: VC6 then
+// caches 0 in a register as retail does (172 -> 254 of 2820), but picks
+// ebx (the `finished` byte test becomes `cmp byte, bl`, retail loads cl
+// and keeps 0 in edi) and still merges the hide blocks into one return. The half field of view goes through a macro: as an
 // inline function, VC6 folded `* 0.5f * 0.01745329f` into one 0.0087266f
 // multiply, where retail keeps both (fmul 0x005507f4, fmul 0x00550480); the
 // macro restores retail's two constants (candidate 2784 -> 2808 bytes of
@@ -206,7 +207,7 @@ int VisualCue::Tick(float frameTime) {
     case 2:
     case 3: {
         if (!cueView->raceTrack)
-            goto hide;
+            { isVisible = 0; return 1; }
         if (cueView->ownRacer->onTrack) {
             isVisible = 0;
             return 1;
@@ -239,7 +240,7 @@ int VisualCue::Tick(float frameTime) {
     }
     case 0: {
         if (!cycleCues || cueRacerCount <= 1)
-            goto hide;
+            { isVisible = 0; return 1; }
         isVisible = 1;
         UNKNOWN_PLACE_CUE();
         Vector3 target = kVec3Zero;
@@ -270,7 +271,7 @@ int VisualCue::Tick(float frameTime) {
             if (!g_UnknownKrustyGame56e26c->tagEvent->followedRacer)
                 return 1;
             if (followed == g_UnknownKrustyGame56e26c->tagEvent->followedRacer)
-                goto hide;
+                { isVisible = 0; return 1; }
             Vector3 direction = g_UnknownKrustyGame56e26c->tagEvent->followedRacer->position - arcadeView->cameraPosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
@@ -282,9 +283,6 @@ int VisualCue::Tick(float frameTime) {
     }
     arcadeModel->Scale(scale, scale, scale);
     isVisible = 1;
-    return 1;
-hide:
-    isVisible = 0;
     return 1;
 }
 
