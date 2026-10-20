@@ -37,20 +37,14 @@
 // binding declares it int).
 //
 // TrackRecordDlg::ListHighScoreTracks (TrackRecord.cpp, 0x0051ffe0, 932
-// bytes): the candidate is 964 bytes. The frame (0x350, so one buffer is
-// 260 bytes), stack slots, calls and the body of the loop agree. Retail
-// cross-jumps the two copies of the digit-suffix branch: the first-file copy
-// jumps into the later copy's strncpy call, and the later copy then jumps
-// back to the first copy's `track[n] = 0`. VC6 here keeps n in esi in the
-// later copy (edi in retail), which needs a reload of `directory` and blocks
-// the merge, so 32 bytes stay duplicated. A separate or block-scoped n, the
-// branches swapped, `continue`, an `ok` variable and track[n] = 0 in both
-// first-file branches do not move it; a goto into the first copy rearranges
-// the prologue (edi pushed late) and is further off.
-// Session 10: compiled inside TrackRecord.cpp it is unchanged (195 of 800
-// masked, 18 instruction diffs); also unchanged: `while (1)`, an unsigned
-// n, a length local, a DirectoryList local for NextName, n declared first,
-// `*(found + n)` and track[n] = 0 before the digit in the later copy.
+// bytes): same size and layout as retail; 926 of 932 bytes match. Setting
+// `digit = 0` in the first file's unprefixed branch (as the loop's later
+// copy does), instead of initialising it at the declaration, keeps n in
+// edi in both digit-suffix copies, so VC6 cross-jumps them as retail does
+// (186 -> 926; before this the later copy kept n in esi and reloaded
+// `directory`). The one remaining difference: retail compares the
+// CurrentName result with the zero in ebx (`cmp eax, ebx`) where VC6 here
+// emits `test eax, eax`; `!= 0`, `!= count` and an `ok` local leave it.
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -100,7 +94,7 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
     char display[64];
     char path[256];
     char pattern[260];
-    int digit = 0;
+    int digit;
     int count = 0;
     int prefixed;
     int n;
@@ -119,6 +113,7 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
             strncpy(track, found, n);
             digit = found[n] - '0';
         } else {
+            digit = 0;
             int length = strlen(found);
             n = length > 127 ? 127 : length;
             strncpy(track, found, n);
