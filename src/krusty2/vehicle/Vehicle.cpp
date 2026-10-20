@@ -272,7 +272,8 @@ void Vehicle::UnknownVirtualSlot43()
 // blending as for contacts using the wheels' contact points, or a single lead wheel.
 // Retail leaves `last` uninitialised (its slot is the squared-distance temporary), declares
 // the running total before the share temporary, and the single-wheel branch zeroes the share
-// temporary in the loop (z, y, x) instead of copying kVec3Zero like the no-contact branch.
+// temporary in the loop with the single-value constructor `Vec3(0.0f)` (dead stores z, y, x)
+// instead of copying kVec3Zero like the no-contact branch.
 static inline Vec3 VehScale(const Vec3& v, float k)
 {
     Vec3 r;
@@ -364,7 +365,7 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
     } else if (wheelsInContact == 1) {
         for (i = 0; i < wheelCount; i++) {
             wheelList[i]->loadWeight = 0.0f;
-            wheelList[i]->appliedShare = Vec3(0.0f, 0.0f, 0.0f);
+            wheelList[i]->appliedShare = Vec3(0.0f);
         }
         primaryWheel->loadWeight = 1.0f;
         primaryWheel->appliedShare = *arg;

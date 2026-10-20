@@ -826,3 +826,7 @@ try on similar code. None is a rule.
 - **A branch straight to the epilogue past `xor eax, eax` returns the tested value.**
   Retail `test eax,eax; jne <pop edi>` after `mov eax,[field]` is
   `if (field != 0) return field;`, not `return 0`.
+- **Dead temporary stores in z, y, x order are the single-value constructor.** Vehicle
+  slot 7 (`0x00526fa0`): retail zeroes a share temporary z, y, x before copying it;
+  `Vec3(0.0f, 0.0f, 0.0f)` stores x first, d3dvec.inl's `Vec3(float f) { x = y = z = f; }`
+  (`Vec3(0.0f)`) gives the chained order and every byte.

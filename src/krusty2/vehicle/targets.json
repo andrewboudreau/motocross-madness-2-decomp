@@ -635,8 +635,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot7@Vehicle",
     "target_va": "0x00526fa0",
     "target_size": 1161,
-    "expect": "partial",
-    "notes": "1159/1161 strict. Inverse-distance blend of *arg over active contacts/wheels. Fixed by uninitialised last, total declared before share, (dy*dy + dx*dx) + dz*dz, total zeroed before active, the blend loops scaling through Math3D operator* (Vec3 * float) and active-- after the share store. The single-wheel branch assigns Vec3(0.0f, 0.0f, 0.0f), which gives retail's instructions and registers. Left: that temporary's dead zero stores go x, y, z (retail z, y, x). Component stores into a share local (all orders, chained, partial aliases, before or in the loop) store z first but swap the edx/edi copies; scalar locals, Vec3(share.x, ...) and -Vec3 keep the x-first stores.",
+    "expect": "exact",
+    "notes": "1161/1161 strict. Inverse-distance blend of *arg over active contacts/wheels. Fixed by uninitialised last, total declared before share, (dy*dy + dx*dx) + dz*dz, total zeroed before active, the blend loops scaling through Math3D operator* (Vec3 * float) and active-- after the share store. The single-wheel branch assigns Vec3(0.0f) (the d3dvec.inl single-value constructor, x = y = z = f), whose dead temporary stores go z, y, x as in retail; Vec3(0.0f, 0.0f, 0.0f) stores x first.",
     "bindings": "Vehicle.bindings.json"
   },
   {
