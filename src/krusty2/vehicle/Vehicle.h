@@ -181,14 +181,16 @@ struct VehicleSmoother {
         maxValue = -3.402823466e+38f;
         blendFactor = 1.0f;
     }
-    // Bike's loader re-arms the two smoothers in place: the value and blend factor are reset,
-    // the time constant only when one is given (FLT_MAX keeps the old one).
+    // Bike's loader re-arms the two smoothers in place: the value is reset; a given time
+    // constant also resets the blend factor (FLT_MAX keeps both; retail stores [+8] only on
+    // that branch, 0x00409334).
     void Reset(float tc)
     {
         smoothedValue = 0.0f;
-        if (tc != 3.402823466e+38f)
+        if (tc != 3.402823466e+38f) {
             timeConstant = tc;
-        blendFactor = 1.0f;
+            blendFactor = 1.0f;
+        }
     }
     float smoothedValue;  // +0x00 slot 49 VehSmooth: x += (target-x)*blend
     float timeConstant;                // +0x04 time constant / cap

@@ -722,11 +722,13 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     pt = r;
     CollisionVec3 n3;
     world->QueryGround(&pt, &n3, 0, &kind);
-    // delta and the score are assigned inside the test: retail keeps delta with `fst` and
-    // the score on the x87 stack for the penetration store.
+    // delta is assigned inside the score expression: retail keeps it with `fst` and the
+    // score on the x87 stack for the penetration store.  The score is a statement before the
+    // test, which compares it with `fcom` as retail does (assigned inside the test, VC6
+    // copies it with `fld st(0)` and compares with `fcomp`).
     float delta;
-    float score;
-    if ((score = (delta = pt.y - r.y) * n3.y) > this->CollisionPoint::penetration) {
+    float score = (delta = pt.y - r.y) * n3.y;
+    if (score > this->CollisionPoint::penetration) {
         lateral = lateral2;
         this->CollisionPoint::worldPosition = r;
         this->CollisionPoint::penetration = score;
