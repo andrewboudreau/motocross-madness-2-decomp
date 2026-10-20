@@ -46,7 +46,7 @@
   "?TireDot@@YAMPBUCollisionVec3@@0@Z": "0x0040ae30",
   "?TireTransformDirection@@YAXPAUCollisionVec3@@PBU1@PBUCollisionMatrix4@@@Z": "0x0042a580",
   "?TireTransformPoint@@YAXPAUCollisionVec3@@U1@PBUCollisionMatrix4@@@Z": "0x0042a510",
-  "?TireVectorBlend@@YAXPAUCollisionVec3@@PBU1@1M@Z": "0x0053304c",
+  "_D3DRMVectorRotate@16": "0x0053304c",
   "?UpdateAttachment@Tire@@QAEXXZ": "0x00515660",
   "?UpdateRoll@Tire@@QAEXMMHHHM@Z": "0x005143d0",
   "?Vec3Normalize@@YAPAUCollisionVec3@@PAU1@PBU1@@Z": "0x005087b0",

@@ -81,7 +81,7 @@ void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const Colli
 
     if (orthogonalize) {
         CollisionVec3 c;
-        c.x = y.y * z.z - y.z * z.y;
+        c.x = (y.y * z.z) - y.z * z.y;   // grouped: retail tests keepZ after the second product
         c.y = y.z * z.x - y.x * z.z;
         c.z = y.x * z.y - y.y * z.x;
         CollisionVec3 r;
@@ -441,8 +441,11 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
 
 // Out-of-line 0x00515600 (cdecl, hidden result): a x b.
 CollisionVec3 TireCross(const CollisionVec3& a, const CollisionVec3& b);
-// 0x0053304c (cdecl): out = function(a, b, t); used with the two global vectors and the angle.
-void TireVectorBlend(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b, float t);
+// d3drm.dll's D3DRMVectorRotate (import thunk 0x0053304c, stdcall: the callee pops its
+// arguments): rotates `vector` about `axis` by `theta`. The SDK types are LPD3DVECTOR;
+// CollisionVec3 has the same layout.
+extern "C" CollisionVec3* __stdcall D3DRMVectorRotate(CollisionVec3* result, const CollisionVec3* vector,
+                                                     const CollisionVec3* axis, float theta);
 // 0x0042a510 / 0x0042a580 (cdecl): transform a point / a direction by a matrix.
 void TireTransformPoint(CollisionVec3* out, CollisionVec3 v, const CollisionMatrix4* m);
 void TireTransformDirection(CollisionVec3* out, const CollisionVec3* v, const CollisionMatrix4* m);
@@ -559,6 +562,25 @@ static inline CollisionVec3 TireCrossGrouped(const CollisionVec3& a, const Colli
     return r;
 }
 
+// TireCrossGrouped with the x component's first product parenthesised too: retail loads
+// a's component first in both x products of the lateral axis (the plain form commutes them).
+static inline CollisionVec3 TireCrossGroupedXY(const CollisionVec3& a, const CollisionVec3& b)
+{
+    CollisionVec3 r;
+    r.x = (a.y * b.z) - a.z * b.y;
+    r.y = (a.z * b.x) - a.x * b.z;
+    r.z = (a.x * b.y) - a.y * b.x;
+    return r;
+}
+
+// z^2-first dot with the last product parenthesised: the extra node holds the integer
+// copy of the cross's z into the destination until after the first faddp, as retail does
+// for the probe's sign and length tests.
+static inline float TireDotGroupedLast(const CollisionVec3& a, const CollisionVec3& b)
+{
+    return a.z * b.z + (a.x * b.x + (a.y * b.y));
+}
+
 // a + b with the z sum parenthesised: the extra node stores z before the y copy, as
 // retail does for the first probe position.
 static inline CollisionVec3 TireSumGroupedZ(const CollisionVec3& a, const CollisionVec3& b)
@@ -613,8 +635,8 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     rollDirection = TireNormalizeOr(TireCross(this->CollisionPoint::surfaceNormal, sideAxis), wheelUpAxis);
 
     CollisionVec3 lateral;
-    lateral = TireCrossGrouped(rollDirection, sideAxis);
-    if (TireDotInline(lateral, this->CollisionPoint::surfaceNormal) > 0.0f) {
+    lateral = TireCrossGroupedXY(rollDirection, sideAxis);
+    if (TireDotGroupedLast(lateral, this->CollisionPoint::surfaceNormal) > 0.0f) {
         lateral.x = lateral.x * -1.0f;
         lateral.y = lateral.y * -1.0f;
         lateral.z = lateral.z * -1.0f;
@@ -636,7 +658,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
         if (MovingPart::ownerRef) {
             CollisionVec3 base = rollDirection * wheelRadius + origin;
             CollisionVec3 c = TireCrossGrouped(rollDirection, kVec3YAxis);
-            float cLenSq = TireDotInline(c, c);
+            float cLenSq = TireDotGroupedLast(c, c);
             if (cLenSq == 0.0f) {
                 c = kVec3Zero;
             } else {
@@ -649,7 +671,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
             pt = c * s + base;
         } else {
             CollisionVec3 v;
-            TireVectorBlend(&v, &kVec3ZAxis, &kVec3YAxis, a5);
+            D3DRMVectorRotate(&v, &kVec3ZAxis, &kVec3YAxis, a5);
             CollisionVec3 base = v * -wheelRadius + origin;
             CollisionVec3 c = TireCrossGrouped(v, kVec3YAxis);
             float cLenSq = TireDot(&c, &c);
@@ -675,7 +697,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     CollisionVec3 v = TireNormalizeOr(TireCross(n2, sideAxis), wheelUpAxis);
     CollisionVec3 u = TireCrossGrouped(v, sideAxis);
     CollisionVec3 lateral2 = u;
-    if (u.z * n2.z + (u.y * n2.y + u.x * n2.x) > 0.0f) {
+    if (u.z * n2.z + (u.y * n2.y + (u.x * n2.x)) > 0.0f) {
         // retail reads x from u and negates y and z in lateral2 (an in-place negate
         // helper gives the same reads but computes the scaled x argument early)
         lateral2.x = u.x * -1.0f;
@@ -1097,7 +1119,7 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
     torque->z += moment.z;
 }
 
-// 0x00513c70 (near miss, 769 of 797 bytes, same length): runs the attached
+// 0x00513c70 (near miss, 793 of 797 bytes, same length): runs the attached
 // shock against the contact. The inline (+0x2b0) and rotating (+0x2ac) shocks
 // are solved with the same follow-up, written out twice as retail keeps two
 // copies; the solve's load and active flag become the contact's penetration and
@@ -1106,11 +1128,13 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
 // failure path (VC6 merges the two tails into retail's single block); with
 // the clears written once after the if/else chain VC6 has too few zero stores
 // to keep retail's zero register (ebx) across the solve call and compiles
-// every null test as `test` (96 of 805 bytes). Left: the rotating path's
-// first world-position add loads the attachment's x first where retail loads
-// the contact's, and the surface position's z sum is staged in the x slot
-// (retail reuses the y slot); TireAddTo-style `d + v` sums swap the inline
-// path's first add as well.
+// every null test as `test` (96 of 805 bytes). The surface position is summed
+// through TireSum (sums into float locals, then stored), which stages z in the
+// dead y slot like retail (769 -> 793). Left: the rotating path's first
+// world-position add loads the attachment's x first where retail loads the
+// contact's; `+=`, `w = w + d`, `w = d + w`, the hinge local, a reference or
+// copy of field_0x80, a reference to worldPosition and vector sums all keep it
+// (TireAddTo-style `d + v` sums swap the inline path's first add as well).
 void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offset,
                        const CollisionVec3* velocity, const CollisionVec3* axisB)
 {
@@ -1131,7 +1155,7 @@ void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offse
                 CollisionPoint::worldPosition.y += field_0x2b0->field_0x80.y;
                 CollisionPoint::worldPosition.z += field_0x2b0->field_0x80.z;
                 if (active)
-                    CollisionPoint::surfacePosition = TireTimes(load, CollisionPoint::surfaceNormal) + CollisionPoint::worldPosition;
+                    CollisionPoint::surfacePosition = TireSum(TireTimes(load, CollisionPoint::surfaceNormal), CollisionPoint::worldPosition);
                 else
                     CollisionPoint::surfacePosition = CollisionPoint::worldPosition;
                 field_0x268 = 1;
@@ -1155,7 +1179,7 @@ void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offse
                 CollisionPoint::worldPosition.y += field_0x2ac->field_0x80.y;
                 CollisionPoint::worldPosition.z += field_0x2ac->field_0x80.z;
                 if (active)
-                    CollisionPoint::surfacePosition = TireTimes(load, CollisionPoint::surfaceNormal) + CollisionPoint::worldPosition;
+                    CollisionPoint::surfacePosition = TireSum(TireTimes(load, CollisionPoint::surfaceNormal), CollisionPoint::worldPosition);
                 else
                     CollisionPoint::surfacePosition = CollisionPoint::worldPosition;
                 field_0x268 = 1;

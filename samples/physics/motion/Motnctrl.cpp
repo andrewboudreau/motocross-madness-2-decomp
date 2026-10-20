@@ -142,7 +142,9 @@ void AxisAngleMatrix(Matrix4* m, float x, float y, float z, float angle);
 // src->position` are all worse (55..193). The position block written as chained
 // assignments or interleaved per component gives 205; storing pose._44 before the position copies leaves 476, as do
 // an assigned or direct-initialised axisX, a const Vec3& of src->position and a float copy of its x
-// (the fld of position.x still schedules above the axisX copies).
+// (the fld of position.x still schedules above the axisX copies).  Frame diagnosis (session 14):
+// the two Vec3Normalize return temporaries share axisX's slot at +0 here where retail gives
+// them a dedicated slot at +0x64; hoisting the pose locals does not separate them.
 void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 {
     Matrix4 pose;

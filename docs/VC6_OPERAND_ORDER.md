@@ -863,3 +863,27 @@ try on similar code. None is a rule.
   `Vec3 sum = kVec3Zero; *out = kVec3Zero;`, `mixed` takes the `out` argument slot and
   `len2` a frame slot; initialising the counters first swaps the two homes and gives the
   prologue's esi copy temporary (24 of the 720 orders are exact, all counters first).
+- **Sibling `{ }` blocks share frame slots; function-scope names do not.**
+  ContactSolveImpulse (`0x005004a0`, 94 to 874 of 1062): the two torque
+  computations written as sibling blocks reuse `torque`/`local`/`world` slots
+  (frame 0x54); writing them at function scope as `torqueA`/`torqueB` etc. gives
+  retail's 0x60 frame. With that frame, `(rel.y * n->y) + rel.x * n->x` loads the
+  y product first as retail does and makes the size exact.
+- **Int-move copies of a member vector before its arithmetic are a named copy.**
+  Bike slot 38 (`0x00405190`, 211 to 274 of 2874): retail copies
+  `worldAngularVelocity` and `f23c` into stack temporaries with `mov reg, [m]; mov
+  [esp+N], reg` before the cross product and the interpolation read them. A
+  block-scoped `Vec3 w = worldAngularVelocity;` crossed in place of the member, and
+  `Vec3 prev = f23c;` used in `(f154 - prev) * t + prev`, give those copies. In the
+  same function a case block's `Vec3 r` declared at function scope stops sharing its
+  slot and gives retail's 0x88 offset.
+- **A d3drm import is stdcall: a cdecl declaration merges its cleanup.**
+  Tire::UpdateSuspensionProbe (`0x00514550`, 2504 to 2576 of 4258): the import thunk
+  `0x0053304c` is D3DRMVectorRotate. Declared cdecl, VC6 defers its 16-byte cleanup
+  into a later `add esp, 0x18`, so every esp offset in that branch is 0x10 too high.
+  `extern "C" ... __stdcall` (as in FollowCamera.h) removes both effects. Check the
+  import table before declaring a callee above 0x530000 cdecl.
+- **Parenthesising a dot's last product delays the pending integer copy.** In the
+  same function, `a.z * b.z + (a.x * b.x + (a.y * b.y))` keeps the `mov [dst+8], eax`
+  copy of the preceding cross's z after the first `faddp`, as retail does at three
+  dot tests. The unparenthesised form stores it before the `faddp`.

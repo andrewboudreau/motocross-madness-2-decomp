@@ -89,6 +89,8 @@ float BikeVec3Dot(const Vec3& a, const Vec3& b);
 // integrator steerTorque; the integrator's length, signed by that axis, is the angle fed to
 // the steer state unless the limit (0.785 rad) is reached, in which case the angle is
 // clamped and the integrator reversed.  Returns the normalised projection.
+// Near miss (447/2272 strict): declaring spin, d or lenSq at function scope leaves the frame
+// and the 144 differing instructions unchanged.
 float Bike::Method_0x0040a520()
 {
     Vec3 push;
@@ -1838,6 +1840,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
     int ctx;
     Vec3* otherVel = 0;
     Vec3* velPtr;
+    Vec3 r;                     // kind 0x3e8 lever; at function scope it keeps its own slot (frame 0xac)
 
     switch (b) {
     case 100: {
@@ -1915,7 +1918,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         break;
     }
     case 0x3e8: {
-        Vec3 r = ((BikeContactSet*)collisionObject)->field_0xa0 - centerOfMass;
+        r = ((BikeContactSet*)collisionObject)->field_0xa0 - centerOfMass;
         UnknownVirtualSlot3(&((BikeContactSet*)collisionObject)->field_0xac, &velocity, &r, &s, 0x3e8, 0, &out);
         return;
     }
@@ -1929,8 +1932,12 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         velA = *o->body->UnknownVirtualSlot43(&tmp);
         otherVel = &blend;
         velPtr = &o->body->f16c;
-        // other point: interpolate body->f23c toward body->f154 by kind->field_0x24
-        blend = (o->body->f154 - o->body->f23c) * kind->field_0x24 + o->body->f23c;
+        // other point: interpolate body->f23c toward body->f154 by kind->field_0x24; retail
+        // adds a struct copy of f23c (int moves into the low temporaries) as a named copy does
+        {
+            Vec3 prev = o->body->f23c;
+            blend = (o->body->f154 - prev) * kind->field_0x24 + prev;
+        }
         l10 = o->body->f17c;
         velB.x = o->body->f1d0;
         velB.y = o->body->f1e4;
@@ -1968,7 +1975,10 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
             other->worldAngularVelocity = other->sceneNode->LocalToWorldDirection(*velPtr);
         }
     } else {
-        scratchVector = CrossProduct(worldAngularVelocity, rel);
+        {
+            Vec3 w = worldAngularVelocity;  // retail crosses a struct copy of the angular velocity
+            scratchVector = CrossProduct(w, rel);
+        }
         Vec3 p = velocity + scratchVector;
         UnknownVirtualSlot3(&((BikeContactSet*)collisionObject)->field_0xac, &p, &rel, &s, b, 0, &out);
         if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
