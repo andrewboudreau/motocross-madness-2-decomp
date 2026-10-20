@@ -48,6 +48,12 @@
 // ebx (the `finished` byte test becomes `cmp byte, bl`, retail loads cl
 // and keeps 0 in edi, pushing ebp) and still merges the hide blocks into
 // one return where retail gives the two early ones their own epilogues.
+// Retail's layout: the first hide, case 2/3's onTrack hide and case 4's
+// hide fall through into their own epilogues, and only the raceTrack and
+// case 0 hides jump into case 4's; VC6 here moves one merged hide after the
+// final epilogue. Still 401: `return isVisible = 0, 1;` for the early
+// hides, `finished` tested as `*(bool*)&`, `!= 0` or `(unsigned char)`, and
+// `scale` initialised (0, 1 or modelScale) before the switch.
 // Retail computes `0.5f - screenY` as `fld 0.5; fsub [esi+0x4c]`; reading
 // the field directly (not through UnknownScreenY) gives that order but
 // changes the `position +=` x87 sequence (fxch/fadd/fstp), 401 -> 383; a
