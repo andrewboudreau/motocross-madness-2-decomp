@@ -15,6 +15,9 @@
 // the gamepad test and loop counters declared up front. VC6 here assigns
 // the scratch registers in strict eax/ecx/edx rotation, as retail does, but
 // retail's rotation starts one step later (ecx) at the first branch.
+// Splitting the button test into two ifs swaps ebx and edi (363); eight
+// pressed-bit spellings and an inline event helper on one or both paths
+// compile identically.
 //
 // PCJoystickDevice::ReadBufferedState (0x004c3100, 1652 bytes with jump
 // tables): the buffered reader. Its control flow and switches line up (a

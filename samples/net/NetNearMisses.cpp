@@ -32,6 +32,12 @@
 // pushes but forms the pointer with `mov; add` (368 bytes, 3 code diffs);
 // testing `MessageAt(messages, offset).from` instead gives retail's
 // load+lea with the ebx/ebp swap (197), with or without the system local.
+// Testing `MessageAt(messages, offset).from` and taking the pointer inside
+// the `if` (or using no pointer) is identical to retail once registers are
+// masked (0 hunks, 139 aligned): only the ebx/ebp swap is left, so VC6 here
+// weights the index above the message web, where retail weights it below.
+// Pointer scope, `register`, const, a reference, per-use MessageAt and a
+// pointer shared with the 0x40 block do not change the weights.
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>

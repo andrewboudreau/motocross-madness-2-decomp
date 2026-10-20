@@ -65,6 +65,8 @@
 // orders of that block's six statements, the four spellings of each
 // ternary, a width local, `rect.right = rect.left + ...` and
 // `rect.left = rect.right + 256` leave the swap (or are worse).
+// Inline width/bottom helpers (by value or const&, in any of 15
+// placements) compile identically.
 
 
 // RadarOverlay::DrawRacers (0x0051bed0, 1160 bytes; 1129 match):
@@ -78,6 +80,10 @@
 // 0x0051d9c0 call. Declaration order and scope, an int copy, a float copy
 // and a distance local do not move either; nor do the distance written
 // inline in the call, a name or overlay local, or the sum written x first.
+// Bracketing one product (`dz * dz + (dx * dx)`) moves the products ahead
+// of the name address and the pushes (1143, one hunk) but computes dx*dx
+// first where retail does dz*dz first, and aligns one instruction fewer;
+// not kept. Square helpers, casts and other bracket placements do not move.
 
 #include <math.h>
 #include <stdio.h>
