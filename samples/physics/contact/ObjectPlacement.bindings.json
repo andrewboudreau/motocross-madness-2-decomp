@@ -19,6 +19,8 @@
   "?Vec3Normalize@@YA?AUVec3@@ABU1@@Z": "0x005087b0",
   "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z": "0x005015b0",
   "?g_PlacementAxisX@@3UVec3@@A": "0x00688758",
+  "?g_PlacementAxisY@@3UVec3@@A": "0x00688768",
+  "?g_PlacementAxisZ@@3UVec3@@A": "0x00688738",
   "?g_PlacementZero@@3UVec3@@A": "0x00688748",
   "__FILE__:objectplacement.cpp": "0x0056eeb4",
   "__real@4@00000000000000000000": "0x00550484",

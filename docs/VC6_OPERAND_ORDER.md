@@ -1018,3 +1018,12 @@ try on similar code. None is a rule.
   `r.y = z.x * y.z - z.z * y.x` VC6 put the next dword copy store before the fsubp; retail
   puts it after. `r.y = (z.x * y.z) - (z.z * y.x)` (any bracketing of the first product of the
   y and z rows) gives retail's order; bracketing only the second products does not.
+- **`operator[]` instead of member names ages the offset-0 component of a global.**
+  FindObjectPlacement (`0x004b0df0`, 3967 to 3971 of 3971): an inline cross of the two axis
+  globals, `CrossProduct(g_Y, g_Z)` with the member-name Math3D.h body, loads `Z.z` and `Z.y`
+  before `Y.x` in the y and z rows (as if `Y.x`, the component at displacement 0, were the
+  older leaf); retail loads `Y.x` first. The d3dvec.inl spelling
+  `r.y = (a[2] * b[0]) - (a[0] * b[2])` (with the parentheses; without them the schedule
+  breaks) gives retail's order and the same instructions otherwise. Changing Math3D.h's
+  CrossProduct to that spelling loses five exact physics functions, so it is a per-site
+  choice (`PlacementCross` in the sample).

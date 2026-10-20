@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 124, c 97, total 223. The three class (a) functions of the
+Counts: a 2, b 123, c 97, total 222. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -137,7 +137,6 @@ the integration temporary. When only displacement sizes differ, read the
 | physics/collision/CollisionPoint | `0x0043ad80` | 604/615 | c | if/else with one exit gives retail's delayed pushes; a `pp` pointer local behind `if (count > 0)` gives the loop header and counter home; retail stores the copy's w.y after the fstp of w.z |
 | physics/constraint/ConstraintMethodCollisionModel | `0x0043bdb0` | 2515/2619 | c | ApplyContactImpulse, frame 0xb8, slot order and size match; termB's dot (ConDotGroupedY), vA's cross (ConCrossGrouped) and rl x nl (ConCrossParen) are grouped; left: scheduling of the LocalToWorldPoint and rl struct copies, one dword move, the `test edi` of `if (other)` and one fld/fmul order in termB's cross |
 | physics/contact/ContactImpulse | `0x005004a0` | 874/1062 | b | size and frame 0x60 exact (torque blocks at function scope, `(y*y') + x*x'`); torque cross loads r before n (leaf age; n aliases inert), one tail mov/push schedule |
-| physics/contact/ObjectPlacement | `0x004b0df0` | 3537/3971 | b | 2 differing instructions (two lea esi one slot apart); frame: only margin (0x28 vs 0x1c) after a function-scope `forward`; declaration order and margin forms inert |
 | physics/helpers/GraphicsTest | `0x0047bd10` | 818/917 | b | DrawCircle: frame 0xb84 vs 0xb78, the `[eax - 4]` store and the centre-sum operand order; a `Vec3* p = &points[i]` local gave +4 |
 | physics/helpers/SoultreeBounds | `0x004fd340` | 618/630 | c | rows _11.._13 written k = 1,3,2,4 and _14 k = 3,1,2,4; the s13 product of _11.._14 loads its operands the other way (retail m3j first) and two _44 products differ (samples/physics/helpers/SoultreeBounds.cpp) |
 | physics/helpers/SoultreeBounds | `0x004fe8a0` | 541/610 | b | frame slot order (retail c, e, w, a) and the hi = w + ext tail |

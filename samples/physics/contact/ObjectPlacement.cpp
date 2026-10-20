@@ -35,6 +35,21 @@ Vec3 g_PlacementAxisX(1.0f, 0.0f, 0.0f);  // 0x00688758
 Vec3 g_PlacementAxisY(0.0f, 1.0f, 0.0f);  // 0x00688768
 Vec3 g_PlacementAxisZ(0.0f, 0.0f, 1.0f);  // 0x00688738
 
+// d3dvec.inl's CrossProduct spelling: the components of a and b are read through
+// operator[].  The shared Math3D.h CrossProduct (member names) compiles to the same
+// instructions, but with the axis globals VC6 then loads Z.z and Z.y before Y.x in the y
+// and z components; through operator[] it loads Y.x first, as retail does at 0x4b10dd and
+// 0x4b1110.  Giving Math3D.h this spelling loses five exact physics functions
+// (0x4cc230, 0x4cc3f0, 0x424ab0, 0x4278d0, 0x405db0), so the spelling stays local.
+static inline Vec3 PlacementCross(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = (a[1] * b[2]) - (a[2] * b[1]);
+    r.y = (a[2] * b[0]) - (a[0] * b[2]);
+    r.z = (a[0] * b[1]) - (a[1] * b[0]);
+    return r;
+}
+
 static inline void PlacementNormalizeInPlace(Vec3* v)
 {
     float lenSq = v->z * v->z + (v->x * v->x + v->y * v->y);
@@ -65,10 +80,9 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
     if (q)
         *q = 0;
 
-    int firstPass = 1;
-    Vec3 forward;   // the basis block's; at function scope it takes retail's 0x40 slot
     Vec3 w;   // the k/o branch below; declared here, VC6 schedules its fchs as retail does
     int canPlace = 1;
+    int firstPass = 1;
     unsigned char centerHit, plusAHit, minusAHit, plusCHit, minusCHit;
     Vec3 centerPt, plusAPt, minusAPt, plusCPt, minusCPt;
     Vec3 centerOut, plusAOut, minusAOut, plusCOut, minusCOut;
@@ -102,12 +116,14 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
                 sweep[1].y = -1.0f;
                 obj->SetMeshShape(1, sweep);
 
-                // orthonormal basis from the axes
+                // orthonormal basis from the axes: side = up x forward, up = forward x side
+                // (normalised), side = up x forward.  The first up value is never read;
+                // retail still stores it (0x4b10fa..0x4b112f).
+                Vec3 forward = g_PlacementAxisZ;
                 Vec3 up = g_PlacementAxisY;
-                forward = g_PlacementAxisZ;
-                Vec3 side = CrossProduct(g_PlacementAxisY, g_PlacementAxisZ);
-                side = CrossProductCall(forward, side);
-                float lenSq = Vec3DotCall(&side, &side);
+                Vec3 side = PlacementCross(g_PlacementAxisY, g_PlacementAxisZ);
+                up = CrossProductCall(forward, side);
+                float lenSq = Vec3DotCall(&up, &up);
                 up = PlacementRescale(up, lenSq);
                 forward = Vec3Normalize(forward);
                 side = CrossProductCall(up, forward);
@@ -219,8 +235,9 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
         if (!minusCHit && minusCOut.y < plusCOut.y) { nextOut = &minusCOut; nextPt = &minusCPt; }
         else { nextOut = &plusCOut; nextPt = 0; }
     } else if (!minusCHit) {
-        bestOut = nextOut = &minusCOut;
+        bestOut = &minusCOut;
         bestPt = &minusCPt;
+        nextOut = &minusCOut;
         nextPt = 0;
     }
 
@@ -232,7 +249,7 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
         }
         if (!plusCHit) {
             if (!(plusCOut.y <= bestOut->y)) { nextOut = bestOut; nextPt = bestPt; bestOut = &plusCOut; bestPt = &plusCPt; }
-            else if (!(plusCOut.y <= nextOut->y)) { nextPt = &plusCPt; nextOut = &plusCOut; }
+            else if (!(plusCOut.y <= nextOut->y)) { nextOut = &plusCOut; nextPt = &plusCPt; }
         }
         if (!minusCHit) {
             if (!(minusCOut.y <= bestOut->y)) { nextOut = bestOut; nextPt = bestPt; bestOut = &minusCOut; bestPt = &minusCPt; }
