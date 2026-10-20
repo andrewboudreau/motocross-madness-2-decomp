@@ -138,7 +138,8 @@ leaf. Bike slot 76 (`v.x *= (s = ...)`) makes `s` newer than `v.x`; a named
   its leaf before `fromStart` is computed, so `fromStart` is the newer leaf and VC6
   emits `fld fromStart; fadd length`; the function is exact with it. Moving the
   `length = toEnd` store up instead folds `toEnd` away and changes the frame.
-- MatrixUtil `0x004a1a50`, Bike slot 54 and the
+- MatrixUtil `0x004a1a50`, SoultreeTransform `0x004fd710` (`v.x * m._11`,
+  the only matrix element the transpose does not touch), Bike slot 54 and the
   particle emitters' normalisations (`fld st(0); fmul` on the first
   component only) are not reproduced by any reference-order change tried
   (loop update order, `for` forms, term order, by-value helpers, helper
@@ -965,12 +966,16 @@ try on similar code. None is a rule.
   (`0x004b5d00`, 265 to 274 of 274): retail loads `mov eax, 1` before the last `faddp`. With
   `t = c * f->z - (s * f->x); f->x = (c * f->x) + s * f->z;` VC6 schedules it there; unbracketed,
   or with only one of those two products bracketed, it lands between the closing `fstp`s.
-- **A no-op store makes an untouched operand the newer leaf.** SoultreeObject
-  WorldToLocalDirection (`0x004fd710`, 207 to 209 of 209): retail loads `v.x` before
-  `m._11` in the last x product, where `m._11` is the only element of the product the
-  inline transpose does not write. `m._11 = m._11;` at the end of the transpose emits
-  nothing but creates that leaf later (section 1.2), and the function is exact.
-  Self-stores of the matrix operands do not fix SoultreeBounds Scale (`0x004fd340`).
+- **Non-source probe: a no-op store ages an untouched operand.** SoultreeObject
+  WorldToLocalDirection (`0x004fd710`, 207 of 209): retail loads `v.x` before `m._11` in
+  the last x product, where `m._11` is the only element of the product the inline
+  transpose does not write. As a probe only, `m._11 = m._11;` (or `m._11 *= 1.0f`) at the
+  end of the transpose emits nothing yet gives 209/209, which supports section 1.2 (the
+  store makes `m._11` the newer leaf). It is a matching-only distortion and is not kept in
+  the sample. Natural shapes that write the diagonal (a loop over `j <= i`, a SwapF helper,
+  a full copy back, a nine-entry transpose into a destination matrix, a by-value
+  `Matrix3 Transposed()`) change the code shape (50 or more lines differ). The same
+  probe on the matrix operands of SoultreeBounds Scale (`0x004fd340`) does not move s13.
 - **A guarded pointer-local loop moves the loop counter's home.** SoultreeRefreshContacts
   (`0x0043ad80`, 597 to 604 of 615): `for (; count > 0; count--, points++)` homes the
   counter in a1's dead argument slot; retail uses points' slot and loads points after the
