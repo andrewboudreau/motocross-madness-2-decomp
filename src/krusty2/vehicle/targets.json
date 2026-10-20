@@ -1606,7 +1606,7 @@
     "target_va": "0x0040a520",
     "target_size": 2272,
     "expect": "partial",
-    "notes": "19% (439/2265 aligned; 2265 vs 2272 bytes). Same call sequence and control flow; differs by the local slot layout (retail: result 0xc, len 0x10, cross temp 0x14, offset 0x20, torque 0x2c, base 0x38, temps 0x44), frontWheel kept in eax (ours edx) and the constant 2 of the state stores materialised in edi. Declaration order does not move the slots.",
+    "notes": "1671/2272 strict (candidate 2232 bytes). Same call sequence and control flow; the axis references and zero-first if (d >= 0) arms give retail's edi axis pointer and branch layout. Left: the operator return temporary and base swap slots (retail base 0x38, temps 0x44), cross products load the first-stored multiplicand first where retail loads it second, the airborne test al, al is issued earlier and the steerTorque update (retail stores result and k and copies the constructed Vec3 through a temporary before the adds). Declaration order does not move the slots.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -1634,7 +1634,7 @@
     "candidate_symbol_contains": "LoadBike@Bike",
     "class": "Bike",
     "expect": "partial",
-    "notes": "Bike's loader (ret 0xa0, 8 EH states, 0x2cc frame): LoadVehicle, the rider character, the handlebar part, the two wheels with their shocks, three contact points, three particle emitters, the inertia tensors and the pose handles are all written out; every call, EH state and x87 sequence is in retail order (instruction ratio 0.88). What differs: the stack slots of the register spills (wheelPos/loop index/front-rear z at 0x10/0x14/0x28 in retail), the frame's low 0x30 bytes being laid out differently, the matched wheel kind kept in esi by retail (spilled here), and store scheduling inside the local string tables and the Vec3 constants. Strict 2078/6718 (size 6714 vs 6745).",
+    "notes": "Bike's loader (ret 0xa0, 8 EH states, 0x2cc frame): LoadVehicle, the rider character, the handlebar part, the two wheels with their shocks, three contact points, three particle emitters, the inertia tensors and the pose handles are all written out; every call, EH state and x87 sequence is in retail order (instruction ratio 0.88). The wheel kind comes from an early-return lookup helper (retail keeps it in esi), the shock-arm distance names all three squares and AddWheel is two calls whose common tail VC6 merges. What differs: the stack slots of the register spills (wheelPos/loop index/front-rear z at 0x10/0x14/0x28 in retail), the frame's low 0x30 bytes being laid out differently, and store scheduling inside the local string tables, the Vec3 constants, and the x87 stack use of the rider and wheel inertia rows (retail keeps the rider depth square and the shared width square live on the stack, copies the width square with `fld st(1)` and spills the wheel diameter square to [esp+0x14]; operand orders, a box-gains helper and reusing the length square are inert or worse). The wheel mass factor is computed before the diameter, which aligns the steering-gain rows. Strict 5268/6745 (candidate 6728 bytes).",
     "source": "Bike.cpp",
     "target_size": 6745,
     "target_va": "0x004079c0"

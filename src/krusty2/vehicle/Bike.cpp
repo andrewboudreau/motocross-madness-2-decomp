@@ -89,12 +89,19 @@ float BikeVec3Dot(const Vec3& a, const Vec3& b);
 // integrator steerTorque; the integrator's length, signed by that axis, is the angle fed to
 // the steer state unless the limit (0.785 rad) is reached, in which case the angle is
 // clamped and the integrator reversed.  Returns the normalised projection.
-// Near miss (447/2272 strict): declaring spin, d or lenSq at function scope leaves the frame
-// and the 144 differing instructions unchanged.
+// Near miss (1671/2272 strict). Retail keeps each contact's axis address in edi for the dot
+// and the scale (the `axis` references) and lays out the zero arm first (`if (d >= 0)`:
+// `test ah, 1; jne <scale>`), 447 -> 1667; base initialised where it is declared, 1671.
+// Left: the return temporary of the out-of-line operators and base swap slots (retail base
+// 0x38, temporary 0x44), every cross product loads the multiplicand stored first (spin.x,
+// push.x) second where VC6 loads it first (all 64 operand orders of a local cross helper
+// compile the same), the `test al, al` of the airborne test is issued later, and retail
+// stores result and k and copies the steerTorque increment through a temporary before the adds.
+// Inert: the declaration order of push/base/torque/offset and len/result; push declared
+// per branch (1555); spin, d or lenSq at function scope.
 float Bike::Method_0x0040a520()
 {
     Vec3 push;
-    Vec3 base;
     Vec3 torque;
     Vec3 offset;
     float len;
@@ -102,7 +109,7 @@ float Bike::Method_0x0040a520()
     torque.x = weightForce.x * 0.25f;
     torque.y = weightForce.y * 0.25f;
     torque.z = weightForce.z * 0.25f;
-    base = torque;
+    Vec3 base = torque;
     int driven = 0;
 
     if (airborne) {
@@ -117,19 +124,21 @@ float Bike::Method_0x0040a520()
             frontWheel->w_0x16c = 2;
             if (leftBarContact->active) {
                 torque = BikeVec3Sub(leftBarContact->point, frontWheel->nodePosition);
-                float d = BikeVec3Dot(torque, leftBarContact->axis);
-                if (d < 0.0f)
-                    push = BikeVec3Scale(leftBarContact->axis, -d);
-                else
+                const Vec3& axis = leftBarContact->axis;
+                float d = BikeVec3Dot(torque, axis);
+                if (d >= 0.0f)
                     push = Vec3(0.0f, 0.0f, 0.0f);
+                else
+                    push = BikeVec3Scale(axis, -d);
                 torque += CrossProduct(offset, push);
                 leftBarContact->state = 2;
             } else if (rightBarContact->active) {
-                float d = BikeVec3Dot(base, rightBarContact->axis);
-                if (d < 0.0f)
-                    push = BikeVec3Scale(rightBarContact->axis, -d);
-                else
+                const Vec3& axis = rightBarContact->axis;
+                float d = BikeVec3Dot(base, axis);
+                if (d >= 0.0f)
                     push = BikeVec3Call(0.0f, 0.0f, 0.0f);
+                else
+                    push = BikeVec3Scale(axis, -d);
                 offset = BikeVec3Sub(rightBarContact->point, frontWheel->nodePosition);
                 torque += CrossProduct(offset, push);
                 rightBarContact->state = 2;
@@ -137,20 +146,22 @@ float Bike::Method_0x0040a520()
         } else if (leftBarContact->active) {
             torque = BikeVec3Sub(leftBarContact->point, frontWheel->nodePosition);
             driven = 1;
-            float d = BikeVec3Dot(torque, leftBarContact->axis);
-            if (d < 0.0f)
-                push = BikeVec3Scale(leftBarContact->axis, -d);
-            else
+            const Vec3& axis = leftBarContact->axis;
+            float d = BikeVec3Dot(torque, axis);
+            if (d >= 0.0f)
                 push = BikeVec3Call(0.0f, 0.0f, 0.0f);
+            else
+                push = BikeVec3Scale(axis, -d);
             torque = CrossProduct(offset, push);
             leftBarContact->state = 2;
         } else if (rightBarContact->active) {
             driven = 1;
-            float d = BikeVec3Dot(base, rightBarContact->axis);
-            if (d < 0.0f)
-                push = BikeVec3Scale(rightBarContact->axis, -d);
-            else
+            const Vec3& axis = rightBarContact->axis;
+            float d = BikeVec3Dot(base, axis);
+            if (d >= 0.0f)
                 push = BikeVec3Call(0.0f, 0.0f, 0.0f);
+            else
+                push = BikeVec3Scale(axis, -d);
             offset = BikeVec3Sub(rightBarContact->point, frontWheel->nodePosition);
             torque = CrossProduct(offset, push);
             rightBarContact->state = 2;
@@ -466,9 +477,10 @@ struct BikeWheelKind {
         (dest)[copied] = 0;                                        \
     }
 
-// Distance between two points with the squared x/y terms kept in named temporaries (the
-// shock-arm length), and the plain accumulated form (the wheel base); both treat a unit
-// squared length as 1 (the shape every Vehicle/Bike length helper has).
+// Distance between two points with the three squares kept in named temporaries (the
+// shock-arm length: retail stores dx*dx and dy*dy and keeps dz*dz on the stack before the
+// sum; with dz*dz inline VC6 folds dy*dy into it), and the plain accumulated form (the wheel
+// base); both treat a unit squared length as 1 (the shape every Vehicle/Bike length helper has).
 static inline float BikeDistance(const Vec3& a, const Vec3& b)
 {
     float dz = a.z - b.z;
@@ -476,7 +488,8 @@ static inline float BikeDistance(const Vec3& a, const Vec3& b)
     float dx = a.x - b.x;
     float dx2 = dx * dx;
     float dy2 = dy * dy;
-    float len2 = dz * dz + (dx2 + dy2);
+    float dz2 = dz * dz;
+    float len2 = dz2 + (dx2 + dy2);
     if (len2 == 1.0f)
         return 1.0f;
     return (float)sqrt(len2);
@@ -501,6 +514,17 @@ struct BikeQuadTreeHead {
 };
 struct BikeTireObject : BikeQuadTreeHead, GameObject {
 };
+
+// Wheel kind of a named wheel (0 when the name is not in the table). The early return keeps
+// the kind in a register: retail zeroes esi on the loop's exit and loads the match out of line.
+static inline int BikeFindWheelKind(const char* name, const BikeWheelKind* kinds)
+{
+    for (int k = 0; k < 4; k++) {
+        if (strcmp(name, kinds[k].name) == 0)
+            return kinds[k].kind;
+    }
+    return 0;
+}
 
 GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const char* riderModel,
                            const SoultreeLoadDesc* desc, const BikeA5C8* info, Vec3 startPosition,
@@ -593,14 +617,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
         BikeWheelKind kinds[4] = {
             { "InlineRear", 0 }, { "InlineFront", 1 }, { "TransverseLeft", 2 }, { "TransverseRight", 3 }
         };
-        int kind = 0;
-        int k;
-        for (k = 0; k < 4; k++) {
-            if (strcmp(wheelNames[i], kinds[k].name) == 0) {
-                kind = kinds[k].kind;
-                break;
-            }
-        }
+        int kind = BikeFindWheelKind(wheelNames[i], kinds);
         char shockNames[2][32] = { "Shocks", "SwingArm" };
         BIKE_COPY_TEXT(partName, shockNames[i], 64);
         VehicleRotatingShock* rotShock;
@@ -634,7 +651,11 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
         tire->SetRenderContext((int)GameObject::renderContext);
         GameObject::AppendChild((GameObject*)tire, -1);
         if (rotating[i]) {
-            AddWheel(wheel, 0, 0, (int)rotShock, driven[i] ? (VehicleWheelAux*)engineState : 0);
+            // two calls (VC6 merges their common tail): retail pushes the aux argument in each arm
+            if (driven[i])
+                AddWheel(wheel, 0, 0, (int)rotShock, (VehicleWheelAux*)engineState);
+            else
+                AddWheel(wheel, 0, 0, (int)rotShock, 0);
             wheel->sceneNode->GetPositionIn(0, &wheelPoint);
             wheelPos[i] = modelNode->WorldToLocalPoint(wheelPoint);
             wheel->sceneNode->GetPositionIn(0, &wheelPoint);
@@ -644,7 +665,10 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
             rotShock->armLengthSq = len * len;
             rotShock->chord = (float)sin(rotShock->swingAngle * 0.5f) * len * 2.0f;
         } else {
-            AddWheel(wheel, 0, (int)lineShock, 0, driven[i] ? (VehicleWheelAux*)engineState : 0);
+            if (driven[i])
+                AddWheel(wheel, 0, (int)lineShock, 0, (VehicleWheelAux*)engineState);
+            else
+                AddWheel(wheel, 0, (int)lineShock, 0, 0);
             wheel->sceneNode->GetPositionIn(0, &wheelPoint);
             wheelPos[i] = modelNode->WorldToLocalPoint(wheelPoint);
             lineShock->UpdateAxis(wheel->sceneNode, handlebars->node);
@@ -738,9 +762,9 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     ((Vec3*)field_0xfc)->z = 1.0f / (riderMk * wh2);
     float wheelMass = baseWeight * 0.05f;
     wheelMass = wheelMass * 0.0310559f;
+    float wheelMk = wheelMass * (1.0f / 12.0f);
     float r = frontWheel->wheelRadius * 2.0f;
     float r2 = r * r;
-    float wheelMk = wheelMass * (1.0f / 12.0f);
     steerTorqueGains.x = 1.0f / ((r2 + h2) * wheelMk);
     steerTorqueGains.y = 1.0f / ((w2 + r2) * wheelMk);
     steerTorqueGains.z = 1.0f / (wheelMk * wh2);

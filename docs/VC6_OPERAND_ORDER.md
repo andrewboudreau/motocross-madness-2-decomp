@@ -892,3 +892,30 @@ try on similar code. None is a rule.
   same function, `a.z * b.z + (a.x * b.x + (a.y * b.y))` keeps the `mov [dst+8], eax`
   copy of the preceding cross's z after the first `faddp`, as retail does at three
   dot tests. The unparenthesised form stores it before the `faddp`.
+- **Grouping a dot's y product picks the accumulator register.** ConstraintMethodCollisionModel
+  ApplyContactImpulse (`0x0043bdb0`, 1570 to 2471 of 2619): with `(a.x*b.x + (a.y*b.y)) + a.z*b.z`
+  over a cross temporary, VC6 sums in the cross's y register (`fld c.y; fmulp st(2)`) as
+  retail does and drops a trailing `fstp st(2)` (the 2-byte size gap). The ungrouped dot and
+  every operand or term order (session 12) gave the same bytes. Parenthesising the first
+  product of each cross row, and the second of the x and y rows, then moves an
+  interleaved struct copy ahead of the subtractions (2471 to 2499).
+- **A reused member address in a register is a reference local; the branch sense picks the
+  fall-through arm.** Bike Method_0x0040a520 (`0x0040a520`, 447 to 1667 of 2272): retail
+  computes `&contact->axis` once into `edi` for both the dot and the scale call. A
+  `const Vec3& axis = contact->axis;` gives that; reading the member twice reloads it.
+  Retail also falls through into the zero vector after `test ah, 1; jne <scale>`, which
+  is `if (d >= 0.0f) push = zero; else push = scale(axis, -d);`; `if (d < 0.0f)` puts the
+  scale arm first.
+- **Loop lookups: an early-return helper keeps the result in a register.** Bike LoadBike
+  (`0x004079c0`, 2080 to 2584 of 6745): retail zeroes `esi` on the loop's exit and loads the
+  match in an out-of-line block that jumps back. `int kind = 0; for (...) if (match) { kind =
+  t[k].kind; break; }` spills kind and stores the zero before the loop. An inline
+  `return t[k].kind;` ... `return 0;` helper (or the goto equivalent) gives retail's form.
+- **Name every square to get retail's spills.** Same function (2584 to 5185): retail stores
+  dx*dx and dy*dy and keeps dz*dz on the stack before the sum. With `float dx2, dy2` but
+  `dz * dz` inline, VC6 folds dy*dy into the sum. A third local `dz2`, declared after
+  the other two, gives the retail sequence. Every grouping of the sum then compiles the same.
+- **An argument pushed in both arms is two calls, not a ternary.** Same function (5185 to
+  5268): retail `je L; push eax; jmp M; L: push 0; M: <rest of the pushes>; call`. This is
+  `if (c) f(..., p); else f(..., 0);` with VC6 merging the common tail. Every ternary form
+  computes the value into a register and pushes it once.

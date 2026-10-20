@@ -69,6 +69,25 @@ static inline float ConDot(const ConVec3& a, const ConVec3& b)
     return (a.x * b.x + a.y * b.y) + a.z * b.z;
 }
 
+// ConCross with each row's first product parenthesised, and the second product of the x
+// and y rows too: the extra nodes move the copy of rl (the WorldToLocalDirection result)
+// ahead of the cross's subtractions and the vLin add, as retail schedules vA = vLin + wA x rA.
+static inline ConVec3 ConCrossGrouped(const ConVec3& a, const ConVec3& b)
+{
+    ConVec3 r;
+    r.x = (a.y * b.z) - (a.z * b.y);
+    r.y = (a.z * b.x) - (a.x * b.z);
+    r.z = (a.x * b.y) - a.y * b.x;
+    return r;
+}
+
+// ConDot with the y product parenthesised: the extra node makes VC6 accumulate termB's dot
+// in the register of the cross product's y, as retail does (fld c.y; fmulp st(2)).
+static inline float ConDotGroupedY(const ConVec3& a, const ConVec3& b)
+{
+    return (a.x * b.x + (a.y * b.y)) + a.z * b.z;
+}
+
 // 0x0043bdb0 (ret 0x2c): impulse response of the body for one contact.  'a' is the
 // penetration offset, 'b' the surface point (the contact point is a + b), 'c' the contact
 // normal, 't' the time fraction used to interpolate the linear velocity, 'other' the other
@@ -84,18 +103,21 @@ static inline float ConDot(const ConVec3& a, const ConVec3& b)
 // Retail recomputes local(J) twice into the same local and converts rA to the local frame in
 // place (both written that way below); wA is reloaded from slot 43 at the end.
 //
-// NEAR MISS: 1570/2619 strict positions (candidate 2621 bytes), instruction alignment 0.962.
+// NEAR MISS: 2499/2619 strict positions (candidate size exact), 11 differing runs.
 // The frame (0xb8) and its slot order match, as do the call sequence and every operand.
-// What still differs:
-//  - termB (the 'other' branch): retail forms the x term of (axisB x rB) as axisB.y first
-//    (fld [axis.y]; fmul rB.z; fld st(1); fmul rB.y) and accumulates the dot product in the
-//    register of the cross product's y (fld c.y; fmulp st(2), sum order y, x, z); VC6 here
-//    loads rB first and sums x, y, z in fresh registers, which ends the branch with an extra
-//    fstp st(2) (the 2-byte size difference shifts everything after 0x43c68b).
-//  - scheduling only: the copy of the LocalToWorldPoint result is interleaved with the a + b
-//    adds differently, the nl copy and one push around the wA x rA cross product, one dword
-//    move in the 'other' path and the `test edi, edi` of `if (other)` (retail issues it
-//    inside the termA rotation).
+// Session 14: termB's dot through ConDotGroupedY (y product parenthesised) makes VC6
+// accumulate it in the cross product's y register as retail does (removes the extra
+// fstp st(2), the old 2-byte size gap; 1570 -> 2471), and vA's cross through ConCrossGrouped
+// moves the rl copy ahead of the subtractions (2471 -> 2499). What still differs:
+//  - the copy of the LocalToWorldPoint result is interleaved with the a + b adds differently
+//    (0x43beb4..0x43bf02);
+//  - the rl copy's last two dwords and one fsubp of the wA x rA cross (0x43bff5);
+//  - one dword move against an fld in the 'other' path (0x43c1ce);
+//  - the `test edi, edi` of `if (other)` (retail issues it inside the termA rotation);
+//  - one fld/fmul st(2) pair of termB's cross that VC6 forms as fld st(1); fmul (0x43c3ea).
+// Session 14 also tried: num and termA's dots with every grouping (inert once termB is
+// grouped); every parenthesisation of the six products in vA's cross (64 forms, the kept
+// one is best; A=0 fewer runs (10) but 2495).
 // Forms tried without reaching those (about 35): dot product as by-reference or by-value
 // helper with every grouping of the three terms (x+y)+z, flat, z+(x+y), (y+x)+z, x+(y+z),
 // (x+z)+y, y+(x+z), both argument orders, written out with a named cross local; termB through
@@ -123,7 +145,7 @@ void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t
     contactPoint = b;
     ConVec3 rl = body->node->WorldToLocalDirection(rA);
     ConVec3 nl = body->node->WorldToLocalDirection(c);
-    ConVec3 vA = ConAdd(vLin, ConCross(wA, rA));
+    ConVec3 vA = ConAdd(vLin, ConCrossGrouped(wA, rA));
     ConVec3 vB;
     ConVec3 rB;
     if (!other) {
@@ -146,7 +168,7 @@ void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t
     if (other) {
         invMassB = 1.0f / other->mass;
         ConVec3 axisB = ConTransform(ConCross(rB, c), other->invInertia);
-        termB = ConDot(ConCross(axisB, rB), c);
+        termB = ConDotGroupedY(ConCross(axisB, rB), c);
     }
     float j = num / (invMassA + termA + invMassB + termB);
     j *= 1.0f - impulseLoss;
