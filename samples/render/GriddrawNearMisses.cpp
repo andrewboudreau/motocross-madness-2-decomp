@@ -413,6 +413,13 @@ int DrawableGridNode::DrawVisibleBlock(void* target, int x, int z, int size, int
 }
 
 
+// 0x00481300 (215 bytes): all but the child index match. Retail forms
+// `lea ecx, [edi + ebp]` (i + j) and adds the table entry; VC6 here loads
+// the entry and adds i and j to it, as retail itself does in the
+// WalkVisibleQuadrants loop (0x0047ef80). The seven orders of the three
+// terms, (i + j) parenthesised, a named `cell = i + j` or table local, the
+// pointer offset applied first or last, and unsigned i or j all compile the
+// same or worse (s14 batch 3).
 // 0x00481300: one 4-cell block; draws it when it has geometry and
 // 0x00481a20 accepts it, then walks the child nodes unless this node's
 // buffers stand in for them.

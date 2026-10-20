@@ -23,7 +23,9 @@
 // list in a register (8 of 125); declared inside the loop it stays 117.
 // A 144-form sweep (count/i statement order, `while (1)`/`for (;;)`, three
 // bound tests, four strcmp operand orders and `== 0`, i++/++i/i += 1) also
-// stays at 117.
+// stays at 117. Not TU context either: compiled alone with only its
+// headers, or in its retail position between the destructor and SetFont,
+// it is unchanged (s14).
 //
 // DrawText4444 (0x0050b400, 758 bytes; 4444 texels),
 // DrawText1555 (0x0050b700, 758 bytes; 1555 texels) and the 32-bit

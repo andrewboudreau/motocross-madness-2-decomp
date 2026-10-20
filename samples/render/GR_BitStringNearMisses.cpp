@@ -18,6 +18,11 @@
 // 0x00423b70 (442 bytes; sub-word shift toward the back): as 0x004239c0;
 // in addition retail rotates the source-pointer decrement to the loop head
 // (`lea esi,[edx-4]` ... `add esi,4`, then `[esi-4]` / `sub esi,4`).
+// `*--src` at the loop head with `src = dst - 1` set after the first store
+// reproduces the head (`[esi-4]` / `sub esi,4`) but not the init/`add` pair
+// (11 diffs, 439 bytes); `src--` in the for increment drops the bottom
+// decrement only (11, 435); `i > 0`, `while (--i)`, an upward count and
+// src derived from `data + i - 1` inside the loop are no better (s14).
 
 #include "../../src/reconstructed/GR_BitString.cpp"
 

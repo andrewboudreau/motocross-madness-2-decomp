@@ -226,7 +226,7 @@ the integration temporary. When only displacement sizes differ, read the
 | render/Pixtrans | `0x004ce420` | 280/458 | b | frame 0x10 and the x loop match; VC6 loads `source` into ebp at entry (ebp pushed before the height guard) and forms the next source row in ebp where retail uses eax and copies it at the row head; first pixel's zero extension in ecx (retail edi) |
 | render/Pixtrans | `0x004cee30` | 1121/1125 masked | b | after the keyed x loop retail reloads the source stride before the width |
 | render/Pixtrans | `0x004cf2a0` | 242/1735 | b | draft: format, pixel size and palette in ebx/esi/edi where retail uses edi/ebx/esi; frame 0x50 vs 0x54 |
-| render/ResourceManager | `0x004e9030` | 100/798 | b | 5 code diffs: `jne @35` vs `mov [esp + N], ebx ; jne @36`; `je @250` vs `je A`; slots differ |
+| render/ResourceManager | `0x004e9030` | 100/804 | b | 5 code diffs, all from retail homing `archive` in the `new` temporary's slot: `mov [esp+0x14], ebx` after the EH state reset and `mov eax, [esp+0x14]` for the success return (the 6 missing bytes) |
 | render/TextService | `0x0050ade0` | 117/125 | c | 1 code diffs: `mov eax, [ebp + N] ; mov edx, edi ; mov~` vs `mov ecx, [ebp + N] ; mov eax, edi ; mov~` |
 | render/TextService | `0x0050b080` | 530/890 | b | 30 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
 | render/TextService | `0x0050b400` | 398/758 | b | 31 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
