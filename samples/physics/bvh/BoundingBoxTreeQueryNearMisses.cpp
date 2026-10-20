@@ -43,7 +43,17 @@
 //   itself is not expanded in SweptBoxOverlap or TreeBoxOverlap, so it cannot be the inline
 //   function).  Differences: VC6 here still expands the first a[] constructor, and the
 //   recursion tails are cross-jumped differently (retail's leaf branches jump into the
-//   b-children tail of the box branch).
+//   b-children tail of the box branch).  Budget: one more accessor expansion anywhere after
+//   the box test (a QueryIsLeaf/volume/child accessor; the same ones in the leaf-pair test
+//   before it change nothing) makes the a[0] constructor a call as in retail, but the
+//   second array's default construction then goes through the vector constructor iterator
+//   (??_H), which retail never calls; dearer QueryAbs forms, named sums, an axis reference,
+//   moving or merging the array declarations and aggregate-initialised arrays do not give
+//   retail's pattern either.  Tails: `int hit = 0` inside each leaf arm gives retail's leaf
+//   code (useMotion pushed per arm, hit cleared after the pushes), but VC6 then merges the
+//   box a-children call into the b-children one and the leaf arms into each other; 24
+//   hit/return layouts (shared, per-arm, early-return, function-level hit) do not give
+//   retail's merge.
 // - SegmentSegmentDistance 0x0042a640 (1471 bytes, 0.89 instruction ratio): written with
 //   explicit call views.  Retail homes the plane parameters, clamps and the first length in
 //   the dead d0/d1 argument slots (frame 0x60); VC6 here keeps them in a 0x80 frame, and the
