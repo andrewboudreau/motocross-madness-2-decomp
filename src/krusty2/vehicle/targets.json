@@ -36,7 +36,7 @@
     "target_va": "0x004060c0",
     "target_size": 1678,
     "expect": "partial",
-    "notes": "slot 7: 1677/1678 strict; the only difference is the second contact loop's load, which addresses [eax + ecx] where retail has [ecx + eax] (Vehicle slot 7 gets retail's order from the same loop). Also inert: the weighting loop as a while loop, with `continue`, with its own `int j`, or with `active--` first (worse), and the share stored before the weight (worse).",
+    "notes": "slot 7: 1677/1678 strict; the only difference is the second contact loop's load, which addresses [eax + ecx] where retail has [ecx + eax] (Vehicle slot 7 gets retail's order from the same loop). Also inert: the weighting loop as a while loop, with `continue`, with its own `int j`, or with `active--` first (worse), and the share stored before the weight (worse). Session 14f, also inert: one function-scope or block-shared `c`, a byte-offset load through `(char*)collisionPoints + i * 4`, `lf / (lf + lr)`, a pointer-taking or staged-sum BikeWheelDistance; computing lr first (1102) or swapping its arguments (843) loses.",
     "bindings": "Bike.bindings.json"
   },
   {
