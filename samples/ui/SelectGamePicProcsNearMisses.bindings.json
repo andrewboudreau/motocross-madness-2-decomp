@@ -373,5 +373,6 @@
   "_sprintf": "0x00534aaf",
   "_srand": "0x00534c0e",
   "_strncat": "0x00536b60",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "?Tick@MPBikeRiderDlg@@UAEHM@Z": "0x004f8820"
 }

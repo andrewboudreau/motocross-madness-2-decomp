@@ -98,5 +98,9 @@
   "_kVec3YAxis": "0x0065b468",
   "_kVec3ZAxis": "0x0065b438",
   "_kVec3Zero": "0x0065b448",
-  "_sscanf": "0x0053530b"
+  "_sscanf": "0x0053530b",
+  "??0FollowCamera@@QAE@H@Z": "0x00462ee0",
+  "?UnknownVirtualSlot45@FollowCamera@@UAE_N_NM@Z": "0x00463a30",
+  "?LoadCameraFile@FollowCamera@@QAEXPBD@Z": "0x004650e0",
+  "?Tick@FollowCamera@@UAEHM@Z": "0x00465c20"
 }

@@ -55,5 +55,6 @@
   "__real@4@4004e52ee00000000000": "0x005552a0",
   "_kVec3Zero": "0x006850f0",
   "_qsort": "0x00534426",
-  "_sprintf": "0x00534aaf"
+  "_sprintf": "0x00534aaf",
+  "?ControllerAngles@MorphBastardModifier@@QAEXPAUMorphBastardChannel@@UMatrix4@@@Z": "0x004a3c80"
 }

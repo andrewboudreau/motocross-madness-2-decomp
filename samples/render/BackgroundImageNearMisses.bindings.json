@@ -1,0 +1,6 @@
+{
+  "?GetDc@BackgroundImage@@QAEHPAPAXPAUCameraRect@@HHPAH21@Z": "0x004049d0",
+  "?MarkRegionPending@BackgroundImage@@QAEXH@Z": "0x00404cb0",
+  "?ReleaseDc@BackgroundImage@@QAEHXZ": "0x00404c80",
+  "?SetRegionRect@BackgroundImage@@QAEXHPAUCameraRect@@@Z": "0x00404240"
+}

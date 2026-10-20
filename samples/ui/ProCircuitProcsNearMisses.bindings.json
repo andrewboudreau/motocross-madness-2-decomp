@@ -359,5 +359,6 @@
   "_sprintf": "0x00534aaf",
   "_srand": "0x00534c0e",
   "_strrchr": "0x00534a60",
-  "?HandleEvent@PCNewEventDlg@@UAEXPAUUnknownDialogEvent@@@Z$ehhandler": "0x0054d257"
+  "?HandleEvent@PCNewEventDlg@@UAEXPAUUnknownDialogEvent@@@Z$ehhandler": "0x0054d257",
+  "?Tick@PCCentralBikeRiderDlg@@UAEHM@Z": "0x004d72c0"
 }

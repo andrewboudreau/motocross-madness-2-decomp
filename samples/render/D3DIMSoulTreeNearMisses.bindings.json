@@ -218,5 +218,6 @@
   "_kVec3ZAxis": "0x006754b0",
   "_kVec3Zero": "0x006754c0",
   "_sprintf": "0x00534aaf",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "?PrepareGeometry@D3DIMSoultreeObject@@UAEHXZ": "0x00443aa0"
 }

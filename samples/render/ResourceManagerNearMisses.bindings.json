@@ -1,0 +1,18 @@
+{
+  "??0ResourceItem@@QAE@XZ": "0x004e8d70",
+  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??1UnknownTextureStream@@QAE@XZ": "0x00460d60",
+  "??2@YAPAXIPBDH@Z": "0x004a3010",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??_C@_02JKAF@rb?$AA@": "0x0056666c",
+  "??_C@_03FFKA@RS2?$AA@": "0x00572b90",
+  "?AddArchive@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z": "0x004e9030",
+  "?AddArchive@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z$ehhandler": "0x0054dace",
+  "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
+  "?IsValidFile@UnknownTextureStream@@QAEHPBD@Z": "0x00460e70",
+  "?MergeWithExisting@UnknownResourceManager@@QAEHPAVResourceItem@@@Z": "0x004e8f40",
+  "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
+  "?Read@UnknownTextureStream@@QAEHPAXHH@Z": "0x00461640",
+  "__FILE__": "0x00572b64",
+  "__stricmp": "0x00536070"
+}

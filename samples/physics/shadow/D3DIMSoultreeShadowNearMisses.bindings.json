@@ -20,5 +20,7 @@
   "__FILE__:d3dimsoultreeshadownearmisses.cpp": "0x00568cac",
   "__ftol": "0x00534a88",
   "__real@4@00000000000000000000": "0x00550484",
-  "__real@4@3ffe8000000000000000": "0x005507f4"
+  "__real@4@3ffe8000000000000000": "0x005507f4",
+  "?UnknownVirtualSlot29@D3DIMSoultreeShadow@@UAEHXZ": "0x00446c30",
+  "?UnknownVirtualSlot30@D3DIMSoultreeShadow@@UAEXXZ": "0x00446f40"
 }

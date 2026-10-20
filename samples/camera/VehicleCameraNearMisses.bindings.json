@@ -3,6 +3,7 @@
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?GetAxes@UnknownVehiclePart@@QAEXPAUVector3@@0@Z": "0x004fc4f0",
   "?QueryGround@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
+  "?UnknownVirtualSlot35@VehicleCamera@@UAE?AUVector3@@EM@Z": "0x0052c510",
   "_$E1": "0x0052cee0",
   "_$E10": "0x0052cfd0",
   "_$E11": "0x0052cfc0",

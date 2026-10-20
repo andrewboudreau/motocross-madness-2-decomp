@@ -123,5 +123,9 @@
   "_kVec3YAxis": "0x0068a058",
   "_kVec3ZAxis": "0x00689fe8",
   "_kVec3Zero": "0x00689ff8",
-  "_sprintf": "0x00534aaf"
+  "_sprintf": "0x00534aaf",
+  "?GetCellCorners@TerrainShutdownObject@@QAEXHHPAMPAUTerrainVec3@@PAE@Z": "0x00483910",
+  "__real@4@3ff583126f0000000000": "0x005507d4",
+  "__real@4@407effffff0000000000": "0x00550844",
+  "?FastInvSqrt@@YAMM@Z": "0x00460c00"
 }

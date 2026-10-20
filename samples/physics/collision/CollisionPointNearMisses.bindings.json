@@ -1,0 +1,10 @@
+{
+  "?FastInvSqrt@@YAMM@Z": "0x00460c00",
+  "?LocalToWorldPoint@CollisionContactOwner@@QAEPAUCollisionVec3@@PAU2@PBU2@@Z": "0x004fd660",
+  "?QueryGround@CollisionFrameHelper@@QAEXPAUCollisionVec3@@PBU2@HPAD@Z": "0x00507c10",
+  "?SoultreeMergeContacts@@YAHHPAPAVCollisionPoint@@PBUCollisionVec3@@11PAU2@2222@Z": "0x0043aa30",
+  "?SoultreeRefreshContacts@@YAHPAXPAHHPAPAVCollisionPoint@@PAVCollisionFrameHelper@@PAUCollisionVec3@@HM@Z": "0x0043ad80",
+  "?g_CollisionZeroVec3@@3UCollisionVec3@@A": "0x005797f0",
+  "__real@4@00000000000000000000": "0x00550484",
+  "__real@4@3fff8000000000000000": "0x00550748"
+}

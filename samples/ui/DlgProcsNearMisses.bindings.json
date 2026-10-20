@@ -534,5 +534,8 @@
   "_rand": "0x00534c1b",
   "_sprintf": "0x00534aaf",
   "_srand": "0x00534c0e",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "?Tick@SPBikeRiderDlg@@UAEHM@Z": "0x0044fae0",
+  "?HandleEvent@SPRaceInfoDlg@@UAEXPAUUnknownDialogEvent@@@Z": "0x004507a0",
+  "?HandleEvent@MPRaceInfoDlg@@UAEXPAUUnknownDialogEvent@@@Z": "0x004513a0"
 }

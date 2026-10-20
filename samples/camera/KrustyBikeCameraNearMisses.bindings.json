@@ -6,5 +6,6 @@
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__real@4@40008000000000000000": "0x0055074c",
   "_s_UnknownActive67c3f4": "0x0067c3f4",
-  "_s_UnknownVector67c3e8": "0x0067c3e8"
+  "_s_UnknownVector67c3e8": "0x0067c3e8",
+  "?Tick@KrustyBikeCamera@@UAEHM@Z": "0x00497e20"
 }
