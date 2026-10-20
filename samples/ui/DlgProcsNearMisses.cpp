@@ -51,8 +51,16 @@
 //   (0x0044fae0 1235/1235). No label-free construct split the block ({},
 //   if (1), do/while (0), switch, empty inline call, (void)x, dead copies),
 //   so the original had some code-free block boundary there; a bare label
-//   is a matching-only form and is not applied. Untested: a label or goto
-//   inside an inline helper wrapping both calls.
+//   is a matching-only form and is not applied. Session 14: an inline
+//   helper wrapping both calls with `goto look; look:` between them is also
+//   exact (1235/1235), the same label moved into a helper, so not applied.
+//   Without the label the helper (const reference or pointer target, void or
+//   int result, one helper per call) gives 1181, by value 74; so do
+//   branches that fold after inlining or propagation (an `int look = 1`
+//   parameter or local, `static const` flag, `if (look) {}`) and
+//   `for (;;) { ...; break; }`, `while (1)` and `if (LookAt(..)) {}`
+//   around the slot-29 call; tests on `this`, `&viewTarget` or a target
+//   pointer add code (109-523).
 // SPRaceInfoDlg::HandleEvent (0x004507a0, 1652 bytes) and
 // MPRaceInfoDlg::HandleEvent (0x004513a0, 2004 bytes): the same
 //   calls, strings and list columns; inside the per-racer loops retail
