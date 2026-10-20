@@ -147,11 +147,16 @@ jumps to it, while the archive Fill failure keeps its own epilogue (eax is
 already zero). Returning from inside each branch lets VC6 fold the archive
 result into `neg/sbb` and put the file success tail first.
 
+Exact (1 more): the start-up `0x004bc6b0` (656 bytes). Every failure goes
+to the shared `failed` return with `goto`, the streamed branch's `Play()`
+failure included. As `return 0` there, VC6 cross-jumped it with the `& 5`
+branch's `Play()` failure; with `goto failed` the streamed failure keeps its
+own epilogue (returning Play's zero from eax) and the `& 5` one falls into
+`failed`, like retail. It needs PCAudio.cpp's notifier constructor to drop
+the EH frame of `new UnknownSoundNotifier`.
+
 Near misses (`samples/audio/PCAudioNearMisses.cpp`, notes there):
-`0x004be910`, the manager's thread
-`0x004bdc00` and the start-up `0x004bc6b0` (in the samples file it also
-gains an EH frame because the notifier's constructor is not defined there;
-inside PCAudio.cpp the frame matches retail).
+`0x004be910` and the manager's thread `0x004bdc00`.
 
 Every function of PCAudio.cpp (`0x004bb630`–`0x004bed40`) is now either
 exact or a documented near miss. `0x004be330` is not a function start: it is

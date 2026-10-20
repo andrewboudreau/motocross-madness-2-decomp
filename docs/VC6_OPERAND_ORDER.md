@@ -505,6 +505,15 @@ trying on other `[base+index]` / `add r, r` order near misses.
   `for (i = 0; i < count && ...; i++)` rotates it (KrustyBike `0x00414370`, +28).
 - A trailing `return X;` after an if-block merges with an earlier identical return, so
   failure paths jump back to it; `goto failed` or an early return emits a second copy.
+- An error check folded into a later combined test (`if (r < 0 && r != E)` covering two
+  calls) sends its failure through that test's blocks; giving each call its own early
+  failure test and `goto failed` reproduces retail's separate error blocks and its zero
+  register compares (NetworkInterface::ConnectUsingLobby `0x004ab960`, 146 -> exact).
+- `if (!Play()) return 0;` in one branch and `else if (!Play()) goto failed;` in the other
+  are cross-jumped into one tail. Writing both as `goto failed` keeps them apart: the first
+  keeps its own epilogue and returns Play's zero from eax without `xor eax, eax`, and the
+  second falls into the shared `failed` block (Sound::PlayWithOptions `0x004bc6b0`, 238 ->
+  exact, measured inside PCAudio.cpp).
 - A helper written as a macro reproduces retail's address recomputation where the same
   helper as an inline function keeps the destination in a register (PCAudio's sound
   name copy).

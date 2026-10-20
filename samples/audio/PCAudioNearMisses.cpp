@@ -18,22 +18,6 @@
 // channels = 2;` (34), an inline SetPcmFormat(format*, channels, rate, bits)
 // helper (51) and rate first with (unsigned short) casts (68) are worse.
 //
-// Sound 0x004bc6b0 (starts a sound): compiled inside PCAudio.cpp (where the
-// UnknownSoundNotifier constructor is defined, so VC6 drops the EH frame
-// like retail) with the guarded do-while duplicate search and playFlags
-// used before preferHardware, 237 of 629 bytes match: the search loop, the
-// prologue and the slot of `status` agree. Left: VC6 cross-jumps the two
-// `Play()` failure tails (streamed `return 0` and the `& 5` branch's
-// `goto failed`) where retail keeps them apart (the streamed one returns
-// Play's zero without `xor eax, eax`). Declaring `queue` after the
-// EnterCriticalSection gives retail's late `xor ebp, ebp` (238 of 629
-// inside PCAudio.cpp; that cross-jump is the only difference left). Tried
-// against the cross-jump: `return played` of a Play result local, `if
-// (Play()) goto done; return 0;` in either branch, `return 0` instead of
-// `goto failed` in the `& 5` branch, the `failed:` label inside that
-// branch, and the `& 5` branch first (VC6 then moves `done` after it).
-// Here (outside PCAudio.cpp) VC6 also adds the EH frame.
-//
 // UnknownPCAudioObject 0x004bdc00 (the loader thread; retail extent is 483
 // bytes, 0x4bdc00..0x4bdde3): spelling the inner queue loop `while (1)`
 // instead of `for (;;)` keeps it top-tested like retail (instruction count
@@ -141,89 +125,5 @@ unsigned __stdcall UnknownPCAudioObject::UnknownThreadProc(void* context) {
     }
 stopped:
     _endthreadex(0);
-    return 0;
-}
-
-// 0x004bc6b0: starts the sound. A sound already playing in the same loop
-// mode starts a free duplicate instead (when `restart`); static sounds
-// play directly, streamed ones get a new notifier first; deferred ones are
-// queued for the loader. Failures after the lock leave the critical section
-// held (retail behaviour).
-int Sound::PlayWithOptions(int restart, unsigned long playFlags, int preferHardware) {
-    if (!SoundSystem()->audioStarted || !soundGroup || !soundGroup->field_0x2c_bit0 ||
-        soundGroup->isPaused)
-        return 1;
-    int looping = playFlags & 1;
-    lastPlayFlags = playFlags;
-    field_0x1f4_bit6 = preferHardware;
-    if (soundFlags & 2) {
-        lastPlayFlags = 1;
-    } else if (!(soundFlags & 0x20)) {
-        if (field_0x1f4_bit6 && SoundSystem()->allowSoundHardware &&
-            (long)SoundSystem()->soundCaps.freeHw3DAllBuffers > 0)
-            lastPlayFlags = playFlags | 2;
-        else
-            lastPlayFlags = playFlags | 4;
-    }
-    if (soundFlags & 4)
-        EnterCriticalSection(&bufferLock);
-    if (dsBuffer) {
-        unsigned long status;
-        int i = 0;
-        if (dsBuffer->GetStatus(&status) < 0)
-            goto failed;
-        if ((status & 1) == 1 && looping == isLooping) {
-            if (!restart)
-                goto done;
-            if (duplicateCount > 0) {
-                do {
-                    if (duplicateBuffers[i]) {
-                        if (duplicateBuffers[i]->GetStatus(&status) < 0)
-                            goto failed;
-                        if ((status & 1) != 1) {
-                            if (duplicateBuffers[i]->Play(0, 0, playFlags) < 0)
-                                goto failed;
-                            return 1;
-                        }
-                    }
-                    i++;
-                } while (i < duplicateCount);
-            }
-            goto failed;
-        }
-        if (!(soundFlags & 5)) {
-            if (soundFlags & 2) {
-                if (notifier)
-                    delete notifier;
-                notifier = new (__FILE__, 816) UnknownSoundNotifier;
-                if (!notifier || !notifier->StartRefillThread(this))
-                    goto failed;
-                filledHalf = bufferBytes / 2;
-                if (!Play())
-                    return 0;
-            }
-        } else if (!Play()) {
-            goto failed;
-        }
-    }
-done:
-    if (soundFlags & 4)
-        LeaveCriticalSection(&bufferLock);
-    if (soundFlags & 4) {
-        EnterCriticalSection(&bufferLock);
-        int queue = 0;
-        if (!bufferReady && !field_0x1f4_bit7) {
-            field_0x1f4_bit7 = 1;
-            queue = 1;
-        }
-        LeaveCriticalSection(&bufferLock);
-        if (queue)
-            SoundSystem()->soundMemoryManager->QueueSoundLoad(this);
-        EnterCriticalSection(&bufferLock);
-        isStopped = 0;
-        LeaveCriticalSection(&bufferLock);
-    }
-    return 1;
-failed:
     return 0;
 }

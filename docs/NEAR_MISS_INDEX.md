@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 121, c 96, total 219. The three class (a) functions of the
+Counts: a 2, b 121, c 95, total 218. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -49,7 +49,6 @@ the integration temporary. When only displacement sizes differ, read the
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
-| audio/PCAudio | `0x004bc6b0` | 238/629 (inside PCAudio.cpp) | c | VC6 cross-jumps the two `Play()` failure tails (streamed `return 0`, the `& 5` branch's `goto failed`) where retail keeps them apart; the sample copy also gains an EH frame |
 | audio/PCAudio | `0x004bdc00` | 91/483 | b | retail extent 483; `while (1)` gives retail's top-tested queue loop (155 insns); left: retail ebp=audio, ebx=&cs then loaded, edi=&sound cs, ready/bytes spilled (frame 0xc vs 8) |
 | audio/PCAudio | `0x004be910` | 108/158 | c | 6 code diffs: retail adds `mov [esp + N], edx`; retail adds `mov [esp + N], edx` |
 | camera/Camera | `0x0042ee30` | 487/492 | c | `sub esp, 0x40` emitted after the `rep movsd` that copies the projection argument (retail before it) in the first MatrixMult; argument copies, viewport temporaries and declaration forms do not move it |
@@ -293,8 +292,9 @@ Wrecker `0x005329e0` (763 -> 1200, with the unit's own vector operators
 instead of copies) and ControlInterface slot 3 `0x004bf4f0` (43 -> 76) are
 measured that way. Every other sample that did not include its unit was
 also compiled inside it (2026-10-12 scan, duplicate statics and helpers
-removed): no other function's bytes changed except PCAudio `0x004bc6b0` and
-EcoSystem `0x00457480` (their rows are already measured in the unit) and
+removed): no other function's bytes changed except PCAudio `0x004bc6b0` (now
+exact in PCAudio.cpp), EcoSystem `0x00457480` (its row is already measured in
+the unit) and
 CarProcedural slot 10 `0x0042fd80` (221 -> 211, worse); those samples keep
 their header includes.
 

@@ -4756,6 +4756,15 @@ CASES = [
         'reason': 'EH frame for new Sound; early failures keep their epilogues, load failures share one delete tail inside the last branch',
     },
     {
+        'name': 'PCAudio Sound PlayWithOptions 0x4bc6b0',
+        'bindings': 'src/reconstructed/PCAudio.bindings.json',
+        'source': 'src/reconstructed/PCAudio.cpp',
+        'symbol': '?PlayWithOptions@Sound@@QAEHHKH@Z',
+        'target_va': '0x004bc6b0',
+        'target_size': 656,
+        'reason': 'every failure, the streamed Play() one included, goes to the shared failed return; the & 5 Play() failure falls into it, keeping the two Play() tails apart',
+    },
+    {
         'name': 'PCAudio UnknownPCAudioObject constructor',
         'bindings': 'src/reconstructed/PCAudio.bindings.json',
         'source': 'src/reconstructed/PCAudio.cpp',
