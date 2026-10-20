@@ -34,5 +34,9 @@
   "?IsInsideStrip@Track@@QAEHUTrackVec3@@PAUTrackSegment@@1@Z": "0x00516ef0",
   "?PlaceNear@Track@@QAEHUVector3@@UTrackPos@@MMHPAU3@@Z": "0x00517340",
   "?IntersectLines@@YAHMMMMMMMMPAM0@Z": "0x0047b800",
-  "?ClosestPointOnTrack@Track@@QAEHUVector3@@PAUTrackPos@@PAM@Z": "0x00516980"
+  "?ClosestPointOnTrack@Track@@QAEHUVector3@@PAUTrackPos@@PAM@Z": "0x00516980",
+  "?LoadTrack@Track@@QAEHPAVUnknownTextureStream@@PAX1PAH2@Z": "0x00515ed0",
+  "?Read@UnknownTextureStream@@QAEHPAXHH@Z": "0x00461640",
+  "?Tell@UnknownTextureStream@@QAEHXZ": "0x00461600",
+  "?AtEnd@UnknownTextureStream@@QAEHXZ": "0x00430ff0"
 }

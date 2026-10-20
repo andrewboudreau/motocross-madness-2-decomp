@@ -104,10 +104,8 @@ clamp-then-select form as `0x00516ca0` (it was 465 of 776 compared bytes
 with the differences computed inside each clamping branch).
 
 The loader `0x00515ed0` (2342 bytes) reads a chunk stream (an id byte,
-then the chunk's data; ids 1-16 are decoded in
-`samples/track/TrackNearMisses.cpp`). It is a draft near miss there (117 of
-2400 compared bytes): dispatch, calls and arithmetic follow retail, but the
-frame is 0x64 against retail's 0x48 and retail keeps `this` in ebp.
+then the chunk's data; ids 1-16 are decoded in its comment in Track.cpp).
+It is exact; see the shapes below.
 
 ## Source shapes that mattered
 
@@ -128,6 +126,14 @@ frame is 0x64 against retail's 0x48 and retail keeps `this` in ebp.
 - `0x00515df0`: `*p++ = 0; if (*p == 0) p = 0; else while (strchr(...)) p++;`
   gives retail's late `push edi`.
 - `0x00516870`: a `while (list)` loop, not do-while.
+- `0x00515ed0`: the cleanup call and `return 0` are written out at each
+  failure. Retail's three cleanup blocks are those copies, cross-jumped by
+  the register that holds the count; one shared `goto fail` gives a 0x64
+  frame without `this` in ebp. The link pass reuses `index` and `slot`
+  (function-scope, address-taken) as its counters, which is why retail
+  stores them to their frame slots each iteration. The probe extents are
+  scaled through a `TrackVec3*` helper, so one base register serves all
+  three components.
 - `0x00518080`: writing the clamp into the by-value `pos.t`, plus a local
   difference vector.
 - `0x00517da0`: a `goto` to the shared path-search call when the segment

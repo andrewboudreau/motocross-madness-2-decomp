@@ -22955,6 +22955,15 @@ CASES = [
         'target_size': 89,
     },
     {
+        'name': 'Track 0x515ed0 track loader',
+        'bindings': 'src/reconstructed/Track.bindings.json',
+        'source': 'src/reconstructed/Track.cpp',
+        'symbol': '?LoadTrack@Track@@QAEHPAVUnknownTextureStream@@PAX1PAH2@Z',
+        'target_va': '0x00515ed0',
+        'target_size': 2342,
+        'reason': 'cleanup repeated at each failure; index/slot reused as link-pass counters; probe extents scaled through a vector pointer',
+    },
+    {
         'name': 'Track 0x516800 free node',
         'bindings': 'src/reconstructed/Track.bindings.json',
         'source': 'src/reconstructed/Track.cpp',

@@ -1,4 +1,5 @@
 #include <float.h>
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -6,6 +7,7 @@
 
 #include "DebugAlloc.h"
 #include "GameUiHelpers.h"
+#include "TextureMap.h"
 #include "../krusty2/math/FastMath.h"
 
 // Vector helpers for 0x00518230. They are file-local: declared in Track.h
@@ -79,6 +81,258 @@ int Track::FreeNodeArray(UnknownStream* stream, TrackNode** nodes, int count)
             FreeNode(nodes[i]);
     }
     DebugFree(nodes, __FILE__, 30);
+    return 1;
+}
+
+// 0x00515ed0: the track loader. A chunk stream: one id byte, then the
+// chunk's data, until the stream ends (the inline end test 0x00430ff0):
+// 1 node count (allocates the node table), 2/3 x/z offset, 4 scale, 5 node
+// index (allocates the node), 6 node flags (bit 0 set), 7 node length,
+// 8 new segment, 9/10/11 the last segment's centre / left / right point
+// (scaled and offset; 9 also sets the previous segment's horizontal length),
+// 12 skipped, 13 link count (allocates the links), 14 one link (slot and
+// node index, range-checked against the count inclusively as retail does),
+// 15/16 the start / finish probe. Afterwards the link indices become node
+// pointers, the start node is kept, the probes are placed on the track and
+// the lap length is measured from just after the start round to it.
+// Retail repeats the cleanup at every failure (VC6 cross-jumps the copies
+// into three blocks by the register holding the count), reuses `index` and
+// `slot` as the link pass's counters (both stay in their frame slots) and
+// scales the probe extents through a vector pointer (one base register).
+// A shared `goto fail`, block-scoped counters or per-field scaling move the
+// frame and registers off retail's.
+// The start / finish probe the loader fills (bikerace.cpp's 0x3c-byte gate).
+struct TrackProbe {
+    TrackVec3 centre;               // +0x00
+    TrackVec3 direction;            // +0x0c
+    TrackVec3 halfExtents;          // +0x18
+    float field_0x24;
+    float field_0x28;               // 150 after loading
+    TrackPos pos;                   // +0x2c
+};
+
+static inline void ScaleTrackVec3(TrackVec3* v, float scale)
+{
+    v->x *= scale;
+    v->y *= scale;
+    v->z *= scale;
+}
+
+int Track::LoadTrack(UnknownTextureStream* stream, void* start, void* finish, int* hasStart,
+                     int* hasFinish)
+{
+    int count = 0;
+    float offsetX = 0.0f;
+    float offsetZ = 0.0f;
+    float scale = 1.0f;
+    TrackNode** nodes;
+    int index;
+    TrackSegment** link;
+    int linkCount;
+    int slot;
+    int target;
+    if (!stream)
+        return 0;
+    char chunk;
+    stream->Read(&chunk, 1, 1);
+    index = 0;
+    while (!stream->AtEnd()) {
+        if (chunk == 1) {
+            stream->Read(&count, 4, 1);
+            if (count <= 0)
+                return 0;
+            nodes = (TrackNode**)DebugCalloc(count, 4, __FILE__, 81);
+            if (!nodes)
+                return 0;
+        } else if (chunk == 2) {
+            stream->Read(&offsetX, 4, 1);
+        } else if (chunk == 3) {
+            stream->Read(&offsetZ, 4, 1);
+        } else if (chunk == 4) {
+            stream->Read(&scale, 4, 1);
+        } else if (chunk == 5) {
+            stream->Read(&index, 4, 1);
+            if (index < 0 || index >= count) {
+                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                return 0;
+            }
+            nodes[index] = (TrackNode*)DebugCalloc(1, sizeof(TrackNode), __FILE__, 108);
+            if (!nodes[index]) {
+                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                return 0;
+            }
+            link = &nodes[index]->firstSegment;
+        } else if (chunk == 6) {
+            if (!nodes[index]) {
+                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                return 0;
+            }
+            int flags;
+            stream->Read(&flags, 4, 1);
+            nodes[index]->flags = (unsigned char)(flags | 1);
+        } else if (chunk == 7) {
+            if (!nodes[index]) {
+                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                return 0;
+            }
+            stream->Read(&nodes[index]->pathLength, 4, 1);
+            nodes[index]->pathLength *= scale;
+        } else if (chunk == 8) {
+            if (!nodes[index] || !link) {
+                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                return 0;
+            }
+            TrackSegment* segment = (TrackSegment*)DebugCalloc(1, sizeof(TrackSegment), __FILE__, 141);
+            if (!segment) {
+                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                return 0;
+            }
+            segment->previous = nodes[index]->lastSegment;
+            *link = segment;
+            link = &segment->next;
+            nodes[index]->lastSegment = segment;
+        } else if (chunk == 9) {
+            if (!nodes[index] || !nodes[index]->lastSegment) {
+                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                return 0;
+            }
+            stream->Read(&nodes[index]->lastSegment->pointX, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->pointY, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->pointZ, 4, 1);
+            nodes[index]->lastSegment->pointX = scale * nodes[index]->lastSegment->pointX + offsetX;
+            nodes[index]->lastSegment->pointY = scale * nodes[index]->lastSegment->pointY;
+            nodes[index]->lastSegment->pointZ = scale * nodes[index]->lastSegment->pointZ + offsetZ;
+            TrackSegment* segment = nodes[index]->lastSegment;
+            TrackSegment* previous = segment->previous;
+            if (previous) {
+                float dx = segment->pointX - previous->pointX;
+                float dz = segment->pointZ - previous->pointZ;
+                previous->horizontalLength = (float)sqrt(dz * dz + dx * dx);
+            }
+        } else if (chunk == 10) {
+            if (!nodes[index] || !nodes[index]->lastSegment) {
+                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                return 0;
+            }
+            stream->Read(&nodes[index]->lastSegment->edgeAX, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->edgeAY, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->edgeAZ, 4, 1);
+            nodes[index]->lastSegment->edgeAX = scale * nodes[index]->lastSegment->edgeAX + offsetX;
+            nodes[index]->lastSegment->edgeAY = scale * nodes[index]->lastSegment->edgeAY;
+            nodes[index]->lastSegment->edgeAZ = scale * nodes[index]->lastSegment->edgeAZ + offsetZ;
+        } else if (chunk == 11) {
+            if (!nodes[index] || !nodes[index]->lastSegment) {
+                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                return 0;
+            }
+            stream->Read(&nodes[index]->lastSegment->edgeBX, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->edgeBY, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->edgeBZ, 4, 1);
+            nodes[index]->lastSegment->edgeBX = scale * nodes[index]->lastSegment->edgeBX + offsetX;
+            nodes[index]->lastSegment->edgeBY = scale * nodes[index]->lastSegment->edgeBY;
+            nodes[index]->lastSegment->edgeBZ = scale * nodes[index]->lastSegment->edgeBZ + offsetZ;
+        } else if (chunk == 12) {
+            int unused;
+            stream->Read(&unused, 4, 1);
+        } else if (chunk == 13) {
+            if (!nodes[index]) {
+                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                return 0;
+            }
+            stream->Read(&linkCount, 4, 1);
+            if (linkCount < 0) {
+                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                return 0;
+            }
+            nodes[index]->linkCount = linkCount;
+            nodes[index]->links = (TrackNode**)DebugCalloc(linkCount, 4, __FILE__, 231);
+            if (!nodes[index]->links) {
+                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                return 0;
+            }
+        } else if (chunk == 14) {
+            if (!nodes[index] || !nodes[index]->links) {
+                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                return 0;
+            }
+            stream->Read(&slot, 4, 1);
+            stream->Read(&target, 4, 1);
+            if (slot < 0 || slot > linkCount || target < 0 || target > count) {
+                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                return 0;
+            }
+            nodes[index]->links[slot] = (TrackNode*)target;
+        } else if (chunk == 15) {
+            *hasStart = 1;
+            TrackProbe* probe = (TrackProbe*)start;
+            stream->Read(&probe->centre.x, 4, 1);
+            stream->Read(&probe->centre.y, 4, 1);
+            stream->Read(&probe->centre.z, 4, 1);
+            stream->Read(&probe->direction.x, 4, 1);
+            stream->Read(&probe->direction.y, 4, 1);
+            stream->Read(&probe->direction.z, 4, 1);
+            stream->Read(&probe->halfExtents.x, 4, 1);
+            stream->Read(&probe->halfExtents.y, 4, 1);
+            stream->Read(&probe->halfExtents.z, 4, 1);
+            stream->Read(&probe->field_0x24, 4, 1);
+            ScaleTrackVec3(&probe->halfExtents, scale);
+            probe->field_0x24 *= scale;
+            probe->centre.x = probe->centre.x * scale + offsetX;
+            probe->centre.y *= scale;
+            probe->centre.z = probe->centre.z * scale + offsetZ;
+        } else if (chunk == 16) {
+            *hasFinish = 1;
+            TrackProbe* probe = (TrackProbe*)finish;
+            stream->Read(&probe->centre.x, 4, 1);
+            stream->Read(&probe->centre.y, 4, 1);
+            stream->Read(&probe->centre.z, 4, 1);
+            stream->Read(&probe->direction.x, 4, 1);
+            stream->Read(&probe->direction.y, 4, 1);
+            stream->Read(&probe->direction.z, 4, 1);
+            stream->Read(&probe->halfExtents.x, 4, 1);
+            stream->Read(&probe->halfExtents.y, 4, 1);
+            stream->Read(&probe->halfExtents.z, 4, 1);
+            stream->Read(&probe->field_0x24, 4, 1);
+            ScaleTrackVec3(&probe->halfExtents, scale);
+            probe->field_0x24 *= scale;
+            probe->centre.x = probe->centre.x * scale + offsetX;
+            probe->centre.y *= scale;
+            probe->centre.z = probe->centre.z * scale + offsetZ;
+        }
+        stream->Read(&chunk, 1, 1);
+    }
+    for (index = 0; index < count; index++) {
+        if (nodes[index] && nodes[index]->links) {
+            for (slot = 0; slot < nodes[index]->linkCount; slot++) {
+                int k = (int)nodes[index]->links[slot];
+                if (k >= 0 && k < count)
+                    nodes[index]->links[slot] = nodes[k];
+            }
+        }
+    }
+    startNode = nodes[0];
+    DebugFree(nodes, __FILE__, 315);
+    if (*hasStart) {
+        TrackProbe* probe = (TrackProbe*)start;
+        probe->field_0x28 = 150.0f;
+        ClosestPointOnTrack(*(Vector3*)&probe->centre, &probe->pos, 0);
+    }
+    if (*hasFinish) {
+        TrackProbe* probe = (TrackProbe*)finish;
+        probe->field_0x28 = 150.0f;
+        ClosestPointOnTrack(*(Vector3*)&probe->centre, &probe->pos, 0);
+    }
+    {
+        TrackPos from;
+        from.node = startNode;
+        from.segment = startNode->firstSegment;
+        from.t = 0.0001f;
+        TrackPos to;
+        to.node = startNode;
+        to.segment = startNode->firstSegment;
+        to.t = 0.0f;
+        ShortestPath(from, to, 0, &lapLength);
+    }
     return 1;
 }
 
