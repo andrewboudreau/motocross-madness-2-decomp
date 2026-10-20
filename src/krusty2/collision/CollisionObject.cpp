@@ -2533,6 +2533,12 @@ void CollisionObject::UpdateModelBounds()
 
 // The 4x4 product of CollisionMatrixMultiply (0x00436500) as SetTransform's hull case expands it
 // (the model case calls the function).
+// Term order dead end (about 40 forms): retail's rows 1-3 share one per-element order and
+// row 0 has its own, consistent with leaf ages fixed in row 0.  Element pointers (float views
+// of out/a/b), references, swapped operands or terms, direct expansion in SetTransform, a
+// hull-body helper, reassigned row pointers and the five bracketings with or without
+// parenthesised products leave every row different; m[i][j] indexing or per-row pointers
+// are dearer and make the point transform a call (per-row pointers reproduce row 1 only).
 static inline void CollisionMatrixMultiplyInline(Matrix4* out, const Matrix4* a, const Matrix4* b)
 {
     out->_11 = b->_11 * a->_11 + b->_12 * a->_21 + b->_13 * a->_31 + b->_14 * a->_41;

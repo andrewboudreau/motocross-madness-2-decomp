@@ -84,6 +84,9 @@ int TerrainShadow::UnknownVirtualSlot29()
 // orthographic scale by lensScale.  Returns 0 when the rectangle does not fit the texture.
 // Each branch owns its matrix: with one shared `m` VC6 cross-jumps the whole Multiply argument
 // copy, retail only merges from the final push.  The chained stores give retail's fst order.
+// Larger-extent dead end (about 18 forms): retail's else arm stores the extent back over
+// itself (`mov edx, [S]; fstp st0; mov [S], edx`) and reloads texture; if/else, ternary,
+// max-by-reference helpers and pointer-select forms all drop the self-copy.
 // Explicit-destination forms of 0x004a1410 / 0x004a1860 (cdecl, the destination is the first
 // argument and is returned), as Math3D.h's MatrixMultiply(Matrix4* out, a, b) declares them.
 ShadowMatrix* TerrainMatrixIdentityInto(ShadowMatrix* out);                       // 0x004a1410
@@ -417,12 +420,14 @@ public:
 extern TerrainShadowClipper* g_terrainShadowClipper;                               // 0x00575a98
 
 // Out-of-line call views (docs/VC6_INLINE_BUDGET.md): the far corners of mode 2 are built
-// with the COMDAT constructor, difference and sum.
+// with the COMDAT constructor, difference and sum.  The sum and difference return by value:
+// their results are statement temporaries, which VC6 lays over the loop's hit slots, and that
+// gives retail's 0xd0 frame (named result locals add 0xc).
 struct TerrainShadowVecCall : TerrainShadowVec {
     TerrainShadowVecCall(float x_, float y_, float z_);                            // 0x00404e60
 };
-TerrainShadowVec* TerrainShadowAddCall(TerrainShadowVec* out, const TerrainShadowVec* a, const TerrainShadowVec* b);      // 0x00421cb0
-TerrainShadowVec* TerrainShadowSubtractCall(TerrainShadowVec* out, const TerrainShadowVec* a, const TerrainShadowVec* b); // 0x00421d00
+TerrainShadowVec TerrainShadowSum(const TerrainShadowVec& a, const TerrainShadowVec& b);         // 0x00421cb0
+TerrainShadowVec TerrainShadowDifference(const TerrainShadowVec& a, const TerrainShadowVec& b);  // 0x00421d00
 
 static inline TerrainShadowVec operator+(const TerrainShadowVec& a, const TerrainShadowVec& b)
 {
@@ -445,11 +450,7 @@ static inline TerrainShadowVec& operator+=(TerrainShadowVec& a, const TerrainSha
 }
 static inline TerrainShadowVec TerrainShadowCross(const TerrainShadowVec& a, const TerrainShadowVec& b)
 {
-    TerrainShadowVec r;
-    r.x = a.y * b.z - a.z * b.y;
-    r.y = a.z * b.x - a.x * b.z;
-    r.z = a.x * b.y - a.y * b.x;
-    return r;
+    return TerrainShadowVec(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 }
 static inline TerrainShadowVec TerrainShadowSubtractCtorCall(const TerrainShadowVec& a, const TerrainShadowVec& b)
 {
@@ -496,13 +497,13 @@ static inline TerrainShadowVec TerrainShadowAddCtorCall(const TerrainShadowVec& 
 int TerrainShadow::UnknownVirtualSlot27()
 {
     minX = 0x7fffffff;
-    minZ = 0x7fffffff;
     maxX = 0x80000000;
+    minZ = 0x7fffffff;
     maxZ = 0x80000000;
     field_0x6668 = 3.4028235e38f;
     field_0x666c = -3.4028235e38f;
-    field_0x6674 = -3.4028235e38f;
     field_0x6670 = 3.4028235e38f;
+    field_0x6674 = -3.4028235e38f;
     TerrainShadowVec eye = TERRAIN_SHADOW_CAMERA()->eye;
     TerrainShadowVec screen;
     int code;
@@ -536,16 +537,14 @@ int TerrainShadow::UnknownVirtualSlot27()
         farCorners[0] = TerrainShadowSubtractCtorCall(TerrainShadowSubtractCtorCall(eye, right), up);
         farCorners[1] = TerrainShadowAddCtorCall(TerrainShadowAddCtorCall(right, eye), up);
         farCorners[2] = TerrainShadowSubtractCtorCall(TerrainShadowAddCtorCall(right, eye), up);
-        TerrainShadowVec difference;
-        TerrainShadowVec sum;
-        farCorners[3] = *TerrainShadowAddCall(&sum, TerrainShadowSubtractCall(&difference, &eye, &right), &up);
+        farCorners[3] = TerrainShadowSum(TerrainShadowDifference(eye, right), up);
         for (int i = 0; i < 4; i++) {
             TerrainShadowVec hit;
             TerrainCell* cell;
             while (((TerrainShadowCaster*)caster)->CastSegment(&nearCorners[i], &farCorners[i], &hit, &cell, 0, 0)) {
                 TERRAIN_SHADOW_ACCUMULATE(cell, hit);
                 TerrainShadowVec step = TerrainShadowVecCall(TERRAIN_SHADOW_CAMERA()->look.x * 3.0f, TERRAIN_SHADOW_CAMERA()->look.y * 3.0f, TERRAIN_SHADOW_CAMERA()->look.z * 3.0f);
-                nearCorners[i] = *TerrainShadowAddCall(&sum, &hit, &step);
+                nearCorners[i] = TerrainShadowSum(hit, step);
             }
         }
         TERRAIN_SHADOW_FINISH();
