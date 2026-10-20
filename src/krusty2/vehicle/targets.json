@@ -1596,7 +1596,7 @@
     "target_va": "0x00527a20",
     "target_size": 870,
     "expect": "partial",
-    "notes": "350/870 (866 bytes). First 0x120 bytes exact (driven-wheel count, 0x514170 drive loop, (x*x+y*y)+z*z dot, zero branch first). The memberwise VehSetV gives retail's direct [wheel+disp] moves for the scaled normal and the friction copy; only the (0,0,0) store remains: the struct assignment keeps a lea, and memberwise forms fold the stack temporary retail keeps. Session 14: a user-declared member-wise Vec3::operator= folds this store too (304/870, 792 bytes); SoulTreePhysics slot 13 0x00501e90 has the same zero-store pattern and the same forms fail there.",
+    "notes": "350/870 (866 bytes). First 0x120 bytes exact (driven-wheel count, 0x514170 drive loop, (x*x+y*y)+z*z dot, zero branch first). The memberwise VehSetV gives retail's direct [wheel+disp] moves for the scaled normal and the friction copy; only the (0,0,0) store remains: the struct assignment keeps a lea, and memberwise forms fold the stack temporary retail keeps. Session 14: a user-declared member-wise Vec3::operator= folds this store too (304/870, 792 bytes); SoulTreePhysics slot 13 0x00501e90 has the same zero-store pattern and the same forms fail there. Session 14: normalLoad = 0 before the vector, kVec3Zero (either order), a named zero assigned or through VehSetV, Vec3(d, d, d) after d = 0 and groundNormal scaled by 0 are the same or worse (350, 324/320, 350/320, 350, 354).",
     "bindings": "Vehicle.bindings.json"
   },
   {
