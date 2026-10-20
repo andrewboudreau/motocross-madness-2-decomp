@@ -1634,7 +1634,7 @@
     "candidate_symbol_contains": "LoadBike@Bike",
     "class": "Bike",
     "expect": "partial",
-    "notes": "Bike's loader (ret 0xa0, 8 EH states, 0x2cc frame): LoadVehicle, the rider character, the handlebar part, the two wheels with their shocks, three contact points, three particle emitters, the inertia tensors and the pose handles are all written out; every call, EH state and x87 sequence is in retail order (instruction ratio 0.88). What differs: the stack slots of the register spills (wheelPos/loop index/front-rear z at 0x10/0x14/0x28 in retail), the frame's low 0x30 bytes being laid out differently, the matched wheel kind kept in esi by retail (spilled here), and store scheduling inside the local string tables and the Vec3 constants. Strict 2078/6718 (size 6714 vs 6745).",
+    "notes": "Bike's loader (ret 0xa0, 8 EH states, 0x2cc frame): LoadVehicle, the rider character, the handlebar part, the two wheels with their shocks, three contact points, three particle emitters, the inertia tensors and the pose handles are all written out; every call, EH state and x87 sequence is in retail order (instruction ratio 0.88). The wheel kind comes from an early-return lookup helper (retail keeps it in esi), the shock-arm distance names all three squares and AddWheel is two calls whose common tail VC6 merges. What differs: the stack slots of the register spills (wheelPos/loop index/front-rear z at 0x10/0x14/0x28 in retail), the frame's low 0x30 bytes being laid out differently, and store scheduling inside the local string tables, the Vec3 constants and the pose-parameter block near 0x408e43. Strict 5268/6745 (candidate 6728 bytes).",
     "source": "Bike.cpp",
     "target_size": 6745,
     "target_va": "0x004079c0"

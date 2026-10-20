@@ -901,3 +901,16 @@ try on similar code. None is a rule.
   Retail also falls through into the zero vector after `test ah, 1; jne <scale>`, which
   is `if (d >= 0.0f) push = zero; else push = scale(axis, -d);`; `if (d < 0.0f)` puts the
   scale arm first.
+- **Loop lookups: an early-return helper keeps the result in a register.** Bike LoadBike
+  (`0x004079c0`, 2080 to 2584 of 6745): retail zeroes `esi` on the loop's exit and loads the
+  match in an out-of-line block that jumps back. `int kind = 0; for (...) if (match) { kind =
+  t[k].kind; break; }` spills kind and stores the zero before the loop. An inline
+  `return t[k].kind;` ... `return 0;` helper (or the goto equivalent) gives retail's form.
+- **Name every square to get retail's spills.** Same function (2584 to 5185): retail stores
+  dx*dx and dy*dy and keeps dz*dz on the stack before the sum. With `float dx2, dy2` but
+  `dz * dz` inline, VC6 folds dy*dy into the sum. A third local `dz2`, declared after
+  the other two, gives the retail sequence. Every grouping of the sum then compiles the same.
+- **An argument pushed in both arms is two calls, not a ternary.** Same function (5185 to
+  5268): retail `je L; push eax; jmp M; L: push 0; M: <rest of the pushes>; call`. This is
+  `if (c) f(..., p); else f(..., 0);` with VC6 merging the common tail. Every ternary form
+  computes the value into a register and pushes it once.

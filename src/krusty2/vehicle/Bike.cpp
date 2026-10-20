@@ -477,9 +477,10 @@ struct BikeWheelKind {
         (dest)[copied] = 0;                                        \
     }
 
-// Distance between two points with the squared x/y terms kept in named temporaries (the
-// shock-arm length), and the plain accumulated form (the wheel base); both treat a unit
-// squared length as 1 (the shape every Vehicle/Bike length helper has).
+// Distance between two points with the three squares kept in named temporaries (the
+// shock-arm length: retail stores dx*dx and dy*dy and keeps dz*dz on the stack before the
+// sum; with dz*dz inline VC6 folds dy*dy into it), and the plain accumulated form (the wheel
+// base); both treat a unit squared length as 1 (the shape every Vehicle/Bike length helper has).
 static inline float BikeDistance(const Vec3& a, const Vec3& b)
 {
     float dz = a.z - b.z;
@@ -487,7 +488,8 @@ static inline float BikeDistance(const Vec3& a, const Vec3& b)
     float dx = a.x - b.x;
     float dx2 = dx * dx;
     float dy2 = dy * dy;
-    float len2 = dz * dz + (dx2 + dy2);
+    float dz2 = dz * dz;
+    float len2 = dz2 + (dx2 + dy2);
     if (len2 == 1.0f)
         return 1.0f;
     return (float)sqrt(len2);
@@ -512,6 +514,17 @@ struct BikeQuadTreeHead {
 };
 struct BikeTireObject : BikeQuadTreeHead, GameObject {
 };
+
+// Wheel kind of a named wheel (0 when the name is not in the table). The early return keeps
+// the kind in a register: retail zeroes esi on the loop's exit and loads the match out of line.
+static inline int BikeFindWheelKind(const char* name, const BikeWheelKind* kinds)
+{
+    for (int k = 0; k < 4; k++) {
+        if (strcmp(name, kinds[k].name) == 0)
+            return kinds[k].kind;
+    }
+    return 0;
+}
 
 GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const char* riderModel,
                            const SoultreeLoadDesc* desc, const BikeA5C8* info, Vec3 startPosition,
@@ -604,14 +617,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
         BikeWheelKind kinds[4] = {
             { "InlineRear", 0 }, { "InlineFront", 1 }, { "TransverseLeft", 2 }, { "TransverseRight", 3 }
         };
-        int kind = 0;
-        int k;
-        for (k = 0; k < 4; k++) {
-            if (strcmp(wheelNames[i], kinds[k].name) == 0) {
-                kind = kinds[k].kind;
-                break;
-            }
-        }
+        int kind = BikeFindWheelKind(wheelNames[i], kinds);
         char shockNames[2][32] = { "Shocks", "SwingArm" };
         BIKE_COPY_TEXT(partName, shockNames[i], 64);
         VehicleRotatingShock* rotShock;
@@ -645,7 +651,11 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
         tire->SetRenderContext((int)GameObject::renderContext);
         GameObject::AppendChild((GameObject*)tire, -1);
         if (rotating[i]) {
-            AddWheel(wheel, 0, 0, (int)rotShock, driven[i] ? (VehicleWheelAux*)engineState : 0);
+            // two calls (VC6 merges their common tail): retail pushes the aux argument in each arm
+            if (driven[i])
+                AddWheel(wheel, 0, 0, (int)rotShock, (VehicleWheelAux*)engineState);
+            else
+                AddWheel(wheel, 0, 0, (int)rotShock, 0);
             wheel->sceneNode->GetPositionIn(0, &wheelPoint);
             wheelPos[i] = modelNode->WorldToLocalPoint(wheelPoint);
             wheel->sceneNode->GetPositionIn(0, &wheelPoint);
@@ -655,7 +665,10 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
             rotShock->armLengthSq = len * len;
             rotShock->chord = (float)sin(rotShock->swingAngle * 0.5f) * len * 2.0f;
         } else {
-            AddWheel(wheel, 0, (int)lineShock, 0, driven[i] ? (VehicleWheelAux*)engineState : 0);
+            if (driven[i])
+                AddWheel(wheel, 0, (int)lineShock, 0, (VehicleWheelAux*)engineState);
+            else
+                AddWheel(wheel, 0, (int)lineShock, 0, 0);
             wheel->sceneNode->GetPositionIn(0, &wheelPoint);
             wheelPos[i] = modelNode->WorldToLocalPoint(wheelPoint);
             lineShock->UpdateAxis(wheel->sceneNode, handlebars->node);
