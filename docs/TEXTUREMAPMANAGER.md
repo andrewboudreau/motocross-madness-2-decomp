@@ -210,6 +210,6 @@ block is taken.
 Near misses (`samples/render/CacheTextureNearMisses.cpp`):
 - `0x005102d0` (558 bytes), blit the occupant's mip levels into its
   region (DirectDraw `GetAttachedSurface`/`Blt`, then slot 9 or +0x188):
-  retail places the shared `return 0` block before the final branch
-  (18 instructions).
+  retail places the shared `return 0` block before the final branch;
+  the loop body matches (462 of 558).
 

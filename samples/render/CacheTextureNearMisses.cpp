@@ -5,7 +5,17 @@
 // occupant's mip levels into its region. Everything lines up except that
 // retail places the shared `return 0` block between the second loop and the
 // overlay check (its loop ends `jle; jmp top`); VC6 here puts it after the
-// final returns. 18 instructions differ, in jump targets and the loop end.
+// final returns. The halvings are written sourceSide, side, levelWidth,
+// left, right, top, bottom (the best of all 5040 orders, 450 -> 462 of
+// 558, which matches retail's loads); what is left is the jump targets
+// and the loop end.
+// Tried (s14, 450 at the old shift order): the Blt failure as `break`
+// (the else's `return 0` still goes last), the else without braces,
+// `goto failed` with `failed:` placed right after the loop and the
+// overlay check behind `upload:` (450-454), `if (sourceSide > 0)` around
+// a do/while or a bottom-tested for(;;) (293), a top-tested `for (;;)`
+// and a trailing `continue` (450). With `if (result) { return 0; } else`
+// VC6 keeps the `return 0` in place, so it is not always moved to the end.
 // Tried (s10, all unchanged at 450/558 or worse): the Blt failure as an
 // else arm or a goto into the else, `for (;;)`-style and for-increment
 // loops, the inner break as an if/else, the first loop returning 0
@@ -69,10 +79,10 @@ int CacheTexture::CopyMipLevels(UnknownTextureRegion* region, int level) {
                 break;
             source = nextSource;
             destination = nextDestination;
-            levelWidth >>= 1;
-            rect.left >>= 1;
             sourceSide >>= 1;
             side >>= 1;
+            levelWidth >>= 1;
+            rect.left >>= 1;
             rect.right >>= 1;
             rect.top >>= 1;
             rect.bottom >>= 1;
