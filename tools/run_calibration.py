@@ -904,6 +904,15 @@ CASES = [
         'reason': 'normalisations written out with an inline LengthSquared (slow branch scales x as fld x; fmul st(1)); / 10.0f uses the reciprocal constant',
     },
     {
+        'name': 'VehicleCamera slot35 chase position',
+        'bindings': 'src/reconstructed/VehicleCamera.bindings.json',
+        'source': 'src/reconstructed/VehicleCamera.cpp',
+        'symbol': '?UnknownVirtualSlot35@VehicleCamera@@UAE?AUVector3@@EM@Z',
+        'target_va': '0x0052c510',
+        'target_size': 1267,
+        'reason': 'direction scaled through one pointer with the short range as x *= (range *= 0.25f): no direct store before the reach product, so x is fld x; fmul st(1) there',
+    },
+    {
         'name': 'BikeCamera slot40 table seed',
         'bindings': 'src/reconstructed/BikeCamera.bindings.json',
         'source': 'src/reconstructed/BikeCamera.cpp',

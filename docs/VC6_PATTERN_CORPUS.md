@@ -99,6 +99,15 @@ loop without copying the head (5 differing instructions). It also keeps
 `result` in a frame slot and tests it at the loop's normal exit, which
 retail does not.
 
+Retail's flow is: the first loop's `GetAttachedSurface` failure, the
+`result` test after that loop (in eax) and the `Blt` failure all jump to one
+`return 0` block. The second loop's `GetAttachedSurface` failures go to the
+upload. The forms with that flow drop the `result` store but put the
+`return 0` block at the end of the function with a plain `jg top` latch
+(16). They were tried with `if (Blt(...)) return 0;` (with `while`,
+`for (;;)` and a named result), with `if (result) return 0;` right after the
+first loop (17, two epilogues), and with a single `failed:` label (16).
+
 ## 3. A load hoisted above the first branch
 
 **Rule (exact example):** VC6 hoists a load above a test when both arms use
@@ -245,8 +254,7 @@ the 2026-10-20 ranking, `work/s14/x87/nearmiss.py`):
 
 | form | lane | row | hunks of that form / all |
 |---|---|---|---|
-| ours dup, retail load | render | VehicleCamera slot 35 `0x0052c510` | 1 / 1 |
-| | shell | Krusty3DObjects `0x0048b100` | 4 / 102 |
+| ours dup, retail load | shell | Krusty3DObjects `0x0048b100` | 4 / 102 |
 | | shell | CarProcedural `0x0042fd80` | 1 / 138 |
 | ours load, retail dup | body | Vehicle slot 74 `0x005281b0` | 1 / 3 |
 | two memory operands swapped, frame and frame | body | SoultreeTransform `0x004fd710` | 1 / 1 |
@@ -276,13 +284,41 @@ the 2026-10-20 ranking, `work/s14/x87/nearmiss.py`):
 Rows whose remaining hunks are all x87 (operand form or scheduling):
 - body: `0x004fd710`, `0x005281b0`, `0x0040b410`, `0x004fd340`,
   `0x00436720`, `0x00436e50`, `0x00446c30`;
-- render: `0x0052c510`, `0x00456890`, `0x004a1a50`, `0x0047e600`, `0x00443aa0`;
+- render: `0x00456890`, `0x004a1a50`, `0x0047e600`, `0x00443aa0` (none
+  of them operand form that a rule above flips; see below);
 - rider: `0x00504d30`, `0x00515880`, `0x004a7fd0`;
 - shell: `0x00516ef0`.
 
 Across all ranked rows, 295 hunks are x87 instructions moved past other code
 (such as `fcom` placed after `fst ; fld st(0)` in Vehicle slot 74), 1427
 are other x87 differences and 7418 are not x87.
+
+**Two indirect words (probe, provisional).** In `r->x = a * b` with `a`
+and `b` read through two different pointers, the written order is inert.
+- A word that is also read in another statement, before or after,
+  becomes the memory operand.
+- When neither is read elsewhere, the larger displacement loads first.
+- When both are, both orders occur in the probes; no rule was found.
+
+The model does not explain every row. In Griddraw `0x0047e600` the
+cell size is read in all six centre/extent statements but still loads first.
+Deleting centre.x (or its minimum term) makes it the memory operand there,
+as in retail. MatrixUtil `0x004a1a50` also departs from the model: retail
+loads `p->y` (displacement 0) before the matrix in every row. Probes:
+`work/s14/x87/ip/p1.cpp`, `p2.cpp` (untracked).
+
+Rows checked with `tools/x87_slips.py` (s14). The rows below are not
+operand form: no x87 rule applies, so they need a different lever.
+- Camera `0x0042ee30`: `sub esp` against the copy placement (section 4).
+- FollowCamera `0x00465c20`: `lea` differences.
+- EcoSystem `0x00456890`: an `fmul` scheduled after integer moves.
+- EcoSystem `0x00457ed0`: the cylinder height load is scheduled earlier.
+- TextService `0x0050ade0`, `0x0050ba00`: integer register choice and
+  store scheduling.
+- D3DIMSoulTree `0x00443aa0`: sum term order, row 1 (see its sample).
+
+D3DIMSoulTree `0x00440f30` has two swaps of stored frame words, which are
+canonical. Its other 1389 differences are not x87.
 
 Leads from the rules:
 - **Vehicle slot 74.** The `u = t * s` after the `s` clamp has retail's
@@ -297,18 +333,14 @@ Leads from the rules:
 
   `t * (s < 1 ? s : 1)` without the assignment, `VehScale(t, s)` and a
   component-wise form all stay at 4.
-- **VehicleCamera slot 35.** The `reach` x product follows rule 6. Our
-  range branches store `direction.x` directly in both arms, so `reach`
-  takes the dup form; retail takes the load form.
-  - Retail has the load form in the first arm (`!= 6`) and the dup form in
-    the second, with a shared `fstp` tail.
-  - Scaling x through a pointer helper in both arms gives retail's `reach`.
-    The second arm then loads x too and merges with the first (4
-    differing instructions).
-  - A pointer helper in the first arm only gives 6; in the second arm only,
-    2 with `reach` still in the dup form.
-  - Retail needs a dup form in the second arm without a direct x store
-    that `reach` sees, which no tried spelling gives.
+- **VehicleCamera slot 35 `0x0052c510` (now exact).** The rules located
+  the source. Retail's `reach` product takes `direction.x` in the load
+  form, so nothing stored it directly earlier (rule 6). Its short range
+  arm takes x in the dup form and y and z in the load form, which is rule
+  5's shape. Scaling through one `Vector3* scaled = &direction` in both arms,
+  with `scaled->x *= (range *= 0.25f)` in the short range, is strict exact.
+  Other spellings of the same two facts are also exact: a pointer-taking
+  helper in the first arm, or `s = range * 0.25f` as the assignment.
 - **SoultreeTransform `0x004fd710`.** The two memory operands are frame
   words. Rule 6 predicts the earlier finding that a store to `m._11` gives
   209/209: retail's `m._11` has a direct store, such as a transpose or
@@ -326,3 +358,10 @@ the object's function symbols. The x87 study scripts are
 `work/s14/x87/scan.py` (form counts), `lines.py` (maps exact-function sites
 to source lines through the `/Z7` COFF line numbers) and `nearmiss.py`
 (classifies the ranked near-miss hunks); they are untracked work scripts.
+
+`tools/x87_slips.py` does the per-row step: it aligns a ranked row's
+candidate against retail, lists each dup/load or memory-order slip with its
+source line, the operand kinds, the CodeView local behind each frame word
+and the candidate's earlier direct stores to it, and names the rule above
+that predicts retail's form (`python tools/x87_slips.py 0x52c510`, or
+`--lane render` for a lane's rows).
