@@ -27,6 +27,10 @@
 //   A D3DMATRIX-style matrix (a union of `_11`..`_44` members and m[4][4])
 //   as the parameter type gives 171 with every operand order of the
 //   x/z terms (512 forms); reached through a cast local it gives 121.
+//   One term per statement (`float z = a; z += b; ...`): the z row alone in
+//   all 24 term orders, with `q->z = z * w` or `z *= w`, gives 164 at best;
+//   all four rows accumulated, products in each of their 6 orders and the
+//   translation last (1296 forms), give 164 at best.
 //
 // TriangleNormal 0x004a11e0 and ViewMatrix 0x004a1500 are exact in
 // src/reconstructed/MatrixUtil.cpp (parenthesised products).

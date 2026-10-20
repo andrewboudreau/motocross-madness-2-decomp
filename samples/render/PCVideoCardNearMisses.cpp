@@ -17,6 +17,12 @@
 //   Also 26 at best: the fields read through a `mode` pointer (retail does
 //   form one with `lea` for +8) with or without `memory`/`pixels` locals,
 //   and the budget written `m + -p * 2`, `m + 2 * -p` or `m - 2 * p`.
+//   Retail forms width * height once (edi) and reuses it for the budget
+//   (`neg edi ; lea edi, [ebp + edi*2]`); VC6 here reassociates the total
+//   as bitDepth * height * width and multiplies width * height again. A
+//   `pixels` local in the block (with the budget written into it, into a
+//   `free` local, as `memory -= pixels * 2` or inline) or at the top gives
+//   the shared product but sinks every field load (6 of 116).
 // UnknownDisplay::ProbeNonLocalTextureMemory (0x004ca5a0, 484 bytes): retail keeps
 //   `target` in ebp, caches 480/16 in registers for the mode search and has
 //   one more 4-byte local; the flow (EH-guarded new PCRenderTarget, 128x128
