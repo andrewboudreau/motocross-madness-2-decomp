@@ -1792,6 +1792,8 @@ inline Vec3 BikeAINormalizeInline(const Vec3& v)
 // The racing line's target speed (40 near a gate, else 1000) and the AI class's speed scale
 // (+0x7c4..+0x7cc by game difficulty +0x60c) follow; a local bike may then start a trick
 // while airborne (0x0048d780 picks it, 0x0048d910 plays it).  Names tier 3.
+// The point loops test the count at the top (retail `cmp ebp, count; jge exit` heads and a
+// `t` test as the back edge), so they are written with a leading break rather than `for`.
 int KrustyBike::Fn_00414370(float dt)
 {
     KbTrackItem* list;
@@ -1891,13 +1893,17 @@ int KrustyBike::Fn_00414370(float dt)
                 if (list && bikeAhead < gateAhead) {
                     aiPath.count = 100;
                     t = 0.0f;
-                    for (i = 0; i < aiPath.count; i++) {
+                    i = 0;
+                    while (1) {
+                        if (i >= aiPath.count)
+                            break;
                         if (!race->raceTrack->MoveAlongPath(statusNode->field_0x44, &p, &list,
                                                             t * linearSpeed, 0))
                             return 0;
                         if (!race->raceTrack->PointAt(p, &aiPath.points[i]))
                             return 0;
                         aiPath.points[i].y = position.y + 2.0f;
+                        i++;
                         t += 0.1f;
                         if (t > 10.0f)
                             break;
@@ -1964,13 +1970,17 @@ int KrustyBike::Fn_00414370(float dt)
             if (list) {
                 aiPath.count = 100;
                 t = 0.0f;
-                for (i = 0; i < aiPath.count; i++) {
+                i = 0;
+                while (1) {
+                    if (i >= aiPath.count)
+                        break;
                     if (!race->raceTrack->MoveAlongPath(statusNode->field_0x44, &p, &list,
                                                         t * linearSpeed, 0))
                         return 0;
                     if (!race->raceTrack->PointAt(p, &aiPath.points[i]))
                         return 0;
                     aiPath.points[i].y = position.y + 2.0f;
+                    i++;
                     t += 0.1f;
                     if (t > 10.0f)
                         break;
@@ -1994,7 +2004,9 @@ int KrustyBike::Fn_00414370(float dt)
             aiPath.count = count;
             if (list) {
                 t = 1.0f;
-                for (i = 0; i < aiPath.count; i++) {
+                for (i = 0;;) {
+                    if (i >= aiPath.count)
+                        break;
                     if (!race->raceTrack->MoveAlongPath(statusNode->field_0x44, &p, &list,
                                                         g_BikeAILookAhead_00572988 * t, 0))
                         return 0;
@@ -2004,6 +2016,7 @@ int KrustyBike::Fn_00414370(float dt)
                     lenSq = SquareMagnitude(aiPath.points[i] - position);
                     if (lenSq == 1.0f || FastSqrt(lenSq) < 100.0f)
                         aiPath.field_0x96c = 40.0f;
+                    i++;
                     t += 0.1f;
                     if (t > 1.0f)
                         break;
