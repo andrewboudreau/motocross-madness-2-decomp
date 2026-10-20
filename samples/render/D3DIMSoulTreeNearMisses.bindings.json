@@ -54,7 +54,6 @@
   "?SoultreeVirtualSlot8@SoultreeObject@@UAEXPAV1@0@Z": "0x004feb30",
   "?Vec3Dot@@YAMPBUVector3@@0@Z": "0x0040ae30",
   "?ReadLods@D3DIMSoultreeObject@@QAEHXZ": "0x00440060",
-  "?UpdateMaterialTexelRatios@D3DIMSoultreeObject@@QAEXXZ": "0x00440810",
   "?TransformVertexGroups@D3DIMSoultreeObject@@QAEXH@Z": "0x00440d40",
   "?DrawCurrentLod@D3DIMSoultreeObject@@QAEXXZ": "0x00440f30",
   "?DrawWireframe@D3DIMSoultreeObject@@QAEXPAUUnknownSoultreeSurface@@@Z": "0x00442f70",

@@ -3,19 +3,6 @@
 // evidence and the exact functions are in src/reconstructed/D3DIMSoulTree.h
 // and .cpp. Bindings: D3DIMSoulTreeNearMisses.bindings.json.
 //
-// UpdateMaterialTexelRatios (0x00440810, 1328 bytes): texture density per
-// material. Same 388 instructions; the uv delta is a copy of a zeroed
-// Vector3 (`Vector3 delta = zero`) taken once, which reproduces retail's
-// single z*z. Retail spills `this` and keeps the face offset in ebx; VC6
-// keeps a separate face counter, so the frame is 4 bytes larger. Retail's
-// ebx is also the zero of the material loop, so the offset restarts at 0
-// without a store. Unchanged or worse: `surface->indices + f * 3`, the face
-// pointer before the zero vector, `int f` outside the loop, vertex pointer
-// locals v0..v2 (much worse), a `vertices` base local, the squared length
-// as `z*z + (x*x + y*y)` or `(x*x + y*y) + z*z`. Indexing through
-// `int first = f * 3` (with or without an `indices` local) gives retail's
-// 0x80 frame but another register plan (148/1344).
-//
 // UnknownVirtualSlot12 (0x00443aa0, 832 bytes): 799/832. The inline view
 // matrix product only gets retail's `add eax, 0xec` base when the camera
 // is not held in a local; named result fields (_11.._44) fix the term
@@ -115,65 +102,6 @@ static inline float Length(const Vector3& v)
     if (squared == 1.0f)
         return 1.0f;
     return 1.0f / FastInvSqrt(squared);
-}
-
-// 0x00440810: for every surface of the current level of detail, the
-// largest ratio of edge length to texture-coordinate length over its
-// faces, divided by the texture height, raises each textured material's
-// +0xcc.
-void D3DIMSoultreeObject::UpdateMaterialTexelRatios()
-{
-    TransformVertexGroups(-1);
-    for (int i = 0; i < lodTable[currentLod].surfaceCount; i++) {
-        UnknownSoultreeSurface* surface = &lodTable[currentLod].surfaces[i];
-        float best = 0.0f;
-        for (int f = 0; f < surface->faceCount; f++) {
-            Vector3 zero(0.0f, 0.0f, 0.0f);
-            unsigned short* face = &surface->indices[f * 3];
-            Vector3 p0 = surface->vertices[face[0]].position;
-            Vector3 p1 = surface->vertices[face[1]].position;
-            Vector3 p2 = surface->vertices[face[2]].position;
-
-            Vector3 delta = zero;
-            Vector3 edge = p0 - p1;
-            delta.x = surface->vertices[face[0]].tu - surface->vertices[face[1]].tu;
-            delta.y = surface->vertices[face[0]].tv - surface->vertices[face[1]].tv;
-            float uvLength = Length(delta);
-            if (uvLength <= 0.01f)
-                uvLength = 10000.0f;
-            float ratio = Length(edge) / uvLength;
-            if (best <= ratio)
-                best = ratio;
-
-            delta.x = surface->vertices[face[1]].tu - surface->vertices[face[2]].tu;
-            delta.y = surface->vertices[face[1]].tv - surface->vertices[face[2]].tv;
-            edge = p1 - p2;
-            uvLength = Length(delta);
-            if (uvLength <= 0.01f)
-                uvLength = 10000.0f;
-            ratio = Length(edge) / uvLength;
-            if (best <= ratio)
-                best = ratio;
-
-            delta.x = surface->vertices[face[2]].tu - surface->vertices[face[0]].tu;
-            delta.y = surface->vertices[face[2]].tv - surface->vertices[face[0]].tv;
-            edge = p2 - p0;
-            uvLength = Length(delta);
-            if (uvLength <= 0.01f)
-                uvLength = 10000.0f;
-            ratio = Length(edge) / uvLength;
-            if (best <= ratio)
-                best = ratio;
-        }
-        for (int k = 0; k < surface->materialCount; k++) {
-            SoultreeMaterial* material = materialTable[surface->materialIndices[k]];
-            if (material->surfaceMap) {
-                float scale = best / material->surfaceMap->texture->textureHeight;
-                float current = *(float*)&material->texelRatio;
-                *(float*)&material->texelRatio = current > scale ? current : scale;
-            }
-        }
-    }
 }
 
 // The box test at 0x00575a98 (VisibilityClipper, 0x0052f570, ret 0x1c):

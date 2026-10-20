@@ -149,6 +149,11 @@ value in one function:
     (`mov edi, [esp + 8]` at the join and `edi` after the `ReleaseDc` call),
     so retail's `surface` is not address-escaped. The search for the second
     counted store stays open.
+  - Retail has no EH frame here (the entry is `push ecx`, which makes
+    `surface`'s home `[esp + 8]`). Every definition before the join is a
+    direct store to that slot (`mov [esp + 8], 0` at the entry, register
+    stores in the branches), there is no `lea` of it, and the join reloads
+    it with `mov edi, [esp + 8]`. It is an ordinary spilled home.
 - EcoSystem ReadEst `0x00457480`: the index row's direction is VC6
   caching 1 in `edi` and retail storing immediates, not the reverse.
   - The two counted stores are `method = 1` (`[esi + 0x30]`) and `i = 1`
@@ -168,6 +173,15 @@ value in one function:
     either. A loop-scoped `int i` is a register variable in the probes, and
     the 1 is coalesced into it. Retail reloads `i` from `[esp + 0x18]` on
     every use.
+  - EH does not keep `i` in memory. Retail's frame has one state region:
+    state 0 is set before the probe stream constructor (`0x00460d10`) and
+    -1 at `0x00457591`, before `Open`. The loop's `new
+    UnknownEcoDefinition` (constructor `0x00455de0`) changes no state.
+  - Neither does a struct. No `lea` reaches `[esp + 0x10..0x1c]` (`total`
+    at 0x10, `i` at 0x18, the `&definitionTable[i]` induction at 0x1c);
+    the only address-taken slots are the section, value and name buffers
+    (0x24, 0xa4, 0x128). Retail stores `total = 0` and `i = 1` there as
+    immediates.
   - So both "bracketing" rows are the same direction (VC6 over-caches with
     two counted stores and an already-pushed register). Neither is solved.
 - Griddraw DrawVisibleBlock `0x00480ad0`: retail's `xor eax, eax` at the
@@ -192,6 +206,17 @@ value in one function:
     does not restore the order: 374 and 378 of 438 with 19 and 16 diffs.
   - Swapping the arms and `block == vertexStart` compares do not help
     either. No form found yet. Variants are in `work/s14/cz/gd/`.
+  - A sweep of 72 forms (`vertexStart`/`indexStart` initialised at the
+    top, inside the `ranges` block or not at all; `vertexStart = 0`,
+    `indexStart = 0` or `indexStart = vertexStart` in the arm; `ranges`
+    or `ranges != 0`) reaches nothing better than 14 differing.
+    - Arm `vertexStart = 0` plus an arm `indexStart` store gives the
+      in-branch web (14). Without the arm `indexStart` store it gives 30.
+    - A top `vertexStart = 0` with an arm `indexStart` store gives 28.
+      With `indexStart` initialised at the top or in its declaration
+      instead, it gives 31, 32 or 49.
+    - `ranges != 0`, declaring `vertexStart` after `ranges` and hoisting
+      `j` change nothing. Variants are in `work/s14/cz/gd2/`.
 - Griddraw RebuildBlockBuffers `0x0047f210` and CubeDraw BuildFaceGeometry
   `0x0043dc60`: both functions allocate the constant as retail does. The
   rows differ in which register it gets (`esi`/`edi` swapped with a pointer
@@ -203,17 +228,27 @@ value in one function:
   (`[esp + 0x84]` inside the pushes) that the candidate makes after the
   call into another slot. The register is the same, so this row is store
   placement and frame layout, not caching.
-- D3DIMSoulTree UpdateMaterialTexelRatios `0x00440810`: both have the
-  entry zero register `ebx`. The `best = 0.0f` and `Vector3 zero` stores
-  stay immediate in both, as the memory-local rule predicts.
-  - The candidate's extra `xor esi, esi` / `mov [esp + 0x20], esi` is a
-    separate face counter (frame 0x84 vs 0x80). Retail starts the face
-    offset from the zero register (`mov esi, ebx`) and steps `ebx` by 6.
-  - So this is an induction-variable difference, not constant caching.
+- D3DIMSoulTree UpdateMaterialTexelRatios `0x00440810` (now exact): both
+  have the entry zero register `ebx`, and the `best = 0.0f` and
+  `Vector3 zero` stores stay immediate, as the memory-local rule predicts.
+  Retail starts the face offset from the zero register (`mov esi, ebx`)
+  and steps `ebx` by 6; the candidate spilled it because each whole
+  Vector3 copy held a second vertex pointer. Per-component position copies
+  free the register. This was register pressure, not constant caching.
 - PCTextureMap Clone `0x004c71c0`: the 1 is cached in both. Retail puts
   it in `ebx` and a pointer in `ebp`; VC6 here swaps them, which is web
-  priority. The candidate is 590 bytes against retail's 538, so the extent
-  has to be fixed first.
+  priority. Retail's extent is 600 bytes (the index's 538 is the masked
+  comparable count); the candidate is 590 bytes, 196 against 197
+  instructions, 43 differing.
+  - Every difference is in the 8-bit colour-key block. Retail builds the
+    key in `edx` (the `dh`/`dl` idiom), uses `ebx` as the third-byte
+    scratch because the cached 1 is dead there, loads the vtable late and
+    adds a `mov eax, edx`. The candidate uses `ecx` and loads the vtable
+    early. The expression shape (the +0xc/+6 split) is the same, so the gap
+    follows from the ebx/ebp swap.
+  - A `color` local and `<< 16` spellings change nothing; an `unsigned
+    char* entry` local gives 586 bytes and 36 differing instructions with a
+    different shape. Variants are in `work/s14/cz/ptm/`.
 - GridNode `0x00484d70`: its `xor ecx, ecx ; mov cx, ...` is the
   zero-extension idiom for an unsigned short load, not a cached constant.
 - KrustyBike `0x00493660`: the choice is function wide (a diagnostic early

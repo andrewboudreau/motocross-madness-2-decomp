@@ -419,6 +419,105 @@ int D3DIMSoultreeObject::ReadLods()
     return untextured;
 }
 
+// MatrixUtil.h's Vector3 has no binary + and -; these are the D3D_OVERLOADS
+// shapes (component-wise temporaries).
+static inline Vector3 operator+(const Vector3& a, const Vector3& b)
+{
+    return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+static inline Vector3 operator-(const Vector3& a, const Vector3& b)
+{
+    return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+// 0x00460c00 (cdecl): table-driven reciprocal square root.
+float FastInvSqrt(float x);
+
+// |v| through the reciprocal square root, exact for 0 and 1. The squared
+// length is grouped z*z + (x*x + y*y), as in Magnitude below.
+static inline float Length(const Vector3& v)
+{
+    float squared = v.z * v.z + (v.x * v.x + v.y * v.y);
+    if (squared == 0.0f)
+        return 0.0f;
+    if (squared == 1.0f)
+        return 1.0f;
+    return 1.0f / FastInvSqrt(squared);
+}
+
+// 0x00440810: for every surface of the current level of detail, the
+// largest ratio of edge length to texture-coordinate length over its
+// faces, divided by the texture height, raises each textured material's
+// +0xcc. The corner positions are copied per component (as from a
+// D3DTLVERTEX's sx/sy/sz): as whole-Vector3 copies VC6 keeps a second
+// pointer to each vertex for the copy and spills the face offset, which
+// retail keeps in ebx. The uv delta is a copy of a zeroed Vector3 taken
+// once per face, which gives retail's single z*z.
+void D3DIMSoultreeObject::UpdateMaterialTexelRatios()
+{
+    TransformVertexGroups(-1);
+    for (int i = 0; i < lodTable[currentLod].surfaceCount; i++) {
+        UnknownSoultreeSurface* surface = &lodTable[currentLod].surfaces[i];
+        float best = 0.0f;
+        for (int f = 0; f < surface->faceCount; f++) {
+            Vector3 zero(0.0f, 0.0f, 0.0f);
+            unsigned short* face = &surface->indices[f * 3];
+            Vector3 p0;
+            p0.x = surface->vertices[face[0]].position.x;
+            p0.y = surface->vertices[face[0]].position.y;
+            p0.z = surface->vertices[face[0]].position.z;
+            Vector3 p1;
+            p1.x = surface->vertices[face[1]].position.x;
+            p1.y = surface->vertices[face[1]].position.y;
+            p1.z = surface->vertices[face[1]].position.z;
+            Vector3 p2;
+            p2.x = surface->vertices[face[2]].position.x;
+            p2.y = surface->vertices[face[2]].position.y;
+            p2.z = surface->vertices[face[2]].position.z;
+
+            Vector3 delta = zero;
+            delta.x = surface->vertices[face[0]].tu - surface->vertices[face[1]].tu;
+            delta.y = surface->vertices[face[0]].tv - surface->vertices[face[1]].tv;
+            Vector3 edge = p0 - p1;
+            float uvLength = Length(delta);
+            if (uvLength <= 0.01f)
+                uvLength = 10000.0f;
+            float ratio = Length(edge) / uvLength;
+            if (best <= ratio)
+                best = ratio;
+
+            delta.x = surface->vertices[face[1]].tu - surface->vertices[face[2]].tu;
+            delta.y = surface->vertices[face[1]].tv - surface->vertices[face[2]].tv;
+            edge = p1 - p2;
+            uvLength = Length(delta);
+            if (uvLength <= 0.01f)
+                uvLength = 10000.0f;
+            ratio = Length(edge) / uvLength;
+            if (best <= ratio)
+                best = ratio;
+
+            delta.x = surface->vertices[face[2]].tu - surface->vertices[face[0]].tu;
+            delta.y = surface->vertices[face[2]].tv - surface->vertices[face[0]].tv;
+            edge = p2 - p0;
+            uvLength = Length(delta);
+            if (uvLength <= 0.01f)
+                uvLength = 10000.0f;
+            ratio = Length(edge) / uvLength;
+            if (best <= ratio)
+                best = ratio;
+        }
+        for (int k = 0; k < surface->materialCount; k++) {
+            SoultreeMaterial* material = materialTable[surface->materialIndices[k]];
+            if (material->surfaceMap) {
+                float scale = best / material->surfaceMap->texture->textureHeight;
+                float current = *(float*)&material->texelRatio;
+                *(float*)&material->texelRatio = current > scale ? current : scale;
+            }
+        }
+    }
+}
+
 // 0x00440d40: the source group is read through a second name for the
 // surface (`surfaceRef`); with `surface->` VC6 forms its address as
 // `groups + offset`, retail `offset + groups`.
@@ -488,18 +587,6 @@ void D3DIMSoultreeObject::DrawWireframe(UnknownSoultreeSurface* surface)
     ((RenderTarget*)renderContext)->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)surface->vertices, surface->vertexCount,
                                                 (int)surface->indices, surface->faceCount * 3, 0);
     ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID, 1);
-}
-
-// MatrixUtil.h's Vector3 has no binary + and -; these are the D3D_OVERLOADS
-// shapes (component-wise temporaries).
-static inline Vector3 operator+(const Vector3& a, const Vector3& b)
-{
-    return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
-}
-
-static inline Vector3 operator-(const Vector3& a, const Vector3& b)
-{
-    return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
 // 0x00442fe0: a line from every vertex of the surface's vertex groups

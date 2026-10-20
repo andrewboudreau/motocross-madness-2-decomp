@@ -18058,6 +18058,15 @@ CASES = [
         'reason': 'called by slot 3; .slt LOD keys, DebugMalloc lines 0x1dd-0x292',
     },
     {
+        'name': 'D3DIMSoulTree.CPP D3DIMSoulTree texel ratios 0x440810',
+        'bindings': 'src/reconstructed/D3DIMSoulTree.bindings.json',
+        'source': 'src/reconstructed/D3DIMSoulTree.cpp',
+        'symbol': '?UpdateMaterialTexelRatios@D3DIMSoultreeObject@@QAEXXZ',
+        'target_va': '0x00440810',
+        'target_size': 1325,
+        'reason': 'corner positions copied per component; squared length z*z + (x*x + y*y)',
+    },
+    {
         'name': 'D3DIMSoulTree.CPP D3DIMSoulTree vertex group transform 0x440d40',
         'bindings': 'src/reconstructed/D3DIMSoulTree.bindings.json',
         'source': 'src/reconstructed/D3DIMSoulTree.cpp',
