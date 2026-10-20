@@ -891,6 +891,24 @@ try on similar code. None is a rule.
   `Vec3 prev = f23c;` used in `(f154 - prev) * t + prev`, give those copies. In the
   same function a case block's `Vec3 r` declared at function scope stops sharing its
   slot and gives retail's 0x88 offset.
+- **One reused function-scope Vec3 packs successive temporaries into one slot.** Bike
+  slot 38 (`0x00405190`, frame 0xb8 to 0xac, aligned 683 to 688): retail's copy of
+  `worldAngularVelocity`, and the sum it passes by address to slot 3, share the slot of an
+  existing function-scope `tmp`. `tmp = w; cross(tmp, rel); tmp = velocity + scratch;
+  f(&tmp)` reproduces that. Sibling blocks, a block-scoped `p`, `&(a + b)`, a by-reference
+  wrapper and a second reused local `v` do not. Declaring an unused extra Vec3 alone
+  costs two aligned instructions.
+- **A component-wise cross into a named local, then one whole assignment, is retail's
+  copy.** SimulateLookAhead (`0x0040eca0`, aligned 3737 to 3760): writing `right.x/y/z`
+  directly keeps the products' stores on `right`; `Vec3 rearCross; rearCross.x = ...;
+  right = rearCross;` gives retail's stack result and int-move copy. `right = Vec3(...)`,
+  a constructed named copy and a CrossProduct call all lose aligned instructions.
+- **Gotos do not move blocks; the flow graph does.** KrustyBike Fn_00414370
+  (`0x00414370`): retail places a shared tail right after a loop and the other branches
+  jump back to it. Rewriting the source with labels so that the tail follows the loop
+  textually compiles to the same bytes as the structured if/else. Retail's layout comes
+  from a different graph: its loop exit has an extra `xor ebp, ebp` block that restores
+  the zero register for a later store.
 - **A d3drm import is stdcall: a cdecl declaration merges its cleanup.**
   Tire::UpdateSuspensionProbe (`0x00514550`, 2504 to 2576 of 4258): the import thunk
   `0x0053304c` is D3DRMVectorRotate. Declared cdecl, VC6 defers its 16-byte cleanup
@@ -938,3 +956,9 @@ try on similar code. None is a rule.
   then loads `ecx`. Retail loads `children[i]` first and interleaves it with the pushes, which
   `Node* child = (Node*)children[i]; return child->Traverse(...);` reproduces (358 to 23
   differing instructions). Virtual calls already load the object first.
+- **Two expansions with different out-of-line counts are two inlines.** Character slot 7
+  (`0x004a70c0`, aligned 342 to 675 of 958): retail calls a pose's generated constructor
+  twice in the first blend expansion and four times in the second. One inline expanded in
+  both loops always gives n then n - 1 calls. Two inlines with the same body and three and
+  five unused poses give 2/4. A wrapper that adds poses and calls the first inline is
+  called out of line instead.

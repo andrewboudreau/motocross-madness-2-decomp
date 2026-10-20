@@ -1860,9 +1860,9 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
     int hasBody = 0;
     int notifyOther = 0;
     float k = 1.0f;             // angle-based response scale (kind 100)
+    Vec3* otherVel = 0;         // before other: retail clears ebx before edi at entry
     Vehicle* other = 0;
     int ctx;
-    Vec3* otherVel = 0;
     Vec3* velPtr;
     Vec3 r;                     // kind 0x3e8 lever; at function scope it keeps its own slot (frame 0xac)
 
@@ -1999,12 +1999,12 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
             other->worldAngularVelocity = other->sceneNode->LocalToWorldDirection(*velPtr);
         }
     } else {
-        {
-            Vec3 w = worldAngularVelocity;  // retail crosses a struct copy of the angular velocity
-            scratchVector = CrossProduct(w, rel);
-        }
-        Vec3 p = velocity + scratchVector;
-        UnknownVirtualSlot3(&((BikeContactSet*)collisionObject)->field_0xac, &p, &rel, &s, b, 0, &out);
+        // retail crosses a copy of the angular velocity and passes the sum through the
+        // same stack slot, so both reuse the function-scope tmp (frame 0xac)
+        tmp = worldAngularVelocity;
+        scratchVector = CrossProduct(tmp, rel);
+        tmp = velocity + scratchVector;
+        UnknownVirtualSlot3(&((BikeContactSet*)collisionObject)->field_0xac, &tmp, &rel, &s, b, 0, &out);
         if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
             velocity = g_BikeVec3_005778a8;
             angularVelocity.y = 0.0f;

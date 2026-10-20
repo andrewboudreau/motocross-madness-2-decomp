@@ -120,17 +120,14 @@ stay in `samples/physics/motion/Motnctrl.cpp`.
     - **RotatePose `0x4a7dc0`, 90.66%**: the Vec3Normalize temporaries use a different stack slot.
     - **PoseRotation `0x4a7fd0`, 55.70%**: the inline budget differs.
     - **InterpolatePose `0x4a8470`, 19.40%**: VC6 inlines the first CrossProduct, where retail calls `0x515600`.
-    - **Slot 7 `0x4a70c0`, 4.79%** (3330 vs 3327 bytes): the frame-accurate advance with pose extrapolation and
-      blending. The call sequence is retail's (Vec3Normalize, the `operator+`/`operator-`/`operator*`/CrossProduct
-      COMDATs inside the two pose-blend expansions, `_ftol`, FindNode, ClampFloat inlined) and the clamp/smoothstep
-      region matches byte for byte, but VC6 distributes the inline budget differently: it calls
-      `CharacterPose::CharacterPose` (`0x4a8930`) 3 then 2 times for the unused pose locals where retail calls it 2
-      then 4 times (the count follows the number of unused `CharacterPose` locals in the blend helper: 4 gives 3/2,
-      6 gives 5/4, 2 gives 1/0, 0 makes `Vec3::Vec3` be called at the first operator sites instead; declaring them
-      before ClampFloat makes ClampFloat be called), and it inlines the `operator*`/`operator+` of the first
-      extrapolation loop that retail calls (retail inlines only the `operator-` there, calling `Vec3::Vec3` for its
-      result). The frame is 0x284 against retail's 0x2dc and every byte after the first expansion shifts. A
-      call-view variant (helpers taking pointers) came closer in size (3182-3190 bytes) but lost the call sequence.
+    - **Slot 7 `0x4a70c0`** (candidate 3376 vs 3327 bytes; aligned instructions 675 of 958): the frame-accurate
+      advance with pose extrapolation and blending. The call sequence is retail's and the clamp/smoothstep region
+      matches byte for byte. One blend inline expanded in both loops always calls `CharacterPose::CharacterPose`
+      (`0x4a8930`) n then n - 1 times where retail calls it 2 then 4 times, so the playback and blend loops use two
+      inlines with the same body and three and five unused poses. The playback loop's extrapolation as an inline
+      helper calls `Vec3::Vec3` and the `operator*`/`operator+` COMDATs as retail does. Left: `this` in edi against
+      retail's esi, the blend loop's unused sums and extrapolation (retail calls `operator-`/`*`/`*`/`+` there) and
+      the frame.
 - **Inline budget**: VC6 spends its per-function inline budget breadth-first over call sites in source order. The
   calls inside inlined bodies are considered after all direct call sites. In these FPU helpers retail calls the
   out-of-line COMDAT copies of `Vec3::Vec3` (`0x404e60`), DotProduct (`0x40ae30`), `operator*` (`0x5015b0`),

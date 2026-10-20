@@ -1946,9 +1946,9 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         g_MemTagStack->Pop(prevTag);
         startRunUpTime = 0;
         contactTime = 0;
-        roamTargetX = 3000.0f;
-        roamTargetZ = 3000.0f;
-        roamTargetY = 0;
+        roamTarget.x = 3000.0f;
+        roamTarget.z = 3000.0f;
+        roamTarget.y = 0;
         if (g_kbGame->eventType != 5 && g_kbGame->eventType != 1)
             field_0x824 = KbRandUnit() * 14.0f - 7.0f;
         else
