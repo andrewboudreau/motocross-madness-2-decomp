@@ -364,3 +364,10 @@ exact:
   46 (`0x5276d0`) stores the last component and pushes the return pointer as retail only
   with Math3D's constructor-return operators (`scratchVector = mid - position`); a helper
   that fills a named `Vec3 r` member-wise (`VehOffset`) gives the same frame, one store late.
+- An inline helper's intermediate that VC6 spills (an x87 value kept across a call) is homed
+  by liveness in some free non-address-taken home, not necessarily the caller's target.
+  Writing the helper through an out reference (`void f(float& out, ..) { out = ..; if (..)
+  out = -out; out += base; }`) makes the spill the target's own slot. BikeRace CreateRacers
+  (`0x419970`) went from 13100 to 13396 of 13428 this way, together with one function-scope
+  loop index shared by two blocks' loops (retail homes both in one slot); either change alone
+  is worse (12792, 2617).

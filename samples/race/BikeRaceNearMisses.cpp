@@ -141,19 +141,24 @@
 // The two network player loops share one block-level `k` for their preset
 // curve copies; with a `for (int k` in each, VC6 allocates the later event
 // AI copy differently (retail [base + n*0xcc], ours was [n*0xcc + base], and
-// its UI else branch loaded bikes[n] before ui->bikes). That makes the
-// candidate retail's code apart from three register choices near the start
-// (0x419b0d, 0x419b39, 0x419bf0). Left are frame slots: the scalars below
-// 0x6c, bikeTexture/riderTexture and ownBikeTexture/ownRiderTexture (each
-// pair swapped; their use counts tie), so 13100 of 13428 bytes match.
-// Measured but not kept: one function-level `i` for both network loops puts
-// i, recordIndex, position, direction and bike/riderTexture in retail's
-// slots but moves up/plate/fromEvent/riders (12792), and a char[2][0x40]
-// for the own textures fixes bike/riderTexture but swaps the recorded pair.
-// The shared-`i` form fails because retail homes the pro circuit's inlined
-// UnknownRandomSkill `offset` temporary (fstp/fld at 0x41a212/0x41a231) in
-// skill's slot, while ours puts it in riders/circuit's, which then ranks
-// too high. That home choice is the lead for the remaining slots.
+// its UI else branch loaded bikes[n] before ui->bikes). Two retail facts
+// fix the scalars below 0x6c: the network block's `i` is a function-scope
+// local that the network AI loop reuses (retail homes both loops' index in
+// one slot at 0), and UnknownRandomSkill writes the skill through a
+// `float&` (retail spills the random offset into skill's own slot before
+// the second rand() and adds base to it; with a returned value VC6 homes the
+// pro circuit's offset in the riders/circuit slot, which then ranks too
+// high). That puts every scalar and bikeTexture/riderTexture at retail's
+// offset, so 13396 of 13428 bytes match. Left: the three register choices
+// near the start (0x419b0d, 0x419b39, 0x419bf0), the first two stores of
+// the prologue in the other order (0x4199ad), the SIB order of one curve
+// copy (0x41b124), and two 0x40-byte pairs swapped in the frame:
+// ownBikeTexture/ownRiderTexture and the two replay blocks' recorded
+// bike/rider pair (each block's bike shares with the other's rider).
+// Measured but not kept: the shared `i` alone gives 12792 (the offset
+// temporary then pushes riders up), the `float&` helper alone 2617 (the
+// second loop's index takes fromEvent's slot), and a char[2][0x40] for the
+// own textures fixed bike/riderTexture but swapped the recorded pair.
 
 #include "../../src/reconstructed/BikeRace.cpp"
 
@@ -962,14 +967,14 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     return this;
 }
 
-// A racer's skill: `base` moved up or down by at most `range`, closer to
-// `base` more often.
-static inline float UnknownRandomSkill(const float& base, const float& range) {
+// A racer's skill, written into `skill`: `base` moved up or down by at most
+// `range`, closer to `base` more often.
+static inline void UnknownRandomSkill(float& skill, const float& base, const float& range) {
     float r = rand() * (1.0f / 32768.0f);
-    float offset = (float)((1.0 - exp(-r * r)) * range);
+    skill = (float)((1.0 - exp(-r * r)) * range);
     if (rand() * (1.0f / 32768.0f) > 0.5f)
-        offset = -offset;
-    return base + offset;
+        skill = -skill;
+    skill += base;
 }
 
 // The network view of start grid entry i (BikeRace reads +0x5 as the AI
@@ -1019,6 +1024,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
     int playerId = 0x7fffffff;
     int recordIndex = 0;
     int id = 0;
+    int i;
     float skill = aiSettings[0];
     Vector3 up(0.0f, 1.0f, 0.0f);
     empty[0] = 0;
@@ -1144,7 +1150,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                     setup.presetCurve[k] = g_TrackGame->ui->standardCurves[bikeClass][0][k];
                 setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
                 setup.weight = g_TrackGame->ui->weight[bikeClass];
-                skill = UnknownRandomSkill(aiSettings[0], aiSettings[1]);
+                UnknownRandomSkill(skill, aiSettings[0], aiSettings[1]);
                 aiRacers[n - 1] = new(__FILE__, 0x47c) UnknownBikeRaceRacer(1);
                 aiRacers[n - 1]->Load(owner, empty, bikeFile, riderFile, lights, textures,
                                                           position, direction, up, terrain, 0, 1, 0, this,
@@ -1245,7 +1251,6 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         // A network race: this player's racer, the other players' and the
         // AI racers of other hosts.
         playerId = g_TrackGame->network->localPlayer;
-        int i;
         int k;
         for (i = 0; i < racerCount; i++) {
             if (GridPlayer(i).networkPlayerId == playerId && !GridPlayer(i).isAi) {
@@ -1476,9 +1481,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                         engineSize = UiBike(bikes[n]).engineSize;
                         fourStroke = UiBike(bikes[n]).fourStroke;
                         if (g_TrackGame->mode.raceSettings.eventType == 0)
-                            skill = UnknownRandomSkill(aiSettings[5], aiSettings[6]);
+                            UnknownRandomSkill(skill, aiSettings[5], aiSettings[6]);
                         else
-                            skill = UnknownRandomSkill(aiSettings[0], aiSettings[1]);
+                            UnknownRandomSkill(skill, aiSettings[0], aiSettings[1]);
                     }
                     float r = rand() * (1.0f / 32768.0f);
                     plate = 101 - (int)(r * -898.0f);
@@ -1554,7 +1559,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         id = 1;
         if (g_TrackGame->mode.raceSettings.aiRacerCount > 0) {
             aiRacers = new(__FILE__, 0x770) UnknownBikeRaceRacer*[g_TrackGame->mode.raceSettings.aiRacerCount];
-            for (int i = 0; i < racerCount; i++) {
+            for (i = 0; i < racerCount; i++) {
                 int other = GridPlayer(i).networkPlayerId;
                 if (other != playerId || !GridPlayer(i).isAi)
                     continue;
