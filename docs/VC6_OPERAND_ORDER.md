@@ -514,6 +514,12 @@ trying on other `[base+index]` / `add r, r` order near misses.
   keeps its own epilogue and returns Play's zero from eax without `xor eax, eax`, and the
   second falls into the shared `failed` block (Sound::PlayWithOptions `0x004bc6b0`, 238 ->
   exact, measured inside PCAudio.cpp).
+- In a switch whose cases differ only in a string pushed for one call, VC6 hands each case's
+  `lea r, [esp]` the next of eax, ecx and edx. Cases whose register matches the final
+  block's are cross-jumped into the shared tail (`push string; jmp`). If the wrong cases
+  are merged, check the case count against retail's decision tree before trying other
+  forms: a missing `case 2` shifted that rotation in the DirectInput error reporter
+  `0x004bf6a0` (518 -> exact).
 - A helper written as a macro reproduces retail's address recomputation where the same
   helper as an inline function keeps the destination in a register (PCAudio's sound
   name copy).

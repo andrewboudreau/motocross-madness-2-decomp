@@ -1975,6 +1975,15 @@ CASES = [
         'reason': 'virtual deletes of the devices, release, base destructor under /GX',
     },
     {
+        'name': 'PCControl DirectInput error reporter 0x4bf6a0',
+        'bindings': 'src/reconstructed/PCControl.bindings.json',
+        'source': 'src/reconstructed/PCControl.cpp',
+        'symbol': '?UnknownReportError@@YAXJPBDH@Z',
+        'target_va': '0x004bf6a0',
+        'target_size': 978,
+        'reason': 'all 34 case values (DI_POLLEDDEVICE included) fix the register rotation that decides which sprintf tails VC6 cross-jumps; size includes the jump tables',
+    },
+    {
         'name': 'PCControl PCControlInterface slot 1 setup',
         'bindings': 'src/reconstructed/PCControl.bindings.json',
         'source': 'src/reconstructed/PCControl.cpp',

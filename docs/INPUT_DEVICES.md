@@ -243,13 +243,18 @@ acquired flag at +0xcc4.
 | `0x004bf490` | (Un)acquires every device |
 | `0x004bf600` | Destructor: deletes the devices, releases DirectInput |
 | `0x004beef0` | Names one of the twelve effect GUIDs (GUID_ConstantForce … GUID_CustomForce); placed in PCControl.cpp by address only |
+| `0x004bf6a0` | The DirectInput error reporter: names a result code and formats it with the caller's `__FILE__`/`__LINE__` (the text is not used further); placed in PCControl.cpp by address only |
 
-All are strict exact except two near misses in `samples/control`:
-- **Slot 3** (`0x004bf4f0`, per-device state; 76/104 compiled inside
-  ControlInterface.cpp, where only the mouse case's block placement differs).
-- **The DirectInput error reporter** (`0x004bf6a0`). Its 33 case values,
-  traced from retail's decision tree, are the DIERR/DI codes named by its
-  own strings. Only VC6's case-tail merging differs.
+The reporter's 34 case values, traced from retail's decision tree, are the
+DIERR/DI codes named by its own strings (978 bytes with the jump tables).
+The 33-case version lacked `case 2` (DI_POLLEDDEVICE, string `0x0056fd04`).
+That one missing case shifted VC6's eax/ecx/edx rotation for the
+`lea r, [esp]` of each case, so VC6 cross-jumped the eax cases into the
+shared sprintf tail where retail cross-jumps the ecx ones.
+
+All are strict exact except one near miss in `samples/control`:
+**slot 3** (`0x004bf4f0`, per-device state; 76/104 compiled inside
+ControlInterface.cpp, where only the mouse case's block placement differs).
 
 ## ContainerList.h
 
