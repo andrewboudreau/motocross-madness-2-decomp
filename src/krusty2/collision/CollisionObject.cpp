@@ -2589,6 +2589,11 @@ static inline float CollisionLengthInline(const Vec3& v)
 // Only the hull case expands the point transform; the other cases call 0x0042a510 (inline budget).
 // The hull case names the previous and current body matrices: retail keeps &prev in edx across
 // the product for the CollisionRelativeTransform argument and spills &body (163 -> 902).
+// Model loop (about 25 forms): retail holds model in ebx at the loop head (copied in the latch,
+// so the empty-loop exit needs no copy).  Reading model->elements into a block-local first
+// gives the ebx base and the stack-kept 0x198 offset but enters the loop with a jmp and copies
+// after it (863, d192; `e = model->elements; e += i` 882, d180); e++, char* or byte-offset
+// strides, while/do forms and named prev/body element pointers score lower.
 void CollisionObject::SetTransform(const Matrix4* m)
 {
     switch (shapeType) {
