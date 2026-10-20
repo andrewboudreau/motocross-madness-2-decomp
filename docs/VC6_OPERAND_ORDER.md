@@ -815,6 +815,11 @@ try on similar code. None is a rule.
 
 ## Levers from session 14
 
+- **Constant registers (0, 1, -1).** Whether VC6 keeps a constant in a register
+  depends on how many displaced stores of it there are (offset-0 stores, pushes and
+  tests do not count), whether the range spans a call, and whether a callee-saved
+  register is already pushed. The measured thresholds (2/3/2/4) and the rows checked
+  against them are in [VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md).
 - **A named result copied after an intervening statement.** Tire ApplyDrive
   (`0x00514170`): `push = TireRatioTimes(...); *speed -= amount;` copies each
   component of the helper's return temporary right after its product; retail
