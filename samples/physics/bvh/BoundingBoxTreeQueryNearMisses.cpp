@@ -62,15 +62,17 @@
 //   copy of segment[1] at entry differ, and the dot product of the set-flag branch loads z
 //   first.
 //
-// - BoxCapsuleOverlap 0x00425900 (4314 bytes, 4237 here): first draft with the decoded
+// - BoxCapsuleOverlap 0x00425900 (4314 bytes, 4285 here): first draft with the decoded
 //   structure (box axes, axes crossed with the segment direction, three corner directions).
 //   The segment transform, the midpoint/half-segment constructor calls and the box-axis tests
 //   match.  The corner distances as six float locals (retail keeps the first corner's on
 //   the x87 stack and stores the second's) squared through QuerySquares bring the instruction
 //   stream in line with retail's (normalised diff 1552 -> 377 instructions; the seventh
-//   normalisation then calls operator* as retail does).  Left: retail calls DotProduct in the
-//   fifth to seventh normalisations and both squared-corner constructors (VC6 here expands
-//   them: retail spent more inline budget), and in each separating-axis test retail sums the
+//   normalisation then calls operator* as retail does).  Writing the twelve corner signs
+//   through the QuerySigned helper spends the inline budget retail spent: both squared-corner
+//   constructors and the fifth normalisation's DotProduct are then calls as in retail
+//   (normalised diff 377 -> 291).  Left: retail also calls DotProduct in the sixth and
+//   seventh normalisations and operator* in the last (one or two expansions more), and in each separating-axis test retail sums the
 //   three projected radii before the segment's half-length projection (as `(r = ...) + D`
 //   would) and orders the z axis's dot product (0 + 0) + l.z * hz.  A projected-radius inline
 //   helper (4430+ bytes) or DotProduct for both the mid and the half-segment projections
@@ -152,6 +154,7 @@ inline Vec3 Vec3NormalizeInline(const Vec3& v)
     return v * inv;
 }
 
+inline float QuerySigned(float s, float p) { return p < 0.0f ? -s : s; }
 // Component-wise squares of the corner distances (BoxCapsuleOverlap).
 inline Vec3 QuerySquares(float x, float y, float z)
 {
@@ -207,11 +210,11 @@ int BoxCapsuleOverlap(const Vec3* center, const Vec3* halfExtents, const Vec3* e
     Vec3 s1 = QuerySquares(c1x, c1y, c1z);
     Vec3 w;
     if (s0.x + s0.y < s1.x + s1.y) {
-        w.x = p0.x < 0.0f ? -s0.x : s0.x;
-        w.y = p0.y < 0.0f ? -s0.y : s0.y;
+        w.x = QuerySigned(s0.x, p0.x);
+        w.y = QuerySigned(s0.y, p0.y);
     } else {
-        w.x = p1.x < 0.0f ? -s1.x : s1.x;
-        w.y = p1.y < 0.0f ? -s1.y : s1.y;
+        w.x = QuerySigned(s1.x, p1.x);
+        w.y = QuerySigned(s1.y, p1.y);
     }
     w.z = 0.0f;
     l = Vec3NormalizeInline(w);
@@ -219,11 +222,11 @@ int BoxCapsuleOverlap(const Vec3* center, const Vec3* halfExtents, const Vec3* e
                                          QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
         return 0;
     if (s0.x + s0.z < s1.x + s1.z) {
-        w.x = p0.x < 0.0f ? -s0.x : s0.x;
-        w.z = p0.z < 0.0f ? -s0.z : s0.z;
+        w.x = QuerySigned(s0.x, p0.x);
+        w.z = QuerySigned(s0.z, p0.z);
     } else {
-        w.x = p1.x < 0.0f ? -s1.x : s1.x;
-        w.z = p1.z < 0.0f ? -s1.z : s1.z;
+        w.x = QuerySigned(s1.x, p1.x);
+        w.z = QuerySigned(s1.z, p1.z);
     }
     w.y = 0.0f;
     l = Vec3NormalizeInline(w);
@@ -231,11 +234,11 @@ int BoxCapsuleOverlap(const Vec3* center, const Vec3* halfExtents, const Vec3* e
                                          QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
         return 0;
     if (s0.y + s0.z < s1.y + s1.z) {
-        w.y = p0.y < 0.0f ? -s0.y : s0.y;
-        w.z = p0.z < 0.0f ? -s0.z : s0.z;
+        w.y = QuerySigned(s0.y, p0.y);
+        w.z = QuerySigned(s0.z, p0.z);
     } else {
-        w.y = p1.y < 0.0f ? -s1.y : s1.y;
-        w.z = p1.z < 0.0f ? -s1.z : s1.z;
+        w.y = QuerySigned(s1.y, p1.y);
+        w.z = QuerySigned(s1.z, p1.z);
     }
     w.x = 0.0f;
     l = Vec3NormalizeInline(w);
