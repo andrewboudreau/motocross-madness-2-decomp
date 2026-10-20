@@ -78,7 +78,7 @@ The notes are in the source header.
 |---|---|---|---|
 | `0x00460db0` | 186 | 16% | header check |
 | `0x00461340` | 702 | 41% | seek |
-| `0x00461640` | 663 | 59% | read |
+| `0x00461640` | 663 | 71% | read |
 | `0x004618e0` | 152 | 88% | write |
 | `0x00461b90` | 282 | 90% | write the header |
 
