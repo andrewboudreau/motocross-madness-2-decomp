@@ -222,7 +222,7 @@ retail does; grouping the x row's first two products does the same for that row.
 | render/MorphBastardModifier | `0x004a33b0` | 1938/2046 | b | spill homes of the loop scalars and the two inverse temporaries; operand order inside the channel inverse's products |
 | render/MorphBastardModifier | `0x004a3c80` | 74/3663 | b | 4 code diffs: `push ebp` vs `mov ebx, [esp + N]`; `mov ecx, [esp + N]` vs `mov ecx, [ebx + 0x44]`; frame 0x1b4 vs 0x1fc |
 | render/MorphBastardModifier | `0x004a4c60` | 185/1570 | c | object/channel loop registers: retail keeps the object offset in esi, reloads the index from +0x28 and keeps the channel in ebp |
-| render/Overlay | `0x004b6710` | 53/365 | b | 23 code diffs: retail adds `mov eax, [esp + N]`; `mov esi, [esp + N]` vs `mov ebx, [eax] ; mov edx, [eax + 4]`; slots differ |
+| render/Overlay | `0x004b6710` | 63/361 | b | retail keeps `whole` and the byte count on the stack (6 slots), the destination in ebp and the row count in eax; VC6 keeps `whole` in edi, the byte count in ebp and the destination and row count on the stack |
 | render/PCTextureMap | `0x004c69c0` | 429/894 (masked) | c | 31 code diffs: `jne @390` vs `jne A`; `jne @120` vs `jne @116 ; lea edx, [esp + N]` |
 | render/PCTextureMap | `0x004c71c0` | 286/538 (masked) | c | 27 code diffs: `mov ebp, 1` vs `mov ebx, 1`; `and eax, ebp` vs `and eax, ebx` |
 | render/PCTextureMap | `0x004c7b40` | 247/767 | b | 35 code diffs: retail lacks `mov edi, [eax]`; slots differ |
