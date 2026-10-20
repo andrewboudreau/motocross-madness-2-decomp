@@ -124,9 +124,17 @@
 // strength-reduces circuit+0x6dd); the network loops index
 // g_TrackGame->mode.racers[j] directly (retail recomputes it from the
 // global, so there is no `slots` local), which pulls setup to retail's 0x6c.
-// The small scalars below 0x6c still order differently and retail's 0x2c
-// (the operator-new temp), 0x44 (fromEvent and the network k counter) and
-// 0x4c (the spilled stream) have no counterpart, so 3464 of 13428 bytes match.
+// The grid entries are read the same way (lea esi, [edx+0x2ec1] from the
+// global, so no `players` local either). The offline player branch comes
+// first in the source: its new carries line 0x4ea against the network
+// block's 0x53b and EH state 3 against their 4-6, although VC6 lays the
+// network block out first. Retail's network search loop jumps past the
+// block when no player is found (no second `i < racerCount` test), so the
+// body probably sat inside the loop before a break, but that form moves
+// VC6's failure-tail cross-jumping and drops the score to 947. The small
+// scalars below 0x6c still order differently and retail's 0x2c (the
+// operator-new temp), 0x44 (fromEvent and the network k counter) and 0x4c
+// (the spilled stream) have no counterpart, so 3644 of 13428 bytes match.
 
 #include "../../src/reconstructed/BikeRace.cpp"
 
@@ -940,6 +948,12 @@ static inline float UnknownRandomSkill(const float& base, const float& range) {
     return base + offset;
 }
 
+// The network view of start grid entry i (BikeRace reads +0x5 as the AI
+// flag); the loader reads it through g_TrackGame each time.
+static inline UnknownBikeRaceNetPlayer& GridPlayer(int i) {
+    return ((UnknownBikeRaceNetPlayer*)g_TrackGame->mode.raceSettings.gridOrder)[i];
+}
+
 // 0x00419970
 int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureFormatChoice* textures,
                                     UnknownBikeRaceProjector* terrain, UnknownBikeRaceNodeOwner* event) {
@@ -1144,20 +1158,58 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         plate = g_TrackGame->mode.plateNumber;
     }
 
-    UnknownBikeRaceNetPlayer* players = (UnknownBikeRaceNetPlayer*)g_TrackGame->mode.raceSettings.gridOrder;
-    if (!g_TrackGame->playingReplay && g_TrackGame->playerCount != 1) {
+    if (g_TrackGame->playingReplay || g_TrackGame->playerCount == 1) {
+        // The player's racer offline (or in a replay).
+        WriteRelativePositions(&position, &direction, event, order[0]);
+        localRacer = new(__FILE__, 0x4ea) UnknownBikeRaceRacer(1);
+        if (!AppendChild(
+                localRacer->Load(
+                    owner, empty, bikeFile, riderFile, lights, textures, position, direction, up, terrain,
+                    g_TrackGame->controlInterface, 0, 0, this, name, 0, id,
+                    (UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions,
+                    g_TrackGame->mode.gasGyro, g_TrackGame->mode.brakeGyro, particleManager,
+                    raceScene, replayVcr, 0, 1),
+                -1)) {
+            sprintf(message, "Player Bike not loaded\n");
+            if (riders)
+                DebugFree(riders, __FILE__, 0x4ff);
+            if (bikes)
+                DebugFree(bikes, __FILE__, 0x500);
+            if (names)
+                DebugFree(names, __FILE__, 0x501);
+            delete stream;
+            Release();
+            return 0;
+        }
+        localRacer->modelNode->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
+        localRacer->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, (int)textures);
+        if (!g_TrackGame->mode.raceSettings.treeCollision) {
+            localRacer->collisionObject->ignoreVegetation = 1;
+            localRacer->frontWheel->ignoreVegetation = 1;
+            localRacer->rearWheel->ignoreVegetation = 1;
+        }
+        localRacer->engineSize = ((UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions)->engineSize;
+        localRacer->fourStroke = (char)((UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions)->fourStroke;
+        localRacer->plateNumber = plate;
+        if ((replayVcr && g_TrackGame->useReplayTape && !g_TrackGame->playingReplay) ||
+            g_TrackGame->mode.raceSettings.raceMode == 4) {
+            replayVcr->SetRacer(0, 0, recordIndex++, g_TrackGame->mode.profileName, bikeFile,
+                                               riderFile, bikeTexture, riderTexture, localRacer->engineSize,
+                                               (unsigned char)localRacer->fourStroke, plate);
+        }
+    } else {
         // A network race: this player's racer, the other players' and the
         // AI racers of other hosts.
         playerId = g_TrackGame->network->localPlayer;
         int i;
         for (i = 0; i < racerCount; i++) {
-            if (players[i].networkPlayerId == playerId && !players[i].isAi)
+            if (GridPlayer(i).networkPlayerId == playerId && !GridPlayer(i).isAi)
                 break;
         }
         if (i < racerCount) {
             int j;
             for (j = 0; j < g_TrackGame->mode.racerCount; j++) {
-                if (players[i].networkPlayerId == g_TrackGame->mode.racers[j].networkPlayerId && g_TrackGame->mode.racers[j].racerIndex == 0) {
+                if (GridPlayer(i).networkPlayerId == g_TrackGame->mode.racers[j].networkPlayerId && g_TrackGame->mode.racers[j].racerIndex == 0) {
                     used[j] = 1;
                     break;
                 }
@@ -1205,11 +1257,11 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             localRacer = racerSlots[j];
         }
         for (i = 0; i < racerCount; i++) {
-            if (players[i].networkPlayerId == playerId || players[i].isAi)
+            if (GridPlayer(i).networkPlayerId == playerId || GridPlayer(i).isAi)
                 continue;
             int j;
             for (j = 0; j < g_TrackGame->mode.racerCount; j++) {
-                if (players[i].networkPlayerId == g_TrackGame->mode.racers[j].networkPlayerId && g_TrackGame->mode.racers[j].racerIndex == 0) {
+                if (GridPlayer(i).networkPlayerId == g_TrackGame->mode.racers[j].networkPlayerId && g_TrackGame->mode.racers[j].racerIndex == 0) {
                     used[j] = 1;
                     break;
                 }
@@ -1256,8 +1308,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             }
         }
         for (i = 0; i < racerCount; i++) {
-            int other = players[i].networkPlayerId;
-            if (other == playerId || !players[i].isAi)
+            int other = GridPlayer(i).networkPlayerId;
+            if (other == playerId || !GridPlayer(i).isAi)
                 continue;
             int j;
             for (j = 0; j < racerCount; j++) {
@@ -1302,45 +1354,6 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                                                    racerSlots[j]->engineSize,
                                                    (unsigned char)racerSlots[j]->fourStroke, g_TrackGame->mode.racers[j].plateNumber);
             }
-        }
-    } else {
-        // The player's racer offline (or in a replay).
-        WriteRelativePositions(&position, &direction, event, order[0]);
-        localRacer = new(__FILE__, 0x4ea) UnknownBikeRaceRacer(1);
-        if (!AppendChild(
-                localRacer->Load(
-                    owner, empty, bikeFile, riderFile, lights, textures, position, direction, up, terrain,
-                    g_TrackGame->controlInterface, 0, 0, this, name, 0, id,
-                    (UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions,
-                    g_TrackGame->mode.gasGyro, g_TrackGame->mode.brakeGyro, particleManager,
-                    raceScene, replayVcr, 0, 1),
-                -1)) {
-            sprintf(message, "Player Bike not loaded\n");
-            if (riders)
-                DebugFree(riders, __FILE__, 0x4ff);
-            if (bikes)
-                DebugFree(bikes, __FILE__, 0x500);
-            if (names)
-                DebugFree(names, __FILE__, 0x501);
-            delete stream;
-            Release();
-            return 0;
-        }
-        localRacer->modelNode->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
-        localRacer->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, (int)textures);
-        if (!g_TrackGame->mode.raceSettings.treeCollision) {
-            localRacer->collisionObject->ignoreVegetation = 1;
-            localRacer->frontWheel->ignoreVegetation = 1;
-            localRacer->rearWheel->ignoreVegetation = 1;
-        }
-        localRacer->engineSize = ((UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions)->engineSize;
-        localRacer->fourStroke = (char)((UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions)->fourStroke;
-        localRacer->plateNumber = plate;
-        if ((replayVcr && g_TrackGame->useReplayTape && !g_TrackGame->playingReplay) ||
-            g_TrackGame->mode.raceSettings.raceMode == 4) {
-            replayVcr->SetRacer(0, 0, recordIndex++, g_TrackGame->mode.profileName, bikeFile,
-                                               riderFile, bikeTexture, riderTexture, localRacer->engineSize,
-                                               (unsigned char)localRacer->fourStroke, plate);
         }
     }
 
@@ -1499,8 +1512,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         if (g_TrackGame->mode.raceSettings.aiRacerCount > 0) {
             aiRacers = new(__FILE__, 0x770) UnknownBikeRaceRacer*[g_TrackGame->mode.raceSettings.aiRacerCount];
             for (int i = 0; i < racerCount; i++) {
-                int other = players[i].networkPlayerId;
-                if (other != playerId || !players[i].isAi)
+                int other = GridPlayer(i).networkPlayerId;
+                if (other != playerId || !GridPlayer(i).isAi)
                     continue;
                 int j;
                 for (j = 0; j < g_TrackGame->mode.racerCount; j++) {
