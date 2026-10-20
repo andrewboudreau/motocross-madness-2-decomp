@@ -1119,22 +1119,33 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
     torque->z += moment.z;
 }
 
-// 0x00513c70 (near miss, 793 of 797 bytes, same length): runs the attached
-// shock against the contact. The inline (+0x2b0) and rotating (+0x2ac) shocks
-// are solved with the same follow-up, written out twice as retail keeps two
-// copies; the solve's load and active flag become the contact's penetration and
-// inContact. The outputs live in the dead `dt` and `velocity` argument slots,
-// as in retail. Each attachment clears field_0x26c and inContact on its own
-// failure path (VC6 merges the two tails into retail's single block); with
-// the clears written once after the if/else chain VC6 has too few zero stores
-// to keep retail's zero register (ebx) across the solve call and compiles
-// every null test as `test` (96 of 805 bytes). The surface position is summed
-// through TireSum (sums into float locals, then stored), which stages z in the
-// dead y slot like retail (769 -> 793). Left: the rotating path's first
-// world-position add loads the attachment's x first where retail loads the
-// contact's; `+=`, `w = w + d`, `w = d + w`, the hinge local, a reference or
-// copy of field_0x80, a reference to worldPosition and vector sums all keep it
-// (TireAddTo-style `d + v` sums swap the inline path's first add as well).
+// In-place component sum through references: the rotating shock path of 0x00513c70
+// adds the attachment's offset to the contact's world position with it.
+static inline void TireAddIn(CollisionVec3& w, const CollisionVec3& d)
+{
+    w.x += d.x;
+    w.y += d.y;
+    w.z += d.z;
+}
+
+// 0x00513c70 (797 bytes, strict exact): runs the attached shock against the
+// contact. The inline (+0x2b0) and rotating (+0x2ac) shocks are solved with
+// the same follow-up, written out twice as retail keeps two copies; the solve's
+// load and active flag become the contact's penetration and inContact. The
+// outputs live in the dead `dt` and `velocity` argument slots, as in retail.
+// Each attachment clears field_0x26c and inContact on its own failure path
+// (VC6 merges the two tails into retail's single block); with the clears
+// written once after the if/else chain VC6 has too few zero stores to keep
+// retail's zero register (ebx) across the solve call and compiles every null
+// test as `test` (96 of 805 bytes). The surface position is summed through
+// TireSum (sums into float locals, then stored), which stages z in the dead y
+// slot like retail (769 -> 793). The inline path adds the attachment offset
+// component-wise in the body (attachment x loaded first, as retail); the
+// rotating path adds it through TireAddIn, after which the contact's x loads
+// first like retail (793 -> 797). Written in the body (`+=`, `w = w + d`,
+// `w = d + w`, the hinge local, a reference or copy of field_0x80, a reference
+// to worldPosition) the attachment's x loads first; TireAddIn in the inline
+// path as well costs 8 differing lines.
 void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offset,
                        const CollisionVec3* velocity, const CollisionVec3* axisB)
 {
@@ -1175,9 +1186,7 @@ void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offse
                 if (active || crashed)
                     CollisionPoint::inContact = 1;
                 CollisionPoint::penetration = load;
-                CollisionPoint::worldPosition.x += field_0x2ac->field_0x80.x;
-                CollisionPoint::worldPosition.y += field_0x2ac->field_0x80.y;
-                CollisionPoint::worldPosition.z += field_0x2ac->field_0x80.z;
+                TireAddIn(CollisionPoint::worldPosition, field_0x2ac->field_0x80);
                 if (active)
                     CollisionPoint::surfacePosition = TireSum(TireTimes(load, CollisionPoint::surfaceNormal), CollisionPoint::worldPosition);
                 else

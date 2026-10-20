@@ -25,7 +25,7 @@ function's bytes. Measured with small probe units under `vc6_o2_mt`.
   into one block after it has decided on the zero register, so retail's
   single clear block can come from two written copies. Tire::UpdateShock
   `0x00513c70` went from 96 to 769 of 797 bytes this way (zero register,
-  prologue, argument offsets and block layout as retail). With the clears
+  prologue, argument offsets and block layout as retail; now exact). With the clears
   written once after the `if`/`else` chain it compiles without the
   register.
 

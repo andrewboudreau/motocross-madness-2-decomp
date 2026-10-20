@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 125, c 99, total 226. The three class (a) functions of the
+Counts: a 2, b 125, c 98, total 225. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -169,7 +169,6 @@ the integration temporary. When only displacement sizes differ, read the
 | physics/soultree_base/SoultreePhysicsInlines | `0x0040b410` | 287/432 | b | 18 code diffs: `fld [edi + 0x1b0]` vs `fld [esi + 4]`; `fld [edi + 0x1b4]` vs `fld [esi + 8]`; slots differ |
 | physics/tire/Tire | `0x00513490` | 199/201 | c | 2 code diffs: `mov [ebp + N], ebx` vs `mov [ebp + N], edi`; `mov [ebp + N], edi` vs `mov [ebp + N], ebx` in the pts[i].origin stores; store/declaration order, chained/comma assignment, member-wise copy, pointer/reference and typedef shifts, splat/setter helpers and scalar zero locals give no gain |
 | physics/tire/Tire | `0x005135f0` | 1584/1664 | b | UpdateContactPatch: lever `lea edi`/store scheduled later; second TireDot push earlier |
-| physics/tire/Tire | `0x00513c70` | 793/797 | c | per-attachment failure clears give retail's zero register and length ([VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md)); TireSum stages the z sum in retail's slot; left: rotating path's first world-position add operand order (all add forms inert) |
 | physics/tire/Tire | `0x00514550` | 2576/4258 | b | 14 differing instructions (abs masked), frame 0xc0 matches (function-scope `rolled`); 0x53304c is stdcall D3DRMVectorRotate; retail keeps four call/ctor temporaries in one high slot (disp32 leas, most of the 10-byte size gap; block-scoping the frame matrix is inert); left: owner branch loads the side pointer late (the reference forms that fix it commute the lateral cross instead), the lateral x products load b first, retail `fcom` where VC6 emits `fld st(0); fcomp` for the kept score, a few copy-store orders |
 | physics/tire/Tire | `0x00515880` | 695/703 | c | keepZ test placed by grouping c.x's first product; left: retail loads z before y.x in the two c products with y.x (8 bytes); operand order and grouping of the c products inert |
 | physics/visibility/VisibilityQuadTreeTraversal | `0x0052d610` | 2265/3027 | c | 23 differing instructions (3022 B): VC6 cross-jumps two recursive-call tails that retail keeps apart (retail merges two slot-2 call tails instead); argument-expression, helper and arm-shape forms do not move the choice |
