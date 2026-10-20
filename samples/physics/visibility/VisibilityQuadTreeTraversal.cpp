@@ -21,7 +21,8 @@ __forceinline QuadTreeResultLink* VisibilityQuadTreeNode::VisitChild(
     int childZ = (i & 1) ? midZ : nodeZ;
     if (*cornersInside == 8)
         return children[i]->UnknownVirtualSlot2(x, z, tail, childX, childZ, half);
-    return ((VisibilityQuadTreeNode*)children[i])->Traverse(x, z, tail, childX, childZ, half, camera);
+    VisibilityQuadTreeNode* child = (VisibilityQuadTreeNode*)children[i];
+    return child->Traverse(x, z, tail, childX, childZ, half, camera);
 }
 
 // Back-to-front walk: the quadrant containing the query point is visited last.

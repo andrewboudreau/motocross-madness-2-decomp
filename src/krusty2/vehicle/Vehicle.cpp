@@ -927,13 +927,10 @@ Vec3* Vehicle::UnknownVirtualSlot46(Vec3* out, float arg)
 // frame transform from the wheels/contacts, and refreshes the cached basis block.
 // Exponential smoother (tier 3 reading): x += (target - x) * a with a = min(dt, tau) / tau,
 // where tau is field_0x04, field_0x08 is the blend factor a, and field_0x00 the smoothed value.
-static inline void VehSmooth(VehicleSmoother* s, float dt, float target)
+static inline float VehSmooth(VehicleSmoother* s, float target, float dt)
 {
-    float step = dt;
-    if (!(step < s->timeConstant))
-        step = s->timeConstant;
-    s->blendFactor = step / s->timeConstant;
-    s->smoothedValue = (target - s->smoothedValue) * s->blendFactor + s->smoothedValue;
+    s->blendFactor = VehMinF(dt, s->timeConstant) / s->timeConstant;
+    return s->smoothedValue = (target - s->smoothedValue) * s->blendFactor + s->smoothedValue;
 }
 
 void Vehicle::UnknownVirtualSlot49(float frame)
@@ -960,7 +957,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         pointsTouching = touchingPointCount > 0;
     }
     justLanded = 0;
-    while (steps > 0) {
+    if (steps > 0) do {
         engineState->TickGearTimer(stepTime);
         Vec3 zero = kVec3Zero;
         if (crashState == 0) {
@@ -985,7 +982,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             break;
         }
         prevSpeed = linearSpeed;
-        if (linearSpeed < 0.001f || !_finite(linearSpeed)) {
+        if (prevSpeed < 0.001f || !_finite(prevSpeed)) {
             prevSpeed = 0.0f;
             velocity = kVec3Zero;
             linearSpeed = 0.0f;
@@ -998,15 +995,15 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             if (spawnProtectTimer <= 0.0f)
                 UnknownVirtualSlot50(0, 0, 0);
         }
-        anyWheelInContact = wheelsInContact != 0;
+        int wheels = wheelsInContact;
+        allWheelsInContact = wheels == wheelCount;
+        anyWheelInContact = wheels != 0;
         speed = prevSpeed;
         up = weightForce;
-        allWheelsInContact = wheelsInContact == wheelCount;
         Vec3 savedOut;
         Vec3 basis = *UnknownVirtualSlot55(&savedOut, &pivot);
         UnknownVirtualSlot56(&basis, 1, 0);
-        res = UnknownVirtualSlot5(0);
-        res = VehContactsA(crashState || (steps == 1 && res), &touchingPointCount, collisionPointCount, ((VehicleContact**)collisionPoints),
+        res = VehContactsA(crashState || (steps == 1 && UnknownVirtualSlot5(0)), &touchingPointCount, collisionPointCount, ((VehicleContact**)collisionPoints),
                            terrain, &centerOfMass, collisionShape, collisionRadius);
         if (res)
             pointsTouching = touchingPointCount > 0;
@@ -1015,9 +1012,11 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         UnknownVirtualSlot6(&up, &speed);
         UnknownVirtualSlot7(&up);
         wheelForwardAlignment = UnknownVirtualSlot75();
-        int settled = 0;
+        int settled;
         if (!anyWheelInContact && !pointsTouching)
             settled = 1;
+        else
+            settled = 0;
         UnknownVirtualSlot71(settled);
         airborne = settled;
         if (airborne)
@@ -1056,9 +1055,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             UnknownVirtualSlot3(&o2, &o1, &o3, &scale, 0x67, 0, &slot3Out);
             if (prevSpeed * 1.3f < linearSpeed && linearSpeed > 5.0f) {
                 float r = prevSpeed / linearSpeed;
-                velocity.x *= r;
-                velocity.y *= r;
-                velocity.z *= r;
+                velocity *= r;
                 linearSpeed = prevSpeed;
             }
             if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
@@ -1067,9 +1064,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
                 linearSpeed = 0.0f;
             }
         }
-        float aq = turnAngle;
-        if (aq < 0.0f)
-            aq = -aq;
+        float aq = VehAbsT(turnAngle);
         Vec3 zeroB = kVec3Zero;
         UnknownVirtualSlot13(&up, &zeroB, t53);
         if (anyWheelInContact) {
@@ -1081,8 +1076,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             AccumulateWheelContacts(&up, &zeroB, t53);
         }
         UnknownVirtualSlot14(&up, &zeroB, &zero);
-        VehSmooth(verticalAccelSmoother, stepTime, (velocity.y - prevVelocity.y) * invStepTime);
-        smoothedVerticalAccel = verticalAccelSmoother->smoothedValue;
+        smoothedVerticalAccel = VehSmooth(verticalAccelSmoother, (velocity.y - prevVelocity.y) * invStepTime, stepTime);
         float k = UnknownVirtualSlot61(aq);
         Vec3 aimOut;
         Vec3 aim = *UnknownVirtualSlot46(&aimOut, k);
@@ -1101,7 +1095,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
                 if (mode == 1 || mode == 2) {
                     bool doit = true;
                     if (aq < 0.0001f) {
-                        if (VehAbs(k) > 0.0001f) {
+                        if (VehAbsT(k) > 0.0001f) {
                             Vec3 contactNormal;
                             scratchVector = *UnknownVirtualSlot54(&contactNormal);
                             tiltAxisLocal = modelNode->WorldToLocalDirection(scratchVector);
@@ -1129,8 +1123,9 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         modelNode->GetPosition(&position);
         centerNode->GetPositionIn(0, &centerOfMass);
         worldAngularVelocity = modelNode->LocalToWorldDirection(angularVelocity);
-        steps = UnknownVirtualSlot28(steps) - 1;
+        steps = UnknownVirtualSlot28(steps);
         lastStepTime = stepTime;
+        steps--;
         if (steps == 0 && stepRemainder > 0.0001f) {
             steps = 1;
             stepTime = stepRemainder;
@@ -1143,11 +1138,10 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         prevVelocity = velocity;
         prevCrashState = crashState;
         UnknownVirtualSlot29(steps == 0);
-    }
+    } while (steps > 0);
     UnknownVirtualSlot21();
     scratchVector = modelNode->WorldToLocalDirection(velocity);
-    VehSmooth(forwardAccelSmoother, frameTime, (scratchVector.z - prevLocalForwardVelocity) / frameTime);
-    smoothedForwardAccel = forwardAccelSmoother->smoothedValue;
+    smoothedForwardAccel = VehSmooth(forwardAccelSmoother, (scratchVector.z - prevLocalForwardVelocity) / frameTime, frameTime);
     prevLocalForwardVelocity = scratchVector.z;
 }
 
@@ -1258,9 +1252,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         scratchVector.x = rel.z * t.y - rel.y * t.z;
         scratchVector.y = rel.x * t.z - rel.z * t.x;
         scratchVector.z = rel.y * t.x - rel.x * t.y;
-        p.x = velocity.x + scratchVector.x;
-        p.y = velocity.y + scratchVector.y;
-        p.z = velocity.z + scratchVector.z;
+        p = velocity + scratchVector;
         UnknownVirtualSlot3(&((VehicleContactSet*)collisionObject)->contactNormal, &p, &rel, &s, b, 0, &l10);
     }
     if (prevSpeed < 0.001f && linearSpeed < 0.1f) {

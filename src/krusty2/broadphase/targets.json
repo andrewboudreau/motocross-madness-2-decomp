@@ -296,7 +296,7 @@
     "target_va": "0x005059d0",
     "target_size": 2116,
     "expect": "partial",
-    "notes": "75.3% strict (1593/2116). TRN v5 loader (__FILE__ lines 0x11c..0x1e6). Frame layout is retail's (0x440, every local in its retail slot). Same calls, arguments, EH states and control flow; candidate is 2114 bytes. Register allocation differs: retail keeps -1 in edi/ebx and uses immediates for 0 and 3 (the candidate holds 3 and 0 in ebx), the colour-key block schedules the red product inside the c9c chain with the key in ebx, and the palette loop strides a pre-offset pointer (add eax,2 / add eax,3). Tried: goto fail (single fail block, kept), inline Vec3 scale helper (kept), keep before c9c, red local first (kept), *colors++ palette loop (worse), separate loop counters (C2362 with goto).",
+    "notes": "28 differing instructions (894/2116 strict, 2117 B for 2116 B). TRN v5 loader (__FILE__ lines 0x11c..0x1e6). Frame layout is retail's (0x440, every local in its retail slot); same calls, arguments, EH states and control flow. Levers that moved it from 112 to 28: green and blue in their own locals with unlitColor before keep, surfaceFlags before the surfaceDesc copy, the quality table as one ternary store, a separate slot pointer for ownedObjects[] (retail strength-reduces it into ebx and keeps i in memory), and gridShift read before level. Remaining: VC6 caches 3 in ebx (palette stride and the block loop EH state) where retail caches -1 from the palette branch on; the slot pointer is set before the loop guard; i++ is scheduled after slot++; mov ecx, eax / sub esi, eax swap in the colour block. Lead: the K7 order (red, then unlitColor, then green and blue) gets retail's -1 in ebx and 1979/2116 strict at 2116 B, but moves alpha/keep to esi/edi (53 differing). Tried without effect: colors += 3, *colors++, an Rgb struct or [3] array view, i + i * 2, j += 3, reordered channel stores, keep inlined, key not cached.",
     "bindings": "Terrain.bindings.json"
   },
   {
@@ -386,7 +386,7 @@
     "target_va": "0x00507c10",
     "target_size": 2963,
     "expect": "partial",
-    "notes": "Height/normal query (58 callers). Checkerboard triangle split, inverse-squared-distance corner weights. Retail uses an EBP frame and inline fistp through pointer-aliased int locals (inline __asm in original source, not reproducible under rules); inherent partial. Also VC6 inline budget differs on Vec3 helpers.",
+    "notes": "Out of reach under the no-inline-asm rule: 71/2731 strict with a 3225 B candidate for 2963 B, so the extents differ and the matrix reports no strict score. Retail opens with push ebp / mov ebp, esp and converts each float with fld [ebp-0x30]; mov eax, [ebp-0x2c]; fistp dword ptr [eax] on homed (int*, float) arguments. That is an inlined __asm float-to-int helper. VC6 C code only reaches __ftol, and __asm is what forces the EBP frame. Height/normal query (58 callers). Checkerboard triangle split, inverse-squared-distance corner weights. Retail uses an EBP frame and inline fistp through pointer-aliased int locals (inline __asm in original source, not reproducible under rules); inherent partial. Also VC6 inline budget differs on Vec3 helpers.",
     "bindings": "Terrain.bindings.json"
   },
   {
