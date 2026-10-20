@@ -249,7 +249,8 @@ void Tire::CollisionPointVirtualSlot1()
         if (c >= 1.0f)
             c = 1.0f;
         tangentCos = c;
-        tangentSin = sqrt(1.0f - c * c);
+        float sinA = sqrt(1.0f - c * c);
+        tangentSin = sinA;   // the side term below reads the member back, not sinA
         float rollTerm = (-rollFriction) * rollFrictionScale * tangentCos * CollisionPoint::frictionCoefficient;
         CollisionPoint::frictionMagnitude = (rollTerm + (-sideFriction) * sideFrictionScale * tangentSin
                                                         * CollisionPoint::frictionCoefficient)

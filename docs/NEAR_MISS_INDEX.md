@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 137, c 104, total 243. The three class (a) functions of the
+Counts: a 2, b 137, c 103, total 242. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -171,7 +171,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/tire/Tire | `0x00513c70` | 769/797 | c | per-attachment failure clears give retail's zero register and length ([VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md)); left: rotating path's first world-position add operand order, z sum staged in the x slot |
 | physics/tire/Tire | `0x00514550` | 2446/4258 | b | 20 differing instructions (abs masked), frame 0xc0 matches (function-scope `rolled`); left: owner branch loads the side pointer late, first lateral cross loads three operands in the other order, retail `fcom` where VC6 emits `fld st(0); fcomp` for the kept score, a few copy-store orders, owner-branch temporaries in other low slots, one `add esp` merge |
 | physics/tire/Tire | `0x00515880` | 677/703 | c | retail tests keepZ one product later and loads z (and y.y) before y.x in the y.x products; operand/dot/decl order insensitive |
-| physics/tire/Tire | `0x00515b50` | 312/316 | c | side friction term: VC6 multiplies frictionCoefficient before the stacked sqrt (retail `fmul st(2) ; fmul [ecx + 0x74]`); VC6 orders the product itself: operand order, `(-mu)`/`-mu`, inline term helpers, side/sum locals, `+=` and a float `s` local stay 312, grouping the side product moves it ahead of the roll term (168) |
 | physics/visibility/VisibilityQuadTreeTraversal | `0x0052d610` | 2218/3027 | c | 137 code diffs: `mov eax, [esp + N] ; mov ecx, [esp + N]` vs `mov eax, [edi + 4]`; retail adds `mov ecx, [eax] ; mov eax, [esp + N] ; p~` |
 | race/BikeRace | `0x00417ed0` | 2804/6756 | c | retail stores `z*z` of each vector length to a stack temporary (`fstp [t]; faddp; fadd [t]`); the girl block's temporaries sit 4 to 12 bytes apart |
 | race/BikeRace | `0x00419970` | 1386/13322 | b | frame 0xac4 vs 0xab0, slot order differs (register choice follows); retail keeps one more stream destructor tail |
