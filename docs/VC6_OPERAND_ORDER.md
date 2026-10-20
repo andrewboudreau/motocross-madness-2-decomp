@@ -882,6 +882,11 @@ try on similar code. None is a rule.
   `Vec3 prev = f23c;` used in `(f154 - prev) * t + prev`, give those copies. In the
   same function a case block's `Vec3 r` declared at function scope stops sharing its
   slot and gives retail's 0x88 offset.
+- **A component-wise cross into a named local, then one whole assignment, is retail's
+  copy.** SimulateLookAhead (`0x0040eca0`, aligned 3737 to 3760): writing `right.x/y/z`
+  directly keeps the products' stores on `right`; `Vec3 rearCross; rearCross.x = ...;
+  right = rearCross;` gives retail's stack result and int-move copy. `right = Vec3(...)`,
+  a constructed named copy and a CrossProduct call all lose aligned instructions.
 - **A d3drm import is stdcall: a cdecl declaration merges its cleanup.**
   Tire::UpdateSuspensionProbe (`0x00514550`, 2504 to 2576 of 4258): the import thunk
   `0x0053304c` is D3DRMVectorRotate. Declared cdecl, VC6 defers its 16-byte cleanup

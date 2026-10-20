@@ -83,7 +83,11 @@
 // 0x005015b0, 0x00413160).  Natural Math3D operators reproduce that pattern; the
 // budget is consumed per inline expansion, so `right` and the start-up cross product
 // are written out component-wise (a CrossProduct call there moves the switch-over
-// points too early).  Remaining differences: the start-up `up` vector and the
+// points too early).  The loop's `right` cross is built in the named copy `rearCross`
+// and assigned whole (aligned 3737 -> 3760 of 3966 retail instructions); `right = Vec3(...)`
+// (3723), a constructed named copy (3722) and `right = CrossProduct(fwd, normalR)`
+// (3686) do not.  Replacing any DotProduct site with another inline dot helper drops
+// to ~3671 (inline budget), and swapping its arguments is inert at every site.  Remaining differences: the start-up `up` vector and the
 // loop-head drag vectors keep their zero components in memory in retail (the
 // candidate's are constant-folded), the order of a few temporaries and stores
 // (0x00411dbc vF += (commuted operands), 0x00412883), and the frame layout.
@@ -1039,9 +1043,11 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                     }
                 }
             }
-            right.x = fwd.y * normalR.z - fwd.z * normalR.y;
-            right.y = fwd.z * normalR.x - fwd.x * normalR.z;
-            right.z = fwd.x * normalR.y - fwd.y * normalR.x;
+            Vec3 rearCross;
+            rearCross.x = fwd.y * normalR.z - fwd.z * normalR.y;
+            rearCross.y = fwd.z * normalR.x - fwd.x * normalR.z;
+            rearCross.z = fwd.x * normalR.y - fwd.y * normalR.x;
+            right = rearCross;
             if (right.x != 0.0f || right.y != 0.0f || right.z != 0.0f)
                 right = SafeNormalize(right);
             dir2 = CrossProduct(CrossProduct(dir2, normalF), normalF);

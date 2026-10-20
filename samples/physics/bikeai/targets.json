@@ -36,7 +36,7 @@
     "target_va": "0x0040eca0",
     "target_size": 17585,
     "expect": "partial",
-    "notes": "two-wheel look-ahead simulation, fully reconstructed with natural Math3D operators (VC6's inline budget reproduces retail's inline/constructor-call/operator-call switch-over); 1493/17585 strict; the int/K initialisations precede the dt clamp (retail schedules their stores into the clamp's compare); frame 0x95c vs 0x93c, see the file header.",
+    "notes": "two-wheel look-ahead simulation, fully reconstructed with natural Math3D operators (VC6's inline budget reproduces retail's inline/constructor-call/operator-call switch-over); 1561/17585 strict, 3760 aligned instructions; the loop's right cross is built in a named copy; the int/K initialisations precede the dt clamp (retail schedules their stores into the clamp's compare); frame 0x95c vs 0x93c, see the file header.",
     "bindings": "BikeAINearMisses.bindings.json"
   },
   {
