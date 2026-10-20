@@ -25,6 +25,13 @@
 // known `jle exit; jmp top` loop-bottom shape that VC6 has not reproduced.
 // Also 462 (s14, current order): the Blt `return 0` braced, with and
 // without an unbraced else, the Blt result in a named local, and `!= 0`.
+// Also 462 at the current order (s14 corpus pass): `goto failed` with
+// `failed: return 0;` after the loop and the overlay check behind
+// `upload:`, `failed:` inside the else arm, and the Blt `return 0` as an
+// if arm with the rest of the body in its else. `if (result) { return 0;
+// }` ahead of the loop (braced or not) gives 545 bytes. In the exact
+// loop-bottom examples (docs/VC6_PATTERN_CORPUS.md) the early return is
+// the body's last test; here it is the first.
 
 #include <string.h>
 

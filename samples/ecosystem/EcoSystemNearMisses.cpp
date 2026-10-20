@@ -35,7 +35,8 @@
 //               vTop (retail's order); scope/order/if-shape variants of
 //               total, i and method did not move the constant, nor did
 //               unsigned/long types, `true`, a nested else chain or a
-//               separate loop variable
+//               separate loop variable, nor did `for (i = 0; ++i < 256;)`
+//               or a `while` loop (s14)
 //   0x00457ed0  one scheduled load (the cylinder height) in the vertex loop
 //               (1105/1153): retail reads it right after the fild, before
 //               the `j` spill store; parentheses on the angle, the cos/sin

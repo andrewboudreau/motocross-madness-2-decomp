@@ -16,6 +16,10 @@
 // `return stream`, and a ternary on the return. VC6 propagates every copy
 // into ebx; retail's value is homed in the `new` temporary's slot from
 // its definition on and read back only for the success return.
+// Also inert (s14 corpus pass): `archive = 0;` then the `new` assignment,
+// and the failure `delete`s without the `if (archive)`. Inverting the
+// Open test into an early return is worse (12 differing lines against
+// 6).
 
 #include "../../src/reconstructed/ResourceManager.cpp"
 
