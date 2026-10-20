@@ -38,6 +38,12 @@
 // pointer alias, used in either product and either operand order (216
 // forms), keeps cell-first too.
 // 0..33 dead initialised int locals at the top keep 1605 at every count.
+// Deleting statements (s14, evidence only) shows that the earlier uses of the
+// leaves decide it. Without the centre.x statement both extent products load
+// the minimum first, as retail does. With centre.x reduced to
+// `cell * 0.5f`, only extent.x flips. Deleting centre.y, centre.z, extent.z,
+// the 0.1 test or the terrain reload flips neither. See
+// docs/VC6_PATTERN_CORPUS.md section 6 (two indirect words).
 //
 // DrawableGridNode 0x00480ad0 (4-cell block draw, 438 bytes; 395 of 438):
 // retail keeps the zero start offset in eax from the prologue and compares
