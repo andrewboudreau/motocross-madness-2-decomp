@@ -775,8 +775,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot72@Vehicle",
     "target_va": "0x00527e30",
     "target_size": 831,
-    "expect": "partial",
-    "notes": "770/831 strict. Normal accumulation + slot-74 call. Fixed by a separate last-flagged-wheel pointer (the argument stays the loop/reset test), flagged reads through it, plain != 0, VehLen2 for both lengths, float count divide, VehMinF clamp, load declared first. Left: the prologue kVec3Zero copies use edx and load out early instead of retail's esi temp then esi=out/edi=copy. Tried: last declared at top/before load/after *out/before mixed/for-init, sum/out copy swapped (64), load after plain, int divide (407).",
+    "expect": "exact",
+    "notes": "831/831 strict. Normal accumulation + slot-74 call. A separate last-flagged-wheel pointer (the argument stays the loop/reset test), flagged reads through it, plain != 0, VehLen2 for both lengths, float count divide, VehMinF clamp, load declared first, then the mixed/flagged/plain counters before the sum and *out kVec3Zero copies: with the counters initialised after the copies, mixed took the dead out argument slot and the prologue copied through edx (24 of 720 orders are exact, all with the counters before the copies).",
     "bindings": "Vehicle.bindings.json"
   },
   {

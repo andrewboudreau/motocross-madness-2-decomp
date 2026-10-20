@@ -616,18 +616,19 @@ static inline float VehMinF(float a, float b) { return (a < b) ? a : b; }
 // Retail keeps the argument wheel (tested from its stack slot, also in the reset test) apart
 // from the last flagged wheel (edi, initialised from the argument): flagged wheels are read
 // through that pointer, plain wheels through the loop's element, so the two branches do not
-// share a tail.  Load is declared first (frame slot 0) and the average divides by a float
-// count (fild/fdivp, not fidiv).
+// share a tail.  Load is declared first (frame slot 0), then the three counters ahead of the
+// two zero copies (retail's esi copy temp, the dead `out` slot reused for len2), and the
+// average divides by a float count (fild/fdivp, not fidiv).
 void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
 {
     if (crashState != 0)
         return;
     float load = 0.0f;
-    Vec3 sum = kVec3Zero;
-    *out = kVec3Zero;
     int mixed = 0;
     int flagged = 0;
     int plain = 0;
+    Vec3 sum = kVec3Zero;
+    *out = kVec3Zero;
     VehicleWheel* last = wheel;
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* w = wheelList[i];

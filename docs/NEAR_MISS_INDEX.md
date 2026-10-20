@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 133, c 100, total 235. The three class (a) functions of the
+Counts: a 2, b 133, c 99, total 234. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -114,7 +114,6 @@ retail does; grouping the x row's first two products does the same for that row.
 | krusty2/vehicle/Vehicle | `0x005268d0` | 223/1578 | b | ratio 0.59: retail adds `xor ebx, ebx`; hasBody/otherVel registers swapped (ebp/ebx); slot order differs |
 | krusty2/vehicle/Vehicle | `0x005276d0` | 496/523 | b | 3 code diffs: `mov [edx + 4], esi` scheduled before `fstp [esp + 0x14]` (midpoint branch); return-pointer `lea eax, [esp + 0x20] ; push eax` earlier in the lead-wheel branch |
 | krusty2/vehicle/Vehicle | `0x00527a20` | 349/870 | b | 25 code diffs: `jne @99` vs `jne @98 ; mov [esp + N], 0 ; mov edx, [~`; `lea edx, [esi + 0x120]` vs `mov [esi + 0x12c], 0`; slots differ |
-| krusty2/vehicle/Vehicle | `0x00527e30` | 770/831 | c | frame and slots match; the prologue's kVec3Zero copies use edx and load `out` into esi first (retail: esi as the copy temp, then esi = `out`, edi = its copy) |
 | krusty2/vehicle/Vehicle | `0x005281b0` | 502/539 | b | 4 code diffs: retail stores field_0x4e8 before the abs `fcom`; `fld st(0) ; fmul [t.x]` vs `fld [t.x] ; fmul st(1)`; scratchVector .y store scheduled later; len/sign dead-parameter slots swapped |
 | krusty2/vehicle/Vehicle | `0x005286a0` | 291/784 | b | slot 56: frame 0x3c matches; retail shares the ground-normal output with the projection and n with the side vector; register roles |
 | krusty2/vehicle/Vehicle | `0x0052a940` | 302/3254 | b | frame 0x104 matches; int `settled` matches retail; retail keeps a function-level zero in ebx and `hit` in ebp (`mov ebp, eax ; xor ebx, ebx`, both reloaded at the back edge), ours only has loop-local zero registers; up/zeroB/lift/pivot/o1..o3 slot order differs |
