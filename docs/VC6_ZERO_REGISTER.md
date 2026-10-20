@@ -237,3 +237,18 @@ value in one function:
 
 The probes are throwaway units compiled with `tools/compile.py --compiler
 vc6 --profile vc6_o2_mt` and disassembled with the repository's COFF tools.
+- Bike slot 38 `0x00405190`: retail clears `ebx` at entry for the zero stores
+  (hasBody, notifyOther), the `crashState` compare, the case 0 store and the
+  0x3e8 `push`, and later reuses `ebx` for `otherVel`.
+  - At the join of the no-body cases retail reloads `ebp` (ctx) and `ebx`
+    (otherVel) from `[esp + 0x1c]`, which is out's home. That is what VC6 emits
+    for register variables left uninitialised on those paths, so retail's
+    `otherVel` probably has no initialiser.
+  - `Vec3* otherVel;` reproduces the reloads and the shared home (strict 280 to
+    1127 of 2874). But the zero web then gets scratch `eax`, the switch index
+    moves to `ecx`, and the case 0 compare becomes `test` (aligned 689 to 642).
+    With `otherVel = 0` the zero gets `ebp` beside `otherVel`'s `ebx`.
+  - Inert under the uninitialised form: every order of the six scalar
+    declarations, passing hasBody or other as the 0x3e8 argument, and redundant
+    `hasBody = 0` stores in case 0x65 or after the slot 3 call. What gives retail's
+    zero web a callee-saved register is still open.
