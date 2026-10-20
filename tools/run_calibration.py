@@ -5863,6 +5863,15 @@ CASES = [
         'reason': 'row offset loaded before x through a row pointer and a copy of x as the inner loop variable',
     },
     {
+        'name': 'Griddraw border vertex walk',
+        'bindings': 'src/reconstructed/Griddraw.bindings.json',
+        'source': 'src/reconstructed/Griddraw.cpp',
+        'symbol': '?WalkBorderVertex@DrawableGridNode@@QAEXHHHHPAUGridBaseCell@@H@Z',
+        'target_va': '0x00483200',
+        'target_size': 956,
+        'reason': 'one child pointer declared per lookup block; final child call becomes a loop',
+    },
+    {
         'name': 'Griddraw edge table build',
         'bindings': 'src/reconstructed/Griddraw.bindings.json',
         'source': 'src/reconstructed/Griddraw.cpp',
