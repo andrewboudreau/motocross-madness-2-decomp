@@ -47,7 +47,9 @@
 // the width. Updating `row` before `sourceRow`, the row steps or `to++` in
 // the for increments, declaring `to` before `from`, a `below` row pointer,
 // counting x or y down and hoisting the loop counters, pointers or entry
-// indices are the same or worse.
+// indices are the same or worse. So are (40 forms, all 1129) `width > x`,
+// the x increments swapped, `1 + sourceStride` and five spellings of the
+// source row step.
 //
 // DitherConvert (0x004cf2a0, 1759 bytes; candidate 1735, 242 match): the
 // Floyd-Steinberg ditherer behind the dithered converters. Two 16.16 error

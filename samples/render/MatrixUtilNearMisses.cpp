@@ -24,6 +24,9 @@
 //   126..171.
 //   0..33 dead initialised int locals at the top give 171 at every count
 //   (unlike the live locals above, they do not reorder it).
+//   A D3DMATRIX-style matrix (a union of `_11`..`_44` members and m[4][4])
+//   as the parameter type gives 171 with every operand order of the
+//   x/z terms (512 forms); reached through a cast local it gives 121.
 //
 // TriangleNormal 0x004a11e0 and ViewMatrix 0x004a1500 are exact in
 // src/reconstructed/MatrixUtil.cpp (parenthesised products).

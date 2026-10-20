@@ -42,7 +42,12 @@
 //               `(float)j`, every order of the five loop statements and
 //               split cos/sin locals give 1105 or (mostly much) worse
 //   0x00458da0  four `[eax + esi]` operands come out as `[esi + eax]`
-//               (457/461). The `name[length] = 0` byte store decides it:
+//               (457/461). Also unchanged: inline helpers for the
+//               terminator, the clamped copy, the length clamp or the
+//               extension; the name head in its own block; `file` and `i`
+//               declared at the top or at first use (a single reassigned
+//               `length` local gives 442).
+//               The `name[length] = 0` byte store decides it:
 //               without it (or without the whole name head) the loop gets
 //               retail's `[veg + i]` order, and each further byte store at
 //               a variable index toggles it back (parity-like; int/short/
