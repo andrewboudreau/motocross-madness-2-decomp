@@ -86,7 +86,7 @@
     "target_va": "0x004da7b0",
     "target_size": 842,
     "expect": "partial",
-    "notes": "Near miss: tail and clip rectangle (stored left, right, top, bottom) match; register choice in the sprintf/QueryFlag set-up and the saved render-target fields differ, and retail keeps a second release-and-return-0 block for the surface-format failures.",
+    "notes": "Near miss: tail and clip rectangle (stored left, right, top, bottom) match; nesting the texture and camera success path under one shared release-and-return-0 reproduces retail's separate surface-format failure block (130 -> 153, 841 bytes against 842). Left: register choice in the sprintf/QueryFlag set-up and the saved render-target fields. Session 14 dead ends: nested format test, if/else format chains, assignment-in-condition pixels test, every save and restore order of height/surface/width, owner read before or after the saves, sprintf through &driverName[0], a cast or a named pointer, QueryFlag through a local.",
     "bindings": "../../../src/krusty2/shadow/ProjectedShadow.bindings.json"
   },
   {

@@ -939,6 +939,14 @@ try on similar code. None is a rule.
   directly keeps the products' stores on `right`; `Vec3 rearCross; rearCross.x = ...;
   right = rearCross;` gives retail's stack result and int-move copy. `right = Vec3(...)`,
   a constructed named copy and a CrossProduct call all lose aligned instructions.
+- **One trailing failure after a nested success path keeps an earlier early return apart.**
+  ProjectedShadow Init (`0x004da7b0`, 130 to 153 of 777, 844 to 841 bytes): retail has two
+  copies of the release-and-return-0 block, one for the surface-format failure and one shared
+  by the caps, texture, pixels and camera failures. Four early returns merge differently
+  (the format and camera failures share a block placed mid-function). Nesting the texture,
+  pixels and camera successes as `if (ok) { ... return this; }` with one trailing
+  `BaseObjectVirtualSlot2(); return 0;` gives retail's two blocks in retail's order. Nesting
+  only the camera test changes nothing.
 - **Gotos do not move blocks; the flow graph does.** KrustyBike Fn_00414370
   (`0x00414370`): retail places a shared tail right after a loop and the other branches
   jump back to it. Rewriting the source with labels so that the tail follows the loop
