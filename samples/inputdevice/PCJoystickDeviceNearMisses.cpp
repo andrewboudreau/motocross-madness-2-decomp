@@ -25,6 +25,14 @@
 // register for the whole function (ebp), while retail uses immediate zeros
 // and enregisters the values in ebx/ebp inside the loop. Abs must be an
 // inline ternary (retail uses jns/neg, not the cdq abs intrinsic).
+// Session 14: loading `events[i].data` once into an `unsigned long data`
+// local before the gamepad switch (cases `(float)data`) removes the zero
+// register and matches the prologue and first 66 instructions (strict
+// 469/1652, regmasked 38 hunks/400 aligned against 45/397), but moves the
+// event pointer from edi to ebx where retail reloads [edi] in each case,
+// so unmasked alignment is worse (67 hunks/292 against 61/368); not kept.
+// Reusing `value` for the load, or a static inline helper taking the data
+// by value, removes the zero register the same way.
 #include <string.h>
 
 #include "../../src/reconstructed/PCJoystickDevice.h"

@@ -463,6 +463,129 @@ failed:
     return result;
 }
 
+// 0x00534420: import thunk (jmp [0x00550030]).
+extern "C" long __stdcall DirectPlayLobbyCreateA(GUID* provider,
+                                                 UnknownDirectPlayLobby3A** lobby,
+                                                 void* outer, void* data,
+                                                 unsigned long dataSize);
+
+// Copies a literal error text into `error`, truncated to 255 characters.
+#define NET_ERROR_TEXT(error, text)                                      \
+    {                                                                    \
+        int length = strlen(text);                                       \
+        int count = length > 255 ? 255 : length;                         \
+        strncpy(error, text, count);                                     \
+        error[count] = 0;                                                \
+    }
+
+// 0x004ab960: connects with the settings of a lobby that launched the game.
+// The size query fails on its own test (VC6 merges its error text with the
+// second query's), and the interfaces are declared in retail's zero-store
+// order.
+long NetworkInterface::ConnectUsingLobby()
+{
+    UnknownDirectPlay4A* baseDirectPlay = 0;
+    UnknownDirectPlay4A* directPlay4 = 0;
+    UnknownDirectPlayLobby3A* baseLobby = 0;
+    NetConnection* connection = 0;
+    unsigned long size;
+    unsigned long flags;
+    char error[256];
+    long result;
+
+    strcpy(error, "");
+    result = DirectPlayLobbyCreateA(0, &baseLobby, 0, 0, 0);
+    if (result < 0) {
+        NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::DirectPlayLobbyCreate");
+        goto failed;
+    }
+    result = baseLobby->QueryInterface(IID_IDirectPlayLobby3A, (void**)&lobby);
+    if (result < 0) {
+        NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::QueryInterface");
+        goto failed;
+    }
+    result = lobby->GetConnectionSettings(0, 0, &size);
+    if (result < 0 && result != NET_DPERR_BUFFERTOOSMALL) {
+        NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::GetConnectionSettings");
+        goto failed;
+    }
+    connection = (NetConnection*)DebugMalloc(size, __FILE__, 778);
+    if (!connection) {
+        result = NET_E_OUTOFMEMORY;
+        NET_ERROR_TEXT(error, "DPERR_OUTOFMEMORY");
+        goto failed;
+    }
+    result = lobby->GetConnectionSettings(0, connection, &size);
+    if (result < 0) {
+        NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::GetConnectionSettings");
+        goto failed;
+    }
+    GetSessionFlags(&flags);
+    connection->session->flags = flags;
+    connection->session->maxPlayers = 8;
+    result = lobby->SetConnectionSettings(0, 0, connection);
+    if (result < 0) {
+        NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::SetConnectionSettings");
+        goto failed;
+    }
+    result = lobby->Connect(0, &baseDirectPlay, 0);
+    if (result < 0) {
+        NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::Connect");
+        goto failed;
+    }
+    result = baseDirectPlay->QueryInterface(IID_IDirectPlay4A, (void**)&directPlay4);
+    if (result < 0) {
+        NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::QueryInterface");
+        goto failed;
+    }
+    EnterCriticalSection(NET_LOCK(lock));
+    directPlay = directPlay4;
+    isHost = (connection->flags >> 1) & 1;              // DPLCONNECTION_CREATESESSION
+    ReadProviderCaps((const GUID*)connection->provider);
+    if (connectionMode == 2 && isHost)
+        result = directPlay->CreatePlayer((unsigned long*)&localPlayer, connection->playerName,
+                                          receiveEvent, 0, 0, 0x100);
+    else
+        result = directPlay->CreatePlayer((unsigned long*)&localPlayer, connection->playerName,
+                                          receiveEvent, 0, 0, 0);
+    if (result < 0) {
+        LeaveCriticalSection(NET_LOCK(lock));
+        NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::CreatePlayer");
+        goto failed;
+    }
+    AddPlayer(localPlayer, connection->playerName->shortName);
+    lobbyConnected = 1;
+    LeaveCriticalSection(NET_LOCK(lock));
+    if (baseDirectPlay) {
+        baseDirectPlay->Release();
+        baseDirectPlay = 0;
+    }
+    if (baseLobby) {
+        baseLobby->Release();
+        baseLobby = 0;
+    }
+    DebugFree(connection, __FILE__, 867);
+    return 0;
+
+failed:
+    ReportDirectPlayError(result, __FILE__, 887);
+    if (baseDirectPlay) {
+        baseDirectPlay->Release();
+        baseDirectPlay = 0;
+    }
+    if (directPlay4) {
+        directPlay4->Release();
+        directPlay4 = 0;
+    }
+    if (baseLobby) {
+        baseLobby->Release();
+        baseLobby = 0;
+    }
+    if (connection)
+        DebugFree(connection, __FILE__, 892);
+    return result;
+}
+
 // 0x004abd40: strips the trailer DPlay appended to a received message.
 void NetworkInterface::StripMessageTrailer(unsigned char** data, unsigned long* size,
                                              int* guaranteed, int* sequence, int* target)

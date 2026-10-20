@@ -27,6 +27,12 @@
 //   instruction (38 instruction diffs against 70) but scores 249/901;
 //   the 8-bit dim loop as `for (x = line & 1; x < width; x += 2)
 //   bits[line * width + x] = 0;` gives 68.
+//   Session 14: `texture = 0` after the bytes-per-pixel read puts the
+//   `xor` after that call as retail does (strict 300, same hunks), but the
+//   zero still serves the null tests. Retail returns the new texture from
+//   edi, which it zeroes before the new-result test and shares with the EH
+//   state store; here ebx holds the texture and the null arm is
+//   `xor ebx, ebx` after the branch.
 // 0x00486b10 (106 bytes, 89/106): one ternary per component (below; two
 //   separate if/else statements compile the same) gives retail's block
 //   order and `pop edi` placement (one if/else block: 86/106). Retail still

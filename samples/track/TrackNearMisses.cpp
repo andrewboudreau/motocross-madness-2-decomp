@@ -34,7 +34,13 @@
 // from the frame. A do-while walk, separate or shared loop variables, an
 // aggregate TrackPos, function-scope distances and an inline accept helper
 // do not change it. The fifth parameter is the work list (RaceStatus.cpp's
-// binding declares it int).
+// binding declares it int). Retail's entry stores give the slots: list
+// (+0x18 above the saved registers, immediate 0), found (+0x1c, from the
+// ebp zero, so candidates = 0 shares the zero web) and this (+0x20);
+// candidates lives in ebp for the whole function with no home. Here
+// candidates gets ebp in the strip loop, a slot at +0x20 and is reloaded
+// around the path loop, where ebp holds start.t. Dropping the dead
+// `list = 0` removes its store (1525 bytes) but retail has it.
 //
 // TrackRecordDlg::ListHighScoreTracks (TrackRecord.cpp, 0x0051ffe0, 932
 // bytes): same size and layout as retail; 926 of 932 bytes match. Setting
@@ -44,7 +50,11 @@
 // (186 -> 926; before this the later copy kept n in esi and reloaded
 // `directory`). The one remaining difference: retail compares the
 // CurrentName result with the zero in ebx (`cmp eax, ebx`) where VC6 here
-// emits `test eax, eax`; `!= 0`, `!= count` and an `ok` local leave it.
+// emits `test eax, eax`; `!= 0`, `!= count` and an `ok` local leave it, and
+// so do `> 0`, `!= prefixed - prefixed` and `digit = 0` before the test
+// (moving it to the head of the found branch costs 286 bytes). Both builds
+// already compare `prefixed` with ebx in the next block and keep digit in
+// ebx, so the ebx zero web is the same; only the call-result test misses it.
 #include <math.h>
 #include <stdio.h>
 #include <string.h>

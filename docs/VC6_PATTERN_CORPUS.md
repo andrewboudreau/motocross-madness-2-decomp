@@ -47,12 +47,12 @@ Exact examples:
 - UIAnim::Rewind `0x00472f50` (zero stores in both arms).
 - KrustyUI::ClearEntries `0x0049bb80` (`entries = 0` after a guarded free; the zero is kept in edi across the call).
 - D3DIMSoultreeObject::SetLowestLod `0x00444d40` and Terrain `0x00507930` (a clamp to 0, then the clamped value is compared and stored).
+- NetworkInterface::ConnectUsingLobby `0x004ab960`: giving the size query its own failure test, so its error path no longer runs through the second query's test, gives retail's `cmp esi, ebx` against the entry zero.
 
 Near misses that differ in this shape:
 - Griddraw `0x00480ad0` (render).
 - BikeRace `0x0041f1d0` (race): retail keeps 0 in edx from the first instruction.
 - GUIManager `0x00486170` (ui): retail has no `xor ebx, ebx`.
-- Net `0x004ab960` (net): retail tests where the candidate compares with ebx.
 - KrustyBike `0x00493660` (physics): retail keeps 0 in edi.
 - FileStream `0x00461340` (io).
 
