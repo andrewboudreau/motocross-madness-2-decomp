@@ -18238,6 +18238,15 @@ CASES = [
         'reason': 'primary slot 4; new 0x2d8 line 0x7d5',
     },
     {
+        'name': 'D3DIMSoulTree.CPP D3DIMSoulTree slot 5 local bounds',
+        'bindings': 'src/reconstructed/D3DIMSoulTree.bindings.json',
+        'source': 'src/reconstructed/D3DIMSoulTree.cpp',
+        'symbol': '?SoultreeVirtualSlot5@D3DIMSoultreeObject@@UAEXXZ',
+        'target_va': '0x00444140',
+        'target_size': 763,
+        'reason': 'primary slot 5; per-component centre sum, valid flag stored last',
+    },
+    {
         'name': 'D3DIMSoulTree.CPP D3DIMSoulTree subtree 0x444440',
         'bindings': 'src/reconstructed/D3DIMSoulTree.bindings.json',
         'source': 'src/reconstructed/D3DIMSoulTree.cpp',
