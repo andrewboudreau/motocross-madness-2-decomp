@@ -70,6 +70,17 @@
 //   `for (;;) { ...; break; }`, `while (1)` and `if (LookAt(..)) {}`
 //   around the slot-29 call; tests on `this`, `&viewTarget` or a target
 //   pointer add code (109-523).
+//   Session 14 copy forms, all 1181 unless noted: a `const Vector3&` local
+//   passed by value, that reference copied into a named local first, a
+//   named copy assigned after its declaration, and a `pointer ? viewTarget
+//   : viewTarget` argument in the drag branch only (pointer is known there,
+//   so the test is threaded away). The same ternary in both branches, or on
+//   previewDragging or frameTime, keeps a real test (75-295). Repeated
+//   `if (pointer)` or `if (dx == dx)` tests ahead of the slot-29 call are
+//   also threaded away and leave the block unsplit (1181); an
+//   `if (!previewDragged)` test on the member is reloaded (801).
+//   The reference, named-copy and threaded-ternary forms also leave
+//   0x004f8820 (1214) and 0x004d72c0 (1233) unchanged.
 // SPRaceInfoDlg::HandleEvent (0x004507a0, 1652 bytes) and
 // MPRaceInfoDlg::HandleEvent (0x004513a0, 2004 bytes): the same
 //   calls, strings and list columns; inside the per-racer loops retail

@@ -23,6 +23,21 @@
 //   `pixels` local in the block (with the budget written into it, into a
 //   `free` local, as `memory -= pixels * 2` or inline) or at the top gives
 //   the shared product but sinks every field load (6 of 116).
+//   Mechanism (session 14 probe): VC6 forwards a local that has a single
+//   use into that use, so the bitDepth and budget loads move into the
+//   full-screen block, and the forwarded bitDepth load then reorders the
+//   product (bitDepth * height * width), which breaks the shared
+//   width * height. Giving bitDepth and a `memory` local a second use in the
+//   windowed call (a wrong-code probe) loads all five values at the top in
+//   retail's registers, with retail's `lea` mode pointer for +8. So in
+//   retail every local was materialised. These leave the loads forwarded
+//   (26): dead copies of bitDepth and memory, register or const locals, an
+//   unused label before the test, an inline reader with out-parameters,
+//   inline fit/size check helpers (three forms), and the budget and need
+//   computed into locals at the top. /G6 scores 10 and /O1 18. An empty
+//   inline function given all five values, before the test or in the
+//   windowed branch, is removed before the decision (26); a `pixels` and
+//   `memory` local pair at the top gives 6.
 // UnknownDisplay::ProbeNonLocalTextureMemory (0x004ca5a0, 484 bytes): retail keeps
 //   `target` in ebp, caches 480/16 in registers for the mode search and has
 //   one more 4-byte local; the flow (EH-guarded new PCRenderTarget, 128x128

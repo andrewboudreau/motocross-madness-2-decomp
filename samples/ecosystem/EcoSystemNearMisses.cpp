@@ -17,6 +17,7 @@
 //               /G6 scores lower (267); redundant parentheses on the
 //               differences, the products and the detail-band casts (225
 //               combinations) do not move it either (356/369)
+//               nor 1..33 prepended typedefs (session 14, all 356)
 //   0x004570a0  retail loads the definition-table entry once into edi before
 //               the position conversions and picks other registers for the
 //               shape store blocks (103/386); retail reloads the index

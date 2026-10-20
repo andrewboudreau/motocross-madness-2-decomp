@@ -27,6 +27,10 @@
 // a `const float&` alias of the camera's +0x198 (1152), a `float&` alias of
 // field_0x1ec for the chained store, and all 24 orders of the alias, the
 // placedFieldOfView store, the delta and `field_0x1f0 = 0`: at best the same 1299.
+// Session 14 parentheses: the numerator product, the whole quotient, the
+// length assignment, both denominator factors and the operands swapped give
+// 1299; `(targetScreenWidth)` alone, `num * (w / den)` and two divisions
+// give 555-600.
 //
 // VisualCue::Tick (0x0048b100, 2796 bytes, jump table at
 // 0x0048bbec): places the cue in front of the camera by camera mode

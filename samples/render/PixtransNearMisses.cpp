@@ -50,6 +50,12 @@
 // indices are the same or worse. So are (40 forms, all 1129) `width > x`,
 // the x increments swapped, `1 + sourceStride` and five spellings of the
 // source row step.
+// Session 14 parentheses (all 1129): `(sourceStride * 2)` in the keyed row
+// step, `(count * 4)` in the three averages, a fully bracketed index
+// expression, `from[(sourceStride + 1)]`, `(from + sourceStride)[1]` and
+// `*(from + sourceStride)`. The two differing loads are the reloads of
+// sourceStride (eax) and width (edx) at the keyed x loop's exit, both
+// carried into the y loop's head.
 //
 // DitherConvert (0x004cf2a0, 1759 bytes; candidate 1735, 242 match): the
 // Floyd-Steinberg ditherer behind the dithered converters. Two 16.16 error

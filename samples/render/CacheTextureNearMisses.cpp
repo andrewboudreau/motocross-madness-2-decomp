@@ -23,6 +23,8 @@
 // the Blt result stored and tested after the loop (338) and `goto failed`
 // to a label at the end or in an `if (result)` block (450-454). This is the
 // known `jle exit; jmp top` loop-bottom shape that VC6 has not reproduced.
+// Also 462 (s14, current order): the Blt `return 0` braced, with and
+// without an unbraced else, the Blt result in a named local, and `!= 0`.
 
 #include <string.h>
 

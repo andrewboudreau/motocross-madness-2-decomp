@@ -39,6 +39,8 @@
 // no inner shadowing `size` (853), a racer local at the top of the else
 // (worse), a racer local in the "%.3f" branch only, `!= 0` tests, no racer
 // local in the 0x6c0 branch (884) and unbraced if/else (unchanged).
+// Session 14: all 24 declaration orders of text, name, length and size
+// keep 966.
 
 // RadarOverlay::DrawTrackOutline (0x0051c720, 1016 bytes; candidate
 // 1002): draws the track outline through a TrackListItem work list. The

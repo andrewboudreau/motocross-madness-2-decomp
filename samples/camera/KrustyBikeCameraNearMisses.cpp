@@ -15,6 +15,11 @@
 // slot 47, a float local for the height, `2.0f + y`, explicit this-> calls, a
 // local for cameraState, `== false`, and the tail nested in an else. A view
 // local for the second call and setting the flag last are worse.
+// Session 14 (all 337): `= 1` for the flag, casts on the slot 46/47 vector
+// arguments, `!= 0` and `== 0` tests, `== false`, an empty-then-else form,
+// a `starting` bool local, and dead statements (a discarded load, an unused
+// int, a scoped pointer) ahead of the second call. The rotation also
+// reaches the restore tail in the other branch.
 // The vector passed to slot 46 (0x0067c3e8) is the unit's kVec3YAxis
 // (src/reconstructed/KrustyBikeCamera.cpp); it is file-static there, so this
 // sample keeps its own static.

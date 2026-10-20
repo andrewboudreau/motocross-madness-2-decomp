@@ -19,6 +19,9 @@
 //   `HitRow(rect, GetRowHeight(row), point)` storing `r.bottom = r.top + h`
 //   gives retail's `add eax, <top>` (319/342, 11 instruction diffs); VC6
 //   then still loads point->x before y.
+//   Session 14: `GetRowHeight(row) + rect.top` without a local (155), a
+//   `bottom` local built with `+=` (322, same code), `rect.bottom = rect.top`
+//   then `+=` the call (134) and reusing `height` for the top step (120).
 // 0x0047b490 colour-key test (120/220): keeping the key pixel in the red
 //   term's variable (`pixel |= green | blue`) keeps it in a register and
 //   spills the row counter into the key's argument slot as retail does;
@@ -69,6 +72,9 @@
 //   Unlock and folds the Lock-failure return into `xor eax, eax`: retail
 //   never treats `opaque` as a known constant. Not kept (a goto for a
 //   partial gain).
+//   Session 14: a second `if (format != 8)` test instead of the else (256,
+//   same code), the inverted test or a switch (245) and one ternary
+//   comparison (249) do not give retail's two result homes.
 // 0x004738a0 UIEditBox slot 40 (440/975): retail keeps the width and the
 //   redraw count in memory.
 // 0x00474150 UIEditBox slot 20 (1018/1044): Backspace reads the length and
@@ -85,6 +91,12 @@
 //   `&controlText[cursor]` with `length + 1 - cursor`, length-first stores,
 //   an Enter-case reorder and all 6 declaration orders x 3 lead-test forms
 //   x 3 decrement forms.
+//   Session 14: one memmove per arm followed by a second `if (lead)` for
+//   the decrements, with only the `length` local, loads both fields before
+//   the branch as retail does (strict 1024) but gives the text pointer ebx
+//   (9 differing instructions against 8); with both locals it saves ebp
+//   (236), one shared memmove or a `step` local drops a call (75-98), and a
+//   `text` or `end` pointer local is worse (99-338).
 // 0x00478570 UIMultiState slot 40 (139/682): retail keeps &+0x1bc in ebx and
 //   shares its spill slot with the DC.
 // 0x0047a400 drop-down layout (702/962): the open area's bottom written from
