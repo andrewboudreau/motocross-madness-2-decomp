@@ -24151,6 +24151,14 @@ CASES = [
         'target_size': 679,
     },
     {
+        'name': 'Net.cpp 0x4ab960 connects with the settings of a lobby that launched the game',
+        'bindings': 'src/reconstructed/Net.bindings.json',
+        'source': 'src/reconstructed/Net.cpp',
+        'symbol': '?ConnectUsingLobby@NetworkInterface@@QAEJXZ',
+        'target_va': '0x004ab960',
+        'target_size': 989,
+    },
+    {
         'name': 'Net.cpp 0x4abd40 strips the trailer DPlay appended to a received message',
         'bindings': 'src/reconstructed/Net.bindings.json',
         'source': 'src/reconstructed/Net.cpp',

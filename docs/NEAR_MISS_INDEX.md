@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 124, c 97, total 223. The three class (a) functions of the
+Counts: a 2, b 123, c 97, total 222. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -118,7 +118,6 @@ the integration temporary. When only displacement sizes differ, read the
 | krusty2/vehicle/Vehicle | `0x005281b0` | 523/539 | c | 2 code diffs: retail stores field_0x4e8 before the abs `fcom`; `fld st(0) ; fmul [t.x]` vs `fld [t.x] ; fmul st(1)` (Math3D operators fixed the scratchVector .y store; frame homes match) |
 | krusty2/vehicle/Vehicle | `0x005286a0` | 754/784 | c | slot 56: two side-cross products load their multiplicands in the other order (retail side.y*a.z, a.x*side.z); source operand order has no effect |
 | krusty2/vehicle/Vehicle | `0x0052a940` | 2339/3254 | b | 40 differing instructions (3257 B; backingUp and DriveForce's reversing are char). The lift tilt-axis arm is laid out after the Rotate(k) arm (30 control-flow forms, dead end); prevSpeed is loaded before the wheel-count store; some local slots differ |
-| net/Net | `0x004ab960` | 149/1072 | b | 51 code diffs: `test esi, esi ; jge @54` vs `cmp esi, ebx ; jge @51`; retail adds `lea edx, [esp + N]`; slots differ |
 | net/Net | `0x004aced0` | 361/370 | c | ring slot addressed through a byte-offset helper (fixes every SIB order); retail loads `from` before `lea ebx, [edx + edi]` for the system-message pointer, VC6 forms the pointer first (`mov ebx, edi ; add ebx, ecx`) and pushes system[2] from edx instead of eax |
 | net/NetThread | `0x004af8e0` | 234/338 | c | 19 code diffs: retail adds `push ebx`; retail adds `mov eax, [A]` |
 | net/NetThread | `0x004afa90` | 740/1251 | b | two blocks: the 0x80 acknowledgement swaps edx and ax/dx, the 0x4b keep-alive caches data in esi across EnterCriticalSection in retail |
@@ -298,10 +297,9 @@ instead of copies) and ControlInterface slot 3 `0x004bf4f0` (43 -> 76) are
 measured that way. Every other sample that did not include its unit was
 also compiled inside it (2026-10-12 scan, duplicate statics and helpers
 removed): no other function's bytes changed except PCAudio `0x004bc6b0` and
-EcoSystem `0x00457480` (their rows are already measured in the unit), CarProcedural slot 10
-`0x0042fd80` (221 -> 211, worse) and Net `0x004ab960` (149 either way, the
-candidate's extent becomes retail's 1072); those samples keep their header
-includes.
+EcoSystem `0x00457480` (their rows are already measured in the unit) and
+CarProcedural slot 10 `0x0042fd80` (221 -> 211, worse); those samples keep
+their header includes.
 
 ## Reproduction
 

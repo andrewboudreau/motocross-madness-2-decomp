@@ -88,7 +88,6 @@ Function and member names in `Net.h` are provisional (tier 3) unless noted:
 
 | VA | Size | Match | Difference |
 |---|---:|---:|---|
-| `0x004ab960` | 989 | ~15% | candidate is 1072 bytes; retail keeps zero in ebx and tail-merges the error texts |
 | `0x004aced0` | 370 | 95.5% | SIB operand order and how field_0x34 is reloaded after the slot-17 call |
 
 ## Source shapes that mattered
@@ -119,6 +118,12 @@ Function and member names in `Net.h` are provisional (tier 3) unless noted:
   the gethostbyname test.
 - `0x004addc0`: the order of the two zero-initialized locals sets their
   frame slots.
+- `0x004ab960`: the size query fails on its own test (`result < 0 &&
+  result != DPERR_BUFFERTOOSMALL`) instead of sharing the second query's.
+  That gives retail's `cmp esi, ebx` tests, the cross-jumped error texts and
+  the memory reload of `connection` in the failure block (149/1072 ->
+  985/989). The four interface pointers are declared in retail's zero-store
+  order (baseDirectPlay, directPlay4, baseLobby, connection) for the rest.
 - `0x004ae100`: the early `return 1` paths must share one tail. Nest the
   work under `if (sessions)` and `if (instance)` rather than returning early.
 - `0x004ad5a0`: 65 `case`s with `sprintf` match exactly, including the
