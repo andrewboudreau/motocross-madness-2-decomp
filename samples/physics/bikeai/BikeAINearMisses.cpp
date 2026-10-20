@@ -1930,7 +1930,7 @@ int KrustyBike::Fn_00414370(float dt)
             gate = statusNode->field_0x34;
             dx = position.x - gate->position.x;
             dz = position.z - gate->position.z;
-            if (FastSqrt(dx * dx + dz * dz) < gateAhead) {
+            if (FastSqrt(dx * dx + dz * dz) < speed) {
                 if (BikeAIDot(SafeNormalize(velocity), SafeNormalize(gate->position - position)) < 0.70755f)
                     aiPath.field_0x96c = 40.0f;
                 else
