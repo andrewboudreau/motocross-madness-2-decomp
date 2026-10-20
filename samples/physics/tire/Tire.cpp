@@ -73,6 +73,11 @@ static inline CollisionVec3 TireNormalizeZ(const CollisionVec3& v)
 // Both axes are normalised (skipped when |v|^2 is exactly 1).  When `orthogonalize` is set
 // the vectors are first made perpendicular using c = y x z:
 //   keepZ != 0 : y = z x c  (z is kept)      keepZ == 0 : z = c x y  (y is kept).
+// Near miss (695 of 703): retail loads z.z and z.y before y.x in c.y's and c.z's
+// y.x products.  Inert or worse (session 14): operand order and grouping of each
+// product, negated c.y, declaring y and z apart from their copies (either order),
+// member-wise copies of y and z (53-55 slot lines), and a cross helper taking y and z
+// by reference, pointer or value in either order (y then loads first everywhere).
 void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const CollisionVec3* zAxis,
                            const CollisionVec3* yAxis, int orthogonalize, int keepZ)
 {
