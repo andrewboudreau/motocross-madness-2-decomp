@@ -36,7 +36,9 @@
 //   helpers by value, by const reference, as if/return bodies, with swapped comparisons, as
 //   macros, as three-argument inlines (VC6 calls them out of line); QueryMin(p0, ...) and
 //   (p2, p1) argument orders; the min/max split into statements; the two tests split; p1
-//   declared before p2, p1 written as p0 - DotProduct(...), both dots named first.
+//   declared before p2, p1 written as p0 - DotProduct(...), both dots named first, and
+//   local helpers with a result local, an assigned parameter or an inverted test (118 to
+//   123..147 differing instructions).
 // - TreeTreeQueryNodes 0x004280e0 (2160 bytes, 2228 here): expands the SAT of BoxOverlap
 //   inline with every helper called out of line except QueryAbs, which this source
 //   reproduces through an inline copy of the BoxOverlap body (BoxOverlapInline; BoxOverlap
