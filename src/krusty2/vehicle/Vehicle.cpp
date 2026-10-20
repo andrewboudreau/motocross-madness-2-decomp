@@ -967,7 +967,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             if (UnknownVirtualSlot10())
                 UnknownVirtualSlot0(0.0f);
         }
-        backingUp = UnknownVirtualSlot82() != 0;
+        backingUp = UnknownVirtualSlot82();
         driveDisengaged = crashState == 0 && (backingUp || UnknownVirtualSlot81());
         throttleOn = crashState == 0 && UnknownVirtualSlot80();
         engineState->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
@@ -1530,7 +1530,7 @@ void Vehicle::UnknownVirtualSlot1(float value)
     prevControlInput = kVec3Zero;
     throttleOn = false;
     driveDisengaged = false;
-    backingUp = false;
+    backingUp = 0;
     VehicleSpeedState* s = engineState;
     if (s) {
         s->gear = 0;
