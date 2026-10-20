@@ -919,3 +919,8 @@ try on similar code. None is a rule.
   5268): retail `je L; push eax; jmp M; L: push 0; M: <rest of the pushes>; call`. This is
   `if (c) f(..., p); else f(..., 0);` with VC6 merging the common tail. Every ternary form
   computes the value into a register and pushes it once.
+- **Inline helper arguments are evaluated last parameter first.** Vehicle slot 49
+  `0x0052a940`: retail loads `dt` onto the x87 stack, then computes the smoother target
+  and spills it to a temporary before the clamp compare. That is `VehSmooth(s, target,
+  dt)` returning the new value. With `(s, dt, target)` the target stays on the stack and
+  `dt` is loaded after it (225 to 211 differing instructions).

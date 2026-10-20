@@ -220,6 +220,14 @@ value in one function:
   `return` moves even the entry zero register to `ebx`). See the
   KrustyBike near-miss sample header.
 
+- Vehicle slot 49 `0x0052a940`: retail's `xor ebx, ebx` right after the
+  slot 39 call, with `hit` in `ebp` and both reloaded at the loop's back
+  edge (`mov ebp, [esp + 0x24] ; xor ebx, ebx ; jmp head`), comes from a
+  guarded do-while (`if (steps > 0) do { ... } while (steps > 0);`). The
+  `while` and `for` forms only build zero registers inside the loop body
+  and keep `hit` in memory (120 to 92 differing instructions, 359 to 1720
+  strict bytes at the time).
+
 ## How to read a near miss
 
 - Retail has the zero register and VC6 here does not: look for zero stores
