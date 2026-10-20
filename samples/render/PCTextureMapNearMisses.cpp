@@ -22,6 +22,10 @@
 // first (its EH state is 0). `int cached = field_0x68 & 1` keeps the
 // store but not the constant register; `if (field_0x68 & 1)` keeps the
 // register but tests the byte in place.
+// A bool/char `cached` gets retail's ebx/ebp split (the byte `and al, bl`
+// needs a byte register) but takes its own byte slot and grows the frame;
+// unsigned/long/ternary/!! forms, separate copy locals, a single return,
+// 1..33 dead locals and moving Clone within the TU leave it unchanged.
 //
 // PCTextureMap::CreateSurface (0x004c69c0, 2031 bytes): the setup.
 // Everything but the non-mip format fallback chain lines up, including

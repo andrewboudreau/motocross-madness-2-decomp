@@ -30,11 +30,6 @@
 // index in the innermost loop, a down-counting column loop, rows stepped
 // by 4 cells, a byte-offset cell address and a column-offset cell pointer:
 // all compile to the same 30 of 352 (the row reset still folds away).
-//
-// 0x0043e330 (398 bytes): the walk matches; eax and ecx swap roles for the
-// render target and its camera, the face mask is addressed [face + cube]
-// in retail and [cube + face] here, and the quad test's arguments are
-// evaluated before the camera load in retail.
 
 #include <string.h>
 
@@ -204,35 +199,4 @@ int DrawableCube::LoadTexturesAndCoords(Cube* cube, UnknownCubeTextureContext* c
         }
     }
     return 1;
-}
-
-// 0x0043e330
-void DrawableCube::MarkVisibleCells()
-{
-    Vector3 forward;
-    forward.x = ((UnknownCubeCameraView*)Target()->currentCamera)->viewMatrix.m[0][2];
-    forward.y = ((UnknownCubeCameraView*)Target()->currentCamera)->viewMatrix.m[1][2];
-    forward.z = ((UnknownCubeCameraView*)Target()->currentCamera)->viewMatrix.m[2][2];
-    const Vector3& center = cubeObject->center;
-    const Vector3& eye = ((UnknownCubeCameraView*)Target()->currentCamera)->position;
-    Vector3 offset(center.x - eye.x, center.y - eye.y, center.z - eye.z);
-    for (int face = 0; face < 6; face++) {
-        cubeObject->faces[face].visibleCells = 0;
-        if (!g_visibilityClipper->CanFaceCamera(Target()->currentCamera, &forward,
-                                                                &s_faceNormals[face]))
-            continue;
-        for (int k = 0; k < 25; k++)
-        {
-            const Vector3& point = s_facePoints[face][k];
-            s_viewPoints[k] = Vector3(offset.x + point.x, offset.y + point.y, offset.z + point.z);
-        }
-        g_visibilityClipper->TransformPoints(
-            s_viewPoints, s_viewPoints, &((UnknownCubeCameraView*)Target()->currentCamera)->viewMatrix, 25);
-        for (int i = 0; i < 16; i++) {
-            int corner = i + i / 4;
-            if (g_visibilityClipper->IsQuadOnScreen(Target()->currentCamera, s_viewPoints, corner,
-                                                                  corner + 1, corner + 6, corner + 5))
-                cubeObject->faces[face].visibleCells |= 1 << i;
-        }
-    }
 }

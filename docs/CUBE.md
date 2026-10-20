@@ -35,8 +35,11 @@ Exact:
   the face counter in the dead argument slots in that order,
   docs/VC6_FRAME_LAYOUT.md), the destructor and its deleting wrapper, the
   vectors and texture loaders, and the eight `$E`.
-- cubedraw.cpp (24): the constructor, the destructor and its deleting
-  wrapper, the loader `0x0043d980`, `0x0043e210`, slot 12, slot 14
+- cubedraw.cpp (25): the constructor, the destructor and its deleting
+  wrapper, the loader `0x0043d980`, `0x0043e210`, `0x0043e330` (the
+  visibility test: it matches with the eye reference bound before the cube
+  centre and the camera read through the `renderContext` cast; the
+  `Target()` accessor's expansion swaps eax and ecx), slot 12, slot 14
   `0x0043e4c0` (the cell draw) and its static matrix's atexit thunk
   `0x0043e840`, the eight empty array `$E` (their order cannot be checked
   because the bodies are identical) and the eight vector `$E`. Slot 14
@@ -49,9 +52,8 @@ Exact:
 
 Near misses:
 - `samples/render/CubeDrawNearMisses.cpp`: the geometry builder
-  `0x0043dc60`, the texture coordinates `0x0043e0b0` and the visibility test
-  `0x0043e330`. They differ in register use, strength reduction and
-  constant materialisation.
+  `0x0043dc60` and the texture coordinates `0x0043e0b0`. They differ in
+  register use, strength reduction and constant materialisation.
 
 ## Function names
 

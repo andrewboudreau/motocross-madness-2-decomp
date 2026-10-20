@@ -826,3 +826,10 @@ try on similar code. None is a rule.
 - **A branch straight to the epilogue past `xor eax, eax` returns the tested value.**
   Retail `test eax,eax; jne <pop edi>` after `mov eax,[field]` is
   `if (field != 0) return field;`, not `return 0`.
+- **Reference binding order and inline accessors set scratch roles.** In
+  CubeDraw MarkVisibleCells (`0x0043e330`, 90 to 398 of 398), binding
+  `const Vector3& eye` (the camera position) before `const Vector3& center`
+  gives retail's load order, and reading the camera through
+  `((RenderTarget*)renderContext)` instead of the `Target()` inline accessor
+  swaps eax and ecx for the render target and camera loads. The binding order
+  alone gives 344; the cast alone does nothing (88); together they are exact.

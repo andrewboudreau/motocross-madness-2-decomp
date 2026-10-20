@@ -119,7 +119,9 @@ strength-reduced pixel pointer).
 The average colour `0x004d24d0` is exact (identical explicit returns in the
 palette and 24-bit cases, `default: return 0;`). Near misses
 (`samples/render/PixtransNearMisses.cpp`): `0x004ce420` (the
-1555 halver; retail keeps the two lower-row pixels in frame slots); `0x004cdf10`, the 8888 halver, which
+1555 halver, 280/458 strict: the lower pair read into frame-slot locals before
+the tests and one reused upper `pixel` give retail's x loop; the source row
+stays in ebp from entry where retail copies it from eax at each row head); `0x004cdf10`, the 8888 halver, which
 averages colour over the 2x2 pixels with alpha set (the fourth pixel adds
 the third one's alpha in retail) and differs in register assignment;
 `0x004cee30` (the palette halver, 1129/1133 strict: written as an if/else with one

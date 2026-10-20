@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 133, c 101, total 236. The three class (a) functions of the
+Counts: a 2, b 132, c 101, total 235. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -193,7 +193,6 @@ retail does; grouping the x row's first two products does the same for that row.
 | render/CacheTexture | `0x005102d0` | 426/529 (masked) | b | 13 code diffs; slots differ |
 | render/CubeDraw | `0x0043dc60` | 121/1064 | b | 53 code diffs: `xor ebp, ebp` vs `xor edx, edx`; `mov [esp + N], ebp ; mov edi, 0x100 ; o~` vs `mov [esp + N], edx ; mov ebx, 0x100 ; o~`; slots differ |
 | render/CubeDraw | `0x0043e0b0` | 30/352 | c | 22 code diffs: retail adds `push ebx`; retail adds `mov ecx, [esp + N]` |
-| render/CubeDraw | `0x0043e330` | 90/399 | b | 15 code diffs: `mov ecx, [edi + 0x18] ; mov eax, [ecx +~` vs `mov eax, [edi + 0x18] ; mov ecx, [eax +~`; `mov eax, [ecx + 8] ; mov edx, [eax + 0x~` vs `mov ecx, [eax + 8] ; mov edx, [ecx + 0x~`; slots differ |
 | render/D3DIMSoulTree | `0x00440810` | 135/1349 | b | 50 code diffs: `jle @345 ; xor esi, esi` vs `jle @340`; `mov [esp + N], esi ; mov eax, [edi + 0x~` vs `mov edx, [edi + 0x1c] ; mov esi, ebx ; ~`; frame 0x84 vs 0x80, slot order differs |
 | render/D3DIMSoulTree | `0x00440f30` | 657/7296 | b | DrawCurrentLod: static-local and `$E` bindings fixed, all relocations bound; mode 8/2 normalisations call the out-of-line Vector3 constructor 0x00404e60 as retail (525 differing insns, was 548); frame (0x940 vs 0x9e8) and register allocation left |
 | render/D3DIMSoulTree | `0x00443aa0` | 799/832 | c | 11 code diffs: retail lacks `fmul [eax + 0x10] ; fld [esp + N]`; retail lacks `faddp st(1)` |
@@ -219,7 +218,7 @@ retail does; grouping the x row's first two products does the same for that row.
 | render/MorphBastardModifier | `0x004a33b0` | 1938/2046 | b | spill homes of the loop scalars and the two inverse temporaries; operand order inside the channel inverse's products |
 | render/MorphBastardModifier | `0x004a3c80` | 74/3663 | b | 4 code diffs: `push ebp` vs `mov ebx, [esp + N]`; `mov ecx, [esp + N]` vs `mov ecx, [ebx + 0x44]`; frame 0x1b4 vs 0x1fc |
 | render/MorphBastardModifier | `0x004a4c60` | 185/1570 | c | object/channel loop registers: retail keeps the object offset in esi, reloads the index from +0x28 and keeps the channel in ebp |
-| render/Overlay | `0x004b6710` | 53/365 | b | 23 code diffs: retail adds `mov eax, [esp + N]`; `mov esi, [esp + N]` vs `mov ebx, [eax] ; mov edx, [eax + 4]`; slots differ |
+| render/Overlay | `0x004b6710` | 63/361 | b | retail keeps `whole` and the byte count on the stack (6 slots), the destination in ebp and the row count in eax; VC6 keeps `whole` in edi, the byte count in ebp and the destination and row count on the stack |
 | render/PCTextureMap | `0x004c69c0` | 429/894 (masked) | c | 31 code diffs: `jne @390` vs `jne A`; `jne @120` vs `jne @116 ; lea edx, [esp + N]` |
 | render/PCTextureMap | `0x004c71c0` | 286/538 (masked) | c | 27 code diffs: `mov ebp, 1` vs `mov ebx, 1`; `and eax, ebp` vs `and eax, ebx` |
 | render/PCTextureMap | `0x004c7b40` | 247/767 | b | 35 code diffs: retail lacks `mov edi, [eax]`; slots differ |
@@ -228,7 +227,7 @@ retail does; grouping the x row's first two products does the same for that row.
 | render/PCVideoCard | `0x004cab00` | 144/1113 | b | retail keeps the mode index in esi shared with the created target (two -3 stores), re-tests `render` after the found path and places the Slot8-success path after the epilogue |
 | render/PCVideoCard | `0x004cb330` | 35/628 | b | 46 code diffs: `push ebx ; mov ebx, [esp + N]` vs `push ebp ; mov ebp, [esp + N]`; `mov eax, [ebx]` vs `mov eax, [ebp + N]`; slots differ |
 | render/Pixtrans | `0x004cdf10` | 46/636 | b | 33 code diffs: retail adds `mov ecx, [esp + N] ; mov [esp + N], eax~`; retail lacks `mov [esp + N], eax ; mov eax, [esp + N]~`; slot order differs |
-| render/Pixtrans | `0x004ce420` | 55/456 | b | 23 code diffs: `sub esp, 8` vs `sub esp, N ; mov edx, [esp + N]`; `mov eax, [esp + N] ; test eax, eax` vs `test edx, edx`; frame 0x8 vs 0x10 |
+| render/Pixtrans | `0x004ce420` | 280/458 | b | frame 0x10 and the x loop match; VC6 loads `source` into ebp at entry (ebp pushed before the height guard) and forms the next source row in ebp where retail uses eax and copies it at the row head; first pixel's zero extension in ecx (retail edi) |
 | render/Pixtrans | `0x004cee30` | 1121/1125 masked | b | after the keyed x loop retail reloads the source stride before the width |
 | render/Pixtrans | `0x004cf2a0` | 242/1735 | b | draft: format, pixel size and palette in ebx/esi/edi where retail uses edi/ebx/esi; frame 0x50 vs 0x54 |
 | render/ResourceManager | `0x004e9030` | 100/798 | b | 5 code diffs: `jne @35` vs `mov [esp + N], ebx ; jne @36`; `je @250` vs `je A`; slots differ |
