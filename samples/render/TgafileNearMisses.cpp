@@ -10,6 +10,10 @@
 // column in the stride slot, the row in the mask slot and the pixel in the
 // descriptor slot. Declaration order, explicit offsets and a function-scope
 // pixel do not reproduce that.
+// Session 14 swept every order of the row, column and pitch declarations
+// with function-scope `pixel` and `swapped` declared among them or not (174
+// forms): the declaration order and `swapped`'s scope are inert (418 strict,
+// 41 differing instructions); a function-scope `pixel` is worse (30, 47).
 
 #include <stdio.h>
 #include <string.h>
