@@ -56,6 +56,16 @@ with `tools/frame_layout.py OBJ --dump`. "Nearest esp" is the lowest address
    spills of compiler temporaries merge into the homes of non-address-taken
    variables but never into one holding an address-taken variable (EcoSystem
    `0x45c040` became exact by reading an index inside a bare block).
+   **Which members pair** (j1-j6, measured): with several locals per block
+   the pairs are not by declaration order. All six probes are reproduced by
+   taking the symbols by density (ties by last use) and putting each into the
+   most recently opened region of its size that holds no member of its own
+   block; this mechanism is inferred, not confirmed. A block local left
+   without a sibling partner is reused by a later statement temporary (a
+   `Vec3` operator result) once its block is closed. Braces around the
+   statement do not scope its temporaries. RunSteps `0x00502f60` became exact
+   by moving one sibling-block output to loop scope. That re-pairs the other
+   block's locals and leaves one of them free for the integration temporary.
 5. **Small frames.** When the locals total at most 0x80 bytes, size decides
    first (ascending, nearest esp = smallest) and the count only orders equal
    sizes (q13: `char a[0x44]` used ten times sits above `char b[0x3c]` used
@@ -201,6 +211,10 @@ void w1() { char p[0x80]; char q[0x80]; char r[0x80]; char s[0x80]; char t[0x80]
 // u1/u3: char a[0x80] x4 vs char b[0x40] x2 -> b first; x5 -> a first
 // u30/u31: int y x1 vs char a[0x80] x32 -> y first; x35 -> a first
 // s3: char c[0x80] x3; { char a[0x80] x2 } { char b[0x80] x2 } -> a/b (shared) first
+// j1: {a x1, b x2, c x3} else {d x3, e x1, g x2} -> c/d, b/g, a/e (12-byte buffers)
+// j2: {a1 b2 c3} else {d1 e2 g3} -> c/g, b/e, a/d; j3: {a1 b2 c3} else {d1 e4} -> c/e, b, a/d
+// j4: {int i x3, a[12] x1} {d[12] x3, int j x1} -> i/j, a/d
+// j5: {a1 b2} {d2 e1} {g4 h5} -> b/d/g, a/e/h; j6: {a1 b2 c3} {d2} {g1} -> b/d, c, a/g
 // q13 f4/f5: char a[0x44] x10, char b[0x3c] x1 -> b first; b[0x40] -> a first
 // m2: 1 1 1 2 2 -> d e a b c ; 1 1 2 2 -> d c a b ; 1 2 2 -> c b a
 // argument slots (stdcall floats, frameless; homes read from the S_BPREL32

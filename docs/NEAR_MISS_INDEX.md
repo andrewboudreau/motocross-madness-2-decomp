@@ -41,6 +41,11 @@ MoveBox `0x00428db0` (class c, 773/789) is exact too: passing the point to the
 inline transform through a local pointer (`const Vec3* point = center`) makes its
 components newer leaves than the matrix elements, so the z row loads them first as
 retail does; grouping the x row's first two products does the same for that row.
+SoultreePhysicsBaseObject::RunSteps `0x00502f60` (class c, 1804/1930) is exact
+too: declaring the merge output `o2` at loop scope instead of in the touching
+block lets the respawn block's `b`/`c` pair with `o3`/`o1` and frees `a` for
+the integration temporary. When only displacement sizes differ, read the
+`/FAs` symbol table for which sibling-block locals share a slot.
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
@@ -95,11 +100,10 @@ retail does; grouping the x row's first two products does the same for that row.
 | krusty2/collision/CollisionObject | `0x00438550` | 734/783 | c | ModelVsModelSwept keeps the last contact (no averaging); an element-pointer local before the call fixes the loop registers. Left: scheduling of the two box copies (as 0x00437ef0); assignment after declaration, component-wise copies and the reversed declaration order do not move it |
 | krusty2/collision/CollisionObject | `0x00434eb0` | 1666/1885 | b | UpdateModelBounds: call pattern, size and frame match (named `lo`, `continue`, inverse pointer, guarded do-while); retail clears i before the guard, ax/az slots swapped, minBound/maxBound among the temporaries |
 | krusty2/collision/CollisionObject | `0x00435830` | 902/1684 | b | SetTransform: per-element term order of the hull case's inline 4x4 product (retail 3,2,1,4 / 1,3,4,2 / ...; arena ordering, see VC6_OPERAND_ORDER.md 3.2; ~40 element-pointer, reference and bracketing forms recorded at the helper); frame 0x30 both |
-| krusty2/collision/CollisionObject | `0x00439820` | 1309/1493 | b | SegmentTouchesObject: same instructions as retail; some temporaries in other frame slots, one `add esp` scheduled late |
+| krusty2/collision/CollisionObject | `0x00439820` | 1309/1493 | b | SegmentTouchesObject: same instructions as retail; some temporaries in other frame slots, one `add esp` scheduled late; a struct copy of the inverse's translation moves p into retail's d slot (and fixes i/scaled) but reschedules the stores |
 | krusty2/soultree/SoulTreePhysics | `0x00500220` | 286/639 | b | 24 code diffs: `je @201 ; fld [edi + 8]` vs `je @197`; `fmul [esi + 4]` vs `fld [esi + 4] ; fmul [edi + 8]`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x00501600` | 651/925 | b | 18 code diffs: `jmp @239 ; fld [esp + N]` vs `jmp @242`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x00501e90` | 169/483 | b | 487 B vs 483: the cross product passed straight to WorldToLocalDirection as `SoultreeCrossCtor` gives retail's copy/push schedule; left: retail stores normalForce member-wise to `[esi + 0x68]` in both branches (a by-reference member-wise helper does that but constant-folds the zero temporary), the x component's products load leverArm first and `*a2 +=` loads `*a2` first |
-| krusty2/soultree/SoulTreePhysics | `0x00502f60` | 1804/1930 | c | 0 code diffs: stack-slot packing of the integration temporary and merge outputs; 9 bytes longer |
 | krusty2/vehicle/Bike | `0x00405190` | 280/2874 | b | 2857 B, aligned 689/742, frame 0xac (uninitialised `otherVel` gives 1127 strict but 642 aligned: zero web in eax, not ebx): function-scope `r`, named copy `prev`, `tmp` reused for the angular copy and the slot 3 argument; out/l10/hasBody order, zero register ebx vs ebp |
 | krusty2/vehicle/Bike | `0x004060c0` | 1677/1678 | c | second contact loop loads `[eax + ecx]` where retail has `[ecx + eax]` (Vehicle slot 7's identical loop gets retail's order). Removing both `BikeWheelDistance` calls of the `mode > 1` branch flips it; one call, helper reshapes, named lenSq/sum/reference locals, dead int locals (0-11), declaration order, `i[arr]`, pointer arithmetic and a `pts` alias do not |
 | krusty2/vehicle/Bike | `0x00406ae0` | 104/2396 | b | retail has three bare `fistp` (inline `__asm`, docs/REBUILD_GAPS.md), hence its ebp frame; 118 code diffs: `push ecx` vs `push ebp ; mov ebp, esp ; sub esp, 8`; `jne @16 ; mov [esp + N], 0 ; jmp @20` vs `jne @18 ; mov [ebp - N], 0 ; jmp @22`; frame 0x0 vs 0x8 |
