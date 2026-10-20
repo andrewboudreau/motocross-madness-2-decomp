@@ -869,3 +869,11 @@ try on similar code. None is a rule.
   (frame 0x54); writing them at function scope as `torqueA`/`torqueB` etc. gives
   retail's 0x60 frame. With that frame, `(rel.y * n->y) + rel.x * n->x` loads the
   y product first as retail does and makes the size exact.
+- **Int-move copies of a member vector before its arithmetic are a named copy.**
+  Bike slot 38 (`0x00405190`, 211 to 274 of 2874): retail copies
+  `worldAngularVelocity` and `f23c` into stack temporaries with `mov reg, [m]; mov
+  [esp+N], reg` before the cross product and the interpolation read them. A
+  block-scoped `Vec3 w = worldAngularVelocity;` crossed in place of the member, and
+  `Vec3 prev = f23c;` used in `(f154 - prev) * t + prev`, give those copies. In the
+  same function a case block's `Vec3 r` declared at function scope stops sharing its
+  slot and gives retail's 0x88 offset.
