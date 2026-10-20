@@ -122,9 +122,9 @@ palette and 24-bit cases, `default: return 0;`). Near misses
 1555 halver; retail keeps the two lower-row pixels in frame slots); `0x004cdf10`, the 8888 halver, which
 averages colour over the 2x2 pixels with alpha set (the fourth pixel adds
 the third one's alpha in retail) and differs in register assignment;
-`0x004cee30` (the palette halver, 101/1133: written as an if/else with one
-`return 1`, ebp is pushed after the palette checks as in retail; VC6 still
-homes the source row in `source`'s slot, which shifts every slot).
+`0x004cee30` (the palette halver, 1129/1133 strict: written as an if/else with one
+`return 1`, ebp is pushed after the palette checks as in retail; only the
+post-loop reload of the source stride and width comes in the other order).
 
 `0x004d0d40` is inline assembly (frame pointer, dead `mov eax, 0`,
 `push ebp` inside the loop, `ebp` used as the loop counter) and is out of scope. The palette-index
