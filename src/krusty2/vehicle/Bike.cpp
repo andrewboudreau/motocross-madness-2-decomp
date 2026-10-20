@@ -1309,8 +1309,10 @@ void Bike::UnknownVirtualSlot97()
 // reason code (field_0x460) and returns 1.
 int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
 {
+    // Retail returns the nonzero state itself (the branch reaches the epilogue with
+    // the loaded crashState still in eax).
     if (crashState != 0)
-        return 0;
+        return crashState;
     BikeA604* rider = wrecker;
     if (rider->a_0xd8) {
         scratchVector = rider->a_0x34->r_0x1a0->d_0x140->WorldToLocalPoint(rider->a_0xdc);
@@ -1379,21 +1381,24 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
         crashReason = 13;
         return 1;
     }
+    // The clamped step is a new local (sharing a's slot): retail copies a into it on
+    // both pass-through paths.
+    float step;
     if (a < fixedStepTime) {
         float m = fixedStepTime * 0.8f;
-        if (m > a)
-            a = m;
-    }
+        step = m > a ? m : a;
+    } else
+        step = a;
     if (UnknownVirtualSlot51()) {
         linkedVehicle = 0;
         return 0;
     }
-    if (UnknownVirtualSlot70(a)) {
+    if (UnknownVirtualSlot70(step)) {
         crashDirection = 1;
         crashReason = 4;
         return 1;
     }
-    if (c && d * invMass > a * impactAccelLimit) {
+    if (c && d * invMass > step * impactAccelLimit) {
         if (angularVelocity.z > 0.0f) {
             crashDirection = 4;
             crashReason = 10;
@@ -1568,7 +1573,12 @@ void Bike::UnknownVirtualSlot91()
             float k = s * (a * linearSpeed * 0.075f) * stepTime;
             velocity += scratchVector2 * k;
             velocity *= linearSpeed / (k + linearSpeed);
-            float lenSq = BikeDot(&velocity, &velocity);
+            // Component copies: retail loads y, x and z once and squares the registers.
+            float y = velocity.y;
+            float x = velocity.x;
+            float z = velocity.z;
+            float lenSq = y * y + x * x;
+            lenSq += z * z;
             linearSpeed = (lenSq == 1.0f) ? 1.0f : (float)sqrt(lenSq);
         }
     }

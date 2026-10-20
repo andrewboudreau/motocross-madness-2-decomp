@@ -145,8 +145,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot99@Bike",
     "target_va": "0x00409b30",
     "target_size": 1374,
-    "expect": "partial",
-    "notes": "65.6% (1356/1374). Dot order, fdivr (float local before 1/x), lieLimit local (fcompp) and d*field_0x24 > a*field_0x44c compare order now match. Remaining diff: retail self-copies the parameter a (mov ecx,[a]; mov [a],ecx on both arms of the clamp at 0x409e90/0x409e9c), 18 bytes; every ternary/if/helper/local form tried only reproduces the stores that matter.",
+    "expect": "exact",
+    "notes": "Strict exact. The clamped step is a new local (step = m > a ? m : a, else step = a) that VC6 coalesces into a's parameter slot, which leaves retail's self-copies mov ecx,[a]; mov [a],ecx on both pass-through arms. The crashState test returns crashState itself (retail branches to the epilogue past the xor eax,eax). Dot order, fdivr (float local before 1/x), lieLimit local (fcompp) and the d*invMass > step*impactAccelLimit compare order match.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -246,7 +246,7 @@
     "target_va": "0x0040aec0",
     "target_size": 1353,
     "expect": "partial",
-    "notes": "slot 91: frame 0x20 vs ours 0x24; first divergence is the spill slot of the first fstp ([esp+8] vs [esp+0x10]) [8.2% match under vc6_o2_ml]",
+    "notes": "slot 91: 1014/1353 strict (candidate 1357 bytes). The velocity length after the lean-plane steer uses y/x/z component copies (retail loads each once and squares the registers). Left: one dot operand order (fld [ecx]; fmul [esi+0xa0]), BikeDirection(force) results stored to a separate temp (retail reuses force's slot at esp+0x10; by-value/in-place/assign-back forms are all identical), the g_BikeVec3 zero copy load order and the mov ecx,[esi+0x720] hoist.",
     "bindings": "Bike.bindings.json"
   },
   {

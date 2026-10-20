@@ -87,13 +87,13 @@ void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const Colli
         CollisionVec3 r;
         if (keepZ) {
             r.x = c.z * z.y - c.y * z.z;
-            r.y = c.x * z.z - c.z * z.x;
+            r.y = (c.x * z.z) - c.z * z.x;
             r.z = c.y * z.x - c.x * z.y;
             y = r;
         } else {
             r.x = c.y * y.z - c.z * y.y;
             r.y = c.z * y.x - c.x * y.z;
-            r.z = c.x * y.y - c.y * y.x;
+            r.z = (c.x * y.y) - c.y * y.x;
             z = r;
         }
     }
@@ -104,8 +104,8 @@ void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const Colli
 
     CollisionVec3 t;
     t.x = y.y * n.z - y.z * n.y;
-    t.y = n.x * y.z - y.x * n.z;
-    t.z = y.x * n.y - n.x * y.y;
+    t.y = (n.x * y.z) - y.x * n.z;
+    t.z = (y.x * n.y) - n.x * y.y;
     out->m[0] = t.x;
     out->m[1] = t.y;
     out->m[2] = t.z;
@@ -249,7 +249,8 @@ void Tire::CollisionPointVirtualSlot1()
         if (c >= 1.0f)
             c = 1.0f;
         tangentCos = c;
-        tangentSin = sqrt(1.0f - c * c);
+        float sinA = sqrt(1.0f - c * c);
+        tangentSin = sinA;   // the side term below reads the member back, not sinA
         float rollTerm = (-rollFriction) * rollFrictionScale * tangentCos * CollisionPoint::frictionCoefficient;
         CollisionPoint::frictionMagnitude = (rollTerm + (-sideFriction) * sideFrictionScale * tangentSin
                                                         * CollisionPoint::frictionCoefficient)
@@ -545,6 +546,40 @@ static inline void TireNegateInPlace(CollisionVec3& v)
     v.z = v.z * -1.0f;
 }
 
+// CollisionCross with the first product of the y and z components parenthesised:
+// the extra node places each fsubp between the load and the store of the previous
+// component's integer copy, as retail does in ApplyDrive's moment and in the
+// suspension probe's crosses.
+static inline CollisionVec3 TireCrossGrouped(const CollisionVec3& a, const CollisionVec3& b)
+{
+    CollisionVec3 r;
+    r.x = a.y * b.z - a.z * b.y;
+    r.y = (a.z * b.x) - a.x * b.z;
+    r.z = (a.x * b.y) - a.y * b.x;
+    return r;
+}
+
+// a + b with the z sum parenthesised: the extra node stores z before the y copy, as
+// retail does for the first probe position.
+static inline CollisionVec3 TireSumGroupedZ(const CollisionVec3& a, const CollisionVec3& b)
+{
+    CollisionVec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = (a.z + b.z);
+    return r;
+}
+
+// TireScaledCtor through local copies of v.y and v.z: the constructor's arguments are
+// evaluated z, y, x, and the copies make VC6 load z and y first and multiply by the held s
+// (`fld mem; fmul st(1)`), with x as `fmul mem`, as retail does for the refined probe.
+static inline CollisionVec3 TireScaledCtorCopyYZ(const CollisionVec3& v, float s)
+{
+    float y = v.y;
+    float z = v.z;
+    return CollisionVec3(v.x * s, y * s, z * s);
+}
+
 void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity, float angle,
                                  float radiusScale, float a5, const CollisionVec3* a6,
                                  const CollisionVec3* a7, TireNode* a8)
@@ -578,7 +613,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     rollDirection = TireNormalizeOr(TireCross(this->CollisionPoint::surfaceNormal, sideAxis), wheelUpAxis);
 
     CollisionVec3 lateral;
-    lateral = CollisionCross(rollDirection, sideAxis);
+    lateral = TireCrossGrouped(rollDirection, sideAxis);
     if (TireDotInline(lateral, this->CollisionPoint::surfaceNormal) > 0.0f) {
         lateral.x = lateral.x * -1.0f;
         lateral.y = lateral.y * -1.0f;
@@ -587,7 +622,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     }
 
     // First probe: the wheel centre pushed out along the lateral axis by field_0x274.
-    CollisionVec3 p = lateral * wheelRadius + origin;
+    CollisionVec3 p = TireSumGroupedZ(TireScaleCopy(lateral, wheelRadius), origin);
     this->CollisionPoint::worldPosition = p;
     this->CollisionPoint::surfacePosition = p;
     CollisionVec3 n1;
@@ -600,7 +635,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     if (mag != 1.5707964f) {
         if (MovingPart::ownerRef) {
             CollisionVec3 base = rollDirection * wheelRadius + origin;
-            CollisionVec3 c = CollisionCross(rollDirection, kVec3YAxis);
+            CollisionVec3 c = TireCrossGrouped(rollDirection, kVec3YAxis);
             float cLenSq = TireDotInline(c, c);
             if (cLenSq == 0.0f) {
                 c = kVec3Zero;
@@ -616,7 +651,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
             CollisionVec3 v;
             TireVectorBlend(&v, &kVec3ZAxis, &kVec3YAxis, a5);
             CollisionVec3 base = v * -wheelRadius + origin;
-            CollisionVec3 c = CollisionCross(v, kVec3YAxis);
+            CollisionVec3 c = TireCrossGrouped(v, kVec3YAxis);
             float cLenSq = TireDot(&c, &c);
             if (cLenSq == 0.0f) {
                 c = kVec3Zero;
@@ -638,24 +673,27 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     unsigned char kind;
     world->QueryGround(&pt, &n2, 0, &kind);
     CollisionVec3 v = TireNormalizeOr(TireCross(n2, sideAxis), wheelUpAxis);
-    CollisionVec3 u = CollisionCross(v, sideAxis);
+    CollisionVec3 u = TireCrossGrouped(v, sideAxis);
     CollisionVec3 lateral2 = u;
-    if (u.x * n2.x + u.y * n2.y + u.z * n2.z > 0.0f) {
+    if (u.z * n2.z + (u.y * n2.y + u.x * n2.x) > 0.0f) {
         lateral2.x = u.x * -1.0f;
         lateral2.y = u.y * -1.0f;
         lateral2.z = u.z * -1.0f;
     }
 
-    CollisionVec3 scaled = TireScaledCtor(lateral2, wheelRadius);
+    CollisionVec3 scaled = TireScaledCtorCopyYZ(lateral2, wheelRadius);
     CollisionVec3 r = CollisionVec3(scaled.x + origin.x, scaled.y + origin.y, scaled.z + origin.z);
     pt = r;
     CollisionVec3 n3;
     world->QueryGround(&pt, &n3, 0, &kind);
-    float delta = pt.y - r.y;
-    if (delta * n3.y > this->CollisionPoint::penetration) {
+    // delta and the score are assigned inside the test: retail keeps delta with `fst` and
+    // the score on the x87 stack for the penetration store.
+    float delta;
+    float score;
+    if ((score = (delta = pt.y - r.y) * n3.y) > this->CollisionPoint::penetration) {
         lateral = lateral2;
         this->CollisionPoint::worldPosition = r;
-        this->CollisionPoint::penetration = delta * n3.y;
+        this->CollisionPoint::penetration = score;
         this->CollisionPoint::surfacePosition = pt;
         *TireSurfaceByte(this) = kind & 7;
         if (!TireSameVec(n2, n3)) {
@@ -677,6 +715,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     }
 
     CollisionMatrix4 frame;
+    CollisionVec3 rolled;   // function scope: retail gives it its own slot (frame 0xc0)
     TireBuildFrame(&frame, &origin, &wheelUpAxis, &lateral, 1, 1);
     SetTransform((const Matrix4*)&frame);   // CollisionObject 0x00435830
     QueryCollisions();
@@ -693,8 +732,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
             this->CollisionPoint::surfaceNormal = bounds->normal;
             *TireSurfaceByte(this) = 7;
             TireTransformDirection(&this->CollisionPoint::worldPosition, (const CollisionVec3*)bounds->box->max, &frame);
-            CollisionVec3 t;
-            rollDirection = *Fn_00515c90(&t, &this->CollisionPoint::surfaceNormal, &sideAxis, &wheelUpAxis);
+            rollDirection = *Fn_00515c90(&rolled, &this->CollisionPoint::surfaceNormal, &sideAxis, &wheelUpAxis);
         }
     }
 
@@ -1014,17 +1052,13 @@ static inline CollisionVec3 TireRatioTimes(float numerator, float denominator,
     return r;
 }
 
-// 0x00514170 (near miss, 565 of 607 bytes): clamping as `*speed < amount` gives
-// retail's `fcom`, and scaling the cross product component-wise through a local
-// copy of +0x1d8 gives its moment. TireRatioTimes gives the scaled push's x87
-// operand order (560 -> 565). Left: the copy of push.y out of the return temp and
-// two cross-product fsubp/mov pairs are scheduled differently.
-// Before TireRatioTimes (560): `dir * k`, a local k, k * dir.x per component, a
-// pre-copied push, `1 / grip * needed`, `v.x * s` operand order (all 8 orders) in
-// TireTimes, a helper copying v.x into a local or into r first, a `dx` copy before
-// the grip test, the negation per component or as `forward ?:` / if-else (114..149),
-// direct push.x stores (336), the quotient as a CSE expression in all three
-// products (361) or named first (553..560).
+// 0x00514170 (strict exact): clamping as `*speed < amount` gives retail's `fcom`,
+// and scaling the cross product component-wise through a local copy of +0x1d8
+// gives its moment. TireRatioTimes gives the scaled push's x87 operand order.
+// The scaled push is a named local copied into `push` after `*speed -= amount`,
+// which schedules the push.y copy after the speed store (assigned straight to
+// `push` VC6 copies y right after its product), and TireCrossGrouped places the
+// cross product's fsubp/mov pairs.
 void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, float* speed,
                       CollisionVec3* torque, CollisionVec3* force)
 {
@@ -1041,8 +1075,9 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
     float rate = mass / stepTime;
     float needed = rate * amount;
     if (grip > needed) {
-        push = TireRatioTimes(needed, grip, dir);
+        CollisionVec3 scaled = TireRatioTimes(needed, grip, dir);
         *speed -= amount;
+        push = scaled;
     } else {
         *speed -= grip / rate;
         push = dir;
@@ -1050,7 +1085,7 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
     force->x += push.x;
     force->y += push.y;
     force->z += push.z;
-    CollisionVec3 moment = CollisionCross(CollisionPoint::relativePosition, push);
+    CollisionVec3 moment = TireCrossGrouped(CollisionPoint::relativePosition, push);
     float s = field_0x1d8;
     moment.x *= s;
     moment.y *= s;

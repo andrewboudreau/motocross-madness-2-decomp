@@ -737,3 +737,26 @@ try on similar code. None is a rule.
   the reverse source order. Term order inside the helper does not move it. A
   sweep over the 2^n direct/`xf` choices per call (n = 8) found both
   functions' best forms.
+
+## Levers from session 14
+
+- **A named result copied after an intervening statement.** Tire ApplyDrive
+  (`0x00514170`): `push = TireRatioTimes(...); *speed -= amount;` copies each
+  component of the helper's return temporary right after its product; retail
+  copies push.y after the speed store. `CollisionVec3 scaled = TireRatioTimes(...);
+  *speed -= amount; push = scaled;` gives retail's order (x and z still copied
+  early, y in the freed `edx`).
+- **Store a result through a local, then read the member back.** Tire
+  CollisionPointVirtualSlot1 (`0x00515b50`): with `tangentSin = sqrt(...)`, or with a
+  local `s` used in the later product, VC6 multiplies the memory operands of
+  `(-side) * scale * tangentSin * mu` first and the stacked sqrt last. With
+  `float s = sqrt(...); tangentSin = s;` and the product still reading `tangentSin`,
+  the sqrt register is used in its source position, as in retail.
+- **Self-copies of a parameter mean a new local coalesced into its slot.** Bike slot 99
+  (`0x00409b30`): retail `mov ecx,[a]; mov [a],ecx` on the pass-through arms of a clamp
+  comes from `float step; if (a < k) step = m > a ? m : a; else step = a;` with later
+  code reading `step`: VC6 gives step the parameter's slot but keeps the copies.
+  Clamping `a` in place, with any if/ternary form, drops them.
+- **A branch straight to the epilogue past `xor eax, eax` returns the tested value.**
+  Retail `test eax,eax; jne <pop edi>` after `mov eax,[field]` is
+  `if (field != 0) return field;`, not `return 0`.
