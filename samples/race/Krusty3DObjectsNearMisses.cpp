@@ -37,15 +37,21 @@
 // function for the block makes VC6 call the Vector3 constructor and
 // operator* (0x00404e60, 0x005015b0) out of line; the block written as a
 // macro (UNKNOWN_PLACE_CUE) expands everything as retail does (aligned
-// instructions 299 -> 604 of 748). Left: retail copies the camera's third
-// matrix column with integer moves into a stack vector, where VC6 keeps two
-// of its components on the x87 stack (member-wise copies in either order,
-// a by-value column helper: same); retail keeps 0 in edi (pushing ebp)
-// and gives the two explicit early returns their own epilogues. Every hide
-// path is written as an explicit `isVisible = 0; return 1;`: VC6 then
-// caches 0 in a register as retail does (172 -> 254 of 2820), but picks
+// instructions 299 -> 604 of 748). Retail copies the camera's third
+// matrix column with integer moves into a stack vector: one function-scope
+// `direction` that the placement block fills and each mode then overwrites
+// with the direction to its target gives that copy (254 -> 401 of 2820);
+// a separate local per block keeps two components on the x87 stack
+// (member-wise copies in either order, a by-value column helper: same).
+// Every hide path is written as an explicit `isVisible = 0; return 1;`:
+// VC6 then caches 0 in a register as retail does (172 -> 254), but picks
 // ebx (the `finished` byte test becomes `cmp byte, bl`, retail loads cl
-// and keeps 0 in edi) and still merges the hide blocks into one return. The half field of view goes through a macro: as an
+// and keeps 0 in edi, pushing ebp) and still merges the hide blocks into
+// one return where retail gives the two early ones their own epilogues.
+// Retail computes `0.5f - screenY` as `fld 0.5; fsub [esi+0x4c]`; reading
+// the field directly (not through UnknownScreenY) gives that order but
+// changes the `position +=` x87 sequence (fxch/fadd/fstp), 401 -> 383; a
+// screenY local: 401. The half field of view goes through a macro: as an
 // inline function, VC6 folded `* 0.5f * 0.01745329f` into one 0.0087266f
 // multiply, where retail keeps both (fmul 0x005507f4, fmul 0x00550480); the
 // macro restores retail's two constants (candidate 2784 -> 2808 bytes of
@@ -166,13 +172,13 @@ struct UnknownCueOwner {
 };
 
 // Places the cue at its screen position in front of the camera, rebuilding
-// the screen offsets when the field of view changed.
+// the screen offsets when the field of view changed. The view direction goes
+// into the caller's `direction`, which then holds the direction to the target.
 #define UNKNOWN_PLACE_CUE() \
     { \
-    Vector3 forward; \
-    forward.x = arcadeView->cameraMatrix[0][2]; \
-    forward.y = arcadeView->cameraMatrix[1][2]; \
-    forward.z = arcadeView->cameraMatrix[2][2]; \
+    direction.x = arcadeView->cameraMatrix[0][2]; \
+    direction.y = arcadeView->cameraMatrix[1][2]; \
+    direction.z = arcadeView->cameraMatrix[2][2]; \
     Vector3 up = Vector3(arcadeView->cameraMatrix[0][1], arcadeView->cameraMatrix[1][1], arcadeView->cameraMatrix[2][1]); \
     Vector3 right = Vector3(arcadeView->cameraMatrix[0][0], arcadeView->cameraMatrix[1][0], arcadeView->cameraMatrix[2][0]); \
     if (arcadeView->fieldOfView != builtFieldOfView) { \
@@ -183,7 +189,7 @@ struct UnknownCueOwner {
         modelScale = field_0x38 * field_0x44 / (arcadeView->focalLength * field_0x3c); \
     } \
     Vector3 position = arcadeView->cameraPosition; \
-    position += forward * field_0x44; \
+    position += direction * field_0x44; \
     position += right * screenOffsetX; \
     position += up * screenOffsetY; \
     SetPosition(&position); \
@@ -192,6 +198,7 @@ struct UnknownCueOwner {
 // 0x0048b100
 int VisualCue::Tick(float frameTime) {
     float scale;
+    Vector3 direction;
 
     if (!ArcadeObject::Tick(frameTime))
         return 1;
@@ -220,7 +227,7 @@ int VisualCue::Tick(float frameTime) {
         else
             target = cueView->ownRacer->trackPoint;
         groundTerrain->QueryGround(&target, 0, 0, 0);
-        Vector3 direction = target - arcadeView->cameraPosition;
+        direction = target - arcadeView->cameraPosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         arcadeModel->Scale(scale, scale, scale);
@@ -232,7 +239,7 @@ int VisualCue::Tick(float frameTime) {
         UnknownKrustyRacerRef* ref = g_UnknownKrustyGame56e26c->bajaEnduroEvent->raceView->raceCamera->followedRacer;
         if (!ref)
             return 1;
-        Vector3 direction =
+        direction =
             g_UnknownKrustyGame56e26c->bajaEnduroEvent->gates[ref->gateIndex].position - arcadeView->cameraPosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
@@ -250,7 +257,7 @@ int VisualCue::Tick(float frameTime) {
                 break;
             }
         }
-        Vector3 direction = target - arcadeView->cameraPosition;
+        direction = target - arcadeView->cameraPosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         arcadeModel->Scale(scale, scale, scale);
@@ -261,7 +268,7 @@ int VisualCue::Tick(float frameTime) {
         if (g_UnknownKrustyGame56e26c->tagBall) {
             Vector3 target;
             g_UnknownKrustyGame56e26c->tagEvent->ball->sceneObject.GetPosition(&target);
-            Vector3 direction = target - arcadeView->cameraPosition;
+            direction = target - arcadeView->cameraPosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         } else {
@@ -272,7 +279,7 @@ int VisualCue::Tick(float frameTime) {
                 return 1;
             if (followed == g_UnknownKrustyGame56e26c->tagEvent->followedRacer)
                 { isVisible = 0; return 1; }
-            Vector3 direction = g_UnknownKrustyGame56e26c->tagEvent->followedRacer->position - arcadeView->cameraPosition;
+            direction = g_UnknownKrustyGame56e26c->tagEvent->followedRacer->position - arcadeView->cameraPosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         }
