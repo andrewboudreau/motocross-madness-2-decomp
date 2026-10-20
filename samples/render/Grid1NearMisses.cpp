@@ -26,6 +26,11 @@
 // fcomp, as retail) only with a second store in one arm: `else { stage = 3;
 // keep = 0; }` gives 287 strict but leaves that store; equal arms through
 // locals, casts, a static const, dead locals or dead parameter stores fold.
+// Retail's arm is empty after `stage = 3` (the `test ah, 1` falls into the
+// join), so the branch went late while the x87 compare stayed. Also kept
+// with a leftover store or branch: `stage = 3; if (g*4 >= detail) stage = 3;`
+// (264), `if (g*4 < detail) detail = 10000.0f;` (267); folded entirely: an
+// empty `if`, `?:` with equal arms, a clamp of a stage 4, `block = 0`.
 //
 // 0x0047d470 (783 bytes; 313 of 786): identical control flow and calls;
 // retail keeps the row (y & 15) in eax, the head length in edx and the run
