@@ -170,7 +170,12 @@
 #include "../../src/reconstructed/SelectGamePicProcs.h"
 #include "../../src/reconstructed/TextureMap.h"
 
-// 0x0041eb20
+// 0x0041eb20. Left: the caster arm loads targetCaster then raceScene as
+// retail does, the entry arm loads targetEntry and raceScene in the other
+// order. Splitting the two arms' targetKind/targetIndex stores into their
+// own `if (caster) ... else ...` ahead of the bodies flips both arms (the
+// entry arm then matches, the caster arm does not); splitting one arm,
+// `!caster` tests, ternary stores or one store per split leave it or worse.
 int BikeRace::AimCamera(int caster) {
     if (UnknownFunctionCameraView()->followingRacer) {
         targetKind = 0xff;

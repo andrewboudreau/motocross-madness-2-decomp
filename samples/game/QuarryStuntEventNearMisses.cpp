@@ -9,7 +9,12 @@
 // puts the page in edx), and after the first ControlInterface call retail
 // loads the global before moving the result to edi. Comparison order, a
 // local page, nested/early-return tests, an inline overlay accessor and
-// declaration placement do not change it.
+// declaration placement do not change it; nor do `nextPage++` written
+// out, `!= 0`, a ternary or inline predicate for the overlay test, a
+// reversed page compare, an early return before the page block, a local
+// overlay pointer, or s_DebugPage non-static or address-taken. Retail
+// does not keep the overlay pointer from the null test (the sibling
+// BikeRace 0x0041f5e0 does), which frees ecx for the page.
 #include <stdio.h>
 #include <string.h>
 

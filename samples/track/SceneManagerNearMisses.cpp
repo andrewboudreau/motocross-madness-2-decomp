@@ -30,13 +30,23 @@
 // token[dot], and the "Cannot find" errors keep retail's two sprintf tails
 // (4393 -> 5113 of 5335). Left: the frame is 0xd00 where retail has 0xcfc,
 // one scalar slot too many, so most offsets above the low slots are 4 off.
-// Retail puts the random-set j at local 0, dot at 4 and the entries-offset
-// spill at 8 (fps's GetFloat home); here the spill is at 0 and j at 8.
-// Reusing `automatic` for dot keeps 0xcfc but loses the store/reload shape
-// (4349); a function-scope `length` shared with the SLT name length, dot
-// in the random-set if/for blocks, a separate random-set index, `next`
-// dropped from the animation loop too, and `automatic`/`fps` declared in
-// the animation loop body all keep 0xd00.
+// Frame symbols mapped to retail's offsets (a /FAs listing against the
+// matched instructions): retail's low slots are {sequence j, axes,
+// random-set j, temporaries} 0, {dot, automatic} 4, {fps, the random-set
+// entries-offset spill} 8, animations 0xc, i 0x10 (alone); here they are
+// {sequence j, temporaries, spill} 0, {i, dot} 4, {axes, random-set j} 8,
+// with automatic and fps alone higher up. So retail lets the strcspn result
+// and the spill reuse the two address-taken GetInt/GetFloat homes once the
+// animation loop is done and keeps i's home to itself; VC6 here gives both
+// i's dead home. Reusing `automatic` for dot gives 0xcfc but loses the
+// store/reload shape (4349). Without effect on the low slots (72 scope
+// combinations measured): automatic at function, loop-body or keyFramed
+// scope; fps at function or loop-body scope or in a block around the loop;
+// dot as a loop-body, random-set-block or function local; i as a function
+// local or `for (int i` (separate random-set index too); axes at function
+// scope; any declaration order of automatic, fps and i; i kept live past
+// the random-set loop. A function-scope `length` shared with the SLT name
+// length and `next` dropped from the animation loop also keep 0xd00.
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -48,7 +48,12 @@
 // it on the x87 stack. Also left: the normalisation of `back` loads its
 // components first in retail, the 1f4 blend the scalar first (here the
 // reverse), and argument-push scheduling around the steering call, the
-// frame helper's copies and the 4fd5c0 call. Earlier form (one named ahead
+// frame helper's copies and the 4fd5c0 call. Declaring axisB (or axisA)
+// at function scope gives retail's 0xdc frame and 69 hunks (72 here), but
+// the other axis still joins the temporaries' group instead of flat's and
+// t stays below back, so it is a size coincidence and not kept; both axes
+// at function scope give 0xe8, a bare block around flat (alone or with
+// target/offset/placement) moves flat into the box or back group. Earlier form (one named ahead
 // for all three path points, the frame written in the body, the contact
 // normal at +0x0c): 807/3018 with frame 0xf4.
 
