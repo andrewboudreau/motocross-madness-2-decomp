@@ -1014,17 +1014,25 @@ static inline CollisionVec3 TireRatioTimes(float numerator, float denominator,
     return r;
 }
 
-// 0x00514170 (near miss, 565 of 607 bytes): clamping as `*speed < amount` gives
-// retail's `fcom`, and scaling the cross product component-wise through a local
-// copy of +0x1d8 gives its moment. TireRatioTimes gives the scaled push's x87
-// operand order (560 -> 565). Left: the copy of push.y out of the return temp and
-// two cross-product fsubp/mov pairs are scheduled differently.
-// Before TireRatioTimes (560): `dir * k`, a local k, k * dir.x per component, a
-// pre-copied push, `1 / grip * needed`, `v.x * s` operand order (all 8 orders) in
-// TireTimes, a helper copying v.x into a local or into r first, a `dx` copy before
-// the grip test, the negation per component or as `forward ?:` / if-else (114..149),
-// direct push.x stores (336), the quotient as a CSE expression in all three
-// products (361) or named first (553..560).
+// CollisionCross with the first product of the y and z components parenthesised:
+// the extra node places each fsubp between the load and the store of the previous
+// component's integer copy, as ApplyDrive's moment does in retail.
+static inline CollisionVec3 TireMomentCross(const CollisionVec3& a, const CollisionVec3& b)
+{
+    CollisionVec3 r;
+    r.x = a.y * b.z - a.z * b.y;
+    r.y = (a.z * b.x) - a.x * b.z;
+    r.z = (a.x * b.y) - a.y * b.x;
+    return r;
+}
+
+// 0x00514170 (strict exact): clamping as `*speed < amount` gives retail's `fcom`,
+// and scaling the cross product component-wise through a local copy of +0x1d8
+// gives its moment. TireRatioTimes gives the scaled push's x87 operand order.
+// The scaled push is a named local copied into `push` after `*speed -= amount`,
+// which schedules the push.y copy after the speed store (assigned straight to
+// `push` VC6 copies y right after its product), and TireMomentCross places the
+// cross product's fsubp/mov pairs.
 void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, float* speed,
                       CollisionVec3* torque, CollisionVec3* force)
 {
@@ -1041,8 +1049,9 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
     float rate = mass / stepTime;
     float needed = rate * amount;
     if (grip > needed) {
-        push = TireRatioTimes(needed, grip, dir);
+        CollisionVec3 scaled = TireRatioTimes(needed, grip, dir);
         *speed -= amount;
+        push = scaled;
     } else {
         *speed -= grip / rate;
         push = dir;
@@ -1050,7 +1059,7 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
     force->x += push.x;
     force->y += push.y;
     force->z += push.z;
-    CollisionVec3 moment = CollisionCross(CollisionPoint::relativePosition, push);
+    CollisionVec3 moment = TireMomentCross(CollisionPoint::relativePosition, push);
     float s = field_0x1d8;
     moment.x *= s;
     moment.y *= s;

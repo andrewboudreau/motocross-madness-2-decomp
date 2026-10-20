@@ -264,8 +264,8 @@
     "candidate_symbol_contains": "ApplyDrive@Tire",
     "target_va": "0x00514170",
     "target_size": 607,
-    "expect": "partial",
-    "notes": "565/607 strict: the clamp, the scaled push and the moment match; the push.y copy and two cross-product fsubp/mov pairs are scheduled differently (see Tire.cpp).",
+    "expect": "exact",
+    "notes": "Strict exact: the scaled push is a named local copied into push after the speed update, and the moment's cross product parenthesises the first y/z products (TireMomentCross; see Tire.cpp).",
     "bindings": "Tire.bindings.json"
   },
   {

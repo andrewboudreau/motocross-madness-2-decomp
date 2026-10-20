@@ -727,3 +727,12 @@ try on similar code. None is a rule.
   the reverse source order. Term order inside the helper does not move it. A
   sweep over the 2^n direct/`xf` choices per call (n = 8) found both
   functions' best forms.
+
+## Levers from session 14
+
+- **A named result copied after an intervening statement.** Tire ApplyDrive
+  (`0x00514170`): `push = TireRatioTimes(...); *speed -= amount;` copies each
+  component of the helper's return temporary right after its product; retail
+  copies push.y after the speed store. `CollisionVec3 scaled = TireRatioTimes(...);
+  *speed -= amount; push = scaled;` gives retail's order (x and z still copied
+  early, y in the freed `edx`).
