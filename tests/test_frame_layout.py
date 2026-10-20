@@ -106,6 +106,16 @@ class TrackerTests(unittest.TestCase):
         self.assertEqual(info.saved_regs, 0xc)
         self.assertEqual([(a.offset, a.width) for a in info.accesses], [(0x10, 1)])
 
+    def test_body_instructions_above_the_allocation(self):
+        # fld [esp+0x28]; fcomp [0]; sub esp,0x100; push ebx; fld [esp+0x12c]; ret
+        # (VC6 schedules an argument load above ``sub esp``; both loads read the same slot)
+        code = (b'\xd9\x44\x24\x28' b'\xd8\x1d\x00\x00\x00\x00' b'\x81\xec\x00\x01\x00\x00' b'\x53'
+                b'\xd9\x84\x24\x2c\x01\x00\x00' b'\xc3')
+        from tools.frame_layout import disassemble
+        info = track_frame(disassemble(code))
+        self.assertEqual(info.frame_size, 0x100)
+        self.assertEqual([a.offset for a in info.accesses], [0x128, 0x128])
+
     def test_ebp_frame(self):
         # push ebp; mov ebp,esp; sub esp,0x20; mov eax,[ebp-4]; mov [ebp-0x20],eax; leave; ret
         code = b'\x55' b'\x8b\xec' b'\x83\xec\x20' b'\x8b\x45\xfc' b'\x89\x45\xe0' b'\xc9' b'\xc3'
