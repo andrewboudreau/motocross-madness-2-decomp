@@ -280,18 +280,21 @@ value in one function:
 
 The probes are throwaway units compiled with `tools/compile.py --compiler
 vc6 --profile vc6_o2_mt` and disassembled with the repository's COFF tools.
-- Bike slot 38 `0x00405190`: retail clears `ebx` at entry for the zero stores
+- Bike slot 38 `0x00405190` (solved for the zero web, strict 280 to 1745 of
+  2874, aligned 689 to 704): retail clears `ebx` at entry for the zero stores
   (hasBody, notifyOther), the `crashState` compare, the case 0 store and the
   0x3e8 `push`, and later reuses `ebx` for `otherVel`.
   - At the join of the no-body cases retail reloads `ebp` (ctx) and `ebx`
     (otherVel) from `[esp + 0x1c]`, which is out's home. That is what VC6 emits
     for register variables left uninitialised on those paths, so retail's
-    `otherVel` probably has no initialiser.
-  - `Vec3* otherVel;` reproduces the reloads and the shared home (strict 280 to
-    1127 of 2874). But the zero web then gets scratch `eax`, the switch index
-    moves to `ecx`, and the case 0 compare becomes `test` (aligned 689 to 642).
-    With `otherVel = 0` the zero gets `ebp` beside `otherVel`'s `ebx`.
-  - Inert under the uninitialised form: every order of the six scalar
-    declarations, passing hasBody or other as the 0x3e8 argument, and redundant
-    `hasBody = 0` stores in case 0x65 or after the slot 3 call. What gives retail's
-    zero web a callee-saved register is still open.
+    `otherVel` is taken as uninitialised (provisional).
+  - `Vec3* otherVel;` alone reproduces the reloads but gives the zero web
+    scratch `eax` (aligned 642). Writing the slot 4 argument as `int l14 =
+    (int)otherVel; if (b == ...) l14 = 0;` instead of a `?:` moves it to `ebx`,
+    as retail. The `?:` and an `if`/`else` pair keep `eax`. Neither form changes
+    anything while `otherVel = 0` is initialised.
+  - The same zero stores appear in both builds. The difference is the web's
+    range: retail serves the 0x3e8 `push` from the register, and a candidate
+    that pushes an immediate there has the shorter scratch web.
+  - Inert: every order of the six scalar declarations, passing hasBody or other
+    as the 0x3e8 argument, and redundant `hasBody = 0` stores.

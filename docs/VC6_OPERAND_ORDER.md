@@ -407,6 +407,10 @@ where the product of the choices is large).
   1023 -> 1032 (a doubly parenthesised factor `((b->x - a->x))` reorders one
   of six inlined edges), TrackOverlay `0x0051c4f0` 321 -> 334 (masked),
   Wrecker `0x00531740` 768 -> 772, BikeRace `0x00417ed0` 2800 -> 2804.
+  BikeAI `0x0040e510` 1846 -> 1865: the walk's segment lengths through the
+  `((x*x) + y*y) + z*z` helper already needed by `0x0040d200` move the named
+  segment copy's z store from before the first faddp to after the z*z product;
+  `(y*y)` gives the same, `(z*z)`, a flat sum and z- or y-first sums do not.
 - No change: Camera slot 29 `0x0042eb10`, MatrixUtil `0x004a1a50` (6208
   forms), Wrecker `0x00531da0`, `0x00532580` and slot 10 `0x005306e0`,
   FollowCamera `0x00465720` and `0x004650e0`, Griddraw `0x0047e600`,
@@ -635,6 +639,10 @@ without effect, as noted.
   (Shock `0x004f9f90`). `m.x = v.x * (s = 1.0f / n); m.y = v.y * s; m.z = v.z * s;`
   gives the x-only `fld st(0); fmul v.x` of retail's collision means
   (CollisionObject `0x00437c20`, `0x00438280`, `0x004376f0`, `0x00437ef0`, +4..5 each).
+  The same store in the first product of a per-component step,
+  `step.x = (t = ahead / len + bestT) * seg.x; step.y = t * seg.y; ...`, gives retail's
+  `fst t; fmul seg.x` where a whole-vector `seg * t` keeps the scale in a register
+  (BikeAI `0x0040e510`, +4 aligned).
 - **Grouped sums through by-reference helpers.** `(a.x*b.x + a.y*b.y) + a.z*b.z` in an
   inline by-reference helper reproduced CollisionObject `0x00439600`; written inline,
   VC6 keeps v.z live. The squared length `v.z*v.z + ((v.x*v.x) + (v.y*v.y))` in an

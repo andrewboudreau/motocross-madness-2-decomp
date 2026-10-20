@@ -1860,9 +1860,9 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
     int hasBody = 0;
     int notifyOther = 0;
     float k = 1.0f;             // angle-based response scale (kind 100)
-    Vec3* otherVel = 0;         // before other: retail clears ebx before edi at entry
     Vehicle* other = 0;
     int ctx;
+    Vec3* otherVel;             // provisional: left uninitialised as retail reads it (no-body join reloads it)
     Vec3* velPtr;
     Vec3 r;                     // kind 0x3e8 lever; at function scope it keeps its own slot (frame 0xac)
 
@@ -1989,12 +1989,16 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
 
     rel = ((BikeContactSet*)collisionObject)->field_0xa0 - centerOfMass;
     if (hasBody) {
-        int l14 = (b == 0x2711 || b == 0x69 || b == 0x3ea) ? 0 : (int)otherVel;
+        // retail stores otherVel first and overwrites it with an immediate 0; with the
+        // uninitialised otherVel this keeps the entry zero in ebx as retail does
+        int l14 = (int)otherVel;
+        if (b == 0x2711 || b == 0x69 || b == 0x3ea)
+            l14 = 0;
         UnknownVirtualSlot4(&((BikeContactSet*)collisionObject)->field_0xac, &velocity, &worldAngularVelocity, &rel, b, l10,
                             ctx, otherVel, &velA, &leverC, &velB, velPtr, l14, &out, k);
         if (other) {
             other->asleep = 0;
-            float len2 = otherVel->x * otherVel->x + otherVel->y * otherVel->y + otherVel->z * otherVel->z;
+            float len2 = otherVel->z * otherVel->z + (otherVel->x * otherVel->x + otherVel->y * otherVel->y);
             other->linearSpeed = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
             other->worldAngularVelocity = other->sceneNode->LocalToWorldDirection(*velPtr);
         }

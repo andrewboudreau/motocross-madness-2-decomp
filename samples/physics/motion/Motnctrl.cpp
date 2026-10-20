@@ -144,7 +144,10 @@ void AxisAngleMatrix(Matrix4* m, float x, float y, float z, float angle);
 // an assigned or direct-initialised axisX, a const Vec3& of src->position and a float copy of its x
 // (the fld of position.x still schedules above the axisX copies).  Frame diagnosis (session 14):
 // the two Vec3Normalize return temporaries share axisX's slot at +0 here where retail gives
-// them a dedicated slot at +0x64; hoisting the pose locals does not separate them.
+// them a dedicated slot at +0x64; hoisting the pose locals does not separate them.  The one
+// remaining code difference is the fld of src->position.x scheduled right after the cross
+// product call (retail: four moves later); every order of the three axis rows and the position
+// block, and the position copied first or as chained assignments, keep it (452..476).
 void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 {
     Matrix4 pose;
@@ -335,7 +338,8 @@ inline void ExtrapolatePose7(CharacterPose* a, CharacterPose* b, CharacterPose* 
     }
     if (flag) {
         Vec3 delta = b->position - a->position;
-        out->position = b->position + delta * ffps * t;
+        Vec3 step = delta * ffps * t;
+        out->position = b->position + step;
     } else {
         out->position = b->position;
     }
@@ -350,11 +354,13 @@ inline void ExtrapolatePose7(CharacterPose* a, CharacterPose* b, CharacterPose* 
 // the two poses are interpolated with a smoothstep weight over blendDuration; nodes flagged in the
 // name table keep the blend-from pose.  Past the last frame a looping motion is restarted through
 // BlendToMotion, a non-looping one sets motionStopped.  Returns the frame number, or 0.
-// Near miss (strict is positional, so the metric here is aligned instructions: 675 of 958, 283
-// differing).  The call sequence and the clamp/ease shape are retail's.  With the two blend inlines
+// Near miss (strict is positional, so the metric here is aligned instructions: 693 of 958, 270
+// differing; clearing finished before the time add and the helper's named step give the last ones).  The call sequence and the clamp/ease shape are retail's.  With the two blend inlines
 // (BlendPose7/BlendPose7B) the constructor calls split 2/4 as in retail, and the playback loop's
 // extrapolation through ExtrapolatePose7 calls Vec3::Vec3 and the operator COMDATs in retail's
-// order.  Left: this pointer in edi (retail esi) from the prologue on, the blend loop's unused sums
+// order.  Left: this pointer in edi (retail esi) in the prologue, with &currentFrame in esi
+// (retail edi) and motionStopped compared in memory (retail loads it into eax first; `!= 0`,
+// `== 1`, a named copy and the time-add spellings do not change either), the blend loop's unused sums
 // and extrapolation (retail calls operator-/*/*/+ there, VC6 inlines some and calls three
 // cross/normalise COMDATs retail does not), and the frame (candidate 3376 bytes).
 int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
@@ -367,8 +373,8 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
 
     if (motionStopped)
         return 0;
-    chr_field_0x10 += time;
     finished = 0;
+    chr_field_0x10 += time;
     if (AdvanceClamped(currentMotion, &currentFrame, &from, &to, &chr_field_0x10, &weight)) {
         ok = 1;
     } else {
