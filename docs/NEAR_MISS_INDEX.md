@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 127, c 101, total 230. The three class (a) functions of the
+Counts: a 2, b 126, c 101, total 229. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -94,7 +94,7 @@ retail does; grouping the x row's first two products does the same for that row.
 | krusty2/collision/CollisionObject | `0x00438280` | 705/710 | c | ModelVsModel: as ModelVsHull, with the same per-component mean; an element-pointer local before the call fixes the mean copy registers. Left: one by-value copy schedule (`sub esp, 0xc` placement) |
 | krusty2/collision/CollisionObject | `0x00438550` | 734/783 | c | ModelVsModelSwept keeps the last contact (no averaging); an element-pointer local before the call fixes the loop registers. Left: scheduling of the two box copies (as 0x00437ef0); assignment after declaration, component-wise copies and the reversed declaration order do not move it |
 | krusty2/collision/CollisionObject | `0x00434eb0` | 1666/1885 | b | UpdateModelBounds: call pattern, size and frame match (named `lo`, `continue`, inverse pointer, guarded do-while); retail clears i before the guard, ax/az slots swapped, minBound/maxBound among the temporaries |
-| krusty2/collision/CollisionObject | `0x00435830` | 163/1688 | b | SetTransform: per-element term order of the hull case's inline 4x4 product (retail 3,2,1,4 / 1,3,4,2 / ...; arena ordering, see VC6_OPERAND_ORDER.md 3.2; ~40 element-pointer, reference and bracketing forms recorded at the helper); frame 0x30 both |
+| krusty2/collision/CollisionObject | `0x00435830` | 902/1684 | b | SetTransform: per-element term order of the hull case's inline 4x4 product (retail 3,2,1,4 / 1,3,4,2 / ...; arena ordering, see VC6_OPERAND_ORDER.md 3.2; ~40 element-pointer, reference and bracketing forms recorded at the helper); frame 0x30 both |
 | krusty2/collision/CollisionObject | `0x00439820` | 1309/1493 | b | SegmentTouchesObject: same instructions as retail; some temporaries in other frame slots, one `add esp` scheduled late |
 | krusty2/soultree/SoulTreePhysics | `0x00500220` | 286/639 | b | 24 code diffs: `je @201 ; fld [edi + 8]` vs `je @197`; `fmul [esi + 4]` vs `fld [esi + 4] ; fmul [edi + 8]`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x00501600` | 651/925 | b | 18 code diffs: `jmp @239 ; fld [esp + N]` vs `jmp @242`; slots differ |
@@ -110,9 +110,8 @@ retail does; grouping the x row's first two products does the same for that row.
 | krusty2/vehicle/Vehicle | `0x005257a0` | 693/745 | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |
 | krusty2/vehicle/Vehicle | `0x005265d0` | 381/555 | b | same size, 0.82 ratio: two products per cross load a before b; the crashState ?: argument is hoisted above the pushes |
 | krusty2/vehicle/Vehicle | `0x005268d0` | 223/1578 | b | ratio 0.59: retail adds `xor ebx, ebx`; hasBody/otherVel registers swapped (ebp/ebx); slot order differs |
-| krusty2/vehicle/Vehicle | `0x005276d0` | 496/523 | b | 3 code diffs: `mov [edx + 4], esi` scheduled before `fstp [esp + 0x14]` (midpoint branch); return-pointer `lea eax, [esp + 0x20] ; push eax` earlier in the lead-wheel branch |
 | krusty2/vehicle/Vehicle | `0x00527a20` | 350/870 | b | 25 code diffs, all in the (0,0,0) store: retail copies its stack temporary with direct `[esi + 0x120]` moves, VC6 keeps `lea edx, [esi + 0x120]` (4 bytes short) |
-| krusty2/vehicle/Vehicle | `0x005281b0` | 512/539 | c | 3 code diffs: retail stores field_0x4e8 before the abs `fcom`; `fld st(0) ; fmul [t.x]` vs `fld [t.x] ; fmul st(1)`; scratchVector .y store scheduled later (frame homes match with the angle in its own local) |
+| krusty2/vehicle/Vehicle | `0x005281b0` | 523/539 | c | 2 code diffs: retail stores field_0x4e8 before the abs `fcom`; `fld st(0) ; fmul [t.x]` vs `fld [t.x] ; fmul st(1)` (Math3D operators fixed the scratchVector .y store; frame homes match) |
 | krusty2/vehicle/Vehicle | `0x005286a0` | 754/784 | c | slot 56: two side-cross products load their multiplicands in the other order (retail side.y*a.z, a.x*side.z); source operand order has no effect |
 | krusty2/vehicle/Vehicle | `0x0052a940` | 302/3254 | b | frame 0x104 matches; int `settled` matches retail; retail keeps a function-level zero in ebx and `hit` in ebp (`mov ebp, eax ; xor ebx, ebx`, both reloaded at the back edge), ours only has loop-local zero registers; up/zeroB/lift/pivot/o1..o3 slot order differs |
 | net/Net | `0x004ab960` | 149/1072 | b | 51 code diffs: `test esi, esi ; jge @54` vs `cmp esi, ebx ; jge @51`; retail adds `lea edx, [esp + N]`; slots differ |

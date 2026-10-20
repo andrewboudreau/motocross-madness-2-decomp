@@ -2333,7 +2333,9 @@ void CollisionRelativeTransform(Matrix4* out, const Matrix4* from, const Matrix4
 // Near miss (441/458): one store (mov [esp+0x30], eax) of the second inverse copy is
 // scheduled later.  No gain from an inline CollisionRelativeTransform (inlines all three),
 // three calls, swapped inverse variants, two inverse locals, block scopes, declaration
-// orders, t2 first or reordered rows in the second copy.
+// orders, t2 first or reordered rows in the second copy.  Also no gain (18 forms) from a
+// separate helper for the second copy with reversed or reordered swaps, split swap temps,
+// a Matrix4& alias, scalar or direct translation stores, or a by-value return.
 void CollisionRelativeFrame(Matrix4* out, const Matrix4* m1, const Matrix4* m2, const Matrix4* m3)
 {
     Matrix4 inv;
@@ -2587,22 +2589,31 @@ static inline float CollisionLengthInline(const Vec3& v)
 //   sphere: the sphere is the shape's own centre and radius through its transform.
 //   capsule: nothing.
 // Only the hull case expands the point transform; the other cases call 0x0042a510 (inline budget).
+// The hull case names the previous and current body matrices: retail keeps &prev in edx across
+// the product for the CollisionRelativeTransform argument and spills &body (163 -> 902).
+// Model loop (about 25 forms): retail holds model in ebx at the loop head (copied in the latch,
+// so the empty-loop exit needs no copy).  Reading model->elements into a block-local first
+// gives the ebx base and the stack-kept 0x198 offset but enters the loop with a jmp and copies
+// after it (863, d192; `e = model->elements; e += i` 882, d180); e++, char* or byte-offset
+// strides, while/do forms and named prev/body element pointers score lower.
 void CollisionObject::SetTransform(const Matrix4* m)
 {
     switch (shapeType) {
     case 0: {
         CollisionHullBody* hull = (CollisionHullBody*)shape;
         CollisionVec3* boundCenter = (CollisionVec3*)&field_0x34;   // +0x40, the bounding-sphere centre
-        hull->prevBodyTransform = hull->bodyTransform;
-        hull->bodyTransform = *m;
+        Matrix4* prev = &hull->prevBodyTransform;
+        Matrix4* body = &hull->bodyTransform;
+        *prev = *body;
+        *body = *m;
         CollisionMatrixMultiplyInline(&hull->worldTransform, m, &hull->localTransform);
-        CollisionRelativeTransform(&hull->motionTransform, m, &hull->prevBodyTransform);
+        CollisionRelativeTransform(&hull->motionTransform, m, prev);
         *boundCenter = hull->triangleTree->center;
         Vec3 half = *(Vec3*)&hull->triangleTree->halfExtents;
         MoveBox((Vec3*)boundCenter, &half, &hull->motionTransform);
         boundRadius = CollisionLengthInline(half);
         Vec3 c = *(Vec3*)boundCenter;
-        CollisionTransformPointInline((Vec3*)boundCenter, c, &hull->bodyTransform);
+        CollisionTransformPointInline((Vec3*)boundCenter, c, body);
         break;
     }
     case 1: {

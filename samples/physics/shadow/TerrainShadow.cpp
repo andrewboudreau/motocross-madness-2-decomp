@@ -376,6 +376,13 @@ full:
 // frustum's corner rays at the height field and accumulates the hit cells' grid rectangle
 // (minX..maxZ) and the hits' screen rectangle (field_0x6668..field_0x6674); returns whether
 // the footprint is on screen and large enough (tier 3 semantics).
+// Lead (not taken): `right` and `up` declared once at function scope and assigned in both
+// modes give retail's temporary-then-copy stores for both and its `add ecx, 0x188` for up
+// (3088 bytes, 745 aligned instructions with registers and displacements masked against 730
+// here), but the cell pointer then takes the slot below the up temporary and eye (retail:
+// up temporary 0x24, eye 0x30, cell 0x3c) and eax/ecx swap throughout (227/3088).  Typedef
+// shifts of 0..62 do not move it; eye = eye + ..., named-result products and declaration
+// placement change nothing or the size.
 // ---------------------------------------------------------------------------------------------
 
 // The unit's vector with the d3dvec.inl constructors (ProjectedShadow.h's ShadowVec3 has none;
