@@ -877,3 +877,13 @@ try on similar code. None is a rule.
   `Vec3 prev = f23c;` used in `(f154 - prev) * t + prev`, give those copies. In the
   same function a case block's `Vec3 r` declared at function scope stops sharing its
   slot and gives retail's 0x88 offset.
+- **A d3drm import is stdcall: a cdecl declaration merges its cleanup.**
+  Tire::UpdateSuspensionProbe (`0x00514550`, 2504 to 2576 of 4258): the import thunk
+  `0x0053304c` is D3DRMVectorRotate. Declared cdecl, VC6 defers its 16-byte cleanup
+  into a later `add esp, 0x18`, so every esp offset in that branch is 0x10 too high.
+  `extern "C" ... __stdcall` (as in FollowCamera.h) removes both effects. Check the
+  import table before declaring a callee above 0x530000 cdecl.
+- **Parenthesising a dot's last product delays the pending integer copy.** In the
+  same function, `a.z * b.z + (a.x * b.x + (a.y * b.y))` keeps the `mov [dst+8], eax`
+  copy of the preceding cross's z after the first `faddp`, as retail does at three
+  dot tests. The unparenthesised form stores it before the `faddp`.

@@ -441,8 +441,11 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
 
 // Out-of-line 0x00515600 (cdecl, hidden result): a x b.
 CollisionVec3 TireCross(const CollisionVec3& a, const CollisionVec3& b);
-// 0x0053304c (cdecl): out = function(a, b, t); used with the two global vectors and the angle.
-void TireVectorBlend(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b, float t);
+// d3drm.dll's D3DRMVectorRotate (import thunk 0x0053304c, stdcall: the callee pops its
+// arguments): rotates `vector` about `axis` by `theta`. The SDK types are LPD3DVECTOR;
+// CollisionVec3 has the same layout.
+extern "C" CollisionVec3* __stdcall D3DRMVectorRotate(CollisionVec3* result, const CollisionVec3* vector,
+                                                     const CollisionVec3* axis, float theta);
 // 0x0042a510 / 0x0042a580 (cdecl): transform a point / a direction by a matrix.
 void TireTransformPoint(CollisionVec3* out, CollisionVec3 v, const CollisionMatrix4* m);
 void TireTransformDirection(CollisionVec3* out, const CollisionVec3* v, const CollisionMatrix4* m);
@@ -559,6 +562,25 @@ static inline CollisionVec3 TireCrossGrouped(const CollisionVec3& a, const Colli
     return r;
 }
 
+// TireCrossGrouped with the x component's first product parenthesised too: retail loads
+// a's component first in both x products of the lateral axis (the plain form commutes them).
+static inline CollisionVec3 TireCrossGroupedXY(const CollisionVec3& a, const CollisionVec3& b)
+{
+    CollisionVec3 r;
+    r.x = (a.y * b.z) - a.z * b.y;
+    r.y = (a.z * b.x) - a.x * b.z;
+    r.z = (a.x * b.y) - a.y * b.x;
+    return r;
+}
+
+// z^2-first dot with the last product parenthesised: the extra node holds the integer
+// copy of the cross's z into the destination until after the first faddp, as retail does
+// for the probe's sign and length tests.
+static inline float TireDotGroupedLast(const CollisionVec3& a, const CollisionVec3& b)
+{
+    return a.z * b.z + (a.x * b.x + (a.y * b.y));
+}
+
 // a + b with the z sum parenthesised: the extra node stores z before the y copy, as
 // retail does for the first probe position.
 static inline CollisionVec3 TireSumGroupedZ(const CollisionVec3& a, const CollisionVec3& b)
@@ -613,8 +635,8 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     rollDirection = TireNormalizeOr(TireCross(this->CollisionPoint::surfaceNormal, sideAxis), wheelUpAxis);
 
     CollisionVec3 lateral;
-    lateral = TireCrossGrouped(rollDirection, sideAxis);
-    if (TireDotInline(lateral, this->CollisionPoint::surfaceNormal) > 0.0f) {
+    lateral = TireCrossGroupedXY(rollDirection, sideAxis);
+    if (TireDotGroupedLast(lateral, this->CollisionPoint::surfaceNormal) > 0.0f) {
         lateral.x = lateral.x * -1.0f;
         lateral.y = lateral.y * -1.0f;
         lateral.z = lateral.z * -1.0f;
@@ -636,7 +658,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
         if (MovingPart::ownerRef) {
             CollisionVec3 base = rollDirection * wheelRadius + origin;
             CollisionVec3 c = TireCrossGrouped(rollDirection, kVec3YAxis);
-            float cLenSq = TireDotInline(c, c);
+            float cLenSq = TireDotGroupedLast(c, c);
             if (cLenSq == 0.0f) {
                 c = kVec3Zero;
             } else {
@@ -649,7 +671,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
             pt = c * s + base;
         } else {
             CollisionVec3 v;
-            TireVectorBlend(&v, &kVec3ZAxis, &kVec3YAxis, a5);
+            D3DRMVectorRotate(&v, &kVec3ZAxis, &kVec3YAxis, a5);
             CollisionVec3 base = v * -wheelRadius + origin;
             CollisionVec3 c = TireCrossGrouped(v, kVec3YAxis);
             float cLenSq = TireDot(&c, &c);
@@ -675,7 +697,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     CollisionVec3 v = TireNormalizeOr(TireCross(n2, sideAxis), wheelUpAxis);
     CollisionVec3 u = TireCrossGrouped(v, sideAxis);
     CollisionVec3 lateral2 = u;
-    if (u.z * n2.z + (u.y * n2.y + u.x * n2.x) > 0.0f) {
+    if (u.z * n2.z + (u.y * n2.y + (u.x * n2.x)) > 0.0f) {
         // retail reads x from u and negates y and z in lateral2 (an in-place negate
         // helper gives the same reads but computes the scaled x argument early)
         lateral2.x = u.x * -1.0f;
