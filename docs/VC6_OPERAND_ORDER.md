@@ -948,6 +948,16 @@ try on similar code. None is a rule.
   Retail also falls through into the zero vector after `test ah, 1; jne <scale>`, which
   is `if (d >= 0.0f) push = zero; else push = scale(axis, -d);`; `if (d < 0.0f)` puts the
   scale arm first.
+- **Products kept on the x87 stack under a stored scalar are float locals.** Same function
+  (1671 to 2080): retail computes `offset.x * gains.x`, then y and z, onto the x87 stack,
+  stores `k = result * stepTime`, and builds each constructor argument as `fld k; fmul
+  st(1)` followed by `fstp st(0)`. `float gx = ..., gy = ..., gz = ...; float k = ...;
+  Vec3 delta = Vec3(gx * k, gy * k, gz * k); steerTorque += delta;` gives that and the copy
+  through a temporary before the adds. Writing the products inside the arguments
+  (`offset.x * gains.x * k`) keeps nothing on the stack, and an inline helper taking
+  the products by value spills two of them. In the same function `(len * stepTime) * sign`
+  keeps retail's left-to-right product with len already on the stack, where the
+  flattened `len * stepTime * sign` loads sign first.
 - **Loop lookups: an early-return helper keeps the result in a register.** Bike LoadBike
   (`0x004079c0`, 2080 to 2584 of 6745): retail zeroes `esi` on the loop's exit and loads the
   match in an out-of-line block that jumps back. `int kind = 0; for (...) if (match) { kind =
