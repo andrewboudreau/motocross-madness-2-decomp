@@ -14,7 +14,16 @@
 //   destructors, but never for two arrays whose element has a destructor
 //   (sibling blocks, else-if chains, switch cases, sequential blocks, try,
 //   same name, inline virtual InfoType destructor), so the source shape
-//   that lets retail share them is still unknown.
+//   that lets retail share them is still unknown. Retail's unwind map
+//   (FuncInfo 0x00560770, 16 states) places both arrays at [ebp-0x5ac]
+//   (states 1 and 0xc) and every `new` temporary at [ebp-0x6d0]. Also
+//   0xc64 here: each array block moved into a static inline helper (both
+//   inline, slots still separate), a wrapper struct holding the array,
+//   scalar destructor objects in place of the arrays, the blocks as switch
+//   cases, sequential blocks, nested depths, a loop body, a try block, the
+//   helper returning early or allocating first, and the flags /Od /Ox /O1
+//   /Og /Oy- /Ob0 /Ob2 /Gy /Oa /Ow /GF /Gf /Zi /Gs. Only /GX- shares the
+//   slot (it drops the unwind states).
 // SPBikeRiderDlg::Tick (0x0044fae0, 1235 bytes, 1181
 //   match): the same flow and x87 code; only the scheduling of the by-value
 //   Vector3 copies passed to the camera's slot 29 differs (retail takes
