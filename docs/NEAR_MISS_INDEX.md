@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 127, c 101, total 230. The three class (a) functions of the
+Counts: a 2, b 126, c 101, total 229. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -110,7 +110,6 @@ retail does; grouping the x row's first two products does the same for that row.
 | krusty2/vehicle/Vehicle | `0x005257a0` | 693/745 | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |
 | krusty2/vehicle/Vehicle | `0x005265d0` | 381/555 | b | same size, 0.82 ratio: two products per cross load a before b; the crashState ?: argument is hoisted above the pushes |
 | krusty2/vehicle/Vehicle | `0x005268d0` | 223/1578 | b | ratio 0.59: retail adds `xor ebx, ebx`; hasBody/otherVel registers swapped (ebp/ebx); slot order differs |
-| krusty2/vehicle/Vehicle | `0x005276d0` | 496/523 | b | 3 code diffs: `mov [edx + 4], esi` scheduled before `fstp [esp + 0x14]` (midpoint branch); return-pointer `lea eax, [esp + 0x20] ; push eax` earlier in the lead-wheel branch |
 | krusty2/vehicle/Vehicle | `0x00527a20` | 350/870 | b | 25 code diffs, all in the (0,0,0) store: retail copies its stack temporary with direct `[esi + 0x120]` moves, VC6 keeps `lea edx, [esi + 0x120]` (4 bytes short) |
 | krusty2/vehicle/Vehicle | `0x005281b0` | 512/539 | c | 3 code diffs: retail stores field_0x4e8 before the abs `fcom`; `fld st(0) ; fmul [t.x]` vs `fld [t.x] ; fmul st(1)`; scratchVector .y store scheduled later (frame homes match with the angle in its own local) |
 | krusty2/vehicle/Vehicle | `0x005286a0` | 754/784 | c | slot 56: two side-cross products load their multiplicands in the other order (retail side.y*a.z, a.x*side.z); source operand order has no effect |

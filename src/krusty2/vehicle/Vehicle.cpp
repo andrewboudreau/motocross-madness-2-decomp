@@ -864,9 +864,9 @@ static inline Vec3 VehOffset(const Vec3& a, const Vec3& b)
 // rotated by the frame transform; falls back to field_0x194 when disabled or > 2 wheels.
 // Each branch converts through its own WorldToLocalDirection call (retail has three) and VC6
 // merges the `*out = ` copies; the midpoint goes through three temporaries (difference, half,
-// sum) as retail's 0x24 frame shows.  Left: two FPU/store scheduling spots in the midpoint and
-// lead-wheel branches (3 instructions).  Tried: by-pointer/reference/named-temp lead wheel,
-// a named offset temp, nested helper expressions, early-return and if/else layouts.
+// sum) as retail's 0x24 frame shows.  The Math3D operators (constructor-return temporaries)
+// give retail's store and return-pointer schedule; VehOffset's member-wise temporaries
+// store the last component one instruction late.
 Vec3* Vehicle::UnknownVirtualSlot46(Vec3* out, float arg)
 {
     if (!airborne && !pointsTouching && wheelsInContact <= 2) {
@@ -885,18 +885,17 @@ Vec3* Vehicle::UnknownVirtualSlot46(Vec3* out, float arg)
                 }
             }
             if (a->driveShare < 0.9f) {
-                scratchVector = VehOffset(b->wheelPosition, position);
+                scratchVector = b->wheelPosition - position;
                 *out = modelNode->WorldToLocalDirection(scratchVector);
             } else {
-                Vec3 d = VehOffset(a->wheelPosition, b->wheelPosition);
-                Vec3 half = VehScale(d, 0.5f);
-                Vec3 mid = VehSum(half, b->wheelPosition);
-                scratchVector = VehOffset(mid, position);
+                Vec3 d = a->wheelPosition - b->wheelPosition;
+                Vec3 half = d * 0.5f;
+                Vec3 mid = half + b->wheelPosition;
+                scratchVector = mid - position;
                 *out = modelNode->WorldToLocalDirection(scratchVector);
             }
         } else {
-            Vec3* p = &primaryWheel->wheelPosition;
-            scratchVector = VehOffset(*p, position);
+            scratchVector = primaryWheel->wheelPosition - position;
             *out = modelNode->WorldToLocalDirection(scratchVector);
         }
     } else {

@@ -343,3 +343,7 @@ exact:
   one-wheel path's sum/difference were by-value out-of-line operator temporaries
   (`BikeVec3Sub(BikeVec3Add(front, half), position)`) instead of named pointer-call
   results, whose own slots kept the transform result off retail's 0x3c.
+- The same frame can still schedule differently by how the temporary is built: Vehicle slot
+  46 (`0x5276d0`) stores the last component and pushes the return pointer as retail only
+  with Math3D's constructor-return operators (`scratchVector = mid - position`); a helper
+  that fills a named `Vec3 r` member-wise (`VehOffset`) gives the same frame, one store late.

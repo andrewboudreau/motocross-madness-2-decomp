@@ -675,8 +675,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot46@Vehicle",
     "target_va": "0x5276d0",
     "target_size": 523,
-    "expect": "partial",
-    "notes": "Same length (523), 3 instruction diffs. Look-at offset toward lead wheel / midpoint of two wheels rotated by 4FD710 in each branch, else field_0x194; frame 0x24 from the difference/half/sum temporaries. Left: store/fstp and return-pointer push scheduling in the midpoint and lead-wheel branches.",
+    "expect": "exact",
+    "notes": "Look-at offset toward lead wheel / midpoint of two wheels rotated by 4FD710 in each branch, else field_0x194; frame 0x24 from the difference/half/sum temporaries. The Math3D operator temporaries give retail's store and return-pointer schedule.",
     "bindings": "Vehicle.bindings.json"
   },
   {
