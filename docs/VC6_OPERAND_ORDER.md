@@ -882,6 +882,13 @@ try on similar code. None is a rule.
   `Vec3 prev = f23c;` used in `(f154 - prev) * t + prev`, give those copies. In the
   same function a case block's `Vec3 r` declared at function scope stops sharing its
   slot and gives retail's 0x88 offset.
+- **One reused function-scope Vec3 packs successive temporaries into one slot.** Bike
+  slot 38 (`0x00405190`, frame 0xb8 to 0xac, aligned 683 to 688): retail's copy of
+  `worldAngularVelocity`, and the sum it passes by address to slot 3, share the slot of an
+  existing function-scope `tmp`. `tmp = w; cross(tmp, rel); tmp = velocity + scratch;
+  f(&tmp)` reproduces that. Sibling blocks, a block-scoped `p`, `&(a + b)`, a by-reference
+  wrapper and a second reused local `v` do not. Declaring an unused extra Vec3 alone
+  costs two aligned instructions.
 - **A component-wise cross into a named local, then one whole assignment, is retail's
   copy.** SimulateLookAhead (`0x0040eca0`, aligned 3737 to 3760): writing `right.x/y/z`
   directly keeps the products' stores on `right`; `Vec3 rearCross; rearCross.x = ...;
