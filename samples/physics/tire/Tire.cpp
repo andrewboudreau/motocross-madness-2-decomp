@@ -1119,7 +1119,7 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
     torque->z += moment.z;
 }
 
-// 0x00513c70 (near miss, 769 of 797 bytes, same length): runs the attached
+// 0x00513c70 (near miss, 793 of 797 bytes, same length): runs the attached
 // shock against the contact. The inline (+0x2b0) and rotating (+0x2ac) shocks
 // are solved with the same follow-up, written out twice as retail keeps two
 // copies; the solve's load and active flag become the contact's penetration and
@@ -1128,11 +1128,13 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
 // failure path (VC6 merges the two tails into retail's single block); with
 // the clears written once after the if/else chain VC6 has too few zero stores
 // to keep retail's zero register (ebx) across the solve call and compiles
-// every null test as `test` (96 of 805 bytes). Left: the rotating path's
-// first world-position add loads the attachment's x first where retail loads
-// the contact's, and the surface position's z sum is staged in the x slot
-// (retail reuses the y slot); TireAddTo-style `d + v` sums swap the inline
-// path's first add as well.
+// every null test as `test` (96 of 805 bytes). The surface position is summed
+// through TireSum (sums into float locals, then stored), which stages z in the
+// dead y slot like retail (769 -> 793). Left: the rotating path's first
+// world-position add loads the attachment's x first where retail loads the
+// contact's; `+=`, `w = w + d`, `w = d + w`, the hinge local, a reference or
+// copy of field_0x80, a reference to worldPosition and vector sums all keep it
+// (TireAddTo-style `d + v` sums swap the inline path's first add as well).
 void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offset,
                        const CollisionVec3* velocity, const CollisionVec3* axisB)
 {
@@ -1153,7 +1155,7 @@ void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offse
                 CollisionPoint::worldPosition.y += field_0x2b0->field_0x80.y;
                 CollisionPoint::worldPosition.z += field_0x2b0->field_0x80.z;
                 if (active)
-                    CollisionPoint::surfacePosition = TireTimes(load, CollisionPoint::surfaceNormal) + CollisionPoint::worldPosition;
+                    CollisionPoint::surfacePosition = TireSum(TireTimes(load, CollisionPoint::surfaceNormal), CollisionPoint::worldPosition);
                 else
                     CollisionPoint::surfacePosition = CollisionPoint::worldPosition;
                 field_0x268 = 1;
@@ -1177,7 +1179,7 @@ void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offse
                 CollisionPoint::worldPosition.y += field_0x2ac->field_0x80.y;
                 CollisionPoint::worldPosition.z += field_0x2ac->field_0x80.z;
                 if (active)
-                    CollisionPoint::surfacePosition = TireTimes(load, CollisionPoint::surfaceNormal) + CollisionPoint::worldPosition;
+                    CollisionPoint::surfacePosition = TireSum(TireTimes(load, CollisionPoint::surfaceNormal), CollisionPoint::worldPosition);
                 else
                     CollisionPoint::surfacePosition = CollisionPoint::worldPosition;
                 field_0x268 = 1;

@@ -245,7 +245,7 @@
     "target_va": "0x00513c70",
     "target_size": 797,
     "expect": "partial",
-    "notes": "96.5% strict (tier 3 name): shock solve against the contact for the inline (+0x2b0) and rotating (+0x2ac) attachments; the per-attachment failure clears give retail's zero register (docs/VC6_ZERO_REGISTER.md), prologue, block layout and length. Left: the rotating path's first world-position add loads the attachment first (retail the contact) and the surface position's z sum is staged in the x slot (retail the y slot)",
+    "notes": "793/797 strict (tier 3 name): shock solve against the contact for the inline (+0x2b0) and rotating (+0x2ac) attachments; the per-attachment failure clears give retail's zero register (docs/VC6_ZERO_REGISTER.md), prologue, block layout and length. The surface position sums through TireSum, which stages z in the dead y slot like retail (769 -> 793). Left: the rotating path's first world-position add loads the attachment first (retail the contact); every add form tried keeps it (see Tire.cpp)",
     "bindings": "Tire.bindings.json"
   },
   {
