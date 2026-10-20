@@ -1173,14 +1173,13 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
     float l10;                     // the other body's field_0x24 (float) or 0
     int l14;
     Vec3 s;                     // scale/mask vector (1,1,1)
-    Vec3 p;                     // lever vector
     Vec3 v30;
     Vec3 v3c;
     Vec3 v48;
     int ctx;
     int hasBody;
-    Vehicle* other = 0;
     Vec3* otherVel = 0;
+    Vehicle* other = 0;
     Vec3 rel;
 
     s = VehOnes();
@@ -1207,30 +1206,32 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         otherVel = &other->velocity;
         ctx = (int)other->modelNode;
         v3c = VehOffset(((VehicleContactSet*)collisionObject)->contactPoint, other->centerOfMass);
-        v30 = other->invInertia;
         v48 = other->worldAngularVelocity;
         c = &other->angularVelocity;
+        v30 = other->invInertia;
         break;
-    case 0x69:
-        hasBody = 1;
-        ctx = *(int*)((char*)((VehicleCollisionEvent*)c)->otherBody + 0x34);
-        v30 = kVec3Zero; v3c = kVec3Zero; v48 = kVec3Zero;
+    case 0x69: {
         l10 = 0;
-        p.x = 1.0f; p.y = 1.0f; p.z = 1.0f;
-        s = p;
-        otherVel = (Vec3*)(ctx + 0x40);
+        char* body = (char*)((VehicleCollisionEvent*)c)->otherBody;
+        ctx = *(int*)(body + 0x34);
+        v3c = kVec3Zero; v48 = kVec3Zero; v30 = kVec3Zero;
+        otherVel = (Vec3*)(body + 0x40);
         c = 0;
-        break;
-    case 0x2711:
+        s = VehOnes();
         hasBody = 1;
-        ctx = *(int*)((char*)((VehicleCollisionEvent*)c)->otherBody + 0x1a0);
-        v30 = kVec3Zero; v3c = kVec3Zero; v48 = kVec3Zero;
-        l10 = 0;
-        p.x = 1.0f; p.y = 1.0f; p.z = 1.0f;
-        s = p;
-        otherVel = (Vec3*)(ctx + 0x224);
-        c = 0;
         break;
+    }
+    case 0x2711: {
+        l10 = 0;
+        char* body = (char*)((VehicleCollisionEvent*)c)->otherBody;
+        ctx = *(int*)(body + 0x1a0);
+        v3c = kVec3Zero; v48 = kVec3Zero; v30 = kVec3Zero;
+        otherVel = (Vec3*)(body + 0x224);
+        c = 0;
+        s = VehOnes();
+        hasBody = 1;
+        break;
+    }
     default:
         return;
     }
@@ -1239,21 +1240,21 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
     if (hasBody) {
         l14 = (b == 0x2711 || b == 0x69) ? 0 : (int)otherVel;
         UnknownVirtualSlot4(&((VehicleContactSet*)collisionObject)->contactNormal, &velocity, &worldAngularVelocity, &rel, b, l10, ctx,
-                            otherVel, (Vec3*)c, &v48, &v3c, &v30, l14, &l10, 1.0f);
+                            otherVel, &v48, &v3c, &v30, (Vec3*)c, l14, &l10, 1.0f);
         if (other) {
             *((char*)other + 0x10a) = 0;
-            float len2 = otherVel->x * otherVel->x + otherVel->y * otherVel->y + otherVel->z * otherVel->z;
-            linearSpeed = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
-            worldAngularVelocity = other->modelNode->LocalToWorldDirection(*(Vec3*)c);
+            float len2 = VehLen2(*otherVel);
+            other->linearSpeed = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
+            other->worldAngularVelocity = other->sceneNode->LocalToWorldDirection(*(Vec3*)c);
         }
     } else {
-        Vec3 t;
-        t.x = worldAngularVelocity.x * s.x; t.y = worldAngularVelocity.y * s.y; t.z = worldAngularVelocity.z * s.z;
-        scratchVector.x = rel.z * t.y - rel.y * t.z;
-        scratchVector.y = rel.x * t.z - rel.z * t.x;
-        scratchVector.z = rel.y * t.x - rel.x * t.y;
-        p = velocity + scratchVector;
-        UnknownVirtualSlot3(&((VehicleContactSet*)collisionObject)->contactNormal, &p, &rel, &s, b, 0, &l10);
+        Vec3 t = worldAngularVelocity;
+        t.x *= s.x;
+        t.y *= s.y;
+        t.z *= s.z;
+        scratchVector = CrossProduct(t, rel);
+        Vec3 q = velocity + scratchVector;
+        UnknownVirtualSlot3(&((VehicleContactSet*)collisionObject)->contactNormal, &q, &rel, &s, b, 0, &l10);
     }
     if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
         velocity = kVec3Zero;
