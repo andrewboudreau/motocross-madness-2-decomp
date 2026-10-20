@@ -173,9 +173,7 @@ public:
     char field_0x810; // 0x810  set with aiTricksEnabled for an AI (aiKind) bike, cleared otherwise
     char pad_0x0811[0x3];
     float contactTime;  // +0x814  seconds with the collision object in contact (0x00413200)
-    float roamTargetX;  // +0x818 BikeAI's free-ride target (x); 3000.0 from the loader for an AI bike, re-picked at random within 50 units
-    float roamTargetY;  // +0x81C BikeAI's free-ride target (y, 0 when re-picked)
-    float roamTargetZ;  // +0x820 BikeAI's free-ride target (z); 3000.0 from the loader for an AI bike
+    Vec3 roamTarget;  // +0x818 BikeAI's free-ride target; x and z 3000.0 from the loader for an AI bike, re-picked at random within 50 units (y 0); 0x00414370 copies it whole into the racing line
     float field_0x824; // 0x824  random in [-7,7) (or [-3,3) in modes 1/5)
     Vec3 predictedLandingNormal;  // +0x828  ground normal under the predicted landing (0x00413200)
     float predictedLandingTime;  // +0x834  predicted time to landing (PredictLanding 0x0040e370)

@@ -1469,7 +1469,9 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 // through a stored temporary.  The trick search needs the `for` form (a do/while is
 // rotated with the first division folded to * 0.2).  Declaring difficulty with the
 // other locals, or kind as well, or splitting kind's declaration leaves edi and 394
-// strict; reading difficulty after kind gives 237.  The random roam target is written x, z,
+// strict; reading difficulty after kind gives 237.  roamTarget is a Vec3: retail copies it
+// into the racing line with one struct copy and builds `roamTarget - position` as a vector
+// temporary (component-wise floats: 1052 aligned, Vec3: 1076).  The random roam target is written x, z,
 // then y (retail's zero store follows the second rand call; 1049 -> 1052 aligned of 1302).
 // Retail keeps `s * d.y` in the inline normalize (d.y is the zero register's value) while
 // VC6 folds it here; by-value, `v * s` and operand-order helper forms do not change that.
@@ -1859,20 +1861,18 @@ int KrustyBike::Fn_00414370(float dt)
         if (kind != 1 && kind != 5) {
             aiPath.count = 1;
             Vec3 d;
-            d = Vec3(roamTargetX - position.x, roamTargetY - position.y, roamTargetZ - position.z);
+            d = roamTarget - position;
             d.y = 0.0f;
             if (d.z * d.z + d.x * d.x < 2500.0f) {
                 d.x = rand() * (1.0f / 32768.0f);
                 d.z = rand() * (1.0f / 32768.0f);
                 d.y = 0.0f;
                 d = BikeAINormalizeInline(d) * 444.0f * terrain->worldScale;
-                roamTargetX = terrain->worldScale * 666.66f + d.x;
-                roamTargetY = 0.0f;
-                roamTargetZ = terrain->worldScale * 666.66f + d.z;
+                roamTarget.x = terrain->worldScale * 666.66f + d.x;
+                roamTarget.y = 0.0f;
+                roamTarget.z = terrain->worldScale * 666.66f + d.z;
             } else {
-                aiPath.points[0].x = roamTargetX;
-                aiPath.points[0].y = roamTargetY;
-                aiPath.points[0].z = roamTargetZ;
+                aiPath.points[0] = roamTarget;
             }
             aiPath.field_0x96c = 1000.0f;
             aiPath.field_0x970 = field_0x7cc;
