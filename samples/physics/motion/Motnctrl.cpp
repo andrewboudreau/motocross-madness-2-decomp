@@ -140,7 +140,9 @@ void AxisAngleMatrix(Matrix4* m, float x, float y, float z, float angle);
 // (hoisted or not) leaves 456 masked; normalising axisZ first gives 448; initialising from
 // Vec3Normalize(src->...), via copies, named or scoped temporaries, and `Vec3 position =
 // src->position` are all worse (55..193). The position block written as chained
-// assignments or interleaved per component gives 205; storing pose._44 before the position copies leaves 476.
+// assignments or interleaved per component gives 205; storing pose._44 before the position copies leaves 476, as do
+// an assigned or direct-initialised axisX, a const Vec3& of src->position and a float copy of its x
+// (the fld of position.x still schedules above the axisX copies).
 void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 {
     Matrix4 pose;
@@ -298,6 +300,16 @@ int AdvanceClamped(Motion* motion, MotionPoseList** cursor, MotionPoseList** fro
 // inline budget is spent differently (see BlendPose7; in the first extrapolation loop retail inlines
 // only operator- for the frame delta, calling Vec3::Vec3 0x404e60 for its result, and calls the
 // operator* / operator+ COMDATs that VC6 inlines here) and the frame is 0x284 instead of 0x2dc.
+// Lead (session 14, not kept: strict 127 < 152 while the tail is still off): the ctor-call split
+// follows from the unused-pose counts once the two blend expansions are separate inlines.  With
+// 3 unused poses in the first expansion and 6 (or 4..5 plus 3..6 dead CharacterPose locals at the
+// top of this function) in the second, VC6 calls the ctor 2 and 4 times and the frame is 0x2dc as
+// in retail; the first extrapolation then matches retail's call sequence (PoseRotation,
+// RotatePose, Vec3::Vec3, operator*, operator*, operator+) when it is an inline helper taking
+// (a, b, out, flag, t, fps) with the named delta.  Left: the second extrapolation, which retail
+// expands with operator-/*/*/+ calls; the same helper there is called out of line, written
+// directly it inlines everything, and nested position helpers move the first one's budget.
+// (One identical-body expansion per loop always gives counts n and n - 1, whatever is added.)
 int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
 {
     MotionPoseList* from;
