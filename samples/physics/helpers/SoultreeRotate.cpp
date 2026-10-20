@@ -34,7 +34,10 @@ void SoultreeObject::RotateAboutPoint(Vec3 pivot, Vec3 axis, float angle)
     // The x row's last two products grouped first gives retail's (nz*_31 + ny*_21) + nx*_11
     // x87 order (285 -> 290). Left: retail pushes &p for SetPosition after the z row's
     // products, VC6 here before the y row's store; the 576 y/z row orders and groupings,
-    // the six scalar declaration orders and Vec3(...) arguments did not move it.
+    // the six scalar declaration orders and Vec3(...) arguments did not move it.  Neither did
+    // (12 forms) a Vec3(...) temporary, named Vec3 or the float overload for this block alone
+    // (the push moves earlier still), or reading the matrix through a reference, a pointer
+    // or a copy of this.
     p.x = nx * localMatrix._11 + (nz * localMatrix._31 + ny * localMatrix._21) + localMatrix._41;
     p.y = nz * localMatrix._32 + ny * localMatrix._22 + nx * localMatrix._12 + localMatrix._42;
     p.z = nz * localMatrix._33 + ny * localMatrix._23 + nx * localMatrix._13 + localMatrix._43;
