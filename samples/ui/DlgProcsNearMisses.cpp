@@ -24,6 +24,13 @@
 //   helper returning early or allocating first, and the flags /Od /Ox /O1
 //   /Og /Oy- /Ob0 /Ob2 /Gy /Oa /Ow /GF /Gf /Zi /Gs. Only /GX- shares the
 //   slot (it drops the unwind states).
+//   ButModem returns from inside its loop once the modem connection is set
+//   up: retail destroys that block's array on two paths (three ??_M calls in
+//   all, the found path jumping straight to the epilogue), which `break`
+//   merged into one (tools/reference_diff.py, session 14). With `return`
+//   both OpenExitDialog calls and every g_kbGame load stay apart as in
+//   retail; aligned instructions 1293 -> 1342 (regmasked hunks 44 -> 37),
+//   strict unchanged because the frame still differs.
 // SPBikeRiderDlg::Tick (0x0044fae0, 1235 bytes, 1181
 //   match): the same flow and x87 code; only the scheduling of the by-value
 //   Vector3 copies passed to the camera's slot 29 differs (retail takes
@@ -337,7 +344,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 if (!memcmp(connections[i].provider, &DPSPGUID_MODEM, sizeof(GUID))) {
                     g_TrackGame->network->directPlay->InitializeConnection(connections[i].connection, 0);
                     g_TrackGame->ui->OpenMenu(0xfc);
-                    break;
+                    return;
                 }
             }
         } else if (!_stricmp("MenuReplay", event->controlName)) {
