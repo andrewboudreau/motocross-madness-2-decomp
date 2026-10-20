@@ -558,7 +558,9 @@ static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
 // Deflects the velocity (field_0x64) by an impulse applied at `point` along `dir` (tier 3).
 // k = slot73(effective mass/stiffness) * d; the change is dir * (-(m*m)/k * dt) scaled by
 // min(1.5*c, 1); the new velocity is renormalised to the old speed (field_0xbc) and the signed
-// deflection angle is returned (0 when the change is negligible or not finite).
+// deflection angle is returned (0 when the change is negligible or not finite).  The angle is
+// its own local: written back into `sign`, its home moved to the d argument slot and len/sign
+// traded the point/dir slots (retail: sign, len, angle in point, dir, c).
 float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
 {
     float k = UnknownVirtualSlot73(point, dir) * d;
@@ -588,13 +590,13 @@ float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
             if (!(k < 0.0f))
                 sign = 1.0f;
             float dot = VehDotG(scratchVector, velocity);
-            sign = VehAbs((float)acos(dot / (len * linearSpeed))) * sign;
-            if (_finite(sign)) {
+            float angle = VehAbs((float)acos(dot / (len * linearSpeed))) * sign;
+            if (_finite(angle)) {
                 velocity = VehScale(*nv, linearSpeed / len);
                 if (movingForward)
-                    return sign;
-                sign = -sign;
-                return sign;
+                    return angle;
+                angle = -angle;
+                return angle;
             }
         }
     }
