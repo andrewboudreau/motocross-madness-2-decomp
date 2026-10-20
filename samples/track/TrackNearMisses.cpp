@@ -55,6 +55,10 @@
 // (moving it to the head of the found branch costs 286 bytes). Both builds
 // already compare `prefixed` with ebx in the next block and keep digit in
 // ebx, so the ebx zero web is the same; only the call-result test misses it.
+// Session 14: an early `if (!CurrentName(found)) goto done;` failure test
+// (the ConnectUsingLobby lever) leaves 926; `prefixed = 0;` before an
+// `if (series == 5 || series == 1) prefixed = 1;` costs a hunk (267
+// aligned), with or without `!= count` on the test.
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
