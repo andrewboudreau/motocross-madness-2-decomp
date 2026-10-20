@@ -1182,6 +1182,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
     int hasBody;
     Vec3* otherVel = 0;
     Vehicle* other = 0;
+    Vec3* otherAngVel;          // the other body's angularVelocity, or 0
     Vec3 rel;
 
     s = VehOnes();
@@ -1209,7 +1210,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         ctx = (int)other->modelNode;
         v3c = VehOffset(((VehicleContactSet*)collisionObject)->contactPoint, other->centerOfMass);
         v48 = other->worldAngularVelocity;
-        c = &other->angularVelocity;
+        otherAngVel = &other->angularVelocity;
         v30 = other->invInertia;
         break;
     case 0x69: {
@@ -1218,7 +1219,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         ctx = *(int*)(body + 0x34);
         v3c = kVec3Zero; v48 = kVec3Zero; v30 = kVec3Zero;
         otherVel = (Vec3*)(body + 0x40);
-        c = 0;
+        otherAngVel = 0;
         s = VehOnes();
         hasBody = 1;
         break;
@@ -1229,7 +1230,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         ctx = *(int*)(body + 0x1a0);
         v3c = kVec3Zero; v48 = kVec3Zero; v30 = kVec3Zero;
         otherVel = (Vec3*)(body + 0x224);
-        c = 0;
+        otherAngVel = 0;
         s = VehOnes();
         hasBody = 1;
         break;
@@ -1242,12 +1243,12 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
     if (hasBody) {
         l14 = (b == 0x2711 || b == 0x69) ? 0 : (int)otherVel;
         UnknownVirtualSlot4(&((VehicleContactSet*)collisionObject)->contactNormal, &velocity, &worldAngularVelocity, &rel, b, l10, ctx,
-                            otherVel, &v48, &v3c, &v30, (Vec3*)c, l14, &l10, 1.0f);
+                            otherVel, &v48, &v3c, &v30, otherAngVel, l14, &l10, 1.0f);
         if (other) {
             *((char*)other + 0x10a) = 0;
             float len2 = VehLen2(*otherVel);
             other->linearSpeed = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
-            other->worldAngularVelocity = other->sceneNode->LocalToWorldDirection(*(Vec3*)c);
+            other->worldAngularVelocity = other->sceneNode->LocalToWorldDirection(*otherAngVel);
         }
     } else {
         Vec3 t = worldAngularVelocity;

@@ -942,8 +942,8 @@ try on similar code. None is a rule.
   the opposite for a product that is stored and passed by address: member-wise
   `scaled.x = local.x * invInertia->x; ...` instead of `Vec3 scaled(...)` (4 bytes
   shorter), plus `SoultreeDot` (`z + (x + y)`) for a dot that retail sums `(x + y) + z`.
-  Its twin Vehicle slot 38 (`0x005268d0`, 394 -> 1577 of 1578, size and frame exact) takes the
-  same in-place copy in its static-body branch.
+  Its twin Vehicle slot 38 (`0x005268d0`, 394 -> 1578 of 1578, exact) takes the same
+  in-place copy in its static-body branch.
 - **Source order sets the store schedule in a case block.** Vehicle slot 38 (`0x005268d0`):
   retail's 0x69/0x2711 blocks store the float `l10 = 0` before anything else and the three
   zero vectors in the order v3c, v48, v30. Writing `l10 = 0;` first, ahead of the body
@@ -951,6 +951,14 @@ try on similar code. None is a rule.
   last, or the ones vector `s = VehOnes()` anywhere but last, moves whole blocks (down
   to 489). Two pointers zeroed at declaration (`Vec3* otherVel = 0; Vehicle* other = 0;`)
   get their `xor` in declaration order.
+- **A parameter reused as a local moves an unset variable's home.** Vehicle slot 38
+  (`0x005268d0`, 1577 -> 1578): on the paths where `ctx` is never assigned, VC6 reloads it
+  from a home slot shared with a parameter. With the `void* c` argument reused for the other
+  body's angular-velocity pointer, that home was c's slot; retail's is b's. Giving the
+  pointer its own local (`Vec3* otherAngVel;`, which VC6 still packs into c's dead slot)
+  moves ctx's home to b's, at any declaration position. Declaration order and type of
+  `ctx` itself do not move it. `work/s14/symmap.py` on the `/FAs` listing shows the shared
+  homes.
 - **One reused function-scope Vec3 packs successive temporaries into one slot.** Bike
   slot 38 (`0x00405190`, frame 0xb8 to 0xac, aligned 683 to 688): retail's copy of
   `worldAngularVelocity`, and the sum it passes by address to slot 3, share the slot of an
