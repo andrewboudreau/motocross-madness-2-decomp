@@ -10750,6 +10750,15 @@ CASES = [
         'reason': 'called by slot 12 0x43e850',
     },
     {
+        'name': 'cubedraw.cpp DrawableCube 0x43e330 visible cells',
+        'bindings': 'src/reconstructed/CubeDraw.bindings.json',
+        'source': 'src/reconstructed/CubeDraw.cpp',
+        'symbol': '?MarkVisibleCells@DrawableCube@@QAEXXZ',
+        'target_va': '0x0043e330',
+        'target_size': 398,
+        'reason': 'eye bound before the cube centre; camera read through the renderContext cast, not Target()',
+    },
+    {
         'name': 'cubedraw.cpp DrawableCube destructor',
         'bindings': 'src/reconstructed/CubeDraw.bindings.json',
         'source': 'src/reconstructed/CubeDraw.cpp',
