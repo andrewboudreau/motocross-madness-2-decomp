@@ -2,7 +2,9 @@
 import unittest
 
 from tools.frame_layout import Insn
-from tools.rank_near_misses import compare, diff_counts, frame_size, lane_for, norm, parse_index, retail_extent
+from mcm2tool.coff import CoffRelocation, CoffSymbol
+from tools.rank_near_misses import (compare, diff_counts, frame_size, lane_for, norm, parse_index,
+                                    retail_extent, symbol_insns)
 
 
 def insns(*lines):
@@ -19,6 +21,19 @@ class FakePE:
 
     def bytes_at_va(self, va, size):
         return self.data[va - self.base:va - self.base + size]
+
+
+class FakeObject:
+    def __init__(self, code, relocs, symbols):
+        self.code, self.relocs = code, relocs
+        self.symbol_by_index = {s.index: s for s in symbols}
+
+    def symbol_extent(self, sym):
+        return self.code, len(self.code), self.relocs
+
+
+def symbol(index, name, section):
+    return CoffSymbol(index, name, 0, section, 0x20, 2, 0)
 
 
 class RankNearMissesTests(unittest.TestCase):
@@ -77,6 +92,15 @@ class RankNearMissesTests(unittest.TestCase):
         body = bytes([0x8b, 0xc1, 0xc3])            # mov eax, ecx; ret
         data = body + bytes([0xcc] * 13) + bytes([0x33, 0xc0, 0xc3])
         self.assertEqual(retail_extent(FakePE(base, data), base, [base, base + len(data)]), 3)
+
+    def test_symbol_insns_masks_relocations_but_not_except_list(self):
+        # mov eax, fs:[0] (via __except_list); mov eax, [g_value]; ret
+        code = bytes([0x64, 0xa1, 0, 0, 0, 0, 0xa1, 0, 0, 0, 0, 0xc3])
+        func, seh, glob = symbol(0, '?f@@YAHXZ', 1), symbol(1, '__except_list', 0), symbol(2, '?g_value@@3HA', 0)
+        relocs = [CoffRelocation(1, 2, 1, 6), CoffRelocation(1, 7, 2, 6)]
+        got, size = symbol_insns(FakeObject(code, relocs, [func, seh, glob]), func)
+        self.assertEqual(size, len(code))
+        self.assertEqual(norm(got), ['mov eax, dword ptr fs:[0]', 'mov eax, dword ptr [G]', 'ret '])
 
 
 if __name__ == '__main__':
