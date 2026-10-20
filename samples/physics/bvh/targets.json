@@ -35,7 +35,7 @@
     "target_va": "0x00425900",
     "target_size": 4314,
     "expect": "partial",
-    "notes": "first draft: decoded structure; inline budget and radius-sum x87 order differ (see the file header).",
+    "notes": "699/4314 (4200 B): corner distances as float locals and QuerySquares; inline budget (normalisations 5-7 dot, squared-corner constructors) and radius-sum order differ (see the file header).",
     "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
   },
   {
