@@ -16,6 +16,12 @@
 // The half field of view needs the (float) cast: without it VC6 folds
 // 0.5f * 0.01745329f into one constant, while retail multiplies twice.
 // 0..15 dead initialised int locals at the top of the function leave the `sub esp, 0x40` in place.
+// In the second MatrixMult both compilers hoist the `sub esp, 0x40` over the
+// copy of `b`, whose space is left over from the first call; in the first
+// call `b`'s space comes from `sub esp, 0x28` plus deferred argument pops, and
+// only retail hoists there. Also worse: building the viewport (identity, or
+// identity and stores) before the projection (29-40 of 492) and /G6
+// (42 of 492); a `projection` copy right before the product is inert (487).
 #include <math.h>
 
 #include "../../src/reconstructed/Camera.h"
