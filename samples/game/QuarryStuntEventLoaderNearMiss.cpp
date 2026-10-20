@@ -6,28 +6,31 @@
 // podium and the remaining race objects, calling `progress` between stages.
 //
 // Status: near miss, 2207 instructions against retail's 2208; sdiff.py
-// (frame offsets, branch targets and immediates masked) aligns 2032 in
-// 109 hunks, and 2167 in 46 hunks with register names masked too. The
-// call sequence, allocation sizes and lines, EH
-// states, error paths, the memory-budget decision tree and frame size
-// (0x650) match. The tree's last AGP and next-to-last non-AGP tests
-// budget the model textures at a quarter (textureBytes / 4, recomputed,
-// not the shared (textureBytes + cubeBytes) / 4), and the last AGP test is
-// its own else-if whose all-2 else merges into the shared tail store.
-// The car's ignore list adds each entry through an if/else of two calls
-// (retail pushes in each arm and merges the call tail), and the physics
-// caster's terrain stores go through one held pointer.
-// Shapes found: the fog object is a bare GameObject (0x2c bytes),
-// the texture-choice members are chained assignments (one load each), the
-// margin percentage is read before the minimum and multiplied after both
-// calls, and the collision loop works through an element pointer with the
-// terrain read once. Left: the stack slots of most scalars (retail shares
-// `step`'s slot with later temporaries but not with the light pointers; a
-// block-scoped `step` merges it with them instead), register choices in
-// the decision tree and around the fog/sky block (retail keeps -1 in edi),
-// the explicit null test of the cube file name, and the animation loop's
-// rotation. The camera setup passes 1.048f (retail pushes 0x3f8624dd; the
-// earlier 1.0485f was a semantic slip hidden by the masked score).
+// (frame offsets, branch targets and immediates masked) aligns 2034 in
+// 107 hunks, and 2169 in 44 hunks with register names masked too. The
+// call sequence, allocation sizes and lines, EH states, error paths, the
+// memory-budget decision tree, the frame size (0x650) and every slot from
+// 0x1c up match. The tree's last AGP and next-to-last non-AGP tests budget
+// the model textures at a quarter (textureBytes / 4, recomputed, not the
+// shared (textureBytes + cubeBytes) / 4), and the last AGP test is its own
+// else-if whose all-2 else merges into the shared tail store. `step` is
+// local to the scene-count block (a function-level `step` takes its own
+// slot and grows the frame to 0x654). The car's ignore list adds each
+// entry through an if/else of two calls (retail pushes in each arm and
+// merges the call tail), and the physics caster's terrain stores go
+// through one held pointer. Shapes found earlier: the fog object is a bare
+// GameObject (0x2c bytes), the texture-choice members are chained
+// assignments (one load each), the margin percentage is read before the
+// minimum and multiplied after both calls, and the collision loop works
+// through an element pointer with the terrain read once. Left: the small
+// slots below 0x1c (retail has percent at 0x4 and flareLight at 0x10),
+// register choices in the decision tree, around the fog/sky block (retail
+// keeps -1 in edi) and after the animation loop (retail holds `progress`
+// in ebx, saving a reload), the explicit null test of the cube file name,
+// and the animation loop's head (retail reloads the table for the entry
+// pointer and enters the rotated loop with a jmp). The camera setup passes
+// 1.048f (retail pushes 0x3f8624dd; the earlier 1.0485f was a semantic
+// slip hidden by the masked score).
 //
 // The views below are local to this sample: they declare only what the
 // loader touches of classes reconstructed (or not) elsewhere, under
@@ -310,7 +313,6 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     int textureBytes;
     int forced;
     int needed;
-    int step;
     int sceneSteps;
     float terrainWidth;
     int hasCube;
@@ -332,7 +334,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                                                 (int)ecosystem);
     sceneSteps = 1;
     if (g_TrackGame->sceneObject->CountSceneObjects(&sceneSteps)) {
-        step = (int)(sceneSteps / (sceneSteps * 0.1f));
+        int step = (int)(sceneSteps / (sceneSteps * 0.1f));
         if (progress)
             progress(&step);
     }
