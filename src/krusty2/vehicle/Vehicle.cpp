@@ -570,10 +570,11 @@ static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
 // its own local: written back into `sign`, its home moved to the d argument slot and len/sign
 // traded the point/dir slots (retail: sign, len, angle in point, dir, c).  The Math3D
 // operator sum (`u + velocity`) schedules scratchVector's y store as retail (512 -> 523/539).
-// Left: retail stores field_0x4e8 before the abs compare (fst; fld st(0); fcom), and u.x loads
-// s first (fld st(0); fmul [t.x]).  No gain from component-wise, constructor, VehScale or
-// *= forms of u, a pointer to t, or assigning k through field_0x4e8, ?: or a nested store;
-// VehAbs or an if-negated copy costs 6 bytes.
+// Clamping s inside the first product (`u.x = t.x * (s = ...)`) gives retail's dup form
+// (fld st(0); fmul [t.x]) for u.x only (523 -> 528/539).
+// Left: retail stores field_0x4e8 before the abs compare (fst; fld st(0); fcom).  No gain from
+// assigning k through field_0x4e8, ?: or a nested store, `> 0.0f`, an inline or named abs,
+// k = d * slot73 or reusing d for k; VehAbs or an if-negated copy costs 6 bytes.
 float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
 {
     float k = UnknownVirtualSlot73(point, dir) * d;
@@ -584,9 +585,10 @@ float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
         float r = m * m / nk * stepTime;
         Vec3 t = VehScale(*dir, r);
         float s = c * 1.5f;
-        if (!(s < 1.0f))
-            s = 1.0f;
-        Vec3 u = t * s;
+        Vec3 u;
+        u.x = t.x * (s = (s < 1.0f) ? s : 1.0f);
+        u.y = t.y * s;
+        u.z = t.z * s;
         scratchVector = u + velocity;
         Vec3* nv = &scratchVector;
         float len2 = VehLen2(*nv);

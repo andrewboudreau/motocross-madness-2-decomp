@@ -90,7 +90,7 @@
     "target_size": 209,
     "expect": "partial",
     "bindings": "SoultreeTransform.bindings.json",
-    "notes": "207/209 bytes: retail loads v.x before m._11 in the last x product. Session 14: a no-op m._11 store gives 209/209 as a non-source probe only (VC6_OPERAND_ORDER.md); a nine-entry transpose into a destination matrix, a by-value Matrix3 Transposed() and a j <= i loop transpose all change the code shape."
+    "notes": "207/209 bytes: retail loads v.x before m._11 in the last x product. Session 14: a no-op m._11 store gives 209/209 as a non-source probe only (VC6_OPERAND_ORDER.md); a nine-entry transpose into a destination matrix, a by-value Matrix3 Transposed() and a j <= i loop transpose all change the code shape. Rule 6 of VC6_PATTERN_CORPUS.md section 6 says retail stored m._11 directly earlier, but a member-wise copy of the whole matrix (274 B, no rep movsd) and m._11 = worldMatrix._11 after the block copy (217 B) are worse; Matrix4 m; m = worldMatrix; is the same bytes."
   },
   {
     "class": "SoultreeObject",
