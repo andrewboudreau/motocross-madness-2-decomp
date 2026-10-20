@@ -386,7 +386,7 @@
     "target_va": "0x00507c10",
     "target_size": 2963,
     "expect": "partial",
-    "notes": "Height/normal query (58 callers). Checkerboard triangle split, inverse-squared-distance corner weights. Retail uses an EBP frame and inline fistp through pointer-aliased int locals (inline __asm in original source, not reproducible under rules); inherent partial. Also VC6 inline budget differs on Vec3 helpers.",
+    "notes": "Out of reach under the no-inline-asm rule: 71/2731 strict with a 3225 B candidate for 2963 B, so the extents differ and the matrix reports no strict score. Retail opens with push ebp / mov ebp, esp and converts each float with fld [ebp-0x30]; mov eax, [ebp-0x2c]; fistp dword ptr [eax] on homed (int*, float) arguments. That is an inlined __asm float-to-int helper. VC6 C code only reaches __ftol, and __asm is what forces the EBP frame. Height/normal query (58 callers). Checkerboard triangle split, inverse-squared-distance corner weights. Retail uses an EBP frame and inline fistp through pointer-aliased int locals (inline __asm in original source, not reproducible under rules); inherent partial. Also VC6 inline budget differs on Vec3 helpers.",
     "bindings": "Terrain.bindings.json"
   },
   {

@@ -81,7 +81,7 @@ retail does; grouping the x row's first two products does the same for that row.
 | io/FileStream | `0x00461b90` | 257/282 | c | 3 code diffs: retail stores the 0xfa seed inside the inlined strcat and sets up the name pointer right after strlen |
 | krusty2/broadphase/Quadtree | `0x004dcac0` | 620/627 | a | x and z spill slots swapped (0x2c/0x30) |
 | krusty2/broadphase/Quadtree | `0x004dcf20` | 182/331 | b | i and cell cached in edi/edx where retail reads their slots; z in esi; slot order differs |
-| krusty2/broadphase/Terrain | `0x00507c10` | 71/2731 (masked) | b | 128 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x114 vs 0x108, slot order differs |
+| krusty2/broadphase/Terrain | `0x00507c10` | 71/2731 (masked) | b | out of reach under the rules: retail inlines an `__asm` float-to-int helper (`fld [ebp-0x30] ; mov eax, [ebp-0x2c] ; fistp dword ptr [eax]`), which forces the EBP frame; candidate 3225 B vs 2963 B |
 | krusty2/broadphase/Terrain | `0x005059d0` | 1593/2116 | c | TRN loader: same frame (0x440, every local in its retail slot), calls and EH states; register choice (retail keeps -1 in edi/ebx, the candidate keeps 3 and 0 in ebx), colour-key scheduling and the palette loop's pre-offset pointer stride differ |
 | krusty2/collision/CollisionObject | `0x00432260` | 441/458 | b | 2 code diffs: retail adds `mov [esp + N], eax`; retail lacks `mov [esp + N], eax`; slots differ |
 | krusty2/collision/CollisionObject | `0x00436100` | 727/804 | c | two diagonal zero stores scheduled after the first products; pop edi/esi placed before the third extent row |
