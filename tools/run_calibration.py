@@ -1975,6 +1975,15 @@ CASES = [
         'reason': 'virtual deletes of the devices, release, base destructor under /GX',
     },
     {
+        'name': 'PCControl DirectInput error reporter 0x4bf6a0',
+        'bindings': 'src/reconstructed/PCControl.bindings.json',
+        'source': 'src/reconstructed/PCControl.cpp',
+        'symbol': '?UnknownReportError@@YAXJPBDH@Z',
+        'target_va': '0x004bf6a0',
+        'target_size': 978,
+        'reason': 'all 34 case values (DI_POLLEDDEVICE included) fix the register rotation that decides which sprintf tails VC6 cross-jumps; size includes the jump tables',
+    },
+    {
         'name': 'PCControl PCControlInterface slot 1 setup',
         'bindings': 'src/reconstructed/PCControl.bindings.json',
         'source': 'src/reconstructed/PCControl.cpp',
@@ -4754,6 +4763,15 @@ CASES = [
         'target_va': '0x004bb890',
         'target_size': 384,
         'reason': 'EH frame for new Sound; early failures keep their epilogues, load failures share one delete tail inside the last branch',
+    },
+    {
+        'name': 'PCAudio Sound PlayWithOptions 0x4bc6b0',
+        'bindings': 'src/reconstructed/PCAudio.bindings.json',
+        'source': 'src/reconstructed/PCAudio.cpp',
+        'symbol': '?PlayWithOptions@Sound@@QAEHHKH@Z',
+        'target_va': '0x004bc6b0',
+        'target_size': 656,
+        'reason': 'every failure, the streamed Play() one included, goes to the shared failed return; the & 5 Play() failure falls into it, keeping the two Play() tails apart',
     },
     {
         'name': 'PCAudio UnknownPCAudioObject constructor',

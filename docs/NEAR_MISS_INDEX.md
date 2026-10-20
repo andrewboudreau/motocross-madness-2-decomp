@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 121, c 96, total 219. The three class (a) functions of the
+Counts: a 2, b 121, c 94, total 217. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -49,7 +49,6 @@ the integration temporary. When only displacement sizes differ, read the
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
-| audio/PCAudio | `0x004bc6b0` | 238/629 (inside PCAudio.cpp) | c | VC6 cross-jumps the two `Play()` failure tails (streamed `return 0`, the `& 5` branch's `goto failed`) where retail keeps them apart; the sample copy also gains an EH frame |
 | audio/PCAudio | `0x004bdc00` | 91/483 | b | retail extent 483; `while (1)` gives retail's top-tested queue loop (155 insns); left: retail ebp=audio, ebx=&cs then loaded, edi=&sound cs, ready/bytes spilled (frame 0xc vs 8) |
 | audio/PCAudio | `0x004be910` | 108/158 | c | 6 code diffs: retail adds `mov [esp + N], edx`; retail adds `mov [esp + N], edx` |
 | camera/Camera | `0x0042ee30` | 487/492 | c | `sub esp, 0x40` emitted after the `rep movsd` that copies the projection argument (retail before it) in the first MatrixMult; argument copies, viewport temporaries and declaration forms do not move it |
@@ -60,7 +59,6 @@ the integration temporary. When only displacement sizes differ, read the
 | camera/KrustyBikeCamera | `0x00497e20` | 337/376 | c | 10 code diffs: `mov ecx, [A]` vs `mov edx, [A]`; retail lacks `lea eax, [esp + N] ; mov edx, [ecx + 0x~` |
 | camera/VehicleCamera | `0x0052c510` | 1262/1267 | c | slot 35: frame, slots and size match; x scaled in each range branch with y/z through one ScaleYZ helper per branch reproduces retail's cross-jumped tail; left: direction * reach x is `fld st(0); fmul x` vs retail `fld x; fmul st(1)` |
 | control/ControlInterface | `0x004bf4f0` | 76/104 (inside ControlInterface.cpp) | c | tails merged as in retail; retail places the mouse pointer load after the shared block's `ret` and jumps back, VC6 places it after the keyboard load |
-| control/ControlInterface | `0x004bf6a0` | 438/726 (masked) | c | 58 code diffs: `jne @158` vs `jne @165 ; lea eax, [esp + N]`; `jmp @169 ; lea ecx, [esp + N]` vs `push eax ; jmp @178` |
 | ecosystem/EcoSystem | `0x00456890` | 356/369 | c | 2 code diffs: retail lacks `fmul [eax + 0x5a8]`; retail adds `fmul [eax + 0x5a8]`; redundant parentheses on the differences, products and detail-band casts (225 combinations) do not move it |
 | ecosystem/EcoSystem | `0x004570a0` | 103/386 | b | retail keeps the definition-table entry in `edi` across the position conversions (`mov edi, [eax + ecx*4 + 0x58]`); register choice in the shape store blocks |
 | ecosystem/EcoSystem | `0x00457480` | 561/2629 (in the unit) | c | 3 code diffs: `mov edi, 1 ; mov [esi + 0x30], edi` vs `mov dword ptr [esi + 0x30], 1`; `mov [esp + N], edi` vs `mov dword ptr [esp + N], 1` (the constant 1 of `method = 1` / `i = 1` kept in `edi`); VC6 over-caches: two counted stores with `edi` already pushed for the string expansions, reproduced by a probe ([VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md)) |
@@ -81,7 +79,7 @@ the integration temporary. When only displacement sizes differ, read the
 | inputdevice/PCJoystickDevice | `0x004c3790` | 345/417 (masked) | b | 7 code diffs: `mov eax, [esi + 0x260] ; mov ecx, [A] ;~` vs `mov ecx, [esi + 0x260] ; mov edx, [A] ;~`; `mov ecx, [ecx + 0x14]` vs `mov ecx, [edx + 0x14]`; slots differ |
 | io/FileStream | `0x00460db0` | 27/186 | c | 10 code diffs: retail keeps the first fseek-failure block inline (samples/io/FileStream.cpp; the extent is 186 bytes, docs/FILESTREAM.md) |
 | io/FileStream | `0x00461340` | 286/702 | c | +0x0c read once into `position` and cleared when not below `offset` (201 with the ternary); left: origin/offset in ebp/ebx swapped, the zero and next pointer in other registers, the SEEK_CUR test repeated where retail threads it |
-| io/FileStream | `0x00461640` | 389/671 | c | a separate `out` pointer gives retail's homed buffer copy; left: file pointer in edx (retail eax/ebx), a third 45c7b0 call retail cross-jumps, and the two `(done + read) / size` returns merged |
+| io/FileStream | `0x00461640` | 467/670 | c | a separate `out` pointer gives retail's homed buffer copy and a `?:` empty-buffer encoded return keeps the buffered one's own `return count`; left: file pointer in edx (retail eax/ebx), the second 45c7b0 call, which retail cross-jumps, and the two `(done + read) / size` returns merged |
 | io/FileStream | `0x004618e0` | 136/152 | c | 7 code diffs: retail loads buffer/size/count into registers before the pushes |
 | io/FileStream | `0x00461b90` | 257/282 | c | 3 code diffs: retail stores the 0xfa seed inside the inlined strcat and sets up the name pointer right after strlen |
 | krusty2/broadphase/Quadtree | `0x004dcac0` | 620/627 | a | x and z spill slots swapped (0x2c/0x30) |
@@ -293,8 +291,9 @@ Wrecker `0x005329e0` (763 -> 1200, with the unit's own vector operators
 instead of copies) and ControlInterface slot 3 `0x004bf4f0` (43 -> 76) are
 measured that way. Every other sample that did not include its unit was
 also compiled inside it (2026-10-12 scan, duplicate statics and helpers
-removed): no other function's bytes changed except PCAudio `0x004bc6b0` and
-EcoSystem `0x00457480` (their rows are already measured in the unit) and
+removed): no other function's bytes changed except PCAudio `0x004bc6b0` (now
+exact in PCAudio.cpp), EcoSystem `0x00457480` (its row is already measured in
+the unit) and
 CarProcedural slot 10 `0x0042fd80` (221 -> 211, worse); those samples keep
 their header includes.
 

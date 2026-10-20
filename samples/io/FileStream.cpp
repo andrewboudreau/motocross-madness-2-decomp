@@ -107,7 +107,10 @@ static inline int HeaderMatches(UnknownTextureStream* stream)
 // `&& fileHandle` and an unsigned `> 0` test for the first seek, each with the
 // `encoded`/+0x124/`fileEncoded = 0` statements in three orders and a cast zero.
 // Nested `if (!fseek(...)) { ... } else { fclose ...}` forms, with the header
-// test negated or not, and an if/else-if chain give 25-28.
+// test negated or not, and an if/else-if chain give 25-28. Session 14: the
+// first seek as `if (fseek(...) == 0) {} else { fclose ... }` keeps the two
+// fclose blocks apart and gives retail's registers from bufferEnd through the
+// four header compares, but places the first block after the function (26/204).
 int UnknownTextureStream::CheckHeader()
 {
     if (fseek(fileHandle, 0, SEEK_SET)) {
@@ -238,14 +241,19 @@ static inline void DecodeBytes(UnknownTextureStream* stream, char* p, int count)
 }
 
 // 0x00461640: reads `count` items of `size` bytes, from the buffer first, and
-// returns how many it read. Near miss (389 of 671): a separate `out` pointer
+// returns how many it read. Near miss (467 of 670): a separate `out` pointer
 // for the advanced buffer (202 when `buffer` itself is advanced) gives
-// retail's ecx copy homed in the dead `buffer` slot. Left: retail loads the
-// file pointer (+0x14) into eax or ebx where VC6 here uses edx, cross-jumps
-// the empty-buffer encoded call into the later one (VC6 here keeps three
-// 45c7b0 calls) and keeps the two `(done + read) / size` failure returns
-// apart (VC6 here merges them). A key pointer local (24) and `left`
-// computed before the encoded test (372) are worse.
+// retail's ecx copy homed in the dead `buffer` slot. The empty-buffer
+// encoded read returns a `?:` (389 as `if (!...) return count - 1; return
+// count;`): the buffered encoded read then keeps its own `return count`
+// after its failure return, like retail, instead of jumping to the later
+// one. Left: retail loads the file pointer (+0x14) into eax or ebx where
+// VC6 here uses edx, cross-jumps the empty-buffer encoded call into the
+// buffered one (VC6 here keeps both 45c7b0 calls) and keeps the two
+// `(done + read) / size` failure returns apart (VC6 here merges them;
+// unsigned `read`, `(read + done)`, `done += read` first and a `goto
+// failed` for the block loop do not change that). A key pointer local (24)
+// and `left` computed before the encoded test (372) are worse.
 int UnknownTextureStream::Read(void* buffer, int size, int count)
 {
     UnknownTextureStream* stream = InnermostStream(this);
@@ -295,10 +303,7 @@ int UnknownTextureStream::Read(void* buffer, int size, int count)
         return count - read;
     }
     if (stream->fileEncoded) {
-        if (!ReadXorDecoded((unsigned char*)buffer, size, count, stream->fileHandle, (unsigned char*)&stream->textMode)) {
-            return count - 1;
-        }
-        return count;
+        return ReadXorDecoded((unsigned char*)buffer, size, count, stream->fileHandle, (unsigned char*)&stream->textMode) ? count : count - 1;
     }
     int total = size * count;
     int done = 0;
