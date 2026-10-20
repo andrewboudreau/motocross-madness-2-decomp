@@ -1573,7 +1573,12 @@ void Bike::UnknownVirtualSlot91()
             float k = s * (a * linearSpeed * 0.075f) * stepTime;
             velocity += scratchVector2 * k;
             velocity *= linearSpeed / (k + linearSpeed);
-            float lenSq = BikeDot(&velocity, &velocity);
+            // Component copies: retail loads y, x and z once and squares the registers.
+            float y = velocity.y;
+            float x = velocity.x;
+            float z = velocity.z;
+            float lenSq = y * y + x * x;
+            lenSq += z * z;
             linearSpeed = (lenSq == 1.0f) ? 1.0f : (float)sqrt(lenSq);
         }
     }

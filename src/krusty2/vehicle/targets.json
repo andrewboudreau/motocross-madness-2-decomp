@@ -246,7 +246,7 @@
     "target_va": "0x0040aec0",
     "target_size": 1353,
     "expect": "partial",
-    "notes": "slot 91: frame 0x20 vs ours 0x24; first divergence is the spill slot of the first fstp ([esp+8] vs [esp+0x10]) [8.2% match under vc6_o2_ml]",
+    "notes": "slot 91: 1014/1353 strict (candidate 1357 bytes). The velocity length after the lean-plane steer uses y/x/z component copies (retail loads each once and squares the registers). Left: one dot operand order (fld [ecx]; fmul [esi+0xa0]), BikeDirection(force) results stored to a separate temp (retail reuses force's slot at esp+0x10; by-value/in-place/assign-back forms are all identical), the g_BikeVec3 zero copy load order and the mov ecx,[esi+0x720] hoist.",
     "bindings": "Bike.bindings.json"
   },
   {
