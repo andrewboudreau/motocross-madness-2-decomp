@@ -18,7 +18,11 @@
 // register choice. Tried without effect: block scopes around the emptying
 // section, the first pass (`requested`), the levels loop and the
 // refill+overlay section; a hoisted count (frame shrinks by 4 but the loop
-// registers rotate); an `elapsed` local for `now - blitStartTime` (worse).
+// registers rotate); an `elapsed` local for `now - blitStartTime` (worse);
+// one block from `int i` through the spare-texel refill, with the levels
+// loop on its own counter, so `format` could reuse `i`/`smallest`: VC6
+// already overlaps `smallest`/`now` and `i`/`filled` and still gives
+// `format` its own 12 bytes (code unchanged, 120 strict).
 //
 // ManagedTextureGroup::RepackWithPartialBlits (0x0050dad0, 5020 bytes): the
 // repack with partial texture blits, chosen by 0x0050c8c0. Control flow,
