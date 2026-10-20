@@ -1606,7 +1606,7 @@
     "target_va": "0x0040a520",
     "target_size": 2272,
     "expect": "partial",
-    "notes": "19% (439/2265 aligned; 2265 vs 2272 bytes). Same call sequence and control flow; differs by the local slot layout (retail: result 0xc, len 0x10, cross temp 0x14, offset 0x20, torque 0x2c, base 0x38, temps 0x44), frontWheel kept in eax (ours edx) and the constant 2 of the state stores materialised in edi. Declaration order does not move the slots.",
+    "notes": "1671/2272 strict (candidate 2232 bytes). Same call sequence and control flow; the axis references and zero-first if (d >= 0) arms give retail's edi axis pointer and branch layout. Left: the operator return temporary and base swap slots (retail base 0x38, temps 0x44), cross products load the first-stored multiplicand first where retail loads it second, the airborne test al, al is issued earlier and the steerTorque update (retail stores result and k and copies the constructed Vec3 through a temporary before the adds). Declaration order does not move the slots.",
     "bindings": "Bike.bindings.json"
   },
   {

@@ -89,12 +89,19 @@ float BikeVec3Dot(const Vec3& a, const Vec3& b);
 // integrator steerTorque; the integrator's length, signed by that axis, is the angle fed to
 // the steer state unless the limit (0.785 rad) is reached, in which case the angle is
 // clamped and the integrator reversed.  Returns the normalised projection.
-// Near miss (447/2272 strict): declaring spin, d or lenSq at function scope leaves the frame
-// and the 144 differing instructions unchanged.
+// Near miss (1671/2272 strict). Retail keeps each contact's axis address in edi for the dot
+// and the scale (the `axis` references) and lays out the zero arm first (`if (d >= 0)`:
+// `test ah, 1; jne <scale>`), 447 -> 1667; base initialised where it is declared, 1671.
+// Left: the return temporary of the out-of-line operators and base swap slots (retail base
+// 0x38, temporary 0x44), every cross product loads the multiplicand stored first (spin.x,
+// push.x) second where VC6 loads it first (all 64 operand orders of a local cross helper
+// compile the same), the `test al, al` of the airborne test is issued later, and retail
+// stores result and k and copies the steerTorque increment through a temporary before the adds.
+// Inert: the declaration order of push/base/torque/offset and len/result; push declared
+// per branch (1555); spin, d or lenSq at function scope.
 float Bike::Method_0x0040a520()
 {
     Vec3 push;
-    Vec3 base;
     Vec3 torque;
     Vec3 offset;
     float len;
@@ -102,7 +109,7 @@ float Bike::Method_0x0040a520()
     torque.x = weightForce.x * 0.25f;
     torque.y = weightForce.y * 0.25f;
     torque.z = weightForce.z * 0.25f;
-    base = torque;
+    Vec3 base = torque;
     int driven = 0;
 
     if (airborne) {
@@ -117,19 +124,21 @@ float Bike::Method_0x0040a520()
             frontWheel->w_0x16c = 2;
             if (leftBarContact->active) {
                 torque = BikeVec3Sub(leftBarContact->point, frontWheel->nodePosition);
-                float d = BikeVec3Dot(torque, leftBarContact->axis);
-                if (d < 0.0f)
-                    push = BikeVec3Scale(leftBarContact->axis, -d);
-                else
+                const Vec3& axis = leftBarContact->axis;
+                float d = BikeVec3Dot(torque, axis);
+                if (d >= 0.0f)
                     push = Vec3(0.0f, 0.0f, 0.0f);
+                else
+                    push = BikeVec3Scale(axis, -d);
                 torque += CrossProduct(offset, push);
                 leftBarContact->state = 2;
             } else if (rightBarContact->active) {
-                float d = BikeVec3Dot(base, rightBarContact->axis);
-                if (d < 0.0f)
-                    push = BikeVec3Scale(rightBarContact->axis, -d);
-                else
+                const Vec3& axis = rightBarContact->axis;
+                float d = BikeVec3Dot(base, axis);
+                if (d >= 0.0f)
                     push = BikeVec3Call(0.0f, 0.0f, 0.0f);
+                else
+                    push = BikeVec3Scale(axis, -d);
                 offset = BikeVec3Sub(rightBarContact->point, frontWheel->nodePosition);
                 torque += CrossProduct(offset, push);
                 rightBarContact->state = 2;
@@ -137,20 +146,22 @@ float Bike::Method_0x0040a520()
         } else if (leftBarContact->active) {
             torque = BikeVec3Sub(leftBarContact->point, frontWheel->nodePosition);
             driven = 1;
-            float d = BikeVec3Dot(torque, leftBarContact->axis);
-            if (d < 0.0f)
-                push = BikeVec3Scale(leftBarContact->axis, -d);
-            else
+            const Vec3& axis = leftBarContact->axis;
+            float d = BikeVec3Dot(torque, axis);
+            if (d >= 0.0f)
                 push = BikeVec3Call(0.0f, 0.0f, 0.0f);
+            else
+                push = BikeVec3Scale(axis, -d);
             torque = CrossProduct(offset, push);
             leftBarContact->state = 2;
         } else if (rightBarContact->active) {
             driven = 1;
-            float d = BikeVec3Dot(base, rightBarContact->axis);
-            if (d < 0.0f)
-                push = BikeVec3Scale(rightBarContact->axis, -d);
-            else
+            const Vec3& axis = rightBarContact->axis;
+            float d = BikeVec3Dot(base, axis);
+            if (d >= 0.0f)
                 push = BikeVec3Call(0.0f, 0.0f, 0.0f);
+            else
+                push = BikeVec3Scale(axis, -d);
             offset = BikeVec3Sub(rightBarContact->point, frontWheel->nodePosition);
             torque = CrossProduct(offset, push);
             rightBarContact->state = 2;
