@@ -27,8 +27,8 @@
 // AddPixel1555 helper for all four pixels compiles as the form here, and
 // with the upper pair read in place it is further off (28).
 //
-// Halve8 (0x004cee30, 1133 bytes; candidate 1133, 1079 of 1125 masked
-// bytes): the palette-index halver. The search for the magenta entry, both
+// Halve8 (0x004cee30, 1133 bytes; candidate 1133, 1121 of 1125 masked
+// bytes, 1129 of 1133 strict): the palette-index halver. The search for the magenta entry, both
 // block loops, the key test and the >= 2 rule match, and nested ifs
 // reproduce retail's single `return 0` block. The keyed and plain loops are
 // an if/else with one `return 1` after it: with a `return 1` after the keyed
@@ -37,15 +37,16 @@
 // block's accumulators first in the x loop body gives retail's frame (0x48)
 // and registers; declared after the four entry copies, VC6 homed
 // `sourceRow` in `source`'s slot (frame 0x44) and every slot moved. The
-// plain loop ORs the blue term before the green one as retail does. Still
-// differs: the 3-byte entry copies take their slots in another order
-// (retail keeps d, c, b, a nearest esp in the keyed loop and b, a, c, d in
-// the plain one; declaring them in other orders, or apart from their
-// initialisers, does not move them), the two zero stores at the top of the
-// keyed x loop come in the other order, and after the keyed x loop retail
-// reloads the source stride before the width. Updating `row` before
-// `sourceRow`, the row steps or `to++` in the for increments and declaring
-// `to` before `from` are worse.
+// plain loop ORs the blue term before the green one as retail does. The
+// four 3-byte entry copies are declared once at the top of the entries
+// block, shared by both loops: declared in each x loop body (in any order)
+// they took their slots in the reverse order. Declaring the accumulators
+// count, red, blue, green orders the two zero stores as retail's. Still
+// differs: after the keyed x loop retail reloads the source stride before
+// the width. Updating `row` before `sourceRow`, the row steps or `to++` in
+// the for increments, declaring `to` before `from`, a `below` row pointer,
+// counting x or y down and hoisting the loop counters, pointers or entry
+// indices are the same or worse.
 //
 // DitherConvert (0x004cf2a0, 1759 bytes; candidate 1735, 242 match): the
 // Floyd-Steinberg ditherer behind the dithered converters. Two 16.16 error
@@ -222,6 +223,7 @@ int Halve8(void* destination, void* source, int width, int height, int destinati
         if (indices) {
             UnknownPixel24* entries = (UnknownPixel24*)palette->GetColors();
             if (entries) {
+                UnknownPixel24 a, b, c, d;
                 int key = -1;
                 for (int i = 0; i < 256; i++) {
                     if (entries[i].red == 0xff && entries[i].green == 0 && entries[i].blue == 0xff) {
@@ -234,15 +236,15 @@ int Halve8(void* destination, void* source, int width, int height, int destinati
                         unsigned char* from = sourceRow;
                         unsigned char* to = row;
                         for (int x = 0; x < width; x++, from += 2) {
-                            int count = 0, red = 0, green = 0, blue = 0;
+                            int count = 0, red = 0, blue = 0, green = 0;
                             int ia = from[0];
-                            UnknownPixel24 a = entries[ia];
+                            a = entries[ia];
                             int ib = from[1];
-                            UnknownPixel24 b = entries[ib];
+                            b = entries[ib];
                             int ic = from[sourceStride];
-                            UnknownPixel24 c = entries[ic];
+                            c = entries[ic];
                             int id = from[sourceStride + 1];
-                            UnknownPixel24 d = entries[id];
+                            d = entries[id];
                             if (ia != key) {
                                 red = a.red;
                                 green = a.green;
@@ -284,10 +286,10 @@ int Halve8(void* destination, void* source, int width, int height, int destinati
                         unsigned char* from = sourceRow;
                         unsigned char* to = row;
                         for (int x = 0; x < width; x++, from += 2) {
-                            UnknownPixel24 a = entries[from[0]];
-                            UnknownPixel24 b = entries[from[1]];
-                            UnknownPixel24 c = entries[from[sourceStride]];
-                            UnknownPixel24 d = entries[from[sourceStride + 1]];
+                            a = entries[from[0]];
+                            b = entries[from[1]];
+                            c = entries[from[sourceStride]];
+                            d = entries[from[sourceStride + 1]];
                             *to++ = indices[((a.red + b.red + c.red + d.red + 16) >> 5) << 10
                                             | (a.blue + b.blue + c.blue + d.blue + 16) >> 5
                                             | ((a.green + b.green + c.green + d.green + 16) >> 5) << 5];
