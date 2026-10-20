@@ -37,7 +37,9 @@
 // seg.y before t (retail t first; z already loads t first, seg.z having an older x87
 // leaf from `n.x = seg.z`; operand order, the y/z store order, the step declaration's
 // position, a dead `seg.y = 0` after the segment differences and component-wise
-// segment differences do not change it) and frame slots.  One perpendicular `n` at the
+// segment differences do not change it; nor do the walk lengths written out in the
+// body, by-value or by-pointer length helpers, `seg` read through a reference or
+// `(&seg)->y`, or by-reference scale helpers for y or y and z) and frame slots.  One perpendicular `n` at the
 // enclosing scope serves both intersection blocks and the final shift, which puts it at
 // retail's +0x14 (block-local `n`s in the two blocks: 1865; hoisting one of them: 1872;
 // all three as one: 1884).  Left in the frame: retail pairs `seg` with `step` at +0x20
