@@ -37,7 +37,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
 | `collision/` | `CollisionObject.cpp` (+ `CollisionObject.h`, `CollisionShapeTests.h`, `CollisionTypes.h`): 65 strict cases of 79; `CollisionPoint.cpp` (+ `CollisionPoint.h`, `CollisionPointCtor.h`): 16 strict cases, its two near misses in `samples/physics/collision/CollisionPointNearMisses.cpp` |
 | `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts); `ObjectPlacement.cpp`: 8 strict cases |
-| `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 46 strict cases of 52; `SoultreeQuadTreeRenderer.cpp`: 9 strict cases; `soultree.cpp` (SoultreeObject): 60 strict cases |
+| `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 47 strict cases of 52; `SoultreeQuadTreeRenderer.cpp`: 9 strict cases; `soultree.cpp` (SoultreeObject): 61 strict cases |
 | `gravity/` | `SelectiveGravityModel.cpp`: 15 strict cases |
 | `vehicle/` | `Vehicle.cpp` (73 strict cases of 83 registered), `Bike.cpp` (44 strict cases of 55), `BikeAI.cpp` (23 strict cases) and `KrustyBike.cpp` (70 strict cases; its 11 partials are in `samples/physics/krustybike/KrustyBikeNearMisses.cpp`), `Vehicle.h`, `Bike.h`, `KrustyBike.h`, `KrustyBikeTypes.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h` (24 strict cases of 27), `Terrain.cpp`/`.h` (21 strict cases of 24) |

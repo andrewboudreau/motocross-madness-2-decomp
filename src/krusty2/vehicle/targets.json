@@ -496,7 +496,7 @@
     "target_va": "0x005257a0",
     "target_size": 745,
     "expect": "partial",
-    "notes": "91.84% (745/745). Remaining: compiler hoists leanAxis/throttleAxis (0x4fc/0x500) stores ahead of retail's 0x4b0/0x4b4 around the weightForce copy (retail also stores inputMap 0x468 before steerAxis). Store order steerAxis, field_0x4a4, terrainScale, throttleAxis, inputMap, leanAxis is the best of an exhaustive sweep (masked 585 vs 579; all 720 orders of those six stores x 6 orders of the weightForce/leanCos/0x4b4 stores). Unchanged or worse: a `Vehicle& self = *this` alias or `this->` on any one or two of them, on weightForce or on leanCos/0x4b4, and chained `leanAxis = throttleAxis = 0`.",
+    "notes": "91.84% (745/745). Remaining: compiler hoists leanAxis/throttleAxis (0x4fc/0x500) stores ahead of retail's 0x4b0/0x4b4 around the weightForce copy (retail also stores inputMap 0x468 before steerAxis). Store order steerAxis, field_0x4a4, terrainScale, throttleAxis, inputMap, leanAxis is the best of an exhaustive sweep (masked 585 vs 579; all 720 orders of those six stores x 6 orders of the weightForce/leanCos/0x4b4 stores). Unchanged or worse: a `Vehicle& self = *this` alias or `this->` on any one or two of them, on weightForce or on leanCos/0x4b4, and chained `leanAxis = throttleAxis = 0`. Session 14: the two early stores are inputMap (0x468) and leanAxis (0x4fc), which VC6 schedules into the gap of the weightForce copy where retail puts leanCos/0x4b4. Their declared types do not matter (float or other pointer stores through casts: unchanged); per-component, reference-alias and cast forms of the weightForce copy are unchanged or worse (115+). Parked.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -796,7 +796,7 @@
     "target_va": "0x005281b0",
     "target_size": 539,
     "expect": "partial",
-    "notes": "Strict 523/539 with the Math3D u = t * s and u + velocity operators (fixes the scratchVector .y store). Velocity deflection, returns signed acos angle. Nested-if layout with one trailing return 0 gives retail esi=dir/edi=this and keeps k live in x87; VehDotG (x+y)+z dot loads retail y,x,z order; angle = -angle before the second return keeps fchs ahead of the pops. Left: retail stores field_0x4e8 before the abs compare (fcom placement), and s*t.x via fld st(0) (the dead-parameter homes match with the angle in its own local). Tried: s/t operand order of each u component (no effect), k stored through k = ... chains, |field_0x4e8| or a named |k|, abs via local if, k assignment forms, sign/len declared at top, len init-then-if/reuse len2 (much worse), ternary return (worse), u via VehScale/scaled helper, sum via named temp, z-first or x-y dot groupings, VehDotI/pointer dot. Session 14: no-op self-stores of s, k or t.x, and s * t: unchanged.",
+    "notes": "Strict 523/539 with the Math3D u = t * s and u + velocity operators (fixes the scratchVector .y store). Velocity deflection, returns signed acos angle. Nested-if layout with one trailing return 0 gives retail esi=dir/edi=this and keeps k live in x87; VehDotG (x+y)+z dot loads retail y,x,z order; angle = -angle before the second return keeps fchs ahead of the pops. Left: retail stores field_0x4e8 before the abs compare (fcom placement), and s*t.x via fld st(0) (the dead-parameter homes match with the angle in its own local). Tried: s/t operand order of each u component (no effect), k stored through k = ... chains, |field_0x4e8| or a named |k|, abs via local if, k assignment forms, sign/len declared at top, len init-then-if/reuse len2 (much worse), ternary return (worse), u via VehScale/scaled helper, sum via named temp, z-first or x-y dot groupings, VehDotI/pointer dot. Session 14: no-op self-stores of s, k or t.x, and s * t: unchanged. Session 14: s through a min helper, a ternary or an if/else of c * 1.5f (unchanged), u or t scaled in place on a copy (109 and 80, 563/557 bytes).",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -1596,7 +1596,7 @@
     "target_va": "0x00527a20",
     "target_size": 870,
     "expect": "partial",
-    "notes": "350/870 (866 bytes). First 0x120 bytes exact (driven-wheel count, 0x514170 drive loop, (x*x+y*y)+z*z dot, zero branch first). The memberwise VehSetV gives retail's direct [wheel+disp] moves for the scaled normal and the friction copy; only the (0,0,0) store remains: the struct assignment keeps a lea, and memberwise forms fold the stack temporary retail keeps.",
+    "notes": "350/870 (866 bytes). First 0x120 bytes exact (driven-wheel count, 0x514170 drive loop, (x*x+y*y)+z*z dot, zero branch first). The memberwise VehSetV gives retail's direct [wheel+disp] moves for the scaled normal and the friction copy; only the (0,0,0) store remains: the struct assignment keeps a lea, and memberwise forms fold the stack temporary retail keeps. Session 14: a user-declared member-wise Vec3::operator= folds this store too (304/870, 792 bytes); SoulTreePhysics slot 13 0x00501e90 has the same zero-store pattern and the same forms fail there.",
     "bindings": "Vehicle.bindings.json"
   },
   {

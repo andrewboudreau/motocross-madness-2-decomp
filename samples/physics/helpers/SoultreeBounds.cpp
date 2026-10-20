@@ -22,7 +22,7 @@
 //   with this form every count 0..31 stays at 618, and the written k order with 0..31
 //   locals is no better. Locals of any type count one each; uninitialised unused ones
 //   and extra statements count nothing.
-// GetWorldBounds (0x004fe8a0, 618 bytes; 541/610): the subtree box through the world matrix,
+// GetWorldBounds (0x004fe8a0, 618 bytes; 551/610): the subtree box through the world matrix,
 //   the half extents through |R| (a diagonal matrix times R, inline fabs). The instruction
 //   stream matches up to the tail; retail places the diagonal matrix at esp+0x10 below the
 //   centre and the product (frame order c, e, w, a; here c, w, a, e, which no use-count change
@@ -34,6 +34,9 @@
 //   small-frame size rule), but VC6 then adds an fxch pair to the ext.x sum (394-396).
 //   Tail forms that change nothing: w + ext operand order, `+=` from a copy, Vec3
 //   operators, inline Set helpers by reference/pointer/value, six ext sum orders.
+//   Session 14: the centre as one expression per row, x + (y + z) + translation (or
+//   (y + z) + x), places the pop esi as retail (541 -> 551); per-statement accumulation
+//   pops it one instruction late. Declaring ext before or with w does not move the tail.
 #include <string.h>
 #include "math/Math3D.h"
 
@@ -93,18 +96,9 @@ void SoultreeObject::GetWorldBounds(Vec3* lo, Vec3* hi)
     UpdateWorldMatrix();
     Vec3 c = subtreeBoundsA;
     Vec3 w;
-    w.x = c.z * worldMatrix._31;
-    w.x += c.y * worldMatrix._21;
-    w.x += c.x * worldMatrix._11;
-    w.x += worldMatrix._41;
-    w.y = c.z * worldMatrix._32;
-    w.y += c.y * worldMatrix._22;
-    w.y += c.x * worldMatrix._12;
-    w.y += worldMatrix._42;
-    w.z = c.z * worldMatrix._33;
-    w.z += c.y * worldMatrix._23;
-    w.z += c.x * worldMatrix._13;
-    w.z += worldMatrix._43;
+    w.x = c.x * worldMatrix._11 + (c.y * worldMatrix._21 + c.z * worldMatrix._31) + worldMatrix._41;
+    w.y = c.x * worldMatrix._12 + (c.y * worldMatrix._22 + c.z * worldMatrix._32) + worldMatrix._42;
+    w.z = c.x * worldMatrix._13 + (c.y * worldMatrix._23 + c.z * worldMatrix._33) + worldMatrix._43;
     float a[3][3];
     a[0][0] = e[0][0] * worldMatrix._11;
     a[0][1] = e[0][0] * worldMatrix._12;

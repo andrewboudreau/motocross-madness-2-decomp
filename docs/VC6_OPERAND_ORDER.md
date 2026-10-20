@@ -568,6 +568,14 @@ trying on other `[base+index]` / `add r, r` order near misses.
 - `x*x + y*y + z*z` as one expression squares z first whatever the parenthesisation or
   accessor; retail's x, y, z order comes from accumulating one square per statement
   (`l = x*x; l += y*y; l += z*z;`). MPBikeRiderDlg slot 29 `0x4f78a0`.
+- A transformed point goes the other way. CollisionObject::GetWorldBounds `0x436100`
+  emits the z, y, x products either way. Only the one-expression form
+  `r.x = v.x*m00 + v.y*m10 + v.z*m20 + m30` lets VC6 group the unrelated integer zero
+  stores and the `pop edi/esi` where retail has them (727 -> 798 of 804).
+  `r.x = v.z*m20; r.x += ...` scatters them. The same holds for a call's argument push:
+  SoultreeObject::RotateAboutPoint `0x4fd1f0` became exact (302 -> 334) once its first
+  point transform was written `x*m1j + (z*m3j + y*m2j) + m4j` per row instead of
+  accumulated, which moves the second SetPosition's `&p` push after the z row's products.
 - One `return frameList[currentFrame];` at the end, with each branch only updating the
   index, is copied into every exit and indexes through `mov ecx, eax`; early
   `return frameList[--currentFrame]` forms index with eax. UIAnim::Advance `0x472fe0`.
@@ -906,6 +914,19 @@ try on similar code. None is a rule.
   `Vec3 prev = f23c;` used in `(f154 - prev) * t + prev`, give those copies. In the
   same function a case block's `Vec3 r` declared at function scope stops sharing its
   slot and gives retail's 0x88 offset.
+- **Scaling a named copy in place keeps the products as x87 variables.**
+  SoultreePhysicsBaseObject slot 38 (`0x00501600`, 651 -> 925 of 925, exact):
+  `Vec3 t = worldAngularVelocity; t.x *= s.x; t.y *= s.y; t.z *= s.z;` before
+  `CrossProduct(t, r)` gives retail's int-move copy, `fld t.c; fmul s.c` per component,
+  `fld r.c; fmul st(i)` in every cross term (no product consumed in place) and the
+  three `fstp st(0)` pops, and also retail's `velocity + scratchVector` load order. A
+  by-value `Scale3(v, s)` helper (assigning a fresh `r`, assigning `v` in place, or
+  returning a constructor), scalar `tx/ty/tz` locals and explicit cross components all
+  consume the products in place (919 bytes).
+  In the same TU, ResolveContactImpulse `0x00500220` (286 -> 541 of 639, size exact) needs
+  the opposite for a product that is stored and passed by address: member-wise
+  `scaled.x = local.x * invInertia->x; ...` instead of `Vec3 scaled(...)` (4 bytes
+  shorter), plus `SoultreeDot` (`z + (x + y)`) for a dot that retail sums `(x + y) + z`.
 - **One reused function-scope Vec3 packs successive temporaries into one slot.** Bike
   slot 38 (`0x00405190`, frame 0xb8 to 0xac, aligned 683 to 688): retail's copy of
   `worldAngularVelocity`, and the sum it passes by address to slot 3, share the slot of an
@@ -918,6 +939,14 @@ try on similar code. None is a rule.
   directly keeps the products' stores on `right`; `Vec3 rearCross; rearCross.x = ...;
   right = rearCross;` gives retail's stack result and int-move copy. `right = Vec3(...)`,
   a constructed named copy and a CrossProduct call all lose aligned instructions.
+- **One trailing failure after a nested success path keeps an earlier early return apart.**
+  ProjectedShadow Init (`0x004da7b0`, 130 to 153 of 777, 844 to 841 bytes): retail has two
+  copies of the release-and-return-0 block, one for the surface-format failure and one shared
+  by the caps, texture, pixels and camera failures. Four early returns merge differently
+  (the format and camera failures share a block placed mid-function). Nesting the texture,
+  pixels and camera successes as `if (ok) { ... return this; }` with one trailing
+  `BaseObjectVirtualSlot2(); return 0;` gives retail's two blocks in retail's order. Nesting
+  only the camera test changes nothing.
 - **Gotos do not move blocks; the flow graph does.** KrustyBike Fn_00414370
   (`0x00414370`): retail places a shared tail right after a loop and the other branches
   jump back to it. Rewriting the source with labels so that the tail follows the loop

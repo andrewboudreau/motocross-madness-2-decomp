@@ -269,7 +269,8 @@ rotated into itself through a by-value inline helper, so VC6 copies it as retail
   keeps the flat view.
 - `SetAxes`'s seventh argument is an int.
 - The helpers samples keep the near misses: WorldToLocalDirection,
-  SetMatrixIn, SetAxesIn and RotateAboutPoint. SetAxesPtr `0x004fbd70` is exact in
+  SetMatrixIn and SetAxesIn. RotateAboutPoint `0x004fd1f0` is exact in soultree.cpp
+  with one expression per row. SetAxesPtr `0x004fbd70` is exact in
   soultree.cpp once its cross products parenthesise the first product
   (VC6_OPERAND_ORDER.md section 3).
 
@@ -477,6 +478,9 @@ Strict exact under `vc6_o2_ml` with `SoulTreePhysics.bindings.json`:
   touching block's `o3`/`o1` and leaves `a` free for the integration temporary, as retail
   does (with all three outputs in the touching block it pairs a/o3, b/o1, c/o2 and the
   respawn block needs 9 bytes of disp32 displacements).
+- Slot 38 `0x00501600` (contact response) is exact. The static arm scales a local copy
+  of `worldAngularVelocity` in place (`t.x *= s.x; ...`) before `CrossProduct(t, r)`;
+  a by-value scaling helper consumes the scaled components in place (919 bytes, not 925).
 
 Still partial in SoulTreePhysics.cpp:
 

@@ -9,10 +9,11 @@
 // texture and camera and retargets the render target at the texture while the camera is built.
 // Returns this, or 0 after releasing the object when no usable format or allocation exists.
 // Near miss: block layout, frame and the tail match (the clip rectangle stored left, right,
-// top, bottom reproduces retail's reload of the texture size).  Left: register choice in the
-// sprintf/QueryFlag argument set-up, the saved render-target fields (retail keeps width in ebx,
-// surface in ebp and spills height; VC6 here spills width), and retail keeps a second copy of
-// the release-and-return-0 block for the surface-format failures where VC6 merges them all.
+// top, bottom reproduces retail's reload of the texture size).  Nesting the texture and camera
+// success path under one shared release-and-return-0 gives retail's two failure blocks (the
+// surface-format failure keeps its own copy).  Left: register choice in the sprintf/QueryFlag
+// argument set-up and the saved render-target fields (retail keeps width in ebx, surface in
+// ebp and spills height; VC6 here spills width), 841 bytes against 842.
 ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* textureOwner)
 {
     GameObject::SetRenderContext((int)target);
@@ -51,46 +52,42 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
     }
 
     texture = new(__FILE__, 0xaa) ShadowTexture(textureOwner, 1);
-    if (!texture
-        || !texture->Create(0, 0x80, 0x80, 0x80, 0x80, surfaceFormat, surfaceFormat, 0, 8, 0, 0, 0,
-                            formatA, formatB, 0, 0x80, 0xff00ff)) {
-        BaseObjectVirtualSlot2();
-        return 0;
-    }
-    texture->UnknownVirtualSlot8(1, 0, 1);
-    field_0x60 = texture->pixels;
-    if (!field_0x60) {
-        BaseObjectVirtualSlot2();
-        return 0;
-    }
-    texture->surface->PageLock(0);
+    if (texture
+        && texture->Create(0, 0x80, 0x80, 0x80, 0x80, surfaceFormat, surfaceFormat, 0, 8, 0, 0, 0,
+                           formatA, formatB, 0, 0x80, 0xff00ff)) {
+        texture->UnknownVirtualSlot8(1, 0, 1);
+        field_0x60 = texture->pixels;
+        if (field_0x60) {
+            texture->surface->PageLock(0);
 
-    int savedHeight = Host()->height;
-    void* savedSurface = Host()->surface;
-    int savedWidth = Host()->width;
-    Host()->width = texture->size;
-    Host()->height = texture->height;
-    Host()->surface = texture->pixels;
-    ShadowOwner* owner = Host()->owner;
+            int savedHeight = Host()->height;
+            void* savedSurface = Host()->surface;
+            int savedWidth = Host()->width;
+            Host()->width = texture->size;
+            Host()->height = texture->height;
+            Host()->surface = texture->pixels;
+            ShadowOwner* owner = Host()->owner;
 
-    camera = new(__FILE__, 0xcd) ShadowCameraProxy(1);
-    if (!camera || !camera->SetRenderContext((int)Host())) {
-        BaseObjectVirtualSlot2();
-        return 0;
+            camera = new(__FILE__, 0xcd) ShadowCameraProxy(1);
+            if (camera && camera->SetRenderContext((int)Host())) {
+                Host()->surface = savedSurface;
+                Host()->width = savedWidth;
+                Host()->height = savedHeight;
+                Host()->SetOwner(owner);
+                Host()->device->SetTransformLike(owner->block_0x1a0);
+                camera->SetLensScale(0.3f);
+                for (int bits = 0x40; bits; bits >>= 1)
+                    sizeShift++;
+                clipRect.left = 0;
+                clipRect.right = texture->size - 1;
+                clipRect.top = 0;
+                clipRect.bottom = texture->size - 1;
+                return this;
+            }
+        }
     }
-    Host()->surface = savedSurface;
-    Host()->width = savedWidth;
-    Host()->height = savedHeight;
-    Host()->SetOwner(owner);
-    Host()->device->SetTransformLike(owner->block_0x1a0);
-    camera->SetLensScale(0.3f);
-    for (int bits = 0x40; bits; bits >>= 1)
-        sizeShift++;
-    clipRect.left = 0;
-    clipRect.right = texture->size - 1;
-    clipRect.top = 0;
-    clipRect.bottom = texture->size - 1;
-    return this;
+    BaseObjectVirtualSlot2();
+    return 0;
 }
 
 // 0x004dc2b0 (352 B): paints shadowColor into the colour word (+0x10 of 0x20-byte vertices) of

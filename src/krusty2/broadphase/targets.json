@@ -236,7 +236,7 @@
     "target_va": "0x004dcac0",
     "target_size": 627,
     "expect": "partial",
-    "notes": "620/627, same size. Only the x/z spill-slot order differs; see the comment above Insert in Quadtree.cpp.",
+    "notes": "620/627, same size. Only the x/z spill-slot order differs; see the comment above Insert in Quadtree.cpp. Session 14: x and z are spilled register candidates (frame 0x2c/0x30, reloaded at the outer loop's latch). Defining cell before x and z (depth, cell, x, z) puts both slots and the latch reloads at retail's places, but schedules the cellSizes load early (12 differing instructions in the prologue); the best of the 420 orders of the seven prologue statements with cell before x and z is 580/627. cz before cx, the definition orders with cell last, if/ternary forms of cx/cz, a separate `cell = ...` assignment and indexing cellSizes by code & 0xf do not swap them. Parked.",
     "bindings": "Quadtree.bindings.json"
   },
   {

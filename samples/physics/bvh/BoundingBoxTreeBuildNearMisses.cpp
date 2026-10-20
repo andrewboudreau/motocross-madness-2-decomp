@@ -14,6 +14,11 @@
 // keep[corners[k]] as [keep + offset] where VC6 gives [offset + keep].  The loop-variable names
 // of the merge passes (j outer, k inner, i for the copy) are the ones that put every local in
 // retail's stack slot; other choices only move slots.
+// Session 14: for the remap read, *(keep + c), corners[k][keep], != 0, a corner local (t, n, i
+// or first), a ternary and the negated test leave [offset + keep] or reshape the pass (57+ lines).
+// For the reload order, numCorners set just before the 0x348 allocation (from numTris, n or
+// numTaken) or numTris * 3 as the size reshape the function (300+); declaration order does not
+// matter.  Both spots look like register-allocation choices with no source lever found.
 void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* triCount,
                           int* vertCount, int** indices, TreeVec3** verts)
 {

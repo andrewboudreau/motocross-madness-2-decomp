@@ -506,24 +506,19 @@ struct SoultreeCollisionEvent {
     SoultreePhysicsBaseObject* other;
 };
 
-static inline Vec3 Scale3(Vec3 v, const Vec3& s)
-{
-    Vec3 r;
-    r.x = v.x * s.x;
-    r.y = v.y * s.y;
-    r.z = v.z * s.z;
-    return r;
-}
-
 // slot 38 (0x00501600): collision response for one contact.  Tier 3 reading: a2 is the
 // event/surface kind (0x68 = contact with another physics body, 0x66/0x6a/0x3e9 = static
 // or world contact, anything else ignored).  For a body contact the relative contact
 // positions and the other body's velocity/angular state are gathered and slot 4 (the impulse
 // solver) is run; the other body's speed and world angular velocity are then refreshed.  For
-// a static contact the lever arm r = contact - position gives torque-like field_0x1ac = r x
-// (field_0xcc * s), and slot 3 (the static solver) is run with velocity + that term.  Finally
+// a static contact the lever arm r = contact - position gives torque-like field_0x1ac = (field_0xcc * s) x r,
+// and slot 3 (the static solver) is run with velocity + that term.  Finally
 // a nearly resting body (small field_0xb8 and speed) is snapped to zero velocity.
 // a2's address is passed on as a float* to slots 3/4 (retail does that).
+// The static arm scales a local copy of the angular velocity in place (t.x *= s.x ...):
+// retail copies field_0xcc to the frame, keeps the three scaled components on the x87
+// stack through the cross product and pops them afterwards.  A by-value Scale3 helper
+// returning a fresh vector consumes them in place instead (919 bytes, not 925).
 void SoultreePhysicsBaseObject::UnknownVirtualSlot38(int a1, int a2, void* a3)
 {
     Vec3 s;
@@ -569,7 +564,10 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot38(int a1, int a2, void* a3)
             other->worldAngularVelocity = other->sceneNode->LocalToWorldDirection(*(Vec3*)a3);
         }
     } else {
-        Vec3 t = Scale3(worldAngularVelocity, s);
+        Vec3 t = worldAngularVelocity;
+        t.x *= s.x;
+        t.y *= s.y;
+        t.z *= s.z;
         scratchVector = CrossProduct(t, r);
         Vec3 p = velocity + scratchVector;
         UnknownVirtualSlot3((Vec3*)&collisionObject->hitNormal, &p, &r, &s, a2, 0, (float*)&a2);
@@ -1373,6 +1371,8 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
 // body-space angular velocity gains I^-1 (arm x n) * j, scaled per axis by *angScale.
 // Slot 3 passes field_0x14c, field_0x24, field_0x08, &field_0xe4 (body-space inverse
 // inertia diagonal), &field_0xd8 and &field_0x64.
+// Matching levers (541/639, size exact): the denominator dot is SoultreeDot (retail sums
+// (x + y) + z), and `scaled` is assigned member-wise; the constructor form costs 4 bytes.
 void ResolveContactImpulse(float restitution, float invMass, SoultreeObject* node, const Vec3* normal,
                const Vec3* relVel, const Vec3* arm, Vec3* invInertia, const Vec3* angScale,
                Vec3* angVel, Vec3* velocity, float* impulseOut, int scaleBits)
@@ -1382,12 +1382,15 @@ void ResolveContactImpulse(float restitution, float invMass, SoultreeObject* nod
     float scale = *(float*)&scaleBits;
     float approach = SoultreeDot(*relVel, *normal);
     if (approach < 0.0) {
-        Vec3 axis = CrossProduct(*arm, *normal);
+        Vec3 axis = SoultreeCross(*arm, *normal);
         Vec3 local = node->WorldToLocalDirection(axis);
-        Vec3 scaled(local.x * invInertia->x, local.y * invInertia->y, local.z * invInertia->z);
+        Vec3 scaled;
+        scaled.x = local.x * invInertia->x;
+        scaled.y = local.y * invInertia->y;
+        scaled.z = local.z * invInertia->z;
         Vec3 world = node->LocalToWorldDirection(scaled);
         Vec3 c = CrossProduct(world, *arm);
-        float j = ((restitution + 1.0f) * -approach) / (DotProduct(c, *normal) + invMass);
+        float j = ((restitution + 1.0f) * -approach) / (SoultreeDot(c, *normal) + invMass);
         *impulseOut = j;
         Vec3 impulse;
         if (scale != 0.0f)

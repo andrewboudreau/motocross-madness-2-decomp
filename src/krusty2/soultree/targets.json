@@ -4,7 +4,7 @@
     "target_va": "0x00500220",
     "target_size": 639,
     "expect": "partial",
-    "notes": "Partial (~44% bytewise, 647 vs 639 bytes). Contact impulse helper called by slot 3. Dot (SoultreeDot), both cross products, numerator/denominator order, the scale branch and velocity update match instruction-for-instruction; remaining differences are stack-slot assignment (retail gives the WorldToLocal result the 0x10 slot and the I^-1 product the cross-temp slot; VC6 here swaps them), operand load order in the first cross product (x and z terms), and the angular tail (retail copies j*scaled through a temporary). Twelfth argument is a float that slot 3 forwards as int a6.",
+    "notes": "541/639 strict, size exact (session 14; was 286/639 at 647 bytes). Levers: SoultreeDot(c, *normal) for the denominator (retail adds (x + y) + z), member-wise scaled.x = local.x * invInertia->x (the Vec3 constructor form is 4 bytes longer), SoultreeCross for the axis (CrossProduct/SoultreeCrossCtor 453, explicit component forms 102). Remaining: retail gives the WorldToLocal result the lower slot and scaled the higher one (VC6 here swaps them, and the impulse temporaries that reuse them follow); declaration order, block scope and hoisting impulse do not move them. The axis x term loads arm->y first in retail. Twelfth argument is a float that slot 3 forwards as int a6.",
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
     "bindings": "SoulTreePhysics.bindings.json"
@@ -115,8 +115,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot38@SoultreePhysicsBaseObject",
     "target_va": "0x00501600",
     "target_size": 925,
-    "expect": "partial",
-    "notes": "71.70% under vc6_o2_ml (wave 3: was 70.46%; size 919 vs 925). Everything up to the static path matches. Scale3 now assigns r.x = v.x * s.x (etc.) member-wise. Remaining: retail keeps all three t components on the x87 stack through the cross product (fld r.c; fmul st(i), never consuming a t value in place, three fstp st(0) at the end), and p = field_0x64 + field_0x1ac loads 0x64 first; cross helper choice (CrossProduct/SoultreeCross/ctor) does not change the bytes.",
+    "expect": "exact",
+    "notes": "Exact under vc6_o2_ml (session 14; was 651/925 at 919 bytes). Lever: the static arm scales a local copy of worldAngularVelocity in place (t.x *= s.x; t.y *= s.y; t.z *= s.z) before CrossProduct(t, r); retail keeps the scaled components on the x87 stack (fld r.c; fmul st(i)) and pops them with three fstp st(0). A by-value Scale3 helper, scalar locals or explicit cross components consume them in place.",
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {
@@ -196,7 +196,7 @@
     "target_va": "0x00501e90",
     "target_size": 483,
     "expect": "partial",
-    "notes": "169/483 strict, 487 B. SoultreeCrossCtor passed straight to WorldToLocalDirection reproduces the cross-product copy/push schedule. Remaining: retail stores both normalForce copies directly to [esi+0x68..0x70] where VC6 emits lea + [reg] (a by-reference member-wise helper fixes the else branch but constant-folds the zero branch); the x component loads leverArm first (retail frictionForce; written operand order is canonicalised) and *a2 += loads *a2 first.",
+    "notes": "169/483 strict, 487 B. SoultreeCrossCtor passed straight to WorldToLocalDirection reproduces the cross-product copy/push schedule. Remaining: retail stores both normalForce copies directly to [esi+0x68..0x70] where VC6 emits lea + [reg] (a by-reference member-wise helper fixes the else branch but constant-folds the zero branch); the x component loads leverArm first (retail frictionForce; written operand order is canonicalised) and *a2 += loads *a2 first. Session 14 (inert or worse): Vec3(0.0f), the magnitude store after the vector, a Vec3& alias, a named or member-wise zero local, a scaled zero, a POD view of both copies and a user-declared member-wise Vec3::operator= (that one folds both copies: 67/483, 443 bytes).",
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {
@@ -747,6 +747,16 @@
     "target_size": 343,
     "expect": "exact",
     "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?RotateAboutPoint@SoultreeObject@@QAEXUVec3@@0M@Z",
+    "target_va": "0x004fd1f0",
+    "target_size": 334,
+    "expect": "exact",
+    "notes": "strict exact; one expression per row with the z and y products grouped (session 14; the per-statement first block scheduled the second &p push early, 302/334)",
     "bindings": "soultree.bindings.json"
   },
   {

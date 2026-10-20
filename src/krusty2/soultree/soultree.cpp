@@ -14,8 +14,8 @@
 // Class identity and offsets: core/SoultreeObject.h. Method names are tier 3.
 //
 // Every function below is strict exact. Near misses of the same unit (WorldToLocalDirection
-// 0x004fd710, SetMatrixIn 0x004fb8c0 with the transpose COMDAT 0x004fefb0, SetAxesIn 0x004fc050,
-// RotateAboutPoint 0x004fd1f0) are in samples/physics/helpers/.
+// 0x004fd710, SetMatrixIn 0x004fb8c0 with the transpose COMDAT 0x004fefb0, SetAxesIn 0x004fc050)
+// are in samples/physics/helpers/.
 // Scale 0x004fd340 (inline 4x4 product) and GetWorldBounds 0x004fe8a0 are near misses in
 // samples/physics/helpers/SoultreeBounds.cpp.
 #define SOULTREE_OBJECT_WITH_BASES
@@ -557,6 +557,29 @@ void SoultreeObject::SetRotation(float x, float y, float z, float angle)
     GetPosition(&pos);
     AxisAngleMatrix(&localMatrix, x, y, z, angle);
     SetPosition(pos);
+}
+
+// 0x004fd1f0. The local point 'pivot' is converted to the parent's space (p = pivot * local,
+// translation included) and stored as the position; the node is then rotated by (axis, angle)
+// via Rotate; finally the position is set to p - pivot * R(new local), i.e. translation +
+// (-pivot) * rotation, so that the pivot keeps its place after the rotation.  Each row is one
+// expression; the first block's rows and the second block's x row group the z and y products,
+// which VC6 emits before the x product.  Accumulating the first block one term per statement
+// puts the second SetPosition's &p push before the y row's store instead of after the z row's
+// products.
+void SoultreeObject::RotateAboutPoint(Vec3 pivot, Vec3 axis, float angle)
+{
+    Vec3 p;
+    p.x = pivot.x * localMatrix._11 + (pivot.z * localMatrix._31 + pivot.y * localMatrix._21) + localMatrix._41;
+    p.y = pivot.x * localMatrix._12 + (pivot.z * localMatrix._32 + pivot.y * localMatrix._22) + localMatrix._42;
+    p.z = pivot.x * localMatrix._13 + (pivot.z * localMatrix._33 + pivot.y * localMatrix._23) + localMatrix._43;
+    SetPosition(p);
+    Rotate(axis, angle);
+    float nx = -pivot.x, ny = -pivot.y, nz = -pivot.z;
+    p.x = nx * localMatrix._11 + (nz * localMatrix._31 + ny * localMatrix._21) + localMatrix._41;
+    p.y = nz * localMatrix._32 + ny * localMatrix._22 + nx * localMatrix._12 + localMatrix._42;
+    p.z = nz * localMatrix._33 + ny * localMatrix._23 + nx * localMatrix._13 + localMatrix._43;
+    SetPosition(p);
 }
 
 // 0x004fd5c0. v * R(world): the upper 3x3 of the world matrix, no translation.
