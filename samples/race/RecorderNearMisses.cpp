@@ -47,6 +47,13 @@
 // the stack slots value 0x18, queued 0x1c, size 0x20 and the readsReset
 // flag/loop count 0x24, keeps loop counts in ebp/edx, and cross-jumps fewer
 // `Rewind(); return 1;` exits.
+// Setting `queued = 1` before the AppendPosition call gives retail's store
+// among that call's argument pushes (63 -> 56 hunks). Assigning `record`
+// before the AppendPosition(recordPosition) call keeps the count in ebp as
+// retail does, but rotates the scratch registers of the switch cases
+// (aligned 706 -> 530). `int queued = 0`, `queued = 0` before the
+// readingReverse test and `while (1)` for the reverse loop do not give
+// retail's `xor eax, eax ; cmp ecx, eax` zero there.
 
 #include "../../src/reconstructed/Recorder.cpp"
 #include "../../src/reconstructed/VCRfile.h"
@@ -430,8 +437,8 @@ int VCRInterface::Tick(float frameTime) {
             if (result == 0) {
                 recordCallback(recordType, recordBuffer, 0, recordId, &keep, recordTimeMs, &milliseconds);
                 if (keep) {
-                    frameRing->AppendPosition(value, recordTimeMs);
                     queued = 1;
+                    frameRing->AppendPosition(value, recordTimeMs);
                 }
             } else {
                 if (result == 1 &&
@@ -489,8 +496,8 @@ int VCRInterface::Tick(float frameTime) {
                 if (result == 0) {
                     recordCallback(recordType, recordBuffer, 1, recordId, &keep, recordTimeMs, &milliseconds);
                     if (keep) {
-                        frameRing->AppendPosition(value, recordTimeMs);
                         queued = 1;
+                        frameRing->AppendPosition(value, recordTimeMs);
                     }
                 } else if (result == 1) {
                     if (recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds) == 12) {
@@ -529,8 +536,8 @@ int VCRInterface::Tick(float frameTime) {
                     if (result == 0) {
                         recordCallback(recordType, recordBuffer, 0, recordId, &keep, recordTimeMs, &milliseconds);
                         if (keep) {
-                            frameRing->AppendPosition(value, recordTimeMs);
                             queued = 1;
+                            frameRing->AppendPosition(value, recordTimeMs);
                         }
                     } else if (result == 1) {
                         if (recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds) == 12) {
@@ -568,8 +575,8 @@ int VCRInterface::Tick(float frameTime) {
             if (result == 0) {
                 recordCallback(recordType, recordBuffer, 0, recordId, &keep, recordTimeMs, &milliseconds);
                 if (keep) {
-                    frameRing->AppendPosition(value, recordTimeMs);
                     queued = 1;
+                    frameRing->AppendPosition(value, recordTimeMs);
                 }
             } else if (result == 1) {
                 if (recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds) == 12) {
@@ -588,8 +595,8 @@ int VCRInterface::Tick(float frameTime) {
             if (result == 0) {
                 recordCallback(recordType, recordBuffer, 0, recordId, &keep, recordTimeMs, &milliseconds);
                 if (keep) {
-                    frameRing->AppendPosition(value, recordTimeMs);
                     queued = 1;
+                    frameRing->AppendPosition(value, recordTimeMs);
                 }
             } else if (result == 1) {
                 if (recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds) == 12) {
