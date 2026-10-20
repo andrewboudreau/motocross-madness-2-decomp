@@ -5,14 +5,18 @@
 // quadtree, shadows, fog and sky, terrain, ecosystem, race, collision links,
 // podium and the remaining race objects, calling `progress` between stages.
 //
-// Status: near miss with retail's instruction count (2208); sdiff.py
-// (frame offsets, branch targets and immediates masked) aligns 1956 of
-// them in 146 hunks. The call sequence, allocation sizes and lines, EH
+// Status: near miss, 2207 instructions against retail's 2208; sdiff.py
+// (frame offsets, branch targets and immediates masked) aligns 2032 in
+// 109 hunks, and 2167 in 46 hunks with register names masked too. The
+// call sequence, allocation sizes and lines, EH
 // states, error paths, the memory-budget decision tree and frame size
 // (0x650) match. The tree's last AGP and next-to-last non-AGP tests
 // budget the model textures at a quarter (textureBytes / 4, recomputed,
 // not the shared (textureBytes + cubeBytes) / 4), and the last AGP test is
 // its own else-if whose all-2 else merges into the shared tail store.
+// The car's ignore list adds each entry through an if/else of two calls
+// (retail pushes in each arm and merges the call tail), and the physics
+// caster's terrain stores go through one held pointer.
 // Shapes found: the fog object is a bare GameObject (0x2c bytes),
 // the texture-choice members are chained assignments (one load each), the
 // margin percentage is read before the minimum and multiplied after both
@@ -683,9 +687,10 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
             UnknownSceneCaster* caster = &eventScene->staticModels->casters[i];
             if (caster->physics) {
                 UnknownTerrain* terrain = eventTerrain;
-                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x1f4 = terrain;
+                UnknownQuarryPhysicsObject* physics = (UnknownQuarryPhysicsObject*)caster->physicsObject;
+                physics->field_0x1f4 = terrain;
                 if (terrain)
-                    ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x1f8 = ((UnknownQuarryTerrain*)terrain)->field_0x40;
+                    physics->field_0x1f8 = ((UnknownQuarryTerrain*)terrain)->field_0x40;
                 ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x128->SnapPlacement();
                 ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x128->SetUseBroadphase(1);
                 ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x128->SetOwner(caster->physicsObject, 0x68);
@@ -695,9 +700,8 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
             }
         }
     }
-    UnknownQuarryRace* race = (UnknownQuarryRace*)raceView;
-    if (race->field_0x6c && race->field_0x6c->collisionObject) {
-        race->field_0x6c->collisionObject->Release();
+    if (((UnknownQuarryRace*)raceView)->field_0x6c && ((UnknownQuarryRace*)raceView)->field_0x6c->collisionObject) {
+        ((UnknownQuarryRace*)raceView)->field_0x6c->collisionObject->Release();
         ((UnknownQuarryRace*)raceView)->field_0x6c->collisionObject = 0;
     }
     if (((UnknownQuarryRace*)raceView)->field_0x64 && ((UnknownQuarryRace*)raceView)->field_0x64->collisionObject) {
@@ -736,9 +740,12 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                 ((UnknownQuarryCollision*)car->sensorCollider)->SetIgnoreListMode(1);
                 for (int j = 0; j < eventScene->animationTable->entryCount; j++) {
                     UnknownSceneEntry* entry = &eventScene->animationTable->entries[j];
-                    ((UnknownQuarryCollision*)car->sensorCollider)
-                        ->AddIgnoredOwner(entry->keyFramed ? (UnknownQuarryCollision*)entry->character->collisionObject
-                                                                       : (UnknownQuarryCollision*)entry->proceduralObject->bodyCollider);
+                    if (entry->keyFramed)
+                        ((UnknownQuarryCollision*)car->sensorCollider)
+                            ->AddIgnoredOwner((UnknownQuarryCollision*)entry->character->collisionObject);
+                    else
+                        ((UnknownQuarryCollision*)car->sensorCollider)
+                            ->AddIgnoredOwner((UnknownQuarryCollision*)entry->proceduralObject->bodyCollider);
                 }
                 ((UnknownQuarryCollision*)car->bodyCollider)->SnapPlacement();
                 ((UnknownQuarryCollision*)car->bodyCollider)->SetUseBroadphase(1);
