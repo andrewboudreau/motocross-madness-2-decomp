@@ -366,7 +366,7 @@
     "target_va": "0x00436100",
     "target_size": 804,
     "expect": "partial",
-    "notes": "727/804: Arvo transformed AABB via diag(half) x M unrolled, same size/frame; two diagonal zero stores and the pop edi/esi pair are scheduled differently",
+    "notes": "798/804: Arvo transformed AABB via diag(half) x M unrolled, same size/frame. Session 14: CollisionTransformPoint written as one sum per component in x, y, z, translation order (VC6 emits the z product first; y, z, x also works) places the zero stores and the pop edi/esi pair as retail (727 -> 798); the accumulate-per-statement form, partial sums and bracketed sums do not. Left: the zero temporaries at 0x3c and 0x40 are swapped. Not moved by: zero store order in CollisionDiagonal (zeros first, columns, chained), int zeros, a vector or pointer parameter (658), Mul3x3 product order, operand order or bracketing (162-798), r before hm, hm at function scope, the center before the diagonal (580), inline case casts (761), an ext vector or the c/h declaration order.",
     "bindings": "CollisionObject.bindings.json"
   },
   {

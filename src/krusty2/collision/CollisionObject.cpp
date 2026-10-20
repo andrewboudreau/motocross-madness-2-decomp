@@ -2219,10 +2219,10 @@ inline void CollisionMul3x3(float r[3][3], const float d[3][3], const Matrix4& m
 // mesh (2): +0x08 with bounds object +0x04.  For any other shape type retail falls through
 // with uninitialised locals; that is reproduced (locals left unset).
 // Retail forms diag(half) as a 3x3 with its zeros as stack temporaries and multiplies it
-// by M fully unrolled; the center is accumulated one term per statement (z, y, x, then the
-// translation), which keeps VC6 from reassociating the sums.  727/804: two of the diagonal's
-// zero stores are scheduled after the first products instead of with the others, and the
-// pop edi/esi pair lands before the third extent row instead of after it.
+// by M fully unrolled.  The center is one sum per component written x, y, z, translation
+// (CollisionTransformPoint); VC6 emits the z product first.  Accumulating it one term per
+// statement gives the same products but schedules the diagonal's zero stores and the pop
+// edi/esi pair elsewhere (727).  798/804: two of the zero temporaries trade stack slots.
 void CollisionObject::GetWorldBounds(CollisionVec3* outMin, CollisionVec3* outMax)
 {
     Matrix4 m;

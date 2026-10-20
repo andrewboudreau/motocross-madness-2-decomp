@@ -568,6 +568,11 @@ trying on other `[base+index]` / `add r, r` order near misses.
 - `x*x + y*y + z*z` as one expression squares z first whatever the parenthesisation or
   accessor; retail's x, y, z order comes from accumulating one square per statement
   (`l = x*x; l += y*y; l += z*z;`). MPBikeRiderDlg slot 29 `0x4f78a0`.
+- A transformed point goes the other way. CollisionObject::GetWorldBounds `0x436100`
+  emits the z, y, x products either way. Only the one-expression form
+  `r.x = v.x*m00 + v.y*m10 + v.z*m20 + m30` lets VC6 group the unrelated integer zero
+  stores and the `pop edi/esi` where retail has them (727 -> 798 of 804).
+  `r.x = v.z*m20; r.x += ...` scatters them.
 - One `return frameList[currentFrame];` at the end, with each branch only updating the
   index, is copied into every exit and indexes through `mov ecx, eax`; early
   `return frameList[--currentFrame]` forms index with eax. UIAnim::Advance `0x472fe0`.
