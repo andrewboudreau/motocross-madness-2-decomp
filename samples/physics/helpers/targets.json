@@ -64,23 +64,23 @@
   },
   {
     "class": "Math",
-    "source": "FastMath.cpp",
+    "source": "../../../src/reconstructed/FastMath.cpp",
     "candidate_symbol_contains": "FastSqrt@@",
     "target_va": "0x00460b50",
     "target_size": 85,
     "expect": "exact",
     "notes": "",
-    "bindings": "FastMath.bindings.json"
+    "bindings": "../../../src/reconstructed/FastMath.bindings.json"
   },
   {
     "class": "Math",
-    "source": "FastMath.cpp",
+    "source": "../../../src/reconstructed/FastMath.cpp",
     "candidate_symbol_contains": "FastInvSqrt@@",
     "target_va": "0x00460c00",
     "target_size": 107,
     "expect": "exact",
     "notes": "",
-    "bindings": "FastMath.bindings.json"
+    "bindings": "../../../src/reconstructed/FastMath.bindings.json"
   },
   {
     "class": "SoultreeObject",
@@ -143,53 +143,53 @@
   },
   {
     "class": "Math",
-    "source": "FastMath.cpp",
+    "source": "../../../src/reconstructed/FastMath.cpp",
     "candidate_symbol_contains": "?InitFastInvSqrtTable@@",
     "target_va": "0x00460bb0",
     "target_size": 74,
     "expect": "exact",
     "notes": "fills 0x5daf5c",
-    "bindings": "FastMath.bindings.json"
+    "bindings": "../../../src/reconstructed/FastMath.bindings.json"
   },
   {
     "class": "Math",
-    "source": "FastMath.cpp",
+    "source": "../../../src/reconstructed/FastMath.cpp",
     "candidate_symbol_contains": "?FastInvSqrtEstimate@@",
     "target_va": "0x00460c70",
     "target_size": 59,
     "expect": "exact",
     "notes": "table estimate, no Newton step",
-    "bindings": "FastMath.bindings.json"
+    "bindings": "../../../src/reconstructed/FastMath.bindings.json"
   },
   {
     "class": "Math",
-    "source": "FastMath.cpp",
+    "source": "../../../src/reconstructed/FastMath.cpp",
     "candidate_symbol_contains": "?InitTrigTables@@",
     "target_va": "0x00460cb0",
     "target_size": 86,
     "expect": "exact",
     "notes": "sin/cos/tan tables 0x61b3e0/0x5db3e0/0x59af5c",
-    "bindings": "FastMath.bindings.json"
+    "bindings": "../../../src/reconstructed/FastMath.bindings.json"
   },
   {
     "class": "Math",
-    "source": "FastMath.cpp",
+    "source": "../../../src/reconstructed/FastMath.cpp",
     "candidate_symbol_contains": "?InitFastMath@@",
     "target_va": "0x00460ad0",
     "target_size": 15,
     "expect": "exact",
     "notes": "builds the three tables (two calls and a tail jump); called from 0x46799c",
-    "bindings": "FastMath.bindings.json"
+    "bindings": "../../../src/reconstructed/FastMath.bindings.json"
   },
   {
     "class": "Math",
-    "source": "FastMath.cpp",
+    "source": "../../../src/reconstructed/FastMath.cpp",
     "candidate_symbol_contains": "?InitFastSqrtTable@@",
     "target_va": "0x00460ae0",
     "target_size": 97,
     "expect": "exact",
     "notes": "fills 0x5dafe0 (256 entries); the index is unsigned (jb)",
-    "bindings": "FastMath.bindings.json"
+    "bindings": "../../../src/reconstructed/FastMath.bindings.json"
   },
   {
     "class": "(free)",

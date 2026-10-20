@@ -319,7 +319,7 @@ extern KbGame* g_kbGame;
 unsigned int ReadClock();
 // 0x004B5D00 (cdecl): forward/up axes from roll, pitch and yaw (tier 3 names).
 void OrientationAxesFromAngles(Vec3* forward, Vec3* up, float roll, float pitch, float yaw);
-// 0x00460C70: 1/sqrt estimate (name from samples/physics/helpers/FastMath.bindings.json).
+// 0x00460C70: 1/sqrt estimate (name from src/reconstructed/FastMath.bindings.json).
 float FastInvSqrtEstimate(float v);
 // Network smoothing settings 0x00493660 reads; 0x0048fc80 loads them from the game config.
 extern int g_kbLatencyHiding;        // 0x0056CB3C

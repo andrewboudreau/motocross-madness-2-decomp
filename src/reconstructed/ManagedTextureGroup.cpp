@@ -7,6 +7,7 @@
 #include "DebugAlloc.h"
 #include "DebugOverlay.h"
 #include "ManagedTexture.h"
+#include "PCRenderTarget.h"
 #include "TrackGame.h"
 
 extern "C" __declspec(dllimport) int __stdcall DeleteObject(void* object);
@@ -222,6 +223,186 @@ int UnknownCompare50ef00(const void* first, const void* second) {
     if (difference > 0.0f)
         return 1;
     return -1;
+}
+
+// GDI (gdi32.dll imports).
+extern "C" __declspec(dllimport) void* __stdcall CreatePen(int style, int width, unsigned long color);
+extern "C" __declspec(dllimport) void* __stdcall SelectObject(void* dc, void* object);
+extern "C" __declspec(dllimport) int __stdcall MoveToEx(void* dc, int x, int y, void* previous);
+extern "C" __declspec(dllimport) int __stdcall LineTo(void* dc, int x, int y);
+extern "C" __declspec(dllimport) int __stdcall TextOutA(void* dc, int x, int y, const char* text, int length);
+
+// The rectangle and fill effects of DirectDraw's Blt.
+struct UnknownBltRect {
+    long left;
+    long top;
+    long right;
+    long bottom;
+};
+
+struct UnknownBltEffects {
+    unsigned long size;
+    unsigned char field_0x04[0x50 - 0x04];
+    unsigned long fillColor;
+    unsigned char field_0x54[0x64 - 0x54];
+};
+
+// 0x0050ef70: with the "TestKey" debug input, shows the debug-key selection
+// below the top 20 rows of `target`: in mode 1 the selected texture (with
+// its use, planned level and Un/Hi/Lo state) and an outline on its page,
+// in mode 2 the selected page with every texture copied into its region.
+// The page-drawing tail sits in its own block so its locals reuse the slots
+// of dead earlier locals, and the single `return 1` (the other exits folded
+// into the page and GetDC tests) lets VC6 save ebx/esi after the "not the
+// selected group" return, as retail does (docs/VC6_SHRINK_WRAP.md). The
+// outline copies the offsets and each axis's scale into locals: a fresh
+// local is the newer x87 leaf, so `width * u` loads `u` and multiplies by
+// st(1), and `uScale + pageOffsetU` loads the scale first.
+int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
+    UnknownSurfaceInterface* surface = target->renderSurface;
+    if (groupManager->debugGroup != this)
+        return 0;
+    if (g_TrackGame->testKey) {
+        char text[0x50];
+        ManagedTexture* selected = 0;
+        TextureMap* page = 0;
+        int mode = groupManager->debugKeyMode;
+        if (mode == 1 && textureCursor >= 0 && textureCursor < managedTextures.m_count) {
+            int index = textureCursor;
+            selected = static_cast<ManagedTexture*>(managedTextures.First());
+            while (selected && index--)
+                selected = static_cast<ManagedTexture*>(managedTextures.Next());
+            if (selected) {
+                const char* state = "";
+                if (!selected->useCount && selected->page)
+                    state = "Un";
+                else if (selected->largestUse > 0.0f) {
+                    if (selected->allocatedLevel > selected->wantedLevel)
+                        state = "Hi";
+                    else if (selected->allocatedLevel < selected->wantedLevel && selected->allocatedLevel != 8)
+                        state = "Lo";
+                }
+                int x = target->targetWidth - selected->textureWidth;
+                long pitch;
+                unsigned char* bits = (unsigned char*)target->LockSurface(0, &pitch, 0x821);
+                if (bits) {
+                    long sourcePitch;
+                    void* source = selected->LockSurface(0, &sourcePitch, 0x811);
+                    if (source) {
+                        int sourceSize = PixelFormatBytesPerPixel(selected->mapFormat);
+                        int size = PixelFormatBytesPerPixel(target->surfacePixelFormat);
+                        ConvertPixels(bits + x * size + 20 * pitch, source, selected->textureWidth,
+                                              selected->textureHeight, pitch / size, sourcePitch / sourceSize,
+                                              target->surfacePixelFormat, selected->mapFormat, 0, selected->colorMapper, 0, 0);
+                        selected->systemSurface->Unlock(0);
+                    }
+                    target->UnlockSurface(0);
+                }
+                _snprintf(text, sizeof(text), "%d %0.2f->%d,%s", textureCursor + 1, selected->largestUse,
+                          selected->allocatedLevel, state);
+                void* textDc;
+                if (!target->renderSurface->GetDC(&textDc)) {
+                    TextOutA(textDc, x, 20, text, strlen(text));
+                    target->renderSurface->ReleaseDC(textDc);
+                }
+            }
+        }
+        if (groupManager->debugKeyMode == 1 && selected) {
+            int index = 0;
+            for (page = cachePages.First(); page; page = cachePages.Next(), index++) {
+                if (page == selected->page)
+                    break;
+            }
+            if (page)
+                pageCursor = index;
+        } else if (groupManager->debugKeyMode == 2) {
+            page = cachePages.First();
+            for (int i = 0; i < pageCursor; i++)
+                page = cachePages.Next();
+        }
+        if (page) {
+            UnknownBltEffects effects;
+            memset(&effects, 0, sizeof(effects));
+            effects.size = sizeof(effects);
+            effects.fillColor = 0;
+            UnknownBltRect rect;
+            rect.left = 0;
+            rect.top = 20;
+            rect.right = page->textureWidth;
+            rect.bottom = page->textureHeight + 20;
+            surface->Blt(&rect, 0, 0, 0x400, &effects);
+            static_cast<CacheTexture*>(page)->ListTextures(&field_0x1a8);
+            long pitch;
+            unsigned char* bits = (unsigned char*)target->LockSurface(0, &pitch, 0x821);
+            if (bits) {
+                for (int j = 0; j < field_0x1a8.m_count; j++) {
+                    ManagedTexture* managed = field_0x1a8.Get(j);
+                    UnknownTextureRegion* region = managed->region;
+                    int left = (int)(page->textureWidth * region->left);
+                    int top = (int)(page->textureHeight * region->top) + 20;
+                    int side = (int)(managed->pageScale * 256.0f);
+                    int levelSide = managed->textureWidth;
+                    UnknownSurfaceInterface* level = managed->systemSurface;
+                    UnknownSurfaceDesc desc;
+                    memset(&desc, 0, sizeof(desc));
+                    desc.size = sizeof(desc);
+                    level->GetSurfaceDesc(&desc);
+                    while (side < levelSide) {
+                        levelSide >>= 1;
+                        level->GetAttachedSurface((UnknownSurfaceCaps*)desc.caps, &level);
+                        level->GetSurfaceDesc(&desc);
+                    }
+                    if (desc.height == side && desc.width == side) {
+                        UnknownSurfaceDesc locked;
+                        memset(&locked, 0, sizeof(locked));
+                        locked.size = sizeof(locked);
+                        if (!level->Lock(0, &locked, 0x811, 0)) {
+                            int sourceSize = PixelFormatBytesPerPixel(managed->mapFormat);
+                            int size = PixelFormatBytesPerPixel(target->surfacePixelFormat);
+                            ConvertPixels(bits + top * pitch + left * size, locked.surface, levelSide, levelSide,
+                                                  pitch / size, locked.pitch / sourceSize, target->surfacePixelFormat,
+                                                  managed->mapFormat, 0, managed->colorMapper, 0, 0);
+                            level->Unlock(0);
+                        }
+                    }
+                }
+                surface->Unlock(0);
+            }
+            field_0x1a8.Clear();
+
+            void* dc;
+            int failed = surface->GetDC(&dc);
+            if (!failed) {
+                if (!gdiObject)
+                    gdiObject = CreatePen(0, 1, 0xff00);
+                if (gdiObject)
+                    SelectObject(dc, gdiObject);
+            }
+            if (selected && !failed) {
+                float width = (float)page->textureWidth;
+                float u = selected->pageOffsetU;
+                int left = (int)(width * u);
+                float uScale = selected->pageScale;
+                int right = (int)((uScale + selected->pageOffsetU) * width);
+                float height = (float)page->textureHeight;
+                float v = selected->pageOffsetV;
+                int top = (int)(height * v + 20.0f);
+                float vScale = selected->pageScale;
+                int bottom = (int)((vScale + selected->pageOffsetV) * height + 20.0f);
+                MoveToEx(dc, left, top, 0);
+                LineTo(dc, right, top);
+                LineTo(dc, right, bottom);
+                LineTo(dc, left, bottom);
+                LineTo(dc, left, top);
+            }
+            if (!failed) {
+                sprintf(text, "#%d", pageCursor + 1);
+                TextOutA(dc, 0, 20, text, strlen(text));
+                surface->ReleaseDC(dc);
+            }
+        }
+    }
+    return 1;
 }
 
 
