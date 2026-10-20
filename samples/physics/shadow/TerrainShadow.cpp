@@ -84,6 +84,9 @@ int TerrainShadow::UnknownVirtualSlot29()
 // orthographic scale by lensScale.  Returns 0 when the rectangle does not fit the texture.
 // Each branch owns its matrix: with one shared `m` VC6 cross-jumps the whole Multiply argument
 // copy, retail only merges from the final push.  The chained stores give retail's fst order.
+// Larger-extent dead end (about 18 forms): retail's else arm stores the extent back over
+// itself (`mov edx, [S]; fstp st0; mov [S], edx`) and reloads texture; if/else, ternary,
+// max-by-reference helpers and pointer-select forms all drop the self-copy.
 // Explicit-destination forms of 0x004a1410 / 0x004a1860 (cdecl, the destination is the first
 // argument and is returned), as Math3D.h's MatrixMultiply(Matrix4* out, a, b) declares them.
 ShadowMatrix* TerrainMatrixIdentityInto(ShadowMatrix* out);                       // 0x004a1410
