@@ -426,7 +426,10 @@ static inline int KbWithinWarpBandOf(float dist2, float limitSq, float frame, fl
 // before PlaceWheels, moving `movingForward = 1` or an int `settled` do not move it; a
 // probe third SetAxesPtr call removes the middle zero register and the tail then matches
 // (233). Also: the replay-branch entry registers (g/race in edx/ecx for retail's ecx/edx),
-// the Vec3 copy scheduling of the interpolated velocity and position, the velocity
+// the Vec3 copy registers from the interpolated velocity on (retail takes edx for the
+// destination before the expression, the candidate ecx after it, which rotates eax/ecx/edx
+// through the position block; KbCopy, a Vec3 reference, pointer or named temporary and
+// either operand order do not move it), the velocity
 // AllowWarping load (`cmp mem` for retail's `mov eax`; a local, `!= 0` and an inline test
 // do not change it), the velocity y/z `fld s; fmul` order, and retail recomputing `c - b`
 // for the pose lerps while the candidate reuses `d`. The 100.0f here is 0x5505ec;
