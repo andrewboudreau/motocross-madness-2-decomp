@@ -425,7 +425,11 @@ static inline int KbWithinWarpBandOf(float dist2, float limitSq, float frame, fl
 // Writing the rider placement in both orientation-save branches, extra `= 1` stores
 // before PlaceWheels, moving `movingForward = 1` or an int `settled` do not move it; a
 // probe third SetAxesPtr call removes the middle zero register and the tail then matches
-// (233). Also: the replay-branch entry registers (g/race in edx/ecx for retail's ecx/edx),
+// (233). Named locals for the 1 (SetAxesPtr arguments, movingForward, the latch stores),
+// for the 0 arguments or for g_kbAllowWarping read before the dist2 sum are propagated away
+// and change nothing. The choice is function wide: a diagnostic `return` before the closing
+// prevVelocity/position/lastStepTime stores moves even the entry zero register to ebx.
+// Also: the replay-branch entry registers (g/race in edx/ecx for retail's ecx/edx),
 // the Vec3 copy registers from the interpolated velocity on (retail takes edx for the
 // destination before the expression, the candidate ecx after it, which rotates eax/ecx/edx
 // through the position block; KbCopy, a Vec3 reference, pointer or named temporary and
