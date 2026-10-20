@@ -1,7 +1,7 @@
 // CubeDraw.cpp -- reconstruction of D:\aardvark\VC\krusty2\cubedraw.cpp.
 // See CubeDraw.h for the TU extent and the class. The geometry builder
-// 0x0043dc60, 0x0043e0b0, 0x0043e330 and slot 14 0x0043e4c0 (with its static
-// matrix and atexit thunk 0x0043e840) are near misses in
+// 0x0043dc60, 0x0043e0b0 and slot 14 0x0043e4c0 (with its static matrix and
+// atexit thunk 0x0043e840) are near misses in
 // samples/render/CubeDrawNearMisses.cpp.
 
 #include <string.h>
@@ -145,6 +145,40 @@ DrawableCube::~DrawableCube()
         loadPalette->Release();
     if (cubeObject)
         cubeObject->Release();
+}
+
+// 0x0043e330: flags the cells of each camera-facing face whose quads are on
+// screen. The camera is read through the cast each time (the Target()
+// accessor's expansion swaps eax/ecx), and the eye reference is bound before
+// the cube centre, which is the order retail loads them in.
+void DrawableCube::MarkVisibleCells()
+{
+    Vector3 forward;
+    forward.x = ((UnknownCubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix.m[0][2];
+    forward.y = ((UnknownCubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix.m[1][2];
+    forward.z = ((UnknownCubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix.m[2][2];
+    const Vector3& eye = ((UnknownCubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position;
+    const Vector3& center = cubeObject->center;
+    Vector3 offset(center.x - eye.x, center.y - eye.y, center.z - eye.z);
+    for (int face = 0; face < 6; face++) {
+        cubeObject->faces[face].visibleCells = 0;
+        if (!g_visibilityClipper->CanFaceCamera(((RenderTarget*)renderContext)->currentCamera, &forward,
+                                                                &s_faceNormals[face]))
+            continue;
+        for (int k = 0; k < 25; k++)
+        {
+            const Vector3& point = s_facePoints[face][k];
+            s_viewPoints[k] = Vector3(offset.x + point.x, offset.y + point.y, offset.z + point.z);
+        }
+        g_visibilityClipper->TransformPoints(
+            s_viewPoints, s_viewPoints, &((UnknownCubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix, 25);
+        for (int i = 0; i < 16; i++) {
+            int corner = i + i / 4;
+            if (g_visibilityClipper->IsQuadOnScreen(((RenderTarget*)renderContext)->currentCamera, s_viewPoints, corner,
+                                                                  corner + 1, corner + 6, corner + 5))
+                cubeObject->faces[face].visibleCells |= 1 << i;
+        }
+    }
 }
 
 // 0x0043e4c0: draws the cube around the camera (scaled by 2, centred on the

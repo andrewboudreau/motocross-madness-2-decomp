@@ -39,8 +39,11 @@ it first.
 
 --target is VA[:SIZE][=SYMBOL] (repeatable). Without a symbol the bindings
 entry for the VA is used; without a size the base variant's size is used.
-Variants are written to --out (default work/sweep/<template stem>), with the
-template's directory on the include path so its quoted includes resolve.
+Variants are written to --out (default work/sweep/<template stem>), each in
+its own directory under the template's file name (or --source-name, e.g. the
+real TU name when the template is a renamed copy) so __FILE__ literals keep
+their '__FILE__:<basename>' binding; the template's directory is on the
+include path so its quoted includes resolve.
 --dry-run lists the choice points and the variant count; --render N writes
 variant N without compiling. Results go to results.jsonl; the best variants
 are re-rendered as best_<rank>.cpp.
@@ -400,6 +403,9 @@ def main(argv=None):
     ap.add_argument('--limit', type=int, help='sample this many variants when the space is larger')
     ap.add_argument('--seed', type=int, default=1)
     ap.add_argument('--out', type=Path)
+    ap.add_argument('--source-name', metavar='NAME',
+                    help='file name each variant is compiled under (default: the template name); '
+                         'the __FILE__ binding key is this basename')
     ap.add_argument('--top', type=int, default=15)
     ap.add_argument('--stop-on-exact', action='store_true')
     ap.add_argument('--dry-run', action='store_true')
@@ -457,8 +463,12 @@ def main(argv=None):
         if stop[0] and not want_diff:
             row['skipped'] = True
             return row
-        src = out / f'v{index:06d}{template.suffix}'
-        obj = out / f'v{index:06d}.obj'
+        # Each variant keeps the source's basename (in its own directory) so
+        # __FILE__ literals still resolve through their '__FILE__:<basename>' binding.
+        vdir = out / f'v{index:06d}'
+        vdir.mkdir(exist_ok=True)
+        src = vdir / (a.source_name or template.name)
+        obj = vdir / 'variant.obj'
         src.write_text(text, encoding='latin-1')
         obj.unlink(missing_ok=True)
         cmd = vc6_command(Path(a.vc6_root), flags, includes, a.extra, src, obj)
@@ -481,6 +491,10 @@ def main(argv=None):
         finally:
             src.unlink(missing_ok=True)
             obj.unlink(missing_ok=True)
+            try:
+                vdir.rmdir()
+            except OSError:
+                pass
         return row
 
     t0 = time.time()

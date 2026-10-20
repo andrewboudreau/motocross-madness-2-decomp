@@ -6,7 +6,8 @@
 // component-wise d, other lenSq term orders, SquareMagnitude/DotProduct helpers and
 // separate dir stores, a scale helper (with or without component copies, products
 // first, 1 / len argument), copies of d or of d.x/d.z for the length or the scale
-// (all 145; component stores 109). The promoted file supplies the rest of the unit.
+// (all 145; component stores 109), and an explicit `float dx` held across the scale
+// (copied before or after the length, read in any operand order; all 145). The promoted file supplies the rest of the unit.
 #include "motion/SteeringControl.cpp"
 
 int SteeringControl::SetAxisFromPoints(SoultreeObject* from, SoultreeObject* to, SoultreeObject* frame)

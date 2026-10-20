@@ -676,9 +676,11 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     CollisionVec3 u = TireCrossGrouped(v, sideAxis);
     CollisionVec3 lateral2 = u;
     if (u.z * n2.z + (u.y * n2.y + u.x * n2.x) > 0.0f) {
+        // retail reads x from u and negates y and z in lateral2 (an in-place negate
+        // helper gives the same reads but computes the scaled x argument early)
         lateral2.x = u.x * -1.0f;
-        lateral2.y = u.y * -1.0f;
-        lateral2.z = u.z * -1.0f;
+        lateral2.y = lateral2.y * -1.0f;
+        lateral2.z = lateral2.z * -1.0f;
     }
 
     CollisionVec3 scaled = TireScaledCtorCopyYZ(lateral2, wheelRadius);

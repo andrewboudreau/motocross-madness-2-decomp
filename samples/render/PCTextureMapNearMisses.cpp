@@ -7,8 +7,12 @@
 // shared failure return line up; about half the instructions differ in the
 // loop nest. Retail keeps left in ebp (with a spilled copy), top in ebx,
 // bottom in edi and right on the stack, and the 8-bit source row in esi;
-// VC6 here swaps left/bottom and the row pointers. Declaration order of the
-// rect locals, row pointers, operand order and indexed loops do not help.
+// VC6 here swaps the row pointers. Reading the rect in retail's load order
+// (top, bottom, left, right; the best of all 24 orders) fixes the left and
+// bottom registers, and two separate Unlock tests give retail's tail (the
+// success path jumps back to the BltFast `return 1`): masked 247 -> 257,
+// differing instructions 152 -> 142. Declaration order of the rect locals,
+// row pointers, operand order and indexed loops do not help.
 //
 // PCTextureMap::Clone (0x004c71c0, 600 bytes): the copy.
 // Everything lines up except that VC6 here keeps the constant 1 in ebp and
@@ -22,6 +26,10 @@
 // first (its EH state is 0). `int cached = field_0x68 & 1` keeps the
 // store but not the constant register; `if (field_0x68 & 1)` keeps the
 // register but tests the byte in place.
+// A bool/char `cached` gets retail's ebx/ebp split (the byte `and al, bl`
+// needs a byte register) but takes its own byte slot and grows the frame;
+// unsigned/long/ternary/!! forms, separate copy locals, a single return,
+// 1..33 dead locals and moving Clone within the TU leave it unchanged.
 //
 // PCTextureMap::CreateSurface (0x004c69c0, 2031 bytes): the setup.
 // Everything but the non-mip format fallback chain lines up, including
@@ -65,10 +73,10 @@ int PCTextureMap::CopyRectTo(unsigned long x, unsigned long y, UnknownSurfaceInt
     target.size = sizeof(target);
     if (destination->Lock(0, &target, 0x811, 0))
         goto failed;
-    left = rect->left;
     top = rect->top;
-    right = rect->right;
     bottom = rect->bottom;
+    left = rect->left;
+    right = rect->right;
     if (x < target.width && y < target.height) {
         if (right - left + x + 1 >= target.width)
             right = target.width - x + left - 2;
@@ -96,7 +104,9 @@ int PCTextureMap::CopyRectTo(unsigned long x, unsigned long y, UnknownSurfaceInt
             }
         }
     }
-    if (destination->Unlock(0) || systemSurface->Unlock(0))
+    if (destination->Unlock(0))
+        goto failed;
+    if (systemSurface->Unlock(0))
         goto failed;
     return 1;
 failed:

@@ -1,14 +1,16 @@
 // Near-miss overlay.cpp candidate, kept out of src/reconstructed until it
 // matches (Overlay.cpp holds the rest of the file).
 //
-// Overlay::RestoreRect (0x004b6710, 361 bytes): the same
-// instructions in the same order, but VC6 here keeps `rect` in esi, `this`
-// in edi and the byte count in ebp, with the locked destination on the
-// stack; retail keeps `this` in esi (spilled), the byte count in edi, the
-// source and destination in ebx/ebp and reloads `rect` from the stack.
-// Pointer locals for the row loop, declaration order, inline width/height
-// expressions, a nested success block, char* pointers and a while loop do
-// not change the allocation.
+// Overlay::RestoreRect (0x004b6710, 361 bytes): `top` read once before
+// the copy branch (retail loads rect->top ahead of the `whole` test) frees
+// esi for `this` and reloads `rect` from the stack as retail does; height
+// before width gives retail's subtrahend-first loads (53 -> 63 of 361).
+// Left: retail keeps `whole` and the byte count on the stack (6 slots,
+// the else branch's offset sharing whole's slot), the destination in ebp
+// and the row count in eax; VC6 here keeps `whole` in edi and the byte
+// count in ebp, and the row count and destination on the stack. Count-down
+// for/while/do-while loops, `whole` set first, set from the comparison or
+// preset to 0, and a bytes-per-pixel local do not get that.
 #include <string.h>
 
 #include "../../src/reconstructed/Overlay.h"
@@ -16,8 +18,8 @@
 
 // 0x004b6710. A rectangle as wide as the texture is copied in one block.
 int Overlay::RestoreRect(const UnknownOverlayRect* rect) {
-    int width = rect->right - rect->left;
     int height = rect->bottom - rect->top;
+    int width = rect->right - rect->left;
     int whole;
     int bytes;
     if (width == overlayTexture->textureWidth) {
@@ -34,10 +36,11 @@ int Overlay::RestoreRect(const UnknownOverlayRect* rect) {
     if (!source || !bits)
         return 0;
 
+    int top = rect->top;
     if (whole) {
-        memcpy(bits + rect->top * pitch, source + rect->top * sourcePitch, bytes);
+        memcpy(bits + top * pitch, source + top * sourcePitch, bytes);
     } else {
-        int offset = rect->top * sourcePitch;
+        int offset = top * sourcePitch;
         offset += PixelFormatBytesPerPixel(overlayTexture->mapFormat) * rect->left;
         source += offset;
         bits += offset;
