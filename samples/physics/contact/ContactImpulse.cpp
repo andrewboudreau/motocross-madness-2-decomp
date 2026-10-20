@@ -26,10 +26,14 @@ inline ContactVec3 ContactSum(const Vec3& a, const Vec3& b) { return ContactVec3
 // Vec3::operator+= 0x428060 for angVelA and the whole B branch (J = *n * -j), so retail had
 // spent its inline budget by then.  ContactScaleCall models those 0x5015b0 sites (bound in
 // the bindings, docs/VC6_INLINE_BUDGET.md); this tail lines up call for call (0.94 ratio).
-// Remaining: frame 0x54 vs 0x60, and the torque cross products load r before n in three
-// products where retail loads n first.  The product order follows leaf age, so neither
-// operand order nor parentheses in the cross move it (all 2^6 forms measured), nor does
-// placing the closing dot before or after the first cross, or naming the tail temporaries.
+// The two torque blocks are written at function scope with distinct names; with
+// sibling { } scopes VC6 shares their slots and the frame shrinks to 0x54 (retail 0x60).
+// closingXY is written (y*y') + x*x' so the y product is loaded first, as retail does.
+// Remaining: the torque cross products load r before n where retail loads n first.
+// The product order follows leaf age, so neither operand order nor parentheses in the
+// cross move it (all 2^6 forms measured), nor do pointer/reference aliases of n, a Vec3
+// copy of n (worse), placing the closing dot after the first cross, or naming the tail
+// temporaries.  The tail also schedules `mov edi, [esp+0xb0]` before a push.
 void ContactSolveImpulse(float restitution, const Vec3* n, float invMassA, SoultreeObject* nodeA,
                          const Vec3* dispA, const Vec3* rA, const Vec3* invInertiaA,
                          Vec3* angVelA, Vec3* velA, float invMassB, SoultreeObject* nodeB,
@@ -38,29 +42,25 @@ void ContactSolveImpulse(float restitution, const Vec3* n, float invMassA, Soult
 {
     Vec3 rel = *dispA - *dispB;
     float closingZ = rel.z * n->z;
-    float closingXY = rel.y * n->y + rel.x * n->x;
+    float closingXY = (rel.y * n->y) + rel.x * n->x;
 
     ContactVec3 sum;
     Vec3 angA, angB, uA;
-    {
-        Vec3 torque = CrossProduct(*rA, *n);
-        Vec3 local = nodeA->WorldToLocalDirection(torque);
-        angA.x = local.x * invInertiaA->x;
-        angA.y = local.y * invInertiaA->y;
-        angA.z = local.z * invInertiaA->z;
-        Vec3 world = nodeA->LocalToWorldDirection(angA);
-        uA = CrossProduct(world, *rA);
-    }
-    {
-        Vec3 torque = CrossProduct(*rB, *n);
-        Vec3 local = nodeB->WorldToLocalDirection(torque);
-        angB.x = local.x * invInertiaB->x;
-        angB.y = local.y * invInertiaB->y;
-        angB.z = local.z * invInertiaB->z;
-        Vec3 world = nodeB->LocalToWorldDirection(angB);
-        Vec3 uB = CrossProduct(world, *rB);
-        sum = ContactSum(uA, uB);
-    }
+    Vec3 torqueA = CrossProduct(*rA, *n);
+    Vec3 localA = nodeA->WorldToLocalDirection(torqueA);
+    angA.x = localA.x * invInertiaA->x;
+    angA.y = localA.y * invInertiaA->y;
+    angA.z = localA.z * invInertiaA->z;
+    Vec3 worldA = nodeA->LocalToWorldDirection(angA);
+    uA = CrossProduct(worldA, *rA);
+    Vec3 torqueB = CrossProduct(*rB, *n);
+    Vec3 localB = nodeB->WorldToLocalDirection(torqueB);
+    angB.x = localB.x * invInertiaB->x;
+    angB.y = localB.y * invInertiaB->y;
+    angB.z = localB.z * invInertiaB->z;
+    Vec3 worldB = nodeB->LocalToWorldDirection(angB);
+    Vec3 uB = CrossProduct(worldB, *rB);
+    sum = ContactSum(uA, uB);
     float num = -((closingXY + closingZ) * (restitution + 1.0f));
     float j = num / (ContactDot(sum, *n) + invMassA + invMassB);
     *outJ = j;

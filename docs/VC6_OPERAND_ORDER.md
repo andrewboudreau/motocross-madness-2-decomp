@@ -863,3 +863,9 @@ try on similar code. None is a rule.
   `Vec3 sum = kVec3Zero; *out = kVec3Zero;`, `mixed` takes the `out` argument slot and
   `len2` a frame slot; initialising the counters first swaps the two homes and gives the
   prologue's esi copy temporary (24 of the 720 orders are exact, all counters first).
+- **Sibling `{ }` blocks share frame slots; function-scope names do not.**
+  ContactSolveImpulse (`0x005004a0`, 94 to 874 of 1062): the two torque
+  computations written as sibling blocks reuse `torque`/`local`/`world` slots
+  (frame 0x54); writing them at function scope as `torqueA`/`torqueB` etc. gives
+  retail's 0x60 frame. With that frame, `(rel.y * n->y) + rel.x * n->x` loads the
+  y product first as retail does and makes the size exact.
