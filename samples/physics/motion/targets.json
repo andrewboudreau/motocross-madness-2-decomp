@@ -76,7 +76,7 @@
     "target_va": "0x004a5e40",
     "target_size": 1090,
     "expect": "partial",
-    "notes": "text .VUE loader, lines 0x1c9/0x1ec/0x1f9/0x22a. 505/1090 strict: identical structure and calls, but register allocation is permuted (retail keeps the file in ebx and poses with the zero constant in ebp; the candidate swaps ebx/ebp and esi/edi), which shifts most ModRM bytes. Initialising poses first and storing the frame index before the count gave 498 -> 505; every declaration order (6), split declarations with every assignment order (36), initialising before the file allocation (moves the EH state, 77-88), a named node local, posesPerFrame before the frames allocation, `while (ReadLine && frame <= 1)` and a separate second-pass counter do not move the permutation.",
+    "notes": "text .VUE loader, lines 0x1c9/0x1ec/0x1f9/0x22a. 505/1090 strict: identical structure and calls, but register allocation is permuted (retail keeps the file in ebx and poses with the zero constant in ebp; the candidate swaps ebx/ebp and esi/edi), which shifts most ModRM bytes. Initialising poses first and storing the frame index before the count gave 498 -> 505; every declaration order (6), split declarations with every assignment order (36), initialising before the file allocation (moves the EH state, 77-88), a named node local, posesPerFrame before the frames allocation, `while (ReadLine && frame <= 1)` and a separate second-pass counter do not move the permutation. Session 14: poses declared before/after the new, assigned-not-initialised file, `Open(...) == 0`, transforms/frame order: 505 at best (no permutation change). Score variants in place: the sweep tool compiles a copy whose __FILE__ differs and reports 380.",
     "bindings": "Motnctrl.bindings.json"
   },
   {
@@ -86,7 +86,7 @@
     "target_va": "0x004a7dc0",
     "target_size": 523,
     "expect": "partial",
-    "notes": "cdecl; slot 7 helper. 90.66%: the two Vec3Normalize result temporaries sit at a different stack slot (retail esp+0x70/0x7c, ours reuses the axisX/position slot) and one fld is scheduled earlier",
+    "notes": "cdecl; slot 7 helper. 90.66%: the two Vec3Normalize result temporaries sit at a different stack slot (retail esp+0x70/0x7c, ours reuses the axisX/position slot) and one fld is scheduled earlier pose/rotation declared in a block opened after the normalisations (or only pose there) leaves 476: the temporaries stay in the low slots.",
     "bindings": "Motnctrl.bindings.json"
   },
   {
