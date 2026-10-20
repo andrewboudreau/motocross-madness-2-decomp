@@ -39,8 +39,8 @@
 // function-local statics, as are the three vectors 0x0057eef8,
 // 0x0057ef38 and 0x0057eee8 (guard 0x0057ef24 bits 1, 2, 4) whose type has
 // an empty destructor: their atexit entries are the `ret` stubs
-// 0x00442f60, 0x00442f50 and 0x00442f40. Same structure (1891 of 1893
-// instructions, 495 differing, 7812 bytes): the three mode 8 and mode 2
+// 0x00442f60, 0x00442f50 and 0x00442f40. Same structure (1895 of 1893
+// instructions, 484 differing, 7832 bytes): the three mode 8 and mode 2
 // normalisations return through the out-of-line Vector3 constructor
 // 0x00404e60 as retail does (Vector3Call; the inline budget, with the
 // constructor expanded in the mode 5 and 6 normalisations). Mode 5's
@@ -49,7 +49,10 @@
 // sit 0x40 below their retail slots (tools/frame_layout.py). Sweeping 13
 // choice points (8192 forms; insn diffs 507 to 495, aligned 1386 to 1398)
 // kept identity(r, c) stores, a reference to the light position and a
-// separate normalisation in mode 3. Left: retail's frame is 0x9e8 (ours
+// separate normalisation in mode 3. Accumulating the squared lengths and
+// the mode 5 and 6 dot products one term per statement (512 forms; the
+// MPBikeRiderDlg lever in docs/VC6_OPERAND_ORDER.md) gives 484 differing
+// and 1409 aligned; Length adds y first, the normalisations x first. Left: retail's frame is 0x9e8 (ours
 // 0x9a8) with temporaries the source does not have yet (mode 2 reads the
 // vertex's y and z through a stack copy, x straight from the vertex; a
 // named copy, a copy constructor, a by-value difference and three-float
@@ -105,7 +108,9 @@ float FastInvSqrt(float x);                         // 0x00460c00
 // |v| through the table-driven reciprocal square root, exact for 0 and 1.
 static inline float Length(const Vector3& v)
 {
-    float squared = v.x * v.x + v.y * v.y + v.z * v.z;
+    float squared = v.y * v.y;
+    squared += v.x * v.x;
+    squared += v.z * v.z;
     if (squared == 0.0f)
         return 0.0f;
     if (squared == 1.0f)
@@ -221,7 +226,9 @@ struct Vector3Call : Vector3 {
 
 static inline Vector3 NormalizedCallingConstructor(const Vector3& v)
 {
-    float squared = v.x * v.x + v.y * v.y + v.z * v.z;
+    float squared = v.x * v.x;
+    squared += v.y * v.y;
+    squared += v.z * v.z;
     if (squared == 1.0f)
         return v;
     float scale = FastInvSqrt(squared);
@@ -230,7 +237,9 @@ static inline Vector3 NormalizedCallingConstructor(const Vector3& v)
 
 static inline Vector3 Normalized(const Vector3& v)
 {
-    float squared = v.x * v.x + v.y * v.y + v.z * v.z;
+    float squared = v.x * v.x;
+    squared += v.y * v.y;
+    squared += v.z * v.z;
     if (squared == 1.0f)
         return v;
     float scale = FastInvSqrt(squared);
@@ -510,7 +519,9 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         Vector3 n(normal.x * world->m[0][0] + normal.z * world->m[2][0] + normal.y * world->m[1][0],
                                   normal.x * world->m[0][1] + normal.y * world->m[1][1] + normal.z * world->m[2][1],
                                   normal.x * world->m[0][2] + normal.y * world->m[1][2] + normal.z * world->m[2][2]);
-                        float facing = direction.x * n.x + direction.y * n.y + direction.z * n.z;
+                        float facing = direction.x * n.x;
+                        facing += direction.y * n.y;
+                        facing += direction.z * n.z;
                         Vector3 offset = n * facing;
                         Vector3 reflected = direction - (offset + offset);
                         Vector3 target = position + reflected;
@@ -581,7 +592,9 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         Vector3& normal = group->normals[v];
                         float d = (toLight.x * normal.x + toLight.y * normal.y + toLight.z * normal.z) * 2.0f;
                         Vector3 reflected = toLight - normal * d;
-                        float specular = toEye.x * reflected.x + toEye.y * reflected.y + toEye.z * reflected.z;
+                        float specular = toEye.x * reflected.x;
+                        specular += toEye.y * reflected.y;
+                        specular += toEye.z * reflected.z;
                         if (specular < 0.0f)
                             specular = 0.0f;
                         group->sourceVertices[v].diffuse = ((long)(pow(specular, exponent) * 255.0) << 24) | 0xffffff;
