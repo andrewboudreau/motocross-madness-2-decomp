@@ -48,7 +48,7 @@ filter). Its stack dump reads the stack top with inline assembly
 
 FastMath's `InitFastMath` (`0x00460ad0`, 15 bytes) and its square root table
 builder (`0x00460ae0`, 97 bytes) close the same gap. They match in
-`samples/physics/helpers/FastMath.cpp`.
+`src/reconstructed/FastMath.cpp`.
 
 ## Reproduce
 

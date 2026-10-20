@@ -1,6 +1,6 @@
 // FileStream.cpp -- the buffered file stream (UnknownTextureStream, declared in
 // TextureMap.h), 0x00460d10..0x00461d57, after the FastMath helpers
-// (samples/physics/helpers/FastMath.cpp) and before the shadow fill code 0x00461d60.
+// (src/reconstructed/FastMath.cpp) and before the shadow fill code 0x00461d60.
 // No __FILE__ literal or RTTI: the file name is ours (tier 3), as are the names.
 //
 // A stream reads a file directly or a slice (+0x130, +0x04) of an inner stream (+0x1c);

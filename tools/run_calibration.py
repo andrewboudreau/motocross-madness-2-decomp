@@ -4135,6 +4135,15 @@ CASES = [
         'reason': 'negated float difference; descending address tie-break',
     },
     {
+        'name': 'ManagedTextureGroup debug selection display',
+        'bindings': 'src/reconstructed/ManagedTextureGroup.bindings.json',
+        'source': 'src/reconstructed/ManagedTextureGroup.cpp',
+        'symbol': '?DrawSelection@ManagedTextureGroup@@QAEHPAVPCRenderTarget@@@Z',
+        'target_va': '0x0050ef70',
+        'target_size': 1834,
+        'reason': 'block-scoped page tail, single exit, fresh outline locals as newer x87 leaves',
+    },
+    {
         'name': 'ManagedTextureGroup fit list 0x50d800',
         'bindings': 'src/reconstructed/ManagedTextureGroup.bindings.json',
         'source': 'src/reconstructed/ManagedTextureGroup.cpp',
@@ -5861,6 +5870,15 @@ CASES = [
         'target_va': '0x00482b40',
         'target_size': 327,
         'reason': 'row offset loaded before x through a row pointer and a copy of x as the inner loop variable',
+    },
+    {
+        'name': 'Griddraw border vertex walk',
+        'bindings': 'src/reconstructed/Griddraw.bindings.json',
+        'source': 'src/reconstructed/Griddraw.cpp',
+        'symbol': '?WalkBorderVertex@DrawableGridNode@@QAEXHHHHPAUGridBaseCell@@H@Z',
+        'target_va': '0x00483200',
+        'target_size': 956,
+        'reason': 'one child pointer declared per lookup block; final child call becomes a loop',
     },
     {
         'name': 'Griddraw edge table build',
@@ -18218,6 +18236,15 @@ CASES = [
         'target_va': '0x004440a0',
         'target_size': 146,
         'reason': 'primary slot 4; new 0x2d8 line 0x7d5',
+    },
+    {
+        'name': 'D3DIMSoulTree.CPP D3DIMSoulTree slot 5 local bounds',
+        'bindings': 'src/reconstructed/D3DIMSoulTree.bindings.json',
+        'source': 'src/reconstructed/D3DIMSoulTree.cpp',
+        'symbol': '?SoultreeVirtualSlot5@D3DIMSoultreeObject@@UAEXXZ',
+        'target_va': '0x00444140',
+        'target_size': 763,
+        'reason': 'primary slot 5; per-component centre sum, valid flag stored last',
     },
     {
         'name': 'D3DIMSoulTree.CPP D3DIMSoulTree subtree 0x444440',

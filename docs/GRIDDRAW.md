@@ -157,7 +157,6 @@ See the notes at the top of `samples/render/GriddrawNearMisses.cpp`:
 | `0x00480ad0` (block draw) | 395/438 | the zero offset kept in eax for compares; esi/edi swapped |
 | `0x00481300` (block walk) | 114/216 | child index term order |
 | `0x0047f210` (per-block rebuild) | 426/1586 | x/count-copy registers, frame slots, minY/maxY load order |
-| `0x00483200` (border walk) | 84/956 | x/z in ebp/ebx (retail ebx/ebp), `level` reload |
 | `0x004815e0` (detail update) | 64/1083 | the two axis deltas stay on the x87 stack across the branch in retail; VC6 stores them, which shifts the frame and keeps `push edi` in the prologue |
 | `0x00481de0` (visibility walk) | 143/1712 | `extent`/`a1` in ebp/ebx where retail keeps `size`, `a9` and `a1`; the subdivision block's placement |
 
@@ -290,5 +289,4 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x0047d780` `DrawableGridNodeSharedTextures::BuildBlockTexture` (Grid1.h)
 - `0x00484d70` `GridNode::FindLeaf` (GridNode near-miss sample)
 - `0x0047e600` `ReadNode`, `0x0047ef80` `WalkVisibleQuadrants`, `0x00480940`
-  `DrawVisibleQuadrants`, `0x004826d0` `PropagateFullMask` and `0x00483200`
-  `WalkBorderVertex` (near-miss sample)
+  `DrawVisibleQuadrants` and `0x004826d0` `PropagateFullMask` (near-miss sample)

@@ -100,6 +100,10 @@ of a call (in `st(0)`):
   (`0x005135f0`) scales its slip vector through a helper that copies `v.x`
   and `v.y` into locals (`fld mem; fmul st(1)` for both, `fmul v.z` last);
   copying all three components or none gives the scalar-first form.
+  ManagedTextureGroup `0x0050ef70` needs a local for each member that must
+  load first: `u` for `width * u` and a per-axis `uScale` copy for
+  `(uScale + pageOffsetU) * width` (one shared `scale` local is CSEd and
+  breaks the frame).
   A freshly computed scalar is the newest leaf and is duplicated for the first
   product (`fld st(0); fmul v.x`): Tire's ApplyDrive (`0x00514170`, 560 to
   565) writes `r.x = a / b * v.x;` and then multiplies copies of `v.y` and
@@ -335,8 +339,9 @@ where the product of the choices is large).
 - No change: Camera slot 29 `0x0042eb10`, MatrixUtil `0x004a1a50` (6208
   forms), Wrecker `0x00531da0`, `0x00532580` and slot 10 `0x005306e0`,
   FollowCamera `0x00465720` and `0x004650e0`, Griddraw `0x0047e600`,
-  EventManager `0x0045d480`, MorphBastardModifier `0x004a33b0` and
-  D3DIMSoulTree `0x00444140`. D3DIMSoulTree slot 12 `0x00443aa0` reaches
+  EventManager `0x0045d480` and MorphBastardModifier `0x004a33b0`
+  (D3DIMSoulTree `0x00444140`, also unmoved by them, is exact with the
+  centre sum written per component). D3DIMSoulTree slot 12 `0x00443aa0` reaches
   826/832 only with a different bracketing per matrix element.
 - Integer and address arithmetic never changed: Griddraw `0x00481300` and
   `0x0047e430` (`a + (b + c)`, `(a + b) + c`, parenthesised terms),

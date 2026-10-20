@@ -1,0 +1,12 @@
+{
+  "profile": "vc6_o2_mt",
+  "source_roots": ["src"],
+  "includes": ["src/krusty2", "src/reconstructed"],
+  "import_definitions": ["config/game-imports/blade.def", "config/game-imports/dinput.def"],
+  "libraries": [
+    "kernel32.lib", "user32.lib", "gdi32.lib", "advapi32.lib",
+    "shell32.lib", "ole32.lib", "d3drm.lib", "winmm.lib", "vfw32.lib",
+    "imm32.lib", "dsound.lib", "wsock32.lib", "dinput.lib", "dplayx.lib",
+    "dxguid.lib", "strmiids.lib", "amstrmid.lib"
+  ]
+}

@@ -41,7 +41,24 @@ Start with [BaseObject.cpp](src/reconstructed/BaseObject.cpp). All six emitted
 bodies match VC6 SP3 `/O2` without `/G6`, with relocations resolved. Unproven
 semantic names and original source ownership remain explicit.
 
-## Run
+## Build the reconstructed C++
+
+```powershell
+python tools/build_game.py --vc6-root work/vc6sp3-disc
+```
+
+This compiles every `src/**/*.cpp` with authentic VC6 SP3 and attempts a
+Windows executable link. It currently fails on missing source providers;
+it does not produce a playable game yet. `--compile-only` checks compilation
+separately. GNU Make users can run `make game` or `make game-compile`.
+
+Each run keeps its objects, compiler logs, import libraries and linker log in
+a fresh `work/game-build/build-*` directory. `work/game-build/latest.json`
+records the last result. The build uses no retail code or address bindings to
+resolve missing symbols. See [source build](docs/GAME_BUILD.md) for the current
+gaps and the distinction between compilation, linking and gameplay.
+
+## Run matching checks
 
 Install private inputs using [TOOLCHAIN.md](docs/TOOLCHAIN.md), then:
 

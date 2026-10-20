@@ -111,7 +111,15 @@ the planned levels in one size list until its texels fit a budget, keeping
 the list sorted (ContainerList's inline ordered remove and insert). Its
 position search is an inline helper: with it VC6 runs out of inline budget
 and calls `ContainerList::Reserve` (`0x005109e0`, also exact) out of line,
-as retail does.
+as retail does. The debug display for manager slot 15, `0x0050ef70`
+(`DrawSelection`, 1834 bytes), copies the selected texture into the top
+right of the render target with its use and Un/Hi/Lo state, or shows the
+selected page with its textures and an outline (GDI pen, MoveToEx/LineTo,
+TextOutA on the surface's DC). Its page-drawing tail is a block of its own
+(block-scoped locals reuse dead slots; function-scope ones never do), a
+single `return 1` keeps the late ebx/esi pushes, and the outline reads
+its offsets and scales through fresh locals, which VC6 loads as the newer
+x87 leaf (`fld [field]; fmul st(1)`).
 
 Near misses (`samples/render/ManagedTextureGroupNearMisses.cpp`):
 - `0x0050c960` (3742 bytes), the repack: plans each used texture's level from
@@ -142,16 +150,7 @@ Near misses (`samples/render/ManagedTextureGroupNearMisses.cpp`):
   blit passes); two of the five 9-entry arrays (0x8c/0xb0) are swapped
   (declaration order, block scopes and memset order do not move them),
   `dropped = 0` is stored after the empty-list return, and the overlay rows
-  rotate eax/ecx/edx, about 216 of 1600 instructions;
-- `0x0050ef70` (1834 bytes, `DrawSelection`), the debug display for manager slot 15: the
-  selected texture copied into the top right of the render target with
-  its use and Un/Hi/Lo state, or the selected page with its textures and an
-  outline (GDI pen, MoveToEx/LineTo, TextOutA on the surface's DC). Every
-  stack slot matches once the page-drawing tail is a block of its own
-  (block-scoped locals reuse dead slots; function-scope ones never do).
-  Left: retail saves ebx/esi only after the first early return, reloads
-  the page at the bottom of the texture loop and multiplies the outline's
-  `left`/`top` as `fld [field]; fmul st(1)`; about 31 of 575 instructions.
+  rotate eax/ecx/edx, about 216 of 1600 instructions.
 
 Provisional names from the behaviour their comments record: `SetPageCount`
 `0x0050c4a0`, `RepackPages` `0x0050c8c0` and the free function
