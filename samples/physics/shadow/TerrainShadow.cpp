@@ -87,6 +87,11 @@ int TerrainShadow::UnknownVirtualSlot29()
 // Larger-extent dead end (about 18 forms): retail's else arm stores the extent back over
 // itself (`mov edx, [S]; fstp st0; mov [S], edx`) and reloads texture; if/else, ternary,
 // max-by-reference helpers and pointer-select forms all drop the self-copy.
+// The orthographic arm reads `fov` unset, in retail too (provisional reading: a source bug):
+// retail's `fmul [esp+0x4c]` there addresses fov's home [esp+0x10] (the slot SetLookAt gets
+// as &fov on the mode-1 path), and nothing on the orthographic path stores to it first.
+// Slot homes (work/s14/symmap.py on /FAs): ours packs fov with extent at [esp+0xc]; retail
+// keeps extent alone at 0xc and puts fov at 0x10 with the size*size temporary.
 // Explicit-destination forms of 0x004a1410 / 0x004a1860 (cdecl, the destination is the first
 // argument and is returned), as Math3D.h's MatrixMultiply(Matrix4* out, a, b) declares them.
 ShadowMatrix* TerrainMatrixIdentityInto(ShadowMatrix* out);                       // 0x004a1410
