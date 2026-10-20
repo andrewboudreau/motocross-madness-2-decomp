@@ -6,7 +6,7 @@
     "target_va": "0x0052d610",
     "target_size": 3027,
     "expect": "partial",
-    "notes": "72.7%, 3026 vs 3027 bytes: call-site argument-load scheduling in recursive/slot-2 call blocks",
+    "notes": "23 differing instructions (2265/3027 strict, 3022 B for 3027 B). Loading the child into a local before the recursive Traverse call puts the object load ahead of the argument loads as retail (358 to 23). Remaining: VC6 cross-jumps the VisitChild(1) and VisitChild(0) recursive-call tails (retail keeps them apart and instead merges two slot-2 call tails), and loads childX after push half in that block. Worse: the != 8 arm first (271), child local shared by both calls (616), tail assigned in both arms (215), inline childX/childZ ternaries (no change).",
     "bindings": "VisibilityQuadTreeTraversal.bindings.json"
   }
 ]
