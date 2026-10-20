@@ -2333,7 +2333,9 @@ void CollisionRelativeTransform(Matrix4* out, const Matrix4* from, const Matrix4
 // Near miss (441/458): one store (mov [esp+0x30], eax) of the second inverse copy is
 // scheduled later.  No gain from an inline CollisionRelativeTransform (inlines all three),
 // three calls, swapped inverse variants, two inverse locals, block scopes, declaration
-// orders, t2 first or reordered rows in the second copy.
+// orders, t2 first or reordered rows in the second copy.  Also no gain (18 forms) from a
+// separate helper for the second copy with reversed or reordered swaps, split swap temps,
+// a Matrix4& alias, scalar or direct translation stores, or a by-value return.
 void CollisionRelativeFrame(Matrix4* out, const Matrix4* m1, const Matrix4* m2, const Matrix4* m3)
 {
     Matrix4 inv;
