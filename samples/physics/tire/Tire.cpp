@@ -87,13 +87,13 @@ void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const Colli
         CollisionVec3 r;
         if (keepZ) {
             r.x = c.z * z.y - c.y * z.z;
-            r.y = c.x * z.z - c.z * z.x;
+            r.y = (c.x * z.z) - c.z * z.x;
             r.z = c.y * z.x - c.x * z.y;
             y = r;
         } else {
             r.x = c.y * y.z - c.z * y.y;
             r.y = c.z * y.x - c.x * y.z;
-            r.z = c.x * y.y - c.y * y.x;
+            r.z = (c.x * y.y) - c.y * y.x;
             z = r;
         }
     }
@@ -104,8 +104,8 @@ void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const Colli
 
     CollisionVec3 t;
     t.x = y.y * n.z - y.z * n.y;
-    t.y = n.x * y.z - y.x * n.z;
-    t.z = y.x * n.y - n.x * y.y;
+    t.y = (n.x * y.z) - y.x * n.z;
+    t.z = (y.x * n.y) - n.x * y.y;
     out->m[0] = t.x;
     out->m[1] = t.y;
     out->m[2] = t.z;
