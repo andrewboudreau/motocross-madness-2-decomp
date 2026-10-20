@@ -12,25 +12,28 @@
 // ShowDialog or the `new` assigned inside the ShowDialog call.
 //
 // EventManager::CreatePodiumScene (0x0045d480, 4247 bytes): the podium
-// scene; 2064 of 4246 bytes (bindings: EventManagerNearMisses.bindings.json).
-// Control flow, calls, strings, `new` lines, EH states and the frame size
-// (0x460) follow retail. Shapes found: the last-race test assigned to `ok`
-// (retail materialises the sete), separate `column`/`row` products, the zero
-// direction test through an inline helper (it places the copy branch first),
-// PodiumLength over a reference (no by-value copy), the nested
-// InProCircuitCareer test (three Winner sprintf copies), and the buffers
-// name[0x80], path[0x104], message[0x184] plus the crowd message's own
-// [0x80] buffer at +0x168. Left: the squared lengths (retail squares each
-// component as it loads it, `fld; fld st(0); fmulp`, and spills z*z with
-// `fstp [t]; fstp st(0); faddp; fadd [t]`, as BikeRace 0x00417ed0 does; plain,
-// local-copy, Square-helper, dot-product and accumulated forms all load the
-// three components first; so do (2026-10-12) the canonical
-// `v.z * v.z + (v.x * v.x + v.y * v.y)` by reference or by value, helpers
-// taking three floats, and square or component locals, a `zz` local
-// being 6 bytes longer), the scalar spill homes below +0x68, the register
-// rotation of the Winner branch (one step behind retail), the place counter
-// store (retail stores 1 after the count test) and the z component order of
-// `podiumPosition + offsets[place - 1]`.
+// scene; 4139 of 4247 bytes (bindings: EventManagerNearMisses.bindings.json,
+// with the EH handler 0x0054ab22 the prologue pushes). Control flow, calls,
+// strings, `new` lines, EH states and the frame size (0x460) follow retail.
+// Shapes found: the last-race test assigned to `ok` (retail materialises the
+// sete), separate `column`/`row` products, the zero direction test through
+// an inline helper (it places the copy branch first), PodiumLength over a
+// reference (no by-value copy) with `xx` and `yy` locals and `v.z * v.z`
+// left in the sum (retail's `fld; fld st(0); fmulp` per component in the
+// offsets/facings loop and the plain camera sites; plain, all-local,
+// component-local, Square-helper, dot-product and three-float-helper forms
+// load all three components first, and a lone `zz` local is 6 bytes longer),
+// the nested InProCircuitCareer test (three Winner sprintf copies), and the
+// buffers name[0x80], path[0x104], message[0x184] plus the crowd message's
+// own [0x80] buffer at +0x168. Left: retail spills the z square to the
+// temporary [esp+0x1c] (`fstp [t]; fstp st(0); faddp; fadd [t]`, as BikeRace
+// 0x00417ed0 does) where VC6 here keeps it on the stack (`faddp st(3); fxch;
+// fadd st(1); fxch` and two pops; the 11 sum, bracket, order and
+// declaration forms of 2026-10-19 do not spill), so the scalar homes at
+// +0x1c/+0x20 swap; the register rotation of the Winner branch (one step
+// behind retail), the place counter store (retail stores 1 after the count
+// test), the z component order of `podiumPosition + offsets[place - 1]` and
+// the loop's two increments.
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -173,7 +176,9 @@ extern "C" Vector3* __stdcall D3DRMVectorRotate(Vector3* result, Vector3* vector
 
 // |v|, exact for unit vectors.
 static inline float PodiumLength(const Vector3& v) {
-    float squared = v.x * v.x + v.y * v.y + v.z * v.z;
+    float xx = v.x * v.x;
+    float yy = v.y * v.y;
+    float squared = xx + yy + v.z * v.z;
     if (squared == 1.0f)
         return 1.0f;
     return (float)sqrt(squared);

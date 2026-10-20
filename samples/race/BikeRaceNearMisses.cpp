@@ -58,7 +58,10 @@
 // 0x00417ed0 (6745 bytes with its jump table at 0x0041992c; the setup,
 // ret 0x24): every branch, all 166 calls in retail order, EH states 0..0x10
 // and the 0x4e8-byte frame with its buffers at retail's offsets
-// (0x0a8/0x1ac/0x2b0/0x3b4). 2804 of 6756 positions match; aligned
+// (0x0a8/0x1ac/0x2b0/0x3b4). 2828 of 6768 positions match with the
+// length helper's `xx` and `yy` locals and the z square left in the sum
+// (the shape that squares each component as retail does in EventManager
+// 0x0045d480's PodiumLength; `(x*x) + y*y + z*z` gives 2804); aligned
 // instruction ratio 0.990. What differs: retail spills z*z of each vector
 // length to a stack temporary (`fstp [t]; faddp; fadd [t]`; the only other
 // copies in the binary are EventManager 0x0045d480's squared lengths at
@@ -85,6 +88,18 @@
 // because its longer x87 code (fld st(n) squares, `fcom qword`) restores
 // the 12 bytes the two missing spills cost, so the code after the length
 // sites realigns; it is not retail's float code and is not used.
+// Session 14 probe: `float xx = x*x, yy = y*y; volatile float zz = z*z;
+// l = xx + yy + zz` gives 6768 bytes and 5578 of 5596 masked: zz then takes
+// retail's shared slot (+0x34, +0x30) and every later frame offset lines up,
+// so retail's z*z is a frame local while x*x and y*y stay on the x87 stack.
+// Only the two length sites (`fst [zz]; fadd st(1); faddp st(2); fstp
+// st(0)` against retail's `fstp [zz]; faddp; fadd [zz]`) and the girl-copy
+// store order remain; volatile is not retail's code and is not used. Plain
+// named squares (any subset, any sum bracketing, `+=` forms, float[3], a
+// struct or constructor of squares, a by-value vector, `const float&`
+// squares or a `float&` out helper) stay on the x87 stack. In probes VC6
+// only stops substituting such locals into the sum inside a function with an
+// EH object (as here), and no /G3-/G6 setting moves a product.
 //
 // 0x00419970 (13428 bytes; the loader, ret 0x14): decoded completely (the
 // pro circuit branch, the network player and AI racers, the offline player,
@@ -501,7 +516,9 @@ public:
 // The length of `v` (1 without a square root for unit vectors); the setup
 // restores the lengths D3DRMVectorRotate's unit results lose.
 static inline float UnknownVectorLength(const Vector3& v) {
-    float lengthSquared = (v.x * v.x) + v.y * v.y + v.z * v.z;
+    float xx = v.x * v.x;
+    float yy = v.y * v.y;
+    float lengthSquared = xx + yy + v.z * v.z;
     if (lengthSquared == 1.0f)
         return 1.0f;
     return (float)sqrt(lengthSquared);

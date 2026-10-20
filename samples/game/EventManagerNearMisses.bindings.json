@@ -23,6 +23,7 @@
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?CreateBackground@UnknownKrustyUIGui@@QAEXXZ": "0x00485ef0",
   "?CreatePodiumScene@EventManager@@QAEHXZ": "0x0045d480",
+  "?CreatePodiumScene@EventManager@@QAEHXZ$ehhandler": "0x0054ab22",
   "?EnableWindowClipper@UnknownKrustyUIGui@@QAEXH@Z": "0x004868b0",
   "?FindDisplayMode@VideoCard@@QAEHHHHHH@Z": "0x0052d250",
   "?FindInputDialog@UnknownKrustyUIGui@@QAEPAVUnknownTrackGameObject56cItem@@XZ": "0x00485df0",
