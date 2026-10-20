@@ -272,7 +272,8 @@ void Vehicle::UnknownVirtualSlot43()
 // blending as for contacts using the wheels' contact points, or a single lead wheel.
 // Retail leaves `last` uninitialised (its slot is the squared-distance temporary), declares
 // the running total before the share temporary, and the single-wheel branch zeroes the share
-// temporary in the loop (z, y, x) instead of copying kVec3Zero like the no-contact branch.
+// temporary in the loop with the single-value constructor `Vec3(0.0f)` (dead stores z, y, x)
+// instead of copying kVec3Zero like the no-contact branch.
 static inline Vec3 VehScale(const Vec3& v, float k)
 {
     Vec3 r;
@@ -364,7 +365,7 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
     } else if (wheelsInContact == 1) {
         for (i = 0; i < wheelCount; i++) {
             wheelList[i]->loadWeight = 0.0f;
-            wheelList[i]->appliedShare = Vec3(0.0f, 0.0f, 0.0f);
+            wheelList[i]->appliedShare = Vec3(0.0f);
         }
         primaryWheel->loadWeight = 1.0f;
         primaryWheel->appliedShare = *arg;
@@ -403,6 +404,19 @@ static inline Vec3 VehNormalizedD(const Vec3& v)
     r.z = inv * v.z;
     return r;
 }
+static inline float VehMinF56(float a, float b) { return (a < b) ? a : b; }
+static inline float VehDotG(const Vec3& a, const Vec3& b)
+{
+    return (a.x * b.x + a.y * b.y) + a.z * b.z;
+}
+static inline Vec3 VehCross56(const Vec3& u, const Vec3& v)
+{
+    Vec3 r;
+    r.x = v.z * u.y - v.y * u.z;
+    r.y = v.x * u.z - v.z * u.x;
+    r.z = v.y * u.x - v.x * u.y;
+    return r;
+}
 void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
 {
     if (wheelCount == 0) {
@@ -423,19 +437,18 @@ void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
     *perp = *Vec3SubtractCall(&d, &n, &proj);
     if (!(perp->x == 0.0f && perp->y == 0.0f && perp->z == 0.0f) && perp) {
         *perp = Vec3Normalize(*perp);
-        scratchVector = ((VehV3&)sideAxis).Cross(*a);
+        scratchVector = VehCross56(sideAxis, *a);
         Vec3 side = VehNormalizedD(scratchVector);
         scratchVector = ((VehV3&)scratchVector2).Cross(side);
         float sign = -1.0f;
-        if (VehDotI(&scratchVector, a) < 0.0f)
+        if (VehDotG(*a, scratchVector) < 0.0f)
             sign = 1.0f;
-        float len2 = VehDotI(&scratchVector, &scratchVector);
-        float len = 1.0f;
+        float len2 = VehLen2(scratchVector);
+        float len;
         if (len2 != 1.0f) {
-            len = (float)sqrt(len2);
-            if (!(len < 1.0f))
-                len = 1.0f;
-        }
+            len = VehMinF56((float)sqrt(len2), 1.0f);
+        } else
+            len = 1.0f;
         double angle = asin(len * sign);
         leanAngle = (float)angle;
         if (b)
@@ -536,10 +549,6 @@ static inline Vec3 VehNormalized(const Vec3& v)
 }
 
 // (x*x + y*y) + z*z grouping: VC6 then loads the y, x, z products in retail's order.
-static inline float VehDotG(const Vec3& a, const Vec3& b)
-{
-    return (a.x * b.x + a.y * b.y) + a.z * b.z;
-}
 
 static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
 {
@@ -557,7 +566,9 @@ static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
 // Deflects the velocity (field_0x64) by an impulse applied at `point` along `dir` (tier 3).
 // k = slot73(effective mass/stiffness) * d; the change is dir * (-(m*m)/k * dt) scaled by
 // min(1.5*c, 1); the new velocity is renormalised to the old speed (field_0xbc) and the signed
-// deflection angle is returned (0 when the change is negligible or not finite).
+// deflection angle is returned (0 when the change is negligible or not finite).  The angle is
+// its own local: written back into `sign`, its home moved to the d argument slot and len/sign
+// traded the point/dir slots (retail: sign, len, angle in point, dir, c).
 float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
 {
     float k = UnknownVirtualSlot73(point, dir) * d;
@@ -587,13 +598,13 @@ float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
             if (!(k < 0.0f))
                 sign = 1.0f;
             float dot = VehDotG(scratchVector, velocity);
-            sign = VehAbs((float)acos(dot / (len * linearSpeed))) * sign;
-            if (_finite(sign)) {
+            float angle = VehAbs((float)acos(dot / (len * linearSpeed))) * sign;
+            if (_finite(angle)) {
                 velocity = VehScale(*nv, linearSpeed / len);
                 if (movingForward)
-                    return sign;
-                sign = -sign;
-                return sign;
+                    return angle;
+                angle = -angle;
+                return angle;
             }
         }
     }
@@ -615,18 +626,19 @@ static inline float VehMinF(float a, float b) { return (a < b) ? a : b; }
 // Retail keeps the argument wheel (tested from its stack slot, also in the reset test) apart
 // from the last flagged wheel (edi, initialised from the argument): flagged wheels are read
 // through that pointer, plain wheels through the loop's element, so the two branches do not
-// share a tail.  Load is declared first (frame slot 0) and the average divides by a float
-// count (fild/fdivp, not fidiv).
+// share a tail.  Load is declared first (frame slot 0), then the three counters ahead of the
+// two zero copies (retail's esi copy temp, the dead `out` slot reused for len2), and the
+// average divides by a float count (fild/fdivp, not fidiv).
 void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
 {
     if (crashState != 0)
         return;
     float load = 0.0f;
-    Vec3 sum = kVec3Zero;
-    *out = kVec3Zero;
     int mixed = 0;
     int flagged = 0;
     int plain = 0;
+    Vec3 sum = kVec3Zero;
+    *out = kVec3Zero;
     VehicleWheel* last = wheel;
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* w = wheelList[i];
@@ -2227,12 +2239,15 @@ void Vehicle::PlaceWheels()
         wheelList[0]->reportContactOutputs = 1;
 }
 
-// 0x00527a20 (PARTIAL, 349/866 bytes aligned): the first 0x120 bytes (count loop, drive
-// loop, dot product and the branch on its sign) match; from there retail copies Vec3 values
-// into the wheel with direct [wheel+disp] stores while VC6 forms the destination address in a
-// register for every struct assignment (lea/add), which shifts register use through the
-// impulse block.  Memberwise helpers give the direct stores for the two member copies but let
-// VC6 fold the (0,0,0) temporary that retail materialises on the stack.
+// 0x00527a20 (PARTIAL, 350/870, 866 bytes): the first 0x120 bytes (count loop, drive
+// loop, dot product and the branch on its sign) match.  Retail copies Vec3 values into the
+// wheel with direct [wheel+disp] moves, while VC6 forms the destination (or source) address
+// of a struct assignment in a register (lea).  The memberwise VehSetV gives the direct
+// moves for the scaled normal and the friction copy, and the impulse block then matches.
+// Left: the (0,0,0) store.  Retail materialises the temporary on the stack and copies it
+// with direct stores; the struct assignment keeps the lea, and VehSetV (also via a named
+// zero, a reference, an inline wheel method or a by-value helper) lets VC6 fold the
+// temporary into immediate stores (832-836 bytes).
 // Wheel drive and contact impulse pass (tier 3 reading).  Counts the in-contact
 // wheels with a nonzero +0x2a0 and, unless crashed, lets each wheel apply its share of the
 // drive (0x00514170).  Then for every wheel in contact: the load pushing into the ground
@@ -2241,6 +2256,7 @@ void Vehicle::PlaceWheels()
 // (tangentSpeed + spinSpeed) are positive an impulse limited by min(*speed, budget) is taken
 // from *speed: the wheel's frictionForce scaled by (mass/dt * m) / timeScale, or unscaled when
 // the time scale is the smaller, is added to *force and its moment about relativePosition to *torque.
+static inline void VehSetV(Vec3& d, const Vec3& s) { d.x = s.x; d.y = s.y; d.z = s.z; }
 void Vehicle::Method_00527A20(float* speed, Vec3* torque, Vec3* force)
 {
     int i;
@@ -2268,7 +2284,7 @@ void Vehicle::Method_00527A20(float* speed, Vec3* torque, Vec3* force)
             Vec3 t;
             d = -d;
             w->normalLoad = d;
-            w->normalLoadVector = *Vec3ScaleCall(&t, &w->groundNormal, d);
+            VehSetV(w->normalLoadVector, *Vec3ScaleCall(&t, &w->groundNormal, d));
         }
         w->contactPoint.UnknownVirtualSlot1();
         float budget = w->spinSpeed + w->tangentSpeed;
@@ -2287,7 +2303,7 @@ void Vehicle::Method_00527A20(float* speed, Vec3* torque, Vec3* force)
                 *speed = *speed - m;
             } else {
                 *speed = *speed - timeScale / rate;
-                v = w->frictionForce;
+                VehSetV(v, w->frictionForce);
             }
             *force += v;
             *torque += CrossProduct(w->relativePosition, v);

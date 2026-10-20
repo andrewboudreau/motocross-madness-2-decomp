@@ -33,6 +33,9 @@ struct Vec3 {
 
     Vec3() {}
     Vec3(float x_, float y_, float z_) { x = x_; y = y_; z = z_; }
+    // d3dvec.inl's single-value constructor; the chained assignment stores z, y, x
+    // (Vehicle slot 7's single-wheel branch).
+    Vec3(float f) { x = y = z = f; }
 
     float& operator[](int i) { return (&x)[i]; }
     const float& operator[](int i) const { return (&x)[i]; }

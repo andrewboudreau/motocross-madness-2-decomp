@@ -395,8 +395,8 @@
     "candidate_symbol_contains": "CastSegment",
     "target_va": "0x00506e90",
     "target_size": 1654,
-    "expect": "partial",
-    "notes": "56.6% (1659 vs 1654). The first 0x3b7 bytes are identical. The Clip helpers are now `inline` with reference params, `-dir` is passed as a temporary, and operator/ builds the result with a direct constructor call. What remains is VC6's inline budget: retail does not inline the ClipZ for the Z end point and inlines the next `-dir`, but this source inlines that ClipZ and so runs out of budget one site early. See the comment above CastSegment.",
+    "expect": "exact",
+    "notes": "Exact. Inline budget: ClipX/ClipZ name their numerator (d = limit - origin.c), so the end-point ClipZ no longer fits while the later -dir sites do; the grid cast is a guarded block with one trailing return 0 (retail's shared fail exit). See the comment above CastSegment.",
     "bindings": "Terrain.bindings.json"
   },
   {

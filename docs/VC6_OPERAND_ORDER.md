@@ -854,3 +854,12 @@ try on similar code. None is a rule.
   In the same function, `angularVelocity *= 0.9f` (operator*= through `this`) keeps
   the next `wobbleStage` load where the source has it. Three component stores let
   VC6 hoist the load above them.
+- **Dead temporary stores in z, y, x order are the single-value constructor.** Vehicle
+  slot 7 (`0x00526fa0`): retail zeroes a share temporary z, y, x before copying it;
+  `Vec3(0.0f, 0.0f, 0.0f)` stores x first, d3dvec.inl's `Vec3(float f) { x = y = z = f; }`
+  (`Vec3(0.0f)`) gives the chained order and every byte.
+- **Initialisation order decides which local inherits a dead argument slot.** Vehicle
+  slot 72 (`0x00527e30`): with `int mixed = 0, flagged = 0, plain = 0` initialised after
+  `Vec3 sum = kVec3Zero; *out = kVec3Zero;`, `mixed` takes the `out` argument slot and
+  `len2` a frame slot; initialising the counters first swaps the two homes and gives the
+  prologue's esi copy temporary (24 of the 720 orders are exact, all counters first).

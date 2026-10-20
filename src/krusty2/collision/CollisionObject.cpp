@@ -2481,9 +2481,10 @@ static inline void CollisionRotateInline(Vec3* out, Vec3 v, const Matrix4* m)
 // projected extent is the sum of the absolute components.  The first element starts the
 // running min/max, the others extend it (CollisionVec3Min/Max out of line).  Retail expands the
 // Min argument's operator- but calls its Vec3 constructor (0x00404e60), and calls operator+
-// (0x00421cb0) for the Max argument: the inline budget runs out there.  This source runs out
-// one site earlier (operator- is called); retail's caller tree is slightly larger (two dead
-// `if` statements' worth reproduce every byte but the loop entry test, see VC6_INLINE_BUDGET).
+// (0x00421cb0) for the Max argument: the inline budget runs out there.  The named `lo`, the
+// `continue`, the toModel pointer and the guarded do-while spend retail's budget
+// (VC6_INLINE_BUDGET).  Retail clears i before the loop guard, which a for loop gives, but a
+// for loop compiles its entry test as `cmp [ebx], 0` where retail loads the count.
 void CollisionObject::UpdateModelBounds()
 {
     CollisionModelBody* model = (CollisionModelBody*)shape;
@@ -2491,35 +2492,40 @@ void CollisionObject::UpdateModelBounds()
     model->field_0x3c = model->halfExtents;
     Matrix4 inv = model->field_0x88;
     CollisionInvertRigidInPlace(&inv);
+    const Matrix4* toModel = &inv;
     Vec3 minBound;
     Vec3 maxBound;
-    for (int i = 0; i < model->elementCount; i++) {
-        if (model->elementEnabled[i]) {
+    if (model->elementCount > 0) {
+        int i = 0;
+        do {
+            if (!model->elementEnabled[i])
+                continue;
             CollisionHullBody* e = &model->elements[i];
             Vec3 ax = Vec3(e->triangleTree->halfExtents.x, 0.0f, 0.0f);
             Vec3 ay = Vec3(0.0f, e->triangleTree->halfExtents.y, 0.0f);
             Vec3 az = Vec3(0.0f, 0.0f, e->triangleTree->halfExtents.z);
             CollisionRotateInline(&ax, ax, &e->worldTransform);
-            CollisionRotateInline(&ax, ax, &inv);
+            CollisionRotateInline(&ax, ax, toModel);
             CollisionRotateInline(&ay, ay, &e->worldTransform);
-            CollisionRotateInline(&ay, ay, &inv);
+            CollisionRotateInline(&ay, ay, toModel);
             CollisionRotateInline(&az, az, &e->worldTransform);
-            CollisionRotateInline(&az, az, &inv);
+            CollisionRotateInline(&az, az, toModel);
             Vec3 extent;
             extent.x = CollisionAbs(ax.x) + CollisionAbs(ay.x) + CollisionAbs(az.x);
             extent.y = CollisionAbs(ax.y) + CollisionAbs(ay.y) + CollisionAbs(az.y);
             extent.z = CollisionAbs(ax.z) + CollisionAbs(ay.z) + CollisionAbs(az.z);
             Vec3 center;
             DebugTransformPoint(&center, *(Vec3*)&e->triangleTree->center, &e->worldTransform);
-            DebugTransformPoint(&center, center, &inv);
+            DebugTransformPoint(&center, center, toModel);
             if (i != 0) {
-                *(CollisionInlineVec3*)&minBound = CollisionVec3Min(*(CollisionVec3*)&minBound, *(CollisionVec3*)&(center - extent));
+                Vec3 lo = center - extent;
+                *(CollisionInlineVec3*)&minBound = CollisionVec3Min(*(CollisionVec3*)&minBound, *(CollisionVec3*)&lo);
                 *(CollisionInlineVec3*)&maxBound = CollisionVec3Max(*(CollisionVec3*)&maxBound, *(CollisionVec3*)&(center + extent));
             } else {
                 minBound = center - extent;
                 maxBound = center + extent;
             }
-        }
+        } while (++i < model->elementCount);
     }
     *(Vec3*)&model->center = (minBound + maxBound) * 0.5f;
     *(Vec3*)&model->halfExtents = (maxBound - minBound) * 0.5f;

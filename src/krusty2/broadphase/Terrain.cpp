@@ -763,7 +763,8 @@ inline TerrainVec3 TerrainClipRayToPlaneZ(TerrainVec3& origin, const TerrainVec3
 {
     if (!((dir.z > 0.0f && origin.z < limit) || (dir.z < 0.0f && origin.z > limit)))
         return origin;
-    float t = (limit - origin.z) / dir.z;
+    float d = limit - origin.z;
+    float t = d / dir.z;
     origin.x += t * dir.x;
     origin.y += t * dir.y;
     origin.z = limit;
@@ -954,7 +955,8 @@ inline TerrainVec3 TerrainClipRayToPlaneX(TerrainVec3& origin, const TerrainVec3
 {
     if (!((dir.x > 0.0f && origin.x < limit) || (dir.x < 0.0f && origin.x > limit)))
         return origin;
-    float t = (limit - origin.x) / dir.x;
+    float d = limit - origin.x;
+    float t = d / dir.x;
     origin.x = limit;
     origin.y += t * dir.y;
     origin.z += t * dir.z;
@@ -973,9 +975,11 @@ inline TerrainVec3 TerrainClipRayToPlaneX(TerrainVec3& origin, const TerrainVec3
 // budget is skipped, later smaller ones may still fit), then the calls inside the inlined bodies
 // (here the TerrainVec3 constructors), and the budget grows with the caller's own code size.
 // Retail inlines ClipX x4, ClipZ for the start point, and every `-dir` but the last; the
-// constructor is inlined only in the two scalings, `end - start` and the first `-dir`.  The
-// first 0x3b7 bytes match; from the Z end-point clip on, this source still inlines one ClipZ
-// too many (PARTIAL: the budget arithmetic, not the statement shapes, is the remaining gap).
+// constructor is inlined only in the two scalings, `end - start` and the first `-dir`.
+// Exact.  The ClipX/ClipZ numerators are named locals (`d = limit - origin.c`).  That makes
+// each expanded clip cost a little more, so the end-point ClipZ no longer fits while the
+// following `-dir` sites still do.  The successful grid cast is the guarded block, which
+// leaves one `return 0` at the end that the reject test also jumps to.
 int Terrain::CastSegment(const TerrainVec3* from, const TerrainVec3* to, TerrainVec3* out,
                          int a, int b, int c)
 {
@@ -1034,12 +1038,12 @@ int Terrain::CastSegment(const TerrainVec3* from, const TerrainVec3* to, Terrain
     t = end.y;
     end.y = end.z;
     end.z = t;
-    if (!heightField->CastSegment(&start, &end, out, a, b, c))
-        return 0;
-
-    t = out->y;
-    out->y = out->z;
-    out->z = t;
-    *out *= gridCellSize;
-    return 1;
+    if (heightField->CastSegment(&start, &end, out, a, b, c)) {
+        t = out->y;
+        out->y = out->z;
+        out->z = t;
+        *out *= gridCellSize;
+        return 1;
+    }
+    return 0;
 }

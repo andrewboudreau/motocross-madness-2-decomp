@@ -635,8 +635,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot7@Vehicle",
     "target_va": "0x00526fa0",
     "target_size": 1161,
-    "expect": "partial",
-    "notes": "1159/1161 strict. Inverse-distance blend of *arg over active contacts/wheels. Fixed by uninitialised last, total declared before share, (dy*dy + dx*dx) + dz*dz, total zeroed before active, the blend loops scaling through Math3D operator* (Vec3 * float) and active-- after the share store. The single-wheel branch assigns Vec3(0.0f, 0.0f, 0.0f), which gives retail's instructions and registers. Left: that temporary's dead zero stores go x, y, z (retail z, y, x). Component stores into a share local (all orders, chained, partial aliases, before or in the loop) store z first but swap the edx/edi copies; scalar locals, Vec3(share.x, ...) and -Vec3 keep the x-first stores.",
+    "expect": "exact",
+    "notes": "1161/1161 strict. Inverse-distance blend of *arg over active contacts/wheels. Fixed by uninitialised last, total declared before share, (dy*dy + dx*dx) + dz*dz, total zeroed before active, the blend loops scaling through Math3D operator* (Vec3 * float) and active-- after the share store. The single-wheel branch assigns Vec3(0.0f) (the d3dvec.inl single-value constructor, x = y = z = f), whose dead temporary stores go z, y, x as in retail; Vec3(0.0f, 0.0f, 0.0f) stores x first.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -775,8 +775,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot72@Vehicle",
     "target_va": "0x00527e30",
     "target_size": 831,
-    "expect": "partial",
-    "notes": "770/831 strict. Normal accumulation + slot-74 call. Fixed by a separate last-flagged-wheel pointer (the argument stays the loop/reset test), flagged reads through it, plain != 0, VehLen2 for both lengths, float count divide, VehMinF clamp, load declared first. Left: the prologue kVec3Zero copies use edx and load out early instead of retail's esi temp then esi=out/edi=copy. Tried: last declared at top/before load/after *out/before mixed/for-init, sum/out copy swapped (64), load after plain, int divide (407).",
+    "expect": "exact",
+    "notes": "831/831 strict. Normal accumulation + slot-74 call. A separate last-flagged-wheel pointer (the argument stays the loop/reset test), flagged reads through it, plain != 0, VehLen2 for both lengths, float count divide, VehMinF clamp, load declared first, then the mixed/flagged/plain counters before the sum and *out kVec3Zero copies: with the counters initialised after the copies, mixed took the dead out argument slot and the prologue copied through edx (24 of 720 orders are exact, all with the counters before the copies).",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -796,7 +796,7 @@
     "target_va": "0x005281b0",
     "target_size": 539,
     "expect": "partial",
-    "notes": "Strict 502/539 (448/483 masked). Velocity deflection, returns signed acos angle. Nested-if layout with one trailing return 0 gives retail esi=dir/edi=this and keeps k live in x87; VehDotG (x+y)+z dot loads retail y,x,z order; sign = -sign before the second return keeps fchs ahead of the pops. Left: retail stores field_0x4e8 before the abs compare (fcom placement), s*t.x via fld st(0), scratchVector .y store scheduling, and len/sign dead-parameter slots swapped (0x28/0x24). Tried: abs via local if, k assignment forms, sign/len declared at top, len init-then-if/reuse len2 (much worse), ternary return (worse), u via VehScale/scaled helper, sum via named temp, z-first or x-y dot groupings, VehDotI/pointer dot.",
+    "notes": "Strict 512/539. Velocity deflection, returns signed acos angle. Nested-if layout with one trailing return 0 gives retail esi=dir/edi=this and keeps k live in x87; VehDotG (x+y)+z dot loads retail y,x,z order; angle = -angle before the second return keeps fchs ahead of the pops. Left: retail stores field_0x4e8 before the abs compare (fcom placement), s*t.x via fld st(0), and scratchVector .y store scheduling (the dead-parameter homes match with the angle in its own local). Tried: s/t operand order of each u component (no effect), k stored through k = ... chains, |field_0x4e8| or a named |k|, abs via local if, k assignment forms, sign/len declared at top, len init-then-if/reuse len2 (much worse), ternary return (worse), u via VehScale/scaled helper, sum via named temp, z-first or x-y dot groupings, VehDotI/pointer dot.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -836,7 +836,7 @@
     "target_va": "0x005286a0",
     "target_size": 784,
     "expect": "partial",
-    "notes": "291/784: tilt angle; the scale/subtract outputs are separate locals (frame 0x3c like retail); perp declared just before s (263 -> 291). Tried: perp at the top (a gets ebx but perp ebp, 190), s/d before n, a member-first cross helper and CrossB (no gain). Left: retail shares the ground-normal output with the projection (and n with the side vector, the normalise temporary separate), register roles (retail esi=this, ebx=a, edi=perp, ebp=&field_0x1ac).",
+    "notes": "754/784: tilt angle; frame 0x3c and slots match. Levers: len2 through VehLen2, len as a min helper of sqrt(len2) and 1 (else 1), the sign test as VehDotG(*a, scratchVector) with VehDotG above slot 56, and the side cross as a free helper of (sideAxis, *a) (291 -> 754). Left: two products of the side cross load their multiplicands in the other order (retail x row side.y*a.z, y row a.x*side.z); all 64 source operand orders of the free and member forms tie, a pointer or value copy of either vector, by-value parameters and the swapped/negated cross are worse.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -1596,7 +1596,7 @@
     "target_va": "0x00527a20",
     "target_size": 870,
     "expect": "partial",
-    "notes": "349/866. First 0x120 bytes exact (driven-wheel count, 0x514170 drive loop, (x*x+y*y)+z*z dot, zero branch first). Retail stores Vec3 results with direct [wheel+disp] moves; VC6 forms every struct-assignment destination address in a register.",
+    "notes": "350/870 (866 bytes). First 0x120 bytes exact (driven-wheel count, 0x514170 drive loop, (x*x+y*y)+z*z dot, zero branch first). The memberwise VehSetV gives retail's direct [wheel+disp] moves for the scaled normal and the friction copy; only the (0,0,0) store remains: the struct assignment keeps a lea, and memberwise forms fold the stack temporary retail keeps.",
     "bindings": "Vehicle.bindings.json"
   },
   {

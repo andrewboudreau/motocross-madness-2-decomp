@@ -84,10 +84,20 @@ until it is used up. Measured with a four-statement helper (`I4`: `int b =
   its nested constructor, then calls `operator+` for the Max argument. The
   natural operator source calls both; one dead `if` is too little, two or
   three give retail's exact call pattern and every byte except the loop
-  entry test, four expand too much. Code-producing bumps (component copies,
-  a `Vec3` constructor for the extent, split `+=` sums) also reach the call
-  pattern but change the x87 code, so the original's extra size is still
-  unidentified.
+  entry test, four expand too much. Natural source reaches the same
+  pattern: a named `lo = center - extent` for the Min argument (which also
+  expands everything when `hi` is named too), `continue` for disabled
+  elements and a pointer to the inverse, with the loop as a guarded
+  do-while (1666/1885). The for-loop form needs one more budget unit and
+  keeps its `cmp [ebx], 0` entry test.
+- Retail skips one large helper but expands the smaller sites after it
+  (Terrain::CastSegment `0x00506e90`: the end-point ClipZ is called, the
+  following `-dir` operators are expanded). Padding the caller only grows
+  the budget, which is the wrong direction. Making the expanded helpers
+  slightly dearer works: name the numerator in ClipX and ClipZ
+  (`float d = limit - origin.x; float t = d / dir.x;`, same code). With
+  that, retail's call pattern comes back, and a guarded success block with
+  one trailing `return 0` makes the function exact.
 - The order in which sites lose is only partly predictable, so a function
   with several out-of-line helper calls needs its inline structure
   reproduced, not padded. Statements that compile to nothing (dead
