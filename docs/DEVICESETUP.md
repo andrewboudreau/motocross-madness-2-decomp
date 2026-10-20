@@ -143,6 +143,20 @@ by `tests/test_directx_guids.py`. Existing C-linkage callers bind to these
 definitions, and the differential harness links this real provider. Its
 filename does not assert original TU ownership.
 
+## Keyboard storage
+
+`DeviceSetupState.cpp` supplies the 256-entry PC-98 scan-code map at
+`0x00568df8`, the keyboard-subtype detection sentinel at `0x005691f8`
+(initially -1), and the zero-filled platform flag at `0x0059ada8`.
+`TranslatePc98ScanCode` bounds the index to 0..255 and retains the input
+when an entry is -1; `DetectKeyboardLayout` replaces the sentinel and
+sets the platform flag. The original defining TU remains unknown.
+
+The data-provider regression in `tests/test_graphics_state.py` verifies all
+1,032 bytes, symbol identities, extents and writable storage using authentic
+VC6 and the hash-pinned retail image. This supplies the existing input code's
+storage; current-Windows keyboard behavior still needs the runnable game.
+
 ## Reproduce
 
 ```bash

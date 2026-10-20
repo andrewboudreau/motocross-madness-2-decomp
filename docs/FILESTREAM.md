@@ -74,20 +74,80 @@ Source forms that mattered:
 
 The notes are in the source header.
 
-| VA | Size (bytes) | Masked match | Function |
-|---|---|---|---|
-| `0x00460db0` | 186 | 16% | header check |
-| `0x00461340` | 702 | 41% | seek |
-| `0x00461640` | 663 | 71% | read |
-| `0x004618e0` | 152 | 88% | write |
-| `0x00461b90` | 282 | 90% | write the header |
+| VA | Retail bytes | Candidate bytes | Masked match | Function |
+|---|---|---|---|---|
+| `0x00460db0` | 186 | 176 | 16% | header check |
+| `0x00461340` | 702 | 696 | 46% | seek |
+| `0x00461640` | 663 | 670 | 71% | read |
+| `0x004618e0` | 152 | 152 | 88% | write |
+| `0x00461b90` | 282 | 282 | 90% | write the header |
 
 Each miss comes down to one of:
 - register assignment, or
 - instruction scheduling (the 0xfa seed store and the name pointer in
   `0x00461b90`, the argument loads in `0x004618e0`).
 
-The control flow of each one is reconstructed.
+The control flow of each one is reconstructed. None is a strict byte match.
+Candidate extents above are measured from authentic VC6 SP3 COFF metadata with
+`vc6_o2_mt`; masked percentages are diagnostic only. All five are registered as
+`expect: partial` in `samples/io/targets.json`.
+
+## Functional build review
+
+The source build explicitly includes `samples/io/FileStream.cpp` as
+`reviewed-nonexact`. Its five methods complement the thirteen exact methods in
+`src/reconstructed/FileStream.cpp`; the candidate stays in `samples/`.
+It supplies the missing `Read` and `Seek` bodies used throughout texture,
+scene, terrain and audio loading, plus the header checks and writes needed by
+`Open`. This is source linkage progress, not a successful game startup.
+
+Review compared the complete decoded retail extents with the source, including
+branch predicates, signed arithmetic, field widths, dependency calls, return
+values and buffer/key mutations:
+
+| Method | Confirmed behavior retained |
+| --- | --- |
+| `CheckHeader` | Seek to zero, disable decoding while checking signed header bytes in FAOE order, restore the encoded flag on mismatch/success, and close/null the file on either seek failure. |
+| `Seek` | Follow archive links while combining the reset flag with each slice offset; honor the same-position fast path; reject nonzero END and negative CUR requests when decoding; restart or preserve the running key and decode forward in 1024-byte blocks; preserve early-return buffer state and file-close behavior. |
+| `Read` | Follow the inner stream; consume and decode its buffer in place; preserve the unsigned remainder/division in the partial-buffer path; use 1024-byte plain reads; retain the retail short-read return values, including `count - read` and `count - 1` on their respective branches. |
+| `Write` | Follow the inner stream; resynchronize encoded output through `ftell`/`fseek`; close/null on seek failure and still pass that resulting file pointer to the encoding helper, as retail does; preserve helper and plain-write returns. |
+| `WriteHeader` | Write four signed header bytes with early failure exits, set encoded/header-size fields, split the filename, append its extension and derive the wrapping byte key from seed `0xfa`. |
+
+The sample's `WriteXorEncoded` declaration now uses the canonical
+`const unsigned char*` input and `unsigned char*` key types from
+`EcoSystem.cpp`. Explicit casts at the stream boundary preserve its call
+arguments. All five sample bodies retain identical emitted bytes and resolved
+relocation destinations compared with their preceding source; only that
+external symbol's C++ spelling changes.
+
+The native VC6 differential test runs **12,390 scenarios** against the
+hash-pinned private executable. It compares returns, every byte of all three
+stream records, output bytes, written payloads, FILE flags, file position/close
+effects, and ordered dependency calls. Cases include direct and nested archive
+views with distinct file identities and keys, buffered and unbuffered reads,
+zero-size/count requests, exact 1024/2048-byte requests and partial blocks,
+encoded/plain paths, all seek origins, same-position seeks, successive
+dependency failures, header-byte mismatches and filename variations.
+
+Both sides use the same deterministic file/encoding boundary mocks. Only the
+five reference bodies are executed from private PE pages; decoded direct calls
+to the twelve known dependencies are redirected to those mocks. The source
+test object substitutes only external CRT dependency names at compile time.
+This fixture is validation-only and is never linked into the source game.
+It does not exercise real disk errors or prove all possible inputs; malformed
+stream graphs and negative-length decoding loops are outside the test domain.
+The decoded source review and partial byte reports remain separate evidence.
+
+No new stream hierarchy is asserted. This nonvirtual `0x134`-byte view has no
+RTTI, and the constructor declarations in `TextureMap.h` and `EcoSystem.h`
+still differ (`int` versus resource-manager pointer). Other named stream views
+remain separate reconstruction work.
+
+```powershell
+$env:VC6_ROOT = 'C:\path\to\vc6sp3'
+$env:MCM2_EXE = 'C:\path\to\mcm2.exe'
+python -m unittest discover -s tests -p test_filestream_behavior.py -v
+```
 
 ## Reproduce
 

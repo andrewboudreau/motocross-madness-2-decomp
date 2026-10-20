@@ -407,7 +407,7 @@ int UnknownTrackGameObject33fc::FormatAssignmentName(int kind, int code, char* t
 
 // The NEC PC-98 scan code table (.data 0x00568df8, 256 entries, -1 where the
 // code has no translation) and the detected layout (0x005691f8, initialised
-// to -1) and platform (.bss 0x0059ada8). The table data is not reconstructed.
+// to -1) and platform (.bss 0x0059ada8). DeviceSetupState.cpp supplies them.
 extern int g_Pc98ScanCodes[256];
 extern int g_KeyboardSubtype;
 extern int g_IsWindowsNT;

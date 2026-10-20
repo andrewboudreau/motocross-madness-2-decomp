@@ -7,6 +7,12 @@
       "status": "reviewed-nonexact",
       "reason": "Complete DirectX startup probe; VC6 emits 1006 bytes versus 1011 retail bytes due to register allocation and spill differences.",
       "evidence": "docs/DEVICESETUP.md#functional-build-review"
+    },
+    {
+      "path": "samples/io/FileStream.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Five complete buffered/archive stream methods reviewed against retail and checked in 12390 native differential scenarios; VC6 bytes remain nonexact.",
+      "evidence": "docs/FILESTREAM.md#functional-build-review"
     }
   ],
   "includes": ["src/krusty2", "src/reconstructed"],

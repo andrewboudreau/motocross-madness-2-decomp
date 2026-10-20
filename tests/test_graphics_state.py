@@ -1,4 +1,4 @@
-"""Verify the compiled renderer globals against the private retail image."""
+"""Verify compiled renderer and input globals against the private retail image."""
 from __future__ import annotations
 
 import json
@@ -22,9 +22,6 @@ EXE = Path(os.environ.get('MCM2_EXE', ROOT / 'work/game/mcm2.exe'))
                      'requires VC6_ROOT and the private retail EXE')
 class GraphicsStateTests(unittest.TestCase):
     def test_compiled_initial_values_sizes_and_mutability_match_retail(self):
-        self.assertEqual(sha256_file(EXE),
-                         '31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874')
-        bindings = json.loads((ROOT / 'src/reconstructed/GraphicsState.bindings.json').read_text())
         sizes = {
             'g_DefaultNearPlane': 4, 'g_DefaultFarPlane': 4, 'g_BladeDeviceGuid': 16,
             'g_GammaRamp': 3 * 256 * 2, 'g_DebugCountTextureMemory': 4,
@@ -33,12 +30,23 @@ class GraphicsStateTests(unittest.TestCase):
             'g_NonBladeLodSettings': 10 * 16, 'g_BladeLodSettings': 10 * 16,
             'g_ActiveLodSettings': 4,
         }
+        self.assert_data_provider('GraphicsState', sizes)
+
+    def test_keyboard_table_detection_sentinel_and_platform_storage_match_retail(self):
+        self.assert_data_provider('DeviceSetupState', {
+            'g_Pc98ScanCodes': 256 * 4, 'g_KeyboardSubtype': 4, 'g_IsWindowsNT': 4,
+        })
+
+    def assert_data_provider(self, stem, sizes):
+        self.assertEqual(sha256_file(EXE),
+                         '31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874')
+        bindings = json.loads((ROOT / f'src/reconstructed/{stem}.bindings.json').read_text())
         retail = PEImage(EXE)
         with tempfile.TemporaryDirectory(prefix='mcm2-graphics-') as tmp:
-            path = Path(tmp) / 'GraphicsState.obj'
+            path = Path(tmp) / f'{stem}.obj'
             result = subprocess.run([
                 sys.executable, str(ROOT / 'tools/compile.py'),
-                str(ROOT / 'src/reconstructed/GraphicsState.cpp'), '-o', str(path),
+                str(ROOT / f'src/reconstructed/{stem}.cpp'), '-o', str(path),
                 '--vc6-root', os.environ['VC6_ROOT'], '--profile', 'vc6_o2_mt',
             ], cwd=ROOT, capture_output=True, text=True, encoding='latin-1',
                 env={**os.environ, 'PYTHONPATH': str(ROOT)})

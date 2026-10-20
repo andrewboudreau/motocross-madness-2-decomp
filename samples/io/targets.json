@@ -1,0 +1,47 @@
+[
+  {
+    "source": "FileStream.cpp",
+    "candidate_symbol_contains": "?CheckHeader@UnknownTextureStream@@QAEHXZ",
+    "target_va": "0x00460db0",
+    "target_size": 186,
+    "expect": "partial",
+    "bindings": "FileStream.bindings.json",
+    "status": "Complete behavior reviewed against retail; 176-byte VC6 candidate remains nonexact."
+  },
+  {
+    "source": "FileStream.cpp",
+    "candidate_symbol_contains": "?Seek@UnknownTextureStream@@QAEHHHH@Z",
+    "target_va": "0x00461340",
+    "target_size": 702,
+    "expect": "partial",
+    "bindings": "FileStream.bindings.json",
+    "status": "Complete behavior reviewed against retail; 696-byte VC6 candidate remains nonexact."
+  },
+  {
+    "source": "FileStream.cpp",
+    "candidate_symbol_contains": "?Read@UnknownTextureStream@@QAEHPAXHH@Z",
+    "target_va": "0x00461640",
+    "target_size": 663,
+    "expect": "partial",
+    "bindings": "FileStream.bindings.json",
+    "status": "Complete behavior reviewed against retail; 670-byte VC6 candidate remains nonexact."
+  },
+  {
+    "source": "FileStream.cpp",
+    "candidate_symbol_contains": "?Write@UnknownTextureStream@@QAEHPBXHH@Z",
+    "target_va": "0x004618e0",
+    "target_size": 152,
+    "expect": "partial",
+    "bindings": "FileStream.bindings.json",
+    "status": "Complete behavior reviewed against retail; equal 152-byte extent but different register allocation."
+  },
+  {
+    "source": "FileStream.cpp",
+    "candidate_symbol_contains": "?WriteHeader@UnknownTextureStream@@QAEHPBD@Z",
+    "target_va": "0x00461b90",
+    "target_size": 282,
+    "expect": "partial",
+    "bindings": "FileStream.bindings.json",
+    "status": "Complete behavior reviewed against retail; equal 282-byte extent but different instruction scheduling."
+  }
+]

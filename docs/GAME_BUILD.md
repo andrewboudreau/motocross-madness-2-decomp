@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-20 build compiles 163 C++ files (162 canonical sources and one
-reviewed candidate) and reaches LINK with 783 unresolved external symbols,
+The 2026-10-20 build compiles 165 C++ files (163 canonical sources and two
+reviewed candidates) and reaches LINK with 775 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -82,6 +82,15 @@ callers use the existing collision methods' opaque-pointer signatures, and
 MorphBastardModifier uses the existing Soultree matrix methods. All prior
 strict matches remain intact. These are narrow method connections; duplicate
 class layouts elsewhere still require independent reconciliation.
+
+The five complete [stream candidates](FILESTREAM.md#functional-build-review)
+now supply `Read`, `Seek`, `Write` and the header methods. They remain explicitly
+nonexact in `samples/`; a native differential test covers 12,390 scenarios,
+and their inclusion preserves the existing strict matches. Three
+[keyboard/platform globals](DEVICESETUP.md#keyboard-storage) supply the
+PC-98 scan-code map, detection sentinel and platform flag, with all 1,032
+initial bytes checked against retail. Together these remove eight more
+unresolved symbols. Real disk/archive integration remains untested.
 
 The source still lacks `Game::Tick` at `0x004685d0`, called by
 `TrackGame::Tick`; its retail timing uses `rdtsc` (see [Game](GAME.md)).
