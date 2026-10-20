@@ -2239,12 +2239,15 @@ void Vehicle::PlaceWheels()
         wheelList[0]->reportContactOutputs = 1;
 }
 
-// 0x00527a20 (PARTIAL, 349/866 bytes aligned): the first 0x120 bytes (count loop, drive
-// loop, dot product and the branch on its sign) match; from there retail copies Vec3 values
-// into the wheel with direct [wheel+disp] stores while VC6 forms the destination address in a
-// register for every struct assignment (lea/add), which shifts register use through the
-// impulse block.  Memberwise helpers give the direct stores for the two member copies but let
-// VC6 fold the (0,0,0) temporary that retail materialises on the stack.
+// 0x00527a20 (PARTIAL, 350/870, 866 bytes): the first 0x120 bytes (count loop, drive
+// loop, dot product and the branch on its sign) match.  Retail copies Vec3 values into the
+// wheel with direct [wheel+disp] moves, while VC6 forms the destination (or source) address
+// of a struct assignment in a register (lea).  The memberwise VehSetV gives the direct
+// moves for the scaled normal and the friction copy, and the impulse block then matches.
+// Left: the (0,0,0) store.  Retail materialises the temporary on the stack and copies it
+// with direct stores; the struct assignment keeps the lea, and VehSetV (also via a named
+// zero, a reference, an inline wheel method or a by-value helper) lets VC6 fold the
+// temporary into immediate stores (832-836 bytes).
 // Wheel drive and contact impulse pass (tier 3 reading).  Counts the in-contact
 // wheels with a nonzero +0x2a0 and, unless crashed, lets each wheel apply its share of the
 // drive (0x00514170).  Then for every wheel in contact: the load pushing into the ground
@@ -2253,6 +2256,7 @@ void Vehicle::PlaceWheels()
 // (tangentSpeed + spinSpeed) are positive an impulse limited by min(*speed, budget) is taken
 // from *speed: the wheel's frictionForce scaled by (mass/dt * m) / timeScale, or unscaled when
 // the time scale is the smaller, is added to *force and its moment about relativePosition to *torque.
+static inline void VehSetV(Vec3& d, const Vec3& s) { d.x = s.x; d.y = s.y; d.z = s.z; }
 void Vehicle::Method_00527A20(float* speed, Vec3* torque, Vec3* force)
 {
     int i;
@@ -2280,7 +2284,7 @@ void Vehicle::Method_00527A20(float* speed, Vec3* torque, Vec3* force)
             Vec3 t;
             d = -d;
             w->normalLoad = d;
-            w->normalLoadVector = *Vec3ScaleCall(&t, &w->groundNormal, d);
+            VehSetV(w->normalLoadVector, *Vec3ScaleCall(&t, &w->groundNormal, d));
         }
         w->contactPoint.UnknownVirtualSlot1();
         float budget = w->spinSpeed + w->tangentSpeed;
@@ -2299,7 +2303,7 @@ void Vehicle::Method_00527A20(float* speed, Vec3* torque, Vec3* force)
                 *speed = *speed - m;
             } else {
                 *speed = *speed - timeScale / rate;
-                v = w->frictionForce;
+                VehSetV(v, w->frictionForce);
             }
             *force += v;
             *torque += CrossProduct(w->relativePosition, v);

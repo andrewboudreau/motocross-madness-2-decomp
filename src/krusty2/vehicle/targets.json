@@ -1596,7 +1596,7 @@
     "target_va": "0x00527a20",
     "target_size": 870,
     "expect": "partial",
-    "notes": "349/866. First 0x120 bytes exact (driven-wheel count, 0x514170 drive loop, (x*x+y*y)+z*z dot, zero branch first). Retail stores Vec3 results with direct [wheel+disp] moves; VC6 forms every struct-assignment destination address in a register.",
+    "notes": "350/870 (866 bytes). First 0x120 bytes exact (driven-wheel count, 0x514170 drive loop, (x*x+y*y)+z*z dot, zero branch first). The memberwise VehSetV gives retail's direct [wheel+disp] moves for the scaled normal and the friction copy; only the (0,0,0) store remains: the struct assignment keeps a lea, and memberwise forms fold the stack temporary retail keeps.",
     "bindings": "Vehicle.bindings.json"
   },
   {
