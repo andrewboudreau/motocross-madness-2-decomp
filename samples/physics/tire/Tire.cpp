@@ -81,6 +81,9 @@ static inline CollisionVec3 TireNormalizeZ(const CollisionVec3& v)
 // A 256-variant sweep bracketing each single product of the cross (the OrientationAxes
 // lever) with both operand orders of the two y.x products tops out at 695: only the
 // bracket on c.x's first product changes the code, and not towards retail.
+// Retail loads z first in all six c products; ours loads y.x first in its two. Rule 6
+// stores (VC6_PATTERN_CORPUS section 6) do not reach it: y member-wise 28, y.x stored
+// again 32, z member-wise 668, either one before the other's copy 14-29.
 void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const CollisionVec3* zAxis,
                            const CollisionVec3* yAxis, int orthogonalize, int keepZ)
 {

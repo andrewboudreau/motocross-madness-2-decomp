@@ -79,6 +79,11 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 // the eventType register, where retail loads it into the g register before the xor/cmp.
 // Index spellings (level-first sums, pointer rows, inline accessors, top-level locals)
 // all compile to the base bytes.
+// Measured (s14f): a true-arm `KbGame*` local gives the else arm retail's registers but
+// holds the game in eax with `setne dl` (100/230). Type/level int locals in either
+// order, flat sums, `== 3 ? 0 : 1`, `!(== 3)`, `3 !=`, `else` arms and a scale local
+// give the base bytes or fewer; a `>` compare, a shared speedGain or limit local and a
+// conditional row pointer lose more (123, 59, 26, 22).
 int KrustyBike::UnknownVirtualSlot70(float arg)
 {
     float b[2][3] = { { 4.0f, 3.25f, 2.5f }, { 3.75f, 3.25f, 2.5f } };
@@ -106,6 +111,10 @@ int KrustyBike::UnknownVirtualSlot70(float arg)
 // cross-jumped into the shared case 0/4 call; case 0 jumps to a call homed in case 4 in
 // retail (here case 4 jumps into case 0's).  `d != 0` first, a Vec3 ternary, `*a3 * inv`
 // and an inv local do not help (494-523).
+// Measured (s14g): a return per arm of the 2/3 normalise gives retail's arm layout (the zero
+// arm falls into the call, the invsqrt arm jumps back to it), but the call's register
+// choice then differs from case 4's tail, so it is not cross-jumped (1392 B; 271 aligned
+// instructions against 275, 341 strict against 523).
 int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* a5)
 {
     int flag;
@@ -404,7 +413,8 @@ static inline int KbWithinWarpBandOf(float dist2, float limitSq, float frame, fl
 // lap and crash flags of the state and runs the physics bookkeeping of a step.
 // `dt` is unused; `a` is set for the live game (lap and race fields are taken over).
 //
-// Partial (8545 bytes retail; 2688 strict, 249 differing instructions): the frame (0x58)
+// Partial (8545 bytes retail, candidate 8558; 2305 strict; aligned 2183 instructions, 77
+// differing): the frame (0x58)
 // and stack slots match retail (tools/frame_layout.py). What fixed the shape so far: 4-byte
 // locals are declared at function scope in retail slot order (ratio, dist2, len, reset)
 // ahead of the 12-byte vectors (step, delta, savedPos, localFwd, localUp); an `int k`
@@ -418,10 +428,17 @@ static inline int KbWithinWarpBandOf(float dist2, float limitSq, float frame, fl
 // products; the pose clamps follow both modes; KB_ABS on a variable gives the copying
 // `jns; neg`; `states[0]->` is re-read after every call and store (no alias); the
 // lap/pose flags are 1/0 if-else stores; the crash-flip test reads bodyUp.y; `char m`
-// keeps the motion compare byte sized.
-// Still different: retail keeps 1 in ebp from the second SetAxesPtr call on and 0 in edi
-// up to the pose section (candidate: 0 in ebp, 1 in ebx, and a zero register through the
-// tail where retail uses `test`/`push 0`), which also forces `c` through a stack byte.
+// keeps the motion compare byte sized. The pose-param and lean lerps subtract the member
+// read (`c - interpSource->poseParam`): VC6 then negates the tested `d` in place and
+// recomputes `c - b` (`sub ecx, edi`) as retail does, and the function's constant
+// registers follow retail (1 in ebp from the second SetAxesPtr call, 0 in edi up to the
+// pose section, `test`/`push 0` in the tail; aligned 2052 -> 2183). With `c - b` in the
+// lerps VC6 kept the first difference in a stack slot and allocated 0 in ebp, 1 in ebx.
+// Still different: `c` is widened through its stack home (`mov [esp+0x20], bl`) where
+// retail widens bl in registers, the 12 bytes of the size gap; dropping the `c` local
+// gives retail's widening but returns the old constant allocation (aligned 2090), as do a
+// `const unsigned char&` c and reading interpTarget in the lerp too. The poseBlend lerp
+// keeps `c - b` (its member-read form recomputes but scores 2182). Before this:
 // Writing the rider placement in both orientation-save branches, extra `= 1` stores
 // before PlaceWheels, moving `movingForward = 1` or an int `settled` do not move it; a
 // probe third SetAxesPtr call removes the middle zero register and the tail then matches
@@ -722,7 +739,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     poseParamLatched = 0;
                 poseParam = (float)latchedPoseParam * KB_BYTE_SCALE;
             } else if (KB_ABS(d) <= 0x18) {
-                poseParam = (float)((int)((float)(c - b) * ratio) + b) * KB_BYTE_SCALE;
+                poseParam = (float)((int)((float)(c - interpSource->poseParam) * ratio) + b) * KB_BYTE_SCALE;
             } else {
                 poseParam = (float)b * KB_BYTE_SCALE;
             }
@@ -761,7 +778,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     poseLeanBlendLatched = 0;
                 poseLeanBlend = (float)latchedPoseLeanBlend * KB_BYTE_SCALE;
             } else if (KB_ABS(d) <= 0x20) {
-                poseLeanBlend = (float)((int)((float)(c - b) * ratio) + b) * KB_BYTE_SCALE;
+                poseLeanBlend = (float)((int)((float)(c - interpSource->poseLeanBlend) * ratio) + b) * KB_BYTE_SCALE;
             } else {
                 poseLeanBlend = (float)b * KB_BYTE_SCALE;
             }

@@ -252,8 +252,11 @@ value in one function:
 - GridNode `0x00484d70`: its `xor ecx, ecx ; mov cx, ...` is the
   zero-extension idiom for an unsigned short load, not a cached constant.
 - KrustyBike `0x00493660`: the choice is function wide (a diagnostic early
-  `return` moves even the entry zero register to `ebx`). See the
-  KrustyBike near-miss sample header.
+  `return` moves even the entry zero register to `ebx`). Writing the pose
+  lerps with the member read (`c - interpSource->poseParam`) gives retail's
+  allocation: VC6 recomputes `c - b` there, and the constant webs then lose
+  the tail registers to `b` and `c`. See VC6_PATTERN_CORPUS section 7 and
+  the KrustyBike near-miss sample header.
 
 - Vehicle slot 49 `0x0052a940`: retail's `xor ebx, ebx` right after the
   slot 39 call, with `hit` in `ebp` and both reloaded at the loop's back

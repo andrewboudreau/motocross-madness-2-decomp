@@ -208,6 +208,11 @@ void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 // esi.  Nor from a PoseAxisRotation inline for either path or both (326..334 differing lines),
 // a cross wrapper (173), the axisZ test negated as `!(... == ... && ...)` (inert) or with
 // swapped operands (the test changes, the cross does not).
+// Retail holds a in edi and b in esi in both paths, yet loads b first in the axisY cross
+// and a first in the axisZ one, so the fixed indirect-word order of VC6_PATTERN_CORPUS
+// section 6 is not decided by the pointer pair alone. Also inert: `else if` / `else`
+// chaining and `*&` operands; swapped axisZ compares with or without swapped dot
+// arguments give 1089-1093.
 void PoseRotation(CharacterPose* a, CharacterPose* b, Vec3* axis, float* angle)
 {
     if (a->axisY.x != b->axisY.x || a->axisY.y != b->axisY.y || a->axisY.z != b->axisY.z) {

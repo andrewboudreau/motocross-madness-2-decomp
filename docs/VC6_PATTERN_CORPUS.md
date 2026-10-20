@@ -55,7 +55,7 @@ Near misses that differ in this shape:
 - Griddraw `0x00480ad0` (render).
 - BikeRace `0x0041f1d0` (race): retail keeps 0 in edx from the first instruction.
 - GUIManager `0x00486170` (ui): retail has no `xor ebx, ebx`.
-- KrustyBike `0x00493660` (physics): retail keeps 0 in edi.
+- KrustyBike `0x00493660` (physics): retail keeps 0 in edi up to the pose section. The candidate now matches it (section 7).
 - FileStream `0x00461340` (io).
 
 The rule says which way to move each of these: make the zero a constant
@@ -345,6 +345,34 @@ Leads from the rules:
   words. Rule 6 predicts the earlier finding that a store to `m._11` gives
   209/209: retail's `m._11` has a direct store, such as a transpose or
   copy that writes every element.
+
+## 7. A byte widened in registers or through the stack
+
+**Rule (confirmed by probes, `vc6_o2_mt`):** an `unsigned char` local held
+in `bl` is widened to int through a stack slot: `mov [esp + x], bl ; mov
+ecx, [esp + x] ; and ecx, 0xff`. A byte member read that VC6 keeps in `bl`
+as a common subexpression, with no named local, is widened in registers:
+`mov ecx, ebx ; and ecx, 0xff`. In the probes, `(c & 0xff)`, `(unsigned
+int)c`, `int ci = c`, `d = c; d -= b`, `const` or a late assignment of `c`
+all keep the stack route. The member read `t->p` used for the difference and
+the byte compares gives the register route. An `unsigned short` local is
+widened in registers (`mov eax, ebx ; and eax, 0xffff`).
+
+**Recomputing a difference (strong inference from one row):** when the
+later use of `c - b` is written with the member read (`c - s->p`, with `b
+= s->p`), VC6 does not reuse the first difference. It negates the tested
+difference in place (`test eax, eax ; jge ; neg eax`) and recomputes `sub
+ecx, edi` for the later expression. With `c - b` written both times, it
+keeps the first difference in a stack slot instead.
+
+Example: KrustyBike `0x00493660` (physics). Retail recomputes `c - b` in
+the pose lerps. Writing the lerps with the member read also moves the
+function's constant registers to retail's (1 in `ebp` from the second
+SetAxesPtr call, 0 in `edi` up to the pose section, no zero register in the
+tail). It raised the aligned count from 2052 to 2183 instructions. Retail
+widens the byte in registers. The no-local form gives that widening, but it
+returns the constant registers to the old allocation (aligned 2090), so the
+row keeps the local.
 
 ## Reproduction
 
