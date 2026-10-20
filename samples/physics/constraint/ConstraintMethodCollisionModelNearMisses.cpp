@@ -69,22 +69,13 @@ static inline float ConDot(const ConVec3& a, const ConVec3& b)
     return (a.x * b.x + a.y * b.y) + a.z * b.z;
 }
 
-// ConCross with each row's first product parenthesised, and the second product of the x
-// and y rows too: the extra nodes move the copy of rl (the WorldToLocalDirection result)
-// ahead of the cross's subtractions and the vLin add, as retail schedules vA = vLin + wA x rA.
-static inline ConVec3 ConCrossGrouped(const ConVec3& a, const ConVec3& b)
-{
-    ConVec3 r;
-    r.x = (a.y * b.z) - (a.z * b.y);
-    r.y = (a.z * b.x) - (a.x * b.z);
-    r.z = (a.x * b.y) - a.y * b.x;
-    return r;
-}
-
-// ConCross with every product parenthesised (d3dvec's CrossProduct spelling), for termA's
-// rl x nl: the extra nodes move the `test edi, edi` of `if (other)` up into termA's rotation,
-// three instructions from retail's position (2499 -> 2515). A scheduling tie-break: every
-// form with four or six parenthesised products gives these bytes; none, one, two, three or
+// ConCross with every product parenthesised (d3dvec's CrossProduct spelling), for vA's
+// wA x rA and termA's rl x nl. At wA x rA the extra nodes move the copy of rl (the
+// WorldToLocalDirection result) ahead of the cross's subtractions and the vLin add, as retail
+// schedules vA = vLin + wA x rA (2471 -> 2499; the form with the z row's second product bare
+// gives the same bytes). At rl x nl they move the `test edi, edi` of `if (other)` up into
+// termA's rotation, three instructions from retail's position (2499 -> 2515); there every
+// form with four or six parenthesised products gives these bytes, none, one, two, three or
 // five give 2495..2511.
 static inline ConVec3 ConCrossParen(const ConVec3& a, const ConVec3& b)
 {
@@ -121,7 +112,7 @@ static inline float ConDotGroupedY(const ConVec3& a, const ConVec3& b)
 // The frame (0xb8) and its slot order match, as do the call sequence and every operand.
 // Session 14: termB's dot through ConDotGroupedY (y product parenthesised) makes VC6
 // accumulate it in the cross product's y register as retail does (removes the extra
-// fstp st(2), the old 2-byte size gap; 1570 -> 2471), and vA's cross through ConCrossGrouped
+// fstp st(2), the old 2-byte size gap; 1570 -> 2471), and vA's cross through ConCrossParen
 // moves the rl copy ahead of the subtractions (2471 -> 2499). What still differs:
 //  - the copy of the LocalToWorldPoint result is interleaved with the a + b adds differently
 //    (0x43beb4..0x43bf02);
@@ -161,7 +152,7 @@ void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t
     contactPoint = b;
     ConVec3 rl = body->node->WorldToLocalDirection(rA);
     ConVec3 nl = body->node->WorldToLocalDirection(c);
-    ConVec3 vA = ConAdd(vLin, ConCrossGrouped(wA, rA));
+    ConVec3 vA = ConAdd(vLin, ConCrossParen(wA, rA));
     ConVec3 vB;
     ConVec3 rB;
     if (!other) {
