@@ -233,7 +233,7 @@ void UnknownEngineGearbox::AutoShift(int arg0, float arg1)
 
 // 0x004d31b0
 void UnknownEngineGearbox::DriveForce(float speedRatio, const Vector3* direction, float scale,
-                                                 bool reversing, float reverseForce, Vector3* force,
+                                                 char reversing, float reverseForce, Vector3* force,
                                                  float* magnitude)
 {
     if (driveCut) {

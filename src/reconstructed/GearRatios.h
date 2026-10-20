@@ -25,7 +25,7 @@ public:
     void UpdateThrottle(float dt, int engaged, unsigned char arg2);   // 0x004d2f50
     void AutoShift(int arg0, float arg1);                        // 0x004d3030
     // 0x004d31b0: drive force along `direction` and its magnitude.
-    void DriveForce(float speedRatio, const Vector3* direction, float scale, bool reversing,
+    void DriveForce(float speedRatio, const Vector3* direction, float scale, char reversing,
                                float reverseForce, Vector3* force, float* magnitude);
 
     // Curve lookups at the current rpm (field_0x04); inline in retail.

@@ -5,7 +5,7 @@
   "??_C@_0DA@BHHP@Unable?5to?5find?5optimum?5shift?5ran@": "0x005716c8",
   "?UpdateThrottle@UnknownEngineGearbox@@QAEXMHE@Z": "0x004d2f50",
   "?AutoShift@UnknownEngineGearbox@@QAEXHM@Z": "0x004d3030",
-  "?DriveForce@UnknownEngineGearbox@@QAEXMPBUVector3@@M_NMPAU2@PAM@Z": "0x004d31b0",
+  "?DriveForce@UnknownEngineGearbox@@QAEXMPBUVector3@@MDMPAU2@PAM@Z": "0x004d31b0",
   "_$E1": "0x004d3350",
   "_$E10": "0x004d3440",
   "_$E11": "0x004d3430",

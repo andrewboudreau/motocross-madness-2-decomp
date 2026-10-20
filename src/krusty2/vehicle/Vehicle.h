@@ -307,7 +307,7 @@ struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisiona
     int field_0x8c;
     int field_0x90;
     // 0x004d31b0: GearRatios.h UnknownEngineGearbox::DriveForce (the last argument is its float* magnitude).
-    void DriveForce(float speedRatio, Vec3* direction, float scale, bool reversing, float reverseForce,
+    void DriveForce(float speedRatio, Vec3* direction, float scale, char reversing, float reverseForce,
                     Vec3* force, Vec3* magnitude);
 };
 // The wheel's collision point (VehicleWheel+0xb8, the CollisionPoint base of Tire): only its
@@ -567,7 +567,7 @@ public:
     float steerInput;  // +0x474 slot 63: = -axis(0x4f8).value; slot 88 classifies it with 0x504.y into 8 stick sectors; slot 64 zeroes it when crashed
     bool throttleOn;  // +0x478  racesnd.cpp throttle-on flag (RaceView +0x478); Bike's gas gyro acts only while set
     bool driveDisengaged;                     // +0x479  slot 49: = no crash and (backingUp or slot 81); passed as the gearbox's driveCut, so DriveForce gives no engine torque; Bike's gas gyro and racesnd.cpp's engine channel test it (tier 2)
-    bool backingUp;                           // +0x47A  slot 49: = slot 82 (KrustyBike: forwardSpeed < 6 and the back-up input); DriveForce pushes backwards while set; KrustyBike slot 86 ramps that push off the BackUpBottom pose phase +0x664 (tier 2)
+    char backingUp;                           // +0x47A  slot 49: = slot 82 (truncated to a byte) (KrustyBike: forwardSpeed < 6 and the back-up input); DriveForce pushes backwards while set; KrustyBike slot 86 ramps that push off the BackUpBottom pose phase +0x664 (tier 2)
     char pad_0x47B[0x1];
     VehicleSteerState* steerState;  // +0x47c VehicleSteerState*: node plus steer angle; slots 53/60/73/36 use it
     VehicleSpeedState* engineState;  // +0x480 VehicleSpeedState*: 6-entry per-gear tables, advanced by UpdateThrottle/AutoShift with throttle/brake flags and speed in slot 49 (provisional)

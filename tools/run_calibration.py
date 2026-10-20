@@ -17872,7 +17872,7 @@ CASES = [
         'name': 'GearRatios gearbox drive force',
         'bindings': 'src/reconstructed/GearRatios.bindings.json',
         'source': 'src/reconstructed/GearRatios.cpp',
-        'symbol': '?DriveForce@UnknownEngineGearbox@@QAEXMPBUVector3@@M_NMPAU2@PAM@Z',
+        'symbol': '?DriveForce@UnknownEngineGearbox@@QAEXMPBUVector3@@MDMPAU2@PAM@Z',
         'target_va': '0x004d31b0',
         'target_size': 388,
         'reason': 'reads unit zero vector 0x689a88; called from 0x491c26/0x529c03',
