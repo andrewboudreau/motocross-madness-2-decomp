@@ -39,14 +39,23 @@
 // function-local statics, as are the three vectors 0x0057eef8,
 // 0x0057ef38 and 0x0057eee8 (guard 0x0057ef24 bits 1, 2, 4) whose type has
 // an empty destructor: their atexit entries are the `ret` stubs
-// 0x00442f60, 0x00442f50 and 0x00442f40. Same structure (1894 of 1893
-// instructions, 525 differing, 7860 bytes): the three mode 8 and mode 2
+// 0x00442f60, 0x00442f50 and 0x00442f40. Same structure (1891 of 1893
+// instructions, 495 differing, 7812 bytes): the three mode 8 and mode 2
 // normalisations return through the out-of-line Vector3 constructor
 // 0x00404e60 as retail does (Vector3Call; the inline budget, with the
-// constructor expanded in the mode 5 and 6 normalisations). Left: retail's
-// frame is 0x9e8 (ours 0x940) with temporaries the source does not have yet
-// (mode 2 reads the vertex's y and z through a stack copy; a named copy
-// also copies x, 542 differing), and register allocation differs.
+// constructor expanded in the mode 5 and 6 normalisations). Mode 5's
+// `lines` has 8 entries (4 used): retail leaves 0x80 bytes after it that
+// nothing touches, and with 8 entries circle, ring, identity and line all
+// sit 0x40 below their retail slots (tools/frame_layout.py). Sweeping 13
+// choice points (8192 forms; insn diffs 507 to 495, aligned 1386 to 1398)
+// kept identity(r, c) stores, a reference to the light position and a
+// separate normalisation in mode 3. Left: retail's frame is 0x9e8 (ours
+// 0x9a8) with temporaries the source does not have yet (mode 2 reads the
+// vertex's y and z through a stack copy, x straight from the vertex; a
+// named copy, a copy constructor, a by-value difference and three-float
+// constructor forms all copy x too), `this` is in esi where ours is in
+// ebx, and the identity diagonal is stored from m[3][3] down (every order
+// and spelling of the four stores is emitted from m[0][0] up).
 // The mode 5 source keeps two retail bugs: `circle[i + 1]` reads past the
 // 16 points, and the group loop indexes with the restore loop's `k`.
 //
@@ -264,10 +273,10 @@ void D3DIMSoultreeObject::DrawCurrentLod()
         TransformVertexGroups(-1);
     Matrix4 identity;
     memset(&identity, 0, sizeof(identity));
-    identity.m[0][0] = 1.0f;
-    identity.m[1][1] = 1.0f;
-    identity.m[2][2] = 1.0f;
-    identity.m[3][3] = 1.0f;
+    identity(0, 0) = 1.0f;
+    identity(1, 1) = 1.0f;
+    identity(2, 2) = 1.0f;
+    identity(3, 3) = 1.0f;
     ((RenderTarget*)renderContext)->currentCamera->SetWorldMatrix(&identity);
     int savedCull;
     int savedShade;
@@ -324,13 +333,14 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 LightEmitter* light = FindLight(lights);
                 if (!light)
                     break;
-                Vector3 lightPosition = light->lightPosition;
+                const Vector3& lightPosition = light->lightPosition;
                 for (int j = 0; j < surface->groupCount; j++) {
                     UnknownSoultreeFaceGroup* group = &surface->groups[j];
                     int vertices = group->vertexCount;
                     Vector3 position;
                     ((UnknownSoultreeNodeView*)group->node)->GetPositionIn(0, &position);
-                    Vector3 direction = NormalizedByCall(position - lightPosition);
+                    Vector3 direction = position - lightPosition;
+                    direction = NormalizedByCall(direction);
                     direction = ((UnknownSoultreeNodeView*)group->node)->WorldToLocalDirection(&direction);
                     for (int v = 0; v < vertices; v++) {
                         group->sourceVertices[v].tu =
@@ -477,7 +487,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     (Vector3&)viewDirection = ((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewDirection;
                     (Vector3&)viewPosition = ((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position;
                 }
-                UnknownSoultreeVertex lines[4];
+                UnknownSoultreeVertex lines[8];          // 4 used; the frame has 8
                 for (i = 0; i < 4; i++) {
                     lines[i].diffuse = 0xffff0000;
                     lines[i].specular = 0xff000000;
