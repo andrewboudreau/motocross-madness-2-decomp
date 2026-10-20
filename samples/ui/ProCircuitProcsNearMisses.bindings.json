@@ -351,7 +351,7 @@
   "_fclose": "0x00534c3d",
   "_fopen": "0x00534ceb",
   "_kVec3XAxis": "0x00689ad8",
-  "_kVec3YAxis": "0x00689ae8",
+  "_kVec3YAxis": "0x00689b28",
   "_kVec3ZAxis": "0x00689ab8",
   "_kVec3Zero": "0x00689ac8",
   "_qsort": "0x00534426",

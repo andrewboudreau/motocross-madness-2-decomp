@@ -47,9 +47,12 @@
 //   but not its registers (135-141); `int fee = entryFee = ...` chains and
 //   member-only arithmetic give 225. Loading debt after fee or cash gives
 //   1048-1054.
-// PCCentralBikeRiderDlg::Tick (0x004d72c0, 1291 bytes, 1233
+// PCCentralBikeRiderDlg::Tick (0x004d72c0, 1291 bytes, 1237
 //   match): as SPBikeRiderDlg slot 10 (DlgProcsNearMisses.cpp), only the
 //   scheduling of the by-value Vector3 copies for the camera call differs.
+//   kVec3YAxis is this unit's own copy at 0x00689b28 (ProCircuitProcs.cpp's
+//   `$E` vector, as in the canonical bindings); the sample had bound
+//   ProCircuit.cpp's 0x00689ae8 (1125).
 
 #include "../../src/reconstructed/ProCircuitProcs.cpp"
 
