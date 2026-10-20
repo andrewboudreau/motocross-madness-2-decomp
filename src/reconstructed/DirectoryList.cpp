@@ -203,6 +203,18 @@ int DirectoryList::CurrentName(char* name) {
     return 1;
 }
 
+// 0x0044a600
+int DirectoryList::IsListed(const char* name, unsigned int attributes) {
+    if (!_stricmp("", name) || !_stricmp(".", name) || !_stricmp("..", name))
+        return 0;
+    if (!includeFiles) {
+        if (attributes & FILE_ATTRIBUTE_DIRECTORY)
+            return 1;
+        return 0;
+    }
+    return 1;
+}
+
 // 0x0044a670
 int DirectoryList::Scan() {
     char search[MAX_PATH];

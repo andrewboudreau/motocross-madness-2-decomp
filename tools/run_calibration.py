@@ -7681,6 +7681,15 @@ CASES = [
         'reason': '_splitpath of the current entry',
     },
     {
+        'name': 'dirlist.cpp DirectoryList found-file filter 0x44a600',
+        'bindings': 'src/reconstructed/DirectoryList.bindings.json',
+        'source': 'src/reconstructed/DirectoryList.cpp',
+        'symbol': '?IsListed@DirectoryList@@QAEHPBDI@Z',
+        'target_va': '0x0044a600',
+        'target_size': 109,
+        'reason': 'skips "", "." and ".."; directories only unless +0x218 is set',
+    },
+    {
         'name': 'dirlist.cpp DirectoryList slot 1 0x44a670',
         'bindings': 'src/reconstructed/DirectoryList.bindings.json',
         'source': 'src/reconstructed/DirectoryList.cpp',
