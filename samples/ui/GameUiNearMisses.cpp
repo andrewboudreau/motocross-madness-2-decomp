@@ -131,6 +131,11 @@
 //   instruction references and no source form reproduces (locals used only
 //   in dead code get no slot). The jump table makes ckm report an unresolved
 //   $L label; compare with sdiff.
+//   Session 14 probes (0x80-byte buffers): a buffer used only under a local
+//   flag that is always 0, a `const int` flag, a loop that never runs, an
+//   inline expansion whose condition is a constant 0 argument, a dead
+//   pointer to it or `sizeof` gets no slot. A condition VC6 cannot fold
+//   (`n > 3 && n < 2`) keeps both the slot and the code.
 
 #include "../../src/reconstructed/GameUi.cpp"
 

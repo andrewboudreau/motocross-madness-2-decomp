@@ -11,6 +11,7 @@
 // not change it.
 // Session 14: `if (scale)`, `scale != 0` and a `!= 0` load test are inert
 // (872); `else scale = 0` instead of the leading store is worse (363).
+// Compiled inside src/reconstructed/KrustyUI.cpp it is unchanged (872).
 //
 #include <stdio.h>
 #include <stdlib.h>
