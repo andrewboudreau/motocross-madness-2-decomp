@@ -16,7 +16,7 @@
     "target_va": "0x0040e510",
     "target_size": 1936,
     "expect": "partial",
-    "notes": "AI path steering direction; full control flow and arithmetic reconstructed (1944 vs 1936 bytes). Retail allocates path=esi/best=edi (swapped here) and a different frame slot order for the Vec3 temporaries; see the file header.",
+    "notes": "AI path steering direction; full control flow and arithmetic reconstructed, 1931 vs 1936 bytes, 1422 strict positions. A separate walk index gives retail's path=esi/index=edi, the perpendiculars are built component-wise and the final parameter is assigned inside the scale; only the frame slots of the segment/perpendicular temporaries and the walk direction differ; see the file header.",
     "bindings": "BikeAINearMisses.bindings.json"
   },
   {
@@ -66,7 +66,7 @@
     "target_va": "0x00414370",
     "target_size": 4802,
     "expect": "partial",
-    "notes": "8.5% (4678 vs 4802 bytes, 394 strict positions). KrustyBike racing-line builder (slot 63 calls it), emitted in BikeAI.cpp: by race kind the track path search (Track 0x5179f0/0x517ea0/0x518080, respawn after 5 s off the track), the gate line (kinds 1/5) or a random free-roam target, then target speed, AI speed class and the airborne trick pick (0x48d780/0x48d910). Block order and calls match; frame 0x74 vs 0x78 (retail spills the difficulty), and in kinds 1/5 retail places the gate-distance test before the single-point and no-track paths. See the file section.",
+    "notes": "8.8% (4677 vs 4802 bytes, 424 strict positions; the gate-distance tail compares against the speed slot (retail `fcomp [esp+0x1c]` after its push), the three point loops are top-tested like retail's `cmp i, count; jge exit` heads: `while (1)`/`for (i = 0;;)` with the count test as a leading break and i++ before the t step). KrustyBike racing-line builder (slot 63 calls it), emitted in BikeAI.cpp: by race kind the track path search (Track 0x5179f0/0x517ea0/0x518080, respawn after 5 s off the track), the gate line (kinds 1/5) or a random free-roam target, then target speed, AI speed class and the airborne trick pick (0x48d780/0x48d910). Block order and calls match; frame 0x74 vs 0x78 (retail spills the difficulty), and in kinds 1/5 retail places the gate-distance test before the single-point and no-track paths. See the file section.",
     "bindings": "BikeAINearMisses.bindings.json"
   }
 ]

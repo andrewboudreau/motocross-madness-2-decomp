@@ -495,6 +495,10 @@ trying on other `[base+index]` / `add r, r` order near misses.
   `int i = 0; if (n > 0) do { ... } while (++i < n);`. `for` and `while` loops, with or
   without `break`/`goto`, are rotated. (`while (1) { if (done) break; ... }` keeps a
   top-tested loop instead, see FontTexture.)
+  A loop with a count test at the head and a different exit test at the bottom
+  (`cmp i, count; jge exit` at the top, `fcomp t, limit` as the back edge) is
+  `while (1) { if (i >= count) break; ...; i++; t += step; if (t > limit) break; }`;
+  `for (i = 0; i < count && ...; i++)` rotates it (KrustyBike `0x00414370`, +28).
 - A trailing `return X;` after an if-block merges with an earlier identical return, so
   failure paths jump back to it; `goto failed` or an early return emits a second copy.
 - A helper written as a macro reproduces retail's address recomputation where the same
@@ -672,6 +676,11 @@ without effect, as noted.
   ebx (Parameterblocks `0x004b7220`). Copying a member read into a named local before
   a compare inside a loop swaps the esi/edi assignment of loop-invariant parameters
   (UIDialog::EnableGroup `0x0046ea80`).
+  Splitting one index variable into two that are joined by a copy
+  (`int index = best;` before a second loop that only advances `index`) gives
+  each its own priority: in BikeAI PathSteeringDirection `0x0040e510` it moved the
+  path pointer to esi and the index to edi like retail (68 -> 17 differing
+  instructions, the copy is coalesced and emits nothing).
 - **Store order of a local struct.** The order of field stores picks the registers
   of later vtable/address temporaries: UIDialog slot 28 `0x0046e8c0` matched one of
   1680 orders.
