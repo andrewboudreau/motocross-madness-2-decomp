@@ -10,22 +10,23 @@
 // count-down x loop do not change it (declaring `bottom` before `top`
 // gives 64 of 636 strict but more masked differences).
 //
-// Halve1555 (0x004ce420, 456 bytes; candidate 448): the 1555
+// Halve1555 (0x004ce420, 456 bytes; candidate 458, 280 strict): the 1555
 // halver behind 0x004d0170. The arithmetic, the >= 2 test and the packing
-// match. Retail loads the two lower-row pixels before the first test and
-// keeps them in frame slots (a 0x10-byte frame); VC6 here loads each where
-// it is first tested (0x8 frame). Locals in every declaration order, a
-// lower-row pointer, function-scope pixels, a 1555 bitfield struct and
-// direct indexing do not keep them. Reading the upper pair in place as
-// top[0]/top[1] loads pixel1 at its test as retail does but still not the
-// lower pair early (fewer differing instructions, fewer strict bytes);
-// pixel1 alone in place, interleaved declarations and the lower pair
-// declared first are worse.
-// Session 10: retail reuses dx for pixel0 and pixel1; one reused `pixel`
-// variable for the upper pair gives that (40 differing instructions, 40
-// bytes) but still loads the lower pair at its tests; an inline by-value
-// AddPixel1555 helper for all four pixels compiles as the form here, and
-// with the upper pair read in place it is further off (28).
+// match. Retail reads the lower pair into locals before the first test and
+// keeps them in frame slots (0x10 frame), and reuses one `pixel` variable
+// for the upper pair (read in place, both in dx): declaring the lower pair
+// and the reused pixel after the accumulators gives that (55 -> 246), and
+// `*to++ =` in both arms instead of `to++` in the x loop increment gives
+// retail's shared `add eax, 2` tail (280). Still differs: VC6 here loads
+// `source` into ebp at entry (so ebp is pushed before the height guard and
+// popped last) and computes the next source row in ebp, where retail uses
+// eax and copies it to ebp at the row head; the first opaque pixel's
+// zero-extended value is formed in ecx (retail: in blue's edi). All 24
+// accumulator orders, the row/pointer declaration orders, char/int row
+// pointers, for-init pointers, count-down loops, the first arm's statement
+// orders (48), pixel types and 1..33 dead locals leave it at 280 or worse;
+// earlier: every pixel declaration order, a lower-row pointer, a 1555
+// bitfield struct and an inline AddPixel1555 helper.
 //
 // Halve8 (0x004cee30, 1133 bytes; candidate 1133, 1121 of 1125 masked
 // bytes, 1129 of 1133 strict): the palette-index halver. The search for the magenta entry, both
@@ -161,26 +162,26 @@ int Halve1555(void* destination, void* source, int width, int height, int destin
     for (int y = 0; y < height; y++) {
         unsigned short* top = sourceRow;
         unsigned short* to = row;
-        for (int x = 0; x < width; x++, to++, top += 2) {
-            unsigned short pixel0 = top[0];
-            unsigned short pixel1 = top[1];
-            unsigned short pixel2 = top[sourceStride];
-            unsigned short pixel3 = top[sourceStride + 1];
+        for (int x = 0; x < width; x++, top += 2) {
             int count = 0;
             int red = 0;
             int green = 0;
             int blue = 0;
-            if (pixel0 & 0x8000) {
-                red += (pixel0 >> 7) & 0xf8;
-                green += (pixel0 >> 2) & 0xf8;
-                blue += (pixel0 & 0x1f) << 3;
+            unsigned short pixel = top[0];
+            unsigned short pixel2 = top[sourceStride];
+            unsigned short pixel3 = top[sourceStride + 1];
+            if (pixel & 0x8000) {
+                red += (pixel >> 7) & 0xf8;
+                green += (pixel >> 2) & 0xf8;
+                blue += (pixel & 0x1f) << 3;
                 count++;
             }
 
-            if (pixel1 & 0x8000) {
-                red += (pixel1 >> 7) & 0xf8;
-                green += (pixel1 >> 2) & 0xf8;
-                blue += (pixel1 & 0x1f) << 3;
+            pixel = top[1];
+            if (pixel & 0x8000) {
+                red += (pixel >> 7) & 0xf8;
+                green += (pixel >> 2) & 0xf8;
+                blue += (pixel & 0x1f) << 3;
                 count++;
             }
             if (pixel2 & 0x8000) {
@@ -199,9 +200,9 @@ int Halve1555(void* destination, void* source, int width, int height, int destin
                 red = (red + count * 4) / count;
                 green = (green + count * 4) / count;
                 blue = (blue + count * 4) / count;
-                *to = 0x8000 | ((red >> 3) << 10) | ((green >> 3) << 5) | (blue >> 3);
+                *to++ = 0x8000 | ((red >> 3) << 10) | ((green >> 3) << 5) | (blue >> 3);
             } else {
-                *to = 0;
+                *to++ = 0;
             }
         }
         sourceRow += sourceStride * 2;
