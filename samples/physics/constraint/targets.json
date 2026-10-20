@@ -46,7 +46,7 @@
     "target_va": "0x43bdb0",
     "target_size": 2619,
     "expect": "partial",
-    "notes": "impulse solver, near miss 1570/2619 strict (candidate 2621 bytes, alignment 0.962). Fully decoded (see the source note): frame 0xb8 and slot order match; termB (the other-body branch) forms its cross/dot in a different x87 register order (2 extra bytes), plus local scheduling differences of three struct copies and one test.",
+    "notes": "impulse solver, near miss 2499/2619 strict (candidate size exact). Fully decoded (see the source note): frame 0xb8 and slot order match; termB's dot and vA's cross use grouped helpers; what remains is the scheduling of the LocalToWorldPoint and rl struct copies, one dword move, the test of if (other) and one fld/fmul order in termB's cross.",
     "bindings": "ConstraintMethodCollisionModelNearMisses.bindings.json"
   }
 ]

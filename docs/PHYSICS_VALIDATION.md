@@ -134,7 +134,7 @@ Both units moved from `samples/physics/` to `src/krusty2/`:
   registered. Slot 11 `0x43ba70` is exact with the refresh and the push-out as
   two `if` statements, the probe-loop locals declared in the ground-query block
   and parenthesised offset products.
-- ApplyContactImpulse `0x43bdb0` stays a near miss (1570/2619) in
+- ApplyContactImpulse `0x43bdb0` stays a near miss (2499/2619) in
   `samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp`. It is
   fully decoded; the frame and slot order match.
 

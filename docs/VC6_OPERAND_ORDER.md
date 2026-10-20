@@ -887,3 +887,10 @@ try on similar code. None is a rule.
   same function, `a.z * b.z + (a.x * b.x + (a.y * b.y))` keeps the `mov [dst+8], eax`
   copy of the preceding cross's z after the first `faddp`, as retail does at three
   dot tests. The unparenthesised form stores it before the `faddp`.
+- **Grouping a dot's y product picks the accumulator register.** ConstraintMethodCollisionModel
+  ApplyContactImpulse (`0x0043bdb0`, 1570 to 2471 of 2619): with `(a.x*b.x + (a.y*b.y)) + a.z*b.z`
+  over a cross temporary, VC6 sums in the cross's y register (`fld c.y; fmulp st(2)`) as
+  retail does and drops a trailing `fstp st(2)` (the 2-byte size gap). The ungrouped dot and
+  every operand or term order (session 12) gave the same bytes. Parenthesising the first
+  product of each cross row, and the second of the x and y rows, then moves an
+  interleaved struct copy ahead of the subtractions (2471 to 2499).

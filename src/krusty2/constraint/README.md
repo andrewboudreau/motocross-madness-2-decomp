@@ -22,7 +22,7 @@ Functions (all in the extent)
   `0x0043b980`, slot 8 `0x0043b9a0`, SetBody `0x0043b9e0`, slot 10 `0x0043ba40`, slot 11 `0x0043ba70`,
   AddProbePoint `0x0043c7f0`, slot 14 `0x0043c880`, the eight `$E` functions `0x0043c8e0..0x0043c9e0`.
   The primary slot 2 target `0x0044d710` is the bare `ret` shared by six vtables; it lies outside the extent.
-- Near miss: ApplyContactImpulse `0x0043bdb0` (1570/2619 strict; the source note lists what differs and the forms
+- Near miss: ApplyContactImpulse `0x0043bdb0` (2499/2619 strict; the source note lists what differs and the forms
   tried).
 - Out-of-line copies of header inline vector operators, called by ApplyContactImpulse and emitted with this
   unit: `v / s` at `0x0043c890` (between slot 14 and the `$E` set) and the 3x3 row-vector rotation at
