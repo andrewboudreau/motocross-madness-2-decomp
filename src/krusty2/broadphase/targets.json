@@ -246,7 +246,7 @@
     "target_va": "0x004dcf20",
     "target_size": 331,
     "expect": "partial",
-    "notes": "182/331. Retail keeps i and cell in memory; VC6 here caches them in edi/edx. See the comment above Remove in Quadtree.cpp.",
+    "notes": "182/331. Retail keeps i and cell in memory; VC6 here caches them in edi/edx. See the comment above Remove in Quadtree.cpp. Session 14: the found flag folded into the RemoveObject test, the removal nested under if (found), and a flagless inner loop that leaves node null are the same or worse (182, 182, 163).",
     "bindings": "Quadtree.bindings.json"
   },
   {
