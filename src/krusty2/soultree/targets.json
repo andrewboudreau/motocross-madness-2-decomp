@@ -4,7 +4,7 @@
     "target_va": "0x00500220",
     "target_size": 639,
     "expect": "partial",
-    "notes": "Partial (~44% bytewise, 647 vs 639 bytes). Contact impulse helper called by slot 3. Dot (SoultreeDot), both cross products, numerator/denominator order, the scale branch and velocity update match instruction-for-instruction; remaining differences are stack-slot assignment (retail gives the WorldToLocal result the 0x10 slot and the I^-1 product the cross-temp slot; VC6 here swaps them), operand load order in the first cross product (x and z terms), and the angular tail (retail copies j*scaled through a temporary). Twelfth argument is a float that slot 3 forwards as int a6.",
+    "notes": "541/639 strict, size exact (session 14; was 286/639 at 647 bytes). Levers: SoultreeDot(c, *normal) for the denominator (retail adds (x + y) + z), member-wise scaled.x = local.x * invInertia->x (the Vec3 constructor form is 4 bytes longer), SoultreeCross for the axis (CrossProduct/SoultreeCrossCtor 453, explicit component forms 102). Remaining: retail gives the WorldToLocal result the lower slot and scaled the higher one (VC6 here swaps them, and the impulse temporaries that reuse them follow); declaration order, block scope and hoisting impulse do not move them. The axis x term loads arm->y first in retail. Twelfth argument is a float that slot 3 forwards as int a6.",
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
     "bindings": "SoulTreePhysics.bindings.json"

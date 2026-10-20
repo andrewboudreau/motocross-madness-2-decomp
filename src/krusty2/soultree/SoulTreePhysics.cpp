@@ -1371,6 +1371,8 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
 // body-space angular velocity gains I^-1 (arm x n) * j, scaled per axis by *angScale.
 // Slot 3 passes field_0x14c, field_0x24, field_0x08, &field_0xe4 (body-space inverse
 // inertia diagonal), &field_0xd8 and &field_0x64.
+// Matching levers (541/639, size exact): the denominator dot is SoultreeDot (retail sums
+// (x + y) + z), and `scaled` is assigned member-wise; the constructor form costs 4 bytes.
 void ResolveContactImpulse(float restitution, float invMass, SoultreeObject* node, const Vec3* normal,
                const Vec3* relVel, const Vec3* arm, Vec3* invInertia, const Vec3* angScale,
                Vec3* angVel, Vec3* velocity, float* impulseOut, int scaleBits)
@@ -1380,12 +1382,15 @@ void ResolveContactImpulse(float restitution, float invMass, SoultreeObject* nod
     float scale = *(float*)&scaleBits;
     float approach = SoultreeDot(*relVel, *normal);
     if (approach < 0.0) {
-        Vec3 axis = CrossProduct(*arm, *normal);
+        Vec3 axis = SoultreeCross(*arm, *normal);
         Vec3 local = node->WorldToLocalDirection(axis);
-        Vec3 scaled(local.x * invInertia->x, local.y * invInertia->y, local.z * invInertia->z);
+        Vec3 scaled;
+        scaled.x = local.x * invInertia->x;
+        scaled.y = local.y * invInertia->y;
+        scaled.z = local.z * invInertia->z;
         Vec3 world = node->LocalToWorldDirection(scaled);
         Vec3 c = CrossProduct(world, *arm);
-        float j = ((restitution + 1.0f) * -approach) / (DotProduct(c, *normal) + invMass);
+        float j = ((restitution + 1.0f) * -approach) / (SoultreeDot(c, *normal) + invMass);
         *impulseOut = j;
         Vec3 impulse;
         if (scale != 0.0f)

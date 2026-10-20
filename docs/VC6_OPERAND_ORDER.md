@@ -923,6 +923,10 @@ try on similar code. None is a rule.
   by-value `Scale3(v, s)` helper (assigning a fresh `r`, assigning `v` in place, or
   returning a constructor), scalar `tx/ty/tz` locals and explicit cross components all
   consume the products in place (919 bytes).
+  In the same TU, ResolveContactImpulse `0x00500220` (286 -> 541 of 639, size exact) needs
+  the opposite for a product that is stored and passed by address: member-wise
+  `scaled.x = local.x * invInertia->x; ...` instead of `Vec3 scaled(...)` (4 bytes
+  shorter), plus `SoultreeDot` (`z + (x + y)`) for a dot that retail sums `(x + y) + z`.
 - **One reused function-scope Vec3 packs successive temporaries into one slot.** Bike
   slot 38 (`0x00405190`, frame 0xb8 to 0xac, aligned 683 to 688): retail's copy of
   `worldAngularVelocity`, and the sum it passes by address to slot 3, share the slot of an
