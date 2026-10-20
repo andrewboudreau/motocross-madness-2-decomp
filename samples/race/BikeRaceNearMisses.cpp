@@ -138,12 +138,18 @@
 // network, ghost and AI racer is held in a local from its new until Load
 // (retail calls Load with mov ecx, eax or edi instead of reloading the slot),
 // and the remote player's setup.weight is stored before its path sprintf.
-// That makes the candidate retail's length with 195 calls in retail's
-// order. Left: a few register choices near the start (0x419b0d, 0x419b39,
-// 0x419bf0), the event AI copy (retail [base + n*0xcc] against our
-// [n*0xcc + base]) and its UI else branch (retail loads ui->bikes before
-// bikes[n]) at 0x41bcf5-0x41bd56, the small scalar slots below 0x6c and
-// bikeFile/riderFile (swapped), so 13069 of 13428 bytes match.
+// The two network player loops share one block-level `k` for their preset
+// curve copies; with a `for (int k` in each, VC6 allocates the later event
+// AI copy differently (retail [base + n*0xcc], ours was [n*0xcc + base], and
+// its UI else branch loaded bikes[n] before ui->bikes). That makes the
+// candidate retail's code apart from three register choices near the start
+// (0x419b0d, 0x419b39, 0x419bf0). Left are frame slots: the scalars below
+// 0x6c, bikeTexture/riderTexture and ownBikeTexture/ownRiderTexture (each
+// pair swapped; their use counts tie), so 13100 of 13428 bytes match.
+// Measured but not kept: one function-level `i` for both network loops puts
+// i, recordIndex, position, direction and bike/riderTexture in retail's
+// slots but moves up/plate/fromEvent/riders (12792), and a char[2][0x40]
+// for the own textures fixes bike/riderTexture but swaps the recorded pair.
 
 #include "../../src/reconstructed/BikeRace.cpp"
 
@@ -1231,6 +1237,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         // AI racers of other hosts.
         playerId = g_TrackGame->network->localPlayer;
         int i;
+        int k;
         for (i = 0; i < racerCount; i++) {
             if (GridPlayer(i).networkPlayerId == playerId && !GridPlayer(i).isAi) {
                 int j;
@@ -1302,7 +1309,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             int bikeClass = BikeClassOf(setup.engineSize);
             setup.rpmLowerLimit = g_TrackGame->ui->rpmLowerLimit[bikeClass];
             setup.rpmUpperLimit = g_TrackGame->ui->rpmUpperLimit[bikeClass];
-            for (int k = 0; k < 11; k++)
+            for (k = 0; k < 11; k++)
                 setup.presetCurve[k] = g_TrackGame->ui->standardCurves[bikeClass][0][k];
             setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
             setup.weight = g_TrackGame->ui->weight[bikeClass];
@@ -1355,7 +1362,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             int bikeClass = BikeClassOf(setup.engineSize);
             setup.rpmLowerLimit = g_TrackGame->ui->rpmLowerLimit[bikeClass];
             setup.rpmUpperLimit = g_TrackGame->ui->rpmUpperLimit[bikeClass];
-            for (int k = 0; k < 11; k++)
+            for (k = 0; k < 11; k++)
                 setup.presetCurve[k] = g_TrackGame->ui->standardCurves[bikeClass][0][k];
             setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
             setup.weight = g_TrackGame->ui->weight[bikeClass];
