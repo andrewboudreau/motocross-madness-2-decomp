@@ -187,11 +187,9 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
                        int quality, int field0xc40, const char* textureName, int halfFormat)
 {
     GameObject::SetRenderContext(host);
-    surfaceDesc = *desc;
     int surfaceFlags = halfFormat ? 8 : 0;
-    g_pTerrainQualityTable = g_terrainQualityHardware;
-    if (!g_terrainGame->softwareRendering)
-        g_pTerrainQualityTable = g_terrainQualitySoftware;
+    surfaceDesc = *desc;
+    g_pTerrainQualityTable = g_terrainGame->softwareRendering ? g_terrainQualityHardware : g_terrainQualitySoftware;
     SelectQuality(quality);
     if (field0xc40)
         hasLightManager = 1;
@@ -231,10 +229,12 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     {
         unsigned int key = detailAverageColor;
         unsigned int alpha = 0xff - (key >> 24);
+        unlitColor = RGBA_MAKE(alpha, alpha, alpha, 0xff);
         unsigned int keep = 0xff - alpha;
         unsigned int red = RGBA_GETRED(key) * keep / 0xff;
-        unlitColor = RGBA_MAKE(alpha, alpha, alpha, 0xff);
-        unlitSpecular = RGBA_MAKE(red, RGBA_GETGREEN(key) * keep / 0xff, RGBA_GETBLUE(key) * keep / 0xff, 0xff);
+        unsigned int green = RGBA_GETGREEN(key) * keep / 0xff;
+        unsigned int blue = RGBA_GETBLUE(key) * keep / 0xff;
+        unlitSpecular = RGBA_MAKE(red, green, blue, 0xff);
     }
     qualityParamA = 0x100;
 
@@ -273,13 +273,14 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     this->stream->Read(&ownedObjectCount, 4, 1);
     this->stream->Read(&surfaceRecords, 4, 1);
     this->stream->Seek(ownedObjectCount * 4, 1, 1);
-    int i;
-    for (i = 0; i < blockRecords; i++)
-        blocks[i] = new(__FILE__, 0x1ab) TerrainGridBlock(this->stream);
+    int b;
+    for (b = 0; b < blockRecords; b++)
+        blocks[b] = new(__FILE__, 0x1ab) TerrainGridBlock(this->stream);
 
     if (surfaceRecords) {
         int width;
-        for (i = 0; i < surfaceRecords; i++) {
+        BaseObject** slot = ownedObjects;
+        for (int i = 0; i < surfaceRecords; i++) {
             int height;
             int format;
             this->stream->Read(&width, 4, 1);
@@ -299,7 +300,7 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
                 if (statusFlags & 1)
                     surface->CreateTextureSurface(1, 0, 0);
             }
-            ownedObjects[i] = surface;
+            *slot++ = surface;
         }
         g_terrainTextureSize = width;
         g_terrainTextureShift = 0;
@@ -317,8 +318,8 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     ScaleTerrainVec3(boundsMax, gridCellSize);
     ScaleTerrainVec3(boundsMin, gridCellSize);
     if (heightField) {
-        int levels = heightField->level;
         int shift = heightField->gridShift;
+        int levels = heightField->level;
         if (levels > 0)
             shift -= levels * 4;
         invGridCellSize = 1.0f / ((float)(1 << shift) * gridCellSize);
