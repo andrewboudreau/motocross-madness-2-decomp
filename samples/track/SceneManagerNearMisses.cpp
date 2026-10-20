@@ -21,32 +21,22 @@
 // /vm* flags leave it.
 
 //
-// Scene::ReadAnimations (0x004edfe0, 5343 bytes): the "Animations"
-// reader. Code, calls, EH states, the error tails and the frame size
-// (0xcfc) line up except: (1) the frame slots of most scalars and of
-// `list`/`sltPath` (VC6 orders the frame by use, not declaration; the
-// arrays follow retail once `dot` reuses `automatic` and the random-set loop
-// reuses `i`); (2) the "NumberOfMotions" test keeps the count in a register
-// for the allocation (retail compares memory against esi and reloads it;
-// 4 test and 5 count spellings, including pointer arithmetic, an
-// `operator new` call and an unsigned count, give identical bytes; inline
-// count helpers are transparent too). Reading the count through a table
-// local inside the block gives retail's copy of the entries pointer, reload
-// and `shl eax, 2` (4372 -> 4393) and removes the 1-byte shift there; retail
-// still encodes both operands as [ebx + reg] where VC6 here writes
-// [reg + ebx], and a local for the test as well is CSE'd with it);
-// (3) the "Cannot find %s" errors share one sprintf tail where retail keeps
-// two (VUE/SLT and MCF/MotionToPlay/RandomSet); (4) the random-set loop end
-// loads in a different order. 4393 of 5346 compared positions.
-// Session 14: from the random-set block on, retail's scratch registers
-// start one step later (the RandomSet error loads scenePath/setName/message
-// into edx/eax/ecx, here ecx/edx/eax), which is what keeps that error's
-// sprintf apart from the Invalid-motion one; at the loop end retail steps
-// the entries[i] offset in ebx ([esp+0x18]), VC6 here in edx ([esp+0x14]).
-// The [reg + reg] operand
-// order is not a source property: `automatic + token + 1`,
-// `&token[automatic + 1]`, `token + (automatic + 1)` and
-// `*(automatic + token) = 0` give identical bytes (4393).
+// Scene::ReadAnimations (0x004edfe0, 5335 bytes): the "Animations"
+// reader. Instruction count (1479), calls, EH states and every error tail
+// match. The random-set loop counts with `i++` and prints `i + 1` (no
+// `next` temporary), and the strcspn result is its own block-local `dot`:
+// that loop then keeps retail's strength-reduced entries offset in ebx,
+// stores/reloads `dot` around strlen and stores an immediate 0 at
+// token[dot], and the "Cannot find" errors keep retail's two sprintf tails
+// (4393 -> 5113 of 5335). Left: the frame is 0xd00 where retail has 0xcfc,
+// one scalar slot too many, so most offsets above the low slots are 4 off.
+// Retail puts the random-set j at local 0, dot at 4 and the entries-offset
+// spill at 8 (fps's GetFloat home); here the spill is at 0 and j at 8.
+// Reusing `automatic` for dot keeps 0xcfc but loses the store/reload shape
+// (4349); a function-scope `length` shared with the SLT name length, dot
+// in the random-set if/for blocks, a separate random-set index, `next`
+// dropped from the animation loop too, and `automatic`/`fps` declared in
+// the animation loop body all keep 0xd00.
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -726,11 +716,10 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
     parameters.GetInt("NumberOfRandomSets", 0, &animationTable->randomSetCount);
     if (animationTable->randomSetCount > 0) {
         animationTable->randomSets = new(__FILE__, 2466) UnknownSceneEntry2[animationTable->randomSetCount];
-        for (i = 0; i < animationTable->randomSetCount; i = next) {
+        for (i = 0; i < animationTable->randomSetCount; i++) {
             animationTable->randomSets[i].animationIndices = 0;
             animationTable->randomSets[i].motionIndices = 0;
-            next = i + 1;
-            sprintf(setName, "RandomSet%d", next);
+            sprintf(setName, "RandomSet%d", i + 1);
             if (!parameters.SelectSection(setName)) {
                 sprintf(message, "\nCannot find [%s] in %s.\n\n", setName, scenePath);
                 UnknownFunction464e80(message);
@@ -749,21 +738,21 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                 animationTable->randomSets[i].animationIndices = new(__FILE__, 2491) signed char[animationTable->randomSets[i].count];
                 animationTable->randomSets[i].motionIndices = new(__FILE__, 2492) signed char[animationTable->randomSets[i].count];
                 for (; token && j < animationTable->randomSets[i].count; j++) {
-                    automatic = strcspn(token, ".");
-                    if (!automatic || automatic == (int)strlen(token)) {
+                    int dot = strcspn(token, ".");
+                    if (!dot || dot == (int)strlen(token)) {
                         sprintf(message, "\nInvalid Animation or Motion #%d in [%s] in %s.\n\n", j, setName,
                                 scenePath);
                         UnknownFunction464e80(message);
                         return 0;
                     }
-                    token[automatic] = 0;
+                    token[dot] = 0;
                     animationTable->randomSets[i].animationIndices[j] = atoi(token) - 1;
                     animationTable->entries[animationTable->randomSets[i].animationIndices[j]].inRandomSet = 1;
                     if (animationTable->entries[i].keyFramed)
                         animationTable->entries[animationTable->randomSets[i].animationIndices[j]].character->Disable();
                     else
                         animationTable->entries[animationTable->randomSets[i].animationIndices[j]].proceduralObject->Disable();
-                    animationTable->randomSets[i].motionIndices[j] = atoi(token + automatic + 1) - 1;
+                    animationTable->randomSets[i].motionIndices[j] = atoi(token + dot + 1) - 1;
                     token = strtok(0, ",");
                 }
                 animationTable->randomSets[i].entry = animationTable->entries;

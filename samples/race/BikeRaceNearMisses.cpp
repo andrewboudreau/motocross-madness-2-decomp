@@ -150,6 +150,10 @@
 // i, recordIndex, position, direction and bike/riderTexture in retail's
 // slots but moves up/plate/fromEvent/riders (12792), and a char[2][0x40]
 // for the own textures fixes bike/riderTexture but swaps the recorded pair.
+// The shared-`i` form fails because retail homes the pro circuit's inlined
+// UnknownRandomSkill `offset` temporary (fstp/fld at 0x41a212/0x41a231) in
+// skill's slot, while ours puts it in riders/circuit's, which then ranks
+// too high. That home choice is the lead for the remaining slots.
 
 #include "../../src/reconstructed/BikeRace.cpp"
 

@@ -32,6 +32,12 @@
 // strcpy is scheduled like case 2's, `lea edx` after `sub edi, ecx`, and
 // cross-jumps into it at `or ecx, -1`). The success path inline before the
 // error path and a block-local copy of name give the same 516.
+// Lead: case 2's two stores written workerAcknowledged-first stop the
+// cross-jump into case 4 (VC6 then schedules `push esi` above them, as
+// retail does) and give 2096 strict, but the stores come out in that
+// order (retail: isStopped first) and case 1's Open/Write block moves
+// after case 2's; aligned 586 -> 590, 13 hunks either way, so not kept.
+// `continue` for case 2's or case 4's break changes nothing (652).
 //
 // 0x004e7d60 (2412 bytes with its jump table, VCRInterface slot 10; KrustyVCR
 // shares it): control flow, call arguments and the callback switch order
