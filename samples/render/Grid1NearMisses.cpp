@@ -16,6 +16,16 @@
 // (ratio 0.71) but reads an uninitialised variable, so it is not used.
 // The stage ladder's fourth compare (retail keeps `fcomp g*4` with no
 // branch after a speculative `stage = 3`) is folded away here.
+// Reading the terrain through the `(Grid1Terrain*)terrain` cast everywhere,
+// and the node's extra through `(Grid1NodeExtra*)extra` in the two texture
+// build blocks, instead of the Terrain()/Extra() accessors, gives retail's
+// shrink-wrapped pushes and most of its register choice (257 -> 63 differing
+// instructions, 104 -> 213 strict positions; found by a greedy per-call
+// accessor/cast search). Casting the other Extra() uses makes it worse.
+// The folded fourth compare comes back (stage store hoisted above the
+// fcomp, as retail) only with a second store in one arm: `else { stage = 3;
+// keep = 0; }` gives 287 strict but leaves that store; equal arms through
+// locals, casts, a static const, dead locals or dead parameter stores fold.
 //
 // 0x0047d470 (783 bytes; 313 of 786): identical control flow and calls;
 // retail keeps the row (y & 15) in eax, the head length in edx and the run
@@ -32,7 +42,7 @@
 // `last`/`span` local and `line` declared at the block start were tried
 // without closing the gap.
 //
-// 0x0047d780 (977 bytes; 216 of 1008): the per-block variant (4 x 4 pixel
+// 0x0047d780 (977 bytes; 227 of 1010): the per-block variant (4 x 4 pixel
 // cells, width / 4 tiles, four rows per run, a dead `done` accumulator that
 // retail keeps). Retail computes the head source pointer before the
 // `x & mask` test and reuses row * tileStride for the line pointer; texture
@@ -40,7 +50,9 @@
 // destination in ebp/[esp+0x14]. Retail has 339 instructions to 325 here.
 // The head source pointer (with or without a `column` local) computed
 // before the test is worse (144-154); `rest` before `line` gains only two
-// bytes (retail computes `line` first here).
+// bytes (retail computes `line` first here). A declaration-order sweep
+// found `dst` before `src` in the head copy and `done` before `tileStride`:
+// strict 216 -> 227, differing instructions 176 -> 158.
 
 #include "../../src/reconstructed/Grid1.h"
 
@@ -70,7 +82,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot3(float distance)
     ManagedTexture* previous = Extra()->texture;
     float detail;
     if (distance != 0.0f)
-        detail = (float)((16 << shift) * Terrain()->cameraFocalLength) / distance;
+        detail = (float)((16 << shift) * ((Grid1Terrain*)terrain)->cameraFocalLength) / distance;
     else
         detail = 10000.0f;
 
@@ -87,7 +99,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot3(float distance)
         stage = 3;
 
     int wanted = stage;
-    if (((Grid1RenderHost*)Terrain()->renderer)->camera->lastMoveDistance > 0.5f && level == 0)
+    if (((Grid1RenderHost*)((Grid1Terrain*)terrain)->renderer)->camera->lastMoveDistance > 0.5f && level == 0)
         wanted = stage > 2 ? 2 : stage;
 
     float scale;
@@ -128,7 +140,7 @@ retry:
             data->texOriginU = 0.0f;
             data->texOriginV = 0.0f;
             data->texStep = 1.0f;
-            Extra()->texture = Terrain()->textures[0];
+            Extra()->texture = ((Grid1Terrain*)terrain)->textures[0];
             for (block = 0; block < 16; block++) {
                 Grid1BlockTexture* record = &Extra()->blocks[block];
                 if (record->index != -1) {
@@ -138,15 +150,15 @@ retry:
                                 if (!TestBlockFrustum(block)) {
                                     Extra()->blocks[block].texture = 0;
                                 } else {
-                                    Extra()->blocks[block].texture = Terrain()->AcquireOwnedObject();
+                                    ((Grid1NodeExtra*)extra)->blocks[block].texture = ((Grid1Terrain*)terrain)->AcquireOwnedObject();
                                     BuildBlockTexture(block, Extra()->blocks[block].texture);
                                     if (Extra()->blocks[block].texture->mapFlags & 1)
                                         Extra()->blocks[block].texture->Reregister();
                                     Extra()->textureFlags |= 1 << block;
                                     g_grid1OwnTextureCount++;
-                                    Terrain()->textureAgeManager->Register(
-                                        &Extra()->blocks[block].ageEntry, (int (*)(void*))EvictBlockTexture,
-                                        this, block, PixelFormatBytesPerPixel(Terrain()->nodeTextureFormat) * 0x40000 / 3);
+                                    ((Grid1Terrain*)terrain)->textureAgeManager->Register(
+                                        &((Grid1NodeExtra*)extra)->blocks[block].ageEntry, (int (*)(void*))EvictBlockTexture,
+                                        this, block, PixelFormatBytesPerPixel(((Grid1Terrain*)terrain)->nodeTextureFormat) * 0x40000 / 3);
                                 }
                             } else {
                                 stage = wanted;
@@ -154,13 +166,13 @@ retry:
                             }
                         }
                     } else {
-                        record->texture = Terrain()->textures[record->index];
+                        record->texture = ((Grid1Terrain*)terrain)->textures[record->index];
                     }
                 } else {
                     record->texture = 0;
                 }
             }
-            Extra()->texture = Terrain()->textures[0];
+            Extra()->texture = ((Grid1Terrain*)terrain)->textures[0];
             scale = 4.0f;
             data->texOriginU = 0.0f;
             data->texOriginV = 0.0f;
@@ -182,7 +194,7 @@ retry:
     }
 
 parentTexture:
-    Extra()->texture = Terrain()->textures[((DrawableGridNodeSharedTextures*)parent)->Extra()->index];
+    Extra()->texture = ((Grid1Terrain*)terrain)->textures[((DrawableGridNodeSharedTextures*)parent)->Extra()->index];
     ReleaseBlockCentres();
     {
         int z = childIndex >> 4;
@@ -195,7 +207,7 @@ parentTexture:
     goto done;
 
 parentBlockTexture:
-    Extra()->texture = Terrain()->textures[index];
+    Extra()->texture = ((Grid1Terrain*)terrain)->textures[index];
     ReleaseBlockCentres();
     {
         int z = childIndex >> 4;
@@ -208,7 +220,7 @@ parentBlockTexture:
     goto done;
 
 sharedTexture:
-    Extra()->texture = Terrain()->textures[Extra()->index];
+    Extra()->texture = ((Grid1Terrain*)terrain)->textures[Extra()->index];
     ReleaseBlockCentres();
     scale = 1.0f;
     data->texOriginU = 0.0f;
@@ -221,14 +233,14 @@ sharedTexture:
     goto done;
 
 createTexture:
-    Extra()->builtTexture = Terrain()->AcquireOwnedObject();
+    ((Grid1NodeExtra*)extra)->builtTexture = ((Grid1Terrain*)terrain)->AcquireOwnedObject();
     BuildNodeTexture((ManagedTexture*)Extra()->builtTexture);
     if (((ManagedTexture*)Extra()->builtTexture)->mapFlags & 1)
         ((ManagedTexture*)Extra()->builtTexture)->Reregister();
     Extra()->textureFlags |= 0x10000;
     g_grid1OwnTextureCount++;
-    Terrain()->textureAgeManager->Register(&Extra()->ageEntry, EvictNodeTexture, this, 0,
-                                                  PixelFormatBytesPerPixel(Terrain()->nodeTextureFormat) * 0x40000 / 3);
+    ((Grid1Terrain*)terrain)->textureAgeManager->Register(&((Grid1NodeExtra*)extra)->ageEntry, EvictNodeTexture, this, 0,
+                                                  PixelFormatBytesPerPixel(((Grid1Terrain*)terrain)->nodeTextureFormat) * 0x40000 / 3);
 ownTexture:
     Extra()->texture = (ManagedTexture*)Extra()->builtTexture;
     ReleaseBlockCentres();
@@ -363,9 +375,9 @@ int DrawableGridNodeSharedTextures::BuildBlockTexture(int block, ManagedTexture*
     int tileSize = width / 4;
     int bpp = PixelFormatBytesPerPixel(texture->mapFormat);
     int pitch = bpp * width;
+    int done = 0;
     int tileStride = bpp * tileSize;
     unsigned char* runs = (unsigned char*)Extra()->data + index * 2;
-    int done = 0;
     while (y < width) {
         int id = *runs++;
         int length = (*runs++ + 1) * 4;
@@ -385,8 +397,8 @@ int DrawableGridNodeSharedTextures::BuildBlockTexture(int block, ManagedTexture*
         }
         int row = y & (tileSize - 1);
         if (((x + length - 1) & ~(tileSize - 1)) - (x & ~(tileSize - 1)) == 0) {
-            unsigned char* src = tile + (x & (tileSize - 1)) * bpp + row * tileStride;
             unsigned char* dst = out;
+            unsigned char* src = tile + (x & (tileSize - 1)) * bpp + row * tileStride;
             for (int k = 0; k < 4; k++) {
                 memcpy(dst, src, length * bpp);
                 src += tileStride;

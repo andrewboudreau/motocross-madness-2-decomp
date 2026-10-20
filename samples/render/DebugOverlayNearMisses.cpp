@@ -1,14 +1,20 @@
 // Near-miss DebugOverlay.cpp candidates, kept out of src/reconstructed until
 // they match (the exact members are in src/reconstructed/DebugOverlay.cpp).
 //
-// DebugOverlay::LoadFont (0x00447a00, 980 bytes; ours 989):
+// DebugOverlay::LoadFont (0x00447a00, 980 bytes; ours 999):
 // the GDI font builder. The glyph loop is a top-tested `while (c < 256)`
 // (a do-while lets VC6 peel the first u0 = 0 and reuse u1 as the next u0),
 // and the GetDC/ReleaseDC/Slot8 failures share one `failed: return 0`.
 // Zero in ebx, the run length in ebp and the glyph pointer in edi match.
-// Left: VC6 here pushes ebp in the prologue and keeps `c` in ebp at the row
-// head (retail reads it into eax once from its stack slot), which shifts the
-// frame by 4; retail shares the row pointer's slot with the v0 temporary.
+// Computing v0 and v1 before the row pointer (any order with `row` after
+// v0) lets the row pointer share the v0 temporary's slot, so ebp is saved
+// only around the GDI section as in retail and `c` is read into eax once:
+// strict 79 -> 460, 28 -> 17 differing instructions, all of them in the
+// returns. `if (CreateTextureSurface) return 1;` cross-jumps the last
+// failure into the CreateFontIndirect failure, but VC6 then copies the
+// epilogue into that block and the success path; retail keeps one
+// epilogue that both `xor eax, eax; jmp` blocks and `mov eax, 1` reach.
+// goto/result-variable/if-else forms of the tail compile identically.
 //
 #include <windows.h>
 #include <string.h>
@@ -77,11 +83,11 @@ int DebugOverlay::LoadFont()
         for (int bottom = size.cy; bottom < 256; bottom += lineHeight) {
             if (c >= 256)
                 break;
-            char* row = &characters[c];
-            int x = 0;
-            int count = 1;
             float v0 = (top + 1) * (1.0f / 256.0f);
             float v1 = bottom * (1.0f / 256.0f);
+            int x = 0;
+            int count = 1;
+            char* row = &characters[c];
             while (c < 256) {
                 glyphs[c].u0 = x * (1.0f / 256.0f);
                 glyphs[c].v0 = v0;
@@ -106,9 +112,8 @@ int DebugOverlay::LoadFont()
         if (fontTexture->systemSurface->ReleaseDC(dc))
             goto failed;
     }
-    if (!fontTexture->CreateTextureSurface(1, 0, 0))
-        goto failed;
-    return 1;
+    if (fontTexture->CreateTextureSurface(1, 0, 0))
+        return 1;
 failed:
     return 0;
 }

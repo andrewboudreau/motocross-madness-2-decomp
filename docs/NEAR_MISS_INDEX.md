@@ -195,13 +195,13 @@ retail does; grouping the x row's first two products does the same for that row.
 | render/D3DIMSoulTree | `0x00440810` | 135/1349 | b | 50 code diffs: `jle @345 ; xor esi, esi` vs `jle @340`; `mov [esp + N], esi ; mov eax, [edi + 0x~` vs `mov edx, [edi + 0x1c] ; mov esi, ebx ; ~`; frame 0x84 vs 0x80, slot order differs |
 | render/D3DIMSoulTree | `0x00440f30` | 657/7296 | b | DrawCurrentLod: static-local and `$E` bindings fixed, all relocations bound; mode 8/2 normalisations call the out-of-line Vector3 constructor 0x00404e60 as retail (525 differing insns, was 548); frame (0x940 vs 0x9e8) and register allocation left |
 | render/D3DIMSoulTree | `0x00443aa0` | 799/832 | c | 11 code diffs: retail lacks `fmul [eax + 0x10] ; fld [esp + N]`; retail lacks `faddp st(1)` |
-| render/DebugOverlay | `0x00447a00` | 79/989 | b | frame 0x26c matches; VC6 pushes ebp in the prologue and keeps `c` in ebp at the row head (retail: eax from its slot, ebp pushed only around the GDI section) |
+| render/DebugOverlay | `0x00447a00` | 460/999 | b | body matches; VC6 copies the epilogue into the failure and success returns (retail: one shared epilogue) |
 | render/DirectoryList | `0x0044a600` | 74/109 | c | 6 code diffs: `jne @31 ; mov al, byte ptr [esp + N]` vs `jne @32 ; mov eax, [esp + N]` |
 | render/GR_BitString | `0x004239c0` | 343/420 | b | 14 code diffs: retail lacks `mov ebx, ecx`; retail adds `mov ebp, ecx`; slots differ |
 | render/GR_BitString | `0x00423b70` | 93/442 | b | 16 code diffs: retail adds `add esi, 4`; `or ecx, eax` vs `or eax, ecx ; mov [edx - 4], eax`; slots differ |
-| render/Grid1 | `0x0047caa0` | 104/1740 | b | slot 3 texture stage switch; frame 0x14 vs retail 0x10, 93 code diffs (samples/render/Grid1NearMisses.cpp) |
+| render/Grid1 | `0x0047caa0` | 213/1728 | b | slot 3 texture stage switch; with the terrain/extra casts 63 instructions differ, mostly after the stage ladder, whose fourth compare VC6 folds (20 bytes short) |
 | render/Grid1 | `0x0047d470` | 313/786 | b | `rest` before `line`; line pointer still spilled (frame 0x838 vs 0x834), first/row in ebx/edx where retail has edx/eax |
-| render/Grid1 | `0x0047d780` | 216/1008 | b | 50 code diffs: `je @321 ; mov esi, [esp + N]` vs `je @315`; `mov eax, [esi]` vs `mov edi, [esp + N]`; slot order differs |
+| render/Grid1 | `0x0047d780` | 227/1010 | b | 50 code diffs: `je @321 ; mov esi, [esp + N]` vs `je @315`; `mov eax, [esi]` vs `mov edi, [esp + N]`; slot order differs |
 | render/GridNode | `0x00484d70` | 81/90 | c | 3 code diffs: `mov ecx, [eax*4 + A] ; add ecx, ebx ; m~` vs `mov eax, [eax*4 + A] ; add eax, ebx ; m~`; retail adds `xor ecx, ecx ; mov cx, word ptr [eax + ~` ; ~110 loop, index-local, final-test and parenthesis spellings unchanged |
 | render/GridNode | `0x00483d40` | 96/4189 | b | slot 1: ebp frame and four bare `fistp [eax]` from an `__asm` rounding helper (`__ftol` still used elsewhere), so unreachable under the no-inline-asm rule; `/Oy-` changes nothing else |
 | render/Griddraw | `0x0047de90` | 977/1083 (masked) | c | 30 code diffs: retail lacks `mov esi, [esp + N]`; `mov edi, [ebp*N + N]` vs `mov edi, [esp + N]` |
@@ -220,7 +220,7 @@ retail does; grouping the x row's first two products does the same for that row.
 | render/Overlay | `0x004b6710` | 63/361 | b | retail keeps `whole` and the byte count on the stack (6 slots), the destination in ebp and the row count in eax; VC6 keeps `whole` in edi, the byte count in ebp and the destination and row count on the stack |
 | render/PCTextureMap | `0x004c69c0` | 429/894 (masked) | c | 31 code diffs: `jne @390` vs `jne A`; `jne @120` vs `jne @116 ; lea edx, [esp + N]` |
 | render/PCTextureMap | `0x004c71c0` | 286/538 (masked) | c | 27 code diffs: `mov ebp, 1` vs `mov ebx, 1`; `and eax, ebp` vs `and eax, ebx` |
-| render/PCTextureMap | `0x004c7b40` | 247/767 | b | 35 code diffs: retail lacks `mov edi, [eax]`; slots differ |
+| render/PCTextureMap | `0x004c7b40` | 257/767 | b | rect read in retail order; the row pointers swap esi/ecx in the loop nest |
 | render/PCVideoCard | `0x004ca520` | 26/124 | c | 13 code diffs: `mov ebx, [esp + N]` vs `push ebp`; retail adds `mov ebp, [ecx + 0x74]` |
 | render/PCVideoCard | `0x004ca5a0` | 66/490 | c | retail keeps `target` in ebp outside the mode loop and 480 in ebp inside it; VC6 here never pushes ebp |
 | render/PCVideoCard | `0x004cab00` | 144/1113 | b | retail keeps the mode index in esi shared with the created target (two -3 stores), re-tests `render` after the found path and places the Slot8-success path after the epilogue |
