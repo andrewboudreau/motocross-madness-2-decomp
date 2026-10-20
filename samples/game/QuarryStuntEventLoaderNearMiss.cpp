@@ -5,11 +5,15 @@
 // quadtree, shadows, fog and sky, terrain, ecosystem, race, collision links,
 // podium and the remaining race objects, calling `progress` between stages.
 //
-// Status: near miss, about 87% of instructions align (difflib over the
-// register- and frame-normalised listings; 2194 instructions against
-// retail's 2209). The call sequence, allocation sizes and lines, EH states,
-// error paths, the memory-budget decision tree and frame size (0x650)
-// match. Shapes found: the fog object is a bare GameObject (0x2c bytes),
+// Status: near miss with retail's instruction count (2208); sdiff.py
+// (frame offsets, branch targets and immediates masked) aligns 1956 of
+// them in 146 hunks. The call sequence, allocation sizes and lines, EH
+// states, error paths, the memory-budget decision tree and frame size
+// (0x650) match. The tree's last AGP and next-to-last non-AGP tests
+// budget the model textures at a quarter (textureBytes / 4, recomputed,
+// not the shared (textureBytes + cubeBytes) / 4), and the last AGP test is
+// its own else-if whose all-2 else merges into the shared tail store.
+// Shapes found: the fog object is a bare GameObject (0x2c bytes),
 // the texture-choice members are chained assignments (one load each), the
 // margin percentage is read before the minimum and multiplied after both
 // calls, and the collision loop works through an element pointer with the
@@ -418,14 +422,15 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                         terrainTextures.halvings = 2;
                         skyTextures.halvings = 1;
                         modelTextures.halvings = 1;
+                    } else if (needed - textureBytes - cubeBytes - terrainBytes + textureBytes / 4 +
+                                   (cubeBytes + terrainBytes) / 16 < available) {
+                        terrainTextures.halvings = 2;
+                        skyTextures.halvings = 2;
+                        modelTextures.halvings = 1;
                     } else {
                         terrainTextures.halvings = 2;
                         skyTextures.halvings = 2;
-                        if (needed - textureBytes - cubeBytes - terrainBytes + (textureBytes + cubeBytes) / 4 +
-                                (cubeBytes + terrainBytes) / 16 < available)
-                            modelTextures.halvings = 1;
-                        else
-                            modelTextures.halvings = 2;
+                        modelTextures.halvings = 2;
                     }
                 }
             }
@@ -467,7 +472,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                     terrainTextures.halvings = 2;
                     skyTextures.halvings = 1;
                     modelTextures.halvings = 1;
-                } else if (needed - textureBytes - cubeBytes - terrainBytes + (textureBytes + cubeBytes) / 4 +
+                } else if (needed - textureBytes - cubeBytes - terrainBytes + textureBytes / 4 +
                                (cubeBytes + terrainBytes) / 16 < available) {
                     g_TrackGame->texturesCached = 0;
                     terrainTextures.halvings = 2;
