@@ -84,10 +84,7 @@ struct VisibilityProfiler {
     char field_0x00[0x38];
     VisibilityLog* log;          // +0x38 first argument of the 0x00447fa0 / 0x00447f40 line writers
 };
-class VisibilityMemoryStats {
-public:
-    int GetBytes(const char* name);   // 0x004a2d20, called with "QuadTree" (tier 3)
-};
+#include "../core/MemTag.h"
 
 struct VisibilityBoxVec;
 struct VisibilityMatrix {

@@ -19,7 +19,7 @@ extern "C" char* _strupr(char*);   // 0x00535d3d
 int MotionManager::LoadVue(Character* character, const char* path, Motion* motion)
 {
     char line[0x100];
-    ArchiveFile* file = new(__FILE__, 0x1c9) ArchiveFile(g_pOwnerRegistry);
+    UnknownTextureStream* file = new(__FILE__, 0x1c9) UnknownTextureStream(g_ResourceManager);
     if (!file->Open(path, "r", 0)) {
         char message[0x80];
         sprintf(message, "Unable to open %s\n", path);
@@ -46,7 +46,7 @@ int MotionManager::LoadVue(Character* character, const char* path, Motion* motio
     motion->frames = (MotionPoseList*)DebugMalloc(motion->frameCount * sizeof(MotionPoseList), __FILE__, 0x1ec);
     motion->posesPerFrame = poses;
     frame = 0;
-    file->Seek(file->field_0x130, 0, 1);
+    file->Seek(file->sliceOffset, 0, 1);
     while (file->ReadLine(line, 0xff) && frame < motion->frameCount) {
         _strupr(line);
         strtok(line, " ");

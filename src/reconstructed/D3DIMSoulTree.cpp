@@ -161,7 +161,7 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
                 RegisterNode();
                 return this;
             }
-            UnknownTextureStream* stream = new (__FILE__, 0xe1) UnknownTextureStream((int)g_ResourceManager);
+            UnknownTextureStream* stream = new (__FILE__, 0xe1) UnknownTextureStream(g_ResourceManager);
             stream->Open(name, "rb", 0);
             LoadFromParameters(stream, 0);
             delete stream;

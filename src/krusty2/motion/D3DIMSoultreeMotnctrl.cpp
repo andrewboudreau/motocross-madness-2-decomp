@@ -213,21 +213,9 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot2()
     SortPoseList(&poseList);
 }
 
-// Global registry (pointer at 0x00572b44): a list of entries keyed by an owner pointer at entry+0x10.
-// 0x004e93f0 finds the entry whose owner is the argument; 0x004e9010 sets an entry's owner.  Names tier 3.
-class OwnerEntry : public BaseObject {
-public:
-    char pad_0x08[8];
-    D3DIMSoultreeCharacter* owner;                       // +0x10 tested and set by slot 11
-};
-class OwnerRegistry {
-public:
-    OwnerEntry* FindByName(const char* name, int a);    // 0x004e9360, ret 8
-    void Load(const char* name, const char* path);      // 0x004e9430, ret 8
-    OwnerEntry* FindByOwner(void* owner);               // 0x004e93f0, ret 4
-    void SetOwner(OwnerEntry* entry, void* owner);      // 0x004e9010, ret 8
-};
-extern OwnerRegistry* g_pOwnerRegistry;                 // 0x00572b44
+// Resource entry +0x10 holds the loaded object; methods and storage are
+// supplied by ResourceManager.cpp. No separate owner-registry object exists.
+#include "../../reconstructed/ResourceManager.h"
 
 // Destructor core 0x004459a0 (retail passes the GameObject virtual base as 'this'; the deleting
 // destructor 0x00446680 is already matched in samples/physics/hierarchy).  Frees the 0x18-byte copied
@@ -239,9 +227,9 @@ D3DIMSoultreeCharacter::~D3DIMSoultreeCharacter()
         DebugFree(*(void**)(d3d_field_0x1a4 + 0x64), __FILE__, 0xc4);
     if (nodeNames)
         operator delete(nodeNames);
-    OwnerEntry* entry = g_pOwnerRegistry->FindByOwner(this);
+    void* entry = g_ResourceManager->FindItemByObject(this);
     if (entry)
-        g_pOwnerRegistry->SetOwner(entry, 0);
+        g_ResourceManager->SetItemObject(entry, 0);
 }
 
 // GameObject slot 4 override (0x00446640, reached through vtordisp thunk 0x004466c0): runs GameObject's
@@ -363,9 +351,9 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
     loaded->Load(renderContext, name, *(int*)(d3d_field_0x1a4 + 0x60), *(int*)(d3d_field_0x1a4 + 0x64),
                  *(int*)(d3d_field_0x1a4 + 0x68));
     ((SoultreeObject*)loaded)->UnregisterNode();
-    OwnerEntry* owner = g_pOwnerRegistry->FindByOwner(loaded);
+    void* owner = g_ResourceManager->FindItemByObject(loaded);
     if (owner)
-        g_pOwnerRegistry->SetOwner(owner, 0);
+        g_ResourceManager->SetItemObject(owner, 0);
     ((ModelObject*)modelNode)->itemCount = loaded->itemCount;
     ((ModelObject*)modelNode)->items =
         (SceneItem**)DebugMalloc(((ModelObject*)modelNode)->itemCount << 2, __FILE__, 0xeb);
@@ -394,19 +382,12 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
 
 // Helpers of slot 11 (all names tier 3).
 unsigned int ReadClock();                                // 0x004bfa80: timeBeginPeriod(1), timeGetTime, timeEndPeriod(1); result unused here
-class ArchiveFile {                                      // 0x134 bytes, ctor takes the registry (0x00460d10, ret 4)
-public:
-    explicit ArchiveFile(OwnerRegistry* registry);
-    ~ArchiveFile();                                      // 0x00460d60: frees the buffer at +0x14
-    void Open(const char* name, const char* mode, int a);   // 0x00460f50, ret 0xc
-    void SetBufferSize(int size);                        // 0x00461310, ret 4
-    char pad_0x00[0x134];
-};
+#include "../../reconstructed/FileStream.h"
 class SltFile {                                          // 0x5c4 bytes, ctor 0x004b7130
 public:
     SltFile();
     ~SltFile();                                          // 0x004b7190
-    void Attach(ArchiveFile* file, int a, int b);        // 0x004b77a0, ret 0xc
+    void Attach(UnknownTextureStream* file, int a, int b);        // 0x004b77a0, ret 0xc
     void SelectSection(const char* name);                // 0x004b78f0, ret 4
     void ReadString(const char* key, char* out, int n);  // 0x004b7b30, ret 0xc
     char pad_0x00[0x5c4];
@@ -435,22 +416,22 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, c
         *(LoadDescCopy**)(d3d_field_0x1a4 + 0x64) = copy;
         *copy = *(LoadDescCopy*)a4;
     }
-    ArchiveFile* file = new(__FILE__, 0x68) ArchiveFile(g_pOwnerRegistry);
+    UnknownTextureStream* file = new(__FILE__, 0x68) UnknownTextureStream(g_ResourceManager);
     _splitpath(a2, drive, dir, fname, ext);
     strcat(fname, ext);
-    OwnerEntry* entry = g_pOwnerRegistry->FindByName(fname, 0);
+    ResourceItem* entry = g_ResourceManager->FindItem(fname, 0);
     if (!entry) {
-        g_pOwnerRegistry->Load(fname, a2);
-        entry = g_pOwnerRegistry->FindByName(fname, 0);
+        g_ResourceManager->AddLooseFile(fname, a2);
+        entry = g_ResourceManager->FindItem(fname, 0);
         if (!entry) {
             Release();
             delete file;
             return 0;
         }
     }
-    if (entry->owner) {
+    if (entry->object) {
         entry->AddRef();
-        CharacterVirtualSlot8((int)entry->owner);
+        CharacterVirtualSlot8((int)entry->object);
         ReadClock();
         delete file;
         return this;
@@ -467,7 +448,7 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, c
     sltFile->ReadString("SLTFile", d3d_field_0x1a4, -1);
     CharacterVirtualSlot1();
     delete sltFile;
-    g_pOwnerRegistry->SetOwner(entry, this);
+    g_ResourceManager->SetItemObject(entry, this);
     delete file;
     ReadClock();
     return this;

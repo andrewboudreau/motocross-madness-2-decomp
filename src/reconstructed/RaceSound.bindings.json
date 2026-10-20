@@ -6,7 +6,7 @@
   "??0SoundGroup@@QAE@H@Z": "0x00401a30",
   "??0UnknownMessage@@QAE@PBDM@Z": "0x0051b200",
   "??0UnknownParameterBlock@@QAE@XZ": "0x004b7130",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1GameObject@@UAE@XZ": "0x00468d60",
   "??1RaceSound@@UAE@XZ": "0x004e21b0",
   "??1RaceSound@@UAE@XZ$ehhandler": "0x0054d728",

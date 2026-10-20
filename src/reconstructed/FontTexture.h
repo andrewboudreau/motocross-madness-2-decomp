@@ -49,8 +49,7 @@ public:
 
     // 0x0065b478. A static data member: its atexit destructor 0x00467130 is
     // guarded by a flag byte, as VC6 emits for class statics. The owning
-    // class is not established. Game.h views the object as
-    // g_UnknownStatic65b478.
+    // class is not established. Game's shutdown uses this same list.
     static UnknownFontTextureManager s_UnknownManager65b478;
 
     char* fontName;                           // name

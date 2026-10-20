@@ -44,7 +44,11 @@ Notes:
 
 Not reconstructed: `RecordExceptionInfo` (`0x0045ff80`, the `__except`
 filter). Its stack dump reads the stack top with inline assembly
-(`mov eax, fs:[4]`), which the project rules exclude.
+(`mov eax, fs:[4]` at `0x004602ef`), which the project rules exclude.
+Authentic VC6 SP3 rejects `#pragma intrinsic(__readfsdword)` with C4163 and
+emits an external call for that spelling; declaring the modern intrinsic
+does not provide the missing operation. No substitute stack bound or
+placeholder filter is supplied.
 
 FastMath's `InitFastMath` (`0x00460ad0`, 15 bytes) and its square root table
 builder (`0x00460ae0`, 97 bytes) close the same gap. They match in

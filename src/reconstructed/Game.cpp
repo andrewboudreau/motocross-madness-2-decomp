@@ -8,6 +8,7 @@
 #include "ControlInterface.h"
 #include "DebugOverlay.h"
 #include "GameObject.h"
+#include "FontTexture.h"
 #include "MemTag.h"
 #include "PCControl.h"
 #include "PeakHold.h"
@@ -400,7 +401,7 @@ int Game::Shutdown() {
     shuttingDown = 1;
     if (g_HiResMeter && debugOverlay && g_HiResMeter->counterUsable)
         g_HiResMeter->Unlink();
-    g_UnknownStatic65b478.DeleteFonts();
+    FontTexture::s_UnknownManager65b478.DeleteFonts();
     if (rootObject) {
         rootObject->Release();
         rootObject = 0;

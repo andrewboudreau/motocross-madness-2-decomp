@@ -146,7 +146,7 @@
   "?Vec3SubtractCall@@YAPAUVec3@@PAU1@PBU1@1@Z": "0x00421d00",
   "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd710",
   "?WorldToLocalPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd7f0",
-  "?g_BikeString_00577738@@3PADA": "0x00577738",
+  "??_C@_00A@?$AA@": "0x00577738",
   "?g_BikeVec3_005778a8@@3UVec3@@A": "0x005778a8",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "_$E1": "0x00407890",

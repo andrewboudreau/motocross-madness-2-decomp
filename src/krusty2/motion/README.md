@@ -3,12 +3,47 @@ Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDAT
 
 # motion (Spheres.cpp, SteeringControl.cpp)
 
-Validation: all 112 targets under `src/krusty2/motion/` pass strict VC6 SP3 comparison
-(Spheres 14, SteeringControl 21, Motnctrl 40, D3DIMSoultreeMotnctrl 26, CollisionCharacter 11). In `samples/physics/motion/`,
+Validation: all 113 targets under `src/krusty2/motion/` pass strict VC6 SP3 comparison
+(Spheres 14, SteeringControl 21, Motnctrl 41, D3DIMSoultreeMotnctrl 26, CollisionCharacter 11). In `samples/physics/motion/`,
 SurfaceMap.cpp is strict exact for 6 of 6 targets; the rest are partial.
 
 Wave 4. Both files are linked back to back in `0x504940..0x5051ec`; SurfaceMap and the keyboard hooks
 that follow live in `samples/physics/motion/`.
+
+## Shared streams and resource entries
+
+Motnctrl and D3DIMSoultreeMotnctrl now use `UnknownTextureStream` from the
+focused `src/reconstructed/FileStream.h`. It is the same declaration formerly
+inside TextureMap.h, which still includes it at that position. No renderer or
+additional math declarations are needed by the motion loaders.
+
+The former `ArchiveFile` view allocated `0x134` bytes and called the same
+constructor (`0x00460d10`), destructor (`0x00460d60`), Open (`0x00460f50`),
+binary-mode setter (`0x00461310`), Read (`0x00461640`) and ReadLine
+(`0x00461aa0`) as the shared stream. Partial LoadVue also seeks through
+`0x00461340` using the stream's slice offset at `+0x130`.
+The constructor takes the resource manager stored at stream `+0x12c`.
+Open and SetBufferSize return integers; their results remain unused where
+the motion loaders originally declared them void.
+
+D3DIMSoultreeMotnctrl's former `OwnerRegistry` and `OwnerEntry` views are
+replaced by `UnknownResourceManager` and `ResourceItem` from ResourceManager.h:
+the same pointer at `0x00572b44`, object field at entry `+0x10`, and
+BaseObject subobject at offset zero. FindItem (`0x004e9360`),
+FindItemByObject (`0x004e93f0`), SetItemObject (`0x004e9010`) and
+AddLooseFile (`0x004e9430`) now import the supplied implementations.
+The returned object's cache/clone and AddRef behavior is preserved.
+The resource manager's original class name remains unconfirmed.
+
+All 26 D3DIMSoultreeMotnctrl and 41 Motnctrl targets remain strict matches,
+including resolved relocations. Both previously strict checks among the
+seven partial-sample checks also remain exact. The COFF regression
+`tests/test_motion_stream_connections.py` verifies that the real callers
+reference symbols supplied by the stream and resource objects.
+
+The `SltFile` parameter-block view remains separate. Its Attach declaration
+now takes the shared stream, but no implementation is supplied under that
+class name; this signature change is not counted as a resolved function.
 
 ## Spheres.cpp
 - `__FILE__` string `D:\aardvark\VC\krusty2\Spheres.cpp` at `0x00574568`; one use (debug `new`, line 4) in the

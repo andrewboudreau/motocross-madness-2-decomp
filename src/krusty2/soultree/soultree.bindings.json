@@ -87,7 +87,7 @@
   "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd710",
   "?WorldToLocalPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd7f0",
   "?g_TypeRegistry@@3PAVTypeRegistry@@A": "0x00575744",
-  "?g_quadTree@@3PAVQuadTree@@A": "0x0068aba4",
+  "?g_collisionQuadTree@@3PAVQuadTree@@A": "0x0068aba4",
   "?g_soultreeNodeCapacity@@3HA": "0x00689ecc",
   "?g_soultreeNodeCount@@3HA": "0x00689ec8",
   "?g_soultreeNodes@@3PAPAVSoultreeObject@@A": "0x00689ec4",

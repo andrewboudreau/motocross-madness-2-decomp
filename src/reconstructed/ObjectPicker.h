@@ -36,46 +36,10 @@ struct UnknownPickCamera {
     int cursorRangeY;                         // +0x1c8 cursor y range
 };
 
-// The members of CollisionObject (krusty2/collision/CollisionObject.h) that
-// ObjectPicker.cpp uses: the 0xb8-byte object built by its constructor
-// 0x00431e70 and used as a one-segment probe. RTTI: CollisionObject :
-// QuadTreeObject (+0), GraphicsTest (+0xc) : GameObject; GraphicsTest's own
-// members are not declared here.
-class CollisionObject;
-class D3DIMSoultreeObject;
-typedef void (*UnknownPickCallback)(CollisionObject* self, CollisionObject* other);
-
-class UnknownPickQuadTreeObject {
-public:
-    virtual void UnknownVirtualSlot0();
-    int field_0x04;
-    int field_0x08;
-};
-
-class CollisionObject : public UnknownPickQuadTreeObject, public GameObject {
-public:
-    explicit CollisionObject(int flags);  // 0x00431e70
-    void Configure(void* a, int b, int c, int d); // 0x004320f0
-    void SetMeshShape(int count, void* points);      // 0x00432ab0: sets the segment
-    void UpdatePlacement();         // 0x00435fb0
-    int QueryCollisions();          // 0x00438e70: 1 on a hit
-    // Seen from ArcadeObject.cpp 0x00401540: 0x00432800 (ret 8) builds the
-    // collision from a ".col" file, 0x00432720 (ret 0x14) without one,
-    // 0x004394d0 (ret 8) and 0x00435fe0 (ret 0) follow.
-    // Opaque node/owner pointers use the canonical CollisionObject signatures;
-    // this local layout view does not establish their complete C++ types.
-    void LoadShape(void* model, const char* path);
-    void SetHullShape(void* model, int a, int b, int c, int d);
-    void SetOwner(void* model, int value);
-    void SnapPlacement();
-
-    unsigned char field_0x38[0x68 - 0x38];
-    int ignoreVegetation;                     // +0x68 ignore vegetation
-    unsigned char field_0x6c[0x88 - 0x6c];
-    UnknownPickCallback onHitCallback;        // +0x88 on-hit callback
-    void* onHitByCallback;                    // +0x8c set with the callback by ArcadeObject 0x00401540
-    unsigned char field_0x90[0xb8 - 0x90];
-};
+// Use the complete shared collision class: size 0xb8, QuadTreeObject at +0,
+// GraphicsTest/GameObject at +0xc. The probe accesses +0x68 and +0x88.
+#include "../krusty2/collision/CollisionObject.h"
+typedef CollisionCallback UnknownPickCallback;
 
 class ObjectPicker : public GameObject {
 public:

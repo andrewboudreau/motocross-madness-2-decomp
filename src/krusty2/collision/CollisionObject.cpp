@@ -1231,7 +1231,7 @@ int CollisionObject::UnknownVirtualSlot14()
         if (debugDrawMode == 5) {
             SetDrawRGBA(0, 0xff, 0xff, 0x80);
             BeginAlphaBlend();
-            DrawSphere((const Vec3*)&field_0x34, boundRadius, 8);
+            DrawSphere((const Vec3*)&this->boundCenter, boundRadius, 8);
         }
         switch (shapeType) {
         case 0:
@@ -2601,7 +2601,7 @@ void CollisionObject::SetTransform(const Matrix4* m)
     switch (shapeType) {
     case 0: {
         CollisionHullBody* hull = (CollisionHullBody*)shape;
-        CollisionVec3* boundCenter = (CollisionVec3*)&field_0x34;   // +0x40, the bounding-sphere centre
+        CollisionVec3* boundCenter = (CollisionVec3*)&this->boundCenter;   // +0x40, the bounding-sphere centre
         Matrix4* prev = &hull->prevBodyTransform;
         Matrix4* body = &hull->bodyTransform;
         *prev = *body;
@@ -2629,7 +2629,7 @@ void CollisionObject::SetTransform(const Matrix4* m)
             CollisionRelativeTransform(&e->motionTransform, &e->bodyTransform, &e->prevBodyTransform);
         }
         UpdateModelBounds();
-        CollisionVec3* boundCenter = (CollisionVec3*)&field_0x34;
+        CollisionVec3* boundCenter = (CollisionVec3*)&this->boundCenter;
         *boundCenter = model->center;
         Vec3 half = *(Vec3*)&model->halfExtents;
         MoveBox((Vec3*)boundCenter, &half, &model->field_0xc8);
@@ -2640,7 +2640,7 @@ void CollisionObject::SetTransform(const Matrix4* m)
     case 2: {
         CollisionMeshBody* mesh = (CollisionMeshBody*)shape;
         mesh->field_0x08 = *m;
-        CollisionVec3* boundCenter = (CollisionVec3*)&field_0x34;
+        CollisionVec3* boundCenter = (CollisionVec3*)&this->boundCenter;
         *boundCenter = mesh->field_0x04->center;
         CollisionVec3 half = mesh->field_0x04->halfExtents;
         boundRadius = CollisionLength(&half);
@@ -2651,7 +2651,7 @@ void CollisionObject::SetTransform(const Matrix4* m)
         break;
     case 4: {
         CollisionSphereShape* sphere = (CollisionSphereShape*)shape;
-        CollisionVec3* boundCenter = (CollisionVec3*)&field_0x34;
+        CollisionVec3* boundCenter = (CollisionVec3*)&this->boundCenter;
         *boundCenter = sphere->center;
         boundRadius = sphere->radius;
         Vec3TransformPoint(boundCenter, *boundCenter, (const Matrix4*)&sphere->transform);
@@ -2690,7 +2690,7 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
 {
     if (object->isEnabled) {
         const Vec3* p = (const Vec3*)ends;
-        if (SegmentPointDistance(p, *(const Vec3*)&object->field_0x34) < object->boundRadius) {
+        if (SegmentPointDistance(p, *(const Vec3*)&object->boundCenter) < object->boundRadius) {
             switch (object->shapeType) {
             case 0: {
                 CollisionHullBody* hull = (CollisionHullBody*)object->shape;

@@ -2,7 +2,7 @@
   "??0D3DIMSoultreeObject@@QAE@H@Z": "0x0043f160",
   "??0SoultreeMaterial@@QAE@H@Z": "0x004fefe0",
   "??0SoultreeObject@@QAE@H@Z": "0x004fb2b0",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1D3DIMSoultreeObject@@UAE@XZ": "0x0043f2b0",
   "??1D3DIMSoultreeObject@@UAE@XZ$ehhandler": "0x0054a048",
   "??1SoultreeObject@@UAE@XZ": "0x004fb430",

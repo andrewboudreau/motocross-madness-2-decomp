@@ -333,10 +333,10 @@ int CarProcedural::Tick(float frameTime)
     }
     bodyCollider->UpdatePlacement();
     if (bodyCollider->QueryCollisions()) {
-        CarProceduralContact* contact = bodyCollider->contactRecord;
+        CarProceduralContact* contact = (CarProceduralContact*)bodyCollider->contactRecord;
         bodyContactPoint = contact->contactPoint;
         bodyContactNormal = contact->contactNormal;
-        Vector3& shapePosition = bodyCollider->shape->position;
+        Vector3& shapePosition = ((CarProceduralBody*)bodyCollider->shape)->position;
         shapePosition.x -= contact->contactOffset.x * 1.005f;
         shapePosition.y -= contact->contactOffset.y * 1.005f;
         shapePosition.z -= contact->contactOffset.z * 1.005f;

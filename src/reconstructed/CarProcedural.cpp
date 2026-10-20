@@ -162,7 +162,7 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
         bodyCollider->LoadShape(carModel, collisionFile);
     else
         bodyCollider->SetHullShape(carModel, 0, 1, 0, 0);
-    bodyCollider->shape->swept = 1;
+    ((CarProceduralBody*)bodyCollider->shape)->swept = 1;
     bodyCollider->SnapPlacement();
     sensorCollider->AddIgnoredOwner(bodyCollider);
     g_MemTagStack->Pop(tag);
@@ -186,7 +186,7 @@ void CarProcedural::ReadPath(const char* pathFile, const char* name)
     char line[0x400];
 
     sprintf(quoted, "\"%s\"", name);
-    UnknownTextureStream* stream = new (__FILE__, 217) UnknownTextureStream((int)g_ResourceManager);
+    UnknownTextureStream* stream = new (__FILE__, 217) UnknownTextureStream(g_ResourceManager);
     if (stream->Open(pathFile, "r", 0)) {
         pathKeyCount = 0;
         while (!stream->AtEnd()) {

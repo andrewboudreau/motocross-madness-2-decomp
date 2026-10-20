@@ -338,7 +338,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         if (progress)
             progress(&step);
     }
-    UnknownTextureStream* stream = new(__FILE__, 252) UnknownTextureStream((int)g_ResourceManager);
+    UnknownTextureStream* stream = new(__FILE__, 252) UnknownTextureStream(g_ResourceManager);
     UnknownTextureStream* preloaded = stream;
     if (ecosystem[0]) {
         if (strstr(ecosystem, ".est"))
@@ -584,7 +584,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         projectedShadow = ((UnknownQuarryShadow*)projectedShadow)->Init(renderContext, g_TrackGame->textureManager);
     }
     if (!preloaded)
-        stream = new(__FILE__, 713) UnknownTextureStream((int)g_ResourceManager);
+        stream = new(__FILE__, 713) UnknownTextureStream(g_ResourceManager);
 
     g_MemTagStack->Push("Sky");
     char* cubeFile = eventScene->environment->cubeFile;
@@ -640,7 +640,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
 
     g_MemTagStack->Push("EcoSystem");
     if (!stream)
-        stream = new(__FILE__, 848) UnknownTextureStream((int)g_ResourceManager);
+        stream = new(__FILE__, 848) UnknownTextureStream(g_ResourceManager);
     if (strstr(eventScene->environment->ecosystemFile, ".est"))
         strcpy(strstr(eventScene->environment->ecosystemFile, ".est"), ".esb");
     if (stream && !g_TrackGame->sceneObject->OpenArchiveFile(stream, eventScene->environment->ecosystemFile,

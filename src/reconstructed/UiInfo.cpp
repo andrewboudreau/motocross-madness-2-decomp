@@ -623,7 +623,7 @@ int TrackGameMode::OpenHelp(const char* topic, const char* parameters) {
 void TrackGameMode::LoadBonusTrackNames() {
     UnknownParameterBlock block;
     char key[0x100];
-    UnknownTextureStream* stream = new(__FILE__, 873) UnknownTextureStream((int)g_ResourceManager);
+    UnknownTextureStream* stream = new(__FILE__, 873) UnknownTextureStream(g_ResourceManager);
     int i;
 
     for (i = 0; i < 6; i++) {

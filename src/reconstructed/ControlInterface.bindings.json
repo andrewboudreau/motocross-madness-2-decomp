@@ -6,5 +6,7 @@
   "?Reset@UnknownControlBinding@@QAEXXZ": "0x0043cca0",
   "?Unbind@UnknownControlBinding@@QAEXXZ": "0x0043cde0",
   "?ModifierHolds@KeyboardDevice@@QAEHH@Z": "0x0048a240",
+  "?NextBindingId@ControlInterface@@QAEHXZ": "0x0043ce90",
+  "?g_LastBindingId@@3HA": "0x0057985c",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c"
 }

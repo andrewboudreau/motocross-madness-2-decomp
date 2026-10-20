@@ -10,7 +10,7 @@
   "??0SoundGroup@@QAE@H@Z": "0x00401a30",
   "??0UnknownParameterBlock@@QAE@XZ": "0x004b7130",
   "??0UnknownSceneResourceManager@@QAE@XZ": "0x004e8e80",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??0UnknownTrackGameObject574@@QAE@XZ": "0x004e99d0",
   "??1GameObject@@UAE@XZ": "0x00468d60",
   "??1Scene@@UAE@XZ": "0x004ea880",

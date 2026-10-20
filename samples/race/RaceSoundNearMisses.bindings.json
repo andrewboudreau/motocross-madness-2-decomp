@@ -3,7 +3,7 @@
   "??0RaceSound@@QAE@H@Z": "0x004e1fb0",
   "??0RaceSound@@QAE@H@Z$ehhandler": "0x0054d708",
   "??0UnknownMessage@@QAE@PBDM@Z": "0x0051b200",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1GameObject@@UAE@XZ": "0x00468d60",
   "??1RaceSound@@UAE@XZ": "0x004e21b0",
   "??1RaceSound@@UAE@XZ$ehhandler": "0x0054d728",

@@ -18,7 +18,7 @@
 #define COLLISION_OBJECT_H
 
 #include "CollisionTypes.h"
-#include "core/GraphicsTest.h"   // canonical BaseObject, GameObject, GraphicsTest
+#include "../core/GraphicsTest.h"   // canonical BaseObject, GameObject, GraphicsTest
 
 class QuadTree;               // broadphase/Quadtree.h
 class CollisionFileStream;     // .col file stream (CollisionShapeSetup.cpp, stand-in)
@@ -183,10 +183,9 @@ public:
     void DrawHull(CollisionHullBody* hull, int depth, int mode);         // 0x00432d30
     void DrawModel(CollisionModelBody* model, int depth, int mode);      // 0x00432b30
 
-    // +0x40 is a world bounding-sphere centre (Vec3, written by SetTransform 0x00435830 via
-    // 0x00428db0/0x0042a510 and read by BoundingSpheresOverlap 0x0043a270); its first float
-    // overlaps GraphicsTest::field_0x34 in the stand-in GraphicsTest layout.
-    char field_0x44[8];                         // bounding-sphere centre y, z
+    // +0x40 world bounding-sphere centre, written by SetTransform 0x00435830
+    // and read by BoundingSpheresOverlap 0x0043a270. It belongs to this class.
+    CollisionVec3 boundCenter;
     float boundRadius;                           // bounding-sphere radius (fstp [this+0x4c] in 0x00435830)
     int shapeType;                             // +0x50 shape type 0..4
     void* shape;                           // +0x54 shape payload (see shape structs)

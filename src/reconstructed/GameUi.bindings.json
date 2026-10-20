@@ -40,7 +40,7 @@
   "??0UIStaticText@@QAE@HPAUCameraRect@@PAVUIDialog@@PBDI@Z": "0x00478ff0",
   "??0UIStaticText@@QAE@HPAUCameraRect@@PAVUIDialog@@PBDI@Z$ehhandler": "0x0054b438",
   "??0UIVideoStatic@@QAE@HPAUCameraRect@@PAVUIDialog@@@Z": "0x0047ae30",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1BaseObject@@UAE@XZ": "0x00405150",
   "??1GameObject@@UAE@XZ": "0x00468d60",
   "??1GameObjectIterator@@QAE@XZ": "0x00469a40",

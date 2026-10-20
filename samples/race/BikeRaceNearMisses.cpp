@@ -629,7 +629,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         COPY_TEXT(path, raceScene->environment->terrainFile, 0x104);
         strcpy(strrchr(path, '.'), ".tdf");
         UnknownTextureStream* stream =
-            new(__FILE__, 0x193) UnknownTextureStream((int)g_ResourceManager);
+            new(__FILE__, 0x193) UnknownTextureStream(g_ResourceManager);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)modelName)) {
             sprintf(message, "No Track file found in env file.  Abort.\n");
             delete stream;
@@ -657,7 +657,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                     g_TrackGame->mode.raceSettings.trackName,
                     g_TrackGame->mode.raceSettings.trackNumber);
             UnknownTextureStream* stream =
-                new(__FILE__, 0x1be) UnknownTextureStream((int)g_ResourceManager);
+                new(__FILE__, 0x1be) UnknownTextureStream(g_ResourceManager);
             if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)modelName)) {
                 delete stream;
             } else if (stream) {
@@ -1029,7 +1029,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
     Vector3 up(0.0f, 1.0f, 0.0f);
     empty[0] = 0;
 
-    UnknownTextureStream* stream = new(__FILE__, 0x3b6) UnknownTextureStream((int)g_ResourceManager);
+    UnknownTextureStream* stream = new(__FILE__, 0x3b6) UnknownTextureStream(g_ResourceManager);
     sprintf(path, "%s\\rider.mcf", "Res");
     if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)riderFile)) {
         sprintf(message, "No Rider MCF found in resources.  Aborting.\n");

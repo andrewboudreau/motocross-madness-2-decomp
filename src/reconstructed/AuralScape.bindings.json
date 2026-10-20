@@ -7,7 +7,7 @@
   "??0SoundGroup@@QAE@H@Z": "0x00401a30",
   "??0SoundGroup@@QAE@H@Z$ehhandler": "0x00549683",
   "??0SoundInterface@@QAE@XZ": "0x00401f80",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1?$ContainerList@PAVSound@@@@QAE@XZ": "0x00402040",
   "??1?$ContainerList@PAVSoundEmitter@@@@QAE@XZ": "0x00402040",
   "??1?$ContainerList@PAX@@QAE@XZ": "0x00402040",

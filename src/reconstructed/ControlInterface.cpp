@@ -259,3 +259,13 @@ int DecodeTextureSize(int bits, int index, int byteIndex) {
     }
     return 0;
 }
+
+// 0x0057985c: writable zero-filled storage, shared by every interface.
+// The original name and translation unit ownership are not established.
+int g_LastBindingId;
+
+// 0x0043ce90: callers supply their ControlInterface in ecx, but this body
+// accesses only the global counter and returns its incremented value.
+int ControlInterface::NextBindingId() {
+    return ++g_LastBindingId;
+}

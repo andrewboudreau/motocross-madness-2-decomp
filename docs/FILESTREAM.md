@@ -2,7 +2,8 @@
 
 Source: `src/reconstructed/FileStream.cpp` (the exact methods) and
 `samples/io/FileStream.cpp` (the near misses), each with its bindings. The
-class is `UnknownTextureStream`, declared in `src/reconstructed/TextureMap.h`.
+class is `UnknownTextureStream`, declared in `src/reconstructed/FileStream.h`
+and included by `TextureMap.h`.
 
 ## Evidence
 
@@ -139,9 +140,24 @@ stream graphs and negative-length decoding loops are outside the test domain.
 The decoded source review and partial byte reports remain separate evidence.
 
 No new stream hierarchy is asserted. This nonvirtual `0x134`-byte view has no
-RTTI, and the constructor declarations in `TextureMap.h` and `EcoSystem.h`
-still differ (`int` versus resource-manager pointer). Other named stream views
-remain separate reconstruction work.
+RTTI. Other named stream views remain separate reconstruction work.
+
+## Constructor connection
+
+The shared declaration in `FileStream.h` (included by `TextureMap.h`) and the
+reduced declaration in `EcoSystem.h` now both take
+`UnknownResourceManager*`. This is a type inference supported by the constructor
+storing its argument at `+0x12c`, `FindArchive` calling `FindItem` through that
+field, and callers supplying `g_ResourceManager` or the resource manager's
+`this` pointer. It connects EcoSystem's existing constructor calls to the
+supplied body at `0x00460d10`; no overload or forwarding stub is introduced.
+
+Callers no longer cast resource-manager pointers to `int`. The two TGA entry
+points retain their separately provisional integer parameter and cast it at
+the stream-construction boundary. The stream's layout and constructor stores
+are unchanged; its exact comparison includes the complete emitted extent and
+resolved relocations. This connection does not establish the original class
+name or unify the separate reduced resource-manager declarations.
 
 ```powershell
 $env:VC6_ROOT = 'C:\path\to\vc6sp3'

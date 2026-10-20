@@ -334,7 +334,7 @@ failed:
 // 0x00511d00: opens `path` "rb" in a new stream (Tgafile.cpp line 494) and
 // reads its header; 0 when it cannot be opened.
 UnknownTgaFile* OpenAndReadHeader(const char* path, UnknownTgaFile* file, int a) {
-    UnknownTextureStream* stream = new(__FILE__, 494) UnknownTextureStream(a);
+    UnknownTextureStream* stream = new(__FILE__, 494) UnknownTextureStream((UnknownResourceManager*)a);
     if (!stream->Open(path, "rb", 0)) {
         delete stream;
         return 0;
@@ -359,7 +359,7 @@ UnknownTgaFile* ReadWholeFile(UnknownTextureStream* stream, UnknownTgaFile* file
     } else if (!ReadTgaPixels16(file, stream)) {
         goto failed;
     }
-    strcpy(file->name, g_EmptyString);
+    strcpy(file->name, "");
     return file;
 failed:
     if (file->bits)
@@ -602,7 +602,7 @@ int ReadTgaPixels16(UnknownTgaFile* file, UnknownTextureStream* stream) {
 // file when the pixels cannot be read. Each failure deletes the stream on
 // its own path.
 UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* file, int a) {
-    UnknownTextureStream* stream = new(__FILE__, 567) UnknownTextureStream(a);
+    UnknownTextureStream* stream = new(__FILE__, 567) UnknownTextureStream((UnknownResourceManager*)a);
     if (!stream->Open(path, "rb", 0)) {
         delete stream;
         return 0;

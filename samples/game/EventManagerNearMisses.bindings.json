@@ -3,7 +3,7 @@
   "??0PCCamera@@QAE@H@Z": "0x004bed80",
   "??0UIDialog@@QAE@HPBD@Z": "0x00469db0",
   "??0UnknownPodiumSound@@QAE@PAVGameObject@@H@Z": "0x004bba10",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1UnknownTextureStream@@QAE@XZ": "0x00460d60",
   "??2@YAPAXIPBDH@Z": "0x004a3010",
   "??3@YAXPAX@Z": "0x004a30c0",

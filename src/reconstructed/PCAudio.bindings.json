@@ -9,7 +9,7 @@
   "??0UnknownPCAudioObject@@QAE@XZ": "0x004bddf0",
   "??0UnknownSoundDevice@@QAE@XZ": "0x004be280",
   "??0UnknownSoundNotifier@@QAE@XZ": "0x004bb720",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1BaseObject@@UAE@XZ": "0x00405150",
   "??1PCSoundInterface@@UAE@XZ": "0x004be4b0",
   "??1PCSoundInterface@@UAE@XZ$ehhandler": "0x0054cad8",

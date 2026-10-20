@@ -59,7 +59,7 @@
   "?AddRef@BaseObject@@UAEHXZ": "0x00405160",
   "?DebugCalloc@@YAPAXIIPBDH@Z": "0x004a2fc0",
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
-  "?DrawLine@GraphicsTest@@QAEXPBUVector3@@0@Z": "0x0047c4f0",
+  "?DrawLine@GraphicsTest@@QAEXPBUVec3@@0@Z": "0x0047c4f0",
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
   "?Release@UIDialog@@UAEHXZ": "0x0046a010",

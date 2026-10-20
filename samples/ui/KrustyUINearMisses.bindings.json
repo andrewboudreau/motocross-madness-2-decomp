@@ -2,7 +2,7 @@
   "??0UIDialog@@QAE@HPBD@Z": "0x00469db0",
   "??0UnknownKrustyUIGui@@QAE@H@Z": "0x00485190",
   "??0UnknownParameterBlock@@QAE@XZ": "0x004b7130",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1GameObject@@UAE@XZ": "0x00468d60",
   "??1UnknownParameterBlock@@QAE@XZ": "0x004b7190",
   "??1UnknownTextureStream@@QAE@XZ": "0x00460d60",

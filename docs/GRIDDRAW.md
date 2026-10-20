@@ -4,6 +4,13 @@
 `src/reconstructed/Gridbase.cpp` with `Gridbase.h`. Near misses are in
 `samples/render/GriddrawNearMisses.cpp`.
 
+Terrain's surface loader now writes the existing `g_gridSize` and `g_gridLevels`
+definitions from Griddraw.cpp. The decoded stores target `0x0067a684` and
+`0x0056c200`: the final surface width and its bit length. Griddraw initializes
+the latter to 9 and computes the former as `1 << (g_gridLevels - 1)`.
+The former terrain-only names described the same mutable integer storage;
+no additional globals or initializers are introduced.
+
 ## Ownership
 
 - Confirmed: `D:\aardvark\VC\krusty2\Gridbase.cpp` (`0x0056c150`) is used

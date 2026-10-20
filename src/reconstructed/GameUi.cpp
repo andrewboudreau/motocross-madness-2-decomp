@@ -2906,7 +2906,7 @@ int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
     UnknownGameUiListRow row;
     if (a) {
         UnknownTextureStream* stream =
-            new(__FILE__, 0x1e20) UnknownTextureStream((int)g_ResourceManager);
+            new(__FILE__, 0x1e20) UnknownTextureStream(g_ResourceManager);
         if (stream->Open(file, "r", 0)) {
             row.kind = 2;
             row.text = 0;
@@ -4121,7 +4121,7 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
         }
         resourceArchive = g_ResourceManager->AddArchive(path, 0);
         sprintf(path, "%s%s", directory ? directory : "", resourceName);
-        UnknownTextureStream* stream = new(__FILE__, 0x194) UnknownTextureStream((int)g_ResourceManager);
+        UnknownTextureStream* stream = new(__FILE__, 0x194) UnknownTextureStream(g_ResourceManager);
         if (stream->Open(path, "r", 0)) {
             if (!ReadDialogResource(stream, 0)) {
                 delete stream;

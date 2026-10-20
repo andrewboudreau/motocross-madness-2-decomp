@@ -39,7 +39,6 @@ int ReadClock();                                        // 0x004bfa80
 int CheckKey(int key, int a, int b, int flags);         // 0x0043caa0 (cdecl, 4 args)
 void SetLineName(VisibilityLog* log, int line, const char* name);                    // 0x00447fa0
 void LogLine(VisibilityLog* log, int line, const char* format, ...);                 // 0x00447f40
-extern VisibilityMemoryStats* g_memoryStats; // 0x0056df04
 
 VisibilityQuadTreeNode::VisibilityQuadTreeNode()
 {
@@ -136,7 +135,7 @@ int VisibilityQuadTree::PrepareGeometry()
         }
         g_visibilityTickStat.AddSample(g_visibilityQueryTicks);
         SetLineName(reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log, statsId, "QuadTree");
-        LogLine(reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log, statsId, "Memory %d", g_memoryStats->GetBytes("QuadTree"));
+        LogLine(reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log, statsId, "Memory %d", g_MemTagStack->GetBytes("QuadTree"));
         LogLine(reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log, statsId, "PrepareGeometry %d %d", g_visibilityQueryTicks,
                 g_visibilityTickStat.GetValue());
     }

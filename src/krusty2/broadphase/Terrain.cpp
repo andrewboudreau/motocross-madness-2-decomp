@@ -151,8 +151,8 @@ struct TerrainGameSettings {                                    // TrackGame (sr
 };
 extern TerrainQualityEntry g_terrainQualityHardware[10];        // 0x00574920 (Terrain.cpp .data)
 extern TerrainQualityEntry g_terrainQualitySoftware[10];        // 0x005749c0
-extern int g_terrainTextureSize;                                // 0x0067a684 width of the last surface record
-extern int g_terrainTextureShift;                               // 0x0056c200 bit length of that width
+extern int g_gridSize;                                // 0x0067a684 width of the last surface record
+extern int g_gridLevels;                               // 0x0056c200 bit length of that width
 // 0x004a2fc0: calloc(count, size, __FILE__, __LINE__) (BikeRace.h's DebugCalloc).
 void* DebugCalloc(unsigned int count, unsigned int size, const char* file, int line);
 // 0x0050a590 (TextureMap.h): shared texture `name` through the manager.
@@ -302,10 +302,10 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
             }
             *slot++ = surface;
         }
-        g_terrainTextureSize = width;
-        g_terrainTextureShift = 0;
+        g_gridSize = width;
+        g_gridLevels = 0;
         for (int w = width; w > 0; w >>= 1)
-            g_terrainTextureShift++;
+            g_gridLevels++;
     }
 
     boundsMin = TerrainVec3(FLT_MAX, FLT_MAX, FLT_MAX);

@@ -316,7 +316,7 @@ int EventManager::CreatePodiumScene() {
     PODIUM_ARCADE->SetAxes(&direction, &up, 0, 1);
     if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->isEnabled)
         PODIUM_ARCADE->field_0x2c->SetUseLighting(1);
-    UnknownTextureStream* stream = new(__FILE__, 0x2f5) UnknownTextureStream((int)g_ResourceManager);
+    UnknownTextureStream* stream = new(__FILE__, 0x2f5) UnknownTextureStream(g_ResourceManager);
     podiumCharacterCount = resultCount < 3 ? resultCount : 3;
     float chance = rand() * (1.0f / 32768);
     for (int place = 1; place - 1 < podiumCharacterCount; place++) {
@@ -371,7 +371,7 @@ int EventManager::CreatePodiumScene() {
     delete stream;
     if (g_TrackGame->mode.soundOn && g_TrackGame->mode.networkGame) {
         UnknownPodiumSound* sound = new(__FILE__, 0x34e) UnknownPodiumSound(PODIUM_OWNER(owner)->field_0x2c->field_0xc4, 1);
-        UnknownTextureStream* audio = new(__FILE__, 0x34f) UnknownTextureStream((int)g_ResourceManager);
+        UnknownTextureStream* audio = new(__FILE__, 0x34f) UnknownTextureStream(g_ResourceManager);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(audio, "CrowdLoop.wav", "rb", 0)) {
             char text[0x80];
             sprintf(text, "CrowdLoop.wav not found in Audio.res.\n");

@@ -290,7 +290,7 @@ NumberObjectManager* NumberObjectManager::SetupDigits(void* value, int b, Unknow
         return 0;
     }
     digitCamera = camera;
-    UnknownTextureStream* stream = new (__FILE__, 0x23d) UnknownTextureStream((int)g_ResourceManager);
+    UnknownTextureStream* stream = new (__FILE__, 0x23d) UnknownTextureStream(g_ResourceManager);
     Vector3 position(0.0f, 0.0f, 0.0f);
     for (int i = 0; i < 5; i++) {
         sprintf(name, "%s\\%s", "Res", names[i]);

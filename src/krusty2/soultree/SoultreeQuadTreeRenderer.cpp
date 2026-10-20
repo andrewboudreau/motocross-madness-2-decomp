@@ -15,7 +15,7 @@ public:
 };
 extern TypeRegistry* g_TypeRegistry;             // 0x00575744
 
-extern QuadTree* g_quadTree;                     // 0x0068aba4
+extern QuadTree* g_collisionQuadTree;                     // 0x0068aba4
 extern SoultreeObject** g_soultreeNodes;     // 0x00689ec4 node array (RegisterNode 0x4fedb0)
 extern int g_soultreeNodeCount;                  // 0x00689ec8
 
@@ -58,9 +58,9 @@ int SoultreeQuadTreeRenderer::UnknownVirtualSlot14()
 // +0x14c yet and counts them.
 int SoultreeQuadTreeRenderer::PrepareGeometry()
 {
-    g_quadTree->RestartQuery();
+    g_collisionQuadTree->RestartQuery();
     visibleCount = 0;
-    while (QuadTreeObject* obj = g_quadTree->NextObject()) {
+    while (QuadTreeObject* obj = g_collisionQuadTree->NextObject()) {
         if (obj->objectTypeId == nodeTypeId) {
             D3DIMSoultreeObject* node = (D3DIMSoultreeObject*)obj;
             if (node->field_0x14c == 0) {

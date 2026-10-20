@@ -1,5 +1,5 @@
 {
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1UnknownTextureStream@@QAE@XZ": "0x00460d60",
   "??2@YAPAXIPBDH@Z": "0x004a3010",
   "??3@YAXPAX@Z": "0x004a30c0",
@@ -22,6 +22,6 @@
   "?FillTgaHeader32@@YAXPAUUnknownTgaFile@@PAXHH@Z": "0x00512870",
   "?FillTgaHeader16@@YAXPAUUnknownTgaFile@@PAXHH@Z": "0x00512940",
   "?WriteTga@@YAHPAUUnknownTgaFile@@IHH@Z": "0x00512990",
-  "?g_EmptyString@@3PADA": "0x00577738",
+  "??_C@_00A@?$AA@": "0x00577738",
   "__FILE__": "0x00574fc8"
 }

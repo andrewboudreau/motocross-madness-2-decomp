@@ -90,36 +90,10 @@ public:
     void QueryGround(Vector3* position, Vector3* normal, int a, int b);
 };
 
-class CarProceduralQuadTreeObject {
-public:
-    virtual void UnknownNodeVirtualSlot0();
-    int field_0x04;
-    int field_0x08;
-};
 
-// CollisionObject (constructor 0x00431e70, new 0xb8 at lines 0x95 and
-// 0xa2): a quadtree object with a GraphicsTest base at +0xc.
-class CarProceduralCollision : public CarProceduralQuadTreeObject, public GraphicsTest {
-public:
-    explicit CarProceduralCollision(int flags);                      // 0x00431e70
-    void Configure(void* a0, int a1, int a2, int a3);    // 0x004320f0
-    void SetHullShape(CarProceduralModel* model, int a, int b, int c, int d); // 0x00432720
-    void LoadShape(CarProceduralModel* model, const char* path); // 0x00432800
-    void SnapPlacement();                                    // 0x00435fe0
-    void AddIgnoredOwner(CarProceduralCollision* other);       // 0x00439410
-    void SetMeshShape(int count, Vector3* points);         // 0x00432ab0 (ret 8): mesh shape
-    void SetTransform(const Matrix4* transform);            // 0x00435830 (ret 4): sets the transform
-    void UpdatePlacement();                                    // 0x00435fb0: placement update
-    int QueryCollisions();                                     // 0x00438e70: runs the collision query
-
-    unsigned char field_0x40[0x54 - 0x40];   // the GraphicsTest base ends at +0x40
-    CarProceduralBody* shape;                 // +0x54  CollisionObject +0x54 shape payload
-    int hasContact;                           // +0x58 has contact
-    CarProceduralContact* contactRecord;      // +0x5C  CollisionObject +0x5c contact record
-    unsigned char field_0x60[0x68 - 0x60];
-    int ignoreVegetation;                     // +0x68  CollisionObject +0x68; set on both car colliders
-    unsigned char field_0x6c[0xb8 - 0x6c];
-};
+// The two owned colliders use the canonical 0xb8-byte layout; their
+// GraphicsTest/GameObject secondary base is at +0xc.
+typedef CollisionObject CarProceduralCollision;
 
 // One path key (16 bytes): time, then position.
 struct CarProceduralKey {

@@ -6,20 +6,9 @@
 #include "motion/D3DIMSoultreeCharacter.h"
 #include "motion/MotionPose.h"
 
-// File and .slt readers shared with D3DIMSoultreeMotnctrl.cpp (local declarations; names tier 3).
-class OwnerRegistry;
-extern OwnerRegistry* g_pOwnerRegistry;                 // 0x00572b44
-class ArchiveFile {                                      // 0x134 bytes, ctor takes the registry (0x00460d10, ret 4)
-public:
-    explicit ArchiveFile(OwnerRegistry* registry);
-    ~ArchiveFile();                                      // 0x00460d60
-    int Open(const char* name, const char* mode, int a); // 0x00460f50, ret 0xc; 0 on failure
-    int Read(void* buffer, int size, int count);         // 0x00461640, ret 0xc
-    int ReadLine(char* buffer, int size);                // 0x00461aa0, ret 8; 0 at the end of the file
-    int Seek(int a, int b, int c);                       // 0x00461340, ret 0xc
-    char pad_0x00[0x130];
-    int field_0x130;                                     // +0x130 first argument of Seek in LoadVue (tier 3)
-};
+// Shared archive stream; the remaining .slt reader view is provisional.
+#include "../../reconstructed/FileStream.h"
+extern UnknownResourceManager* g_ResourceManager; // 0x00572b44
 class SltFile {                                          // 0x5c4 bytes
 public:
     void SelectSection(const char* name);                // 0x004b78f0, ret 4

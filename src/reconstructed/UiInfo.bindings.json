@@ -6,7 +6,7 @@
   "??0TrackGameMode@@QAE@XZ$ehhandler": "0x0054ef82",
   "??0UnknownDriveList@@QAE@XZ": "0x004676a0",
   "??0UnknownParameterBlock@@QAE@XZ": "0x004b7130",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??0UnknownTrackGameRacerSlot@@QAE@XZ": "0x00521f30",
   "??1SessionInfoType@@UAE@XZ": "0x00523c80",
   "??1TrackGameMode@@QAE@XZ": "0x005225f0",

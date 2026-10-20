@@ -23,7 +23,7 @@ inline float CapsuleSegmentDot(const CollisionVec3& a, const CollisionVec3& b)
 int Fn_00439600(CollisionVec3* ends, float radius, float radiusSq, CollisionObject* object)
 {
     if (object->isEnabled) {
-        const CollisionVec3* center = (const CollisionVec3*)&object->field_0x34;
+        const CollisionVec3* center = (const CollisionVec3*)&object->boundCenter;
         CollisionVec3 d = ends[1] - ends[0];
         CollisionVec3 v = *center - ends[0];
         float t = CapsuleSegmentDot(v, d) / ((d.y * d.y + d.x * d.x) + d.z * d.z);

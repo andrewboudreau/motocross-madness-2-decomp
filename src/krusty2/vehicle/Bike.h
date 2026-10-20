@@ -298,7 +298,7 @@ struct BikeA38 {
 // (../common/SoultreeObject.h).
 
 struct BikeGlobal_0056e26c { char pad_0x000[0x2f0]; float g_0x2f0; };
-extern char g_BikeString_00577738[];
+
 extern Vec3 g_BikeVec3_005778a8;
 
 class Bike : public Vehicle {

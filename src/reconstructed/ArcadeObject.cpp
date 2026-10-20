@@ -107,7 +107,7 @@ int ArcadeObject::BuildCollision(const char* name, int value, UnknownPickCallbac
     collisionObject->Configure(renderContext, 1, a, b);
     strcpy(path, name);
     strcpy(strrchr(path, '.'), ".col");
-    UnknownTextureStream* stream = new (__FILE__, 160) UnknownTextureStream((int)g_ResourceManager);
+    UnknownTextureStream* stream = new (__FILE__, 160) UnknownTextureStream(g_ResourceManager);
     if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)found))
         found[0] = 0;
     if (stream)
@@ -119,7 +119,7 @@ int ArcadeObject::BuildCollision(const char* name, int value, UnknownPickCallbac
     collisionObject->SetOwner(arcadeModel, value);
     collisionObject->SnapPlacement();
     collisionObject->onHitCallback = callback;
-    collisionObject->onHitByCallback = context;
+    collisionObject->onHitByCallback = (CollisionCallback)context;
     AppendChild(collisionObject, -1);
     g_MemTagStack->Push(tag);
     collisionBuilt = 1;

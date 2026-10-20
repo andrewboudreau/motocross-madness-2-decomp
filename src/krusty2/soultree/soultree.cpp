@@ -32,7 +32,7 @@ public:
 };
 extern TypeRegistry* g_TypeRegistry;             // 0x00575744
 
-extern QuadTree* g_quadTree;                     // 0x0068aba4
+extern QuadTree* g_collisionQuadTree;                     // 0x0068aba4
 
 // 0x00436500 (cdecl): out = b * a in the row-vector convention (collision area,
 // collision/CollisionObject.cpp).
@@ -1033,23 +1033,23 @@ void SoultreeObject::UpdateQuadtreeCell()
 {
     Vec3 lo, hi;
     GetWorldBounds(&lo, &hi);
-    unsigned int code = g_quadTree->ComputeCode(lo.x, lo.z, hi.x, hi.z);
+    unsigned int code = g_collisionQuadTree->ComputeCode(lo.x, lo.z, hi.x, hi.z);
     if (code != (unsigned int)quadtreeCell) {
         if (quadtreeCell != 15)
-            g_quadTree->Remove(this, quadtreeCell);
+            g_collisionQuadTree->Remove(this, quadtreeCell);
         quadtreeCell = code;
         if (code != 15)
-            g_quadTree->Insert(this, code, lo.y, hi.y);
+            g_collisionQuadTree->Insert(this, code, lo.y, hi.y);
     } else {
-        g_quadTree->UpdateRange(this, quadtreeCell, lo.y, hi.y);
+        g_collisionQuadTree->UpdateRange(this, quadtreeCell, lo.y, hi.y);
     }
 }
 
 // 0x004fed70.
 void SoultreeObject::RemoveFromQuadtree()
 {
-    if (inQuadtree && g_quadTree && quadtreeCell != 15)
-        g_quadTree->Remove(this, quadtreeCell);
+    if (inQuadtree && g_collisionQuadTree && quadtreeCell != 15)
+        g_collisionQuadTree->Remove(this, quadtreeCell);
     inQuadtree = 0;
     quadtreeCell = 15;
 }

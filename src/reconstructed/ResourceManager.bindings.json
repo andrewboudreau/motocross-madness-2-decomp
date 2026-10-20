@@ -3,7 +3,7 @@
   "??0ResourceItem@@QAE@XZ": "0x004e8d70",
   "??0ResourceItem@@QAE@XZ$ehhandler": "0x0054da68",
   "??0UnknownResourceManager@@QAE@XZ": "0x004e8e80",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1BaseObject@@UAE@XZ": "0x00405150",
   "??1ResourceItem@@UAE@XZ": "0x004e8e10",
   "??1ResourceItem@@UAE@XZ$ehhandler": "0x0054da88",

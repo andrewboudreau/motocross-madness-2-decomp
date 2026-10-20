@@ -10,7 +10,7 @@
   "??0UnknownKrustyUIShadowLink@@QAE@H@Z": "0x00446840",
   "??0UnknownLobbySlotTable@@QAE@XZ": "0x004f2f00",
   "??0UnknownParameterBlock@@QAE@XZ": "0x004b7130",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1Exit1Dlg@@UAE@XZ": "0x00450fc0",
   "??1GameObject@@UAE@XZ": "0x00468d60",
   "??1KrustyUI@@UAE@XZ": "0x0049b470",

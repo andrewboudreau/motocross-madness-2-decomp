@@ -1,7 +1,7 @@
 {
   "??0FollowCamera@@QAE@H@Z$ehhandler": "0x0054ab68",
   "??0PCCamera@@QAE@H@Z": "0x004bed80",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1Camera@@UAE@XZ": "0x0042f020",
   "??1FollowCamera@@UAE@XZ": "0x00463350",
   "??1FollowCamera@@UAE@XZ$ehhandler": "0x0054ab88",

@@ -4,7 +4,7 @@
   "??0UIDialog@@QAE@HPBD@Z": "0x00469db0",
   "??0UnknownBikeNumberPainter@@QAE@PAVTextureMapManager@@@Z": "0x00417500",
   "??0UnknownLobbySlotTable@@QAE@XZ": "0x004f2f00",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1GameObject@@UAE@XZ": "0x00468d60",
   "??1GameObjectIterator@@QAE@XZ": "0x00469a40",
   "??1PlayerInfoType@@UAE@XZ": "0x00523c80",

@@ -16,7 +16,7 @@
   "??0UnknownQuarryTerrainObject@@QAE@H@Z": "0x00505830",
   "??0UnknownQuarryTerrainShadow@@QAE@H@Z": "0x00508ae0",
   "??0UnknownQuarryVisibility@@QAE@H@Z": "0x0052d340",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1UnknownTextureStream@@QAE@XZ": "0x00460d60",
   "??2@YAPAXIPBDH@Z": "0x004a3010",
   "??3@YAXPAX@Z": "0x004a30c0",

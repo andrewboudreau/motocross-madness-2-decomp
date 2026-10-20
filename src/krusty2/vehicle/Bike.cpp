@@ -452,7 +452,7 @@ Bike::Bike(int flags) : GameObject(1), Vehicle(flags)
     brakeGyro = 1;
     wrecker = 0;
     riderCharacter = 0;
-    strcpy(riderName, g_BikeString_00577738);
+    strcpy(riderName, "");
     poseSmoothTime = 0.55f;
     tailContact = 0;
     leftBarContact = 0;

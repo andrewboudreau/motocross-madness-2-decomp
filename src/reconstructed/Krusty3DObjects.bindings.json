@@ -5,7 +5,7 @@
   "??0GameObject@@QAE@H@Z": "0x00468ca0",
   "??0NumberObjectManager@@QAE@H@Z": "0x0048bca0",
   "??0RunwayLights@@QAE@H@Z": "0x0048a5b0",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??0VisualCue@@QAE@H@Z": "0x0048ad60",
   "??1ArcadeObject@@UAE@XZ": "0x00401300",
   "??1BonusObjectManager@@UAE@XZ": "0x0048c320",

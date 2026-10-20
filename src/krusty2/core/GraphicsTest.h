@@ -11,10 +11,11 @@
 //    0x00553de4, SetDrawColor(0xff, 0xff, 0xff) (0x0047c690, packs into +0x2c), then
 //    field_0x30 = 0.  Tier 1 decoded.  CollisionObject passes 1; PhysicsBody forwards its own
 //    constructor argument.
-//  * Size 0x38: PhysicsBody's first own field (name) is at 0x38 and PhysicsRigidBody's ctor
-//    zeroes +0x34 (tier 2: extent from the derived classes).  CollisionObject's first
-//    accessed own field is at 0x50 = 12 + 0x44, so CollisionObject has 0xc unaccessed bytes
-//    of its own before it.
+//  * Size 0x34 (tier 2): the constructor initializes only +0x2c/+0x30;
+//    CarProcedural/Wrecker store their first pointers at +0x34, the renderer
+//    keeps its node count there, and CollisionObject's bounds start at +0x40
+//    after the +0xc secondary-base offset. Derived +0x34 stores do not establish
+//    another base field. Each derived declaration retains its observed offsets.
 #ifndef GRAPHICS_TEST_H
 #define GRAPHICS_TEST_H
 
@@ -54,9 +55,8 @@ public:
 
     int drawColor;                   // +0x2c packed draw color (SetDrawColor)
     int field_0x30;                   // zeroed by the GraphicsTest constructor
-    int field_0x34;                   // zeroed by the PhysicsRigidBody constructor
 };
 
-typedef char graphics_test_assert_sizeof[(sizeof(GraphicsTest) == 0x38) ? 1 : -1];
+typedef char graphics_test_assert_sizeof[(sizeof(GraphicsTest) == 0x34) ? 1 : -1];
 
 #endif

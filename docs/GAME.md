@@ -56,6 +56,13 @@ candidates.
 | 8 | `0x00467eb0` | Exact. Renders a frame, timing each phase, and fills the debug overlay's profile and memory pages |
 | 10 | `0x004685d0` | Not reconstructed: it reads the time stamp counter with `rdtsc`, which VC6 can only emit from inline assembly |
 
+The two `rdtsc` instructions are at `0x004686a0` and `0x00468712`; they
+update the HiResMeter profiling entry. The gameplay frame delta separately
+uses `ReadClock` at `0x004bfa80`. Authentic VC6 SP3 rejects
+`#pragma intrinsic(__rdtsc)` with C4163 and emits an external call for that
+spelling. Replacing the counter with `ReadClock` would change the profiling
+units and behavior, so no such substitute is supplied.
+
 The members at +0x2f4 and +0x34 are GameObjects (the root objects). The
 non-virtual initialiser `0x00467b70` constructs them with GameObject's
 constructor and links +0x34 under +0x2f4 (`0x00469190`). It then creates:
@@ -125,3 +132,16 @@ The peak-hold class (`src/reconstructed/PeakHold.cpp`, `0x004cb670`..
 `0x004cb6d8`) is exact. Its TU is not established; the nearest source literal
 is PCVideoCard.cpp's. Game.cpp's ten statics of it are constructed by the
 dynamic initializers at `0x00467850`..`0x0046798f`, which are also exact.
+
+## Shared font storage
+
+Shutdown now calls `DeleteFonts` on `FontTexture::s_UnknownManager65b478`,
+the existing list at `0x0065b478`. The previous standalone global declaration
+named the same storage but had no definition. The inherited list method still
+receives the object at offset zero and calls the retail target `0x004677c0`.
+The original owning class remains uncertain, as documented in `FontTexture.h`.
+
+Including that declaration changes VC6's generated initializer symbol numbers
+in Game.cpp by one. The matching selectors and bindings follow the emitted
+names; all ten initializer bodies and their ten jump stubs retain their full
+strict matches, as do the remaining Game.cpp targets.

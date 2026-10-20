@@ -34,6 +34,21 @@ unresolved force-feedback virtuals keep their slot names.
 
 ## Classes
 
+`ControlInterface::NextBindingId` (`0x0043ce90`, 12 bytes) now has its actual
+member provider in `ControlInterface.cpp`. DeviceSetup, GUIManager and
+ObjectPicker call it with the control interface in `ecx`; the decoded body
+does not read `this`. It increments the shared word at `0x0057985c` and returns
+the new value. That word lies wholly in the writable, loader-zeroed tail of
+retail `.data`; the source supplies four writable uninitialized bytes as
+`g_LastBindingId`. Original names and translation unit ownership remain
+provisional.
+
+The former free-function sample has been removed and its physics check now
+uses the canonical member. The calibration target compares all 12 bytes with
+both global relocations resolved. `tests/test_controlinterface_provider.py`
+independently checks the counter's retail section bounds and compiled
+zero-initialized storage.
+
 - **InputDevice:** slot 0 is `_purecall` and slot 1 its destructor, so a pure
   virtual precedes the destructor. Its constructor (`0x00489780`) takes an id,
   sets +0x10 to -1 and clears a six-bit bitfield at +0x14. The helper

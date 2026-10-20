@@ -12,42 +12,18 @@
 // slot 10 (0x005306e0), slot 14 (0x004de400) and slot 23 (0x00532890).
 // Allocation size 0x53c (Bike slot 97, `new(bike.cpp) Wrecker(1)`).
 
-// GraphicsTest (RTTI .?AVGraphicsTest@@, vtable 0x00553de4). Only what the
-// Wrecker code reaches is declared; the canonical, fuller declaration is
-// src/krusty2/core/GraphicsTest.h. Constructor 0x0047bc70 (thiscall, ret 4),
-// destructor core 0x0047bd00. Wrecker's own fields start at +0x34: the first
-// Wrecker method that sets it (0x005301c0) is the only writer seen here, so
-// whether +0x34 belongs to GraphicsTest is open.
-class GraphicsTest : public GameObject {
-public:
-    explicit GraphicsTest(int flags);
-    virtual ~GraphicsTest();
-
-    // Debug drawing (bikerace.cpp slot 14): 0x0047c690 packs the draw
-    // colour, 0x0047c4f0 draws a line between two world points.
-    void SetDrawColor(int r, int g, int b);
-    void DrawLine(const Vector3* a, const Vector3* b);
-
-protected:
-    int drawColor;                            // +0x2c packed draw colour (0x0047c690)
-    int field_0x30;            // zeroed by the GraphicsTest constructor
-};
+// Shared debug-drawing base and collision layout. GraphicsTest ends at +0x34;
+// the fields following it belong to each derived object.
+#include "../krusty2/collision/CollisionObject.h"
 
 // Object at Wrecker+0x38, RTTI ConstraintMethodCollisionModel (constructor
 // 0x0043b8d0 writes vtables 0x00551260 at +0 and 0x005511f0 (a GameObject-shaped
 // table) at +0xc; new size 0x10c at wrecker.cpp line 0x68). The secondary
 // GameObject subobject at +0xc is what UnknownVirtualSlot8/10 dispatch on.
-class UnknownWreckerQuadTreeObject {
-public:
-    virtual void UnknownVirtualSlot0();
-    int field_0x04;
-    int field_0x08;
-};
 
 // GameObject slot 11 as the physics objects implement it: the per-step
 // update with the step length (src/krusty2/core/GameObject.h declares it
-// with `float dt`; src/reconstructed/GameObject.h still declares the slot
-// with an int). Slot 10 of Wrecker calls it through this view of the same
+// with `float dt`). Slot 10 of Wrecker calls it through this view of the same
 // vtable on its gravity model, rigid body and collision model.
 class UnknownWreckerSteppable {
 public:
@@ -76,34 +52,17 @@ struct UnknownWreckerProbe {
     Vector3 normal;            // +0x14 contact normal
 };
 
-// Field names follow src/krusty2/collision/CollisionObject.h (+0x58..+0x84)
-// and ConstraintMethodCollisionModel.h (+0xe8..+0x108).
-class UnknownWreckerCollisionObject : public UnknownWreckerQuadTreeObject, public GraphicsTest {
-public:
-    // 0x00439410 (thiscall, ret 4): appends `owner` to the ignore list.
-    void AddIgnoredOwner(UnknownWreckerCollisionObject* owner);
-    void SnapPlacement();                      // 0x00435fe0
-    // The per-step update (GameObject slot 11 with the step length, see
-    // UnknownWreckerSteppable) on the GraphicsTest subobject at +0xc.
-    // Spelled with the explicit offset: a pointer conversion to the base
-    // gets a null check that slot 10 of Wrecker does not have.
-    void UnknownFunctionStep(float step) {
-        ((UnknownWreckerSteppable*)((char*)this + 0xc))->UnknownVirtualSlot11(step);
-    }
-
-    unsigned char field_0x40[0x58 - 0x40];  // GraphicsTest subobject ends at +0x40
-    int hasContact;            // +0x58
-    unsigned char field_0x5c[0x6c - 0x5c];
-    int collisionEnabled;      // +0x6c
-    int collidable;            // +0x70
-    unsigned char field_0x74[0x84 - 0x74];
-    int quadtreeCell;          // +0x84 quadtree cell, passed to QuadTree::Remove
-};
+// Same complete CollisionObject, with GraphicsTest/GameObject at +0xc.
+typedef CollisionObject UnknownWreckerCollisionObject;
 
 class UnknownWreckerRigidBody;
 
 class UnknownWreckerCollisionModel : public UnknownWreckerCollisionObject {
 public:
+    // Dispatch through the secondary GameObject base without a null conversion.
+    void UnknownFunctionStep(float step) {
+        ((UnknownWreckerSteppable*)((char*)this + 0xc))->UnknownVirtualSlot11(step);
+    }
     explicit UnknownWreckerCollisionModel(int flags);              // 0x0043b8d0
     // 0x0043b9e0 (thiscall, ret 0xc): binds the model to `body`; `name`
     // is the collision file Bike passes ("rider.col").
@@ -111,7 +70,7 @@ public:
     // 0x0043c7f0 (thiscall, ret 0x10): adds a probe at `offset` on `bone`.
     void AddProbePoint(Vector3 offset, int bone);
 
-    unsigned char field_0x88[0xe8 - 0x88];
+    unsigned char field_0xb8[0xe8 - 0xb8];
     int manualStep;            // +0xe8
     int shapeCollisionEnabled; // +0xec
     float damping;             // +0xf0

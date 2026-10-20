@@ -36,7 +36,7 @@ addresses and never forces unresolved references into an executable.
 ## Current gaps
 
 The 2026-10-20 build compiles 165 C++ files (163 canonical sources and two
-reviewed candidates) and reaches LINK with 775 unresolved external symbols,
+reviewed candidates) and reaches LINK with 744 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -54,7 +54,7 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
 the current composition retains all 1,076 strict-exact physics targets and all
-2,971 distinct strict-exact calibration cases. A native link/runtime regression checks
+2,972 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 
@@ -91,6 +91,18 @@ and their inclusion preserves the existing strict matches. Three
 PC-98 scan-code map, detection sentinel and platform flag, with all 1,032
 initial bytes checked against retail. Together these remove eight more
 unresolved symbols. Real disk/archive integration remains untested.
+
+The collision consumers now share the canonical class, preserving its `+0xc`
+secondary base and all observed field offsets. Motion loaders use the supplied
+stream/resource methods and the existing resource-manager pointer. The stream
+constructor has one resource-manager-pointer signature, and the exact input
+binding-ID allocator is now supplied by ControlInterface.cpp. Soultree uses
+the quadtree pointer maintained by VisibilityQuadTree; terrain writes Griddraw's
+existing size/level words; visibility statistics use MemTagStack; and shutdown
+uses the existing font list. Bike and TGA readers use the verified empty
+literal instead of undefined array names. This composition removes another
+31 unresolved symbols, with prior strict matches preserved. Corrected names
+for still-missing methods are not counted as resolutions.
 
 The source still lacks `Game::Tick` at `0x004685d0`, called by
 `TrackGame::Tick`; its retail timing uses `rdtsc` (see [Game](GAME.md)).

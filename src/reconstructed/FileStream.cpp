@@ -36,7 +36,7 @@ static inline UnknownTextureStream* InnermostStream(UnknownTextureStream* stream
 // 0x00460d10. The buffer pointer is named before the argument store: only then does VC6
 // load the argument at entry (edx) and keep the buffer address in ecx for both pointer
 // stores, as retail does.
-UnknownTextureStream::UnknownTextureStream(int a)
+UnknownTextureStream::UnknownTextureStream(UnknownResourceManager* manager)
 {
     fileEncoded = 0;
     headerSize = 0;
@@ -52,7 +52,7 @@ UnknownTextureStream::UnknownTextureStream(int a)
     headerByte2 = 'O';
     headerByte3 = 'E';
     char* buffer = readBuffer;
-    archives = (UnknownResourceManager*)a;
+    archives = manager;
     bufferPos = buffer;
     bufferEnd = buffer;
 }

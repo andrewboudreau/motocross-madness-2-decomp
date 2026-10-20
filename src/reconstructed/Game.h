@@ -24,10 +24,6 @@ public:
 };
 extern GameHiResMeterView* g_HiResMeter;
 
-// Static object at 0x0065b478: the font list (FontTextureManager.h;
-// FontTexture.cpp defines it as FontTexture::s_UnknownManager65b478).
-extern UnknownStatic65b478 g_UnknownStatic65b478;
-
 // cdecl 0x00460ad0: fills math lookup tables (called by the constructor).
 void InitFastMath();
 

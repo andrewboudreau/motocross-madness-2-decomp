@@ -4,7 +4,7 @@
   "??0Rectangle2D@@QAE@ABV0@@Z": "0x004e8b60",
   "??0Rectangle2D@@QAE@MMMM@Z": "0x004e8ad0",
   "??0UnknownFontTextureManager@@QAE@XZ": "0x00467690",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1CharacterCell@@UAE@XZ": "0x00467680",
   "??1FontTexture@@UAE@XZ": "0x00467290",
   "??1Rectangle2D@@UAE@XZ": "0x004e8bc0",

@@ -1,10 +1,12 @@
 # CarProcedural.cpp and Grid1.cpp
 
 `src/reconstructed/CarProcedural.*` and `Grid1.*`. Names are provisional
-unless RTTI gives them. Both files declare their own boundary views for the
-models, collision and grid terrain they touch. This keeps them away from
-the conflicting declarations in Griddraw.h, LightEmitter.h and
-ObjectPicker.h.
+unless RTTI gives them. Model and grid-terrain boundary views remain local.
+CarProcedural's two owned colliders use the shared `CollisionObject`
+declaration: size `0xb8`, with the GraphicsTest/GameObject base at `+0xc`.
+The constructor, setup, shape, placement and ignore-list calls consequently
+use the existing collision implementations. Shape/contact payload casts
+retain their observed offsets without claiming their complete original types.
 
 **CarProcedural.cpp** (`0x0042f390..0x00430feb`). Evidence: the `__FILE__`
 literal at `0x005683e4` (xrefs `0x0042f657..0x0042fb52`) and RTTI

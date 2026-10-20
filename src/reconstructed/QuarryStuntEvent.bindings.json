@@ -8,7 +8,7 @@
   "??0StatsOverlay@@QAE@H@Z": "0x00519370",
   "??0TextQueueOverlay@@QAE@H@Z": "0x0051b2a0",
   "??0UnknownMessage@@QAE@PBDM@Z": "0x0051b200",
-  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??0VisualCue@@QAE@H@Z": "0x0048ad60",
   "??1BaseQuarryEvent@@UAE@XZ": "0x004e1f10",
   "??1BaseQuarryEvent@@UAE@XZ$ehhandler": "0x0054d6e8",

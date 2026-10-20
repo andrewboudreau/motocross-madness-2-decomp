@@ -10,12 +10,24 @@ including the call to `GameObject::SetRenderContext`, match retail. The first
 argument passes through as the render-context pointer. Physics and scene callers
 now share its `void*` signature; the pointee's complete type remains unproven.
 
-ObjectPicker's local CollisionObject view also uses the canonical opaque-pointer
-signatures for `LoadShape`, `SetHullShape` and `SetOwner`. ArcadeObject's direct
-calls consequently resolve to the existing implementations at `0x00432800`,
-`0x00432720` and `0x004394d0`. This supplies five previously unresolved symbol
-identities without additional wrapper bodies. It does not reconcile every local
-CollisionObject layout or establish the model/owner pointers' original types.
+ObjectPicker, CarProcedural and Wrecker now use this shared CollisionObject
+declaration. Their constructor, setup, shape, placement and ignore-list calls
+resolve to the existing implementations. Model/owner parameters remain opaque
+where their complete types are unproven.
+
+GraphicsTest's extent is modeled as `0x34` (tier 2): its constructor initializes
+`+0x2c` and `+0x30`; CarProcedural and Wrecker place their first pointers at
+`+0x34`, while SoultreeQuadTreeRenderer keeps its own node count there.
+PhysicsBody's `+0x34` field is declared in that derived class. CollisionObject's
+bounding-sphere center belongs to CollisionObject at `+0x40`, immediately after
+the secondary GraphicsTest base at `+0xc`. It no longer aliases a purported
+GraphicsTest field. CollisionObject remains `0xb8` bytes and the Wrecker
+collision-model view remains `0x10c`; all accessed field offsets are retained.
+
+`tests/test_collision_link.py` checks these layouts with VC6 and verifies that
+real production caller relocations name the real collision implementations.
+This does not establish the original header structure or reconcile every
+remaining scene-node and constraint-model boundary view.
 
 # CollisionPoint.cpp (collision)
 

@@ -71,6 +71,7 @@ public:
     // slot 43, 0x004cbed0: angular velocity expressed in the world frame.
     virtual Vec3 GetWorldAngularVelocity();
 
+    int field_0x34;                   // PhysicsRigidBody constructor clears it
     char name[256];                   // 0x038, SetName clamps to 255 + NUL
     int active;                       // 0x138, 1 after construction; the rigid-body
                                       //        step integrates only while nonzero

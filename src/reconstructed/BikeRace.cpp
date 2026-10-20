@@ -1914,14 +1914,14 @@ void BikeRace::DrawTrack(Track* track) {
                 raceTerrain->QueryGround(&b, 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
-                DrawLine(&a, &b);
+                DrawLine((const Vec3*)&a, (const Vec3*)&b);
                 a = *(Vector3*)&segment->edgeBX;
                 b = *(Vector3*)&segment->next->edgeBX;
                 raceTerrain->QueryGround(&a, 0, 0, 0);
                 raceTerrain->QueryGround(&b, 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
-                DrawLine(&a, &b);
+                DrawLine((const Vec3*)&a, (const Vec3*)&b);
                 SetDrawColor(0, 0, 0xff);
                 a = *(Vector3*)&segment->pointX;
                 b = *(Vector3*)&segment->next->pointX;
@@ -1929,7 +1929,7 @@ void BikeRace::DrawTrack(Track* track) {
                 raceTerrain->QueryGround(&b, 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
-                DrawLine(&a, &b);
+                DrawLine((const Vec3*)&a, (const Vec3*)&b);
                 segment = segment->next;
             }
             item = list;
@@ -1968,7 +1968,7 @@ int BikeRace::UnknownVirtualSlot14() {
                 b = startProbe.center + startProbe.halfExtents;
                 a.y += 2.5f;
                 b.y += 2.5f;
-                DrawLine(&a, &b);
+                DrawLine((const Vec3*)&a, (const Vec3*)&b);
             }
             if (hasFinishProbe) {
                 SetDrawColor(0, 0xff, 0xff);
@@ -1976,7 +1976,7 @@ int BikeRace::UnknownVirtualSlot14() {
                 b = finishProbe.center + finishProbe.halfExtents;
                 a.y += 2.5f;
                 b.y += 2.5f;
-                DrawLine(&a, &b);
+                DrawLine((const Vec3*)&a, (const Vec3*)&b);
             }
         }
         if (debugDraw) {
@@ -1985,37 +1985,37 @@ int BikeRace::UnknownVirtualSlot14() {
             } else {
                 SetDrawColor(0, 0xff, 0);
             }
-            DrawLine(&g_ObstacleDebugUpperLine[0], &g_ObstacleDebugUpperLine[1]);
+            DrawLine((const Vec3*)&g_ObstacleDebugUpperLine[0], (const Vec3*)&g_ObstacleDebugUpperLine[1]);
             if (g_ObstacleDebugHit) {
                 SetDrawColor(0xff, 0, 0x80);
             } else {
                 SetDrawColor(0, 0xff, 0x80);
             }
-            DrawLine(&g_ObstacleDebugLine[0], &g_ObstacleDebugLine[1]);
+            DrawLine((const Vec3*)&g_ObstacleDebugLine[0], (const Vec3*)&g_ObstacleDebugLine[1]);
             if (g_ObstacleDebugLowerHit) {
                 SetDrawColor(0xff, 0, 0xff);
             } else {
                 SetDrawColor(0, 0xff, 0xff);
             }
-            DrawLine(&g_ObstacleDebugLowerLine[0], &g_ObstacleDebugLowerLine[1]);
+            DrawLine((const Vec3*)&g_ObstacleDebugLowerLine[0], (const Vec3*)&g_ObstacleDebugLowerLine[1]);
             if (g_ObstacleDebugLeftHit) {
                 SetDrawColor(0xff, 0, 0xff);
             } else {
                 SetDrawColor(0, 0xff, 0xff);
             }
-            DrawLine(&g_ObstacleDebugLeftLine[0], &g_ObstacleDebugLeftLine[1]);
+            DrawLine((const Vec3*)&g_ObstacleDebugLeftLine[0], (const Vec3*)&g_ObstacleDebugLeftLine[1]);
             if (g_ObstacleDebugRightHit) {
                 SetDrawColor(0xff, 0, 0xff);
             } else {
                 SetDrawColor(0, 0xff, 0xff);
             }
-            DrawLine(&g_ObstacleDebugRightLine[0], &g_ObstacleDebugRightLine[1]);
+            DrawLine((const Vec3*)&g_ObstacleDebugRightLine[0], (const Vec3*)&g_ObstacleDebugRightLine[1]);
             SetDrawColor(0, 0, 0xff);
-            DrawLine(&g_GateDebugBoxLine[0], &g_GateDebugBoxLine[1]);
+            DrawLine((const Vec3*)&g_GateDebugBoxLine[0], (const Vec3*)&g_GateDebugBoxLine[1]);
             SetDrawColor(0xff, 0, 0xff);
-            DrawLine(&g_GateDebugDirectionLine[0], &g_GateDebugDirectionLine[1]);
+            DrawLine((const Vec3*)&g_GateDebugDirectionLine[0], (const Vec3*)&g_GateDebugDirectionLine[1]);
             SetDrawColor(0xff, 0, 0);
-            DrawLine(&g_PathTargetDebugLine[0], &g_PathTargetDebugLine[1]);
+            DrawLine((const Vec3*)&g_PathTargetDebugLine[0], (const Vec3*)&g_PathTargetDebugLine[1]);
         }
     }
     return 1;

@@ -110,14 +110,14 @@
     "bindings": "CollisionVectorHelpers.bindings.json"
   },
   {
-    "class": "CollisionObject",
-    "source": "CollisionVectorHelpers.cpp",
-    "candidate_symbol_contains": "NextBindingId",
+    "class": "ControlInterface",
+    "source": "../../../src/reconstructed/ControlInterface.cpp",
+    "candidate_symbol_contains": "?NextBindingId@ControlInterface@@QAEHXZ",
     "target_va": "0x0043ce90",
     "target_size": 12,
     "expect": "exact",
-    "notes": "return ++g gives mov/inc/mov; ControlInterface::NextBindingId; owner: bracket only",
-    "bindings": "CollisionVectorHelpers.bindings.json"
+    "notes": "Canonical member provider: callers pass ControlInterface in ecx; the body returns ++global at 0x57985c without accessing this. Original names/TU ownership remain provisional.",
+    "bindings": "../../../src/reconstructed/ControlInterface.bindings.json"
   },
   {
     "class": "CollisionObject",

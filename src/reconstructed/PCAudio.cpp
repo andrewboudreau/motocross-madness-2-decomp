@@ -388,7 +388,7 @@ int Sound::Load(const char* name, UnknownTextureStream* stream, int flags, int a
     if (!SoundSystem() || !SoundSystem()->audioStarted)
         return 0;
     if (!stream) {
-        file = new (__FILE__, 544) UnknownTextureStream((int)g_ResourceManager);
+        file = new (__FILE__, 544) UnknownTextureStream(g_ResourceManager);
         if (!file->Open(name, "rb", 0)) {
             delete file;
             return 0;
@@ -842,7 +842,7 @@ int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
         if (!FillBufferFromStream(buffer, entry->archive, 0, bufferBytes))
             return 0;
     } else {
-        UnknownTextureStream* file = new (__FILE__, 1368) UnknownTextureStream((int)g_ResourceManager);
+        UnknownTextureStream* file = new (__FILE__, 1368) UnknownTextureStream(g_ResourceManager);
         if (!file->Open(soundName, "rb", 0)) {
             delete file;
             return 0;

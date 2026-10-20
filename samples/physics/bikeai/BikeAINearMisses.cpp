@@ -753,7 +753,7 @@ int QuerySegmentObstacles(Vec3* seg, float radius, int skipVegetation, int ignor
                     }
                 } else if (obj->ownerType == 0x69) {
                     UnknownBikeAIPointOwner* owner = (UnknownBikeAIPointOwner*)obj->ownerObject;
-                    Vec3* center = (Vec3*)&obj->field_0x34;
+                    Vec3* center = (Vec3*)&obj->boundCenter;
                     d = *center - seg[0];
                     distSq = BikeAISquareMagnitude(d);
                     d = BikeAINormalizeVS(d);
