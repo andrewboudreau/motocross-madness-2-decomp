@@ -245,8 +245,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot91@Bike",
     "target_va": "0x0040aec0",
     "target_size": 1353,
-    "expect": "partial",
-    "notes": "slot 91: 1014/1353 strict (candidate 1357 bytes). The velocity length after the lean-plane steer uses y/x/z component copies (retail loads each once and squares the registers). Left: one dot operand order (fld [ecx]; fmul [esi+0xa0]), BikeDirection(force) results stored to a separate temp (retail reuses force's slot at esp+0x10; by-value/in-place/assign-back forms are all identical), the g_BikeVec3 zero copy load order and the mov ecx,[esi+0x720] hoist.",
+    "expect": "exact",
+    "notes": "slot 91: byte-exact. The velocity length after the lean-plane steer uses y/x/z component copies (retail loads each once and squares the registers); force is normalized in place inside the call guard (zero assigned on the zero path, operator*= otherwise; retail writes the unit vector back into force's slot) and passed by value with the pivot read through a const Vec3& local; the angular-velocity decay uses operator*=, which keeps the wobbleStage load below the decay stores.",
     "bindings": "Bike.bindings.json"
   },
   {

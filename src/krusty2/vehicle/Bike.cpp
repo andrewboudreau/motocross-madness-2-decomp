@@ -1254,15 +1254,6 @@ static inline float BikeMagnitude(const Vec3& v)
     return 1.0f / FastInvSqrt(lenSq);
 }
 
-static inline Vec3 BikeDirection(const Vec3& v)
-{
-    float lenSq = BikeDot(&v, &v);
-    if (lenSq == 0.0f)
-        return g_BikeVec3_005778a8;
-    float s = FastInvSqrt(lenSq);
-    return Vec3(s * v.x, s * v.y, s * v.z);
-}
-
 // Slot 97: builds the rider ragdoll ("rider.col") and attaches the 15 body
 // bones by name (Pelvis, UprTorso, Head, arms, legs, feet) with local offsets.
 // BikeAttachBone is __forceinline because retail expands the same sequence at each of the 15
@@ -1583,11 +1574,22 @@ void Bike::UnknownVirtualSlot91()
         }
     }
     float mag = BikeMagnitude(force);
-    if (_finite(mag) && ((mag < 0.0f) ? -mag : mag) >= 0.0001f)
-        modelNode->RotateAboutPoint(rotationPivot, BikeDirection(force), mag);
-    angularVelocity.x = angularVelocity.x * 0.9f;
-    angularVelocity.y = angularVelocity.y * 0.9f;
-    angularVelocity.z = angularVelocity.z * 0.9f;
+    if (_finite(mag) && ((mag < 0.0f) ? -mag : mag) >= 0.0001f) {
+        // force is normalized in place (retail writes the unit vector back into its
+        // slot; an inline helper taking Vec3& flips the operand order of the
+        // heading dot above) and the pivot is read through a reference
+        float lenSq = BikeDot(&force, &force);
+        if (lenSq == 0.0f) {
+            force = g_BikeVec3_005778a8;
+        } else {
+            float s = FastInvSqrt(lenSq);
+            force *= s;
+        }
+        const Vec3& pivot = rotationPivot;
+        modelNode->RotateAboutPoint(pivot, force, mag);
+    }
+    // operator*= keeps the wobbleStage load below the decay stores
+    angularVelocity *= 0.9f;
     // wobble: ramps a short-lived oscillation on field_0xd8.z (cnt 1..2)
     float t = wobbleTime + stepTime;
     int cnt = wobbleStage;
