@@ -48,9 +48,10 @@
 // normalisations return through the out-of-line Vector3 constructor
 // 0x00404e60 as retail does (Vector3Call; the inline budget, with the
 // constructor expanded in the mode 5 and 6 normalisations). Mode 5's
-// `lines` has 8 entries (4 used): retail leaves 0x80 bytes after it that
-// nothing touches, and with 8 entries circle, ring, identity and line all
-// sit 0x40 below their retail slots (tools/frame_layout.py). Sweeping 13
+// `lines` has 8 entries (4 used). This is a strong inference from the
+// frame, not confirmed: retail leaves 0x80 bytes after it that nothing
+// touches, and with 8 entries circle, ring, identity and line all sit
+// 0x40 below their retail slots (tools/frame_layout.py). Sweeping 13
 // choice points (8192 forms; insn diffs 507 to 495, aligned 1386 to 1398)
 // kept identity(r, c) stores, a reference to the light position and a
 // separate normalisation in mode 3. Accumulating the squared lengths and
@@ -60,7 +61,9 @@
 // 0x9a8) with temporaries the source does not have yet (mode 2 reads the
 // vertex's y and z through a stack copy, x straight from the vertex; a
 // named copy, a copy constructor, a by-value difference and three-float
-// constructor forms all copy x too), `this` is in esi where ours is in
+// constructor forms all copy x too; x subtracted before a named copy keeps
+// retail's loads but adds a dead x store (713); y and z in float locals,
+// alone or with x read in place, are folded away (744)), `this` is in esi where ours is in
 // ebx, and the identity diagonal is stored from m[3][3] down (every order
 // and spelling of the four stores is emitted from m[0][0] up).
 // The mode 5 source keeps two retail bugs: `circle[i + 1]` reads past the
@@ -500,7 +503,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     (Vector3&)viewDirection = ((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewDirection;
                     (Vector3&)viewPosition = ((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position;
                 }
-                UnknownSoultreeVertex lines[8];          // 4 used; the frame has 8
+                UnknownSoultreeVertex lines[8];          // 4 used; 8 inferred from the frame
                 for (i = 0; i < 4; i++) {
                     lines[i].diffuse = 0xffff0000;
                     lines[i].specular = 0xff000000;

@@ -31,7 +31,8 @@ through it (written out with COPY_NAME, VC6 keeps a separate pointer and
 loses the merged count's register), and initialises the search as
 `for (j = 0, found = 0; ...)` (`found = 0` first swaps the two slots).
 
-Exact: 26 calibration cases (everything above except the near miss).
+The found-file filter `0x0044a600` tests the directory bit with an `if`
+returning 1 or 0; `(attributes >> 4) & 1` in any type or cast gives VC6's
+byte load (`mov al`, eax known zero) instead of retail's `and eax, 0xff`.
 
-Near miss (`samples/render/DirectoryListNearMisses.cpp`, notes there): the
-found-file filter `0x0044a600` (attribute load width).
+Exact: 27 calibration cases (everything above).

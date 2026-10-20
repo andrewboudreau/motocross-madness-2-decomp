@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 125, c 101, total 228. The three class (a) functions of the
+Counts: a 2, b 125, c 100, total 227. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -185,13 +185,12 @@ retail does; grouping the x row's first two products does the same for that row.
 | race/Wrecker | `0x00531740` | 1606/1624 | c | slots match; the argument push of two loop constructor calls comes one load earlier (`push ecx` before the particle-pointer load and before `along.y`), two registers differ |
 | race/Wrecker | `0x005329e0` | 1200/1312 (inside Wrecker.cpp) | a | every instruction equal; slot order only (retail keeps `push` nearest esp, then the y/x extent copies, `p`) |
 | render/BackgroundImage | `0x004049d0` | 108/606 (masked) | c | block layout as retail; VC6 caches 0 in edi (`xor edi, edi`, `mov [esp + N], edi`) where retail stores immediates, which moves the region loop's registers; two counted zero stores (`surface`'s home, `copyDcNext`) with `edi` already pushed meet the cache threshold ([VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md)) |
-| render/CacheTexture | `0x005102d0` | 426/529 (masked) | b | 13 code diffs; slots differ |
+| render/CacheTexture | `0x005102d0` | 438/529 (masked) | b | 462/558 strict; the halving order matches retail's loads; retail lays the shared `return 0` out after the second loop (`jle; jmp top`), VC6 here after the final returns (goto, break and loop-shape forms do not move it) |
 | render/CubeDraw | `0x0043dc60` | 121/1064 | b | 53 code diffs: `xor ebp, ebp` vs `xor edx, edx`; `mov [esp + N], ebp ; mov edi, 0x100 ; o~` vs `mov [esp + N], edx ; mov ebx, 0x100 ; o~`; slots differ |
 | render/CubeDraw | `0x0043e0b0` | 30/352 | c | 22 code diffs: retail adds `push ebx`; retail adds `mov ecx, [esp + N]` |
 | render/D3DIMSoulTree | `0x00440f30` | 696/7268 | b | DrawCurrentLod: all relocations bound; mode 8/2 normalisations call the out-of-line Vector3 constructor 0x00404e60 as retail; mode 5 `lines[8]` closes retail's untouched 0x80 gap; sweeps over declarations, references and one-term-per-statement sums: 484 differing insns (was 507); frame (0x9a8 vs 0x9e8), temporaries and register allocation left |
 | render/D3DIMSoulTree | `0x00443aa0` | 799/832 | c | 11 code diffs: retail lacks `fmul [eax + 0x10] ; fld [esp + N]`; retail lacks `faddp st(1)` |
 | render/DebugOverlay | `0x00447a00` | 460/999 | b | body matches; VC6 copies the epilogue into the failure and success returns (retail: one shared epilogue) |
-| render/DirectoryList | `0x0044a600` | 74/109 | c | 6 code diffs: `jne @31 ; mov al, byte ptr [esp + N]` vs `jne @32 ; mov eax, [esp + N]` |
 | render/GR_BitString | `0x004239c0` | 343/420 | b | 14 code diffs: retail lacks `mov ebx, ecx`; retail adds `mov ebp, ecx`; slots differ |
 | render/GR_BitString | `0x00423b70` | 93/442 | b | 16 code diffs: retail adds `add esi, 4`; `or ecx, eax` vs `or eax, ecx ; mov [edx - 4], eax`; slots differ |
 | render/Grid1 | `0x0047caa0` | 213/1728 | b | slot 3 texture stage switch; with the terrain/extra casts 63 instructions differ, mostly after the stage ladder, whose fourth compare VC6 folds (20 bytes short) |

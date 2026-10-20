@@ -25,6 +25,15 @@
 // 8 of 9 products (m[3][0] * m[0][2] is the exception); the translation
 // read into locals before or after the swaps, a Vector3* translation
 // pointer and a Vector3 position copy are worse (1068-1343).
+// s14 (strict 1938 unchanged): function-scope j, controller, isNew, t, r
+// and target are inert, a function-scope channel or targetValue gives
+// 1346-1362 and one function-scope k for both channel loops 1341;
+// frame_layout puts all three swapped pairs (j/controller, k/isNew,
+// i/second k) at adjacent ranks with no count adjustment. The channel
+// translation summed before the swaps from the untransposed elements, or
+// through a `const Vector3&` to row 3, is worse (masked 935-1148 of 1738,
+// base 1634); writing every product's operands the other way round
+// changes nothing.
 //
 // MorphBastardModifier::UnknownVirtualSlot27 (0x004a4c60, 1568 bytes): blends
 // the target deltas of every channel into the copied mesh. The control flow,
