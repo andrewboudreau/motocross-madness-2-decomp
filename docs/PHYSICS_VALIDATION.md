@@ -499,7 +499,9 @@ These were measured with VC6 SP3 `/O2` on the real targets and on small syntheti
 sources. They describe compiler behaviour, not original source.
 
 **x87 operand load order.** Cases include the inlined cross products in
-PoseRotation 0x4a7fd0, WorldToLocalDirection 0x4fd710 and Bike slot 76 0x406840.
+PoseRotation 0x4a7fd0 and Bike slot 76 0x406840 (WorldToLocalDirection 0x4fd710
+is exact: a no-op store to the one matrix element the transpose leaves makes it the
+newer leaf).
 The Vehicle slot 34/35 cross product is exact: slot 34 (0x40c4c0) gets retail's
 `b.x`-first order once the function has one more live symbol (a named `side`
 result local; slot 35 has its parameters). A `Vec3* corner = &corners[i]` local
