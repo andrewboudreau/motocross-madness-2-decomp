@@ -28,15 +28,19 @@
 // repack with partial texture blits, chosen by 0x0050c8c0. Control flow,
 // calls, inlining and the scalar stack slots line up (the slots only once
 // one `managed` variable serves every loop, and the blit-pass loop only as
-// `while (pass < 3 && ...)`). Left: retail places `unused`'s neighbours
-// `levels` and `spare` the other way round (0x8c/0xb0), the 9-entry loop's
-// registers follow from that, retail stores `dropped = 0` after the
-// empty-list return (moving the declaration or the store there costs 130
-// more differences), and from the "ManagedTextures" row on the overlay
-// calls rotate eax/ecx/edx. About 216 of 1600 instructions differ; the
-// size is 5022 against 5020. Declaration order, block scopes around the
-// arrays and the memset order do not move the arrays; computing
-// `managedTexels` at its row is worse.
+// `while (pass < 3 && ...)`). The `levels`/`spare` arrays take retail's
+// slots (0x8c/0xb0) once the dropped branch of the 9-entry loop reads
+// `levels[i]` into `n` itself; the two field_0x7c sorts go through a small
+// SortTextures helper (retail reads the count through the list pointer);
+// and the excess clamp loops store `pages` before `spare`/`unused`. Left:
+// retail stores `dropped = 0` after the empty-list return (every placement
+// there spills `managed` and costs about 140 more differences), and from the
+// "ManagedTextures:%d" row on the overlay loads rotate eax/ecx/edx: retail
+// loads the count, then debugPage, then g_TrackGame, where VC6 here loads
+// g_TrackGame second; every later row inherits the rotation. 206 of 1600
+// instructions differ; the size is 5021 against 5020. Declaration order,
+// block scopes around the arrays and the memset order do not move the
+// arrays; computing `managedTexels` at its row is worse.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,6 +51,10 @@
 #include "../../src/reconstructed/ManagedTexture.h"
 #include "../../src/reconstructed/PCRenderTarget.h"
 #include "../../src/reconstructed/TrackGame.h"
+
+static inline void SortTextures(ContainerList<ManagedTexture*>* list, int (__cdecl* compare)(const void*, const void*)) {
+    qsort(list->m_data, list->m_count, sizeof(ManagedTexture*), compare);
+}
 
 static inline int LevelArea(int level) {
     if (level == 0)
@@ -348,7 +356,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         managed = static_cast<ManagedTexture*>(managedTextures.Next());
     }
 
-    qsort(field_0x7c.m_data, field_0x7c.m_count, sizeof(ManagedTexture*), UnknownCompare50ef00);
+    SortTextures(&field_0x7c, UnknownCompare50ef00);
     int texels = 0;
     int i;
     for (i = 0; i < field_0x7c.m_count; i++) {
@@ -400,9 +408,11 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
     int total = 0;
     memset(spare, 0, sizeof(spare));
     for (i = 0; i <= 8; i++) {
-        int n = levels[i];
-        if (!dropped) {
-            n += unused[i];
+        int n;
+        if (dropped) {
+            n = levels[i];
+        } else {
+            n = levels[i] + unused[i];
             if (n < field_0x18[i]) {
                 spare[i] = field_0x18[i] - n;
                 n = field_0x18[i];
@@ -419,8 +429,8 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
             count++;
         if (count > spare[level])
             count = spare[level];
-        spare[level] -= count;
         pages[level] -= count;
+        spare[level] -= count;
         excess -= LevelArea(level) * count;
         total -= LevelArea(level) * count;
         level++;
@@ -432,8 +442,8 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
             count++;
         if (count > unused[level])
             count = unused[level];
-        unused[level] -= count;
         pages[level] -= count;
+        unused[level] -= count;
         excess -= LevelArea(level) * count;
         total -= LevelArea(level) * count;
         ContainerList<ManagedTexture*>* list = &field_0x90[level];
@@ -495,7 +505,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         }
     }
     cachePages.AppendList(&emptied);
-    qsort(field_0x7c.m_data, field_0x7c.m_count, sizeof(ManagedTexture*), UnknownCompare50ee70);
+    SortTextures(&field_0x7c, UnknownCompare50ee70);
     if (field_0x7c.m_count > 0) {
         texture = cachePages.Last();
         while (field_0x7c.m_count > 0 && field_0x7c.Get(0)->plannedLevel == 8) {
