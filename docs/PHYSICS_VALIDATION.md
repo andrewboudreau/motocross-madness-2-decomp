@@ -399,7 +399,7 @@ Large functions of the two units (all registered in `src/krusty2/vehicle/targets
 - `Method_00527A20` `0x00527a20` stays at 349/866: references to the wheel or to the
   destination vector do not change the struct-assignment addressing.
 - `Bike::LoadBike` `0x004079c0` (6745 bytes, `ret 0xa0` = 40 argument dwords, 8 EH states,
-  0x2cc-byte frame) is written out as a partial (strict 6236/6745, instruction ratio 0.88,
+  0x2cc-byte frame) is written out as a partial (strict 6428/6745, instruction ratio 0.88,
   every call, EH state and x87 sequence in retail order).  It runs `LoadVehicle` with
   `(a1, engineName, a3, desc, info, position, forward, up, a9, map, a10, a11 (230 when <= 0),
   0.9f, 0.698f, device, 2, 3, 3, 1, 1, defaultEngine, tables, 0.18f, axes, track, a21)`
