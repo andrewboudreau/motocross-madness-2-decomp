@@ -1469,7 +1469,8 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 // through a stored temporary.  The trick search needs the `for` form (a do/while is
 // rotated with the first division folded to * 0.2).  Declaring difficulty with the
 // other locals, or kind as well, or splitting kind's declaration leaves edi and 394
-// strict; reading difficulty after kind gives 237.  roamTarget is a Vec3: retail copies it
+// strict; reading difficulty after kind gives 237; a switch for the free-roam trick delay
+// loses 2 aligned instructions and the edi piece stays.  roamTarget is a Vec3: retail copies it
 // into the racing line with one struct copy and builds `roamTarget - position` as a vector
 // temporary (component-wise floats: 1052 aligned, Vec3: 1076).  The random roam target is written x, z,
 // then y (retail's zero store follows the second rand call; 1049 -> 1052 aligned of 1302).
