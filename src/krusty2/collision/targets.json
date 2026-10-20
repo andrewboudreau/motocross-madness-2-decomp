@@ -426,7 +426,7 @@
     "target_va": "0x004376f0",
     "target_size": 707,
     "expect": "partial",
-    "notes": "681/707: rel = inverse(a+0xc8) * b+0x88 in one local, zero sum via a Vec3 temporary that also serves as the unread 0x4fc9a0 output (frame 0x60 like retail); mean written per component with s assigned inside the x product. Left: one push schedule, the loop's this/offset loads and the mean copy registers.",
+    "notes": "681/707: rel = inverse(a+0xc8) * b+0x88 in one local, zero sum via a Vec3 temporary that also serves as the unread 0x4fc9a0 output (frame 0x60 like retail); mean written per component with s assigned inside the x product. Left: one push schedule, the loop's this/offset loads and the mean copy registers. Session 14 (in place): computing the mean in place on the sum (sum *= s, or sum.x *= s per component) instead of into its own vector is worse.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
