@@ -93,8 +93,11 @@ the end.
 CacheTexture::CopyMipLevels `0x005102d0` (render) has the exit first, and
 retail does not copy its head. Its guarded do-while forms place the exit as
 retail does, but they copy the head (294 of 586). The `while` form keeps 462
-of 558. The construct that places the exit after the loop without copying
-the head is not known yet.
+of 558. Testing both failures once after the loops (the `Blt` result in
+`result`, `break`, then `if (result) return 0;`) places the exit after the
+loop without copying the head (5 differing instructions). It also keeps
+`result` in a frame slot and tests it at the loop's normal exit, which
+retail does not.
 
 ## 3. A load hoisted above the first branch
 

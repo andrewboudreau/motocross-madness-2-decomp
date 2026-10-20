@@ -33,6 +33,11 @@
 // included. A `try { } catch (...) { delete archive; throw; }` round the
 // body gives 4 states and 1 try block, and a holder local with a destructor
 // gives 3 states, so neither is the retail source.
+// Early-failure forms (the ConnectUsingLobby lever): the Open failure
+// and the RS2 header failure as separate early `delete archive; return 0`
+// tests give 60 (11 with `if (archive)`), and one combined early test gives
+// 8. Ours already has retail's two failure tails (`test ebx; je; jmp` and
+// `test ebx; je`), so the nested form stays.
 
 #include "../../src/reconstructed/ResourceManager.cpp"
 
