@@ -66,6 +66,7 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
         *q = 0;
 
     int firstPass = 1;
+    Vec3 forward;   // the basis block's; at function scope it takes retail's 0x40 slot
     Vec3 w;   // the k/o branch below; declared here, VC6 schedules its fchs as retail does
     int canPlace = 1;
     unsigned char centerHit, plusAHit, minusAHit, plusCHit, minusCHit;
@@ -103,7 +104,7 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
 
                 // orthonormal basis from the axes
                 Vec3 up = g_PlacementAxisY;
-                Vec3 forward = g_PlacementAxisZ;
+                forward = g_PlacementAxisZ;
                 Vec3 side = CrossProduct(g_PlacementAxisY, g_PlacementAxisZ);
                 side = CrossProductCall(forward, side);
                 float lenSq = Vec3DotCall(&side, &side);
