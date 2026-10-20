@@ -221,7 +221,7 @@ retail does; grouping the x row's first two products does the same for that row.
 | render/Overlay | `0x004b6710` | 63/361 | b | retail keeps `whole` and the byte count on the stack (6 slots), the destination in ebp and the row count in eax; VC6 keeps `whole` in edi, the byte count in ebp and the destination and row count on the stack |
 | render/PCTextureMap | `0x004c69c0` | 429/894 (masked) | c | 31 code diffs: `jne @390` vs `jne A`; `jne @120` vs `jne @116 ; lea edx, [esp + N]` |
 | render/PCTextureMap | `0x004c71c0` | 286/538 (masked) | c | 27 code diffs: `mov ebp, 1` vs `mov ebx, 1`; `and eax, ebp` vs `and eax, ebx` |
-| render/PCTextureMap | `0x004c7b40` | 247/767 | b | 35 code diffs: retail lacks `mov edi, [eax]`; slots differ |
+| render/PCTextureMap | `0x004c7b40` | 257/767 | b | rect read in retail order; the row pointers swap esi/ecx in the loop nest |
 | render/PCVideoCard | `0x004ca520` | 26/124 | c | 13 code diffs: `mov ebx, [esp + N]` vs `push ebp`; retail adds `mov ebp, [ecx + 0x74]` |
 | render/PCVideoCard | `0x004ca5a0` | 66/490 | c | retail keeps `target` in ebp outside the mode loop and 480 in ebp inside it; VC6 here never pushes ebp |
 | render/PCVideoCard | `0x004cab00` | 144/1113 | b | retail keeps the mode index in esi shared with the created target (two -3 stores), re-tests `render` after the found path and places the Slot8-success path after the epilogue |
