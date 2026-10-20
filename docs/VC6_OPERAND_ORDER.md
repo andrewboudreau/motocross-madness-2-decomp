@@ -919,3 +919,9 @@ try on similar code. None is a rule.
   5268): retail `je L; push eax; jmp M; L: push 0; M: <rest of the pushes>; call`. This is
   `if (c) f(..., p); else f(..., 0);` with VC6 merging the common tail. Every ternary form
   computes the value into a register and pushes it once.
+- **Two expansions with different out-of-line counts are two inlines.** Character slot 7
+  (`0x004a70c0`, aligned 342 to 675 of 958): retail calls a pose's generated constructor
+  twice in the first blend expansion and four times in the second. One inline expanded in
+  both loops always gives n then n - 1 calls. Two inlines with the same body and three and
+  five unused poses give 2/4. A wrapper that adds poses and calls the first inline is
+  called out of line instead.

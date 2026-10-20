@@ -258,21 +258,43 @@ inline float SmoothStep(float x)
     return (3.0f - (t + t)) * t * t;
 }
 
-// Slot 7's expansion of the pose blend (the same inline that AdvanceMotion, strict exact in
+// Slot 7's expansions of the pose blend (the same inline that AdvanceMotion, strict exact in
 // src/krusty2/motion/Motnctrl.cpp, expands with the first term's operators inlined).  In slot 7
 // retail calls the out-of-line copies of every operator (0x421d00, 0x5015b0, 0x421cb0, 0x515600),
 // which the plain operators reproduce once the inline budget runs out, and also calls
 // CharacterPose's generated default constructor (0x004a8930, `mov eax,ecx`) for pose temporaries
-// that are never used otherwise: two in the first expansion and four in the second.  With four
-// unused poses VC6 calls it three times and twice; six or two unused poses move both counts
-// together (five/four, one/zero), so the retail split is not a count of locals.
+// that are never used otherwise: twice in the first expansion and four times in the second.  One
+// inline expanded in both loops always gives counts n and n - 1, so the playback loop and the
+// blend loop use two inlines with the same body and different numbers of unused poses (strong
+// inference from the constructor calls; the local counts themselves are not observable).  Three and
+// five give retail's 2/4 split and the best alignment (aligned instructions 342 -> 675 together with
+// the extrapolation helper below); the earlier single inline with four gave 3/2.
 inline void BlendPose7(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t)
 {
     ClampFloat(0.0f, 1.0f, &t);
     float s = 1.0f - t;
     out->nodeIndex = a->nodeIndex;
     out->hasPose = a->hasPose;
-    CharacterPose unused1, unused2, unused3, unused4;
+    CharacterPose unused1, unused2, unused3;
+    out->axisZ = Vec3Normalize(a->axisZ + (b->axisZ - a->axisZ) * t);
+    out->axisY = Vec3Normalize(a->axisY + (b->axisY - a->axisY) * t);
+    out->position = a->position + (b->position - a->position) * t;
+    Vec3 axisX = CrossProduct(out->axisZ, out->axisY);
+    out->axisY = CrossProduct(axisX, out->axisZ);
+    Vec3 unused;
+    unused = a->axisZ * s + b->axisZ * t;
+    unused = a->axisY * s + b->axisY * t;
+    unused = a->position * s + b->position * t;
+}
+
+// The blend loop's copy of BlendPose7 (see above).
+inline void BlendPose7B(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t)
+{
+    ClampFloat(0.0f, 1.0f, &t);
+    float s = 1.0f - t;
+    out->nodeIndex = a->nodeIndex;
+    out->hasPose = a->hasPose;
+    CharacterPose unused1, unused2, unused3, unused4, unused5;
     out->axisZ = Vec3Normalize(a->axisZ + (b->axisZ - a->axisZ) * t);
     out->axisY = Vec3Normalize(a->axisY + (b->axisY - a->axisY) * t);
     out->position = a->position + (b->position - a->position) * t;
@@ -289,6 +311,36 @@ inline void BlendPose7(CharacterPose* a, CharacterPose* b, CharacterPose* out, f
 int AdvanceClamped(Motion* motion, MotionPoseList** cursor, MotionPoseList** from, MotionPoseList** to,
                    float* time, float* weight);
 
+// Pose b extrapolated past the last frame pair (a, b) by t seconds at fps: the rotation from a to b
+// scaled to the elapsed frames, and (when the node applies translation) the frame delta likewise.
+// As an inline helper of the playback loop VC6 calls PoseRotation, RotatePose, Vec3::Vec3 for the
+// delta and the operator*/operator+ COMDATs in retail's order (one more unused pose here also
+// matches their placement, aligned 705, but that local would be padding).  The blend loop writes
+// the same steps out: retail expands them there with operator- called too, and the helper would be
+// called out of line once the budget is spent.
+inline void ExtrapolatePose7(CharacterPose* a, CharacterPose* b, CharacterPose* out, int flag, float t, int fps)
+{
+    Vec3 axis;
+    float angle;
+    PoseRotation(a, b, &axis, &angle);
+    float ffps = (float)fps;
+    out->hasPose = a->hasPose;
+    angle = ffps * angle * t;
+    out->nodeIndex = a->nodeIndex;
+    if (angle != 0.0f) {
+        RotatePose(b, out, axis, angle);
+    } else {
+        out->axisZ = b->axisZ;
+        out->axisY = b->axisY;
+    }
+    if (flag) {
+        Vec3 delta = b->position - a->position;
+        out->position = b->position + delta * ffps * t;
+    } else {
+        out->position = b->position;
+    }
+}
+
 // owner: bracket only (Character method contiguous with its Motnctrl.cpp methods)
 // 0x004a70c0 (ret 0xc; Character slot 7, inherited by D3DIMSoultreeCharacter): per-frame playback of
 // a non-looping motion with sub-frame interpolation.  The current motion is advanced by AdvanceClamped;
@@ -298,20 +350,13 @@ int AdvanceClamped(Motion* motion, MotionPoseList** cursor, MotionPoseList** fro
 // the two poses are interpolated with a smoothstep weight over blendDuration; nodes flagged in the
 // name table keep the blend-from pose.  Past the last frame a looping motion is restarted through
 // BlendToMotion, a non-looping one sets motionStopped.  Returns the frame number, or 0.
-// Near miss, 3330 vs 3327 bytes: the call sequence and the clamp/ease shape are retail's, but the
-// inline budget is spent differently (see BlendPose7; in the first extrapolation loop retail inlines
-// only operator- for the frame delta, calling Vec3::Vec3 0x404e60 for its result, and calls the
-// operator* / operator+ COMDATs that VC6 inlines here) and the frame is 0x284 instead of 0x2dc.
-// Lead (session 14, not kept: strict 127 < 152 while the tail is still off): the ctor-call split
-// follows from the unused-pose counts once the two blend expansions are separate inlines.  With
-// 3 unused poses in the first expansion and 6 (or 4..5 plus 3..6 dead CharacterPose locals at the
-// top of this function) in the second, VC6 calls the ctor 2 and 4 times and the frame is 0x2dc as
-// in retail; the first extrapolation then matches retail's call sequence (PoseRotation,
-// RotatePose, Vec3::Vec3, operator*, operator*, operator+) when it is an inline helper taking
-// (a, b, out, flag, t, fps) with the named delta.  Left: the second extrapolation, which retail
-// expands with operator-/*/*/+ calls; the same helper there is called out of line, written
-// directly it inlines everything, and nested position helpers move the first one's budget.
-// (One identical-body expansion per loop always gives counts n and n - 1, whatever is added.)
+// Near miss (strict is positional, so the metric here is aligned instructions: 675 of 958, 283
+// differing).  The call sequence and the clamp/ease shape are retail's.  With the two blend inlines
+// (BlendPose7/BlendPose7B) the constructor calls split 2/4 as in retail, and the playback loop's
+// extrapolation through ExtrapolatePose7 calls Vec3::Vec3 and the operator COMDATs in retail's
+// order.  Left: this pointer in edi (retail esi) from the prologue on, the blend loop's unused sums
+// and extrapolation (retail calls operator-/*/*/+ there, VC6 inlines some and calls three
+// cross/normalise COMDATs retail does not), and the frame (candidate 3376 bytes).
 int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
 {
     MotionPoseList* from;
@@ -349,26 +394,8 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
                 float t = chr_field_0x10;
                 int fps = currentMotion->fps;
                 CharacterPose* b = &to->poses[i];
-                Vec3 axis;
-                float angle;
                 CharacterPose out;
-                PoseRotation(a, b, &axis, &angle);
-                float ffps = (float)fps;
-                out.hasPose = a->hasPose;
-                angle = ffps * angle * t;
-                out.nodeIndex = a->nodeIndex;
-                if (angle != 0.0f) {
-                    RotatePose(b, &out, axis, angle);
-                } else {
-                    out.axisZ = b->axisZ;
-                    out.axisY = b->axisY;
-                }
-                if (flag) {
-                    Vec3 delta = b->position - a->position;
-                    out.position = b->position + delta * ffps * t;
-                } else {
-                    out.position = b->position;
-                }
+                ExtrapolatePose7(a, b, &out, flag, t, fps);
                 if (mirror == 0)
                     CharacterVirtualSlot4((int)&out, mask);
                 else
@@ -395,7 +422,7 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
             CharacterPose pose2;
             CharacterPose out;
             CharacterPose result;
-            BlendPose7(&from->poses[j], &to->poses[j], &out, weight);
+            BlendPose7B(&from->poses[j], &to->poses[j], &out, weight);
             if (ok2) {
                 InterpolatePose(&from2->poses[j], &to2->poses[j], &pose2, weight2);
             } else {
