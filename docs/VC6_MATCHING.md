@@ -499,3 +499,17 @@ combination with VC6 and rank them by strict bytes and aligned instructions:
 ```powershell
 python tools/sweep_variants.py work/sweep/t.cpp --target 0x00472e30:82 --bindings src/reconstructed/GameUi.bindings.json --exe $env:MCM2_EXE --vc6-root $env:VC6_ROOT --jobs 12
 ```
+
+A function with `new` expressions, destructible locals or try blocks under
+`/GX` starts with `push -1 ; push handler`, and the handler's `mov eax,
+funcinfo` names a FuncInfo whose unwind-state count and try-block map record
+how many of each the source had. `tools/eh_funcinfo.py` parses it from the
+retail image and from a candidate object and compares the two; `--scan` takes
+the JSON of `tools/rank_near_misses.py` and checks every EH-bearing row. On
+2026-10-20 all 27 such near misses had retail's state and try-block shape, so
+none of them is missing or adding a try block or a destructible local:
+
+```powershell
+python tools/eh_funcinfo.py 0x004e9030 --obj X.obj --symbol '?AddArchive@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z'
+python tools/eh_funcinfo.py --scan work/rank.json
+```
