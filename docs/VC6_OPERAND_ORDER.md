@@ -229,6 +229,72 @@ they are source-form differences under the deterministic rules of section 1.
 - Adding or removing declarations to move a near miss into a window is not a
   fix: the scan shows no near miss that has one.
 
+### 2.4 Function-local definitions and x87 term order (period 32)
+
+A second count, separate from the file-level count above, moves the x87 term
+order of a reassociated sum. This was a controlled probe of D3DIMSoultreeShadow
+slot 27's shape (2026-10-20):
+
+```cpp
+struct M { M() {} float _11, ..., _44; };   // 16 floats
+struct Cam { char pad[0xec]; M matrix; };
+void GetMatrix(M* out); int Test(const float* m);
+static inline void Product(M* out, const M& a, const M& b)
+{ out->_11 = a._11 * b._11 + a._12 * b._21 + a._13 * b._31 + a._14 * b._41; /* 16 rows */ }
+int Slot(Cam* cam)
+{
+    /* k dummies here */
+    M local; M m; GetMatrix(&local);
+    const M& view = cam->matrix;
+    Product(&m, local, view);
+    return Test(&m._11);
+}
+```
+
+The probe records the sequence of `fld`/`fmul` operands for k = 0..135 dummies.
+
+- **Initialised dummies change the order.** `int dN = N;`, `float dN = 0.0f;`
+  and `const M& dN = cam->matrix;` all change it, and so does
+  `int dN; dN = N;`. All of them are dead and emit no code. Each one is one
+  unit. The int and float dummies give identical orders at every count; the
+  reference dummies differ at a few counts.
+- **The period is exactly 32 from k = 22 to k = 96.** Every k in that range
+  gives the same order as k + 32. Below 22 some counts differ from their
+  k + 32 partner (1-4, 7, 9 and 15-21); from k = 97 the k + 32 partner
+  differs again. 70 counts give 22 distinct orders.
+- **Only dummies placed before `M local` count.** `local` is the aggregate
+  that holds the `a` leaves. Dummies have no effect anywhere else: between
+  `M local` and `M m`, after the declarations and before the call, between
+  the call and the product, or after the product.
+- **Some forms have no effect at any count.** These are uninitialised
+  declarations (`int dN;`), file-scope typedefs placed before the file
+  (section 2.1's arena count), and the same probe without the call/local
+  structure (a plain `out = a * b` over pointer parameters).
+- **Live global stores (`g[N] = 0;`) are not periodic.** They move the order
+  in steps of 3 to 5 stores, because they add code and tuples.
+- **Dummies inside the inline helper are inconclusive.** They change the order
+  up to k = 34 and then stop (the expansion budget changes), so the probe
+  does not settle that case.
+
+The model this supports is strong inference: the age of a local aggregate's
+field leaves depends on that local's definition index modulo 32. This is
+consistent with leaves being ranked by a bit position in 32-bit set words.
+Uninitialised and unused locals seem to be dropped before that numbering;
+dead initialised ones are not. Consequences:
+
+- This is a real source lever, but not a readable one. A near miss whose
+  term order depends on it needs a different number of real initialised
+  locals before the operand aggregate. Unused dummies are not a fix. Two
+  near misses depend on it: D3DIMSoultreeShadow slot 29 `0x00446c30` and
+  SoultreeBounds `0x004fd340`. In both, the count windows (0..31 at the top
+  of the function, plus helper counts) reach neither exact form, so neither
+  is unlocked: their remaining pairs need another lever.
+- Two exact counts that differ by 32 are the same state, so searching
+  k = 0..31 (plus the transient below 22) covers every reachable order.
+- The k + 32 transient below 22 and the break at 97 are not explained. The
+  break may be a 128-entry limit, since the function has about 30 other
+  definitions.
+
 ## 3. Redundant parentheses around a product
 
 VC6 keeps a redundant pair of parentheses as a node of its own, and that
