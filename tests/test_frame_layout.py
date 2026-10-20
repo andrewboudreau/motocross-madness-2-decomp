@@ -116,6 +116,16 @@ class TrackerTests(unittest.TestCase):
         self.assertEqual(info.frame_size, 0x100)
         self.assertEqual([a.offset for a in info.accesses], [0x128, 0x128])
 
+    def test_by_value_argument_space_is_popped_by_the_caller(self):
+        # sub esp,0x10; sub esp,0xc; push ecx; call; add esp,0x10; jmp; mov eax,[esp+4]; ret
+        # (``sub esp, 0xc`` reserves a by-value Vec3 argument that the caller's ``add esp`` pops)
+        code = (b'\x83\xec\x10' b'\x83\xec\x0c' b'\x51' b'\xe8\x00\x00\x00\x00' b'\x83\xc4\x10'
+                b'\xeb\x00' b'\x8b\x44\x24\x04' b'\xc3')
+        from tools.frame_layout import disassemble
+        info = track_frame(disassemble(code))
+        self.assertEqual(info.frame_size, 0x10)
+        self.assertEqual([a.offset for a in info.accesses], [4])
+
     def test_ebp_frame(self):
         # push ebp; mov ebp,esp; sub esp,0x20; mov eax,[ebp-4]; mov [ebp-0x20],eax; leave; ret
         code = b'\x55' b'\x8b\xec' b'\x83\xec\x20' b'\x8b\x45\xfc' b'\x89\x45\xe0' b'\xc9' b'\xc3'

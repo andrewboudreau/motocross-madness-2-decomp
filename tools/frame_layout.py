@@ -505,7 +505,12 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
             depth = max(0, depth - 4)
             pending = max(0, pending - 4)
         elif m == 'sub' and o.startswith('esp, '):
-            depth = 0 if j == early_sub else depth + _imm(o[5:])
+            if j == early_sub:
+                depth = 0
+            else:
+                # argument space for a by-value struct (``sub esp, 0xc; mov eax, esp``)
+                depth += _imm(o[5:])
+                pending += _imm(o[5:])
         elif m == 'add' and o.startswith('esp, '):
             depth = max(0, depth - _imm(o[5:]))
             pending = 0
