@@ -10,6 +10,12 @@
 // a second `result` variable (declared at the top or at the `new`, assigned
 // from `archive` or receiving the `new` and copied to `archive`; all 95 of
 // 798 by match.py), a single shared return.
+// Also inert (s14): a `result` assigned from `archive` just before the
+// success return, `UnknownTextureStream* const archive`, the `new` in a
+// `stream` local copied to `archive` (declared together or apart) with
+// `return stream`, and a ternary on the return. VC6 propagates every copy
+// into ebx; retail's value is homed in the `new` temporary's slot from
+// its definition on and read back only for the success return.
 
 #include "../../src/reconstructed/ResourceManager.cpp"
 
