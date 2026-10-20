@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 141, c 104, total 247. The three class (a) functions of the
+Counts: a 2, b 141, c 103, total 246. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -37,6 +37,10 @@ computes the LOGFONT face-name address in both branches of the face test,
 and that second use raises the LOGFONT's uses per byte above the two
 rectangles', so it sits below them as in retail. A slot order that the
 scan calls "differs" can come from a reference VC6 duplicates into branches.
+MoveBox `0x00428db0` (class c, 773/789) is exact too: passing the point to the
+inline transform through a local pointer (`const Vec3* point = center`) makes its
+components newer leaves than the matrix elements, so the z row loads them first as
+retail does; grouping the x row's first two products does the same for that row.
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
@@ -130,7 +134,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/bvh/BoundingBoxTreeQuery | `0x00426be0` | 1673/2572 | b | cross products match; min/max of the projections (retail keeps p2 on the x87 stack and stores p1 twice), one operand pair of a vertex transform and the frame (0x160 vs 0x164) |
 | physics/bvh/BoundingBoxTreeQuery | `0x00427c10` | 349/1110 | b | natural operator form: retail's helper call sequence; retail keeps the constant 1 in ebp and copies segment[1] at entry, so registers and slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x004280e0` | 453/2228 | b | inline BoxOverlap copy: one constructor still expanded and the recursion tails cross-jumped differently |
-| physics/bvh/BoundingBoxTreeQuery | `0x00428db0` | 773/789 | c | frame and slots match (loop output in its own local, `grown` after the last rotation, z, y, x transform sums); the first two products of the transform's x and z rows load the matrix element first |
 | physics/bvh/BoundingBoxTreeQuery | `0x0042a640` | 41/1428 | b | retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80); cross-product operand order of the x term |
 | physics/collision/CollisionPoint | `0x0043aa30` | 820/845 | c | frame, blocks and the y, x, z accumulated squared normal length match (samples/physics/collision/CollisionPointNearMisses.cpp); sum * (1/merged) loads y component-first in retail, one push fstp scheduled later |
 | physics/collision/CollisionPoint | `0x0043ad80` | 597/615 | b | if/else with one exit gives retail's delayed pushes; one vector-copy store and the `points`/`frame` loads are swapped |

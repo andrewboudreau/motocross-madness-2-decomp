@@ -2,13 +2,13 @@
 // (src/krusty2/bvh/BoundingBoxTreeQuery.cpp, 0x00424690..0x0042ad2f).  Names are tier 3.
 //
 // Status (VC6 SP3, vc6_o2_ml; tools/run_physics_samples.py scores):
-// - MoveBox 0x00428db0 (789 bytes, 773 strict): the GrowBoxByTransformedBox body on pointer
-//   arguments (that one is exact in the src file).  With the loop output in its own local
-//   (`mid`), `grown` assigned after the last rotation and the z, y, x sums of the transform,
-//   frame and slots match.  Left: the first two products of the transform's x and z rows load
-//   the matrix element first (retail the point component); written order, per-term
-//   reference/pointer aliases of the point or the matrix, by-reference, by-value-return and
-//   in-body transforms do not move them.
+// - MoveBox 0x00428db0 (789 bytes, exact): the GrowBoxByTransformedBox body on pointer
+//   arguments (that one is exact in the src file).  The loop output in its own local (`mid`),
+//   `grown` assigned after the last rotation and the z, y, x sums of the transform give the
+//   frame and slots.  The point passed through a local pointer makes the z row load the point
+//   component before the matrix element (leaf age: the local's leaves are newer than the
+//   matrix's); grouping the x row's first two products does the same there.  Written order,
+//   per-term aliases, by-reference, by-value-return and in-body transforms do not.
 //
 // LeafPairQuery 0x004275f0, LeafNodeQuery 0x004269e0 and SegmentTreeQuery 0x00429e90 are
 // exact in the src file.
@@ -78,11 +78,12 @@ static Matrix4 s_motion;            // 0x00579018
 static int s_mode;                  // 0x0057905c
 extern QueryHit* g_CollisionBoxResult;   // 0x00579058
 
-// MoveBox's transform: the x and z rows sum z, y, x (no grouping), which also gives retail's
-// slot order for d and half.
+// MoveBox's transform: the x and z rows sum z, y, x, which also gives retail's slot order for
+// d and half; the x row's first two products are grouped (with the point through a local
+// pointer, below, this makes both rows load the point's component before the matrix element).
 inline void TransformPointPtrInline(Vec3* out, const Vec3* v, const Matrix4* m)
 {
-    out->x = v->z * m->_31 + v->y * m->_21 + v->x * m->_11 + m->_41;
+    out->x = (v->z * m->_31 + v->y * m->_21) + v->x * m->_11 + m->_41;
     out->y = v->x * m->_12 + v->y * m->_22 + v->z * m->_32 + m->_42;
     out->z = v->z * m->_33 + v->y * m->_23 + v->x * m->_13 + m->_43;
 }
@@ -110,7 +111,8 @@ void MoveBox(Vec3* center, Vec3* halfExtents, const Matrix4* m)
     half.y = QueryAbs(ax.y) + QueryAbs(ay.y) + QueryAbs(az.y);
     half.z = QueryAbs(ax.z) + QueryAbs(ay.z) + QueryAbs(az.z);
     Vec3 moved;
-    TransformPointPtrInline(&moved, center, m);
+    const Vec3* point = center;
+    TransformPointPtrInline(&moved, point, m);
     Vec3 d;
     d.x = moved.x - center->x;
     d.y = moved.y - center->y;

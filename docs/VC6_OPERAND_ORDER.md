@@ -66,6 +66,11 @@ Probe evidence (operand loaded first is listed):
 | `V* a = get(1); V* b = get(2); a->y * b->z` | `b->z` (assigned later), independent of declaration order |
 | `v->next->y * w->z`, `a[i] * a[0]` | the operand that needs an address computation (`v->next`, `a[i]`) |
 
+Retail use (MoveBox `0x00428db0`, exact): a pointer argument copied into a local
+pointer (`const Vec3* point = center;`) before an inline transform makes its members
+newer leaves than matrix elements already used by earlier rotations, so each product
+loads the point component first.
+
 Register-sized integers follow the same order: `*a + *b` loads `*a` into the
 destination register first; for `s.availPhys + s.availPageFile` the member
 with the larger displacement is the destination (`add <pageFile>, <phys>`)
