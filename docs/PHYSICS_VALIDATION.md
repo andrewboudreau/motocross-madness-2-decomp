@@ -269,7 +269,8 @@ rotated into itself through a by-value inline helper, so VC6 copies it as retail
   keeps the flat view.
 - `SetAxes`'s seventh argument is an int.
 - The helpers samples keep the near misses: WorldToLocalDirection,
-  SetMatrixIn, SetAxesIn and RotateAboutPoint. SetAxesPtr `0x004fbd70` is exact in
+  SetMatrixIn and SetAxesIn. RotateAboutPoint `0x004fd1f0` is exact in soultree.cpp
+  with one expression per row. SetAxesPtr `0x004fbd70` is exact in
   soultree.cpp once its cross products parenthesise the first product
   (VC6_OPERAND_ORDER.md section 3).
 

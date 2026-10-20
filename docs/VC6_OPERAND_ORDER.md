@@ -572,7 +572,10 @@ trying on other `[base+index]` / `add r, r` order near misses.
   emits the z, y, x products either way. Only the one-expression form
   `r.x = v.x*m00 + v.y*m10 + v.z*m20 + m30` lets VC6 group the unrelated integer zero
   stores and the `pop edi/esi` where retail has them (727 -> 798 of 804).
-  `r.x = v.z*m20; r.x += ...` scatters them.
+  `r.x = v.z*m20; r.x += ...` scatters them. The same holds for a call's argument push:
+  SoultreeObject::RotateAboutPoint `0x4fd1f0` became exact (302 -> 334) once its first
+  point transform was written `x*m1j + (z*m3j + y*m2j) + m4j` per row instead of
+  accumulated, which moves the second SetPosition's `&p` push after the z row's products.
 - One `return frameList[currentFrame];` at the end, with each branch only updating the
   index, is copied into every exit and indexes through `mov ecx, eax`; early
   `return frameList[--currentFrame]` forms index with eax. UIAnim::Advance `0x472fe0`.

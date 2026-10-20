@@ -752,6 +752,16 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
+    "candidate_symbol_contains": "?RotateAboutPoint@SoultreeObject@@QAEXUVec3@@0M@Z",
+    "target_va": "0x004fd1f0",
+    "target_size": 334,
+    "expect": "exact",
+    "notes": "strict exact; one expression per row with the z and y products grouped (session 14; the per-statement first block scheduled the second &p push early, 302/334)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
     "candidate_symbol_contains": "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
     "target_va": "0x004fd5c0",
     "target_size": 150,
