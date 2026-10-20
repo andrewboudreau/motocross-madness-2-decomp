@@ -196,7 +196,7 @@
     "target_va": "0x00501e90",
     "target_size": 483,
     "expect": "partial",
-    "notes": "169/483 strict, 487 B. SoultreeCrossCtor passed straight to WorldToLocalDirection reproduces the cross-product copy/push schedule. Remaining: retail stores both normalForce copies directly to [esi+0x68..0x70] where VC6 emits lea + [reg] (a by-reference member-wise helper fixes the else branch but constant-folds the zero branch); the x component loads leverArm first (retail frictionForce; written operand order is canonicalised) and *a2 += loads *a2 first.",
+    "notes": "169/483 strict, 487 B. SoultreeCrossCtor passed straight to WorldToLocalDirection reproduces the cross-product copy/push schedule. Remaining: retail stores both normalForce copies directly to [esi+0x68..0x70] where VC6 emits lea + [reg] (a by-reference member-wise helper fixes the else branch but constant-folds the zero branch); the x component loads leverArm first (retail frictionForce; written operand order is canonicalised) and *a2 += loads *a2 first. Session 14 (inert or worse): Vec3(0.0f), the magnitude store after the vector, a Vec3& alias, a named or member-wise zero local, a scaled zero, a POD view of both copies and a user-declared member-wise Vec3::operator= (that one folds both copies: 67/483, 443 bytes).",
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {
