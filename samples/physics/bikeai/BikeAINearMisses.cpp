@@ -87,7 +87,9 @@
 // and assigned whole (aligned 3737 -> 3760 of 3966 retail instructions); `right = Vec3(...)`
 // (3723), a constructed named copy (3722) and `right = CrossProduct(fwd, normalR)`
 // (3686) do not.  Replacing any DotProduct site with another inline dot helper drops
-// to ~3671 (inline budget), and swapping its arguments is inert at every site.  Remaining differences: the start-up `up` vector and the
+// to ~3671 (inline budget), and swapping its arguments is inert at every site.  The same
+// named copy at dir2's double cross, the loop's flat right, both dir2 rebuilds and sideV's
+// inner cross loses (3485..3728).  Written-out dots at sideDotF: 3737 (inline budget).  Remaining differences: the start-up `up` vector and the
 // loop-head drag vectors keep their zero components in memory in retail (the
 // candidate's are constant-folded), the order of a few temporaries and stores
 // (0x00411dbc vF += (commuted operands), 0x00412883), and the frame layout.
@@ -1467,7 +1469,14 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 // through a stored temporary.  The trick search needs the `for` form (a do/while is
 // rotated with the first division folded to * 0.2).  Declaring difficulty with the
 // other locals, or kind as well, or splitting kind's declaration leaves edi and 394
-// strict; reading difficulty after kind gives 237.
+// strict; reading difficulty after kind gives 237.  The random roam target is written x, z,
+// then y (retail's zero store follows the second rand call; 1049 -> 1052 aligned of 1302).
+// Retail keeps `s * d.y` in the inline normalize (d.y is the zero register's value) while
+// VC6 folds it here; by-value, `v * s` and operand-order helper forms do not change that.
+// The local declaration order is inert.  Writing the gate tail after the loop with gotos
+// compiles to identical code: the block order comes from the flow graph, and retail's has
+// an extra `xor ebp, ebp` re-zero edge after the loop (its tail stores field_0x11b0 from
+// the zero register, the candidate an immediate).
 // 0x00572988: look-ahead distance of the race-kind 2/3 path samples (100.0f).
 extern float g_BikeAILookAhead_00572988;
 
@@ -1852,10 +1861,10 @@ int KrustyBike::Fn_00414370(float dt)
             Vec3 d;
             d = Vec3(roamTargetX - position.x, roamTargetY - position.y, roamTargetZ - position.z);
             d.y = 0.0f;
-            if (d.x * d.x + d.z * d.z < 2500.0f) {
+            if (d.z * d.z + d.x * d.x < 2500.0f) {
                 d.x = rand() * (1.0f / 32768.0f);
-                d.y = 0.0f;
                 d.z = rand() * (1.0f / 32768.0f);
+                d.y = 0.0f;
                 d = BikeAINormalizeInline(d) * 444.0f * terrain->worldScale;
                 roamTargetX = terrain->worldScale * 666.66f + d.x;
                 roamTargetY = 0.0f;

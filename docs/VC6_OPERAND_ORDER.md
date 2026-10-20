@@ -887,6 +887,12 @@ try on similar code. None is a rule.
   directly keeps the products' stores on `right`; `Vec3 rearCross; rearCross.x = ...;
   right = rearCross;` gives retail's stack result and int-move copy. `right = Vec3(...)`,
   a constructed named copy and a CrossProduct call all lose aligned instructions.
+- **Gotos do not move blocks; the flow graph does.** KrustyBike Fn_00414370
+  (`0x00414370`): retail places a shared tail right after a loop and the other branches
+  jump back to it. Rewriting the source with labels so that the tail follows the loop
+  textually compiles to the same bytes as the structured if/else. Retail's layout comes
+  from a different graph: its loop exit has an extra `xor ebp, ebp` block that restores
+  the zero register for a later store.
 - **A d3drm import is stdcall: a cdecl declaration merges its cleanup.**
   Tire::UpdateSuspensionProbe (`0x00514550`, 2504 to 2576 of 4258): the import thunk
   `0x0053304c` is D3DRMVectorRotate. Declared cdecl, VC6 defers its 16-byte cleanup
