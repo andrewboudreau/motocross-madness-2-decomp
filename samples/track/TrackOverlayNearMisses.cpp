@@ -74,7 +74,8 @@
 // scalar slot, so y and the loop temporaries shift by one), and schedules
 // the distance products before the name address and the pushes of the
 // 0x0051d9c0 call. Declaration order and scope, an int copy, a float copy
-// and a distance local do not move either.
+// and a distance local do not move either; nor do the distance written
+// inline in the call, a name or overlay local, or the sum written x first.
 
 #include <math.h>
 #include <stdio.h>

@@ -24,6 +24,14 @@
 // opened critical section as an inline helper, a lock pointer local, the
 // two stores as a comma or chained assignment, `register` on name, an
 // unsigned headerSize, name declared first or at its assignment.
+// Session 14: with case 1 given its own copy of the tail (516), case 2 is
+// retail's instruction for instruction (name in edi from its Open to the
+// strcpy, headerSize reloaded for the Seek), so the goto is what costs case
+// 2 its registers. Case 1's copy then starts its block with `lea edx,
+// message`, which VC6 hoists above the header-write `je` (retail's case 1
+// strcpy is scheduled like case 2's, `lea edx` after `sub edi, ecx`, and
+// cross-jumps into it at `or ecx, -1`). The success path inline before the
+// error path and a block-local copy of name give the same 516.
 //
 // 0x004e7d60 (2412 bytes with its jump table, VCRInterface slot 10; KrustyVCR
 // shares it): control flow, call arguments and the callback switch order
