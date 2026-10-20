@@ -1,0 +1,4 @@
+LIBRARY blade.dll
+EXPORTS
+    DirectDrawCreateEx@16 @3 NONAME
+    DirectDrawEnumerateA@8 @4 NONAME

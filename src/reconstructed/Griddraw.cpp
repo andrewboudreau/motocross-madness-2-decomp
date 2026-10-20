@@ -1270,6 +1270,115 @@ int DrawableGridNode::ReleaseBlockCentres()
     return 1;
 }
 
+// 0x00483200: walks a border vertex down the node tree (VC6 turns the final
+// child call into a loop, as retail does).
+// Each block that looks up a child declares its own `child` (one function-scope
+// pointer gave x and z the other two callee-saved registers and reloaded `level`).
+void DrawableGridNode::WalkBorderVertex(int x, int z, int flag, int dir, GridBaseCell* origin, int minLevel)
+{
+    if (level != 0) {
+        int shift = 0;
+        for (int i = 0; i < level; i++)
+            shift += 4;
+        int unit = 1 << shift;
+        int mask = unit - 1;
+        int rx = x & mask;
+        if (rx == 0 && (z & mask) == 0) {
+            GridBaseCell* cell = &block->cells[g_gridRow17[z >> shift] + (x >> shift)];
+            if (cell != origin)
+                SetVertexDirection(x >> shift, z >> shift, flag, dir, origin);
+        }
+        if (children == 0 || level <= minLevel)
+            return;
+        int cx = x;
+        int cz = z;
+        int px = x - 1;
+        int pz = z - 1;
+        int j = level;
+        while (j--) {
+            cx /= 16;
+            cz /= 16;
+            px /= 16;
+            pz /= 16;
+        }
+        if (px == cx) {
+            if (cx >= 16)
+                return;
+            if (pz == cz) {
+                if (cz >= 16)
+                    return;
+                DrawableGridNode* child;
+                child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
+                if (child == 0)
+                    return;
+                child->WalkBorderVertex(rx, z & mask, flag, dir, origin, minLevel);
+            } else {
+                if (cz < 16) {
+                    DrawableGridNode* child;
+                    child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
+                    if (child)
+                        child->WalkBorderVertex(rx, z & mask, flag, dir, origin, minLevel);
+                }
+                if (pz >= 16)
+                    return;
+                DrawableGridNode* child;
+                child = (DrawableGridNode*)children[g_gridRow16[pz] + cx];
+                if (child == 0)
+                    return;
+                child->WalkBorderVertex(rx, (z & mask) + unit, flag, dir, origin, minLevel);
+            }
+        } else if (pz == cz) {
+            if (cx < 16 && cz < 16) {
+                DrawableGridNode* child;
+                child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
+                if (child)
+                    child->WalkBorderVertex(rx, z & mask, flag, dir, origin, minLevel);
+            }
+            if (px >= 16 || cz >= 16)
+                return;
+            DrawableGridNode* child;
+            child = (DrawableGridNode*)children[g_gridRow16[cz] + px];
+            if (child == 0)
+                return;
+            child->WalkBorderVertex(rx + unit, z & mask, flag, dir, origin, minLevel);
+        } else {
+            if (cx < 16) {
+                if (cz < 16) {
+                    DrawableGridNode* child;
+                    child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
+                    if (child)
+                        child->WalkBorderVertex(rx, z & mask, flag, dir, origin, minLevel);
+                }
+                if (pz < 16) {
+                    DrawableGridNode* child;
+                    child = (DrawableGridNode*)children[g_gridRow16[pz] + cx];
+                    if (child)
+                        child->WalkBorderVertex(rx, z & mask + unit, flag, dir, origin, minLevel);
+                }
+            }
+            if (px >= 16)
+                return;
+            if (cz < 16) {
+                DrawableGridNode* child;
+                child = (DrawableGridNode*)children[g_gridRow16[cz] + px];
+                if (child)
+                    child->WalkBorderVertex(rx + unit, z & mask, flag, dir, origin, minLevel);
+            }
+            if (pz >= 16)
+                return;
+            DrawableGridNode* child;
+            child = (DrawableGridNode*)children[g_gridRow16[pz] + px];
+            if (child == 0)
+                return;
+            child->WalkBorderVertex(rx + unit, (z & mask) + unit, flag, dir, origin, minLevel);
+        }
+        return;
+    }
+    GridBaseCell* cell = &block->cells[g_gridRow17[z] + x];
+    if (cell != origin)
+        SetVertexDirection(x, z, flag, dir, origin);
+}
+
 // 0x004835c0: a vertex on the border of `child` changed; passes the change to
 // the neighbouring children of this node, or for children on this node's own
 // border, down from the root node through 0x00483200.

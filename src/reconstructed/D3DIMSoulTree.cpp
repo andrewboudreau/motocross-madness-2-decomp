@@ -855,6 +855,58 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot4(SoultreeObject** out)
     copy->UnknownVirtualSlot9(renderContext, "", (int)lightManager, (int)textureOptions, 1);
 }
 
+static inline void Raise(float& bound, float value)
+{
+    if (value > bound)
+        bound = value;
+}
+
+static inline void Lower(float& bound, float value)
+{
+    if (value < bound)
+        bound = value;
+}
+
+// 0x00444140: the local bounds of the vertices this node owns in every
+// level of detail (zero when it owns none). The centre sum is written per
+// component: through operator+ VC6 adds y and z high-first, retail
+// low-first; the valid flag is stored last.
+void D3DIMSoultreeObject::SoultreeVirtualSlot5()
+{
+    D3DIMSoultreeObject* model = this;
+    while (!model->lodTable)
+        model = (D3DIMSoultreeObject*)model->parent;
+    boundsFound = 0;
+    Vector3 low(64000.0f, 64000.0f, 64000.0f);
+    Vector3 high(-64000.0f, -64000.0f, -64000.0f);
+    for (int lod = 0; lod < model->lodCount; lod++) {
+        for (int i = 0; i < model->lodTable[lod].surfaceCount; i++) {
+            for (int j = 0; j < model->lodTable[lod].surfaces[i].groupCount; j++) {
+                if (model->lodTable[lod].surfaces[i].groups[j].node == this) {
+                    UnknownSoultreeVertex* vertex = model->lodTable[lod].surfaces[i].groups[j].transformedVertices;
+                    int count = model->lodTable[lod].surfaces[i].groups[j].vertexCount;
+                    for (int k = 0; k < count; k++) {
+                        Raise(high.x, vertex[k].position.x);
+                        Raise(high.y, vertex[k].position.y);
+                        Raise(high.z, vertex[k].position.z);
+                        Lower(low.x, vertex[k].position.x);
+                        Lower(low.y, vertex[k].position.y);
+                        Lower(low.z, vertex[k].position.z);
+                        boundsFound = 1;
+                    }
+                }
+            }
+        }
+    }
+    if (!boundsFound) {
+        low = Vector3(0.0f, 0.0f, 0.0f);
+        high = Vector3(0.0f, 0.0f, 0.0f);
+    }
+    localBoundsCenter = Vector3(low.x + high.x, low.y + high.y, low.z + high.z) * 0.5f;
+    localBoundsHalfExtent = (high - low) * 0.5f;
+    localBoundsValid = 1;
+}
+
 // 0x00444440
 void D3DIMSoultreeObject::ComputeAllBounds()
 {

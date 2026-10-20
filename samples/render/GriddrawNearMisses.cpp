@@ -77,21 +77,6 @@
 // them; retail keeps both, so x steps inside the body), three m/n
 // initialisations and the origin taken from x/z.
 //
-// DrawableGridNode 0x00483200 (border vertex walk, 955 bytes; 84 of 956):
-// control flow, the tail call VC6 turns into a loop and every call match;
-// VC6 gives x ebp and z ebx (retail: ebx and ebp) and re-reads `level` for
-// the shift loop where retail reuses al. Tried the shift and count loop
-// forms, rx as a variable or inline, the cell comparison forms, an explicit
-// node loop (worse) and x reused as the divided column.
-// The `z & mask + unit` argument is retail's precedence (`lea edx, [esi +
-// ecx] ; and edx, ebp`). Level reuse: an `int` copy of level reloads it, an
-// `unsigned char` copy gives retail's `test al, al` / `and eax, 0xff` pair but
-// spills the copy into an argument slot; `level > 0`, `0 < level`, a leaf-first
-// early return, and down-counting, while, unsigned char and `(int)level` loop
-// forms keep the reload. Register swap: rz as a local (worse), the cx/cz and
-// px/pz declaration and division orders, px/pz taken from cx/cz, named
-// x >> shift / z >> shift, and 0..33 dead initialised locals change nothing.
-//
 // DrawableGridNode 0x004815e0 (detail update, 1082 bytes; candidate 1083):
 // computes the squared near and far distances of the viewer to the node's
 // x and z range, the y delta, the distance (FastSqrt), and the two
@@ -579,105 +564,6 @@ int DrawableGridNode::RebuildBlockBuffers()
     return 1;
 }
 
-
-// 0x00483200: walks a border vertex down the node tree (VC6 turns the final
-// child call into a loop, as retail does).
-void DrawableGridNode::WalkBorderVertex(int x, int z, int flag, int dir, GridBaseCell* origin, int minLevel)
-{
-    if (level != 0) {
-        int shift = 0;
-        for (int i = 0; i < level; i++)
-            shift += 4;
-        int unit = 1 << shift;
-        int mask = unit - 1;
-        int rx = x & mask;
-        if (rx == 0 && (z & mask) == 0) {
-            GridBaseCell* cell = &block->cells[g_gridRow17[z >> shift] + (x >> shift)];
-            if (cell != origin)
-                SetVertexDirection(x >> shift, z >> shift, flag, dir, origin);
-        }
-        if (children == 0 || level <= minLevel)
-            return;
-        int cx = x;
-        int cz = z;
-        int px = x - 1;
-        int pz = z - 1;
-        int j = level;
-        while (j--) {
-            cx /= 16;
-            cz /= 16;
-            px /= 16;
-            pz /= 16;
-        }
-        DrawableGridNode* child;
-        if (px == cx) {
-            if (cx >= 16)
-                return;
-            if (pz == cz) {
-                if (cz >= 16)
-                    return;
-                child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
-                if (child == 0)
-                    return;
-                child->WalkBorderVertex(rx, z & mask, flag, dir, origin, minLevel);
-            } else {
-                if (cz < 16) {
-                    child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
-                    if (child)
-                        child->WalkBorderVertex(rx, z & mask, flag, dir, origin, minLevel);
-                }
-                if (pz >= 16)
-                    return;
-                child = (DrawableGridNode*)children[g_gridRow16[pz] + cx];
-                if (child == 0)
-                    return;
-                child->WalkBorderVertex(rx, (z & mask) + unit, flag, dir, origin, minLevel);
-            }
-        } else if (pz == cz) {
-            if (cx < 16 && cz < 16) {
-                child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
-                if (child)
-                    child->WalkBorderVertex(rx, z & mask, flag, dir, origin, minLevel);
-            }
-            if (px >= 16 || cz >= 16)
-                return;
-            child = (DrawableGridNode*)children[g_gridRow16[cz] + px];
-            if (child == 0)
-                return;
-            child->WalkBorderVertex(rx + unit, z & mask, flag, dir, origin, minLevel);
-        } else {
-            if (cx < 16) {
-                if (cz < 16) {
-                    child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
-                    if (child)
-                        child->WalkBorderVertex(rx, z & mask, flag, dir, origin, minLevel);
-                }
-                if (pz < 16) {
-                    child = (DrawableGridNode*)children[g_gridRow16[pz] + cx];
-                    if (child)
-                        child->WalkBorderVertex(rx, z & mask + unit, flag, dir, origin, minLevel);
-                }
-            }
-            if (px >= 16)
-                return;
-            if (cz < 16) {
-                child = (DrawableGridNode*)children[g_gridRow16[cz] + px];
-                if (child)
-                    child->WalkBorderVertex(rx + unit, z & mask, flag, dir, origin, minLevel);
-            }
-            if (pz >= 16)
-                return;
-            child = (DrawableGridNode*)children[g_gridRow16[pz] + px];
-            if (child == 0)
-                return;
-            child->WalkBorderVertex(rx + unit, (z & mask) + unit, flag, dir, origin, minLevel);
-        }
-        return;
-    }
-    GridBaseCell* cell = &block->cells[g_gridRow17[z] + x];
-    if (cell != origin)
-        SetVertexDirection(x, z, flag, dir, origin);
-}
 
 // 0x004815e0: the detail update (see the note at the top).
 float DrawableGridNode::ComputeViewerDetail(int coarse)

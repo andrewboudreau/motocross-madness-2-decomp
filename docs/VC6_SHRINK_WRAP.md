@@ -59,7 +59,7 @@ repository's COFF tools).
   ManagedTextureGroup `0x0050ef70` returned 1 early when TestKey was off
   and again when no page was selected; nesting the body under
   `if (testKey)` and `if (page)` with one trailing `return 1;` moved its
-  masked score from 93 to 951 of 1678 bytes.
+  masked score from 93 to 951 of 1678 bytes (it is exact now).
 - If retail pushes before the guard and the reconstruction delays the pushes,
   the original probably had more exits that the reconstruction folded into
   the final one. Parser `0x004b87f0` (33 of 408 bytes) became exact by

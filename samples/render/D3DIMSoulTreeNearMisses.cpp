@@ -3,22 +3,6 @@
 // evidence and the exact functions are in src/reconstructed/D3DIMSoulTree.h
 // and .cpp. Bindings: D3DIMSoulTreeNearMisses.bindings.json.
 //
-// SoultreeVirtualSlot5 (0x00444140, 768 bytes): 610/764. The bounds use
-// by-value Raise/Lower inlines and no face-group pointer; the loops match.
-// VC6 adds the y and z of `high + low` as low + high, and keeps the
-// +0x164 address in ebp where retail uses edx. Unchanged by `high + low`,
-// `0.5f * (...)`, named center/extent locals, operator+ with by-value
-// operands or swapped component sums; explicit component constructors are
-// worse. Retail loads high first in every component (`fld high; fadd
-// low`) and forms +0x164 in edx after the +0x158 stores; VC6 here loads
-// high first only for x. Worse: the
-// zero reset as `high` then `low` (604) or chained (515-518), `high`
-// declared first (596), the Lower calls first (588) or interleaved (556).
-// Also unchanged (610): a named `sum` local, center/extent pointer or
-// reference locals for +0x158/+0x164, a reference alias of `low` or `high`
-// in the sum, Raise/Lower taking a pointer. `center = low; center += high`
-// gives 552; comparisons written out in the loop load 64000 from .rdata.
-//
 // UpdateMaterialTexelRatios (0x00440810, 1328 bytes): texture density per
 // material. Same 388 instructions; the uv delta is a copy of a zeroed
 // Vector3 (`Vector3 delta = zero`) taken once, which reproduces retail's
@@ -56,8 +40,7 @@
 // fold), and a second reference to the camera's view matrix gives 160.
 // Dead initialised int locals (2026-10-11): 0..33 at the top and 0..31 just before row 1
 // give the same scores by count (799 at 0 and 29..33, otherwise 706..776), so the count
-// moves all rows together and no count gives retail's row 1. SoultreeVirtualSlot5 stays
-// at 610 for 0..33 top locals.
+// moves all rows together and no count gives retail's row 1.
 //
 // DrawCurrentLod (0x00440f30..0x00442dd8, 7848 bytes): the drawing
 // function. A nine-way switch on the material mapping type (+0xc8; source
@@ -119,55 +102,6 @@ static inline Vector3 operator+(const Vector3& a, const Vector3& b)
 static inline Vector3 operator-(const Vector3& a, const Vector3& b)
 {
     return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
-}
-
-static inline void Raise(float& bound, float value)
-{
-    if (value > bound)
-        bound = value;
-}
-
-static inline void Lower(float& bound, float value)
-{
-    if (value < bound)
-        bound = value;
-}
-
-// 0x00444140
-void D3DIMSoultreeObject::SoultreeVirtualSlot5()
-{
-    D3DIMSoultreeObject* model = this;
-    while (!model->lodTable)
-        model = (D3DIMSoultreeObject*)model->parent;
-    boundsFound = 0;
-    Vector3 low(64000.0f, 64000.0f, 64000.0f);
-    Vector3 high(-64000.0f, -64000.0f, -64000.0f);
-    for (int lod = 0; lod < model->lodCount; lod++) {
-        for (int i = 0; i < model->lodTable[lod].surfaceCount; i++) {
-            for (int j = 0; j < model->lodTable[lod].surfaces[i].groupCount; j++) {
-                if (model->lodTable[lod].surfaces[i].groups[j].node == this) {
-                    UnknownSoultreeVertex* vertex = model->lodTable[lod].surfaces[i].groups[j].transformedVertices;
-                    int count = model->lodTable[lod].surfaces[i].groups[j].vertexCount;
-                    for (int k = 0; k < count; k++) {
-                        Raise(high.x, vertex[k].position.x);
-                        Raise(high.y, vertex[k].position.y);
-                        Raise(high.z, vertex[k].position.z);
-                        Lower(low.x, vertex[k].position.x);
-                        Lower(low.y, vertex[k].position.y);
-                        Lower(low.z, vertex[k].position.z);
-                        boundsFound = 1;
-                    }
-                }
-            }
-        }
-    }
-    if (!boundsFound) {
-        low = Vector3(0.0f, 0.0f, 0.0f);
-        high = Vector3(0.0f, 0.0f, 0.0f);
-    }
-    localBoundsValid = 1;
-    localBoundsCenter = (low + high) * 0.5f;
-    localBoundsHalfExtent = (high - low) * 0.5f;
 }
 
 float FastInvSqrt(float x);                         // 0x00460c00

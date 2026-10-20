@@ -1,12 +1,12 @@
-// FastMath.cpp -- table-driven float helpers declared in ../common/Math3D.h
-// (0x00460b50 FastSqrt, 0x00460c00 FastInvSqrt). They sit in the EventManager.cpp range by
-// proximity only (tier 3 for the file).
-#include "math/Math3D.h"
+// FastMath.cpp -- table-driven float helpers at 0x00460ad0..0x00460d06.
+// Names and original translation-unit ownership remain provisional. The decoded
+// table accesses and initialization loops establish the storage extents below.
+#include "../krusty2/math/FastMath.h"
 
-// 256 x uint32 mantissa table at 0x005dafe0 (sqrt) and 128 x uint8 table at 0x005daf5c
-// (rsqrt), both filled at run time, so they are extern here.
-extern unsigned long g_FastSqrtTable[256];
-extern unsigned char g_FastInvSqrtTable[128];
+// Both arrays are in retail .data zero-fill, beyond its initialized raw bytes.
+// InitFastMath fills them before Game creates the physics and rendering objects.
+unsigned long g_FastSqrtTable[256];       // 0x005dafe0
+unsigned char g_FastInvSqrtTable[128];    // 0x005daf5c
 
 // 0x00460b50. Returns 0 for x == 0; otherwise the result is assembled bit-wise from the
 // halved exponent and the table entry indexed by the top 8 bits of the mantissa (with the
@@ -42,10 +42,10 @@ float FastInvSqrt(float x)
 // variant.  Names tier 3.
 #include <math.h>
 
-extern float g_TrigTableScale;          // 0x005dafdc: table entries per radian
-extern float g_SinTable[0x10000];       // 0x0061b3e0
-extern float g_CosTable[0x10000];       // 0x005db3e0
-extern float g_TanTable[0x10000];       // 0x0059af5c
+float g_TrigTableScale;          // 0x005dafdc: table entries per radian
+float g_SinTable[0x10000];       // 0x0061b3e0
+float g_CosTable[0x10000];       // 0x005db3e0
+float g_TanTable[0x10000];       // 0x0059af5c
 
 // 0x00460ae0: fills the 256-entry square root mantissa table from sqrt over
 // two exponent octaves ([1,2) at i, [2,4) at i + 0x80), keeping the result's
