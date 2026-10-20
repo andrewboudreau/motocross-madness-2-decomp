@@ -31,6 +31,8 @@
 //   all 24 term orders, with `q->z = z * w` or `z *= w`, gives 164 at best;
 //   all four rows accumulated, products in each of their 6 orders and the
 //   translation last (1296 forms), give 164 at best.
+//   The operand order inside each of the twelve products (all 4096
+//   combinations, session 14) gives 171 every time: VC6 canonicalises it.
 //
 // TriangleNormal 0x004a11e0 and ViewMatrix 0x004a1500 are exact in
 // src/reconstructed/MatrixUtil.cpp (parenthesised products).

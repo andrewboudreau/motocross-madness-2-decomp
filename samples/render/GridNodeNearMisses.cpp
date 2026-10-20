@@ -12,6 +12,7 @@
 // z-first comparisons and int casts or locals for gridX/gridZ (77/86 at best).
 // A `static const` or extern row table, the column term first in the index
 // sum and unsigned shifted coordinates are unchanged as well.
+// 0..33 prepended typedefs (section 2 tie-break) give 81 at every count.
 //
 // 0x00483910 (cell sampler) is exact and lives in src/reconstructed/GridNode.cpp.
 // It closed (cycle 3) from 1040/1067 with two levers: `level` read through a
