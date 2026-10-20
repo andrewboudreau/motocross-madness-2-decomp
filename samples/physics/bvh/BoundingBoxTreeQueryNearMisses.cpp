@@ -85,7 +85,9 @@
 //   266 (734 bytes in place; the last normalisation's operator* is then a call as in
 //   retail).  Left: retail also calls DotProduct in the sixth and seventh normalisations
 //   (corner-distance or box-axis-test helpers spend more budget but leave those two
-//   expanded), copies each normalised axis twice (into a temporary that the
+//   expanded; dearer QuerySigned/QuerySquares bodies, corner differences passed inline,
+//   corner locals interleaved with their squares and a zero-constructed w each reshuffle the
+//   whole call pattern instead, normalised diff 268-975), copies each normalised axis twice (into a temporary that the
 //   test reads and into the axis), and in each separating-axis test retail sums the
 //   three projected radii before the segment's half-length projection (as `(r = ...) + D`
 //   would) and orders the z axis's dot product (0 + 0) + l.z * hz.  A projected-radius inline
