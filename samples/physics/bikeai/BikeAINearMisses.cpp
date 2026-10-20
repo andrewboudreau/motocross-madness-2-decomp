@@ -856,14 +856,14 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                           float* frontSusp, float* rearSusp, int* outFrontContact, int* outRearContact,
                           UnknownBikeAIPath* path, float* speedTable, float sideOffset, int nearOnly)
 {
-    if (dt > 0.05f)
-        dt = 0.05f;
     int frontContact = 1;
     int rearContact = 1;
     float frontK = 90.0f;
     float rearK = 90.0f;
     int steerSign = 0;
     int steps = 0;
+    if (dt > 0.05f)
+        dt = 0.05f;
     float frontC;
     float rearC;
     frontC = rearC = ((dt - 0.005f) * 4.21053f + 0.6f) * 0.6f;
