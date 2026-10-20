@@ -321,3 +321,10 @@ the object's function symbols. The x87 study scripts are
 `work/s14/x87/scan.py` (form counts), `lines.py` (maps exact-function sites
 to source lines through the `/Z7` COFF line numbers) and `nearmiss.py`
 (classifies the ranked near-miss hunks); they are untracked work scripts.
+
+`tools/x87_slips.py` does the per-row step: it aligns a ranked row's
+candidate against retail, lists each dup/load or memory-order slip with its
+source line, the operand kinds, the CodeView local behind each frame word
+and the candidate's earlier direct stores to it, and names the rule above
+that predicts retail's form (`python tools/x87_slips.py 0x52c510`, or
+`--lane render` for a lane's rows).
