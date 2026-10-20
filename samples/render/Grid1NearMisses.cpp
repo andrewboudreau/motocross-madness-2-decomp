@@ -42,7 +42,7 @@
 // `last`/`span` local and `line` declared at the block start were tried
 // without closing the gap.
 //
-// 0x0047d780 (977 bytes; 216 of 1008): the per-block variant (4 x 4 pixel
+// 0x0047d780 (977 bytes; 227 of 1010): the per-block variant (4 x 4 pixel
 // cells, width / 4 tiles, four rows per run, a dead `done` accumulator that
 // retail keeps). Retail computes the head source pointer before the
 // `x & mask` test and reuses row * tileStride for the line pointer; texture
@@ -50,7 +50,9 @@
 // destination in ebp/[esp+0x14]. Retail has 339 instructions to 325 here.
 // The head source pointer (with or without a `column` local) computed
 // before the test is worse (144-154); `rest` before `line` gains only two
-// bytes (retail computes `line` first here).
+// bytes (retail computes `line` first here). A declaration-order sweep
+// found `dst` before `src` in the head copy and `done` before `tileStride`:
+// strict 216 -> 227, differing instructions 176 -> 158.
 
 #include "../../src/reconstructed/Grid1.h"
 
@@ -373,9 +375,9 @@ int DrawableGridNodeSharedTextures::BuildBlockTexture(int block, ManagedTexture*
     int tileSize = width / 4;
     int bpp = PixelFormatBytesPerPixel(texture->mapFormat);
     int pitch = bpp * width;
+    int done = 0;
     int tileStride = bpp * tileSize;
     unsigned char* runs = (unsigned char*)Extra()->data + index * 2;
-    int done = 0;
     while (y < width) {
         int id = *runs++;
         int length = (*runs++ + 1) * 4;
@@ -395,8 +397,8 @@ int DrawableGridNodeSharedTextures::BuildBlockTexture(int block, ManagedTexture*
         }
         int row = y & (tileSize - 1);
         if (((x + length - 1) & ~(tileSize - 1)) - (x & ~(tileSize - 1)) == 0) {
-            unsigned char* src = tile + (x & (tileSize - 1)) * bpp + row * tileStride;
             unsigned char* dst = out;
+            unsigned char* src = tile + (x & (tileSize - 1)) * bpp + row * tileStride;
             for (int k = 0; k < 4; k++) {
                 memcpy(dst, src, length * bpp);
                 src += tileStride;
