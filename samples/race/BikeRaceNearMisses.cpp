@@ -85,6 +85,18 @@
 // because its longer x87 code (fld st(n) squares, `fcom qword`) restores
 // the 12 bytes the two missing spills cost, so the code after the length
 // sites realigns; it is not retail's float code and is not used.
+// Session 14 probe: `float xx = x*x, yy = y*y; volatile float zz = z*z;
+// l = xx + yy + zz` gives 6768 bytes and 5578 of 5596 masked: zz then takes
+// retail's shared slot (+0x34, +0x30) and every later frame offset lines up,
+// so retail's z*z is a frame local while x*x and y*y stay on the x87 stack.
+// Only the two length sites (`fst [zz]; fadd st(1); faddp st(2); fstp
+// st(0)` against retail's `fstp [zz]; faddp; fadd [zz]`) and the girl-copy
+// store order remain; volatile is not retail's code and is not used. Plain
+// named squares (any subset, any sum bracketing, `+=` forms, float[3], a
+// struct or constructor of squares, a by-value vector, `const float&`
+// squares or a `float&` out helper) stay on the x87 stack. In probes VC6
+// only stops substituting such locals into the sum inside a function with an
+// EH object (as here), and no /G3-/G6 setting moves a product.
 //
 // 0x00419970 (13428 bytes; the loader, ret 0x14): decoded completely (the
 // pro circuit branch, the network player and AI racers, the offline player,
