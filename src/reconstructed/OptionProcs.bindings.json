@@ -229,7 +229,7 @@
   "?OpenHelp@TrackGameMode@@QAEHPBD0@Z": "0x00523d30",
   "?UnknownMethod4c3ae0@PCJoystickDevice@@QAEXE@Z": "0x004c3ae0",
   "?Tick@UIDialog@@UAEHM@Z": "0x0046ef00",
-  "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
+  "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?RenderPre3D@GameObject@@UAEHXZ": "0x00469330",
   "?UnknownVirtualSlot14@GameObject@@UAEHXZ": "0x00469360",

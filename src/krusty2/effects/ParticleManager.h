@@ -146,7 +146,7 @@ public:
     explicit ParticleManager(int flags);
     virtual ~ParticleManager();
     virtual int Tick(float dt);
-    virtual int GameObjectVirtualSlot14();
+    virtual int UnknownVirtualSlot14();
     // 0x004ba4d0 (ret 0x10): returns this, or 0 (after BaseObject slot 2) when a vertex buffer
     // or the index array is missing.
     virtual ParticleManager* UnknownVirtualSlot27(int parentArg, TextureMapManager* textures,

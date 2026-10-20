@@ -38,7 +38,7 @@ SoultreeQuadTreeRenderer::~SoultreeQuadTreeRenderer()
 }
 
 // slot 14, 0x00504570: publishes the node counters on the statistics overlay.
-int SoultreeQuadTreeRenderer::GameObjectVirtualSlot14()
+int SoultreeQuadTreeRenderer::UnknownVirtualSlot14()
 {
     SoultreeStatsLog* log = g_soultreeStats->log;
     if (log) {
@@ -51,7 +51,7 @@ int SoultreeQuadTreeRenderer::GameObjectVirtualSlot14()
         SoultreeLogLine(g_soultreeStats->log, statsId, "Objects Visible        : %i\n", visibleCount);
         SoultreeLogLine(g_soultreeStats->log, statsId, "Objects in list        : %i\n", g_soultreeNodeCount);
     }
-    return GraphicsTest::GameObjectVirtualSlot14();
+    return GraphicsTest::UnknownVirtualSlot14();
 }
 
 // slot 12, 0x00504620: flags every quadtree object of the renderer's type that has no
@@ -125,9 +125,9 @@ void SoultreeQuadTreeRenderer::RemoveNodesFromQuadtree()
 
 // slot 23, 0x005048d0: with the debug keys enabled, key 0x2d switches every
 // node on (InsertNodesInQuadtree) or, when some are on, off again (RemoveNodesFromQuadtree).
-int SoultreeQuadTreeRenderer::OnControlPress(int a, int b)
+int SoultreeQuadTreeRenderer::OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b)
 {
-    if ((g_soultreeStats->debugFlags & 4) && CheckKey(0x2d, 0, a, 0x80)) {
+    if ((g_soultreeStats->debugFlags & 4) && CheckKey(0x2d, 0, (int)a, 0x80)) {
         if (!field_0x34)
             InsertNodesInQuadtree();
         else

@@ -47,8 +47,9 @@ semantic names and original source ownership remain explicit.
 python tools/build_game.py --vc6-root work/vc6sp3-disc
 ```
 
-This compiles every `src/**/*.cpp` with authentic VC6 SP3 and attempts a
-Windows executable link. It currently fails on missing source providers;
+This compiles every `src/**/*.cpp` plus explicitly reviewed candidates listed
+in `config/game_build.json`, using authentic VC6 SP3, and attempts a Windows
+executable link. It currently fails on missing source providers;
 it does not produce a playable game yet. `--compile-only` checks compilation
 separately. GNU Make users can run `make game` or `make game-compile`.
 

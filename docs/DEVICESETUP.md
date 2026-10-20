@@ -13,7 +13,7 @@ all ours (tier 3):
 
 The gap `0x00448560..0x00449e60` runs from the end of DebugOverlay.cpp
 (`0x00447a67`) to dirlist.cpp (`0x00449ea6`). Its parts:
-- `0x00448560..0x0044895b` is `GetDXVersion`. The startup code
+- `0x00448560..0x00448953` is `GetDXVersion`. The startup code
   (`0x004a08f7`, [MAIN](MAIN.md)) calls it.
 - `0x00448960..0x00449e54` is the control-layout object at TrackGame+0x33fc
   and the key-name helpers after it.
@@ -95,9 +95,63 @@ Not tried successfully:
 - dropping the dead NULL initialisers;
 - giving the NT path separate library variables.
 
+## Functional-build review
+
+The functional source build explicitly includes this candidate through
+`config/game_build.json`. It remains in `samples/`, registered as `partial`
+in `samples/game/targets.json`; neither inclusion nor behavioral validation
+claims byte identity or recovered translation-unit ownership.
+
+The decoded retail body was compared with the VC6 `/O2 /MT` candidate over
+the complete 1011-byte retail extent. The candidate is 1006 bytes with a
+0x11c-byte local frame versus retail's 0x118. The changed register assignment
+spills the DirectInput entry-point address, changes epilogue scheduling and
+instruction lengths, and shifts branches. The API arguments, signed HRESULT
+tests, output writes, COM slots, object lifetimes and failure cleanup agree.
+
+`tests/test_device_setup_behavior.py` compiles a native VC6 differential
+harness and reads the private hash-pinned executable. Four needed retail PE
+pages are placed at their original addresses inside test-only reserved
+storage; the four API IAT slots are redirected to deterministic mocks. It
+compares retail with the candidate source compiled against the same API
+mocks. No private code enters the repository or the production build.
+
+The test passed **720 scenarios**, comparing all three output values and
+ordered API/COM calls:
+
+- NT major versions 3, 4, 5 and 10, Windows 9x, and the unknown-platform
+  fallback that retail also sends down the 9x path;
+- build values below, at and above 0x549, including a nonzero high word;
+- every observed version/library/entry-point/COM failure and success path;
+- exact primary-surface descriptor fields, GUID arguments, release order,
+  library release order and caller-visible untouched-output cases.
+
+The original routine does not release the successful Surface3/Surface4
+query results; the candidate preserves that behavior. The test provides
+finite behavioral evidence, not proof of arbitrary DLL implementations or
+full-game startup. Real current-Windows startup remains a game-build gate.
+
+The required version scalar read by `WinMainBody` now has a source
+definition in `Main.cpp`: an initialized `.data` DWORD of 0x700, matching
+retail `0x0056e270`. Its original defining TU remains unproven. All five
+existing Main functions still pass strict relocation-resolved matching.
+
+`src/reconstructed/DirectXGuids.cpp` supplies nine identifiers missing from
+the bundled SDK libraries, including the probe's DirectDraw7 and Surface4
+IDs. Each has a confirmed 16-byte retail value and readonly storage, verified
+by `tests/test_directx_guids.py`. Existing C-linkage callers bind to these
+definitions, and the differential harness links this real provider. Its
+filename does not assert original TU ownership.
+
 ## Reproduce
 
 ```bash
 python3 tools/compile.py --compiler vc6 --vc6-root "$VC6_ROOT" src/reconstructed/DeviceSetup.cpp -o work/DeviceSetup.obj
 python3 tools/run_calibration.py --exe "$MCM2_EXE" --compiler vc6 --vc6-root "$VC6_ROOT"
+python3 tools/run_physics_samples.py --exe "$MCM2_EXE" --vc6-root "$VC6_ROOT" --profile vc6_o2_mt --root samples/game --source samples/game/DeviceSetupNearMisses.cpp --strict
+python3 -m unittest discover -s tests -p test_device_setup_behavior.py -v
 ```
+
+The differential test requires native Windows, `VC6_ROOT` and `MCM2_EXE`;
+otherwise it skips. The partial target check reports the byte mismatch and
+must not be interpreted as strict-match acceptance.

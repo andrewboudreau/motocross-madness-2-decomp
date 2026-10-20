@@ -4,7 +4,7 @@
 //
 // The CollisionObject members 0x00435830 SetTransform, 0x00439400 SetIgnoreListMode and
 // 0x00439410 AddIgnoredOwner are declared in collision/CollisionObject.h (src/krusty2).
-// Virtual: slot 2 of the GraphicsTest subobject at +0xc (BaseObjectVirtualSlot2, the
+// Virtual: slot 2 of the GraphicsTest subobject at +0xc (Release, the
 // Release-style slot, called through [ [obj+0xc] + 8 ]) is invoked after use.
 #ifndef OBJECT_PLACEMENT_TYPES_H
 #define OBJECT_PLACEMENT_TYPES_H

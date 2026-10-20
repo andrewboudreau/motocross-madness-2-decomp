@@ -42,7 +42,7 @@
   {
     "class": "TerrainShadow",
     "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot14@TerrainShadow",
+    "candidate_symbol_contains": "UnknownVirtualSlot14@TerrainShadow",
     "target_va": "0x0050a1a0",
     "target_size": 498,
     "expect": "exact",

@@ -189,7 +189,7 @@ Tire::~Tire()
 // Each element is 24 bytes: a zero vector followed by the point.  The shape is installed
 // with CollisionObject 0x00432ab0 (type 2), the owner pointer (field_0x60) is this tire
 // and field_0x88/field_0x8c get the contact callback and no second callback.
-GameObject* Tire::SetRenderContext(int a)
+GameObject* Tire::SetRenderContext(void* a)
 {
     struct TirePoint {
         CollisionVec3 origin;
@@ -197,7 +197,7 @@ GameObject* Tire::SetRenderContext(int a)
     };
     TirePoint pts[8];
 
-    Configure(a, 1, 1, 1);
+    Configure((int)a, 1, 1, 1);
     // The zero vector is built from a zero float (not three literals): VC6 then keeps the
     // zero in registers across the loop instead of reloading it from the stack.
     float zeroValue = 0.0f;

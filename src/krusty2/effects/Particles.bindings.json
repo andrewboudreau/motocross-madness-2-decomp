@@ -7,7 +7,7 @@
   "??3@YAXPAX@Z": "0x4a30c0",
   "??_7ParticleManager@@6B@": "0x555d10",
   "?FastInvSqrt@@YAMM@Z": "0x460c00",
-  "?SetRenderContext@GameObject@@UAEPAV1@H@Z": "0x4692f0",
+  "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x4692f0",
   "?TerrainLoadTexture@@YAPAVParticleTexture@@PAVTextureMapManager@@PBDHPAXHHH2HIHH@Z": "0x50a590",
   "?g_gameContext@@3PAUParticleGameContext@@A": "0x56e26c",
   "?g_particleCellUVs@@3PAUParticleUVRect@@A": "0x689158",

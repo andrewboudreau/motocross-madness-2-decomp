@@ -8,7 +8,7 @@
 
 // 0x00689964 (.bss, read 4 times, never written): when set, PCTextureMap
 // has the manager recount texture memory (0x00511580) after it releases or
-// recreates a surface.
+// recreates a surface. Storage is supplied by GraphicsState.cpp.
 extern int g_DebugCountTextureMemory;
 
 // Lzw.cpp (cdecl 0x004a03d0): expands `source` into `size` bytes.

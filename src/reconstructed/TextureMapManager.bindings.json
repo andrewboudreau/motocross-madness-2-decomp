@@ -48,7 +48,7 @@
   "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "?Tick@TextureMapManager@@UAEHM@Z": "0x00510dd0",
-  "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
+  "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?PrepareGeometry@TextureMapManager@@UAEHXZ": "0x00510df0",
   "?RenderPre3D@GameObject@@UAEHXZ": "0x00469330",

@@ -85,8 +85,8 @@ public:
     virtual ~SoultreeQuadTreeRenderer();                              // slot 0: deleting 0x00504500, core 0x00504520
     virtual int Tick(float dt);                                       // 0x00504690
     virtual int PrepareGeometry();                                    // 0x00504620
-    virtual int GameObjectVirtualSlot14();                            // 0x00504570
-    virtual int OnControlPress(int a, int b);                         // 0x005048d0
+    virtual int UnknownVirtualSlot14();                            // 0x00504570
+    virtual int OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b);                         // 0x005048d0
 
     void InsertNodesInQuadtree();    // owner: SoultreeQuadTreeRenderer.cpp (__FILE__ line 0x63)
     void RemoveNodesFromQuadtree();    // owner: SoultreeQuadTreeRenderer.cpp (__FILE__ line 0x7f)

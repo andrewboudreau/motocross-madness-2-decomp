@@ -250,7 +250,7 @@
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "?Tick@VCRDlg@@UAEHM@Z": "0x004893c0",
   "?Tick@VCRInterface@@UAEHM@Z": "0x004e7d60",
-  "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
+  "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?RenderPre3D@GameObject@@UAEHXZ": "0x00469330",
   "?RenderPre3D@UIDialog@@UAEHXZ": "0x0046f1c0",

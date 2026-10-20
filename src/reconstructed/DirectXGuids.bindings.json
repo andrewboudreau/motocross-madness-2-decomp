@@ -1,0 +1,11 @@
+{
+  "_IID_IDirectDraw7": "0x005560b0",
+  "_IID_IDirectDrawSurface4": "0x005560f0",
+  "_IID_IDirectDrawGammaControl": "0x00556140",
+  "_IID_IDirect3D7": "0x00556180",
+  "_IID_IDirect3DRefDevice": "0x005561d0",
+  "_IID_IDirect3DNullDevice": "0x005561e0",
+  "_IID_IDirectPlay4A": "0x005567b0",
+  "_IID_IDirectInput7A": "0x005569e0",
+  "_IID_IDirectInputDevice7A": "0x00556a50"
+}

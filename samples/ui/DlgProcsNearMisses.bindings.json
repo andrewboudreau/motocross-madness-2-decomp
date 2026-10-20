@@ -406,7 +406,7 @@
   "?Tick@MainDlg@@UAEHM@Z": "0x0044c6b0",
   "?Tick@TransDlg@@UAEHM@Z": "0x00455bd0",
   "?Tick@UIDialog@@UAEHM@Z": "0x0046ef00",
-  "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
+  "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?RenderPre3D@SPBikeRiderDlg@@UAEHXZ": "0x0044ffc0",
   "?RenderPre3D@UIDialog@@UAEHXZ": "0x0046f1c0",

@@ -41,7 +41,7 @@ ParticleManager::ParticleManager(int flags) : GameObject(flags)
 ParticleManager::~ParticleManager()
 {
     if (texture)
-        texture->BaseObjectVirtualSlot2();
+        texture->Release();
     for (int i = 0; i < 1000; i++) {
         if (particles[i])
             delete particles[i];
@@ -104,7 +104,7 @@ int ParticleManager::Tick(float dt)
 ParticleManager* ParticleManager::UnknownVirtualSlot27(int parentArg, TextureMapManager* textures,
                                                        const char* textureName, int field)
 {
-    GameObject::SetRenderContext(parentArg);
+    GameObject::SetRenderContext((void*)parentArg);
     for (int i = 0; i < 1000; i++)
         particles[i] = new(__FILE__, 0x48a) Particle;
 
@@ -127,7 +127,7 @@ ParticleManager* ParticleManager::UnknownVirtualSlot27(int parentArg, TextureMap
 
     indices = new(__FILE__, 0x4a8) unsigned short[6000];
     if (!vertexBuffer || !indices || !indexBufferObject) {
-        BaseObjectVirtualSlot2();
+        Release();
         return 0;
     }
     for (i = 0; i < 1000; i++) {

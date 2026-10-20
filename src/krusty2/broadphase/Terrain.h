@@ -314,13 +314,13 @@ public:
     int CastSegment(const TerrainVec3* from, const TerrainVec3* to, TerrainVec3* out, int a, int b, int c);
     // GameObject slot overrides (vtable 0x0055825c, tier 1 addresses).
     // Slot 14 (0x00506220): draws the height field (tier 3 role; see Terrain.cpp).
-    virtual int GameObjectVirtualSlot14();
-    virtual int GameObjectVirtualSlot19(int a);                 // 0x00507920 returns 0
+    virtual int UnknownVirtualSlot14();
+    virtual int UnknownVirtualSlot19(int a);                 // 0x00507920 returns 0
     void GetHeightRange(float* outMin, float* outMax);          // 0x00508970
-    virtual int OnControlRelease(int a, int b);                 // 0x004dc4c0 returns 0 (shared stub)
+    virtual int OnControlRelease(UnknownControlEvent* a, UnknownInputEntry* b);                 // 0x004dc4c0 returns 0 (shared stub)
     // Slot 23 (0x00508850, ret 8): debug key handler; tier 3 name kept in the comment only
     // so the override has the base's name.  First argument is the input event.
-    virtual int OnControlPress(int event, int unused);
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* unused);
     // 0x00507bb0 (plain thiscall, no args): derives four floats from the ints at 0x6c / 0x70
     // (tier 3: a = appliedDrawDistance, b = cameraFocalLength): 0x74 = a/b, 0x78 = (a*a)/(b*b), 0x7c = 1/0x78,
     // 0x80 = 1/0x74.

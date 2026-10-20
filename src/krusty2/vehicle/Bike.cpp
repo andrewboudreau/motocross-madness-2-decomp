@@ -589,7 +589,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     crashGraceTime = crashTimerReload - 0.5f;
     UnknownVirtualSlot1(loadWeight);
 
-    riderCharacter = (BikeA5C4*)new(__FILE__, 0x583) D3DIMSoultreeCharacter(GameObject::statusFlags & 1);
+    riderCharacter = (BikeA5C4*)new(__FILE__, 0x583) D3DIMSoultreeCharacter(GameObject::isEnabled);
     if (!GameObject::AppendChild(
             ((D3DIMSoultreeCharacter*)riderCharacter)->D3DIMVirtualSlot11(
                 (int)GameObject::renderContext, riderModel, desc, (int)info, 1, 1), -1))
@@ -649,7 +649,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
         char tireNames[2][32] = { "TireFront", "TireRear" };
         BIKE_COPY_TEXT(partName, tireNames[i], 64);
         if (strlen(partName) == 0) {
-            BaseObjectVirtualSlot2();
+            Release();
             return 0;
         }
         float roll[2] = { 0.1f, 1.0f };
@@ -660,7 +660,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
                                                                 steered[i] ? steerState : 0, 45.0f, 1.0f,
                                                                 roll[i], 255.0f, grip[i], a12, a13, 0.5f, trackObject);
         BikeTireObject* tire = (BikeTireObject*)wheel;
-        tire->SetRenderContext((int)GameObject::renderContext);
+        tire->SetRenderContext((void*)GameObject::renderContext);
         GameObject::AppendChild((GameObject*)tire, -1);
         if (rotating[i]) {
             // two calls (VC6 merges their common tail): retail pushes the aux argument in each arm
@@ -704,11 +704,11 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
 
     if (field_0x124) {
         dustEmitter = new(__FILE__, 0x70f) BikeDustEmitter(1);
-        GameObject::AppendChild(dustEmitter->UnknownVirtualSlot27(GameObject::renderContext, field_0x124), -1);
+        GameObject::AppendChild((GameObject*)dustEmitter->UnknownVirtualSlot27(GameObject::renderContext, field_0x124), -1);
         dirtChunkEmitter = new(__FILE__, 0x710) BikeDirtChunkEmitter(1);
-        GameObject::AppendChild(dirtChunkEmitter->UnknownVirtualSlot27(GameObject::renderContext, field_0x124), -1);
+        GameObject::AppendChild((GameObject*)dirtChunkEmitter->UnknownVirtualSlot27(GameObject::renderContext, field_0x124), -1);
         steamEmitter = new(__FILE__, 0x711) BikeSteamEmitter(1);
-        GameObject::AppendChild(steamEmitter->UnknownVirtualSlot27(GameObject::renderContext, field_0x124), -1);
+        GameObject::AppendChild((GameObject*)steamEmitter->UnknownVirtualSlot27(GameObject::renderContext, field_0x124), -1);
         steamEmitter->emitting = 1;
     }
 
@@ -726,7 +726,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     Vec3 steamOffset = Vec3(0.0f, 2.5f, -2.75f);
     UnknownVirtualSlot37(4, steamEmitter, 0, &steamOffset);
     if (centerNode == 0) {
-        BaseObjectVirtualSlot2();
+        Release();
         return 0;
     }
 
@@ -1310,7 +1310,7 @@ void Bike::UnknownVirtualSlot97()
 {
     wrecker = new(__FILE__, 2023) BikeA604(1);
     if (wrecker->SetupWrecker(GameObject::renderContext, riderCharacter, "rider.col")) {
-        GameObject::AppendChild(wrecker, -1);
+        GameObject::AppendChild((GameObject*)wrecker, -1);
         wrecker->a_0x38->n_0xe4 = ((BikeA1F4*)terrain);
         wrecker->a_0x38->n_0x64 = 0x65;
         BikeAttachBone(this, "Pelvis", 0.0f, 0.0f, -0.35f);
@@ -1909,7 +1909,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
             else
                 k = 1.0f;
         }
-        if (field_0x124 && (field_0x124->statusFlags & 1)) {
+        if (field_0x124 && (field_0x124->isEnabled)) {
             sparkEmitter->SetPosition(((BikeContactSet*)collisionObject)->field_0xa0);
             sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
             sparkEmitter->burstPending = 1;
@@ -1935,7 +1935,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
     case 0x6a:
         s = Vec3(1.0f, 1.0f, 1.0f);
         hasBody = 0;
-        if (field_0x124 && (field_0x124->statusFlags & 1)) {
+        if (field_0x124 && (field_0x124->isEnabled)) {
             sparkEmitter->SetPosition(((BikeContactSet*)collisionObject)->field_0xa0);
             sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
             sparkEmitter->burstPending = 1;

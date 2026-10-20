@@ -19,7 +19,7 @@ class D3DIMSoultreeShadow : public ShadowReceiver {
 public:
     explicit D3DIMSoultreeShadow(int flags);                       // 0x00446840
     D3DIMSoultreeShadow* Attach(int host, ShadowCaster* caster, ProjectedShadow* shadow);  // 0x004468b0
-    virtual int GameObjectVirtualSlot14();                         // 0x00447540 (render)
+    virtual int UnknownVirtualSlot14();                         // 0x00447540 (render)
     virtual int UnknownVirtualSlot27();                            // 0x004468f0
     virtual int UnknownVirtualSlot28();                            // 0x00446bf0
     virtual int UnknownVirtualSlot29();                            // 0x00446c30

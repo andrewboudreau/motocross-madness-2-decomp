@@ -7,7 +7,7 @@
   "??_7D3DIMSoultreeShadow@@6B@": "0x55156c",
   "??_7ShadowReceiver@@6B@": "0x5515ec",
   "?AddReceiver@ProjectedShadow@@QAEXPAVShadowReceiver@@@Z": "0x4daba0",
-  "?SetRenderContext@GameObject@@UAEPAV1@H@Z": "0x4692f0",
+  "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x4692f0",
   "?GetBounds@D3DIMShadowCasterView@@QAEXPAUShadowVec3@@0@Z": "0x004fe850",
   "?GetMatrixIn@D3DIMShadowCasterView@@QAEXPAXPAUD3DIMShadowMatrix4@@@Z": "0x004fca80",
   "?TestBox@D3DIMShadowClipper@@QAEHPAVD3DIMShadowCameraView@@PBM11PAH2H@Z": "0x0052f570",

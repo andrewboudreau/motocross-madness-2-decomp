@@ -273,7 +273,7 @@
   "?OpenAndReadHeader@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x00511d00",
   "?FreeFile@@YAXPAUUnknownTgaFile@@@Z": "0x00512dd0",
   "?Tick@Scene@@UAEHM@Z": "0x004eab00",
-  "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
+  "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?RenderPre3D@GameObject@@UAEHXZ": "0x00469330",
   "?UnknownVirtualSlot14@GameObject@@UAEHXZ": "0x00469360",

@@ -162,7 +162,7 @@ SoultreeObject::SoultreeObject(int a)
     subtreeBoundsB.z = 0;
     name[0] = 0;
     loadedNodeCount = 0;
-    field_0x1c[8] = objectTypeId = g_TypeRegistry->FindTypeId("SoultreeObject");
+    field_0x24 = objectTypeId = g_TypeRegistry->FindTypeId("SoultreeObject");
 }
 
 // 0x004fb430 (scalar deleting wrapper 0x004fb400). Detaches from the parent, releases the
@@ -173,8 +173,8 @@ SoultreeObject::~SoultreeObject()
         parent->RemoveChild(this);
     if (firstChild) {
         while (firstChild->nextSibling)
-            firstChild->nextSibling->BaseObjectVirtualSlot2();
-        firstChild->BaseObjectVirtualSlot2();
+            firstChild->nextSibling->Release();
+        firstChild->Release();
     }
     RemoveFromQuadtree();
     UnregisterNode();
@@ -1009,7 +1009,7 @@ void SoultreeObject::CopySubtree(SoultreeObject* src, SoultreeObject* dst)
 }
 
 // 0x004fec30. GameObject slot 25: forwards to the children first.
-int SoultreeObject::AttachRenderContext(int a)
+int SoultreeObject::AttachRenderContext(void* a)
 {
     for (SoultreeObject* c = firstChild; c; c = c->nextSibling)
         c->AttachRenderContext(a);

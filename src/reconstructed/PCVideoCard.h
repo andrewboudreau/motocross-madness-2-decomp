@@ -36,8 +36,8 @@ struct UnknownBltFx {
     unsigned char field_0x54[0x64 - 0x54];
 };
 
-// 0x00570570: the gamma ramp set when the card supports one (zero
-// initialised .data, only referenced by 0x004c9f30).
+// 0x00570570: initialized, channel-specific gamma ramp. GraphicsState.cpp
+// preserves the retail values passed by CreateFlipChain (0x004c9f30).
 extern unsigned short g_GammaRamp[3][256];
 
 // cdecl helpers after wrecker.cpp's code, called around cooperative level

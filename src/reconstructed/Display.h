@@ -92,6 +92,6 @@ struct UnknownDisplay : public VideoCard {
 
 // 0x0068a754 / 0x0068a764: the displays EnumerateDisplays (0x004c9600)
 // collects, at most 4 (PCGame 0x004c16b0 profiles each one; DeleteDisplays
-// 0x0052d0d0 frees them).
+// 0x0052d0d0 frees them). Storage is supplied by GraphicsState.cpp.
 extern UnknownDisplay* g_Displays[4];
 extern int g_DisplayCount;

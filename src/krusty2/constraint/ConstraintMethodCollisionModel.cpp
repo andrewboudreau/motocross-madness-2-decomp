@@ -10,7 +10,7 @@
 // SOLVER OVERVIEW (semantic names are tier 3; instruction behaviour is tier 1)
 //   Method: single-contact IMPULSE (velocity-level rigid body response) plus a small
 //   PROJECTION step. There is no penalty force and no iterative solver in this file.
-//   Structure of one step (GameObjectVirtualSlot11 at 0x0043ba70, called every tick by slot 10):
+//   Structure of one step (UnknownVirtualSlot11 at 0x0043ba70, called every tick by slot 10):
 //     1. Save dt (+0xc0). If the model is active (+0xec) refresh the collision node
 //        (0x435fb0/0x435fe0); when the base reports an overlap (0x438e70) push the body
 //        back along the recorded contact normal by 1.005 (projection) and refresh again.
@@ -71,9 +71,9 @@ ConstraintMethodCollisionModel::~ConstraintMethodCollisionModel()
 {
 }
 
-GameObject* ConstraintMethodCollisionModel::SetRenderContext(int a)
+GameObject* ConstraintMethodCollisionModel::SetRenderContext(void* a)
 {
-    Configure(a, 1, 1, 1);
+    Configure((int)a, 1, 1, 1);
     onHitCallback = ConstraintContactCallback;
     onHitByCallback = CollisionEmptyCallback;
     ownerObject = this;
@@ -83,13 +83,13 @@ GameObject* ConstraintMethodCollisionModel::SetRenderContext(int a)
 int ConstraintMethodCollisionModel::Tick(float t)
 {
     if (!manualStep)
-        GameObjectVirtualSlot11(t);
+        UnknownVirtualSlot11(t);
     return CollisionObject::Tick(t);
 }
 
-int ConstraintMethodCollisionModel::GameObjectVirtualSlot14()
+int ConstraintMethodCollisionModel::UnknownVirtualSlot14()
 {
-    return CollisionObject::GameObjectVirtualSlot14();
+    return CollisionObject::UnknownVirtualSlot14();
 }
 
 void ConstraintMethodCollisionModel::SetBody(ConBody* b, int useNodeModel, const char* arg)
@@ -109,7 +109,7 @@ void ConstraintMethodCollisionModel::SetBody(ConBody* b, int useNodeModel, const
 // (in the loop body they share frame slots with the push-out's locals, giving a different
 // frame); the offset products carry redundant parentheses (docs/VC6_OPERAND_ORDER.md section 3),
 // without which VC6 schedules the argument copies of the ApplyContactImpulse call differently.
-int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
+int ConstraintMethodCollisionModel::UnknownVirtualSlot11(float t)
 {
     dt = t;
     if (shapeCollisionEnabled) {

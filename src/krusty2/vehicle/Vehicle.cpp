@@ -1191,7 +1191,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
     case 0x6a:
         s = VehOnes();
         hasBody = 0;
-        if (field_0x124 && (field_0x124->statusFlags & 1)) {
+        if (field_0x124 && (field_0x124->isEnabled)) {
             sparkEmitter->SetPosition(((VehicleContactSet*)collisionObject)->contactPoint);
             sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
             sparkEmitter->burstPending = 1;
@@ -2042,7 +2042,7 @@ GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3,
                                                    a21);
     if (field_0x124) {
         sparkEmitter = new(__FILE__, 0x1dc) VehicleSparkEmitter(1);
-        GameObject::AppendChild(sparkEmitter->UnknownVirtualSlot27(renderContext, field_0x124), -1);
+        GameObject::AppendChild((GameObject*)sparkEmitter->UnknownVirtualSlot27(renderContext, field_0x124), -1);
     }
     steerState = new(__FILE__, 0x1e0) VehicleSteerState(steerScale, controlResponse[0], &a7, &a8);
     Vec3 down = a8 * -1.0f;

@@ -99,9 +99,9 @@ class SurfaceBaseObject {
 public:
     SurfaceBaseObject();
     virtual ~SurfaceBaseObject();
-    virtual void BaseObjectVirtualSlot1();
-    virtual void BaseObjectVirtualSlot2();
-    virtual int BaseObjectVirtualSlot3();
+    virtual void AddRef();
+    virtual void Release();
+    virtual int GetRefCount();
     int refCount;  // +0x04
 };
 

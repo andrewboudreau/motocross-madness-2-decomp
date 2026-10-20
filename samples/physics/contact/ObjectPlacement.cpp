@@ -148,12 +148,12 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
                     if (p)
                         *p = *(Vec3*)(rec + 2);
                     *q = 1;
-                    obj->BaseObjectVirtualSlot2();
+                    obj->Release();
                     // Retail returns no value here: it jumps to the epilogue with the slot-2
                     // call's eax, as do the k-without-o and no-l paths below.
                     goto done;
                 }
-                obj->BaseObjectVirtualSlot2();
+                obj->Release();
             }
         }
 

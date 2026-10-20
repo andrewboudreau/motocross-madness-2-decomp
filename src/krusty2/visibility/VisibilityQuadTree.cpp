@@ -70,7 +70,7 @@ VisibilityQuadTree::~VisibilityQuadTree()
 
 GameObject* VisibilityQuadTree::Setup(int parentArg, float x0, float z0, float x1, float z1, float minCell)
 {
-    GameObject::SetRenderContext(parentArg);
+    GameObject::SetRenderContext((void*)parentArg);
     Reset();
     Init(x0, z0, x1, z1, minCell);
     return this;
@@ -103,13 +103,13 @@ int VisibilityQuadTree::RenderPost3D()
     return 1;
 }
 
-int VisibilityQuadTree::OnControlPress(int a, int b)
+int VisibilityQuadTree::OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b)
 {
-    if (CheckKey(0x44, 0, a, 0x80)) {
+    if (CheckKey(0x44, 0, (int)a, 0x80)) {
         g_visibilityDebugDraw = 1 - g_visibilityDebugDraw;
         return 1;
     }
-    if (CheckKey(0x57, 0, a, 0x80)) {
+    if (CheckKey(0x57, 0, (int)a, 0x80)) {
         g_visibilityFreeze = 1 - g_visibilityFreeze;
         if (g_visibilityFreeze)
             g_frozenCamera = *View()->camera;
@@ -143,7 +143,7 @@ int VisibilityQuadTree::PrepareGeometry()
     return 1;
 }
 
-int VisibilityQuadTree::GameObjectVirtualSlot14()
+int VisibilityQuadTree::UnknownVirtualSlot14()
 {
     if (!g_visibilityDebugDraw)
         return 1;

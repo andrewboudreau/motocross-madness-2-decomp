@@ -311,7 +311,7 @@ public:
     virtual void CopySubtree(SoultreeObject* src, SoultreeObject* dst); // slot 8, 0x004feb30, ret 8
     // GameObject slot 25 override 0x004fec30: forwards to every node of the sibling chain at
     // +0x140 (GameObject view +0x134) before GameObject's own slot 25 (0x00469720).
-    virtual int AttachRenderContext(int a);
+    virtual int AttachRenderContext(void* a);
 #endif
 
     // ---- layout (offsets tier 1 from the constructor/helpers; names tier 3) ----

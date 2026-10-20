@@ -36,7 +36,7 @@ TerrainShadow::TerrainShadow(int flags)
 TerrainShadow* TerrainShadow::Attach(int host, Terrain* c, ProjectedShadow* s)
 {
     if (s) {
-        GameObject::SetRenderContext(host);
+        GameObject::SetRenderContext((void*)host);
         if (this) {
             caster = c;
             shadow = s;
@@ -170,7 +170,7 @@ public:
 // shadow texture and modulating texture stages; D3DIMSoultreeShadow slot 14 without the world
 // matrix.  The address mode and render state 4 are restored afterwards; format 0x613 textures
 // also switch render state 0x21 on around the draw.
-int TerrainShadow::GameObjectVirtualSlot14()
+int TerrainShadow::UnknownVirtualSlot14()
 {
     if (vertexCount) {
         ((TerrainShadowTextureView*)shadow->texture)->Bind();

@@ -41,12 +41,12 @@ DirtSprayParticleEmitter::~DirtSprayParticleEmitter() {}
 
 int DirtSprayParticleEmitter::UnknownVirtualSlot27(void* a, ParticleManager* m)
 {
-    GameObject::SetRenderContext((int)a);
+    GameObject::SetRenderContext((void*)a);
     if (m) {
         manager = m;
         return (int)this;
     }
-    BaseObjectVirtualSlot2();
+    Release();
     return 0;
 }
 

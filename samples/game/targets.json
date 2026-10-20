@@ -1,0 +1,11 @@
+[
+  {
+    "source": "DeviceSetupNearMisses.cpp",
+    "candidate_symbol_contains": "?GetDXVersion@@YAXPAK00@Z",
+    "target_va": "0x00448560",
+    "target_size": 1011,
+    "expect": "partial",
+    "bindings": "DeviceSetupNearMisses.bindings.json",
+    "status": "Complete startup behavior reviewed against retail; 1006-byte VC6 candidate remains nonexact."
+  }
+]

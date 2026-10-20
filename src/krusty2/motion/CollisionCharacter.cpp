@@ -31,9 +31,9 @@ CollisionCharacter::~CollisionCharacter()
 }
 
 // Slot 14 (0x00431cf0): tail call to the base implementation (0x00469360).
-int CollisionCharacter::GameObjectVirtualSlot14()
+int CollisionCharacter::UnknownVirtualSlot14()
 {
-    return GameObject::GameObjectVirtualSlot14();
+    return GameObject::UnknownVirtualSlot14();
 }
 
 // Slot 10 (0x00431b30, ret 4): per-frame update.  Tier 3 semantics:
@@ -98,5 +98,5 @@ GameObject* CollisionCharacter::Load(int a1, const char* name, const char* colPa
     collisionObject->SnapPlacement();
     collisionObject->SetOwner(this, 0x2711);
     g_MemTagStack->Pop(prevTag);
-    return GameObject::SetRenderContext(a1);
+    return GameObject::SetRenderContext((void*)a1);
 }

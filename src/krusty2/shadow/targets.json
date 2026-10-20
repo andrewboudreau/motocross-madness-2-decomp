@@ -172,7 +172,7 @@
   {
     "class": "D3DIMSoultreeShadow",
     "source": "D3DIMSoultreeShadow.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot14@D3DIMSoultreeShadow",
+    "candidate_symbol_contains": "?UnknownVirtualSlot14@D3DIMSoultreeShadow",
     "target_va": "0x447540",
     "target_size": 574,
     "expect": "exact",

@@ -52,7 +52,7 @@
   {
     "class": "SelectiveGravityModel",
     "source": "SelectiveGravityModel.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot11@SelectiveGravityModel@@UAEHM@Z",
+    "candidate_symbol_contains": "?UnknownVirtualSlot11@SelectiveGravityModel@@UAEHM@Z",
     "target_va": "0x004f9890",
     "target_size": 113,
     "expect": "exact",

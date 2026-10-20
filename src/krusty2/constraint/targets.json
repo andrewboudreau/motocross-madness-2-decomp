@@ -72,7 +72,7 @@
   {
     "class": "ConstraintMethodCollisionModel",
     "source": "ConstraintMethodCollisionModel.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot11@ConstraintMethodCollisionModel",
+    "candidate_symbol_contains": "UnknownVirtualSlot11@ConstraintMethodCollisionModel",
     "target_va": "0x43ba70",
     "target_size": 829,
     "expect": "exact",
@@ -92,7 +92,7 @@
   {
     "class": "ConstraintMethodCollisionModel",
     "source": "ConstraintMethodCollisionModel.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot14@ConstraintMethodCollisionModel",
+    "candidate_symbol_contains": "UnknownVirtualSlot14@ConstraintMethodCollisionModel",
     "target_va": "0x43c880",
     "target_size": 5,
     "expect": "exact",

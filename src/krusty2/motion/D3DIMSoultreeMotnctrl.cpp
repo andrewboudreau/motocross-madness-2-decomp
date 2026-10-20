@@ -348,7 +348,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
     name[n] = 0;
     strcat(name, d3d_field_0x1a4);
 
-    ModelObject* frame = new(__FILE__, 0xd6) ModelObject(statusFlags & 1);
+    ModelObject* frame = new(__FILE__, 0xd6) ModelObject(isEnabled);
     modelNode = (SoultreeObject*)frame;
     frame->Load(renderContext, "", *(int*)(d3d_field_0x1a4 + 0x60), *(int*)(d3d_field_0x1a4 + 0x64), 1);
     GameObject* frameChild = (ModelObject*)modelNode;
@@ -359,7 +359,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
     strncpy(modelNode->name, "Base Character Frame", n);
     modelNode->name[n] = 0;
 
-    ModelObject* loaded = new(__FILE__, 0xdf) ModelObject(statusFlags & 1);
+    ModelObject* loaded = new(__FILE__, 0xdf) ModelObject(isEnabled);
     loaded->Load(renderContext, name, *(int*)(d3d_field_0x1a4 + 0x60), *(int*)(d3d_field_0x1a4 + 0x64),
                  *(int*)(d3d_field_0x1a4 + 0x68));
     ((SoultreeObject*)loaded)->UnregisterNode();
@@ -376,7 +376,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
                                                   ((ModelObject*)modelNode)->textureFormat);
         AppendChild(((ModelObject*)modelNode)->items[i], -1);
         ((ModelObject*)modelNode)->items[i]->CopyFrom(loaded->items[i]);
-        loaded->items[i]->BaseObjectVirtualSlot2();
+        loaded->items[i]->Release();
     }
     ((ModelObject*)modelNode)->lodTable = loaded->lodTable;
     loaded->lodTable = 0;
@@ -443,13 +443,13 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, c
         g_pOwnerRegistry->Load(fname, a2);
         entry = g_pOwnerRegistry->FindByName(fname, 0);
         if (!entry) {
-            BaseObjectVirtualSlot2();
+            Release();
             delete file;
             return 0;
         }
     }
     if (entry->owner) {
-        entry->BaseObjectVirtualSlot1();
+        entry->AddRef();
         CharacterVirtualSlot8((int)entry->owner);
         ReadClock();
         delete file;

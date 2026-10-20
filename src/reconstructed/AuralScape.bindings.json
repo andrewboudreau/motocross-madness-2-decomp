@@ -123,7 +123,7 @@
   "?Tick@SoultreeSoundEmitter@@UAEHM@Z": "0x00402a70",
   "?Tick@SoundEmitter@@UAEHM@Z": "0x004028d0",
   "?Tick@SoundGroup@@UAEHM@Z": "0x00401f30",
-  "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
+  "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?RenderPre3D@GameObject@@UAEHXZ": "0x00469330",
   "?UnknownVirtualSlot14@GameObject@@UAEHXZ": "0x00469360",

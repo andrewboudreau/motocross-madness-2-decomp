@@ -69,17 +69,17 @@ Terrain::~Terrain()
     int scope = g_MemTagStack->Push("Terrain");
     if (ownedObjectArray) {
         for (int i = 0; i < ownedObjectArrayCount; i++)
-            ownedObjectArray[i]->BaseObjectVirtualSlot2();
+            ownedObjectArray[i]->Release();
         DebugFree(ownedObjectArray, __FILE__, 0x4b3);
     }
     if (detailTexture)
-        detailTexture->BaseObjectVirtualSlot2();
+        detailTexture->Release();
     if (colorMapper)
-        colorMapper->BaseObjectVirtualSlot2();
+        colorMapper->Release();
     if (ownedObjectCount) {
         for (int i = 0; i < ownedObjectCount; i++) {
             if (ownedObjects[i])
-                ownedObjects[i]->BaseObjectVirtualSlot2();
+                ownedObjects[i]->Release();
         }
     }
     if (heightField) {
@@ -186,7 +186,7 @@ static inline void ScaleTerrainVec3(TerrainVec3& v, float s)
 Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc* desc,
                        int quality, int field0xc40, const char* textureName, int halfFormat)
 {
-    GameObject::SetRenderContext(host);
+    GameObject::SetRenderContext((void*)host);
     int surfaceFlags = halfFormat ? 8 : 0;
     surfaceDesc = *desc;
     g_pTerrainQualityTable = g_terrainGame->softwareRendering ? g_terrainQualityHardware : g_terrainQualitySoftware;
@@ -194,7 +194,7 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     if (field0xc40)
         hasLightManager = 1;
     if (!stream) {
-        BaseObjectVirtualSlot2();
+        Release();
         return 0;
     }
     this->stream = stream;
@@ -297,7 +297,7 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
                 surface = new(__FILE__, 0x1c8) TerrainSurfaceBase(surfaceDesc.manager, 1);
                 surface->LoadSurface(this->stream, width, height, 1, format, 0, 0, colorMapper,
                                      surfaceFlags | 2, directDrawPalette, 2, 1, &surfaceDesc, 0x80, 0xff00ff);
-                if (statusFlags & 1)
+                if (isEnabled)
                     surface->CreateTextureSurface(1, 0, 0);
             }
             *slot++ = surface;
@@ -328,7 +328,7 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
 
 fail:
     heightField = 0;
-    BaseObjectVirtualSlot2();
+    Release();
     return 0;
 }
 
@@ -428,7 +428,7 @@ unsigned int ReadClock();                // 0x004bfa80
 // page when the game's debug flag 4 is set.  Retail re-reads renderContext for every call
 // (tier 1); with a cached local, or an inline accessor, VC6 does not share the tail of the
 // single-pass branch with the detail pass.
-int Terrain::GameObjectVirtualSlot14()
+int Terrain::UnknownVirtualSlot14()
 {
     if (!g_terrainToggle718)
         return 1;
@@ -591,7 +591,7 @@ int Terrain::GameObjectVirtualSlot14()
     ((TerrainRenderTarget*)renderContext)->SetRenderState(4, savedPerspective, 0);
     ((TerrainRenderTarget*)renderContext)->SetRenderState(9, savedShade, 0);
     indicesDrawn /= 3;
-    GameObject::GameObjectVirtualSlot14();
+    GameObject::UnknownVirtualSlot14();
     g_terrainRender3DTicks = ReadClock() - start;
 
     if ((g_terrainGame->debugFlags & 4) && g_terrainGame->overlay) {
@@ -675,12 +675,12 @@ TerrainQualityEntry* g_pTerrainQualityTable;
 int g_terrainQualityValue;
 
 // Slot 19 (0x00507920) and slot 22 (0x004dc4c0) are the shared "return 0" stubs.
-int Terrain::GameObjectVirtualSlot19(int)
+int Terrain::UnknownVirtualSlot19(int)
 {
     return 0;
 }
 
-int Terrain::OnControlRelease(int, int)
+int Terrain::OnControlRelease(UnknownControlEvent*, UnknownInputEntry*)
 {
     return 0;
 }
@@ -715,15 +715,15 @@ int g_terrainToggle718;
 
 // Slot 23 (0x00508850): debug key handler.  The three TestInputEvent kinds 0x43, 2 and 3
 // each flip one toggle and return 1 (tier 3 semantics).
-int Terrain::OnControlPress(int event, int)
+int Terrain::OnControlPress(UnknownControlEvent* event, UnknownInputEntry*)
 {
-    if (TestInputEvent(0x43, 0, event, 0x80)) {
+    if (TestInputEvent(0x43, 0, (int)event, 0x80)) {
         g_terrainToggle314 = 1 - g_terrainToggle314;
         if (g_terrainToggle314)
             g_terrainSharedState = *((TerrainHost*)renderContext)->sharedState;
         return 1;
     }
-    if (TestInputEvent(2, 0, event, 0x80)) {
+    if (TestInputEvent(2, 0, (int)event, 0x80)) {
         if (g_terrainQualityValue && canSinglePassDual) {
             lowestQualityOverride = 1 - lowestQualityOverride;
             if (lowestQualityOverride) {
@@ -735,7 +735,7 @@ int Terrain::OnControlPress(int event, int)
         g_terrainQualityValue = 1 - g_terrainQualityValue;
         return 1;
     }
-    if (TestInputEvent(3, 0, event, 0x80)) {
+    if (TestInputEvent(3, 0, (int)event, 0x80)) {
         g_terrainToggle718 = 1 - g_terrainToggle718;
         return 1;
     }

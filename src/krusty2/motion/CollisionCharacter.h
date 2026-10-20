@@ -28,7 +28,7 @@ public:
     CollisionCharacter(int a);                  // 0x004318d0 (ret 8: a + hidden vbase flag)
     virtual ~CollisionCharacter();              // core 0x00431980, deleting 0x00431d20
     virtual int Tick(float dt);                      // 0x00431b30 (ret 4), thunk 0x00431d80
-    virtual int GameObjectVirtualSlot14();           // 0x00431cf0, thunk 0x00431d90
+    virtual int UnknownVirtualSlot14();           // 0x00431cf0, thunk 0x00431d90
 
     // 0x004319c0 (ret 0x1c), non-virtual.  Not a vtable slot: it is absent from every
     // vtable, and the 0x00445680 call is a direct call.  Tier 3 name/argument roles.

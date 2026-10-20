@@ -35,7 +35,7 @@ public:
     explicit PhysicsBody(int flags);
     virtual ~PhysicsBody();                             // 0x004cbde0 (scalar deleting 0x004cbdc0)
 
-    virtual int GameObjectVirtualSlot14();              // 0x004cbf10
+    virtual int UnknownVirtualSlot14();              // 0x004cbf10
 
     // slot 27, 0x004cc060: copies at most 255 chars into name and terminates it.
     virtual void SetName(const char* s);
@@ -104,8 +104,8 @@ public:
     virtual ~PhysicsRigidBody();                        // 0x004cc1e0 (scalar deleting 0x004cc1c0)
 
     virtual int Tick(float dt);                         // 0x004cc600
-    virtual int GameObjectVirtualSlot11(float dt);      // 0x004cc630, the integration step
-    virtual int GameObjectVirtualSlot14();              // 0x004cca80
+    virtual int UnknownVirtualSlot11(float dt);      // 0x004cc630, the integration step
+    virtual int UnknownVirtualSlot14();              // 0x004cca80
 
     virtual void AddWorldForceAtWorldPoint(Vec3 force, Vec3 point);   // 0x004cc230
     virtual void AddWorldForce(Vec3 force);                           // 0x004cc1f0
