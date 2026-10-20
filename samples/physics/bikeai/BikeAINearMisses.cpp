@@ -21,14 +21,20 @@
 // g * halfDtSq; v.y += g * dt` (operator order, parentheses, written-out sums).
 //
 // 0x0040e510 (1936 bytes, AI path steering direction): every branch, call and
-// constant is reconstructed and the instruction sequence aligns 1:1 apart from
-// two allocation choices.  Retail keeps the path pointer in esi and the best index
-// in edi (the candidate swaps them), and retail's frame puts the perpendicular /
-// normal at +0x24, the walk direction at +0x30 and the operator- temporaries and
-// target at +0x3c (the candidate places the segment temporary at +0x24).
-// Declaration order of the Vec3 locals does not change VC6's frame (all 24
-// permutations tried); declaring bestT before best fixed the immediate store of
-// bestT = 0.  The candidate is 1944 bytes.
+// constant is reconstructed; the candidate is 1931 bytes and aligns 1:1 except
+// frame slots.  The walk along the path uses its own index (`index = best`): with
+// one variable for the nearest search and the walk, VC6 swaps esi/edi against
+// retail (path in esi, index in edi).  The three perpendiculars are built
+// component-wise (`n.x = seg.z; n.y = 0; n.z = -seg.x; n = SafeNormalize(n)`) as in
+// 0x0040d200, which copies seg.z with integer moves like retail.  The final
+// parameter is assigned inside the scale (`dir * (t = ...)`): retail keeps the sum
+// on the FPU stack for the first product (`fst t; fmul dir.x`); with a separate
+// `t = ...;` statement VC6 emits `fstp t; fld dir.x; fmul t` (6 bytes longer, three
+// more aligned instructions but the tail shifted).  The remaining differences are
+// the slots of the segment / perpendicular temporaries (retail +0x30/+0x50, candidate
+// +0x3c/+0x38) and of the walk direction.  Declaration order of the Vec3 locals does
+// not change VC6's frame (all 24 permutations tried); declaring bestT before best
+// fixed the immediate store of bestT = 0.
 //
 // The inline length helper used here has the same body as the out-of-line copy at
 // 0x00413190 (matched in the canonical file as a plain function).  Retail's
@@ -151,7 +157,11 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         Vec3 seg;
         if (nearest > 0) {
             seg = path->points[nearest] - path->points[nearest - 1];
-            Vec3 n = SafeNormalize(Vec3(seg.z, 0.0f, -seg.x));
+            Vec3 n;
+            n.x = seg.z;
+            n.y = 0.0f;
+            n.z = -seg.x;
+            n = SafeNormalize(n);
             if (!IntersectLines(path->points[nearest - 1].x, path->points[nearest - 1].z, seg.x, seg.z,
                                        pos.x, pos.z, n.x, n.z, &t, &offset))
                 return 0;
@@ -163,7 +173,11 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         }
         if (nearest < path->count - 1) {
             seg = path->points[nearest + 1] - path->points[nearest];
-            Vec3 n = SafeNormalize(Vec3(seg.z, 0.0f, -seg.x));
+            Vec3 n;
+            n.x = seg.z;
+            n.y = 0.0f;
+            n.z = -seg.x;
+            n = SafeNormalize(n);
             if (!IntersectLines(path->points[nearest].x, path->points[nearest].z, seg.x, seg.z,
                                        pos.x, pos.z, n.x, n.z, &t, &offset))
                 return 0;
@@ -172,33 +186,37 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
                 bestT = t;
             }
         }
+        int index = best;
         float ahead = path->lookAhead;
         int kind = g_BikeAIGame_0056e26c->raceKind;
         if (kind == 2 || kind == 3)
             ahead += (offset < 0.0f ? -offset : offset);
-        Vec3 dir = path->points[best + 1] - path->points[best];
+        Vec3 dir = path->points[index + 1] - path->points[index];
         float len = (1.0f - bestT) * BikeAILength(dir);
         while (ahead > 0.0f) {
-            if (!(len < ahead) || best >= path->count - 1)
+            if (!(len < ahead) || index >= path->count - 1)
                 break;
             ahead -= len;
-            best++;
+            index++;
             bestT = 0.0f;
-            if (best < path->count - 1) {
-                dir = path->points[best + 1] - path->points[best];
+            if (index < path->count - 1) {
+                dir = path->points[index + 1] - path->points[index];
                 len = BikeAILength(dir);
             }
         }
-        Vec3 n = SafeNormalize(Vec3(dir.z, 0.0f, -dir.x));
+        Vec3 n;
+        n.x = dir.z;
+        n.y = 0.0f;
+        n.z = -dir.x;
+        n = SafeNormalize(n);
         Vec3 target;
-        if (best >= path->count - 1) {
+        if (index >= path->count - 1) {
             t = 0.0f;
-            target = path->points[best];
+            target = path->points[index];
         } else if (len > ahead) {
-            t = ahead / len + bestT;
-            target = path->points[best] + dir * t;
+            target = path->points[index] + dir * (t = ahead / len + bestT);
         }
-        path->index = best;
+        path->index = index;
         path->t = t;
         *outDir = (target - pos) + n * side;
         outDir->y = 0.0f;
