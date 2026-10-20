@@ -1998,7 +1998,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
                             ctx, otherVel, &velA, &leverC, &velB, velPtr, l14, &out, k);
         if (other) {
             other->asleep = 0;
-            float len2 = otherVel->x * otherVel->x + otherVel->y * otherVel->y + otherVel->z * otherVel->z;
+            float len2 = otherVel->z * otherVel->z + (otherVel->x * otherVel->x + otherVel->y * otherVel->y);
             other->linearSpeed = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
             other->worldAngularVelocity = other->sceneNode->LocalToWorldDirection(*velPtr);
         }
