@@ -317,13 +317,15 @@ placed after the vtable).
 
 Also a near miss in the same samples file:
 
-- Slot 35 (`0x0052c510`, 1267 bytes, 813/1261): the chase position
+- Slot 35 (`0x0052c510`, 1267 bytes, 1262/1267): the chase position
   (heading turned by +0x308 × 0.7 about y, pitched by −vehicle +0x4c in
   state 3, through `D3DRMVectorRotate`; distance from the preset angles,
   zoom and speed; lift eased in +0x2d8 over the vehicle's first rider
   with +0x2a8 set). Its `a` argument is tested as a byte, so FollowCamera.h
   declares it `unsigned char` (slot 48's int argument still passes without
-  conversion code); +0x2d8 is a float. Frame and slot layout differ.
+  conversion code); +0x2d8 is a float. Frame, slots and size match; the
+  one difference left is the x87 operand form of `direction * reach`'s x
+  component (see the samples file).
 
 ## KrustyBikeCamera
 
