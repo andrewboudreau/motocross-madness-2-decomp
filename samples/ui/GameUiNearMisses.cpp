@@ -74,7 +74,9 @@
 //   partial gain).
 //   Session 14: a second `if (format != 8)` test instead of the else (256,
 //   same code), the inverted test or a switch (245) and one ternary
-//   comparison (249) do not give retail's two result homes.
+//   comparison (249) do not give retail's two result homes, and neither
+//   does an inline pixel-test helper taking `opaque` by reference or by
+//   pointer (256, same code: the Lock-failure return still folds to 0).
 // 0x004738a0 UIEditBox slot 40 (440/975): retail keeps the width and the
 //   redraw count in memory.
 // 0x00474150 UIEditBox slot 20 (1018/1044): Backspace reads the length and
