@@ -81,7 +81,7 @@ void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const Colli
 
     if (orthogonalize) {
         CollisionVec3 c;
-        c.x = y.y * z.z - y.z * z.y;
+        c.x = (y.y * z.z) - y.z * z.y;   // grouped: retail tests keepZ after the second product
         c.y = y.z * z.x - y.x * z.z;
         c.z = y.x * z.y - y.y * z.x;
         CollisionVec3 r;
