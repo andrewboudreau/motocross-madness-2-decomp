@@ -30,7 +30,7 @@
   "?AddChild@SoultreeObject@@QAEXPAV1@@Z": "0x004fd910",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
-  "?Configure@CollisionObject@@QAEXHHHH@Z": "0x004320f0",
+  "?Configure@CollisionObject@@QAEXPAXHHH@Z": "0x004320f0",
   "?UpdatePlacement@CollisionObject@@QAEXXZ": "0x00435fb0",
   "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?QueryCollisions@CollisionObject@@QAEHXZ": "0x00438e70",

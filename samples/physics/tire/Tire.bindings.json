@@ -21,7 +21,7 @@
   "??_GTire@@UAEPAXI@Z": "0x005133a0",
   "?ApplyRollAngle@Tire@@QAEXXZ": "0x005135b0",
   "?CollisionRejectFrom@@YAPAUCollisionVec3@@PAU1@PBU1@1@Z": "0x0043b190",
-  "?Configure@CollisionObject@@QAEXHHHH@Z": "0x004320f0",
+  "?Configure@CollisionObject@@QAEXPAXHHH@Z": "0x004320f0",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?Fn_00515c90@Tire@@QAEPAUCollisionVec3@@PAU2@PBU2@11@Z": "0x00515c90",

@@ -52,15 +52,11 @@ inline void MorphBastardInvertRigid(Matrix4& m)
     m.m[3][2] = t.z;
 }
 
-// The scene node calls used here (the model, the morph objects and the
-// controllers). Tier 2 from the call sites; src/krusty2/core/SoultreeObject.h
-// has the canonical view.
-class MorphBastardNode {
-public:
-    void GetLocalMatrix(Matrix4* out);                    // 0x004fca60: local matrix
-    void GetMatrixIn(MorphBastardNode* frame, Matrix4* out); // 0x004fca80: matrix in frame
-    MorphBastardNode* FindByName(const char* name);   // 0x004fdae0: named descendant
-};
+// Tier 2 from the matrix call sites: morph models/controllers use complete
+// SoultreeObject node pointers, at offset zero.
+// Use the shared declaration reached through D3DIMSoultreeModifier.h; the
+// local name describes their role, not a distinct retail class.
+typedef SoultreeObject MorphBastardNode;
 
 // One delta set (0x14 bytes, sorted by value with qsort 0x4a3bb0).
 struct MorphBastardTarget {

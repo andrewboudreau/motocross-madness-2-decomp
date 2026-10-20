@@ -94,9 +94,9 @@ public:
 
     // Non-virtual members (this == complete object).
     void FreeShape();                                        // 0x00432430
-    // 0x004320f0 (ret 0x10): GameObject slot 8 body (0x004692f0, render context at +0x18) on
-    // the GraphicsTest base with `context`, then stores the three flags (decoded).
-    void Configure(int context, int useBroadphase, int collisionEnabled, int collidable);
+    // 0x004320f0 (ret 0x10): stores the three flags, then calls the GameObject slot 8
+    // body (0x004692f0) on the GraphicsTest base with the opaque context pointer.
+    void Configure(void* context, int useBroadphase, int collisionEnabled, int collidable);
     void SetUseBroadphase(int enable);                         // 0x00432120, (re)inserts into or removes from the quadtree
     // Shape setters (type in shapeType, payload in shape; every allocation passes __FILE__).
     void SetSphereShape(CollisionVec3 center, float radius); // 0x004329a0 (type 4)

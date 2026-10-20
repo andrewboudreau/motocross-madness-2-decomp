@@ -1,15 +1,5 @@
 [
   {
-    "class": "CollisionObject",
-    "source": "CollisionObjectSetup.cpp",
-    "candidate_symbol_contains": "Configure",
-    "target_va": "0x004320f0",
-    "target_size": 40,
-    "expect": "exact",
-    "notes": "Stores b,c,d into field_0x80/0x6c/0x70 then tail-calls GameObject slot 8 (0x4692f0).",
-    "bindings": "CollisionObjectSetup.bindings.json"
-  },
-  {
     "class": "ContactSolveImpulse",
     "source": "ContactImpulse.cpp",
     "candidate_symbol_contains": "ContactSolveImpulse",

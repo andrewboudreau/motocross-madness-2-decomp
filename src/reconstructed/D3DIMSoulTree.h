@@ -63,6 +63,10 @@ public:
     virtual void SoultreeVirtualSlot8(SoultreeObject* source, SoultreeObject* target); // 0x004feb30 (ret 8)
 
     // soultree.cpp helpers (thiscall).
+    // Same complete-node pointer (+0), shared with the physics declaration.
+    void GetLocalMatrix(Matrix4* out);                            // 0x004fca60
+    void GetMatrixIn(SoultreeObject* frame, Matrix4* out);          // 0x004fca80
+    SoultreeObject* FindByName(const char* name);                  // 0x004fdae0
     int CountNodes();                                   // 0x004fda30: node count of the subtree
     void CollectDescendants(int* index, SoultreeObject** nodes);    // 0x004fda60: collects the subtree
     void SetFlag14c();                                  // 0x004fdb40

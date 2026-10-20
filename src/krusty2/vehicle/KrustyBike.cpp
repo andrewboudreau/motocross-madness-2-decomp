@@ -1835,11 +1835,11 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     animSetC[15] = (int)((KbA5C4*)riderCharacter)->FindMotion("DCanCanAlt", 1);
 
     bikeAndRiderCollision = new(__FILE__, 0x77e) CollisionObject(1);
-    bikeAndRiderCollision->Configure(a1, 1, 1, 1);
+    bikeAndRiderCollision->Configure((void*)a1, 1, 1, 1);
     bikeAndRiderCollision->LoadShape(modelNode->firstChild, "BikeAndRider.col");
     GameObject::AppendChild((GraphicsTest*)bikeAndRiderCollision, -1);
     bikeCollision = new(__FILE__, 0x784) CollisionObject(1);
-    bikeCollision->Configure(a1, 1, 1, 1);
+    bikeCollision->Configure((void*)a1, 1, 1, 1);
     bikeCollision->LoadShape(modelNode->firstChild, "Bike.col");
     GameObject::AppendChild((GraphicsTest*)bikeCollision, -1);
     bikeCollision->Disable();
@@ -1931,7 +1931,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         }
         int prevTag = g_MemTagStack->Push("Collision");
         probeSegment = new(__FILE__, 0x82f) CollisionObject(1);
-        probeSegment->Configure((int)renderContext, 1, 1, 0);
+        probeSegment->Configure(renderContext, 1, 1, 0);
         probeSegment->ignoreVegetation = 1;
         GameObject::AppendChild((GraphicsTest*)probeSegment, -1);
         memset(&points[0], 0, sizeof(Vec3));

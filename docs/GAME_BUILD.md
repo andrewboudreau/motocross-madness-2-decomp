@@ -36,7 +36,7 @@ addresses and never forces unresolved references into an executable.
 ## Current gaps
 
 The 2026-10-20 build compiles 163 C++ files (162 canonical sources and one
-reviewed candidate) and reaches LINK with 790 unresolved external symbols,
+reviewed candidate) and reaches LINK with 783 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -54,7 +54,7 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
 the current composition retains all 1,076 strict-exact physics targets and all
-2,971 strict-exact calibration rows. A native link/runtime regression checks
+2,971 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 
@@ -75,6 +75,13 @@ the destructor confirmed by Vehicle's delete sequence. `SetAxisFromPoints`
 remains a separate unresolved partial reconstruction. Six [network GUIDs](NET.md#network-identifiers)
 also have verified source definitions. These three integrations remove 21
 unresolved symbols from the preceding 811-symbol build.
+
+The next source connections remove another seven symbols: the exact
+40-byte `CollisionObject::Configure` now lives in canonical source, scene
+callers use the existing collision methods' opaque-pointer signatures, and
+MorphBastardModifier uses the existing Soultree matrix methods. All prior
+strict matches remain intact. These are narrow method connections; duplicate
+class layouts elsewhere still require independent reconciliation.
 
 The source still lacks `Game::Tick` at `0x004685d0`, called by
 `TrackGame::Tick`; its retail timing uses `rdtsc` (see [Game](GAME.md)).

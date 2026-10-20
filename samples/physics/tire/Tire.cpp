@@ -197,7 +197,7 @@ GameObject* Tire::SetRenderContext(void* a)
     };
     TirePoint pts[8];
 
-    Configure((int)a, 1, 1, 1);
+    Configure(a, 1, 1, 1);
     // The zero vector is built from a zero float (not three literals): VC6 then keeps the
     // zero in registers across the loop instead of reloading it from the stack.
     float zeroValue = 0.0f;

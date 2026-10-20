@@ -7,7 +7,7 @@
   "??_7ConstraintMethodCollisionModel@@6BQuadTreeObject@@@": "0x00551260",
   "?ApplyContactImpulse@ConstraintMethodCollisionModel@@QAEXPAVConBody@@MUConVec3@@11@Z": "0x0043bdb0",
   "?CollisionEmptyCallback@@YAXPAVCollisionObject@@0@Z": "0x00464e90",
-  "?Configure@CollisionObject@@QAEXHHHH@Z": "0x004320f0",
+  "?Configure@CollisionObject@@QAEXPAXHHH@Z": "0x004320f0",
   "?ConstraintContactCallback@@YAXPAVCollisionObject@@0@Z": "0x0043b800",
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
   "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",

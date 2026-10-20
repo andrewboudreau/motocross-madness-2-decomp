@@ -958,5 +958,15 @@
     "expect": "exact",
     "notes": "slot 1 inline in CollisionObject.h (ret 4, returns 15); its COMDAT lies among CollisionObject.cpp's functions, where the QuadTreeObject vtable is emitted too",
     "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "?Configure@CollisionObject@@QAEXPAXHHH@Z",
+    "target_va": "0x004320f0",
+    "target_size": 40,
+    "expect": "exact",
+    "notes": "Stores b,c,d into field_0x80/0x6c/0x70 then calls GameObject slot 8 (0x4692f0).",
+    "bindings": "CollisionObject.bindings.json"
   }
 ]

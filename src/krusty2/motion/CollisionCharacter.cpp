@@ -86,7 +86,7 @@ GameObject* CollisionCharacter::Load(int a1, const char* name, const char* colPa
     D3DIMSoultreeCharacter::D3DIMVirtualSlot11(a1, name, desc, a5, a6, a7);
     int prevTag = g_MemTagStack->Push("Collision");
     collisionObject = new(CC_FILE, 27) CollisionObject(1);
-    collisionObject->Configure(a1, 1, 0, 1);
+    collisionObject->Configure((void*)a1, 1, 0, 1);
     collisionObject->ignoreVegetation = 1;
     // node + 0x140 is the scene node whose position slot 10 tracks (tier 3)
     sceneNode = *(SoultreeObject**)((char*)modelNode + 0x140);

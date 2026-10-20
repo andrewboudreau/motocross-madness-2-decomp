@@ -2,6 +2,21 @@ Collision units: `CollisionObject.cpp` and `CollisionPoint.cpp`, with their shar
 headers (`CollisionObject.h`, `CollisionPoint.h`, `CollisionPointCtor.h`, `CollisionShapeTests.h`,
 `CollisionTypes.h`). See [physics validation](../../../docs/PHYSICS_VALIDATION.md).
 
+## Collision setup and caller connections
+
+`CollisionObject::Configure` at `0x004320f0` is supplied by the canonical
+`CollisionObject.cpp`; its former standalone sample is removed. All 40 bytes,
+including the call to `GameObject::SetRenderContext`, match retail. The first
+argument passes through as the render-context pointer. Physics and scene callers
+now share its `void*` signature; the pointee's complete type remains unproven.
+
+ObjectPicker's local CollisionObject view also uses the canonical opaque-pointer
+signatures for `LoadShape`, `SetHullShape` and `SetOwner`. ArcadeObject's direct
+calls consequently resolve to the existing implementations at `0x00432800`,
+`0x00432720` and `0x004394d0`. This supplies five previously unresolved symbol
+identities without additional wrapper bodies. It does not reconcile every local
+CollisionObject layout or establish the model/owner pointers' original types.
+
 # CollisionPoint.cpp (collision)
 
 Extent: `0x0043a1e0..0x0043b320` (CollisionObject.cpp's last function `0x0043a050` precedes it,

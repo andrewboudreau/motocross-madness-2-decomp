@@ -62,9 +62,11 @@ public:
     // Seen from ArcadeObject.cpp 0x00401540: 0x00432800 (ret 8) builds the
     // collision from a ".col" file, 0x00432720 (ret 0x14) without one,
     // 0x004394d0 (ret 8) and 0x00435fe0 (ret 0) follow.
-    void LoadShape(D3DIMSoultreeObject* model, const char* path);
-    void SetHullShape(D3DIMSoultreeObject* model, int a, int b, int c, int d);
-    void SetOwner(D3DIMSoultreeObject* model, int value);
+    // Opaque node/owner pointers use the canonical CollisionObject signatures;
+    // this local layout view does not establish their complete C++ types.
+    void LoadShape(void* model, const char* path);
+    void SetHullShape(void* model, int a, int b, int c, int d);
+    void SetOwner(void* model, int value);
     void SnapPlacement();
 
     unsigned char field_0x38[0x68 - 0x38];

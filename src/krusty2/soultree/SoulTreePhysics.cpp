@@ -835,7 +835,7 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, Vec3 
     if (a20) {
         collisionObject = new(SP_FILE, 0x245) CollisionObject(1);
         InstallCollisionCallbacks();
-        collisionObject->Configure(a1, 0, 1, 1);
+        collisionObject->Configure((void*)a1, 0, 1, 1);
     } else {
         collisionObject = 0;
     }

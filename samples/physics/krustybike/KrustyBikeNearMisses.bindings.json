@@ -97,7 +97,7 @@
   "??_EKrustyBike@@UAEPAXI@Z": "0x00497c40",
   "?AddIgnoredOwner@CollisionObject@@QAEXPAX@Z": "0x00439410",
   "?ApplyRestPose@KbA5C4@@QAEXXZ": "0x004a8b00",
-  "?Configure@CollisionObject@@QAEXHHHH@Z": "0x004320f0",
+  "?Configure@CollisionObject@@QAEXPAXHHH@Z": "0x004320f0",
   "?DebugCalloc@@YAPAXIIPBDH@Z": "0x004a2fc0",
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",

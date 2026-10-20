@@ -38,6 +38,15 @@ Near misses (`samples/render/MorphBastardModifierNearMisses.cpp`):
 
 Slot 27 differs in stack-slot and register assignment.
 
+`MorphBastardNode` is an alias of the existing `SoultreeObject` declaration.
+The matrix calls in `UpdateChannels` use the complete node pointer at offset
+zero: `GetLocalMatrix` (`0x004fca60`) and `GetMatrixIn` (`0x004fca80`) now
+resolve to their existing `soultree.cpp` implementations. This is tier 2
+call-site evidence; it does not reconcile every separate Soultree declaration
+or establish the original header structure. The 166-byte caller remains strict
+exact. The parameter-loader sample uses the same alias and retains its
+1938/2046 comparison; it remains outside production source.
+
 D3DIMSoultreeModifier.h now gives slot 27 its signature `(object, mesh,
 out)`, taken from the call site `0x00440ded`.
 

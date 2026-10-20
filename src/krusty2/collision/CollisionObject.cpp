@@ -2743,3 +2743,14 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
     }
     return 0;
 }
+
+// 0x004320f0: three collision flags followed by a nonvirtual call to
+// GameObject::SetRenderContext on the secondary base at +0xc. The context
+// is passed through unchanged; its pointed-to type remains opaque.
+void CollisionObject::Configure(void* context, int broadphase, int enabled, int collidableValue)
+{
+    useBroadphase = broadphase;
+    collisionEnabled = enabled;
+    collidable = collidableValue;
+    GameObject::SetRenderContext(context);
+}

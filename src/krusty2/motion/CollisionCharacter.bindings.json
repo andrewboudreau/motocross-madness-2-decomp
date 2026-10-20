@@ -13,7 +13,7 @@
   "??_8CollisionCharacter@@7B@": "0x0055113c",
   "??_C@_09GHJD@Collision?$AA@": "0x00566678",
   "??_ECollisionCharacter@@UAEPAXI@Z": "0x00431d20",
-  "?Configure@CollisionObject@@QAEXHHHH@Z": "0x004320f0",
+  "?Configure@CollisionObject@@QAEXPAXHHH@Z": "0x004320f0",
   "?D3DIMVirtualSlot11@D3DIMSoultreeCharacter@@UAEPAVGameObject@@HPBDPBUSoultreeLoadDesc@@HHH@Z": "0x00445680",
   "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?Tick@CollisionCharacter@@UAEHM@Z": "0x00431b30",
