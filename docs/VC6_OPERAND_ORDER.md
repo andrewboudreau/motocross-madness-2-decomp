@@ -914,6 +914,15 @@ try on similar code. None is a rule.
   `Vec3 prev = f23c;` used in `(f154 - prev) * t + prev`, give those copies. In the
   same function a case block's `Vec3 r` declared at function scope stops sharing its
   slot and gives retail's 0x88 offset.
+- **Scaling a named copy in place keeps the products as x87 variables.**
+  SoultreePhysicsBaseObject slot 38 (`0x00501600`, 651 -> 925 of 925, exact):
+  `Vec3 t = worldAngularVelocity; t.x *= s.x; t.y *= s.y; t.z *= s.z;` before
+  `CrossProduct(t, r)` gives retail's int-move copy, `fld t.c; fmul s.c` per component,
+  `fld r.c; fmul st(i)` in every cross term (no product consumed in place) and the
+  three `fstp st(0)` pops, and also retail's `velocity + scratchVector` load order. A
+  by-value `Scale3(v, s)` helper (assigning a fresh `r`, assigning `v` in place, or
+  returning a constructor), scalar `tx/ty/tz` locals and explicit cross components all
+  consume the products in place (919 bytes).
 - **One reused function-scope Vec3 packs successive temporaries into one slot.** Bike
   slot 38 (`0x00405190`, frame 0xb8 to 0xac, aligned 683 to 688): retail's copy of
   `worldAngularVelocity`, and the sum it passes by address to slot 3, share the slot of an

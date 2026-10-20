@@ -115,8 +115,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot38@SoultreePhysicsBaseObject",
     "target_va": "0x00501600",
     "target_size": 925,
-    "expect": "partial",
-    "notes": "71.70% under vc6_o2_ml (wave 3: was 70.46%; size 919 vs 925). Everything up to the static path matches. Scale3 now assigns r.x = v.x * s.x (etc.) member-wise. Remaining: retail keeps all three t components on the x87 stack through the cross product (fld r.c; fmul st(i), never consuming a t value in place, three fstp st(0) at the end), and p = field_0x64 + field_0x1ac loads 0x64 first; cross helper choice (CrossProduct/SoultreeCross/ctor) does not change the bytes.",
+    "expect": "exact",
+    "notes": "Exact under vc6_o2_ml (session 14; was 651/925 at 919 bytes). Lever: the static arm scales a local copy of worldAngularVelocity in place (t.x *= s.x; t.y *= s.y; t.z *= s.z) before CrossProduct(t, r); retail keeps the scaled components on the x87 stack (fld r.c; fmul st(i)) and pops them with three fstp st(0). A by-value Scale3 helper, scalar locals or explicit cross components consume them in place.",
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {

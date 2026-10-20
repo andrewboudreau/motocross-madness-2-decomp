@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 124, c 96, total 222. The three class (a) functions of the
+Counts: a 2, b 123, c 96, total 221. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -102,7 +102,6 @@ the integration temporary. When only displacement sizes differ, read the
 | krusty2/collision/CollisionObject | `0x00435830` | 902/1684 | b | SetTransform: per-element term order of the hull case's inline 4x4 product (retail 3,2,1,4 / 1,3,4,2 / ...; arena ordering, see VC6_OPERAND_ORDER.md 3.2; ~40 element-pointer, reference and bracketing forms recorded at the helper); frame 0x30 both |
 | krusty2/collision/CollisionObject | `0x00439820` | 1309/1493 | b | SegmentTouchesObject: same instructions as retail; some temporaries in other frame slots, one `add esp` scheduled late; a struct copy of the inverse's translation moves p into retail's d slot (and fixes i/scaled) but reschedules the stores |
 | krusty2/soultree/SoulTreePhysics | `0x00500220` | 286/639 | b | 24 code diffs: `je @201 ; fld [edi + 8]` vs `je @197`; `fmul [esi + 4]` vs `fld [esi + 4] ; fmul [edi + 8]`; slots differ |
-| krusty2/soultree/SoulTreePhysics | `0x00501600` | 651/925 | b | 18 code diffs: `jmp @239 ; fld [esp + N]` vs `jmp @242`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x00501e90` | 169/483 | b | 487 B vs 483: the cross product passed straight to WorldToLocalDirection as `SoultreeCrossCtor` gives retail's copy/push schedule; left: retail stores normalForce member-wise to `[esi + 0x68]` in both branches (a by-reference member-wise helper does that but constant-folds the zero temporary), the x component's products load leverArm first and `*a2 +=` loads `*a2` first |
 | krusty2/vehicle/Bike | `0x00405190` | 1756/2874 | b | 2865 B, aligned 710/742, frame 0xac: function-scope `r`, named copy `prev`, `tmp` reused for the angular copy and the slot 3 argument, uninitialised `otherVel` (provisional) with a statement-form `l14`, len2 as `z*z + (x*x + y*y)`; velA/blend/0x3ea temporary slot offsets |
 | krusty2/vehicle/Bike | `0x004060c0` | 1677/1678 | c | second contact loop loads `[eax + ecx]` where retail has `[ecx + eax]` (Vehicle slot 7's identical loop gets retail's order). Removing both `BikeWheelDistance` calls of the `mode > 1` branch flips it; one call, helper reshapes, named lenSq/sum/reference locals, dead int locals (0-11), declaration order, `i[arr]`, pointer arithmetic and a `pts` alias do not |
