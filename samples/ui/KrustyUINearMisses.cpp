@@ -9,6 +9,8 @@
 // layer +0xc0, GUI +0x34c) and loads the global before pushing the joystick
 // filter. Inline-helper, block-local, local-gui and local-filter forms do
 // not change it.
+// Session 14: `if (scale)`, `scale != 0` and a `!= 0` load test are inert
+// (872); `else scale = 0` instead of the leading store is worse (363).
 //
 #include <stdio.h>
 #include <stdlib.h>
