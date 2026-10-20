@@ -635,6 +635,10 @@ without effect, as noted.
   (Shock `0x004f9f90`). `m.x = v.x * (s = 1.0f / n); m.y = v.y * s; m.z = v.z * s;`
   gives the x-only `fld st(0); fmul v.x` of retail's collision means
   (CollisionObject `0x00437c20`, `0x00438280`, `0x004376f0`, `0x00437ef0`, +4..5 each).
+  The same store in the first product of a per-component step,
+  `step.x = (t = ahead / len + bestT) * seg.x; step.y = t * seg.y; ...`, gives retail's
+  `fst t; fmul seg.x` where a whole-vector `seg * t` keeps the scale in a register
+  (BikeAI `0x0040e510`, +4 aligned).
 - **Grouped sums through by-reference helpers.** `(a.x*b.x + a.y*b.y) + a.z*b.z` in an
   inline by-reference helper reproduced CollisionObject `0x00439600`; written inline,
   VC6 keeps v.z live. The squared length `v.z*v.z + ((v.x*v.x) + (v.y*v.y))` in an

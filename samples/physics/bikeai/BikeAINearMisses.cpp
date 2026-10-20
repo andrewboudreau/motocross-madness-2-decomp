@@ -21,22 +21,30 @@
 // g * halfDtSq; v.y += g * dt` (operator order, parentheses, written-out sums).
 //
 // 0x0040e510 (1936 bytes, AI path steering direction): every branch, call and
-// constant is reconstructed; the candidate is 1931 bytes and aligns 1:1 except
-// frame slots.  The walk along the path uses its own index (`index = best`): with
-// one variable for the nearest search and the walk, VC6 swaps esi/edi against
-// retail (path in esi, index in edi).  The three perpendiculars are built
-// component-wise (`n.x = seg.z; n.y = 0; n.z = -seg.x; n = SafeNormalize(n)`) as in
-// 0x0040d200, which copies seg.z with integer moves like retail.  The final
-// parameter is assigned inside the scale (`dir * (t = ...)`): retail keeps the sum
-// on the FPU stack for the first product (`fst t; fmul dir.x`); with a separate
-// `t = ...;` statement VC6 emits `fstp t; fld dir.x; fmul t` (6 bytes longer, three
-// more aligned instructions but the tail shifted).  The remaining differences are
-// the slots of the segment / perpendicular temporaries (retail +0x30/+0x50, candidate
-// +0x3c/+0x38) and of the walk direction.  Declaration order of the Vec3 locals does
-// not change VC6's frame (all 24 permutations tried); declaring bestT before best
-// fixed the immediate store of bestT = 0.  Also inert on the slots (session 14): a
+// constant is reconstructed; the candidate is 1935 bytes (retail's extent ends in one
+// nop) and aligns 1:1 except three instructions and frame slots.  The walk along the
+// path uses its own index (`index = best`): with one variable for the nearest search
+// and the walk, VC6 swaps esi/edi against retail (path in esi, index in edi).  The
+// three perpendiculars are built component-wise (`n.x = seg.z; n.y = 0; n.z =
+// -seg.x; n = SafeNormalize(n)`) as in 0x0040d200, which copies seg.z with integer
+// moves like retail.  The walk reuses `seg` for its direction (1844 -> 1846 over a
+// separate `dir`), and the final step is written per component with the parameter
+// assigned in the first product (`step.x = (t = ahead / len + bestT) * seg.x; step.y =
+// t * seg.y; ...`): retail keeps the sum on the FPU stack for x (`fst t; fmul x`) and
+// reloads t from memory for y and z (1422 -> 1846; `seg * (t = ...)` keeps t on the
+// FPU stack for all three, a separate `t = ...;` gives `fstp t; fld x; fmul t`, and a
+// `const float&` scale helper gives the same as the latter).  Left: the y product loads
+// seg.y before t (retail t first; z already loads t first, seg.z having an older x87
+// leaf from `n.x = seg.z`; operand order, the y/z store order, the step declaration's
+// position, a dead `seg.y = 0` after the segment differences and component-wise
+// segment differences do not change it), two `faddp`/`fld` orders in the segment
+// lengths and the slots of the segment / perpendicular temporaries (retail
+// +0x30/+0x50, candidate +0x3c/+0x38).  Declaration order of the Vec3 locals does not
+// change VC6's frame (all 24 permutations tried); declaring bestT before best fixed
+// the immediate store of bestT = 0.  Also inert on the slots (session 14): a
 // per-block `seg`, a `seg` reference alias and splitting the walk direction's
-// declaration from its first assignment.
+// declaration from its first assignment; block-scoped `t` locals for the two
+// intersection tests lose 630 strict bytes.
 //
 // The inline length helper used here has the same body as the out-of-line copy at
 // 0x00413190 (matched in the canonical file as a plain function).  Retail's
@@ -201,8 +209,8 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         int kind = g_BikeAIGame_0056e26c->raceKind;
         if (kind == 2 || kind == 3)
             ahead += (offset < 0.0f ? -offset : offset);
-        Vec3 dir = path->points[index + 1] - path->points[index];
-        float len = (1.0f - bestT) * BikeAILength(dir);
+        seg = path->points[index + 1] - path->points[index];
+        float len = (1.0f - bestT) * BikeAILength(seg);
         while (ahead > 0.0f) {
             if (!(len < ahead) || index >= path->count - 1)
                 break;
@@ -210,21 +218,25 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
             index++;
             bestT = 0.0f;
             if (index < path->count - 1) {
-                dir = path->points[index + 1] - path->points[index];
-                len = BikeAILength(dir);
+                seg = path->points[index + 1] - path->points[index];
+                len = BikeAILength(seg);
             }
         }
         Vec3 n;
-        n.x = dir.z;
+        n.x = seg.z;
         n.y = 0.0f;
-        n.z = -dir.x;
+        n.z = -seg.x;
         n = SafeNormalize(n);
         Vec3 target;
         if (index >= path->count - 1) {
             t = 0.0f;
             target = path->points[index];
         } else if (len > ahead) {
-            target = path->points[index] + dir * (t = ahead / len + bestT);
+            Vec3 step;
+            step.x = (t = ahead / len + bestT) * seg.x;
+            step.y = t * seg.y;
+            step.z = t * seg.z;
+            target = path->points[index] + step;
         }
         path->index = index;
         path->t = t;
