@@ -404,6 +404,19 @@ static inline Vec3 VehNormalizedD(const Vec3& v)
     r.z = inv * v.z;
     return r;
 }
+static inline float VehMinF56(float a, float b) { return (a < b) ? a : b; }
+static inline float VehDotG(const Vec3& a, const Vec3& b)
+{
+    return (a.x * b.x + a.y * b.y) + a.z * b.z;
+}
+static inline Vec3 VehCross56(const Vec3& u, const Vec3& v)
+{
+    Vec3 r;
+    r.x = v.z * u.y - v.y * u.z;
+    r.y = v.x * u.z - v.z * u.x;
+    r.z = v.y * u.x - v.x * u.y;
+    return r;
+}
 void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
 {
     if (wheelCount == 0) {
@@ -424,19 +437,18 @@ void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
     *perp = *Vec3SubtractCall(&d, &n, &proj);
     if (!(perp->x == 0.0f && perp->y == 0.0f && perp->z == 0.0f) && perp) {
         *perp = Vec3Normalize(*perp);
-        scratchVector = ((VehV3&)sideAxis).Cross(*a);
+        scratchVector = VehCross56(sideAxis, *a);
         Vec3 side = VehNormalizedD(scratchVector);
         scratchVector = ((VehV3&)scratchVector2).Cross(side);
         float sign = -1.0f;
-        if (VehDotI(&scratchVector, a) < 0.0f)
+        if (VehDotG(*a, scratchVector) < 0.0f)
             sign = 1.0f;
-        float len2 = VehDotI(&scratchVector, &scratchVector);
-        float len = 1.0f;
+        float len2 = VehLen2(scratchVector);
+        float len;
         if (len2 != 1.0f) {
-            len = (float)sqrt(len2);
-            if (!(len < 1.0f))
-                len = 1.0f;
-        }
+            len = VehMinF56((float)sqrt(len2), 1.0f);
+        } else
+            len = 1.0f;
         double angle = asin(len * sign);
         leanAngle = (float)angle;
         if (b)
@@ -537,10 +549,6 @@ static inline Vec3 VehNormalized(const Vec3& v)
 }
 
 // (x*x + y*y) + z*z grouping: VC6 then loads the y, x, z products in retail's order.
-static inline float VehDotG(const Vec3& a, const Vec3& b)
-{
-    return (a.x * b.x + a.y * b.y) + a.z * b.z;
-}
 
 static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
 {

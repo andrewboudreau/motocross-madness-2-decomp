@@ -836,7 +836,7 @@
     "target_va": "0x005286a0",
     "target_size": 784,
     "expect": "partial",
-    "notes": "291/784: tilt angle; the scale/subtract outputs are separate locals (frame 0x3c like retail); perp declared just before s (263 -> 291). Tried: perp at the top (a gets ebx but perp ebp, 190), s/d before n, a member-first cross helper and CrossB (no gain). Left: retail shares the ground-normal output with the projection (and n with the side vector, the normalise temporary separate), register roles (retail esi=this, ebx=a, edi=perp, ebp=&field_0x1ac).",
+    "notes": "754/784: tilt angle; frame 0x3c and slots match. Levers: len2 through VehLen2, len as a min helper of sqrt(len2) and 1 (else 1), the sign test as VehDotG(*a, scratchVector) with VehDotG above slot 56, and the side cross as a free helper of (sideAxis, *a) (291 -> 754). Left: two products of the side cross load their multiplicands in the other order (retail x row side.y*a.z, y row a.x*side.z); all 64 source operand orders of the free and member forms tie, a pointer or value copy of either vector, by-value parameters and the swapped/negated cross are worse.",
     "bindings": "Vehicle.bindings.json"
   },
   {
