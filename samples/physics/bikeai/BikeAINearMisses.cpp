@@ -37,8 +37,16 @@
 // seg.y before t (retail t first; z already loads t first, seg.z having an older x87
 // leaf from `n.x = seg.z`; operand order, the y/z store order, the step declaration's
 // position, a dead `seg.y = 0` after the segment differences and component-wise
-// segment differences do not change it) and the slots of the segment / perpendicular
-// temporaries (retail +0x30/+0x50, candidate +0x3c/+0x38).  The walk's two segment
+// segment differences do not change it; nor do the walk lengths written out in the
+// body, by-value or by-pointer length helpers, `seg` read through a reference or
+// `(&seg)->y`, or by-reference scale helpers for y or y and z) and frame slots.  One perpendicular `n` at the
+// enclosing scope serves both intersection blocks and the final shift, which puts it at
+// retail's +0x14 (block-local `n`s in the two blocks: 1865; hoisting one of them: 1872;
+// all three as one: 1884).  Left in the frame: retail pairs `seg` with `step` at +0x20
+// and the segment difference temporary with `target` at +0x2c; here `seg` shares
+// `target`'s slot and the temporary takes +0x20, with `step` alone at +0x38 (hoisting
+// `step`, `target` or `dist`, block-local segments and n/seg declaration order are
+// inert or lose a byte).  The walk's two segment
 // lengths use BikeAISegmentLength, as 0x0040d200 does: its `(x*x)` parentheses issue
 // the named copy's z store after the z*z product like retail (BikeAILength issues it
 // before the first faddp; `(y*y)` parentheses do the same as `(x*x)`, `(z*z)`, a flat
@@ -75,6 +83,13 @@
 // 0..17 dead initialised int locals at the top change nothing; nor do the single-value
 // `Vec3(0.0f)` zero (same z, y, x stores as the chained form) or block versus function
 // scope for the `p` and the operator temporaries' named copies (session 14).
+// Frame symbols (/FAs): retail orders the address-taken block locals `tmp`, `v`, `v`,
+// `p` where VC6 gives `p`, `v`, `v`, `tmp`, and the six one-use `d * k`/`d * 10`/`d * push`
+// results plus `offset` come out in another permutation.  One at a time (session 14,
+// after RunSteps): `p` in the vegetation loop body, its hit block, the vegetation block,
+// the quadtree block or before the object loop, the outPush step or one `zero` at
+// function scope, and either `v` there, all leave 6063; both `v`s at function scope give
+// 5919, both `zero`s 5924, `tmp` at function or quadtree-block scope 6005.
 // Source forms that mattered: unsigned char type-id statics with an unsigned compare
 // (`mov bl, 0xff`), the max/min helpers with by-value arguments (two spellings,
 // see BikeAIMaxR), the squared distance and k dot product grouped z + ((x) + y)
@@ -193,9 +208,9 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         float t;
         float offset;
         Vec3 seg;
+        Vec3 n;
         if (nearest > 0) {
             seg = path->points[nearest] - path->points[nearest - 1];
-            Vec3 n;
             n.x = seg.z;
             n.y = 0.0f;
             n.z = -seg.x;
@@ -211,7 +226,6 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         }
         if (nearest < path->count - 1) {
             seg = path->points[nearest + 1] - path->points[nearest];
-            Vec3 n;
             n.x = seg.z;
             n.y = 0.0f;
             n.z = -seg.x;
@@ -242,7 +256,6 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
                 len = BikeAISegmentLength(seg);
             }
         }
-        Vec3 n;
         n.x = seg.z;
         n.y = 0.0f;
         n.z = -seg.x;

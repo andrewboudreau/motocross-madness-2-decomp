@@ -66,6 +66,9 @@ with `tools/frame_layout.py OBJ --dump`. "Nearest esp" is the lowest address
    statement do not scope its temporaries. RunSteps `0x00502f60` became exact
    by moving one sibling-block output to loop scope. That re-pairs the other
    block's locals and leaves one of them free for the integration temporary.
+   BikeAI `0x0040e510` moved its perpendicular to retail's slot the same way: two
+   sibling-block `Vec3 n` and a later one at the enclosing scope became one local at
+   that scope (strict 1865 -> 1884; hoisting only one block's `n` gives 1872).
 5. **Small frames.** When the locals total at most 0x80 bytes, size decides
    first (ascending, nearest esp = smallest) and the count only orders equal
    sizes (q13: `char a[0x44]` used ten times sits above `char b[0x3c]` used

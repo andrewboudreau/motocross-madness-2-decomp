@@ -649,6 +649,13 @@ without effect, as noted.
   inlined helper (any parameter passing) instead of in the body gives `fld x; fmul
   st(1)` in the normalisation (VehicleCamera `0x0052c030`). A flat sum gets VC6's
   term order whatever order it is written in; only explicit grouping forces it.
+- **One copy of a repeated sum through a by-reference helper.** When a function
+  writes the same `w.x += d.x; w.y += d.y; w.z += d.z;` on two paths and retail's
+  second copy loads `w.x` first (the first copy and the y/z adds load `d` first),
+  putting only the second copy into `inline void AddIn(Vec3& w, const Vec3& d)`
+  gives that order; written in the body both copies load `d.x` first (every add
+  form), and the helper on both paths costs the first copy its order
+  (Tire::UpdateShock `0x00513c70`, 793 -> 797, exact).
 - **Parentheses around call arguments.** In EcoSystem `0x004598d0` the
   `mov ecx, [g_collisionQuadTree]` of a `ComputeCode((x - r), (z - r), (x + r),
   (z + r))` thiscall moves before the last `fsub/fstp` once there are at least three
