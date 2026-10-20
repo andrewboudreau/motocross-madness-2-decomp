@@ -760,3 +760,15 @@ try on similar code. None is a rule.
 - **A branch straight to the epilogue past `xor eax, eax` returns the tested value.**
   Retail `test eax,eax; jne <pop edi>` after `mov eax,[field]` is
   `if (field != 0) return field;`, not `return 0`.
+- **A unit vector written back into its own slot is an in-place normalize at the call
+  site.** Bike slot 91 (`0x0040aec0`): retail stores `s * force.x/y/z` into force's
+  slot, then loads them into `edx`/`eax`/`ecx` for the by-value argument, and the
+  zero path loads the zero vector into the same registers. That is
+  `if (lenSq == 0) force = zero; else force *= s;` followed by passing `force`. A
+  helper returning the direction, by value or through `Vec3&`, gets a separate temp
+  or `eax`/`ecx`/`edx`. Moving the same code into an inline helper taking `Vec3&`
+  flips the operand order of an earlier, unrelated dot product.
+- **A compound-assignment operator keeps a later member load below the stores.**
+  In the same function, `angularVelocity *= 0.9f` (operator*= through `this`) keeps
+  the next `wobbleStage` load where the source has it. Three component stores let
+  VC6 hoist the load above them.

@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 133, c 101, total 236. The three class (a) functions of the
+Counts: a 2, b 132, c 101, total 235. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -107,7 +107,6 @@ retail does; grouping the x row's first two products does the same for that row.
 | krusty2/vehicle/Bike | `0x004079c0` | 2080/6718 | b | spill homes of the loop values, the matched wheel kind kept in esi by retail, store scheduling of the local string tables and Vec3 constants (see PHYSICS_VALIDATION.md); 40/32-degree constants now 40*0.01745329f / 32*0.01745329f |
 | krusty2/vehicle/Bike | `0x00407440` | 188/485 | c | clamps are BikeMin(BikeMaxF(t,.25),.75) and BikeMaxF(BikeMin(a,32.2),-32.2), constants bound; left: retail's dead `cnt+=2` store (to the shared [esp+0x10] slot, tail-merged: the `idx > 2, idx != 10` arm also jumps into `add ecx, 2`), idx/next/step/cnt register roles swapped (declaration order of the four locals and `cnt += 2` placements in both arms are insensitive: VC6 drops the dead update), 0.0310559 read from the 0x550790 copy (binding gives 0x550ad0) |
 | krusty2/vehicle/Bike | `0x0040a520` | 439/2272 | b | 96 code diffs: retail lacks `test al, al`; retail adds `test al, al`; slots differ |
-| krusty2/vehicle/Bike | `0x0040aec0` | 1014/1353 | b | 13 code diffs: a dot operand order, the BikeDirection temp slot (retail reuses force's slot), the zero-copy load order and one hoisted `mov ecx, [esi + 0x720]` |
 | krusty2/vehicle/Bike | `0x0040c000` | 162/1015 | b | retail has a bare `fistp` (inline `__asm`, docs/REBUILD_GAPS.md), hence its ebp frame; 60 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `fld [A]`; slot order differs |
 | krusty2/vehicle/Vehicle | `0x005257a0` | 693/745 | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |
 | krusty2/vehicle/Vehicle | `0x005265d0` | 381/555 | b | same size, 0.82 ratio: two products per cross load a before b; the crashState ?: argument is hoisted above the pushes |
