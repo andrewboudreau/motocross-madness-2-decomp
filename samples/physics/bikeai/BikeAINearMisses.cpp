@@ -81,6 +81,13 @@
 // 0..17 dead initialised int locals at the top change nothing; nor do the single-value
 // `Vec3(0.0f)` zero (same z, y, x stores as the chained form) or block versus function
 // scope for the `p` and the operator temporaries' named copies (session 14).
+// Frame symbols (/FAs): retail orders the address-taken block locals `tmp`, `v`, `v`,
+// `p` where VC6 gives `p`, `v`, `v`, `tmp`, and the six one-use `d * k`/`d * 10`/`d * push`
+// results plus `offset` come out in another permutation.  One at a time (session 14,
+// after RunSteps): `p` in the vegetation loop body, its hit block, the vegetation block,
+// the quadtree block or before the object loop, the outPush step or one `zero` at
+// function scope, and either `v` there, all leave 6063; both `v`s at function scope give
+// 5919, both `zero`s 5924, `tmp` at function or quadtree-block scope 6005.
 // Source forms that mattered: unsigned char type-id statics with an unsigned compare
 // (`mov bl, 0xff`), the max/min helpers with by-value arguments (two spellings,
 // see BikeAIMaxR), the squared distance and k dot product grouped z + ((x) + y)
