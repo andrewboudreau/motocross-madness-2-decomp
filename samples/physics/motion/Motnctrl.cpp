@@ -338,7 +338,8 @@ inline void ExtrapolatePose7(CharacterPose* a, CharacterPose* b, CharacterPose* 
     }
     if (flag) {
         Vec3 delta = b->position - a->position;
-        out->position = b->position + delta * ffps * t;
+        Vec3 step = delta * ffps * t;
+        out->position = b->position + step;
     } else {
         out->position = b->position;
     }
@@ -353,8 +354,8 @@ inline void ExtrapolatePose7(CharacterPose* a, CharacterPose* b, CharacterPose* 
 // the two poses are interpolated with a smoothstep weight over blendDuration; nodes flagged in the
 // name table keep the blend-from pose.  Past the last frame a looping motion is restarted through
 // BlendToMotion, a non-looping one sets motionStopped.  Returns the frame number, or 0.
-// Near miss (strict is positional, so the metric here is aligned instructions: 676 of 958, 282
-// differing; clearing finished before the time add gives the last one).  The call sequence and the clamp/ease shape are retail's.  With the two blend inlines
+// Near miss (strict is positional, so the metric here is aligned instructions: 693 of 958, 270
+// differing; clearing finished before the time add and the helper's named step give the last ones).  The call sequence and the clamp/ease shape are retail's.  With the two blend inlines
 // (BlendPose7/BlendPose7B) the constructor calls split 2/4 as in retail, and the playback loop's
 // extrapolation through ExtrapolatePose7 calls Vec3::Vec3 and the operator COMDATs in retail's
 // order.  Left: this pointer in edi (retail esi) in the prologue, with &currentFrame in esi
