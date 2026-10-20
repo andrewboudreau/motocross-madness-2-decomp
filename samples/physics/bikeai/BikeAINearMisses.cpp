@@ -63,8 +63,8 @@
 // and operator*(Vec3, float) that retail calls even in this function's first lines.
 //
 // 0x0040eca0 (17585 bytes, look-ahead simulation of the two wheels): the whole
-// function is reconstructed; 3929 vs 3966 instructions, 392 masked code differences,
-// frame 0x8b8 vs 0x93c.  The call sequence matches retail call for call except one
+// function is reconstructed; frame 0x95c vs 0x93c (named locals map ~1:1 to retail
+// slots via tools/frame_layout.py; the gap is temporaries).  The call sequence matches retail call for call except one
 // site (0x00412e23: retail inlines operator+ with the out-of-line constructor, the
 // candidate calls operator+).  This function exhausts VC6's per-function inline
 // budget: the first part expands every Vec3 operator, from 0x00410d00 the operators
@@ -856,14 +856,14 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                           float* frontSusp, float* rearSusp, int* outFrontContact, int* outRearContact,
                           UnknownBikeAIPath* path, float* speedTable, float sideOffset, int nearOnly)
 {
-    if (dt > 0.05f)
-        dt = 0.05f;
     int frontContact = 1;
     int rearContact = 1;
     float frontK = 90.0f;
     float rearK = 90.0f;
     int steerSign = 0;
     int steps = 0;
+    if (dt > 0.05f)
+        dt = 0.05f;
     float frontC;
     float rearC;
     frontC = rearC = ((dt - 0.005f) * 4.21053f + 0.6f) * 0.6f;

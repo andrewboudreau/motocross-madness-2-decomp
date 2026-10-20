@@ -426,6 +426,7 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
     i = 0
     pushed_before_frame = 0
     pushed_after_mov_ebp = 0
+    early_sub = None     # index of a ``sub esp, N`` scheduled below body instructions
     ebp_based = False
     frame = 0
     while i < n:
@@ -457,13 +458,26 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
                 frame = _imm(o[5:])
                 i = k + 1
                 break
+        # VC6 may schedule a few body instructions (an argument load, a compare)
+        # above ``sub esp, N``; they address the frame from the unallocated esp.
+        k = i
+        while k < min(n, i + 8):
+            km, ko = insns[k].mnemonic, insns[k].op_str
+            if km == 'sub' and ko.startswith('esp, '):
+                frame = _imm(ko[5:])
+                early_sub = k
+                break
+            if km in ('push', 'pop', 'call', 'ret', 'retn', 'leave') or km.startswith('j') \
+                    or re.match(r'(esp|ebp)\b', ko):
+                break
+            k += 1
         break
     info.frame_size = frame
     info.ebp_based = ebp_based
     info.saved_regs = pushed_before_frame
     info.ebp_delta = pushed_after_mov_ebp + frame
     info.prologue_end = i
-    depth = 0            # bytes pushed below the base
+    depth = -frame if early_sub is not None else 0   # bytes pushed below the base
     pending = 0          # argument bytes pushed since the last call / add esp
     seen_call = False
     base_depth = None    # depth outside argument sequences (callee-saved pushes)
@@ -491,7 +505,12 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
             depth = max(0, depth - 4)
             pending = max(0, pending - 4)
         elif m == 'sub' and o.startswith('esp, '):
-            depth += _imm(o[5:])
+            if j == early_sub:
+                depth = 0
+            else:
+                # argument space for a by-value struct (``sub esp, 0xc; mov eax, esp``)
+                depth += _imm(o[5:])
+                pending += _imm(o[5:])
         elif m == 'add' and o.startswith('esp, '):
             depth = max(0, depth - _imm(o[5:]))
             pending = 0
