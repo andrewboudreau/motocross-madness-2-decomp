@@ -132,6 +132,9 @@ Near misses (`samples/ui/DlgProcsNearMisses.cpp`):
   `0x0044f750`, and `0x00452930`: register allocation or tail merging.
 - MainDlg slot 29 `0x0044b200`: retail shares one frame slot between its two
   ConnectionInfoType[5] arrays; VC6 here does not (frame 0xc64 vs 0x6c4).
+  Retail's unwind map (FuncInfo `0x00560770`) gives both arrays `[ebp-0x5ac]`
+  in states 1 and 0xc. No source shape or optimisation flag tried makes VC6 SP3
+  share two EH-tracked arrays; only /GX- does, by dropping their states.
 - SPBikeRiderDlg slot 10 `0x0044fae0`, 1181 of 1235 bytes: only the
   scheduling of the by-value vector copies for the camera call differs
   (no argument spelling changes it; a Vector3 copy constructor is worse).

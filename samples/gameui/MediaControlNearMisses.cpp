@@ -17,7 +17,14 @@
 // after that QueryInterface and keeps &videoDrawStream in ebp and videoStream in
 // ebx; VC6 hoists the xor to entry and swaps ebx/ebp, so the score stays.
 // Zeroing `surface` both before the memset and after frameHeight gives 11%
-// with two stores.
+// with two stores. Session 14: the initialiser in a block opened after the
+// videoDrawStream QueryInterface (later `surface = 0` kept) scores 73 of 646
+// strict against 53, but VC6 still births the zero at entry (in ebp,
+// &videoDrawStream in ebx) and adds a store, so it is not adopted. A bare
+// block (53) or the rest nested under `>= 0` instead of the goto (50; 64
+// with the initialiser) do not help.
+// Retail's second memset fills with eax, the zero the DirectDraw
+// QueryInterface's `jne failed` test leaves there.
 //
 // 0x004a2900 (restart) is exact in src/reconstructed/MediaControl.cpp.
 

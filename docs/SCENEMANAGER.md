@@ -188,7 +188,7 @@ member lookup resolving to the virtual base's protected `field_0x10`.
 
   `0x004edfe0` builds the same store from the same source shape, and
   there VC6 matches retail.
-- `0x004edfe0` (5343 bytes) is a near miss in the same sample (4372 of
+- `0x004edfe0` (5343 bytes) is a near miss in the same sample (4393 of
   5346 compared positions): the "Animations" reader. Each "Animation<n>"
   entry (`UnknownSceneEntry`, 0x44 bytes) is either key-framed (bit 3; a
   `CollisionCharacter`, 0x294 bytes, constructor `0x004318d0`, loaded by
@@ -197,7 +197,8 @@ member lookup resolving to the virtual base's protected `field_0x10`.
   sections fill `UnknownSceneEntry2`. Code, calls, EH states and the frame
   size line up. What differs:
   - the frame slots of most scalars and of two buffers;
-  - one count comparison;
+  - one count comparison (a table local for the allocation count gives
+    retail's reload; the [ebx + reg] operand order is left);
   - the grouping of the shared "Cannot find %s" error tails;
   - the load order at the end of the random-set loop.
 

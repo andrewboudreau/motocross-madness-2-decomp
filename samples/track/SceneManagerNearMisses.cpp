@@ -29,10 +29,24 @@
 // reuses `i`); (2) the "NumberOfMotions" test keeps the count in a register
 // for the allocation (retail compares memory against esi and reloads it;
 // 4 test and 5 count spellings, including pointer arithmetic, an
-// `operator new` call and an unsigned count, give identical bytes);
+// `operator new` call and an unsigned count, give identical bytes; inline
+// count helpers are transparent too). Reading the count through a table
+// local inside the block gives retail's copy of the entries pointer, reload
+// and `shl eax, 2` (4372 -> 4393) and removes the 1-byte shift there; retail
+// still encodes both operands as [ebx + reg] where VC6 here writes
+// [reg + ebx], and a local for the test as well is CSE'd with it);
 // (3) the "Cannot find %s" errors share one sprintf tail where retail keeps
 // two (VUE/SLT and MCF/MotionToPlay/RandomSet); (4) the random-set loop end
-// loads in a different order. 4372 of 5346 compared positions.
+// loads in a different order. 4393 of 5346 compared positions.
+// Session 14: from the random-set block on, retail's scratch registers
+// start one step later (the RandomSet error loads scenePath/setName/message
+// into edx/eax/ecx, here ecx/edx/eax), which is what keeps that error's
+// sprintf apart from the Invalid-motion one; at the loop end retail steps
+// the entries[i] offset in ebx ([esp+0x18]), VC6 here in edx ([esp+0x14]).
+// The [reg + reg] operand
+// order is not a source property: `automatic + token + 1`,
+// `&token[automatic + 1]`, `token + (automatic + 1)` and
+// `*(automatic + token) = 0` give identical bytes (4393).
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -625,7 +639,8 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             animationTable->entries[i].motions = 0;
             animationTable->entries[i].motionSequence = 0;
             if (animationTable->entries[i].motionCount > 0) {
-                animationTable->entries[i].motions = new(__FILE__, 2357) void*[animationTable->entries[i].motionCount];
+                UnknownSceneTable* table = animationTable;
+                animationTable->entries[i].motions = new(__FILE__, 2357) void*[table->entries[i].motionCount];
                 for (int m = 0; m < animationTable->entries[i].motionCount; m++) {
                     sprintf(key, "MotionToPlay%d", m + 1);
                     if (!parameters.GetString(key, "", motion, 0x10)) {

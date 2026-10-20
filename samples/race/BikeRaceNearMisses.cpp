@@ -43,7 +43,11 @@
 // Scale(field_0x170, 20.0f) in the mode 4 case; this candidate does the
 // opposite (VC6's inline budget). Call sequence (D dot, I FastInvSqrt,
 // S scale, C constructor): retail DIS..CCDISCCCCCCDISCCCCCCDISCC-CSS+,
-// candidate DIS..DISCCCCCCDISCCCCCCDISCS-SS+. Statement-count and helper
+// candidate DIS..DISCCCCCCDISCCCCCCDISCS-CSS+ (the mode 2/3 slot step
+// scaled with `gridSlotStep = Scale(...)` instead of an inline `*=`
+// gives mode 4's middle constructor call, 975 -> 1018 of 3008; spelling
+// the 4.66 offset `*a = *a - Scale(...)` in any case is worse).
+// Statement-count and helper
 // spelling variations moved either end but never both: Normalize written
 // `return Scale(v, FastInvSqrt(length))` gives retail's mode 4 sequence
 // (DISCC-CSS+) but still expands the mode 2/3 tail (aligned ratio 0.85 ->
@@ -373,13 +377,6 @@ static inline Vector3& operator-=(Vector3& v, const Vector3& o) {
     return v;
 }
 
-static inline Vector3& operator*=(Vector3& v, float s) {
-    v.x *= s;
-    v.y *= s;
-    v.z *= s;
-    return v;
-}
-
 static inline float SquareMagnitude(const Vector3& v) {
     return DotProduct(v, v);
 }
@@ -443,7 +440,7 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
         *a -= Scale(*b, 4.66f);
         gridSlotStep = Vector3(b->z, 0.0f, -b->x);
         gridFirstSlot = *a - Scale(Scale(Scale(gridSlotStep, 6.75f), raceTerrain->gridCellSize), side);
-        gridSlotStep *= raceTerrain->gridCellSize * 15.5f / (racerCount + 1) * side;
+        gridSlotStep = Scale(gridSlotStep, raceTerrain->gridCellSize * 15.5f / (racerCount + 1) * side);
         *a = Scale(gridSlotStep, (float)count) + gridFirstSlot;
         break;
     }
