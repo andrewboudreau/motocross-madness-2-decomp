@@ -22,7 +22,7 @@ In this tree, SoultreeObject is a view with real bases
 untouched. The secondary-base slots are named `QuadTreeVirtualSlot0/1` and
 `SoultreeVirtualSlot2..8`, so they cannot collide with GameObject's.
 
-Exact: 51 calibration cases:
+Exact: 52 calibration cases:
 - The constructor, the destructor and its deleting wrapper.
 - The `.slb`/`.slt` loader (slot 9), the binary load (slot 2) and the
   materials (slot 3).
@@ -35,6 +35,12 @@ Exact: 51 calibration cases:
   texture, and the counts.
 - Slot 5 (the local bounds) writes the centre sum per component (through
   operator+ VC6 adds y and z high-first) and stores the valid flag last.
+- The texture-density pass `0x00440810` (1325 bytes; the old 1349 was the
+  candidate's length) copies the three corner positions per component, as
+  from a D3DTLVERTEX's sx/sy/sz. With whole-Vector3 copies VC6 keeps a
+  second pointer to each vertex for the copy, runs out of registers and
+  spills the face offset (frame 0x84); retail keeps it in ebx. Its squared
+  length is grouped `z*z + (x*x + y*y)` like the LOD chooser's.
 - What made the last four exact: the transformed points are copied into
   the vertices per component (normals, gizmo, box), the box corners are
   stored per component (VC6 then shares each negated extent, retail's
@@ -53,10 +59,8 @@ header):
 - Slot 12 `0x00443aa0` (799 of 832): row 1 of the inline view-matrix
   product adds its terms in another order. VC6 canonicalises each sum by
   the kind of its leaves and destination, not by the source order.
-- The texture-density pass `0x00440810` (same instruction count; one
-  extra frame slot: retail keeps the face offset in the register that
-  holds zero). Slot 7 `0x00444560` matches once the surface pointer `d`
-  is declared before `s`.
+- Slot 7 `0x00444560` matches once the surface pointer `d` is declared
+  before `s`.
 - The drawing function `0x00440f30..0x00442dd8`: a nine-way switch on the
   material mapping type, then modifiers, draw and debug overlays. Its
   function-local statics are the .data ints `0x00568930..0x0056893c`, the
@@ -77,7 +81,7 @@ method slots and arguments, callers); the address-derived names they
 replace are in Git history. Tier 3 unless the entry says otherwise.
 
 - `0x00440060` `ReadLods`
-- `0x00440810` `UpdateMaterialTexelRatios` (near-miss sample)
+- `0x00440810` `UpdateMaterialTexelRatios`
 - `0x00440d40` `TransformVertexGroups`
 - `0x00440f30` `DrawCurrentLod`
 - `0x00442f70` `DrawWireframe`

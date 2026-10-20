@@ -820,6 +820,15 @@ try on similar code. None is a rule.
   tests do not count), whether the range spans a call, and whether a callee-saved
   register is already pushed. The measured thresholds (2/3/2/4) and the rows checked
   against them are in [VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md).
+- **A whole-struct copy from a pointer still in use takes a second register.**
+  D3DIMSoulTree UpdateMaterialTexelRatios (`0x00440810`): with
+  `Vector3 p0 = v[face[0]].position;` and later reads of `v[face[0]].tu`, VC6 copies
+  the vertex pointer into another register for the block copy (`mov edx, ecx`). With
+  three corners the extra registers push the face offset to the stack. Copying the
+  position per component (`p0.x = ...position.x;` and so on) reads the fields through
+  the one pointer, as retail does, and the function becomes exact. If the address
+  is first used by the `tu` read, the shared register comes back too, but the
+  copies then move ahead of the edge.
 - **A named result copied after an intervening statement.** Tire ApplyDrive
   (`0x00514170`): `push = TireRatioTimes(...); *speed -= amount;` copies each
   component of the helper's return temporary right after its product; retail

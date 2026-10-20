@@ -203,13 +203,13 @@ value in one function:
   (`[esp + 0x84]` inside the pushes) that the candidate makes after the
   call into another slot. The register is the same, so this row is store
   placement and frame layout, not caching.
-- D3DIMSoulTree UpdateMaterialTexelRatios `0x00440810`: both have the
-  entry zero register `ebx`. The `best = 0.0f` and `Vector3 zero` stores
-  stay immediate in both, as the memory-local rule predicts.
-  - The candidate's extra `xor esi, esi` / `mov [esp + 0x20], esi` is a
-    separate face counter (frame 0x84 vs 0x80). Retail starts the face
-    offset from the zero register (`mov esi, ebx`) and steps `ebx` by 6.
-  - So this is an induction-variable difference, not constant caching.
+- D3DIMSoulTree UpdateMaterialTexelRatios `0x00440810` (now exact): both
+  have the entry zero register `ebx`, and the `best = 0.0f` and
+  `Vector3 zero` stores stay immediate, as the memory-local rule predicts.
+  Retail starts the face offset from the zero register (`mov esi, ebx`)
+  and steps `ebx` by 6; the candidate spilled it because each whole
+  Vector3 copy held a second vertex pointer. Per-component position copies
+  free the register. This was register pressure, not constant caching.
 - PCTextureMap Clone `0x004c71c0`: the 1 is cached in both. Retail puts
   it in `ebx` and a pointer in `ebp`; VC6 here swaps them, which is web
   priority. The candidate is 590 bytes against retail's 538, so the extent
