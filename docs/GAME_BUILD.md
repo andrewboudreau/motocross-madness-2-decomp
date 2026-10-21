@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-20 build compiles 179 C++ files (174 canonical sources and five
-reviewed candidates) and reaches LINK with 641 unresolved external symbols,
+The 2026-10-20 build compiles 181 C++ files (174 canonical sources and seven
+reviewed candidates) and reaches LINK with 613 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -167,17 +167,36 @@ Their 39,376 native differential scenarios retain gameplay's ReadClock timing;
 4,096 separate native calls exercise the actual QPC backend. These slices
 remove fifteen missing symbols without introducing new unresolved names.
 
+Bike and KrustyBike now use the existing [Wrecker providers](BIKE_WRECKER_CONNECTIONS.md),
+preserving the `+0x604` pointer, `0x53c` allocation and animation-handle bits.
+Wrecker in turn uses the existing [Soultree and character interfaces](WRECKER.md),
+including the virtual GameObject base and model-node offset. These connections
+remove 27 missing names; two renamed Soultree methods still lack definitions
+and are not counted as supplied implementations. Full headers are included
+only where their complete definitions are needed, avoiding the separate render
+and physics Soultree declarations colliding in other translation units.
+
+The complete [crash reporter](EXCEPTIONHANDLER.md#functional-build-review)
+supplies one more missing startup provider as a reviewed nonexact candidate.
+Its actual standalone object passes 13,838 differential scenarios, including
+faulting code/stack reads and both SEH regions. An ordinary-C++ OS backend
+replaces the retail FS stack-base load and passes 1,536 main/worker/fiber checks.
+A separate native integration test links the reporter, backend and canonical
+helpers unchanged, writes a real report and verifies exception propagation
+and one-shot behavior. This tests the reporting path on the current host;
+it does not establish game startup.
+
 Validation of this composition passes the toolchain/manual/generated VC6 gate,
 2,975 of 2,986 calibration rows (2,973 distinct source/address/extent cases),
 and all 1,076 previously strict physics targets among 1,152 comparisons.
 The recursive reset's strict case moves from FileStream.cpp to
 Parameterblocks.cpp with its address and full 30-byte extent unchanged;
 ShowDialog adds one strict case. The native-enabled Python suite passes
-407 tests with 11 skipped. These counts retain existing nonexact comparisons;
+417 tests with 11 skipped. These counts retain existing nonexact comparisons;
 they do not describe a fully matched or working game.
 
-Startup still lacks `RecordExceptionInfo`. Other incompatible class views,
-missing methods and unresolved globals continue to block linking. Import
+Other incompatible class views, missing methods and unresolved globals
+continue to block linking. Import
 libraries alone cannot supply them.
 
 An eventual successful link is only the next gate. Startup/static

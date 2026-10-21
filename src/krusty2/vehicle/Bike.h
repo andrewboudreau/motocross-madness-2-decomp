@@ -25,7 +25,7 @@
 
 struct BikeWheel;
 struct BikeWheelQ;
-struct BikeA604;
+class Wrecker;
 struct BikeA34;
 struct BikeA5C4;
 struct BikeA1A0;
@@ -166,30 +166,6 @@ struct BikeWheelQ {
                     Vec3* force, float* magnitude);
 };
 
-struct BikeA604 {
-    char pad_0x000[52];
-    BikeA34* a_0x34;
-    BikeA38* a_0x38;
-    char pad_0x03c[8];
-    int a_0x44;
-    char pad_0x048[100];
-    int a_0xac;
-    char pad_0x0b0[40];
-    int a_0xd8;
-    Vec3 a_0xdc;
-    char pad_0x0e8[52];
-    void* a_0x11c;           // receives SoultreePhysicsBaseObject::field_0x124
-    BikeA604(int a);
-    char pad_0x120[0x40c];
-    int a_0x52c;                  // KrustyBike slot 33 (0x0048e130) sets it to 1
-    char pad_0x530[0xc];          // allocation size 0x53c (Bike slot 97)
-    // Called through Bike+0x604 by KrustyBike slots 27 and 67 (purpose unknown).
-    void StartAnimatedWreck(int a);
-    void StartTumble();
-    void EndWreck();
-    int SetupWrecker(void* a, BikeA5C4* b, const char* name);
-    void AddProbe(Vec3 offset, int bone);
-};
 
 struct BikeA34 {
     char pad_0x000[416];
@@ -389,7 +365,7 @@ public:
     BikeA5F8* leftBarContact;      // +0x5f8 cleared in the ctor (0x00407700); LoadBike adds it at (-1.305, 0.225, -0.228) on the "Handlebars" node; Method_0x0040a520 reads it
     BikeA5F8* rightBarContact;     // +0x5fc cleared in the ctor; the mirror point (+1.305, 0.225, -0.228) on the "Handlebars" node
     int tailContact;                          // +0x600  the loader's contact point at the tail (0, 3.345, -3.206) on modelNode, beside the handlebar contacts
-    BikeA604* wrecker;  // +0x604  Wrecker (SetupWrecker with rider.col, StartAnimatedWreck); RaceView/BikeRace +0x604 wrecker
+    Wrecker* wrecker;  // +0x604  Wrecker (SetupWrecker with rider.col, StartAnimatedWreck); RaceView/BikeRace +0x604 wrecker
     Vehicle* linkedVehicle;  // +0x608 cleared in ctor and reset (lines near linkedVehicle = 0), set reciprocally in the slot 38 pairing code: linkedVehicle = other; ((Bike*)other)->linkedVehicle = this
     BikeA60C* handlebars;          // +0x60c BikeA60C("Handlebars", model, steerState); the steer axis runs from the front wheel to its node; cleared in the ctor; ~Bike calls 0x00464e90 on it, then operator delete
     Vec3 steerTorqueGains;  // +0x610  per-axis gains of the steering torque integrator (Method_0x0040a520)

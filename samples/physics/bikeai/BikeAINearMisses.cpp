@@ -147,6 +147,7 @@
 #include "../../../src/reconstructed/TrackGame.h"
 #include "../../../src/krusty2/vehicle/BikeAI.cpp"
 #include "vehicle/KrustyBike.h"
+#include "../../../src/reconstructed/Wrecker.h"
 #include "collision/CollisionObject.h"
 #include "broadphase/Quadtree.h"
 #include <math.h>

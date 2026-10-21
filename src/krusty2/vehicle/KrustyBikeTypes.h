@@ -546,14 +546,7 @@ struct KbA5C4 {
     void Fn_004A8BF0(int a, float b);   // 0x004A8BF0 (ret 8): same as D3DIMSoultreeCharacter::Method_0x004a8bf0
     void ApplyRestPose();               // 0x004A8B00 (Character::ApplyRestPose)
 };
-struct KbA604 {
-    void AddContactAnimation(KbAnim* a);
-    void AddRandomAnimation(KbAnim* a);
-    void AddIndexedAnimation(KbAnim* a);
-    void AddIgnoredObject(BikeWheel* w);
-    void AddIgnoredObject(CollisionObject* body);   // same 0x00530680 with one of the two collision bodies
-    void SetPushBox(SoultreeObject* node, Vec3 a, Vec3 b);
-};
+
 
 // Session object at KbGame+0x570; 0x0045D2B0 returns the local player record (tier 3 names).
 struct KbMessage;

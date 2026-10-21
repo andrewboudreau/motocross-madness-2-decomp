@@ -5,6 +5,7 @@
 #include <string.h>
 #include "vehicle/Bike.h"
 #include "collision/CollisionObject.h"
+#include "../../reconstructed/Wrecker.h"
 
 // The loader compares the wheel names with the library strcmp (0x00536070), not the
 // intrinsic expansion.
@@ -26,7 +27,7 @@ float Bike::UnknownVirtualSlot47(float)
 
 int Bike::UnknownVirtualSlot98()
 {
-    if (crashState && wrecker->a_0x44)
+    if (crashState && wrecker->wreckState)
         return 1;
     return 0;
 }
@@ -849,12 +850,12 @@ int Bike::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,
     Matrix4 tmp;
     RunTickers();
     int r = Vehicle::UnknownVirtualSlot33(a, b, c, d, e, f);
-    int mode = wrecker->a_0x44;
+    int mode = wrecker->wreckState;
     if (mode == 0 || mode == 1) {
         modelNode->GetMatrixIn(0, &tmp);
         riderCharacter->c_0x1a0->SetMatrixIn(0, &tmp);
     }
-    wrecker->a_0x38->Method_0x00435fe0();
+    ((BikeA38*)wrecker->collisionModel)->Method_0x00435fe0();
     return r;
 }
 
@@ -939,10 +940,10 @@ int Bike::UnknownVirtualSlot39(float arg)
     if (r)
         return r;
     if (crashState) {
-        if (crashTimer != 0.0f && wrecker->a_0xac) {
+        if (crashTimer != 0.0f && wrecker->hadContact) {
             crashTimer -= reinterpret_cast<BikeGlobal_0056e26c*>(g_TrackGame)->g_0x2f0;
             if (crashTimer > crashGraceTime) {
-                wrecker->a_0xac = 0;
+                wrecker->hadContact = 0;
             } else if (crashTimer <= 0.0f) {
                 if (crashTimer == 0.0f)
                     crashTimer = -0.1f;
@@ -1044,7 +1045,7 @@ void Bike::UnknownVirtualSlot29(int)
         OrientationAnglesFromVectors(savedForward, savedUp, &savedYaw, &savedPitch, &savedRoll,
                             &savedSinRoll, &savedCosRoll, &savedCosPitch, &savedSinPitch);
     }
-    int mode = wrecker->a_0x44;
+    int mode = wrecker->wreckState;
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);
@@ -1128,7 +1129,7 @@ void Bike::UnknownVirtualSlot102(float)
     float w = 1.0f - poseBlend;
     riderCharacter->Method_0x004a8c50(riderPoseHandles[idx], riderPoseHandles[next], poseParam, w);
     D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, w);
-    int mode = wrecker->a_0x44;
+    int mode = wrecker->wreckState;
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);
@@ -1299,21 +1300,21 @@ static inline float BikeMagnitude(const Vec3& v)
 // call does not reproduce the bytes.
 static __forceinline void BikeAttachBone(Bike* self, const char* name, float x, float y, float z)
 {
-    Vec3 offset;
+    Vector3 offset;
     offset.x = x;
     offset.y = y;
     offset.z = z;
-    int bone = self->wrecker->a_0x34->r_0x1a0->FindByName(name);
+    int bone = ((BikeA34*)self->wrecker->character)->r_0x1a0->FindByName(name);
     self->wrecker->AddProbe(offset, bone);
 }
 
 void Bike::UnknownVirtualSlot97()
 {
-    wrecker = new(__FILE__, 2023) BikeA604(1);
-    if (wrecker->SetupWrecker(GameObject::renderContext, riderCharacter, "rider.col")) {
+    wrecker = new(__FILE__, 2023) Wrecker(1);
+    if (wrecker->SetupWrecker(GameObject::renderContext, (UnknownWreckerCharacter*)riderCharacter, "rider.col")) {
         GameObject::AppendChild((GameObject*)wrecker, -1);
-        wrecker->a_0x38->n_0xe4 = ((BikeA1F4*)terrain);
-        wrecker->a_0x38->n_0x64 = 0x65;
+        ((BikeA38*)wrecker->collisionModel)->n_0xe4 = ((BikeA1F4*)terrain);
+        ((BikeA38*)wrecker->collisionModel)->n_0x64 = 0x65;
         BikeAttachBone(this, "Pelvis", 0.0f, 0.0f, -0.35f);
         BikeAttachBone(this, "UprTorso", 0.0f, 0.0f, 0.0f);
         BikeAttachBone(this, "Head", 0.0f, 0.75f, 0.0f);
@@ -1329,7 +1330,7 @@ void Bike::UnknownVirtualSlot97()
         BikeAttachBone(this, "LwrLegR", 0.0f, 0.0f, 0.0f);
         BikeAttachBone(this, "FootR", 0.0f, -0.5f, 0.75f);
         BikeAttachBone(this, "FootR", 0.0f, -1.0f, 0.0f);
-        wrecker->a_0x11c = field_0x124;
+        wrecker->particles = (UnknownWreckerParticles*)field_0x124;
     }
 }
 
@@ -1342,9 +1343,9 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
     // the loaded crashState still in eax).
     if (crashState != 0)
         return crashState;
-    BikeA604* rider = wrecker;
-    if (rider->a_0xd8) {
-        scratchVector = rider->a_0x34->r_0x1a0->d_0x140->WorldToLocalPoint(rider->a_0xdc);
+    Wrecker* rider = wrecker;
+    if (rider->anyProbeHit) {
+        scratchVector = ((BikeA34*)rider->character)->r_0x1a0->d_0x140->WorldToLocalPoint(reinterpret_cast<const Vec3&>(rider->hitCenter));
         if (scratchVector.y > 1.0f) {
             if (scratchVector.x < -1.0f) {
                 crashDirection = 5;

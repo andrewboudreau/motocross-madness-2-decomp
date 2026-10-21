@@ -446,7 +446,8 @@ python tools/run_physics_samples.py --strict --root src/krusty2/vehicle \
 ```
 
 This run reports `139/164 strict exact` with no required failures (`0x409420` is
-strict exact since the BikeA604 constructor call is bound to `0x0052ff90`).
+strict exact with its canonical Wrecker constructor call bound to `0x0052ff90`;
+see [Bike/Wrecker connections](BIKE_WRECKER_CONNECTIONS.md)).
 
 ## SoulTreePhysics round-out
 

@@ -3,6 +3,18 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/game/RecordExceptionInfo.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete crash filter checked in 13838 native differential scenarios, including both SEH regions and one-shot state. VC6 emits 1277 bytes versus 1290 retail bytes; the stack-base load uses the paired OS backend.",
+      "evidence": "docs/EXCEPTIONHANDLER.md#functional-build-review"
+    },
+    {
+      "path": "samples/game/ThreadStackBase.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Ordinary-C++ stack-base backend dynamically calls the current OS NtCurrentTeb export. 1536 native main/worker/fiber checks match independent OS bounds; both unavailable-backend paths raise into the reporter's guarded stack-dump failure path.",
+      "evidence": "docs/EXCEPTIONHANDLER.md#functional-build-review"
+    },
+    {
       "path": "samples/game/GameTick.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete Tick and profiler calibration checked in 39376 native differential scenarios; QPC replaces the four retail RDTSC boundaries consistently. Gameplay retains ReadClock. VC6 emits 716/204 bytes versus 683/196 retail bytes.",

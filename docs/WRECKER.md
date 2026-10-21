@@ -29,7 +29,8 @@ relocation resolved by the bindings. Two near misses are parked in
   dispatch used by these callers.
 - Confirmed: Bike slot 97 (`0x00409420`) allocates 0x53c bytes and calls the
   constructor `0x0052ff90` with 1, then `0x00530190` with "rider.col"
-  (`src/krusty2/vehicle/Bike.cpp`, its `BikeA604` view of this class).
+  (`src/krusty2/vehicle/Bike.cpp`, now using the canonical Wrecker class;
+  see [the Bike caller connections](BIKE_WRECKER_CONNECTIONS.md)).
 - Strong inference (TU extent): the linker placed the objects in name order
   and wrecker.cpp is the last `__FILE__` name. `.CRT$XCU` lists the
   previous TU's initializers (`0x0052fdc0`, `0x0052fe10`, `0x0052fe60`,
@@ -56,8 +57,73 @@ relocation resolved by the bindings. Two near misses are parked in
   `+0x11c` receives Bike's particle manager (`0x004baa50` is
   `ParticleManager::AddParticle` in `src/krusty2/effects`). The scene-node
   calls `0x004fc690`..`0x004fe850` are the SoultreeObject helpers documented
-  in `src/krusty2/core/SoultreeObject.h`. They are declared here as
-  `UnknownWreckerSkeleton` with address names.
+  in `src/krusty2/core/SoultreeObject.h`. `UnknownWreckerSkeleton` now aliases
+  that shared class instead of declaring separate methods.
+
+## Shared model and motion calls
+
+Wrecker's rider pointer uses the existing `D3DIMSoultreeCharacter` declaration
+through the compatibility alias `UnknownWreckerCharacter`. Its primary
+Character subobject remains at offset zero; the GameObject base stays virtual.
+The read/write sites agree with `currentMotion` at `+0x18`, `currentFrame` at
+`+0x1c`, `blendActive` at `+0x34`, `poseList` at `+0x190`, and D3DIM's
+`modelNode` at `+0x1a0`. Calls to Character's slot 7 still dispatch through
+the primary vtable at `+0x1c`, with the same float argument bits. No conversion
+to the virtual GameObject base is inserted at these calls.
+
+The scene-node pointer is the complete SoultreeObject start. Its actual
+GameObject subobject is at `+0xc`; Wrecker calls its nonvirtual helpers and
+uses the existing flat declaration, so no base-pointer conversion is needed.
+The `firstChild` and `subtreeDirty` accesses stay at `+0x140` and `+0x18c`.
+
+Twelve existing source bodies now satisfy thirteen former decorated aliases
+(the two local GetMatrixIn output types converge on one Matrix4 signature):
+
+| Retail VA | Bytes | Shared provider |
+|---|---:|---|
+| `0x004a8ac0` | 59 | Character::ApplyPoseListSlot6 |
+| `0x004a8b10` | 33 | Character::SetMotionByName |
+| `0x004a8b40` | 27 | Character::SetMotion |
+| `0x004a8b80` | 107 | Character::BlendToMotion(Motion*, float) |
+| `0x004fc690` | 175 | SoultreeObject::TranslateIn |
+| `0x004fc740` | 265 | SoultreeObject::SetPositionInFrame |
+| `0x004fc890` | 222 | SoultreeObject::SetPositionIn |
+| `0x004fc9a0` | 134 | SoultreeObject::GetPositionIn |
+| `0x004fca80` | 494 | SoultreeObject::GetMatrixIn |
+| `0x004fcc70` | 109 | SoultreeObject::ResetMatrices |
+| `0x004fd660` | 168 | SoultreeObject::LocalToWorldPoint |
+| `0x004fe850` | 74 | SoultreeObject::GetSubtreeBounds |
+
+Two additional aliases now name the shared SetMatrixIn (`0x004fb8c0`) and
+WorldToLocalDirection (`0x004fd710`) methods. Both bodies remain in samples
+and their canonical symbols were already unresolved elsewhere; this change
+does not supply those implementations. The retained PushProbesOutOfBox sample
+also calls the shared WorldToLocalPoint declaration.
+
+Wrecker retains its local Vector3 and row-oriented frame/matrix views.
+Explicit boundary casts preserve the same 12-byte vectors and 64-byte
+matrices, including the hidden result buffer used by vector-returning
+methods. The shared Vec3 declaration is available through the narrow
+`math/Vec3.h`; its body is unchanged, and Math3D's operators and per-unit
+constants remain in Math3D.h. Wrecker therefore keeps its original four
+Vector3 initializers. Motion arrays and pending-animation fields retain their
+existing integer pointer-bit representation, converted to `Motion*` at the
+Character calls. The narrow frame-count/FPS read view is checked against
+the actual Motion layout; other motion fields are not inferred here.
+
+`tests/test_wrecker_model_connections.py` compiles the actual Wrecker,
+SoultreeObject and Character source units under VC6 SP3. It verifies all
+29 registered Wrecker cases plus the folded five-byte slot-14 body, the
+twelve complete providers with resolved relocations, actual COFF imports,
+and the relevant field/argument layouts. This covers the 4178-byte update's
+hidden-result calls and the 995-byte body-creation routine. No new method
+body, wrapper, RTTI identity or original source ownership is claimed.
+
+```powershell
+$env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path
+$env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
+python -m unittest discover -s tests -p test_wrecker_model_connections.py -v
+```
 
 ## Layout (Wrecker, 0x53c bytes)
 
@@ -174,24 +240,16 @@ near miss `0x00531740` `SprayContactParticles`. The list appenders
 `0x005305b0`..`0x00530680` are `AddContactAnimation`, `AddRandomAnimation`,
 `AddIndexedAnimation` and `AddIgnoredObject`.
 
-Calls into code another unit owns now use that unit's canonical name where
-krusty2 already names the address and no other lane's header shares the
-declaration: `AddIgnoredOwner` `0x00439410`, `SoultreeObject`'s
-`SetMatrixIn` `0x004fb8c0`, `SetPositionIn` `0x004fc890`, `TranslateIn`
-`0x004fc690`, `GetPosition` `0x004fc970` and `GetAxes` `0x004fc4f0`,
-`Vec3ScaleCall` `0x005015b0` and `FastInvSqrt` `0x00460c00` (in the Wrecker,
-CarProcedural, BikeRace, Krusty3DObjects, RaceSound, VehicleCamera,
-FollowCamera and D3DIMSoulTree views). `FastSqrt` `0x00460b50`, `FindByName`
-`0x004fdae0`, `GetPositionIn` `0x004fc9a0`, `CountNodes` `0x004fda30`,
-`SetPosition` `0x004fc660`, `QueryGround` `0x00507c10` and `SelectQuality`
-`0x00507960` keep their address names because AuralScape.cpp, BikeCamera.cpp,
-ArcadeObject.cpp, QuarryStuntEvent.cpp or a game sample reach them through
-these headers.
+Model and motion calls now use the shared declarations listed above.
+Complete caller and provider comparisons establish their retail destinations;
+semantic method names remain provisional. The remaining rigid-body, gravity,
+collision-model and particle views are outside this declaration consolidation.
 
 ## Remaining uncertainty
 
-All method and class names are provisional, as are the field names above
-that come from data flow rather than literal strings. Field meanings beyond the offsets above are
+RTTI establishes the class names cited in the evidence section. Semantic
+method names and field names inferred from data flow remain provisional.
+Field meanings beyond the offsets above are
 inferred from the decoded data flow. Whether `+0x34` belongs to GraphicsTest
 (the krusty2 tree gives GraphicsTest a `+0x34` field) is open. The X-axis
 clip in `0x005329e0` reads the previous position's `y`; that is what retail
@@ -201,9 +259,9 @@ does, not a reconstruction error.
 
 ```bash
 python tools/compile.py --compiler vc6 --vc6-root "$VC6_ROOT" --profile vc6_o2_mt \
-  src/reconstructed/Wrecker.cpp -o work/wrecker.obj
+  src/reconstructed/Wrecker.cpp -o work/wrecker.obj --include src/krusty2
 python tools/match.py --exe "$MCM2_EXE" --target-va 0x005301c0 --target-size 995 \
   --obj work/wrecker.obj \
-  --symbol '?CreateBodies@Wrecker@@QAEXPAVUnknownWreckerCharacter@@PBD@Z' \
+  --symbol '?CreateBodies@Wrecker@@QAEXPAVD3DIMSoultreeCharacter@@PBD@Z' \
   --bindings src/reconstructed/Wrecker.bindings.json --json
 ```

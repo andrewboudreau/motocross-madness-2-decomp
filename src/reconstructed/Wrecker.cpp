@@ -2,6 +2,7 @@
 // See Wrecker.h and docs/WRECKER.md.
 
 #include "Wrecker.h"
+#include "../krusty2/core/SoultreeObject.h"
 
 #include <stdlib.h>
 
@@ -69,14 +70,14 @@ Wrecker* Wrecker::SetupWrecker(void* owner, UnknownWreckerCharacter* rider, cons
 
 void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
     character = rider;
-    rider->skeleton->TranslateIn(0, Vector3(0.0f, 120.0f, 0.0f));
+    rider->modelNode->TranslateIn(0, Vec3(0.0f, 120.0f, 0.0f));
     gravityModel = new (__FILE__, 0x5b) UnknownWreckerGravityModel(1);
     gravityModel->SetRenderContext(renderContext);
     AppendChild(gravityModel, -1);
     rigidBody = new (__FILE__, 0x5f) UnknownWreckerRigidBody(1);
     rigidBody->SetRenderContext(renderContext);
     AppendChild(rigidBody, -1);
-    rigidBody->UnknownVirtualSlot28(character->skeleton);
+    rigidBody->UnknownVirtualSlot28(character->modelNode);
     gravityModel->UnknownVirtualSlot27(rigidBody);
     collisionModel = new (__FILE__, 0x68) UnknownWreckerCollisionModel(1);
     collisionModel->SetRenderContext(renderContext);
@@ -97,13 +98,13 @@ void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
     rigidBody->isEnabled = 0;
     rigidBody->initialAngularVelocity = Vector3(0.0f, 0.0f, 0.0f);
     rigidBody->initialVelocity = Vector3(0.0f, 0.0f, 0.0f);
-    character->skeleton->subtreeDirty = 1;
+    character->modelNode->subtreeDirty = 1;
     character->SetMotionByName("Fall02");
     UpdateInertia();
     rigidBody->UnknownVirtualSlot34(&Vector3(0.0f, 0.0f, 0.0f));
     rigidBody->UnknownVirtualSlot33(&Vector3(0.0f, 0.0f, 0.0f));
     rigidBody->UnknownVirtualSlot44();
-    poseNode = character->skeleton->firstChild;
+    poseNode = character->modelNode->firstChild;
     collisionModel->manualStep = 1;
     rigidBody->stepDisabled = 1;
     gravityModel->manualStep = 1;
@@ -289,10 +290,10 @@ int Wrecker::Tick(float frameTime) {
         RebuildPoseSteps();
         linearStep = linearStep * (1.0f / frameTime);
         angularStep = angularStep * (1.0f / frameTime);
-        poseNode->GetMatrixIn(0, &lastPose);
+        poseNode->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&lastPose));
     } else {
         if (pendingAnimation && !character->blendActive) {
-            character->BlendToMotion(pendingAnimation, 0.5f);
+            character->BlendToMotion(reinterpret_cast<Motion*>(pendingAnimation), 0.5f);
             pendingAnimation = 0;
             if (tumbleStarted == 0 && blendStarted == 0) {
                 blendStarted = 1;
@@ -323,9 +324,9 @@ int Wrecker::Tick(float frameTime) {
             PushProbesOutOfBox(step);
             if (wreckState != 1) {
                 Vector3 position;
-                rigidBody->node->GetPositionIn(0, &position);
+                rigidBody->node->GetPositionIn(0, reinterpret_cast<Vec3*>(&position));
                 position += pushImpulse;
-                rigidBody->node->SetPositionInFrame(0, &position);
+                rigidBody->node->SetPositionInFrame(0, reinterpret_cast<const Vec3*>(&position));
             }
             collisionModel->UnknownFunctionStep(step);
             remaining -= step;
@@ -340,8 +341,8 @@ int Wrecker::Tick(float frameTime) {
         }
         if (wreckState) {
             if (wreckState == 1) {
-                UnknownWreckerMotion* motion = character->currentMotion;
-                if ((float)(motion->frameCount - character->currentFrame->frame) / motion->fps < 0.5f) {
+                UnknownWreckerMotion* motion = reinterpret_cast<UnknownWreckerMotion*>(character->currentMotion);
+                if ((float)(motion->frameCount - character->currentFrame->frameIndex) / motion->fps < 0.5f) {
                     ContinueAsTumble();
                     RebuildPoseSteps();
                     linearStep = linearStep * (1.0f / frameTime);
@@ -349,7 +350,7 @@ int Wrecker::Tick(float frameTime) {
                     rigidBody->UnknownVirtualSlot44();
                     rigidBody->velocity = linearStep;
                     rigidBody->prevVelocity = linearStep;
-                    rigidBody->angularVelocity = rigidBody->node->WorldToLocalDirection(angularStep);
+                    rigidBody->angularVelocity = reinterpret_cast<const Vector3&>(rigidBody->node->WorldToLocalDirection(reinterpret_cast<const Vec3&>(angularStep)));
                 }
             }
             if (blendStarted && !character->blendActive) {
@@ -362,8 +363,8 @@ int Wrecker::Tick(float frameTime) {
                 angularStep = angularStep * (1.0f / frameTime);
                 poseStepsPending = 0;
             }
-            poseNode->GetMatrixIn(0, &lastPose);
-            character->UnknownVirtualSlot7(frameTime, 0, 0);
+            poseNode->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&lastPose));
+            character->CharacterVirtualSlot7(frameTime, 0, 0);
         }
     }
     if (carryRiderPose) {
@@ -371,19 +372,19 @@ int Wrecker::Tick(float frameTime) {
         // the pose lastPose was taken, then re-orthonormalise its axes.
         UnknownWreckerMatrix pose;
         UnknownWreckerMatrix relative;
-        poseNode->GetMatrixIn(0, &pose);
+        poseNode->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&pose));
         UnknownWreckerFrame* frame = &lastPose;
         Vector3 oldPosition = WreckerCopy(frame->position);
         WreckerInvertRigid(&pose);
         WreckerMatrixProduct(&relative, *(UnknownWreckerMatrix*)frame, pose);
-        character->skeleton->GetMatrixIn(0, &pose);
+        character->modelNode->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&pose));
         WreckerMatrixProduct(&pose, relative, pose);
         WreckerOrthonormalize(&pose);
-        character->skeleton->SetMatrixIn(0, &pose);
+        character->modelNode->SetMatrixIn(0, reinterpret_cast<Matrix4*>(&pose));
         Vector3 position;
-        poseNode->GetPositionIn(0, &position);
+        poseNode->GetPositionIn(0, reinterpret_cast<Vec3*>(&position));
         Vector3 delta = WreckerSubtractValue(oldPosition, position);
-        character->skeleton->SetPositionIn(0, &delta);
+        character->modelNode->SetPositionIn(0, reinterpret_cast<const Vec3*>(&delta));
         carryRiderPose = 0;
     }
     UpdateInertia();
@@ -441,7 +442,7 @@ void Wrecker::EmitProbeTrail(Vector3 from, Vector3 to, float frameTime) {
 void Wrecker::EmitProbeEffects(float frameTime) {
     for (int i = 0; i < collisionModel->probeCount; i++) {
         if (collisionModel->probes[i].hit) {
-            Vector3 point = collisionModel->probes[i].node->LocalToWorldPoint(collisionModel->probes[i].localPoint);
+            Vector3 point = reinterpret_cast<const Vector3&>(collisionModel->probes[i].node->LocalToWorldPoint(reinterpret_cast<const Vec3&>(collisionModel->probes[i].localPoint)));
             EmitProbeTrail(probePositions[i], point, frameTime);
             SprayContactParticles(probePositions[i], point, collisionModel->probes[i].normal, frameTime);
         }
@@ -450,7 +451,7 @@ void Wrecker::EmitProbeEffects(float frameTime) {
 
 void Wrecker::UpdateInertia() {
     Vector3 size;
-    character->skeleton->GetSubtreeBounds(&rigidBody->centerOfMass, &size);
+    character->modelNode->GetSubtreeBounds(reinterpret_cast<Vec3*>(&rigidBody->centerOfMass), reinterpret_cast<Vec3*>(&size));
     rigidBody->inertia(0, 0) = (size.y * size.y + size.z * size.z) * inertiaFactor;
     rigidBody->inertia(1, 1) = (size.x * size.x + size.z * size.z) * inertiaFactor;
     rigidBody->inertia(2, 2) = (size.x * size.x + size.y * size.y) * inertiaFactor;
@@ -466,7 +467,7 @@ void Wrecker::StartAnimatedWreck(int index) {
     collisionModel->collisionEnabled = 1;
     collisionModel->collidable = 1;
     collisionModel->applyImpulses = 1;
-    character->SetMotion(indexedAnimations[index]);
+    character->SetMotion(reinterpret_cast<Motion*>(indexedAnimations[index]));
     wreckState = 1;
     rigidBody->isEnabled = 0;
     rigidBody->UnknownVirtualSlot44();
@@ -483,14 +484,14 @@ void Wrecker::StartTumble() {
     collisionModel->collidable = 1;
     collisionModel->applyImpulses = 1;
     wreckState = 2;
-    character->BlendToMotion(randomAnimations[(int)(RANDOM_UNIT() * randomAnimationCount)], 0.5f);
+    character->BlendToMotion(reinterpret_cast<Motion*>(randomAnimations[(int)(RANDOM_UNIT() * randomAnimationCount)]), 0.5f);
     blendStarted = 1;
     poseStepsPending = 1;
     rigidBody->isEnabled = 1;
     rigidBody->UnknownVirtualSlot44();
     rigidBody->velocity = linearStep;
     rigidBody->prevVelocity = linearStep;
-    rigidBody->angularVelocity = rigidBody->node->WorldToLocalDirection(angularStep);
+    rigidBody->angularVelocity = reinterpret_cast<const Vector3&>(rigidBody->node->WorldToLocalDirection(reinterpret_cast<const Vec3&>(angularStep)));
     for (int i = 0; i < collisionModel->probeCount; i++)
         probePositions[i] = Vector3(0.0f, 0.0f, 0.0f);
     hadContact = 0;
@@ -501,7 +502,7 @@ void Wrecker::ContinueAsTumble() {
     wreckState = 2;
     pendingAnimation = randomAnimations[(int)(RANDOM_UNIT() * randomAnimationCount)];
     if (!character->blendActive) {
-        character->BlendToMotion(pendingAnimation, 0.5f);
+        character->BlendToMotion(reinterpret_cast<Motion*>(pendingAnimation), 0.5f);
         pendingAnimation = 0;
         if (blendStarted) {
             carryRiderPose = 1;
@@ -540,7 +541,7 @@ inline Vector3 WreckerCross(const Vector3& a, const Vector3& b) {
 void Wrecker::RebuildPoseSteps() {
     UnknownWreckerFrame pose;
     linearStep = WreckerCopy(lastPose.position);
-    poseNode->GetMatrixIn(0, &pose);
+    poseNode->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&pose));
     linearStep = pose.position - linearStep;
     Vector3 forward = WreckerCopy(lastPose.forward);
     const Vector3& target = pose.forward;
@@ -576,8 +577,8 @@ void Wrecker::EndWreck() {
         g_collisionQuadTree->Remove(collisionModel, collisionModel->quadtreeCell);
         pendingAnimation = 0;
         skipProbeEffects = 1;
-        character->skeleton->ResetMatrices();
-        character->ApplyPoseListSlot6(&character->restPoseList, 0);
+        character->modelNode->ResetMatrices();
+        character->ApplyPoseListSlot6(&character->poseList, 0);
         UpdateInertia();
     }
 }

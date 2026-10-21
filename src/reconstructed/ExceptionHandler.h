@@ -11,8 +11,8 @@
 #include <windows.h>
 
 // 0x0045ff80: the __except filter of the program's thread wrappers
-// (0x004a0c19 passes "main thread"). Not reconstructed: its stack dump
-// reads the stack top with inline assembly (mov eax, fs:[4]).
+// (0x004a0c19 passes "main thread"). The reviewed nonexact candidate in
+// samples/game uses an OS backend for the original FS:[4] stack-base read.
 int __cdecl RecordExceptionInfo(PEXCEPTION_POINTERS data, const char* Message);
 
 void hprintf(HANDLE LogFile, char* Format, ...);               // 0x00460490

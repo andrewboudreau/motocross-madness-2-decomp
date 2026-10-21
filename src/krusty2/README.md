@@ -176,8 +176,8 @@ hid it.
 
 No strict failures remain under `src/krusty2`. The last missing bindings were the
 BlockAllocator::Reset call in Quadtree.cpp (0x00424110, a strict calibration target)
-and the BikeA604 constructor called from Bike slot 97 (0x0052ff90, the reviewed Wrecker
-constructor binding); the Bike.cpp target 0x00409420 is now `expect: "exact"`.
+and the Wrecker constructor called from Bike slot 97 (0x0052ff90; now the
+canonical Wrecker declaration, see docs/BIKE_WRECKER_CONNECTIONS.md); the Bike.cpp target 0x00409420 is now `expect: "exact"`.
 
 The CollisionFileStream constructor 0x460d10 and destructor 0x460d60 are now bound as the
 direct call targets of 0x00432800 (a 0x134-byte object from `new(__FILE__, 0x12f)`, opened

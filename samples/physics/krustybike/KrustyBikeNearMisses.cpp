@@ -1381,7 +1381,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
             D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, w);
         }
     }
-    int mode = wrecker->a_0x44;
+    int mode = wrecker->wreckState;
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);

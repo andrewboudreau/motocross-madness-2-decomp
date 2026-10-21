@@ -41,7 +41,8 @@ public:
     virtual int UnknownVirtualSlot11(float step);
 };
 
-struct UnknownWreckerSkeleton;
+class SoultreeObject;
+typedef SoultreeObject UnknownWreckerSkeleton;
 
 // 32-byte probe record of the collision model (+0x104, count +0x100). Field
 // names follow ConstraintProbe in src/krusty2/constraint/ConstraintMethodCollisionModel.h.
@@ -113,27 +114,9 @@ struct UnknownWreckerMatrix {
     float _41, _42, _43, _44;
 };
 
-// Scene-graph node (0x004fxxxx methods; the rider's +0x1a0, the rigid
-// body's +0x234 and Wrecker+0xb8 all point at one). Method names provisional;
-// the two field names follow SoultreeObject in src/krusty2/core/SoultreeObject.h.
-struct UnknownWreckerSkeleton {
-    void TranslateIn(UnknownWreckerSkeleton* frame, Vector3 delta); // 0x004fc690 (ret 0x10)
-    void SetPositionInFrame(UnknownWreckerSkeleton* frame, Vector3* position); // 0x004fc740 (ret 8)
-    void GetPositionIn(UnknownWreckerSkeleton* frame, Vector3* position); // 0x004fc9a0 (ret 8)
-    void GetMatrixIn(UnknownWreckerSkeleton* frame, UnknownWreckerFrame* out);        // 0x004fca80 (ret 8)
-    void GetMatrixIn(UnknownWreckerSkeleton* frame, UnknownWreckerMatrix* out);       // the same function, for a matrix local
-    void SetMatrixIn(UnknownWreckerSkeleton* frame, UnknownWreckerMatrix* matrix);    // 0x004fb8c0 (ret 8): sets this node's matrix in `frame` space
-    void SetPositionIn(UnknownWreckerSkeleton* frame, const Vector3* offset);           // 0x004fc890 (ret 8): translates by `offset` given in `frame` space
-    void ResetMatrices();                                  // 0x004fcc70
-    Vector3 LocalToWorldPoint(const Vector3& point);           // 0x004fd660 (ret 8)
-    Vector3 WorldToLocalDirection(const Vector3& direction);       // 0x004fd710 (ret 8)
-    Vector3 WorldToLocalPoint(const Vector3& point);           // 0x004fd7f0 (ret 8)
-    void GetSubtreeBounds(Vector3* a, Vector3* b);            // 0x004fe850 (ret 8)
-    unsigned char field_0x000[0x140];
-    UnknownWreckerSkeleton* firstChild; // +0x140
-    unsigned char field_0x144[0x18c - 0x144];
-    int subtreeDirty;          // +0x18c
-};
+// Vector storage shared with the scene-node helpers. The complete scene-node
+// declaration is needed only by Wrecker.cpp; other consumers use pointer types.
+#include "../krusty2/math/Vec3.h"
 
 // The character's current motion (src/krusty2 Motion, Motnctrl.h).
 struct UnknownWreckerMotion {
@@ -143,43 +126,9 @@ struct UnknownWreckerMotion {
     int fps;                           // +0xb4 "FPS"
 };
 
-// The 12-byte pose list at +0x190 (src/krusty2 MotionPoseList).
-struct UnknownWreckerPoseList {
-    int frame;                         // +0x00
-    void* poses;                       // +0x04 0x2c-byte records
-    int count;                         // +0x08
-};
-
-// Object at Wrecker+0x34 (Bike passes its rider character). Its +0x1a0 is
-// the skeleton the probes and the wreck pose are attached to.
-class UnknownWreckerCharacter {
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7(float frameTime, int a, int b);
-
-    // 0x004a8ac0 (ret 8): passes each pose of `list` to slot 6 (src/krusty2
-    // Character::ApplyPoseListSlot6).
-    void ApplyPoseListSlot6(UnknownWreckerPoseList* list, int mask);
-    void SetMotionByName(const char* animation);             // 0x004a8b10 (ret 4)
-    void SetMotion(int value);                         // 0x004a8b40 (ret 4)
-    void BlendToMotion(int value, float blend);            // 0x004a8b80 (ret 8)
-
-    unsigned char field_0x004[0x18 - 0x4];
-    UnknownWreckerMotion* currentMotion;      // +0x18 (src/krusty2 Character::currentMotion)
-    UnknownWreckerPoseList* currentFrame;     // +0x1c the motion's frame being played
-    unsigned char field_0x020[0x34 - 0x20];
-    int blendActive;                          // +0x34 set by BlendToMotion, cleared by SetMotion
-    unsigned char field_0x038[0x190 - 0x38];
-    UnknownWreckerPoseList restPoseList; // +0x190 rest pose list (src/krusty2 Character::poseList)
-    unsigned char field_0x19c[0x1a0 - 0x19c];
-    UnknownWreckerSkeleton* skeleton; // +0x1a0
-};
+// Rider is the primary Character/D3DIM subobject; its GameObject base remains virtual.
+#include "../krusty2/motion/D3DIMSoultreeCharacter.h"
+typedef D3DIMSoultreeCharacter UnknownWreckerCharacter;
 
 // Object at Wrecker+0x40: RTTI PhysicsRigidBody (new 0x2a8 at line 0x5f,
 // constructor 0x004cc120). Slots past GameObject's 27 are called by number.

@@ -28,23 +28,7 @@
 #ifndef MCM2_PHYSICS_COMMON_MATH3D_H
 #define MCM2_PHYSICS_COMMON_MATH3D_H
 
-struct Vec3 {
-    float x, y, z;
-
-    Vec3() {}
-    Vec3(float x_, float y_, float z_) { x = x_; y = y_; z = z_; }
-    // d3dvec.inl's single-value constructor; the chained assignment stores z, y, x
-    // (Vehicle slot 7's single-wheel branch).
-    Vec3(float f) { x = y = z = f; }
-
-    float& operator[](int i) { return (&x)[i]; }
-    const float& operator[](int i) const { return (&x)[i]; }
-
-    Vec3& operator+=(const Vec3& v) { x += v.x; y += v.y; z += v.z; return *this; }
-    Vec3& operator-=(const Vec3& v) { x -= v.x; y -= v.y; z -= v.z; return *this; }
-    Vec3& operator*=(float s) { x *= s; y *= s; z *= s; return *this; }
-    Vec3& operator/=(float s) { x /= s; y /= s; z /= s; return *this; }
-};
+#include "Vec3.h"
 
 inline Vec3 operator-(const Vec3& v) { return Vec3(-v.x, -v.y, -v.z); }
 inline Vec3 operator+(const Vec3& a, const Vec3& b) { return Vec3(a.x + b.x, a.y + b.y, a.z + b.z); }
