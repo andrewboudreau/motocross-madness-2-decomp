@@ -30,7 +30,10 @@
 // join), so the branch went late while the x87 compare stayed. Also kept
 // with a leftover store or branch: `stage = 3; if (g*4 >= detail) stage = 3;`
 // (264), `if (g*4 < detail) detail = 10000.0f;` (267); folded entirely: an
-// empty `if`, `?:` with equal arms, a clamp of a stage 4, `block = 0`.
+// empty `if`, `?:` with equal arms, a clamp of a stage 4, `block = 0`,
+// an inline helper returning the stage (with or without the final else),
+// a reversed fourth compare and a local holding 3 (s15 reference diff:
+// the missing g*4.0f loads and `test ah, 1` are this compare).
 //
 // 0x0047d470 (783 bytes; 313 of 786): identical control flow and calls;
 // retail keeps the row (y & 15) in eax, the head length in edx and the run
