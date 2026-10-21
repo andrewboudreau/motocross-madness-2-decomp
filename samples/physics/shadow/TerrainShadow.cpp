@@ -386,10 +386,17 @@ full:
 // Lead (not taken): `right` and `up` declared once at function scope and assigned in both
 // modes give retail's temporary-then-copy stores for both and its `add ecx, 0x188` for up
 // (3088 bytes, 745 aligned instructions with registers and displacements masked against 730
-// here), but the cell pointer then takes the slot below the up temporary and eye (retail:
-// up temporary 0x24, eye 0x30, cell 0x3c) and eax/ecx swap throughout (227/3088).  Typedef
-// shifts of 0..62 do not move it; eye = eye + ..., named-result products and declaration
-// placement change nothing or the size.
+// here), but eax/ecx swap throughout (227/3088).  Typedef shifts of 0..62 do not move it;
+// eye = eye + ..., named-result products and declaration placement change nothing or the size.
+// Retail's frame, from the call arguments (offsets from esp after the prologue): `hit` 0x24
+// and `cell` 0x3c in both modes, screen 0xc, code 0x58, eye 0x30, up 0x40, right 0x4c, the
+// mode 2 step 0xc4 and the mode 2 sum/difference results at 0 and 0x18.  The two modes
+// sharing hit and cell fits one function-scope pair: with that pair and the lead, the
+// registers-masked difference is 287 instructions (1108 here; size 3088), and what is left
+// of the frame is eye after cell (0x34, cell 0x30) and 8 bytes of select temporaries for the
+// mode 1 0x6670/0x6674 minimum and maximum between eye and up, which push up, right and code
+// 8 bytes out (retail selects all four on the x87 stack; its 8 bytes sit at 0x8c, after the
+// corners).
 // s15 reference diff: the missing 5.0f load and `test ah, 0x41` are retail's second footprint
 // test (each mode keeps its own copy, the mode 2 one after `pop ebp`); VC6 here keeps the screen
 // rectangle on the x87 stack and cross-jumps the two into one.  The 0x17c/0x188 immediates are
