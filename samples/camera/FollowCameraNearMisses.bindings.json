@@ -29,7 +29,7 @@
   "?Vec3ScaleCall@@YA?AUVector3@@ABU1@M@Z": "0x005015b0",
   "?Vec3Normalize@@YA?AUVector3@@ABU1@@Z": "0x005087b0",
   "?CrossProduct@@YA?AUVector3@@ABU1@0@Z": "0x00515600",
-  "?ProjectPoint@UnknownFollowCameraProjector@@QAEHPAVCamera@@PBXPBUVector3@@PAU3@PAH@Z": "0x0052f340",
+  "?ProjectPoint@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityMatrix@@PBUVisibilityBoxVec@@PAU4@PAI@Z": "0x0052f340",
   "?Tick@Camera@@UAEHM@Z": "0x0042e690",
   "?OnControlPress@Camera@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x0042f090",
   "?OnControlPress@FollowCamera@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x00466ad0",

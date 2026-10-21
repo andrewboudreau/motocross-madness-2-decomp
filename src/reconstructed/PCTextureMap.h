@@ -11,8 +11,7 @@
 // recreates a surface. Storage is supplied by GraphicsState.cpp.
 extern int g_DebugCountTextureMemory;
 
-// Lzw.cpp (cdecl 0x004a03d0): expands `source` into `size` bytes.
-void ExpandLzw(void* destination, void* source, int size);
+#include "Lzw.h"
 
 // bmpfile.cpp (cdecl): 0x004245f0 describes an 8-bit bitmap and 0x00424380
 // writes it (the level dump).

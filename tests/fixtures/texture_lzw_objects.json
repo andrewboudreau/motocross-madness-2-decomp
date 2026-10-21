@@ -1,0 +1,17 @@
+{
+  "src/reconstructed/PCTextureMap.cpp": {
+    "sections": 157,
+    "relocations": 462,
+    "sha256": "dae51457619db9fd8f2a4745be4a6a75959cf8816a8ca59ae5b9881a02a3ac6b"
+  },
+  "samples/render/PCTextureMapNearMisses.cpp": {
+    "sections": 7,
+    "relocations": 50,
+    "sha256": "e50259427a9c0e0fc147e39f751fc569ad4adaf6e422574a6e088a72291d84bd"
+  },
+  "src/reconstructed/ProCircuitProcs.cpp": {
+    "sections": 334,
+    "relocations": 2083,
+    "sha256": "f3042c569c3627036805fa1b7b9f1146b8323a606710c683af91dff0d21f2f95"
+  }
+}

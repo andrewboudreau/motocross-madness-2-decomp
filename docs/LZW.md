@@ -61,11 +61,16 @@ that retail links, `0x004a01d0..0x004a05da`. Every function is exact under
 
 ## Remaining uncertainty
 
-Function, variable and field names are provisional (tier 3). The behaviour
-is tier 1. The `GR_BitString` declaration only covers what this TU uses;
-its other virtuals, its field meanings and its own TU are unexamined. The
-original header that supplies the per-TU vectors is not identified; a
-TU-local stand-in type reproduces them.
+Function, variable and field names are provisional (tier 3). The decoded
+instruction behavior is tier 1. `GR_BitString` now has canonical constructor,
+destructor, shared reader state and table definitions; its original TU filename
+remains unknown. The [reviewed nonexact reader](BITSTRING_READ.md) has native
+retail comparisons and source-only decoder integration using the actual
+allocator. Those finite checks do not establish decoding of every real asset.
+The [texture-loader connection](TEXTURE_LZW_CONNECTION.md) preserves both
+compressed-image call sites and their complete caller object. The original
+header supplying the per-TU vectors is still unidentified; a TU-local stand-in
+type reproduces them.
 
 ## Reproduce
 

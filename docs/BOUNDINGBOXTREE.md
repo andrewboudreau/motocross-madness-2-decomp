@@ -37,7 +37,12 @@ Exact: 9 calibration cases. These are the constructor, the destructor and
 its deleting wrapper, slots 0-3, and the whole-word shifts `0x004238c0`
 (`ShiftTowardFront`) and `0x00423940` (`ShiftTowardBack`; provisional names). In `0x004238c0` the fill-only branch counts a separate
 `remaining = words` down (counting `words` itself swaps esi and edi). GR_BitString.h drops the inline `~GR_PixelString`. With it,
-VC6 gives `~GR_BitString` an EH frame that retail lacks. Near misses
-(`samples/render/GR_BitStringNearMisses.cpp`): the two sub-word shift
-helpers, which differ in register swaps and OR operand order. The bit
-reader `0x00423ef0` looks like an `__asm` body and is not attempted.
+VC6 gives `~GR_BitString` an EH frame that retail lacks. The two sub-word
+helpers remain individually reviewed nonexact candidates in
+[`BitStringShifts.cpp`](../samples/render/BitStringShifts.cpp); see
+[their finite validation](BITSTRING_SHIFTS.md). The complete 125-byte reader
+at `0x00423ef0` has an ordinary C++ nonexact reconstruction in
+[`BitStringRead.cpp`](../samples/render/BitStringRead.cpp), with independent
+[reader and source LZW validation](BITSTRING_READ.md). Its instruction shape
+suggests original inline assembly; that source attribution is inference,
+not confirmed original source.

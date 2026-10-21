@@ -1,3 +1,4 @@
+#include "../krusty2/visibility/VisibilityClipper.h"
 #include "../krusty2/broadphase/Terrain.h"
 #include "FollowCamera.h"
 
@@ -181,9 +182,13 @@ void FollowCamera::UnknownVirtualSlot38(float dt, bool blend, bool pitch) {
     Vector3 nearest = Vector3(0.0f, 0.0f, FLT_MAX);
     Vector3 second;
     for (int i = 0; i < pointCount; i++) {
-        int code;
-        if (!g_visibilityClipper->ProjectPoint(
-                this, screenMatrix, &points[i].position, &points[i].screenPoint, &code)) {
+        unsigned int code;
+        if (!reinterpret_cast<VisibilityClipper*>(g_visibilityClipper)->ProjectPoint(
+                reinterpret_cast<const VisibilityCamera*>(this),
+                reinterpret_cast<const VisibilityMatrix*>(screenMatrix),
+                reinterpret_cast<const VisibilityBoxVec*>(&points[i].position),
+                reinterpret_cast<VisibilityBoxVec*>(&points[i].screenPoint),
+                &code)) {
             followDistance += dt * points[i].distanceRate;
             followDistance = distanceEase->Update(followDistance, dt);
             switch (code) {

@@ -11,7 +11,7 @@
   "?SetTableEntry@FollowCamera@@QAE_NHPBUVector3@@PBM1111@Z": "0x00463450",
   "?AppendTableEntry@FollowCamera@@QAE_NABUVector3@@MMMMM@Z": "0x00463520",
   "?SetSubject@FollowCamera@@QAEXPAUUnknownFollowCameraSubject@@@Z": "0x00463600",
-  "?ProjectPoint@UnknownFollowCameraProjector@@QAEHPAVCamera@@PBXPBUVector3@@PAU3@PAH@Z": "0x0052f340",
+  "?ProjectPoint@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityMatrix@@PBUVisibilityBoxVec@@PAU4@PAI@Z": "0x0052f340",
   "?OnControlPress@Camera@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x0042f090",
   "?OnControlPress@FollowCamera@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x00466ad0",
   "?UnknownVirtualSlot38@FollowCamera@@UAEXM_N0@Z": "0x004636e0",

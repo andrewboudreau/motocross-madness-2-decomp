@@ -122,7 +122,7 @@
   "??_C@_0P@MLDL@DDERR_NOFLIPHW?$AA@": "0x0057127c",
   "?Tell@UnknownTextureStream@@QAEHXZ": "0x00461600",
   "?Read@UnknownTextureStream@@QAEHPAXHH@Z": "0x00461640",
-  "?ExpandLzw@@YAXPAX0H@Z": "0x004a03d0",
+  "?ExpandLzw@@YAXPAEPBXH@Z": "0x004a03d0",
   "?AddDirectXBytes@MemTagStack@@QAEXH@Z": "0x004a2de0",
   "?SubtractDirectXBytes@MemTagStack@@QAEXH@Z": "0x004a2e00",
   "?CreateSystemSurface@PCTextureMap@@QAEHPAUUnknownSurfaceDesc@@HPAH@Z": "0x004c68e0",

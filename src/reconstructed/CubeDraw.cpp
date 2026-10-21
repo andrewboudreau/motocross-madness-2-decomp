@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "CubeDraw.h"
+#include "../krusty2/visibility/VisibilityClipper.h"
 
 #include "Camera.h"
 #include "Cube.h"
@@ -162,20 +163,26 @@ void DrawableCube::MarkVisibleCells()
     Vector3 offset(center.x - eye.x, center.y - eye.y, center.z - eye.z);
     for (int face = 0; face < 6; face++) {
         cubeObject->faces[face].visibleCells = 0;
-        if (!g_visibilityClipper->CanFaceCamera(((RenderTarget*)renderContext)->currentCamera, &forward,
-                                                                &s_faceNormals[face]))
+        if (!reinterpret_cast<VisibilityClipper*>(g_visibilityClipper)->TestDot(
+                reinterpret_cast<const VisibilityCamera*>(((RenderTarget*)renderContext)->currentCamera),
+                reinterpret_cast<const VisibilityBoxVec*>(&forward),
+                reinterpret_cast<const VisibilityBoxVec*>(&s_faceNormals[face])))
             continue;
         for (int k = 0; k < 25; k++)
         {
             const Vector3& point = s_facePoints[face][k];
             s_viewPoints[k] = Vector3(offset.x + point.x, offset.y + point.y, offset.z + point.z);
         }
-        g_visibilityClipper->TransformPoints(
-            s_viewPoints, s_viewPoints, &((UnknownCubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix, 25);
+        reinterpret_cast<VisibilityClipper*>(g_visibilityClipper)->TransformVectors(
+            reinterpret_cast<const VisibilityBoxVec*>(s_viewPoints),
+            reinterpret_cast<VisibilityBoxVec*>(s_viewPoints),
+            reinterpret_cast<const VisibilityMatrix*>(&((UnknownCubeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix), 25);
         for (int i = 0; i < 16; i++) {
             int corner = i + i / 4;
-            if (g_visibilityClipper->IsQuadOnScreen(((RenderTarget*)renderContext)->currentCamera, s_viewPoints, corner,
-                                                                  corner + 1, corner + 6, corner + 5))
+            if (reinterpret_cast<VisibilityClipper*>(g_visibilityClipper)->CullQuad(
+                    reinterpret_cast<const VisibilityCamera*>(((RenderTarget*)renderContext)->currentCamera),
+                    reinterpret_cast<const VisibilityBoxVec*>(s_viewPoints), corner,
+                    corner + 1, corner + 6, corner + 5))
                 cubeObject->faces[face].visibleCells |= 1 << i;
         }
     }

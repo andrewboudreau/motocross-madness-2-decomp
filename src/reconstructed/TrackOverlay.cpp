@@ -1,3 +1,4 @@
+#include "../krusty2/visibility/VisibilityClipper.h"
 #include "../krusty2/broadphase/Terrain.h"
 #include "BikeRaceCore.h"
 #include "GUIManagerCore.h"
@@ -365,8 +366,13 @@ int NameOverlay::UnknownVirtualSlot14()
     if (overlayAlpha) {
         Camera* camera = Target()->currentCamera;
         Vector3 screen;
-        float depth;
-        if (g_UnknownGlobal575a98->ProjectPoint(camera, camera->screenMatrix, &head, &screen, &depth)) {
+        unsigned int outCode;
+        if (reinterpret_cast<VisibilityClipper*>(g_UnknownGlobal575a98)->ProjectPoint(
+                reinterpret_cast<const VisibilityCamera*>(camera),
+                reinterpret_cast<const VisibilityMatrix*>(camera->screenMatrix),
+                reinterpret_cast<const VisibilityBoxVec*>(&head),
+                reinterpret_cast<VisibilityBoxVec*>(&screen),
+                &outCode)) {
             int x = (int)screen.x;
             int y = (int)screen.y;
             screenRect = UnknownMakeOverlayRect(x, y, drawWidth + x, sourceHeight + y);

@@ -91,6 +91,7 @@
 #include <string.h>
 
 #include "../../src/reconstructed/TrackOverlay.h"
+#include "../../src/reconstructed/GUIManagerCore.h"
 #include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/PCTextureMap.h"
 #include "../../src/reconstructed/Camera.h"

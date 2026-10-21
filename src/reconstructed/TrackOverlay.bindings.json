@@ -137,7 +137,7 @@
   "?GetHistory@UnknownChatInput@@QAEPADHPAH@Z": "0x0051eb10",
   "?AddHistory@UnknownChatInput@@QAEXPBD0H@Z": "0x0051eb40",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
-  "?ProjectPoint@UnknownProjector@@QAEHPAVCamera@@PBXPBUVector3@@PAU3@PAM@Z": "0x0052f340",
+  "?ProjectPoint@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityMatrix@@PBUVisibilityBoxVec@@PAU4@PAI@Z": "0x0052f340",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "?Tick@Overlay@@UAEHM@Z": "0x00499ae0",
   "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",

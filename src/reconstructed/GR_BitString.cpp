@@ -7,11 +7,11 @@
 // (0x00578e90..0x00578e9b) is referenced only from this range. No `$E`
 // initializers: every table is statically initialized.
 //
-// Not reconstructed: the reader 0x00423ef0 (Lzw.cpp's caller binds it). It
-// has an ebp frame, a `bswap` and the `mov [ebp-4], esi` / `mov eax,
-// [ebp-4]` return of a VC6 __asm body, so it is assumed to be inline
-// assembly. The shifts 0x004239c0 and 0x00423b70 are near misses
-// in samples/render/GR_BitStringNearMisses.cpp.
+// The complete reader 0x00423ef0 is an ordinary C++ nonexact candidate in
+// samples/render/BitStringRead.cpp; see docs/BITSTRING_READ.md. Its retail EBP
+// frame, BSWAP and local-return sequence suggest an original inline-assembly
+// body, but that source attribution remains inference. The two sub-word
+// shifts are reviewed nonexact candidates in samples/render/BitStringShifts.cpp.
 
 #include "GR_BitString.h"
 

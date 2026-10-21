@@ -1,0 +1,47 @@
+{
+  "baseline": "Round46 same-path baseline objects before five joins. TrackOverlayNearMisses original HEAD fails because GUIManager is incomplete; its baseline adds only the genuine GUIManagerCore include before these joins. All seven complete nondebug sections and relocation destinations are preserved under exactly the five names; known full source filenames alone are checkout-relative.",
+  "renames": {
+    "?TransformPoints@UnknownCubeClipper@@QAEXPAUVector3@@0PAUMatrix4@@H@Z": "?TransformVectors@VisibilityClipper@@QAEXPBUVisibilityBoxVec@@PAU2@PBUVisibilityMatrix@@H@Z",
+    "?CanFaceCamera@UnknownCubeClipper@@QAEHPAVCamera@@PAUVector3@@1@Z": "?TestDot@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityBoxVec@@1@Z",
+    "?IsQuadOnScreen@UnknownCubeClipper@@QAEHPAVCamera@@PAUVector3@@HHHH@Z": "?CullQuad@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityBoxVec@@HHHH@Z",
+    "?ProjectPoint@UnknownFollowCameraProjector@@QAEHPAVCamera@@PBXPBUVector3@@PAU3@PAH@Z": "?ProjectPoint@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityMatrix@@PBUVisibilityBoxVec@@PAU4@PAI@Z",
+    "?ProjectPoint@UnknownProjector@@QAEHPAVCamera@@PBXPBUVector3@@PAU3@PAM@Z": "?ProjectPoint@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityMatrix@@PBUVisibilityBoxVec@@PAU4@PAI@Z"
+  },
+  "objects": {
+    "src/reconstructed/CubeDraw.cpp": {
+      "sections": 47,
+      "relocations": 174,
+      "sha256": "3e6c4e8f3e2d3970816a30ab6dc6050a5a15c421bfa96e6f1ded45bcaf3d3f2e"
+    },
+    "src/reconstructed/FollowCamera.cpp": {
+      "sections": 98,
+      "relocations": 250,
+      "sha256": "513e8bd19e054fdce985ef5ff1f8fe55abeb6ccee715baaa7aada65c335f6be3"
+    },
+    "src/reconstructed/TrackOverlay.cpp": {
+      "sections": 207,
+      "relocations": 863,
+      "sha256": "eec31d0fce2bdbb1baf1f9f035848b08080fd3946bf85028366d80baa342206b"
+    },
+    "samples/render/CubeDrawNearMisses.cpp": {
+      "sections": 17,
+      "relocations": 55,
+      "sha256": "f34401ebda6eaf1cc94d872fe440566d1a2aa11703af90e01e3b4219d803fd3e"
+    },
+    "samples/camera/FollowCameraNearMisses.cpp": {
+      "sections": 66,
+      "relocations": 336,
+      "sha256": "6f0f4bb739462b47582cbec20009cec6ee4211376a22b86c1e6be514e690eda6"
+    },
+    "samples/track/TrackOverlayNearMisses.cpp": {
+      "sections": 37,
+      "relocations": 162,
+      "sha256": "5914078c29620649c1cfe2044d9b72267d6590d09eb7d15fad3a10e1b957e38a"
+    },
+    "src/krusty2/visibility/VisibilityQuadTree.cpp": {
+      "sections": 87,
+      "relocations": 341,
+      "sha256": "f224a17cb69678fdc1e476e9216faf769a06b1ebb8b485513527137ba7e44d5c"
+    }
+  }
+}

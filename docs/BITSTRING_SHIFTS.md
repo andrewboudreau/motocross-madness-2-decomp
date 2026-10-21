@@ -88,8 +88,9 @@ The finite successful domain uses prepared positive-length buffers. Direct
 zero/negative bit counts and arbitrary out-of-range shift arguments can create
 invalid indexing or unbounded loops in retail and are not accepted successful
 inputs. No real game session, compressed-texture decoding or all bit-string
-operations are validated by this fixture. In particular, the separate missing
-`ReadBits` body at `0x00423ef0` remains unresolved.
+operations are validated by this fixture. The separate complete `ReadBits`
+candidate and source-only LZW integration have their own
+[bounded validation](BITSTRING_READ.md).
 
 ## Reproduce
 

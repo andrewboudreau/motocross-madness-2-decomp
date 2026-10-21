@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/render/BitStringRead.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete 157-byte reader against 125 retail bytes, with 8 resolved matching positions. Preserves canonical constructor and shared storage; 205632 native reader cases and 2051 source-only LZW streams pass using the actual decoder and allocation helpers. Finite valid-count and padded-stream limits are explicit.",
+      "evidence": "docs/BITSTRING_READ.md#functional-build-review"
+    },
+    {
       "path": "samples/ui/EditBoxOnChar.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete 1044-byte edit-box character handler with 1018 resolved matching positions; preserves its entire original aggregate and passes 20962 native text, callback, audio-boundary and fault scenarios with actual strict UI/sound helpers. Win32, COM and CRT boundary contracts are explicit; integrated menus remain unverified.",

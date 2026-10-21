@@ -23,45 +23,46 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The [serial-address group](SERIAL_ADDRESS.md) now supplies the missing serial
-popup conversion. All five bodies retain their 339 strict bytes and the complete
-six-section, 26-relocation sample emission. Seven strict comparisons and 28,934
-native selection, overlap and fault cases pass. Calibration routes through the
-canonical source; original TU ownership remains unproven.
+The [texture-to-LZW connection](TEXTURE_LZW_CONNECTION.md) routes both
+compressed-image paths to the existing strict decoder. All 2,129 caller bytes
+remain strict; complete texture, sample and transitive menu objects preserve
+498 sections and 2,595 relocations under one external-name substitution.
+The focused regression passes 38 strict comparisons.
 
-Three [KrustyBike connections](KRUSTYBIKE_COLLISION_OVERLAY.md) route eight
-collision and diagnostic calls to existing strict providers. The complete
-416-byte collision caller and 1,153-byte Tick remain strict; canonical and sample
-objects retain all 514 sections and 2,497 relocations under three reviewed name
-connections. Validation passes 96 strict checks and 22,225 native cases. The
-existing nonexact DotProduct helper and the fixture's CRT boundaries are explicit.
+Five [visibility connections](VISIBILITY_CONNECTIONS.md) route cube visibility,
+camera tracking and racer-name projection to existing strict providers. The seven-object
+proof retains 559 sections and 2,181 relocations under exactly five names;
+214 strict checks and 66,845 native scenarios pass with actual CullPolygon.
+The previously uncompilable TrackOverlay sample first receives its genuine
+GUIManager include; that repaired baseline is explicitly distinguished from
+the six unchanged baselines. Shared clipper storage remains missing.
 
-[Edit-box character input](EDIT_BOX_ON_CHAR.md#functional-build-review) supplies
-insertion, Backspace, Enter, double-byte state and notifications as a reviewed
-nonexact candidate: 1,044 emitted bytes and 1,018 matching positions. Extraction
-preserves the entire 733-section, 3,912-relocation aggregate. Eighteen strict
-helper checks and 20,962 native cases pass with actual UI/sound helpers and
-explicit Win32/COM/CRT contracts. Actual locale, rendering and streaming-audio
-integration remain unverified.
+The [global bit reader](BITSTRING_READ.md#functional-build-review) is admitted
+as a reviewed nonexact candidate: 157 emitted bytes against 125 retail bytes,
+with 8 resolved matching positions. Its 205,632 native reader/constructor cases
+and 2,051 source-only LZW streams pass with the actual decoder, shared storage
+and allocator. Forty-two strict helper/initializer checks and the complete
+20-section canonical state-provider object remain intact. These finite checks
+do not establish decoding of every game asset.
 
-All 248 prior production objects preserve 10,653 nondebug sections and 45,645
-relocations under only the three KrustyBike destination-name connections, with
-no filename exclusions. Both new objects independently reproduce their actual
-game-command emissions. The real links remove exactly five missing names,
-**268 -> 267 -> 264 -> 263**, with none added. The final report checks all 250
-source hashes, 227 header hashes, configuration, profile and per-source flags.
-Private evidence is in `work/game-build/round45-link-evidence.json`,
-`round45-all-objects.json`, `round45-admitted.json` and
-`connections-round45-preservation.json`.
+All 250 prior production objects preserve 10,661 nondebug sections and 45,693
+relocations under only the six reviewed destination-name connections, with no
+filename exclusions. The new reader object independently reproduces its actual
+game-command emission. Real links remove exactly seven missing names,
+**263 -> 262 -> 257 -> 256**, with none added. The final report checks all 251
+source hashes, 228 header hashes, configuration, profile and per-source flags.
+Private evidence is in `work/game-build/round46-link-evidence.json`,
+`round46-all-objects.json`, `round46-admitted.json` and
+`connections-round46-preservation.json`.
 
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and excluded from strict counts.
 The only per-source compiler exception remains `/QIfist` for the motion-start
 helper; this slice changes no compiler flags. Finite native checks do not
-establish integrated gameplay. Static checks pass for 255 Python files
-and 392 JSON files.
-The full native regression run passes: 536 tests, 525 passed and 11 skipped
-(`work/game-build/tests-round45.log`).
+establish integrated gameplay. Static checks pass for 258 Python files
+and 396 JSON files.
+The final full regression run passes: 539 tests, 528 passed and 11 skipped
+(`work/game-build/tests-round46-final.log`).
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json
