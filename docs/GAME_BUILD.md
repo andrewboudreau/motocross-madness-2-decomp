@@ -37,38 +37,40 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 227 C++ files (189 canonical sources and 38
-reviewed candidates) and reaches LINK with 335 unresolved external symbols,
+The 2026-10-21 build compiles 229 C++ files (190 canonical sources and 39
+reviewed candidates) and reaches LINK with 320 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-rl5ao1p1` retains all prior strict results:
+The composition in `build-cx_80xxq` retains all prior strict results:
 2,994/3,005 calibration rows and 1,086/1,162 physics comparisons, with no
 near-miss score drops. This does not establish startup, menus or racing while
 linkage remains incomplete. Two existing nonexact physics candidates retain
 their unresolved comparison bindings; neither is counted as strict.
-The full regression run passes: 504 tests, with 493 passed and eleven skipped
-(`work/game-build/tests-round33.log`). Static checking also passes for 224
-Python files and 363 JSON files.
+The full regression run passes: 506 tests, with 495 passed and eleven skipped
+(`work/game-build/tests-round34.log`). Static checking also passes for 226
+Python files and 365 JSON files.
 
-The [shadow getter connections](SHADOW_SCENE_GETTER_CONNECTIONS.md) supply two
-existing scene methods and retain the complete strict 767-byte caller and both
-separate sample fingerprints. Their real helper closure passes 6,144 native
-matrix, bounds, cache and alias cases. The [bike vector connections](VECTOR_CALLS.md#bike-steering-torque-subtraction-and-scaling)
-join nine subtraction/scale calls to existing providers while preserving the
-complete 2,272-byte steering-torque partial. All 226 prior production objects
-preserve 10,509 nondebug sections and 45,418 relocations under four verified
-method-name substitutions.
-The [menu hit tests](CONTROL_HIT_TEST.md) add one reviewed nonexact candidate
-with two complete methods, validated in 2,780 native scenarios using four real
-strict helpers and the byte-verified CRT conversion. Their 328/303 emitted
-bytes are compared against full 354/329-byte retail extents. The original UI
-aggregate's 350 functions and 733 nondebug sections remain unchanged.
-The three isolated links reduce unresolved names **341 → 339 → 337 → 335**,
+The [race debug state](BIKE_RACE_DEBUG_STATE.md) supplies six true two-vector
+arrays, five zero flags and the selected-row integer initialized to two.
+Native CRT startup and 336 independent storage mutations pass; 80 strict
+caller bodies and ten partial fingerprints remain unchanged. The ordinary
+Vector3 array initializers are retained without claiming their retail identity.
+The [collision scalar connections](COLLISION_SCALAR_CONNECTIONS.md) join three
+calls to existing dot/length providers while preserving the full 1,493-byte
+caller. All 227 prior production objects preserve 10,512 nondebug sections
+and 45,428 relocations under only two verified symbol substitutions.
+The [menu texture color scan](TEXTURE_HAS_COLOR.md) adds one reviewed nonexact
+candidate, retaining its complete 220-byte body and 120 matching positions.
+Its 131,899 native scenarios use actual strict lock/unlock helpers, check every
+16-bit pixel value in both supported formats, and preserve callback/fault and
+held-lock behavior. The original UI aggregate retains all 733 nondebug sections
+and 3,912 relocations, including filename storage.
+The three isolated links reduce unresolved names **335 → 323 → 321 → 320**,
 with no new missing names. Private evidence is in
-`work/game-build/round33-link-evidence.json`, `round33-all-objects.json` and
-`connections-round33-preservation.json`.
+`work/game-build/round34-link-evidence.json`, `round34-all-objects.json` and
+`connections-round34-preservation.json`.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

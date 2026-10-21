@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 COLLISION = 'src/krusty2/collision/CollisionObject.cpp'
 QUERY = 'src/krusty2/bvh/BoundingBoxTreeQuery.cpp'
 NODE = 'src/krusty2/soultree/soultree.cpp'
+VECTOR = 'src/reconstructed/VectorCalls.cpp'
 SOURCES = (COLLISION, QUERY, 'src/krusty2/motion/CollisionCharacter.cpp',
            'samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp',
            'samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp',
@@ -87,7 +88,7 @@ class CollisionQueryConnectionsTests(unittest.TestCase):
                 function_text(text, 'TransformPointGB') + '\n' +
                 '\n'.join(function_text(text, name) for name in native_names) + '\n')
             fixture = 'tests/fixtures/collision_query_boundaries.cpp'
-            jobs = [(source, source, []) for source in (*SOURCES, NODE, str(extracted), fixture)]
+            jobs = [(source, source, []) for source in (*SOURCES, NODE, VECTOR, str(extracted), fixture)]
             jobs.append(('query_layout', fixture, ['--extra', '/DQUERY_LAYOUT']))
             objects, paths = {}, {}
             for index, (key, source, extra) in enumerate(jobs):
@@ -98,6 +99,29 @@ class CollisionQueryConnectionsTests(unittest.TestCase):
                     text=True, encoding='latin1', env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 objects[key], paths[key] = CoffObject(obj), obj
+            # The complete SegmentTouchesObject partial below retains its
+            # resolved fingerprint. These three calls now name their existing
+            # pointer-view providers; the returned temporary remains alive for
+            # the full expression that takes its const-reference address.
+            segment = objects[COLLISION].find_symbol('SegmentTouchesObject')
+            _, _, segment_relocs = objects[COLLISION].symbol_extent(segment)
+            scalar_calls = Counter(objects[COLLISION].symbol_by_index[r.symbol_index].name
+                                   for r in segment_relocs if r.type == 0x14)
+            original_calls = Counter(i.operands[0].imm for i in
+                decoder.disasm(retail.bytes_at_va(0x439820, 1493), 0x439820)
+                if i.mnemonic == 'call' and i.operands[0].type == capstone.x86.X86_OP_IMM)
+            for source, symbol, va, size, count in (
+                (VECTOR, '?Vec3DotCall@@YAMPBUVec3@@0@Z', 0x40ae30, 29, 2),
+                (COLLISION, '?CollisionLength@@YAMPBUCollisionVec3@@@Z', 0x435ec0, 74, 1),
+            ):
+                provider = objects[source].find_symbol(symbol)
+                self.assertEqual((provider.function_size, provider.extent_source), (size, 'coff_function_aux'))
+                self.assertTrue(compare(retail, objects[source], symbol, va, size,
+                    (ROOT / source).with_suffix('.bindings.json'))['strict_exact'])
+                self.assertEqual(scalar_calls[symbol], count)
+                self.assertEqual(original_calls[va], count)
+            self.assertFalse(any(s.name in ('?SegmentDot@@YAMABUVec3@@0@Z',
+                '?SegmentLength@@YAMABUVec3@@@Z') for s in objects[COLLISION].symbols))
             imported = Counter(objects[COLLISION].symbol_by_index[r.symbol_index].name
                                for r in objects[COLLISION].relocations if r.type == 0x14)
             self.assertFalse(set(imported) & evidence['renames'].keys())

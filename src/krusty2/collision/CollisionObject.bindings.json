@@ -118,8 +118,6 @@
   "?ResetHitState@CollisionObject@@QAEXXZ": "0x00434a10",
   "?SegmentAdd@@YA?AUVec3@@ABU1@0@Z": "0x00421cb0",
   "?SegmentBoxOverlap@@YAHPBUVec3@@0U1@1PBUMatrix4@@@Z": "0x004253b0",
-  "?SegmentDot@@YAMABUVec3@@0@Z": "0x0040ae30",
-  "?SegmentLength@@YAMABUVec3@@@Z": "0x00435ec0",
   "?SegmentSubtract@@YA?AUVec3@@ABU1@0@Z": "0x00421d00",
   "?SegmentTouchesObject@@YAHPBUCollisionVec3@@PAVCollisionObject@@PAU1@2@Z": "0x00439820",
   "?SegmentTreeQueryWithVertices@@YAHPBUVec3@@PAUQueryTreeNode@@PBUMatrix4@@PAU1@@Z": "0x00429e60",

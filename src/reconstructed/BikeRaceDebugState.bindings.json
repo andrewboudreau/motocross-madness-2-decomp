@@ -1,0 +1,14 @@
+{
+  "?g_ObstacleDebugLeftLine@@3PAUVector3@@A": "0x005779d8",
+  "?g_ObstacleDebugUpperHit@@3HA": "0x00577a00",
+  "?g_ObstacleDebugRightLine@@3PAUVector3@@A": "0x00577a18",
+  "?g_ObstacleDebugLine@@3PAUVector3@@A": "0x00577a30",
+  "?g_ObstacleDebugLowerLine@@3PAUVector3@@A": "0x00577a48",
+  "?g_ObstacleDebugHit@@3HA": "0x00578da8",
+  "?g_ObstacleDebugLowerHit@@3HA": "0x00578dac",
+  "?g_PathTargetDebugLine@@3PAUVector3@@A": "0x00578dc0",
+  "?g_ObstacleDebugRightHit@@3HA": "0x00578dd8",
+  "?g_ObstacleDebugUpperLine@@3PAUVector3@@A": "0x00578de0",
+  "?g_ObstacleDebugLeftHit@@3HA": "0x00578df8",
+  "?g_LodDebugSelectedRow@@3HA": "0x00567a88"
+}

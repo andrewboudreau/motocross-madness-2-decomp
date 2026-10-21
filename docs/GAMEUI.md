@@ -282,6 +282,13 @@ in dead code get no slot).
 
 ## Functional build review
 
+The complete texture color scan is maintained in
+`samples/ui/TextureHasColor.cpp`, included by the aggregate. Its full retail
+and unchanged candidate extents are both 220 bytes, with 120 matching
+positions. [Texture color evidence](TEXTURE_HAS_COLOR.md) records the strict
+caller/helper closure and 131,899-case native validation, including the
+packed-zero and continued-row behavior.
+
 The two complete pixel hit tests are maintained in
 `samples/ui/ControlHitTest.cpp`, included by the aggregate. Their corrected
 retail extents are 354 bytes (UIButton) and 329 bytes (UIMultiState); unchanged

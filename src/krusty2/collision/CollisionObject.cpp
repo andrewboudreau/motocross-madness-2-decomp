@@ -2695,20 +2695,20 @@ void CollisionObject::SetTransform(const Matrix4* m)
 // compiler temporary): subtract 0x00421d00, add 0x00421cb0, dot 0x0040ae30, length 0x00435ec0.
 Vec3 SegmentSubtract(const Vec3& a, const Vec3& b);
 Vec3 SegmentAdd(const Vec3& a, const Vec3& b);
-float SegmentDot(const Vec3& a, const Vec3& b);
-float SegmentLength(const Vec3& v);
 // Distance from center to the closest point of the segment p[0]..p[1].  Retail's frame
 // (0xa8, each operator result in its own slot) comes from this helper being inlined.
+// Taking the const reference address retains each returned temporary through the
+// full expression while joining the existing pointer-view dot/length providers.
 static inline float SegmentPointDistance(const Vec3* p, const Vec3& center)
 {
     Vec3 d = SegmentSubtract(p[1], p[0]);
-    float t = SegmentDot(d, SegmentSubtract(center, p[0])) / SegmentDot(d, d);
+    float t = Vec3DotCall(&d, &static_cast<const Vec3&>(SegmentSubtract(center, p[0]))) / Vec3DotCall(&d, &d);
     if (t >= 1.0f)
         t = 1.0f;
     else if (t <= 0.0f)
         t = 0.0f;
     Vec3 scaled = CollisionVec3Call(d.x * t, d.y * t, d.z * t);
-    return SegmentLength(SegmentSubtract(center, SegmentAdd(scaled, p[0])));
+    return CollisionLength(reinterpret_cast<const CollisionVec3*>(&static_cast<const Vec3&>(SegmentSubtract(center, SegmentAdd(scaled, p[0])))));
 }
 int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, CollisionVec3* outPoint,
                          CollisionVec3* outNormal)

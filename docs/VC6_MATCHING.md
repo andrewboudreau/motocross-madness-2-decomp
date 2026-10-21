@@ -21,24 +21,26 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The current [shadow getter connections](SHADOW_SCENE_GETTER_CONNECTIONS.md)
-and [bike vector calls](VECTOR_CALLS.md#bike-steering-torque-subtraction-and-scaling)
-preserve all 226 prior production objects under four name substitutions:
-10,509 nondebug sections and 45,418 relocations. The separate shadow samples
-and complete bike steering-torque partial retain their full fingerprints.
-The reviewed [menu hit tests](CONTROL_HIT_TEST.md) remain nonexact at 328/303
-bytes versus the complete 354/329-byte retail bodies. Their 2,780 native cases
-use actual strict helpers and the identical CRT conversion; the original UI
-aggregate preserves all 350 functions and 733 nondebug sections.
-The real link compiles 227 translation units and reports 335 unresolved names.
-Private evidence is in `work/game-build/round33-all-objects.json`,
-`round33-link-evidence.json` and `connections-round33-preservation.json`.
+The current [collision scalar connections](COLLISION_SCALAR_CONNECTIONS.md)
+preserve all 227 prior production objects under two name substitutions:
+10,512 nondebug sections and 45,428 relocations. The full segment caller remains
+nonexact with its unchanged 1,493-byte fingerprint and 1,309 matching positions.
+The [race debug globals](BIKE_RACE_DEBUG_STATE.md) supply twelve writable
+objects with independently checked array extents, initialization and native
+mutability; their ordinary no-op startup routes have no claimed retail identity.
+The reviewed [menu texture color scan](TEXTURE_HAS_COLOR.md) remains nonexact
+at 220 bytes and 120 matching positions. Its 131,899 native cases use real
+strict lock/unlock helpers; both complete callers remain strict. The original
+UI aggregate preserves all 733 nondebug sections and 3,912 relocations.
+The real link compiles 229 translation units and reports 320 unresolved names.
+Private evidence is in `work/game-build/round34-all-objects.json`,
+`round34-link-evidence.json` and `connections-round34-preservation.json`.
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and are excluded from strict counts.
 
-The final regression run passes 493 tests with eleven skipped (504 total),
-recorded in `work/game-build/tests-round33.log`. Static checking passes for
-224 Python files and 363 JSON files.
+The final regression run passes 495 tests with eleven skipped (506 total),
+recorded in `work/game-build/tests-round34.log`. Static checking passes for
+226 Python files and 365 JSON files.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json
