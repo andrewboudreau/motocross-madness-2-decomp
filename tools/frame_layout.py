@@ -400,7 +400,49 @@ def call_conventions(obj, sym, insns: list[Insn]) -> dict[int, bool]:
     return out
 
 
-def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -> FrameInfo:
+def callee_pop_bytes(pe, target: int, limit: int = 0x4000) -> int | None:
+    """Bytes a callee pops on return: N of its first ``ret N``, 0 for a plain ``ret``.
+
+    Reads the callee's own code in the image (a direct ``jmp`` thunk is
+    followed). None when no ``ret`` comes before padding or ``limit``.
+    """
+    for _ in range(4):
+        if not pe.is_code_va(target):
+            return None
+        try:
+            code = pe.bytes_at_va(target, limit)
+        except Exception:
+            return None
+        insns = disassemble(code, target)
+        if insns and insns[0].mnemonic == 'jmp' and re.fullmatch(r'0x[0-9a-f]+', insns[0].op_str):
+            target = int(insns[0].op_str, 16)
+            continue
+        for ins in insns:
+            if ins.mnemonic in ('ret', 'retn'):
+                return _imm(ins.op_str) if ins.op_str else 0
+            if ins.mnemonic == 'int3':
+                return None
+        return None
+    return None
+
+
+def retail_pops(pe, insns: list[Insn]) -> dict[int, int]:
+    """{instruction index: bytes the callee pops} for the direct calls of retail code."""
+    out: dict[int, int] = {}
+    cache: dict[int, int | None] = {}
+    for idx, ins in enumerate(insns):
+        if ins.mnemonic != 'call' or not re.fullmatch(r'0x[0-9a-f]+', ins.op_str):
+            continue
+        target = int(ins.op_str, 16)
+        if target not in cache:
+            cache[target] = callee_pop_bytes(pe, target)
+        if cache[target] is not None:
+            out[idx] = cache[target]
+    return out
+
+
+def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None,
+                pops: dict[int, int] | None = None) -> FrameInfo:
     """Track the esp depth through a function and collect its frame accesses.
 
     The prologue is the run of ``push reg/imm``, ``mov ebp, esp``, the EH
@@ -408,7 +450,11 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
     allocation (``sub esp, N`` or ``mov eax, N; call __chkstk``), which ends
     it. ``conventions`` says per call index whether the callee pops its
     arguments (from the callee's mangled name, ``call_conventions``); for
-    calls without an entry the ``add esp`` look-ahead below decides. Offsets are relative to the base: esp right after the allocation, so
+    calls without an entry the ``add esp`` look-ahead below decides. ``pops``
+    gives per call index the bytes the callee pops (its ``ret N``,
+    ``retail_pops``); it overrides both, so a callee-saved push between the
+    argument pushes and the call (VC6 saves ebp late in a branch) stays on
+    the stack. Offsets are relative to the base: esp right after the allocation, so
     the locals occupy [0, N) and offset 0 is the slot nearest esp. Callee-saved
     pushes after the allocation (VC6 interleaves them with the first body
     instructions) and argument pushes raise the tracked depth; ``pop``,
@@ -551,6 +597,18 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
             if not seen_call:
                 base_depth = depth - pending
             seen_call = True
+            if pops and j in pops:
+                popped = pops[j]
+                if popped:
+                    # pushes beyond the callee's arguments stay on the stack: an
+                    # outer call's arguments or a callee-saved register
+                    depth = max(0, depth - popped)
+                    pending = max(0, pending - popped)
+                else:
+                    awaiting += pending
+                    pending = 0
+                info.depths.append((j, depth))
+                continue
             known = conventions.get(j) if conventions else None
             if known is None:
                 # cdecl callers clean up with ``add esp, N``, which VC6 may schedule a
@@ -917,9 +975,15 @@ def locate(rows: list[dict], off: int) -> dict | None:
 
 
 def build_report(cand: list[Insn], retail: list[Insn], proc: CvProc,
-                 conventions: dict[int, bool] | None = None) -> dict:
-    ci = track_frame(cand, conventions)
+                 conventions: dict[int, bool] | None = None,
+                 retail_pop_bytes: dict[int, int] | None = None) -> dict:
     pairs = align(cand, retail)
+    # candidate calls aligned with retail calls pop what the retail callee pops
+    cpops = None
+    if retail_pop_bytes:
+        cpops = {i: retail_pop_bytes[j] for i, j in pairs
+                 if cand[i].mnemonic == 'call' and j in retail_pop_bytes}
+    ci = track_frame(cand, conventions, cpops)
     # retail calls aligned with candidate calls inherit the callee's convention
     rconv: dict[int, bool] = {}
     if conventions:
@@ -946,7 +1010,7 @@ def build_report(cand: list[Insn], retail: list[Insn], proc: CvProc,
             near = [i for i in cand_calls if abs(i - ti) <= 3]
             if len(near) == 1:
                 rconv[j] = conventions[near[0]]
-    ri = track_frame(retail, rconv)
+    ri = track_frame(retail, rconv, retail_pop_bytes)
     rows = local_ranges(proc, ci)
     unmapped_retail: Counter = Counter()
     # candidate instruction index -> retail index (aligned, else the nearest aligned one)
@@ -1172,9 +1236,11 @@ def main() -> None:
         raise SystemExit('set MCM2_EXE or pass --exe')
     va = int(a.va, 16)
     size = a.size or len(raw)
-    retail = PEImage(a.exe).bytes_at_va(va, size)
+    pe = PEImage(a.exe)
+    retail_insns = disassemble(pe.bytes_at_va(va, size), va)
     cand_insns = disassemble(raw)
-    rep = build_report(cand_insns, disassemble(retail, va), proc, call_conventions(obj, sym, cand_insns))
+    rep = build_report(cand_insns, retail_insns, proc, call_conventions(obj, sym, cand_insns),
+                       retail_pops(pe, retail_insns))
     if a.json:
         print(json.dumps(rep, indent=1, default=str))
     else:

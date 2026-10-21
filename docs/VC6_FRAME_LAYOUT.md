@@ -246,8 +246,11 @@ symbol, `--va` the retail function. The report shows:
   to offsets from the frame base = esp after the prologue, nearest esp = 0),
   with scope-sharing members at equal offsets;
 - the frame accesses of both functions, `[esp+N]` with the push depth
-  tracked (callee cleanup from the callees' mangled names in the candidate's
-  relocations, carried over to the aligned retail calls; `add esp` look-ahead
+  tracked (each retail callee pops what its own `ret N` says, and the
+  aligned candidate calls pop the same, so a register VC6 saves late in a
+  branch, between argument pushes, stays on the stack; otherwise callee
+  cleanup from the callees' mangled names in the candidate's relocations,
+  carried over to the aligned retail calls; `add esp` look-ahead
   otherwise, corrected when one `add esp` cleans several calls; forward
   branches carry their depth into early returns and shared call tails; a
   second push of a saved register is an argument) and `[ebp-N]` in ebp
