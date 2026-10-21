@@ -40,6 +40,9 @@ def source_files(root: Path, spec: dict) -> list[Path]:
         if (candidate.get('status') != 'reviewed-nonexact'
                 or not candidate.get('reason') or not candidate.get('evidence')):
             raise ValueError(f'candidate lacks nonexact review evidence: {relative}')
+        flags = candidate.get('extra_flags', [])
+        if not isinstance(flags, list) or any(flag != '/QIfist' for flag in flags):
+            raise ValueError(f'unsupported candidate compiler flags: {relative}')
         sources.add(path)
     if not sources:
         raise ValueError('no C++ sources found')
@@ -101,7 +104,7 @@ def valid_object(path: Path) -> bool:
 
 
 def compile_source(source: Path, build: Path, vc6: Path, includes: list[Path],
-                   profile: str, env: dict) -> dict:
+                   profile: str, env: dict, extra_flags: tuple[str, ...] = ()) -> dict:
     relative = source.relative_to(ROOT)
     obj = (build / 'objects' / relative).with_suffix('.obj')
     obj.parent.mkdir(parents=True, exist_ok=True)
@@ -110,6 +113,8 @@ def compile_source(source: Path, build: Path, vc6: Path, includes: list[Path],
                '--profile', profile]
     for include in includes:
         command.extend(['--include', str(include)])
+    for flag in extra_flags:
+        command.extend(['--extra', flag])
     row = run_command(command, ROOT, env, obj.with_suffix('.log'))
     row.update(source=relative.as_posix(), source_sha256=sha256_file(source),
                object=str(obj), compiled=False)
@@ -171,6 +176,8 @@ def build_game(vc6: Path, jobs: int, compile_only: bool = False) -> tuple[dict, 
         env['LIB'] = windows_path(libdir, runner)
         env['PATH'] = str(find_vc6_bin(vc6)) + os.pathsep + env.get('PATH', '')
         sources = source_files(ROOT, spec)
+        source_flags = {(ROOT / candidate['path']).resolve(): tuple(candidate.get('extra_flags', []))
+                        for candidate in spec.get('candidate_sources', [])}
         includes = [ROOT / name for name in spec['includes']]
         report['profile'] = spec['profile']
         report['candidate_sources'] = spec.get('candidate_sources', [])
@@ -180,7 +187,7 @@ def build_game(vc6: Path, jobs: int, compile_only: bool = False) -> tuple[dict, 
         with ThreadPoolExecutor(max_workers=jobs) as pool:
             report['sources'] = list(pool.map(
                 lambda source: compile_source(source, build, vc6, includes,
-                                              spec['profile'], env), sources))
+                                              spec['profile'], env, source_flags.get(source, ())), sources))
         passed = sum(row['compiled'] for row in report['sources'])
         print(f'VC6 compiled {passed}/{len(sources)} C++ translation units')
         report['compiled'] = passed == len(sources)

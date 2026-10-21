@@ -187,10 +187,16 @@ stay in `samples/physics/motion/Motnctrl.cpp`.
   out-of-line COMDAT copies of `Vec3::Vec3` (`0x404e60`), DotProduct (`0x40ae30`), `operator*` (`0x5015b0`),
   `operator+`/`operator-` (`0x421cb0`/`0x421d00`) and CrossProduct (`0x515600`) at specific sites. Moving the identity
   branch of PoseRotation last gave the biggest gain. Helper spellings and dummy preceding functions had no effect.
-- **Not reconstructed**:
-  - The functions after `0x4a9aa0`.
-  - `0x4a8bf0`, `0x4a8c50` and `0x4a9050` (2138 bytes), which round with direct `fistp` instructions (no
-    `_ftol` call): `__asm` in the original, which the readable-C++ rule excludes.
+- **Direct integer conversion**: `0x4a8bf0`, `0x4a8c50` and `0x4a9050` contain
+  direct `fistp` instructions. That proves instruction behavior, not original
+  inline-assembly provenance. The complete 81-byte motion-start method now has
+  a reviewed nonexact ordinary-C++ candidate in
+  `samples/physics/motion/CharacterMotionStart.cpp`. Its `/QIfist` helper follows
+  current rounding and preserves the old destination on unmasked invalid
+  conversion. See [motion-start evidence](../../../docs/CHARACTER_MOTION_START.md)
+  for the actual-helper native checks and finite exception-state limits.
+- **Not reconstructed**: `0x4a8c50`, `0x4a9050`, and the functions
+  after `0x4a9aa0`. The new motion-start evidence does not establish these bodies.
 
 ## CollisionCharacter.cpp
 Extent: `0x004318d0..0x00431da0`. All 11 functions are strict exact in

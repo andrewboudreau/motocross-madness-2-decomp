@@ -12,6 +12,15 @@ from match import compare  # noqa: E402
 
 CASES = [
     {
+        'name': 'CollisionObject secondary-base tick forwarding',
+        'bindings': 'src/reconstructed/CollisionObjectTick.bindings.json',
+        'source': 'src/reconstructed/CollisionObjectTick.cpp',
+        'symbol': '?Tick@CollisionObject@@UAEHM@Z',
+        'target_va': '0x00499ae0',
+        'target_size': 13,
+        'reason': 'secondary GameObject table slot 10, object offset 12; complete forwarding body, original TU unknown',
+    },
+    {
         'name': 'Bike out-of-line vector scale assignment',
         'bindings': 'src/reconstructed/VectorScaleAssign.bindings.json',
         'source': 'src/reconstructed/VectorScaleAssign.cpp',

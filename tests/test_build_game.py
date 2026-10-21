@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from tools.build_game import (header_hashes, link_game, response_file, run_command,
+from tools.build_game import (compile_source, header_hashes, link_game, response_file, run_command,
                              source_files, valid_object)
 
 
@@ -72,6 +72,13 @@ class GameBuildTests(unittest.TestCase):
                          'evidence': 'docs/review.md'}
             spec = {'source_roots': [], 'candidate_sources': [candidate]}
             self.assertEqual(source_files(root, spec), [root / candidate['path']])
+            candidate['extra_flags'] = ['/QIfist']
+            self.assertEqual(source_files(root, spec), [root / candidate['path']])
+            for flags in ('/QIfist', ['/FIreplacement.h'], [None]):
+                candidate['extra_flags'] = flags
+                with self.assertRaisesRegex(ValueError, 'compiler flags'):
+                    source_files(root, spec)
+            candidate.pop('extra_flags')
             candidate['status'] = 'partial'
             with self.assertRaisesRegex(ValueError, 'review evidence'):
                 source_files(root, spec)
@@ -81,6 +88,23 @@ class GameBuildTests(unittest.TestCase):
             candidate['path'] = '../outside.cpp'
             with self.assertRaisesRegex(ValueError, 'escapes repository'):
                 source_files(root, spec)
+
+    def test_candidate_flags_reach_only_the_selected_compilation_and_report(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / 'candidate.cpp'
+            source.write_text('void candidate() {}')
+            def recorded(command, cwd, env, log):
+                return {'command': command, 'returncode': 0, 'log': str(log)}
+            with patch('tools.build_game.ROOT', root), \
+                 patch('tools.build_game.run_command', side_effect=recorded), \
+                 patch('tools.build_game.valid_object', return_value=True):
+                selected = compile_source(source, root / 'build', root, [], 'vc6_o2_mt', {}, ('/QIfist',))
+                ordinary = compile_source(source, root / 'build', root, [], 'vc6_o2_mt', {})
+            self.assertTrue(selected['compiled'] and ordinary['compiled'])
+            self.assertEqual(selected['command'][-2:], ['--extra', '/QIfist'])
+            self.assertNotIn('--extra', ordinary['command'])
+            self.assertEqual(selected['source_sha256'], ordinary['source_sha256'])
 
     def test_failed_link_does_not_accept_existing_executable(self):
         with tempfile.TemporaryDirectory() as tmp:

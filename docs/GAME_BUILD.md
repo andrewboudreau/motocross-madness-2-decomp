@@ -29,7 +29,11 @@ Each object has an adjacent compiler log. Import-library and linker logs
 are in the build directory. Failed compilation or linking returns nonzero;
 an old executable cannot satisfy a subsequent build.
 
-The default profile is `vc6_o2_mt`. Objects are ordered by source basename,
+The default profile is `vc6_o2_mt`. A reviewed candidate may explicitly request
+`/QIfist` through `extra_flags`; this currently applies only to the motion-start
+conversion helper, preserving the incoming rounding mode on a floating-point
+trap. Every actual per-source command is recorded in the report. Other source
+files retain the default flags. Objects are ordered by source basename,
 then path. This is a reproducible working order, not proof that reconstructed
 files recover original translation units. Ordinary import libraries supply
 external DLL functions; the build never resolves game functions to retail
@@ -37,44 +41,54 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 232 C++ files (191 canonical sources and 41
-reviewed candidates) and reaches LINK with 310 unresolved external symbols,
+The 2026-10-21 build compiles 235 C++ files (192 canonical sources and 43
+reviewed candidates) and reaches LINK with 307 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-c34seh12` retains all prior strict results:
-2,994/3,005 calibration rows and 1,086/1,162 physics comparisons, with no
-near-miss score drops in either matrix. Two existing nonexact physics candidates
-retain their unresolved comparison bindings; neither is counted as strict.
-The full regression run passes: 512 tests, with 501 passed and eleven skipped
-(`work/game-build/tests-round36.log`). Static checking also passes for 232
-Python files and 367 JSON files.
+The composition in `build-6bsh80s7` retains every prior strict result:
+2,995/3,006 calibration rows and 1,086/1,162 physics comparisons. Calibration
+adds one strict CollisionObject forwarding method; its retail address was
+already represented by another class's independently identified method.
+The sole partial-score decrease is the demonstrated physics correction below.
+Two existing nonexact physics candidates retain their unresolved comparison
+bindings; neither is counted as strict.
 
-The [Bike placement connection](BIKE_SNAP_PLACEMENT.md) calls the existing
-CollisionObject::SnapPlacement through the evidenced primary collision base.
-Its full 135-byte caller stays strict; 10,240 native cases exercise the actual
-snap/update pair with scripted transform and quadtree boundaries.
-The [BikeRace state connections](BIKE_RACE_STATE_CONNECTIONS.md) connect seven
-calls to the actual KrustyBike state/recorder providers. Five canonical class
-declarations move unchanged to shared headers without their implementation-only
-dependencies. All 231 prior production objects preserve 10,548 nondebug
-sections and 45,478 relocations under only these four method-name joins.
-The unadmitted CreateRacers candidate has one explicitly reviewed seven-byte
-register-scheduling change; the two independent assignments produce the same
-register values and flags. Its complete extent remains 13,428 bytes, every
-relocation destination is retained, and the other 205 aggregate sections are
-unchanged. It is outside both matching matrices and is not added to the build.
-The reviewed [background DC selection](BACKGROUND_DC.md) retains its complete
-678-byte body with 115 matching positions. Its 21,611 native cases exercise
-real region/release helpers and scripted COM DC boundaries. Both scratch
-globals have independently checked writable zero storage; original storage
-order and executable layout are not claimed.
-The three isolated links reduce unresolved names **315 → 314 → 311 → 310**,
-with no new missing names. Private evidence is in
-`work/game-build/round36-link-evidence.json`, `round36-all-objects.json` and
-`connections-round36-preservation.json`. Startup, integrated menus and racing
-remain unverified while the game does not link.
+[Collision tick forwarding](COLLISION_TICK.md) supplies the complete 13-byte
+strict body with the correct secondary GameObject receiver at offset 12.
+Its full caller and callee remain strict; 4,096 native boundary cases check
+receiver adjustment, argument bits, return values and exception propagation.
+[Physics slot 6](SOULTREE_DRAG.md) fixes a discarded FastSqrt result that made
+the old candidate incorrectly use squared magnitude in its budget calculation.
+The corrected complete body emits 440 bytes with 126 matching positions
+against 432 retail bytes, replacing the nonexact 432/287 candidate. Its 78,305
+native cases execute actual strict math and cover aliases, FP modes and
+progressive access faults with FP exceptions masked. The other 16 aggregate
+sections, including slot 36 and ordinary local vector initialization, are
+unchanged.
+[Character motion startup](CHARACTER_MOTION_START.md) supplies the missing
+frame selection and actual pose-list traversal. Its 93-byte method and
+368-byte ordinary-C++ conversion helper are nonexact. The dedicated compiler
+option and explicit signed-32 conversion semantics preserve current rounding
+and the prior destination on unmasked invalid conversion. Its 320,999 native
+cases use the real strict pose walker; virtual pose application is scripted,
+and transient x87 register-stack context is outside the comparison.
+
+All 232 prior production objects retain 10,551 nondebug sections and 45,496
+relocation destinations without symbol-name substitutions. Independent
+compilation of all three new providers produces identical nondebug objects
+to the actual game build, including the motion source's individual flag.
+The isolated links reduce unresolved names **310 → 309 → 308 → 307**, with
+no new missing names. Private evidence is in
+`work/game-build/round37-link-evidence.json`, `round37-all-objects.json`,
+`round37-admitted.json` and `connections-round37-preservation.json`.
+Startup, integrated menus and racing remain unverified while the game does
+not link.
+
+The full regression run completes with **516 tests: 505 passed, 11 skipped**
+(`work/game-build/tests-round37.log`). Static checks pass for 235 Python and
+370 JSON files; the generated progress report is current.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based
@@ -89,7 +103,7 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
 the current composition retains all prior physics targets, with 1,086 now strict-exact, and all
-2,987 distinct strict-exact calibration cases. A native link/runtime regression checks
+2,988 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 

@@ -3,12 +3,14 @@
 Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 The 2026-10-21 native Windows VC6 SP3 gate passes its toolchain identity,
-manual smoke and generated-probe checks. Calibration has 2,994 strict-exact
-rows among 3,005 comparisons: 2,987 distinct source/address/extent cases.
-It covers 150 source files, 147 with at least one strict case. The separate
+manual smoke and generated-probe checks. Calibration has 2,995 strict-exact
+rows among 3,006 comparisons: 2,988 distinct source/address/extent cases.
+It covers 151 source files, 148 with at least one strict case. The separate
 physics matrix has 1,086 strict-exact targets among 1,162 comparisons.
 All prior strict cases are retained in the current connection composition.
-The calibration and physics comparisons report no near-miss score drops.
+Calibration reports no partial-score decrease. Physics has one explicitly
+reviewed nonexact correction: slot 6 now retains the FastSqrt result; its
+complete candidate changes from 432/287 to 440/126 bytes/matching positions.
 Strict results are complete function checks with relocations resolved;
 they do not establish complete translation units or a working game.
 
@@ -21,30 +23,29 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The current [Bike placement connection](BIKE_SNAP_PLACEMENT.md) and
-[BikeRace state connections](BIKE_RACE_STATE_CONNECTIONS.md) use four existing
-providers. All 231 prior production objects preserve 10,548 nondebug sections
-and 45,478 relocations under only those four symbol substitutions. Five actual
-class declarations move unchanged into shared headers; existing include wrappers
-retain their implementation dependencies and order.
-The unadmitted CreateRacers candidate has one independently reviewed scheduling
-change: XOR EDI,EDI and MOV EBX,1 exchange order over seven bytes. Its complete
-13,428-byte extent and relocation destinations are retained; the other 205
-aggregate sections are unchanged. This candidate is outside both matrices.
-The reviewed [background DC selection](BACKGROUND_DC.md) adds a complete
-678-byte nonexact body with 115 matching positions. Its 21,611 native cases
-execute all three strict source helpers; COM DC operations remain scripted.
-The [Bike placement checks](BIKE_SNAP_PLACEMENT.md) exercise the actual strict
-snap/update pair in 10,240 mutation and exception cases.
-The real link compiles 232 translation units and reports 310 unresolved names.
-Private evidence is in `work/game-build/round36-all-objects.json`,
-`round36-link-evidence.json` and `connections-round36-preservation.json`.
-The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
-and Terrain::QueryGround) are unchanged and are excluded from strict counts.
+The [collision tick provider](COLLISION_TICK.md) adds a complete 13-byte strict
+forwarder using the secondary GameObject receiver. The corrected
+[physics slot 6](SOULTREE_DRAG.md) passes 78,305 native cases with real strict
+FastSqrt and initialization. The newly supplied
+[Character motion start](CHARACTER_MOTION_START.md) passes 320,999 native
+state, callback, rounding and exception cases with the actual strict pose
+walker. Both latter providers are explicitly reviewed nonexact candidates;
+their finite native checks do not promote them to strict matches.
 
-The final regression run passes 501 tests with eleven skipped (512 total),
-recorded in `work/game-build/tests-round36.log`. Static checking passes for
-232 Python files and 367 JSON files.
+All 232 old production objects retain 10,551 nondebug sections and 45,496
+relocation destinations, with no name substitutions. The real link compiles
+235 translation units and reports 307 unresolved names. Private evidence is
+in `work/game-build/round37-all-objects.json`, `round37-link-evidence.json`,
+`round37-admitted.json` and `connections-round37-preservation.json`.
+The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
+and Terrain::QueryGround) are unchanged and excluded from strict counts.
+The only per-source compiler exception is `/QIfist` for the new motion-start
+helper; existing translation units retain their historical matching profile.
+This is a source-behavior requirement, not a claim about original build flags.
+
+The full regression run completes with **516 tests: 505 passed, 11 skipped**
+(`work/game-build/tests-round37.log`). Static checks pass for 235 Python and
+370 JSON files; the generated progress report is current.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

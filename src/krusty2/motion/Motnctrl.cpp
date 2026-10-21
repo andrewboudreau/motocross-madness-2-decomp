@@ -13,8 +13,8 @@
 // relocations resolved (Motnctrl.bindings.json).  Not here: the text .VUE loader 0x004a5e40,
 // the slot 7 helpers 0x004a7dc0, 0x004a7fd0, 0x004a8440 (an out-of-line copy of an inline) and
 // 0x004a8470, and slot 7 0x004a70c0 itself (near misses, samples/physics/motion/Motnctrl.cpp),
-// and 0x004a8bf0, 0x004a8c50 and 0x004a9050 (they round with direct fistp instructions where the
-// rest of the unit calls __ftol: __asm, not reproducible here).
+// and the direct-FISTP methods: 0x004a8bf0 has a reviewed nonexact ordinary-C++ candidate
+// in samples/physics/motion/CharacterMotionStart.cpp; 0x004a8c50 and 0x004a9050 remain missing.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

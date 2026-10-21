@@ -3,6 +3,19 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/physics/motion/CharacterMotionStart.cpp",
+      "status": "reviewed-nonexact",
+      "extra_flags": ["/QIfist"],
+      "reason": "Complete motion-start implementation passes 320999 state, actual pose-helper, callback, rounding and exception scenarios. The 93-byte method and 368-byte ordinary C++ conversion helper preserve signed32 current-rounding results and invalid unmasked no-store behavior. Only this source uses /QIfist to avoid __ftol changing the rounding mode on a trap. The actual 59-byte pose walker remains strict. Slot4 is scripted; transient x87 stack context and integrated animation are not claimed equivalent.",
+      "evidence": "docs/CHARACTER_MOTION_START.md#functional-build-review"
+    },
+    {
+      "path": "samples/physics/soultree_base/SoultreeDrag.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete physics slot 6 corrects a demonstrated discarded-square-root bug and passes 78305 whole-state, actual FastSqrt, alias, floating-point-mode and progressive access-fault cases. The corrected body emits 440 bytes with 126 matching positions against 432 retail bytes, replacing a nonexact 432/287 candidate; all other aggregate sections remain unchanged. FP exceptions are masked in this finite comparison; integrated physics remains unverified.",
+      "evidence": "docs/SOULTREE_DRAG.md#functional-build-review"
+    },
+    {
       "path": "samples/render/BackgroundImageNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete background drawing-context selection passes 21611 native region, cache, actual-helper, COM, alias and fault comparisons. The unchanged 678-byte body has 115 matching positions against 678 retail bytes; all three source helpers and the full dialog caller remain strict. Scratch globals have independently checked writable zero storage. COM DC acquisition/release are scripted; real DirectDraw/GDI and integrated menus remain untested.",
