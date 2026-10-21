@@ -224,6 +224,8 @@ int TerrainShadow::UnknownVirtualSlot14()
 // and texture coordinates scaled by field_0x677c.  Cells that were drawn into are marked used.
 // Tier 3 semantics; the retail body converts with an inline __asm fistp helper, so this stays a
 // documented partial (see targets.json).
+// s15 reference diff: the six extra __ftol calls are those roundings, and the missing
+// immediates sit in the 240 bytes the asm helper's ebp frame adds (1788 retail, 1548 here).
 void TerrainShadow::UnknownVirtualSlot30()
 {
     enum { kMaxMeshVertices = 867 };
@@ -388,6 +390,10 @@ full:
 // up temporary 0x24, eye 0x30, cell 0x3c) and eax/ecx swap throughout (227/3088).  Typedef
 // shifts of 0..62 do not move it; eye = eye + ..., named-result products and declaration
 // placement change nothing or the size.
+// s15 reference diff: the missing 5.0f load and `test ah, 0x41` are retail's second footprint
+// test (each mode keeps its own copy, the mode 2 one after `pop ebp`); VC6 here keeps the screen
+// rectangle on the x87 stack and cross-jumps the two into one.  The 0x17c/0x188 immediates are
+// the `add reg, 0x17c/0x188` row pointers of the lead above.
 // ---------------------------------------------------------------------------------------------
 
 // The unit's vector with the d3dvec.inl constructors (ProjectedShadow.h's ShadowVec3 has none;

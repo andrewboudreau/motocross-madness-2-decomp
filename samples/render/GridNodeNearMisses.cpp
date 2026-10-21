@@ -32,6 +32,8 @@
 // /QIfist is excluded and the match is out of reach under the no-inline-asm rule;
 // `/Oy-` only fakes the frame (still 96/4189) and the x87 scheduling of the crossing
 // loops (running y/z kept on the stack) stays different. Written here as casts.
+// s15 reference diff: the four extra __ftol calls are the fistp roundings; the immediates
+// (test ah, 1 against 0x41, 0xc, 0x18) were not traced further.
 #include "../../src/reconstructed/Griddraw.h"
 #include "../../src/reconstructed/MatrixUtil.h"
 

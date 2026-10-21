@@ -255,6 +255,8 @@ int ProjectedShadow::ComputeBounds()
 // PARTIAL: the 16-bit clear goes through FillShortsUnrolled (retail's 15-entry jump table) and
 // the size matches; the vertex helpers are inlined differently.  Verified exclusion: retail 0x004dbb5c and
 // 0x004dbb8b are bare `fistp dword ptr [eax]` in an ebp frame (inline-asm rounding).
+// s15 reference diff: the two extra __ftol calls are those roundings; the missing immediates
+// (0xb980004d ...) are the jump table after the ret at 0x004dbcf1 read as code (false positive).
 // Fills count shorts at p with value: one short to reach dword alignment, then dword pairs
 // (pair = value in both halves) unrolled 16 per pass with a Duff's device, then the last
 // odd short.
@@ -387,6 +389,8 @@ void ProjectedShadow::RenderShadow()
 // Near miss: block structure, the fill expansions and the counted inner loops match; left:
 // register assignment of the clip fields and of the format-9 constants (retail computes the
 // nibble masks with byte operations on the low byte of shadowPixel).
+// s15 reference diff (masked match): its missing immediates lie in the three jump tables after
+// the ret at 0x004dc1f1, read as code (false positive).
 void ProjectedShadow::Present()
 {
     if (surfaceFormat == 0x613)

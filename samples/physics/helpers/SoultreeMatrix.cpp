@@ -155,9 +155,11 @@ void SoultreeObject::SetAxesIn(SoultreeObject* frame, const Vec3* axisZ, const V
 // 'frame' space. frame == this stores *m as the local matrix (0x004fca30); otherwise *m is
 // first carried into world space in place (*m = *m * frame->worldMatrix) and then
 // re-expressed relative to this node's parent. Tier 2 data flow, tier 3 names.
-// PARTIAL: same instructions and frame (0x90) as retail, including both out-of-line calls of
-// 0x004fefb0, but VC6 here gives the first copied matrix of each block the 0x50 slot and the
-// second the 0x10 slot; retail has them the other way round. Declaration order, statement
+// PARTIAL: same frame (0x90) as retail. Retail calls 0x004fefb0 for both transposes; VC6 here
+// expands the first (the inline budget; the same with this file as of 3778c4f2, under
+// vc6_o2_mt and vc6_o2_ml), the s15 reference diff's missing call. VC6 here also gives the
+// first copied matrix of each block the 0x50 slot and the second the 0x10 slot; retail has
+// them the other way round. Declaration order, statement
 // order, block- or function-scope matrices and a by-value inline product did not swap them.
 void SoultreeObject::SetMatrixIn(SoultreeObject* frame, Matrix4* m)
 {

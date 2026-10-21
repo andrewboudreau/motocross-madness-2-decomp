@@ -68,7 +68,11 @@
 //               (180), a vegetation base local (205) and index or
 //               byte-offset element helpers (257) are far worse
 //   0x00459ce0  the frame slots: same size, the locals and temporaries
-//               are assigned in a different order (323/3300)
+//               are assigned in a different order (323/3300); retail
+//               keeps the first sample's TGA in ebx and reloads
+//               g_collisionQuadTree after its first __ftol, where VC6
+//               here caches the tree in ebx (the s15 reference diff's
+//               missing load)
 //   0x0045b060  frame 0xe0 for 0xf0 and the slot order; retail leans the
 //               side normals through memory temporaries (no Vector3 /
 //               helper spelling of the lean produces them) and releases
