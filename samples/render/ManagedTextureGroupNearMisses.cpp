@@ -14,8 +14,11 @@
 // slots fewer (frame 0x78 against 0x80), puts the 12-byte format buffer
 // over the dead `i`/`smallest` slots and `filled` over `texels`, keeps
 // `now` in ebp through the overlay block and hoists the level-count loop's
-// bound. About 158 of 1150 instructions differ, almost all in slot or
-// register choice. Tried without effect: block scopes around the emptying
+// bound. Its "ManagedTextures:%d" row prints a `managedCount` local, as
+// RepackWithPartialBlits' does, which gives retail's load order for that
+// row (tools/rank_near_misses.py: 145 -> 94 differing instructions, size
+// 3757 -> 3754 against 3742); the rest is almost all slot or register
+// choice. Tried without effect: block scopes around the emptying
 // section, the first pass (`requested`), the levels loop and the
 // refill+overlay section; a hoisted count (frame shrinks by 4 but the loop
 // registers rotate); an `elapsed` local for `now - blitStartTime` (worse);
@@ -253,7 +256,8 @@ void ManagedTextureGroup::RepackWholePages() {
         g_TrackGame->debugOverlay->Print(
             debugPage, "CacheTextures:%d %.2fM", cachePages.m_count,
             PageMegabytes(this, cachePages.m_count));
-        g_TrackGame->debugOverlay->Print(debugPage, "ManagedTextures:%d", managedTextures.m_count);
+        int managedCount = managedTextures.m_count;
+        g_TrackGame->debugOverlay->Print(debugPage, "ManagedTextures:%d", managedCount);
         float peak = (float)texelsBlittedHistory.LargestRecentSample();
         g_TrackGame->debugOverlay->Print(
             debugPage, "TexMem Blted: %.2fM, Peak: %.2fM",
