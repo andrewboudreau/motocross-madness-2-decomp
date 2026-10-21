@@ -1,0 +1,13 @@
+{
+  "?OnChar@UIEditBox@@UAEHH@Z": "0x00474150",
+  "?OnChar@UIControl@@UAEHH@Z": "0x00472320",
+  "?GetName@UIControl@@QAEPADXZ": "0x00470df0",
+  "?FilterCharacter@UIEditBox@@QAEDD@Z": "0x00473fc0",
+  "?SetVolume@Sound@@QAEHJH@Z": "0x004bcbe0",
+  "?PlayWithOptions@Sound@@QAEHHKH@Z": "0x004bc6b0",
+  "_memmove": "0x00536d00",
+  "__imp__CharPrevA@8": "0x005502f0",
+  "__imp__IsDBCSLeadByte@4": "0x005501bc",
+  "__imp__SelectObject@8": "0x00550078",
+  "__imp__GetTextExtentPoint32A@16": "0x00550084"
+}

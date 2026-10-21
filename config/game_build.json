@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/ui/EditBoxOnChar.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete 1044-byte edit-box character handler with 1018 resolved matching positions; preserves its entire original aggregate and passes 20962 native text, callback, audio-boundary and fault scenarios with actual strict UI/sound helpers. Win32, COM and CRT boundary contracts are explicit; integrated menus remain unverified.",
+      "evidence": "docs/EDIT_BOX_ON_CHAR.md#functional-build-review"
+    },
+    {
       "path": "samples/render/D3DIMScale.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete 630-byte scene scale operation with 618 resolved matching positions; actual rendering callers and cache helpers verified in 99827 native scenarios. Floating-point operand ordering remains nonexact.",

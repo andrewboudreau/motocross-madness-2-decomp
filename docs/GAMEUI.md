@@ -308,6 +308,13 @@ retail extents are 354 bytes (UIButton) and 329 bytes (UIMultiState); unchanged
 VC6 candidates emit 328/303 bytes. See [menu control hit-test evidence](CONTROL_HIT_TEST.md)
 for full-body, helper, extraction and 2,780-case native validation boundaries.
 
+[Edit-box character input](EDIT_BOX_ON_CHAR.md#functional-build-review) is
+maintained in `samples/ui/EditBoxOnChar.cpp` and included by the aggregate.
+The complete 1,044-byte candidate remains nonexact, with 1,018 matching
+positions; it is individually admitted after 18 strict helper checks and
+20,962 native scenarios. Its platform contracts and runtime limits are recorded
+in the dedicated evidence page.
+
 `samples/ui/UIDialogTick.cpp` supplies the complete dialog tick as an explicit
 nonexact game-build candidate. GameUiNearMisses.cpp includes this same source
 for its existing calibration; the larger sample is not added to the game link.

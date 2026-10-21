@@ -1,0 +1,8 @@
+{
+  "source": "samples/ui/GameUiNearMisses.cpp",
+  "baseline": "0b113a3b",
+  "sections": 733,
+  "relocations": 3912,
+  "sha256": "899fe6388dd30422ac46494bb6da768ccd0490d8b5edd1e73a71d24b4673b757",
+  "normalization": "Only the three known __FILE__ paths; private same-path extraction has no exceptions"
+}

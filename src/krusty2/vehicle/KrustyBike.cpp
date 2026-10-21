@@ -27,6 +27,7 @@
 #endif
 #include "../../reconstructed/Recorder.h"
 #include "../../reconstructed/EventManager.h"
+#include "../../reconstructed/DebugOverlay.h"
 #include "../../reconstructed/TrackGame.h"
 #include "math/FastMath.h"
 #include "collision/CollisionObject.h"
@@ -564,10 +565,10 @@ int KrustyBike::UnknownVirtualSlot28(int a)
         if (this != p->field_0xa8 && this == race->localRacer) {
             Vehicle* v = p->field_0xa8;
             if (v) {
-                if (((KbBody*)collisionObject)->TestMeshBounds((KbBody*)v->collisionObject))
+                if (collisionObject->TestMeshBounds(v->collisionObject))
                     Fn_004925A0(this, 1);
             } else if (p->field_0xdc) {
-                if (((KbBody*)collisionObject)->TestMeshBounds((KbBody*)p->field_0xdc->collisionObject)) {
+                if (collisionObject->TestMeshBounds(p->field_0xdc->collisionObject)) {
                     if (reinterpret_cast<KbGame*>(g_TrackGame)->network->field_0x10) p->Fn_004A9E80(this, 0, 1);
                     else Fn_004925A0(this, 1);
                 }
@@ -1493,7 +1494,7 @@ int KrustyBike::Tick(float dt)
         KrustyBike* bike;
         for (bike = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor)); bike; bike = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor))) {
             if (!bike->outOfRace && !bike->UnknownVirtualSlot51() && bike != this) {
-                overlap = ((KbBody*)collisionObject)->TestMeshBounds((KbBody*)bike->collisionObject);
+                overlap = collisionObject->TestMeshBounds(bike->collisionObject);
                 if (overlap)
                     break;
             }
@@ -1513,9 +1514,9 @@ int KrustyBike::Tick(float dt)
             int line = reinterpret_cast<KbGame*>(g_TrackGame)->debugOverlay->lineCount++;
             debugPage = line;
         }
-        reinterpret_cast<KbGame*>(g_TrackGame)->debugOverlay->Title(debugPage, "KrustyBike");
-        reinterpret_cast<KbGame*>(g_TrackGame)->debugOverlay->Print(debugPage, "Position/Heading=");
-        reinterpret_cast<KbGame*>(g_TrackGame)->debugOverlay->Print(debugPage, "%.2f, %.2f, %.2f / (%.0f)", position.x, position.y,
+        reinterpret_cast<DebugOverlay*>(reinterpret_cast<KbGame*>(g_TrackGame)->debugOverlay)->Title(debugPage, "KrustyBike");
+        reinterpret_cast<DebugOverlay*>(reinterpret_cast<KbGame*>(g_TrackGame)->debugOverlay)->Print(debugPage, "Position/Heading=");
+        reinterpret_cast<DebugOverlay*>(reinterpret_cast<KbGame*>(g_TrackGame)->debugOverlay)->Print(debugPage, "%.2f, %.2f, %.2f / (%.0f)", position.x, position.y,
                                     position.z, bodyYaw * 57.29578f);
         if (s_kbTimeTo60Armed) {
             if (forwardSpeed > 0.2f) {
@@ -1530,8 +1531,8 @@ int KrustyBike::Tick(float dt)
             s_kbTimeTo60 = 0;
             s_kbTimeTo60Armed = 1;
         }
-        reinterpret_cast<KbGame*>(g_TrackGame)->debugOverlay->Print(debugPage, "Last TimeTo60 = %.2f  seconds", s_kbLastTimeTo60);
-        reinterpret_cast<KbGame*>(g_TrackGame)->debugOverlay->Print(debugPage, "TimeTo60 = %.2f  seconds", s_kbTimeTo60);
+        reinterpret_cast<DebugOverlay*>(reinterpret_cast<KbGame*>(g_TrackGame)->debugOverlay)->Print(debugPage, "Last TimeTo60 = %.2f  seconds", s_kbLastTimeTo60);
+        reinterpret_cast<DebugOverlay*>(reinterpret_cast<KbGame*>(g_TrackGame)->debugOverlay)->Print(debugPage, "TimeTo60 = %.2f  seconds", s_kbTimeTo60);
     }
     return 1;
 }

@@ -1,8 +1,6 @@
-// SerialAddress.cpp -- the serial-connection helpers 0x004ae2f0..0x004ae454
-// between Net.cpp's last function (the EnumPlayers callback 0x004ae270) and
-// NetProcs.cpp's first literal user (0x004ae460). They have no __FILE__ or
-// RTTI, so either file may own them (docs/NET.md, docs/DIALOGPROCS.md);
-// they stay here until something decides it. Names are ours.
+// Complete strict serial-selection conversion group.
+// Names and original TU ownership are provisional; see docs/SERIAL_ADDRESS.md.
+// Proximity to Net.cpp and NetProcs.cpp does not establish ownership.
 //
 // BuildComPortAddress converts SerialPopupDlg's selection indices
 // (SerialSettings, NetProcs.h) into the DirectPlay DPCOMPORTADDRESS
@@ -10,8 +8,8 @@
 // TWOSTOPBITS, NOPARITY/EVENPARITY/ODDPARITY/MARKPARITY (the dialog lists
 // even before odd) and DPCPA_NOFLOW..DPCPA_RTSDTRFLOW.
 
-#include "../../src/reconstructed/NetProcs.h"
-#include "../../src/reconstructed/DlgProcs.h"
+#include "NetProcs.h"
+#include "DlgProcs.h"
 
 // 0x004ae2f0: "ButBaud" index to baud rate.
 static int SerialBaudRate(int index) {

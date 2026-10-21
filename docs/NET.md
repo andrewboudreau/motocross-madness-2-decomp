@@ -38,7 +38,7 @@ Function and member names in `Net.h` are provisional (tier 3) unless noted:
   its `__FILE__` is at `0x0056eb2c` and its literals begin at `0x0056eb04`
   (used from `0x004ae467`). The small switch helpers at
   `0x004ae2f0`..`0x004ae410` sit between the two files and are not claimed;
-  they are reconstructed (all strict exact) in samples/net/SerialAddress.cpp,
+  they are reconstructed (all strict exact) in src/reconstructed/SerialAddress.cpp,
   where `BuildComPortAddress` (`0x004ae410`) fills the DPCOMPORTADDRESS.
 - Vtables:
   - `NetworkInterface`: `0x005553e8`, one slot, `0x004ad050`.

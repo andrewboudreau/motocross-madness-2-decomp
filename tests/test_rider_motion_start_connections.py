@@ -19,8 +19,9 @@ RETIRED={'?Method_0x004a8bf0@BikeA5C4@@QAEXHM@Z','?Fn_004A8BF0@KbA5C4@@QAEXHM@Z'
 SOURCES={
  # InlineShock connection: only the verified UpdateAxis external destination changes.
  'src/krusty2/vehicle/Bike.cpp':(242,1089,3,'16777035e9d5516a5d422d797c90c69df3e918db3e5ce86cfdac451621598fef'),
- 'src/krusty2/vehicle/KrustyBike.cpp':(243,1054,2,'892b622eb1ec11539d1a7bb37a1c2143c8e1ddf295778cb32b4c33eb0b68daca'),
- 'samples/physics/krustybike/KrustyBikeNearMisses.cpp':(271,1443,8,'ad3d79c2ff9577c6b135de0cb1944e7dd8ad399b63a78abb3fdfacb82056078b'),
+ # Verified collision/debug-overlay connections change only three external names.
+ 'src/krusty2/vehicle/KrustyBike.cpp':(243,1054,2,'ac4bce1e5b9d6559b6be6c50d9f51d31b06d611090c921de5d479935f9ea054c'),
+ 'samples/physics/krustybike/KrustyBikeNearMisses.cpp':(271,1443,8,'d3ef0d93837a2b668ca6efbb9070adfb3f48aa88b67a32fdc251cb08c13eb7f4'),
 }
 
 def view(obj, normalize_paths=()):

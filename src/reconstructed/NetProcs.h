@@ -9,7 +9,7 @@
 // The serial settings SerialPopupDlg's selectors write (0x006886b8, in
 // NetProcs.cpp's .bss between Net.cpp's 0x006886b4 and NetThread.cpp's
 // 0x006886d0). Each field is the selected state index of the control the
-// procedure binds to it; dlgprocs.cpp 0x00452af9 passes the record to
+// procedure binds to it; dlgprocs.cpp 0x00452b09 passes the record to
 // 0x004ae410, which converts it to DirectPlay serial values.
 struct SerialSettings {
     int port;                                 // "ButPort"

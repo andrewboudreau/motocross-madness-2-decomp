@@ -39,9 +39,9 @@ It holds the slot 29 of HostJoinDlg, SerialPopupDlg, TCPAddressDlg,
 SessionDlg, WaitOrCallDlg, ConnectErrorDlg and PlayerRemovedDlg. It also
 has the session join `0x004ae460` and the network drop and ensure
 functions `0x004aef40`/`0x004aefa0`. The serial helpers at
-`0x004ae2f0..0x004ae454` map baud, parity and other settings; Net.cpp and
-NetProcs.cpp are equally possible owners, so they are not claimed (they are
-reconstructed in samples/net/SerialAddress.cpp).
+`0x004ae2f0..0x004ae454` map baud, parity and other settings. Their original TU
+ownership remains unproven. The complete strict group now
+lives in `src/reconstructed/SerialAddress.cpp`; see [serial conversion](SERIAL_ADDRESS.md).
 
 Exact: all 16 functions (6 and 10). Source forms needed:
 - `_stricmp` calls take the literal first.

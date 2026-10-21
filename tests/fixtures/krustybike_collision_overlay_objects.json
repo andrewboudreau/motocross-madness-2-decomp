@@ -1,0 +1,20 @@
+{
+  "note": "Published complete objects preserve every nondebug byte and relocation destination under exactly three verified external name joins. Both same-path old/current objects independently produce these pins.",
+  "renames": {
+    "?TestMeshBounds@KbBody@@QAEHPAU1@@Z": "?TestMeshBounds@CollisionObject@@QAEHPAV1@@Z",
+    "?Title@KbOverlay@@QAAXHPBDZZ": "?Title@DebugOverlay@@QAAXHPBDZZ",
+    "?Print@KbOverlay@@QAAXHPBDZZ": "?Print@DebugOverlay@@QAAXHPBDZZ"
+  },
+  "objects": {
+    "src/krusty2/vehicle/KrustyBike.cpp": {
+      "sections": 243,
+      "relocations": 1054,
+      "sha256": "ac4bce1e5b9d6559b6be6c50d9f51d31b06d611090c921de5d479935f9ea054c"
+    },
+    "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
+      "sections": 271,
+      "relocations": 1443,
+      "sha256": "d3ef0d93837a2b668ca6efbb9070adfb3f48aa88b67a32fdc251cb08c13eb7f4"
+    }
+  }
+}

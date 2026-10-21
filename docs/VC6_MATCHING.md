@@ -23,41 +23,45 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-[InlineShock axis setup](INLINE_SHOCK_AXIS.md) supplies the complete strict
-250-byte loading operation through its verified primary receiver. The Bike
-call changes only its declared destination. The sample aggregate retains its
-complete emission under the reviewed scene-helper naming connection. Its
-regression passes 87 strict comparisons and 149,508 native scenarios.
+The [serial-address group](SERIAL_ADDRESS.md) now supplies the missing serial
+popup conversion. All five bodies retain their 339 strict bytes and the complete
+six-section, 26-relocation sample emission. Seven strict comparisons and 28,934
+native selection, overlap and fault cases pass. Calibration routes through the
+canonical source; original TU ownership remains unproven.
 
-[Wheel attachment](WHEEL_ATTACHMENT.md) supplies the existing per-wheel call
-view with a complete strict 195-byte body and unchanged callers. Validation
-passes 48 strict comparisons and 47,006 native scenarios using actual scene,
-matrix and CRT helpers. Its ordinary header-generated vector initializers
-are explicitly accounted for; original TU ownership is not claimed.
+Three [KrustyBike connections](KRUSTYBIKE_COLLISION_OVERLAY.md) route eight
+collision and diagnostic calls to existing strict providers. The complete
+416-byte collision caller and 1,153-byte Tick remain strict; canonical and sample
+objects retain all 514 sections and 2,497 relocations under three reviewed name
+connections. Validation passes 96 strict checks and 22,225 native cases. The
+existing nonexact DotProduct helper and the fixture's CRT boundaries are explicit.
 
-[Rendering scale](SOULTREE_SCALE.md#functional-build-review) is admitted as an
-explicitly reviewed nonexact candidate: 630 emitted bytes and 618 matching
-positions. All 14 original aggregate sections and 32 relocations remain
-unchanged. Real caller/helper evidence and 99,827 native scenarios support
-this finite admission; arbitrary floating-point equivalence is not claimed.
+[Edit-box character input](EDIT_BOX_ON_CHAR.md#functional-build-review) supplies
+insertion, Backspace, Enter, double-byte state and notifications as a reviewed
+nonexact candidate: 1,044 emitted bytes and 1,018 matching positions. Extraction
+preserves the entire 733-section, 3,912-relocation aggregate. Eighteen strict
+helper checks and 20,962 native cases pass with actual UI/sound helpers and
+explicit Win32/COM/CRT contracts. Actual locale, rendering and streaming-audio
+integration remain unverified.
 
-All 245 prior production objects preserve 10,636 nondebug sections and 45,615
-relocations under only the verified InlineShock destination-name connection,
-with no filename exclusions. The three new objects independently reproduce
-their actual game-command emissions. The real links remove exactly three
-missing names, **271 -> 270 -> 269 -> 268**, with none added. The final report
-checks all 248 source hashes, 227 header hashes, configuration, profile and
-per-source flags. Private evidence is in `work/game-build/round44-link-evidence.json`,
-`round44-all-objects.json`, `round44-admitted.json` and
-`connections-round44-preservation.json`.
+All 248 prior production objects preserve 10,653 nondebug sections and 45,645
+relocations under only the three KrustyBike destination-name connections, with
+no filename exclusions. Both new objects independently reproduce their actual
+game-command emissions. The real links remove exactly five missing names,
+**268 -> 267 -> 264 -> 263**, with none added. The final report checks all 250
+source hashes, 227 header hashes, configuration, profile and per-source flags.
+Private evidence is in `work/game-build/round45-link-evidence.json`,
+`round45-all-objects.json`, `round45-admitted.json` and
+`connections-round45-preservation.json`.
 
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and excluded from strict counts.
 The only per-source compiler exception remains `/QIfist` for the motion-start
 helper; this slice changes no compiler flags. Finite native checks do not
-establish integrated gameplay. The full regression suite passes 522 tests,
-with 11 explicit skips (533 total). Static checks pass for 252 Python files
-and 389 JSON files.
+establish integrated gameplay. Static checks pass for 255 Python files
+and 392 JSON files.
+The full native regression run passes: 536 tests, 525 passed and 11 skipped
+(`work/game-build/tests-round45.log`).
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json
@@ -296,7 +300,7 @@ Three more units without RTTI or `__FILE__` match strictly:
 
 PickDevice.cpp, the display and controller choosers (8, including the two
 builders; [PICKDEVICE](PICKDEVICE.md)), and the serial address helpers
-between Net.cpp and NetProcs.cpp (5, samples/net/SerialAddress.cpp; owner
+between Net.cpp and NetProcs.cpp (5, src/reconstructed/SerialAddress.cpp; owner
 unknown) match strictly. In physics targets KrustyBike gains slot 10 and the
 message 1 builder, and TerrainShadow its slot 14 ([PHYSICS_VALIDATION](PHYSICS_VALIDATION.md)).
 
