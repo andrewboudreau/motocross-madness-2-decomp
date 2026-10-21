@@ -301,6 +301,8 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
             if (flags & 4) {
                 desc.caps[0] = 0x400808;
             } else {
+                // DDSCAPS flags; tools/reference_diff.py reads 0x401008 and 0x401808 as
+                // .text addresses; they are DDSCAPS bits, not pointers (a false positive).
                 desc.caps[0] = 0x401008;
                 if (!(flags & 8) && !g_TrackGame->bladeRenderer &&
                     !(g_TrackGame->texturesCached) &&
