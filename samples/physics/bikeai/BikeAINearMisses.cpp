@@ -101,8 +101,7 @@
 // and operator*(Vec3, float) that retail calls even in this function's first lines.
 //
 // 0x0040eca0 (17585 bytes, look-ahead simulation of the two wheels): the whole
-// function is reconstructed; frame 0x95c vs 0x93c (named locals map ~1:1 to retail
-// slots via tools/frame_layout.py; the gap is temporaries).  The call sequence matches retail call for call except one
+// function is reconstructed; frame 0x968 vs 0x93c (see the frame notes below).  The call sequence matches retail call for call except one
 // site (0x00412e23: retail inlines operator+ with the out-of-line constructor, the
 // candidate calls operator+).  This function exhausts VC6's per-function inline
 // budget: the first part expands every Vec3 operator, from 0x00410d00 the operators
@@ -124,8 +123,24 @@
 //
 // The game reads (race kind, tree collision, object root, difficulty, race mode) go
 // through the complete TrackGame class, with no view cast: aligned 3731 of 3966, frame
-// 0x968 vs 0x93c (the cast views gave 3402; the frame figures above predate the shared
-// g_TrackGame pointer).
+// 0x968 vs 0x93c (the cast views gave 3402).  The read's member-path depth moves the
+// inline switch-over although the global loads are identical: a flat member of a plain
+// struct pointer gives 3760, a one-level nested member 3402 (frame 0x978), the complete
+// two-level TrackGame path 3731 (the 0x00410d00 `aim = fwd +- right` site inlines one more
+// constructor and the end site 0x00412e79 then calls operator+).
+//
+// Frame (tools/frame_layout.py after aba3ceb7; the earlier 0x95c reading is superseded):
+// retail's 0x93c holds xf as a full Matrix4 at +0x568 (identity written in the prologue)
+// and, just above it, the end site's single-use return buffers (CrossProduct at
+// 0x00412b37, operator- at 0x00412eb2).  Declaring the four post-loop ground/normal
+// vectors at function scope gives 0x938 with every temporary region at retail's offset
+// except that 12-byte slot, but the loop's copy-initialisations become assignments and
+// the inline switch-over moves (aligned 3631).  A bare block around the post-loop
+// section (groundF..`back -= pen * normalR`) gives 0x92c, or 0x938 with groundF at
+// function scope, with identical code; neither gains a strict byte because the ~100
+// locals still sort in a different use-count order (front +0x54 vs +0x50, normalF +0x80
+// vs +0x70, ...), so neither is kept.  A typedef-prefix scan (k = 0..63 extra
+// declarations) is inert (3731 throughout).
 //
 // 0x00413160 (Vec3::operator-=, 33 bytes) is the out-of-line COMDAT that VC6 emits
 // right after 0x0040eca0 for its epilogue; this file reproduces it strict exact.
