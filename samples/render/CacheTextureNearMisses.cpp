@@ -76,7 +76,7 @@ int CacheTexture::CopyMipLevels(UnknownTextureRegion* region, int level) {
     int sourceSide = region->occupant->textureWidth;
     UnknownSurfaceCaps caps;
     memset(&caps, 0, sizeof(caps));
-    caps.caps = 0x401000;
+    caps.caps = 0x401000;   // DDSCAPS bits; reference_diff reads them as ??0AgeManager (false positive)
     long result = 0;
     while (sourceSide > side) {
         result = source->GetAttachedSurface(&caps, &nextSource);

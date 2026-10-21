@@ -796,6 +796,13 @@ static inline void FloatToInt(int* dst, float v)
     *dst = (int)v;
 }
 
+// Retail dots the face normal with the y axis inline (fmul [0x0068a05c], [0x0068a058],
+// [0x0068a060]) but calls 0x0040ae30 inside the normalisation, so two dot helpers exist.
+static inline float TerrainDotInline(const TerrainVec3& a, const TerrainVec3& b)
+{
+    return a.y * b.y + a.x * b.x + a.z * b.z;
+}
+
 static inline TerrainVec3 TerrainNormalize(const TerrainVec3& v)
 {
     float lenSq = TerrainDot(v, v);
@@ -891,7 +898,7 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
             if (flatShaded) {
                 TerrainVec3 face;
                 TerrainTriangleNormal(&v[0], &v[1], &v[2], &face, 0);
-                if (TerrainDot(face, kVec3YAxis) < 0.0f)
+                if (TerrainDotInline(face, kVec3YAxis) < 0.0f)
                     *normal = -face;
                 else
                     *normal = face;
@@ -906,7 +913,7 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
             if (flatShaded) {
                 TerrainVec3 face;
                 TerrainTriangleNormal(&v[1], &v[3], &v[2], &face, 0);
-                if (TerrainDot(face, kVec3YAxis) < 0.0f)
+                if (TerrainDotInline(face, kVec3YAxis) < 0.0f)
                     *normal = -face;
                 else
                     *normal = face;
@@ -923,7 +930,7 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
             if (flatShaded) {
                 TerrainVec3 face;
                 TerrainTriangleNormal(&v[0], &v[1], &v[3], &face, 0);
-                if (TerrainDot(face, kVec3YAxis) < 0.0f)
+                if (TerrainDotInline(face, kVec3YAxis) < 0.0f)
                     *normal = -face;
                 else
                     *normal = face;
@@ -938,7 +945,7 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
             if (flatShaded) {
                 TerrainVec3 face;
                 TerrainTriangleNormal(&v[0], &v[3], &v[2], &face, 0);
-                if (TerrainDot(face, kVec3YAxis) < 0.0f)
+                if (TerrainDotInline(face, kVec3YAxis) < 0.0f)
                     *normal = -face;
                 else
                     *normal = face;

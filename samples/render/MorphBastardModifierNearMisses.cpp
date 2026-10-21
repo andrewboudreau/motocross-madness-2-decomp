@@ -54,7 +54,12 @@
 // budget). Normalised ratio 0.93 over the first half; 872 of 896
 // instructions, retail frame 0x1fc (ours 0x1b4); the source here uses the
 // inline Vector3 constructor where retail calls 0x00404e60, and VC6's
-// term order differs in the products.
+// term order differs in the products. Retail's only 0x00404e60 call is
+// the (0, 0, 1) fallback of the z axis block (push 1.0, 0, 0 and call at
+// 0x004a49a8). It stays inline here: VC6 expands Vector3's constructor at
+// that site, 0x00404e60 is the out-of-line copy of Math3D.h's Vec3
+// constructor, and Math3D.h cannot be included next to MatrixUtil.h (both
+// define Matrix4), so the call would need a declared-only stand-in type.
 // Retail's in/out-of-line split is a budget split of one helper set: the
 // three axis blocks are the same code (row getter 0x004a2350, cross
 // product 0x00515600, the normalisation calling the dot product 0x0040ae30,

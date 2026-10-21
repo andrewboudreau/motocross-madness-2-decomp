@@ -35,6 +35,8 @@
 // rounds the clipped points with an inline __asm fld/fistp helper (float temp at ebp-8 / ebp-0x14,
 // pointer at ebp-0x10, `fld; mov eax,[ptr]; fistp [eax]`), which forces its ebp frame; the
 // (int) casts here call __ftol instead.
+// The same frame explains the two s_shadowPoints loads the s15 reference diff misses: with
+// ebp taken retail reloads the pointer per triangle copy, where VC6 here keeps it in ebp.
 #include "shadow/D3DIMSoultreeShadow.h"
 #include "../../../src/reconstructed/ClipRectangle.h"
 

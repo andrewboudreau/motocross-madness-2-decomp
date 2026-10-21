@@ -17,6 +17,9 @@
 // but 152 instruction diffs against 148; the row reset still folds), slot
 // 14's flat `first = cell * 6` vertex form and
 // `grid[0][cellRow * 5 + cellColumn]` (121).
+// Session 15 reference diff: the three 100.0f loads retail has and this lacks are
+// the case tails VC6 cross-jumps here (fild; fmul 100.0f; fstp [eax+8] shared by
+// cases 1, 3 and 4), and 0x0057a220 against 0x0057a224 is the +4 pointer bias.
 //
 // 0x0043e0b0 (352 bytes): the texture-coordinate arithmetic matches once the
 // low value is stored before the high one is computed. Retail keeps a row
