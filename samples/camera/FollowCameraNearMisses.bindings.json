@@ -27,7 +27,6 @@
   "?SetSubject@FollowCamera@@QAEXPAUUnknownFollowCameraSubject@@@Z": "0x00463600",
   "?LoadCameraFile@FollowCamera@@QAEXPBD@Z$ehhandler": "0x0054abba",
   "?Vec3ScaleCall@@YA?AUVector3@@ABU1@M@Z": "0x005015b0",
-  "?QueryGround@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
   "?Vec3Normalize@@YA?AUVector3@@ABU1@@Z": "0x005087b0",
   "?CrossProduct@@YA?AUVector3@@ABU1@0@Z": "0x00515600",
   "?ProjectPoint@UnknownFollowCameraProjector@@QAEHPAVCamera@@PBXPBUVector3@@PAU3@PAH@Z": "0x0052f340",
@@ -104,5 +103,6 @@
   "?LoadCameraFile@FollowCamera@@QAEXPBD@Z": "0x004650e0",
   "?Tick@FollowCamera@@UAEHM@Z": "0x00465c20",
   "?Vec3DotCall@@YAMPBUVec3@@0@Z": "0x0040ae30",
-  "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z": "0x005015b0"
+  "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z": "0x005015b0",
+  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10"
 }

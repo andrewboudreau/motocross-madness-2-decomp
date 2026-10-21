@@ -1,4 +1,6 @@
+#include "../krusty2/broadphase/Terrain.h"
 #include "GUIManagerCore.h"
+#include "../krusty2/motion/D3DIMSoultreeCharacter.h"
 #include "BikeRace.h"
 #include "TrackOverlay.h"
 
@@ -614,27 +616,27 @@ int BikeRace::Tick(float frameTime) {
                                                                               localRacer->statusNode->progressPos);
                         if (flagGirlState && localRacer->finished && fromFinish > 100.0f) {
                             ReplaceMeshId(flagGirl, 1, 2);
-                            flagGirl->SetMotionByName("Stand");
+                            reinterpret_cast<Character*>(flagGirl)->SetMotionByName("Stand");
                             flagGirlState = 0;
                         } else if ((previous && toFinish < 300.0f) || (last && fromFinish < 100.0f)) {
                             if (flagGirlState != 1) {
                                 ReplaceMeshId(flagGirl, 1, 2);
                                 flagGirlState = 1;
-                                flagGirl->SetMotionByName("FlagStart");
+                                reinterpret_cast<Character*>(flagGirl)->SetMotionByName("FlagStart");
                             } else if (flagGirl->motionFinished) {
-                                flagGirl->SetMotionByName("FlagLoop");
+                                reinterpret_cast<Character*>(flagGirl)->SetMotionByName("FlagLoop");
                             }
                         } else if (flagGirlState && flagGirlState < 3 &&
                                    ((previous && toFinish > 100.0f) || (last && fromFinish > 100.0f))) {
-                            flagGirl->SetMotionByName("Stand");
+                            reinterpret_cast<Character*>(flagGirl)->SetMotionByName("Stand");
                             flagGirlState = 0;
                         } else if ((last && toFinish < 300.0f) || (localRacer->finished && fromFinish < 100.0f)) {
                             if (flagGirlState < 3) {
                                 ReplaceMeshId(flagGirl, 2, 1);
                                 flagGirlState = 3;
-                                flagGirl->SetMotionByName("FlagStart");
+                                reinterpret_cast<Character*>(flagGirl)->SetMotionByName("FlagStart");
                             } else if (flagGirl->motionFinished) {
-                                flagGirl->SetMotionByName("FlagLoop");
+                                reinterpret_cast<Character*>(flagGirl)->SetMotionByName("FlagLoop");
                                 flagGirlState = 4;
                             }
                         }
@@ -1336,7 +1338,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
     }
     if (flagGirl != 0) {
         ReplaceMeshId(flagGirl, 1, 2);
-        flagGirl->SetMotionByName("Stand");
+        reinterpret_cast<Character*>(flagGirl)->SetMotionByName("Stand");
         flagGirlState = 0;
     }
     SetSceneTime(0.0001f);
@@ -1912,23 +1914,23 @@ void BikeRace::DrawTrack(Track* track) {
                 SetDrawColor(0, 0xff, 0);
                 a = *(Vector3*)&segment->edgeAX;
                 b = *(Vector3*)&segment->next->edgeAX;
-                raceTerrain->QueryGround(&a, 0, 0, 0);
-                raceTerrain->QueryGround(&b, 0, 0, 0);
+                reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&a), 0, 0, 0);
+                reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&b), 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine((const Vec3*)&a, (const Vec3*)&b);
                 a = *(Vector3*)&segment->edgeBX;
                 b = *(Vector3*)&segment->next->edgeBX;
-                raceTerrain->QueryGround(&a, 0, 0, 0);
-                raceTerrain->QueryGround(&b, 0, 0, 0);
+                reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&a), 0, 0, 0);
+                reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&b), 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine((const Vec3*)&a, (const Vec3*)&b);
                 SetDrawColor(0, 0, 0xff);
                 a = *(Vector3*)&segment->pointX;
                 b = *(Vector3*)&segment->next->pointX;
-                raceTerrain->QueryGround(&a, 0, 0, 0);
-                raceTerrain->QueryGround(&b, 0, 0, 0);
+                reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&a), 0, 0, 0);
+                reinterpret_cast<Terrain*>(raceTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&b), 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine((const Vec3*)&a, (const Vec3*)&b);

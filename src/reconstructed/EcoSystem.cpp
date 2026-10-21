@@ -1,3 +1,4 @@
+#include "../krusty2/broadphase/Terrain.h"
 // EcoSystem.cpp -- D:\aardvark\VC\krusty2\EcoSystem.cpp, 0x00455da0..0x0045c830.
 // See EcoSystem.h for the class evidence and docs/ECOSYSTEM.md for the
 // match state. Line numbers in the allocation calls are the retail
@@ -925,7 +926,7 @@ int EcoSystem::PlaceAuthoredObjects() {
                 position.x = (column + 0.5f) * cellX;
                 position.y = 0.0f;
                 position.z = (row + 0.5f) * cellZ;
-                groundTerrain->QueryGround(&position, 0, 0, 0);
+                reinterpret_cast<Terrain*>(groundTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&position), 0, 0, 0);
                 unsigned char heightParameter = definitionTable[index]->RandomParameter();
                 unsigned char radiusParameter = definitionTable[index]->ParameterForHeight(
                     definitionTable[index]->HeightForParameter(heightParameter));

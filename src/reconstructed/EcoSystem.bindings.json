@@ -111,7 +111,6 @@
   "?NextObjectSorted@UnknownEcoQuadTree@@QAEPAVUnknownEcoQuadTreeObject@@XZ": "0x004dd600",
   "?Pop@MemTagStack@@QAEXH@Z": "0x004a2d90",
   "?Push@MemTagStack@@QAEHPBD@Z": "0x004a2d00",
-  "?QueryGround@UnknownEcoTerrain@@QAEXPAUVector3@@0HPAE@Z": "0x00507c10",
   "?ReadClock@@YAIXZ": "0x004bfa80",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
   "?RestartQuery@UnknownEcoQuadTree@@QAEXXZ": "0x004dd750",
@@ -272,5 +271,6 @@
   "_strrchr": "0x00534a60",
   "_strstr": "0x005362c0",
   "_strtok": "0x00536397",
-  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x0050a590"
+  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x0050a590",
+  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10"
 }

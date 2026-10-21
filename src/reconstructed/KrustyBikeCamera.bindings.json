@@ -13,7 +13,6 @@
   "?LoadCameraFile@FollowCamera@@QAEXPBD@Z": "0x004650e0",
   "?SetupFlyby@KrustyBikeCamera@@QAEPAV1@PAXMMMMMHHPBH@Z": "0x00497d90",
   "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
-  "?QueryGround@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
   "?ReplaceHeadMessage@TextQueueOverlay@@QAEXPAVUnknownMessage@@@Z": "0x0051b540",
   "?GetSelectedSeries@TrackGameMode@@QAEHXZ": "0x00524100",
   "?OnControlPress@FollowCamera@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x00466ad0",
@@ -46,5 +45,6 @@
   "_kVec3XAxis": "0x0067c3d8",
   "_kVec3YAxis": "0x0067c3e8",
   "_kVec3ZAxis": "0x0067c3b8",
-  "_kVec3Zero": "0x0067c3c8"
+  "_kVec3Zero": "0x0067c3c8",
+  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10"
 }

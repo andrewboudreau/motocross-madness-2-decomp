@@ -25,4 +25,7 @@ method above). Near misses
 file), whose case bodies and jump table line up; VC6 merges the shared
 tails of cases 1, 2 and 4 differently. Also slot 10 `0x004e7d60`, which
 KrustyVCR shares; its control flow and callback switch order are
-reconstructed, but register and stack-slot assignment differ.
+reconstructed, but register and stack-slot assignment differ. The complete
+Tick body is maintained in `samples/race/RecorderTick.cpp` and included by the
+aggregate. Its [functional build review](RECORDER_TICK.md#functional-build-review)
+records the complete extent, native differential evidence and remaining limits.

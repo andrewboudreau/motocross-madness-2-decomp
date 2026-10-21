@@ -1,3 +1,4 @@
+#include "../../src/krusty2/broadphase/Terrain.h"
 // Complete per-frame camera candidate. Original TU ownership is unproven.
 // See docs/FOLLOW_CAMERA_TICK.md for the explicit nonexact review boundary.
 #include "../../src/reconstructed/FollowCamera.h"
@@ -28,7 +29,7 @@ int FollowCamera::Tick(float dt) {
         targetPoint = UnknownVirtualSlot57(0);
         position = followHeading * -followDistance;
         position += targetPoint;
-        subject->QueryGround(&position, 0, 0, 0);
+        reinterpret_cast<Terrain*>(subject)->QueryGround(reinterpret_cast<TerrainVec3*>(&position), 0, 0, 0);
         Vector3 direction = position - targetPoint;
         D3DRMVectorRotate(&position, &direction, &kVec3XAxis, followPitch);
         D3DRMVectorRotate(&direction, &position, &kVec3YAxis, followYaw);
@@ -37,7 +38,7 @@ int FollowCamera::Tick(float dt) {
         SetFrame(&position, 0, 0, 0, 0);
         target = followHeading * lookAheadDistance;
         target += targetPoint;
-        subject->QueryGround(&target, 0, 0, 0);
+        reinterpret_cast<Terrain*>(subject)->QueryGround(reinterpret_cast<TerrainVec3*>(&target), 0, 0, 0);
         LookAt(target);
         wasWide = FollowCameraAbs(followYaw) > 2.0f;
     }

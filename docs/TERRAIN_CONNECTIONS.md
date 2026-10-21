@@ -99,9 +99,11 @@ terrain loader or claim a fully reconstructed stream hierarchy. The isolated
 real build compiles 200/200 units and removes exactly these three obsolete
 names: **522 to 519**, with no new unresolved names.
 
-## QueryGround remains blocked
+## QueryGround behavior remains incomplete
 
-The five production QueryGround view names were examined but left unchanged.
+The five production QueryGround view names now use the canonical declaration;
+see [the caller connection proof](TERRAIN_QUERY_CONNECTIONS.md). That change
+preserves caller bytes and does not accept the provider's behavior.
 The existing provider at 0x00507c10 is registered as partial. Its current native
 COFF extent is **3321 bytes**, against the registered **2963-byte** retail body;
 older notes recording a 3225-byte candidate describe an earlier composition.
@@ -119,8 +121,8 @@ This example follows the decoded conversion semantics; it is not a full native
 behavioral validation of QueryGround or a claim about every runtime control-word
 state.
 
-Connecting more callers to that body would not establish correct ground
-sampling. It needs a separate full-body review and native differential proof,
+These connections do not establish correct ground sampling. The provider
+needs a separate full-body review and native differential proof,
 including conversion modes, cell boundaries, surface-byte selection and normal
 outputs. `/QIfist` is a possible compiler-calibration experiment for ordinary
 C++; it has not been adopted here. No assembly, rounding substitute or weakened

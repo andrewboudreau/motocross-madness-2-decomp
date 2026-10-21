@@ -1,3 +1,4 @@
+#include "../krusty2/broadphase/Terrain.h"
 #include "FollowCamera.h"
 
 #include "DebugAlloc.h"
@@ -647,7 +648,7 @@ bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
         eyePosition.z = viewMatrix.m[3][2];
         eyePosition += *offset;
         Vector3 ground = eyePosition;
-        subject->QueryGround(&ground, 0, 0, 0);
+        reinterpret_cast<Terrain*>(subject)->QueryGround(reinterpret_cast<TerrainVec3*>(&ground), 0, 0, 0);
         float height = ground.y + 3.5f;
         if (height > eyePosition.y)
             eyePosition.y = height;

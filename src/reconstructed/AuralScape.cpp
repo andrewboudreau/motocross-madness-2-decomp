@@ -1,3 +1,4 @@
+#include "../krusty2/broadphase/Terrain.h"
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -710,7 +711,7 @@ int AuralScape::Tick(float frameTime) {
     unsigned char material = 0;
     if (reverbEnabled && groundSubject && reverbOwner) {
         Vector3 position = ((UnknownAuralScapeTarget*)renderContext)->currentCamera->eyePosition;
-        groundSubject->QueryGround(&position, 0, 0, (int)&material);
+        reinterpret_cast<Terrain*>(groundSubject)->QueryGround(reinterpret_cast<TerrainVec3*>(&position), 0, 0, &material);
         zone = (material >> 4) & 3;
         environment = reverbOwner->field_0xa4->field_0x410[zone];
         SoundSystem()->SetEAXEnvironment(environment);

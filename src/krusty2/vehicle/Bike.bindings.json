@@ -95,7 +95,6 @@
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?FindByName@SoultreeObject@@QAEPAV1@PBD@Z": "0x004fdae0",
-  "?FindMotion@BikeA5C4@@QAEHPBDH@Z": "0x004a6b30",
   "?FindMotion@Character@@QAEPAUMotion@@PBDH@Z": "0x004a6b30",
   "?SetUseLighting@BikeA1A0@@QAEXH@Z": "0x004444c0",
   "?GetAxesIn@SoultreeObject@@QAEXPAV1@PAUVec3@@1@Z": "0x004fc540",

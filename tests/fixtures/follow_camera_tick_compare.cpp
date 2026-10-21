@@ -5,6 +5,7 @@
 #include <string.h>
 #include <float.h>
 #include "../../src/reconstructed/FollowCamera.h"
+#include "../../src/krusty2/broadphase/Terrain.h"
 #include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/TrackGameGlobal.h"
 
@@ -83,9 +84,9 @@ public:
         Begin(100,key,who,modifiers);Finish();return (scenario.keys&(key==0xc7?1:2))?-7:0;
     }
 };
-void UnknownFollowCameraSubject::QueryGround(Vector3* point,int a,int b,int c){
+void Terrain::QueryGround(TerrainVec3* point,TerrainVec3* a,int b,unsigned char* c){
     if((BYTE*)this!=world.subject || a || b || c)ExitProcess(85);
-    Event& e=Begin(101);VectorArgs(e,*point);Finish();point->y+=1.25f;
+    Event& e=Begin(101);VectorArgs(e,*(Vector3*)point);Finish();point->y+=1.25f;
 }
 extern "C" Vector3* __stdcall D3DRMVectorRotate(Vector3* result,Vector3* value,Vector3* axis,float angle){
     Event& e=Begin(102,result==value,result==axis,value==axis);VectorArgs(e,*value);VectorArgs(e,*axis,3);e.args[6]=angle;Finish();
@@ -109,7 +110,7 @@ template<class T> static DWORD Address(T method){union {T method;DWORD address;}
 void InitFastSqrtTable();
 static DWORD Hook(DWORD address){
     switch(address){
-    case 0x507c10:return Address(&UnknownFollowCameraSubject::QueryGround);
+    case 0x507c10:return Address(&Terrain::QueryGround);
     case 0x53304c:return (DWORD)D3DRMVectorRotate;
     case 0x42e9b0:return Address(&Camera::SetFrame);
     case 0x460b50:return (DWORD)FastSqrt;

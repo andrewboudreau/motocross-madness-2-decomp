@@ -37,17 +37,20 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 204 C++ files (181 canonical sources and twenty-three
-reviewed candidates) and reaches LINK with 492 unresolved external symbols,
+The 2026-10-21 build compiles 205 C++ files (181 canonical sources and twenty-four
+reviewed candidates) and reaches LINK with 483 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The final composition in `build-8h0dkhta` retains all prior strict results:
-2,978/2,989 calibration rows and 1,086/1,162 physics comparisons. The full
-suite ran 455 tests (444 passed, eleven skipped); all eight build-tool tests
-also pass after adding the candidate-header inventory regression. This does
+The final composition in `build-jfyngil3` retains all prior strict results:
+2,978/2,989 calibration rows and 1,086/1,162 physics comparisons. This does
 not establish game startup, menus or racing while linkage remains incomplete.
+Regression verification covers 459 tests: 448 passed and eleven skipped.
+The full run exposed one stale compiler-local EH label fingerprint; after
+verifying unchanged code and relocation destinations, its affected test passed
+on rerun. Logs are `tests-round19.log` and `tests-round19-terrain-rerun.log`
+under `work/game-build/`.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based
@@ -383,10 +386,38 @@ relocations remain unchanged. Its only game dependency is the existing global
 game pointer; the real link removes one name, **493 → 492**, with none added.
 Actual input devices and rendered camera operation remain untested.
 
+The [terrain query caller connections](TERRAIN_QUERY_CONNECTIONS.md) replace
+five provisional names with the canonical provider across nine units and 23
+calls, **492 → 487**. All caller code is preserved. QueryGround itself remains
+partial and has a known cell-selection defect: its truncating conversion
+differs from retail's rounding-mode-sensitive FISTP. Ground sampling still
+requires correction and full behavioral proof.
+
+Three [Character motion connections](CHARACTER_MOTION_CONNECTIONS.md) route
+rider lookups and flag/garage animation selection through existing strict
+providers, **487 → 484**. They retain primary receiver pointers and the exact
+32-bit motion-pointer handles. The focused checks preserve 181 strict results
+and twelve complete partial fingerprints; 3,840 native cases execute the actual
+lookup and state-update bodies, including missing-name faults.
+
+The complete [recorder tick](RECORDER_TICK.md#functional-build-review) is
+admitted as reviewed-nonexact after 147,749 native comparisons, **484 → 483**.
+Its 2,448-byte candidate handles forward, pending and reverse playback against
+the complete 2,412-byte retail body and jump table. Extraction preserves all
+13 aggregate functions and 45 nondebug sections. Locks and existing helper
+calls are scripted; actual threads, replay files and recording remain untested.
+
+Across the final build, all 204 pre-existing objects preserve their 10,373
+nondebug sections and 44,807 relocations under the eight verified external-name
+substitutions. Named COFF sections identify reordered RTTI records; local
+targets retain their section identity and offset. The new recorder candidate
+is the only added object. Private evidence is in
+`work/game-build/round19-all-objects.json` and `round19-link-evidence.json`.
+
 Validation of this composition passes the toolchain/manual/generated VC6 gate,
 2,978 of 2,989 calibration rows (2,976 distinct source/address/extent cases),
 and 1,086 strict physics targets among 1,162 comparisons. All prior strict
-cases remain, with seven additions across the two suites.
+cases remain, with no additions or losses in this composition.
 Both near-miss comparisons report zero drops. These counts retain existing nonexact comparisons;
 they do not describe a fully matched or working game.
 

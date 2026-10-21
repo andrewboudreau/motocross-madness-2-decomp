@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/race/RecorderTick.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete VCRInterface replay tick passes 147749 native whole-state, callback, lock, exception, fault and floating-point scenarios with the real VC6 conversion helper. VC6 emits 2448 bytes against 2412 retail bytes, retaining 276 matching positions. Seven game helpers and synchronization boundaries are scripted; actual worker scheduling and replay-file playback remain untested.",
+      "evidence": "docs/RECORDER_TICK.md#functional-build-review"
+    },
+    {
       "path": "samples/camera/FollowCameraControls.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete FollowCamera control handler passes 195339 native input, whole-state, callback, exception, fault and floating-point scenarios. VC6 emits 4046 bytes against the complete 4058-byte retail body, retaining 927 matching positions. Input callbacks are scripted; real DirectInput and rendered camera behavior remain untested.",

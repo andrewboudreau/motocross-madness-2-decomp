@@ -9,7 +9,6 @@
   "?FindTypeId@TypeRegistry@@QAEDPBD@Z": "0x00521ea0",
   "?g_TypeRegistry@@3PAVTypeRegistry@@A": "0x00575744",
   "?SphereTouchesObject@@YAHPBUCollisionVec3@@MMPAVCollisionObject@@@Z": "0x004394f0",
-  "?QueryGround@PlacementProbe@@QAEXPBUCollisionVec3@@PAU2@HPAE@Z": "0x00507c10",
   "_s_typeIdsReady": "0x00688774",
   "_s_collisionObjectTypeId": "0x0056eeb0",
   "_s_vegetationTypeId": "0x0056eeb1",
@@ -19,5 +18,6 @@
   "__real@4@3ffeb4fdf40000000000": "0x00550ae4",
   "__real@4@3fff9ddcc60000000000": "0x00555578",
   "__real@4@4002a000000000000000": "0x00550780",
-  "__real@4@40078000000000000000": "0x00550760"
+  "__real@4@40078000000000000000": "0x00550760",
+  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10"
 }

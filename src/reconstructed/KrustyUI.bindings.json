@@ -134,7 +134,6 @@
   "?Create@LightEmitter@@QAEPAV1@PAXHIPBUVector3@@1MHHHHH@Z": "0x0049e230",
   "?AddLight@LightManager@@QAEXPAVLightEmitter@@@Z": "0x0049e470",
   "?AdvanceMotion@UnknownKrustyUICharacter@@QAEHMHH@Z": "0x004a6bb0",
-  "?SetMotionByName@UnknownKrustyUICharacter@@QAEXPBD@Z": "0x004a8b10",
   "?Attach@UnknownParameterBlock@@QAEXPAVUnknownTextureStream@@HH@Z": "0x004b77a0",
   "?SelectSection@UnknownParameterBlock@@QAEHPBD@Z": "0x004b78f0",
   "?GetString@UnknownParameterBlock@@QAEHPBD0PADH@Z": "0x004b7ec0",
@@ -225,5 +224,6 @@
   "?FindInputDialog@GUIManager@@QAEPAVUIDialog@@XZ": "0x00485df0",
   "?OpenDialogResource@GUIManager@@QAEHPBD@Z": "0x00485c80",
   "?ShowCursors@GUIManager@@QAEXH@Z": "0x00486630",
-  "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70"
+  "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
+  "?SetMotionByName@Character@@QAEXPBD@Z": "0x004a8b10"
 }

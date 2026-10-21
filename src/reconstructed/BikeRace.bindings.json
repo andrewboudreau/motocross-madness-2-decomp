@@ -114,7 +114,6 @@
   "?RecordedLength@KrustyVCR@@QAEMXZ": "0x0049c000",
   "?SaveRecording@KrustyVCR@@QAEXMPADH@Z": "0x0049c010",
   "?SetRacer@KrustyVCR@@QAEXHDHPAD0000HHH@Z": "0x0049c070",
-  "?SetMotionByName@UnknownBikeRaceCharacter@@QAEXPBD@Z": "0x004a8b10",
   "?ApplyReplayDelta@UnknownBikeRaceGhost@@QAEXPBUUnknownBikeRaceGhostDelta@@PAUUnknownBikeRaceGhostPart@@@Z": "0x004a9aa0",
   "?SetRecorder@UnknownTrackGameViewOwnerDc@@QAEXPAVKrustyVCR@@@Z": "0x004a9d10",
   "?PickFollowedRacer@TrackGameViewOwner@@QAEXXZ": "0x004a9d20",
@@ -133,7 +132,6 @@
   "?RestartAllEntries@Scene@@QAEXM@Z": "0x004eb000",
   "?RestartEntry@Scene@@QAEHHMHH@Z": "0x004eb040",
   "?ResolveSltPath@Scene@@QAEHPAD@Z": "0x004f0ec0",
-  "?QueryGround@UnknownBikeRaceProjector@@QAEXPAUVector3@@0HPAE@Z": "0x00507c10",
   "?FreeReachableNodes@Track@@QAEHPAPAUTrackNode@@@Z": "0x00516870",
   "?FreeWorkList@Track@@QAEHPAPAUTrackListItem@@H@Z": "0x00517930",
   "?DistanceAlong@Track@@QAEMUTrackPos@@0@Z": "0x00517da0",
@@ -244,5 +242,7 @@
   "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
   "?ShowCursors@GUIManager@@QAEXH@Z": "0x00486630",
   "?GetUser@GUIManager@@QAEPAVGUIUser@@H@Z": "0x00486540",
-  "?CreateCursors@GUIManager@@QAEXPBDH@Z": "0x00486590"
+  "?CreateCursors@GUIManager@@QAEXPBDH@Z": "0x00486590",
+  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10",
+  "?SetMotionByName@Character@@QAEXPBD@Z": "0x004a8b10"
 }

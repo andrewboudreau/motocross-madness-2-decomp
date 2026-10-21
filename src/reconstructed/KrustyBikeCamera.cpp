@@ -1,3 +1,4 @@
+#include "../krusty2/broadphase/Terrain.h"
 #include "KrustyBikeCamera.h"
 #include "D3DIMSoulTree.h"
 
@@ -61,7 +62,7 @@ void KrustyBikeCamera::UnknownVirtualSlot52(Vector3* point) {
     bool capped = g_TrackGame->mode.GetSelectedSeries() == 3 ||
                   g_TrackGame->mode.GetSelectedSeries() == 4;
     Vector3 ground = *point;
-    subject->QueryGround(&ground, 0, 0, 0);
+    reinterpret_cast<Terrain*>(subject)->QueryGround(reinterpret_cast<TerrainVec3*>(&ground), 0, 0, 0);
     float minimum = ground.y + 3.5f;
     if (minimum > point->y) {
         if (followPitch < 0.0f)

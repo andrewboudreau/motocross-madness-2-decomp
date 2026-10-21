@@ -1,3 +1,4 @@
+#include "../krusty2/broadphase/Terrain.h"
 // Placement area queries (0x004b08f0..0x004b0df0). The code sits after
 // ObjectPicker.cpp's last function and before ObjectPlacement.cpp's first
 // __FILE__ reference, and ObjectPlacement (0x004b0df0) is the main caller.
@@ -178,12 +179,12 @@ void ClampToPlacementSquare(CollisionObject* object, PlacementProbe* probe, cons
     float step = scale * 10.0f;
     if (step + minX > position->x) {
         CollisionVec3 probePoint = *position;
-        probe->QueryGround(&probePoint, &normal, 1, 0);
+        reinterpret_cast<Terrain*>(probe)->QueryGround(reinterpret_cast<TerrainVec3*>(&probePoint), reinterpret_cast<TerrainVec3*>(&normal), 1, 0);
         if (normal.y < 0.707f)
             position->x = step + position->x;
     } else if (maxX - step < position->x) {
         CollisionVec3 probePoint = *position;
-        probe->QueryGround(&probePoint, &normal, 1, 0);
+        reinterpret_cast<Terrain*>(probe)->QueryGround(reinterpret_cast<TerrainVec3*>(&probePoint), reinterpret_cast<TerrainVec3*>(&normal), 1, 0);
         if (normal.y < 0.707f)
             position->x = position->x - step;
     }
@@ -194,12 +195,12 @@ void ClampToPlacementSquare(CollisionObject* object, PlacementProbe* probe, cons
         position->z = maxZ - margin;
     if (step + minZ > position->z) {
         CollisionVec3 probePoint = *position;
-        probe->QueryGround(&probePoint, &normal, 1, 0);
+        reinterpret_cast<Terrain*>(probe)->QueryGround(reinterpret_cast<TerrainVec3*>(&probePoint), reinterpret_cast<TerrainVec3*>(&normal), 1, 0);
         if (normal.y < 0.707f)
             position->z = step + position->z;
     } else if (maxZ - step < position->z) {
         CollisionVec3 probePoint = *position;
-        probe->QueryGround(&probePoint, &normal, 1, 0);
+        reinterpret_cast<Terrain*>(probe)->QueryGround(reinterpret_cast<TerrainVec3*>(&probePoint), reinterpret_cast<TerrainVec3*>(&normal), 1, 0);
         if (normal.y < 0.707f)
             position->z = position->z - step;
     }

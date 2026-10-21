@@ -3,7 +3,6 @@
   "?SetFieldOfView@Camera@@QAEXM@Z": "0x0042e930",
   "?SetFrame@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
-  "?QueryGround@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
   "?Tick@Camera@@UAEHM@Z": "0x0042e690",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "_D3DRMVectorRotate@16": "0x0053304c",
@@ -25,5 +24,6 @@
   "_$E2": "0x00466f60",
   "_$E1": "0x00466f70",
   "_$E5": "0x00466ff0",
-  "_$E4": "0x00467000"
+  "_$E4": "0x00467000",
+  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10"
 }

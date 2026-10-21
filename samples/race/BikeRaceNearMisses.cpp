@@ -796,7 +796,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 flagGirl->modelNode->SetUseLighting(1);
                 flagGirl->modelNode->SetPositionVec3(girlPosition);
                 flagGirl->modelNode->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
-                flagGirl->SetMotionByName("Stand");
+                reinterpret_cast<Character*>(flagGirl)->SetMotionByName("Stand");
                 flagGirl->UnknownVirtualSlot7(0.001f, 0, 0);
             }
 

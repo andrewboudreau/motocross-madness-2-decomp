@@ -69,8 +69,8 @@
   "?UnknownVirtualSlot36@FollowCamera@@UAE_NABUVector3@@_N1@Z": "0x00465000",
   "__ftol": "0x00534a88",
   "?UnknownVirtualSlot47@FollowCamera@@UAE_NMPBUVector3@@@Z": "0x00465720",
-  "?QueryGround@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
   "__real@4@4000e000000000000000": "0x00550b94",
   "?SetFieldOfView@Camera@@QAEXM@Z": "0x0042e930",
-  "?Tick@Camera@@UAEHM@Z": "0x0042e690"
+  "?Tick@Camera@@UAEHM@Z": "0x0042e690",
+  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10"
 }

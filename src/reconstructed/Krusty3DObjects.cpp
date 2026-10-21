@@ -1,3 +1,4 @@
+#include "../krusty2/broadphase/Terrain.h"
 #include "BikeRaceCore.h"
 // Krusty3DObjects.cpp -- reconstruction of part of
 // D:\aardvark\VC\krusty2\Krusty3DObjects.cpp. See Krusty3DObjects.h and
@@ -125,27 +126,27 @@ int RunwayLights::Tick(float frameTime) {
     Vector3 point;
     Vector3 normal;
     point = position + direction * 6.0f;
-    groundTerrain->QueryGround(&point, &normal, 0, 0);
+    reinterpret_cast<Terrain*>(groundTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
     point.y += 4.0f;
     lightModels[0]->SetPosition(&point);
     lightModels[0]->SetAxes(&direction, &normal, 1, 0);
     point = position + direction * 3.0f;
-    groundTerrain->QueryGround(&point, &normal, 0, 0);
+    reinterpret_cast<Terrain*>(groundTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
     point.y += 4.0f;
     lightModels[1]->SetPosition(&point);
     lightModels[1]->SetAxes(&direction, &normal, 1, 0);
     point = position;
-    groundTerrain->QueryGround(&point, &normal, 0, 0);
+    reinterpret_cast<Terrain*>(groundTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
     point.y += 4.0f;
     lightModels[2]->SetPosition(&point);
     lightModels[2]->SetAxes(&direction, &normal, 1, 0);
     point = position - direction * 3.0f;
-    groundTerrain->QueryGround(&point, &normal, 0, 0);
+    reinterpret_cast<Terrain*>(groundTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
     point.y += 4.0f;
     lightModels[3]->SetPosition(&point);
     lightModels[3]->SetAxes(&direction, &normal, 1, 0);
     point = position - direction * 6.0f;
-    groundTerrain->QueryGround(&point, &normal, 0, 0);
+    reinterpret_cast<Terrain*>(groundTerrain)->QueryGround(reinterpret_cast<TerrainVec3*>(&point), reinterpret_cast<TerrainVec3*>(&normal), 0, 0);
     point.y += 4.0f;
     lightModels[4]->SetPosition(&point);
     lightModels[4]->SetAxes(&direction, &normal, 1, 0);

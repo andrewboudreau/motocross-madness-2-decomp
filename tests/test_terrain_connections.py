@@ -29,8 +29,10 @@ PROVIDERS = (
 # This is deliberately not a successful retail comparison of either function.
 PARTIAL = (
     # Stream, cache and texture connections change external names and renumber an EH
-    # label. All 84 non-debug sections retain their bytes and destinations.
-    ('?Load@Terrain@@', 2117, '54ce14f2eaec205011dfa23fa914b73d44a07f63afc7fa1ba81411c9d93ab775'),
+    # label. The shared GroundFogableObject header later changes $L4894 to
+    # $L4895 at offset 3; complete nondebug section bytes/destinations remain
+    # identical (round19-all-objects.json), including this EH target.
+    ('?Load@Terrain@@', 2117, '178c14f231b2e602d70a1f07bd0781b3ea6ec6d32b4b2722a71319a73a1d4e0f'),
     ('QueryGround', 3321, '07ea9bdeb16235841aaf1d125c77ee580b9b1667ec900de488c74df2f57207b3'),
 )
 

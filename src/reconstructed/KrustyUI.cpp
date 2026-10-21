@@ -1,4 +1,5 @@
 #include "GUIManagerCore.h"
+#include "../krusty2/motion/D3DIMSoultreeCharacter.h"
 #include "KrustyUI.h"
 
 #include <stdio.h>
@@ -305,7 +306,7 @@ void KrustyUI::BuildGarageScene(int value) {
         KRUSTYUI_GARAGE->modelNode->SetUseLighting(0);
         KRUSTYUI_GARAGE->modelNode->SetPosition(&garageFocus);
         KRUSTYUI_GARAGE->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
-        KRUSTYUI_GARAGE->SetMotionByName("Spin");
+        reinterpret_cast<Character*>(KRUSTYUI_GARAGE)->SetMotionByName("Spin");
         KRUSTYUI_GARAGE->AdvanceMotion(0.03f, 0, 0);
         UnknownKrustyUIShadow* projected = new(__FILE__, 0x182) UnknownKrustyUIShadow(1);
         shadow = projected->Init(renderContext, g_TrackGame->textureManager);
@@ -321,7 +322,7 @@ void KrustyUI::BuildGarageScene(int value) {
         KRUSTYUI_RIDER->modelNode->SetUseLighting(1);
         KRUSTYUI_RIDER->modelNode->SetPosition(&KRUSTYUI_RIDER_POSITION);
         KRUSTYUI_RIDER->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
-        KRUSTYUI_RIDER->SetMotionByName("WaitR");
+        reinterpret_cast<Character*>(KRUSTYUI_RIDER)->SetMotionByName("WaitR");
         KRUSTYUI_RIDER->AdvanceMotion(0.03f, 0, 0);
         ((RenderTarget*)renderContext)->SetCamera(0);
         pending = 1;
@@ -340,7 +341,7 @@ void KrustyUI::BuildGarageScene(int value) {
             bike->modelNode->SetUseLighting(1);
             bike->modelNode->SetPosition(&garageFocus);
             bike->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
-            bike->SetMotionByName("WaitB");
+            reinterpret_cast<Character*>(bike)->SetMotionByName("WaitB");
             bike->AdvanceMotion(0.03f, 0, 0);
             painter.PaintNumber(bike->modelNode, g_TrackGame->mode.plateNumber);
         }

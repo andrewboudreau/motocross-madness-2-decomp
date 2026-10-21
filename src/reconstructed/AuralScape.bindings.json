@@ -117,7 +117,6 @@
   "?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVUnknownTextureStream@@PBD1H@Z": "0x004e9cd0",
   "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
   "?FindByName@SoultreeObject@@QAEPAV1@PBD@Z": "0x004fdae0",
-  "?QueryGround@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
   "?Tick@AuralScape@@UAEHM@Z": "0x00403710",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "?Tick@SoultreeSoundEmitter@@UAEHM@Z": "0x00402a70",
@@ -182,5 +181,6 @@
   "_s_UnknownListenerDistances57772c": "0x0057772c",
   "_s_UnknownListenerPositions5776f8": "0x005776f8",
   "_sprintf": "0x00534aaf",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10"
 }

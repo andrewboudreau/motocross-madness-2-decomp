@@ -1,0 +1,14 @@
+{
+  "?Tick@VCRInterface@@UAEHM@Z": "0x004e7d60",
+  "?AppendPosition@UnknownVcr@@QAEXHH@Z": "0x00524590",
+  "__real@4@4008fa00000000000000": "0x00550f44",
+  "?Rewind@VCRInterface@@QAEXXZ": "0x004e8a70",
+  "?Seek@VCRInterface@@QAEXI@Z": "0x004e8a20",
+  "?SeekPosition@UnknownVcr@@QAEXH@Z": "0x00524870",
+  "?StopReading@VCRInterface@@QAEXXZ": "0x004e8990",
+  "?TakeRecord@VCRInterface@@QAEHPAH00PAXPAIH@Z": "0x004e8810",
+  "?RestartReverseRead@VCRInterface@@QAEXXZ": "0x004e89c0",
+  "__imp__LeaveCriticalSection@4": "0x00550284",
+  "__imp__EnterCriticalSection@4": "0x0055025c",
+  "__ftol": "0x00534a88"
+}

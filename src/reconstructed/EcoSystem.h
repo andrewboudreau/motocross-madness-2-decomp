@@ -29,14 +29,7 @@ class TextureMapManager;
 struct UnknownBitmapFile;
 struct UnknownTgaFile;
 
-// Second direct base at +0x2c (RTTI .?AVGroundFogableObject@@, no vfptr);
-// the shared ctor body 0x004aae20 stores one zero dword
-// (src/krusty2/broadphase/Terrain.h declares the same class).
-class GroundFogableObject {
-public:
-    GroundFogableObject();                    // 0x004aae20
-    int field_0x00;
-};
+#include "GroundFogableObject.h"
 
 // Stand-ins for classes reconstructed elsewhere, limited to what this
 // file touches (the canonical declarations live in src/krusty2 and would

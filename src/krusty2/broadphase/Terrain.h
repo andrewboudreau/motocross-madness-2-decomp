@@ -20,13 +20,7 @@
 #include "../core/MemTag.h"
 #include "../core/DebugAlloc.h"
 
-// Second direct base of Terrain at mdisp 0x2c (RTTI .?AVGroundFogableObject@@, tier 1); it has no
-// vfptr.  Its contents are PROVISIONAL: the 0x004aae20 ctor only stores 0 in its first dword.
-class GroundFogableObject {
-public:
-    GroundFogableObject();                      // 0x004aae20: stores 0 in field_0x00
-    int field_0x00;
-};
+#include "../../reconstructed/GroundFogableObject.h"
 
 // PROVISIONAL: DirectX-style interface at Terrain+0x34; the dtor calls slot 2 with `this`
 // pushed on the stack (`mov ecx,[eax]; push eax; call [ecx+8]`), i.e. an IUnknown::Release.
