@@ -529,3 +529,12 @@ with its first error line, and the tool then exits with status 1:
 ```powershell
 python tools/reference_diff.py --lane shell --json work/ref.json --md work/ref.md
 ```
+
+The gates guard strict-exact entries only; a near miss can lose positional
+strict bytes, or its source can stop compiling, without failing them.
+`tools/near_miss_drops.py` compares two calibration or physics outputs per
+target VA and exits with status 1 when any row lost bytes or went missing:
+
+```powershell
+python tools/near_miss_drops.py work/base-phys.json work/phys.json
+```
