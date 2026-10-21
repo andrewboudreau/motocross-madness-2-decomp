@@ -53,7 +53,9 @@ The dialog is a plain `UIDialog*` everywhere (the former `UnknownGuiDialog`
 view is gone; `FindSectionObject` returns the dialog's `Sound*`). Near misses
 (`samples/ui/GUIManagerNearMisses.cpp`, notes there): the screen grab `0x00486170`, the tool-tip layout `0x00486b10` and
 `0x00488120`. HiResMeter slot 8
-`0x00488440` uses `rdtsc` (inline assembly) and is not attempted.
+`0x00488440` uses `rdtsc` in retail. A complete [functional candidate](GAME_TICK.md)
+retains its calibration algorithm with QPC replacing the profiling counter;
+it is explicitly nonexact and remains in `samples/`.
 
 ## Shared caller connections
 

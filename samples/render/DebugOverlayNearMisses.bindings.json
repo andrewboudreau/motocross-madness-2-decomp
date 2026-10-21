@@ -6,7 +6,6 @@
   "??_C@_0BF@GMNB@DebugOverlayText?4tga?$AA@": "0x00568d2c",
   "?LoadFont@DebugOverlay@@QAEHXZ": "0x00447a00",
   "?LoadFont@DebugOverlay@@QAEHXZ$ehhandler": "0x0054a2d7",
-  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHHHHHHHIHH@Z": "0x0050a590",
   "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
@@ -21,5 +20,6 @@
   "__imp__SetTextColor@8": "0x00550080",
   "__imp__TextOutA@20": "0x00550088",
   "__real@4@3ff78000000000000000": "0x005516d8",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x0050a590"
 }

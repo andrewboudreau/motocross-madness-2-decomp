@@ -11,9 +11,7 @@
 class TextureMapManager;
 
 // 0x0050a590 (Texmap.cpp, cdecl): loads the texture file `name`; 0 on failure.
-TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int format,
-                                  int a4, int a5, int a6, int a7, int a8, int a9,
-                                  unsigned int key, int a11, int a12);
+#include "TextureLoader.h"
 
 // A rectangle built from its two horizontal and two vertical edges
 // (0x00518d50, 0x00518d60). It has the same layout as UnknownOverlayRect.

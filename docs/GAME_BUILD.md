@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-20 build compiles 176 C++ files (173 canonical sources and three
-reviewed candidates) and reaches LINK with 656 unresolved external symbols,
+The 2026-10-20 build compiles 179 C++ files (174 canonical sources and five
+reviewed candidates) and reaches LINK with 641 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -157,20 +157,28 @@ another twelve unresolved names with none added. Native checks cover resource
 layouts and imports, 229 collision geometry/alias cases, and SurfaceMap's
 ownership, material copying and virtual-call interfaces.
 
+The shared [texture loader](TEXTURE_LOADER_CONNECTIONS.md) and material
+declarations connect eight more existing providers. Garage lighting uses four
+actual LightEmitter/LightManager providers, and verified [meter pointer
+storage](HIRESMETER_STORAGE.md) supplies the existing global instance's address.
+The complete [game tick and calibration](GAME_TICK.md#functional-build-review)
+are reviewed nonexact candidates with a consistent QPC profiling backend.
+Their 39,376 native differential scenarios retain gameplay's ReadClock timing;
+4,096 separate native calls exercise the actual QPC backend. These slices
+remove fifteen missing symbols without introducing new unresolved names.
+
 Validation of this composition passes the toolchain/manual/generated VC6 gate,
 2,975 of 2,986 calibration rows (2,973 distinct source/address/extent cases),
 and all 1,076 previously strict physics targets among 1,152 comparisons.
 The recursive reset's strict case moves from FileStream.cpp to
 Parameterblocks.cpp with its address and full 30-byte extent unchanged;
 ShowDialog adds one strict case. The native-enabled Python suite passes
-399 tests with 11 skipped. These counts retain existing nonexact comparisons;
+407 tests with 11 skipped. These counts retain existing nonexact comparisons;
 they do not describe a fully matched or working game.
 
-The source still lacks `Game::Tick` at `0x004685d0`, called by
-`TrackGame::Tick`; its retail timing uses `rdtsc` (see [Game](GAME.md)).
-Startup still lacks `RecordExceptionInfo`. These are gameplay blockers in
-addition to other incompatible class views, missing methods and unresolved
-globals. Import libraries alone cannot supply them.
+Startup still lacks `RecordExceptionInfo`. Other incompatible class views,
+missing methods and unresolved globals continue to block linking. Import
+libraries alone cannot supply them.
 
 An eventual successful link is only the next gate. Startup/static
 initialization, external assets, resources, current-Windows display behavior,

@@ -1318,7 +1318,7 @@ HiResMeter g_HiResMeterInstance(0);
 // 0x00488380
 HiResMeter::HiResMeter(int flags) : GameObject(flags) {
     overlayPage = -1;
-    countsPerMs = 0;
+    millisecondsPerCounterTick = 0;
     ClearTimers();
     if (SetRenderContext(0))
         counterUsable = 1;

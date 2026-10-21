@@ -34,11 +34,8 @@ struct SoultreeTextureOptions {
 };
 
 // 0x0050a590 (Texmap.cpp, cdecl): loads the texture file `name`; 0 on failure.
-// TrackOverlay.h declares the same entry with an int in place of `options`.
-TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int format,
-                                  int a4, int flags, int sourceBlend, int destBlend,
-                                  SoultreeTextureOptions* options, int alphaThreshold,
-                                  unsigned int key, int a11, int a12);
+// The local six-word options view is converted at the shared call boundary.
+#include "TextureLoader.h"
 
 class SoultreeMaterial : public GameObject {
 public:

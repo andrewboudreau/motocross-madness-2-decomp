@@ -237,10 +237,7 @@ public:
     int pixelFormat;                          // +0x20
 };
 // 0x0050a590 (TextureMap.h): loads a texture through the manager.
-UnknownEcoTexture* TerrainLoadTexture(TextureMapManager* manager, const char* name, int format,
-                                         void* palette, int flags, int addressU, int addressV,
-                                         void* choice, int alphaThreshold, unsigned int key,
-                                         int addRef, int fromArchive);
+#include "TextureLoader.h"
 
 // 0x00460b50 / 0x00460c00 / 0x00460c70 (src/krusty2/math/FastMath.h).
 float FastSqrt(float x);

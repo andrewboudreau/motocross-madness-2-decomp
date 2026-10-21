@@ -45,7 +45,6 @@
   "?SetRadarAnchor@NameOverlay@@QAEXUVector3@@HH@Z": "0x005190a0",
   "?Setup@ChatOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@PAXUUnknownOverlayRect@@3@Z": "0x0051cf80",
   "?Setup@ChatOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@PAXUUnknownOverlayRect@@3@Z$ehhandler": "0x0054ed34",
-  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHHHHHHHIHH@Z": "0x0050a590",
   "?TintRows@Overlay@@QAEHHHG@Z": "0x004b6880",
   "?WorldToMap@RadarOverlay@@QAEHUVector3@@PAH1PAM2@Z": "0x0051c360",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
@@ -69,5 +68,6 @@
   "__real@4@bfd0b424dc0000000000": "0x0055884c",
   "_qsort": "0x00534426",
   "_s_UnknownGlobal68a444": "0x0068a444",
-  "_sprintf": "0x00534aaf"
+  "_sprintf": "0x00534aaf",
+  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x0050a590"
 }

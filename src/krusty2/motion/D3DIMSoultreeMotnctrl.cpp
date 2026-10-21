@@ -269,7 +269,8 @@ D3DIMSoultreeCharacter::D3DIMSoultreeCharacter(int a) : GameObject(1), Character
 // and GameObject +0xc, 0x2d8 bytes).  samples/physics/collision/SoultreePhysicsObject.h declares it, but its slot 7
 // (0x00444560, `ret 4`) takes the object to copy from and the header declares no argument, so this TU keeps a local
 // stand-in with the same layout and vtable shape (tier 3).
-class SceneItem;
+#include "../../reconstructed/SoultreeMaterial.h"
+typedef SoultreeMaterial SceneItem;
 class ModelObject : public QuadTreeObject, public GameObject {
 public:
     explicit ModelObject(int a);                 // 0x0043f160, ret 4
@@ -283,9 +284,9 @@ public:
     // 0x0043f4b0, ret 0x14: loads the model; slot 0 passes (field_0x18, name, descriptor words, 1).
     virtual void Load(void* a1, const char* a2, int a3, int a4, int a5);
     char pad_0x38[0x240 - 0x38];
-    int textureManager;                          // +0x240 D3DIMSoulTree.h names: copied by CopyFrom, passed to SceneItem::Init
-    int textureFormat;                           // +0x244 copied by CopyFrom, passed to SceneItem::Init
-    char textureOptions[0x274 - 0x248];          // +0x248 the six option dwords, then the modifier lists; passed by address to SceneItem::Init
+    int textureManager;                          // +0x240 D3DIMSoulTree.h names: copied by CopyFrom, passed to SoultreeMaterial::Attach
+    int textureFormat;                           // +0x244 copied by CopyFrom, passed to SoultreeMaterial::Attach
+    char textureOptions[0x274 - 0x248];          // +0x248 the six option dwords, then the modifier lists; passed by address to SoultreeMaterial::Attach
     int lodCount;                                // +0x274 moved from the temporary model in slot 0
     char pad_0x278[0x280 - 0x278];
     int autoLodDistances;                        // +0x280 moved (and cleared in the source) in slot 0
@@ -295,16 +296,6 @@ public:
     SceneItem** items;                           // +0x290 array of itemCount SceneItem pointers (D3DIMSoulTree.h materialTable)
     int itemCount;                               // +0x294
     char pad_0x298[0x2d8 - 0x298];
-};
-
-// 0x00500xxx-range helper object (0xd0 bytes, GameObject base, ctor 0x004fefe0 ret 4): one per entry of
-// ModelObject::items (tier 3 name).
-class SceneItem : public GameObject {
-public:
-    explicit SceneItem(int a);                                        // 0x004fefe0
-    void Init(void* a, void* b, int c, int d);                        // 0x004ff0b0, ret 0x10
-    void CopyFrom(SceneItem* other);                                  // 0x005000f0, ret 4
-    char pad_0x2c[0xd0 - 0x2c];
 };
 
 // slot 9 (0x00445ec0, ret 4): clones the argument character's node model, makes it a child of this object's
@@ -360,8 +351,9 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
         (SceneItem**)DebugMalloc(((ModelObject*)modelNode)->itemCount << 2, __FILE__, 0xeb);
     for (int i = 0; i < ((ModelObject*)modelNode)->itemCount; i++) {
         ((ModelObject*)modelNode)->items[i] = new(__FILE__, 0xed) SceneItem(1);
-        ((ModelObject*)modelNode)->items[i]->Init(renderContext, ((ModelObject*)modelNode)->textureOptions,
-                                                  ((ModelObject*)modelNode)->textureManager,
+        ((ModelObject*)modelNode)->items[i]->Attach(static_cast<RenderTarget*>(renderContext),
+                reinterpret_cast<const SoultreeTextureOptions*>(((ModelObject*)modelNode)->textureOptions),
+                reinterpret_cast<TextureMapManager*>(((ModelObject*)modelNode)->textureManager),
                                                   ((ModelObject*)modelNode)->textureFormat);
         AppendChild(((ModelObject*)modelNode)->items[i], -1);
         ((ModelObject*)modelNode)->items[i]->CopyFrom(loaded->items[i]);

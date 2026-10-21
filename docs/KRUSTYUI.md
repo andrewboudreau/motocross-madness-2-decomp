@@ -112,9 +112,24 @@ Exact (43 functions, including the open-menu routine `OpenMenu` `0x00499b20`):
   render target read through a cast each time (a local adds a register
   copy), and an inline helper for "add the light when there is one" —
   written out three times, VC6 forms the bike loop's addresses as
-  [offset + list] instead of [list + offset]. The views it calls are local
-  to `KrustyUI.cpp`;
+  [offset + list] instead of [list + offset]. The remaining character and
+  shadow views are local to `KrustyUI.cpp`; lights use `LightEmitter.h`;
 - `0x0049bdb0` and the eight `$E` thunks/bodies `0x0049bdd0..0x0049bed0`.
+
+The garage's `LightEmitter` and `LightManager` calls join the existing
+canonical implementations directly: constructors `0x0049deb0` (227 bytes)
+and `0x0049e390` (78), `LightEmitter::Create` `0x0049e230` (348), and
+`LightManager::AddLight` `0x0049e470` (23). The allocations are respectively
+0xac and 0x11c bytes; retail RTTI gives each a nonvirtual `GameObject` base
+at offset zero. `Create` retains its eleven arguments and pointer return;
+`AddLight` stores the emitter in the manager's array and sets its owner at
++0xa4. No adapter bodies or duplicate light objects are introduced.
+`tests/test_garage_light_connections.py` compiles the real caller and
+providers, verifies all five complete bodies against retail with resolved
+relocations, and checks native sizes, registration fields and base-pointer
+conversions against the retail inheritance records. All 72 KrustyUI and
+LightEmitter calibration cases remain strict. These four connected symbols
+do not complete the garage's remaining character and shadow dependencies.
 
 The random helper `RandomUnit()` returns `(float)(rand() * (1.0f / 32768))`.
 The explicit cast is what keeps VC6 from folding the scale into a following

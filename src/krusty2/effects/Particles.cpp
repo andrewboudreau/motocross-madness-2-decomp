@@ -201,8 +201,8 @@ ParticleManager* ParticleManager::UnknownVirtualSlot27(int parentArg, TextureMap
         g_particleCellUVs[i].v3 = v;
     }
 
-    texture = TerrainLoadTexture(textures, textureName, 0x115c, 0, 0, 5, 6, 0, 0x80,
-                                    0xff00ff, 1, 1);
+    texture = reinterpret_cast<ParticleTexture*>(TerrainLoadTexture(textures, textureName, 0x115c, 0, 0, 5, 6, 0, 0x80,
+                                    0xff00ff, 1, 1));
     texture->UnknownVirtualSlot8(1, 0, 0);
 
     corners[0].x = 1.0f;

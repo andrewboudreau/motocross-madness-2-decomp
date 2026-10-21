@@ -54,14 +54,16 @@ candidates.
 | 7, 19–29, 31, 32, 34 | | `_purecall` |
 | 2 | `0x00467af0` | Exact. Creates the PCControlInterface (`new` at line 187) and calls its slot 1 |
 | 8 | `0x00467eb0` | Exact. Renders a frame, timing each phase, and fills the debug overlay's profile and memory pages |
-| 10 | `0x004685d0` | Not reconstructed: it reads the time stamp counter with `rdtsc`, which VC6 can only emit from inline assembly |
+| 10 | `0x004685d0` | Complete [functional candidate](GAME_TICK.md) with QPC profiling; nonexact, gameplay still uses ReadClock |
 
 The two `rdtsc` instructions are at `0x004686a0` and `0x00468712`; they
 update the HiResMeter profiling entry. The gameplay frame delta separately
 uses `ReadClock` at `0x004bfa80`. Authentic VC6 SP3 rejects
 `#pragma intrinsic(__rdtsc)` with C4163 and emits an external call for that
-spelling. Replacing the counter with `ReadClock` would change the profiling
-units and behavior, so no such substitute is supplied.
+spelling. The functional candidate uses QPC at both profiling-stamp and
+calibration boundaries, explicitly changing that backend and retaining the
+independent gameplay clock. Its evidence and nonexact limits are recorded in
+[Game tick](GAME_TICK.md).
 
 The members at +0x2f4 and +0x34 are GameObjects (the root objects). The
 non-virtual initialiser `0x00467b70` constructs them with GameObject's

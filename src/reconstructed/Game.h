@@ -55,7 +55,7 @@ public:
     virtual int SetRenderStates() = 0;       // render state setup (PCGame)
     virtual int RenderFrame();                // 0x00467eb0: renders a frame
     virtual int PresentFrame();               // 0x004685c0
-    virtual int Tick();                       // 0x004685d0, not reconstructed (rdtsc)
+    virtual int Tick();                       // 0x004685d0; functional QPC candidate in samples/game
     virtual int SetInputSuspended(int value);                                             // 0x004688a0
     virtual int UnknownVirtualSlot12(int value);                                          // 0x004688e0
     virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x00468900

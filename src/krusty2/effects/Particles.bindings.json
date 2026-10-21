@@ -8,7 +8,6 @@
   "??_7ParticleManager@@6B@": "0x555d10",
   "?FastInvSqrt@@YAMM@Z": "0x460c00",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x4692f0",
-  "?TerrainLoadTexture@@YAPAVParticleTexture@@PAVTextureMapManager@@PBDHPAXHHH2HIHH@Z": "0x50a590",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x56e26c",
   "?g_particleCellUVs@@3PAUParticleUVRect@@A": "0x689158",
   "__FILE__:particles.cpp": "0x56fa00",
@@ -18,5 +17,6 @@
   "__real@4@3ffe8000000000000000": "0x5507f4",
   "__real@4@3ffec000000000000000": "0x55084c",
   "__real@4@4008fa00000000000000": "0x550f44",
-  "__real@4@bfff8000000000000000": "0x550810"
+  "__real@4@bfff8000000000000000": "0x550810",
+  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x50a590"
 }

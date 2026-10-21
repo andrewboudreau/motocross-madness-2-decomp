@@ -185,7 +185,6 @@
   "?GetRowInt@UnknownParameterBlock@@QAEHHPAH@Z": "0x004b8180",
   "?GetRowFloat@UnknownParameterBlock@@QAEHHPAM@Z": "0x004b81c0",
   "?FindItem@UnknownResourceManager@@QAEPAVResourceItem@@PBDH@Z": "0x004e9360",
-  "?TerrainLoadTexture@@YAPAVUnknownEcoTexture@@PAVTextureMapManager@@PBDHPAXHHH2HIHH@Z": "0x0050a590",
   "?IsFormat4444Or8888@@YAHH@Z": "0x00511ad0",
   "?LoadFile@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x005125c0",
   "?FreeFile@@YAXPAUUnknownTgaFile@@@Z": "0x00512dd0",
@@ -272,5 +271,6 @@
   "_strncpy": "0x00534b10",
   "_strrchr": "0x00534a60",
   "_strstr": "0x005362c0",
-  "_strtok": "0x00536397"
+  "_strtok": "0x00536397",
+  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x0050a590"
 }

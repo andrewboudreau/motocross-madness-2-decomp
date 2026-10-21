@@ -7,7 +7,6 @@
 #include "LightEmitter.h"
 #include "Net.h"
 #include "PCAudio.h"
-#include "SoultreeMaterial.h"
 #include "TextureMap.h"
 #include "Tgafile.h"
 #include "SceneManager.h"
@@ -1291,6 +1290,11 @@ static inline void CopyPathPart(char* to, const char* from)
     strncpy(to, from, count);
     to[count] = 0;
 }
+
+// The texture-accounting functions below construct and inspect materials.
+// Keep that complete class dependency local to this group; earlier scene and
+// light parsers do not use it. Declaration order affects VC6's ReadLight code.
+#include "SoultreeMaterial.h"
 
 // 0x004f0390: see the declaration. The compiled ".slb" file holds the node
 // records (skipped) and the materials; without it the ".slt" text file's

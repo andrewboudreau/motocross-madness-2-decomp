@@ -60,7 +60,6 @@
   "?SetField0xbec@Terrain@@QAEXH@Z": "0x00507930",
   "?Shutdown@TerrainShutdownObject@@QAEXH@Z": "0x0047edb0",
   "?Tell@TerrainStream@@QAEHXZ": "0x00461600",
-  "?TerrainLoadTexture@@YAPAVTerrainSurfaceBase@@PAVTextureMapManager@@PBDHPAXHHH2HIHH@Z": "0x0050a590",
   "?TestInputEvent@@YAHHHHH@Z": "0x0043caa0",
   "?Print@TerrainDebugOverlay@@QAAXHPBDZZ": "0x00447f40",
   "?Title@TerrainDebugOverlay@@QAAXHPBDZZ": "0x00447fa0",
@@ -127,5 +126,6 @@
   "?GetCellCorners@TerrainShutdownObject@@QAEXHHPAMPAUTerrainVec3@@PAE@Z": "0x00483910",
   "__real@4@3ff583126f0000000000": "0x005507d4",
   "__real@4@407effffff0000000000": "0x00550844",
-  "?FastInvSqrt@@YAMM@Z": "0x00460c00"
+  "?FastInvSqrt@@YAMM@Z": "0x00460c00",
+  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x0050a590"
 }

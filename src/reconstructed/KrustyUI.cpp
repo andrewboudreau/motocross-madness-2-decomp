@@ -15,6 +15,7 @@
 #include "UIDialog.h"
 #include "RenderTarget.h"
 #include "TrackGame.h"
+#include "LightEmitter.h"
 #include "DlgProcs.h"
 #include "InGameProcs.h"
 #include "MenuId.h"
@@ -42,9 +43,8 @@ char g_ResourceNames[36][16];
 // keyboard hook, nonzero removes it. Called first on shutdown with 0.
 void SetTaskSwitchAllowed(int value);
 
-// Views for 0x00498cf0 (the garage scene). Only what it calls is declared;
-// the classes' full declarations (LightEmitter.h, the D3DIMSoultree and
-// ProjectedShadow headers) are not mixed into this unit. Names provisional.
+// Remaining views for 0x00498cf0 (the garage scene). Only the character and
+// shadow boundaries it calls are declared here; their names are provisional.
 
 // The Soultree object at a character's +0x1a0.
 struct UnknownKrustyUISoultree {
@@ -81,30 +81,10 @@ public:
     unsigned char field_0x1a4[0x214 - 0x1a4];
 };
 
-// RTTI LightManager (0x11c bytes) and LightEmitter (0xac bytes).
-class UnknownKrustyUILight;
-class UnknownKrustyUILightManager : public GameObject {
-public:
-    explicit UnknownKrustyUILightManager(int flags);               // 0x0049e390
-    void AddLight(UnknownKrustyUILight* light);        // 0x0049e470: adds a light
-    unsigned char field_0x2c[0x11c - 0x2c];
-};
-
-class UnknownKrustyUILight : public GameObject {
-public:
-    explicit UnknownKrustyUILight(int flags);                      // 0x0049deb0
-    // 0x0049e230: slot 8, then type, colour, range, position, direction.
-    UnknownKrustyUILight* Create(void* owner, int type, unsigned int color,
-                                                const Vector3* position, const Vector3* direction,
-                                                float range, int sphere, int a8, int a9, int a10,
-                                                int index);
-    unsigned char field_0x2c[0xac - 0x2c];
-};
-
 // Adds `light` to `lights` when there is one. An inline helper: written out
 // at each of the three sites, VC6 here forms the bike loop's addresses as
 // [offset + list] instead of retail's [list + offset].
-static inline void KrustyUIAddLight(UnknownKrustyUILightManager* lights, UnknownKrustyUILight* light) {
+static inline void KrustyUIAddLight(LightManager* lights, LightEmitter* light) {
     if (light)
         lights->AddLight(light);
 }
@@ -249,8 +229,8 @@ void KrustyUI::BuildGarageScene(int value) {
     static UnknownKrustyUIVector s468;
     static UnknownKrustyUIVector s478;
     static UnknownKrustyUIVector s488;
-    static UnknownKrustyUILightManager* lights;
-    static UnknownKrustyUILight* light;
+    static LightManager* lights;
+    static LightEmitter* light;
     static UnknownKrustyUIShadow* shadow;
     static GameObject* shadowLink;
     static int pending;
@@ -279,16 +259,16 @@ void KrustyUI::BuildGarageScene(int value) {
         garageScene->AppendChild(garageCamera, -1);
         garageCamera->widthKeysEnabled = 0;
         garageCamera->fovKeysEnabled = 0;
-        UnknownKrustyUILightManager* manager = new(__FILE__, 0x111) UnknownKrustyUILightManager(1);
-        lights = (UnknownKrustyUILightManager*)manager->SetRenderContext(renderContext);
+        LightManager* manager = new(__FILE__, 0x111) LightManager(1);
+        lights = (LightManager*)manager->SetRenderContext(renderContext);
         garageScene->AppendChild(lights, -1);
-        UnknownKrustyUILight* emitter = new(__FILE__, 0x116) UnknownKrustyUILight(1);
+        LightEmitter* emitter = new(__FILE__, 0x116) LightEmitter(1);
         light = emitter->Create(renderContext, 6, 0x606060, 0, 0, 0, 0, 0, 0, 0, 0);
         garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
         Vector3 position(-1800.0f, 200.0f, 0.0f);
         Vector3 direction = garageFocus - position;
-        emitter = new(__FILE__, 0x121) UnknownKrustyUILight(1);
+        emitter = new(__FILE__, 0x121) LightEmitter(1);
         light = emitter->Create(renderContext, 4, 0xffffff, &position, &direction, 0, 0, 0,
                                                0, 0, 0);
         garageScene->AppendChild(light, -1);
@@ -300,7 +280,7 @@ void KrustyUI::BuildGarageScene(int value) {
         s448 = s488;
         s448.x -= 24.0f;
         s438 = garageFocus - s448;
-        emitter = new(__FILE__, 0x130) UnknownKrustyUILight(1);
+        emitter = new(__FILE__, 0x130) LightEmitter(1);
         light = emitter->Create(renderContext, 1, 0x8c8c8c, &s488, &s408, 0, 0, 0, 0, 0, 0);
         garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);

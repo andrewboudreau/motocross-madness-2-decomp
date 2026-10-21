@@ -251,41 +251,4 @@ public:
 
 #include "GUIManagerCore.h"
 
-// RTTI: HiResMeter : GameObject (vtable 0x00554170). A global instance at
-// 0x0067b468 (initializer 0x00488340) prints timer rows on a DebugOverlay
-// page.
-struct UnknownHiResMeterEntry {
-    float startStampLow;                      // +0x0  low dword of the rdtsc stamp the timed code stores at its start (0x00468712) and subtracts at its end (0x004686a0)
-    float startStampHigh;                     // +0x4  high dword of that stamp (the sbb operand)
-    // Named after slot 10's "MS Timers [CallsThisTick-->TotMSThisTick
-    // (AvgMSPerTick)] : (Per-call Peak/Avg)" columns.
-    float calls;                              // +0x08
-    float totalMs;                            // +0x0c: total time (per-call average = totalMs / calls)
-    float callsThisTick;                      // +0x10
-    float msThisTick;                         // +0x14
-    float msAllTicks;                         // +0x18: msThisTick summed each tick
-    float ticks;                              // +0x1c
-    float peakMs;                             // +0x20: per-call peak
-    char name[0x24];                          // +0x24
-};
-
-class HiResMeter : public GameObject {
-public:
-    explicit HiResMeter(int flags);           // 0x00488380
-    virtual ~HiResMeter();                    // 0x00488430 (deleting wrapper 0x00488410)
-    // 0x00488440: calibrates the time stamp counter (rdtsc; not
-    // reconstructed).
-    virtual GameObject* SetRenderContext(void* value);
-    virtual int Tick(float frameTime);                 // 0x004885c0
-
-    void ClearTickTimes();                    // 0x00488510: per-tick counts (each game tick, 0x00468807)
-    void ResetTimerStats();                   // 0x00488540: all counts of the used timers (page not shown)
-    void ClearTimers();                       // 0x00488580: all 50 entries and their names (constructor)
-
-    unsigned char counterUsable;              // +0x2c: slot 8 calibrated the time stamp counter
-    float countsPerMs;                        // +0x30: counts per millisecond
-    int timerCount;                           // +0x34: entries in use
-    int field_0x38;                           // +0x38 cleared by the resets; not read in this unit
-    int overlayPage;                          // +0x3c: debug overlay page, -1 until assigned
-    UnknownHiResMeterEntry timers[50];        // +0x40
-};
+#include "HiResMeter.h"

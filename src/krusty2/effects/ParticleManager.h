@@ -72,10 +72,7 @@ class TextureMapManager;
 // 0x0050a590 (cdecl; src/reconstructed/TextureMap.h TerrainLoadTexture): the texture
 // `name` through the manager; 0 on failure.  Pointer parameters other than the first two are
 // passed as 0 here.
-ParticleTexture* TerrainLoadTexture(TextureMapManager* manager, const char* name, int format,
-                                       void* palette, int flags, int addressU, int addressV,
-                                       void* choice, int alphaThreshold, unsigned int key,
-                                       int addRef, int fromArchive);
+#include "../../reconstructed/TextureLoader.h"
 
 // One 0x20-byte TLVERTEX-sized template (FVF 0x1c4); slot 27 writes only x, y, z.
 struct ParticleCornerVertex {

@@ -227,7 +227,7 @@ void SoultreeMaterial::LoadTexture()
     } else {
         texture = TerrainLoadTexture(textureManager, textureName, format, 0, mipMapped ? 2 : 0,
                                         hasSourceBlend ? sourceBlend : 5, hasDestBlend ? destBlend : 6,
-                                        &textureOptions, 0x80, 0xff00ff, 1, 1);
+                                        reinterpret_cast<UnknownTextureFormatChoice*>(&textureOptions), 0x80, 0xff00ff, 1, 1);
     }
     if (!texture) {
         char message[256];

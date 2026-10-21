@@ -75,7 +75,6 @@
   "?ReadKeys@SoultreeMaterial@@QAEXPAVUnknownParameterBlock@@H@Z": "0x004ff9e0",
   "?MakeUntextured@SoultreeMaterial@@QAEXXZ": "0x005000b0",
   "?CopyFrom@SoultreeMaterial@@QAEXPBV1@@Z": "0x005000f0",
-  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHHHHHPAUSoultreeTextureOptions@@HIHH@Z": "0x0050a590",
   "?AddTexture@ManagedTextureGroup@@QAEXPAVManagedTexture@@@Z": "0x0050c6c0",
   "?IsFormat4444Or8888@@YAHH@Z": "0x00511ad0",
   "?NextToken@UnknownTokenizer@@QAEPADPBD@Z": "0x00515df0",
@@ -112,5 +111,6 @@
   "_atoi": "0x00536057",
   "_sprintf": "0x00534aaf",
   "?Select@SurfaceMap@@QAEXXZ": "0x00505310",
-  "?ApplyRenderStates@SoultreeMaterial@@QAEXXZ": "0x004ff180"
+  "?ApplyRenderStates@SoultreeMaterial@@QAEXXZ": "0x004ff180",
+  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x0050a590"
 }

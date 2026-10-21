@@ -3,6 +3,18 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/game/GameTick.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete Tick and profiler calibration checked in 39376 native differential scenarios; QPC replaces the four retail RDTSC boundaries consistently. Gameplay retains ReadClock. VC6 emits 716/204 bytes versus 683/196 retail bytes.",
+      "evidence": "docs/GAME_TICK.md#functional-build-review"
+    },
+    {
+      "path": "samples/game/ProfilingCounter.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Explicit QPC profiling backend for both Tick stamps and calibration, independently checked in 4096 native bracketed calls. This is a functional platform adaptation, not a retail-byte reconstruction.",
+      "evidence": "docs/GAME_TICK.md#functional-build-review"
+    },
+    {
       "path": "samples/game/DeviceSetupNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete DirectX startup probe; VC6 emits 1006 bytes versus 1011 retail bytes due to register allocation and spill differences.",

@@ -115,10 +115,7 @@ extern int g_gridLevels;                               // 0x0056c200 bit length 
 // 0x004a2fc0: calloc(count, size, __FILE__, __LINE__) (BikeRace.h's DebugCalloc).
 void* DebugCalloc(unsigned int count, unsigned int size, const char* file, int line);
 // 0x0050a590 (TextureMap.h): shared texture `name` through the manager.
-TerrainSurfaceBase* TerrainLoadTexture(TextureMapManager* manager, const char* name, int format,
-                                       void* palette, int flags, int addressU, int addressV,
-                                       void* choice, int alphaThreshold, unsigned int key,
-                                       int addRef, int fromArchive);
+#include "../../reconstructed/TextureLoader.h"
 // ColorMapper (0x18b10 bytes; ctor 0x004ddf40, 0x004de270 returns its 256 RGB triplets).
 class TerrainColorMapper : public BaseObject {
 public:
@@ -176,8 +173,8 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     field_0xc98 = 6;
     if (!textureName)
         textureName = "testnoise.tga";
-    detailTexture = TerrainLoadTexture(surfaceDesc.manager, textureName, 0x115c, 0, 2, 5, 6, 0,
-                                     0x80, 0xff00ff, 1, 1);
+    detailTexture = reinterpret_cast<TerrainSurfaceBase*>(TerrainLoadTexture(surfaceDesc.manager, textureName, 0x115c, 0, 2, 5, 6, 0,
+                                     0x80, 0xff00ff, 1, 1));
     if (detailTexture) {
         detailTexture->CreateTextureSurface(1, 0, 1);
         detailAverageColor = detailTexture->averageColor;
