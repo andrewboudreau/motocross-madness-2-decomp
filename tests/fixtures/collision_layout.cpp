@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include "../../src/reconstructed/CarProcedural.h"
+#include "../../src/reconstructed/FileStream.h"
 
 // Independently observed retail sizes and offsets, including the secondary
 // GraphicsTest/GameObject base. No game implementation is replaced here.
@@ -17,3 +18,8 @@ CHECK_LAYOUT(wrecker_model_manual, offsetof(UnknownWreckerCollisionModel, manual
 CHECK_LAYOUT(wrecker_model_probes, offsetof(UnknownWreckerCollisionModel, probes) == 0x104);
 CHECK_LAYOUT(wrecker_field, offsetof(Wrecker, character) == 0x34);
 CHECK_LAYOUT(car_field, offsetof(CarProcedural, carModel) == 0x34);
+
+CHECK_LAYOUT(stream_extent, sizeof(CollisionFileStream) == 0x134);
+CHECK_LAYOUT(stream_manager, offsetof(CollisionFileStream, archives) == 0x12c);
+CHECK_LAYOUT(quadtree_xextent, offsetof(QuadTree, extentX) == 0x50);
+CHECK_LAYOUT(quadtree_zextent, offsetof(QuadTree, extentZ) == 0x54);

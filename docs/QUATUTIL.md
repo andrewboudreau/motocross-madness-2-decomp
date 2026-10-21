@@ -3,7 +3,7 @@
 Canonical reconstruction: `src/reconstructed/QuatUtil.cpp`. The range is
 `0x004a1d10..0x004a2350`. No `__FILE__` literal or RTTI reaches it, so the
 file name is ours (tier 3). `0x004a1d10` and `0x004a1f90` were already
-matched in `samples/physics/common/Math3D.cpp` and stay there. Whether they
+matched in `src/reconstructed/Math3D.cpp`. Whether they
 belong to the same unit as the functions below is open.
 
 ## Matched (11 of 11 unregistered, strict exact)

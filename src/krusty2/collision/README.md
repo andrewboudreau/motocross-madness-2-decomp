@@ -29,6 +29,36 @@ real production caller relocations name the real collision implementations.
 This does not establish the original header structure or reconcile every
 remaining scene-node and constraint-model boundary view.
 
+## Collision resource and quadtree boundaries
+
+The `.col` loader uses the shared `UnknownTextureStream` declaration: its
+`0x134`-byte allocation, constructor at `0x00460d10`, destructor at
+`0x00460d60`, `Open` and `Read` calls identify the same archive-capable stream.
+The constructor stores the resource-manager pointer at `+0x12c`; both this
+loader and SoulTreePhysics now read the existing `g_ResourceManager` pointer
+at `0x00572b44`. The SoultreeFile view remains provisional, so that caller
+retains an explicit pointer-to-int conversion at its unmerged constructor
+boundary. This does not reinterpret the resource-manager object as an integer.
+
+`ReadTriangleMesh` (`0x0042e0f0`) and `ReadPointNode` (`0x0042e190`) connect
+to the existing BoundingBoxTreeBuild implementations through their actual
+`BoxTreeNode**` and `TreeVec3**` parameters. The former allocates the vertex
+array and writes its output pointer; both readers write allocated tree nodes
+through the supplied output pointers. Casts remain at the provisional hull
+field views; no allocation, field offset or file format changes here.
+
+Wrecker uses the existing `QuadTree` declaration and `g_collisionQuadTree`
+pointer at `0x0068aba4`. Its `Remove` calls pass the CollisionObject's primary
+QuadTreeObject base at offset zero. This joins existing source providers;
+it does not merge the separate EcoSystem quadtree view.
+
+The native collision regression checks the stream's size and manager offset,
+the quadtree extents, and actual caller/provider COFF identities. All affected
+required physics matches remain strict exact. The stream `Read` provider is
+the separately admitted, behavior-tested nonexact candidate in
+`samples/io/FileStream.cpp`; these caller connections do not upgrade its
+byte-match status or establish a working full game.
+
 # CollisionPoint.cpp (collision)
 
 Extent: `0x0043a1e0..0x0043b320` (CollisionObject.cpp's last function `0x0043a050` precedes it,

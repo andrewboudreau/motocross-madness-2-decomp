@@ -22,8 +22,16 @@ class CollisionLinkTests(unittest.TestCase):
                            'src/reconstructed/CarProcedural.cpp',
                            'src/reconstructed/Wrecker.cpp',
                            'src/reconstructed/ObjectPicker.cpp',
+                           'src/reconstructed/FileStream.cpp',
+                           'samples/io/FileStream.cpp',
+                           'src/reconstructed/ResourceManager.cpp',
+                           'src/reconstructed/BoundingBoxTreeBuild.cpp',
+                           'src/krusty2/soultree/SoulTreePhysics.cpp',
+                           'src/krusty2/broadphase/Quadtree.cpp',
+                           'src/krusty2/visibility/VisibilityQuadTree.cpp',
                            'tests/fixtures/collision_layout.cpp'):
-                obj = Path(directory) / (Path(source).stem + '.obj')
+                label = 'StreamCandidate' if source.startswith('samples/') else Path(source).stem
+                obj = Path(directory) / (label + '.obj')
                 result = subprocess.run(
                     [sys.executable, str(ROOT / 'tools/compile.py'),
                      str(ROOT / source), '-o', str(obj),
@@ -33,7 +41,7 @@ class CollisionLinkTests(unittest.TestCase):
                     cwd=ROOT, capture_output=True, text=True, encoding='latin-1',
                     env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                objects[Path(source).stem] = CoffObject(obj)
+                objects[label] = CoffObject(obj)
             providers = {s.name for s in objects['CollisionObject'].symbols
                          if s.storage_class == 2 and s.section_number > 0}
 
@@ -67,6 +75,30 @@ class CollisionLinkTests(unittest.TestCase):
                 self.assertFalse(any('CarProceduralCollision@@' in s.name or
                                      'UnknownWreckerCollisionObject@@' in s.name
                                      for s in objects[caller].symbols))
+
+            stream_calls = {
+                '??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z',
+                '??1UnknownTextureStream@@QAE@XZ',
+                '?Open@UnknownTextureStream@@QAEHPBD0H@Z',
+            }
+            source_definitions = {
+                name: {s.name for s in obj.symbols
+                       if s.storage_class == 2 and s.section_number > 0}
+                for name, obj in objects.items()
+            }
+            self.assertTrue(stream_calls <= imports(objects['CollisionObject']))
+            self.assertTrue(stream_calls <= source_definitions['FileStream'])
+            for caller, provider, symbol in (
+                ('CollisionObject', 'BoundingBoxTreeBuild', '?ReadPointNode@@YAXPAPAUBoxTreeNode@@PAVUnknownTextureStream@@@Z'),
+                ('CollisionObject', 'BoundingBoxTreeBuild', '?ReadTriangleMesh@@YAXPAPAUBoxTreeNode@@PAPAUTreeVec3@@PAVUnknownTextureStream@@@Z'),
+                ('SoulTreePhysics', 'ResourceManager', '?g_ResourceManager@@3PAVUnknownResourceManager@@A'),
+                ('CollisionObject', 'StreamCandidate', '?Read@UnknownTextureStream@@QAEHPAXHH@Z'),
+                ('CollisionObject', 'ResourceManager', '?g_ResourceManager@@3PAVUnknownResourceManager@@A'),
+                ('Wrecker', 'Quadtree', '?Remove@QuadTree@@QAEXPAVQuadTreeObject@@I@Z'),
+                ('Wrecker', 'VisibilityQuadTree', '?g_collisionQuadTree@@3PAVQuadTree@@A'),
+            ):
+                self.assertIn(symbol, imports(objects[caller]))
+                self.assertIn(symbol, source_definitions[provider])
 
 
 if __name__ == '__main__':

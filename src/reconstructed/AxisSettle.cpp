@@ -1,7 +1,7 @@
 // 0x004cb6e0 (1058 bytes, __cdecl): per-axis settle of two accumulators against a third.  The
 // function sits alone between PeakHold.cpp (0x4cb668..) and PhysicsBody (0x4cbc50..) with the
-// Math3D.h vector set .CRT$XCU 220-223 (0x4cbb10.., globals 0x689970..) behind it, so it is its
-// own unit (Pe..Ph; no __FILE__ string, no RTTI).  Called from KrustyBike 0x495d51 and
+// Math3D.h vector set .CRT$XCU 220-223 (0x4cbb10.., globals 0x689970..) behind it, suggesting a separate
+// unit (strong inference, Pe..Ph; no __FILE__ string, no RTTI).  Called from KrustyBike 0x495d51 and
 // SoulTreePhysics 0x50229f.  Declared in math/Math3D.h; the roles of a, b and c are tier 3.
 //
 // For each axis k (bit 1 << k of 'mask'), nothing happens when c[k] is zero.  Otherwise:

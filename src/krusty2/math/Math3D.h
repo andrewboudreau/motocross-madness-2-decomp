@@ -24,7 +24,7 @@
 // grouping as evidence of how the source was written, not as term shuffling.
 //
 // Exact byte-match bodies for MatrixZero, IntegrateAdamsBashforth2, QuatDerivative
-// and Vec3Normalize are in Math3D.cpp (samples/physics/common/targets.json).
+// and Vec3Normalize are in src/reconstructed/Math3D.cpp (samples/physics/common/targets.json).
 #ifndef MCM2_PHYSICS_COMMON_MATH3D_H
 #define MCM2_PHYSICS_COMMON_MATH3D_H
 
@@ -215,7 +215,7 @@ void MatrixMultiply(Matrix4* out, Matrix4 a, Matrix4 b);
 // 0x004b5a60, 657 bytes, __cdecl: angle extraction from a "forward" vector a and an
 // "up" vector b (both by value), writing through seven pointers; returns 0 when any of
 // the first three pointers is null, else 1 (tier 1 control flow). Body in
-// ../helpers/OrientationAngles.cpp; names are tier 3. The callers ignore the result.
+// src/reconstructed/OrientationAngles.cpp; names are tier 3. The callers ignore the result.
 int OrientationAnglesFromVectors(Vec3 a, Vec3 b, float* yaw, float* pitch, float* roll,
                                  float* sinRoll, float* cosRoll, float* cosPitch,
                                  float* sinPitch);
@@ -231,7 +231,7 @@ int OrientationAnglesFromVectors(Vec3 a, Vec3 b, float* yaw, float* pitch, float
 // This reads like a static-friction or stop-at-zero integrator guard. Tier 2
 // arithmetic (the three axes are spelled out; y and z use bits 2 and 4). The
 // name and parameter roles are tier 3. Body in
-// ../../../samples/physics/helpers/AxisSettle.cpp (its own unit between
+// src/reconstructed/AxisSettle.cpp (inferred separate unit between
 // PeakHold.cpp and PhysicsBody, with the vector set .CRT$XCU 220-223 behind it).
 void UnknownAxisSettle_4cb6e0(float* a, float* b, const float* c, float dt,
                               unsigned char mask);

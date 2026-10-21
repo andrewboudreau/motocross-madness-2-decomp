@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-20 build compiles 165 C++ files (163 canonical sources and two
-reviewed candidates) and reaches LINK with 744 unresolved external symbols,
+The 2026-10-20 build compiles 170 C++ files (168 canonical sources and two
+reviewed candidates) and reaches LINK with 712 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -103,6 +103,18 @@ uses the existing font list. Bike and TGA readers use the verified empty
 literal instead of undefined array names. This composition removes another
 31 unresolved symbols, with prior strict matches preserved. Corrected names
 for still-missing methods are not counted as resolutions.
+
+The next connections supply nine collision/resource/BVH/quadtree names and
+eight motion parameter-reader names. Four [physics math units](PHYSICS_MATH.md)
+supply seven exact bodies, four of which satisfy current callers. Eleven
+additional Soultree physics methods now have canonical definitions verified
+against their primary-vtable slots at object offset zero. Together these
+remove another 32 unresolved symbols while preserving all prior strict
+matches. Their source grouping does not establish original TU ownership;
+unassigned header initializer copies remain documented separately. The
+remaining parameter-stream view retains its inline reset behavior, which is
+required by the current strict SelectSection match. Soultree slot 35 still
+depends on the already-missing SetAxesIn implementation.
 
 The source still lacks `Game::Tick` at `0x004685d0`, called by
 `TrackGame::Tick`; its retail timing uses `rdtsc` (see [Game](GAME.md)).

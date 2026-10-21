@@ -3,7 +3,7 @@
 // 179-182, globals 0x00685070..0x006850ac), the same set MatrixUtil.cpp
 // defines from the shared header. Nothing reads these copies. No __FILE__
 // literal or RTTI reaches the range, so the file name is ours (tier 3).
-// 0x004a1d10 and 0x004a1f90 are matched in samples/physics/common/Math3D.cpp.
+// 0x004a1d10 and 0x004a1f90 are matched in src/reconstructed/Math3D.cpp.
 // PhysicsRigidBody (0x004cc6c4, 0x004cc960, 0x004cc98f) calls the three below.
 
 #include <math.h>

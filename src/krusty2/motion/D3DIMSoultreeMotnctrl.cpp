@@ -383,15 +383,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
 // Helpers of slot 11 (all names tier 3).
 unsigned int ReadClock();                                // 0x004bfa80: timeBeginPeriod(1), timeGetTime, timeEndPeriod(1); result unused here
 #include "../../reconstructed/FileStream.h"
-class SltFile {                                          // 0x5c4 bytes, ctor 0x004b7130
-public:
-    SltFile();
-    ~SltFile();                                          // 0x004b7190
-    void Attach(UnknownTextureStream* file, int a, int b);        // 0x004b77a0, ret 0xc
-    void SelectSection(const char* name);                // 0x004b78f0, ret 4
-    void ReadString(const char* key, char* out, int n);  // 0x004b7b30, ret 0xc
-    char pad_0x00[0x5c4];
-};
+#include "../../reconstructed/Parameterblocks.h"
 struct LoadDescCopy {                                    // 0x18-byte block copied by slot 11 (no member is read in this TU)
     int field_0x00[6];
 };
@@ -442,8 +434,8 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, c
     int n = len > 0x4f ? 0x4f : len;
     strncpy(sltPath, a2, n);
     sltPath[n] = 0;
-    sltFile = new(__FILE__, 0xa5) SltFile();
-    sltFile->Attach(file, 0, 1);
+    sltFile = new(__FILE__, 0xa5) UnknownParameterBlock();
+    sltFile->Attach((UnknownParameterStream*)file, 0, 1);
     sltFile->SelectSection("General info");
     sltFile->ReadString("SLTFile", d3d_field_0x1a4, -1);
     CharacterVirtualSlot1();

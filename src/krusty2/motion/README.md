@@ -36,14 +36,25 @@ The returned object's cache/clone and AddRef behavior is preserved.
 The resource manager's original class name remains unconfirmed.
 
 All 26 D3DIMSoultreeMotnctrl and 41 Motnctrl targets remain strict matches,
-including resolved relocations. Both previously strict checks among the
+including resolved relocations. All three previously strict checks among the
 seven partial-sample checks also remain exact. The COFF regression
 `tests/test_motion_stream_connections.py` verifies that the real callers
 reference symbols supplied by the stream and resource objects.
 
-The `SltFile` parameter-block view remains separate. Its Attach declaration
-now takes the shared stream, but no implementation is supplied under that
-class name; this signature change is not counted as a resolved function.
+The former `SltFile` view now uses `UnknownParameterBlock` from
+`Parameterblocks.h`. The loader allocates the same `0x5c4` bytes, calls its
+constructor at `0x004b7130`, attaches the stream at `0x004b77a0`, reads the
+same section/key strings and destroys it through `0x004b7190`. These lifecycle
+and call-site facts support the shared type; the original class name remains
+unknown. Eight formerly missing constructor/destructor/reader symbols now
+resolve to the existing implementation. Getter return values remain unused
+where the former view declared them void.
+
+`UnknownParameterStream` remains a separate stream view at the Attach boundary.
+Its inline ResetTextMode affects SelectSection's exact code: replacing it with
+the shared stream's out-of-line declaration shortens that target from 573 to
+533 bytes. That broader consolidation is deferred; the parameter-block
+connection preserves the complete 573-byte strict match.
 
 ## Spheres.cpp
 - `__FILE__` string `D:\aardvark\VC\krusty2\Spheres.cpp` at `0x00574568`; one use (debug `new`, line 4) in the
@@ -87,9 +98,9 @@ are not reconstructed.
     address as offset + table, retail table + offset.
   - Slot 11 `0x445680` uses the `sltFile` member directly for the .slt reader; through a local, VC6 keeps a2 in esi,
     spills the registry entry and grows the frame from 0x308 to 0x30c.
-- Local stand-in `ModelObject` is D3DIMSoultreeObject (vtable `0x5513ec`, size 0x2d8, ctor `0x43f160(int)`, slot 7
-  `0x444560` takes a source object); helper classes ArchiveFile (0x134), SltFile (0x5c4), registry entry (owner +0x10)
-  are local, tier 3.
+- Local stand-in `ModelObject` describes D3DIMSoultreeObject (vtable `0x5513ec`, size 0x2d8,
+  ctor `0x43f160(int)`, slot 7 `0x444560` takes a source object). The stream, parameter block
+  and resource entry now use the shared implementations described above.
 - D3DIMSoultreeShadow `0x446840..` (its `__FILE__` xrefs `0x447024/0x447044` straddle the bracket end) is
   reconstructed in `src/krusty2/shadow/D3DIMSoultreeShadow.cpp`.
 

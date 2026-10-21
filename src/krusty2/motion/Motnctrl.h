@@ -6,16 +6,10 @@
 #include "motion/D3DIMSoultreeCharacter.h"
 #include "motion/MotionPose.h"
 
-// Shared archive stream; the remaining .slt reader view is provisional.
+// Shared archive stream and section/key reader; original class names are provisional.
 #include "../../reconstructed/FileStream.h"
 extern UnknownResourceManager* g_ResourceManager; // 0x00572b44
-class SltFile {                                          // 0x5c4 bytes
-public:
-    void SelectSection(const char* name);                // 0x004b78f0, ret 4
-    void GetString(const char* key, const char* def, char* out, int size);  // 0x004b7ec0, ret 0x10
-    void GetInt(const char* key, int def, int* out);     // 0x004b7f10, ret 0xc
-    int GetFloat(const char* key, float def, float* out);   // 0x004b7f40, ret 0xc; 0 when the key is missing
-};
+#include "../../reconstructed/Parameterblocks.h"
 
 // One motion (0xcc bytes, allocated by MotionManager::Load at line 0x159).  Offsets tier 1 (Load,
 // LoadMot, LoadVue, FreeMotion and the playback code); names tier 3.

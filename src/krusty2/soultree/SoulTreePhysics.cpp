@@ -1101,7 +1101,8 @@ struct SoultreeGlobals {
     char field_0x000[0x574];
     SoultreeFileFinder* field_0x574;
 };
-extern int g_00572b44;          // passed by value to the SoultreeFile constructor
+class UnknownResourceManager;
+extern UnknownResourceManager* g_ResourceManager; // pointer stored at 0x00572b44
 
 // SoultreePhysicsObject slot 40 (0x00503970, `ret 0x70`).  Loads the model through the
 // D3DIM object base (slot 9) and runs the physics setup (slot 2).  If the ".col" file is
@@ -1135,7 +1136,7 @@ GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int a1, const char* a2,
     name[n] = 0;
     strcpy(strrchr(name, '.'), ".col");
 
-    SoultreeFile* file = new(SP_FILE, 0x84e) SoultreeFile(g_00572b44);
+    SoultreeFile* file = new(SP_FILE, 0x84e) SoultreeFile((int)g_ResourceManager);
     if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->field_0x574->OpenArchiveFile(file, name, "rb", colPath)) {
         colPath[0] = 0;
     }
@@ -1186,7 +1187,7 @@ GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int a1, int a2, const
     name[n] = 0;
     strcpy(strrchr(name, '.'), ".col");
 
-    SoultreeFile* file = new(SP_FILE, 0x8cd) SoultreeFile(g_00572b44);
+    SoultreeFile* file = new(SP_FILE, 0x8cd) SoultreeFile((int)g_ResourceManager);
     if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->field_0x574->OpenArchiveFile(file, name, "rb", colPath)) {
         colPath[0] = 0;
     }

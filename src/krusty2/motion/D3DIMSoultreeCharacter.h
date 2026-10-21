@@ -35,7 +35,7 @@
 #include "math/Math3D.h"
 
 class SoultreeObject;
-class SltFile;          // .slt section/key reader (0x5c4 bytes); declared by its users
+class UnknownParameterBlock; // shared 0x5c4-byte section/key reader
 struct Motion;          // 0xcc-byte motion record of the MotionManager (src/krusty2/motion/Motnctrl.cpp)
 struct CharacterPose;   // 0x2c-byte pose record; defined by users that need the layout (src/krusty2/motion/MotionPose.h)
 
@@ -110,7 +110,7 @@ public:
     // vfptr +0, vbptr +4 (compiler generated); Character's own data up to 0x1a0.
     // Offsets are tier 1 (ctor 0x004a6780 stores, slot 8 0x004a98b0 copies, Motnctrl.cpp users);
     // names are tier 3.  See src/krusty2/motion/Motnctrl.cpp.
-    SltFile* sltFile;               // +0x008 set by D3DIM slot 11 around the slot 1 call; slot 1 reads the "General info" keys through it
+    UnknownParameterBlock* sltFile;               // +0x008 set by D3DIM slot 11 around the slot 1 call; slot 1 reads the "General info" keys through it
     int motionStopped;              // +0x00c ctor 1; AdvanceMotion sets it when a non-looping motion ends (and then returns 0); SetMotion (0x004a8b40) clears it
     float chr_field_0x10;           // +0x010 the motion clock (src/krusty2/vehicle reads it under this name): AdvanceMotion adds dt and steps the frames by it; slot 7 adds its time argument; copied to blendFromTime by BlendToMotion (0x004a8b80)
     int motionCount;                // +0x014 "NumberOfMotions" (slot 1); loop bound of LoadMotions and the dtor

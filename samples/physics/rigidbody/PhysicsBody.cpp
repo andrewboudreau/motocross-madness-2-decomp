@@ -7,7 +7,7 @@
 // at the end of each unit here: the set at 0x004cbf20 writes 0x006899c0, the
 // kVec3Zero copy the constructor reads, while the set before the constructor
 // (0x004cbb10, globals 0x00689980) belongs to the helper unit in front of it
-// (../helpers/AxisSettle.cpp). The remaining PhysicsBody setters (slots 27, 31..35)
+// (src/reconstructed/AxisSettle.cpp). The remaining PhysicsBody setters (slots 27, 31..35)
 // sit in the next TU, ahead of the PhysicsRigidBody constructor (see
 // PhysicsRigidBody.cpp). Neighbouring source strings are PCVideoCard.cpp (before)
 // and Pixtrans.cpp (after), which fits alphabetical link order.

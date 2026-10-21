@@ -1,13 +1,13 @@
 [
  {
   "class": "SoultreePhysicsBaseObject",
-  "source": "SoultreePhysicsInlines.cpp",
+  "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot5@SoultreePhysicsBaseObject",
   "target_va": "0x004aa150",
   "target_size": 14,
   "expect": "exact",
   "notes": "exact under vc6_o2_ml (no /G6)",
-  "bindings": "SoultreePhysicsInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/SoultreePhysicsMethods.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
@@ -21,103 +21,103 @@
  },
  {
   "class": "SoultreePhysicsBaseObject",
-  "source": "SoultreePhysicsInlines.cpp",
+  "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot10@SoultreePhysicsBaseObject",
   "target_va": "0x0040b5c0",
   "target_size": 28,
   "expect": "exact",
   "notes": "exact under vc6_o2_ml (no /G6)",
-  "bindings": "SoultreePhysicsInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/SoultreePhysicsMethods.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
-  "source": "SoultreePhysicsInlines.cpp",
+  "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot12@SoultreePhysicsBaseObject",
   "target_va": "0x00507920",
   "target_size": 5,
   "expect": "exact",
   "notes": "exact under vc6_o2_ml (no /G6)",
-  "bindings": "SoultreePhysicsInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/SoultreePhysicsMethods.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
-  "source": "SoultreePhysicsInlines.cpp",
+  "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot19@SoultreePhysicsBaseObject",
   "target_va": "0x00464e80",
   "target_size": 3,
   "expect": "exact",
   "notes": "exact under vc6_o2_ml (no /G6)",
-  "bindings": "SoultreePhysicsInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/SoultreePhysicsMethods.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
-  "source": "SoultreePhysicsInlines.cpp",
+  "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot22@SoultreePhysicsBaseObject",
   "target_va": "0x0040b5e0",
   "target_size": 24,
   "expect": "exact",
   "notes": "exact under vc6_o2_ml (no /G6)",
-  "bindings": "SoultreePhysicsInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/SoultreePhysicsMethods.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
-  "source": "SoultreePhysicsInlines.cpp",
+  "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot23@SoultreePhysicsBaseObject",
   "target_va": "0x004aa160",
   "target_size": 38,
   "expect": "exact",
   "notes": "exact under vc6_o2_ml (no /G6)",
-  "bindings": "SoultreePhysicsInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/SoultreePhysicsMethods.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
-  "source": "SoultreePhysicsInlines.cpp",
+  "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot24@SoultreePhysicsBaseObject",
   "target_va": "0x004aa190",
   "target_size": 3,
   "expect": "exact",
   "notes": "exact under vc6_o2_ml (no /G6)",
-  "bindings": "SoultreePhysicsInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/SoultreePhysicsMethods.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
-  "source": "SoultreePhysicsInlines.cpp",
+  "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot26@SoultreePhysicsBaseObject",
   "target_va": "0x00464e90",
   "target_size": 1,
   "expect": "exact",
   "notes": "exact under vc6_o2_ml (no /G6)",
-  "bindings": "SoultreePhysicsInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/SoultreePhysicsMethods.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
-  "source": "SoultreePhysicsInlines.cpp",
+  "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot32@SoultreePhysicsBaseObject",
   "target_va": "0x004aa1a0",
   "target_size": 28,
   "expect": "exact",
   "notes": "exact under vc6_o2_ml (no /G6)",
-  "bindings": "SoultreePhysicsInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/SoultreePhysicsMethods.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
-  "source": "SoultreePhysicsInlines.cpp",
+  "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot34@SoultreePhysicsBaseObject",
   "target_va": "0x004aa1c0",
   "target_size": 25,
   "expect": "exact",
   "notes": "exact under vc6_o2_ml (no /G6)",
-  "bindings": "SoultreePhysicsInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/SoultreePhysicsMethods.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
-  "source": "SoultreePhysicsInlines.cpp",
+  "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot35@SoultreePhysicsBaseObject",
   "target_va": "0x004aa1e0",
   "target_size": 37,
   "expect": "exact",
   "notes": "exact under vc6_o2_ml (no /G6)",
-  "bindings": "SoultreePhysicsInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/SoultreePhysicsMethods.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",

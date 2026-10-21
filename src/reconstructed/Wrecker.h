@@ -84,11 +84,8 @@ public:
 
 // Global collision quadtree (0x0068aba4, VisibilityQuadTree's constructor
 // installs it). 0x004dcf20 (thiscall, ret 8) removes an object from a cell.
-class UnknownWreckerQuadTree {
-public:
-    void Remove(UnknownWreckerCollisionObject* object, int cell);
-};
-extern UnknownWreckerQuadTree* g_collisionQuadTree;
+#include "../krusty2/broadphase/Quadtree.h"
+extern QuadTree* g_collisionQuadTree;
 
 // A 4x4 transform read as four Vector3 rows (right, up, forward,
 // position). Retail copies these rows with integer moves, which is how VC6

@@ -18,10 +18,10 @@
 #ifndef BROADPHASE_QUADTREE_H
 #define BROADPHASE_QUADTREE_H
 
-#include "collision/CollisionObject.h"   // QuadTreeObject (canonical)
+#include "../collision/CollisionObject.h"   // QuadTreeObject (canonical)
 
 // Debug allocation forms (size/ptr, __FILE__, __LINE__): core/DebugAlloc.h.
-#include "core/DebugAlloc.h"
+#include "../core/DebugAlloc.h"
 
 #include "../../reconstructed/BlockAllocator.h"
 

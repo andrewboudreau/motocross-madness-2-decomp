@@ -248,19 +248,11 @@ void CollisionObject::SetTriangleMeshHullShape(const CollisionVec3* verts, const
     hull->pointTree = 0;
 }
 
-// .col file object: 0x134 bytes, thiscall ctor 0x00460d10 (one global argument, the registry
-// at 0x00572b44), destructor 0x00460d60, Open 0x00460f50 (ret 0xc) and the fread-order reader
-// 0x00461640 (ptr, size, count).  The same object appears as SoultreeFile / ArchiveFile / TreeFile
-// in the other areas; this is a local stand-in with just the members used here.
-class CollisionFileStream {
-public:
-    explicit CollisionFileStream(int registry);                  // 0x00460d10
-    ~CollisionFileStream();                                      // 0x00460d60
-    void Open(const char* name, const char* mode, int a);        // 0x00460f50
-    int Read(void* dst, int size, int count);                    // 0x00461640
-    char field_0x00[0x134];
-};
-extern int g_00572b44;      // the registry passed to the file constructor
+// The .col loader uses the shared 0x134-byte archive stream: constructor
+// 0x00460d10 stores this resource-manager pointer at +0x12c, Open returns
+// an int at 0x00460f50 (ignored here), and Read uses fread argument order.
+#include "../../reconstructed/FileStream.h"
+extern UnknownResourceManager* g_ResourceManager; // 0x00572b44
 
 // 0x00439e10 (ret 8): reads the shape type from the stream and builds that payload
 // (0: hull 0x198 bytes, 1: model 0x120 bytes), then lets the matching loader fill it.
@@ -292,7 +284,7 @@ void CollisionObject::ReadShape(void* node, CollisionFileStream* stream)
 // ReadShape read it; the file object is heap-allocated at line 0x12f.
 void CollisionObject::LoadShape(void* node, const char* path)
 {
-    CollisionFileStream* file = new(__FILE__, 0x12f) CollisionFileStream(g_00572b44);
+    CollisionFileStream* file = new(__FILE__, 0x12f) CollisionFileStream(g_ResourceManager);
     file->Open(path, "rb", 0);
     ReadShape(node, file);
     delete file;
@@ -309,9 +301,11 @@ public:
     CollisionSourceNode* parent;   // +0x13c 0x0043a050 climbs it to the root before collecting
 };
 
-// Box-tree stream readers (BoundingBoxTreeBuild.cpp; void* stand-ins for the bvh types).
-void ReadTriangleMesh(void** tree, void** vertices, CollisionFileStream* stream);   // 0x0042e0f0
-void ReadPointNode(void** tree, CollisionFileStream* stream);                       // 0x0042e190
+// Box-tree readers use the shared BVH pointer types at this boundary.
+struct BoxTreeNode;
+struct TreeVec3;
+void ReadTriangleMesh(BoxTreeNode** tree, TreeVec3** vertices, CollisionFileStream* stream);   // 0x0042e0f0
+void ReadPointNode(BoxTreeNode** tree, CollisionFileStream* stream);                       // 0x0042e190
 
 // 0x00439ed0 (ret 8): reads one hull payload: the 3x4 local transform (the w column is set
 // to 0,0,0,1 here), the swept flag, then the triangle tree with its vertices and the point
@@ -338,12 +332,12 @@ void CollisionObject::ReadHullShape(CollisionFileStream* stream, CollisionHullBo
     int hasTriangles;
     stream->Read(&hasTriangles, 4, 1);
     if (hasTriangles)
-        ReadTriangleMesh((void**)&hull->triangleTree, &hull->vertices, stream);
+        ReadTriangleMesh((BoxTreeNode**)&hull->triangleTree, (TreeVec3**)&hull->vertices, stream);
     hull->pointTree = 0;
     int hasPoints;
     stream->Read(&hasPoints, 4, 1);
     if (hasPoints)
-        ReadPointNode(&hull->pointTree, stream);
+        ReadPointNode((BoxTreeNode**)&hull->pointTree, stream);
 }
 
 // 0x0043a050 (ret 0xc): reads a model payload.  The node's root (followed through +0x13c) is

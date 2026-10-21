@@ -1,8 +1,6 @@
-// SoultreePhysicsBaseObject virtual overrides whose retail bodies lie OUTSIDE the
-// SoulTreePhysics.cpp bracket: 0x0040b410..0x0040b5e0 (Bike.cpp), 0x00464e80/0x00464e90
-// (FollowCam.cpp), 0x004aa150..0x004aa210 (between Motnctrl.cpp and MSZoneInterface.cpp) and
-// 0x00507920 (Terrain.cpp).  The class's own table points at them, so they are most likely inline
-// members kept from the first TU that emitted each COMDAT (tier 2).
+// Remaining sample-only methods: slot 6 is partial; slot 36 requires an
+// unsupplied orientation-vector global. Exact methods are in
+// src/reconstructed/SoultreePhysicsMethods.cpp.
 #include <math.h>
 #include <string.h>
 #include "soultree/SoultreePhysicsBaseObject.h"
@@ -55,60 +53,6 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot6(Vec3* a, float* b)
     *a += scratchVector2;
 }
 
-int SoultreePhysicsBaseObject::UnknownVirtualSlot10()
-{
-    if (totalWeight == baseWeight)
-        return 1;
-    return 0;
-}
-
-int SoultreePhysicsBaseObject::UnknownVirtualSlot22()
-{
-    return staggerCounter == staggerPhase;
-}
-
-void SoultreePhysicsBaseObject::UnknownVirtualSlot19(SoultreeAttachment* a)
-{
-}
-
-void SoultreePhysicsBaseObject::UnknownVirtualSlot26()
-{
-}
-
-// slot 5 (0x004aa150): shared with Vehicle/Character, compares its argument with zero.
-int SoultreePhysicsBaseObject::UnknownVirtualSlot5(int value)
-{
-    return value == 0;
-}
-
-int SoultreePhysicsBaseObject::UnknownVirtualSlot23()
-{
-    return !airborne && linearSpeed >= 1.0f;
-}
-
-int SoultreePhysicsBaseObject::UnknownVirtualSlot24()
-{
-    return 0;
-}
-
-float SoultreePhysicsBaseObject::UnknownVirtualSlot32()
-{
-    if (UnknownVirtualSlot10())
-        return 0.0f;
-    return loadWeight;
-}
-
-void SoultreePhysicsBaseObject::UnknownVirtualSlot34()
-{
-    sceneNode->GetAxesIn(0, &bodyForward, &bodyUp);
-}
-
-// slot 35 (0x004aa1e0)
-void SoultreePhysicsBaseObject::UnknownVirtualSlot35(int a, int b)
-{
-    sceneNode->SetAxesIn(0, &bodyForward, &bodyUp, a, b);
-}
-
 // slot 36 (0x004aa210): resolve the initial orientation vectors and reset the pose state.
 void SoultreePhysicsBaseObject::UnknownVirtualSlot36()
 {
@@ -135,9 +79,4 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot36()
     savedCosRoll = 1.0f;
     savedCosPitch = 1.0f;
     savedSinPitch = 0.0f;
-}
-
-int SoultreePhysicsBaseObject::UnknownVirtualSlot12(int value)
-{
-    return 0;
 }

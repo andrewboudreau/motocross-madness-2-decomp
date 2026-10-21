@@ -23,6 +23,7 @@ class MotionStreamConnectionTests(unittest.TestCase):
             'stream': 'src/reconstructed/FileStream.cpp',
             'partial_stream': 'samples/io/FileStream.cpp',
             'resources': 'src/reconstructed/ResourceManager.cpp',
+            'parameters': 'src/reconstructed/Parameterblocks.cpp',
         }
         with tempfile.TemporaryDirectory(prefix='mcm2-motion-stream-') as directory:
             objects = {}
@@ -58,12 +59,22 @@ class MotionStreamConnectionTests(unittest.TestCase):
                 '?SetItemObject@UnknownResourceManager@@QAEXPAX0@Z',
                 '?AddLooseFile@UnknownResourceManager@@QAEHPBD0@Z',
             }
+            parameter_calls = {
+                '??0UnknownParameterBlock@@QAE@XZ',
+                '??1UnknownParameterBlock@@QAE@XZ',
+                '?Attach@UnknownParameterBlock@@QAEXPAVUnknownParameterStream@@HH@Z',
+                '?SelectSection@UnknownParameterBlock@@QAEHPBD@Z',
+                '?ReadString@UnknownParameterBlock@@QAEHPBDPADH@Z',
+                '?GetString@UnknownParameterBlock@@QAEHPBD0PADH@Z',
+                '?GetInt@UnknownParameterBlock@@QAEHPBDHPAH@Z',
+                '?GetFloat@UnknownParameterBlock@@QAEHPBDMPAM@Z',
+            }
             motion_imports = imports(objects['motion']) | imports(objects['d3d'])
-            self.assertTrue(stream_calls | resource_calls <= motion_imports)
-            supplied = {s.name for name in ('stream', 'partial_stream', 'resources')
+            self.assertTrue(stream_calls | resource_calls | parameter_calls <= motion_imports)
+            supplied = {s.name for name in ('stream', 'partial_stream', 'resources', 'parameters')
                         for s in objects[name].symbols
                         if s.storage_class == 2 and s.section_number > 0}
-            self.assertTrue(stream_calls | resource_calls <= supplied)
+            self.assertTrue(stream_calls | resource_calls | parameter_calls <= supplied)
             seek = '?Seek@UnknownTextureStream@@QAEHHHH@Z'
             self.assertIn(seek, imports(objects['partial_motion']))
             self.assertIn(seek, supplied)
@@ -71,13 +82,8 @@ class MotionStreamConnectionTests(unittest.TestCase):
                 self.assertFalse(any(alias in symbol.name
                                      for symbol in objects[name].symbols
                                      for alias in ('ArchiveFile@@', 'OwnerRegistry@@',
-                                                   'OwnerEntry@@', 'g_pOwnerRegistry@@')))
-            # The separate parameter-block view still has no supplied Attach
-            # body under this class name. Rekeying its stream argument is not
-            # counted as an implemented function.
-            attach = '?Attach@SltFile@@QAEXPAVUnknownTextureStream@@HH@Z'
-            self.assertIn(attach, imports(objects['d3d']))
-            self.assertNotIn(attach, supplied)
+                                                   'OwnerEntry@@', 'g_pOwnerRegistry@@',
+                                                   'SltFile@@')))
 
 
 if __name__ == '__main__':

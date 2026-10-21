@@ -1,6 +1,6 @@
-// Math3D.cpp -- out-of-line bodies of small Math3D.h helpers (byte-match samples).
+// Math3D.cpp -- out-of-line bodies of small Math3D.h helpers.
 //
-// This is a sample grouping, not a claim about the retail translation unit. The
+// This is a reconstruction grouping, not a claim about the retail translation unit. The
 // helpers sit in different retail ranges: 0x004a13e0 and 0x004a1d10..0x004a2040
 // belong to the matrix/quaternion library, and 0x005087b0 is elsewhere. Which file
 // owned each one is unknown (tier 3).
