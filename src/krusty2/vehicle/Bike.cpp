@@ -8,6 +8,7 @@
 #include "soultree/SoultreePhysicsObject.h"
 #include "collision/CollisionPoint.h"
 #include "../../reconstructed/Wrecker.h"
+#include "../../reconstructed/Suspension.h"
 
 // The loader compares the wheel names with the library strcmp (0x00536070), not the
 // intrinsic expansion.
@@ -711,7 +712,9 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
                 AddWheel(wheel, 0, (int)lineShock, 0, 0);
             wheel->sceneNode->GetPositionIn(0, &wheelPoint);
             wheelPos[i] = modelNode->WorldToLocalPoint(wheelPoint);
-            lineShock->UpdateAxis(wheel->sceneNode, handlebars->node);
+            reinterpret_cast<InlineShock*>(lineShock)->UpdateAxis(
+                reinterpret_cast<ShockNode*>(wheel->sceneNode),
+                reinterpret_cast<ShockNode*>(handlebars->node));
         }
     }
 

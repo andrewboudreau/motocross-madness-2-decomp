@@ -17,7 +17,8 @@ ROOT=Path(__file__).resolve().parents[1]
 START='?Method_0x004a8bf0@Character@@QAEXHM@Z'
 RETIRED={'?Method_0x004a8bf0@BikeA5C4@@QAEXHM@Z','?Fn_004A8BF0@KbA5C4@@QAEXHM@Z'}
 SOURCES={
- 'src/krusty2/vehicle/Bike.cpp':(242,1089,3,'2ce10b46d8a204e9c3a7b7a7c0300495d6e84344eb3a5b490b58fdd554092d5e'),
+ # InlineShock connection: only the verified UpdateAxis external destination changes.
+ 'src/krusty2/vehicle/Bike.cpp':(242,1089,3,'16777035e9d5516a5d422d797c90c69df3e918db3e5ce86cfdac451621598fef'),
  'src/krusty2/vehicle/KrustyBike.cpp':(243,1054,2,'892b622eb1ec11539d1a7bb37a1c2143c8e1ddf295778cb32b4c33eb0b68daca'),
  'samples/physics/krustybike/KrustyBikeNearMisses.cpp':(271,1443,8,'ad3d79c2ff9577c6b135de0cb1944e7dd8ad399b63a78abb3fdfacb82056078b'),
 }

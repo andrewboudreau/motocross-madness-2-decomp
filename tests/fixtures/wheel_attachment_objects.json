@@ -1,0 +1,12 @@
+{
+  "samples/physics/tire/Tire.cpp": {
+    "sections": 82,
+    "relocations": 441,
+    "sha256": "b5d4ec5f1ff65efd0a7612aaae5b50aee4f0fce82beb6dfb0a8241cf1f173f54"
+  },
+  "src/krusty2/vehicle/Bike.cpp": {
+    "sections": 242,
+    "relocations": 1089,
+    "sha256": "16777035e9d5516a5d422d797c90c69df3e918db3e5ce86cfdac451621598fef"
+  }
+}

@@ -3,9 +3,9 @@
 Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 The 2026-10-21 native Windows VC6 SP3 gate passes its toolchain identity,
-manual smoke and generated-probe checks. Calibration has 3,013 strict-exact
-rows among 3,024 comparisons: 2,998 distinct source/address/extent cases.
-It covers 158 source files, 155 with at least one strict case. The separate
+manual smoke and generated-probe checks. Calibration has 3,015 strict-exact
+rows among 3,026 comparisons: 3,000 distinct source/address/extent cases.
+It covers 160 source files, 157 with at least one strict case. The separate
 physics matrix has 1,086 strict-exact targets among 1,162 comparisons.
 All prior strict cases are retained in the current connection composition.
 Neither matrix reports a partial-score decrease in this composition. The
@@ -23,39 +23,41 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The two [by-value position implementations](SOULTREE_POSITION_VALUE.md) each
-retain the complete strict 38-byte body and actual cache-helper dependency.
-The motion and LightEmitter callers remain unchanged. Validation passes 121
-strict checks and 158,212 native scenarios for each setter, including cache
-propagation, raw float bits, aliases and progressive faults.
+[InlineShock axis setup](INLINE_SHOCK_AXIS.md) supplies the complete strict
+250-byte loading operation through its verified primary receiver. The Bike
+call changes only its declared destination. The sample aggregate retains its
+complete emission under the reviewed scene-helper naming connection. Its
+regression passes 87 strict comparisons and 149,508 native scenarios.
 
-The three [vector arithmetic providers](VECTOR_VALUE_ARITHMETIC.md) retain
-complete strict 69-byte bodies and pass 152,535 native cases. The full Wrecker
-Tick caller remains strict; the collision caller remains an unchanged partial.
-Two source subtraction views share one retail body, with no original TU claim.
+[Wheel attachment](WHEEL_ATTACHMENT.md) supplies the existing per-wheel call
+view with a complete strict 195-byte body and unchanged callers. Validation
+passes 48 strict comparisons and 47,006 native scenarios using actual scene,
+matrix and CRT helpers. Its ordinary header-generated vector initializers
+are explicitly accounted for; original TU ownership is not claimed.
 
-The [steering-axis candidate](STEERING_AXIS_FROM_POINTS.md) remains reviewed
-nonexact: 230 bytes against 234 retail bytes, with 145 matching positions.
-Its extraction preserves all 32 aggregate sections and 90 relocations; 48
-strict helper/canonical checks and 100,852 native scenarios use actual cache
-and transform helpers. The existing direction helper also remains nonexact.
+[Rendering scale](SOULTREE_SCALE.md#functional-build-review) is admitted as an
+explicitly reviewed nonexact candidate: 630 emitted bytes and 618 matching
+positions. All 14 original aggregate sections and 32 relocations remain
+unchanged. Real caller/helper evidence and 99,827 native scenarios support
+this finite admission; arbitrary floating-point equivalence is not claimed.
 
-All 241 old production objects retain 10,605 nondebug sections and 45,567
-relocations with no symbol substitutions or filename exclusions. The four
-new objects are independently recompiled using actual game commands. The
-real link compiles 245 translation units and reports 271 unresolved names;
-the accepted composition reduces **277 -> 276 -> 272 -> 271**. Private evidence
-is in `work/game-build/round43-all-objects.json`, `round43-link-evidence.json`,
-`round43-admitted.json` and `connections-round43-preservation.json`.
+All 245 prior production objects preserve 10,636 nondebug sections and 45,615
+relocations under only the verified InlineShock destination-name connection,
+with no filename exclusions. The three new objects independently reproduce
+their actual game-command emissions. The real links remove exactly three
+missing names, **271 -> 270 -> 269 -> 268**, with none added. The final report
+checks all 248 source hashes, 227 header hashes, configuration, profile and
+per-source flags. Private evidence is in `work/game-build/round44-link-evidence.json`,
+`round44-all-objects.json`, `round44-admitted.json` and
+`connections-round44-preservation.json`.
 
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and excluded from strict counts.
 The only per-source compiler exception remains `/QIfist` for the motion-start
 helper; this slice changes no compiler flags. Finite native checks do not
-establish integrated gameplay. The full regression suite passes 519 tests,
-with 11 explicit skips (530 total); the expanded position initializer check
-also passes in a fresh focused rerun. Static checks pass for 249 Python files
-and 384 JSON files.
+establish integrated gameplay. The full regression suite passes 522 tests,
+with 11 explicit skips (533 total). Static checks pass for 252 Python files
+and 389 JSON files.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

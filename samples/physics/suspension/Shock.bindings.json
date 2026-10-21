@@ -11,6 +11,7 @@
   "?ClearForces@Shock@@UAEXXZ": "0x004f9c70",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?GetPositionIn@ShockNode@@QAEXPAV1@PAUShockVec3@@@Z": "0x004fc9a0",
+  "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
   "?Reset@Shock@@UAEXXZ": "0x004f9ba0",
   "?Rotate@ShockNode@@QAEXUShockVec3@@M@Z": "0x004fceb0",
   "?SetMatrixLike@ShockNode@@QAEXPBX@Z": "0x004fca30",

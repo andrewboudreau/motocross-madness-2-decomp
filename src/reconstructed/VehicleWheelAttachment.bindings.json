@@ -1,0 +1,6 @@
+{
+  "?SetPositionVec3@SoultreeObject@@QAEXUVec3@@@Z": "0x004fc630",
+  "?SetLocalMatrix@SoultreeObject@@QAEXPBUMatrix4@@@Z": "0x004fca30",
+  "?Rotate@SoultreeObject@@QAEXUVec3@@M@Z": "0x004fceb0",
+  "__finite": "0x00534d07"
+}

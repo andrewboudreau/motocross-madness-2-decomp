@@ -1,5 +1,5 @@
 {
-  "baseline": "21934bae plus the rider motion-start connections documented in docs/RIDER_MOTION_START.md. All three affected complete objects preserve 756 nondebug sections and 3586 relocations under only the two retired names. All 23 affected baseline/current partials were independently checked; two name-sensitive fingerprints changed, while complete body bytes, extents and retail scores are preserved. Untouched cases retain their prior pins. Local labels use stable public section identities; anonymous destinations retain ordinal, payload and relocation identity, rather than numeric COFF indices.",
+  "baseline": "10b30382fa90ad5abfad91fb14df9e29c7907bb5 plus the verified InlineShock connection documented in docs/INLINE_SHOCK_AXIS.md. Complete prior Bike sections and LoadBike bytes are preserved; exactly one external UpdateAxis destination now names the primary InlineShock implementation. All other partial fingerprints are unchanged. Local labels retain stable section identities and exact offsets; anonymous destinations retain ordinal, payload and relocation identity.",
   "partials": [
     [
       "src/krusty2/vehicle/Bike.cpp",
@@ -116,7 +116,7 @@
       6745,
       6745,
       6428,
-      "cc08c741aac414d5cb0c4902ea7912903d9796093ddbb772c13a3e463478a63a"
+      "c1322732b5c31af745dadba136e1e6f73a9816fbb853b4b01d4ce684c79c2b66"
     ],
     [
       "samples/physics/bikeai/BikeAINearMisses.cpp",

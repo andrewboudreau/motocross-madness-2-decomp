@@ -134,7 +134,7 @@
   "?UnknownVirtualSlot76@Vehicle@@UAE?AUVec3@@PBU2@0@Z": "0x00529b40",
   "?UnknownVirtualSlot97@Bike@@UAEXXZ$ehhandler": "0x005498d7",
   "?UpdateAttachment@VehicleWheel@@QAEXXZ": "0x00515660",
-  "?UpdateAxis@VehicleInlineShock@@QAEXPAVSoultreeObject@@0@Z": "0x004f9f90",
+  "?UpdateAxis@InlineShock@@QAEXPAVShockNode@@0@Z": "0x004f9f90",
   "?Vec3AddCall@@YAPAUVec3@@PAU1@PBU1@1@Z": "0x00421cb0",
   "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z": "0x005015b0",
   "?Vec3SubtractCall@@YAPAUVec3@@PAU1@PBU1@1@Z": "0x00421d00",

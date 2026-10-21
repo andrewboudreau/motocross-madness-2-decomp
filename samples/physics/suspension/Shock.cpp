@@ -113,19 +113,7 @@ InlineShock::~InlineShock()
 // The store to axisLength is embedded in the divisor: retail's `fld st(0); fdivr [1.0]` (the
 // only one in .text) needs it; a separate `axisLength = len;` statement gives `fld [1.0];
 // fdiv st(1)`, as do named inverse locals, `1.0f / axisLength` and parenthesised forms.
-void InlineShock::UpdateAxis(ShockNode* a, ShockNode* b)
-{
-    ShockVec3 pa;
-    ShockVec3 pb;
-    a->GetPositionIn(0, &pa);
-    b->GetPositionIn(0, &pb);
-    axis = ShockVec3(pa.x - pb.x, pa.y - pb.y, pa.z - pb.z);
-    float len = axis.LengthSquared();
-    len = (len == 1.0f) ? 1.0f : (float)sqrt(len);
-    axis = axis * (1.0f / (axisLength = len));
-    if (len < minLength)
-        minLength = len;
-}
+#include "../../../src/reconstructed/InlineShockAxis.cpp"
 
 void InlineShock::ClampAndStep(float maxDelta, float dt, ShockVec3& pos)
 {

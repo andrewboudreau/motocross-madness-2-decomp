@@ -26987,6 +26987,28 @@ CASES = [
     },
 ]
 
+CASES += [
+    {
+        'name': 'InlineShock axis setup',
+        'source': 'src/reconstructed/InlineShockAxis.cpp',
+        'bindings': 'src/reconstructed/InlineShockAxis.bindings.json',
+        'symbol': '?UpdateAxis@InlineShock@@QAEXPAVShockNode@@0@Z',
+        'target_va': '0x004f9f90', 'target_size': 250,
+        'includes': ['src/krusty2', 'src/reconstructed'],
+        'reason': 'Primary InlineShock constructor and Bike receiver chain; see docs/INLINE_SHOCK_AXIS.md',
+    },
+    {
+        'name': 'Vehicle wheel attachment update',
+        'source': 'src/reconstructed/VehicleWheelAttachment.cpp',
+        'bindings': 'src/reconstructed/VehicleWheelAttachment.bindings.json',
+        'symbol': '?UpdateAttachment@VehicleWheel@@QAEXXZ',
+        'target_va': '0x00515660', 'target_size': 195,
+        'includes': ['src/krusty2', 'src/reconstructed'],
+        'reason': 'Existing Bike wheel receiver and Tire attachment field views; native transform closure verified',
+    },
+]
+
+
 def main():
     ap=argparse.ArgumentParser(description='Run compiler-calibration targets. Non-exact results are data, not failure.')
     ap.add_argument('--exe',default='work/game/mcm2.exe')

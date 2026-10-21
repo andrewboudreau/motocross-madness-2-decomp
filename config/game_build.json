@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/render/D3DIMScale.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete 630-byte scene scale operation with 618 resolved matching positions; actual rendering callers and cache helpers verified in 99827 native scenarios. Floating-point operand ordering remains nonexact.",
+      "evidence": "docs/SOULTREE_SCALE.md#functional-build-review"
+    },
+    {
       "path": "samples/physics/motion/SteeringAxisFromPoints.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete steering-axis setup passes 100852 finite native cache, transform, alias, FP and fault scenarios with actual scene helpers and independent result/partial-write oracles. VC6 emits 230 bytes against 234 retail bytes, with 145 matching positions; extraction preserves all 32 aggregate sections and 90 relocations. The existing direction helper remains nonexact; arbitrary NaN payloads and resumable exception equivalence are outside this validation.",

@@ -161,8 +161,10 @@ class SteeringAxisFromPointsTests(unittest.TestCase):
             self.assertEqual(len(caller_relocs),219)
             self.assertEqual(hashlib.sha256(caller_bytes).hexdigest(),
                              '1dba68b1345a120c9f1ad806330cd4a2582f02905a47873db0063946f74a97e3')
+            # InlineShock's verified destination and one compiler-local label spelling
+            # changed; the complete Bike proof retains every byte and local destination.
             self.assertEqual(hashlib.sha256(json.dumps(caller_relocs).encode()).hexdigest(),
-                             'a4531213c81084818a4b1c069117dc2106e520d86dded39564fa92e2eef98d5a')
+                             '9ad26589c8eee2a884b86f8318196cd681faabf33dade6b3d9b69d9d7364f9f7')
             self.assertEqual(sum(name==SYMBOL for _,_,name in caller_relocs),1)
             transform_path,transform = compile_source(ROOT/TRANSFORM,'transform')
             self.assertEqual(signature(candidate,SYMBOL),signature(aggregate,SYMBOL))
