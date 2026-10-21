@@ -28,6 +28,40 @@ Exact: 32 calibration cases (4 + 4 + 17 + 7), including FontTexture's
 `FindCell` `0x00467340` and loader `0x004673d0` and the manager's removal
 `0x00467760` and search `0x004677f0`.
 
+## Font rectangle index storage
+
+`src/reconstructed/Rectangle2DState.cpp` supplies the four writable DWORDs
+already declared in `Rectangle2D.h`. The zero-valued cell at `0x0057972c`
+lies in the zero-filled tail of the retail image's writable `.data` section;
+`0x00568468`, `0x0056846c` and `0x00568470` contain 1, 2 and 3. The new
+object has four bytes of `.bss` and twelve bytes of `.data`, with no code,
+dynamic initializer, relocation or external dependency. Original names,
+aggregate membership and translation-unit ownership remain unknown.
+
+An exhaustive scan for each encoded absolute DWORD finds exactly one load:
+`0x00467547`, `0x00467540`, `0x00467532` and `0x0046752c`, respectively.
+The loader uses those values to select four floats from the record read by
+`UnknownTextureStream::Read`, then passes them to the actual Rectangle2D
+constructor at `0x004e8ad0`. This proves these direct references, not absence
+of arbitrary indirect writes. It does not justify changing the cells to
+read-only constants or inlining their values into callers.
+
+`tests/test_graphics_state.py` verifies all sixteen initial bytes, individual
+symbol extents, writable storage, absence of initialization code/dependencies,
+and the actual indexed-load/constructor sequence against retail. The actual
+game objects retain all 22 strict FontTexture and Rectangle2D cases. The real
+link removes exactly these four names, **250 -> 246**, without adding another
+missing symbol. Existing production objects remain unchanged. These checks
+do not establish loading real font assets or integrated menu rendering.
+
+```powershell
+$env:PYTHONPATH='.;tests'
+$env:VC6_ROOT=(Resolve-Path work/vc6sp3-disc).Path
+$env:MCM2_EXE=(Resolve-Path work/game/mcm2.exe).Path
+python -m unittest test_graphics_state -v
+python tools/build_game.py -j6
+```
+
 Source forms that mattered:
 - `0x00467340` and `0x004677f0` keep the loop test at the top only as
   `while (1)` with the end test and the match as `break`s; `for` and

@@ -8,7 +8,7 @@
   "?TransformVectors@VisibilityClipper@@QAEXPBUVisibilityBoxVec@@PAU2@PBUVisibilityMatrix@@H@Z": "0x0052f0a0",
   "?TestDot@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityBoxVec@@1@Z": "0x0052f140",
   "?CullQuad@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityBoxVec@@HHHH@Z": "0x0052f4d0",
-  "?g_visibilityClipper@@3PAVUnknownCubeClipper@@A": "0x00575a98",
+  "?g_visibilityClipper@@3PAVVisibilityClipper@@A": "0x00575a98",
   "__real@4@3ffd8000000000000000": "0x005507f8",
   "__real@4@3fff8000000000000000": "0x00550748",
   "__real@4@4005c800000000000000": "0x005505ec",

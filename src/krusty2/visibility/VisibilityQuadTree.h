@@ -100,7 +100,6 @@ struct VisibilityVertex {
 };
 
 #include "VisibilityClipper.h"
-extern VisibilityClipper* g_visibilityClipper;   // 0x00575a98
 
 // Tier 3.  The renderer reached through camera + 0x18 (0x0052e450 loads it with
 // mov ecx,[edi+0x18]); DrawBox calls its virtual slot 16 (+0x40) with (3, 0x1e2, vertices,

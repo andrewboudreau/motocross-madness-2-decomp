@@ -193,7 +193,7 @@
   "?g_EcoSystem@@3PAVEcoSystem@@A": "0x0059aebc",
   "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "?g_collisionQuadTree@@3PAVUnknownEcoQuadTree@@A": "0x0068aba4",
-  "?g_visibilityClipper@@3PAVUnknownEcoVisibilityClipper@@A": "0x00575a98",
+  "?g_visibilityClipper@@3PAVVisibilityClipper@@A": "0x00575a98",
   "_$E1": "0x00459840",
   "_$E10": "0x00459b00",
   "_$E11": "0x00459af0",

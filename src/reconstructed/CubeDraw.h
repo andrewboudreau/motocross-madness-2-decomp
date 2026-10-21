@@ -74,7 +74,7 @@ public:
     // 0x0052f4d0: whether the quad of `points` a, b, c, d is on screen.
     int IsQuadOnScreen(Camera* camera, Vector3* points, int a, int b, int c, int d);
 };
-extern UnknownCubeClipper* g_visibilityClipper;   // 0x00575a98 (VisibilityClipper, src/krusty2/visibility)
+#include "../krusty2/visibility/VisibilityClipperGlobal.h"   // 0x00575a98 (VisibilityClipper, src/krusty2/visibility)
 
 class DrawableCube : public GameObject {
 public:

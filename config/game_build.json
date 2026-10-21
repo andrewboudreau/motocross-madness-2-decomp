@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/ui/EditBoxDraw.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete edit-box text, image, caret and IME drawing candidate passes 14793 native scenarios with thirteen actual strict helpers and independent layout, callback, fault and held-DC checks. VC6 emits 975 bytes against 973 retail bytes, with 206 resolved matching positions; extraction preserves all 733 aggregate sections and 3912 relocations. Background GetDc and COM/GDI/IME boundaries remain scripted; integrated menu rendering is unverified.",
+      "evidence": "docs/EDIT_BOX_DRAW.md#functional-build-review"
+    },
+    {
       "path": "samples/render/BitStringRead.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete 157-byte reader against 125 retail bytes, with 8 resolved matching positions. Preserves canonical constructor and shared storage; 205632 native reader cases and 2051 source-only LZW streams pass using the actual decoder and allocation helpers. Finite valid-count and padded-stream limits are explicit.",

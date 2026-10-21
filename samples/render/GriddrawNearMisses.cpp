@@ -694,7 +694,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* a0, void* a1, float* center,
     int j;
     if (size > 1) {
         g_gridBoxTests++;
-        visible = g_visibilityClipper->TestBox(terrain->renderer->camera, (float*)a1, center, extent, 0, &corners, 0);
+        visible = reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->renderer->camera, (float*)a1, center, extent, 0, &corners, 0);
         if (corners != 8)
             corners = 0;
         if (size == 16) {
@@ -747,7 +747,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* a0, void* a1, float* center,
                     } else {
                         int dummy;
                         g_gridBoxTests++;
-                        if (g_visibilityClipper->TestBox(terrain->renderer->camera, (float*)a1, &child->center.x,
+                        if (reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->renderer->camera, (float*)a1, &child->center.x,
                                                          &child->extent.x, 0, 0, &dummy)) {
                             if (child->childMask != 0x1fffff) {
                                 child->childMask = 0x1fffff;

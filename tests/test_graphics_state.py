@@ -22,6 +22,37 @@ EXE = Path(os.environ.get('MCM2_EXE', ROOT / 'work/game/mcm2.exe'))
 @unittest.skipUnless(os.environ.get('VC6_ROOT') and EXE.is_file(),
                      'requires VC6_ROOT and the private retail EXE')
 class GraphicsStateTests(unittest.TestCase):
+    def test_font_rectangle_indices_storage_and_actual_loader_reads(self):
+        self.assert_data_provider('Rectangle2DState', {
+            'g_UnknownGlobal57972c': 4, 'g_UnknownGlobal568468': 4,
+            'g_UnknownGlobal56846c': 4, 'g_UnknownGlobal568470': 4,
+        })
+        retail = PEImage(EXE)
+        # Complete absolute-DWORD scan: each cell has one encoded load in the
+        # font loader, with no encoded direct write or address-taking reference.
+        # This does not exclude arbitrary indirect writes or prove TU ownership.
+        for va, site, opcode in ((0x57972c, 0x467547, b'\x8b\x0d'),
+                                 (0x568468, 0x467540, b'\x8b\x15'),
+                                 (0x56846c, 0x467532, b'\xa1'),
+                                 (0x568470, 0x46752c, b'\x8b\x0d')):
+            needle = struct.pack('<I', va)
+            offsets, start = [], 0
+            while (offset := retail.data.find(needle, start)) >= 0:
+                offsets.append(retail.offset_to_va(offset))
+                start = offset + 1
+            self.assertEqual(offsets, [site + len(opcode)])
+            self.assertEqual(retail.bytes_at_va(site, len(opcode) + 4), opcode + needle)
+        # The four loaded DWORDs index the stack's four floats, pushed right to
+        # left into the real Rectangle2D constructor. Retain every intervening
+        # instruction, including the changing stack displacement after pushes.
+        self.assertEqual(retail.bytes_at_va(0x467537, 4), bytes.fromhex('8b548c20'))
+        self.assertEqual(retail.bytes_at_va(0x46753b, 5), bytes.fromhex('8b4c842052'))
+        self.assertEqual(retail.bytes_at_va(0x46754d, 14),
+                         bytes.fromhex('8b4494288b548c2850528d4c2440'))
+        call = retail.bytes_at_va(0x46755b, 5)
+        self.assertEqual(call[0], 0xe8)
+        self.assertEqual(0x467560 + struct.unpack('<i', call[1:])[0], 0x4e8ad0)
+
     def test_bike_class_table_size_values_and_writable_storage(self):
         self.assert_data_provider('BikeClassData', {'g_BikeClassEngineSizes': 20})
 
@@ -83,6 +114,15 @@ class GraphicsStateTests(unittest.TestCase):
             definitions = {s.name: s for s in obj.symbols
                            if s.storage_class == 2 and s.section_number > 0}
             self.assertEqual(set(definitions), set(bindings))
+            if stem == 'Rectangle2DState':
+                self.assertFalse([r for r in obj.relocations
+                                  if not obj.section(r.section_number).name.startswith('.debug')])
+                self.assertFalse(any(s.storage_class == 2 and s.section_number == 0
+                                     for s in obj.symbols))
+                self.assertFalse(any(s.name.startswith('.CRT') for s in obj.sections))
+                self.assertEqual(sorted((s.name, s.raw_size) for s in obj.sections
+                                        if s.raw_size and s.name in ('.data', '.bss')),
+                                 [('.bss', 4), ('.data', 12)])
             if stem == 'TextureSurfaceState':
                 self.assertFalse([r for r in obj.relocations
                                   if not obj.section(r.section_number).name.startswith('.debug')])

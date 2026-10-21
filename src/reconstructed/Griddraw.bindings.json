@@ -90,7 +90,7 @@
   "?g_gridQuadOrder@@3PAHA": "0x0056c248",
   "?g_gridSize@@3HA": "0x0067a684",
   "?g_gridVertexCache@@3VGridVertexCache@@A": "0x00677910",
-  "?g_visibilityClipper@@3PAVGridVisibilityClipper@@A": "0x00575a98",
+  "?g_visibilityClipper@@3PAVVisibilityClipper@@A": "0x00575a98",
   "_$E1": "0x004807d0",
   "_$E10": "0x004808c0",
   "_$E11": "0x004808b0",

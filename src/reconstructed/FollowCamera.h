@@ -116,7 +116,7 @@ public:
     int ProjectPoint(Camera* camera, const void* matrix, const Vector3* point,
                               Vector3* screen, int* code);
 };
-extern UnknownFollowCameraProjector* g_visibilityClipper;   // 0x00575a98 (VisibilityClipper, src/krusty2/visibility)
+#include "../krusty2/visibility/VisibilityClipperGlobal.h"   // 0x00575a98 (VisibilityClipper, src/krusty2/visibility)
 
 // d3drm.dll's D3DRMVectorRotate (import thunk 0x0053304c, the module's only
 // d3drm import): rotates `vector` about `axis` by `theta`. The SDK types are

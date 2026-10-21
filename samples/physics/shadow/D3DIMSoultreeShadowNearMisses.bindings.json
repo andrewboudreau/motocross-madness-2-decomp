@@ -14,7 +14,7 @@
   "?g_d3dimShadowOutcodes@@3PAHA": "0x0057efd4",
   "?g_d3dimShadowTexel@@3MA": "0x0057efa4",
   "?g_d3dimShadowVertexArray@@3PAUD3DIMShadowVertexView@@A": "0x00581eb8",
-  "?g_visibilityClipper@@3PAVD3DIMShadowClipper@@A": "0x00575a98",
+  "?g_visibilityClipper@@3PAVVisibilityClipper@@A": "0x00575a98",
   "_s_shadowPointCapacity": "0x0059ad28",
   "_s_shadowPoints": "0x0059ad2c",
   "__FILE__:d3dimsoultreeshadownearmisses.cpp": "0x00568cac",

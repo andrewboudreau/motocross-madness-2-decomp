@@ -39,4 +39,6 @@ public:
                         int* fullyInside);                                     // 0x0052fbb0
 };
 
+#include "VisibilityClipperGlobal.h"
+
 #endif

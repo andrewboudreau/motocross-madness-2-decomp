@@ -1017,7 +1017,7 @@ int EcoSystem::PrepareGeometry() {
                 center.x = object->quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
                 center.y = object->quantizedPosition.y * g_EcoSystem->unitsPerCoordinate + height;
                 center.z = object->quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
-                visible = g_visibilityClipper->SphereInFrustum(ECO_VIEW->camera, &ECO_VIEW->camera->field_0xec,
+                visible = reinterpret_cast<UnknownEcoVisibilityClipper*>(g_visibilityClipper)->SphereInFrustum(ECO_VIEW->camera, &ECO_VIEW->camera->field_0xec,
                                                                &center, radius, 0);
             }
             if (visible) {

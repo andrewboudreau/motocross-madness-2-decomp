@@ -37,7 +37,7 @@
   "?g_gridQuadCell@@3PAHA": "0x0056c208",
   "?g_gridQuadOrder@@3PAHA": "0x0056c248",
   "?g_gridVertexCache@@3VGridVertexCache@@A": "0x00677910",
-  "?g_visibilityClipper@@3PAVGridVisibilityClipper@@A": "0x00575a98",
+  "?g_visibilityClipper@@3PAVVisibilityClipper@@A": "0x00575a98",
   "__FILE__": "0x0056c288",
   "__ftol": "0x00534a88",
   "__real@4@00000000000000000000": "0x00550484",

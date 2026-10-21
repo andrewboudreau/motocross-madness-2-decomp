@@ -41,53 +41,55 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 251 C++ files (202 canonical sources and 49
-reviewed candidates) and reaches LINK with 256 unresolved external symbols,
+The 2026-10-21 build compiles 253 C++ files (203 canonical sources and 50
+reviewed candidates) and reaches LINK with 245 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-9qzoq9yp` retains every prior strict result:
+The composition in `build-rc6bus6k` retains every prior strict result:
 3,015/3,026 calibration rows and 1,086/1,162 physics comparisons, with no
 partial-score decreases. The two existing nonexact physics comparison-binding
 diagnostics are unchanged and excluded from strict counts.
 
-The [texture-to-LZW connection](TEXTURE_LZW_CONNECTION.md) routes both
-compressed-image paths to the existing strict decoder. All 2,129 caller bytes
-remain strict; complete texture, sample and transitive menu objects preserve
-498 sections and 2,595 relocations under one external-name substitution.
-The focused regression passes 38 strict comparisons.
+The [shared clipper declaration](CLIPPER_GLOBAL_CONNECTIONS.md) joins six
+provisional pointer spellings to the canonical VisibilityClipper import. Its
+345 strict checks retain 15 complete objects: 1,035 sections and 4,712
+relocations, including the transitive Terrain consumer. All 46 encoded retail
+pointer loads are verified. The narrow global header avoids exposing unrelated
+method declarations to those consumers. Canonical clipper storage remains
+unresolved; this slice does not invent an object or constructor.
 
-Five [visibility connections](VISIBILITY_CONNECTIONS.md) route cube visibility,
-camera tracking and racer-name projection to existing strict providers. The seven-object
-proof retains 559 sections and 2,181 relocations under exactly five names;
-214 strict checks and 66,845 native scenarios pass with actual CullPolygon.
-The previously uncompilable TrackOverlay sample first receives its genuine
-GUIManager include; that repaired baseline is explicitly distinguished from
-the six unchanged baselines. Shared clipper storage remains missing.
+Four [font rectangle index cells](FONTTEXTURE.md#font-rectangle-index-storage)
+now supply the writable values 0, 1, 2 and 3 read by FontTexture::Load. All
+sixteen initial bytes, scalar extents, four actual retail loads and constructor
+arguments are checked. The new object has no code, initializer, relocation or
+external dependency. All 22 strict FontTexture and Rectangle2D comparisons
+remain intact; original names, aggregate membership and TU ownership are unknown.
 
-The [global bit reader](BITSTRING_READ.md#functional-build-review) is admitted
-as a reviewed nonexact candidate: 157 emitted bytes against 125 retail bytes,
-with 8 resolved matching positions. Its 205,632 native reader/constructor cases
-and 2,051 source-only LZW streams pass with the actual decoder, shared storage
-and allocator. Forty-two strict helper/initializer checks and the complete
-20-section canonical state-provider object remain intact. These finite checks
-do not establish decoding of every game asset.
+The [edit-box drawing candidate](EDIT_BOX_DRAW.md#functional-build-review)
+now supplies the missing menu text/image/caret/IME operation. It remains
+reviewed nonexact: 975 emitted bytes against the complete 973 retail bytes,
+with 206 resolved matching positions. Its 14,793 native cases use thirteen
+actual strict helpers; 27 helper/constructor checks and the complete 733-section,
+3,912-relocation aggregate remain intact. Signed layout oracles, reached
+callback/exception boundaries and partial-fault state are checked. Background
+GetDc and COM/GDI/IME remain scripted boundaries; integrated menus are unverified.
 
-All 250 prior production objects preserve 10,661 nondebug sections and 45,693
-relocations under only the six reviewed destination-name connections, with no
-filename exclusions. The new reader object independently reproduces its actual
-game-command emission. Real links remove exactly seven missing names,
-**263 -> 262 -> 257 -> 256**, with none added. The final report checks all 251
-source hashes, 228 header hashes, configuration, profile and per-source flags.
-Private evidence is in `work/game-build/round46-link-evidence.json`,
-`round46-all-objects.json`, `round46-admitted.json` and
-`connections-round46-preservation.json`.
+All 251 prior production objects preserve 10,663 nondebug sections and 45,701
+relocations under only the six reviewed global-name connections, with no
+filename exclusions. Both new objects independently reproduce their actual
+game-command emission. Real links remove exactly eleven missing names,
+**256 -> 250 -> 246 -> 245**, with none added. The final report checks all 253
+source hashes, 229 header hashes, configuration, profile and per-source flags.
+Private evidence is in `work/game-build/round47-link-evidence.json`,
+`round47-all-objects.json`, `round47-admitted.json` and
+`connections-round47-preservation.json`.
 
 Linking, startup, integrated menus and racing remain unverified.
-Static checks pass for 258 Python files and 396 JSON files.
-The final full regression run passes: 539 tests, 528 passed and 11 skipped
-(`work/game-build/tests-round46-final.log`).
+Static checks pass for 260 Python files and 401 JSON files.
+The final full regression run passes: 542 tests, 531 passed and 11 skipped
+(`work/game-build/tests-round47-final.log`).
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

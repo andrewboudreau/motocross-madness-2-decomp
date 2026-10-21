@@ -367,7 +367,7 @@ int NameOverlay::UnknownVirtualSlot14()
         Camera* camera = Target()->currentCamera;
         Vector3 screen;
         unsigned int outCode;
-        if (reinterpret_cast<VisibilityClipper*>(g_UnknownGlobal575a98)->ProjectPoint(
+        if (reinterpret_cast<VisibilityClipper*>(g_visibilityClipper)->ProjectPoint(
                 reinterpret_cast<const VisibilityCamera*>(camera),
                 reinterpret_cast<const VisibilityMatrix*>(camera->screenMatrix),
                 reinterpret_cast<const VisibilityBoxVec*>(&head),

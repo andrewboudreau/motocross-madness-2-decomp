@@ -67,7 +67,7 @@
   "?TransformVectors@VisibilityClipper@@QAEXPBUVisibilityBoxVec@@PAU2@PBUVisibilityMatrix@@H@Z": "0x0052f0a0",
   "?TestDot@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityBoxVec@@1@Z": "0x0052f140",
   "?CullQuad@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityBoxVec@@HHHH@Z": "0x0052f4d0",
-  "?g_visibilityClipper@@3PAVUnknownCubeClipper@@A": "0x00575a98",
+  "?g_visibilityClipper@@3PAVVisibilityClipper@@A": "0x00575a98",
   "_s_faceNormals": "0x00579a70",
   "_s_facePoints": "0x00579af8",
   "_s_viewPoints": "0x00579930"

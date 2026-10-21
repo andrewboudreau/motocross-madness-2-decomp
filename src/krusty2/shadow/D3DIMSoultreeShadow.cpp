@@ -90,7 +90,7 @@ public:
     int TestBox(D3DIMShadowCameraView* camera, const float* matrix, const float* center,
                 const float* extent, int* screenRect, int* cornersInside, int unused);  // 0x0052f570
 };
-extern D3DIMShadowClipper* g_visibilityClipper;   // 0x00575a98
+#include "../visibility/VisibilityClipperGlobal.h"   // 0x00575a98
 
 static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIMShadowMatrix4& a,
                                             const D3DIMShadowMatrix4& b)
@@ -134,7 +134,7 @@ int D3DIMSoultreeShadow::UnknownVirtualSlot27()
         reinterpret_cast<SoultreeObject*>(caster)->GetSubtreeBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extent));
         const D3DIMShadowMatrix4& view = ((D3DIMShadowCameraView*)shadow->camera)->matrix_0xec;
         D3DIMShadowMatrixProduct(&m, local, view);
-        if (g_visibilityClipper->TestBox((D3DIMShadowCameraView*)shadow->camera, &m._11, &center.x,
+        if (reinterpret_cast<D3DIMShadowClipper*>(g_visibilityClipper)->TestBox((D3DIMShadowCameraView*)shadow->camera, &m._11, &center.x,
                                          &extent.x, 0, 0, 0))
             inShadowView = 1;
     }

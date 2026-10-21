@@ -100,7 +100,7 @@ public:
     int ProjectPoint(Camera* camera, const void* matrix, const Vector3* point,
                               Vector3* screen, float* depth);
 };
-extern UnknownProjector* g_UnknownGlobal575a98;
+#include "../krusty2/visibility/VisibilityClipperGlobal.h"
 
 // NameOverlay+0x12c: only +0x4c (the terrain) is read.
 struct UnknownNameOverlayWorld {

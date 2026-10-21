@@ -315,6 +315,14 @@ positions; it is individually admitted after 18 strict helper checks and
 20,962 native scenarios. Its platform contracts and runtime limits are recorded
 in the dedicated evidence page.
 
+[Edit-box drawing](EDIT_BOX_DRAW.md#functional-build-review) is maintained in
+`samples/ui/EditBoxDraw.cpp`, included by the aggregate and individually admitted
+as a nonexact source-game candidate. The complete retail extent is 973 bytes;
+the unchanged candidate emits 975 bytes with 206 matching positions. Its
+27 strict helper/constructor checks, complete aggregate preservation and
+14,793 native scenarios exercise the actual six direct game helpers while
+keeping explicit scripted DC, surface, GDI and IME boundaries.
+
 `samples/ui/UIDialogTick.cpp` supplies the complete dialog tick as an explicit
 nonexact game-build candidate. GameUiNearMisses.cpp includes this same source
 for its existing calibration; the larger sample is not added to the game link.

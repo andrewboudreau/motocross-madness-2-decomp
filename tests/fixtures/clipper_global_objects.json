@@ -1,0 +1,105 @@
+{
+  "baseline": "Published 5c439bb source hashes matched the same-path private baseline before applying six global-name joins. All nondebug bytes, flags and relocation destinations remain identical. Terrain transitive consumer included after genuine global-only header narrowing; no commutative target swaps accepted. Only recognized complete checkout filenames are portable.",
+  "renames": {
+    "?g_visibilityClipper@@3PAVD3DIMShadowClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
+    "?g_visibilityClipper@@3PAVUnknownCubeClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
+    "?g_visibilityClipper@@3PAVUnknownEcoVisibilityClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
+    "?g_visibilityClipper@@3PAVUnknownFollowCameraProjector@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
+    "?g_visibilityClipper@@3PAVGridVisibilityClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
+    "?g_UnknownGlobal575a98@@3PAVUnknownProjector@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A"
+  },
+  "objects": {
+    "src/reconstructed/CubeDraw.cpp": {
+      "sections": 47,
+      "relocations": 174,
+      "sha256": "b18f1da5eb7da0aeb2d25da152397fc8458647d670bc4fcde8ee39d386064b9d"
+    },
+    "src/reconstructed/FollowCamera.cpp": {
+      "sections": 98,
+      "relocations": 250,
+      "sha256": "5326d69f142ef9f9f7fdf3cd181ff979dd374727101b30cb3c632bb8cdc2e226"
+    },
+    "src/reconstructed/TrackOverlay.cpp": {
+      "sections": 207,
+      "relocations": 863,
+      "sha256": "30cc5fcb670ceb1ca81252f2b55dc4551bd021cd0a767437e80f285ffd32e61a"
+    },
+    "src/reconstructed/EcoSystem.cpp": {
+      "sections": 132,
+      "relocations": 720,
+      "sha256": "9da6f6357818cc3611fb2d5c2fa6e600e2099dbfe7e49e59621ee812a0f570bf"
+    },
+    "src/reconstructed/Griddraw.cpp": {
+      "sections": 84,
+      "relocations": 456,
+      "sha256": "5e1eb7e0e46243368c7630b722993f297c5f4d06f6b231f9023e99d1e775de53"
+    },
+    "src/krusty2/shadow/D3DIMSoultreeShadow.cpp": {
+      "sections": 47,
+      "relocations": 132,
+      "sha256": "ffdcd1447894682ed6e8c8a123537eb56c226480b79767ec8b82eba172367d13"
+    },
+    "src/krusty2/visibility/VisibilityQuadTree.cpp": {
+      "sections": 87,
+      "relocations": 341,
+      "sha256": "f224a17cb69678fdc1e476e9216faf769a06b1ebb8b485513527137ba7e44d5c"
+    },
+    "samples/render/CubeDrawNearMisses.cpp": {
+      "sections": 17,
+      "relocations": 55,
+      "sha256": "f34401ebda6eaf1cc94d872fe440566d1a2aa11703af90e01e3b4219d803fd3e"
+    },
+    "samples/camera/FollowCameraNearMisses.cpp": {
+      "sections": 66,
+      "relocations": 336,
+      "sha256": "6f0f4bb739462b47582cbec20009cec6ee4211376a22b86c1e6be514e690eda6"
+    },
+    "samples/track/TrackOverlayNearMisses.cpp": {
+      "sections": 37,
+      "relocations": 162,
+      "sha256": "5914078c29620649c1cfe2044d9b72267d6590d09eb7d15fad3a10e1b957e38a"
+    },
+    "samples/ecosystem/EcoSystemNearMisses.cpp": {
+      "sections": 98,
+      "relocations": 444,
+      "sha256": "0bb809b92e24c92953adc640161290024f90e675dcbb218a4a18ad50e273467e"
+    },
+    "samples/render/GriddrawNearMisses.cpp": {
+      "sections": 21,
+      "relocations": 159,
+      "sha256": "9c89a5a145c0d445c589e1a26aae134e050a7ed1ae099fd0f4ccbd71c7bd8caf"
+    },
+    "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp": {
+      "sections": 7,
+      "relocations": 51,
+      "sha256": "b902332e94f7ada273a090e00c67e382bd62ab8921a3de63f360478a0e7d8482"
+    },
+    "samples/physics/visibility/VisibilityQuadTreeTraversal.cpp": {
+      "sections": 2,
+      "relocations": 52,
+      "sha256": "128c7efffa87aff26cfb4d6f575ea209c535e1eb0c55c5d8609cf1128d99e823"
+    },
+    "src/krusty2/broadphase/Terrain.cpp": {
+      "sections": 85,
+      "relocations": 517,
+      "sha256": "ef2e81dd804e8b60b539541978862b60eb35cab41615831ef1801f4b3f344f6e"
+    }
+  },
+  "pointer_imports": {
+    "src/reconstructed/CubeDraw.cpp": 3,
+    "src/reconstructed/FollowCamera.cpp": 1,
+    "src/reconstructed/TrackOverlay.cpp": 1,
+    "src/reconstructed/EcoSystem.cpp": 1,
+    "src/reconstructed/Griddraw.cpp": 1,
+    "src/krusty2/shadow/D3DIMSoultreeShadow.cpp": 1,
+    "src/krusty2/visibility/VisibilityQuadTree.cpp": 16,
+    "samples/render/CubeDrawNearMisses.cpp": 0,
+    "samples/camera/FollowCameraNearMisses.cpp": 0,
+    "samples/track/TrackOverlayNearMisses.cpp": 0,
+    "samples/ecosystem/EcoSystemNearMisses.cpp": 0,
+    "samples/render/GriddrawNearMisses.cpp": 2,
+    "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp": 1,
+    "samples/physics/visibility/VisibilityQuadTreeTraversal.cpp": 16,
+    "src/krusty2/broadphase/Terrain.cpp": 0
+  }
+}

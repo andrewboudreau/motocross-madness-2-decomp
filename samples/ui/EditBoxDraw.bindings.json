@@ -1,0 +1,16 @@
+{
+  "??_C@_00A@?$AA@": "0x00577738",
+  "?BeginControlDraw@UIDialog@@QAEHPAPAXPAUCameraRect@@PAHPAVUIControl@@@Z": "0x0046ed70",
+  "?DrawAlignedText@UIDialog@@QAEXPAXPAUCameraRect@@PBDHIHPAUUnknownGameUiTextRun@@HIHHPAVUIControl@@@Z": "0x0046f550",
+  "?EndControlDraw@UIDialog@@QAEXPAX@Z": "0x0046eeb0",
+  "?SetEditText@UIEditBox@@QAEXPAD@Z": "0x00473da0",
+  "?DrawImage@BackgroundImage@@QAEHPAVPCTextureMap@@PAUCameraRect@@PAXHHHPAHH@Z": "0x00404480",
+  "?ReleaseDc@BackgroundImage@@QAEHXZ": "0x00404c80",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
+  "_ImmGetContext@4": "0x00533076",
+  "_ImmGetOpenStatus@4": "0x00533070",
+  "_ImmReleaseContext@8": "0x00533064",
+  "_ImmSetCompositionWindow@8": "0x0053306a",
+  "__imp__FrameRect@12": "0x005502ec",
+  "__imp__GetStockObject@4": "0x0055005c"
+}

@@ -164,7 +164,7 @@
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
-  "?g_UnknownGlobal575a98@@3PAVUnknownProjector@@A": "0x00575a98",
+  "?g_visibilityClipper@@3PAVVisibilityClipper@@A": "0x00575a98",
   "_$E1": "0x0051dbb0",
   "_$E10": "0x0051dca0",
   "_$E11": "0x0051dc90",

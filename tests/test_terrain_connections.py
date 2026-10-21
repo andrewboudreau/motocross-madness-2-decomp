@@ -42,10 +42,11 @@ PARTIAL = (
     # Canonical ColorMapper, GridBaseBlock and shared-texture node calls.
     # Complete section bytes and relocation destinations are preserved;
     # only the four external names in this body change.
-    # The visibility declaration extraction renumbers its EH label from
-    # $L6169 to $L6170. Both resolve to .text$x+182; the complete object,
-    # including that handler and its relocations, remains identical.
-    ('?Load@Terrain@@', 2117, '1c2f59c57a18d393d1668dc29275bed554366d84edee7687925adeb41eaf7bde'),
+    # The shared clipper pointer declaration renumbers its EH label from
+    # $L6170 to $L6172. Both resolve to section 29 .text$x+182 with zero
+    # addend; all 85 sections and 517 relocations of the old/current game
+    # and fresh test objects remain identical by resolved destination.
+    ('?Load@Terrain@@', 2117, 'b1a655b7c9ef6d0d56363415f18deaa7648b3250ccc4a8da463249bf0bf9dbd2'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with

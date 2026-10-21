@@ -104,7 +104,7 @@ public:
     int TestBox(GridCamera* camera, const float* matrix, const float* center, const float* extent,
                 int* screenRect, int* cornersInside, int* a6);  // 0x0052f570 (ret 0x1c)
 };
-extern GridVisibilityClipper* g_visibilityClipper;   // 0x00575a98
+#include "../krusty2/visibility/VisibilityClipperGlobal.h"   // 0x00575a98
 
 // Boundary view of Terrain (RTTI .?AVTerrain@@; reconstructed in
 // src/krusty2/broadphase/Terrain.h). Only the members this file touches.

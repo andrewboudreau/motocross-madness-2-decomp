@@ -379,7 +379,7 @@ public:
     int SphereInFrustum(const UnknownEcoCamera* camera, const void* matrix, const Vector3* center,
                         float radius, int* fullyInside);       // 0x0052fbb0
 };
-extern UnknownEcoVisibilityClipper* g_visibilityClipper;        // 0x00575a98
+#include "../krusty2/visibility/VisibilityClipperGlobal.h"        // 0x00575a98
 
 // TrackGame.h: the game object 0x0056e26c, as far as this file reads it
 // (slot 22 is the registry query).

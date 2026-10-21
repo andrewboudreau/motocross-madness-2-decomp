@@ -1465,7 +1465,7 @@ int DrawableGridNode::TestBlockFrustum(int block)
     boxCenter[0] = (block % 4) * size + data->gridMinX * terrain->gridCellSize + half;
     boxCenter[2] = (block / 4) * size + data->gridMinZ * terrain->gridCellSize + half;
     boxCenter[1] = ((GridBlockRange*)data->blockRanges)[block].centerY;
-    int visible = g_visibilityClipper->TestBox(terrain->camera, terrain->camera->matrix,
+    int visible = reinterpret_cast<GridVisibilityClipper*>(g_visibilityClipper)->TestBox(terrain->camera, terrain->camera->matrix,
                                                boxCenter, boxExtent, 0, 0, 0);
     if (visible)
         data->visibleBlockMask |= 1 << block;
