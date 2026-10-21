@@ -94,10 +94,11 @@ Twelve existing source bodies now satisfy thirteen former decorated aliases
 | `0x004fd660` | 168 | SoultreeObject::LocalToWorldPoint |
 | `0x004fe850` | 74 | SoultreeObject::GetSubtreeBounds |
 
-Two additional aliases now name the shared SetMatrixIn (`0x004fb8c0`) and
-WorldToLocalDirection (`0x004fd710`) methods. Both bodies remain in samples
-and their canonical symbols were already unresolved elsewhere; this change
-does not supply those implementations. The retained PushProbesOutOfBox sample
+Two additional aliases name the shared SetMatrixIn (`0x004fb8c0`) and
+WorldToLocalDirection (`0x004fd710`) methods. Their complete bodies now have
+separate [reviewed nonexact functional admission](SOULTREE_TRANSFORMS.md),
+remaining in samples; the alias connection itself added no implementation.
+The retained PushProbesOutOfBox sample
 also calls the shared WorldToLocalPoint declaration.
 
 Wrecker retains its local Vector3 and row-oriented frame/matrix views.

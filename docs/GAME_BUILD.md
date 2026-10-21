@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-20 build compiles 181 C++ files (174 canonical sources and seven
-reviewed candidates) and reaches LINK with 613 unresolved external symbols,
+The 2026-10-20 build compiles 183 C++ files (174 canonical sources and nine
+reviewed candidates) and reaches LINK with 594 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -171,8 +171,8 @@ Bike and KrustyBike now use the existing [Wrecker providers](BIKE_WRECKER_CONNEC
 preserving the `+0x604` pointer, `0x53c` allocation and animation-handle bits.
 Wrecker in turn uses the existing [Soultree and character interfaces](WRECKER.md),
 including the virtual GameObject base and model-node offset. These connections
-remove 27 missing names; two renamed Soultree methods still lack definitions
-and are not counted as supplied implementations. Full headers are included
+remove 27 missing names; two renamed Soultree methods required separate
+functional admission below. Full headers are included
 only where their complete definitions are needed, avoiding the separate render
 and physics Soultree declarations colliding in other translation units.
 
@@ -186,13 +186,34 @@ helpers unchanged, writes a real report and verifies exception propagation
 and one-shot behavior. This tests the reporting path on the current host;
 it does not establish game startup.
 
+Six [vehicle camera/audio model connections](VEHICLE_MODEL_CONNECTIONS.md)
+now use the existing scene-node providers while preserving their base offsets
+and vector layouts. Three [scene profiling consumers](DEBUGOVERLAY.md#scene-profiling-connections)
+use the existing overlay and peak-hold methods, removing ten more incompatible
+names. The visibility timer now reserves the actual 12 bytes required by its
+fields instead of an empty class's one-byte allocation. Complete caller and
+provider matches, native layout assertions and real COFF imports cover these
+connections. A local RaceView type alias preserves the declaration order
+required for ProCircuitProcs' complete strict AddCircuitRow body.
+
+The complete [Soultree transform candidates](SOULTREE_TRANSFORMS.md)
+provide WorldToLocalDirection, SetMatrixIn and SetAxesIn. They remain explicitly
+nonexact in samples; the transpose helper retains its existing strict match.
+Their actual standalone objects pass 86,016 native differential scenarios,
+covering frame/parent branches, finite fractional inputs, overlapping matrices
+and vectors, complete state changes and ordered calls. The test scripts node
+cache dependencies and checks the hidden result-buffer return pointer; it does
+not establish recursive scene-cache integration or universal NaN equivalence.
+These three methods remove three additional missing names without introducing
+new unresolved dependencies.
+
 Validation of this composition passes the toolchain/manual/generated VC6 gate,
 2,975 of 2,986 calibration rows (2,973 distinct source/address/extent cases),
 and all 1,076 previously strict physics targets among 1,152 comparisons.
 The recursive reset's strict case moves from FileStream.cpp to
 Parameterblocks.cpp with its address and full 30-byte extent unchanged;
 ShowDialog adds one strict case. The native-enabled Python suite passes
-417 tests with 11 skipped. These counts retain existing nonexact comparisons;
+420 tests with 11 skipped. These counts retain existing nonexact comparisons;
 they do not describe a fully matched or working game.
 
 Other incompatible class views, missing methods and unresolved globals

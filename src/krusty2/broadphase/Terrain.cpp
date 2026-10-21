@@ -1,6 +1,7 @@
 // Terrain.cpp -- reconstruction of D:\aardvark\VC\krusty2\Terrain.cpp.
 #include "../../reconstructed/TrackGameGlobal.h"
 #include "Terrain.h"
+#include "../../reconstructed/DebugOverlay.h"
 
 #include <float.h>
 #include <stdio.h>
@@ -82,7 +83,7 @@ void Terrain::RetireOwnedObject(BaseObject* object)
 }
 
 // Boundary declarations for Terrain::Load (tier 1 addresses, tier 3 names).
-class TerrainDebugOverlay;
+
 struct TerrainGameDisplay {                                     // Display (src/reconstructed/Display.h)
     char pad_0x000[0x4bc];
     char driverName[1];                                         // +0x4bc the DriverInfo registry key component
@@ -99,7 +100,7 @@ struct TerrainGameSettings {                                    // TrackGame (sr
     char pad_0x004[0x0c - 0x04];
     TerrainGameDisplay* display;                                // +0x00c
     char pad_0x010[0x38 - 0x10];
-    TerrainDebugOverlay* overlay;                               // +0x038 profile page printer
+    DebugOverlay* overlay;                               // +0x038 profile page printer
     char pad_0x03c[0x2d0 - 0x3c];
     int softwareRendering;                                      // +0x2d0
     unsigned char debugFlags;                                   // +0x2d4 bit 2: print the terrain profile page
@@ -342,15 +343,6 @@ public:
     char pad_0x48[0x50 - 0x48];
     TerrainDevice* device;                                     // +0x50
 };
-// The profile page (DebugOverlay in src/reconstructed; cdecl member printers).
-class TerrainDebugOverlay {
-public:
-    void Print(int row, const char* format, ...);   // 0x00447f40: one line (DebugOverlay::Print)
-    void Title(int row, const char* format, ...);   // 0x00447fa0: the page title (DebugOverlay::Title)
-    char pad_0x0000[0x26c0];
-    int pageCount;                                             // +0x26c0 next free page
-};
-
 // Terrain timing / memory counters (tier 3 names, tier 1 addresses; defined outside this file).
 extern int g_terrainAgeTime0;     // 0x0068a308 "AgeTime" first value
 extern int g_terrainAgeTime1;     // 0x0068a30c "AgeTime" second value
@@ -555,7 +547,7 @@ int Terrain::UnknownVirtualSlot14()
 
     if ((reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->debugFlags & 4) && reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay) {
         if (g_terrainDebugPage < 0) {
-            int page = reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->pageCount++;
+            int page = reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay->nextPage++;
             g_terrainDebugPage = page;
         }
         g_terrainAgeTime0Peak.Record(g_terrainAgeTime0);

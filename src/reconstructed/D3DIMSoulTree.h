@@ -28,6 +28,7 @@
 #include "MatrixUtil.h"
 #include "SoultreeLodSettings.h"
 
+struct Vec3;
 class LightManager;
 class RenderTarget;
 class SoultreeMaterial;
@@ -64,6 +65,10 @@ public:
 
     // soultree.cpp helpers (thiscall).
     // Same complete-node pointer (+0), shared with the physics declaration.
+    // Explicit Vec3 output buffers, as in the existing soultree.cpp providers.
+    void GetPositionIn(SoultreeObject* frame, Vec3* out);          // 0x004fc9a0
+    Vec3* GetPosition(Vec3* out);                                 // 0x004fc970
+    void GetAxes(Vec3* first, Vec3* second);                      // 0x004fc4f0
     void GetLocalMatrix(Matrix4* out);                            // 0x004fca60
     void GetMatrixIn(SoultreeObject* frame, Matrix4* out);          // 0x004fca80
     SoultreeObject* FindByName(const char* name);                  // 0x004fdae0

@@ -48,3 +48,34 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 
 - `0x00447e90` `SetRowText`
 - `0x00448200` `DrawString`
+
+## Scene profiling connections
+
+Terrain, VisibilityQuadTree and SoultreeQuadTreeRenderer use the shared
+`DebugOverlay` declaration for their profile pages. Their receiver comes from
+the Game member at `+0x38`; retail RTTI places Game at offset zero within
+TrackGame. Page allocation increments `DebugOverlay::nextPage` at `+0x26c0`.
+The complete callers match retail after replacing the local overlay views and
+free-function declarations with `Print` (`0x00447f40`, 94 bytes) and `Title`
+(`0x00447fa0`, 94 bytes). Both are variadic cdecl members: the receiver remains
+the first stack argument, and the caller still removes all arguments.
+
+Visibility's object at `0x0068ab90` uses `UnknownPeakHold`, the same implementation
+as Game's profile counters. The initializer at `0x0052d330` passes 5000 to the
+constructor at `0x004cb670`; the object stores a timestamp, peak and hold interval
+at offsets 0, 4 and 8. This requires 12 bytes of writable storage. The former
+empty `VisibilityStat` declaration reserved only one byte. The canonical type
+fixes that storage defect and connects `Record` (`0x004cb6b0`) and `Peak`
+(`0x004cb690`). These names describe observed behavior; the original class name
+and owning source file remain unknown. Visibility also uses the existing
+unsigned `ReadClock` return (`0x004bfa80`) and unsigned elapsed subtraction.
+
+`tests/test_scene_profiler_connections.py` compiles the actual three consumer
+and three provider translation units with VC6 SP3, verifies six complete retail
+provider bodies and four complete caller/initializer bodies, checks imports
+and unique definitions, and guards the actual timer's writable COFF storage.
+Its native layout fixture checks the owner/member offsets. Focused validation
+preserves all 72 strict cases across the three consumer units; Terrain's two
+partial cases are unchanged. Ten formerly missing symbol spellings now reach
+existing providers. This establishes these profiling connections, not complete
+scene rendering or a linked game.

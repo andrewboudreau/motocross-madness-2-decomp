@@ -1,4 +1,5 @@
 #include "VehicleCamera.h"
+#include "D3DIMSoulTree.h"
 #include "TrackGame.h"
 
 // The four Math3D vector constants (.CRT$XCU 336-339, initialisers
@@ -65,23 +66,23 @@ Vector3 VehicleCamera::CachedTargetHeading() {
 Vector3 VehicleCamera::TargetPoint() {
     Vector3 position;
     if (vehicleMode) {
-        vehicle->modelNode->GetPositionIn(0, &position);
+        vehicle->modelNode->GetPositionIn(0, reinterpret_cast<Vec3*>(&position));
         return position;
     }
     if (targetCharacter) {
-        UnknownVehiclePart* model = targetCharacter->modelNode;
+        SoultreeObject* model = targetCharacter->modelNode;
         if (model->firstChild)
-            model->firstChild->GetPositionIn(0, &position);
+            model->firstChild->GetPositionIn(0, reinterpret_cast<Vec3*>(&position));
         else
-            model->GetPositionIn(0, &position);
+            model->GetPositionIn(0, reinterpret_cast<Vec3*>(&position));
         return position;
     }
     if (targetCar) {
-        targetCar->carModel->GetPosition(&position);
+        targetCar->carModel->GetPosition(reinterpret_cast<Vec3*>(&position));
         return position;
     }
     if (targetCaster) {
-        targetCaster->GetPosition(&position);
+        targetCaster->GetPosition(reinterpret_cast<Vec3*>(&position));
         return position;
     }
     return kVec3Zero;
@@ -253,13 +254,13 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
     } else {
         Vector3 other;
         if (targetCharacter) {
-            UnknownVehiclePart* model = targetCharacter->modelNode;
+            SoultreeObject* model = targetCharacter->modelNode;
             if (model->firstChild)
-                model->firstChild->GetAxes(&heading, &other);
+                model->firstChild->GetAxes(reinterpret_cast<Vec3*>(&heading), reinterpret_cast<Vec3*>(&other));
             else
-                model->GetAxes(&heading, &other);
+                model->GetAxes(reinterpret_cast<Vec3*>(&heading), reinterpret_cast<Vec3*>(&other));
         } else if (targetCar) {
-            targetCar->carModel->GetAxes(&heading, &other);
+            targetCar->carModel->GetAxes(reinterpret_cast<Vec3*>(&heading), reinterpret_cast<Vec3*>(&other));
         } else {
             heading = kVec3ZAxis;
         }
@@ -387,7 +388,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
 // 0x0052cb80: the vehicle's position 0, raised by 5.
 Vector3 VehicleCamera::UnknownVirtualSlot50() {
     Vector3 position;
-    vehicle->modelNode->GetPositionIn(0, &position);
+    vehicle->modelNode->GetPositionIn(0, reinterpret_cast<Vec3*>(&position));
     position.y += 5.0f;
     return position;
 }

@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "TrackOverlay.h"
+#include "D3DIMSoulTree.h"
 #include "DebugAlloc.h"
 #include "BikeCamera.h"
 #include "Camera.h"
@@ -344,7 +345,7 @@ int NameOverlay::UnknownVirtualSlot14()
         overlayAlpha = alpha;
     }
     Vector3 head;
-    trackedRacer->riderCharacter->modelNode->FindByName("Head")->GetPositionIn(0, &head);
+    trackedRacer->riderCharacter->modelNode->FindByName("Head")->GetPositionIn(0, reinterpret_cast<Vec3*>(&head));
     head.y += 1.62f;
     int hidden = !IsPointVisible(&head);
     if (hidden) {

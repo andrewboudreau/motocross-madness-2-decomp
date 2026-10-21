@@ -12,7 +12,7 @@ struct UnknownVisibilityStatic {
 };
 static UnknownVisibilityStatic s_visibilityUnknownStatic0;
 VisibilityCamera g_frozenCamera(1);                // 0x0068a968
-VisibilityStat g_visibilityTickStat(5000);        // 0x0068ab90
+UnknownPeakHold g_visibilityTickStat(5000);        // 0x0068ab90
 
 #include "math/Math3D.h"
 
@@ -35,10 +35,8 @@ extern int g_visibilityFreeze;             // 0x0068aba0 toggled by key 0x57 in 
 extern int g_visibilityQueryTicks;         // 0x0068ab88 clock delta around Query in slot 12
 // g_visibilityTickStat (0x0068ab90): accumulator fed with the query ticks (defined above).
 
-int ReadClock();                                        // 0x004bfa80
+unsigned int ReadClock();                                        // 0x004bfa80
 int CheckKey(int key, int a, int b, int flags);         // 0x0043caa0 (cdecl, 4 args)
-void SetLineName(VisibilityLog* log, int line, const char* name);                    // 0x00447fa0
-void LogLine(VisibilityLog* log, int line, const char* format, ...);                 // 0x00447f40
 
 VisibilityQuadTreeNode::VisibilityQuadTreeNode()
 {
@@ -119,7 +117,7 @@ int VisibilityQuadTree::OnControlPress(UnknownControlEvent* a, UnknownInputEntry
 
 int VisibilityQuadTree::PrepareGeometry()
 {
-    int start = ReadClock();
+    unsigned int start = ReadClock();
     VisibilityCamera* cam;
     if (g_visibilityFreeze)
         cam = &g_frozenCamera;
@@ -129,15 +127,15 @@ int VisibilityQuadTree::PrepareGeometry()
     g_visibilityQueryTicks = ReadClock() - start;
     if (reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log) {
         if (statsId < 0) {
-            VisibilityLog* log = reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log;
-            int line = log->nextLineIndex++;
+            DebugOverlay* log = reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log;
+            int line = log->nextPage++;
             statsId = line;
         }
-        g_visibilityTickStat.AddSample(g_visibilityQueryTicks);
-        SetLineName(reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log, statsId, "QuadTree");
-        LogLine(reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log, statsId, "Memory %d", g_MemTagStack->GetBytes("QuadTree"));
-        LogLine(reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log, statsId, "PrepareGeometry %d %d", g_visibilityQueryTicks,
-                g_visibilityTickStat.GetValue());
+        g_visibilityTickStat.Record(g_visibilityQueryTicks);
+        reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log->Title(statsId, "QuadTree");
+        reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log->Print(statsId, "Memory %d", g_MemTagStack->GetBytes("QuadTree"));
+        reinterpret_cast<VisibilityProfiler*>(g_TrackGame)->log->Print(statsId, "PrepareGeometry %d %d", g_visibilityQueryTicks,
+                g_visibilityTickStat.Peak());
     }
     return 1;
 }

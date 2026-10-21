@@ -1,4 +1,5 @@
 #include "BikeCamera.h"
+#include "D3DIMSoulTree.h"
 
 // The unit's per-file vectors (Math3D.h's four constants); their initializers
 // 0x00417350..0x0041746b sit after slot 0x00417340 and build 0x00578e20,
@@ -50,9 +51,9 @@ void BikeCamera::UnknownVirtualSlot40(float a) {
         value10 = 5.0f;
         value14 = 5.0f;
     }
-    UnknownVehiclePart* headPart = bike->riderCharacter->modelNode->FindByName("Head");
+    SoultreeObject* headPart = bike->riderCharacter->modelNode->FindByName("Head");
     Vector3 head;
-    headPart->GetPositionIn(0, &head);
+    headPart->GetPositionIn(0, reinterpret_cast<Vec3*>(&head));
     SetTableEntry(0, &head, 0, &value10, &value14, 0, 0);
     SetTableEntry(1, &targetPoint, 0, &value10, &value14, 0, 0);
     UnknownVirtualSlot38(a, bike->wrecker->wreckState != 1, special);
@@ -60,9 +61,9 @@ void BikeCamera::UnknownVirtualSlot40(float a) {
 
 // 0x00416fb0: 38% of the way from the rider's head to the target point.
 Vector3 BikeCamera::UnknownVirtualSlot37() {
-    UnknownVehiclePart* headPart = bike->riderCharacter->modelNode->FindByName("Head");
+    SoultreeObject* headPart = bike->riderCharacter->modelNode->FindByName("Head");
     Vector3 head;
-    headPart->GetPositionIn(0, &head);
+    headPart->GetPositionIn(0, reinterpret_cast<Vec3*>(&head));
     Vector3 result;
     result.x = (targetPoint.x - head.x) * 0.38f + head.x;
     result.y = (targetPoint.y - head.y) * 0.38f + head.y;
@@ -78,7 +79,7 @@ Vector3 BikeCamera::UnknownVirtualSlot37() {
 Vector3 BikeCamera::UnknownVirtualSlot34(float dt) {
     Vector3 result;
     if (isCrashView) {
-        bike->riderCharacter->modelNode->GetPositionIn(0, &result);
+        bike->riderCharacter->modelNode->GetPositionIn(0, reinterpret_cast<Vec3*>(&result));
         if (targetDistance < 500.0f) {
             Vector3 lead = bike->wrecker->rigidBody->velocity * dt;
             lead = lead * (4.0f - targetDistance * 0.006f);
@@ -102,16 +103,16 @@ Vector3 BikeCamera::UnknownVirtualSlot34(float dt) {
 
 // 0x00417290: the rider's head position.
 Vector3 BikeCamera::UnknownVirtualSlot50() {
-    UnknownVehiclePart* headPart = bike->riderCharacter->modelNode->FindByName("Head");
+    SoultreeObject* headPart = bike->riderCharacter->modelNode->FindByName("Head");
     Vector3 head;
-    headPart->GetPositionIn(0, &head);
+    headPart->GetPositionIn(0, reinterpret_cast<Vec3*>(&head));
     return head;
 }
 
 // 0x004172e0
 void BikeCamera::UnknownVirtualSlot53() {
-    bike->modelNode->ClearScreenRects();
-    bike->riderCharacter->modelNode->ClearScreenRects();
+    static_cast<D3DIMSoultreeObject*>(bike->modelNode)->ClearScreenRects();
+    static_cast<D3DIMSoultreeObject*>(bike->riderCharacter->modelNode)->ClearScreenRects();
 }
 
 // 0x00417310

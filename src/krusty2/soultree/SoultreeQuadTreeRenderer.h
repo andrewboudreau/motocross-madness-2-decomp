@@ -63,21 +63,14 @@ private:
     char field_0x00[0x94];
 };
 
-// 0x56e26c: the profiler object whose +0x38 is the on-screen text log (same pair as
-// visibility/VisibilityQuadTree.h; tier 3 roles, from slot 14).  The two writers are cdecl
-// free functions taking the log as their first argument.
-struct SoultreeStatsLog {
-    char pad_0x00[0x26c0];
-    int nextLineIndex;                // +0x26c0 post-incremented to hand out a line index
-};
+// TrackGame's Game base stores its DebugOverlay pointer at +0x38.
+#include "../../reconstructed/DebugOverlay.h"
 struct SoultreeStats {
     char pad_0x00[0x38];
-    SoultreeStatsLog* log;            // +0x38
+    DebugOverlay* log;            // +0x38
     char pad_0x3c[0x2d4 - 0x3c];
     unsigned char debugFlags;         // +0x2d4 bit 2 enables the debug keys (slot 23)
 };
-void SoultreeSetLineName(SoultreeStatsLog* log, int line, const char* name);              // 0x00447fa0
-void SoultreeLogLine(SoultreeStatsLog* log, int line, const char* format, ...);           // 0x00447f40
 
 class SoultreeQuadTreeRenderer : public GraphicsTest {
 public:

@@ -3,6 +3,18 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/physics/helpers/SoultreeTransform.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete WorldToLocalDirection body reviewed against retail and checked with the matrix setters in 86016 native full-state/alias scenarios. Both bodies are 209 bytes but one x87 operand-load order differs; finite tested values match, universal NaN equivalence is not claimed.",
+      "evidence": "docs/SOULTREE_TRANSFORMS.md#functional-build-review"
+    },
+    {
+      "path": "samples/physics/helpers/SoultreeMatrix.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete SetMatrixIn and SetAxesIn reviewed against retail and checked with the direction transform in 86016 native full-state/alias scenarios. VC6 emits 1134/1171 bytes against 1096/1171 retail; the 41-byte transpose helper remains strict exact. Cache dependencies are scripted in the differential test.",
+      "evidence": "docs/SOULTREE_TRANSFORMS.md#functional-build-review"
+    },
+    {
       "path": "samples/game/RecordExceptionInfo.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete crash filter checked in 13838 native differential scenarios, including both SEH regions and one-shot state. VC6 emits 1277 bytes versus 1290 retail bytes; the stack-base load uses the paired OS backend.",

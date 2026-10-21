@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "AuralScape.h"
+#include "D3DIMSoulTree.h"
 
 #include "DebugAlloc.h"
 #include "DebugOverlay.h"
@@ -383,7 +384,7 @@ SoultreeSoundEmitter::SoultreeSoundEmitter(AuralScape* scape, SoundGroup* group,
 
 // 0x004029f0
 SoultreeSoundEmitter* SoultreeSoundEmitter::CreateFollowing(void* target, const char* name,
-                                                                  const char* partName, UnknownVehiclePart* part,
+                                                                  const char* partName, SoultreeObject* part,
                                                                   UnknownSound3DParameters params,
                                                                   unsigned long flags, float oneShotDistance,
                                                                   float randomTriggerPercent, int is2D,
@@ -403,9 +404,9 @@ SoultreeSoundEmitter* SoultreeSoundEmitter::CreateFollowing(void* target, const 
 int SoultreeSoundEmitter::Tick(float frameTime) {
     Vector3 position = kVec3Zero;
     if (childPart)
-        childPart->GetPositionIn(0, &position);
+        childPart->GetPositionIn(0, reinterpret_cast<Vec3*>(&position));
     else
-        followedPart->GetPositionIn(0, &position);
+        followedPart->GetPositionIn(0, reinterpret_cast<Vec3*>(&position));
     previousPosition = soundParameters.position;
     soundParameters.position = position;
     if (loadedSound)

@@ -20,7 +20,7 @@
 #include "SoundInterface.h"
 
 class AuralScape;
-class UnknownVehiclePart;
+class SoultreeObject;
 struct UnknownFollowCameraSubject;
 
 // 8-byte listener record AuralScape keeps two of (not RTTI-typed): the
@@ -104,12 +104,12 @@ public:
     // 0x004029f0: SoundEmitter's loader, then the part (and its child
     // `partName`) to follow.
     SoultreeSoundEmitter* CreateFollowing(void* target, const char* name, const char* partName,
-                                                UnknownVehiclePart* part, UnknownSound3DParameters params,
+                                                SoultreeObject* part, UnknownSound3DParameters params,
                                                 unsigned long flags, float oneShotDistance,
                                                 float randomTriggerPercent, int is2D, int force2D);
 
-    UnknownVehiclePart* followedPart;         // +0x1a4
-    UnknownVehiclePart* childPart;            // +0x1a8
+    SoultreeObject* followedPart;         // +0x1a4
+    SoultreeObject* childPart;            // +0x1a8
 };
 
 // What AuralScape+0x94 points at: +0xa4 holds a table whose +0x410 has four

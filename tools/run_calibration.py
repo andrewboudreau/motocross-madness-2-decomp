@@ -10321,7 +10321,7 @@ CASES = [
         'name': 'AuralScape.cpp SoultreeSoundEmitter load 0x4029f0',
         'bindings': 'src/reconstructed/AuralScape.bindings.json',
         'source': 'src/reconstructed/AuralScape.cpp',
-        'symbol': '?CreateFollowing@SoultreeSoundEmitter@@QAEPAV1@PAXPBD1PAVUnknownVehiclePart@@UUnknownSound3DParameters@@KMMHH@Z',
+        'symbol': '?CreateFollowing@SoultreeSoundEmitter@@QAEPAV1@PAXPBD1PAVSoultreeObject@@UUnknownSound3DParameters@@KMMHH@Z',
         'target_va': '0x004029f0',
         'target_size': 126,
         'reason': 'calls 0x402260; SceneManager caller 0x4eddcd',

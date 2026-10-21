@@ -1,4 +1,5 @@
 #include "KrustyBikeCamera.h"
+#include "D3DIMSoulTree.h"
 
 #include "EventManager.h"
 
@@ -156,7 +157,7 @@ void KrustyBikeCamera::UnknownVirtualSlot58() {
 Vector3 KrustyBikeCamera::UnknownVirtualSlot34(float dt) {
     Vector3 result;
     if (isCrashView) {
-        bike->riderCharacter->modelNode->GetPositionIn(0, &result);
+        bike->riderCharacter->modelNode->GetPositionIn(0, reinterpret_cast<Vec3*>(&result));
         if (targetDistance < 500.0f) {
             Vector3 lead = bike->wrecker->rigidBody->velocity * dt;
             lead = lead * (4.0f - targetDistance * 0.006f);

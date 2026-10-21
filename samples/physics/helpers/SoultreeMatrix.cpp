@@ -6,7 +6,7 @@
 
 // 0x00436500: 4x4 product out = b * a (row-vector convention), owned by the collision area
 // (CollisionMatrixMultiply). Declared here only so the call target is right.
-void MatrixProductRows(Matrix4* out, const Matrix4* a, const Matrix4* b);
+void CollisionMatrixMultiply(Matrix4* out, const Matrix4* a, const Matrix4* b);
 
 // Transposes the upper 3x3 of *m in place. GetMatrixIn and SetAxesIn expand it inline;
 // SetMatrixIn calls the out-of-line COMDAT copy 0x004fefb0 (emitted at the end of the unit,
@@ -136,7 +136,7 @@ void SoultreeObject::SetAxesIn(SoultreeObject* frame, const Vec3* axisZ, const V
         d.y = t._42 - parentWorld._42;
         d.z = t._43 - parentWorld._43;
         TransposeRotation3(t);
-        MatrixProductRows(local, &t, &parentWorld);
+        CollisionMatrixMultiply(local, &t, &parentWorld);
         TransposeRotation3(*local);
         RotateByRowsTo(&d, d, parentWorld);
         local->_41 = d.x;
@@ -183,7 +183,7 @@ void SoultreeObject::SetMatrixIn(SoultreeObject* frame, Matrix4* m)
         d.y = t._42 - parentWorld._42;
         d.z = t._43 - parentWorld._43;
         TransposeRotation3x3(&t);
-        MatrixProductRows(local, &t, &parentWorld);
+        CollisionMatrixMultiply(local, &t, &parentWorld);
         TransposeRotation3x3(local);
         Vec3TransformNormalTranspose(&d, d, &parentWorld);
         local->_41 = d.x;

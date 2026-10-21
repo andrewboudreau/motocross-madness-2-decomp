@@ -68,21 +68,13 @@ struct VisibilityResultList {
     QuadTreeResultLink* field_0x04;
 };
 
-// Accumulator object at 0x0068ab90: 0x004cb6b0 adds a sample, 0x004cb690 reads a value (tier 3).
-class VisibilityStat {
-public:
-    explicit VisibilityStat(int hold);   // 0x004cb670 (5000 for g_visibilityTickStat)
-    void AddSample(int value);   // 0x004cb6b0
-    int GetValue();              // 0x004cb690
-};
-// Text log at VisibilityProfiler::log (+0x38) and the profiler object at 0x0056e26c.
-struct VisibilityLog {
-    char field_0x00[0x26c0];
-    int nextLineIndex;           // +0x26c0 post-incremented to hand out a line index (slot 12)
-};
+// The query timer uses the same 12-byte peak holder as Game's profile page.
+#include "../../reconstructed/PeakHold.h"
+#include "../../reconstructed/DebugOverlay.h"
+
 struct VisibilityProfiler {
     char field_0x00[0x38];
-    VisibilityLog* log;          // +0x38 first argument of the 0x00447fa0 / 0x00447f40 line writers
+    DebugOverlay* log;          // +0x38 first argument of the 0x00447fa0 / 0x00447f40 line writers
 };
 #include "../core/MemTag.h"
 

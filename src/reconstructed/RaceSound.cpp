@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "RaceSound.h"
+#include "D3DIMSoulTree.h"
 
 #include "BikeCamera.h"
 #include "DebugAlloc.h"
@@ -568,12 +569,12 @@ int RaceSound::Tick(float frameTime) {
         SoundSystem()->SetListenerVelocity(listenerCamera->followedBike->velocity);
         for (i = 0; i < channelsInUse; i++) {
             if (engineChannels[i].channelSound) {
-                engineChannels[i].channelRacer->vehicleModel->GetPosition(&position);
+                engineChannels[i].channelRacer->vehicleModel->GetPosition(reinterpret_cast<Vec3*>(&position));
                 engineChannels[i].channelSound->Set3DPosition(position, 0);
                 engineChannels[i].channelSound->Set3DVelocity(engineChannels[i].channelRacer->velocity, 0);
             }
         }
-        listenerRacer->vehicleModel->GetPosition(&position);
+        listenerRacer->vehicleModel->GetPosition(reinterpret_cast<Vec3*>(&position));
         landHardSound->Set3DPosition(position, 0);
         landHardSound->Set3DVelocity(listenerRacer->velocity, 0);
         SoundSystem()->CommitListenerSettings();
@@ -912,7 +913,7 @@ int RaceSound::PlayWreckSound(UnknownEventRacer* racer) {
             return 0;
         index = rand() % 6;
     }
-    racer->vehicleModel->GetPosition(&position);
+    racer->vehicleModel->GetPosition(reinterpret_cast<Vec3*>(&position));
     wreckSounds[index]->Set3DPosition(position, 0);
     PlayIfEnabled(wreckSounds[index], 0, 0, 0, 0);
     return index;
@@ -931,7 +932,7 @@ int RaceSound::PlayFallSound(UnknownEventRacer* racer) {
             return 0;
         index = rand() % 6;
     }
-    racer->vehicleModel->GetPosition(&position);
+    racer->vehicleModel->GetPosition(reinterpret_cast<Vec3*>(&position));
     fallSounds[index]->Set3DPosition(position, 0);
     PlayIfEnabled(fallSounds[index], 0, 0, 0, 0);
     return index;

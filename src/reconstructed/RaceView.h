@@ -58,7 +58,9 @@ struct UnknownEventRacerModel {
 };
 struct UnknownCameraBikeRider;
 struct UnknownCameraBikeState;
-class UnknownVehiclePart;
+class SoultreeObject;
+// Keep the local race-view name while using the actual scene-node type.
+typedef SoultreeObject UnknownVehiclePart;
 
 // 0x54-byte race status node (RaceStatus.cpp, DebugCalloc'd): one per
 // racer, chained through +0x50; the racer points back at it from +0x744.

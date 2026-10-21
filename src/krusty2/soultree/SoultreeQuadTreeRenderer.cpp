@@ -40,16 +40,16 @@ SoultreeQuadTreeRenderer::~SoultreeQuadTreeRenderer()
 // slot 14, 0x00504570: publishes the node counters on the statistics overlay.
 int SoultreeQuadTreeRenderer::UnknownVirtualSlot14()
 {
-    SoultreeStatsLog* log = reinterpret_cast<SoultreeStats*>(g_TrackGame)->log;
+    DebugOverlay* log = reinterpret_cast<SoultreeStats*>(g_TrackGame)->log;
     if (log) {
         if (statsId < 0) {
-            int line = log->nextLineIndex++;
+            int line = log->nextPage++;
             statsId = line;
         }
-        SoultreeSetLineName(reinterpret_cast<SoultreeStats*>(g_TrackGame)->log, statsId, "SoultreeQuadTreeRenderer");
-        SoultreeLogLine(reinterpret_cast<SoultreeStats*>(g_TrackGame)->log, statsId, "Total Objects in scene : %i\n", field_0x34);
-        SoultreeLogLine(reinterpret_cast<SoultreeStats*>(g_TrackGame)->log, statsId, "Objects Visible        : %i\n", visibleCount);
-        SoultreeLogLine(reinterpret_cast<SoultreeStats*>(g_TrackGame)->log, statsId, "Objects in list        : %i\n", g_soultreeNodeCount);
+        reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Title(statsId, "SoultreeQuadTreeRenderer");
+        reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Print(statsId, "Total Objects in scene : %i\n", field_0x34);
+        reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Print(statsId, "Objects Visible        : %i\n", visibleCount);
+        reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Print(statsId, "Objects in list        : %i\n", g_soultreeNodeCount);
     }
     return GraphicsTest::UnknownVirtualSlot14();
 }

@@ -2,25 +2,7 @@
 
 #include "FollowCamera.h"
 
-// Object at VehicleCamera+0x394 (the followed vehicle; its class is not
-// established). Only the fields the camera reads are declared.
-class UnknownVehiclePart {
-public:
-    unsigned char field_0x000[0x140];
-    UnknownVehiclePart* firstChild;           // +0x140 0x0052bb60 prefers it when set
-
-    // 0x004fc9a0: writes a position for `index` into *position.
-    void GetPositionIn(int index, Vector3* position);
-    // 0x004fc970: writes the part's translation into *translation.
-    void GetPosition(Vector3* translation);
-    // 0x004fdae0: looks up a named child part (BikeCamera asks for "Head").
-    UnknownVehiclePart* FindByName(const char* name);
-    void ClearScreenRects(); // 0x004444e0 (BikeCamera slot 53)
-    void ClearFlag14c(); // 0x004fdb50 (BikeCamera slot 54)
-    // 0x004fc4f0 (src/krusty2's SoultreeObject::GetAxes): writes two axis
-    // vectors; VehicleCamera slot 41 uses the first.
-    void GetAxes(Vector3* first, Vector3* second);
-};
+class SoultreeObject;
 
 // An entry of the vehicle's +0x53c list (VehicleCamera slot 35).
 struct UnknownCameraRider {
@@ -41,7 +23,7 @@ struct UnknownCameraVehicle {
     unsigned char field_0x094[0xbc - 0x94];
     float linearSpeed;                        // +0xbc |velocity|; VehicleCamera slot 41 (at least 0.01)
     unsigned char field_0x0c0[0x3bc - 0xc0];
-    UnknownVehiclePart* modelNode;            // +0x3bc VehicleCamera slot 50
+    SoultreeObject* modelNode;            // +0x3bc VehicleCamera slot 50
     unsigned char field_0x3c0[0x434 - 0x3c0];
     float forwardSpeed;  // +0x434  Vehicle +0x434 = dot(velocity, bodyForward) (BikeAI); KrustyBike compares it with 60 mph in ft/s
     float referenceSpeed;                     // +0x438  Vehicle +0x438 referenceSpeed (180); the bike cameras divide by it
@@ -78,14 +60,14 @@ struct UnknownCameraVehicle {
 // Optional targets at VehicleCamera+0x384 / +0x388 (slot 33).
 struct UnknownCameraTargetA {
     unsigned char field_0x000[0x1a0];
-    UnknownVehiclePart* modelNode;       // +0x1a0 0x0052bb60; the characters' model node (krusty2 Character)
+    SoultreeObject* modelNode;       // +0x1a0 0x0052bb60; the characters' model node (krusty2 Character)
     unsigned char field_0x1a4[0x224 - 0x1a4];
     Vector3 nodeVelocity;                // +0x224 krusty2 CollisionCharacter::nodeVelocity
 };
 
 struct UnknownCameraTargetB {
     unsigned char field_0x00[0x34];
-    UnknownVehiclePart* carModel;  // +0x34  camera +0x388 is a scene procedural entry (CarProcedural, BikeRace TargetObject); CarProcedural +0x34 carModel
+    SoultreeObject* carModel;  // +0x34  camera +0x388 is a scene procedural entry (CarProcedural, BikeRace TargetObject); CarProcedural +0x34 carModel
     unsigned char field_0x38[0x40 - 0x38];
     Vector3 pathVelocity;  // +0x40  CarProcedural +0x40 pathVelocity; slot 33 returns it as the tracked velocity (like vehicle velocity)
 };
@@ -145,7 +127,7 @@ public:
 protected:
     UnknownCameraTargetA* targetCharacter;  // +0x384  BikeRace TargetCharacter stores a key-framed scene character; slots 33/41/TargetPoint read its node
     UnknownCameraTargetB* targetCar;  // +0x388  BikeRace TargetObject stores a scene procedural object (CarProcedural)
-    UnknownVehiclePart* targetCaster;  // +0x38C  BikeRace view +0x38c shadowCaster (TargetCaster); TargetPoint takes its translation
+    SoultreeObject* targetCaster;  // +0x38C  BikeRace view +0x38c shadowCaster (TargetCaster); TargetPoint takes its translation
     bool vehicleMode;                    // +0x390, vehicle mode
     unsigned char targetPointCached;     // +0x391 cachedTargetPoint is valid (cleared on a new target)
     unsigned char targetHeadingCached;   // +0x392 cachedTargetHeading is valid

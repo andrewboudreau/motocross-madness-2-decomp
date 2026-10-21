@@ -4,7 +4,7 @@
 
 struct UnknownCameraBikeRider {
     unsigned char field_0x000[0x1a0];
-    UnknownVehiclePart* modelNode;            // +0x1a0 the rider model; has a "Head" part
+    SoultreeObject* modelNode;            // +0x1a0 the rider model; has a "Head" part
 };
 
 // Object at UnknownCameraBikeState+0x40, Wrecker.h's UnknownWreckerRigidBody;
@@ -34,7 +34,7 @@ struct UnknownCameraBike {
     unsigned char field_0x04c[0x58 - 0x4c];
     float savedCosRoll;                       // +0x58 slot 51 multiplies it with savedRoll
     unsigned char field_0x05c[0x3bc - 0x5c];
-    UnknownVehiclePart* modelNode;            // +0x3bc
+    SoultreeObject* modelNode;            // +0x3bc
     unsigned char field_0x3c0[0x444 - 0x3c0];
     int crashState;                           // +0x444
     unsigned char field_0x448[0x460 - 0x448];
