@@ -112,7 +112,7 @@
   "?OpenMenu@KrustyUI@@QAEXH@Z$ehhandler": "0x0054c1b3",
   "?Shutdown@KrustyUI@@QAEXXZ": "0x004999b0",
   "?PaintNumber@UnknownBikeNumberPainter@@QAEXPAVD3DIMSoultreeObject@@H@Z": "0x00417670",
-  "?SetUseLighting@UnknownKrustyUISoultree@@QAEXH@Z": "0x004444c0",
+  "?SetUseLighting@D3DIMSoultreeObject@@QAEXH@Z": "0x004444c0",
   "?Attach@D3DIMSoultreeShadow@@QAEPAV1@HPAVShadowCaster@@PAVProjectedShadow@@@Z": "0x004468b0",
   "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?ResetClock@Game@@QAEXXZ": "0x00468880",

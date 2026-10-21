@@ -94,7 +94,8 @@ lookup (78), DebugMalloc (57), DebugFree (96), debug new (70) and its placement
 delete (96). Complete object comparisons are recorded in
 `work/game-build/gui-screen-provider-proof.json`. The global TrackGame pointer
 and VC6 CRT exception support are existing providers. PCTextureMap::CreateSurface
-remains an existing missing virtual provider; admission does not implement it.
+has a separate [reviewed candidate](TEXTURE_SURFACE_CREATE.md#functional-build-review);
+this capture fixture continues to script that virtual boundary.
 
 The fixture's minimal class declarations are private ABI boundary views, not
 replacement production types. Rendering, format lookup, COM surfaces, allocator

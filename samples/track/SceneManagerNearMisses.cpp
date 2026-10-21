@@ -632,7 +632,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             animationTable->entries[i].character->modelNode->SetPosition(&animationTable->entries[i].position);
             if (axes)
                 animationTable->entries[i].character->modelNode->SetAxesPtr(&look, &up, 1, 0);
-            animationTable->entries[i].character->modelNode->SetUseLighting(useLighting);
+            reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].character->modelNode)->SetUseLighting(useLighting);
             parameters.GetInt("UseBlendedKeys", 1, &automatic);
             animationTable->entries[i].useBlendedKeys = automatic;
             parameters.GetInt("NumberOfMotions", 0, &animationTable->entries[i].motionCount);
@@ -688,7 +688,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         } else {
             UnknownFunction4de580(name, "SLT", sltPath);
             animationTable->entries[i].motionCount = 1;
-            animationTable->entries[i].proceduralObject->carModel->SetUseLighting(useLighting);
+            reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].proceduralObject->carModel)->SetUseLighting(useLighting);
             if (axes)
                 animationTable->entries[i].proceduralObject->carModel->SetAxesPtr(&look, &up, 1, 0);
         }

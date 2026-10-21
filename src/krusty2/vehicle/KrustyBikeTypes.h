@@ -495,8 +495,6 @@ struct KbXform {
     Vec3 WorldToLocalDirection(const Vec3* v);
     // D3DIMSoultreeObject setters (names from src/reconstructed/D3DIMSoulTree.h): 0x0048fc80 calls
     // these with 0 or 1 on the bike and rider nodes.
-    void SetLod(int value);         // 0x00444D00
-    void SetLowestLod(int value);         // 0x00444D40
 };
 // Element of the array at Bike+0x12c (count at +0x130).
 struct KbChild {

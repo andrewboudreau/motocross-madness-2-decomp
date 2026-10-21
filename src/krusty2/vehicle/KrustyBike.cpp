@@ -1990,15 +1990,15 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     bikeAndRiderCollision->AddIgnoredOwner(frontWheel);
     bikeAndRiderCollision->AddIgnoredOwner(rearWheel);
     if (this->race->forceHighLod) {
-        ((KbXform*)modelNode)->SetLowestLod(0);
-        ((KbXform*)riderCharacter->c_0x1a0)->SetLowestLod(0);
-        ((KbXform*)modelNode)->SetLod(0);
-        ((KbXform*)riderCharacter->c_0x1a0)->SetLod(0);
+        reinterpret_cast<D3DIMSoultreeObject*>(modelNode)->SetLowestLod(0);
+        reinterpret_cast<D3DIMSoultreeObject*>(riderCharacter->c_0x1a0)->SetLowestLod(0);
+        reinterpret_cast<D3DIMSoultreeObject*>(modelNode)->SetLod(0);
+        reinterpret_cast<D3DIMSoultreeObject*>(riderCharacter->c_0x1a0)->SetLod(0);
     } else {
-        ((KbXform*)modelNode)->SetLowestLod(1);
-        ((KbXform*)riderCharacter->c_0x1a0)->SetLowestLod(1);
-        ((KbXform*)modelNode)->SetLod(1);
-        ((KbXform*)riderCharacter->c_0x1a0)->SetLod(1);
+        reinterpret_cast<D3DIMSoultreeObject*>(modelNode)->SetLowestLod(1);
+        reinterpret_cast<D3DIMSoultreeObject*>(riderCharacter->c_0x1a0)->SetLowestLod(1);
+        reinterpret_cast<D3DIMSoultreeObject*>(modelNode)->SetLod(1);
+        reinterpret_cast<D3DIMSoultreeObject*>(riderCharacter->c_0x1a0)->SetLod(1);
     }
     if (isGhost) {
         UnknownVirtualSlot50(1, 0.0f, 1);

@@ -1,0 +1,15 @@
+{
+  "?AverageColor@@YAHPAXHHHHPAUUnknownTexturePalette@@@Z": "0x004d24d0",
+  "?ConvertPixels@@YAHPAX0HHHHHHHPAUUnknownTexturePalette@@HI@Z": "0x004d1d20",
+  "?CreateSurface@PCTextureMap@@UAEHPAXHHHHHHPAUUnknownTexturePalette@@H0HHHHPAUUnknownTextureFormatChoice@@HI@Z": "0x004c69c0",
+  "?CreateSystemSurface@PCTextureMap@@QAEHPAUUnknownSurfaceDesc@@HPAH@Z": "0x004c68e0",
+  "?DumpLevel@PCTextureMap@@QAEHPAUUnknownSurfaceInterface@@PBD@Z": "0x004c84e0",
+  "?FillPixelFormat@@YAXHPAX@Z": "0x005119c0",
+  "?GrowSecondScratchBuffer@TextureMapManager@@QAEPAXI@Z": "0x00511370",
+  "?IsFormat4444Or8888@@YAHH@Z": "0x00511ad0",
+  "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
+  "?g_DebugDumpTextureLevels@@3HA": "0x00689968",
+  "?g_SharedMipTextureSurfaces@@3PAPAUUnknownSurfaceInterface@@A": "0x0068a36c",
+  "?g_SharedTextureSurfaces@@3PAPAUUnknownSurfaceInterface@@A": "0x0068a394",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c"
+}

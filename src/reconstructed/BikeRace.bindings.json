@@ -93,7 +93,7 @@
   "?DrawTrack@BikeRace@@QAEXPAVTrack@@@Z": "0x00423140",
   "?SetDetailLevel@BikeRace@@QAEXH@Z": "0x00423790",
   "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
-  "?ApplyLodSettings@UnknownBikeRaceModel@@QAEXH@Z": "0x004451e0",
+  "?ApplyLodSettings@D3DIMSoultreeObject@@QAEXH@Z": "0x004451e0",
   "?Print@DebugOverlay@@QAAXHPBDZZ": "0x00447f40",
   "?Title@DebugOverlay@@QAAXHPBDZZ": "0x00447fa0",
   "?SetRowHighlight@DebugOverlay@@QAEXHHH@Z": "0x00448000",

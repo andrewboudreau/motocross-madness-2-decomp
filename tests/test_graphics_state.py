@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import struct
 from pathlib import Path
 import subprocess
 import sys
@@ -35,6 +36,29 @@ class GraphicsStateTests(unittest.TestCase):
         }
         self.assert_data_provider('GraphicsState', sizes)
 
+    def test_texture_dump_flag_loader_zero_storage_and_direct_reference(self):
+        self.assert_data_provider('TextureSurfaceState', {'g_DebugDumpTextureLevels': 4})
+        retail = PEImage(EXE)
+        va = 0x689968
+        section = retail.section_for_rva(va - retail.image_base)
+        self.assertTrue(section.characteristics & 0x80000000)
+        self.assertGreaterEqual(va - retail.image_base - section.virtual_address,
+                                section.raw_size)
+        self.assertLessEqual(va + 4 - retail.image_base - section.virtual_address,
+                             section.virtual_size)
+        # Scan all file-backed sections for the explicit address. This proves
+        # the located direct reference, not absence of possible indirect writes.
+        sites = []
+        needle = struct.pack('<I', va)
+        for candidate in retail.sections:
+            data = retail.data[candidate.raw_offset:candidate.raw_offset + candidate.raw_size]
+            start = 0
+            while (offset := data.find(needle, start)) >= 0:
+                sites.append(retail.image_base + candidate.virtual_address + offset)
+                start = offset + 1
+        self.assertEqual(sites, [0x4c7097])
+        self.assertEqual(retail.bytes_at_va(0x4c7096, 5), b'\xa1' + needle)
+
     def test_keyboard_table_detection_sentinel_and_platform_storage_match_retail(self):
         self.assert_data_provider('DeviceSetupState', {
             'g_Pc98ScanCodes': 256 * 4, 'g_KeyboardSubtype': 4, 'g_IsWindowsNT': 4,
@@ -59,6 +83,17 @@ class GraphicsStateTests(unittest.TestCase):
             definitions = {s.name: s for s in obj.symbols
                            if s.storage_class == 2 and s.section_number > 0}
             self.assertEqual(set(definitions), set(bindings))
+            if stem == 'TextureSurfaceState':
+                self.assertFalse([r for r in obj.relocations
+                                  if not obj.section(r.section_number).name.startswith('.debug')])
+                self.assertFalse(any(s.storage_class == 2 and s.section_number == 0
+                                     for s in obj.symbols))
+                self.assertFalse(any(s.name.startswith('.CRT') for s in obj.sections))
+                nondebug = [s for s in obj.sections
+                            if s.raw_size and not s.name.startswith('.debug')
+                            and s.name != '.drectve']
+                self.assertEqual([(s.name, s.raw_size, s.raw_ptr) for s in nondebug],
+                                 [('.bss', 4, 0)])
             # No dynamic initializer is needed for these constants and caches.
             self.assertFalse(any(s.raw_size and s.characteristics & 0x20 for s in obj.sections))
             for name, address in bindings.items():

@@ -22,17 +22,22 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The current collision-tree and model/scene connections preserve all 210
-unaffected prior production objects under thirteen verified external-name
-substitutions. The remaining prior object adds four verified readonly GUIDs.
-The separately reviewed GUIManager::CopyScreenToTexture adds one nonexact
-candidate: its 888-byte complete body has 284 matching positions against 896
-retail bytes and passes 8,237 native scripted-boundary scenarios. The final real
-link compiles 212 translation units and reports 420 unresolved names. Private
-evidence is in `work/game-build/round24-all-objects.json`,
-`round24-link-evidence.json` and `connections-round24-preservation.json`.
-The full native regression run passes 464 tests with eleven skipped;
-`work/game-build/tests-round24.log` records all 475 results.
+The current collision ownership/traversal and model render-state connections
+preserve all 212 prior production objects under fifteen verified external-name
+substitutions: 10,456 nondebug sections and 45,266 relocations. The nonadmitted
+CreateRacers sample has one separately proved instruction-order improvement;
+see [the complete composition proof](MODEL_RENDER_STATE_CONNECTIONS.md).
+The separately reviewed PCTextureMap::CreateSurface adds one nonexact candidate:
+its 2,028-byte complete body has 518 matching positions against 2,033 retail
+bytes and passes 12,226 native scripted-boundary scenarios. A data-only provider
+supplies its four-byte debug flag. The final real link compiles 214 translation
+units and reports 404 unresolved names. Private evidence is in
+`work/game-build/round25-all-objects.json`, `round25-link-evidence.json`
+and `connections-round25-preservation.json`.
+
+The final regression run passes 468 tests with eleven skipped (479 total),
+recorded in `work/game-build/tests-round25.log`. Static checking passes for
+201 Python files and 347 JSON files.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

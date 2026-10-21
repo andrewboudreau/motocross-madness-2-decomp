@@ -205,7 +205,7 @@ int CapsuleTreeQuery(const Vec3* ends, float radius, float radiusSq, QueryTreeNo
 int SegmentTreeQueryWithVertices(const Vec3* ends, QueryTreeNode* node, const Matrix4* xf,
                                  Vec3* vertices);                                  // 0x00429e60
 int SegmentTreeQuery(const Vec3* ends, QueryTreeNode* node, const Matrix4* xf);    // 0x00429e90
-void FreeBoxTree(QueryTreeNode* node);                                             // 0x0042a160
+#include "BoundingBoxTreeQueryFunctions.h"
 void Vec3TransformNormal(Vec3* out, Vec3 v, const Matrix4* m);                     // 0x0042a450
 void Vec3TransformNormalTranspose(Vec3* out, Vec3 v, const Matrix4* m);            // 0x0042a4b0
 void Vec3TransformPoint(Vec3* out, Vec3 v, const Matrix4* m);                      // 0x0042a510

@@ -124,7 +124,7 @@ Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
   callee-saved assignment: retail keeps the constant 1 in ebx and the copy
   in ebp, VC6 the reverse, which also changes the 8-bit key expansion's
   scratch registers.
-- slot 4 (2031 bytes), the setup: it picks the format (through the
+- slot 4 (2033 bytes), the setup: it picks the format (through the
   optional +0x0c/+0x10 choice when the format has alpha), counts mip
   levels by halving both sides down to `minimumSize`, reuses a shared
   surface (`0x0068a394` plain, `0x0068a36c` mipmapped, indexed by level
@@ -185,3 +185,5 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x004c83a0` `FindMipLevel`
 - `0x004c84e0` `DumpLevel`
 - `0x004c8550` `WriteLevel`
+
+The complete slot-4 candidate now has a separate [functional build review](TEXTURE_SURFACE_CREATE.md#functional-build-review), including the corrected full return extent, actual source-format helpers and native surface/failure boundary tests.

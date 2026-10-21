@@ -59,15 +59,16 @@ PARTIAL = [['samples/race/BikeRaceNearMisses.cpp',
   6760,
   2821,
   '59d5d6fed62ff5b907d3df81802c39f84c8feeede5d33f5cde930089545f8c90'],
- # Terrain's canonical input header reorders independent XOR EDI/MOV EBX at +538;
- # all other 13,428-byte body bytes and relocation destinations are unchanged.
+ # Removing GraphicsTest's redundant inherited-method declaration restores
+ # XOR EDI/MOV EBX order at +538. Same state/flags; no interior entry;
+ # all other 13,428 body bytes and relocation destinations are unchanged.
  ['samples/race/BikeRaceNearMisses.cpp',
   '?CreateRacers@BikeRace@@',
   4299120,
   13428,
   13428,
-  13390,
-  'dfc0ee81775e2529319f4644466baacd436755506630b8d402b6621e29cea48c'],
+  13396,
+  'a6159f61caafc2347d11f9ef24dfc6956a1da5b180cd6749c63609a4716f8482'],
  ['samples/ui/KrustyUINearMisses.cpp',
   '?Create@KrustyUI@@',
   4819104,

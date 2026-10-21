@@ -1071,15 +1071,6 @@ int SoultreePhysicsObject::Tick(float dt)
 // 0x134-byte file object; retail pushes this TU's __FILE__ string 0x00574320 at 0x00503b13 and
 // 0x00503f87 (tier 1), which places both functions here.
 
-// The scene node at field_0x08 is the D3DIM object (SoultreePhysicsCharacter copies
-// d3d_field_0x1a0 into it).  0x004444c0 (thiscall, `ret 4`) is one of that object's methods.
-// SoultreeObject (core/SoultreeObject.h) does not declare it, so it is reached through this
-// view (tier 3 name).
-class SoultreeD3DNode {
-public:
-    void SetUseLighting(int a);
-};
-
 // Shared archive stream and scene-file finder. The finder pointer is read
 // from TrackGame+0x574; its complete layout is declared independently.
 #include "../../reconstructed/FileStream.h"
@@ -1115,7 +1106,7 @@ GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int a1, const char* a2,
                                                    a13, a14, a15, a16, a17, a18, a19, a20,
                                                    a21, a22);
     if (a3 && (a3->field_0x25 & 1)) {
-        ((SoultreeD3DNode*)SoultreePhysicsBaseObject::sceneNode)->SetUseLighting(1);
+        reinterpret_cast<D3DIMSoultreeObject*>(SoultreePhysicsBaseObject::sceneNode)->SetUseLighting(1);
     }
 
     int len = strlen(a2);
@@ -1166,7 +1157,7 @@ GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int a1, int a2, const
                                                    a14, a15, a16, a17, a18, 0.0f, 0, a19, a20,
                                                    a21);
     if (a4 && (a4->field_0x25 & 1)) {
-        ((SoultreeD3DNode*)sceneNode)->SetUseLighting(1);
+        reinterpret_cast<D3DIMSoultreeObject*>(sceneNode)->SetUseLighting(1);
     }
 
     int len = strlen(a3);

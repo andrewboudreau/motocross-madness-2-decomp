@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <float.h>
 #include "collision/CollisionObject.h"
+#include "soultree/SoultreePhysicsObject.h"
 #include "soultree/SoultreePhysicsCallees.h"
 
 void Vehicle::UnknownVirtualSlot0(float dt)
@@ -1270,7 +1271,7 @@ void Vehicle::UnknownVirtualSlot44()
 {
     outOfRace = 1;
     Disable();
-    ((VehSceneNodeView*)modelNode)->Method_004444E0();
+    reinterpret_cast<D3DIMSoultreeObject*>(modelNode)->ClearScreenRects();
 }
 
 // Input-map driven state test (provisional): the 0x46c/0x470 pair short-circuits to "true".

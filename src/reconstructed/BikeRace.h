@@ -201,7 +201,6 @@ class ChatOverlay;
 // (D3DIMSoultreeModifier.cpp's code).
 class UnknownBikeRaceModel {
 public:
-    void ApplyLodSettings(int level);    // 0x004451e0
     void SetLod(int value);    // 0x00444d00
     void SetLowestLod(int value);    // 0x00444d40: hidden for the followed racer
     void ClearFlag14c();             // 0x004fdb50

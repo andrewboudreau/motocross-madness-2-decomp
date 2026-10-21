@@ -1196,25 +1196,24 @@ void Scene::SetDetailLevel(int level)
         int i;
         for (i = 0; i < animationTable->entryCount; i++) {
             if (animationTable->entries[i].keyFramed)
-                animationTable->entries[i].character->modelNode->ApplyLodSettings(level);
+                reinterpret_cast<D3DIMSoultreeObject*>(animationTable->entries[i].character->modelNode)->ApplyLodSettings(level);
             else
-                ((UnknownSceneAnimatedObject*)animationTable->entries[i].proceduralObject)
-                    ->carModel->ApplyLodSettings(level);
+                reinterpret_cast<D3DIMSoultreeObject*>(((UnknownSceneAnimatedObject*)animationTable->entries[i].proceduralObject)->carModel)->ApplyLodSettings(level);
         }
         for (i = 0; i < animationTable->randomSetCount; i++) {
             UnknownSceneEntry* entry = animationTable->randomSets[i].entry;
             if (entry->keyFramed)
-                entry->character->modelNode->ApplyLodSettings(level);
+                reinterpret_cast<D3DIMSoultreeObject*>(entry->character->modelNode)->ApplyLodSettings(level);
             else
-                ((UnknownSceneAnimatedObject*)entry->proceduralObject)->carModel->ApplyLodSettings(level);
+                reinterpret_cast<D3DIMSoultreeObject*>(((UnknownSceneAnimatedObject*)entry->proceduralObject)->carModel)->ApplyLodSettings(level);
         }
     }
     if (staticModels) {
         for (int i = 0; i < staticModels->casterCount; i++) {
             if (staticModels->casters[i].model) {
-                ((UnknownSceneLodObject*)staticModels->casters[i].model)->ApplyLodSettings(level);
+                reinterpret_cast<D3DIMSoultreeObject*>(staticModels->casters[i].model)->ApplyLodSettings(level);
                 if (!staticModels->casters[i].useLighting)
-                    ((UnknownSceneLodObject*)staticModels->casters[i].model)->SetUseLighting(0);
+                    reinterpret_cast<D3DIMSoultreeObject*>(staticModels->casters[i].model)->SetUseLighting(0);
             }
         }
     }

@@ -12,6 +12,8 @@
 #include "math/Math3D.h"
 #include "../../reconstructed/MatrixUtil.h"
 #include "../../reconstructed/BoundingBoxTreeFunctions.h"
+#include "bvh/BoundingBoxTreeQueryFunctions.h"
+#include "soultree/SoultreePhysicsObject.h"
 
 // ==============================================================================================
 // Section: CollisionObject
@@ -38,7 +40,6 @@
 //   CollisionObject owns shapes (ctor 0x431e70, FreeShape 0x432430).
 
 // Retail helpers reached by direct call (addresses are the call targets).
-void FreeBoxTree(void* p);                       // shape sub-object destructor (cdecl, 1 arg)
 void CollisionHullShape_Free(CollisionHullShape* s);   // 0x00431da0
 // Element type of a model's hull array.  Retail allocates it with array new, whose empty
 // constructor loop survives as a leftover count in the code, so the class needs a constructor.
@@ -62,9 +63,9 @@ void CollisionMeshShape_Free(void* s);                 // 0x00431e50
 
 void CollisionHullShape_Free(CollisionHullShape* s) {
     if (s->triangleTree)
-        FreeBoxTree(s->triangleTree);
+        FreeBoxTree(static_cast<QueryTreeNode*>(s->triangleTree));
     if (s->pointTree)
-        FreeBoxTree(s->pointTree);
+        FreeBoxTree(static_cast<QueryTreeNode*>(s->pointTree));
     if (s->vertices)
         DebugFree(s->vertices, __FILE__, 36);
 }
@@ -85,7 +86,7 @@ void CollisionModelShape_Free(void* shape) {
 void CollisionMeshShape_Free(void* shape) {
     CollisionMeshShapeData* s = (CollisionMeshShapeData*)shape;
     if (s->field_0x04)
-        FreeBoxTree(s->field_0x04);
+        FreeBoxTree(static_cast<QueryTreeNode*>(s->field_0x04));
     operator delete(s);
 }
 
@@ -287,9 +288,6 @@ void CollisionObject::LoadShape(void* node, const char* path)
 // local stand-in with just the calls used here, all thiscall).
 class CollisionSourceNode {
 public:
-    int CountNodes();                                        // 0x004fda30
-    void CollectNodes(int* count, CollisionSourceNode** list);   // 0x004fda60 (ret 8)
-    int Accepts(CollisionSourceNode* child, int filter);     // 0x00445060 (ret 8), tier 3 name
     char field_0x00[0x13c];
     CollisionSourceNode* parent;   // +0x13c 0x0043a050 climbs it to the root before collecting
 };
@@ -340,11 +338,11 @@ void CollisionObject::ReadModelShape(void* nodeArg, CollisionFileStream* stream,
     CollisionSourceNode* node = (CollisionSourceNode*)nodeArg;
     while (node->parent)
         node = node->parent;
-    int total = node->CountNodes();
+    int total = reinterpret_cast<SoultreeObject*>(node)->CountNodes();
     CollisionSourceNode** list = (CollisionSourceNode**)operator new(total * 4, __FILE__, 0xa9e);
     int one = 1;
     list[0] = node;
-    node->CollectNodes(&one, list);
+    reinterpret_cast<SoultreeObject*>(node)->CollectDescendants(&one, reinterpret_cast<SoultreeObject**>(list));
     stream->Read(&model->elementCount, 4, 1);
     stream->Read(&model->swept, 4, 1);
     model->elements = new(__FILE__, 0xaa8) CollisionHullElement[model->elementCount];
@@ -373,14 +371,14 @@ void CollisionObject::SetModelShape(void* nodeArg, int buildPointTrees, int swep
     shapeType = 1;
     shape = model;
     model->swept = swept;
-    int total = node->CountNodes();
+    int total = reinterpret_cast<SoultreeObject*>(node)->CountNodes();
     CollisionSourceNode** list = (CollisionSourceNode**)operator new(total * 4, __FILE__, 0xe4);
     int one = 1;
     list[0] = node;
-    node->CollectNodes(&one, list);
+    reinterpret_cast<SoultreeObject*>(node)->CollectDescendants(&one, reinterpret_cast<SoultreeObject**>(list));
     model->elementCount = 0;
     for (int i = 0; i < total; i++) {
-        if (node->Accepts(list[i], filter))
+        if (reinterpret_cast<D3DIMSoultreeObject*>(node)->NodeMovesVertices(reinterpret_cast<SoultreeObject*>(list[i]), filter))
             model->elementCount++;
     }
     model->field_0x10 = (int)node;
@@ -389,7 +387,7 @@ void CollisionObject::SetModelShape(void* nodeArg, int buildPointTrees, int swep
     model->elementHighlight = (int*)operator new(model->elementCount * 4, __FILE__, 0xf5);
     int index = 0;
     for (int j = 0; j < total; j++) {
-        if (node->Accepts(list[j], filter)) {
+        if (reinterpret_cast<D3DIMSoultreeObject*>(node)->NodeMovesVertices(reinterpret_cast<SoultreeObject*>(list[j]), filter)) {
             model->elements[index].swept = swept;
             model->elementEnabled[index] = 1;
             model->elements[index].triangleTree = (CollisionBoxBounds*)operator new(0x24, __FILE__, 0xfd);

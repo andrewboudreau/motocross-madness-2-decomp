@@ -38,6 +38,7 @@
 
 class D3DIMSoultreeObject : public QuadTreeObject, public GameObject {
 public:
+    int NodeMovesVertices(SoultreeObject* node, int lod); // 0x00445060
     explicit D3DIMSoultreeObject(int a);          // 0x0043f160 (thiscall, ret 4)
     virtual ~D3DIMSoultreeObject();               // core 0x0043f2b0, deleting 0x0043f280
     virtual void Disable();                       // 0x00444540
@@ -59,6 +60,13 @@ public:
     void AddModifier(GameObject* modifier);          // 0x00444d80
     void RemoveModifier(GameObject* modifier);       // 0x00444de0
     void AddSecondModifier(GameObject* modifier);    // 0x00444eb0
+
+    // Existing primary-model render-state helpers in D3DIMSoulTree.cpp.
+    void SetUseLighting(int value);             // 0x004444c0
+    void ClearScreenRects();                   // 0x004444e0
+    void SetLod(int lod);                       // 0x00444d00
+    void SetLowestLod(int lod);                 // 0x00444d40
+    void ApplyLodSettings(int index);           // 0x004451e0
 
     // QuadTreeObject (12) + GameObject (0x2c) = 0x38; the rest runs to the vtordisp at
     // 0x4f4 - 0x21c = 0x2d8 (extent only, tier 2).

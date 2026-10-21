@@ -1,5 +1,8 @@
 # Collision shape construction connections
 
+Related [ownership and scene-traversal connections](COLLISION_SCENE_CONNECTIONS.md)
+cover tree destruction, model enumeration and class-name logging.
+
 CollisionObject's hull, model and mesh setup now calls five existing source
 providers: IdentityMatrix (`0x4a1410`, 71 bytes), BuildModelTriangleTree
 (`0x42c8c0`, 928 bytes), BuildTriangleMeshTree (`0x42cc60`, 831 bytes),

@@ -3,9 +3,15 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/render/TextureSurfaceCreate.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete PCTextureMap surface setup passes 12226 native descriptor, mip-count, reference, conversion-boundary, callback and fault scenarios, using three strict source-format helpers. VC6 emits 2028 bytes against the corrected complete 2033-byte retail body with 518 matching positions. COM surfaces, conversion and larger helpers are scripted; minimum mip size is positive, and actual pixel conversion, drivers and integrated rendering remain untested.",
+      "evidence": "docs/TEXTURE_SURFACE_CREATE.md#functional-build-review"
+    },
+    {
       "path": "samples/ui/GuiScreenTexture.cpp",
       "status": "reviewed-nonexact",
-      "reason": "Complete menu screen capture passes 8237 native pixel, state, callback, allocation, fault and unwind scenarios. VC6 emits 888 bytes against the complete 896-byte retail body with 284 matching positions. Rendering, surfaces, format lookup, allocation and texture creation are scripted; real DirectDraw capture and modal menus remain untested, and PCTextureMap CreateSurface is still a missing provider.",
+      "reason": "Complete menu screen capture passes 8237 native pixel, state, callback, allocation, fault and unwind scenarios. VC6 emits 888 bytes against the complete 896-byte retail body with 284 matching positions. Rendering, surfaces, format lookup, allocation and texture creation are scripted; real DirectDraw capture and modal menus remain untested.",
       "evidence": "docs/GUI_SCREEN_TEXTURE.md#functional-build-review"
     },
     {

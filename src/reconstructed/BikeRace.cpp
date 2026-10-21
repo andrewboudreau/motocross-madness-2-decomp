@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "ArcadeObject.h"
+#include "D3DIMSoulTree.h"
 #include "DebugAlloc.h"
 #include "EventManager.h"
 
@@ -2028,17 +2029,17 @@ int BikeRace::UnknownVirtualSlot14() {
 // 0x00423790
 void BikeRace::SetDetailLevel(int level) {
     g_ActiveLodSettings = g_TrackGame->bladeRenderer ? g_BladeLodSettings : g_NonBladeLodSettings;
-    localRacer->modelNode->ApplyLodSettings(level);
-    localRacer->riderCharacter->modelNode->ApplyLodSettings(level);
+    reinterpret_cast<D3DIMSoultreeObject*>(localRacer->modelNode)->ApplyLodSettings(level);
+    reinterpret_cast<D3DIMSoultreeObject*>(localRacer->riderCharacter->modelNode)->ApplyLodSettings(level);
     if (g_TrackGame->mode.raceSettings.raceMode != 4) {
         for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
-            aiRacers[i]->modelNode->ApplyLodSettings(level);
-            aiRacers[i]->riderCharacter->modelNode->ApplyLodSettings(level);
+            reinterpret_cast<D3DIMSoultreeObject*>(aiRacers[i]->modelNode)->ApplyLodSettings(level);
+            reinterpret_cast<D3DIMSoultreeObject*>(aiRacers[i]->riderCharacter->modelNode)->ApplyLodSettings(level);
         }
     }
     for (int j = 0; j < g_TrackGame->mode.raceSettings.networkPlayerCount; j++) {
-        racerSlots[j]->modelNode->ApplyLodSettings(level);
-        racerSlots[j]->riderCharacter->modelNode->ApplyLodSettings(level);
+        reinterpret_cast<D3DIMSoultreeObject*>(racerSlots[j]->modelNode)->ApplyLodSettings(level);
+        reinterpret_cast<D3DIMSoultreeObject*>(racerSlots[j]->riderCharacter->modelNode)->ApplyLodSettings(level);
     }
 }
 

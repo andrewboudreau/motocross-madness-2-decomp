@@ -24,8 +24,9 @@ void ExpandLzw(void* destination, void* source, int size);
 extern UnknownSurfaceInterface* g_SharedMipTextureSurfaces[10];
 extern UnknownSurfaceInterface* g_SharedTextureSurfaces[10];
 
-// 0x00689968 (.bss, read once at 0x004c7097, never written): when set,
-// CreateSurface dumps the first level with DumpLevel (0x004c84e0).
+// 0x00689968 (writable loader-zero storage, DWORD read at 0x004c7096):
+// when set, CreateSurface dumps the first level with DumpLevel (0x004c84e0).
+// TextureSurfaceState.cpp supplies storage; no other direct address reference found.
 extern int g_DebugDumpTextureLevels;
 
 // cdecl 0x004c86e0: formats a DirectDraw result with the caller's __FILE__
