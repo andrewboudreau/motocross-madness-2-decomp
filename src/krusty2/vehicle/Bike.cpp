@@ -1905,7 +1905,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
                 k = 0.2f;
             else if (ang > 2.09f)
                 k = 0.6f;
-            else if (ang > 0.52359878f)
+            else if (ang > 0.5236f)
                 k = 0.8f;
             else
                 k = 1.0f;
