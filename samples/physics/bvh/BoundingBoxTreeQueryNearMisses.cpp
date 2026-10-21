@@ -442,7 +442,9 @@ inline float SegLength(const Vec3& v)
     return FastSqrt(sq);
 }
 
-inline float SegClamp01(float v) { return v < 1.0f ? QueryMax(v, 0.0f) : 1.0f; }
+// Min, then max: retail loads 1.0 through the FPU in the upper arm and skips the zero test
+// there (the `v < 1 ? max(v, 0) : 1` form stores the immediates; 76 -> 56 differing).
+inline float SegClamp01(float v) { return QueryMax(QueryMin(v, 1.0f), 0.0f); }
 
 float Vec3LengthRef(const Vec3& v);   // 0x00435ec0 (call view of the length helper)
 
