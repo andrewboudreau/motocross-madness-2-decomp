@@ -397,6 +397,9 @@ full:
 // around ProjectVertices and two `add eax, 0x170/0x17c` row pointers.  One footprint test
 // after the if/else shrinks the function to 2938 bytes (496): the inline budget needs both
 // copies.
+// Retail's `add eax, 0x17c` before the mode 2 step is a reference to look: a scale helper
+// taking `const TerrainShadowVec&` gives it (3094 bytes, 51 differing instructions) but 1557
+// strict here.  The 16 operand orders of the cross product's x and y terms compile the same.
 // ---------------------------------------------------------------------------------------------
 
 // The unit's vector with the d3dvec.inl constructors (ProjectedShadow.h's ShadowVec3 has none;
