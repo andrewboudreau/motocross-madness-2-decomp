@@ -481,9 +481,20 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
     pending = 0          # argument bytes pushed since the last call / add esp
     seen_call = False
     base_depth = None    # depth outside argument sequences (callee-saved pushes)
+    branch_depths = {}   # forward branch target address -> depth at the branch
+    after_branch = False
     for j in range(i, n):
         ins = insns[j]
         m, o = ins.mnemonic, ins.op_str
+        if after_branch and ins.address in branch_depths:
+            # the block after a jmp/ret is entered from a branch above it (an
+            # early return's ``pop esi; ret`` must not drop the depth of the rest)
+            depth = branch_depths[ins.address]
+        after_branch = False
+        if m.startswith('j') and re.fullmatch(r'0x[0-9a-f]+', o):
+            target = int(o, 16)
+            if target > ins.address:
+                branch_depths.setdefault(target, depth)
         fo = frame_operand(o, m)
         if fo is not None:
             reg, disp, width = fo
@@ -493,10 +504,12 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
                 info.accesses.append(FrameAccess(j, info.ebp_delta + disp, width, m == 'lea', f'{m} {o}'))
         if m in ('jmp', 'ret', 'retn'):
             # a new basic block starts at the base level (VC6 cleans arguments
-            # before branching except in rare shared tails)
+            # before branching except in rare shared tails) unless a branch
+            # recorded its depth
             if base_depth is not None:
                 depth = base_depth
             pending = 0
+            after_branch = True
         if m == 'push':
             depth += 4
             if seen_call or o not in ('ebx', 'esi', 'edi', 'ebp'):
