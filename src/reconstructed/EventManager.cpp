@@ -491,7 +491,7 @@ int EventManager::OnNetworkMessage(int type, void* data, int from, int to, int f
             }
             UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
             if (view)
-                view->HandlePlayerLeft(message->player);
+                reinterpret_cast<BikeRace*>(view)->HandlePlayerLeft(message->player);
         } else if (type == 0x8e) {
             if (message->player == g_TrackGame->network->localPlayer) {
                 if (FindRaceMode()) {
@@ -926,7 +926,7 @@ void EventManager::CloseRace(int mode) {
             GetDateFormatA(0, 0, 0, "M/d/yyyy", date, sizeof(date));
             GetTimeFormatA(0, 0, 0, "h:mm tt", time, sizeof(time));
             sprintf(description, "%s %s", date, time);
-            view->SaveReplay(name, description);
+            reinterpret_cast<BikeRace*>(view)->SaveReplay(name, description);
         }
         if (g_TrackGame->mode.raceSettings.raceMode == 4 && g_TrackGame->mode.saveGhost) {
             char time[32];

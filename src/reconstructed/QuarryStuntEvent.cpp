@@ -1,3 +1,4 @@
+#include "BikeRaceCore.h"
 #include "../krusty2/broadphase/Terrain.h"
 #include <stdio.h>
 #include <string.h>
@@ -517,7 +518,7 @@ int BaseQuarryEvent::OnNetworkMessage(int type, void* data, int from, int to, in
         sprintf(buffer, "%s %s", name, text);
         UnknownMessage message(buffer, 3.25f);
         textQueue->AppendMessage(&message);
-        raceView->HandlePlayerLeft(leave->playerId);
+        reinterpret_cast<BikeRace*>(raceView)->HandlePlayerLeft(leave->playerId);
         if (g_TrackGame->mode.raceSettings.raceMode == 2)
             g_TrackGame->eventManager->RemovePlayer(leave->playerId);
     } else if (from && type == 0x89) {
@@ -527,7 +528,7 @@ int BaseQuarryEvent::OnNetworkMessage(int type, void* data, int from, int to, in
         sprintf(buffer, "%s %s", (char*)data + 4, text);
         UnknownMessage message(buffer, 3.25f);
         textQueue->AppendMessage(&message);
-        raceView->HandlePlayerLeft(from);
+        reinterpret_cast<BikeRace*>(raceView)->HandlePlayerLeft(from);
         if (g_TrackGame->mode.raceSettings.raceMode == 2)
             g_TrackGame->eventManager->RemovePlayer(from);
     }

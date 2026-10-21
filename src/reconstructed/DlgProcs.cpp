@@ -1,3 +1,4 @@
+#include "BikeRaceCore.h"
 #include "GUIManagerCore.h"
 #include "DlgProcs.h"
 
@@ -1325,7 +1326,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
                 event->handled = 1;
                 g_TrackGame->StopCDAudio();
                 g_TrackGame->ResetClock();
-                g_TrackGame->eventManager->FindRaceView()->ResetStartCountdown();
+                reinterpret_cast<BikeRace*>(g_TrackGame->eventManager->FindRaceView())->ResetStartCountdown();
                 if (g_TrackGame->quarryEvent)
                     g_TrackGame->quarryEvent->ResetClock();
                 if (g_TrackGame->tagEvent)

@@ -17,23 +17,10 @@ class UnknownTextureStream;
 struct GridVertex;
 struct GridCamera;
 
-// AgeManager (D:\aardvark\VC\krusty2\AgeManager.cpp, tier 1 by its
-// destructor's __FILE__ use) as seen from this file: 0x00401050 registers a
-// 0x14-byte entry with an eviction callback, 0x004010d0 unregisters it.
-struct GridAgeEntry {
-    int age;                                   // +0x00 set from the manager
-    int (*callback)(void* owner);              // +0x04
-    void* owner;                               // +0x08
-    int context;  // +0xC  AgeManager.h AgeEntry::context (second callback argument)
-    int size;                                  // +0x10 (nonzero while registered)
-};
-class GridAgeManager {
-public:
-    void Register(GridAgeEntry* entry, int (*callback)(void* owner), void* owner,
-                               int a, int size);    // 0x00401050 (ret 0x14)
-    void Unregister(GridAgeEntry* entry);  // 0x004010d0 (ret 4)
-    void MarkUsed(GridAgeEntry* entry);  // 0x00401250 (ret 4), marks the entry used
-};
+// The grid caches share AgeManager's 0x14-byte manager and entry records.
+// Eviction receives owner and context; callbacks may ignore the second value.
+#include "AgeEntry.h"
+#include "AgeManager.h"
 
 // Boundary view of the renderer at Terrain+0x18 (thiscall virtuals). Slot 7
 // takes (stage, state, value) like a texture-stage state, slot 8 three
@@ -162,7 +149,7 @@ struct GridTerrain {
     GridVertexSink* vertexSink;                // +0xc40
     float transform[16];                       // +0xc44 transform
     int textureAgeManager;  // +0xC84  Grid1.h's Grid1Terrain view: the node texture AgeManager
-    GridAgeManager* ageManager;                // +0xc88
+    AgeManager* ageManager;                    // +0xc88
     GridCamera* camera;                        // +0xc8c
     unsigned char field_0xc90[0xc9c - 0xc90];
     union {
@@ -202,7 +189,7 @@ struct GridNodeDrawData {
     short indexCount;                          // +0x13e three per triangle
     short vertexBufferBytes;                   // +0x140 size charged to g_gridDrawMemory for +0x134
     short indexBufferBytes;                    // +0x142 size charged for +0x138
-    GridAgeEntry ageEntry;                     // +0x144
+    AgeEntry ageEntry;                         // +0x144
     float texOriginU;  // +0x158  vertex cache u = ((x - origin) * texStep + texOriginU) * 0.9375 + 1/32 (0x0047de90)
     float texOriginV;  // +0x15C  vertex cache v origin (0x0047de90), as texOriginU
     float texStep;  // +0x160  texture coordinate step per grid sample (0x0047de90); x4 per 4x4 block build
@@ -382,7 +369,7 @@ public:
 };
 
 // 0x0047ecc0: AgeManager eviction callback for a node's vertex buffers.
-int EvictNodeBuffers(void* owner);
+int EvictNodeBuffers(void* owner, int context);
 
 // One link of the 17 x 17 vertex grid (0x006754e0, 32 bytes each). The
 // first two words are filled by 0x0047e4d0, the rest by 0x0047e340.

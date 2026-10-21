@@ -195,7 +195,7 @@ DrawableGridNode::~DrawableGridNode()
 // 0x0047ecc0: AgeManager eviction callback (registered by 0x0047f210 and
 // 0x0047f840 with the node as owner): frees both vertex buffers and marks
 // the node for a rebuild.
-int EvictNodeBuffers(void* owner)
+int EvictNodeBuffers(void* owner, int)
 {
     GridNodeDrawData* d = ((DrawableGridNode*)owner)->data;
     if (d->vertexBuffer) {

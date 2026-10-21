@@ -1,6 +1,7 @@
 // Verified support functions from retail Terrain.cpp; remaining Terrain methods
 // are in src/krusty2/broadphase/Terrain.cpp. This filename is ours.
 #include "../krusty2/broadphase/Terrain.h"
+#include "AgeManager.h"
 
 // File-scope statics.  retail's first code in this TU is their dynamic initialisers
 // (0x00505490.. : the camera ctor + atexit, then ten 5000-tick PeakHolds in 0x20-byte
@@ -23,9 +24,9 @@ TerrainPeakHold g_terrainTotalPeak(5000);   // 0x0068a078
 BaseObject* Terrain::AcquireOwnedObject()
 {
     if (ownedObjectArrayCount > 0x3c) {
-        textureAgeManager->age--;
-        textureAgeManager->Purge(0);
-        textureAgeManager->age++;
+        textureAgeManager->currentAge--;
+        textureAgeManager->EvictStale(0);
+        textureAgeManager->currentAge++;
     }
     BaseObject* object = ownedObjectArray[ownedObjectArrayCount];
     if (object) {

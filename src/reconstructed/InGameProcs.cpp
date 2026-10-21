@@ -1,3 +1,4 @@
+#include "BikeRaceCore.h"
 #include "InGameProcs.h"
 
 #include "DialogEventKind.h"
@@ -29,7 +30,7 @@ void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
             if (!g_TrackGame->uiInteractionBlocked) {
                 UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
                 if (view && !view->localRacer->hasFinished) {
-                    view->RestartRace(1, 0, 0);
+                    reinterpret_cast<BikeRace*>(view)->RestartRace(1, 0, 0);
                     g_TrackGame->SetMenuOpen(0, kMenuExit, 1);
                 }
             }
@@ -158,14 +159,14 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogCommand:
         if (!_stricmp("TogPlay", event->controlName)) {
             if (view->lastRecordKind != -2) {
-                view->ToggleReplayPause(1);
-                view->ToggleReplayPause(0);
+                reinterpret_cast<BikeRace*>(view)->ToggleReplayPause(1);
+                reinterpret_cast<BikeRace*>(view)->ToggleReplayPause(0);
                 view->replayMode = 4;
                 g_TrackGame->replaySpeed = 1.0f;
             }
         } else if (!_stricmp("TogPause", event->controlName)) {
             if (view->lastRecordKind != -2) {
-                view->ToggleReplayPause(0);
+                reinterpret_cast<BikeRace*>(view)->ToggleReplayPause(0);
                 view->replayMode = 4;
                 g_TrackGame->replaySpeed = 1.0f;
             }
@@ -173,11 +174,11 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
             if (view->lastRecordKind != -2) {
                 if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
                     if (view->replayPaused)
-                        view->ToggleReplayPause(0);
+                        reinterpret_cast<BikeRace*>(view)->ToggleReplayPause(0);
                     view->replayMode = 8;
                     g_TrackGame->replaySpeed = 2.0f;
                 } else {
-                    view->ToggleReplayPause(1);
+                    reinterpret_cast<BikeRace*>(view)->ToggleReplayPause(1);
                     view->replayMode = 4;
                     g_TrackGame->replaySpeed = 1.0f;
                 }
@@ -186,11 +187,11 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
             if (view->lastRecordKind != -2) {
                 if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
                     if (view->replayPaused)
-                        view->ToggleReplayPause(0);
+                        reinterpret_cast<BikeRace*>(view)->ToggleReplayPause(0);
                     view->replayMode = 9;
                     g_TrackGame->replaySpeed = 8.0f;
                 } else {
-                    view->ToggleReplayPause(1);
+                    reinterpret_cast<BikeRace*>(view)->ToggleReplayPause(1);
                     view->replayMode = 4;
                     g_TrackGame->replaySpeed = 1.0f;
                 }
@@ -199,30 +200,30 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
             if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
                 if (view->replayMode != 14) {
                     if (view->replayPaused)
-                        view->ToggleReplayPause(0);
+                        reinterpret_cast<BikeRace*>(view)->ToggleReplayPause(0);
                     view->replayMode = 11;
                     g_TrackGame->replaySpeed = 0.0f;
                 }
             } else {
-                view->ToggleReplayPause(1);
+                reinterpret_cast<BikeRace*>(view)->ToggleReplayPause(1);
                 view->replayMode = 4;
                 g_TrackGame->replaySpeed = 1.0f;
             }
         } else if (!_stricmp("ButFrame", event->controlName)) {
             if (view->lastRecordKind != -2) {
                 if (view->replayPaused)
-                    view->ToggleReplayPause(0);
+                    reinterpret_cast<BikeRace*>(view)->ToggleReplayPause(0);
                 view->replayStepFrame = 1;
                 g_TrackGame->stepOneFrame = 1;
             }
         } else if (!_stricmp("ButBeginning", event->controlName)) {
             if (view->replayPaused)
-                view->ToggleReplayPause(0);
+                reinterpret_cast<BikeRace*>(view)->ToggleReplayPause(0);
             view->replayMode = 12;
         } else if (!_stricmp("ButEnd", event->controlName)) {
             if (view->lastRecordKind != -2) {
                 if (view->replayPaused)
-                    view->ToggleReplayPause(0);
+                    reinterpret_cast<BikeRace*>(view)->ToggleReplayPause(0);
                 view->replayMode = 9;
                 g_TrackGame->replaySpeed = 30.0f;
             }

@@ -18,6 +18,7 @@
 
 #include "GameObject.h"
 #include "MatrixUtil.h"
+#include "AgeEntry.h"
 #include "AgeManager.h"
 #include "DebugAlloc.h"
 

@@ -36,7 +36,7 @@
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
   "?LookupCell@TerrainShutdownObject@@QAEPAUTerrainCell@@HH@Z": "0x00484d70",
-  "?MarkUsed@TerrainOwned@@QAEXPAX@Z": "0x00401250",
+  "?MarkUsed@AgeManager@@QAEXPAUAgeEntry@@@Z": "0x00401250",
   "?Set@ClipRectangle@@QAEXMMMM@Z": "0x00431350",
   "?SetLookAt@ShadowCameraProxy@@QAEXPBUShadowVec3@@HHHPAM@Z": "0x0042e9b0",
   "?ShadowFillTriangle@@YAXHPAFFPAHH@Z": "0x00461e60",

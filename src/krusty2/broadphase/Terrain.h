@@ -37,18 +37,9 @@ public:
     virtual unsigned long __stdcall Release();
 };
 
-// PROVISIONAL: owned object with a real (non-virtual) dtor at 0x00401020, freed with plain delete.
-// Tier 1: its destructor frees +0x0c with __FILE__ AgeManager.cpp line 0x11, so this is an AgeManager;
-// tier 3 member names.
-class TerrainOwned {
-public:
-    TerrainOwned();                                             // 0x00401000 (0x14 bytes: Terrain::Load's line 0x11c/0x122 allocations)
-    ~TerrainOwned();                                            // 0x00401020
-    int Purge(int target);                                      // 0x004011b0 (ret 4; 0x00505600 calls it with 0 between --age and ++age)
-    void MarkUsed(void* entry);                                 // 0x00401250 (ret 4; AgeManager::MarkUsed; TerrainShadow slot 30 passes a cell mesh's +0x144)
-    int age;                                                    // +0x00 decremented around Purge by Terrain::AcquireOwnedObject
-    char pad_0x04[0x14 - 0x04];
-};
+// The two cache managers use AgeManager's constructor, destructor and 0x14-byte
+// layout, so the fields use the shared declaration.
+class AgeManager;
 
 // PROVISIONAL view of the file stream at Terrain+0x3c (UnknownTextureStream in
 // src/reconstructed/TextureMap.h; tier 1 call targets, tier 3 names).
@@ -132,7 +123,7 @@ struct TerrainCellOwner {
     short vertexCount;                                         // +0x13c (0 selects the cell key in TerrainShadow slot 29)
     short indexCount;                                          // +0x13e
     char pad_0x140[0x144 - 0x140];
-    char ageEntry[0x17c - 0x144];                              // +0x144 passed to TerrainOwned::MarkUsed
+    char ageEntry[0x17c - 0x144];                              // +0x144 passed to AgeManager::MarkUsed
     TerrainCellSection sections[0x10];                         // +0x17c
 };
 struct TerrainCell {
@@ -391,8 +382,8 @@ public:
     TerrainSurfaceBase* detailTexture;  // +0xC3C  Load: texture named by textureName (testnoise.tga; QuarryStuntEvent passes detailTexture); slot 14 detail pass
     int lightManager;  // +0xC40  Load argument; Griddraw calls 0x0049e4a0 (LightManager lighting routine) on it with transform
     TerrainMatrix transform;                                  // +0xc44 copy of the matrix from 0x004a1410
-    TerrainOwned* textureAgeManager;  // +0xC84  Load: AgeManager; AcquireOwnedObject purges it past 60 pooled surfaces (Grid1Terrain textureAgeManager)
-    TerrainOwned* meshAgeManager;  // +0xC88  Load: AgeManager; Griddraw registers node buffers (EvictNodeBuffers), TerrainShadow marks cell meshes used
+    AgeManager* textureAgeManager;  // +0xC84  Load: AgeManager; AcquireOwnedObject purges it past 60 pooled surfaces (Grid1Terrain textureAgeManager)
+    AgeManager* meshAgeManager;  // +0xC88  Load: AgeManager; Griddraw registers node buffers (EvictNodeBuffers), TerrainShadow marks cell meshes used
     int visibilityCamera;  // +0xC8C  GridTerrain camera: Griddraw passes it and its +0xec matrix to VisibilityClipper::TestBox
     unsigned int detailAverageColor;  // +0xc90  Load: detailTexture->averageColor (Pixtrans AverageColor), or -1 without it; source of unlitColor/unlitSpecular
     int field_0xc94;                                            // +0xc94 Load: 5 (the texture's fifth-argument value)

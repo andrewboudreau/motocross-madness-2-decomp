@@ -46,7 +46,7 @@ GridNode* DrawableGridNodeSharedTextures::UnknownVirtualSlot2(UnknownTextureStre
 }
 
 // 0x0047ca00: eviction callback for the node-wide texture.
-int EvictNodeTexture(void* owner)
+int EvictNodeTexture(void* owner, int)
 {
     DrawableGridNodeSharedTextures* node = (DrawableGridNodeSharedTextures*)owner;
     reinterpret_cast<::Terrain*>(node->Terrain())->RetireOwnedObject(node->Extra()->builtTexture);

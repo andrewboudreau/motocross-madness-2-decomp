@@ -28,9 +28,9 @@ PROVIDERS = (
 # relocation records are hashed because QueryGround still has unbound helpers.
 # This is deliberately not a successful retail comparison of either function.
 PARTIAL = (
-    # Stream connection changes three relocation names and renumbers an EH
+    # Stream and cache connections change external names and renumber an EH
     # label. All 84 non-debug sections retain their bytes and destinations.
-    ('?Load@Terrain@@', 2117, '431190d6d2ce7dbfdfaf8ba13be94737176701bcfb7d1e588f81878bae853a50'),
+    ('?Load@Terrain@@', 2117, '64354ee50e643c9abadd4c2c0f9b7a059ee9cd90c85c2a88a84650e4eb2a3b64'),
     ('QueryGround', 3321, '07ea9bdeb16235841aaf1d125c77ee580b9b1667ec900de488c74df2f57207b3'),
 )
 

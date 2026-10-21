@@ -4,6 +4,7 @@
 // 0x005089a0 just before it closes Terrain.cpp (docs/INITIALIZERS.md), so this code starts a unit
 // of its own or continues Terrain.cpp (tier 3).
 #include "TerrainShadow.h"
+#include "../../../src/reconstructed/AgeManager.h"
 #include "../../../src/reconstructed/ClipRectangle.h"
 
 // ---------------------------------------------------------------------------------------------
@@ -371,7 +372,7 @@ void TerrainShadow::UnknownVirtualSlot30()
         }
 full:
         if (used)
-            caster->meshAgeManager->MarkUsed(mesh->ageEntry);
+            caster->meshAgeManager->MarkUsed(reinterpret_cast<AgeEntry*>(mesh->ageEntry));
         if (vertexCount == 0x300)
             break;
     }

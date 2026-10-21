@@ -134,7 +134,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         if (g_TrackGame->profileDirectory->count >= 1 && g_TrackGame->ui->profileLoaded) {
             if (event->field_0x18 == 0x63) {
                 PlayerRemovedDlg* dialog = new(__FILE__, 168) PlayerRemovedDlg;
-                g_TrackGame->ui->gui->ShowDialog(dialog, 0x1fa, 0xc, 0, (int)this, 0, 0, 1);
+                g_TrackGame->ui->gui->ShowDialog(dialog, 0x1fa, 0xc, 0, (UIDialog*)this, 0, 0, 1);
             }
         } else {
             g_TrackGame->ui->OpenMenu(0xbba);

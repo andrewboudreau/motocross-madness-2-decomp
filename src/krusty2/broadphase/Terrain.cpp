@@ -1,6 +1,7 @@
 // Terrain.cpp -- reconstruction of D:\aardvark\VC\krusty2\Terrain.cpp.
 #include "../../reconstructed/TrackGameGlobal.h"
 #include "Terrain.h"
+#include "../../reconstructed/AgeManager.h"
 #include "../../reconstructed/FileStream.h"
 #include "../../reconstructed/DebugOverlay.h"
 
@@ -161,8 +162,8 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     fileStartOffset = reinterpret_cast<UnknownTextureStream*>(this->stream)->Tell();
     surfaceRegistry = surfaceDesc.registry;
     lightManager = field0xc40;
-    textureAgeManager = new(__FILE__, 0x11c) TerrainOwned;
-    meshAgeManager = new(__FILE__, 0x122) TerrainOwned;
+    textureAgeManager = new(__FILE__, 0x11c) AgeManager;
+    meshAgeManager = new(__FILE__, 0x122) AgeManager;
     ownedObjectArray = (BaseObject**)DebugCalloc(200, 4, __FILE__, 0x127);
 
     char tag[4];

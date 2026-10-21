@@ -61,6 +61,11 @@ immediate.
 
 A near miss is kept in `samples/camera/FollowCameraNearMisses.cpp`:
 
+The complete per-frame Tick is shared with the standalone
+`samples/camera/FollowCameraTick.cpp` candidate. Its explicit nonexact build
+review, initializer proof and native behavioral boundary are documented in
+[FOLLOW_CAMERA_TICK.md](FOLLOW_CAMERA_TICK.md#functional-build-review).
+
 - The constructor (`0x00462ee0`, 564 bytes) has every value and offset right,
   and its virtual call to slot 71 binds statically to `0x00466e50`. Copying
   the saved state and parameter before +0x224 gives retail's second +0x16c

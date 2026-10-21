@@ -7,19 +7,9 @@
 // No RTTI: the class has no virtual functions. The class name follows the
 // file name (tier 2); method and member names are provisional. The 0x14-byte
 // layout is decoded from the constructor 0x00401000 and the users below.
-// Griddraw.h's GridAgeManager/GridAgeEntry are the terrain's view of the
-// same objects (Terrain+0xc88).
+// Terrain and grid caches use this manager at Terrain+0xc84 and +0xc88.
 
-// One registered resource. The manager keeps pointers to entries owned by
-// the callers; an entry is stamped with the manager's current age when it is
-// registered or used (0x00401250).
-struct AgeEntry {
-    unsigned int age;                          // +0x00 last use
-    int (*callback)(void* owner, int context); // +0x04 evicts the resource, nonzero on success
-    void* owner;                               // +0x08
-    int context;                               // +0x0c second callback argument
-    int size;                                  // +0x10 accounted bytes
-};
+struct AgeEntry;
 
 class AgeManager {
 public:

@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/camera/FollowCameraTick.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete FollowCamera Tick passes 674335 native full-state, callback, allocation, fault and floating-point comparisons with actual initialized strict FastSqrt. VC6 retains 3659 of 3672 matching positions; axis initializers are strict. Terrain, rotation, other camera methods and input callbacks are scripted, so rendered-camera behavior remains untested.",
+      "evidence": "docs/FOLLOW_CAMERA_TICK.md#functional-build-review"
+    },
+    {
       "path": "samples/audio/AudioLoaderThread.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete streamed-audio loader passes 37387 native queue, ownership, lock, callback, exception and fault comparisons. VC6 emits 478 bytes versus 483 retail bytes; the five game helpers and synchronization boundaries are scripted, so real scheduling and audio playback remain untested.",

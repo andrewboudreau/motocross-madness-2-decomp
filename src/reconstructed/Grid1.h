@@ -26,7 +26,7 @@ struct Grid1BlockTexture {
     unsigned int own : 1;                      // +0x00 bit 0: texture at +4, else Terrain's table
     int index : 15;                            // +0x00 bits 1..15: table index (-1: none)
     ManagedTexture* texture;                   // +0x04
-    GridAgeEntry ageEntry;                     // +0x08
+    AgeEntry ageEntry;                         // +0x08
     float mappingScale;                        // +0x1c Griddraw.h's GridBlockRecord names (RemapTexCoordsIfMoved)
     float mappingOffsetU;                      // +0x20
     float mappingOffsetV;                      // +0x24
@@ -44,7 +44,7 @@ struct Grid1NodeExtra {
     unsigned int own : 1;                      // +0x0c packed like Grid1BlockTexture
     int index : 15;
     BaseObject* builtTexture;                 // +0x10  the node's own texture from Terrain's pool, built by BuildNodeTexture; EvictNodeTexture 0x0047ca00 hands it back
-    GridAgeEntry ageEntry;                     // +0x14
+    AgeEntry ageEntry;                         // +0x14
     float mappingScale;                        // +0x28 slot 3 resets these to 1, 0, 0 on a texture change
     float mappingOffsetU;                      // +0x2c
     float mappingOffsetV;                      // +0x30
@@ -69,7 +69,7 @@ struct Grid1Terrain {
     unsigned char field_0xbec[0xc24 - 0xbec];
     int nodeTextureFormat;                     // +0xc24 pixel format of the node textures
     unsigned char field_0xc28[0xc84 - 0xc28];
-    GridAgeManager* textureAgeManager;         // +0xc84 texture AgeManager
+    AgeManager* textureAgeManager;             // +0xc84 texture AgeManager
 };
 
 // Grid1.cpp's view of the host object at Terrain+0x18 (Terrain.h: its +8
@@ -111,7 +111,7 @@ public:
 
 // AgeManager eviction callbacks registered for the node-wide texture and for
 // one block's texture (tier 3).
-int EvictNodeTexture(void* owner);
+int EvictNodeTexture(void* owner, int context);
 int EvictBlockTexture(void* owner, int block);
 
 // Texture use table (defined with Terrain's data; tier 3 names).

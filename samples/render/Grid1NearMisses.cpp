@@ -165,7 +165,7 @@ retry:
                                     Extra()->textureFlags |= 1 << block;
                                     g_grid1OwnTextureCount++;
                                     ((Grid1Terrain*)terrain)->textureAgeManager->Register(
-                                        &((Grid1NodeExtra*)extra)->blocks[block].ageEntry, (int (*)(void*))EvictBlockTexture,
+                                        &((Grid1NodeExtra*)extra)->blocks[block].ageEntry, EvictBlockTexture,
                                         this, block, PixelFormatBytesPerPixel(((Grid1Terrain*)terrain)->nodeTextureFormat) * 0x40000 / 3);
                                 }
                             } else {

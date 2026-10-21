@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 201 C++ files (180 canonical sources and twenty-one
-reviewed candidates) and reaches LINK with 515 unresolved external symbols,
+The 2026-10-21 build compiles 202 C++ files (180 canonical sources and twenty-two
+reviewed candidates) and reaches LINK with 503 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -328,14 +328,34 @@ their relocations. The real link removes its missing callback name,
 helpers are scripted in that fixture; actual scheduling and playback remain
 untested.
 
+The terrain and grid caches now share the existing [AgeManager](AGEMANAGER.md)
+and its two-argument eviction callback signature. All nine affected objects
+preserve their non-debug section bytes and relocation destinations under the
+canonical symbol renames. Separating the entry record from the manager's
+pointer-only declaration preserves Terrain's sensitive VC6 load scheduling.
+The isolated real link removes six names, **515 → 509**, with none added.
+
+Five [race-control connections](RACE_CONTROL_CONNECTIONS.md) use the existing
+BikeRace providers for player departure, replay pause/save, restart and start
+countdown. All 206 registered strict comparisons and four complete partial
+fingerprints remain unchanged; 993 native cases cover actual event routing
+and pause behavior. The next real link removes five names, **509 → 504**,
+with no new unresolved dependencies.
+
+The complete [FollowCamera tick](FOLLOW_CAMERA_TICK.md#functional-build-review)
+is admitted as an explicitly nonexact candidate after 674,335 native
+comparisons. Its full 3,672-byte body retains 3,659 matching positions; axis
+initializers and the actual FastSqrt provider remain strict. The aggregate's
+code, storage and relocations are preserved with the documented diagnostic
+filename changes. The final real link removes one name, **504 → 503**.
+Terrain, rotation and other camera methods are scripted test boundaries, so
+rendered camera behavior remains untested.
+
 Validation of this composition passes the toolchain/manual/generated VC6 gate,
 2,977 of 2,988 calibration rows (2,975 distinct source/address/extent cases),
-and all prior strict physics targets, with four additions making 1,080 among
-1,156 comparisons. Both near-miss comparisons report zero drops.
-The recursive reset's strict case moves from FileStream.cpp to
-Parameterblocks.cpp with its address and full 30-byte extent unchanged;
-ShowDialog adds one strict case. The native-enabled Python suite passes
-449 tests with 11 skipped. These counts retain existing nonexact comparisons;
+and all 1,080 prior strict physics targets among 1,156 comparisons.
+Both near-miss comparisons report zero drops. The native-enabled Python suite
+runs 452 tests: 441 pass and 11 are skipped. These counts retain existing nonexact comparisons;
 they do not describe a fully matched or working game.
 
 Other incompatible class views, missing methods and unresolved globals
