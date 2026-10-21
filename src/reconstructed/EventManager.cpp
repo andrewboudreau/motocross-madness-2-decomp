@@ -1,3 +1,4 @@
+#include "BikeRaceCore.h"
 #include "GUIManagerCore.h"
 #include "EventManager.h"
 
@@ -672,7 +673,7 @@ void EventManager::CheckRaceOver(float frameTime) {
             allRacersFinished = 1;
             int iterator = 0;
             UnknownEventRacer* racer;
-            while ((racer = view->NextBike(&iterator)) != 0) {
+            while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
                 if (racer->hasFinished)
                     anyRacerFinished = 1;
                 else if (!racer->outOfRace)
@@ -746,7 +747,7 @@ void EventManager::RankRacers() {
             UnknownEventRanking rankings[11];
             int ranked = 0;
             int next = 0;
-            while ((racer = view->NextBike(&next)) != 0) {
+            while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
                 if (!racer->outOfRace) {
                     rankings[ranked].value = racer->totalRunningTime;
                     rankings[ranked].racer = racer;
@@ -758,7 +759,7 @@ void EventManager::RankRacers() {
                 rankings[i].racer->finishPosition = i + 1;
         }
         iterator = 0;
-        for (racer = view->NextBike(&iterator); racer; racer = view->NextBike(&iterator)) {
+        for (racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator)); racer; racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) {
             results[count].CopyFromRacer(racer);
             if ((g_TrackGame->mode.raceSettings.raceMode == 2 || g_TrackGame->proCircuit) &&
                 !racer->outOfRace)
@@ -771,7 +772,7 @@ void EventManager::RankRacers() {
         UnknownEventScore scores[11];
         int scored = 0;
         int next = 0;
-        while ((racer = view->NextBike(&next)) != 0) {
+        while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
             if (!racer->outOfRace) {
                 scores[scored].value = racer->score;
                 scores[scored].racer = racer;
@@ -782,7 +783,7 @@ void EventManager::RankRacers() {
         for (int i = 0; i < scored; i++)
             scores[i].racer->finishPosition = i + 1;
         next = 0;
-        for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
+        for (racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next)); racer; racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) {
             results[count].CopyFromRacer(racer);
             if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->outOfRace)
                 AddChampionshipPoints(racer, &results[count].points);
@@ -795,7 +796,7 @@ void EventManager::RankRacers() {
             UnknownEventScore scores[11];
             int scored = 0;
             int next = 0;
-            while ((racer = view->NextBike(&next)) != 0) {
+            while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
                 if (!racer->outOfRace) {
                     scores[scored].value = racer->score;
                     scores[scored].racer = racer;
@@ -806,7 +807,7 @@ void EventManager::RankRacers() {
             for (int i = 0; i < scored; i++)
                 scores[i].racer->finishPosition = i + 1;
             next = 0;
-            for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
+            for (racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next)); racer; racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) {
                 results[count].CopyFromRacer(racer);
                 if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->outOfRace)
                     AddChampionshipPoints(racer, &results[count].points);
@@ -816,7 +817,7 @@ void EventManager::RankRacers() {
             UnknownEventScore scores[11];
             int scored = 0;
             int next = 0;
-            while ((racer = view->NextBike(&next)) != 0) {
+            while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
                 if (!racer->outOfRace) {
                     scores[scored].value = racer->totalTagRun;
                     scores[scored].racer = racer;
@@ -827,7 +828,7 @@ void EventManager::RankRacers() {
             for (int i = 0; i < scored; i++)
                 scores[i].racer->finishPosition = i + 1;
             next = 0;
-            for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
+            for (racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next)); racer; racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) {
                 results[count].CopyFromRacer(racer);
                 if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->outOfRace)
                     AddChampionshipPoints(racer, &results[count].points);
@@ -841,7 +842,7 @@ void EventManager::RankRacers() {
         UnknownEventStanding standings[11];
         int next = 0;
         int standing = 0;
-        while ((racer = view->NextBike(&next)) != 0) {
+        while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
             if (!racer->outOfRace) {
                 standings[standing].points = results[standing].points;
                 standings[standing].racer = racer;
@@ -850,7 +851,7 @@ void EventManager::RankRacers() {
         }
         qsort(standings, standing, sizeof(standings[0]), CompareStandings);
         next = 0;
-        while ((racer = view->NextBike(&next)) != 0) {
+        while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&next))) != 0) {
             int i;
             for (i = 0; i < standing; i++) {
                 if (standings[i].racer == racer) {
@@ -899,7 +900,7 @@ void EventManager::CloseRace(int mode) {
             view->youIndicator->Disable();
         int iterator = 0;
         UnknownEventRacer* racer;
-        while ((racer = view->NextBike(&iterator)) != 0)
+        while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0)
             racer->Disable();
         return;
     }

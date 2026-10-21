@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 195 C++ files (176 canonical sources and nineteen
-reviewed candidates) and reaches LINK with 563 unresolved external symbols,
+The 2026-10-21 build compiles 197 C++ files (177 canonical sources and twenty
+reviewed candidates) and reaches LINK with 540 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -270,6 +270,24 @@ Real links after each admission remove one, one and two missing names
 respectively, reaching 563 with no added unresolved dependencies. This is
 bounded behavior and integration evidence, not startup, menu or racing proof.
 
+Five option dialogs now [inherit the supplied synchronization method](DIALOGPROCS.md#inherited-option-dialog-synchronization)
+shown by their retail primary vtables. Removing the incorrect override
+declarations preserves all 593 strict cases in the affected/provider units and
+removes five unresolved names. Seven race consumers now call the canonical
+[`BikeRace::NextBike`](NEXTBIKE_CONNECTIONS.md), closing four more names. The complete class declaration
+is shared through a narrower header; its fields and bases are unchanged.
+Twelve [writable bike-state scalars](KRUSTY_BIKE_STATE.md) provide their exact retail initial values,
+including loader-zeroed storage and the distinction between file initialization
+and later configuration writes. They remove twelve more missing names.
+
+The complete [tooltip and pointer-device helpers](GUI_POINTER_HELPERS.md#functional-build-review)
+are admitted as one explicitly nonexact candidate unit after 19,606 native
+comparisons. Their full 106/52-byte bodies and aggregate relocations remain
+unchanged. Their admission removes two more names. Real links after these four
+slices measure **563 → 558 → 554 → 542 → 540**, with no new unresolved
+dependencies. The game still does not link, so these checks do not establish
+interactive menus or racing.
+
 Validation of this composition passes the toolchain/manual/generated VC6 gate,
 2,975 of 2,986 calibration rows (2,973 distinct source/address/extent cases),
 and all prior strict physics targets, with four additions making 1,080 among
@@ -277,7 +295,7 @@ and all prior strict physics targets, with four additions making 1,080 among
 The recursive reset's strict case moves from FileStream.cpp to
 Parameterblocks.cpp with its address and full 30-byte extent unchanged;
 ShowDialog adds one strict case. The native-enabled Python suite passes
-439 tests with 11 skipped. These counts retain existing nonexact comparisons;
+443 tests with 11 skipped. These counts retain existing nonexact comparisons;
 they do not describe a fully matched or working game.
 
 Other incompatible class views, missing methods and unresolved globals

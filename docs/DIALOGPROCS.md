@@ -91,6 +91,46 @@ Header additions:
 - UIDialog.h, TrackGame.h, KrustyUI.h and JoystickDevice.h: new members.
 - InputDevice.h befriends OptControlsDlg.
 
+### Inherited option-dialog synchronization
+
+Five option-dialog classes inherit the existing `UIDialog::SyncValues`
+implementation at `0x00470050`. Their former declarations incorrectly
+introduced separate overrides with no source definitions. Removing those
+declarations makes the compiled primary vtables refer to the supplied base
+method without adding wrappers or new function bodies.
+
+| RTTI class | Primary vtable | Slot 31 |
+|---|---|---|
+| OptionsDlg | `0x00551b18` | `0x00470050` |
+| GlobalSettingsDlg | `0x00555604` | `0x00470050` |
+| ConfirmRestoreDlg | `0x005559a0` | `0x00470050` |
+| OptAdvancedGraphicsDlg | `0x00555580` | `0x00470050` |
+| OptMessagesDlg | `0x0055570c` | `0x00470050` |
+
+This connection follows decoded RTTI's direct `UIDialog` base at offset zero,
+the primary complete-object locator and slot position, and the complete
+24-byte base implementation. That body invokes the optional callback at
+`+0xd0` with the dialog and synchronization flag. The shared address alone is
+not the inheritance evidence; the class relations and matching slot are also
+required. The other five option-page synchronization overrides remain intact.
+
+`tests/test_dialog_sync_inheritance.py` reparses the pinned retail RTTI and
+slot words, compiles the six affected/provider units with authentic VC6, and
+checks their actual vtable relocations to `UIDialog::SyncValues`. A compile
+fixture checks the inherited member-pointer ownership and all five object
+sizes, including OptionsDlg's first page at `+0x7f58`. All **593 strict
+calibration cases** in those units remain exact, including the complete base
+provider. The real link removes exactly five missing decorated names, reducing
+563 unresolved symbols to 558, with none added. This verifies the source
+connection; interactive menu behavior remains a separate runtime gate.
+
+```powershell
+$env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path
+$env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
+$env:PYTHONPATH = '.'
+python -m unittest discover -s tests -p test_dialog_sync_inheritance.py -v
+```
+
 **dlgprocs.cpp** (`0x0044b0a0..0x00455d9f`, `src/reconstructed/DlgProcs.*`).
 Evidence:
 - **`__FILE__`:** the literal at `0x0056963c`, xrefs `0x0044b317..0x00455151`.

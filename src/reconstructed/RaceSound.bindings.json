@@ -66,7 +66,7 @@
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
   "?SetMemberVolume@SoundGroup@@QAEXJ@Z": "0x00401dd0",
-  "?NextBike@UnknownKrustyBikeView@@QAEPAUUnknownEventRacer@@PAH@Z": "0x004204e0",
+  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0",
   "?FindRaceMode@EventManager@@QAEPAUTrackGameViewOwner@@XZ": "0x0045d2b0",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",

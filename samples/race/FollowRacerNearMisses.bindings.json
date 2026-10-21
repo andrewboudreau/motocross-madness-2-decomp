@@ -13,5 +13,6 @@
   "__real@4@3ff08000000000000000": "0x005505f0",
   "__real@4@3ffac90fd00000000000": "0x0055534c",
   "__real@4@3ffcf000000000000000": "0x00554714",
-  "__real@4@400a9c40000000000000": "0x00550bb8"
+  "__real@4@400a9c40000000000000": "0x00550bb8",
+  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0"
 }

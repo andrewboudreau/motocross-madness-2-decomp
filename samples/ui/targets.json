@@ -1,5 +1,23 @@
 [
   {
+    "source": "GuiPointerHelpers.cpp",
+    "candidate_symbol_contains": "?ShowControlToolTip@ToolTip@@QAEXPAVUnknownGuiControl@@@Z",
+    "target_va": "0x00486b10",
+    "target_size": 106,
+    "expect": "partial",
+    "bindings": "GuiPointerHelpers.bindings.json",
+    "status": "Complete tooltip positioning reviewed with ownership helper in 19606 native scenarios; 106-byte candidate remains nonexact."
+  },
+  {
+    "source": "GuiPointerHelpers.cpp",
+    "candidate_symbol_contains": "?SetPointerDevice@GUIUser@@QAEHPAVGUIInputDevice@@@Z",
+    "target_va": "0x00488120",
+    "target_size": 52,
+    "expect": "partial",
+    "bindings": "GuiPointerHelpers.bindings.json",
+    "status": "Complete pointer ownership reviewed with tooltip helper in 19606 native scenarios; 52-byte candidate remains nonexact."
+  },
+  {
     "source": "UIDialogTick.cpp",
     "candidate_symbol_contains": "?Tick@UIDialog@@UAEHM@Z",
     "target_va": "0x0046ef00",

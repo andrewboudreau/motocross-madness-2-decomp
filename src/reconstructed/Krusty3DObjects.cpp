@@ -1,3 +1,4 @@
+#include "BikeRaceCore.h"
 // Krusty3DObjects.cpp -- reconstruction of part of
 // D:\aardvark\VC\krusty2\Krusty3DObjects.cpp. See Krusty3DObjects.h and
 // docs/KRUSTY3DOBJECTS.md.
@@ -198,7 +199,7 @@ void VisualCue::CollectRacers(UnknownVisualCueView* view) {
     cueRacerCount = 0;
     iterator = 0;
     cueView = view;
-    while ((racer = cueView->NextBike(&iterator)) != 0) {
+    while ((racer = reinterpret_cast<UnknownVisualCueRacer*>(reinterpret_cast<BikeRace*>(cueView)->NextBike(&iterator))) != 0) {
         cueRacers[cueRacerCount] = racer;
         cueRacerCount++;
     }

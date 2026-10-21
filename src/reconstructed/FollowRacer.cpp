@@ -57,8 +57,8 @@ void UnknownTrackGameViewOwnerDc::SetRecorder(KrustyVCR* vcr)
 void TrackGameViewOwner::AnnounceFollowedRacer(UnknownEventRacer* racer, UnknownEventRacer* previous)
 {
     int iterator = 0;
-    for (UnknownEventRacer* other = raceView->NextBike(&iterator); other;
-         other = raceView->NextBike(&iterator)) {
+    for (UnknownEventRacer* other = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator)); other;
+         other = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) {
         if (other == racer)
             continue;
         if (racer)

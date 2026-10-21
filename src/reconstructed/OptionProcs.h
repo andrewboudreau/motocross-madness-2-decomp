@@ -143,7 +143,7 @@ class OptAdvancedGraphicsDlg : public UIDialog {
 public:
     OptAdvancedGraphicsDlg() : UIDialog(1, "OptAdvG.dtm") {}
     virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b26c0
-    virtual void SyncValues(int save);
+    // Slot 31 inherits UIDialog::SyncValues (0x00470050).
 };
 
 // RTTI: OptSoundDlg : UIDialog (vtable 0x00555814; 0x7f58 bytes).
@@ -199,7 +199,7 @@ class OptMessagesDlg : public UIDialog {
 public:
     OptMessagesDlg() : UIDialog(1, "OptMess.dtm") {}
     virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b40a0
-    virtual void SyncValues(int save);
+    // Slot 31 inherits UIDialog::SyncValues (0x00470050).
 };
 
 // The 0x94-byte records at KrustyUI+0x50 (+0x54 counts them) as OptionsDlg
@@ -216,7 +216,7 @@ class OptionsDlg : public UIDialog {
 public:
     OptionsDlg() : UIDialog(1, "OptBase.dtm") {} // SelectGamePicProcs.cpp 0x004f8047 allocates 0x7f70 bytes
     virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b4280
-    virtual void SyncValues(int save);
+    // Slot 31 inherits UIDialog::SyncValues (0x00470050).
     void OpenPage(int page);     // 0x004b4ab0: opens page `page` (0..5)
 
     OptGameSettingsDlg* gameSettingsPage;     // +0x7f58
@@ -233,7 +233,7 @@ class GlobalSettingsDlg : public UIDialog {
 public:
     GlobalSettingsDlg() : UIDialog(1, "GlobSet.dtm") {}
     virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b4e70
-    virtual void SyncValues(int save);
+    // Slot 31 inherits UIDialog::SyncValues (0x00470050).
     void ListOtherProfiles();             // 0x004b51a0: lists the other profiles
 };
 
@@ -242,5 +242,5 @@ class ConfirmRestoreDlg : public UIDialog {
 public:
     ConfirmRestoreDlg() : UIDialog(1, "messbox2.dtm") {}
     virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b5380
-    virtual void SyncValues(int save);
+    // Slot 31 inherits UIDialog::SyncValues (0x00470050).
 };

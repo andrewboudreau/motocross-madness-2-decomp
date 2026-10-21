@@ -1,0 +1,14 @@
+{
+  "?g_kbAllowNegative@@3HA": "0x0056cb5c",
+  "?g_kbAllowWarping@@3HA": "0x0056cb44",
+  "?g_kbExtrapLimit@@3MA": "0x0056cb4c",
+  "?g_kbInterpolate@@3HA": "0x0056cb60",
+  "?g_kbLatencyHiding@@3HA": "0x0056cb3c",
+  "?g_kbLatencyThreshold@@3MA": "0x0056cb50",
+  "?g_kbPadActive@@3HA": "0x0067c3ac",
+  "?g_kbRateLimiting@@3HA": "0x0056cb40",
+  "?g_kbUseExtrapLimit@@3HA": "0x0056cb48",
+  "?g_kbUseLatencyThreshold@@3HA": "0x0067c3a0",
+  "?g_kbUseTimeReceived@@3HA": "0x0056cb58",
+  "?g_kbWarpThreshold@@3MA": "0x0056cb54"
+}

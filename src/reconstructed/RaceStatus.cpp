@@ -274,7 +274,7 @@ int RankByScore(int keepRacing) {
         UnknownKrustyBikeView* view = g_TrackGame->quarryEvent->raceView;
         UnknownEventRacer* racer;
         iterator = 0;
-        for (racer = view->NextBike(&iterator); racer; racer = view->NextBike(&iterator)) {
+        for (racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator)); racer; racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) {
             if (racer->isEnabled) {
                 scores[count].value = racer->score;
                 scores[count].racer = racer;

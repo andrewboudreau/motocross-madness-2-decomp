@@ -42,7 +42,7 @@
   "?Create@ArcadeObject@@QAEPAV1@PAXHHPBDUVector3@@HPAUUnknownArcadeView@@MMME@Z": "0x00401310",
   "?SetPosition@ArcadeObject@@QAEXPBUVector3@@@Z": "0x004014f0",
   "?SetAxes@ArcadeObject@@QAEXPBUVector3@@0HH@Z": "0x00401520",
-  "?NextBike@UnknownVisualCueView@@QAEPAUUnknownVisualCueRacer@@PAH@Z": "0x004204e0",
+  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0",
   "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
   "?ClearScreenRects@D3DIMSoultreeObject@@QAEXXZ": "0x004444e0",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",

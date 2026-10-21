@@ -1,3 +1,4 @@
+#include "BikeRaceCore.h"
 #include "GUIManagerCore.h"
 #include <math.h>
 #include <stdio.h>
@@ -605,7 +606,7 @@ int StatsOverlay::DrawViewModePanel()
     int finished = 0;
     iterator = 0;
     UnknownEventRacer* racer;
-    while ((racer = statsSource->NextBike(&iterator)) != 0) {
+    while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(statsSource)->NextBike(&iterator))) != 0) {
         if (racer->outOfRace)
             finished++;
     }
@@ -717,7 +718,7 @@ int StatsOverlay::DrawRacePanel()
     int finished = 0;
     iterator = 0;
     UnknownEventRacer* racer;
-    while ((racer = statsSource->NextBike(&iterator)) != 0) {
+    while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(statsSource)->NextBike(&iterator))) != 0) {
         if (racer->outOfRace)
             finished++;
     }
@@ -814,7 +815,7 @@ int StatsOverlay::DrawTagStandings()
         UnknownKrustyBikeView* view = g_TrackGame->tagEvent->raceView;
         iterator = 0;
         UnknownEventRacer* racer;
-        while ((racer = view->NextBike(&iterator)) != 0) {
+        while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(view)->NextBike(&iterator))) != 0) {
             scores[count].value = racer->score;
             scores[count].racer = racer;
             count++;
@@ -1196,7 +1197,7 @@ int RadarOverlay::TakeRacers(UnknownKrustyBikeView* view, int a2)
     racerCount = 0;
     iterator = 0;
     radarView = view;
-    while ((racer = radarView->NextBike(&iterator)) != 0) {
+    while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(radarView)->NextBike(&iterator))) != 0) {
         racers[racerCount] = racer;
         racerCount++;
     }

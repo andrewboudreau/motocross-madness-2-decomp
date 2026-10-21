@@ -69,5 +69,6 @@
   "_qsort": "0x00534426",
   "_s_UnknownGlobal68a444": "0x0068a444",
   "_sprintf": "0x00534aaf",
-  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x0050a590"
+  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x0050a590",
+  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0"
 }

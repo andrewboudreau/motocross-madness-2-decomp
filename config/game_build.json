@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/ui/GuiPointerHelpers.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete tooltip placement and pointer ownership helpers pass 19606 native state, coordinate, callback, exception and fault comparisons. VC6 emits the full 106/52-byte extents with 89/46 matching positions; ShowText and real input devices remain outside this scripted boundary test.",
+      "evidence": "docs/GUI_POINTER_HELPERS.md#functional-build-review"
+    },
+    {
       "path": "samples/game/UiInfoNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete defaults reset and data-file lookup pass 21332 native scripted comparisons and 192 actual VC6 CRT file searches. Full retail extents are 427/355 bytes; VC6 emits 427/357 bytes. CD discovery and prompts remain scripted.",

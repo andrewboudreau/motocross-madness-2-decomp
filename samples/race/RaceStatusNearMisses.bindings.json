@@ -52,5 +52,6 @@
   "_kVec3ZAxis": "0x00689c00",
   "_kVec3Zero": "0x00689c10",
   "_qsort": "0x00534426",
-  "_rand": "0x00534c1b"
+  "_rand": "0x00534c1b",
+  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0"
 }

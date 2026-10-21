@@ -1,3 +1,4 @@
+#include "BikeRaceCore.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -169,7 +170,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     enginePresent[1] = 0;
     enginePresent[2] = 0;
     iterator = 0;
-    while ((racer = raceView->NextBike(&iterator)) != 0) {
+    while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) != 0) {
         if (racer->engineSize < 250) {
             enginePresent[0] = 1;
             if (racer == raceView->localRacer)
@@ -478,7 +479,7 @@ void RaceSound::AssignChannels() {
 
     iterator = 0;
     count = 0;
-    while ((racer = raceView->NextBike(&iterator)) != 0) {
+    while ((racer = reinterpret_cast<UnknownEventRacer*>(reinterpret_cast<BikeRace*>(raceView)->NextBike(&iterator))) != 0) {
         engineChannels[count].channelRacer = racer;
         if (racer->engineSize < 250)
             engineChannels[count].engine = 0;

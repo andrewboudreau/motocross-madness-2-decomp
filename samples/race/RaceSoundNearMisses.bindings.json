@@ -125,5 +125,6 @@
   "_s_UnknownVector689bd0": "0x00689bd0",
   "_s_UnknownVector689be0": "0x00689be0",
   "_s_UnknownVector689bf0": "0x00689bf0",
-  "_sprintf": "0x00534aaf"
+  "_sprintf": "0x00534aaf",
+  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0"
 }

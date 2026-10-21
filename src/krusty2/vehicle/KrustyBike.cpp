@@ -1,3 +1,4 @@
+#include "../../reconstructed/BikeRaceCore.h"
 // KrustyBike.cpp -- reconstruction of D:\aardvark\VC\krusty2\KrustyBike.cpp
 // (string 0x0056d3ac, tier 1).
 //
@@ -1197,7 +1198,7 @@ void KrustyBike::Fn_00496E30(int a)
     int cursor = 0;
     KrustyBike* other;
     if (a) {
-        for (other = race->NextBike(&cursor); other; other = race->NextBike(&cursor)) {
+        for (other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor)); other; other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor))) {
             if (other != this)
                 Fn_00496F90(other);
         }
@@ -1209,7 +1210,7 @@ void KrustyBike::Fn_00496E30(int a)
             }
         }
     } else {
-        for (other = race->NextBike(&cursor); other; other = race->NextBike(&cursor)) {
+        for (other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor)); other; other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor))) {
             if (other != this && (!isRemote || !other->isRemote))
                 Fn_00497370(other);
         }
@@ -1322,9 +1323,9 @@ void KrustyCollisionCallbackB(CollisionObject* self, CollisionObject* other)
 KrustyBike* KrustyBike::FindNearestRival(float* outDistance)
 {
     int cursor = 0;
-    KrustyBike* b = race->NextBike(&cursor);
+    KrustyBike* b = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
     while (b && b->outOfRace)
-        b = race->NextBike(&cursor);
+        b = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
     KrustyBike* best = 0;
     float bestSq = 3.4028235e38f;
     while (b) {
@@ -1338,9 +1339,9 @@ KrustyBike* KrustyBike::FindNearestRival(float* outDistance)
                 best = b;
             }
         }
-        b = race->NextBike(&cursor);
+        b = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
         while (b && b->outOfRace)
-            b = race->NextBike(&cursor);
+            b = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
     }
     if (outDistance)
         *outDistance = FastSqrt(bestSq);
@@ -1474,7 +1475,7 @@ int KrustyBike::Tick(float dt)
         int cursor = 0;
         int overlap = 0;
         KrustyBike* bike;
-        for (bike = race->NextBike(&cursor); bike; bike = race->NextBike(&cursor)) {
+        for (bike = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor)); bike; bike = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor))) {
             if (!bike->outOfRace && !bike->UnknownVirtualSlot51() && bike != this) {
                 overlap = ((KbBody*)collisionObject)->TestMeshBounds((KbBody*)bike->collisionObject);
                 if (overlap)

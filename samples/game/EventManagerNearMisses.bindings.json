@@ -89,5 +89,6 @@
   "?FindInputDialog@GUIManager@@QAEPAVUIDialog@@XZ": "0x00485df0",
   "?GetUser@GUIManager@@QAEPAVGUIUser@@H@Z": "0x00486540",
   "?ShowCursors@GUIManager@@QAEXH@Z": "0x00486630",
-  "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70"
+  "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
+  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0"
 }

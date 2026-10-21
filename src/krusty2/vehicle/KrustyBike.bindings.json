@@ -162,7 +162,7 @@
   "?StartAnimatedWreck@Wrecker@@QAEXH@Z": "0x00532220",
   "?StartTumble@Wrecker@@QAEXXZ": "0x00532310",
   "?EndWreck@Wrecker@@QAEXXZ": "0x005327c0",
-  "?NextBike@KbRace@@QAEPAVKrustyBike@@PAH@Z": "0x004204e0",
+  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0",
   "?OrientationAnglesFromVectors@@YAHUVec3@@0PAM111111@Z": "0x004b5a60",
   "?PlaceWheels@Vehicle@@QAEXXZ": "0x00528eb0",
   "?Pop@MemTagStack@@QAEXH@Z": "0x004a2d90",
