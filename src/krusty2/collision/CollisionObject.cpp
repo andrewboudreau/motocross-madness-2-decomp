@@ -5,6 +5,7 @@
 // shape setters pass that string.  The sections below were separate sample files during
 // matching; the section banners keep their original notes.
 #include "../../reconstructed/TrackGameGlobal.h"
+#include "../../reconstructed/ControlInterface.h"
 #include "collision/CollisionObject.h"
 #include "collision/CollisionShapeTests.h"
 #include "broadphase/Quadtree.h"
@@ -649,21 +650,17 @@ void CollisionObject::SyncTransformFromNode()
     }
 }
 
-// 0x0043caa0 (cdecl): true when the input event (arg 3: two ints, code and sub code) matches
-// (code, sub) and the input owner accepts the mask; tier 3 signature.
-int CheckKey(int code, int sub, void* event, int mask);
-
 // 0x00434970: debug-key handling for the collision-tree overlay, then the GameObject base.
 int CollisionObject::OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b)
 {
-    if (CheckKey(10, 0, (void*)a, 0x80)) {
+    if (TestInputEvent(10, 0, a, 0x80)) {
         debugTreeDepth--;
         if (debugTreeDepth < 0)
             debugTreeDepth = 0;
     }
-    if (CheckKey(11, 0, (void*)a, 0x80))
+    if (TestInputEvent(11, 0, a, 0x80))
         debugTreeDepth++;
-    if (CheckKey(0x2e, 0, (void*)a, 0x80)) {
+    if (TestInputEvent(0x2e, 0, a, 0x80)) {
         debugDrawMode++;
         if (debugDrawMode > 7)
             debugDrawMode = 0;

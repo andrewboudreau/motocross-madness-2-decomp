@@ -23,7 +23,7 @@
   "??_C@_0BG@BJHO@PrepareGeometry?5?$CFd?5?$CFd?$AA@": "0x56a594",
   "??_EVisibilityQuadTree@@UAEPAXI@Z": "0x52d3d0",
   "?Record@UnknownPeakHold@@QAEXH@Z": "0x4cb6b0",
-  "?CheckKey@@YAHHHHH@Z": "0x43caa0",
+  "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x43caa0",
   "?CullPolygon@VisibilityClipper@@QAEHPBUVisibilityCamera@@PAUVisibilityCullPoint@@H@Z": "0x0052fac0",
   "?CullQuad@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityBoxVec@@HHHH@Z": "0x0052f4d0",
   "?DebugDraw@VisibilityQuadTreeNode@@QAEXHHHHHPAUVisibilityCamera@@@Z": "0x52e450",

@@ -40,7 +40,7 @@
   "?BuildPointTree@@YAXPAXPAUMatrix4@@00@Z": "0x0042d390",
   "?BuildTriangleMeshTree@@YAXPAXPAUMatrix4@@PAUCollisionVec3@@PBHHHH@Z": "0x0042cc60",
   "?CapsuleTreeQueryWithVertices@@YAHPAUCollisionVec3@@MMPAXPBUMatrix4@@H1@Z": "0x00429890",
-  "?CheckKey@@YAHHHPAXH@Z": "0x0043caa0",
+  "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
   "?CollectNodes@CollisionSourceNode@@QAEXPAHPAPAV1@@Z": "0x004fda60",
   "?CollisionDivide@@YAPAUCollisionVec3@@PAU1@PBU1@M@Z": "0x0043c890",
   "?CollisionHullShape_Free@@YAXPAUCollisionHullShape@@@Z": "0x00431da0",

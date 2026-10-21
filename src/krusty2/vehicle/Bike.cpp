@@ -5,6 +5,7 @@
 #include <string.h>
 #include "vehicle/Bike.h"
 #include "collision/CollisionObject.h"
+#include "collision/CollisionPoint.h"
 #include "../../reconstructed/Wrecker.h"
 
 // The loader compares the wheel names with the library strcmp (0x00536070), not the
@@ -425,9 +426,8 @@ void Bike::UnknownVirtualSlot1(float arg)
 
 // Retail 0x00409a10 is ~Bike's body (reached through the vbase-adjusted deleting destructor
 // 0x0040ca40); ~Vehicle (0x00526380) runs after it.  0x0043a5e0 is CollisionPoint.cpp's
-// RemoveCollisionPoint (collision agent's file): removes a point from a pointer list.
+// RemoveCollisionPoint removes the embedded wheel contact from the pointer list.
 // owner: bracket only (not xref-anchored)
-void BikeRemoveCollisionPoint(SoultreeContact** points, void* point, int* count);   // 0x0043a5e0
 
 Bike::~Bike()
 {
@@ -436,11 +436,13 @@ Bike::~Bike()
     if (poseSmoother)
         delete poseSmoother;
     if (frontWheel)
-        BikeRemoveCollisionPoint(collisionPoints, frontWheel->contactPoint_0x0b8, &collisionPointCount);
+        RemoveCollisionPoint(reinterpret_cast<CollisionPoint**>(collisionPoints),
+                             reinterpret_cast<CollisionPoint*>(frontWheel->contactPoint_0x0b8), &collisionPointCount);
     if (handlebars)
         delete handlebars;
     if (rearWheel)
-        BikeRemoveCollisionPoint(collisionPoints, rearWheel->contactPoint_0x0b8, &collisionPointCount);
+        RemoveCollisionPoint(reinterpret_cast<CollisionPoint**>(collisionPoints),
+                             reinterpret_cast<CollisionPoint*>(rearWheel->contactPoint_0x0b8), &collisionPointCount);
 }
 
 // owner: Bike.cpp (neighbour of slot 1 0x00407630; Bike's __FILE__ xrefs start at 0x00407c3a)
@@ -472,13 +474,10 @@ Bike::Bike(int flags) : GameObject(1), Vehicle(flags)
 }
 
 // ---- the loader (0x004079c0) --------------------------------------------------------------
-// Helpers of LoadBike.  BikeAddContactPoint is CollisionPoint.cpp's AddCollisionPoint
-// (0x0043a330) with the owner node and track typed as this unit passes them.
+// The loader uses the shared CollisionPoint allocation helper. Its final
+// argument retains the 32-bit track/surface-owner address.
 void BikeCollisionCallback(CollisionObject* self, CollisionObject* other);
 void BikeStaticCollisionCallback(CollisionObject* self, CollisionObject* other);
-extern BikeA5F8* __cdecl BikeAddContactPoint(int capacity, SoultreeContact** points, const Vec3* position,
-                                             SoultreeObject* owner, float a4, int* count, float a6,
-                                             SoultreeSlot1f0* track);
 
 // Name/kind table the loader matches the wheel names against.
 struct BikeWheelKind {
@@ -722,12 +721,18 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     Vec3 leftBarEnd = Vec3(-1.305f, 0.225f, -0.228f);
     Vec3 rightBarEnd = Vec3(1.305f, 0.225f, -0.228f);
     Vec3 tailPoint = Vec3(0.0f, 3.345f, -3.206f);
-    leftBarContact = BikeAddContactPoint(collisionPointCapacity, collisionPoints, &leftBarEnd, handlebars->node,
-                                      0.0f, &collisionPointCount, 0.6f, track);
-    rightBarContact = BikeAddContactPoint(collisionPointCapacity, collisionPoints, &rightBarEnd, handlebars->node,
-                                      0.0f, &collisionPointCount, 0.6f, track);
-    tailContact = (int)BikeAddContactPoint(collisionPointCapacity, collisionPoints, &tailPoint, modelNode,
-                                           -0.3f, &collisionPointCount, 0.6f, track);
+    leftBarContact = reinterpret_cast<BikeA5F8*>(AddCollisionPoint(collisionPointCapacity,
+        reinterpret_cast<CollisionPoint**>(collisionPoints), reinterpret_cast<const CollisionVec3*>(&leftBarEnd),
+        reinterpret_cast<CollisionContactOwner*>(handlebars->node), 0.0f, &collisionPointCount, 0.6f,
+        reinterpret_cast<int>(track)));
+    rightBarContact = reinterpret_cast<BikeA5F8*>(AddCollisionPoint(collisionPointCapacity,
+        reinterpret_cast<CollisionPoint**>(collisionPoints), reinterpret_cast<const CollisionVec3*>(&rightBarEnd),
+        reinterpret_cast<CollisionContactOwner*>(handlebars->node), 0.0f, &collisionPointCount, 0.6f,
+        reinterpret_cast<int>(track)));
+    tailContact = reinterpret_cast<int>(AddCollisionPoint(collisionPointCapacity,
+        reinterpret_cast<CollisionPoint**>(collisionPoints), reinterpret_cast<const CollisionVec3*>(&tailPoint),
+        reinterpret_cast<CollisionContactOwner*>(modelNode), -0.3f, &collisionPointCount, 0.6f,
+        reinterpret_cast<int>(track)));
     UnknownVirtualSlot37(1, dustEmitter, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
     UnknownVirtualSlot37(2, dirtChunkEmitter, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
     Vec3 steamOffset = Vec3(0.0f, 2.5f, -2.75f);

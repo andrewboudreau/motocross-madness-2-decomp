@@ -73,4 +73,7 @@ CollisionPoint* AddCollisionPoint(int capacity, CollisionPoint** points, const C
                                   CollisionContactOwner* owner, float a4, int* count, float a6,
                                   int a7);
 
+// 0x0043a5e0: remove the first matching pointer and clear the vacated slot.
+void RemoveCollisionPoint(CollisionPoint** points, CollisionPoint* point, int* count);
+
 #endif

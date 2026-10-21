@@ -193,9 +193,6 @@ struct TerrainQualityEntry {
 extern TerrainQualityEntry* g_pTerrainQualityTable;             // 0x0068a32c
 extern int g_terrainQualityValue;                               // 0x0057471c (Terrain.cpp .data)
 
-// PROVISIONAL: 0x0043caa0 tests an input event; cdecl (kind, 0, event, 0x80) at the call in 0x00508850.
-int TestInputEvent(int kind, int zero, int event, int mask);    // 0x0043caa0 (tier 3 name)
-
 // PROVISIONAL: GameObject::renderContext points at a host object whose +8 member points at a 0x220
 // byte block that 0x00508850 copies to 0x0068a090.
 // Tier 2: retail constructs this global with 0x004bed80 (PCCamera(int), argument 1) and registers

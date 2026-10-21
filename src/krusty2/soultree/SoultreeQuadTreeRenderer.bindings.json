@@ -18,7 +18,7 @@
   "??_R0?AVD3DIMSoultreeObject@@@8": "0x00568970",
   "??_R0?AVGameObject@@@8": "0x00566608",
   "??_R0?AVSoultreeObject@@@8": "0x00568950",
-  "?CheckKey@@YAHHHHH@Z": "0x0043caa0",
+  "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
   "?FindTypeId@TypeRegistry@@QAEDPBD@Z": "0x00521ea0",
   "?TransformVertexGroups@D3DIMSoultreeObject@@QAEXH@Z": "0x00440d40",
   "?SelectLod@D3DIMSoultreeObject@@QAEXHH@Z": "0x00443de0",

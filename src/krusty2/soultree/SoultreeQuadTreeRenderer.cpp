@@ -4,6 +4,7 @@
 // referrer of that string (InsertNodesInQuadtree, RemoveNodesFromQuadtree) or a method of the same class laid out
 // contiguously with them, so the promotion rule is met.
 #include "../../reconstructed/TrackGameGlobal.h"
+#include "../../reconstructed/ControlInterface.h"
 #include "SoultreeQuadTreeRenderer.h"
 #include "core/DebugAlloc.h"
 #include "broadphase/Quadtree.h"
@@ -19,7 +20,6 @@ extern QuadTree* g_collisionQuadTree;                     // 0x0068aba4
 extern SoultreeObject** g_soultreeNodes;     // 0x00689ec4 node array (RegisterNode 0x4fedb0)
 extern int g_soultreeNodeCount;                  // 0x00689ec8
 
-int CheckKey(int key, int a, int b, int flags);  // 0x0043caa0 (cdecl)
 
 // 0x00504490
 SoultreeQuadTreeRenderer::SoultreeQuadTreeRenderer(int flags)
@@ -127,7 +127,7 @@ void SoultreeQuadTreeRenderer::RemoveNodesFromQuadtree()
 // node on (InsertNodesInQuadtree) or, when some are on, off again (RemoveNodesFromQuadtree).
 int SoultreeQuadTreeRenderer::OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b)
 {
-    if ((reinterpret_cast<SoultreeStats*>(g_TrackGame)->debugFlags & 4) && CheckKey(0x2d, 0, (int)a, 0x80)) {
+    if ((reinterpret_cast<SoultreeStats*>(g_TrackGame)->debugFlags & 4) && TestInputEvent(0x2d, 0, a, 0x80)) {
         if (!field_0x34)
             InsertNodesInQuadtree();
         else

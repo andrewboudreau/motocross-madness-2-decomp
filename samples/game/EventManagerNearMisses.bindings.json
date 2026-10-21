@@ -90,5 +90,6 @@
   "?GetUser@GUIManager@@QAEPAVGUIUser@@H@Z": "0x00486540",
   "?ShowCursors@GUIManager@@QAEXH@Z": "0x00486630",
   "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
-  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0"
+  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0",
+  "__FILE__:leaveraceformenu.cpp": "0x0056a940"
 }

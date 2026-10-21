@@ -158,8 +158,11 @@ add.
 Near misses (`samples/game/EventManagerNearMisses.cpp`):
 - `0x0045e710`, which leaves the race for a menu: it restores the UI and
   640x480x16 and shows a `TransDlg` ("Trans.dtm", retail line 1064).
-  454 of 533 bytes; retail picks eax/edx where VC6 here picks ecx/eax
-  after the `new`.
+  454 of 533 bytes against the complete 531-byte retail body; retail picks
+  eax/edx where VC6 here picks ecx/eax after the `new`. The maintained body
+  is in `samples/game/LeaveRaceForMenu.cpp`, included by the aggregate.
+  Its [functional build review](LEAVE_RACE_FOR_MENU.md#functional-build-review)
+  records the full extent, constructor unwind proof and native comparisons.
 
 Slot 24's message layouts live in `EventManager.cpp`, and the GUI page and
 control classes in the near-miss sample. Declaring either in a shared

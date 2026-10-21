@@ -1,5 +1,6 @@
 // VisibilityQuadTree.cpp -- reconstruction of D:\aardvark\VC\krusty2\VisibilityQuadTree.cpp.
 #include "../../reconstructed/TrackGameGlobal.h"
+#include "../../reconstructed/ControlInterface.h"
 #include "visibility/VisibilityQuadTree.h"
 
 // The unit's file statics, in .CRT$XCU order (entries 340-347): an empty
@@ -36,7 +37,6 @@ extern int g_visibilityQueryTicks;         // 0x0068ab88 clock delta around Quer
 // g_visibilityTickStat (0x0068ab90): accumulator fed with the query ticks (defined above).
 
 unsigned int ReadClock();                                        // 0x004bfa80
-int CheckKey(int key, int a, int b, int flags);         // 0x0043caa0 (cdecl, 4 args)
 
 VisibilityQuadTreeNode::VisibilityQuadTreeNode()
 {
@@ -102,11 +102,11 @@ int VisibilityQuadTree::RenderPost3D()
 
 int VisibilityQuadTree::OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b)
 {
-    if (CheckKey(0x44, 0, (int)a, 0x80)) {
+    if (TestInputEvent(0x44, 0, a, 0x80)) {
         g_visibilityDebugDraw = 1 - g_visibilityDebugDraw;
         return 1;
     }
-    if (CheckKey(0x57, 0, (int)a, 0x80)) {
+    if (TestInputEvent(0x57, 0, a, 0x80)) {
         g_visibilityFreeze = 1 - g_visibilityFreeze;
         if (g_visibilityFreeze)
             g_frozenCamera = *View()->camera;

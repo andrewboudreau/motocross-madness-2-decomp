@@ -37,17 +37,20 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 209 C++ files (183 canonical sources and twenty-six
-reviewed candidates) and reaches LINK with 461 unresolved external symbols,
+The 2026-10-21 build compiles 210 C++ files (183 canonical sources and twenty-seven
+reviewed candidates) and reaches LINK with 453 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The final composition in `build-pl4kpvmo` retains all prior strict results:
+The final composition in `build-kngsl_c0` retains all prior strict results:
 2,981/2,992 calibration rows and 1,086/1,162 physics comparisons. This does
 not establish game startup, menus or racing while linkage remains incomplete.
-Regression verification covers 465 tests: 454 passed and eleven skipped.
-The complete run is recorded in `work/game-build/tests-round21.log`.
+Regression verification covers 469 tests: 458 passed and eleven skipped.
+The full run found two partial expectations affected by the verified instruction
+reorder described below; both passed on focused rerun. Logs are
+`work/game-build/tests-round22.log` and
+`work/game-build/race22-sample/regression-tests.log`.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based
@@ -472,6 +475,41 @@ Evidence is in `work/game-build/round21-all-objects.json` and
 2,992 cases, representing 2,978 distinct source/address/extent cases and
 2,972 unique retail address/extent pairs among 2,983 targets. All prior strict
 calibration and physics results remain, with no strict-score near-miss drops.
+
+The [input connections](RACE_INPUT_CONNECTIONS.md) route nine collision,
+terrain and visibility calls to the existing event predicate, **461 → 458**.
+All six complete caller/provider bodies remain strict; 6,720 native cases
+execute the predicate and keyboard modifier helper. The
+[Bike contact connections](BIKE_CONTACT_CONNECTIONS.md) use the existing
+allocation and removal functions, **458 → 456**, preserving Tire's `+0xb8`
+secondary contact pointer and passing 13,056 native helper cases. The
+[race descendant switches](RACE_INPUT_CONNECTIONS.md#named-descendant-switches)
+now use GameObject's existing methods, **456 → 454**; all eighteen calls and
+the complete 5,980-byte BikeRace tick remain strict.
+
+The complete [race-to-menu transition](LEAVE_RACE_FOR_MENU.md#functional-build-review)
+is admitted as reviewed-nonexact after 9,437 native state, callback, allocation,
+fault and unwind cases. Its 533-byte body retains 454 matching positions
+against the complete 531-byte retail body. All sixteen dependency providers
+are strict, but the native comparison scripts those GUI, display, input-method,
+result-recording and audio boundaries. Actual menu/device transitions remain
+untested. The isolated real link removes only LeaveRaceForMenu, **454 → 453**.
+
+This composition preserves all 209 pre-existing objects, 10,427 complete
+nondebug sections and 45,122 relocations under seven documented symbol
+substitutions. Only the transition candidate adds an object. All 210 source
+hashes, 209 header hashes and configuration hashes match the final build.
+Private evidence is `work/game-build/round22-all-objects.json` and
+`round22-link-evidence.json`. All prior strict calibration and physics results
+remain, with no strict-score near-miss drops.
+
+The separate nonexact CreateRacers sample changes one seven-byte window:
+two independent register initializations exchange order. All other bytes and
+relocation destinations are unchanged, with no branch entering that window's
+interior. Its diagnostic comparison changes from 13,396 to 13,390 matching
+positions out of 13,428 bytes. The two partial baseline expectations are
+updated only after verifying equivalent register/flag effects; this sample
+is outside the strict calibration and physics counts.
 
 Other incompatible class views, missing methods and unresolved globals
 continue to block linking. Import

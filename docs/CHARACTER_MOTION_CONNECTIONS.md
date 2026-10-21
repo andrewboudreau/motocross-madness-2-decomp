@@ -58,6 +58,16 @@ Bike methods and five BikeRace sample methods. These fingerprints include full
 candidate lengths, matching-position counts and resolved byte hashes. They
 guard unchanged partial reconstructions, not retail fidelity.
 
+Terrain's canonical input-header dependency changes VC6 scheduling in the nonexact
+`CreateRacers` sample: its 13,428-byte body now has 13,390 matching positions,
+previously 13,396. At offset 538, `xor edi, edi` and `mov ebx, 1` exchange order;
+all other bytes and all relocation destinations remain unchanged. Both orders
+leave the same registers and flags, access no memory, and change no unwind
+state. No decoded direct branch, symbol or relocated pointer enters the changed
+window. The two caller regressions retain the complete updated fingerprint;
+this sample remains nonexact, and no production body was changed to influence
+its scheduling.
+
 The regression compiles actual caller and provider translation units with VC6
 SP3, checks canonical imports and complete provider extents, and rejects the
 three retired imports. The native fixture executes **3,840 cases** covering

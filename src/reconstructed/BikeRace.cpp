@@ -366,19 +366,19 @@ int BikeRace::Tick(float frameTime) {
                                 if (g_TrackGame->eventManager->FindRaceMode()->auralScape != 0) {
                                     g_TrackGame->eventManager->FindRaceMode()->auralScape->Enable();
                                 }
-                                ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->EnableByClassName("SoundGroup");
+                                g_TrackGame->childRoot->EnableByClassName("SoundGroup");
                             }
                             if (g_TrackGame->mode.particlesOn) {
-                                ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->EnableByClassName("ParticleManager");
-                                ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->EnableByClassName("DirtParticleEmitter");
-                                ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->EnableByClassName("DustParticleEmitter");
-                                ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->EnableByClassName("DirtChunkParticleEmitter");
-                                ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->EnableByClassName("SteamParticleEmitter");
+                                g_TrackGame->childRoot->EnableByClassName("ParticleManager");
+                                g_TrackGame->childRoot->EnableByClassName("DirtParticleEmitter");
+                                g_TrackGame->childRoot->EnableByClassName("DustParticleEmitter");
+                                g_TrackGame->childRoot->EnableByClassName("DirtChunkParticleEmitter");
+                                g_TrackGame->childRoot->EnableByClassName("SteamParticleEmitter");
                             }
                             if (g_TrackGame->mode.shadowsOn) {
-                                ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->EnableByClassName("ProjectedShadow");
-                                ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->EnableByClassName("TerrainShadow");
-                                ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->EnableByClassName("D3DIMSoultreeShadow");
+                                g_TrackGame->childRoot->EnableByClassName("ProjectedShadow");
+                                g_TrackGame->childRoot->EnableByClassName("TerrainShadow");
+                                g_TrackGame->childRoot->EnableByClassName("D3DIMSoultreeShadow");
                             }
                         }
                     } else if (appliedReplayMode != replayMode) {
@@ -386,15 +386,15 @@ int BikeRace::Tick(float frameTime) {
                         if (g_TrackGame->eventManager->FindRaceMode()->auralScape != 0) {
                             g_TrackGame->eventManager->FindRaceMode()->auralScape->Disable();
                         }
-                        ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->DisableByClassName("SoundGroup");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->DisableByClassName("ParticleManager");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->DisableByClassName("DirtParticleEmitter");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->DisableByClassName("DustParticleEmitter");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->DisableByClassName("DirtChunkParticleEmitter");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->DisableByClassName("SteamParticleEmitter");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->DisableByClassName("ProjectedShadow");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->DisableByClassName("TerrainShadow");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->DisableByClassName("D3DIMSoultreeShadow");
+                        g_TrackGame->childRoot->DisableByClassName("SoundGroup");
+                        g_TrackGame->childRoot->DisableByClassName("ParticleManager");
+                        g_TrackGame->childRoot->DisableByClassName("DirtParticleEmitter");
+                        g_TrackGame->childRoot->DisableByClassName("DustParticleEmitter");
+                        g_TrackGame->childRoot->DisableByClassName("DirtChunkParticleEmitter");
+                        g_TrackGame->childRoot->DisableByClassName("SteamParticleEmitter");
+                        g_TrackGame->childRoot->DisableByClassName("ProjectedShadow");
+                        g_TrackGame->childRoot->DisableByClassName("TerrainShadow");
+                        g_TrackGame->childRoot->DisableByClassName("D3DIMSoultreeShadow");
                     }
                 }
                 if (!g_TrackGame->playingReplay && isRacing) {

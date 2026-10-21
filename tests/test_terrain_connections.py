@@ -28,10 +28,10 @@ PROVIDERS = (
 # relocation records are hashed because QueryGround still has unbound helpers.
 # This is deliberately not a successful retail comparison of either function.
 PARTIAL = (
-    # Shared sampling declarations rename the loader's local EH label to
-    # $L5863, still section 29 +182. terrain-math-round21-preservation.json
+    # Shared input declarations rename the loader's local EH label to
+    # $L6028, still section 29 +182. race-tree-round22-all-objects.json
     # proves every section byte and relocation destination is unchanged.
-    ('?Load@Terrain@@', 2117, '476cce82cf4fb10a2e10129b8e05c9b2c3548a9f9f11df9c408fcb2d58ff3c3a'),
+    ('?Load@Terrain@@', 2117, '0ebbdea8152eaa172d03fb2c94e5db58cda243da854f2f28deb225c36380d38f'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with

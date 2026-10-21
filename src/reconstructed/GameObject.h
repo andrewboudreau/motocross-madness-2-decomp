@@ -113,6 +113,7 @@ protected:
     friend class StatsOverlay; // reads its racers' +0x25 bit 0 (0x00519a20)
     friend class RadarOverlay; // reads its racers' +0x25 bit 0 (0x0051bed0)
     friend class Wrecker;   // clears its rigid body's +0x25 bit 0 (0x005327c0)
+    friend class BikeRace; // toggles named sound/effect children (0x0041d2b0)
     friend class RaceSound; // turns the "SoundGroup" children off (0x004e3430)
     friend class GUIManager; // reads a dialog's +0x25 bit 0 (0x00485bd0)
     friend class GUIUser;   // reads a control's +0x25 bit 3 and +0x28 (0x00487730, 0x00487800)

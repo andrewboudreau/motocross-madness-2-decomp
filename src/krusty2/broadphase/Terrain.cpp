@@ -1,5 +1,6 @@
 // Terrain.cpp -- reconstruction of D:\aardvark\VC\krusty2\Terrain.cpp.
 #include "../../reconstructed/TrackGameGlobal.h"
+#include "../../reconstructed/ControlInterface.h"
 #include "Terrain.h"
 #include "../../reconstructed/AgeManager.h"
 #include "../../reconstructed/ManagedTexture.h"
@@ -719,13 +720,13 @@ int g_terrainToggle718;
 // each flip one toggle and return 1 (tier 3 semantics).
 int Terrain::OnControlPress(UnknownControlEvent* event, UnknownInputEntry*)
 {
-    if (TestInputEvent(0x43, 0, (int)event, 0x80)) {
+    if (TestInputEvent(0x43, 0, event, 0x80)) {
         g_terrainToggle314 = 1 - g_terrainToggle314;
         if (g_terrainToggle314)
             g_terrainSharedState = *((TerrainHost*)renderContext)->sharedState;
         return 1;
     }
-    if (TestInputEvent(2, 0, (int)event, 0x80)) {
+    if (TestInputEvent(2, 0, event, 0x80)) {
         if (g_terrainQualityValue && canSinglePassDual) {
             lowestQualityOverride = 1 - lowestQualityOverride;
             if (lowestQualityOverride) {
@@ -737,7 +738,7 @@ int Terrain::OnControlPress(UnknownControlEvent* event, UnknownInputEntry*)
         g_terrainQualityValue = 1 - g_terrainQualityValue;
         return 1;
     }
-    if (TestInputEvent(3, 0, (int)event, 0x80)) {
+    if (TestInputEvent(3, 0, event, 0x80)) {
         g_terrainToggle718 = 1 - g_terrainToggle718;
         return 1;
     }

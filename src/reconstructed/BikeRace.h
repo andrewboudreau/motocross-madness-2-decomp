@@ -796,15 +796,6 @@ struct UnknownBikeRaceUiChoice {
     int fourStroke;                           // +0x90 four-stroke flag (KrustyUI "BikeFourStroke_%02d")
 };
 
-// Game+0x34, the second root object, seen for GameObject's name switches
-// 0x00468dd0 and 0x00468f10 (protected in GameObject.h), which slot 10
-// applies to the sound and effect children by name.
-class UnknownBikeRaceRoot {
-public:
-    void DisableByClassName(const char* name);
-    void EnableByClassName(const char* name);
-};
-
 // The highlighted row of the "Soultree LOD (%s)" debug page (0x00567a88):
 // SetRowHighlight marks row + 1, the arrow keys act on it and Enter (0x1c)
 // advances it, wrapping back to 2.
