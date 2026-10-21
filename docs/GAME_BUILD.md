@@ -66,7 +66,8 @@ nonexact candidate in `samples/`, explicitly included after a native
 720-scenario differential test against retail. This is behavioral evidence;
 its 1006 emitted bytes still differ from the 1011-byte retail body.
 
-Fourteen [provisional views](TRACKGAME_GLOBAL.md) now read the same `g_TrackGame` pointer defined by
+Thirteen [provisional views](TRACKGAME_GLOBAL.md) and the BikeAI sample, which reads the complete
+`TrackGame`, now use the same `g_TrackGame` pointer defined by
 MSZoneInterface, eliminating ten unresolved names in the current build. The
 views still describe only the offsets each caller uses; their consolidation
 does not establish complete class layouts. Vehicle's steering state now uses

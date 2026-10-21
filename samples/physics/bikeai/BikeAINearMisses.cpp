@@ -122,9 +122,14 @@
 // candidate's are constant-folded), the order of a few temporaries and stores
 // (0x00411dbc vF += (commuted operands), 0x00412883), and the frame layout.
 //
+// The game reads (race kind, tree collision, object root, difficulty, race mode) go
+// through the complete TrackGame class, with no view cast: aligned 3731 of 3966, frame
+// 0x968 vs 0x93c (the cast views gave 3402; the frame figures above predate the shared
+// g_TrackGame pointer).
+//
 // 0x00413160 (Vec3::operator-=, 33 bytes) is the out-of-line COMDAT that VC6 emits
 // right after 0x0040eca0 for its epilogue; this file reproduces it strict exact.
-#include "../../../src/reconstructed/TrackGameGlobal.h"
+#include "../../../src/reconstructed/TrackGame.h"
 #include "../../../src/krusty2/vehicle/BikeAI.cpp"
 #include "vehicle/KrustyBike.h"
 #include "collision/CollisionObject.h"
@@ -135,17 +140,6 @@
 
 // The AI racing line UnknownBikeAIPath is declared in vehicle/KrustyBikeTypes.h
 // (KrustyBike+0x838 holds one).
-
-// View of the game object at 0x0056e26c (TrackGame in src/reconstructed): the object tree
-// root, the race kind and the +0x2d80 flag are read here.
-struct UnknownBikeAIGameView {
-    char pad_0x0000[0x34];
-    GameObject* root;   // +0x34 root of the object tree (GameObjectIterator walk in 0x00415640)
-    char pad_0x0038[0x2d74 - 0x38];
-    int raceKind;       // +0x2d74
-    char pad_0x2d78[0x8];
-    int field_0x2d80;   // +0x2d80 nonzero: vegetation is avoided too (0x00410a2a)
-};
 
 // 0x0047b800 (cdecl, after gameui.cpp): 2D (x, z) intersection of the line a + s*da
 // with the line b + u*db; writes s and u, returns 0 when they do not intersect
@@ -242,7 +236,7 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         }
         int index = best;
         float ahead = path->lookAhead;
-        int kind = reinterpret_cast<UnknownBikeAIGameView*>(g_TrackGame)->raceKind;
+        int kind = g_TrackGame->mode.raceSettings.eventType;
         if (kind == 2 || kind == 3)
             ahead += (offset < 0.0f ? -offset : offset);
         seg = path->points[index + 1] - path->points[index];
@@ -860,7 +854,7 @@ int QuerySegmentObstacles(Vec3* seg, float radius, int skipVegetation, int ignor
         }
         g_collisionQuadTree->EndQuery();
     } else {
-        GameObjectIterator* it = new(__FILE__, 0xb24) GameObjectIterator(reinterpret_cast<UnknownBikeAIGameView*>(g_TrackGame)->root, 1, "CollisionObject");
+        GameObjectIterator* it = new(__FILE__, 0xb24) GameObjectIterator(g_TrackGame->childRoot, 1, "CollisionObject");
         CollisionObject* obj;
         while ((obj = (CollisionObject*)it->Next()) != 0) {
             if (!obj->shape)
@@ -1194,7 +1188,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                 Vec3 push;
                 Vec3 avoidPoint;
                 float avoidDist;
-                if (QuerySegmentObstacles(seg, 2.0f, reinterpret_cast<UnknownBikeAIGameView*>(g_TrackGame)->field_0x2d80 == 0, probe->ignoreCount,
+                if (QuerySegmentObstacles(seg, 2.0f, g_TrackGame->mode.raceSettings.treeCollision == 0, probe->ignoreCount,
                                           (CollisionObject**)probe->ignoreList, speedF, &push, &avoidPoint,
                                           &avoidDist, nearOnly)
                     && !(push.x == 0.0f && push.z == 0.0f)) {
@@ -1219,7 +1213,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                     aim.y = 0.0f;
                     aim = SafeNormalize(aim);
                 }
-                int kind = reinterpret_cast<UnknownBikeAIGameView*>(g_TrackGame)->raceKind;
+                int kind = g_TrackGame->mode.raceSettings.eventType;
                 if (kind == 5 || kind == 1) {
                     flatFwd = vF;
                     flatFwd.y = 0.0f;
@@ -1230,7 +1224,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                 Vec3 dv = avoidPoint + aim * flatSpeed - vF;
                 dv.y = 0.0f;
                 float dvLen = BikeAILengthCall(dv);
-                kind = reinterpret_cast<UnknownBikeAIGameView*>(g_TrackGame)->raceKind;
+                kind = g_TrackGame->mode.raceSettings.eventType;
                 if (kind == 5 || kind == 1) {
                     float limit = speedF * 0.2f;
                     if (dvLen > limit)
@@ -1888,8 +1882,8 @@ int KrustyBike::Fn_00414370(float dt)
     memset(&aiPath, 0, sizeof(aiPath));
     list = 0;
     dummy = 0;
-    int difficulty = reinterpret_cast<KbGame*>(g_TrackGame)->difficulty;
-    int kind = reinterpret_cast<KbGame*>(g_TrackGame)->eventType;
+    int difficulty = g_TrackGame->mode.difficulty;
+    int kind = g_TrackGame->mode.raceSettings.eventType;
     if (kind != 3 && kind != 2) {
         if (kind != 1 && kind != 5) {
             aiPath.count = 1;
@@ -2061,11 +2055,11 @@ int KrustyBike::Fn_00414370(float dt)
                 aiPath.count = 1;
                 aiPath.points[0] = linearSpeed * bodyForward + position;
             }
-            if (!reinterpret_cast<KbGame*>(g_TrackGame)->raceMode)
+            if (!g_TrackGame->mode.raceSettings.raceMode)
                 aiOffTrackTime = 0.0f;
         } else {
             count = 1;
-            if (!reinterpret_cast<KbGame*>(g_TrackGame)->raceMode) {
+            if (!g_TrackGame->mode.raceSettings.raceMode) {
                 aiOffTrackTime += dt;
                 if (aiOffTrackTime >= 5.0f) {
                     UnknownVirtualSlot11(count, &a, &b, &c, &dummy);
