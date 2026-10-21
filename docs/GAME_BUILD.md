@@ -41,63 +41,57 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 265 C++ files (209 canonical sources and 56
-reviewed candidates) and reaches LINK with 210 unresolved external symbols,
+The 2026-10-21 build compiles 266 C++ files (210 canonical sources and 56
+reviewed candidates) and reaches LINK with 208 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The current
-run is `work/game-build/build-piwu0zg2`; its `link.log` is authoritative.
+run is `work/game-build/build-jwoie6g6`; its `link.log` is authoritative.
 
-The [vegetation placement slice](VEGETATION_COLLISION_OBJECT.md) connects the
-remaining query call through the genuine primary Vegetation declaration and
-admits its complete reviewed nonexact implementation. The source emits 384 bytes
-with 103 resolved matching positions against the full 386-byte retail target.
-Its native test executes actual parameter and math helpers in 39,936 finite
-cases, including 3,048 access faults. It does not establish complete construction,
-arbitrary floating-point values or integrated gameplay.
+The [texture-history timer](TEXTURE_HISTORY_TIMER.md) supplies the existing
+UnknownTimer(int) constructor at all three embedded ManagedTextureGroup sites.
+Its complete 30-byte body matches strictly and calls the existing strict
+ReadClock helper. Existing class declarations remain unchanged. The retained
+test checks the complete factory/owner chain, eight strict checks and four
+whole objects, plus 3,072 real-clock calls (1,024 exact write faults) and 128
+controlled platform-boundary calls (96 exceptions). These are finite storage
+and call-boundary observations, not a full texture-manager lifetime test.
 
-The hull path exposed an existing SetTransform addition-order error. Ordinary
-C++ parentheses now reproduce the decoded x87 grouping. A symbolic stack check
-verifies all sixteen arithmetic expressions and store order; the retained original
-source must still fail at the exact known one-bit result difference. SetTransform
-remains nonexact at 1,684 bytes against 1,676 retail bytes. Its partial score
-changes explicitly from 902 to 890 matching positions. Every other nondebug
-section in the canonical and aggregate objects is preserved. A separate later
-instruction-scheduling window preserves ordinary register/stack effects; complete
-exception-context resumption is not claimed.
+The [EcoSystem light connection](ECO_LIGHT_CONNECTIONS.md) corrects the existing
+lookup return declaration to LightEmitter*. Three explicit casts preserve the
+caller's bounded provisional prefix view. Actual primary constructors, stored
+pointers and all three calls establish the connection; the existing class
+views are not asserted to be interchangeable whole types. Thirteen complete
+objects retain 1,196 sections and 6,093 relocations under exactly one name.
+The retained suite checks 75 strict comparisons and 4,480 native scenarios, including
+192 independently modeled faults, using actual lookup and append helpers.
 
-The [gameplay defaults](GAMEPLAY_DEFAULTS.md) supply three independently identified
-existing declarations: the handlebar-view destructor, engine-state-view destructor
-and race callback. Their complete 1/1/3-byte bodies match strictly. Actual owning
-virtual-base receivers, subordinate pointers and primary callback calls establish
-the boundaries; shared tiny addresses do not establish class equivalence. Genuine
-declarations move verbatim into narrow headers. Nine existing consumer objects
-retain all 1,072 sections and 5,226 relocations, and 211 strict checks plus 3,072
-native calls pass. The new object has no imports, data or CRT initialization.
+The isolated real links remove exactly two names: **210 -> 209 -> 208**, with
+none added. The timer step preserves all 265 prior production objects, 10,713
+nondebug sections and 45,818 relocations without mappings. The light step
+preserves all 266 prior objects, 10,715 sections and 45,819 relocations under
+the single lookup name. Neither proof excludes filenames. Actual game-command
+objects and all 266 source hashes, 238 header hashes, configuration, compiler
+profile and per-source flags are checked. No compiler flags change.
 
-Isolated real links remove exactly four names: **214 -> 213 -> 210**, with none
-added. The first step accounts for all 263 prior production objects, 10,707
-nondebug sections and 45,813 relocations: under the single query call-name change,
-only the complete SetTransform section differs, with flags and relocation records
-unchanged. The second step preserves all 264 prior objects, 10,709 sections and
-45,818 relocations with no mappings. Neither proof excludes filenames. Actual
-game-command objects reproduce the reviewed candidate and strict defaults.
-The final report verifies 265 source hashes, 238 header hashes, configuration,
-compiler profile and per-source flags. No compiler flags change.
+Calibration passes **3,023/3,034** strict rows (3,007 distinct source/address/
+extent cases). The **2,980/2,990** unique retail address/extent count is unchanged
+because the timer constructor address already had another source view.
+Physics retains **1,086/1,162** strict comparisons. Every old row retains its
+full extent and resolved matching-position count; no strict result is lost
+and no partial score decreases. The two prior nonexact physics binding
+diagnostics remain unchanged and excluded from strict counts.
 
-Calibration passes **3,022/3,033** strict rows (3,006 distinct source/address/
-extent cases); the **2,980/2,990** unique retail address/extent count is unchanged.
-Physics retains **1,086/1,162** strict comparisons. Every prior strict match is
-preserved. A row-by-row comparison confirms the canonical SetTransform row is
-the only changed old matrix result; retained tests separately pin the same
-correction in both canonical and aggregate objects. The two prior nonexact
-physics binding diagnostics remain unchanged and excluded from strict counts.
+Portable retained pins now enumerate the exact additional ContainerList.h
+filename spellings emitted by their consumers. Old private pins were reproduced
+before this test-metadata repair, then complete cross-root views were compared.
+The four older EcoSystem pins were independently reproduced before applying
+only the verified lookup-name correction; other records retain their old pins.
 
-Evidence is in `work/game-build/round56-runtime-proof.json`,
-`round56-gameplay-proof.json`, `connections-round56-preservation.json` and
-`round56-row-score-preservation.json`. Static checks pass for 279 Python and
-427 JSON files. Full regression: 562 tests, 551 passed and 11 skipped
-(`work/game-build/tests-round56-final.log`). The game still does not link;
-startup, integrated menus and racing remain unverified.
+Evidence is in `work/game-build/round57-timer-proof.json`, `round57-light-proof.json`,
+`connections-round57-preservation.json` and `round57-row-score-preservation.json`.
+Static checks pass for 281 Python and 430 JSON files. Full regression: 564 tests,
+553 passed and 11 skipped (`work/game-build/tests-round57-final.log`). The game
+still does not link; startup, integrated menus and racing remain unverified.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

@@ -174,7 +174,7 @@
   "?FilePrintf@@YAHPAU_iobuf@@PBDZZ": "0x00461d40",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?ReadIniFloat@@YAMPBD0N0@Z": "0x0047b8a0",
-  "?FindLightOfType@LightManager@@QAEPAVUnknownEcoLight@@H@Z": "0x004a0190",
+  "?FindLightOfType@LightManager@@QAEPAVLightEmitter@@H@Z": "0x004a0190",
   "?Attach@UnknownParameterBlock@@QAEXPAVUnknownTextureStream@@HH@Z": "0x004b77a0",
   "?SelectSection@UnknownParameterBlock@@QAEHPBD@Z": "0x004b78f0",
   "?ReadString@UnknownParameterBlock@@QAEHPBDPADH@Z": "0x004b7b30",

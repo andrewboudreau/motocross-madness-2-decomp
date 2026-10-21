@@ -942,7 +942,7 @@ done:
 
 // 0x0045a9a0
 void EcoSystem::LightingChanged() {
-    UnknownEcoLight* light = lightManager->FindLightOfType(6);
+    UnknownEcoLight* light = reinterpret_cast<UnknownEcoLight*>(lightManager->FindLightOfType(6));
     if (light) {
         ambientLight.x = light->colour[0];
         ambientLight.y = light->colour[1];
@@ -952,9 +952,9 @@ void EcoSystem::LightingChanged() {
         ambientLight.y = 0.0f;
         ambientLight.x = 0.0f;
     }
-    light = lightManager->FindLightOfType(4);
+    light = reinterpret_cast<UnknownEcoLight*>(lightManager->FindLightOfType(4));
     if (!light) {
-        light = lightManager->FindLightOfType(2);
+        light = reinterpret_cast<UnknownEcoLight*>(lightManager->FindLightOfType(2));
         if (!light) {
             lightColor.z = 0.0f;
             lightColor.y = 0.0f;

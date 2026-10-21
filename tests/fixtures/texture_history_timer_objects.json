@@ -1,0 +1,25 @@
+{
+  "objects": {
+    "src/reconstructed/ManagedTextureGroup.cpp": {
+      "sections": 50,
+      "relocations": 239,
+      "sha256": "e9ee468816ada0dfdffed36bc51cc5ea5ea7bba651a070f46e5cdf8d434a59ec"
+    },
+    "samples/render/ManagedTextureGroupNearMisses.cpp": {
+      "sections": 36,
+      "relocations": 275,
+      "sha256": "49fb4c22f1da43568db961c0b21a5a3052be1c56a87bbce2b8d23613619333e9"
+    },
+    "src/reconstructed/SceneManager.cpp": {
+      "sections": 272,
+      "relocations": 1273,
+      "sha256": "70bfbb8b2e0aba03a6108d91e7cca3c90d17b5585ef95681f41c5c5d4c28283f"
+    },
+    "src/reconstructed/ProCircuitProcs.cpp": {
+      "sections": 334,
+      "relocations": 2083,
+      "sha256": "c3ac3bec1cf278f2d060dcd1f987ea7c57d4b96007166650fd0d83c94e8469ee"
+    }
+  },
+  "note": "Four same-path old objects independently preserved with no symbol joins. Portable pins normalize only these four source filenames and the two exact canonical/sample-relative ContainerList.h spellings; old private pins were reproduced before the exact header-filename portability repair, and all four live-root objects equal the private mirror under this normalization."
+}

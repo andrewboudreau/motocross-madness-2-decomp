@@ -1,5 +1,5 @@
 {
-  "baseline": "Published ed3d06ce same-path complete objects; all nondebug bytes and relocation destinations preserved under exactly these six interface names. Only enumerated complete source paths are portable. Insert remains complete627/620 nonexact. The frozen visibility camera now uses actual PCCamera storage: its old complete pin was independently reproduced first; three names join the same lifecycle/storage, with one exact implicit destructor COMDAT (5 code bytes plus 11 alignment NOPs) and the cleanup reference resolving to that definition. All 87 old sections and 341 relocations otherwise preserve their bytes and destinations.",
+  "baseline": "Published ed3d06ce same-path complete objects; all nondebug bytes and relocation destinations preserved under exactly these six interface names. Only enumerated complete source paths are portable. Insert remains complete627/620 nonexact. The frozen visibility camera now uses actual PCCamera storage: its old complete pin was independently reproduced first; three names join the same lifecycle/storage, with one exact implicit destructor COMDAT (5 code bytes plus 11 alignment NOPs) and the cleanup reference resolving to that definition. All 87 old sections and 341 relocations otherwise preserve their bytes and destinations. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the UnknownEcoLight*-to-LightEmitter* method-return spelling. All other records unchanged.",
   "renames": {
     "?ComputeCode@UnknownEcoQuadTree@@QAEIMMMM@Z": "?ComputeCode@QuadTree@@QAEIMMMM@Z",
     "?Insert@UnknownEcoQuadTree@@QAEXPAVUnknownEcoQuadTreeObject@@IMM@Z": "?Insert@QuadTree@@QAEXPAVQuadTreeObject@@IMM@Z",
@@ -12,7 +12,7 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "354bb5c1ed552f8149b33035d8b48d74cf84d3d672af7fc3b2218a92077bc96f"
+      "sha256": "bee71269987ec98dd50c2343ae52dc7d0c2e0eeab9cf1b4214e8aa81cf283f0d"
     },
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,

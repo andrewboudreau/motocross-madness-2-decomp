@@ -1,5 +1,5 @@
 {
-  "baseline": "Private round54 same-path four complete objects; all bytes/flags/addends/destinations preserved under only these three names. Only exact enumerated source filename prefixes are portable. Refresh published baseline before admission. Round56 private composition independently reproduces these old pins; one GetObject-to-GetCollisionObject primary call rename and the independently validated complete SetTransform arithmetic repair are then applied. All other sections and relocation destinations remain preserved.",
+  "baseline": "Private round54 same-path four complete objects; all bytes/flags/addends/destinations preserved under only these three names. Only exact enumerated source filename prefixes are portable. Refresh published baseline before admission. Round56 private composition independently reproduces these old pins; one GetObject-to-GetCollisionObject primary call rename and the independently validated complete SetTransform arithmetic repair are then applied. All other sections and relocation destinations remain preserved. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the UnknownEcoLight*-to-LightEmitter* method-return spelling. All other records unchanged.",
   "renames": {
     "?GetObjectCount@CollisionVegetation@@QAEHXZ": "?GetCollisionCount@Vegetation@@QAEHXZ",
     "?GetRadius@CollisionVegetation@@QAEMXZ": "?GetRadius@Vegetation@@QAEMXZ",
@@ -19,7 +19,7 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "354bb5c1ed552f8149b33035d8b48d74cf84d3d672af7fc3b2218a92077bc96f"
+      "sha256": "bee71269987ec98dd50c2343ae52dc7d0c2e0eeab9cf1b4214e8aa81cf283f0d"
     },
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,

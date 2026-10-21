@@ -106,9 +106,10 @@ public:
     unsigned char field_0x64[0x70 - 0x64];
     Vector3 direction;                        // +0x70
 };
+class LightEmitter;
 class LightManager {
 public:
-    UnknownEcoLight* FindLightOfType(int type); // 0x004a0190: first light of `type`
+    LightEmitter* FindLightOfType(int type); // 0x004a0190: first light of `type`
 };
 
 // RenderTarget.h: the view at GameObject+0x18 and its Camera (+0x08).

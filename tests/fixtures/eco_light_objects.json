@@ -1,0 +1,507 @@
+{
+  "baseline": "Published dfdf98230fff5c3ccead8e21a82acc4eebc5b3b9: complete same-path before/after objects preserve all payloads, flags, addends and destinations under precisely one return-type symbol mapping. Only enumerated filenames are normalized in these portable retained pins. Explicit ContainerList.h filename normalization repairs the sole cross-root SceneManager pin difference; all thirteen original private pins were reproduced before repair, and complete cross-root rows then match.",
+  "renames": {
+    "?FindLightOfType@LightManager@@QAEPAVUnknownEcoLight@@H@Z": "?FindLightOfType@LightManager@@QAEPAVLightEmitter@@H@Z"
+  },
+  "objects": {
+    "src/reconstructed/EcoSystem.cpp": {
+      "sections": 132,
+      "relocations": 720,
+      "sha256": "bee71269987ec98dd50c2343ae52dc7d0c2e0eeab9cf1b4214e8aa81cf283f0d"
+    },
+    "src/reconstructed/LightEmitter.cpp": {
+      "sections": 57,
+      "relocations": 172,
+      "sha256": "41c790eaf9d623b2f5c54ace757375c410e191462c6530b458df411fe84bdd99"
+    },
+    "src/reconstructed/SceneManager.cpp": {
+      "sections": 272,
+      "relocations": 1273,
+      "sha256": "70bfbb8b2e0aba03a6108d91e7cca3c90d17b5585ef95681f41c5c5d4c28283f"
+    },
+    "src/reconstructed/KrustyUI.cpp": {
+      "sections": 296,
+      "relocations": 1722,
+      "sha256": "e0a9f4311077bf4ad790899457d4a02c326546a309a9a18d0624437f991d8833"
+    },
+    "src/reconstructed/QuarryStuntEvent.cpp": {
+      "sections": 86,
+      "relocations": 393,
+      "sha256": "21f1fc43eb8d2dd11a7b0ab2b6c514d5f596ff26aabdc1fd78d34a3a742a319c"
+    },
+    "src/reconstructed/ArcadeObject.cpp": {
+      "sections": 32,
+      "relocations": 127,
+      "sha256": "e82e48c1c21df0d28aec4843180877f705d28c4e2b4360f386d33a93b8b8547f"
+    },
+    "src/reconstructed/D3DIMSoultreeModifier.cpp": {
+      "sections": 23,
+      "relocations": 75,
+      "sha256": "80a55fd012f2204870c8d6bec641496654ec6b21ca35c76bbdf532bd0ffed779"
+    },
+    "samples/ecosystem/EcoSystemNearMisses.cpp": {
+      "sections": 98,
+      "relocations": 444,
+      "sha256": "a4edaa1d283330a35b29e49adddfeaf0d2a821c5e35909f5084bb856a50c5159"
+    },
+    "samples/ecosystem/VegetationCollisionObject.cpp": {
+      "sections": 2,
+      "relocations": 5,
+      "sha256": "a5eb97359de774d8b615e52b3b6c62acabe1e283a0ac28058a37744b12024a84"
+    },
+    "samples/track/SceneManagerNearMisses.cpp": {
+      "sections": 96,
+      "relocations": 484,
+      "sha256": "8d19f0c77ce7255d02b063447df46fe777e85d67f5ad3cc99c7617160ff57776"
+    },
+    "samples/render/D3DIMSoulTreeNearMisses.cpp": {
+      "sections": 29,
+      "relocations": 148,
+      "sha256": "3c81985425dc9a87e2913d96652e180416fdfcfcf75bfb6b7f1d36219f0fc160"
+    },
+    "samples/game/QuarryStuntEventNearMisses.cpp": {
+      "sections": 23,
+      "relocations": 95,
+      "sha256": "2424e484c913dbfbb28a6ee2e5770287610a9ca2d9996a341cf879f3e2327e27"
+    },
+    "samples/game/QuarryStuntEventLoaderNearMiss.cpp": {
+      "sections": 50,
+      "relocations": 435,
+      "sha256": "5bb960c06667e9194204770be6f60a48ec775d2d6e73f2905ea205aa8c6877e3"
+    }
+  },
+  "strict_cases": [
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "_$E2",
+      "va": "0x0049dd30",
+      "size": 5
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "_$E1",
+      "va": "0x0049dd40",
+      "size": 60
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "_$E5",
+      "va": "0x0049dd80",
+      "size": 5
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "_$E4",
+      "va": "0x0049dd90",
+      "size": 60
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "_$E8",
+      "va": "0x0049ddd0",
+      "size": 5
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "_$E7",
+      "va": "0x0049dde0",
+      "size": 60
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "_$E11",
+      "va": "0x0049de20",
+      "size": 5
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "_$E10",
+      "va": "0x0049de30",
+      "size": 60
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "?SetRgbColor@UnknownLightEmitterTarget@@QAEXI@Z",
+      "va": "0x0049de70",
+      "size": 18
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "?SetPosition@UnknownLightEmitterTarget@@QAEXPBUVector3@@@Z",
+      "va": "0x0049de90",
+      "size": 29
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "??0LightEmitter@@QAE@H@Z",
+      "va": "0x0049deb0",
+      "size": 227
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "??_GLightEmitter@@UAEPAXI@Z",
+      "va": "0x0049dfa0",
+      "size": 30
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "??1LightEmitter@@UAE@XZ",
+      "va": "0x0049dfc0",
+      "size": 11
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "?PackedColor@LightEmitter@@QAEIXZ",
+      "va": "0x0049dfd0",
+      "size": 80
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "?SetColor@LightEmitter@@QAEXI@Z",
+      "va": "0x0049e020",
+      "size": 202
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "?SetRange@LightEmitter@@QAEXM@Z",
+      "va": "0x0049e0f0",
+      "size": 87
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "?SetPosition@LightEmitter@@QAEXPBUVector3@@@Z",
+      "va": "0x0049e150",
+      "size": 141
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "?SetDirection@LightEmitter@@QAEXPBUVector3@@@Z",
+      "va": "0x0049e1e0",
+      "size": 77
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "?Create@LightEmitter@@QAEPAV1@PAXHIPBUVector3@@1MHHHHH@Z",
+      "va": "0x0049e230",
+      "size": 348
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "??0LightManager@@QAE@H@Z",
+      "va": "0x0049e390",
+      "size": 78
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "??_GLightManager@@UAEPAXI@Z",
+      "va": "0x0049e3e0",
+      "size": 30
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "??1LightManager@@UAE@XZ",
+      "va": "0x0049e400",
+      "size": 103
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "?AddLight@LightManager@@QAEXPAVLightEmitter@@@Z",
+      "va": "0x0049e470",
+      "size": 23
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "?MarkChanged@LightManager@@QAEXXZ",
+      "va": "0x0049e490",
+      "size": 7
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "??G@YA?AUVector3@@ABU0@@Z",
+      "va": "0x0049f180",
+      "size": 63
+    },
+    {
+      "source": "src/reconstructed/LightEmitter.cpp",
+      "symbol": "?FindLightOfType@LightManager@@QAEPAVLightEmitter@@H@Z",
+      "va": "0x004a0190",
+      "size": 52
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "??0UnknownEcoDefinition@@QAE@XZ",
+      "va": "0x00455de0",
+      "size": 160
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "??1UnknownEcoDefinition@@QAE@XZ",
+      "va": "0x00455e80",
+      "size": 195
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?RandomParameter@UnknownEcoDefinition@@QAEHXZ",
+      "va": "0x00455f50",
+      "size": 9
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?ParameterForHeight@UnknownEcoDefinition@@QAEHM@Z",
+      "va": "0x00455f60",
+      "size": 40
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?HeightForParameter@UnknownEcoDefinition@@QAEME@Z",
+      "va": "0x00455f90",
+      "size": 95
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?RadiusForParameter@UnknownEcoDefinition@@QAEME@Z",
+      "va": "0x00455ff0",
+      "size": 95
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?LoadModel@UnknownEcoDefinition@@QAEHPAVTextureMapManager@@H@Z",
+      "va": "0x00456050",
+      "size": 1522
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "??0Vegetation@@QAE@XZ",
+      "va": "0x00456650",
+      "size": 58
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?UnknownVirtualSlot0@Vegetation@@UAEGXZ",
+      "va": "0x00456690",
+      "size": 141
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?UnknownVirtualSlot1@Vegetation@@UAEIPAVUnknownEcoQuadTree@@@Z",
+      "va": "0x00456720",
+      "size": 117
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?PlaceQuantized@Vegetation@@QAEXPAVTextureMapManager@@EPBUUnknownEcoCoordinates@@EE@Z",
+      "va": "0x004567a0",
+      "size": 53
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?EvictGeometry@@YAHPAXH@Z",
+      "va": "0x00456850",
+      "size": 49
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?SetBillboard@Vegetation@@QAEXHH@Z",
+      "va": "0x00456a10",
+      "size": 1512
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?DrawGeometry@Vegetation@@QAEXPAVUnknownEcoRenderTarget@@@Z",
+      "va": "0x00457000",
+      "size": 125
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?GetCollisionCount@Vegetation@@QAEHXZ",
+      "va": "0x00457080",
+      "size": 22
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?GetRadius@Vegetation@@QAEMXZ",
+      "va": "0x00457230",
+      "size": 24
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "??0EcoSystem@@QAE@H@Z",
+      "va": "0x00457250",
+      "size": 180
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "??_GEcoSystem@@UAEPAXI@Z",
+      "va": "0x00457310",
+      "size": 30
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "??1EcoSystem@@UAE@XZ",
+      "va": "0x00457330",
+      "size": 335
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?WriteEsb@EcoSystem@@QAEHPBD@Z",
+      "va": "0x004587b0",
+      "size": 1516
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?ReadEsb@EcoSystem@@QAEHPBDPAVUnknownTextureStream@@@Z",
+      "va": "0x00458f70",
+      "size": 1351
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?SetDetailLevel@EcoSystem@@QAEXH@Z",
+      "va": "0x004594c0",
+      "size": 13
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?Create@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVUnknownEcoTerrain@@PAVLightManager@@PADPAVUnknownTextureStream@@HHH@Z",
+      "va": "0x004594d0",
+      "size": 859
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?PlaceStoredObjects@EcoSystem@@QAEHXZ",
+      "va": "0x004598d0",
+      "size": 455
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?LightingChanged@EcoSystem@@QAEXXZ",
+      "va": "0x0045a9a0",
+      "size": 300
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?PrepareGeometry@EcoSystem@@UAEHXZ",
+      "va": "0x0045aad0",
+      "size": 771
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?SetRenderStates@EcoSystem@@QAEXH@Z",
+      "va": "0x0045ade0",
+      "size": 629
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?OnControlPress@EcoSystem@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+      "va": "0x0045bfe0",
+      "size": 84
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?PreloadEcosystem@@YAHPAVTextureMapManager@@PADPAVUnknownTextureStream@@H@Z",
+      "va": "0x0045c040",
+      "size": 1619
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "_$E1",
+      "va": "0x00459840",
+      "size": 60
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "_$E2",
+      "va": "0x00459830",
+      "size": 5
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "_$E4",
+      "va": "0x00459890",
+      "size": 60
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "_$E5",
+      "va": "0x00459880",
+      "size": 5
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "_$E7",
+      "va": "0x00459ab0",
+      "size": 60
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "_$E8",
+      "va": "0x00459aa0",
+      "size": 5
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "_$E10",
+      "va": "0x00459b00",
+      "size": 60
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "_$E11",
+      "va": "0x00459af0",
+      "size": 5
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "_$E13",
+      "va": "0x00455db0",
+      "size": 16
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "_$E14",
+      "va": "0x00455da0",
+      "size": 5
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "_$E16",
+      "va": "0x00455dd0",
+      "size": 16
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "_$E17",
+      "va": "0x00455dc0",
+      "size": 5
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?Place@Vegetation@@QAEXPAVTextureMapManager@@EPBUVector3@@EE@Z",
+      "va": "0x004567e0",
+      "size": 112
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?ReadCollisionObjects@EcoSystem@@QAEXPBDHPAVUnknownEcoDefinition@@@Z",
+      "va": "0x00458360",
+      "size": 1101
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?PlaceAuthoredObjects@EcoSystem@@QAEHXZ",
+      "va": "0x00459b40",
+      "size": 412
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?WriteXorEncoded@@YAHPBEHHPAU_iobuf@@PAE@Z",
+      "va": "0x0045c6a0",
+      "size": 260
+    },
+    {
+      "source": "src/reconstructed/EcoSystem.cpp",
+      "symbol": "?ReadXorDecoded@@YAHPAEHHPAU_iobuf@@0@Z",
+      "va": "0x0045c7b0",
+      "size": 115
+    }
+  ]
+}

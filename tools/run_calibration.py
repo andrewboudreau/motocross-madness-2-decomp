@@ -11,6 +11,14 @@ from mcm2tool.pe import PEImage  # noqa: E402
 from match import compare  # noqa: E402
 
 CASES = [
+    {'name': 'Texture history timer constructor',
+     'source': 'src/reconstructed/TextureHistoryTimer.cpp',
+     'bindings': 'src/reconstructed/TextureHistoryTimer.bindings.json',
+     'symbol': '??0UnknownTimer@@QAE@H@Z',
+     'target_va': '0x004cb670',
+     'target_size': 30,
+     'reason': 'Complete constructor at three actual embedded owner sites; unchanged existing view, actual '
+               'clock helper and field/store ordering. Original class and TU remain provisional.'},
     {'name': 'Gameplay default ??1BikeA60C@@QAE@XZ',
      'source': 'src/reconstructed/GameplayDefaults.cpp',
      'bindings': 'src/reconstructed/GameplayDefaults.bindings.json',

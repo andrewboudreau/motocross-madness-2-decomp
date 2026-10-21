@@ -1,5 +1,5 @@
 {
-  "baseline": "Published f6c22865 before declaration correction; each same-path complete object preserves all nondebug bytes, flags and relocation targets under only the FilePrintf void-to-int external-name substitution. Only enumerated full source filenames are checkout-relative. EcoSystem QuadTree correction: published ed3d06ce old EcoSystem pins reproduced independently; both complete objects preserve all bytes and destinations under only the six tree interface names, with no exclusions or score changes.",
+  "baseline": "Published f6c22865 before declaration correction; each same-path complete object preserves all nondebug bytes, flags and relocation targets under only the FilePrintf void-to-int external-name substitution. Only enumerated full source filenames are checkout-relative. EcoSystem QuadTree correction: published ed3d06ce old EcoSystem pins reproduced independently; both complete objects preserve all bytes and destinations under only the six tree interface names, with no exclusions or score changes. Round57 light lookup: published dfdf9823 canonical EcoSystem pin independently reproduced, then complete132 sections/720 relocations preserved under only the UnknownEcoLight*-to-LightEmitter* method-return spelling. All other records unchanged.",
   "rename": {
     "?FilePrintf@@YAXPAU_iobuf@@PBDZZ": "?FilePrintf@@YAHPAU_iobuf@@PBDZZ"
   },
@@ -17,7 +17,7 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "724215f54fa464d2a9b0341dbfd553b633999d7b5d886557d3532bb4f69cfde6"
+      "sha256": "50a9d2cd33e551666293226a9a5c9074f485a55b7470ef0fd655e1f9e5084d66"
     },
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,
