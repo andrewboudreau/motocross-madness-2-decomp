@@ -34,11 +34,16 @@
 // SortTextures helper (retail reads the count through the list pointer);
 // and the excess clamp loops store `pages` before `spare`/`unused`. Left:
 // retail stores `dropped = 0` after the empty-list return (every placement
-// there spills `managed` and costs about 140 more differences), and from the
-// "ManagedTextures:%d" row on the overlay loads rotate eax/ecx/edx: retail
-// loads the count, then debugPage, then g_TrackGame, where VC6 here loads
-// g_TrackGame second; every later row inherits the rotation. 206 of 1600
-// instructions differ; the size is 5021 against 5020. Declaration order,
+// there spills `managed` and costs about 140 more differences). The
+// "ManagedTextures:%d" row prints a `managedCount` local read just before
+// it: VC6 then loads the count, debugPage and g_TrackGame in retail's order
+// and the later rows keep retail's registers (passing the field directly
+// loads g_TrackGame second and every later row inherits the rotation).
+// Also left: the Managed/Ideal rows issue the fmul after the overlay load
+// (retail: before; `9.5e-07f * x`, an implicit conversion and `/ 1048576.0f`
+// change nothing) and the " 32:" row loads its second count
+// after `add esp`. 11 of 1597 instructions differ (tools/rank_near_misses.py,
+// was 206); the size is 5020 as retail's. Declaration order,
 // block scopes around the arrays and the memset order do not move the
 // arrays; computing `managedTexels` at its row is worse.
 
@@ -591,7 +596,8 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         g_TrackGame->debugOverlay->Print(
             debugPage, "CacheTextures:%d %.2fM", cachePages.m_count,
             (PixelFormatBytesPerPixel(groupFormat) * cachePages.m_count << 18) * 3.1789145e-07f);
-        g_TrackGame->debugOverlay->Print(debugPage, "ManagedTextures:%d", managedTextures.m_count);
+        int managedCount = managedTextures.m_count;
+        g_TrackGame->debugOverlay->Print(debugPage, "ManagedTextures:%d", managedCount);
         g_TrackGame->debugOverlay->Print(debugPage, "Managed %0.2fM",
                                                                 (managedF = (float)managedTexels) * 9.536743e-07f);
         g_TrackGame->debugOverlay->Print(debugPage, "Ideal   %0.2fM",
