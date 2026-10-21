@@ -11,6 +11,7 @@
 #include "KrustyUI.h"
 #include "MenuId.h"
 #include "TrackGame.h"
+#include "EventManager.h"
 #include "MatrixUtil.h"
 #include "DebugAlloc.h"
 #include "../krusty2/math/FastMath.h"

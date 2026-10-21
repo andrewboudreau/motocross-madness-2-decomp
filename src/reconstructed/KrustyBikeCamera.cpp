@@ -1,5 +1,7 @@
 #include "KrustyBikeCamera.h"
 
+#include "EventManager.h"
+
 // The four Math3D vector constants (.CRT$XCU 159-162, initialisers
 // 0x004986b0..0x004987eb, after the last method): 0x0067c3c8, 0x0067c3d8,
 // 0x0067c3e8 and 0x0067c3b8. Slot 10 passes the y axis to FollowCamera

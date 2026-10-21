@@ -192,6 +192,56 @@ void ManagedTextureGroup::RepackPages() {
         RepackWithPartialBlits();
 }
 
+// Where `texture` goes in `list`, kept in descending 0x005109b0 order.
+static inline int FindPosition(ContainerList<ManagedTexture*>* list, ManagedTexture* texture) {
+    int position = 0;
+    for (int j = list->m_count - 1; j >= 0; j--) {
+        if (texture->Unhappiness() < list->Get(j)->Unhappiness()) {
+            position = j + 1;
+            break;
+        }
+    }
+    return position;
+}
+
+// 0x0050d800: sorts `list` by 0x005109b0 and lowers the planned level (+0xac)
+// of the least needy texture until the planned texels fit `budget`; a
+// texture already at level 5 is dropped (level -1). Returns the texels.
+int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget) {
+    qsort(list->m_data, list->m_count, sizeof(ManagedTexture*), UnknownCompare50ef00);
+    int area = 0;
+    for (int i = 0; i < list->m_count; i++)
+        area += LevelArea(list->Get(i)->plannedLevel);
+    while (list->m_count > 0 && area > budget) {
+        int index = list->m_count - 1;
+        ManagedTexture* texture = list->Get(index);
+        while (list->m_count > 0 && texture->plannedLevel == 5) {
+            if (--index == 0) {
+                texture->plannedLevel = -1;
+                area -= 0x400;
+                list->RemoveOrdered(texture);
+                index = list->m_count - 1;
+            }
+            if (index < 0)
+                return area;
+            texture = list->Get(index);
+        }
+        int level = texture->plannedLevel;
+        if (texture->Unhappiness() < 0.0f)
+            texture->plannedLevel = texture->wantedLevel;
+        else
+            texture->plannedLevel--;
+        int newLevel = texture->plannedLevel;
+        area -= LevelArea(level);
+        area += LevelArea(newLevel);
+        if (list->m_count > 1) {
+            list->RemoveOrdered(texture);
+            list->Insert(texture, FindPosition(list, texture));
+        }
+    }
+    return area;
+}
+
 // 0x0050ee70: qsort order of ManagedTexture pointers, by +0xac descending,
 // then by address.
 int UnknownCompare50ee70(const void* first, const void* second) {
@@ -403,55 +453,4 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
         }
     }
     return 1;
-}
-
-
-// Where `texture` goes in `list`, kept in descending 0x005109b0 order.
-static inline int FindPosition(ContainerList<ManagedTexture*>* list, ManagedTexture* texture) {
-    int position = 0;
-    for (int j = list->m_count - 1; j >= 0; j--) {
-        if (texture->Unhappiness() < list->Get(j)->Unhappiness()) {
-            position = j + 1;
-            break;
-        }
-    }
-    return position;
-}
-
-// 0x0050d800: sorts `list` by 0x005109b0 and lowers the planned level (+0xac)
-// of the least needy texture until the planned texels fit `budget`; a
-// texture already at level 5 is dropped (level -1). Returns the texels.
-int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget) {
-    qsort(list->m_data, list->m_count, sizeof(ManagedTexture*), UnknownCompare50ef00);
-    int area = 0;
-    for (int i = 0; i < list->m_count; i++)
-        area += LevelArea(list->Get(i)->plannedLevel);
-    while (list->m_count > 0 && area > budget) {
-        int index = list->m_count - 1;
-        ManagedTexture* texture = list->Get(index);
-        while (list->m_count > 0 && texture->plannedLevel == 5) {
-            if (--index == 0) {
-                texture->plannedLevel = -1;
-                area -= 0x400;
-                list->RemoveOrdered(texture);
-                index = list->m_count - 1;
-            }
-            if (index < 0)
-                return area;
-            texture = list->Get(index);
-        }
-        int level = texture->plannedLevel;
-        if (texture->Unhappiness() < 0.0f)
-            texture->plannedLevel = texture->wantedLevel;
-        else
-            texture->plannedLevel--;
-        int newLevel = texture->plannedLevel;
-        area -= LevelArea(level);
-        area += LevelArea(newLevel);
-        if (list->m_count > 1) {
-            list->RemoveOrdered(texture);
-            list->Insert(texture, FindPosition(list, texture));
-        }
-    }
-    return area;
 }

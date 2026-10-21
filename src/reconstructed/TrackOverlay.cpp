@@ -14,6 +14,7 @@
 #include "PCRenderTarget.h"
 #include "PCTextureMap.h"
 #include "TrackGame.h"
+#include "EventManager.h"
 #include "Track.h"
 #include "D3DConstants.h"
 

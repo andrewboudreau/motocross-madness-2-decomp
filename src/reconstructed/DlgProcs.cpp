@@ -20,6 +20,7 @@
 #include "RenderTarget.h"
 #include "SelectGamePicProcs.h"
 #include "TrackGame.h"
+#include "EventManager.h"
 #include "TrackRecordDlg.h"
 
 // A truncating copy into a `size`-byte buffer. Retail evaluates `source`

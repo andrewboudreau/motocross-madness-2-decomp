@@ -14,6 +14,7 @@
 #include "SceneManager.h"
 #include "TextureMap.h"
 #include "TrackGame.h"
+#include "EventManager.h"
 #include "TrackOverlay.h"
 #include "UnknownResourceManager.h"
 

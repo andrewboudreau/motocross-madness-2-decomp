@@ -6,6 +6,7 @@
 
 #include "ArcadeObject.h"
 #include "DebugAlloc.h"
+#include "EventManager.h"
 
 // A truncating copy into a `size`-byte buffer (as DlgProcs.cpp); retail
 // evaluates `source` once for the length and again for the copy.

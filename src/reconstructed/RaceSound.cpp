@@ -11,6 +11,7 @@
 #include "RaceView.h"
 #include "TextureMap.h"
 #include "TrackGame.h"
+#include "EventManager.h"
 
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 

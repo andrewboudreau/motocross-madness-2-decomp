@@ -42,6 +42,7 @@
 #include "../../src/reconstructed/GameUi.h"
 #include "../../src/reconstructed/SoundInterface.h"
 #include "../../src/reconstructed/TrackGame.h"
+#include "../../src/reconstructed/EventManager.h"
 #include "../../src/reconstructed/UIDialog.h"
 #include "../../src/reconstructed/PCCamera.h"
 #include "../../src/reconstructed/TextureMap.h"

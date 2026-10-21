@@ -3,7 +3,7 @@
 #include "CDAudio.h"
 #include "ControlInterface.h"
 #include "DirectoryList.h"
-#include "EventManager.h"
+class EventManager;  // EventManager.h; files that use its members include it
 #include "KrustyUI.h"
 #include "MemTag.h"
 #include "PCGame.h"

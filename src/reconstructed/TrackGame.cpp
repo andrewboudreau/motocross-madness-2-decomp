@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "TrackGame.h"
+#include "EventManager.h"
 
 #include "DebugAlloc.h"
 #include "KeyboardDevice.h"

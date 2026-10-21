@@ -6,6 +6,7 @@
 #include "RaceView.h"
 #include "RenderTarget.h"
 #include "TrackGame.h"
+#include "EventManager.h"
 #include "TrackOverlay.h"
 
 // Reconstruction of D:\aardvark\VC\krusty2\NationalRace.cpp (literal

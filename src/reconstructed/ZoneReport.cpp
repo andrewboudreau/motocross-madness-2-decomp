@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "TrackGame.h"
+#include "EventManager.h"
 #include "Parser.h"
 
 unsigned int ReadClock();   // 0x004bfa80: milliseconds

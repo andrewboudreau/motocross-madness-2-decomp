@@ -97,6 +97,7 @@
 #include "../../src/reconstructed/FollowCamera.h"
 #include "../../src/reconstructed/Track.h"
 #include "../../src/reconstructed/TrackGame.h"
+#include "../../src/reconstructed/EventManager.h"
 #include "../../src/reconstructed/ControlInterface.h"
 #include "../../src/reconstructed/D3DConstants.h"
 

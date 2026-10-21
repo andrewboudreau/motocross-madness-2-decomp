@@ -8,6 +8,7 @@
 #include "DebugAlloc.h"
 #include "Net.h"
 #include "TrackGame.h"
+#include "EventManager.h"
 #include "MenuId.h"
 
 extern "C" const GUID DPSPGUID_TCPIP;         // 0x005567e0

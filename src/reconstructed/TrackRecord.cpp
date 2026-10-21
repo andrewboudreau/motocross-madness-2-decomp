@@ -5,6 +5,7 @@
 
 #include "Track.h"
 #include "TrackGame.h"
+#include "EventManager.h"
 #include "TrackRecordDlg.h"
 #include "DebugAlloc.h"
 #include "MenuId.h"

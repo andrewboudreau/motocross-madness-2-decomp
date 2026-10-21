@@ -238,6 +238,13 @@ they are source-form differences under the deterministic rules of section 1.
   new windows are `(62, 63)`, `(0, 1)` and `(4, 38)`, so it is still a narrow
   fit. Function order that follows retail addresses is the defensible lever
   here; padding declarations are not.
+- ManagedTextureGroup::DrawSelection (`0x0050ef70`) worked the same way. With
+  EventManager.h no longer included through TrackGame.h, it went to 1838
+  bytes, with windows `(17, 25)`, `(29, 39)` and `(44, 53)`. Defining
+  FitTexturesToBudget (`0x0050d800`) and its inline helper at their retail
+  position, before the comparators at `0x0050ee70`, restored it. TextureMapManager.h
+  already declares both functions. The new windows are `(58, 63)`, `(0, 4)`,
+  `(9, 18)` and `(46, 54)`.
 
 ### 2.4 Function-local definitions and x87 term order (period 32)
 

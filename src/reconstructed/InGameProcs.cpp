@@ -10,6 +10,7 @@
 #include "FollowCamera.h"
 #include "Net.h"
 #include "TrackGame.h"
+#include "EventManager.h"
 #include "MenuId.h"
 
 // The 0x14-byte message 0x89 that a network player sends when it leaves
