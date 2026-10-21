@@ -282,6 +282,13 @@ in dead code get no slot).
 
 ## Functional build review
 
+The complete list-box mouse-button candidate is maintained in
+`samples/ui/ListBoxButtonDown.cpp`. Explicit Y-before-X point reads correct a
+native-confirmed fault-order discrepancy. The full extent stays 342 bytes;
+matching positions change from 322 to 306. [List-box behavior evidence](LIST_BOX_BUTTON_DOWN.md)
+records the preserved aggregate, existing strict providers and 8,707-case
+native proof with scripted selection/base/event boundaries.
+
 The complete texture color scan is maintained in
 `samples/ui/TextureHasColor.cpp`, included by the aggregate. Its full retail
 and unchanged candidate extents are both 220 bytes, with 120 matching

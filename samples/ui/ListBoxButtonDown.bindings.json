@@ -1,0 +1,6 @@
+{
+  "?GetRowHeight@UIListBox@@QAEHH@Z": "0x004769a0",
+  "?SelectRow@UIListBox@@QAEHH@Z": "0x00476a60",
+  "?ButtonDown@UIControl@@UAEHHH@Z": "0x004721b0",
+  "__imp__PtInRect@12": "0x005502d4"
+}

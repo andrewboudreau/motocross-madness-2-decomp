@@ -21,26 +21,29 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The current [collision scalar connections](COLLISION_SCALAR_CONNECTIONS.md)
-preserve all 227 prior production objects under two name substitutions:
-10,512 nondebug sections and 45,428 relocations. The full segment caller remains
-nonexact with its unchanged 1,493-byte fingerprint and 1,309 matching positions.
-The [race debug globals](BIKE_RACE_DEBUG_STATE.md) supply twelve writable
-objects with independently checked array extents, initialization and native
-mutability; their ordinary no-op startup routes have no claimed retail identity.
-The reviewed [menu texture color scan](TEXTURE_HAS_COLOR.md) remains nonexact
-at 220 bytes and 120 matching positions. Its 131,899 native cases use real
-strict lock/unlock helpers; both complete callers remain strict. The original
-UI aggregate preserves all 733 nondebug sections and 3,912 relocations.
-The real link compiles 229 translation units and reports 320 unresolved names.
-Private evidence is in `work/game-build/round34-all-objects.json`,
-`round34-link-evidence.json` and `connections-round34-preservation.json`.
+The current [constraint scene connections](CONSTRAINT_SCENE_CONNECTIONS.md)
+join three provisional ConNode methods to verified Soultree providers. All 229
+prior production objects preserve 10,531 nondebug sections and 45,440 relocations
+under only those three name substitutions. The focused test checks 41 strict
+caller/producer bodies and 32,768 native scene/cache/alias cases.
+[Vehicle reset](VEHICLE_RESET.md) is promoted to canonical source with its full
+368-byte strict match and 6,144 native callback/exception cases. Its sample
+routing moves to the canonical provider without changing the physics target.
+The reviewed [list-box mouse selection](LIST_BOX_BUTTON_DOWN.md) adds a complete
+342-byte nonexact body. Correcting its evidenced Y-before-X fault order changes
+its score from 322 to 306 matching positions; this is outside both matching
+matrices. All other 349 functions in the original UI aggregate are unchanged.
+Its 8,707 native cases use the actual strict row-height helper and Windows hit
+testing, with selection and dispatch boundaries scripted.
+The real link compiles 231 translation units and reports 315 unresolved names.
+Private evidence is in `work/game-build/round35-all-objects.json`,
+`round35-link-evidence.json` and `connections-round35-preservation.json`.
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and are excluded from strict counts.
 
-The final regression run passes 495 tests with eleven skipped (506 total),
-recorded in `work/game-build/tests-round34.log`. Static checking passes for
-226 Python files and 365 JSON files.
+The final regression run passes 498 tests with eleven skipped (509 total),
+recorded in `work/game-build/tests-round35.log`. Static checking passes for
+229 Python files and 366 JSON files.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

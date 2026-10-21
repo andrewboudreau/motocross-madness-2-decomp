@@ -2,26 +2,11 @@
 // included below for its types and matched functions). Check: compile this
 // file and compare each function with GameUiNearMisses.bindings.json.
 //
-// 0x00477e90 UIListBox slot 55 (322/342): an `int height` local for the
-//   first GetRowHeight call gives retail's ebx (point) and ebp (row offset);
-//   without it (155/344) the two are swapped. With the local, retail still
-//   loads rect.top into ecx and the point's y before x and adds the height
-//   into eax; VC6 here adds into the rect.top register and loads x first.
-//   `height += rect.top`, `height + rect.top`, a `top` local, a POINT copy
-//   before or after, the local at function scope or reused for the second
-//   call, a nested flags test, `(POINT*)b` casts, an owner local, `point !=
-//   0`, `found != 0`, guarded do-while rows and `rect.bottom = h; bottom +=
-//   top` were tried (456 swept combinations, best 322). The form without the
-//   local (`rect.bottom = rect.top + GetRowHeight(row);`, as in the exact
-//   UIListBox slot 10 at 0x00476020) matches retail apart from the
-//   ebx/ebp swap (ebp makes `[ebp]` take a disp8, so 344 bytes); no
-//   declaration shift (k = 0..63) changes either form. An inline helper
-//   `HitRow(rect, GetRowHeight(row), point)` storing `r.bottom = r.top + h`
-//   gives retail's `add eax, <top>` (319/342, 11 instruction diffs); VC6
-//   then still loads point->x before y.
-//   Session 14: `GetRowHeight(row) + rect.top` without a local (155), a
-//   `bottom` local built with `+=` (322, same code), `rect.bottom = rect.top`
-//   then `+=` the call (134) and reusing `height` for the top step (120).
+// 0x00477e90 UIListBox slot 55 (306 matching positions, full retail and
+//   candidate both 342 bytes): included from ListBoxButtonDown.cpp. The old
+//   322-position form read point.x before point.y and faulted at address1
+//   instead of retail's address5 for point=1. Ordered volatile reads preserve
+//   the decoded y-then-x behavior; see docs/LIST_BOX_BUTTON_DOWN.md.
 // 0x0047b490 colour-key test (120/220): keeping the key pixel in the red
 //   term's variable (`pixel |= green | blue`) keeps it in a register and
 //   spills the row counter into the key's argument slot as retail does;
@@ -157,34 +142,7 @@
 #include "../../src/reconstructed/Tgafile.h"
 
 // 0x00477e90
-int UIListBox::ButtonDown(int a, int b) {
-    POINT* point = (POINT*)b;
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && point) {
-        if (a == 0) {
-            if (selectable) {
-                int found = 0;
-                RECT rect = *(RECT*)screenArea;
-                for (int row = firstVisibleRow; row < firstVisibleRow + visibleRowCount; row++) {
-                    int height = GetRowHeight(row);
-                    rect.bottom = rect.top + height;
-                    if (PtInRect(&rect, *point) && !(rowTable[row].flags & 1)) {
-                        SelectRow(row);
-                        ReportClick(&found);
-                        break;
-                    }
-                    if (!found)
-                        rect.top += GetRowHeight(row);
-                }
-                if (found)
-                    return 1;
-            }
-        } else if (a == 1 && allowWScroll) {
-            dragStartX = point->x;
-            return UIControl::ButtonDown(a, b);
-        }
-    }
-    return UIControl::ButtonDown(a, b);
-}
+#include "ListBoxButtonDown.cpp"
 
 // ---------------------------------------------------------------------------
 // Drawing, input and loading near misses

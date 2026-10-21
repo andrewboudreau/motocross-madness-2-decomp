@@ -131,13 +131,13 @@
  },
  {
   "class": "Vehicle",
-  "source": "VehicleInlines.cpp",
+  "source": "../../../src/reconstructed/VehicleReset.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot36@Vehicle",
   "target_va": "0x0040c710",
   "target_size": 368,
   "expect": "exact",
-  "notes": "Wave 2. Sign chosen as y >= 0 ? -1 : 1 to get the branch polarity.",
-  "bindings": "VehicleInlines.bindings.json"
+  "notes": "Complete strict primary slot 36; existing zero/Y-axis initializers and canonical scene/steering providers. See docs/VEHICLE_RESET.md.",
+  "bindings": "../../../src/reconstructed/VehicleReset.bindings.json"
  },
  {
   "class": "Vehicle",

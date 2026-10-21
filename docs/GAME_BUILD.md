@@ -37,40 +37,42 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 229 C++ files (190 canonical sources and 39
-reviewed candidates) and reaches LINK with 320 unresolved external symbols,
+The 2026-10-21 build compiles 231 C++ files (191 canonical sources and 40
+reviewed candidates) and reaches LINK with 315 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-cx_80xxq` retains all prior strict results:
+The composition in `build-33hph3xk` retains all prior strict results:
 2,994/3,005 calibration rows and 1,086/1,162 physics comparisons, with no
-near-miss score drops. This does not establish startup, menus or racing while
-linkage remains incomplete. Two existing nonexact physics candidates retain
-their unresolved comparison bindings; neither is counted as strict.
-The full regression run passes: 506 tests, with 495 passed and eleven skipped
-(`work/game-build/tests-round34.log`). Static checking also passes for 226
-Python files and 365 JSON files.
+near-miss score drops in either matrix. The one Vehicle reset target now
+uses its canonical source path. This does not establish startup, menus or
+racing while linkage remains incomplete. Two existing nonexact physics
+candidates retain their unresolved comparison bindings; neither is strict.
+The full regression run passes: 509 tests, with 498 passed and eleven skipped
+(`work/game-build/tests-round35.log`). Static checking also passes for 229
+Python files and 366 JSON files.
 
-The [race debug state](BIKE_RACE_DEBUG_STATE.md) supplies six true two-vector
-arrays, five zero flags and the selected-row integer initialized to two.
-Native CRT startup and 336 independent storage mutations pass; 80 strict
-caller bodies and ten partial fingerprints remain unchanged. The ordinary
-Vector3 array initializers are retained without claiming their retail identity.
-The [collision scalar connections](COLLISION_SCALAR_CONNECTIONS.md) join three
-calls to existing dot/length providers while preserving the full 1,493-byte
-caller. All 227 prior production objects preserve 10,512 nondebug sections
-and 45,428 relocations under only two verified symbol substitutions.
-The [menu texture color scan](TEXTURE_HAS_COLOR.md) adds one reviewed nonexact
-candidate, retaining its complete 220-byte body and 120 matching positions.
-Its 131,899 native scenarios use actual strict lock/unlock helpers, check every
-16-bit pixel value in both supported formats, and preserve callback/fault and
-held-lock behavior. The original UI aggregate retains all 733 nondebug sections
-and 3,912 relocations, including filename storage.
-The three isolated links reduce unresolved names **335 → 323 → 321 → 320**,
+The [constraint scene connections](CONSTRAINT_SCENE_CONNECTIONS.md) join
+GetPositionIn, SetPositionIn and LocalToWorldPoint to their evidenced Soultree
+providers; placement uses SetPositionInFrame. All 229 prior production objects
+preserve 10,531 nondebug sections and 45,440 relocations under those three name
+substitutions. Native checks exercise 32,768 actual scene/cache/alias cases.
+[Vehicle reset](VEHICLE_RESET.md) moves its full 368-byte strict provider to
+canonical source, preserves its ordinary vector initialization, and passes
+6,144 native callback and exception cases. The reset initializes its body-up
+vector to the Y axis; its node-position argument is the separate zero vector.
+The reviewed [list-box mouse selection](LIST_BOX_BUTTON_DOWN.md) corrects an
+evidenced point-read fault order: retail reads Y before X. The full body remains
+342 bytes, with its nonexact score changing from 322 to 306 matching positions.
+This candidate is outside both matching matrices. The other 349 aggregate
+functions and 732 nondebug sections remain unchanged. Its 8,707 native cases
+use the strict row-height helper and real Windows hit testing; selection and
+click/base dispatch remain scripted boundaries, not integrated menu evidence.
+The three isolated links reduce unresolved names **320 → 317 → 316 → 315**,
 with no new missing names. Private evidence is in
-`work/game-build/round34-link-evidence.json`, `round34-all-objects.json` and
-`connections-round34-preservation.json`.
+`work/game-build/round35-link-evidence.json`, `round35-all-objects.json` and
+`connections-round35-preservation.json`.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

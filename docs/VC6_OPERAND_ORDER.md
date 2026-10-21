@@ -720,7 +720,7 @@ without effect, as noted.
   ahead of the last `faddp`.
 - **One more live symbol.** A named result local (`Vec3 side = ...CrossB(up); axis =
   side;`), a pointer local or a `this` copy gave retail's b.x-first cross-product
-  order in VehicleInlines `0x0040c4c0`; an unused int, braces and declaration shifts
+  order in VehicleMethods `0x0040c4c0`; an unused int, braces and declaration shifts
   did not. `const Vec3& rear = ..., & front = ...;` declared rear first fixed Bike
   slot 46's register pair (`0x0040b600`).
 - **Components read into scalars first.** `float y = v.y, x = v.x, z = v.z;` before a

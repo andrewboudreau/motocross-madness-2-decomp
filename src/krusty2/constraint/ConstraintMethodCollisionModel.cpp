@@ -37,6 +37,9 @@
 //   samples/physics/constraint/PixelBlend.cpp) have no literal tying them to this unit.
 //
 #include "ConstraintMethodCollisionModel.h"
+#include "math/Vec3.h"
+#include "../../reconstructed/Matrix4.h"
+#include "core/SoultreeObject.h"
 
 #include "core/DebugAlloc.h"   // DebugRealloc
 
@@ -123,7 +126,8 @@ int ConstraintMethodCollisionModel::UnknownVirtualSlot11(float t)
     if (shapeCollisionEnabled && QueryCollisions()) {
         const ConVec3* n = (const ConVec3*)contactRecord;
         ConVec3 pos;
-        body->node->GetPositionIn(0, &pos);
+        reinterpret_cast<SoultreeObject*>(body->node)->GetPositionIn(
+            0, reinterpret_cast<Vec3*>(&pos));
         ConVec3 d;
         d.x = n->x * 1.005f;
         d.y = n->y * 1.005f;
@@ -131,7 +135,8 @@ int ConstraintMethodCollisionModel::UnknownVirtualSlot11(float t)
         pos.x -= d.x;
         pos.y -= d.y;
         pos.z -= d.z;
-        body->node->SetPositionIn(0, &pos);
+        reinterpret_cast<SoultreeObject*>(body->node)->SetPositionInFrame(
+            0, reinterpret_cast<const Vec3*>(&pos));
         UpdatePlacement();
     }
     if (groundQuery) {
@@ -143,7 +148,11 @@ int ConstraintMethodCollisionModel::UnknownVirtualSlot11(float t)
         float probeY;
         ConVec3 n;
         for (int i = 0; i < probeCount; i++) {
-            p = probes[i].node->LocalToWorldPoint(probes[i].localPoint);
+            // The probe stores a primary scene-node pointer. Its returned
+            // xyz value remains alive through this assignment's full expression.
+            p = reinterpret_cast<const ConVec3&>(static_cast<const Vec3&>(
+                reinterpret_cast<SoultreeObject*>(probes[i].node)->LocalToWorldPoint(
+                    reinterpret_cast<const Vec3&>(probes[i].localPoint))));
             probeY = p.y;
             groundQuery->QueryPoint(&p, &n, 0, 0);
             if (probeY < p.y) {
@@ -168,7 +177,8 @@ int ConstraintMethodCollisionModel::UnknownVirtualSlot11(float t)
             offset.z = (bestNormal.z * d);
             ApplyContactImpulse(0, 1.0f, offset, bestPoint, bestNormal);
             ConVec3 pos;
-            body->node->GetPositionIn(0, &pos);
+            reinterpret_cast<SoultreeObject*>(body->node)->GetPositionIn(
+                0, reinterpret_cast<Vec3*>(&pos));
             ConVec3 step;
             step.x = offset.x * 1.005f;
             step.y = offset.y * 1.005f;
@@ -176,7 +186,8 @@ int ConstraintMethodCollisionModel::UnknownVirtualSlot11(float t)
             pos.x -= step.x;
             pos.y -= step.y;
             pos.z -= step.z;
-            body->node->SetPositionIn(0, &pos);
+            reinterpret_cast<SoultreeObject*>(body->node)->SetPositionInFrame(
+                0, reinterpret_cast<const Vec3*>(&pos));
             UpdatePlacement();
             hasContact = 1;
         }

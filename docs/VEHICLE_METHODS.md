@@ -1,9 +1,10 @@
 # Vehicle primary-vtable methods
 
-`src/reconstructed/VehicleMethods.cpp` supplies thirteen exact method bodies
-previously present only in `samples/physics/vehicle/VehicleInlines.cpp`.
-Their signatures and bodies are unchanged. All thirteen were unresolved in
-the production build, referenced by Vehicle and its derived classes.
+`src/reconstructed/VehicleMethods.cpp` supplies thirteen exact method bodies;
+`src/reconstructed/VehicleReset.cpp` supplies the complete slot 36 reset.
+All fourteen now have canonical providers for the production Vehicle, Bike
+and KrustyBike tables. Semantic names and original source grouping remain
+inferred; matching does not establish a complete working vehicle.
 
 | Primary slot | Retail VA | Bytes | Behavior |
 |---:|---:|---:|---|
@@ -12,6 +13,7 @@ the production build, referenced by Vehicle and its derived classes.
 | 25 | `0x0040cb60` | 59 | Tests decreasing throttle, crash state and speed |
 | 34 | `0x0040c4c0` | 118 | Reads node axes and computes the side vector |
 | 35 | `0x0040c540` | 130 | Writes node axes and computes the side vector |
+| 36 | `0x0040c710` | 368 | Resets orientation state and steering node |
 | 45 | `0x0040c880` | 7 | Returns `3.0f` |
 | 51 | `0x0040c890` | 7 | Returns the spawn-protection field |
 | 52 | `0x0040c8a0` | 14 | Tests whether crash state is zero |
@@ -31,40 +33,39 @@ tiny addresses identify the same C++ method.
 These bodies lie outside the Vehicle.cpp range: most occur among Bike.cpp
 methods, slots 78/79 in the KrustyBike.cpp range, and slot 92 in the
 Motnctrl.cpp range. Inline member COMDAT selection explains the distribution
-as a strong inference. The new file is a reconstruction grouping, not a
-recovered original translation unit. Semantic field names remain provisional.
+as a strong inference. Both files are reconstruction groupings, not recovered
+original translation units. Semantic field names remain provisional.
 
-Slot 36 remains an exact 368-byte sample. It needs the unsupplied
-`g_VehZeroVec3_005778a8` and `g_VehZeroVec3_005778c8` globals and the separate
-`VehSceneNodeView::SetAxesPtr` declaration. This promotion does not introduce
-those dependencies or claim that this reset path is connected.
+The [slot 36 reset](VEHICLE_RESET.md) uses the existing ordinary header-local
+zero and Y-axis vectors, plus the canonical SetPosition, SetAxesPtr and
+SteeringControl::SetAngle providers. Its obsolete sample and bindings have
+been removed, and the physics target and provider regression use canonical
+source. The legacy address `0x005778c8` is Y axis despite its earlier provisional
+zero-vector name; both relevant initializer bodies are independently strict.
 
-The promoted object has only `__fltused`, `SoultreeObject::GetAxesIn` and
-`SoultreeObject::SetAxesIn` undefined. GetAxesIn is supplied; SetAxesIn is an
-existing unresolved dependency whose body is still partial in
-`samples/physics/helpers/SoultreeMatrix.cpp`. No new unresolved name is added.
-The existing headers emit four private vector constants and initializer
-entries. No retail ownership or original linked order is assigned to this
-group's additional initializer copies; strict method proof is not whole-unit
-identity.
+VehicleMethods has only `__fltused`, SoultreeObject::GetAxesIn and
+SoultreeObject::SetAxesIn undefined. GetAxesIn is canonical; SetAxesIn is supplied
+by the reviewed nonexact `samples/physics/helpers/SoultreeMatrix.cpp` candidate.
+VehicleReset has only `__fltused` and its three existing direct methods
+undefined. Each object retains four ordinary header-local vector constants and
+initializer entries. No original TU ownership or linked initializer order is
+claimed for these reconstruction groups.
 
-Bike's zero-vector reads now reference its existing header-local `kVec3Zero`
-instead of the undefined `g_BikeVec3_005778a8`. Its full 60-byte initializer
-at `0x00407890` establishes that storage's retail destination at `0x005778a8`;
-the existing binding and all 51 strict Bike checks remain unchanged in value
-and extent. No vector storage or initializer is added. The provider regression
-checks the initializer, local COFF storage and actual read relocations. This
-does not consolidate the separate globals used by Vehicle's retained slot 36.
+Bike's own zero-vector reads use its existing header-local `kVec3Zero`.
+Its strict 60-byte initializer at `0x00407890` establishes that storage's
+retail destination at `0x005778a8`; this does not consolidate private constants
+across production objects.
 
-`tests/test_vehicle_method_providers.py` reads the verified retail RTTI/COL
-and every target slot, compiles the actual Vehicle source and verifies the
-primary-vtable relocations resolve to the new definitions, and checks all
-fourteen complete function extents with resolved relocations under VC6 SP3
-`/O2 /GR /GX /MT /Z7`. It also protects the remaining sample boundary and
-checks undefined symbols and local initializer scope.
+`tests/test_vehicle_method_providers.py` checks retail RTTI/COL and each target
+slot, actual production vtable relocations and all fourteen complete strict
+bodies. `tests/test_vehicle_reset.py` additionally checks slot 36 in all three
+primary tables, the real direct providers, zero/Y-axis initialization, and
+6,144 native reset state/callback/exception cases with explicit helper boundaries.
 
 ```powershell
 $env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path
 $env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
+$env:PYTHONPATH = '.'
 python -m unittest discover -s tests -p test_vehicle_method_providers.py -v
+python -m unittest discover -s tests -p test_vehicle_reset.py -v
 ```

@@ -32,12 +32,12 @@ class VehicleMethodProviderTests(unittest.TestCase):
                          (0, 0, 0, 0x566c98, 0x55f9a0))
         name = b'.?AVVehicle@@\0'
         self.assertEqual(retail.bytes_at_va(0x566ca0, len(name)), name)
-        slots = {23, 24, 25, 34, 35, 45, 51, 52, 68, 69, 78, 79, 92}
+        slots = {23, 24, 25, 34, 35, 36, 45, 51, 52, 68, 69, 78, 79, 92}
         sources = {
             'methods': 'src/reconstructed/VehicleMethods.cpp',
             'owner': 'src/krusty2/vehicle/Vehicle.cpp',
             'bike': 'src/krusty2/vehicle/Bike.cpp',
-            'remaining': 'samples/physics/vehicle/VehicleInlines.cpp',
+            'reset': 'src/reconstructed/VehicleReset.cpp',
         }
         with tempfile.TemporaryDirectory(prefix='mcm2-vehicle-methods-') as directory:
             objects = {}
@@ -58,18 +58,18 @@ class VehicleMethodProviderTests(unittest.TestCase):
             table_refs = {r.virtual_address - table.value:
                           owner.symbol_by_index[r.symbol_index].name
                           for r in owner.relocations if r.section_number == table.section_number}
-            definitions = {s.name for s in objects['methods'].symbols
+            definitions = {s.name for key in ('methods', 'reset') for s in objects[key].symbols
                            if s.storage_class == 2 and s.section_number > 0}
             path = ROOT / 'samples/physics/vehicle/targets.json'
             checked = set()
             for target in json.loads(path.read_text()):
                 source = (path.parent / target['source']).resolve()
-                if source not in {ROOT / sources['methods'], ROOT / sources['remaining']}:
+                if source not in {ROOT / sources['methods'], ROOT / sources['reset']}:
                     continue
                 slot = int(re.search(r'Slot(\d+)@', target['candidate_symbol_contains'])[1])
                 promoted = slot in slots
-                self.assertEqual(source, ROOT / sources['methods' if promoted else 'remaining'])
-                obj = objects['methods' if promoted else 'remaining']
+                self.assertEqual(source, ROOT / sources['reset' if slot == 36 else 'methods'])
+                obj = objects['reset' if slot == 36 else 'methods']
                 result = compare(retail, obj, target['candidate_symbol_contains'],
                                  int(target['target_va'], 0), target['target_size'],
                                  path.parent / target['bindings'])
@@ -82,16 +82,16 @@ class VehicleMethodProviderTests(unittest.TestCase):
                         self.assertEqual(table_refs[slot * 4], result['symbol'])
                         self.assertIn(table_refs[slot * 4], definitions)
                     checked.add(slot)
-            self.assertEqual(checked, slots | {36})
-            self.assertFalse(any('UnknownVirtualSlot36@' in name for name in definitions))
+            self.assertEqual(checked, slots)
+            self.assertIn('?UnknownVirtualSlot36@Vehicle@@UAEXXZ', definitions)
 
             methods = objects['methods']
             self.assertEqual({s.name for s in methods.symbols if s.section_number == 0}, {
                 '__fltused', '?GetAxesIn@SoultreeObject@@QAEXPAV1@PAUVec3@@1@Z',
                 '?SetAxesIn@SoultreeObject@@QAEXPAV1@PBUVec3@@1HH@Z',
             })
-            # SetAxesIn is already an unresolved production dependency. No new
-            # globals or view aliases from sample slot 36 may leak into this unit.
+            # These two providers already exist. The separate reset object
+            # must not introduce globals or view aliases into this unit.
             constants = [s for s in methods.symbols if s.name.startswith('_kVec3')]
             self.assertEqual(len(constants), 4)
             self.assertTrue(all(s.storage_class == 3 for s in constants))

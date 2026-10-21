@@ -33,7 +33,8 @@ struct VehBlock7 { float f[7]; };   // 28-byte state block (pose/orientation val
 
 // This TU's zero vector (0x0068a6e8) is Math3D.h's per-TU kVec3Zero: the `$E` body at
 // 0x005278f0 writes it, and methods on both sides of that block read it.
-// Zero vectors in the retail data section at 0x005778a8 / 0x005778c8 (read-only copies).
+// Legacy address views: 0x005778a8 is zero; 0x005778c8 is Y axis despite its
+// provisional name below. Slot 36 now uses the ordinary header-local constants.
 extern Vec3 g_VehZeroVec3_005778a8;
 extern Vec3 g_VehZeroVec3_005778c8;
 

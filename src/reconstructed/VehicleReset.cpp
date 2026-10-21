@@ -1,6 +1,6 @@
-// Vehicle slot 36 remains an exact sample because its vector globals and
-// VehSceneNodeView::SetAxesPtr dependency are not supplied. The thirteen
-// other exact methods are in src/reconstructed/VehicleMethods.cpp.
+// Complete Vehicle primary slot 36 (0x0040c710, 368 bytes).
+// Reconstruction grouping; original TU ownership and semantic names remain inferred.
+// See docs/VEHICLE_RESET.md for vector initialization and dependency evidence.
 #include <math.h>
 #include <float.h>
 #include "vehicle/Vehicle.h"
@@ -16,7 +16,7 @@ void Vehicle::UnknownVirtualSlot36()
         float s = bodyForward.y >= 0.0f ? -1.0f : 1.0f;
         bodyForward = s * bodyUp;
     }
-    bodyUp = g_VehZeroVec3_005778c8;
+    bodyUp = kVec3YAxis;
     bodyForward.y = 0.0f;
     UnknownVirtualSlot35(1, 0);
     UnknownVirtualSlot34();
@@ -35,7 +35,7 @@ void Vehicle::UnknownVirtualSlot36()
     savedCosRoll = bodyCosRoll;
     savedCosPitch = bodyCosPitch;
     savedSinPitch = bodySinPitch;
-    steerState->node->SetPosition(g_VehZeroVec3_005778a8);
-    ((VehSceneNodeView*)steerState->node)->SetAxesPtr(&bodyForward, &bodyUp, 0, 1);
+    steerState->node->SetPosition(kVec3Zero);
+    steerState->node->SetAxesPtr(&bodyForward, &bodyUp, 0, 1);
     steerState->SetAngle(0, poseNode);
 }
