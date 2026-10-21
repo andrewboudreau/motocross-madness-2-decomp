@@ -38,7 +38,7 @@ type, member and function names are provisional.
   `_$E1`..`_$E11` pairs at `0x004ecb70`..`0x004ecd20`.
 - `0x004f0d20` keeps an unused 0x18-byte resource manager on its stack,
   with constructor `0x004e8e80` and destructor `0x004e8ea0`. It is declared
-  as the view `UnknownSceneResourceManager` (see below).
+  under the alias `UnknownSceneResourceManager` of the canonical resource manager.
 
 ## Matched functions
 
@@ -101,16 +101,13 @@ type, member and function names are provisional.
 - `TrackGame.h`: `UnknownTrackGameObject574` gets its constructor layout
   and the methods above. `0x004ea010` takes `int*` outputs (TrackRecord
   bindings renamed).
-- `UnknownResourceManager.h`:
-  - `0x004e9030` returns the archive (KrustyUI and TrackGame bindings renamed);
-  - `0x004e9830`, `0x004e9430` and `0x004e96b0` are declared.
-- Why the constructor, destructor and fields are on a view: declaring them
-  on the shared class flips one register choice (`add edx,eax` vs
-  `add eax,edx`) in TrackGame `0x00520ab0`. That function's TU only uses the
-  class through a pointer. Adding just the constructor, one ordinary method
-  or one field does not flip it; adding the destructor or four named fields
-  does. That suggests VC6 is sensitive to the TU's declarations rather than
-  to layout.
+- `UnknownResourceManager.h` includes the canonical ResourceManager declaration.
+  Scene's `UnknownSceneResourceManager` is a type alias, preserving its
+  `0x18`-byte stack objects while connecting the existing constructor and
+  destructor. FindItem returns ResourceItem; the other resource method
+  signatures also agree with their providers (see [resource evidence](RESOURCEMANAGER.md#existing-provider-connections)).
+  The complete shared declaration preserves all affected strict bodies,
+  including TrackGame `0x00520ab0`; no separate lifecycle view remains.
 - `TextureMap.h`: declares `0x00461cb0`.
 - `mcm2tool/resolved_match.py`:
   - The `$ehhandler` binding also accepts prologues where VC6 schedules

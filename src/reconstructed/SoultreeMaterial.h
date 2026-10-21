@@ -18,18 +18,7 @@
 #include "PCRenderTarget.h"
 #include "TextureMapManager.h"
 
-// The 0x70-byte texture holder at +0x70 (RTTI SurfaceMap : BaseObject, vtable
-// 0x00558248; code 0x005051f0..0x00505350, reconstructed in
-// samples/physics/motion/SurfaceMap.cpp). Only what the material calls.
-class SurfaceMap : public BaseObject {
-public:
-    SurfaceMap(TextureMap* texture, const void* material); // 0x005051f0
-    void SetTexture(TextureMap* texture);                   // 0x005052c0
-    void Select();                                          // 0x00505310
-
-    TextureMap* texture;                                    // +0x08
-    unsigned char field_0x0c[0x70 - 0x0c];
-};
+#include "SurfaceMap.h"
 
 // The six dwords at +0x74, handed to the texture loader as its format
 // choice (+0x80 is the format UnknownTextureFormatChoice calls field_0x0c).

@@ -224,24 +224,8 @@ struct UnknownSceneFog {
     float haziness;                       // "Haziness", default 0.5
 };
 
-// The 0x18-byte resource manager 0x004f0d20 keeps (unused) on its stack.
-// Tier 2: the same retail class as UnknownResourceManager. Its constructor
-// 0x004e8e80 zeroes the six fields; its destructor 0x004e8ea0 frees both
-// arrays (ResourceManager.cpp lines 135 and 139). A separate view because
-// declaring the destructor and fields on the shared class flips one register
-// choice in TrackGame 0x00520ab0 (see docs/SCENEMANAGER.md).
-class UnknownSceneResourceManager {
-public:
-    UnknownSceneResourceManager();       // 0x004e8e80
-    ~UnknownSceneResourceManager();      // 0x004e8ea0
-
-    int itemCapacity;  // +0x0  same class as UnknownResourceManager (ResourceManager.h +0x00 itemCapacity)
-    int archiveCapacity;  // +0x4  UnknownResourceManager +0x04 archiveCapacity
-    int itemCount;  // +0x8  UnknownResourceManager +0x08 itemCount
-    int archiveCount;  // +0xC  UnknownResourceManager +0x0c archiveCount
-    void** archives;  // +0x10  UnknownResourceManager +0x10 archives
-    void** items;  // +0x14  UnknownResourceManager +0x14 items
-};
+// Scene's local manager has the same 0x18-byte layout and lifecycle.
+typedef UnknownResourceManager UnknownSceneResourceManager;
 
 // Name/value pair scanned by 0x004e9980.
 struct UnknownSceneKeyword {

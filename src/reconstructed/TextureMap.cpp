@@ -139,7 +139,7 @@ failed:
                            alphaThreshold, key);
         FreeFile(file);
         if (!entry)
-            g_ResourceManager->AddObject(name, (int)map);
+            g_ResourceManager->AddObject(name, map);
     } else if (map->LoadSurface(entry->archive, width, height, minimumSize, fileFormat, dataSize,
                                 format, texturePalette, flags, surfacePalette, addressU, addressV,
                                 choice, alphaThreshold, key)) {

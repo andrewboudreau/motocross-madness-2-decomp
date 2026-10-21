@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-20 build compiles 174 C++ files (171 canonical sources and three
-reviewed candidates) and reaches LINK with 668 unresolved external symbols,
+The 2026-10-20 build compiles 176 C++ files (173 canonical sources and three
+reviewed candidates) and reaches LINK with 656 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -147,13 +147,23 @@ padding. These two providers remove two more unresolved symbols. Scripted
 dependency tests do not establish working archive loading or menus in the
 source-built game.
 
+The shared [ResourceManager declaration](RESOURCEMANAGER.md) now connects seven
+more existing providers, including Scene's local manager lifecycle. Complete
+[collision transforms](COLLISION_TRANSFORMS.md) supply MoveBox and the rigid
+inverse, and [SurfaceMap](SURFACEMAP.md) supplies its three material-caller
+imports. Its six bodies use the actual shared base, texture and rendering
+interfaces while retaining the caller's `0x70` allocation. These slices remove
+another twelve unresolved names with none added. Native checks cover resource
+layouts and imports, 229 collision geometry/alias cases, and SurfaceMap's
+ownership, material copying and virtual-call interfaces.
+
 Validation of this composition passes the toolchain/manual/generated VC6 gate,
 2,975 of 2,986 calibration rows (2,973 distinct source/address/extent cases),
 and all 1,076 previously strict physics targets among 1,152 comparisons.
 The recursive reset's strict case moves from FileStream.cpp to
 Parameterblocks.cpp with its address and full 30-byte extent unchanged;
 ShowDialog adds one strict case. The native-enabled Python suite passes
-396 tests with 11 skipped. These counts retain existing nonexact comparisons;
+399 tests with 11 skipped. These counts retain existing nonexact comparisons;
 they do not describe a fully matched or working game.
 
 The source still lacks `Game::Tick` at `0x004685d0`, called by

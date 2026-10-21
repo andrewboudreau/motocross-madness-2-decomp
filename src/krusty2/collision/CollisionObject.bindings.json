@@ -44,7 +44,7 @@
   "?CollectNodes@CollisionSourceNode@@QAEXPAHPAPAV1@@Z": "0x004fda60",
   "?CollisionDivide@@YAPAUCollisionVec3@@PAU1@PBU1@M@Z": "0x0043c890",
   "?CollisionHullShape_Free@@YAXPAUCollisionHullShape@@@Z": "0x00431da0",
-  "?CollisionInvertRigidCall@@YAXPAUMatrix4@@@Z": "0x0042e2b0",
+  "?InvertRigidTransform@@YAXPAUMatrix4@@@Z": "0x0042e2b0",
   "?CollisionLength@@YAMPBUCollisionVec3@@@Z": "0x00435ec0",
   "?CollisionMatrixMultiply@@YAXPAUMatrix4@@PBU1@1@Z": "0x00436500",
   "?CollisionMeshShape_Free@@YAXPAX@Z": "0x00431e50",

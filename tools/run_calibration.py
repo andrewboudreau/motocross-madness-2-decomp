@@ -19330,7 +19330,7 @@ CASES = [
         'name': 'SceneManager.cpp SceneManager 0x4f0390 model texture count',
         'bindings': 'src/reconstructed/SceneManager.bindings.json',
         'source': 'src/reconstructed/SceneManager.cpp',
-        'symbol': '?CountModelTextures@@YAHPBDPAVUnknownSceneResourceManager@@PAK@Z',
+        'symbol': '?CountModelTextures@@YAHPBDPAVUnknownResourceManager@@PAK@Z',
         'target_va': '0x004f0390',
         'target_size': 2442,
         'reason': 'lines 3447/3466/3472/3622; .slb/.slt',

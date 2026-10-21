@@ -1,22 +1,23 @@
 [
   {
     "class": "BoundingBoxTreeBuild",
-    "source": "RigidTransform.cpp",
+    "source": "../../../src/reconstructed/CollisionTransforms.cpp",
     "candidate_symbol_contains": "?InvertRigidTransform@@",
     "target_va": "0x0042e2b0",
     "target_size": 144,
     "expect": "exact",
-    "notes": "no __FILE__; after ReadPointNode, before Camera.cpp; called only from CollisionObject.cpp 0x004399be/0x00439a47; same body as the InvertRigid inline in BuildModelBoxTree"
+    "notes": "Complete strict body; no __FILE__ ownership claim. Direct CollisionObject callers at 0x4399be/0x439a47 now use the shared Matrix4 declaration. Same in-place transpose/translation algorithm as the builder inline.",
+    "bindings": "../../../src/reconstructed/CollisionTransforms.bindings.json"
   },
   {
     "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "source": "../../../src/reconstructed/CollisionTransforms.cpp",
     "candidate_symbol_contains": "?MoveBox@@YAXPAUVec3@@0PBUMatrix4@@@Z",
     "target_va": "0x00428db0",
     "target_size": 789,
     "expect": "exact",
-    "notes": "exact: the point goes to the transform through a local pointer and the x row groups its first two products (operand leaf age)",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
+    "notes": "Complete strict body promoted to a grouping of collision transform helpers; original TU identity remains provisional. Point-through-local transform and grouped x-row products preserve the decoded operand order.",
+    "bindings": "../../../src/reconstructed/CollisionTransforms.bindings.json"
   },
   {
     "class": "(free)",

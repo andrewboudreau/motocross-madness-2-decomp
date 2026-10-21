@@ -2,29 +2,6 @@
 // (src/krusty2/bvh/BoundingBoxTreeQuery.cpp, 0x00424690..0x0042ad2f).  Names are tier 3.
 //
 // Status (VC6 SP3, vc6_o2_ml; tools/run_physics_samples.py scores):
-// - MoveBox 0x00428db0 (789 bytes, exact): the GrowBoxByTransformedBox body on pointer
-//   arguments (that one is exact in the src file).  The loop output in its own local (`mid`),
-//   `grown` assigned after the last rotation and the z, y, x sums of the transform give the
-//   frame and slots.  The point passed through a local pointer makes the z row load the point
-//   component before the matrix element (leaf age: the local's leaves are newer than the
-//   matrix's); grouping the x row's first two products does the same there.  Written order,
-//   per-term aliases, by-reference, by-value-return and in-body transforms do not.
-//
-// LeafPairQuery 0x004275f0, LeafNodeQuery 0x004269e0 and SegmentTreeQuery 0x00429e90 are
-// exact in the src file.
-//
-// SphereTreeQuery 0x00429570 and CapsuleTreeQuery 0x004298c0 are exact in the src file too.
-//
-// SweptBoxOverlap 0x00424730, BoxOverlap 0x00424ab0 and PointInTriangle 0x004278d0 are exact
-// in the src file as well (the last two with Math3D.h's parenthesised CrossProduct and
-// QueryDot's parenthesised y term; docs/VC6_OPERAND_ORDER.md section 3).
-//
-// The SAT functions below are written with the natural Vec3 operators and inline helpers.
-// VC6's inline budget (docs/VC6_INLINE_BUDGET.md) then reproduces retail's mix of expanded
-// and out-of-line helper calls exactly; the out-of-line instances are bound to retail's
-// COMDAT copies (TransformPointInline 0x0042a510, RotateVectorInline 0x0042a450,
-// Vec3NormalizeInline 0x005087b0, CrossProduct 0x00515600, DotProduct 0x0040ae30, the
-// Vec3 constructor and operators).
 // - BoxTriangleQuery 0x00426be0 (2576 bytes, 2572 here, 1673 strict): the 13-axis
 //   box/triangle SAT.  The inline/out-of-line pattern, the jump table and (with the
 //   parenthesised CrossProduct) the cross products of cases 4-12 match.  Left: one operand
@@ -108,59 +85,6 @@ static Matrix4 s_relativeBA;        // 0x00578eb0
 static Matrix4 s_motion;            // 0x00579018
 static int s_mode;                  // 0x0057905c
 extern QueryHit* g_CollisionBoxResult;   // 0x00579058
-
-// MoveBox's transform: the x and z rows sum z, y, x, which also gives retail's slot order for
-// d and half; the x row's first two products are grouped (with the point through a local
-// pointer, below, this makes both rows load the point's component before the matrix element).
-inline void TransformPointPtrInline(Vec3* out, const Vec3* v, const Matrix4* m)
-{
-    out->x = (v->z * m->_31 + v->y * m->_21) + v->x * m->_11 + m->_41;
-    out->y = v->x * m->_12 + v->y * m->_22 + v->z * m->_32 + m->_42;
-    out->z = v->z * m->_33 + v->y * m->_23 + v->x * m->_13 + m->_43;
-}
-// 0x00428db0.  Grows the box (center, halfExtents) in place to also contain itself moved by m.
-void MoveBox(Vec3* center, Vec3* halfExtents, const Matrix4* m)
-{
-    Vec3 hx(halfExtents->x, 0.0f, 0.0f);
-    Vec3 hy(0.0f, halfExtents->y, 0.0f);
-    Vec3 hz(0.0f, 0.0f, halfExtents->z);
-    Vec3 axes[3];
-    RotateVectorInline(&axes[0], hx, m);
-    RotateVectorInline(&axes[1], hy, m);
-    RotateVectorInline(&axes[2], hz, m);
-    // Assigned after the last rotation: VC6 hoists the x and y copies but keeps the z copy
-    // after the last read of hz.z, whose slot it shares.
-    Vec3 grown;
-    grown.x = halfExtents->x;
-    grown.y = halfExtents->y;
-    grown.z = halfExtents->z;
-    Vec3& ax = axes[0];
-    Vec3& ay = axes[1];
-    Vec3& az = axes[2];
-    Vec3 half;
-    half.x = QueryAbs(ax.x) + QueryAbs(ay.x) + QueryAbs(az.x);
-    half.y = QueryAbs(ax.y) + QueryAbs(ay.y) + QueryAbs(az.y);
-    half.z = QueryAbs(ax.z) + QueryAbs(ay.z) + QueryAbs(az.z);
-    Vec3 moved;
-    const Vec3* point = center;
-    TransformPointPtrInline(&moved, point, m);
-    Vec3 d;
-    d.x = moved.x - center->x;
-    d.y = moved.y - center->y;
-    d.z = moved.z - center->z;
-    Vec3 mid;
-    for (int i = 0; i < 3; i++) {
-        float lo = d[i] - half[i];
-        float hi = half[i] + d[i];
-        if (-grown[i] < lo)
-            lo = -grown[i];
-        hi = QueryMax(grown[i], hi);
-        mid[i] = (hi + lo) * 0.5f;
-        grown[i] = (hi - lo) * 0.5f;
-    }
-    *center += mid;
-    *halfExtents = grown;
-}
 
 // The 15 separating-axis candidates of the box/box test, filled lazily inside the loop.
 static Vec3 s_axes[15];             // 0x00578f50

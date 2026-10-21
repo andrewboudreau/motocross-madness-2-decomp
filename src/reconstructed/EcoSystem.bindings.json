@@ -184,7 +184,7 @@
   "?ReadRow@UnknownParameterBlock@@QAEHPAD@Z": "0x004b8010",
   "?GetRowInt@UnknownParameterBlock@@QAEHHPAH@Z": "0x004b8180",
   "?GetRowFloat@UnknownParameterBlock@@QAEHHPAM@Z": "0x004b81c0",
-  "?FindItem@UnknownResourceManager@@QAEPAUUnknownResourceEntry@@PBDH@Z": "0x004e9360",
+  "?FindItem@UnknownResourceManager@@QAEPAVResourceItem@@PBDH@Z": "0x004e9360",
   "?TerrainLoadTexture@@YAPAVUnknownEcoTexture@@PAVTextureMapManager@@PBDHPAXHHH2HIHH@Z": "0x0050a590",
   "?IsFormat4444Or8888@@YAHH@Z": "0x00511ad0",
   "?LoadFile@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x005125c0",

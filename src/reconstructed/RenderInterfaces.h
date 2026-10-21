@@ -10,6 +10,7 @@
 // 5). Slot indices are noted on each method.
 
 struct Matrix4;
+struct SurfaceMaterial;
 struct UnknownGuid;
 struct UnknownClipperInterface;
 struct UnknownSurfaceDesc;
@@ -37,7 +38,7 @@ struct UnknownRenderInterface {
     virtual long __stdcall SetViewport(void* viewport);                           // 13
     virtual long __stdcall UnknownMethod14();
     virtual long __stdcall UnknownMethod15();
-    virtual long __stdcall UnknownMethod16();
+    virtual long __stdcall SetMaterial(const SurfaceMaterial* material);          // 16
     virtual long __stdcall UnknownMethod17();
     virtual long __stdcall UnknownMethod18();
     virtual long __stdcall UnknownMethod19();

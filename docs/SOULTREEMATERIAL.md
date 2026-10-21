@@ -12,6 +12,10 @@ The material holds render states, a SurfaceMap (+0x70) and textures. It
 loads them from a stream (`0x004ff450`) or from material keys
 (`0x004ff9e0`); both paths use the texture loader `0x004ff620`.
 
+The shared [SurfaceMap provider](SURFACEMAP.md) now supplies its constructor,
+SetTexture and Select calls. Its declaration retains the retail caller's
+`0x70` allocation, including the unknown tail beyond the material fields.
+
 Exact: 11 calibration cases. These are the constructor, the destructor and
 its deleting wrapper, attach `0x004ff0b0`, the render-state switch
 `0x004ff180`, restore `0x004ff410`, the stream load, the texture load, the

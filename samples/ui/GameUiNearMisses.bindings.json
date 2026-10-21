@@ -327,7 +327,7 @@
   "?Load@Sound@@QAEHPBDPAVUnknownTextureStream@@HHHH@Z": "0x004bc320",
   "?ReadClock@@YAIXZ": "0x004bfa80",
   "?AddArchive@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z": "0x004e9030",
-  "?FindItem@UnknownResourceManager@@QAEPAUUnknownResourceEntry@@PBDH@Z": "0x004e9360",
+  "?FindItem@UnknownResourceManager@@QAEPAVResourceItem@@PBDH@Z": "0x004e9360",
   "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
   "?OpenAndReadHeader@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x00511d00",
   "?ReadWholeFile@@YAPAUUnknownTgaFile@@PAVUnknownTextureStream@@PAU1@H@Z": "0x00511dd0",

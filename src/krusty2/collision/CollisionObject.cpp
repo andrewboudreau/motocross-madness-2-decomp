@@ -887,7 +887,7 @@ struct CollisionTreeSegment {
 
 // 0x00428db0 (cdecl, 3 args): moves the box (center, half extents) by the second
 // matrix in place.  The motion draw calls it between two DrawBox calls.  Tier 3 name.
-void MoveBox(Vec3* center, Vec3* halfExtents, const Matrix4* m);
+#include "../../reconstructed/CollisionTransforms.h"
 
 // v * M + translation row.  This has the same signature and result as the out-of-line
 // 0x0042a510 (out, v by value, m).  DrawTreeNormals calls that copy for its fourth
@@ -2437,7 +2437,6 @@ static inline void CollisionInvertRigidInPlace(Matrix4* m)
     m->_42 = p.y;
     m->_43 = p.z;
 }
-void CollisionInvertRigidCall(Matrix4* m);   // 0x0042e2b0
 
 // BoundingBoxTreeQuery.cpp entry points the segment query uses (bvh/BoundingBoxTreeQuery.h
 // declares them on its own node types; the tree pointer is opaque here).
@@ -2713,12 +2712,12 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                 hit.fraction = 1.0f;
                 SetCollisionBoxResult(&hit);
                 Matrix4 inv = model->field_0x88;
-                CollisionInvertRigidCall(&inv);
+                InvertRigidTransform(&inv);
                 if (SegmentBoxOverlap((Vec3*)&model->center, (Vec3*)&model->halfExtents, p[0], p[1], &inv)) {
                     for (int i = 0; i < model->elementCount; i++) {
                         CollisionHullBody* e = &model->elements[i];
                         inv = e->worldTransform;
-                        CollisionInvertRigidCall(&inv);
+                        InvertRigidTransform(&inv);
                         if (SegmentTreeQueryWithVertices(p, e->triangleTree, &inv, (Vec3*)e->vertices)) {
                             Vec3 d = SubtractCtorCall(p[1], p[0]);
                             Vec3 scaled = ScaleCtorCall(d, hit.fraction);

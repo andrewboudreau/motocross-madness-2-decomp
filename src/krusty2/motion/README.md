@@ -4,11 +4,13 @@ Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDAT
 # motion (Spheres.cpp, SteeringControl.cpp)
 
 Validation: all 113 targets under `src/krusty2/motion/` pass strict VC6 SP3 comparison
-(Spheres 14, SteeringControl 21, Motnctrl 41, D3DIMSoultreeMotnctrl 26, CollisionCharacter 11). In `samples/physics/motion/`,
-SurfaceMap.cpp is strict exact for 6 of 6 targets; the rest are partial.
+(Spheres 14, SteeringControl 21, Motnctrl 41, D3DIMSoultreeMotnctrl 26, CollisionCharacter 11).
+The six [SurfaceMap](../../../docs/SURFACEMAP.md) targets now use the canonical
+provider in `src/reconstructed/SurfaceMap.cpp`; their full bodies remain strict.
 
-Wave 4. Both files are linked back to back in `0x504940..0x5051ec`; SurfaceMap and the keyboard hooks
-that follow live in `samples/physics/motion/`.
+Spheres and SteeringControl are linked back to back in `0x504940..0x5051ec`.
+The following SurfaceMap and keyboard-hook bodies have canonical reconstruction
+groupings; adjacency alone does not assign their original translation units.
 
 ## Shared streams and resource entries
 

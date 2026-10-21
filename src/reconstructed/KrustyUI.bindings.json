@@ -146,7 +146,7 @@
   "?SetShadowGrey@UnknownKrustyUIShadow@@QAEXH@Z": "0x004dae30",
   "?SetLight@UnknownKrustyUIShadow@@QAEXPBUVector3@@0H@Z": "0x004dae50",
   "?SetCamera@RenderTarget@@QAEXPAVCamera@@@Z": "0x004e8cf0",
-  "?FindItem@UnknownResourceManager@@QAEPAUUnknownResourceEntry@@PBDH@Z": "0x004e9360",
+  "?FindItem@UnknownResourceManager@@QAEPAVResourceItem@@PBDH@Z": "0x004e9360",
   "?SetAxes@UnknownKrustyUISoultree@@QAEXMMMMMMMH@Z": "0x004fbd10",
   "?SetPosition@UnknownKrustyUISoultree@@QAEXPBUVector3@@@Z": "0x004fc660",
   "?SetTaskSwitchAllowed@@YAXH@Z": "0x005053b0",

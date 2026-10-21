@@ -18,7 +18,7 @@ Evidence
     `BoundingBoxTreeQuery.cpp` (file name ours; near misses in
     `samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp`).
   - 0x42e2b0, the rigid inverse, is called only from CollisionObject. It is in
-    `samples/physics/bvh/RigidTransform.cpp`.
+    `src/reconstructed/CollisionTransforms.cpp`.
 - RTTI: none. The file has no classes, only free functions over plain structs.
 - Layout (decoded accesses; names are tier 3; see the `// +0xNN` comments in BoundingBoxTreeBuild.h):
   - Interior node: 0x24 bytes, `{volume, center, halfExtents, child[2]}`; volume >= 0 marks an

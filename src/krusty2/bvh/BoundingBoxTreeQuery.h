@@ -189,7 +189,7 @@ int TreeTreeQuery(QueryTreeNode* a, QueryTreeNode* b, const Matrix4* xfA, const 
                   int mode, Vec3* vertices, const Matrix4* motion);                // 0x00428950
 int TreeBoxOverlap(QueryTreeNode* a, QueryTreeNode* b, const Matrix4* xfA,
                    const Matrix4* xfB);                                            // 0x00428c20
-void MoveBox(Vec3* center, Vec3* halfExtents, const Matrix4* m);                   // 0x00428db0
+#include "../../reconstructed/CollisionTransforms.h"
 void GrowBoxByTransformedBox(Vec3* outCenter, Vec3* outHalfExtents, Vec3 center,
                              Vec3 halfExtents, const Matrix4* m);                  // 0x004290d0
 int SphereTreeQueryWithVertices(const Vec3* center, float radius, float radiusSq,

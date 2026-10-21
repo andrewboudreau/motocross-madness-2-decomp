@@ -158,8 +158,8 @@ Callers no longer cast resource-manager pointers to `int`. The two TGA entry
 points retain their separately provisional integer parameter and cast it at
 the stream-construction boundary. The stream's layout and constructor stores
 are unchanged; its exact comparison includes the complete emitted extent and
-resolved relocations. This connection does not establish the original class
-name or unify the separate reduced resource-manager declarations.
+resolved relocations. The original class name remains unknown. The resource
+manager consumers now share its [canonical declaration](RESOURCEMANAGER.md#existing-provider-connections).
 
 The parameter-reader stream view is an alias of this shared declaration.
 `ResetTextMode` is now a recursive inline accessor alongside GetTextMode and

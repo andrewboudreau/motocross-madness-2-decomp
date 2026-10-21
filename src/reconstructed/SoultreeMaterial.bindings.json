@@ -3,7 +3,7 @@
   "??0ManagedTexture@@QAE@PAVTextureMapManager@@@Z": "0x00510500",
   "??0PCTextureMap@@QAE@PAVTextureMapManager@@H@Z": "0x004c5f00",
   "??0SoultreeMaterial@@QAE@H@Z": "0x004fefe0",
-  "??0SurfaceMap@@QAE@PAVTextureMap@@PBX@Z": "0x005051f0",
+  "??0SurfaceMap@@QAE@PAVTextureMap@@PBUSurfaceMaterial@@@Z": "0x005051f0",
   "??0UnknownTokenizer@@QAE@PAD@Z": "0x00515dc0",
   "??1GameObject@@UAE@XZ": "0x00468d60",
   "??1SoultreeMaterial@@UAE@XZ": "0x004ff120",

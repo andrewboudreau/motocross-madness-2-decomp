@@ -3,10 +3,7 @@
 // D:\aardvark\VC\krusty2\ResourceManager.cpp (__FILE__ 0x00572b64).
 // Names are provisional except ResourceItem (RTTI).
 //
-// This header is the full declaration of the class other TUs see through
-// UnknownResourceManager.h. That header stays a reduced view because
-// declaring the destructor and fields there flips a register choice in
-// TrackGame 0x00520ab0 (docs/SCENEMANAGER.md); never include both.
+// Shared declaration for resource and scene consumers.
 
 #include "BaseObject.h"
 
@@ -15,8 +12,8 @@ class UnknownTextureStream;
 // RTTI: ResourceItem : BaseObject (vtable 0x00557858, COL 0x0055ec78), 0x20
 // bytes (operator new(0x20) at 0x004e91e1, 0x004e957f, 0x004e9718). One
 // named file: the archive holding it and where, or the object it was
-// loaded as. UnknownResourceEntry (UnknownResourceManager.h) is the view
-// other TUs use.
+// loaded as. UnknownResourceEntry (UnknownResourceManager.h) is a legacy
+// alias of this same declaration.
 class ResourceItem : public BaseObject {
 public:
     ResourceItem();                       // 0x004e8d70

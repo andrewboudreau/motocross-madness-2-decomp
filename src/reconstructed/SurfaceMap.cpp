@@ -1,9 +1,11 @@
-// SurfaceMap.cpp -- SurfaceMap (0x005051f0..0x00505350), a texture plus material wrapper.
-// Placement and ownership: see SurfaceMap.h.
-#include "../../../src/reconstructed/TrackGameGlobal.h"
+// Complete SurfaceMap bodies; original translation-unit ownership is unknown.
 #include "SurfaceMap.h"
+#include "TextureMap.h"
+#include "Game.h"
+#include "PCRenderTarget.h"
+#include "TrackGameGlobal.h"
 
-SurfaceMap::SurfaceMap(SurfaceTexture* tex, const SurfaceMaterial* mat)
+SurfaceMap::SurfaceMap(TextureMap* tex, const SurfaceMaterial* mat)
 {
     texture = tex;
     if (tex)
@@ -38,7 +40,7 @@ SurfaceMap::~SurfaceMap()
         texture->Release();
 }
 
-void SurfaceMap::SetTexture(SurfaceTexture* tex)
+void SurfaceMap::SetTexture(TextureMap* tex)
 {
     if (texture)
         texture->Release();
@@ -50,7 +52,7 @@ void SurfaceMap::SetTexture(SurfaceTexture* tex)
 
 int SurfaceMap::Apply()
 {
-    return reinterpret_cast<SurfaceGame*>(g_TrackGame)->display->device->SetMaterial(&material) == 0;
+    return static_cast<PCRenderTarget*>(reinterpret_cast<Game*>(g_TrackGame)->renderTarget)->device->SetMaterial(&material) == 0;
 }
 
 void SurfaceMap::Select()
@@ -60,6 +62,6 @@ void SurfaceMap::Select()
         texture->Bind();
         return;
     }
-    reinterpret_cast<SurfaceGame*>(g_TrackGame)->display->Slot7(0, 1, 1);
-    reinterpret_cast<SurfaceGame*>(g_TrackGame)->display->Slot7(0, 4, 1);
+    reinterpret_cast<Game*>(g_TrackGame)->renderTarget->SetTextureStageState(0, 1, 1);
+    reinterpret_cast<Game*>(g_TrackGame)->renderTarget->SetTextureStageState(0, 4, 1);
 }

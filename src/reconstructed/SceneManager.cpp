@@ -1319,7 +1319,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
     strcat(file, dir);
     strcat(file, fname);
     strcat(file, ".slb");
-    if (!AddResource((UnknownResourceManager*)resources, name, file))
+    if (!AddResource(resources, name, file))
         return 1;
     UnknownResourceEntry* entry = g_ResourceManager->FindItem(name, 0);
     if (!entry) {
@@ -1370,7 +1370,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
                 position = entry->archive->Tell();
                 mode = entry->archive->GetTextMode();
                 if (material->hasTextureName) {
-                    if (!AddResource((UnknownResourceManager*)resources, material->textureName, 0))
+                    if (!AddResource(resources, material->textureName, 0))
                         return 1;
                     if (!CountTexture((UnknownSceneTextureInfo*)material, (int*)counts))
                         return 0;
@@ -1388,7 +1388,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
     strcat(file, dir);
     strcat(file, fname);
     strcat(file, ".slt");
-    if (!AddResource((UnknownResourceManager*)resources, name, file))
+    if (!AddResource(resources, name, file))
         return 1;
     if (!g_ResourceManager->FindItem(name, 0)) {
         g_ResourceManager->AddLooseFile(name, file);
@@ -1406,7 +1406,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
         sprintf(section, "Material - %d", k);
         block.SelectSection(section);
         if (block.ReadString("TextureMap", material.textureName, -1)) {
-            if (!AddResource((UnknownResourceManager*)resources, material.textureName, 0)) {
+            if (!AddResource(resources, material.textureName, 0)) {
                 delete stream;
                 return 1;
             }

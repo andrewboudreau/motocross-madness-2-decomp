@@ -14,7 +14,7 @@
 //   therefore belongs to the same TU) and its .bss (0x00578ea0..0x00579070) is referenced from
 //   0x00424df8..0x0042a0ae; 0x0042a640 and 0x0042ac00 are called from it.
 // - After 0x0042e2a3: the out-of-line rigid inverse 0x0042e2b0 (called only from
-//   CollisionObject; kept in samples/physics/bvh/RigidTransform.cpp), then Camera.cpp 0x0042e340.
+//   CollisionObject; supplied by src/reconstructed/CollisionTransforms.cpp), then Camera.cpp 0x0042e340.
 // The four kVec3 `$E` pairs 0x0042d250..0x0042d38b sit mid-file.
 //
 // Near miss (samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp): GatherModelTriangles

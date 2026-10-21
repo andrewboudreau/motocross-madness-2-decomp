@@ -55,7 +55,7 @@ inline void TransformPoint(TreeVec3* out, TreeVec3 v, const TreeMatrix4* m)
 // In-place inverse of a rigid transform: transpose the rotation block, then rotate the
 // translation back and negate it.  BuildModelBoxTree (0x0042dc90) inlines exactly this body
 // (it must go through the pointer: the same statements written on the local matrix directly
-// make VC6 order the x87 operands differently); the out-of-line copy at 0x0042e2b0 has the same body (samples/physics/bvh/RigidTransform.cpp).
+// make VC6 order the x87 operands differently); the out-of-line copy at 0x0042e2b0 has the same body (src/reconstructed/CollisionTransforms.cpp).
 inline void InvertRigid(TreeMatrix4* m)
 {
     float swap;

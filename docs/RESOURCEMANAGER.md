@@ -13,13 +13,10 @@ Names other than ResourceItem are provisional.
 The manager keeps named items (ResourceItem: a name, the archive stream
 holding the file and its offset, or the object loaded from it), opens
 "RS2" archives and adds their items, finds items by name or object, and
-releases archives. `ResourceManager.h` is the full class;
-`UnknownResourceManager.h` stays the reduced view other files include,
-because declaring the destructor and fields there flips a register choice
-in TrackGame `0x00520ab0` (see [SCENEMANAGER](SCENEMANAGER.md)). The two
-headers must not be included together. Two methods have different
-declared return types in the two headers (`0x004e9360`, `0x004e96b0`);
-both bind to the same retail address.
+releases archives. `ResourceManager.h` provides the shared full declaration;
+`UnknownResourceManager.h` includes it and retains `UnknownResourceEntry` as
+an alias of ResourceItem. SceneManager's `UnknownSceneResourceManager` is
+likewise an alias of the same manager. Both include paths can be used together.
 
 The archive opener `0x004e9030` is a nonexact candidate in
 `samples/render/ResourceManagerNearMisses.cpp`. It is a standalone source
@@ -27,6 +24,38 @@ containing only `AddArchive`; it does not include the canonical `.cpp` or
 redefine the global manager. Independent review accepted it for explicit
 reviewed-nonexact admission through `config/game_build.json`; its source
 remains in `samples/` and is not a strict-match provider.
+
+## Existing provider connections
+
+Seven formerly unresolved identities now call existing strict providers:
+the manager constructor and destructor (`0x004e8e80`, `0x004e8ea0`), FindItem
+(`0x004e9360`), AddLooseFile (`0x004e9430`), AddObject (`0x004e96b0`),
+SetItemObject (`0x004e9010`) and RemoveArchiveItems (`0x004e9830`). No method
+body, wrapper, forwarding alias or singleton storage was added by this change.
+
+The scene's local manager occupies `0x18` bytes with archive/item arrays at
+`+0x10`/`+0x14`. Its constructor clears all six fields, and its destructor
+releases archive streams and items, then frees the tables. Scene CountObjects
+and CountTextures now reference that same lifecycle, including exception
+cleanup. FindItem returns the actual `0x20`-byte ResourceItem, whose object,
+archive and offset are at `+0x10`, `+0x14` and `+0x18`. The callers previously
+used compatible field offsets through a different return type.
+
+AddLooseFile, AddObject and RemoveArchiveItems return integers; callers that
+previously declared void continue to discard the result. AddObject stores its
+second argument as the item's object pointer. TextureMap now passes its map
+pointer directly, and SetItemObject's former integer overload is removed:
+callers pass an object pointer or a null pointer. The call argument sizes and
+retail destinations are unchanged.
+
+`tests/test_resource_connections.py` compiles the real manager and eight caller
+translation units, verifies all seven provider bodies strictly against retail,
+and requires the imports to use those supplied names. Its compile-only layout
+fixture checks both include paths, legacy alias type identity, the scene's
+stack size, ResourceItem size and accessed fields. The affected calibration
+closure preserves every prior strict case, including the previously sensitive
+TrackGame `0x00520ab0`. The real link removes all seven missing names; this does
+not establish functional resource loading or startup.
 
 ## Functional build review
 
@@ -114,6 +143,5 @@ is `AddArchive`. The full header also names `FindItem` (`0x004e9360`),
 `FindItemByObject` (`0x004e93f0`), `AddLooseFile` (`0x004e9430`),
 `AddObject` (`0x004e96b0`), `RemoveArchiveItems` (`0x004e9830`) and
 `ReleaseItem` (`0x004e9900`). These semantic names remain provisional.
-Reduced declarations still differ in several return/argument types;
-method naming does not establish complete C++ type identity across those
-views.
+The canonical signatures now also cover the former reduced declarations;
+these source-level names remain inferred even where the ABI is confirmed.
