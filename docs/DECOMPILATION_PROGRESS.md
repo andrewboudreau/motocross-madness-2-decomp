@@ -1,11 +1,11 @@
 # Decompilation progress
 
-> Last reviewed: **2026-10-12** · Retail executable: `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`
+> Last reviewed: **2026-10-21** · Retail executable: `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`
 
 There is not yet a defensible whole-game percentage. The best reproducible
-headline is that **2964 of 2975 selected function targets (99.6%)**
+headline is that **2970 of 2981 selected function targets (99.6%)**
 have strict, byte-for-byte matches in the reviewed calibration suite, compiled
-with VC6 SP3. The suite contains **2980 cases**; repeated
+with VC6 SP3. The suite contains **2988 cases**; repeated
 retail address/extent pairs count once.
 That percentage measures the active target set, **not 99.6% of MCM2**:
 targets are chosen because they are useful or tractable, and the executable's
@@ -15,10 +15,10 @@ complete function inventory has not been established.
 
 | Indicator | Current value | What it means |
 |---|---:|---|
-| Strict VC6 exact targets | **2964 / 2975 (99.6%)** | Unique retail address/extent pairs in the reviewed calibration run |
+| Strict VC6 exact targets | **2970 / 2981 (99.6%)** | Unique retail address/extent pairs in the reviewed calibration run |
 | Canonical reconstructed implementation files | **180** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
 | Canonical reconstructed headers | **193** | Layout and interface declarations, including support-only headers |
-| Canonical C++ source lines | **105,180** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
+| Canonical C++ source lines | **105,181** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
 | Retail source-path strings | **111** | Navigation evidence; reconstructed files are not one-to-one with original TUs |
 | Recovered RTTI types | **252** | Confirmed type descriptors, not necessarily reconstructed classes |
 | Retail `.text` virtual size | **1,368,518 bytes (1.31 MiB)** | Broad code-section denominator; includes library code, thunks and padding |
@@ -65,9 +65,9 @@ python3 tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt --vc6-root "
 
 Inspect every result: the runner reports nonmatches as data and its exit status
 alone does not prove strict matching. Reviewed code revision:
-`47e9c0735377d5e7e0efde1c5135212710a418bf`. Source inventory counts reflect the current tree
+`3fc0a9b890174edb0f889867643c8030b4d9fcb1`. Source inventory counts reflect the current tree
 and do not imply every body in those files matches.
 
 ### Caveats recorded with the snapshot
 
-2964 of 2975 unique retail address/extent pairs passed strict comparison in 2980 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). Every relocation was resolved, or the function had no relocation bytes. The remaining 11 match only with relocations masked or are registered near misses: BaseObject::Release, seven UI compiler-shape probes, two FollowRacer near misses (0x4a9d20, 0x4a9e80) and the GridNode near miss 0x484d70. This excludes the physics runner, whose historical exact label masks relocations, and is not a census of retail functions. RTTI/source-path and .text figures were regenerated from the hash-pinned executable.
+2970 of 2981 unique retail address/extent pairs passed strict comparison in 2988 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). There are 2977 strict rows and 2975 distinct source/address/extent cases; multiple source definitions may share a retail address. Every strict comparison resolves all relocations or has no relocation bytes. The remaining 11 cases are BaseObject::Release, seven UI compiler-shape probes, two FollowRacer near misses (0x4a9d20, 0x4a9e80) and the GridNode near miss 0x484d70. The separately reviewed physics runner has 1080 strict exact results among 1156 comparisons; those results are not included in this calibration percentage. Neither suite is a census of retail functions or evidence that the source-built game links or runs. RTTI/source-path and .text figures retain their hash-pinned executable provenance.

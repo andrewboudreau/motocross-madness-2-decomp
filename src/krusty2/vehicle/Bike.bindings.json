@@ -94,7 +94,6 @@
   "?BikeVec3Sub@@YA?AUVec3@@ABU1@0@Z": "0x00421d00",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
-  "?FindByName@BikeA1A0@@QAEHPBD@Z": "0x004fdae0",
   "?FindByName@SoultreeObject@@QAEPAV1@PBD@Z": "0x004fdae0",
   "?FindMotion@BikeA5C4@@QAEHPBDH@Z": "0x004a6b30",
   "?FindMotion@Character@@QAEPAUMotion@@PBDH@Z": "0x004a6b30",
@@ -102,7 +101,6 @@
   "?GetAxesIn@SoultreeObject@@QAEXPAV1@PAUVec3@@1@Z": "0x004fc540",
   "?GetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fca80",
   "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
-  "?GetSubtreeBounds@BikeA1A0@@QAEXPAUVec3@@0@Z": "0x004fe850",
   "?GetSubtreeBounds@SoultreeObject@@QAEXPAUVec3@@0@Z": "0x004fe850",
   "?LoadBike@Bike@@QAEPAVGameObject@@HPBD00PBUSoultreeLoadDesc@@PBUBikeA5C8@@UVec3@@33PAXPAUVehicleInputMap@@0HHPAHHHHMMMMMMHH44PAUVehicleAxis@@77PAVSoultreeSlot1f0@@MH@Z$ehhandler": "0x005498b0",
   "?LoadVehicle@Vehicle@@QAEPAVGameObject@@HPBD0PBUSoultreeLoadDesc@@HUVec3@@22PAXPAUVehicleInputMap@@3MMM3HHHHHHPAHHHHMPAUVehicleAxis@@66PAVSoultreeSlot1f0@@H@Z": "0x00525e20",
@@ -116,7 +114,6 @@
   "?Method_0x004a8bf0@Character@@QAEXHM@Z": "0x004a8bf0",
   "?Method_0x004a8c50@BikeA5C4@@QAEXHHMM@Z": "0x004a8c50",
   "?Method_0x004a8c50@Character@@QAEXHHMM@Z": "0x004a8c50",
-  "?SetMatrixIn@BikeA1A0@@QAEXHPAUMatrix4@@@Z": "0x004fb8c0",
   "?SetupWrecker@Wrecker@@QAEPAV1@PAXPAVD3DIMSoultreeCharacter@@PBD@Z": "0x00530190",
   "?EndWreck@Wrecker@@QAEXXZ": "0x005327c0",
   "?AddProbe@Wrecker@@QAEXUVector3@@H@Z": "0x00532900",
@@ -251,5 +248,6 @@
   "_strcmp": "0x00536070",
   "_strncpy": "0x00534b10",
   "__real@8@00000000000000000000": "0x005507e8",
-  "??G@YA?AUVec3@@ABU0@0@Z": "0x00421d00"
+  "??G@YA?AUVec3@@ABU0@0@Z": "0x00421d00",
+  "?SetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fb8c0"
 }

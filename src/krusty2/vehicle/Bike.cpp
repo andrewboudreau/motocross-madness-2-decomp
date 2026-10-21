@@ -731,7 +731,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     }
 
     modelNode->GetMatrixIn(0, &riderMatrix);
-    riderCharacter->c_0x1a0->SetMatrixIn(0, &riderMatrix);
+    reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->SetMatrixIn(0, &riderMatrix);
     UnknownVirtualSlot97();
     steerState->SetAxisFromPoints(frontWheel->sceneNode, handlebars->node, poseNode);
     steerState->SetAngle(0.0f, poseNode);
@@ -756,7 +756,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     // rider and of the steering integrator gains (tier 3 reading).
     modelNode->GetSubtreeBounds(&bikeCenter, &bikeExtents);
     float length = bikeExtents.z * 2.0f;
-    riderCharacter->c_0x1a0->GetSubtreeBounds(&riderCenter, &riderExtents);
+    reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->GetSubtreeBounds(&riderCenter, &riderExtents);
     float width = riderExtents.x * 2.0f;
     float height = riderExtents.y * 2.0f;
     float h2 = height * height;
@@ -851,7 +851,7 @@ int Bike::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,
     int mode = wrecker->wreckState;
     if (mode == 0 || mode == 1) {
         modelNode->GetMatrixIn(0, &tmp);
-        riderCharacter->c_0x1a0->SetMatrixIn(0, &tmp);
+        reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->SetMatrixIn(0, &tmp);
     }
     ((BikeA38*)wrecker->collisionModel)->Method_0x00435fe0();
     return r;
@@ -1047,7 +1047,7 @@ void Bike::UnknownVirtualSlot29(int)
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);
-        riderCharacter->c_0x1a0->SetMatrixIn(0, &tmp);
+        reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->SetMatrixIn(0, &tmp);
     }
 }
 
@@ -1131,7 +1131,7 @@ void Bike::UnknownVirtualSlot102(float)
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);
-        riderCharacter->c_0x1a0->SetMatrixIn(0, &tmp);
+        reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->SetMatrixIn(0, &tmp);
     }
 }
 
@@ -1302,7 +1302,7 @@ static __forceinline void BikeAttachBone(Bike* self, const char* name, float x, 
     offset.x = x;
     offset.y = y;
     offset.z = z;
-    int bone = ((BikeA34*)self->wrecker->character)->r_0x1a0->FindByName(name);
+    int bone = reinterpret_cast<int>(reinterpret_cast<SoultreeObject*>(((BikeA34*)self->wrecker->character)->r_0x1a0)->FindByName(name));
     self->wrecker->AddProbe(offset, bone);
 }
 

@@ -1385,6 +1385,6 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);
-        riderCharacter->c_0x1a0->SetMatrixIn(0, &tmp);
+        reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->SetMatrixIn(0, &tmp);
     }
 }

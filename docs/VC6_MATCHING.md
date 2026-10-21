@@ -3,9 +3,9 @@
 Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 The 2026-10-21 native Windows VC6 SP3 gate passes its toolchain identity,
-manual smoke and generated-probe checks. Calibration has 2,975 strict-exact
-rows among 2,986 comparisons: 2,973 distinct source/address/extent cases.
-It covers 141 source files, 138 with at least one strict case. The separate
+manual smoke and generated-probe checks. Calibration has 2,977 strict-exact
+rows among 2,988 comparisons: 2,975 distinct source/address/extent cases.
+It covers 143 source files, 140 with at least one strict case. The separate
 physics matrix has 1,080 strict-exact targets among 1,156 comparisons.
 All prior strict cases are retained, and both near-miss comparisons report
 zero drops. These are complete function checks with relocations resolved;

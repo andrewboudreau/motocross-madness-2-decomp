@@ -686,7 +686,7 @@ void KrustyBike::UnknownVirtualSlot29(int a)
     if (!mode || mode == 1) {
         Matrix4 m;
         modelNode->GetMatrixIn(0, &m);
-        riderCharacter->c_0x1a0->SetMatrixIn(0, &m);
+        reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->SetMatrixIn(0, &m);
     }
     if (motionCompleted && !hasFinished && landingLatched) {
         if (trickLandTimer < 0.0f) {

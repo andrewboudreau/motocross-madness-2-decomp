@@ -1,6 +1,7 @@
 // Terrain.cpp -- reconstruction of D:\aardvark\VC\krusty2\Terrain.cpp.
 #include "../../reconstructed/TrackGameGlobal.h"
 #include "Terrain.h"
+#include "../../reconstructed/FileStream.h"
 #include "../../reconstructed/DebugOverlay.h"
 
 #include <float.h>
@@ -156,8 +157,8 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     }
     this->stream = stream;
     if (stream->inner)
-        stream->Seek(stream->innerStart, 0, 0);
-    fileStartOffset = this->stream->Tell();
+        reinterpret_cast<UnknownTextureStream*>(stream)->Seek(stream->innerStart, 0, 0);
+    fileStartOffset = reinterpret_cast<UnknownTextureStream*>(this->stream)->Tell();
     surfaceRegistry = surfaceDesc.registry;
     lightManager = field0xc40;
     textureAgeManager = new(__FILE__, 0x11c) TerrainOwned;
@@ -166,8 +167,8 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
 
     char tag[4];
     int version;
-    this->stream->Read(tag, 4, 1);
-    this->stream->Read(&version, 4, 1);
+    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(tag, 4, 1);
+    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&version, 4, 1);
     if (strcmp(tag, "TRN") != 0 || version != 5)
         goto fail;
     field_0xc94 = 5;
@@ -196,7 +197,7 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     qualityParamA = 0x100;
 
     int hasPalette;
-    this->stream->Read(&hasPalette, 4, 1);
+    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&hasPalette, 4, 1);
     if (hasPalette) {
         TerrainColorMapper* mapper = new(__FILE__, 0x167) TerrainColorMapper(this->stream);
         colorMapper = mapper;
@@ -219,17 +220,17 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     int unusedHeader;
     int blockRecords;
     int surfaceRecords;
-    this->stream->Read(&field_0xbe8, 4, 1);
-    this->stream->Read(&gridCellSize, 4, 1);
-    this->stream->Read(&gridSize, 4, 1);
-    this->stream->Read(&unusedHeader, 4, 1);
-    this->stream->Read(&blockCount, 4, 1);
-    this->stream->Read(&blockRecords, 4, 1);
+    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&field_0xbe8, 4, 1);
+    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&gridCellSize, 4, 1);
+    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&gridSize, 4, 1);
+    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&unusedHeader, 4, 1);
+    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&blockCount, 4, 1);
+    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&blockRecords, 4, 1);
     blocks = (void**)DebugMalloc(blockCount * 4, __FILE__, 0x197);
-    this->stream->Seek(blockCount * 4, 1, 1);
-    this->stream->Read(&ownedObjectCount, 4, 1);
-    this->stream->Read(&surfaceRecords, 4, 1);
-    this->stream->Seek(ownedObjectCount * 4, 1, 1);
+    reinterpret_cast<UnknownTextureStream*>(this->stream)->Seek(blockCount * 4, 1, 1);
+    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&ownedObjectCount, 4, 1);
+    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&surfaceRecords, 4, 1);
+    reinterpret_cast<UnknownTextureStream*>(this->stream)->Seek(ownedObjectCount * 4, 1, 1);
     int b;
     for (b = 0; b < blockRecords; b++)
         blocks[b] = new(__FILE__, 0x1ab) TerrainGridBlock(this->stream);
@@ -240,9 +241,9 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
         for (int i = 0; i < surfaceRecords; i++) {
             int height;
             int format;
-            this->stream->Read(&width, 4, 1);
-            this->stream->Read(&height, 4, 1);
-            this->stream->Read(&format, 4, 1);
+            reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&width, 4, 1);
+            reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&height, 4, 1);
+            reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&format, 4, 1);
             TerrainSurfaceBase* surface;
             if (surfaceRegistry && width == 0x100) {
                 TerrainSurface* managed = new(__FILE__, 0x1bb) TerrainSurface(surfaceDesc.manager);

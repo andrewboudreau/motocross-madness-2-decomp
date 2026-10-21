@@ -158,7 +158,6 @@
   "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd5c0",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?Method_0x004a8bf0@Character@@QAEXHM@Z": "0x004a8bf0",
-  "?SetMatrixIn@BikeA1A0@@QAEXHPAUMatrix4@@@Z": "0x004fb8c0",
   "?StartAnimatedWreck@Wrecker@@QAEXH@Z": "0x00532220",
   "?StartTumble@Wrecker@@QAEXXZ": "0x00532310",
   "?EndWreck@Wrecker@@QAEXXZ": "0x005327c0",
@@ -356,5 +355,6 @@
   "?UnknownVirtualSlot14@SoultreePhysicsBaseObject@@UAEXPAUVec3@@PBU2@1@Z": "0x00502080",
   "__real@4@3ffeffbe770000000000": "0x00554744",
   "?Remove@QuadTree@@QAEXPAVQuadTreeObject@@I@Z": "0x004dcf20",
-  "?g_collisionQuadTree@@3PAVQuadTree@@A": "0x0068aba4"
+  "?g_collisionQuadTree@@3PAVQuadTree@@A": "0x0068aba4",
+  "?SetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fb8c0"
 }

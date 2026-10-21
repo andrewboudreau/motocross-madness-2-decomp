@@ -52,7 +52,7 @@ python tests/test_terrain_connections.py -v
 ```
 
 The regression compiles the three actual caller TUs, Terrain.cpp,
-TerrainSupport.cpp and native layout assertions. It preserves **178** strict
+TerrainSupport.cpp, FileStream.cpp and native layout assertions. It preserves **190** strict
 cases, proves the three full COFF function extents and retail bytes with
 resolved relocations, and checks that actual caller objects import the
 canonical providers rather than the retired names. It also retains complete
@@ -71,6 +71,33 @@ This is not full terrain dependency closure: CastSegment still imports the
 existing unresolved `TerrainVec3::operator*=`, and its runtime height-field
 object must be supplied by the remaining game reconstruction. No terrain
 runtime integration or completed game is claimed.
+
+## Terrain stream calls
+
+Terrain::Load now calls the existing UnknownTextureStream `Read`, `Seek` and
+`Tell` methods at its stream boundary. The provisional TerrainStream layout
+and Load signature remain unchanged. Both stream views are 0x134 bytes, with
+their nested stream at +0x1c and slice offset at +0x130. Load's existing
+receiver-producing instructions, all 14 reads, three seeks and one tell match
+the corresponding retail call sites. The complete retail loader is 2116 bytes;
+the current 2117-byte source loader remains nonexact.
+
+Before/after VC6 objects preserve all 84 non-debug sections' bytes, sizes,
+attributes and relocation destinations, allowing only the three externally
+renamed providers. Compiler-local labels retain their section and offset.
+Adding the stream header renumbers an EH label in Load, so its full named
+relocation fingerprint was refreshed after that comparison; its raw instruction
+hash and the complete QueryGround fingerprint are unchanged. The committed
+test checks those fingerprints, all 18 actual imports, decoded retail call
+counts, stream layouts and the existing strict caller/provider cases.
+
+Read and Seek remain the already reviewed nonexact bodies in
+`samples/io/FileStream.cpp`; Tell's complete 63-byte body is strict exact.
+The [stream differential test](FILESTREAM.md#functional-build-review) still
+passes 12,390 cases. This boundary change does not newly validate the complete
+terrain loader or claim a fully reconstructed stream hierarchy. The isolated
+real build compiles 200/200 units and removes exactly these three obsolete
+names: **522 to 519**, with no new unresolved names.
 
 ## QueryGround remains blocked
 

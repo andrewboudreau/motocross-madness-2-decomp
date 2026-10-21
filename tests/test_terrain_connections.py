@@ -1,4 +1,5 @@
-"""Full caller/provider byte proofs for three existing terrain operations."""
+"""Complete terrain caller/provider proofs and stream boundary preservation."""
+from collections import Counter
 import hashlib
 import json
 import os
@@ -17,7 +18,7 @@ from tools.run_calibration import CASES
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ('src/reconstructed/Grid1.cpp', 'src/reconstructed/QuarryStuntEvent.cpp',
            'src/reconstructed/TrackOverlay.cpp', 'src/krusty2/broadphase/Terrain.cpp',
-           'src/reconstructed/TerrainSupport.cpp')
+           'src/reconstructed/TerrainSupport.cpp', 'src/reconstructed/FileStream.cpp')
 PROVIDERS = (
     ('?RetireOwnedObject@Terrain@@QAEXPAVBaseObject@@@Z', 0x5057d0, 83),
     ('?SelectQuality@Terrain@@QAEXH@Z', 0x507960, 129),
@@ -27,7 +28,9 @@ PROVIDERS = (
 # relocation records are hashed because QueryGround still has unbound helpers.
 # This is deliberately not a successful retail comparison of either function.
 PARTIAL = (
-    ('?Load@Terrain@@', 2117, '0e0914cc5a15a2f8b5210e4d1a2b2354dc559821e8c031e072a4004b348c98f3'),
+    # Stream connection changes three relocation names and renumbers an EH
+    # label. All 84 non-debug sections retain their bytes and destinations.
+    ('?Load@Terrain@@', 2117, '431190d6d2ce7dbfdfaf8ba13be94737176701bcfb7d1e588f81878bae853a50'),
     ('QueryGround', 3321, '07ea9bdeb16235841aaf1d125c77ee580b9b1667ec900de488c74df2f57207b3'),
 )
 
@@ -96,7 +99,31 @@ class TerrainConnectionsTests(unittest.TestCase):
             for source, symbol, va, size, bindings in dict.fromkeys(cases):
                 self.assertTrue(compare(retail, objects[source], symbol, va, size, bindings)['strict_exact'],
                                 (source, symbol))
-            self.assertGreaterEqual(len(dict.fromkeys(cases)), 178)
+            self.assertEqual(len(dict.fromkeys(cases)), 190)
+            # Load remains nonexact; keep its complete candidate instruction
+            # bytes, while joining only the three evidenced stream calls.
+            entry = provider.find_symbol('?Load@Terrain@@')
+            body, size, relocations = provider.symbol_extent(entry)
+            self.assertEqual(size, 2117)
+            self.assertEqual(hashlib.sha256(body).hexdigest(),
+                             '809febfee089efa6c3c7b4cd3ae3ff2e22f73f638260973ff5deb747d414bbaa')
+            stream_calls = {'?Read@UnknownTextureStream@@QAEHPAXHH@Z': (0x461640, 14),
+                            '?Seek@UnknownTextureStream@@QAEHHHH@Z': (0x461340, 3),
+                            '?Tell@UnknownTextureStream@@QAEHXZ': (0x461600, 1)}
+            calls = Counter(provider.symbol_by_index[r.symbol_index].name
+                            for r in relocations if r.type == 0x14)
+            for symbol, (va, count) in stream_calls.items():
+                self.assertEqual(calls[symbol], count)
+                self.assertNotIn(symbol.replace('@UnknownTextureStream@@', '@TerrainStream@@'), calls)
+            import capstone
+            decoder = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
+            decoder.detail = True
+            decoded = list(decoder.disasm(retail.bytes_at_va(0x5059d0, 2116), 0x5059d0))
+            self.assertEqual(sum(i.size for i in decoded), 2116)
+            retail_calls = Counter(i.operands[0].imm for i in decoded if i.mnemonic == 'call'
+                                   and i.operands[0].type == capstone.x86.X86_OP_IMM)
+            for va, count in stream_calls.values():
+                self.assertEqual(retail_calls[va], count)
             for symbol, expected_size, digest in PARTIAL:
                 entry = provider.find_symbol(symbol)
                 body, size, relocations = provider.symbol_extent(entry)

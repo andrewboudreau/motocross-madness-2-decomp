@@ -157,6 +157,9 @@ the EH frame of `new UnknownSoundNotifier`.
 
 Near misses (`samples/audio/PCAudioNearMisses.cpp`, notes there):
 `0x004be910` and the manager's thread `0x004bdc00`.
+The aggregate includes their standalone candidates. The manager's complete
+loader-thread review and native boundary tests are documented in
+[AUDIO_LOADER_THREAD.md](AUDIO_LOADER_THREAD.md#functional-build-review).
 
 Every function of PCAudio.cpp (`0x004bb630`–`0x004bed40`) is now either
 exact or a documented near miss. `0x004be330` is not a function start: it is

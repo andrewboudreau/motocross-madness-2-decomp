@@ -184,6 +184,11 @@ python -m unittest discover -s tests -p test_filestream_behavior.py -v
 
 ## Reproduce
 
+Terrain's provisional stream view now connects its Read, Seek and Tell calls
+to these providers through explicit casts at the call boundary. Its layout and
+loader signature are unchanged. See [the terrain stream proof](TERRAIN_CONNECTIONS.md#terrain-stream-calls)
+for complete caller-byte preservation and the remaining nonexact loader scope.
+
 ```bash
 PYTHONPATH=. python tools/run_calibration.py --compiler vc6 --vc6-root "$VC6_ROOT"
 ```

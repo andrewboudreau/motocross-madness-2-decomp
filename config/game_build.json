@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/audio/AudioLoaderThread.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete streamed-audio loader passes 37387 native queue, ownership, lock, callback, exception and fault comparisons. VC6 emits 478 bytes versus 483 retail bytes; the five game helpers and synchronization boundaries are scripted, so real scheduling and audio playback remain untested.",
+      "evidence": "docs/AUDIO_LOADER_THREAD.md#functional-build-review"
+    },
+    {
       "path": "samples/ui/GuiPointerHelpers.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete tooltip placement and pointer ownership helpers pass 19606 native state, coordinate, callback, exception and fault comparisons. VC6 emits the full 106/52-byte extents with 89/46 matching positions; ShowText and real input devices remain outside this scripted boundary test.",

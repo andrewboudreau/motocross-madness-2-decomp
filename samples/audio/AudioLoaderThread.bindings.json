@@ -1,0 +1,12 @@
+{
+  "?CreatePendingBuffer@Sound@@QAEHXZ": "0x004bd4b0",
+  "?FillBufferFromFile@Sound@@QAEHPAPAUUnknownSoundBuffer@@@Z": "0x004bd0c0",
+  "?MakeRoomForSound@UnknownPCAudioObject@@QAEXH@Z": "0x004be130",
+  "?Play@Sound@@QAEHXZ": "0x004bbcd0",
+  "?RecordLoadedSound@UnknownPCAudioObject@@QAEXPAVSound@@H@Z": "0x004be0a0",
+  "?UnknownThreadProc@UnknownPCAudioObject@@SGIPAX@Z": "0x004bdc00",
+  "__endthreadex": "0x00537c9f",
+  "__imp__EnterCriticalSection@4": "0x0055025c",
+  "__imp__LeaveCriticalSection@4": "0x00550284",
+  "__imp__WaitForMultipleObjects@16": "0x005500d8"
+}
