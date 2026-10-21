@@ -377,3 +377,8 @@ exact:
   0x978 and its locals sort and share slots differently (aligned 3760 -> 3402), even with a
   single such site. A pointer declared with the view type, or a no-op cast to its own type,
   leaves the frame alone. The global loads themselves are identical.
+- A global pointer read at every use is cached in a register but reloaded after any store
+  through a pointer that may alias it; a local copy (`T* g = g_X;`) is never reloaded. A
+  retail reload of the global after a `*out = v` store therefore means the source read the
+  global there. KrustyBike slot 11 (`0x491d10`): dropping the local copy gives retail's
+  `mov ebx, [g_TrackGame]` after case 4's `*a3 = bodyForward` (aligned 275 -> 309).

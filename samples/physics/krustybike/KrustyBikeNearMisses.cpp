@@ -116,6 +116,9 @@ int KrustyBike::UnknownVirtualSlot70(float arg)
 // arm falls into the call, the invsqrt arm jumps back to it), but the call's register
 // choice then differs from case 4's tail, so it is not cross-jumped (1392 B; 271 aligned
 // instructions against 275, 341 strict against 523).
+// Every game read goes through the shared global (no `KbGame* g` copy): retail keeps it in
+// ebx but reloads it after case 4's `*a3 = bodyForward`, a store that may alias the global
+// (aligned 275 -> 309, 526 strict, 1288 bytes).
 int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* a5)
 {
     int flag;
@@ -131,12 +134,11 @@ int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* 
     unsigned char hit = 0;
     if (reinterpret_cast<KbGame*>(g_TrackGame)->mode.GetSelectedSeries() == 5)
         hit = Kb_004B0AC0(&position, 2.0f, 2.0f, 2.0f, terrainScale, 0, 0, 0, 0);
-    KbGame* g = reinterpret_cast<KbGame*>(g_TrackGame);
-    switch (g->eventType) {
+    switch (reinterpret_cast<KbGame*>(g_TrackGame)->eventType) {
     case 2:
     case 3:
-        if (g->raceMode || onTrack || aiKind || isGhost || a1 == 2 ||
-            g->field_0xc50) {
+        if (reinterpret_cast<KbGame*>(g_TrackGame)->raceMode || onTrack || aiKind || isGhost || a1 == 2 ||
+            reinterpret_cast<KbGame*>(g_TrackGame)->field_0xc50) {
             *a2 = respawnPosition;
             *a3 = respawnHeading;
             position = *a2;
@@ -159,21 +161,21 @@ int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* 
                            hit, 6.0f, 8, p, 0, !respawnPending, a2, a3, a4, a5);
     }
     case 4: {
-        KbPlayer* r = (KbPlayer*)g->tagEvent;
+        KbPlayer* r = (KbPlayer*)reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent;
         const Vec3* l = 0;
         const Vec3* k = 0;
         if (r->field_0xdc) l = &r->field_0xdc->position;
         else if (r->field_0xa8 == this) { *a3 = bodyForward; k = &bodyForward; }
         else l = &r->field_0xa8->position;
         float i = 9.0f;
-        if (((KbPlayer*)g->tagEvent)->field_0xa8 != this) i = 3.0f;
+        if (((KbPlayer*)reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent)->field_0xa8 != this) i = 3.0f;
         return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, flag, lim, lim,
                            hit, i, 8, k, l, !respawnPending, a2, a3, a4, a5);
     }
     case 1:
     case 5: {
         if (respawnPending) scratchVector = respawnPosition + respawnHeading;
-        else scratchVector = g->bajaEnduroEvent[lapGate + 9].field_0x00;
+        else scratchVector = reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent[lapGate + 9].field_0x00;
         return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, flag, lim,
                            respawnPending ? 0x64 : 0x7fffffff, respawnPending ? 0x65 : 0x7fffffff,
                            3.0f, 8, 0, &scratchVector, !respawnPending, a2, a3, a4, a5);
