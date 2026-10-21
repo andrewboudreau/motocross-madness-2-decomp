@@ -77,7 +77,20 @@
 //               side normals through memory temporaries (no Vector3 /
 //               helper spelling of the lean produces them) and releases
 //               edi/ebp/ebx before the overlay rows (461/3967 compiled
-//               inside the unit; the retail function is 3967 bytes)
+//               inside the unit; the retail function is 3967 bytes).
+//               Retail's frame (tools/frame_layout.py): the x87 int
+//               temporaries at +0, the three lights at +4/+8/+0xc shared
+//               with the loop's vertex offsets 1/3/2, the lengths, the
+//               lean's z and backColor at +0x10, `object` at +0x14, then
+//               right, left, offset5, back and `i` (+0x18..+0x40) unshared,
+//               `definition` in memory at +0x5c, 8 unused bytes at +0xa4
+//               and a second lean z temporary at +0xac below the matrix.
+//               Three float lights (not a Vector3, which VC6 lays over
+//               `right`) leave the normals unshared as retail does; the
+//               instruction stream is the same. Lean helpers taking
+//               floats by value or reference, a Vector3 by value or
+//               reference, inline locals, `-=`, `0.1f * x` and a double
+//               factor do not give retail's duplicated lean values.
 
 #include "../../src/reconstructed/TrackGameGlobal.h"
 #include <float.h>
@@ -766,20 +779,19 @@ int EcoSystem::UnknownVirtualSlot14() {
     UnknownEcoNormalizeXZ(&right);
     UnknownEcoNormalizeXZ(&left);
     UnknownEcoNormalizeXZ(&back);
-    // The three intensities (x right, y left, z back).
-    Vector3 intensity;
-    intensity.x = UnknownEcoLightOn(this, &right);
-    if (intensity.x < 0.0f)
-        intensity.x = 0.0f;
-    intensity.y = UnknownEcoLightOn(this, &left);
-    if (intensity.y < 0.0f)
-        intensity.y = 0.0f;
-    intensity.z = UnknownEcoLightOn(this, &back);
-    if (intensity.z < 0.0f)
-        intensity.z = 0.0f;
-    unsigned int backColor = UnknownEcoLitColor(this, intensity.z);
-    unsigned int rightColor = UnknownEcoLitColor(this, intensity.x);
-    unsigned int leftColor = UnknownEcoLitColor(this, intensity.y);
+    // The light on each face.
+    float rightLight = UnknownEcoLightOn(this, &right);
+    if (rightLight < 0.0f)
+        rightLight = 0.0f;
+    float leftLight = UnknownEcoLightOn(this, &left);
+    if (leftLight < 0.0f)
+        leftLight = 0.0f;
+    float backLight = UnknownEcoLightOn(this, &back);
+    if (backLight < 0.0f)
+        backLight = 0.0f;
+    unsigned int backColor = UnknownEcoLitColor(this, backLight);
+    unsigned int rightColor = UnknownEcoLitColor(this, rightLight);
+    unsigned int leftColor = UnknownEcoLitColor(this, leftLight);
     float inverse = FastInvSqrtEstimate(camera->direction.x * camera->direction.x
                                           + camera->direction.z * camera->direction.z);
     float sine = inverse * camera->direction.x;

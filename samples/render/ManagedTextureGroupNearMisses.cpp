@@ -14,8 +14,11 @@
 // slots fewer (frame 0x78 against 0x80), puts the 12-byte format buffer
 // over the dead `i`/`smallest` slots and `filled` over `texels`, keeps
 // `now` in ebp through the overlay block and hoists the level-count loop's
-// bound. About 158 of 1150 instructions differ, almost all in slot or
-// register choice. Tried without effect: block scopes around the emptying
+// bound. Its "ManagedTextures:%d" row prints a `managedCount` local, as
+// RepackWithPartialBlits' does, which gives retail's load order for that
+// row (tools/rank_near_misses.py: 145 -> 94 differing instructions, size
+// 3757 -> 3754 against 3742); the rest is almost all slot or register
+// choice. Tried without effect: block scopes around the emptying
 // section, the first pass (`requested`), the levels loop and the
 // refill+overlay section; a hoisted count (frame shrinks by 4 but the loop
 // registers rotate); an `elapsed` local for `now - blitStartTime` (worse);
@@ -34,11 +37,16 @@
 // SortTextures helper (retail reads the count through the list pointer);
 // and the excess clamp loops store `pages` before `spare`/`unused`. Left:
 // retail stores `dropped = 0` after the empty-list return (every placement
-// there spills `managed` and costs about 140 more differences), and from the
-// "ManagedTextures:%d" row on the overlay loads rotate eax/ecx/edx: retail
-// loads the count, then debugPage, then g_TrackGame, where VC6 here loads
-// g_TrackGame second; every later row inherits the rotation. 206 of 1600
-// instructions differ; the size is 5021 against 5020. Declaration order,
+// there spills `managed` and costs about 140 more differences). The
+// "ManagedTextures:%d" row prints a `managedCount` local read just before
+// it: VC6 then loads the count, debugPage and g_TrackGame in retail's order
+// and the later rows keep retail's registers (passing the field directly
+// loads g_TrackGame second and every later row inherits the rotation).
+// Also left: the Managed/Ideal rows issue the fmul after the overlay load
+// (retail: before; `9.5e-07f * x`, an implicit conversion and `/ 1048576.0f`
+// change nothing) and the " 32:" row loads its second count
+// after `add esp`. 11 of 1597 instructions differ (tools/rank_near_misses.py,
+// was 206); the size is 5020 as retail's. Declaration order,
 // block scopes around the arrays and the memset order do not move the
 // arrays; computing `managedTexels` at its row is worse.
 
@@ -248,7 +256,8 @@ void ManagedTextureGroup::RepackWholePages() {
         g_TrackGame->debugOverlay->Print(
             debugPage, "CacheTextures:%d %.2fM", cachePages.m_count,
             PageMegabytes(this, cachePages.m_count));
-        g_TrackGame->debugOverlay->Print(debugPage, "ManagedTextures:%d", managedTextures.m_count);
+        int managedCount = managedTextures.m_count;
+        g_TrackGame->debugOverlay->Print(debugPage, "ManagedTextures:%d", managedCount);
         float peak = (float)texelsBlittedHistory.LargestRecentSample();
         g_TrackGame->debugOverlay->Print(
             debugPage, "TexMem Blted: %.2fM, Peak: %.2fM",
@@ -591,7 +600,8 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         g_TrackGame->debugOverlay->Print(
             debugPage, "CacheTextures:%d %.2fM", cachePages.m_count,
             (PixelFormatBytesPerPixel(groupFormat) * cachePages.m_count << 18) * 3.1789145e-07f);
-        g_TrackGame->debugOverlay->Print(debugPage, "ManagedTextures:%d", managedTextures.m_count);
+        int managedCount = managedTextures.m_count;
+        g_TrackGame->debugOverlay->Print(debugPage, "ManagedTextures:%d", managedCount);
         g_TrackGame->debugOverlay->Print(debugPage, "Managed %0.2fM",
                                                                 (managedF = (float)managedTexels) * 9.536743e-07f);
         g_TrackGame->debugOverlay->Print(debugPage, "Ideal   %0.2fM",

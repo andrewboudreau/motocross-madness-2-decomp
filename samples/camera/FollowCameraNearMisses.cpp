@@ -34,15 +34,17 @@
 // FollowCamera::UnknownVirtualSlot45 (0x00463a30, 4055 bytes plus padding):
 // the control flow, the stack frame (0x20, with ebp/edi holding the 1.55/7.0
 // constants) and every FPU sequence agree, but the code drifts by a few bytes
-// (aligned instruction ratio 0.937; 1088 instructions against retail's 1079).
-// Each joystick block is guarded by `if (activeJoystick) { ... }`: retail's
-// null test jumps to the shared epilogue at 0x004649fe. Left: at each joystick
-// test retail tests a copy (mov edx, [ecx+0xc]) and reloads the pointer for
-// the call (mov edx, ecx; mov ecx, [edx+0xc]) where VC6 reuses the tested
-// register (inline free/member wrappers do not change this), and retail stores
-// the x * speed scale before multiplying (fstp/fmul) where VC6 emits
-// fst/fmulp. The clamp/wrap must come from inline helpers (they keep the
-// sum on the FPU stack), and the key queries must be macros: with inline
+// (4046 bytes). Each joystick block is guarded by `if (activeJoystick) { ... }`:
+// retail's null test jumps to the shared epilogue at 0x004649fe. The speed
+// blocks name the view's side axis and the `x * speed` scale (`float xs`), which
+// gives retail's fstp/fmul; a scale local declared before the axis, or
+// `(x * speed)` inline, is worse. Left: at each joystick test retail tests a
+// copy (mov edx, [ecx+0xc]) and reloads the pointer for the call (mov edx, ecx;
+// mov ecx, [edx+0xc]) where VC6 reuses the tested register (inline free/member
+// wrappers, a const reference, `!= 0`, and type-punned or offset reads of
+// activeJoystick do not change this); retail returns `moved` with mov al, bl
+// where VC6 emits xor al, al. The clamp/wrap must come from inline helpers
+// (they keep the sum on the FPU stack), and the key queries must be macros: with inline
 // helpers VC6 runs out of inline budget and calls the Vector3 constructor.
 //
 // FollowCamera::LoadCameraFile (0x004650e0, 1012 bytes): about half the
@@ -321,7 +323,9 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
                     ->UnknownVirtualSlot4(0, &x, &y)) {
                 if (targetDistance > 0.0f)
                     cachedTarget.y += y * speed;
-                cachedTarget += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * (x * speed);
+                Vector3 side(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0));
+                float xs = x * speed;
+                cachedTarget += side * xs;
                 if (x != 0.0f || y != 0.0f)
                     return moved;
             }
@@ -365,7 +369,9 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
                     ->UnknownVirtualSlot4(0, &x, &y)) {
                 if (targetDistance > 6.5f)
                     eyePosition.y += y * speed;
-                eyePosition += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * (x * speed);
+                Vector3 side(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0));
+                float xs = x * speed;
+                eyePosition += side * xs;
                 if (x != 0.0 || y != 0.0f)
                     moved = true;
                 if (x != 0.0f || y != 0.0f)

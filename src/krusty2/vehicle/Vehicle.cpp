@@ -962,6 +962,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
     if (steps > 0) do {
         engineState->TickGearTimer(stepTime);
         Vec3 zero = kVec3Zero;
+        Vec3 o2;          // VehContactsB's second output (loop scope: see the slot 49 note)
         if (crashState == 0) {
             if (UpdateWheelRampLevels())
                 engineState->driveCut = 1;
@@ -1050,7 +1051,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             } else {
                 scale = Vec3(0.3f, 0.1f, 0.3f);
             }
-            Vec3 o1, o2, o3;
+            Vec3 o1, o3;
             VehContactsB(collisionPointCount, ((VehicleContact**)collisionPoints), &scale, &worldAngularVelocity, &velocity, &centerOfMass,
                          &position, &o3, &o2, &o1);
             float slot3Out;
@@ -1095,19 +1096,14 @@ void Vehicle::UnknownVirtualSlot49(float frame)
                 UnknownVirtualSlot91();
             } else if (mode) {
                 if (mode == 1 || mode == 2) {
-                    bool doit = true;
-                    if (aq < 0.0001f) {
-                        if (VehAbsT(k) > 0.0001f) {
+                    if (aq >= 0.0001f || VehAbsT(k) > 0.0001f) {
+                        if (aq >= 0.0001f) {
+                            tiltAxisLocal = modelNode->WorldToLocalDirection(lift);
+                        } else {
                             Vec3 contactNormal;
                             scratchVector = *UnknownVirtualSlot54(&contactNormal);
                             tiltAxisLocal = modelNode->WorldToLocalDirection(scratchVector);
-                        } else {
-                            doit = false;
                         }
-                    } else {
-                        tiltAxisLocal = modelNode->WorldToLocalDirection(lift);
-                    }
-                    if (doit) {
                         if (k != 0.0f && aq < 0.003f)
                             modelNode->RotateAboutPoint(aim, tiltAxisLocal, k);
                         else

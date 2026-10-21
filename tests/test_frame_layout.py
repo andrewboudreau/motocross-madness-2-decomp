@@ -126,6 +126,16 @@ class TrackerTests(unittest.TestCase):
         self.assertEqual(info.frame_size, 0x10)
         self.assertEqual([a.offset for a in info.accesses], [4])
 
+    def test_early_return_keeps_the_depth_of_the_branch(self):
+        # sub esp,0x10; push esi; jne body; pop esi; add esp,0x10; ret;
+        # body: push ebx; mov eax,[esp+8]; ret
+        # (the block after the early return is entered from the jne, with esi pushed)
+        code = (b'\x83\xec\x10' b'\x56' b'\x75\x05' b'\x5e' b'\x83\xc4\x10' b'\xc3'
+                b'\x53' b'\x8b\x44\x24\x08' b'\xc3')
+        from tools.frame_layout import disassemble
+        info = track_frame(disassemble(code))
+        self.assertEqual([a.offset for a in info.accesses], [0])
+
     def test_ebp_frame(self):
         # push ebp; mov ebp,esp; sub esp,0x20; mov eax,[ebp-4]; mov [ebp-0x20],eax; leave; ret
         code = b'\x55' b'\x8b\xec' b'\x83\xec\x20' b'\x8b\x45\xfc' b'\x89\x45\xe0' b'\xc9' b'\xc3'
