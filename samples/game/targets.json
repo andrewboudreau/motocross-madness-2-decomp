@@ -1,5 +1,23 @@
 [
   {
+    "source": "UiInfoNearMisses.cpp",
+    "candidate_symbol_contains": "?ResetDefaults@TrackGameMode@@QAEXXZ",
+    "target_va": "0x00522440",
+    "target_size": 427,
+    "expect": "partial",
+    "bindings": "UiInfoNearMisses.bindings.json",
+    "status": "Complete defaults reset reviewed in 1152 native cases; 427-byte candidate remains nonexact."
+  },
+  {
+    "source": "UiInfoNearMisses.cpp",
+    "candidate_symbol_contains": "?FindDataFile@TrackGameMode@@QAEHPBDPAD@Z",
+    "target_va": "0x005238f0",
+    "target_size": 355,
+    "expect": "partial",
+    "bindings": "UiInfoNearMisses.bindings.json",
+    "status": "Complete lookup reviewed in 20180 scripted and 192 actual CRT file-search cases; 357-byte candidate remains nonexact."
+  },
+  {
     "source": "PCGameNearMisses.cpp",
     "candidate_symbol_contains": "?ProfileDisplays@PCGame@@QAEHXZ",
     "target_va": "0x004c0d10",

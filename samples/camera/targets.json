@@ -1,0 +1,11 @@
+[
+  {
+    "source": "CameraNearMisses.cpp",
+    "candidate_symbol_contains": "?UpdateMatrices@Camera@@UAEXXZ",
+    "target_va": "0x0042ee30",
+    "target_size": 492,
+    "expect": "partial",
+    "bindings": "CameraNearMisses.bindings.json",
+    "status": "Complete matrix update reviewed in 76288 scripted and 9216 source-provider integration cases; 492-byte candidate remains nonexact."
+  }
+]

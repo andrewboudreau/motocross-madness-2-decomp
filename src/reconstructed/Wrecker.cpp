@@ -555,7 +555,12 @@ void Wrecker::RebuildPoseSteps() {
     } else {
         angularStep = WreckerCross(Vector3(upX, upY, upZ), pose.up);
     }
-    angularStep = Vec3ScaleCall(angularStep, 1.0f);
+    {
+        // The explicit output has the former returned temporary's lifetime.
+        Vector3 scaled;
+        angularStep = *reinterpret_cast<Vector3*>(Vec3ScaleCall(reinterpret_cast<Vec3*>(&scaled),
+            reinterpret_cast<const Vec3*>(&angularStep), 1.0f));
+    }
 }
 
 void Wrecker::EndWreck() {

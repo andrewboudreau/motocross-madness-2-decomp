@@ -75,7 +75,6 @@
   "?BoxCapsuleOverlap@@YAHPBUVec3@@00MMPBUMatrix4@@@Z": "0x00425900",
   "?SegmentSegmentDistance@@YAMPBUVec3@@000@Z": "0x0042a640",
   "?Vec3Add@@YA?AUVec3@@ABU1@0@Z": "0x00421cb0",
-  "?Vec3Dot@@YAMABUVec3@@0@Z": "0x0040ae30",
   "?Vec3Length@@YAMABUVec3@@@Z": "0x00435ec0",
   "?Vec3Scale@@YA?AUVec3@@ABU1@M@Z": "0x005015b0",
   "?Vec3ScaleLeft@@YA?AUVec3@@MABU1@@Z": "0x00428090",

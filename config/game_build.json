@@ -3,6 +3,24 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/game/UiInfoNearMisses.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete defaults reset and data-file lookup pass 21332 native scripted comparisons and 192 actual VC6 CRT file searches. Full retail extents are 427/355 bytes; VC6 emits 427/357 bytes. CD discovery and prompts remain scripted.",
+      "evidence": "docs/UIINFO.md#functional-build-review"
+    },
+    {
+      "path": "samples/audio/PrimarySoundFormat.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete 158-byte primary-buffer PCM format setup passes 172032 native state, initialized-payload, callback, exception and fault cases. VC6 retains 108 matching positions; trailing uninitialized format bytes and real sound-device behavior are not established.",
+      "evidence": "docs/PCAUDIO.md#functional-build-review"
+    },
+    {
+      "path": "samples/camera/CameraNearMisses.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete 492-byte matrix update passes 76288 native scripted state/argument/exception cases and 9216 cases with initialized source math providers. VC6 retains 487 matching positions; real rendering remains untested.",
+      "evidence": "docs/CAMERA_UPDATE.md#functional-build-review"
+    },
+    {
       "path": "samples/render/NonLocalTextureMemory.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete non-local texture-memory probe passes 12912 native full-state, call, alias, fault and ownership comparisons. Full retail CFG is 486 bytes including the final ret8; VC6 emits 490 bytes. Dependencies are scripted and invalid-path behavior is retained.",

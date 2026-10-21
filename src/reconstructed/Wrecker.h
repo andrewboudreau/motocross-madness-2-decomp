@@ -224,7 +224,7 @@ float FastInvSqrt(float value);
 
 // 0x005015b0 (cdecl): the out-of-line copy of a vector scale (see
 // src/krusty2/math/Math3D.h, Vec3ScaleCall).
-Vector3 Vec3ScaleCall(const Vector3& v, float scale);
+Vec3* Vec3ScaleCall(Vec3* out, const Vec3* v, float scale);
 
 
 class Wrecker : public GraphicsTest {

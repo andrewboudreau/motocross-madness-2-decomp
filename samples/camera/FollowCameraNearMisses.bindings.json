@@ -102,5 +102,7 @@
   "??0FollowCamera@@QAE@H@Z": "0x00462ee0",
   "?UnknownVirtualSlot45@FollowCamera@@UAE_N_NM@Z": "0x00463a30",
   "?LoadCameraFile@FollowCamera@@QAEXPBD@Z": "0x004650e0",
-  "?Tick@FollowCamera@@UAEHM@Z": "0x00465c20"
+  "?Tick@FollowCamera@@UAEHM@Z": "0x00465c20",
+  "?Vec3DotCall@@YAMPBUVec3@@0@Z": "0x0040ae30",
+  "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z": "0x005015b0"
 }

@@ -224,7 +224,8 @@ int Camera::UnknownVirtualSlot14() {
 }
 
 // 0x0040ae30 (cdecl): out-of-line dot product.
-float Vec3Dot(const Vector3* a, const Vector3* b);
+struct Vec3;
+float Vec3DotCall(const Vec3* a, const Vec3* b);
 
 // Vector3 seen through the out-of-line (x, y, z) constructor copy 0x00404e60.
 struct CameraVec3Call : Vector3 {
@@ -233,7 +234,7 @@ struct CameraVec3Call : Vector3 {
 
 // v scaled to unit length through the out-of-line dot product.
 static inline Vector3 NormalizeCall(const Vector3& v) {
-    float squared = Vec3Dot(&v, &v);
+    float squared = Vec3DotCall(reinterpret_cast<const Vec3*>(&v), reinterpret_cast<const Vec3*>(&v));
     if (squared == 1.0f)
         return v;
     float scale = FastInvSqrt(squared);

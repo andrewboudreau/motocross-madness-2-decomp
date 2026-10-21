@@ -47,5 +47,6 @@
   "__real@4@4008fa00000000000000": "0x00550f44",
   "__real@4@4009fa00000000000000": "0x00555b28",
   "_kVec3Zero": "0x0068ad00",
-  "_rand": "0x00534c1b"
+  "_rand": "0x00534c1b",
+  "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z": "0x005015b0"
 }

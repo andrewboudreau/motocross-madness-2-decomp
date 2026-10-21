@@ -41,7 +41,7 @@
   "?LocalToWorldPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd660",
   "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd710",
   "?GetSubtreeBounds@SoultreeObject@@QAEXPAUVec3@@0@Z": "0x004fe850",
-  "?Vec3ScaleCall@@YA?AUVector3@@ABU1@M@Z": "0x005015b0",
+  "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z": "0x005015b0",
   "?SetupWrecker@Wrecker@@QAEPAV1@PAXPAVD3DIMSoultreeCharacter@@PBD@Z": "0x00530190",
   "?CreateBodies@Wrecker@@QAEXPAVD3DIMSoultreeCharacter@@PBD@Z": "0x005301c0",
   "?CreateBodies@Wrecker@@QAEXPAVD3DIMSoultreeCharacter@@PBD@Z$ehhandler": "0x0054f1bc",

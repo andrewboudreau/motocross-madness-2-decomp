@@ -77,10 +77,9 @@ struct BikeVec3ScaleAssign : Vec3 {
 };
 // By-value views of the out-of-line operators (hidden result pointer first, same ABI as
 // the pointer forms in math/Math3D.h): operator- 0x00421d00,
-// operator*(Vec3, float) 0x005015b0 and DotProduct 0x0040ae30.
+// operator*(Vec3, float) 0x005015b0. Dot calls use the shared Vec3DotCall.
 Vec3 BikeVec3Sub(const Vec3& a, const Vec3& b);
 Vec3 BikeVec3Scale(const Vec3& v, float s);
-float BikeVec3Dot(const Vec3& a, const Vec3& b);
 
 // 0x0040a520 (tier 3 reading).  Builds a world-space steering torque `torque`: a quarter of
 // the force accumulator weightForce, turned by the front wheel's contact (offset x normalLoadVector) and by each
@@ -135,7 +134,7 @@ float Bike::Method_0x0040a520()
             if (leftBarContact->active) {
                 torque = BikeVec3Sub(leftBarContact->point, frontWheel->nodePosition);
                 const Vec3& axis = leftBarContact->axis;
-                float d = BikeVec3Dot(torque, axis);
+                float d = Vec3DotCall(&torque, &axis);
                 if (d >= 0.0f)
                     push = Vec3(0.0f, 0.0f, 0.0f);
                 else
@@ -144,7 +143,7 @@ float Bike::Method_0x0040a520()
                 leftBarContact->state = 2;
             } else if (rightBarContact->active) {
                 const Vec3& axis = rightBarContact->axis;
-                float d = BikeVec3Dot(base, axis);
+                float d = Vec3DotCall(&base, &axis);
                 if (d >= 0.0f)
                     push = BikeVec3Call(0.0f, 0.0f, 0.0f);
                 else
@@ -157,7 +156,7 @@ float Bike::Method_0x0040a520()
             driven = 1;
             torque = BikeVec3Sub(leftBarContact->point, frontWheel->nodePosition);
             const Vec3& axis = leftBarContact->axis;
-            float d = BikeVec3Dot(torque, axis);
+            float d = Vec3DotCall(&torque, &axis);
             if (d >= 0.0f)
                 push = BikeVec3Call(0.0f, 0.0f, 0.0f);
             else
@@ -167,7 +166,7 @@ float Bike::Method_0x0040a520()
         } else if (rightBarContact->active) {
             driven = 1;
             const Vec3& axis = rightBarContact->axis;
-            float d = BikeVec3Dot(base, axis);
+            float d = Vec3DotCall(&base, &axis);
             if (d >= 0.0f)
                 push = BikeVec3Call(0.0f, 0.0f, 0.0f);
             else
@@ -179,7 +178,7 @@ float Bike::Method_0x0040a520()
             result = 0.0f;
             goto integrate;
         }
-        float lenSq = BikeVec3Dot(torque, torque);
+        float lenSq = Vec3DotCall(&torque, &torque);
         if (lenSq == 1.0f) {
             len = 1.0f;
         } else {
@@ -205,7 +204,7 @@ integrate:
     float sign = -1.0f;
     if (BikeDotZ(steerTorque, frontWheel->ownerRef->axis) >= 0.0f)
         sign = 1.0f;
-    float lenSq = BikeVec3Dot(steerTorque, steerTorque);
+    float lenSq = Vec3DotCall(&steerTorque, &steerTorque);
     if (lenSq == 1.0f)
         len = 1.0f;
     else

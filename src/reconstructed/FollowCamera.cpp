@@ -532,8 +532,9 @@ bool FollowCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool 
 // did not expand them there). See src/krusty2/math/Math3D.h, whose call views
 // describe the same addresses; names here are provisional.
 float FastInvSqrt(float value);                          // 0x00460c00: 1/sqrt approximation
-float Vec3Dot(const Vector3* a, const Vector3* b);   // 0x0040ae30: dot product
-Vector3 Vec3ScaleCall(const Vector3& v, float scale);      // 0x005015b0: v * scale
+struct Vec3;
+float Vec3DotCall(const Vec3* a, const Vec3* b);   // 0x0040ae30: dot product
+Vec3* Vec3ScaleCall(Vec3* out, const Vec3* v, float scale);      // 0x005015b0: v * scale
 #include "../krusty2/math/Vec3.h"
 Vec3 CrossProductCall(const Vec3& a, const Vec3& b); // 0x00515600: shared cross product
 
@@ -546,11 +547,13 @@ inline Vector3 FollowCameraCross(const Vector3& a, const Vector3& b) {
 
 // Inline normalisation: unit-length vectors are returned unchanged.
 inline Vector3 FollowCameraNormalize(const Vector3& v) {
-    float lengthSquared = Vec3Dot(&v, &v);
+    float lengthSquared = Vec3DotCall(reinterpret_cast<const Vec3*>(&v), reinterpret_cast<const Vec3*>(&v));
     if (lengthSquared == 1.0f)
         return v;
     float scale = FastInvSqrt(lengthSquared);
-    return Vec3ScaleCall(v, scale);
+    Vector3 result;
+    return *reinterpret_cast<Vector3*>(Vec3ScaleCall(reinterpret_cast<Vec3*>(&result),
+        reinterpret_cast<const Vec3*>(&v), scale));
 }
 
 // 0x004654e0: an orthonormal basis from `forward` and `up` (up is made

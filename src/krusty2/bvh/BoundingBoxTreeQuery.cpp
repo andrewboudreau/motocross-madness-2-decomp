@@ -472,13 +472,14 @@ int CapsuleTreeQuery(const Vec3* ends, float radius, float radiusSq, QueryTreeNo
             InverseTransformPointInline(&p, *ends, xf);
             Vec3 d;
             Vec3TransformNormalTranspose(&d, Vec3Sub(ends[1], ends[0]), xf);
-            float t = -(Vec3Dot(tri->normal, p) + tri->planeOffset) / Vec3Dot(tri->normal, d);
+            float t = -(Vec3DotCall(&tri->normal, &p) + tri->planeOffset) / Vec3DotCall(&tri->normal, &d);
             if (!(t < 1.0f))
                 t = 1.0f;
             else if (t <= 0.0f)
                 t = 0.0f;
             Vec3 c = Vec3Add(Vec3Scale(d, t), p);
-            float dist = Vec3Dot(Vec3Sub(c, s_vertices[tri->vertex[0]]), tri->normal);
+            // Bind the returned vector only through this call expression.
+            float dist = Vec3DotCall(&static_cast<const Vec3&>(Vec3Sub(c, s_vertices[tri->vertex[0]])), &tri->normal);
             if (QueryAbs(dist) <= radius) {
                 q = Vec3Sub(c, Vec3ScaleLeft(dist, tri->normal));
                 if (PointInTriangle(&q, tri))
@@ -498,7 +499,7 @@ int CapsuleTreeQuery(const Vec3* ends, float radius, float radiusSq, QueryTreeNo
             Vec3 p = ((QueryPointLeaf*)node)->point;
             TransformPointInline(&p, p, xf);
             Vec3 dir = Vec3Call(ends[1].x - ends[0].x, ends[1].y - ends[0].y, ends[1].z - ends[0].z);
-            float t = Vec3Dot(dir, Vec3Sub(p, *ends)) / Vec3Dot(dir, dir);
+            float t = Vec3DotCall(&dir, &static_cast<const Vec3&>(Vec3Sub(p, *ends))) / Vec3DotCall(&dir, &dir);
             if (!(t < 1.0f))
                 t = 1.0f;
             else if (t <= 0.0f)

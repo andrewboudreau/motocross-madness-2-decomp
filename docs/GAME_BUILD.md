@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 192 C++ files (176 canonical sources and sixteen
-reviewed candidates) and reaches LINK with 572 unresolved external symbols,
+The 2026-10-21 build compiles 195 C++ files (176 canonical sources and nineteen
+reviewed candidates) and reaches LINK with 563 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -251,6 +251,25 @@ aggregate sample includes the extracted bodies and preserves its normalized
 instruction bytes and relocation structure. Each admission reruns the real
 link: together they remove four missing symbols and introduce none.
 
+Five more [math call-view connections](VECTOR_CALLS.md#existing-call-view-connections)
+join camera, matrix, Bike, Wrecker and BVH callers to the existing dot/scale
+providers. All 209 strict caller cases and nine complete partial-function
+candidate hashes remain unchanged. The real link drops from 572 to 567
+unresolved names, with none added.
+
+Three individually reviewed candidate units then supply four missing bodies:
+[camera matrix updates](CAMERA_UPDATE.md#functional-build-review),
+[primary-buffer PCM format setup](PCAUDIO.md#functional-build-review), and
+[menu defaults and data-file lookup](UIINFO.md#functional-build-review).
+The camera passes 76,288 scripted comparisons and 9,216 cases with initialized
+source math providers; audio passes 172,032 state/payload/callback cases.
+The menu unit passes 21,332 scripted comparisons plus 192 searches through
+actual VC6 CRT file I/O. These bodies remain nonexact. The file-lookup retail
+extent is corrected to 355 bytes to include its complete final return.
+Real links after each admission remove one, one and two missing names
+respectively, reaching 563 with no added unresolved dependencies. This is
+bounded behavior and integration evidence, not startup, menu or racing proof.
+
 Validation of this composition passes the toolchain/manual/generated VC6 gate,
 2,975 of 2,986 calibration rows (2,973 distinct source/address/extent cases),
 and all prior strict physics targets, with four additions making 1,080 among
@@ -258,7 +277,7 @@ and all prior strict physics targets, with four additions making 1,080 among
 The recursive reset's strict case moves from FileStream.cpp to
 Parameterblocks.cpp with its address and full 30-byte extent unchanged;
 ShowDialog adds one strict case. The native-enabled Python suite passes
-434 tests with 11 skipped. These counts retain existing nonexact comparisons;
+439 tests with 11 skipped. These counts retain existing nonexact comparisons;
 they do not describe a fully matched or working game.
 
 Other incompatible class views, missing methods and unresolved globals

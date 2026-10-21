@@ -54,6 +54,8 @@
 #include <math.h>
 
 #include "../../src/reconstructed/Wrecker.cpp"
+// The unfinished helpers below retain their by-value scale call view.
+Vector3 Vec3ScaleCall(const Vector3& v, float scale);
 
 // This call-only view is still needed by the unfinished helpers below.
 // The canonical Wrecker playback body uses the shared Vec3 constructor.

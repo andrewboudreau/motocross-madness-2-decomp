@@ -2,8 +2,8 @@
 
 `src/reconstructed/VectorCalls.cpp` supplies four existing call signatures from
 `src/krusty2/math/Math3D.h`. Vehicle, motion, collision, BVH and scene-graph
-callers already import these names. Their declarations and compiled callers
-are unchanged.
+callers import these names directly. Additional call-view connections below
+retain their complete compiled bodies.
 
 | Provider | Retail VA | Complete bytes |
 |---|---:|---:|
@@ -56,6 +56,52 @@ $env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
 python tests/test_vector_calls.py -v
 ```
 
-The helper manifest records all four canonical functions. This closes four
-real linker names; other vector call views, incomplete source bodies and game
-startup/menu/racing validation remain separate work.
+## Existing call-view connections
+
+Camera, FollowCamera and MatrixUtil call the exact dot provider through their
+existing 12-byte `Vector3` views. Bike and BoundingBoxTreeQuery use their existing
+`Vec3` objects directly. Their former reference or pointer dot declarations
+all bound to `0x0040ae30`; complete caller matches and the provider's full
+29-byte body establish the concrete stack arguments and x87 result, rather than
+relying on the shared address alone.
+
+FollowCamera, MatrixUtil and Wrecker now call the scale provider with explicit
+output storage. This joins their previous hidden-result declarations to the
+complete 69-byte provider at `0x005015b0`. The native layout guard verifies both
+vector types are 12 bytes with float components at offsets 0, 4 and 8. Pointer
+casts cross that evidenced boundary; the surrounding reconstructed types and
+inline math formulas are retained. A scoped Wrecker output preserves the
+former returned temporary's lifetime. BVH dot inputs that are returned vectors
+bind const references within the original call expression, retaining the
+existing result-buffer lifetime.
+
+Five previously missing decorated names now import existing providers:
+
+| Former view | Callers | Provider |
+|---|---|---|
+| `Vec3Dot(const Vector3*, const Vector3*)` | Camera, FollowCamera, MatrixUtil | `Vec3DotCall` |
+| `Vec3Dot(const Vec3&, const Vec3&)` | BoundingBoxTreeQuery | `Vec3DotCall` |
+| `BikeVec3Dot(const Vec3&, const Vec3&)` | Bike | `Vec3DotCall` |
+| `Vec3ScaleCall(const Vector3&, float)` | FollowCamera, Wrecker | explicit-output `Vec3ScaleCall` |
+| `Vec3Scale(const Vector3&, float)` | MatrixUtil | explicit-output `Vec3ScaleCall` |
+
+`tests/test_math_call_connections.py` recompiles these six complete production
+translation units and both actual providers with authentic VC6. It verifies
+209 complete strict caller cases, the provider extents and bytes, real COFF
+imports/call relocations, and the vector layout guard. Seven existing Bike
+partial functions and both Wrecker sample functions retain their complete
+relocation-resolved candidate hashes, extents and comparison scores. These
+partial hashes protect unchanged reconstructed code; they are not retail
+identity claims. The Wrecker sample retains its unfinished by-value scale view
+locally; it is not supplied as another production provider.
+
+```powershell
+$env:PYTHONPATH = '.'
+python tests/test_math_call_connections.py -v
+```
+
+The helper manifest records the four canonical providers. Other vector call
+views, incomplete source bodies and game startup/menu/racing validation remain
+separate work. In particular, Bike and collision constructor call views remain
+unresolved: simply substituting the known inline `Vec3` constructor changes
+existing partial bodies. They are not supplied through aliases or wrappers.

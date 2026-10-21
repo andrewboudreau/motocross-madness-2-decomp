@@ -162,3 +162,42 @@ Every function of PCAudio.cpp (`0x004bb630`–`0x004bed40`) is now either
 exact or a documented near miss. `0x004be330` is not a function start: it is
 mid-instruction (`lea eax, [esi + 0x90]` at `0x004be32d`) inside
 `0x004be2d0`.
+
+## Functional build review
+
+`samples/audio/PrimarySoundFormat.cpp` extracts the unchanged complete
+`PCSoundInterface::SetPrimaryFormat` candidate at `0x004be910`. The original
+aggregate sample includes it. The full retail extent is 158 bytes, ending
+with `ret 12` at `0x004be9ab`, followed by two padding bytes. The candidate
+also emits 158 bytes, with 108 matching positions. It remains nonexact and
+does not claim ownership of the complete original audio translation unit.
+
+The method returns zero when the audio-started bit is clear. Otherwise it
+initializes the first 16 bytes of a PCM format, truncates sample bits to
+16 bits, computes channels from the stereo argument, and calculates byte
+rate and alignment with the retail integer wrapping and division behavior.
+It calls the primary buffer's COM `SetFormat` slot at vtable offset `0x38`
+and returns whether its signed HRESULT is nonnegative. The final four bytes
+of the 20-byte format storage remain uninitialized; the review does not
+claim values for them. No new dependency provider is needed.
+
+`tests/test_primary_sound_format_behavior.py` checks the hash-pinned retail
+extent and virtual call, then builds the complete candidate and native fixture
+with VC6 SP3. **172,032 cases** compare complete interface/buffer state,
+the first 16 initialized format bytes, callback state and return values.
+They cover every 16-bit sample-size value in mono and stereo, varied rates,
+HRESULT signs, audio flags, callback mutations and C++ exceptions. The
+started/null-buffer path retains the observed read access violation at zero.
+Independent assertions check disabled-audio behavior, PCM tag/channels and
+result handling. These are finite tests against a scripted COM buffer;
+real sound-device initialization and playback remain untested.
+
+Retail mapping exists only in the private validation fixture. Production
+build admission uses ordinary C++ and is explicitly marked reviewed-nonexact
+in `config/game_build.json`.
+
+```powershell
+$env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path
+$env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
+python -m unittest discover -s tests -p test_primary_sound_format_behavior.py -v
+```

@@ -18,7 +18,8 @@
 // An inline settings-reset helper over the 13 stores (720 variants) turns
 // them into [eax + N] stores (174, 394 bytes).
 //
-// TrackGameMode::FindDataFile (0x005238f0, 353 bytes): 190 of 357.
+// TrackGameMode::FindDataFile (0x005238f0, 355 bytes): candidate 357 bytes.
+// The old 353-byte extent cut off the final ret 8 operand; see docs/UIINFO.md.
 // The found block written once after the CD retry (`if (file) { ...; return
 // 1; } return 0;`) gives retail's block layout and its single `return 0`
 // tail. Left: retail keeps fopen's result in eax until the found block (mov

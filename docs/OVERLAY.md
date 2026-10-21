@@ -84,6 +84,10 @@ Slot 28 is a near miss in `samples/camera/CameraNearMisses.cpp`:
   `rep movsd` differs. The half angle needs a `float` cast: VC6 folds
   `fov * 0.5f * k` into one constant, retail multiplies twice.
 
+The unchanged complete candidate is admitted to the functional source build
+after [native state, call-contract and source-provider integration checks](CAMERA_UPDATE.md#functional-build-review).
+It remains nonexact; rendering and gameplay still require runtime validation.
+
 ## Function names
 
 Names given from each function's behaviour (string literals, D3D/DirectDraw

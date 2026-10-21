@@ -1,0 +1,11 @@
+[
+  {
+    "source": "PrimarySoundFormat.cpp",
+    "candidate_symbol_contains": "?SetPrimaryFormat@PCSoundInterface@@QAEHHHH@Z",
+    "target_va": "0x004be910",
+    "target_size": 158,
+    "expect": "partial",
+    "bindings": "PrimarySoundFormat.bindings.json",
+    "status": "Complete PCM format setup reviewed in 172032 native cases; 158-byte candidate remains nonexact."
+  }
+]
