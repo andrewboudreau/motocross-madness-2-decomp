@@ -15,12 +15,7 @@
 // pointer (see samples/physics/common/Math3D.h), and MatrixMult only matches
 // when written with the operator() accessor (plain m[][] indexing swaps the
 // fld/fmul operands).
-struct Matrix4 {
-    Matrix4() {}
-    float& operator()(int row, int column) { return m[row][column]; }
-    const float& operator()(int row, int column) const { return m[row][column]; }
-    float m[4][4];
-};
+#include "Matrix4.h"
 
 // 12-byte float triple with D3DVECTOR-style constructors and the d3dvec.inl
 // index accessor (D3D_OVERLOADS). The accessor matters to codegen the same
