@@ -425,7 +425,7 @@ public:
     char installDirectory[0x104];         // +0x23d0: installed data directory (uiinfo.cpp 0x00523c90)
     char cdDataDirectory[0x104];          // +0x24d4: CD data directory (uiinfo.cpp 0x00523bf0)
     char cdDriveRoot[4];                  // +0x25d8: CD drive root (uiinfo.cpp 0x00523bf0)
-    UnknownDriveList* driveList;          // +0x25dc: created by the constructor (0x005221e7)
+    UnknownDriveList* driveList;          // +0x25dc: constructor call 0x005221d2; Rescan call 0x005221e7
     DirectoryList* highScoreDirectoryList;    // +0x25e0 scanned by TrackRecord.cpp 0x00520390
     DirectoryList* trackDirectoryList;    // +0x25e4: track directories (SelectGamePicProcs.cpp)
     CombinedDirectoryList* field_0x25e8;      // created by 0x00522d00

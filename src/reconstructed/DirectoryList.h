@@ -14,12 +14,12 @@ struct UnknownDriveEntry {
     char volumeName[0x104];
 };
 
-// The logical drives. The game creates one (0x005221e7, 8 bytes; the
-// constructor is a folded two-field reset) and looks for the CD-ROM whose
+// The logical drives. TrackGameMode allocates 8 bytes and calls the constructor
+// at 0x005221d2; 0x005221e7 calls Rescan. It looks for the CD-ROM whose
 // volume is "MCM2" (0x00523bf0).
 class UnknownDriveList {
 public:
-    UnknownDriveList();                                   // called at 0x004676a0 (folded)
+    UnknownDriveList();                                   // 0x004676a0; called at 0x005221d2
     ~UnknownDriveList();                                  // 0x0044a000
     int Rescan();                          // 0x00449e60: rescans
     // 0x00449e70: lists the fixed and CD-ROM drives; 0 when out of memory.

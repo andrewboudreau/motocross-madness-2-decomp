@@ -11,6 +11,22 @@ from mcm2tool.pe import PEImage  # noqa: E402
 from match import compare  # noqa: E402
 
 CASES = [
+    {'name': 'Startup list constructor UnknownParserList',
+     'source': 'src/reconstructed/StartupListConstructors.cpp',
+     'bindings': 'src/reconstructed/StartupListConstructors.bindings.json',
+     'symbol': '??0UnknownParserList@@QAE@XZ',
+     'target_va': '0x004aae20',
+     'target_size': 9,
+     'reason': 'Complete no-argument constructor identified by full actual producer and receiver/field '
+               'dataflow; class name and original TU provisional, no identity inference from shared body.'},
+    {'name': 'Startup list constructor UnknownDriveList',
+     'source': 'src/reconstructed/StartupListConstructors.cpp',
+     'bindings': 'src/reconstructed/StartupListConstructors.bindings.json',
+     'symbol': '??0UnknownDriveList@@QAE@XZ',
+     'target_va': '0x004676a0',
+     'target_size': 16,
+     'reason': 'Complete no-argument constructor identified by full actual producer and receiver/field '
+               'dataflow; class name and original TU provisional, no identity inference from shared body.'},
     {'name': 'StatsOverlay cue default method',
      'source': 'src/reconstructed/StatsOverlayDefaults.cpp',
      'bindings': 'src/reconstructed/StatsOverlayDefaults.bindings.json',

@@ -41,58 +41,55 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 262 C++ files (207 canonical sources and 55
-reviewed candidates) and reaches LINK with 219 unresolved external symbols,
+The 2026-10-21 build compiles 263 C++ files (208 canonical sources and 55
+reviewed candidates) and reaches LINK with 214 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
-This is a measured link failure, not a source-completion percentage. The
-current run's `link.log` is authoritative for remaining failures.
+This is a measured link failure, not a source-completion percentage. The current
+run is `work/game-build/build-1wo__8o2`; its `link.log` is authoritative.
 
-The composition in `build-rmu8z7mx` retains every prior strict result:
-3,017/3,028 calibration rows and 1,086/1,162 physics comparisons, with no
-partial-score decreases in either matrix. The two existing nonexact physics
-comparison-binding diagnostics are unchanged and excluded from strict counts.
+The [vegetation query connections](VEGETATION_QUERY_CONNECTIONS.md) route
+count and radius calls to existing strict Vegetation providers and use the
+existing EcoSystem global pointer. Genuine declarations move verbatim into
+narrow headers; the collision caller retains its explicit primary-pointer and
+single-field views. Four complete affected objects retain all 501 nondebug
+sections and 2,618 relocations under precisely three verified names. The
+retained regression passes 119 strict checks and 65,807 native getter cases,
+including 15 independently checked read faults. It does not establish the full
+query or missing GetObject provider.
 
-The [garage material connection](GARAGE_MATERIAL_CONNECTIONS.md) now also routes
-the two ProCircuit bike/rider preview calls to the existing D3DIMSoultreeObject
-provider. The genuine class header is included before its first complete-type
-consumer; original include order is not claimed. Both ProCircuit objects preserve
-all 698 nondebug sections and 4,404 relocations under one verified method-name
-change. The combined garage regression passes 136 strict checks and 11,589 native
-cases with the actual 133-byte provider. Resource loading is scripted, and native
-VC6 string copying is shared. The published LZW consumer pin was independently
-reproduced before updating its one affected record.
+The [startup list constructors](STARTUP_LIST_CONSTRUCTORS.md) supply the two
+already-declared parser-list and drive-list defaults. Their complete 9-byte and
+16-byte bodies match strictly, with actual caller/storage evidence; shared tiny
+addresses do not establish identity with other classes. Five prior objects are
+unchanged across 321 sections and 1,256 relocations. The native fixture passes
+1,344 actual-constructor cases, including 192 exact guarded write faults, alongside
+102 strict provider/caller checks. Original names and translation-unit ownership
+remain provisional.
 
-The [camera-file loader](FOLLOW_CAMERA_LOAD_FILE.md) supplies the missing flyby
-resource loader as an explicitly reviewed nonexact candidate. It passes 1,551
-native cases using actual stream and math helpers, plus constructor-unwind and
-progressive-output guards. Two retained negative controls demonstrate the repaired
-first-cross float rounding and matrix-store order. The complete candidate is
-980 bytes with 429 matching positions against 1,014 retail bytes; the previous
-952-byte candidate had 519 positions but failed those behavior checks. This
-separate candidate correction is not counted as a strict match. Shared stream
-CheckHeader/Seek remain nonexact; allocation is scripted, and full camera
-construction, malformed records and unmasked floating-point exceptions are outside
-the native test scope.
+Isolated real links remove exactly five names: **219 -> 216 -> 214**, with no
+additions. Across each step, all 262 prior production objects preserve 10,704
+nondebug sections and 45,813 relocations: the first step permits only the three
+verified vegetation names, and the second permits no mappings. Neither proof
+excludes filenames. The new startup object has three complete sections, no
+nondebug relocations and two strict providers under the actual game command.
+The final build verifies all 263 source hashes, 235 header hashes, configuration,
+compiler profile and per-source flags. Evidence is in
+`work/game-build/round55-getters-proof.json`, `round55-startup-proof.json` and
+`connections-round55-preservation.json`.
 
-All 261 prior production objects preserve 10,695 nondebug sections and 45,776
-relocations under the single ProCircuit call-name connection, without filename
-exclusions. Independent compilation reproduces the new loader's nine sections
-and 37 relocations under the actual game command. The camera aggregate accounts
-for all 66 sections: 63 remain identical; the corrected loader, constructor-EH
-stack displacement and validated diagnostic filename are the only changes.
-Both prior visibility-test fingerprints were independently reproduced before
-updating their camera aggregate records; their filename allowlists now explicitly
-include the extracted loader path. Other object fingerprints remain unchanged.
-Isolated real links remove exactly two names, **221 -> 220 -> 219**, with none
-added. The final report checks all source/header hashes, configuration, compiler
-profile and per-source flags. Private evidence is in
-`work/game-build/round54-link-evidence.json`, `round54-all-objects.json`,
-`round54-admitted.json` and `connections-round54-preservation.json`.
+Calibration now passes **3,019/3,030** strict rows (3,004 distinct source/address/
+extent cases). Its **2,980/2,990** unique retail address/extent count is unchanged
+because other source views already targeted the constructor bodies. Physics
+retains **1,086/1,162** strict comparisons. No previous strict match is lost and
+no partial score decreases in either matrix. The two prior nonexact physics
+binding diagnostics remain unchanged and excluded from strict counts.
 
 Game linking still fails; startup, integrated menus and racing remain untested.
-Static checks pass for 275 Python files and 420 JSON files.
-The final full regression run passes: 558 tests, 547 passed and 11 skipped
-(`work/game-build/tests-round54-final.log`).
+The separate vegetation placement and transform-arithmetic correction is private
+and unadmitted. This slice changes no compiler flags.
+Static checks pass for 277 Python files and 423 JSON files. The final regression
+passes: 560 tests, 549 passed and 11 skipped
+(`work/game-build/tests-round55-final.log`).
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

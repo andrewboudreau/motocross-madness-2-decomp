@@ -1,0 +1,30 @@
+{
+  "baseline": "Private round54 same-path four complete objects; all bytes/flags/addends/destinations preserved under only these three names. Only exact enumerated source filename prefixes are portable. Refresh published baseline before admission.",
+  "renames": {
+    "?GetObjectCount@CollisionVegetation@@QAEHXZ": "?GetCollisionCount@Vegetation@@QAEHXZ",
+    "?GetRadius@CollisionVegetation@@QAEMXZ": "?GetRadius@Vegetation@@QAEMXZ",
+    "?g_vegetationGrid@@3PAUCollisionVegetationGrid@@A": "?g_EcoSystem@@3PAVEcoSystem@@A"
+  },
+  "objects": {
+    "src/krusty2/collision/CollisionObject.cpp": {
+      "sections": 135,
+      "relocations": 722,
+      "sha256": "eb34e005f05ecf192be4633da883e3ecf64ed4715f06f443d74fdb25be4d884c"
+    },
+    "samples/physics/collision/CollisionObjectNearMisses.cpp": {
+      "sections": 136,
+      "relocations": 732,
+      "sha256": "daf6eb84252076bf297d1d1145f11b0892596446aee39a82f7aa06013f615cd1"
+    },
+    "src/reconstructed/EcoSystem.cpp": {
+      "sections": 132,
+      "relocations": 720,
+      "sha256": "354bb5c1ed552f8149b33035d8b48d74cf84d3d672af7fc3b2218a92077bc96f"
+    },
+    "samples/ecosystem/EcoSystemNearMisses.cpp": {
+      "sections": 98,
+      "relocations": 444,
+      "sha256": "a4edaa1d283330a35b29e49adddfeaf0d2a821c5e35909f5084bb856a50c5159"
+    }
+  }
+}

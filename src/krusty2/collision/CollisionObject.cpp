@@ -1411,6 +1411,9 @@ void CollisionMatrixMultiply(Matrix4* out, const Matrix4* a, const Matrix4* b)
                    b->m[3][2] * a->m[2][3] + b->m[3][3] * a->m[3][3];
 }
 
+#include "../../reconstructed/Vegetation.h"
+#include "../../reconstructed/EcoSystemGlobal.h"
+
 // Collision queries over the broad phase (0x00438e70).
 // Vegetation patch as 0x00438e70 sees a quadtree object whose objectTypeId is Vegetation's:
 // cell coordinates at +0x0c / +0x10 and thiscall accessors (tier 3 stand-in).
@@ -1427,7 +1430,7 @@ struct CollisionVegetationGrid {   // object at *0x0059aebc (tier 3): a view of 
     char field_0x00[0x5a8];
     float cellSize;                // +0x5a8 world size of one vegetation cell
 };
-extern CollisionVegetationGrid* g_vegetationGrid;   // 0x0059aebc
+
 struct CollisionGameContext {      // object at *0x0056e26c (tier 3; root of the object tree at +0x34)
     char field_0x00[0x34];
     GameObject* root;              // +0x34
@@ -1486,11 +1489,11 @@ int CollisionObject::QueryCollisions()
             } else if (!ignoreVegetation && o->objectTypeId == g_VegetationTypeId) {
                 CollisionVegetation* vegetation = (CollisionVegetation*)o;
                 Vec3 center;
-                center.x = vegetation->cellX * g_vegetationGrid->cellSize;
-                center.z = vegetation->cellZ * g_vegetationGrid->cellSize;
-                float radius = vegetation->GetRadius();   // unused: retail calls it and pops the result
-                if (SphereContainsPointXZ((CollisionBoundingSphere*)this, &center, vegetation->GetRadius())) {
-                    for (int i = 0; i < vegetation->GetObjectCount(); i++) {
+                center.x = vegetation->cellX * reinterpret_cast<CollisionVegetationGrid*>(g_EcoSystem)->cellSize;
+                center.z = vegetation->cellZ * reinterpret_cast<CollisionVegetationGrid*>(g_EcoSystem)->cellSize;
+                float radius = reinterpret_cast<Vegetation*>(vegetation)->GetRadius();   // unused: retail calls it and pops the result
+                if (SphereContainsPointXZ((CollisionBoundingSphere*)this, &center, reinterpret_cast<Vegetation*>(vegetation)->GetRadius())) {
+                    for (int i = 0; i < reinterpret_cast<Vegetation*>(vegetation)->GetCollisionCount(); i++) {
                         hitObject = vegetation->GetObject(i);
                         hitObject->field_0x98 = 1;
                         if (TestAgainst(hitObject))

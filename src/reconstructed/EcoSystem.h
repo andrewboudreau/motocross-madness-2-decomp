@@ -36,15 +36,7 @@ struct UnknownTgaFile;
 // drag in the collision header tree).
 
 // src/krusty2/collision/CollisionObject.h: QuadTreeObject.
-class UnknownEcoQuadTreeObject {
-public:
-    virtual unsigned short UnknownVirtualSlot0();
-    virtual unsigned int UnknownVirtualSlot1(class UnknownEcoQuadTree* tree);
-    UnknownEcoQuadTreeObject() { queryStamp = 0; typeId = (char)0xff; }
-    short queryStamp;                         // +0x04: query stamp (ctor 0)
-    short sortKey;                            // +0x06: sort key, slot 0's result
-    char typeId;                              // +0x08: object type id (ctor -1)
-};
+#include "EcoQuadTreeObject.h"
 
 // src/krusty2/broadphase/Quadtree.h: QuadTree (the global 0x0068aba4).
 class UnknownEcoQuadTree {
@@ -259,11 +251,7 @@ struct UnknownEcoVertex {
 
 // A placed object's quantised position (Vegetation+0x0c; the .esb stores
 // the six bytes as they are).
-struct UnknownEcoCoordinates {
-    unsigned short x;
-    unsigned short y;
-    unsigned short z;
-};
+#include "EcoCoordinates.h"
 
 // One "CollisionObject%i" entry of a definition (0x24 bytes).
 struct UnknownEcoCollisionDefinition {
@@ -332,38 +320,7 @@ public:
 
 // RTTI: Vegetation : QuadTreeObject (vtable 0x005524f8), 0x1c bytes
 // (0x00459656 allocates count * 0x1c).
-class Vegetation : public UnknownEcoQuadTreeObject {
-public:
-    Vegetation();                             // 0x00456650
-    virtual unsigned short UnknownVirtualSlot0(); // 0x00456690: view depth as a sort key
-    virtual unsigned int UnknownVirtualSlot1(UnknownEcoQuadTree* tree); // 0x00456720: cell code
-
-    // 0x004567a0 / 0x004567e0: place the object (quantised or world
-    // coordinates); the first argument (EcoSystem::textureManager) is not used.
-    void PlaceQuantized(TextureMapManager* textures, unsigned char definition,
-                               const UnknownEcoCoordinates* coordinates, unsigned char heightParameter,
-                               unsigned char radiusParameter);
-    void Place(TextureMapManager* textures, unsigned char definition,
-                               const Vector3* position, unsigned char heightParameter,
-                               unsigned char radiusParameter);
-    // 0x00456890: distance test against the current detail band.
-    void TestDistance(int* billboard, int* fade);
-    // 0x00456a10: switches between the 3D geometry and the billboard.
-    void SetBillboard(int billboard, int fade);
-    void DrawGeometry(UnknownEcoRenderTarget* target);          // 0x00457000: draws the geometry
-    int GetCollisionCount();                  // 0x00457080: the definition's collision count
-    // 0x004570a0: the definition's collision object `index`, placed here.
-    CollisionObject* GetCollisionObject(int index);
-    float GetRadius();                        // 0x00457230: the radius
-
-    UnknownEcoCoordinates quantizedPosition;  // in EcoSystem::unitsPerCoordinate units
-    unsigned char definitionIndex;            // definition index
-    unsigned char fadeLevel;                  // fade (0..255)
-    unsigned char heightParam;                // height parameter
-    unsigned char radiusParam;                // radius parameter
-    unsigned char isBillboard : 1;            // drawn as a billboard
-    void* geometryBlock;                      // geometry block (vertices, indices, AgeEntry)
-};
+#include "Vegetation.h"
 
 // 0x00456850 (cdecl): the AgeManager eviction callback for a geometry block.
 int EvictGeometry(void* object, int context);
@@ -521,7 +478,7 @@ public:
 
 // 0x0059aebc: the EcoSystem instance; the constructor 0x00457250
 // stores `this` and the destructor 0x00457330 clears it.
-extern EcoSystem* g_EcoSystem;
+#include "EcoSystemGlobal.h"
 
 // NormalDistribution.cpp (src/krusty2/effects): the tabulated bell curve
 // the generator weighs the slope and altitude with. The pointer at

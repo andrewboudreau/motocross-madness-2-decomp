@@ -1,0 +1,30 @@
+{
+  "scope": "Five complete same-path old objects unchanged, zero name mappings. Only declared source filename prefixes are portable; all flags, bytes, raw addends and resolved section/offset destinations retained. Header corrections are comments only.",
+  "objects": {
+    "src/reconstructed/TrackGame.cpp": {
+      "sections": 76,
+      "relocations": 395,
+      "sha256": "4f8c12429ae1b429920ec86eaedfd361b23f4a5953538cbd21a8ebf966443866"
+    },
+    "src/reconstructed/ZoneReport.cpp": {
+      "sections": 74,
+      "relocations": 253,
+      "sha256": "ab8f56a6759a587d96fa953409c5e7e609fcbf07475cfa787c33f0e24fc1031f"
+    },
+    "src/reconstructed/Parser.cpp": {
+      "sections": 18,
+      "relocations": 50,
+      "sha256": "f293aff96571e3cf41bc1bdb47673c109669476212ec24b34a7dd1277a6a8671"
+    },
+    "src/reconstructed/DirectoryList.cpp": {
+      "sections": 53,
+      "relocations": 154,
+      "sha256": "71a77a7f1a69c7a71536558ba2415faeea4e6b8c83a42b02b0f77419029947bf"
+    },
+    "src/reconstructed/UiInfo.cpp": {
+      "sections": 100,
+      "relocations": 404,
+      "sha256": "f37c215df1a8fb79deb5b80bbcbf0d513652595aedb6e9a67f3b5838892fe85b"
+    }
+  }
+}
