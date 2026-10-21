@@ -55,6 +55,11 @@ public:
     virtual void D3DIMObjectVirtualSlot9(int a1, const char* a2, const SoultreeLoadDesc* a3,
                                          int a4, int a5);
 
+    // Existing D3DIMSoulTree.cpp helpers; the receiver is the primary model pointer.
+    void AddModifier(GameObject* modifier);          // 0x00444d80
+    void RemoveModifier(GameObject* modifier);       // 0x00444de0
+    void AddSecondModifier(GameObject* modifier);    // 0x00444eb0
+
     // QuadTreeObject (12) + GameObject (0x2c) = 0x38; the rest runs to the vtordisp at
     // 0x4f4 - 0x21c = 0x2d8 (extent only, tier 2).
     char d3do_field_0x38[0x2d8 - 0x38];

@@ -37,20 +37,18 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 210 C++ files (183 canonical sources and twenty-seven
-reviewed candidates) and reaches LINK with 453 unresolved external symbols,
+The 2026-10-21 build compiles 211 C++ files (183 canonical sources and twenty-eight
+reviewed candidates) and reaches LINK with 438 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The final composition in `build-kngsl_c0` retains all prior strict results:
+The final composition in `build-kioe61ys` retains all prior strict results:
 2,981/2,992 calibration rows and 1,086/1,162 physics comparisons. This does
 not establish game startup, menus or racing while linkage remains incomplete.
-Regression verification covers 469 tests: 458 passed and eleven skipped.
-The full run found two partial expectations affected by the verified instruction
-reorder described below; both passed on focused rerun. Logs are
-`work/game-build/tests-round22.log` and
-`work/game-build/race22-sample/regression-tests.log`.
+The full regression run passes: 471 tests, with 460 passed and eleven skipped
+(`work/game-build/tests-round23.log`). Static checking also passes for 195
+Python files and 343 JSON files.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based
@@ -510,6 +508,30 @@ interior. Its diagnostic comparison changes from 13,396 to 13,390 matching
 positions out of 13,428 bytes. The two partial baseline expectations are
 updated only after verifying equivalent register/flag effects; this sample
 is outside the strict calibration and physics counts.
+
+The [bike modifier connections](BIKE_MODIFIER_CONNECTIONS.md) use the existing
+GhostMod1 and MorphBastardModifier constructors and model attachment/fade
+methods, **453 → 447**. All six connections preserve receiver offsets and
+complete object bytes; native checks exercise 3,712 attachment, removal and
+fade cases. The [terrain construction/rendering connections](TERRAIN_CONSTRUCTION_CONNECTIONS.md)
+use eight existing matrix, palette, grid-block and shared-node providers,
+**447 → 439**, preserving every complete caller body and relocation destination.
+
+The complete [movie-opening candidate](MEDIA_CONTROL_OPEN.md#functional-build-review)
+is admitted as reviewed-nonexact after 11,125 native COM, output, descriptor,
+callback, alias and failure scenarios. Its 656-byte body retains 53 matching
+positions against the complete 646-byte retail body. Actual SDK/canonical
+GUID values are checked; COM, OS and helper boundaries are scripted. Live
+decoding, drivers and downstream Release cleanup remain untested. Its isolated
+real link removes only Open, **439 → 438**.
+
+This composition preserves all 210 pre-existing production objects, 10,447
+complete nondebug sections and 45,217 relocations under fourteen verified
+external-name substitutions. Only the Open candidate adds an object. All 211
+source hashes, 212 header hashes and configuration hashes match the final build.
+Private evidence is `work/game-build/round23-all-objects.json` and
+`round23-link-evidence.json`. All prior strict calibration and physics cases
+remain, with no strict-score near-miss drops.
 
 Other incompatible class views, missing methods and unresolved globals
 continue to block linking. Import

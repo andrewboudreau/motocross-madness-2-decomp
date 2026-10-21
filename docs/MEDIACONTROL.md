@@ -45,6 +45,9 @@ Member names are ours: `Open` (`0x004a2560`), `IsDirectShowInstalled`
   branch target matches. Retail allocates one more callee-saved register
   (a zero in `ebx`, `&videoDrawStream` in `ebp`), which shifts every frame
   offset by four.
+  The [functional build review](MEDIA_CONTROL_OPEN.md#functional-build-review)
+  records the complete-body native COM/output/alias/failure comparison and
+  the remaining real-device and decoder limits.
 
 ## Reproduce
 

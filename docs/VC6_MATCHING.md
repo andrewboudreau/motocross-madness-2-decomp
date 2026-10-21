@@ -22,6 +22,17 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
+The current terrain and bike-modifier connections retain all 210 previous
+production objects under fourteen verified external-name substitutions.
+The separately reviewed MediaControl::Open adds one nonexact candidate;
+its 656-byte complete body has 53 matching positions against 646 retail bytes
+and passes 11,125 native scripted-boundary scenarios. The final real link
+compiles 211 translation units and reports 438 unresolved names. Private
+evidence is in `work/game-build/round23-all-objects.json`,
+`round23-link-evidence.json` and `connections-round23-preservation.json`.
+The full native regression run passes 460 tests with eleven skipped;
+`work/game-build/tests-round23.log` records all 471 results.
+
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json
 python tools/run_physics_samples.py --compiler vc6 --vc6-root work/vc6sp3-disc --profile vc6_o2_mt --strict

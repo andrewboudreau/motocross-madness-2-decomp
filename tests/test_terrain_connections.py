@@ -19,6 +19,17 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ('src/reconstructed/Grid1.cpp', 'src/reconstructed/QuarryStuntEvent.cpp',
            'src/reconstructed/TrackOverlay.cpp', 'src/krusty2/broadphase/Terrain.cpp',
            'src/reconstructed/TerrainSupport.cpp', 'src/reconstructed/FileStream.cpp')
+CONSTRUCTION_PROVIDERS = (
+    ('MatrixUtil', '?IdentityMatrix@@YA?AUMatrix4@@XZ', 0x4a1410, 71, '??0Terrain@@', 0x505830, 370, 1),
+    ('Quantize', '??0ColorMapper@@QAE@PAVUnknownTextureStream@@@Z', 0x4ddf40, 689, '?Load@Terrain@@', 0x5059d0, 2116, 1),
+    ('Quantize', '?GetColors@ColorMapper@@QAEPAEXZ', 0x4de270, 4, '?Load@Terrain@@', 0x5059d0, 2116, 1),
+    ('Gridbase', '??0GridBaseBlock@@QAE@PAVUnknownTextureStream@@@Z', 0x47dc20, 382, '?Load@Terrain@@', 0x5059d0, 2116, 1),
+    ('Grid1', '??0DrawableGridNodeSharedTextures@@QAE@PAVUnknownTextureStream@@HPAVGridNode@@PAUGridTerrain@@HHHHHPAM3@Z',
+     0x47c880, 176, '?Load@Terrain@@', 0x5059d0, 2116, 1),
+    ('Griddraw', '?DrawVisible@DrawableGridNode@@QAEHPAX@Z', 0x480900, 23, '?UnknownVirtualSlot14@Terrain@@', 0x506220, 3173, 2),
+    ('Griddraw', '?DrawVisibleWithDetail@DrawableGridNode@@QAEHPAXH@Z', 0x480920, 26, '?UnknownVirtualSlot14@Terrain@@', 0x506220, 3173, 2),
+    ('Griddraw', '?ReleaseVertexBuffers@DrawableGridNode@@QAEXH@Z', 0x47edb0, 441, '??1Terrain@@', 0x5079f0, 441, 1),
+)
 PROVIDERS = (
     ('?RetireOwnedObject@Terrain@@QAEXPAVBaseObject@@@Z', 0x5057d0, 83),
     ('?SelectQuality@Terrain@@QAEXH@Z', 0x507960, 129),
@@ -28,10 +39,10 @@ PROVIDERS = (
 # relocation records are hashed because QueryGround still has unbound helpers.
 # This is deliberately not a successful retail comparison of either function.
 PARTIAL = (
-    # Shared input declarations rename the loader's local EH label to
-    # $L6028, still section 29 +182. race-tree-round22-all-objects.json
-    # proves every section byte and relocation destination is unchanged.
-    ('?Load@Terrain@@', 2117, '0ebbdea8152eaa172d03fb2c94e5db58cda243da854f2f28deb225c36380d38f'),
+    # Canonical ColorMapper, GridBaseBlock and shared-texture node calls.
+    # Complete section bytes and relocation destinations are preserved;
+    # only the four external names in this body change.
+    ('?Load@Terrain@@', 2117, '6981e098cc6f3fe0abf740cd488861b58e7695a5b6cec74e7991323882bac3b9'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with
@@ -59,10 +70,28 @@ class TerrainConnectionsTests(unittest.TestCase):
         self.assertEqual(bases[b'.?AVTerrain@@'], (0, -1, 0))
         self.assertEqual(bases[b'.?AVGameObject@@'], (0, -1, 0))
         self.assertEqual(bases[b'.?AVGroundFogableObject@@'], (0x2c, -1, 0))
+        for table, name, expected_bases in (
+            (0x557658, b'.?AVColorMapper@@', (b'.?AVBaseObject@@',)),
+            (0x553e54, b'.?AVDrawableGridNodeSharedTextures@@',
+             (b'.?AVDrawableGridNode@@', b'.?AVGridNode@@')),
+        ):
+            locator, = struct.unpack('<I', retail.bytes_at_va(table - 4, 4))
+            _, offset, _, descriptor, hierarchy = struct.unpack('<5I', retail.bytes_at_va(locator, 20))
+            self.assertEqual(offset, 0)
+            self.assertEqual(retail.bytes_at_va(descriptor + 8, 64).split(b'\0')[0], name)
+            _, _, count, array = struct.unpack('<4I', retail.bytes_at_va(hierarchy, 16))
+            bases = {}
+            for pointer in struct.unpack('<' + 'I' * count, retail.bytes_at_va(array, count * 4)):
+                descriptor, _, mdisp, pdisp, vdisp, _ = struct.unpack('<2I3iI', retail.bytes_at_va(pointer, 24))
+                bases[retail.bytes_at_va(descriptor + 8, 64).split(b'\0')[0]] = (mdisp, pdisp, vdisp)
+            for base in (name, *expected_bases):
+                self.assertEqual(bases[base], (0, -1, 0))
 
         with tempfile.TemporaryDirectory(prefix='mcm2-terrain-connections-') as directory:
             objects = {}
-            for source in (*SOURCES, 'tests/fixtures/terrain_connection_layout.cpp'):
+            additional = tuple('src/reconstructed/' + name + '.cpp'
+                               for name in ('MatrixUtil', 'Quantize', 'Gridbase', 'Griddraw'))
+            for source in (*SOURCES, *additional, 'tests/fixtures/terrain_connection_layout.cpp'):
                 path = Path(directory) / (Path(source).stem + '.obj')
                 command = [
                     sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
@@ -123,6 +152,26 @@ class TerrainConnectionsTests(unittest.TestCase):
             import capstone
             decoder = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
             decoder.detail = True
+            for unit, symbol, va, extent, caller, caller_va, caller_extent, count in CONSTRUCTION_PROVIDERS:
+                source = 'src/reconstructed/' + unit + '.cpp'
+                obj = objects[source]
+                entry = obj.find_symbol(symbol)
+                self.assertEqual((entry.function_size, entry.extent_source), (extent, 'coff_function_aux'))
+                self.assertTrue(compare(retail, obj, symbol, va, extent,
+                                        (ROOT / source).with_suffix('.bindings.json'))['strict_exact'], symbol)
+                entry = provider.find_symbol(caller)
+                _, _, relocations = provider.symbol_extent(entry)
+                self.assertEqual(sum(r.type == 0x14 and provider.symbol_by_index[r.symbol_index].name == symbol
+                                     for r in relocations), count)
+                code = list(decoder.disasm(retail.bytes_at_va(caller_va, caller_extent), caller_va))
+                self.assertEqual(sum(i.size for i in code), caller_extent)
+                self.assertEqual(sum(i.mnemonic == 'call' and i.operands[0].type == capstone.x86.X86_OP_IMM
+                                     and i.operands[0].imm == va for i in code), count)
+            imports = {s.name for s in provider.symbols if s.section_number == 0}
+            self.assertFalse(any('TerrainColorMapper' in s or 'TerrainGridBlock' in s or 'GetIdentityMatrix@@' in s
+                                 or s.startswith(('??0TerrainShutdownObject', '?Shutdown@TerrainShutdownObject',
+                                                  '?DrawVisible@TerrainShutdownObject', '?DrawVisibleWithDetail@TerrainShutdownObject'))
+                                 for s in imports))
             decoded = list(decoder.disasm(retail.bytes_at_va(0x5059d0, 2116), 0x5059d0))
             self.assertEqual(sum(i.size for i in decoded), 2116)
             retail_calls = Counter(i.operands[0].imm for i in decoded if i.mnemonic == 'call'

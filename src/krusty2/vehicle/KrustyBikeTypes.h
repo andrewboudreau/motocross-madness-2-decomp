@@ -492,14 +492,11 @@ struct KbSink {
 // transforms a vector.
 struct KbMorphMod;
 struct KbXform {
-    void AddModifier(KbObj128* who);   // 0x00444D80 (tier 3: attach/detach with a scene object)
-    void RemoveModifier(KbObj128* who);   // 0x00444DE0 (D3DIMSoultreeObject; GameObject slot 10)
     Vec3 WorldToLocalDirection(const Vec3* v);
     // D3DIMSoultreeObject setters (names from src/reconstructed/D3DIMSoulTree.h): 0x0048fc80 calls
-    // the first two with 0 or 1 on the bike and rider nodes and the third with the rider morph.
+    // these with 0 or 1 on the bike and rider nodes.
     void SetLod(int value);         // 0x00444D00
     void SetLowestLod(int value);         // 0x00444D40
-    void AddSecondModifier(KbMorphMod* mod);   // 0x00444EB0 (D3DIMSoultreeObject; D3DIMSoulTree.CPP line 0x97f)
 };
 // Element of the array at Bike+0x12c (count at +0x130).
 struct KbChild {
@@ -508,9 +505,8 @@ struct KbChild {
     char pad_8[0x9c];
     int field_0xa4;
 };
-// CollisionObject (collision/) viewed by address: ignore list at +0x78/+0x7c.
+// Opaque storage view of the ghost modifier; allocation/calls use GhostMod1.
 struct KbObj128 {
-    void StartFade(float a);   // 0x0047BBF0 (tier 3)
 };
 
 
@@ -585,12 +581,9 @@ struct KbBikeSetup {
     int field_0x54;
     int field_0x58;
 };
-// 0x48-byte object built with 0x0047bb20 (src/reconstructed GhostMod1) for a ghost bike.
-struct KbGhostMod { char pad_0x00[0x48]; KbGhostMod(int flags); };
 // 0x58-byte rider morph (src/reconstructed MorphBastardModifier: ctor 0x004a3150, loader 0x004a33b0).
 struct KbMorphMod {
     char pad_0x00[0x58];
-    KbMorphMod(int flags);
     KbMorphMod* LoadParameterFile(void* a, const char* path, SoultreeObject* node);
 };
 // Bike's own loader 0x004079c0 (`ret 0xa0`, 40 argument dwords; not a vtable entry).  It is a

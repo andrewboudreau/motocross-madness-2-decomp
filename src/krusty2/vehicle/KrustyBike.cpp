@@ -24,6 +24,9 @@
 #include "../../reconstructed/Wrecker.h"
 #include "broadphase/Quadtree.h"
 #include "core/MemTag.h"
+#include "soultree/SoultreePhysicsObject.h"
+#include "../../reconstructed/GhostModCore.h"
+#include "../../reconstructed/MorphBastardModifierCore.h"
 
 // KbFloat: identity inline standing in for the original inline float getters (tier 3).
 // Passing a member straight to a float parameter makes VC6 push the raw dword; retail
@@ -708,9 +711,9 @@ void KrustyBike::UnknownVirtualSlot50(int a, float b, int c)
         if (a) {
             if (!spawnProtected) {
                 if (isGhost) {
-                    ((KbXform*)modelNode)->AddModifier(ghostMod);
-                    ((KbXform*)riderCharacter->c_0x1a0)->AddModifier(ghostMod);
-                    ghostMod->StartFade(0);
+                    ((D3DIMSoultreeObject*)modelNode)->AddModifier((GameObject*)ghostMod);
+                    ((D3DIMSoultreeObject*)riderCharacter->c_0x1a0)->AddModifier((GameObject*)ghostMod);
+                    ((GhostMod1*)ghostMod)->StartFade(0);
                 }
                 Fn_00496E30(1);
             }
@@ -730,9 +733,9 @@ void KrustyBike::UnknownVirtualSlot50(int a, float b, int c)
     if (a) {
         if (!spawnProtected) {
             if (isGhost) {
-                ((KbXform*)modelNode)->AddModifier(ghostMod);
-                ((KbXform*)riderCharacter->c_0x1a0)->AddModifier(ghostMod);
-                ghostMod->StartFade(b);
+                ((D3DIMSoultreeObject*)modelNode)->AddModifier((GameObject*)ghostMod);
+                ((D3DIMSoultreeObject*)riderCharacter->c_0x1a0)->AddModifier((GameObject*)ghostMod);
+                ((GhostMod1*)ghostMod)->StartFade(b);
             }
             Fn_00496E30(1);
         }
@@ -1486,8 +1489,8 @@ int KrustyBike::Tick(float dt)
             spawnProtected = 0;
             spawnProtectEndPending = 0;
             if (isGhost) {
-                ((KbXform*)modelNode)->RemoveModifier(ghostMod);
-                ((KbXform*)riderCharacter->c_0x1a0)->RemoveModifier(ghostMod);
+                ((D3DIMSoultreeObject*)modelNode)->RemoveModifier((GameObject*)ghostMod);
+                ((D3DIMSoultreeObject*)riderCharacter->c_0x1a0)->RemoveModifier((GameObject*)ghostMod);
             }
             Fn_00496E30(0);
         }
@@ -1690,7 +1693,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         fourStroke = copy.field_0x4;
     }
     if (isGhost) {
-        ghostMod = (KbObj128*)new(__FILE__, 0x690) KbGhostMod(1);
+        ghostMod = (KbObj128*)new(__FILE__, 0x690) GhostMod1(1);
         GameObject::AppendChild((GameObject*)ghostMod, -1);
     }
     statusNode = 0;
@@ -2007,10 +2010,10 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         Vec3 axisY(0.0f, 1.0f, 0.0f);
         Vec3 axisZ(0.0f, 0.0f, 1.0f);
         ((SoultreeObject*)riderCharacter->c_0x1a0)->SetAxesIn(0, &axisZ, &axisY, 0, 1);
-        KbMorphMod* morph = new(__FILE__, 0x891) KbMorphMod(1);
+        KbMorphMod* morph = (KbMorphMod*)new(__FILE__, 0x891) MorphBastardModifier(1);
         morph->LoadParameterFile((void*)a1, "RiderMorph.mbf", (SoultreeObject*)riderCharacter->c_0x1a0);
         GameObject::AppendChild((GameObject*)morph, -1);
-        ((KbXform*)riderCharacter->c_0x1a0)->AddSecondModifier(morph);
+        ((D3DIMSoultreeObject*)riderCharacter->c_0x1a0)->AddSecondModifier((GameObject*)morph);
     }
     UnknownVirtualSlot102(0.001f);
     return this;

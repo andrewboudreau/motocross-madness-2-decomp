@@ -135,12 +135,6 @@ struct TerrainCell {
 class Terrain;
 class TerrainShutdownObject {
 public:
-    // 0x0047c880 (Grid1.cpp, DrawableGridNodeSharedTextures in src/reconstructed/Grid1.h;
-    // 0x5c bytes, 11 stack arguments): reads the height field from the stream.  Terrain::Load
-    // passes (stream, host, 0, this, gridSize, gridSize * 4, 0, 0, 0, &boundsMin, &boundsMax).
-    TerrainShutdownObject(TerrainStream* stream, int host, void* parentNode, Terrain* terrain,
-                          int size, int size4, int a7, int a8, int a9, TerrainVec3* boundsMin,
-                          TerrainVec3* boundsMax);
     // 0x00484d70 (thiscall, ret 8): walks the cell quadtree (child table +0x04, shift +0x29, nibble
     // table at 0x0056c2ac) down to the leaf whose +0x24/+0x26 halfwords equal (x, z); null if none.
     TerrainCell* LookupCell(int x, int z);
@@ -149,18 +143,11 @@ public:
     // casts the grid-space segment (a, b) against the terrain; on a hit writes the grid-space hit
     // point to *out.  The last three ints are forwarded from Terrain::CastSegment (tier 3 role).
     virtual int CastSegment(TerrainVec3* a, TerrainVec3* b, TerrainVec3* out, int p3, int p4, int p5);
-    void Shutdown(int flag);                                    // 0x0047edb0
     // 0x00483910 (thiscall, ret 0x14; tier 2: field_0x44 is the same object the dtor shuts
     // down).  Fetches the four corners of grid cell (ix, iz): heights[4], optional normals[4]
     // and per-corner surface bytes[4] (three output arrays, see Terrain::QueryGround).
     void GetCellCorners(int ix, int iz, float* heights, TerrainVec3* normals,
                         unsigned char* surface);
-    // 0x00480900 (ret 4) / 0x00480920 (ret 8): DrawableGridNode draw entry points
-    // (src/reconstructed/Griddraw.h).  Terrain slot 14 passes the render target and, for the
-    // detail passes, the detail texture; a zero result makes slot 14 return 0 (tier 3 roles).
-    int DrawVisible(void* target);
-    int DrawVisibleWithDetail(void* target, TerrainSurfaceBase* texture);
-
     // Members read by Terrain::CastSegment (tier 2 offsets, tier 3 names).
     void* cellTable;                                           // +0x04 cell table read by 0x00483910
     char pad_0x08[0x18 - 0x08];
@@ -180,7 +167,6 @@ public:
 struct TerrainMatrix {
     float m[16];
 };
-TerrainMatrix* GetIdentityMatrix(TerrainMatrix* out);           // 0x004a1410 (fills *out, returns it; tier 3 name)
 
 // PROVISIONAL: 16-byte entries of the table at *0x0068a32c indexed by Terrain::field_0xbf0
 // (`shl eax,4`, fields at +0, +4, +8, +0xc read by 0x00507960; tier 2 layout, tier 3 use).
@@ -322,7 +308,7 @@ public:
                   int quality, int field0xc40, const char* textureName, int halfFormat);
     virtual ~Terrain();                                         // 0x005059b0 -> core 0x005079f0
 
-    BaseObject* colorMapper;  // +0x30  Load: the TerrainColorMapper (palette source); passed as palette to LoadSurface/CreateSurface
+    BaseObject* colorMapper;  // +0x30  Load: the ColorMapper (palette source); passed as palette to LoadSurface/CreateSurface
     TerrainComObject* directDrawPalette;  // +0x34  Load: IDirectDraw CreatePalette(0x44, 256 entries) out pointer; Release()d by the dtor
     TerrainSurfaceRegistry* surfaceRegistry;  // +0x38  Load: desc->registry; when set, surfaces are ManagedTextures Register()ed with it
     TerrainStream* stream;                                      // +0x3c Load's stream argument

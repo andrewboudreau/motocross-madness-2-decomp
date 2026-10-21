@@ -9,6 +9,9 @@
 #include "../../reconstructed/DebugOverlay.h"
 #include "../../reconstructed/Griddraw.h"
 #include "../../reconstructed/MatrixUtil.h"
+#include "../../reconstructed/Quantize.h"
+#include "../../reconstructed/Gridbase.h"
+#include "../../reconstructed/Grid1.h"
 
 struct Vec3;
 float Vec3DotCall(const Vec3* a, const Vec3* b);
@@ -66,8 +69,7 @@ Terrain::Terrain(int a)
     hasLightManager = 0;
     fileStartOffset = 0;
     detailTexture = 0;
-    TerrainMatrix tmp;
-    transform = *GetIdentityMatrix(&tmp);
+    *reinterpret_cast<Matrix4*>(&transform) = IdentityMatrix();
     ownedObjectArray = 0;
     ownedObjectArrayCount = 0;
     createdSurfaceCount = 0;
@@ -127,20 +129,6 @@ extern int g_gridLevels;                               // 0x0056c200 bit length 
 void* DebugCalloc(unsigned int count, unsigned int size, const char* file, int line);
 // 0x0050a590 (TextureMap.h): shared texture `name` through the manager.
 #include "../../reconstructed/TextureLoader.h"
-// ColorMapper (0x18b10 bytes; ctor 0x004ddf40, 0x004de270 returns its 256 RGB triplets).
-class TerrainColorMapper : public BaseObject {
-public:
-    explicit TerrainColorMapper(TerrainStream* stream);
-    unsigned char* GetColors();
-    char pad_0x08[0x18b10 - 0x08];
-};
-// GridBaseBlock (src/reconstructed/Gridbase.h; 0xd50 bytes, ctor 0x0047dc20).
-class TerrainGridBlock {
-public:
-    explicit TerrainGridBlock(TerrainStream* stream);
-    char pad_0x000[0xd50];
-};
-
 // In-place scale (an inlined Vec3 operator*=: the factor stays on the x87 stack).
 static inline void ScaleTerrainVec3(TerrainVec3& v, float s)
 {
@@ -208,7 +196,7 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     int hasPalette;
     reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&hasPalette, 4, 1);
     if (hasPalette) {
-        TerrainColorMapper* mapper = new(__FILE__, 0x167) TerrainColorMapper(this->stream);
+        ColorMapper* mapper = new(__FILE__, 0x167) ColorMapper(reinterpret_cast<UnknownTextureStream*>(this->stream));
         colorMapper = mapper;
         unsigned char* colors = mapper->GetColors();
         TerrainPaletteEntry entries[256];
@@ -242,7 +230,7 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     reinterpret_cast<UnknownTextureStream*>(this->stream)->Seek(ownedObjectCount * 4, 1, 1);
     int b;
     for (b = 0; b < blockRecords; b++)
-        blocks[b] = new(__FILE__, 0x1ab) TerrainGridBlock(this->stream);
+        blocks[b] = new(__FILE__, 0x1ab) GridBaseBlock(reinterpret_cast<UnknownTextureStream*>(this->stream));
 
     if (surfaceRecords) {
         int width;
@@ -277,9 +265,10 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
 
     boundsMin = TerrainVec3(FLT_MAX, FLT_MAX, FLT_MAX);
     boundsMax = TerrainVec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-    heightField = new(__FILE__, 0x1e6) TerrainShutdownObject(this->stream, host, 0, this, gridSize,
-                                                             gridSize * 4, 0, 0, 0, &boundsMin,
-                                                             &boundsMax);
+    heightField = reinterpret_cast<TerrainShutdownObject*>(new(__FILE__, 0x1e6)
+        DrawableGridNodeSharedTextures(reinterpret_cast<UnknownTextureStream*>(this->stream), host,
+                                      0, reinterpret_cast<GridTerrain*>(this), gridSize,
+                                      gridSize * 4, 0, 0, 0, &boundsMin.x, &boundsMax.x));
     boundsMax.x += 16.0f;
     boundsMax.z += 16.0f;
     ScaleTerrainVec3(boundsMax, gridCellSize);
@@ -512,7 +501,7 @@ int Terrain::UnknownVirtualSlot14()
         ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 1, 0xd);
         ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1d, 0, 0);
         ((TerrainRenderTarget*)renderContext)->device->SetTexture(1, detailTexture->textureSurface);
-        if (!heightField->DrawVisibleWithDetail(((TerrainRenderTarget*)renderContext), detailTexture))
+        if (!reinterpret_cast<DrawableGridNode*>(heightField)->DrawVisibleWithDetail(renderContext, reinterpret_cast<int>(detailTexture)))
             return 0;
         ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0xb, 0);
     } else {
@@ -522,14 +511,14 @@ int Terrain::UnknownVirtualSlot14()
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 4, 1);
             ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1d, 1, 0);
-            heightField->DrawVisible(((TerrainRenderTarget*)renderContext));
+            reinterpret_cast<DrawableGridNode*>(heightField)->DrawVisible(renderContext);
             ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1d, 0, 0);
         } else {
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 1, 2);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 4, 1);
             ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1d, 0, 0);
-            heightField->DrawVisible(((TerrainRenderTarget*)renderContext));
+            reinterpret_cast<DrawableGridNode*>(heightField)->DrawVisible(renderContext);
         }
         if (!reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->softwareRendering && detailTexture && g_terrainQualityValue) {
             detailTexture->SetAsTexture();
@@ -542,7 +531,7 @@ int Terrain::UnknownVirtualSlot14()
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x10, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->magFilter);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x11, 2);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x12, 1);
-            if (!heightField->DrawVisibleWithDetail(((TerrainRenderTarget*)renderContext), detailTexture))
+            if (!reinterpret_cast<DrawableGridNode*>(heightField)->DrawVisibleWithDetail(renderContext, reinterpret_cast<int>(detailTexture)))
                 return 0;
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x10, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->magFilter);
             ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x11, reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->minFilter);
@@ -691,7 +680,7 @@ Terrain::~Terrain()
         }
     }
     if (heightField) {
-        heightField->Shutdown(1);
+        reinterpret_cast<DrawableGridNode*>(heightField)->ReleaseVertexBuffers(1);
         if (heightField)
             delete heightField;
     }

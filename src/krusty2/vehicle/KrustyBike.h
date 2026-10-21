@@ -241,7 +241,7 @@ public:
     char field_0x15e5; // 0x15E5
     char spawnProtectForced;  // +0x15E6  slot 50's forced (c != 0) path sets/clears it; unforced slot 50 calls return early while it is set (tier 3)
     char pad_0x15E7[0x1];
-    KbObj128* ghostMod;  // +0x15E8  KbGhostMod the loader creates for a ghost (isGhost)
+    KbObj128* ghostMod;  // +0x15E8  GhostMod1 the loader creates for a ghost (isGhost)
     float stateIntervalElapsed;  // +0x15EC  seconds into the current state interval (0x00493660)
     float stateIntervalLength;  // +0x15F0  length of the current state interval in seconds
     int firstPacketLatch;  // +0x15F4  first-packet latch (1 from the loader)

@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/gameui/MediaControlNearMisses.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete MediaControl Open passes 11125 native scripted COM, OS and helper scenarios including output aliasing, callback mutations, failures and faults. VC6 emits 656 bytes against the complete 646-byte retail body with 53 matching positions. Actual SDK and canonical GUID providers are checked; live DirectShow decoding, DirectDraw drivers and downstream Release cleanup remain untested.",
+      "evidence": "docs/MEDIA_CONTROL_OPEN.md#functional-build-review"
+    },
+    {
       "path": "samples/game/LeaveRaceForMenu.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete race-to-menu transition passes 9437 native state, display/input, callback, allocation, fault and unwind scenarios. VC6 emits 533 bytes against the complete 531-byte retail body with 454 matching positions; generated TransDlg destructor helpers are strict. GUI, display, IME, result-recording, audio and allocation boundaries are scripted; live menu rendering and device transitions remain untested.",

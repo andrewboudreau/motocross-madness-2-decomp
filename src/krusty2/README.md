@@ -98,6 +98,9 @@ The physics runner adds `src/krusty2` to the include path.
   `TerrainComObject`, `TerrainOwned` and others) are provisional stand-ins with tier 3 names.
   `TerrainVec3` stays separate from the shared Vec3 because including `Math3D.h` would add
   static initializers that Terrain.cpp does not have.
+- Construction, palette access, height-field rendering and buffer release now
+  use eight [existing providers](../../docs/TERRAIN_CONSTRUCTION_CONNECTIONS.md),
+  retaining complete caller bytes and relocation destinations.
 
 ## Evidence: KrustyBike.cpp
 
