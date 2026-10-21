@@ -1,5 +1,5 @@
 {
-  "baseline": "Published 5c439bb source hashes matched the same-path private baseline before applying six global-name joins. All nondebug bytes, flags and relocation destinations remain identical. Terrain transitive consumer included after genuine global-only header narrowing; no commutative target swaps accepted. Only recognized complete checkout filenames are portable. FilePrintf declaration correction: both EcoSystem objects were independently checked against these original pins and complete current objects under only the void-to-int FilePrintf name; only the sample hash changes. EcoSystem QuadTree correction: published ed3d06ce old EcoSystem pins reproduced independently; both complete objects preserve all bytes and destinations under only the six tree interface names, with no exclusions or score changes. Round50 exposes the existing TrackOverlay flag at unchanged BSS+0x40: its published old pin was reproduced first, and all207 sections/863 relocations remain identical under only that one static-to-external symbol name/visibility change; only the canonical TrackOverlay record is refreshed.",
+  "baseline": "Published 5c439bb source hashes matched the same-path private baseline before applying six global-name joins. All nondebug bytes, flags and relocation destinations remain identical. Terrain transitive consumer included after genuine global-only header narrowing; no commutative target swaps accepted. Only recognized complete checkout filenames are portable. FilePrintf declaration correction: both EcoSystem objects were independently checked against these original pins and complete current objects under only the void-to-int FilePrintf name; only the sample hash changes. EcoSystem QuadTree correction: published ed3d06ce old EcoSystem pins reproduced independently; both complete objects preserve all bytes and destinations under only the six tree interface names, with no exclusions or score changes. Round50 exposes the existing TrackOverlay flag at unchanged BSS+0x40: its published old pin was reproduced first, and all207 sections/863 relocations remain identical under only that one static-to-external symbol name/visibility change; only the canonical TrackOverlay record is refreshed. The frozen visibility camera now uses actual PCCamera storage: its old complete pin was independently reproduced first; three names join the same lifecycle/storage, with one exact implicit destructor COMDAT (5 code bytes plus 11 alignment NOPs) and the cleanup reference resolving to that definition. All 87 old sections and 341 relocations otherwise preserve their bytes and destinations. Round51 StatsOverlay::DrawStandings extraction: the published old aggregate pin was independently reproduced; all 37 sections and 162 relocations preserve exactly under only its two iterator-call targets (function offsets 172 and 220) joining existing BikeRace::NextBike. Other aggregate functions and the canonical TrackOverlay record are unchanged.",
   "renames": {
     "?g_visibilityClipper@@3PAVD3DIMShadowClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
     "?g_visibilityClipper@@3PAVUnknownCubeClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
@@ -40,9 +40,9 @@
       "sha256": "ffdcd1447894682ed6e8c8a123537eb56c226480b79767ec8b82eba172367d13"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
-      "sections": 87,
-      "relocations": 341,
-      "sha256": "f224a17cb69678fdc1e476e9216faf769a06b1ebb8b485513527137ba7e44d5c"
+      "sections": 88,
+      "relocations": 342,
+      "sha256": "47cf02499bf52c21c38dab9a00f203624a0dc51d24a01ce4058541922ee0172a"
     },
     "samples/render/CubeDrawNearMisses.cpp": {
       "sections": 17,
@@ -57,7 +57,7 @@
     "samples/track/TrackOverlayNearMisses.cpp": {
       "sections": 37,
       "relocations": 162,
-      "sha256": "5914078c29620649c1cfe2044d9b72267d6590d09eb7d15fad3a10e1b957e38a"
+      "sha256": "a05ca4f90257c35341b96120f0880067425879dda79372880b15a5fd7eb6505e"
     },
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,

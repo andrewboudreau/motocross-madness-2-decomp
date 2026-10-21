@@ -178,8 +178,9 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
                 report = compare(pe, objects[source], symbol, va, size, bindings)
                 self.assertTrue(report['strict_exact'], (source, symbol, report))
                 strict += 1
-            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 1035)
-            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4712)
+            # The actual frozen PCCamera emits one strict implicit destructor COMDAT.
+            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 1036)
+            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4713)
         print('Clipper global:', strict, 'strict checks; 15 whole objects; 46 retail pointer loads; storage remains unresolved')
 
 

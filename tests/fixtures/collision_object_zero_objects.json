@@ -1,0 +1,15 @@
+{
+  "scope": "Complete nondebug objects; only recognized source filename roots normalized for portability. Existing TU-local zero vector destination.",
+  "objects": {
+    "src/krusty2/collision/CollisionObject.cpp": {
+      "sections": 135,
+      "relocations": 722,
+      "sha256": "af9fc8a09ff70677d1d82db519a9bf60bedc5f301e195768ba49923460eede74"
+    },
+    "samples/physics/collision/CollisionObjectNearMisses.cpp": {
+      "sections": 136,
+      "relocations": 732,
+      "sha256": "fd6db90a203a9ec0407352ef8908668843edf3471c2e102dceb47d317809a01b"
+    }
+  }
+}

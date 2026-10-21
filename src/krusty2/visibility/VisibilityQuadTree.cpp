@@ -2,6 +2,7 @@
 #include "../../reconstructed/TrackGameGlobal.h"
 #include "../../reconstructed/ControlInterface.h"
 #include "visibility/VisibilityQuadTree.h"
+#include "../../reconstructed/PCCamera.h"
 
 // The unit's file statics, in .CRT$XCU order (entries 340-347): an empty
 // static (0x0052d2c0), the frozen camera (0x0052d2e0) and the query timer
@@ -12,7 +13,7 @@ struct UnknownVisibilityStatic {
     UnknownVisibilityStatic() {}
 };
 static UnknownVisibilityStatic s_visibilityUnknownStatic0;
-VisibilityCamera g_frozenCamera(1);                // 0x0068a968
+PCCamera g_frozenCamera(1);                        // 0x0068a968
 UnknownPeakHold g_visibilityTickStat(5000);        // 0x0068ab90
 
 #include "math/Math3D.h"
@@ -109,7 +110,7 @@ int VisibilityQuadTree::OnControlPress(UnknownControlEvent* a, UnknownInputEntry
     if (TestInputEvent(0x57, 0, a, 0x80)) {
         g_visibilityFreeze = 1 - g_visibilityFreeze;
         if (g_visibilityFreeze)
-            g_frozenCamera = *View()->camera;
+            *reinterpret_cast<VisibilityCamera*>(&g_frozenCamera) = *View()->camera;
         return 1;
     }
     return 0;
@@ -120,7 +121,7 @@ int VisibilityQuadTree::PrepareGeometry()
     unsigned int start = ReadClock();
     VisibilityCamera* cam;
     if (g_visibilityFreeze)
-        cam = &g_frozenCamera;
+        cam = reinterpret_cast<VisibilityCamera*>(&g_frozenCamera);
     else
         cam = View()->camera;
     Query(cam->worldX, cam->worldZ, cam);

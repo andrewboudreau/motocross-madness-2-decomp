@@ -1,0 +1,21 @@
+{
+  "??_C@_02DILL@?$CFs?$AA@": "0x00566aa0",
+  "??_C@_0O@KFEA@?$CFd?$CJ?5?$CFs?5?3?5?$CF?40f?$AA@": "0x00575204",
+  "?CompareScoresDescending@@YAHPBX0@Z": "0x005199f0",
+  "?DrawStandings@StatsOverlay@@QAEHXZ": "0x00519a20",
+  "?FormatMinutesSeconds@@YAXPADM@Z": "0x00518640",
+  "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
+  "?RestoreRect@Overlay@@QAEHPBUUnknownOverlayRect@@@Z": "0x004b6710",
+  "?TintRows@Overlay@@QAEHHHG@Z": "0x004b6880",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
+  "__imp__DrawTextA@20": "0x005502e8",
+  "__imp__GetTextExtentPoint32A@16": "0x00550084",
+  "__imp__SelectObject@8": "0x00550078",
+  "__imp__SetBkColor@8": "0x00550070",
+  "__imp__SetBkMode@8": "0x00550074",
+  "__imp__SetTextColor@8": "0x00550080",
+  "__real@4@4004f000000000000000": "0x00550768",
+  "_qsort": "0x00534426",
+  "_sprintf": "0x00534aaf",
+  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0"
+}

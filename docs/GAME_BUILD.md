@@ -41,64 +41,56 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 258 C++ files (205 canonical sources and 53
-reviewed candidates) and reaches LINK with 230 unresolved external symbols,
+The 2026-10-21 build compiles 259 C++ files (205 canonical sources and 54
+reviewed candidates) and reaches LINK with 226 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-yq4yuhn6` retains every prior strict result:
+The composition in `build-tvjli7lk` retains every prior strict result:
 3,015/3,026 calibration rows and 1,086/1,162 physics comparisons, with no
 partial-score decreases. The two existing nonexact physics comparison-binding
 diagnostics are unchanged and excluded from strict counts.
 
-The [visibility control storage](VISIBILITY_CONTROL_STATE.md) supplies three
-separate writable zero-initialized DWORDs. All nine encoded references lie in
-three complete strict consumers. Storage and instruction checks preserve the
-existing secondary-base adjustment; keyboard, camera and query execution are
-not established by this storage slice.
+The [frozen camera connection](FROZEN_CAMERA_CONNECTIONS.md) uses the existing
+PCCamera lifecycle and preserves the complete 0x220-byte snapshot. All 41
+registered visibility bodies and the actual provider constructor/destructor
+remain strict. One new COMDAT contains the exact five-byte implicit destructor
+and eleven alignment NOPs; its cleanup reference resolves to that definition.
+The original 87 sections/341 relocations, BSS and CRT ordering are preserved
+under exactly the three lifecycle/storage names. Full camera startup and teardown
+have not been executed.
 
-The [name-tag drawing candidate](CHAT_NAME_TAG_DRAW.md#functional-build-review)
-supplies the complete missing ChatOverlay method. Its unchanged 974-byte body
-has 966 resolved matching positions and remains explicitly nonexact. The
-existing mutable flag retains its canonical storage offset with ordinary
-external linkage. All 207 canonical sections/863 relocations and 37 aggregate
-sections/162 relocations are preserved under only that flag visibility change.
-Native validation covers 5,864 scenarios, including explicit text, rectangle,
-font and fault oracles, with 94 strict game checks and the complete 82-byte
-native sprintf wrapper. GDI callbacks are scripted; integrated HUD rendering
-remains unverified.
+The [collision zero-vector connection](COLLISION_OBJECT_ZERO.md) joins two
+constructor reads to the existing TU-local initialized vector. Both complete
+objects preserve 271 sections and 1,454 relocations under that exact destination
+connection. Eighteen strict checks cover the constructor and all four vector
+initializers/wrappers in both objects. The distinct vector types retain explicit
+12-byte field views; full constructor execution is outside this proof.
 
-The [EcoSystem tree connections](ECO_QUADTREE_CONNECTIONS.md) join five obsolete
-game imports to the existing QuadTree methods and persistent pointer. Primary
-receiver and Vegetation-prefix evidence supports explicit call-boundary casts;
-other provisional views remain separate. A declaration-only header split keeps
-all four affected objects intact: 368 sections and 1,631 relocations under six
-names, including one sample-only name. Insert remains nonexact (627 bytes,
-620 matching positions); its private stack-home differences are reviewed and
-13,347 native scenarios execute the actual tree/pool helpers. The focused
-regression protects 120 strict cases. Allocation boundaries are scripted, and
-the derived visibility factory and integrated scene traversal are untested.
+The [standings drawing candidate](STATS_STANDINGS_DRAW.md#functional-build-review)
+supplies StatsOverlay's complete missing gameplay HUD method. It remains
+explicitly nonexact: 1,004 emitted bytes against 1,002 retail bytes, with 605
+resolved matching positions. Its 3,228 native scenarios pass with 30 strict
+game/CRT comparisons; COM, GDI and resource callbacks are scripted. Its iterator
+calls connect to the existing BikeRace provider. The review records finite input
+and rendering limits. No whole-aggregate sample admission or compiler flag
+change is involved.
 
-The steering regression now identifies compiler-local EH targets by their
-complete section contents and destinations. One generated label changed spelling;
-all 6,745 caller bytes, 219 relocation destinations and the full Bike object
-remain unchanged. The independent 100,852-case native check passes.
+All 258 prior production objects preserve 10,685 nondebug sections and 45,748
+relocations under the exact camera and zero-vector connections, with no filename
+exclusions. The added destructor section is separately checked, and the new
+standings object independently reproduces its actual game compile command.
+Real links remove exactly four names, **230 -> 228 -> 227 -> 226**, with none
+added. The final report checks all source/header hashes, configuration, compiler
+profile and per-source flags. Private evidence is in
+`work/game-build/round51-link-evidence.json`, `round51-all-objects.json`,
+`round51-admitted.json` and `connections-round51-preservation.json`.
 
-All 256 prior production objects preserve 10,675 nondebug sections and 45,728
-relocations under only the six tree names and the existing flag's visibility/
-name change, with no filename exclusions. Both new providers independently
-reproduce their actual game compile commands. Real links remove exactly nine
-names, **239 -> 236 -> 235 -> 230**, with none added. The final report checks
-all 258 source hashes, 231 header hashes, configuration, profile and per-source
-flags. Private evidence is in `work/game-build/round50-link-evidence.json`,
-`round50-all-objects.json`, `round50-admitted.json` and
-`connections-round50-preservation.json`.
-
-Linking, startup, integrated menus and racing remain unverified.
-Static checks pass for 267 Python files and 410 JSON files.
-The final full regression run passes: 550 tests, 539 passed and 11 skipped
-(`work/game-build/tests-round50-final.log`).
+Game linking still fails; startup, integrated menus and racing remain untested.
+Static checks pass for 270 Python files and 414 JSON files.
+The final full regression run passes: 553 tests, 542 passed and 11 skipped
+(`work/game-build/tests-round51-final.log`).
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

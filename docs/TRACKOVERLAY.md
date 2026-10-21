@@ -223,7 +223,8 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x0051eaf0` `GetLineTail`
 - `0x0051eb10` `GetHistory`
 - `0x0051eb40` `AddHistory`
-- `0x00519a20` `DrawStandings` (near-miss sample)
+- `0x00519a20` `DrawStandings` ([reviewed nonexact source provider](STATS_STANDINGS_DRAW.md),
+  complete 1,002-byte retail extent; 1,004-byte candidate)
 - `0x0051baf0` `TakeRacers` and `0x0051d730` `CollectRacers` (the loader
   sample's view uses `TakeRacers`; its `0x0051d730` stays address-named
   because VisualCue's `CollectRacers` has the same view signature)

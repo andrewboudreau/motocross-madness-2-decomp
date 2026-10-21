@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/track/StatsStandingsDraw.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete standings drawing candidate checked in 3228 finite native scenarios with actual iteration, formatting, texture and overlay helpers. VC6 emits 1004 bytes against 1002 retail bytes, with 605 resolved matching positions. All 37 aggregate sections and 162 relocations are preserved except two iterator calls connected to the existing BikeRace provider. COM, GDI and resource callbacks are scripted; integrated HUD rendering remains unverified.",
+      "evidence": "docs/STATS_STANDINGS_DRAW.md#functional-build-review"
+    },
+    {
       "path": "samples/track/ChatNameTagDraw.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete name-tag drawing candidate passes 5864 finite native scenarios with the actual VC6 sprintf wrapper, explicit callback/fault/font oracles and 94 strict game checks. Unchanged VC6 body emits 974 bytes with 966 resolved matching positions against 974 retail bytes. Canonical flag exposure preserves 207 sections/863 relocations; aggregate extraction preserves 37 sections/162 relocations. GDI is scripted; integrated HUD rendering remains unverified.",

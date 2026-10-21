@@ -1,5 +1,5 @@
 {
-  "baseline": "Published ed3d06ce same-path complete objects; all nondebug bytes and relocation destinations preserved under exactly these six interface names. Only enumerated complete source paths are portable. Insert remains complete627/620 nonexact.",
+  "baseline": "Published ed3d06ce same-path complete objects; all nondebug bytes and relocation destinations preserved under exactly these six interface names. Only enumerated complete source paths are portable. Insert remains complete627/620 nonexact. The frozen visibility camera now uses actual PCCamera storage: its old complete pin was independently reproduced first; three names join the same lifecycle/storage, with one exact implicit destructor COMDAT (5 code bytes plus 11 alignment NOPs) and the cleanup reference resolving to that definition. All 87 old sections and 341 relocations otherwise preserve their bytes and destinations.",
   "renames": {
     "?ComputeCode@UnknownEcoQuadTree@@QAEIMMMM@Z": "?ComputeCode@QuadTree@@QAEIMMMM@Z",
     "?Insert@UnknownEcoQuadTree@@QAEXPAVUnknownEcoQuadTreeObject@@IMM@Z": "?Insert@QuadTree@@QAEXPAVQuadTreeObject@@IMM@Z",
@@ -25,9 +25,9 @@
       "sha256": "f1074481256560870f6c1b5f871c055ff92121b75bf1371a24d505a1251aeca0"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
-      "sections": 87,
-      "relocations": 341,
-      "sha256": "48c1afa9a68bf988c060ac0f0864dbe52583953b1af5b96a87daaccc791fa650"
+      "sections": 88,
+      "relocations": 342,
+      "sha256": "3af8a8c9934dfc0e0eae0651060b6c4f1a53a30d2549f413c8a3f69ff534f03e"
     }
   },
   "inventory": [

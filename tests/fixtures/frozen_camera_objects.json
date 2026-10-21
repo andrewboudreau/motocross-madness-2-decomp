@@ -1,0 +1,19 @@
+{
+  "baseline": "Published22979f9e complete VisibilityQuadTree object, only the three named lifecycle/storage joins. The current object adds the independently strict implicit PCCamera destructor and resolves the existing cleanup reference to that definition; every old section byte, flag and destination is retained otherwise. Only the complete canonical source filename is checkout-relative.",
+  "source": "src/krusty2/visibility/VisibilityQuadTree.cpp",
+  "renames": {
+    "??0VisibilityCamera@@QAE@H@Z": "??0PCCamera@@QAE@H@Z",
+    "??1VisibilityCamera@@QAE@XZ": "??1PCCamera@@UAE@XZ",
+    "?g_frozenCamera@@3UVisibilityCamera@@A": "?g_frozenCamera@@3VPCCamera@@A"
+  },
+  "before_joined": {
+    "sections": 87,
+    "relocations": 341,
+    "sha256": "bb47b6db8129600cb48c1a7a8694f11233157281db2386f1fbff69be0b1b2144"
+  },
+  "after": {
+    "sections": 88,
+    "relocations": 342,
+    "sha256": "47cf02499bf52c21c38dab9a00f203624a0dc51d24a01ce4058541922ee0172a"
+  }
+}

@@ -154,8 +154,10 @@ CollisionObject::CollisionObject(int a)
     ownerType = 0;
     field_0x98 = 0;
     hitObject = 0;
-    hitPoint = g_CollisionVec3_5797b0;
-    hitNormal = g_CollisionVec3_5797b0;
+    // Both retail reads use this TU's initialized kVec3Zero at 0x5797b0.
+    // CollisionVec3 is the 12-byte field view; this does not unify the types.
+    hitPoint = reinterpret_cast<const CollisionVec3&>(kVec3Zero);
+    hitNormal = reinterpret_cast<const CollisionVec3&>(kVec3Zero);
 }
 
 // 0x00431fd0 (deleting) -> 0x00432000 (core)
