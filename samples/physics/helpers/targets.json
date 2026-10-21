@@ -1,5 +1,15 @@
 [
   {
+    "class": "CollisionVec3",
+    "source": "../../../src/reconstructed/CollisionVectorConstructor.cpp",
+    "candidate_symbol_contains": "??0CollisionVec3@@QAE@MMM@Z",
+    "target_va": "0x00404e60",
+    "target_size": 25,
+    "expect": "exact",
+    "bindings": "../../../src/reconstructed/CollisionVectorConstructor.bindings.json",
+    "notes": "Complete xyz constructor for the existing provisional call-view type; no shared class identity or original TU ownership inferred."
+  },
+  {
     "class": "Vec3",
     "source": "../../../src/reconstructed/VectorCalls.cpp",
     "candidate_symbol_contains": "?Vec3AddCall@@",

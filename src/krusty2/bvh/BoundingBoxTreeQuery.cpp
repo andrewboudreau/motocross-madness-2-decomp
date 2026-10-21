@@ -24,6 +24,14 @@
 // samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp.
 #include "bvh/BoundingBoxTreeQuery.h"
 
+// Complete 0x00404e60 constructor behavior for this provisional call view.
+Vec3Call::Vec3Call(float x_, float y_, float z_)
+{
+    x = x_;
+    y = y_;
+    z = z_;
+}
+
 void operator delete(void* p);   // 0x004a30c0
 
 // 0x00578f4c: vertex array of the triangle tree being queried; the entry points store it

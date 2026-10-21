@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/camera/FollowCameraControls.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete FollowCamera control handler passes 195339 native input, whole-state, callback, exception, fault and floating-point scenarios. VC6 emits 4046 bytes against the complete 4058-byte retail body, retaining 927 matching positions. Input callbacks are scripted; real DirectInput and rendered camera behavior remain untested.",
+      "evidence": "docs/FOLLOW_CAMERA_CONTROLS.md#functional-build-review"
+    },
+    {
       "path": "samples/camera/FollowCameraTick.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete FollowCamera Tick passes 674335 native full-state, callback, allocation, fault and floating-point comparisons with actual initialized strict FastSqrt. VC6 retains 3659 of 3672 matching positions; axis initializers are strict. Terrain, rotation, other camera methods and input callbacks are scripted, so rendered-camera behavior remains untested.",

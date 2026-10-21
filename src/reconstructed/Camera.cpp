@@ -232,6 +232,14 @@ struct CameraVec3Call : Vector3 {
     CameraVec3Call(float x_, float y_, float z_);
 };
 
+// Complete 0x00404e60 constructor behavior for this provisional call view.
+CameraVec3Call::CameraVec3Call(float x_, float y_, float z_)
+{
+    x = x_;
+    y = y_;
+    z = z_;
+}
+
 // v scaled to unit length through the out-of-line dot product.
 static inline Vector3 NormalizeCall(const Vector3& v) {
     float squared = Vec3DotCall(reinterpret_cast<const Vec3*>(&v), reinterpret_cast<const Vec3*>(&v));

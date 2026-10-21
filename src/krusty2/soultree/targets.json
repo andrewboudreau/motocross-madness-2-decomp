@@ -1,5 +1,15 @@
 [
   {
+    "class": "SoultreeOolVec3",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "??0SoultreeOolVec3@@QAE@MMM@Z",
+    "target_va": "0x00404e60",
+    "target_size": 25,
+    "expect": "exact",
+    "bindings": "soultree.bindings.json",
+    "notes": "Complete xyz constructor for the existing provisional call-view type; no shared class identity or original TU ownership inferred."
+  },
+  {
     "candidate_symbol_contains": "?ResolveContactImpulse@@YAXMMPAVSoultreeObject@@",
     "target_va": "0x00500220",
     "target_size": 639,

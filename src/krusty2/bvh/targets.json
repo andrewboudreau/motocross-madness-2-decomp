@@ -1,5 +1,15 @@
 [
   {
+    "class": "Vec3Call",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "??0Vec3Call@@QAE@MMM@Z",
+    "target_va": "0x00404e60",
+    "target_size": 25,
+    "expect": "exact",
+    "bindings": "BoundingBoxTreeQuery.bindings.json",
+    "notes": "Complete xyz constructor for the existing provisional call-view type; no shared class identity or original TU ownership inferred."
+  },
+  {
     "class": "BoundingBoxTreeQuery",
     "source": "BoundingBoxTreeQuery.cpp",
     "candidate_symbol_contains": "_$E14",

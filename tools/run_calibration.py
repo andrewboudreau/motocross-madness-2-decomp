@@ -12,6 +12,15 @@ from match import compare  # noqa: E402
 
 CASES = [
     {
+        'name': 'Camera vector constructor call view',
+        'bindings': 'src/reconstructed/Camera.bindings.json',
+        'source': 'src/reconstructed/Camera.cpp',
+        'symbol': '??0CameraVec3Call@@QAE@MMM@Z',
+        'target_va': '0x00404e60',
+        'target_size': 25,
+        'reason': 'complete three-float constructor; provisional call-view type, no class-identity claim',
+    },
+    {
         'name': 'BlockAllocator constructor',
         'bindings': 'src/reconstructed/BlockAllocator.bindings.json',
         'source': 'src/reconstructed/BlockAllocator.cpp',

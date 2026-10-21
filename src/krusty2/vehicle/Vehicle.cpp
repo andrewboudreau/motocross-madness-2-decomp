@@ -1751,6 +1751,15 @@ int __cdecl VehVec3Equal(const Vec3* a, const Vec3* b)
 struct VehVec3Call : Vec3 {
     VehVec3Call(float x_, float y_, float z_);
 };
+
+// Complete 0x00404e60 constructor behavior for this provisional call view.
+VehVec3Call::VehVec3Call(float x_, float y_, float z_)
+{
+    x = x_;
+    y = y_;
+    z = z_;
+}
+
 struct VehVec3AddAssign : Vec3 {
     VehVec3AddAssign& operator+=(const Vec3& v);
 };

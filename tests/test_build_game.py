@@ -5,10 +5,28 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from tools.build_game import link_game, response_file, run_command, source_files, valid_object
+from tools.build_game import (header_hashes, link_game, response_file, run_command,
+                             source_files, valid_object)
 
 
 class GameBuildTests(unittest.TestCase):
+    def test_header_inventory_covers_candidate_helpers_and_detects_changes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            names = ('src/shared.h', 'samples/camera/Support.h',
+                     'samples/shared/Math.inl', 'samples/shared/Types.HPP')
+            for name in (*names, 'samples/probe.cpp', 'work/private.h'):
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text('first')
+            before = header_hashes(root)
+            self.assertEqual(set(before), set(names))
+            helper = 'samples/camera/Support.h'
+            (root / helper).write_text('changed')
+            after = header_hashes(root)
+            self.assertNotEqual(before.pop(helper), after.pop(helper))
+            self.assertEqual(before, after)
+
     def test_data_only_providers_are_valid_but_empty_and_wrong_machine_objects_are_not(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / 'globals.obj'

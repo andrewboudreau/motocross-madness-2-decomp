@@ -2,6 +2,8 @@
 #include "../../reconstructed/TrackGameGlobal.h"
 #include "Terrain.h"
 #include "../../reconstructed/AgeManager.h"
+#include "../../reconstructed/ManagedTexture.h"
+#include "../../reconstructed/TextureMapManager.h"
 #include "../../reconstructed/FileStream.h"
 #include "../../reconstructed/DebugOverlay.h"
 
@@ -247,13 +249,13 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
             reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&format, 4, 1);
             TerrainSurfaceBase* surface;
             if (surfaceRegistry && width == 0x100) {
-                TerrainSurface* managed = new(__FILE__, 0x1bb) TerrainSurface(surfaceDesc.manager);
-                surface = managed;
+                ManagedTexture* managed = new(__FILE__, 0x1bb) ManagedTexture(surfaceDesc.manager);
+                surface = reinterpret_cast<TerrainSurfaceBase*>(managed);
                 surface->LoadSurface(this->stream, width, height, 1, format, 0, 0, colorMapper,
                                      surfaceFlags | 2, directDrawPalette, 2, 1, &surfaceDesc, 0x80, 0xff00ff);
-                surfaceRegistry->Register(managed);
+                reinterpret_cast<ManagedTextureGroup*>(surfaceRegistry)->AddTexture(managed);
             } else {
-                surface = new(__FILE__, 0x1c8) TerrainSurfaceBase(surfaceDesc.manager, 1);
+                surface = reinterpret_cast<TerrainSurfaceBase*>(new(__FILE__, 0x1c8) PCTextureMap(surfaceDesc.manager, 1));
                 surface->LoadSurface(this->stream, width, height, 1, format, 0, 0, colorMapper,
                                      surfaceFlags | 2, directDrawPalette, 2, 1, &surfaceDesc, 0x80, 0xff00ff);
                 if (isEnabled)

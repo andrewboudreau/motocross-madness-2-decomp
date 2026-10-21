@@ -427,12 +427,12 @@ Near misses (`samples/camera/FollowCameraNearMisses.cpp`):
   `dz*dz + dx*dx + dy` (the y delta is not squared in retail).
 - The CAMERA-file loader `0x004650e0`: retail keeps cross products in memory;
   normalising the second one straight from the call gives its frame 0x18c.
-- Slot 45 `0x00463a30`: aligned instruction ratio 0.937 (1088 instructions
-  against 1079). Retail's null-joystick tests jump to the shared epilogue at
-  `0x004649fe`, so each joystick block is an `if (activeJoystick) { ... }`.
-  Left: retail tests the pointer in edx and reloads it for the call
-  (`mov edx, ecx; mov ecx, [edx+0xc]`), and stores `x * speed` before
-  multiplying (`fstp`/`fmul`) where VC6 keeps it (`fst`/`fmulp`).
+- Slot 45 `0x00463a30`: the full retail extent is 4,058 bytes, including
+  `ret 8` at `0x00464a07`. The old 4,055-byte estimate omitted that return.
+  The unchanged 4,046-byte candidate retains 927 matching positions. It is
+  shared with `samples/camera/FollowCameraControls.cpp`; complete behavioral
+  and extraction evidence is recorded in
+  [FOLLOW_CAMERA_CONTROLS.md](FOLLOW_CAMERA_CONTROLS.md#functional-build-review).
 
 `FollowCamera.h` also types slot 41 as returning `Vector3` (slot 10 stores
 it at +0x29c) and +0x304 as a float (slot 10's blend clock, clamped to 1).

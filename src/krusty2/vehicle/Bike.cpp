@@ -67,6 +67,15 @@ float Bike::UnknownVirtualSlot75()
 struct BikeVec3Call : Vec3 {
     BikeVec3Call(float x_, float y_, float z_);
 };
+
+// Complete 0x00404e60 constructor behavior for this provisional call view.
+BikeVec3Call::BikeVec3Call(float x_, float y_, float z_)
+{
+    x = x_;
+    y = y_;
+    z = z_;
+}
+
 // Dot product in the operand order retail 0x0040a520 evaluates (y and x terms, then z).
 static inline float BikeDotZ(const Vec3& a, const Vec3& b)
 {

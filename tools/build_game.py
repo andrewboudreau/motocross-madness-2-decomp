@@ -48,6 +48,14 @@ def source_files(root: Path, spec: dict) -> list[Path]:
     return sorted(sources, key=lambda p: (p.name.casefold(), p.as_posix().casefold()))
 
 
+def header_hashes(root: Path) -> dict[str, str]:
+    """Conservative inventory including headers shared by admitted candidates."""
+    return {p.relative_to(root).as_posix(): sha256_file(p)
+            for name in ('src', 'samples')
+            for p in sorted((root / name).rglob('*'))
+            if p.is_file() and p.suffix.lower() in ('.h', '.hpp', '.inl')}
+
+
 def verify_toolchain(vc6: Path) -> dict:
     """Use the installed private bundle's pinned compiler/linker/CRT hashes."""
     expected = json.loads((ROOT / 'config/private_bundle_expected.json').read_text())
@@ -167,9 +175,7 @@ def build_game(vc6: Path, jobs: int, compile_only: bool = False) -> tuple[dict, 
         report['profile'] = spec['profile']
         report['candidate_sources'] = spec.get('candidate_sources', [])
         report['profile_sha256'] = sha256_file(ROOT / 'config/compile_profiles.json')
-        report['headers'] = {p.relative_to(ROOT).as_posix(): sha256_file(p)
-                             for p in sorted((ROOT / 'src').rglob('*'))
-                             if p.suffix in ('.h', '.hpp', '.inl')}
+        report['headers'] = header_hashes(ROOT)
         report['stage'] = 'compile'
         with ThreadPoolExecutor(max_workers=jobs) as pool:
             report['sources'] = list(pool.map(

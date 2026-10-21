@@ -2449,6 +2449,15 @@ int SegmentTreeQueryWithVertices(const Vec3* ends, void* node, const Matrix4* xf
 struct CollisionVec3Call : Vec3 {
     CollisionVec3Call(float x_, float y_, float z_);
 };
+
+// Complete 0x00404e60 constructor behavior for this provisional call view.
+CollisionVec3Call::CollisionVec3Call(float x_, float y_, float z_)
+{
+    x = x_;
+    y = y_;
+    z = z_;
+}
+
 static inline Vec3 SubtractCtorCall(const Vec3& a, const Vec3& b)
 {
     return CollisionVec3Call(a.x - b.x, a.y - b.y, a.z - b.z);

@@ -23,6 +23,8 @@ python3 tools/with_private_env.py -- python3 tools/build_game.py
 Every invocation creates a fresh output directory under `work/game-build/`.
 `latest.json` points to that run through its `build_directory` field and
 records source/header hashes, the compiler profile and per-source results.
+The header inventory conservatively covers both `src/` and `samples/`,
+including helpers used by individually admitted candidates.
 Each object has an adjacent compiler log. Import-library and linker logs
 are in the build directory. Failed compilation or linking returns nonzero;
 an old executable cannot satisfy a subsequent build.
@@ -35,11 +37,17 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 202 C++ files (180 canonical sources and twenty-two
-reviewed candidates) and reaches LINK with 503 unresolved external symbols,
+The 2026-10-21 build compiles 204 C++ files (181 canonical sources and twenty-three
+reviewed candidates) and reaches LINK with 492 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
+
+The final composition in `build-8h0dkhta` retains all prior strict results:
+2,978/2,989 calibration rows and 1,086/1,162 physics comparisons. The full
+suite ran 455 tests (444 passed, eleven skipped); all eight build-tool tests
+also pass after adding the candidate-header inventory regression. This does
+not establish game startup, menus or racing while linkage remains incomplete.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based
@@ -53,8 +61,8 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
-the current composition retains all prior physics targets, with 1,080 now strict-exact, and all
-2,975 distinct strict-exact calibration cases. A native link/runtime regression checks
+the current composition retains all prior physics targets, with 1,086 now strict-exact, and all
+2,976 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 
@@ -351,11 +359,35 @@ filename changes. The final real link removes one name, **504 → 503**.
 Terrain, rotation and other camera methods are scripted test boundaries, so
 rendered camera behavior remains untested.
 
+Terrain loading and pooled-surface allocation now use the existing
+[texture constructors and group registration](TERRAIN_TEXTURE_CONNECTIONS.md).
+The three connections preserve 106 strict cases, both complete caller objects,
+and their existing partial functions. The real link removes three names,
+**503 → 500**, with no added unresolved dependencies.
+
+Seven [vector constructor definitions](VECTOR_CONSTRUCTORS.md) now supply the
+existing provisional call types used by camera, collision, BVH, Soultree and
+vehicle code. Each complete 25-byte body is strict. The original call sites
+remain out of line, all existing strict cases and 28 complete partial hashes
+are preserved, and 72,240 native cases check raw floating-point words,
+placement and overlapping argument storage. Their shared retail address does
+not establish shared class identity or original TU ownership. The next real
+link removes exactly seven names, **500 → 493**.
+
+The complete [camera-control handler](FOLLOW_CAMERA_CONTROLS.md#functional-build-review)
+is admitted as a reviewed nonexact candidate after 195,339 native comparisons.
+Its 4,046-byte body handles keyboard/joystick translation, orbit controls,
+pitch/distance limits and yaw wrapping. The full retail extent is corrected
+to 4,058 bytes, including the final return. Aggregate code, storage and
+relocations remain unchanged. Its only game dependency is the existing global
+game pointer; the real link removes one name, **493 → 492**, with none added.
+Actual input devices and rendered camera operation remain untested.
+
 Validation of this composition passes the toolchain/manual/generated VC6 gate,
-2,977 of 2,988 calibration rows (2,975 distinct source/address/extent cases),
-and all 1,080 prior strict physics targets among 1,156 comparisons.
-Both near-miss comparisons report zero drops. The native-enabled Python suite
-runs 452 tests: 441 pass and 11 are skipped. These counts retain existing nonexact comparisons;
+2,978 of 2,989 calibration rows (2,976 distinct source/address/extent cases),
+and 1,086 strict physics targets among 1,162 comparisons. All prior strict
+cases remain, with seven additions across the two suites.
+Both near-miss comparisons report zero drops. These counts retain existing nonexact comparisons;
 they do not describe a fully matched or working game.
 
 Other incompatible class views, missing methods and unresolved globals

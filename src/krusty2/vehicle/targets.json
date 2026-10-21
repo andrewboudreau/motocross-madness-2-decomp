@@ -1,5 +1,25 @@
 [
   {
+    "class": "VehVec3Call",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "??0VehVec3Call@@QAE@MMM@Z",
+    "target_va": "0x00404e60",
+    "target_size": 25,
+    "expect": "exact",
+    "bindings": "Vehicle.bindings.json",
+    "notes": "Complete xyz constructor for the existing provisional call-view type; no shared class identity or original TU ownership inferred."
+  },
+  {
+    "class": "BikeVec3Call",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "??0BikeVec3Call@@QAE@MMM@Z",
+    "target_va": "0x00404e60",
+    "target_size": 25,
+    "expect": "exact",
+    "bindings": "Bike.bindings.json",
+    "notes": "Complete xyz constructor for the existing provisional call-view type; no shared class identity or original TU ownership inferred."
+  },
+  {
     "class": "Bike",
     "source": "Bike.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot38@Bike",

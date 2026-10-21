@@ -2,6 +2,8 @@
 // are in src/krusty2/broadphase/Terrain.cpp. This filename is ours.
 #include "../krusty2/broadphase/Terrain.h"
 #include "AgeManager.h"
+#include "ManagedTexture.h"
+#include "TextureMapManager.h"
 
 // File-scope statics.  retail's first code in this TU is their dynamic initialisers
 // (0x00505490.. : the camera ctor + atexit, then ten 5000-tick PeakHolds in 0x20-byte
@@ -35,13 +37,13 @@ BaseObject* Terrain::AcquireOwnedObject()
     }
     TerrainSurfaceBase* surface;
     if (surfaceRegistry) {
-        TerrainSurface* s = new(__FILE__, 0x67) TerrainSurface(surfaceDesc.manager);
-        surface = s;
+        ManagedTexture* s = new(__FILE__, 0x67) ManagedTexture(surfaceDesc.manager);
+        surface = reinterpret_cast<TerrainSurfaceBase*>(s);
         surface->CreateSurface(0, 0x100, 0x100, 0x100, 1, 0, 0, colorMapper, 2, directDrawPalette, 0, 0, 2, 1,
                                &surfaceDesc, 0x80, 0xff00ff);
-        surfaceRegistry->Register(s);
+        reinterpret_cast<ManagedTextureGroup*>(surfaceRegistry)->AddTexture(s);
     } else {
-        surface = new(__FILE__, 0x78) TerrainSurfaceBase(surfaceDesc.manager, 1);
+        surface = reinterpret_cast<TerrainSurfaceBase*>(new(__FILE__, 0x78) PCTextureMap(surfaceDesc.manager, 1));
         surface->CreateSurface(0, 0x100, 0x100, 0x100, 1, 0, 0, colorMapper, 2, directDrawPalette, 0, 0, 2, 1,
                                &surfaceDesc, 0x80, 0xff00ff);
     }

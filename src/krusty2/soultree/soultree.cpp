@@ -893,10 +893,18 @@ void SoultreeObject::UpdateSubtreeBounds()
 }
 
 // Vec3 whose (x, y, z) constructor is out of line in retail (0x00404e60, thiscall, ret 0xc);
-// declared only, so VC6 emits the call. AccumulateBounds builds its upper corner through it.
+// AccumulateBounds builds its upper corner through this call view.
 struct SoultreeOolVec3 : public Vec3 {
     SoultreeOolVec3(float x_, float y_, float z_);
 };
+
+// Complete 0x00404e60 constructor behavior for this provisional call view.
+SoultreeOolVec3::SoultreeOolVec3(float x_, float y_, float z_)
+{
+    x = x_;
+    y = y_;
+    z = z_;
+}
 
 static inline float AbsValue(float v)
 {
