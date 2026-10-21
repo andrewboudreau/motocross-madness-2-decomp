@@ -1,0 +1,50 @@
+{
+  "note": "Whole before/after objects preserve all bytes and relocation destinations under three names except unadmitted CreateRacers offsets538..545: independent XOR EDI/MOV EBX instructions exchange. All full extents retained; see BIKE_RACE_STATE_CONNECTIONS.md.",
+  "partials": [
+    [
+      "samples/race/BikeRaceNearMisses.cpp",
+      "?AimCamera@BikeRace@@",
+      4320032,
+      1708,
+      1710,
+      1697,
+      "eb234386bbb1d381b505b22fb6d0727ff26fbd05d76e8415db13c486c2ed1659"
+    ],
+    [
+      "samples/race/BikeRaceNearMisses.cpp",
+      "?NextCameraTarget@BikeRace@@",
+      4321744,
+      881,
+      881,
+      266,
+      "42791867fd4e02d2037db3c5b8b7b510e8e2abdab85c7bee4ca296a2efe4c49d"
+    ],
+    [
+      "samples/race/BikeRaceNearMisses.cpp",
+      "?WriteRelativePositions@BikeRace@@",
+      4329712,
+      2940,
+      2964,
+      1017,
+      "7cfed9416fc9c408ed45bf304f5993adf1c2e64b3b9868554479fb39ef1203a9"
+    ],
+    [
+      "samples/race/BikeRaceNearMisses.cpp",
+      "?Create@BikeRace@@",
+      4292304,
+      6745,
+      6760,
+      2821,
+      "bed27c4eec8b564466334fd6dff8c214d126142fcab5d149c884da44cbd5487f"
+    ],
+    [
+      "samples/race/BikeRaceNearMisses.cpp",
+      "?CreateRacers@BikeRace@@",
+      4299120,
+      13428,
+      13428,
+      13390,
+      "2e01aa42972e9d2abca94ce35551d26c1cb16a6e157472611b0e2ab2dfeb22b5"
+    ]
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "note": "Complete candidate fingerprints preserved from 7dd638b8; preservation is not retail fidelity. Compared under the ten explicit model-state symbol renames. GraphicsTest inherited-method cleanup reverses independent MOV EBX,1 / XOR EDI,EDI at CreateRacers +538..545; all other bytes and relocation destinations unchanged, no interior entry. This one current fingerprint is updated after full proof.",
+  "note": "Complete resolved candidates are pinned; preservation is not retail fidelity. Explicit provider joins preserve bytes and target destinations. Shared racer declarations exchange independent XOR EDI/MOV EBX instructions at CreateRacers offsets538..545, with no interior entry; all other bytes and destinations are unchanged. Its nonexact score is13390/13428 (previously13396); old/new full hashes and evidence are in BIKE_RACE_STATE_CONNECTIONS.md.",
   "partials": [
     [
       "src/krusty2/soultree/SoulTreePhysics.cpp",
@@ -232,8 +232,8 @@
       4299120,
       13428,
       13428,
-      13396,
-      "a6159f61caafc2347d11f9ef24dfc6956a1da5b180cd6749c63609a4716f8482"
+      13390,
+      "dfc0ee81775e2529319f4644466baacd436755506630b8d402b6621e29cea48c"
     ]
   ],
   "additional_functions": [

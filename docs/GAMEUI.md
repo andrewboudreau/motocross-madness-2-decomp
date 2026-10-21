@@ -282,6 +282,12 @@ in dead code get no slot).
 
 ## Functional build review
 
+The strict BeginControlDraw caller reaches the complete nonexact background
+DC-selection candidate in `samples/render/BackgroundImageNearMisses.cpp`.
+[Background DC evidence](BACKGROUND_DC.md) records the unchanged 678-byte
+body, three actual strict helpers, scratch state and 21,611-case bounded
+COM/alias/fault proof. Real DirectDraw rendering remains outside that fixture.
+
 The complete list-box mouse-button candidate is maintained in
 `samples/ui/ListBoxButtonDown.cpp`. Explicit Y-before-X point reads correct a
 native-confirmed fault-order discrepancy. The full extent stays 342 bytes;

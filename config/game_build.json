@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/render/BackgroundImageNearMisses.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete background drawing-context selection passes 21611 native region, cache, actual-helper, COM, alias and fault comparisons. The unchanged 678-byte body has 115 matching positions against 678 retail bytes; all three source helpers and the full dialog caller remain strict. Scratch globals have independently checked writable zero storage. COM DC acquisition/release are scripted; real DirectDraw/GDI and integrated menus remain untested.",
+      "evidence": "docs/BACKGROUND_DC.md#functional-build-review"
+    },
+    {
       "path": "samples/ui/ListBoxButtonDown.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete list-box mouse selection passes 8707 native row, real-height-helper, Windows hit-test, callback and fault scenarios. The 342-byte candidate has 306 matching positions against 342 retail bytes; an evidenced Y-before-X point-read correction changes the former 322-position partial. Selection, base dispatch and click reporting are scripted boundaries; integrated menu navigation remains untested.",

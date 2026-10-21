@@ -887,7 +887,7 @@ int Bike::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,
         modelNode->GetMatrixIn(0, &tmp);
         reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->SetMatrixIn(0, &tmp);
     }
-    ((BikeA38*)wrecker->collisionModel)->Method_0x00435fe0();
+    wrecker->collisionModel->SnapPlacement();
     return r;
 }
 

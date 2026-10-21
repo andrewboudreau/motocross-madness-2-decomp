@@ -21,29 +21,30 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The current [constraint scene connections](CONSTRAINT_SCENE_CONNECTIONS.md)
-join three provisional ConNode methods to verified Soultree providers. All 229
-prior production objects preserve 10,531 nondebug sections and 45,440 relocations
-under only those three name substitutions. The focused test checks 41 strict
-caller/producer bodies and 32,768 native scene/cache/alias cases.
-[Vehicle reset](VEHICLE_RESET.md) is promoted to canonical source with its full
-368-byte strict match and 6,144 native callback/exception cases. Its sample
-routing moves to the canonical provider without changing the physics target.
-The reviewed [list-box mouse selection](LIST_BOX_BUTTON_DOWN.md) adds a complete
-342-byte nonexact body. Correcting its evidenced Y-before-X fault order changes
-its score from 322 to 306 matching positions; this is outside both matching
-matrices. All other 349 functions in the original UI aggregate are unchanged.
-Its 8,707 native cases use the actual strict row-height helper and Windows hit
-testing, with selection and dispatch boundaries scripted.
-The real link compiles 231 translation units and reports 315 unresolved names.
-Private evidence is in `work/game-build/round35-all-objects.json`,
-`round35-link-evidence.json` and `connections-round35-preservation.json`.
+The current [Bike placement connection](BIKE_SNAP_PLACEMENT.md) and
+[BikeRace state connections](BIKE_RACE_STATE_CONNECTIONS.md) use four existing
+providers. All 231 prior production objects preserve 10,548 nondebug sections
+and 45,478 relocations under only those four symbol substitutions. Five actual
+class declarations move unchanged into shared headers; existing include wrappers
+retain their implementation dependencies and order.
+The unadmitted CreateRacers candidate has one independently reviewed scheduling
+change: XOR EDI,EDI and MOV EBX,1 exchange order over seven bytes. Its complete
+13,428-byte extent and relocation destinations are retained; the other 205
+aggregate sections are unchanged. This candidate is outside both matrices.
+The reviewed [background DC selection](BACKGROUND_DC.md) adds a complete
+678-byte nonexact body with 115 matching positions. Its 21,611 native cases
+execute all three strict source helpers; COM DC operations remain scripted.
+The [Bike placement checks](BIKE_SNAP_PLACEMENT.md) exercise the actual strict
+snap/update pair in 10,240 mutation and exception cases.
+The real link compiles 232 translation units and reports 310 unresolved names.
+Private evidence is in `work/game-build/round36-all-objects.json`,
+`round36-link-evidence.json` and `connections-round36-preservation.json`.
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and are excluded from strict counts.
 
-The final regression run passes 498 tests with eleven skipped (509 total),
-recorded in `work/game-build/tests-round35.log`. Static checking passes for
-229 Python files and 366 JSON files.
+The final regression run passes 501 tests with eleven skipped (512 total),
+recorded in `work/game-build/tests-round36.log`. Static checking passes for
+232 Python files and 367 JSON files.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

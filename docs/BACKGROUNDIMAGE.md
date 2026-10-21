@@ -50,10 +50,12 @@ first body statement, before the zeros, the two -1 stores and the other
 two 1 stores. With the 1 stores last VC6 materialises 1 in eax after the
 -1 stores and stores the vptr first.
 
-Near misses (`samples/render/BackgroundImageNearMisses.cpp`, notes there):
-slot 13 and the DC lookup
-`0x004049d0` (retail stores its leading zeros as immediates; VC6 here
-caches 0 in edi).
+The complete DC lookup at `0x004049d0` remains nonexact in
+`samples/render/BackgroundImageNearMisses.cpp`: both bodies are 678 bytes,
+with 115 matching positions after binding its two scratch globals. Its algorithm
+is unchanged. [DC-selection evidence](BACKGROUND_DC.md) records complete object
+preservation, the writable zero-storage distinction, actual strict helper
+integration and 21,611 native comparisons with scripted COM boundaries.
 
 ## Function names
 

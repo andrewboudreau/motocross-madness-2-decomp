@@ -12,6 +12,7 @@
 #include "DebugAlloc.h"
 #include "EventManager.h"
 #include "BaseQuarryEvent.h"
+#include "../krusty2/vehicle/KrustyBikeCore.h"
 
 // A truncating copy into a `size`-byte buffer (as DlgProcs.cpp); retail
 // evaluates `source` once for the length and again for the copy.
@@ -789,7 +790,7 @@ int BikeRace::Tick(float frameTime) {
 int BikeRace::AnyRacerRemote() {
     if (g_TrackGame->playerCount > 1) {
         for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
-            if (racerSlots[i]->UnknownFunction495c00()) {
+            if (reinterpret_cast<KrustyBike*>(racerSlots[i])->Fn_00495C00()) {
                 return 1;
             }
         }
@@ -1158,7 +1159,9 @@ int BikeRace::OnNetworkMessage(int type, void* data, int from, int to, int flags
                 racerSlots[i]->receivedStates[1] = racerSlots[i]->receivedStates[0];
                 racerSlots[i]->receivedStates[0] = oldest;
                 racerSlots[i]->receivedStates[0]->messageFlags = flags;
-                racerSlots[i]->UnknownFunction4933e0(message, racerSlots[i]->receivedStates[0]);
+                reinterpret_cast<KrustyBike*>(racerSlots[i])->Fn_004933E0(
+                    reinterpret_cast<const KbNetDelta*>(message),
+                    reinterpret_cast<KbNetState*>(racerSlots[i]->receivedStates[0]));
                 racerSlots[i]->receivedStates[0]->fresh = 0;
                 return 1;
             }
@@ -1353,7 +1356,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
                               positions[iterator - 1]);
         racer->startPosition = position;
         racer->startDirection = direction;
-        racer->UnknownFunction496e20(replayVcr);
+        reinterpret_cast<KrustyBike*>(racer)->Fn_00496E20(reinterpret_cast<KbRecorder*>(replayVcr));
         replayPaused = false;
     }
     if (g_TrackGame->tagEvent != 0 &&
@@ -1447,7 +1450,7 @@ void BikeRace::RestartReplay() {
                                        (unsigned char)aiRacers[0]->fourStroke,
                                        g_TrackGame->mode.plateNumber);
     AppendChild(replayVcr, -1);
-    localRacer->UnknownFunction496e20(replayVcr);
+    reinterpret_cast<KrustyBike*>(localRacer)->Fn_00496E20(reinterpret_cast<KbRecorder*>(replayVcr));
     if (startBeforeFinish && localRacer->lapCount == 1 && ghostFilePlayed[0] == 0) {
         return;
     }
@@ -1459,7 +1462,7 @@ void BikeRace::RestartReplay() {
         return;
     }
     localRacer->fastestLap = bestGhostLength = ghostVcr->RecordedLength();
-    aiRacers[0]->UnknownFunction496e20(ghostVcr);
+    reinterpret_cast<KrustyBike*>(aiRacers[0])->Fn_00496E20(reinterpret_cast<KbRecorder*>(ghostVcr));
     aiRacers[0]->Enable();
     aiRacers[0]->hasFullState = 0;
     ClearAiRacerParts(0);
@@ -1736,7 +1739,9 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
             racer->receivedStates[1] = racer->receivedStates[0];
             racer->receivedStates[0] = oldest;
             oldest->messageFlags = time;
-            racer->UnknownFunction4933e0(message, racer->receivedStates[0]);
+            reinterpret_cast<KrustyBike*>(racer)->Fn_004933E0(
+                    reinterpret_cast<const KbNetDelta*>(message),
+                    reinterpret_cast<KbNetState*>(racer->receivedStates[0]));
             racer->receivedStates[0]->state.time = (int)(s_UnknownStatic578e8c * 1000.0f);
             racer->receivedStates[0]->fresh = 0;
             return 1;
@@ -1757,7 +1762,9 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
                 aiRacers[i]->receivedStates[1] = aiRacers[i]->receivedStates[0];
                 aiRacers[i]->receivedStates[0] = oldest;
                 aiRacers[i]->receivedStates[0]->messageFlags = time;
-                aiRacers[i]->UnknownFunction4933e0(message, aiRacers[i]->receivedStates[0]);
+                reinterpret_cast<KrustyBike*>(aiRacers[i])->Fn_004933E0(
+                    reinterpret_cast<const KbNetDelta*>(message),
+                    reinterpret_cast<KbNetState*>(aiRacers[i]->receivedStates[0]));
                 aiRacers[i]->receivedStates[0]->state.time = (int)(s_UnknownStatic578e8c * 1000.0f);
                 aiRacers[i]->receivedStates[0]->fresh = 0;
                 return 1;

@@ -37,42 +37,44 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 231 C++ files (191 canonical sources and 40
-reviewed candidates) and reaches LINK with 315 unresolved external symbols,
+The 2026-10-21 build compiles 232 C++ files (191 canonical sources and 41
+reviewed candidates) and reaches LINK with 310 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-33hph3xk` retains all prior strict results:
+The composition in `build-c34seh12` retains all prior strict results:
 2,994/3,005 calibration rows and 1,086/1,162 physics comparisons, with no
-near-miss score drops in either matrix. The one Vehicle reset target now
-uses its canonical source path. This does not establish startup, menus or
-racing while linkage remains incomplete. Two existing nonexact physics
-candidates retain their unresolved comparison bindings; neither is strict.
-The full regression run passes: 509 tests, with 498 passed and eleven skipped
-(`work/game-build/tests-round35.log`). Static checking also passes for 229
-Python files and 366 JSON files.
+near-miss score drops in either matrix. Two existing nonexact physics candidates
+retain their unresolved comparison bindings; neither is counted as strict.
+The full regression run passes: 512 tests, with 501 passed and eleven skipped
+(`work/game-build/tests-round36.log`). Static checking also passes for 232
+Python files and 367 JSON files.
 
-The [constraint scene connections](CONSTRAINT_SCENE_CONNECTIONS.md) join
-GetPositionIn, SetPositionIn and LocalToWorldPoint to their evidenced Soultree
-providers; placement uses SetPositionInFrame. All 229 prior production objects
-preserve 10,531 nondebug sections and 45,440 relocations under those three name
-substitutions. Native checks exercise 32,768 actual scene/cache/alias cases.
-[Vehicle reset](VEHICLE_RESET.md) moves its full 368-byte strict provider to
-canonical source, preserves its ordinary vector initialization, and passes
-6,144 native callback and exception cases. The reset initializes its body-up
-vector to the Y axis; its node-position argument is the separate zero vector.
-The reviewed [list-box mouse selection](LIST_BOX_BUTTON_DOWN.md) corrects an
-evidenced point-read fault order: retail reads Y before X. The full body remains
-342 bytes, with its nonexact score changing from 322 to 306 matching positions.
-This candidate is outside both matching matrices. The other 349 aggregate
-functions and 732 nondebug sections remain unchanged. Its 8,707 native cases
-use the strict row-height helper and real Windows hit testing; selection and
-click/base dispatch remain scripted boundaries, not integrated menu evidence.
-The three isolated links reduce unresolved names **320 → 317 → 316 → 315**,
+The [Bike placement connection](BIKE_SNAP_PLACEMENT.md) calls the existing
+CollisionObject::SnapPlacement through the evidenced primary collision base.
+Its full 135-byte caller stays strict; 10,240 native cases exercise the actual
+snap/update pair with scripted transform and quadtree boundaries.
+The [BikeRace state connections](BIKE_RACE_STATE_CONNECTIONS.md) connect seven
+calls to the actual KrustyBike state/recorder providers. Five canonical class
+declarations move unchanged to shared headers without their implementation-only
+dependencies. All 231 prior production objects preserve 10,548 nondebug
+sections and 45,478 relocations under only these four method-name joins.
+The unadmitted CreateRacers candidate has one explicitly reviewed seven-byte
+register-scheduling change; the two independent assignments produce the same
+register values and flags. Its complete extent remains 13,428 bytes, every
+relocation destination is retained, and the other 205 aggregate sections are
+unchanged. It is outside both matching matrices and is not added to the build.
+The reviewed [background DC selection](BACKGROUND_DC.md) retains its complete
+678-byte body with 115 matching positions. Its 21,611 native cases exercise
+real region/release helpers and scripted COM DC boundaries. Both scratch
+globals have independently checked writable zero storage; original storage
+order and executable layout are not claimed.
+The three isolated links reduce unresolved names **315 → 314 → 311 → 310**,
 with no new missing names. Private evidence is in
-`work/game-build/round35-link-evidence.json`, `round35-all-objects.json` and
-`connections-round35-preservation.json`.
+`work/game-build/round36-link-evidence.json`, `round36-all-objects.json` and
+`connections-round36-preservation.json`. Startup, integrated menus and racing
+remain unverified while the game does not link.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

@@ -1,5 +1,5 @@
 {
-  "baseline": "146bd261; full bytes and relocation targets preserved under two documented method connections. Physical source-path suffixes are normalized; defined compiler-local $L/$T labels use COFF section and offset. The latter representation was verified equal for all 25 partials before/after the b6655bd0 garage SetAxes declaration; no extent or code bytes changed.",
+  "baseline": "Complete body bytes and relocation target identities, with physical source-path suffix normalization and defined compiler-local $L/$T labels represented by COFF section and offset. OnNetworkMessage changes only the verified external decoder name; CreateRacers has the separately proved seven-byte independent-instruction schedule exception described in BIKE_RACE_STATE_CONNECTIONS.md. Extents remain complete.",
   "partials": [
     [
       "src/reconstructed/QuarryStuntEvent.cpp",
@@ -59,7 +59,7 @@
       "samples/race/BikeRaceNearMisses.cpp",
       "?OnNetworkMessage@BikeRace@@UAEHHPAXHHH@Z",
       1182,
-      "62c2e8e879638576441d74133b885ce4614c22109c849965e433c5c8c064d50f"
+      "b26233fd1db10ffc15b015811d049cf9d1c272a376ff696e8dc233964a702935"
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",
@@ -95,7 +95,7 @@
       "samples/race/BikeRaceNearMisses.cpp",
       "?CreateRacers@BikeRace@@QAEHPAXPAVLightManager@@PAUUnknownTextureFormatChoice@@PAVUnknownBikeRaceProjector@@PAUUnknownBikeRaceNodeOwner@@@Z",
       13428,
-      "466585fe01c0807835ba2ba10dea83649cbb54151c52c18fa36d055935053282"
+      "2e01aa42972e9d2abca94ce35551d26c1cb16a6e157472611b0e2ab2dfeb22b5"
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",

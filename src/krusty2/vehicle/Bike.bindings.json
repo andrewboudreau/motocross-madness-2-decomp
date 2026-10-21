@@ -106,7 +106,7 @@
   "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd5c0",
   "?LocalToWorldPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd660",
   "?Method_0x0040a520@Bike@@QAEMXZ": "0x0040a520",
-  "?Method_0x00435fe0@BikeA38@@QAEXXZ": "0x00435fe0",
+  "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?ClearScreenRects@D3DIMSoultreeObject@@QAEXXZ": "0x004444e0",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?Method_0x004a8bf0@BikeA5C4@@QAEXHM@Z": "0x004a8bf0",

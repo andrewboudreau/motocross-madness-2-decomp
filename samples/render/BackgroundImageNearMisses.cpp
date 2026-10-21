@@ -1,17 +1,7 @@
-// Near-miss BackgroundImage.cpp candidates, kept out of src/reconstructed
-// until they match. See docs/BACKGROUNDIMAGE.md.
-//
-// 0x004049d0 (678 bytes): retail stores the three leading zeros (and
-// `copyDcNext = 0`) as immediates; VC6 here caches 0 in edi, which shifts
-// the register choice of the region loop. Statement orders and a helper
-// for the DC tail do not change that. The DC tail as `if (surface) { ... }
-// return 0;` with the release branch returning on its own gives retail's
-// block order (retail duplicates that `*dc = heldDc; return 1` tail and puts
-// `return 0` last): 39 -> 108 of 606 masked bytes, 65 -> 46 instruction
-// diffs, candidate 678 bytes like retail. Then `*a = 0` before `surface = 0`
-// and `surface` before `*a = 1` in the copy branch align the rest. All six
-// orders of the three leading stores, `surface` initialised at its
-// declaration and `copyDcNext = 0` first in its branch keep the edi zero.
+// Complete nonexact BackgroundImage::GetDc candidate; original TU ownership
+// is unproven. Retail and VC6 bodies are both 678 bytes, with 115 matching
+// positions after all relocation bindings. Zero-register allocation and DC
+// return-block placement still differ. See docs/BACKGROUND_DC.md.
 
 #include <string.h>
 
@@ -28,7 +18,8 @@ extern CameraRect g_BackgroundImageRect;
 extern CameraRect g_DrawImageClipRect;
 extern CameraRect g_DrawImageSourceRect;
 // 0x005777a0 / 0x005777a8: GetDc's dirty-region index and clipped rectangle;
-// retail references them only inside GetDc (0x00404a56..0x00404ba8).
+// decoded direct DWORD references lie within GetDc. Both retail ranges start
+// at raw-backed zero bytes in writable .data; original COFF placement is unknown.
 int g_GetDcRegionIndex;
 CameraRect g_GetDcClipRect;
 
