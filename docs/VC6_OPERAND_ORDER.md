@@ -228,6 +228,16 @@ they are source-form differences under the deterministic rules of section 1.
   types in the file that uses them (as EventManager.cpp does).
 - Adding or removing declarations to move a near miss into a window is not a
   fix: the scan shows no near miss that has one.
+- Terrain slot 14 (`0x00506220`) is a second exact function in this class.
+  Defining MemTagStack once for both header trees added about 11 units
+  before it and swapped its two tick loads (3171 of 3173 bytes). The windows
+  were `(0, 21)` and `(51, 63)` typedefs before the change and `(29, 63)`
+  after it. Function definitions count too, so moving `Terrain::~Terrain`
+  (`0x005079f0`) from before slot 14 to its retail position after
+  SelectQuality (`0x00507960`) restored it with no other source change. The
+  new windows are `(62, 63)`, `(0, 1)` and `(4, 38)`, so it is still a narrow
+  fit. Function order that follows retail addresses is the defensible lever
+  here; padding declarations are not.
 
 ### 2.4 Function-local definitions and x87 term order (period 32)
 

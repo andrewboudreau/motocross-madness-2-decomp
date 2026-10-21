@@ -65,47 +65,6 @@ Terrain::Terrain(int a)
     closeUpStateSet = 0;
 }
 
-Terrain::~Terrain()
-{
-    int scope = g_MemTagStack->Push("Terrain");
-    if (ownedObjectArray) {
-        for (int i = 0; i < ownedObjectArrayCount; i++)
-            ownedObjectArray[i]->Release();
-        DebugFree(ownedObjectArray, __FILE__, 0x4b3);
-    }
-    if (detailTexture)
-        detailTexture->Release();
-    if (colorMapper)
-        colorMapper->Release();
-    if (ownedObjectCount) {
-        for (int i = 0; i < ownedObjectCount; i++) {
-            if (ownedObjects[i])
-                ownedObjects[i]->Release();
-        }
-    }
-    if (heightField) {
-        heightField->Shutdown(1);
-        if (heightField)
-            delete heightField;
-    }
-    if (directDrawPalette) {
-        directDrawPalette->Release();
-        directDrawPalette = 0;
-    }
-    if (blocks) {
-        for (int i = 0; i < blockCount; i++) {
-            if (blocks[i])
-                delete blocks[i];
-        }
-        DebugFree(blocks, __FILE__, 0x4d0);
-    }
-    if (textureAgeManager)
-        delete textureAgeManager;
-    if (meshAgeManager)
-        delete meshAgeManager;
-    g_MemTagStack->Pop(scope);
-}
-
 // 0x005057d0.  Moves `object` out of the live prefix of field_0xcb8[] (swap with the last live
 // element, shrink the live count), keeping the pointer just behind the new end.
 void Terrain::RetireOwnedObject(BaseObject* object)
@@ -428,6 +387,9 @@ unsigned int ReadClock();                // 0x004bfa80
 // page when the game's debug flag 4 is set.  Retail re-reads renderContext for every call
 // (tier 1); with a cached local, or an inline accessor, VC6 does not share the tail of the
 // single-pass branch with the detail pass.
+// Its two tick loads before the "Total" sum are a scheduling tie-break that depends on the
+// declarations before it (docs/VC6_OPERAND_ORDER.md section 2): it is exact with the
+// destructor defined at its retail position after SelectQuality, not before this function.
 int Terrain::UnknownVirtualSlot14()
 {
     if (!g_terrainToggle718)
@@ -708,6 +670,48 @@ void Terrain::SelectQuality(int index)
     else
         qualityParamA = g_pTerrainQualityTable[qualityIndex].closeUpDetailLimit;
     qualityParamB = g_pTerrainQualityTable[qualityIndex].perspectiveLimit;
+}
+
+// 0x005079f0.
+Terrain::~Terrain()
+{
+    int scope = g_MemTagStack->Push("Terrain");
+    if (ownedObjectArray) {
+        for (int i = 0; i < ownedObjectArrayCount; i++)
+            ownedObjectArray[i]->Release();
+        DebugFree(ownedObjectArray, __FILE__, 0x4b3);
+    }
+    if (detailTexture)
+        detailTexture->Release();
+    if (colorMapper)
+        colorMapper->Release();
+    if (ownedObjectCount) {
+        for (int i = 0; i < ownedObjectCount; i++) {
+            if (ownedObjects[i])
+                ownedObjects[i]->Release();
+        }
+    }
+    if (heightField) {
+        heightField->Shutdown(1);
+        if (heightField)
+            delete heightField;
+    }
+    if (directDrawPalette) {
+        directDrawPalette->Release();
+        directDrawPalette = 0;
+    }
+    if (blocks) {
+        for (int i = 0; i < blockCount; i++) {
+            if (blocks[i])
+                delete blocks[i];
+        }
+        DebugFree(blocks, __FILE__, 0x4d0);
+    }
+    if (textureAgeManager)
+        delete textureAgeManager;
+    if (meshAgeManager)
+        delete meshAgeManager;
+    g_MemTagStack->Pop(scope);
 }
 
 int g_terrainToggle314;
