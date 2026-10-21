@@ -23,39 +23,38 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The five [Character defaults](CHARACTER_DEFAULTS.md) supply missing primary
-virtual bodies, independently identified from RTTI, primary tables, constructor
-writes and callers. Their complete one- and three-byte returns are strict;
-secondary virtual-base tables remain separate. Native checks exercise 4,902
-prepared, null and unreadable receiver calls without memory or FP-state changes.
+The [rider motion-start connections](RIDER_MOTION_START.md) preserve complete
+Bike/KrustyBike callers and their sample while using the existing reviewed
+nonexact Character implementation. Its unchanged source retains 320,999 finite
+native state, callback, rounding and exception comparisons.
 
-Six [Scene callbacks](SCENE_CALLBACKS.md) supply complete strict three-byte
-returns used by 74 calls in ten complete strict readers. Signature grouping and
-original names remain provisional. Native checks pass 36,864 calls with prepared,
-null and unreadable receivers and pointer arguments.
+The [Scene motion connections](SCENE_MOTION_CONNECTIONS.md) retain the strict
+280-byte restart caller and actual 27/1,293-byte Character providers. Receiver
+construction, raw primary/virtual-base RTTI and Motion-pointer production are
+checked independently. Native validation passes 62,215 actual-source cases.
 
-[CollisionPoint storage](COLLISION_POINT_STORAGE.md) connects zero/Y reads to
-the existing dynamically initialized objects through ordinary source declarations.
-The four original objects, eight strict initializer functions, 60-byte BSS and
-ordered CRT entries remain unchanged. Existing native suites now use that actual
-exported storage and initialization without substitute zero/Y definitions.
+The [race stream refill](RACE_SOUND_REFILL.md) is an individually reviewed
+nonexact candidate: 2,038 emitted bytes against 2,032 retail, with 806 matching
+positions. The full aggregate preserves 106 sections and 579 relocations;
+58 strict caller/helper checks and 4,782 native cases cover actual Sound helpers,
+byte-copy/selection oracles, callback mutations, aliases and partial faults.
 
-All 238 old production objects retain 10,590 nondebug sections and 45,556
-relocations under only those two verified storage connections, with no filename
-exclusions. Both new standalone objects are independently recompiled using the
-actual game commands. The real link compiles 240 translation units and reports
-282 unresolved names, following isolated reductions **295 -> 290 -> 284 -> 282**.
-Private evidence is in `work/game-build/round41-all-objects.json`,
-`round41-link-evidence.json`, `round41-admitted.json` and
-`connections-round41-preservation.json`.
+All 240 old production objects retain 10,603 nondebug sections and 45,556
+relocations under only four verified motion-call connections, with no filename
+exclusions. The admitted refill object is independently recompiled using the
+actual game command. The real link compiles 241 translation units and reports
+277 unresolved names, following isolated reductions **282 -> 280 -> 278 -> 277**.
+Private evidence is in `work/game-build/round42-all-objects.json`,
+`round42-link-evidence.json`, `round42-admitted.json` and
+`connections-round42-preservation.json`.
 
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and excluded from strict counts.
 The only per-source compiler exception remains `/QIfist` for the motion-start
 helper; this slice changes no compiler flags. The finite native checks do not
-establish integrated gameplay. The full regression suite passes 513 tests,
-with 11 explicit skips (524 total). Static checks pass for 243 Python files
-and 377 JSON files.
+establish integrated gameplay. The full regression suite passes 516 tests,
+with 11 explicit skips (527 total). Static checks pass for 246 Python files
+and 379 JSON files.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

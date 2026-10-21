@@ -46,9 +46,13 @@ resets are written `if (sampleKind != 6) ... else ...` with identical
 arms, which reproduces retail's dead `cmp ecx, 6`; the source comments
 this. The wreck and fall cues use `if (!index) f(); else if (!playing) f();`.
 
-Near miss (`samples/race/RaceSoundNearMisses.cpp`, notes there): the
-half-buffer refill `0x004e4d10`, where two register-allocation
-differences remain.
+The complete half-buffer refill `0x004e4d10` remains nonexact in
+`samples/race/RaceSoundRefill.cpp`, included by the original near-miss aggregate.
+Its unchanged 2,038-byte candidate is independently reviewed against the complete
+2,032-byte retail body using actual strict Sound helpers and 4,782 bounded native
+scenarios. See [the functional review](RACE_SOUND_REFILL.md#functional-build-review)
+for preservation evidence, independent buffer oracles, scripted COM/random
+boundaries and the excluded unwritten-cursor paths.
 
 Field names come from the loader's literals: the sample tables are named
 after their audio_*.ini keys (`idle_%d` .. `Rev_%d`, the `Total*` counts,

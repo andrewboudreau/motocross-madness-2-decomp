@@ -10,6 +10,7 @@
 #include "TextureMap.h"
 #include "Tgafile.h"
 #include "SceneManager.h"
+#include "../krusty2/motion/D3DIMSoultreeCharacter.h"
 
 float FastInvSqrt(float x); // 0x00460c00
 
@@ -447,10 +448,10 @@ int Scene::RestartEntry(int index, float time, int force, int motion)
                     entry->sequenceIndex = motion;
                 animationTable->entries[index].currentMotion =
                     animationTable->entries[index].motionSequence[animationTable->entries[index].sequenceIndex] - 1;
-                object->SetMotion(
-                    animationTable->entries[index].motions[animationTable->entries[index].currentMotion]);
+                reinterpret_cast<Character*>(object)->SetMotion(
+                    reinterpret_cast<Motion*>(animationTable->entries[index].motions[animationTable->entries[index].currentMotion]));
                 object->motionTime = 0;
-                animationTable->entries[index].motionFrame = object->AdvanceMotion(time, 0, 0);
+                animationTable->entries[index].motionFrame = reinterpret_cast<Character*>(object)->AdvanceMotion(time, 0, 0);
                 return 1;
             }
         } else {

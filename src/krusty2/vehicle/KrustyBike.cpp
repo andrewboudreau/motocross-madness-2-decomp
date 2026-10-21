@@ -1402,7 +1402,7 @@ void KrustyBike::Fn_0048E280()
         rivalBearingScaled = (rivalBearing * 0.36963f) * 0.7f;
     }
     headTurnAngle = 0;
-    ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[14], 0.5f);
+    reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8bf0(riderPoseHandles[14], 0.5f);
     D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[14], 0.5f);
 }
 

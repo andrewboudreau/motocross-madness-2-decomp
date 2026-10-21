@@ -1301,7 +1301,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                 }
             }
             float pose = look + 0.5f;
-            ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[14], pose);
+            reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8bf0(riderPoseHandles[14], pose);
             D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[14], pose);
         }
     } else if (hasFinished == 2) {
@@ -1362,8 +1362,8 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
             backUpPhase += backUpPhaseRate;
             if (backUpPhase > 1.0f)
                 backUpPhase -= 1.0f;
-            ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[16], poseParam);
-            ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[17], backUpPhase);
+            reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8bf0(riderPoseHandles[16], poseParam);
+            reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8bf0(riderPoseHandles[17], backUpPhase);
         } else if (blend) {
             ((Character*)riderCharacter)->Method_0x004a9050(riderPoseHandles[idx], riderPoseHandles[next],
                 riderPoseHandles[cnt], riderPoseHandles[other], poseParam, w, poseLeanBlend);

@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/race/RaceSoundRefill.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete engine-stream refill passes 4782 finite native state, sample-copy, callback, alias and fault cases with actual strict Sound helpers and independent byte/random-selection oracles. VC6 emits 2038 bytes against 2032 retail bytes, with 806 matching positions; extraction preserves all 106 aggregate sections and 579 relocations. COM and rand boundaries are scripted; unwritten cursor outputs and integrated audio playback are outside this validation.",
+      "evidence": "docs/RACE_SOUND_REFILL.md#functional-build-review"
+    },
+    {
       "path": "samples/render/BitStringShifts.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete sub-word shifts checked in 422838 finite native cases with actual strict wrappers and mask storage, independent bit oracles, aliases and progressive faults. VC6 emits 420/438 bytes against 420/442 retail bytes, with 343/93 resolved matching positions; extraction preserves the full existing aggregate.",

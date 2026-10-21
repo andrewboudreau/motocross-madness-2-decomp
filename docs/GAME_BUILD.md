@@ -41,47 +41,49 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 240 C++ files (196 canonical sources and 44
-reviewed candidates) and reaches LINK with 282 unresolved external symbols,
+The 2026-10-21 build compiles 241 C++ files (196 canonical sources and 45
+reviewed candidates) and reaches LINK with 277 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-jduiaxj0` retains every prior strict result:
+The composition in `build-puygm1gk` retains every prior strict result:
 3,008/3,019 calibration rows and 1,086/1,162 physics comparisons, with no
 partial-score decreases. The two existing nonexact physics comparison-binding
 diagnostics are unchanged and excluded from strict counts.
 
-Five [Character defaults](CHARACTER_DEFAULTS.md) now supply independently
-identified primary virtual bodies without changing declarations or inheritance.
-Their complete one- and three-byte returns match strictly. Constructor/table
-checks preserve the separate virtual GameObject base; 4,902 native calls check
-the bodies' unchanged storage and FP state.
+[Rider motion-start calls](RIDER_MOTION_START.md) now reach the existing
+reviewed nonexact Character provider. Both production calls and three sample
+calls retain complete caller bytes; the three objects preserve 756 nondebug
+sections and 3,586 relocations under the two names. The unchanged provider passes
+320,999 finite native state, callback, rounding and exception cases.
 
-Six [Scene reader callbacks](SCENE_CALLBACKS.md) supply strict three-byte return
-bodies for 74 direct calls in ten complete strict readers. Their provisional
-names and overload grouping remain explicit. Native checks exercise 36,864 calls
-with prepared, null and unreadable receivers and pointer arguments.
+[Scene restart](SCENE_MOTION_CONNECTIONS.md) now uses the actual strict
+Character::SetMotion and AdvanceMotion implementations. Primary receiver and
+Motion-pointer production are independently traced through the animation reader.
+The complete 280-byte caller and 27/1,293-byte providers remain strict; 62,215
+native cases exercise actual restart, frame, callback and fault behavior.
 
-The [CollisionPoint constants](COLLISION_POINT_STORAGE.md) use ordinary external
-const declarations to connect readers to existing zero/Y storage. All four
-objects, original copy-initialization expressions, eight initializer functions
-and ordered CRT entries are preserved. Native fixtures now use those actual
-source objects and CRT writes; the separate normalizer import remains unresolved.
+The [race stream refill](RACE_SOUND_REFILL.md) supplies one missing gameplay
+method as an individually reviewed nonexact candidate. It emits 2,038 bytes
+against 2,032 retail bytes, with 806 matching positions. Its extraction preserves
+all 106 aggregate sections and 579 relocations. Actual strict Sound helpers and
+independent byte/selection oracles support 4,782 native cases. COM and rand are
+scripted; actual audio playback remains untested.
 
-All 238 prior production objects retain 10,590 nondebug sections and 45,556
-relocations under only the two verified storage connections. No filename bytes
-are excluded. Both new standalone objects are independently recompiled with the
-actual game's commands and preserve all section bytes and relocations. Real
-isolated links remove exactly thirteen missing names, **295 -> 290 -> 284 -> 282**,
-with none added. The final report verifies all 240 source hashes, 224 header
+All 240 prior production objects retain 10,603 nondebug sections and 45,556
+relocations under only the four verified motion-call connections, with no
+filename exclusions. The new refill object is independently recompiled with the
+actual game's command and preserves all section bytes and relocations. Real
+isolated links remove exactly five missing names, **282 -> 280 -> 278 -> 277**,
+with none added. The final report verifies all 241 source hashes, 224 header
 hashes, configuration, profile and per-source flags. Private evidence is in
-`work/game-build/round41-link-evidence.json`, `round41-all-objects.json`,
-`round41-admitted.json` and `connections-round41-preservation.json`.
+`work/game-build/round42-link-evidence.json`, `round42-all-objects.json`,
+`round42-admitted.json` and `connections-round42-preservation.json`.
 
 Linking, startup, integrated menus and racing remain unverified. The full
-regression suite passes 513 tests, with 11 explicit skips (524 total). Static
-checks pass for 243 Python files and 377 JSON files.
+regression suite passes 516 tests, with 11 explicit skips (527 total). Static
+checks pass for 246 Python files and 379 JSON files.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

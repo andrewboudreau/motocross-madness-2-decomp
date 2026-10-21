@@ -29,8 +29,9 @@ and its Character base PMD directly from the pinned retail image. Character is
 at offset zero; the virtual GameObject base is distinct. The native fixture
 uses the actual source declarations on prepared raw storage. It does not run
 constructors or establish complete object lifetime. The separate BikeA5C4 and
-KbA5C4 call views are not renamed or equated with Character in this slice;
-their receiver-production connections require their own caller proof.
+KbA5C4 call views retain their declarations. Their five motion-start calls now
+use explicit primary Character conversions, with independent receiver-production
+and complete-caller evidence in [RIDER_MOTION_START.md](RIDER_MOTION_START.md).
 
 ## Why the conversion is explicit
 
@@ -129,8 +130,9 @@ not establish universal exception-context or whole-game equivalence.
 
 The complete candidate is suitable for individual reviewed-nonexact admission
 with the required `/QIfist` source flag and the limits above. Existing source
-bodies, call sites, headers and matching targets are unchanged; only obsolete
-comments claiming original inline-assembly provenance are corrected. The blend
+bodies, headers and matching targets are unchanged by its extraction. The later
+rider connections preserve complete caller bytes under the two documented
+symbol substitutions. The blend
 method at `0x4a8c50` and later method at `0x4a9050` remain missing. Linking,
 startup, full animation and racing remain separate validation gates.
 

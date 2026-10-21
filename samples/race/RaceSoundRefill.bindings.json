@@ -1,0 +1,6 @@
+{
+  "?GetBufferPosition@Sound@@QAEHPAK0@Z": "0x004bcd40",
+  "?LockBuffer@Sound@@QAEHKKPAPAXPAK01K@Z": "0x004bd020",
+  "?UnlockBuffer@Sound@@QAEHPAXK0K@Z": "0x004bd080",
+  "_rand": "0x00534c1b"
+}

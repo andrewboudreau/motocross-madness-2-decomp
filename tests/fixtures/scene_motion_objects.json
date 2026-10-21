@@ -1,0 +1,15 @@
+{
+  "baseline": "21934bae; complete same-path old/current objects agree under exactly the two Scene motion symbol joins. Only complete __FILE__ prefixes are checkout-relative.",
+  "objects": {
+    "src/reconstructed/SceneManager.cpp": {
+      "sections": 272,
+      "relocations": 1273,
+      "sha256": "ff72d91c0dac66f3cb8d1c386e933f2cefc2e4752a62ad98ee2b2237cd54363e"
+    },
+    "samples/track/SceneManagerNearMisses.cpp": {
+      "sections": 96,
+      "relocations": 484,
+      "sha256": "4151c32792c97ee2f7e45bfd059d985a8d94a5e684322c10326def287cf93f60"
+    }
+  }
+}

@@ -868,7 +868,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     }
     wrecker->EndWreck();
     D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[1], 0.5f);
-    riderCharacter->Method_0x004a8bf0(riderPoseHandles[1], 0.5f);
+    reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8bf0(riderPoseHandles[1], 0.5f);
     verticalAccelSmoother->Reset(fixedStepTime * 7.0f);
     forwardAccelSmoother->Reset(0.5f);
     steerAxis = new(__FILE__, 0x7df) BikeA640(frontWheel->restLoadWeight, fixedStepTime * 6.3f);
