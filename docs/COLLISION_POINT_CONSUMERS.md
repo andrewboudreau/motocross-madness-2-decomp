@@ -105,11 +105,12 @@ Private reproducible evidence resides in `work/contact-connections38/`:
 `prove_live_objects.py`, `check_functions.py`, and the retail producer/RTTI
 instruction reports. Native boundary validation is recorded separately by the
 focused collision-point-consumer regression. Its small native executable uses
-explicit validation-only mappings for the existing CollisionVec3 normalization
-call view and constant-storage references. Those mappings are not production
-connections: the real game link still lacks that normalization name and those
-contact globals. Strict matching of the complete providers is not a claim that
-all their dependencies already link from canonical source.
+an explicit validation-only mapping for the existing CollisionVec3 normalization
+call view. The zero/Y-axis constants now use ordinary source linkage to the
+actual existing CollisionPoint objects and their original CRT initializers; see
+[shared contact storage](COLLISION_POINT_STORAGE.md). The normalizer mapping is
+not a production connection. Strict matching of the complete providers does not
+establish closure of every remaining dependency.
 
 ## Native validation
 
@@ -159,16 +160,16 @@ length/division, FastSqrt/FastInvSqrt, and LocalToWorldPoint. Actual strict tabl
 initializers run before the matrix. Scene helpers perform their actual cache and
 matrix operations, with no scripted math or virtual callbacks.
 
-The native link has two explicit validation-only accommodations. The existing
+The native link has one explicit validation-only accommodation. The existing
 CollisionVec3 normalization import is bound to the actual 150-byte Vec3 provider,
 whose hidden-output pointer and source pointer occupy the same cdecl stack words
-and whose return register is the same output pointer. The zero/Y-axis imports
-are bound to the actual CollisionPoint object's private initialized storage.
-The test checks those storage destinations, all three destination addends,
-strict initializer bodies/thunks and `.CRT$XCU` links. These changes affect only
-private COFF symbol/relocation metadata: every section payload and instruction
-byte remains unchanged. They neither supply production aliases nor hide the
-remaining game-link dependencies. Allocation entry points are fail-fast and
+and whose return register is the same output pointer. That change affects only
+private COFF symbol metadata; every section payload and instruction byte remains
+unchanged. The zero/Y-axis constants use actual exported source storage with no
+private relocation editing or fixture definitions. The test checks their storage
+destinations, all three destination addends, strict initializer bodies/thunks and
+`.CRT$XCU` links. The normalizer remains an unresolved production dependency.
+Allocation entry points are fail-fast and
 unreached here; the existing bike-contact suite covers real source allocation
 and removal, and the existing scene-contact suite covers the larger independent
 transform/cache matrix. Full RunSteps and Vehicle-frame execution is not part

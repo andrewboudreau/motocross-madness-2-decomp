@@ -53,12 +53,15 @@ inline CollisionVec3 operator*(const CollisionVec3& v, float s) {
     return r;
 }
 
-// Zero vector in .bss at 0x005797f0 (three dwords copied by every vector reset).
-extern CollisionVec3 g_CollisionZeroVec3;
-// Third global vec3 at 0x005797b0 (initial value of CollisionObject::field_0xa0/field_0xac).
+// Actual dynamically initialized objects owned by CollisionPoint.cpp. Only their
+// 12-byte xyz storage is shared through the existing CollisionVec3 read view;
+// the original vector type/header identity remains unproven.
+struct CollisionPointConstVec3;
+extern const CollisionPointConstVec3 kCollisionPointZero;  // 0x005797f0
+extern const CollisionPointConstVec3 kCollisionPointYAxis; // 0x00579810
+
+// Third global vec3 at 0x005797b0 (CollisionObject's initial vector value).
 extern CollisionVec3 g_CollisionVec3_5797b0;
-// Second global vec3 at 0x00579810 (source of CollisionPoint::field_0x2c initial value; (0,1,0), stored by the initializer 0x0043b100).
-extern CollisionVec3 g_CollisionVec3_579810;
 
 // The debug operator new/delete (size or ptr, __FILE__, __LINE__) are in DebugAlloc.h.
 

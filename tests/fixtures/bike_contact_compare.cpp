@@ -26,8 +26,6 @@ typedef char ListView[offsetof(SoultreeContact,ownerNode) == offsetof(CollisionP
     offsetof(SoultreeContact,touching) == offsetof(CollisionPoint,inContact) ? 1 : -1];
 typedef char WheelContact[offsetof(BikeWheel,contactPoint_0x0b8) == 0xb8 ? 1 : -1];
 
-CollisionVec3 g_CollisionZeroVec3;
-CollisionVec3 g_CollisionVec3_579810;
 // Link-only guards for methods outside this fixture's two exercised bodies.
 // Any accidental entry into those dependencies terminates the test.
 CollisionVec3::CollisionVec3(float,float,float) { ExitProcess(90); }
@@ -155,10 +153,12 @@ static void CompareRemove(CollisionPoint* point) {
 }
 int main(int argc,char** argv) {
     if(argc!=2 || !Map(argv[1])) return 4;
-    g_CollisionZeroVec3.x=g_CollisionZeroVec3.y=g_CollisionZeroVec3.z=0;
-    g_CollisionVec3_579810.x=0; g_CollisionVec3_579810.y=1; g_CollisionVec3_579810.z=0;
+    // Real CollisionPoint.cpp CRT initializers supply these shared objects.
+    const CollisionVec3* zero=reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero);
+    const CollisionVec3* axis=reinterpret_cast<const CollisionVec3*>(&kCollisionPointYAxis);
+    if(zero->x!=0 || zero->y!=0 || zero->z!=0 || axis->x!=0 || axis->y!=1 || axis->z!=0) return 78;
     memset(&state,0xa5,sizeof(state)); state.count=0; allocationMode=0;
-    CollisionPoint* p=AddCollisionPoint(1,state.list,&g_CollisionZeroVec3,0,0,&state.count,0.6f,0x12345678);
+    CollisionPoint* p=AddCollisionPoint(1,state.list,zero,0,0,&state.count,0.6f,0x12345678);
     productionVtable=*(DWORD*)p;
     if(p!=Allocated() || state.list[0]!=p || state.count!=1 || p->surfaceOwner!=0x12345678 ||
        p->normalForce!=0.6f || p->penetration!=-999 || p->inContact || p->surfaceNormal.y!=1) return 5;

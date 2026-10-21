@@ -53,33 +53,19 @@ def definition(text, name):
 
 
 def native_point_bindings(path, destination):
-    """Validation-only ABI/storage joins, after proving original object bytes.
+    """Validation-only normalizer ABI join; storage uses actual source linkage.
 
     Normalization's explicit-output view has the same cdecl stack words and
-    return register as the actual Vec3 hidden result. The external zero/y-axis
-    names refer to the actual TU's private, dynamically initialized constants.
-    No instruction bytes, addends, implementations, or production objects change.
+    return register as the actual Vec3 hidden result. No instruction payloads
+    or production objects change. Zero/Y use their real exported objects and
+    original CRT initializers, without relocation edits or fixture definitions.
     """
     obj = CoffObject(path)
     data = bytearray(obj.data)
-    local = {
-        '?g_CollisionZeroVec3@@3UCollisionVec3@@A': '_kCollisionPointZero',
-        '?g_CollisionVec3_579810@@3UCollisionVec3@@A': '_kCollisionPointYAxis',
-    }
-    for section in obj.sections:
-        for index in range(section.reloc_count):
-            offset = section.reloc_ptr + 10 * index
-            old_index, = struct.unpack_from('<I', data, offset + 4)
-            name = obj.symbol_by_index[old_index].name
-            if name in local:
-                target = obj.find_symbol(local[name])
-                assert target.section_number > 0 and target.storage_class == 3
-                struct.pack_into('<I', data, offset + 4, target.index)
-    for symbol in obj.symbols:
-        if symbol.name in local and symbol.section_number == 0:
-            target = obj.find_symbol(local[symbol.name])
-            struct.pack_into('<Ih', data, obj.sym_ptr + symbol.index*18 + 8, target.value, target.section_number)
-            data[obj.sym_ptr + symbol.index*18 + 16] = 3
+    assert not any(s.name in {
+        '?g_CollisionZeroVec3@@3UCollisionVec3@@A',
+        '?g_CollisionVec3_579810@@3UCollisionVec3@@A',
+    } for s in obj.symbols)
     assert obj._str_off + obj._str_size == len(data)
     encoded = NORMALIZE.encode() + b'\0'
     for symbol in obj.symbols:
@@ -243,7 +229,8 @@ class CollisionPointConsumersTests(unittest.TestCase):
             crt_names = [point_object.symbol_by_index[r.symbol_index].name
                          for r in point_object.relocations if r.section_number==crt[0]]
             self.assertEqual(crt_names, ['_$E2','_$E5','_$E8','_$E11'])
-            for initializer, destination in (('_$E1','_kCollisionPointZero'), ('_$E7','_kCollisionPointYAxis')):
+            for initializer, destination in (('_$E1','?kCollisionPointZero@@3UCollisionPointConstVec3@@B'),
+                                              ('_$E7','?kCollisionPointYAxis@@3UCollisionPointConstVec3@@B')):
                 entry = point_object.find_symbol(initializer)
                 body, _, relocations = point_object.symbol_extent(entry)
                 self.assertEqual([point_object.symbol_by_index[r.symbol_index].name

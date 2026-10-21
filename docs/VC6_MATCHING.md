@@ -3,9 +3,9 @@
 Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 The 2026-10-21 native Windows VC6 SP3 gate passes its toolchain identity,
-manual smoke and generated-probe checks. Calibration has 2,997 strict-exact
-rows among 3,008 comparisons: 2,990 distinct source/address/extent cases.
-It covers 153 source files, 150 with at least one strict case. The separate
+manual smoke and generated-probe checks. Calibration has 3,008 strict-exact
+rows among 3,019 comparisons: 2,994 distinct source/address/extent cases.
+It covers 155 source files, 152 with at least one strict case. The separate
 physics matrix has 1,086 strict-exact targets among 1,162 comparisons.
 All prior strict cases are retained in the current connection composition.
 Neither matrix reports a partial-score decrease in this composition. The
@@ -23,33 +23,39 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The [vector addition slice](VECTOR_ADD_ASSIGN.md) connects Vehicle's two calls
-to the canonical Vec3 operator and supplies the BVH caller's separate provisional
-call-view definition. Both emitted providers are strict 33-byte bodies; the
-complete 1,415-byte Vehicle and 736-byte BVH callers remain exact. Native
-addition checks pass 34,014 arithmetic, overlap, FP and partial-fault cases.
+The five [Character defaults](CHARACTER_DEFAULTS.md) supply missing primary
+virtual bodies, independently identified from RTTI, primary tables, constructor
+writes and callers. Their complete one- and three-byte returns are strict;
+secondary virtual-base tables remain separate. Native checks exercise 4,902
+prepared, null and unreadable receiver calls without memory or FP-state changes.
 
-The [bit-string shifts](BITSTRING_SHIFTS.md) are reviewed nonexact candidates:
-420/438 emitted bytes against 420/442 retail, with 343/93 matching positions.
-Their full aggregate retains all 22 nondebug sections and 38 relocations.
-Eighteen strict checks and 422,838 native cases cover the existing canonical
-wrappers/masks, independent bit oracles, overlap and progressive faults.
+Six [Scene callbacks](SCENE_CALLBACKS.md) supply complete strict three-byte
+returns used by 74 calls in ten complete strict readers. Signature grouping and
+original names remain provisional. Native checks pass 36,864 calls with prepared,
+null and unreadable receivers and pointer arguments.
 
-All 236 old production objects retain 10,584 nondebug sections and 45,548
-relocation destinations under the Vehicle call-name substitution. Vehicle's
-naturally emitted canonical 33-byte COMDAT is the only added section in those
-objects. The real link compiles 238 translation units and reports 295 unresolved
-names. Private evidence is in `work/game-build/round40-all-objects.json`,
-`round40-link-evidence.json`, `round40-admitted.json` and
-`connections-round40-preservation.json`.
+[CollisionPoint storage](COLLISION_POINT_STORAGE.md) connects zero/Y reads to
+the existing dynamically initialized objects through ordinary source declarations.
+The four original objects, eight strict initializer functions, 60-byte BSS and
+ordered CRT entries remain unchanged. Existing native suites now use that actual
+exported storage and initialization without substitute zero/Y definitions.
+
+All 238 old production objects retain 10,590 nondebug sections and 45,556
+relocations under only those two verified storage connections, with no filename
+exclusions. Both new standalone objects are independently recompiled using the
+actual game commands. The real link compiles 240 translation units and reports
+282 unresolved names, following isolated reductions **295 -> 290 -> 284 -> 282**.
+Private evidence is in `work/game-build/round41-all-objects.json`,
+`round41-link-evidence.json`, `round41-admitted.json` and
+`connections-round41-preservation.json`.
 
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and excluded from strict counts.
 The only per-source compiler exception remains `/QIfist` for the motion-start
 helper; this slice changes no compiler flags. The finite native checks do not
-establish integrated gameplay. The full regression suite passes 510 tests,
-with 11 explicit skips (521 total). Static checks pass for 240 Python files
-and 375 JSON files.
+establish integrated gameplay. The full regression suite passes 513 tests,
+with 11 explicit skips (524 total). Static checks pass for 243 Python files
+and 377 JSON files.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

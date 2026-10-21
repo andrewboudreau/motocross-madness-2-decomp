@@ -15,8 +15,6 @@ typedef char VecLayout[sizeof(Vec3)==12 && sizeof(CollisionVec3)==12 && offsetof
 typedef char NodeLayout[sizeof(SoultreeObject)==0x1a4 && offsetof(SoultreeObject,localMatrix)==0xb8 && offsetof(SoultreeObject,worldMatrix)==0xf8 && offsetof(SoultreeObject,worldValid)==0x138 && offsetof(SoultreeObject,parent)==0x13c ? 1:-1];
 typedef char ContactLayout[sizeof(CollisionPoint)==0xc4 && offsetof(CollisionPoint,ownerNode)==4 && offsetof(CollisionPoint,localPosition)==8 && offsetof(CollisionPoint,worldPosition)==0x14 && offsetof(CollisionPoint,inContact)==0xa4 ? 1:-1];
 
-CollisionVec3 g_CollisionZeroVec3;
-CollisionVec3 g_CollisionVec3_579810;
 CollisionVec3::CollisionVec3(float,float,float) { ExitProcess(90); }
 CollisionVec3* CollisionDivide(CollisionVec3*,const CollisionVec3*,float) { ExitProcess(91); return 0; }
 float CollisionLength(const CollisionVec3*) { ExitProcess(92); return 0; }
@@ -70,7 +68,10 @@ static int Fault(EXCEPTION_POINTERS* p) {
     return EXCEPTION_EXECUTE_HANDLER;
 }
 int main() {
-    g_CollisionVec3_579810.y=1;
+    // Real CollisionPoint.cpp CRT initializers supply these shared objects.
+    const CollisionVec3* zero=reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero);
+    const CollisionVec3* axis=reinterpret_cast<const CollisionVec3*>(&kCollisionPointYAxis);
+    if(zero->x!=0 || zero->y!=0 || zero->z!=0 || axis->x!=0 || axis->y!=1 || axis->z!=0) return 78;
     for(int seed=0;seed<32;seed++) for(int hierarchy=0;hierarchy<4;hierarchy++)
     for(int states=0;states<8;states++) for(int count=0;count<=6;count++) for(int duplicate=0;duplicate<2;duplicate++) {
         memset(points,0xa5,sizeof(points));memset(nodes,0x5a,sizeof(nodes));

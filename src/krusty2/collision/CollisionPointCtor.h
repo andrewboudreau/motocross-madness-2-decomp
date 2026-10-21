@@ -7,15 +7,15 @@
 
 inline CollisionPoint::CollisionPoint(float a, int b)
     : normalForce(a), surfaceOwner(b) {
-    localPosition = g_CollisionZeroVec3;
+    localPosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
     ownerNode = 0;
-    worldPosition = g_CollisionZeroVec3;
-    surfacePosition = g_CollisionZeroVec3;
-    surfaceNormal = g_CollisionVec3_579810;
-    relativePosition = g_CollisionZeroVec3;
-    field_0x44 = g_CollisionZeroVec3;
-    frictionDirection = g_CollisionZeroVec3;
-    field_0x5c = g_CollisionZeroVec3;
+    worldPosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+    surfacePosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+    surfaceNormal = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointYAxis));
+    relativePosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+    field_0x44 = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+    frictionDirection = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+    field_0x5c = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
     tangentSpeed = 0;
     spinSpeed = 0;
     field_0xb8 = 1.0f;
@@ -30,9 +30,9 @@ inline CollisionPoint::CollisionPoint(float a, int b)
     field_0xa0 = 0.5f;
     surfaceType = 0;
     frictionMagnitude = 0;
-    frictionForce = g_CollisionZeroVec3;
+    frictionForce = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
     frictionCoefficient = 0;
-    field_0x68 = g_CollisionZeroVec3;
+    field_0x68 = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
 }
 
 #endif

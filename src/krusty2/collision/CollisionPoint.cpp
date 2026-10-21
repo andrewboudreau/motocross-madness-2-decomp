@@ -129,7 +129,7 @@ void CollisionPoint::UpdateRelativeMotion(const CollisionVec3* a1, const Collisi
             if (len > 0.001f) {
                 frictionDirection = DividedVec3(w, len);
             } else {
-                frictionDirection = g_CollisionZeroVec3;
+                frictionDirection = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
                 spinSpeed = 0.0f;
             }
         }
@@ -142,7 +142,7 @@ void CollisionPoint::UpdateRelativeMotion(const CollisionVec3* a1, const Collisi
             CollisionVec3 d;
             frictionDirection = *CollisionDivide(&d, &w, len);
         } else {
-            frictionDirection = g_CollisionZeroVec3;
+            frictionDirection = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
             spinSpeed = 0.0f;
         }
     }
@@ -156,7 +156,7 @@ CollisionPoint* AddExistingCollisionPoint(int capacity, CollisionPoint** points,
         if (point)
             points[*count] = point;
         CollisionPoint* p = points[*count];
-        p->localPosition = g_CollisionZeroVec3;
+        p->localPosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
         p->penetration = a4 - 999.0f;
         p->ownerNode = 0;
         p->penetrationThreshold = a4;
@@ -229,7 +229,7 @@ static inline CollisionPointVec3 ScaleVec3(const CollisionVec3& v, float s) {
 void CollisionPoint::CollisionPointVirtualSlot1() {
     if (!(tangentSpeed > 0.001f) && !(spinSpeed > 0.001f)) {
         frictionMagnitude = 0.0f;
-        frictionForce = g_CollisionZeroVec3;
+        frictionForce = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
     } else {
         frictionMagnitude = (-normalForce) * surfaceGrip * frictionCoefficient;
         frictionForce = ScaleVec3(frictionDirection, frictionMagnitude);
@@ -242,15 +242,16 @@ void CollisionPoint::CollisionPointVirtualSlot1() {
 // 0x0043b050/0x0043b0a0/0x0043b0f0/0x0043b140 jump to 60-byte bodies that build the value in a
 // stack temporary and copy it out (copy-initialization from a constructor call, as for
 // ConstraintMethodCollisionModel.cpp's 0x00579830).  The zero vector 0x005797f0 and the y axis
-// 0x00579810 are the objects the code above reads as g_CollisionZeroVec3 and
-// g_CollisionVec3_579810 (CollisionTypes.h keeps those extern for the other sample units); the
-// x and z axes have no readers here.  The local type stands in for the unrecovered header vector
+// 0x00579810 are the existing objects read through explicit CollisionVec3 views.
+// They have external linkage so all consumers use this storage and its original
+// initialization. The x/z axes remain local. This constructor-bearing type is a
+// provisional view of the unrecovered header vector
 // (CollisionVec3's three-float constructor is out of line, 0x00404e60).
 struct CollisionPointConstVec3 {
     float x, y, z;
     CollisionPointConstVec3(float a, float b, float c) : x(a), y(b), z(c) {}
 };
-static const CollisionPointConstVec3 kCollisionPointZero = CollisionPointConstVec3(0.0f, 0.0f, 0.0f);
+const CollisionPointConstVec3 kCollisionPointZero = CollisionPointConstVec3(0.0f, 0.0f, 0.0f);
 static const CollisionPointConstVec3 kCollisionPointXAxis = CollisionPointConstVec3(1.0f, 0.0f, 0.0f);
-static const CollisionPointConstVec3 kCollisionPointYAxis = CollisionPointConstVec3(0.0f, 1.0f, 0.0f);
+const CollisionPointConstVec3 kCollisionPointYAxis = CollisionPointConstVec3(0.0f, 1.0f, 0.0f);
 static const CollisionPointConstVec3 kCollisionPointZAxis = CollisionPointConstVec3(0.0f, 0.0f, 1.0f);

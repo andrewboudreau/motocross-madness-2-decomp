@@ -55,8 +55,8 @@ int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec
         sum = first->worldPosition;
         *normal = first->surfaceNormal;
     } else {
-        sum = g_CollisionZeroVec3;
-        *normal = g_CollisionZeroVec3;
+        sum = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+        *normal = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
         merged = 0;
         deepest = 0.0f;
     }
@@ -82,7 +82,7 @@ int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec
             len2 += normal->x * normal->x;
             len2 += normal->z * normal->z;
             if (len2 == 0.0f) {
-                *normal = g_CollisionZeroVec3;
+                *normal = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
             } else {
                 float s = FastInvSqrt(len2);
                 normal->x *= s;

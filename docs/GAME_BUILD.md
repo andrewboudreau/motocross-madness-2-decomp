@@ -41,45 +41,47 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 238 C++ files (194 canonical sources and 44
-reviewed candidates) and reaches LINK with 295 unresolved external symbols,
+The 2026-10-21 build compiles 240 C++ files (196 canonical sources and 44
+reviewed candidates) and reaches LINK with 282 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-fsiteikw` retains every prior strict result:
-2,997/3,008 calibration rows and 1,086/1,162 physics comparisons, with no
+The composition in `build-jduiaxj0` retains every prior strict result:
+3,008/3,019 calibration rows and 1,086/1,162 physics comparisons, with no
 partial-score decreases. The two existing nonexact physics comparison-binding
 diagnostics are unchanged and excluded from strict counts.
 
-[Vector addition](VECTOR_ADD_ASSIGN.md) connects two calls in Vehicle's complete
-1,415-byte method to the existing Vec3 operator. VC6 naturally emits its exact
-33-byte COMDAT. The BVH caller retains its separate provisional call view,
-supplied by an ordinary 33-byte out-of-line definition with the same sequential
-component reads and writes. All complete old callers remain unchanged; 34,014
-native cases cover arithmetic, overlap, FP modes and partial faults.
+Five [Character defaults](CHARACTER_DEFAULTS.md) now supply independently
+identified primary virtual bodies without changing declarations or inheritance.
+Their complete one- and three-byte returns match strictly. Constructor/table
+checks preserve the separate virtual GameObject base; 4,902 native calls check
+the bodies' unchanged storage and FP state.
 
-The [bit-string shifts](BITSTRING_SHIFTS.md) supply two missing sub-word
-operations through one individually reviewed sample. Their complete retail
-extents are 420/442 bytes; VC6 emits 420/438 bytes with 343/93 resolved matching
-positions. They remain nonexact. Extraction preserves all 22 existing aggregate
-sections and 38 relocations. The only dependency is the existing mask table;
-422,838 native cases exercise actual source wrappers, independent bit oracles,
-aliases and progressive faults within the documented finite domain.
+Six [Scene reader callbacks](SCENE_CALLBACKS.md) supply strict three-byte return
+bodies for 74 direct calls in ten complete strict readers. Their provisional
+names and overload grouping remain explicit. Native checks exercise 36,864 calls
+with prepared, null and unreadable receivers and pointer arguments.
 
-All 236 prior production objects retain 10,584 nondebug sections and 45,548
-relocation destinations under the one intended Vehicle call-name substitution,
-including its transition to the naturally emitted canonical COMDAT. That added
-33-byte body is checked independently. Both new standalone objects are recompiled
-with the actual game's commands and preserve all section bytes and relocations.
-Real isolated links remove exactly four missing names, **299 -> 297 -> 295**,
-with none added. Private evidence is in
-`work/game-build/round40-link-evidence.json`, `round40-all-objects.json`,
-`round40-admitted.json` and `connections-round40-preservation.json`.
+The [CollisionPoint constants](COLLISION_POINT_STORAGE.md) use ordinary external
+const declarations to connect readers to existing zero/Y storage. All four
+objects, original copy-initialization expressions, eight initializer functions
+and ordered CRT entries are preserved. Native fixtures now use those actual
+source objects and CRT writes; the separate normalizer import remains unresolved.
+
+All 238 prior production objects retain 10,590 nondebug sections and 45,556
+relocations under only the two verified storage connections. No filename bytes
+are excluded. Both new standalone objects are independently recompiled with the
+actual game's commands and preserve all section bytes and relocations. Real
+isolated links remove exactly thirteen missing names, **295 -> 290 -> 284 -> 282**,
+with none added. The final report verifies all 240 source hashes, 224 header
+hashes, configuration, profile and per-source flags. Private evidence is in
+`work/game-build/round41-link-evidence.json`, `round41-all-objects.json`,
+`round41-admitted.json` and `connections-round41-preservation.json`.
 
 Linking, startup, integrated menus and racing remain unverified. The full
-regression suite passes 510 tests, with 11 explicit skips (521 total). Static
-checks pass for 240 Python files and 375 JSON files.
+regression suite passes 513 tests, with 11 explicit skips (524 total). Static
+checks pass for 243 Python files and 377 JSON files.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based
@@ -94,7 +96,7 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
 the current composition retains all prior physics targets, with 1,086 now strict-exact, and all
-2,990 distinct strict-exact calibration cases. A native link/runtime regression checks
+2,994 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 
