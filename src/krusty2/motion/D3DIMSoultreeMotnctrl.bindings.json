@@ -24,7 +24,7 @@
   "??_C@_0N@FNMN@General?5info?$AA@": "0x00568b60",
   "??_ED3DIMSoultreeCharacter@@UAEPAXI@Z": "0x00446680",
   "?AddChild@SoultreeObject@@QAEXPAV1@@Z": "0x004fd910",
-  "?Attach@UnknownParameterBlock@@QAEXPAVUnknownParameterStream@@HH@Z": "0x004b77a0",
+  "?Attach@UnknownParameterBlock@@QAEXPAVUnknownTextureStream@@HH@Z": "0x004b77a0",
   "?ReadClock@@YAIXZ": "0x004bfa80",
   "?CharacterVirtualSlot0@D3DIMSoultreeCharacter@@UAEXXZ$ehhandler": "0x0054a25e",
   "?CharacterVirtualSlot8@Character@@UAEXH@Z": "0x004a98b0",

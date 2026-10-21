@@ -1,3 +1,4 @@
+#include "../../src/reconstructed/GUIManagerCore.h"
 // Near-miss bikerace.cpp candidates, kept out of src/reconstructed until
 // they match. The canonical file is included first so the TU-local
 // declarations, statics and inline helpers are the same.

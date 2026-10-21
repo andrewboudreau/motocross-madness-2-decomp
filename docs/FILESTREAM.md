@@ -117,9 +117,9 @@ values and buffer/key mutations:
 The sample's `WriteXorEncoded` declaration now uses the canonical
 `const unsigned char*` input and `unsigned char*` key types from
 `EcoSystem.cpp`. Explicit casts at the stream boundary preserve its call
-arguments. All five sample bodies retain identical emitted bytes and resolved
-relocation destinations compared with their preceding source; only that
-external symbol's C++ spelling changes.
+arguments. The subsequent shared inline ResetTextMode consolidation can
+change Seek's emitted instructions; the five methods remain reviewed nonexact
+candidates and are checked behaviorally rather than claimed byte-identical.
 
 The native VC6 differential test runs **12,390 scenarios** against the
 hash-pinned private executable. It compares returns, every byte of all three
@@ -132,7 +132,9 @@ dependency failures, header-byte mismatches and filename variations.
 
 Both sides use the same deterministic file/encoding boundary mocks. Only the
 five reference bodies are executed from private PE pages; decoded direct calls
-to the twelve known dependencies are redirected to those mocks. The source
+to the twelve known dependencies are redirected to the fixture. ResetTextMode
+uses its independently strict-verified shared accessor, including recursion;
+the other dependencies use mocks. The source
 test object substitutes only external CRT dependency names at compile time.
 This fixture is validation-only and is never linked into the source game.
 It does not exercise real disk errors or prove all possible inputs; malformed
@@ -144,8 +146,8 @@ RTTI. Other named stream views remain separate reconstruction work.
 
 ## Constructor connection
 
-The shared declaration in `FileStream.h` (included by `TextureMap.h`) and the
-reduced declaration in `EcoSystem.h` now both take
+The shared declaration in `FileStream.h` (included by `TextureMap.h` and
+`EcoSystem.h`) takes
 `UnknownResourceManager*`. This is a type inference supported by the constructor
 storing its argument at `+0x12c`, `FindArchive` calling `FindItem` through that
 field, and callers supplying `g_ResourceManager` or the resource manager's
@@ -158,6 +160,21 @@ the stream-construction boundary. The stream's layout and constructor stores
 are unchanged; its exact comparison includes the complete emitted extent and
 resolved relocations. This connection does not establish the original class
 name or unify the separate reduced resource-manager declarations.
+
+The parameter-reader stream view is an alias of this shared declaration.
+`ResetTextMode` is now a recursive inline accessor alongside GetTextMode and
+SetTextMode. SelectSection preserves its strict 573-byte body and naturally
+emits the accessor's complete, strict 30-byte copy in Parameterblocks.cpp;
+the calibration check follows that emitted copy. This does not assign original
+TU ownership. Parameterblocks now uses the shared ResourceManager declarations,
+with the same archive and offset fields. FindItem and AddLooseFile resolve to
+canonical providers; AddArchive is supplied by the reviewed nonexact
+[archive loader candidate](RESOURCEMANAGER.md#functional-build-review).
+The native stream differential test
+still passes all 12,390 scenarios with the shared accessor; the fixture no
+longer supplies its own duplicate reset body or records that internal accessor
+as an external side effect. All stream-state bytes still participate in the
+differential comparison.
 
 ```powershell
 $env:VC6_ROOT = 'C:\path\to\vc6sp3'

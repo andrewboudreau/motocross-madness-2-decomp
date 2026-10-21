@@ -7,66 +7,18 @@ class Camera;
 class RenderTarget;
 struct UnknownKrustyUIModelObject;
 
-// Object at KrustyUI+0x2c (its methods sit among GUIManager.cpp's literals).
-class UnknownTrackGameObject56cItem;
-// Object at a GUI layer's +0xc0.
-struct UnknownKrustyUIGuiLayerItem {
+// Shared GUI manager and user declarations. Legacy view names are aliases;
+// object storage and methods belong to the existing GUI implementations.
+class GUIManager;
+class GUIUser;
+typedef GUIManager UnknownKrustyUIGui;
+typedef GUIUser UnknownKrustyUIGuiLayer;
+
+// Tooltip option boundary used without importing the Windows drawing types.
+struct UnknownKrustyUIToolTipView {
     unsigned char field_0x00[0x5c];
-    int enabled;                              // +0x5c ToolTip::enabled; set from TrackGame+0xc4c, the tool tips option (EventManager 0x0045e710)
+    int enabled;
 };
-
-// One of the GUI's four layers (+0x330).
-struct UnknownKrustyUIGuiLayer {
-    void AcceptDevice(int value);    // 0x00487c30
-    void ForgetDevices();             // 0x00487d60
-
-    unsigned char field_0x00[0x30];
-    GameObject* userCursor;                   // +0x30 the cursor (bikerace.cpp slot 23 tests its +0x25 bit 0)
-    unsigned char field_0x34[0xc0 - 0x34];
-    UnknownKrustyUIGuiLayerItem* userToolTip; // +0xc0
-};
-
-class TextureMapManager;
-class BackgroundImage;
-
-class UnknownKrustyUIGui {
-public:
-    explicit UnknownKrustyUIGui(int flags);                  // 0x00485190 (0x3e0 bytes; GUIManager.cpp)
-    // 0x004853b0: sets the GUI up (font, cursor, progress callback); returns
-    // the object KrustyUI adds as its child.
-    GameObject* SetUp(void* owner, int a, TextureMapManager* textures, int b, int c,
-                      int d, const char* font, int fontSize, const char* cursor,
-                      void (*progress)(), int e);
-    void SetDialogDirectory(const char* directory);       // 0x00485d70 ("ui")
-    void SetWaitCursorImage(const char* image);           // 0x00486560 ("ui\\wait.tga")
-    void SetToolTipFont(char* font);                  // 0x004866c0
-    void ShowCursors(int value);                             // 0x00486630
-    void CloseDialogResource();                            // 0x00485d50 (KrustyUI 0x004999b0)
-    UnknownTrackGameObject56cItem* FindInputDialog();        // 0x00485df0
-    void CreateBackground();                                 // 0x00485ef0
-    UnknownKrustyUIGuiLayer* GetUser(int index); // 0x00486540: layer `index` (0 past 3)
-    void CreateCursors(const char* image, int visible); // 0x00486590 (bikerace.cpp: "ui\\cursor.tga")
-    void EnableWindowClipper(int value);                     // 0x004868b0
-    // 0x00485a70: shows `dialog` (EventManager 0x0045e710 passes 0, 2, 0, 0,
-    // 0, 0, 1).
-    void ShowDialog(GameObject* dialog, int a, int b, int c, int d, int e, int f, int g);
-    void ReleaseBackground();                            // 0x00485fc0: releases the background
-
-    unsigned char field_0x000[0x3c];
-    BackgroundImage* guiBackground;           // +0x03c the background (dlgprocs.cpp 0x004536e0)
-    unsigned char field_0x040[0xec - 0x40];
-    int uiAnimations;                         // +0x0ec GUIManager::uiAnimations; from TrackGame+0xc40 (KrustyUI 0x004988a0)
-    unsigned char field_0x0f0[0x30c - 0xf0];
-    int keyboardDevice;                       // +0x30c GUIManager::keyboardDevice
-    unsigned char field_0x310[0x34c - 0x310];
-    int soundVolume;                          // +0x34c GUIManager::soundVolume
-    char toolTipFontFace[0x3d0 - 0x350];      // +0x350 font face (TrackOverlay 0x0051b320)
-    float fontSizeOffset;                     // +0x3d0 string 0xfed's value when nonzero; added to the dialog font heights (0x0046a920)
-    int toolTipBold;                          // +0x3d4 string 0x1469's value; bold font
-    int toolTipItalic;                        // +0x3d8 italic font (TrackOverlay 0x0051b320)
-    unsigned char field_0x3dc[0x3e0 - 0x3dc];
-};
-
 
 // Page object at +0x490 (see samples/game/EventManagerNearMisses.cpp).
 class UnknownGameUiPage;

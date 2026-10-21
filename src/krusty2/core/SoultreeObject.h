@@ -28,7 +28,8 @@
 #define MCM2_PHYSICS_COMMON_SOULTREEOBJECT_H
 
 class UnknownParameterBlock;
-class UnknownParameterStream;
+class UnknownTextureStream;
+typedef UnknownTextureStream UnknownParameterStream;
 
 #ifdef SOULTREE_OBJECT_WITH_BASES
 #include "collision/CollisionObject.h"   // QuadTreeObject, GameObject

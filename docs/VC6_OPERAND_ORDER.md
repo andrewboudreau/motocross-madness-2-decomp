@@ -238,13 +238,21 @@ they are source-form differences under the deterministic rules of section 1.
   new windows are `(62, 63)`, `(0, 1)` and `(4, 38)`, so it is still a narrow
   fit. Function order that follows retail addresses is the defensible lever
   here; padding declarations are not.
-- ManagedTextureGroup::DrawSelection (`0x0050ef70`) worked the same way. With
-  EventManager.h no longer included through TrackGame.h, it went to 1838
-  bytes, with windows `(17, 25)`, `(29, 39)` and `(44, 53)`. Defining
-  FitTexturesToBudget (`0x0050d800`) and its inline helper at their retail
-  position, before the comparators at `0x0050ee70`, restored it. TextureMapManager.h
-  already declares both functions. The new windows are `(58, 63)`, `(0, 4)`,
-  `(9, 18)` and `(46, 54)`.
+- ManagedTextureGroup::DrawSelection (`0x0050ef70`) worked the same way. Before
+  the shared GUI declaration consolidation, removing EventManager.h from
+  TrackGame.h produced 1838 bytes, with windows `(17, 25)`, `(29, 39)` and
+  `(44, 53)`. Moving FitTexturesToBudget (`0x0050d800`) and its inline helper
+  before the comparators restored it in that composition, with windows
+  `(58, 63)`, `(0, 4)`, `(9, 18)` and `(46, 54)`.
+  The composed GUI declarations changed this again. The current consumer
+  includes Game.h and TrackGameGlobal.h: it only uses Game's testKey and
+  display fields, so it does not need derived TrackGame or GUI declarations.
+  TrackGame RTTI COL `0x0055f8e0` proves its nonvirtual Game base has offset
+  zero. Explicit casts preserve each read of the existing singleton pointer.
+  With that narrower dependency, retaining the earlier helper placement after
+  DrawSelection restores all 15 strict cases, including its full 1834 bytes.
+  This uses no padding declarations and leaves control flow, type layouts
+  and compiler flags unchanged.
 
 ### 2.4 Function-local definitions and x87 term order (period 32)
 

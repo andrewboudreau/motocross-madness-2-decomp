@@ -201,8 +201,6 @@
   "?SetCurrentState@UIMultiState@@QAEXH@Z": "0x00478cf0",
   "?SelectInGroup@UIRadioButton@@QAEHH@Z": "0x00479310",
   "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
-  "?ShowDialog@UnknownKrustyUIGui@@QAEXPAVGameObject@@HHHHHHH@Z": "0x00485a70",
-  "?FindInputDialog@UnknownKrustyUIGui@@QAEPAVUnknownTrackGameObject56cItem@@XZ": "0x00485df0",
   "?RequestFocus@GUIUser@@QAEHPAVUnknownGuiControl@@PAPAV2@H@Z": "0x00487790",
   "?ShowScene@KrustyUI@@QAEXPAVGameObject@@@Z": "0x004999f0",
   "?HideScene@KrustyUI@@QAEXXZ": "0x00499a20",
@@ -374,5 +372,6 @@
   "_srand": "0x00534c0e",
   "_strncat": "0x00536b60",
   "_strncpy": "0x00534b10",
-  "?Tick@MPBikeRiderDlg@@UAEHM@Z": "0x004f8820"
+  "?Tick@MPBikeRiderDlg@@UAEHM@Z": "0x004f8820",
+  "?FindInputDialog@GUIManager@@QAEPAVUIDialog@@XZ": "0x00485df0"
 }

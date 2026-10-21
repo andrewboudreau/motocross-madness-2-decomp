@@ -29,7 +29,14 @@ public:
     int Write(const void* buffer, int size, int count); // 0x004618e0: writes
     int WriteByte(int c);         // 0x00461a60: writes a byte
     int WriteHeader(const char* path); // 0x00461b90: writes the header, keyed by the name
-    void ResetTextMode();             // 0x00461d20: restarts the key
+    // 0x00461d20: recursive accessor; SelectSection inlines its outer steps.
+    void ResetTextMode()
+    {
+        if (innerStream)
+            innerStream->ResetTextMode();
+        else
+            textMode = nameKey;
+    }
     // 0x0043e9e0 (out-of-line copy): the text-mode byte.
     char GetTextMode()
     {
@@ -87,3 +94,6 @@ public:
     UnknownResourceManager* archives;         // +0x12c the archives (constructor argument)
     int sliceOffset;                          // +0x130 start offset in the inner stream
 };
+
+// Parameter readers use the same 0x134-byte archive stream.
+typedef UnknownTextureStream UnknownParameterStream;

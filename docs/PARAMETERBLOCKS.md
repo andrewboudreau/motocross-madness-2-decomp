@@ -58,15 +58,25 @@ the game's file stream, and archives can redirect that stream.
   - The out-of-line copies of three recursive inline stream accessors:
     `0x0043e9e0` (get the mode byte), `0x0043e9b0` (set it) and `0x00461d20`
     (reset it).
-  - The stream and archive views are declared under their own names
-    (`UnknownParameterStream`, `UnknownParameterArchive`). The reason is that
-    `TextureMap.h` lacks the line reader and the inline accessors, and
-    `UnknownResourceManager.h` declares `0x004e9030` as `void`, while this TU
-    tests its result.
+  - `UnknownParameterStream` is now an alias of the shared
+    `UnknownTextureStream` in `FileStream.h`. The parameter implementation
+    uses `ResourceManager.h`'s resource manager and `ResourceItem` declarations.
+    `AddArchive` returns the stream pointer tested by this caller;
+    `FindItem` supplies the archive at `+0x14` and offset at `+0x18`.
+    The former separate archive view is removed. FindItem and AddLooseFile
+    have canonical providers; AddArchive is supplied by the explicitly reviewed
+    nonexact [archive loader candidate](RESOURCEMANAGER.md#functional-build-review).
 - Allocator line numbers are literal operands:
   - 44, 141, 147, 273, 275, 285, 290, 318, 321, 362, 459, 471 and 802.
 
 ## Source details retail needs
+
+- The shared stream's recursive `ResetTextMode` remains inline. This preserves
+  SelectSection's complete 573-byte body; its recursive call also naturally
+  emits the exact 30-byte out-of-line copy at `0x00461d20`. That calibration
+  case now checks the Parameterblocks object. All 27 parameter-reader bodies
+  remain strict exact. This establishes body and call compatibility, not the
+  original header spelling or ownership of the emitted copy.
 
 - `0x004b6fb0` computes the string size into a local before calling
   `DebugMalloc`. Passing `strlen(text) + 1` as the argument moves the

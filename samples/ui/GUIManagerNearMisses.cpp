@@ -5,12 +5,6 @@
 //
 // 0x004853b0 (SetUp) is exact in src/reconstructed/GUIManager.cpp with a `short`
 //   font-size parameter (docs/VC6_FRAME_LAYOUT.md: dead argument slots).
-// 0x00485a70 (345 bytes): same calls and argument order; retail keeps
-//   `flags & 4` in edi and `wait` in ebp, VC6 here keeps `a`/`parent` in
-//   ebp (a `flags & 4` local makes it worse: 21/347, the local lands in
-//   ecx; also with the local assigned in the condition). Inverting the
-//   first test (`(flags & 4) || (flags & 2)` with the grab code first)
-//   compiles the same.
 // 0x00486170 (896 bytes): same logic; retail keeps three more stack locals
 //   (frame 0xb0 against 0xa4) and allocates registers differently around
 //   the row copy and the 8-bit dim loop. Retail has two return tails
@@ -73,42 +67,6 @@
 //   (the duplicated test that matches 0x004705d0 does not help here).
 
 #include "../../src/reconstructed/GUIManager.cpp"
-
-// 0x00485a70
-UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
-                                                   UIDialog* parent, int c, int d, int wait) {
-    CameraRect screen;
-    CameraRect* rect;
-
-    if (!(flags & 4) && !(flags & 2)) {
-        if (!FindInputDialog() || !FindInputDialog()->isModal)
-            ReleaseBackgroundGrab();
-    } else {
-        rect = 0;
-        if (flags & 0x10) {
-            screen.left = screen.top = 0;
-            screen.right = ((RenderTarget*)renderContext)->targetWidth;
-            screen.bottom = ((RenderTarget*)renderContext)->targetHeight;
-            rect = &screen;
-        }
-        if (parent)
-            parent->SetModalPause(1, flags & 8, rect);
-        else if ((flags & 4) && (flags & 0x10))
-            GrabBackground(flags & 8);
-    }
-    if (wait)
-        RecreateCursors(waitCursorImage, paletteChanged == 0);
-    if (dialog->UnknownVirtualSlot27(renderContext, (CameraRect*)b, a, flags, guiSoundGroup, guiTextures, dialogDirectory,
-                                     parent, guiBackground, dialogFontName, dialogFontSize, this, users[0],
-                                     (const char*)d)) {
-        dialog->showFlags = flags;
-        AttachDialog(dialog, a, wait);
-        return dialog;
-    }
-    if (wait)
-        RecreateCursors(cursorImage, paletteChanged == 0);
-    return 0;
-}
 
 // 0x00486170
 PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {

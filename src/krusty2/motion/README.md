@@ -50,11 +50,11 @@ unknown. Eight formerly missing constructor/destructor/reader symbols now
 resolve to the existing implementation. Getter return values remain unused
 where the former view declared them void.
 
-`UnknownParameterStream` remains a separate stream view at the Attach boundary.
-Its inline ResetTextMode affects SelectSection's exact code: replacing it with
-the shared stream's out-of-line declaration shortens that target from 573 to
-533 bytes. That broader consolidation is deferred; the parameter-block
-connection preserves the complete 573-byte strict match.
+`UnknownParameterStream` is now an alias of the shared `UnknownTextureStream`.
+Its recursive ResetTextMode is inline in `FileStream.h`, preserving
+SelectSection's complete 573-byte strict match and naturally emitting the
+exact 30-byte accessor in the Parameterblocks object. Attach and the stream
+read/seek calls now use the supplied implementations directly.
 
 ## Spheres.cpp
 - `__FILE__` string `D:\aardvark\VC\krusty2\Spheres.cpp` at `0x00574568`; one use (debug `new`, line 4) in the

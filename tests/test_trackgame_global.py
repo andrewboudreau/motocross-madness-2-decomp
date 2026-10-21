@@ -26,7 +26,7 @@ class TrackGameGlobalTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-trackgame-') as directory:
             output = Path(directory)
             objects = []
-            for stem in ('particle', 'eco', 'smoke'):
+            for stem in ('particle', 'eco', 'game', 'smoke'):
                 source = ROOT / f'tests/fixtures/trackgame_global_{stem}.cpp'
                 obj = output / f'{stem}.obj'
                 result = subprocess.run([
@@ -40,9 +40,12 @@ class TrackGameGlobalTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 coff = CoffObject(obj)
                 shared = [s for s in coff.symbols if s.name == GLOBAL]
-                self.assertEqual(len(shared), 1)
-                self.assertEqual(shared[0].storage_class, 2)
-                if stem != 'smoke':
+                if stem == 'game':
+                    self.assertTrue(all(s.section_number == 0 for s in shared))
+                else:
+                    self.assertEqual(len(shared), 1)
+                    self.assertEqual(shared[0].storage_class, 2)
+                if stem not in ('smoke', 'game'):
                     self.assertEqual(shared[0].section_number, 0)
                     self.assertEqual(shared[0].value, 0)
                 objects.append(str(obj))

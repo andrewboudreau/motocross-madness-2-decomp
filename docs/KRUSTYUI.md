@@ -131,12 +131,14 @@ same file.
 
 Near misses (`samples/ui/KrustyUINearMisses.cpp`, own bindings file):
 
-- `0x004988a0`, TrackGame slot 4's initialiser (872 of 1104 bytes). It loads
+- `0x004988a0`, TrackGame slot 4's initialiser (1102 emitted bytes versus 1104 retail bytes). It loads
   36 short strings (resources 5000–5035) into `0x0068a498`, the GUI scale
   (0xfed) and font (0xff2, else "Arial"), creates the GUI (line 121), loads
   `ui`, `ui\wait.tga` and `ui\uires.res`, restores "MRUProfile" and
   "JoystickFilter", and offline opens `Intro1Dlg` (line 201). From the scale
-  store on, retail picks different registers.
+  store on, retail picks different registers. The shared GUI declaration
+  also fixes SetUp to ten arguments and passes -1 to AppendSibling separately;
+  this candidate remains nonexact (see [GUI connections](GUIMANAGER.md)).
 - `0x0049b0d0`, which picks distinct random bikes and riders for the AI
   (880 of 916 bytes). Retail places the "class 1 above 0.2" arm after the
   probe loop; every if/else, goto and ternary form tried keeps it before.

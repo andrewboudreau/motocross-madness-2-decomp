@@ -49,7 +49,7 @@
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
   "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
-  "?Attach@UnknownParameterBlock@@QAEXPAVUnknownParameterStream@@HH@Z": "0x004b77a0",
+  "?Attach@UnknownParameterBlock@@QAEXPAVUnknownTextureStream@@HH@Z": "0x004b77a0",
   "?SelectSection@UnknownParameterBlock@@QAEHPBD@Z": "0x004b78f0",
   "?GetString@UnknownParameterBlock@@QAEHPBD0PADH@Z": "0x004b7ec0",
   "?GetInt@UnknownParameterBlock@@QAEHPBDHPAH@Z": "0x004b7f10",

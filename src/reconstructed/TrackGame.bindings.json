@@ -77,8 +77,6 @@
   "?DisableByClassName@GameObject@@IAEXPBD@Z": "0x00468dd0",
   "?EnableByClassName@GameObject@@IAEXPBD@Z": "0x00468f10",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
-  "?FindInputDialog@UnknownKrustyUIGui@@QAEPAVUnknownTrackGameObject56cItem@@XZ": "0x00485df0",
-  "?ShowCursors@UnknownKrustyUIGui@@QAEXH@Z": "0x00486630",
   "?Create@KrustyUI@@QAEPAVGameObject@@PAVRenderTarget@@H@Z": "0x004988a0",
   "?BuildGarageScene@KrustyUI@@QAEXH@Z": "0x00498cf0",
   "?OpenMenu@KrustyUI@@QAEXH@Z": "0x00499b20",
@@ -135,5 +133,7 @@
   "__imp__SystemParametersInfoA@16": "0x005502c0",
   "__real@4@3ff583126f0000000000": "0x005541e8",
   "_sprintf": "0x00534aaf",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "?FindInputDialog@GUIManager@@QAEPAVUIDialog@@XZ": "0x00485df0",
+  "?ShowCursors@GUIManager@@QAEXH@Z": "0x00486630"
 }

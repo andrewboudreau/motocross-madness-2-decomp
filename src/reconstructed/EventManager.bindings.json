@@ -69,12 +69,6 @@
   "?Unlink@GameObject@@QAEHXZ": "0x004691f0",
   "?FindControl@UnknownGameUiPage@@QAEPAVUIControl@@PBDH@Z": "0x0046ebf0",
   "?EndDialog@UnknownTrackGameObject56cItem@@QAEXH@Z": "0x0046ff30",
-  "?ShowDialog@UnknownKrustyUIGui@@QAEXPAVGameObject@@HHHHHHH@Z": "0x00485a70",
-  "?FindInputDialog@UnknownKrustyUIGui@@QAEPAVUnknownTrackGameObject56cItem@@XZ": "0x00485df0",
-  "?CreateBackground@UnknownKrustyUIGui@@QAEXXZ": "0x00485ef0",
-  "?GetUser@UnknownKrustyUIGui@@QAEPAUUnknownKrustyUIGuiLayer@@H@Z": "0x00486540",
-  "?ShowCursors@UnknownKrustyUIGui@@QAEXH@Z": "0x00486630",
-  "?EnableWindowClipper@UnknownKrustyUIGui@@QAEXH@Z": "0x004868b0",
   "?StepProgressBar@KrustyUI@@QAEXXZ": "0x0049b530",
   "?RecordRaceResults@KrustyUI@@QAEXXZ": "0x0049bbb0",
   "?ReportRaceToZone@UnknownTrackGameObject3410@@QAEHXZ": "0x0049c770",
@@ -135,5 +129,11 @@
   "_qsort": "0x00534426",
   "_sprintf": "0x00534aaf",
   "_strchr": "0x00535f10",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
+  "?FindInputDialog@GUIManager@@QAEPAVUIDialog@@XZ": "0x00485df0",
+  "?CreateBackground@GUIManager@@QAEXXZ": "0x00485ef0",
+  "?GetUser@GUIManager@@QAEPAVGUIUser@@H@Z": "0x00486540",
+  "?ShowCursors@GUIManager@@QAEXH@Z": "0x00486630",
+  "?EnableWindowClipper@GUIManager@@QAEHH@Z": "0x004868b0"
 }

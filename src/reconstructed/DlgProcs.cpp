@@ -1,3 +1,4 @@
+#include "GUIManagerCore.h"
 #include "DlgProcs.h"
 
 #include "DialogEventKind.h"
@@ -528,19 +529,19 @@ void SinglePlayerDlg::OpenPage(int page) {
     case 0:
         if (!eventPage) {
             eventPage = new(__FILE__, 1401) SPEventDlg;
-            g_TrackGame->ui->gui->ShowDialog(eventPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)eventPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 1:
         if (!bikeRiderPage) {
             bikeRiderPage = new(__FILE__, 1407) SPBikeRiderDlg;
-            g_TrackGame->ui->gui->ShowDialog(bikeRiderPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)bikeRiderPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 2:
         if (!raceInfoPage) {
             raceInfoPage = new(__FILE__, 1413) SPRaceInfoDlg;
-            g_TrackGame->ui->gui->ShowDialog(raceInfoPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)raceInfoPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     }
@@ -1408,7 +1409,7 @@ void CreateProfile(UnknownDialogEvent* event) {
         return;
     if (g_TrackGame->profileDirectory->Contains(name)) {
         ProfileExistsDlg* dialog = new(__FILE__, 3416) ProfileExistsDlg;
-        g_TrackGame->ui->gui->ShowDialog(dialog, 0, 4, 0, (int)event->dialog,
+        g_TrackGame->ui->gui->ShowDialog((UIDialog*)dialog, 0, 4, 0, (UIDialog*)event->dialog,
                                                                      (int)name, 0, 1);
         return;
     }
@@ -1908,7 +1909,7 @@ void Intro1Dlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogClose:
         if (!g_TrackGame->shuttingDown) {
             Intro2Dlg* dialog = new(__FILE__, 4217) Intro2Dlg;
-            g_TrackGame->ui->gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 0);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 0);
         }
         break;
     case kDialogInit:
@@ -1940,7 +1941,7 @@ void Intro2Dlg::HandleEvent(UnknownDialogEvent* event) {
         if (!g_TrackGame->shuttingDown) {
             if (!g_IntroSkipped) {
                 Intro3Dlg* dialog = new(__FILE__, 4256) Intro3Dlg;
-                g_TrackGame->ui->gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 0);
+                g_TrackGame->ui->gui->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 0);
             } else {
                 g_TrackGame->ui->OpenMenu(kMenuMain);
                 g_TrackGame->ui->gui->ShowCursors(1);
@@ -2054,22 +2055,22 @@ void LeaveMenusForRace() {
     }
     switch (g_TrackGame->mode.raceSettings.eventType) {
     case 3:
-        g_TrackGame->ui->gui->ShowDialog(new(__FILE__, 4405) LoadSupercrossDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        g_TrackGame->ui->gui->ShowDialog((UIDialog*)new(__FILE__, 4405) LoadSupercrossDlg(1), 0, 2, 0, 0, 0, 0, 0);
         break;
     case 5:
-        g_TrackGame->ui->gui->ShowDialog(new(__FILE__, 4408) LoadEnduroDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        g_TrackGame->ui->gui->ShowDialog((UIDialog*)new(__FILE__, 4408) LoadEnduroDlg(1), 0, 2, 0, 0, 0, 0, 0);
         break;
     case 0:
-        g_TrackGame->ui->gui->ShowDialog(new(__FILE__, 4411) LoadQuarryDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        g_TrackGame->ui->gui->ShowDialog((UIDialog*)new(__FILE__, 4411) LoadQuarryDlg(1), 0, 2, 0, 0, 0, 0, 0);
         break;
     case 4:
-        g_TrackGame->ui->gui->ShowDialog(new(__FILE__, 4414) LoadTagDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        g_TrackGame->ui->gui->ShowDialog((UIDialog*)new(__FILE__, 4414) LoadTagDlg(1), 0, 2, 0, 0, 0, 0, 0);
         break;
     case 1:
-        g_TrackGame->ui->gui->ShowDialog(new(__FILE__, 4417) LoadBajaDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        g_TrackGame->ui->gui->ShowDialog((UIDialog*)new(__FILE__, 4417) LoadBajaDlg(1), 0, 2, 0, 0, 0, 0, 0);
         break;
     case 2:
-        g_TrackGame->ui->gui->ShowDialog(new(__FILE__, 4420) LoadNationalsDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        g_TrackGame->ui->gui->ShowDialog((UIDialog*)new(__FILE__, 4420) LoadNationalsDlg(1), 0, 2, 0, 0, 0, 0, 0);
         break;
     }
 }
@@ -2141,13 +2142,13 @@ void GhostReplayDlg::OpenPage(int page) {
     case 0:
         if (!ghostPage) {
             ghostPage = new(__FILE__, 4498) GhostFilesDlg;
-            g_TrackGame->ui->gui->ShowDialog(ghostPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)ghostPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 1:
         if (!replayPage) {
             replayPage = new(__FILE__, 4504) ReplayFilesDlg;
-            g_TrackGame->ui->gui->ShowDialog(replayPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)replayPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     }

@@ -1,3 +1,4 @@
+#include "GUIManagerCore.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -428,7 +429,7 @@ void TrackGame::SetMenuOpen(int open, int id, int sound) {
             return;
         if (id != ui->currentMenu)
             return;
-        ui->gui->FindInputDialog()->UnknownVirtualSlot26();
+        ui->gui->FindInputDialog()->MarkPendingRelease();
         GameObject* current = eventManager->FindRaceMode();
         if (current)
             current->Enable();

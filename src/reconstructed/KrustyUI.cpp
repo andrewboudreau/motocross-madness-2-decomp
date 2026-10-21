@@ -1,3 +1,4 @@
+#include "GUIManagerCore.h"
 #include "KrustyUI.h"
 
 #include <stdio.h>
@@ -152,12 +153,6 @@ struct UnknownKrustyUIContext {
     int halvings;                             // +0x14 halve wide textures once when video memory is short
 };
 
-// The GUI's 0x00485c80 (GUIManager.h) opens a dialog resource.
-class UnknownKrustyUIGuiView {
-public:
-    int OpenDialogResource(const char* resource);
-};
-
 // The garage scene's static vectors have an empty destructor: retail
 // registers six empty atexit handlers (0x00499920..0x00499970).
 struct UnknownKrustyUIVector : public Vector3 {
@@ -274,7 +269,7 @@ void KrustyUI::BuildGarageScene(int value) {
         allowIme = g_TrackGame->GetRegistryFlag("AllowIME", allowIme);
         if (allowIme)
             gui->EnableWindowClipper(1);
-        ((UnknownKrustyUIGuiView*)gui)->OpenDialogResource("global.dtm");
+        gui->OpenDialogResource("global.dtm");
         garageFocus = kVec3Zero;
         KRUSTYUI_RIDER_POSITION = kVec3Zero;
         KRUSTYUI_RIDER_POSITION.y += 0.1f;
@@ -509,46 +504,46 @@ void KrustyUI::OpenMenu(int menu) {
     switch (menu) {
     case kMenuMain:
         dialog = new(__FILE__, 674) MainDlg;
-        gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, menu, 2, 0, 0, 0, 0, 1);
         g_TrackGame->ResetClock();
         break;
     case kMenuSinglePlayer:
         dialog = new(__FILE__, 681) SinglePlayerDlg;
-        gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
     case kMenuOptions:
         dialog = new(__FILE__, 685) OptionsDlg;
-        gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
     case kMenuLoading:
         if (g_TrackGame->mode.displayModeIndex != g_TrackGame->display->currentDisplayMode)
             g_TrackGame->SwitchDisplayMode(g_TrackGame->mode.displayModeIndex);
         dialog = new(__FILE__, 695) LoadingDlg(1);
-        gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
     case kMenuHostJoin85c:
     case kMenuHostJoin85d:
         dialog = new(__FILE__, 727) HostJoinDlg;
-        gui->ShowDialog(dialog, menu, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, menu, 4, 0, (UIDialog*)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuMultiPlayer866:
     case kMenuMultiPlayer867:
     case kMenuMultiPlayer868:
         dialog = new(__FILE__, 733) MultiPlayerDlg;
-        gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
     case kMenuSerialPopup:
         dialog = new(__FILE__, 737) SerialPopupDlg;
-        gui->ShowDialog(dialog, kMenuSerialPopup, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, kMenuSerialPopup, 4, 0, (UIDialog*)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuTCPAddress:
         dialog = new(__FILE__, 741) TCPAddressDlg;
-        gui->ShowDialog(dialog, menu, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, menu, 4, 0, (UIDialog*)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuPCCentral:
         if (g_TrackGame->proCircuit) {
             dialog = new(__FILE__, 747) PCCentralDlg;
-            gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
+            gui->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
         }
         break;
     case kMenu88e: {
@@ -561,54 +556,54 @@ void KrustyUI::OpenMenu(int menu) {
             }
             if (g_TrackGame->mode.raceSettings.raceMode == 1) {
                 dialog = new(__FILE__, 760) PCLastRaceDlg;
-                gui->ShowDialog(dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
+                gui->ShowDialog((UIDialog*)dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
             } else {
                 dialog = new(__FILE__, 763) PCCentralDlg;
-                gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
+                gui->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             }
         } else if (g_TrackGame->playerCount == 1) {
             dialog = new(__FILE__, 767) SinglePlayerDlg;
-            gui->ShowDialog(dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
+            gui->ShowDialog((UIDialog*)dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
         } else {
             dialog = new(__FILE__, 769) MultiPlayerDlg;
-            gui->ShowDialog(dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
+            gui->ShowDialog((UIDialog*)dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
         }
         break;
     }
     case kMenuWaitOrCall:
         dialog = new(__FILE__, 774) WaitOrCallDlg;
-        gui->ShowDialog(dialog, menu, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, menu, 4, 0, (UIDialog*)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuTrackRecord910:
     case kMenuTrackRecord911:
         dialog = new(__FILE__, 788) TrackRecordDlg;
-        gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
     case kMenuUserNameBb9:
     case kMenuUserNameBba:
     case kMenuUserNameBbb:
         dialog = new(__FILE__, 798) UserNameDlg;
-        gui->ShowDialog(dialog, menu, 0xc, 0, (int)gui->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, menu, 0xc, 0, (UIDialog*)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuRemoveProfile:
         dialog = new(__FILE__, 802) RemoveProfileDlg;
-        gui->ShowDialog(dialog, menu, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, menu, 4, 0, (UIDialog*)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuConnectError:
         dialog = new(__FILE__, 806) ConnectErrorDlg;
-        gui->ShowDialog(dialog, kMenuConnectError, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, kMenuConnectError, 4, 0, (UIDialog*)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuPlayerRemoved:
         dialog = new(__FILE__, 810) PlayerRemovedDlg;
-        gui->ShowDialog(dialog, kMenuPlayerRemoved, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, kMenuPlayerRemoved, 4, 0, (UIDialog*)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuExit:
         dialog = new(__FILE__, 817) ExitDlg;
-        gui->ShowDialog(dialog, kMenuExit, 0x1c, 0, 0, 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, kMenuExit, 0x1c, 0, 0, 0, 0, 1);
         break;
     case kMenuContinue:
         dialog = new(__FILE__, 822) ContinueDlg;
-        gui->ShowDialog(dialog, menu, 0x1c, 0, 0, 0, 0, 1);
+        gui->ShowDialog((UIDialog*)dialog, menu, 0x1c, 0, 0, 0, 0, 1);
         break;
     }
 }
@@ -617,7 +612,7 @@ void KrustyUI::OpenMenu(int menu) {
 void KrustyUI::OpenExitDialog() {
     DisableByClassName("MediaControl");
     gui->ShowCursors(0);
-    gui->ShowDialog(new(__FILE__, 836) Exit1Dlg, 0, 2, 0, 0, 0, 0, 1);
+    gui->ShowDialog((UIDialog*)new(__FILE__, 836) Exit1Dlg, 0, 2, 0, 0, 0, 0, 1);
 }
 
 // 0x0049a540: reads presets.pb's garage tables, or sets the defaults.

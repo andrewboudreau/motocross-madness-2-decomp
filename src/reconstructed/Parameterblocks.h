@@ -7,73 +7,7 @@
 
 #include "UnknownTokenizer.h"
 
-class UnknownParameterStream;
-
-// What 0x004e9360 returns: an archive entry naming the stream and offset
-// that hold a file.
-struct UnknownParameterArchiveEntry {
-    unsigned char field_0x00[0x14];
-    UnknownParameterStream* holderStream;     // +0x14 stream holding the file
-    int holderOffset;                         // +0x18 offset of the file in it
-};
-
-// The archive list a stream points to at +0x12c. Tier 2: the same retail
-// object as UnknownResourceManager (UnknownResourceManager.h), whose shared
-// declaration types 0x004e9030 as void; Parameterblocks.cpp tests its result,
-// so this view declares the three members it calls with their own addresses.
-class UnknownParameterArchive {
-public:
-    UnknownParameterArchiveEntry* FindItem(const char* name, int a); // 0x004e9360: finds `name`
-    int AddArchive(const char* path, int flags);   // 0x004e9030: adds an archive
-    void AddLooseFile(const char* name, const char* path); // 0x004e9430: loads `name` from `path`
-};
-
-// The stream a parameter block reads. Tier 2: the same retail object as
-// UnknownTextureStream (TextureMap.h, whose header this TU must not edit);
-// this view adds the line reader and the three recursive inline accessors
-// whose out-of-line copies retail calls (0x0043e9e0, 0x0043e9b0, 0x00461d20).
-// Every accessor follows +0x1c to the innermost stream first.
-class UnknownParameterStream {
-public:
-    int Seek(int offset, int a, int origin); // 0x00461340: seeks
-    int Tell();                              // 0x00461600: read position
-    int ReadLine(char* buffer, int size);        // 0x00461aa0: reads a line, 0 at the end
-    int Read(void* buffer, int size, int count); // 0x00461640: reads `count` items (SoultreeMaterial.cpp)
-
-    // 0x0043e9e0 (out-of-line copy): the text-mode byte.
-    char GetTextMode()
-    {
-        if (innerStream)
-            return innerStream->GetTextMode();
-        return textMode;
-    }
-    // 0x0043e9b0 (out-of-line copy): sets the text-mode byte.
-    void SetTextMode(char mode)
-    {
-        if (innerStream)
-            innerStream->SetTextMode(mode);
-        else
-            textMode = mode;
-    }
-    // 0x00461d20 (out-of-line copy): restores the text-mode byte from +3.
-    void ResetTextMode()
-    {
-        if (innerStream)
-            innerStream->ResetTextMode();
-        else
-            textMode = initialTextMode;
-    }
-
-    char field_0x00;
-    char textMode;                         // +0x01 text-mode byte
-    char field_0x02;
-    char initialTextMode;                  // +0x03 its initial value
-    unsigned char field_0x04[0x1c - 0x04];
-    UnknownParameterStream* innerStream;      // +0x1c inner stream
-    unsigned char field_0x020[0x12c - 0x20];
-    UnknownParameterArchive* archives;        // +0x12c archives
-    int startOffset;                          // +0x130 start offset in the inner stream
-};
+#include "FileStream.h"
 
 // One parsed row value: 0 int, 1 float, 2 string (owned, DebugMalloc).
 struct UnknownParameterValue {

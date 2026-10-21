@@ -13,6 +13,12 @@
       "status": "reviewed-nonexact",
       "reason": "Five complete buffered/archive stream methods reviewed against retail and checked in 12390 native differential scenarios; VC6 bytes remain nonexact.",
       "evidence": "docs/FILESTREAM.md#functional-build-review"
+    },
+    {
+      "path": "samples/render/ResourceManagerNearMisses.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete AddArchive loader checked in 17292 native differential scenarios including constructor unwind paths; VC6 emits 798 bytes versus 804 retail bytes.",
+      "evidence": "docs/RESOURCEMANAGER.md#functional-build-review"
     }
   ],
   "includes": ["src/krusty2", "src/reconstructed"],

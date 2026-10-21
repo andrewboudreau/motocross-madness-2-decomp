@@ -346,7 +346,7 @@ void Bike::UnknownVirtualSlot67()
     crashTimer = 0.0f;
     prevCrashState = 0;
     linkedVehicle = 0;
-    steerTorque = g_BikeVec3_005778a8;
+    steerTorque = kVec3Zero;
 }
 
 float Bike::UnknownVirtualSlot73(const Vec3* a, const Vec3* b)
@@ -461,7 +461,7 @@ Bike::Bike(int flags) : GameObject(1), Vehicle(flags)
     dustEmitter = 0;
     dirtChunkEmitter = 0;
     steamEmitter = 0;
-    steerTorque = g_BikeVec3_005778a8;
+    steerTorque = kVec3Zero;
     frontWheelLifted = 0;
 }
 
@@ -1004,7 +1004,7 @@ Vec3 Bike::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
 {
     Vec3 v = Vehicle::UnknownVirtualSlot76(a, b);
     if (linearSpeed < 10.0f && savedPitch > 0.8727f && frontWheel->inContact) {
-        v = g_BikeVec3_005778a8;
+        v = kVec3Zero;
         if (angularVelocity.x < 0.0f)
             angularVelocity.x = 0;
     } else if (angularVelocity.x < -1.0f) {
@@ -1145,7 +1145,7 @@ static inline void BikeNormalizeInPlace(Vec3* v)
     float lenSq = v->y * v->y + v->x * v->x;
     lenSq += v->z * v->z;
     if (lenSq == 0.0f) {
-        *v = g_BikeVec3_005778a8;
+        *v = kVec3Zero;
     } else {
         float s = FastInvSqrt(lenSq);
         v->x *= s;
@@ -1513,7 +1513,7 @@ void Bike::UnknownVirtualSlot7(const Vec3* dir)
                 last = i;
             } else {
                 c->blendWeight = 0.0f;
-                c->appliedShare = g_BikeVec3_005778a8;
+                c->appliedShare = kVec3Zero;
             }
         }
         if (active == 1) {
@@ -1556,19 +1556,19 @@ void Bike::UnknownVirtualSlot7(const Vec3* dir)
             frontWheel->loadWeight = 1.0f;
             frontWheel->appliedShare = *dir;
             rearWheel->loadWeight = 0.0f;
-            rearWheel->appliedShare = g_BikeVec3_005778a8;
+            rearWheel->appliedShare = kVec3Zero;
         } else {
             frontWheel->loadWeight = 0.0f;
-            frontWheel->appliedShare = g_BikeVec3_005778a8;
+            frontWheel->appliedShare = kVec3Zero;
             rearWheel->loadWeight = 1.0f;
             rearWheel->appliedShare = *dir;
         }
     } else {
         BikeSteerToward(steerAxis, controlInput.y * 0.25f + 0.5f, stepTime);
         rearWheel->loadWeight = 0.0f;
-        rearWheel->appliedShare = g_BikeVec3_005778a8;
+        rearWheel->appliedShare = kVec3Zero;
         frontWheel->loadWeight = 0.0f;
-        frontWheel->appliedShare = g_BikeVec3_005778a8;
+        frontWheel->appliedShare = kVec3Zero;
     }
 }
 
@@ -1618,7 +1618,7 @@ void Bike::UnknownVirtualSlot91()
         // heading dot above) and the pivot is read through a reference
         float lenSq = BikeDot(&force, &force);
         if (lenSq == 0.0f) {
-            force = g_BikeVec3_005778a8;
+            force = kVec3Zero;
         } else {
             float s = FastInvSqrt(lenSq);
             force *= s;
@@ -1945,7 +1945,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
     case 0x69: {
         char* obj = (char*)((BikeCollisionEvent*)c)->field_0x60;
         ctx = *(int*)(obj + 0x34);
-        velA = g_BikeVec3_005778a8; velB = g_BikeVec3_005778a8; leverC = g_BikeVec3_005778a8;
+        velA = kVec3Zero; velB = kVec3Zero; leverC = kVec3Zero;
         s = Vec3(1.0f, 1.0f, 1.0f);
         l10 = 0.0f;
         otherVel = (Vec3*)(obj + 0x40);
@@ -1987,7 +1987,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
     case 0x2711: {
         char* obj = (char*)((BikeCollisionEvent*)c)->field_0x60;
         ctx = *(int*)(obj + 0x1a0);
-        velA = g_BikeVec3_005778a8; velB = g_BikeVec3_005778a8; leverC = g_BikeVec3_005778a8;
+        velA = kVec3Zero; velB = kVec3Zero; leverC = kVec3Zero;
         s = Vec3(1.0f, 1.0f, 1.0f);
         l10 = 0.0f;
         otherVel = (Vec3*)(obj + 0x224);
@@ -2022,7 +2022,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         tmp = velocity + scratchVector;
         UnknownVirtualSlot3(&((BikeContactSet*)collisionObject)->field_0xac, &tmp, &rel, &s, b, 0, &out);
         if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
-            velocity = g_BikeVec3_005778a8;
+            velocity = kVec3Zero;
             angularVelocity.y = 0.0f;
             linearSpeed = 0.0f;
         }

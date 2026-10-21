@@ -101,7 +101,7 @@
   "?GetSubtreeBounds@D3DIMSoultreeObject@@QAEXPAUVector3@@0@Z": "0x004fe850",
   "?RegisterNode@SoultreeObject@@QAEXXZ": "0x004fedb0",
   "?Attach@SoultreeMaterial@@QAEPAV1@PAVRenderTarget@@PBUSoultreeTextureOptions@@PAVTextureMapManager@@H@Z": "0x004ff0b0",
-  "?ReadSaved@SoultreeMaterial@@QAEXPAVUnknownParameterStream@@@Z": "0x004ff450",
+  "?ReadSaved@SoultreeMaterial@@QAEXPAVUnknownTextureStream@@@Z": "0x004ff450",
   "?LoadTexture@SoultreeMaterial@@QAEXXZ": "0x004ff620",
   "?ReadKeys@SoultreeMaterial@@QAEXPAVUnknownParameterBlock@@H@Z": "0x004ff9e0",
   "?MakeUntextured@SoultreeMaterial@@QAEXXZ": "0x005000b0",

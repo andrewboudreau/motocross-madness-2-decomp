@@ -33,7 +33,7 @@
   "?AngleBetween@@YAMUVector3@@0@Z": "0x004a3be0",
   "?UpdateChannels@MorphBastardModifier@@QAEXPAUMorphBastardObject@@@Z": "0x004a4bb0",
   "?CopyMesh@MorphBastardModifier@@QAEXPAUUnknownSoultreeMesh@@@Z": "0x004a5290",
-  "?Attach@UnknownParameterBlock@@QAEXPAVUnknownParameterStream@@HH@Z": "0x004b77a0",
+  "?Attach@UnknownParameterBlock@@QAEXPAVUnknownTextureStream@@HH@Z": "0x004b77a0",
   "?SelectSection@UnknownParameterBlock@@QAEHPBD@Z": "0x004b78f0",
   "?ReadString@UnknownParameterBlock@@QAEHPBDPADH@Z": "0x004b7b30",
   "?ReadFloat@UnknownParameterBlock@@QAEHPBDPAM@Z": "0x004b7e70",

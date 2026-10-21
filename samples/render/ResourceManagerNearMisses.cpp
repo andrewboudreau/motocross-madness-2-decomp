@@ -1,45 +1,16 @@
-// Near-miss ResourceManager.cpp candidates, kept out of src/reconstructed
-// until they match. The canonical file is included first so the TU-local
-// declarations and globals are the same.
-//
-// 0x004e9030 (804 bytes, opens an "RS2" archive and adds its items): every
-// instruction matches except that retail also keeps `archive` in the stack
-// slot of the `new` temporary ([esp+0x14], stored right after the EH state
-// reset) and returns it from there; VC6 here keeps it in ebx only. Those
-// are the 6 missing bytes: `mov [esp+0x14], ebx` (4) at 0x004e9094 and
-// `mov eax, [esp+0x14]` (4, for `mov eax, ebx`'s 2) at 0x004e9309, which
-// also moves the `itemCount` store ahead of `pop edi`. ([esp+0x14] is not
-// `magic`, which lives at frame offset 0.) Tried
-// without effect: declaration order, separate declaration and assignment,
-// a second `result` variable (declared at the top or at the `new`, assigned
-// from `archive` or receiving the `new` and copied to `archive`; all 95 of
-// 798 by match.py), a single shared return.
-// Also inert (s14): a `result` assigned from `archive` just before the
-// success return, `UnknownTextureStream* const archive`, the `new` in a
-// `stream` local copied to `archive` (declared together or apart) with
-// `return stream`, and a ternary on the return. VC6 propagates every copy
-// into ebx; retail's value is homed in the `new` temporary's slot from
-// its definition on and read back only for the success return.
-// Also inert (s14 corpus pass): `archive = 0;` then the `new` assignment,
-// and the failure `delete`s without the `if (archive)`. Inverting the
-// Open test into an early return is worse (12 differing lines against
-// 6). Also inert (s14 batch 3): the loop's `new ResourceItem` through an
-// `item` local, and a `result` declared at the top and assigned from
-// `archive` before the success return.
-// EH tables (confirmed, tools/eh_funcinfo.py): retail FuncInfo 0x005632f8
-// has 2 unwind states, both to -1 (funclets 0x0054daa0 deleting [ebp-0x10],
-// the line-212 `new`, and 0x0054dab7 deleting [ebp+8], the line-261 `new`
-// homed in the `path` slot) and no try blocks; ours is the same, funclets
-// included. A `try { } catch (...) { delete archive; throw; }` round the
-// body gives 4 states and 1 try block, and a holder local with a destructor
-// gives 3 states, so neither is the retail source.
-// Early-failure forms (the ConnectUsingLobby lever): the Open failure
-// and the RS2 header failure as separate early `delete archive; return 0`
-// tests give 60 (11 with `if (archive)`), and one combined early test gives
-// 8. Ours already has retail's two failure tails (`test ebx; je; jmp` and
-// `test ebx; je`), so the nested form stays.
+// Standalone AddArchive candidate, admitted to the game as reviewed nonexact.
+// Retail 0x004e9030 spans 804 bytes; authentic VC6 /O2 /MT emits 798.
+// Retail additionally homes the archive result in the new temporary's stack
+// slot and returns it from there; the candidate keeps it in EBX. The final
+// itemCount store/pop scheduling also differs. Both have two unwind states,
+// each leading to -1, and no try blocks. See docs/RESOURCEMANAGER.md for the
+// bounded profile experiment and private behavioral validation boundary.
+// The other manager methods and storage belong to the canonical source.
 
-#include "../../src/reconstructed/ResourceManager.cpp"
+#include <string.h>
+#include "../../src/reconstructed/ResourceManager.h"
+#include "../../src/reconstructed/DebugAlloc.h"
+#include "../../src/reconstructed/FileStream.h"
 
 // 0x004e9030
 UnknownTextureStream* UnknownResourceManager::AddArchive(const char* path, int flags)

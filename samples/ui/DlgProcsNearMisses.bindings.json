@@ -348,12 +348,8 @@
   "?SetBarTexture@UIProgressBar@@QAEXHH@Z": "0x0047b3d0",
   "?ResizeDebugBlock@@YAPAXPAXI@Z": "0x0047b570",
   "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
-  "?ShowDialog@UnknownKrustyUIGui@@QAEXPAVGameObject@@HHHHHHH@Z": "0x00485a70",
-  "?ReleaseBackground@UnknownKrustyUIGui@@QAEXXZ": "0x00485fc0",
   "?RecreateCursors@GUIManager@@QAEXPBDH@Z": "0x004865e0",
   "?ShowCursors@GUIManager@@QAEXH@Z": "0x00486630",
-  "?ShowCursors@UnknownKrustyUIGui@@QAEXH@Z": "0x00486630",
-  "?EnableWindowClipper@UnknownKrustyUIGui@@QAEXH@Z": "0x004868b0",
   "?RequestFocus@GUIUser@@QAEHPAVUnknownGuiControl@@PAPAV2@H@Z": "0x00487790",
   "?FormatTime@@YAXPADM@Z": "0x00488bd0",
   "?BuildGarageScene@KrustyUI@@QAEXH@Z": "0x00498cf0",
@@ -537,5 +533,7 @@
   "_strncpy": "0x00534b10",
   "?Tick@SPBikeRiderDlg@@UAEHM@Z": "0x0044fae0",
   "?HandleEvent@SPRaceInfoDlg@@UAEXPAUUnknownDialogEvent@@@Z": "0x004507a0",
-  "?HandleEvent@MPRaceInfoDlg@@UAEXPAUUnknownDialogEvent@@@Z": "0x004513a0"
+  "?HandleEvent@MPRaceInfoDlg@@UAEXPAUUnknownDialogEvent@@@Z": "0x004513a0",
+  "?ReleaseBackground@GUIManager@@QAEXXZ": "0x00485fc0",
+  "?EnableWindowClipper@GUIManager@@QAEHH@Z": "0x004868b0"
 }

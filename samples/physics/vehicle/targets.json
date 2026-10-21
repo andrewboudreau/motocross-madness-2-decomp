@@ -1,133 +1,133 @@
 [
  {
   "class": "Vehicle",
-  "source": "VehicleInlines.cpp",
+  "source": "../../../src/reconstructed/VehicleMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot34@Vehicle",
   "target_va": "0x0040c4c0",
   "target_size": 118,
   "expect": "exact",
   "notes": "Exact once the cross product goes through a named local (Vec3 side = ...CrossB(bodyUp); sideAxis = side). Written as slot 35's single assignment VC6 loads this->z / this->y before b.x in the y and z terms (110/118); any extra live symbol (the local, a node/axis pointer local, slot 35's parameters) gives retail's b.x-first order, an unused int does not. No CrossB spelling (256 paren/operand forms) or declaration shift (k = 0..63) moved it.",
-  "bindings": "VehicleInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/VehicleMethods.bindings.json"
  },
  {
   "class": "Vehicle",
-  "source": "VehicleInlines.cpp",
+  "source": "../../../src/reconstructed/VehicleMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot35@Vehicle",
   "target_va": "0x0040c540",
   "target_size": 130,
   "expect": "exact",
   "notes": "strict exact with VehV3::CrossB written as the plain formula with parenthesised first products (fsubp between the load and the store of the copied component).",
-  "bindings": "VehicleInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/VehicleMethods.bindings.json"
  },
  {
   "class": "Vehicle",
-  "source": "VehicleInlines.cpp",
+  "source": "../../../src/reconstructed/VehicleMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot45@Vehicle",
   "target_va": "0x0040c880",
   "target_size": 7,
   "expect": "exact",
   "notes": "slot 45 (introduced); exact under vc6_o2_ml (no /G6)",
-  "bindings": "VehicleInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/VehicleMethods.bindings.json"
  },
  {
   "class": "Vehicle",
-  "source": "VehicleInlines.cpp",
+  "source": "../../../src/reconstructed/VehicleMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot51@Vehicle",
   "target_va": "0x0040c890",
   "target_size": 7,
   "expect": "exact",
   "notes": "slot 51 (introduced); exact under vc6_o2_ml (no /G6)",
-  "bindings": "VehicleInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/VehicleMethods.bindings.json"
  },
  {
   "class": "Vehicle",
-  "source": "VehicleInlines.cpp",
+  "source": "../../../src/reconstructed/VehicleMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot52@Vehicle",
   "target_va": "0x0040c8a0",
   "target_size": 14,
   "expect": "exact",
   "notes": "slot 52 (introduced); exact under vc6_o2_ml (no /G6)",
-  "bindings": "VehicleInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/VehicleMethods.bindings.json"
  },
  {
   "class": "Vehicle",
-  "source": "VehicleInlines.cpp",
+  "source": "../../../src/reconstructed/VehicleMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot68@Vehicle",
   "target_va": "0x0040cac0",
   "target_size": 18,
   "expect": "exact",
   "notes": "slot 68 (introduced); exact under vc6_o2_ml (no /G6)",
-  "bindings": "VehicleInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/VehicleMethods.bindings.json"
  },
  {
   "class": "Vehicle",
-  "source": "VehicleInlines.cpp",
+  "source": "../../../src/reconstructed/VehicleMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot69@Vehicle",
   "target_va": "0x0040cae0",
   "target_size": 13,
   "expect": "exact",
   "notes": "slot 69 (introduced); exact under vc6_o2_ml (no /G6)",
-  "bindings": "VehicleInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/VehicleMethods.bindings.json"
  },
  {
   "class": "Vehicle",
-  "source": "VehicleInlines.cpp",
+  "source": "../../../src/reconstructed/VehicleMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot23@Vehicle",
   "target_va": "0x0040caf0",
   "target_size": 38,
   "expect": "exact",
   "notes": "slot 23 (override); exact under vc6_o2_ml (no /G6)",
-  "bindings": "VehicleInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/VehicleMethods.bindings.json"
  },
  {
   "class": "Vehicle",
-  "source": "VehicleInlines.cpp",
+  "source": "../../../src/reconstructed/VehicleMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot24@Vehicle",
   "target_va": "0x0040cb20",
   "target_size": 59,
   "expect": "exact",
   "notes": "slot 24 (override); exact under vc6_o2_ml (no /G6)",
-  "bindings": "VehicleInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/VehicleMethods.bindings.json"
  },
  {
   "class": "Vehicle",
-  "source": "VehicleInlines.cpp",
+  "source": "../../../src/reconstructed/VehicleMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot25@Vehicle",
   "target_va": "0x0040cb60",
   "target_size": 59,
   "expect": "exact",
   "notes": "slot 25 (override); exact under vc6_o2_ml (no /G6)",
-  "bindings": "VehicleInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/VehicleMethods.bindings.json"
  },
  {
   "class": "Vehicle",
-  "source": "VehicleInlines.cpp",
+  "source": "../../../src/reconstructed/VehicleMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot78@Vehicle",
   "target_va": "0x00492220",
   "target_size": 76,
   "expect": "exact",
   "notes": "slot 78 (introduced); exact under vc6_o2_ml (no /G6)",
-  "bindings": "VehicleInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/VehicleMethods.bindings.json"
  },
  {
   "class": "Vehicle",
-  "source": "VehicleInlines.cpp",
+  "source": "../../../src/reconstructed/VehicleMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot79@Vehicle",
   "target_va": "0x00492270",
   "target_size": 76,
   "expect": "exact",
   "notes": "slot 79 (introduced); exact under vc6_o2_ml (no /G6)",
-  "bindings": "VehicleInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/VehicleMethods.bindings.json"
  },
  {
   "class": "Vehicle",
-  "source": "VehicleInlines.cpp",
+  "source": "../../../src/reconstructed/VehicleMethods.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot92@Vehicle",
   "target_va": "0x004a6ba0",
   "target_size": 3,
   "expect": "exact",
   "notes": "slot 92 (introduced); exact under vc6_o2_ml (no /G6)",
-  "bindings": "VehicleInlines.bindings.json"
+  "bindings": "../../../src/reconstructed/VehicleMethods.bindings.json"
  },
  {
   "class": "Vehicle",

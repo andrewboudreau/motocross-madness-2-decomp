@@ -1,3 +1,4 @@
+#include "GUIManagerCore.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -770,16 +771,14 @@ void OptionsDlg::HandleEvent(UnknownDialogEvent* event)
             OpenPage(5);
         } else if (_stricmp("Restore", event->controlName) == 0) {
             GlobalSettingsDlg* dialog = new(__FILE__, 979) GlobalSettingsDlg;
-            event->gui->ShowDialog((UIDialog*)dialog, 0, 0xc, 0,
-                                                     (UIDialog*)this, 0, 0, 1);
+            event->gui->ShowDialog((UIDialog*)dialog, 0, 0xc, 0, (UIDialog*)this, 0, 0, 1);
         } else if (_stricmp("Help", event->controlName) == 0) {
             g_TrackGame->mode.OpenHelp("MCM2HELP", 0);
         } else if (_stricmp("Advanced", event->controlName) == 0) {
             if (graphicsPage)
                 graphicsPage->UpdateBoundValues(1);
             OptAdvancedGraphicsDlg* dialog = new(__FILE__, 987) OptAdvancedGraphicsDlg;
-            event->gui->ShowDialog((UIDialog*)dialog, 0, 0xc, 0,
-                                                     (UIDialog*)this, 0, 0, 1);
+            event->gui->ShowDialog((UIDialog*)dialog, 0, 0xc, 0, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 9:
@@ -872,37 +871,37 @@ void OptionsDlg::OpenPage(int page)
     case 0:
         if (!gameSettingsPage) {
             gameSettingsPage = new(__FILE__, 1066) OptGameSettingsDlg;
-            g_TrackGame->ui->gui->ShowDialog(gameSettingsPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)gameSettingsPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 1:
         if (!graphicsPage) {
             graphicsPage = new(__FILE__, 1072) OptGraphicsDlg;
-            g_TrackGame->ui->gui->ShowDialog(graphicsPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)graphicsPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 2:
         if (!soundPage) {
             soundPage = new(__FILE__, 1078) OptSoundDlg;
-            g_TrackGame->ui->gui->ShowDialog(soundPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)soundPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 3:
         if (!controlsPage) {
             controlsPage = new(__FILE__, 1084) OptControlsDlg;
-            g_TrackGame->ui->gui->ShowDialog(controlsPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)controlsPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 4:
         if (!messagesPage) {
             messagesPage = new(__FILE__, 1090) OptMessagesDlg;
-            g_TrackGame->ui->gui->ShowDialog(messagesPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)messagesPage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 5:
         if (!garagePage) {
             garagePage = new(__FILE__, 1096) OptGarageDlg;
-            g_TrackGame->ui->gui->ShowDialog(garagePage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog((UIDialog*)garagePage, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     }

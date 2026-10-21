@@ -8,7 +8,9 @@
 #include "DebugOverlay.h"
 #include "ManagedTexture.h"
 #include "PCRenderTarget.h"
-#include "TrackGame.h"
+// Only the offset-zero Game base is used (TrackGame RTTI COL 0x0055f8e0).
+#include "Game.h"
+#include "TrackGameGlobal.h"
 
 extern "C" __declspec(dllimport) int __stdcall DeleteObject(void* object);
 
@@ -181,65 +183,15 @@ void ManagedTextureGroup::WriteDebugReport() {
 // 0x0050c8c0: unless frozen by the debug key, empties the size lists and
 // repacks the pages (through 0x0050dad0 when partial texture blits are on).
 void ManagedTextureGroup::RepackPages() {
-    if (g_TrackGame->testKey && noRepacking)
+    if (reinterpret_cast<Game*>(g_TrackGame)->testKey && noRepacking)
         return;
     field_0x7c.Clear();
     for (int i = 0; i < 9; i++)
         field_0x90[i].Clear();
-    if (g_TrackGame->display->partialTextureUploadResult <= 0)
+    if (reinterpret_cast<Game*>(g_TrackGame)->display->partialTextureUploadResult <= 0)
         RepackWholePages();
     else
         RepackWithPartialBlits();
-}
-
-// Where `texture` goes in `list`, kept in descending 0x005109b0 order.
-static inline int FindPosition(ContainerList<ManagedTexture*>* list, ManagedTexture* texture) {
-    int position = 0;
-    for (int j = list->m_count - 1; j >= 0; j--) {
-        if (texture->Unhappiness() < list->Get(j)->Unhappiness()) {
-            position = j + 1;
-            break;
-        }
-    }
-    return position;
-}
-
-// 0x0050d800: sorts `list` by 0x005109b0 and lowers the planned level (+0xac)
-// of the least needy texture until the planned texels fit `budget`; a
-// texture already at level 5 is dropped (level -1). Returns the texels.
-int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget) {
-    qsort(list->m_data, list->m_count, sizeof(ManagedTexture*), UnknownCompare50ef00);
-    int area = 0;
-    for (int i = 0; i < list->m_count; i++)
-        area += LevelArea(list->Get(i)->plannedLevel);
-    while (list->m_count > 0 && area > budget) {
-        int index = list->m_count - 1;
-        ManagedTexture* texture = list->Get(index);
-        while (list->m_count > 0 && texture->plannedLevel == 5) {
-            if (--index == 0) {
-                texture->plannedLevel = -1;
-                area -= 0x400;
-                list->RemoveOrdered(texture);
-                index = list->m_count - 1;
-            }
-            if (index < 0)
-                return area;
-            texture = list->Get(index);
-        }
-        int level = texture->plannedLevel;
-        if (texture->Unhappiness() < 0.0f)
-            texture->plannedLevel = texture->wantedLevel;
-        else
-            texture->plannedLevel--;
-        int newLevel = texture->plannedLevel;
-        area -= LevelArea(level);
-        area += LevelArea(newLevel);
-        if (list->m_count > 1) {
-            list->RemoveOrdered(texture);
-            list->Insert(texture, FindPosition(list, texture));
-        }
-    }
-    return area;
 }
 
 // 0x0050ee70: qsort order of ManagedTexture pointers, by +0xac descending,
@@ -312,7 +264,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
     UnknownSurfaceInterface* surface = target->renderSurface;
     if (groupManager->debugGroup != this)
         return 0;
-    if (g_TrackGame->testKey) {
+    if (reinterpret_cast<Game*>(g_TrackGame)->testKey) {
         char text[0x50];
         ManagedTexture* selected = 0;
         TextureMap* page = 0;
@@ -453,4 +405,54 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
         }
     }
     return 1;
+}
+
+// Where `texture` goes in `list`, kept in descending 0x005109b0 order.
+static inline int FindPosition(ContainerList<ManagedTexture*>* list, ManagedTexture* texture) {
+    int position = 0;
+    for (int j = list->m_count - 1; j >= 0; j--) {
+        if (texture->Unhappiness() < list->Get(j)->Unhappiness()) {
+            position = j + 1;
+            break;
+        }
+    }
+    return position;
+}
+
+// 0x0050d800: sorts `list` by 0x005109b0 and lowers the planned level (+0xac)
+// of the least needy texture until the planned texels fit `budget`; a
+// texture already at level 5 is dropped (level -1). Returns the texels.
+int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget) {
+    qsort(list->m_data, list->m_count, sizeof(ManagedTexture*), UnknownCompare50ef00);
+    int area = 0;
+    for (int i = 0; i < list->m_count; i++)
+        area += LevelArea(list->Get(i)->plannedLevel);
+    while (list->m_count > 0 && area > budget) {
+        int index = list->m_count - 1;
+        ManagedTexture* texture = list->Get(index);
+        while (list->m_count > 0 && texture->plannedLevel == 5) {
+            if (--index == 0) {
+                texture->plannedLevel = -1;
+                area -= 0x400;
+                list->RemoveOrdered(texture);
+                index = list->m_count - 1;
+            }
+            if (index < 0)
+                return area;
+            texture = list->Get(index);
+        }
+        int level = texture->plannedLevel;
+        if (texture->Unhappiness() < 0.0f)
+            texture->plannedLevel = texture->wantedLevel;
+        else
+            texture->plannedLevel--;
+        int newLevel = texture->plannedLevel;
+        area -= LevelArea(level);
+        area += LevelArea(newLevel);
+        if (list->m_count > 1) {
+            list->RemoveOrdered(texture);
+            list->Insert(texture, FindPosition(list, texture));
+        }
+    }
+    return area;
 }

@@ -3,6 +3,7 @@
 // Line numbers passed to the debug allocator are the retail literals.
 
 #include "Parameterblocks.h"
+#include "ResourceManager.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -157,7 +158,7 @@ void UnknownParameterBlock::OpenFromArchives(UnknownParameterStream* stream,
                                                   int index)
 {
     if (stream->archives) {
-        UnknownParameterArchiveEntry* entry =
+        ResourceItem* entry =
             stream->archives->FindItem(name, 0);
         if (!entry) {
             if (!stream->archives->AddArchive(path, 0))
@@ -167,10 +168,10 @@ void UnknownParameterBlock::OpenFromArchives(UnknownParameterStream* stream,
                 Attach(stream, 0, index);
                 return;
             }
-            Attach(entry->holderStream, entry->holderOffset, index);
+            Attach(entry->archive, entry->offset, index);
             return;
         }
-        Attach(entry->holderStream, entry->holderOffset, index);
+        Attach(entry->archive, entry->offset, index);
         return;
     }
     Attach(stream, 0, index);
@@ -293,7 +294,7 @@ void UnknownParameterBlock::Attach(UnknownParameterStream* stream, int offset,
         sectionTable = 0;
         sectionCount = 0;
     }
-    stream->Seek(stream->startOffset + fileOffset, 0, 0);
+    stream->Seek(stream->sliceOffset + fileOffset, 0, 0);
     if (index)
         IndexSections(stream);
     readingRows = 0;
@@ -327,7 +328,7 @@ int UnknownParameterBlock::SelectSection(const char* name)
     if (!isOpen)
         return 0;
     if (!sectionTable) {
-        blockStream->Seek(blockStream->startOffset + fileOffset, 0, 0);
+        blockStream->Seek(blockStream->sliceOffset + fileOffset, 0, 0);
         blockStream->ResetTextMode();
         return ScanSection(name);
     }

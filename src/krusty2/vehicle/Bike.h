@@ -299,7 +299,7 @@ struct BikeA38 {
 
 struct BikeGlobal_0056e26c { char pad_0x000[0x2f0]; float g_0x2f0; };
 
-extern Vec3 g_BikeVec3_005778a8;
+// Bike.cpp uses its Math3D header-local kVec3Zero, initialized at 0x00407890.
 
 class Bike : public Vehicle {
 public:

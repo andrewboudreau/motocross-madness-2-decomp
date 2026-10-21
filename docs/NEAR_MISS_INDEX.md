@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 120, c 93, total 215. The three class (a) functions of the
+Counts: a 2, b 120, c 92, total 214. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -241,7 +241,6 @@ the integration temporary. When only displacement sizes differ, read the
 | ui/DlgProcs | `0x0044fae0` | 1181/1235 | b | 8 code diffs: retail lacks `mov edi, esp`; retail adds `mov edi, esp`; slots differ |
 | ui/DlgProcs | `0x004507a0` | 589/1668 | c | 32 code diffs: retail computes `lea eax,[TrackGame+0x570]` in each loop test and reloads eventManager through it at the body top; VC6 here reuses the loaded pointer; a reference-returning accessor, `++i`, a reversed test, `(&em)[0]` and `field_0x50 + i` all compile the same |
 | ui/DlgProcs | `0x004513a0` | 595/2004 | c | first loop: retail reloads EventManager for the +0x04 sprintf arg, VC6 here reuses it; `continue`, `EventManager* const&` alias, entry reference/pointer, TrackGame local, `(int)` cast and `(field_0x50 + i)->` all give 595 |
-| ui/GUIManager | `0x00485a70` | 62/345 | c | 29 code diffs: retail lacks `mov edx, ebx`; retail lacks `mov ebp, [esp + N]` |
 | ui/GUIManager | `0x00486170` | 280/896 | b | 52 code diffs: retail lacks `xor ebx, ebx`; `cmp ecx, ebx` vs `xor ebx, ebx`; frame 0xa4 vs 0xb0, slot order differs |
 | ui/GUIManager | `0x00486b10` | 89/106 | c | two per-component ternaries give retail's `pop edi` placement; retail loads bottom into eax after storing x and passes the text in eax and &position in edx (VC6 here hoists the bottom load into edx beside the cdq and swaps the call registers) |
 | ui/GUIManager | `0x00488120` | 46/52 | c | retail tests the owner for zero before comparing it with `this`; VC6 threads the ternary's xor arm into a leading zero test, so the sample compares with `this` first (samples/ui/GUIManagerNearMisses.cpp) |

@@ -368,16 +368,6 @@ int UnknownTextureStream::GetFileTimes(int* time, int* size)
     return FileTimes(this, time, size);
 }
 
-// 0x00461d20
-void UnknownTextureStream::ResetTextMode()
-{
-    if (innerStream) {
-        innerStream->ResetTextMode();
-        return;
-    }
-    textMode = nameKey;
-}
-
 // 0x00461d40: fprintf.
 int FilePrintf(FILE* file, const char* format, ...)
 {

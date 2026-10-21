@@ -1,17 +1,12 @@
+#include "../../src/reconstructed/GUIManagerCore.h"
 // Near-miss KrustyUI candidates, kept out of src/reconstructed until they
 // match. See docs/KRUSTYUI.md.
 //
-// KrustyUI::Create (0x004988a0, 1104 bytes): TrackGame slot
-// 4's initialiser. The control flow, calls, both debug `new`s (GUI, line
-// 121; Intro1Dlg, line 201), the strncpy clamps and the frame (text is a
-// 260-byte buffer read 128 at a time) match: 872 of 1104 bytes. From the
-// scale store on, retail picks eax/ecx where VC6 here picks edx/eax (scale,
-// layer +0xc0, GUI +0x34c) and loads the global before pushing the joystick
-// filter. Inline-helper, block-local, local-gui and local-filter forms do
-// not change it.
-// Session 14: `if (scale)`, `scale != 0` and a `!= 0` load test are inert
-// (872); `else scale = 0` instead of the leading store is worse (363).
-// Compiled inside src/reconstructed/KrustyUI.cpp it is unchanged (872).
+// KrustyUI::Create (0x004988a0, 1104 retail bytes) remains nonexact:
+// the current shared GUI declarations emit 1102 bytes. SetUp takes ten
+// arguments; -1 belongs to the following AppendSibling call. This ABI
+// correction does not establish source acceptance or promote this sample.
+// See docs/GUIMANAGER.md for the decoded call boundary and layout evidence.
 //
 #include <stdio.h>
 #include <stdlib.h>
@@ -67,8 +62,8 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     font[count] = 0;
     gui = new(__FILE__, 121) UnknownKrustyUIGui(1);
     if (!AppendSibling(gui->SetUp(
-            renderContext, g_TrackGame->display->palette, g_TrackGame->textureManager, 0,
-            0, 0, "Arial", 15, "ui\\cursor.tga", GuiProgressCallback, -1))) {
+            renderContext, (Palette8*)g_TrackGame->display->palette, g_TrackGame->textureManager, 0,
+            0, 0, "Arial", 15, "ui\\cursor.tga", (int)GuiProgressCallback), -1)) {
         Release();
         return 0;
     }
@@ -78,7 +73,7 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
             gui->toolTipBold = atoi(text);
     }
     if (scale != 0.0f)
-        gui->fontSizeOffset = scale;
+        *(float*)&gui->fontSizeOffset = scale;
     gui->CreateBackground();
     gui->SetDialogDirectory("ui");
     gui->SetWaitCursorImage("ui\\wait.tga");
@@ -92,7 +87,7 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     g_TrackGame->mode.LoadProfile();
     gui->uiAnimations = g_TrackGame->mode.uiAnimations;
     if (!g_TrackGame->mode.toolTips)
-        gui->GetUser(0)->userToolTip->enabled = 0;
+        ((UnknownKrustyUIToolTipView*)gui->GetUser(0)->userToolTip)->enabled = 0;
     if (g_TrackGame->controlInterface->activeJoystick)
         ((PCJoystickDevice*)g_TrackGame->controlInterface->activeJoystick)
             ->UnknownMethod4c3ae0(g_TrackGame->GetRegistryFlag("JoystickFilter", 0));

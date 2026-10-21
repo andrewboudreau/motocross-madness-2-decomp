@@ -1,3 +1,4 @@
+#include "GUIManagerCore.h"
 // SelectGamePicProcs.cpp (__FILE__ 0x00573c6c): the multiplayer lobby
 // dialogs. Extent 0x004f1740..0x004f975b: the player-record initializers
 // 0x004f1740..0x004f1793 open it, the first __FILE__ user is
@@ -1288,28 +1289,28 @@ void MultiPlayerDlg::ShowPage(int page) {
     case 0:
         if (!eventPage) {
             eventPage = new(__FILE__, 0x7a4) MPEventDlg;
-            g_TrackGame->ui->gui->ShowDialog(eventPage, 0, 1, (int)&area, (int)this,
+            g_TrackGame->ui->gui->ShowDialog(eventPage, 0, 1, (int)&area, (UIDialog*)this,
                                                                          0, 0, 1);
         }
         break;
     case 1:
         if (!bikeRiderPage) {
             bikeRiderPage = new(__FILE__, 0x7aa) MPBikeRiderDlg;
-            g_TrackGame->ui->gui->ShowDialog(bikeRiderPage, 0, 1, (int)&area, (int)this,
+            g_TrackGame->ui->gui->ShowDialog(bikeRiderPage, 0, 1, (int)&area, (UIDialog*)this,
                                                                          0, 0, 1);
         }
         break;
     case 2:
         if (!raceInfoPage) {
             raceInfoPage = new(__FILE__, 0x7b0) MPRaceInfoDlg;
-            g_TrackGame->ui->gui->ShowDialog(raceInfoPage, 0, 1, (int)&area, (int)this,
+            g_TrackGame->ui->gui->ShowDialog(raceInfoPage, 0, 1, (int)&area, (UIDialog*)this,
                                                                          0, 0, 1);
         }
         break;
     case 3:
         if (!optionsPage) {
             optionsPage = new(__FILE__, 0x7b6) MPOptionsDlg;
-            g_TrackGame->ui->gui->ShowDialog(optionsPage, 0, 1, (int)&area, (int)this,
+            g_TrackGame->ui->gui->ShowDialog(optionsPage, 0, 1, (int)&area, (UIDialog*)this,
                                                                          0, 0, 1);
         }
         break;

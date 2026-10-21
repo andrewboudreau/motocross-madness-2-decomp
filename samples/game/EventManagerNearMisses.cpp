@@ -1,3 +1,4 @@
+#include "../../src/reconstructed/GUIManagerCore.h"
 // Near-miss EventManager candidates, kept out of src/reconstructed until
 // they match. See docs/EVENTMANAGER.md.
 //
@@ -60,7 +61,7 @@ extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
 void EventManager::LeaveRaceForMenu(int menu) {
     if (!g_TrackGame->ui)
         return;
-    UnknownTrackGameObject56cItem* item = g_TrackGame->ui->gui->FindInputDialog();
+    UIDialog* item = g_TrackGame->ui->gui->FindInputDialog();
     if (item)
         item->EndDialog(0);
     if (g_TrackGame->ui->savedInputContext)
@@ -78,7 +79,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
             g_TrackGame->display->FindDisplayMode(640, 480, 16, 0, 0));
     g_TrackGame->ui->gui->CreateBackground();
     UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->gui->GetUser(0);
-    layer->userToolTip->enabled = g_TrackGame->mode.toolTips;
+    ((UnknownKrustyUIToolTipView*)layer->userToolTip)->enabled = g_TrackGame->mode.toolTips;
     if (!g_TrackGame->playingReplay && !g_TrackGame->ui->playingDemo &&
         g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4)
         g_TrackGame->ui->RecordRaceResults();

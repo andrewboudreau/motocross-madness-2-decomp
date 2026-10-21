@@ -1,3 +1,4 @@
+#include "GUIManagerCore.h"
 #include "EventManager.h"
 
 #include <float.h>

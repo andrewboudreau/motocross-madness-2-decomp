@@ -569,7 +569,7 @@
   "?ReadDialogResource@UIDialog@@QAEHPAXH@Z$ehhandler": "0x0054afd5",
   "__chkstk": "0x00535ed0",
   "??0UnknownParameterBlock@@QAE@XZ": "0x004b7130",
-  "?Attach@UnknownParameterBlock@@QAEXPAVUnknownParameterStream@@HH@Z": "0x004b77a0",
+  "?Attach@UnknownParameterBlock@@QAEXPAVUnknownTextureStream@@HH@Z": "0x004b77a0",
   "?GetSectionNames@UnknownParameterBlock@@QAEHPADH@Z": "0x004b8240",
   "??0UnknownTokenizer@@QAE@PAD@Z": "0x00515dc0",
   "??_C@_01PKMN@?$DP?$AA@": "0x0056bca4",

@@ -75,7 +75,7 @@
   "?DisableByClassName@GameObject@@IAEXPBD@Z": "0x00468dd0",
   "?EnableByClassName@GameObject@@IAEXPBD@Z": "0x00468f10",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
-  "?Attach@UnknownParameterBlock@@QAEXPAVUnknownParameterStream@@HH@Z": "0x004b77a0",
+  "?Attach@UnknownParameterBlock@@QAEXPAVUnknownTextureStream@@HH@Z": "0x004b77a0",
   "?SelectSection@UnknownParameterBlock@@QAEHPBD@Z": "0x004b78f0",
   "?ReadString@UnknownParameterBlock@@QAEHPBDPADH@Z": "0x004b7b30",
   "?ReadInt@UnknownParameterBlock@@QAEHPBDPAH@Z": "0x004b7cf0",

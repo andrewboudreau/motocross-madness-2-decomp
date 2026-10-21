@@ -47,6 +47,15 @@ bytes. Keeping the original declaration restores the exact body. Explicit
 casts also preserve instruction scheduling that a templated accessor changed
 in several callers.
 
+ManagedTextureGroup now reads only the canonical Game base through
+`Game.h` and `TrackGameGlobal.h`. Retail TrackGame COL `0x0055f8e0` and
+hierarchy `0x0055f8d0` record PCGame and Game with `mdisp=0`, `pdisp=-1`;
+there is no base adjustment. RepackPages reads TestKey at `+0x2d4`, mask 4
+(`0x0050c8c8`), and display at `+0x0c` (`0x0050c936`). The native shared-pointer
+regression checks the full declaration's base conversion and these field
+locations. All 15 ManagedTextureGroup calibration cases remain strict with
+its prior helper order; see [declaration-order evidence](VC6_OPERAND_ORDER.md).
+
 ## Shared header definitions
 
 The reconstructed headers (`src/reconstructed`) and the krusty2 physics

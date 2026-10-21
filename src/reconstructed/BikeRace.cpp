@@ -1,3 +1,4 @@
+#include "GUIManagerCore.h"
 #include "BikeRace.h"
 #include "TrackOverlay.h"
 
@@ -1319,8 +1320,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
                     replayVcr = 0;
                 }
                 g_TrackGame->ui->gui->ShowCursors(1);
-                g_TrackGame->ui->gui->ShowDialog(
-                    new (__FILE__, 0x1073) VCRDlg(1, "VCR.dtm"), 0, 1, 0, 0, 0, 0, 1);
+                g_TrackGame->ui->gui->ShowDialog((UIDialog*)new (__FILE__, 0x1073) VCRDlg(1, "VCR.dtm"), 0, 1, 0, 0, 0, 0, 1);
             } else {
                 g_TrackGame->playingReplay = 0;
                 if (!replayVcr->OpenRecording(RecorderCallback, 0, "VCRtape.dat",

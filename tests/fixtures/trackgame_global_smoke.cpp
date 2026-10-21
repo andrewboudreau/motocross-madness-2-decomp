@@ -10,9 +10,12 @@ int ReadParticleRendererFlag();
 void WriteParticleRendererFlag(int value);
 int ReadEcoRendererFlag();
 void WriteEcoRendererFlag(int value);
+int CheckGameBaseBoundary();
 
 int main()
 {
+    if (CheckGameBaseBoundary())
+        return 6;
     ParticleGameContext first = {0};
     ParticleGameContext second = {0};
     first.hidden = 17;

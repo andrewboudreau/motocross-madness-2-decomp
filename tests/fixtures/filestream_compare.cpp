@@ -114,9 +114,7 @@ int ReadXorDecoded(unsigned char* buffer, int size, int count, FILE* file, unsig
 int UnknownTextureStream::Tell() {
     Record(9, (char*)this - (char*)Stream(0), 0, 0); return scenario.position;
 }
-void UnknownTextureStream::ResetTextMode() {
-    Record(10, (char*)this - (char*)Stream(0), 0, 0); textMode = nameKey;
-}
+
 int UnknownTextureStream::ReadByte() {
     Record(11, (char*)this - (char*)Stream(0), 0, 0);
     int value = "FAOE"[bytes++ % 4];

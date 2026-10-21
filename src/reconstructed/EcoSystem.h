@@ -23,19 +23,8 @@
 
 class EcoSystem;
 class TextureMapManager;
-class UnknownParameterStream;
+#include "FileStream.h"
 
-// TextureMap.h: UnknownTextureStream, as far as this file uses it.
-class UnknownTextureStream {
-public:
-    explicit UnknownTextureStream(class UnknownResourceManager* manager); // 0x00460d10
-    ~UnknownTextureStream();                  // 0x00460d60
-    int Open(const char* path, const char* mode, int a); // 0x00460f50: opens
-    int Seek(int offset, int a, int origin);            // 0x00461340: seeks
-    int Read(void* buffer, int size, int count);        // 0x00461640: reads
-
-    unsigned char field_0x000[0x134];         // 0x134 bytes (operator new at 0x00458fcb)
-};
 struct UnknownBitmapFile;
 struct UnknownTgaFile;
 

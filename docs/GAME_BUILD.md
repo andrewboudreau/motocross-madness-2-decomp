@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-20 build compiles 172 C++ files (170 canonical sources and two
-reviewed candidates) and reaches LINK with 701 unresolved external symbols,
+The 2026-10-20 build compiles 174 C++ files (171 canonical sources and three
+reviewed candidates) and reaches LINK with 668 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -54,7 +54,7 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
 the current composition retains all 1,076 strict-exact physics targets and all
-2,972 distinct strict-exact calibration cases. A native link/runtime regression checks
+2,973 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 
@@ -113,7 +113,7 @@ against their primary-vtable slots at object offset zero. Together these
 remove another 32 unresolved symbols while preserving all prior strict
 matches. Their source grouping does not establish original TU ownership;
 unassigned header initializer copies remain documented separately. The
-remaining parameter-stream view retains its inline reset behavior, which is
+shared parameter stream retains its inline reset behavior, which is
 required by the current strict SelectSection match. Soultree slot 35 still
 depends on the already-missing SetAxesIn implementation.
 
@@ -123,9 +123,38 @@ class for its input, visibility and message calls. Four complete
 [collision helpers](COLLISION_HELPERS.md) now have canonical providers; three
 are imported by current production callers. These connections remove eleven
 unresolved names without introducing any new ones, preserving all strict
-calibration and physics matches. The full regression suite completes 391
-tests with 11 skipped; native layout, retail call-site and provider checks
-cover the new connections.
+calibration and physics matches. Native layout, retail call-site and provider
+checks cover these connections.
+
+The [parameter reader](PARAMETERBLOCKS.md) now shares its stream declaration
+and resource-manager interfaces with existing implementations, preserving
+SelectSection's complete body and the reset accessor. The
+[GUI connections](GUIMANAGER.md#shared-caller-connections) supply eight existing
+provider identities and consolidate the ShowDialog alias. Thirteen
+[Vehicle methods](VEHICLE_METHODS.md) now have canonical definitions verified
+against their own primary-vtable slots. Bike's zero-vector reads use the local
+storage already supplied by its strict initializer. These changes remove
+31 unresolved names without adding any new ones.
+
+The [archive loader](RESOURCEMANAGER.md#functional-build-review) now supplies
+AddArchive as an explicitly reviewed nonexact candidate. Its complete body
+passes 17,292 native differential scenarios, including constructor unwind
+paths; VC6 emits 798 bytes against retail's 804. The corrected
+[ShowDialog](GUIMANAGER.md) has a complete strict 341-byte body in canonical
+source and passes 34,560 native differential scenarios. Its extent follows
+independent retail control-flow evidence; the old 345-byte range included
+padding. These two providers remove two more unresolved symbols. Scripted
+dependency tests do not establish working archive loading or menus in the
+source-built game.
+
+Validation of this composition passes the toolchain/manual/generated VC6 gate,
+2,975 of 2,986 calibration rows (2,973 distinct source/address/extent cases),
+and all 1,076 previously strict physics targets among 1,152 comparisons.
+The recursive reset's strict case moves from FileStream.cpp to
+Parameterblocks.cpp with its address and full 30-byte extent unchanged;
+ShowDialog adds one strict case. The native-enabled Python suite passes
+396 tests with 11 skipped. These counts retain existing nonexact comparisons;
+they do not describe a fully matched or working game.
 
 The source still lacks `Game::Tick` at `0x004685d0`, called by
 `TrackGame::Tick`; its retail timing uses `rdtsc` (see [Game](GAME.md)).

@@ -344,6 +344,42 @@ int GUIManager::RenderPost3D() {
     return 1;
 }
 
+// 0x00485a70
+UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
+                                 UIDialog* parent, int c, int d, int wait) {
+    CameraRect screen;
+    CameraRect* rect;
+
+    if (!(flags & 4) && !(flags & 2)) {
+        if (!FindInputDialog() || !FindInputDialog()->isModal)
+            ReleaseBackgroundGrab();
+    } else {
+        rect = 0;
+        if (flags & 0x10) {
+            screen.left = screen.top = 0;
+            screen.right = ((RenderTarget*)renderContext)->targetWidth;
+            screen.bottom = ((RenderTarget*)renderContext)->targetHeight;
+            rect = &screen;
+        }
+        if (parent)
+            parent->SetModalPause(1, flags & 8, rect);
+        else if ((flags & 4) && (flags & 0x10))
+            GrabBackground(flags & 8);
+    }
+    if (wait)
+        RecreateCursors(waitCursorImage, paletteChanged == 0);
+    if (dialog->UnknownVirtualSlot27(renderContext, (CameraRect*)b, a, flags, guiSoundGroup, guiTextures, dialogDirectory,
+                                     parent, guiBackground, dialogFontName, dialogFontSize, this, users[0],
+                                     (const char*)d)) {
+        dialog->showFlags = flags;
+        AttachDialog(dialog, c, wait);
+        return dialog;
+    }
+    if (wait)
+        RecreateCursors(cursorImage, paletteChanged == 0);
+    return 0;
+}
+
 // 0x00485bd0
 void GUIManager::AttachDialog(UIDialog* dialog, int a, int wait) {
     int visible = dialog->isEnabled;

@@ -147,10 +147,13 @@ The physics runner adds `src/krusty2` to the include path.
   - 0x507920 is in Terrain.
 
   The class tables point at these copies, so they are most likely inline members kept
-  from the first TU that emitted each COMDAT. They stay in
-  `samples/physics/vehicle/VehicleInlines.cpp` and
-  `samples/physics/soultree_base/SoultreePhysicsInlines.cpp` until an inline-in-header
-  reconstruction reproduces that placement.
+  from the first TU that emitted each COMDAT. Thirteen Vehicle methods and eleven
+  SoultreePhysicsBaseObject methods are strict exact in the reconstruction groups
+  `src/reconstructed/VehicleMethods.cpp` and `SoultreePhysicsMethods.cpp`; these
+  groups do not claim original TU placement. Vehicle slot 36 and Soultree slots
+  6/36 remain in their respective sample files because of matching or dependency
+  gaps. See [Vehicle methods](../../docs/VEHICLE_METHODS.md) and
+  [Soultree methods](../../docs/SOULTREE_PHYSICS_METHODS.md).
 
 Bindings (`*.bindings.json` next to each `.cpp`) were proposed by
 `tools/propose_bindings.py` from masked-exact targets only and accepted only on

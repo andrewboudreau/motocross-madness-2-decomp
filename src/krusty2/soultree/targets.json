@@ -882,7 +882,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?LoadFromParameters@SoultreeObject@@QAEXPAVUnknownParameterStream@@H@Z",
+    "candidate_symbol_contains": "?LoadFromParameters@SoultreeObject@@QAEXPAVUnknownTextureStream@@H@Z",
     "target_va": "0x004fdb60",
     "target_size": 159,
     "expect": "exact",

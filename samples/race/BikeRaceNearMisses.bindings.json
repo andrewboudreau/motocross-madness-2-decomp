@@ -173,10 +173,6 @@
   "?EnableByClassName@UnknownBikeRaceRoot@@QAEXPBD@Z": "0x00468f10",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?Unlink@GameObject@@QAEHXZ": "0x004691f0",
-  "?ShowDialog@UnknownKrustyUIGui@@QAEXPAVGameObject@@HHHHHHH@Z": "0x00485a70",
-  "?GetUser@UnknownKrustyUIGui@@QAEPAUUnknownKrustyUIGuiLayer@@H@Z": "0x00486540",
-  "?CreateCursors@UnknownKrustyUIGui@@QAEXPBDH@Z": "0x00486590",
-  "?ShowCursors@UnknownKrustyUIGui@@QAEXH@Z": "0x00486630",
   "?ModifierHolds@KeyboardDevice@@QAEHH@Z": "0x0048a240",
   "?SetupDigits@NumberObjectManager@@QAEPAV1@PAXHPAUUnknownNumberRacer@@HPAUUnknownNumberCamera@@M@Z": "0x0048bd00",
   "?SetupCounter@BonusObjectManager@@QAEPAV1@PAXHHPAUUnknownBonusRacer@@PAUUnknownBonusCamera@@@Z": "0x0048ca60",
@@ -361,5 +357,9 @@
   "_sprintf": "0x00534aaf",
   "_strncpy": "0x00534b10",
   "_strrchr": "0x00534a60",
-  "??DVector3@@QBE?AU0@M@Z": "0x005015b0"
+  "??DVector3@@QBE?AU0@M@Z": "0x005015b0",
+  "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
+  "?GetUser@GUIManager@@QAEPAVGUIUser@@H@Z": "0x00486540",
+  "?CreateCursors@GUIManager@@QAEXPBDH@Z": "0x00486590",
+  "?ShowCursors@GUIManager@@QAEXH@Z": "0x00486630"
 }
