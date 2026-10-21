@@ -1,0 +1,22 @@
+{
+  "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
+  "??1UnknownTextureStream@@QAE@XZ": "0x00460d60",
+  "??2@YAPAXIPBDH@Z": "0x004a3010",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??3@YAXPAXPBDH@Z": "0x004a3060",
+  "??_C@_02MMAH@rt?$AA@": "0x0056b274",
+  "??_C@_06MMHP@CAMERA?$AA@": "0x0056b26c",
+  "??_C@_0CE@EPFO@?$CF?$CKs?$CF?$CKs?$CF?$CKf?$CF?$CKf?$CF?$CKf?$CFf?$CFf?$CFf?$CFf?$CFf?$CFf?$CFf?$CFf?$CF@": "0x0056b248",
+  "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
+  "?Seek@UnknownTextureStream@@QAEHHHH@Z": "0x00461340",
+  "?ReadLine@UnknownTextureStream@@QAEHPADH@Z": "0x00461aa0",
+  "?LoadCameraFile@FollowCamera@@QAEXPBD@Z$ehhandler": "0x0054abba",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "__FILE__": "0x0056b220",
+  "__FILE__:followcameranearmisses.cpp": "0x0056b220",
+  "__strnicmp": "0x005476f0",
+  "_sscanf": "0x0053530b",
+  "?LoadCameraFile@FollowCamera@@QAEXPBD@Z": "0x004650e0",
+  "?Vec3Normalize@@YA?AUVec3@@ABU1@@Z": "0x005087b0",
+  "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z": "0x00515600"
+}

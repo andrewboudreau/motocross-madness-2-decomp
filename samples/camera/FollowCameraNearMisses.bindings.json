@@ -104,5 +104,7 @@
   "?Tick@FollowCamera@@UAEHM@Z": "0x00465c20",
   "?Vec3DotCall@@YAMPBUVec3@@0@Z": "0x0040ae30",
   "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z": "0x005015b0",
-  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10"
+  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10",
+  "?Vec3Normalize@@YA?AUVec3@@ABU1@@Z": "0x005087b0",
+  "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z": "0x00515600"
 }

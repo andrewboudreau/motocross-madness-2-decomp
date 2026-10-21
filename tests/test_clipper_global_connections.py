@@ -33,7 +33,8 @@ SOURCES = (
     'samples/physics/visibility/VisibilityQuadTreeTraversal.cpp',
     'src/krusty2/broadphase/Terrain.cpp',
 )
-FILENAMES = SOURCES + ('samples/camera/FollowCameraTick.cpp',)
+FILENAMES = SOURCES + ('samples/camera/FollowCameraTick.cpp',
+                       'samples/camera/FollowCameraLoadFile.cpp')
 
 def view(obj, normalize_paths=()):
     """Complete sections and destinations, with known source paths made portable."""
@@ -180,7 +181,8 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
                 strict += 1
             # The actual frozen PCCamera emits one strict implicit destructor COMDAT.
             self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 1036)
-            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4713)
+            # The corrected camera loader adds its explicit first-cross call relocation.
+            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4714)
         print('Clipper global:', strict, 'strict checks; 15 whole objects; 46 retail pointer loads; storage remains unresolved')
 
 

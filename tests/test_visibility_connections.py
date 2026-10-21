@@ -28,7 +28,8 @@ SOURCES = (
     'src/krusty2/visibility/VisibilityQuadTree.cpp',
 )
 PROVIDER = SOURCES[-1]
-FILENAMES = SOURCES + ('samples/camera/FollowCameraTick.cpp',)
+FILENAMES = SOURCES + ('samples/camera/FollowCameraTick.cpp',
+                       'samples/camera/FollowCameraLoadFile.cpp')
 METHODS = [('TransformVectors', 0x52f0a0, 156), ('TestDot', 0x52f140, 72),
            ('ProjectPoint', 0x52f340, 389), ('CullQuad', 0x52f4d0, 155),
            ('CullPolygon', 0x52fac0, 234)]

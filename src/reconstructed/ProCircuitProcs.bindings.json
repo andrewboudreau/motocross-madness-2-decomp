@@ -169,7 +169,7 @@
   "?PaintNumber@UnknownBikeNumberPainter@@QAEXPAVD3DIMSoultreeObject@@H@Z": "0x00417670",
   "?SetFrame@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
   "?SetViewport@Camera@@QAEHHHHH@Z": "0x0042f190",
-  "?ReplaceMaterialTexture@UnknownProCircuitSkinned@@QAEXHPBDPAPAVTextureMapManager@@@Z": "0x00444c70",
+  "?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z": "0x00444c70",
   "?CompareRowNumbersAscending@@YAHPBX0@Z": "0x0044b0a0",
   "?CompareRowNumbersDescending@@YAHPBX0@Z": "0x0044b0e0",
   "?LeaveMenusForRace@@YAXXZ": "0x004536e0",

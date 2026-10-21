@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
@@ -17,17 +18,27 @@ from tools.match import compare
 from tools.run_calibration import CASES
 from test_edit_box_on_char import extract
 from test_edit_box_draw import signature
-from test_uianim_connections import whole_object, pin
+from test_uianim_connections import whole_object, pin, FILENAMES
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCES = ('src/reconstructed/DlgProcs.cpp', 'samples/ui/DlgProcsNearMisses.cpp')
+SOURCES = ('src/reconstructed/DlgProcs.cpp', 'samples/ui/DlgProcsNearMisses.cpp',
+           'src/reconstructed/ProCircuitProcs.cpp', 'samples/ui/ProCircuitProcsNearMisses.cpp')
 RENDER = 'src/reconstructed/D3DIMSoulTree.cpp'
 GARAGE = 'src/reconstructed/KrustyUI.cpp'
 CHARACTER = 'src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp'
 MATERIAL = 'src/reconstructed/SoultreeMaterial.cpp'
 PROVIDER = '?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z'
 OLD = '?ReplaceMaterialTexture@UnknownModelTexture@@QAEXHPBDPAPAVTextureMapManager@@@Z'
+OTHER_OLD = '?ReplaceMaterialTexture@UnknownProCircuitSkinned@@QAEXHPBDPAPAVTextureMapManager@@@Z'
 CALLER = '?RenderPre3D@SPBikeRiderDlg@@UAEHXZ'
+OTHER_CALLER = '?RenderPre3D@PCCentralBikeRiderDlg@@UAEHXZ'
+
+
+def material_object(obj):
+    # Reuse the complete-section representation, extending only its explicit
+    # filename allowlist for the two added caller paths.
+    with patch('test_uianim_connections.FILENAMES', FILENAMES + SOURCES[2:]):
+        return whole_object(obj)
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),
@@ -40,7 +51,7 @@ class GarageMaterialConnectionsTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(image.data).hexdigest(),
                          '31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874')
         expected = json.loads((ROOT/'tests/fixtures/garage_material_objects.json').read_text())
-        self.assertEqual(expected['renames'], {OLD: PROVIDER})
+        self.assertEqual(expected['renames'], {OLD: PROVIDER, OTHER_OLD: PROVIDER})
         decoder = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
         decoder.detail = True
 
@@ -68,7 +79,7 @@ class GarageMaterialConnectionsTests(unittest.TestCase):
                          b'.?AVD3DIMSoultreeCharacter@@')
         self.assertEqual(struct.unpack('<I', image.bytes_at_va(0x551530, 4))[0], 0x445a70)
         code = {i.address: (i.mnemonic, i.op_str) for va, size in
-                ((0x498cf0, 3114), (0x445a70, 1021), (0x44ffc0, 257)) for i in decode(va, size)}
+                ((0x498cf0, 3114), (0x445a70, 1021), (0x44ffc0, 257), (0x4d77d0, 236)) for i in decode(va, size)}
         for va, instruction in {
             0x499548: ('push', '0x240'), 0x49956e: ('call', '0x4455b0'),
             0x499577: ('mov', 'dword ptr [ebp + 0x46c], eax'),
@@ -88,6 +99,14 @@ class GarageMaterialConnectionsTests(unittest.TestCase):
             0x4500a6: ('mov', 'ecx, dword ptr [eax + 0x1a0]'),
             0x4500ac: ('call', '0x444c70'),
             0x4500b1: ('mov', 'dword ptr [esi + 0x7f88], 0'),
+            0x4d782c: ('mov', 'ecx, dword ptr [eax + edx*8 + 0xc0]'),
+            0x4d7833: ('mov', 'ecx, dword ptr [ecx + 0x1a0]'),
+            0x4d7839: ('call', '0x444c70'),
+            0x4d783e: ('mov', 'dword ptr [esi + 0x7f84], 0'),
+            0x4d7895: ('mov', 'eax, dword ptr [edi + 0x46c]'),
+            0x4d789d: ('mov', 'ecx, dword ptr [eax + 0x1a0]'),
+            0x4d78a3: ('call', '0x444c70'),
+            0x4d78a8: ('mov', 'dword ptr [esi + 0x7f88], 0'),
         }.items(): self.assertEqual(code[va], instruction)
         caller = decode(0x44ffc0, 257)
         self.assertEqual([i.address for i in caller if i.mnemonic == 'call' and i.op_str == '0x444c70'],
@@ -96,6 +115,13 @@ class GarageMaterialConnectionsTests(unittest.TestCase):
         # int return is ignored. The full provider only reads arguments1 and2.
         self.assertEqual([i.address for i in caller if i.mnemonic == 'add' and i.op_str == 'edx, 0x1c'],
                          [0x45001d, 0x450090])
+        circuit_caller = decode(0x4d77d0, 236)
+        self.assertEqual([i.address for i in circuit_caller
+                          if i.mnemonic == 'call' and i.op_str == '0x444c70'],
+                         [0x4d7839, 0x4d78a3])
+        self.assertEqual([i.address for i in circuit_caller
+                          if i.mnemonic == 'add' and i.op_str == 'edx, 0x1c'],
+                         [0x4d7814, 0x4d7887])
         provider_code = decode(0x444c70, 133)
         self.assertEqual([(i.address, i.op_str) for i in provider_code if i.mnemonic == 'ret'],
                          [(0x444c84, '0xc'), (0x444c9e, '0xc'), (0x444cf2, '0xc')])
@@ -120,7 +146,7 @@ class GarageMaterialConnectionsTests(unittest.TestCase):
             strict = 0
             for n, source in enumerate(SOURCES):
                 _, obj = compile_source(ROOT/source, 'consumer'+str(n))
-                self.assertEqual(pin(whole_object(obj)), expected['objects'][source])
+                self.assertEqual(pin(material_object(obj)), expected['objects'][source])
                 for case in CASES:
                     if case['source'] != source: continue
                     self.assertTrue(compare(image, obj, case['symbol'], int(case['target_va'], 0),
@@ -128,12 +154,13 @@ class GarageMaterialConnectionsTests(unittest.TestCase):
                     strict += 1
                 imports = {s.name for s in obj.symbols if s.section_number == 0 and s.storage_class == 2}
                 self.assertIn(PROVIDER, imports)
-                self.assertNotIn(OLD, imports)
-                symbol = obj.find_symbol(CALLER)
+                self.assertFalse(imports & {OLD, OTHER_OLD})
+                symbol = obj.find_symbol(CALLER if n < 2 else OTHER_CALLER)
                 _, size, relocs = obj.symbol_extent(symbol)
-                self.assertEqual(size, 257)
+                self.assertEqual(size, 257 if n < 2 else 236)
                 self.assertEqual([(r.virtual_address-symbol.value, r.type) for r in relocs
-                                  if obj.symbol_by_index[r.symbol_index].name == PROVIDER], [(131, 20), (237, 20)])
+                                  if obj.symbol_by_index[r.symbol_index].name == PROVIDER],
+                                 [(131, 20), (237, 20)] if n < 2 else [(106, 20), (212, 20)])
             objects = {}
             for n, source in enumerate((RENDER, GARAGE, CHARACTER, MATERIAL)):
                 _, objects[source] = compile_source(ROOT/source, 'provider'+str(n),
@@ -176,8 +203,8 @@ class GarageMaterialConnectionsTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
             self.assertEqual(result.stdout.strip(),
                              'ReplaceMaterialTexture: 11589 cases, 69 AV, 1080 scripted throws')
-        self.assertEqual(strict, 99)
-        print('%d strict checks; two whole objects; two calls; %s' % (strict, result.stdout.strip()))
+        self.assertEqual(strict, 136)
+        print('%d strict checks; four whole objects; four calls; %s' % (strict, result.stdout.strip()))
 
 
 if __name__ == '__main__':

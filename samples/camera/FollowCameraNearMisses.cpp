@@ -48,16 +48,10 @@
 // (they keep the sum on the FPU stack), and the key queries must be macros: with inline
 // helpers VC6 runs out of inline budget and calls the Vector3 constructor.
 //
-// FollowCamera::LoadCameraFile (0x004650e0, 1014 bytes; 519 here, 952 bytes):
-// registers and the EH frame agree once the frame pointer is taken before the
-// vector maths.  Normalising the second cross product straight from the call
-// (`up = Vec3Normalize(FollowCameraCross(direction, side))`) gives retail's frame
-// 0x18c: the product becomes a memory temporary passed by reference.  Retail also
-// stores each component of the first product to a temporary, copies it to `side`
-// and reads the temporary (not `side`) in the second product.  A named result
-// (`Vector3 r; r.x = ...`), float locals, by-value operands (either or both) and
-// assignment instead of initialisation (41 forms) keep that product on the FPU
-// stack (508..513 with the separate normalisation).
+// FollowCamera::LoadCameraFile (0x004650e0, complete 1014 bytes) is retained in
+// FollowCameraLoadFile.cpp. Native evidence corrects first-cross float rounding
+// and progressive matrix-store faults; see docs/FOLLOW_CAMERA_LOAD_FILE.md.
+// It remains nonexact. The previous candidate was 952 bytes / 519 positions.
 //
 // FollowCamera::FollowCamera (0x00462ee0, 564 bytes; 511 of 564): every
 // store value, offset and the static slot-71 call are right. Storing the
@@ -181,58 +175,7 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
 // numbers, a direction, an up hint and a position (each stored x, z, y) and
 // one more value. The frame matrix gets the side, the corrected up and the
 // direction as rows 0-2 and the position as row 3.
-void FollowCamera::LoadCameraFile(const char* path) {
-    UnknownTextureStream* stream =
-        new(__FILE__, 0x3c7) UnknownTextureStream(g_ResourceManager);
-    if (!stream->Open(path, "rt", 0)) {
-        delete stream;
-        return;
-    }
-    char line[256];
-    frameCount = 0;
-    while (stream->ReadLine(line, 0xff)) {
-        if (!_strnicmp(line, "CAMERA", 6))
-            frameCount++;
-    }
-    frames = new(__FILE__, 0x3e1) Matrix4[frameCount];
-    field_0x33c = new(__FILE__, 0x3e2) float[frameCount];
-    stream->Seek(stream->sliceOffset, 0, 1);
-    int k = 0;
-    while (stream->ReadLine(line, 0xff)) {
-        if (!_strnicmp(line, "CAMERA", 6)) {
-            Vector3 direction;
-            Vector3 upHint;
-            Vector3 position;
-            sscanf(line, "%*s%*s%*f%*f%*f%f%f%f%f%f%f%f%f%f%f", &direction.x, &direction.z,
-                   &direction.y, &upHint.x, &upHint.z, &upHint.y, &position.x, &position.z,
-                   &position.y, &field_0x33c[k]);
-            Matrix4* frame = &frames[k];
-            Vector3 forward = direction;
-            Vector3 side = FollowCameraCross(upHint, direction);
-            Vector3 up = Vec3Normalize(FollowCameraCross(direction, side));
-            forward = Vec3Normalize(forward);
-            side = CrossProduct(up, forward);
-            frame->m[0][0] = side.x;
-            frame->m[0][1] = side.y;
-            frame->m[0][2] = side.z;
-            frame->m[0][3] = 0.0f;
-            frame->m[1][0] = up.x;
-            frame->m[1][1] = up.y;
-            frame->m[1][2] = up.z;
-            frame->m[1][3] = 0.0f;
-            frame->m[2][0] = forward.x;
-            frame->m[2][1] = forward.y;
-            frame->m[2][2] = forward.z;
-            frame->m[2][3] = 0.0f;
-            frame->m[3][0] = position.x;
-            frame->m[3][1] = position.y;
-            frame->m[3][2] = position.z;
-            frame->m[3][3] = 1.0f;
-            k++;
-        }
-    }
-    delete stream;
-}
+#include "FollowCameraLoadFile.cpp"
 
 #include "FollowCameraControls.cpp"
 

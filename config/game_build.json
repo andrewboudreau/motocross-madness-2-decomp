@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/camera/FollowCameraLoadFile.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete camera-file loader checked in 1551 finite native cases with actual stream, math and CRT helpers, constructor unwind and progressive output faults. VC6 emits 980 bytes versus 1014 retail bytes, with 429 resolved matching positions. Two retained negative controls demonstrate the repaired first-cross rounding and matrix-store order. Shared stream CheckHeader/Seek remain nonexact; debug allocation is scripted and full camera lifetime is unverified.",
+      "evidence": "docs/FOLLOW_CAMERA_LOAD_FILE.md#functional-build-review"
+    },
+    {
       "path": "samples/track/StatsStandingsDraw.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete standings drawing candidate checked in 3228 finite native scenarios with actual iteration, formatting, texture and overlay helpers. VC6 emits 1004 bytes against 1002 retail bytes, with 605 resolved matching positions. All 37 aggregate sections and 162 relocations are preserved except two iterator calls connected to the existing BikeRace provider. COM, GDI and resource callbacks are scripted; integrated HUD rendering remains unverified.",

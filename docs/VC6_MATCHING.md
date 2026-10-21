@@ -23,34 +23,42 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The [garage texture connection](GARAGE_MATERIAL_CONNECTIONS.md) routes the two
-single-player bike/rider preview calls to the existing D3DIMSoultreeObject
-provider. The primary model receiver is traced through actual allocation,
-constructor and Character field stores. Both complete objects preserve 977
-nondebug sections and 7,192 relocations under one method-name change. Native
-prepared-state checks exercise the actual 133-byte provider in 11,589 cases,
-including 69 independently checked access faults and 1,080 scripted throws.
-Texture resource loading is scripted; native VC6 string copying is shared.
-The separate ProCircuit connection has not yet completed its own acceptance
-checks.
+The [garage material connection](GARAGE_MATERIAL_CONNECTIONS.md) now also routes
+the two ProCircuit bike/rider preview calls to the existing D3DIMSoultreeObject
+provider. The genuine class header is included before its first complete-type
+consumer; original include order is not claimed. Both ProCircuit objects preserve
+all 698 nondebug sections and 4,404 relocations under one verified method-name
+change. The combined garage regression passes 136 strict checks and 11,589 native
+cases with the actual 133-byte provider. Resource loading is scripted, and native
+VC6 string copying is shared. The published LZW consumer pin was independently
+reproduced before updating its one affected record.
 
-The [StatsOverlay default method](STATS_OVERLAY_DEFAULT.md) supplies the missing
-complete three-byte return used by the quarry cue update. Five strict comparisons
-cover its full body and the actual allocation, constructor, LoadPanel and tick
-chain. The primary object and single stack argument are checked directly;
-other methods sharing that retail address retain their separate identities.
-The new object adds no imports, storage or CRT initializer.
+The [camera-file loader](FOLLOW_CAMERA_LOAD_FILE.md) supplies the missing flyby
+resource loader as an explicitly reviewed nonexact candidate. It passes 1,551
+native cases using actual stream and math helpers, plus constructor-unwind and
+progressive-output guards. Two retained negative controls demonstrate the repaired
+first-cross float rounding and matrix-store order. The complete candidate is
+980 bytes with 429 matching positions against 1,014 retail bytes; the previous
+952-byte candidate had 519 positions but failed those behavior checks. This
+separate candidate correction is not counted as a strict match. Shared stream
+CheckHeader/Seek remain nonexact; allocation is scripted, and full camera
+construction, malformed records and unmasked floating-point exceptions are outside
+the native test scope.
 
-All 260 prior production objects preserve 10,693 nondebug sections and 45,776
-relocations under the single garage call-name connection, without filename
-exclusions. The new default-method object independently reproduces its actual
-game compile command. Published UIAnim object pins were independently reproduced
-before updating the two DlgProcs entries under that exact connection.
-Isolated real links remove exactly two names, **223 -> 222 -> 221**, with none
+All 261 prior production objects preserve 10,695 nondebug sections and 45,776
+relocations under the single ProCircuit call-name connection, without filename
+exclusions. Independent compilation reproduces the new loader's nine sections
+and 37 relocations under the actual game command. The camera aggregate accounts
+for all 66 sections: 63 remain identical; the corrected loader, constructor-EH
+stack displacement and validated diagnostic filename are the only changes.
+Both prior visibility-test fingerprints were independently reproduced before
+updating their camera aggregate records; their filename allowlists now explicitly
+include the extracted loader path. Other object fingerprints remain unchanged.
+Isolated real links remove exactly two names, **221 -> 220 -> 219**, with none
 added. The final report checks all source/header hashes, configuration, compiler
 profile and per-source flags. Private evidence is in
-`work/game-build/round53-link-evidence.json`, `round53-all-objects.json`,
-`round53-admitted.json` and `connections-round53-preservation.json`.
+`work/game-build/round54-link-evidence.json`, `round54-all-objects.json`,
+`round54-admitted.json` and `connections-round54-preservation.json`.
 
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and excluded from strict counts.
@@ -59,9 +67,9 @@ helper; this slice changes no compiler flags. Finite native checks do not
 establish integrated gameplay.
 
 Game linking still fails; startup, integrated menus and racing remain untested.
-Static checks pass for 274 Python files and 418 JSON files.
-The final full regression run passes: 557 tests, 546 passed and 11 skipped
-(`work/game-build/tests-round53-final.log`).
+Static checks pass for 275 Python files and 420 JSON files.
+The final full regression run passes: 558 tests, 547 passed and 11 skipped
+(`work/game-build/tests-round54-final.log`).
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

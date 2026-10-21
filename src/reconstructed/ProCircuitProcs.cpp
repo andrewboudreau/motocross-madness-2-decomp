@@ -1265,6 +1265,9 @@ void PCCentralBikeRiderDlg::FillBikeRiderLists()
 }
 
 
+// The material replacement below consumes the canonical model declaration.
+#include "D3DIMSoulTree.h"
+
 // 0x004d77d0
 int PCCentralBikeRiderDlg::RenderPre3D()
 {
@@ -1273,16 +1276,16 @@ int PCCentralBikeRiderDlg::RenderPre3D()
         KrustyUI* ui = g_TrackGame->ui;
         int bike = list->GetRowData(-1);
         UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)ui->bikes)[bike];
-        ((UnknownProCircuitSkinned*)((UnknownKrustyUIModel*)ui->manufacturers)[entry->model].uiModel->plateTexture)
-            ->ReplaceMaterialTexture(0, entry->texture, &g_TrackGame->textureContext);
+        reinterpret_cast<D3DIMSoultreeObject*>(((UnknownKrustyUIModel*)ui->manufacturers)[entry->model].uiModel->plateTexture)
+            ->ReplaceMaterialTexture(0, entry->texture, reinterpret_cast<int>(&g_TrackGame->textureContext));
         bikeChanged = 0;
     }
     if (riderChanged) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIModel* rider = &((UnknownKrustyUIModel*)ui->riders)[list->GetRowData(-1)];
-        ((UnknownProCircuitSkinned*)ui->riderPreview->plateTexture)
-            ->ReplaceMaterialTexture(0, rider->modelName, &g_TrackGame->textureContext);
+        reinterpret_cast<D3DIMSoultreeObject*>(ui->riderPreview->plateTexture)
+            ->ReplaceMaterialTexture(0, rider->modelName, reinterpret_cast<int>(&g_TrackGame->textureContext));
         riderChanged = 0;
     }
     return UIDialog::RenderPre3D();
