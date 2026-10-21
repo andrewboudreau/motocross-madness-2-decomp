@@ -49,12 +49,17 @@
 // `along`, by-value or derived-type returning helpers, `from + along`;
 // prepending 0..63 typedefs (tools/decl_shift_scan.py) never changes it.
 
-// Compiled inside Wrecker.cpp, whose vector operators, WreckerCross, the
-// out-of-line constructor view WreckerVec3Call and the mean push's inline
-// `operator/` (`v * (1.0f / s)`) these candidates use.
+// Compiled inside Wrecker.cpp, whose vector operators, WreckerCross and the
+// mean push's inline `operator/` (`v * (1.0f / s)`) these candidates use.
 #include <math.h>
 
 #include "../../src/reconstructed/Wrecker.cpp"
+
+// This call-only view is still needed by the unfinished helpers below.
+// The canonical Wrecker playback body uses the shared Vec3 constructor.
+struct WreckerVec3Call : Vector3 {
+    WreckerVec3Call(float x_, float y_, float z_);
+};
 
 inline float WreckerSquareMagnitude(const Vector3& v) {
     return v.x * v.x + v.y * v.y + v.z * v.z;

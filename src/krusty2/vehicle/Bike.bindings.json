@@ -4,7 +4,7 @@
   "??0BikeA60C@@QAE@PBDPAVSoultreeObject@@PAVSteeringControl@@@Z": "0x004a23a0",
   "??0BikeDirtChunkEmitter@@QAE@H@Z": "0x004b8df0",
   "??0BikeDustEmitter@@QAE@H@Z": "0x004b8a00",
-  "??0BikeOolVec3@@QAE@MMM@Z": "0x00404e60",
+  "??0Vec3@@QAE@MMM@Z": "0x00404e60",
   "??0BikeSteamEmitter@@QAE@H@Z": "0x004b9f40",
   "??0BikeVec3Call@@QAE@MMM@Z": "0x00404e60",
   "??0D3DIMSoultreeCharacter@@QAE@H@Z": "0x004455b0",
@@ -89,7 +89,7 @@
   "?BikeRemoveCollisionPoint@@YAXPAPAVSoultreeContact@@PAXPAH@Z": "0x0043a5e0",
   "?BikeStaticCollisionCallback@@YAXPAVCollisionObject@@0@Z": "0x00405d70",
   "?BikeVec3Dot@@YAMABUVec3@@0@Z": "0x0040ae30",
-  "?BikeVec3Add@@YA?AUVec3@@ABU1@0@Z": "0x00421cb0",
+  "??H@YA?AUVec3@@ABU0@0@Z": "0x00421cb0",
   "?BikeVec3Scale@@YA?AUVec3@@ABU1@M@Z": "0x005015b0",
   "?BikeVec3Sub@@YA?AUVec3@@ABU1@0@Z": "0x00421d00",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
@@ -251,5 +251,6 @@
   "_kVec3Zero": "0x005778a8",
   "_strcmp": "0x00536070",
   "_strncpy": "0x00534b10",
-  "__real@8@00000000000000000000": "0x005507e8"
+  "__real@8@00000000000000000000": "0x005507e8",
+  "??G@YA?AUVec3@@ABU0@0@Z": "0x00421d00"
 }

@@ -5,7 +5,7 @@
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?NextKey@BonusObjectManager@@QAEXXZ": "0x0048cad0",
   "?HideDigits@BonusObjectManager@@QAEXXZ": "0x0048d540",
-  "?SetAxesPtr@D3DIMSoultreeObject@@QAEXPBUVector3@@0HH@Z": "0x004fbd70",
+  "?SetAxesPtr@SoultreeObject@@QAEXPBUVec3@@0HH@Z": "0x004fbd70",
   "?TranslateIn@SoultreeObject@@QAEXPAV1@UVector3@@@Z": "0x004fc690",
   "?GetPosition@UnknownBonusRacerPart@@QAEXPAUVector3@@@Z": "0x004fc970",
   "?SetRotation@SoultreeObject@@QAEXMMMM@Z": "0x004fd090",

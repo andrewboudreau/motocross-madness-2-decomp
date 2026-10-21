@@ -389,7 +389,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             strncpy(staticModels->casters[i].fileName, sltPath, count);
             staticModels->casters[i].fileName[count] = 0;
             ((D3DIMSoultreeObject*)staticModels->casters[i].model)->SetPositionVec3(position);
-            ((D3DIMSoultreeObject*)staticModels->casters[i].model)->SetAxesPtr(&look, &up, 1, 0);
+            ((D3DIMSoultreeObject*)staticModels->casters[i].model)->SetAxesPtr(reinterpret_cast<const Vec3*>(&look), reinterpret_cast<const Vec3*>(&up), 1, 0);
             parameters.GetInt("Collision", 1, &collision);
             staticModels->casters[i].collisionObject = 0;
             if (collision && !stadium

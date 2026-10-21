@@ -534,7 +534,8 @@ bool FollowCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool 
 float FastInvSqrt(float value);                          // 0x00460c00: 1/sqrt approximation
 float Vec3Dot(const Vector3* a, const Vector3* b);   // 0x0040ae30: dot product
 Vector3 Vec3ScaleCall(const Vector3& v, float scale);      // 0x005015b0: v * scale
-Vector3 CrossProduct(const Vector3& a, const Vector3& b); // 0x00515600: cross product
+#include "../krusty2/math/Vec3.h"
+Vec3 CrossProductCall(const Vec3& a, const Vec3& b); // 0x00515600: shared cross product
 
 // Inline cross product (expanded by slot 46). The parenthesised first
 // products put each fsubp between the load and the store of the previous component's copy,
@@ -561,7 +562,7 @@ void FollowCamera::UnknownVirtualSlot46(Vector3* forward, Vector3* up) {
     y = FollowCameraCross(z, FollowCameraCross(y, z));
     y = FollowCameraNormalize(y);
     z = FollowCameraNormalize(z);
-    Vector3 x = CrossProduct(y, z);
+    Vec3 x = CrossProductCall(reinterpret_cast<const Vec3&>(y), reinterpret_cast<const Vec3&>(z));
     orientation.m[0][0] = x.x;
     orientation.m[0][1] = x.y;
     orientation.m[0][2] = x.z;

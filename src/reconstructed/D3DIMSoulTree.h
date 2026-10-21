@@ -69,6 +69,10 @@ public:
     void GetPositionIn(SoultreeObject* frame, Vec3* out);          // 0x004fc9a0
     Vec3* GetPosition(Vec3* out);                                 // 0x004fc970
     void GetAxes(Vec3* first, Vec3* second);                      // 0x004fc4f0
+    void SetPosition(const Vec3& position);                      // 0x004fc660
+    void GetSubtreeBounds(Vec3* center, Vec3* extents);            // 0x004fe850
+    void SetAxesPtr(const Vec3* z, const Vec3* y, int orthogonalize, int keepZ); // 0x004fbd70
+    void Rotate(Vec3 axis, float angle);                         // 0x004fceb0
     void GetLocalMatrix(Matrix4* out);                            // 0x004fca60
     void GetMatrixIn(SoultreeObject* frame, Matrix4* out);          // 0x004fca80
     SoultreeObject* FindByName(const char* name);                  // 0x004fdae0
@@ -227,15 +231,6 @@ public:
 
     void SetPositionVec3(Vector3 position);  // 0x004fc630: sets the local translation
     void Scale(float x, float y, float z); // 0x004fd340
-    // Seen from ArcadeObject.cpp: 0x004fc660 (ret 4) sets the position from
-    // a pointer, 0x004fe850 (ret 8) returns two vectors (the second is the
-    // half extent ArcadeObject doubles), 0x004fbd70 (ret 0x10) takes four
-    // pass-through arguments, 0x004fceb0 (ret 0x10) an axis and an angle,
-    // 0x00444d80 (ret 4) attaches a modifier.
-    void SetPosition(const Vector3* position);
-    void GetSubtreeBounds(Vector3* a, Vector3* b);
-    void SetAxesPtr(const Vector3* a, const Vector3* b, int c, int d); // two axes by pointer
-    void Rotate(Vector3 axis, float angle);
     void AddModifier(GameObject* modifier);        // 0x00444d80: appends to the first list (+0x264)
     // Seen from D3DIMSoultreeModifier.cpp: 0x00444de0 and 0x00444f10 (both
     // ret 4) remove a modifier from the first (+0x264) or second (+0x26c)

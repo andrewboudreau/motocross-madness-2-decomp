@@ -354,17 +354,16 @@ exact:
   slot out. The ModelVsHull family (`0x437c20`, `0x437ef0`, `0x438280`, `0x4376f0`) gets
   retail's frame from both temporaries sharing one slot; its inverse is written into the
   product's own local (`MatrixMultiply(&rel, rel, b)`), one 64-byte slot.
-- An inline helper that returns the base type (`Vec3`) from an out-of-line constructor of a
-  derived call type (`return BikeOolVec3(...)`) constructs into a temporary and copies it into
-  the helper's return slot; returning the derived type binds the constructor result directly.
-  Retail's chain of such helpers in Bike slot 46 (`0x40b600`) shows the copies all landing in
-  one slot at frame 0.
+- Bike slot 46 (`0x40b600`) uses inline arithmetic helpers returning `Vec3(...)`.
+  VC6 naturally emits calls to the canonical vector constructor, with temporary copies
+  sharing one slot at frame 0. A separate derived vector declaration is unnecessary:
+  the complete 1066-byte caller and its 25-byte constructor COMDAT match retail.
 - Temporaries of one full expression stay live to its end; a call result in the next
   statement can take a dead temporary's slot. Bike slot 46 (`0x40b600`) matched once the
   transform `*out = node->WorldToLocalDirection(scratchVector)` was its own statement after
   `scratchVector = <helper chain>` (its result reuses the chain's sum slot), and the
   one-wheel path's sum/difference were by-value out-of-line operator temporaries
-  (`BikeVec3Sub(BikeVec3Add(front, half), position)`) instead of named pointer-call
+  (`front + half - position`) instead of named pointer-call
   results, whose own slots kept the transform result off retail's 0x3c.
 - The same frame can still schedule differently by how the temporary is built: Vehicle slot
   46 (`0x5276d0`) stores the last component and pushes the return pointer as retail only

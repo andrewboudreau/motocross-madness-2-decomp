@@ -62,6 +62,24 @@ relocation resolved by the bindings. Two near misses are parked in
 
 ## Shared model and motion calls
 
+The rotation-basis reconstruction in `Tick` now uses shared `Vec3` locals,
+its three-float constructor, `CrossProductCall` and `Vec3Normalize`. Existing
+definitions in `math/Vec3.h`, `src/reconstructed/CrossProduct.cpp` and
+`src/reconstructed/Math3D.cpp` provide the complete 25/91/150-byte retail
+bodies at `0x00404e60`, `0x00515600` and `0x005087b0`. The constructor is a
+naturally emitted inline COMDAT; the other two providers are existing external
+definitions. No new wrapper, alias implementation or link substitution is used.
+
+This connects three formerly missing names while preserving the complete
+4178-byte Tick and all 29 Wrecker calibration cases. The focused native check
+`tests/test_camera_wrecker_math_connections.py` verifies those callers, actual
+call relocations, provider bytes and vector/matrix layouts. The two unfinished
+sample bodies retain identical bytes and relocations, including their separate
+constructor call view now declared only in `WreckerNearMisses.cpp`; their
+1200/1312 and 1606/1624 comparisons remain partial. Other vector call views
+remain unresolved, and these connections do not establish a running wreck or
+camera path. Original math type names and header ownership remain provisional.
+
 Wrecker's rider pointer uses the existing `D3DIMSoultreeCharacter` declaration
 through the compatibility alias `UnknownWreckerCharacter`. Its primary
 Character subobject remains at offset zero; the GameObject base stays virtual.

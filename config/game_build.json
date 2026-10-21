@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/physics/motion/Motnctrl.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete Character playback and pose helpers pass 835584 native state/pose comparisons; LoadVue passes 33280 parse/ownership/unwind scenarios. Playback uses explicit vector-call boundaries and preserves retail x87 frame-rate precision. Candidate playback is 3333 bytes versus 3327 retail; three existing helper matches remain strict. External vector call-view providers remain unresolved production dependencies.",
+      "evidence": "docs/MOTION_PLAYBACK.md#functional-build-review"
+    },
+    {
       "path": "samples/physics/helpers/SoultreeTransform.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete WorldToLocalDirection body reviewed against retail and checked with the matrix setters in 86016 native full-state/alias scenarios. Both bodies are 209 bytes but one x87 operand-load order differs; finite tested values match, universal NaN equivalence is not claimed.",

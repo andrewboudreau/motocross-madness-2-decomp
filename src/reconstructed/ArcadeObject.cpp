@@ -4,6 +4,7 @@
 
 #include "DebugAlloc.h"
 #include "LightEmitter.h"
+#include "../krusty2/math/Vec3.h"
 #include "MemTag.h"
 #include "ObjectPicker.h"
 #include "TextureMap.h"
@@ -58,7 +59,7 @@ ArcadeObject* ArcadeObject::Create(void* value, int a, int b, const char* name,
     isVisible = 1;
     field_0x44 = size;
     arcadeView = view;
-    arcadeModel->GetSubtreeBounds(&low, &extent);
+    arcadeModel->GetSubtreeBounds(reinterpret_cast<Vec3*>(&low), reinterpret_cast<Vec3*>(&extent));
     modelWidth = extent.x + extent.x;
     modelHeight = extent.y + extent.y;
     if (pixels && arcadeView) {
@@ -84,14 +85,14 @@ ArcadeObject* ArcadeObject::Create(void* value, int a, int b, const char* name,
 
 // 0x004014f0
 void ArcadeObject::SetPosition(const Vector3* position) {
-    arcadeModel->SetPosition(position);
+    arcadeModel->SetPosition(*reinterpret_cast<const Vec3*>(position));
     if (collisionBuilt)
         collisionObject->SnapPlacement();
 }
 
 // 0x00401520
 void ArcadeObject::SetAxes(const Vector3* a, const Vector3* b, int c, int d) {
-    arcadeModel->SetAxesPtr(a, b, c, d);
+    arcadeModel->SetAxesPtr(reinterpret_cast<const Vec3*>(a), reinterpret_cast<const Vec3*>(b), c, d);
 }
 
 // 0x00401540
@@ -159,7 +160,7 @@ int ArcadeObject::Tick(float frameTime) {
         spinAngle = g_TrackGame->frameTime * spinSpeed;
         while (spinAngle > 6.2831855f)
             spinAngle -= 6.2831855f;
-        arcadeModel->Rotate(spinAxis, spinAngle);
+        arcadeModel->Rotate(*reinterpret_cast<const Vec3*>(&spinAxis), spinAngle);
     }
     return 1;
 }

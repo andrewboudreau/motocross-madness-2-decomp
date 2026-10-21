@@ -76,9 +76,8 @@ struct BikeVec3ScaleAssign : Vec3 {
     BikeVec3ScaleAssign& operator*=(float s);
 };
 // By-value views of the out-of-line operators (hidden result pointer first, same ABI as
-// the pointer forms in math/Math3D.h): operator+ 0x00421cb0, operator- 0x00421d00,
+// the pointer forms in math/Math3D.h): operator- 0x00421d00,
 // operator*(Vec3, float) 0x005015b0 and DotProduct 0x0040ae30.
-Vec3 BikeVec3Add(const Vec3& a, const Vec3& b);
 Vec3 BikeVec3Sub(const Vec3& a, const Vec3& b);
 Vec3 BikeVec3Scale(const Vec3& v, float s);
 float BikeVec3Dot(const Vec3& a, const Vec3& b);
@@ -1654,24 +1653,17 @@ void Bike::UnknownVirtualSlot91()
     }
 }
 
-// Vec3 whose (x, y, z) constructor is out of line in retail (0x00404e60,
-// thiscall, ret 0xc); declared only, so VC6 emits the call instead of inlining.
-struct BikeOolVec3 : public Vec3 {
-    BikeOolVec3() {}
-    BikeOolVec3(float x_, float y_, float z_);
-};
-
 static inline Vec3 BikeOolSub(const Vec3& a, const Vec3& b)
 {
-    return BikeOolVec3(a.x - b.x, a.y - b.y, a.z - b.z);
+    return Vec3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
 static inline Vec3 BikeOolAdd(const Vec3& a, const Vec3& b)
 {
-    return BikeOolVec3(a.x + b.x, a.y + b.y, a.z + b.z);
+    return Vec3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 static inline Vec3 BikeOolHalf(const Vec3& v)
 {
-    return BikeOolVec3(v.x * 0.5f, v.y * 0.5f, v.z * 0.5f);
+    return Vec3(v.x * 0.5f, v.y * 0.5f, v.z * 0.5f);
 }
 
 // Slot 46: focus/anchor point of the bike in local space.  Airborne or flagged
@@ -1712,7 +1704,7 @@ Vec3* Bike::UnknownVirtualSlot46(Vec3* out, float t)
         // operators, all as temporaries of one statement
         const Vec3& rear = rearWheel->wheelPosition;
         const Vec3& front = frontWheel->wheelPosition;
-        scratchVector = BikeVec3Sub(BikeVec3Add(frontWheel->wheelPosition, BikeOolHalf(BikeOolSub(rear, front))), position);
+        scratchVector = frontWheel->wheelPosition + BikeOolHalf(BikeOolSub(rear, front)) - position;
         *out = modelNode->WorldToLocalDirection(scratchVector);
         return out;
     }

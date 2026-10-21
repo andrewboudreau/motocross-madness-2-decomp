@@ -116,6 +116,57 @@ box as centre and half extent by `D3DIMSoultreeObject` slot 5,
 0x00444140), `subtreeBoundsCenter`/
 `subtreeBoundsHalfExtent` (+0x174/+0x180, refreshed by 0x004fe0f0) and
 `subtreeDirty` (+0x18c, set up the parent chain by 0x004fdab0).
-`D3DIMSoultreeObject` +0x27c (the current level of detail;
-BoundingBoxTreeBuild.h calls it `currentLod`) stays `field_0x27c` because
-a TU outside this lane reads it.
+`D3DIMSoultreeObject` +0x27c is `currentLod`, the current level of detail.
+
+## Inherited model helpers
+
+The render declaration now inherits these four existing `SoultreeObject`
+providers instead of declaring duplicate D3DIMSoultreeObject methods:
+
+| Provider | Retail VA | Complete bytes |
+| --- | --- | ---: |
+| `SetAxesPtr(const Vec3*, const Vec3*, int, int)` | `0x004fbd70` | 733 |
+| `SetPosition(const Vec3&)` | `0x004fc660` | 38 |
+| `Rotate(Vec3, float)` | `0x004fceb0` | 465 |
+| `GetSubtreeBounds(Vec3*, Vec3*)` | `0x004fe850` | 74 |
+
+The bodies are in `src/krusty2/soultree/soultree.cpp`. Retail RTTI places the
+SoultreeObject base at offset zero within D3DIMSoultreeObject and GameObject
+at `+0x0c`; these calls use the complete node pointer, without a GameObject
+adjustment. `SetPosition` receives the address of three floats and invalidates
+the world matrix after storing the local translation. `Rotate` receives its
+axis by value, preserves the local translation around the rotation product,
+and invalidates the world matrix. `GetSubtreeBounds` refreshes dirty bounds
+before copying the center and extents at `+0x174/+0x180`. The two axes passed
+to `SetAxesPtr` remain pointers, with their two integer flags unchanged.
+
+ArcadeObject, Krusty3DObjects and D3DIMSoulTree keep their local `Vector3`
+buffers and use explicit casts at the canonical `Vec3` boundaries. The
+three-float layouts are checked with VC6; the by-value Rotate call still
+copies the complete vector before calling. No wrapper or helper body is
+added. The render header keeps its existing multiple inheritance; the
+separate flat physics header is not imported into these callers. These
+connections establish four provider identities, not original TU ownership.
+
+`SetPositionVec3` and `Scale` remain unresolved boundaries. The former shares
+the retail three-float entry at `0x004fc630`, but replacing LightEmitter's
+vector argument with three scalar arguments changes its complete emitted
+body; that change is not included. Scale's body is still a partial sample.
+
+`tests/test_render_node_connections.py` checks the four complete providers,
+actual COFF imports/definitions, RTTI offsets, native layouts, and all 125
+calibration cases from D3DIMSoulTree, ArcadeObject, Krusty3DObjects and
+LightEmitter. Together with the vehicle-model regression, 477 focused cases
+remain strict. The affected partial D3DIMSoulTree, Krusty3DObjects and
+SceneManager sample bodies retain their previous sizes and matching-position
+counts; they remain samples. The combined build with the separate Bike query
+connections removes six unresolved names. With the separately reviewed
+Character playback/VUE candidate and camera/Wrecker math connections, the
+current build compiles 184/184 units and has 582 unresolved names.
+
+```powershell
+$env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path
+$env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
+python -m unittest discover -s tests -p test_render_node_connections.py -v
+python -m unittest discover -s tests -p test_vehicle_model_connections.py -v
+```

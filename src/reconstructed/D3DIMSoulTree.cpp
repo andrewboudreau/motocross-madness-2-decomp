@@ -712,7 +712,7 @@ void D3DIMSoultreeObject::ComputeSubtreeBounds()
     Vector3 center;
     Vector3 extents;
     if (!parent) {
-        GetSubtreeBounds(&center, &extents);
+        GetSubtreeBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extents));
         DrawBoxOutline(center, extents, 1);
     }
     GetLocalBounds(&center, &extents);
@@ -875,7 +875,7 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
     if (!center || !extents) {
         center = &boundsCenter;
         extents = &boundsExtents;
-        GetSubtreeBounds(center, extents);
+        GetSubtreeBounds(reinterpret_cast<Vec3*>(center), reinterpret_cast<Vec3*>(extents));
     }
     float distance = Magnitude(LocalToWorldPoint(*center) -
                                ((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->position);

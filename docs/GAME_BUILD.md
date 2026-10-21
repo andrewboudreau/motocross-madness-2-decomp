@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-20 build compiles 183 C++ files (174 canonical sources and nine
-reviewed candidates) and reaches LINK with 594 unresolved external symbols,
+The 2026-10-20 build compiles 184 C++ files (174 canonical sources and ten
+reviewed candidates) and reaches LINK with 582 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -207,13 +207,28 @@ not establish recursive scene-cache integration or universal NaN equivalence.
 These three methods remove three additional missing names without introducing
 new unresolved dependencies.
 
+Four [inherited render-node methods](D3DIMSOULTREE.md#inherited-model-helpers)
+and two [Bike math aliases](BIKE_MATH_CONNECTIONS.md) now reach existing
+providers while preserving complete caller and provider matches. The complete
+[Character playback and VUE loader](MOTION_PLAYBACK.md#functional-build-review)
+unit is a reviewed nonexact candidate. Its native comparisons cover 835,584
+playback/state cases and 33,280 loader/ownership/unwind cases; the three
+previously strict pose helpers remain strict. Playback's extrapolation now
+preserves retail's vector-call rounding and integer frame-rate precision.
+The vector call-view declarations still need production providers. These
+changes remove eight unresolved names and introduce none. Four additional
+[camera](FOLLOW_CAMERA.md) and [Wrecker math connections](WRECKER.md#shared-model-and-motion-calls)
+use the existing vector constructor, cross product and normalization providers.
+All 67 strict caller cases and both Wrecker partial comparisons remain unchanged;
+the real link removes four more names with none added.
+
 Validation of this composition passes the toolchain/manual/generated VC6 gate,
 2,975 of 2,986 calibration rows (2,973 distinct source/address/extent cases),
 and all 1,076 previously strict physics targets among 1,152 comparisons.
 The recursive reset's strict case moves from FileStream.cpp to
 Parameterblocks.cpp with its address and full 30-byte extent unchanged;
 ShowDialog adds one strict case. The native-enabled Python suite passes
-420 tests with 11 skipped. These counts retain existing nonexact comparisons;
+426 tests with 11 skipped. These counts retain existing nonexact comparisons;
 they do not describe a fully matched or working game.
 
 Other incompatible class views, missing methods and unresolved globals

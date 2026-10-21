@@ -153,12 +153,9 @@ inline Vector3 operator-(const Vector3& a, const Vector3& b) {
 // calls the COMDAT copy of a header inline instead of expanding it. Declared
 // only; the bindings map them to the retail copies.
 // ---------------------------------------------------------------------------
-struct WreckerVec3Call : Vector3 {
-    WreckerVec3Call(float x_, float y_, float z_);                 // 0x00404e60
-};
 Vector3 WreckerSubtractValue(const Vector3& a, const Vector3& b);  // 0x00421d00
-Vector3 WreckerNormalizeCall(const Vector3& v);                    // 0x005087b0
-Vector3 WreckerCrossCall(const Vector3& a, const Vector3& b);      // 0x00515600
+Vec3 Vec3Normalize(const Vec3& v);                               // 0x005087b0
+Vec3 CrossProductCall(const Vec3& a, const Vec3& b);              // 0x00515600
 
 // Copies a vector member by member into a returned local: retail copies
 // the old position (and forward row) through a stack temporary this way.
@@ -210,11 +207,11 @@ static inline void WreckerInvertRigid(UnknownWreckerMatrix* m) {
 
 // Rebuilds the rotation rows of a pose from its up and forward rows.
 static inline void WreckerOrthonormalize(UnknownWreckerMatrix* m) {
-    Vector3 up = WreckerVec3Call(m->_21, m->_22, m->_23);
-    Vector3 forward = WreckerVec3Call(m->_31, m->_32, m->_33);
-    forward = WreckerNormalizeCall(forward);
-    Vector3 right = WreckerNormalizeCall(WreckerCrossCall(up, forward));
-    up = WreckerCrossCall(forward, right);
+    Vec3 up = Vec3(m->_21, m->_22, m->_23);
+    Vec3 forward = Vec3(m->_31, m->_32, m->_33);
+    forward = Vec3Normalize(forward);
+    Vec3 right = Vec3Normalize(CrossProductCall(up, forward));
+    up = CrossProductCall(forward, right);
     m->_11 = right.x;
     m->_12 = right.y;
     m->_13 = right.z;

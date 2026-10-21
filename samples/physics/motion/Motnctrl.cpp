@@ -128,8 +128,9 @@ inline Vec3 UnitVector(const Vec3& v)
 }
 
 // 0x0042de90 (BoundingBoxTreeBuild.cpp): rotation of 'angle' radians about (x, y, z), row-vector
-// convention, no translation.  Declared here with this TU's Matrix4.
-void AxisAngleMatrix(Matrix4* m, float x, float y, float z, float angle);
+// convention, no translation. Its provider uses the identical 64-byte tree matrix.
+struct TreeMatrix4;
+void AxisAngleMatrix(TreeMatrix4* m, float x, float y, float z, float angle);
 
 // owner: bracket only
 // 0x004a7dc0 (cdecl, called twice by slot 7 when the angle is nonzero): *dst = *src rotated by
@@ -180,7 +181,7 @@ void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
     position.y = pose._42;
     position.z = pose._43;
     pose._44 = 1.0f;
-    AxisAngleMatrix(&rotation, axis.x, axis.y, axis.z, angle);
+    AxisAngleMatrix(reinterpret_cast<TreeMatrix4*>(&rotation), axis.x, axis.y, axis.z, angle);
     MatrixMultiply(&pose, pose, rotation);
     dst->axisZ.x = pose._31;
     dst->axisZ.y = pose._32;
@@ -238,9 +239,8 @@ void PoseRotation(CharacterPose* a, CharacterPose* b, Vec3* axis, float* angle)
 // clamped to [0, 1]: the axes and the position are interpolated linearly (the axes renormalised),
 // then axisY is made orthogonal to axisZ again.  The three weighted sums at the end are
 // computed into a temporary and never used (retail calls operator* and operator+ for them).
-// Retail also constructs two poses that are never used (two calls of CharacterPose's generated
-// constructor, 0x004a8930, and their 0x58 bytes of frame); with them VC6 calls both
-// CrossProducts and the unused sums' operators out of line as retail does (inline budget).
+// Two unused pose locals reproduce the inline budget of this candidate. The complete retail
+// body has no CharacterPose constructor calls; their original declaration is unproven.
 void InterpolatePose(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t)
 {
     ClampFloat(0.0f, 1.0f, &t);
@@ -336,7 +336,9 @@ inline void ExtrapolatePose7(CharacterPose* a, CharacterPose* b, CharacterPose* 
     PoseRotation(a, b, &axis, &angle);
     float ffps = (float)fps;
     out->hasPose = a->hasPose;
-    angle = ffps * angle * t;
+    // Retail keeps FILD's integer value in x87 for rotation, while the
+    // translation operators below receive the separately rounded float fps.
+    angle = (double)fps * angle * t;
     out->nodeIndex = a->nodeIndex;
     if (angle != 0.0f) {
         RotatePose(b, out, axis, angle);
@@ -362,15 +364,16 @@ inline void ExtrapolatePose7(CharacterPose* a, CharacterPose* b, CharacterPose* 
 // the two poses are interpolated with a smoothstep weight over blendDuration; nodes flagged in the
 // name table keep the blend-from pose.  Past the last frame a looping motion is restarted through
 // BlendToMotion, a non-looping one sets motionStopped.  Returns the frame number, or 0.
-// Near miss (strict is positional, so the metric here is aligned instructions: 693 of 958, 270
-// differing; clearing finished before the time add and the helper's named step give the last ones).  The call sequence and the clamp/ease shape are retail's.  With the two blend inlines
+// Nonexact functional candidate; complete emitted extent 3333 bytes versus retail's 3327.
+// See docs/MOTION_PLAYBACK.md for native differential coverage and dependency boundaries.
+// With the two blend inlines
 // (BlendPose7/BlendPose7B) the constructor calls split 2/4 as in retail, and the playback loop's
 // extrapolation through ExtrapolatePose7 calls Vec3::Vec3 and the operator COMDATs in retail's
 // order.  Left: this pointer in edi (retail esi) in the prologue, with &currentFrame in esi
 // (retail edi) and motionStopped compared in memory (retail loads it into eax first; `!= 0`,
-// `== 1`, a named copy and the time-add spellings do not change either), the blend loop's unused sums
-// and extrapolation (retail calls operator-/*/*/+ there, VC6 inlines some and calls three
-// cross/normalise COMDATs retail does not), and the frame (candidate 3376 bytes).
+// `== 1`, a named copy and the time-add spellings do not change either), and the blend loop's
+// unused sums and cross/normalise calls. Its extrapolation uses the explicit vector-call
+// declarations to retain retail's rounding between subtraction, two scales and addition.
 int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
 {
     MotionPoseList* from;
@@ -450,7 +453,7 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
                 PoseRotation(a, b, &axis, &angle);
                 float ffps = (float)fps;
                 pose2.hasPose = a->hasPose;
-                angle = angle * t * ffps;
+                angle = (angle * t) * ffps;
                 pose2.nodeIndex = a->nodeIndex;
                 if (angle != 0.0f) {
                     RotatePose(b, &pose2, axis, angle);
@@ -459,7 +462,14 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
                     pose2.axisY = b->axisY;
                 }
                 if (flag) {
-                    pose2.position = b->position + (b->position - a->position) * ffps * t;
+                    // Retail calls each vector operator separately. Preserve the float
+                    // result of each call before the next operation: an inlined chain
+                    // retains x87 precision and changes the applied translation.
+                    Vec3 delta, velocity, step;
+                    Vec3SubtractCall(&delta, &b->position, &a->position);
+                    Vec3ScaleCall(&velocity, &delta, ffps);
+                    Vec3ScaleCall(&step, &velocity, t);
+                    Vec3AddCall(&pose2.position, &b->position, &step);
                 } else {
                     pose2.position = b->position;
                 }

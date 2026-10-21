@@ -176,7 +176,7 @@ int D3DIMSoultreeObject::PrepareGeometry()
         ((UnknownSoultreeNodeView*)this)->GetMatrixIn(0, &world);
         Vector3 center;
         Vector3 extents;
-        GetSubtreeBounds(&center, &extents);
+        GetSubtreeBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extents));
         const Matrix4& projection = ((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewMatrix;
         UnknownSoultreeMatrix view;
         view._11 = world.m[0][0] * projection.m[0][0] + world.m[0][1] * projection.m[1][0] + world.m[0][2] * projection.m[2][0] + world.m[0][3] * projection.m[3][0];

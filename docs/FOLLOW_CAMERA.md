@@ -388,6 +388,17 @@ Slot 40 takes a float, because slot 38 loads its argument as one. So the
 FollowCamera and BikeCamera slot 40 cases now use the `@@UAEXM@Z` names.
 The 0x344 matrix belongs to FollowCamera, not VehicleCamera.
 
+Slot 46 now calls the shared `CrossProductCall(const Vec3&, const Vec3&)`
+definition in `src/reconstructed/CrossProduct.cpp`. Its existing `Vector3`
+inputs cross that reference boundary through explicit casts; both types store
+three floats at offsets 0/4/8 and occupy 12 bytes. The returned `Vec3` supplies
+the same rotation-row stores. The complete 576-byte caller and 91-byte provider
+remain strict exact; this removes one missing link name without adding an alias
+body. The type names and original math-header ownership remain provisional.
+`tests/test_camera_wrecker_math_connections.py` checks the native layouts, real
+call relocation and all 38 FollowCamera calibration cases. The dot and scale
+call views in the normalisation path remain separate unresolved dependencies.
+
 Slot 47 (`0x00465720`, 1267 bytes) is exact. It plays the recorded path:
 the record matrix times +0x344 becomes the view, and rows 2, 1 and 3 become
 the forward, up and position vectors. The products are written `b * a`

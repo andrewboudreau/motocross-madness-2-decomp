@@ -150,7 +150,7 @@ int BonusObjectManager::Tick(float frameTime) {
             eyeToFrame = position - camera->eyePosition;
             Vector3 forward = eyeToFrame;
             forward.y = 0.0f;
-            baseFrame->SetAxesPtr(&forward, &kVec3YAxis, 1, 1);
+            baseFrame->SetAxesPtr(reinterpret_cast<const Vec3*>(&forward), reinterpret_cast<const Vec3*>(&kVec3YAxis), 1, 1);
         } else {
             Vector3 axis = t * keyAxisChange + keyAxis;
             baseFrame->SetRotation(axis.x, axis.y, axis.z, t * keyAngleChange + keyAngle);

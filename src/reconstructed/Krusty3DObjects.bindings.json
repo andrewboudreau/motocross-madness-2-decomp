@@ -63,7 +63,7 @@
   "?SetupCounter@BonusObjectManager@@QAEPAV1@PAXHHPAUUnknownBonusRacer@@PAUUnknownBonusCamera@@@Z": "0x0048ca60",
   "?NextKey@BonusObjectManager@@QAEXXZ": "0x0048cad0",
   "?HideDigits@BonusObjectManager@@QAEXXZ": "0x0048d540",
-  "?SetPosition@D3DIMSoultreeObject@@QAEXPBUVector3@@@Z": "0x004fc660",
+  "?SetPosition@SoultreeObject@@QAEXABUVec3@@@Z": "0x004fc660",
   "?RemoveChild@SoultreeObject@@QAEXPAV1@@Z": "0x004fd990",
   "?QueryGround@UnknownRunwayTerrain@@QAEXPAUVector3@@0HH@Z": "0x00507c10",
   "?PointAt@UnknownRunwayTrack@@QAEHUUnknownRunwayTrackPos@@PAUVector3@@@Z": "0x00518080",
