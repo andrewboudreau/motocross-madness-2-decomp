@@ -13,6 +13,7 @@
 #include "soultree/SoultreePhysicsContact.h"
 #include "soultree/SoultreePhysicsObject.h"
 #include "soultree/SoultreePhysicsCharacter.h"
+#include "collision/CollisionPoint.h"
 
 #define g_Zero kVec3Zero
 
@@ -318,7 +319,11 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot31()
         if (c->ownerNode && c->field_0x98 >= 0.0f) {
             if (c->contactState != 2)
                 c->contactState = 1;
-            c->UpdateRelativeMotion(&centerOfMass, &worldAngularVelocity, &velocity, &c->leverArm, linearSpeed);
+            reinterpret_cast<CollisionPoint*>(c)->UpdateRelativeMotion(
+                reinterpret_cast<const CollisionVec3*>(&centerOfMass),
+                reinterpret_cast<const CollisionVec3*>(&worldAngularVelocity),
+                reinterpret_cast<const CollisionVec3*>(&velocity),
+                reinterpret_cast<const CollisionVec3*>(&c->leverArm), linearSpeed);
         } else {
             c->contactState = 0;
         }
@@ -1272,7 +1277,8 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
         airborne = !pointsTouching;
         if (pointsTouching) {
             if (!res)
-                SoultreeResetContacts(collisionPointCount, collisionPoints);
+                UpdateCollisionPointWorldPositions(collisionPointCount,
+                    reinterpret_cast<CollisionPoint**>(collisionPoints));
             UnknownVirtualSlot31();
         }
         Vec3 o2;

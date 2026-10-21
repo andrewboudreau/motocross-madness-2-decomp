@@ -42,53 +42,38 @@ addresses and never forces unresolved references into an executable.
 ## Current gaps
 
 The 2026-10-21 build compiles 235 C++ files (192 canonical sources and 43
-reviewed candidates) and reaches LINK with 307 unresolved external symbols,
+reviewed candidates) and reaches LINK with 304 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-6bsh80s7` retains every prior strict result:
-2,995/3,006 calibration rows and 1,086/1,162 physics comparisons. Calibration
-adds one strict CollisionObject forwarding method; its retail address was
-already represented by another class's independently identified method.
-The sole partial-score decrease is the demonstrated physics correction below.
-Two existing nonexact physics candidates retain their unresolved comparison
-bindings; neither is counted as strict.
+The composition in `build-3jal2tv5` retains every prior strict result:
+2,995/3,006 calibration rows and 1,086/1,162 physics comparisons, with no
+partial-score decreases. The two existing nonexact physics comparison-binding
+diagnostics are unchanged and excluded from strict counts.
 
-[Collision tick forwarding](COLLISION_TICK.md) supplies the complete 13-byte
-strict body with the correct secondary GameObject receiver at offset 12.
-Its full caller and callee remain strict; 4,096 native boundary cases check
-receiver adjustment, argument bits, return values and exception propagation.
-[Physics slot 6](SOULTREE_DRAG.md) fixes a discarded FastSqrt result that made
-the old candidate incorrectly use squared magnitude in its budget calculation.
-The corrected complete body emits 440 bytes with 126 matching positions
-against 432 retail bytes, replacing the nonexact 432/287 candidate. Its 78,305
-native cases execute actual strict math and cover aliases, FP modes and
-progressive access faults with FP exceptions masked. The other 16 aggregate
-sections, including slot 36 and ordinary local vector initialization, are
-unchanged.
-[Character motion startup](CHARACTER_MOTION_START.md) supplies the missing
-frame selection and actual pose-list traversal. Its 93-byte method and
-368-byte ordinary-C++ conversion helper are nonexact. The dedicated compiler
-option and explicit signed-32 conversion semantics preserve current rounding
-and the prior destination on unmasked invalid conversion. Its 320,999 native
-cases use the real strict pose walker; virtual pose application is scripted,
-and transient x87 register-stack context is outside the comparison.
+[CollisionPoint consumers](COLLISION_POINT_CONSUMERS.md) now call the existing
+canonical relative-motion and world-position providers. Soultree physics slot
+31 passes the already point-relative receiver and the four existing vector
+addresses; its RunSteps method and Vehicle slot 49 pass the original contact
+array to the world-position provider. The array can contain standalone points
+and secondary CollisionPoint subobjects: wheel insertion already applies the
+required offset, so consumers apply no additional adjustment. The reduced
+contact views remain provisional rather than asserting complete type identity.
 
-All 232 prior production objects retain 10,551 nondebug sections and 45,496
-relocation destinations without symbol-name substitutions. Independent
-compilation of all three new providers produces identical nondebug objects
-to the actual game build, including the motion source's individual flag.
-The isolated links reduce unresolved names **310 → 309 → 308 → 307**, with
-no new missing names. Private evidence is in
-`work/game-build/round37-link-evidence.json`, `round37-all-objects.json`,
-`round37-admitted.json` and `connections-round37-preservation.json`.
-Startup, integrated menus and racing remain unverified while the game does
-not link.
+All 235 production objects retain 10,582 nondebug sections and 45,548 relocation
+destinations under exactly three call-target name substitutions. No provider,
+object or per-source compiler flag was added. The real link removes exactly
+three missing names, **307 -> 304**, with none added. Private evidence is in
+`work/game-build/round38-link-evidence.json`, `round38-all-objects.json`,
+and `connections-round38-preservation.json`.
 
-The full regression run completes with **516 tests: 505 passed, 11 skipped**
-(`work/game-build/tests-round37.log`). Static checks pass for 235 Python and
-370 JSON files; the generated progress report is current.
+These joins do not supply every remaining dependency of the collision
+providers. Linking, startup, integrated menus and racing remain unverified.
+The focused native comparison passes 39,557 cases with actual math and scene
+helpers. The full regression run passes **517 tests: 506 passed, 11 skipped**
+(`work/game-build/tests-round38-final.log`). Static checks pass for 236 Python
+and 370 JSON files; the generated progress report is current.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

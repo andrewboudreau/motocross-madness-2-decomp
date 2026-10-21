@@ -8,9 +8,9 @@ rows among 3,006 comparisons: 2,988 distinct source/address/extent cases.
 It covers 151 source files, 148 with at least one strict case. The separate
 physics matrix has 1,086 strict-exact targets among 1,162 comparisons.
 All prior strict cases are retained in the current connection composition.
-Calibration reports no partial-score decrease. Physics has one explicitly
-reviewed nonexact correction: slot 6 now retains the FastSqrt result; its
-complete candidate changes from 432/287 to 440/126 bytes/matching positions.
+Neither matrix reports a partial-score decrease in this composition. The
+previously corrected nonexact physics slot 6 retains its complete 440-byte
+candidate and 126 matching positions against 432 retail bytes.
 Strict results are complete function checks with relocations resolved;
 they do not establish complete translation units or a working game.
 
@@ -23,29 +23,27 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The [collision tick provider](COLLISION_TICK.md) adds a complete 13-byte strict
-forwarder using the secondary GameObject receiver. The corrected
-[physics slot 6](SOULTREE_DRAG.md) passes 78,305 native cases with real strict
-FastSqrt and initialization. The newly supplied
-[Character motion start](CHARACTER_MOTION_START.md) passes 320,999 native
-state, callback, rounding and exception cases with the actual strict pose
-walker. Both latter providers are explicitly reviewed nonexact candidates;
-their finite native checks do not promote them to strict matches.
+The [CollisionPoint consumer connections](COLLISION_POINT_CONSUMERS.md) replace
+three provisional call views with the existing canonical providers. Primary
+points and wheel secondary CollisionPoint subobjects share the already
+adjusted array-pointer boundary; no new receiver adjustment is introduced.
+The complete Soultree callers and providers remain strict, and the complete
+nonexact Vehicle caller retains its prior bytes and resolved fingerprint.
 
-All 232 old production objects retain 10,551 nondebug sections and 45,496
-relocation destinations, with no name substitutions. The real link compiles
-235 translation units and reports 307 unresolved names. Private evidence is
-in `work/game-build/round37-all-objects.json`, `round37-link-evidence.json`,
-`round37-admitted.json` and `connections-round37-preservation.json`.
+All 235 production objects retain 10,582 nondebug sections and 45,548 relocation
+destinations under exactly three call-target name substitutions. The real link
+compiles 235 translation units and reports 304 unresolved names. Private evidence
+is in `work/game-build/round38-all-objects.json`, `round38-link-evidence.json`
+and `connections-round38-preservation.json`.
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and excluded from strict counts.
-The only per-source compiler exception is `/QIfist` for the new motion-start
-helper; existing translation units retain their historical matching profile.
-This is a source-behavior requirement, not a claim about original build flags.
+The only per-source compiler exception remains `/QIfist` for the motion-start
+helper; this slice changes no compiler flags.
 
-The full regression run completes with **516 tests: 505 passed, 11 skipped**
-(`work/game-build/tests-round37.log`). Static checks pass for 235 Python and
-370 JSON files; the generated progress report is current.
+The focused native comparison passes 39,557 cases with actual math and scene
+helpers. The full regression run passes **517 tests: 506 passed, 11 skipped**
+(`work/game-build/tests-round38-final.log`). Static checks pass for 236 Python
+and 370 JSON files; the generated progress report is current.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

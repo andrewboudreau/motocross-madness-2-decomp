@@ -8,6 +8,7 @@
 #include "collision/CollisionObject.h"
 #include "soultree/SoultreePhysicsObject.h"
 #include "soultree/SoultreePhysicsCallees.h"
+#include "collision/CollisionPoint.h"
 
 void Vehicle::UnknownVirtualSlot0(float dt)
 {
@@ -1039,7 +1040,8 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             }
             if (pointsTouching) {
                 if (!res)
-                    VehContactsC(collisionPointCount, ((VehicleContact**)collisionPoints));
+                    UpdateCollisionPointWorldPositions(collisionPointCount,
+                        reinterpret_cast<CollisionPoint**>(collisionPoints));
                 UnknownVirtualSlot31();
             }
         } else {

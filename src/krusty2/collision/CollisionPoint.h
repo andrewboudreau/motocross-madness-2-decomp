@@ -76,4 +76,7 @@ CollisionPoint* AddCollisionPoint(int capacity, CollisionPoint** points, const C
 // 0x0043a5e0: remove the first matching pointer and clear the vacated slot.
 void RemoveCollisionPoint(CollisionPoint** points, CollisionPoint* point, int* count);
 
+// 0x0043aff0: refresh world positions for points with an owner and active contact.
+void UpdateCollisionPointWorldPositions(int count, CollisionPoint** points);
+
 #endif

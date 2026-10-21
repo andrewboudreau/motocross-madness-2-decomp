@@ -85,7 +85,7 @@
   "?VehBasisToBlock@@YAXUVec3@@0PAM111111@Z": "0x004b5a60",
   "?VehContactsA@@YAHHPAHHPAPAUVehicleContact@@PAUSoultreeProbe@@PAUVec3@@HM@Z": "0x0043ad80",
   "?VehContactsB@@YAXHPAPAUVehicleContact@@PAUVec3@@1111111@Z": "0x0043aa30",
-  "?VehContactsC@@YAXHPAPAUVehicleContact@@@Z": "0x0043aff0",
+  "?UpdateCollisionPointWorldPositions@@YAXHPAPAVCollisionPoint@@@Z": "0x0043aff0",
   "?VehVec3Equal@@YAHPBUVec3@@0@Z": "0x005299e0",
   "?VehicleHit@@YAXPAVCollisionObject@@0@Z": "0x00525dd0",
   "?VehicleHitBy@@YAXPAVCollisionObject@@0@Z": "0x00525e00",
