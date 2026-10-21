@@ -29,9 +29,16 @@ References per instruction:
 - switch: per `jmp [reg*4 + table]` the table's entry count and distinct
   targets, and the number of byte index tables.
 
-Skipped on both sides: jump/index tables, the C++ EH handler pushed after
+Skipped on both sides: jump/index tables (the code ends at the first table a
+`jmp [reg*4 + table]` or a `byte ptr [reg + table]` read addresses, so the
+table bytes are never decoded as instructions), the C++ EH handler pushed after
 `push -1`, absolute symbols such as __except_list, and candidate symbols in the
 function's own section.
+
+A candidate source that fails to compile is listed under "compile failures"
+with the compiler's first error line (its row reads "compile failure" when no
+source of it compiled) and the tool exits with status 1, so a broken sample is
+never mistaken for an unmeasured row.
 
 Rows are ranked by retail references whose target the candidate never uses
 (`absent`), then by the multiset shortfall (`missing`: calls and addresses net
@@ -202,7 +209,14 @@ def retail_refs(rt: Retail, va: int, size: int, internal_end: int) -> dict:
         b = rt.read(a, 4)
         return struct.unpack('<I', b)[0] if len(b) == 4 else None
     eh_seen = False
+    cut = va + len(code)                # the function's own jump/index tables end its code
     for k, i in enumerate(insns):
+        if i.address >= cut:
+            break
+        for v in disp_of(i):            # a table ends the code before the next instruction is read
+            if internal(v) and i.address < v < cut and (
+                    (i.mnemonic == 'jmp' and '*4' in i.op_str) or 'byte ptr' in i.op_str):
+                cut = v
         if is_branch(i):
             targets = imm_of(i)
             if targets:
@@ -527,9 +541,10 @@ def main(argv=None) -> int:
         k = bisect.bisect_right(starts, r['va'])
         internal_end = min(starts[k] if k < len(starts) else r['va'] + 0x4000, r['va'] + 0x4000)
         internal_end = max(internal_end, r['va'] + size)
+        r['compile_failures'] = compile_failures(r, by_va, errors)
         best = find_candidate(objs, by_va, errors, r, pe, rt, size)
         if best is None:
-            r['kind'] = 'unmeasured'
+            r['kind'] = 'compile_failure' if r['compile_failures'] else 'unmeasured'
             out.append(r)
             continue
         diffs, cpp, o, s = best
@@ -555,7 +570,28 @@ def main(argv=None) -> int:
         Path(a.md).write_text(md, encoding='utf-8')
     else:
         print(md)
-    return 0
+    return exit_status(out)
+
+
+def exit_status(rows: list[dict]) -> int:
+    """1 (after naming each on stderr) when a candidate source did not compile, else 0."""
+    failed = [(r, src, err) for r in rows for src, err in r.get('compile_failures', [])]
+    for r, src, err in failed:
+        print('compile failure: 0x%08x %s: %s' % (r['va'], src, err), file=sys.stderr)
+    return 1 if failed else 0
+
+
+def compile_failures(r: dict, by_va, errors) -> list[list[str]]:
+    """[source, first error line] of each of the row's candidate sources that did not compile."""
+    out = []
+    for c in sorted({c[0].resolve() for c in by_va.get(r['va'], [])}):
+        if errors.get(c):
+            try:
+                name = c.relative_to(ROOT).as_posix()
+            except ValueError:
+                name = c.as_posix()
+            out.append([name, errors[c]])
+    return out
 
 
 def sort_key(r: dict):
@@ -575,6 +611,9 @@ def render_md(rows: list[dict]) -> str:
                   '| TU | VA | absent | missing | calls | addrs | switch | imm -/+ | extra calls/addrs | unbound | detail |',
                   '|---|---|---|---|---|---|---|---|---|---|---|']
         for r in lr:
+            if r.get('kind') == 'compile_failure':
+                lines.append('| %s | `0x%08x` | compile failure | | | | | | | | see below |' % (r['tu'], r['va']))
+                continue
             if r.get('kind') == 'unmeasured':
                 lines.append('| %s | `0x%08x` | unmeasured | | | | | | | | |' % (r['tu'], r['va']))
                 continue
@@ -597,6 +636,15 @@ def render_md(rows: list[dict]) -> str:
                 r['tu'], r['va'], r['absent'], r['missing'], r['missing_calls'], r['missing_addrs'], r['missing_switch'],
                 r['missing_imm'], r['extra_imm'], r['extra_calls'], r['extra_addrs'], r['unbound'],
                 '; '.join(bits).replace('|', '\\|')))
+        lines.append('')
+    failed = [(r, src, err) for r in sorted(rows, key=lambda r: r['va'])
+              for src, err in r.get('compile_failures', [])]
+    if failed:
+        lines += ['## compile failures', '',
+                  'Candidate sources that do not compile (a row is unmeasured when none of its sources do).', '',
+                  '| TU | VA | source | first error |', '|---|---|---|---|']
+        for r, src, err in failed:
+            lines.append('| %s | `0x%08x` | %s | %s |' % (r['tu'], r['va'], src, err.replace('|', '\\|')))
         lines.append('')
     return '\n'.join(lines)
 
