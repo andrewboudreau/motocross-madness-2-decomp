@@ -103,6 +103,14 @@ until it is used up. Measured with a four-statement helper (`I4`: `int b =
   reproduced, not padded. Statements that compile to nothing (dead
   branches, folded arithmetic) still move the budget and are rejected as
   reconstruction devices.
+- The member-path depth of a read counts toward the budget even when the
+  emitted load is identical. In the BikeAI look-ahead (`0x0040eca0`) three
+  reads of the same global field compile to the same instructions as a flat
+  member of a plain struct pointer (aligned 3760 of 3966), a one-level
+  nested member (3402, frame 0x978) or the complete two-level TrackGame
+  path (3731: one more constructor is expanded at `0x00410d00` and the end
+  site `0x00412e79` then calls operator+). Spell such reads as the real
+  class path; do not flatten or deepen them to move the switch-over.
 - Whether a later service pack's compiler used a different floor is
   untested; every byte-exact function was produced by SP3, and functions
   limited by the budget are exactly the ones that are not exact.
