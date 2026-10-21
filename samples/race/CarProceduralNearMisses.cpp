@@ -299,7 +299,7 @@ int CarProcedural::Tick(float frameTime)
     sensorCollider->SetTransform(&transform);
     sensorCollider->QueryCollisions();
     if (sensorCollider->hasContact) {
-        CarProceduralContact* contact = sensorCollider->contactRecord;
+        CarProceduralContact* contact = (CarProceduralContact*)sensorCollider->contactRecord;
         Vector3 lifted = kVec3YAxis * ((1.0f - contact->contactOffset.x) * sensorHalfHeight * 2.0f - sensorHalfHeight) + position;
         if (lifted.y > ground.y) {
             ground = lifted;
