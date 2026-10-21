@@ -1765,9 +1765,6 @@ VehVec3Call::VehVec3Call(float x_, float y_, float z_)
     z = z_;
 }
 
-struct VehVec3AddAssign : Vec3 {
-    VehVec3AddAssign& operator+=(const Vec3& v);
-};
 // operator*(const Vec3&, float) expanded around the out-of-line constructor (the nested
 // expansion is the first one VC6 gives up).
 static inline Vec3 VehScaleCtorCall(const Vec3& v, float s)
@@ -1835,12 +1832,12 @@ void Vehicle::Method_00529450(Vec3* up, Vec3* zero)
             }
         }
         wheel->appliedShare += scratchVector;
-        *(VehVec3AddAssign*)up += scratchVector;
+        *up += scratchVector;
         scratchVector2 = CrossProductCall(wheel->relativePosition, scratchVector);
         scratchVector = modelNode->WorldToLocalDirection(scratchVector2);
         scratchVector.y = 0.0f;
         scratchVector.z = 0.0f;
-        *(VehVec3AddAssign*)zero += scratchVector;
+        *zero += scratchVector;
     }
 }
 

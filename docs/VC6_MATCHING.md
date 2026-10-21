@@ -3,9 +3,9 @@
 Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 The 2026-10-21 native Windows VC6 SP3 gate passes its toolchain identity,
-manual smoke and generated-probe checks. Calibration has 2,996 strict-exact
-rows among 3,007 comparisons: 2,989 distinct source/address/extent cases.
-It covers 152 source files, 149 with at least one strict case. The separate
+manual smoke and generated-probe checks. Calibration has 2,997 strict-exact
+rows among 3,008 comparisons: 2,990 distinct source/address/extent cases.
+It covers 153 source files, 150 with at least one strict case. The separate
 physics matrix has 1,086 strict-exact targets among 1,162 comparisons.
 All prior strict cases are retained in the current connection composition.
 Neither matrix reports a partial-score decrease in this composition. The
@@ -23,32 +23,33 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The [BVH vector connections](BVH_VECTOR_CONNECTIONS.md) replace four provisional
-call views at twelve sites with existing canonical providers. The complete
-1,436-byte CapsuleTreeQuery remains strict. Both complete BVH source objects,
-including the separate near-miss aggregate, preserve bytes and relocation
-destinations under only those four names.
+The [vector addition slice](VECTOR_ADD_ASSIGN.md) connects Vehicle's two calls
+to the canonical Vec3 operator and supplies the BVH caller's separate provisional
+call-view definition. Both emitted providers are strict 33-byte bodies; the
+complete 1,415-byte Vehicle and 736-byte BVH callers remain exact. Native
+addition checks pass 34,014 arithmetic, overlap, FP and partial-fault cases.
 
-The [scalar-first vector provider](VECTOR_SCALE_LEFT.md) adds a complete strict
-69-byte body and one calibration case. It has no game dependencies or startup
-storage; the original translation unit remains unproven. Both existing caller
-sites retain their exact argument order and complete caller bytes.
+The [bit-string shifts](BITSTRING_SHIFTS.md) are reviewed nonexact candidates:
+420/438 emitted bytes against 420/442 retail, with 343/93 matching positions.
+Their full aggregate retains all 22 nondebug sections and 38 relocations.
+Eighteen strict checks and 422,838 native cases cover the existing canonical
+wrappers/masks, independent bit oracles, overlap and progressive faults.
 
-All 235 old production objects retain 10,582 nondebug sections and 45,548
-relocation destinations under the four substitutions. The real link compiles
-236 translation units and reports 299 unresolved names. Private evidence is in
-`work/game-build/round39-all-objects.json`, `round39-link-evidence.json`,
-`round39-admitted.json` and `connections-round39-preservation.json`.
+All 236 old production objects retain 10,584 nondebug sections and 45,548
+relocation destinations under the Vehicle call-name substitution. Vehicle's
+naturally emitted canonical 33-byte COMDAT is the only added section in those
+objects. The real link compiles 238 translation units and reports 295 unresolved
+names. Private evidence is in `work/game-build/round40-all-objects.json`,
+`round40-link-evidence.json`, `round40-admitted.json` and
+`connections-round40-preservation.json`.
+
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and excluded from strict counts.
 The only per-source compiler exception remains `/QIfist` for the motion-start
-helper; this slice changes no compiler flags.
-
-Native checks pass 36,866 BVH point-leaf/boundary cases and 135,279 scalar-first
-helper cases, using actual source math. These finite checks do not establish
-triangle/interior traversal or integrated gameplay. The full regression suite
-passes 508 tests, with 11 explicit skips (519 total). Static checks pass for
-238 Python files and 372 JSON files.
+helper; this slice changes no compiler flags. The finite native checks do not
+establish integrated gameplay. The full regression suite passes 510 tests,
+with 11 explicit skips (521 total). Static checks pass for 240 Python files
+and 375 JSON files.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

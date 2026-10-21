@@ -125,10 +125,7 @@ struct Vec3Call : Vec3 {
 };
 
 // Vec3::operator+=, 0x00428060 (thiscall, ret 4).
-struct Vec3AddAssignCall : Vec3 {
-    Vec3AddAssignCall() {}
-    Vec3AddAssignCall& operator+=(const Vec3& v);
-};
+#include "../../reconstructed/VectorAddAssign.h"
 
 // By-value views of the out-of-line operators (same ABI: hidden result pointer first).
 Vec3 Vec3Sub(const Vec3& a, const Vec3& b);     // 0x00421d00 operator-

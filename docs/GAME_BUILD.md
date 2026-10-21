@@ -41,45 +41,45 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 236 C++ files (193 canonical sources and 43
-reviewed candidates) and reaches LINK with 299 unresolved external symbols,
+The 2026-10-21 build compiles 238 C++ files (194 canonical sources and 44
+reviewed candidates) and reaches LINK with 295 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-qvu1tpyh` retains every prior strict result:
-2,996/3,007 calibration rows and 1,086/1,162 physics comparisons, with no
+The composition in `build-fsiteikw` retains every prior strict result:
+2,997/3,008 calibration rows and 1,086/1,162 physics comparisons, with no
 partial-score decreases. The two existing nonexact physics comparison-binding
 diagnostics are unchanged and excluded from strict counts.
 
-[BVH vector connections](BVH_VECTOR_CONNECTIONS.md) join twelve calls in the
-complete 1,436-byte CapsuleTreeQuery to the existing addition, subtraction,
-vector-first scale and length providers. Explicit result storage preserves the
-original expression lifetimes and hidden-output addresses. Both complete BVH
-objects, including the separate near-miss aggregate, retain all bytes and
-relocation destinations under exactly four imported-name substitutions.
+[Vector addition](VECTOR_ADD_ASSIGN.md) connects two calls in Vehicle's complete
+1,415-byte method to the existing Vec3 operator. VC6 naturally emits its exact
+33-byte COMDAT. The BVH caller retains its separate provisional call view,
+supplied by an ordinary 33-byte out-of-line definition with the same sequential
+component reads and writes. All complete old callers remain unchanged; 34,014
+native cases cover arithmetic, overlap, FP modes and partial faults.
 
-The [scalar-first scale provider](VECTOR_SCALE_LEFT.md) supplies the genuinely
-missing helper at 0x428090. Its complete 69-byte ordinary C++ body is strict,
-with no game dependencies, data or initialization. The scalar and vector
-argument order differs from the existing vector-first helper. Its two existing
-calls are verified within the complete strict CapsuleTreeQuery body.
+The [bit-string shifts](BITSTRING_SHIFTS.md) supply two missing sub-word
+operations through one individually reviewed sample. Their complete retail
+extents are 420/442 bytes; VC6 emits 420/438 bytes with 343/93 resolved matching
+positions. They remain nonexact. Extraction preserves all 22 existing aggregate
+sections and 38 relocations. The only dependency is the existing mask table;
+422,838 native cases exercise actual source wrappers, independent bit oracles,
+aliases and progressive faults within the documented finite domain.
 
-All 235 prior production objects retain 10,582 nondebug sections and 45,548
-relocation destinations under the four intended names. The new standalone
-provider is independently recompiled with the actual game's command and retains
-all nondebug section bytes and relocation identities. Real isolated links remove
-exactly five missing names, **304 -> 300 -> 299**, with none added. Private
-evidence is in `work/game-build/round39-link-evidence.json`,
-`round39-all-objects.json`, `round39-admitted.json` and
-`connections-round39-preservation.json`.
+All 236 prior production objects retain 10,584 nondebug sections and 45,548
+relocation destinations under the one intended Vehicle call-name substitution,
+including its transition to the naturally emitted canonical COMDAT. That added
+33-byte body is checked independently. Both new standalone objects are recompiled
+with the actual game's commands and preserve all section bytes and relocations.
+Real isolated links remove exactly four missing names, **299 -> 297 -> 295**,
+with none added. Private evidence is in
+`work/game-build/round40-link-evidence.json`, `round40-all-objects.json`,
+`round40-admitted.json` and `connections-round40-preservation.json`.
 
-The focused native comparisons pass 36,866 point-leaf/boundary cases and 135,279
-scalar-first helper cases with actual source math. Triangle/interior traversal,
-unmasked FP exceptions and whole-game collision behavior are outside those
-finite native checks. Linking, startup, integrated menus and racing remain
-unverified. The full regression suite passes 508 tests, with 11 explicit skips
-(519 total). Static checks pass for 238 Python files and 372 JSON files.
+Linking, startup, integrated menus and racing remain unverified. The full
+regression suite passes 510 tests, with 11 explicit skips (521 total). Static
+checks pass for 240 Python files and 375 JSON files.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based
@@ -94,7 +94,7 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
 the current composition retains all prior physics targets, with 1,086 now strict-exact, and all
-2,989 distinct strict-exact calibration cases. A native link/runtime regression checks
+2,990 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 

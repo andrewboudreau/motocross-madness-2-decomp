@@ -46,11 +46,51 @@ def cases():
 def fingerprint(obj, symbol):
     entry = obj.find_symbol(symbol)
     body, size, relocs = obj.symbol_extent(entry)
+    def source_filename(symbol):
+        if not symbol.name.startswith('??_C@') or symbol.section_number <= 0:
+            return None
+        section = obj.sections[symbol.section_number - 1]
+        value = obj.data[section.raw_ptr + symbol.value:section.raw_ptr + section.raw_size].split(b'\0')[0]
+        filename = value.decode('latin1').replace('\\', '/')
+        for source in SOURCES:
+            if filename.endswith('/' + source):
+                return 'source-filename:' + source
+        return None
+
+    def section_identity(number, visiting=()):
+        section = obj.sections[number - 1]
+        public = tuple(sorted((source_filename(s) or s.name, s.value) for s in obj.symbols
+                              if s.section_number == number and s.storage_class == 2))
+        if public:
+            return ('public-section', public)
+        # New public COMDATs can renumber later local targets. Anonymous sections
+        # retain their ordinal among anonymous sections, flags, complete payload
+        # and relocation destinations; distinct storage is not collapsed.
+        anonymous = [sec.index for sec in obj.sections if not sec.name.startswith('.debug') and
+                     not any(s.section_number == sec.index and s.storage_class == 2 for s in obj.symbols)]
+        ordinal = anonymous.index(number)
+        data = (obj.data[section.raw_ptr:section.raw_ptr + section.raw_size]
+                if section.raw_ptr else bytes(section.raw_size))
+        base = ('anonymous-section', ordinal, section.name, section.characteristics, data.hex())
+        if number in visiting:
+            return base + (('cycle', visiting.index(number)),)
+        destinations = []
+        for relocation in obj.relocations:
+            if relocation.section_number != number:
+                continue
+            symbol = obj.symbol_by_index[relocation.symbol_index]
+            if symbol.section_number > 0:
+                destination = (section_identity(symbol.section_number, visiting + (number,)), symbol.value)
+            else:
+                destination = ('external', symbol.name, symbol.value, symbol.section_number)
+            destinations.append((relocation.virtual_address, relocation.type, destination))
+        return base + (tuple(destinations),)
+
     def identity(target):
-        # Local VC6 label numbers are disposable; retain their actual section
-        # and offset (below). External/public symbol names remain exact.
+        # Local label spelling and COFF section numbering are disposable. Their
+        # stable public/anonymous section identity and exact offset are retained.
         if target.section_number > 0 and target.storage_class in (3, 6) and target.name.startswith(('$L', '$T')):
-            return ('local-section', target.section_number)
+            return section_identity(target.section_number)
         if target.name.startswith('??_C@') and target.section_number > 0:
             section = obj.sections[target.section_number - 1]
             value = obj.data[section.raw_ptr + target.value:section.raw_ptr + section.raw_size].split(b'\0')[0]
@@ -71,18 +111,33 @@ class VehicleGearboxFingerprintTests(unittest.TestCase):
     def test_local_labels_preserve_destination_and_byte_identity(self):
         entry = SimpleNamespace(value=0)
         target = SimpleNamespace(name='$L100', section_number=3, storage_class=6, value=16)
-        reloc = SimpleNamespace(virtual_address=1, type=6, symbol_index=1)
+        first = SimpleNamespace(name='?First', section_number=3, storage_class=2, value=0)
+        second = SimpleNamespace(name='?Second', section_number=4, storage_class=2, value=0)
+        sections = [SimpleNamespace(index=i, name='.text', characteristics=0x20,
+                                    raw_ptr=0, raw_size=0) for i in range(1, 5)]
+        reloc = SimpleNamespace(virtual_address=1, type=6, symbol_index=1, section_number=1)
         obj = SimpleNamespace(find_symbol=lambda symbol: entry, symbol_by_index={1: target},
-                              symbol_extent=lambda symbol: (b'\xa1\x00\x00\x00\x00', 5, [reloc]))
+                              symbol_extent=lambda symbol: (b'\xa1\x00\x00\x00\x00', 5, [reloc]),
+                              symbols=[target, first, second], sections=sections, data=b'', relocations=[])
         original = fingerprint(obj, 'method')
         target.name = '$L109'
         self.assertEqual(fingerprint(obj, 'method'), original)
         target.value = 20
         self.assertNotEqual(fingerprint(obj, 'method'), original)
         target.value = 16
-        target.section_number = 4
+        # Inserting a new earlier section shifts all existing numbers, while
+        # the local destination remains exactly ?First+16.
+        obj.sections.insert(0, SimpleNamespace(index=1, name='.text', characteristics=0x20,
+                                              raw_ptr=0, raw_size=0))
+        for i, section in enumerate(obj.sections, 1):
+            section.index = i
+        target.section_number += 1
+        first.section_number += 1
+        second.section_number += 1
+        self.assertEqual(fingerprint(obj, 'method'), original)
+        target.section_number = second.section_number
         self.assertNotEqual(fingerprint(obj, 'method'), original)
-        target.section_number = 3
+        target.section_number = first.section_number
         obj.symbol_extent = lambda symbol: (b'\xa3\x00\x00\x00\x00', 5, [reloc])
         self.assertNotEqual(fingerprint(obj, 'method'), original)
         obj.symbol_extent = lambda symbol: (b'\xa1\x00\x00\x00\x00', 5, [reloc])
@@ -90,6 +145,30 @@ class VehicleGearboxFingerprintTests(unittest.TestCase):
         external = fingerprint(obj, 'method')
         target.name = '?ExternalTwo'
         self.assertNotEqual(fingerprint(obj, 'method'), external)
+
+        # Anonymous local destinations retain payload and relocation identity;
+        # inserting an unrelated public COMDAT does not change that identity.
+        target.name, target.storage_class, target.section_number, target.value = '$L2', 6, 1, 0
+        dependency = SimpleNamespace(name='?Dependency', section_number=0, storage_class=2, value=0)
+        anonymous = SimpleNamespace(index=1, name='.rdata', characteristics=0x40, raw_ptr=1, raw_size=4)
+        anonymous_reloc = SimpleNamespace(virtual_address=0, type=6, symbol_index=2, section_number=1)
+        obj.symbols = [target, dependency]
+        obj.symbol_by_index = {1: target, 2: dependency}
+        obj.sections = [anonymous]
+        obj.data = b'\0\x11\x22\x33\x44'
+        obj.relocations = [anonymous_reloc]
+        anonymous_original = fingerprint(obj, 'method')
+        obj.data = b'\0\x12\x22\x33\x44'
+        self.assertNotEqual(fingerprint(obj, 'method'), anonymous_original)
+        obj.data = b'\0\x11\x22\x33\x44'
+        dependency.name = '?DifferentDependency'
+        self.assertNotEqual(fingerprint(obj, 'method'), anonymous_original)
+        dependency.name = '?Dependency'
+        public = SimpleNamespace(name='?NewComdat', section_number=1, storage_class=2, value=0)
+        obj.symbols.append(public)
+        obj.sections.insert(0, SimpleNamespace(index=1, name='.text', characteristics=0x20, raw_ptr=0, raw_size=0))
+        anonymous.index = target.section_number = anonymous_reloc.section_number = 2
+        self.assertEqual(fingerprint(obj, 'method'), anonymous_original)
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),

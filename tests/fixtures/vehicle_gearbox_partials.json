@@ -1,5 +1,5 @@
 {
-  "baseline": "eb470e531e943af060ddd08ec40b9ea5accdf505; full COFF body and relocation target fingerprints after whole-object preservation under five documented connections; round29 three network/provider renames and compiler-local label renumbering: complete nondebug section bytes and all relocation section/offset destinations preserved under three symbol substitutions; round30 four text-provider substitutions: complete nondebug section bytes and all resolved relocation destinations preserved; extents and scores unchanged; round31 three motion-provider names and existing TU-local zero-vector target: complete nondebug bytes and resolved destinations preserved; round33 nine math-call sites replace two external names with complete bytes/destinations preserved; defined compiler-local $L/$T labels now fingerprint by section/offset, verified on all 28 published/current bodies; extents and scores unchanged; contact-consumer connection changes only slot49 external VehContactsC to UpdateCollisionPointWorldPositions at 0x43aff0: all complete body bytes/addends and relocation destinations preserved under that single name substitution; the raw-name fingerprint is updated, while the full resolved fingerprint, extent and score remain unchanged",
+  "baseline": "eb470e531e943af060ddd08ec40b9ea5accdf505; full COFF body and relocation target fingerprints after whole-object preservation under five documented connections; round29 three network/provider renames and compiler-local label renumbering: complete nondebug section bytes and all relocation section/offset destinations preserved under three symbol substitutions; round30 four text-provider substitutions: complete nondebug section bytes and all resolved relocation destinations preserved; extents and scores unchanged; round31 three motion-provider names and existing TU-local zero-vector target: complete nondebug bytes and resolved destinations preserved; round33 nine math-call sites replace two external names with complete bytes/destinations preserved; defined compiler-local $L/$T labels now fingerprint by section/offset, verified on all 28 published/current bodies; extents and scores unchanged; contact-consumer connection changes only slot49 external VehContactsC to UpdateCollisionPointWorldPositions at 0x43aff0: all complete body bytes/addends and relocation destinations preserved under that single name substitution; the raw-name fingerprint is updated, while the full resolved fingerprint, extent and score remain unchanged; round40 local labels use stable public section identities (anonymous destinations retain ordinal/content/relocations), not numeric COFF indices. All28 published/current normalized fingerprints and raw bodies agree; newly emitted Vehicle operator COMDAT only shifts section numbers. Extents and retail scores unchanged.",
   "partials": [
     [
       "src/krusty2/vehicle/Bike.cpp",
@@ -8,7 +8,7 @@
       2874,
       2865,
       1758,
-      "f1291b885c36400c82a2fb17416a5e6c71f23dd8535f1790a4530fe1facb923a"
+      "fc4d722f95f86e56c2e5dacf137e40094f7c9f149bf62dab44f33243cd2d1587"
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",
@@ -26,7 +26,7 @@
       2396,
       2120,
       115,
-      "e8a91929cad4d9b8117f7e17390347c184352e91b8ae78ba9a13e729f4f31558"
+      "ef3a7613603e70027975de63eaab474792a8807b356a4ccf51b5c411b06b0d22"
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",
@@ -53,7 +53,7 @@
       745,
       745,
       693,
-      "0e1105cb5e15297f9bda7096cf072a0feb6d55a3069e09f0a9468dcd14201969"
+      "f4424df2eaebc317f946ece278e0a06ea3ca223a8123823aafc3c53b6cfa1933"
     ],
     [
       "src/krusty2/vehicle/Vehicle.cpp",
@@ -116,7 +116,7 @@
       6745,
       6745,
       6428,
-      "bf9a95b97c8b2de1b18ffa7e561006f6583e073eb230b51d2c9513f4f51c0463"
+      "d6591b9ed265dfff0511e20682e346ca213f3a1bad829e252f9df4ba9764d5e6"
     ],
     [
       "samples/physics/bikeai/BikeAINearMisses.cpp",
@@ -134,7 +134,7 @@
       6112,
       6111,
       6063,
-      "caec25548e58c338c04739ba5f6ed211557b6fd58a55c6251fc42a68bdae0e93"
+      "750045a18d4d975b11e16734fd9cb75530cc472b994790cd5ae998517f5544ee"
     ],
     [
       "samples/physics/bikeai/BikeAINearMisses.cpp",
@@ -179,7 +179,7 @@
       1296,
       1288,
       526,
-      "38ff4147cafbc3b4b6e24f998df9cab5f3a9c4e794db485ded3c2b0e0302b96f"
+      "7226467bed566b784e72c2e134e2021a2719646daba01f4b44b9070129e949eb"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
@@ -206,7 +206,7 @@
       532,
       532,
       472,
-      "38add8a755ed13343eeabc4e4c7d877d6746568749041e4edfac76c148735468"
+      "ac45a1cfeb7b694bfa1e756be4d480a21b76aaf21bea95bfe952c09fc8b44652"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
@@ -215,7 +215,7 @@
       2920,
       2952,
       608,
-      "3acc2482c06dcf8dec1be7c2474bd4a1e76a3b97e881e8390158653a5de2113c"
+      "a4bbd8369d2d60adc766325de6c76d8df69032083ed3214cbd6123396a8ba8b1"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
@@ -224,7 +224,7 @@
       895,
       895,
       null,
-      "95f0159076e232c976247178b5acce832760d77ba14abc82203294bbc7a1a61a"
+      "fe827c12b2fc21a68ab5962b570a3433418497848cd98afb7434bb45fe032043"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",

@@ -13,7 +13,7 @@
   "??1SteeringControl@@QAE@XZ": "0x00504c50",
   "??2@YAPAXIPBDH@Z": "0x004a3010",
   "??3@YAXPAX@Z": "0x004a30c0",
-  "??YVehVec3AddAssign@@QAEAAU0@ABUVec3@@@Z": "0x00428060",
+  "??YVec3@@QAEAAU0@ABU0@@Z": "0x00428060",
   "??_7Vehicle@@6BCharacter@@@": "0x00558a50",
   "??_7Vehicle@@6BGameObject@@@": "0x005589e0",
   "??_7Vehicle@@6BSoultreePhysicsBaseObject@@@": "0x00558a84",

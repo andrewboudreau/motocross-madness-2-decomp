@@ -12,6 +12,15 @@ from match import compare  # noqa: E402
 
 CASES = [
     {
+        'name': 'BVH in-place vector addition call view',
+        'bindings': 'src/reconstructed/VectorAddAssign.bindings.json',
+        'source': 'src/reconstructed/VectorAddAssign.cpp',
+        'symbol': '??YVec3AddAssignCall@@QAEAAU0@ABUVec3@@@Z',
+        'target_va': '0x00428060',
+        'target_size': 33,
+        'reason': 'complete thiscall body with sequential component updates; verified BVH caller, original TU and class identity unproven',
+    },
+    {
         'name': 'Scalar-first vector multiplication',
         'bindings': 'src/reconstructed/VectorScaleLeft.bindings.json',
         'source': 'src/reconstructed/VectorScaleLeft.cpp',
