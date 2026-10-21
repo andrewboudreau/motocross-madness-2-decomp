@@ -1,4 +1,5 @@
 #include "BikeRace.h"
+#include "TrackOverlay.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -539,20 +540,20 @@ int BikeRace::Tick(float frameTime) {
                         }
                         switch (g_TrackGame->mode.raceSettings.eventType) {
                         case 2:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->nationalEvent->chatOverlay;
+                            chatOverlay = (ChatOverlay*)g_TrackGame->nationalEvent->chatOverlay;
                             break;
                         case 3:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->supercrossEvent->chatOverlay;
+                            chatOverlay = (ChatOverlay*)g_TrackGame->supercrossEvent->chatOverlay;
                             break;
                         case 0:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->quarryEvent->chatOverlay;
+                            chatOverlay = (ChatOverlay*)g_TrackGame->quarryEvent->chatOverlay;
                             break;
                         case 1:
                         case 5:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->bajaEnduroEvent->chatOverlay;
+                            chatOverlay = (ChatOverlay*)g_TrackGame->bajaEnduroEvent->chatOverlay;
                             break;
                         case 4:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->tagEvent->chatOverlay;
+                            chatOverlay = (ChatOverlay*)g_TrackGame->tagEvent->chatOverlay;
                             break;
                         }
                     }
@@ -593,7 +594,7 @@ int BikeRace::Tick(float frameTime) {
                     if (chatHideTimer <= 0.0f) {
                         chatHideTimer = 0;
                         if (chatOverlay != 0) {
-                            chatOverlay->typing = 0;
+                            chatOverlay->typingEnabled = 0;
                             chatOverlay->HideInputLine();
                         }
                         chatOpen = false;
@@ -836,7 +837,7 @@ int BikeRace::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entr
     if (chatOpen && chatOverlay != 0) {
         if (event->control == 1 && event->kind == 0) {
             chatHideTimer = 0.1f;
-            chatOverlay->typing = 0;
+            chatOverlay->typingEnabled = 0;
             chatOpen = false;
             return 1;
         }
@@ -862,7 +863,7 @@ int BikeRace::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entr
                     }
                     if (chatOverlay != 0) {
                         chatOverlay->ShowInputLine();
-                        chatOverlay->typing = 1;
+                        chatOverlay->typingEnabled = 1;
                     }
                     chatHideTimer = 10.0f;
                     chatOpen = true;
@@ -874,7 +875,7 @@ int BikeRace::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entr
                 }
                 if (g_TrackGame->mode.chatInputLine == 1 && chatOverlay != 0) {
                     chatOverlay->ShowInputLine();
-                    chatOverlay->typing = 1;
+                    chatOverlay->typingEnabled = 1;
                     chatOpen = true;
                 }
                 char title[0x80];
@@ -1181,7 +1182,7 @@ int BikeRace::OnNetworkMessage(int type, void* data, int from, int to, int flags
                 chatOpen = true;
             }
             if (chatOverlay != 0) {
-                chatOverlay->AddMessage(name, &((UnknownBikeRaceNetStamp*)data)->timeStamp, 1);
+                chatOverlay->AddMessage(name, (int)&((UnknownBikeRaceNetStamp*)data)->timeStamp, 1);
             }
         }
         return 1;

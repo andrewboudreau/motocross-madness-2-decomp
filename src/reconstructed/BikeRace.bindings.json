@@ -140,10 +140,10 @@
   "?FreeWorkList@Track@@QAEHPAPAUTrackListItem@@H@Z": "0x00517930",
   "?DistanceAlong@Track@@QAEMUTrackPos@@0@Z": "0x00517da0",
   "?ReplaceHeadMessage@TextQueueOverlay@@QAEXPAVUnknownMessage@@@Z": "0x0051b540",
-  "?HandleChatKey@UnknownBikeRaceOverlay19c@@QAEHHPAH@Z": "0x0051da30",
-  "?ShowInputLine@UnknownBikeRaceOverlay19c@@QAEXXZ": "0x0051dd10",
-  "?HideInputLine@UnknownBikeRaceOverlay19c@@QAEXXZ": "0x0051dd40",
-  "?AddMessage@UnknownBikeRaceOverlay19c@@QAEXPADPAIH@Z": "0x0051dd70",
+  "?HandleChatKey@ChatOverlay@@QAEHHPAH@Z": "0x0051da30",
+  "?ShowInputLine@ChatOverlay@@QAEXXZ": "0x0051dd10",
+  "?HideInputLine@ChatOverlay@@QAEXXZ": "0x0051dd40",
+  "?AddMessage@ChatOverlay@@QAEXPBDHH@Z": "0x0051dd70",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?InProCircuitCareer@TrackGame@@QAEHXZ": "0x00521cd0",
   "?Tick@BikeRace@@UAEHM@Z": "0x0041d2b0",
@@ -243,6 +243,6 @@
   "?ShowCursors@KrustyUI@@QAEXXZ": "0x00499b00",
   "?Create@ObjectPicker@@QAEPAV1@PAXPAVTextureMapManager@@P6AXPAVCollisionObject@@2@ZPAVGameCursor@@@Z": "0x004b0210",
   "?PickAtCursor@ObjectPicker@@QAEHXZ": "0x004b04c0",
-  "?HandleChatInput@UnknownBikeRaceOverlay19c@@QAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@PAH@Z": "0x0051dce0",
+  "?HandleChatInput@ChatOverlay@@QAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@PAH@Z": "0x0051dce0",
   "?OnControlPress@BikeRace@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z$ehhandler": "0x00549cd4"
 }

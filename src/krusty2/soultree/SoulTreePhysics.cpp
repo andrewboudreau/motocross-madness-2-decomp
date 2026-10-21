@@ -1080,26 +1080,14 @@ public:
     void SetUseLighting(int a);
 };
 
-// 0x134-byte file object: ctor 0x00460d10 takes one global, the destructor 0x00460d60
-// fcloses the FILE* at +0x14 (tier 2).  Names are tier 3.
-class SoultreeFile {
-public:
-    SoultreeFile(int a);            // 0x00460d10
-    ~SoultreeFile();                // 0x00460d60
-    char field_0x00[0x134];
-};
+// Shared archive stream and scene-file finder. The finder pointer is read
+// from TrackGame+0x574; its complete layout is declared independently.
+#include "../../reconstructed/FileStream.h"
+#include "../../reconstructed/SceneArchiveFinder.h"
 
-// Object at +0x574 of the global at 0x0056e26c.  0x004e9cd0 (thiscall, ret 0x10) sits
-// between the ResourceManager.cpp and SceneManager.cpp __FILE__ references.  It gets the
-// file object, the name, the mode "rb" and an output buffer; on a zero return the caller
-// clears the output path (tier 2 data flow, tier 3 names).
-class SoultreeFileFinder {
-public:
-    int OpenArchiveFile(SoultreeFile* file, const char* name, const char* mode, char* outPath);
-};
 struct SoultreeGlobals {
     char field_0x000[0x574];
-    SoultreeFileFinder* field_0x574;
+    UnknownTrackGameObject574* field_0x574;
 };
 class UnknownResourceManager;
 extern UnknownResourceManager* g_ResourceManager; // pointer stored at 0x00572b44
@@ -1136,8 +1124,8 @@ GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int a1, const char* a2,
     name[n] = 0;
     strcpy(strrchr(name, '.'), ".col");
 
-    SoultreeFile* file = new(SP_FILE, 0x84e) SoultreeFile((int)g_ResourceManager);
-    if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->field_0x574->OpenArchiveFile(file, name, "rb", colPath)) {
+    UnknownTextureStream* file = new(SP_FILE, 0x84e) UnknownTextureStream(g_ResourceManager);
+    if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->field_0x574->OpenArchiveFile(file, name, "rb", (int)colPath)) {
         colPath[0] = 0;
     }
     delete file;
@@ -1187,8 +1175,8 @@ GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int a1, int a2, const
     name[n] = 0;
     strcpy(strrchr(name, '.'), ".col");
 
-    SoultreeFile* file = new(SP_FILE, 0x8cd) SoultreeFile((int)g_ResourceManager);
-    if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->field_0x574->OpenArchiveFile(file, name, "rb", colPath)) {
+    UnknownTextureStream* file = new(SP_FILE, 0x8cd) UnknownTextureStream(g_ResourceManager);
+    if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->field_0x574->OpenArchiveFile(file, name, "rb", (int)colPath)) {
         colPath[0] = 0;
     }
     delete file;

@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-20 build compiles 170 C++ files (168 canonical sources and two
-reviewed candidates) and reaches LINK with 712 unresolved external symbols,
+The 2026-10-20 build compiles 172 C++ files (170 canonical sources and two
+reviewed candidates) and reaches LINK with 701 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -115,6 +115,16 @@ unassigned header initializer copies remain documented separately. The
 remaining parameter-stream view retains its inline reset behavior, which is
 required by the current strict SelectSection match. Soultree slot 35 still
 depends on the already-missing SetAxesIn implementation.
+
+Soultree's collision-file loaders now use that same stream implementation and
+SceneManager's archive finder. BikeRace uses the existing [ChatOverlay](TRACKOVERLAY.md)
+class for its input, visibility and message calls. Four complete
+[collision helpers](COLLISION_HELPERS.md) now have canonical providers; three
+are imported by current production callers. These connections remove eleven
+unresolved names without introducing any new ones, preserving all strict
+calibration and physics matches. The full regression suite completes 391
+tests with 11 skipped; native layout, retail call-site and provider checks
+cover the new connections.
 
 The source still lacks `Game::Tick` at `0x004685d0`, called by
 `TrackGame::Tick`; its retail timing uses `rdtsc` (see [Game](GAME.md)).

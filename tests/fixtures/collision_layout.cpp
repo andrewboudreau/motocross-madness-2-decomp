@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include "../../src/reconstructed/CarProcedural.h"
 #include "../../src/reconstructed/FileStream.h"
+#include "../../src/reconstructed/SceneArchiveFinder.h"
 
 // Independently observed retail sizes and offsets, including the secondary
 // GraphicsTest/GameObject base. No game implementation is replaced here.
@@ -23,3 +24,7 @@ CHECK_LAYOUT(stream_extent, sizeof(CollisionFileStream) == 0x134);
 CHECK_LAYOUT(stream_manager, offsetof(CollisionFileStream, archives) == 0x12c);
 CHECK_LAYOUT(quadtree_xextent, offsetof(QuadTree, extentX) == 0x50);
 CHECK_LAYOUT(quadtree_zextent, offsetof(QuadTree, extentZ) == 0x54);
+
+CHECK_LAYOUT(finder_extent, sizeof(UnknownTrackGameObject574) == 0x394);
+CHECK_LAYOUT(finder_archive, offsetof(UnknownTrackGameObject574, sceneArchive) == 0);
+CHECK_LAYOUT(finder_directory, offsetof(UnknownTrackGameObject574, sceneDirectory) == 0x44);

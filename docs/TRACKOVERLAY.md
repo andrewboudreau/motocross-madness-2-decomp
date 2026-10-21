@@ -43,6 +43,20 @@ rectangle the loader is given, and +0x1c8/+0x1cc two plain Overlay side
 panels created only when the screen is wider than 512 pixels (allocations
 at lines 2284 and 2294).
 
+BikeRace now uses this same `ChatOverlay` declaration for its borrowed pointer
+at `+0x19c`, replacing the provisional `UnknownBikeRaceOverlay19c` view.
+Retail directly calls `HandleChatKey` at `0x0041f5b1`, `HandleChatInput` at
+`0x0041f675`, `HideInputLine` at `0x0041e135`, `ShowInputLine` at `0x0041f731`
+and `AddMessage` at `0x00420440`. The event's `0x3e0` allocation at
+`0x004e08e4` calls the ChatOverlay constructor at `0x004e090a`; the constructor
+installs the primary vtable above. Both caller and provider use the typing
+flag at `+0x3dc`. The existing integer text argument of `AddMessage` is retained
+with an explicit pointer cast; its provider interprets those bits as a string.
+This connection changes no ownership or lifetime behavior. All 136 strict
+BikeRace and TrackOverlay calibration cases remain exact. The native VC6
+regression in `tests/test_chat_overlay_connections.py` checks the retail calls,
+compiled layouts and imports against the real provider object.
+
 ## Status
 
 92 functions are exact under `vc6_o2_mt`, with every relocation bound:

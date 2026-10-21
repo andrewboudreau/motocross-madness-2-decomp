@@ -157,8 +157,8 @@ extents is exact, a near miss or excluded:
   `0x43a1e0..0x43b320`) passes 16 targets. New: UpdateRelativeMotion `0x43a640`
   (header-shaped inline helpers whose constructor calls go out of line under the
   inline budget), CollisionRejectFrom `0x43b190` (moved from
-  `samples/physics/collision/CollisionVectorHelpers.cpp`) and slot 1 `0x43b240`. The
-  sphere tests `0x43a1e0`/`0x43a270` stay exact in `samples/physics/collision/CollisionQueries.cpp`
+  `src/reconstructed/CollisionVectorHelpers.cpp`) and slot 1 `0x43b240`. The
+  sphere tests `0x43a1e0`/`0x43a270` stay exact in `src/reconstructed/CollisionQueries.cpp`
   (unit open). The contact merge `0x43aa30` and refresh `0x43ad80` (formerly
   `CollisionContactUpdate.cpp`) are near misses in `samples/physics/collision/CollisionPointNearMisses.cpp`.
 - `src/krusty2/shadow/ProjectedShadow.cpp` (extent `0x4da570..0x4dc610`) passes 21

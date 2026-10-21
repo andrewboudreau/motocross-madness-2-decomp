@@ -130,7 +130,7 @@ The physics runner adds `src/krusty2` to the include path.
   0x431da0..0x439e10. The first, `CollisionHullShape_Free` 0x431da0, contains the first
   `__FILE__` xref (0x431dd8). The shape setters pass `__FILE__` with lines 0xd8..0x18a.
   The helpers outside the span (0x43b190, 0x43c890, 0x43ca20, 0x43ce90) stay in
-  `samples/physics/collision/CollisionVectorHelpers.cpp`.
+  `src/reconstructed/CollisionVectorHelpers.cpp`.
 - Vehicle.cpp and Bike.cpp hold methods of their class that lie contiguously in the
   bracket. Bike's methods start at 0x405190, before the first xref inside the constructor
   0x407700. The Vec3 helpers 0x40ae00/0x40ae30 are not Bike methods, so they stay in

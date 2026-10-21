@@ -27,7 +27,7 @@ Functions (all in the extent)
 - Out-of-line copies of header inline vector operators, called by ApplyContactImpulse and emitted with this
   unit: `v / s` at `0x0043c890` (between slot 14 and the `$E` set) and the 3x3 row-vector rotation at
   `0x0043ca20` (after the `$E` set, ends `0x0043ca93`). Both are registered in
-  `samples/physics/collision/CollisionVectorHelpers.cpp` (`0x0043c890` exact, `0x0043ca20` near miss). This
+  `src/reconstructed/CollisionVectorHelpers.cpp` (both strict exact). This
   source declares them out of line in `ConstraintTypes.h`, so it does not emit them itself: in retail their
   constructor is expanded inside them while ApplyContactImpulse calls the constructor out of line, which is
   VC6's inline budget (docs/VC6_INLINE_BUDGET.md) and needs the original header's inline structure.

@@ -36,9 +36,18 @@ The `.col` loader uses the shared `UnknownTextureStream` declaration: its
 `0x00460d60`, `Open` and `Read` calls identify the same archive-capable stream.
 The constructor stores the resource-manager pointer at `+0x12c`; both this
 loader and SoulTreePhysics now read the existing `g_ResourceManager` pointer
-at `0x00572b44`. The SoultreeFile view remains provisional, so that caller
-retains an explicit pointer-to-int conversion at its unmerged constructor
-boundary. This does not reinterpret the resource-manager object as an integer.
+at `0x00572b44`. SoulTreePhysics now also constructs and destroys the shared stream directly.
+Its two `.col` lookup paths read the scene finder at TrackGame `+0x574` and
+call the existing `UnknownTrackGameObject574::OpenArchiveFile` at `0x004e9cd0`.
+The unchanged finder declaration is shared through `SceneArchiveFinder.h`;
+its inferred extent is `0x394`. The output path is passed with an explicit
+pointer-to-int cast at the provider's existing provisional argument boundary.
+
+The lookup retains the original lifetime sequence: construct the `0x134`-byte
+stream, query the finder, delete the stream, then load the returned `.col`
+path or use the node's hull/model fallback. The existing finder's loose-file
+branch deletes its stream and allocates a local replacement; this connection
+preserves that decoded behavior and does not claim to repair its ownership.
 
 `ReadTriangleMesh` (`0x0042e0f0`) and `ReadPointNode` (`0x0042e190`) connect
 to the existing BoundingBoxTreeBuild implementations through their actual
@@ -81,7 +90,7 @@ Functions (all in the extent)
   UpdateRelativeMotion `0x0043a640`, UpdateCollisionPointWorldPositions `0x0043aff0`, the eight `$E`
   functions `0x0043b050..0x0043b150`, CollisionRejectFrom `0x0043b190`, slot 1 `0x0043b240` and the
   deleting destructor `0x0043b300`.
-- Exact in `samples/physics/collision/CollisionQueries.cpp` (ownership open, see above):
+- Exact in `src/reconstructed/CollisionQueries.cpp` (ownership open, see above):
   SphereContainsPointXZ `0x0043a1e0`, BoundingSpheresOverlap `0x0043a270`.
 - Near misses in `samples/physics/collision/CollisionPointNearMisses.cpp` (includes this file): the
   contact merge `0x0043aa30` and the contact refresh `0x0043ad80`; their notes list what differs.
@@ -101,7 +110,7 @@ Source shapes that matter (tier 3: they reproduce retail, the original text is u
 python tools/run_physics_samples.py --strict \
   --source src/krusty2/collision/CollisionPoint.cpp \
   --source samples/physics/collision/CollisionPointNearMisses.cpp \
-  --source samples/physics/collision/CollisionQueries.cpp \
+  --source src/reconstructed/CollisionQueries.cpp \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 

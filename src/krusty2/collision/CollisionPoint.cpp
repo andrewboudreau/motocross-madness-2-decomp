@@ -9,7 +9,7 @@
 // functions of the extent: the contact merge 0x0043aa30 and refresh 0x0043ad80 are near
 // misses in samples/physics/collision/CollisionPointNearMisses.cpp (which includes this
 // file); the two sphere tests 0x0043a1e0/0x0043a270 are exact in
-// samples/physics/collision/CollisionQueries.cpp (whether they open this unit or close
+// src/reconstructed/CollisionQueries.cpp (whether they open this unit or close
 // CollisionObject.cpp is open).
 #include "collision/CollisionPoint.h"
 

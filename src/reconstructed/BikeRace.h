@@ -193,20 +193,8 @@ struct UnknownBikeRaceMeshItem {
     unsigned char field_0x28[0x38 - 0x28];
 };
 
-// The object at BikeRace+0x19c (TrackOverlay.cpp's 0x0051da30 runs it).
-class UnknownBikeRaceOverlay19c {
-public:
-    // 0x0051dce0: the chat line's input; nonzero when it took the event.
-    int HandleChatInput(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
-    void ShowInputLine();             // 0x0051dd10
-    void HideInputLine();             // 0x0051dd40: closes the chat line
-    void AddMessage(char* name, unsigned int* text, int flag); // 0x0051dd70
-
-    unsigned char field_0x000[0x3dc];
-    int typing;                               // +0x3dc typing
-    int HandleChatKey(int value, int* result); // 0x0051da30
-};
-
+// Shared chat overlay stored at BikeRace+0x19c and by the race events.
+class ChatOverlay;
 
 // A racer's model parts as 0x00423790 reaches them: the racer's +0x3bc and
 // its rider's +0x1a0 take a detail level through 0x004451e0
@@ -982,7 +970,7 @@ public:
     unsigned char field_0x191[0x194 - 0x191];
     float chatHideTimer;                      // +0x194 seconds until the chat input line hides (10 after a message)
     int chatInputLineSetting;  // +0x198  the constructor copies TrackGameMode chatInputLine
-    UnknownBikeRaceOverlay19c* chatOverlay;   // +0x19c
+    ChatOverlay* chatOverlay;   // +0x19c
     KrustyVCR* replayVcr;                   // replay being recorded or played
     KrustyVCR* ghostVcr;                   // ghost
     UnknownVcrFile* vcrFile;                  // +0x1a8 VCR file the replay and ghost recordings open

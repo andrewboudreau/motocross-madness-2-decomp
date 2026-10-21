@@ -25,6 +25,7 @@ class CollisionLinkTests(unittest.TestCase):
                            'src/reconstructed/FileStream.cpp',
                            'samples/io/FileStream.cpp',
                            'src/reconstructed/ResourceManager.cpp',
+                           'src/reconstructed/SceneManager.cpp',
                            'src/reconstructed/BoundingBoxTreeBuild.cpp',
                            'src/krusty2/soultree/SoulTreePhysics.cpp',
                            'src/krusty2/broadphase/Quadtree.cpp',
@@ -88,9 +89,15 @@ class CollisionLinkTests(unittest.TestCase):
             }
             self.assertTrue(stream_calls <= imports(objects['CollisionObject']))
             self.assertTrue(stream_calls <= source_definitions['FileStream'])
+            self.assertTrue((stream_calls - {'?Open@UnknownTextureStream@@QAEHPBD0H@Z'})
+                            <= imports(objects['SoulTreePhysics']))
+            self.assertFalse(any('SoultreeFile@@' in symbol.name or
+                                 'SoultreeFileFinder@@' in symbol.name
+                                 for symbol in objects['SoulTreePhysics'].symbols))
             for caller, provider, symbol in (
                 ('CollisionObject', 'BoundingBoxTreeBuild', '?ReadPointNode@@YAXPAPAUBoxTreeNode@@PAVUnknownTextureStream@@@Z'),
                 ('CollisionObject', 'BoundingBoxTreeBuild', '?ReadTriangleMesh@@YAXPAPAUBoxTreeNode@@PAPAUTreeVec3@@PAVUnknownTextureStream@@@Z'),
+                ('SoulTreePhysics', 'SceneManager', '?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVUnknownTextureStream@@PBD1H@Z'),
                 ('SoulTreePhysics', 'ResourceManager', '?g_ResourceManager@@3PAVUnknownResourceManager@@A'),
                 ('CollisionObject', 'StreamCandidate', '?Read@UnknownTextureStream@@QAEHPAXHH@Z'),
                 ('CollisionObject', 'ResourceManager', '?g_ResourceManager@@3PAVUnknownResourceManager@@A'),

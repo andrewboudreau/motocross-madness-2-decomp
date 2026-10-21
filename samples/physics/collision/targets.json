@@ -51,33 +51,33 @@
   },
   {
     "class": "CollisionQueries",
-    "source": "CollisionQueries.cpp",
+    "source": "../../../src/reconstructed/CollisionQueries.cpp",
     "candidate_symbol_contains": "SphereContainsPointXZ",
     "target_va": "0x0043a1e0",
     "target_size": 134,
     "expect": "exact",
     "notes": "exact under vc6_o2_ml (no /G6), likely true retail profile; point-in-circle test in XZ against bounding sphere",
-    "bindings": "CollisionQueries.bindings.json"
+    "bindings": "../../../src/reconstructed/CollisionQueries.bindings.json"
   },
   {
     "class": "CollisionQueries",
-    "source": "CollisionQueries.cpp",
+    "source": "../../../src/reconstructed/CollisionQueries.cpp",
     "candidate_symbol_contains": "BoundingSpheresOverlap",
     "target_va": "0x0043a270",
     "target_size": 183,
     "expect": "exact",
     "notes": "exact under vc6_o2_ml (no /G6), likely true retail profile; sphere-sphere overlap",
-    "bindings": "CollisionQueries.bindings.json"
+    "bindings": "../../../src/reconstructed/CollisionQueries.bindings.json"
   },
   {
     "class": "CollisionVectorHelpers",
-    "source": "CollisionVectorHelpers.cpp",
+    "source": "../../../src/reconstructed/CollisionVectorHelpers.cpp",
     "candidate_symbol_contains": "CollisionDivide",
     "target_va": "0x0043c890",
     "target_size": 71,
     "expect": "exact",
     "notes": "exact under vc6_o2_ml (no /G6); 77.6% under gate g6",
-    "bindings": "CollisionVectorHelpers.bindings.json"
+    "bindings": "../../../src/reconstructed/CollisionVectorHelpers.bindings.json"
   },
   {
     "class": "CollisionPoint",
@@ -101,13 +101,13 @@
   },
   {
     "class": "CollisionVectorHelpers",
-    "source": "CollisionVectorHelpers.cpp",
+    "source": "../../../src/reconstructed/CollisionVectorHelpers.cpp",
     "candidate_symbol_contains": "CollisionRotateVector",
     "target_va": "0x0043ca20",
     "target_size": 115,
     "expect": "exact",
     "notes": "returns out (both callers read eax after the call: 0x43c524 mov ecx,[eax], 0x43c75b push eax); the void form lacked the result-pointer copy mov ecx,eax (113 bytes, 61/115)",
-    "bindings": "CollisionVectorHelpers.bindings.json"
+    "bindings": "../../../src/reconstructed/CollisionVectorHelpers.bindings.json"
   },
   {
     "class": "ControlInterface",
