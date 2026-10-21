@@ -1,7 +1,9 @@
 """near_miss_drops compares per-row strict bytes; synthetic gate outputs only, no VC6."""
+import io
 import json
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 
 from tools.near_miss_drops import drops, main, strict_bytes
@@ -41,8 +43,10 @@ class NearMissDropsTest(unittest.TestCase):
         base = self.write("base.json", [physics_row("0x1", 5)])
         same = self.write("same.json", [physics_row("0x1", 6)])
         worse = self.write("worse.json", [physics_row("0x1", 4)])
-        self.assertEqual(main(["x", base, same]), 0)
-        self.assertEqual(main(["x", base, worse]), 1)
+        with redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(main(["x", base, same]), 0)
+            self.assertEqual(main(["x", base, worse]), 1)
+        self.assertIn("near-miss drop 0x1 5 -> 4", out.getvalue())
 
 
 if __name__ == "__main__":
