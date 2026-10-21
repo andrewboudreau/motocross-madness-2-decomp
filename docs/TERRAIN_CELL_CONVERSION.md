@@ -50,7 +50,9 @@ Load's 2117-byte body is also unchanged. The additional local helper renumbers
 its EH relocation target from `$L4895` to `$L4924`, both section 29 at offset
 182. The complete object comparison confirms identical bytes and relocation
 destinations before the named fingerprint is refreshed. The affected terrain
-regression passes on rerun.
+regression passes on rerun. Subsequent [sampling-provider connections](TERRAIN_SAMPLING_CONNECTIONS.md)
+preserve both bodies, refreshing named fingerprints for canonical callees and
+Load's next compiler-local EH label.
 
 The adjacent GroundFogableObject constructor now has a canonical source
 definition at the confirmed `0x004aae20`: its complete **nine bytes** are strict

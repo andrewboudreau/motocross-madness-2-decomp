@@ -37,20 +37,17 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 207 C++ files (182 canonical sources and twenty-five
-reviewed candidates) and reaches LINK with 475 unresolved external symbols,
+The 2026-10-21 build compiles 209 C++ files (183 canonical sources and twenty-six
+reviewed candidates) and reaches LINK with 461 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The final composition in `build-uk70iui4` retains all prior strict results:
-2,979/2,990 calibration rows and 1,086/1,162 physics comparisons. This does
+The final composition in `build-pl4kpvmo` retains all prior strict results:
+2,981/2,992 calibration rows and 1,086/1,162 physics comparisons. This does
 not establish game startup, menus or racing while linkage remains incomplete.
-Regression verification covers 462 tests: 451 passed and eleven skipped.
-The full run exposed one stale compiler-local EH label fingerprint; after
-verifying unchanged code and relocation destinations, its affected test passed
-on rerun. Logs are `tests-round20.log` and `tests-round20-terrain-rerun.log`
-under `work/game-build/`.
+Regression verification covers 465 tests: 454 passed and eleven skipped.
+The complete run is recorded in `work/game-build/tests-round21.log`.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based
@@ -65,7 +62,7 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
 the current composition retains all prior physics targets, with 1,086 now strict-exact, and all
-2,977 distinct strict-exact calibration cases. A native link/runtime regression checks
+2,978 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 
@@ -449,6 +446,32 @@ address/extent counts remain 2,971 of 2,982. Both near-miss comparisons report
 zero strict-score drops. QueryGround's explicitly non-gating masked score
 changes from 65/2711 to 54/2707; its behavior repair does not claim matching.
 These counts do not describe a fully matched or working game.
+
+The [terrain and collision-tree sampling connections](TERRAIN_SAMPLING_CONNECTIONS.md)
+use the existing corner, dot-product and triangle-normal providers, **475 → 471**.
+The [garage shadow connections](GARAGE_SHADOW_CONNECTIONS.md) supply seven
+existing constructor, attachment and lighting providers, **471 → 464**.
+Two new complete 33-byte in-place scale definitions match strictly and remove
+their missing Bike and Terrain call signatures, **464 → 462**. Native checks
+cover 69,699 corner-sampling cases, 48,792 scale cases and 3,776 shadow cases;
+complete terrain interpolation and rendered garage shadows remain untested.
+
+The complete [recorder worker](RECORDER_WORKER.md#functional-build-review)
+is admitted as reviewed-nonexact after 24,595 native event, data, lock, failure
+and termination scenarios. Both complete extents are 2,148 bytes, with 2,100
+matching positions. Existing ring/file helpers and synchronization boundaries
+are scripted; actual scheduling and integrated recording/playback remain
+untested. Its isolated real link removes one name, **462 → 461**.
+
+Across these four slices, all 207 pre-existing objects preserve 10,409 complete
+nondebug sections and 44,995 relocations under eleven documented external-name
+substitutions. Only VectorScaleAssign and RecorderWorker add objects. All 209
+source hashes, 209 header hashes and configuration hashes match the final build.
+Evidence is in `work/game-build/round21-all-objects.json` and
+`round21-link-evidence.json`. The final calibration has 2,981 strict rows among
+2,992 cases, representing 2,978 distinct source/address/extent cases and
+2,972 unique retail address/extent pairs among 2,983 targets. All prior strict
+calibration and physics results remain, with no strict-score near-miss drops.
 
 Other incompatible class views, missing methods and unresolved globals
 continue to block linking. Import

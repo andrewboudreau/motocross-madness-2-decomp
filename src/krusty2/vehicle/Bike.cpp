@@ -81,9 +81,7 @@ static inline float BikeDotZ(const Vec3& a, const Vec3& b)
 {
     return a.z * b.z + (a.x * b.x + a.y * b.y);
 }
-struct BikeVec3ScaleAssign : Vec3 {
-    BikeVec3ScaleAssign& operator*=(float s);
-};
+#include "../../reconstructed/VectorScaleAssign.h"
 // By-value views of the out-of-line operators (hidden result pointer first, same ABI as
 // the pointer forms in math/Math3D.h): operator- 0x00421d00,
 // operator*(Vec3, float) 0x005015b0. Dot calls use the shared Vec3DotCall.

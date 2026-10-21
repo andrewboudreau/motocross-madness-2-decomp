@@ -28,16 +28,15 @@ PROVIDERS = (
 # relocation records are hashed because QueryGround still has unbound helpers.
 # This is deliberately not a successful retail comparison of either function.
 PARTIAL = (
-    # Stream, cache and texture connections change external names and renumber an EH
-    # label. The shared GroundFogableObject header later changes $L4894 to
-    # $L4895 at offset 3; complete nondebug section bytes/destinations remain
-    # identical (round19-all-objects.json), including this EH target. The new
-    # cell-conversion helper changes $L4895 to $L4924, still section 29 +182;
-    # round20-all-object-preservation.json verifies unchanged bytes/destinations.
-    ('?Load@Terrain@@', 2117, '28a208f9154c32d74066eda0c12503779911bfb8095704457d9f0114aa75e10f'),
+    # Shared sampling declarations rename the loader's local EH label to
+    # $L5863, still section 29 +182. terrain-math-round21-preservation.json
+    # proves every section byte and relocation destination is unchanged.
+    ('?Load@Terrain@@', 2117, '476cce82cf4fb10a2e10129b8e05c9b2c3548a9f9f11df9c408fcb2d58ff3c3a'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
-    ('QueryGround', 3255, '656417ea66c6520e195bb16e23a44ad74cab40b9ab294b57ae8b9762def1a085'),
+    # The sampler, dot and triangle provider names are now canonical, with
+    # complete bytes/relocations preserved under those explicit substitutions.
+    ('QueryGround', 3255, '6962fa1f6369f5d34b4feb6fe57de2354071bb9dee7893f5a30e008bd10d652c'),
 )
 
 

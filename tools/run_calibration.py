@@ -12,6 +12,24 @@ from match import compare  # noqa: E402
 
 CASES = [
     {
+        'name': 'Bike out-of-line vector scale assignment',
+        'bindings': 'src/reconstructed/VectorScaleAssign.bindings.json',
+        'source': 'src/reconstructed/VectorScaleAssign.cpp',
+        'symbol': '??XBikeVec3ScaleAssign@@QAEAAU0@M@Z',
+        'target_va': '0x0040ae00',
+        'target_size': 33,
+        'reason': 'complete thiscall vector operator used by Bike steering; call-view name and grouping provisional',
+    },
+    {
+        'name': 'Terrain out-of-line vector scale assignment',
+        'bindings': 'src/reconstructed/VectorScaleAssign.bindings.json',
+        'source': 'src/reconstructed/VectorScaleAssign.cpp',
+        'symbol': '??XTerrainVec3@@QAEAAU0@M@Z',
+        'target_va': '0x0040ae00',
+        'target_size': 33,
+        'reason': 'complete thiscall operator scales the Terrain segment hit into world units; call-view name provisional',
+    },
+    {
         'name': 'Ground fog base constructor',
         'bindings': 'src/reconstructed/GroundFogableObject.bindings.json',
         'source': 'src/reconstructed/GroundFogableObject.cpp',

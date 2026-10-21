@@ -22,8 +22,11 @@ Exact: 12 calibration cases (the constructor and destructors and every
 method above). Near misses
 (`samples/race/RecorderNearMisses.cpp`, notes there): the worker thread
 `0x004e6f80` (an 11-way `WaitForMultipleObjects` switch over the VCR
-file), whose case bodies and jump table line up; VC6 merges the shared
-tails of cases 1, 2 and 4 differently. Also slot 10 `0x004e7d60`, which
+file), whose complete body is maintained in `samples/race/RecorderWorker.cpp`
+and included by the aggregate. Its [functional build review](RECORDER_WORKER.md#functional-build-review)
+records the full code/table extent, unchanged aggregate, improved but still
+nonexact standalone code shape and finite native boundary evidence.
+Also slot 10 `0x004e7d60`, which
 KrustyVCR shares; its control flow and callback switch order are
 reconstructed, but register and stack-slot assignment differ. The complete
 Tick body is maintained in `samples/race/RecorderTick.cpp` and included by the

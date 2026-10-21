@@ -6,6 +6,9 @@
 #include <string.h>
 #include <float.h>
 #include "../../src/krusty2/broadphase/Terrain.h"
+#include "../../src/reconstructed/Griddraw.h"
+#include "../../src/reconstructed/MatrixUtil.h"
+struct Vec3;
 static BYTE referenceSpace[0x800000];
 static BYTE terrainBytes[sizeof(Terrain)],fieldBytes[0x100];
 static TerrainVec3 point,normal;
@@ -13,14 +16,14 @@ static unsigned char material;
 struct Observation {int called,x,z,normal;unsigned fp,control;TerrainVec3 point,output;unsigned char material;};
 static Observation observed,expected;
 static unsigned checks;
-void TerrainShutdownObject::GetCellCorners(int x,int z,float* heights,TerrainVec3* normals,unsigned char* kinds){
+int GridNode::GetCellCorners(int x,int z,float* heights,GridVec3* normals,unsigned char* kinds){
     if((void*)this!=fieldBytes || !heights || !kinds)ExitProcess(81);
     observed.called=1;observed.x=x;observed.z=z;observed.normal=normals!=0;
     throw 0x3910; // Stop at the first cell request, before interpolation.
 }
-float TerrainDot(const TerrainVec3&,const TerrainVec3&){ExitProcess(82);return 0;}
+float Vec3DotCall(const Vec3*,const Vec3*){ExitProcess(82);return 0;}
 float FastInvSqrt(float){ExitProcess(83);return 0;}
-void TerrainTriangleNormal(const TerrainVec3*,const TerrainVec3*,const TerrainVec3*,TerrainVec3*,float*){ExitProcess(84);}
+void TriangleNormal(const Vector3*,const Vector3*,const Vector3*,Vector3*,float*){ExitProcess(84);}
 template<class T>static DWORD Address(T method){union{T method;DWORD address;}u;u.method=method;return u.address;}
 static int Map(const char* name){
     BYTE* mapped=(BYTE*)0x400000;DWORD old;
@@ -37,7 +40,7 @@ static int Map(const char* name){
     }
     free(raw);BYTE* site=(BYTE*)0x507cf8;
     if(*site!=0xe8 || (DWORD)(site+5)+*(DWORD*)(site+1)!=0x483910)return 0;
-    *(DWORD*)(site+1)=Address(&TerrainShutdownObject::GetCellCorners)-(DWORD)(site+5);
+    *(DWORD*)(site+1)=Address(&GridNode::GetCellCorners)-(DWORD)(site+5);
     return FlushInstructionCache(GetCurrentProcess(),0,0);
 }
 static void Run(int retail,unsigned x,unsigned z,unsigned scale,int mode,int precision,int hasField,int wantsNormal){

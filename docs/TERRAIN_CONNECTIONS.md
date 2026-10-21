@@ -67,10 +67,10 @@ paths for its core/math dependencies, with their original include order intact.
 
 The isolated source build compiled **198/198** translation units and reduced
 unresolved names **527 to 524**, exactly these three names, with none added.
-This is not full terrain dependency closure: CastSegment still imports the
-existing unresolved `TerrainVec3::operator*=`, and its runtime height-field
-object must be supplied by the remaining game reconstruction. No terrain
-runtime integration or completed game is claimed.
+This is not full terrain dependency closure. CastSegment's former missing
+`TerrainVec3::operator*=` now has a [strict provider](TERRAIN_SAMPLING_CONNECTIONS.md),
+but its runtime height-field object still depends on the remaining game
+reconstruction. No terrain runtime integration or completed game is claimed.
 
 ## Terrain stream calls
 

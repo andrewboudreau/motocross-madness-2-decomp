@@ -24,6 +24,7 @@
 
 #include "BoundingBoxTreeBuild.h"
 #include "TextureMap.h"
+#include "MatrixUtil.h"
 
 // ---------------------------------------------------------------------------------------------
 // Partition and bounds helpers.
@@ -500,8 +501,10 @@ void BuildModelTriangleTree(BoxTreeNode* root, TreeMatrix4* m, TreeModelSource* 
         tris[i].vertex[0] = indices[3 * i];
         tris[i].vertex[1] = indices[3 * i + 1];
         tris[i].vertex[2] = indices[3 * i + 2];
-        TriangleNormal(&vertices[indices[3 * i]], &vertices[indices[3 * i + 1]],
-                       &vertices[indices[3 * i + 2]], &tris[i].normal, &tris[i].planeOffset);
+        TriangleNormal(reinterpret_cast<const Vector3*>(&vertices[indices[3 * i]]),
+                       reinterpret_cast<const Vector3*>(&vertices[indices[3 * i + 1]]),
+                       reinterpret_cast<const Vector3*>(&vertices[indices[3 * i + 2]]),
+                       reinterpret_cast<Vector3*>(&tris[i].normal), &tris[i].planeOffset);
     }
 
     memset(m, 0, sizeof(*m));
@@ -538,8 +541,10 @@ void BuildTriangleMeshTree(BoxTreeNode* root, TreeMatrix4* m, TreeVec3* verts,
         tris[i].vertex[0] = indices[3 * i];
         tris[i].vertex[1] = indices[3 * i + 1];
         tris[i].vertex[2] = indices[3 * i + 2];
-        TriangleNormal(&verts[indices[3 * i]], &verts[indices[3 * i + 1]],
-                       &verts[indices[3 * i + 2]], &tris[i].normal, &tris[i].planeOffset);
+        TriangleNormal(reinterpret_cast<const Vector3*>(&verts[indices[3 * i]]),
+                       reinterpret_cast<const Vector3*>(&verts[indices[3 * i + 1]]),
+                       reinterpret_cast<const Vector3*>(&verts[indices[3 * i + 2]]),
+                       reinterpret_cast<Vector3*>(&tris[i].normal), &tris[i].planeOffset);
     }
 
     memset(m, 0, sizeof(*m));

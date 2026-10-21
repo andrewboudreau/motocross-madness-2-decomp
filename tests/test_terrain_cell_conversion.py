@@ -49,7 +49,10 @@ class TerrainCellConversionTests(unittest.TestCase):
             last = text.index('// X-axis sibling', first)
             extracted = output / 'query.cpp'
             extracted.write_text('#include "' + (ROOT / 'src/krusty2/broadphase/Terrain.h').as_posix()
-                                 + '"\n#include <float.h>\n#include <string.h>\n' + text[first:last])
+                                 + '"\n#include "' + (ROOT / 'src/reconstructed/Griddraw.h').as_posix()
+                                 + '"\n#include "' + (ROOT / 'src/reconstructed/MatrixUtil.h').as_posix()
+                                 + '"\nstruct Vec3; float Vec3DotCall(const Vec3*, const Vec3*);\n'
+                                 + '#include <float.h>\n#include <string.h>\n' + text[first:last])
             objects = []
             for path in (source, extracted, ROOT / 'tests/fixtures/terrain_cell_conversion.cpp'):
                 obj = output / (path.stem + '.obj')

@@ -89,8 +89,9 @@ This evidence supports **reviewed-nonexact** admission. Lock APIs and the seven
 game helpers are scripted, even though their canonical providers exist. The
 test therefore does not exercise actual thread scheduling, worker events,
 ring allocation, replay-file I/O, or end-to-end recording/playback. NaN
-payload behavior is not established. The missing worker operation and other
-link gaps still require their own implementations and evidence.
+payload behavior is not established. The [worker operation](RECORDER_WORKER.md#functional-build-review) has separate
+finite behavioral evidence; integrated worker/playback operation and other
+link gaps remain unverified.
 
 The isolated real build `build-jfyngil3` compiles **205/205 translation units**.
 Compared with `build-pclfp8jr`, unresolved names decrease from **484 to 483**:

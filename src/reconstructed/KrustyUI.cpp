@@ -1,4 +1,5 @@
 #include "GUIManagerCore.h"
+#include "../krusty2/shadow/D3DIMSoultreeShadow.h"
 #include "../krusty2/motion/D3DIMSoultreeCharacter.h"
 #include "KrustyUI.h"
 
@@ -90,27 +91,13 @@ static inline void KrustyUIAddLight(LightManager* lights, LightEmitter* light) {
         lights->AddLight(light);
 }
 
-// RTTI ProjectedShadow (0x134 bytes, constructor 0x004da570).
+// Init remains a partial provider (0x004da7b0). Keep this view only for
+// that unconnected boundary and its GameObject primary base. Construction
+// and the verified shadow methods use the canonical classes below.
 class UnknownKrustyUIShadow : public GameObject {
 public:
-    explicit UnknownKrustyUIShadow(int flags);
-    UnknownKrustyUIShadow* Init(void* owner, TextureMapManager* textures); // 0x004da7b0
-    void AddCaster(UnknownKrustyUISoultree* caster);     // 0x004dab00: adds a caster
-    // 0x004dae50: ProjectedShadow::SetLight (src/krusty2/shadow); mode 3
-    // sets only the light direction.
-    void SetLight(const Vector3* position, const Vector3* direction, int mode);
-    void SetShadowStrength(int value);                           // 0x004dace0
-    void SetShadowGrey(int value);                           // 0x004dae30
+    UnknownKrustyUIShadow* Init(void* owner, TextureMapManager* textures);
     unsigned char field_0x2c[0x134 - 0x2c];
-};
-
-// RTTI D3DIMSoultreeShadow (0x48 bytes, constructor 0x00446840).
-class UnknownKrustyUIShadowLink : public GameObject {
-public:
-    explicit UnknownKrustyUIShadowLink(int flags);
-    GameObject* Attach(void* owner, UnknownKrustyUISoultree* caster,
-                                      UnknownKrustyUIShadow* shadow); // 0x004468b0
-    unsigned char field_0x2c[0x48 - 0x2c];
 };
 
 // Game+0x1c..+0x33, copied as the garage model's resource context; 0x00498cf0
@@ -299,10 +286,10 @@ void KrustyUI::BuildGarageScene(int value) {
         KRUSTYUI_GARAGE->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         reinterpret_cast<Character*>(KRUSTYUI_GARAGE)->SetMotionByName("Spin");
         reinterpret_cast<Character*>(KRUSTYUI_GARAGE)->AdvanceMotion(0.03f, 0, 0);
-        UnknownKrustyUIShadow* projected = new(__FILE__, 0x182) UnknownKrustyUIShadow(1);
+        UnknownKrustyUIShadow* projected = reinterpret_cast<UnknownKrustyUIShadow*>(new(__FILE__, 0x182) ProjectedShadow(1));
         shadow = projected->Init(renderContext, g_TrackGame->textureManager);
-        UnknownKrustyUIShadowLink* link = new(__FILE__, 0x186) UnknownKrustyUIShadowLink(1);
-        shadowLink = link->Attach(renderContext, KRUSTYUI_GARAGE->modelNode, shadow);
+        D3DIMSoultreeShadow* link = new(__FILE__, 0x186) D3DIMSoultreeShadow(1);
+        shadowLink = link->Attach(reinterpret_cast<int>(renderContext), reinterpret_cast<ShadowCaster*>(KRUSTYUI_GARAGE->modelNode), reinterpret_cast<ProjectedShadow*>(shadow));
         garageScene->AppendChild(shadowLink, -1);
         if (shadow)
             garageScene->AppendChild(shadow, -1);
@@ -337,16 +324,16 @@ void KrustyUI::BuildGarageScene(int value) {
             painter.PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(bike->modelNode), g_TrackGame->mode.plateNumber);
         }
         if (shadow) {
-            shadow->AddCaster(KRUSTYUI_MODELS[0].uiModel->modelNode);
-            shadow->AddCaster(KRUSTYUI_RIDER->modelNode);
+            reinterpret_cast<ProjectedShadow*>(shadow)->AddCaster(reinterpret_cast<ShadowCaster*>(KRUSTYUI_MODELS[0].uiModel->modelNode));
+            reinterpret_cast<ProjectedShadow*>(shadow)->AddCaster(reinterpret_cast<ShadowCaster*>(KRUSTYUI_RIDER->modelNode));
             s468 = garageFocus;
             s468.y += 40.0f;
             s468.x += 15.0f;
             s478 = garageFocus - s468;
             // Retail passes the key light's vectors here, not the two just set.
-            shadow->SetLight(&s488, &s408, 3);
-            shadow->SetShadowStrength(0x20);
-            shadow->SetShadowGrey(0x20);
+            reinterpret_cast<ProjectedShadow*>(shadow)->SetLight(reinterpret_cast<const ShadowVec3*>(&s488), reinterpret_cast<const ShadowVec3*>(&s408), 3);
+            reinterpret_cast<ProjectedShadow*>(shadow)->SetShadowStrength(0x20);
+            reinterpret_cast<ProjectedShadow*>(shadow)->SetShadowGrey(0x20);
             pending = 0;
             done = 1;
         }

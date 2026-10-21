@@ -6,6 +6,11 @@
 #include "../../reconstructed/TextureMapManager.h"
 #include "../../reconstructed/FileStream.h"
 #include "../../reconstructed/DebugOverlay.h"
+#include "../../reconstructed/Griddraw.h"
+#include "../../reconstructed/MatrixUtil.h"
+
+struct Vec3;
+float Vec3DotCall(const Vec3* a, const Vec3* b);
 
 #include <float.h>
 #include <stdio.h>
@@ -843,7 +848,7 @@ static inline float TerrainDotInline(const TerrainVec3& a, const TerrainVec3& b)
 
 static inline TerrainVec3 TerrainNormalize(const TerrainVec3& v)
 {
-    float lenSq = TerrainDot(v, v);
+    float lenSq = Vec3DotCall(reinterpret_cast<const Vec3*>(&v), reinterpret_cast<const Vec3*>(&v));
     if (lenSq == 1.0f)
         return v;
     return v * FastInvSqrt(lenSq);
@@ -888,7 +893,8 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
     TerrainVec3* cornerNormals = 0;
     if (normal)
         cornerNormals = n;
-    heightField->GetCellCorners(ix, iz, heights, cornerNormals, kinds);
+    reinterpret_cast<GridNode*>(heightField)->GetCellCorners(
+        ix, iz, heights, reinterpret_cast<GridVec3*>(cornerNormals), kinds);
 
     float y0 = heights[0] * gridCellSize;
     float y1 = heights[1] * gridCellSize;
@@ -936,7 +942,8 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
                 return;
             if (flatShaded) {
                 TerrainVec3 face;
-                TerrainTriangleNormal(&v[0], &v[1], &v[2], &face, 0);
+                TriangleNormal(reinterpret_cast<const Vector3*>(&v[0]), reinterpret_cast<const Vector3*>(&v[1]),
+                               reinterpret_cast<const Vector3*>(&v[2]), reinterpret_cast<Vector3*>(&face), 0);
                 if (TerrainDotInline(face, kVec3YAxis) < 0.0f)
                     *normal = -face;
                 else
@@ -951,7 +958,8 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
                 return;
             if (flatShaded) {
                 TerrainVec3 face;
-                TerrainTriangleNormal(&v[1], &v[3], &v[2], &face, 0);
+                TriangleNormal(reinterpret_cast<const Vector3*>(&v[1]), reinterpret_cast<const Vector3*>(&v[3]),
+                               reinterpret_cast<const Vector3*>(&v[2]), reinterpret_cast<Vector3*>(&face), 0);
                 if (TerrainDotInline(face, kVec3YAxis) < 0.0f)
                     *normal = -face;
                 else
@@ -968,7 +976,8 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
                 return;
             if (flatShaded) {
                 TerrainVec3 face;
-                TerrainTriangleNormal(&v[0], &v[1], &v[3], &face, 0);
+                TriangleNormal(reinterpret_cast<const Vector3*>(&v[0]), reinterpret_cast<const Vector3*>(&v[1]),
+                               reinterpret_cast<const Vector3*>(&v[3]), reinterpret_cast<Vector3*>(&face), 0);
                 if (TerrainDotInline(face, kVec3YAxis) < 0.0f)
                     *normal = -face;
                 else
@@ -983,7 +992,8 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
                 return;
             if (flatShaded) {
                 TerrainVec3 face;
-                TerrainTriangleNormal(&v[0], &v[3], &v[2], &face, 0);
+                TriangleNormal(reinterpret_cast<const Vector3*>(&v[0]), reinterpret_cast<const Vector3*>(&v[3]),
+                               reinterpret_cast<const Vector3*>(&v[2]), reinterpret_cast<Vector3*>(&face), 0);
                 if (TerrainDotInline(face, kVec3YAxis) < 0.0f)
                     *normal = -face;
                 else

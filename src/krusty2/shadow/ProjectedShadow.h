@@ -16,9 +16,9 @@
 #define SHADOW_PROJECTEDSHADOW_H
 
 #include "../../reconstructed/TrackGameGlobal.h"
-#include "core/GameObject.h"
-#include "math/FastMath.h"
-#include "core/DebugAlloc.h"
+#include "../core/GameObject.h"
+#include "../math/FastMath.h"
+#include "../core/DebugAlloc.h"
 
 // Stand-in for the shared Vec3 (the real one lives in src/krusty2/math/Math3D.h, which
 // is not included here: every includer would get its static const Vec3 objects and their

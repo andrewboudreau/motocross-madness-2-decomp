@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/race/RecorderWorker.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete replay worker passes 24595 native event, payload, whole-state, lock, failure, mutation and termination scenarios. Both complete extents are 2148 bytes, with 2100 matching positions. Twenty existing ring/file helpers, synchronization APIs and thread exit are scripted; actual scheduling, file I/O and integrated recording/playback remain untested.",
+      "evidence": "docs/RECORDER_WORKER.md#functional-build-review"
+    },
+    {
       "path": "samples/ui/KrustyUINearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete KrustyUI startup passes 13540 native whole-state, allocation, exception, fault, profile and callback scenarios; generated Intro1Dlg destructor helpers match strictly. VC6 emits 1102 bytes against 1104 retail bytes with 872 matching positions. GUI, resource, profile and device dependencies are scripted; rendered menus and live navigation remain untested.",
