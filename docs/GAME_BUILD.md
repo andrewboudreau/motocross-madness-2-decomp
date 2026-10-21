@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 198 C++ files (178 canonical sources and twenty
-reviewed candidates) and reaches LINK with 524 unresolved external symbols,
+The 2026-10-21 build compiles 200 C++ files (180 canonical sources and twenty
+reviewed candidates) and reaches LINK with 522 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -54,7 +54,7 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
 the current composition retains all prior physics targets, with 1,080 now strict-exact, and all
-2,973 distinct strict-exact calibration cases. A native link/runtime regression checks
+2,975 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 
@@ -301,14 +301,22 @@ coordinate conversion truncates where retail follows the active x87 rounding
 mode. The game still does not link, so these checks do not establish
 interactive menus or racing.
 
+Two [empty lifecycle providers](EMPTY_LIFECYCLE_PROVIDERS.md) now supply the
+GUIManager palette-related hook and the scene-finder destructor used during
+shutdown. Each complete one-byte body matches retail, and each method identity
+is supported independently by its callers. Their shared retail address does
+not establish shared source identity. Both remain out of line, preserving
+existing caller bytes. The real link removes exactly those two names,
+**524 → 522**, without exposing additional dependencies.
+
 Validation of this composition passes the toolchain/manual/generated VC6 gate,
-2,975 of 2,986 calibration rows (2,973 distinct source/address/extent cases),
+2,977 of 2,988 calibration rows (2,975 distinct source/address/extent cases),
 and all prior strict physics targets, with four additions making 1,080 among
 1,156 comparisons. Both near-miss comparisons report zero drops.
 The recursive reset's strict case moves from FileStream.cpp to
 Parameterblocks.cpp with its address and full 30-byte extent unchanged;
 ShowDialog adds one strict case. The native-enabled Python suite passes
-446 tests with 11 skipped. These counts retain existing nonexact comparisons;
+447 tests with 11 skipped. These counts retain existing nonexact comparisons;
 they do not describe a fully matched or working game.
 
 Other incompatible class views, missing methods and unresolved globals

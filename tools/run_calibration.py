@@ -26652,6 +26652,24 @@ CASES = [
         'target_size': 976,
         'reason': 'StatsOverlay loader: the per-branch face-name copy ranks the LOGFONT below the rectangles (retail frame), lfItalic/lfHeight stored last, source rectangle top/bottom first',
     },
+    {
+        'name': 'GUIManager direct palette-related empty hook',
+        'bindings': 'src/reconstructed/GUIManagerHooks.bindings.json',
+        'source': 'src/reconstructed/GUIManagerHooks.cpp',
+        'symbol': '?UnknownFunction464e90@GUIManager@@QAEXXZ',
+        'target_va': '0x00464e90',
+        'target_size': 1,
+        'reason': 'GUIManager Tick and UIDialog destruction supply GUIManager receiver to direct call; shared RET does not establish other method identities',
+    },
+    {
+        'name': 'Scene finder empty destructor',
+        'bindings': 'src/reconstructed/SceneArchiveFinderLifetime.bindings.json',
+        'source': 'src/reconstructed/SceneArchiveFinderLifetime.cpp',
+        'symbol': '??1UnknownTrackGameObject574@@QAE@XZ',
+        'target_va': '0x00464e90',
+        'target_size': 1,
+        'reason': 'TrackGame Shutdown calls on +0x574 before operator delete; independently evidenced destructor with no additional resource cleanup',
+    },
 ]
 
 def main():
