@@ -28,7 +28,7 @@ its deleting wrapper, the qsort comparator `0x004a3bb0`, the vector angle
 - The mesh's +0x20/+0x24 pair is one 8-byte struct.
 
 Near misses (`samples/render/MorphBastardModifierNearMisses.cpp`):
-- The 2046-byte parameter-file loader `LoadParameterFile` `0x004a33b0` (1938 of 2046): an
+- The 2046-byte parameter-file loader `LoadParameterFile` `0x004a33b0` (1942 of 2046): an
   existing channel records the target index `j`; the stack homes of the loop
   scalars and the operand order of the channel inverse's products differ.
 - Slot 27 `0x004a4c60`.

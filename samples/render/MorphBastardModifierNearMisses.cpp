@@ -3,7 +3,7 @@
 // class evidence.
 //
 // MorphBastardModifier::LoadParameterFile (0x004a33b0, 2046 bytes): the
-// parameter-file loader, 1938 of 2046 positions. Calls, strings, lines,
+// parameter-file loader, 1942 of 2046 positions. Calls, strings, lines,
 // field offsets and the frame size (0x350) match retail; the object's rigid
 // inverse is MorphBastardInvertRigid (an inline building a Vector3; the
 // plain-locals form leaves the frame 0x18 bytes short). An existing channel
@@ -14,10 +14,14 @@
 // which gives retail's term order; the products' operand order inside
 // t.x/t.y/t.z still differs (six term orders per sum, all 216 combinations,
 // tried).
-// Remaining: the stack homes of the spilled scalars (retail: controller
-// +0x10, j +0x14, axis +0x1c, isNew +0x20, k +0x24, i +0x28, targetCount
-// +0x30, found +0x40, probe +0x44; the two inverse temporaries 0x48/0x54 in
-// the other order). Declaration scopes of targetCount, probe, found and i,
+// Remaining: the stack homes of the spilled scalars (retail, offsets from
+// esp after the prologue: controller +0, j +4 (shared with the second k),
+// targetValue +8, axis +0xc, isNew +0x10, k +0x14, i +0x18, targetCount
+// +0x20 (shared with `this` and the two `new` results before the loop),
+// channelAxis +0x24, found +0x30, probe +0x34; the two inverse temporaries
+// +0x38/+0x44 in the other order). The candidate gives the second k and
+// targetCount slots of their own (+0x18, +0x34). `probe` declared in the axis loop beside
+// `found` gives 1942 (function scope 1938). Declaration scopes of targetCount, found and i,
 // constant channel axes, the isNew/controller test order and the
 // targetValue initialisation do not move them; tools/frame_layout.py finds
 // no use-count adjustment for the swapped pairs (j/controller, k/isNew,
@@ -112,7 +116,6 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
     char objectName[0x100];
     char controllerName[0x100];
     int targetCount;
-    float probe;
 
     D3DIMSoultreeModifier::SetRenderContext(value);
     UnknownTextureStream* stream =
@@ -145,6 +148,7 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
             int isNew = 1;
             for (int axis = 0; axis < 3; axis++) {
                 int found;
+                float probe;
                 int channelAxis;
                 if (axis == 0) {
                     channelAxis = axis;
