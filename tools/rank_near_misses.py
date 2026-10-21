@@ -42,6 +42,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import functools
 import json
 import os
 import re
@@ -237,11 +238,26 @@ def retail_extent(pe, va: int, starts: list[int], limit: int = 0x4000) -> int:
     return (insns[-1].address + insns[-1].size - va) if insns else end - va
 
 
+@functools.lru_cache(maxsize=None)
+def physics_sources(root: Path) -> frozenset:
+    """Sources named by samples/physics targets; run_physics_samples compiles them with src/krusty2."""
+    out = set()
+    for t in sorted((root / 'samples/physics').rglob('targets.json')):
+        try:
+            d = json.loads(t.read_text(encoding='utf-8'))
+        except ValueError:
+            continue
+        for e in d if isinstance(d, list) else []:
+            if isinstance(e, dict) and e.get('source'):
+                out.add((t.parent / e['source']).resolve())
+    return frozenset(out)
+
+
 def compile_one(root: Path, vc6_root: str, cpp: Path, obj: Path) -> str | None:
     cmd = [sys.executable, str(root / 'tools/compile.py'), '--compiler', 'vc6', '--vc6-root', vc6_root,
            '--profile', 'vc6_o2_mt', str(cpp), '-o', str(obj)]
     rel = cpp.resolve().relative_to(root).as_posix()
-    if 'krusty2' in rel or rel.startswith('samples/physics/'):
+    if 'krusty2' in rel or rel.startswith('samples/physics/') or cpp.resolve() in physics_sources(root):
         cmd += ['--include', str(root / 'src/krusty2')]
     env = dict(os.environ, PYTHONPATH=str(root))
     p = subprocess.run(cmd, capture_output=True, text=True, encoding='latin-1', env=env, cwd=root)

@@ -1,11 +1,14 @@
 """reference_diff counts references on both sides as multisets; synthetic inputs only, no VC6."""
+import io
 import struct
 import unittest
+from contextlib import redirect_stderr
+from pathlib import Path
 from types import SimpleNamespace
 
 from mcm2tool.coff import CoffRelocation, CoffSymbol
-from tools.reference_diff import (candidate_refs, float_key, match_refs, retail_refs, score, string_key,
-                                  table_entries)
+from tools.reference_diff import (candidate_refs, compile_failures, exit_status, float_key, match_refs,
+                                  render_md, retail_refs, score, string_key, table_entries)
 
 BASE = 0x401000
 
@@ -94,6 +97,40 @@ class ReferenceDiffTests(unittest.TestCase):
             ('addr', 0x402010, 'flt:20.0', None),
             ('imm', None, None, 5)])
         self.assertEqual(got['tables'], [(3, 2)])
+
+    def test_retail_refs_stop_at_the_tables(self):
+        # a byte index table after the jump table: its 0x04 bytes would decode as `add al, 4`
+        code = (b'\x0f\xb6\x80' + struct.pack('<I', BASE + 0x18) +   # movzx eax, byte ptr [eax + index]
+                b'\xff\x24\x85' + struct.pack('<I', BASE + 0x10) +   # jmp [eax*4 + table]
+                b'\xc3\xc3')
+        table = struct.pack('<II', BASE + 0xe, BASE + 0xf)
+        index = b'\x04\x04\x04\x04\x01\x00\x04\x04'
+        image = image_with({BASE: code, BASE + 0x10: table, BASE + 0x18: index})
+        got = retail_refs(FakeRetail(image), BASE, 0x20, BASE + 0x40)
+        self.assertEqual(got['refs'], [])
+        self.assertEqual((got['tables'], got['byte_tables']), ([(2, 2)], 1))
+
+    def test_compile_failures_are_reported(self):
+        ok, bad = Path('samples/race/Ok.cpp').resolve(), Path('samples/race/Bad.cpp').resolve()
+        by_va = {0x401000: [(bad, 'F', False)], 0x402000: [(ok, 'G', False), (bad, 'G', False)],
+                 0x403000: [(ok, 'H', False)]}
+        errors = {ok: None, bad: 'Bad.cpp(3) : error C2027: undefined type'}
+        rows = []
+        for va in sorted(by_va):
+            r = dict(tu='race/X', va=va, lane='shell', kind='unmeasured')
+            r['compile_failures'] = compile_failures(r, by_va, errors)
+            rows.append(r)
+        self.assertEqual([len(r['compile_failures']) for r in rows], [1, 1, 0])
+        self.assertTrue(rows[0]['compile_failures'][0][0].endswith('samples/race/Bad.cpp'))
+        rows[0]['kind'] = 'compile_failure'
+        md = render_md(rows)
+        self.assertIn('| race/X | `0x00401000` | compile failure |', md)
+        self.assertIn('## compile failures', md)
+        self.assertEqual(md.count('error C2027'), 2)       # both rows that name the broken source
+        with redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(exit_status(rows), 1)
+        self.assertIn('0x00402000', err.getvalue())
+        self.assertEqual(exit_status([rows[2]]), 0)
 
     def test_candidate_refs(self):
         code = (b'\x68\x00\x00\x00\x00'              # push offset ??_C@... (DIR32)

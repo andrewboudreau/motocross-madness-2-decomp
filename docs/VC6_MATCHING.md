@@ -521,7 +521,10 @@ and string addresses (unbound candidate symbols matched by string text,
 float value or import name), the non-zero immediates and the jump-table
 entry counts. It ranks rows by what retail has and the candidate lacks: a
 missing call, string, global or switch case means missing source, not
-scheduling (the DirectInput reporter `0x004bf6a0` lacked `case 2`):
+scheduling (the DirectInput reporter `0x004bf6a0` lacked `case 2`). Both
+sides stop decoding at the function's first jump or byte index table. A
+candidate source that does not compile is listed under "compile failures"
+with its first error line, and the tool then exits with status 1:
 
 ```powershell
 python tools/reference_diff.py --lane shell --json work/ref.json --md work/ref.md
