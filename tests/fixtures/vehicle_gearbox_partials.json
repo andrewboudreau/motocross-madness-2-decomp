@@ -1,5 +1,5 @@
 {
-  "baseline": "eb470e531e943af060ddd08ec40b9ea5accdf505; full COFF body and relocation target fingerprints after whole-object preservation under five documented connections; round29 three network/provider renames and compiler-local label renumbering: complete nondebug section bytes and all relocation section/offset destinations preserved under three symbol substitutions; round30 four text-provider substitutions: complete nondebug section bytes and all resolved relocation destinations preserved; extents and scores unchanged; round31 three motion-provider names and existing TU-local zero-vector target: complete nondebug bytes and resolved destinations preserved",
+  "baseline": "eb470e531e943af060ddd08ec40b9ea5accdf505; full COFF body and relocation target fingerprints after whole-object preservation under five documented connections; round29 three network/provider renames and compiler-local label renumbering: complete nondebug section bytes and all relocation section/offset destinations preserved under three symbol substitutions; round30 four text-provider substitutions: complete nondebug section bytes and all resolved relocation destinations preserved; extents and scores unchanged; round31 three motion-provider names and existing TU-local zero-vector target: complete nondebug bytes and resolved destinations preserved; round33 nine math-call sites replace two external names with complete bytes/destinations preserved; defined compiler-local $L/$T labels now fingerprint by section/offset, verified on all 28 published/current bodies; extents and scores unchanged",
   "partials": [
     [
       "src/krusty2/vehicle/Bike.cpp",
@@ -8,7 +8,7 @@
       2874,
       2865,
       1758,
-      "ed963e394918c4995352b0e14618cad9aca5b55a974fd26623b8b030e7190feb"
+      "f1291b885c36400c82a2fb17416a5e6c71f23dd8535f1790a4530fe1facb923a"
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",
@@ -26,7 +26,7 @@
       2396,
       2120,
       115,
-      "607ea7cf4745dda375db369d624fd646f940d9558b5c1399ecc5dd38f11a059c"
+      "e8a91929cad4d9b8117f7e17390347c184352e91b8ae78ba9a13e729f4f31558"
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",
@@ -53,7 +53,7 @@
       745,
       745,
       693,
-      "1d412d293f70516c6d227a85a74f46ecaeddac6351856bd1dbd5daa5c5b77153"
+      "0e1105cb5e15297f9bda7096cf072a0feb6d55a3069e09f0a9468dcd14201969"
     ],
     [
       "src/krusty2/vehicle/Vehicle.cpp",
@@ -107,7 +107,7 @@
       2272,
       2272,
       2112,
-      "db22e0cef50419617c5ea20c079ac298ef74a6afe5b62cf4cde323f9e7dac583"
+      "932986d16ab7e4d7371aed55f98f98cae93123e8e72edf33288e75ea3e747067"
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",
@@ -116,7 +116,7 @@
       6745,
       6745,
       6428,
-      "40e231e0da898e7e8e9e92b766a66d7f56835d1197562ba6ded6e0893cf73e9a"
+      "bf9a95b97c8b2de1b18ffa7e561006f6583e073eb230b51d2c9513f4f51c0463"
     ],
     [
       "samples/physics/bikeai/BikeAINearMisses.cpp",
@@ -134,7 +134,7 @@
       6112,
       6111,
       6063,
-      "998f6139e141cb464d8d96be7640f3c327fbd19b6dca6a45d301d84d214d12a0"
+      "caec25548e58c338c04739ba5f6ed211557b6fd58a55c6251fc42a68bdae0e93"
     ],
     [
       "samples/physics/bikeai/BikeAINearMisses.cpp",
@@ -179,7 +179,7 @@
       1296,
       1288,
       526,
-      "f32ae07d1963409e1f4c3a6b97c219266170d02079a2333073ffbf4180794843"
+      "38ff4147cafbc3b4b6e24f998df9cab5f3a9c4e794db485ded3c2b0e0302b96f"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
@@ -206,7 +206,7 @@
       532,
       532,
       472,
-      "849320ebec50bdaecf8353b94e5068e0f8e4e07955d89e95a85c1749f8ccd1da"
+      "38add8a755ed13343eeabc4e4c7d877d6746568749041e4edfac76c148735468"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
@@ -215,7 +215,7 @@
       2920,
       2952,
       608,
-      "be20302aa8a2d5d6e470bf99052867f7e0d2febb761b5bf0e31e50366022f207"
+      "3acc2482c06dcf8dec1be7c2474bd4a1e76a3b97e881e8390158653a5de2113c"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
@@ -224,7 +224,7 @@
       895,
       895,
       null,
-      "3cef749edf12ff81a45d4a3608b357b75378dcad8ce5420d478f7023043351c3"
+      "95f0159076e232c976247178b5acce832760d77ba14abc82203294bbc7a1a61a"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",

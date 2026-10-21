@@ -86,7 +86,7 @@ Five previously missing decorated names now import existing providers:
 | `Vec3Scale(const Vector3&, float)` | MatrixUtil | explicit-output `Vec3ScaleCall` |
 
 `tests/test_math_call_connections.py` recompiles these six complete production
-translation units and both actual providers with authentic VC6. It verifies
+translation units and three actual providers with authentic VC6. It verifies
 209 complete strict caller cases, the provider extents and bytes, real COFF
 imports/call relocations, and the vector layout guard. Seven existing Bike
 partial functions and both Wrecker sample functions retain their complete
@@ -102,6 +102,41 @@ python tests/test_math_call_connections.py -v
 
 The helper manifest records the four canonical providers. Other vector call
 views, incomplete source bodies and game startup/menu/racing validation remain
-separate work. In particular, Bike and collision constructor call views remain
-unresolved: simply substituting the known inline `Vec3` constructor changes
-existing partial bodies. They are not supplied through aliases or wrappers.
+separate work. Bike and collision constructor call views now have their own
+verified providers; they retain the existing partial bodies rather than
+substituting an inline constructor with different code generation.
+
+## Bike steering-torque subtraction and scaling
+
+`Bike::Method_0x0040a520` now joins five subtraction calls and four scale calls
+to `Vec3SubtractCall` and `Vec3ScaleCall`. Each scoped `Vec3 callResult` retains
+the former returned temporary's lifetime. The provider receives that output
+address first and returns it in EAX; the caller then copies its three words
+to the existing destination. No wrapper or alternate arithmetic is introduced.
+
+The complete 2,272-byte caller remains nonexact: 2,112 matching positions
+against the full retail extent. Its existing relocation-resolved fingerprint,
+result-buffer addresses, argument order, stack cleanup and post-call copies
+are unchanged. Every nondebug section of the complete Bike object is also
+preserved under only the two external-name substitutions. The existing math
+connection regression now checks all nine call relocations, the corresponding
+retail call counts, both full 69-byte providers and the unchanged caller
+fingerprint. The native vector-provider regression continues to exercise the
+actual providers, including overlapping inputs/outputs and floating-point
+bit patterns. This does not establish complete bike physics behavior.
+
+The gearbox regression also verifies 28 complete partial bodies. Its local
+VC6 label fingerprints now retain section/offset identity instead of label
+numbers, which changed when the old declarations were removed. All old pins
+were reproduced from the published baseline before migrating ten hashes;
+full bytes, extents, scores and destinations remain unchanged under the two
+verified external-name substitutions. A regression still rejects changed
+bytes, offsets, sections and external names. Private comparison evidence is
+in `work/game-build/gearbox33/normalized-proof.json`.
+
+The isolated real link `work/game-build/build-h85tsf4m` removes exactly the two
+old Bike vector names: 339 to 337 unresolved symbols, with no new missing names.
+Together with the shadow getter connections, all 226 prior production objects
+preserve 10,509 nondebug sections and 45,418 relocations under four name
+substitutions (`work/game-build/round33-all-objects.json`). Startup, menus and
+racing still require completion of the remaining providers and runtime tests.

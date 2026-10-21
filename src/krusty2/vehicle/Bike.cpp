@@ -84,11 +84,9 @@ static inline float BikeDotZ(const Vec3& a, const Vec3& b)
     return a.z * b.z + (a.x * b.x + a.y * b.y);
 }
 #include "../../reconstructed/VectorScaleAssign.h"
-// By-value views of the out-of-line operators (hidden result pointer first, same ABI as
-// the pointer forms in math/Math3D.h): operator- 0x00421d00,
-// operator*(Vec3, float) 0x005015b0. Dot calls use the shared Vec3DotCall.
-Vec3 BikeVec3Sub(const Vec3& a, const Vec3& b);
-Vec3 BikeVec3Scale(const Vec3& v, float s);
+// The out-of-line subtraction (0x00421d00) and scale (0x005015b0)
+// calls use the explicit-output providers in math/Math3D.h. Scoped result
+// storage preserves each former returned temporary and its subsequent copy.
 
 // 0x0040a520 (tier 3 reading).  Builds a world-space steering torque `torque`: a quarter of
 // the force accumulator weightForce, turned by the front wheel's contact (offset x normalLoadVector) and by each
@@ -136,18 +134,26 @@ float Bike::Method_0x0040a520()
         result = 0.0f;
     } else {
         if (frontWheel->inContact) {
-            offset = BikeVec3Sub(frontWheel->wheelPosition, frontWheel->nodePosition);
+            {
+                Vec3 callResult;
+                offset = *Vec3SubtractCall(&callResult, &frontWheel->wheelPosition, &frontWheel->nodePosition);
+            }
             driven = 1;
             torque = CrossProduct(offset, frontWheel->normalLoadVector);
             frontWheel->w_0x16c = 2;
             if (leftBarContact->active) {
-                torque = BikeVec3Sub(leftBarContact->point, frontWheel->nodePosition);
+                {
+                    Vec3 callResult;
+                    torque = *Vec3SubtractCall(&callResult, &leftBarContact->point, &frontWheel->nodePosition);
+                }
                 const Vec3& axis = leftBarContact->axis;
                 float d = Vec3DotCall(&torque, &axis);
                 if (d >= 0.0f)
                     push = Vec3(0.0f, 0.0f, 0.0f);
-                else
-                    push = BikeVec3Scale(axis, -d);
+                else {
+                    Vec3 callResult;
+                    push = *Vec3ScaleCall(&callResult, &axis, -d);
+                }
                 torque += CrossProduct(offset, push);
                 leftBarContact->state = 2;
             } else if (rightBarContact->active) {
@@ -155,21 +161,31 @@ float Bike::Method_0x0040a520()
                 float d = Vec3DotCall(&base, &axis);
                 if (d >= 0.0f)
                     push = BikeVec3Call(0.0f, 0.0f, 0.0f);
-                else
-                    push = BikeVec3Scale(axis, -d);
-                offset = BikeVec3Sub(rightBarContact->point, frontWheel->nodePosition);
+                else {
+                    Vec3 callResult;
+                    push = *Vec3ScaleCall(&callResult, &axis, -d);
+                }
+                {
+                    Vec3 callResult;
+                    offset = *Vec3SubtractCall(&callResult, &rightBarContact->point, &frontWheel->nodePosition);
+                }
                 torque += CrossProduct(offset, push);
                 rightBarContact->state = 2;
             }
         } else if (leftBarContact->active) {
             driven = 1;
-            torque = BikeVec3Sub(leftBarContact->point, frontWheel->nodePosition);
+            {
+                Vec3 callResult;
+                torque = *Vec3SubtractCall(&callResult, &leftBarContact->point, &frontWheel->nodePosition);
+            }
             const Vec3& axis = leftBarContact->axis;
             float d = Vec3DotCall(&torque, &axis);
             if (d >= 0.0f)
                 push = BikeVec3Call(0.0f, 0.0f, 0.0f);
-            else
-                push = BikeVec3Scale(axis, -d);
+            else {
+                Vec3 callResult;
+                push = *Vec3ScaleCall(&callResult, &axis, -d);
+            }
             torque = CrossProduct(offset, push);
             leftBarContact->state = 2;
         } else if (rightBarContact->active) {
@@ -178,9 +194,14 @@ float Bike::Method_0x0040a520()
             float d = Vec3DotCall(&base, &axis);
             if (d >= 0.0f)
                 push = BikeVec3Call(0.0f, 0.0f, 0.0f);
-            else
-                push = BikeVec3Scale(axis, -d);
-            offset = BikeVec3Sub(rightBarContact->point, frontWheel->nodePosition);
+            else {
+                Vec3 callResult;
+                push = *Vec3ScaleCall(&callResult, &axis, -d);
+            }
+            {
+                Vec3 callResult;
+                offset = *Vec3SubtractCall(&callResult, &rightBarContact->point, &frontWheel->nodePosition);
+            }
             torque = CrossProduct(offset, push);
             rightBarContact->state = 2;
         } else {

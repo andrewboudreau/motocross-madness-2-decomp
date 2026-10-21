@@ -282,6 +282,12 @@ in dead code get no slot).
 
 ## Functional build review
 
+The two complete pixel hit tests are maintained in
+`samples/ui/ControlHitTest.cpp`, included by the aggregate. Their corrected
+retail extents are 354 bytes (UIButton) and 329 bytes (UIMultiState); unchanged
+VC6 candidates emit 328/303 bytes. See [menu control hit-test evidence](CONTROL_HIT_TEST.md)
+for full-body, helper, extraction and 2,780-case native validation boundaries.
+
 `samples/ui/UIDialogTick.cpp` supplies the complete dialog tick as an explicit
 nonexact game-build candidate. GameUiNearMisses.cpp includes this same source
 for its existing calibration; the larger sample is not added to the game link.

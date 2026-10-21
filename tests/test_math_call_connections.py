@@ -1,4 +1,5 @@
 """Existing camera, matrix, bike and BVH calls join exact shared providers."""
+from collections import Counter
 import hashlib
 import json
 import os
@@ -18,6 +19,7 @@ from tools.run_calibration import CASES
 ROOT = Path(__file__).resolve().parents[1]
 DOT = '?Vec3DotCall@@YAMPBUVec3@@0@Z'
 SCALE = '?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z'
+SUBTRACT = '?Vec3SubtractCall@@YAPAUVec3@@PAU1@PBU1@1@Z'
 SOURCES = (
     'src/reconstructed/Camera.cpp', 'src/reconstructed/FollowCamera.cpp',
     'src/reconstructed/MatrixUtil.cpp', 'src/reconstructed/Wrecker.cpp',
@@ -62,7 +64,8 @@ class MathCallConnectionsTests(unittest.TestCase):
                 objects[source] = CoffObject(path)
 
             provider = objects['src/reconstructed/VectorCalls.cpp']
-            for symbol, va, size in ((DOT, 0x40ae30, 29), (SCALE, 0x5015b0, 69)):
+            for symbol, va, size in ((DOT, 0x40ae30, 29), (SCALE, 0x5015b0, 69),
+                                     (SUBTRACT, 0x421d00, 69)):
                 entry = provider.find_symbol(symbol)
                 self.assertGreater(entry.section_number, 0)
                 self.assertEqual(entry.function_size, size)
@@ -74,13 +77,15 @@ class MathCallConnectionsTests(unittest.TestCase):
             expected_imports = {
                 SOURCES[0]: {DOT}, SOURCES[1]: {DOT, SCALE},
                 SOURCES[2]: {DOT, SCALE}, SOURCES[3]: {SCALE},
-                SOURCES[4]: {DOT}, SOURCES[5]: {DOT},
+                SOURCES[4]: {DOT, SCALE, SUBTRACT}, SOURCES[5]: {DOT},
             }
             retired = {'?Vec3Dot@@YAMPBUVector3@@0@Z',
                        '?Vec3ScaleCall@@YA?AUVector3@@ABU1@M@Z',
                        '?Vec3Scale@@YA?AUVector3@@ABU1@M@Z',
                        '?BikeVec3Dot@@YAMABUVec3@@0@Z',
-                       '?Vec3Dot@@YAMABUVec3@@0@Z'}
+                       '?Vec3Dot@@YAMABUVec3@@0@Z',
+                       '?BikeVec3Sub@@YA?AUVec3@@ABU1@0@Z',
+                       '?BikeVec3Scale@@YA?AUVec3@@ABU1@M@Z'}
             for source, wanted in expected_imports.items():
                 obj = objects[source]
                 imports = {symbol.name for symbol in obj.symbols
@@ -90,6 +95,20 @@ class MathCallConnectionsTests(unittest.TestCase):
                 calls = {obj.symbol_by_index[r.symbol_index].name
                          for r in obj.relocations if r.type == 0x14}
                 self.assertTrue(wanted <= calls)
+
+            # All nine new connections belong to the complete steering-torque
+            # partial below. Its existing resolved fingerprint also preserves
+            # the result-buffer addresses, cleanup and post-call vector copies.
+            bike = objects[SOURCES[4]]
+            _, _, relocs = bike.symbol_extent(bike.find_symbol('Method_0x0040a520@Bike'))
+            calls = Counter(bike.symbol_by_index[r.symbol_index].name for r in relocs
+                            if r.type == 0x14 and bike.symbol_by_index[r.symbol_index].name in (SCALE, SUBTRACT))
+            self.assertEqual(calls, Counter({SUBTRACT: 5, SCALE: 4}))
+            import capstone
+            decoder = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
+            retail_calls = Counter(i.op_str for i in decoder.disasm(retail.bytes_at_va(0x40a520, 2272), 0x40a520)
+                                   if i.mnemonic == 'call' and i.op_str in ('0x421d00', '0x5015b0'))
+            self.assertEqual(retail_calls, Counter({'0x421d00': 5, '0x5015b0': 4}))
 
             cases = [(c['source'], c['symbol'], int(c['target_va'], 0), c['target_size'],
                       ROOT / c['bindings']) for c in CASES if c['source'] in SOURCES]

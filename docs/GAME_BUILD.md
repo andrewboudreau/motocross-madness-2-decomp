@@ -37,36 +37,38 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 226 C++ files (189 canonical sources and 37
-reviewed candidates) and reaches LINK with 341 unresolved external symbols,
+The 2026-10-21 build compiles 227 C++ files (189 canonical sources and 38
+reviewed candidates) and reaches LINK with 335 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-w7963nyq` retains all prior strict results and adds
-two strict edit-box methods: 2,994/3,005 calibration rows and 1,086/1,162
-physics comparisons. This does not establish game startup, menus or racing
-while linkage remains incomplete. Two existing nonexact physics candidates
-retain their unresolved comparison bindings; neither is counted as strict.
-The full regression run passes: 501 tests, with 490 passed and eleven skipped
-(`work/game-build/tests-round32-final.log`). Static checking also passes for 222
-Python files and 362 JSON files.
+The composition in `build-rl5ao1p1` retains all prior strict results:
+2,994/3,005 calibration rows and 1,086/1,162 physics comparisons, with no
+near-miss score drops. This does not establish startup, menus or racing while
+linkage remains incomplete. Two existing nonexact physics candidates retain
+their unresolved comparison bindings; neither is counted as strict.
+The full regression run passes: 504 tests, with 493 passed and eleven skipped
+(`work/game-build/tests-round33.log`). Static checking also passes for 224
+Python files and 363 JSON files.
 
-The current [garage setter connections](GARAGE_SETTER_CONNECTIONS.md) supply
-two existing Soultree methods at six call sites, preserving the complete
-3,114-byte caller. The [edit-box methods](UI_EDIT_EVENTS.md) supply ButtonUp
-and UpdateNeedsRedraw, with independently identified primary slots and 4,992
-native cases using real strict helpers. All 224 prior production objects
-preserve 10,504 nondebug sections and 45,410 relocations under only the two
-garage method-name substitutions.
-The [per-device button query](DEVICE_BUTTON_QUERY.md) adds one reviewed
-nonexact dispatcher with 45,489 native scenarios and four actual strict input
-helpers. The standalone candidate emits 124 bytes with 43 matching positions
-against the complete 104-byte retail extent; physical input remains untested.
-The three isolated links reduce unresolved names **346 → 344 → 342 → 341**,
+The [shadow getter connections](SHADOW_SCENE_GETTER_CONNECTIONS.md) supply two
+existing scene methods and retain the complete strict 767-byte caller and both
+separate sample fingerprints. Their real helper closure passes 6,144 native
+matrix, bounds, cache and alias cases. The [bike vector connections](VECTOR_CALLS.md#bike-steering-torque-subtraction-and-scaling)
+join nine subtraction/scale calls to existing providers while preserving the
+complete 2,272-byte steering-torque partial. All 226 prior production objects
+preserve 10,509 nondebug sections and 45,418 relocations under four verified
+method-name substitutions.
+The [menu hit tests](CONTROL_HIT_TEST.md) add one reviewed nonexact candidate
+with two complete methods, validated in 2,780 native scenarios using four real
+strict helpers and the byte-verified CRT conversion. Their 328/303 emitted
+bytes are compared against full 354/329-byte retail extents. The original UI
+aggregate's 350 functions and 733 nondebug sections remain unchanged.
+The three isolated links reduce unresolved names **341 → 339 → 337 → 335**,
 with no new missing names. Private evidence is in
-`work/game-build/round32-link-evidence.json`, `round32-all-objects.json` and
-`connections-round32-preservation.json`.
+`work/game-build/round33-link-evidence.json`, `round33-all-objects.json` and
+`connections-round33-preservation.json`.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

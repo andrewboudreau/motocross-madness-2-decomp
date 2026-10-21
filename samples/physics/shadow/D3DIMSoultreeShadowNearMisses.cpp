@@ -38,6 +38,9 @@
 // The same frame explains the two s_shadowPoints loads the s15 reference diff misses: with
 // ebp taken retail reloads the pointer per triangle copy, where VC6 here keeps it in ebp.
 #include "shadow/D3DIMSoultreeShadow.h"
+#include "math/Vec3.h"
+#include "../../../src/reconstructed/Matrix4.h"
+#include "core/SoultreeObject.h"
 #include "../../../src/reconstructed/ClipRectangle.h"
 
 // Row-major 4x4 matrix with the D3DMATRIX member names and the index view (Math3D.h's
@@ -143,8 +146,8 @@ int D3DIMSoultreeShadow::UnknownVirtualSlot29()
         D3DIMShadowMatrix4 local;
         ShadowVec3 center, extent;
         D3DIMShadowMatrix4 m;
-        c->GetMatrixIn(0, &local);
-        ((D3DIMShadowCasterView*)caster)->GetBounds(&center, &extent);
+        reinterpret_cast<SoultreeObject*>(c)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&local));
+        reinterpret_cast<SoultreeObject*>(caster)->GetSubtreeBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extent));
         D3DIMShadowCameraView* camera = ((D3DIMShadowHostView*)renderContext)->camera;
         const D3DIMShadowMatrix4& view = camera->matrix_0xec;
         D3DIMShadowMatrixProduct(&m, local, view);

@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
 
 from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
@@ -46,6 +47,10 @@ def fingerprint(obj, symbol):
     entry = obj.find_symbol(symbol)
     body, size, relocs = obj.symbol_extent(entry)
     def identity(target):
+        # Local VC6 label numbers are disposable; retain their actual section
+        # and offset (below). External/public symbol names remain exact.
+        if target.section_number > 0 and target.storage_class in (3, 6) and target.name.startswith(('$L', '$T')):
+            return ('local-section', target.section_number)
         if target.name.startswith('??_C@') and target.section_number > 0:
             section = obj.sections[target.section_number - 1]
             value = obj.data[section.raw_ptr + target.value:section.raw_ptr + section.raw_size].split(b'\0')[0]
@@ -60,6 +65,31 @@ def fingerprint(obj, symbol):
                 identity(obj.symbol_by_index[r.symbol_index]),
                 obj.symbol_by_index[r.symbol_index].value) for r in relocs]
     return hashlib.sha256(body + json.dumps(targets).encode()).hexdigest()
+
+
+class VehicleGearboxFingerprintTests(unittest.TestCase):
+    def test_local_labels_preserve_destination_and_byte_identity(self):
+        entry = SimpleNamespace(value=0)
+        target = SimpleNamespace(name='$L100', section_number=3, storage_class=6, value=16)
+        reloc = SimpleNamespace(virtual_address=1, type=6, symbol_index=1)
+        obj = SimpleNamespace(find_symbol=lambda symbol: entry, symbol_by_index={1: target},
+                              symbol_extent=lambda symbol: (b'\xa1\x00\x00\x00\x00', 5, [reloc]))
+        original = fingerprint(obj, 'method')
+        target.name = '$L109'
+        self.assertEqual(fingerprint(obj, 'method'), original)
+        target.value = 20
+        self.assertNotEqual(fingerprint(obj, 'method'), original)
+        target.value = 16
+        target.section_number = 4
+        self.assertNotEqual(fingerprint(obj, 'method'), original)
+        target.section_number = 3
+        obj.symbol_extent = lambda symbol: (b'\xa3\x00\x00\x00\x00', 5, [reloc])
+        self.assertNotEqual(fingerprint(obj, 'method'), original)
+        obj.symbol_extent = lambda symbol: (b'\xa1\x00\x00\x00\x00', 5, [reloc])
+        target.section_number, target.storage_class, target.name = 0, 2, '?ExternalOne'
+        external = fingerprint(obj, 'method')
+        target.name = '?ExternalTwo'
+        self.assertNotEqual(fingerprint(obj, 'method'), external)
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),

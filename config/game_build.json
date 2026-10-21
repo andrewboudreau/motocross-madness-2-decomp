@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/ui/ControlHitTest.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete UIButton and UIMultiState pixel hit tests pass 2780 native pixel, real-helper, callback, floating-point, fault and held-lock comparisons. Unchanged VC6 candidates emit 328/303 bytes with 256/231 matching positions against complete 354/329-byte retail bodies. Four actual helpers and the CRT conversion remain strict; DirectDraw surfaces are scripted and menu navigation remains untested.",
+      "evidence": "docs/CONTROL_HIT_TEST.md#functional-build-review"
+    },
+    {
       "path": "samples/control/DeviceButtonQuery.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete per-device query passes 45489 native dispatch, real-helper, callback and finite fault comparisons. Standalone VC6 emits 124 bytes with 43 matching positions against 104 retail bytes; four actual input helpers remain strict. Prepared devices do not validate physical input or arbitrary out-of-bounds indices.",

@@ -4,6 +4,9 @@
 #include <string.h>
 
 #include "D3DIMSoultreeShadow.h"
+#include "math/Vec3.h"
+#include "../../reconstructed/Matrix4.h"
+#include "core/SoultreeObject.h"
 
 // Per-TU vector constants (tier 2): 0x004477d0..0x004478d0 are the four VC6 dynamic initializers
 // that many retail TUs have, as in ProjectedShadow.cpp: jmp thunks $E2/$E5/$E8/$E11 into bodies
@@ -127,8 +130,8 @@ int D3DIMSoultreeShadow::UnknownVirtualSlot27()
         D3DIMShadowMatrix4 local;
         ShadowVec3 center, extent;
         D3DIMShadowMatrix4 m;
-        c->GetMatrixIn(0, &local);
-        ((D3DIMShadowCasterView*)caster)->GetBounds(&center, &extent);
+        reinterpret_cast<SoultreeObject*>(c)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&local));
+        reinterpret_cast<SoultreeObject*>(caster)->GetSubtreeBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extent));
         const D3DIMShadowMatrix4& view = ((D3DIMShadowCameraView*)shadow->camera)->matrix_0xec;
         D3DIMShadowMatrixProduct(&m, local, view);
         if (g_visibilityClipper->TestBox((D3DIMShadowCameraView*)shadow->camera, &m._11, &center.x,

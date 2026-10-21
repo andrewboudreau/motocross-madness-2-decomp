@@ -51,9 +51,11 @@
 //   `timer->targetControl` twice moves the +0x0c store before the load as
 //   retail does, but changes the call's registers (172); a control local
 //   read before or after the store gives 352.
-// 0x004734c0 UIButton slot 28 (256/328) and 0x00478e10 UIMultiState slot 28
-//   (231/303; UIMultiState tests its own area in place, without UIButton's
-//   RECT copy, which gives retail's 0x84 frame and head): retail keeps the 8-bit result in edi and the 16-bit one in
+// 0x004734c0 UIButton slot 28 (256 positions, retail 354/candidate 328)
+//   and 0x00478e10 UIMultiState slot 28 (231 positions, retail 329/candidate
+//   303; UIMultiState tests its own area in place, without UIButton's RECT
+//   copy, which gives retail's 0x84 frame and head): retail keeps the 8-bit
+//   result in edi and the 16-bit one in
 //   memory, tests Unlock's result and returns separately when Lock fails.
 //   Ternary, separate-result and goto forms keep the result in memory; an
 //   early return on Lock failure, an empty `if (Unlock)` and an inline
@@ -228,65 +230,7 @@ unlock:
 // The complete tick candidate is also compiled independently for the game build.
 #include "UIDialogTick.cpp"
 
-// 0x004734c0: whether `point` is on an opaque pixel of the image.
-int UIButton::ContainsPoint(POINT point, int state) {
-    int opaque = 0;
-    int format = g_TrackGame->renderTarget->surfacePixelFormat;
-    RECT rect = *(RECT*)screenArea;
-    if (PtInRect(&rect, point)) {
-        point.x -= rect.left;
-        point.y -= rect.top;
-        int x = (int)(point.x / ownerDialog->scaleX);
-        int y = (int)(point.y / ownerDialog->scaleY);
-        UnknownSurfaceDesc desc;
-        desc.size = sizeof(desc);
-        PCTextureMap* texture = (PCTextureMap*)GetStateTexture(-1);
-        if (!texture->systemSurface->Lock(0, &desc, 1, 0)) {
-            int offset = desc.pitch * y / PixelFormatBytesPerPixel(format) + x;
-            if (format == 8) {
-                if (((unsigned char*)desc.surface)[offset] != *(unsigned char*)&desc.field_0x28[0x18])
-                    opaque = 1;
-            } else {
-                if (((unsigned short*)desc.surface)[offset] != *(unsigned short*)&desc.field_0x28[0x18])
-                    opaque = 1;
-            }
-            if (texture->systemSurface->Unlock(0))
-                return opaque;
-        }
-        return opaque;
-    }
-    return 0;
-}
-
-// 0x00478e10: the same test as UIButton slot 28 (0x004734c0), but on the
-// control's own area (no RECT copy: retail passes &screenArea to PtInRect).
-int UIMultiState::ContainsPoint(POINT point, int state) {
-    int opaque = 0;
-    int format = g_TrackGame->renderTarget->surfacePixelFormat;
-    if (PtInRect((RECT*)screenArea, point)) {
-        point.x -= ((RECT*)screenArea)->left;
-        point.y -= ((RECT*)screenArea)->top;
-        int x = (int)(point.x / ownerDialog->scaleX);
-        int y = (int)(point.y / ownerDialog->scaleY);
-        UnknownSurfaceDesc desc;
-        desc.size = sizeof(desc);
-        PCTextureMap* texture = (PCTextureMap*)GetStateTexture(-1);
-        if (!texture->systemSurface->Lock(0, &desc, 1, 0)) {
-            int offset = desc.pitch * y / PixelFormatBytesPerPixel(format) + x;
-            if (format == 8) {
-                if (((unsigned char*)desc.surface)[offset] != *(unsigned char*)&desc.field_0x28[0x18])
-                    opaque = 1;
-            } else {
-                if (((unsigned short*)desc.surface)[offset] != *(unsigned short*)&desc.field_0x28[0x18])
-                    opaque = 1;
-            }
-            if (texture->systemSurface->Unlock(0))
-                return opaque;
-        }
-        return opaque;
-    }
-    return 0;
-}
+#include "ControlHitTest.cpp"
 
 // 0x004738a0: draws the image, the text scrolled to keep the caret in view,
 // and the caret.
