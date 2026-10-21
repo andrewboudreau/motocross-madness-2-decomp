@@ -88,17 +88,7 @@ struct UnknownKrustyUIModel {
     int modelKind;                            // +0xc4: kind
 };
 
-// The plate number painter (0x2c bytes; constructor 0x00417500 loads
-// "BikeNumbers128.tga", destructor 0x00417570 releases it; code among
-// BikeAI.cpp's and bikerace.cpp's literals).
-class UnknownBikeNumberPainter {
-public:
-    UnknownBikeNumberPainter(TextureMapManager* textures); // 0x00417500
-    ~UnknownBikeNumberPainter();              // 0x00417570
-    void PaintNumber(void* texture, int number); // 0x00417670: draws `number`
-
-    unsigned char field_0x00[0x2c];
-};
+#include "BikeNumberPainterCore.h"
 
 struct UnknownKrustyUIBike {
     int model;                                // +0x00: model (KrustyUI+0x48)

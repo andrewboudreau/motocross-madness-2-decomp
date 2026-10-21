@@ -37,19 +37,19 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 205 C++ files (181 canonical sources and twenty-four
-reviewed candidates) and reaches LINK with 483 unresolved external symbols,
+The 2026-10-21 build compiles 207 C++ files (182 canonical sources and twenty-five
+reviewed candidates) and reaches LINK with 475 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The final composition in `build-jfyngil3` retains all prior strict results:
-2,978/2,989 calibration rows and 1,086/1,162 physics comparisons. This does
+The final composition in `build-uk70iui4` retains all prior strict results:
+2,979/2,990 calibration rows and 1,086/1,162 physics comparisons. This does
 not establish game startup, menus or racing while linkage remains incomplete.
-Regression verification covers 459 tests: 448 passed and eleven skipped.
+Regression verification covers 462 tests: 451 passed and eleven skipped.
 The full run exposed one stale compiler-local EH label fingerprint; after
 verifying unchanged code and relocation destinations, its affected test passed
-on rerun. Logs are `tests-round19.log` and `tests-round19-terrain-rerun.log`
+on rerun. Logs are `tests-round20.log` and `tests-round20-terrain-rerun.log`
 under `work/game-build/`.
 
 Many remaining declarations use provisional class views or different method
@@ -65,7 +65,7 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
 the current composition retains all prior physics targets, with 1,086 now strict-exact, and all
-2,976 distinct strict-exact calibration cases. A native link/runtime regression checks
+2,977 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 
@@ -307,10 +307,9 @@ cases. Three [terrain method connections](TERRAIN_CONNECTIONS.md) then join
 texture eviction, detail selection and segment visibility callers to existing
 complete providers. All 178 strict cases and both partial-body fingerprints
 are preserved. The isolated real links measure **540 → 539 → 527 → 524**,
-with no new missing names. QueryGround remains disconnected: its current
-coordinate conversion truncates where retail follows the active x87 rounding
-mode. The game still does not link, so these checks do not establish
-interactive menus or racing.
+with no new missing names. QueryGround's subsequent caller connections and
+bounded cell-conversion repair are described below. The game still does not
+link, so these checks do not establish interactive menus or racing.
 
 Two [empty lifecycle providers](EMPTY_LIFECYCLE_PROVIDERS.md) now supply the
 GUIManager palette-related hook and the scene-finder destructor used during
@@ -388,10 +387,9 @@ Actual input devices and rendered camera operation remain untested.
 
 The [terrain query caller connections](TERRAIN_QUERY_CONNECTIONS.md) replace
 five provisional names with the canonical provider across nine units and 23
-calls, **492 → 487**. All caller code is preserved. QueryGround itself remains
-partial and has a known cell-selection defect: its truncating conversion
-differs from retail's rounding-mode-sensitive FISTP. Ground sampling still
-requires correction and full behavioral proof.
+calls, **492 → 487**. All caller code is preserved. QueryGround remains partial;
+the subsequent cell-conversion repair below addresses its truncation defect.
+Full ground sampling still requires behavioral proof.
 
 Three [Character motion connections](CHARACTER_MOTION_CONNECTIONS.md) route
 rider lookups and flag/garage animation selection through existing strict
@@ -407,19 +405,50 @@ the complete 2,412-byte retail body and jump table. Extraction preserves all
 13 aggregate functions and 45 nondebug sections. Locks and existing helper
 calls are scripted; actual threads, replay files and recording remain untested.
 
-Across the final build, all 204 pre-existing objects preserve their 10,373
+Across that build, all 204 pre-existing objects preserve their 10,373
 nondebug sections and 44,807 relocations under the eight verified external-name
 substitutions. Named COFF sections identify reordered RTTI records; local
 targets retain their section identity and offset. The new recorder candidate
 is the only added object. Private evidence is in
 `work/game-build/round19-all-objects.json` and `round19-link-evidence.json`.
 
-Validation of this composition passes the toolchain/manual/generated VC6 gate,
-2,978 of 2,989 calibration rows (2,976 distinct source/address/extent cases),
-and 1,086 strict physics targets among 1,162 comparisons. All prior strict
-cases remain, with no additions or losses in this composition.
-Both near-miss comparisons report zero drops. These counts retain existing nonexact comparisons;
-they do not describe a fully matched or working game.
+The [garage preview connections](GARAGE_PREVIEW_CONNECTIONS.md) join character
+construction, motion advance and plate painting to five existing strict
+providers, removing six provisional names: **483 → 477**. Ten affected objects
+preserve all section bytes and relocations under those substitutions; 192
+native painter lifetime cases exercise construction, release and unwind.
+
+The [terrain conversion repair](TERRAIN_CELL_CONVERSION.md) corrects cell
+selection under active x87 rounding and passes 278,411 native comparisons
+through the first cell request. The partial QueryGround changes deliberately;
+full interpolation and unmasked exception behavior remain unverified. The
+same slice supplies the strict nine-byte GroundFogableObject constructor,
+removing only that missing name: **477 → 476**.
+
+The complete [KrustyUI startup operation](KRUSTYUI_CREATE.md#functional-build-review)
+is admitted as a reviewed nonexact candidate after 13,540 native comparisons.
+It retains its full 1102-byte body against 1104 retail bytes, including both
+allocation unwind states and the inline intro-dialog table. GUI, resource,
+profile and device boundaries remain scripted; this does not establish
+rendered menus. The isolated real link removes only Create, **476 → 475**,
+with no new unresolved names.
+
+All 204 pre-existing objects outside Terrain preserve their 10,292 nondebug
+sections and 44,347 relocations under the six verified garage substitutions.
+Terrain additionally preserves 83 complete sections, 445 relocations and all
+29 other full function extents; its prior 22 strict targets remain exact.
+Whole-object evidence is in `work/game-build/round20-all-object-preservation.json`.
+The final build's 207 source hashes, 208 header hashes and configuration hash
+match the reviewed files; link deltas are in `round20-link-evidence.json`.
+
+Validation passes the toolchain/manual/generated VC6 gate, 2,979 of 2,990
+calibration rows (2,977 distinct source/address/extent cases), and 1,086 strict
+physics targets among 1,162 comparisons. All prior strict cases remain, with
+one new constructor case. Its nine-byte retail body is shared, so unique
+address/extent counts remain 2,971 of 2,982. Both near-miss comparisons report
+zero strict-score drops. QueryGround's explicitly non-gating masked score
+changes from 65/2711 to 54/2707; its behavior repair does not claim matching.
+These counts do not describe a fully matched or working game.
 
 Other incompatible class views, missing methods and unresolved globals
 continue to block linking. Import

@@ -31,9 +31,13 @@ PARTIAL = (
     # Stream, cache and texture connections change external names and renumber an EH
     # label. The shared GroundFogableObject header later changes $L4894 to
     # $L4895 at offset 3; complete nondebug section bytes/destinations remain
-    # identical (round19-all-objects.json), including this EH target.
-    ('?Load@Terrain@@', 2117, '178c14f231b2e602d70a1f07bd0781b3ea6ec6d32b4b2722a71319a73a1d4e0f'),
-    ('QueryGround', 3321, '07ea9bdeb16235841aaf1d125c77ee580b9b1667ec900de488c74df2f57207b3'),
+    # identical (round19-all-objects.json), including this EH target. The new
+    # cell-conversion helper changes $L4895 to $L4924, still section 29 +182;
+    # round20-all-object-preservation.json verifies unchanged bytes/destinations.
+    ('?Load@Terrain@@', 2117, '28a208f9154c32d74066eda0c12503779911bfb8095704457d9f0114aa75e10f'),
+    # Intentional cell-conversion repair, verified at the actual first-cell
+    # boundary in test_terrain_cell_conversion; full interpolation remains partial.
+    ('QueryGround', 3255, '656417ea66c6520e195bb16e23a44ad74cab40b9ab294b57ae8b9762def1a085'),
 )
 
 

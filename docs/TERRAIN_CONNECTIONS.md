@@ -105,25 +105,14 @@ The five production QueryGround view names now use the canonical declaration;
 see [the caller connection proof](TERRAIN_QUERY_CONNECTIONS.md). That change
 preserves caller bytes and does not accept the provider's behavior.
 The existing provider at 0x00507c10 is registered as partial. Its current native
-COFF extent is **3321 bytes**, against the registered **2963-byte** retail body;
-older notes recording a 3225-byte candidate describe an earlier composition.
-It also has unresolved helper bindings, so no complete strict comparison is
-claimed for it.
+COFF extent is **3255 bytes**, against the complete **2963-byte** retail body,
+with a separate 370-byte local conversion helper. Unresolved helper bindings
+still prevent a complete strict comparison.
 
-There is a semantic conversion mismatch, not just a different instruction
-sequence. Retail subtracts 0.5 from each scaled coordinate, stores the float,
-then uses `FISTP` at 0x00507c86 and 0x00507ca0 without changing the active rounding
-mode. The current `FloatToInt` uses a C++ integer cast, emitted through
-`__ftol`, which truncates. With round-to-nearest and a scaled coordinate of
-1.25, retail converts 0.75 to cell index 1 while the source selects index 0.
-This changes the inputs to `GetCellCorners`, before height/normal interpolation.
-This example follows the decoded conversion semantics; it is not a full native
-behavioral validation of QueryGround or a claim about every runtime control-word
-state.
-
-These connections do not establish correct ground sampling. The provider
-needs a separate full-body review and native differential proof,
-including conversion modes, cell boundaries, surface-byte selection and normal
-outputs. `/QIfist` is a possible compiler-calibration experiment for ordinary
-C++; it has not been adopted here. No assembly, rounding substitute or weakened
-comparison was introduced in this slice.
+The [cell conversion repair](TERRAIN_CELL_CONVERSION.md) corrects the former
+truncation defect: a scaled coordinate of 1.25 now selects cell one under
+nearest rounding. It passes 278,411 native comparisons through the first
+GetCellCorners request, with masked exceptions. The complete QueryGround
+fingerprint was intentionally refreshed for that repair; it is not preserved
+from the earlier connection-only slice. Full interpolation, normals, material
+selection and unmasked exception behavior still need independent validation.

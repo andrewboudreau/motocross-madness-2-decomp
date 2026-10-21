@@ -6,8 +6,8 @@
   "rtti_types": 252,
   "vc6_selected_targets": 2982,
   "vc6_exact_targets": 2971,
-  "notes": "2971 of 2982 unique retail address/extent pairs passed strict comparison in 2989 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). There are 2978 strict rows and 2976 distinct source/address/extent cases; multiple source definitions may share a retail address. Every strict comparison resolves all relocations or has no relocation bytes. The remaining 11 cases are BaseObject::Release, seven UI compiler-shape probes, two FollowRacer near misses (0x4a9d20, 0x4a9e80) and the GridNode near miss 0x484d70. The separately reviewed physics runner has 1086 strict exact results among 1162 comparisons; those results are not included in this calibration percentage. Neither suite is a census of retail functions or evidence that the source-built game links or runs. RTTI/source-path and .text figures retain their hash-pinned executable provenance.",
-  "vc6_case_count": 2989,
+  "notes": "2971 of 2982 unique retail address/extent pairs passed strict comparison in 2990 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). There are 2979 strict rows and 2977 distinct source/address/extent cases; multiple source definitions may share a retail address. Every strict comparison resolves all relocations or has no relocation bytes. The remaining 11 cases are BaseObject::Release, seven UI compiler-shape probes, two FollowRacer near misses (0x4a9d20, 0x4a9e80) and the GridNode near miss 0x484d70. The separately reviewed physics runner has 1086 strict exact results among 1162 comparisons; those results are not included in this calibration percentage. Neither suite is a census of retail functions or evidence that the source-built game links or runs. RTTI/source-path and .text figures retain their hash-pinned executable provenance.",
+  "vc6_case_count": 2990,
   "vc6_profile": "vc6_o2_mt",
-  "reviewed_commit": "8d7abb93fa2d9c8de75b2aec5d8dfbfa00efb2f9"
+  "reviewed_commit": "c8444fa830868cc65d433eae8d6e78ade554b144"
 }

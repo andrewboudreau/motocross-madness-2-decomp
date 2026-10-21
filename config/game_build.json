@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/ui/KrustyUINearMisses.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete KrustyUI startup passes 13540 native whole-state, allocation, exception, fault, profile and callback scenarios; generated Intro1Dlg destructor helpers match strictly. VC6 emits 1102 bytes against 1104 retail bytes with 872 matching positions. GUI, resource, profile and device dependencies are scripted; rendered menus and live navigation remain untested.",
+      "evidence": "docs/KRUSTYUI_CREATE.md#functional-build-review"
+    },
+    {
       "path": "samples/race/RecorderTick.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete VCRInterface replay tick passes 147749 native whole-state, callback, lock, exception, fault and floating-point scenarios with the real VC6 conversion helper. VC6 emits 2448 bytes against 2412 retail bytes, retaining 276 matching positions. Seven game helpers and synchronization boundaries are scripted; actual worker scheduling and replay-file playback remain untested.",

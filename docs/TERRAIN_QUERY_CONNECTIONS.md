@@ -37,14 +37,13 @@ provisional. Other partial views and class ownership claims are unchanged.
 `tests/test_terrain_query_connections.py` checks both RTTI hierarchies, the
 constructor bytes, native layouts, all 23 retail call destinations and COFF
 imports, and **289 strict caller comparisons**. It also pins the complete
-3,321-byte QueryGround candidate and its named relocations. That provider
+3,255-byte QueryGround candidate and its named relocations. That provider
 remains nonexact and still has unresolved helper dependencies; this connection
 does not establish correct terrain behavior or a functioning source-built game.
-It also retains a [known cell-selection defect](TERRAIN_CONNECTIONS.md#queryground-behavior-remains-incomplete):
-retail's `FISTP` honors the active rounding mode, while the source's `__ftol`
-conversion truncates. At nearest rounding, a scaled coordinate of 1.25 selects
-cell 1 in retail and cell 0 in the source. This slice preserves that existing
-defect; correcting and differentially validating the provider remains required.
+The original connection-only slice preserved a 3,321-byte provider with a
+truncating cell conversion. A separate [conversion repair](TERRAIN_CELL_CONVERSION.md)
+now passes 278,411 native cases through the first cell request and refreshes
+that fingerprint. Full interpolation and unmasked exceptions remain unverified.
 The separate FollowCamera tick regression continues to script the terrain
 boundary, now through the canonical method signature.
 

@@ -166,7 +166,7 @@
   "?ReleaseRegion@BackgroundImage@@QAEXH@Z": "0x00404200",
   "?SetRegionRect@BackgroundImage@@QAEXHPAUCameraRect@@@Z": "0x00404240",
   "?MarkAllDirty@BackgroundImage@@QAEXXZ": "0x00404da0",
-  "?PaintNumber@UnknownBikeNumberPainter@@QAEXPAXH@Z": "0x00417670",
+  "?PaintNumber@UnknownBikeNumberPainter@@QAEXPAVD3DIMSoultreeObject@@H@Z": "0x00417670",
   "?SetFrame@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
   "?SetViewport@Camera@@QAEHHHHH@Z": "0x0042f190",
   "?ReplaceMaterialTexture@UnknownProCircuitSkinned@@QAEXHPBDPAPAVTextureMapManager@@@Z": "0x00444c70",

@@ -121,7 +121,7 @@
   "?StartSpin@ArcadeObject@@QAEXUVector3@@M@Z": "0x004017a0",
   "?SelectLapGates@TrackGameViewOwner@@QAEXHHPAX@Z": "0x00404df0",
   "?Vec3Dot@@YAMPBUVector3@@0@Z": "0x0040ae30",
-  "?PaintNumber@UnknownBikeNumberPainter@@QAEXPAXH@Z": "0x00417670",
+  "?PaintNumber@UnknownBikeNumberPainter@@QAEXPAVD3DIMSoultreeObject@@H@Z": "0x00417670",
   "?PickerHitCallback@@YAXPAVCollisionObject@@0@Z": "0x00417b00",
   "?SortDescending@@YAXPAH0H@Z": "0x00417b30",
   "?RankByPoints@BikeRace@@QAEXPAH@Z": "0x00417bc0",

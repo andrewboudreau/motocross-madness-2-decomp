@@ -12,6 +12,15 @@ from match import compare  # noqa: E402
 
 CASES = [
     {
+        'name': 'Ground fog base constructor',
+        'bindings': 'src/reconstructed/GroundFogableObject.bindings.json',
+        'source': 'src/reconstructed/GroundFogableObject.cpp',
+        'symbol': '??0GroundFogableObject@@QAE@XZ',
+        'target_va': '0x004aae20',
+        'target_size': 9,
+        'reason': 'complete constructor of the RTTI-identified secondary Terrain/EcoSystem base; source grouping provisional',
+    },
+    {
         'name': 'Camera vector constructor call view',
         'bindings': 'src/reconstructed/Camera.bindings.json',
         'source': 'src/reconstructed/Camera.cpp',

@@ -95,11 +95,11 @@ class TerrainQueryConnectionsTests(unittest.TestCase):
             provider = objects['Terrain']
             entry = provider.find_symbol(PROVIDER)
             body, size, relocations = provider.symbol_extent(entry)
-            self.assertEqual((entry.function_size, size), (3321, 3321))
+            self.assertEqual((entry.function_size, size), (3255, 3255))
             records = [(r.virtual_address - entry.value, r.type,
                         provider.symbol_by_index[r.symbol_index].name) for r in relocations]
             self.assertEqual(hashlib.sha256(body + json.dumps(records).encode()).hexdigest(),
-                             '07ea9bdeb16235841aaf1d125c77ee580b9b1667ec900de488c74df2f57207b3')
+                             '656417ea66c6520e195bb16e23a44ad74cab40b9ab294b57ae8b9762def1a085')
             print(f'{len(cases)} strict caller comparisons; 23 query call boundaries and complete partial provider preserved')
 
 

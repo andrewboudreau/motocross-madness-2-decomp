@@ -154,6 +154,8 @@ Near misses (`samples/ui/KrustyUINearMisses.cpp`, own bindings file):
   store on, retail picks different registers. The shared GUI declaration
   also fixes SetUp to ten arguments and passes -1 to AppendSibling separately;
   this candidate remains nonexact (see [GUI connections](GUIMANAGER.md)).
+  Its complete native startup comparison and admission limits are recorded in
+  [GUI startup review](KRUSTYUI_CREATE.md#functional-build-review).
 - `0x0049b0d0`, which picks distinct random bikes and riders for the AI
   (880 of 916 bytes). Retail places the "class 1 above 0.2" arm after the
   probe loop; every if/else, goto and ternary form tried keeps it before.

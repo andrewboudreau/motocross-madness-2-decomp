@@ -942,25 +942,25 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
 
     UnknownBikeNumberPainter* painter = new(__FILE__, 0x367) UnknownBikeNumberPainter(textures->manager);
     if (g_TrackGame->playingReplay) {
-        painter->PaintNumber(localRacer->modelNode, localRacer->plateNumber);
+        painter->PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(localRacer->modelNode), localRacer->plateNumber);
         for (int i = 0; i < UnknownFunctionRacerCount() - 1; i++)
-            painter->PaintNumber(aiRacers[i]->modelNode, aiRacers[i]->plateNumber);
+            painter->PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(aiRacers[i]->modelNode), aiRacers[i]->plateNumber);
     } else if (g_TrackGame->playerCount > 1) {
         for (int i = 0; i < UnknownFunctionRacerCount(); i++) {
             for (int j = 0; j < UnknownFunctionRacerCount(); j++) {
                 UnknownBikeRaceRacer* racer = racerSlots[i];
                 UnknownTrackGameRacerSlot* slot = &g_TrackGame->mode.racers[j];
                 if (racer->recorderId == slot->networkPlayerId && racer->aiMessageIndex == slot->racerIndex)
-                    painter->PaintNumber(racer->modelNode, slot->plateNumber);
+                    painter->PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(racer->modelNode), slot->plateNumber);
             }
         }
     } else {
-        painter->PaintNumber(localRacer->modelNode, g_TrackGame->mode.plateNumber);
+        painter->PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(localRacer->modelNode), g_TrackGame->mode.plateNumber);
         if (g_TrackGame->mode.raceSettings.raceMode == 4) {
-            painter->PaintNumber(aiRacers[0]->modelNode, g_TrackGame->mode.plateNumber);
+            painter->PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(aiRacers[0]->modelNode), g_TrackGame->mode.plateNumber);
         } else {
             for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++)
-                painter->PaintNumber(aiRacers[i]->modelNode, aiRacers[i]->plateNumber);
+                painter->PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(aiRacers[i]->modelNode), aiRacers[i]->plateNumber);
         }
     }
     delete painter;

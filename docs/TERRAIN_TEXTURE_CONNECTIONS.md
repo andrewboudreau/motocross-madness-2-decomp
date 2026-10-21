@@ -56,8 +56,10 @@ relocations** across Terrain.cpp and TerrainSupport.cpp. Section bytes,
 relocation sites/types/addends and destinations remain identical under the
 three explicit external-name substitutions; compiler-local targets are
 compared by section and offset. This includes complete partial functions:
-the 2,117-byte Load candidate and 3,321-byte QueryGround candidate remain
-unchanged, without being claimed as retail matches. Load's retained named
+the 2,117-byte Load candidate and then-3,321-byte QueryGround candidate are
+unchanged by these connections, without being claimed as retail matches.
+The subsequent [cell-conversion repair](TERRAIN_CELL_CONVERSION.md) intentionally
+changes QueryGround and refreshes its fingerprint. Load's retained named
 relocation fingerprint changes only to reflect the canonical provider names.
 Private evidence is in `work/game-build/texture-round18-preservation.json`,
 `texture-renames.json` and `check_texture_objects.py`.

@@ -781,16 +781,57 @@ static const TerrainVec3 kVec3XAxis = TerrainVec3(1.0f, 0.0f, 0.0f);
 static const TerrainVec3 kVec3YAxis = TerrainVec3(0.0f, 1.0f, 0.0f);
 static const TerrainVec3 kVec3ZAxis = TerrainVec3(0.0f, 0.0f, 1.0f);
 
-// Truncates v to an int through *dst.  Retail does this with an inline `fistp` (the caller
-// subtracts 0.5 first, so it floors), and the inlined helper materialises both arguments in
-// stack temporaries (`lea eax,[ix]; mov [tmp],eax; fstp [tmp2]; fld [tmp2]; fistp [eax]`).
-// NOTE: a plain (int) cast compiles to a call to _ftol under the gate profile. Spilling both
-// arguments to stack temporaries is the shape of an inlined `__asm { fld f; mov edx,p;
-// fistp [edx] }` FloatToInt helper (tier 3); /QIfist alone would emit a bare fistp. Inline
-// asm is out of bounds here, so QueryGround stays partial (see targets.json).
-static inline void FloatToInt(int* dst, float v)
+// Retail converts a stored binary32 value with FISTP to signed32 under the
+// current x87 rounding mode. VC6 casts truncate through __ftol; /QIfist instead
+// converts to signed64, with different overflow behavior. Decode the rounded
+// integer explicitly and retain the hardware conversion exception flags.
+// This is a behavior repair, not an exact reconstruction of the inline helper.
+static void FloatToInt(int* destination, float value)
 {
-    *dst = (int)v;
+    unsigned bits;
+    memcpy(&bits, &value, sizeof(bits));
+    unsigned absolute = bits & 0x7fffffff;
+    unsigned negative = bits >> 31;
+    unsigned exponent = absolute >> 23;
+    unsigned mode = _control87(0, 0) & _MCW_RC;
+    unsigned magnitude = 0;
+    int invalid = absolute >= 0x4f000000 && !(negative && absolute == 0x4f000000);
+
+    // VC6's ordinary cast uses __ftol. It supplies the conversion's sticky
+    // exceptions; a quiet NaN supplies invalid for signed32 overflow too.
+    float exceptionInput = value;
+    if (invalid) {
+        unsigned quietNaN = 0x7fc00000;
+        memcpy(&exceptionInput, &quietNaN, sizeof(quietNaN));
+    }
+    volatile __int64 exceptionResult = (__int64)exceptionInput;
+
+    if (invalid || absolute == 0x4f000000) {
+        magnitude = 0x80000000;
+    } else {
+        unsigned remainder = 0;
+        unsigned half = 0;
+        if (exponent < 127) {
+            remainder = absolute;
+            half = 0x3f000000;
+        } else if (exponent < 150) {
+            unsigned shift = 150 - exponent;
+            unsigned significand = (absolute & 0x7fffff) | 0x800000;
+            magnitude = significand >> shift;
+            remainder = significand & ((1u << shift) - 1);
+            half = 1u << (shift - 1);
+        } else {
+            magnitude = ((absolute & 0x7fffff) | 0x800000) << (exponent - 150);
+        }
+        if (remainder) {
+            if ((mode == _RC_NEAR && (remainder > half || (remainder == half && (magnitude & 1)))) ||
+                (mode == _RC_DOWN && negative) || (mode == _RC_UP && !negative))
+                ++magnitude;
+        }
+        if (negative)
+            magnitude = 0u - magnitude;
+    }
+    memcpy(destination, &magnitude, sizeof(magnitude));
 }
 
 // Retail dots the face normal with the y axis inline (fmul [0x0068a05c], [0x0068a058],
@@ -809,7 +850,8 @@ static inline TerrainVec3 TerrainNormalize(const TerrainVec3& v)
 }
 
 // 0x00507c10 (tier 3 names throughout).  x/z are scaled by field_0xc30 (grid units per world
-// unit), floored to a cell (ix, iz), and the four corners are fetched.  The point's offsets
+// unit), rounded after subtracting 0.5 to a cell (ix, iz), and the four corners
+// are fetched. The result follows the active rounding mode, including tie-to-even.  The point's offsets
 // (u, v) inside the cell give a squared distance to each corner (w[0..3]); the smallest picks
 // the surface byte.  The cell is split into two triangles along a diagonal that alternates in a
 // checkerboard ((ix ^ iz) & 1), the nearer-corner test picks the triangle, and the height is

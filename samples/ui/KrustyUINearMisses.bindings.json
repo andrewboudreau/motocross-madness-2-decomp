@@ -1,6 +1,9 @@
 {
   "??0UIDialog@@QAE@HPBD@Z": "0x00469db0",
   "??0GUIManager@@QAE@H@Z": "0x00485190",
+  "??_GIntro1Dlg@@UAEPAXI@Z": "0x0049bdb0",
+  "??1Intro1Dlg@@UAE@XZ": "0x00450fc0",
+  "??1UIDialog@@UAE@XZ": "0x0046a070",
   "??0UnknownParameterBlock@@QAE@XZ": "0x004b7130",
   "??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
   "??1GameObject@@UAE@XZ": "0x00468d60",
