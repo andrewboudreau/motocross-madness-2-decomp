@@ -1,0 +1,18 @@
+{
+  "baseline": "Published5e51cf31 same-path untouched canonical and aggregate objects; every nondebug byte/flag/addend/destination retained under exactly the one named method substitution. Only enumerated source checkout prefixes normalize for portable pins.",
+  "renames": {
+    "?ReplaceMaterialTexture@UnknownModelTexture@@QAEXHPBDPAPAVTextureMapManager@@@Z": "?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z"
+  },
+  "objects": {
+    "src/reconstructed/DlgProcs.cpp": {
+      "sections": 420,
+      "relocations": 3040,
+      "sha256": "ec734d6ec369811897db074ecb79d2366a80a0bb5a9cf0990bc4e7186ddb7ee9"
+    },
+    "samples/ui/DlgProcsNearMisses.cpp": {
+      "sections": 557,
+      "relocations": 4152,
+      "sha256": "2c45d32d807f787e99f0cda5dafcf1f97c36855deb995e38df9174acc51017cd"
+    }
+  }
+}

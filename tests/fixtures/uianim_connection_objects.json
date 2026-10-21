@@ -1,5 +1,5 @@
 {
-  "baseline": "Published 7ecf5ff4 same-path old/current objects preserve every nondebug byte and resolved destination under exactly two method-name joins. Portable pins normalize only the checkout prefix and lexical spelling of the four source paths, ContainerList.h and GuiScreenTexture.cpp; no section is excluded.",
+  "baseline": "Published 7ecf5ff4 same-path old/current objects preserve every nondebug byte and resolved destination under exactly two method-name joins. Portable pins normalize only the checkout prefix and lexical spelling of the four source paths, ContainerList.h and GuiScreenTexture.cpp; no section is excluded. DlgProcs canonical and aggregate pins were independently reproduced from published round52 before objects, then advanced under only the verified UnknownModelTexture to D3DIMSoultreeObject ReplaceMaterialTexture external-name join; all section bytes, flags and destination offsets remain identical.",
   "renames": {
     "?GetCurrentTexture@UnknownDialogImage@@QAEHXZ": "?GetCurrentTexture@UIAnim@@QAEPAVTextureMap@@XZ",
     "?AdvancePastSounds@UnknownCursorAnimation@@QAEHXZ": "?AdvancePastSounds@UIAnim@@QAEPAVTextureMap@@XZ"
@@ -13,7 +13,7 @@
     "src/reconstructed/DlgProcs.cpp": {
       "sections": 420,
       "relocations": 3040,
-      "sha256": "278ac8c5204480e7ea2a2a20a5084142336d3e50b5aecfc549eab5707f40e443"
+      "sha256": "ec734d6ec369811897db074ecb79d2366a80a0bb5a9cf0990bc4e7186ddb7ee9"
     },
     "samples/ui/GUIManagerNearMisses.cpp": {
       "sections": 209,
@@ -23,7 +23,7 @@
     "samples/ui/DlgProcsNearMisses.cpp": {
       "sections": 557,
       "relocations": 4152,
-      "sha256": "ac656375ce8e469eec7bbe5bb1bb9a547d699b6292ed51f302667f96e9f346b6"
+      "sha256": "2c45d32d807f787e99f0cda5dafcf1f97c36855deb995e38df9174acc51017cd"
     }
   }
 }

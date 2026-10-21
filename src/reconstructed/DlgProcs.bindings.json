@@ -244,7 +244,7 @@
   "?ResetStartCountdown@BikeRace@@QAEXXZ": "0x00421050",
   "?SetFrame@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
   "?SetViewport@Camera@@QAEHHHHH@Z": "0x0042f190",
-  "?ReplaceMaterialTexture@UnknownModelTexture@@QAEXHPBDPAPAVTextureMapManager@@@Z": "0x00444c70",
+  "?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z": "0x00444c70",
   "?ApplyDevice@UnknownTrackGameObject33fc@@QAEXPBDH@Z": "0x00448e90",
   "?SetDirectory@DirectoryList@@QAEXPBD@Z": "0x0044a1d0",
   "?SetPattern@DirectoryList@@QAEXPBDH@Z": "0x0044a220",

@@ -10,6 +10,7 @@
 
 #include "BackgroundImage.h"
 #include "Camera.h"
+#include "D3DIMSoulTree.h"
 #include "DebugAlloc.h"
 #include "../krusty2/math/FastMath.h"
 #include "InGameProcs.h"
@@ -1161,16 +1162,16 @@ int SPBikeRiderDlg::RenderPre3D() {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->bikes)[list->GetRowData(-1)];
-        ((UnknownModelTexture*)((UnknownKrustyUIModel*)ui->manufacturers)[bike->model].uiModel->plateTexture)
-            ->ReplaceMaterialTexture(0, bike->texture, &g_TrackGame->textureContext);
+        reinterpret_cast<D3DIMSoultreeObject*>(((UnknownKrustyUIModel*)ui->manufacturers)[bike->model].uiModel->plateTexture)
+            ->ReplaceMaterialTexture(0, bike->texture, reinterpret_cast<int>(&g_TrackGame->textureContext));
         bikeChanged = 0;
     }
     if (riderChanged) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIModel* rider = &((UnknownKrustyUIModel*)ui->riders)[list->GetRowData(-1)];
-        ((UnknownModelTexture*)ui->riderPreview->plateTexture)
-            ->ReplaceMaterialTexture(0, rider->modelName, &g_TrackGame->textureContext);
+        reinterpret_cast<D3DIMSoultreeObject*>(ui->riderPreview->plateTexture)
+            ->ReplaceMaterialTexture(0, rider->modelName, reinterpret_cast<int>(&g_TrackGame->textureContext));
         riderChanged = 0;
     }
     return result;

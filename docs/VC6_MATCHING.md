@@ -3,9 +3,9 @@
 Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 The 2026-10-21 native Windows VC6 SP3 gate passes its toolchain identity,
-manual smoke and generated-probe checks. Calibration has 3,016 strict-exact
-rows among 3,027 comparisons: 3,001 distinct source/address/extent cases.
-It covers 161 source files, 158 with at least one strict case. The separate
+manual smoke and generated-probe checks. Calibration has 3,017 strict-exact
+rows among 3,028 comparisons: 3,002 distinct source/address/extent cases.
+It covers 162 source files, 159 with at least one strict case. The separate
 physics matrix has 1,086 strict-exact targets among 1,162 comparisons.
 All prior strict cases are retained in the current connection composition.
 Neither matrix reports a partial-score decrease in this composition. The
@@ -23,31 +23,34 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The [UIAnim connections](UIANIM_CONNECTIONS.md) route cursor advancement and
-loading-dialog texture access to the existing primary UIAnim implementations.
-All four affected complete objects preserve 1,387 nondebug sections and 8,896
-relocations under exactly two method-name changes. The retained check passes
-199 strict comparisons and 3,067 native getter cases, including 41 independently
-checked access faults. Allocation, primary RTTI and named-resource propagation
-support the local receiver casts. Sound/clock lifecycle execution remains
-outside this connection proof.
+The [garage texture connection](GARAGE_MATERIAL_CONNECTIONS.md) routes the two
+single-player bike/rider preview calls to the existing D3DIMSoultreeObject
+provider. The primary model receiver is traced through actual allocation,
+constructor and Character field stores. Both complete objects preserve 977
+nondebug sections and 7,192 relocations under one method-name change. Native
+prepared-state checks exercise the actual 133-byte provider in 11,589 cases,
+including 69 independently checked access faults and 1,080 scripted throws.
+Texture resource loading is scripted; native VC6 string copying is shared.
+The separate ProCircuit connection has not yet completed its own acceptance
+checks.
 
-The [collision default callback](COLLISION_EMPTY_CALLBACK.md) supplies the
-complete missing one-byte return. Its actual secondary-pointer installation
-and all three two-pointer cdecl dispatch sites are checked alongside the full
-59-byte installer and 1,102-byte query. The new object adds only compiler
-directives and its padded code COMDAT, with no imports, storage or initializer.
-Its semantic name and original TU remain provisional; sharing the retail empty
-address does not equate it with other methods.
+The [StatsOverlay default method](STATS_OVERLAY_DEFAULT.md) supplies the missing
+complete three-byte return used by the quarry cue update. Five strict comparisons
+cover its full body and the actual allocation, constructor, LoadPanel and tick
+chain. The primary object and single stack argument are checked directly;
+other methods sharing that retail address retain their separate identities.
+The new object adds no imports, storage or CRT initializer.
 
-All 259 prior production objects preserve 10,691 nondebug sections and 45,776
-relocations under the two UIAnim name connections, without filename exclusions.
-The new callback object independently reproduces its actual game compile command.
-Isolated real links remove exactly three names, **226 -> 224 -> 223**, with none
+All 260 prior production objects preserve 10,693 nondebug sections and 45,776
+relocations under the single garage call-name connection, without filename
+exclusions. The new default-method object independently reproduces its actual
+game compile command. Published UIAnim object pins were independently reproduced
+before updating the two DlgProcs entries under that exact connection.
+Isolated real links remove exactly two names, **223 -> 222 -> 221**, with none
 added. The final report checks all source/header hashes, configuration, compiler
 profile and per-source flags. Private evidence is in
-`work/game-build/round52-link-evidence.json`, `round52-all-objects.json`,
-`round52-admitted.json` and `connections-round52-preservation.json`.
+`work/game-build/round53-link-evidence.json`, `round53-all-objects.json`,
+`round53-admitted.json` and `connections-round53-preservation.json`.
 
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and excluded from strict counts.
@@ -56,9 +59,9 @@ helper; this slice changes no compiler flags. Finite native checks do not
 establish integrated gameplay.
 
 Game linking still fails; startup, integrated menus and racing remain untested.
-Static checks pass for 272 Python files and 416 JSON files.
-The final full regression run passes: 555 tests, 544 passed and 11 skipped
-(`work/game-build/tests-round52-final.log`).
+Static checks pass for 274 Python files and 418 JSON files.
+The final full regression run passes: 557 tests, 546 passed and 11 skipped
+(`work/game-build/tests-round53-final.log`).
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

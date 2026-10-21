@@ -11,6 +11,14 @@ from mcm2tool.pe import PEImage  # noqa: E402
 from match import compare  # noqa: E402
 
 CASES = [
+    {'name': 'StatsOverlay cue default method',
+     'source': 'src/reconstructed/StatsOverlayDefaults.cpp',
+     'bindings': 'src/reconstructed/StatsOverlayDefaults.bindings.json',
+     'symbol': '?UnknownFunction464e80@StatsOverlay@@QAEXH@Z',
+     'target_va': '0x00464e80',
+     'target_size': 3,
+     'reason': 'complete RET 4; primary receiver traced from allocation and LoadPanel to quarry tick; '
+               'method purpose and original TU provisional, other shared-address methods remain separate'},
     {'name': 'Collision hit-by default callback',
      'source': 'src/reconstructed/CollisionCallbacks.cpp',
      'includes': ['src/krusty2'],
