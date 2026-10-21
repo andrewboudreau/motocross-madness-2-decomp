@@ -205,7 +205,7 @@
   "?ReadClock@@YAIXZ": "0x004bfa80",
   "?AddCaster@UnknownBikeRaceShadow@@QAEXPAVUnknownBikeRaceModel@@@Z": "0x004dab00",
   "?ClearCasters@UnknownBikeRaceShadow@@QAEXXZ": "0x004dab90",
-  "?ResetClock@TrackGameViewOwner@@QAEXXZ": "0x004e1f00",
+  "?ResetClock@BaseQuarryEvent@@QAEXXZ": "0x004e1f00",
   "?Create@RaceSound@@QAEPAV1@PAXPAUUnknownKrustyBikeView@@PAUUnknownRaceSoundCamera@@H@Z": "0x004e23f0",
   "?BuildStatusList@@YAHPAPAUUnknownEventRacerPart@@PAUUnknownKrustyBikeView@@@Z": "0x004e5d00",
   "?FreeStatusList@@YAHPAUUnknownEventRacerPart@@@Z": "0x004e5f10",

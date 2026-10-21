@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/race/FollowedRacerPicker.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete host racer selection passes 4270 native selection, iterator, packet, callback, floating-point and fault scenarios with the real strict iterator and VC6 conversion. An evidenced cached-view correction changes the old 346-byte/69-position partial to 342 bytes/67 positions against 340 retail bytes. Only five packet bytes are initialized by retail; the test preserves that boundary. Random values, network send and replay queue are scripted; live networking, replay files and racing remain untested.",
+      "evidence": "docs/FOLLOWED_RACER_PICKER.md#functional-build-review"
+    },
+    {
       "path": "samples/render/CacheTextureNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete CopyMipLevels passes 5674 native state, rectangle, attachment, callback, floating-point and failure scenarios with the real strict coordinate helper and VC6 CRT conversion. The unchanged 569-byte candidate has 337 matching positions against 558 retail bytes. COM and Upload boundaries are scripted, with at most twelve successful attachments; actual pixel copying, DirectDraw ownership and integrated rendering remain untested.",

@@ -2,14 +2,10 @@
 // src/reconstructed until they match. See docs/FOLLOWRACER.md. The canonical
 // file is included first so the TU-local declarations are the same.
 //
-// 0x004a9d20 (340 bytes, 20%): the whole function is retail's with two
-// register pairs swapped: retail keeps `this` in edi and the still-racing
-// count in esi (VC6 here: esi/edi), and retail's zero register ebp is the
-// retry counter of the random pick (VC6 here merges the zero with the last
-// racer seen, so the loop compares with `test` instead of `cmp reg, ebp`).
-// All 24 declaration orders, hoisting any of the four locals above the host
-// check, for/while/assign-in-condition loops, a cached racer array, a single
-// pick variable, renaming and extra declarations in the TU leave both swaps.
+// 0x004a9d20 is included from FollowedRacerPicker.cpp. Its complete body
+// remains nonexact (342 vs 340 bytes). The saved race-view pointer across
+// rand follows decoded retail and a native mutation regression; see
+// docs/FOLLOWED_RACER_PICKER.md.
 //
 // 0x004a9e80 (272 bytes, 95%): one scheduling difference. After the best-run
 // ternary retail pushes the three arguments of the virtual call before the
@@ -59,47 +55,7 @@ struct UnknownFollowedRacerSlots {
 };
 #define FOLLOWED_RACER_SLOTS(racer) ((UnknownFollowedRacerSlots*)(racer))
 
-// 0x004a9d20: the host picks the racer to follow: the only one still racing
-// (+0x4a0 clear), or a random still-racing one, or its own racer when none
-// is; then tells the players (message 0x87) and the replay recorder.
-void TrackGameViewOwner::PickFollowedRacer()
-{
-    if (!g_TrackGame->network || !g_TrackGame->network->isHost)
-        return;
-    int racing = 0;
-    int iterator = 0;
-    int tries = 0;
-    UnknownEventRacer* last = 0;
-    UnknownEventRacer* racer = raceView->NextBike(&iterator);
-    while (racer) {
-        if (racer->outOfRace == 0) {
-            last = racer;
-            racing++;
-        }
-        racer = raceView->NextBike(&iterator);
-    }
-    if (racing == 0) {
-        followedRacer = raceView->localRacer;
-    } else if (racing == 1) {
-        followedRacer = last;
-    } else {
-        int count = raceView->racerCount;
-        int index = (int)(UNKNOWN_RANDOM_UNIT() * count);
-        while (raceView->racerSlots[index]->outOfRace == 1 && tries < count) {
-            index++;
-            if (index >= count)
-                index = 0;
-            tries++;
-        }
-        followedRacer = raceView->racerSlots[index];
-    }
-    UnknownBikeRaceVcrFollow follow;
-    follow.field_0x04 = 0;
-    follow.followedRacerId = followedRacer->networkPlayerId;
-    g_TrackGame->network->Send(0x87, &follow, sizeof(follow), g_TrackGame->network->localPlayer, 0);
-    if (raceView->replayVcr && g_TrackGame->mode.saveReplay && !g_TrackGame->playingReplay)
-        ((VCRInterface*)raceView->replayVcr)->QueueRecord(0x87, followedRacer->networkPlayerId, &follow, 1);
-}
+#include "FollowedRacerPicker.cpp"
 
 // 0x004a9e80: switches the followed racer from `previous` to `racer`. The
 // previous racer banks its run (tagRun into totalTagRun, the best into bestTagRun),

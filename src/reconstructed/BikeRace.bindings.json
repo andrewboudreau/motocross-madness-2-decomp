@@ -122,7 +122,7 @@
   "?Send@NetworkInterface@@QAEHHPAXHHH@Z": "0x004ac830",
   "?StopKeepAlive@NetworkInterface@@QAEHXZ": "0x004ac950",
   "?ReadClock@@YAIXZ": "0x004bfa80",
-  "?ResetClock@TrackGameViewOwner@@QAEXXZ": "0x004e1f00",
+  "?ResetClock@BaseQuarryEvent@@QAEXXZ": "0x004e1f00",
   "?FreeStatusList@@YAHPAUUnknownEventRacerPart@@@Z": "0x004e5f10",
   "?RankByScore@@YAHH@Z": "0x004e62d0",
   "?UpdateLapRace@@YAHPAPAUUnknownEventRacerPart@@PAVTrack@@MPAUUnknownBikeRaceNode@@2HH@Z": "0x004e63e0",

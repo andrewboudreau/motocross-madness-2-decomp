@@ -6,5 +6,6 @@
   "?SoultreeRefreshContacts@@YAHPAXPAHHPAPAVCollisionPoint@@PAVCollisionFrameHelper@@PAUCollisionVec3@@HM@Z": "0x0043ad80",
   "?g_CollisionZeroVec3@@3UCollisionVec3@@A": "0x005797f0",
   "__real@4@00000000000000000000": "0x00550484",
-  "__real@4@3fff8000000000000000": "0x00550748"
+  "__real@4@3fff8000000000000000": "0x00550748",
+  "?LocalToWorldPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd660"
 }

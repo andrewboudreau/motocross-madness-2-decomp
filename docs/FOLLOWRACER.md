@@ -66,14 +66,12 @@ provisional (proximity only).
 
 ## Near misses
 
-- `0x004a9d20` (340 B, 346 B candidate, 20%): every instruction is retail's
-  with two register pairs swapped. Retail keeps `this` in edi and the
-  still-racing count in esi; retail's zero register ebp is the retry
-  counter, while VC6 here merges the zero with the last racer seen (so the
-  loop compares with `test` instead of `cmp reg, ebp`). All 24 declaration
-  orders, hoisting the locals above the host check, `for`/`while`/assign-in-
-  condition loops, a cached racer array, a single pick variable, renaming
-  and extra declarations in the TU leave both swaps.
+- `0x004a9d20` (340 B retail, 342 B candidate, 67 matching positions) is
+  extracted into [FollowedRacerPicker.cpp](../samples/race/FollowedRacerPicker.cpp).
+  It uses the canonical iterator and preserves the saved race-view pointer
+  across `rand()`, as the retail instructions do. Complete behavioral evidence
+  and the explicit correction to the old partial fingerprint are recorded in
+  [the picker review](FOLLOWED_RACER_PICKER.md). It remains nonexact.
 - `0x004a9e80` (272 B, 95%): one scheduling difference. Retail pushes the
   three arguments of the first slot-50 call before the `fstp` into +0x760;
   VC6 here stores after the first push. The if/else, max-helper,

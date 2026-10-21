@@ -14,6 +14,7 @@
 #include "TextureMap.h"
 #include "TrackGame.h"
 #include "EventManager.h"
+#include "BaseQuarryEvent.h"
 
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
@@ -828,7 +829,7 @@ int RaceSound::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* ent
                 eaxEnabled = 0;
             }
             if (owner)
-                owner->ShowOnOffMessage(0x14c3, eaxEnabled);
+                reinterpret_cast<BaseQuarryEvent*>(owner)->ShowOnOffMessage(0x14c3, eaxEnabled);
             SoundSystem()->SetEAXListenerParameters(&environment);
             break;
         case 0x2e:
@@ -894,7 +895,7 @@ int RaceSound::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* ent
                     g_TrackGame->eventManager->FindRaceMode()->auralScape->Disable();
             }
             if (owner)
-                owner->ShowOnOffMessage(0x1429, g_TrackGame->mode.soundOn);
+                reinterpret_cast<BaseQuarryEvent*>(owner)->ShowOnOffMessage(0x1429, g_TrackGame->mode.soundOn);
             return 1;
         }
     }

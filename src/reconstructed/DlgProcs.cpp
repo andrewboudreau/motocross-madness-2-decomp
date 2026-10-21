@@ -23,6 +23,7 @@
 #include "SelectGamePicProcs.h"
 #include "TrackGame.h"
 #include "EventManager.h"
+#include "BaseQuarryEvent.h"
 #include "TrackRecordDlg.h"
 
 // A truncating copy into a `size`-byte buffer. Retail evaluates `source`
@@ -1328,9 +1329,9 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
                 g_TrackGame->ResetClock();
                 reinterpret_cast<BikeRace*>(g_TrackGame->eventManager->FindRaceView())->ResetStartCountdown();
                 if (g_TrackGame->quarryEvent)
-                    g_TrackGame->quarryEvent->ResetClock();
+                    reinterpret_cast<BaseQuarryEvent*>(g_TrackGame->quarryEvent)->ResetClock();
                 if (g_TrackGame->tagEvent)
-                    g_TrackGame->tagEvent->ResetClock();
+                    reinterpret_cast<BaseQuarryEvent*>(g_TrackGame->tagEvent)->ResetClock();
                 g_TrackGame->eventManager->EnableRaceObjects();
             }
             g_LoadingTimerTicks++;

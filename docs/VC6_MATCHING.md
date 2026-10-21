@@ -7,9 +7,10 @@ manual smoke and generated-probe checks. Calibration has 2,981 strict-exact
 rows among 2,992 comparisons: 2,978 distinct source/address/extent cases.
 It covers 145 source files, 142 with at least one strict case. The separate
 physics matrix has 1,086 strict-exact targets among 1,162 comparisons.
-All prior strict cases are retained, and both near-miss comparisons report
-zero strict-score drops. The intentionally repaired partial QueryGround changes
-its non-gating masked score; see [the bounded behavior proof](TERRAIN_CELL_CONVERSION.md).
+All prior strict cases are retained. The nonexact picker's evidenced saved-view
+correction changes its positional strict score from 69 to 67; see the
+[bounded behavior proof](FOLLOWED_RACER_PICKER.md). No other calibration
+near-miss score drops, and the physics comparison reports no drops.
 Strict results are complete function checks with relocations resolved;
 they do not establish complete translation units or a working game.
 
@@ -22,23 +23,24 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The current collision query-state and vehicle gearbox connections preserve all
-215 prior production objects under eight verified name substitutions: 10,465
-nondebug sections and 45,316 relocations. Complete sample objects and partial
+The current race-event and contact scene connections preserve all 216 prior
+production objects under four verified name substitutions: 10,468 nondebug
+sections and 45,323 relocations. Their complete sample objects and partial
 fingerprints are preserved as well; see the
-[collision state](COLLISION_QUERY_STATE_CONNECTIONS.md) and
-[gearbox](VEHICLE_GEARBOX_CONNECTIONS.md) evidence.
-The separately reviewed [CacheTexture::CopyMipLevels](CACHE_TEXTURE_MIPS.md)
-adds one nonexact candidate: its unchanged 569-byte complete body has 337
-matching positions against 558 retail bytes and passes 5,674 native scenarios
-under an explicit finite attachment contract. The final real link compiles 216
-translation units and reports 377 unresolved names. Private evidence is in
-`work/game-build/round27-all-objects.json`, `round27-link-evidence.json`
-and `connections-round27-preservation.json`.
+[race-event](RACE_EVENT_CONNECTIONS.md) and
+[contact](COLLISION_POINT_SCENE_CONNECTIONS.md) evidence.
+The separately reviewed [followed-racer picker](FOLLOWED_RACER_PICKER.md)
+adds one nonexact candidate: its corrected 342-byte complete body has 67
+matching positions against 340 retail bytes and passes 4,270 native scenarios.
+Only that picker partial changes in its aggregate; all other bodies and sections
+remain unchanged. The final real link compiles 217 translation units and reports
+372 unresolved names. Private evidence is in
+`work/game-build/round28-all-objects.json`, `round28-link-evidence.json`
+and `connections-round28-preservation.json`.
 
-The final regression run passes 474 tests with eleven skipped (485 total),
-recorded in `work/game-build/tests-round27.log`. Static checking passes for
-207 Python files and 351 JSON files.
+The final regression run passes 477 tests with eleven skipped (488 total),
+recorded in `work/game-build/tests-round28.log`. Static checking passes for
+210 Python files and 353 JSON files.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

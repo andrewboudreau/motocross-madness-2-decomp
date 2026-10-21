@@ -1,0 +1,9 @@
+{
+  "?NextBike@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0",
+  "?Send@NetworkInterface@@QAEHHPAXHHH@Z": "0x004ac830",
+  "?QueueRecord@VCRInterface@@QAEHHHPBXI@Z": "0x004e8720",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
+  "_rand": "0x00534c1b",
+  "__ftol": "0x00534a88",
+  "__real@4@3ff08000000000000000": "0x005505f0"
+}

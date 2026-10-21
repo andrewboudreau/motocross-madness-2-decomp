@@ -11,6 +11,7 @@
 #include "D3DIMSoulTree.h"
 #include "DebugAlloc.h"
 #include "EventManager.h"
+#include "BaseQuarryEvent.h"
 
 // A truncating copy into a `size`-byte buffer (as DlgProcs.cpp); retail
 // evaluates `source` once for the length and again for the copy.
@@ -1360,10 +1361,10 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         g_TrackGame->tagEvent->ball->SetRecorder(replayVcr);
     }
     if (g_TrackGame->quarryEvent != 0) {
-        g_TrackGame->quarryEvent->ResetClock();
+        reinterpret_cast<BaseQuarryEvent*>(g_TrackGame->quarryEvent)->ResetClock();
     }
     if (g_TrackGame->tagEvent != 0) {
-        g_TrackGame->tagEvent->ResetClock();
+        reinterpret_cast<BaseQuarryEvent*>(g_TrackGame->tagEvent)->ResetClock();
     }
     if (g_TrackGame->bajaEnduroEvent != 0) {
         g_TrackGame->bajaEnduroEvent->SelectLapGates(0, 1, UnknownFunctionCameraView()->followedRacer);

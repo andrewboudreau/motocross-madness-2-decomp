@@ -27,8 +27,12 @@ SOURCES = (
 )
 # Complete resolved candidate hashes captured before connecting the calls.
 # These preserve partial functions; they do not assert retail byte identity.
+# Picker exception: the saved-view correction is independently demonstrated by
+# the native rand-boundary mutation test. Old 346B/69-position hash was
+# a9d4a6f4f3770e957a5efa00ca26dcaffe88bbd5dd8cf8011f1f50d942f0f303.
+# See docs/FOLLOWED_RACER_PICKER.md; all other rows retain their prior hashes.
 PARTIAL = [
-    ('samples/race/FollowRacerNearMisses.cpp', '?PickFollowedRacer@TrackGameViewOwner@@QAEXXZ', 4889888, 340, 346, 69, 'a9d4a6f4f3770e957a5efa00ca26dcaffe88bbd5dd8cf8011f1f50d942f0f303'),
+    ('samples/race/FollowRacerNearMisses.cpp', '?PickFollowedRacer@TrackGameViewOwner@@QAEXXZ', 4889888, 340, 342, 67, '458488750e4bac7e802c4cfedbd485c6a2abb98a503c88e044ab31a9f57a78fc'),
     ('samples/race/FollowRacerNearMisses.cpp', '?SetFollowedRacer@TrackGameViewOwner@@QAEXPAUUnknownEventRacer@@0H@Z', 4890240, 272, 272, 259, '6f7a0fdf97b1e244baeb6a3f3af7cf634acda08a0ea738fd1e3de094ccc7032d'),
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'UnknownVirtualSlot70@KrustyBike', 4790688, 229, 230, 151, '3124025ed125d088a9cf9d706154f76eb28d5e8661543863782a91d540c2e19f'),
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'UnknownVirtualSlot11@KrustyBike', 4791568, 1296, 1288, 526, '2260143a9d880dfabfff868e69178f34173f372aa53195cc6d885ed5f14bc576'),

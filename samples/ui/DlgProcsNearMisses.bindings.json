@@ -374,7 +374,7 @@
   "?BuildComPortAddress@@YAXPAUSerialSettings@@PAUNetComPortAddress@@@Z": "0x004ae410",
   "?EndNetworkGame@@YAXXZ": "0x004aef40",
   "?EnsureNetworkInterface@@YAHXZ": "0x004aefa0",
-  "?ResetClock@TrackGameViewOwner@@QAEXXZ": "0x004e1f00",
+  "?ResetClock@BaseQuarryEvent@@QAEXXZ": "0x004e1f00",
   "?SetCamera@RenderTarget@@QAEXPAVCamera@@@Z": "0x004e8cf0",
   "?SetSceneDirectory@UnknownTrackGameObject574@@QAEXPAD@Z": "0x004e9b80",
   "?ReadSceneName@UnknownTrackGameObject574@@QAEXPAD0HPBDPAH2@Z": "0x004ea010",

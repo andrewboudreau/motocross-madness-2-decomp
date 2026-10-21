@@ -37,30 +37,31 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 216 C++ files (184 canonical sources and 32
-reviewed candidates) and reaches LINK with 377 unresolved external symbols,
+The 2026-10-21 build compiles 217 C++ files (184 canonical sources and 33
+reviewed candidates) and reaches LINK with 372 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The final composition in `build-mta0srax` retains all prior strict results:
+The final composition in `build-whauddmy` retains all prior strict results:
 2,981/2,992 calibration rows and 1,086/1,162 physics comparisons. This does
 not establish game startup, menus or racing while linkage remains incomplete.
-The full regression run passes: 485 tests, with 474 passed and eleven skipped
-(`work/game-build/tests-round27.log`). Static checking also passes for 207
-Python files and 351 JSON files.
+The full regression run passes: 488 tests, with 477 passed and eleven skipped
+(`work/game-build/tests-round28.log`). Static checking also passes for 210
+Python files and 353 JSON files.
 
-The current [collision query-state connections](COLLISION_QUERY_STATE_CONNECTIONS.md)
-and [vehicle gearbox connections](VEHICLE_GEARBOX_CONNECTIONS.md) remove eight
-obsolete import names. All 215 prior production objects preserve 10,465
-nondebug sections and 45,316 relocations under those eight verified name
-substitutions. [Cache mip copying](CACHE_TEXTURE_MIPS.md) supplies one reviewed
-nonexact candidate after 5,674 native scripted-boundary comparisons. The three
-isolated links reduce unresolved names **386 → 383 → 378 → 377**, with no new
-missing names. The scratch-array connection remains deferred because it changes
-a complete partial caller. Private evidence is in
-`work/game-build/round27-link-evidence.json`, `round27-all-objects.json` and
-`connections-round27-preservation.json`.
+The current [race-event connections](RACE_EVENT_CONNECTIONS.md) and
+[contact scene connections](COLLISION_POINT_SCENE_CONNECTIONS.md) remove four
+obsolete import names. All 216 prior production objects preserve 10,468
+nondebug sections and 45,323 relocations under those four verified name
+substitutions. [Followed-racer selection](FOLLOWED_RACER_PICKER.md) supplies one
+reviewed nonexact candidate after 4,270 native comparisons. Its evidenced
+saved-pointer correction changes the sample from 346 bytes/69 matching positions
+to 342 bytes/67 positions; all other aggregate bodies remain unchanged.
+The three isolated links reduce unresolved names **377 → 375 → 373 → 372**,
+with no new missing names. Private evidence is in
+`work/game-build/round28-link-evidence.json`, `round28-all-objects.json` and
+`connections-round28-preservation.json`.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

@@ -35,9 +35,9 @@ CollisionVec3* CollisionDivide(CollisionVec3*,const CollisionVec3*,float) { Exit
 float CollisionLength(const CollisionVec3*) { ExitProcess(92); return 0; }
 float FastSqrt(float) { ExitProcess(93); return 0; }
 float FastInvSqrt(float) { ExitProcess(94); return 0; }
-float Vec3DotCall(const CollisionVec3*,const CollisionVec3*) { ExitProcess(95); return 0; }
+float Vec3DotCall(const Vec3*,const Vec3*) { ExitProcess(95); return 0; }
 CollisionVec3* Vec3Normalize(CollisionVec3*,const CollisionVec3*) { ExitProcess(96); return 0; }
-CollisionVec3* CollisionContactOwner::LocalToWorldPoint(CollisionVec3*,const CollisionVec3*) { ExitProcess(97); return 0; }
+Vec3 SoultreeObject::LocalToWorldPoint(const Vec3&) { ExitProcess(97); return Vec3(); }
 static BYTE referenceSpace[0x800000] = {1};
 struct State {
     DWORD allocation[0xc4/4+4];

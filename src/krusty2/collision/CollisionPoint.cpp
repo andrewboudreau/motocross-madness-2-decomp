@@ -14,6 +14,12 @@
 #include "collision/CollisionPoint.h"
 
 #include "collision/CollisionPointCtor.h"
+#include "math/Vec3.h"
+#include "../../reconstructed/Matrix4.h"
+#include "core/SoultreeObject.h"
+
+// Same canonical dot declaration as Math3D.h, without its per-unit vector initializers.
+float Vec3DotCall(const Vec3* a, const Vec3* b);
 
 CollisionPoint* AddCollisionPoint(int capacity, CollisionPoint** points, const CollisionVec3* position,
                                   CollisionContactOwner* owner, float a4, int* count, float a6,
@@ -93,7 +99,7 @@ void CollisionPoint::UpdateRelativeMotion(const CollisionVec3* a1, const Collisi
         if (f > 0.001f) {
             CollisionVec3 v1 = ScaledVec3(t, f);
             w = SummedVec3(c, v1);
-            float m = Vec3DotCall(&w, &w);
+            float m = Vec3DotCall(reinterpret_cast<const Vec3*>(&w), reinterpret_cast<const Vec3*>(&w));
             float len;
             if (m == 0.0f)
                 len = 0.0f;
@@ -103,7 +109,7 @@ void CollisionPoint::UpdateRelativeMotion(const CollisionVec3* a1, const Collisi
                 len = 1.0f / FastInvSqrt(m);
             float k = 1.0f / len;
             frictionDirection = ScaledVec3(w, k);
-            float cm = Vec3DotCall(&c, &c);
+            float cm = Vec3DotCall(reinterpret_cast<const Vec3*>(&c), reinterpret_cast<const Vec3*>(&c));
             float cl;
             if (cm == 1.0f)
                 cl = 1.0f;
@@ -113,7 +119,7 @@ void CollisionPoint::UpdateRelativeMotion(const CollisionVec3* a1, const Collisi
         } else {
             tangentSpeed = 0.0f;
             w = c;
-            float cm = Vec3DotCall(&w, &w);
+            float cm = Vec3DotCall(reinterpret_cast<const Vec3*>(&w), reinterpret_cast<const Vec3*>(&w));
             float len;
             if (cm == 1.0f)
                 len = 1.0f;
@@ -175,13 +181,15 @@ void RemoveCollisionPoint(CollisionPoint** points, CollisionPoint* point, int* c
 
 // 0x0043aff0: refreshes the world position (field_0x14) of every owned, active contact point from the
 // owner's transform of its local position (field_0x08).
+// Bike passes primary scene nodes to AddCollisionPoint; the canonical Vec3
+// return uses the same hidden 12-byte result buffer as the old call view.
 void UpdateCollisionPointWorldPositions(int count, CollisionPoint** points) {
-    CollisionVec3 tmp;
     for (int i = count; i > 0; i--, points++) {
         CollisionPoint* p = *points;
         if (p->ownerNode && p->inContact) {
-            CollisionVec3* world = (*points)->ownerNode->LocalToWorldPoint(&tmp, &p->localPosition);
-            (*points)->worldPosition = *world;
+            reinterpret_cast<Vec3&>((*points)->worldPosition) =
+                reinterpret_cast<SoultreeObject*>((*points)->ownerNode)->LocalToWorldPoint(
+                    reinterpret_cast<const Vec3&>(p->localPosition));
         }
     }
 }

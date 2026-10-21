@@ -48,7 +48,7 @@
   "?SetListenerVelocity@PCSoundInterface@@QAEHUVector3@@@Z": "0x004bec90",
   "?SetListenerRolloffFactor@PCSoundInterface@@QAEHM@Z": "0x004becd0",
   "?SetEAXListenerParameters@PCSoundInterface@@QAEHPAX@Z": "0x004bed40",
-  "?ShowOnOffMessage@TrackGameViewOwner@@QAEXHH@Z": "0x004e0c30",
+  "?ShowOnOffMessage@BaseQuarryEvent@@QAEXHH@Z": "0x004e0c30",
   "?AssignChannels@RaceSound@@QAEXXZ": "0x004e3430",
   "?UpdateRacerSounds@RaceSound@@QAEHM@Z": "0x004e39b0",
   "?PlayWreckSound@RaceSound@@QAEHPAUUnknownEventRacer@@@Z": "0x004e42e0",

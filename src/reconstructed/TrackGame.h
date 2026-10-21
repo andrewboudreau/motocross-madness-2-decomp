@@ -59,6 +59,8 @@ struct UnknownTrackGameViewEntry {
 };
 
 struct TrackGameViewOwner : public GameObject {
+    // Legacy declarations retained with this provisional view; production
+    // clock/message calls now use BaseQuarryEvent through its verified prefix.
     // 0x004e0c30 (among QuarryStuntEvent.cpp's code): shows the on/off
     // message for string `id` (racesnd.cpp passes 0x1429 and 0x14c3).
     void ShowOnOffMessage(int id, int value);
