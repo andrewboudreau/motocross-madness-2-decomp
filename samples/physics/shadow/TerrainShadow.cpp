@@ -391,12 +391,11 @@ full:
 // right 0x4c, code 0x58, the corners 0x5c, the near corners 0x94; the mode 2 sum/difference
 // results sit at 0 and 0xc4 and 8 bytes of select temporaries at 0x8c.  This form has all of
 // those except cell 0x30 and eye 0x34 (declaration order does not move them).
-// Remaining (534/3119): eax/ecx swap from the eight min/max initial stores onward (retail
-// loads 0x7f7fffff into ecx for 0x6668/0x6670 and the shadow into ecx after them); mode 1's
-// failure path is a 25-byte copy here where retail jumps to the shared exit 0x005097b7; push
-// and lea scheduling around CastSegment and ProjectVertices; lensScale kept on the x87 stack;
-// one missing `add eax, 0x17c`.  One FINISH after the if/else shrinks the function to 2938
-// bytes (496): the inline budget needs both copies.
+// Remaining (684/3111): eax/ecx swap from the eight min/max initial stores onward (retail
+// loads 0x7f7fffff into ecx for 0x6668/0x6670 and the shadow into ecx after them);
+// push and lea scheduling around CastSegment and ProjectVertices; lensScale kept on the x87
+// stack; one missing `add eax, 0x17c`.  One footprint test after the if/else shrinks the
+// function to 2938 bytes (496): the inline budget needs both copies.
 // ---------------------------------------------------------------------------------------------
 // 0x00508bc0 (slot 27, 3087 bytes): the shadow's footprint on the terrain.  Casts the light
 // frustum's corner rays at the height field and accumulates the hit cells' grid rectangle
@@ -528,15 +527,13 @@ static inline TerrainShadowVec TerrainShadowAddCtorCall(const TerrainShadowVec& 
 #define TERRAIN_SHADOW_VIEWER() ((TerrainShadowViewer*)renderContext)
 
 // The footprint is usable when its screen rectangle overlaps the viewport and is at least
-// 10 x 5 pixels; otherwise the cell list and the vertices are dropped.
-#define TERRAIN_SHADOW_FINISH()                                                                      \
+// 10 x 5 pixels.  Each mode repeats the test (the inline budget needs both copies); both fall
+// through to one shared exit that drops the cell list and the vertices.
+#define TERRAIN_SHADOW_RETURN_IF_VISIBLE()                                                                      \
     if ((float)TERRAIN_SHADOW_VIEWER()->width > field_0x6668 && field_0x666c > 0.0f                   \
         && (float)TERRAIN_SHADOW_VIEWER()->height > field_0x6670 && field_0x6674 > 0.0f               \
         && field_0x666c - field_0x6668 > 10.0f && field_0x6674 - field_0x6670 > 5.0f)                \
-        return 1;                                                                                    \
-    cellCount = 0;                                                                                   \
-    vertexCount = 0;                                                                                 \
-    return 0
+        return 1
 
 int TerrainShadow::UnknownVirtualSlot27()
 {
@@ -570,7 +567,7 @@ int TerrainShadow::UnknownVirtualSlot27()
                 TERRAIN_SHADOW_ACCUMULATE(cell, hit);
             }
         }
-        TERRAIN_SHADOW_FINISH();
+        TERRAIN_SHADOW_RETURN_IF_VISIBLE();
     } else {
         eye += TERRAIN_SHADOW_CAMERA()->look * 10000.0f;
         right = TerrainShadowCross(TERRAIN_SHADOW_CAMERA()->look, TERRAIN_SHADOW_CAMERA()->up) * shadow->lensScale;
@@ -592,6 +589,9 @@ int TerrainShadow::UnknownVirtualSlot27()
                 nearCorners[i] = TerrainShadowSum(hit, step);
             }
         }
-        TERRAIN_SHADOW_FINISH();
+        TERRAIN_SHADOW_RETURN_IF_VISIBLE();
     }
+    cellCount = 0;
+    vertexCount = 0;
+    return 0;
 }
