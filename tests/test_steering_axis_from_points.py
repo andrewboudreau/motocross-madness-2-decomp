@@ -165,8 +165,10 @@ class SteeringAxisFromPointsTests(unittest.TestCase):
             # The sole round50 change was $L7843 -> $L7844 at +22: the same
             # .text$x EH target at +208. Published and current complete objects
             # agree under the existing payload/destination-aware local identity.
+            # Emitter construction joins preserve these bytes and exact targets;
+            # only the three verified external constructor names change.
             self.assertEqual(caller_fingerprint(bike, '?LoadBike@Bike@@'),
-                             'c1322732b5c31af745dadba136e1e6f73a9816fbb853b4b01d4ce684c79c2b66')
+                             '70f599f7d80e0211525484f6b33710483fa20d92edacf6d319d58ea726353220')
             self.assertEqual(sum(name==SYMBOL for _,_,name in caller_relocs),1)
             transform_path,transform = compile_source(ROOT/TRANSFORM,'transform')
             self.assertEqual(signature(candidate,SYMBOL),signature(aggregate,SYMBOL))

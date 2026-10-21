@@ -9,6 +9,7 @@
 #include "soultree/SoultreePhysicsObject.h"
 #include "soultree/SoultreePhysicsCallees.h"
 #include "collision/CollisionPoint.h"
+#include "../../reconstructed/ParticleEmitters.h"
 
 void Vehicle::UnknownVirtualSlot0(float dt)
 {
@@ -1193,7 +1194,8 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         s = VehOnes();
         hasBody = 0;
         if (field_0x124 && (field_0x124->isEnabled)) {
-            sparkEmitter->SetPosition(((VehicleContactSet*)collisionObject)->contactPoint);
+            reinterpret_cast<SparkParticleEmitter*>(sparkEmitter)->SetPosition(
+                reinterpret_cast<const ParticleVec3&>(((VehicleContactSet*)collisionObject)->contactPoint));
             sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
             sparkEmitter->burstPending = 1;
         }
@@ -2051,7 +2053,8 @@ GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3,
                                                    a14 ? ((VehicleTrackView*)a14)->field_0x88 : 0,
                                                    a21);
     if (field_0x124) {
-        sparkEmitter = new(__FILE__, 0x1dc) VehicleSparkEmitter(1);
+        sparkEmitter = reinterpret_cast<VehicleSparkEmitter*>(
+            new(__FILE__, 0x1dc) SparkParticleEmitter(1));
         GameObject::AppendChild((GameObject*)sparkEmitter->UnknownVirtualSlot27(renderContext, field_0x124), -1);
     }
     steerState = new(__FILE__, 0x1e0) VehicleSteerState(steerScale, controlResponse[0], &a7, &a8);

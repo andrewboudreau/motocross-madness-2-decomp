@@ -4,7 +4,7 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "3ae4013653d6280a5bd0e84efd7f57245080b030af0544a07a3f736b975db7fe"
+      "sha256": "4685bb42b8a736ce5dd527b9cc8c038bd46e3d05a5589fca84b0e4a5c715a903"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
@@ -14,7 +14,7 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "0bc4264c3599b3adffa9dc19aa7968b2f658d6a970a2ad5b99c5d51b133a43a9"
+      "sha256": "a9f12f3676abe4ec8bd940e0a5c0a7cc6022ca519f6a0b34e68df408c47ef5a2"
     },
     "src/reconstructed/VehicleDefaults.cpp": {
       "sections": 13,

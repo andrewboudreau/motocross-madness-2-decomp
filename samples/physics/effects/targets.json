@@ -1,113 +1,113 @@
 [
   {
     "class": "DustParticleEmitter",
-    "source": "DustParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DustParticleEmitter.cpp",
     "candidate_symbol_contains": "??0DustParticleEmitter",
     "target_va": "0x004b8a00",
     "target_size": 122,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor; emitRate starts at 4000.0 (retail imm 0x457a0000; the clamp in slot 3 caps it at 1000). Exact with plain ParticleVec3 position/previousPosition and previousPosition struct-copied from the zeroed position (retail `lea ecx,[esi+0x50]; mov edx,eax`); a member-zeroing Vec3 default ctor does not reproduce it.",
-    "bindings": "DustParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DustParticleEmitter.bindings.json"
   },
   {
     "class": "DustParticleEmitter",
-    "source": "DustParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DustParticleEmitter.cpp",
     "candidate_symbol_contains": "??_GDustParticleEmitter",
     "target_va": "0x004b8a80",
     "target_size": 30,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). scalar deleting destructor",
-    "bindings": "DustParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DustParticleEmitter.bindings.json"
   },
   {
     "class": "DustParticleEmitter",
-    "source": "DustParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DustParticleEmitter.cpp",
     "candidate_symbol_contains": "??1DustParticleEmitter",
     "target_va": "0x004b8aa0",
     "target_size": 11,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). dtor",
-    "bindings": "DustParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DustParticleEmitter.bindings.json"
   },
   {
     "class": "DustParticleEmitter",
-    "source": "DustParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DustParticleEmitter.cpp",
     "candidate_symbol_contains": "?UnknownVirtualSlot27@DustParticleEmitter",
     "target_va": "0x004ba040",
     "target_size": 43,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). slot 27, shared by all five emitters (ICF-folded): GameObject slot 8, then stores the manager or releases",
-    "bindings": "DustParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DustParticleEmitter.bindings.json"
   },
   {
     "class": "DustParticleEmitter",
-    "source": "DustParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DustParticleEmitter.cpp",
     "candidate_symbol_contains": "?Tick@DustParticleEmitter",
     "target_va": "0x004b8ab0",
     "target_size": 732,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: speed from distance/dt clamps the rate, spawns AddParticle calls along the segment; the dead dt slot holds the particle count",
-    "bindings": "DustParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DustParticleEmitter.bindings.json"
   },
   {
     "class": "DustParticleEmitter",
-    "source": "DustParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DustParticleEmitter.cpp",
     "candidate_symbol_contains": "?SetPosition@DustParticleEmitter",
     "target_va": "0x004b8d90",
     "target_size": 58,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). SetPosition(Vec3 by value, float): previous = position; position = p",
-    "bindings": "DustParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DustParticleEmitter.bindings.json"
   },
   {
     "class": "DustParticleEmitter",
-    "source": "DustParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DustParticleEmitter.cpp",
     "candidate_symbol_contains": "?SetColor@DustParticleEmitter",
     "target_va": "0x004b8dd0",
     "target_size": 31,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). packs r, g, b into color",
-    "bindings": "DustParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DustParticleEmitter.bindings.json"
   },
   {
     "class": "DirtChunkParticleEmitter",
-    "source": "DirtChunkParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DirtChunkParticleEmitter.cpp",
     "candidate_symbol_contains": "??0DirtChunkParticleEmitter",
     "target_va": "0x004b8df0",
     "target_size": 287,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with two rand() fill loops. Exact once position/previousPosition are plain ParticleVec3 (no zeroing default ctor), the stores follow retail order and previousPosition is struct-copied from the zeroed position (retail `lea ecx,[esi+0x50]; mov edx,eax`); randomTable is `((float)rand() / 32768.0f) * 0.25f`, randomVectors components assigned directly.",
-    "bindings": "DirtChunkParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DirtChunkParticleEmitter.bindings.json"
   },
   {
     "class": "DirtChunkParticleEmitter",
-    "source": "DirtChunkParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DirtChunkParticleEmitter.cpp",
     "candidate_symbol_contains": "?Tick@DirtChunkParticleEmitter",
     "target_va": "0x004b8f40",
     "target_size": 970,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: writes particles straight into the manager table (inlined AddParticle-like code). gravStep written `inv * (dt * manager->gravity)` (free operator*(float, v)) fixes the velStep first component (with gravStep as member operator*, it regresses); a per-iteration copy `ParticleVec3 g(gravStep.x, gravStep.y, gravStep.z)` used in the velocity product makes its components newer leaves than the (n - i) scale, so gravStep.x loads first like retail (`fld [esp+N]; fmul st(1)`); ~400 earlier variants using gravStep directly kept `fld st(0); fmul [esp+N]`.",
-    "bindings": "DirtChunkParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DirtChunkParticleEmitter.bindings.json"
   },
   {
     "class": "DirtChunkParticleEmitter",
-    "source": "DirtChunkParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DirtChunkParticleEmitter.cpp",
     "candidate_symbol_contains": "??_GDirtChunkParticleEmitter",
     "target_va": "0x004b8f10",
     "target_size": 30,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). scalar deleting destructor",
-    "bindings": "DirtChunkParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DirtChunkParticleEmitter.bindings.json"
   },
   {
     "class": "DirtChunkParticleEmitter",
-    "source": "DirtChunkParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DirtChunkParticleEmitter.cpp",
     "candidate_symbol_contains": "??1DirtChunkParticleEmitter",
     "target_va": "0x004b8f30",
     "target_size": 11,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). dtor",
-    "bindings": "DirtChunkParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DirtChunkParticleEmitter.bindings.json"
   },
   {
     "class": "DirtSprayParticleEmitter",
@@ -151,153 +151,153 @@
   },
   {
     "class": "SparkParticleEmitter",
-    "source": "SparkParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SparkParticleEmitter.cpp",
     "candidate_symbol_contains": "??0SparkParticleEmitter",
     "target_va": "0x004b9830",
     "target_size": 307,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with two rand() fill loops. Exact with plain ParticleVec3 position/previousPosition, retail store order with previousPosition copied from the zeroed position, and the scale written `((float)rand() / 32768.0f) * k` (without the parentheses VC6 folds 1/32768*k into one constant retail does not have).",
-    "bindings": "SparkParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SparkParticleEmitter.bindings.json"
   },
   {
     "class": "SparkParticleEmitter",
-    "source": "SparkParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SparkParticleEmitter.cpp",
     "candidate_symbol_contains": "??_GSparkParticleEmitter",
     "target_va": "0x004b9970",
     "target_size": 30,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). scalar deleting destructor",
-    "bindings": "SparkParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SparkParticleEmitter.bindings.json"
   },
   {
     "class": "SparkParticleEmitter",
-    "source": "SparkParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SparkParticleEmitter.cpp",
     "candidate_symbol_contains": "??1SparkParticleEmitter",
     "target_va": "0x004b9990",
     "target_size": 11,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). dtor",
-    "bindings": "SparkParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SparkParticleEmitter.bindings.json"
   },
   {
     "class": "SparkParticleEmitter",
-    "source": "SparkParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SparkParticleEmitter.cpp",
     "candidate_symbol_contains": "?Tick@SparkParticleEmitter",
     "target_va": "0x004b99a0",
     "target_size": 1055,
     "expect": "exact",
     "notes": "The opening previous-position reset tests field_0x64 > 0.25 (retail double at 0x555c90, exposed by strict scoring). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: DirtChunk-like direct particle fill that switches itself off once the manager table is full or the burst ends, with DirtChunk's scalar-first gravStep and per-iteration copy in the velocity product (see its note).",
-    "bindings": "SparkParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SparkParticleEmitter.bindings.json"
   },
   {
     "class": "SparkParticleEmitter",
-    "source": "SparkParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SparkParticleEmitter.cpp",
     "candidate_symbol_contains": "?SetPosition@SparkParticleEmitter",
     "target_va": "0x004b9dc0",
     "target_size": 49,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). SetPosition(Vec3 by value)",
-    "bindings": "SparkParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SparkParticleEmitter.bindings.json"
   },
   {
     "class": "SteamParticleEmitter",
-    "source": "SteamParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SteamParticleEmitter.cpp",
     "candidate_symbol_contains": "??0SteamParticleEmitter",
     "target_va": "0x004b9f40",
     "target_size": 199,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with one rand() fill loop. Exact with plain ParticleVec3 position/previousPosition, retail store order with previousPosition copied from the zeroed position, and the group of four filled by an inner `for (k = 0; k < 4; k++) t[k] = v;` (retail spills v once and copies it through eax; four explicit stores or chained assignments keep v on the x87 stack).",
-    "bindings": "SteamParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SteamParticleEmitter.bindings.json"
   },
   {
     "class": "SteamParticleEmitter",
-    "source": "SteamParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SteamParticleEmitter.cpp",
     "candidate_symbol_contains": "??_GSteamParticleEmitter",
     "target_va": "0x004ba010",
     "target_size": 30,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). scalar deleting destructor",
-    "bindings": "SteamParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SteamParticleEmitter.bindings.json"
   },
   {
     "class": "SteamParticleEmitter",
-    "source": "SteamParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SteamParticleEmitter.cpp",
     "candidate_symbol_contains": "??1SteamParticleEmitter",
     "target_va": "0x004ba030",
     "target_size": 11,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). dtor",
-    "bindings": "SteamParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SteamParticleEmitter.bindings.json"
   },
   {
     "class": "SteamParticleEmitter",
-    "source": "SteamParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SteamParticleEmitter.cpp",
     "candidate_symbol_contains": "?Tick@SteamParticleEmitter",
     "target_va": "0x004ba070",
     "target_size": 590,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: spawns particles along the movement segment; lenSq is written z*z + (y*y + x*x), which is the term order VC6 needs",
-    "bindings": "SteamParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SteamParticleEmitter.bindings.json"
   },
   {
     "class": "SteamParticleEmitter",
-    "source": "SteamParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SteamParticleEmitter.cpp",
     "candidate_symbol_contains": "?SetPosition@SteamParticleEmitter",
     "target_va": "0x004ba2c0",
     "target_size": 49,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). SetPosition(Vec3 by value)",
-    "bindings": "SteamParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SteamParticleEmitter.bindings.json"
   },
   {
     "class": "SteamParticleEmitter",
-    "source": "SteamParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SteamParticleEmitter.cpp",
     "candidate_symbol_contains": "?Restart@SteamParticleEmitter",
     "target_va": "0x004ba300",
     "target_size": 18,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ",
-    "bindings": "SteamParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SteamParticleEmitter.bindings.json"
   },
   {
     "class": "SteamParticleEmitter",
-    "source": "SteamParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SteamParticleEmitter.cpp",
     "candidate_symbol_contains": "?Burst@SteamParticleEmitter",
     "target_va": "0x004ba320",
     "target_size": 19,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ",
-    "bindings": "SteamParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SteamParticleEmitter.bindings.json"
   },
   {
     "class": "SteamParticleEmitter",
-    "source": "SteamParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SteamParticleEmitter.cpp",
     "candidate_symbol_contains": "?StopEmitting@SteamParticleEmitter",
     "target_va": "0x004ba340",
     "target_size": 30,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ",
-    "bindings": "SteamParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SteamParticleEmitter.bindings.json"
   },
   {
     "class": "SteamParticleEmitter",
-    "source": "SteamParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SteamParticleEmitter.cpp",
     "candidate_symbol_contains": "?SetColor@SteamParticleEmitter",
     "target_va": "0x004ba360",
     "target_size": 34,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). packs r, g, b into color",
-    "bindings": "SteamParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SteamParticleEmitter.bindings.json"
   },
   {
     "class": "DirtChunkParticleEmitter",
-    "source": "DirtChunkParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DirtChunkParticleEmitter.cpp",
     "candidate_symbol_contains": "?UnknownVirtualSlot27@DirtChunkParticleEmitter",
     "target_va": "0x004ba040",
     "target_size": 43,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). slot 27, ICF-folded with the other emitters",
-    "bindings": "DirtChunkParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DirtChunkParticleEmitter.bindings.json"
   },
   {
     "class": "DirtSprayParticleEmitter",
@@ -311,23 +311,23 @@
   },
   {
     "class": "SparkParticleEmitter",
-    "source": "SparkParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SparkParticleEmitter.cpp",
     "candidate_symbol_contains": "?UnknownVirtualSlot27@SparkParticleEmitter",
     "target_va": "0x004ba040",
     "target_size": 43,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). slot 27, ICF-folded with the other emitters",
-    "bindings": "SparkParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SparkParticleEmitter.bindings.json"
   },
   {
     "class": "SteamParticleEmitter",
-    "source": "SteamParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/SteamParticleEmitter.cpp",
     "candidate_symbol_contains": "?UnknownVirtualSlot27@SteamParticleEmitter",
     "target_va": "0x004ba040",
     "target_size": 43,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). slot 27, ICF-folded with the other emitters",
-    "bindings": "SteamParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/SteamParticleEmitter.bindings.json"
   },
   {
     "class": "EmitterConstVec3",

@@ -9,6 +9,7 @@
 #include "collision/CollisionPoint.h"
 #include "../../reconstructed/Wrecker.h"
 #include "../../reconstructed/Suspension.h"
+#include "../../reconstructed/ParticleEmitters.h"
 
 // The loader compares the wheel names with the library strcmp (0x00536070), not the
 // intrinsic expansion.
@@ -734,11 +735,11 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     centerNode = modelNode->FindByName("NullFrame");
 
     if (field_0x124) {
-        dustEmitter = new(__FILE__, 0x70f) BikeDustEmitter(1);
+        dustEmitter = reinterpret_cast<BikeDustEmitter*>(new(__FILE__, 0x70f) DustParticleEmitter(1));
         GameObject::AppendChild((GameObject*)dustEmitter->UnknownVirtualSlot27(GameObject::renderContext, field_0x124), -1);
-        dirtChunkEmitter = new(__FILE__, 0x710) BikeDirtChunkEmitter(1);
+        dirtChunkEmitter = reinterpret_cast<BikeDirtChunkEmitter*>(new(__FILE__, 0x710) DirtChunkParticleEmitter(1));
         GameObject::AppendChild((GameObject*)dirtChunkEmitter->UnknownVirtualSlot27(GameObject::renderContext, field_0x124), -1);
-        steamEmitter = new(__FILE__, 0x711) BikeSteamEmitter(1);
+        steamEmitter = reinterpret_cast<BikeSteamEmitter*>(new(__FILE__, 0x711) SteamParticleEmitter(1));
         GameObject::AppendChild((GameObject*)steamEmitter->UnknownVirtualSlot27(GameObject::renderContext, field_0x124), -1);
         steamEmitter->emitting = 1;
     }
@@ -1940,7 +1941,8 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
                 k = 1.0f;
         }
         if (field_0x124 && (field_0x124->isEnabled)) {
-            sparkEmitter->SetPosition(((BikeContactSet*)collisionObject)->field_0xa0);
+            reinterpret_cast<SparkParticleEmitter*>(sparkEmitter)->SetPosition(
+                reinterpret_cast<const ParticleVec3&>(((BikeContactSet*)collisionObject)->field_0xa0));
             sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
             sparkEmitter->burstPending = 1;
         }
@@ -1966,7 +1968,8 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         s = Vec3(1.0f, 1.0f, 1.0f);
         hasBody = 0;
         if (field_0x124 && (field_0x124->isEnabled)) {
-            sparkEmitter->SetPosition(((BikeContactSet*)collisionObject)->field_0xa0);
+            reinterpret_cast<SparkParticleEmitter*>(sparkEmitter)->SetPosition(
+                reinterpret_cast<const ParticleVec3&>(((BikeContactSet*)collisionObject)->field_0xa0));
             sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
             sparkEmitter->burstPending = 1;
         }

@@ -1,0 +1,3001 @@
+{
+  "objects": {
+    "src/krusty2/vehicle/Bike.cpp": {
+      "sections": 242,
+      "relocations": 1089,
+      "sha256": "4685bb42b8a736ce5dd527b9cc8c038bd46e3d05a5589fca84b0e4a5c715a903"
+    },
+    "src/krusty2/vehicle/Vehicle.cpp": {
+      "sections": 151,
+      "relocations": 720,
+      "sha256": "a9f12f3676abe4ec8bd940e0a5c0a7cc6022ca519f6a0b34e68df408c47ef5a2"
+    },
+    "src/reconstructed/DustParticleEmitter.cpp": {
+      "sections": 28,
+      "relocations": 65,
+      "sha256": "f2f760a624631b247c13567bacce5371d84a1061bc3c2c3eb957de2919a1bf4e"
+    },
+    "src/reconstructed/DirtChunkParticleEmitter.cpp": {
+      "sections": 22,
+      "relocations": 63,
+      "sha256": "9391f70274576311e6969bb61f002af263b8fe7632e54a13f304ebc88a6f35a0"
+    },
+    "src/reconstructed/SteamParticleEmitter.cpp": {
+      "sections": 26,
+      "relocations": 61,
+      "sha256": "6e40249eec255a635aaf8bd8f86b8f39b387507498800b4afdfeff58f1450b69"
+    },
+    "src/reconstructed/SparkParticleEmitter.cpp": {
+      "sections": 25,
+      "relocations": 67,
+      "sha256": "6de4b9c11367a8c2db026fbd0fc1a9fb2c493020339b8a76d40f3721295a5b36"
+    },
+    "samples/physics/effects/DirtSprayParticleEmitter.cpp": {
+      "sections": 23,
+      "relocations": 59,
+      "sha256": "e535ebbb79b154e122f587a5d09fb7789a2b626444a62b7866ff7be40d5a2633"
+    }
+  },
+  "renames": {
+    "??0BikeDustEmitter@@QAE@H@Z": "??0DustParticleEmitter@@QAE@H@Z",
+    "??0BikeDirtChunkEmitter@@QAE@H@Z": "??0DirtChunkParticleEmitter@@QAE@H@Z",
+    "??0BikeSteamEmitter@@QAE@H@Z": "??0SteamParticleEmitter@@QAE@H@Z",
+    "??0VehicleSparkEmitter@@QAE@H@Z": "??0SparkParticleEmitter@@QAE@H@Z",
+    "?SetPosition@VehicleSparkEmitter@@QAEXUVec3@@@Z": "?SetPosition@SparkParticleEmitter@@QAEXUParticleVec3@@@Z"
+  },
+  "baseline": "Private dfdf9823 plus frozen round57 Eco composition; same-path complete seven-object equality under five exact names, no filename exclusions. Refresh against next published base before integration.",
+  "caller_strict": [
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "??0BikeVec3Call@@QAE@MMM@Z",
+      "target_va": "0x00404e60",
+      "target_size": 25,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot72@Bike",
+      "target_va": "0x00405db0",
+      "target_size": 724,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot73@Bike",
+      "target_va": "0x00406090",
+      "target_size": 44,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot8@Bike",
+      "target_va": "0x00406750",
+      "target_size": 231,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot76@Bike",
+      "target_va": "0x00406840",
+      "target_size": 395,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot16@Bike",
+      "target_va": "0x004069d0",
+      "target_size": 121,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot33@Bike",
+      "target_va": "0x00406a50",
+      "target_size": 135,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot1@Bike",
+      "target_va": "0x00407630",
+      "target_size": 205,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "??0Bike@@QAE@H@Z",
+      "target_va": "0x00407700",
+      "target_size": 374,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot97@Bike",
+      "target_va": "0x00409420",
+      "target_size": 1516,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "??1Bike@@UAE@XZ",
+      "target_va": "0x00409a10",
+      "target_size": 276,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot99@Bike",
+      "target_va": "0x00409b30",
+      "target_size": 1374,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot100@Bike",
+      "target_va": "0x0040a090",
+      "target_size": 232,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot67@Bike",
+      "target_va": "0x0040a180",
+      "target_size": 103,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot39@Bike",
+      "target_va": "0x0040a1f0",
+      "target_size": 306,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot59@Bike",
+      "target_va": "0x0040a330",
+      "target_size": 125,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot56@Bike",
+      "target_va": "0x0040a3b0",
+      "target_size": 71,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot57@Bike",
+      "target_va": "0x0040a400",
+      "target_size": 117,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot71@Bike",
+      "target_va": "0x0040a480",
+      "target_size": 124,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot44@Bike",
+      "target_va": "0x0040a500",
+      "target_size": 27,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot90@Bike",
+      "target_va": "0x0040ae50",
+      "target_size": 99,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot91@Bike",
+      "target_va": "0x0040aec0",
+      "target_size": 1353,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot46@Bike",
+      "target_va": "0x0040b600",
+      "target_size": 1066,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot92@Bike",
+      "target_va": "0x0040ba30",
+      "target_size": 1157,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot29@Bike",
+      "target_va": "0x0040bec0",
+      "target_size": 306,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot62@Bike",
+      "target_va": "0x0040c400",
+      "target_size": 189,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot65@Bike",
+      "target_va": "0x0040c5d0",
+      "target_size": 307,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot54@Bike",
+      "target_va": "0x0040c8b0",
+      "target_size": 354,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot49@Bike",
+      "target_va": "0x0040ca20",
+      "target_size": 30,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "??_EBike@@$4PPPPPPPM@A@AEPAXI@Z",
+      "target_va": "0x0040ca40",
+      "target_size": 8,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "??_GBike@@UAEPAXI@Z",
+      "target_va": "0x0040ca50",
+      "target_size": 51,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot32@Bike",
+      "target_va": "0x0040cba0",
+      "target_size": 7,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot47@Bike",
+      "target_va": "0x0040cbb0",
+      "target_size": 21,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot41@Bike",
+      "target_va": "0x0040cbd0",
+      "target_size": 486,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot98@Bike",
+      "target_va": "0x0040cdc0",
+      "target_size": 32,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot42@Bike",
+      "target_va": "0x0040cde0",
+      "target_size": 52,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot75@Bike",
+      "target_va": "0x0040ce20",
+      "target_size": 64,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot55@Bike",
+      "target_va": "0x0040ce60",
+      "target_size": 244,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot5@Bike",
+      "target_va": "0x0040cf60",
+      "target_size": 103,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot66@Bike",
+      "target_va": "0x0040cfd0",
+      "target_size": 29,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot53@Bike",
+      "target_va": "0x0040cff0",
+      "target_size": 63,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot96@Bike",
+      "target_va": "0x0040d030",
+      "target_size": 52,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "?BikeCollisionCallback@@",
+      "target_va": "0x00405cd0",
+      "target_size": 145,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "?BikeStaticCollisionCallback@@",
+      "target_va": "0x00405d70",
+      "target_size": 58,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E2",
+      "target_va": "0x00407880",
+      "target_size": 5,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E1",
+      "target_va": "0x00407890",
+      "target_size": 60,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E5",
+      "target_va": "0x004078d0",
+      "target_size": 5,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E4",
+      "target_va": "0x004078e0",
+      "target_size": 60,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E8",
+      "target_va": "0x00407920",
+      "target_size": 5,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E7",
+      "target_va": "0x00407930",
+      "target_size": 60,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E11",
+      "target_va": "0x00407970",
+      "target_size": 5,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E10",
+      "target_va": "0x00407980",
+      "target_size": 60,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "??0VehVec3Call@@QAE@MMM@Z",
+      "target_va": "0x00404e60",
+      "target_size": 25,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot0@Vehicle",
+      "target_va": "0x00525520",
+      "target_size": 45,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot1@Vehicle",
+      "target_va": "0x00525550",
+      "target_size": 372,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot43@Vehicle",
+      "target_va": "0x005256d0",
+      "target_size": 199,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "ResetWheelContacts",
+      "target_va": "0x00525a90",
+      "target_size": 461,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "RunTickers",
+      "target_va": "0x00525c60",
+      "target_size": 79,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "AddEarlyTicker",
+      "target_va": "0x00525cb0",
+      "target_size": 57,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "AddLateTicker",
+      "target_va": "0x00525cf0",
+      "target_size": 57,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "AddWheel",
+      "target_va": "0x00525d30",
+      "target_size": 160,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "VehicleHit@@YA",
+      "target_va": "0x00525dd0",
+      "target_size": 46,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "VehicleHitBy@@YA",
+      "target_va": "0x00525e00",
+      "target_size": 19,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot3@Vehicle",
+      "target_va": "0x005264c0",
+      "target_size": 264,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot70@Vehicle",
+      "target_va": "0x00526800",
+      "target_size": 44,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "CheckCrash",
+      "target_va": "0x00526830",
+      "target_size": 150,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot38@Vehicle",
+      "target_va": "0x5268d0",
+      "target_size": 1578,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot39@Vehicle",
+      "target_va": "0x00526f00",
+      "target_size": 150,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot7@Vehicle",
+      "target_va": "0x00526fa0",
+      "target_size": 1161,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot33@Vehicle",
+      "target_va": "0x00527430",
+      "target_size": 365,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot88@Vehicle",
+      "target_va": "0x005275a0",
+      "target_size": 288,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot89@Vehicle",
+      "target_va": "0x005276c0",
+      "target_size": 11,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot46@Vehicle",
+      "target_va": "0x5276d0",
+      "target_size": 523,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E2",
+      "target_va": "0x005278e0",
+      "target_size": 5,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E1",
+      "target_va": "0x005278f0",
+      "target_size": 60,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E5",
+      "target_va": "0x00527930",
+      "target_size": 5,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E4",
+      "target_va": "0x00527940",
+      "target_size": 60,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E8",
+      "target_va": "0x00527980",
+      "target_size": 5,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E7",
+      "target_va": "0x00527990",
+      "target_size": 60,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E11",
+      "target_va": "0x005279d0",
+      "target_size": 5,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E10",
+      "target_va": "0x005279e0",
+      "target_size": 60,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot71@Vehicle",
+      "target_va": "0x00527d90",
+      "target_size": 154,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot72@Vehicle",
+      "target_va": "0x00527e30",
+      "target_size": 831,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot73@Vehicle",
+      "target_va": "0x00528170",
+      "target_size": 60,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot44@Vehicle",
+      "target_va": "0x005283d0",
+      "target_size": 43,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "GetAverageGroundNormal",
+      "target_va": "0x00528400",
+      "target_size": 291,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot54@Vehicle",
+      "target_va": "0x00528530",
+      "target_size": 358,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot57@Vehicle",
+      "target_va": "0x005289b0",
+      "target_size": 7,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot58@Vehicle",
+      "target_va": "0x005289c0",
+      "target_size": 938,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot63@Vehicle",
+      "target_va": "0x00528d70",
+      "target_size": 209,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot64@Vehicle",
+      "target_va": "0x00528e50",
+      "target_size": 81,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot82@Vehicle",
+      "target_va": "0x005290b0",
+      "target_size": 26,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot81@Vehicle",
+      "target_va": "0x005290d0",
+      "target_size": 26,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot80@Vehicle",
+      "target_va": "0x005290f0",
+      "target_size": 137,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot83@Vehicle",
+      "target_va": "0x00529180",
+      "target_size": 114,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot77@Vehicle",
+      "target_va": "0x00529200",
+      "target_size": 67,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot84@Vehicle",
+      "target_va": "0x00529250",
+      "target_size": 24,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot93@Vehicle",
+      "target_va": "0x00529270",
+      "target_size": 11,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UpdateWheelRampLevels",
+      "target_va": "0x00529280",
+      "target_size": 221,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot85@Vehicle",
+      "target_va": "0x00529360",
+      "target_size": 128,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "Method_005293E0",
+      "target_va": "0x005293e0",
+      "target_size": 104,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "VehVec3Equal",
+      "target_va": "0x005299e0",
+      "target_size": 54,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UpdateWheelsInContact",
+      "target_va": "0x00529a20",
+      "target_size": 273,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot76@Vehicle",
+      "target_va": "0x00529b40",
+      "target_size": 93,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot86@Vehicle",
+      "target_va": "0x00529ba0",
+      "target_size": 127,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "AccumulateWheelContacts",
+      "target_va": "0x00529c20",
+      "target_size": 320,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot90@Vehicle",
+      "target_va": "0x00529d60",
+      "target_size": 83,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot18@Vehicle",
+      "target_va": "0x529dc0",
+      "target_size": 529,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot19@Vehicle",
+      "target_va": "0x529fe0",
+      "target_size": 679,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot20@Vehicle",
+      "target_va": "0x52a290",
+      "target_size": 614,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot21@Vehicle",
+      "target_va": "0x0052a500",
+      "target_size": 24,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot59@Vehicle",
+      "target_va": "0x0052a520",
+      "target_size": 10,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot60@Vehicle",
+      "target_va": "0x0052a530",
+      "target_size": 126,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot61@Vehicle",
+      "target_va": "0x0052a5b0",
+      "target_size": 9,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot62@Vehicle",
+      "target_va": "0x0052a5c0",
+      "target_size": 33,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot28@Vehicle",
+      "target_va": "0x0052a5f0",
+      "target_size": 173,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot95@Vehicle",
+      "target_va": "0x0052a6a0",
+      "target_size": 399,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot48@Vehicle",
+      "target_va": "0x0052a890",
+      "target_size": 171,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot50@Vehicle",
+      "target_va": "0x0052b600",
+      "target_size": 23,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot53@Vehicle",
+      "target_va": "0x0052b6a0",
+      "target_size": 41,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot55@Vehicle",
+      "target_va": "0x0052b6d0",
+      "target_size": 63,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot42@Vehicle",
+      "target_va": "0x0052b710",
+      "target_size": 39,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot67@Vehicle",
+      "target_va": "0x0052b740",
+      "target_size": 66,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot75@Vehicle",
+      "target_va": "0x0052b790",
+      "target_size": 337,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot96@Vehicle",
+      "target_va": "0x0052b8f0",
+      "target_size": 42,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "??1Vehicle@@UAE@XZ",
+      "target_va": "0x00526380",
+      "target_size": 319,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "?Tick@Vehicle@@UAEHM@Z",
+      "target_va": "0x0052a830",
+      "target_size": 86,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "?PlaceWheels@Vehicle@@QAEXXZ",
+      "target_va": "0x00528eb0",
+      "target_size": 505,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "LoadVehicle@Vehicle",
+      "target_va": "0x00525e20",
+      "target_size": 1373,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "Method_00529450@Vehicle",
+      "target_va": "0x00529450",
+      "target_size": 1415,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    }
+  ],
+  "inherited_vtables": [
+    {
+      "class": "DustParticleEmitter",
+      "slots": [
+        {
+          "slot": 1,
+          "symbol": "?AddRef@BaseObject@@UAEHXZ",
+          "va": "0x405160",
+          "source": "src/reconstructed/BaseObject.cpp",
+          "extent": 8,
+          "strict": true
+        },
+        {
+          "slot": 2,
+          "symbol": "?Release@GameObject@@UAEHXZ",
+          "va": "0x4696c0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 81,
+          "strict": true
+        },
+        {
+          "slot": 3,
+          "symbol": "?GetRefCount@BaseObject@@UAEHXZ",
+          "va": "0x401940",
+          "source": "src/reconstructed/BaseObject.cpp",
+          "extent": 4,
+          "strict": true
+        },
+        {
+          "slot": 4,
+          "symbol": "?Disable@GameObject@@UAEXXZ",
+          "va": "0x4690a0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 13,
+          "strict": true
+        },
+        {
+          "slot": 5,
+          "symbol": "?Enable@GameObject@@UAEXXZ",
+          "va": "0x4690b0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 13,
+          "strict": true
+        },
+        {
+          "slot": 6,
+          "symbol": "?OnDisable@GameObject@@UAEXXZ",
+          "va": "0x469050",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 30,
+          "strict": true
+        },
+        {
+          "slot": 7,
+          "symbol": "?OnEnable@GameObject@@UAEXXZ",
+          "va": "0x469070",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 35,
+          "strict": true
+        },
+        {
+          "slot": 8,
+          "symbol": "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z",
+          "va": "0x4692f0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 12,
+          "strict": true
+        },
+        {
+          "slot": 9,
+          "symbol": "?UnknownVirtualSlot9@GameObject@@UAEHH@Z",
+          "va": "0x469430",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 65,
+          "strict": true
+        },
+        {
+          "slot": 11,
+          "symbol": "?UnknownVirtualSlot11@GameObject@@UAEHM@Z",
+          "va": "0x4da540",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 8,
+          "strict": true
+        },
+        {
+          "slot": 12,
+          "symbol": "?PrepareGeometry@GameObject@@UAEHXZ",
+          "va": "0x469300",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 48,
+          "strict": true
+        },
+        {
+          "slot": 13,
+          "symbol": "?RenderPre3D@GameObject@@UAEHXZ",
+          "va": "0x469330",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 47,
+          "strict": true
+        },
+        {
+          "slot": 14,
+          "symbol": "?UnknownVirtualSlot14@GameObject@@UAEHXZ",
+          "va": "0x469360",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 55,
+          "strict": true
+        },
+        {
+          "slot": 15,
+          "symbol": "?RenderPost3D@GameObject@@UAEHXZ",
+          "va": "0x4693a0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 47,
+          "strict": true
+        },
+        {
+          "slot": 16,
+          "symbol": "?SetPaused@GameObject@@UAEHH@Z",
+          "va": "0x469480",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 74,
+          "strict": true
+        },
+        {
+          "slot": 17,
+          "symbol": "?OnDeactivate@GameObject@@UAEHXZ",
+          "va": "0x469500",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 42,
+          "strict": true
+        },
+        {
+          "slot": 18,
+          "symbol": "?OnActivate@GameObject@@UAEHXZ",
+          "va": "0x4694d0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 42,
+          "strict": true
+        },
+        {
+          "slot": 19,
+          "symbol": "?UnknownVirtualSlot19@GameObject@@UAEHH@Z",
+          "va": "0x469530",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 68,
+          "strict": true
+        },
+        {
+          "slot": 20,
+          "symbol": "?OnChar@GameObject@@UAEHH@Z",
+          "va": "0x469c00",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 60,
+          "strict": true
+        },
+        {
+          "slot": 21,
+          "symbol": "?OnKeyDown@GameObject@@UAEHH@Z",
+          "va": "0x469c40",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 60,
+          "strict": true
+        },
+        {
+          "slot": 22,
+          "symbol": "?OnControlRelease@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "va": "0x469580",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 76,
+          "strict": true
+        },
+        {
+          "slot": 23,
+          "symbol": "?OnControlPress@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "va": "0x4695d0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 76,
+          "strict": true
+        },
+        {
+          "slot": 24,
+          "symbol": "?OnNetworkMessage@GameObject@@UAEHHPAXHHH@Z",
+          "va": "0x469620",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 94,
+          "strict": true
+        },
+        {
+          "slot": 25,
+          "symbol": "?AttachRenderContext@GameObject@@UAEHPAX@Z",
+          "va": "0x469720",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 68,
+          "strict": true
+        },
+        {
+          "slot": 26,
+          "symbol": "?MarkPendingRelease@GameObject@@UAEXXZ",
+          "va": "0x4692c0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 36,
+          "strict": true
+        }
+      ]
+    },
+    {
+      "class": "DirtChunkParticleEmitter",
+      "slots": [
+        {
+          "slot": 1,
+          "symbol": "?AddRef@BaseObject@@UAEHXZ",
+          "va": "0x405160",
+          "source": "src/reconstructed/BaseObject.cpp",
+          "extent": 8,
+          "strict": true
+        },
+        {
+          "slot": 2,
+          "symbol": "?Release@GameObject@@UAEHXZ",
+          "va": "0x4696c0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 81,
+          "strict": true
+        },
+        {
+          "slot": 3,
+          "symbol": "?GetRefCount@BaseObject@@UAEHXZ",
+          "va": "0x401940",
+          "source": "src/reconstructed/BaseObject.cpp",
+          "extent": 4,
+          "strict": true
+        },
+        {
+          "slot": 4,
+          "symbol": "?Disable@GameObject@@UAEXXZ",
+          "va": "0x4690a0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 13,
+          "strict": true
+        },
+        {
+          "slot": 5,
+          "symbol": "?Enable@GameObject@@UAEXXZ",
+          "va": "0x4690b0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 13,
+          "strict": true
+        },
+        {
+          "slot": 6,
+          "symbol": "?OnDisable@GameObject@@UAEXXZ",
+          "va": "0x469050",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 30,
+          "strict": true
+        },
+        {
+          "slot": 7,
+          "symbol": "?OnEnable@GameObject@@UAEXXZ",
+          "va": "0x469070",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 35,
+          "strict": true
+        },
+        {
+          "slot": 8,
+          "symbol": "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z",
+          "va": "0x4692f0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 12,
+          "strict": true
+        },
+        {
+          "slot": 9,
+          "symbol": "?UnknownVirtualSlot9@GameObject@@UAEHH@Z",
+          "va": "0x469430",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 65,
+          "strict": true
+        },
+        {
+          "slot": 11,
+          "symbol": "?UnknownVirtualSlot11@GameObject@@UAEHM@Z",
+          "va": "0x4da540",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 8,
+          "strict": true
+        },
+        {
+          "slot": 12,
+          "symbol": "?PrepareGeometry@GameObject@@UAEHXZ",
+          "va": "0x469300",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 48,
+          "strict": true
+        },
+        {
+          "slot": 13,
+          "symbol": "?RenderPre3D@GameObject@@UAEHXZ",
+          "va": "0x469330",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 47,
+          "strict": true
+        },
+        {
+          "slot": 14,
+          "symbol": "?UnknownVirtualSlot14@GameObject@@UAEHXZ",
+          "va": "0x469360",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 55,
+          "strict": true
+        },
+        {
+          "slot": 15,
+          "symbol": "?RenderPost3D@GameObject@@UAEHXZ",
+          "va": "0x4693a0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 47,
+          "strict": true
+        },
+        {
+          "slot": 16,
+          "symbol": "?SetPaused@GameObject@@UAEHH@Z",
+          "va": "0x469480",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 74,
+          "strict": true
+        },
+        {
+          "slot": 17,
+          "symbol": "?OnDeactivate@GameObject@@UAEHXZ",
+          "va": "0x469500",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 42,
+          "strict": true
+        },
+        {
+          "slot": 18,
+          "symbol": "?OnActivate@GameObject@@UAEHXZ",
+          "va": "0x4694d0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 42,
+          "strict": true
+        },
+        {
+          "slot": 19,
+          "symbol": "?UnknownVirtualSlot19@GameObject@@UAEHH@Z",
+          "va": "0x469530",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 68,
+          "strict": true
+        },
+        {
+          "slot": 20,
+          "symbol": "?OnChar@GameObject@@UAEHH@Z",
+          "va": "0x469c00",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 60,
+          "strict": true
+        },
+        {
+          "slot": 21,
+          "symbol": "?OnKeyDown@GameObject@@UAEHH@Z",
+          "va": "0x469c40",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 60,
+          "strict": true
+        },
+        {
+          "slot": 22,
+          "symbol": "?OnControlRelease@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "va": "0x469580",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 76,
+          "strict": true
+        },
+        {
+          "slot": 23,
+          "symbol": "?OnControlPress@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "va": "0x4695d0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 76,
+          "strict": true
+        },
+        {
+          "slot": 24,
+          "symbol": "?OnNetworkMessage@GameObject@@UAEHHPAXHHH@Z",
+          "va": "0x469620",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 94,
+          "strict": true
+        },
+        {
+          "slot": 25,
+          "symbol": "?AttachRenderContext@GameObject@@UAEHPAX@Z",
+          "va": "0x469720",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 68,
+          "strict": true
+        },
+        {
+          "slot": 26,
+          "symbol": "?MarkPendingRelease@GameObject@@UAEXXZ",
+          "va": "0x4692c0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 36,
+          "strict": true
+        }
+      ]
+    },
+    {
+      "class": "SteamParticleEmitter",
+      "slots": [
+        {
+          "slot": 1,
+          "symbol": "?AddRef@BaseObject@@UAEHXZ",
+          "va": "0x405160",
+          "source": "src/reconstructed/BaseObject.cpp",
+          "extent": 8,
+          "strict": true
+        },
+        {
+          "slot": 2,
+          "symbol": "?Release@GameObject@@UAEHXZ",
+          "va": "0x4696c0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 81,
+          "strict": true
+        },
+        {
+          "slot": 3,
+          "symbol": "?GetRefCount@BaseObject@@UAEHXZ",
+          "va": "0x401940",
+          "source": "src/reconstructed/BaseObject.cpp",
+          "extent": 4,
+          "strict": true
+        },
+        {
+          "slot": 4,
+          "symbol": "?Disable@GameObject@@UAEXXZ",
+          "va": "0x4690a0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 13,
+          "strict": true
+        },
+        {
+          "slot": 5,
+          "symbol": "?Enable@GameObject@@UAEXXZ",
+          "va": "0x4690b0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 13,
+          "strict": true
+        },
+        {
+          "slot": 6,
+          "symbol": "?OnDisable@GameObject@@UAEXXZ",
+          "va": "0x469050",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 30,
+          "strict": true
+        },
+        {
+          "slot": 7,
+          "symbol": "?OnEnable@GameObject@@UAEXXZ",
+          "va": "0x469070",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 35,
+          "strict": true
+        },
+        {
+          "slot": 8,
+          "symbol": "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z",
+          "va": "0x4692f0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 12,
+          "strict": true
+        },
+        {
+          "slot": 9,
+          "symbol": "?UnknownVirtualSlot9@GameObject@@UAEHH@Z",
+          "va": "0x469430",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 65,
+          "strict": true
+        },
+        {
+          "slot": 11,
+          "symbol": "?UnknownVirtualSlot11@GameObject@@UAEHM@Z",
+          "va": "0x4da540",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 8,
+          "strict": true
+        },
+        {
+          "slot": 12,
+          "symbol": "?PrepareGeometry@GameObject@@UAEHXZ",
+          "va": "0x469300",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 48,
+          "strict": true
+        },
+        {
+          "slot": 13,
+          "symbol": "?RenderPre3D@GameObject@@UAEHXZ",
+          "va": "0x469330",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 47,
+          "strict": true
+        },
+        {
+          "slot": 14,
+          "symbol": "?UnknownVirtualSlot14@GameObject@@UAEHXZ",
+          "va": "0x469360",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 55,
+          "strict": true
+        },
+        {
+          "slot": 15,
+          "symbol": "?RenderPost3D@GameObject@@UAEHXZ",
+          "va": "0x4693a0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 47,
+          "strict": true
+        },
+        {
+          "slot": 16,
+          "symbol": "?SetPaused@GameObject@@UAEHH@Z",
+          "va": "0x469480",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 74,
+          "strict": true
+        },
+        {
+          "slot": 17,
+          "symbol": "?OnDeactivate@GameObject@@UAEHXZ",
+          "va": "0x469500",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 42,
+          "strict": true
+        },
+        {
+          "slot": 18,
+          "symbol": "?OnActivate@GameObject@@UAEHXZ",
+          "va": "0x4694d0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 42,
+          "strict": true
+        },
+        {
+          "slot": 19,
+          "symbol": "?UnknownVirtualSlot19@GameObject@@UAEHH@Z",
+          "va": "0x469530",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 68,
+          "strict": true
+        },
+        {
+          "slot": 20,
+          "symbol": "?OnChar@GameObject@@UAEHH@Z",
+          "va": "0x469c00",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 60,
+          "strict": true
+        },
+        {
+          "slot": 21,
+          "symbol": "?OnKeyDown@GameObject@@UAEHH@Z",
+          "va": "0x469c40",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 60,
+          "strict": true
+        },
+        {
+          "slot": 22,
+          "symbol": "?OnControlRelease@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "va": "0x469580",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 76,
+          "strict": true
+        },
+        {
+          "slot": 23,
+          "symbol": "?OnControlPress@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "va": "0x4695d0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 76,
+          "strict": true
+        },
+        {
+          "slot": 24,
+          "symbol": "?OnNetworkMessage@GameObject@@UAEHHPAXHHH@Z",
+          "va": "0x469620",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 94,
+          "strict": true
+        },
+        {
+          "slot": 25,
+          "symbol": "?AttachRenderContext@GameObject@@UAEHPAX@Z",
+          "va": "0x469720",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 68,
+          "strict": true
+        },
+        {
+          "slot": 26,
+          "symbol": "?MarkPendingRelease@GameObject@@UAEXXZ",
+          "va": "0x4692c0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 36,
+          "strict": true
+        }
+      ]
+    },
+    {
+      "class": "SparkParticleEmitter",
+      "slots": [
+        {
+          "slot": 1,
+          "symbol": "?AddRef@BaseObject@@UAEHXZ",
+          "va": "0x405160",
+          "source": "src/reconstructed/BaseObject.cpp",
+          "extent": 8,
+          "strict": true
+        },
+        {
+          "slot": 2,
+          "symbol": "?Release@GameObject@@UAEHXZ",
+          "va": "0x4696c0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 81,
+          "strict": true
+        },
+        {
+          "slot": 3,
+          "symbol": "?GetRefCount@BaseObject@@UAEHXZ",
+          "va": "0x401940",
+          "source": "src/reconstructed/BaseObject.cpp",
+          "extent": 4,
+          "strict": true
+        },
+        {
+          "slot": 4,
+          "symbol": "?Disable@GameObject@@UAEXXZ",
+          "va": "0x4690a0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 13,
+          "strict": true
+        },
+        {
+          "slot": 5,
+          "symbol": "?Enable@GameObject@@UAEXXZ",
+          "va": "0x4690b0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 13,
+          "strict": true
+        },
+        {
+          "slot": 6,
+          "symbol": "?OnDisable@GameObject@@UAEXXZ",
+          "va": "0x469050",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 30,
+          "strict": true
+        },
+        {
+          "slot": 7,
+          "symbol": "?OnEnable@GameObject@@UAEXXZ",
+          "va": "0x469070",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 35,
+          "strict": true
+        },
+        {
+          "slot": 8,
+          "symbol": "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z",
+          "va": "0x4692f0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 12,
+          "strict": true
+        },
+        {
+          "slot": 9,
+          "symbol": "?UnknownVirtualSlot9@GameObject@@UAEHH@Z",
+          "va": "0x469430",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 65,
+          "strict": true
+        },
+        {
+          "slot": 11,
+          "symbol": "?UnknownVirtualSlot11@GameObject@@UAEHM@Z",
+          "va": "0x4da540",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 8,
+          "strict": true
+        },
+        {
+          "slot": 12,
+          "symbol": "?PrepareGeometry@GameObject@@UAEHXZ",
+          "va": "0x469300",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 48,
+          "strict": true
+        },
+        {
+          "slot": 13,
+          "symbol": "?RenderPre3D@GameObject@@UAEHXZ",
+          "va": "0x469330",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 47,
+          "strict": true
+        },
+        {
+          "slot": 14,
+          "symbol": "?UnknownVirtualSlot14@GameObject@@UAEHXZ",
+          "va": "0x469360",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 55,
+          "strict": true
+        },
+        {
+          "slot": 15,
+          "symbol": "?RenderPost3D@GameObject@@UAEHXZ",
+          "va": "0x4693a0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 47,
+          "strict": true
+        },
+        {
+          "slot": 16,
+          "symbol": "?SetPaused@GameObject@@UAEHH@Z",
+          "va": "0x469480",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 74,
+          "strict": true
+        },
+        {
+          "slot": 17,
+          "symbol": "?OnDeactivate@GameObject@@UAEHXZ",
+          "va": "0x469500",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 42,
+          "strict": true
+        },
+        {
+          "slot": 18,
+          "symbol": "?OnActivate@GameObject@@UAEHXZ",
+          "va": "0x4694d0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 42,
+          "strict": true
+        },
+        {
+          "slot": 19,
+          "symbol": "?UnknownVirtualSlot19@GameObject@@UAEHH@Z",
+          "va": "0x469530",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 68,
+          "strict": true
+        },
+        {
+          "slot": 20,
+          "symbol": "?OnChar@GameObject@@UAEHH@Z",
+          "va": "0x469c00",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 60,
+          "strict": true
+        },
+        {
+          "slot": 21,
+          "symbol": "?OnKeyDown@GameObject@@UAEHH@Z",
+          "va": "0x469c40",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 60,
+          "strict": true
+        },
+        {
+          "slot": 22,
+          "symbol": "?OnControlRelease@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "va": "0x469580",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 76,
+          "strict": true
+        },
+        {
+          "slot": 23,
+          "symbol": "?OnControlPress@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "va": "0x4695d0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 76,
+          "strict": true
+        },
+        {
+          "slot": 24,
+          "symbol": "?OnNetworkMessage@GameObject@@UAEHHPAXHHH@Z",
+          "va": "0x469620",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 94,
+          "strict": true
+        },
+        {
+          "slot": 25,
+          "symbol": "?AttachRenderContext@GameObject@@UAEHPAX@Z",
+          "va": "0x469720",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 68,
+          "strict": true
+        },
+        {
+          "slot": 26,
+          "symbol": "?MarkPendingRelease@GameObject@@UAEXXZ",
+          "va": "0x4692c0",
+          "source": "src/reconstructed/GameObject.cpp",
+          "extent": 36,
+          "strict": true
+        }
+      ]
+    }
+  ],
+  "rtti": [
+    {
+      "class": "DustParticleEmitter",
+      "vtable": "0x555ab8",
+      "col": "0x55df20",
+      "object_offset": 0,
+      "GameObject_mdisp": 0,
+      "GameObject_pdisp": -1
+    },
+    {
+      "class": "DirtChunkParticleEmitter",
+      "vtable": "0x555b34",
+      "col": "0x55df70",
+      "object_offset": 0,
+      "GameObject_mdisp": 0,
+      "GameObject_pdisp": -1
+    },
+    {
+      "class": "SteamParticleEmitter",
+      "vtable": "0x555c9c",
+      "col": "0x55e060",
+      "object_offset": 0,
+      "GameObject_mdisp": 0,
+      "GameObject_pdisp": -1
+    },
+    {
+      "class": "SparkParticleEmitter",
+      "vtable": "0x555c1c",
+      "col": "0x55e010",
+      "object_offset": 0,
+      "GameObject_mdisp": 0,
+      "GameObject_pdisp": -1
+    }
+  ],
+  "producer_windows": [
+    {
+      "caller": "LoadBike",
+      "target": "0x4b8a00",
+      "site": "0x40879f",
+      "instructions": [
+        [
+          "0x408769",
+          "cmp",
+          "eax, ebx"
+        ],
+        [
+          "0x40876b",
+          "je",
+          "0x4088e3"
+        ],
+        [
+          "0x408771",
+          "push",
+          "0x70f"
+        ],
+        [
+          "0x408776",
+          "push",
+          "0x566e4c"
+        ],
+        [
+          "0x40877b",
+          "push",
+          "0x80"
+        ],
+        [
+          "0x408780",
+          "call",
+          "0x4a3010"
+        ],
+        [
+          "0x408785",
+          "add",
+          "esp, 0xc"
+        ],
+        [
+          "0x408788",
+          "mov",
+          "dword ptr [esp + 0x38], eax"
+        ],
+        [
+          "0x40878c",
+          "cmp",
+          "eax, ebx"
+        ],
+        [
+          "0x40878e",
+          "mov",
+          "dword ptr [esp + 0x2d8], 5"
+        ],
+        [
+          "0x408799",
+          "je",
+          "0x4087be"
+        ],
+        [
+          "0x40879b",
+          "push",
+          "1"
+        ],
+        [
+          "0x40879d",
+          "mov",
+          "ecx, eax"
+        ],
+        [
+          "0x40879f",
+          "call",
+          "0x4b8a00"
+        ],
+        [
+          "0x4087a4",
+          "jmp",
+          "0x4087c0"
+        ],
+        [
+          "0x4087a6",
+          "mov",
+          "ecx, dword ptr [ebp + 4]"
+        ],
+        [
+          "0x4087a9",
+          "mov",
+          "edx, dword ptr [ecx + 4]"
+        ],
+        [
+          "0x4087ac",
+          "mov",
+          "eax, dword ptr [edx + ebp + 4]"
+        ],
+        [
+          "0x4087b0",
+          "lea",
+          "ecx, [edx + ebp + 4]"
+        ],
+        [
+          "0x4087b4",
+          "call",
+          "dword ptr [eax + 8]"
+        ],
+        [
+          "0x4087b7",
+          "xor",
+          "eax, eax"
+        ],
+        [
+          "0x4087b9",
+          "jmp",
+          "0x4093fe"
+        ],
+        [
+          "0x4087be",
+          "xor",
+          "eax, eax"
+        ],
+        [
+          "0x4087c0",
+          "or",
+          "esi, 0xffffffff"
+        ],
+        [
+          "0x4087c3",
+          "mov",
+          "dword ptr [ebp + 0x728], eax"
+        ],
+        [
+          "0x4087c9",
+          "mov",
+          "ecx, dword ptr [ebp + 0x124]"
+        ],
+        [
+          "0x4087cf",
+          "push",
+          "esi"
+        ],
+        [
+          "0x4087d0",
+          "push",
+          "ecx"
+        ],
+        [
+          "0x4087d1",
+          "mov",
+          "ecx, dword ptr [ebp + 4]"
+        ],
+        [
+          "0x4087d4",
+          "mov",
+          "edx, dword ptr [eax]"
+        ],
+        [
+          "0x4087d6",
+          "mov",
+          "dword ptr [esp + 0x2e0], esi"
+        ],
+        [
+          "0x4087dd",
+          "mov",
+          "ecx, dword ptr [ecx + 4]"
+        ],
+        [
+          "0x4087e0",
+          "mov",
+          "ecx, dword ptr [ecx + ebp + 0x1c]"
+        ],
+        [
+          "0x4087e4",
+          "push",
+          "ecx"
+        ],
+        [
+          "0x4087e5",
+          "mov",
+          "ecx, eax"
+        ],
+        [
+          "0x4087e7",
+          "call",
+          "dword ptr [edx + 0x6c]"
+        ]
+      ]
+    },
+    {
+      "caller": "LoadBike",
+      "target": "0x4b8df0",
+      "site": "0x408828",
+      "instructions": [
+        [
+          "0x4087f1",
+          "lea",
+          "ecx, [eax + ebp + 4]"
+        ],
+        [
+          "0x4087f5",
+          "call",
+          "0x469190"
+        ],
+        [
+          "0x4087fa",
+          "push",
+          "0x710"
+        ],
+        [
+          "0x4087ff",
+          "push",
+          "0x566e4c"
+        ],
+        [
+          "0x408804",
+          "push",
+          "0x608"
+        ],
+        [
+          "0x408809",
+          "call",
+          "0x4a3010"
+        ],
+        [
+          "0x40880e",
+          "add",
+          "esp, 0xc"
+        ],
+        [
+          "0x408811",
+          "mov",
+          "dword ptr [esp + 0x38], eax"
+        ],
+        [
+          "0x408815",
+          "cmp",
+          "eax, ebx"
+        ],
+        [
+          "0x408817",
+          "mov",
+          "dword ptr [esp + 0x2d8], 6"
+        ],
+        [
+          "0x408822",
+          "je",
+          "0x40882f"
+        ],
+        [
+          "0x408824",
+          "push",
+          "1"
+        ],
+        [
+          "0x408826",
+          "mov",
+          "ecx, eax"
+        ],
+        [
+          "0x408828",
+          "call",
+          "0x4b8df0"
+        ],
+        [
+          "0x40882d",
+          "jmp",
+          "0x408831"
+        ],
+        [
+          "0x40882f",
+          "xor",
+          "eax, eax"
+        ],
+        [
+          "0x408831",
+          "mov",
+          "dword ptr [ebp + 0x72c], eax"
+        ],
+        [
+          "0x408837",
+          "mov",
+          "ecx, dword ptr [ebp + 0x124]"
+        ],
+        [
+          "0x40883d",
+          "push",
+          "esi"
+        ],
+        [
+          "0x40883e",
+          "push",
+          "ecx"
+        ],
+        [
+          "0x40883f",
+          "mov",
+          "ecx, dword ptr [ebp + 4]"
+        ],
+        [
+          "0x408842",
+          "mov",
+          "edx, dword ptr [eax]"
+        ],
+        [
+          "0x408844",
+          "mov",
+          "dword ptr [esp + 0x2e0], esi"
+        ],
+        [
+          "0x40884b",
+          "mov",
+          "ecx, dword ptr [ecx + 4]"
+        ],
+        [
+          "0x40884e",
+          "mov",
+          "ecx, dword ptr [ecx + ebp + 0x1c]"
+        ],
+        [
+          "0x408852",
+          "push",
+          "ecx"
+        ],
+        [
+          "0x408853",
+          "mov",
+          "ecx, eax"
+        ],
+        [
+          "0x408855",
+          "call",
+          "dword ptr [edx + 0x6c]"
+        ],
+        [
+          "0x408858",
+          "mov",
+          "edx, dword ptr [ebp + 4]"
+        ],
+        [
+          "0x40885b",
+          "push",
+          "eax"
+        ],
+        [
+          "0x40885c",
+          "mov",
+          "eax, dword ptr [edx + 4]"
+        ],
+        [
+          "0x40885f",
+          "lea",
+          "ecx, [eax + ebp + 4]"
+        ],
+        [
+          "0x408863",
+          "call",
+          "0x469190"
+        ],
+        [
+          "0x408868",
+          "push",
+          "0x711"
+        ],
+        [
+          "0x40886d",
+          "push",
+          "0x566e4c"
+        ],
+        [
+          "0x408872",
+          "push",
+          "0x47c"
+        ]
+      ]
+    },
+    {
+      "caller": "LoadBike",
+      "target": "0x4b9f40",
+      "site": "0x408896",
+      "instructions": [
+        [
+          "0x40885f",
+          "lea",
+          "ecx, [eax + ebp + 4]"
+        ],
+        [
+          "0x408863",
+          "call",
+          "0x469190"
+        ],
+        [
+          "0x408868",
+          "push",
+          "0x711"
+        ],
+        [
+          "0x40886d",
+          "push",
+          "0x566e4c"
+        ],
+        [
+          "0x408872",
+          "push",
+          "0x47c"
+        ],
+        [
+          "0x408877",
+          "call",
+          "0x4a3010"
+        ],
+        [
+          "0x40887c",
+          "add",
+          "esp, 0xc"
+        ],
+        [
+          "0x40887f",
+          "mov",
+          "dword ptr [esp + 0x38], eax"
+        ],
+        [
+          "0x408883",
+          "cmp",
+          "eax, ebx"
+        ],
+        [
+          "0x408885",
+          "mov",
+          "dword ptr [esp + 0x2d8], 7"
+        ],
+        [
+          "0x408890",
+          "je",
+          "0x40889d"
+        ],
+        [
+          "0x408892",
+          "push",
+          "1"
+        ],
+        [
+          "0x408894",
+          "mov",
+          "ecx, eax"
+        ],
+        [
+          "0x408896",
+          "call",
+          "0x4b9f40"
+        ],
+        [
+          "0x40889b",
+          "jmp",
+          "0x40889f"
+        ],
+        [
+          "0x40889d",
+          "xor",
+          "eax, eax"
+        ],
+        [
+          "0x40889f",
+          "mov",
+          "dword ptr [ebp + 0x730], eax"
+        ],
+        [
+          "0x4088a5",
+          "mov",
+          "ecx, dword ptr [ebp + 0x124]"
+        ],
+        [
+          "0x4088ab",
+          "push",
+          "esi"
+        ],
+        [
+          "0x4088ac",
+          "push",
+          "ecx"
+        ],
+        [
+          "0x4088ad",
+          "mov",
+          "ecx, dword ptr [ebp + 4]"
+        ],
+        [
+          "0x4088b0",
+          "mov",
+          "edx, dword ptr [eax]"
+        ],
+        [
+          "0x4088b2",
+          "mov",
+          "dword ptr [esp + 0x2e0], esi"
+        ],
+        [
+          "0x4088b9",
+          "mov",
+          "ecx, dword ptr [ecx + 4]"
+        ],
+        [
+          "0x4088bc",
+          "mov",
+          "ecx, dword ptr [ecx + ebp + 0x1c]"
+        ],
+        [
+          "0x4088c0",
+          "push",
+          "ecx"
+        ],
+        [
+          "0x4088c1",
+          "mov",
+          "ecx, eax"
+        ],
+        [
+          "0x4088c3",
+          "call",
+          "dword ptr [edx + 0x6c]"
+        ],
+        [
+          "0x4088c6",
+          "mov",
+          "edx, dword ptr [ebp + 4]"
+        ],
+        [
+          "0x4088c9",
+          "push",
+          "eax"
+        ],
+        [
+          "0x4088ca",
+          "mov",
+          "eax, dword ptr [edx + 4]"
+        ],
+        [
+          "0x4088cd",
+          "lea",
+          "ecx, [eax + ebp + 4]"
+        ],
+        [
+          "0x4088d1",
+          "call",
+          "0x469190"
+        ],
+        [
+          "0x4088d6",
+          "mov",
+          "ecx, dword ptr [ebp + 0x730]"
+        ],
+        [
+          "0x4088dc",
+          "mov",
+          "dword ptr [ecx + 0x60], 1"
+        ],
+        [
+          "0x4088e3",
+          "mov",
+          "dword ptr [esp + 0x18], 0xbfa70a3d"
+        ]
+      ]
+    },
+    {
+      "caller": "LoadVehicle",
+      "target": "0x4b9830",
+      "site": "0x52621e",
+      "instructions": [
+        [
+          "0x5261e8",
+          "cmp",
+          "dword ptr [esi + 0x124], ebx"
+        ],
+        [
+          "0x5261ee",
+          "je",
+          "0x52625b"
+        ],
+        [
+          "0x5261f0",
+          "push",
+          "0x1dc"
+        ],
+        [
+          "0x5261f5",
+          "push",
+          "0x575918"
+        ],
+        [
+          "0x5261fa",
+          "push",
+          "0x60c"
+        ],
+        [
+          "0x5261ff",
+          "call",
+          "0x4a3010"
+        ],
+        [
+          "0x526204",
+          "add",
+          "esp, 0xc"
+        ],
+        [
+          "0x526207",
+          "mov",
+          "dword ptr [esp + 0xa4], eax"
+        ],
+        [
+          "0x52620e",
+          "cmp",
+          "eax, ebx"
+        ],
+        [
+          "0x526210",
+          "mov",
+          "dword ptr [esp + 0x20], 2"
+        ],
+        [
+          "0x526218",
+          "je",
+          "0x526225"
+        ],
+        [
+          "0x52621a",
+          "push",
+          "1"
+        ],
+        [
+          "0x52621c",
+          "mov",
+          "ecx, eax"
+        ],
+        [
+          "0x52621e",
+          "call",
+          "0x4b9830"
+        ],
+        [
+          "0x526223",
+          "jmp",
+          "0x526227"
+        ],
+        [
+          "0x526225",
+          "xor",
+          "eax, eax"
+        ],
+        [
+          "0x526227",
+          "mov",
+          "ecx, dword ptr [esi + 0x124]"
+        ],
+        [
+          "0x52622d",
+          "push",
+          "edi"
+        ],
+        [
+          "0x52622e",
+          "push",
+          "ecx"
+        ],
+        [
+          "0x52622f",
+          "mov",
+          "ecx, dword ptr [esi + 4]"
+        ],
+        [
+          "0x526232",
+          "mov",
+          "dword ptr [esi + 0x5ac], eax"
+        ],
+        [
+          "0x526238",
+          "mov",
+          "edx, dword ptr [eax]"
+        ],
+        [
+          "0x52623a",
+          "mov",
+          "ecx, dword ptr [ecx + 4]"
+        ],
+        [
+          "0x52623d",
+          "mov",
+          "dword ptr [esp + 0x28], edi"
+        ],
+        [
+          "0x526241",
+          "mov",
+          "ecx, dword ptr [ecx + esi + 0x1c]"
+        ],
+        [
+          "0x526245",
+          "push",
+          "ecx"
+        ],
+        [
+          "0x526246",
+          "mov",
+          "ecx, eax"
+        ],
+        [
+          "0x526248",
+          "call",
+          "dword ptr [edx + 0x6c]"
+        ],
+        [
+          "0x52624b",
+          "mov",
+          "edx, dword ptr [esi + 4]"
+        ],
+        [
+          "0x52624e",
+          "push",
+          "eax"
+        ],
+        [
+          "0x52624f",
+          "mov",
+          "eax, dword ptr [edx + 4]"
+        ],
+        [
+          "0x526252",
+          "lea",
+          "ecx, [eax + esi + 4]"
+        ],
+        [
+          "0x526256",
+          "call",
+          "0x469190"
+        ],
+        [
+          "0x52625b",
+          "push",
+          "0x1e0"
+        ],
+        [
+          "0x526260",
+          "push",
+          "0x575918"
+        ],
+        [
+          "0x526265",
+          "push",
+          "0x18"
+        ]
+      ]
+    }
+  ],
+  "setter_windows": [
+    {
+      "source": "Bike.cpp",
+      "caller": "UnknownVirtualSlot38@Bike",
+      "target_va": "0x00405190",
+      "extent": 2874,
+      "site": "0x405392",
+      "instructions": [
+        [
+          "0x405377",
+          "mov",
+          "eax, dword ptr [ecx]"
+        ],
+        [
+          "0x405379",
+          "sub",
+          "esp, 0xc"
+        ],
+        [
+          "0x40537c",
+          "mov",
+          "edx, esp"
+        ],
+        [
+          "0x40537e",
+          "mov",
+          "dword ptr [edx], eax"
+        ],
+        [
+          "0x405380",
+          "mov",
+          "eax, dword ptr [ecx + 4]"
+        ],
+        [
+          "0x405383",
+          "mov",
+          "ecx, dword ptr [ecx + 8]"
+        ],
+        [
+          "0x405386",
+          "mov",
+          "dword ptr [edx + 4], eax"
+        ],
+        [
+          "0x405389",
+          "mov",
+          "dword ptr [edx + 8], ecx"
+        ],
+        [
+          "0x40538c",
+          "mov",
+          "ecx, dword ptr [esi + 0x5ac]"
+        ],
+        [
+          "0x405392",
+          "call",
+          "0x4b9dc0"
+        ],
+        [
+          "0x405397",
+          "mov",
+          "edx, dword ptr [esi + 0x5ac]"
+        ],
+        [
+          "0x40539d",
+          "mov",
+          "dword ptr [esp + 0x10], 0"
+        ],
+        [
+          "0x4053a5",
+          "mov",
+          "eax, dword ptr [esp + 0x10]"
+        ],
+        [
+          "0x4053a9",
+          "add",
+          "edx, 0x78"
+        ],
+        [
+          "0x4053ac",
+          "mov",
+          "dword ptr [esp + 0x14], 0x41400000"
+        ],
+        [
+          "0x4053b4",
+          "mov",
+          "ecx, dword ptr [esp + 0x14]"
+        ],
+        [
+          "0x4053b8",
+          "mov",
+          "dword ptr [edx], eax"
+        ],
+        [
+          "0x4053ba",
+          "mov",
+          "dword ptr [esp + 0x18], 0"
+        ],
+        [
+          "0x4053c2",
+          "mov",
+          "eax, dword ptr [esp + 0x18]"
+        ]
+      ]
+    },
+    {
+      "source": "Bike.cpp",
+      "caller": "UnknownVirtualSlot38@Bike",
+      "target_va": "0x00405190",
+      "extent": 2874,
+      "site": "0x40563c",
+      "instructions": [
+        [
+          "0x40561e",
+          "add",
+          "ecx, 0xa0"
+        ],
+        [
+          "0x405624",
+          "mov",
+          "edx, esp"
+        ],
+        [
+          "0x405626",
+          "mov",
+          "eax, dword ptr [ecx]"
+        ],
+        [
+          "0x405628",
+          "mov",
+          "dword ptr [edx], eax"
+        ],
+        [
+          "0x40562a",
+          "mov",
+          "eax, dword ptr [ecx + 4]"
+        ],
+        [
+          "0x40562d",
+          "mov",
+          "dword ptr [edx + 4], eax"
+        ],
+        [
+          "0x405630",
+          "mov",
+          "ecx, dword ptr [ecx + 8]"
+        ],
+        [
+          "0x405633",
+          "mov",
+          "dword ptr [edx + 8], ecx"
+        ],
+        [
+          "0x405636",
+          "mov",
+          "ecx, dword ptr [esi + 0x5ac]"
+        ],
+        [
+          "0x40563c",
+          "call",
+          "0x4b9dc0"
+        ],
+        [
+          "0x405641",
+          "mov",
+          "edx, dword ptr [esi + 0x5ac]"
+        ],
+        [
+          "0x405647",
+          "mov",
+          "dword ptr [esp + 0x10], 0"
+        ],
+        [
+          "0x40564f",
+          "mov",
+          "eax, dword ptr [esp + 0x10]"
+        ],
+        [
+          "0x405653",
+          "add",
+          "edx, 0x78"
+        ],
+        [
+          "0x405656",
+          "mov",
+          "dword ptr [esp + 0x14], 0x41400000"
+        ],
+        [
+          "0x40565e",
+          "mov",
+          "ecx, dword ptr [esp + 0x14]"
+        ],
+        [
+          "0x405662",
+          "mov",
+          "dword ptr [edx], eax"
+        ],
+        [
+          "0x405664",
+          "mov",
+          "dword ptr [esp + 0x18], 0"
+        ],
+        [
+          "0x40566c",
+          "mov",
+          "eax, dword ptr [esp + 0x18]"
+        ]
+      ]
+    },
+    {
+      "source": "Vehicle.cpp",
+      "caller": "UnknownVirtualSlot38@Vehicle",
+      "target_va": "0x5268d0",
+      "extent": 1578,
+      "site": "0x526ad7",
+      "instructions": [
+        [
+          "0x526aba",
+          "add",
+          "eax, 0xa0"
+        ],
+        [
+          "0x526abf",
+          "mov",
+          "ecx, esp"
+        ],
+        [
+          "0x526ac1",
+          "mov",
+          "edx, dword ptr [eax]"
+        ],
+        [
+          "0x526ac3",
+          "mov",
+          "dword ptr [ecx], edx"
+        ],
+        [
+          "0x526ac5",
+          "mov",
+          "edx, dword ptr [eax + 4]"
+        ],
+        [
+          "0x526ac8",
+          "mov",
+          "dword ptr [ecx + 4], edx"
+        ],
+        [
+          "0x526acb",
+          "mov",
+          "eax, dword ptr [eax + 8]"
+        ],
+        [
+          "0x526ace",
+          "mov",
+          "dword ptr [ecx + 8], eax"
+        ],
+        [
+          "0x526ad1",
+          "mov",
+          "ecx, dword ptr [esi + 0x5ac]"
+        ],
+        [
+          "0x526ad7",
+          "call",
+          "0x4b9dc0"
+        ],
+        [
+          "0x526adc",
+          "mov",
+          "ecx, dword ptr [esi + 0x5ac]"
+        ],
+        [
+          "0x526ae2",
+          "mov",
+          "edx, ebp"
+        ],
+        [
+          "0x526ae4",
+          "add",
+          "ecx, 0x78"
+        ],
+        [
+          "0x526ae7",
+          "mov",
+          "dword ptr [esp + 0x28], 0x41400000"
+        ],
+        [
+          "0x526aef",
+          "mov",
+          "eax, dword ptr [esp + 0x28]"
+        ],
+        [
+          "0x526af3",
+          "mov",
+          "dword ptr [esp + 0x24], ebp"
+        ],
+        [
+          "0x526af7",
+          "mov",
+          "dword ptr [ecx], edx"
+        ],
+        [
+          "0x526af9",
+          "mov",
+          "dword ptr [esp + 0x2c], ebp"
+        ],
+        [
+          "0x526afd",
+          "mov",
+          "dword ptr [ecx + 4], eax"
+        ]
+      ]
+    }
+  ],
+  "constructor_evidence": [
+    {
+      "class": "DustParticleEmitter",
+      "instructions": [
+        [
+          "0x4b8a05",
+          "mov",
+          "esi, ecx"
+        ],
+        [
+          "0x4b8a08",
+          "call",
+          "0x468ca0"
+        ],
+        [
+          "0x4b8a3a",
+          "mov",
+          "dword ptr [esi], 0x555ab8"
+        ],
+        [
+          "0x4b8a71",
+          "mov",
+          "eax, esi"
+        ],
+        [
+          "0x4b8a77",
+          "ret",
+          "4"
+        ]
+      ]
+    },
+    {
+      "class": "DirtChunkParticleEmitter",
+      "instructions": [
+        [
+          "0x4b8df7",
+          "mov",
+          "esi, ecx"
+        ],
+        [
+          "0x4b8dfa",
+          "call",
+          "0x468ca0"
+        ],
+        [
+          "0x4b8e06",
+          "mov",
+          "dword ptr [esi], 0x555b34"
+        ],
+        [
+          "0x4b8f07",
+          "mov",
+          "eax, esi"
+        ],
+        [
+          "0x4b8f0c",
+          "ret",
+          "4"
+        ]
+      ]
+    },
+    {
+      "class": "SteamParticleEmitter",
+      "instructions": [
+        [
+          "0x4b9f48",
+          "mov",
+          "esi, ecx"
+        ],
+        [
+          "0x4b9f4b",
+          "call",
+          "0x468ca0"
+        ],
+        [
+          "0x4b9f5b",
+          "mov",
+          "dword ptr [esi], 0x555c9c"
+        ],
+        [
+          "0x4b9ffe",
+          "mov",
+          "eax, esi"
+        ],
+        [
+          "0x4ba004",
+          "ret",
+          "4"
+        ]
+      ]
+    },
+    {
+      "class": "SparkParticleEmitter",
+      "instructions": [
+        [
+          "0x4b9837",
+          "mov",
+          "esi, ecx"
+        ],
+        [
+          "0x4b983a",
+          "call",
+          "0x468ca0"
+        ],
+        [
+          "0x4b9846",
+          "mov",
+          "dword ptr [esi], 0x555c1c"
+        ],
+        [
+          "0x4b995b",
+          "mov",
+          "eax, esi"
+        ],
+        [
+          "0x4b9960",
+          "ret",
+          "4"
+        ]
+      ]
+    }
+  ]
+}
