@@ -23,6 +23,7 @@
 // Near misses and the functions not yet matched are in
 // samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp.
 #include "bvh/BoundingBoxTreeQuery.h"
+#include "collision/CollisionPoint.h"
 
 // Complete 0x00404e60 constructor behavior for this provisional call view.
 Vec3Call::Vec3Call(float x_, float y_, float z_)
@@ -479,26 +480,49 @@ int CapsuleTreeQuery(const Vec3* ends, float radius, float radiusSq, QueryTreeNo
             Vec3 p;
             InverseTransformPointInline(&p, *ends, xf);
             Vec3 d;
-            Vec3TransformNormalTranspose(&d, Vec3Sub(ends[1], ends[0]), xf);
+            {
+                Vec3 delta;
+                Vec3TransformNormalTranspose(&d, *Vec3SubtractCall(&delta, &ends[1], &ends[0]), xf);
+            }
             float t = -(Vec3DotCall(&tri->normal, &p) + tri->planeOffset) / Vec3DotCall(&tri->normal, &d);
             if (!(t < 1.0f))
                 t = 1.0f;
             else if (t <= 0.0f)
                 t = 0.0f;
-            Vec3 c = Vec3Add(Vec3Scale(d, t), p);
-            // Bind the returned vector only through this call expression.
-            float dist = Vec3DotCall(&static_cast<const Vec3&>(Vec3Sub(c, s_vertices[tri->vertex[0]])), &tri->normal);
+            Vec3 c;
+            {
+                Vec3 scaled, sum;
+                c = *Vec3AddCall(&sum, Vec3ScaleCall(&scaled, &d, t), &p);
+            }
+            // Retain result storage for the original full call expression.
+            float dist;
+            {
+                Vec3 delta;
+                dist = Vec3DotCall(Vec3SubtractCall(&delta, &c, &s_vertices[tri->vertex[0]]), &tri->normal);
+            }
             if (QueryAbs(dist) <= radius) {
-                q = Vec3Sub(c, Vec3ScaleLeft(dist, tri->normal));
+                {
+                    Vec3 delta;
+                    q = *Vec3SubtractCall(&delta, &c, &static_cast<const Vec3&>(Vec3ScaleLeft(dist, tri->normal)));
+                }
                 if (PointInTriangle(&q, tri))
                     return 1;
-                e = Vec3Sub(s_vertices[tri->vertex[1]], s_vertices[tri->vertex[0]]);
+                {
+                    Vec3 delta;
+                    e = *Vec3SubtractCall(&delta, &s_vertices[tri->vertex[1]], &s_vertices[tri->vertex[0]]);
+                }
                 if (SegmentSegmentDistance(&p, &d, &s_vertices[tri->vertex[0]], &e) > radius)
                     return 1;
-                e = Vec3Sub(s_vertices[tri->vertex[2]], s_vertices[tri->vertex[1]]);
+                {
+                    Vec3 delta;
+                    e = *Vec3SubtractCall(&delta, &s_vertices[tri->vertex[2]], &s_vertices[tri->vertex[1]]);
+                }
                 if (SegmentSegmentDistance(&p, &d, &s_vertices[tri->vertex[1]], &e) > radius)
                     return 1;
-                e = Vec3Sub(s_vertices[tri->vertex[0]], s_vertices[tri->vertex[2]]);
+                {
+                    Vec3 delta;
+                    e = *Vec3SubtractCall(&delta, &s_vertices[tri->vertex[0]], &s_vertices[tri->vertex[2]]);
+                }
                 if (SegmentSegmentDistance(&p, &d, &s_vertices[tri->vertex[2]], &e) > radius)
                     return 1;
             }
@@ -507,13 +531,21 @@ int CapsuleTreeQuery(const Vec3* ends, float radius, float radiusSq, QueryTreeNo
             Vec3 p = ((QueryPointLeaf*)node)->point;
             TransformPointInline(&p, p, xf);
             Vec3 dir = Vec3Call(ends[1].x - ends[0].x, ends[1].y - ends[0].y, ends[1].z - ends[0].z);
-            float t = Vec3DotCall(&dir, &static_cast<const Vec3&>(Vec3Sub(p, *ends))) / Vec3DotCall(&dir, &dir);
+            float t;
+            {
+                Vec3 delta;
+                t = Vec3DotCall(&dir, Vec3SubtractCall(&delta, &p, ends)) / Vec3DotCall(&dir, &dir);
+            }
             if (!(t < 1.0f))
                 t = 1.0f;
             else if (t <= 0.0f)
                 t = 0.0f;
-            if (Vec3Length(Vec3Sub(p, Vec3Add(Vec3ScaleLeft(t, dir), *ends))) < radius)
-                return 1;
+            {
+                Vec3 sum, delta;
+                if (CollisionLength(reinterpret_cast<const CollisionVec3*>(Vec3SubtractCall(&delta, &p,
+                        Vec3AddCall(&sum, &static_cast<const Vec3&>(Vec3ScaleLeft(t, dir)), ends)))) < radius)
+                    return 1;
+            }
         }
     } else if (BoxCapsuleOverlap(&node->center, &node->halfExtents, ends, radius, radiusSq, xf)) {
         int hit = CapsuleTreeQuery(ends, radius, radiusSq, node->child[0], xf, triangles);

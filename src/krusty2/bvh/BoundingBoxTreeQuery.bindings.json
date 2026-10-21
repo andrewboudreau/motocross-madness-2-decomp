@@ -74,9 +74,7 @@
   "?GrowBoxByTransformedBox@@YAXPAUVec3@@0U1@1PBUMatrix4@@@Z": "0x004290d0",
   "?BoxCapsuleOverlap@@YAHPBUVec3@@00MMPBUMatrix4@@@Z": "0x00425900",
   "?SegmentSegmentDistance@@YAMPBUVec3@@000@Z": "0x0042a640",
-  "?Vec3Add@@YA?AUVec3@@ABU1@0@Z": "0x00421cb0",
-  "?Vec3Length@@YAMABUVec3@@@Z": "0x00435ec0",
-  "?Vec3Scale@@YA?AUVec3@@ABU1@M@Z": "0x005015b0",
-  "?Vec3ScaleLeft@@YA?AUVec3@@MABU1@@Z": "0x00428090",
-  "?Vec3Sub@@YA?AUVec3@@ABU1@0@Z": "0x00421d00"
+  "?Vec3AddCall@@YAPAUVec3@@PAU1@PBU1@1@Z": "0x00421cb0",
+  "?CollisionLength@@YAMPBUCollisionVec3@@@Z": "0x00435ec0",
+  "?Vec3ScaleLeft@@YA?AUVec3@@MABU1@@Z": "0x00428090"
 }

@@ -12,6 +12,15 @@ from match import compare  # noqa: E402
 
 CASES = [
     {
+        'name': 'Scalar-first vector multiplication',
+        'bindings': 'src/reconstructed/VectorScaleLeft.bindings.json',
+        'source': 'src/reconstructed/VectorScaleLeft.cpp',
+        'symbol': '?Vec3ScaleLeft@@YA?AUVec3@@MABU1@@Z',
+        'target_va': '0x00428090',
+        'target_size': 69,
+        'reason': 'complete scalar-first cdecl body with hidden 12-byte result; two verified BVH calls, original TU unknown',
+    },
+    {
         'name': 'CollisionObject secondary-base tick forwarding',
         'bindings': 'src/reconstructed/CollisionObjectTick.bindings.json',
         'source': 'src/reconstructed/CollisionObjectTick.cpp',
