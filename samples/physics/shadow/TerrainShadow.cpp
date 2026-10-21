@@ -383,6 +383,25 @@ full:
 // frustum's corner rays at the height field and accumulates the hit cells' grid rectangle
 // (minX..maxZ) and the hits' screen rectangle (field_0x6668..field_0x6674); returns whether
 // the footprint is on screen and large enough (tier 3 semantics).
+// The accumulate macro is braced under each CastSegment test: unbraced, only its first
+// statement was conditional.  hit, cell, right and up are declared once at function scope and
+// both modes assign right and up, which gives retail's temporary-then-copy stores and its
+// `add ecx, 0x188` for up.  Retail's frame, from the call arguments (offsets from esp after
+// the prologue): screen 0xc, the mode 2 step 0x18, hit 0x24, eye 0x30, cell 0x3c, up 0x40,
+// right 0x4c, code 0x58, the corners 0x5c, the near corners 0x94; the mode 2 sum/difference
+// results sit at 0 and 0xc4 and 8 bytes of select temporaries at 0x8c.  This form has all of
+// those except cell 0x30 and eye 0x34 (declaration order does not move them).
+// Remaining (534/3119): eax/ecx swap from the eight min/max initial stores onward (retail
+// loads 0x7f7fffff into ecx for 0x6668/0x6670 and the shadow into ecx after them); mode 1's
+// failure path is a 25-byte copy here where retail jumps to the shared exit 0x005097b7; push
+// and lea scheduling around CastSegment and ProjectVertices; lensScale kept on the x87 stack;
+// one missing `add eax, 0x17c`.  One FINISH after the if/else shrinks the function to 2938
+// bytes (496): the inline budget needs both copies.
+// ---------------------------------------------------------------------------------------------
+// 0x00508bc0 (slot 27, 3087 bytes): the shadow's footprint on the terrain.  Casts the light
+// frustum's corner rays at the height field and accumulates the hit cells' grid rectangle
+// (minX..maxZ) and the hits' screen rectangle (field_0x6668..field_0x6674); returns whether
+// the footprint is on screen and large enough (tier 3 semantics).
 // Lead (not taken): `right` and `up` declared once at function scope and assigned in both
 // modes give retail's temporary-then-copy stores for both and its `add ecx, 0x188` for up
 // (3088 bytes, 745 aligned instructions with registers and displacements masked against 730
@@ -530,29 +549,32 @@ int TerrainShadow::UnknownVirtualSlot27()
     field_0x6670 = 3.4028235e38f;
     field_0x6674 = -3.4028235e38f;
     TerrainShadowVec eye = TERRAIN_SHADOW_CAMERA()->eye;
+    TerrainShadowVec hit;
     TerrainShadowVec screen;
     int code;
+    TerrainCell* cell;
+    TerrainShadowVec right;
+    TerrainShadowVec up;
     if (shadow->mode == 1) {
         eye += TERRAIN_SHADOW_CAMERA()->look * TERRAIN_SHADOW_CAMERA()->field_0x198;
         float half = (float)shadow->texture->size * 0.5f;
-        TerrainShadowVec right = TerrainShadowCross(TERRAIN_SHADOW_CAMERA()->look, TERRAIN_SHADOW_CAMERA()->up) * half;
-        TerrainShadowVec up = TERRAIN_SHADOW_CAMERA()->up * half;
+        right = TerrainShadowCross(TERRAIN_SHADOW_CAMERA()->look, TERRAIN_SHADOW_CAMERA()->up) * half;
+        up = TERRAIN_SHADOW_CAMERA()->up * half;
         TerrainShadowVec corners[4];
         corners[0] = (eye - right) - up;
         corners[1] = (right + eye) + up;
         corners[2] = (right + eye) - up;
         corners[3] = (eye - right) + up;
         for (int i = 0; i < 4; i++) {
-            TerrainShadowVec hit;
-            TerrainCell* cell;
-            if (((TerrainShadowCaster*)caster)->CastSegment(&TERRAIN_SHADOW_CAMERA()->eye, &corners[i], &hit, &cell, 0, 0))
+            if (((TerrainShadowCaster*)caster)->CastSegment(&TERRAIN_SHADOW_CAMERA()->eye, &corners[i], &hit, &cell, 0, 0)) {
                 TERRAIN_SHADOW_ACCUMULATE(cell, hit);
+            }
         }
         TERRAIN_SHADOW_FINISH();
     } else {
         eye += TERRAIN_SHADOW_CAMERA()->look * 10000.0f;
-        TerrainShadowVec right = TerrainShadowCross(TERRAIN_SHADOW_CAMERA()->look, TERRAIN_SHADOW_CAMERA()->up) * shadow->lensScale;
-        TerrainShadowVec up = TERRAIN_SHADOW_CAMERA()->up * shadow->lensScale;
+        right = TerrainShadowCross(TERRAIN_SHADOW_CAMERA()->look, TERRAIN_SHADOW_CAMERA()->up) * shadow->lensScale;
+        up = TERRAIN_SHADOW_CAMERA()->up * shadow->lensScale;
         TerrainShadowVec nearCorners[4];
         nearCorners[0] = (TERRAIN_SHADOW_CAMERA()->eye - right) - up;
         nearCorners[1] = (right + TERRAIN_SHADOW_CAMERA()->eye) + up;
@@ -564,8 +586,6 @@ int TerrainShadow::UnknownVirtualSlot27()
         farCorners[2] = TerrainShadowSubtractCtorCall(TerrainShadowAddCtorCall(right, eye), up);
         farCorners[3] = TerrainShadowSum(TerrainShadowDifference(eye, right), up);
         for (int i = 0; i < 4; i++) {
-            TerrainShadowVec hit;
-            TerrainCell* cell;
             while (((TerrainShadowCaster*)caster)->CastSegment(&nearCorners[i], &farCorners[i], &hit, &cell, 0, 0)) {
                 TERRAIN_SHADOW_ACCUMULATE(cell, hit);
                 TerrainShadowVec step = TerrainShadowVecCall(TERRAIN_SHADOW_CAMERA()->look.x * 3.0f, TERRAIN_SHADOW_CAMERA()->look.y * 3.0f, TERRAIN_SHADOW_CAMERA()->look.z * 3.0f);
