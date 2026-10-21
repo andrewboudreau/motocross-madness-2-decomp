@@ -540,7 +540,7 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStre
 // Helpers reconstructed elsewhere.
 // 0x0047b8a0 (gameui.cpp tail): a float profile value, `defaultValue` when the key is "NONE".
 float ReadIniFloat(const char* section, const char* key, double defaultValue, const char* path);
-void FilePrintf(FILE* file, const char* format, ...); // 0x00461d40: fprintf
+#include "FilePrintf.h"
 UnknownBitmapFile* ReadBitmap(const char* path, UnknownBitmapFile* into); // 0x00424140
 void FreeBitmap(UnknownBitmapFile* bitmap);                  // 0x004245b0
 UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* into, int a); // 0x005125c0

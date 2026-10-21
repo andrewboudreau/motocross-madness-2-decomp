@@ -23,48 +23,40 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The [shared clipper declaration](CLIPPER_GLOBAL_CONNECTIONS.md) joins six
-provisional pointer spellings to the canonical VisibilityClipper import. Its
-345 strict checks retain 15 complete objects: 1,035 sections and 4,712
-relocations, including the transitive Terrain consumer. All 46 encoded retail
-pointer loads are verified. The narrow global header avoids exposing unrelated
-method declarations to those consumers. Canonical clipper storage remains
-unresolved; this slice does not invent an object or constructor.
+The [FilePrintf declaration connection](FILE_PRINTF_CONNECTION.md) joins the
+obsolete void-return spelling to the existing integer-returning implementation.
+Its 74 strict checks preserve four complete objects (300 sections and 1,464
+relocations), including the unadmitted EcoSystem listing. Seven actual call
+sites and 227 tests with real VC6 CRT streams check arguments, formatted output,
+return values and a read-only stream failure. No caller body or provider changes.
 
-Four [font rectangle index cells](FONTTEXTURE.md#font-rectangle-index-storage)
-now supply the writable values 0, 1, 2 and 3 read by FontTexture::Load. All
-sixteen initial bytes, scalar extents, four actual retail loads and constructor
-arguments are checked. The new object has no code, initializer, relocation or
-external dependency. All 22 strict FontTexture and Rectangle2D comparisons
-remain intact; original names, aggregate membership and TU ownership are unknown.
+The [HUD rectangle-restoration candidate](OVERLAY_RESTORE_RECT.md#functional-build-review)
+now supplies Overlay::RestoreRect for the existing statistics and chat callers.
+It remains reviewed nonexact: 365 emitted bytes against the complete 365 retail
+bytes, with 77 resolved matching positions. Explicit ordered field reads model
+decoded fault behavior; they do not establish original volatile qualification.
+Its 12,970 finite native cases use actual strict lock/unlock and pixel-format
+helpers, with 17 strict helper/producer/caller checks and eight verified direct
+calls. COM surfaces remain scripted; integrated HUD behavior is unverified.
 
-The [edit-box drawing candidate](EDIT_BOX_DRAW.md#functional-build-review)
-now supplies the missing menu text/image/caret/IME operation. It remains
-reviewed nonexact: 975 emitted bytes against the complete 973 retail bytes,
-with 206 resolved matching positions. Its 14,793 native cases use thirteen
-actual strict helpers; 27 helper/constructor checks and the complete 733-section,
-3,912-relocation aggregate remain intact. Signed layout oracles, reached
-callback/exception boundaries and partial-fault state are checked. Background
-GetDc and COM/GDI/IME remain scripted boundaries; integrated menus are unverified.
-
-All 251 prior production objects preserve 10,663 nondebug sections and 45,701
-relocations under only the six reviewed global-name connections, with no
-filename exclusions. Both new objects independently reproduce their actual
-game-command emission. Real links remove exactly eleven missing names,
-**256 -> 250 -> 246 -> 245**, with none added. The final report checks all 253
-source hashes, 229 header hashes, configuration, profile and per-source flags.
-Private evidence is in `work/game-build/round47-link-evidence.json`,
-`round47-all-objects.json`, `round47-admitted.json` and
-`connections-round47-preservation.json`.
+All 253 prior production objects preserve 10,669 nondebug sections and 45,717
+relocations under only the FilePrintf external-name correction, with no
+filename exclusions. The new two-section, three-relocation Overlay object
+independently reproduces its actual game-command emission. Real links remove
+exactly two missing names, **245 -> 244 -> 243**, with none added. The final
+report checks all 254 source hashes, 230 header hashes, configuration, profile
+and per-source flags. Private evidence is in
+`work/game-build/round48-link-evidence.json`, `round48-all-objects.json`,
+`round48-admitted.json` and `connections-round48-preservation.json`.
 
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and excluded from strict counts.
 The only per-source compiler exception remains `/QIfist` for the motion-start
 helper; this slice changes no compiler flags. Finite native checks do not
-establish integrated gameplay. Static checks pass for 260 Python files
-and 401 JSON files.
-The final full regression run passes: 542 tests, 531 passed and 11 skipped
-(`work/game-build/tests-round47-final.log`).
+establish integrated gameplay. Static checks pass for 262 Python files
+and 402 JSON files.
+The final full regression run passes: 544 tests, 533 passed and 11 skipped
+(`work/game-build/tests-round48-final.log`).
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

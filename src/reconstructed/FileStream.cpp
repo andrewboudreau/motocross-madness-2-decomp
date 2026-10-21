@@ -21,6 +21,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "FilePrintf.h"
 #include "TextureMap.h"
 #include "ResourceManager.h"
 

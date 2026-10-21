@@ -15,7 +15,7 @@
 extern "C" __declspec(dllimport) int __stdcall DeleteObject(void* object);
 
 // cdecl 0x00461d40: formatted output to `file`.
-void FilePrintf(FILE* file, const char* format, ...);
+#include "FilePrintf.h"
 
 // Texels of a square level-`level` texture (1 for level 0, none below).
 static inline int LevelArea(int level) {

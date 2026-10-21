@@ -71,7 +71,7 @@
   "?UnknownCompare50ef00@@YAHPBX0@Z": "0x0050ef00",
   "?Print@DebugOverlay@@QAAXHPBDZZ": "0x00447f40",
   "?Title@DebugOverlay@@QAAXHPBDZZ": "0x00447fa0",
-  "?FilePrintf@@YAXPAU_iobuf@@PBDZZ": "0x00461d40",
+  "?FilePrintf@@YAHPAU_iobuf@@PBDZZ": "0x00461d40",
   "?UnknownFunction464e90@ManagedTextureGroup@@QAEXXZ": "0x00464e90",
   "?ReadClock@@YAIXZ": "0x004bfa80",
   "?LargestRecentSample@UnknownTimer@@QAEHXZ": "0x004cb690",

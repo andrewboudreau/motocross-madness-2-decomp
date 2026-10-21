@@ -1,0 +1,28 @@
+{
+  "baseline": "Published f6c22865 before declaration correction; each same-path complete object preserves all nondebug bytes, flags and relocation targets under only the FilePrintf void-to-int external-name substitution. Only enumerated full source filenames are checkout-relative.",
+  "rename": {
+    "?FilePrintf@@YAXPAU_iobuf@@PBDZZ": "?FilePrintf@@YAHPAU_iobuf@@PBDZZ"
+  },
+  "objects": {
+    "src/reconstructed/FileStream.cpp": {
+      "sections": 20,
+      "relocations": 61,
+      "sha256": "69b9f1f5cf561449f1ff0965c035507cda6b05a075471c017c70a688fa473826"
+    },
+    "src/reconstructed/ManagedTextureGroup.cpp": {
+      "sections": 50,
+      "relocations": 239,
+      "sha256": "ae790032816ba3bed39d6def170dd7b4e066bb6e3a5b775f81938af84e49ee80"
+    },
+    "src/reconstructed/EcoSystem.cpp": {
+      "sections": 132,
+      "relocations": 720,
+      "sha256": "9da6f6357818cc3611fb2d5c2fa6e600e2099dbfe7e49e59621ee812a0f570bf"
+    },
+    "samples/ecosystem/EcoSystemNearMisses.cpp": {
+      "sections": 98,
+      "relocations": 444,
+      "sha256": "249de017371bed4040b56f55be293f33e1ddc57bc2c509eaad45fe8fe97cd42f"
+    }
+  }
+}

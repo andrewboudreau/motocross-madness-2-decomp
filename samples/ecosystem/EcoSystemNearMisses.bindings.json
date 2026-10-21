@@ -165,7 +165,7 @@
   "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?Seek@UnknownTextureStream@@QAEHHHH@Z": "0x00461340",
   "?Read@UnknownTextureStream@@QAEHPAXHH@Z": "0x00461640",
-  "?FilePrintf@@YAXPAU_iobuf@@PBDZZ": "0x00461d40",
+  "?FilePrintf@@YAHPAU_iobuf@@PBDZZ": "0x00461d40",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?ReadIniFloat@@YAMPBD0N0@Z": "0x0047b8a0",
   "?FindLightOfType@LightManager@@QAEPAVUnknownEcoLight@@H@Z": "0x004a0190",

@@ -1,16 +1,6 @@
-// Near-miss overlay.cpp candidate, kept out of src/reconstructed until it
-// matches (Overlay.cpp holds the rest of the file).
-//
-// Overlay::RestoreRect (0x004b6710, 361 bytes): `top` read once before
-// the copy branch (retail loads rect->top ahead of the `whole` test) frees
-// esi for `this` and reloads `rect` from the stack as retail does; height
-// before width gives retail's subtrahend-first loads (53 -> 63 of 361).
-// Left: retail keeps `whole` and the byte count on the stack (6 slots,
-// the else branch's offset sharing whole's slot), the destination in ebp
-// and the row count in eax; VC6 here keeps `whole` in edi and the byte
-// count in ebp, and the row count and destination on the stack. Count-down
-// for/while/do-while loops, `whole` set first, set from the comparison or
-// preset to 0, and a bytes-per-pixel local do not get that.
+// Overlay::RestoreRect, complete retail 0x004b6710..0x004b687c (365 bytes).
+// Reviewed functional candidate; emitted code remains nonexact. See
+// docs/OVERLAY_RESTORE_RECT.md for the ordered-read repair and finite proof.
 #include <string.h>
 
 #include "../../src/reconstructed/Overlay.h"
@@ -18,8 +8,15 @@
 
 // 0x004b6710. A rectangle as wide as the texture is copied in one block.
 int Overlay::RestoreRect(const UnknownOverlayRect* rect) {
-    int height = rect->bottom - rect->top;
-    int width = rect->right - rect->left;
+    // Model the decoded left/top/right/bottom access order, including faults.
+    // This qualification describes reconstructed behavior, not an original type.
+    const volatile UnknownOverlayRect* initial = rect;
+    int initialLeft = initial->left;
+    int initialTop = initial->top;
+    int initialRight = initial->right;
+    int initialBottom = initial->bottom;
+    int height = initialBottom - initialTop;
+    int width = initialRight - initialLeft;
     int whole;
     int bytes;
     if (width == overlayTexture->textureWidth) {

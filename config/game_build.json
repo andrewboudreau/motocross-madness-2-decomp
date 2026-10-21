@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/render/OverlayNearMisses.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete HUD rectangle restoration checked in 12970 finite native scenarios with actual strict texture-lock and pixel-format helpers. Explicit ordered reads preserve decoded fault behavior. VC6 emits 365 bytes against 365 retail bytes, with 77 resolved matching positions.",
+      "evidence": "docs/OVERLAY_RESTORE_RECT.md#functional-build-review"
+    },
+    {
       "path": "samples/ui/EditBoxDraw.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete edit-box text, image, caret and IME drawing candidate passes 14793 native scenarios with thirteen actual strict helpers and independent layout, callback, fault and held-DC checks. VC6 emits 975 bytes against 973 retail bytes, with 206 resolved matching positions; extraction preserves all 733 aggregate sections and 3912 relocations. Background GetDc and COM/GDI/IME boundaries remain scripted; integrated menu rendering is unverified.",
