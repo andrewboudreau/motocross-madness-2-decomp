@@ -1,0 +1,2127 @@
+{
+  "objects": {
+    "src/krusty2/vehicle/Vehicle.cpp": {
+      "sections": 151,
+      "relocations": 720,
+      "sha256": "b1f879a0acb36c047a0836909fa0e470f4cfa00fa1276fbe245c22851c4c11e3"
+    },
+    "src/krusty2/vehicle/Bike.cpp": {
+      "sections": 242,
+      "relocations": 1089,
+      "sha256": "4685bb42b8a736ce5dd527b9cc8c038bd46e3d05a5589fca84b0e4a5c715a903"
+    },
+    "src/krusty2/vehicle/KrustyBike.cpp": {
+      "sections": 243,
+      "relocations": 1054,
+      "sha256": "154f6344186e5213e9a8eb08ca388eb7b51221089a586b26b40c07697b0b8c0c"
+    },
+    "src/reconstructed/VehicleDefaults.cpp": {
+      "sections": 13,
+      "relocations": 20,
+      "sha256": "ec2fd79a2e78acacd6ce66af726ae0fb4da1658b97b30e5fcc0507809ff38008"
+    },
+    "src/reconstructed/VehicleMethods.cpp": {
+      "sections": 27,
+      "relocations": 26,
+      "sha256": "f768a01910966ec30529f25efb3b937a22844915ddfedda3657efd98255a0968"
+    },
+    "src/reconstructed/VehicleReset.cpp": {
+      "sections": 15,
+      "relocations": 32,
+      "sha256": "0a07905867177d183e7ab189c3abd3851bf1451dc2d3241b43a0e11cf9174c73"
+    },
+    "src/reconstructed/VehicleWheelAttachment.cpp": {
+      "sections": 12,
+      "relocations": 24,
+      "sha256": "80d2e9a25d07f80bab29b81a8873c4dd9bb92ae33432b9ca4fae9324ea2250a4"
+    },
+    "samples/physics/bikeai/BikeAINearMisses.cpp": {
+      "sections": 98,
+      "relocations": 818,
+      "sha256": "efa2251fce054ed9508afafd2c01f7fee62e689c55005e2605df2b2568cc6573"
+    },
+    "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
+      "sections": 271,
+      "relocations": 1443,
+      "sha256": "ffc9b9c36c3bb2cdce5d9220efb7666ac7dc0da8d9cba53f2354049f52ab4023"
+    },
+    "src/reconstructed/InputDevice.cpp": {
+      "sections": 11,
+      "relocations": 13,
+      "sha256": "b755a0dba049e2c32972e2ffa0e247e052e0035d1db2acca6c16e0c3b0864f14"
+    }
+  },
+  "strict_cases": [
+    {
+      "source": "src/reconstructed/InputDevice.cpp",
+      "symbol": "??0InputDevice@@QAE@H@Z",
+      "va": "0x489780",
+      "extent": 42,
+      "bindings": "src/reconstructed/InputDevice.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/InputDevice.cpp",
+      "symbol": "??_GInputDevice@@UAEPAXI@Z",
+      "va": "0x4897b0",
+      "extent": 30,
+      "bindings": "src/reconstructed/InputDevice.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/InputDevice.cpp",
+      "symbol": "??1InputDevice@@UAE@XZ",
+      "va": "0x4897d0",
+      "extent": 7,
+      "bindings": "src/reconstructed/InputDevice.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/InputDevice.cpp",
+      "symbol": "?IsDeviceSubtype@InputDevice@@QAEHH@Z",
+      "va": "0x4897e0",
+      "extent": 17,
+      "bindings": "src/reconstructed/InputDevice.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleDefaults.cpp",
+      "symbol": "?UnknownVirtualSlot87@Vehicle@@UAEXXZ",
+      "va": "0x464e90",
+      "extent": 1,
+      "bindings": "src/reconstructed/VehicleDefaults.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleDefaults.cpp",
+      "symbol": "?UnknownVirtualSlot94@Vehicle@@UAEXXZ",
+      "va": "0x464e90",
+      "extent": 1,
+      "bindings": "src/reconstructed/VehicleDefaults.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleWheelAttachment.cpp",
+      "symbol": "?UpdateAttachment@VehicleWheel@@QAEXXZ",
+      "va": "0x515660",
+      "extent": 195,
+      "bindings": "src/reconstructed/VehicleWheelAttachment.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "??0VehVec3Call@@QAE@MMM@Z",
+      "va": "0x404e60",
+      "extent": 25,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "??0BikeVec3Call@@QAE@MMM@Z",
+      "va": "0x404e60",
+      "extent": 25,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot72@Bike",
+      "va": "0x405db0",
+      "extent": 724,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot73@Bike",
+      "va": "0x406090",
+      "extent": 44,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot8@Bike",
+      "va": "0x406750",
+      "extent": 231,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot76@Bike",
+      "va": "0x406840",
+      "extent": 395,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot16@Bike",
+      "va": "0x4069d0",
+      "extent": 121,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot33@Bike",
+      "va": "0x406a50",
+      "extent": 135,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot1@Bike",
+      "va": "0x407630",
+      "extent": 205,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "??0Bike@@QAE@H@Z",
+      "va": "0x407700",
+      "extent": 374,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot97@Bike",
+      "va": "0x409420",
+      "extent": 1516,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "??1Bike@@UAE@XZ",
+      "va": "0x409a10",
+      "extent": 276,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot99@Bike",
+      "va": "0x409b30",
+      "extent": 1374,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot100@Bike",
+      "va": "0x40a090",
+      "extent": 232,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot67@Bike",
+      "va": "0x40a180",
+      "extent": 103,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot39@Bike",
+      "va": "0x40a1f0",
+      "extent": 306,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot59@Bike",
+      "va": "0x40a330",
+      "extent": 125,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot56@Bike",
+      "va": "0x40a3b0",
+      "extent": 71,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot57@Bike",
+      "va": "0x40a400",
+      "extent": 117,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot71@Bike",
+      "va": "0x40a480",
+      "extent": 124,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot44@Bike",
+      "va": "0x40a500",
+      "extent": 27,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot90@Bike",
+      "va": "0x40ae50",
+      "extent": 99,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot91@Bike",
+      "va": "0x40aec0",
+      "extent": 1353,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot46@Bike",
+      "va": "0x40b600",
+      "extent": 1066,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot92@Bike",
+      "va": "0x40ba30",
+      "extent": 1157,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot29@Bike",
+      "va": "0x40bec0",
+      "extent": 306,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot62@Bike",
+      "va": "0x40c400",
+      "extent": 189,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot65@Bike",
+      "va": "0x40c5d0",
+      "extent": 307,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot54@Bike",
+      "va": "0x40c8b0",
+      "extent": 354,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot49@Bike",
+      "va": "0x40ca20",
+      "extent": 30,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "??_EBike@@$4PPPPPPPM@A@AEPAXI@Z",
+      "va": "0x40ca40",
+      "extent": 8,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "??_GBike@@UAEPAXI@Z",
+      "va": "0x40ca50",
+      "extent": 51,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot32@Bike",
+      "va": "0x40cba0",
+      "extent": 7,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot47@Bike",
+      "va": "0x40cbb0",
+      "extent": 21,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot41@Bike",
+      "va": "0x40cbd0",
+      "extent": 486,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot98@Bike",
+      "va": "0x40cdc0",
+      "extent": 32,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot42@Bike",
+      "va": "0x40cde0",
+      "extent": 52,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot75@Bike",
+      "va": "0x40ce20",
+      "extent": 64,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot55@Bike",
+      "va": "0x40ce60",
+      "extent": 244,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot5@Bike",
+      "va": "0x40cf60",
+      "extent": 103,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot66@Bike",
+      "va": "0x40cfd0",
+      "extent": 29,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot53@Bike",
+      "va": "0x40cff0",
+      "extent": 63,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot96@Bike",
+      "va": "0x40d030",
+      "extent": 52,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot0@Vehicle",
+      "va": "0x525520",
+      "extent": 45,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot1@Vehicle",
+      "va": "0x525550",
+      "extent": 372,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot43@Vehicle",
+      "va": "0x5256d0",
+      "extent": 199,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "ResetWheelContacts",
+      "va": "0x525a90",
+      "extent": 461,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "RunTickers",
+      "va": "0x525c60",
+      "extent": 79,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "AddEarlyTicker",
+      "va": "0x525cb0",
+      "extent": 57,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "AddLateTicker",
+      "va": "0x525cf0",
+      "extent": 57,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "AddWheel",
+      "va": "0x525d30",
+      "extent": 160,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "VehicleHit@@YA",
+      "va": "0x525dd0",
+      "extent": 46,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "VehicleHitBy@@YA",
+      "va": "0x525e00",
+      "extent": 19,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot3@Vehicle",
+      "va": "0x5264c0",
+      "extent": 264,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot70@Vehicle",
+      "va": "0x526800",
+      "extent": 44,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "CheckCrash",
+      "va": "0x526830",
+      "extent": 150,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot38@Vehicle",
+      "va": "0x5268d0",
+      "extent": 1578,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot39@Vehicle",
+      "va": "0x526f00",
+      "extent": 150,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot7@Vehicle",
+      "va": "0x526fa0",
+      "extent": 1161,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot33@Vehicle",
+      "va": "0x527430",
+      "extent": 365,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot88@Vehicle",
+      "va": "0x5275a0",
+      "extent": 288,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot89@Vehicle",
+      "va": "0x5276c0",
+      "extent": 11,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot46@Vehicle",
+      "va": "0x5276d0",
+      "extent": 523,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E2",
+      "va": "0x5278e0",
+      "extent": 5,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E1",
+      "va": "0x5278f0",
+      "extent": 60,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E5",
+      "va": "0x527930",
+      "extent": 5,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E4",
+      "va": "0x527940",
+      "extent": 60,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E8",
+      "va": "0x527980",
+      "extent": 5,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E7",
+      "va": "0x527990",
+      "extent": 60,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E11",
+      "va": "0x5279d0",
+      "extent": 5,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "_$E10",
+      "va": "0x5279e0",
+      "extent": 60,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot71@Vehicle",
+      "va": "0x527d90",
+      "extent": 154,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot72@Vehicle",
+      "va": "0x527e30",
+      "extent": 831,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot73@Vehicle",
+      "va": "0x528170",
+      "extent": 60,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot44@Vehicle",
+      "va": "0x5283d0",
+      "extent": 43,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "GetAverageGroundNormal",
+      "va": "0x528400",
+      "extent": 291,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot54@Vehicle",
+      "va": "0x528530",
+      "extent": 358,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot57@Vehicle",
+      "va": "0x5289b0",
+      "extent": 7,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot58@Vehicle",
+      "va": "0x5289c0",
+      "extent": 938,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot63@Vehicle",
+      "va": "0x528d70",
+      "extent": 209,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot64@Vehicle",
+      "va": "0x528e50",
+      "extent": 81,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot82@Vehicle",
+      "va": "0x5290b0",
+      "extent": 26,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot81@Vehicle",
+      "va": "0x5290d0",
+      "extent": 26,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot80@Vehicle",
+      "va": "0x5290f0",
+      "extent": 137,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot83@Vehicle",
+      "va": "0x529180",
+      "extent": 114,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot77@Vehicle",
+      "va": "0x529200",
+      "extent": 67,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot84@Vehicle",
+      "va": "0x529250",
+      "extent": 24,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot93@Vehicle",
+      "va": "0x529270",
+      "extent": 11,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UpdateWheelRampLevels",
+      "va": "0x529280",
+      "extent": 221,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot85@Vehicle",
+      "va": "0x529360",
+      "extent": 128,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "Method_005293E0",
+      "va": "0x5293e0",
+      "extent": 104,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "VehVec3Equal",
+      "va": "0x5299e0",
+      "extent": 54,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UpdateWheelsInContact",
+      "va": "0x529a20",
+      "extent": 273,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot76@Vehicle",
+      "va": "0x529b40",
+      "extent": 93,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot86@Vehicle",
+      "va": "0x529ba0",
+      "extent": 127,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "AccumulateWheelContacts",
+      "va": "0x529c20",
+      "extent": 320,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot90@Vehicle",
+      "va": "0x529d60",
+      "extent": 83,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot18@Vehicle",
+      "va": "0x529dc0",
+      "extent": 529,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot19@Vehicle",
+      "va": "0x529fe0",
+      "extent": 679,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot20@Vehicle",
+      "va": "0x52a290",
+      "extent": 614,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot21@Vehicle",
+      "va": "0x52a500",
+      "extent": 24,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot59@Vehicle",
+      "va": "0x52a520",
+      "extent": 10,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot60@Vehicle",
+      "va": "0x52a530",
+      "extent": 126,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot61@Vehicle",
+      "va": "0x52a5b0",
+      "extent": 9,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot62@Vehicle",
+      "va": "0x52a5c0",
+      "extent": 33,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot28@Vehicle",
+      "va": "0x52a5f0",
+      "extent": 173,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot95@Vehicle",
+      "va": "0x52a6a0",
+      "extent": 399,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot48@Vehicle",
+      "va": "0x52a890",
+      "extent": 171,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot50@Vehicle",
+      "va": "0x52b600",
+      "extent": 23,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot53@Vehicle",
+      "va": "0x52b6a0",
+      "extent": 41,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot55@Vehicle",
+      "va": "0x52b6d0",
+      "extent": 63,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot42@Vehicle",
+      "va": "0x52b710",
+      "extent": 39,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot67@Vehicle",
+      "va": "0x52b740",
+      "extent": 66,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot75@Vehicle",
+      "va": "0x52b790",
+      "extent": 337,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot96@Vehicle",
+      "va": "0x52b8f0",
+      "extent": 42,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "?BikeCollisionCallback@@",
+      "va": "0x405cd0",
+      "extent": 145,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "?BikeStaticCollisionCallback@@",
+      "va": "0x405d70",
+      "extent": 58,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E2",
+      "va": "0x407880",
+      "extent": 5,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E1",
+      "va": "0x407890",
+      "extent": 60,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E5",
+      "va": "0x4078d0",
+      "extent": 5,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E4",
+      "va": "0x4078e0",
+      "extent": 60,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E8",
+      "va": "0x407920",
+      "extent": 5,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E7",
+      "va": "0x407930",
+      "extent": 60,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E11",
+      "va": "0x407970",
+      "extent": 5,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "_$E10",
+      "va": "0x407980",
+      "extent": 60,
+      "bindings": "src/krusty2/vehicle/Bike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "??1Vehicle@@UAE@XZ",
+      "va": "0x526380",
+      "extent": 319,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "?Tick@Vehicle@@UAEHM@Z",
+      "va": "0x52a830",
+      "extent": 86,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "?PlaceWheels@Vehicle@@QAEXXZ",
+      "va": "0x528eb0",
+      "extent": 505,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "LoadVehicle@Vehicle",
+      "va": "0x525e20",
+      "extent": 1373,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "Method_00529450@Vehicle",
+      "va": "0x529450",
+      "extent": 1415,
+      "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot27@KrustyBike",
+      "va": "0x48da00",
+      "extent": 75,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot3@KrustyBike",
+      "va": "0x48dbf0",
+      "extent": 109,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot4@KrustyBike",
+      "va": "0x48dc60",
+      "extent": 112,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot12@KrustyBike",
+      "va": "0x48de20",
+      "extent": 191,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot33@KrustyBike",
+      "va": "0x48e130",
+      "extent": 87,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot1@KrustyBike",
+      "va": "0x48fa10",
+      "extent": 74,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot8@KrustyBike",
+      "va": "0x491600",
+      "extent": 40,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot84@KrustyBike",
+      "va": "0x491630",
+      "extent": 103,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot67@KrustyBike",
+      "va": "0x491a90",
+      "extent": 121,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot39@KrustyBike",
+      "va": "0x491b10",
+      "extent": 83,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot76@KrustyBike",
+      "va": "0x491ca0",
+      "extent": 103,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot80@KrustyBike",
+      "va": "0x4922c0",
+      "extent": 155,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot83@KrustyBike",
+      "va": "0x492360",
+      "extent": 100,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot81@KrustyBike",
+      "va": "0x4923d0",
+      "extent": 88,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot82@KrustyBike",
+      "va": "0x492430",
+      "extent": 134,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot63@KrustyBike",
+      "va": "0x4924c0",
+      "extent": 50,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot64@KrustyBike",
+      "va": "0x492500",
+      "extent": 37,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot71@KrustyBike",
+      "va": "0x492530",
+      "extent": 105,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot45@KrustyBike",
+      "va": "0x4957d0",
+      "extent": 37,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot52@KrustyBike",
+      "va": "0x495800",
+      "extent": 29,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot42@KrustyBike",
+      "va": "0x495820",
+      "extent": 164,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot24@KrustyBike",
+      "va": "0x4958d0",
+      "extent": 123,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot25@KrustyBike",
+      "va": "0x495950",
+      "extent": 123,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot69@KrustyBike",
+      "va": "0x4959d0",
+      "extent": 85,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot68@KrustyBike",
+      "va": "0x495a30",
+      "extent": 49,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot66@KrustyBike",
+      "va": "0x495a70",
+      "extent": 44,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot96@KrustyBike",
+      "va": "0x495aa0",
+      "extent": 352,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot44@KrustyBike",
+      "va": "0x495ca0",
+      "extent": 5,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot15@KrustyBike",
+      "va": "0x495cb0",
+      "extent": 176,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot16@KrustyBike",
+      "va": "0x495d60",
+      "extent": 124,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot22@KrustyBike",
+      "va": "0x495de0",
+      "extent": 42,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot23@KrustyBike",
+      "va": "0x495e10",
+      "extent": 56,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot48@KrustyBike",
+      "va": "0x4964e0",
+      "extent": 249,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Fn_0048D8B0@KrustyBike",
+      "va": "0x48d8b0",
+      "extent": 85,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot86@KrustyBike",
+      "va": "0x491b70",
+      "extent": 298,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot28@KrustyBike",
+      "va": "0x48da50",
+      "extent": 416,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot99@KrustyBike",
+      "va": "0x4916a0",
+      "extent": 757,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot93@KrustyBike",
+      "va": "0x496370",
+      "extent": 113,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot94@KrustyBike",
+      "va": "0x4963f0",
+      "extent": 236,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Fn_00495FF0@KrustyBike",
+      "va": "0x495ff0",
+      "extent": 895,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot14@KrustyBike",
+      "va": "0x4965e0",
+      "extent": 431,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Fn_00496D20@KrustyBike",
+      "va": "0x496d20",
+      "extent": 119,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Fn_00496DA0@KrustyBike",
+      "va": "0x496da0",
+      "extent": 119,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot29@KrustyBike",
+      "va": "0x495e50",
+      "extent": 401,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot50@KrustyBike",
+      "va": "0x497630",
+      "extent": 365,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot43@KrustyBike",
+      "va": "0x48dee0",
+      "extent": 580,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot97@KrustyBike",
+      "va": "0x4912d0",
+      "extent": 624,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "UnknownVirtualSlot49@KrustyBike",
+      "va": "0x496790",
+      "extent": 1400,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "??1KrustyBike",
+      "va": "0x491540",
+      "extent": 192,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Fn_004925A0",
+      "va": "0x4925a0",
+      "extent": 197,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Fn_00496E20",
+      "va": "0x496e20",
+      "extent": 13,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Fn_00495C00",
+      "va": "0x495c00",
+      "extent": 151,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Fn_00496F90",
+      "va": "0x496f90",
+      "extent": 981,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Fn_00497370",
+      "va": "0x497370",
+      "extent": 692,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Fn_00496E30",
+      "va": "0x496e30",
+      "extent": 350,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Fn_0048D910",
+      "va": "0x48d910",
+      "extent": 123,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Fn_0048D990",
+      "va": "0x48d990",
+      "extent": 98,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "KrustyCollisionCallbackA",
+      "va": "0x48dcd0",
+      "extent": 165,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "KrustyCollisionCallbackB",
+      "va": "0x48dd80",
+      "extent": 155,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "FindNearestRival",
+      "va": "0x48e190",
+      "extent": 225,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "??_EKrustyBike@@$4PPPPPPPM@A@AEPAXI@Z",
+      "va": "0x497c30",
+      "extent": 8,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "?Tick@KrustyBike@@$4PPPPPPPM@A@AEHM@Z",
+      "va": "0x497ca0",
+      "extent": 8,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "?Fn_004933E0@KrustyBike@@",
+      "va": "0x4933e0",
+      "extent": 634,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "_$E2",
+      "va": "0x491190",
+      "extent": 5,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "_$E1",
+      "va": "0x4911a0",
+      "extent": 60,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "_$E5",
+      "va": "0x4911e0",
+      "extent": 5,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "_$E4",
+      "va": "0x4911f0",
+      "extent": 60,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "_$E8",
+      "va": "0x491230",
+      "extent": 5,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "_$E7",
+      "va": "0x491240",
+      "extent": 60,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "_$E11",
+      "va": "0x491280",
+      "extent": 5,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "_$E10",
+      "va": "0x491290",
+      "extent": 60,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "?Tick@KrustyBike@@UAEHM@Z",
+      "va": "0x4977a0",
+      "extent": 1153,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Fn_00492670@KrustyBike",
+      "va": "0x492670",
+      "extent": 1106,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Load@KrustyBike",
+      "va": "0x48fc80",
+      "extent": 5384,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "Fn_0048E280",
+      "va": "0x48e280",
+      "extent": 339,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "src/krusty2/vehicle/KrustyBike.cpp",
+      "symbol": "?UnknownVirtualSlot101@KrustyBike@@",
+      "va": "0x496d10",
+      "extent": 5,
+      "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
+    },
+    {
+      "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "symbol": "PredictPathMotion",
+      "va": "0x40d200",
+      "extent": 4464,
+      "bindings": "samples/physics/bikeai/BikeAINearMisses.bindings.json"
+    },
+    {
+      "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "symbol": "??ZVec3@@QAEAAU0@ABU0@@Z",
+      "va": "0x413160",
+      "extent": 33,
+      "bindings": "samples/physics/bikeai/BikeAINearMisses.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleMethods.cpp",
+      "symbol": "UnknownVirtualSlot34@Vehicle",
+      "va": "0x40c4c0",
+      "extent": 118,
+      "bindings": "src/reconstructed/VehicleMethods.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleMethods.cpp",
+      "symbol": "UnknownVirtualSlot35@Vehicle",
+      "va": "0x40c540",
+      "extent": 130,
+      "bindings": "src/reconstructed/VehicleMethods.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleMethods.cpp",
+      "symbol": "UnknownVirtualSlot45@Vehicle",
+      "va": "0x40c880",
+      "extent": 7,
+      "bindings": "src/reconstructed/VehicleMethods.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleMethods.cpp",
+      "symbol": "UnknownVirtualSlot51@Vehicle",
+      "va": "0x40c890",
+      "extent": 7,
+      "bindings": "src/reconstructed/VehicleMethods.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleMethods.cpp",
+      "symbol": "UnknownVirtualSlot52@Vehicle",
+      "va": "0x40c8a0",
+      "extent": 14,
+      "bindings": "src/reconstructed/VehicleMethods.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleMethods.cpp",
+      "symbol": "UnknownVirtualSlot68@Vehicle",
+      "va": "0x40cac0",
+      "extent": 18,
+      "bindings": "src/reconstructed/VehicleMethods.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleMethods.cpp",
+      "symbol": "UnknownVirtualSlot69@Vehicle",
+      "va": "0x40cae0",
+      "extent": 13,
+      "bindings": "src/reconstructed/VehicleMethods.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleMethods.cpp",
+      "symbol": "UnknownVirtualSlot23@Vehicle",
+      "va": "0x40caf0",
+      "extent": 38,
+      "bindings": "src/reconstructed/VehicleMethods.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleMethods.cpp",
+      "symbol": "UnknownVirtualSlot24@Vehicle",
+      "va": "0x40cb20",
+      "extent": 59,
+      "bindings": "src/reconstructed/VehicleMethods.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleMethods.cpp",
+      "symbol": "UnknownVirtualSlot25@Vehicle",
+      "va": "0x40cb60",
+      "extent": 59,
+      "bindings": "src/reconstructed/VehicleMethods.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleMethods.cpp",
+      "symbol": "UnknownVirtualSlot78@Vehicle",
+      "va": "0x492220",
+      "extent": 76,
+      "bindings": "src/reconstructed/VehicleMethods.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleMethods.cpp",
+      "symbol": "UnknownVirtualSlot79@Vehicle",
+      "va": "0x492270",
+      "extent": 76,
+      "bindings": "src/reconstructed/VehicleMethods.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleMethods.cpp",
+      "symbol": "UnknownVirtualSlot92@Vehicle",
+      "va": "0x4a6ba0",
+      "extent": 3,
+      "bindings": "src/reconstructed/VehicleMethods.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/VehicleReset.cpp",
+      "symbol": "UnknownVirtualSlot36@Vehicle",
+      "va": "0x40c710",
+      "extent": 368,
+      "bindings": "src/reconstructed/VehicleReset.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/JoystickDevice.cpp",
+      "symbol": "?AttachAxisBinding@JoystickDevice@@QAEHPAUUnknownControlBinding@@MM@Z",
+      "va": "0x00489a20",
+      "extent": 324,
+      "bindings": "src/reconstructed/JoystickDevice.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/KeyboardDevice.cpp",
+      "symbol": "?BindKeys@KeyboardDevice@@QAEHPAUUnknownControlBinding@@HHMM@Z",
+      "va": "0x00489f80",
+      "extent": 176,
+      "bindings": "src/reconstructed/KeyboardDevice.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/MouseDevice.cpp",
+      "symbol": "?AttachBinding@MouseDevice@@QAEHPAUUnknownControlBinding@@@Z",
+      "va": "0x0048a420",
+      "extent": 145,
+      "bindings": "src/reconstructed/MouseDevice.bindings.json"
+    },
+    {
+      "source": "src/reconstructed/DeviceSetup.cpp",
+      "symbol": "?BindAxis@UnknownTrackGameObject33fc@@QAEHPAUUnknownControlBinding@@HHH@Z",
+      "va": "0x00448d30",
+      "extent": 186,
+      "bindings": "src/reconstructed/DeviceSetup.bindings.json"
+    }
+  ],
+  "partial_diagnostics": [
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot38@Bike",
+      "va": "0x405190",
+      "extent": 2874,
+      "candidate": 2865,
+      "matching": 1758
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot7@Bike",
+      "va": "0x4060c0",
+      "extent": 1678,
+      "candidate": 1678,
+      "matching": 1677
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot89@Bike",
+      "va": "0x406ae0",
+      "extent": 2396,
+      "candidate": 2120,
+      "matching": 115
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot102@Bike",
+      "va": "0x407440",
+      "extent": 485,
+      "candidate": 474,
+      "matching": 188
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "UnknownVirtualSlot61@Bike",
+      "va": "0x40c000",
+      "extent": 1015,
+      "candidate": 946,
+      "matching": 162
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "??0Vehicle@@QAE@H@Z",
+      "va": "0x5257a0",
+      "extent": 745,
+      "candidate": 745,
+      "matching": 693
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot4@Vehicle",
+      "va": "0x5265d0",
+      "extent": 555,
+      "candidate": 555,
+      "matching": 381
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot74@Vehicle",
+      "va": "0x5281b0",
+      "extent": 539,
+      "candidate": 539,
+      "matching": 528
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot56@Vehicle",
+      "va": "0x5286a0",
+      "extent": 784,
+      "candidate": 784,
+      "matching": 754
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "UnknownVirtualSlot49@Vehicle",
+      "va": "0x52a940",
+      "extent": 3254,
+      "candidate": 3254,
+      "matching": 3229
+    },
+    {
+      "source": "src/krusty2/vehicle/Vehicle.cpp",
+      "symbol": "?Method_00527A20@Vehicle@@QAEXPAMPAUVec3@@1@Z",
+      "va": "0x527a20",
+      "extent": 870,
+      "candidate": 866,
+      "matching": 350
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "Method_0x0040a520@Bike",
+      "va": "0x40a520",
+      "extent": 2272,
+      "candidate": 2272,
+      "matching": 2112
+    },
+    {
+      "source": "src/krusty2/vehicle/Bike.cpp",
+      "symbol": "LoadBike@Bike",
+      "va": "0x4079c0",
+      "extent": 6745,
+      "candidate": 6745,
+      "matching": 6428
+    },
+    {
+      "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "symbol": "PathSteeringDirection",
+      "va": "0x40e510",
+      "extent": 1936,
+      "candidate": 1935,
+      "matching": 1884
+    },
+    {
+      "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "symbol": "QuerySegmentObstacles",
+      "va": "0x415640",
+      "extent": 6112,
+      "candidate": 6111,
+      "matching": 6063
+    },
+    {
+      "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "symbol": "SimulateLookAhead",
+      "va": "0x40eca0",
+      "extent": 17585,
+      "candidate": 17415,
+      "matching": 1432
+    },
+    {
+      "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "symbol": "?Fn_00413200@KrustyBike@@",
+      "va": "0x413200",
+      "extent": 4112,
+      "candidate": 4114,
+      "matching": 2026
+    },
+    {
+      "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
+      "symbol": "?Fn_00414370@KrustyBike@@",
+      "va": "0x414370",
+      "extent": 4802,
+      "candidate": 4694,
+      "matching": 505
+    },
+    {
+      "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "symbol": "UnknownVirtualSlot70@KrustyBike",
+      "va": "0x4919a0",
+      "extent": 229,
+      "candidate": 230,
+      "matching": 151
+    },
+    {
+      "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "symbol": "UnknownVirtualSlot11@KrustyBike",
+      "va": "0x491d10",
+      "extent": 1296,
+      "candidate": 1288,
+      "matching": 526
+    },
+    {
+      "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "symbol": "Fn_00492AD0@KrustyBike",
+      "va": "0x492ad0",
+      "extent": 2315,
+      "candidate": 2312,
+      "matching": 192
+    },
+    {
+      "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "symbol": "Fn_00493660@KrustyBike",
+      "va": "0x493660",
+      "extent": 8545,
+      "candidate": 8558,
+      "matching": 2305
+    },
+    {
+      "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "symbol": "??0KrustyBike@@QAE@H@Z",
+      "va": "0x48fa60",
+      "extent": 532,
+      "candidate": 532,
+      "matching": 472
+    },
+    {
+      "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "symbol": "UnknownVirtualSlot102@KrustyBike",
+      "va": "0x48eea0",
+      "extent": 2920,
+      "candidate": 2952,
+      "matching": 608
+    }
+  ],
+  "instructions": [
+    [
+      "0x407a0e",
+      "mov",
+      "edx, dword ptr [esp + 0x370]"
+    ],
+    [
+      "0x407a16",
+      "mov",
+      "eax, dword ptr [esp + 0x370]"
+    ],
+    [
+      "0x407a1e",
+      "mov",
+      "ecx, dword ptr [esp + 0x370]"
+    ],
+    [
+      "0x407b21",
+      "call",
+      "0x525e20"
+    ],
+    [
+      "0x448d60",
+      "mov",
+      "ecx, dword ptr [eax + 0x14]"
+    ],
+    [
+      "0x448d63",
+      "mov",
+      "ecx, dword ptr [ecx + 0xc]"
+    ],
+    [
+      "0x448d79",
+      "call",
+      "0x489a20"
+    ],
+    [
+      "0x448d88",
+      "mov",
+      "ecx, dword ptr [eax + 0x14]"
+    ],
+    [
+      "0x448d8b",
+      "mov",
+      "ecx, dword ptr [ecx + 0x30]"
+    ],
+    [
+      "0x448da1",
+      "call",
+      "0x48a420"
+    ],
+    [
+      "0x448db3",
+      "call",
+      "0x48a420"
+    ],
+    [
+      "0x448dd7",
+      "mov",
+      "eax, dword ptr [edx + 0x14]"
+    ],
+    [
+      "0x448dda",
+      "mov",
+      "ecx, dword ptr [eax + 0x34]"
+    ],
+    [
+      "0x448ddd",
+      "call",
+      "0x489f80"
+    ],
+    [
+      "0x449024",
+      "add",
+      "ecx, 0x3344"
+    ],
+    [
+      "0x44902b",
+      "push",
+      "ecx"
+    ],
+    [
+      "0x44902e",
+      "call",
+      "0x448d30"
+    ],
+    [
+      "0x4897e0",
+      "mov",
+      "ecx, dword ptr [ecx + 0x10]"
+    ],
+    [
+      "0x489a34",
+      "mov",
+      "dword ptr [ebp], ecx"
+    ],
+    [
+      "0x489f95",
+      "mov",
+      "dword ptr [esi], ecx"
+    ],
+    [
+      "0x48a429",
+      "mov",
+      "dword ptr [edx], ecx"
+    ],
+    [
+      "0x48ff3e",
+      "mov",
+      "eax, dword ptr [0x56e26c]"
+    ],
+    [
+      "0x48ff43",
+      "lea",
+      "edi, [eax + 0x33bc]"
+    ],
+    [
+      "0x48ff4a",
+      "lea",
+      "edi, [eax + 0x3380]"
+    ],
+    [
+      "0x48ff50",
+      "add",
+      "eax, 0x3344"
+    ],
+    [
+      "0x490061",
+      "call",
+      "0x4079c0"
+    ],
+    [
+      "0x525e3c",
+      "mov",
+      "edx, dword ptr [esp + 0xa0]"
+    ],
+    [
+      "0x525e49",
+      "mov",
+      "ecx, dword ptr [esp + 0xa4]"
+    ],
+    [
+      "0x525e57",
+      "mov",
+      "eax, dword ptr [esp + 0xb0]"
+    ],
+    [
+      "0x525e5e",
+      "mov",
+      "dword ptr [esi + 0x4f8], ecx"
+    ],
+    [
+      "0x525e68",
+      "mov",
+      "dword ptr [esi + 0x4fc], edx"
+    ],
+    [
+      "0x525e72",
+      "mov",
+      "dword ptr [esi + 0x500], eax"
+    ],
+    [
+      "0x528dc0",
+      "mov",
+      "eax, dword ptr [esi + 0x4f8]"
+    ],
+    [
+      "0x528dd9",
+      "mov",
+      "eax, dword ptr [eax]"
+    ],
+    [
+      "0x528ddf",
+      "push",
+      "4"
+    ],
+    [
+      "0x528de1",
+      "mov",
+      "ecx, eax"
+    ],
+    [
+      "0x528de3",
+      "call",
+      "0x4897e0"
+    ]
+  ],
+  "rtti": [
+    {
+      "name": "PCInputDevice",
+      "col": "0x55e268",
+      "vtable": "0x555eec",
+      "type": "0x56c6f8"
+    },
+    {
+      "name": "JoystickDevice",
+      "col": "0x55cdf0",
+      "vtable": "0x5541fc",
+      "type": "0x56c718"
+    },
+    {
+      "name": "KeyboardDevice",
+      "col": "0x55ce40",
+      "vtable": "0x554258",
+      "type": "0x56c750"
+    },
+    {
+      "name": "MouseDevice",
+      "col": "0x55ce90",
+      "vtable": "0x554278",
+      "type": "0x56c770"
+    },
+    {
+      "name": "PCJoystickDevice",
+      "col": "0x55e2c0",
+      "vtable": "0x555ef8",
+      "type": "0x570378"
+    },
+    {
+      "name": "PCKeyboardDevice",
+      "col": "0x55e318",
+      "vtable": "0x555f58",
+      "type": "0x570430"
+    },
+    {
+      "name": "PCMouseDevice",
+      "col": "0x55e370",
+      "vtable": "0x555f78",
+      "type": "0x570450"
+    }
+  ],
+  "renames": {
+    "?Method_004897E0@VehicleAxisSource@@QAEHH@Z": "?IsDeviceSubtype@InputDevice@@QAEHH@Z"
+  },
+  "filename_paths": [
+    "src/krusty2/vehicle/Vehicle.cpp",
+    "src/krusty2/vehicle/Bike.cpp",
+    "src/krusty2/vehicle/KrustyBike.cpp",
+    "src/reconstructed/VehicleDefaults.cpp",
+    "src/reconstructed/VehicleMethods.cpp",
+    "src/reconstructed/VehicleReset.cpp",
+    "src/reconstructed/VehicleWheelAttachment.cpp",
+    "samples/physics/bikeai/BikeAINearMisses.cpp",
+    "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+    "src/reconstructed/InputDevice.cpp"
+  ]
+}

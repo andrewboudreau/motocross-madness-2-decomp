@@ -42,53 +42,43 @@ addresses and never forces unresolved references into an executable.
 ## Current gaps
 
 The 2026-10-21 build compiles 270 C++ files (214 canonical sources and 56
-reviewed candidates) and reaches LINK with 203 unresolved external symbols,
+reviewed candidates) and reaches LINK with 202 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The current
-run is `work/game-build/build-o5ke14xh`; its `link.log` is authoritative.
+run is `work/game-build/build-nwwm3o2k`; its `link.log` is authoritative.
 
-The [particle-emitter connections](PARTICLE_EMITTER_CONNECTIONS.md) promote
-four existing complete classes: Dust, DirtChunk, Steam and Spark. All 28 methods
-remain strict; their existing physics targets now use canonical source paths.
-Original translation-unit ownership remains uncertain. The shared declaration
-is defined once, and existing caller field views retain explicit pointer casts.
-Four constructors and three Spark position calls now use the genuine providers.
-The separate mixed-receiver VehicleImpactSink setter remains unresolved.
+The [Vehicle input subtype connection](VEHICLE_INPUT_SUBTYPE.md) replaces the
+provisional steering-owner call with the existing primary InputDevice getter.
+Actual binding producers, loader argument propagation and offset-zero RTTI
+establish the receiver. The caller's bounded prefix view remains unchanged.
+No provider, initialization, compiler flag or calibration row is added.
 
-The isolated real link removes exactly five names: **208 -> 203**, with none
-added. All 266 prior production objects retain 10,715 nondebug sections and
-45,819 relocations under the five verified name changes, without filename
-exclusions. The four new objects retain the reviewed 101 sections and 256
-relocations. All 270 source hashes, 239 header hashes, build configuration,
-compiler profile and per-source flags are checked. No compiler flags change.
+The isolated real link removes exactly one name: **203 -> 202**, with none
+added. All 270 prior production objects preserve 10,816 nondebug sections and
+46,075 relocations under that one verified name, without filename exclusions.
+The actual build's 270 source hashes, 239 header hashes, configuration, compiler
+profile and per-source flags are checked.
 
-The retained emitter test passes 268 strict comparisons and pins seven complete
-objects. The actual Spark setter passes 3,200 native prepared-storage cases,
-including 1,024 independently modeled access faults. The fixture checks complete
-pages, captured by-value arguments and progressive write order. It does not
-exercise constructed emitter lifetimes, Tick or rendering; those methods have
-complete strict body, vtable and dependency evidence. All nine affected retained
-tests also pass in the actual checkout, including the existing vector, gearbox,
-steering, wheel, shock, gameplay-default and model-render checks.
+The retained test passes 233 strict full-body comparisons and pins ten complete
+objects. The actual 17-byte getter passes 11,264 prepared-storage native cases,
+including 3,072 independently modeled read faults. Return values, exact fault
+addresses and complete pages are checked. This does not execute constructed
+input-device lifetimes or whole Vehicle input polling. Six affected tests pass,
+including the actual-path vector-add and prior emitter/gearbox/default checks.
+Three old Vehicle fingerprints were reproduced before their one-name update;
+all other records and six gearbox partial fingerprints remain unchanged.
 
 Calibration retains **3,023/3,034** strict rows (3,007 distinct source/address/
 extent cases, and 2,980/2,990 unique retail address/extent pairs). Physics retains
-**1,086/1,162** strict comparisons. After the explicit four-file source migration,
-every old row retains its full extent and resolved matching-position count.
-The two prior nonexact physics binding diagnostics remain unchanged.
+**1,086/1,162** strict comparisons. Every prior score, full extent and strict
+result is unchanged; the two prior nonexact physics binding diagnostics remain.
 
-Old name-bearing test fingerprints were reproduced before updating only the
-verified names; resolved model-render pins remain unchanged. The new portable
-pins enumerate exact source filename spellings. The legacy vector-add test's
-actual-path fingerprint was independently reproduced and passes unchanged test
-logic after its symbol-name update.
-
-Evidence: `work/game-build/round58-emitter-link-proof.json`,
-`connections-round58-preservation.json` and `round58-emitter-actual-retained.log`.
+Evidence: `work/game-build/round59-input-link-proof.json`,
+`connections-round59-preservation.json` and `round59-input-retained-final.log`.
 The game still does not link; startup, integrated menus and racing are unverified.
 
-Static checks pass for 282 Python and 431 JSON files. Full regression passes:
-565 tests, 554 passed and 11 skipped (`work/game-build/tests-round58-final.log`).
+Static checks pass for 283 Python and 432 JSON files. Full regression passes:
+566 tests, 555 passed and 11 skipped (`work/game-build/tests-round59-input.log`).
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

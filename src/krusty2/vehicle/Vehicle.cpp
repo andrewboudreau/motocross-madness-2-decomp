@@ -2,6 +2,7 @@
 // (__FILE__ xrefs near 0x00525e98). See Vehicle.h for the evidence/provisional notes.
 #include "vehicle/Vehicle.h"
 #include "../../reconstructed/GearRatios.h"
+#include "../../reconstructed/InputDevice.h"
 #include <math.h>
 #include <stdlib.h>
 #include <float.h>
@@ -1359,7 +1360,7 @@ void Vehicle::UnknownVirtualSlot63(float dt)
     VehicleAxisSource* src = steerAxis->axisSource;
     // Retail never sets eax on any path, so the slot returns void (KrustyBike's override
     // likewise only calls through).
-    if (src && !src->Method_004897E0(4)
+    if (src && !reinterpret_cast<InputDevice*>(src)->IsDeviceSubtype(4)
         && (steerAxis->axisSource->kindCode == 2 || steerAxis->axisSource->kindCode == 3)) {
         float v = steerInput;
         float sq = v * v;

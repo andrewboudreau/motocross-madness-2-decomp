@@ -40,7 +40,7 @@
   "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd5c0",
   "?ClearScreenRects@D3DIMSoultreeObject@@QAEXXZ": "0x004444e0",
   "?Method_00478FE0@Vehicle@@QAEHXZ": "0x00478fe0",
-  "?Method_004897E0@VehicleAxisSource@@QAEHH@Z": "0x004897e0",
+  "?IsDeviceSubtype@InputDevice@@QAEHH@Z": "0x004897e0",
   "?UpdateThrottle@UnknownEngineGearbox@@QAEXMHE@Z": "0x004d2f50",
   "?AutoShift@UnknownEngineGearbox@@QAEXHM@Z": "0x004d3030",
   "?DriveForce@UnknownEngineGearbox@@QAEXMPBUVector3@@MDMPAU2@PAM@Z": "0x004d31b0",

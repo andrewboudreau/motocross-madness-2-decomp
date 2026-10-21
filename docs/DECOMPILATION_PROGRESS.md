@@ -65,7 +65,7 @@ python3 tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt --vc6-root "
 
 Inspect every result: the runner reports nonmatches as data and its exit status
 alone does not prove strict matching. Reviewed code revision:
-`a81fb3783a50cf40805bc58b38684246428320f3 plus this validated slice (source hashes: work/game-build/build-o5ke14xh/report.json)`. Source inventory counts reflect the current tree
+`d9898a5a86b2c2a139cf2ec0d9497b804439aa7c plus this validated slice (source hashes: work/game-build/build-nwwm3o2k/report.json)`. Source inventory counts reflect the current tree
 and do not imply every body in those files matches.
 
 ### Caveats recorded with the snapshot

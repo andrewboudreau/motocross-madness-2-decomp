@@ -180,7 +180,6 @@ typedef SteeringControl VehicleSteerState;
 struct VehicleAxisSource {           // object at VehicleAxis+0x00 (provisional)
     char pad_0x00[0xC];
     int kindCode;                  // +0x0c kind code (2 and 3 are tested by slot 63)
-    int Method_004897E0(int a);      // 0x004897e0, purpose unknown
 };
 struct VehicleAxis {                 // objects at Vehicle+0x4f8/0x4fc/0x500 (provisional)
     VehicleAxisSource* axisSource;  // +0x00 VehicleAxisSource queried in slot 63
