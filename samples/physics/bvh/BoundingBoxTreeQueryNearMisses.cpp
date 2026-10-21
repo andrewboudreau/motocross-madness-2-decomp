@@ -55,7 +55,10 @@
 //   code (useMotion pushed per arm, hit cleared after the pushes), but VC6 then merges the
 //   box a-children call into the b-children one and the leaf arms into each other; 24
 //   hit/return layouts (shared, per-arm, early-return, function-level hit) do not give
-//   retail's merge.
+//   retail's merge.  The out-of-line Vec3Call for a[0] (or a[0] and a[1]) only moves the
+//   expansion to the next constructor (472/177, 469/161 bytes/differing; all three give
+//   93/235), so one call stays missing in the s15 reference diff; its 0x22/0x86 immediates
+//   are the jump table after the function's ret (0x00428914), a false positive.
 // - SegmentSegmentDistance 0x0042a640 (1471 bytes, 0.89 instruction ratio): written with
 //   explicit call views.  Retail homes the plane parameters, clamps and the first length in
 //   the dead d0/d1 argument slots (frame 0x60); VC6 here keeps them in a 0x80 frame, and the
@@ -94,7 +97,8 @@
 //   three projected radii before the segment's half-length projection (as `(r = ...) + D`
 //   would) and orders the z axis's dot product (0 + 0) + l.z * hz.  A projected-radius inline
 //   helper (4430+ bytes) or DotProduct for both the mid and the half-segment projections
-//   (4543) spends too much budget.
+//   (4543) spends too much budget.  A fresh axis local per test changes nothing (734 bytes,
+//   266 differing; the two missing 0x0040ae30 calls in the s15 reference diff).
 #include "bvh/BoundingBoxTreeQuery.h"
 
 // The unit's file statics (bound to the same addresses as in the src file).
