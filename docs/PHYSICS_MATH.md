@@ -1,7 +1,8 @@
 # Shared physics math providers
 
-Four reconstruction units now supply seven previously sample-only function
-bodies. These paths are organizational names, not recovered retail filenames.
+The four reconstruction units in this table supply seven complete function
+bodies. The explicit-output vector provider is described separately below.
+These paths are organizational names, not recovered retail filenames.
 Types and semantic names remain inferred from arithmetic and decoded callers.
 The target addresses, extents and relocation-resolved instruction bytes are
 confirmed against the verified demo executable.
@@ -67,3 +68,13 @@ python -m unittest discover -s tests -p test_physics_math_providers.py -v
 The complete physics matrix and real source compile/link remain separate
 integration gates. Other unresolved vector and quaternion aliases are outside
 this promotion.
+
+## Explicit-output vector calls
+
+`src/reconstructed/VectorCalls.cpp` additionally supplies the existing
+`Vec3AddCall`, `Vec3SubtractCall`, `Vec3ScaleCall` and `Vec3DotCall` signatures.
+Their complete 69/69/69/29-byte bodies match retail without caller changes.
+This unit includes only `Vec3.h`, so it introduces no per-unit vector constants
+or dynamic initializers. [Vector call evidence](VECTOR_CALLS.md) records the
+explicit-output ABI, overlap behavior, dot-product grouping, source-ownership
+limits and the 31,873-case native comparison.

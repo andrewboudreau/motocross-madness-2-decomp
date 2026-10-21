@@ -29,7 +29,7 @@
 extern "C" const UnknownGuid IID_IDirect3DHALDevice;
 void FillPixelFormat(int format, void* pixelFormat);
 
-// 0x004c0d10: profiles each display that has no current profile: its mode
+// 0x004c0d10: unless all cached profiles load, profiles every display: its mode
 // list, whether windowed, full-screen, software and hardware rendering work,
 // its video memory, AGP, whether ten 256x256 textures fit and the partial
 // texture blit timing.

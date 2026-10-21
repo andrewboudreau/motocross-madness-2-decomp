@@ -61,7 +61,7 @@ class CharacterMotionBehaviorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-character-motion-') as directory:
             output = Path(directory)
             objects = []
-            for source in ('samples/physics/motion/Motnctrl.cpp', 'tests/fixtures/character_motion_compare.cpp'):
+            for source in ('samples/physics/motion/Motnctrl.cpp', 'src/reconstructed/VectorCalls.cpp', 'tests/fixtures/character_motion_compare.cpp'):
                 obj = output / (Path(source).stem + '.obj')
                 result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
                     '-o', str(obj), '--vc6-root', str(compiler), '--profile', 'vc6_o2_mt',

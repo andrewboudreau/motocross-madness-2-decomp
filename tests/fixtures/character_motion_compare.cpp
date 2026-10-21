@@ -66,15 +66,6 @@ Vec3 Vec3Normalize(const Vec3& v) {
     return ((Vec3(__cdecl*)(const Vec3&))0x5087b0)(v);
 }
 float FastInvSqrt(float v) { return ((float(__cdecl*)(float))0x460c00)(v); }
-Vec3* Vec3SubtractCall(Vec3* out,const Vec3* a,const Vec3* b) {
-    return ((Vec3*(__cdecl*)(Vec3*,const Vec3*,const Vec3*))0x421d00)(out,a,b);
-}
-Vec3* Vec3ScaleCall(Vec3* out,const Vec3* v,float s) {
-    return ((Vec3*(__cdecl*)(Vec3*,const Vec3*,float))0x5015b0)(out,v,s);
-}
-Vec3* Vec3AddCall(Vec3* out,const Vec3* a,const Vec3* b) {
-    return ((Vec3*(__cdecl*)(Vec3*,const Vec3*,const Vec3*))0x421cb0)(out,a,b);
-}
 
 // The standalone TU also contains LoadVue, validated by a separate fixture.
 // Any accidental use of that unrelated path fails this playback test.

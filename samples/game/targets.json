@@ -1,5 +1,14 @@
 [
   {
+    "source": "PCGameNearMisses.cpp",
+    "candidate_symbol_contains": "?ProfileDisplays@PCGame@@QAEHXZ",
+    "target_va": "0x004c0d10",
+    "target_size": 1790,
+    "expect": "partial",
+    "bindings": "PCGameNearMisses.bindings.json",
+    "status": "Complete display profiling reviewed in 8486 native scenarios; 1790-byte candidate remains nonexact."
+  },
+  {
     "source": "DeviceSetupNearMisses.cpp",
     "candidate_symbol_contains": "?GetDXVersion@@YAXPAK00@Z",
     "target_va": "0x00448560",

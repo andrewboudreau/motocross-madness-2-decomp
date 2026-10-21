@@ -38,10 +38,10 @@ exposed precision differences in the earlier candidate:
 `AxisAngleMatrix` now names the existing provider's `TreeMatrix4` signature.
 The local matrix and provider both use sixteen consecutive floats; a narrow
 pointer cast connects them without importing conflicting complete headers.
-The three explicit vector call views already occur in canonical motion,
-Soultree, Vehicle and BVH source, but their production definitions remain
-unresolved. The private comparison supplies their retail behavior; it does
-not establish source-provider closure.
+The three explicit vector call views also occur in canonical motion,
+Soultree, Vehicle and BVH source. Their complete strict implementations now
+live in `src/reconstructed/VectorCalls.cpp`; both native playback and pose
+tests link that actual production object. See [the provider proof](VECTOR_CALLS.md).
 
 ## Native comparison
 
@@ -59,7 +59,7 @@ inside and above the transition, interpolation and extrapolation, fractional
 time steps, fps 1 through 120 at selected rates and 16777215/16777217/16777219.
 Another 16,384 of those scenarios vary finite axes, positions and times with a
 deterministic generator. Candidate pose helpers execute unchanged. External
-math, frame advancement and restart use retail dependencies; application
+math other than the explicit vector calls, frame advancement and restart use retail dependencies; application
 slots are observers. Four decoded CRT call sites use native VC6 CRT functions.
 
 `tests/test_character_pose_helpers.py` separately exercises 159,744 complete
@@ -69,7 +69,7 @@ interpolation into either input, identical inputs, and axis/angle output
 aliases into input storage. Finite random axes span zero through 1024 scale;
 parameters include signed zero, negative angles and values on both sides of
 the interpolation clamp boundaries. Input/output storage and guard bytes are
-compared without normalization. External math dependencies still use retail.
+compared without normalization. Other external math dependencies still use retail.
 
 `tests/test_motion_vue_behavior.py` checks the standalone 1088-byte loader and
 its one-state C++ unwind metadata, then compares 33,280 scenarios. It observes
@@ -98,8 +98,7 @@ python -m unittest discover -s tests -p test_motion_vue_behavior.py -v
 python tools/build_game.py -j6
 ```
 
-Together with the inherited render-node, Bike and camera/Wrecker math connections,
-the real build compiles 184/184 units and reports 582 unresolved symbols, down from 594.
-The motion unit removes two missing names and introduces none. All 2,973
-distinct strict calibration cases and 1,076 strict physics targets remain;
-both near-miss comparisons also report zero drops.
+The motion unit removes two missing names and introduces none. Its admission
+and the later vector-provider integration preserve all prior strict matches;
+both near-miss comparisons report zero drops. [Current game-build evidence](GAME_BUILD.md)
+records the complete composition and remaining linker failures.

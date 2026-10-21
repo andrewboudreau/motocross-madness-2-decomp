@@ -1,0 +1,13 @@
+{
+  "?UpdatePointerHover@UIDialog@@QAEXXZ": "0x0046f120",
+  "?RequestHover@UIDialog@@QAEHPAVUIControl@@HH@Z": "0x00470000",
+  "?PreviousFocusableControl@UIControl@@QAEPAV1@XZ": "0x004727c0",
+  "?NextFocusableControl@UIControl@@QAEPAV1@XZ": "0x00472810",
+  "?SetCursorAnimation@GUIUser@@QAEXPAUUnknownCursorAnimation@@@Z": "0x00487fb0",
+  "?GetAcceptedDevice@GUIUser@@QAEPAVGUIInputDevice@@H@Z": "0x00488310",
+  "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
+  "?Tick@UIDialog@@UAEHM@Z": "0x0046ef00",
+  "__ftol": "0x00534a88",
+  "__real@4@00000000000000000000": "0x00550484",
+  "__real@4@4008fa00000000000000": "0x00550f44"
+}

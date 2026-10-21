@@ -1,0 +1,11 @@
+[
+  {
+    "source": "UIDialogTick.cpp",
+    "candidate_symbol_contains": "?Tick@UIDialog@@UAEHM@Z",
+    "target_va": "0x0046ef00",
+    "target_size": 543,
+    "expect": "partial",
+    "bindings": "UIDialogTick.bindings.json",
+    "status": "Complete reachable retail CFG including cold joystick tail; 555-byte candidate checked in 73728 native scenarios remains nonexact."
+  }
+]

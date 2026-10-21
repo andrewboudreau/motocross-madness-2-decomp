@@ -21,6 +21,9 @@ EXE = Path(os.environ.get('MCM2_EXE', ROOT / 'work/game/mcm2.exe'))
 @unittest.skipUnless(os.environ.get('VC6_ROOT') and EXE.is_file(),
                      'requires VC6_ROOT and the private retail EXE')
 class GraphicsStateTests(unittest.TestCase):
+    def test_bike_class_table_size_values_and_writable_storage(self):
+        self.assert_data_provider('BikeClassData', {'g_BikeClassEngineSizes': 20})
+
     def test_compiled_initial_values_sizes_and_mutability_match_retail(self):
         sizes = {
             'g_DefaultNearPlane': 4, 'g_DefaultFarPlane': 4, 'g_BladeDeviceGuid': 16,

@@ -3,9 +3,21 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/ui/UIDialogTick.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete UIDialog Tick passes 73728 native whole-state and mutating-callback comparisons. The retail CFG is 543 bytes including cold joystick branches; VC6 emits 555 bytes. Dependencies are scripted; end-to-end menus remain untested.",
+      "evidence": "docs/GAMEUI.md#functional-build-review"
+    },
+    {
+      "path": "samples/game/PCGameNearMisses.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete ProfileDisplays passes 8486 native state, ordered-call, resource and unwind comparisons. The unchanged VC6 body is 1790 bytes with 1776 matching positions. Display and registry dependencies are scripted; real driver behavior remains untested.",
+      "evidence": "docs/PCGAME.md#functional-build-review"
+    },
+    {
       "path": "samples/physics/motion/Motnctrl.cpp",
       "status": "reviewed-nonexact",
-      "reason": "Complete Character playback and pose helpers pass 835584 native state/pose comparisons; LoadVue passes 33280 parse/ownership/unwind scenarios. Playback uses explicit vector-call boundaries and preserves retail x87 frame-rate precision. Candidate playback is 3333 bytes versus 3327 retail; three existing helper matches remain strict. External vector call-view providers remain unresolved production dependencies.",
+      "reason": "Complete Character playback and pose helpers pass 835584 native state/pose comparisons; LoadVue passes 33280 parse/ownership/unwind scenarios. Playback uses the canonical vector-call providers and preserves retail x87 frame-rate precision. Candidate playback is 3333 bytes versus 3327 retail; three existing helper matches remain strict.",
       "evidence": "docs/MOTION_PLAYBACK.md#functional-build-review"
     },
     {

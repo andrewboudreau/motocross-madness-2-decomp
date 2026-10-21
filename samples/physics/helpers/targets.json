@@ -1,6 +1,46 @@
 [
   {
     "class": "Vec3",
+    "source": "../../../src/reconstructed/VectorCalls.cpp",
+    "candidate_symbol_contains": "?Vec3AddCall@@",
+    "target_va": "0x00421cb0",
+    "target_size": 69,
+    "expect": "exact",
+    "bindings": "../../../src/reconstructed/VectorCalls.bindings.json",
+    "notes": "Complete explicit-output call ABI; local vector then output copy preserves retail stores and alias behavior. Original TU ownership unconfirmed."
+  },
+  {
+    "class": "Vec3",
+    "source": "../../../src/reconstructed/VectorCalls.cpp",
+    "candidate_symbol_contains": "?Vec3SubtractCall@@",
+    "target_va": "0x00421d00",
+    "target_size": 69,
+    "expect": "exact",
+    "bindings": "../../../src/reconstructed/VectorCalls.bindings.json",
+    "notes": "Complete explicit-output subtraction call ABI; all 69 bytes match without caller changes."
+  },
+  {
+    "class": "Vec3",
+    "source": "../../../src/reconstructed/VectorCalls.cpp",
+    "candidate_symbol_contains": "?Vec3ScaleCall@@",
+    "target_va": "0x005015b0",
+    "target_size": 69,
+    "expect": "exact",
+    "bindings": "../../../src/reconstructed/VectorCalls.bindings.json",
+    "notes": "Complete explicit-output scalar multiplication call ABI, with each result stored as float before copying."
+  },
+  {
+    "class": "Vec3",
+    "source": "../../../src/reconstructed/VectorCalls.cpp",
+    "candidate_symbol_contains": "?Vec3DotCall@@",
+    "target_va": "0x0040ae30",
+    "target_size": 29,
+    "expect": "exact",
+    "bindings": "../../../src/reconstructed/VectorCalls.bindings.json",
+    "notes": "Complete dot-product call ABI and retail x87 sum order (y product + x product) + z product; not the differently grouped inline DotProduct."
+  },
+  {
+    "class": "Vec3",
     "source": "VectorOps.cpp",
     "candidate_symbol_contains": "??0Vec3",
     "target_va": "0x00404e60",

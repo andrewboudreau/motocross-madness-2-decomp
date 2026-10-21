@@ -90,6 +90,76 @@ following, which are inference:
 - GetAvailableVidMem (method 23);
 - CreateSurface (method 6), to test whether ten 256x256 textures fit.
 
+### Functional build review
+
+`samples/game/PCGameNearMisses.cpp` contains only the complete
+`PCGame::ProfileDisplays` body. `StartUp` calls it after display enumeration.
+The source emits all 1790 bytes under authentic VC6 SP3 `/O2 /GR /GX /MT`;
+1776 positions match after relocation resolution. The remaining difference is
+instruction scheduling around the surface-description size store and
+`FillPixelFormat`. This is a reviewed behavioral candidate, not a strict match
+or a reconstruction of the complete original translation unit.
+
+The functional build explicitly admits this candidate. It supplies
+`ProfileDisplays`, but introduces its previously unlinked dependency
+`void UnknownDisplay::ProbePartialTextureUploads(RenderTarget*)`
+(`0x004cab00`, 1129 retail bytes). That body exists only in
+`samples/render/PCVideoCardNearMisses.cpp`, which is not admitted; there is no
+canonical provider or alternate-signature implementation to connect. Its current
+VC6 candidate is 1113 bytes with 144 matching positions. Consequently this
+admission replaces one missing linker name with another; it does not reduce the
+missing-name count or complete display startup. The profiling fixture scripts
+this dependency and does not establish the missing body's correctness.
+
+The full decoded control flow includes loading every cached profile, returning
+early if all load successfully, and otherwise profiling **every** display,
+including those with a successful cached load. It retains the disabled-mode
+registry gates, software/hardware mode attempts, video-memory queries,
+capability-dependent mode limits, AGP probe, ten 256-by-256 surface attempts,
+ordered surface releases and target deletion. During the partial-upload probe,
+Game's display and render-target fields temporarily expose the tested objects;
+normal return resets both to null. A previously disabled full-screen display
+skips the final cooperative-level reset, as retail does.
+
+`tests/test_profile_displays_behavior.py` compiles this unchanged standalone
+candidate and a separate fixture using VC6. The fixture compares against the
+hash-pinned retail body and its complete exception cleanup/handler. Its 8,486
+finite scenarios compare all game/display/target bytes, mode tables, allocation
+ownership, surface lifetimes and ordered dependency calls. Calls record registry
+names and binary payloads, complete surface descriptions, mode arguments,
+receiver identities and transient Game display/target values. The cases cover
+zero through four displays and all cached-profile masks, all disable masks,
+cooperative-level/mode/initializer failures, each of the ten surface failure
+boundaries, capability and OS branches, zero through four modes, signed
+partial-upload settings, negative display counts and exceptions from allocation,
+construction, initialization and the partial-upload probe. Normal completion
+also independently requires return value 1 and no live fixture resources.
+
+Retail's one-state C++ unwind map is at `0x00562870`, with placement-delete
+cleanup `0x0054cbf0` and handler `0x0054cc0a`. The test verifies the corresponding
+candidate metadata and executes constructor-throw cleanup. Exceptions after
+construction retain the retail ownership and transient state, including any
+unreleased target; the fixture does not add cleanup absent from retail.
+
+The comparison scripts registry, allocation, display, DirectDraw and render
+target dependencies. It does not validate real driver behavior, registry access
+or end-to-end startup. The allocator-null case uses an initializer dependency
+that accepts the null receiver, proving the caller passes it through; it does
+not establish that the real initializer can safely accept null. Diagnostic
+source-file paths are checked before that argument is normalized. The fixture
+uses `/Od` because VC6 SP3 `/O2` encounters an internal compiler error in its
+seven-argument scripted display callback; the production candidate remains
+compiled and measured with `/O2`. All reference mapping and call patching stays
+inside this private validation executable.
+
+Reproduce in PowerShell with private inputs:
+
+```powershell
+$env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path
+$env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
+python -m unittest discover -s tests -p test_profile_displays_behavior.py -v
+```
+
 
 ## Start-up (`0x004bfc50`)
 

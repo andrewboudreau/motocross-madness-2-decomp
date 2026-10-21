@@ -140,3 +140,11 @@ Near misses (`samples/ui/DlgProcsNearMisses.cpp`):
   (no argument spelling changes it; a Vector3 copy constructor is worse).
 - SPRaceInfoDlg and MPRaceInfoDlg slot 29 (`0x004507a0`, `0x004513a0`):
   register use inside the per-racer loops differs.
+
+The shared bike-class engine-size table now has a canonical source definition
+in `src/reconstructed/BikeClassData.cpp`: five 32-bit integers
+`125, 250, 400, 500, 600` at retail `0x0056cb6c`. Its existing declaration and
+six consuming translation units are unchanged. `tests/test_graphics_state.py`
+checks all 20 retail bytes, writable COFF data storage, the exported symbol
+and absence of dynamic initialization. The file groups reconstructed storage;
+it does not assert original translation-unit ownership.

@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-20 build compiles 184 C++ files (174 canonical sources and ten
-reviewed candidates) and reaches LINK with 582 unresolved external symbols,
+The 2026-10-21 build compiles 188 C++ files (176 canonical sources and twelve
+reviewed candidates) and reaches LINK with 576 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -53,7 +53,7 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
-the current composition retains all 1,076 strict-exact physics targets and all
+the current composition retains all prior physics targets, with 1,080 now strict-exact, and all
 2,973 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
@@ -215,20 +215,38 @@ unit is a reviewed nonexact candidate. Its native comparisons cover 835,584
 playback/state cases and 33,280 loader/ownership/unwind cases; the three
 previously strict pose helpers remain strict. Playback's extrapolation now
 preserves retail's vector-call rounding and integer frame-rate precision.
-The vector call-view declarations still need production providers. These
-changes remove eight unresolved names and introduce none. Four additional
+These changes remove eight unresolved names and introduce none. Four additional
 [camera](FOLLOW_CAMERA.md) and [Wrecker math connections](WRECKER.md#shared-model-and-motion-calls)
 use the existing vector constructor, cross product and normalization providers.
 All 67 strict caller cases and both Wrecker partial comparisons remain unchanged;
 the real link removes four more names with none added.
 
+Four complete [vector call providers](VECTOR_CALLS.md) now supply the explicit
+output signatures used by motion, collision and vehicle code. Their full
+69/69/69/29-byte bodies are strict exact and pass 31,873 native arithmetic,
+return-pointer and aliasing cases. Playback and pose tests now link these
+actual providers. The [bike-class engine-size table](DIALOGPROCS.md) supplies
+another missing name with all 20 writable data bytes verified. Together these
+remove five unresolved names without adding any.
+
+The complete [dialog tick](GAMEUI.md#functional-build-review) and
+[display profiling pass](PCGAME.md#functional-build-review) are now explicitly
+reviewed nonexact candidates. Their native comparisons pass 73,728 and 8,486
+scenarios respectively, including mutating UI callbacks and display resource
+ownership/unwind paths. Dialog ticking removes one missing name. Profiling
+supplies its entry point but introduces a reference to the genuinely missing
+`UnknownDisplay::ProbePartialTextureUploads`, so its admission leaves the
+missing-symbol count unchanged. Dependencies in these tests are scripted;
+real input, registry and display-driver integration remain untested.
+
 Validation of this composition passes the toolchain/manual/generated VC6 gate,
 2,975 of 2,986 calibration rows (2,973 distinct source/address/extent cases),
-and all 1,076 previously strict physics targets among 1,152 comparisons.
+and all prior strict physics targets, with four additions making 1,080 among
+1,156 comparisons. Both near-miss comparisons report zero drops.
 The recursive reset's strict case moves from FileStream.cpp to
 Parameterblocks.cpp with its address and full 30-byte extent unchanged;
 ShowDialog adds one strict case. The native-enabled Python suite passes
-426 tests with 11 skipped. These counts retain existing nonexact comparisons;
+430 tests with 11 skipped. These counts retain existing nonexact comparisons;
 they do not describe a fully matched or working game.
 
 Other incompatible class views, missing methods and unresolved globals

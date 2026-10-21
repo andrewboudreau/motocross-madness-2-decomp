@@ -39,7 +39,8 @@
 //   `return found` after Unlock; `if (!Unlock) return 0; return found;`
 //   becomes neg/sbb/and, early returns for a failed Lock duplicate the
 //   epilogue, and goto, result variable and while row loops do not give it.
-// 0x0046ef00 UIDialog slot 10 (352/555): the timer's +0x0c is cleared before
+// 0x0046ef00 UIDialog slot 10 (352 matching positions, retail 543/candidate
+//   555 bytes; included from UIDialogTick.cpp): the timer's +0x0c is cleared before
 //   +0x14 is loaded, and the joystick branches after the first sit after the
 //   epilogue. `while (1)`/`for (;;)` device loops, `continue` per branch and
 //   the joystick test as an inline helper (with and without returns) keep
@@ -224,89 +225,8 @@ unlock:
 }
 
 
-// 0x0046ef00: runs the timers and the joystick focus moves.
-int UIDialog::Tick(float frameTime) {
-    if (lastFrameTime != 0.0f)
-        lastFrameTime = frameTime;
-    else
-        lastFrameTime = 0.001f;
-    if (sendFrameEvent) {
-        UnknownDialogEvent event;
-        event.gui = guiManager;
-        event.handled = 0;
-        event.kind = kDialogFrame;
-        event.controlName = 0;
-        event.dialog = this;
-        event.control = 0;
-        HandleEvent(&event);
-        sendFrameEvent = 0;
-    }
-    if (!isPaused && !isClosing) {
-        UITimer* timer;
-        for (int i = 0; (timer = timerList.Get(i)) != 0; i++) {
-            timer->elapsedTime += (int)(frameTime * 1000.0f);
-            if ((unsigned int)timer->elapsedTime >= (unsigned int)timer->periodTime) {
-                timer->elapsedTime = 0;
-                UIControl* control;
-                if ((control = timer->targetControl) != 0) {
-                    control->HandleTimer((int)timer);
-                } else {
-                    UnknownDialogEvent event;
-                    event.code = timer->timerId;
-                    event.gui = guiManager;
-                    event.handled = 0;
-                    event.kind = kDialogTimer;
-                    event.controlName = 0;
-                    event.dialog = this;
-                    event.control = 0;
-                    HandleEvent(&event);
-                    if (event.handled)
-                        return 1;
-                }
-            }
-        }
-        GUIUser* user = guiUser;
-        UIControl* focus = (UIControl*)user->hoverControl;
-        user->SetCursorAnimation(focus && focus->mouseAnim ? (UnknownCursorAnimation*)focus->mouseAnim
-                                                                 : cursorAnimation);
-        GUIInputDevice* device;
-        int j = 0;
-        while ((device = guiUser->GetAcceptedDevice(j++)) != 0) {
-            if (device->inputDevice->deviceKind == 2) {
-                int x = device->pointerPosition.x;
-                int y = device->pointerPosition.y;
-                if (focus) {
-                    if (x <= -1) {
-                        if (joystickCentred) {
-                            UIControl* next = focus->PreviousFocusableControl();
-                            joystickCentred = 0;
-                            if (next)
-                                RequestHover(next, 0, 0);
-                        }
-                    } else if (x >= 1) {
-                        if (joystickCentred) {
-                            UIControl* next = focus->NextFocusableControl();
-                            joystickCentred = 0;
-                            if (next)
-                                RequestHover(next, 0, 0);
-                        }
-                    } else if (y <= -1) {
-                        if (joystickCentred)
-                            joystickCentred = 0;
-                    } else if (y >= 1) {
-                        if (joystickCentred)
-                            joystickCentred = 0;
-                    } else {
-                        joystickCentred = 1;
-                    }
-                }
-            }
-        }
-        UpdatePointerHover();
-        GameObject::Tick(lastFrameTime);
-    }
-    return 1;
-}
+// The complete tick candidate is also compiled independently for the game build.
+#include "UIDialogTick.cpp"
 
 // 0x004734c0: whether `point` is on an opaque pixel of the image.
 int UIButton::ContainsPoint(POINT point, int state) {

@@ -214,8 +214,11 @@ void UnknownAxisSettle_4cb6e0(float* a, float* b, const float* c, float dt,
 // of an inline Vec3 helper instead of expanding it (inline budget). Those sites are
 // reconstructed through these plain declarations, which VC6 cannot inline. One
 // declaration per retail address; the pointer/reference form follows the callers
-// (the ABI is the same). Bodies: ../helpers/VectorOps.cpp (tier 2: decoded bodies
-// identical to the inline formulas).
+// (the ABI is the same). Complete explicit-output bodies are reconstructed in
+// src/reconstructed/VectorCalls.cpp; CrossProductCall is in CrossProduct.cpp.
+// The original header/TU ownership and these call-view names remain provisional.
+// Vec3DotCall preserves the retail sum grouping; the inline DotProduct above
+// emits a different grouping and is not its interchangeable provider.
 // ---------------------------------------------------------------------------
 
 // 0x0040ae30, __cdecl, result in st(0): a.b.

@@ -279,3 +279,39 @@ the candidate keeps in registers, and retail has one 0x80-byte local at
 `esp+0x2174` of the frame base (between `toolTip` and `fxSoundOut`) that no
 instruction references and that no source form reproduces (locals used only
 in dead code get no slot).
+
+## Functional build review
+
+`samples/ui/UIDialogTick.cpp` supplies the complete dialog tick as an explicit
+nonexact game-build candidate. GameUiNearMisses.cpp includes this same source
+for its existing calibration; the larger sample is not added to the game link.
+The reachable retail CFG spans `0x0046ef00..0x0046f11e` (543 bytes), including
+cold joystick branches beyond its sole return. The next byte is alignment.
+VC6 emits 555 bytes, with 352 matching positions after relocation resolution;
+timer-store scheduling and joystick block placement remain different.
+
+The body retains the first-frame `0.001f` rule, frame-event flag reset after
+the callback, unsigned timer comparison, timer-list mutation visibility,
+handled-timer early return, cached focus versus refreshed GUI user, joystick
+centring and the final hover/base tick calls. Semantic names remain inferred;
+the decoded instructions and offsets are the evidence.
+
+`tests/test_dialog_tick_behavior.py` compiles the actual standalone source
+under VC6 and compares it with hash-pinned retail in 73,728 native scenarios.
+It proves complete CFG coverage, checks all nine direct call sites and three
+virtual dispatches, and compares the full dialog and dependency storage at
+every callback and final return. Scenarios cover paused/closing state, timer
+wrap and signed edges, null/holey/mutated lists, frame and timer callbacks,
+multiple input devices, both focus directions and callback changes to the
+GUI user, focus and frame time. Independent assertions also check constant
+success, early returns, the initial-frame rule and branch coverage.
+
+The fixture scripts dependencies and observes only initialized event fields.
+This does not establish real input-device integration or working menus. Retail
+mapping and call patching exist only inside the private test executable.
+
+```powershell
+$env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path
+$env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
+python -m unittest discover -s tests -p test_dialog_tick_behavior.py -v
+```

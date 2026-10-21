@@ -245,7 +245,7 @@ the integration temporary. When only displacement sizes differ, read the
 | ui/GUIManager | `0x00486b10` | 89/106 | c | two per-component ternaries give retail's `pop edi` placement; retail loads bottom into eax after storing x and passes the text in eax and &position in edx (VC6 here hoists the bottom load into edx beside the cdq and swaps the call registers) |
 | ui/GUIManager | `0x00488120` | 46/52 | c | retail tests the owner for zero before comparing it with `this`; VC6 threads the ternary's xor arm into a leading zero test, so the sample compares with `this` first (samples/ui/GUIManagerNearMisses.cpp) |
 | ui/GameUi | `0x0046a920` | 684/2323 (masked) | b | 17 code diffs: `mov eax, 0x64` vs `mov ecx, 0x64 ; mov eax, 1 ; mov [esp +~`; `mov eax, 1` vs `mov [esp + N], eax`; frame 0x9bf4 vs 0x9c74, slot order differs |
-| ui/GameUi | `0x0046ef00` | 352/555 | c | 13 code diffs: retail adds `mov [edi + 0xc], ebx`; retail lacks `mov [edi + 0xc], ebx` |
+| ui/UIDialogTick | `0x0046ef00` | 352/543 (candidate 555) | c | Complete CFG includes cold joystick tail; scheduling and branch placement differ. Native behavior reviewed in GAMEUI.md. |
 | ui/GameUi | `0x004734c0` | 256/354 | c | 8 code diffs: `je @82 ; jmp @81` vs `je @83 ; mov edi, 1 ; jmp @84` |
 | ui/GameUi | `0x004738a0` | 206/975 | b | retail keeps the width and the redraw count in memory; the caret store now writes the member (the old 440 stored through a self-initialised pointer) |
 | ui/GameUi | `0x00474150` | 1018/1044 | c | Backspace: retail gives the cursor eax, VC6 here edx; one local (1004 length / 351 cursor), no locals (339), call as condition and swapped decrements (1002) are worse |
