@@ -386,39 +386,17 @@ full:
 // The accumulate macro is braced under each CastSegment test: unbraced, only its first
 // statement was conditional.  hit, cell, right and up are declared once at function scope and
 // both modes assign right and up, which gives retail's temporary-then-copy stores and its
-// `add ecx, 0x188` for up.  Retail's frame, from the call arguments (offsets from esp after
-// the prologue): screen 0xc, the mode 2 step 0x18, hit 0x24, eye 0x30, cell 0x3c, up 0x40,
-// right 0x4c, code 0x58, the corners 0x5c, the near corners 0x94; the mode 2 sum/difference
-// results sit at 0 and 0xc4 and 8 bytes of select temporaries at 0x8c.  This form has all of
-// those except cell 0x30 and eye 0x34 (declaration order does not move them).
-// Remaining (684/3111): eax/ecx swap from the eight min/max initial stores onward (retail
-// loads 0x7f7fffff into ecx for 0x6668/0x6670 and the shadow into ecx after them);
-// push and lea scheduling around CastSegment and ProjectVertices; lensScale kept on the x87
-// stack; one missing `add eax, 0x17c`.  One footprint test after the if/else shrinks the
-// function to 2938 bytes (496): the inline budget needs both copies.
-// ---------------------------------------------------------------------------------------------
-// 0x00508bc0 (slot 27, 3087 bytes): the shadow's footprint on the terrain.  Casts the light
-// frustum's corner rays at the height field and accumulates the hit cells' grid rectangle
-// (minX..maxZ) and the hits' screen rectangle (field_0x6668..field_0x6674); returns whether
-// the footprint is on screen and large enough (tier 3 semantics).
-// Lead (not taken): `right` and `up` declared once at function scope and assigned in both
-// modes give retail's temporary-then-copy stores for both and its `add ecx, 0x188` for up
-// (3088 bytes, 745 aligned instructions with registers and displacements masked against 730
-// here), but eax/ecx swap throughout (227/3088).  Typedef shifts of 0..62 do not move it;
-// eye = eye + ..., named-result products and declaration placement change nothing or the size.
-// Retail's frame, from the call arguments (offsets from esp after the prologue): `hit` 0x24
-// and `cell` 0x3c in both modes, screen 0xc, code 0x58, eye 0x30, up 0x40, right 0x4c, the
-// mode 2 step 0xc4 and the mode 2 sum/difference results at 0 and 0x18.  The two modes
-// sharing hit and cell fits one function-scope pair: with that pair and the lead, the
-// registers-masked difference is 287 instructions (1108 here; size 3088), and what is left
-// of the frame is eye after cell (0x34, cell 0x30) and 8 bytes of select temporaries for the
-// mode 1 0x6670/0x6674 minimum and maximum between eye and up, which push up, right and code
-// 8 bytes out (retail selects all four on the x87 stack; its 8 bytes sit at 0x8c, after the
-// corners).
-// s15 reference diff: the missing 5.0f load and `test ah, 0x41` are retail's second footprint
-// test (each mode keeps its own copy, the mode 2 one after `pop ebp`); VC6 here keeps the screen
-// rectangle on the x87 stack and cross-jumps the two into one.  The 0x17c/0x188 immediates are
-// the `add reg, 0x17c/0x188` row pointers of the lead above.
+// `add ecx, 0x188` for up; mode 2 reads lensScale once into a local, as mode 1 does its half
+// size, so the scale stays on the x87 stack.  Retail's frame, from the call arguments
+// (offsets from esp after the prologue): screen 0xc, the mode 2 step 0x18, hit 0x24, eye 0x30,
+// cell 0x3c, up 0x40, right 0x4c, code 0x58, the corners 0x5c, the near corners 0x94; the
+// mode 2 sum/difference results sit at 0 and 0xc4 and 8 bytes of select temporaries at 0x8c.
+// This form has all of them.
+// Remaining (1563/3099, 48 differing instructions): the scheduling of the mode 1 right/up
+// component copies and corner loads, the mode 2 cross product's x87 store order, push order
+// around ProjectVertices and two `add eax, 0x170/0x17c` row pointers.  One footprint test
+// after the if/else shrinks the function to 2938 bytes (496): the inline budget needs both
+// copies.
 // ---------------------------------------------------------------------------------------------
 
 // The unit's vector with the d3dvec.inl constructors (ProjectedShadow.h's ShadowVec3 has none;
@@ -570,8 +548,9 @@ int TerrainShadow::UnknownVirtualSlot27()
         TERRAIN_SHADOW_RETURN_IF_VISIBLE();
     } else {
         eye += TERRAIN_SHADOW_CAMERA()->look * 10000.0f;
-        right = TerrainShadowCross(TERRAIN_SHADOW_CAMERA()->look, TERRAIN_SHADOW_CAMERA()->up) * shadow->lensScale;
-        up = TERRAIN_SHADOW_CAMERA()->up * shadow->lensScale;
+        float lens = shadow->lensScale;
+        right = TerrainShadowCross(TERRAIN_SHADOW_CAMERA()->look, TERRAIN_SHADOW_CAMERA()->up) * lens;
+        up = TERRAIN_SHADOW_CAMERA()->up * lens;
         TerrainShadowVec nearCorners[4];
         nearCorners[0] = (TERRAIN_SHADOW_CAMERA()->eye - right) - up;
         nearCorners[1] = (right + TERRAIN_SHADOW_CAMERA()->eye) + up;
