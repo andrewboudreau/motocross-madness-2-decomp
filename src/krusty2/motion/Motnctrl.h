@@ -3,6 +3,7 @@
 #ifndef KRUSTY2_MOTION_MOTNCTRL_H
 #define KRUSTY2_MOTION_MOTNCTRL_H
 
+#include "math/Math3D.h"
 #include "motion/D3DIMSoultreeCharacter.h"
 #include "motion/MotionPose.h"
 

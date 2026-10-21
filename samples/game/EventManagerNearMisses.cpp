@@ -195,6 +195,7 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
 #define PODIUM_OWNER(o) ((UnknownPodiumOwner*)(o))
 #define PODIUM_VIEW(v) ((UnknownPodiumViewFields*)(v))
 #define PODIUM_ARCADE ((UnknownPodiumArcade*)podiumObject)
+#define PODIUM_MODEL(c) ((UnknownPodiumSoultree*)(c)->modelNode)
 
 // Whether v is the zero vector (the grid's "no podium direction").
 static inline int PodiumIsZero(const Vector3& v) {
@@ -342,11 +343,12 @@ int EventManager::CreatePodiumScene() {
         }
         D3DIMSoultreeCharacter*& character = podiumCharacters[place - 1];
         character = new(__FILE__, 0x31d) D3DIMSoultreeCharacter(isEnabled);
-        character->CharacterVirtualSlot11(renderContext, path, PODIUM_OWNER(owner)->field_0x7c, &context, 1, 1);
+        character->D3DIMVirtualSlot11((int)renderContext, path, (const SoultreeLoadDesc*)PODIUM_OWNER(owner)->field_0x7c,
+                                       (int)&context, 1, 1);
         view->AppendChild(character, -1);
         if (character) {
             if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->isEnabled)
-                character->modelNode->SetUseLighting(1);
+                PODIUM_MODEL(character)->SetUseLighting(1);
             int mode = g_TrackGame->mode.GetSelectedSeries();
             if (mode == 3 || mode == 2 || mode == 4) {
                 if (chance < 0.5f && podiumCharacterCount != 1)
@@ -358,14 +360,14 @@ int EventManager::CreatePodiumScene() {
             }
             podiumMotions[place - 1] = character->FindMotion(name, 1);
             Vector3 position = podiumPosition + offsets[place - 1];
-            character->modelNode->SetPosition(&position);
-            character->modelNode->SetAxesPtr(&facings[place - 1], &kVec3YAxis, 1, 1);
+            PODIUM_MODEL(character)->SetPosition(&position);
+            PODIUM_MODEL(character)->SetAxesPtr(&facings[place - 1], &kVec3YAxis, 1, 1);
             character->SetMotion(podiumMotions[place - 1]);
-            character->motionTime = 0;
+            character->chr_field_0x10 = 0.0f;
             if (racer) {
                 UnknownPodiumTextureEntry** texture = ((UnknownPodiumRacer*)racer)->riderCharacter->modelNode->field_0x290;
                 if (texture)
-                    character->modelNode->ReplaceMaterialTexture(0, (*texture)->field_0x2c, &context);
+                    PODIUM_MODEL(character)->ReplaceMaterialTexture(0, (*texture)->field_0x2c, &context);
             }
         }
     }

@@ -31,8 +31,7 @@
 #ifndef SOULTREE_D3DIM_SOULTREE_CHARACTER_H
 #define SOULTREE_D3DIM_SOULTREE_CHARACTER_H
 
-#include "core/GameObject.h"
-#include "math/Math3D.h"
+#include "../core/GameObject.h"
 
 class SoultreeObject;
 class UnknownParameterBlock; // shared 0x5c4-byte section/key reader

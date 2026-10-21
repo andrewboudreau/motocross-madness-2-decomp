@@ -20,6 +20,7 @@
 #ifndef COLLISION_CHARACTER_H
 #define COLLISION_CHARACTER_H
 
+#include "math/Math3D.h"
 #include "motion/D3DIMSoultreeCharacter.h"
 #include "collision/CollisionObject.h"
 

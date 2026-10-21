@@ -31,6 +31,7 @@
 #ifndef SOULTREE_PHYSICS_OBJECT_H
 #define SOULTREE_PHYSICS_OBJECT_H
 
+#include "math/Math3D.h"
 #include "motion/D3DIMSoultreeCharacter.h"   // SoultreePhysicsBaseObject, SoultreeLoadDesc
 #include "collision/CollisionObject.h"       // QuadTreeObject, GameObject
 #include "soultree/SoultreePhysicsBaseObject.h"

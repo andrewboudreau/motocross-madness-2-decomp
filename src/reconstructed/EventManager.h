@@ -48,24 +48,12 @@ void LoadProgressCallback(int* step);  // 0x0045cb20
 // cdecl 0x0045fbb0: qsort order for unsigned values.
 int CompareUnsigned(const void* a, const void* b);  // 0x0045fbb0
 
-// Minimal view of RTTI classes Character : virtual GameObject and
-// D3DIMSoultreeCharacter : Character, declared in full in
-// src/krusty2/motion/D3DIMSoultreeCharacter.h, whose header tree cannot be
-// mixed with this one. 0x0045d480 constructs up to three (0x240 bytes,
-// constructor 0x004455b0 writes D3DIMSoultreeCharacter's vtables) into
-// EventManager+0x424; slot 10 calls their primary slot 7.
-class Character : public virtual GameObject {
-public:
-    virtual void CharacterVirtualSlot0();
-    virtual void CharacterVirtualSlot1();
-    virtual void CharacterVirtualSlot2();
-    virtual void CharacterVirtualSlot3(int a);
-    virtual void CharacterVirtualSlot4(int a, int b);
-    virtual void CharacterVirtualSlot5(int a, int b);
-    virtual void CharacterVirtualSlot6(int a, int b);
-    // 0x004a70c0 (ret 0xc): adds `time` (fld of the first argument) to +0x10.
-    virtual int CharacterVirtualSlot7(float time, int a, int b);
-};
+// RTTI classes Character : virtual GameObject and D3DIMSoultreeCharacter :
+// Character, shared with the physics tree. 0x0045d480 constructs up to three
+// (0x240 bytes, constructor 0x004455b0) into EventManager+0x424; slot 10
+// calls their primary slot 7 (0x004a70c0, adds its time to +0x10).
+#include "../krusty2/motion/D3DIMSoultreeCharacter.h"
+
 // The Soultree object at a podium character's +0x1a0 (D3DIMSoulTree.h's
 // D3DIMSoultreeObject methods, seen from the podium scene).
 struct UnknownPodiumTextureEntry {
@@ -81,29 +69,6 @@ struct UnknownPodiumSoultree {
     unsigned char field_0x000[0x290];
     UnknownPodiumTextureEntry** field_0x290;       // the racer model's texture
 };
-
-struct Motion;
-
-class D3DIMSoultreeCharacter : public Character {
-public:
-    explicit D3DIMSoultreeCharacter(int flags);    // 0x004455b0 (0x240 bytes)
-    virtual void CharacterVirtualSlot8();
-    virtual void CharacterVirtualSlot9();
-    virtual void CharacterVirtualSlot10();
-    // Loads the model file `name`; returns the GameObject to add.
-    virtual GameObject* CharacterVirtualSlot11(void* owner, const char* name, GameObject* lights,
-                                               void* context, int a, int b);
-    Motion* FindMotion(const char* name, int a); // 0x004a6b30: finds a motion
-    void SetMotion(Motion* motion);    // 0x004a8b40: plays it
-
-    unsigned char field_0x008[0x10 - 0x8];
-    int motionTime;                           // +0x10  Character +0x10 motion time (slot 7 adds time; SceneManager.h's view names it the same)
-    unsigned char field_0x014[0x1a0 - 0x14];
-    UnknownPodiumSoultree* modelNode;         // +0x1a0
-    unsigned char field_0x1a4[0x214 - 0x1a4];
-};
-
-// Motion record (src/krusty2/motion): 0x004a6b30's result, 0x004a8b40's argument.
 
 // cdecl 0x004aef40: deletes TrackGame's NetworkInterface (+0x08), sets +0x18
 // to 1 and clears +0x3424, +0x2da5 and +0x2d98. EventManager slot 10 calls

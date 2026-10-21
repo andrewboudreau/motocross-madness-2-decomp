@@ -25,6 +25,7 @@
 #define SOULTREE_PHYSICS_CHARACTER_CANONICAL_H
 
 #include "soultree/SoultreePhysicsBaseObject.h"
+#include "math/Math3D.h"
 #include "motion/D3DIMSoultreeCharacter.h"
 
 class SoultreePhysicsCharacter : public SoultreePhysicsBaseObject, public D3DIMSoultreeCharacter {

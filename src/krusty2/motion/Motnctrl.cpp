@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "core/DebugAlloc.h"
+#include "math/Math3D.h"
 #include "motion/D3DIMSoultreeCharacter.h"
 #include "motion/MotionPose.h"   // Math3D.h: the four per-TU Vec3 initialisers (.CRT$XCU 188-191)
 #include "motion/Motnctrl.h"

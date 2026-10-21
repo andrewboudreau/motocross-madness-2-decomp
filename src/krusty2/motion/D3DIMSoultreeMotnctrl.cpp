@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include "core/DebugAlloc.h"
 #include "collision/CollisionObject.h"
+#include "math/Math3D.h"
 #include "motion/D3DIMSoultreeCharacter.h"
 #include "core/SoultreeObject.h"
 #include "motion/MotionPose.h"

@@ -971,7 +971,9 @@ void EventManager::CloseRace(int mode) {
 
 // The quadtree members 0x0045fce0 and 0x0045fdc0 use. Quadtree.cpp and
 // CollisionObject.cpp are declared in full under src/krusty2/broadphase and
-// src/krusty2/collision, whose header tree cannot be mixed with this one.
+// src/krusty2/collision. That tree reaches krusty2 math/Math3D.h, whose
+// per-TU Vec3 constants collide with this file's kVec3 constants, so this
+// file keeps local views of them.
 // RTTI: Vegetation : QuadTreeObject (vtable 0x005524f8) and
 // CollisionObject : QuadTreeObject (+0), GraphicsTest (+0xc) : GameObject.
 class QuadTree;
