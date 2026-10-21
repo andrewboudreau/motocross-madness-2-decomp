@@ -762,11 +762,6 @@ void CollisionObject::StoreHitNormal()
     offset->z += push.z;
 }
 
-// 0x00428c20: broad-phase overlap of two bounds boxes under their transforms (tier 3 signature
-// from the push order at 0x004393e8: boundsA, boundsB, xfA, xfB).
-int TreeBoxOverlap(CollisionBoxBounds* boundsA, CollisionBoxBounds* boundsB, const Matrix4* xfA,
-                const Matrix4* xfB);
-
 // 0x004392c0: bounds-only overlap of this object against `other` (used by TestMeshAgainst).
 // The second model case sets `boundsB` before it reads `other->shape`; reading the shape
 // first swaps ecx and eax for `other` and its shape type across the second switch.
@@ -823,7 +818,8 @@ int CollisionObject::TestMeshBounds(CollisionObject* other)
         break;
     }
     }
-    return TreeBoxOverlap(boundsA, boundsB, xfA, xfB);
+    return TreeBoxOverlap(reinterpret_cast<QueryTreeNode*>(boundsA), reinterpret_cast<QueryTreeNode*>(boundsB),
+        xfA, xfB);
 }
 
 // ==============================================================================================
@@ -1630,7 +1626,8 @@ int CollisionObject::HullVsSphere(CollisionHullBody* hull, CollisionSphereShape*
     world.z = c.z * m[10] + c.y * m[6] + c.x * m[2] + m[14];
     float r = sphere->radiusScale * sphere->radius;
     float rr = r * r;
-    return SphereTreeQuery(&world, r, rr, hull->pointTree, &hull->worldTransform, 0);
+    return SphereTreeQuery(reinterpret_cast<const Vec3*>(&world), r, rr,
+        reinterpret_cast<QueryTreeNode*>(hull->pointTree), &hull->worldTransform, 0);
 }
 
 // 0x00437aa0: hull vs capsule.  Both capsule endpoints are scaled by capsule->field_0x24 and
@@ -1651,7 +1648,9 @@ int CollisionObject::HullVsCapsule(CollisionHullBody* hull, CollisionCapsuleShap
     ends[1].y = (b.z * m[9] + b.y * m[5]) + b.x * m[1] + m[13];
     ends[1].z = (b.z * m[10] + b.y * m[6]) + b.x * m[2] + m[14];
     float r = capsule->radiusScale * capsule->radius;
-    return CapsuleTreeQueryWithVertices(ends, r, r * r, hull->pointTree, &hull->worldTransform, 0, hull->vertices);
+    return CapsuleTreeQueryWithVertices(reinterpret_cast<const Vec3*>(ends), r, r * r,
+        reinterpret_cast<QueryTreeNode*>(hull->pointTree), &hull->worldTransform, 0,
+        reinterpret_cast<Vec3*>(hull->vertices));
 }
 
 // 0x00438860: model vs sphere.  Same world-space sphere as HullVsSphere; the model's bounds
@@ -1667,10 +1666,13 @@ int CollisionObject::ModelVsSphere(CollisionModelBody* model, CollisionSphereSha
     world.z = c.z * m[10] + c.y * m[6] + c.x * m[2] + m[14];
     float r = sphere->radiusScale * sphere->radius;
     float rr = r * r;
-    if (BoxSphereOverlap(&model->center, &model->halfExtents, world, r, rr, &model->field_0x88)) {
+    if (BoxSphereOverlap(reinterpret_cast<const Vec3*>(&model->center),
+        reinterpret_cast<const Vec3*>(&model->halfExtents), reinterpret_cast<const Vec3&>(world), r, rr,
+        &model->field_0x88)) {
         for (int i = 0; i < model->elementCount; i++) {
-            if (SphereTreeQuery(&world, r, rr, model->elements[i].pointTree,
-                            &model->elements[i].worldTransform, 0))
+            if (SphereTreeQuery(reinterpret_cast<const Vec3*>(&world), r, rr,
+                reinterpret_cast<QueryTreeNode*>(model->elements[i].pointTree),
+                &model->elements[i].worldTransform, 0))
                 return 1;
         }
     }
@@ -1697,8 +1699,9 @@ int CollisionObject::ModelVsCapsule(CollisionModelBody* model, CollisionCapsuleS
     float rr = r * r;
     if (BoxCapsuleOverlap(&model->center, &model->halfExtents, ends, r, rr, &model->field_0x88)) {
         for (int i = 0; i < model->elementCount; i++) {
-            if (CapsuleTreeQueryWithVertices(ends, r, rr, model->elements[i].pointTree,
-                            &model->elements[i].worldTransform, 0, model->elements[i].vertices))
+            if (CapsuleTreeQueryWithVertices(reinterpret_cast<const Vec3*>(ends), r, rr,
+                reinterpret_cast<QueryTreeNode*>(model->elements[i].pointTree),
+                &model->elements[i].worldTransform, 0, reinterpret_cast<Vec3*>(model->elements[i].vertices)))
                 return 1;
         }
     }
@@ -1731,8 +1734,9 @@ int CollisionObject::ModelVsHull(CollisionModelBody* a, CollisionHullBody* b, Co
     Matrix4 rel;
     CollisionInvertRigid(&rel, &a->field_0x88);
     MatrixMultiply(&rel, rel, b->worldTransform);
-    if (SweptBoxOverlap(a->center, a->halfExtents, &b->triangleTree->center,
-                    &b->triangleTree->halfExtents, &rel, &a->field_0xc8)) {
+    if (SweptBoxOverlap(reinterpret_cast<const Vec3&>(a->center), reinterpret_cast<const Vec3&>(a->halfExtents),
+        reinterpret_cast<const Vec3*>(&b->triangleTree->center),
+        reinterpret_cast<const Vec3*>(&b->triangleTree->halfExtents), &rel, &a->field_0xc8)) {
         Vec3 sum;
         sum = Vec3(0.0f, 0.0f, 0.0f);
         int count = 0;
@@ -1776,11 +1780,14 @@ int CollisionObject::ModelVsHullSwept(CollisionModelBody* a, CollisionHullBody* 
     MatrixMultiply(&rel, rel, b->bodyTransform);
     CollisionVec3 center = a->center;
     CollisionVec3 half = a->halfExtents;
-    GrowBoxByTransformedBox(&center, &half, a->field_0x30, a->field_0x3c, &a->field_0xc8);
+    GrowBoxByTransformedBox(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&half),
+        reinterpret_cast<const Vec3&>(a->field_0x30), reinterpret_cast<const Vec3&>(a->field_0x3c),
+        &a->field_0xc8);
     a->sweptCenter = center;
     a->sweptHalfExtents = half;
-    if (SweptBoxOverlap(center, half, &b->triangleTree->center,
-                    &b->triangleTree->halfExtents, &rel, &a->field_0xc8)) {
+    if (SweptBoxOverlap(reinterpret_cast<const Vec3&>(center), reinterpret_cast<const Vec3&>(half),
+        reinterpret_cast<const Vec3*>(&b->triangleTree->center),
+        reinterpret_cast<const Vec3*>(&b->triangleTree->halfExtents), &rel, &a->field_0xc8)) {
         Vec3 sum;
         sum = Vec3(0.0f, 0.0f, 0.0f);
         int count = 0;
@@ -1819,7 +1826,9 @@ int CollisionObject::ModelVsModel(CollisionModelBody* a, CollisionModelBody* b, 
     Matrix4 rel;
     CollisionInvertRigid(&rel, &a->field_0x88);
     MatrixMultiply(&rel, rel, b->field_0x88);
-    if (SweptBoxOverlap(a->center, a->halfExtents, &b->center, &b->halfExtents, &rel, &a->field_0xc8)) {
+    if (SweptBoxOverlap(reinterpret_cast<const Vec3&>(a->center), reinterpret_cast<const Vec3&>(a->halfExtents),
+        reinterpret_cast<const Vec3*>(&b->center), reinterpret_cast<const Vec3*>(&b->halfExtents), &rel,
+        &a->field_0xc8)) {
         Vec3 sum;
         sum = Vec3(0.0f, 0.0f, 0.0f);
         int count = 0;
@@ -1872,10 +1881,14 @@ int CollisionObject::ModelVsModelSwept(CollisionModelBody* a, CollisionModelBody
     MatrixMultiply(&rel, rel, b->field_0x88);
     CollisionVec3 center = a->center;
     CollisionVec3 half = a->halfExtents;
-    GrowBoxByTransformedBox(&center, &half, a->field_0x30, a->field_0x3c, &a->field_0xc8);
+    GrowBoxByTransformedBox(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&half),
+        reinterpret_cast<const Vec3&>(a->field_0x30), reinterpret_cast<const Vec3&>(a->field_0x3c),
+        &a->field_0xc8);
     a->sweptCenter = center;
     a->sweptHalfExtents = half;
-    if (SweptBoxOverlap(center, half, &b->center, &b->halfExtents, &rel, &a->field_0xc8)) {
+    if (SweptBoxOverlap(reinterpret_cast<const Vec3&>(center), reinterpret_cast<const Vec3&>(half),
+        reinterpret_cast<const Vec3*>(&b->center), reinterpret_cast<const Vec3*>(&b->halfExtents), &rel,
+        &a->field_0xc8)) {
         Vec3 last;
         last = Vec3(0.0f, 0.0f, 0.0f);
         for (int i = 0; i < b->elementCount; i++) {
@@ -1994,8 +2007,9 @@ int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, Coll
     for (int i = 0; i < g_CollisionScratchCount; i++)
         CollisionRotateRowsGrouped(&g_CollisionScratchPoints[i], g_CollisionScratchPoints[i], xf);
 
-    int hit = TreeTreeQuery(a->pointTree, b->triangleTree, &a->worldTransform, &b->worldTransform, 2, b->vertices,
-                          &a->motionTransform);
+    int hit = TreeTreeQuery(reinterpret_cast<QueryTreeNode*>(a->pointTree),
+        reinterpret_cast<QueryTreeNode*>(b->triangleTree), &a->worldTransform, &b->worldTransform, 2,
+        reinterpret_cast<Vec3*>(b->vertices), &a->motionTransform);
     if (hit) {
         float s = 1.0f / q->contactCount;
         q->contact = CollisionScaledProducts(q->contact, s);
@@ -2004,7 +2018,8 @@ int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, Coll
     CollisionRotateColsTo(&q->contactOffset, q->contactOffset, &b->worldTransform);
     CollisionRotateColsTo(&q->contactNormal, q->contactNormal, &b->worldTransform);
     for (int j = 0; j < g_CollisionScratchCount; j++)
-        Vec3TransformNormal(&g_CollisionScratchPoints[j], g_CollisionScratchPoints[j], &b->worldTransform);
+        Vec3TransformNormal(reinterpret_cast<Vec3*>(&g_CollisionScratchPoints[j]),
+            reinterpret_cast<const Vec3&>(g_CollisionScratchPoints[j]), &b->worldTransform);
     return hit;
 }
 
@@ -2034,8 +2049,9 @@ int CollisionObject::HullVsHullSwept(CollisionHullBody* a, CollisionHullBody* b,
 
     q->contactCount = 0;
     int hit;
-    if (!TreeTreeQuery(b->pointTree, a->triangleTree, &b->worldTransform, xf, 2, a->vertices,
-                    &b->relativeFrame))
+    if (!TreeTreeQuery(reinterpret_cast<QueryTreeNode*>(b->pointTree),
+        reinterpret_cast<QueryTreeNode*>(a->triangleTree), &b->worldTransform, xf, 2,
+        reinterpret_cast<Vec3*>(a->vertices), &b->relativeFrame))
         hit = 0;
     else {
         hit = 1;
@@ -2043,10 +2059,13 @@ int CollisionObject::HullVsHullSwept(CollisionHullBody* a, CollisionHullBody* b,
         q->contact = CollisionScaled(q->contact, s);
         CollisionTransformPointTo(&q->contact, q->contact, &a->worldTransform);
     }
-    Vec3TransformNormal(&q->contactOffset, -q->contactOffset, &a->worldTransform);
-    Vec3TransformNormal(&q->contactNormal, -q->contactNormal, &a->worldTransform);
+    Vec3TransformNormal(reinterpret_cast<Vec3*>(&q->contactOffset),
+        reinterpret_cast<const Vec3&>(-q->contactOffset), &a->worldTransform);
+    Vec3TransformNormal(reinterpret_cast<Vec3*>(&q->contactNormal),
+        reinterpret_cast<const Vec3&>(-q->contactNormal), &a->worldTransform);
     for (int j = 0; j < g_CollisionScratchCount; j++)
-        Vec3TransformNormal(&g_CollisionScratchPoints[j], g_CollisionScratchPoints[j], &a->worldTransform);
+        Vec3TransformNormal(reinterpret_cast<Vec3*>(&g_CollisionScratchPoints[j]),
+            reinterpret_cast<const Vec3&>(g_CollisionScratchPoints[j]), &a->worldTransform);
     return hit;
 }
 
@@ -2060,14 +2079,16 @@ int CollisionObject::HullVsModelSwept(CollisionHullBody* a, CollisionModelBody* 
     Matrix4 rel;
     CollisionInvertRigid(&rel, &a->bodyTransform);
     MatrixMultiply(&rel, rel, b->field_0x88);
-    if (SweptBoxOverlap(a->triangleTree->center, a->triangleTree->halfExtents, &b->center,
-                    &b->halfExtents, &rel, &a->motionTransform)) {
+    if (SweptBoxOverlap(reinterpret_cast<const Vec3&>(a->triangleTree->center),
+        reinterpret_cast<const Vec3&>(a->triangleTree->halfExtents), reinterpret_cast<const Vec3*>(&b->center),
+        reinterpret_cast<const Vec3*>(&b->halfExtents), &rel, &a->motionTransform)) {
         Vec3 sum;
         sum = Vec3(0.0f, 0.0f, 0.0f);
         CollisionVec3 nodePos;
         int count = 0;
         // Retail makes this call (0x004fc9a0); nodePos is never read.
-        ((CollisionSceneNode*)a->sceneNode)->GetPositionRelativeTo(0, &nodePos);
+        reinterpret_cast<SoultreeObject*>(a->sceneNode)->GetPositionIn(
+            0, reinterpret_cast<Vec3*>(&nodePos));
         for (int i = 0; i < b->elementCount; i++) {
             if (b->elementEnabled[i]) {
                 CollisionHullBody* e = &b->elements[i];
@@ -2130,17 +2151,20 @@ int CollisionObject::HullVsModel(CollisionHullBody* a, CollisionModelBody* b, Co
     CollisionInvertRigidRelFrame(&rel, &a->bodyTransform);
     MatrixMultiplyInline(&rel, rel, b->field_0x88);
     CollisionBoxBounds* tree = a->triangleTree;
-    if (SweptBoxOverlap(tree->center, tree->halfExtents, &b->center,
-                    &b->halfExtents, &rel, &a->motionTransform)) {
+    if (SweptBoxOverlap(reinterpret_cast<const Vec3&>(tree->center),
+        reinterpret_cast<const Vec3&>(tree->halfExtents), reinterpret_cast<const Vec3*>(&b->center),
+        reinterpret_cast<const Vec3*>(&b->halfExtents), &rel, &a->motionTransform)) {
         Vec3 sum = Vec3(0.0f, 0.0f, 0.0f);
         CollisionVec3 nodePos;
         int count = 0;
         // Retail makes this call (0x004fc9a0); nodePos is never read.
-        ((CollisionSceneNode*)a->sceneNode)->GetPositionRelativeTo(0, &nodePos);
+        reinterpret_cast<SoultreeObject*>(a->sceneNode)->GetPositionIn(
+            0, reinterpret_cast<Vec3*>(&nodePos));
         for (int i = 0; i < b->elementCount; i++) {
             // Retail makes this call too, for each element; the result is not read.
             CollisionVec3 elementPos;
-            ((CollisionSceneNode*)b->elements[i].sceneNode)->GetPositionRelativeTo(0, &elementPos);
+            reinterpret_cast<SoultreeObject*>(b->elements[i].sceneNode)->GetPositionIn(
+            0, reinterpret_cast<Vec3*>(&elementPos));
             if (!b->elementEnabled[i])
                 continue;
             CollisionHullBody* e = &b->elements[i];
@@ -2151,8 +2175,9 @@ int CollisionObject::HullVsModel(CollisionHullBody* a, CollisionModelBody* b, Co
             q->contactCount = 0;
             for (int j = 0; j < g_CollisionScratchCount; j++)
                 CollisionRotateRowsTo(&g_CollisionScratchPoints[j], g_CollisionScratchPoints[j], xf);
-            if (TreeTreeQuery(a->pointTree, e->triangleTree, &a->worldTransform, xf, 2, e->vertices,
-                            &a->motionTransform)) {
+            if (TreeTreeQuery(reinterpret_cast<QueryTreeNode*>(a->pointTree),
+                reinterpret_cast<QueryTreeNode*>(e->triangleTree), &a->worldTransform, xf, 2,
+                reinterpret_cast<Vec3*>(e->vertices), &a->motionTransform)) {
                 CollisionVec3 mean;
                 q->contact = *CollisionDivide(&mean, &q->contact, (float)q->contactCount);
                 CollisionTransformPointTo(&q->contact, q->contact, xf);
@@ -2270,8 +2295,9 @@ int CollisionObject::TestMeshAgainst(CollisionObject* other)
     switch (other->shapeType) {
     case 0: {
         CollisionHullBody* hull = (CollisionHullBody*)other->shape;
-        if (TreeTreeQuery(mesh->field_0x04, hull->triangleTree, &mesh->field_0x08, &hull->worldTransform, 1,
-                        hull->vertices, 0)) {
+        if (TreeTreeQuery(reinterpret_cast<QueryTreeNode*>(mesh->field_0x04),
+            reinterpret_cast<QueryTreeNode*>(hull->triangleTree), &mesh->field_0x08, &hull->worldTransform, 1,
+            reinterpret_cast<Vec3*>(hull->vertices), 0)) {
             CollisionRotateColsInPlace(&g_CollisionBoxResult->field_0x08, g_CollisionBoxResult->field_0x08, &hull->worldTransform);
             return 1;
         }
@@ -2284,8 +2310,9 @@ int CollisionObject::TestMeshAgainst(CollisionObject* other)
             for (int i = 0; i < model->elementCount; i++) {
                 CollisionHullBody* e = &model->elements[i];
                 if (model->elementEnabled[i]) {
-                    if (TreeTreeQuery(mesh->field_0x04, e->triangleTree, &mesh->field_0x08, &e->worldTransform, 1,
-                                    e->vertices, 0)) {
+                    if (TreeTreeQuery(reinterpret_cast<QueryTreeNode*>(mesh->field_0x04),
+                        reinterpret_cast<QueryTreeNode*>(e->triangleTree), &mesh->field_0x08, &e->worldTransform,
+                        1, reinterpret_cast<Vec3*>(e->vertices), 0)) {
                         hit = 1;
                         CollisionRotateColsInPlace(&g_CollisionBoxResult->field_0x08, g_CollisionBoxResult->field_0x08, &e->worldTransform);
                     }
@@ -2384,16 +2411,20 @@ int SphereTouchesObject(const CollisionVec3* center, float radius, float radiusS
     switch (object->shapeType) {
     case 0: {
         CollisionHullBody* hull = (CollisionHullBody*)object->shape;
-        return SphereTreeQueryWithVertices(center, radius, radiusSq, hull->triangleTree, &hull->worldTransform, 1,
-                           hull->vertices);
+        return SphereTreeQueryWithVertices(reinterpret_cast<const Vec3*>(center), radius, radiusSq,
+            reinterpret_cast<QueryTreeNode*>(hull->triangleTree), &hull->worldTransform, 1,
+            reinterpret_cast<Vec3*>(hull->vertices));
     }
     case 1: {
         CollisionModelBody* model = (CollisionModelBody*)object->shape;
-        if (BoxSphereOverlap(&model->center, &model->halfExtents, *center, radius, radiusSq, &model->field_0x88)) {
+        if (BoxSphereOverlap(reinterpret_cast<const Vec3*>(&model->center),
+            reinterpret_cast<const Vec3*>(&model->halfExtents), reinterpret_cast<const Vec3&>(*center), radius,
+            radiusSq, &model->field_0x88)) {
             for (int i = 0; i < model->elementCount; i++) {
                 CollisionHullBody* hull = &model->elements[i];
-                if (SphereTreeQueryWithVertices(center, radius, radiusSq, hull->triangleTree, &hull->worldTransform, 1,
-                                hull->vertices))
+                if (SphereTreeQueryWithVertices(reinterpret_cast<const Vec3*>(center), radius, radiusSq,
+                    reinterpret_cast<QueryTreeNode*>(hull->triangleTree), &hull->worldTransform, 1,
+                    reinterpret_cast<Vec3*>(hull->vertices)))
                     return 1;
             }
         }
@@ -2625,7 +2656,8 @@ void CollisionObject::SetTransform(const Matrix4* m)
         Vec3 half = *(Vec3*)&model->halfExtents;
         MoveBox((Vec3*)boundCenter, &half, &model->field_0xc8);
         boundRadius = CollisionLengthInline(half);
-        Vec3TransformPoint(boundCenter, *boundCenter, &model->field_0x88);
+        Vec3TransformPoint(reinterpret_cast<Vec3*>(boundCenter), reinterpret_cast<const Vec3&>(*boundCenter),
+            &model->field_0x88);
         break;
     }
     case 2: {
@@ -2635,7 +2667,8 @@ void CollisionObject::SetTransform(const Matrix4* m)
         *boundCenter = mesh->field_0x04->center;
         CollisionVec3 half = mesh->field_0x04->halfExtents;
         boundRadius = CollisionLength(&half);
-        Vec3TransformPoint(boundCenter, *boundCenter, &mesh->field_0x08);
+        Vec3TransformPoint(reinterpret_cast<Vec3*>(boundCenter), reinterpret_cast<const Vec3&>(*boundCenter),
+            &mesh->field_0x08);
         break;
     }
     case 3:
@@ -2645,7 +2678,8 @@ void CollisionObject::SetTransform(const Matrix4* m)
         CollisionVec3* boundCenter = (CollisionVec3*)&this->boundCenter;
         *boundCenter = sphere->center;
         boundRadius = sphere->radius;
-        Vec3TransformPoint(boundCenter, *boundCenter, (const Matrix4*)&sphere->transform);
+        Vec3TransformPoint(reinterpret_cast<Vec3*>(boundCenter), reinterpret_cast<const Vec3&>(*boundCenter),
+            (const Matrix4*)&sphere->transform);
         break;
     }
     }
@@ -2720,7 +2754,8 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                             Vec3 d = SubtractCtorCall(p[1], p[0]);
                             Vec3 scaled = ScaleCtorCall(d, hit.fraction);
                             *(Vec3*)outPoint = SegmentAdd(scaled, p[0]);
-                            Vec3TransformNormal(outNormal, hit.field_0x08, &e->worldTransform);
+                            Vec3TransformNormal(reinterpret_cast<Vec3*>(outNormal),
+                                reinterpret_cast<const Vec3&>(hit.field_0x08), &e->worldTransform);
                             return 1;
                         }
                     }

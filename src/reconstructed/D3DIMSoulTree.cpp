@@ -127,12 +127,12 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
         if (item) {
             if (item->object) {
                 item->AddRef();
-                SoultreeVirtualSlot7((SoultreeObject*)item->object);
+                CloneFrom((SoultreeObject*)item->object);
                 RegisterNode();
                 return this;
             }
             ((UnknownTextureStream*)item->archive)->Seek(item->offset, 0, 0);
-            SoultreeVirtualSlot2((UnknownTextureStream*)item->archive);
+            LoadHierarchy((UnknownTextureStream*)item->archive);
         } else {
             fnameLength = strlen(fname);
             length = fnameLength > 0x103 ? 0x103 : fnameLength;
@@ -157,7 +157,7 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
             }
             if (item->object) {
                 item->AddRef();
-                SoultreeVirtualSlot7((SoultreeObject*)item->object);
+                CloneFrom((SoultreeObject*)item->object);
                 RegisterNode();
                 return this;
             }
@@ -174,9 +174,9 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
 }
 
 // 0x0043f950
-void D3DIMSoultreeObject::SoultreeVirtualSlot2(UnknownTextureStream* stream)
+void D3DIMSoultreeObject::LoadHierarchy(UnknownTextureStream* stream)
 {
-    SoultreeObject::SoultreeVirtualSlot2(stream);
+    SoultreeObject::LoadHierarchy(stream);
     int count = CountNodes();
     SoultreeObject** nodes = (SoultreeObject**)DebugMalloc(count * 4, __FILE__, 0x14e);
     int index = 1;
@@ -251,11 +251,11 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot2(UnknownTextureStream* stream)
 }
 
 // 0x0043fe40
-void D3DIMSoultreeObject::SoultreeVirtualSlot3()
+void D3DIMSoultreeObject::LoadHierarchyFromParameters()
 {
     parameterBlock->SelectSection("Materials");
     parameterBlock->GetInt("NumberOfMaterials", 0, &materialCount);
-    SoultreeObject::SoultreeVirtualSlot3();
+    SoultreeObject::LoadHierarchyFromParameters();
     int untextured = ReadLods();
     int count = materialCount;
     if (untextured)
@@ -1047,14 +1047,14 @@ void D3DIMSoultreeObject::Disable()
 // CollectDescendants counter `index`; `to` is declared before `from`, and
 // `d` before `s`, which gives retail's register rotation (source ebx,
 // `from` edi, `to` ebp).
-void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
+void D3DIMSoultreeObject::CloneFrom(SoultreeObject* sourceNode)
 {
     D3DIMSoultreeObject* source = (D3DIMSoultreeObject*)sourceNode;
     GameObject::SetRenderContext(source->renderContext);
     textureFormat = source->textureFormat;
     textureManager = source->textureManager;
     lightManager = source->lightManager;
-    SoultreeObject::SoultreeVirtualSlot7(source);
+    SoultreeObject::CloneFrom(source);
     CopyMaterials(source);
     lodCount = source->lodCount;
     currentLod = source->currentLod;
@@ -1144,9 +1144,9 @@ void D3DIMSoultreeObject::CopyMaterials(D3DIMSoultreeObject* source)
 }
 
 // 0x00444b60
-void D3DIMSoultreeObject::SoultreeVirtualSlot8(SoultreeObject* sourceNode, SoultreeObject* targetNode)
+void D3DIMSoultreeObject::CopySubtree(SoultreeObject* sourceNode, SoultreeObject* targetNode)
 {
-    SoultreeObject::SoultreeVirtualSlot8(sourceNode, targetNode);
+    SoultreeObject::CopySubtree(sourceNode, targetNode);
     D3DIMSoultreeObject* source = (D3DIMSoultreeObject*)sourceNode;
     D3DIMSoultreeObject* target = (D3DIMSoultreeObject*)targetNode;
     target->subtreeDirty = 1;
@@ -1314,7 +1314,7 @@ int D3DIMSoultreeObject::NodeMovesVertices(SoultreeObject* node, int lod)
 }
 
 // 0x004450c0
-void D3DIMSoultreeObject::SoultreeVirtualSlot6()
+void D3DIMSoultreeObject::ResetLocalMatrices()
 {
     int saved = currentLod;
     for (int lod = 0; lod < lodCount; lod++) {
@@ -1332,7 +1332,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot6()
         }
     }
     currentLod = saved;
-    SoultreeObject::SoultreeVirtualSlot6();
+    SoultreeObject::ResetLocalMatrices();
     if (!parent)
         ComputeAllBounds();
 }

@@ -167,14 +167,10 @@ inline Vec3 ScaleCtorCall(const Vec3& v, float s)
 // The unit's functions (cdecl).
 // ---------------------------------------------------------------------------------------
 
-int SweptBoxOverlap(Vec3 aCenter, Vec3 aHalf, const Vec3* bCenter, const Vec3* bHalf,
-                    const Matrix4* rel, const Matrix4* xfA);                       // 0x00424730
 int BoxOverlap(const Vec3* aCenter, const Vec3* aHalfExtents, Vec3 bCenter, Vec3 bHalfExtents,
                const Matrix4* bToA);                                               // 0x00424ab0
 int SegmentBoxOverlap(const Vec3* center, const Vec3* halfExtents, Vec3 p0, Vec3 p1,
                       const Matrix4* m);                                           // 0x004253b0
-int BoxSphereOverlap(const Vec3* center, const Vec3* halfExtents, Vec3 sphereCenter,
-                     float radius, float radiusSq, const Matrix4* xf);             // 0x00425750
 int BoxCapsuleOverlap(const Vec3* center, const Vec3* halfExtents, const Vec3* ends,
                       float radius, float radiusSq, const Matrix4* xf);            // 0x00425900
 int LeafNodeQuery(QueryTreeNode* a, QueryTreeNode* b, int useMotion);              // 0x004269e0
@@ -185,30 +181,14 @@ int PointInTriangle(const Vec3* p, const QueryTriangle* tri);                   
 int SegmentTriangleQuery(const QueryTriangle* tri, const Vec3* segment, const Matrix4* m);
                                                                                    // 0x00427c10
 int TreeTreeQueryNodes(QueryTreeNode* a, QueryTreeNode* b, int useMotion);         // 0x004280e0
-int TreeTreeQuery(QueryTreeNode* a, QueryTreeNode* b, const Matrix4* xfA, const Matrix4* xfB,
-                  int mode, Vec3* vertices, const Matrix4* motion);                // 0x00428950
-int TreeBoxOverlap(QueryTreeNode* a, QueryTreeNode* b, const Matrix4* xfA,
-                   const Matrix4* xfB);                                            // 0x00428c20
 #include "../../reconstructed/CollisionTransforms.h"
-void GrowBoxByTransformedBox(Vec3* outCenter, Vec3* outHalfExtents, Vec3 center,
-                             Vec3 halfExtents, const Matrix4* m);                  // 0x004290d0
-int SphereTreeQueryWithVertices(const Vec3* center, float radius, float radiusSq,
-                                QueryTreeNode* node, const Matrix4* xf, int triangles,
-                                Vec3* vertices);                                   // 0x00429540
-int SphereTreeQuery(const Vec3* center, float radius, float radiusSq, QueryTreeNode* node,
-                    const Matrix4* xf, int triangles);                             // 0x00429570
-int CapsuleTreeQueryWithVertices(const Vec3* ends, float radius, float radiusSq,
-                                 QueryTreeNode* node, const Matrix4* xf, int triangles,
-                                 Vec3* vertices);                                  // 0x00429890
 int CapsuleTreeQuery(const Vec3* ends, float radius, float radiusSq, QueryTreeNode* node,
                      const Matrix4* xf, int triangles);                            // 0x004298c0
 int SegmentTreeQueryWithVertices(const Vec3* ends, QueryTreeNode* node, const Matrix4* xf,
                                  Vec3* vertices);                                  // 0x00429e60
 int SegmentTreeQuery(const Vec3* ends, QueryTreeNode* node, const Matrix4* xf);    // 0x00429e90
 #include "BoundingBoxTreeQueryFunctions.h"
-void Vec3TransformNormal(Vec3* out, Vec3 v, const Matrix4* m);                     // 0x0042a450
 void Vec3TransformNormalTranspose(Vec3* out, Vec3 v, const Matrix4* m);            // 0x0042a4b0
-void Vec3TransformPoint(Vec3* out, Vec3 v, const Matrix4* m);                      // 0x0042a510
 void TransformPointPtr(Vec3* out, const Vec3* v, const Matrix4* m);                // 0x0042a580
 void InverseTransformPoint(Vec3* out, Vec3 p, const Matrix4* m);                   // 0x0042a5e0
 // 0x0042a640: a distance between the segments p0 + s*d0 and p1 + t*d1 (0 when d0 x d1 is

@@ -34,12 +34,8 @@ typedef UnknownTextureStream UnknownParameterStream;
 #ifdef SOULTREE_OBJECT_WITH_BASES
 #include "collision/CollisionObject.h"   // QuadTreeObject, GameObject
 
-// 0x00461640 (thiscall, ret 0xc): Read(dst, elementSize, count). The stream class is
-// named CollisionFileStream / UnknownTextureStream elsewhere; tier 3 stand-in here.
-class SoultreeFileStream {
-public:
-    int Read(void* dst, int size, int count);
-};
+#include "../../reconstructed/FileStream.h"
+
 // src/reconstructed/Parameterblocks.h declares the full class; only the members
 // soultree.cpp calls are listed (same mangled names).
 class UnknownParameterBlock {
@@ -303,8 +299,8 @@ public:
     virtual ~SoultreeObject();
     // Primary vtable 0x00557c18 (QuadTreeObject's): slots 0/1 inherited, 2..8 introduced.
     // Names tier 3 from the decoded bodies below; D3DIMSoultreeObject's overrides are its
-    // SoultreeVirtualSlot2..8.
-    virtual void LoadHierarchy(SoultreeFileStream* stream);   // slot 2, 0x004fdc00, ret 4: node count, names, matrices, parent indices
+    // corresponding primary virtual methods (slots 2..8).
+    virtual void LoadHierarchy(UnknownTextureStream* stream);   // slot 2, 0x004fdc00, ret 4: node count, names, matrices, parent indices
     virtual void LoadHierarchyFromParameters();               // slot 3, 0x004fddc0: the "Object Hierarchy" rows of parameterBlock
     virtual void CreateNode(SoultreeObject** out);            // slot 4, 0x004fe020, ret 4: *out = new node (the loaders' and clone's factory)
     virtual void UpdateLocalBounds();                         // slot 5, 0x00464e90 (shared empty body); GetLocalBounds calls it while localBoundsValid is 0

@@ -760,7 +760,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             arch->arcadeModel->SetUseLighting(1);
             float scale = finishProbe.width / arch->modelWidth * 1.111f;
             arch->arcadeModel->Scale(scale, scale, scale);
-            arch->arcadeModel->SoultreeVirtualSlot6();
+            arch->arcadeModel->ResetLocalMatrices();
             arch->SetPosition(&point);
             arch->SetAxes(&direction, &kVec3YAxis, 1, 0);
             arch->BuildCollision(name, 0x6a, 0, 0, 0, 1);

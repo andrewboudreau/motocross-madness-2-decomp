@@ -775,7 +775,7 @@ void SoultreeObject::LoadFromParameters(UnknownParameterStream* stream, int offs
 // 0x004fdc00. Slot 2: reads a whole hierarchy from a binary stream: the node count, then per
 // node its name, local matrix and bounds fields (new nodes come from slot 4; node 0 is this
 // one), then one parent index per node (-1 = none, __FILE__ line 0x370).
-void SoultreeObject::LoadHierarchy(SoultreeFileStream* stream)
+void SoultreeObject::LoadHierarchy(UnknownTextureStream* stream)
 {
     SoultreeObject* nodes[256];
     int i;

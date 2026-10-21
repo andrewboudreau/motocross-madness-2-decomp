@@ -55,13 +55,13 @@ class SoultreeObject : public UnknownSoultreeQuadTreeObject, public GameObject {
 public:
     explicit SoultreeObject(int flags);
     virtual ~SoultreeObject();
-    virtual void SoultreeVirtualSlot2(UnknownTextureStream* stream);   // 0x004fdc00 (ret 4): reads a saved node
-    virtual void SoultreeVirtualSlot3();                                  // 0x004fddc0: reads the .slt keys
+    virtual void LoadHierarchy(UnknownTextureStream* stream);   // 0x004fdc00 (ret 4): reads a saved node
+    virtual void LoadHierarchyFromParameters();                                  // 0x004fddc0: reads the .slt keys
     virtual void SoultreeVirtualSlot4(SoultreeObject** out);              // 0x004fe020 (ret 4): clone
     virtual void SoultreeVirtualSlot5();                                  // 0x00464e90 (shared `ret`)
-    virtual void SoultreeVirtualSlot6();                                  // 0x004fec70
-    virtual void SoultreeVirtualSlot7(SoultreeObject* source);            // 0x004feb10 (ret 4): copies `source`
-    virtual void SoultreeVirtualSlot8(SoultreeObject* source, SoultreeObject* target); // 0x004feb30 (ret 8)
+    virtual void ResetLocalMatrices();                                  // 0x004fec70
+    virtual void CloneFrom(SoultreeObject* source);            // 0x004feb10 (ret 4): copies `source`
+    virtual void CopySubtree(SoultreeObject* source, SoultreeObject* target); // 0x004feb30 (ret 8)
 
     // soultree.cpp helpers (thiscall).
     // Same complete-node pointer (+0), shared with the physics declaration.
@@ -206,13 +206,13 @@ class D3DIMSoultreeObject : public SoultreeObject {
 public:
     explicit D3DIMSoultreeObject(int flags);       // 0x0043f160 (ret 4)
     virtual ~D3DIMSoultreeObject();                // 0x0043f2b0 (deleting wrapper 0x0043f280)
-    virtual void SoultreeVirtualSlot2(UnknownTextureStream* stream); // 0x0043f950
-    virtual void SoultreeVirtualSlot3();                               // 0x0043fe40
+    virtual void LoadHierarchy(UnknownTextureStream* stream); // 0x0043f950
+    virtual void LoadHierarchyFromParameters();                               // 0x0043fe40
     virtual void SoultreeVirtualSlot4(SoultreeObject** out);           // 0x004440a0
     virtual void SoultreeVirtualSlot5();                               // 0x00444140
-    virtual void SoultreeVirtualSlot6();                               // 0x004450c0
-    virtual void SoultreeVirtualSlot7(SoultreeObject* source);         // 0x00444560
-    virtual void SoultreeVirtualSlot8(SoultreeObject* source, SoultreeObject* target); // 0x00444b60
+    virtual void ResetLocalMatrices();                               // 0x004450c0
+    virtual void CloneFrom(SoultreeObject* source);         // 0x00444560
+    virtual void CopySubtree(SoultreeObject* source, SoultreeObject* target); // 0x00444b60
     // Slot 9 (0x0043f4b0, ret 0x14): loads the model `name` (".slb" from
     // the resource manager, else ".slt") and returns the GameObject base;
     // callers hand it straight to GameObject 0x00469190. `owner` goes to

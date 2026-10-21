@@ -14,6 +14,7 @@
 #include "collision/CollisionObject.h"
 #include "CollisionPoint.h"
 #include "math/Math3D.h"
+#include "bvh/BoundingBoxTreeQueryFunctions.h"
 
 // Box bounds object at CollisionHullShape::field_0x188: two vec3s read as
 // (+4, +0x10) by every caller of the broad-phase test 0x00424730 (center, half extents;
@@ -73,51 +74,20 @@ struct CollisionMeshBody {
 };
 
 // ---------------------------------------------------------------------------
-// Callees outside this file (all cdecl unless noted; arguments are tier 3 guesses from
-// the push order at the call sites).
+// Remaining provisional call views. The connected query entry points are declared in
+// BoundingBoxTreeQueryFunctions.h; CollisionObject casts only at the call boundary.
+// Their pointer/value ABI is verified without equating whole provisional classes.
 // ---------------------------------------------------------------------------
 
-// 0x00428950: oriented-box (hull) vs oriented-box test.  Copies both transforms into
-// file-scope scratch (0x00578ef0...), leaves contact points in g_CollisionScratchPoints
-// and their count in g_CollisionScratchCount.
-int TreeTreeQuery(void* geomA, void* geomB, const Matrix4* xfA, const Matrix4* xfB,
-                int mode, void* aux, void* out);
-// 0x00429570: hull vs sphere (world center, r, r*r).  0x00429890: hull vs capsule (two
-// world endpoints, r, r*r).  Same trailing arguments as the box test.  The second
-// argument is the radius: every caller stores r into a dead argument slot and pushes that
-// dword (0x004379c0 +0xaf..+0xc9), so it is a float, not the shape pointer.
-int SphereTreeQuery(CollisionVec3* worldCenter, float radius, float radiusSq, void* geom,
-                const Matrix4* xf, int mode);
-int CapsuleTreeQueryWithVertices(CollisionVec3* worldEnds, float radius, float radiusSq, void* geom,
-                const Matrix4* xf, int mode, void* aux);
-// 0x00429540: the sphere test of 0x00429570 with a vertex array (BoundingBoxTreeQuery.h's
-// SphereTreeQueryWithVertices).
-int SphereTreeQueryWithVertices(const CollisionVec3* worldCenter, float radius, float radiusSq, void* geom,
-                const Matrix4* xf, int mode, void* vertices);
-// 0x00424730: broad-phase box overlap in a relative frame (center/half extents of box A by
-// value, box B by pointer, relative transform, transform of A).
-int SweptBoxOverlap(CollisionVec3 aCenter, CollisionVec3 aHalf, const CollisionVec3* bCenter,
-                const CollisionVec3* bHalf, const Matrix4* rel, const Matrix4* xfA);
-
-// 0x00425750 / 0x00425900: broad-phase overlap of a model's bounds (center, half extents,
-// in the frame of `xf`) with a sphere (world center by value) / capsule (pointer to the two
-// world endpoints), given radius and radius squared.  Nonzero = may touch.
-int BoxSphereOverlap(const CollisionVec3* boundsCenter, const CollisionVec3* boundsHalf,
-                CollisionVec3 worldCenter, float radius, float radiusSq, const Matrix4* xf);
+// 0x00425900: this capsule broad-phase provider is still missing from the game link.
 int BoxCapsuleOverlap(const CollisionVec3* boundsCenter, const CollisionVec3* boundsHalf,
                 const CollisionVec3* worldEnds, float radius, float radiusSq, const Matrix4* xf);
 
-// 0x0042a450: out = v * M3x3 (rotate by the matrix, no translation); 0x0042a4b0:
-// out = M3x3 * v (rotate by the transpose); 0x0042a510: out = v * M + translation row.
-void Vec3TransformNormal(CollisionVec3* out, CollisionVec3 v, const Matrix4* m);
+// 0x0042a4b0: rotate by the transpose; this provisional call view is not connected here.
 void Vec3TransformNormalTranspose(CollisionVec3* out, CollisionVec3 v, const Matrix4* m);
-void Vec3TransformPoint(CollisionVec3* out, CollisionVec3 v, const Matrix4* m);
 
-// 0x004fc9a0 (thiscall on a scene node): position of the node relative to `parent`
-// (parent == 0 gives the world position).
 class CollisionSceneNode {
 public:
-    void GetPositionRelativeTo(CollisionSceneNode* parent, CollisionVec3* out);
     void GetMatrixIn(CollisionSceneNode* frame, Matrix4* out);   // 0x004fca80
 };
 
@@ -223,12 +193,6 @@ struct CollisionContactSum {
     CollisionContactSum() { x = 0.0f; y = 0.0f; z = 0.0f; }
     void Accumulate(const CollisionVec3* v);   // 0x00428060
 };
-
-// 0x004290d0: bounds of a swept box in another frame (provisional signature: two output
-// vec3s, two input vec3s by value, a transform).  Results land in CollisionModelBody
-// field_0x108 / field_0x114 in 0x00437ef0 and 0x00438550.
-void GrowBoxByTransformedBox(CollisionVec3* outCenter, CollisionVec3* outHalf, CollisionVec3 center,
-                 CollisionVec3 half, const Matrix4* xf);
 
 // 0x00432180 (cdecl): out = to * inverse(from) for rigid transforms.
 void CollisionRelativeTransform(Matrix4* out, const Matrix4* from, const Matrix4* to);

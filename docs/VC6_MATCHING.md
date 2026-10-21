@@ -22,22 +22,23 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The current collision ownership/traversal and model render-state connections
-preserve all 212 prior production objects under fifteen verified external-name
-substitutions: 10,456 nondebug sections and 45,266 relocations. The nonadmitted
-CreateRacers sample has one separately proved instruction-order improvement;
-see [the complete composition proof](MODEL_RENDER_STATE_CONNECTIONS.md).
-The separately reviewed PCTextureMap::CreateSurface adds one nonexact candidate:
-its 2,028-byte complete body has 518 matching positions against 2,033 retail
-bytes and passes 12,226 native scripted-boundary scenarios. A data-only provider
-supplies its four-byte debug flag. The final real link compiles 214 translation
-units and reports 404 unresolved names. Private evidence is in
-`work/game-build/round25-all-objects.json`, `round25-link-evidence.json`
-and `connections-round25-preservation.json`.
+The current collision-query and Soultree hierarchy connections preserve all
+214 prior production objects under 23 verified declaration and definition name
+substitutions: 10,460 nondebug sections and 45,294 relocations. Complete sample
+objects and partial fingerprints are preserved as well; see the
+[collision](COLLISION_QUERY_CONNECTIONS.md) and
+[hierarchy](SOULTREE_HIERARCHY_CONNECTIONS.md) evidence.
+The separately reviewed [PCTextureMap::Clone](TEXTURE_CLONE.md) adds one
+nonexact candidate: its 590-byte complete body has 333 matching positions
+against 600 retail bytes and passes 135,464 native scripted-boundary scenarios,
+including both allocation cleanup states. The final real link compiles 215
+translation units and reports 386 unresolved names. Private evidence is in
+`work/game-build/round26-all-objects.json`, `round26-link-evidence.json`
+and `connections-round26-preservation.json`.
 
-The final regression run passes 468 tests with eleven skipped (479 total),
-recorded in `work/game-build/tests-round25.log`. Static checking passes for
-201 Python files and 347 JSON files.
+The final regression run passes 471 tests with eleven skipped (482 total),
+recorded in `work/game-build/tests-round26.log`. Static checking passes for
+204 Python files and 350 JSON files.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

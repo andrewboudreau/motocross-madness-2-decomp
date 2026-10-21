@@ -187,3 +187,5 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x004c8550` `WriteLevel`
 
 The complete slot-4 candidate now has a separate [functional build review](TEXTURE_SURFACE_CREATE.md#functional-build-review), including the corrected full return extent, actual source-format helpers and native surface/failure boundary tests.
+
+The complete slot-6 Clone candidate has a separate [functional build review](TEXTURE_CLONE.md#functional-build-review), including both allocation cleanup states, existing deleting-destructor providers and native copy/color-key/failure boundary tests.

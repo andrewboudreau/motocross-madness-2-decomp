@@ -1,0 +1,11 @@
+{
+  "??0ManagedTexture@@QAE@PAVTextureMapManager@@@Z": "0x00510500",
+  "??0PCTextureMap@@QAE@PAVTextureMapManager@@H@Z": "0x004c5f00",
+  "??2@YAPAXIPBDH@Z": "0x004a3010",
+  "?AddTexture@ManagedTextureGroup@@QAEXPAVManagedTexture@@@Z": "0x0050c6c0",
+  "?Clone@PCTextureMap@@UAEPAVTextureMap@@XZ": "0x004c71c0",
+  "?Clone@PCTextureMap@@UAEPAVTextureMap@@XZ$ehhandler": "0x0054cd34",
+  "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
+  "__FILE__": "0x00570524"
+}

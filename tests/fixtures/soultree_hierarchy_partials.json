@@ -1,0 +1,21 @@
+{
+  "baseline": "799f6e9daca7b8af7057ad9a6b61d57c0552a898",
+  "functions": [
+    [
+      "samples/render/D3DIMSoulTreeNearMisses.cpp",
+      "?PrepareGeometry@D3DIMSoultreeObject@@UAEHXZ",
+      4471456,
+      832,
+      832,
+      "5ea97b888c0f3af61fdbaac2464fe3c4b06d884438864907303f96c1f90161a0"
+    ],
+    [
+      "samples/render/D3DIMSoulTreeNearMisses.cpp",
+      "?DrawCurrentLod@D3DIMSoultreeObject@@QAEXXZ",
+      4460336,
+      7848,
+      7848,
+      "e713ca27d59df9f4ed4c24700c77830bc75bfc652734a4d8298b403ffa42ad6e"
+    ]
+  ]
+}

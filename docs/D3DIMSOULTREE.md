@@ -1,8 +1,8 @@
 # D3DIMSoulTree.CPP
 
 `src/reconstructed/D3DIMSoulTree.h` / `D3DIMSoulTree.cpp`. LightEmitter.h
-includes the header, so every existing caller keeps its declarations and
-mangled names. Names other than the RTTI classes are provisional.
+includes the header, so its consumers share the same declarations.
+Names other than the RTTI classes are provisional.
 
 Evidence:
 - **`__FILE__`:** the literal at `0x00568994`, xrefs `0x0043f2ee..0x00444f6b`.
@@ -18,9 +18,10 @@ large drawing function with a jump table; fnlist's starts inside it are
 false.
 
 In this tree, SoultreeObject is a view with real bases
-(`UnknownSoultreeQuadTreeObject`, GameObject); the krusty2 headers are
-untouched. The secondary-base slots are named `QuadTreeVirtualSlot0/1` and
-`SoultreeVirtualSlot2..8`, so they cannot collide with GameObject's.
+(`UnknownSoultreeQuadTreeObject`, GameObject). Its primary hierarchy methods
+now share the [loading and cloning declarations](SOULTREE_HIERARCHY_CONNECTIONS.md)
+with the canonical soultree provider. Their slots remain 2, 3, 6, 7 and 8;
+the separate GameObject base remains at offset `+0xc`.
 
 Exact: 52 calibration cases:
 - The constructor, the destructor and its deleting wrapper.

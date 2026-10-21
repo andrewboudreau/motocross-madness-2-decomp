@@ -37,28 +37,29 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 214 C++ files (184 canonical sources and thirty
-reviewed candidates) and reaches LINK with 404 unresolved external symbols,
+The 2026-10-21 build compiles 215 C++ files (184 canonical sources and 31
+reviewed candidates) and reaches LINK with 386 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The final composition in `build-ure841up` retains all prior strict results:
+The final composition in `build-orqgbi60` retains all prior strict results:
 2,981/2,992 calibration rows and 1,086/1,162 physics comparisons. This does
 not establish game startup, menus or racing while linkage remains incomplete.
-The full regression run passes: 479 tests, with 468 passed and eleven skipped
-(`work/game-build/tests-round25.log`). Static checking also passes for 201
-Python files and 347 JSON files.
+The full regression run passes: 482 tests, with 471 passed and eleven skipped
+(`work/game-build/tests-round26.log`). Static checking also passes for 204
+Python files and 350 JSON files.
 
-The current [collision ownership and traversal](COLLISION_SCENE_CONNECTIONS.md)
-and [model lighting/LOD connections](MODEL_RENDER_STATE_CONNECTIONS.md) remove
-fifteen obsolete call-view names. All 212 prior production objects preserve
-10,456 nondebug sections and 45,266 relocations under verified substitutions.
-The [texture-surface setup](TEXTURE_SURFACE_CREATE.md) supplies one reviewed
-nonexact candidate after 12,226 native scripted-boundary comparisons; a
-separate data-only provider supplies its four-byte debug-dump flag. Together
-these changes remove sixteen previously missing symbols with no new unresolved
-names in the final composition.
+The current [collision-query connections](COLLISION_QUERY_CONNECTIONS.md) and
+[Soultree hierarchy connections](SOULTREE_HIERARCHY_CONNECTIONS.md) remove
+seventeen obsolete call-view names. All 214 prior production objects preserve
+10,460 nondebug sections and 45,294 relocations under 23 verified declaration
+and definition name substitutions. [Texture cloning](TEXTURE_CLONE.md) supplies
+one reviewed nonexact candidate after 135,464 native scripted-boundary
+comparisons, including both allocation cleanup states. Together these changes
+remove eighteen previously missing symbols with no new unresolved names.
+Private evidence is in `work/game-build/round26-link-evidence.json`,
+`round26-all-objects.json` and `connections-round26-preservation.json`.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

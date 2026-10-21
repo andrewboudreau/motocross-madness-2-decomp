@@ -902,7 +902,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?LoadHierarchy@SoultreeObject@@UAEXPAVSoultreeFileStream@@@Z",
+    "candidate_symbol_contains": "?LoadHierarchy@SoultreeObject@@UAEXPAVUnknownTextureStream@@@Z",
     "target_va": "0x004fdc00",
     "target_size": 433,
     "expect": "exact",
