@@ -371,3 +371,9 @@ exact:
   (`0x419970`) went from 13100 to 13396 of 13428 this way, together with one function-scope
   loop index shared by two blocks' loops (retail homes both in one slot); either change alone
   is worse (12792, 2617).
+- A type-changing cast of a global pointer at a member read (`reinterpret_cast<View*>(g)->f`,
+  a C cast, a cast through `void*`, or the same cast inside an inline accessor) changes the
+  whole function's frame: the 17585-byte BikeAI look-ahead (`0x40eca0`) grows from 0x968 to
+  0x978 and its locals sort and share slots differently (aligned 3760 -> 3402), even with a
+  single such site. A pointer declared with the view type, or a no-op cast to its own type,
+  leaves the frame alone. The global loads themselves are identical.
