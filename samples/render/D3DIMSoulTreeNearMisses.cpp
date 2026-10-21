@@ -44,7 +44,7 @@
 // 0x0057ef38 and 0x0057eee8 (guard 0x0057ef24 bits 1, 2, 4) whose type has
 // an empty destructor: their atexit entries are the `ret` stubs
 // 0x00442f60, 0x00442f50 and 0x00442f40. Same structure (1895 of 1893
-// instructions, 484 differing, 7832 bytes): the three mode 8 and mode 2
+// instructions, 484 differing, then 7832 bytes): the three mode 8 and mode 2
 // normalisations return through the out-of-line Vector3 constructor
 // 0x00404e60 as retail does (Vector3Call; the inline budget, with the
 // constructor expanded in the mode 5 and 6 normalisations). Mode 5's
@@ -66,6 +66,12 @@
 // alone or with x read in place, are folded away (744)), `this` is in esi where ours is in
 // ebx, and the identity diagonal is stored from m[3][3] down (every order
 // and spelling of the four stores is emitted from m[0][0] up).
+// Mode 2 halves the reflection as a vector before adding 0.5 (written
+// `x * 0.5f + 0.5f`, VC6 factors it to `(x + 1) * 0.5`; retail multiplies,
+// then adds, through 0x005507f4 both times; 7848 bytes as retail). Mode 3
+// copies the light position by value in retail (add edi, 0x64, then three
+// dword stores to the frame); that copy here is worse (695 vs 719 bytes,
+// 733 vs 706 differing instructions), so the reference stays.
 // The mode 5 source keeps two retail bugs: `circle[i + 1]` reads past the
 // 16 points, and the group loop indexes with the restore loop's `k`.
 //
@@ -461,8 +467,9 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         Vector3 twice = n + n;
                         float d = direction.x * n.x + direction.y * n.y + direction.z * n.z;
                         Vector3 reflected = twice * d - direction;
-                        group->sourceVertices[v].tu = reflected.x * 0.5f + 0.5f;
-                        group->sourceVertices[v].tv = reflected.y * 0.5f + 0.5f - scroll;
+                        Vector3 half = reflected * 0.5f;
+                        group->sourceVertices[v].tu = half.x + 0.5f;
+                        group->sourceVertices[v].tv = half.y + 0.5f - scroll;
                     }
                 }
                 restore = 1;
