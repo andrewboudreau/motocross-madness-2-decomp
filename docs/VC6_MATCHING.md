@@ -23,40 +23,51 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The [FilePrintf declaration connection](FILE_PRINTF_CONNECTION.md) joins the
-obsolete void-return spelling to the existing integer-returning implementation.
-Its 74 strict checks preserve four complete objects (300 sections and 1,464
-relocations), including the unadmitted EcoSystem listing. Seven actual call
-sites and 227 tests with real VC6 CRT streams check arguments, formatted output,
-return values and a read-only stream failure. No caller body or provider changes.
+The [palette getter connections](PALETTE_GETTER_CONNECTIONS.md) join two
+provisional getter names to the existing ColorMapper implementations. The
+public palette view remains separate. Six call sites, 103 strict checks and
+8,139 finite native cases verify the connection; two complete objects preserve
+56 sections and 153 relocations under exactly those two names. Dither and the
+still-missing fast 555 converter are outside the native scalar conversion tests.
 
-The [HUD rectangle-restoration candidate](OVERLAY_RESTORE_RECT.md#functional-build-review)
-now supplies Overlay::RestoreRect for the existing statistics and chat callers.
-It remains reviewed nonexact: 365 emitted bytes against the complete 365 retail
-bytes, with 77 resolved matching positions. Explicit ordered field reads model
-decoded fault behavior; they do not establish original volatile qualification.
-Its 12,970 finite native cases use actual strict lock/unlock and pixel-format
-helpers, with 17 strict helper/producer/caller checks and eight verified direct
-calls. COM surfaces remain scripted; integrated HUD behavior is unverified.
+The [Soultree counter storage](SOULTREE_STATE.md) supplies one writable,
+zero-initialized four-byte cell. All four retail references lie in the complete
+strict 1,500-byte initializer. The name and original source ownership remain
+provisional; the test verifies storage and instructions, not runtime lifecycle.
 
-All 253 prior production objects preserve 10,669 nondebug sections and 45,717
-relocations under only the FilePrintf external-name correction, with no
-filename exclusions. The new two-section, three-relocation Overlay object
-independently reproduces its actual game-command emission. Real links remove
-exactly two missing names, **245 -> 244 -> 243**, with none added. The final
-report checks all 254 source hashes, 230 header hashes, configuration, profile
-and per-source flags. Private evidence is in
-`work/game-build/round48-link-evidence.json`, `round48-all-objects.json`,
-`round48-admitted.json` and `connections-round48-preservation.json`.
+The [multistate drawing candidate](MULTI_STATE_DRAW.md#functional-build-review)
+supplies the missing UIMultiState::Draw virtual method. Its unchanged readable
+body remains nonexact: 682 emitted bytes against the complete 672 retail bytes,
+with 139 resolved matching positions. The full original aggregate preserves
+733 sections and 3,912 relocations. Native validation covers 16,181 finite
+scenarios with sixteen actual strict source helpers, complete native CRT
+conversion, layout and fault oracles, and 37 strict helper/producer/caller checks.
+Lower GetDc, COM and GDI boundaries remain scripted; integrated menus are untested.
+
+The [edit-box fixture](EDIT_BOX_DRAW.md) now resets and snapshots the full
+0x7f58-byte dialog, including the previously omitted clip-region and previous-font
+fields. Its 14,793 scenarios and 27 strict checks pass; independent lifecycle
+oracles verify restoration and deletion. This corrects test storage without
+changing the production implementation or its preservation checks.
+
+All 254 prior production objects preserve 10,671 nondebug sections and 45,720
+relocations under only the two palette getter name corrections, with no filename
+exclusions. Both new provider objects independently reproduce their actual game
+compile commands. Real links remove exactly four names,
+**243 -> 241 -> 240 -> 239**, with none added. The final report checks all 256
+source hashes, 230 header hashes, configuration, profile and per-source flags.
+Private evidence is in `work/game-build/round49-link-evidence.json`,
+`round49-all-objects.json`, `round49-admitted.json` and
+`connections-round49-preservation.json`.
 
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and excluded from strict counts.
 The only per-source compiler exception remains `/QIfist` for the motion-start
 helper; this slice changes no compiler flags. Finite native checks do not
-establish integrated gameplay. Static checks pass for 262 Python files
-and 402 JSON files.
-The final full regression run passes: 544 tests, 533 passed and 11 skipped
-(`work/game-build/tests-round48-final.log`).
+establish integrated gameplay. Static checks pass for 264 Python files
+and 406 JSON files.
+The final full regression run passes: 547 tests, 536 passed and 11 skipped
+(`work/game-build/tests-round49-final.log`).
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

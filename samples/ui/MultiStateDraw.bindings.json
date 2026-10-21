@@ -1,0 +1,10 @@
+{
+  "?BeginControlDraw@UIDialog@@QAEHPAPAXPAUCameraRect@@PAHPAVUIControl@@@Z": "0x0046ed70",
+  "?DrawAlignedText@UIDialog@@QAEXPAXPAUCameraRect@@PBDHIHPAUUnknownGameUiTextRun@@HIHHPAVUIControl@@@Z": "0x0046f550",
+  "?DrawControlText@UIDialog@@QAEXPAXPAVUIControl@@H@Z": "0x0046f6c0",
+  "?EndControlDraw@UIDialog@@QAEXPAX@Z": "0x0046eeb0",
+  "?GetCurrentFrame@UIAnim@@QAEPAVUIFrame@@XZ": "0x00472f80",
+  "?DrawImage@BackgroundImage@@QAEHPAVPCTextureMap@@PAUCameraRect@@PAXHHHPAHH@Z": "0x00404480",
+  "?Draw@UIMultiState@@UAEHXZ": "0x00478570",
+  "__ftol": "0x00534a88"
+}

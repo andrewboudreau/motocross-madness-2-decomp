@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/ui/MultiStateDraw.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete multistate image and text drawing candidate checked in 16181 finite native scenarios with sixteen actual strict source helpers and the complete native VC6 conversion routine. VC6 emits 682 bytes against 672 retail bytes, with 139 resolved matching positions; extraction preserves all 733 aggregate sections and 3912 relocations. Lower GetDc, COM and GDI boundaries remain scripted; integrated menus are unverified.",
+      "evidence": "docs/MULTI_STATE_DRAW.md#functional-build-review"
+    },
+    {
       "path": "samples/render/OverlayNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete HUD rectangle restoration checked in 12970 finite native scenarios with actual strict texture-lock and pixel-format helpers. Explicit ordered reads preserve decoded fault behavior. VC6 emits 365 bytes against 365 retail bytes, with 77 resolved matching positions.",

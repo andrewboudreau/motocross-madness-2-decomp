@@ -1,0 +1,55 @@
+{
+  "baseline": "Published 52cb3235, same-path complete canonical/sample objects preserve all nondebug bytes, section flags and resolved relocation destinations under only two getter names. Same-path proof has no exclusions; portable pins normalize only the two enumerated source filenames. All four sample partial bodies remain complete and unchanged.",
+  "renames": {
+    "?GetIndexFrom555@UnknownTexturePalette@@QAEPAEXZ": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ",
+    "?GetIndexFrom565@UnknownTexturePalette@@QAEPAEXZ": "?GetIndexFrom565@ColorMapper@@QAEPAEXZ"
+  },
+  "objects": {
+    "src/reconstructed/Pixtrans.cpp": {
+      "sections": 49,
+      "relocations": 124,
+      "sha256": "0e82586556bbb687988dd742b20ba0e8081ad5657a862cfc0b3d1d4c77263be1"
+    },
+    "samples/render/PixtransNearMisses.cpp": {
+      "sections": 7,
+      "relocations": 29,
+      "sha256": "c89edd0d55d41aea364caa2a45d34f6461e49ba9e3bd5577e101b493048aa867"
+    }
+  },
+  "getter_calls": {
+    "src/reconstructed/Pixtrans.cpp": [
+      {
+        "caller": "?Convert24To8@@YAHPAX0HHHHHPAUUnknownTexturePalette@@@Z",
+        "offset": 91,
+        "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
+      },
+      {
+        "caller": "?Convert565To8@@YAHPAX0HHHHHPAUUnknownTexturePalette@@@Z",
+        "offset": 85,
+        "callee": "?GetIndexFrom565@ColorMapper@@QAEPAEXZ"
+      },
+      {
+        "caller": "?Convert555To8@@YAHPAX0HHHHHPAUUnknownTexturePalette@@@Z",
+        "offset": 109,
+        "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
+      },
+      {
+        "caller": "?Convert555To8@@YAHPAX0HHHHHPAUUnknownTexturePalette@@@Z",
+        "offset": 162,
+        "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
+      }
+    ],
+    "samples/render/PixtransNearMisses.cpp": [
+      {
+        "caller": "?Halve8@@YAHPAX0HHHHPAUUnknownTexturePalette@@@Z",
+        "offset": 37,
+        "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
+      },
+      {
+        "caller": "?DitherConvert@@YAHPAXHHHHH0000PAUUnknownTexturePalette@@@Z",
+        "offset": 35,
+        "callee": "?GetIndexFrom555@ColorMapper@@QAEPAEXZ"
+      }
+    ]
+  }
+}

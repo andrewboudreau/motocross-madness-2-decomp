@@ -23,6 +23,82 @@ EXE = Path(os.environ.get('MCM2_EXE', ROOT / 'work/game/mcm2.exe'))
 @unittest.skipUnless(os.environ.get('VC6_ROOT') and EXE.is_file(),
                      'requires VC6_ROOT and the private retail EXE')
 class SoultreePhysicsMethodTests(unittest.TestCase):
+    def test_instance_counter_storage_and_complete_initializer(self):
+        import capstone
+        self.assertEqual(sha256_file(EXE),
+                         '31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874')
+        retail = PEImage(EXE)
+        name = '?g_SoultreeInstanceCounter@@3HA'
+        address = 0x689f14
+        section = retail.section_for_rva(address - retail.image_base)
+        offset = address - retail.image_base - section.virtual_address
+        self.assertEqual(section.name, '.data')
+        self.assertTrue(section.characteristics & 0x80000000)
+        self.assertGreaterEqual(offset, section.raw_size)
+        self.assertLessEqual(offset + 4, section.virtual_size)
+        # The PE loader supplies these four zero bytes. They are not file-backed.
+        # Scan every explicit encoded address; this does not exclude indirect uses.
+        sites, start = [], 0
+        needle = struct.pack('<I', address)
+        while (found := retail.data.find(needle, start)) >= 0:
+            sites.append(retail.offset_to_va(found))
+            start = found + 1
+        self.assertEqual(sites, [0x500de2, 0x500df3, 0x500dfc, 0x500e04])
+        decoder = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
+        code = list(decoder.disasm(retail.bytes_at_va(0x500c50, 1500), 0x500c50))
+        self.assertEqual(sum(instruction.size for instruction in code), 1500)
+        instructions = {i.address: (i.mnemonic, i.op_str) for i in code}
+        for at, mnemonic, operands in (
+            (0x500c77, 'xor', 'ebx, ebx'),
+            (0x500de0, 'mov', 'ecx, dword ptr [0x689f14]'),
+            (0x500de6, 'mov', 'dword ptr [ebp + 0x204], ecx'),
+            (0x500dec, 'mov', 'dword ptr [ebp + 0x208], ebx'),
+            (0x500df2, 'mov', 'eax, dword ptr [0x689f14]'),
+            (0x500df7, 'inc', 'eax'), (0x500df8, 'cmp', 'eax, 5'),
+            (0x500dfb, 'mov', 'dword ptr [0x689f14], eax'),
+            (0x500e00, 'jle', '0x500e08'),
+            (0x500e02, 'mov', 'dword ptr [0x689f14], ebx'),
+        ):
+            self.assertEqual(instructions[at], (mnemonic, operands))
+        bindings = ROOT / 'src/reconstructed/SoultreeState.bindings.json'
+        self.assertEqual(json.loads(bindings.read_text()), {name: '0x00689f14'})
+        with tempfile.TemporaryDirectory(prefix='mcm2-soultree-state-') as directory:
+            objects = []
+            for stem, source in (
+                ('state', 'src/reconstructed/SoultreeState.cpp'),
+                ('consumer', 'src/krusty2/soultree/SoulTreePhysics.cpp'),
+            ):
+                output = Path(directory) / (stem + '.obj')
+                run = subprocess.run([
+                    sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
+                    '-o', str(output), '--vc6-root', os.environ['VC6_ROOT'],
+                    '--profile', 'vc6_o2_mt', '--include', str(ROOT / 'src/krusty2'),
+                ], cwd=ROOT, capture_output=True, text=True, encoding='latin1',
+                    env={**os.environ, 'PYTHONPATH': str(ROOT)})
+                self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+                objects.append(CoffObject(output))
+            provider, consumer = objects
+            self.assertEqual(provider.machine, 0x14c)
+            definitions = [s for s in provider.symbols if s.storage_class == 2]
+            self.assertEqual([(s.name, s.value) for s in definitions], [(name, 0)])
+            storage = provider.section(definitions[0].section_number)
+            self.assertEqual((storage.name, storage.raw_size, storage.raw_ptr), ('.bss', 4, 0))
+            self.assertTrue(storage.characteristics & 0x80000000)
+            self.assertTrue(storage.characteristics & 0x80)
+            self.assertEqual([(s.name, s.raw_size) for s in provider.sections
+                              if not s.name.startswith('.debug')], [('.drectve', 40), ('.bss', 4)])
+            self.assertEqual([r for r in provider.relocations
+                              if not provider.section(r.section_number).name.startswith('.debug')], [])
+            function = consumer.find_symbol('?UnknownVirtualSlot2@SoultreePhysicsBaseObject@@')
+            _, extent, relocations = consumer.symbol_extent(function)
+            self.assertEqual(extent, 1500)
+            self.assertEqual([(0x500c50 + r.virtual_address - function.value, r.type)
+                              for r in relocations if consumer.symbol_by_index[r.symbol_index].name == name],
+                             [(site, 6) for site in sites])
+            result = compare(retail, consumer, function.name, 0x500c50, 1500,
+                             ROOT / 'src/krusty2/soultree/SoulTreePhysics.bindings.json')
+            self.assertTrue(result['strict_exact'], result)
+
     def test_exact_methods_and_primary_vtable_ownership(self):
         self.assertEqual(sha256_file(EXE),
                          '31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874')

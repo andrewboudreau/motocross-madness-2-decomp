@@ -16,9 +16,9 @@ complete function inventory has not been established.
 | Indicator | Current value | What it means |
 |---|---:|---|
 | Strict VC6 exact targets | **2980 / 2990 (99.7%)** | Unique retail address/extent pairs in the reviewed calibration run |
-| Canonical reconstructed implementation files | **203** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
+| Canonical reconstructed implementation files | **204** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
 | Canonical reconstructed headers | **217** | Layout and interface declarations, including support-only headers |
-| Canonical C++ source lines | **106,228** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
+| Canonical C++ source lines | **106,233** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
 | Retail source-path strings | **111** | Navigation evidence; reconstructed files are not one-to-one with original TUs |
 | Recovered RTTI types | **252** | Confirmed type descriptors, not necessarily reconstructed classes |
 | Retail `.text` virtual size | **1,368,518 bytes (1.31 MiB)** | Broad code-section denominator; includes library code, thunks and padding |
@@ -65,7 +65,7 @@ python3 tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt --vc6-root "
 
 Inspect every result: the runner reports nonmatches as data and its exit status
 alone does not prove strict matching. Reviewed code revision:
-`f6c22865625d2c8c01bbdb6090dbdbf902a5393b plus this validated slice (source hashes: work/game-build/build-jd7lf5es/report.json)`. Source inventory counts reflect the current tree
+`52cb3235bf1da9693869baa528340ac6a1743558 plus this validated slice (source hashes: work/game-build/build-v5nqn0ru/report.json)`. Source inventory counts reflect the current tree
 and do not imply every body in those files matches.
 
 ### Caveats recorded with the snapshot

@@ -72,6 +72,7 @@
 #include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/Pixtrans.h"
 #include "../../src/reconstructed/TextureMap.h"
+#include "../../src/reconstructed/Quantize.h"
 #include "../../src/reconstructed/Tgafile.h"
 
 // 0x004cdf10: halves 8888 pixels. Colour averages the 2x2 pixels whose
@@ -228,7 +229,7 @@ int Halve8(void* destination, void* source, int width, int height, int destinati
     unsigned char* sourceRow = (unsigned char*)source;
     unsigned char* row = (unsigned char*)destination;
     if (palette) {
-        unsigned char* indices = palette->GetIndexFrom555();
+        unsigned char* indices = reinterpret_cast<ColorMapper*>(palette)->GetIndexFrom555();
         if (indices) {
             UnknownPixel24* entries = (UnknownPixel24*)palette->GetColors();
             if (entries) {
@@ -359,7 +360,7 @@ int DitherConvert(void* source, int format, int width, int height, int sourceStr
     unsigned char* indices;
     unsigned char* colors;
     if (palette) {
-        indices = palette->GetIndexFrom555();
+        indices = reinterpret_cast<ColorMapper*>(palette)->GetIndexFrom555();
         colors = palette->GetColors();
     }
     if (g_ditherCapacity < width) {

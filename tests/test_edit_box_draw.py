@@ -208,6 +208,8 @@ class EditBoxDrawTests(unittest.TestCase):
                 'offsetof(UIEditBox,textWidth)==0x1fc && offsetof(UIEditBox,caretRect)==0x214 && '
                 'offsetof(UIControl,controlText)==0xc0 && offsetof(UIControl,controlTextLength)==0xd0 && '
                 'offsetof(UIDialog,guiUser)==0x34 && offsetof(UIDialog,dialogBackground)==0x110 && '
+                'sizeof(UIDialog)==0x7f58 && offsetof(UIDialog,drawClipRegion)==0x7f00 && '
+                'offsetof(UIDialog,previousFont)==0x7f04 && '
                 'offsetof(BackgroundImage,heldDcSurface)==0x6c && offsetof(BackgroundImage,regionTable)==0x50 && '
                 'sizeof(UnknownBackgroundRegion)==64 && offsetof(PCRenderTarget,renderSurface)==0x48)?1:-1];\n')
             compile_source(layout,'layout')

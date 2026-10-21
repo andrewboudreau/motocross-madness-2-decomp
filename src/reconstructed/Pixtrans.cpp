@@ -6,6 +6,7 @@
 
 #include "DebugAlloc.h"
 #include "TextureMap.h"
+#include "Quantize.h"
 
 // 0x004d0700: converts 565 to 8888; the key colour becomes opaque magenta.
 int Convert565To8888(void* destination, void* source, int width, int height, int destinationStride,
@@ -653,7 +654,7 @@ int Convert24To8(void* destination, void* source, int width, int height, int des
     } else {
         UnknownPixel24* sourceRow = (UnknownPixel24*)source;
         unsigned char* row = (unsigned char*)destination;
-        unsigned char* indices = palette->GetIndexFrom555();
+        unsigned char* indices = reinterpret_cast<ColorMapper*>(palette)->GetIndexFrom555();
         for (int y = 0; y < height; y++) {
             UnknownPixel24* from = sourceRow;
             unsigned char* to = row;
@@ -675,7 +676,7 @@ int Convert565To8(void* destination, void* source, int width, int height, int de
     } else {
         unsigned short* sourceRow = (unsigned short*)source;
         unsigned char* row = (unsigned char*)destination;
-        unsigned char* indices = palette->GetIndexFrom565();
+        unsigned char* indices = reinterpret_cast<ColorMapper*>(palette)->GetIndexFrom565();
         for (int y = 0; y < height; y++) {
             unsigned short* from = sourceRow;
             unsigned char* to = row;
@@ -1010,11 +1011,11 @@ int Convert555To8(void* destination, void* source, int width, int height, int de
                               destination, palette);
     } else if (sourceStride == width && sourceStride % 8 == 0) {
         Convert555To8Fast(source, destination, destinationStride, width, height,
-                              palette->GetIndexFrom555());
+                              reinterpret_cast<ColorMapper*>(palette)->GetIndexFrom555());
     } else {
         unsigned short* sourceRow = (unsigned short*)source;
         unsigned char* row = (unsigned char*)destination;
-        unsigned char* indices = palette->GetIndexFrom555();
+        unsigned char* indices = reinterpret_cast<ColorMapper*>(palette)->GetIndexFrom555();
         for (int y = 0; y < height; y++) {
             unsigned short* from = sourceRow;
             unsigned char* to = row;

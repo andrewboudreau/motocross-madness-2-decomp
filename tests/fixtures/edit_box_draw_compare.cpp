@@ -19,7 +19,7 @@ struct Scratch {CameraRect control,clip,source;SIZE size;int result,x,y,clipPoin
 static Scratch ScratchState(){Scratch r;r.control=g_ControlDrawRect;r.clip=g_DrawImageClipRect;r.source=g_DrawImageSourceRect;r.size=g_AlignedTextSize;r.result=g_ControlDrawResult;r.x=g_AlignedTextX;r.y=g_AlignedTextY;r.clipPointer=g_ControlDrawClipRect?((g_ControlDrawClipRect==&g_ControlDrawRect)?2:1):0;r.bytes=g_UnclaimedBytes;return r;}
 
 static BYTE referenceSpace[0x800000]={1};
-struct World { BYTE edit[0x250],dialog[0x580],user[0x200],game[0x340],display[0x100],target[0x80],texture[0x100],background[0x200],text[64],surface[3][32],regions[8*64];BYTE guard[0x250];int held[3],gets[3],releases[3]; };
+struct World { BYTE edit[0x250],dialog[sizeof(UIDialog)],user[0x200],game[0x340],display[0x100],target[0x80],texture[0x100],background[0x200],text[64],surface[3][32],regions[8*64];BYTE guard[0x250];int held[3],gets[3],releases[3]; };
 struct Event {int kind;DWORD receiver,args[12];RECT rect;World before,after;Scratch scratchBefore,scratchAfter;};
 struct Result {World state;Scratch scratch;BYTE allocated[64];int value,complete,count;DWORD exception,kind,address;Event events[64];};
 struct Scenario {int align,focus,font,textWidth,texture,freeze,brush,passes,beginFail,mutateAt,mutation,throwAt,nullText,dcStatus,dcNull,imeNull,imeClosed,apiStatus,copyValid,dirty,left,top,width,height,marginX,marginY,shadow,fault,alias;};
@@ -126,6 +126,8 @@ int main(int argc,char**argv){setvbuf(stdout,0,_IONBF,0);if(argc!=2)return 4;gua
   if((int)At(w.edit,0x200)!=scroll||(int)At(w.edit,0x214)!=caret||(int)At(w.edit,0x218)!=y+sc.marginY+1||(int)At(w.edit,0x21c)!=caret+1||(int)At(w.edit,0x220)!=y+sc.marginY+2+(sc.font?sc.font:15)||w.held[0])return 10;
   int texts=0,frames=0;for(int e=0;e<got.count;e++){Event&v=got.events[e];if(v.kind==25){int shadow=sc.shadow&&texts==0;if((int)v.args[0]!=sc.left+scroll+sc.marginX-shadow||(int)v.args[1]!=y+sc.marginY-shadow||v.args[2]!=4)return 11;texts++;}if(v.kind==11)frames++;}
   if(texts!=1+!!sc.shadow||frames!=1||w.gets[0]!=1||w.releases[0]!=1)return 12;
+  int selects=0,deletes=0;for(int j=0;j<got.count;j++){Event&v=got.events[j];if(v.kind==19){if(selects==1&&v.args[0]!=0x9999)return 19;selects++;}if(v.kind==22){if(v.receiver!=0x2222)return 20;deletes++;}}
+  if(selects!=2||deletes!=1||At(w.dialog,0x7f04)!=0x9999||At(w.dialog,0x7f00)!=0x2222)return 21;
  }
  memset(&sc,0,sizeof(sc));sc.apiStatus=1;sc.left=10;sc.top=20;sc.width=70;sc.height=40;sc.marginX=2;sc.marginY=3;sc.font=13;sc.textWidth=100;sc.align=0x12;sc.focus=1;sc.brush=1;sc.passes=1;
  for(sc.alias=1;sc.alias<=2;sc.alias++)for(sc.texture=0;sc.texture<3;sc.texture++)for(sc.copyValid=0;sc.copyValid<2;sc.copyValid++)for(sc.dirty=0;sc.dirty<2;sc.dirty++)Check();sc.alias=0;sc.texture=0;sc.copyValid=0;sc.dirty=0;

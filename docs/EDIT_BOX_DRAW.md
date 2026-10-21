@@ -136,6 +136,14 @@ The scratch rectangle pointer is classified as null, global scratch, or the
 caller's temporary rectangle; temporary stack addresses themselves are not
 compared. The rectangle values consumed by callbacks are recorded.
 
+The dialog buffer now covers the complete header size, **0x7f58 bytes**, with
+compile-time checks for `drawClipRegion` at **+0x7f00** and `previousFont` at
+**+0x7f04**. The earlier 0x580-byte fixture omitted these actual BeginControlDraw
+writes from its reset and snapshots. This test-storage correction leaves the
+production candidate unchanged. All 14,793 scenarios run with the enlarged
+buffer; the 11,200 signed-layout cases also independently require font restoration,
+clip-region deletion, and the expected final values in both late fields.
+
 ### Finite boundaries and limitations
 
 The lower **BackgroundImage::GetDc** operation is scripted; it is separately
