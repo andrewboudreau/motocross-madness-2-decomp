@@ -67,7 +67,7 @@
   "?DisableCollisionObjectsInRect@EventManager@@QAEXMMMM@Z": "0x0045fdc0",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?Unlink@GameObject@@QAEHXZ": "0x004691f0",
-  "?FindControl@UnknownGameUiPage@@QAEPAVUIControl@@PBDH@Z": "0x0046ebf0",
+  "?FindControl@UIDialog@@QAEPAVUIControl@@PBDH@Z": "0x0046ebf0",
   "?EndDialog@UnknownTrackGameObject56cItem@@QAEXH@Z": "0x0046ff30",
   "?StepProgressBar@KrustyUI@@QAEXXZ": "0x0049b530",
   "?RecordRaceResults@KrustyUI@@QAEXXZ": "0x0049bbb0",

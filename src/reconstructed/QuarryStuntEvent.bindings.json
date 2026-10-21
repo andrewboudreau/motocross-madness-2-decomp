@@ -74,7 +74,7 @@
   "?ResetClock@BaseQuarryEvent@@QAEXXZ": "0x004e1f00",
   "?ReadCurrentSceneName@UnknownTrackGameObject574@@QAEXPAD0H@Z": "0x004ea390",
   "?SetDetailLevel@Scene@@QAEXH@Z": "0x004eff30",
-  "?SelectQuality@UnknownTerrain@@QAEXH@Z": "0x00507960",
+  "?SelectQuality@Terrain@@QAEXH@Z": "0x00507960",
   "?Setup@InstrumentOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@PAUUnknownInstrumentSource@@@Z": "0x00518770",
   "?LoadPanel@StatsOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@PAXUUnknownOverlayRect@@@Z": "0x005194b0",
   "?Setup@TextQueueOverlay@@QAEPAV1@PAXUUnknownOverlayRect@@@Z": "0x0051b320",

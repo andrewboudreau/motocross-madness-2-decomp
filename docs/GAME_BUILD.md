@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 197 C++ files (177 canonical sources and twenty
-reviewed candidates) and reaches LINK with 540 unresolved external symbols,
+The 2026-10-21 build compiles 198 C++ files (178 canonical sources and twenty
+reviewed candidates) and reaches LINK with 524 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -285,7 +285,20 @@ are admitted as one explicitly nonexact candidate unit after 19,606 native
 comparisons. Their full 106/52-byte bodies and aggregate relocations remain
 unchanged. Their admission removes two more names. Real links after these four
 slices measure **563 → 558 → 554 → 542 → 540**, with no new unresolved
-dependencies. The game still does not link, so these checks do not establish
+dependencies.
+
+The [loading-progress dialog](DIALOGPROCS.md#loading-progress-dialog-connection)
+now supplies its evidenced UIDialog receiver to the existing FindControl
+provider, removing one missing name while preserving 506 strict cases.
+Twelve [terrain and drawing globals](TERRAIN_DRAW_STATE.md) supply exact writable
+initial storage, including loader-zeroed words, and preserve 79 strict caller
+cases. Three [terrain method connections](TERRAIN_CONNECTIONS.md) then join
+texture eviction, detail selection and segment visibility callers to existing
+complete providers. All 178 strict cases and both partial-body fingerprints
+are preserved. The isolated real links measure **540 → 539 → 527 → 524**,
+with no new missing names. QueryGround remains disconnected: its current
+coordinate conversion truncates where retail follows the active x87 rounding
+mode. The game still does not link, so these checks do not establish
 interactive menus or racing.
 
 Validation of this composition passes the toolchain/manual/generated VC6 gate,
@@ -295,7 +308,7 @@ and all prior strict physics targets, with four additions making 1,080 among
 The recursive reset's strict case moves from FileStream.cpp to
 Parameterblocks.cpp with its address and full 30-byte extent unchanged;
 ShowDialog adds one strict case. The native-enabled Python suite passes
-443 tests with 11 skipped. These counts retain existing nonexact comparisons;
+446 tests with 11 skipped. These counts retain existing nonexact comparisons;
 they do not describe a fully matched or working game.
 
 Other incompatible class views, missing methods and unresolved globals

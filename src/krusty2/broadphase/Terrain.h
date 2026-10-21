@@ -15,10 +15,10 @@
 
 #include "../../reconstructed/PeakHold.h"
 
-#include "core/GameObject.h"
-#include "math/FastMath.h"
-#include "core/MemTag.h"
-#include "core/DebugAlloc.h"
+#include "../core/GameObject.h"
+#include "../math/FastMath.h"
+#include "../core/MemTag.h"
+#include "../core/DebugAlloc.h"
 
 // Second direct base of Terrain at mdisp 0x2c (RTTI .?AVGroundFogableObject@@, tier 1); it has no
 // vfptr.  Its contents are PROVISIONAL: the 0x004aae20 ctor only stores 0 in its first dword.

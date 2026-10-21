@@ -20,8 +20,8 @@ struct UnknownKrustyUIToolTipView {
     int enabled;
 };
 
-// Page object at +0x490 (see samples/game/EventManagerNearMisses.cpp).
-class UnknownGameUiPage;
+// LoadingDlg publishes its UIDialog base at +0x490.
+class UIDialog;
 
 // 8-byte record; KrustyUI keeps eight at +0x634 (the constructor's loop
 // clears both fields of each).
@@ -125,7 +125,7 @@ public:
     Vector3 garageFocus;                      // +0x474: the +0x464 scene's focus (SelectGamePicProcs.cpp)
     unsigned char field_0x480[0x48c - 0x480];
     int profileLoaded;                        // +0x48c: set once a profile is loaded or saved (UiInfo.cpp LoadProfile/SaveProfile)
-    UnknownGameUiPage* progressDialog;        // +0x490: the dialog holding "ProgressBar" (DlgProcs.cpp sets and clears it)
+    UIDialog* progressDialog;                 // +0x490: the dialog holding "ProgressBar" (DlgProcs.cpp sets and clears it)
     void* savedInputContext;                  // +0x494: ImmAssociateContext's result (DlgProcs.cpp), restored to the window (EventManager 0x0045e710)
     int allowIme;                             // +0x498: "AllowIME" registry flag (0x00498cf0)
     int field_0x49c;

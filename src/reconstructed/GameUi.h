@@ -749,9 +749,3 @@ public:
     int showPercentage;                       // +0x1fc
     int ownsBarTexture;                       // +0x200: owns +0x1f8
 };
-
-// Page object at KrustyUI+0x490.
-class UnknownGameUiPage {
-public:
-    UIControl* FindControl(const char* name, int flags); // 0x0046ebf0
-};

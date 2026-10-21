@@ -1350,7 +1350,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
         bar->stepCount = 20;
         bar->showPercentage = 0;
         area->Show(0, 1);
-        g_TrackGame->ui->progressDialog = (UnknownGameUiPage*)this;
+        g_TrackGame->ui->progressDialog = this;
         g_TrackGame->ui->HideCursors();
         g_LoadingEventLoaded = 0;
         g_TrackGame->mode.SaveProfile();

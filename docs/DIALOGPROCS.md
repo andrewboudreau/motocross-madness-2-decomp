@@ -188,3 +188,26 @@ six consuming translation units are unchanged. `tests/test_graphics_state.py`
 checks all 20 retail bytes, writable COFF data storage, the exported symbol
 and absence of dynamic initialization. The file groups reconstructed storage;
 it does not assert original translation-unit ownership.
+
+## Loading-progress dialog connection
+
+`KrustyUI::progressDialog` at +0x490 now has type `UIDialog*`. LoadingDlg's
+582-byte event handler at 0x00451020 stores its receiver there at 0x0045113f
+and clears it at 0x004511f2. Retail RTTI identifies LoadingDlg's UIDialog base
+at offset zero. The implicit derived-to-base assignment preserves that address;
+the obsolete empty `UnknownGameUiPage` declaration is removed.
+
+EventManager and KrustyUI therefore call the existing full 200-byte
+`UIDialog::FindControl` at 0x0046ebf0. Their binding destinations are unchanged.
+`tests/test_progress_dialog_connection.py` checks retail RTTI, lifecycle stores,
+native member/layout/conversion assertions and actual caller imports. All 506
+strict cases across EventManager, KrustyUI, DlgProcs and GameUi remain exact
+with relocations resolved. Run it with `VC6_ROOT` and `MCM2_EXE` configured:
+
+```powershell
+python -m unittest discover -s tests -p test_progress_dialog_connection.py -v
+```
+
+The isolated real build compiled 197/197 units and reduced unresolved symbols
+from 540 to 539, removing only the obsolete FindControl name. This connects
+the loading-progress receiver; it does not establish working menus or startup.

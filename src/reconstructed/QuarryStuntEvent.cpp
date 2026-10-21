@@ -1,3 +1,4 @@
+#include "../krusty2/broadphase/Terrain.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -418,7 +419,7 @@ int BaseQuarryEvent::OnControlPress(UnknownControlEvent* event, UnknownInputEntr
         g_TrackGame->mode.videoSettings[1] = level;
         g_TrackGame->mode.videoSettings[2] = level;
         g_TrackGame->mode.videoSettings[4] = level;
-        eventTerrain->SelectQuality(level);
+        reinterpret_cast<Terrain*>(eventTerrain)->SelectQuality(level);
         if (ecoSystem)
             ecoSystem->SetDetailLevel(level);
         if (eventFog)
@@ -444,7 +445,7 @@ int BaseQuarryEvent::OnControlPress(UnknownControlEvent* event, UnknownInputEntr
         g_TrackGame->mode.videoSettings[1] = level;
         g_TrackGame->mode.videoSettings[2] = level;
         g_TrackGame->mode.videoSettings[4] = level;
-        eventTerrain->SelectQuality(level);
+        reinterpret_cast<Terrain*>(eventTerrain)->SelectQuality(level);
         if (ecoSystem)
             ecoSystem->SetDetailLevel(level);
         if (eventFog)

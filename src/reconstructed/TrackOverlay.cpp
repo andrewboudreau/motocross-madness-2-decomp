@@ -1,3 +1,4 @@
+#include "../krusty2/broadphase/Terrain.h"
 #include "BikeRaceCore.h"
 #include "GUIManagerCore.h"
 #include <math.h>
@@ -286,7 +287,9 @@ int NameOverlay::IsPointVisible(const Vector3* point)
 {
     Vector3 hit;
     if (frameCounter == testPhase) {
-        int hidden = world->terrain->CastSegment(&((RenderTarget*)renderContext)->currentCamera->eyePosition, point, &hit, 0, 0, 0);
+        int hidden = reinterpret_cast<Terrain*>(world->terrain)->CastSegment(
+            reinterpret_cast<const TerrainVec3*>(&((RenderTarget*)renderContext)->currentCamera->eyePosition),
+            reinterpret_cast<const TerrainVec3*>(point), reinterpret_cast<TerrainVec3*>(&hit), 0, 0, 0);
         lastVisible = !hidden;
     }
     frameCounter++;

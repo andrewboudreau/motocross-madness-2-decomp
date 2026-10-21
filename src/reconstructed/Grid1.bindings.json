@@ -9,7 +9,7 @@
   "??3@YAXPAXPBDH@Z": "0x004a3060",
   "??_7DrawableGridNodeSharedTextures@@6B@": "0x00553e54",
   "??_GDrawableGridNodeSharedTextures@@UAEPAXI@Z": "0x0047c930",
-  "?RetireOwnedObject@Grid1Terrain@@QAEXPAVBaseObject@@@Z": "0x005057d0",
+  "?RetireOwnedObject@Terrain@@QAEXPAVBaseObject@@@Z": "0x005057d0",
   "?MarkUsed@GridAgeManager@@QAEXPAUGridAgeEntry@@@Z": "0x00401250",
   "?EvictNodeTexture@@YAHPAX@Z": "0x0047ca00",
   "?EvictBlockTexture@@YAHPAXH@Z": "0x0047ca40",

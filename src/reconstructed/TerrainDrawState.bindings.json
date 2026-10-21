@@ -1,0 +1,14 @@
+{
+  "?g_terrainDebugPage@@3HA": "0x00574714",
+  "?g_terrainCacheBytes@@3HA": "0x00689ff4",
+  "?g_gridDrawMemoryPeak@@3HA": "0x0068a2fc",
+  "?g_gridDrawMemory@@3HA": "0x0068a300",
+  "?g_gridDrawFrameCount@@3HA": "0x0068a304",
+  "?g_terrainAgeTime0@@3HA": "0x0068a308",
+  "?g_terrainAgeTime1@@3HA": "0x0068a30c",
+  "?g_terrainCacheCount@@3HA": "0x0068a310",
+  "?g_terrainPrepareGeometryTicks@@3HA": "0x0068a318",
+  "?g_terrainRender3DTicks@@3HA": "0x0068a31c",
+  "?g_terrainTotalTicks@@3HA": "0x0068a320",
+  "?g_terrainDualTextureProbed@@3HA": "0x0068a328"
+}

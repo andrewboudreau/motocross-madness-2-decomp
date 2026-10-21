@@ -37,8 +37,7 @@ public:
     UIDialog(int flags, const char* resource);    // 0x00469db0
     virtual ~UIDialog();                      // 0x0046a070 (deleting wrapper 0x00469ff0)
     // 0x0046ebf0: the control whose .dtm section is `name` ("LstProfiles",
-    // "ButLeft", ...), of control type `type` when nonzero (GameUi.h declares
-    // the same function on UnknownGameUiPage).
+    // "ButLeft", ...), of control type `type` when nonzero.
     UIControl* FindControl(const char* name, int type);
 
     virtual int Release();                    // 0x0046a010 (gameui.cpp)

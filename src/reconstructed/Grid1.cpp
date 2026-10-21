@@ -1,3 +1,4 @@
+#include "../krusty2/broadphase/Terrain.h"
 // Grid1.cpp -- reconstruction of part of D:\aardvark\VC\krusty2\Grid1.cpp.
 // See Grid1.h.
 
@@ -48,7 +49,7 @@ GridNode* DrawableGridNodeSharedTextures::UnknownVirtualSlot2(UnknownTextureStre
 int EvictNodeTexture(void* owner)
 {
     DrawableGridNodeSharedTextures* node = (DrawableGridNodeSharedTextures*)owner;
-    node->Terrain()->RetireOwnedObject(node->Extra()->builtTexture);
+    reinterpret_cast<::Terrain*>(node->Terrain())->RetireOwnedObject(node->Extra()->builtTexture);
     node->Extra()->builtTexture = 0;
     node->Extra()->textureFlags &= ~0x10000;
     node->Extra()->ageEntry.size = 0;
@@ -59,7 +60,7 @@ int EvictNodeTexture(void* owner)
 int EvictBlockTexture(void* owner, int block)
 {
     DrawableGridNodeSharedTextures* node = (DrawableGridNodeSharedTextures*)owner;
-    node->Terrain()->RetireOwnedObject(node->Extra()->blocks[block].texture);
+    reinterpret_cast<::Terrain*>(node->Terrain())->RetireOwnedObject(node->Extra()->blocks[block].texture);
     node->Extra()->blocks[block].texture = 0;
     node->Extra()->textureFlags &= ~(1 << block);
     node->Extra()->blocks[block].ageEntry.size = 0;

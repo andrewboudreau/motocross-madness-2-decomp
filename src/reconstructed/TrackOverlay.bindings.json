@@ -85,7 +85,7 @@
   "?TintRows@Overlay@@QAEHHHG@Z": "0x004b6880",
   "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
   "?FindByName@SoultreeObject@@QAEPAV1@PBD@Z": "0x004fdae0",
-  "?CastSegment@UnknownTerrain@@QAEHPBUVector3@@0PAU2@HHH@Z": "0x00506e90",
+  "?CastSegment@Terrain@@QAEHPBUTerrainVec3@@0PAU2@HHH@Z": "0x00506e90",
   "?SetAddressModes@TextureMap@@QAEHHH@Z": "0x0050abd0",
   "?SelectFont@UnknownOverlayText@@QAEXPBD@Z": "0x0050ade0",
   "?DrawTextInto@UnknownOverlayText@@QAEHPAVTextureMap@@HHPBDH@Z": "0x0050b080",
