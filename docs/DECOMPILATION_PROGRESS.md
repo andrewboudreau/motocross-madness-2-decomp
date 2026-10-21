@@ -3,11 +3,11 @@
 > Last reviewed: **2026-10-21** · Retail executable: `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`
 
 There is not yet a defensible whole-game percentage. The best reproducible
-headline is that **2972 of 2983 selected function targets (99.6%)**
+headline is that **2973 of 2983 selected function targets (99.7%)**
 have strict, byte-for-byte matches in the reviewed calibration suite, compiled
-with VC6 SP3. The suite contains **2996 cases**; repeated
+with VC6 SP3. The suite contains **3003 cases**; repeated
 retail address/extent pairs count once.
-That percentage measures the active target set, **not 99.6% of MCM2**:
+That percentage measures the active target set, **not 99.7% of MCM2**:
 targets are chosen because they are useful or tractable, and the executable's
 complete function inventory has not been established.
 
@@ -15,10 +15,10 @@ complete function inventory has not been established.
 
 | Indicator | Current value | What it means |
 |---|---:|---|
-| Strict VC6 exact targets | **2972 / 2983 (99.6%)** | Unique retail address/extent pairs in the reviewed calibration run |
-| Canonical reconstructed implementation files | **187** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
+| Strict VC6 exact targets | **2973 / 2983 (99.7%)** | Unique retail address/extent pairs in the reviewed calibration run |
+| Canonical reconstructed implementation files | **188** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
 | Canonical reconstructed headers | **204** | Layout and interface declarations, including support-only headers |
-| Canonical C++ source lines | **105,418** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
+| Canonical C++ source lines | **105,451** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
 | Retail source-path strings | **111** | Navigation evidence; reconstructed files are not one-to-one with original TUs |
 | Recovered RTTI types | **252** | Confirmed type descriptors, not necessarily reconstructed classes |
 | Retail `.text` virtual size | **1,368,518 bytes (1.31 MiB)** | Broad code-section denominator; includes library code, thunks and padding |
@@ -65,9 +65,9 @@ python3 tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt --vc6-root "
 
 Inspect every result: the runner reports nonmatches as data and its exit status
 alone does not prove strict matching. Reviewed code revision:
-`ffc9f7e5a6a374363aab5cfa56f12791e29a4e65 plus this validated slice (source hashes: work/game-build/build-x_vk5ibp/report.json)`. Source inventory counts reflect the current tree
+`6503e588d560862a3c224d6c79fafa8dd33417a1 plus this validated slice (source hashes: work/game-build/build-1vwzypi6/report.json)`. Source inventory counts reflect the current tree
 and do not imply every body in those files matches.
 
 ### Caveats recorded with the snapshot
 
-2972 of 2983 unique retail address/extent pairs passed strict comparison in 2996 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). There are 2985 strict rows and 2981 distinct source/address/extent cases; multiple source definitions may share a retail address. Every strict comparison resolves all relocations or has no relocation bytes. The remaining 11 cases are BaseObject::Release, seven UI compiler-shape probes, two FollowRacer near misses (0x4a9d20, 0x4a9e80) and the GridNode near miss 0x484d70. The separately reviewed physics runner has 1086 strict exact results among 1162 comparisons; those results are not included in this calibration percentage. Neither suite is a census of retail functions or evidence that the source-built game links or runs. RTTI/source-path and .text figures retain their hash-pinned executable provenance.
+2973 of 2983 unique retail address/extent pairs passed strict comparison in 3003 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). There are 2992 strict rows and 2985 distinct source/address/extent cases; multiple source definitions may share a retail address. Every strict comparison resolves all relocations or has no relocation bytes. The 11 nonexact rows are BaseObject::Release, seven UI compiler-shape probes, two FollowRacer near misses (0x4a9d20, 0x4a9e80) and the GridNode near miss 0x484d70. The UIStatic zero-return probe remains nonexact while the independently identified UIStaticText body at the same address now matches strictly. The separately reviewed physics runner has 1086 strict exact results among 1162 comparisons; those results are not included in this calibration percentage. Neither suite is a census of retail functions or evidence that the source-built game links or runs. RTTI/source-path and .text figures retain their hash-pinned executable provenance.

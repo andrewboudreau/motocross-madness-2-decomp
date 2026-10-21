@@ -96,9 +96,9 @@ scripted boundaries, not actual device scheduling. No exception cleanup is
 invented; this function has no owned resources or EH registration.
 
 The constructor and registry lookup default `BufferedJoystick` to 1. The
-separate buffered reader remains an unadmitted nonexact candidate; this review
-closes only the immediate-input operation, not the default buffered path or
-complete device startup.
+separate [buffered reader](JOYSTICK_BUFFERED_STATE.md) has its own reviewed
+nonexact implementation. This review establishes only the immediate-input
+operation; complete device startup remains unverified.
 
 The real build `work/game-build/build-x_vk5ibp/report.json` compiles all 222
 translation units. Adding this reader removes exactly its missing definition,

@@ -1,0 +1,9 @@
+{
+  "?KillFocus@UIControl@@UAEXH@Z": "0x00464e80",
+  "?SyncBoundValue@UIControl@@UAEXH@Z": "0x00464e80",
+  "?HandleTimer@UIControl@@UAEXH@Z": "0x00464e80",
+  "?IsInteractive@UIControl@@UAEHXZ": "0x00467ae0",
+  "?IsInteractive@UIDropDownList@@UAEHXZ": "0x00467ae0",
+  "?IsInteractive@UIStaticText@@UAEHXZ": "0x00478fe0",
+  "?SetState@UIStaticText@@UAEXH@Z": "0x00479220"
+}

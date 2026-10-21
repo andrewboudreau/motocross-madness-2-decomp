@@ -1307,7 +1307,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
     } else if (hasFinished == 2) {
         // The end pose (riderPoseHandles[15]) once the rider character is ready.
         if (riderCharacter->c_0xc) {
-            ((KbA5C4*)riderCharacter)->SetMotion(riderPoseHandles[15]);
+            reinterpret_cast<Character*>(riderCharacter)->SetMotion(reinterpret_cast<Motion*>(riderPoseHandles[15]));
             ((KbA5C4*)riderCharacter)->field_0x10 = 0;
             hasFinished++;
         } else {

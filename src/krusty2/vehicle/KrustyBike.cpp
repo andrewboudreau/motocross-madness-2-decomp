@@ -292,7 +292,7 @@ void KrustyBike::UnknownVirtualSlot71(int a)
 Vec3 KrustyBike::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
 {
     if (aiKind)
-        return g_kbZeroVec;
+        return kVec3Zero;
     return Bike::UnknownVirtualSlot76(a, b);
 }
 
@@ -414,7 +414,7 @@ void KrustyBike::UnknownVirtualSlot67()
     prevCrashState = 0;
     linkedVehicle = 0;
     wrecker->EndWreck();
-    steerTorque = g_kbZeroVec;
+    steerTorque = kVec3Zero;
 }
 
 // ---- physics ----
@@ -463,7 +463,7 @@ void KrustyBike::UnknownVirtualSlot48()
     Vec3 v = velocity * 3.0f;
     Vec3 d = (v - prevVelocity) * 0.5f;
     position += d * stepTime;
-    rearWheel->driveForce = g_kbZeroVec;
+    rearWheel->driveForce = kVec3Zero;
     rearWheel->driveForceMagnitude = 0;
 }
 
@@ -836,21 +836,21 @@ static KrustyTrickName s_KrustyTricks[6] = {
 void KrustyBike::UnknownVirtualSlot97()
 {
     Bike::UnknownVirtualSlot97();
-    wrecker->AddRandomAnimation((int)((KbA5C4*)riderCharacter)->FindMotion("Fall01", 1));
-    wrecker->AddRandomAnimation((int)((KbA5C4*)riderCharacter)->FindMotion("Fall02", 1));
-    wrecker->AddRandomAnimation((int)((KbA5C4*)riderCharacter)->FindMotion("Fall03", 1));
-    wrecker->AddRandomAnimation((int)((KbA5C4*)riderCharacter)->FindMotion("Fall04", 1));
-    wrecker->AddContactAnimation((int)((KbA5C4*)riderCharacter)->FindMotion("LeftHit", 1));
-    wrecker->AddContactAnimation((int)((KbA5C4*)riderCharacter)->FindMotion("RightHit", 1));
-    wrecker->AddContactAnimation((int)((KbA5C4*)riderCharacter)->FindMotion("FeetHitL", 1));
-    wrecker->AddContactAnimation((int)((KbA5C4*)riderCharacter)->FindMotion("FeetHitR", 1));
-    wrecker->AddContactAnimation((int)((KbA5C4*)riderCharacter)->FindMotion("HeadHit", 1));
-    wrecker->AddIndexedAnimation((int)((KbA5C4*)riderCharacter)->FindMotion(s_KrustyTricks[0].name, 1));
-    wrecker->AddIndexedAnimation((int)((KbA5C4*)riderCharacter)->FindMotion(s_KrustyTricks[1].name, 1));
-    wrecker->AddIndexedAnimation((int)((KbA5C4*)riderCharacter)->FindMotion(s_KrustyTricks[2].name, 1));
-    wrecker->AddIndexedAnimation((int)((KbA5C4*)riderCharacter)->FindMotion(s_KrustyTricks[3].name, 1));
-    wrecker->AddIndexedAnimation((int)((KbA5C4*)riderCharacter)->FindMotion(s_KrustyTricks[4].name, 1));
-    wrecker->AddIndexedAnimation((int)((KbA5C4*)riderCharacter)->FindMotion(s_KrustyTricks[5].name, 1));
+    wrecker->AddRandomAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Fall01", 1));
+    wrecker->AddRandomAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Fall02", 1));
+    wrecker->AddRandomAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Fall03", 1));
+    wrecker->AddRandomAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Fall04", 1));
+    wrecker->AddContactAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LeftHit", 1));
+    wrecker->AddContactAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("RightHit", 1));
+    wrecker->AddContactAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("FeetHitL", 1));
+    wrecker->AddContactAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("FeetHitR", 1));
+    wrecker->AddContactAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("HeadHit", 1));
+    wrecker->AddIndexedAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion(s_KrustyTricks[0].name, 1));
+    wrecker->AddIndexedAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion(s_KrustyTricks[1].name, 1));
+    wrecker->AddIndexedAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion(s_KrustyTricks[2].name, 1));
+    wrecker->AddIndexedAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion(s_KrustyTricks[3].name, 1));
+    wrecker->AddIndexedAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion(s_KrustyTricks[4].name, 1));
+    wrecker->AddIndexedAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion(s_KrustyTricks[5].name, 1));
     wrecker->AddIgnoredObject((CollisionObject*)frontWheel);
     wrecker->AddIgnoredObject((CollisionObject*)rearWheel);
     wrecker->SetPushBox((UnknownWreckerSkeleton*)modelNode->firstChild, Vector3(0.0f, 2.0f, 0.0f), Vector3(0.5f, 1.5f, 3.0f));
@@ -930,7 +930,7 @@ void KrustyBike::UnknownVirtualSlot49(float dt)
                 if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType) {
                     UnknownVirtualSlot41();
                     motionCompleted = 0;
-                    ((KbA5C4*)riderCharacter)->SetMotion(riderPoseHandles[15]);
+                    reinterpret_cast<Character*>(riderCharacter)->SetMotion(reinterpret_cast<Motion*>(riderPoseHandles[15]));
                     ((KbA5C4*)riderCharacter)->field_0x10 = 0;
                     hasFinished = 3;
                 } else {
@@ -1257,7 +1257,7 @@ void KrustyBike::Fn_0048D910(int idx)
     chainedTrickTime = 0;
     trickHoldTime = 0;
     motionIndex = (char)idx;
-    ((KbA5C4*)riderCharacter)->SetMotion(animSetA[idx]);
+    reinterpret_cast<Character*>(riderCharacter)->SetMotion(reinterpret_cast<Motion*>(animSetA[idx]));
     ((KbA5C4*)riderCharacter)->field_0x10 = 0;
     D3DIMSoultreeCharacter::SetMotion((Motion*)animSetB[idx]);
     chr_field_0x10 = 0;
@@ -1271,7 +1271,7 @@ void KrustyBike::Fn_0048D990(int idx)
     chainedTrickTime = trickClipTime;
     trickClipTime = 0;
     motionIndex = (char)(idx + 0x10);
-    ((KbA5C4*)riderCharacter)->SetMotion(animSetC[idx]);
+    reinterpret_cast<Character*>(riderCharacter)->SetMotion(reinterpret_cast<Motion*>(animSetC[idx]));
     D3DIMSoultreeCharacter::SetMotion((Motion*)animSetD[idx]);
     trickChained = 1;
 }
@@ -1599,9 +1599,9 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
     state->angularVelocity = angularVelocity;
     state->angularVelocity.y += turnRate;
     state->time = message.time;
-    state->velocityError = g_kbZeroVec;
-    state->positionError = g_kbZeroVec;
-    state->angularVelocityError = g_kbZeroVec;
+    state->velocityError = kVec3Zero;
+    state->positionError = kVec3Zero;
+    state->angularVelocityError = kVec3Zero;
     state->rollError = 0;
     state->pitchError = 0;
     state->yawError = 0;
@@ -1819,38 +1819,38 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     animSetD[13] = 0;
     animSetD[14] = 0;
     animSetD[15] = (int)FindMotion("bDCanCanAlt", 1);
-    animSetA[0] = (int)((KbA5C4*)riderCharacter)->FindMotion("BarKneel", 1);
-    animSetA[1] = (int)((KbA5C4*)riderCharacter)->FindMotion("SplitX", 1);
-    animSetA[2] = (int)((KbA5C4*)riderCharacter)->FindMotion("BKahuna", 1);
-    animSetA[3] = (int)((KbA5C4*)riderCharacter)->FindMotion("Cordova", 1);
-    animSetA[4] = (int)((KbA5C4*)riderCharacter)->FindMotion("HeelClicker", 1);
-    animSetA[5] = (int)((KbA5C4*)riderCharacter)->FindMotion("NacNac", 1);
-    animSetA[6] = (int)((KbA5C4*)riderCharacter)->FindMotion("SuperMan", 1);
-    animSetA[7] = (int)((KbA5C4*)riderCharacter)->FindMotion("AirWalk", 1);
-    animSetA[8] = (int)((KbA5C4*)riderCharacter)->FindMotion("BarHop", 1);
-    animSetA[9] = (int)((KbA5C4*)riderCharacter)->FindMotion("SeatGrab", 1);
-    animSetA[10] = (int)((KbA5C4*)riderCharacter)->FindMotion("SaranWrap", 1);
-    animSetA[11] = (int)((KbA5C4*)riderCharacter)->FindMotion("CliffHanger", 1);
-    animSetA[12] = (int)((KbA5C4*)riderCharacter)->FindMotion("HeartAttack", 1);
-    animSetA[13] = (int)((KbA5C4*)riderCharacter)->FindMotion("TailGrab", 1);
-    animSetA[14] = (int)((KbA5C4*)riderCharacter)->FindMotion("LazyBoy", 1);
-    animSetA[15] = (int)((KbA5C4*)riderCharacter)->FindMotion("DCanCan", 1);
-    animSetC[0] = (int)((KbA5C4*)riderCharacter)->FindMotion("BarKneelAlt", 1);
+    animSetA[0] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BarKneel", 1);
+    animSetA[1] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SplitX", 1);
+    animSetA[2] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BKahuna", 1);
+    animSetA[3] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Cordova", 1);
+    animSetA[4] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("HeelClicker", 1);
+    animSetA[5] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("NacNac", 1);
+    animSetA[6] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SuperMan", 1);
+    animSetA[7] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("AirWalk", 1);
+    animSetA[8] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BarHop", 1);
+    animSetA[9] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SeatGrab", 1);
+    animSetA[10] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SaranWrap", 1);
+    animSetA[11] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("CliffHanger", 1);
+    animSetA[12] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("HeartAttack", 1);
+    animSetA[13] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("TailGrab", 1);
+    animSetA[14] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LazyBoy", 1);
+    animSetA[15] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("DCanCan", 1);
+    animSetC[0] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BarKneelAlt", 1);
     animSetC[1] = 0;
     animSetC[2] = 0;
     animSetC[3] = 0;
-    animSetC[4] = (int)((KbA5C4*)riderCharacter)->FindMotion("HeelClickerAlt", 1);
-    animSetC[5] = (int)((KbA5C4*)riderCharacter)->FindMotion("NacNacAlt", 1);
-    animSetC[6] = (int)((KbA5C4*)riderCharacter)->FindMotion("SuperManAlt", 1);
+    animSetC[4] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("HeelClickerAlt", 1);
+    animSetC[5] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("NacNacAlt", 1);
+    animSetC[6] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SuperManAlt", 1);
     animSetC[7] = 0;
     animSetC[8] = 0;
     animSetC[9] = 0;
-    animSetC[10] = (int)((KbA5C4*)riderCharacter)->FindMotion("SaranWrapAlt", 1);
+    animSetC[10] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SaranWrapAlt", 1);
     animSetC[11] = 0;
     animSetC[12] = 0;
     animSetC[13] = 0;
     animSetC[14] = 0;
-    animSetC[15] = (int)((KbA5C4*)riderCharacter)->FindMotion("DCanCanAlt", 1);
+    animSetC[15] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("DCanCanAlt", 1);
 
     bikeAndRiderCollision = new(__FILE__, 0x77e) CollisionObject(1);
     bikeAndRiderCollision->Configure((void*)a1, 1, 1, 1);
@@ -2018,7 +2018,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         collisionObject->Disable();
     }
     if (withRider) {
-        ((KbA5C4*)riderCharacter)->ApplyRestPose();
+        reinterpret_cast<Character*>(riderCharacter)->ApplyRestPose();
         ((SoultreeObject*)riderCharacter->c_0x1a0)->TranslateIn(0, Vec3(0.0f, 0.0f, 0.0f));
         Vec3 axisY(0.0f, 1.0f, 0.0f);
         Vec3 axisZ(0.0f, 0.0f, 1.0f);

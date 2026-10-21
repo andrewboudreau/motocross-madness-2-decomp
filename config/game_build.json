@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/inputdevice/JoystickBufferedState.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete default buffered joystick reader passes 4520 native record, axis, binding, button, timestamp, queue, retry, callback and fault scenarios with actual strict input helpers and the independently byte-verified VC6 conversion routine. The unchanged 1641-byte candidate has 128 matching positions against the complete 1665-byte retail extent including all switch tables. Successful COM calls fully initialize bounded records; diagnostic filenames intentionally differ. Physical devices, real acquisition, scheduling and integrated input remain untested.",
+      "evidence": "docs/JOYSTICK_BUFFERED_STATE.md#functional-build-review"
+    },
+    {
       "path": "samples/inputdevice/JoystickImmediateState.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete immediate joystick reader passes 5014 native axis, binding, button, queue, POV, floating-point, callback and fault scenarios with the real strict input helpers. The unchanged 453-byte candidate has 373 matching positions against the corrected complete 454-byte retail extent. COM success writes the full 80-byte state; binding lists and queues are bounded. Physical controllers, scheduling and the separate default buffered-input path remain untested.",

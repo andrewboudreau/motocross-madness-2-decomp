@@ -1,0 +1,11 @@
+{
+  "?ApplyAxisDeadZone@PCJoystickDevice@@QAEHHH@Z": "0x004c3090",
+  "?ButtonIndexFromOffset@PCJoystickDevice@@QAEHH@Z": "0x004c2ef0",
+  "?FeedAxis@JoystickDevice@@QAEXHMM@Z": "0x00489c00",
+  "?QueueEvent@ControlInterface@@QAEXHHHH@Z": "0x0043cea0",
+  "?ReadBufferedState@PCJoystickDevice@@QAEHH@Z": "0x004c3100",
+  "?UnknownReportError@@YAXJPBDH@Z": "0x004bf6a0",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
+  "__FILE__": "0x005703ac",
+  "__ftol": "0x00534a88"
+}

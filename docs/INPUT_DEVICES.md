@@ -169,10 +169,12 @@ zero-initialized storage.
   - `0x004c3090` applies that scale around 32768 and clamps to 0–65535.
   - `0x004c2d90` is the gamepad's axis-driven key repeat.
   - `0x004c2ef0` maps state offsets 0x30–0x4f to button indices.
-  - The buffered reader `0x004c3100` is a near miss. Its flow matches, but
-    VC6 here keeps 0 in a register for the whole function, while retail
-    uses immediate zeros. It filters spikes over 10000, and applies the dead
-    zone to X and Y only.
+  - The buffered reader `0x004c3100` remains nonexact: the unchanged candidate
+    emits 1,641 bytes with 128 matching positions against the full 1,665-byte
+    extent. The former 1,652-byte extent omitted the final 13-byte POV remap.
+    Its [functional review](JOYSTICK_BUFFERED_STATE.md#functional-build-review)
+    uses actual strict input helpers and a bounded COM fixture. It filters
+    spikes over 10000 and applies the dead zone to X and Y only.
   - Slot 20 uses the "BufferedJoystick" setting through `0x004c3a10`.
 
   Effect-related slots act only for device type 3 (+0x0c). Slot 19 matches

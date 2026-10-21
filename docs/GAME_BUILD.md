@@ -37,33 +37,37 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 222 C++ files (187 canonical sources and 35
-reviewed candidates) and reaches LINK with 358 unresolved external symbols,
+The 2026-10-21 build compiles 224 C++ files (188 canonical sources and 36
+reviewed candidates) and reaches LINK with 346 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-x_vk5ibp` retains all prior strict results and adds
-two strict Vehicle defaults: 2,985/2,996 calibration rows and 1,086/1,162
+The composition in `build-1vwzypi6` retains all prior strict results and adds
+seven strict UI methods: 2,992/3,003 calibration rows and 1,086/1,162
 physics comparisons. This does not establish game startup, menus or racing
 while linkage remains incomplete.
-The full regression run passes: 494 tests, with 483 passed and eleven skipped
-(`work/game-build/tests-round30.log`). Static checking also passes for 216
-Python files and 358 JSON files.
+The full regression run passes: 497 tests, with 486 passed and eleven skipped
+(`work/game-build/tests-round31.log`). Static checking also passes for 219
+Python files and 360 JSON files.
 
-The current [KrustyBike text connections](BIKE_TEXT_CONNECTIONS.md) supply four
-existing message, queue and resource providers. Two [Vehicle defaults and the
-Bike pure-virtual correction](VEHICLE_DEFAULT_SLOTS.md) remove three more
-missing names. All 220 prior production objects preserve 10,478 nondebug
-sections and 45,333 relocations under those five verified name substitutions.
-The [immediate joystick reader](JOYSTICK_IMMEDIATE_STATE.md) adds one reviewed
-nonexact candidate with 5,014 native scenarios using the real strict binding
-and event helpers. Its full retail extent is 454 bytes; the unchanged candidate
-emits 453. The separate default buffered-input reader remains missing.
-The three isolated links reduce unresolved names **366 → 362 → 359 → 358**,
+The current [rider-motion connections](BIKE_RIDER_MOTION_CONNECTIONS.md) supply
+three existing Character methods at 41 bike call sites and connect a zero-vector
+reference to the already emitted and initialized local storage. Seven
+[UI control methods](UI_CONTROL_DEFAULTS.md) supply independently identified
+default callbacks, interaction predicates and the static-text state setter.
+All 222 prior production objects preserve 10,493 nondebug sections and 45,362
+relocations under three verified method-name substitutions and that one
+external-to-local storage connection. The [buffered joystick reader](JOYSTICK_BUFFERED_STATE.md)
+adds one reviewed nonexact candidate with 4,520 native scenarios using actual
+strict input helpers and the byte-verified CRT conversion. Its complete retail
+extent is 1,665 bytes including the switch tables; the candidate emits 1,641.
+Both buffered and immediate readers are now supplied; device startup and real
+input remain unverified.
+The four isolated links reduce unresolved names **358 → 355 → 348 → 347 → 346**,
 with no new missing names. Private evidence is in
-`work/game-build/round30-link-evidence.json`, `round30-all-objects.json` and
-`connections-round30-preservation.json`.
+`work/game-build/round31-link-evidence.json`, `round31-all-objects.json` and
+`connections-round31-preservation.json`.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based
@@ -78,7 +82,7 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
 the current composition retains all prior physics targets, with 1,086 now strict-exact, and all
-2,981 distinct strict-exact calibration cases. A native link/runtime regression checks
+2,985 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 
