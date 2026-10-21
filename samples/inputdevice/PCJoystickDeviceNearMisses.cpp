@@ -1,23 +1,11 @@
 // Near-miss joystick device candidates, kept out of src/reconstructed until
 // they match. See docs/INPUT_DEVICES.md.
 //
-// PCJoystickDevice::ReadImmediateState (0x004c3790, 452 bytes): 373 bytes
-// match. The axes match only with `axis = field = (float)value` chains, and
-// the POV copy only as a loop (memcpy and four statements place `mov eax, 1`
-// differently). Retail then rotates registers differently in both
-// button-event calls (joystickIndex in ecx and the global in edx, not eax and
-// ecx) and in the POV copy. Pointer, unsigned, store-in-branch and
-// device-local forms do not fix it. Also tried without gain: the
-// pressed/previous loads swapped, `previous != pressed`, the state store
-// embedded in the test, an unsigned shift, `!pressed`, `pressed` as the
-// call argument, `this->joystickIndex`, a controlInterface or index local
-// (335), the inverted branch (356), an hr local, an empty-if inversion of
-// the gamepad test and loop counters declared up front. VC6 here assigns
-// the scratch registers in strict eax/ecx/edx rotation, as retail does, but
-// retail's rotation starts one step later (ecx) at the first branch.
-// Splitting the button test into two ifs swaps ebx and edi (363); eight
-// pressed-bit spellings and an inline event helper on one or both paths
-// compile identically.
+// PCJoystickDevice::ReadImmediateState (0x004c3790, 454 bytes): complete
+// candidate is 453 bytes, with 373 matching positions. The former 452-byte
+// extent truncated the final ret 4. The unchanged standalone body below is
+// behaviorally reviewed; see docs/JOYSTICK_IMMEDIATE_STATE.md for the native
+// comparison and its finite, scripted COM boundary.
 //
 // PCJoystickDevice::ReadBufferedState (0x004c3100, 1652 bytes with jump
 // tables): the buffered reader. Its control flow and switches line up (a
@@ -38,57 +26,7 @@
 #include "../../src/reconstructed/PCJoystickDevice.h"
 #include "../../src/reconstructed/TrackGame.h"
 
-// 0x004c3790: reads the immediate state. Non-gamepads feed the six axes to
-// their bindings (axis 1 flipped by the JoyDirectionFlipped bit, axis 2
-// always); button changes are queued as events, and the POV values kept.
-int PCJoystickDevice::ReadImmediateState(int value) {
-    UnknownJoystickState state;
-    if (!device)
-        return 0;
-    if (device->GetDeviceState(sizeof(state), &state) < 0)
-        return 0;
-    if (DEVICE_SUBTYPE(deviceInfo.deviceType) != 4) {
-        float axis;
-        axis = (float)state.axes[0];
-        axisValues[0] = axis;
-        FeedAxis(0, axis, axisMaximums[0]);
-        axis = axisValues[1] = (float)state.axes[1];
-        if (directionFlipped)
-            axis = axisMaximums[1] - axis;
-        FeedAxis(1, axis, axisMaximums[1]);
-        axis = (float)state.axes[2];
-        axisValues[2] = axis;
-        FeedAxis(2, axisMaximums[2] - axis, axisMaximums[2]);
-        axis = (float)state.axes[3];
-        axisValues[3] = axis;
-        FeedAxis(3, axis, axisMaximums[3]);
-        axis = (float)state.axes[4];
-        axisValues[4] = axis;
-        FeedAxis(4, axis, axisMaximums[4]);
-        axis = (float)state.axes[5];
-        axisValues[5] = axis;
-        FeedAxis(5, axis, axisMaximums[5]);
-    }
-    for (int i = 0; i < 32; i++) {
-        int pressed = state.buttons[i] >> 7;
-        int previous = buttonStates[i].state;
-        buttonStates[i].state = pressed;
-        if (pressed != previous) {
-            if (pressed == 0) {
-                buttonStates[i].previousReleaseTime = 0;
-                buttonStates[i].releaseTime = 0;
-                g_TrackGame->controlInterface->QueueEvent(i, 2, 0, joystickIndex);
-            } else {
-                buttonStates[i].previousPressTime = 0;
-                buttonStates[i].pressTime = 0;
-                g_TrackGame->controlInterface->QueueEvent(i, 2, 1, joystickIndex);
-            }
-        }
-    }
-    for (int j = 0; j < 4; j++)
-        povValues[j] = state.pov[j];
-    return 1;
-}
+#include "JoystickImmediateState.cpp"
 
 static inline int AxisAbs(int value) {
     return value < 0 ? -value : value;

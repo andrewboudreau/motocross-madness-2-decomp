@@ -154,8 +154,11 @@ zero-initialized storage.
   with the error returns. `0x004c3a10` (switch buffered input) matches with
   `goto failed`. `0x004c3790`, the immediate reader, is a near miss. It
   reads a DIJOYSTATE-shaped state, feeds axes through `0x00489c00`, queues
-  button changes on the ControlInterface, and keeps the POV values. 373 of
-  452 bytes match; the rest is register rotation.
+  button changes on the ControlInterface, and keeps the POV values. The complete
+  retail extent is 454 bytes; the earlier 452-byte extent cut the final return.
+  The unchanged standalone candidate emits 453 bytes with 373 matching positions.
+  Its [functional review](JOYSTICK_IMMEDIATE_STATE.md#functional-build-review)
+  uses the actual strict binding/queue helpers and a scripted COM boundary.
 
   Device setup and helpers:
   - `0x004c2930` opens a device from its description. It reads the

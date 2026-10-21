@@ -26724,6 +26724,26 @@ CASES = [
         'target_size': 8,
         'reason': 'BackgroundImage primary vtable slot 27 and RenderPre3D surface calls independently establish this method',
     },
+    {
+        'name': 'Vehicle primary slot 87 empty default',
+        'includes': ['src/krusty2', 'src/reconstructed'],
+        'bindings': 'src/reconstructed/VehicleDefaults.bindings.json',
+        'source': 'src/reconstructed/VehicleDefaults.cpp',
+        'symbol': '?UnknownVirtualSlot87@Vehicle@@UAEXXZ',
+        'target_va': '0x00464e90',
+        'target_size': 1,
+        'reason': 'Vehicle primary slot 87, inherited unchanged in Bike and KrustyBike; complete RET body',
+    },
+    {
+        'name': 'Vehicle primary slot 94 empty default',
+        'includes': ['src/krusty2', 'src/reconstructed'],
+        'bindings': 'src/reconstructed/VehicleDefaults.bindings.json',
+        'source': 'src/reconstructed/VehicleDefaults.cpp',
+        'symbol': '?UnknownVirtualSlot94@Vehicle@@UAEXXZ',
+        'target_va': '0x00464e90',
+        'target_size': 1,
+        'reason': 'Vehicle primary slot 94, inherited by Bike but overridden by KrustyBike; complete RET body',
+    },
 ]
 
 def main():
@@ -26745,6 +26765,9 @@ def main():
             index,source=item
             obj=Path(td)/f'cal{index}.obj'
             cmd=[sys.executable,'tools/compile.py',source,'-o',str(obj),'--compiler',args.compiler]
+            for include in dict.fromkeys(include for case in CASES if case['source']==source
+                                         for include in case.get('includes', [])):
+                cmd += ['--include',include]
             if args.profile: cmd += ['--profile',args.profile]
             if args.compiler=='vc6': cmd += ['--vc6-root',args.vc6_root]
             cr=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)

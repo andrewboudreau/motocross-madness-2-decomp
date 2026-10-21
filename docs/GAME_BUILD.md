@@ -37,33 +37,33 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 220 C++ files (186 canonical sources and 34
-reviewed candidates) and reaches LINK with 366 unresolved external symbols,
+The 2026-10-21 build compiles 222 C++ files (187 canonical sources and 35
+reviewed candidates) and reaches LINK with 358 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-oxgukjco` retains all prior strict results and adds
-two strict default methods: 2,983/2,994 calibration rows and 1,086/1,162
+The composition in `build-x_vk5ibp` retains all prior strict results and adds
+two strict Vehicle defaults: 2,985/2,996 calibration rows and 1,086/1,162
 physics comparisons. This does not establish game startup, menus or racing
 while linkage remains incomplete.
-The full regression run passes: 491 tests, with 480 passed and eleven skipped
-(`work/game-build/tests-round29.log`). Static checking also passes for 213
-Python files and 356 JSON files.
+The full regression run passes: 494 tests, with 483 passed and eleven skipped
+(`work/game-build/tests-round30.log`). Static checking also passes for 216
+Python files and 358 JSON files.
 
-The current [startup and background default methods](STARTUP_DEFAULT_METHODS.md)
-remove two missing definitions, and the
-[KrustyBike network/replay connections](BIKE_NETWORK_CONNECTIONS.md)
-remove three obsolete import names. All 217 prior production objects preserve
-10,472 nondebug sections and 45,333 relocations under those three verified
-name substitutions. The [texture rectangle copy](TEXTURE_RECT_COPY.md) adds
-one reviewed nonexact candidate with explicit COM, pixel and fault boundaries.
-Its ordered WORD reads reproduce retail's destination-before-source fault
-order; non-8-bit processing retains the retail low-address lookup.
-The three isolated links reduce unresolved names **372 → 370 → 367 → 366**,
+The current [KrustyBike text connections](BIKE_TEXT_CONNECTIONS.md) supply four
+existing message, queue and resource providers. Two [Vehicle defaults and the
+Bike pure-virtual correction](VEHICLE_DEFAULT_SLOTS.md) remove three more
+missing names. All 220 prior production objects preserve 10,478 nondebug
+sections and 45,333 relocations under those five verified name substitutions.
+The [immediate joystick reader](JOYSTICK_IMMEDIATE_STATE.md) adds one reviewed
+nonexact candidate with 5,014 native scenarios using the real strict binding
+and event helpers. Its full retail extent is 454 bytes; the unchanged candidate
+emits 453. The separate default buffered-input reader remains missing.
+The three isolated links reduce unresolved names **366 → 362 → 359 → 358**,
 with no new missing names. Private evidence is in
-`work/game-build/round29-link-evidence.json`, `round29-all-objects.json` and
-`connections-round29-preservation.json`.
+`work/game-build/round30-link-evidence.json`, `round30-all-objects.json` and
+`connections-round30-preservation.json`.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based
@@ -78,7 +78,7 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
 the current composition retains all prior physics targets, with 1,086 now strict-exact, and all
-2,980 distinct strict-exact calibration cases. A native link/runtime regression checks
+2,981 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 

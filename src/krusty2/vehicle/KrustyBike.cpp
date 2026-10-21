@@ -27,6 +27,7 @@
 #endif
 #include "../../reconstructed/Recorder.h"
 #include "../../reconstructed/EventManager.h"
+#include "../../reconstructed/TrackGame.h"
 #include "math/FastMath.h"
 #include "collision/CollisionObject.h"
 #include "../../reconstructed/Wrecker.h"
@@ -866,23 +867,23 @@ void KrustyBike::UnknownVirtualSlot49(float dt)
         ((SoultreeObject*)riderCharacter->c_0x1a0)->SetPosition(position);
     }
     if (race->localRacer == this && reinterpret_cast<KbGame*>(g_TrackGame)->raceMode == 4) {
-        KbMsgSink* sink = reinterpret_cast<KbGame*>(g_TrackGame)->eventManager->FindTextQueue();
-        KbMessage* msg = 0;
+        TextQueueOverlay* sink = reinterpret_cast<EventManager*>(reinterpret_cast<KbGame*>(g_TrackGame)->eventManager)->FindTextQueue();
+        UnknownMessage* msg = 0;
         if (sink) {
             char text[0x100];
             if (totalRunningTime == 0) {
                 if (race->startBeforeFinish)
-                    reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x14d6, text, 0x80);
+                    g_TrackGame->LoadResourceString(0x14d6, text, 0x80);
                 else
-                    reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x14d7, text, 0x80);
-                msg = new(__FILE__, 0x11c6) KbMessage(text, 3.25f);
+                    g_TrackGame->LoadResourceString(0x14d7, text, 0x80);
+                msg = new(__FILE__, 0x11c6) UnknownMessage(text, 3.25f);
                 if (msg) {
                     sink->ReplaceHeadMessage(msg);
                     delete msg;
                 }
             } else if (lapCount != prevLapCount && lapCount == 1 && race->startBeforeFinish) {
-                reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x14d7, text, 0x80);
-                msg = new(__FILE__, 0x11d0) KbMessage(text, 3.25f);
+                g_TrackGame->LoadResourceString(0x14d7, text, 0x80);
+                msg = new(__FILE__, 0x11d0) UnknownMessage(text, 3.25f);
                 if (msg) {
                     sink->ReplaceHeadMessage(msg);
                     delete msg;
@@ -892,33 +893,33 @@ void KrustyBike::UnknownVirtualSlot49(float dt)
     }
     if (hasFinished) {
         if (hasFinished == 1) {
-            KbMsgSink* sink = reinterpret_cast<KbGame*>(g_TrackGame)->eventManager->FindTextQueue();
+            TextQueueOverlay* sink = reinterpret_cast<EventManager*>(reinterpret_cast<KbGame*>(g_TrackGame)->eventManager)->FindTextQueue();
             if (race->localRacer == this && sink) {
                 char text[0x100];
-                KbMessage* msg = 0;
+                UnknownMessage* msg = 0;
                 if (reinterpret_cast<KbGame*>(g_TrackGame)->playerCount == 1) {
                     switch (finishPosition) {
-                    case 1: reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x1481, text, 0x80); break;
-                    case 2: reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x1482, text, 0x80); break;
-                    case 3: reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x1483, text, 0x80); break;
-                    case 4: reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x1484, text, 0x80); break;
-                    case 5: reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x1485, text, 0x80); break;
-                    case 6: reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x1486, text, 0x80); break;
-                    case 7: reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x1487, text, 0x80); break;
-                    case 8: reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x1488, text, 0x80); break;
-                    case 9: reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x1489, text, 0x80); break;
-                    case 10: reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x148a, text, 0x80); break;
-                    case 11: reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x148b, text, 0x80); break;
-                    default: reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x148c, text, 0x80); break;
+                    case 1: g_TrackGame->LoadResourceString(0x1481, text, 0x80); break;
+                    case 2: g_TrackGame->LoadResourceString(0x1482, text, 0x80); break;
+                    case 3: g_TrackGame->LoadResourceString(0x1483, text, 0x80); break;
+                    case 4: g_TrackGame->LoadResourceString(0x1484, text, 0x80); break;
+                    case 5: g_TrackGame->LoadResourceString(0x1485, text, 0x80); break;
+                    case 6: g_TrackGame->LoadResourceString(0x1486, text, 0x80); break;
+                    case 7: g_TrackGame->LoadResourceString(0x1487, text, 0x80); break;
+                    case 8: g_TrackGame->LoadResourceString(0x1488, text, 0x80); break;
+                    case 9: g_TrackGame->LoadResourceString(0x1489, text, 0x80); break;
+                    case 10: g_TrackGame->LoadResourceString(0x148a, text, 0x80); break;
+                    case 11: g_TrackGame->LoadResourceString(0x148b, text, 0x80); break;
+                    default: g_TrackGame->LoadResourceString(0x148c, text, 0x80); break;
                     }
-                    msg = new(__FILE__, 0x1206) KbMessage(text, 3.25f);
+                    msg = new(__FILE__, 0x1206) UnknownMessage(text, 3.25f);
                     if (msg) {
                         sink->ReplaceHeadMessage(msg);
                         delete msg;
                     }
                 } else {
-                    reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x14e1, text, 0x80);
-                    msg = new(__FILE__, 0x120d) KbMessage(text, 3.25f);
+                    g_TrackGame->LoadResourceString(0x14e1, text, 0x80);
+                    msg = new(__FILE__, 0x120d) UnknownMessage(text, 3.25f);
                     if (msg) {
                         sink->ReplaceHeadMessage(msg);
                         delete msg;
@@ -1010,21 +1011,21 @@ float KrustyBike::Fn_00495FF0()
             }
         }
         if (this == race->raceCamera->followedRacer) {
-            KbMsgSink* sink = reinterpret_cast<KbGame*>(g_TrackGame)->eventManager->FindTextQueue();
+            TextQueueOverlay* sink = reinterpret_cast<EventManager*>(reinterpret_cast<KbGame*>(g_TrackGame)->eventManager)->FindTextQueue();
             char text[0x80];
             char line[0x80];
             if (gain > 0.0f) {
-                reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x14d8, text, 0x80);
+                g_TrackGame->LoadResourceString(0x14d8, text, 0x80);
                 sprintf(line, "%s %.0f.00", text, gain);
-                KbMessage* message = new(__FILE__, 0xa14) KbMessage(line, 3.25f);
+                UnknownMessage* message = new(__FILE__, 0xa14) UnknownMessage(line, 3.25f);
                 if (message) {
                     sink->ReplaceHeadMessage(message);
                     delete message;
                 }
             } else {
-                reinterpret_cast<KbGame*>(g_TrackGame)->GetStringText(0x14d9, text, 0x80);
+                g_TrackGame->LoadResourceString(0x14d9, text, 0x80);
                 sprintf(line, "%s %.0f.00)", text, points * rules->limitScale);
-                KbMessage* message = new(__FILE__, 0xa1d) KbMessage(line, 3.25f);
+                UnknownMessage* message = new(__FILE__, 0xa1d) UnknownMessage(line, 3.25f);
                 if (message) {
                     sink->ReplaceHeadMessage(message);
                     delete message;

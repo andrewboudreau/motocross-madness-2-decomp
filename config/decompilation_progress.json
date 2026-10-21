@@ -6,8 +6,8 @@
   "rtti_types": 252,
   "vc6_selected_targets": 2983,
   "vc6_exact_targets": 2972,
-  "notes": "2972 of 2983 unique retail address/extent pairs passed strict comparison in 2994 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). There are 2983 strict rows and 2980 distinct source/address/extent cases; multiple source definitions may share a retail address. Every strict comparison resolves all relocations or has no relocation bytes. The remaining 11 cases are BaseObject::Release, seven UI compiler-shape probes, two FollowRacer near misses (0x4a9d20, 0x4a9e80) and the GridNode near miss 0x484d70. The separately reviewed physics runner has 1086 strict exact results among 1162 comparisons; those results are not included in this calibration percentage. Neither suite is a census of retail functions or evidence that the source-built game links or runs. RTTI/source-path and .text figures retain their hash-pinned executable provenance.",
-  "vc6_case_count": 2994,
+  "notes": "2972 of 2983 unique retail address/extent pairs passed strict comparison in 2996 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). There are 2985 strict rows and 2981 distinct source/address/extent cases; multiple source definitions may share a retail address. Every strict comparison resolves all relocations or has no relocation bytes. The remaining 11 cases are BaseObject::Release, seven UI compiler-shape probes, two FollowRacer near misses (0x4a9d20, 0x4a9e80) and the GridNode near miss 0x484d70. The separately reviewed physics runner has 1086 strict exact results among 1162 comparisons; those results are not included in this calibration percentage. Neither suite is a census of retail functions or evidence that the source-built game links or runs. RTTI/source-path and .text figures retain their hash-pinned executable provenance.",
+  "vc6_case_count": 2996,
   "vc6_profile": "vc6_o2_mt",
-  "reviewed_commit": "94c364f01a0b5e997c66fb500956f558efced329 plus this validated slice (source hashes: work/game-build/build-oxgukjco/report.json)"
+  "reviewed_commit": "ffc9f7e5a6a374363aab5cfa56f12791e29a4e65 plus this validated slice (source hashes: work/game-build/build-x_vk5ibp/report.json)"
 }

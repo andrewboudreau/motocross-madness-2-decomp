@@ -322,7 +322,9 @@ public:
     virtual int UnknownVirtualSlot98();
     virtual int UnknownVirtualSlot99(float a, float b, int c, float d);
     virtual int UnknownVirtualSlot100(float a, int b, float c);
-    virtual void UnknownVirtualSlot101();
+    // Primary vtable 0x00550900 slot 101 is CRT _purecall (0x00534cfe).
+    // KrustyBike supplies the concrete override at 0x00496d10.
+    virtual void UnknownVirtualSlot101() = 0;
     virtual void UnknownVirtualSlot102(float arg);
     
     // 0x004079c0 (6745 bytes, `ret 0xa0` = 40 argument dwords): the bike loader.  Runs

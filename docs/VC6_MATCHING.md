@@ -3,11 +3,11 @@
 Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 The 2026-10-21 native Windows VC6 SP3 gate passes its toolchain identity,
-manual smoke and generated-probe checks. Calibration has 2,983 strict-exact
-rows among 2,994 comparisons: 2,980 distinct source/address/extent cases.
-It covers 147 source files, 144 with at least one strict case. The separate
+manual smoke and generated-probe checks. Calibration has 2,985 strict-exact
+rows among 2,996 comparisons: 2,981 distinct source/address/extent cases.
+It covers 148 source files, 145 with at least one strict case. The separate
 physics matrix has 1,086 strict-exact targets among 1,162 comparisons.
-All prior strict cases are retained, with two newly checked default methods.
+All prior strict cases are retained, with two newly checked Vehicle defaults.
 The calibration and physics comparisons report no near-miss score drops.
 Strict results are complete function checks with relocations resolved;
 they do not establish complete translation units or a working game.
@@ -21,23 +21,22 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The current [KrustyBike network/replay connections](BIKE_NETWORK_CONNECTIONS.md)
-preserve all 217 prior
-production objects under three verified name substitutions: 10,472 nondebug
-sections and 45,333 relocations. The added
-[startup/background defaults](STARTUP_DEFAULT_METHODS.md) are complete strict
-16-byte and 8-byte bodies. The separately reviewed
-[texture rectangle copy](TEXTURE_RECT_COPY.md) remains nonexact: 775 bytes,
-364 matching positions against 750 retail bytes. Its explicit ordered reads
-correct an observed fault-order difference while retaining retail's low-address
-lookup in the non-8-bit branch. Other aggregate bodies remain unchanged.
-The real link compiles 220 translation units and reports 366 unresolved names.
-Private evidence is in `work/game-build/round29-all-objects.json`,
-`round29-link-evidence.json` and `connections-round29-preservation.json`.
+The current [KrustyBike text connections](BIKE_TEXT_CONNECTIONS.md) and
+[Bike pure-virtual correction](VEHICLE_DEFAULT_SLOTS.md) preserve all 220 prior
+production objects under five verified name substitutions: 10,478 nondebug
+sections and 45,333 relocations. The two Vehicle defaults are complete strict
+one-byte RET bodies with independently established slot identities.
+The separately reviewed [immediate joystick reader](JOYSTICK_IMMEDIATE_STATE.md)
+remains nonexact: 453 bytes, 373 matching positions against the complete
+454-byte retail body. Its 5,014 native scenarios execute the real strict
+binding and queue helpers. Both original aggregate functions remain unchanged.
+The real link compiles 222 translation units and reports 358 unresolved names.
+Private evidence is in `work/game-build/round30-all-objects.json`,
+`round30-link-evidence.json` and `connections-round30-preservation.json`.
 
-The final regression run passes 480 tests with eleven skipped (491 total),
-recorded in `work/game-build/tests-round29.log`. Static checking passes for
-213 Python files and 356 JSON files.
+The final regression run passes 483 tests with eleven skipped (494 total),
+recorded in `work/game-build/tests-round30.log`. Static checking passes for
+216 Python files and 358 JSON files.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

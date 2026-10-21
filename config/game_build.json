@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/inputdevice/JoystickImmediateState.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete immediate joystick reader passes 5014 native axis, binding, button, queue, POV, floating-point, callback and fault scenarios with the real strict input helpers. The unchanged 453-byte candidate has 373 matching positions against the corrected complete 454-byte retail extent. COM success writes the full 80-byte state; binding lists and queues are bounded. Physical controllers, scheduling and the separate default buffered-input path remain untested.",
+      "evidence": "docs/JOYSTICK_IMMEDIATE_STATE.md#functional-build-review"
+    },
+    {
       "path": "samples/render/TextureRectCopy.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete rectangle-copy implementation reviewed against retail COM calls, clipping, indexed pixels, aliases, callbacks and failure/fault state. Explicit ordered WORD reads preserve the observed destination-before-source fault order. All non-8-bit processed pixels retain retail's low-address byte lookup; successful non-8-bit processing is not validated. The 775-byte body has 364 matching positions against 750 retail bytes; real DirectDraw and game rendering remain untested.",
