@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "GUIManager.h"
+#include "GameUi.h"
 
 #include "BackgroundImage.h"
 #include "DebugAlloc.h"
@@ -124,7 +125,8 @@ void GUICursor::SetAnimation(UnknownCursorAnimation* animation) {
 // 0x00485170
 int GUICursor::RenderPost3D() {
     if (cursorAnimation)
-        currentFrame = cursorAnimation->AdvancePastSounds();
+        currentFrame = reinterpret_cast<int>(
+            reinterpret_cast<UIAnim*>(cursorAnimation)->AdvancePastSounds());
     return GameCursor::RenderPost3D();
 }
 

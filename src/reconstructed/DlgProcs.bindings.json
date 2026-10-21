@@ -320,7 +320,7 @@
   "?SetText@UIControl@@QAEXPBD@Z": "0x00470b20",
   "?SetTextAlign@UIControl@@QAEXH@Z": "0x00470da0",
   "?SetName@UIControl@@QAEXPBD@Z": "0x00470dc0",
-  "?GetCurrentTexture@UnknownDialogImage@@QAEHXZ": "0x00472f90",
+  "?GetCurrentTexture@UIAnim@@QAEPAVTextureMap@@XZ": "0x00472f90",
   "?SetSortList@UIButton@@QAEXPAVUIListBox@@@Z": "0x00473390",
   "?SetCapacity@UIEditBox@@QAEXH@Z": "0x00473c70",
   "?SetEditText@UIEditBox@@QAEXPAD@Z": "0x00473da0",

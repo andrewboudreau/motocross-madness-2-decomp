@@ -1,0 +1,29 @@
+{
+  "baseline": "Published 7ecf5ff4 same-path old/current objects preserve every nondebug byte and resolved destination under exactly two method-name joins. Portable pins normalize only the checkout prefix and lexical spelling of the four source paths, ContainerList.h and GuiScreenTexture.cpp; no section is excluded.",
+  "renames": {
+    "?GetCurrentTexture@UnknownDialogImage@@QAEHXZ": "?GetCurrentTexture@UIAnim@@QAEPAVTextureMap@@XZ",
+    "?AdvancePastSounds@UnknownCursorAnimation@@QAEHXZ": "?AdvancePastSounds@UIAnim@@QAEPAVTextureMap@@XZ"
+  },
+  "objects": {
+    "src/reconstructed/GUIManager.cpp": {
+      "sections": 201,
+      "relocations": 833,
+      "sha256": "9682f8e7ee3d9fba1aaf8a29f79f5606e4dca4f5b31ee61420c850423d5d7523"
+    },
+    "src/reconstructed/DlgProcs.cpp": {
+      "sections": 420,
+      "relocations": 3040,
+      "sha256": "278ac8c5204480e7ea2a2a20a5084142336d3e50b5aecfc549eab5707f40e443"
+    },
+    "samples/ui/GUIManagerNearMisses.cpp": {
+      "sections": 209,
+      "relocations": 871,
+      "sha256": "27a47a96380d74c6ae2426b453bcd1a0ae496a8d6f60907f5c85f23763d8d107"
+    },
+    "samples/ui/DlgProcsNearMisses.cpp": {
+      "sections": 557,
+      "relocations": 4152,
+      "sha256": "ac656375ce8e469eec7bbe5bb1bb9a547d699b6292ed51f302667f96e9f346b6"
+    }
+  }
+}

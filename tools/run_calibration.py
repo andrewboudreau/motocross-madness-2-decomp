@@ -11,6 +11,15 @@ from mcm2tool.pe import PEImage  # noqa: E402
 from match import compare  # noqa: E402
 
 CASES = [
+    {'name': 'Collision hit-by default callback',
+     'source': 'src/reconstructed/CollisionCallbacks.cpp',
+     'includes': ['src/krusty2'],
+     'bindings': 'src/reconstructed/CollisionCallbacks.bindings.json',
+     'symbol': '?CollisionEmptyCallback@@YAXPAVCollisionObject@@0@Z',
+     'target_va': '0x00464e90',
+     'target_size': 1,
+     'reason': 'complete return; installed at primary +0x8c and dispatched as cdecl with two pointers; '
+               'semantic name and original TU provisional, no identity claim for other shared-address users'},
     {'name': 'Rendering primary by-value position',
      'source': 'src/reconstructed/D3DIMPositionValue.cpp',
      'includes': ['src/krusty2', 'src/reconstructed'],

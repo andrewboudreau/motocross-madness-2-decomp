@@ -1348,7 +1348,8 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
         AddControl(bar, 0, 0);
         bar->SetName("ProgressBar");
         UnknownDialogImage* image = (UnknownDialogImage*)FindSectionObject("BlueBar");
-        bar->SetBarTexture(image->GetCurrentTexture(), 0);
+        bar->SetBarTexture(reinterpret_cast<int>(
+            reinterpret_cast<UIAnim*>(image)->GetCurrentTexture()), 0);
         bar->stepCount = 20;
         bar->showPercentage = 0;
         area->Show(0, 1);

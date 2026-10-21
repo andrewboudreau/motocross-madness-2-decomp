@@ -41,56 +41,47 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 259 C++ files (205 canonical sources and 54
-reviewed candidates) and reaches LINK with 226 unresolved external symbols,
+The 2026-10-21 build compiles 260 C++ files (206 canonical sources and 54
+reviewed candidates) and reaches LINK with 223 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-tvjli7lk` retains every prior strict result:
-3,015/3,026 calibration rows and 1,086/1,162 physics comparisons, with no
+The composition in `build-4h522ikm` retains every prior strict result:
+3,016/3,027 calibration rows and 1,086/1,162 physics comparisons, with no
 partial-score decreases. The two existing nonexact physics comparison-binding
 diagnostics are unchanged and excluded from strict counts.
 
-The [frozen camera connection](FROZEN_CAMERA_CONNECTIONS.md) uses the existing
-PCCamera lifecycle and preserves the complete 0x220-byte snapshot. All 41
-registered visibility bodies and the actual provider constructor/destructor
-remain strict. One new COMDAT contains the exact five-byte implicit destructor
-and eleven alignment NOPs; its cleanup reference resolves to that definition.
-The original 87 sections/341 relocations, BSS and CRT ordering are preserved
-under exactly the three lifecycle/storage names. Full camera startup and teardown
-have not been executed.
+The [UIAnim connections](UIANIM_CONNECTIONS.md) route cursor advancement and
+loading-dialog texture access to the existing primary UIAnim implementations.
+All four affected complete objects preserve 1,387 nondebug sections and 8,896
+relocations under exactly two method-name changes. The retained check passes
+199 strict comparisons and 3,067 native getter cases, including 41 independently
+checked access faults. Allocation, primary RTTI and named-resource propagation
+support the local receiver casts. Sound/clock lifecycle execution remains
+outside this connection proof.
 
-The [collision zero-vector connection](COLLISION_OBJECT_ZERO.md) joins two
-constructor reads to the existing TU-local initialized vector. Both complete
-objects preserve 271 sections and 1,454 relocations under that exact destination
-connection. Eighteen strict checks cover the constructor and all four vector
-initializers/wrappers in both objects. The distinct vector types retain explicit
-12-byte field views; full constructor execution is outside this proof.
+The [collision default callback](COLLISION_EMPTY_CALLBACK.md) supplies the
+complete missing one-byte return. Its actual secondary-pointer installation
+and all three two-pointer cdecl dispatch sites are checked alongside the full
+59-byte installer and 1,102-byte query. The new object adds only compiler
+directives and its padded code COMDAT, with no imports, storage or initializer.
+Its semantic name and original TU remain provisional; sharing the retail empty
+address does not equate it with other methods.
 
-The [standings drawing candidate](STATS_STANDINGS_DRAW.md#functional-build-review)
-supplies StatsOverlay's complete missing gameplay HUD method. It remains
-explicitly nonexact: 1,004 emitted bytes against 1,002 retail bytes, with 605
-resolved matching positions. Its 3,228 native scenarios pass with 30 strict
-game/CRT comparisons; COM, GDI and resource callbacks are scripted. Its iterator
-calls connect to the existing BikeRace provider. The review records finite input
-and rendering limits. No whole-aggregate sample admission or compiler flag
-change is involved.
-
-All 258 prior production objects preserve 10,685 nondebug sections and 45,748
-relocations under the exact camera and zero-vector connections, with no filename
-exclusions. The added destructor section is separately checked, and the new
-standings object independently reproduces its actual game compile command.
-Real links remove exactly four names, **230 -> 228 -> 227 -> 226**, with none
+All 259 prior production objects preserve 10,691 nondebug sections and 45,776
+relocations under the two UIAnim name connections, without filename exclusions.
+The new callback object independently reproduces its actual game compile command.
+Isolated real links remove exactly three names, **226 -> 224 -> 223**, with none
 added. The final report checks all source/header hashes, configuration, compiler
 profile and per-source flags. Private evidence is in
-`work/game-build/round51-link-evidence.json`, `round51-all-objects.json`,
-`round51-admitted.json` and `connections-round51-preservation.json`.
+`work/game-build/round52-link-evidence.json`, `round52-all-objects.json`,
+`round52-admitted.json` and `connections-round52-preservation.json`.
 
 Game linking still fails; startup, integrated menus and racing remain untested.
-Static checks pass for 270 Python files and 414 JSON files.
-The final full regression run passes: 553 tests, 542 passed and 11 skipped
-(`work/game-build/tests-round51-final.log`).
+Static checks pass for 272 Python files and 416 JSON files.
+The final full regression run passes: 555 tests, 544 passed and 11 skipped
+(`work/game-build/tests-round52-final.log`).
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based
@@ -105,7 +96,7 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
 the current composition retains all prior physics targets, with 1,086 now strict-exact, and all
-3,000 distinct strict-exact calibration cases. A native link/runtime regression checks
+3,001 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 

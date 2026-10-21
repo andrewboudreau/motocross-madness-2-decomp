@@ -68,7 +68,7 @@
   "?AcceptDevice@GUIUser@@QAEHPAVGUIInputDevice@@@Z": "0x00487c30",
   "?AcceptKeyboardAndJoysticks@GUIUser@@QAEXXZ": "0x00487d00",
   "?AddRef@BaseObject@@UAEHXZ": "0x00405160",
-  "?AdvancePastSounds@UnknownCursorAnimation@@QAEHXZ": "0x004730b0",
+  "?AdvancePastSounds@UIAnim@@QAEPAVTextureMap@@XZ": "0x004730b0",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?Bind@GUIInputDevice@@QAEPAV1@PAXPAVInputDevice@@MMMM@Z": "0x00486fb0",
   "?CloseDialogResource@GUIManager@@QAEXXZ": "0x00485d50",
