@@ -9,7 +9,9 @@ belong to the same unit as the functions below is open.
 ## Matched (11 of 11 unregistered, strict exact)
 
 - `0x004a1d60` QuatNormalize (173 bytes). Returns `q / |q|`, or the
-  identity at `0x006850b0` when `|q|^2 == 0`.
+  shared fallback at `0x006850b0` when `|q|^2 == 0`. These sixteen bytes
+  begin as loader-zero storage; the old identity-value inference was unsupported.
+  See [the storage and consumer proof](QUATERNION_STORAGE.md).
 - `0x004a1e10` QuatToMatrix (381 bytes). The row-vector rotation matrix of
   `q`, scaled by `2 / |q|^2` so that `q` need not be normalized.
 - `0x004a2040` QuatFromMatrix (462 bytes). Picks the largest of `w^2`,

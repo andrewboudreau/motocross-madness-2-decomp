@@ -1,6 +1,6 @@
 {
   "??0GraphicsTest@@QAE@H@Z": "0x0047bc70",
-  "??0UnknownWreckerCollisionModel@@QAE@H@Z": "0x0043b8d0",
+  "??0ConstraintMethodCollisionModel@@QAE@H@Z": "0x0043b8d0",
   "??0UnknownWreckerGravityModel@@QAE@H@Z": "0x004f9760",
   "??0UnknownWreckerRigidBody@@QAE@H@Z": "0x004cc120",
   "??0Wrecker@@QAE@H@Z": "0x0052ff90",
@@ -22,8 +22,8 @@
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
   "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?AddIgnoredOwner@CollisionObject@@QAEXPAX@Z": "0x00439410",
-  "?SetBody@UnknownWreckerCollisionModel@@QAEXPAVUnknownWreckerRigidBody@@HPBD@Z": "0x0043b9e0",
-  "?AddProbePoint@UnknownWreckerCollisionModel@@QAEXUVector3@@H@Z": "0x0043c7f0",
+  "?SetBody@ConstraintMethodCollisionModel@@QAEXPAVConBody@@HPBD@Z": "0x0043b9e0",
+  "?AddProbePoint@ConstraintMethodCollisionModel@@QAEXUConVec3@@PAVConNode@@@Z": "0x0043c7f0",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?ApplyPoseListSlot6@Character@@QAEXPAUMotionPoseList@@H@Z": "0x004a8ac0",
   "?SetMotionByName@Character@@QAEXPBD@Z": "0x004a8b10",

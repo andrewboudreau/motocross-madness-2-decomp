@@ -3,6 +3,7 @@
 
 #include "Wrecker.h"
 #include "../krusty2/core/SoultreeObject.h"
+#include "../krusty2/constraint/ConstraintMethodCollisionModel.h"
 
 #include <stdlib.h>
 
@@ -79,9 +80,11 @@ void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
     AppendChild(rigidBody, -1);
     rigidBody->UnknownVirtualSlot28(character->modelNode);
     gravityModel->UnknownVirtualSlot27(rigidBody);
-    collisionModel = new (__FILE__, 0x68) UnknownWreckerCollisionModel(1);
+    collisionModel = reinterpret_cast<UnknownWreckerCollisionModel*>(
+        new (__FILE__, 0x68) ConstraintMethodCollisionModel(1));
     collisionModel->SetRenderContext(renderContext);
-    collisionModel->SetBody(rigidBody, 1, name);
+    reinterpret_cast<ConstraintMethodCollisionModel*>(collisionModel)->SetBody(
+        reinterpret_cast<ConBody*>(rigidBody), 1, name);
     AppendChild(collisionModel, -1);
     collisionModel->shapeCollisionEnabled = 0;
     collisionModel->collisionEnabled = 0;
@@ -600,7 +603,8 @@ void Wrecker::SetPushBox(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 
 }
 
 void Wrecker::AddProbe(Vector3 offset, int bone) {
-    collisionModel->AddProbePoint(offset, bone);
+    reinterpret_cast<ConstraintMethodCollisionModel*>(collisionModel)->AddProbePoint(
+        reinterpret_cast<const ConVec3&>(offset), reinterpret_cast<ConNode*>(bone));
     probePositions = (Vector3*)DebugRealloc(probePositions, collisionModel->probeCount * sizeof(Vector3), __FILE__, 0x308);
     probePositions[collisionModel->probeCount - 1] = Vector3(0.0f, 0.0f, 0.0f);
     probeHits = (int*)DebugRealloc(probeHits, collisionModel->probeCount * 4, __FILE__, 0x30b);

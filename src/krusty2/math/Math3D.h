@@ -106,8 +106,8 @@ Quat QuatFromMatrix(const Matrix4& m);
 // translation row zero). The scale is s = 2/|q|^2 when |q|^2 > 0, else 0. Tier 2.
 Matrix4 QuatToMatrix(const Quat& q);
 
-// 0x004a1d60, 173 bytes: q / |q|. Returns the identity quaternion (global at
-// 0x006850b0, set up at run time) when |q|^2 == 0.0 (double compare). Tier 2.
+// 0x004a1d60, 173 bytes: q / |q|. Returns the shared fallback (global at
+// 0x006850b0, initially loader-zero) when |q|^2 == 0.0 (double compare). Tier 2.
 Quat QuatNormalize(const Quat& q);
 
 // 0x004a1f90, 169 bytes: time derivative of an orientation quaternion under the
@@ -126,9 +126,9 @@ typedef void (*IntegrateFn)(float dt, int n, float* state, float* deriv);
 // Tier 1 for the arithmetic (decoded), tier 3 for the name.
 void IntegrateAdamsBashforth2(float dt, int n, float* state, float* deriv);
 
-// Identity quaternion {1,0,0,0} at 0x006850b0 (.bss, filled at run time). Read by
-// QuatNormalize for a zero-length input and by PhysicsRigidBody::ResetState.
-// Tier 2 for the value (from its uses), tier 3 for the name.
+// Sixteen loader-zero bytes at 0x006850b0, read by QuatNormalize and
+// PhysicsRigidBody::ResetState. No initializer was found in the bounded audit.
+// The existing symbol name is provisional; it does not imply {1,0,0,0}.
 extern Quat g_QuatIdentity;
 
 // Row-vector rotation v * M using only the upper 3x3 (no translation):

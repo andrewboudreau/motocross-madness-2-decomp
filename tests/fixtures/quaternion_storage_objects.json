@@ -1,0 +1,25 @@
+{
+  "baseline": "6b8afca2ac4e58b3b4e32f485cb3f741d89e3bd8",
+  "objects": {
+    "src/reconstructed/QuatUtil.cpp": {
+      "sections": 19,
+      "relocations": 43,
+      "sha256": "0f11d3514d06dea8d0cd99d15747b5125cf7cf1c5878771546cd3fc7319b9e2c"
+    },
+    "samples/physics/rigidbody/PhysicsRigidBody.cpp": {
+      "sections": 49,
+      "relocations": 142,
+      "sha256": "0b600f02765161ba7b07d4d61a1d70639bf4c9bac12313140923e08af2fc61e4"
+    },
+    "src/reconstructed/Math3D.cpp": {
+      "sections": 19,
+      "relocations": 28,
+      "sha256": "2f3016e20001795e921bd8b86d0afd795bf990e4b1b837b4f3494dc1455cb840"
+    }
+  },
+  "filenames": [
+    "src/reconstructed/QuatUtil.cpp",
+    "samples/physics/rigidbody/PhysicsRigidBody.cpp",
+    "src/reconstructed/Math3D.cpp"
+  ]
+}

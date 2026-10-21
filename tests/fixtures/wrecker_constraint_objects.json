@@ -1,0 +1,15 @@
+{
+  "baseline": "Every original nondebug byte and relocation destination retained under exactly three verified constructor/method names; only explicitly listed filenames normalize checkout roots.",
+  "objects": {
+    "src/reconstructed/Wrecker.cpp": {
+      "sections": 67,
+      "relocations": 237,
+      "sha256": "3e9fa6e97b91466f027a8ce13e87a495a95f3ca68b565cd04c244989c22cf9ba"
+    },
+    "samples/race/WreckerNearMisses.cpp": {
+      "sections": 72,
+      "relocations": 277,
+      "sha256": "e1fbb889b1b99e501b75f71a5eb4bc1b814168944d27b6940dc00ad2c96cf6b2"
+    }
+  }
+}

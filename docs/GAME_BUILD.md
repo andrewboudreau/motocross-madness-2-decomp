@@ -41,60 +41,70 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 272 C++ files (214 canonical sources and 58
-reviewed candidates) and reaches LINK with 184 unresolved external symbols,
+The 2026-10-21 build compiles 273 C++ files (215 canonical sources and 58
+reviewed candidates) and reaches LINK with 180 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The current
-run is `work/game-build/build-5ou5d2p9`; its `link.log` is authoritative.
+run is `work/game-build/build-taq3kk_h`; its `link.log` is authoritative.
 
-The [D3DIM virtual connections](D3DIM_VTABLE_CONNECTIONS.md) connect seven
-existing providers through the physics declaration's primary-model table.
-Raw RTTI, constructor writes and full provider bodies distinguish the model
-at owner +0x21c from its GameObject at +0x228. The folded physics class view
-remains provisional; no layout, initializer or vtable order changes.
+The [shared quaternion storage](QUATERNION_STORAGE.md) supplies the missing
+sixteen-byte writable fallback at retail `0x006850b0`. The loader-zero value
+comes from the PE section extent, rather than the provisional `g_QuatIdentity`
+name. No direct initializer was discovered in the bounded reference audit;
+indirect writes and global immutability are not claimed.
 
-The isolated link removes exactly seven names: **192 -> 185**, none added.
-All 271 previous objects preserve 10,833 nondebug sections and 46,129 relocations
-under those seven names, without filename exclusions. The retained test checks
-59 full strict bodies, nine whole objects, two unchanged partials and 896 native
-ABI dispatch cases. These dispatch probes do not simulate provider behavior.
-The single affected prior object pin was reproduced before its name transition.
+The isolated actual link removes exactly that global: **184 -> 183**, none
+added. All 272 previous objects retain their complete 10,864 nondebug sections
+and 46,268 relocations, without symbol mappings or filename exclusions. The
+new ordinary data object has sixteen BSS bytes and no functions, imports,
+nondebug relocations or dynamic initializer. No compiler flags or build
+configuration changes.
 
-The [FollowCamera constructor](FOLLOW_CAMERA_CONSTRUCTOR.md) adds a separate
-reviewed nonexact implementation for the full 564-byte retail constructor.
-It emits 569 bytes with 100 matching resolved positions. The original 564-byte,
-511-position sample remains unchanged. Explicit volatile accesses preserve
-observed partial-write ordering; they do not establish original member types.
+Fourteen full strict checks and 11,134 native cases cover the actual normalizer
+and derivative-reset consumers. Two initial scenarios run before fixture
+mutation; later patterns verify shared writable storage. The finite matrix
+includes twelve masked x87 modes and 148 independently modeled aligned access
+faults. The conventional `{1,0,0,0}` provider fails the retained negative
+control. Prepared storage and finite arithmetic tests do not establish a full
+rigid-body lifetime or game behavior.
 
-The constructor's finite native suite passes 7,392 cases with 27 strict helper,
-initializer and caller checks. Actual initialization and unwind helpers run
-against independent byte, write-order, allocation and ownership oracles.
-The reference shares verified source helpers and the native CRT. Second malloc
-NULL is excluded because the existing fallback can overrun its small buffer;
-unmasked FP, full exception register/stack context and complete gameplay lifetime
-remain unverified. The original constructor fails the retained guard-order
-control, while the separately admitted candidate passes.
+The [Wrecker constraint connections](WRECKER_CONSTRAINT_CONNECTIONS.md) join
+three existing providers: the collision-model constructor, `SetBody`, and
+`AddProbePoint`. Full allocation/producer instructions and RTTI establish the
+primary model receiver, its separate GameObject at +0xc, the rigid-body node
+field, and the pointer carried through the legacy integer probe argument.
+No class declarations or layouts change.
 
-The constructor link removes exactly its missing provider: **185 -> 184**,
-none added. All 271 previous objects remain completely unchanged. The new
-object's 31 nondebug sections and 139 relocations match the reviewed candidate,
-including genuine vtable/RTTI, EH, private BSS and CRT initialization artifacts.
-All 272 source hashes, 240 header hashes and build/compiler inputs agree.
-No compiler profile override or existing calibration row is changed.
+The isolated real link removes exactly three names: **183 -> 180**, none
+added. All 273 production objects preserve 10,866 nondebug sections and
+46,268 relocations under those three names, with no filename exclusions.
+The canonical and aggregate Wrecker objects retain all 139 sections and 514
+relocations. Both existing nonexact sample bodies retain their full resolved
+fingerprints and scores; neither is admitted by this connection.
+
+The retained test passes 87 full strict checks and 2,568 native probe-append
+cases with eight independently modeled access faults. Actual source append,
+probe, debug-allocation and copy code executes with real VC6 CRT operations;
+three instrumented CRT names supply explicit failure/sentinel contracts.
+Independent oracles check full prepared state, arrays, ownership, accounting
+and first faults. Constructor and SetBody lifetime graphs remain unexecuted;
+failed allocations cover count zero, without asserting safe fallback into
+undersized old allocations. Actual-path quaternion and Wrecker tests pass.
+
+Evidence: `work/game-build/round63-wrecker-link-proof.json`,
+`connections-round63-preservation.json` and `round63-retained-final.log`.
 
 Calibration retains **3,023/3,034** strict rows (3,007 distinct source/address/
-extent cases and 2,980/2,990 unique retail address/extent pairs). Physics retains
-**1,086/1,162** strict comparisons. Each isolated slice preserves every previous
-score, full extent, strict result and existing nonexact binding diagnostic.
-The combined affected camera tests pass alongside the existing connection tests.
+extent cases). Physics retains **1,086/1,162** strict comparisons. Every old
+score, full extent and strict result remains unchanged.
 
-Evidence: `work/game-build/round62-d3dim-link-proof.json`,
-`round62-camera-link-proof.json`, `connections-round62-d3dim-preservation.json`,
-`connections-round62-preservation.json` and `round62-camera-retained.log`.
+Evidence: `work/game-build/round63-quaternion-link-proof.json`,
+`connections-round63-quaternion-preservation.json` and
+`round63-quaternion-retained.log`.
 The game still does not link; startup, integrated menus and racing are unverified.
 
-Static checks pass for 288 Python and 439 JSON files. Full regression passes:
-571 tests, 560 passed and 11 skipped (`work/game-build/tests-round62.log`).
+Static checks pass for 290 Python and 442 JSON files. Full regression passes:
+573 tests, 562 passed and 11 skipped (`work/game-build/tests-round63.log`).
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

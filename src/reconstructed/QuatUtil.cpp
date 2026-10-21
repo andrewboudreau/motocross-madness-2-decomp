@@ -23,9 +23,9 @@ struct Quat {
     float z;
 };
 
-extern Quat g_QuatIdentity;   // 0x006850b0
+extern Quat g_QuatIdentity;   // 0x006850b0: loader-zero fallback; legacy name
 
-// 0x004a1d60: q / |q|, or the identity for a zero quaternion.
+// 0x004a1d60: q / |q|, or the shared fallback for a zero quaternion.
 Quat QuatNormalize(const Quat& q)
 {
     Quat result;
