@@ -84,8 +84,17 @@
       "path": "samples/physics/motion/CharacterMotionStart.cpp",
       "status": "reviewed-nonexact",
       "extra_flags": ["/QIfist"],
-      "reason": "Complete motion-start implementation passes 320999 state, actual pose-helper, callback, rounding and exception scenarios. The 93-byte method and 368-byte ordinary C++ conversion helper preserve signed32 current-rounding results and invalid unmasked no-store behavior. Only this source uses /QIfist to avoid __ftol changing the rounding mode on a trap. The actual 59-byte pose walker remains strict. Slot4 is scripted; transient x87 stack context and integrated animation are not claimed equivalent.",
+      "reason": "Complete motion-start implementation passes 320999 state, actual pose-helper, callback, rounding and exception scenarios. The 93-byte method and 368-byte ordinary C++ conversion helper preserve signed32 current-rounding results and invalid unmasked no-store behavior. This candidate uses /QIfist to avoid __ftol changing the rounding mode on a trap. The actual 59-byte pose walker remains strict. Slot4 is scripted; transient x87 stack context and integrated animation are not claimed equivalent.",
       "evidence": "docs/CHARACTER_MOTION_START.md#functional-build-review"
+    },
+    {
+      "path": "samples/physics/motion/CharacterMotionBlend.cpp",
+      "status": "reviewed-nonexact",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "Complete 1011-byte retail two-motion blend reconstructed as ordinary 441-byte method, 652-byte first interpolation and shared 368-byte conversion helper. Passes 576692 finite native cases with actual strict math helpers and three failing controls. Separate InterpolatePose repair changes exactly two dot-call relocations while preserving its full strict 1205-byte body. Candidate-only /QIfist preserves current-rounding conversion exception behavior. Prepared storage and bounded slot4 callbacks; temporary pose padding and x87 TOP/register context/resumption are excluded. Integrated animation remains unverified.",
+      "evidence": "docs/CHARACTER_MOTION_BLEND.md#functional-build-review"
     },
     {
       "path": "samples/physics/soultree_base/SoultreeDrag.cpp",

@@ -41,44 +41,61 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 270 C++ files (214 canonical sources and 56
-reviewed candidates) and reaches LINK with 202 unresolved external symbols,
+The 2026-10-21 build compiles 271 C++ files (214 canonical sources and 57
+reviewed candidates) and reaches LINK with 193 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The current
-run is `work/game-build/build-nwwm3o2k`; its `link.log` is authoritative.
+run is `work/game-build/build-3dvwvszm`; its `link.log` is authoritative.
 
-The [Vehicle input subtype connection](VEHICLE_INPUT_SUBTYPE.md) replaces the
-provisional steering-owner call with the existing primary InputDevice getter.
-Actual binding producers, loader argument propagation and offset-zero RTTI
-establish the receiver. The caller's bounded prefix view remains unchanged.
-No provider, initialization, compiler flag or calibration row is added.
+The [Soultree emitter connections](SOULTREE_ATTACHMENT_EMITTERS.md) join nine
+calls to the canonical Dust and Steam methods. Actual Bike and Scene producers,
+primary RTTI, slot37 registration and the caller instructions support seven
+name substitutions. The isolated link removes seven missing names: **202 -> 195**.
+All 270 old objects preserve 10,816 nondebug sections and 46,075 relocations
+under those names, without filename exclusions. The retained test passes 66
+strict checks and 130,816 finite native store cases, including 30,080 modeled
+access faults. The two existing Soultree partial fingerprints remain unchanged.
 
-The isolated real link removes exactly one name: **203 -> 202**, with none
-added. All 270 prior production objects preserve 10,816 nondebug sections and
-46,075 relocations under that one verified name, without filename exclusions.
-The actual build's 270 source hashes, 239 header hashes, configuration, compiler
-profile and per-source flags are checked.
+The [Character two-motion blend](CHARACTER_MOTION_BLEND.md) adds a reviewed
+nonexact gameplay implementation for the complete 1,011-byte retail function.
+Its ordinary method, first-interpolation helper and shared conversion helper
+emit 441, 652 and 368 bytes. This is not a strict match for the new method.
+The genuine Character declaration, primary rider receiver, actual math helpers
+and bounded slot4 callback tests support its functional admission. The finite
+native suite passes 576,692 cases and rejects three incorrect math/conversion
+controls. Temporary pose padding, full x87 register context, exception resumption,
+constructed lifetimes and integrated animation remain outside that evidence.
 
-The retained test passes 233 strict full-body comparisons and pins ten complete
-objects. The actual 17-byte getter passes 11,264 prepared-storage native cases,
-including 3,072 independently modeled read faults. Return values, exact fault
-addresses and complete pages are checked. This does not execute constructed
-input-device lifetimes or whole Vehicle input polling. Six affected tests pass,
-including the actual-path vector-add and prior emitter/gearbox/default checks.
-Three old Vehicle fingerprints were reproduced before their one-name update;
-all other records and six gearbox partial fingerprints remain unchanged.
+The blend link removes the genuine method and its provisional rider name:
+**195 -> 193**, with none added. Existing objects remain unchanged under the
+rider-call name except for a separately proved math dependency repair:
+InterpolatePose retains all 1,205 instruction bytes and its strict match while
+two call relocations at offsets 302 and 609 now reach the existing strict dot
+provider. Every other aggregate section is unchanged. The new candidate adds
+17 nondebug sections and 54 relocations, including documented header-generated
+initializers. Only the new candidate adds /QIfist; existing per-source flags
+are unchanged. All 271 source hashes, 240 header hashes and build inputs agree.
 
 Calibration retains **3,023/3,034** strict rows (3,007 distinct source/address/
 extent cases, and 2,980/2,990 unique retail address/extent pairs). Physics retains
-**1,086/1,162** strict comparisons. Every prior score, full extent and strict
-result is unchanged; the two prior nonexact physics binding diagnostics remain.
+**1,086/1,162** strict comparisons. Both isolated slices preserve every prior
+score, full extent and strict result, including the two prior nonexact binding
+diagnostics. No calibration row is added for the nonexact blend implementation.
 
-Evidence: `work/game-build/round59-input-link-proof.json`,
-`connections-round59-preservation.json` and `round59-input-retained-final.log`.
+Shared fixture records were combined by source identity: current Vehicle rows
+remain intact while reviewed Bike rows change. Three additional fingerprints in
+the newer Vehicle and Soultree fixtures were reproduced from actual link/test
+objects before deriving their one-name transitions. Six combined affected
+tests pass in the actual checkout, including the new native suites and prior
+emitter, gameplay-default and rider checks.
+
+Evidence: `work/game-build/round60-soultree-link-proof.json`,
+`round60-blend-link-proof.json`, `connections-round60-soultree-preservation.json`,
+`connections-round60-preservation.json` and `round60-blend-retained.log`.
 The game still does not link; startup, integrated menus and racing are unverified.
 
-Static checks pass for 283 Python and 432 JSON files. Full regression passes:
-566 tests, 555 passed and 11 skipped (`work/game-build/tests-round59-input.log`).
+Static checks pass for 285 Python and 435 JSON files. Full regression passes:
+568 tests, 557 passed and 11 skipped (`work/game-build/tests-round60.log`).
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

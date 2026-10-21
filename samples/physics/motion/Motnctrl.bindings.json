@@ -48,5 +48,6 @@
   "__strupr": "0x00535d3d",
   "_atof": "0x00536340",
   "_sprintf": "0x00534aaf",
-  "_strtok": "0x00536397"
+  "_strtok": "0x00536397",
+  "?Vec3DotCall@@YAMPBUVec3@@0@Z": "0x0040ae30"
 }

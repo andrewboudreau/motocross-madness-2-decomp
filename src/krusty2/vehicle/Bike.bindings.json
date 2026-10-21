@@ -110,7 +110,6 @@
   "?ClearScreenRects@D3DIMSoultreeObject@@QAEXXZ": "0x004444e0",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?Method_0x004a8bf0@Character@@QAEXHM@Z": "0x004a8bf0",
-  "?Method_0x004a8c50@BikeA5C4@@QAEXHHMM@Z": "0x004a8c50",
   "?Method_0x004a8c50@Character@@QAEXHHMM@Z": "0x004a8c50",
   "?SetupWrecker@Wrecker@@QAEPAV1@PAXPAVD3DIMSoultreeCharacter@@PBD@Z": "0x00530190",
   "?EndWreck@Wrecker@@QAEXXZ": "0x005327c0",

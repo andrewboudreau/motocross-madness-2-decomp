@@ -3,6 +3,7 @@
 // Translation-unit ownership of the neighbouring functions is tier 2 (proximity
 // plus the same __FILE__ string).
 #include "../../reconstructed/TrackGameGlobal.h"
+#include "../../reconstructed/ParticleEmitters.h"
 #include <math.h>
 #include <string.h>
 #include <float.h>
@@ -260,7 +261,8 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot18(SoultreeAttachment* a)
         if (c->touching && !c->effectSpawned &&
             track->trackData->materialEffectFlags[(unsigned char)c->materialId] != 0) {
             c->effectSpawned = 1;
-            a->contactEmitter->SetPosition(c->field_0x20, 0);
+            reinterpret_cast<DustParticleEmitter*>(a->contactEmitter)->SetPosition(
+                reinterpret_cast<const ParticleVec3&>(c->field_0x20), 0.0f);
             if (a->resetTrail)
                 a->contactEmitter->previousPosition = a->contactEmitter->currentPosition;
             a->contactEmitter->activeThisFrame = 1;
@@ -664,18 +666,18 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
                 switch (attachments[i].type) {
                 case 1:
                     if (hit) {
-                        attachments[i].contactEmitter->SetColor(0x40, 0x40, 0x40);
+                        reinterpret_cast<DustParticleEmitter*>(attachments[i].contactEmitter)->SetColor(0x40, 0x40, 0x40);
                         attachments[i].contactEmitter->renderFlags |= 0x800;
                     } else {
-                        attachments[i].contactEmitter->SetColor(0xff, 0xff, 0xff);
+                        reinterpret_cast<DustParticleEmitter*>(attachments[i].contactEmitter)->SetColor(0xff, 0xff, 0xff);
                         attachments[i].contactEmitter->renderFlags &= ~0x800;
                     }
                     break;
                 case 4:
                     if (hit)
-                        AttachmentSink(&attachments[i])->SetColor(0x80, 0x80, 0x80);
+                        reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(&attachments[i]))->SetColor(0x80, 0x80, 0x80);
                     else
-                        AttachmentSink(&attachments[i])->SetColor(0xff, 0xff, 0xff);
+                        reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(&attachments[i]))->SetColor(0xff, 0xff, 0xff);
                     break;
                 }
             }
@@ -708,15 +710,16 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
         case 4:
             if (!justReset) {
                 scratchVector = sceneNode->LocalToWorldPoint(a->localOffset);
-                AttachmentSink(a)->SetPosition(scratchVector);
+                reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(a))->SetPosition(
+                    reinterpret_cast<const ParticleVec3&>(scratchVector));
                 if (a->resetTrail) {
                     AttachmentSink(a)->previousPosition = AttachmentSink(a)->currentPosition;
                     a->resetTrail = 0;
                 }
                 if (settled && !field_0x20e)
-                    AttachmentSink(a)->Restart();
+                    reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(a))->Restart();
                 else if (UnknownVirtualSlot25())
-                    AttachmentSink(a)->Burst();
+                    reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(a))->Burst();
             }
             break;
         }
@@ -736,7 +739,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
                 ((SoultreePadObject*)attachments[i].field_0x0c)->activeThisFrame = 0;
                 break;
             case 4:
-                AttachmentSink(&attachments[i])->StopEmitting();
+                reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(&attachments[i]))->StopEmitting();
                 break;
             }
         }

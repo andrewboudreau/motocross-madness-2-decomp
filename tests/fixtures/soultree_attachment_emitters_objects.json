@@ -1,0 +1,2214 @@
+{
+  "objects": {
+    "src/krusty2/soultree/SoulTreePhysics.cpp": {
+      "sections": 128,
+      "relocations": 625,
+      "sha256": "8e6c56074785c225145f22b77210712d4bb04e6613d74b2e097f2aa6cb0fe3ba"
+    },
+    "src/reconstructed/DustParticleEmitter.cpp": {
+      "sections": 28,
+      "relocations": 65,
+      "sha256": "f2f760a624631b247c13567bacce5371d84a1061bc3c2c3eb957de2919a1bf4e"
+    },
+    "src/reconstructed/SteamParticleEmitter.cpp": {
+      "sections": 26,
+      "relocations": 61,
+      "sha256": "6e40249eec255a635aaf8bd8f86b8f39b387507498800b4afdfeff58f1450b69"
+    },
+    "src/krusty2/vehicle/Bike.cpp": {
+      "sections": 242,
+      "relocations": 1089,
+      "sha256": "89f1e889f9bc656b50a616af835038ab70b95cabf4287c950451f1c9b0080c10"
+    },
+    "samples/track/SceneManagerNearMisses.cpp": {
+      "sections": 96,
+      "relocations": 484,
+      "sha256": "8d19f0c77ce7255d02b063447df46fe777e85d67f5ad3cc99c7617160ff57776"
+    }
+  },
+  "renames": {
+    "?SetPosition@SoultreeAttachedObject@@QAEXUVec3@@H@Z": "?SetPosition@DustParticleEmitter@@QAEXUParticleVec3@@M@Z",
+    "?SetColor@SoultreeAttachedObject@@QAEXHHH@Z": "?SetColor@DustParticleEmitter@@QAEXEEH@Z",
+    "?SetPosition@SoultreeSinkObject@@QAEXUVec3@@@Z": "?SetPosition@SteamParticleEmitter@@QAEXUParticleVec3@@@Z",
+    "?Restart@SoultreeSinkObject@@QAEXXZ": "?Restart@SteamParticleEmitter@@QAEXXZ",
+    "?Burst@SoultreeSinkObject@@QAEXXZ": "?Burst@SteamParticleEmitter@@QAEXXZ",
+    "?StopEmitting@SoultreeSinkObject@@QAEXXZ": "?StopEmitting@SteamParticleEmitter@@QAEXXZ",
+    "?SetColor@SoultreeSinkObject@@QAEXHHH@Z": "?SetColor@SteamParticleEmitter@@QAEXEEH@Z"
+  },
+  "strict": [
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot0@SoultreePhysicsBaseObject",
+      "va": "0x005008d0",
+      "extent": 54
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot1@SoultreePhysicsBaseObject",
+      "va": "0x00500910",
+      "extent": 399
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "??0SoultreePhysicsBaseObject@@",
+      "va": "0x00500aa0",
+      "extent": 348
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "?SoultreeCollisionCallback@@",
+      "va": "0x00500c00",
+      "extent": 35
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "?SoultreeStaticCollisionCallback@@",
+      "va": "0x00500c30",
+      "extent": 25
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot2@SoultreePhysicsBaseObject",
+      "va": "0x00500c50",
+      "extent": 1500
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "?InstallCollisionCallbacks@SoultreePhysicsBaseObject@@",
+      "va": "0x00501230",
+      "extent": 33
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "??1SoultreePhysicsBaseObject@@",
+      "va": "0x00501260",
+      "extent": 164
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot3@SoultreePhysicsBaseObject",
+      "va": "0x00501310",
+      "extent": 185
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot4@SoultreePhysicsBaseObject",
+      "va": "0x005013d0",
+      "extent": 473
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot38@SoultreePhysicsBaseObject",
+      "va": "0x00501600",
+      "extent": 925
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot39@SoultreePhysicsBaseObject",
+      "va": "0x005019a0",
+      "extent": 63
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot7@SoultreePhysicsBaseObject",
+      "va": "0x005019e0",
+      "extent": 485
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot8@SoultreePhysicsBaseObject",
+      "va": "0x00501bd0",
+      "extent": 76
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot33@SoultreePhysicsBaseObject",
+      "va": "0x00501c20",
+      "extent": 186
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot9@SoultreePhysicsBaseObject",
+      "va": "0x00501ce0",
+      "extent": 187
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot11@SoultreePhysicsBaseObject",
+      "va": "0x00501da0",
+      "extent": 105
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot31@SoultreePhysicsBaseObject",
+      "va": "0x00501e10",
+      "extent": 127
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot14@SoultreePhysicsBaseObject",
+      "va": "0x00502080",
+      "extent": 373
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot15@SoultreePhysicsBaseObject",
+      "va": "0x00502200",
+      "extent": 174
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot16@SoultreePhysicsBaseObject",
+      "va": "0x005022b0",
+      "extent": 127
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot17@SoultreePhysicsBaseObject",
+      "va": "0x00502330",
+      "extent": 239
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot18@SoultreePhysicsBaseObject",
+      "va": "0x00502420",
+      "extent": 193
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot21@SoultreePhysicsBaseObject",
+      "va": "0x005024f0",
+      "extent": 1116
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot28@SoultreePhysicsBaseObject",
+      "va": "0x00502950",
+      "extent": 120
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot29@SoultreePhysicsBaseObject",
+      "va": "0x005029d0",
+      "extent": 103
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot37@SoultreePhysicsBaseObject",
+      "va": "0x00502a40",
+      "extent": 272
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "_$E2",
+      "va": "0x00502b50",
+      "extent": 5
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "_$E1",
+      "va": "0x00502b60",
+      "extent": 60
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "_$E5",
+      "va": "0x00502ba0",
+      "extent": 5
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "_$E4",
+      "va": "0x00502bb0",
+      "extent": 60
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "_$E8",
+      "va": "0x00502bf0",
+      "extent": 5
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "_$E7",
+      "va": "0x00502c00",
+      "extent": 60
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "?UpdateRestState@SoultreePhysicsBaseObject@@",
+      "va": "0x00502c40",
+      "extent": 632
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "_$E11",
+      "va": "0x00502ec0",
+      "extent": 5
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "_$E10",
+      "va": "0x00502ed0",
+      "extent": 60
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot30@SoultreePhysicsBaseObject",
+      "va": "0x00502f10",
+      "extent": 76
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "?Tick@SoultreePhysicsBaseObject@@UAEHM@Z",
+      "va": "0x005036f0",
+      "extent": 202
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "??_ESoultreePhysicsBaseObject@@$4PPPPPPPM@A@AEPAXI@Z",
+      "va": "0x00504280",
+      "extent": 8
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "??_GSoultreePhysicsBaseObject@@",
+      "va": "0x00504290",
+      "extent": 51
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "?Tick@SoultreePhysicsBaseObject@@$4PPPPPPPM@A@AEHM@Z",
+      "va": "0x005042d0",
+      "extent": 8
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "??0SoultreePhysicsObject@@QAE@H@Z",
+      "va": "0x005037c0",
+      "extent": 194
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "??1SoultreePhysicsObject@@UAE@XZ",
+      "va": "0x005038d0",
+      "extent": 156
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "??_GSoultreePhysicsObject@@UAEPAXI@Z",
+      "va": "0x00503890",
+      "extent": 51
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "?Tick@SoultreePhysicsObject@@UAEHM@Z",
+      "va": "0x00503c50",
+      "extent": 30
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "??_ESoultreePhysicsObject@@$4PPPPPPPM@CNA@AEPAXI@Z",
+      "va": "0x00504260",
+      "extent": 14
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "?Tick@SoultreePhysicsObject@@$4PPPPPPPM@CNA@AEHM@Z",
+      "va": "0x00504270",
+      "extent": 14
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "?RunSteps@SoultreePhysicsBaseObject@@QAEXHHH@Z",
+      "va": "0x00502f60",
+      "extent": 1921
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot40@SoultreePhysicsObject",
+      "va": "0x00503970",
+      "extent": 724
+    },
+    {
+      "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "symbol": "UnknownVirtualSlot40@SoultreePhysicsCharacter",
+      "va": "0x00503de0",
+      "extent": 731
+    },
+    {
+      "source": "src/reconstructed/DustParticleEmitter.cpp",
+      "symbol": "??0DustParticleEmitter",
+      "va": "0x004b8a00",
+      "extent": 122
+    },
+    {
+      "source": "src/reconstructed/DustParticleEmitter.cpp",
+      "symbol": "?SetPosition@DustParticleEmitter",
+      "va": "0x004b8d90",
+      "extent": 58
+    },
+    {
+      "source": "src/reconstructed/DustParticleEmitter.cpp",
+      "symbol": "?SetColor@DustParticleEmitter",
+      "va": "0x004b8dd0",
+      "extent": 31
+    },
+    {
+      "source": "src/reconstructed/SteamParticleEmitter.cpp",
+      "symbol": "??0SteamParticleEmitter",
+      "va": "0x004b9f40",
+      "extent": 199
+    },
+    {
+      "source": "src/reconstructed/SteamParticleEmitter.cpp",
+      "symbol": "?SetPosition@SteamParticleEmitter",
+      "va": "0x004ba2c0",
+      "extent": 49
+    },
+    {
+      "source": "src/reconstructed/SteamParticleEmitter.cpp",
+      "symbol": "?Restart@SteamParticleEmitter",
+      "va": "0x004ba300",
+      "extent": 18
+    },
+    {
+      "source": "src/reconstructed/SteamParticleEmitter.cpp",
+      "symbol": "?Burst@SteamParticleEmitter",
+      "va": "0x004ba320",
+      "extent": 19
+    },
+    {
+      "source": "src/reconstructed/SteamParticleEmitter.cpp",
+      "symbol": "?StopEmitting@SteamParticleEmitter",
+      "va": "0x004ba340",
+      "extent": 30
+    },
+    {
+      "source": "src/reconstructed/SteamParticleEmitter.cpp",
+      "symbol": "?SetColor@SteamParticleEmitter",
+      "va": "0x004ba360",
+      "extent": 34
+    }
+  ],
+  "providers": [
+    {
+      "source": "src/reconstructed/DustParticleEmitter.cpp",
+      "symbol": "?SetPosition@DustParticleEmitter",
+      "va": "0x004b8d90",
+      "extent": 58
+    },
+    {
+      "source": "src/reconstructed/DustParticleEmitter.cpp",
+      "symbol": "?SetColor@DustParticleEmitter",
+      "va": "0x004b8dd0",
+      "extent": 31
+    },
+    {
+      "source": "src/reconstructed/SteamParticleEmitter.cpp",
+      "symbol": "?SetPosition@SteamParticleEmitter",
+      "va": "0x004ba2c0",
+      "extent": 49
+    },
+    {
+      "source": "src/reconstructed/SteamParticleEmitter.cpp",
+      "symbol": "?Restart@SteamParticleEmitter",
+      "va": "0x004ba300",
+      "extent": 18
+    },
+    {
+      "source": "src/reconstructed/SteamParticleEmitter.cpp",
+      "symbol": "?Burst@SteamParticleEmitter",
+      "va": "0x004ba320",
+      "extent": 19
+    },
+    {
+      "source": "src/reconstructed/SteamParticleEmitter.cpp",
+      "symbol": "?StopEmitting@SteamParticleEmitter",
+      "va": "0x004ba340",
+      "extent": 30
+    },
+    {
+      "source": "src/reconstructed/SteamParticleEmitter.cpp",
+      "symbol": "?SetColor@SteamParticleEmitter",
+      "va": "0x004ba360",
+      "extent": 34
+    }
+  ],
+  "windows": [
+    {
+      "va": "0x408771",
+      "instructions": [
+        [
+          "0x408771",
+          "push",
+          "0x70f"
+        ],
+        [
+          "0x408776",
+          "push",
+          "0x566e4c"
+        ],
+        [
+          "0x40877b",
+          "push",
+          "0x80"
+        ],
+        [
+          "0x408780",
+          "call",
+          "0x4a3010"
+        ],
+        [
+          "0x408785",
+          "add",
+          "esp, 0xc"
+        ],
+        [
+          "0x408788",
+          "mov",
+          "dword ptr [esp + 0x38], eax"
+        ],
+        [
+          "0x40878c",
+          "cmp",
+          "eax, ebx"
+        ],
+        [
+          "0x40878e",
+          "mov",
+          "dword ptr [esp + 0x2d8], 5"
+        ],
+        [
+          "0x408799",
+          "je",
+          "0x4087be"
+        ],
+        [
+          "0x40879b",
+          "push",
+          "1"
+        ],
+        [
+          "0x40879d",
+          "mov",
+          "ecx, eax"
+        ],
+        [
+          "0x40879f",
+          "call",
+          "0x4b8a00"
+        ],
+        [
+          "0x4087a4",
+          "jmp",
+          "0x4087c0"
+        ]
+      ]
+    },
+    {
+      "va": "0x4087be",
+      "instructions": [
+        [
+          "0x4087be",
+          "xor",
+          "eax, eax"
+        ],
+        [
+          "0x4087c0",
+          "or",
+          "esi, 0xffffffff"
+        ],
+        [
+          "0x4087c3",
+          "mov",
+          "dword ptr [ebp + 0x728], eax"
+        ]
+      ]
+    },
+    {
+      "va": "0x408868",
+      "instructions": [
+        [
+          "0x408868",
+          "push",
+          "0x711"
+        ],
+        [
+          "0x40886d",
+          "push",
+          "0x566e4c"
+        ],
+        [
+          "0x408872",
+          "push",
+          "0x47c"
+        ],
+        [
+          "0x408877",
+          "call",
+          "0x4a3010"
+        ],
+        [
+          "0x40887c",
+          "add",
+          "esp, 0xc"
+        ],
+        [
+          "0x40887f",
+          "mov",
+          "dword ptr [esp + 0x38], eax"
+        ],
+        [
+          "0x408883",
+          "cmp",
+          "eax, ebx"
+        ],
+        [
+          "0x408885",
+          "mov",
+          "dword ptr [esp + 0x2d8], 7"
+        ],
+        [
+          "0x408890",
+          "je",
+          "0x40889d"
+        ],
+        [
+          "0x408892",
+          "push",
+          "1"
+        ],
+        [
+          "0x408894",
+          "mov",
+          "ecx, eax"
+        ],
+        [
+          "0x408896",
+          "call",
+          "0x4b9f40"
+        ],
+        [
+          "0x40889b",
+          "jmp",
+          "0x40889f"
+        ],
+        [
+          "0x40889d",
+          "xor",
+          "eax, eax"
+        ],
+        [
+          "0x40889f",
+          "mov",
+          "dword ptr [ebp + 0x730], eax"
+        ]
+      ]
+    },
+    {
+      "va": "0x408a59",
+      "instructions": [
+        [
+          "0x408a59",
+          "mov",
+          "edx, dword ptr [ebp]"
+        ],
+        [
+          "0x408a5c",
+          "push",
+          "ebx"
+        ],
+        [
+          "0x408a5d",
+          "push",
+          "eax"
+        ],
+        [
+          "0x408a5e",
+          "mov",
+          "eax, dword ptr [ebp + 0x728]"
+        ],
+        [
+          "0x408a64",
+          "push",
+          "eax"
+        ],
+        [
+          "0x408a65",
+          "push",
+          "1"
+        ],
+        [
+          "0x408a67",
+          "mov",
+          "ecx, ebp"
+        ],
+        [
+          "0x408a69",
+          "call",
+          "dword ptr [edx + 0x94]"
+        ]
+      ]
+    },
+    {
+      "va": "0x408ad1",
+      "instructions": [
+        [
+          "0x408ad1",
+          "mov",
+          "ecx, dword ptr [ebp + 0x730]"
+        ],
+        [
+          "0x408ad7",
+          "push",
+          "eax"
+        ],
+        [
+          "0x408ad8",
+          "mov",
+          "dword ptr [esp + 0xb4], edx"
+        ],
+        [
+          "0x408adf",
+          "mov",
+          "edx, dword ptr [ebp]"
+        ],
+        [
+          "0x408ae2",
+          "push",
+          "ebx"
+        ],
+        [
+          "0x408ae3",
+          "push",
+          "ecx"
+        ],
+        [
+          "0x408ae4",
+          "push",
+          "4"
+        ],
+        [
+          "0x408ae6",
+          "mov",
+          "ecx, ebp"
+        ],
+        [
+          "0x408ae8",
+          "call",
+          "dword ptr [edx + 0x94]"
+        ]
+      ]
+    },
+    {
+      "va": "0x4ed6e0",
+      "instructions": [
+        [
+          "0x4ed6e0",
+          "push",
+          "0x77d"
+        ],
+        [
+          "0x4ed6e5",
+          "push",
+          "0x572ccc"
+        ],
+        [
+          "0x4ed6ea",
+          "push",
+          "0x80"
+        ],
+        [
+          "0x4ed6ef",
+          "call",
+          "0x4a3010"
+        ],
+        [
+          "0x4ed6f4",
+          "add",
+          "esp, 0xc"
+        ],
+        [
+          "0x4ed6f7",
+          "mov",
+          "dword ptr [esp + 0x20], eax"
+        ],
+        [
+          "0x4ed6fb",
+          "test",
+          "eax, eax"
+        ],
+        [
+          "0x4ed6fd",
+          "mov",
+          "dword ptr [esp + 0xb34], 2"
+        ],
+        [
+          "0x4ed708",
+          "je",
+          "0x4ed729"
+        ],
+        [
+          "0x4ed70a",
+          "push",
+          "1"
+        ],
+        [
+          "0x4ed70c",
+          "mov",
+          "ecx, eax"
+        ],
+        [
+          "0x4ed70e",
+          "call",
+          "0x4b8a00"
+        ],
+        [
+          "0x4ed713",
+          "mov",
+          "edi, eax"
+        ],
+        [
+          "0x4ed715",
+          "jmp",
+          "0x4ed72b"
+        ]
+      ]
+    },
+    {
+      "va": "0x4ed762",
+      "instructions": [
+        [
+          "0x4ed762",
+          "mov",
+          "eax, dword ptr [esi + 0x12c]"
+        ],
+        [
+          "0x4ed768",
+          "mov",
+          "edx, dword ptr [esi]"
+        ],
+        [
+          "0x4ed76a",
+          "push",
+          "0"
+        ],
+        [
+          "0x4ed76c",
+          "mov",
+          "ecx, dword ptr [eax]"
+        ],
+        [
+          "0x4ed76e",
+          "push",
+          "ecx"
+        ],
+        [
+          "0x4ed76f",
+          "push",
+          "edi"
+        ],
+        [
+          "0x4ed770",
+          "push",
+          "1"
+        ],
+        [
+          "0x4ed772",
+          "mov",
+          "ecx, esi"
+        ],
+        [
+          "0x4ed774",
+          "call",
+          "dword ptr [edx + 0x94]"
+        ]
+      ]
+    },
+    {
+      "va": "0x502a40",
+      "instructions": [
+        [
+          "0x502a40",
+          "mov",
+          "eax, dword ptr [ecx + 0x1dc]"
+        ],
+        [
+          "0x502a46",
+          "mov",
+          "edx, dword ptr [ecx + 0x1d8]"
+        ],
+        [
+          "0x502a4c",
+          "push",
+          "ebx"
+        ],
+        [
+          "0x502a4d",
+          "cmp",
+          "eax, edx"
+        ],
+        [
+          "0x502a4f",
+          "push",
+          "esi"
+        ],
+        [
+          "0x502a50",
+          "jge",
+          "0x502b39"
+        ],
+        [
+          "0x502a56",
+          "mov",
+          "esi, dword ptr [esp + 0xc]"
+        ],
+        [
+          "0x502a5a",
+          "xor",
+          "ebx, ebx"
+        ],
+        [
+          "0x502a5c",
+          "cmp",
+          "esi, ebx"
+        ],
+        [
+          "0x502a5e",
+          "je",
+          "0x502b39"
+        ],
+        [
+          "0x502a64",
+          "mov",
+          "edx, dword ptr [ecx + 0x1d4]"
+        ],
+        [
+          "0x502a6a",
+          "lea",
+          "eax, [eax + eax*4]"
+        ],
+        [
+          "0x502a6d",
+          "push",
+          "ebp"
+        ],
+        [
+          "0x502a6e",
+          "push",
+          "edi"
+        ],
+        [
+          "0x502a6f",
+          "lea",
+          "eax, [edx + eax*8]"
+        ],
+        [
+          "0x502a72",
+          "mov",
+          "edx, dword ptr [esp + 0x1c]"
+        ],
+        [
+          "0x502a76",
+          "mov",
+          "dword ptr [eax + 0x10], edx"
+        ],
+        [
+          "0x502a79",
+          "lea",
+          "edx, [eax + 0x18]"
+        ],
+        [
+          "0x502a7c",
+          "mov",
+          "dword ptr [eax], esi"
+        ],
+        [
+          "0x502a7e",
+          "mov",
+          "dword ptr [eax + 4], ebx"
+        ],
+        [
+          "0x502a81",
+          "mov",
+          "dword ptr [eax + 8], ebx"
+        ],
+        [
+          "0x502a84",
+          "mov",
+          "dword ptr [eax + 0xc], ebx"
+        ],
+        [
+          "0x502a87",
+          "mov",
+          "dword ptr [eax + 0x14], ebx"
+        ],
+        [
+          "0x502a8a",
+          "mov",
+          "ebp, dword ptr [0x689ee8]"
+        ],
+        [
+          "0x502a90",
+          "mov",
+          "edi, edx"
+        ],
+        [
+          "0x502a92",
+          "dec",
+          "esi"
+        ],
+        [
+          "0x502a93",
+          "cmp",
+          "esi, 3"
+        ],
+        [
+          "0x502a96",
+          "mov",
+          "dword ptr [edi], ebp"
+        ],
+        [
+          "0x502a98",
+          "mov",
+          "ebp, dword ptr [0x689eec]"
+        ],
+        [
+          "0x502a9e",
+          "mov",
+          "dword ptr [edi + 4], ebp"
+        ],
+        [
+          "0x502aa1",
+          "mov",
+          "ebp, dword ptr [0x689ef0]"
+        ],
+        [
+          "0x502aa7",
+          "mov",
+          "byte ptr [eax + 0x24], bl"
+        ],
+        [
+          "0x502aaa",
+          "mov",
+          "dword ptr [edi + 8], ebp"
+        ],
+        [
+          "0x502aad",
+          "ja",
+          "0x502b25"
+        ],
+        [
+          "0x502aaf",
+          "jmp",
+          "dword ptr [esi*4 + 0x502b40]"
+        ]
+      ]
+    },
+    {
+      "va": "0x502ab6",
+      "instructions": [
+        [
+          "0x502ab6",
+          "mov",
+          "edx, dword ptr [esp + 0x18]"
+        ],
+        [
+          "0x502aba",
+          "pop",
+          "edi"
+        ],
+        [
+          "0x502abb",
+          "mov",
+          "dword ptr [eax + 4], edx"
+        ],
+        [
+          "0x502abe",
+          "mov",
+          "edx, dword ptr [ecx + 0x1dc]"
+        ],
+        [
+          "0x502ac4",
+          "inc",
+          "edx"
+        ],
+        [
+          "0x502ac5",
+          "pop",
+          "ebp"
+        ],
+        [
+          "0x502ac6",
+          "pop",
+          "esi"
+        ],
+        [
+          "0x502ac7",
+          "mov",
+          "dword ptr [ecx + 0x1dc], edx"
+        ],
+        [
+          "0x502acd",
+          "pop",
+          "ebx"
+        ],
+        [
+          "0x502ace",
+          "ret",
+          "0x10"
+        ]
+      ]
+    },
+    {
+      "va": "0x502b07",
+      "instructions": [
+        [
+          "0x502b07",
+          "mov",
+          "esi, dword ptr [esp + 0x18]"
+        ],
+        [
+          "0x502b0b",
+          "mov",
+          "dword ptr [eax + 0x14], esi"
+        ],
+        [
+          "0x502b0e",
+          "mov",
+          "esi, dword ptr [esp + 0x20]"
+        ],
+        [
+          "0x502b12",
+          "mov",
+          "edi, dword ptr [esi]"
+        ],
+        [
+          "0x502b14",
+          "mov",
+          "dword ptr [edx], edi"
+        ],
+        [
+          "0x502b16",
+          "mov",
+          "edi, dword ptr [esi + 4]"
+        ],
+        [
+          "0x502b19",
+          "mov",
+          "dword ptr [edx + 4], edi"
+        ],
+        [
+          "0x502b1c",
+          "mov",
+          "esi, dword ptr [esi + 8]"
+        ],
+        [
+          "0x502b1f",
+          "mov",
+          "dword ptr [eax + 0x10], ebx"
+        ],
+        [
+          "0x502b22",
+          "mov",
+          "dword ptr [edx + 8], esi"
+        ],
+        [
+          "0x502b25",
+          "mov",
+          "edx, dword ptr [ecx + 0x1dc]"
+        ],
+        [
+          "0x502b2b",
+          "pop",
+          "edi"
+        ],
+        [
+          "0x502b2c",
+          "inc",
+          "edx"
+        ],
+        [
+          "0x502b2d",
+          "pop",
+          "ebp"
+        ],
+        [
+          "0x502b2e",
+          "pop",
+          "esi"
+        ],
+        [
+          "0x502b2f",
+          "mov",
+          "dword ptr [ecx + 0x1dc], edx"
+        ],
+        [
+          "0x502b35",
+          "pop",
+          "ebx"
+        ],
+        [
+          "0x502b36",
+          "ret",
+          "0x10"
+        ],
+        [
+          "0x502b39",
+          "pop",
+          "esi"
+        ],
+        [
+          "0x502b3a",
+          "xor",
+          "eax, eax"
+        ],
+        [
+          "0x502b3c",
+          "pop",
+          "ebx"
+        ],
+        [
+          "0x502b3d",
+          "ret",
+          "0x10"
+        ]
+      ]
+    },
+    {
+      "class": "DustParticleEmitter",
+      "instructions": [
+        [
+          "0x4b8a05",
+          "mov",
+          "esi, ecx"
+        ],
+        [
+          "0x4b8a08",
+          "call",
+          "0x468ca0"
+        ],
+        [
+          "0x4b8a3a",
+          "mov",
+          "dword ptr [esi], 0x555ab8"
+        ],
+        [
+          "0x4b8a71",
+          "mov",
+          "eax, esi"
+        ],
+        [
+          "0x4b8a77",
+          "ret",
+          "4"
+        ]
+      ]
+    },
+    {
+      "class": "SteamParticleEmitter",
+      "instructions": [
+        [
+          "0x4b9f48",
+          "mov",
+          "esi, ecx"
+        ],
+        [
+          "0x4b9f4b",
+          "call",
+          "0x468ca0"
+        ],
+        [
+          "0x4b9f5b",
+          "mov",
+          "dword ptr [esi], 0x555c9c"
+        ],
+        [
+          "0x4b9ffe",
+          "mov",
+          "eax, esi"
+        ],
+        [
+          "0x4ba004",
+          "ret",
+          "4"
+        ]
+      ]
+    },
+    {
+      "instructions": [
+        [
+          "0x502493",
+          "sub",
+          "esp, 0xc"
+        ],
+        [
+          "0x502496",
+          "mov",
+          "edx, esp"
+        ],
+        [
+          "0x502498",
+          "mov",
+          "ecx, dword ptr [eax]"
+        ],
+        [
+          "0x50249a",
+          "mov",
+          "dword ptr [edx], ecx"
+        ],
+        [
+          "0x50249c",
+          "mov",
+          "ecx, dword ptr [eax + 4]"
+        ],
+        [
+          "0x50249f",
+          "mov",
+          "dword ptr [edx + 4], ecx"
+        ],
+        [
+          "0x5024a2",
+          "mov",
+          "ecx, dword ptr [esi + 4]"
+        ],
+        [
+          "0x5024a5",
+          "mov",
+          "eax, dword ptr [eax + 8]"
+        ],
+        [
+          "0x5024a8",
+          "mov",
+          "dword ptr [edx + 8], eax"
+        ],
+        [
+          "0x5024ab",
+          "call",
+          "0x4b8d90"
+        ],
+        [
+          "0x5024b0",
+          "mov",
+          "al, byte ptr [esi + 0x24]"
+        ]
+      ]
+    },
+    {
+      "instructions": [
+        [
+          "0x502668",
+          "je",
+          "0x5026a9"
+        ],
+        [
+          "0x50266a",
+          "sub",
+          "ecx, 3"
+        ],
+        [
+          "0x50266d",
+          "jne",
+          "0x5026f7"
+        ],
+        [
+          "0x502673",
+          "test",
+          "ebx, ebx"
+        ],
+        [
+          "0x502675",
+          "je",
+          "0x502690"
+        ],
+        [
+          "0x502677",
+          "mov",
+          "ecx, dword ptr [eax + 0x14]"
+        ],
+        [
+          "0x50267a",
+          "push",
+          "0x80"
+        ],
+        [
+          "0x50267f",
+          "push",
+          "0x80"
+        ],
+        [
+          "0x502684",
+          "push",
+          "0x80"
+        ],
+        [
+          "0x502689",
+          "call",
+          "0x4ba360"
+        ],
+        [
+          "0x50268e",
+          "jmp",
+          "0x5026f7"
+        ]
+      ]
+    },
+    {
+      "instructions": [
+        [
+          "0x50267a",
+          "push",
+          "0x80"
+        ],
+        [
+          "0x50267f",
+          "push",
+          "0x80"
+        ],
+        [
+          "0x502684",
+          "push",
+          "0x80"
+        ],
+        [
+          "0x502689",
+          "call",
+          "0x4ba360"
+        ],
+        [
+          "0x50268e",
+          "jmp",
+          "0x5026f7"
+        ],
+        [
+          "0x502690",
+          "mov",
+          "ecx, dword ptr [eax + 0x14]"
+        ],
+        [
+          "0x502693",
+          "push",
+          "0xff"
+        ],
+        [
+          "0x502698",
+          "push",
+          "0xff"
+        ],
+        [
+          "0x50269d",
+          "push",
+          "0xff"
+        ],
+        [
+          "0x5026a2",
+          "call",
+          "0x4ba360"
+        ],
+        [
+          "0x5026a7",
+          "jmp",
+          "0x5026f7"
+        ]
+      ]
+    },
+    {
+      "instructions": [
+        [
+          "0x50269d",
+          "push",
+          "0xff"
+        ],
+        [
+          "0x5026a2",
+          "call",
+          "0x4ba360"
+        ],
+        [
+          "0x5026a7",
+          "jmp",
+          "0x5026f7"
+        ],
+        [
+          "0x5026a9",
+          "test",
+          "ebx, ebx"
+        ],
+        [
+          "0x5026ab",
+          "je",
+          "0x5026cd"
+        ],
+        [
+          "0x5026ad",
+          "mov",
+          "ecx, dword ptr [eax + 4]"
+        ],
+        [
+          "0x5026b0",
+          "push",
+          "0x40"
+        ],
+        [
+          "0x5026b2",
+          "push",
+          "0x40"
+        ],
+        [
+          "0x5026b4",
+          "push",
+          "0x40"
+        ],
+        [
+          "0x5026b6",
+          "call",
+          "0x4b8dd0"
+        ],
+        [
+          "0x5026bb",
+          "mov",
+          "edx, dword ptr [esi + 0x1d4]"
+        ]
+      ]
+    },
+    {
+      "instructions": [
+        [
+          "0x5026bb",
+          "mov",
+          "edx, dword ptr [esi + 0x1d4]"
+        ],
+        [
+          "0x5026c1",
+          "mov",
+          "eax, dword ptr [edi + edx + 4]"
+        ],
+        [
+          "0x5026c5",
+          "mov",
+          "ecx, dword ptr [eax + 0x74]"
+        ],
+        [
+          "0x5026c8",
+          "or",
+          "ch, 8"
+        ],
+        [
+          "0x5026cb",
+          "jmp",
+          "0x5026f4"
+        ],
+        [
+          "0x5026cd",
+          "mov",
+          "ecx, dword ptr [eax + 4]"
+        ],
+        [
+          "0x5026d0",
+          "push",
+          "0xff"
+        ],
+        [
+          "0x5026d5",
+          "push",
+          "0xff"
+        ],
+        [
+          "0x5026da",
+          "push",
+          "0xff"
+        ],
+        [
+          "0x5026df",
+          "call",
+          "0x4b8dd0"
+        ],
+        [
+          "0x5026e4",
+          "mov",
+          "eax, dword ptr [esi + 0x1d4]"
+        ]
+      ]
+    },
+    {
+      "instructions": [
+        [
+          "0x502821",
+          "mov",
+          "dword ptr [edx + 8], ecx"
+        ],
+        [
+          "0x502824",
+          "mov",
+          "ecx, dword ptr [eax]"
+        ],
+        [
+          "0x502826",
+          "mov",
+          "edx, esp"
+        ],
+        [
+          "0x502828",
+          "mov",
+          "dword ptr [edx], ecx"
+        ],
+        [
+          "0x50282a",
+          "mov",
+          "ecx, dword ptr [eax + 4]"
+        ],
+        [
+          "0x50282d",
+          "mov",
+          "eax, dword ptr [eax + 8]"
+        ],
+        [
+          "0x502830",
+          "mov",
+          "dword ptr [edx + 4], ecx"
+        ],
+        [
+          "0x502833",
+          "mov",
+          "ecx, dword ptr [edi + 0x14]"
+        ],
+        [
+          "0x502836",
+          "mov",
+          "dword ptr [edx + 8], eax"
+        ],
+        [
+          "0x502839",
+          "call",
+          "0x4ba2c0"
+        ],
+        [
+          "0x50283e",
+          "mov",
+          "al, byte ptr [edi + 0x24]"
+        ]
+      ]
+    },
+    {
+      "instructions": [
+        [
+          "0x50285b",
+          "mov",
+          "dword ptr [eax + 8], ecx"
+        ],
+        [
+          "0x50285e",
+          "mov",
+          "byte ptr [edi + 0x24], 0"
+        ],
+        [
+          "0x502862",
+          "mov",
+          "ebx, dword ptr [esp + 0x18]"
+        ],
+        [
+          "0x502866",
+          "test",
+          "ebx, ebx"
+        ],
+        [
+          "0x502868",
+          "je",
+          "0x50287e"
+        ],
+        [
+          "0x50286a",
+          "mov",
+          "al, byte ptr [esi + 0x20e]"
+        ],
+        [
+          "0x502870",
+          "test",
+          "al, al"
+        ],
+        [
+          "0x502872",
+          "jne",
+          "0x50287e"
+        ],
+        [
+          "0x502874",
+          "mov",
+          "ecx, dword ptr [edi + 0x14]"
+        ],
+        [
+          "0x502877",
+          "call",
+          "0x4ba300"
+        ],
+        [
+          "0x50287c",
+          "jmp",
+          "0x502891"
+        ]
+      ]
+    },
+    {
+      "instructions": [
+        [
+          "0x502874",
+          "mov",
+          "ecx, dword ptr [edi + 0x14]"
+        ],
+        [
+          "0x502877",
+          "call",
+          "0x4ba300"
+        ],
+        [
+          "0x50287c",
+          "jmp",
+          "0x502891"
+        ],
+        [
+          "0x50287e",
+          "mov",
+          "edx, dword ptr [esi]"
+        ],
+        [
+          "0x502880",
+          "mov",
+          "ecx, esi"
+        ],
+        [
+          "0x502882",
+          "call",
+          "dword ptr [edx + 0x64]"
+        ],
+        [
+          "0x502885",
+          "test",
+          "eax, eax"
+        ],
+        [
+          "0x502887",
+          "je",
+          "0x502891"
+        ],
+        [
+          "0x502889",
+          "mov",
+          "ecx, dword ptr [edi + 0x14]"
+        ],
+        [
+          "0x50288c",
+          "call",
+          "0x4ba320"
+        ],
+        [
+          "0x502891",
+          "mov",
+          "eax, dword ptr [esp + 0x10]"
+        ]
+      ]
+    },
+    {
+      "instructions": [
+        [
+          "0x5028f8",
+          "mov",
+          "dword ptr [ecx + 0x60], edx"
+        ],
+        [
+          "0x5028fb",
+          "jmp",
+          "0x502915"
+        ],
+        [
+          "0x5028fd",
+          "mov",
+          "eax, dword ptr [eax + 8]"
+        ],
+        [
+          "0x502900",
+          "mov",
+          "dword ptr [eax + 0x60], edx"
+        ],
+        [
+          "0x502903",
+          "jmp",
+          "0x502915"
+        ],
+        [
+          "0x502905",
+          "mov",
+          "ecx, dword ptr [eax + 0xc]"
+        ],
+        [
+          "0x502908",
+          "mov",
+          "dword ptr [ecx + 0x60], edx"
+        ],
+        [
+          "0x50290b",
+          "jmp",
+          "0x502915"
+        ],
+        [
+          "0x50290d",
+          "mov",
+          "ecx, dword ptr [eax + 0x14]"
+        ],
+        [
+          "0x502910",
+          "call",
+          "0x4ba340"
+        ],
+        [
+          "0x502915",
+          "mov",
+          "eax, dword ptr [esi + 0x1dc]"
+        ]
+      ]
+    },
+    {
+      "instructions": [
+        [
+          "0x4ed2a6",
+          "push",
+          "0x735"
+        ],
+        [
+          "0x4ed2ab",
+          "push",
+          "0x572ccc"
+        ],
+        [
+          "0x4ed2b0",
+          "push",
+          "0x524"
+        ],
+        [
+          "0x4ed2b5",
+          "call",
+          "0x4a3010"
+        ],
+        [
+          "0x4ed2ba",
+          "add",
+          "esp, 0xc"
+        ],
+        [
+          "0x4ed2bd",
+          "mov",
+          "dword ptr [esp + 0x1c], eax"
+        ],
+        [
+          "0x4ed2c1",
+          "test",
+          "eax, eax"
+        ],
+        [
+          "0x4ed2c3",
+          "mov",
+          "dword ptr [esp + 0xb34], 1"
+        ],
+        [
+          "0x4ed2ce",
+          "je",
+          "0x4ed2eb"
+        ],
+        [
+          "0x4ed2d0",
+          "push",
+          "1"
+        ],
+        [
+          "0x4ed2d2",
+          "push",
+          "1"
+        ],
+        [
+          "0x4ed2d4",
+          "mov",
+          "ecx, eax"
+        ],
+        [
+          "0x4ed2d6",
+          "call",
+          "0x5037c0"
+        ],
+        [
+          "0x4ed2db",
+          "mov",
+          "esi, eax"
+        ]
+      ]
+    },
+    {
+      "instructions": [
+        [
+          "0x5037c0",
+          "push",
+          "-1"
+        ],
+        [
+          "0x5037c2",
+          "push",
+          "0x54e39b"
+        ],
+        [
+          "0x5037c7",
+          "mov",
+          "eax, dword ptr fs:[0]"
+        ],
+        [
+          "0x5037cd",
+          "push",
+          "eax"
+        ],
+        [
+          "0x5037ce",
+          "mov",
+          "dword ptr fs:[0], esp"
+        ],
+        [
+          "0x5037d5",
+          "sub",
+          "esp, 8"
+        ],
+        [
+          "0x5037d8",
+          "mov",
+          "eax, dword ptr [esp + 0x1c]"
+        ],
+        [
+          "0x5037dc",
+          "push",
+          "ebx"
+        ],
+        [
+          "0x5037dd",
+          "push",
+          "esi"
+        ],
+        [
+          "0x5037de",
+          "xor",
+          "ebx, ebx"
+        ],
+        [
+          "0x5037e0",
+          "mov",
+          "esi, ecx"
+        ],
+        [
+          "0x5037e2",
+          "push",
+          "edi"
+        ],
+        [
+          "0x5037e3",
+          "cmp",
+          "eax, ebx"
+        ],
+        [
+          "0x5037e5",
+          "mov",
+          "dword ptr [esp + 0x10], esi"
+        ],
+        [
+          "0x5037e9",
+          "mov",
+          "dword ptr [esp + 0xc], ebx"
+        ],
+        [
+          "0x5037ed",
+          "mov",
+          "edi, 1"
+        ],
+        [
+          "0x5037f2",
+          "je",
+          "0x50380f"
+        ],
+        [
+          "0x5037f4",
+          "push",
+          "edi"
+        ],
+        [
+          "0x5037f5",
+          "lea",
+          "ecx, [esi + 0x4f8]"
+        ],
+        [
+          "0x5037fb",
+          "mov",
+          "dword ptr [esi + 4], 0x557ff8"
+        ],
+        [
+          "0x503802",
+          "call",
+          "0x468ca0"
+        ],
+        [
+          "0x503807",
+          "mov",
+          "dword ptr [esp + 0xc], edi"
+        ],
+        [
+          "0x50380b",
+          "mov",
+          "dword ptr [esp + 0x1c], ebx"
+        ],
+        [
+          "0x50380f",
+          "push",
+          "ebx"
+        ],
+        [
+          "0x503810",
+          "mov",
+          "ebx, dword ptr [esp + 0x28]"
+        ],
+        [
+          "0x503814",
+          "push",
+          "ebx"
+        ],
+        [
+          "0x503815",
+          "mov",
+          "ecx, esi"
+        ],
+        [
+          "0x503817",
+          "call",
+          "0x500aa0"
+        ],
+        [
+          "0x50381c",
+          "mov",
+          "dword ptr [esp + 0x1c], edi"
+        ],
+        [
+          "0x503820",
+          "lea",
+          "edi, [esi + 0x21c]"
+        ],
+        [
+          "0x503826",
+          "push",
+          "ebx"
+        ],
+        [
+          "0x503827",
+          "mov",
+          "ecx, edi"
+        ],
+        [
+          "0x503829",
+          "call",
+          "0x43f160"
+        ],
+        [
+          "0x50382e",
+          "mov",
+          "eax, dword ptr [esi + 4]"
+        ],
+        [
+          "0x503831",
+          "mov",
+          "dword ptr [esi], 0x557f54"
+        ],
+        [
+          "0x503837",
+          "mov",
+          "dword ptr [edi], 0x557f28"
+        ],
+        [
+          "0x50383d",
+          "mov",
+          "dword ptr [esi + 0x228], 0x557eb8"
+        ],
+        [
+          "0x503847",
+          "mov",
+          "ecx, dword ptr [eax + 4]"
+        ],
+        [
+          "0x50384a",
+          "mov",
+          "dword ptr [ecx + esi + 4], 0x557e48"
+        ],
+        [
+          "0x503852",
+          "mov",
+          "edx, dword ptr [esi + 4]"
+        ],
+        [
+          "0x503855",
+          "mov",
+          "eax, dword ptr [edx + 4]"
+        ],
+        [
+          "0x503858",
+          "lea",
+          "ecx, [eax - 0x4f4]"
+        ],
+        [
+          "0x50385e",
+          "mov",
+          "dword ptr [eax + esi], ecx"
+        ],
+        [
+          "0x503861",
+          "mov",
+          "eax, esi"
+        ],
+        [
+          "0x503863",
+          "mov",
+          "ecx, dword ptr [esp + 0x14]"
+        ],
+        [
+          "0x503867",
+          "neg",
+          "eax"
+        ],
+        [
+          "0x503869",
+          "sbb",
+          "eax, eax"
+        ],
+        [
+          "0x50386b",
+          "and",
+          "eax, edi"
+        ],
+        [
+          "0x50386d",
+          "pop",
+          "edi"
+        ],
+        [
+          "0x50386e",
+          "mov",
+          "dword ptr [esi + 8], eax"
+        ],
+        [
+          "0x503871",
+          "mov",
+          "eax, esi"
+        ],
+        [
+          "0x503873",
+          "pop",
+          "esi"
+        ],
+        [
+          "0x503874",
+          "pop",
+          "ebx"
+        ],
+        [
+          "0x503875",
+          "mov",
+          "dword ptr fs:[0], ecx"
+        ],
+        [
+          "0x50387c",
+          "add",
+          "esp, 0x14"
+        ],
+        [
+          "0x50387f",
+          "ret",
+          "8"
+        ]
+      ]
+    }
+  ],
+  "rtti": [
+    {
+      "name": "Bike",
+      "col": "0x55ab80",
+      "vtable": "0x550900"
+    },
+    {
+      "name": "DustParticleEmitter",
+      "col": "0x55df20",
+      "vtable": "0x555ab8"
+    },
+    {
+      "name": "SoultreePhysicsBaseObject",
+      "col": "0x55f0d0",
+      "vtable": "0x557d90"
+    },
+    {
+      "name": "SteamParticleEmitter",
+      "col": "0x55e060",
+      "vtable": "0x555c9c"
+    },
+    {
+      "name": "SoultreePhysicsObject",
+      "col": "0x55f168",
+      "vtable": "0x557f54"
+    }
+  ],
+  "call_sites": [
+    [
+      "0x5024ab",
+      "0x4b8d90"
+    ],
+    [
+      "0x502689",
+      "0x4ba360"
+    ],
+    [
+      "0x5026a2",
+      "0x4ba360"
+    ],
+    [
+      "0x5026b6",
+      "0x4b8dd0"
+    ],
+    [
+      "0x5026df",
+      "0x4b8dd0"
+    ],
+    [
+      "0x502839",
+      "0x4ba2c0"
+    ],
+    [
+      "0x502877",
+      "0x4ba300"
+    ],
+    [
+      "0x50288c",
+      "0x4ba320"
+    ],
+    [
+      "0x502910",
+      "0x4ba340"
+    ]
+  ],
+  "partials": [
+    [
+      "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "?ResolveContactImpulse@@YAXMMPAVSoultreeObject@@",
+      5243424,
+      639,
+      639,
+      541,
+      "0a48e79dd765d846d4e173d9bd5c3cf78ec42fb5b38708a44ea68a950e5004ec"
+    ],
+    [
+      "src/krusty2/soultree/SoulTreePhysics.cpp",
+      "UnknownVirtualSlot13@SoultreePhysicsBaseObject",
+      5250704,
+      483,
+      487,
+      169,
+      "15920eaef57d2a361dea3f477a2de119ed1270aa995bf359a6c20206476f44ba"
+    ]
+  ]
+}

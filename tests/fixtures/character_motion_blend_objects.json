@@ -1,0 +1,52 @@
+{
+  "baseline": "Published a81fb378 with accepted emitter composition; unpublished at private capture. Complete before/after proof retains all sections except two explicit InterpolatePose callee names, and rider call joins.",
+  "filenames": [
+    "src/krusty2/vehicle/Bike.cpp",
+    "src/krusty2/vehicle/KrustyBike.cpp",
+    "samples/physics/motion/Motnctrl.cpp"
+  ],
+  "objects": {
+    "src/krusty2/vehicle/Bike.cpp": {
+      "sections": 242,
+      "relocations": 1089,
+      "sha256": "89f1e889f9bc656b50a616af835038ab70b95cabf4287c950451f1c9b0080c10"
+    },
+    "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
+      "sections": 271,
+      "relocations": 1443,
+      "sha256": "90f00e90f7394bae5b8691df34c8d782fadd8b4cd9e072441eb890b12254a3db"
+    },
+    "samples/physics/motion/Motnctrl.cpp": {
+      "sections": 37,
+      "relocations": 249,
+      "sha256": "febf31cec465cf3c1a35d3009a569824098541369f4fbcdcd43938eec894ad90"
+    },
+    "samples/physics/motion/CharacterMotionStart.cpp": {
+      "sections": 14,
+      "relocations": 24,
+      "sha256": "8f31bf78249ffdbb74c253989372942a6eaa44ac918db1d7da25fc5b72e4f784"
+    }
+  },
+  "before": {
+    "src/krusty2/vehicle/Bike.cpp": {
+      "sections": 242,
+      "relocations": 1089,
+      "sha256": "4685bb42b8a736ce5dd527b9cc8c038bd46e3d05a5589fca84b0e4a5c715a903"
+    },
+    "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
+      "sections": 271,
+      "relocations": 1443,
+      "sha256": "ffc9b9c36c3bb2cdce5d9220efb7666ac7dc0da8d9cba53f2354049f52ab4023"
+    },
+    "samples/physics/motion/Motnctrl.cpp": {
+      "sections": 37,
+      "relocations": 249,
+      "sha256": "c5a56c8835e512b1d805bacf30b8f62bd3b4956b9df5ecf24b7c3166eaf4d8ca"
+    },
+    "samples/physics/motion/CharacterMotionStart.cpp": {
+      "sections": 14,
+      "relocations": 24,
+      "sha256": "8f31bf78249ffdbb74c253989372942a6eaa44ac918db1d7da25fc5b72e4f784"
+    }
+  }
+}

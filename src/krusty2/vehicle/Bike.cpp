@@ -1163,7 +1163,7 @@ void Bike::UnknownVirtualSlot102(float)
         cnt += 2;
     }
     float w = 1.0f - poseBlend;
-    riderCharacter->Method_0x004a8c50(riderPoseHandles[idx], riderPoseHandles[next], poseParam, w);
+    reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8c50(riderPoseHandles[idx], riderPoseHandles[next], poseParam, w);
     D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, w);
     int mode = wrecker->wreckState;
     if (mode == 0 || mode == 1) {

@@ -1368,7 +1368,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
             ((Character*)riderCharacter)->Method_0x004a9050(riderPoseHandles[idx], riderPoseHandles[next],
                 riderPoseHandles[cnt], riderPoseHandles[other], poseParam, w, poseLeanBlend);
         } else {
-            riderCharacter->Method_0x004a8c50(riderPoseHandles[idx], riderPoseHandles[next], poseParam, w);
+            reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8c50(riderPoseHandles[idx], riderPoseHandles[next], poseParam, w);
         }
         if (idx >= 11 && idx <= 13) {
             D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, w);

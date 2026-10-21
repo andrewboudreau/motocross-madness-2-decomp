@@ -66,7 +66,8 @@ unmasked invalid conversion: with count zero and phase `+Inf`, its frame
 pointer differed from retail's previous-index pointer. The explicit no-store
 rule fixes that observed state difference. No failed control is admitted.
 
-`/QIfist` applies only to this candidate source. It is a semantic compiler
+`/QIfist` applies to this candidate and the reviewed Character blend candidate,
+which share the unchanged conversion helper. It is a semantic compiler
 requirement, not a change to the project's ordinary compiler profile. The
 retained test rejects a `__ftol` import and decodes the emitted FISTP64. This
 is compiler-specific x86 behavior, not a claim that C++ floating-to-integer
