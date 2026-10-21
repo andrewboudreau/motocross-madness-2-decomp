@@ -1,0 +1,18 @@
+{
+  "??0PCCamera@@QAE@H@Z": "0x004bed80",
+  "??_7FollowCamera@@6B@": "0x0055282c",
+  "?UnknownVirtualSlot71@FollowCamera@@UAEXH@Z": "0x00466e50",
+  "_$E1": "0x00466f20",
+  "_$E10": "0x004670c0",
+  "_$E11": "0x004670b0",
+  "_$E2": "0x00466f10",
+  "_$E4": "0x00466f70",
+  "_$E5": "0x00466f60",
+  "_$E7": "0x00467000",
+  "_$E8": "0x00466ff0",
+  "_kVec3XAxis": "0x0065b458",
+  "_kVec3YAxis": "0x0065b468",
+  "_kVec3ZAxis": "0x0065b438",
+  "_kVec3Zero": "0x0065b448",
+  "??0FollowCamera@@QAE@H@Z$ehhandler": "0x0054ab68"
+}

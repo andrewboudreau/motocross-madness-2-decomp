@@ -3,7 +3,7 @@
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
       "sections": 128,
       "relocations": 625,
-      "sha256": "8e6c56074785c225145f22b77210712d4bb04e6613d74b2e097f2aa6cb0fe3ba"
+      "sha256": "a819f398006846a2aa52aad3b4d8061aa575754ea5a23fa55430f9b45dee3290"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -2210,5 +2210,6 @@
       169,
       "15920eaef57d2a361dea3f477a2de119ed1270aa995bf359a6c20206476f44ba"
     ]
-  ]
+  ],
+  "baseline": " The SoulTreePhysics table slots 2..8 now name the seven existing rendering providers; all section bytes and relocation destinations are preserved under only those names."
 }

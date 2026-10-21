@@ -1,0 +1,19 @@
+{
+  "baseline": "Published c524a871; original aggregate and its 564/511 constructor remain unchanged.",
+  "filenames": [
+    "samples/camera/FollowCameraNearMisses.cpp",
+    "samples/camera/FollowCameraLoadFile.cpp",
+    "samples/camera/FollowCameraTick.cpp",
+    "samples/camera/FollowCameraControls.cpp"
+  ],
+  "aggregate": {
+    "sections": 66,
+    "relocations": 337,
+    "sha256": "3d6bd5e569db05cb998470f06acee2f72835c6e967fde4ec3031d60c24bca4da"
+  },
+  "candidate": {
+    "sections": 31,
+    "relocations": 139,
+    "sha256": "d038e2158860b2807028ddc46ac09c57d2a3617ecc1d17b661a1763444b2887a"
+  }
+}

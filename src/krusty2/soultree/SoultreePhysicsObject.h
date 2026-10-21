@@ -26,8 +26,9 @@
 // Deliberate simplification (listed in hierarchy/MIGRATION.md): the SoultreeObject level is
 // folded into D3DIMSoultreeObject, because core/SoultreeObject.h is the flat,
 // non-polymorphic view of that class ("do not derive from it").  The base offsets and
-// vtable shapes are the same.  Slot names are D3DIMObjectVirtualSlotN so they cannot
-// override SoultreePhysicsBaseObject::UnknownVirtualSlotN by accident.
+// vtable shapes are the same. Primary slots 2..8 use the existing rendering
+// provider declarations; this does not unify the two complete class views.
+// Slot 9 retains its provisional declaration and remains a separate dependency.
 #ifndef SOULTREE_PHYSICS_OBJECT_H
 #define SOULTREE_PHYSICS_OBJECT_H
 
@@ -35,6 +36,8 @@
 #include "motion/D3DIMSoultreeCharacter.h"   // SoultreePhysicsBaseObject, SoultreeLoadDesc
 #include "collision/CollisionObject.h"       // QuadTreeObject, GameObject
 #include "soultree/SoultreePhysicsBaseObject.h"
+
+class UnknownTextureStream;
 
 class D3DIMSoultreeObject : public QuadTreeObject, public GameObject {
 public:
@@ -44,13 +47,13 @@ public:
     virtual void Disable();                       // 0x00444540
     virtual void Enable();                        // 0x00444520
     virtual int Tick(float dt);                    // 0x00443490
-    virtual void D3DIMObjectVirtualSlot2();       // 0x0043f950
-    virtual void D3DIMObjectVirtualSlot3();       // 0x0043fe40
-    virtual void D3DIMObjectVirtualSlot4();       // 0x004440a0
-    virtual void D3DIMObjectVirtualSlot5();       // 0x00444140
-    virtual void D3DIMObjectVirtualSlot6();       // 0x004450c0
-    virtual void D3DIMObjectVirtualSlot7();       // 0x00444560
-    virtual void D3DIMObjectVirtualSlot8();       // 0x00444b60
+    virtual void LoadHierarchy(UnknownTextureStream* stream); // 0x0043f950, ret 4
+    virtual void LoadHierarchyFromParameters();       // 0x0043fe40
+    virtual void SoultreeVirtualSlot4(SoultreeObject** out); // 0x004440a0, ret 4
+    virtual void SoultreeVirtualSlot5();       // 0x00444140
+    virtual void ResetLocalMatrices();       // 0x004450c0
+    virtual void CloneFrom(SoultreeObject* source); // 0x00444560, ret 4
+    virtual void CopySubtree(SoultreeObject* source, SoultreeObject* target); // 0x00444b60, ret 8
     // 0x0043f4b0, `ret 0x14`.  SoultreePhysicsObject slot 40 passes (a1, name, desc, a4, 1);
     // the argument types follow that caller (tier 2).
     virtual void D3DIMObjectVirtualSlot9(int a1, const char* a2, const SoultreeLoadDesc* a3,

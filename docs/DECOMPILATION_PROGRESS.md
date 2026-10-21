@@ -18,7 +18,7 @@ complete function inventory has not been established.
 | Strict VC6 exact targets | **2980 / 2990 (99.7%)** | Unique retail address/extent pairs in the reviewed calibration run |
 | Canonical reconstructed implementation files | **214** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
 | Canonical reconstructed headers | **226** | Layout and interface declarations, including support-only headers |
-| Canonical C++ source lines | **106,994** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
+| Canonical C++ source lines | **106,997** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
 | Retail source-path strings | **111** | Navigation evidence; reconstructed files are not one-to-one with original TUs |
 | Recovered RTTI types | **252** | Confirmed type descriptors, not necessarily reconstructed classes |
 | Retail `.text` virtual size | **1,368,518 bytes (1.31 MiB)** | Broad code-section denominator; includes library code, thunks and padding |
@@ -65,7 +65,7 @@ python3 tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt --vc6-root "
 
 Inspect every result: the runner reports nonmatches as data and its exit status
 alone does not prove strict matching. Reviewed code revision:
-`c524a871fc6bd2bfcdff8b365630c13a608d5290 plus this validated slice (source hashes: work/game-build/build-wuy_ooiv/report.json)`. Source inventory counts reflect the current tree
+`6b8afca2ac4e58b3b4e32f485cb3f741d89e3bd8 plus these validated slices (source hashes: work/game-build/build-5ou5d2p9/report.json)`. Source inventory counts reflect the current tree
 and do not imply every body in those files matches.
 
 ### Caveats recorded with the snapshot

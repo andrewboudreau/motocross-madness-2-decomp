@@ -41,46 +41,60 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 271 C++ files (214 canonical sources and 57
-reviewed candidates) and reaches LINK with 192 unresolved external symbols,
+The 2026-10-21 build compiles 272 C++ files (214 canonical sources and 58
+reviewed candidates) and reaches LINK with 184 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The current
-run is `work/game-build/build-wuy_ooiv`; its `link.log` is authoritative.
+run is `work/game-build/build-5ou5d2p9`; its `link.log` is authoritative.
 
-The [followed-racer collision connection](FOLLOWED_RACER_COLLISIONS.md)
-replaces three provisional calls with the existing KrustyBike notification
-provider. All nine racer constructor/store paths, the caller instructions and
-primary/secondary RTTI offsets support the unchanged primary pointers. No
-provider, storage, shared header, compiler flag or calibration row is added.
+The [D3DIM virtual connections](D3DIM_VTABLE_CONNECTIONS.md) connect seven
+existing providers through the physics declaration's primary-model table.
+Raw RTTI, constructor writes and full provider bodies distinguish the model
+at owner +0x21c from its GameObject at +0x228. The folded physics class view
+remains provisional; no layout, initializer or vtable order changes.
 
-The isolated real link removes exactly one name: **193 -> 192**, with none
-added. All 271 old objects preserve 10,833 nondebug sections and 46,129
-relocations under that one verified name, without filename exclusions. All
-271 source hashes, 240 header hashes, configuration and compiler flags agree
-with the actual build inputs.
+The isolated link removes exactly seven names: **192 -> 185**, none added.
+All 271 previous objects preserve 10,833 nondebug sections and 46,129 relocations
+under those seven names, without filename exclusions. The retained test checks
+59 full strict bodies, nine whole objects, two unchanged partials and 896 native
+ABI dispatch cases. These dispatch probes do not simulate provider behavior.
+The single affected prior object pin was reproduced before its name transition.
 
-The retained test passes 20 complete strict comparisons, three whole-object
-pins and both unchanged FollowRacer partial fingerprints. Its actual-source
-native fixture passes 20,432 independent state/fault-oracle cases, including
-10,960 modeled access faults and 32 real-CRT allocation/duplicate-owner cases.
-It does not execute mapped retail code; separate full-body strict comparisons
-establish the tested game helpers' byte identity. Prepared object storage and
-finite alias/fault cases do not establish constructor or gameplay lifetimes.
-All three affected tests pass, including the existing iterator and picker.
+The [FollowCamera constructor](FOLLOW_CAMERA_CONSTRUCTOR.md) adds a separate
+reviewed nonexact implementation for the full 564-byte retail constructor.
+It emits 569 bytes with 100 matching resolved positions. The original 564-byte,
+511-position sample remains unchanged. Explicit volatile accesses preserve
+observed partial-write ordering; they do not establish original member types.
+
+The constructor's finite native suite passes 7,392 cases with 27 strict helper,
+initializer and caller checks. Actual initialization and unwind helpers run
+against independent byte, write-order, allocation and ownership oracles.
+The reference shares verified source helpers and the native CRT. Second malloc
+NULL is excluded because the existing fallback can overrun its small buffer;
+unmasked FP, full exception register/stack context and complete gameplay lifetime
+remain unverified. The original constructor fails the retained guard-order
+control, while the separately admitted candidate passes.
+
+The constructor link removes exactly its missing provider: **185 -> 184**,
+none added. All 271 previous objects remain completely unchanged. The new
+object's 31 nondebug sections and 139 relocations match the reviewed candidate,
+including genuine vtable/RTTI, EH, private BSS and CRT initialization artifacts.
+All 272 source hashes, 240 header hashes and build/compiler inputs agree.
+No compiler profile override or existing calibration row is changed.
 
 Calibration retains **3,023/3,034** strict rows (3,007 distinct source/address/
 extent cases and 2,980/2,990 unique retail address/extent pairs). Physics retains
-**1,086/1,162** strict comparisons. Every prior score, full extent and strict
-result is unchanged, including the two existing nonexact binding diagnostics.
+**1,086/1,162** strict comparisons. Each isolated slice preserves every previous
+score, full extent, strict result and existing nonexact binding diagnostic.
+The combined affected camera tests pass alongside the existing connection tests.
 
-Evidence: `work/game-build/round61-collision-link-proof.json`,
-`connections-round61-collision-preservation.json` and
-`round61-collision-retained.log`.
+Evidence: `work/game-build/round62-d3dim-link-proof.json`,
+`round62-camera-link-proof.json`, `connections-round62-d3dim-preservation.json`,
+`connections-round62-preservation.json` and `round62-camera-retained.log`.
 The game still does not link; startup, integrated menus and racing are unverified.
 
-Static checks pass for 286 Python and 436 JSON files. Full regression passes:
-569 tests, 558 passed and 11 skipped (`work/game-build/tests-round61-collision.log`).
-
+Static checks pass for 288 Python and 439 JSON files. Full regression passes:
+571 tests, 560 passed and 11 skipped (`work/game-build/tests-round62.log`).
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based
