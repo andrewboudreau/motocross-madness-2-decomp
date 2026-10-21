@@ -108,11 +108,10 @@ Exact (25 calibration cases):
   parameter slots.
 
 Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
-- `0x004c7b40` (about half of 750 bytes), the table blit: BltFast without
-  a table; otherwise it locks both surfaces (0x811), clips the rectangle to
-  the destination and sets each pixel to `table[source << 8 | destination]`
-  (8-bit; 16-bit pixels read the destination byte through the pixel value).
-  The loop nest's register assignment differs;
+- `0x004c7b40` (750-byte retail / 775-byte candidate) is extracted into
+  [TextureRectCopy.cpp](../samples/render/TextureRectCopy.cpp). The nonexact
+  [functional review](TEXTURE_RECT_COPY.md) preserves the non-8-bit low-address
+  read and the evidenced destination-before-source WORD access order.
 - slot 6 (ratio 0.78 of 600 bytes), the copy. It makes a `ManagedTexture`
   (RTTI `ManagedTexture : PCTextureMap`, 0xbc bytes, registered with the
   source's +0x90 ManagedTextureGroup) when TextureMap+0x68 bit 0 is set,

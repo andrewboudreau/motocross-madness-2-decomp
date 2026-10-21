@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/render/TextureRectCopy.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete rectangle-copy implementation reviewed against retail COM calls, clipping, indexed pixels, aliases, callbacks and failure/fault state. Explicit ordered WORD reads preserve the observed destination-before-source fault order. All non-8-bit processed pixels retain retail's low-address byte lookup; successful non-8-bit processing is not validated. The 775-byte body has 364 matching positions against 750 retail bytes; real DirectDraw and game rendering remain untested.",
+      "evidence": "docs/TEXTURE_RECT_COPY.md#functional-build-review"
+    },
+    {
       "path": "samples/race/FollowedRacerPicker.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete host racer selection passes 4270 native selection, iterator, packet, callback, floating-point and fault scenarios with the real strict iterator and VC6 conversion. An evidenced cached-view correction changes the old 346-byte/69-position partial to 342 bytes/67 positions against 340 retail bytes. Only five packet bytes are initialized by retail; the test preserves that boundary. Random values, network send and replay queue are scripted; live networking, replay files and racing remain untested.",

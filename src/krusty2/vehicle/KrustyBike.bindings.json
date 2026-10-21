@@ -110,7 +110,6 @@
   "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?AddModifier@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444d80",
   "?RemoveModifier@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444de0",
-  "?FindRaceMode@KbSession@@QAEPAUKbPlayer@@XZ": "0x0045d2b0",
   "?FindTextQueue@KbSession@@QAEPAUKbMsgSink@@XZ": "0x0045d340",
   "?StartFade@GhostMod1@@QAEXM@Z": "0x0047bbf0",
   "?ShowValue@KbScoreBoard@@QAEXMM@Z": "0x0048d1e0",
@@ -136,7 +135,6 @@
   "?Fn_004A9E80@KbPlayer@@QAEXPAVVehicle@@0H@Z": "0x004a9e80",
   "?DriveForce@UnknownEngineGearbox@@QAEXMPBUVector3@@MDMPAU2@PAM@Z": "0x004d31b0",
   "?Fn_004DE580@KbRaceHandler@@QAEXPAXMH@Z": "0x004de580",
-  "?QueueRecord@KbRecorder@@QAEHHHPAXH@Z": "0x004e8720",
   "?ReplaceHeadMessage@KbMsgSink@@QAEXPAUKbMessage@@@Z": "0x0051b540",
   "?AddContactAnimation@Wrecker@@QAEXH@Z": "0x005305b0",
   "?AddRandomAnimation@Wrecker@@QAEXH@Z": "0x005305f0",
@@ -169,7 +167,6 @@
   "?Push@MemTagStack@@QAEHPBD@Z": "0x004a2d00",
   "?RemoveIgnoredOwner@CollisionObject@@QAEXPAX@Z": "0x00439490",
   "?ReportTrickScore@KbRaceHandler@@QAEXPAVKrustyBike@@M@Z": "0x004e57d0",
-  "?Send@KbGameCfg@@QAEHHPAXHHH@Z": "0x004ac830",
   "?SetAxesIn@SoultreeObject@@QAEXPAV1@PBUVec3@@1HH@Z": "0x004fc050",
   "?SetAxesPtr@SoultreeObject@@QAEXPBUVec3@@0HH@Z": "0x004fbd70",
   "?SetIgnoreListMode@CollisionObject@@QAEXH@Z": "0x00439400",
@@ -356,5 +353,8 @@
   "__real@4@3ffeffbe770000000000": "0x00554744",
   "?Remove@QuadTree@@QAEXPAVQuadTreeObject@@I@Z": "0x004dcf20",
   "?g_collisionQuadTree@@3PAVQuadTree@@A": "0x0068aba4",
-  "?SetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fb8c0"
+  "?SetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fb8c0",
+  "?Send@NetworkInterface@@QAEHHPAXHHH@Z": "0x004ac830",
+  "?QueueRecord@VCRInterface@@QAEHHHPBXI@Z": "0x004e8720",
+  "?FindRaceMode@EventManager@@QAEPAUTrackGameViewOwner@@XZ": "0x0045d2b0"
 }

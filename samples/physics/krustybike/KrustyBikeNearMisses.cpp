@@ -342,9 +342,9 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                         message.field_0x11 = lapGate;
                                     if (!record) {
                                         if (reinterpret_cast<KbGame*>(g_TrackGame)->network)
-                                            reinterpret_cast<KbGame*>(g_TrackGame)->network->Send(13, &message, sizeof(message), netId, record);
+                                            reinterpret_cast<NetworkInterface*>(reinterpret_cast<KbGame*>(g_TrackGame)->network)->Send(13, &message, sizeof(message), netId, record);
                                     } else if (netRecorder) {
-                                        netRecorder->QueueRecord(13, netId, &message, sizeof(message));
+                                        reinterpret_cast<VCRInterface*>(netRecorder)->QueueRecord(13, netId, &message, sizeof(message));
                                     }
                                     state->position = position;
                                     state->roll = bodyRoll;
@@ -361,14 +361,14 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                             if (pingTimer < 0.0f) {
                                                 ping.field_0x04 = score;
                                                 ping.field_0x01 = loaderKind;
-                                                reinterpret_cast<KbGame*>(g_TrackGame)->network->Send(10, &ping, sizeof(ping), netId, 0);
+                                                reinterpret_cast<NetworkInterface*>(reinterpret_cast<KbGame*>(g_TrackGame)->network)->Send(10, &ping, sizeof(ping), netId, 0);
                                                 pingTimer = 2.0f;
                                             }
                                         }
                                     } else if (netRecorder && race->scoreRecordDue) {
                                         ping.field_0x04 = score;
                                         ping.field_0x01 = loaderKind;
-                                        netRecorder->QueueRecord(10, netId, &ping, sizeof(ping));
+                                        reinterpret_cast<VCRInterface*>(netRecorder)->QueueRecord(10, netId, &ping, sizeof(ping));
                                     }
                                     return;
                                 }

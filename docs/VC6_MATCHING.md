@@ -3,14 +3,12 @@
 Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 The 2026-10-21 native Windows VC6 SP3 gate passes its toolchain identity,
-manual smoke and generated-probe checks. Calibration has 2,981 strict-exact
-rows among 2,992 comparisons: 2,978 distinct source/address/extent cases.
-It covers 145 source files, 142 with at least one strict case. The separate
+manual smoke and generated-probe checks. Calibration has 2,983 strict-exact
+rows among 2,994 comparisons: 2,980 distinct source/address/extent cases.
+It covers 147 source files, 144 with at least one strict case. The separate
 physics matrix has 1,086 strict-exact targets among 1,162 comparisons.
-All prior strict cases are retained. The nonexact picker's evidenced saved-view
-correction changes its positional strict score from 69 to 67; see the
-[bounded behavior proof](FOLLOWED_RACER_PICKER.md). No other calibration
-near-miss score drops, and the physics comparison reports no drops.
+All prior strict cases are retained, with two newly checked default methods.
+The calibration and physics comparisons report no near-miss score drops.
 Strict results are complete function checks with relocations resolved;
 they do not establish complete translation units or a working game.
 
@@ -23,24 +21,23 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The current race-event and contact scene connections preserve all 216 prior
-production objects under four verified name substitutions: 10,468 nondebug
-sections and 45,323 relocations. Their complete sample objects and partial
-fingerprints are preserved as well; see the
-[race-event](RACE_EVENT_CONNECTIONS.md) and
-[contact](COLLISION_POINT_SCENE_CONNECTIONS.md) evidence.
-The separately reviewed [followed-racer picker](FOLLOWED_RACER_PICKER.md)
-adds one nonexact candidate: its corrected 342-byte complete body has 67
-matching positions against 340 retail bytes and passes 4,270 native scenarios.
-Only that picker partial changes in its aggregate; all other bodies and sections
-remain unchanged. The final real link compiles 217 translation units and reports
-372 unresolved names. Private evidence is in
-`work/game-build/round28-all-objects.json`, `round28-link-evidence.json`
-and `connections-round28-preservation.json`.
+The current [KrustyBike network/replay connections](BIKE_NETWORK_CONNECTIONS.md)
+preserve all 217 prior
+production objects under three verified name substitutions: 10,472 nondebug
+sections and 45,333 relocations. The added
+[startup/background defaults](STARTUP_DEFAULT_METHODS.md) are complete strict
+16-byte and 8-byte bodies. The separately reviewed
+[texture rectangle copy](TEXTURE_RECT_COPY.md) remains nonexact: 775 bytes,
+364 matching positions against 750 retail bytes. Its explicit ordered reads
+correct an observed fault-order difference while retaining retail's low-address
+lookup in the non-8-bit branch. Other aggregate bodies remain unchanged.
+The real link compiles 220 translation units and reports 366 unresolved names.
+Private evidence is in `work/game-build/round29-all-objects.json`,
+`round29-link-evidence.json` and `connections-round29-preservation.json`.
 
-The final regression run passes 477 tests with eleven skipped (488 total),
-recorded in `work/game-build/tests-round28.log`. Static checking passes for
-210 Python files and 353 JSON files.
+The final regression run passes 480 tests with eleven skipped (491 total),
+recorded in `work/game-build/tests-round29.log`. Static checking passes for
+213 Python files and 356 JSON files.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

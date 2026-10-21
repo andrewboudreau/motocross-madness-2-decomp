@@ -20,6 +20,13 @@
 #include <string.h>
 #include "vehicle/KrustyBike.h"
 #include "../../reconstructed/GearRatios.h"
+#include "../../reconstructed/Net.h"
+// Recorder.h needs core Win32 synchronization types here, not OLE headers.
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include "../../reconstructed/Recorder.h"
+#include "../../reconstructed/EventManager.h"
 #include "math/FastMath.h"
 #include "collision/CollisionObject.h"
 #include "../../reconstructed/Wrecker.h"
@@ -347,9 +354,9 @@ void KrustyBike::Fn_004925A0(Vehicle* who, bool flag)
         KbNetPacket pkt;
         pkt.field_0x8 = who ? ((KbNetBike*)who)->netId : 0;
         pkt.field_0x4 = flag;
-        reinterpret_cast<KbGame*>(g_TrackGame)->network->Send((unsigned char)(flag ? 0x13 : 0x87), &pkt, 12, ((KbNetBike*)this)->netId, 0);
+        reinterpret_cast<NetworkInterface*>(reinterpret_cast<KbGame*>(g_TrackGame)->network)->Send((unsigned char)(flag ? 0x13 : 0x87), &pkt, 12, ((KbNetBike*)this)->netId, 0);
         if (!flag && netRecorder && reinterpret_cast<KbGame*>(g_TrackGame)->saveReplay && !reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay)
-            netRecorder->QueueRecord(0x87, who ? ((KbNetBike*)who)->netId : 0, &pkt, 1);
+            reinterpret_cast<VCRInterface*>(netRecorder)->QueueRecord(0x87, who ? ((KbNetBike*)who)->netId : 0, &pkt, 1);
     }
 }
 
@@ -551,7 +558,8 @@ int KrustyBike::UnknownVirtualSlot28(int a)
     lastCollisionType = 0;
     if (isGhost) return a;
     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4) {
-        KbPlayer* p = reinterpret_cast<KbGame*>(g_TrackGame)->eventManager->FindRaceMode();
+        KbPlayer* p = reinterpret_cast<KbPlayer*>(reinterpret_cast<EventManager*>(
+            reinterpret_cast<KbGame*>(g_TrackGame)->eventManager)->FindRaceMode());
         if (this != p->field_0xa8 && this == race->localRacer) {
             Vehicle* v = p->field_0xa8;
             if (v) {
@@ -1469,7 +1477,8 @@ int KrustyBike::Tick(float dt)
             Fn_00492AD0(dt, 0);
     }
     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4) {
-        KbPlayer* p = reinterpret_cast<KbGame*>(g_TrackGame)->eventManager->FindRaceMode();
+        KbPlayer* p = reinterpret_cast<KbPlayer*>(reinterpret_cast<EventManager*>(
+            reinterpret_cast<KbGame*>(g_TrackGame)->eventManager)->FindRaceMode());
         if (p->field_0xdc && p->field_0xa8 == this && crashState) {
             if (reinterpret_cast<KbGame*>(g_TrackGame)->network->field_0x10)
                 p->Fn_004A9E80(0, this, 1);
@@ -1577,9 +1586,9 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
     message.field_0x02 = (short)message.time - (short)state->time;
     if (!record) {
         if (reinterpret_cast<KbGame*>(g_TrackGame)->network)
-            reinterpret_cast<KbGame*>(g_TrackGame)->network->Send(1, &message, sizeof(message), netId, 0);
+            reinterpret_cast<NetworkInterface*>(reinterpret_cast<KbGame*>(g_TrackGame)->network)->Send(1, &message, sizeof(message), netId, 0);
     } else if (netRecorder) {
-        netRecorder->QueueRecord(1, netId, &message, sizeof(message));
+        reinterpret_cast<VCRInterface*>(netRecorder)->QueueRecord(1, netId, &message, sizeof(message));
     }
     state->position = position;
     state->roll = bodyRoll;
@@ -1604,7 +1613,7 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
                 KbBikePing ping;
                 ping.field_0x04 = score;
                 ping.field_0x01 = loaderKind;
-                reinterpret_cast<KbGame*>(g_TrackGame)->network->Send(10, &ping, sizeof(ping), netId, 0);
+                reinterpret_cast<NetworkInterface*>(reinterpret_cast<KbGame*>(g_TrackGame)->network)->Send(10, &ping, sizeof(ping), netId, 0);
                 pingTimer = 2.0f;
             }
         }
@@ -1612,7 +1621,7 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
         KbBikePing ping;
         ping.field_0x04 = score;
         ping.field_0x01 = loaderKind;
-        netRecorder->QueueRecord(10, netId, &ping, sizeof(ping));
+        reinterpret_cast<VCRInterface*>(netRecorder)->QueueRecord(10, netId, &ping, sizeof(ping));
     }
 }
 

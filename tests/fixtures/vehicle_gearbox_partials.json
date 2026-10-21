@@ -1,5 +1,5 @@
 {
-  "baseline": "eb470e531e943af060ddd08ec40b9ea5accdf505; full COFF body and relocation target fingerprints after whole-object preservation under five documented connections",
+  "baseline": "eb470e531e943af060ddd08ec40b9ea5accdf505; full COFF body and relocation target fingerprints after whole-object preservation under five documented connections; round29 three network/provider renames and compiler-local label renumbering: complete nondebug section bytes and all relocation section/offset destinations preserved under three symbol substitutions",
   "partials": [
     [
       "src/krusty2/vehicle/Bike.cpp",
@@ -179,7 +179,7 @@
       1296,
       1288,
       526,
-      "9ad16cbb3c5e67b23173aadbb7b2b96b8983a8f27bb332973fee3af79f5b9795"
+      "04926adda683d096bde203ac827c9c7decfbbb33ddcce1aa373adc93d9d85561"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
@@ -188,7 +188,7 @@
       2315,
       2312,
       192,
-      "dccc80a9157a45758acbf575e29c2bc555318d6edaf866444d09eb20edfb44e6"
+      "9d9af4ca7d149338dfc089e2473d66445b06a41a1222764d7e224e40fa947d67"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
@@ -206,7 +206,7 @@
       532,
       532,
       472,
-      "629ea063c6f5026ac8d184f265c4ca35bcab2fb74d53073f5a1f056c9aecc064"
+      "67f6a2c3fa6bd4ef2dad25608b349a4e3c49e3f75d52e255055be2db238b8526"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
@@ -215,7 +215,7 @@
       2920,
       2952,
       608,
-      "3c4a68b1656da309349393b525f6bc22d5968d01da96ed93d466ab54d0b60385"
+      "d9f3596ec452afd5795951682659c2df94902a5ce1b0e0620dd44b40571f0b31"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
@@ -224,7 +224,7 @@
       895,
       895,
       null,
-      "aa9410354a05033518a7feac66ba1782ffa777b9106a22c7a24d73bcf3128de0"
+      "bf51a821914c1db2a7930f113cc627190915d94aa9e37c22bd5300e79f5f71d5"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",

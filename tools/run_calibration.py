@@ -26706,6 +26706,24 @@ CASES = [
         'target_size': 1,
         'reason': 'TrackGame Shutdown calls on +0x574 before operator delete; independently evidenced destructor with no additional resource cleanup',
     },
+    {
+        'name': 'Zone interface folded base constructor',
+        'bindings': 'src/reconstructed/ZoneInterfaceLifetime.bindings.json',
+        'source': 'src/reconstructed/ZoneInterfaceLifetime.cpp',
+        'symbol': '??0UnknownTrackGameObject3410Base@@QAE@XZ',
+        'target_va': '0x004676a0',
+        'target_size': 16,
+        'reason': 'TrackGame CreateGameObjects calls on the allocation stored at +0x3410; clears only the two COM pointers',
+    },
+    {
+        'name': 'BackgroundImage default surface hook',
+        'bindings': 'src/reconstructed/BackgroundImageHooks.bindings.json',
+        'source': 'src/reconstructed/BackgroundImageHooks.cpp',
+        'symbol': '?UnknownVirtualSlot27@BackgroundImage@@UAEHPAUUnknownSurfaceInterface@@@Z',
+        'target_va': '0x004627f0',
+        'target_size': 8,
+        'reason': 'BackgroundImage primary vtable slot 27 and RenderPre3D surface calls independently establish this method',
+    },
 ]
 
 def main():
