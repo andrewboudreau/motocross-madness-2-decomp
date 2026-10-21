@@ -136,6 +136,52 @@ class TrackerTests(unittest.TestCase):
         info = track_frame(disassemble(code))
         self.assertEqual([a.offset for a in info.accesses], [0])
 
+    def test_second_push_of_a_saved_register_is_an_argument(self):
+        # push edi saves it once; the second push edi passes it to a thiscall
+        insns = [Insn(0, 'sub', 'esp, 0x10', 3), Insn(3, 'push', 'edi', 1), Insn(4, 'push', 'edi', 1),
+                 Insn(5, 'call', '0x100', 5), Insn(10, 'mov', 'eax, dword ptr [esp + 4]', 4), Insn(14, 'ret', '', 1)]
+        self.assertEqual([a.offset for a in track_frame(insns).accesses], [0])
+
+    def test_shared_call_tail_keeps_the_pushed_arguments(self):
+        # push esi; push 1; jne tail; call; ret; tail: call (pops the 1); mov eax,[esp+4]
+        insns = [Insn(0, 'sub', 'esp, 0x10', 3), Insn(3, 'push', 'esi', 1), Insn(4, 'push', '1', 2),
+                 Insn(6, 'jne', '0xe', 2), Insn(8, 'call', '0x100', 5), Insn(13, 'ret', '', 1),
+                 Insn(14, 'call', '0x200', 5), Insn(19, 'mov', 'eax, dword ptr [esp + 4]', 4), Insn(23, 'ret', '', 1)]
+        self.assertEqual([a.offset for a in track_frame(insns).accesses], [0])
+
+    def test_merged_cdecl_cleanup_restores_a_guessed_pop(self):
+        # push 1; call f (no add esp before the next push); push 2; call g; add esp, 8
+        insns = [Insn(0, 'sub', 'esp, 0x10', 3), Insn(3, 'push', 'esi', 1), Insn(4, 'push', '1', 2),
+                 Insn(6, 'call', '0x100', 5), Insn(11, 'push', '2', 2), Insn(13, 'call', '0x200', 5),
+                 Insn(18, 'add', 'esp, 8', 3), Insn(21, 'mov', 'eax, dword ptr [esp + 4]', 4), Insn(25, 'ret', '', 1)]
+        self.assertEqual([a.offset for a in track_frame(insns).accesses], [0])
+
+    def test_callee_pops_keep_a_late_register_save(self):
+        # push 1; call f (ret 4); push ebp; push 2; push 3; call g (ret 8); the saved ebp stays
+        insns = [Insn(0, 'sub', 'esp, 0x10', 3), Insn(3, 'push', 'esi', 1), Insn(4, 'push', '1', 2),
+                 Insn(6, 'call', '0x100', 5), Insn(11, 'push', 'ebp', 1), Insn(12, 'push', '2', 2),
+                 Insn(14, 'push', '3', 2), Insn(16, 'call', '0x200', 5),
+                 Insn(21, 'mov', 'eax, dword ptr [esp + 8]', 4), Insn(25, 'ret', '', 1)]
+        self.assertEqual([a.offset for a in track_frame(insns, None, {3: 4, 7: 8}).accesses], [0])
+
+    def test_callee_pop_bytes_reads_ret_and_follows_a_thunk(self):
+        from tools.frame_layout import callee_pop_bytes
+
+        class Image:
+            code = {0x1000: b'\xe9\x0b\x00\x00\x00',              # jmp 0x1010
+                    0x1010: b'\x8b\xc1\xc2\x0c\x00',              # mov eax, ecx; ret 0xc
+                    0x1020: b'\x33\xc0\xc3'}                      # xor eax, eax; ret
+
+            def is_code_va(self, va):
+                return va in self.code
+
+            def bytes_at_va(self, va, size):
+                return self.code[va]
+
+        self.assertEqual(callee_pop_bytes(Image(), 0x1000), 0xc)
+        self.assertEqual(callee_pop_bytes(Image(), 0x1020), 0)
+        self.assertIsNone(callee_pop_bytes(Image(), 0x2000))
+
     def test_ebp_frame(self):
         # push ebp; mov ebp,esp; sub esp,0x20; mov eax,[ebp-4]; mov [ebp-0x20],eax; leave; ret
         code = b'\x55' b'\x8b\xec' b'\x83\xec\x20' b'\x8b\x45\xfc' b'\x89\x45\xe0' b'\xc9' b'\xc3'

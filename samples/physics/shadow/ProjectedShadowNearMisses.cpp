@@ -180,10 +180,18 @@ static inline void ShadowTransformExtents(ShadowVec3* out, ShadowVec3 h, const S
 // built through by-value temporaries, and the mode-1 normalisation is written out with the
 // out-of-line constructor.  PARTIAL: retail copies the GetBounds extents into three separate
 // slots before the products (VC6 elides that copy here), which shifts every frame slot.
+// One product buffer t serves both modes (0x134 -> 0xf4, 177 -> 188 strict).
+// Retail's frame (tools/frame_layout.py, 0xc0 against 0xf4 here) has no 64-byte buffer beside m:
+// the identity call and the product's result pointer are both m's own slot (0x64), with
+// fov 0xc, c 0x1c, mn 0x28, mx 0x34, ext 0x40, eye 0x4c and sq 0x78, and 12-byte temporaries
+// at 0, 0x10 and 0x58.  Passing &m as the product's result instead keeps a 64-byte identity
+// temporary (0xf4, 1970 bytes, 185 strict, 244 differing instructions); `m = ShadowMatrixIdentity()` after the declaration
+// compiles the same as the initialisation.
 int ProjectedShadow::ComputeBounds()
 {
     if (!casters)
         return 1;
+    ShadowMatrix t;
     ShadowVec3 mn, mx;
     mn.x = mn.y = mn.z = 3.4028235e38f;
     mx.x = mx.y = mx.z = -3.4028235e38f;
@@ -216,7 +224,6 @@ int ProjectedShadow::ComputeBounds()
         camera->SetLookAt(&eye, 0, 0, 0, 0);
         camera->UnknownVirtualSlot29(center);
         camera->UnknownVirtualSlot28();
-        ShadowMatrix t;
         lightMatrix = *ShadowMatrixMultiplyInto(&t, m, camera->matrix_0xac);
         return 1;
     } else if (mode == 1) {
@@ -240,7 +247,6 @@ int ProjectedShadow::ComputeBounds()
         ShadowMatrix m = ShadowMatrixIdentity();
         m.m[0][0] = (float)texture->size;
         m.m[1][1] = (float)texture->size;
-        ShadowMatrix t;
         lightMatrix = *ShadowMatrixMultiplyInto(&t, m, camera->matrix_0xec);
     }
     return 1;

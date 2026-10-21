@@ -409,7 +409,8 @@ Near misses (`samples/camera/FollowCameraNearMisses.cpp`):
   x87 stall slot of its block; retail's slot is that of a block starting at
   `fld st(0)` (sample header lists the forms tried). The state-5 distance is
   `dz*dz + dx*dx + dy` (the y delta is not squared in retail).
-- The CAMERA-file loader `0x004650e0`: retail keeps cross products in memory.
+- The CAMERA-file loader `0x004650e0`: retail keeps cross products in memory;
+  normalising the second one straight from the call gives its frame 0x18c.
 - Slot 45 `0x00463a30`: aligned instruction ratio 0.937 (1088 instructions
   against 1079). Retail's null-joystick tests jump to the shared epilogue at
   `0x004649fe`, so each joystick block is an `if (activeJoystick) { ... }`.
