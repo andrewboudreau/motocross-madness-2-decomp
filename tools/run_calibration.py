@@ -11,6 +11,30 @@ from mcm2tool.pe import PEImage  # noqa: E402
 from match import compare  # noqa: E402
 
 CASES = [
+    {'name': 'Gameplay default ??1BikeA60C@@QAE@XZ',
+     'source': 'src/reconstructed/GameplayDefaults.cpp',
+     'bindings': 'src/reconstructed/GameplayDefaults.bindings.json',
+     'symbol': '??1BikeA60C@@QAE@XZ',
+     'target_va': '0x00464e90',
+     'target_size': 1,
+     'reason': 'Complete independent default identified through actual receiver/member lifetime or argument '
+               'dataflow; original TU and view names provisional, no shared-address class identity.'},
+    {'name': 'Gameplay default ??1VehicleSpeedState@@QAE@XZ',
+     'source': 'src/reconstructed/GameplayDefaults.cpp',
+     'bindings': 'src/reconstructed/GameplayDefaults.bindings.json',
+     'symbol': '??1VehicleSpeedState@@QAE@XZ',
+     'target_va': '0x00464e90',
+     'target_size': 1,
+     'reason': 'Complete independent default identified through actual receiver/member lifetime or argument '
+               'dataflow; original TU and view names provisional, no shared-address class identity.'},
+    {'name': 'Gameplay default ?Fn_004DE580@KbRaceHandler@@QAEXPAXMH@Z',
+     'source': 'src/reconstructed/GameplayDefaults.cpp',
+     'bindings': 'src/reconstructed/GameplayDefaults.bindings.json',
+     'symbol': '?Fn_004DE580@KbRaceHandler@@QAEXPAXMH@Z',
+     'target_va': '0x004de580',
+     'target_size': 3,
+     'reason': 'Complete independent default identified through actual receiver/member lifetime or argument '
+               'dataflow; original TU and view names provisional, no shared-address class identity.'},
     {'name': 'Startup list constructor UnknownParserList',
      'source': 'src/reconstructed/StartupListConstructors.cpp',
      'bindings': 'src/reconstructed/StartupListConstructors.bindings.json',

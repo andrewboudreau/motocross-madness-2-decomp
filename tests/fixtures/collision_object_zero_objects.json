@@ -1,15 +1,15 @@
 {
-  "scope": "Complete nondebug objects; only recognized source filename roots normalized for portability. Existing TU-local zero vector destination. Three vegetation count/radius/global external names join their existing providers; old pins independently reproduced before exact mapping. All bytes and defined destinations remain unchanged.",
+  "scope": "Complete nondebug objects; only recognized source filename roots normalized for portability. Existing TU-local zero vector destination. Three vegetation count/radius/global external names join their existing providers; old pins independently reproduced before exact mapping. All bytes and defined destinations remain unchanged. Round56 private composition independently reproduces these old pins; one GetObject-to-GetCollisionObject primary call rename and the independently validated complete SetTransform arithmetic repair are then applied. All other sections and relocation destinations remain preserved.",
   "objects": {
     "src/krusty2/collision/CollisionObject.cpp": {
       "sections": 135,
       "relocations": 722,
-      "sha256": "822bd3229de77c8068c4a7f8e6106ea13105c3bf883a3277961d50055de74435"
+      "sha256": "b23aac230ea28b0a5c34e5b5014e108969518f512f17a8b6f484f92da8b04587"
     },
     "samples/physics/collision/CollisionObjectNearMisses.cpp": {
       "sections": 136,
       "relocations": 732,
-      "sha256": "31b1bc6e3b81d7455330a26024680efcdafec7c7ebc187962c54888a657a542f"
+      "sha256": "a1668422462cf87dfd07324f655f8a48956e0e2043bae9f021ff1f9ee5a52dfb"
     }
   }
 }

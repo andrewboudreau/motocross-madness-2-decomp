@@ -317,10 +317,7 @@ struct KbRacer {
     void* followedRacer;  // +0x3B4  BikeRace raceCamera +0x3b4 followedRacer (KrustyBikeCamera's racer)
 };
 
-struct KbRaceHandler {
-    void Fn_004DE580(void* who, float a, int b);
-    void ReportTrickScore(KrustyBike* who, float score);   // 0x004e57d0: reports a trick score
-};
+#include "BikeRaceHandlerView.h"
 // Object at KbRace+0xbc: 0x00495ff0 hands it the trick angle and multiplier.
 struct KbScoreBoard { void ShowValue(float points, float multiplier); };
 // Object at KbGame+0x3444 (bonus rules; packed: its ints sit at odd offsets).

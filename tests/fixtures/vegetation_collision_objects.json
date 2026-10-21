@@ -1,0 +1,31 @@
+{
+  "objects": {
+    "src/krusty2/collision/CollisionObject.cpp": {
+      "sections": 135,
+      "relocations": 722,
+      "sha256": "b23aac230ea28b0a5c34e5b5014e108969518f512f17a8b6f484f92da8b04587",
+      "filenames": [
+        "src/krusty2/collision/CollisionObject.cpp"
+      ]
+    },
+    "samples/physics/collision/CollisionObjectNearMisses.cpp": {
+      "sections": 136,
+      "relocations": 732,
+      "sha256": "a1668422462cf87dfd07324f655f8a48956e0e2043bae9f021ff1f9ee5a52dfb",
+      "filenames": [
+        "src/krusty2/collision/CollisionObject.cpp"
+      ]
+    },
+    "samples/ecosystem/EcoSystemNearMisses.cpp": {
+      "sections": 98,
+      "relocations": 444,
+      "sha256": "adefbff12c00c5e62e96fdb25c5da3143adee069d68e3b84a7e812c86173c6a6",
+      "filenames": [
+        "samples/ecosystem/EcoSystemNearMisses.cpp"
+      ]
+    }
+  },
+  "original_inline": "static inline void CollisionMatrixMultiplyInline(Matrix4* out, const Matrix4* a, const Matrix4* b)\n{\n    out->_11 = b->_11 * a->_11 + b->_12 * a->_21 + b->_13 * a->_31 + b->_14 * a->_41;\n    out->_12 = b->_11 * a->_12 + b->_12 * a->_22 + b->_13 * a->_32 + b->_14 * a->_42;\n    out->_13 = b->_11 * a->_13 + b->_12 * a->_23 + b->_13 * a->_33 + b->_14 * a->_43;\n    out->_14 = b->_11 * a->_14 + b->_12 * a->_24 + b->_13 * a->_34 + b->_14 * a->_44;\n    out->_21 = b->_21 * a->_11 + b->_22 * a->_21 + b->_23 * a->_31 + b->_24 * a->_41;\n    out->_22 = b->_21 * a->_12 + b->_22 * a->_22 + b->_23 * a->_32 + b->_24 * a->_42;\n    out->_23 = b->_21 * a->_13 + b->_22 * a->_23 + b->_23 * a->_33 + b->_24 * a->_43;\n    out->_24 = b->_21 * a->_14 + b->_22 * a->_24 + b->_23 * a->_34 + b->_24 * a->_44;\n    out->_31 = b->_31 * a->_11 + b->_32 * a->_21 + b->_33 * a->_31 + b->_34 * a->_41;\n    out->_32 = b->_31 * a->_12 + b->_32 * a->_22 + b->_33 * a->_32 + b->_34 * a->_42;\n    out->_33 = b->_31 * a->_13 + b->_32 * a->_23 + b->_33 * a->_33 + b->_34 * a->_43;\n    out->_34 = b->_31 * a->_14 + b->_32 * a->_24 + b->_33 * a->_34 + b->_34 * a->_44;\n    out->_41 = b->_41 * a->_11 + b->_42 * a->_21 + b->_43 * a->_31 + b->_44 * a->_41;\n    out->_42 = b->_41 * a->_12 + b->_42 * a->_22 + b->_43 * a->_32 + b->_44 * a->_42;\n    out->_43 = b->_41 * a->_13 + b->_42 * a->_23 + b->_43 * a->_33 + b->_44 * a->_43;\n    out->_44 = b->_41 * a->_14 + b->_42 * a->_24 + b->_43 * a->_34 + b->_44 * a->_44;\n}",
+  "original_transform_raw_sha256": "9dea0391ab079c3916c62b98784999d759ce985f8b74d09dcd9d475960021744",
+  "original_transform_size": 1684
+}

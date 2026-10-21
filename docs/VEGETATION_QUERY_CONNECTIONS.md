@@ -2,9 +2,9 @@
 
 This slice connects the vegetation count and radius calls in
 `CollisionObject::QueryCollisions` to existing strict implementations, and uses
-the existing `g_EcoSystem` pointer storage. It does not supply the still-missing
-`CollisionVegetation::GetObject` method or admit the sample
-`Vegetation::GetCollisionObject` implementation.
+the existing `g_EcoSystem` pointer storage. The later [placement slice](VEGETATION_COLLISION_OBJECT.md) separately connects
+the fourth GetObject call and admits its reviewed nonexact implementation; the
+three existing-provider connections described here retain their original scope.
 
 ## Scope and declarations
 
@@ -28,8 +28,8 @@ claim about recovered original headers or complete provisional-type identity.
 
 The collision code retains its existing `CollisionVegetationGrid` view for the
 single float at primary EcoSystem offset `0x5a8`, casting the canonical global
-at that access. The unconnected `GetObject` call and other provisional
-interfaces remain unchanged.
+at that access. The later placement slice connects `GetObject` through the same genuine primary
+declaration. This does not establish complete identity of the provisional views.
 
 ## Receiver and storage evidence
 
@@ -152,4 +152,5 @@ exclusions. The four affected canonical/aggregate objects independently retain
 all 501 sections and 2,618 relocations at their actual source paths.
 
 The source-built game remains unlinked; startup, integrated menus and racing
-have not been tested. GetObject remains unresolved and is outside this slice.
+have not been tested. The separate placement slice now supplies GetObject; its nonexact behavior
+evidence and transform correction are documented independently.

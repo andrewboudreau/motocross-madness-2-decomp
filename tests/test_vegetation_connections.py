@@ -93,11 +93,12 @@ class VegetationConnectionsTests(unittest.TestCase):
             self.assertTrue(required<={(va,size)for _,_,va,size,_ in cases})
             for source,symbol,va,size,bindings in cases:
                 self.assertTrue(compare(image,objects[source],symbol,va,size,bindings)['strict_exact'],(source,symbol));strict+=1
-            # Keep the exact remaining missing method; this slice does not admit its candidate.
+            # The later placement slice separately connects the genuine primary receiver.
             for source in SOURCES[:2]:
                 obj=objects[source];imports={s.name for s in obj.symbols if s.storage_class==2 and s.section_number==0}
                 self.assertFalse(imports&set(RENAMES));self.assertTrue(set(RENAMES.values())<=imports)
-                self.assertIn('?GetObject@CollisionVegetation@@QAEPAVCollisionObject@@H@Z',imports)
+                self.assertNotIn('?GetObject@CollisionVegetation@@QAEPAVCollisionObject@@H@Z',imports)
+                self.assertIn('?GetCollisionObject@Vegetation@@QAEPAVCollisionObject@@H@Z',imports)
                 symbol=obj.find_symbol('QueryCollisions@CollisionObject');_,size,rels=obj.symbol_extent(symbol);self.assertEqual(size,1102)
                 calls=[(r.virtual_address-symbol.value,obj.symbol_by_index[r.symbol_index].name)for r in rels if obj.symbol_by_index[r.symbol_index].name in RENAMES.values()]
                 self.assertEqual(calls,[(407,'?g_EcoSystem@@3PAVEcoSystem@@A'),(462,'?GetRadius@Vegetation@@QAEMXZ'),(471,'?GetRadius@Vegetation@@QAEMXZ'),(506,'?GetCollisionCount@Vegetation@@QAEHXZ'),(683,'?GetCollisionCount@Vegetation@@QAEHXZ')])

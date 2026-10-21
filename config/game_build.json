@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/ecosystem/VegetationCollisionObject.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete 386-byte retail placement method; source emits 384 bytes with 103 resolved matching positions. Checked in 39,936 finite native cases including 3,048 access faults with actual math/parameter helpers. Hull closure includes the independently reviewed SetTransform addition-order correction (1,684 bytes, 902 to 890 matching positions), exact original failing control and symbolic x87 association proof. Prepared storage and masked finite FP only; full gameplay lifetime and exception resumption unverified.",
+      "evidence": "docs/VEGETATION_COLLISION_OBJECT.md#functional-build-review"
+    },
+    {
       "path": "samples/camera/FollowCameraLoadFile.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete camera-file loader checked in 1551 finite native cases with actual stream, math and CRT helpers, constructor unwind and progressive output faults. VC6 emits 980 bytes versus 1014 retail bytes, with 429 resolved matching positions. Two retained negative controls demonstrate the repaired first-cross rounding and matrix-store order. Shared stream CheckHeader/Seek remain nonexact; debug allocation is scripted and full camera lifetime is unverified.",

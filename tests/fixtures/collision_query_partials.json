@@ -1,5 +1,5 @@
 {
-  "baseline": "799f6e9d",
+  "baseline": "799f6e9d; round56 private SetTransform correction 1684/902 to 1684/890; old full resolved fingerprints independently reproduced",
   "partials": [
     [
       "src/krusty2/collision/CollisionObject.cpp",
@@ -106,8 +106,8 @@
       4413488,
       1676,
       1684,
-      902,
-      "dc5aacb4c93a7385f5116dc32e708088cfca2c157d60c4912d57f31948b2fc67"
+      890,
+      "0918e17658ebe61094b489bfee74ae7e1d0e8c00c2c7af7231add76b5bbef9ce"
     ],
     [
       "src/krusty2/collision/CollisionObject.cpp",
@@ -268,8 +268,8 @@
       4413488,
       1676,
       1684,
-      902,
-      "dc5aacb4c93a7385f5116dc32e708088cfca2c157d60c4912d57f31948b2fc67"
+      890,
+      "0918e17658ebe61094b489bfee74ae7e1d0e8c00c2c7af7231add76b5bbef9ce"
     ],
     [
       "samples/physics/collision/CollisionObjectNearMisses.cpp",

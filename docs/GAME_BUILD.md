@@ -41,55 +41,63 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 263 C++ files (208 canonical sources and 55
-reviewed candidates) and reaches LINK with 214 unresolved external symbols,
+The 2026-10-21 build compiles 265 C++ files (209 canonical sources and 56
+reviewed candidates) and reaches LINK with 210 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The current
-run is `work/game-build/build-1wo__8o2`; its `link.log` is authoritative.
+run is `work/game-build/build-piwu0zg2`; its `link.log` is authoritative.
 
-The [vegetation query connections](VEGETATION_QUERY_CONNECTIONS.md) route
-count and radius calls to existing strict Vegetation providers and use the
-existing EcoSystem global pointer. Genuine declarations move verbatim into
-narrow headers; the collision caller retains its explicit primary-pointer and
-single-field views. Four complete affected objects retain all 501 nondebug
-sections and 2,618 relocations under precisely three verified names. The
-retained regression passes 119 strict checks and 65,807 native getter cases,
-including 15 independently checked read faults. It does not establish the full
-query or missing GetObject provider.
+The [vegetation placement slice](VEGETATION_COLLISION_OBJECT.md) connects the
+remaining query call through the genuine primary Vegetation declaration and
+admits its complete reviewed nonexact implementation. The source emits 384 bytes
+with 103 resolved matching positions against the full 386-byte retail target.
+Its native test executes actual parameter and math helpers in 39,936 finite
+cases, including 3,048 access faults. It does not establish complete construction,
+arbitrary floating-point values or integrated gameplay.
 
-The [startup list constructors](STARTUP_LIST_CONSTRUCTORS.md) supply the two
-already-declared parser-list and drive-list defaults. Their complete 9-byte and
-16-byte bodies match strictly, with actual caller/storage evidence; shared tiny
-addresses do not establish identity with other classes. Five prior objects are
-unchanged across 321 sections and 1,256 relocations. The native fixture passes
-1,344 actual-constructor cases, including 192 exact guarded write faults, alongside
-102 strict provider/caller checks. Original names and translation-unit ownership
-remain provisional.
+The hull path exposed an existing SetTransform addition-order error. Ordinary
+C++ parentheses now reproduce the decoded x87 grouping. A symbolic stack check
+verifies all sixteen arithmetic expressions and store order; the retained original
+source must still fail at the exact known one-bit result difference. SetTransform
+remains nonexact at 1,684 bytes against 1,676 retail bytes. Its partial score
+changes explicitly from 902 to 890 matching positions. Every other nondebug
+section in the canonical and aggregate objects is preserved. A separate later
+instruction-scheduling window preserves ordinary register/stack effects; complete
+exception-context resumption is not claimed.
 
-Isolated real links remove exactly five names: **219 -> 216 -> 214**, with no
-additions. Across each step, all 262 prior production objects preserve 10,704
-nondebug sections and 45,813 relocations: the first step permits only the three
-verified vegetation names, and the second permits no mappings. Neither proof
-excludes filenames. The new startup object has three complete sections, no
-nondebug relocations and two strict providers under the actual game command.
-The final build verifies all 263 source hashes, 235 header hashes, configuration,
-compiler profile and per-source flags. Evidence is in
-`work/game-build/round55-getters-proof.json`, `round55-startup-proof.json` and
-`connections-round55-preservation.json`.
+The [gameplay defaults](GAMEPLAY_DEFAULTS.md) supply three independently identified
+existing declarations: the handlebar-view destructor, engine-state-view destructor
+and race callback. Their complete 1/1/3-byte bodies match strictly. Actual owning
+virtual-base receivers, subordinate pointers and primary callback calls establish
+the boundaries; shared tiny addresses do not establish class equivalence. Genuine
+declarations move verbatim into narrow headers. Nine existing consumer objects
+retain all 1,072 sections and 5,226 relocations, and 211 strict checks plus 3,072
+native calls pass. The new object has no imports, data or CRT initialization.
 
-Calibration now passes **3,019/3,030** strict rows (3,004 distinct source/address/
-extent cases). Its **2,980/2,990** unique retail address/extent count is unchanged
-because other source views already targeted the constructor bodies. Physics
-retains **1,086/1,162** strict comparisons. No previous strict match is lost and
-no partial score decreases in either matrix. The two prior nonexact physics
-binding diagnostics remain unchanged and excluded from strict counts.
+Isolated real links remove exactly four names: **214 -> 213 -> 210**, with none
+added. The first step accounts for all 263 prior production objects, 10,707
+nondebug sections and 45,813 relocations: under the single query call-name change,
+only the complete SetTransform section differs, with flags and relocation records
+unchanged. The second step preserves all 264 prior objects, 10,709 sections and
+45,818 relocations with no mappings. Neither proof excludes filenames. Actual
+game-command objects reproduce the reviewed candidate and strict defaults.
+The final report verifies 265 source hashes, 238 header hashes, configuration,
+compiler profile and per-source flags. No compiler flags change.
 
-Game linking still fails; startup, integrated menus and racing remain untested.
-The separate vegetation placement and transform-arithmetic correction is private
-and unadmitted. This slice changes no compiler flags.
-Static checks pass for 277 Python files and 423 JSON files. The final regression
-passes: 560 tests, 549 passed and 11 skipped
-(`work/game-build/tests-round55-final.log`).
+Calibration passes **3,022/3,033** strict rows (3,006 distinct source/address/
+extent cases); the **2,980/2,990** unique retail address/extent count is unchanged.
+Physics retains **1,086/1,162** strict comparisons. Every prior strict match is
+preserved. A row-by-row comparison confirms the canonical SetTransform row is
+the only changed old matrix result; retained tests separately pin the same
+correction in both canonical and aggregate objects. The two prior nonexact
+physics binding diagnostics remain unchanged and excluded from strict counts.
+
+Evidence is in `work/game-build/round56-runtime-proof.json`,
+`round56-gameplay-proof.json`, `connections-round56-preservation.json` and
+`round56-row-score-preservation.json`. Static checks pass for 279 Python and
+427 JSON files. Full regression: 562 tests, 551 passed and 11 skipped
+(`work/game-build/tests-round56-final.log`). The game still does not link;
+startup, integrated menus and racing remain unverified.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

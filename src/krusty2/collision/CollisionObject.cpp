@@ -1494,7 +1494,7 @@ int CollisionObject::QueryCollisions()
                 float radius = reinterpret_cast<Vegetation*>(vegetation)->GetRadius();   // unused: retail calls it and pops the result
                 if (SphereContainsPointXZ((CollisionBoundingSphere*)this, &center, reinterpret_cast<Vegetation*>(vegetation)->GetRadius())) {
                     for (int i = 0; i < reinterpret_cast<Vegetation*>(vegetation)->GetCollisionCount(); i++) {
-                        hitObject = vegetation->GetObject(i);
+                        hitObject = reinterpret_cast<Vegetation*>(vegetation)->GetCollisionObject(i);
                         hitObject->field_0x98 = 1;
                         if (TestAgainst(hitObject))
                             ReportHit();
@@ -2560,32 +2560,28 @@ void CollisionObject::UpdateModelBounds()
     *(Vec3*)&model->halfExtents = (maxBound - minBound) * 0.5f;
 }
 
-// The 4x4 product of CollisionMatrixMultiply (0x00436500) as SetTransform's hull case expands it
-// (the model case calls the function).
-// Term order dead end (about 40 forms): retail's rows 1-3 share one per-element order and
-// row 0 has its own, consistent with leaf ages fixed in row 0.  Element pointers (float views
-// of out/a/b), references, swapped operands or terms, direct expansion in SetTransform, a
-// hull-body helper, reassigned row pointers and the five bracketings with or without
-// parenthesised products leave every row different; m[i][j] indexing or per-row pointers
-// are dearer and make the point transform a call (per-row pointers reproduce row 1 only).
+// The hull case expands this product instead of calling CollisionMatrixMultiply.
+// Preserve the decoded addition order: flat sums allow VC6 to reassociate terms,
+// which changes finite results (a retained native control differs by one ULP).
+// Parentheses model the observed arithmetic, not recovered original source spelling.
 static inline void CollisionMatrixMultiplyInline(Matrix4* out, const Matrix4* a, const Matrix4* b)
 {
-    out->_11 = b->_11 * a->_11 + b->_12 * a->_21 + b->_13 * a->_31 + b->_14 * a->_41;
-    out->_12 = b->_11 * a->_12 + b->_12 * a->_22 + b->_13 * a->_32 + b->_14 * a->_42;
-    out->_13 = b->_11 * a->_13 + b->_12 * a->_23 + b->_13 * a->_33 + b->_14 * a->_43;
-    out->_14 = b->_11 * a->_14 + b->_12 * a->_24 + b->_13 * a->_34 + b->_14 * a->_44;
-    out->_21 = b->_21 * a->_11 + b->_22 * a->_21 + b->_23 * a->_31 + b->_24 * a->_41;
-    out->_22 = b->_21 * a->_12 + b->_22 * a->_22 + b->_23 * a->_32 + b->_24 * a->_42;
-    out->_23 = b->_21 * a->_13 + b->_22 * a->_23 + b->_23 * a->_33 + b->_24 * a->_43;
-    out->_24 = b->_21 * a->_14 + b->_22 * a->_24 + b->_23 * a->_34 + b->_24 * a->_44;
-    out->_31 = b->_31 * a->_11 + b->_32 * a->_21 + b->_33 * a->_31 + b->_34 * a->_41;
-    out->_32 = b->_31 * a->_12 + b->_32 * a->_22 + b->_33 * a->_32 + b->_34 * a->_42;
-    out->_33 = b->_31 * a->_13 + b->_32 * a->_23 + b->_33 * a->_33 + b->_34 * a->_43;
-    out->_34 = b->_31 * a->_14 + b->_32 * a->_24 + b->_33 * a->_34 + b->_34 * a->_44;
-    out->_41 = b->_41 * a->_11 + b->_42 * a->_21 + b->_43 * a->_31 + b->_44 * a->_41;
-    out->_42 = b->_41 * a->_12 + b->_42 * a->_22 + b->_43 * a->_32 + b->_44 * a->_42;
-    out->_43 = b->_41 * a->_13 + b->_42 * a->_23 + b->_43 * a->_33 + b->_44 * a->_43;
-    out->_44 = b->_41 * a->_14 + b->_42 * a->_24 + b->_43 * a->_34 + b->_44 * a->_44;
+    out->_11 = (a->_41 * b->_14) + ((b->_11 * a->_11) + ((b->_12 * a->_21) + (b->_13 * a->_31)));
+    out->_12 = (b->_12 * a->_22) + ((a->_42 * b->_14) + ((b->_13 * a->_32) + (b->_11 * a->_12)));
+    out->_13 = (b->_13 * a->_33) + ((b->_11 * a->_13) + ((b->_12 * a->_23) + (a->_43 * b->_14)));
+    out->_14 = (b->_14 * a->_44) + ((b->_12 * a->_24) + ((b->_13 * a->_34) + (b->_11 * a->_14)));
+    out->_21 = (b->_21 * a->_11) + ((b->_23 * a->_31) + ((b->_22 * a->_21) + (b->_24 * a->_41)));
+    out->_22 = (a->_32 * b->_23) + ((a->_42 * b->_24) + ((b->_21 * a->_12) + (a->_22 * b->_22)));
+    out->_23 = (b->_21 * a->_13) + ((a->_33 * b->_23) + ((a->_43 * b->_24) + (b->_22 * a->_23)));
+    out->_24 = (b->_22 * a->_24) + ((b->_23 * a->_34) + ((b->_24 * a->_44) + (b->_21 * a->_14)));
+    out->_31 = (b->_31 * a->_11) + ((b->_33 * a->_31) + ((b->_32 * a->_21) + (b->_34 * a->_41)));
+    out->_32 = (a->_32 * b->_33) + ((a->_42 * b->_34) + ((b->_31 * a->_12) + (a->_22 * b->_32)));
+    out->_33 = (b->_31 * a->_13) + ((a->_33 * b->_33) + ((a->_43 * b->_34) + (b->_32 * a->_23)));
+    out->_34 = (b->_32 * a->_24) + ((b->_33 * a->_34) + ((b->_34 * a->_44) + (b->_31 * a->_14)));
+    out->_41 = (b->_41 * a->_11) + ((b->_43 * a->_31) + ((b->_42 * a->_21) + (b->_44 * a->_41)));
+    out->_42 = (a->_32 * b->_43) + ((a->_42 * b->_44) + ((b->_41 * a->_12) + (a->_22 * b->_42)));
+    out->_43 = (b->_41 * a->_13) + ((a->_33 * b->_43) + ((a->_43 * b->_44) + (b->_42 * a->_23)));
+    out->_44 = (b->_42 * a->_24) + ((b->_43 * a->_34) + ((b->_44 * a->_44) + (b->_41 * a->_14)));
 }
 
 // v * M + translation as the hull case of 0x00435830 expands it (the sum of the three

@@ -1,0 +1,50 @@
+{
+  "scope": "Nine same-path complete old objects before/after verbatim genuine narrow declaration extraction; zero mappings, no excluded sections. Only explicit source filenames portable.",
+  "objects": {
+    "src/krusty2/vehicle/Bike.cpp": {
+      "sections": 242,
+      "relocations": 1089,
+      "sha256": "3ae4013653d6280a5bd0e84efd7f57245080b030af0544a07a3f736b975db7fe"
+    },
+    "src/krusty2/vehicle/KrustyBike.cpp": {
+      "sections": 243,
+      "relocations": 1054,
+      "sha256": "154f6344186e5213e9a8eb08ca388eb7b51221089a586b26b40c07697b0b8c0c"
+    },
+    "src/krusty2/vehicle/Vehicle.cpp": {
+      "sections": 151,
+      "relocations": 720,
+      "sha256": "0bc4264c3599b3adffa9dc19aa7968b2f658d6a970a2ad5b99c5d51b133a43a9"
+    },
+    "src/reconstructed/VehicleDefaults.cpp": {
+      "sections": 13,
+      "relocations": 20,
+      "sha256": "ec2fd79a2e78acacd6ce66af726ae0fb4da1658b97b30e5fcc0507809ff38008"
+    },
+    "src/reconstructed/VehicleMethods.cpp": {
+      "sections": 27,
+      "relocations": 26,
+      "sha256": "f768a01910966ec30529f25efb3b937a22844915ddfedda3657efd98255a0968"
+    },
+    "src/reconstructed/VehicleReset.cpp": {
+      "sections": 15,
+      "relocations": 32,
+      "sha256": "0a07905867177d183e7ab189c3abd3851bf1451dc2d3241b43a0e11cf9174c73"
+    },
+    "src/reconstructed/VehicleWheelAttachment.cpp": {
+      "sections": 12,
+      "relocations": 24,
+      "sha256": "80d2e9a25d07f80bab29b81a8873c4dd9bb92ae33432b9ca4fae9324ea2250a4"
+    },
+    "samples/physics/bikeai/BikeAINearMisses.cpp": {
+      "sections": 98,
+      "relocations": 818,
+      "sha256": "efa2251fce054ed9508afafd2c01f7fee62e689c55005e2605df2b2568cc6573"
+    },
+    "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
+      "sections": 271,
+      "relocations": 1443,
+      "sha256": "ffc9b9c36c3bb2cdce5d9220efb7666ac7dc0da8d9cba53f2354049f52ab4023"
+    }
+  }
+}

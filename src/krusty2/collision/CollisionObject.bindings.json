@@ -80,7 +80,6 @@
   "?FreeBoxTree@@YAXPAUQueryTreeNode@@@Z": "0x0042a160",
   "?FreeShape@CollisionObject@@QAEXXZ": "0x00432430",
   "?GetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fca80",
-  "?GetObject@CollisionVegetation@@QAEPAVCollisionObject@@H@Z": "0x004570a0",
   "?GetCollisionCount@Vegetation@@QAEHXZ": "0x00457080",
   "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
   "?GetRadius@Vegetation@@QAEMXZ": "0x00457230",
@@ -186,5 +185,6 @@
   "?BuildModelTriangleTree@@YAXPAUBoxTreeNode@@PAUTreeMatrix4@@PAVTreeModelSource@@PAPAUTreeVec3@@PAVTreeSceneNode@@H@Z": "0x0042c8c0",
   "?IdentityMatrix@@YA?AUMatrix4@@XZ": "0x004a1410",
   "?BuildTriangleMeshTree@@YAXPAUBoxTreeNode@@PAUTreeMatrix4@@PAUTreeVec3@@PBHHHH@Z": "0x0042cc60",
-  "?BuildModelBoxTree@@YAXPAUBoxTreeNode@@PBUTreeMatrix4@@PAUTreeVec3@@H@Z": "0x0042dc90"
+  "?BuildModelBoxTree@@YAXPAUBoxTreeNode@@PBUTreeMatrix4@@PAUTreeVec3@@H@Z": "0x0042dc90",
+  "?GetCollisionObject@Vegetation@@QAEPAVCollisionObject@@H@Z": "0x004570a0"
 }

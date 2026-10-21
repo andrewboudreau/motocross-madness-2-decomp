@@ -40,14 +40,7 @@ struct BikeA38;
 // Object at Bike+0x60c: the handlebar part (samples/physics/tire/Tire.h MovingPart, 0x4c bytes).
 // The loader builds it with `new(__FILE__, 0x660)` from the "Handlebars" node of the model and
 // the steer state; ~Bike deletes it through an out-of-line empty destructor (0x00464e90).
-struct BikeA60C {
-    BikeA60C(const char* name, SoultreeObject* root, VehicleSteerState* owner);   // 0x004a23a0 (ret 0xc)
-    ~BikeA60C();
-    char pad_0x00[0x40];
-    SoultreeObject* node;          // +0x40 root->FindByName(name); the shocks and contacts are anchored on it
-    VehicleSteerState* owner;      // +0x44 ctor argument
-    int field_0x48;
-};
+#include "BikeHandlebarView.h"
 
 // 24-byte block the loader's sixth argument points to; copied into Bike+0x5c8 when present
 // (tier 3: contents unknown, only the whole-block copy is decoded).
