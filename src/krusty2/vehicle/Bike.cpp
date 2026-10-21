@@ -2041,11 +2041,22 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
 // smoothed value (field_0x644) toward field_0x504 and maps it through a small 5-state machine
 // (steerPoseState) to field_0x65c.  Retail converts the pose index with an inlined fistp helper
 // (round-to-nearest after the -0.5); plain (int) is used here.
+// The clamps are small inline helpers: retail copies each memory limit into a frame temp
+// and keeps each clamped value in memory, the shape of a by-value inline argument, and it
+// rereads controlInput.x at every use rather than caching it.
+static inline float BikeAtLeast(float x, float lo)
+{
+    return x <= lo ? lo : x;
+}
+
+static inline float BikeAtMost(float x, float hi)
+{
+    return x >= hi ? hi : x;
+}
+
 static inline float BikeRange(float x, float lo, float hi)
 {
-    if (x <= lo)
-        return lo;
-    return x < hi ? x : hi;
+    return BikeAtMost(BikeAtLeast(x, lo), hi);
 }
 
 int Bike::UnknownVirtualSlot89(float t)
@@ -2112,18 +2123,15 @@ int Bike::UnknownVirtualSlot89(float t)
         }
     }
 
-    float p = controlInput.x;
     float x;
     if (crossoverPose) {
-        // advance the smoothed value toward p, limited by its rate m_0x4
+        // advance the smoothed value toward controlInput.x, limited by its rate m_0x4
         BikeA644* q = poseSmoother;
-        float d = p - *(float*)&q->smoothedValue;
-        if (d < 0.0f) {
-            if (d <= q->maxFall)
-                d = q->maxFall;
-        } else if (d >= q->maxRise) {
-            d = q->maxRise;
-        }
+        float d = controlInput.x - *(float*)&q->smoothedValue;
+        if (d < 0.0f)
+            d = BikeAtLeast(d, q->maxFall);
+        else
+            d = BikeAtMost(d, q->maxRise);
         float step = t < q->smoothTime ? t : q->smoothTime;
         q->smoothRatio = step / q->smoothTime;
         *(float*)&q->smoothedValue = d * q->smoothRatio + *(float*)&q->smoothedValue;
@@ -2169,65 +2177,65 @@ int Bike::UnknownVirtualSlot89(float t)
     } else {
         switch (steerPoseState) {
         case 1:
-            if (p < 0.0f) {
-                if (p < -0.9f)
+            if (controlInput.x < 0.0f) {
+                if (controlInput.x < -0.9f)
                     steerPoseState = 2;
-                x = p * -0.25f;
+                x = controlInput.x * -0.25f;
                 poseParam = BikeRange(x, 0.0f, 0.25f);
             } else {
-                if (p > 0.9f)
+                if (controlInput.x > 0.9f)
                     steerPoseState = 4;
-                x = p * 0.25f + 0.5f;
+                x = controlInput.x * 0.25f + 0.5f;
                 poseParam = BikeRange(x, 0.5f, 0.75f);
             }
             break;
         case 2:
-            if (p > prevControlInput.x) {
+            if (controlInput.x > prevControlInput.x) {
                 steerPoseState = 3;
-                x = p * 0.25f + 0.5f;
+                x = controlInput.x * 0.25f + 0.5f;
                 poseParam = BikeRange(x, 0.25f, 0.5f);
             } else {
-                x = p * -0.25f;
+                x = controlInput.x * -0.25f;
                 poseParam = BikeRange(x, 0.0f, 0.25f);
             }
             break;
         case 3:
-            if (p > -0.032f) {
+            if (controlInput.x > -0.032f) {
                 steerPoseState = 1;
-                if (p < 0.0f) {
-                    x = p * -0.25f;
+                if (controlInput.x < 0.0f) {
+                    x = controlInput.x * -0.25f;
                     poseParam = BikeRange(x, 0.0f, 0.25f);
                 } else {
-                    x = p * 0.25f + 0.5f;
+                    x = controlInput.x * 0.25f + 0.5f;
                     poseParam = BikeRange(x, 0.5f, 0.75f);
                 }
             } else {
-                x = p * 0.25f + 0.5f;
+                x = controlInput.x * 0.25f + 0.5f;
                 poseParam = BikeRange(x, 0.25f, 0.5f);
             }
             break;
         case 4:
-            if (p < prevControlInput.x) {
+            if (controlInput.x < prevControlInput.x) {
                 steerPoseState = 5;
-                x = p * -0.25f + 1.0f;
+                x = controlInput.x * -0.25f + 1.0f;
                 poseParam = BikeRange(x, 0.75f, 1.0f);
             } else {
-                x = p * 0.25f + 0.5f;
+                x = controlInput.x * 0.25f + 0.5f;
                 poseParam = BikeRange(x, 0.5f, 0.75f);
             }
             break;
         case 5:
-            if (p < 0.032f) {
+            if (controlInput.x < 0.032f) {
                 steerPoseState = 1;
-                if (p < 0.0f) {
-                    x = p * 0.25f + 0.5f;
+                if (controlInput.x < 0.0f) {
+                    x = controlInput.x * 0.25f + 0.5f;
                     poseParam = BikeRange(x, 0.5f, 0.75f);
                 } else {
-                    x = p * -0.25f;
+                    x = controlInput.x * -0.25f;
                     poseParam = BikeRange(x, 0.0f, 0.25f);
                 }
             } else {
-                x = p * -0.25f + 1.0f;
+                x = controlInput.x * -0.25f + 1.0f;
                 poseParam = BikeRange(x, 0.75f, 1.0f);
             }
             break;
