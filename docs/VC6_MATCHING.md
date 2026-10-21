@@ -3,11 +3,11 @@
 Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 The 2026-10-21 native Windows VC6 SP3 gate passes its toolchain identity,
-manual smoke and generated-probe checks. Calibration has 2,992 strict-exact
-rows among 3,003 comparisons: 2,985 distinct source/address/extent cases.
-It covers 149 source files, 146 with at least one strict case. The separate
+manual smoke and generated-probe checks. Calibration has 2,994 strict-exact
+rows among 3,005 comparisons: 2,987 distinct source/address/extent cases.
+It covers 150 source files, 147 with at least one strict case. The separate
 physics matrix has 1,086 strict-exact targets among 1,162 comparisons.
-All prior strict cases are retained, with seven newly checked UI methods.
+All prior strict cases are retained, with two newly checked edit-box methods.
 The calibration and physics comparisons report no near-miss score drops.
 Strict results are complete function checks with relocations resolved;
 they do not establish complete translation units or a working game.
@@ -21,23 +21,23 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The current [rider-motion connections](BIKE_RIDER_MOTION_CONNECTIONS.md) preserve
-all 222 prior production objects under three method-name substitutions and one
-external-to-existing-local zero-vector connection: 10,493 nondebug sections and
-45,362 relocations. Seven [UI methods](UI_CONTROL_DEFAULTS.md) have complete
-strict bodies and independently established primary-slot identities.
-The separately reviewed [buffered joystick reader](JOYSTICK_BUFFERED_STATE.md)
-remains nonexact: 1,641 bytes, 128 matching positions against the complete
-1,665-byte retail body. Its 4,520 native scenarios execute actual strict input
-helpers and the byte-verified CRT conversion. Both original aggregate bodies
-remain unchanged; the extracted buffered diagnostic filename differs explicitly.
-The real link compiles 224 translation units and reports 346 unresolved names.
-Private evidence is in `work/game-build/round31-all-objects.json`,
-`round31-link-evidence.json` and `connections-round31-preservation.json`.
+The current [garage setter connections](GARAGE_SETTER_CONNECTIONS.md) preserve
+all 224 prior production objects under two method-name substitutions: 10,504
+nondebug sections and 45,410 relocations. Two [edit-box methods](UI_EDIT_EVENTS.md)
+have complete strict bodies and independently established primary-slot identities.
+The separately reviewed [per-device button query](DEVICE_BUTTON_QUERY.md)
+remains nonexact: 124 bytes, 43 matching positions against the complete
+104-byte retail body. Its 45,489 native scenarios execute four actual strict
+input helpers; the original aggregate's complete object remains unchanged.
+The real link compiles 226 translation units and reports 341 unresolved names.
+Private evidence is in `work/game-build/round32-all-objects.json`,
+`round32-link-evidence.json` and `connections-round32-preservation.json`.
+The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
+and Terrain::QueryGround) are unchanged and are excluded from strict counts.
 
-The final regression run passes 486 tests with eleven skipped (497 total),
-recorded in `work/game-build/tests-round31.log`. Static checking passes for
-219 Python files and 360 JSON files.
+The final regression run passes 490 tests with eleven skipped (501 total),
+recorded in `work/game-build/tests-round32-final.log`. Static checking passes for
+222 Python files and 362 JSON files.
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

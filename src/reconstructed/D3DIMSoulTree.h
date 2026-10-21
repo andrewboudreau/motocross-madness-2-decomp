@@ -71,6 +71,8 @@ public:
     void GetAxes(Vec3* first, Vec3* second);                      // 0x004fc4f0
     void SetPosition(const Vec3& position);                      // 0x004fc660
     void GetSubtreeBounds(Vec3* center, Vec3* extents);            // 0x004fe850
+    void SetAxes(float zx, float zy, float zz, float yx, float yy, float yz,
+                 int orthogonalize, int keepZ);                   // 0x004fbd10
     void SetAxesPtr(const Vec3* z, const Vec3* y, int orthogonalize, int keepZ); // 0x004fbd70
     void Rotate(Vec3 axis, float angle);                         // 0x004fceb0
     void GetLocalMatrix(Matrix4* out);                            // 0x004fca60

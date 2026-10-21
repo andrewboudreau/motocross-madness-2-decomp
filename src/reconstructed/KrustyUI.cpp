@@ -2,6 +2,7 @@
 #include "../krusty2/shadow/D3DIMSoultreeShadow.h"
 #include "../krusty2/motion/D3DIMSoultreeCharacter.h"
 #include "KrustyUI.h"
+#include "../krusty2/math/Vec3.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -281,8 +282,8 @@ void KrustyUI::BuildGarageScene(int value) {
         garageScene->AppendChild(
             KRUSTYUI_GARAGE->CharacterVirtualSlot11(renderContext, "UIgarage.mcf", lights, &context, 1, 1), -1);
         reinterpret_cast<D3DIMSoultreeObject*>(KRUSTYUI_GARAGE->modelNode)->SetUseLighting(0);
-        KRUSTYUI_GARAGE->modelNode->SetPosition(&garageFocus);
-        KRUSTYUI_GARAGE->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
+        reinterpret_cast<SoultreeObject*>(KRUSTYUI_GARAGE->modelNode)->SetPosition(*reinterpret_cast<const Vec3*>(&garageFocus));
+        reinterpret_cast<SoultreeObject*>(KRUSTYUI_GARAGE->modelNode)->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
         reinterpret_cast<Character*>(KRUSTYUI_GARAGE)->SetMotionByName("Spin");
         reinterpret_cast<Character*>(KRUSTYUI_GARAGE)->AdvanceMotion(0.03f, 0, 0);
         UnknownKrustyUIShadow* projected = reinterpret_cast<UnknownKrustyUIShadow*>(new(__FILE__, 0x182) ProjectedShadow(1));
@@ -297,8 +298,8 @@ void KrustyUI::BuildGarageScene(int value) {
             KRUSTYUI_RIDER->CharacterVirtualSlot11(renderContext, "UIRider.mcf", lights,
                                                    &g_TrackGame->textureContext, 1, 1), -1);
         reinterpret_cast<D3DIMSoultreeObject*>(KRUSTYUI_RIDER->modelNode)->SetUseLighting(1);
-        KRUSTYUI_RIDER->modelNode->SetPosition(&KRUSTYUI_RIDER_POSITION);
-        KRUSTYUI_RIDER->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
+        reinterpret_cast<SoultreeObject*>(KRUSTYUI_RIDER->modelNode)->SetPosition(*reinterpret_cast<const Vec3*>(&KRUSTYUI_RIDER_POSITION));
+        reinterpret_cast<SoultreeObject*>(KRUSTYUI_RIDER->modelNode)->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
         reinterpret_cast<Character*>(KRUSTYUI_RIDER)->SetMotionByName("WaitR");
         reinterpret_cast<Character*>(KRUSTYUI_RIDER)->AdvanceMotion(0.03f, 0, 0);
         ((RenderTarget*)renderContext)->SetCamera(0);
@@ -316,8 +317,8 @@ void KrustyUI::BuildGarageScene(int value) {
                                                                       1, 1), -1);
             UnknownKrustyUICharacter* bike = KRUSTYUI_MODELS[i].uiModel;
             reinterpret_cast<D3DIMSoultreeObject*>(bike->modelNode)->SetUseLighting(1);
-            bike->modelNode->SetPosition(&garageFocus);
-            bike->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
+            reinterpret_cast<SoultreeObject*>(bike->modelNode)->SetPosition(*reinterpret_cast<const Vec3*>(&garageFocus));
+            reinterpret_cast<SoultreeObject*>(bike->modelNode)->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
             reinterpret_cast<Character*>(bike)->SetMotionByName("WaitB");
             reinterpret_cast<Character*>(bike)->AdvanceMotion(0.03f, 0, 0);
             painter.PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(bike->modelNode), g_TrackGame->mode.plateNumber);

@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/control/DeviceButtonQuery.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete per-device query passes 45489 native dispatch, real-helper, callback and finite fault comparisons. Standalone VC6 emits 124 bytes with 43 matching positions against 104 retail bytes; four actual input helpers remain strict. Prepared devices do not validate physical input or arbitrary out-of-bounds indices.",
+      "evidence": "docs/DEVICE_BUTTON_QUERY.md#functional-build-review"
+    },
+    {
       "path": "samples/inputdevice/JoystickBufferedState.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete default buffered joystick reader passes 4520 native record, axis, binding, button, timestamp, queue, retry, callback and fault scenarios with actual strict input helpers and the independently byte-verified VC6 conversion routine. The unchanged 1641-byte candidate has 128 matching positions against the complete 1665-byte retail extent including all switch tables. Successful COM calls fully initialize bounded records; diagnostic filenames intentionally differ. Physical devices, real acquisition, scheduling and integrated input remain untested.",

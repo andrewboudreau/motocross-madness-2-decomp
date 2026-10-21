@@ -37,37 +37,36 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 224 C++ files (188 canonical sources and 36
-reviewed candidates) and reaches LINK with 346 unresolved external symbols,
+The 2026-10-21 build compiles 226 C++ files (189 canonical sources and 37
+reviewed candidates) and reaches LINK with 341 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-1vwzypi6` retains all prior strict results and adds
-seven strict UI methods: 2,992/3,003 calibration rows and 1,086/1,162
+The composition in `build-w7963nyq` retains all prior strict results and adds
+two strict edit-box methods: 2,994/3,005 calibration rows and 1,086/1,162
 physics comparisons. This does not establish game startup, menus or racing
-while linkage remains incomplete.
-The full regression run passes: 497 tests, with 486 passed and eleven skipped
-(`work/game-build/tests-round31.log`). Static checking also passes for 219
-Python files and 360 JSON files.
+while linkage remains incomplete. Two existing nonexact physics candidates
+retain their unresolved comparison bindings; neither is counted as strict.
+The full regression run passes: 501 tests, with 490 passed and eleven skipped
+(`work/game-build/tests-round32-final.log`). Static checking also passes for 222
+Python files and 362 JSON files.
 
-The current [rider-motion connections](BIKE_RIDER_MOTION_CONNECTIONS.md) supply
-three existing Character methods at 41 bike call sites and connect a zero-vector
-reference to the already emitted and initialized local storage. Seven
-[UI control methods](UI_CONTROL_DEFAULTS.md) supply independently identified
-default callbacks, interaction predicates and the static-text state setter.
-All 222 prior production objects preserve 10,493 nondebug sections and 45,362
-relocations under three verified method-name substitutions and that one
-external-to-local storage connection. The [buffered joystick reader](JOYSTICK_BUFFERED_STATE.md)
-adds one reviewed nonexact candidate with 4,520 native scenarios using actual
-strict input helpers and the byte-verified CRT conversion. Its complete retail
-extent is 1,665 bytes including the switch tables; the candidate emits 1,641.
-Both buffered and immediate readers are now supplied; device startup and real
-input remain unverified.
-The four isolated links reduce unresolved names **358 → 355 → 348 → 347 → 346**,
+The current [garage setter connections](GARAGE_SETTER_CONNECTIONS.md) supply
+two existing Soultree methods at six call sites, preserving the complete
+3,114-byte caller. The [edit-box methods](UI_EDIT_EVENTS.md) supply ButtonUp
+and UpdateNeedsRedraw, with independently identified primary slots and 4,992
+native cases using real strict helpers. All 224 prior production objects
+preserve 10,504 nondebug sections and 45,410 relocations under only the two
+garage method-name substitutions.
+The [per-device button query](DEVICE_BUTTON_QUERY.md) adds one reviewed
+nonexact dispatcher with 45,489 native scenarios and four actual strict input
+helpers. The standalone candidate emits 124 bytes with 43 matching positions
+against the complete 104-byte retail extent; physical input remains untested.
+The three isolated links reduce unresolved names **346 → 344 → 342 → 341**,
 with no new missing names. Private evidence is in
-`work/game-build/round31-link-evidence.json`, `round31-all-objects.json` and
-`connections-round31-preservation.json`.
+`work/game-build/round32-link-evidence.json`, `round32-all-objects.json` and
+`connections-round32-preservation.json`.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based
@@ -82,7 +81,7 @@ tables (`tests/test_fastmath_link.py`, enabled by `VC6_ROOT` on Windows).
 The physics and game hierarchies now share one [GameObject](GAMEOBJECT.md)
 declaration. This removes incompatible virtual names and parameter types;
 the current composition retains all prior physics targets, with 1,086 now strict-exact, and all
-2,985 distinct strict-exact calibration cases. A native link/runtime regression checks
+2,987 distinct strict-exact calibration cases. A native link/runtime regression checks
 virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 

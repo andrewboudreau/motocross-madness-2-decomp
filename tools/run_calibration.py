@@ -26807,6 +26807,24 @@ CASES = [
         'target_size': 20,
         'reason': 'UIStaticText primary slot 29, inherited by UIDropDownList; writes redraw then state fields',
     },
+    {
+        'name': 'UIEditBox release event and base handling',
+        'bindings': 'src/reconstructed/UIEditBoxEvents.bindings.json',
+        'source': 'src/reconstructed/UIEditBoxEvents.cpp',
+        'symbol': '?ButtonUp@UIEditBox@@UAEHHPAH@Z',
+        'target_va': '0x00474b10',
+        'target_size': 144,
+        'reason': 'UIEditBox primary slot 56 independently identifies this complete folded body',
+    },
+    {
+        'name': 'UIEditBox redraw update',
+        'bindings': 'src/reconstructed/UIEditBoxEvents.bindings.json',
+        'source': 'src/reconstructed/UIEditBoxEvents.cpp',
+        'symbol': '?UpdateNeedsRedraw@UIEditBox@@UAEXXZ',
+        'target_va': '0x00479100',
+        'target_size': 107,
+        'reason': 'UIEditBox primary slot 38 independently identifies this complete folded body',
+    },
 ]
 
 def main():

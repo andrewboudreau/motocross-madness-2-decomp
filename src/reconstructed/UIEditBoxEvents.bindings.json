@@ -1,0 +1,7 @@
+{
+  "?ButtonUp@UIEditBox@@UAEHHPAH@Z": "0x00474b10",
+  "?UpdateNeedsRedraw@UIEditBox@@UAEXXZ": "0x00479100",
+  "?ButtonUp@UIControl@@UAEHHPAH@Z": "0x00472250",
+  "?GetName@UIControl@@QAEPADXZ": "0x00470df0",
+  "?FindLastAnchor@UIControl@@QAEPAV1@PAV1@@Z": "0x00470850"
+}
