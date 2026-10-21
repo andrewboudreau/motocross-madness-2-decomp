@@ -40,7 +40,7 @@
 // and 0x00417b00) belongs to this file is open. Member names are
 // provisional.
 
-class CarProceduralCollision;
+class CollisionObject;  // collision/CollisionObject.h (src/krusty2)
 class LightManager;
 struct UnknownTextureFormatChoice;
 struct UnknownBikeRaceBikeSetup;
@@ -242,7 +242,7 @@ class UnknownBikeRaceProjector;
 // other racers' (the loader 0x00419970).
 struct UnknownBikeRaceRacerPart604 {
     unsigned char field_0x00[0x38];
-    CarProceduralCollision* collisionModel;  // +0x38  Wrecker+0x38 collisionModel (Wrecker.h); the loader pairs it with other racers' collisions
+    CollisionObject* collisionModel;  // +0x38  Wrecker+0x38 collisionModel (Wrecker.h); the loader pairs it with other racers' collisions
 };
 
 // A bike's engine setup (0x5c bytes): the loader copies TrackGameMode
@@ -421,7 +421,7 @@ public:
     Vector3 startPosition;                    // +0x10c start position (0x004210f0)
     Vector3 startDirection;                   // +0x118 start direction
     unsigned char field_0x124[0x128 - 0x124];
-    CarProceduralCollision* collisionObject;  // +0x128  SoultreePhysicsBaseObject+0x128 collisionObject; its +0x68 is set without tree collision (the loader)
+    CollisionObject* collisionObject;  // +0x128  SoultreePhysicsBaseObject+0x128 collisionObject; its +0x68 is set without tree collision (the loader)
     unsigned char field_0x12c[0x3bc - 0x12c];
     UnknownBikeRaceModel* modelNode;          // +0x3bc
     unsigned char field_0x3c0[0x4a0 - 0x3c0];
@@ -431,8 +431,8 @@ public:
     int brakeGyro;                            // +0x5c0 TrackGameMode brakeGyro copy (slot 23 key 0x30)
     UnknownBikeRaceRider* riderCharacter;     // +0x5c4
     unsigned char field_0x5c8[0x5f0 - 0x5c8];
-    CarProceduralCollision* frontWheel;       // +0x5f0 paired with the other racers' (the loader)
-    CarProceduralCollision* rearWheel;        // +0x5f4
+    CollisionObject* frontWheel;       // +0x5f0 paired with the other racers' (the loader)
+    CollisionObject* rearWheel;        // +0x5f4
     unsigned char field_0x5f8[0x604 - 0x5f8];
     UnknownBikeRaceRacerPart604* wrecker;  // +0x604  Bike+0x604 object (SetupWrecker with rider.col, StartAnimatedWreck: Wrecker); its collision model is paired
     unsigned char field_0x608[0x734 - 0x608];
@@ -477,8 +477,8 @@ public:
     unsigned char field_0x138c[0x13f8 - 0x138c];
     float recordStateTimer;  // +0x13F8  KrustyBike recordState(+0x1390).timer: s since the last full record; FLT_MAX/2 forces one
     unsigned char field_0x13fc[0x1414 - 0x13fc];
-    CarProceduralCollision* bikeAndRiderCollision;  // +0x1414  KrustyBike+0x1414 bikeAndRiderCollision (KrustyBike.h, "BikeAndRider.col"); paired between remote racers by the loader
-    CarProceduralCollision* bikeCollision;  // +0x1418  KrustyBike+0x1418 bikeCollision (KrustyBike.h, "Bike.col"); paired between remote racers by the loader
+    CollisionObject* bikeAndRiderCollision;  // +0x1414  KrustyBike+0x1414 bikeAndRiderCollision (KrustyBike.h, "BikeAndRider.col"); paired between remote racers by the loader
+    CollisionObject* bikeCollision;  // +0x1418  KrustyBike+0x1418 bikeCollision (KrustyBike.h, "Bike.col"); paired between remote racers by the loader
     unsigned char field_0x141c[0x160c - 0x141c]; // the GameObject virtual base follows (0x1638 bytes)
 };
 

@@ -16,7 +16,7 @@
     "target_va": "0x00491d10",
     "target_size": 1296,
     "expect": "partial",
-    "notes": "37.0% (523/1296 strict, candidate 1300 bytes). Tier-3: camera/target ray query per game mode. flag/lim assigned in both if arms (prologue, frame 0x20 and lim in ebp match); the mode 2/3 copy path breaks out (retail returns there) and copies position from *a2. Left: the 2/3 normalise join sits after the invsqrt arm (retail after the zero arm), its query call is not cross-jumped into the shared call, and retail homes the case 0/4 call in case 4 (candidate in case 0).",
+    "notes": "40.6% (526/1296 strict, candidate 1288 bytes, 309 aligned instructions). Tier-3: camera/target ray query per game mode. Every game read goes through g_TrackGame (no local copy): retail reloads the global after case 4's `*a3 = bodyForward` store, which may alias it (aligned 275 -> 309). flag/lim assigned in both if arms (prologue, frame 0x20 and lim in ebp match); the mode 2/3 copy path breaks out (retail returns there) and copies position from *a2. Left: the 2/3 normalise join sits after the invsqrt arm (retail after the zero arm), its query call is not cross-jumped into the shared call, and retail homes the case 0/4 call in case 4 (candidate in case 0).",
     "bindings": "KrustyBikeNearMisses.bindings.json"
   },
   {

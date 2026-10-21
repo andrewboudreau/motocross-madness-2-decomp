@@ -557,6 +557,11 @@ trying on other `[base+index]` / `add r, r` order near misses.
   stack across the compare (`fld; fcom; jne; fstp st(0); fld c`); the in-place forms
   `if (!(v.x < c)) v.x = c` and `v.x = v.x < c ? v.x : c` reload or spill it. Vehicle
   slot 19.
+- A two-sided clamp written as two one-sided by-value helpers, `AtMost(AtLeast(x, lo), hi)`,
+  homes the intermediate in a frame slot (`fst [m]; fcomp lo; ...; fld [m]; fld [m]; fcomp
+  hi`), and a limit read from memory (`AtLeast(d, q->maxFall)`) is first copied to a frame
+  temp with integer moves (`mov eax, [ecx + 0x10]; mov [t], eax; fcom [t]`). One helper
+  with both compares keeps the value on the x87 stack. Bike slot 89 `0x406ae0`.
 - Identical tails written out in each branch (`case 9: ...; tail; break; case 10: ...;
   tail; break;`) are cross-jumped: the fall-through branch keeps its copy and its own
   epilogue, the other branch jumps into it. A shared `goto` label or a tail after the
