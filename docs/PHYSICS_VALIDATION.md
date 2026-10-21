@@ -498,7 +498,9 @@ Still partial in SoulTreePhysics.cpp:
   scaling differs.  Retail keeps the inverse length duplicated (`fld st(0); fmul st(3)` for
   x, `fld [d.y]; fmul st(1)` for y, `fxch; fmul` for z) and pops `d.x` at the end; the
   `Vec3(d.x * inv, ...)`, `d * inv`, `inv * d` and `d * (1.0f / len)` forms all consume
-  `d.x` first (`fxch st(2); fmul st(2)`).
+  `d.x` first (`fxch st(2); fmul st(2)`). The unchanged standalone now has a
+  [finite native behavior review](STEERING_AXIS_FROM_POINTS.md), including actual
+  cache/transform helpers; its 230-byte body remains nonexact against all 234 retail bytes.
 
 ```bash
 python tools/run_physics_samples.py --strict --source src/krusty2/soultree/SoulTreePhysics.cpp \

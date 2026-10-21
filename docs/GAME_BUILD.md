@@ -41,49 +41,53 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 241 C++ files (196 canonical sources and 45
-reviewed candidates) and reaches LINK with 277 unresolved external symbols,
+The 2026-10-21 build compiles 245 C++ files (199 canonical sources and 46
+reviewed candidates) and reaches LINK with 271 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The composition in `build-puygm1gk` retains every prior strict result:
-3,008/3,019 calibration rows and 1,086/1,162 physics comparisons, with no
+The composition in `build-55x25rcs` retains every prior strict result:
+3,013/3,024 calibration rows and 1,086/1,162 physics comparisons, with no
 partial-score decreases. The two existing nonexact physics comparison-binding
 diagnostics are unchanged and excluded from strict counts.
 
-[Rider motion-start calls](RIDER_MOTION_START.md) now reach the existing
-reviewed nonexact Character provider. Both production calls and three sample
-calls retain complete caller bytes; the three objects preserve 756 nondebug
-sections and 3,586 relocations under the two names. The unchanged provider passes
-320,999 finite native state, callback, rounding and exception cases.
+Two [by-value position providers](SOULTREE_POSITION_VALUE.md) supply the
+existing physics and rendering call views. Both match the complete 38-byte
+retail body and call the real hierarchy-cache implementation. Existing motion,
+LightEmitter and Scene callers remain unchanged. Validation passes 121 strict
+checks and 158,212 native cache, overlap, raw-bit and fault scenarios per setter.
+These are two source views of one retail body, not two recovered retail functions.
 
-[Scene restart](SCENE_MOTION_CONNECTIONS.md) now uses the actual strict
-Character::SetMotion and AdvanceMotion implementations. Primary receiver and
-Motion-pointer production are independently traced through the animation reader.
-The complete 280-byte caller and 27/1,293-byte providers remain strict; 62,215
-native cases exercise actual restart, frame, callback and fault behavior.
+Three [vector-value arithmetic providers](VECTOR_VALUE_ARITHMETIC.md) supply
+existing collision and Wrecker call views. All three complete 69-byte bodies
+match strictly. Wrecker's full 4,178-byte Tick remains strict; the collision
+consumer retains its existing 1,493-byte partial body and 1,309 matching positions.
+The providers pass 152,535 native hidden-result, overlap, FP and fault cases.
 
-The [race stream refill](RACE_SOUND_REFILL.md) supplies one missing gameplay
-method as an individually reviewed nonexact candidate. It emits 2,038 bytes
-against 2,032 retail bytes, with 806 matching positions. Its extraction preserves
-all 106 aggregate sections and 579 relocations. Actual strict Sound helpers and
-independent byte/selection oracles support 4,782 native cases. COM and rand are
-scripted; actual audio playback remains untested.
+[Steering-axis setup](STEERING_AXIS_FROM_POINTS.md) supplies a missing Bike load
+dependency as an individually reviewed nonexact candidate: 230 emitted bytes
+against 234 retail bytes, with 145 matching positions. Its extraction preserves
+all 32 aggregate sections and 90 relocations. Actual cache/transform helpers
+and independent result/partial-write oracles support 100,852 native scenarios.
+The existing direction helper remains nonexact; the review is explicitly finite.
 
-All 240 prior production objects retain 10,603 nondebug sections and 45,556
-relocations under only the four verified motion-call connections, with no
-filename exclusions. The new refill object is independently recompiled with the
-actual game's command and preserves all section bytes and relocations. Real
-isolated links remove exactly five missing names, **282 -> 280 -> 278 -> 277**,
-with none added. The final report verifies all 241 source hashes, 224 header
-hashes, configuration, profile and per-source flags. Private evidence is in
-`work/game-build/round42-link-evidence.json`, `round42-all-objects.json`,
-`round42-admitted.json` and `connections-round42-preservation.json`.
+All 241 prior production objects retain 10,605 nondebug sections and 45,567
+relocations with no symbol substitutions or filename exclusions. All four new
+objects are independently recompiled with the actual game's commands and
+preserve every section byte and relocation. The accepted composition removes
+six missing names, **277 -> 276 -> 272 -> 271**, with none added. Earlier
+isolated vector and position links are retained as diagnostics; the final
+position implementation preserves the complete old objects. The final report
+verifies all 245 source hashes, 224 header hashes, configuration, profile and
+per-source flags. Private evidence is in `work/game-build/round43-link-evidence.json`,
+`round43-all-objects.json`, `round43-admitted.json` and
+`connections-round43-preservation.json`.
 
 Linking, startup, integrated menus and racing remain unverified. The full
-regression suite passes 516 tests, with 11 explicit skips (527 total). Static
-checks pass for 246 Python files and 379 JSON files.
+regression suite passes 519 tests, with 11 explicit skips (530 total). The
+expanded position initializer check also passes in a fresh focused rerun.
+Static checks pass for 249 Python files and 384 JSON files.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based

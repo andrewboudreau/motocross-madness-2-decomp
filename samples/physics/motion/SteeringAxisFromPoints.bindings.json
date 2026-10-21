@@ -1,0 +1,5 @@
+{
+  "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
+  "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd710",
+  "__real@4@3fff8000000000000000": "0x00550748"
+}

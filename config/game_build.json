@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/physics/motion/SteeringAxisFromPoints.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete steering-axis setup passes 100852 finite native cache, transform, alias, FP and fault scenarios with actual scene helpers and independent result/partial-write oracles. VC6 emits 230 bytes against 234 retail bytes, with 145 matching positions; extraction preserves all 32 aggregate sections and 90 relocations. The existing direction helper remains nonexact; arbitrary NaN payloads and resumable exception equivalence are outside this validation.",
+      "evidence": "docs/STEERING_AXIS_FROM_POINTS.md#functional-build-review"
+    },
+    {
       "path": "samples/race/RaceSoundRefill.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete engine-stream refill passes 4782 finite native state, sample-copy, callback, alias and fault cases with actual strict Sound helpers and independent byte/random-selection oracles. VC6 emits 2038 bytes against 2032 retail bytes, with 806 matching positions; extraction preserves all 106 aggregate sections and 579 relocations. COM and rand boundaries are scripted; unwritten cursor outputs and integrated audio playback are outside this validation.",

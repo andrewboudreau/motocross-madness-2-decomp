@@ -1,0 +1,30 @@
+{
+  "baseline": "e5ec20dc; same-path full old/current objects preserve all nondebug bytes and destinations with no symbol substitutions. Only the existing cache-helper declaration is added to the rendering header. Filename roots normalize for checkout portability; named sections retain their complete identity independent of RTTI COMDAT ordering.",
+  "objects": {
+    "src/reconstructed/LightEmitter.cpp": {
+      "sections": 57,
+      "relocations": 172,
+      "sha256": "7343eebd775bc98eb5b27b09c19e3334db09484412f6b382028ac08a8e0b3c10"
+    },
+    "src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp": {
+      "sections": 62,
+      "relocations": 273,
+      "sha256": "e10bf0bf9315e70fe3b91097b643fac80a37554bb9dc655873ae4177f66c0d21"
+    },
+    "samples/track/SceneManagerNearMisses.cpp": {
+      "sections": 96,
+      "relocations": 484,
+      "sha256": "40bdebbef702df0512a88c6a75fb9dec97855a80f2927fa2de395de0b305a9d7"
+    },
+    "samples/race/BikeRaceNearMisses.cpp": {
+      "sections": 206,
+      "relocations": 1929,
+      "sha256": "b0cf32fff68135862fa2bd3c5cfdd46cb3f941b4c3ff9813222c4efa9e425f09"
+    },
+    "src/reconstructed/SceneManager.cpp": {
+      "sections": 272,
+      "relocations": 1273,
+      "sha256": "5bd60167656a49762aab6de1f23b8b87e77fd752681186cce58ce8a83f30f014"
+    }
+  }
+}
