@@ -23,55 +23,40 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The [Soultree emitter connections](SOULTREE_ATTACHMENT_EMITTERS.md) join nine
-calls to the canonical Dust and Steam methods. Actual Bike and Scene producers,
-primary RTTI, slot37 registration and the caller instructions support seven
-name substitutions. The isolated link removes seven missing names: **202 -> 195**.
-All 270 old objects preserve 10,816 nondebug sections and 46,075 relocations
-under those names, without filename exclusions. The retained test passes 66
-strict checks and 130,816 finite native store cases, including 30,080 modeled
-access faults. The two existing Soultree partial fingerprints remain unchanged.
+The [followed-racer collision connection](FOLLOWED_RACER_COLLISIONS.md)
+replaces three provisional calls with the existing KrustyBike notification
+provider. All nine racer constructor/store paths, the caller instructions and
+primary/secondary RTTI offsets support the unchanged primary pointers. No
+provider, storage, shared header, compiler flag or calibration row is added.
 
-The [Character two-motion blend](CHARACTER_MOTION_BLEND.md) adds a reviewed
-nonexact gameplay implementation for the complete 1,011-byte retail function.
-Its ordinary method, first-interpolation helper and shared conversion helper
-emit 441, 652 and 368 bytes. This is not a strict match for the new method.
-The genuine Character declaration, primary rider receiver, actual math helpers
-and bounded slot4 callback tests support its functional admission. The finite
-native suite passes 576,692 cases and rejects three incorrect math/conversion
-controls. Temporary pose padding, full x87 register context, exception resumption,
-constructed lifetimes and integrated animation remain outside that evidence.
+The isolated real link removes exactly one name: **193 -> 192**, with none
+added. All 271 old objects preserve 10,833 nondebug sections and 46,129
+relocations under that one verified name, without filename exclusions. All
+271 source hashes, 240 header hashes, configuration and compiler flags agree
+with the actual build inputs.
 
-The blend link removes the genuine method and its provisional rider name:
-**195 -> 193**, with none added. Existing objects remain unchanged under the
-rider-call name except for a separately proved math dependency repair:
-InterpolatePose retains all 1,205 instruction bytes and its strict match while
-two call relocations at offsets 302 and 609 now reach the existing strict dot
-provider. Every other aggregate section is unchanged. The new candidate adds
-17 nondebug sections and 54 relocations, including documented header-generated
-initializers. Only the new candidate adds /QIfist; existing per-source flags
-are unchanged. All 271 source hashes, 240 header hashes and build inputs agree.
+The retained test passes 20 complete strict comparisons, three whole-object
+pins and both unchanged FollowRacer partial fingerprints. Its actual-source
+native fixture passes 20,432 independent state/fault-oracle cases, including
+10,960 modeled access faults and 32 real-CRT allocation/duplicate-owner cases.
+It does not execute mapped retail code; separate full-body strict comparisons
+establish the tested game helpers' byte identity. Prepared object storage and
+finite alias/fault cases do not establish constructor or gameplay lifetimes.
+All three affected tests pass, including the existing iterator and picker.
 
 Calibration retains **3,023/3,034** strict rows (3,007 distinct source/address/
-extent cases, and 2,980/2,990 unique retail address/extent pairs). Physics retains
-**1,086/1,162** strict comparisons. Both isolated slices preserve every prior
-score, full extent and strict result, including the two prior nonexact binding
-diagnostics. No calibration row is added for the nonexact blend implementation.
+extent cases and 2,980/2,990 unique retail address/extent pairs). Physics retains
+**1,086/1,162** strict comparisons. Every prior score, full extent and strict
+result is unchanged, including the two existing nonexact binding diagnostics.
 
-Shared fixture records were combined by source identity: current Vehicle rows
-remain intact while reviewed Bike rows change. Three additional fingerprints in
-the newer Vehicle and Soultree fixtures were reproduced from actual link/test
-objects before deriving their one-name transitions. Six combined affected
-tests pass in the actual checkout, including the new native suites and prior
-emitter, gameplay-default and rider checks.
-
-Evidence: `work/game-build/round60-soultree-link-proof.json`,
-`round60-blend-link-proof.json`, `connections-round60-soultree-preservation.json`,
-`connections-round60-preservation.json` and `round60-blend-retained.log`.
+Evidence: `work/game-build/round61-collision-link-proof.json`,
+`connections-round61-collision-preservation.json` and
+`round61-collision-retained.log`.
 The game still does not link; startup, integrated menus and racing are unverified.
 
-Static checks pass for 285 Python and 435 JSON files. Full regression passes:
-568 tests, 557 passed and 11 skipped (`work/game-build/tests-round60.log`).
+Static checks pass for 286 Python and 436 JSON files. Full regression passes:
+569 tests, 558 passed and 11 skipped (`work/game-build/tests-round61-collision.log`).
+
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

@@ -1,0 +1,42 @@
+{
+  "renames": {
+    "?UnknownFunction496f90@UnknownEventRacer@@QAEXPAU1@@Z": "?Fn_00496F90@KrustyBike@@QAEXPAV1@@Z"
+  },
+  "objects": {
+    "src/reconstructed/FollowRacer.cpp": {
+      "sections": 7,
+      "relocations": 17,
+      "sha256": "8a13a364930424dc3fbc0c2adb2035ebc8a2e5646f7d5405019aaf0936acd93e"
+    },
+    "samples/race/FollowRacerNearMisses.cpp": {
+      "sections": 11,
+      "relocations": 32,
+      "sha256": "30a40a15314bfe841a59e7b9de1f60a41f8b0ffb7653a37556863165b011ed7a"
+    },
+    "samples/race/FollowedRacerPicker.cpp": {
+      "sections": 4,
+      "relocations": 10,
+      "sha256": "8c3acf9e0fd1e0698faa5cacb33b0e08808b66cf8ecc16289a1754a256ded00d"
+    }
+  },
+  "partials": [
+    {
+      "symbol": "?PickFollowedRacer@TrackGameViewOwner@@QAEXXZ",
+      "va": 4889888,
+      "retail_size": 340,
+      "size": 342,
+      "score": 67,
+      "raw_sha256": "611f2e5870390a8cb83be11a1407b24d7fd3ebf097dc17690107e2c0964d51a3",
+      "resolved_sha256": "458488750e4bac7e802c4cfedbd485c6a2abb98a503c88e044ab31a9f57a78fc"
+    },
+    {
+      "symbol": "?SetFollowedRacer@TrackGameViewOwner@@QAEXPAUUnknownEventRacer@@0H@Z",
+      "va": 4890240,
+      "retail_size": 272,
+      "size": 272,
+      "score": 259,
+      "raw_sha256": "5cbe9db0685f5d30a286b558e2f22bd3188e6c9e7764b9d6a0c0ad579f6efed0",
+      "resolved_sha256": "6f7a0fdf97b1e244baeb6a3f3af7cf634acda08a0ea738fd1e3de094ccc7032d"
+    }
+  ]
+}

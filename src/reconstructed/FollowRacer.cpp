@@ -10,6 +10,7 @@
 
 #include "BikeRace.h"
 #include "TrackGame.h"
+#include "../krusty2/vehicle/KrustyBikeCore.h"
 
 // Replay angle delta step. Retail holds 0.0490873456f (0x0055534c), which is
 // 3.14159f / 64 exactly, not the correctly rounded pi / 64 that KrustyBike.cpp
@@ -62,10 +63,10 @@ void TrackGameViewOwner::AnnounceFollowedRacer(UnknownEventRacer* racer, Unknown
         if (other == racer)
             continue;
         if (racer)
-            racer->UnknownFunction496f90(other);
+            reinterpret_cast<KrustyBike*>(racer)->Fn_00496F90(reinterpret_cast<KrustyBike*>(other));
         if (previous && previous != other)
-            other->UnknownFunction496f90(previous);
+            reinterpret_cast<KrustyBike*>(other)->Fn_00496F90(reinterpret_cast<KrustyBike*>(previous));
         if (racer)
-            other->UnknownFunction496f90(racer);
+            reinterpret_cast<KrustyBike*>(other)->Fn_00496F90(reinterpret_cast<KrustyBike*>(racer));
     }
 }

@@ -9,5 +9,5 @@
   "notes": "2980 of 2990 unique retail address/extent pairs passed strict comparison in 3034 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). There are 3023 strict rows and 3007 distinct source/address/extent cases; multiple source definitions may share a retail address. Every strict comparison resolves all relocations or has no relocation bytes. The 11 nonexact rows are BaseObject::Release, seven UI compiler-shape probes, two FollowRacer near misses (0x4a9d20, 0x4a9e80) and the GridNode near miss 0x484d70. The UIStatic zero-return probe remains nonexact while the independently identified UIStaticText body at the same address now matches strictly. The separately reviewed physics runner has 1086 strict exact results among 1162 comparisons; those results are not included in this calibration percentage. Neither suite is a census of retail functions or evidence that the source-built game links or runs. RTTI/source-path and .text figures retain their hash-pinned executable provenance.",
   "vc6_case_count": 3034,
   "vc6_profile": "vc6_o2_mt",
-  "reviewed_commit": "61375ff1ea388e52731ae5aa3b1adb675148174a plus these validated slices (source hashes: work/game-build/build-3dvwvszm/report.json)"
+  "reviewed_commit": "c524a871fc6bd2bfcdff8b365630c13a608d5290 plus this validated slice (source hashes: work/game-build/build-wuy_ooiv/report.json)"
 }
