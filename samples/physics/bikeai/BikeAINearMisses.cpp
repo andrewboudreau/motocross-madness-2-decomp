@@ -1520,7 +1520,9 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 // The local declaration order is inert.  Writing the gate tail after the loop with gotos
 // compiles to identical code: the block order comes from the flow graph, and retail's has
 // an extra `xor ebp, ebp` re-zero edge after the loop (its tail stores field_0x11b0 from
-// the zero register, the candidate an immediate).
+// the zero register, the candidate an immediate). Both builds give the loop
+// counter ebp (`xor ebp, ebp ; ... inc ebp`); retail then restores the zero web
+// in ebp for the tail, the candidate ends the zero web at the loop.
 // 0x00572988: look-ahead distance of the race-kind 2/3 path samples (100.0f).
 extern float g_BikeAILookAhead_00572988;
 

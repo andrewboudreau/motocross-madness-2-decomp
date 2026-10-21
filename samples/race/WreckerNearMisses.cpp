@@ -32,7 +32,9 @@
 // direct-initialised push (370), push and previousPush (113), sum (124)
 // or previousSum (117), a component-wise sum (216), `sum = sum + push`
 // (259) and `hits++` before the sum (929); a direct-initialised p is
-// unchanged.
+// unchanged. The extent and previous copies have four accesses each in both
+// builds (the z extent five in retail), so the per-byte use count does not
+// explain retail ranking the extent copies among the vectors.
 //
 // SprayContactParticles (0x00531740, 1624 bytes; 1606/1624): the contact
 // particle spray. Frame, slot order and every instruction but two match

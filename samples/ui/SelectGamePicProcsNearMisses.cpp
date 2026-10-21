@@ -30,6 +30,12 @@
 //   same flow, calls, frame size and message layout; register allocation
 //   differs: retail keeps the racer total in memory (+0x1c) and the bike,
 //   rider and name arrays in edi/ebx/ebp, VC6 here enregisters the total.
+//   After the settings copies retail tests `start` through the ax it
+//   stored to message.start (`test ax, ax`) and loads `this` straight into
+//   esi; VC6 here loads `this` into eax and compares the argument in
+//   memory. `if (message.start)` (copy-propagated to `start`) and `!= 0`
+//   are inert (933 of 2120); reading racerCount in the last loop loses
+//   (aligned 499 -> 460).
 
 #include "../../src/reconstructed/SelectGamePicProcs.cpp"
 
