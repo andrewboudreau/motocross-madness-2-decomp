@@ -77,7 +77,7 @@
 //   comparison (249) do not give retail's two result homes, and neither
 //   does an inline pixel-test helper taking `opaque` by reference or by
 //   pointer (256, same code: the Lock-failure return still folds to 0).
-// 0x004738a0 UIEditBox slot 40 (440/975): retail keeps the width and the
+// 0x004738a0 UIEditBox slot 40 (206/975): retail keeps the width and the
 //   redraw count in memory. Retail reloads width into edi at the loop top
 //   (0x47396d) and consumes that copy in the scroll arms (`sub edi, ebx`),
 //   reading [esp+0x14] for the caret limit; the Blit and no-texture arms
@@ -440,13 +440,11 @@ int UIEditBox::Draw() {
                 if (!height)
                     height = ownerDialog->dialogFontHeight;
                 rect.bottom = rect.top + height + 1;
-                // FIXME: this local initialises from itself (C4700), so the store
-                // below goes through an uninitialised pointer; retail stores to
-                // the member (`lea ebx, [esi + 0x214]`). The correct
-                // `*(CameraRect*)caretRect = rect` keeps aligned 198 but is 975
-                // bytes (strict 440 -> 206), so it waits for the frame fix.
-                CameraRect* caretRect = (CameraRect*)caretRect;
-                *caretRect = rect;
+                // Retail stores to the member (`lea ebx, [esi + 0x214]`). The
+                // earlier self-initialised local (C4700) scored strict 440 by
+                // storing through an uninitialised pointer; the correct store
+                // is 975 bytes (strict 206, aligned 198) until the frame fix.
+                *(CameraRect*)caretRect = rect;
                 if (backgroundBrush)
                     FrameRect((HDC)dc, (RECT*)&rect, (HBRUSH)backgroundBrush);
                 else
