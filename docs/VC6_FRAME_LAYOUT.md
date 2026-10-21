@@ -248,7 +248,10 @@ symbol, `--va` the retail function. The report shows:
 - the frame accesses of both functions, `[esp+N]` with the push depth
   tracked (callee cleanup from the callees' mangled names in the candidate's
   relocations, carried over to the aligned retail calls; `add esp` look-ahead
-  otherwise) and `[ebp-N]` in ebp frames;
+  otherwise, corrected when one `add esp` cleans several calls; forward
+  branches carry their depth into early returns and shared call tails; a
+  second push of a saved register is an argument) and `[ebp-N]` in ebp
+  frames;
 - the candidate-to-retail slot map, voted from instruction-aligned accesses
   (a sync walk that keeps repeated `strcpy` expansions in step), the retail
   slot order and retail slots that no candidate local maps to (a retail

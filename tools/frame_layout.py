@@ -414,11 +414,16 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
     instructions) and argument pushes raise the tracked depth; ``pop``,
     ``add esp`` lower it. After a ``call`` that no ``add esp`` follows, the
     pushes since the previous call are assumed popped by the callee
-    (stdcall/thiscall); pushes of ebx/esi/edi/ebp before the first call are
-    callee-saved and exempt. The ``add esp`` may be scheduled a few
-    instructions after the call (before the next push, call or branch). That
-    reset and the return to the base depth after every ``jmp``/``ret`` (a
-    new basic block) are the tracker's heuristics. ``[ebp-N]`` operands count
+    (stdcall/thiscall); the first push of each of ebx/esi/edi/ebp before the
+    first call is callee-saved and exempt (a second push of one is an
+    argument). The ``add esp`` may be scheduled a few instructions after the
+    call (before the next push, call or branch), and one ``add esp`` may clean
+    several cdecl calls; bytes beyond the pending arguments undo a pop the
+    look-ahead assumed. After a ``jmp``/``ret`` (a new basic block) the depth
+    returns to the base, unless a forward branch targets the next block: then
+    that branch's depth and pending arguments resume (an early return's ``pop
+    esi; ret``, a call tail shared by branches). These resets are the
+    tracker's heuristics. ``[ebp-N]`` operands count
     only in ``mov ebp, esp`` frames.
     """
     info = FrameInfo()
@@ -429,11 +434,14 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
     early_sub = None     # index of a ``sub esp, N`` scheduled below body instructions
     ebp_based = False
     frame = 0
+    saved = set()        # callee-saved registers already pushed
     while i < n:
         ins = insns[i]
         m, o = ins.mnemonic, ins.op_str
         if m == 'push' and re.fullmatch(r'e[a-d]x|e[sd]i|ebp|-?0x[0-9a-f]+|-?\d+', o):
             pushed_before_frame += 4
+            if o in ('ebx', 'esi', 'edi', 'ebp'):
+                saved.add(o)
             if ebp_based:
                 pushed_after_mov_ebp += 4
             i += 1
@@ -481,7 +489,9 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
     pending = 0          # argument bytes pushed since the last call / add esp
     seen_call = False
     base_depth = None    # depth outside argument sequences (callee-saved pushes)
-    branch_depths = {}   # forward branch target address -> depth at the branch
+    branch_depths = {}   # forward branch target -> (depth, pending) at the branch
+    awaiting = 0         # argument bytes of cdecl calls not yet cleaned by ``add esp``
+    guessed = 0          # argument bytes the look-ahead assumed a callee popped
     after_branch = False
     for j in range(i, n):
         ins = insns[j]
@@ -489,12 +499,12 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
         if after_branch and ins.address in branch_depths:
             # the block after a jmp/ret is entered from a branch above it (an
             # early return's ``pop esi; ret`` must not drop the depth of the rest)
-            depth = branch_depths[ins.address]
+            depth, pending = branch_depths[ins.address]
         after_branch = False
         if m.startswith('j') and re.fullmatch(r'0x[0-9a-f]+', o):
             target = int(o, 16)
             if target > ins.address:
-                branch_depths.setdefault(target, depth)
+                branch_depths.setdefault(target, (depth, pending))
         fo = frame_operand(o, m)
         if fo is not None:
             reg, disp, width = fo
@@ -512,8 +522,11 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
             after_branch = True
         if m == 'push':
             depth += 4
-            if seen_call or o not in ('ebx', 'esi', 'edi', 'ebp'):
+            if seen_call or o not in ('ebx', 'esi', 'edi', 'ebp') or o in saved:
+                # a register saved once already is an argument the second time
                 pending += 4
+            else:
+                saved.add(o)
         elif m == 'pop':
             depth = max(0, depth - 4)
             pending = max(0, pending - 4)
@@ -525,8 +538,15 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
                 depth += _imm(o[5:])
                 pending += _imm(o[5:])
         elif m == 'add' and o.startswith('esp, '):
-            depth = max(0, depth - _imm(o[5:]))
-            pending = 0
+            size = _imm(o[5:])
+            # VC6 merges the cleanup of consecutive cdecl calls into one ``add
+            # esp``; bytes beyond the known arguments belong to an earlier call
+            # the look-ahead took for stdcall
+            excess = size - awaiting - pending
+            if excess > 0 and guessed:
+                depth += min(guessed, excess)
+            depth = max(0, depth - size)
+            pending = awaiting = guessed = 0
         elif m == 'call':
             if not seen_call:
                 base_depth = depth - pending
@@ -546,8 +566,11 @@ def track_frame(insns: list[Insn], conventions: dict[int, bool] | None = None) -
                 known = not cdecl
                 if known and pending:
                     info.depth_resets += 1
+                    guessed += pending
             if known and pending:
                 depth = max(0, depth - pending)
+            elif not known:
+                awaiting += pending
             pending = 0     # a cdecl callee's arguments wait for a later ``add esp``
         info.depths.append((j, depth))
     return info
