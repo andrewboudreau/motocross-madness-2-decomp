@@ -54,7 +54,7 @@ the integration temporary. When only displacement sizes differ, read the
 | camera/Camera | `0x0042ee30` | 487/492 | c | `sub esp, 0x40` emitted after the `rep movsd` that copies the projection argument (retail before it) in the first MatrixMult; argument copies, viewport temporaries and declaration forms do not move it |
 | camera/FollowCamera | `0x00462ee0` | 511/564 | c | constructor: the post-call copies match; VC6 fills the +0x29c vector copy's load-delay slot with the +0x274/+0x2dc zero stores where retail uses +0x2e4/+0x276 (28 positions of the pair and 29 of the copy tried) |
 | camera/FollowCamera | `0x00463a30` | 903/4042 | b | slot 45 (keyboard/joystick controls), 138 code diffs; aligned instruction ratio 0.937 (samples/camera/FollowCameraNearMisses.cpp) |
-| camera/FollowCamera | `0x004650e0` | 509/937 | b | retail keeps the two cross products in memory temporaries (frame 0x18c vs 0x180); branch targets of the two `je` tests |
+| camera/FollowCamera | `0x004650e0` | 519/1014 | b | frame 0x18c as retail (second cross product normalised straight from the call); retail keeps the first product's components in memory temporaries and reads them for the second; branch targets of the two `je` tests |
 | camera/FollowCamera | `0x00465c20` | 3659/3672 | b | 4 code diffs: retail adds `lea ecx, [esp + N]`; retail lacks `lea ecx, [esp + N]`; slots differ |
 | camera/KrustyBikeCamera | `0x00497e20` | 337/376 | c | 10 code diffs: `mov ecx, [A]` vs `mov edx, [A]`; retail lacks `lea eax, [esp + N] ; mov edx, [ecx + 0x~` |
 | control/ControlInterface | `0x004bf4f0` | 76/104 (inside ControlInterface.cpp) | c | tails merged as in retail; retail places the mouse pointer load after the shared block's `ret` and jumps back, VC6 places it after the keyboard load |

@@ -47,15 +47,16 @@
 // (they keep the sum on the FPU stack), and the key queries must be macros: with inline
 // helpers VC6 runs out of inline budget and calls the Vector3 constructor.
 //
-// FollowCamera::LoadCameraFile (0x004650e0, 1012 bytes): about half the
-// bytes match. Registers and the EH frame agree once the frame pointer is taken
-// before the vector maths; retail keeps the two cross products in memory
-// temporaries (12 more frame bytes) where VC6 keeps them on the FPU stack.
-// Retail stores each component of the first product to a temporary, copies
-// it to `side` and reads the temporary (not `side`) in the second product.
-// A named result (`Vector3 r; r.x = ...`), float locals, by-value operands
-// (either or both) and assignment instead of initialisation (41 forms) keep
-// frame 0x180 (508..513).
+// FollowCamera::LoadCameraFile (0x004650e0, 1014 bytes; 519 here, 952 bytes):
+// registers and the EH frame agree once the frame pointer is taken before the
+// vector maths.  Normalising the second cross product straight from the call
+// (`up = Vec3Normalize(FollowCameraCross(direction, side))`) gives retail's frame
+// 0x18c: the product becomes a memory temporary passed by reference.  Retail also
+// stores each component of the first product to a temporary, copies it to `side`
+// and reads the temporary (not `side`) in the second product.  A named result
+// (`Vector3 r; r.x = ...`), float locals, by-value operands (either or both) and
+// assignment instead of initialisation (41 forms) keep that product on the FPU
+// stack (508..513 with the separate normalisation).
 //
 // FollowCamera::FollowCamera (0x00462ee0, 564 bytes; 511 of 564): every
 // store value, offset and the static slot-71 call are right. Storing the
@@ -265,8 +266,7 @@ void FollowCamera::LoadCameraFile(const char* path) {
             Matrix4* frame = &frames[k];
             Vector3 forward = direction;
             Vector3 side = FollowCameraCross(upHint, direction);
-            Vector3 up = FollowCameraCross(direction, side);
-            up = Vec3Normalize(up);
+            Vector3 up = Vec3Normalize(FollowCameraCross(direction, side));
             forward = Vec3Normalize(forward);
             side = CrossProduct(up, forward);
             frame->m[0][0] = side.x;
