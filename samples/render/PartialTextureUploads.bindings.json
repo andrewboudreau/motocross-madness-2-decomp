@@ -1,0 +1,18 @@
+{
+  "??0PCRenderTarget@@QAE@XZ": "0x004c4ee0",
+  "??0PCTextureMap@@QAE@PAVTextureMapManager@@H@Z": "0x004c5f00",
+  "??2@YAPAXIPBDH@Z": "0x004a3010",
+  "??3@YAXPAXPBDH@Z": "0x004a3060",
+  "??_C@_0M@DKPE@partblt?4tga?$AA@": "0x005715d0",
+  "?InitializeRenderTarget@PCRenderTarget@@QAEPAVRenderTarget@@PAUUnknownDisplay@@PBUUnknownGuid@@PAUUnknownSurfaceInterface@@HH@Z": "0x004c4f80",
+  "?SetFullscreenDisplayMode@UnknownDisplay@@QAEHHH@Z": "0x004ca900",
+  "?ProbePartialTextureUploads@UnknownDisplay@@QAEXPAVRenderTarget@@@Z": "0x004cab00",
+  "?ProbePartialTextureUploads@UnknownDisplay@@QAEXPAVRenderTarget@@@Z$ehhandler": "0x0054ce2c",
+  "?TestPartialTextureUpload@@YAHPAVPCRenderTarget@@PAUUnknownRect@@PAVPCTextureMap@@22PAUUnknownDisplay@@H@Z": "0x004caf70",
+  "?LoadFile@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x005125c0",
+  "?FreeFile@@YAXPAUUnknownTgaFile@@@Z": "0x00512dd0",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
+  "_IID_IDirect3DHALDevice": "0x005561b0",
+  "__FILE__": "0x005714f4",
+  "__except_list": "0x00000000"
+}

@@ -100,16 +100,14 @@ instruction scheduling around the surface-description size store and
 `FillPixelFormat`. This is a reviewed behavioral candidate, not a strict match
 or a reconstruction of the complete original translation unit.
 
-The functional build explicitly admits this candidate. It supplies
-`ProfileDisplays`, but introduces its previously unlinked dependency
+The functional build explicitly admits this candidate. Its initial admission
+supplied `ProfileDisplays` but exposed a previously unlinked dependency,
 `void UnknownDisplay::ProbePartialTextureUploads(RenderTarget*)`
-(`0x004cab00`, 1129 retail bytes). That body exists only in
-`samples/render/PCVideoCardNearMisses.cpp`, which is not admitted; there is no
-canonical provider or alternate-signature implementation to connect. Its current
-VC6 candidate is 1113 bytes with 144 matching positions. Consequently this
-admission replaces one missing linker name with another; it does not reduce the
-missing-name count or complete display startup. The profiling fixture scripts
-this dependency and does not establish the missing body's correctness.
+(`0x004cab00`, 1129 retail bytes). Its complete body is now independently
+reviewed and admitted from [PartialTextureUploads.cpp](PARTIAL_TEXTURE_UPLOADS.md),
+along with the [non-local memory probe](NONLOCAL_TEXTURE_MEMORY.md).
+The profiling fixture still scripts these dependencies; their separate native
+tests establish bounded behavior, not integrated display startup.
 
 The full decoded control flow includes loading every cached profile, returning
 early if all load successfully, and otherwise profiling **every** display,

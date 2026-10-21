@@ -2,35 +2,36 @@
 
 Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
-Results use VC6 SP3 natively on Windows. The full gate and profile matrix were
-repeated on 2026-10-02 under Linux/wibo; the default-profile calibration
-was rerun on 2026-10-07 (2658 cases: 2650 strict exact with every relocation
-resolved, 8 exact without bindings). A complete linked game remains a
-separate, unverified gate.
+The 2026-10-21 native Windows VC6 SP3 gate passes its toolchain identity,
+manual smoke and generated-probe checks. Calibration has 2,975 strict-exact
+rows among 2,986 comparisons: 2,973 distinct source/address/extent cases.
+It covers 141 source files, 138 with at least one strict case. The separate
+physics matrix has 1,080 strict-exact targets among 1,156 comparisons.
+All prior strict cases are retained, and both near-miss comparisons report
+zero drops. These are complete function checks with relocations resolved;
+they do not establish complete translation units or a working game.
 
-The default-profile calibration checks byte-exact functions from 117
-handwritten C++ files: 112 of the 113 files in `src/reconstructed/` (all but
-`TerrainSupport.cpp`) and five files in `samples/`. This is a count of source files represented by at least one
-checked function, not a claim that complete object files or a linked game match.
+## Readability validation
 
-## Pending readability validation
+The earlier private-input download failure is resolved. The current authentic
+VC6 checks include the PC-layer readability declarations and bindings, shared
+implementation connections, and the complete display-probe extractions.
+Clang consistency checks are supplementary evidence, not the compiler oracle.
+The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
+menus and racing remain unverified.
 
-The PC-layer readability changes rename methods and fields, name DirectX
-constants and rekey callers, bindings and calibration symbols. The matching
-results below were recorded before these edits. Repeating the authoritative
-VC6 calibration is pending: the configured private-input download returned
-HTTP 403 in this environment.
-
-Independent Clang checks found no new syntax errors across 137 translation
-units and unchanged code bytes/normalized relocations in all 2797 compared
-code sections from 129 compilable files, including the PC layer and its callers.
-These checks establish source consistency and
-independent code shape; they do not establish a VC6 retail-byte match.
-With private inputs installed, reproduce the authoritative checks with
-`make vc6-private-gate` and
-`python3 tools/with_private_env.py -- make calibration-vc6`.
+```powershell
+python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json
+python tools/run_physics_samples.py --compiler vc6 --vc6-root work/vc6sp3-disc --profile vc6_o2_mt --strict
+python tools/build_game.py -j6
+```
 
 ## Compiler profiles
+
+The historical profile experiment below predates the current inventory and
+strict binding improvements. Its calibration column includes relocation-masked
+passes; use the current strict results above for acceptance. Alternative-profile
+subsets are compiler-shape evidence, not validation of the current source tree.
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
@@ -44,7 +45,7 @@ Passing manual samples mask no bytes. Generated probes resolve both global-load
 addresses. Summaries prefer strict results when available.
 
 The default is `vc6_o2_mt`: `/O2` without `/G6` is the only tested family that
-matches every calibration target, and no target prefers `/G6`. The 34 `/G6`
+matched the historical calibration set, and no target in that experiment preferred `/G6`. The 34 `/G6`
 misses (BaseObject Release, UIControl 61/62, FollowCamera 68/69/72, Camera
 13/18/30–32, `~Camera`, PCCamera 13 and 21 [GameObject](GAMEOBJECT.md) functions) differ only in
 instruction selection and scheduling; explicit `/G5` behaves like VC6's default. `/ML` and

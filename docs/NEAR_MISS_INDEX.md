@@ -210,10 +210,10 @@ the integration temporary. When only displacement sizes differ, read the
 | render/PCTextureMap | `0x004c69c0` | 429/894 (masked) | c | 31 code diffs: `jne @390` vs `jne A`; `jne @120` vs `jne @116 ; lea edx, [esp + N]` |
 | render/PCTextureMap | `0x004c71c0` | 286/538 (masked) | c | retail extent 600 (538 is the masked comparable count), candidate 590; 43 code diffs, all in the 8-bit colour-key block: retail builds the key in edx with ebx as the byte scratch and loads the vtable late; the ebx/ebp swap of the cached 1 and the pointer |
 | render/PCTextureMap | `0x004c7b40` | 257/767 | b | rect read in retail order; the row pointers swap esi/ecx in the loop nest |
-| render/PCVideoCard | `0x004ca520` | 26/124 | c | 13 code diffs: `mov ebx, [esp + N]` vs `push ebp`; retail adds `mov ebp, [ecx + 0x74]` |
-| render/PCVideoCard | `0x004ca5a0` | 66/490 | c | retail keeps `target` in ebp outside the mode loop and 480 in ebp inside it; VC6 here never pushes ebp |
-| render/PCVideoCard | `0x004cab00` | 144/1113 | b | retail keeps the mode index in esi shared with the created target (two -3 stores), re-tests `render` after the found path and places the Slot8-success path after the epilogue |
-| render/PCVideoCard | `0x004cb330` | 35/628 | b | 46 code diffs: `push ebx ; mov ebx, [esp + N]` vs `push ebp ; mov ebp, [esp + N]`; `mov eax, [ebx]` vs `mov eax, [ebp + N]`; slots differ |
+| render/ModeSurfaces | `0x004ca520` | 26/116 (candidate 124) | c | Complete native-reviewed candidate; register allocation and load scheduling differ. See DISPLAY_SURFACE_HELPERS.md. |
+| render/NonLocalTextureMemory | `0x004ca5a0` | 66/486 (candidate 490) | c | Corrected full RET extent; complete native-reviewed candidate. See NONLOCAL_TEXTURE_MEMORY.md. |
+| render/PartialTextureUploads | `0x004cab00` | 140/1129 (candidate 1145) | b | Complete native-reviewed standalone candidate; aggregate context remains 1113 bytes/144 matching positions. See PARTIAL_TEXTURE_UPLOADS.md. |
+| render/TextureChannelDifference | `0x004cb330` | 35/629 (candidate 620) | b | Corrected full cold-tail extent; complete native-reviewed candidate. See DISPLAY_SURFACE_HELPERS.md. |
 | render/Pixtrans | `0x004cdf10` | 46/636 | b | 33 code diffs: retail adds `mov ecx, [esp + N] ; mov [esp + N], eax~`; retail lacks `mov [esp + N], eax ; mov eax, [esp + N]~`; slot order differs |
 | render/Pixtrans | `0x004ce420` | 280/458 | b | frame 0x10 and the x loop match; VC6 loads `source` into ebp at entry (ebp pushed before the height guard) and forms the next source row in ebp where retail uses eax and copies it at the row head; first pixel's zero extension in ecx (retail edi) |
 | render/Pixtrans | `0x004cee30` | 1121/1125 masked | b | after the keyed x loop retail reloads the source stride before the width |

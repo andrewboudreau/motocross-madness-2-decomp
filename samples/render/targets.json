@@ -1,0 +1,38 @@
+[
+  {
+    "source": "ModeSurfaces.cpp",
+    "candidate_symbol_contains": "?CreateModeSurfaces@UnknownDisplay@@QAEHH@Z",
+    "target_va": "0x004ca520",
+    "target_size": 116,
+    "expect": "partial",
+    "bindings": "ModeSurfaces.bindings.json",
+    "status": "Complete native-reviewed candidate; explicitly nonexact. See corresponding functional-build review."
+  },
+  {
+    "source": "TextureChannelDifference.cpp",
+    "candidate_symbol_contains": "?MeanTextureChannelDifference@@YAMPAVTextureMap@@0@Z",
+    "target_va": "0x004cb330",
+    "target_size": 629,
+    "expect": "partial",
+    "bindings": "TextureChannelDifference.bindings.json",
+    "status": "Complete native-reviewed candidate; explicitly nonexact. See corresponding functional-build review."
+  },
+  {
+    "source": "PartialTextureUploads.cpp",
+    "candidate_symbol_contains": "?ProbePartialTextureUploads@UnknownDisplay@@QAEXPAVRenderTarget@@@Z",
+    "target_va": "0x004cab00",
+    "target_size": 1129,
+    "expect": "partial",
+    "bindings": "PartialTextureUploads.bindings.json",
+    "status": "Complete native-reviewed candidate; explicitly nonexact. See corresponding functional-build review."
+  },
+  {
+    "source": "NonLocalTextureMemory.cpp",
+    "candidate_symbol_contains": "?ProbeNonLocalTextureMemory@UnknownDisplay@@QAEHPAHPAVRenderTarget@@@Z",
+    "target_va": "0x004ca5a0",
+    "target_size": 486,
+    "expect": "partial",
+    "bindings": "NonLocalTextureMemory.bindings.json",
+    "status": "Complete reachable CFG including final ret8; reviewed in 12912 native scenarios, remains nonexact."
+  }
+]

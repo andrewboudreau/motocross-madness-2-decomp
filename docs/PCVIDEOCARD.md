@@ -39,8 +39,8 @@ slot order and call shapes). Remaining uncertain fields and virtual contracts
 keep their offset/slot names. Callers and near-miss samples use the same names;
 binding addresses and calibration extents are unchanged.
 
-See [pending readability validation](VC6_MATCHING.md#pending-readability-validation)
-for the distinction between the checks on these edits and the prior VC6 results.
+The current authentic VC6 gate retains every prior strict calibration case.
+Function-byte checks remain distinct from complete display-driver integration.
 
 ## Matching status
 
@@ -54,3 +54,19 @@ Near misses (`samples/render/PCVideoCardNearMisses.cpp`, notes there):
 and `0x004cb330`. The VideoCard constructor `0x0052d180` is exact once the
 bit field and +0x68 are cleared before the two 0x7fffffff times (that order
 schedules retail's `xor esi, esi` ahead of the bit-2 mask).
+
+## Functional build candidates
+
+The four near misses now have independent standalone sources included by the
+aggregate sample. Each is explicitly nonexact in the game-build configuration:
+[mode-surface setup and channel comparison](DISPLAY_SURFACE_HELPERS.md),
+[non-local texture memory](NONLOCAL_TEXTURE_MEMORY.md) and
+[partial texture uploads](PARTIAL_TEXTURE_UPLOADS.md). Their native comparisons
+cover complete bodies, dependency contracts and ownership. The aggregate's
+normalized instruction bytes and relocation structure remain unchanged.
+
+Complete control-flow decoding corrects two old retail extents: the memory
+probe is 486 bytes, including the complete final `ret 8`; channel comparison
+is 629 bytes, including its zero-height cold branch. Candidate extents remain
+490 and 620 bytes respectively. These corrections do not promote either body
+to a strict match or alter any existing strict calibration case.

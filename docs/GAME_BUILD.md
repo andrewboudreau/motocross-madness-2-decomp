@@ -35,8 +35,8 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 188 C++ files (176 canonical sources and twelve
-reviewed candidates) and reaches LINK with 576 unresolved external symbols,
+The 2026-10-21 build compiles 192 C++ files (176 canonical sources and sixteen
+reviewed candidates) and reaches LINK with 572 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
@@ -234,10 +234,22 @@ The complete [dialog tick](GAMEUI.md#functional-build-review) and
 reviewed nonexact candidates. Their native comparisons pass 73,728 and 8,486
 scenarios respectively, including mutating UI callbacks and display resource
 ownership/unwind paths. Dialog ticking removes one missing name. Profiling
-supplies its entry point but introduces a reference to the genuinely missing
-`UnknownDisplay::ProbePartialTextureUploads`, so its admission leaves the
+supplies its entry point but initially exposes a reference to
+`UnknownDisplay::ProbePartialTextureUploads`, so that admission leaves the
 missing-symbol count unchanged. Dependencies in these tests are scripted;
 real input, registry and display-driver integration remain untested.
+
+Four complete display candidates now supply [mode-surface creation and channel
+comparison](DISPLAY_SURFACE_HELPERS.md), [non-local texture memory probing](NONLOCAL_TEXTURE_MEMORY.md)
+and [partial texture uploads](PARTIAL_TEXTURE_UPLOADS.md). They pass 200,448,
+144,944, 12,912 and 26,600 native comparisons respectively, including complete
+state, dependency calls, pixels, ownership, constructor unwind and observed
+fault paths as applicable. All four remain nonexact. Complete control-flow
+decoding corrects the memory-probe and channel-comparison retail extents to
+486 and 629 bytes; the older ranges ended inside instructions. The original
+aggregate sample includes the extracted bodies and preserves its normalized
+instruction bytes and relocation structure. Each admission reruns the real
+link: together they remove four missing symbols and introduce none.
 
 Validation of this composition passes the toolchain/manual/generated VC6 gate,
 2,975 of 2,986 calibration rows (2,973 distinct source/address/extent cases),
@@ -246,7 +258,7 @@ and all prior strict physics targets, with four additions making 1,080 among
 The recursive reset's strict case moves from FileStream.cpp to
 Parameterblocks.cpp with its address and full 30-byte extent unchanged;
 ShowDialog adds one strict case. The native-enabled Python suite passes
-430 tests with 11 skipped. These counts retain existing nonexact comparisons;
+434 tests with 11 skipped. These counts retain existing nonexact comparisons;
 they do not describe a fully matched or working game.
 
 Other incompatible class views, missing methods and unresolved globals

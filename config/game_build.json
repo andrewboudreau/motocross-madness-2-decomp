@@ -3,6 +3,30 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/render/NonLocalTextureMemory.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete non-local texture-memory probe passes 12912 native full-state, call, alias, fault and ownership comparisons. Full retail CFG is 486 bytes including the final ret8; VC6 emits 490 bytes. Dependencies are scripted and invalid-path behavior is retained.",
+      "evidence": "docs/NONLOCAL_TEXTURE_MEMORY.md#functional-build-review"
+    },
+    {
+      "path": "samples/render/PartialTextureUploads.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete partial-upload startup probe passes 26600 native state, ownership, ordered-call, C++ exception and access-violation scenarios. Full retail CFG is 1129 bytes; standalone VC6 candidate is 1145 bytes. Image, texture and display dependencies are scripted.",
+      "evidence": "docs/PARTIAL_TEXTURE_UPLOADS.md#functional-build-review"
+    },
+    {
+      "path": "samples/render/ModeSurfaces.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete display-mode surface setup passes 200448 native arithmetic, budget-boundary, whole-state and callback comparisons. VC6 emits 124 bytes versus 116 retail; invalid mode storage is outside this finite validation.",
+      "evidence": "docs/DISPLAY_SURFACE_HELPERS.md#functional-build-review"
+    },
+    {
+      "path": "samples/render/TextureChannelDifference.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete channel comparison passes 144944 native pixel, pitch, lock-failure and callback comparisons, including 256/512/1024-square images. The full retail CFG is 629 bytes, including its cold tail; VC6 emits 620 bytes.",
+      "evidence": "docs/DISPLAY_SURFACE_HELPERS.md#functional-build-review"
+    },
+    {
       "path": "samples/ui/UIDialogTick.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete UIDialog Tick passes 73728 native whole-state and mutating-callback comparisons. The retail CFG is 543 bytes including cold joystick branches; VC6 emits 555 bytes. Dependencies are scripted; end-to-end menus remain untested.",
