@@ -180,6 +180,12 @@ static inline void ShadowTransformExtents(ShadowVec3* out, ShadowVec3 h, const S
 // built through by-value temporaries, and the mode-1 normalisation is written out with the
 // out-of-line constructor.  PARTIAL: retail copies the GetBounds extents into three separate
 // slots before the products (VC6 elides that copy here), which shifts every frame slot.
+// Retail's frame (tools/frame_layout.py, 0xc0 against 0x134 here) has no 64-byte temporary:
+// the identity call and the product's result pointer are both m's own slot (0x64), with
+// fov 0xc, c 0x1c, mn 0x28, mx 0x34, ext 0x40, eye 0x4c and sq 0x78, and 12-byte temporaries
+// at 0, 0x10 and 0x58.  Passing &m as the product's result gives 0xf4 (1970 bytes, 185 strict
+// but 244 differing instructions); `m = ShadowMatrixIdentity()` after the declaration
+// compiles the same as the initialisation.
 int ProjectedShadow::ComputeBounds()
 {
     if (!casters)
