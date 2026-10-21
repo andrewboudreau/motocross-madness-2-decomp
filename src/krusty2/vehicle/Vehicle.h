@@ -137,6 +137,8 @@ struct VehicleImpactEvent {          // argument of slots 18..20 (provisional)
 };
 // Object at Vehicle+0x480: the engine gearbox (ctor 0x004d2940, 0x1e4 bytes), the same object as
 // src/reconstructed/GearRatios.h's UnknownEngineGearbox; slots 42/57 read throttleFraction.
+// Keep this provisional field view; construction/throttle/shift calls use the
+// canonical provider. The shared empty destructor still lacks identity evidence.
 struct VehicleSpeedEntry { float a; float b; };   // 8-byte table entry (slot 1 reads .a)
 struct VehicleSpeedState {
     float throttleFraction;                   // +0x0  UnknownEngineGearbox +0x00 (GearRatios.h); UpdateThrottle ramps it in [0, 1]
@@ -152,12 +154,6 @@ struct VehicleSpeedState {
     int lastUpdateRpm;                        // +0x84  UnknownEngineGearbox +0x84 rpm at the last update
     char pad_0x88[0x15c];           // the object is 0x1e4 bytes (LoadVehicle's allocation)
     ~VehicleSpeedState();                           // 0x00464e90, the shared empty out-of-line destructor (~Vehicle)
-    // 0x004d2940 (ret 0x24): the gearbox constructor (src/reconstructed/GearRatios.h names the
-    // parameters); LoadVehicle passes 0.02f, the table/rpm arguments or zeros, and controlResponse[2..3] (PressThrottle/ReleaseThrottle).
-    VehicleSpeedState(const char* name, float unused, int* torqueTable, int rpmLow, int rpmHigh,
-                      int rpmStep, float a6, float riseRate, float fallRate);
-    void UpdateThrottle(float dt, int throttleOn, bool cutDrive);  // 0x004d2f50, GearRatios.h UnknownEngineGearbox::UpdateThrottle (cutDrive: one byte pushed)
-    void AutoShift(int throttleOn, float speed);   // 0x004d3030, GearRatios.h UnknownEngineGearbox::AutoShift
     // Inline in Vehicle slot 49: counts the timer down to zero (retail loads dt before the
     // timer, the inline-parameter order).
     void TickGearTimer(float dt)
@@ -298,9 +294,6 @@ struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisiona
     char pad_0x00[0x8C];
     int field_0x8c;
     int field_0x90;
-    // 0x004d31b0: GearRatios.h UnknownEngineGearbox::DriveForce (the last argument is its float* magnitude).
-    void DriveForce(float speedRatio, Vec3* direction, float scale, char reversing, float reverseForce,
-                    Vec3* force, Vec3* magnitude);
 };
 // The wheel's collision point (VehicleWheel+0xb8, the CollisionPoint base of Tire): only its
 // virtual slot 1 (friction update) is called here, by Method_00527A20.  Provisional view.

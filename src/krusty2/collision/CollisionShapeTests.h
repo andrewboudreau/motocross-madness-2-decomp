@@ -86,10 +86,7 @@ int BoxCapsuleOverlap(const CollisionVec3* boundsCenter, const CollisionVec3* bo
 // 0x0042a4b0: rotate by the transpose; this provisional call view is not connected here.
 void Vec3TransformNormalTranspose(CollisionVec3* out, CollisionVec3 v, const Matrix4* m);
 
-class CollisionSceneNode {
-public:
-    void GetMatrixIn(CollisionSceneNode* frame, Matrix4* out);   // 0x004fca80
-};
+class CollisionSceneNode; // Existing payload pointer view; calls use the canonical scene boundary.
 
 // Result record of the last box test (global pointer at 0x00579058); the mesh tests read a
 // vec3 at +8 from it and rotate it into world space.  Tier 3 shape.
@@ -98,11 +95,9 @@ struct CollisionBoxResult {
     const CollisionVec3* point;    // +0x04 segment leaf point (0x00439820 starts it at 0)
     CollisionVec3 field_0x08;      // +0x08 face normal
 };
-extern CollisionBoxResult* g_CollisionBoxResult;   // 0x00579058
 
-// Scratch contact list filled by the box tests (globals, .bss).
-extern int g_CollisionScratchCount;             // 0x00579014
-extern CollisionVec3 g_CollisionScratchPoints[];  // 0x00579068, 12 bytes each
+#include "bvh/BoundingBoxTreeQueryState.h"
+extern CollisionVec3 g_CollisionScratchPoints[]; // Existing provisional array view.
 
 // Contact/sweep record passed to the hull-vs-hull family (tier 3 layout): two input
 // vectors, an accumulated contact position and a contact counter.

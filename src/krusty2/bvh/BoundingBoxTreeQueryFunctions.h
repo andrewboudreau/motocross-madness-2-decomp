@@ -33,3 +33,6 @@ void GrowBoxByTransformedBox(Vec3* outCenter, Vec3* outHalfExtents, Vec3 center,
                              Vec3 halfExtents, const Matrix4* m);                  // 0x004290d0
 void Vec3TransformNormal(Vec3* out, Vec3 v, const Matrix4* m);                     // 0x0042a450
 void Vec3TransformPoint(Vec3* out, Vec3 v, const Matrix4* m);                      // 0x0042a510
+
+int SegmentTreeQueryWithVertices(const Vec3* ends, QueryTreeNode* node, const Matrix4* xf,
+                                 Vec3* vertices);                                  // 0x00429e60

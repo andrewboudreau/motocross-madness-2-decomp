@@ -1,5 +1,9 @@
 # TextureMapManager
 
+The remaining CacheTexture mip-copy candidate has a separate
+[functional build review](CACHE_TEXTURE_MIPS.md#functional-build-review),
+including complete extent/provider proof and native COM-chain/FP tests.
+
 RTTI: `TextureMapManager : GameObject` (vtable `0x0055848c`, 0x7c bytes).
 Its code cites `D:\aardvark\VC\krusty2\TextureMapManager.cpp` through
 `__FILE__` (`0x00574f00`). Canonical source:

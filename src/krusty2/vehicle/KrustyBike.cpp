@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "vehicle/KrustyBike.h"
+#include "../../reconstructed/GearRatios.h"
 #include "math/FastMath.h"
 #include "collision/CollisionObject.h"
 #include "../../reconstructed/Wrecker.h"
@@ -475,8 +476,10 @@ void KrustyBike::UnknownVirtualSlot86()
         else
             ramp = 0;
         if (w->aux)
-            w->aux->DriveForce(KbFloat(linearSpeed), &w->rollDirection, KbFloat(driveForceScale), backingUp, ramp,
-                                    &w->driveForce, &w->driveForceMagnitude);
+            reinterpret_cast<UnknownEngineGearbox*>(w->aux)->DriveForce(
+                KbFloat(linearSpeed), reinterpret_cast<const Vector3*>(&w->rollDirection),
+                KbFloat(driveForceScale), backingUp, ramp, reinterpret_cast<Vector3*>(&w->driveForce),
+                &w->driveForceMagnitude);
         if (reinterpret_cast<KbGame*>(g_TrackGame)->raceMode && !onTrack) {
             rearWheel->driveForce *= 0.5f;
             rearWheel->driveForceMagnitude *= 0.5f;

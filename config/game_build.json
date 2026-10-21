@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/render/CacheTextureNearMisses.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete CopyMipLevels passes 5674 native state, rectangle, attachment, callback, floating-point and failure scenarios with the real strict coordinate helper and VC6 CRT conversion. The unchanged 569-byte candidate has 337 matching positions against 558 retail bytes. COM and Upload boundaries are scripted, with at most twelve successful attachments; actual pixel copying, DirectDraw ownership and integrated rendering remain untested.",
+      "evidence": "docs/CACHE_TEXTURE_MIPS.md#functional-build-review"
+    },
+    {
       "path": "samples/render/TextureClone.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete texture cloning and both allocation cleanup states pass 135464 native state, argument, color-key, callback, failure and unwind scenarios. VC6 emits 590 bytes against the full 600-byte retail body with 333 matching positions. The actual strict pixel-size helper executes; allocation, constructors, registration, surfaces, creation and deletion are scripted. Existing constructor/destructor/deleting-wrapper providers are separately strict; integrated texture lifecycle and rendering remain untested.",

@@ -613,7 +613,7 @@ void CollisionObject::GetShapePosition(CollisionVec3* out)
     }
 }
 
-// Scene-graph node held by the shape payloads (CollisionSceneNode::GetMatrixIn = 0x004fca80).
+// Primary scene-graph pointers held by the shape payloads (GetMatrixIn = 0x004fca80).
 
 struct HullNodeView { int field_0x00; CollisionSceneNode* node; };      // hull: node at +4
 struct ModelNodeView { char pad[0x10]; CollisionSceneNode* node; };     // model: node at +0x10
@@ -625,15 +625,15 @@ void CollisionObject::SyncTransformFromNode()
     Matrix4 m;
     switch (shapeType) {
     case 0:
-        ((HullNodeView*)shape)->node->GetMatrixIn(0, &m);
+        reinterpret_cast<SoultreeObject*>(((HullNodeView*)shape)->node)->GetMatrixIn(0, &m);
         SetTransform(&m);
         break;
     case 1:
-        ((ModelNodeView*)shape)->node->GetMatrixIn(0, &m);
+        reinterpret_cast<SoultreeObject*>(((ModelNodeView*)shape)->node)->GetMatrixIn(0, &m);
         SetTransform(&m);
         break;
     case 2:
-        ((MeshNodeView*)shape)->node->GetMatrixIn(0, &m);
+        reinterpret_cast<SoultreeObject*>(((MeshNodeView*)shape)->node)->GetMatrixIn(0, &m);
         SetTransform(&m);
         break;
     case 4:
@@ -2298,7 +2298,8 @@ int CollisionObject::TestMeshAgainst(CollisionObject* other)
         if (TreeTreeQuery(reinterpret_cast<QueryTreeNode*>(mesh->field_0x04),
             reinterpret_cast<QueryTreeNode*>(hull->triangleTree), &mesh->field_0x08, &hull->worldTransform, 1,
             reinterpret_cast<Vec3*>(hull->vertices), 0)) {
-            CollisionRotateColsInPlace(&g_CollisionBoxResult->field_0x08, g_CollisionBoxResult->field_0x08, &hull->worldTransform);
+            CollisionRotateColsInPlace(&reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->field_0x08,
+                reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->field_0x08, &hull->worldTransform);
             return 1;
         }
         break;
@@ -2314,7 +2315,8 @@ int CollisionObject::TestMeshAgainst(CollisionObject* other)
                         reinterpret_cast<QueryTreeNode*>(e->triangleTree), &mesh->field_0x08, &e->worldTransform,
                         1, reinterpret_cast<Vec3*>(e->vertices), 0)) {
                         hit = 1;
-                        CollisionRotateColsInPlace(&g_CollisionBoxResult->field_0x08, g_CollisionBoxResult->field_0x08, &e->worldTransform);
+                        CollisionRotateColsInPlace(&reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->field_0x08,
+                            reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->field_0x08, &e->worldTransform);
                     }
                 }
             }
@@ -2397,7 +2399,7 @@ float CollisionLength(const CollisionVec3* v)
 // owner: bracket only (between the 0x00439xxx shape tests and the __FILE__ xrefs of CollisionObject.cpp).
 void SetCollisionBoxResult(CollisionBoxResult* result)
 {
-    g_CollisionBoxResult = result;
+    g_CollisionBoxResult = reinterpret_cast<QueryHit*>(result);
 }
 
 // 0x004394f0 (cdecl; ObjectPicker.cpp 0x004b0a46): whether a sphere (world centre, r, r*r)
@@ -2462,8 +2464,6 @@ static inline void CollisionInvertRigidInPlace(Matrix4* m)
 // declares them on its own node types; the tree pointer is opaque here).
 int SegmentBoxOverlap(const Vec3* center, const Vec3* halfExtents, Vec3 p0, Vec3 p1,
                       const Matrix4* m);                                             // 0x004253b0
-int SegmentTreeQueryWithVertices(const Vec3* ends, void* node, const Matrix4* xf,
-                                 Vec3* vertices);                                    // 0x00429e60
 // Call views (see math/Math3D.h): the Vec3 constructor 0x00404e60 inside the expanded
 // operators of 0x00439820.
 struct CollisionVec3Call : Vec3 {
@@ -2646,7 +2646,7 @@ void CollisionObject::SetTransform(const Matrix4* m)
         for (int i = 0; i < model->elementCount; i++) {
             CollisionHullBody* e = &model->elements[i];
             e->prevBodyTransform = e->bodyTransform;
-            ((CollisionSceneNode*)e->sceneNode)->GetMatrixIn(0, &e->bodyTransform);
+            reinterpret_cast<SoultreeObject*>(e->sceneNode)->GetMatrixIn(0, &e->bodyTransform);
             CollisionMatrixMultiply(&e->worldTransform, &e->bodyTransform, &e->localTransform);
             CollisionRelativeTransform(&e->motionTransform, &e->bodyTransform, &e->prevBodyTransform);
         }
@@ -2726,7 +2726,7 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                 SetCollisionBoxResult(&hit);
                 Matrix4 inv = hull->worldTransform;
                 CollisionInvertRigidInPlace(&inv);
-                int result = SegmentTreeQueryWithVertices(p, hull->triangleTree, &inv,
+                int result = SegmentTreeQueryWithVertices(p, reinterpret_cast<QueryTreeNode*>(hull->triangleTree), &inv,
                                                           (Vec3*)hull->vertices);
                 if (result) {
                     Vec3 d = SubtractCtorCall(p[1], p[0]);
@@ -2750,7 +2750,8 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                         CollisionHullBody* e = &model->elements[i];
                         inv = e->worldTransform;
                         InvertRigidTransform(&inv);
-                        if (SegmentTreeQueryWithVertices(p, e->triangleTree, &inv, (Vec3*)e->vertices)) {
+                        if (SegmentTreeQueryWithVertices(p, reinterpret_cast<QueryTreeNode*>(e->triangleTree),
+                                &inv, (Vec3*)e->vertices)) {
                             Vec3 d = SubtractCtorCall(p[1], p[0]);
                             Vec3 scaled = ScaleCtorCall(d, hit.fraction);
                             *(Vec3*)outPoint = SegmentAdd(scaled, p[0]);

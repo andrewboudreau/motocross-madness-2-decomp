@@ -1,6 +1,7 @@
 // Vehicle.cpp - reconstruction of the retail Vehicle translation unit
 // (__FILE__ xrefs near 0x00525e98). See Vehicle.h for the evidence/provisional notes.
 #include "vehicle/Vehicle.h"
+#include "../../reconstructed/GearRatios.h"
 #include <math.h>
 #include <stdlib.h>
 #include <float.h>
@@ -200,8 +201,9 @@ void Vehicle::UnknownVirtualSlot86()
             if (w->aux) {
                 float sp = linearSpeed;
                 float scale = driveForceScale;
-                w->aux->DriveForce(sp, &w->rollDirection, scale, backingUp, 100.0f,
-                                                &w->driveForce, &w->field_0x280);
+                reinterpret_cast<UnknownEngineGearbox*>(w->aux)->DriveForce(
+                    sp, reinterpret_cast<const Vector3*>(&w->rollDirection), scale, backingUp, 100.0f,
+                    reinterpret_cast<Vector3*>(&w->driveForce), reinterpret_cast<float*>(&w->field_0x280));
             }
             w->UpdateDriveShare(this);
         }
@@ -974,8 +976,8 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         backingUp = UnknownVirtualSlot82();
         driveDisengaged = crashState == 0 && (backingUp || UnknownVirtualSlot81());
         throttleOn = crashState == 0 && UnknownVirtualSlot80();
-        engineState->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
-        engineState->AutoShift(throttleOn, linearSpeed);
+        reinterpret_cast<UnknownEngineGearbox*>(engineState)->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
+        reinterpret_cast<UnknownEngineGearbox*>(engineState)->AutoShift(throttleOn, linearSpeed);
         if (hit) {
             Vec3 hitA, hitB, hitC;
             int dummy = 0;
@@ -2034,13 +2036,16 @@ GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3,
     verticalAccelSmoother = new(__FILE__, 0x19d) VehicleSmoother(0.14f);
     forwardAccelSmoother = new(__FILE__, 0x1a0) VehicleSmoother(0.5f);
     UnknownVirtualSlot96();
+    // The provisional float gearArg is passed as an unchanged DWORD in retail;
+    // the canonical constructor stores it at +0x1d8 without numeric conversion.
     if (defaultEngine)
-        engineState = new(__FILE__, 0x1aa) VehicleSpeedState(engineName, 0.02f, 0, 0, 0, 0, gearArg,
-                                                             controlResponse[2], controlResponse[3]);
+        engineState = reinterpret_cast<VehicleSpeedState*>(new(__FILE__, 0x1aa) UnknownEngineGearbox(
+            engineName, 0.02f, 0, 0, 0, 0, reinterpret_cast<const int&>(gearArg),
+            controlResponse[2], controlResponse[3]));
     else
-        engineState = new(__FILE__, 0x1b5) VehicleSpeedState(engineName, 0.02f, torqueTable, rpmLow,
-                                                             rpmHigh, rpmStep, gearArg,
-                                                             controlResponse[2], controlResponse[3]);
+        engineState = reinterpret_cast<VehicleSpeedState*>(new(__FILE__, 0x1b5) UnknownEngineGearbox(
+            engineName, 0.02f, torqueTable, rpmLow, rpmHigh, rpmStep, reinterpret_cast<const int&>(gearArg),
+            controlResponse[2], controlResponse[3]));
     SoultreePhysicsCharacter::UnknownVirtualSlot40(a1, 0, a3, a4, a5, a6, a7, a8, a9, a10, a11,
                                                    wheelCap + extraContacts, a13, a14, 0.02f,
                                                    100, 0.001f, 0.1f, 3,

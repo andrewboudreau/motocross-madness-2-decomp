@@ -147,6 +147,7 @@
 #include "../../../src/reconstructed/TrackGame.h"
 #include "../../../src/krusty2/vehicle/BikeAI.cpp"
 #include "vehicle/KrustyBike.h"
+#include "../../../src/reconstructed/GearRatios.h"
 #include "../../../src/reconstructed/Wrecker.h"
 #include "collision/CollisionObject.h"
 #include "broadphase/Quadtree.h"
@@ -1494,7 +1495,8 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 // the candidate keeps it on the FPU stack (a reference clamp helper does not change it).
 // Shapes that mattered: the gearbox timer as an inline taking dt (fld dt; fsubr), the
 // filter step as `step = tc; if (dt < step) step = dt` (tc loaded first),
-// VehicleSpeedState::UpdateThrottle's third parameter as bool (retail pushes eax unmasked),
+// the gearbox's one-byte drive-cut argument (retail pushes eax unmasked; the canonical
+// unsigned-char declaration preserves the former bool call's complete emission),
 // the x/y-grouped dot product, dot(normal, forward) in both AI branches, and
 // `(controlInput.y + 1) + 1` through a named temporary (one expression folds to + 2.0).
 // Not kept: `Vec3(0.0f)` zero temporaries (2033 strict but 27 differing instructions
@@ -1635,8 +1637,8 @@ int KrustyBike::Fn_00413200(float dt)
     else
         throttleOn = 0;
     driveDisengaged = crashState == 0 && UnknownVirtualSlot81();
-    engineState->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
-    engineState->AutoShift(throttleOn, linearSpeed);
+    reinterpret_cast<UnknownEngineGearbox*>(engineState)->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
+    reinterpret_cast<UnknownEngineGearbox*>(engineState)->AutoShift(throttleOn, linearSpeed);
     if (hit) {
         Vec3 b;
         int dummy = 0;

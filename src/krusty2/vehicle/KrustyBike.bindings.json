@@ -134,7 +134,7 @@
   "?Fn_00497370@KrustyBike@@QAEXPAV1@@Z": "0x00497370",
   "?Fn_004A8BF0@KbA5C4@@QAEXHM@Z": "0x004a8bf0",
   "?Fn_004A9E80@KbPlayer@@QAEXPAVVehicle@@0H@Z": "0x004a9e80",
-  "?DriveForce@BikeWheelQ@@QAEXMPAUVec3@@MDM0PAM@Z": "0x004d31b0",
+  "?DriveForce@UnknownEngineGearbox@@QAEXMPBUVector3@@MDMPAU2@PAM@Z": "0x004d31b0",
   "?Fn_004DE580@KbRaceHandler@@QAEXPAXMH@Z": "0x004de580",
   "?QueueRecord@KbRecorder@@QAEHHHPAXH@Z": "0x004e8720",
   "?ReplaceHeadMessage@KbMsgSink@@QAEXPAUKbMessage@@@Z": "0x0051b540",

@@ -48,14 +48,7 @@ struct QuerySegmentLeaf {
     Vec3 end[2];                // +0x04, +0x10
 };
 
-// Hit record the leaf tests update through 0x00579058 (the 0x14-byte mesh record
-// CollisionObject allocates): the hit fraction along the segment, the segment leaf's first
-// point, the face normal.
-struct QueryHit {
-    float fraction;             // +0x00
-    const Vec3* point;          // +0x04
-    Vec3 normal;                // +0x08
-};
+#include "BoundingBoxTreeQueryState.h"
 
 // ---------------------------------------------------------------------------------------
 // Inline helpers as this unit's code expands them.
@@ -184,8 +177,6 @@ int TreeTreeQueryNodes(QueryTreeNode* a, QueryTreeNode* b, int useMotion);      
 #include "../../reconstructed/CollisionTransforms.h"
 int CapsuleTreeQuery(const Vec3* ends, float radius, float radiusSq, QueryTreeNode* node,
                      const Matrix4* xf, int triangles);                            // 0x004298c0
-int SegmentTreeQueryWithVertices(const Vec3* ends, QueryTreeNode* node, const Matrix4* xf,
-                                 Vec3* vertices);                                  // 0x00429e60
 int SegmentTreeQuery(const Vec3* ends, QueryTreeNode* node, const Matrix4* xf);    // 0x00429e90
 #include "BoundingBoxTreeQueryFunctions.h"
 void Vec3TransformNormalTranspose(Vec3* out, Vec3 v, const Matrix4* m);            // 0x0042a4b0

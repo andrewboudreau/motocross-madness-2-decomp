@@ -160,11 +160,8 @@ struct BikeWheel {
 };
 
 // Object at BikeWheel+0x2a8: the gearbox (engineState) for driven wheels (Bike's loader).
-struct BikeWheelQ {
-    // 0x004D31B0: GearRatios.h UnknownEngineGearbox::DriveForce.
-    void DriveForce(float speedRatio, Vec3* direction, float scale, char reversing, float reverseForce,
-                    Vec3* force, float* magnitude);
-};
+// Opaque provisional view; force calls use UnknownEngineGearbox directly.
+struct BikeWheelQ {};
 
 
 struct BikeA34 {
