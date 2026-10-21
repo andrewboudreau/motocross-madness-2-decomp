@@ -101,6 +101,12 @@ zero-extension.
 
 These are in `samples/track/TrackOverlayNearMisses.cpp`, with notes:
 
+The complete `DrawNameTag` body is now included from
+`samples/track/ChatNameTagDraw.cpp`. It remains nonexact (974 bytes, 966
+matching positions); see [shared flag, actual CRT and finite native evidence](CHAT_NAME_TAG_DRAW.md).
+The canonical flag at `0x68a444` retains its storage offset and now has external
+linkage so the standalone uses the same mutable DWORD as `RenderPre3D`.
+
 - `0x0051e3f0` (draws one name tag, 974 bytes, 966 match): the frame matches;
   a racer local in the position branch gives retail's eax there; in the
   `%.3f` branch retail picks eax/ecx/edx for the racer, the buffer and the

@@ -1,5 +1,5 @@
 {
-  "baseline": "Published 5c439bb source hashes matched the same-path private baseline before applying six global-name joins. All nondebug bytes, flags and relocation destinations remain identical. Terrain transitive consumer included after genuine global-only header narrowing; no commutative target swaps accepted. Only recognized complete checkout filenames are portable. FilePrintf declaration correction: both EcoSystem objects were independently checked against these original pins and complete current objects under only the void-to-int FilePrintf name; only the sample hash changes.",
+  "baseline": "Published 5c439bb source hashes matched the same-path private baseline before applying six global-name joins. All nondebug bytes, flags and relocation destinations remain identical. Terrain transitive consumer included after genuine global-only header narrowing; no commutative target swaps accepted. Only recognized complete checkout filenames are portable. FilePrintf declaration correction: both EcoSystem objects were independently checked against these original pins and complete current objects under only the void-to-int FilePrintf name; only the sample hash changes. EcoSystem QuadTree correction: published ed3d06ce old EcoSystem pins reproduced independently; both complete objects preserve all bytes and destinations under only the six tree interface names, with no exclusions or score changes. Round50 exposes the existing TrackOverlay flag at unchanged BSS+0x40: its published old pin was reproduced first, and all207 sections/863 relocations remain identical under only that one static-to-external symbol name/visibility change; only the canonical TrackOverlay record is refreshed.",
   "renames": {
     "?g_visibilityClipper@@3PAVD3DIMShadowClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
     "?g_visibilityClipper@@3PAVUnknownCubeClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
@@ -22,12 +22,12 @@
     "src/reconstructed/TrackOverlay.cpp": {
       "sections": 207,
       "relocations": 863,
-      "sha256": "30cc5fcb670ceb1ca81252f2b55dc4551bd021cd0a767437e80f285ffd32e61a"
+      "sha256": "b1e2aab2acaf7fa3db94fa92dcd2e5e08c389fd18815771d9996c279d9e01287"
     },
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "9da6f6357818cc3611fb2d5c2fa6e600e2099dbfe7e49e59621ee812a0f570bf"
+      "sha256": "724215f54fa464d2a9b0341dbfd553b633999d7b5d886557d3532bb4f69cfde6"
     },
     "src/reconstructed/Griddraw.cpp": {
       "sections": 84,
@@ -62,7 +62,7 @@
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,
       "relocations": 444,
-      "sha256": "249de017371bed4040b56f55be293f33e1ddc57bc2c509eaad45fe8fe97cd42f"
+      "sha256": "adefbff12c00c5e62e96fdb25c5da3143adee069d68e3b84a7e812c86173c6a6"
     },
     "samples/render/GriddrawNearMisses.cpp": {
       "sections": 21,

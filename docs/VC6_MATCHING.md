@@ -23,42 +23,48 @@ Clang consistency checks are supplementary evidence, not the compiler oracle.
 The [source-built game](GAME_BUILD.md) still fails at the real link, so startup,
 menus and racing remain unverified.
 
-The [palette getter connections](PALETTE_GETTER_CONNECTIONS.md) join two
-provisional getter names to the existing ColorMapper implementations. The
-public palette view remains separate. Six call sites, 103 strict checks and
-8,139 finite native cases verify the connection; two complete objects preserve
-56 sections and 153 relocations under exactly those two names. Dither and the
-still-missing fast 555 converter are outside the native scalar conversion tests.
+The [visibility control storage](VISIBILITY_CONTROL_STATE.md) supplies three
+separate writable zero-initialized DWORDs. All nine encoded references lie in
+three complete strict consumers. Storage and instruction checks preserve the
+existing secondary-base adjustment; keyboard, camera and query execution are
+not established by this storage slice.
 
-The [Soultree counter storage](SOULTREE_STATE.md) supplies one writable,
-zero-initialized four-byte cell. All four retail references lie in the complete
-strict 1,500-byte initializer. The name and original source ownership remain
-provisional; the test verifies storage and instructions, not runtime lifecycle.
+The [name-tag drawing candidate](CHAT_NAME_TAG_DRAW.md#functional-build-review)
+supplies the complete missing ChatOverlay method. Its unchanged 974-byte body
+has 966 resolved matching positions and remains explicitly nonexact. The
+existing mutable flag retains its canonical storage offset with ordinary
+external linkage. All 207 canonical sections/863 relocations and 37 aggregate
+sections/162 relocations are preserved under only that flag visibility change.
+Native validation covers 5,864 scenarios, including explicit text, rectangle,
+font and fault oracles, with 94 strict game checks and the complete 82-byte
+native sprintf wrapper. GDI callbacks are scripted; integrated HUD rendering
+remains unverified.
 
-The [multistate drawing candidate](MULTI_STATE_DRAW.md#functional-build-review)
-supplies the missing UIMultiState::Draw virtual method. Its unchanged readable
-body remains nonexact: 682 emitted bytes against the complete 672 retail bytes,
-with 139 resolved matching positions. The full original aggregate preserves
-733 sections and 3,912 relocations. Native validation covers 16,181 finite
-scenarios with sixteen actual strict source helpers, complete native CRT
-conversion, layout and fault oracles, and 37 strict helper/producer/caller checks.
-Lower GetDc, COM and GDI boundaries remain scripted; integrated menus are untested.
+The [EcoSystem tree connections](ECO_QUADTREE_CONNECTIONS.md) join five obsolete
+game imports to the existing QuadTree methods and persistent pointer. Primary
+receiver and Vegetation-prefix evidence supports explicit call-boundary casts;
+other provisional views remain separate. A declaration-only header split keeps
+all four affected objects intact: 368 sections and 1,631 relocations under six
+names, including one sample-only name. Insert remains nonexact (627 bytes,
+620 matching positions); its private stack-home differences are reviewed and
+13,347 native scenarios execute the actual tree/pool helpers. The focused
+regression protects 120 strict cases. Allocation boundaries are scripted, and
+the derived visibility factory and integrated scene traversal are untested.
 
-The [edit-box fixture](EDIT_BOX_DRAW.md) now resets and snapshots the full
-0x7f58-byte dialog, including the previously omitted clip-region and previous-font
-fields. Its 14,793 scenarios and 27 strict checks pass; independent lifecycle
-oracles verify restoration and deletion. This corrects test storage without
-changing the production implementation or its preservation checks.
+The steering regression now identifies compiler-local EH targets by their
+complete section contents and destinations. One generated label changed spelling;
+all 6,745 caller bytes, 219 relocation destinations and the full Bike object
+remain unchanged. The independent 100,852-case native check passes.
 
-All 254 prior production objects preserve 10,671 nondebug sections and 45,720
-relocations under only the two palette getter name corrections, with no filename
-exclusions. Both new provider objects independently reproduce their actual game
-compile commands. Real links remove exactly four names,
-**243 -> 241 -> 240 -> 239**, with none added. The final report checks all 256
-source hashes, 230 header hashes, configuration, profile and per-source flags.
-Private evidence is in `work/game-build/round49-link-evidence.json`,
-`round49-all-objects.json`, `round49-admitted.json` and
-`connections-round49-preservation.json`.
+All 256 prior production objects preserve 10,675 nondebug sections and 45,728
+relocations under only the six tree names and the existing flag's visibility/
+name change, with no filename exclusions. Both new providers independently
+reproduce their actual game compile commands. Real links remove exactly nine
+names, **239 -> 236 -> 235 -> 230**, with none added. The final report checks
+all 258 source hashes, 231 header hashes, configuration, profile and per-source
+flags. Private evidence is in `work/game-build/round50-link-evidence.json`,
+`round50-all-objects.json`, `round50-admitted.json` and
+`connections-round50-preservation.json`.
 
 The two existing nonexact physics binding diagnostics (ProjectedShadow::Init
 and Terrain::QueryGround) are unchanged and excluded from strict counts.
@@ -66,8 +72,8 @@ The only per-source compiler exception remains `/QIfist` for the motion-start
 helper; this slice changes no compiler flags. Finite native checks do not
 establish integrated gameplay. Static checks pass for 264 Python files
 and 406 JSON files.
-The final full regression run passes: 547 tests, 536 passed and 11 skipped
-(`work/game-build/tests-round49-final.log`).
+The final full regression run passes: 550 tests, 539 passed and 11 skipped
+(`work/game-build/tests-round50-final.log`).
 
 ```powershell
 python tools/vc6_gate.py --vc6-root work/vc6sp3-disc --out work/vc6-gate.json

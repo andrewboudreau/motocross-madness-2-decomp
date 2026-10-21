@@ -15,6 +15,7 @@ from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
 from tools.build_game import compile_source as build_compile_source
+from test_vehicle_gearbox_connections import fingerprint as caller_fingerprint
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'samples/physics/motion/SteeringAxisFromPoints.cpp'
@@ -161,10 +162,11 @@ class SteeringAxisFromPointsTests(unittest.TestCase):
             self.assertEqual(len(caller_relocs),219)
             self.assertEqual(hashlib.sha256(caller_bytes).hexdigest(),
                              '1dba68b1345a120c9f1ad806330cd4a2582f02905a47873db0063946f74a97e3')
-            # InlineShock's verified destination and one compiler-local label spelling
-            # changed; the complete Bike proof retains every byte and local destination.
-            self.assertEqual(hashlib.sha256(json.dumps(caller_relocs).encode()).hexdigest(),
-                             '9ad26589c8eee2a884b86f8318196cd681faabf33dade6b3d9b69d9d7364f9f7')
+            # The sole round50 change was $L7843 -> $L7844 at +22: the same
+            # .text$x EH target at +208. Published and current complete objects
+            # agree under the existing payload/destination-aware local identity.
+            self.assertEqual(caller_fingerprint(bike, '?LoadBike@Bike@@'),
+                             'c1322732b5c31af745dadba136e1e6f73a9816fbb853b4b01d4ce684c79c2b66')
             self.assertEqual(sum(name==SYMBOL for _,_,name in caller_relocs),1)
             transform_path,transform = compile_source(ROOT/TRANSFORM,'transform')
             self.assertEqual(signature(candidate,SYMBOL),signature(aggregate,SYMBOL))

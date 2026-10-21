@@ -677,7 +677,7 @@ int EcoSystem::GenerateObjects(int checkCodes) {
                                                     probe.z + radius);
             vegetation[placedCount].Place(textureManager, selected, &probe, heightParameter, radiusParameter);
             g_MemTagStack->Push("QuadTree");
-            g_collisionQuadTree->Insert(&vegetation[placedCount], code, probe.y, probe.y + height);
+            g_collisionQuadTree->Insert(reinterpret_cast<QuadTreeObject*>(&vegetation[placedCount]), code, probe.y, probe.y + height);
             g_MemTagStack->Push("EcoSystem");
             placedCount++;
         }

@@ -284,7 +284,7 @@ unsigned int Vegetation::UnknownVirtualSlot1(UnknownEcoQuadTree* tree) {
     float radius = g_EcoSystem->definitionTable[definitionIndex]->RadiusForParameter(radiusParam);
     float x = quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
     float z = quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
-    return tree->ComputeCode(x - radius, z - radius, x + radius, z + radius);
+    return reinterpret_cast<QuadTree*>(tree)->ComputeCode(x - radius, z - radius, x + radius, z + radius);
 }
 
 // 0x004567a0
@@ -887,7 +887,7 @@ int EcoSystem::PlaceStoredObjects() {
         float z = vegetation[i].quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
         unsigned int code = g_collisionQuadTree->ComputeCode((x - radius), (z - radius), (x + radius), (z + radius));
         g_MemTagStack->Push("QuadTree");
-        g_collisionQuadTree->Insert(&vegetation[i], code, y, y + height);
+        g_collisionQuadTree->Insert(reinterpret_cast<QuadTreeObject*>(&vegetation[i]), code, y, y + height);
         g_MemTagStack->Push("EcoSystem");
     }
     if (!esbStreamInArchive) {

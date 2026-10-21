@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/track/ChatNameTagDraw.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete name-tag drawing candidate passes 5864 finite native scenarios with the actual VC6 sprintf wrapper, explicit callback/fault/font oracles and 94 strict game checks. Unchanged VC6 body emits 974 bytes with 966 resolved matching positions against 974 retail bytes. Canonical flag exposure preserves 207 sections/863 relocations; aggregate extraction preserves 37 sections/162 relocations. GDI is scripted; integrated HUD rendering remains unverified.",
+      "evidence": "docs/CHAT_NAME_TAG_DRAW.md#functional-build-review"
+    },
+    {
       "path": "samples/ui/MultiStateDraw.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete multistate image and text drawing candidate checked in 16181 finite native scenarios with sixteen actual strict source helpers and the complete native VC6 conversion routine. VC6 emits 682 bytes against 672 retail bytes, with 139 resolved matching positions; extraction preserves all 733 aggregate sections and 3912 relocations. Lower GetDc, COM and GDI boundaries remain scripted; integrated menus are unverified.",

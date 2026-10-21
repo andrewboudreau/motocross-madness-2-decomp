@@ -75,7 +75,7 @@ static float s_UnknownGlobal68a448;
 static int s_UnknownGlobal68a440;
 
 // 0x0068a444: when set, ChatOverlay redraws all of its lines.
-static int s_UnknownGlobal68a444;
+int s_UnknownGlobal68a444;
 
 // 0x00518720
 InstrumentOverlay::InstrumentOverlay(int flags) : Overlay(flags, 1)

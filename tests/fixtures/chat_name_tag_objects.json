@@ -1,0 +1,13 @@
+{
+  "baseline_commit": "ed3d06ce",
+  "canonical": {
+    "sections": 207,
+    "relocations": 863,
+    "sha256": "1b930a4eda41feb141a118260b6aa6655f60cdc08e273d2f0e8b0ee397b74ef1"
+  },
+  "aggregate": {
+    "sections": 37,
+    "relocations": 162,
+    "sha256": "3d1651fd1daa40bb9cd96170f11279b8e3181c640b427022170aeec2f3a9dffb"
+  }
+}

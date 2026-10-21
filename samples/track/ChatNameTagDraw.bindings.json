@@ -1,0 +1,15 @@
+{
+  "??_C@_00A@?$AA@": "0x00577738",
+  "??_C@_02CKJF@?9?9?$AA@": "0x0056a090",
+  "??_C@_02DILL@?$CFs?$AA@": "0x00566aa0",
+  "??_C@_02MECO@?$CFd?$AA@": "0x00568dc0",
+  "??_C@_03DHMP@?5?3?5?$AA@": "0x00575344",
+  "??_C@_04KIBJ@?$CF?43f?$AA@": "0x00575348",
+  "?DrawNameTag@ChatOverlay@@QAEXPAXH@Z": "0x0051e3f0",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
+  "__imp__DrawTextA@20": "0x005502e8",
+  "__imp__GetTextExtentPoint32A@16": "0x00550084",
+  "__imp__SelectObject@8": "0x00550078",
+  "_sprintf": "0x00534aaf",
+  "?s_UnknownGlobal68a444@@3HA": "0x0068a444"
+}

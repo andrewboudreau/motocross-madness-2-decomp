@@ -214,7 +214,6 @@
   "_s_UnknownGlobal57513c": "0x0057513c",
   "_s_UnknownGlobal575140": "0x00575140",
   "_s_UnknownGlobal68a440": "0x0068a440",
-  "_s_UnknownGlobal68a444": "0x0068a444",
   "_s_UnknownGlobal68a448": "0x0068a448",
   "_s_UnknownVector68a400": "0x0068a400",
   "_s_UnknownVector68a410": "0x0068a410",
@@ -223,5 +222,6 @@
   "_sprintf": "0x00534aaf",
   "_strncat": "0x00536b60",
   "_strncpy": "0x00534b10",
-  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x0050a590"
+  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x0050a590",
+  "?s_UnknownGlobal68a444@@3HA": "0x0068a444"
 }

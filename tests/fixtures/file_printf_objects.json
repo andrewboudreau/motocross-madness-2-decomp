@@ -1,5 +1,5 @@
 {
-  "baseline": "Published f6c22865 before declaration correction; each same-path complete object preserves all nondebug bytes, flags and relocation targets under only the FilePrintf void-to-int external-name substitution. Only enumerated full source filenames are checkout-relative.",
+  "baseline": "Published f6c22865 before declaration correction; each same-path complete object preserves all nondebug bytes, flags and relocation targets under only the FilePrintf void-to-int external-name substitution. Only enumerated full source filenames are checkout-relative. EcoSystem QuadTree correction: published ed3d06ce old EcoSystem pins reproduced independently; both complete objects preserve all bytes and destinations under only the six tree interface names, with no exclusions or score changes.",
   "rename": {
     "?FilePrintf@@YAXPAU_iobuf@@PBDZZ": "?FilePrintf@@YAHPAU_iobuf@@PBDZZ"
   },
@@ -17,12 +17,12 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "9da6f6357818cc3611fb2d5c2fa6e600e2099dbfe7e49e59621ee812a0f570bf"
+      "sha256": "724215f54fa464d2a9b0341dbfd553b633999d7b5d886557d3532bb4f69cfde6"
     },
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,
       "relocations": 444,
-      "sha256": "249de017371bed4040b56f55be293f33e1ddc57bc2c509eaad45fe8fe97cd42f"
+      "sha256": "adefbff12c00c5e62e96fdb25c5da3143adee069d68e3b84a7e812c86173c6a6"
     }
   }
 }

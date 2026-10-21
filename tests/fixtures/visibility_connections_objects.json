@@ -1,5 +1,5 @@
 {
-  "baseline": "Round46 same-path baseline objects before five joins. TrackOverlayNearMisses original HEAD fails because GUIManager is incomplete; its baseline adds only the genuine GUIManagerCore include before these joins. All seven complete nondebug sections and relocation destinations are preserved under exactly the five names; known full source filenames alone are checkout-relative. Round47 joins six global pointer spellings to the same canonical unresolved cell; all seven complete objects were independently rechecked against both old pins and fresh candidate objects, with no other changes.",
+  "baseline": "Round46 same-path baseline objects before five joins. TrackOverlayNearMisses original HEAD fails because GUIManager is incomplete; its baseline adds only the genuine GUIManagerCore include before these joins. All seven complete nondebug sections and relocation destinations are preserved under exactly the five names; known full source filenames alone are checkout-relative. Round47 joins six global pointer spellings to the same canonical unresolved cell; all seven complete objects were independently rechecked against both old pins and fresh candidate objects, with no other changes. Round50 exposes the existing TrackOverlay flag at unchanged BSS+0x40: its published old pin was reproduced first, and all207 sections/863 relocations remain identical under only that one static-to-external symbol name/visibility change; only the canonical TrackOverlay record is refreshed.",
   "renames": {
     "?TransformPoints@UnknownCubeClipper@@QAEXPAUVector3@@0PAUMatrix4@@H@Z": "?TransformVectors@VisibilityClipper@@QAEXPBUVisibilityBoxVec@@PAU2@PBUVisibilityMatrix@@H@Z",
     "?CanFaceCamera@UnknownCubeClipper@@QAEHPAVCamera@@PAUVector3@@1@Z": "?TestDot@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityBoxVec@@1@Z",
@@ -21,7 +21,7 @@
     "src/reconstructed/TrackOverlay.cpp": {
       "sections": 207,
       "relocations": 863,
-      "sha256": "30cc5fcb670ceb1ca81252f2b55dc4551bd021cd0a767437e80f285ffd32e61a"
+      "sha256": "b1e2aab2acaf7fa3db94fa92dcd2e5e08c389fd18815771d9996c279d9e01287"
     },
     "samples/render/CubeDrawNearMisses.cpp": {
       "sections": 17,

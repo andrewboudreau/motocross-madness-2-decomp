@@ -28,19 +28,9 @@
 // ebp for `this` and the view. A goto out of the loop, a flag, drawing
 // inside the loop and separate loop variables spill the index instead.
 
-// ChatOverlay::DrawNameTag (0x0051e3f0, 974 bytes, 966 match):
-// the frame and code match except in the racer-tag branch. A racer local in
-// the position branch gives retail's eax there; in the "%.3f" branch retail
-// loads the racer into eax and the buffer address into ecx (VC6 here edx and
-// eax), and loads the game pointer into edx (here ecx). Inverted branches, a
-// racer local in that branch, a game local, a float or double local and a
-// buffer pointer do not change it; nor do an inline float or double
-// accessor for +0x4a4, an explicit (double) cast or `&text[0]`. Also tried:
-// no inner shadowing `size` (853), a racer local at the top of the else
-// (worse), a racer local in the "%.3f" branch only, `!= 0` tests, no racer
-// local in the 0x6c0 branch (884) and unbraced if/else (unchanged).
-// Session 14: all 24 declaration orders of text, name, length and size
-// keep 966.
+// ChatOverlay::DrawNameTag is included from ChatNameTagDraw.cpp below.
+// Its complete 974-byte candidate has 966 matching retail positions;
+// behavior and platform-boundary evidence are in docs/CHAT_NAME_TAG_DRAW.md.
 
 // RadarOverlay::DrawTrackOutline (0x0051c720, 1016 bytes; candidate
 // 1002): draws the track outline through a TrackListItem work list. The
@@ -313,66 +303,7 @@ fail:
 // 0x0051e3f0: draws name tag `index` into `dc`: the name line for the
 // player's own tag, otherwise the position and the racer's name (or the
 // value at +0x4a4), centred, and sizes the tag to the text.
-void ChatOverlay::DrawNameTag(void* dc, int index)
-{
-    char text[0x80];
-    char name[0x80];
-    int length;
-    UnknownTextExtent size;
-    void* font = SelectObject(dc, nameTagFont);
-    if (index == racerCount) {
-        sprintf(text, "%s", cueRacerName);
-        length = strlen(text);
-        UnknownOverlayRect rect = nameTagRects[index];
-        rect.left += nameTags[index]->drawWidth;
-        DrawTextA(dc, text, length, &rect, 0x8124);
-        UnknownTextExtent size;
-        GetTextExtentPoint32A(dc, text, length, &size);
-        nameTags[index]->drawWidth += size.cx;
-        nameTags[index]->sourceRect = nameTagRects[index];
-        if (nameTags[index]->drawWidth + 4 < nameTags[index]->sourceWidth) {
-            nameTags[index]->drawWidth += 4;
-            nameTags[index]->sourceRect.right = nameTags[index]->drawWidth + nameTags[index]->sourceRect.left - 1;
-        } else {
-            nameTags[index]->drawWidth = nameTags[index]->sourceWidth;
-        }
-    } else {
-        if (s_UnknownGlobal68a444) {
-            sprintf(text, "%.3f", racers[index]->driveForceScale);
-        } else {
-            if (g_TrackGame->mode.showRiderPositions) {
-                UnknownChatRacer* racer = racers[index];
-                if (racer->position > 0)
-                    sprintf(text, "%d", racer->position);
-                else
-                    strcpy(text, "--");
-            } else {
-                strcpy(text, "");
-            }
-            if (g_TrackGame->mode.showRiderNames)
-                strcpy(name, racers[index]->name);
-            else
-                strcpy(name, "");
-            if (g_TrackGame->mode.showRiderPositions && g_TrackGame->mode.showRiderNames)
-                strcat(text, " : ");
-            strcat(text, name);
-        }
-        length = strlen(text);
-        GetTextExtentPoint32A(dc, text, length, &size);
-        nameTags[index]->drawWidth = size.cx;
-        DrawTextA(dc, text, length, &nameTagRects[index], 0x8125);
-        nameTags[index]->sourceRect = nameTagRects[index];
-        if (nameTags[index]->drawWidth + 4 < nameTags[index]->sourceWidth) {
-            nameTags[index]->drawWidth += 4;
-            int margin = (nameTags[index]->sourceWidth - nameTags[index]->drawWidth) >> 1;
-            nameTags[index]->sourceRect.left += margin;
-            nameTags[index]->sourceRect.right += 1 - margin;
-        } else {
-            nameTags[index]->drawWidth = nameTags[index]->sourceWidth;
-        }
-    }
-    SelectObject(dc, font);
-}
+#include "ChatNameTagDraw.cpp"
 
 // The view RadarOverlay draws (+0x12c) holds its track at +0x48.
 struct UnknownRadarView {

@@ -59,7 +59,7 @@ public:
     void RestartQuery();                      // 0x004dd750
     int IsValidCode(unsigned int code);       // 0x004ddd90
 };
-extern UnknownEcoQuadTree* g_collisionQuadTree; // 0x0068aba4
+#include "../krusty2/broadphase/QuadTreeDeclarations.h"
 
 // src/krusty2/broadphase/Terrain.h: Terrain.
 class UnknownEcoTerrain {
