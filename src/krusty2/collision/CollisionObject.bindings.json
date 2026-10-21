@@ -35,10 +35,6 @@
   "?BoundingSpheresOverlap@@YAHPBUCollisionBoundingSphere@@0@Z": "0x0043a270",
   "?BoxCapsuleOverlap@@YAHPBUCollisionVec3@@00MMPBUMatrix4@@@Z": "0x00425900",
   "?BoxSphereOverlap@@YAHPBUCollisionVec3@@0U1@MMPBUMatrix4@@@Z": "0x00425750",
-  "?BuildModelBoxTree@@YAXPAX00H@Z": "0x0042dc90",
-  "?BuildModelTriangleTree@@YAXPAXPAUMatrix4@@0PAPAUCollisionVec3@@0H@Z": "0x0042c8c0",
-  "?BuildPointTree@@YAXPAXPAUMatrix4@@00@Z": "0x0042d390",
-  "?BuildTriangleMeshTree@@YAXPAXPAUMatrix4@@PAUCollisionVec3@@PBHHHH@Z": "0x0042cc60",
   "?CapsuleTreeQueryWithVertices@@YAHPAUCollisionVec3@@MMPAXPBUMatrix4@@H1@Z": "0x00429890",
   "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
   "?CollectNodes@CollisionSourceNode@@QAEXPAHPAPAV1@@Z": "0x004fda60",
@@ -83,7 +79,6 @@
   "?FindTypeId@TypeRegistry@@QAEDPBD@Z": "0x00521ea0",
   "?FreeBoxTree@@YAXPAX@Z": "0x0042a160",
   "?FreeShape@CollisionObject@@QAEXXZ": "0x00432430",
-  "?GetIdentityMatrix@@YAPAUMatrix4@@PAU1@@Z": "0x004a1410",
   "?GetMatrixIn@CollisionSceneNode@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fca80",
   "?GetObject@CollisionVegetation@@QAEPAVCollisionObject@@H@Z": "0x004570a0",
   "?GetObjectCount@CollisionVegetation@@QAEHXZ": "0x00457080",
@@ -189,5 +184,10 @@
   "_kVec3XAxis": "0x005797c0",
   "_kVec3YAxis": "0x005797d0",
   "_kVec3ZAxis": "0x005797a0",
-  "_kVec3Zero": "0x005797b0"
+  "_kVec3Zero": "0x005797b0",
+  "?BuildModelPointTree@@YAXPAUBoxTreeNode@@PAUTreeMatrix4@@PAVTreeModelSource@@PAVTreeSceneNode@@@Z": "0x0042d390",
+  "?BuildModelTriangleTree@@YAXPAUBoxTreeNode@@PAUTreeMatrix4@@PAVTreeModelSource@@PAPAUTreeVec3@@PAVTreeSceneNode@@H@Z": "0x0042c8c0",
+  "?IdentityMatrix@@YA?AUMatrix4@@XZ": "0x004a1410",
+  "?BuildTriangleMeshTree@@YAXPAUBoxTreeNode@@PAUTreeMatrix4@@PAUTreeVec3@@PBHHHH@Z": "0x0042cc60",
+  "?BuildModelBoxTree@@YAXPAUBoxTreeNode@@PBUTreeMatrix4@@PAUTreeVec3@@H@Z": "0x0042dc90"
 }

@@ -256,5 +256,6 @@
   "_kVec3YAxis": "0x0067b458",
   "_kVec3ZAxis": "0x0067b428",
   "_kVec3Zero": "0x0067b438",
-  "_strstr": "0x005362c0"
+  "_strstr": "0x005362c0",
+  "__FILE__:guiscreentexture.cpp": "0x0056c3cc"
 }

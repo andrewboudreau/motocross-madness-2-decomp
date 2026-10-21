@@ -715,7 +715,7 @@ void D3DIMSoultreeObject::ComputeSubtreeBounds()
         GetSubtreeBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extents));
         DrawBoxOutline(center, extents, 1);
     }
-    GetLocalBounds(&center, &extents);
+    GetLocalBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extents));
     DrawBoxOutline(center, extents, 0);
     if (nextSibling)
         ((D3DIMSoultreeObject*)nextSibling)->ComputeSubtreeBounds();

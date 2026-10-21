@@ -40,9 +40,6 @@ public:
     // arguments 0, 1, 3 and 4, then 1).
     virtual void UnknownNodeVirtualSlot9(void* a0, const char* name, int a3, int a4, int a5);
 
-    CarProceduralNode* FindByName(const char* name);       // 0x004fdae0 named child
-    void GetPosition(Vector3* position);                   // 0x004fc970
-    void GetLocalBounds(Vector3* a, Vector3* b);              // 0x004fe0a0 (ret 8)
     // Frame-relative helpers slot 10 uses (src/krusty2/core/SoultreeObject.h
     // documents them): position in `frame` space, placement there, the
     // local<->world direction maps and the two-axis orientation setter.
@@ -60,7 +57,6 @@ public:
 // node with a GameObject base at +0xc.
 class CarProceduralModel : public CarProceduralNode, public GameObject {
 public:
-    explicit CarProceduralModel(int flags);                          // 0x0043f160
     char field_0x38[0x2d8 - 0x38];            // starts with the model name (0x0042fa00)
 };
 

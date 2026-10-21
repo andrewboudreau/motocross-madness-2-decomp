@@ -25,6 +25,7 @@
 #include "BoundingBoxTreeBuild.h"
 #include "TextureMap.h"
 #include "MatrixUtil.h"
+#include "D3DIMSoulTree.h"
 
 // ---------------------------------------------------------------------------------------------
 // Partition and bounds helpers.
@@ -661,14 +662,14 @@ void BuildModelPointTree(BoxTreeNode* root, TreeMatrix4* m, TreeModelSource* mod
     int j;
     int k;
 
-    model->TransformVertexGroups(-1);
+    reinterpret_cast<D3DIMSoultreeObject*>(model)->TransformVertexGroups(-1);
     total = 0;
     for (i = 0; i < model->lods[model->currentLod].meshCount; i++)
         total += model->lods[model->currentLod].meshes[i].vertexCount;
     points = (TreeVec3*)DebugMalloc(total * sizeof(TreeVec3), __FILE__, 0x44f);
     count = 0;
     if (frame == 0) {
-        model->GetMatrixIn(0, &frameInverse);
+        reinterpret_cast<SoultreeObject*>(model)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&frameInverse));
         InvertRigid(&frameInverse);
         for (i = 0; i < model->lods[model->currentLod].meshCount; i++) {
             mesh = &model->lods[model->currentLod].meshes[i];
@@ -682,7 +683,7 @@ void BuildModelPointTree(BoxTreeNode* root, TreeMatrix4* m, TreeModelSource* mod
             }
         }
     } else {
-        frame->GetMatrixIn(0, &frameInverse);
+        reinterpret_cast<SoultreeObject*>(frame)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&frameInverse));
         InvertRigid(&frameInverse);
         for (i = 0; i < model->lods[model->currentLod].meshCount; i++) {
             mesh = &model->lods[model->currentLod].meshes[i];

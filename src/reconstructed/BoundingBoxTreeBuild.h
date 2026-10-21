@@ -12,6 +12,7 @@
 #define BOUNDING_BOX_TREE_BUILD_H
 
 #include "DebugAlloc.h"
+#include "BoundingBoxTreeFunctions.h"
 
 // Three consecutive floats; copies are three dword moves (tier 1).  A local type, because
 // this TU has none of the per-TU $E vector-constant initialisers that common/Math3D.h adds;
@@ -130,7 +131,6 @@ public:
     void SetAxesIn(TreeSceneNode* frame, const TreeVec3* axisZ, const TreeVec3* axisY,
                    int orthogonalize, int keepZ);                // 0x004fc050
     void SetPositionIn(TreeSceneNode* frame, const TreeVec3* p);  // 0x004fc740
-    void GetMatrixIn(TreeSceneNode* frame, TreeMatrix4* out);   // 0x004fca80
     void MarkSubtreeDirty();                                    // 0x004fdab0
 };
 
@@ -178,7 +178,6 @@ struct TreeModelLod {
 // Render model (D3DIMSoulTree.CPP; derives from the scene node, see 0x00440d40's this).  Stand-in.
 class TreeModelSource : public TreeSceneNode {
 public:
-    void TransformVertexGroups(int lod);  // 0x00440d40 (D3DIMSoulTree.h): -1 keeps currentLod, then walks the LOD's meshes
     char pad_0x000[0x1a4];
     int field_0x1a4;            // +0x1a4 saved, cleared around TransformVertexGroups(-1) and restored by
                                 // 0x0042c260

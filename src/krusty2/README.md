@@ -59,6 +59,10 @@ builder also remain samples pending complete relocation verification.
 Shared headers use paths relative to this folder, e.g. `core/GameObject.h`.
 The physics runner adds `src/krusty2` to the include path.
 
+Collision shape setup now uses the existing matrix and tree-building functions
+through [five verified connections](../../docs/COLLISION_BUILDER_CONNECTIONS.md).
+Their complete callers retain strict matches and the primary scene pointers.
+
 ## Evidence: Quadtree.cpp
 
 - Name: `D:\aardvark\VC\krusty2\Quadtree.cpp`, string at 0x00572040.

@@ -15,6 +15,7 @@
 #include "motion/D3DIMSoultreeCharacter.h"
 #include "core/SoultreeObject.h"
 #include "motion/MotionPose.h"
+#include "soultree/SoultreePhysicsObject.h"
 
 extern "C" char* _strupr(char*);   // 0x00535d3d (case-maps with 0x20; locale-aware CRT strupr)
 
@@ -273,7 +274,6 @@ D3DIMSoultreeCharacter::D3DIMSoultreeCharacter(int a) : GameObject(1), Character
 typedef SoultreeMaterial SceneItem;
 class ModelObject : public QuadTreeObject, public GameObject {
 public:
-    explicit ModelObject(int a);                 // 0x0043f160, ret 4
     virtual void ModelSlot2();                   // 0x0043f950
     virtual void ModelSlot3();                   // 0x0043fe40
     virtual void ModelSlot4();                   // 0x004440a0
@@ -303,7 +303,7 @@ public:
 void D3DIMSoultreeCharacter::CharacterVirtualSlot9(int a)
 {
     SoultreeObject* source = ((D3DIMSoultreeCharacter*)a)->modelNode;
-    ModelObject* model = new(__FILE__, 0x116) ModelObject(1);
+    ModelObject* model = reinterpret_cast<ModelObject*>(new(__FILE__, 0x116) D3DIMSoultreeObject(1));
     modelNode = (SoultreeObject*)model;
     ((ModelObject*)modelNode)->CopyFrom((ModelObject*)source);
     GameObject* child = (ModelObject*)modelNode;
@@ -328,7 +328,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
     name[n] = 0;
     strcat(name, d3d_field_0x1a4);
 
-    ModelObject* frame = new(__FILE__, 0xd6) ModelObject(isEnabled);
+    ModelObject* frame = reinterpret_cast<ModelObject*>(new(__FILE__, 0xd6) D3DIMSoultreeObject(isEnabled));
     modelNode = (SoultreeObject*)frame;
     frame->Load(renderContext, "", *(int*)(d3d_field_0x1a4 + 0x60), *(int*)(d3d_field_0x1a4 + 0x64), 1);
     GameObject* frameChild = (ModelObject*)modelNode;
@@ -339,7 +339,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
     strncpy(modelNode->name, "Base Character Frame", n);
     modelNode->name[n] = 0;
 
-    ModelObject* loaded = new(__FILE__, 0xdf) ModelObject(isEnabled);
+    ModelObject* loaded = reinterpret_cast<ModelObject*>(new(__FILE__, 0xdf) D3DIMSoultreeObject(isEnabled));
     loaded->Load(renderContext, name, *(int*)(d3d_field_0x1a4 + 0x60), *(int*)(d3d_field_0x1a4 + 0x64),
                  *(int*)(d3d_field_0x1a4 + 0x68));
     ((SoultreeObject*)loaded)->UnregisterNode();

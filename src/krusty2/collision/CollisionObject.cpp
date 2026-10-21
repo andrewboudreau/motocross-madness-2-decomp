@@ -10,6 +10,8 @@
 #include "collision/CollisionShapeTests.h"
 #include "broadphase/Quadtree.h"
 #include "math/Math3D.h"
+#include "../../reconstructed/MatrixUtil.h"
+#include "../../reconstructed/BoundingBoxTreeFunctions.h"
 
 // ==============================================================================================
 // Section: CollisionObject
@@ -190,18 +192,6 @@ CollisionObject::~CollisionObject()
 // node, mesh arrays or a .col stream (wave 5).  Names tier 3; offsets/sizes tier 1 (target bytes).
 // owner: CollisionObject.cpp (__FILE__ strings at every allocation, lines 0xd8..0x14f / 0x9e8..0x9f0).
 
-// 0x004a1410 (cdecl): fills *out with the identity-like frame matrix and returns it (the
-// same function Terrain.h calls GetIdentityMatrix).  Local stand-in.
-Matrix4* GetIdentityMatrix(Matrix4* out);
-
-// Triangle-tree builders (BoundingBoxTreeBuild.cpp).  Local stand-ins with void* in place of
-// the bvh types.
-void BuildModelTriangleTree(void* root, Matrix4* m, void* model, CollisionVec3** verts,
-                            void* frame, int unused);                          // 0x0042c8c0
-void BuildTriangleMeshTree(void* root, Matrix4* m, CollisionVec3* verts, const int* indices,
-                           int triCount, int vertCount, int unused);           // 0x0042cc60
-void BuildPointTree(void* root, Matrix4* m, void* model, void* frame);          // 0x0042d390 (tier 3 name)
-
 // 0x00432720 (ret 0x14): hull shape for a scene node.  `buildPointTree` (arg 2, the only one
 // that is tested) adds the point tree; arg 3 is the hull's swept flag; args 4 and 5 are unused
 // except that arg 5 is forwarded to the triangle-tree builder.
@@ -209,20 +199,23 @@ void CollisionObject::SetHullShape(void* node, int buildPointTree, int swept, in
 {
     FreeShape();
     CollisionHullBody* hull = (CollisionHullBody*)operator new(0x198, __FILE__, 0x116);
-    Matrix4 tmp;
-    hull->relativeFrame = *GetIdentityMatrix(&tmp);
+    hull->relativeFrame = IdentityMatrix();
     hull->swept = swept;
     shapeType = 0;
     shape = hull;
     hull->sceneNode = node;
     hull->vertices = 0;
     hull->triangleTree = (CollisionBoxBounds*)operator new(0x24, __FILE__, 0x123);
-    BuildModelTriangleTree(hull->triangleTree, &hull->localTransform, node,
-                           (CollisionVec3**)&hull->vertices, 0, d);
+    BuildModelTriangleTree(reinterpret_cast<BoxTreeNode*>(hull->triangleTree),
+                           reinterpret_cast<TreeMatrix4*>(&hull->localTransform),
+                           reinterpret_cast<TreeModelSource*>(node),
+                           reinterpret_cast<TreeVec3**>(&hull->vertices), 0, d);
     hull->pointTree = 0;
     if (buildPointTree) {
         hull->pointTree = operator new(0x24, __FILE__, 0x128);
-        BuildPointTree(hull->pointTree, &hull->localTransform, node, 0);
+        BuildModelPointTree(reinterpret_cast<BoxTreeNode*>(hull->pointTree),
+                            reinterpret_cast<TreeMatrix4*>(&hull->localTransform),
+                            reinterpret_cast<TreeModelSource*>(node), 0);
     }
 }
 
@@ -234,8 +227,7 @@ void CollisionObject::SetTriangleMeshHullShape(const CollisionVec3* verts, const
 {
     FreeShape();
     CollisionHullBody* hull = (CollisionHullBody*)operator new(0x198, __FILE__, 0x13c);
-    Matrix4 tmp;
-    hull->relativeFrame = *GetIdentityMatrix(&tmp);
+    hull->relativeFrame = IdentityMatrix();
     hull->swept = 0;
     shapeType = 0;
     shape = hull;
@@ -244,8 +236,9 @@ void CollisionObject::SetTriangleMeshHullShape(const CollisionVec3* verts, const
     for (int i = 0; i < vertCount; i++)
         ((CollisionVec3*)hull->vertices)[i] = verts[i];
     hull->triangleTree = (CollisionBoxBounds*)operator new(0x24, __FILE__, 0x14f);
-    BuildTriangleMeshTree(hull->triangleTree, &hull->localTransform, (CollisionVec3*)hull->vertices,
-                          indices, triCount, vertCount, 0);
+    BuildTriangleMeshTree(reinterpret_cast<BoxTreeNode*>(hull->triangleTree),
+                          reinterpret_cast<TreeMatrix4*>(&hull->localTransform),
+                          reinterpret_cast<TreeVec3*>(hull->vertices), indices, triCount, vertCount, 0);
     hull->pointTree = 0;
 }
 
@@ -265,8 +258,7 @@ void CollisionObject::ReadShape(void* node, CollisionFileStream* stream)
     case 0: {
         CollisionHullBody* hull = (CollisionHullBody*)operator new(0x198, __FILE__, 0x9e8);
         hull->sceneNode = node;
-        Matrix4 tmp;
-        hull->relativeFrame = *GetIdentityMatrix(&tmp);
+        hull->relativeFrame = IdentityMatrix();
         shape = hull;
         ReadHullShape(stream, hull);
         break;
@@ -362,8 +354,7 @@ void CollisionObject::ReadModelShape(void* nodeArg, CollisionFileStream* stream,
         int index;
         stream->Read(&index, 4, 1);
         model->elements[i].sceneNode = list[index];
-        Matrix4 tmp;
-        model->elements[i].relativeFrame = *GetIdentityMatrix(&tmp);
+        model->elements[i].relativeFrame = IdentityMatrix();
         ReadHullShape(stream, &model->elements[i]);
         model->elementEnabled[i] = 1;
     }
@@ -403,15 +394,19 @@ void CollisionObject::SetModelShape(void* nodeArg, int buildPointTrees, int swep
             model->elementEnabled[index] = 1;
             model->elements[index].triangleTree = (CollisionBoxBounds*)operator new(0x24, __FILE__, 0xfd);
             model->elements[index].sceneNode = list[j];
-            Matrix4 tmp;
-            model->elements[index].relativeFrame = *GetIdentityMatrix(&tmp);
-            BuildModelTriangleTree(model->elements[index].triangleTree, &model->elements[index].localTransform,
-                                   node, (CollisionVec3**)&model->elements[index].vertices, list[j], d);
+            model->elements[index].relativeFrame = IdentityMatrix();
+            BuildModelTriangleTree(reinterpret_cast<BoxTreeNode*>(model->elements[index].triangleTree),
+                                   reinterpret_cast<TreeMatrix4*>(&model->elements[index].localTransform),
+                                   reinterpret_cast<TreeModelSource*>(node),
+                                   reinterpret_cast<TreeVec3**>(&model->elements[index].vertices),
+                                   reinterpret_cast<TreeSceneNode*>(list[j]), d);
             model->elements[index].pointTree = 0;
             if (buildPointTrees) {
                 model->elements[index].pointTree = operator new(0x24, __FILE__, 0x107);
-                BuildPointTree(model->elements[index].pointTree, &model->elements[index].localTransform,
-                               node, list[j]);
+                BuildModelPointTree(reinterpret_cast<BoxTreeNode*>(model->elements[index].pointTree),
+                                   reinterpret_cast<TreeMatrix4*>(&model->elements[index].localTransform),
+                                   reinterpret_cast<TreeModelSource*>(node),
+                                   reinterpret_cast<TreeSceneNode*>(list[j]));
             }
             index++;
         }
@@ -424,9 +419,6 @@ void CollisionObject::SetModelShape(void* nodeArg, int buildPointTrees, int swep
 // CollisionObjectMethods.cpp -- small CollisionObject members (CollisionObject.cpp TU, tier 3 names).
 // Shape setters free the old shape (FreeShape 0x00432430), allocate the payload with the debug
 // allocator at CollisionObject.cpp lines 0x15b / 0x16e / 0x183 / 0x18a, then set field_0x50/0x54.
-
-// 0x0042dc90: builds the mesh shape's point block (dest, matrix, points, count); tier 3 signature.
-void BuildModelBoxTree(void* dest, void* matrix, void* points, int count);
 
 extern "C" void* memset(void* dest, int c, unsigned int count);
 #pragma intrinsic(memset)
@@ -487,7 +479,9 @@ void CollisionObject::SetMeshShape(int count, void* points)
     s->field_0x00 = 0;
     s->field_0x04 = operator new(0x24, __FILE__, 0x18a);
     SetIdentity(&s->field_0x08);
-    BuildModelBoxTree(s->field_0x04, &s->field_0x08, points, count);
+    BuildModelBoxTree(reinterpret_cast<BoxTreeNode*>(s->field_0x04),
+                      reinterpret_cast<const TreeMatrix4*>(&s->field_0x08),
+                      reinterpret_cast<TreeVec3*>(points), count);
 }
 
 // 0x00432120: toggles useBroadphase; the object is only in the quadtree while it is set.

@@ -20,6 +20,18 @@ the EAX 1.0 listener property set GUID. Semantic method names such as
 `SetEAXEnvironment` describe decoded behavior; they are provisional
 reconstruction names, not recovered symbols.
 
+`DirectXGuids.cpp` supplies C-linkage readonly definitions for the buffer
+algorithm identifier `DS3DALG_NO_VIRTUALIZATION` at `0x00556cf0` and listener
+property set `DSPROPSETID_EAX_ListenerProperties` at `0x00556d20`. CreateBuffer
+copies all 16 algorithm bytes when constructing a 3D buffer; ProbeEAXSupport,
+SetEAXEnvironment and SetEAXListenerParameters pass the property-set address.
+Their complete 342/301/61/61-byte bodies remain strict exact.
+`tests/test_directx_guids.py` checks the actual native data symbols, complete
+readonly storage and all six audio/network consumers. The four added constants
+reduce the real build from 438 to 434 unresolved names, with no additions and
+211/211 units compiled. This supplies data dependencies; hardware EAX support,
+live network services and a linked game remain unestablished.
+
 The same naming convention covers Sound's playback, buffer, streaming and
 3D helpers (`Play`, `LoadWave`, `LockBuffer`, `Set3DDistanceRange`) and the
 loader's queue and eviction helpers. Device and interface members in

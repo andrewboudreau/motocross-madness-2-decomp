@@ -11,6 +11,7 @@
 #include "MemTag.h"
 #include "TextureMap.h"
 #include "UnknownResourceManager.h"
+#include "D3DIMSoulTree.h"
 
 // Per-TU vector constants (the shape documented in docs/LZW.md): four
 // dynamic initializers (0x00430eb0..0x00430feb, .CRT$XCU 0x005660d8..
@@ -113,7 +114,7 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
     strncpy(carName, name, length);
     carName[length] = 0;
 
-    carModel = new (__FILE__, 99) CarProceduralModel(1);
+    carModel = reinterpret_cast<CarProceduralModel*>(new (__FILE__, 99) D3DIMSoultreeObject(1));
     carModel->UnknownNodeVirtualSlot9(a0, name, a3, a4, 1);
     AppendChild(carModel, -1);
     pathOffset = *a7;
@@ -122,27 +123,28 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
     smoothedBack = kVec3Zero;
     steersFrontWheels = a9;
     wheelSpinAngle = 0.0f;
-    CarProceduralNode* body = carModel->FindByName("Body");
-    body->GetPosition(&bodyOffset);
+    CarProceduralNode* body = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("Body"));
+    reinterpret_cast<SoultreeObject*>(body)->GetPosition(reinterpret_cast<Vec3*>(&bodyOffset));
 
     numWheels = wheelCount;
     if (numWheels > 0) {
         wheelNodes = new (__FILE__, 126) CarProceduralNode*[numWheels];
         if (numWheels > 0)
-            wheelNodes[0] = carModel->FindByName("TireFrontL");
+            wheelNodes[0] = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("TireFrontL"));
         if (numWheels > 1)
-            wheelNodes[1] = carModel->FindByName("TireFrontR");
+            wheelNodes[1] = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("TireFrontR"));
         if (numWheels > 2)
-            wheelNodes[2] = carModel->FindByName("TireBackL");
+            wheelNodes[2] = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("TireBackL"));
         if (numWheels > 3)
-            wheelNodes[3] = carModel->FindByName("TireBackR");
+            wheelNodes[3] = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("TireBackR"));
         if (numWheels > 4)
-            wheelNodes[4] = carModel->FindByName("TireMidL");
+            wheelNodes[4] = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("TireMidL"));
         if (numWheels > 5)
-            wheelNodes[5] = carModel->FindByName("TireMidR");
+            wheelNodes[5] = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("TireMidR"));
         Vector3 minimum;
         Vector3 maximum;
-        wheelNodes[0]->GetLocalBounds(&minimum, &maximum);
+        reinterpret_cast<SoultreeObject*>(wheelNodes[0])->GetLocalBounds(
+            reinterpret_cast<Vec3*>(&minimum), reinterpret_cast<Vec3*>(&maximum));
         inverseWheelRadius = 1.0f / maximum.y;
     }
     groundProvider = a5;

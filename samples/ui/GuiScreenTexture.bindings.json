@@ -1,0 +1,18 @@
+{
+  "??0PCTextureMap@@QAE@PAVTextureMapManager@@H@Z": "0x004c5f00",
+  "??2@YAPAXIPBDH@Z": "0x004a3010",
+  "??3@YAXPAXPBDH@Z": "0x004a3060",
+  "??_C@_07CMPK@ToolTip?$AA@": "0x0056c400",
+  "??_C@_09GLGN@GUICursor?$AA@": "0x0056c408",
+  "?CopyScreenToTexture@GUIManager@@QAEPAVPCTextureMap@@HPAUCameraRect@@@Z": "0x00486170",
+  "?CopyScreenToTexture@GUIManager@@QAEPAVPCTextureMap@@HPAUCameraRect@@@Z$ehhandler": "0x0054b88a",
+  "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
+  "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
+  "?ReleaseDc@BackgroundImage@@QAEHXZ": "0x00404c80",
+  "?DisableByClassName@GameObject@@IAEXPBD@Z": "0x00468dd0",
+  "?EnableByClassName@GameObject@@IAEXPBD@Z": "0x00468f10",
+  "?AdvanceFrame@RenderTarget@@QAEXXZ": "0x004e8cc0",
+  "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
+  "__FILE__": "0x0056c3cc"
+}

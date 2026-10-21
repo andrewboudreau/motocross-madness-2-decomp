@@ -11,11 +11,9 @@
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
   "?GatherModelTriangles@@YAXPAVTreeModelSource@@PAVTreeSceneNode@@PAH2PAPAHPAPAUTreeVec3@@@Z": "0x0042c260",
-  "?GetMatrixIn@TreeSceneNode@@QAEXPAV1@PAUTreeMatrix4@@@Z": "0x004fca80",
   "?MarkSubtreeDirty@TreeSceneNode@@QAEXXZ": "0x004fdab0",
   "?PointBoundsVolume@@YAMPBUTreeVec3@@H@Z": "0x0042b5c0",
   "?ReadTriangleNode@@YAXPAPAUBoxTreeNode@@PAVUnknownTextureStream@@@Z": "0x0042dfa0",
-  "?TransformVertexGroups@TreeModelSource@@QAEXH@Z": "0x00440d40",
   "?SetAxesIn@TreeSceneNode@@QAEXPAV1@PBUTreeVec3@@1HH@Z": "0x004fc050",
   "?SetMatrixIn@TreeSceneNode@@QAEXPAV1@PAUTreeMatrix4@@@Z": "0x004fb8c0",
   "?SetPositionIn@TreeSceneNode@@QAEXPAV1@PBUTreeVec3@@@Z": "0x004fc740",
@@ -41,5 +39,7 @@
   "__real@4@3ffe8000000000000000": "0x005507f4",
   "__real@4@3fff8000000000000000": "0x00550748",
   "__real@4@40018000000000000000": "0x00550800",
-  "__real@4@4002a000000000000000": "0x00550780"
+  "__real@4@4002a000000000000000": "0x00550780",
+  "?GetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fca80",
+  "?TransformVertexGroups@D3DIMSoultreeObject@@QAEXH@Z": "0x00440d40"
 }

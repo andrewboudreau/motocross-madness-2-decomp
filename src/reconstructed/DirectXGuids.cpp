@@ -1,6 +1,6 @@
 #include "Guid.h"
 
-// Interface/device identifiers used by the reconstructed DirectX callers but
+// Interface/device/property identifiers used by the reconstructed DirectX callers but
 // absent from the bundled VC6-era DXGUID.LIB. Values and readonly storage are
 // confirmed from retail .rdata; address bindings identify each caller use.
 // This file is a source provider, not a claim about original TU ownership.
@@ -42,4 +42,21 @@ extern "C" const UnknownGuid IID_IDirectInput7A = {
 // 0x00556a50
 extern "C" const UnknownGuid IID_IDirectInputDevice7A = {
     0x57d7c6bc, 0x2356, 0x11d3, {0x8e, 0x9d, 0x00, 0xc0, 0x4f, 0x68, 0x44, 0xae}
+};
+
+// 0x00556870: Net.cpp requests this interface from the created lobby object.
+extern "C" const UnknownGuid IID_IDirectPlayLobby3A = {
+    0x2db72491, 0x652c, 0x11d1, {0xa7, 0xa8, 0x00, 0x00, 0xf8, 0x03, 0xab, 0xfc}
+};
+// 0x00556960: Net.cpp's optional two-byte TCP/IP port address element.
+extern "C" const UnknownGuid DPAID_INetPort = {
+    0xe4524541, 0x8ea5, 0x11d1, {0x8a, 0x96, 0x00, 0x60, 0x97, 0xb0, 0x14, 0x11}
+};
+// 0x00556cf0: PCAudio.cpp selects this algorithm when creating a 3D buffer.
+extern "C" const UnknownGuid DS3DALG_NO_VIRTUALIZATION = {
+    0xc241333f, 0x1c1b, 0x11d2, {0x94, 0xf5, 0x00, 0xc0, 0x4f, 0xc2, 0x8a, 0xca}
+};
+// 0x00556d20: property set used by the EAX listener probe and setters.
+extern "C" const UnknownGuid DSPROPSETID_EAX_ListenerProperties = {
+    0x4a4e6fc1, 0xc341, 0x11d1, {0xb7, 0x3a, 0x44, 0x45, 0x53, 0x54, 0x00, 0x00}
 };

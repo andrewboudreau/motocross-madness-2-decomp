@@ -37,18 +37,27 @@ addresses and never forces unresolved references into an executable.
 
 ## Current gaps
 
-The 2026-10-21 build compiles 211 C++ files (183 canonical sources and twenty-eight
-reviewed candidates) and reaches LINK with 438 unresolved external symbols,
+The 2026-10-21 build compiles 212 C++ files (183 canonical sources and twenty-nine
+reviewed candidates) and reaches LINK with 420 unresolved external symbols,
 down from 855 before the shared-class, global-provider and rendering integration.
 This is a measured link failure, not a source-completion percentage. The
 current run's `link.log` is authoritative for remaining failures.
 
-The final composition in `build-kioe61ys` retains all prior strict results:
+The final composition in `build-2utwbyvo` retains all prior strict results:
 2,981/2,992 calibration rows and 1,086/1,162 physics comparisons. This does
 not establish game startup, menus or racing while linkage remains incomplete.
-The full regression run passes: 471 tests, with 460 passed and eleven skipped
-(`work/game-build/tests-round23.log`). Static checking also passes for 195
-Python files and 343 JSON files.
+The full regression run passes: 475 tests, with 464 passed and eleven skipped
+(`work/game-build/tests-round24.log`). Static checking also passes for 198
+Python files and 344 JSON files.
+
+The current [collision builders](COLLISION_BUILDER_CONNECTIONS.md) and
+[model/scene connections](MODEL_CONSTRUCTION_CONNECTIONS.md) remove thirteen
+obsolete names while preserving all 210 unaffected prior production objects:
+10,447 nondebug sections and 45,229 relocations under verified substitutions.
+The remaining prior object gains only four verified 16-byte readonly GUIDs.
+The [menu-background capture](GUI_SCREEN_TEXTURE.md) adds one reviewed nonexact
+candidate, passing 8,237 native scripted-boundary comparisons. Together these
+changes remove eighteen missing symbols with no new unresolved names.
 
 Many remaining declarations use provisional class views or different method
 signatures from the available implementation. Those need evidence-based
@@ -68,7 +77,7 @@ virtual dispatch, child callbacks and iterator mutation guards against the
 real BaseObject, GameObject and MemTag implementations.
 
 [Graphics storage](GRAPHICS_STATE.md) now supplies the display lists, camera
-limits, gamma ramp, shared texture caches and detail presets. Nine missing
+limits, gamma ramp, shared texture caches and detail presets. Thirteen missing
 DirectX GUIDs and the required-version scalar also have source definitions.
 The [DirectX startup probe](DEVICESETUP.md#functional-build-review) remains a
 nonexact candidate in `samples/`, explicitly included after a native

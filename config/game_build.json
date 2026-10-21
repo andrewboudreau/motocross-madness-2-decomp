@@ -3,6 +3,12 @@
   "source_roots": ["src"],
   "candidate_sources": [
     {
+      "path": "samples/ui/GuiScreenTexture.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Complete menu screen capture passes 8237 native pixel, state, callback, allocation, fault and unwind scenarios. VC6 emits 888 bytes against the complete 896-byte retail body with 284 matching positions. Rendering, surfaces, format lookup, allocation and texture creation are scripted; real DirectDraw capture and modal menus remain untested, and PCTextureMap CreateSurface is still a missing provider.",
+      "evidence": "docs/GUI_SCREEN_TEXTURE.md#functional-build-review"
+    },
+    {
       "path": "samples/gameui/MediaControlNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete MediaControl Open passes 11125 native scripted COM, OS and helper scenarios including output aliasing, callback mutations, failures and faults. VC6 emits 656 bytes against the complete 646-byte retail body with 53 matching positions. Actual SDK and canonical GUID providers are checked; live DirectShow decoding, DirectDraw drivers and downstream Release cleanup remain untested.",

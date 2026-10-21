@@ -149,6 +149,16 @@ names, extents, storage flags and every byte against the hash-pinned private
 EXE. Supplying these constants resolves linker dependencies; it does not
 establish that the original external lobby service is operational.
 
+`DirectXGuids.cpp` also supplies the C-linkage `IID_IDirectPlayLobby3A`
+(`0x00556870`) and `DPAID_INetPort` (`0x00556960`) constants. ConnectUsingLobby
+pushes the former at `0x004ab9ee` for QueryInterface. CreateAddress copies all
+four DWORDs of the latter at `0x004ac044/49/4f/59` into its optional two-byte
+TCP/IP port element. Their complete 989-byte and 948-byte callers remain strict
+exact. These symbols are absent from the installed VC6 libraries, including
+DXGUID.LIB; source definitions reproduce retail's 16-byte readonly storage.
+This establishes the observed constants and their uses, not an original SDK
+revision, library object or defining translation unit.
+
 ## Reproduce
 
 ```bash

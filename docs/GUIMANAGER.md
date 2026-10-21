@@ -133,6 +133,7 @@ null/non-null caller rectangles and multiple screen dimensions.
 
 This is finite behavioral evidence with scripted dependencies. It does not
 exercise actual rendering, dialog resources or message-loop interaction.
-Both manager and dialog background-grab paths still require the missing
-CopyScreenToTexture implementation, so this test does not establish working
-modal menus or startup.
+The complete CopyScreenToTexture candidate has a separate
+[capture and pixel-buffer comparison](GUI_SCREEN_TEXTURE.md#functional-build-review).
+Its surface and texture dependencies remain scripted, so these tests do not
+establish working modal menus or startup.

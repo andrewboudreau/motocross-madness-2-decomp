@@ -46,13 +46,13 @@ void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* tri
     int t;
 
     numTris = 0;
-    model->GetMatrixIn(0, &saved);
+    reinterpret_cast<SoultreeObject*>(model)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&saved));
     model->SetAxesIn(0, &kVec3ZAxis, &kVec3YAxis, 0, 1);
     model->SetPositionIn(0, &kVec3Zero);
     savedField = model->field_0x1a4;
     model->field_0x1a4 = 0;
     model->MarkSubtreeDirty();
-    model->TransformVertexGroups(-1);
+    reinterpret_cast<D3DIMSoultreeObject*>(model)->TransformVertexGroups(-1);
     model->field_0x1a4 = savedField;
     model->MarkSubtreeDirty();
 

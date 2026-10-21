@@ -117,7 +117,7 @@
   "?SetFlag14c@SoultreeObject@@QAEXXZ": "0x004fdb40",
   "?ClearFlag14c@SoultreeObject@@QAEXXZ": "0x004fdb50",
   "?LoadFromParameters@SoultreeObject@@QAEXPAVUnknownTextureStream@@H@Z": "0x004fdb60",
-  "?GetLocalBounds@SoultreeObject@@QAEXPAUVector3@@0@Z": "0x004fe0a0",
+  "?GetLocalBounds@SoultreeObject@@QAEXPAUVec3@@0@Z": "0x004fe0a0",
   "?UpdateSubtreeBounds@SoultreeObject@@QAEXXZ": "0x004fe0f0",
   "?GetSubtreeBounds@SoultreeObject@@QAEXPAUVec3@@0@Z": "0x004fe850",
   "?RegisterNode@SoultreeObject@@QAEXXZ": "0x004fedb0",
