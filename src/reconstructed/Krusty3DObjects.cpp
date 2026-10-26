@@ -398,7 +398,7 @@ BonusObjectManager::~BonusObjectManager() {
 }
 
 // 0x0048c330
-int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
+int BonusObjectManager::LoadDigitModels(void* context, int a, int b) {
     char name[0x104];
     Vector3 position;
     int digit;
@@ -407,13 +407,13 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
     position = Vector3(0.74f, 0.0f, 0.0f);
     sprintf(name, "%s\\%1d.slt", "Res", 0);
     digitModels[0][0] = new (__FILE__, 0x2d3) D3DIMSoultreeObject(isEnabled);
-    digitModels[0][0]->UnknownVirtualSlot9(value, name, a, b, 1);
+    digitModels[0][0]->UnknownVirtualSlot9(context, name, a, b, 1);
     digitModels[0][0]->SetPosition(*reinterpret_cast<const Vec3*>(&position));
     baseFrame->AppendChild(digitModels[0][0], -1);
     digitModels[0][0]->ClearScreenRects();
     position.x = 0.37f;
     digitModels[0][1] = new (__FILE__, 0x2da) D3DIMSoultreeObject(isEnabled);
-    digitModels[0][1]->UnknownVirtualSlot9(value, name, a, b, 1);
+    digitModels[0][1]->UnknownVirtualSlot9(context, name, a, b, 1);
     digitModels[0][1]->SetPosition(*reinterpret_cast<const Vec3*>(&position));
     baseFrame->AppendChild(digitModels[0][1], -1);
     digitModels[0][1]->ClearScreenRects();
@@ -426,7 +426,7 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
         position.x = 0.0f;
         for (place = 2; place < 5; place++) {
             digitModels[digit][place] = new (__FILE__, 0x2ec) D3DIMSoultreeObject(isEnabled);
-            digitModels[digit][place]->UnknownVirtualSlot9(value, name, a, b, 1);
+            digitModels[digit][place]->UnknownVirtualSlot9(context, name, a, b, 1);
             digitModels[digit][place]->SetPosition(*reinterpret_cast<const Vec3*>(&position));
             baseFrame->AppendChild(digitModels[digit][place], -1);
             digitModels[digit][place]->ClearScreenRects();
@@ -438,14 +438,14 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
     position.x = 1.18f;
     sprintf(name, "%s\\x.slt", "Res", 0);
     timesModel = new (__FILE__, 0x2fe) D3DIMSoultreeObject(isEnabled);
-    timesModel->UnknownVirtualSlot9(value, name, a, b, 1);
+    timesModel->UnknownVirtualSlot9(context, name, a, b, 1);
     timesModel->SetPosition(*reinterpret_cast<const Vec3*>(&position));
     baseFrame->AppendChild(timesModel, -1);
     timesModel->ClearScreenRects();
     position.x = 1.67f;
     sprintf(name, "%s\\DecimalPoint.slt", "Res", 0);
     decimalPointModel = new (__FILE__, 0x307) D3DIMSoultreeObject(isEnabled);
-    decimalPointModel->UnknownVirtualSlot9(value, name, a, b, 1);
+    decimalPointModel->UnknownVirtualSlot9(context, name, a, b, 1);
     decimalPointModel->SetPosition(*reinterpret_cast<const Vec3*>(&position));
     baseFrame->AppendChild(decimalPointModel, -1);
     decimalPointModel->ClearScreenRects();
@@ -454,7 +454,7 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
         position.x = 1.87f;
         for (place = 0; place < 2; place++) {
             fractionDigitModels[digit][place] = new (__FILE__, 0x312) D3DIMSoultreeObject(isEnabled);
-            fractionDigitModels[digit][place]->UnknownVirtualSlot9(value, name, a, b, 1);
+            fractionDigitModels[digit][place]->UnknownVirtualSlot9(context, name, a, b, 1);
             fractionDigitModels[digit][place]->SetPosition(*reinterpret_cast<const Vec3*>(&position));
             baseFrame->AppendChild(fractionDigitModels[digit][place], -1);
             fractionDigitModels[digit][place]->ClearScreenRects();
@@ -467,9 +467,9 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
 }
 
 // 0x0048c8a0
-int BonusObjectManager::CreateFrameNode(void* value, int a, int b) {
+int BonusObjectManager::CreateFrameNode(void* context, int a, int b) {
     baseFrame = new (__FILE__, 0x326) D3DIMSoultreeObject(1);
-    if (!AppendChild(baseFrame->UnknownVirtualSlot9(value, "", a, b, 1), -1))
+    if (!AppendChild(baseFrame->UnknownVirtualSlot9(context, "", a, b, 1), -1))
         return 0;
     strcpy(baseFrame->nodeName, "Base Bonus Frame");
     baseFrame->subtreeBoundsCenter = kVec3Zero;
@@ -483,16 +483,16 @@ int BonusObjectManager::CreateFrameNode(void* value, int a, int b) {
 }
 
 // 0x0048ca60
-BonusObjectManager* BonusObjectManager::SetupCounter(void* value, int a, int b, UnknownBonusRacer* racer,
+BonusObjectManager* BonusObjectManager::SetupCounter(void* context, int a, int b, UnknownBonusRacer* racer,
                                                      UnknownBonusCamera* camera) {
-    GameObject::SetRenderContext(value);
+    GameObject::SetRenderContext(context);
     raceView = racer;
     this->camera = camera;
-    if (!CreateFrameNode(value, a, b)) {
+    if (!CreateFrameNode(context, a, b)) {
         Release();
         return 0;
     }
-    if (!LoadDigitModels(value, a, b)) {
+    if (!LoadDigitModels(context, a, b)) {
         Release();
         return 0;
     }

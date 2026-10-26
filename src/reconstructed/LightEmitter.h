@@ -34,7 +34,7 @@ public:
     // 0x0049e230 (ret 0x2c): slot 8 of the base, then the type, colour,
     // range, optional position/direction and sphere model; arguments 8-10
     // are unused.
-    LightEmitter* Create(void* value, int type, unsigned int color,
+    LightEmitter* Create(void* context, int type, unsigned int color,
                                         const Vector3* position, const Vector3* direction,
                                         float range, int sphere, int a8, int a9, int a10,
                                         int index);
