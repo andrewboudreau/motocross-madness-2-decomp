@@ -84,7 +84,7 @@ public:
     void InsertNodesInQuadtree();    // owner: SoultreeQuadTreeRenderer.cpp (__FILE__ line 0x63)
     void RemoveNodesFromQuadtree();    // owner: SoultreeQuadTreeRenderer.cpp (__FILE__ line 0x7f)
 
-    int field_0x34;                  // +0x34 count of nodes 0x5046e0 switched on.
+    int sceneObjectCount;            // +0x34 count of nodes 0x5046e0 switched on ("Total Objects in scene")
     int statsId;                      // +0x38 -1 until slot 14 takes an id from the stats table
     int visibleCount;                 // +0x3c slot 12 counts the nodes it flagged ("Objects Visible")
     int field_0x40;                   // zeroed by the ctor

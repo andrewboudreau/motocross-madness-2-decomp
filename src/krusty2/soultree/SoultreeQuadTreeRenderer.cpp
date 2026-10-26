@@ -25,7 +25,7 @@ extern int g_soultreeNodeCount;                  // 0x00689ec8
 SoultreeQuadTreeRenderer::SoultreeQuadTreeRenderer(int flags)
     : GraphicsTest(flags)
 {
-    field_0x34 = 0;
+    sceneObjectCount = 0;
     statsId = -1;
     field_0x40 = 0;
     nodeTypeId = g_TypeRegistry->FindTypeId("SoultreeObject");
@@ -47,7 +47,7 @@ int SoultreeQuadTreeRenderer::UnknownVirtualSlot14()
             statsId = line;
         }
         reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Title(statsId, "SoultreeQuadTreeRenderer");
-        reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Print(statsId, "Total Objects in scene : %i\n", field_0x34);
+        reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Print(statsId, "Total Objects in scene : %i\n", sceneObjectCount);
         reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Print(statsId, "Objects Visible        : %i\n", visibleCount);
         reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Print(statsId, "Objects in list        : %i\n", g_soultreeNodeCount);
     }
@@ -94,7 +94,7 @@ void SoultreeQuadTreeRenderer::InsertNodesInQuadtree()
     while (GameObject* obj = it->Next()) {
         D3DIMSoultreeObject* node = dynamic_cast<D3DIMSoultreeObject*>(obj);
         if (node && node->field_0x28c) {
-            field_0x34++;
+            sceneObjectCount++;
             node->field_0x190 = 0;
             node->subtreeDirty = 1;
             node->inQuadtree = 1;
@@ -105,7 +105,7 @@ void SoultreeQuadTreeRenderer::InsertNodesInQuadtree()
     delete it;
 }
 
-// 0x005047f0: the inverse walk; resets the +0x34 count.
+// 0x005047f0: the inverse walk; resets sceneObjectCount.
 void SoultreeQuadTreeRenderer::RemoveNodesFromQuadtree()
 {
     GameObject* root = this;
@@ -119,7 +119,7 @@ void SoultreeQuadTreeRenderer::RemoveNodesFromQuadtree()
             node->field_0x190 = 1;
         }
     }
-    field_0x34 = 0;
+    sceneObjectCount = 0;
     delete it;
 }
 
@@ -128,7 +128,7 @@ void SoultreeQuadTreeRenderer::RemoveNodesFromQuadtree()
 int SoultreeQuadTreeRenderer::OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b)
 {
     if ((reinterpret_cast<SoultreeStats*>(g_TrackGame)->debugFlags & 4) && TestInputEvent(0x2d, 0, a, 0x80)) {
-        if (!field_0x34)
+        if (!sceneObjectCount)
             InsertNodesInQuadtree();
         else
             RemoveNodesFromQuadtree();
