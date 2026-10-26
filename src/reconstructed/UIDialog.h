@@ -77,7 +77,7 @@ public:
     void ShowGroup(int group, int show);      // 0x0046eb30: Show on the controls of "GroupId" `group`
     void EndDialog(int result);               // 0x0046ff30: stores `result` (+0x17c) and starts closing
     void NotifyParent(int code, int kind);    // 0x0046ff70: sends the parent dialog an event
-    int RequestHover(UIControl* control, int a, int b); // 0x00470000
+    int RequestHover(UIControl* control, int previous, int update); // 0x00470000
     GameObject* AddControl(GameObject* control, int group, int region); // 0x0046a8a0
 
     // gameui.cpp (provisional names).

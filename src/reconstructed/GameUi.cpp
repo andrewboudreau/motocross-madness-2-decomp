@@ -1993,9 +1993,9 @@ UIControl* UIDialog::SetupControl(UIControl* control, int group, int region) {
 }
 
 // 0x0046a8a0
-GameObject* UIDialog::AddControl(GameObject* control, int a, int b) {
+GameObject* UIDialog::AddControl(GameObject* control, int group, int region) {
     if (control) {
-        SetupControl((UIControl*)control, a, b);
+        SetupControl((UIControl*)control, group, region);
         controlContainer->AppendChild(control, -1);
         return control;
     }
@@ -2201,9 +2201,8 @@ void UIDialog::SetBackground(void* background) {
 }
 
 // 0x00470000
-int UIDialog::RequestHover(UIControl* control, int a, int b) {
-    return guiUser->RequestHover((UnknownGuiControl*)control,
-                                                                    (UnknownGuiControl**)a, b);
+int UIDialog::RequestHover(UIControl* control, int previous, int update) {
+    return guiUser->RequestHover((UnknownGuiControl*)control, (UnknownGuiControl**)previous, update);
 }
 
 // 0x00470020
@@ -3691,10 +3690,10 @@ int UIDialog::BeginControlDraw(void** dc, CameraRect* rect, int* a, UIControl* c
 }
 
 // 0x0046fce0
-void UIDialog::AddTimer(int a, int time, int b) {
+void UIDialog::AddTimer(int id, int time, int control) {
     if (time)
         timerList.Add(
-            new(__FILE__, 0xa76) UITimer(a, time, (UIControl*)b));
+            new(__FILE__, 0xa76) UITimer(id, time, (UIControl*)control));
 }
 
 // ---------------------------------------------------------------------------
