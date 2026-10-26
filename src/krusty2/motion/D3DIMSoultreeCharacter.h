@@ -163,12 +163,14 @@ public:
     virtual void CharacterVirtualSlot9(int a);    // 0x00445ec0
     virtual void CharacterVirtualSlot10();        // 0x00446520
     // --- slot 11, introduced here ---
-    // a2/a3 types follow SoultreePhysicsCharacter slot 40, which passes its name string and
-    // descriptor here (tier 2).
+    // path/desc types follow SoultreePhysicsCharacter slot 40, which passes its name string and
+    // descriptor here (tier 2).  context and unused go to SetCharacterRenderContext; desc is
+    // kept at d3d_field_0x1a4+0x60, a copy of the 0x18-byte loadInfo block (when nonzero) at
+    // +0x64 and a5 at +0x68 (tier 1 decode).
     // Returns the GameObject subobject (this converted to GameObject*) on success, 0 when the
     // resource could not be found and the object released itself (tier 1 decode of 0x00445680).
-    virtual GameObject* D3DIMVirtualSlot11(int a1, const char* a2, const SoultreeLoadDesc* a3, int a4,
-                                    int a5, int a6); // 0x00445680 (ret 0x18)
+    virtual GameObject* D3DIMVirtualSlot11(int context, const char* path, const SoultreeLoadDesc* desc,
+                                           int loadInfo, int a5, int unused); // 0x00445680 (ret 0x18)
 
     // D3DIM's own data 0x1a0..0x210 (then vtordisp at 0x210, GameObject at 0x214).
     // modelNode is the pointer that SoultreePhysicsCharacter code reads at the

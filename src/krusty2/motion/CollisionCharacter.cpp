@@ -74,19 +74,19 @@ int CollisionCharacter::Tick(float dt)
     return GameObject::Tick(dt);
 }
 
-// 0x004319c0 (ret 0x1c).  Loads the character through the D3DIM base (slot 11 with a1, name,
-// desc, a5, a6, a7), then creates the CollisionObject for it (new(0xb8, __FILE__, 27),
+// 0x004319c0 (ret 0x1c).  Loads the character through the D3DIM base (slot 11 with context, name,
+// desc, loadInfo, a6, unused), then creates the CollisionObject for it (new(0xb8, __FILE__, 27),
 // ctor 0x00431e70 with 1) and gives it a shape: from the .col file colPath when one was
 // supplied, otherwise from the scene node.  The character becomes the object's owner with
-// tag 0x2711.  Returns the result of GameObject slot 8 (stores a1 in field_0x18 and returns
+// tag 0x2711.  Returns the result of GameObject slot 8 (stores context in field_0x18 and returns
 // the GameObject).  The 'Collision' allocation category is selected around the new.
-GameObject* CollisionCharacter::Load(int a1, const char* name, const char* colPath,
-                                     const SoultreeLoadDesc* desc, int a5, int a6, int a7)
+GameObject* CollisionCharacter::Load(int context, const char* name, const char* colPath,
+                                     const SoultreeLoadDesc* desc, int loadInfo, int a6, int unused)
 {
-    D3DIMSoultreeCharacter::D3DIMVirtualSlot11(a1, name, desc, a5, a6, a7);
+    D3DIMSoultreeCharacter::D3DIMVirtualSlot11(context, name, desc, loadInfo, a6, unused);
     int prevTag = g_MemTagStack->Push("Collision");
     collisionObject = new(CC_FILE, 27) CollisionObject(1);
-    collisionObject->Configure((void*)a1, 1, 0, 1);
+    collisionObject->Configure((void*)context, 1, 0, 1);
     collisionObject->ignoreVegetation = 1;
     // node + 0x140 is the scene node whose position slot 10 tracks (tier 3)
     sceneNode = *(SoultreeObject**)((char*)modelNode + 0x140);
@@ -98,5 +98,5 @@ GameObject* CollisionCharacter::Load(int a1, const char* name, const char* colPa
     collisionObject->SnapPlacement();
     collisionObject->SetOwner(this, 0x2711);
     g_MemTagStack->Pop(prevTag);
-    return GameObject::SetRenderContext((void*)a1);
+    return GameObject::SetRenderContext((void*)context);
 }

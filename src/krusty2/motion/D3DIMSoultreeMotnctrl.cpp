@@ -381,32 +381,32 @@ struct LoadDescCopy {                                    // 0x18-byte block copi
     int field_0x00[6];
 };
 
-// slot 11 (0x00445680, ret 0x18): loads a character from the resource 'a2'.  The file name part is looked up
+// slot 11 (0x00445680, ret 0x18): loads a character from the resource 'path'.  The file name part is looked up
 // in the owner registry; a cached entry with an owner is cloned through slot 8, otherwise the .slt file is read
 // and the new object becomes the entry's owner.  Returns the GameObject subobject, or 0 when the lookup fails
 // (the object has then released itself).
-GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, const SoultreeLoadDesc* a3, int a4,
-                                                       int a5, int a6)
+GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int context, const char* path, const SoultreeLoadDesc* desc,
+                                                       int loadInfo, int a5, int unused)
 {
     char drive[4];
     char fname[0x100];
     char ext[0x100];
     char dir[0x100];
     ReadClock();
-    SetCharacterRenderContext(a1, a6);
-    *(const SoultreeLoadDesc**)(d3d_field_0x1a4 + 0x60) = a3;
+    SetCharacterRenderContext(context, unused);
+    *(const SoultreeLoadDesc**)(d3d_field_0x1a4 + 0x60) = desc;
     *(int*)(d3d_field_0x1a4 + 0x68) = a5;
-    if (a4) {
+    if (loadInfo) {
         LoadDescCopy* copy = (LoadDescCopy*)DebugMalloc(0x18, __FILE__, 0x64);
         *(LoadDescCopy**)(d3d_field_0x1a4 + 0x64) = copy;
-        *copy = *(LoadDescCopy*)a4;
+        *copy = *(LoadDescCopy*)loadInfo;
     }
     UnknownTextureStream* file = new(__FILE__, 0x68) UnknownTextureStream(g_ResourceManager);
-    _splitpath(a2, drive, dir, fname, ext);
+    _splitpath(path, drive, dir, fname, ext);
     strcat(fname, ext);
     ResourceItem* entry = g_ResourceManager->FindItem(fname, 0);
     if (!entry) {
-        g_ResourceManager->AddLooseFile(fname, a2);
+        g_ResourceManager->AddLooseFile(fname, path);
         entry = g_ResourceManager->FindItem(fname, 0);
         if (!entry) {
             Release();
@@ -423,9 +423,9 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, c
     }
     file->Open(fname, "rb", 0);
     file->SetBufferSize(0x4000);
-    int len = strlen(a2);
+    int len = strlen(path);
     int n = len > 0x4f ? 0x4f : len;
-    strncpy(sltPath, a2, n);
+    strncpy(sltPath, path, n);
     sltPath[n] = 0;
     sltFile = new(__FILE__, 0xa5) UnknownParameterBlock();
     sltFile->Attach((UnknownParameterStream*)file, 0, 1);
