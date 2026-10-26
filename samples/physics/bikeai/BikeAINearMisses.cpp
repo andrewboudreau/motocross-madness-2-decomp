@@ -1727,8 +1727,8 @@ int KrustyBike::Fn_00413200(float dt)
     Vec3* fwd = &bodyForward;
     worldAngularVelocity = *fwd * angularVelocity.z + *up * angularVelocity.y
                            - CrossProduct(*fwd, *up) * angularVelocity.x;
-    Vec3* w = &worldAngularVelocity;
-    lookAheadFrontVelocity = CrossProduct(*w, bodyForward) * 3.5f + velocity;
+    Vec3* spin = &worldAngularVelocity;
+    lookAheadFrontVelocity = CrossProduct(*spin, bodyForward) * 3.5f + velocity;
     lookAheadRearVelocity = velocity - CrossProduct(worldAngularVelocity, *fwd) * 3.5f;
     unsigned char airborneOut = airborne;
     SimulateLookAhead(&steer, &lookAheadFrontVelocity, &lookAheadRearVelocity, &velocity, 0, &position,

@@ -270,42 +270,42 @@ int ProjectedShadow::ComputeBounds()
 static inline void FillShortsUnrolled(short* p, int count, short value, unsigned int pair)
 {
     if (count > 0) {
-        short* q = p;
+        short* aligned = p;
         if ((int)p & 2) {
             *p = value;
-            q = p + 1;
+            aligned = p + 1;
             count--;
         }
         int pairs = count >> 1;
         if (pairs > 0) {
-            unsigned int* d = (unsigned int*)q;
+            unsigned int* words = (unsigned int*)aligned;
             int k = pairs - 1;
             unsigned int passes = (unsigned int)(pairs + 15) >> 4;
             do {
                 switch (k) {
-                default: d[15] = pair;
-                case 14: d[14] = pair;
-                case 13: d[13] = pair;
-                case 12: d[12] = pair;
-                case 11: d[11] = pair;
-                case 10: d[10] = pair;
-                case 9: d[9] = pair;
-                case 8: d[8] = pair;
-                case 7: d[7] = pair;
-                case 6: d[6] = pair;
-                case 5: d[5] = pair;
-                case 4: d[4] = pair;
-                case 3: d[3] = pair;
-                case 2: d[2] = pair;
-                case 1: d[1] = pair;
-                case 0: d[0] = pair;
+                default: words[15] = pair;
+                case 14: words[14] = pair;
+                case 13: words[13] = pair;
+                case 12: words[12] = pair;
+                case 11: words[11] = pair;
+                case 10: words[10] = pair;
+                case 9: words[9] = pair;
+                case 8: words[8] = pair;
+                case 7: words[7] = pair;
+                case 6: words[6] = pair;
+                case 5: words[5] = pair;
+                case 4: words[4] = pair;
+                case 3: words[3] = pair;
+                case 2: words[2] = pair;
+                case 1: words[1] = pair;
+                case 0: words[0] = pair;
                 }
                 k -= 16;
-                d += 16;
+                words += 16;
             } while (--passes);
         }
         if (count & 1)
-            q[count - 1] = value;
+            aligned[count - 1] = value;
     }
 }
 
@@ -354,9 +354,9 @@ void ProjectedShadow::RenderShadow()
                 int points[6];
                 bool inside = true;
                 for (int k = 0; k < 3; k++) {
-                    ShadowVec3* v = &vertexBuffer[*(indices + i + k) + vertexBase];
-                    points[k * 2] = (int)(v->x - 0.5f);
-                    points[k * 2 + 1] = (int)(v->y - 0.5f);
+                    ShadowVec3* vertex = &vertexBuffer[*(indices + i + k) + vertexBase];
+                    points[k * 2] = (int)(vertex->x - 0.5f);
+                    points[k * 2 + 1] = (int)(vertex->y - 0.5f);
                     if (points[k * 2] <= 1 || points[k * 2] >= texture->size - 1
                         || points[k * 2 + 1] <= 1 || points[k * 2 + 1] >= texture->size - 1) {
                         inside = false;
@@ -367,14 +367,14 @@ void ProjectedShadow::RenderShadow()
                     continue;
 
                 for (int j = 0; j < 3; j++) {
-                    ShadowVec3* v = &vertexBuffer[indices[i + j] + vertexBase];
+                    ShadowVec3* vertex = &vertexBuffer[indices[i + j] + vertexBase];
                     int x = points[j * 2];
                     int y = points[j * 2 + 1];
                     clipRect.left = clipRect.left < x ? clipRect.left : x;
                     clipRect.top = clipRect.top < y ? clipRect.top : y;
                     clipRect.right = clipRect.right > x ? clipRect.right : x;
                     clipRect.bottom = clipRect.bottom > y ? clipRect.bottom : y;
-                    minDepth = v->z > minDepth ? minDepth : v->z;
+                    minDepth = vertex->z > minDepth ? minDepth : vertex->z;
                 }
                 ShadowFillTriangle(sizeShift, heightMap, shadowPixel, points, 1);
             }
