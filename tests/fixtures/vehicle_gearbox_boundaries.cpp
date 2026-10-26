@@ -17,7 +17,7 @@ CHECK(aux_field8c, offsetof(VehicleWheelAux, field_0x8c) == offsetof(UnknownEngi
 CHECK(aux_field90, offsetof(VehicleWheelAux, field_0x90) == offsetof(UnknownEngineGearbox, gearCount));
 CHECK(vehicle_aux, offsetof(VehicleWheel, aux) == 0x2a8);
 CHECK(bike_aux, offsetof(BikeWheel, aux) == 0x2a8);
-CHECK(vehicle_magnitude, offsetof(VehicleWheel, field_0x280) == 0x280);
+CHECK(vehicle_magnitude, offsetof(VehicleWheel, driveMagnitude) == 0x280);
 CHECK(bike_magnitude, offsetof(BikeWheel, driveForceMagnitude) == 0x280);
 CHECK(vector_size, sizeof(Vec3) == sizeof(Vector3) && sizeof(Vec3) == 12);
 CHECK(vector_x, offsetof(Vec3, x) == offsetof(Vector3, x));
@@ -51,8 +51,8 @@ int main() {
         for (int reverse = 0; reverse < 2; ++reverse) {
             reinterpret_cast<UnknownEngineGearbox*>(wheel->aux)->DriveForce(1.0f,
                 reinterpret_cast<const Vector3*>(&wheel->rollDirection), 0.5f, (char)reverse, 100.0f,
-                reinterpret_cast<Vector3*>(&wheel->driveForce), reinterpret_cast<float*>(&wheel->field_0x280));
-            if (wheel->field_0x280.x != (reverse ? 100.0f : 0.0f)) return 3;
+                reinterpret_cast<Vector3*>(&wheel->driveForce), &wheel->driveMagnitude);
+            if (wheel->driveMagnitude != (reverse ? 100.0f : 0.0f)) return 3;
             if (wheel->driveForce.x != (reverse ? -100.0f : 0.0f) ||
                 wheel->driveForce.y != (reverse ? 200.0f : 0.0f) ||
                 wheel->driveForce.z != (reverse ? -300.0f : 0.0f)) return 4;

@@ -11,9 +11,9 @@
 CHECK(game_network,offsetof(KbGame,network)==8);
 CHECK(game_session,offsetof(KbGame,eventManager)==0x570);
 CHECK(recorder_pointer,offsetof(KrustyBike,netRecorder)==0x13fc);
-CHECK(owner_racer,offsetof(KbPlayer,field_0xa8)==0xa8);
-CHECK(owner_ghost,offsetof(KbPlayer,field_0xdc)==0xdc);
-CHECK(network_host,offsetof(KbGameCfg,field_0x10)==offsetof(NetworkInterface,isHost));
+CHECK(owner_racer,offsetof(KbPlayer,followedRacer)==0xa8);
+CHECK(owner_ghost,offsetof(KbPlayer,ball)==0xdc);
+CHECK(network_host,offsetof(KbGameCfg,isHost)==offsetof(NetworkInterface,isHost));
 extern "C" int BikeRecorderPrimary() {
     return (int)static_cast<GameObject*>(reinterpret_cast<VCRInterface*>(0x1000))-0x1000;
 }

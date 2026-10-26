@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import posixpath
 from pathlib import Path
 import re
 import struct
@@ -55,7 +56,7 @@ def complete_object(obj):
     prefix = str(ROOT).replace('\\', '/')+'/'
     def filename(data):
         text, nul, tail = data.partition(b'\0')
-        value = text.decode('latin1').replace('\\', '/')
+        value = posixpath.normpath(text.decode('latin1').replace('\\', '/'))
         if nul and value.lower().startswith(prefix.lower()) and value[len(prefix):] == CANONICAL:
             return ('source:'+CANONICAL).encode()+nul+tail
         return data
@@ -166,7 +167,7 @@ class RaceSoundRefillTests(unittest.TestCase):
             self.assertEqual(report['strict_match']['matching_positions'], 806)
             rows = complete_object(aggregate)
             self.assertEqual((len(rows), sum(len(row[3]) for row in rows)), (106, 579))
-            self.assertEqual(hashlib.sha256(json.dumps(rows).encode()).hexdigest(), 'f4f0a753f4bd506b302d2340c73c345ac4a4f54a35b940679bdf3018728a743a')
+            self.assertEqual(hashlib.sha256(json.dumps(rows).encode()).hexdigest(), '153f52a9c17d47c12e076d386248daa6994dc4a383d2a967b483b4259258836d')
             cases = [c for c in CASES if c['source'] == CANONICAL]
             self.assertEqual(len(cases), 26)
             for case in cases:

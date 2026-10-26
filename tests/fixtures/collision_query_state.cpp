@@ -10,7 +10,7 @@
 CHECK_LAYOUT(hit_size, sizeof(QueryHit) == 20 && sizeof(CollisionBoxResult) == 20);
 CHECK_LAYOUT(hit_fraction, offsetof(QueryHit, fraction) == offsetof(CollisionBoxResult, fraction));
 CHECK_LAYOUT(hit_pointer, offsetof(QueryHit, point) == 4 && offsetof(CollisionBoxResult, point) == 4);
-CHECK_LAYOUT(hit_normal, offsetof(QueryHit, normal) == 8 && offsetof(CollisionBoxResult, field_0x08) == 8);
+CHECK_LAYOUT(hit_normal, offsetof(QueryHit, normal) == 8 && offsetof(CollisionBoxResult, normal) == 8);
 CHECK_LAYOUT(pointer_size, sizeof(g_CollisionBoxResult) == 4);
 CHECK_LAYOUT(vector_stride, sizeof(Vec3) == 12 && sizeof(CollisionVec3) == 12);
 void SetCollisionBoxResult(CollisionBoxResult* record);
@@ -77,8 +77,8 @@ int main() {
             float t = (float(layers[leaf]) - start) / dz;
             if (inside && dz * float(sign) < 0 && t >= 0 && t <= 1 && t <= wanted.hit.fraction) {
                 wantedHit = 1; wanted.hit.fraction = t; wanted.hit.point = ends;
-                wanted.hit.field_0x08.x = wanted.hit.field_0x08.y = 0;
-                wanted.hit.field_0x08.z = float(sign * scale);
+                wanted.hit.normal.x = wanted.hit.normal.y = 0;
+                wanted.hit.normal.z = float(sign * scale);
             }
         }
         unsigned char savedBanks[sizeof(banks)], savedTree[sizeof(tree)], savedLeaves[sizeof(nearLeaf)+sizeof(farLeaf)];

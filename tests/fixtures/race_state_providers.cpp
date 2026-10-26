@@ -41,13 +41,13 @@ int main() {
     const float cells[]={0.0f,-0.0f,0.25f,-0.25f,0.99f,-0.99f,1.0f,-1.0f,1.75f,-1.75f,127.5f,-128.5f};
     for(int remote=0;remote<2;++remote)for(int a=0;a<12;++a)for(int b=0;b<12;++b)for(int axis=0;axis<2;++axis) {
         Pattern(&actual,sizeof(actual),a*13+b);
-        KbCell first,second;Pattern(&first,sizeof(first),a);Pattern(&second,sizeof(second),b);
-        first.field_0x8=first.field_0x10=2.5f;second.field_0x8=second.field_0x10=2.5f;
-        if(axis==0){first.field_0x8=cells[a];second.field_0x8=cells[b];}
-        else{first.field_0x10=cells[a];second.field_0x10=cells[b];}
+        KbBikeNetState first,second;Pattern(&first,sizeof(first),a);Pattern(&second,sizeof(second),b);
+        first.position.x=first.position.z=2.5f;second.position.x=second.position.z=2.5f;
+        if(axis==0){first.position.x=cells[a];second.position.x=cells[b];}
+        else{first.position.z=cells[a];second.position.z=cells[b];}
         bike->isRemote=(char)remote;
-        ((KbNetBike*)bike)->field_0x11c8=&first;((KbNetBike*)bike)->field_0x11cc=&second;
-        expected=actual;KbCell firstBefore=first,secondBefore=second;
+        bike->states[0]=&first;bike->states[1]=&second;
+        expected=actual;KbBikeNetState firstBefore=first,secondBefore=second;
         int want=remote && cells[a]!=0 && cells[b]!=0 && (int)cells[a]!=(int)cells[b];
         if(bike->Fn_00495C00()!=want || memcmp(&actual,&expected,sizeof(actual)) || memcmp(&first,&firstBefore,sizeof(first)) || memcmp(&second,&secondBefore,sizeof(second)))return Fail("cells",a*12+b);
         ++count;

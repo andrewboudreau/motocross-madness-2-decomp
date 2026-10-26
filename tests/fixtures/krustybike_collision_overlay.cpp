@@ -37,8 +37,8 @@ static void Prepare() {
   b->center.x=Value(n);b->center.y=Value(n+1);b->center.z=Value(n+2);
   b->halfExtents.x=0.5f+(seed%3);b->halfExtents.y=1;b->halfExtents.z=2;
   if(o->shapeType==0){CollisionHullBody*h=(CollisionHullBody*)o->shape;h->triangleTree=b;Matrix(&h->bodyTransform,n);}
-  if(o->shapeType==1){CollisionModelBody*m=(CollisionModelBody*)o->shape;m->center=b->center;m->halfExtents=b->halfExtents;Matrix(&m->field_0x88,n);}
-  if(o->shapeType==2){CollisionMeshBody*m=(CollisionMeshBody*)o->shape;m->field_0x04=b;Matrix(&m->field_0x08,n);}
+  if(o->shapeType==1){CollisionModelBody*m=(CollisionModelBody*)o->shape;m->center=b->center;m->halfExtents=b->halfExtents;Matrix(&m->bodyTransform,n);}
+  if(o->shapeType==2){CollisionMeshBody*m=(CollisionMeshBody*)o->shape;m->boxTree=b;Matrix(&m->bodyTransform,n);}
  }
  if(alias==1){Object(1)->shapeType=Object(0)->shapeType;Object(1)->shape=Object(0)->shape;}
  if(fault==3)Object(0)->shape=0;
@@ -99,7 +99,7 @@ static int MapReference(const char* path){DWORD old;BYTE*mapped=(BYTE*)0x400000;
 int main(int argc,char**argv){if(argc!=2||!MapReference(argv[1]))return 3;
  PatchCall(0x447f0e,0x534b10,(void*)strncpy);PatchCall(0x447f79,0x535e71,(void*)vsprintf);PatchCall(0x447fd9,0x535e71,(void*)vsprintf);
  FlushInstructionCache(GetCurrentProcess(),0,0);
- if(offsetof(CollisionObject,shapeType)!=0x50||offsetof(CollisionObject,shape)!=0x54||sizeof(CollisionBoxBounds)!=0x24||offsetof(CollisionHullBody,triangleTree)!=0x188||offsetof(CollisionHullBody,bodyTransform)!=0xc8||offsetof(CollisionModelBody,center)!=0x18||offsetof(CollisionModelBody,field_0x88)!=0x88||offsetof(CollisionMeshBody,field_0x04)!=4||offsetof(CollisionMeshBody,field_0x08)!=8||sizeof(DebugOverlay)!=0x36e0||offsetof(DebugOverlay,rows)!=0xb4||offsetof(DebugOverlay,shownPage)!=0x26c4)return 5;
+ if(offsetof(CollisionObject,shapeType)!=0x50||offsetof(CollisionObject,shape)!=0x54||sizeof(CollisionBoxBounds)!=0x24||offsetof(CollisionHullBody,triangleTree)!=0x188||offsetof(CollisionHullBody,bodyTransform)!=0xc8||offsetof(CollisionModelBody,center)!=0x18||offsetof(CollisionModelBody,bodyTransform)!=0x88||offsetof(CollisionMeshBody,boxTree)!=4||offsetof(CollisionMeshBody,bodyTransform)!=8||sizeof(DebugOverlay)!=0x36e0||offsetof(DebugOverlay,rows)!=0xb4||offsetof(DebugOverlay,shownPage)!=0x26c4)return 5;
  unsigned rc[]={_RC_NEAR,_RC_DOWN,_RC_UP,_RC_CHOP},pc[]={_PC_64,_PC_53,_PC_24};
  for(kindA=0;kindA<3;++kindA)for(kindB=0;kindB<3;++kindB)for(seed=0;seed<16;++seed)for(family=0;family<6;++family)for(int r=0;r<4;++r)for(int p=0;p<3;++p){rounding=rc[r];precision=pc[p];Compare(1);}
  for(alias=1;alias<=2;++alias)for(kindA=0;kindA<3;++kindA)for(kindB=0;kindB<3;++kindB)for(seed=0;seed<16;++seed){family=3;Compare(1);}alias=0;

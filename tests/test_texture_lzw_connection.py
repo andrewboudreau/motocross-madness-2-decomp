@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import posixpath
 from pathlib import Path
 import struct
 import subprocess
@@ -22,14 +23,16 @@ RETIRED = '?ExpandLzw@@YAXPAX0H@Z'
 
 
 def whole_object(obj):
-    """Keep all nondebug contents; normalize only these three exact source paths."""
+    """Keep all nondebug contents; normalize only the checkout prefix of source paths."""
     sections = [s for s in obj.sections if not s.name.startswith('.debug')]
     prefix = str(ROOT).replace('\\', '/') + '/'
+    # The near-miss aggregate's literal names its included TextureClone.cpp.
+    filenames = (*SOURCES, 'samples/render/TextureClone.cpp')
 
     def filename(data):
         value, nul, tail = data.partition(b'\0')
-        path = value.decode('latin1').replace('\\', '/')
-        if nul and path.lower().startswith(prefix.lower()) and path[len(prefix):] in SOURCES:
+        path = posixpath.normpath(value.decode('latin1').replace('\\', '/'))
+        if nul and path.lower().startswith(prefix.lower()) and path[len(prefix):] in filenames:
             return ('source:' + path[len(prefix):]).encode() + nul + tail
         return data
 

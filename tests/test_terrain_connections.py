@@ -3,6 +3,7 @@ from collections import Counter
 import hashlib
 import json
 import os
+import posixpath
 from pathlib import Path
 import struct
 import subprocess
@@ -46,13 +47,25 @@ PARTIAL = (
     # $L6170 to $L6172. Both resolve to section 29 .text$x+182 with zero
     # addend; all 85 sections and 517 relocations of the old/current game
     # and fresh test objects remain identical by resolved destination.
-    ('?Load@Terrain@@', 2117, 'b1a655b7c9ef6d0d56363415f18deaa7648b3250ccc4a8da463249bf0bf9dbd2'),
+    ('?Load@Terrain@@', 2117, '12b0100734eb09fafcd872adb6d7488742ebc4e59b8473fa76d446862434f83c'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with
     # complete bytes/relocations preserved under those explicit substitutions.
     ('QueryGround', 3255, '6962fa1f6369f5d34b4feb6fe57de2354071bb9dee7893f5a30e008bd10d652c'),
 )
+
+
+def literal_name(obj, symbol):
+    """Spell a __FILE__ literal by its checkout-relative path; the mangled name embeds the checkout."""
+    if symbol.name.startswith('??_C@') and symbol.section_number > 0:
+        section = obj.section(symbol.section_number)
+        value = obj.data[section.raw_ptr + symbol.value:section.raw_ptr + section.raw_size].partition(b'\0')[0]
+        path = posixpath.normpath(value.decode('latin1').replace('\\', '/'))
+        prefix = str(ROOT).replace('\\', '/') + '/'
+        if path.lower().startswith(prefix.lower()):
+            return 'source:' + path[len(prefix):]
+    return symbol.name
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),
@@ -187,7 +200,8 @@ class TerrainConnectionsTests(unittest.TestCase):
                 body, size, relocations = provider.symbol_extent(entry)
                 self.assertEqual(size, expected_size)
                 records = [(r.virtual_address - entry.value, r.type,
-                            provider.symbol_by_index[r.symbol_index].name) for r in relocations]
+                            literal_name(provider, provider.symbol_by_index[r.symbol_index]))
+                           for r in relocations]
                 self.assertEqual(hashlib.sha256(body + json.dumps(records).encode()).hexdigest(), digest)
 
 

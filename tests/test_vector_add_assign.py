@@ -3,6 +3,7 @@ from collections import Counter
 import hashlib
 import json
 import os
+import posixpath
 from pathlib import Path
 import subprocess
 import sys
@@ -33,7 +34,23 @@ def fingerprint(obj, source):
     added = {s.section_number for s in obj.symbols if source == VEHICLE and
              s.name == CANONICAL and s.section_number > 0}
     sections = [s for s in obj.sections if not s.name.startswith('.debug') and s.index not in added]
-    keys = {s.index: tuple(sorted(t.name for t in obj.symbols if t.section_number == s.index and t.storage_class == 2))
+    def filename(data):
+        # A complete __FILE__ literal is checkout-dependent. Preserve its source
+        # suffix and any following bytes; no function/data payload is normalized.
+        value, separator, suffix = data.partition(b'\0')
+        literal = posixpath.normpath(value.decode('latin1').replace('\\', '/'))
+        if separator and literal.endswith('/'+source):
+            return ('source:'+source).encode()+separator+suffix
+        return data
+    def name(symbol):
+        # The literal's mangled name spells the same checkout path.
+        if symbol.name.startswith('??_C@') and symbol.section_number > 0:
+            section = obj.section(symbol.section_number)
+            data = obj.data[section.raw_ptr+symbol.value:section.raw_ptr+section.raw_size]
+            if filename(data) != data:
+                return 'source:'+source
+        return symbol.name
+    keys = {s.index: tuple(sorted(name(t) for t in obj.symbols if t.section_number == s.index and t.storage_class == 2))
             or ('section', i, s.name) for i, s in enumerate(sections)}
     def target(symbol):
         if source == VEHICLE and symbol.name in (CANONICAL, OLD):
@@ -45,12 +62,7 @@ def fingerprint(obj, source):
     rows = []
     for section in sections:
         data = obj.data[section.raw_ptr:section.raw_ptr+section.raw_size] if section.raw_ptr else bytes(section.raw_size)
-        # A complete __FILE__ literal is checkout-dependent. Preserve its source
-        # suffix and any following bytes; no function/data payload is normalized.
-        value, separator, suffix = data.partition(b'\0')
-        literal = value.decode('latin1').replace('\\', '/')
-        if separator and literal.endswith('/'+source):
-            data = ('source:'+source).encode()+separator+suffix
+        data = filename(data)
         relocations = [(r.virtual_address, r.type, target(obj.symbol_by_index[r.symbol_index]))
                        for r in obj.relocations if r.section_number == section.index]
         rows.append((keys[section.index], section.name, section.characteristics, data.hex(), relocations))
