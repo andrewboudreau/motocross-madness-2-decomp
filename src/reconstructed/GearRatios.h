@@ -22,7 +22,7 @@ public:
     UnknownEngineGearbox(const char* name, float unused, int* torqueTable, int rpmLow, int rpmHigh,
                          int rpmStep, int arg6, float riseRate, float fallRate);
 
-    void UpdateThrottle(float dt, int engaged, unsigned char arg2);   // 0x004d2f50
+    void UpdateThrottle(float dt, int engaged, unsigned char disengaged);   // 0x004d2f50
     void AutoShift(int arg0, float arg1);                        // 0x004d3030
     // 0x004d31b0: drive force along `direction` and its magnitude.
     void DriveForce(float speedRatio, const Vector3* direction, float scale, char reversing,

@@ -183,10 +183,10 @@ UnknownEngineGearbox::UnknownEngineGearbox(const char* name, float unused, int* 
 }
 
 // 0x004d2f50
-void UnknownEngineGearbox::UpdateThrottle(float dt, int engaged, unsigned char arg2)
+void UnknownEngineGearbox::UpdateThrottle(float dt, int engaged, unsigned char disengaged)
 {
     if (engaged && shiftTimer == 0.0f) {
-        driveCut = arg2;
+        driveCut = disengaged;
         if (throttleFraction < 1.0f) {
             throttleFraction += dt / throttleTimeScale * throttleRiseRate;
             throttleFraction = UnknownMin(throttleFraction, 1.0f);

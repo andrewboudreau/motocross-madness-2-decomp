@@ -95,13 +95,13 @@ int ConstraintMethodCollisionModel::UnknownVirtualSlot14()
     return CollisionObject::UnknownVirtualSlot14();
 }
 
-void ConstraintMethodCollisionModel::SetBody(ConBody* b, int useNodeModel, const char* arg)
+void ConstraintMethodCollisionModel::SetBody(ConBody* b, int useNodeModel, const char* shapePath)
 {
     body = b;
-    if (useNodeModel && !arg)
+    if (useNodeModel && !shapePath)
         SetModelShape(b->node, 1, 0, 0, 0);
     else
-        LoadShape(b->node, arg);
+        LoadShape(b->node, shapePath);
     UpdatePlacement();
 }
 
