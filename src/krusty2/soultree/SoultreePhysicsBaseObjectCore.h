@@ -148,7 +148,8 @@ public:
     virtual void UnknownVirtualSlot34();
     virtual void UnknownVirtualSlot35(int a, int b);
     virtual void UnknownVirtualSlot36();
-    virtual SoultreeAttachment* UnknownVirtualSlot37(int type, void* a2, SoultreeAttachTarget* a3, const Vec3* v);
+    virtual SoultreeAttachment* UnknownVirtualSlot37(int type, void* target, SoultreeAttachTarget* anchor,
+                                                     const Vec3* v);
     // Slot 38 (ret 0xc): 0x00501600 switches on eventKind (0x66/0x68/0x69/0x6a/0x2711) and reads
     // event->+0x60 as the other body (tier 1); event's type is provisional.
     virtual void UnknownVirtualSlot38(int notify, int eventKind, void* event);

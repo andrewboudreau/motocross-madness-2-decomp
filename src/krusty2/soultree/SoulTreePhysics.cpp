@@ -361,33 +361,33 @@ int SoultreePhysicsBaseObject::UnknownVirtualSlot33(const Vec3* a1, const Vec3* 
 }
 
 // slot 37 (0x00502a40): append an attachment record.
-SoultreeAttachment* SoultreePhysicsBaseObject::UnknownVirtualSlot37(int type, void* a2,
-                                                                   SoultreeAttachTarget* a3,
+SoultreeAttachment* SoultreePhysicsBaseObject::UnknownVirtualSlot37(int type, void* target,
+                                                                   SoultreeAttachTarget* anchor,
                                                                    const Vec3* v)
 {
     if (attachmentCount >= attachmentCapacity || type == 0)
         return 0;
     SoultreeAttachment* a = &attachments[attachmentCount];
     a->type = type;
-    a->anchor = a3;
+    a->anchor = anchor;
     a->contactEmitter = 0;
-    a->field_0x08 = 0;
-    a->field_0x0c = 0;
+    a->slideEmitter = 0;
+    a->scrapeEmitter = 0;
     a->pointEmitter = 0;
     a->localOffset = g_Zero;
     a->resetTrail = 0;
     switch (type) {
     case 1:
-        a->contactEmitter = (SoultreeAttachedObject*)a2;
+        a->contactEmitter = (SoultreeAttachedObject*)target;
         break;
     case 2:
-        a->field_0x08 = a2;
+        a->slideEmitter = target;
         break;
     case 3:
-        a->field_0x0c = a2;
+        a->scrapeEmitter = target;
         break;
     case 4:
-        a->pointEmitter = a2;
+        a->pointEmitter = target;
         a->localOffset = *v;
         a->anchor = 0;
         break;
@@ -609,7 +609,7 @@ struct SoultreeLight {        // entries of the list above; tier 3: a light (kin
     Vec3 lightPosition;  // +0x64 slot 21 probes toward it for kind 4 (positional)
     float lightDirX, lightDirY, lightDirZ;  // +0x78 slot 21, kind 2: probe target z = origin.z + lightDirZ * -3000
 };
-struct SoultreePadObject {         // attachment field_0x08 / field_0x0c targets: only +0x60 is written
+struct SoultreePadObject {         // attachment slideEmitter / scrapeEmitter targets: only +0x60 is written
     char pad_0x00[0x60];
     int activeThisFrame;  // +0x60 slot 21 clears it every frame for type-2/3 targets, like SoultreeAttachedObject::activeThisFrame
 };
@@ -706,12 +706,12 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
                 UnknownVirtualSlot18(a);
             break;
         case 2:
-            ((SoultreePadObject*)a->field_0x08)->activeThisFrame = 0;
+            ((SoultreePadObject*)a->slideEmitter)->activeThisFrame = 0;
             if (moving)
                 UnknownVirtualSlot19(a);
             break;
         case 3:
-            ((SoultreePadObject*)a->field_0x0c)->activeThisFrame = 0;
+            ((SoultreePadObject*)a->scrapeEmitter)->activeThisFrame = 0;
             if (moving)
                 UnknownVirtualSlot20(a);
             break;
@@ -741,10 +741,10 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
                 attachments[i].contactEmitter->activeThisFrame = 0;
                 break;
             case 2:
-                ((SoultreePadObject*)attachments[i].field_0x08)->activeThisFrame = 0;
+                ((SoultreePadObject*)attachments[i].slideEmitter)->activeThisFrame = 0;
                 break;
             case 3:
-                ((SoultreePadObject*)attachments[i].field_0x0c)->activeThisFrame = 0;
+                ((SoultreePadObject*)attachments[i].scrapeEmitter)->activeThisFrame = 0;
                 break;
             case 4:
                 reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(&attachments[i]))->StopEmitting();

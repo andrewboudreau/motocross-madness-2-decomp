@@ -42,12 +42,12 @@ public:
     void UpdateRelativeMotion(Vec3* a, Vec3* b, Vec3* c, Vec3* d, float e);
 };
 
-// The object at SoultreePhysicsBaseObject::field_0x128 is a CollisionObject (0xb8 bytes,
-// ctor 0x00431e70; tier 1) -- see collision/CollisionObject.h (src/krusty2).  Its field_0xa0 (contact
-// point) and field_0xac (contact normal) are CollisionVec3 there, which slots 28/38 view
+// The object at SoultreePhysicsBaseObject::collisionObject (+0x128) is a CollisionObject
+// (0xb8 bytes, ctor 0x00431e70; tier 1) -- see collision/CollisionObject.h (src/krusty2).  Its
+// hitPoint (+0xa0) and hitNormal (+0xac) are CollisionVec3 there, which slots 28/38 view
 // as Vec3 until the collision vector type is unified with Vec3.
 
-// Object at SoultreeAttachment::field_0x04 (slot 18: position at +0x44/+0x50).
+// Object at SoultreeAttachment::contactEmitter (slot 18: position at +0x44/+0x50).
 class SoultreeAttachedObject {
 public:
     char field_0x00[0x44];
@@ -61,7 +61,7 @@ public:
     void SetColor(int r, int g, int b);      // 0x004b8dd0 DustParticleEmitter::SetColor (ParticleEmitters.h): +0x7c = (r << 16) | (g << 8) | (b & 0xff); slot 21 tints 0x40/0xff
 };
 
-// Object at SoultreeAttachment::field_0x10 (slot 17 sums its Vec3 at +0x20).
+// Object at SoultreeAttachment::anchor (slot 17 sums its Vec3 at +0x20).
 class SoultreeAttachTarget {
 public:
     char field_0x00[0x20];
@@ -74,8 +74,8 @@ class SoultreeAttachment {
 public:
     int type;
     SoultreeAttachedObject* contactEmitter;  // +0x04 type-1 target (slot 37); slot 18 places it at a touching contact (0x004b8d90) whose material allows it and marks it active (+0x60); slot 21 tints it (0x004b8dd0) and toggles its flag 0x800
-    void* field_0x08;
-    void* field_0x0c;
+    void* slideEmitter;   // +0x08 type-2 target (slot 37); slot 21 clears its +0x60 and calls slot 19, which Vehicle reads as VehicleImpactEvent::slideSink
+    void* scrapeEmitter;  // +0x0c type-3 target (slot 37); slot 21 clears its +0x60 and calls slot 20 (Vehicle: VehicleImpactEvent::scrapeSink)
     SoultreeAttachTarget* anchor;  // +0x10 slot 37's a3; slot 17 averages the anchors' +0x20 positions (non-type-4 records) as the shadow probe origin
     void* pointEmitter;  // +0x14 type-4 target (slot 37); slot 21 moves it to the world point of localOffset (0x004ba2c0), starts/stops it (0x004ba300/0x004ba320) and tints it (0x004ba360)
     Vec3 localOffset;  // +0x18 type 4: node-local point given to slot 37; slot 21 maps it with LocalToWorldPoint each frame
