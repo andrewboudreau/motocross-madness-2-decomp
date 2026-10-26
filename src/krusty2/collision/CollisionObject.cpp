@@ -1020,20 +1020,20 @@ void CollisionObject::DrawPointTree(CollisionTreeNode* node, const Matrix4* xf,
         DrawPointTree(node->child[0], xf, motion);
         DrawPointTree(node->child[1], xf, motion);
     } else {
-        Vec3 p = node->center;
+        Vec3 point = node->center;
         if (motion) {
-            Vec3 q;
-            DebugTransformPointRef(&q, p, motion);
-            DebugTransformPoint(&p, node->center, xf);
-            DebugTransformPoint(&q, q, xf);
+            Vec3 moved;
+            DebugTransformPointRef(&moved, point, motion);
+            DebugTransformPoint(&point, node->center, xf);
+            DebugTransformPoint(&moved, moved, xf);
             SetDrawColor(0, 0xff, 0);
-            DrawLine(&p, &q);
-            DrawMarker(&p, 0.05f);
-            DrawMarker(&q, 0.05f);
+            DrawLine(&point, &moved);
+            DrawMarker(&point, 0.05f);
+            DrawMarker(&moved, 0.05f);
         } else {
             SetDrawColor(0, 0xff, 0);
-            DebugTransformPoint(&p, p, xf);
-            DrawMarker(&p, 0.25f);
+            DebugTransformPoint(&point, point, xf);
+            DrawMarker(&point, 0.25f);
         }
     }
 }
@@ -1048,27 +1048,27 @@ void CollisionObject::DrawTreeNormals(CollisionTreeNode* node, const Vec3* verts
         DrawTreeNormals(node->child[1], verts, xf);
     } else {
         const CollisionTreeTriangle* tri = (const CollisionTreeTriangle*)node;
-        Vec3 a = verts[tri->vertex[0]];
-        Vec3 b = verts[tri->vertex[1]];
-        Vec3 c = verts[tri->vertex[2]];
-        Vec3 center = (a + b + c) * (1.0f / 3.0f);
-        Vec3 n = tri->normal;
-        DebugRotateVector(&n, n, xf);
+        Vec3 corner0 = verts[tri->vertex[0]];
+        Vec3 corner1 = verts[tri->vertex[1]];
+        Vec3 corner2 = verts[tri->vertex[2]];
+        Vec3 center = (corner0 + corner1 + corner2) * (1.0f / 3.0f);
+        Vec3 normal = tri->normal;
+        DebugRotateVector(&normal, normal, xf);
         SetDrawColor(0, 0xff, 0);
-        DebugTransformPoint(&a, a, xf);
-        DebugTransformPoint(&b, b, xf);
-        DebugTransformPoint(&c, c, xf);
+        DebugTransformPoint(&corner0, corner0, xf);
+        DebugTransformPoint(&corner1, corner1, xf);
+        DebugTransformPoint(&corner2, corner2, xf);
         DebugTransformPoint(&center, center, xf);
-        n = center + n * 0.1f;   // retail reuses the normal's stack slot for the tip
-        DrawMarker(&a, 0.1f);
-        DrawMarker(&b, 0.1f);
-        DrawMarker(&c, 0.1f);
+        normal = center + normal * 0.1f;   // retail reuses the normal's stack slot for the tip
+        DrawMarker(&corner0, 0.1f);
+        DrawMarker(&corner1, 0.1f);
+        DrawMarker(&corner2, 0.1f);
         SetDrawColor(0, 0, 0xff);
-        DrawLine(&a, &b);
-        DrawLine(&b, &c);
-        DrawLine(&c, &a);
+        DrawLine(&corner0, &corner1);
+        DrawLine(&corner1, &corner2);
+        DrawLine(&corner2, &corner0);
         SetDrawColor(0xff, 0, 0);
-        DrawLine(&center, &n);
+        DrawLine(&center, &normal);
     }
 }
 
@@ -1086,9 +1086,9 @@ void CollisionObject::DrawBoxTree(CollisionTreeNode* node, int depth, const Matr
             DrawBox(&node->center, &node->halfExtents, xf);
         } else {
             SetDrawColor(0xff, 0, 0xff);
-            Vec3 p = node->center;
-            DebugTransformPoint(&p, p, xf);
-            DrawMarker(&p, 0.25f);
+            Vec3 point = node->center;
+            DebugTransformPoint(&point, point, xf);
+            DrawMarker(&point, 0.25f);
         }
     } else if (node->volume >= 0.0f) {
         DrawBoxTree(node->child[0], depth - 1, xf);
@@ -1106,14 +1106,14 @@ void CollisionObject::DrawSegmentTree(CollisionTreeNode* node, const Matrix4* xf
         DrawSegmentTree(node->child[1], xf);
     } else {
         SetDrawColor(0xff, 0, 0xff);
-        Vec3 p, q;
+        Vec3 segStart, segEnd;
         const Vec3* ends = &((const CollisionTreeSegment*)node)->end[0];
-        DebugTransformPoint(&p, ends[0], xf);
-        DebugTransformPoint(&q, ends[1], xf);
-        DrawMarker(&p, 0.25f);
-        DrawMarker(&q, 0.25f);
+        DebugTransformPoint(&segStart, ends[0], xf);
+        DebugTransformPoint(&segEnd, ends[1], xf);
+        DrawMarker(&segStart, 0.25f);
+        DrawMarker(&segEnd, 0.25f);
         SetDrawColor(0, 0xff, 0);
-        DrawLine(&p, &q);
+        DrawLine(&segStart, &segEnd);
     }
 }
 
@@ -1131,14 +1131,14 @@ void CollisionObject::DrawSegmentTreeLevel(CollisionTreeNode* node, int depth, c
             DrawBox(&node->center, &node->halfExtents, xf);
         } else {
             SetDrawColor(0xff, 0, 0xff);
-            Vec3 p, q;
+            Vec3 segStart, segEnd;
             const Vec3* ends = &((const CollisionTreeSegment*)node)->end[0];
-            DebugTransformPoint(&p, ends[0], xf);
-            DebugTransformPoint(&q, ends[1], xf);
-            DrawMarker(&p, 0.25f);
-            DrawMarker(&q, 0.25f);
+            DebugTransformPoint(&segStart, ends[0], xf);
+            DebugTransformPoint(&segEnd, ends[1], xf);
+            DrawMarker(&segStart, 0.25f);
+            DrawMarker(&segEnd, 0.25f);
             SetDrawColor(0, 0xff, 0);
-            DrawLine(&p, &q);
+            DrawLine(&segStart, &segEnd);
         }
     } else if (node->volume >= 0.0f) {
         DrawSegmentTreeLevel(node->child[0], depth - 1, xf);
@@ -1245,9 +1245,9 @@ int CollisionObject::UnknownVirtualSlot14()
             DebugTransformCapsuleEnd(&ends[1], &capsule->p1, &capsule->transform);
             DrawSphere(&ends[0], capsule->radius, 0x10);
             DrawSphere(&ends[1], ((CollisionCapsuleView*)shape)->radius, 0x10);
-            Vec3 d = ends[1] - ends[0];
-            CollisionVec3 axis = DebugNormalized(*(CollisionVec3*)&d);
-            Vec3 step = d / 10.0f;
+            Vec3 span = ends[1] - ends[0];
+            CollisionVec3 axis = DebugNormalized(*(CollisionVec3*)&span);
+            Vec3 step = span / 10.0f;
             for (int i = 0; i < 10; i++) {
                 Vec3 ring = ends[0] + step * (float)i;
                 DrawCircle(&ring, ((CollisionCapsuleView*)shape)->radius, (Vec3*)&axis, 0x20);
@@ -1762,13 +1762,13 @@ int CollisionObject::ModelVsHull(CollisionModelBody* a, CollisionHullBody* b, Co
         }
         if (hit) {
             Vec3 mean;
-            float s;
-            mean.x = sum.x * (s = 1.0f / count);
-            mean.y = sum.y * s;
-            mean.z = sum.z * s;
+            float invCount;
+            mean.x = sum.x * (invCount = 1.0f / count);
+            mean.y = sum.y * invCount;
+            mean.z = sum.z * invCount;
             QueryContact(q) = mean;
             // Retail scales x as fld st(0); fmul sum.x and y/z component
-            // first: s assigned inside the x product gives that order
+            // first: invCount assigned inside the x product gives that order
             // (sum * (1.0f / count), a Vec3 ctor, member operators and a
             // by-value helper all scale x component first).  The copy
             // registers (retail eax/ecx/edx) still differ.
@@ -1813,10 +1813,10 @@ int CollisionObject::ModelVsHullSwept(CollisionModelBody* a, CollisionHullBody* 
         }
         if (hit) {
             Vec3 mean;
-            float s;
-            mean.x = sum.x * (s = 1.0f / count);
-            mean.y = sum.y * s;
-            mean.z = sum.z * s;
+            float invCount;
+            mean.x = sum.x * (invCount = 1.0f / count);
+            mean.y = sum.y * invCount;
+            mean.z = sum.z * invCount;
             QueryContact(q) = mean;
         }
         return hit;
@@ -1852,10 +1852,10 @@ int CollisionObject::ModelVsModel(CollisionModelBody* a, CollisionModelBody* b, 
         }
         if (hit) {
             Vec3 mean;
-            float s;
-            mean.x = sum.x * (s = 1.0f / count);
-            mean.y = sum.y * s;
-            mean.z = sum.z * s;
+            float invCount;
+            mean.x = sum.x * (invCount = 1.0f / count);
+            mean.y = sum.y * invCount;
+            mean.z = sum.z * invCount;
             QueryContact(q) = mean;
         }
         return hit;
@@ -2021,8 +2021,8 @@ int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, Coll
         reinterpret_cast<QueryTreeNode*>(b->triangleTree), &a->worldTransform, &b->worldTransform, 2,
         reinterpret_cast<Vec3*>(b->vertices), &a->motionTransform);
     if (hit) {
-        float s = 1.0f / q->contactCount;
-        q->contact = CollisionScaledProducts(q->contact, s);
+        float invCount = 1.0f / q->contactCount;
+        q->contact = CollisionScaledProducts(q->contact, invCount);
         CollisionTransformPointTo(&q->contact, q->contact, &b->worldTransform);
     }
     CollisionRotateColsTo(&q->contactOffset, q->contactOffset, &b->worldTransform);
@@ -2111,10 +2111,10 @@ int CollisionObject::HullVsModelSwept(CollisionHullBody* a, CollisionModelBody* 
         }
         if (hit) {
             Vec3 mean;
-            float s;
-            mean.x = sum.x * (s = 1.0f / count);
-            mean.y = sum.y * s;
-            mean.z = sum.z * s;
+            float invCount;
+            mean.x = sum.x * (invCount = 1.0f / count);
+            mean.y = sum.y * invCount;
+            mean.z = sum.z * invCount;
             QueryContact(q) = mean;
         }
         return hit;
