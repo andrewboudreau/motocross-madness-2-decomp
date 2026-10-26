@@ -123,14 +123,14 @@ static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIM
 // samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp.
 int D3DIMSoultreeShadow::UnknownVirtualSlot27()
 {
-    D3DIMShadowCasterView* c = (D3DIMShadowCasterView*)caster;
+    D3DIMShadowCasterView* casterView = (D3DIMShadowCasterView*)caster;
     inCameraView = 0;
     inShadowView = 0;
-    if (!c->field_0x14c) {
+    if (!casterView->field_0x14c) {
         D3DIMShadowMatrix4 local;
         ShadowVec3 center, extent;
         D3DIMShadowMatrix4 m;
-        reinterpret_cast<SoultreeObject*>(c)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&local));
+        reinterpret_cast<SoultreeObject*>(casterView)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&local));
         reinterpret_cast<SoultreeObject*>(caster)->GetSubtreeBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extent));
         const D3DIMShadowMatrix4& view = ((D3DIMShadowCameraView*)shadow->camera)->matrix_0xec;
         D3DIMShadowMatrixProduct(&m, local, view);
@@ -146,13 +146,13 @@ int D3DIMSoultreeShadow::UnknownVirtualSlot27()
 float g_d3dimShadowTexel;  // 0x0057efa4
 int D3DIMSoultreeShadow::UnknownVirtualSlot28()
 {
-    ProjectedShadow* s = shadow;
-    float k;
-    if (s->field_0x98)
-        k = 0.5f;
+    ProjectedShadow* projected = shadow;
+    float numerator;
+    if (projected->field_0x98)
+        numerator = 0.5f;
     else
-        k = 1.0f;
-    g_d3dimShadowTexel = k / s->texture->size;
+        numerator = 1.0f;
+    g_d3dimShadowTexel = numerator / projected->texture->size;
     return 0;
 }
 

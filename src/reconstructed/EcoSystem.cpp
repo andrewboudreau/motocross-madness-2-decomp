@@ -267,9 +267,10 @@ Vegetation::Vegetation() {
 
 // 0x00456690
 unsigned short Vegetation::UnknownVirtualSlot0() {
-    Matrix4* m = g_UnknownGlobal59af00;
-    float depth = ((quantizedPosition.z * (*m)(2, 2) + quantizedPosition.x * (*m)(0, 2)) * g_EcoSystem->unitsPerCoordinate
-                   + (*m)(3, 2)) * g_EcoSystem->depthScale;
+    Matrix4* view = g_UnknownGlobal59af00;
+    float depth = ((quantizedPosition.z * (*view)(2, 2) + quantizedPosition.x * (*view)(0, 2)) *
+                       g_EcoSystem->unitsPerCoordinate +
+                   (*view)(3, 2)) * g_EcoSystem->depthScale;
     if (depth < 0.0)
         sortKey = 0;
     else if ((int)depth >= 0xffff)

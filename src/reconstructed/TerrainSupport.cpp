@@ -37,11 +37,11 @@ BaseObject* Terrain::AcquireOwnedObject()
     }
     TerrainSurfaceBase* surface;
     if (surfaceRegistry) {
-        ManagedTexture* s = new(__FILE__, 0x67) ManagedTexture(surfaceDesc.manager);
-        surface = reinterpret_cast<TerrainSurfaceBase*>(s);
+        ManagedTexture* texture = new(__FILE__, 0x67) ManagedTexture(surfaceDesc.manager);
+        surface = reinterpret_cast<TerrainSurfaceBase*>(texture);
         surface->CreateSurface(0, 0x100, 0x100, 0x100, 1, 0, 0, colorMapper, 2, directDrawPalette, 0, 0, 2, 1,
                                &surfaceDesc, 0x80, 0xff00ff);
-        reinterpret_cast<ManagedTextureGroup*>(surfaceRegistry)->AddTexture(s);
+        reinterpret_cast<ManagedTextureGroup*>(surfaceRegistry)->AddTexture(texture);
     } else {
         surface = reinterpret_cast<TerrainSurfaceBase*>(new(__FILE__, 0x78) PCTextureMap(surfaceDesc.manager, 1));
         surface->CreateSurface(0, 0x100, 0x100, 0x100, 1, 0, 0, colorMapper, 2, directDrawPalette, 0, 0, 2, 1,

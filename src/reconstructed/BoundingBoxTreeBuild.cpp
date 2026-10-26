@@ -674,11 +674,11 @@ void BuildModelPointTree(BoxTreeNode* root, TreeMatrix4* m, TreeModelSource* mod
         for (i = 0; i < model->lods[model->currentLod].meshCount; i++) {
             mesh = &model->lods[model->currentLod].meshes[i];
             for (j = 0; j < mesh->vertexCount; j++) {
-                TreeVec3* p = &points[count];
-                p->x = mesh->vertices[j].position.x;
-                p->y = mesh->vertices[j].position.y;
-                p->z = mesh->vertices[j].position.z;
-                TransformPoint(p, *p, &frameInverse);
+                TreeVec3* point = &points[count];
+                point->x = mesh->vertices[j].position.x;
+                point->y = mesh->vertices[j].position.y;
+                point->z = mesh->vertices[j].position.z;
+                TransformPoint(point, *point, &frameInverse);
                 count++;
             }
         }
@@ -697,11 +697,11 @@ void BuildModelPointTree(BoxTreeNode* root, TreeMatrix4* m, TreeModelSource* mod
                 }
             }
             for (j = first; j < end; j++) {
-                TreeVec3* p = &points[count];
-                p->x = mesh->vertices[j].position.x;
-                p->y = mesh->vertices[j].position.y;
-                p->z = mesh->vertices[j].position.z;
-                TransformPoint(p, *p, &frameInverse);
+                TreeVec3* point = &points[count];
+                point->x = mesh->vertices[j].position.x;
+                point->y = mesh->vertices[j].position.y;
+                point->z = mesh->vertices[j].position.z;
+                TransformPoint(point, *point, &frameInverse);
                 count++;
             }
         }

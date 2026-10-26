@@ -2721,8 +2721,8 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                          CollisionVec3* outNormal)
 {
     if (object->isEnabled) {
-        const Vec3* p = (const Vec3*)ends;
-        if (SegmentPointDistance(p, *(const Vec3*)&object->boundCenter) < object->boundRadius) {
+        const Vec3* segment = (const Vec3*)ends;
+        if (SegmentPointDistance(segment, *(const Vec3*)&object->boundCenter) < object->boundRadius) {
             switch (object->shapeType) {
             case 0: {
                 CollisionHullBody* hull = (CollisionHullBody*)object->shape;
@@ -2733,12 +2733,13 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                 SetCollisionBoxResult(&hit);
                 Matrix4 inv = hull->worldTransform;
                 CollisionInvertRigidInPlace(&inv);
-                int result = SegmentTreeQueryWithVertices(p, reinterpret_cast<QueryTreeNode*>(hull->triangleTree), &inv,
-                                                          (Vec3*)hull->vertices);
+                int result = SegmentTreeQueryWithVertices(segment,
+                                                          reinterpret_cast<QueryTreeNode*>(hull->triangleTree),
+                                                          &inv, (Vec3*)hull->vertices);
                 if (result) {
-                    Vec3 d = SubtractCtorCall(p[1], p[0]);
-                    Vec3 scaled = ScaleCtorCall(d, hit.fraction);
-                    *(Vec3*)outPoint = AddCtorCall(scaled, p[0]);
+                    Vec3 direction = SubtractCtorCall(segment[1], segment[0]);
+                    Vec3 scaled = ScaleCtorCall(direction, hit.fraction);
+                    *(Vec3*)outPoint = AddCtorCall(scaled, segment[0]);
                     CollisionRotateColsTo(outNormal, hit.normal, &hull->worldTransform);
                 }
                 return result;
@@ -2752,17 +2753,18 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                 SetCollisionBoxResult(&hit);
                 Matrix4 inv = model->bodyTransform;
                 InvertRigidTransform(&inv);
-                if (SegmentBoxOverlap((Vec3*)&model->center, (Vec3*)&model->halfExtents, p[0], p[1], &inv)) {
+                if (SegmentBoxOverlap((Vec3*)&model->center, (Vec3*)&model->halfExtents, segment[0],
+                                      segment[1], &inv)) {
                     for (int i = 0; i < model->elementCount; i++) {
                         CollisionHullBody* element = &model->elements[i];
                         inv = element->worldTransform;
                         InvertRigidTransform(&inv);
-                        if (SegmentTreeQueryWithVertices(p,
+                        if (SegmentTreeQueryWithVertices(segment,
                                 reinterpret_cast<QueryTreeNode*>(element->triangleTree), &inv,
                                 (Vec3*)element->vertices)) {
-                            Vec3 d = SubtractCtorCall(p[1], p[0]);
-                            Vec3 scaled = ScaleCtorCall(d, hit.fraction);
-                            *(Vec3*)outPoint = SegmentAdd(scaled, p[0]);
+                            Vec3 direction = SubtractCtorCall(segment[1], segment[0]);
+                            Vec3 scaled = ScaleCtorCall(direction, hit.fraction);
+                            *(Vec3*)outPoint = SegmentAdd(scaled, segment[0]);
                             Vec3TransformNormal(reinterpret_cast<Vec3*>(outNormal),
                                 reinterpret_cast<const Vec3&>(hit.normal), &element->worldTransform);
                             return 1;

@@ -57,16 +57,16 @@ void BlockAllocator::Free(void* p) {
 }
 
 int BlockAllocator::AllocateBlock() {
-    Block* p = static_cast<Block*>(DebugMalloc(blockSize, __FILE__, 132));
-    if (!p) return 0;
+    Block* block = static_cast<Block*>(DebugMalloc(blockSize, __FILE__, 132));
+    if (!block) return 0;
     if (!firstBlock) {
-        lastBlock = p;
-        firstBlock = p;
+        lastBlock = block;
+        firstBlock = block;
     } else {
-        lastBlock->next = p;
-        lastBlock = p;
+        lastBlock->next = block;
+        lastBlock = block;
     }
-    p->next = 0;
+    block->next = 0;
     reservedBytes += blockSize;
     return 1;
 }
@@ -76,10 +76,10 @@ BlockAllocator::~BlockAllocator() {
 }
 
 void BlockAllocator::Clear() {
-    Block* p = firstBlock;
-    while (p) {
-        Block* old = p;
-        p = p->next;
+    Block* block = firstBlock;
+    while (block) {
+        Block* old = block;
+        block = block->next;
         DebugFree(old, __FILE__, 156);
     }
     firstBlock = 0;

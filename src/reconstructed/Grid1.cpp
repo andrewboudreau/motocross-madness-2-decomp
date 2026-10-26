@@ -140,20 +140,20 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot6()
 }
 
 // 0x0047d370: selects and binds one block's texture. The record's index
-// and own bits share one word, read once through `x->blocks[block]`
+// and own bits share one word, read once through `extra->blocks[block]`
 // (retail's single load, `test dl, 1`).
 void DrawableGridNodeSharedTextures::UnknownVirtualSlot7(int block)
 {
-    Grid1NodeExtra* x = Extra();
-    int index = x->blocks[block].index;
+    Grid1NodeExtra* extra = Extra();
+    int index = extra->blocks[block].index;
     if (index == -1) {
-        x->texture = 0;
-    } else if (x->blocks[block].own) {
-        x->texture = x->blocks[block].texture;
+        extra->texture = 0;
+    } else if (extra->blocks[block].own) {
+        extra->texture = extra->blocks[block].texture;
         if (Extra()->blocks[block].ageEntry.size)
             Terrain()->textureAgeManager->MarkUsed(&Extra()->blocks[block].ageEntry);
     } else {
-        x->texture = Terrain()->textures[index];
+        extra->texture = Terrain()->textures[index];
     }
     if (Extra()->texture) {
         Extra()->texture->Bind();

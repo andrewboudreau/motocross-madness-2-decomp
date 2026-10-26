@@ -166,30 +166,30 @@ extern VisibilityBoxVertex g_visibilityBoxVertices[16];   // 0x0068a768 (ends at
 // square, the remaining vertical edges) and draws it.
 void VisibilityQuadTreeNode::DrawBox(VisibilityRenderer* renderer, const float* center, const float* extent)
 {
-    VisibilityBoxVertex* v = g_visibilityBoxVertices;
+    VisibilityBoxVertex* strip = g_visibilityBoxVertices;
     float x0 = center[0] - extent[0];
     float x1 = center[0] + extent[0];
     float y0 = center[1] - extent[1];
     float y1 = extent[1] + center[1];
     float z0 = center[2] - extent[2];
     float z1 = extent[2] + center[2];
-    v[0].x = x0;  v[0].y = y0;  v[0].z = z0;
-    v[1].x = x1;  v[1].y = y0;  v[1].z = z0;
-    v[2].x = x1;  v[2].y = y1;  v[2].z = z0;
-    v[3].x = x0;  v[3].y = y1;  v[3].z = z0;
-    v[4].x = x0;  v[4].y = y0;  v[4].z = z0;
-    v[5].x = x0;  v[5].y = y0;  v[5].z = z1;
-    v[6].x = x1;  v[6].y = y0;  v[6].z = z1;
-    v[7].x = x1;  v[7].y = y1;  v[7].z = z1;
-    v[8].x = x0;  v[8].y = y1;  v[8].z = z1;
-    v[9].x = x0;  v[9].y = y0;  v[9].z = z1;
-    v[10].x = x1; v[10].y = y0; v[10].z = z1;
-    v[11].x = x1; v[11].y = y0; v[11].z = z0;
-    v[12].x = x1; v[12].y = y1; v[12].z = z0;
-    v[13].x = x1; v[13].y = y1; v[13].z = z1;
-    v[14].x = x0; v[14].y = y1; v[14].z = z1;
-    v[15].x = x0; v[15].y = y1; v[15].z = z0;
-    renderer->DrawLineStrip(3, 0x1e2, v, 16, 0);
+    strip[0].x = x0;  strip[0].y = y0;  strip[0].z = z0;
+    strip[1].x = x1;  strip[1].y = y0;  strip[1].z = z0;
+    strip[2].x = x1;  strip[2].y = y1;  strip[2].z = z0;
+    strip[3].x = x0;  strip[3].y = y1;  strip[3].z = z0;
+    strip[4].x = x0;  strip[4].y = y0;  strip[4].z = z0;
+    strip[5].x = x0;  strip[5].y = y0;  strip[5].z = z1;
+    strip[6].x = x1;  strip[6].y = y0;  strip[6].z = z1;
+    strip[7].x = x1;  strip[7].y = y1;  strip[7].z = z1;
+    strip[8].x = x0;  strip[8].y = y1;  strip[8].z = z1;
+    strip[9].x = x0;  strip[9].y = y0;  strip[9].z = z1;
+    strip[10].x = x1; strip[10].y = y0; strip[10].z = z1;
+    strip[11].x = x1; strip[11].y = y0; strip[11].z = z0;
+    strip[12].x = x1; strip[12].y = y1; strip[12].z = z0;
+    strip[13].x = x1; strip[13].y = y1; strip[13].z = z1;
+    strip[14].x = x0; strip[14].y = y1; strip[14].z = z1;
+    strip[15].x = x0; strip[15].y = y1; strip[15].z = z0;
+    renderer->DrawLineStrip(3, 0x1e2, strip, 16, 0);
 }
 
 // One child of the debug walk: draws the child's box when it is at least partly visible and
@@ -313,39 +313,39 @@ void VisibilityClipper::ProjectVertices(const VisibilityCamera* camera, const Vi
 {
     const VisibilityMatrix* matrix = m;
     for (int i = 0; i < count; i++) {
-        const VisibilityVertex* p = v;
-        VisibilityClipPoint c;
+        const VisibilityVertex* vertex = v;
+        VisibilityClipPoint clip;
         int code = 0;
-        c.w = p->x * m->m[0][3];
-        c.w += p->y * m->m[1][3];
-        c.w += p->z * m->m[2][3];
-        c.w += m->m[3][3];
-        float inv = 1.0f / c.w;
-        c.x = p->y * m->m[1][0] + (p->z * m->m[2][0] + p->x * m->m[0][0]);
-        c.x += m->m[3][0];
-        if (c.x < 0.0)
+        clip.w = vertex->x * m->m[0][3];
+        clip.w += vertex->y * m->m[1][3];
+        clip.w += vertex->z * m->m[2][3];
+        clip.w += m->m[3][3];
+        float inv = 1.0f / clip.w;
+        clip.x = vertex->y * m->m[1][0] + (vertex->z * m->m[2][0] + vertex->x * m->m[0][0]);
+        clip.x += m->m[3][0];
+        if (clip.x < 0.0)
             code = 1;
-        else if (c.w - c.x < 0.0)
+        else if (clip.w - clip.x < 0.0)
             code = 2;
-        c.y = p->z * m->m[2][1];
-        c.y += p->y * m->m[1][1];
-        c.y += p->x * matrix->m[0][1];
-        c.y += m->m[3][1];
-        if (c.y < 0.0)
+        clip.y = vertex->z * m->m[2][1];
+        clip.y += vertex->y * m->m[1][1];
+        clip.y += vertex->x * matrix->m[0][1];
+        clip.y += m->m[3][1];
+        if (clip.y < 0.0)
             code |= 4;
-        else if (c.w - c.y < 0.0)
+        else if (clip.w - clip.y < 0.0)
             code |= 8;
-        c.z = p->y * m->m[1][2];
-        c.z += p->x * matrix->m[0][2];
-        c.z += p->z * m->m[2][2];
-        c.z += m->m[3][2];
-        if (c.z < 0.0)
+        clip.z = vertex->y * m->m[1][2];
+        clip.z += vertex->x * matrix->m[0][2];
+        clip.z += vertex->z * m->m[2][2];
+        clip.z += m->m[3][2];
+        if (clip.z < 0.0)
             code |= 0x10;
-        else if (c.w - c.z < 0.0)
+        else if (clip.w - clip.z < 0.0)
             code |= 0x20;
-        out->x = camera->viewportWidth * c.x * inv;
-        out->y = camera->viewportHeight * c.y * inv;
-        out->z = camera->viewportHeight * c.z * inv;
+        out->x = camera->viewportWidth * clip.x * inv;
+        out->y = camera->viewportHeight * clip.y * inv;
+        out->z = camera->viewportHeight * clip.z * inv;
         if (codes)
             *codes++ = code;
         v++;

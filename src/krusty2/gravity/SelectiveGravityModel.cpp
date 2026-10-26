@@ -53,8 +53,8 @@ int SelectiveGravityModel::Tick(float dt)
 int SelectiveGravityModel::UnknownVirtualSlot11(float dt)
 {
     for (int i = 0; i < bodyCount; i++) {
-        GravityBody* b = bodies[i];
-        b->AddWorldForce(Vec3(0.0f, -1.0f, 0.0f) * (b->mass * gravity));
+        GravityBody* body = bodies[i];
+        body->AddWorldForce(Vec3(0.0f, -1.0f, 0.0f) * (body->mass * gravity));
     }
     return 1;
 }

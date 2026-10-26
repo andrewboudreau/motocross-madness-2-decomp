@@ -1083,42 +1083,45 @@ void D3DIMSoultreeObject::CloneFrom(SoultreeObject* sourceNode)
             to->surfaceCount = from->surfaceCount;
             to->surfaces = (UnknownSoultreeSurface*)DebugMalloc(to->surfaceCount * 0x38, __FILE__, 0x8aa);
             for (int i = 0; i < to->surfaceCount; i++) {
-                UnknownSoultreeSurface* d = &to->surfaces[i];
-                UnknownSoultreeSurface* s = &from->surfaces[i];
-                d->vertexCount = s->vertexCount;
-                d->faceCount = s->faceCount;
-                d->materialCount = s->materialCount;
-                d->materialIndices = (int*)DebugMalloc(d->materialCount * 4, __FILE__, 0x8b3);
+                UnknownSoultreeSurface* toSurface = &to->surfaces[i];
+                UnknownSoultreeSurface* fromSurface = &from->surfaces[i];
+                toSurface->vertexCount = fromSurface->vertexCount;
+                toSurface->faceCount = fromSurface->faceCount;
+                toSurface->materialCount = fromSurface->materialCount;
+                toSurface->materialIndices = (int*)DebugMalloc(toSurface->materialCount * 4, __FILE__, 0x8b3);
                 int k;
-                for (k = 0; k < d->materialCount; k++)
-                    d->materialIndices[k] = s->materialIndices[k];
-                d->field_0x2c = s->field_0x2c;
-                d->field_0x30 = s->field_0x30;
-                d->field_0x34 = s->field_0x34;
-                d->vertices = (UnknownSoultreeVertex*)DebugMalloc(d->vertexCount * 0x20, __FILE__, 0x8bd);
-                d->drawnVertices = (UnknownSoultreeVertex*)DebugMalloc(d->vertexCount * 0x20, __FILE__, 0x8be);
-                d->normals = (Vector3*)DebugMalloc(d->vertexCount * 0xc, __FILE__, 0x8bf);
-                d->indices = (unsigned short*)DebugMalloc(d->faceCount * 6, __FILE__, 0x8c0);
-                d->uvs = (UnknownSoultreeUV*)DebugMalloc(d->vertexCount * 8, __FILE__, 0x8c1);
-                memcpy(d->vertices, s->vertices, d->vertexCount * 0x20);
-                memcpy(d->drawnVertices, s->drawnVertices, d->vertexCount * 0x20);
-                memcpy(d->normals, s->normals, d->vertexCount * 0xc);
-                memcpy(d->indices, s->indices, d->faceCount * 6);
-                memcpy(d->uvs, s->uvs, d->vertexCount * 8);
-                d->groupCount = s->groupCount;
-                d->groups = (UnknownSoultreeFaceGroup*)DebugMalloc(d->groupCount * 0x14, __FILE__, 0x8cb);
+                for (k = 0; k < toSurface->materialCount; k++)
+                    toSurface->materialIndices[k] = fromSurface->materialIndices[k];
+                toSurface->field_0x2c = fromSurface->field_0x2c;
+                toSurface->field_0x30 = fromSurface->field_0x30;
+                toSurface->field_0x34 = fromSurface->field_0x34;
+                toSurface->vertices =
+                    (UnknownSoultreeVertex*)DebugMalloc(toSurface->vertexCount * 0x20, __FILE__, 0x8bd);
+                toSurface->drawnVertices =
+                    (UnknownSoultreeVertex*)DebugMalloc(toSurface->vertexCount * 0x20, __FILE__, 0x8be);
+                toSurface->normals = (Vector3*)DebugMalloc(toSurface->vertexCount * 0xc, __FILE__, 0x8bf);
+                toSurface->indices = (unsigned short*)DebugMalloc(toSurface->faceCount * 6, __FILE__, 0x8c0);
+                toSurface->uvs = (UnknownSoultreeUV*)DebugMalloc(toSurface->vertexCount * 8, __FILE__, 0x8c1);
+                memcpy(toSurface->vertices, fromSurface->vertices, toSurface->vertexCount * 0x20);
+                memcpy(toSurface->drawnVertices, fromSurface->drawnVertices, toSurface->vertexCount * 0x20);
+                memcpy(toSurface->normals, fromSurface->normals, toSurface->vertexCount * 0xc);
+                memcpy(toSurface->indices, fromSurface->indices, toSurface->faceCount * 6);
+                memcpy(toSurface->uvs, fromSurface->uvs, toSurface->vertexCount * 8);
+                toSurface->groupCount = fromSurface->groupCount;
+                toSurface->groups =
+                    (UnknownSoultreeFaceGroup*)DebugMalloc(toSurface->groupCount * 0x14, __FILE__, 0x8cb);
                 int first = 0;
-                for (int j = 0; j < d->groupCount; j++) {
-                    d->groups[j].node = 0;
-                    for (index = 0; !d->groups[j].node; index++) {
-                        if (sourceNodes[index] == s->groups[j].node)
-                            d->groups[j].node = nodes[index];
+                for (int j = 0; j < toSurface->groupCount; j++) {
+                    toSurface->groups[j].node = 0;
+                    for (index = 0; !toSurface->groups[j].node; index++) {
+                        if (sourceNodes[index] == fromSurface->groups[j].node)
+                            toSurface->groups[j].node = nodes[index];
                     }
-                    d->groups[j].vertexCount = s->groups[j].vertexCount;
-                    d->groups[j].sourceVertices = &d->vertices[first];
-                    d->groups[j].transformedVertices = &d->drawnVertices[first];
-                    d->groups[j].normals = &d->normals[first];
-                    first += d->groups[j].vertexCount;
+                    toSurface->groups[j].vertexCount = fromSurface->groups[j].vertexCount;
+                    toSurface->groups[j].sourceVertices = &toSurface->vertices[first];
+                    toSurface->groups[j].transformedVertices = &toSurface->drawnVertices[first];
+                    toSurface->groups[j].normals = &toSurface->normals[first];
+                    first += toSurface->groups[j].vertexCount;
                 }
             }
         }
