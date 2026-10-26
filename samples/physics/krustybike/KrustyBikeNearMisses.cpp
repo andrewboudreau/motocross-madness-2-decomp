@@ -100,26 +100,26 @@ int KrustyBike::UnknownVirtualSlot70(float dt)
     return 0;
 }
 
-// Slot 11 (0x00491d10): tier 3 -- camera / target ray query.  Fills a2 (origin) and a3
+// Slot 11 (0x00491d10): tier 3 -- respawn placement.  Fills outPosition and outForward
 // (unit direction) according to the game mode (g->0x2d74: 0..5), then issues the same
 // collision query as the base class with per-mode ranges.  The two "copy the stored
 // vectors" paths fall off the end without setting a result (retail leaves eax as is).
 // Near miss (523/1296 strict, 1300 bytes): flag and lim are assigned in both arms (an
 // initialiser plus a conditional store keeps 0 in edi and spills lim), and the mode 2/3
 // copy path ends with `break` (retail returns there; it does not fall into case 0) and
-// copies position from *a2.  Left: the 2/3 normalise places its join after the invsqrt
+// copies position from *outPosition.  Left: the 2/3 normalise places its join after the invsqrt
 // arm (retail: after the zero arm, the invsqrt arm jumps back) and its query call is not
 // cross-jumped into the shared case 0/4 call; case 0 jumps to a call homed in case 4 in
-// retail (here case 4 jumps into case 0's).  `d != 0` first, a Vec3 ternary, `*a3 * inv`
+// retail (here case 4 jumps into case 0's).  `d != 0` first, a Vec3 ternary, `*outForward * inv`
 // and an inv local do not help (494-523).
 // Measured (s14g): a return per arm of the 2/3 normalise gives retail's arm layout (the zero
 // arm falls into the call, the invsqrt arm jumps back to it), but the call's register
 // choice then differs from case 4's tail, so it is not cross-jumped (1392 B; 271 aligned
 // instructions against 275, 341 strict against 523).
 // Every game read goes through the shared global (no `KbGame* g` copy): retail keeps it in
-// ebx but reloads it after case 4's `*a3 = bodyForward`, a store that may alias the global
+// ebx but reloads it after case 4's `*outForward = bodyForward`, a store that may alias the global
 // (aligned 275 -> 309, 526 strict, 1288 bytes).
-int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* a5)
+int KrustyBike::UnknownVirtualSlot11(int respawn, Vec3* outPosition, Vec3* outForward, Vec3* outUp, int* outKeepPlacement)
 {
     int flag;
     if (reinterpret_cast<KbGame*>(g_TrackGame)->mode.GetSelectedSeries() == 3 || reinterpret_cast<KbGame*>(g_TrackGame)->mode.GetSelectedSeries() == 4)
@@ -137,40 +137,40 @@ int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* 
     switch (reinterpret_cast<KbGame*>(g_TrackGame)->eventType) {
     case 2:
     case 3:
-        if (reinterpret_cast<KbGame*>(g_TrackGame)->raceMode || onTrack || aiKind || isGhost || a1 == 2 ||
+        if (reinterpret_cast<KbGame*>(g_TrackGame)->raceMode || onTrack || aiKind || isGhost || respawn == 2 ||
             reinterpret_cast<KbGame*>(g_TrackGame)->field_0xc50) {
-            *a2 = respawnPosition;
-            *a3 = respawnHeading;
-            position = *a2;
+            *outPosition = respawnPosition;
+            *outForward = respawnHeading;
+            position = *outPosition;
             break;
         } else {
             Vec3 v = respawnPosition;
-            *a2 = position;
-            *a3 = Vec3(v.x - a2->x, -a2->y, v.z - a2->z);
-            float d = a3->x * a3->x;
-            d += a3->y * a3->y;
-            d += a3->z * a3->z;
-            if (d == 0.0f) *a3 = g_kbZeroVec;
-            else *a3 *= FastInvSqrt(d);
+            *outPosition = position;
+            *outForward = Vec3(v.x - outPosition->x, -outPosition->y, v.z - outPosition->z);
+            float d = outForward->x * outForward->x;
+            d += outForward->y * outForward->y;
+            d += outForward->z * outForward->z;
+            if (d == 0.0f) *outForward = g_kbZeroVec;
+            else *outForward *= FastInvSqrt(d);
             return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, flag, 0x64,
-                               0x65, hit, 3.0f, 8, 0, &respawnPosition, !respawnPending, a2, a3, a4, a5);
+                               0x65, hit, 3.0f, 8, 0, &respawnPosition, !respawnPending, outPosition, outForward, outUp, outKeepPlacement);
         }
     case 0: {
         const Vec3* p = respawnPending ? &respawnHeading : &bodyForward;
         return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, flag, lim, lim,
-                           hit, 6.0f, 8, p, 0, !respawnPending, a2, a3, a4, a5);
+                           hit, 6.0f, 8, p, 0, !respawnPending, outPosition, outForward, outUp, outKeepPlacement);
     }
     case 4: {
         KbPlayer* r = (KbPlayer*)reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent;
         const Vec3* l = 0;
         const Vec3* k = 0;
         if (r->ball) l = &r->ball->position;
-        else if (r->followedRacer == this) { *a3 = bodyForward; k = &bodyForward; }
+        else if (r->followedRacer == this) { *outForward = bodyForward; k = &bodyForward; }
         else l = &r->followedRacer->position;
         float i = 9.0f;
         if (((KbPlayer*)reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent)->followedRacer != this) i = 3.0f;
         return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, flag, lim, lim,
-                           hit, i, 8, k, l, !respawnPending, a2, a3, a4, a5);
+                           hit, i, 8, k, l, !respawnPending, outPosition, outForward, outUp, outKeepPlacement);
     }
     case 1:
     case 5: {
@@ -178,11 +178,11 @@ int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* 
         else scratchVector = reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent[lapGate + 9].field_0x00;
         return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, flag, lim,
                            respawnPending ? 0x64 : 0x7fffffff, respawnPending ? 0x65 : 0x7fffffff,
-                           3.0f, 8, 0, &scratchVector, !respawnPending, a2, a3, a4, a5);
+                           3.0f, 8, 0, &scratchVector, !respawnPending, outPosition, outForward, outUp, outKeepPlacement);
     }
     default:
-        *a2 = position;
-        *a3 = bodyForward;
+        *outPosition = position;
+        *outForward = bodyForward;
     }
 }
 

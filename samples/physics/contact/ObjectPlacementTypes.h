@@ -25,8 +25,9 @@ int Fn_4b0ac0(const Vec3* p, float r0, float r1, float r2, float d, int a, int b
 // 0x004b08f0: 7 stack args (point, margin, body, f, g, 1, 0); nonzero = blocked (tier 3).
 int Fn_4b08f0(const Vec3* p, float margin, CollisionObject* a, int f, int g, int one, int zero);
 // 0x004b0b80: 10 stack args, the tail call of 0x004b0df0; its result is the caller's result.
-int Fn_4b0b80(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int f, int g,
-              const Vec3* l, Vec3* n, Vec3* o);
+int Fn_4b0b80(CollisionObject* body, SoultreeProbe* terrain, Vec3* position, float terrainScale,
+              int useAreaTest, int limit1, int limit2, const Vec3* targetPoint, Vec3* outPosition,
+              Vec3* outForward);
 // 0x00515600 / 0x0040ae30 / 0x005015b0: CrossProductCall / Vec3DotCall / Vec3ScaleCall
 // (../common/Math3D.h out-of-line call views).
 }

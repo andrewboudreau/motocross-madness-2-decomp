@@ -951,7 +951,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
     Vec3 force;       // force accumulator, seeded with weightForce
     Vec3 pivot;
     float speed;
-    int hit;
+    int respawn;
     int res;
 
     justReset = 0;
@@ -962,8 +962,8 @@ void Vehicle::UnknownVirtualSlot49(float frame)
     UnknownVirtualSlot60(controlInput.x, UnknownVirtualSlot59(), steps);
     UnknownVirtualSlot65(frame);
     pointsTouching = 0;
-    hit = UnknownVirtualSlot39(frame);
-    if (!hit && !crashState && steps != 1) {
+    respawn = UnknownVirtualSlot39(frame);
+    if (!respawn && !crashState && steps != 1) {
         VehContactsA(UnknownVirtualSlot5(0), &touchingPointCount, collisionPointCount, ((VehicleContact**)collisionPoints), terrain,
                      &centerOfMass, collisionShape, collisionRadius);
         pointsTouching = touchingPointCount > 0;
@@ -985,11 +985,11 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         throttleOn = crashState == 0 && UnknownVirtualSlot80();
         reinterpret_cast<UnknownEngineGearbox*>(engineState)->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
         reinterpret_cast<UnknownEngineGearbox*>(engineState)->AutoShift(throttleOn, linearSpeed);
-        if (hit) {
-            Vec3 hitA, hitB, hitC;
-            int dummy = 0;
-            UnknownVirtualSlot11(hit, &hitA, &hitB, &hitC, &dummy);
-            UnknownVirtualSlot33(&hitA, &hitB, &bodyUp, &hitC, dummy, UnknownVirtualSlot32());
+        if (respawn) {
+            Vec3 placedPosition, placedForward, placedUp;
+            int keepPlacement = 0;
+            UnknownVirtualSlot11(respawn, &placedPosition, &placedForward, &placedUp, &keepPlacement);
+            UnknownVirtualSlot33(&placedPosition, &placedForward, &bodyUp, &placedUp, keepPlacement, UnknownVirtualSlot32());
             steps = 0;
             stepRemainder = 0.0f;
             break;

@@ -971,9 +971,9 @@ Vec3* Bike::UnknownVirtualSlot54(Vec3* out)
     return out;
 }
 
-int Bike::UnknownVirtualSlot39(float arg)
+int Bike::UnknownVirtualSlot39(float dt)
 {
-    int r = Vehicle::UnknownVirtualSlot39(arg);
+    int r = Vehicle::UnknownVirtualSlot39(dt);
     if (r)
         return r;
     if (crashState) {

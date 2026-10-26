@@ -5,26 +5,30 @@
 // 11 0x00501dfe and the KrustyBike overrides 0x4920bb/0x4921b9).  Semantics are tier 3,
 // every call, branch and offset below is decoded from the target bytes (tier 1).
 //
-//  * Probes a cross of five points around the position `c`: the centre and four points
+//  * Probes a cross of five points around `position`: the centre and four points
 //    at +/-radius along the global axes 0x688738 (0,0,1) and 0x688758 (1,0,0).  The
-//    radius starts at `i` and grows by `i` while all five probes are clear.
-//  * Each probe is flagged 1 when 0x4b0ac0 (only if e != 0) or 0x4b08f0 report it
-//    blocked, otherwise 0x507c10 on `b` fills a ground hit and the flag byte, ANDed
-//    with `j`.
-//  * On the first pass, with h set, once, q non-null and the centre not clear, it creates
-//    a temporary CollisionObject with a two-point vertical sweep shape, orients it with
-//    a basis built from the axes, and runs its collision test (0x438e70).  A resulting
-//    contact (field_0x58 != 0) is turned into outputs n/o/p/q and the object released.
-//  * After the loop the two worst failing probes are selected, refined when m is set,
-//    written to n / o, and the result of the tail call 0x4b0b80 is returned.
+//    radius starts at radiusStep and grows by it while all five probes are clear.
+//  * Each probe is flagged 1 when 0x4b0ac0 (only with useAreaTest) or 0x4b08f0 report it
+//    blocked, otherwise 0x507c10 on `terrain` fills a ground hit and the flag byte, ANDed
+//    with groundMask.
+//  * On the first pass, with allowObjectTest set, once, outKeepPlacement non-null and the
+//    centre not clear, it creates a temporary CollisionObject with a two-point vertical
+//    sweep shape, orients it with a basis built from the axes, and runs its collision test
+//    (0x438e70).  A resulting contact (field_0x58 != 0) sets all four outputs (with
+//    outKeepPlacement = 1) and the object is released.
+//  * After the loop the two worst failing probes are selected, refined when refinePair is
+//    set, written to outPosition / outForward, and the result of the tail call 0x4b0b80 is
+//    returned.
 //
-// Parameter roles from the call sites (SoulTreePhysics slot 11 0x501da0, KrustyBike):
-//   a body, b probe object (thiscall this of 0x507c10), c position, d float forwarded to
-//   0x4b0ac0, e "use radius probe" (0 => margin 4.0f, else 2.0f), f/g 0x7fffffff limits
-//   forwarded to 0x4b08f0, h "allow object test", i radius step, j AND mask for probe
-//   results, k/l nullable Vec3* (k: reference direction, l: target point), m "pair mode",
-//   n/o/p out Vec3*, q out flag.  (SoultreePhysicsCallees.h types l as int; it is a
-//   Vec3*: 0x4b17f1 and 0x4b1c72 dereference it.)
+// Parameter roles from the call sites (SoulTreePhysics slot 11 0x501da0, KrustyBike), tier 3
+// beyond the decoded data flow: body (the caller's collisionObject), terrain (thiscall this
+// of 0x507c10), position, terrainScale (forwarded to 0x4b0ac0), useAreaTest (0 => margin
+// 4.0f and outForward = referenceDir, else 2.0f), limit1/limit2 (0x7fffffff or 0x64/0x65,
+// forwarded to 0x4b08f0), allowObjectTest, radiusStep, groundMask (AND mask for probe
+// results), referenceDir/targetPoint (nullable), refinePair, and the outputs outPosition,
+// outForward, outUp (the contact normal) and outKeepPlacement, which the step loops hand to
+// slot 33 as newPosition, newForward, settleUp and keepPlacement.  (targetPoint is a Vec3*:
+// 0x4b17f1 and 0x4b1c72 dereference it.)
 #include "ObjectPlacementTypes.h"
 
 // Runtime-initialised globals.  The initialisers are at 0x4b1d80 (zero), 0x4b1dd0 (X),
@@ -69,18 +73,20 @@ static inline Vec3 PlacementRescale(const Vec3& v, float lenSq)
     return *Vec3ScaleCall(&t, &v, inv);
 }
 
-int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int f, int g, int h,
-              float i, unsigned char j, const Vec3* k, const Vec3* l, int m, Vec3* n, Vec3* o,
-              Vec3* p, int* q)
+int FindObjectPlacement(CollisionObject* body, SoultreeProbe* terrain, Vec3* position,
+                        float terrainScale, int useAreaTest, int limit1, int limit2,
+                        int allowObjectTest, float radiusStep, unsigned char groundMask,
+                        const Vec3* referenceDir, const Vec3* targetPoint, int refinePair,
+                        Vec3* outPosition, Vec3* outForward, Vec3* outUp, int* outKeepPlacement)
 {
-    float radius = i;
+    float radius = radiusStep;
     float margin = 2.0f;
-    if (e == 0)
+    if (useAreaTest == 0)
         margin = 4.0f;
-    if (q)
-        *q = 0;
+    if (outKeepPlacement)
+        *outKeepPlacement = 0;
 
-    Vec3 w;   // the k/o branch below; declared here, VC6 schedules its fchs as retail does
+    Vec3 w;   // the referenceDir/outForward branch below; declared here, VC6 schedules its fchs as retail does
     int canPlace = 1;
     int firstPass = 1;
     unsigned char centerHit, plusAHit, minusAHit, plusCHit, minusCHit;
@@ -94,19 +100,19 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
         Vec3 minusCOff = g_PlacementAxisX * -radius;
 
         if (firstPass) {
-            centerPt = *c;
-            ((PlacementProbe*)b)->QueryGround(&centerPt, &centerOut, 1, &centerHit);
-            centerHit &= j;
+            centerPt = *position;
+            ((PlacementProbe*)terrain)->QueryGround(&centerPt, &centerOut, 1, &centerHit);
+            centerHit &= groundMask;
         }
 
-        if (h && canPlace) {
+        if (allowObjectTest && canPlace) {
             canPlace = 0;
-            if (q && !centerHit) {
+            if (outKeepPlacement && !centerHit) {
                 CollisionObject* obj = new(__FILE__, 0x172) CollisionObject(1);
                 obj->Configure(0, 1, 1, 0);
                 obj->ignoreVegetation = 1;
                 obj->SetIgnoreListMode(1);
-                obj->AddIgnoredOwner(a);
+                obj->AddIgnoredOwner(body);
 
                 // two-point vertical sweep: (0,1,0) and (0,-1,0)
                 Vec3 sweep[2];
@@ -132,25 +138,25 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
                 xf._11 = side.x;    xf._12 = side.y;    xf._13 = side.z;   xf._14 = 0.0f;
                 xf._21 = up.x;      xf._22 = up.y;      xf._23 = up.z;      xf._24 = 0.0f;
                 xf._31 = forward.x; xf._32 = forward.y; xf._33 = forward.z; xf._34 = 0.0f;
-                xf._41 = c->x;      xf._42 = c->y;      xf._43 = c->z;      xf._44 = 1.0f;
+                xf._41 = position->x; xf._42 = position->y; xf._43 = position->z; xf._44 = 1.0f;
                 obj->SetTransform(&xf);
                 obj->QueryCollisions();
 
                 if (obj->hasContact != 0) {
                     // contact: rec[0] = fraction, rec + 8 = contact normal (tier 3)
                     float* rec = (float*)obj->contactRecord;
-                    c->y += (1.0f - rec[0]) * 2.0f - 1.0f;
-                    *n = *c;
-                    if (l) {
-                        *o = *l - *c;
-                        PlacementNormalizeInPlace(o);
+                    position->y += (1.0f - rec[0]) * 2.0f - 1.0f;
+                    *outPosition = *position;
+                    if (targetPoint) {
+                        *outForward = *targetPoint - *position;
+                        PlacementNormalizeInPlace(outForward);
                     }
-                    if (p)
-                        *p = *(Vec3*)(rec + 2);
-                    *q = 1;
+                    if (outUp)
+                        *outUp = *(Vec3*)(rec + 2);
+                    *outKeepPlacement = 1;
                     obj->Release();
                     // Retail returns no value here: it jumps to the epilogue with the slot-2
-                    // call's eax, as do the k-without-o and no-l paths below.
+                    // call's eax, as do the referenceDir-without-outForward and no-targetPoint paths below.
                     goto done;
                 }
                 obj->Release();
@@ -158,55 +164,55 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
         }
 
         if (firstPass) {
-            if (e && !Fn_4b0ac0(c, 1.0f, 1.0f, 1.0f, d, 0, 0, 0, 0))
+            if (useAreaTest && !Fn_4b0ac0(position, 1.0f, 1.0f, 1.0f, terrainScale, 0, 0, 0, 0))
                 centerHit = 1;
-            else if (Fn_4b08f0(&centerPt, margin, a, f, g, 1, 0))
+            else if (Fn_4b08f0(&centerPt, margin, body, limit1, limit2, 1, 0))
                 centerHit = 1;
             firstPass = 0;
         }
 
-        plusAPt = *c + plusAOff;
-        if (e && !Fn_4b0ac0(&plusAPt, 1.0f, 1.0f, 1.0f, d, 0, 0, 0, 0))
+        plusAPt = *position + plusAOff;
+        if (useAreaTest && !Fn_4b0ac0(&plusAPt, 1.0f, 1.0f, 1.0f, terrainScale, 0, 0, 0, 0))
             plusAHit = 1;
-        else if (Fn_4b08f0(&plusAPt, margin, a, f, g, 1, 0))
+        else if (Fn_4b08f0(&plusAPt, margin, body, limit1, limit2, 1, 0))
             plusAHit = 1;
         else {
-            ((PlacementProbe*)b)->QueryGround(&plusAPt, &plusAOut, 1, &plusAHit);
-            plusAHit &= j;
+            ((PlacementProbe*)terrain)->QueryGround(&plusAPt, &plusAOut, 1, &plusAHit);
+            plusAHit &= groundMask;
         }
 
-        minusAPt = *c + minusAOff;
-        if (e && !Fn_4b0ac0(&minusAPt, 1.0f, 1.0f, 1.0f, d, 0, 0, 0, 0))
+        minusAPt = *position + minusAOff;
+        if (useAreaTest && !Fn_4b0ac0(&minusAPt, 1.0f, 1.0f, 1.0f, terrainScale, 0, 0, 0, 0))
             minusAHit = 1;
-        else if (Fn_4b08f0(&minusAPt, margin, a, f, g, 1, 0))
+        else if (Fn_4b08f0(&minusAPt, margin, body, limit1, limit2, 1, 0))
             minusAHit = 1;
         else {
-            ((PlacementProbe*)b)->QueryGround(&minusAPt, &minusAOut, 1, &minusAHit);
-            minusAHit &= j;
+            ((PlacementProbe*)terrain)->QueryGround(&minusAPt, &minusAOut, 1, &minusAHit);
+            minusAHit &= groundMask;
         }
 
-        plusCPt = *c + plusCOff;
-        if (e && !Fn_4b0ac0(&plusCPt, 1.0f, 1.0f, 1.0f, d, 0, 0, 0, 0))
+        plusCPt = *position + plusCOff;
+        if (useAreaTest && !Fn_4b0ac0(&plusCPt, 1.0f, 1.0f, 1.0f, terrainScale, 0, 0, 0, 0))
             plusCHit = 1;
-        else if (Fn_4b08f0(&plusCPt, margin, a, f, g, 1, 0))
+        else if (Fn_4b08f0(&plusCPt, margin, body, limit1, limit2, 1, 0))
             plusCHit = 1;
         else {
-            ((PlacementProbe*)b)->QueryGround(&plusCPt, &plusCOut, 1, &plusCHit);
-            plusCHit &= j;
+            ((PlacementProbe*)terrain)->QueryGround(&plusCPt, &plusCOut, 1, &plusCHit);
+            plusCHit &= groundMask;
         }
 
-        minusCPt = *c + minusCOff;
-        if (e && !Fn_4b0ac0(&minusCPt, 1.0f, 1.0f, 1.0f, d, 0, 0, 0, 0))
+        minusCPt = *position + minusCOff;
+        if (useAreaTest && !Fn_4b0ac0(&minusCPt, 1.0f, 1.0f, 1.0f, terrainScale, 0, 0, 0, 0))
             minusCHit = 1;
-        else if (Fn_4b08f0(&minusCPt, margin, a, f, g, 1, 0))
+        else if (Fn_4b08f0(&minusCPt, margin, body, limit1, limit2, 1, 0))
             minusCHit = 1;
         else {
-            ((PlacementProbe*)b)->QueryGround(&minusCPt, &minusCOut, 1, &minusCHit);
-            minusCHit &= j;
+            ((PlacementProbe*)terrain)->QueryGround(&minusCPt, &minusCOut, 1, &minusCHit);
+            minusCHit &= groundMask;
         }
 
         if (centerHit && plusAHit && minusAHit && plusCHit && minusCHit)
-            radius += i;
+            radius += radiusStep;
         else
             break;
     }
@@ -241,7 +247,7 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
         nextPt = 0;
     }
 
-    if (m) {
+    if (refinePair) {
         // keep the two highest failing hits (by out.y) among -A, +C, -C
         if (!minusAHit) {
             if (!(minusAOut.y <= bestOut->y)) { nextOut = bestOut; nextPt = bestPt; bestOut = &minusAOut; bestPt = &minusAPt; }
@@ -257,29 +263,29 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
         }
     }
 
-    *n = *bestPt;
+    *outPosition = *bestPt;
 
-    if (k) {
-        if (o) {
-            if (m && nextPt) {
-                // horizontal direction between the two worst points, flipped to face k
+    if (referenceDir) {
+        if (outForward) {
+            if (refinePair && nextPt) {
+                // horizontal direction between the two worst points, flipped to face referenceDir
                 w = *nextPt - *bestPt;
                 w.y = 0.0f;
-                if (w.x * k->x + w.z * k->z < 0.0f) {
-                    *o = Vec3(-w.x, 0.0f, -w.z);
+                if (w.x * referenceDir->x + w.z * referenceDir->z < 0.0f) {
+                    *outForward = Vec3(-w.x, 0.0f, -w.z);
                 } else {
-                    *o = w;
+                    *outForward = w;
                 }
-                PlacementNormalizeInPlace(o);
-            } else if (e == 0) {
-                *o = *k;
+                PlacementNormalizeInPlace(outForward);
+            } else if (useAreaTest == 0) {
+                *outForward = *referenceDir;
             }
-            return Fn_4b0b80(a, b, c, d, e, f, g, l, n, o);
+            return Fn_4b0b80(body, terrain, position, terrainScale, useAreaTest, limit1, limit2, targetPoint, outPosition, outForward);
         }
-    } else if (l) {
-        *o = *l - *bestPt;
-        PlacementNormalizeInPlace(o);
-        return Fn_4b0b80(a, b, c, d, e, f, g, l, n, o);
+    } else if (targetPoint) {
+        *outForward = *targetPoint - *bestPt;
+        PlacementNormalizeInPlace(outForward);
+        return Fn_4b0b80(body, terrain, position, terrainScale, useAreaTest, limit1, limit2, targetPoint, outPosition, outForward);
     }
     // No return statement on these paths (retail leaves eax unset; VC6 warns C4715).
 done:

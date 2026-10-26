@@ -184,12 +184,12 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot9(float dt, int* steps)
 }
 
 // slot 11 (0x00501da0)
-int SoultreePhysicsBaseObject::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3,
-                                                    Vec3* a4, int* a5)
+int SoultreePhysicsBaseObject::UnknownVirtualSlot11(int respawn, Vec3* outPosition, Vec3* outForward,
+                                                    Vec3* outUp, int* outKeepPlacement)
 {
     return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, 0, 0x7fffffff,
                      0x7fffffff, 0, 3.0f, groundProbeMask, &savedForward, 0, !respawnPending,
-                     a2, a3, a4, a5);
+                     outPosition, outForward, outUp, outKeepPlacement);
 }
 
 // slot 15 (0x00502200)
@@ -1049,15 +1049,15 @@ int SoultreePhysicsBaseObject::Tick(float dt)
     UnknownVirtualSlot9(dt, &steps);
     UnknownVirtualSlot30();
     pointsTouching = 0;
-    int held = UnknownVirtualSlot39(dt);
-    if (!held) {
+    int respawn = UnknownVirtualSlot39(dt);
+    if (!respawn) {
         refreshed = SoultreeRefreshContacts(UnknownVirtualSlot5(1), &touchingPointCount, collisionPointCount,
                                             collisionPoints, terrain, &centerOfMass, collisionShape,
                                             collisionRadius);
         if (refreshed)
             pointsTouching = touchingPointCount > 0;
     }
-    RunSteps(steps, held, refreshed);
+    RunSteps(steps, respawn, refreshed);
     UnknownVirtualSlot21();
     return 1;
 }
@@ -1244,14 +1244,14 @@ static inline float VecLengthRsq(const Vec3& v)
 // estimate (3v - v_prev)/2 * dt, rotates the node about the pivot by |w| * dt, then
 // refreshes the cached world state (slots 28/34/29, orientation angles).  A leftover
 // remainder after the last step is run as one extra short step.  `refreshed` is unused.
-// While a respawn is pending (`held`), the placement search (slot 11) and reset (slot 33)
+// While slot 39 asks for a respawn (`respawn`), the placement search (slot 11) and reset (slot 33)
 // replace the step.
 // Exact once `o2` lives at loop scope.  The respawn block's locals then share slots with
 // its sibling blocks as in retail: dummy with sq, b with o3 (-76), c with o1 (-52), and `a`
 // is left for the integration result temporary (-136); o2 gets its own slot next to
 // impulse.  With all three outputs in the touching block, VC6 pairs a/o3, b/o1, c/o2 and
 // the cold respawn block needs disp32 displacements (1804/1930).
-void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
+void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
 {
     Vec3 force;
     float speed;
@@ -1267,11 +1267,11 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
             velocity = kVec3Zero;
             linearSpeed = 0.0f;
         }
-        if (held) {
-            int dummy;
-            Vec3 a, b, c;
-            UnknownVirtualSlot11(held, &a, &b, &c, &dummy);
-            UnknownVirtualSlot33(&a, &b, &bodyUp, &c, dummy, UnknownVirtualSlot32());
+        if (respawn) {
+            int keepPlacement;
+            Vec3 placedPosition, placedForward, placedUp;
+            UnknownVirtualSlot11(respawn, &placedPosition, &placedForward, &placedUp, &keepPlacement);
+            UnknownVirtualSlot33(&placedPosition, &placedForward, &bodyUp, &placedUp, keepPlacement, UnknownVirtualSlot32());
             stepRemainder = 0.0f;
             break;
         }

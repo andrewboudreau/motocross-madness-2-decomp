@@ -110,10 +110,11 @@ public:
     virtual void UnknownVirtualSlot8();
     virtual void UnknownVirtualSlot9(float dt, int* steps);
     virtual int UnknownVirtualSlot10();
-    // Slot 11 (ret 0x14): returns the 0x004b0df0 result (tier 1).  a2..a4 receive Vec3
-    // addresses and a5 an int address at the Vehicle slot 49 call site (tier 2).
-    virtual int UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4,
-                                     int* a5);
+    // Slot 11 (ret 0x14): returns the FindObjectPlacement (0x004b0df0) result (tier 1).
+    // respawn is slot 39's answer; the four outputs are what the step loops pass to slot 33
+    // as newPosition, newForward, settleUp and keepPlacement (tier 2).
+    virtual int UnknownVirtualSlot11(int respawn, Vec3* outPosition, Vec3* outForward, Vec3* outUp,
+                                     int* outKeepPlacement);
     virtual int UnknownVirtualSlot12(int value);
     virtual void UnknownVirtualSlot13(Vec3* force, Vec3* localTorque, float torqueScale);
     // Slot 14 (ret 0xc): retail 0x00502080 passes localTorque to slot 16, worldTorque to slot
@@ -164,7 +165,7 @@ public:
     // Non-virtual helpers reached from the GameObject slot 10 override 0x005036f0 (tier 1 call
     // shapes): 0x00502f60 (thiscall, ret 0xc) is the per-frame step, 0x00502c40 (thiscall, no
     // arguments) the rest/settle check it calls.
-    void RunSteps(int steps, int held, int refreshed);
+    void RunSteps(int steps, int respawn, int refreshed);
     void UpdateRestState();
 
     // --- data members (offsets confirmed by decoded accesses; names provisional) ---
