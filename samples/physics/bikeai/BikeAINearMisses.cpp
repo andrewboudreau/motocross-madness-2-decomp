@@ -1068,10 +1068,10 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                 probe->QueryCollisions();
                 if (probe->hasContact) {
                     float* rec = (float*)probe->contactRecord;
-                    float h = front.y + 4.0f - rec[0] * 5.0f;
-                    probe->hitPoint.y = h;
-                    if (h > groundF.y) {
-                        groundF.y = h;
+                    float probeY = front.y + 4.0f - rec[0] * 5.0f;
+                    probe->hitPoint.y = probeY;
+                    if (probeY > groundF.y) {
+                        groundF.y = probeY;
                         normalF = *(Vec3*)(rec + 2);
                     }
                 }
@@ -1082,10 +1082,10 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                 probe->QueryCollisions();
                 if (probe->hasContact) {
                     float* rec = (float*)probe->contactRecord;
-                    float h = back.y + 4.0f - rec[0] * 5.0f;
-                    probe->hitPoint.y = h;
-                    if (h > groundR.y) {
-                        groundR.y = h;
+                    float probeY = back.y + 4.0f - rec[0] * 5.0f;
+                    probe->hitPoint.y = probeY;
+                    if (probeY > groundR.y) {
+                        groundR.y = probeY;
                         normalR = *(Vec3*)(rec + 2);
                     }
                 }
@@ -1130,9 +1130,9 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                     frontBrake = an * -8.0f;
                     accF -= normalF * an;
                 }
-                float m = sideDotF * kF;
-                accF += sideF * (m + rollF);
-                frontS -= m * halfDtSq + dampF * dt;
+                float sideSpring = sideDotF * kF;
+                accF += sideF * (sideSpring + rollF);
+                frontS -= sideSpring * halfDtSq + dampF * dt;
                 if (frontS < 0.0f) {
                     frontS = 0.0f;
                 } else if (frontS > 1.0f) {
@@ -1173,9 +1173,9 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                     rearBrake = an * -100.0f;
                     accR -= normalR * an;
                 }
-                float m = sideDotR * kR;
-                accR += sideR * (m + rollR);
-                rearS -= m * halfDtSq + dampR * dt;
+                float sideSpring = sideDotR * kR;
+                accR += sideR * (sideSpring + rollR);
+                rearS -= sideSpring * halfDtSq + dampR * dt;
                 if (rearS < 0.0f) {
                     rearS = 0.0f;
                 } else if (rearS > 1.0f) {
@@ -1214,9 +1214,9 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                     FastSqrt(vF.x * vF.x + vF.z * vF.z);
                     push.y = 0.0f;
                     push = SafeNormalize(push);
-                    float d = DotProduct(vF, push);
-                    if (d > 0.0f) {
-                        aim = vF - push * d;
+                    float pushSpeed = DotProduct(vF, push);
+                    if (pushSpeed > 0.0f) {
+                        aim = vF - push * pushSpeed;
                         aim.y = 0.0f;
                         aim = SafeNormalize(aim);
                     }
@@ -1258,9 +1258,9 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                 accF += dv;
             }
 
-            float w = DotProduct(vR, right) * invDt + DotProduct(accR, right);
+            float lateralAccel = DotProduct(vR, right) * invDt + DotProduct(accR, right);
             if (frontContact || rearContact) {
-                accR -= right * w;
+                accR -= right * lateralAccel;
                 if (rearContact) {
                     if (path) {
                         float accel = (path->targetSpeed - speedR) * invDt;
@@ -1417,10 +1417,10 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
         probe->QueryCollisions();
         if (probe->hasContact) {
             float* rec = (float*)probe->contactRecord;
-            float h = front.y + 1.0f - rec[0] * 2.0f;
-            probe->hitPoint.y = h;
-            if (h > groundF.y) {
-                groundF.y = h;
+            float probeY = front.y + 1.0f - rec[0] * 2.0f;
+            probe->hitPoint.y = probeY;
+            if (probeY > groundF.y) {
+                groundF.y = probeY;
                 normalF = *(Vec3*)(rec + 2);
             }
         }
@@ -1431,10 +1431,10 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
         probe->QueryCollisions();
         if (probe->hasContact) {
             float* rec = (float*)probe->contactRecord;
-            float h = back.y + 1.0f - rec[0] * 2.0f;
-            probe->hitPoint.y = h;
-            if (h > groundR.y) {
-                groundR.y = h;
+            float probeY = back.y + 1.0f - rec[0] * 2.0f;
+            probe->hitPoint.y = probeY;
+            if (probeY > groundR.y) {
+                groundR.y = probeY;
                 normalR = *(Vec3*)(rec + 2);
             }
         }
