@@ -96,7 +96,7 @@ class CollisionSceneNode; // Existing payload pointer view; calls use the canoni
 struct CollisionBoxResult {
     float fraction;                // +0x00 hit fraction along the segment (0x00439820 starts it at 1.0)
     const CollisionVec3* point;    // +0x04 segment leaf point (0x00439820 starts it at 0)
-    CollisionVec3 field_0x08;      // +0x08 face normal
+    CollisionVec3 normal;          // +0x08 face normal (QueryHit::normal)
 };
 
 #include "bvh/BoundingBoxTreeQueryState.h"

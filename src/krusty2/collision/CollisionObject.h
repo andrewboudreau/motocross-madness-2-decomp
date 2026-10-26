@@ -208,7 +208,7 @@ public:
     CollisionCallback onHitByCallback;               // +0x8c 0x0043b9a0 stores 0x00464e90 (empty function)
     int debugTreeDepth;  // +0x90 slot 23 (0x00434970) decrements it (clamped at 0) on key 10 and increments it on key 11; slot 14 (0x00434540) passes it as the depth argument of DrawHull 0x00432d30 / DrawModel 0x00432b30 and DrawBoxTree
     int debugDrawMode;  // +0x94 slot 23 (0x00434970) increments it on key 0x2e and wraps to 0 above 7; slot 14 (0x00434540) passes it as the mode argument of DrawHull / DrawModel
-    int field_0x98;
+    int queryTouched;  // +0x98 0x00438e70 sets it on this object and on each broad-phase candidate, the BikeAI obstacle query on each object it visits; the ctor and slot 14 (after the debug draw) clear it; no reader decoded yet (tier 3)
     CollisionObject* hitObject;  // +0x9c 0x00438e70 stores each broad-phase candidate here before TestAgainst(candidate) and then passes it to the callbacks
     CollisionVec3 hitPoint;  // +0xa0 0x00434bb0 fills it from the contact record +0x18, 0x00438e70 copies it into the hit object +0xa0; SoultreePhysics slots 28/38 read it as contact point
     CollisionVec3 hitNormal;  // +0xac 0x00434bb0 fills it from the normalised accumulated scratch points; 0x00438e70 copies it into the hit object +0xac; read as contact normal by SoultreePhysics

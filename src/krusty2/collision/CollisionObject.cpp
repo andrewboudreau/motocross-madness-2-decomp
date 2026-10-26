@@ -55,7 +55,7 @@ struct CollisionModelShapeData {   // type 1: count + array of CollisionHullShap
 };
 struct CollisionMeshShapeData {    // type 2
     int field_0x00;
-    void* field_0x04;
+    void* boxTree;                 // +0x04 tree root (see CollisionMeshShapeBlock)
 };
 void CollisionModelShape_Free(void* s);                // 0x00431df0
 void CollisionMeshShape_Free(void* s);                 // 0x00431e50
@@ -85,8 +85,8 @@ void CollisionModelShape_Free(void* shape) {
 
 void CollisionMeshShape_Free(void* shape) {
     CollisionMeshShapeData* s = (CollisionMeshShapeData*)shape;
-    if (s->field_0x04)
-        FreeBoxTree(static_cast<QueryTreeNode*>(s->field_0x04));
+    if (s->boxTree)
+        FreeBoxTree(static_cast<QueryTreeNode*>(s->boxTree));
     operator delete(s);
 }
 
@@ -152,7 +152,7 @@ CollisionObject::CollisionObject(int a)
     ignoreCount = 0;
     ownerObject = 0;
     ownerType = 0;
-    field_0x98 = 0;
+    queryTouched = 0;
     hitObject = 0;
     // Both retail reads use this TU's initialized kVec3Zero at 0x5797b0.
     // CollisionVec3 is the 12-byte field view; this does not unify the types.
@@ -434,8 +434,8 @@ static inline void SetIdentity(CollisionMatrix4* r)
 
 struct CollisionMeshShapeBlock {                 // type 2, 0x48 bytes
     int field_0x00;
-    void* field_0x04;                            // 0x24-byte block, filled by 0x0042dc90
-    CollisionMatrix4 field_0x08;                 // identity
+    void* boxTree;                               // +0x04 0x24-byte root, filled by 0x0042dc90
+    CollisionMatrix4 bodyTransform;              // +0x08 identity; CollisionMeshBody's view
 };
 
 // 0x004329a0
@@ -477,10 +477,10 @@ void CollisionObject::SetMeshShape(int count, void* points)
     shapeType = 2;
     shape = s;
     s->field_0x00 = 0;
-    s->field_0x04 = operator new(0x24, __FILE__, 0x18a);
-    SetIdentity(&s->field_0x08);
-    BuildModelBoxTree(reinterpret_cast<BoxTreeNode*>(s->field_0x04),
-                      reinterpret_cast<const TreeMatrix4*>(&s->field_0x08),
+    s->boxTree = operator new(0x24, __FILE__, 0x18a);
+    SetIdentity(&s->bodyTransform);
+    BuildModelBoxTree(reinterpret_cast<BoxTreeNode*>(s->boxTree),
+                      reinterpret_cast<const TreeMatrix4*>(&s->bodyTransform),
                       reinterpret_cast<TreeVec3*>(points), count);
 }
 
@@ -853,22 +853,22 @@ int CollisionObject::TestMeshBounds(CollisionObject* other)
 
 // Tree node.  Names are tier 3; offsets are tier 1 (see above).
 struct CollisionTreeNode {
-    float field_0x00;              // >= 0: interior node (box valid); < 0: leaf
+    float volume;                  // >= 0: interior node (box valid); < 0: leaf (BoxTreeNode)
     Vec3 center;                   // +0x04 box center (a point leaf: the point)
     Vec3 halfExtents;              // +0x10
     CollisionTreeNode* child[2];   // +0x1c, +0x20
 };
 
-// Triangle leaf view of the same node (field_0x00 < 0).
+// Triangle leaf view of the same node (volume < 0).
 struct CollisionTreeTriangle {
-    float field_0x00;
+    float marker;                  // -1.0f (BoxTreeTriangleLeaf)
     unsigned short vertex[3];      // +0x04, indices into the vertex array
     Vec3 normal;                   // +0x0c
 };
 
-// Segment leaf view (polyline trees, field_0x00 < 0): the two end points.
+// Segment leaf view (polyline trees, volume < 0): the two end points.
 struct CollisionTreeSegment {
-    float field_0x00;
+    float marker;
     Vec3 end[2];                   // +0x04, +0x10
 };
 
@@ -947,7 +947,7 @@ void CollisionObject::DrawTree(CollisionTreeNode* node, int depth, const Matrix4
                                const Vec3* verts)
 {
     if (depth == 0) {
-        if (node->field_0x00 >= 0.0f) {
+        if (node->volume >= 0.0f) {
             SetDrawColor(0xff, 0, 0);
             DrawBox(&node->center, &node->halfExtents, xf);
         } else {
@@ -961,7 +961,7 @@ void CollisionObject::DrawTree(CollisionTreeNode* node, int depth, const Matrix4
             DrawLine(&p[1], &p[2]);
             DrawLine(&p[2], &p[0]);
         }
-    } else if (node->field_0x00 >= 0.0f) {
+    } else if (node->volume >= 0.0f) {
         DrawTree(node->child[0], depth - 1, xf, verts);
         DrawTree(node->child[1], depth - 1, xf, verts);
     }
@@ -974,14 +974,14 @@ void CollisionObject::DrawTreeMotion(CollisionTreeNode* node, int depth, const M
                                      const Matrix4* motion, const Vec3* verts)
 {
     if (depth == 0) {
-        if (node->field_0x00 < 0.0f) {
+        if (node->volume < 0.0f) {
             SetDrawColor(0, 0, 0xff);
         } else {
             SetDrawColor(0xff, 0, 0);
         }
         Vec3 center = node->center;
         Vec3 halfExtents = node->halfExtents;
-        if (node->field_0x00 >= 0.0f) {
+        if (node->volume >= 0.0f) {
             DrawBox(&center, &halfExtents, xf);
             MoveBox(&center, &halfExtents, motion);
             DrawBox(&center, &halfExtents, xf);
@@ -1005,7 +1005,7 @@ void CollisionObject::DrawTreeMotion(CollisionTreeNode* node, int depth, const M
             DrawLine(&p[1], &q[1]);
             DrawLine(&p[2], &q[2]);
         }
-    } else if (node->field_0x00 >= 0.0f) {
+    } else if (node->volume >= 0.0f) {
         DrawTreeMotion(node->child[0], depth - 1, xf, motion, verts);
         DrawTreeMotion(node->child[1], depth - 1, xf, motion, verts);
     }
@@ -1016,7 +1016,7 @@ void CollisionObject::DrawTreeMotion(CollisionTreeNode* node, int depth, const M
 void CollisionObject::DrawPointTree(CollisionTreeNode* node, const Matrix4* xf,
                                     const Matrix4* motion)
 {
-    if (node->field_0x00 >= 0.0f) {
+    if (node->volume >= 0.0f) {
         DrawPointTree(node->child[0], xf, motion);
         DrawPointTree(node->child[1], xf, motion);
     } else {
@@ -1043,7 +1043,7 @@ void CollisionObject::DrawPointTree(CollisionTreeNode* node, const Matrix4* xf,
 void CollisionObject::DrawTreeNormals(CollisionTreeNode* node, const Vec3* verts,
                                       const Matrix4* xf)
 {
-    if (node->field_0x00 >= 0.0f) {
+    if (node->volume >= 0.0f) {
         DrawTreeNormals(node->child[0], verts, xf);
         DrawTreeNormals(node->child[1], verts, xf);
     } else {
@@ -1077,12 +1077,12 @@ void CollisionObject::DrawTreeNormals(CollisionTreeNode* node, const Vec3* verts
 void CollisionObject::DrawBoxTree(CollisionTreeNode* node, int depth, const Matrix4* xf)
 {
     if (depth == 0) {
-        if (node->field_0x00 < 0.0f) {
+        if (node->volume < 0.0f) {
             SetDrawColor(0, 0, 0xff);
         } else {
             SetDrawColor(0xff, 0, 0);
         }
-        if (node->field_0x00 >= 0.0f) {
+        if (node->volume >= 0.0f) {
             DrawBox(&node->center, &node->halfExtents, xf);
         } else {
             SetDrawColor(0xff, 0, 0xff);
@@ -1090,7 +1090,7 @@ void CollisionObject::DrawBoxTree(CollisionTreeNode* node, int depth, const Matr
             DebugTransformPoint(&p, p, xf);
             DrawMarker(&p, 0.25f);
         }
-    } else if (node->field_0x00 >= 0.0f) {
+    } else if (node->volume >= 0.0f) {
         DrawBoxTree(node->child[0], depth - 1, xf);
         DrawBoxTree(node->child[1], depth - 1, xf);
     }
@@ -1101,7 +1101,7 @@ void CollisionObject::DrawBoxTree(CollisionTreeNode* node, int depth, const Matr
 // VC6 turns the second recursive call into the loop retail shows.
 void CollisionObject::DrawSegmentTree(CollisionTreeNode* node, const Matrix4* xf)
 {
-    if (node->field_0x00 >= 0.0f) {
+    if (node->volume >= 0.0f) {
         DrawSegmentTree(node->child[0], xf);
         DrawSegmentTree(node->child[1], xf);
     } else {
@@ -1122,12 +1122,12 @@ void CollisionObject::DrawSegmentTree(CollisionTreeNode* node, const Matrix4* xf
 void CollisionObject::DrawSegmentTreeLevel(CollisionTreeNode* node, int depth, const Matrix4* xf)
 {
     if (depth == 0) {
-        if (node->field_0x00 < 0.0f) {
+        if (node->volume < 0.0f) {
             SetDrawColor(0, 0, 0xff);
         } else {
             SetDrawColor(0xff, 0, 0);
         }
-        if (node->field_0x00 >= 0.0f) {
+        if (node->volume >= 0.0f) {
             DrawBox(&node->center, &node->halfExtents, xf);
         } else {
             SetDrawColor(0xff, 0, 0xff);
@@ -1140,7 +1140,7 @@ void CollisionObject::DrawSegmentTreeLevel(CollisionTreeNode* node, int depth, c
             SetDrawColor(0, 0xff, 0);
             DrawLine(&p, &q);
         }
-    } else if (node->field_0x00 >= 0.0f) {
+    } else if (node->volume >= 0.0f) {
         DrawSegmentTreeLevel(node->child[0], depth - 1, xf);
         DrawSegmentTreeLevel(node->child[1], depth - 1, xf);
     }
@@ -1254,7 +1254,7 @@ int CollisionObject::UnknownVirtualSlot14()
         }
         }
     }
-    field_0x98 = 0;
+    queryTouched = 0;
     return GameObject::UnknownVirtualSlot14();
 }
 
@@ -1474,7 +1474,7 @@ int CollisionObject::QueryCollisions()
     }
     ResetHitState();
     if (g_collisionQuadTree && useBroadphase) {
-        field_0x98 = 1;
+        queryTouched = 1;
         CollisionVec3 maxBounds;
         CollisionVec3 minBounds;
         GetWorldBounds(&minBounds, &maxBounds);
@@ -1482,7 +1482,7 @@ int CollisionObject::QueryCollisions()
         for (QuadTreeObject* o = g_collisionQuadTree->NextObject(); o; o = g_collisionQuadTree->NextObject()) {
             if (o->objectTypeId == g_CollisionObjectTypeId) {
                 hitObject = (CollisionObject*)o;
-                hitObject->field_0x98 = 1;
+                hitObject->queryTouched = 1;
                 if (BoundingSpheresOverlap((CollisionBoundingSphere*)this, (CollisionBoundingSphere*)hitObject)
                     && TestAgainst(hitObject))
                     ReportHit();
@@ -1495,7 +1495,7 @@ int CollisionObject::QueryCollisions()
                 if (SphereContainsPointXZ((CollisionBoundingSphere*)this, &center, reinterpret_cast<Vegetation*>(vegetation)->GetRadius())) {
                     for (int i = 0; i < reinterpret_cast<Vegetation*>(vegetation)->GetCollisionCount(); i++) {
                         hitObject = reinterpret_cast<Vegetation*>(vegetation)->GetCollisionObject(i);
-                        hitObject->field_0x98 = 1;
+                        hitObject->queryTouched = 1;
                         if (TestAgainst(hitObject))
                             ReportHit();
                     }
@@ -1504,7 +1504,7 @@ int CollisionObject::QueryCollisions()
         }
         g_collisionQuadTree->EndQuery();
     } else {
-        field_0x98 = 1;
+        queryTouched = 1;
         GameObjectIterator* it = new(__FILE__, 0x7da) GameObjectIterator(reinterpret_cast<CollisionGameContext*>(g_TrackGame)->root, 1, "");
         // Retail null-checks the CollisionObject* and then the GameObject* again (three tests
         // per step), which is this round trip through the derived pointer type.
@@ -1512,7 +1512,7 @@ int CollisionObject::QueryCollisions()
         while ((object = (CollisionObject*)it->Next()) != 0) {
             hitObject = dynamic_cast<CollisionObject*>(object);
             if (hitObject) {
-                hitObject->field_0x98 = 1;
+                hitObject->queryTouched = 1;
                 if (TestAgainst(hitObject))
                     ReportHit();
             }
@@ -2303,8 +2303,8 @@ int CollisionObject::TestMeshAgainst(CollisionObject* other)
         if (TreeTreeQuery(reinterpret_cast<QueryTreeNode*>(mesh->boxTree),
             reinterpret_cast<QueryTreeNode*>(hull->triangleTree), &mesh->bodyTransform, &hull->worldTransform, 1,
             reinterpret_cast<Vec3*>(hull->vertices), 0)) {
-            CollisionRotateColsInPlace(&reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->field_0x08,
-                reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->field_0x08, &hull->worldTransform);
+            CollisionRotateColsInPlace(&reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->normal,
+                reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->normal, &hull->worldTransform);
             return 1;
         }
         break;
@@ -2320,8 +2320,8 @@ int CollisionObject::TestMeshAgainst(CollisionObject* other)
                         reinterpret_cast<QueryTreeNode*>(e->triangleTree), &mesh->bodyTransform, &e->worldTransform,
                         1, reinterpret_cast<Vec3*>(e->vertices), 0)) {
                         hit = 1;
-                        CollisionRotateColsInPlace(&reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->field_0x08,
-                            reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->field_0x08, &e->worldTransform);
+                        CollisionRotateColsInPlace(&reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->normal,
+                            reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->normal, &e->worldTransform);
                     }
                 }
             }
@@ -2722,7 +2722,7 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                 CollisionHullBody* hull = (CollisionHullBody*)object->shape;
                 CollisionBoxResult hit;
                 hit.point = 0;
-                *(Vec3*)&hit.field_0x08 = Vec3(0.0f, 0.0f, 0.0f);
+                *(Vec3*)&hit.normal = Vec3(0.0f, 0.0f, 0.0f);
                 hit.fraction = 1.0f;
                 SetCollisionBoxResult(&hit);
                 Matrix4 inv = hull->worldTransform;
@@ -2733,7 +2733,7 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                     Vec3 d = SubtractCtorCall(p[1], p[0]);
                     Vec3 scaled = ScaleCtorCall(d, hit.fraction);
                     *(Vec3*)outPoint = AddCtorCall(scaled, p[0]);
-                    CollisionRotateColsTo(outNormal, hit.field_0x08, &hull->worldTransform);
+                    CollisionRotateColsTo(outNormal, hit.normal, &hull->worldTransform);
                 }
                 return result;
             }
@@ -2741,7 +2741,7 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                 CollisionModelBody* model = (CollisionModelBody*)object->shape;
                 CollisionBoxResult hit;
                 hit.point = 0;
-                *(Vec3*)&hit.field_0x08 = Vec3(0.0f, 0.0f, 0.0f);
+                *(Vec3*)&hit.normal = Vec3(0.0f, 0.0f, 0.0f);
                 hit.fraction = 1.0f;
                 SetCollisionBoxResult(&hit);
                 Matrix4 inv = model->bodyTransform;
@@ -2757,7 +2757,7 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                             Vec3 scaled = ScaleCtorCall(d, hit.fraction);
                             *(Vec3*)outPoint = SegmentAdd(scaled, p[0]);
                             Vec3TransformNormal(reinterpret_cast<Vec3*>(outNormal),
-                                reinterpret_cast<const Vec3&>(hit.field_0x08), &e->worldTransform);
+                                reinterpret_cast<const Vec3&>(hit.normal), &e->worldTransform);
                             return 1;
                         }
                     }

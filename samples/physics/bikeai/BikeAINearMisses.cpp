@@ -742,7 +742,7 @@ int QuerySegmentObstacles(Vec3* seg, float radius, int skipVegetation, int ignor
                         ignored = 1;
                 if (ignored)
                     continue;
-                obj->field_0x98 = 1;
+                obj->queryTouched = 1;
                 if (obj->ownerType == 0x64 || obj->ownerType == 0x65) {
                     UnknownBikeAISegmentOwner* owner = (UnknownBikeAISegmentOwner*)obj->ownerObject;
                     d = owner->start - seg[0];
