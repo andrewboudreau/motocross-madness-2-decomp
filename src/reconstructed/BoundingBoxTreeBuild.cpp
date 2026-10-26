@@ -218,7 +218,7 @@ void ChooseTriangleSplit(const TreeBuildTriangle* tris, int count, const TreeVec
     int bestAxis;
     int bestStep;
     int i;
-    int a;
+    int trialAxis;
 
     for (i = 0; i < count; i++) {
         TreeVec3 p = tris[i].centroid;
@@ -257,16 +257,16 @@ void ChooseTriangleSplit(const TreeBuildTriangle* tris, int count, const TreeVec
     best = TriangleBoundsVolume(right, verts, rightCount) + TriangleBoundsVolume(left, verts, leftCount);
 
     for (i = 0; i < 18; i++) {
-        for (a = 0; a < 3; a++) {
-            switch (a) {
+        for (trialAxis = 0; trialAxis < 3; trialAxis++) {
+            switch (trialAxis) {
             case 0: *split = (dx / 20.0f) * (i + 1) + min.x; break;
             case 1: *split = (dy / 20.0f) * (i + 1) + min.y; break;
             case 2: *split = (dz / 20.0f) * (i + 1) + min.z; break;
             }
-            SplitTriangles(tris, left, right, count, &leftCount, &rightCount, *split, a);
+            SplitTriangles(tris, left, right, count, &leftCount, &rightCount, *split, trialAxis);
             cost = TriangleBoundsVolume(right, verts, rightCount) + TriangleBoundsVolume(left, verts, leftCount);
             if (cost < best) {
-                bestAxis = a;
+                bestAxis = trialAxis;
                 best = cost;
                 bestStep = i;
             }
@@ -346,7 +346,7 @@ void ChooseBoxSplit(const TreeVec3* boxes, const TreeVec3* centers, int count, f
     int bestAxis;
     int bestStep;
     int i;
-    int a;
+    int trialAxis;
 
     for (i = 1; i < 2 * count; i++) {
         if (boxes[i].x > max.x) max.x = boxes[i].x;
@@ -386,17 +386,17 @@ void ChooseBoxSplit(const TreeVec3* boxes, const TreeVec3* centers, int count, f
     best = PointBoundsVolume(leftBoxes, 2 * leftCount) + PointBoundsVolume(rightBoxes, 2 * rightCount);
 
     for (i = 0; i < 18; i++) {
-        for (a = 0; a < 3; a++) {
-            switch (a) {
+        for (trialAxis = 0; trialAxis < 3; trialAxis++) {
+            switch (trialAxis) {
             case 0: *split = (dx / 20.0f) * (i + 1) + min.x; break;
             case 1: *split = (dy / 20.0f) * (i + 1) + min.y; break;
             case 2: *split = (dz / 20.0f) * (i + 1) + min.z; break;
             }
             if (SplitBoxes(boxes, centers, leftBoxes, rightBoxes, leftCenters, rightCenters,
-                           count, &leftCount, &rightCount, *split, a)) {
+                           count, &leftCount, &rightCount, *split, trialAxis)) {
                 cost = PointBoundsVolume(leftBoxes, 2 * leftCount) + PointBoundsVolume(rightBoxes, 2 * rightCount);
                 if (cost < best) {
-                    bestAxis = a;
+                    bestAxis = trialAxis;
                     best = cost;
                     bestStep = i;
                 }

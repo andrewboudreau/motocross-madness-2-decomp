@@ -724,7 +724,7 @@ void ToolTip::ShowText(const char* text, int* position, float time) {
     SIZE size;
     int width;
     int height;
-    int x;
+    int left;
 
     if (textTexture) {
         textTexture->Release();
@@ -752,9 +752,9 @@ void ToolTip::ShowText(const char* text, int* position, float time) {
             textArea.bottom = height;
             screenArea.left = position[0];
             screenArea.top = position[1];
-            x = screenArea.left - width / 2;
-            x = x < 0 ? 0 : x;
-            screenArea.left = __min(target->targetWidth - width, x);
+            left = screenArea.left - width / 2;
+            left = left < 0 ? 0 : left;
+            screenArea.left = __min(target->targetWidth - width, left);
             screenArea.top = __min(target->targetHeight - height, screenArea.top);
             screenArea.right = screenArea.left + width;
             screenArea.bottom = screenArea.top + height;
@@ -862,8 +862,8 @@ GUIInputDevice* GUIInputDevice::Bind(void* target, InputDevice* device, float mi
 void GUIInputDevice::Rebind() {
     float rangeX;
     float rangeY;
-    int x = (int)bindingX.currentValue;
-    int y = (int)bindingY.currentValue;
+    int cursorX = (int)bindingX.currentValue;
+    int cursorY = (int)bindingY.currentValue;
 
     if (!inputDevice)
         return;
@@ -877,9 +877,9 @@ void GUIInputDevice::Rebind() {
         rangeX = (float)(((RenderTarget*)renderContext)->targetWidth - 1);
         rangeY = (float)(((RenderTarget*)renderContext)->targetHeight - 1);
     }
-    bindingX = UnknownControlBinding(rangeMinX, rangeX, (float)x,
+    bindingX = UnknownControlBinding(rangeMinX, rangeX, (float)cursorX,
                                        g_TrackGame->controlInterface->NextBindingId(), 0, 0.0f);
-    bindingY = UnknownControlBinding(rangeMinY, rangeY, (float)y,
+    bindingY = UnknownControlBinding(rangeMinY, rangeY, (float)cursorY,
                                        g_TrackGame->controlInterface->NextBindingId(), 1, 0.0f);
     if (inputDevice->deviceKind == 2) {
         ((JoystickDevice*)inputDevice)->AttachAxisBinding(&bindingX, 0.01f, 0.01f);
