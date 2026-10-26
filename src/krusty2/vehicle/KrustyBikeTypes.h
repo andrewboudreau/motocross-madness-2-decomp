@@ -448,8 +448,11 @@ struct KbObj128 {
 };
 
 
-// Pad/force-feedback-like device at VehicleInputMap+0x0c (tier 3 name).  Vtable slots used
-// by KrustyBike slots 93/94: 6 (0x18), 7 (0x1c), 11 (0x2c), 12 (0x30); field +0x0c is a mode.
+// KrustyBike slots 93/94's view of the JoystickDevice at VehicleInputMap+0x0c (the
+// ControlInterface's activeJoystick; see Vehicle.h).  The slots they call are its force
+// feedback methods: 6 CreateConstantForce, 7 SetConstantForce, 11 StopEffect, 12 StartEffect;
+// +0x0c is InputDevice's deviceKind.  KbEffectParams is SetConstantForce's direction array
+// (0x4650 = 180 degrees in DirectInput hundredths).
 struct KbEffectParams { int field_0x0; int field_0x4; };
 struct KbPad {
     virtual void UnknownVirtualSlot0();
@@ -458,15 +461,15 @@ struct KbPad {
     virtual void UnknownVirtualSlot3();
     virtual void UnknownVirtualSlot4();
     virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6(int a, int b, int c);
-    virtual void UnknownVirtualSlot7(int a, KbEffectParams* b, int c);
+    virtual void UnknownVirtualSlot6(int effect, int magnitude, int duration);
+    virtual void UnknownVirtualSlot7(int effect, KbEffectParams* direction, int magnitude);
     virtual void UnknownVirtualSlot8();
     virtual void UnknownVirtualSlot9();
     virtual void UnknownVirtualSlot10();
-    virtual void UnknownVirtualSlot11(int a);
-    virtual void UnknownVirtualSlot12(int a, int b, int c);
+    virtual void UnknownVirtualSlot11(int effect);
+    virtual void UnknownVirtualSlot12(int effect, int iterations, int flags);
     char pad_0x04[0x8];
-    int field_0xc;
+    int deviceKind;  // +0x0c; 3 when force feedback is driven
 };
 extern int g_kbPadActive;   // 0x0067C3AC
 

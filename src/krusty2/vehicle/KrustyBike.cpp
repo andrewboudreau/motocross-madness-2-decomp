@@ -339,13 +339,13 @@ int KrustyBike::UnknownVirtualSlot83(VehicleWheel* wheel)
     return 0;
 }
 
-int KrustyBike::UnknownVirtualSlot84(int a, int b)
+int KrustyBike::UnknownVirtualSlot84(int control, int modifier)
 {
     if (!aiKind && !isRemote && !isGhost) {
         KbSensor* s = race->chatOverlay;
         if (!s || !s->typing) {
-            Bike::UnknownVirtualSlot84(a, b);
-            return inputMap->UnknownVirtualSlot2(a, b);
+            Bike::UnknownVirtualSlot84(control, modifier);
+            return inputMap->UnknownVirtualSlot2(control, modifier);
         }
     }
     return 0;
@@ -636,12 +636,13 @@ int KrustyBike::UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, 
     return Bike::UnknownVirtualSlot99(dt, noseOverLimit, impact, impulse);
 }
 
-// Slot 93: when the pad device (input map +0x0c) is in mode 3, reset one effect channel and
-// re-arm another with a time-scaled value, then derive forceFeedbackGain from the same FeedbackSlider value.
+// Slot 93: when the joystick (input map +0x0c) is of kind 3, recreates constant-force effects
+// 1 (magnitude 10000, infinite) and 0 (scaled by FeedbackSlider, 70 s), then derives
+// forceFeedbackGain from the same FeedbackSlider value.
 void KrustyBike::UnknownVirtualSlot93()
 {
     KbPad* pad = (KbPad*)inputMap->valueSource;
-    if (pad && pad->field_0xc == 3) {
+    if (pad && pad->deviceKind == 3) {
         pad->UnknownVirtualSlot6(1, 10000, -1);
         pad = (KbPad*)inputMap->valueSource;
         pad->UnknownVirtualSlot6(0, (int)(reinterpret_cast<KbGame*>(g_TrackGame)->feedbackSlider * 83.333336f), 70000);
@@ -649,12 +650,13 @@ void KrustyBike::UnknownVirtualSlot93()
     }
 }
 
-// Slot 94: pad effect update; the force term is smoothedForwardAccel * forceFeedbackGain * 180 clamped to
-// [-10000, 10000] while not in state 1, then the effect is toggled on slot 80's result.
+// Slot 94: force-feedback update; effect 1's magnitude is smoothedForwardAccel *
+// forceFeedbackGain * 180 clamped to [-10000, 10000] while not in state 1, and the effect is
+// started or stopped on slot 80's result; effect 0 restarts on landing.
 void KrustyBike::UnknownVirtualSlot94()
 {
     KbPad* pad = (KbPad*)inputMap->valueSource;
-    if (pad && pad->field_0xc == 3) {
+    if (pad && pad->deviceKind == 3) {
         if (crashState != 1) {
             KbEffectParams params = { 0x4650, 0 };
             int force = (int)(smoothedForwardAccel * forceFeedbackGain * 180.0f);

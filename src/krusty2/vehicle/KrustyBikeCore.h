@@ -78,7 +78,7 @@ public:
     virtual int UnknownVirtualSlot82();
     virtual int UnknownVirtualSlot83(VehicleWheel* wheel);
     virtual void UnknownVirtualSlot86();
-    virtual int UnknownVirtualSlot84(int a, int b);
+    virtual int UnknownVirtualSlot84(int control, int modifier);
     virtual void UnknownVirtualSlot93();
     virtual void UnknownVirtualSlot97();
     virtual void UnknownVirtualSlot94();

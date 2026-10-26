@@ -84,9 +84,9 @@ int Vehicle::UnknownVirtualSlot81()
     return inputMap->UnknownVirtualSlot3(0x1d, 0, 0x3f, 0) != 0;
 }
 
-int Vehicle::UnknownVirtualSlot84(int a, int b)
+int Vehicle::UnknownVirtualSlot84(int control, int modifier)
 {
-    return inputMap->UnknownVirtualSlot2(a, b);
+    return inputMap->UnknownVirtualSlot2(control, modifier);
 }
 
 // True when the speed change this step (linearSpeed - prevSpeed) is below dt * speedGainLimit;

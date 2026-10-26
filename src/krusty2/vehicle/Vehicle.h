@@ -59,12 +59,16 @@ extern void __cdecl VehContactsC(int n, VehicleContact** arr);
 extern void __cdecl VehBasisToBlock(Vec3 a, Vec3 b, float* p0, float* p1, float* p2,
                                     float* p3, float* p4, float* p5, float* p6);
 
-// Object at Vehicle+0x468: control/input map with two virtual queries.
-struct VehicleValueSource {          // object at VehicleInputMap+0x0c (provisional)
+// Vehicle+0x468 holds the game's ControlInterface (src/reconstructed/ControlInterface.h):
+// BikeRace's view of KrustyBike::Load (0x0048fc80) passes a ControlInterface* in this
+// argument position, and +0x0c / +0x34 are its activeJoystick and keyboard.  The structs
+// below are views of those classes; argument names follow JoystickDevice / KeyboardDevice /
+// ControlInterface.
+struct VehicleValueSource {          // VehicleInputMap+0x0c: the active JoystickDevice
     virtual void UnknownVirtualSlot0();
     virtual void UnknownVirtualSlot1();
     virtual void UnknownVirtualSlot2();
-    virtual int  UnknownVirtualSlot3(int a, float* out);
+    virtual int  UnknownVirtualSlot3(int index, float* angle);  // GetPovAngle
     virtual void UnknownVirtualSlot4();
     virtual void UnknownVirtualSlot5();
     virtual void UnknownVirtualSlot6();
@@ -76,22 +80,22 @@ struct VehicleValueSource {          // object at VehicleInputMap+0x0c (provisio
     virtual void UnknownVirtualSlot12();
     virtual void UnknownVirtualSlot13();
     virtual void UnknownVirtualSlot14();
-    virtual void UnknownVirtualSlot15();   // ~Vehicle (0x00526380) calls slots 15 and 16 on it
-    virtual void UnknownVirtualSlot16();
+    virtual void UnknownVirtualSlot15();   // ReleaseEffects: ~Vehicle (0x00526380) calls slots
+    virtual void UnknownVirtualSlot16();   // 15 and 16 (ResetForceFeedback) on it
 };
-struct VehicleKeyTable {             // object at VehicleInputMap+0x34 (provisional)
+struct VehicleKeyTable {             // VehicleInputMap+0x34: the KeyboardDevice
     virtual void UnknownVirtualSlot0();
     virtual void UnknownVirtualSlot1();
     virtual void UnknownVirtualSlot2();
     virtual void UnknownVirtualSlot3();
     virtual void UnknownVirtualSlot4();
-    virtual int  UnknownVirtualSlot5(int a, int b, int c);
+    virtual int  UnknownVirtualSlot5(int key, int modifier, int entry);  // IsButtonDown
 };
-struct VehicleInputMap {
+struct VehicleInputMap {             // ControlInterface
     virtual void UnknownVirtualSlot0();
     virtual void UnknownVirtualSlot1();
-    virtual int  UnknownVirtualSlot2(int a, int b);
-    virtual int  UnknownVirtualSlot3(int a, int b, int c, int d);
+    virtual int  UnknownVirtualSlot2(int control, int modifier);  // IsControlDown
+    virtual int  UnknownVirtualSlot3(int control, int kind, int modifier, int device);  // IsDeviceButtonDown
     char pad_0x04[0x8];
     VehicleValueSource* valueSource;  // +0x0c float query used by slot 77
     char pad_0x10[0x24];

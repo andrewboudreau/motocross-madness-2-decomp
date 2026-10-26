@@ -107,7 +107,7 @@ public:
     virtual int UnknownVirtualSlot83(VehicleWheel* wheel);
     // Returns the input-map query (KrustyBike 0x00491630 uses the result; the Vehicle
     // body 0x00529250 leaves it in eax) (tier 2).
-    virtual int UnknownVirtualSlot84(int a, int b);
+    virtual int UnknownVirtualSlot84(int control, int modifier);
     virtual void UnknownVirtualSlot85();
     virtual void UnknownVirtualSlot86();
     virtual void UnknownVirtualSlot87();  // entry is the shared empty stub 0x00464e90
