@@ -39,12 +39,12 @@ static Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 // For DPSYS_DESTROYPLAYERORGROUP the fields are DPMSG_DESTROYPLAYERORGROUP's
 // dwType, dwPlayerType and dpId.
 struct UnknownEventPlayerMessage {
-    int field_0x00;
+    int header;                                    // +0x00: type (DPMSG dwType for system messages)
     int player;                                    // +0x04: player (types 0xcc and 0x8e)
     int dpId;                                      // +0x08: DPSYS_DESTROYPLAYERORGROUP
 };
 struct UnknownEventRacerMessage {                  // type 0x86
-    int field_0x00;
+    int header;                                    // +0x00: type byte and sequence
     char racerIndex;                               // +0x04: the sender's racer index
     char finished;                                 // +0x05: racer +0x7a4
     float score;                                   // +0x08: racer +0x768
@@ -984,9 +984,9 @@ public:
     virtual void UnknownVirtualSlot0();
     // 0x00456720 for Vegetation: the object's quadtree code (ret 4).
     virtual unsigned int UnknownVirtualSlot1(QuadTree* tree);
-    short field_0x04;
-    short field_0x06;
-    char field_0x08;
+    short queryStamp;                              // +0x04, as CollisionObject.h
+    short sortKey;                                 // +0x06
+    char objectTypeId;                             // +0x08
 };
 class Vegetation : public QuadTreeObject {};
 class UnknownEventGraphicsTest : public GameObject {};
