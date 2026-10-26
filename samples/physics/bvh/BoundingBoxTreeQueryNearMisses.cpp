@@ -68,11 +68,11 @@
 //   retail).  Left: retail also calls DotProduct in the sixth and seventh normalisations
 //   (corner-distance or box-axis-test helpers spend more budget but leave those two
 //   expanded; dearer QuerySigned/QuerySquares bodies, corner differences passed inline,
-//   corner locals interleaved with their squares and a zero-constructed w each reshuffle the
+//   corner locals interleaved with their squares and a zero-constructed cornerDir each reshuffle the
 //   whole call pattern instead, normalised diff 268-975), copies each normalised axis twice (into a temporary that the
 //   test reads and into the axis), and in each separating-axis test retail sums the
 //   three projected radii before the segment's half-length projection (as `(r = ...) + D`
-//   would) and orders the z axis's dot product (0 + 0) + l.z * hz.  A projected-radius inline
+//   would) and orders the z axis's dot product (0 + 0) + axis.z * hz.  A projected-radius inline
 //   helper (4430+ bytes) or DotProduct for both the mid and the half-segment projections
 //   (4543) spends too much budget.  A fresh axis local per test changes nothing (734 bytes,
 //   266 differing; the two missing 0x0040ae30 calls in the s15 reference diff).
@@ -126,30 +126,36 @@ int BoxCapsuleOverlap(const Vec3* center, const Vec3* halfExtents, const Vec3* e
     p0 -= *center;
     p1 -= *center;
     Vec3 mid = (p0 + p1) * 0.5f;
-    Vec3 d = mid - p0;
-    if (QueryAbs(mid.x) > QueryAbs(d.x) + halfExtents->x + radius)
+    Vec3 halfSegment = mid - p0;
+    if (QueryAbs(mid.x) > QueryAbs(halfSegment.x) + halfExtents->x + radius)
         return 0;
-    if (QueryAbs(mid.y) > QueryAbs(d.y) + halfExtents->y + radius)
+    if (QueryAbs(mid.y) > QueryAbs(halfSegment.y) + halfExtents->y + radius)
         return 0;
-    if (QueryAbs(mid.z) > QueryAbs(d.z) + radius + halfExtents->z)
+    if (QueryAbs(mid.z) > QueryAbs(halfSegment.z) + radius + halfExtents->z)
         return 0;
-    Vec3 a[3];
-    a[0] = Vec3(halfExtents->x, 0.0f, 0.0f);
-    a[1] = Vec3(0.0f, halfExtents->y, 0.0f);
-    a[2] = Vec3(0.0f, 0.0f, halfExtents->z);
-    Vec3 u = Vec3NormalizeInline(p1 - p0);
-    Vec3 l;
-    l = Vec3NormalizeInline(Vec3(-u.z, 0.0f, u.x));
-    if (QueryAbs(l.z * mid.z + (l.x * mid.x + l.y * mid.y)) > QueryAbs(DotProduct(l, a[0])) + QueryAbs(DotProduct(l, a[1])) + QueryAbs(DotProduct(l, a[2])) +
-                                         QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
+    Vec3 boxAxes[3];
+    boxAxes[0] = Vec3(halfExtents->x, 0.0f, 0.0f);
+    boxAxes[1] = Vec3(0.0f, halfExtents->y, 0.0f);
+    boxAxes[2] = Vec3(0.0f, 0.0f, halfExtents->z);
+    Vec3 dir = Vec3NormalizeInline(p1 - p0);
+    Vec3 axis;
+    axis = Vec3NormalizeInline(Vec3(-dir.z, 0.0f, dir.x));
+    if (QueryAbs(axis.z * mid.z + (axis.x * mid.x + axis.y * mid.y)) >
+            QueryAbs(DotProduct(axis, boxAxes[0])) + QueryAbs(DotProduct(axis, boxAxes[1]))
+            + QueryAbs(DotProduct(axis, boxAxes[2]))
+            + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
         return 0;
-    l = Vec3NormalizeInline(Vec3(u.y, -u.x, 0.0f));
-    if (QueryAbs(l.z * mid.z + (l.x * mid.x + l.y * mid.y)) > QueryAbs(DotProduct(l, a[0])) + QueryAbs(DotProduct(l, a[1])) + QueryAbs(DotProduct(l, a[2])) +
-                                         QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
+    axis = Vec3NormalizeInline(Vec3(dir.y, -dir.x, 0.0f));
+    if (QueryAbs(axis.z * mid.z + (axis.x * mid.x + axis.y * mid.y)) >
+            QueryAbs(DotProduct(axis, boxAxes[0])) + QueryAbs(DotProduct(axis, boxAxes[1]))
+            + QueryAbs(DotProduct(axis, boxAxes[2]))
+            + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
         return 0;
-    l = Vec3NormalizeInline(Vec3(0.0f, u.z, -u.y));
-    if (QueryAbs(l.z * mid.z + (l.x * mid.x + l.y * mid.y)) > QueryAbs(DotProduct(l, a[0])) + QueryAbs(DotProduct(l, a[1])) + QueryAbs(DotProduct(l, a[2])) +
-                                         QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
+    axis = Vec3NormalizeInline(Vec3(0.0f, dir.z, -dir.y));
+    if (QueryAbs(axis.z * mid.z + (axis.x * mid.x + axis.y * mid.y)) >
+            QueryAbs(DotProduct(axis, boxAxes[0])) + QueryAbs(DotProduct(axis, boxAxes[1]))
+            + QueryAbs(DotProduct(axis, boxAxes[2]))
+            + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
         return 0;
     float c0x = QueryAbs(halfExtents->x) - QueryAbs(p0.x);
     float c0y = QueryAbs(halfExtents->y) - QueryAbs(p0.y);
@@ -159,42 +165,48 @@ int BoxCapsuleOverlap(const Vec3* center, const Vec3* halfExtents, const Vec3* e
     float c1z = QueryAbs(halfExtents->z) - QueryAbs(p1.z);
     Vec3 s0 = QuerySquares(c0x, c0y, c0z);
     Vec3 s1 = QuerySquares(c1x, c1y, c1z);
-    Vec3 w;
+    Vec3 cornerDir;
     if (s0.x + s0.y < s1.x + s1.y) {
-        w.x = QuerySigned(s0.x, p0.x);
-        w.y = QuerySigned(s0.y, p0.y);
+        cornerDir.x = QuerySigned(s0.x, p0.x);
+        cornerDir.y = QuerySigned(s0.y, p0.y);
     } else {
-        w.x = QuerySigned(s1.x, p1.x);
-        w.y = QuerySigned(s1.y, p1.y);
+        cornerDir.x = QuerySigned(s1.x, p1.x);
+        cornerDir.y = QuerySigned(s1.y, p1.y);
     }
-    w.z = 0.0f;
-    l = Vec3NormalizeInline(w);
-    if (QueryAbs(l.z * mid.z + (l.x * mid.x + l.y * mid.y)) > QueryAbs(DotProduct(l, a[0])) + QueryAbs(DotProduct(l, a[1])) + QueryAbs(DotProduct(l, a[2])) +
-                                         QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
+    cornerDir.z = 0.0f;
+    axis = Vec3NormalizeInline(cornerDir);
+    if (QueryAbs(axis.z * mid.z + (axis.x * mid.x + axis.y * mid.y)) >
+            QueryAbs(DotProduct(axis, boxAxes[0])) + QueryAbs(DotProduct(axis, boxAxes[1]))
+            + QueryAbs(DotProduct(axis, boxAxes[2]))
+            + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
         return 0;
     if (s0.x + s0.z < s1.x + s1.z) {
-        w.x = QuerySigned(s0.x, p0.x);
-        w.z = QuerySigned(s0.z, p0.z);
+        cornerDir.x = QuerySigned(s0.x, p0.x);
+        cornerDir.z = QuerySigned(s0.z, p0.z);
     } else {
-        w.x = QuerySigned(s1.x, p1.x);
-        w.z = QuerySigned(s1.z, p1.z);
+        cornerDir.x = QuerySigned(s1.x, p1.x);
+        cornerDir.z = QuerySigned(s1.z, p1.z);
     }
-    w.y = 0.0f;
-    l = Vec3NormalizeInline(w);
-    if (QueryAbs(l.z * mid.z + (l.x * mid.x + l.y * mid.y)) > QueryAbs(DotProduct(l, a[0])) + QueryAbs(DotProduct(l, a[1])) + QueryAbs(DotProduct(l, a[2])) +
-                                         QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
+    cornerDir.y = 0.0f;
+    axis = Vec3NormalizeInline(cornerDir);
+    if (QueryAbs(axis.z * mid.z + (axis.x * mid.x + axis.y * mid.y)) >
+            QueryAbs(DotProduct(axis, boxAxes[0])) + QueryAbs(DotProduct(axis, boxAxes[1]))
+            + QueryAbs(DotProduct(axis, boxAxes[2]))
+            + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
         return 0;
     if (s0.y + s0.z < s1.y + s1.z) {
-        w.y = QuerySigned(s0.y, p0.y);
-        w.z = QuerySigned(s0.z, p0.z);
+        cornerDir.y = QuerySigned(s0.y, p0.y);
+        cornerDir.z = QuerySigned(s0.z, p0.z);
     } else {
-        w.y = QuerySigned(s1.y, p1.y);
-        w.z = QuerySigned(s1.z, p1.z);
+        cornerDir.y = QuerySigned(s1.y, p1.y);
+        cornerDir.z = QuerySigned(s1.z, p1.z);
     }
-    w.x = 0.0f;
-    l = Vec3NormalizeInline(w);
-    if (QueryAbs(l.z * mid.z + (l.x * mid.x + l.y * mid.y)) > QueryAbs(DotProduct(l, a[0])) + QueryAbs(DotProduct(l, a[1])) + QueryAbs(DotProduct(l, a[2])) +
-                                         QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
+    cornerDir.x = 0.0f;
+    axis = Vec3NormalizeInline(cornerDir);
+    if (QueryAbs(axis.z * mid.z + (axis.x * mid.x + axis.y * mid.y)) >
+            QueryAbs(DotProduct(axis, boxAxes[0])) + QueryAbs(DotProduct(axis, boxAxes[1]))
+            + QueryAbs(DotProduct(axis, boxAxes[2]))
+            + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
         return 0;
     return 1;
 }
@@ -210,17 +222,17 @@ int BoxTriangleQuery(const Vec3* center, const Vec3* halfExtents, const QueryTri
     TransformPointInline(&v[0], s_vertices[tri->vertex[0]], m);
     TransformPointInline(&v[1], s_vertices[tri->vertex[1]], m);
     TransformPointInline(&v[2], s_vertices[tri->vertex[2]], m);
-    Vec3 n;
-    RotateVectorInline(&n, tri->normal, m);
-    Vec3 a[3];
-    a[0] = Vec3(halfExtents->x, 0.0f, 0.0f);
-    a[1] = Vec3(0.0f, halfExtents->y, 0.0f);
-    a[2] = Vec3(0.0f, 0.0f, halfExtents->z);
-    Vec3 c = v[0] - *center;
+    Vec3 faceNormal;
+    RotateVectorInline(&faceNormal, tri->normal, m);
+    Vec3 boxAxes[3];
+    boxAxes[0] = Vec3(halfExtents->x, 0.0f, 0.0f);
+    boxAxes[1] = Vec3(0.0f, halfExtents->y, 0.0f);
+    boxAxes[2] = Vec3(0.0f, 0.0f, halfExtents->z);
+    Vec3 offset = v[0] - *center;
     Vec3 e0, e1, e2;
     for (int i = 0; i < 13; i++) {
         switch (i) {
-        case 0: s_axes[0] = n; break;
+        case 0: s_axes[0] = faceNormal; break;
         case 1: s_axes[1] = Vec3(1.0f, 0.0f, 0.0f); break;
         case 2: s_axes[2] = Vec3(0.0f, 1.0f, 0.0f); break;
         case 3: s_axes[3] = Vec3(0.0f, 0.0f, 1.0f); break;
@@ -237,20 +249,22 @@ int BoxTriangleQuery(const Vec3* center, const Vec3* halfExtents, const QueryTri
         case 11: s_axes[11] = CrossProduct(s_axes[2], e2); break;
         case 12: s_axes[12] = CrossProduct(s_axes[3], e2); break;
         }
-        float r = QueryAbs(DotProduct(a[0], s_axes[i])) + QueryAbs(DotProduct(a[1], s_axes[i])) + QueryAbs(DotProduct(a[2], s_axes[i]));
+        float boxRadius = QueryAbs(DotProduct(boxAxes[0], s_axes[i]))
+                          + QueryAbs(DotProduct(boxAxes[1], s_axes[i]))
+                          + QueryAbs(DotProduct(boxAxes[2], s_axes[i]));
         if (i == 0) {
-            if (QueryAbs(DotProduct(c, s_axes[0])) > r)
+            if (QueryAbs(DotProduct(offset, s_axes[0])) > boxRadius)
                 return 0;
             e0 = v[0] - v[1];
             e1 = v[0] - v[2];
         } else {
-            float p0 = DotProduct(c, s_axes[i]);
+            float p0 = DotProduct(offset, s_axes[i]);
             float d1 = DotProduct(e0, s_axes[i]);
             float p2 = p0 - DotProduct(e1, s_axes[i]);
             float p1 = p0 - d1;
             float mn = QueryMin(QueryMin(p1, p2), p0);
             float mx = QueryMax(QueryMax(p1, p2), p0);
-            if (-r > mx || r < mn)
+            if (-boxRadius > mx || boxRadius < mn)
                 return 0;
         }
     }
