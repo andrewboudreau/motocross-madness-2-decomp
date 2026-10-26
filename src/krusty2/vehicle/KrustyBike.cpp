@@ -124,18 +124,18 @@ void KrustyBike::UnknownVirtualSlot8()
         frontWheelLifted = 0;
 }
 
-int KrustyBike::UnknownVirtualSlot12(int a)
+int KrustyBike::UnknownVirtualSlot12(int grounded)
 {
-    if (a && reinterpret_cast<KbGame*>(g_TrackGame)->eventType != 3) {
+    if (grounded && reinterpret_cast<KbGame*>(g_TrackGame)->eventType != 3) {
         float lo = terrainScale * 105.0f;
         if (position.x < lo)
             return 1;
-        KbTrackB* t = ((KbTrackA*)track)->trackData;
-        if ((t->sizeX * 256.0f - 105.0f) * terrainScale < position.x)
+        KbTrackB* grid = ((KbTrackA*)track)->trackData;
+        if ((grid->sizeX * 256.0f - 105.0f) * terrainScale < position.x)
             return 2;
         if (position.z < lo)
             return 3;
-        if ((t->sizeZ * 256.0f - 105.0f) * terrainScale < position.z)
+        if ((grid->sizeZ * 256.0f - 105.0f) * terrainScale < position.z)
             return 4;
     }
     return 0;
@@ -601,9 +601,9 @@ int KrustyBike::UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, 
 {
     if (crashState) return crashState;
     if (UnknownVirtualSlot12(anyWheelInContact)) {
-        KbTrackB* t = ((KbTrackA*)track)->trackData;
-        scratchVector = Vec3(t->sizeX * terrainScale * 128.0f, 20.0f,
-                             t->sizeZ * terrainScale * 128.0f);
+        KbTrackB* grid = ((KbTrackA*)track)->trackData;
+        scratchVector = Vec3(grid->sizeX * terrainScale * 128.0f, 20.0f,
+                             grid->sizeZ * terrainScale * 128.0f);
         Vec3 off = scratchVector - position;
         velocity = off * 0.055f;
         velocity.y = 120.0f;
