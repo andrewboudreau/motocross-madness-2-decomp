@@ -1,0 +1,15 @@
+{
+  "baseline": "Complete published-before objects normalized under the single SetDetailLevel method name. All bytes, flags and relocation destinations remain identical; the standalone sample has no such calls.",
+  "objects": {
+    "src/reconstructed/QuarryStuntEvent.cpp": {
+      "sections": 86,
+      "relocations": 393,
+      "sha256": "37a7a6b50a62a145889f23f06c28e3c0bc9ab5c5cbf694cff31e08a969effbbd"
+    },
+    "samples/game/QuarryStuntEventNearMisses.cpp": {
+      "sections": 23,
+      "relocations": 95,
+      "sha256": "2424e484c913dbfbb28a6ee2e5770287610a9ca2d9996a341cf879f3e2327e27"
+    }
+  }
+}

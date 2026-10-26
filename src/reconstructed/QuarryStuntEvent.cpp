@@ -426,7 +426,7 @@ int BaseQuarryEvent::OnControlPress(UnknownControlEvent* event, UnknownInputEntr
         if (eventFog)
             eventFog->SetDetailLevel(level);
         eventScene->SetDetailLevel(level);
-        raceView->SetDetailLevel(level);
+        reinterpret_cast<BikeRace*>(raceView)->SetDetailLevel(level);
         if (textQueue) {
             char text[0x80];
             char buffer[0x100];
@@ -452,7 +452,7 @@ int BaseQuarryEvent::OnControlPress(UnknownControlEvent* event, UnknownInputEntr
         if (eventFog)
             eventFog->SetDetailLevel(level);
         eventScene->SetDetailLevel(level);
-        raceView->SetDetailLevel(level);
+        reinterpret_cast<BikeRace*>(raceView)->SetDetailLevel(level);
         if (textQueue) {
             char text[0x80];
             char buffer[0x100];

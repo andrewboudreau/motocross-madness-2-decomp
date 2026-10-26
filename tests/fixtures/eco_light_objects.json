@@ -1,5 +1,5 @@
 {
-  "baseline": "Published dfdf98230fff5c3ccead8e21a82acc4eebc5b3b9: complete same-path before/after objects preserve all payloads, flags, addends and destinations under precisely one return-type symbol mapping. Only enumerated filenames are normalized in these portable retained pins. Explicit ContainerList.h filename normalization repairs the sole cross-root SceneManager pin difference; all thirteen original private pins were reproduced before repair, and complete cross-root rows then match.",
+  "baseline": "Published dfdf98230fff5c3ccead8e21a82acc4eebc5b3b9: complete same-path before/after objects preserve all payloads, flags, addends and destinations under precisely one return-type symbol mapping. Only enumerated filenames are normalized in these portable retained pins. Explicit ContainerList.h filename normalization repairs the sole cross-root SceneManager pin difference; all thirteen original private pins were reproduced before repair, and complete cross-root rows then match. QuarryStuntEvent preserves every nondebug section and relocation under only the verified SetDetailLevel method-name join; its standalone sample is unchanged.",
   "renames": {
     "?FindLightOfType@LightManager@@QAEPAVUnknownEcoLight@@H@Z": "?FindLightOfType@LightManager@@QAEPAVLightEmitter@@H@Z"
   },
@@ -27,7 +27,7 @@
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 86,
       "relocations": 393,
-      "sha256": "21f1fc43eb8d2dd11a7b0ab2b6c514d5f596ff26aabdc1fd78d34a3a742a319c"
+      "sha256": "37a7a6b50a62a145889f23f06c28e3c0bc9ab5c5cbf694cff31e08a969effbbd"
     },
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,

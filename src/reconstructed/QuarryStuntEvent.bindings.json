@@ -50,7 +50,7 @@
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
   "?SetListener@AuralScape@@QAEXHPAUVector3@@000@Z": "0x004030a0",
   "?HandlePlayerLeft@BikeRace@@QAEXH@Z": "0x00420590",
-  "?SetDetailLevel@UnknownKrustyBikeView@@QAEXH@Z": "0x00423790",
+  "?SetDetailLevel@BikeRace@@QAEXH@Z": "0x00423790",
   "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
   "?SetRowHighlight@DebugOverlay@@QAEXHHH@Z": "0x00448000",
   "?SetDetailLevel@EcoSystem@@QAEXH@Z": "0x004594c0",
