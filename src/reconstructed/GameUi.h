@@ -49,9 +49,9 @@ struct UnknownGameUiListRow {
 class UIFrame : public BaseObject {
 public:
     // 0x00472960: loads image `file`.
-    UIFrame(const char* file, void* textures, int a, int b, void* palette);
+    UIFrame(const char* file, void* textures, int soundGroup, int duplicates, void* palette);
     // 0x00472d00: loads image `id` from a resource module.
-    UIFrame(void* module, int id, void* textures, int a, int b, int c, void* palette);
+    UIFrame(void* module, int id, void* textures, int soundGroup, int skip, int duplicates, void* palette);
     virtual ~UIFrame();                       // 0x00472dc0 (deleting wrapper 0x00472ba0)
     // 0x00472bc0: loads the image at `offset` of `stream`; 0 when it fails.
     int LoadFromStream(void* stream, int offset, void* palette);
@@ -84,7 +84,7 @@ public:
     UIFrame* Advance();         // 0x00472fe0: advances
     TextureMap* AdvancePastSounds();      // 0x004730b0: advances past sound frames
     void LoadFile(const char* file, void* palette); // 0x004730e0
-    void LoadFromModule(void* module, int id, int a, void* palette); // 0x00473160
+    void LoadFromModule(void* module, int id, int soundGroup, void* palette); // 0x00473160
 
     int currentFrame;                         // +0x08
     int playForwards;                         // +0x0c: 1: playing forwards
@@ -201,7 +201,7 @@ public:
     virtual int ButtonDown(int button, int position); // slot 55, 0x004721b0: state 2, sound 2
     virtual int ButtonUp(int button, int* position); // slot 56, 0x00472250: state 3, sound 3
     virtual void ButtonHeld(int button, int* position); // slot 57, 0x004722b0: drags a Moveable control
-    virtual void PlayControlSound(int index, int a); // slot 58, 0x00472670: plays sound `index`
+    virtual void PlayControlSound(int index, int unused); // slot 58, 0x00472670: plays sound `index`
     // Slot 59: `value` != 0 stores the control's value through boundValue
     // (BindValue), 0 loads it (SelectGamePicProcs.cpp "ChkRecordRace").
     virtual void SyncBoundValue(int value); // 0x00464e80
@@ -512,17 +512,17 @@ public:
     void SetRowTextColor(unsigned int color, int row); // 0x00476c70 (row -1: the control's)
     void SetSelectBoxColor(unsigned int color); // 0x00476cd0: "SelectBoxColor"
     char* GetRowText(int row);                // 0x00476d20: (-1: the selected one)
-    int AddRow(const char* text, int data, int a); // 0x00476d80: adds a row ("Item%d")
+    int AddRow(const char* text, int data, int rowFlags); // 0x00476d80: adds a row ("Item%d")
     int CountVisibleRows();                   // 0x00476ee0: the rows that fit from the first shown
     int ReserveRows(int rows);      // 0x00476f50: grows the rows to `rows`
     void SetRowText(int row, const char* text); // 0x00476ff0
     int AddImageFileRow(const char* file, int data, int loadImage, int rowFlags); // 0x00477110
-    int AddImageRow(UIAnim* image, int data, int a); // 0x004773a0 ("Item%d" starting with '@')
+    int AddImageRow(UIAnim* image, int data, int rowFlags); // 0x004773a0 ("Item%d" starting with '@')
     int RemoveRow(int row);                   // 0x00477490
     void RemoveAllRows();                     // 0x004775f0
     void SetSortCompare(int (*compare)(const void* a, const void* b)); // 0x004777f0: qsort callback
-    void Sort(int a);                         // 0x00477900: qsorts the rows
-    void SetSelectable(int a);                // 0x00477bb0: "Selectable" (+0x224)
+    void Sort(int force);                         // 0x00477900: qsorts the rows
+    void SetSelectable(int value);                // 0x00477bb0: "Selectable" (+0x224)
     void UpdateScrollBars();                  // 0x00477bc0: the attached scroll bars follow
     void SetPartialRows(int value);           // 0x00477e60: partialRows (SelectGamePicProcs.cpp)
     char* GetRowKind(int row);                // 0x00476970: rowTable[row].kind (0 out of range)
@@ -725,7 +725,7 @@ public:
     virtual int Tick(float frameTime);                 // 0x0047af90
     virtual int Draw();                   // slot 40, 0x0047afa0: copies the movie's frame
     // 0x0047ae90: plays `file`; `done` is called with `owner` at its end.
-    int PlayMovie(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner);
+    int PlayMovie(const char* file, int restart, void (*done)(UIDialog* dialog), UIDialog* owner);
 
     MediaControl* moviePlayer;                // +0x1ec: the player
     int frameRect[4];                         // +0x1f0: the frame's source rectangle

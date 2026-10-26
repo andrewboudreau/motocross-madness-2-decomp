@@ -1043,7 +1043,7 @@ void RaceSound::ReadSample(const char* name, void** data, int* size) {
 }
 
 // 0x004e5660
-int RaceSound::LoadSound(Sound* sound, const char* name, int a, int b) {
+int RaceSound::LoadSound(Sound* sound, const char* name, int flags, int controls) {
     char message[0x184];
     UnknownTextureStream* stream;
 
@@ -1056,7 +1056,7 @@ int RaceSound::LoadSound(Sound* sound, const char* name, int a, int b) {
             delete stream;
         return 0;
     }
-    if (!sound->Load(name, stream, a, b, 0, -1)) {
+    if (!sound->Load(name, stream, flags, controls, 0, -1)) {
         if (stream)
             delete stream;
         return 0;

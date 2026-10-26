@@ -97,7 +97,7 @@ public:
     // buffer; its size goes to *size (both 0 on failure).
     void ReadSample(const char* name, void** data, int* size);
     // 0x004e5660: loads `name` from Audio.res into `sound`.
-    int LoadSound(Sound* sound, const char* name, int a, int b);
+    int LoadSound(Sound* sound, const char* name, int flags, int controls);
     // 0x004e5780: plays `sound` while sound is on (`network` sounds only in
     // network games); `stop` rewinds it first.
     void PlayIfEnabled(Sound* sound, int network, int stop, int loop, int unused);

@@ -568,7 +568,7 @@ void UIControl::LeaveHover(int value) {
 }
 
 // 0x00472670
-void UIControl::PlayControlSound(int index, int a) {
+void UIControl::PlayControlSound(int index, int unused) {
     if (sounds[index]) {
         sounds[index]->SetVolume(ownerGui->soundVolume, 0);
         sounds[index]->PlayWithOptions(1, 0, 0);
@@ -1017,12 +1017,12 @@ void UIListBox::SyncBoundValue(int value) {
 // ---------------------------------------------------------------------------
 // UIFrame and UIAnim
 
-// 0x00472960: a frame from `file`: a .wav file becomes a sound of group `a`
-// (played with `b`), anything else an image texture keyed on magenta. The
-// image is freed after both the loaded and the missing path, which retail
-// tests once after the whole if/else; the missing-image warning is formatted
-// but never shown.
-UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) {
+// 0x00472960: a frame from `file`: a .wav file becomes a sound of `soundGroup`
+// (with Sound::Load's `duplicates`), anything else an image texture keyed on
+// magenta. The image is freed after both the loaded and the missing path,
+// which retail tests once after the whole if/else; the missing-image warning
+// is formatted but never shown.
+UIFrame::UIFrame(const char* file, void* textures, int soundGroup, int duplicates, void* palette) {
     UnknownTgaFile* image = 0;
     if (_stricmp(".wav", file + strlen(file) - 4)) {
         int format = g_TrackGame->renderTarget->surfacePixelFormat;
@@ -1048,8 +1048,8 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
             sprintf(message, "UIFrame(): Warning! Error loading frame: %s\n", file);
         }
     } else {
-        frameSound = new(__FILE__, 0x13b9) Sound((SoundGroup*)a, 1);
-        frameSound->Load(file, 0, 1, 3, b, -1);
+        frameSound = new(__FILE__, 0x13b9) Sound((SoundGroup*)soundGroup, 1);
+        frameSound->Load(file, 0, 1, 3, duplicates, -1);
         ownsSound = 1;
         isSound = 1;
         frameWidth = 0;
@@ -1061,17 +1061,19 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
 }
 
 // 0x00472d00: `module` is the image's name and `id` the resource manager
-// holding it; `a` is the sound group a missing image is loaded from as a sound.
-UIFrame::UIFrame(void* module, int id, void* textures, int a, int b, int c, void* palette) {
-    if (!b) {
+// holding it; `soundGroup` is the group a missing image is loaded from as a sound.
+// With `skip` the frame stays unloaded.
+UIFrame::UIFrame(void* module, int id, void* textures, int soundGroup, int skip, int duplicates,
+                 void* palette) {
+    if (!skip) {
         ownsSound = 0;
         isSound = 0;
         frameSound = 0;
         frameTextures = (int)textures;
         UnknownResourceEntry* entry =
             ((UnknownResourceManager*)id)->FindItem((const char*)module, 1);
-        if (!LoadFromStream(entry->archive, entry->offset, palette) && a) {
-            LoadEntrySound((SoundGroup*)a, (const char*)module, 1, 3, c, -1);
+        if (!LoadFromStream(entry->archive, entry->offset, palette) && soundGroup) {
+            LoadEntrySound((SoundGroup*)soundGroup, (const char*)module, 1, 3, duplicates, -1);
             ownsSound = 1;
             isSound = 1;
             frameWidth = 0;
@@ -1131,8 +1133,8 @@ void UIAnim::LoadFile(const char* file, void* palette) {
 }
 
 // 0x00473160
-void UIAnim::LoadFromModule(void* module, int id, int a, void* palette) {
-    AddFrame(new(__FILE__, 0x14e6) UIFrame(module, id, animTextures, a, 0, 0, palette));
+void UIAnim::LoadFromModule(void* module, int id, int soundGroup, void* palette) {
+    AddFrame(new(__FILE__, 0x14e6) UIFrame(module, id, animTextures, soundGroup, 0, 0, palette));
 }
 
 // ---------------------------------------------------------------------------
@@ -1302,8 +1304,8 @@ void UIListBox::SetAllowWScroll(int value) {
 }
 
 // 0x00477bb0
-void UIListBox::SetSelectable(int a) {
-    selectable = a;
+void UIListBox::SetSelectable(int value) {
+    selectable = value;
 }
 
 // 0x00477bc0: counts the rows of the last page (the rows that fit from the
@@ -2866,7 +2868,7 @@ void UIListBox::SetRowText(int row, const char* text) {
 }
 
 // 0x00476d80
-int UIListBox::AddRow(const char* text, int data, int a) {
+int UIListBox::AddRow(const char* text, int data, int rowFlags) {
     if (text && (rowCount < rowCapacity || ReserveRows(rowCount + 1))) {
         UnknownGameUiListRow* row = &rowTable[rowCount];
         row->width = strlen(text);
@@ -2879,7 +2881,7 @@ int UIListBox::AddRow(const char* text, int data, int a) {
         row->brush = 0;
         row->height = height;
         row->kind = 1;
-        row->flags = a;
+        row->flags = rowFlags;
         row->text = (char*)DebugMalloc(row->width + 1, __FILE__, 0x1dc7);
         strcpy(row->text, text);
         row->textLines = ownerDialog->SplitTextLines(row->text, textColor, (void*)fontHandle,
@@ -2954,7 +2956,7 @@ int UIListBox::AddImageFileRow(const char* file, int data, int loadImage, int ro
 }
 
 // 0x004773a0
-int UIListBox::AddImageRow(UIAnim* image, int data, int a) {
+int UIListBox::AddImageRow(UIAnim* image, int data, int rowFlags) {
     if (rowCount >= rowCapacity && !ReserveRows(rowCount + 1))
         return 0;
     UnknownGameUiListRow row;
@@ -2965,7 +2967,7 @@ int UIListBox::AddImageRow(UIAnim* image, int data, int a) {
     UIFrame* frame = image->frameList[0];
     row.width = frame->frameWidth;
     row.height = frame->frameHeight;
-    row.flags = a;
+    row.flags = rowFlags;
     row.imageFile = 0;
     row.textLines = 0;
     row.field_0x30 = 0;
@@ -3247,8 +3249,8 @@ int CompareSortedRows(const void* a, const void* b) {
 }
 
 // 0x00477900
-void UIListBox::Sort(int a) {
-    if (a || !ownerDialog->sortingList || !g_SortingDialog) {
+void UIListBox::Sort(int force) {
+    if (force || !ownerDialog->sortingList || !g_SortingDialog) {
         ownerDialog->sortingList = this;
         g_SortingDialog = ownerDialog;
     }
@@ -4996,7 +4998,7 @@ UIVideoStatic::UIVideoStatic(int flags, CameraRect* area, UIDialog* owner)
 }
 
 // 0x0047ae90
-int UIVideoStatic::PlayMovie(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner) {
+int UIVideoStatic::PlayMovie(const char* file, int restart, void (*done)(UIDialog* dialog), UIDialog* owner) {
     if (moviePlayer)
         moviePlayer->Release();
     moviePlayer = new(__FILE__, 0x264d) MediaControl(1);
@@ -5009,7 +5011,7 @@ int UIVideoStatic::PlayMovie(const char* file, int a, void (*done)(UIDialog* dia
     frameRect[1] = 0;
     frameRect[2] = moviePlayer->frameWidth;
     frameRect[3] = moviePlayer->frameHeight;
-    if (a)
+    if (restart)
         moviePlayer->Restart();
     return 1;
 }
