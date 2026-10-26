@@ -1108,30 +1108,30 @@ extern UnknownResourceManager* g_ResourceManager; // pointer stored at 0x00572b4
 // found it becomes the collision shape, otherwise the hull comes from the node (0x00432720).
 // SoultreePhysicsObject has two GameObjects, so field_0x08 and the GameObject call are
 // qualified.
-GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int a1, const char* a2,
-                                                        const SoultreeLoadDesc* a3, int a4,
-                                                        Vec3 a5, Vec3 a6,
-                                                        Vec3 a7, void* a8, void* a9,
-                                                        float a10, int a11, int a12,
-                                                        SoultreeSlot1f0* a13, float a14,
-                                                        int a15, float a16, float a17,
-                                                        float a18, int a19, int a20,
-                                                        unsigned char a21, int a22)
+GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int renderContext, const char* modelPath,
+                                                        const SoultreeLoadDesc* desc, int a4,
+                                                        Vec3 startPosition, Vec3 startForward,
+                                                        Vec3 startUp, void* terrainProbe, void* linkedObject,
+                                                        float weight, int contactCapacity, int attachmentSlots,
+                                                        SoultreeSlot1f0* trackObject, float fixedStep,
+                                                        int maxSteps, float drag, float elasticity,
+                                                        float radius, int shapeMode, int restThreshold,
+                                                        unsigned char probeMask, int createCollision)
 {
     char name[0x104];
     char colPath[0x104];
 
-    D3DIMSoultreeObject::D3DIMObjectVirtualSlot9(a1, a2, a3, a4, 1);
-    SoultreePhysicsBaseObject::UnknownVirtualSlot2(a1, 1, a5, a6, a7, a8, a9, a10, a11, a12,
-                                                   a13, a14, a15, a16, a17, a18, a19, a20,
-                                                   a21, a22);
-    if (a3 && (a3->field_0x25 & 1)) {
+    D3DIMSoultreeObject::D3DIMObjectVirtualSlot9(renderContext, modelPath, desc, a4, 1);
+    SoultreePhysicsBaseObject::UnknownVirtualSlot2(renderContext, 1, startPosition, startForward, startUp, terrainProbe, linkedObject, weight, contactCapacity, attachmentSlots,
+                                                   trackObject, fixedStep, maxSteps, drag, elasticity, radius, shapeMode, restThreshold,
+                                                   probeMask, createCollision);
+    if (desc && (desc->field_0x25 & 1)) {
         reinterpret_cast<D3DIMSoultreeObject*>(SoultreePhysicsBaseObject::sceneNode)->SetUseLighting(1);
     }
 
-    int len = strlen(a2);
+    int len = strlen(modelPath);
     int n = len > 0x103 ? 0x103 : len;
-    strncpy(name, a2, n);
+    strncpy(name, modelPath, n);
     name[n] = 0;
     strcpy(strrchr(name, '.'), ".col");
 
@@ -1159,30 +1159,30 @@ GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int a1, const char* a2,
 // SoultreePhysicsCharacter slot 40 (0x00503de0, `ret 0x6c`).  The same loader for the
 // character: D3DIM character slot 11 instead of the object's slot 9, line 0x8cd, the pose
 // node set from the model node, and shape setup 0x004324b0 when no ".col" file exists.
-GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int a1, int a2, const char* a3,
-                                                           const SoultreeLoadDesc* a4, int a5,
-                                                           Vec3 a6, Vec3 a7,
-                                                           Vec3 a8, void* a9, void* a10,
-                                                           float a11, int a12, int a13,
-                                                           SoultreeSlot1f0* a14, float a15,
-                                                           int a16, float a17, float a18,
-                                                           int a19, unsigned char a20, int a21)
+GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int renderContext, int createCenterNode, const char* modelPath,
+                                                           const SoultreeLoadDesc* desc, int a5,
+                                                           Vec3 startPosition, Vec3 startForward,
+                                                           Vec3 startUp, void* terrainProbe, void* linkedObject,
+                                                           float weight, int contactCapacity, int attachmentSlots,
+                                                           SoultreeSlot1f0* trackObject, float fixedStep,
+                                                           int maxSteps, float drag, float elasticity,
+                                                           int restThreshold, unsigned char probeMask, int createCollision)
 {
     char name[0x104];
     char colPath[0x104];
 
-    D3DIMSoultreeCharacter::D3DIMVirtualSlot11(a1, a3, a4, a5, 1, 1);
+    D3DIMSoultreeCharacter::D3DIMVirtualSlot11(renderContext, modelPath, desc, a5, 1, 1);
     poseNode = sceneNode = modelNode;
-    SoultreePhysicsBaseObject::UnknownVirtualSlot2(a1, a2, a6, a7, a8, a9, a10, a11, a12, a13,
-                                                   a14, a15, a16, a17, a18, 0.0f, 0, a19, a20,
-                                                   a21);
-    if (a4 && (a4->field_0x25 & 1)) {
+    SoultreePhysicsBaseObject::UnknownVirtualSlot2(renderContext, createCenterNode, startPosition, startForward, startUp, terrainProbe, linkedObject, weight, contactCapacity, attachmentSlots,
+                                                   trackObject, fixedStep, maxSteps, drag, elasticity, 0.0f, 0, restThreshold, probeMask,
+                                                   createCollision);
+    if (desc && (desc->field_0x25 & 1)) {
         reinterpret_cast<D3DIMSoultreeObject*>(sceneNode)->SetUseLighting(1);
     }
 
-    int len = strlen(a3);
+    int len = strlen(modelPath);
     int n = len > 0x103 ? 0x103 : len;
-    strncpy(name, a3, n);
+    strncpy(name, modelPath, n);
     name[n] = 0;
     strcpy(strrchr(name, '.'), ".col");
 

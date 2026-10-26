@@ -58,15 +58,24 @@ public:
     //  * Float types (a15, a17, a18) follow the Vehicle caller's float constants
     //    (0.02f, 0.001f, 0.1f); a20 is pushed zero-extended from a byte (tier 2).
     //  * a10, a11, a14, a20 take the types of the slot 2 parameters they are forwarded to.
+    //  * The names follow slot 2's: a1 renderContext, a2 createCenterNode, a3 modelPath,
+    //    a4 desc, a6..a8 startPosition/startForward/startUp, a9..a18 terrainProbe ..
+    //    elasticity, a19 restThreshold, a20 probeMask, a21 createCollision; slot 2's radius
+    //    and shapeMode are passed as 0.0f and 0.
     //  * Returns the GameObject virtual base (`this ? this+vbase : 0` at 0x0050408e).  The
     //    sibling SoultreePhysicsObject slot 40 (0x00503970, ret 0x70) has the same shape; its
     //    SceneManager caller 0x004ed3bf passes the result to GameObject::AppendChild.
-    virtual GameObject* UnknownVirtualSlot40(int a1, int a2, const char* a3,
-                                             const SoultreeLoadDesc* a4, int a5,
-                                             Vec3 a6, Vec3 a7, Vec3 a8,
-                                             void* a9, void* a10, float a11, int a12, int a13,
-                                             SoultreeSlot1f0* a14, float a15, int a16, float a17,
-                                             float a18, int a19, unsigned char a20, int a21);
+    virtual GameObject* UnknownVirtualSlot40(int renderContext, int createCenterNode,
+                                             const char* modelPath,
+                                             const SoultreeLoadDesc* desc, int a5,
+                                             Vec3 startPosition, Vec3 startForward,
+                                             Vec3 startUp, void* terrainProbe,
+                                             void* linkedObject, float weight,
+                                             int contactCapacity, int attachmentSlots,
+                                             SoultreeSlot1f0* trackObject, float fixedStep,
+                                             int maxSteps, float drag, float elasticity,
+                                             int restThreshold, unsigned char probeMask,
+                                             int createCollision);
     virtual void UnknownVirtualSlot41();                          // 0x00504360
     virtual int UnknownVirtualSlot42();                           // 0x00504470
 

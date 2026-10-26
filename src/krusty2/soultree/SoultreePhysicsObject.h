@@ -85,20 +85,25 @@ public:
     virtual ~SoultreePhysicsObject();             // core 0x005038d0, deleting 0x00503890
     virtual int Tick(float dt);                    // 0x00503c50 (vbase thunk 0x00504270)
     // Slot 40 (0x00503970, `ret 0x70` = 28 argument dwords, tier 1).  Grouping (tier 2):
-    //  * a1..a4 go to D3DIMObjectVirtualSlot9 as (a1, a2, a3, a4, 1); a2 is also the name the
-    //    ".col" path is built from, a3 is tested at +0x25.
+    //  * renderContext, modelPath, desc and a4 (a1..a4) go to D3DIMObjectVirtualSlot9 as
+    //    (a1, a2, a3, a4, 1); modelPath is also the name the ".col" path is built from, desc
+    //    is tested at +0x25.
     //  * a5..a7 are three Vec3 by value (struct-copy shape) and a8..a22 are forwarded
-    //    unchanged to slot 2 as its a6..a20, so their types are slot 2's.  Slot 2 gets
-    //    (a1, 1, a5, a6, a7, a8..a22).
+    //    unchanged to slot 2 as its a6..a20, so their types and names are slot 2's.  Slot 2
+    //    gets (a1, 1, a5, a6, a7, a8..a22).
     //  * The SceneManager caller 0x004ed3bf passes the result to GameObject::AppendChild.
     //  * Returns the D3DIMSoultreeObject GameObject (+0x228), not the virtual one: the tail
     //    0x00503c16 null-checks `this`, then this+0x21c, then adds 12.
-    virtual GameObject* UnknownVirtualSlot40(int a1, const char* a2, const SoultreeLoadDesc* a3,
-                                             int a4, Vec3 a5, Vec3 a6,
-                                             Vec3 a7, void* a8, void* a9, float a10,
-                                             int a11, int a12, SoultreeSlot1f0* a13, float a14,
-                                             int a15, float a16, float a17, float a18, int a19,
-                                             int a20, unsigned char a21, int a22);
+    virtual GameObject* UnknownVirtualSlot40(int renderContext, const char* modelPath,
+                                             const SoultreeLoadDesc* desc, int a4,
+                                             Vec3 startPosition, Vec3 startForward,
+                                             Vec3 startUp, void* terrainProbe,
+                                             void* linkedObject, float weight,
+                                             int contactCapacity, int attachmentSlots,
+                                             SoultreeSlot1f0* trackObject, float fixedStep,
+                                             int maxSteps, float drag, float elasticity,
+                                             float radius, int shapeMode, int restThreshold,
+                                             unsigned char probeMask, int createCollision);
 };
 
 #endif
