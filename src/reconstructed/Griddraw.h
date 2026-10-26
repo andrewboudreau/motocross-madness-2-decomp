@@ -23,9 +23,11 @@ struct GridCamera;
 #include "AgeManager.h"
 
 // Boundary view of the renderer at Terrain+0x18 (thiscall virtuals). Slot 7
-// takes (stage, state, value) like a texture-stage state, slot 8 three
-// values, slot 15 draws an indexed list (primitive 4, vertex format, vertices,
-// count, indices, count, flags). Names tier 3.
+// takes (stage, state, value) like a texture-stage state, slot 8 a render
+// state (D3DRENDERSTATE_TEXTUREPERSPECTIVE, 1/0, 0), slot 15 draws an indexed
+// list (primitive 4, vertex format, vertices, count, indices, count, flags):
+// RenderTarget's SetTextureStageState, SetRenderState and DrawIndexedPrimitive
+// slots (RenderTarget.h). Names tier 3.
 class GridRenderDevice {
 public:
     virtual void UnknownVirtualSlot0() = 0;
@@ -36,7 +38,7 @@ public:
     virtual void UnknownVirtualSlot5() = 0;
     virtual void UnknownVirtualSlot6() = 0;
     virtual void UnknownVirtualSlot7(int stage, int state, int value) = 0;
-    virtual void UnknownVirtualSlot8(int a, int b, int c) = 0;
+    virtual void UnknownVirtualSlot8(int state, int value, int force) = 0;
     virtual void UnknownVirtualSlot9() = 0;
     virtual void UnknownVirtualSlot10() = 0;
     virtual void UnknownVirtualSlot11() = 0;
