@@ -59,10 +59,10 @@ static inline float BikeDot(const Vec3* a, const Vec3* b)
 
 float Bike::UnknownVirtualSlot75()
 {
-    float d = BikeDot(&savedForward, &rearWheel->rollDirection);
-    if (d < 0.0f)
-        d = -d;
-    return d;
+    float alignment = BikeDot(&savedForward, &rearWheel->rollDirection);
+    if (alignment < 0.0f)
+        alignment = -alignment;
+    return alignment;
 }
 
 // Out-of-line call views for Method_0x0040a520 (see math/Math3D.h): the Vec3 constructor
@@ -416,16 +416,16 @@ Vec3 Bike::UnknownVirtualSlot16(const Vec3* localTorque)
 void Bike::UnknownVirtualSlot1(float extraWeight)
 {
     Vehicle::UnknownVirtualSlot1(extraWeight);
-    BikeA644* p = poseSmoother;
-    if (p) {
-        float v = poseSmoothTime;
-        p->smoothedValue = 0;
-        if (v != FLT_MAX) {
-            p->smoothTime = v;
-            p->smoothRatio = 1.0f;
+    BikeA644* smoother = poseSmoother;
+    if (smoother) {
+        float initialTime = poseSmoothTime;
+        smoother->smoothedValue = 0;
+        if (initialTime != FLT_MAX) {
+            smoother->smoothTime = initialTime;
+            smoother->smoothRatio = 1.0f;
         }
-        p->maxRise = 1.0f;
-        p->maxFall = -1.0f;
+        smoother->maxRise = 1.0f;
+        smoother->maxFall = -1.0f;
     }
     crossoverPose = 0;
     steerPoseState = 1;
@@ -813,10 +813,10 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     ((Vec3*)field_0xfc)->z = 1.0f / (riderMk * wh2);
     float wheelMass = baseWeight * 0.05f;
     wheelMass = wheelMass * 0.0310559f;
-    float r = frontWheel->wheelRadius * 2.0f;
-    float r2 = r * r;
-    steerTorqueGains.x = 1.0f / ((r2 + h2) * (wheelMass * (1.0f / 12.0f)));
-    steerTorqueGains.y = 1.0f / ((w2 + r2) * (wheelMass * (1.0f / 12.0f)));
+    float wheelDiameter = frontWheel->wheelRadius * 2.0f;
+    float diameterSq = wheelDiameter * wheelDiameter;
+    steerTorqueGains.x = 1.0f / ((diameterSq + h2) * (wheelMass * (1.0f / 12.0f)));
+    steerTorqueGains.y = 1.0f / ((w2 + diameterSq) * (wheelMass * (1.0f / 12.0f)));
     steerTorqueGains.z = 1.0f / ((wheelMass * (1.0f / 12.0f)) * wh2);
     UnknownVirtualSlot43();
 
@@ -886,14 +886,15 @@ int Bike::UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, 
 {
     Matrix4 tmp;
     RunTickers();
-    int r = Vehicle::UnknownVirtualSlot33(newPosition, newForward, newUp, settleUp, keepPlacement, extraWeight);
+    int result = Vehicle::UnknownVirtualSlot33(newPosition, newForward, newUp, settleUp, keepPlacement,
+                                               extraWeight);
     int mode = wrecker->wreckState;
     if (mode == 0 || mode == 1) {
         modelNode->GetMatrixIn(0, &tmp);
         reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->SetMatrixIn(0, &tmp);
     }
     wrecker->collisionModel->SnapPlacement();
-    return r;
+    return result;
 }
 
 int Bike::UnknownVirtualSlot62(float slideAngle)
@@ -973,9 +974,9 @@ Vec3* Bike::UnknownVirtualSlot54(Vec3* out)
 
 int Bike::UnknownVirtualSlot39(float dt)
 {
-    int r = Vehicle::UnknownVirtualSlot39(dt);
-    if (r)
-        return r;
+    int result = Vehicle::UnknownVirtualSlot39(dt);
+    if (result)
+        return result;
     if (crashState) {
         if (crashTimer != 0.0f && wrecker->hadContact) {
             crashTimer -= reinterpret_cast<BikeGlobal_0056e26c*>(g_TrackGame)->g_0x2f0;
@@ -1548,15 +1549,15 @@ void Bike::UnknownVirtualSlot7(const Vec3* force)
         active = 0;
         int last;
         for (i = 0; i < collisionPointCount; i++) {
-            VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
-            if (c->contactActive) {
-                dist[i] = BikeContactDistance(centerOfMass, c->contactPosition);
+            VehicleContact* contact = ((VehicleContact**)collisionPoints)[i];
+            if (contact->contactActive) {
+                dist[i] = BikeContactDistance(centerOfMass, contact->contactPosition);
                 total += dist[i];
                 active++;
                 last = i;
             } else {
-                c->blendWeight = 0.0f;
-                c->appliedShare = kVec3Zero;
+                contact->blendWeight = 0.0f;
+                contact->appliedShare = kVec3Zero;
             }
         }
         if (active == 1) {
@@ -1565,11 +1566,11 @@ void Bike::UnknownVirtualSlot7(const Vec3* force)
             return;
         }
         for (i = 0; active > 0; i++) {
-            VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
-            if (c->contactActive) {
-                float w = 1.0f - dist[i] / total;
-                c->blendWeight = w;
-                c->appliedShare = *force * w;
+            VehicleContact* contact = ((VehicleContact**)collisionPoints)[i];
+            if (contact->contactActive) {
+                float weight = 1.0f - dist[i] / total;
+                contact->blendWeight = weight;
+                contact->appliedShare = *force * weight;
                 active--;
             }
         }
@@ -1758,16 +1759,16 @@ static inline void BikeCancelToward(float* value, const float& delta)
 {
     if (delta > 0.0f) {
         if (*value < 0.0f) {
-            float n = delta * 1.5f + *value;
-            if (0.0f < n)
-                n = 0.0f;
-            *value = n;
+            float moved = delta * 1.5f + *value;
+            if (0.0f < moved)
+                moved = 0.0f;
+            *value = moved;
         }
     } else if (*value > 0.0f) {
-        float n = delta * 1.5f + *value;
-        if (0.0f > n)
-            n = 0.0f;
-        *value = n;
+        float moved = delta * 1.5f + *value;
+        if (0.0f > moved)
+            moved = 0.0f;
+        *value = moved;
     }
 }
 
@@ -2003,25 +2004,25 @@ void Bike::UnknownVirtualSlot38(int notify, int eventKind, void* event)
         hasBody = 0;
         break;
     case 0x3ea: {
-        BikeKindParty* o = (BikeKindParty*)((BikeCollisionEvent*)event)->otherBody;
-        BikeKindInfo* kind = o->kind;
-        otherWorldAngVel = *o->body->UnknownVirtualSlot43(&tmp);
+        BikeKindParty* other = (BikeKindParty*)((BikeCollisionEvent*)event)->otherBody;
+        BikeKindInfo* kind = other->kind;
+        otherWorldAngVel = *other->body->UnknownVirtualSlot43(&tmp);
         otherVel = &blend;
-        otherAngVel = &o->body->f16c;
+        otherAngVel = &other->body->f16c;
         // other point: interpolate body->f23c toward body->f154 by kind->field_0x24; retail
         // adds a struct copy of f23c (int moves into the low temporaries) as a named copy does
         {
-            Vec3 prev = o->body->f23c;
-            blend = (o->body->f154 - prev) * kind->field_0x24 + prev;
+            Vec3 prev = other->body->f23c;
+            blend = (other->body->f154 - prev) * kind->field_0x24 + prev;
         }
-        otherInvMass = o->body->f17c;
-        otherInvInertia.x = o->body->f1d0;
-        otherInvInertia.y = o->body->f1e4;
-        otherInvInertia.z = o->body->f1f8;
-        Vec3 wp = o->body->f234->LocalToWorldPoint(o->body->f228);
+        otherInvMass = other->body->f17c;
+        otherInvInertia.x = other->body->f1d0;
+        otherInvInertia.y = other->body->f1e4;
+        otherInvInertia.z = other->body->f1f8;
+        Vec3 wp = other->body->f234->LocalToWorldPoint(other->body->f228);
         hasBody = 1;
         otherArm = ((BikeContactSet*)collisionObject)->hitPoint - wp;
-        otherNode = (int)o->body->f234;
+        otherNode = (int)other->body->f234;
         break;
     }
     case 0x2711: {
@@ -2104,9 +2105,9 @@ static inline float BikeRange(float x, float lo, float hi)
 
 int Bike::UnknownVirtualSlot89(float t)
 {
-    int r = UnknownVirtualSlot66();
-    if (r)
-        return r;
+    int result = UnknownVirtualSlot66();
+    if (result)
+        return result;
 
     float lean;
     if (airborne || rearWheel->inContact)
@@ -2115,21 +2116,21 @@ int Bike::UnknownVirtualSlot89(float t)
         lean = 0.0f;
 
     if (airborne && lean > 2.0f && rearWheel->penetration < -1.0f) {
-        float u = (0.75f - steerAxis->steerValue) * 3.99f;
-        poseIndex = (int)(u - 0.5f);
+        float posePosition = (0.75f - steerAxis->steerValue) * 3.99f;
+        poseIndex = (int)(posePosition - 0.5f);
         int idx = poseIndex;
         poseIndex = idx + 11;
         poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
         if (crossoverPose == 0) {
-            BikeA644* p = poseSmoother;
-            float v = poseSmoothTime;
-            *(float*)&p->smoothedValue = 0.0f;
-            if (v != FLT_MAX) {
-                p->smoothTime = v;
-                p->smoothRatio = 1.0f;
+            BikeA644* smoother = poseSmoother;
+            float initialTime = poseSmoothTime;
+            *(float*)&smoother->smoothedValue = 0.0f;
+            if (initialTime != FLT_MAX) {
+                smoother->smoothTime = initialTime;
+                smoother->smoothRatio = 1.0f;
             }
-            p->maxRise = 1.0f;
-            p->maxFall = -1.0f;
+            smoother->maxRise = 1.0f;
+            smoother->maxFall = -1.0f;
             steerPoseState = 1;
         }
         crossoverPose = 1;
@@ -2169,16 +2170,16 @@ int Bike::UnknownVirtualSlot89(float t)
     float x;
     if (crossoverPose) {
         // advance the smoothed value toward controlInput.x, limited by its rate m_0x4
-        BikeA644* q = poseSmoother;
-        float d = controlInput.x - *(float*)&q->smoothedValue;
-        if (d < 0.0f)
-            d = BikeAtLeast(d, q->maxFall);
+        BikeA644* smoother = poseSmoother;
+        float change = controlInput.x - *(float*)&smoother->smoothedValue;
+        if (change < 0.0f)
+            change = BikeAtLeast(change, smoother->maxFall);
         else
-            d = BikeAtMost(d, q->maxRise);
-        float step = t < q->smoothTime ? t : q->smoothTime;
-        q->smoothRatio = step / q->smoothTime;
-        *(float*)&q->smoothedValue = d * q->smoothRatio + *(float*)&q->smoothedValue;
-        t = *(float*)&q->smoothedValue;
+            change = BikeAtMost(change, smoother->maxRise);
+        float step = t < smoother->smoothTime ? t : smoother->smoothTime;
+        smoother->smoothRatio = step / smoother->smoothTime;
+        *(float*)&smoother->smoothedValue = change * smoother->smoothRatio + *(float*)&smoother->smoothedValue;
+        t = *(float*)&smoother->smoothedValue;
         switch (steerPoseState) {
         case 1:
             x = t * -0.25f;
