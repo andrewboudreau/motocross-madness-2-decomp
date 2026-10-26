@@ -84,7 +84,7 @@ void KrustyBike::UnknownVirtualSlot1(float a)
 {
     Bike::UnknownVirtualSlot1(a);
     Fn_0048D8B0();
-    field_0x152c = 0;
+    aiTrickHoldLeft = 0;
     headTurningToRival = 0;
     headTurningBack = 0;
     nearestRival = 0;
@@ -1256,7 +1256,7 @@ void KrustyBike::Fn_0048D910(int idx)
     UnknownVirtualSlot41();
     motionActive = 1;
     motionCompleted = 0;
-    field_0x432 = 1;
+    motionJustStarted = 1;
     trickClipTime = 0;
     chainedTrickTime = 0;
     trickHoldTime = 0;
@@ -1393,7 +1393,7 @@ void KrustyBike::Fn_0048E280()
     UnknownVirtualSlot41();
     motionCompleted = 0;
     motionActive = 1;
-    field_0x432 = 1;
+    motionJustStarted = 1;
     headTurningToRival = 1;
     motionIndex = (char)0xff;
     if (rivalBearing > 2.7f) {

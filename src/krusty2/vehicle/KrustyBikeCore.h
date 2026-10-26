@@ -229,7 +229,7 @@ public:
     float trickClipTime;                      // +0x1520  seconds into the trick clip; slot 102 adds dt up to s_kbTrickLength[trick]; summed by slot 42 (tier 3)
     float chainedTrickTime;                   // +0x1524  clip time banked by the chain start 0x0048d990; summed by slot 42 (tier 3)
     float trickHoldTime;                      // +0x1528  seconds the player holds the pose in the s_kbTrickFrame window; summed by slot 42 (tier 3)
-    float field_0x152c; // 0x152C
+    float aiTrickHoldLeft;                    // +0x152C AI bike: seconds left in the trick pose; the clip tick counts it down in the s_kbTrickFrame window and releases trickPoseHeld at 0; slot 1 clears it (no setter decoded) (tier 3)
     float trickPoints;                        // +0x1530  slot 42 adds 2500 per trick second; 0x00495ff0 rounds it to 100 and shows it with the multiplier (tier 3)
     float field_0x1534; // 0x1534
     float trickMultiplier;                    // +0x1538  slot 42 sets it to trickCount, +0.5 when chained; multiplies trickPoints (tier 3)

@@ -1131,8 +1131,8 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
     if (motionActive) {
         if (motionIndex >= 0) {
             // Trick clip.
-            if (field_0x432) {
-                field_0x432 = 0;
+            if (motionJustStarted) {
+                motionJustStarted = 0;
                 ((Character*)riderCharacter)->CharacterVirtualSlot7(0, 0, 0);
                 CharacterVirtualSlot7(0, 0, 0);
             } else {
@@ -1145,7 +1145,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                 trickClipTime += dt;
                 if (motionIndex < 16 && trickClipTime > s_kbTrickLength[motionIndex])
                     trickClipTime = s_kbTrickLength[motionIndex];
-                if (!held && field_0x152c == 0.0f) {
+                if (!held && aiTrickHoldLeft == 0.0f) {
                     if (remote) {
                         if (!trickPoseHeld) {
                             if (trickPoseHeldPrev && motionIndex > 15)
@@ -1170,9 +1170,9 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                     if (frame > s_kbTrickFrame[motionIndex] && frame < s_kbTrickFrame[motionIndex] + 3) {
                         trickPoseHeld = 1;
                         if (aiKind) {
-                            field_0x152c -= dt;
-                            if (field_0x152c < 0.0) {
-                                field_0x152c = 0;
+                            aiTrickHoldLeft -= dt;
+                            if (aiTrickHoldLeft < 0.0) {
+                                aiTrickHoldLeft = 0;
                                 trickPoseHeld = 0;
                             }
                         } else {

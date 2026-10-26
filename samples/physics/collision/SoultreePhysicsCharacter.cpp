@@ -15,7 +15,7 @@ void SoultreePhysicsCharacter::UnknownVirtualSlot1(float value)
     SoultreePhysicsBaseObject::UnknownVirtualSlot1(value);
     motionActive = 0;
     motionCompleted = 0;
-    field_0x432 = 0;
+    motionJustStarted = 0;
     motionIndex = 0;
 }
 
