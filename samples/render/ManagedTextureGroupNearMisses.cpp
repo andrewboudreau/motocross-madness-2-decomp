@@ -33,7 +33,7 @@
 // one `managed` variable serves every loop, and the blit-pass loop only as
 // `while (pass < 3 && ...)`). The `levels`/`spare` arrays take retail's
 // slots (0x8c/0xb0) once the dropped branch of the 9-entry loop reads
-// `levels[i]` into `n` itself; the two field_0x7c sorts go through a small
+// `levels[i]` into `n` itself; the two usedTextures sorts go through a small
 // SortTextures helper (retail reads the count through the list pointer);
 // and the excess clamp loops store `pages` before `spare`/`unused`. Left:
 // retail stores `dropped = 0` after the empty-list return (every placement
@@ -82,9 +82,9 @@ static inline CacheTexture* LeastWantedPage(UnknownTextureMapList* pages, int* l
     *lowest = 0x7fffffff;
     for (TextureMap* texture = pages->First(); texture; texture = pages->Next()) {
         CacheTexture* page = static_cast<CacheTexture*>(texture);
-        if (page->field_0x18c < *lowest) {
+        if (page->wantedTexels < *lowest) {
             best = page;
-            *lowest = page->field_0x18c;
+            *lowest = page->wantedTexels;
         }
     }
     return best;
@@ -102,7 +102,7 @@ static inline float PageMegabytes(ManagedTextureGroup* group, const int& pages) 
 void ManagedTextureGroup::RepackWholePages() {
     texelsBlitted = 0;
     ReadClock();
-    field_0x1cc = 0;
+    placePasses = 0;
     memset(requestedBySize, 0, sizeof(requestedBySize));
     memset(grantedBySize, 0, sizeof(grantedBySize));
     texelsRequested = 0;
@@ -122,7 +122,7 @@ void ManagedTextureGroup::RepackWholePages() {
             int placed = managed->allocatedLevel;
             if (placed >= 0) {
                 unused[placed]++;
-                field_0x90[placed].Add(managed);
+                unusedByLevel[placed].Add(managed);
             }
             texture = managedTextures.Next();
             continue;
@@ -140,93 +140,93 @@ void ManagedTextureGroup::RepackWholePages() {
             level = managed->allocatedLevel;
         managed->plannedLevel = level;
         managed->lastUseFrame = groupManager->frameCount;
-        field_0x7c.Add(managed);
+        usedTextures.Add(managed);
         texture = managedTextures.Next();
         texels += LevelArea(level);
     }
 
-    FitTexturesToBudget(&field_0x7c, pageMemory);
+    FitTexturesToBudget(&usedTextures, pageMemory);
     int i;
-    for (i = field_0x7c.m_count - 1; i >= 0; i--) {
-        ManagedTexture* managed = field_0x7c.Get(i);
+    for (i = usedTextures.m_count - 1; i >= 0; i--) {
+        ManagedTexture* managed = usedTextures.Get(i);
         if (managed->allocatedLevel <= 0) {
-            field_0x7c.RemoveOrdered(managed);
-            field_0x158.Add(managed);
+            usedTextures.RemoveOrdered(managed);
+            unplacedTextures.Add(managed);
         } else if (managed->allocatedLevel < managed->plannedLevel) {
-            field_0x7c.RemoveOrdered(managed);
-            field_0x16c.Add(managed);
+            usedTextures.RemoveOrdered(managed);
+            growingTextures.Add(managed);
         }
     }
 
     texels = 0;
-    for (i = 0; i < field_0x158.m_count; i++)
-        texels += field_0x158.Get(i)->textureWidth * field_0x158.Get(i)->textureHeight;
+    for (i = 0; i < unplacedTextures.m_count; i++)
+        texels += unplacedTextures.Get(i)->textureWidth * unplacedTextures.Get(i)->textureHeight;
 
     for (texture = cachePages.First(); texture; texture = cachePages.Next()) {
         CacheTexture* page = static_cast<CacheTexture*>(texture);
-        page->field_0x18c = -(page->textureWidth * page->textureHeight);
-        page->ListTextures(&field_0x180);
-        for (int j = 0; j < field_0x180.m_count; j++) {
-            ManagedTexture* managed = field_0x180.Get(j);
+        page->wantedTexels = -(page->textureWidth * page->textureHeight);
+        page->ListTextures(&pageTextures);
+        for (int j = 0; j < pageTextures.m_count; j++) {
+            ManagedTexture* managed = pageTextures.Get(j);
             if (managed->plannedLevel > 0)
-                page->field_0x18c += LevelArea(managed->plannedLevel);
+                page->wantedTexels += LevelArea(managed->plannedLevel);
         }
     }
 
-    qsort(field_0x16c.m_data, field_0x16c.m_count, sizeof(ManagedTexture*), UnknownCompare50eeb0);
+    qsort(growingTextures.m_data, growingTextures.m_count, sizeof(ManagedTexture*), UnknownCompare50eeb0);
     int smallest = 0x7fffffff;
-    if (field_0x16c.m_count > 0)
-        smallest = LevelArea(field_0x16c.Get(0)->plannedLevel);
+    if (growingTextures.m_count > 0)
+        smallest = LevelArea(growingTextures.Get(0)->plannedLevel);
     int freed = 0;
     while (cachePages.m_count > 0) {
         int lowest;
         CacheTexture* best = LeastWantedPage(&cachePages, &lowest);
         int enough = freed >= texels;
-        int full = freed >= field_0x158.m_count << 10;
-        int limit = emptied.m_count >= field_0x78;
+        int full = freed >= unplacedTextures.m_count << 10;
+        int limit = emptied.m_count >= maxEmptiedPages;
         int worthless = lowest <= -smallest;
         if (full && (limit || (enough && !worthless)))
             break;
         cachePages.Remove(best);
         emptied.Append(best);
-        best->ListTextures(&field_0x194);
+        best->ListTextures(&evictedTextures);
         freed += best->textureWidth * best->textureHeight;
-        for (int j = 0; j < field_0x194.m_count; j++) {
-            ManagedTexture* managed = field_0x194.Get(j);
-            if (managed->largestUse > 0.0f && !field_0x158.Contains(managed) && field_0x158.Add(managed))
+        for (int j = 0; j < evictedTextures.m_count; j++) {
+            ManagedTexture* managed = evictedTextures.Get(j);
+            if (managed->largestUse > 0.0f && !unplacedTextures.Contains(managed) && unplacedTextures.Add(managed))
                 texels += managed->textureWidth * managed->textureHeight;
-            field_0x7c.Remove(managed);
-            field_0x16c.Remove(managed);
+            usedTextures.Remove(managed);
+            growingTextures.Remove(managed);
             managed->ReleasePage();
         }
         best->EmptyPage();
     }
 
-    freed -= FitTexturesToBudget(&field_0x158, freed); // now the spare texels
-    while (freed > 0 && field_0x16c.m_count > 0) {
-        ManagedTexture* managed = field_0x16c.Get(0);
+    freed -= FitTexturesToBudget(&unplacedTextures, freed); // now the spare texels
+    while (freed > 0 && growingTextures.m_count > 0) {
+        ManagedTexture* managed = growingTextures.Get(0);
         if (LevelArea(managed->plannedLevel) > freed)
             break;
         freed -= LevelArea(managed->plannedLevel);
-        field_0x158.Add(managed);
-        field_0x16c.Remove(managed);
+        unplacedTextures.Add(managed);
+        growingTextures.Remove(managed);
         managed->ReleasePage();
     }
 
-    qsort(field_0x158.m_data, field_0x158.m_count, sizeof(ManagedTexture*), UnknownCompare50ee70);
+    qsort(unplacedTextures.m_data, unplacedTextures.m_count, sizeof(ManagedTexture*), UnknownCompare50ee70);
     int levels[9];
     memset(levels, 0, sizeof(levels));
-    for (i = 0; i < field_0x158.m_count; i++)
-        levels[field_0x158.Get(i)->plannedLevel]++;
+    for (i = 0; i < unplacedTextures.m_count; i++)
+        levels[unplacedTextures.Get(i)->plannedLevel]++;
     blitStartTime = ReadClock();
     int filled = 0;
     for (texture = emptied.First(); texture; texture = emptied.Next()) {
-        if (field_0x158.m_count <= 0)
+        if (unplacedTextures.m_count <= 0)
             break;
         CacheTexture* page = static_cast<CacheTexture*>(texture);
         filled++;
         page->ReserveRegions(levels, 8);
-        page->PlaceTextures(&field_0x158, 0);
+        page->PlaceTextures(&unplacedTextures, 0);
         page->Upload(0, -1);
     }
     cachePages.AppendList(&emptied);
@@ -283,10 +283,10 @@ void ManagedTextureGroup::RepackWholePages() {
         g_TrackGame->debugOverlay->Print(debugPage, "Textures Blted %d (%d)", filled,
                                                                 texturesBlittedHistory.LargestRecentSample());
     }
-    field_0x158.Clear();
-    field_0x16c.Clear();
-    field_0x180.Clear();
-    field_0x194.Clear();
+    unplacedTextures.Clear();
+    growingTextures.Clear();
+    pageTextures.Clear();
+    evictedTextures.Clear();
 }
 
 // The last element of `list`, or 0 when empty.
@@ -320,13 +320,13 @@ static inline int FindPosition(ContainerList<ManagedTexture*>* list, ManagedText
 void ManagedTextureGroup::RepackWithPartialBlits() {
     texelsBlitted = 0;
     ReadClock();
-    field_0x1cc = 0;
+    placePasses = 0;
     memset(requestedBySize, 0, sizeof(requestedBySize));
     memset(grantedBySize, 0, sizeof(grantedBySize));
     texelsRequested = 0;
     texelsGranted = 0;
     texelsManaged = 0;
-    field_0x144.Clear();
+    blitTextures.Clear();
     int unused[9];
     int pages[9];
     int levels[9];
@@ -344,7 +344,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
             int placed = managed->allocatedLevel;
             if (placed >= 0) {
                 unused[placed]++;
-                field_0x90[placed].Add(managed);
+                unusedByLevel[placed].Add(managed);
             }
             managed = static_cast<ManagedTexture*>(managedTextures.Next());
             continue;
@@ -361,15 +361,15 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
             level = managed->allocatedLevel;
         managed->lastUseFrame = groupManager->frameCount;
         managed->plannedLevel = level;
-        field_0x7c.Add(managed);
+        usedTextures.Add(managed);
         managed = static_cast<ManagedTexture*>(managedTextures.Next());
     }
 
-    SortTextures(&field_0x7c, UnknownCompare50ef00);
+    SortTextures(&usedTextures, UnknownCompare50ef00);
     int texels = 0;
     int i;
-    for (i = 0; i < field_0x7c.m_count; i++) {
-        int level = field_0x7c.Get(i)->plannedLevel;
+    for (i = 0; i < usedTextures.m_count; i++) {
+        int level = usedTextures.Get(i)->plannedLevel;
         if (level >= 0)
             texels += LevelArea(level);
     }
@@ -377,16 +377,16 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         dropped = 1;
         memset(unused, 0, sizeof(unused));
         for (int k = 0; k < 9; k++) {
-            for (int j = 0; j < field_0x90[k].m_count; j++)
-                field_0x90[k].Get(j)->ReleasePage();
-            field_0x90[k].Clear();
+            for (int j = 0; j < unusedByLevel[k].m_count; j++)
+                unusedByLevel[k].Get(j)->ReleasePage();
+            unusedByLevel[k].Clear();
         }
     }
     while (texels > pageMemory) {
-        int index = field_0x7c.m_count - 1;
-        managed = field_0x7c.Get(index);
+        int index = usedTextures.m_count - 1;
+        managed = usedTextures.Get(index);
         while (managed->plannedLevel == 5)
-            managed = field_0x7c.Get(--index);
+            managed = usedTextures.Get(--index);
         int level = managed->plannedLevel;
         if (managed->Unhappiness() < 0.0f) {
             managed->ReleasePage();
@@ -397,21 +397,21 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         int newLevel = managed->plannedLevel;
         texels -= LevelArea(level);
         texels += LevelArea(newLevel);
-        if (field_0x7c.m_count > 1) {
-            field_0x7c.RemoveOrdered(managed);
-            field_0x7c.Insert(managed, FindPosition(&field_0x7c, managed));
+        if (usedTextures.m_count > 1) {
+            usedTextures.RemoveOrdered(managed);
+            usedTextures.Insert(managed, FindPosition(&usedTextures, managed));
         }
     }
 
-    for (i = 0; i < field_0x7c.m_count; i++) {
-        managed = field_0x7c.Get(i);
+    for (i = 0; i < usedTextures.m_count; i++) {
+        managed = usedTextures.Get(i);
         if (managed->IsResident() && managed->plannedLevel != managed->allocatedLevel)
             managed->ReleasePage();
     }
     memset(levels, 0, sizeof(levels));
-    int count = field_0x7c.m_count;
+    int count = usedTextures.m_count;
     for (i = 0; i < count; i++)
-        levels[field_0x7c.Get(i)->plannedLevel]++;
+        levels[usedTextures.Get(i)->plannedLevel]++;
 
     memset(pages, 0, sizeof(pages));
     int total = 0;
@@ -422,9 +422,9 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
             n = levels[i];
         } else {
             n = levels[i] + unused[i];
-            if (n < field_0x18[i]) {
-                spare[i] = field_0x18[i] - n;
-                n = field_0x18[i];
+            if (n < pagesByLevel[i]) {
+                spare[i] = pagesByLevel[i] - n;
+                n = pagesByLevel[i];
             }
         }
         total += LevelArea(i) * n;
@@ -455,7 +455,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         unused[level] -= count;
         excess -= LevelArea(level) * count;
         total -= LevelArea(level) * count;
-        ContainerList<ManagedTexture*>* list = &field_0x90[level];
+        ContainerList<ManagedTexture*>* list = &unusedByLevel[level];
         ManagedTexture* last = LastOf(list);
         for (int j = 0; j < count; j++) {
             last->ReleasePage();
@@ -464,7 +464,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         }
         level++;
     }
-    memcpy(field_0x18, pages, sizeof(pages));
+    memcpy(pagesByLevel, pages, sizeof(pages));
 
     UnknownTextureMapList emptied;
     TextureMap* texture;
@@ -503,29 +503,29 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         static_cast<CacheTexture*>(texture)->EmptyPage();
 
     i = 0;
-    while (i < field_0x7c.m_count) {
-        managed = field_0x7c.Get(i);
+    while (i < usedTextures.m_count) {
+        managed = usedTextures.Get(i);
         if (managed->IsResident()) {
             if (managed->field_0x98)
-                field_0x144.Add(managed);
-            field_0x7c.Remove(managed);
+                blitTextures.Add(managed);
+            usedTextures.Remove(managed);
         } else {
             i++;
         }
     }
     cachePages.AppendList(&emptied);
-    SortTextures(&field_0x7c, UnknownCompare50ee70);
-    if (field_0x7c.m_count > 0) {
+    SortTextures(&usedTextures, UnknownCompare50ee70);
+    if (usedTextures.m_count > 0) {
         texture = cachePages.Last();
-        while (field_0x7c.m_count > 0 && field_0x7c.Get(0)->plannedLevel == 8) {
-            static_cast<CacheTexture*>(texture)->PlaceTextures(&field_0x7c, &field_0x144);
-            field_0x1cc++;
+        while (usedTextures.m_count > 0 && usedTextures.Get(0)->plannedLevel == 8) {
+            static_cast<CacheTexture*>(texture)->PlaceTextures(&usedTextures, &blitTextures);
+            placePasses++;
             texture = cachePages.Previous();
         }
         texture = cachePages.First();
         while (texture) {
-            int done = static_cast<CacheTexture*>(texture)->PlaceTextures(&field_0x7c, &field_0x144);
-            field_0x1cc++;
+            int done = static_cast<CacheTexture*>(texture)->PlaceTextures(&usedTextures, &blitTextures);
+            placePasses++;
             if (done)
                 break;
             texture = cachePages.Next();
@@ -535,22 +535,22 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
     }
 
     blitStartTime = ReadClock();
-    if (field_0x144.m_count > 0) {
+    if (blitTextures.m_count > 0) {
         int blitted = 0;
-        for (i = 0; i < field_0x144.m_count; i++) {
-            managed = field_0x144.Get(i);
+        for (i = 0; i < blitTextures.m_count; i++) {
+            managed = blitTextures.Get(i);
             managed->field_0x9c = 0;
             blitted += LevelArea(managed->plannedLevel);
         }
         int j = 0;
         int pass = 1;
-        while (pass < 3 && field_0x144.m_count > 0 && blitted > field_0x74) {
-            managed = field_0x144.Get(j);
+        while (pass < 3 && blitTextures.m_count > 0 && blitted > blitBudget) {
+            managed = blitTextures.Get(j);
             if (managed->allocatedLevel - pass >= 5) {
                 blitted -= LevelArea(managed->plannedLevel - managed->field_0x9c);
                 managed->field_0x9c = pass;
                 if (pass == managed->field_0x98 && managed->IsResident()) {
-                    field_0x144.RemoveOrdered(managed);
+                    blitTextures.RemoveOrdered(managed);
                 } else {
                     blitted += LevelArea(managed->plannedLevel - managed->field_0x9c);
                     j++;
@@ -558,13 +558,13 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
             } else {
                 j++;
             }
-            if (j >= field_0x144.m_count) {
+            if (j >= blitTextures.m_count) {
                 j = 0;
                 pass++;
             }
         }
-        for (i = 0; i < field_0x144.m_count; i++) {
-            managed = field_0x144.Get(i);
+        for (i = 0; i < blitTextures.m_count; i++) {
+            managed = blitTextures.Get(i);
             managed->field_0x98 = managed->field_0x9c;
             managed->page->CopyMipLevels(managed->region, managed->field_0x9c);
         }
@@ -628,6 +628,6 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
             debugPage, "TexMemGranted:%.2fM", (float)PixelFormatBytesPerPixel(groupFormat) * texelsGranted * 1.2715658e-06f);
         g_TrackGame->debugOverlay->Print(
             debugPage, "TexMemManaged:%.2fM", (float)PixelFormatBytesPerPixel(groupFormat) * texelsManaged * 1.2715658e-06f);
-        g_TrackGame->debugOverlay->Print(debugPage, "Textures Blted %d", field_0x144.m_count);
+        g_TrackGame->debugOverlay->Print(debugPage, "Textures Blted %d", blitTextures.m_count);
     }
 }

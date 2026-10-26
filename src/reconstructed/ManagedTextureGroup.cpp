@@ -35,22 +35,22 @@ ManagedTextureGroup::ManagedTextureGroup(TextureMapManager* manager, int format,
     groupManager = manager;
     groupFormat = format;
     pageMemory = 0;
-    field_0x7c.Init(64, 64);
-    field_0x144.Init(64, 64);
-    field_0x158.Init(16, 16);
-    field_0x16c.Init(16, 16);
-    field_0x180.Init(16, 16);
-    field_0x194.Init(16, 16);
-    field_0x1a8.Init(16, 16);
+    usedTextures.Init(64, 64);
+    blitTextures.Init(64, 64);
+    unplacedTextures.Init(16, 16);
+    growingTextures.Init(16, 16);
+    pageTextures.Init(16, 16);
+    evictedTextures.Init(16, 16);
+    dumpTextures.Init(16, 16);
     for (int i = 0; i < 9; i++)
-        field_0x90[i].Init(64, 64);
-    memset(field_0x18, 0, sizeof(field_0x18));
+        unusedByLevel[i].Init(64, 64);
+    memset(pagesByLevel, 0, sizeof(pagesByLevel));
     pageCursor = 0;
     textureCursor = 0;
-    field_0x1cc = 0;
+    placePasses = 0;
     texelsBlitted = 0;
-    field_0x74 = 0x10000;
-    field_0x78 = 6 / PixelFormatBytesPerPixel(groupFormat);
+    blitBudget = 0x10000;
+    maxEmptiedPages = 6 / PixelFormatBytesPerPixel(groupFormat);
     gdiObject = 0;
     groupPalette = 0;
     noRepacking = 0;
@@ -185,9 +185,9 @@ void ManagedTextureGroup::WriteDebugReport() {
 void ManagedTextureGroup::RepackPages() {
     if (reinterpret_cast<Game*>(g_TrackGame)->testKey && noRepacking)
         return;
-    field_0x7c.Clear();
+    usedTextures.Clear();
     for (int i = 0; i < 9; i++)
-        field_0x90[i].Clear();
+        unusedByLevel[i].Clear();
     if (reinterpret_cast<Game*>(g_TrackGame)->display->partialTextureUploadResult <= 0)
         RepackWholePages();
     else
@@ -333,12 +333,12 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
             rect.right = page->textureWidth;
             rect.bottom = page->textureHeight + 20;
             surface->Blt(&rect, 0, 0, 0x400, &effects);
-            static_cast<CacheTexture*>(page)->ListTextures(&field_0x1a8);
+            static_cast<CacheTexture*>(page)->ListTextures(&dumpTextures);
             long pitch;
             unsigned char* bits = (unsigned char*)target->LockSurface(0, &pitch, 0x821);
             if (bits) {
-                for (int j = 0; j < field_0x1a8.m_count; j++) {
-                    ManagedTexture* managed = field_0x1a8.Get(j);
+                for (int j = 0; j < dumpTextures.m_count; j++) {
+                    ManagedTexture* managed = dumpTextures.Get(j);
                     UnknownTextureRegion* region = managed->region;
                     int left = (int)(page->textureWidth * region->left);
                     int top = (int)(page->textureHeight * region->top) + 20;
@@ -370,7 +370,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
                 }
                 surface->Unlock(0);
             }
-            field_0x1a8.Clear();
+            dumpTextures.Clear();
 
             void* dc;
             int failed = surface->GetDC(&dc);

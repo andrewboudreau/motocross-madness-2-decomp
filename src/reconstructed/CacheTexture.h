@@ -78,5 +78,5 @@ public:
     ContainerList<UnknownTextureRegion*> reservedLeaves[9]; // +0xd0 reserved leaves per level
     int texelCount;                           // +0x184 texels
     int field_0x188;                          // a blit happened without the display's +0x5bc
-    int field_0x18c;                          // texels wanted on the page less its size (repacking)
+    int wantedTexels;                         // +0x18c texels wanted on the page less its size (repacking; LeastWantedPage picks the lowest)
 };

@@ -82,27 +82,27 @@ public:
     int groupFormat;                          // +0x0c pixel format
     int groupAddressU;                        // +0x10 address mode u
     int groupAddressV;                        // +0x14 address mode v
-    int field_0x18[9];
+    int pagesByLevel[9];                      // +0x18 region slots per size level kept by the last partial-blit repack
     int pageMemory;                           // +0x3c pages' memory
     TextureMapManager* groupManager;          // +0x40
     UnknownTextureMapList managedTextures;    // +0x44 ManagedTextures, stepped through by +0x1c8
     UnknownTextureMapList cachePages;         // +0x54 CacheTexture pages, stepped through by +0x1c4
     UnknownTextureMapList field_0x64;
-    int field_0x74;
-    int field_0x78;                           // 6 / bytes per pixel
-    ContainerList<ManagedTexture*> field_0x7c;
-    ContainerList<ManagedTexture*> field_0x90[9];
-    ContainerList<ManagedTexture*> field_0x144;
-    ContainerList<ManagedTexture*> field_0x158;
-    ContainerList<ManagedTexture*> field_0x16c;
-    ContainerList<ManagedTexture*> field_0x180;
-    ContainerList<ManagedTexture*> field_0x194;
-    ContainerList<ManagedTexture*> field_0x1a8;
+    int blitBudget;                           // +0x74 ctor 0x10000; the partial-blit repack lowers mip levels while more texels than this are queued
+    int maxEmptiedPages;                      // +0x78 6 / bytes per pixel; the whole-page repack empties at most this many pages once every unplaced texture fits
+    ContainerList<ManagedTexture*> usedTextures;     // +0x7c textures used since the last repack, at their planned level
+    ContainerList<ManagedTexture*> unusedByLevel[9]; // +0x90 unused textures that still hold a region, by allocated level
+    ContainerList<ManagedTexture*> blitTextures;     // +0x144 textures whose mip levels the partial-blit repack copies
+    ContainerList<ManagedTexture*> unplacedTextures; // +0x158 textures without a region, placed into the emptied pages
+    ContainerList<ManagedTexture*> growingTextures;  // +0x16c textures allocated below their planned level
+    ContainerList<ManagedTexture*> pageTextures;     // +0x180 scratch: one page's textures while its wantedTexels is summed
+    ContainerList<ManagedTexture*> evictedTextures;  // +0x194 scratch: the textures of a page being emptied
+    ContainerList<ManagedTexture*> dumpTextures;     // +0x1a8 scratch: one page's textures for the debug page dump
     void* groupPalette;                       // +0x1bc palette of 8-bit groups
     PCTextureMap* surfaceTexture;             // +0x1c0 256x256 texture whose system surface the pages share
     int pageCursor;                           // +0x1c4 debug key cursor (pages)
     int textureCursor;                        // +0x1c8 debug key cursor (textures)
-    int field_0x1cc;
+    int placePasses;                          // +0x1cc PlaceTextures calls in the last repack
     int texelsBlitted;                        // +0x1d0 "TexMem Blted" (x bytes/pixel); CacheTexture adds each blit rect's area
     UnknownTimer texelsBlittedHistory;        // +0x1d4 samples of +0x1d0; its largest is "TexMem Blted"'s peak
     UnknownTimer blitTimeHistory;             // +0x1e0 samples of now - +0x250; its largest is "BltTime"'s (%d)
