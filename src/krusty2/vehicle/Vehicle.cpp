@@ -315,15 +315,15 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* force)
         active = 0;
         int last;
         for (i = 0; i < collisionPointCount; i++) {
-            VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
-            if (c->contactActive) {
-                dist[i] = VehDistance(centerOfMass, c->contactPosition);
+            VehicleContact* contact = ((VehicleContact**)collisionPoints)[i];
+            if (contact->contactActive) {
+                dist[i] = VehDistance(centerOfMass, contact->contactPosition);
                 total += dist[i];
                 active++;
                 last = i;
             } else {
-                c->blendWeight = 0.0f;
-                c->appliedShare = kVec3Zero;
+                contact->blendWeight = 0.0f;
+                contact->appliedShare = kVec3Zero;
             }
         }
         if (active == 1) {
@@ -332,11 +332,11 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* force)
             return;
         }
         for (i = 0; active > 0; i++) {
-            VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
-            if (c->contactActive) {
-                float w = 1.0f - dist[i] / total;
-                c->blendWeight = w;
-                c->appliedShare = *force * w;
+            VehicleContact* contact = ((VehicleContact**)collisionPoints)[i];
+            if (contact->contactActive) {
+                float weight = 1.0f - dist[i] / total;
+                contact->blendWeight = weight;
+                contact->appliedShare = *force * weight;
                 active--;
             }
         }
@@ -345,29 +345,29 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* force)
     if (motionActive) {
         for (i = 0; i < wheelCount; i++) {
             wheelList[i]->loadWeight = wheelList[i]->restLoadWeight;
-            float w = wheelList[i]->loadWeight;
-            wheelList[i]->appliedShare = *force * w;
+            float share = wheelList[i]->loadWeight;
+            wheelList[i]->appliedShare = *force * share;
         }
         return;
     }
     if (wheelsInContact > 1) {
         total = 0.0f;
         for (i = 0; i < wheelCount; i++) {
-            VehicleWheel* w = wheelList[i];
-            if (w->inContact) {
-                dist[i] = VehDistance(centerOfMass, w->wheelPosition);
+            VehicleWheel* wheel = wheelList[i];
+            if (wheel->inContact) {
+                dist[i] = VehDistance(centerOfMass, wheel->wheelPosition);
                 total += dist[i];
             } else {
-                w->loadWeight = 0.0f;
-                w->appliedShare = kVec3Zero;
+                wheel->loadWeight = 0.0f;
+                wheel->appliedShare = kVec3Zero;
             }
         }
         for (i = 0; i < wheelCount; i++) {
-            VehicleWheel* w = wheelList[i];
-            if (w->inContact) {
-                float k = 1.0f - dist[i] / total;
-                w->loadWeight = k;
-                w->appliedShare = *force * k;
+            VehicleWheel* wheel = wheelList[i];
+            if (wheel->inContact) {
+                float weight = 1.0f - dist[i] / total;
+                wheel->loadWeight = weight;
+                wheel->appliedShare = *force * weight;
             }
         }
     } else if (wheelsInContact == 1) {
@@ -654,9 +654,9 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
     *out = kVec3Zero;
     VehicleWheel* last = wheel;
     for (int i = 0; i < wheelCount; i++) {
-        VehicleWheel* w = wheelList[i];
-        if (w->inContact || wheel) {
-            if (w->ownerRef) {
+        VehicleWheel* current = wheelList[i];
+        if (current->inContact || wheel) {
+            if (current->ownerRef) {
                 last = wheelList[i];
                 flagged++;
                 sum.x += last->rollDirection.x;
@@ -670,9 +670,9 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
                     mixed = 1;
             } else {
                 plain++;
-                out->x += w->groundNormal.x;
-                out->y += w->groundNormal.y;
-                out->z += w->groundNormal.z;
+                out->x += current->groundNormal.x;
+                out->y += current->groundNormal.y;
+                out->z += current->groundNormal.z;
                 load += wheelList[i]->contactLoad;
                 if (flagged > 0)
                     mixed = 1;
@@ -689,8 +689,8 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
             out->y = inv * out->y;
             out->z = inv * out->z;
         }
-        float n = (float)wheelsInContact;
-        load = load / n;
+        float contactCount = (float)wheelsInContact;
+        load = load / contactCount;
     }
     if (mixed == 0 && wheel == 0) {
         turnAngle = 0.0f;
@@ -699,8 +699,8 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
             *out = wheelList[0]->groundNormal;
         return;
     }
-    Vec3 c = ((VehV3&)sum).Cross(*out);
-    Vec3 axis = VehNormalized(c);
+    Vec3 turnCross = ((VehV3&)sum).Cross(*out);
+    Vec3 axis = VehNormalized(turnCross);
     turnAngle = UnknownVirtualSlot74(&last->sideAxis, &axis, VehMinF(load, 1.0f), 1.0f);
     turnRate = turnAngle * invStepTime;
 }
@@ -724,34 +724,34 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* attachment)
     VehicleImpactEvent* ev = (VehicleImpactEvent*)attachment;
     int i = 0;
     if (wheelCount > 0) do {
-        VehicleWheel* w = wheelList[i];
-        if (w->aux && w->inContact && !w->impactPosted &&
-            (!track || ((VehicleMaterialSet*)track)->environment[0x400 + w->surfaceMaterial])) {
-            w->impactPosted = 1;
-            float intensity = w->driveShareComplement * 20.0f;
-            ev->impactSink->SetPosition(w->groundPoint, (intensity > 1.0f) ? intensity : 1.0f);
+        VehicleWheel* wheel = wheelList[i];
+        if (wheel->aux && wheel->inContact && !wheel->impactPosted &&
+            (!track || ((VehicleMaterialSet*)track)->environment[0x400 + wheel->surfaceMaterial])) {
+            wheel->impactPosted = 1;
+            float intensity = wheel->driveShareComplement * 20.0f;
+            ev->impactSink->SetPosition(wheel->groundPoint, (intensity > 1.0f) ? intensity : 1.0f);
             VehCommitImpact(ev, &ev->impactSink);
             return;
         }
     } while (++i < wheelCount);
     i = 0;
     if (wheelCount > 0) do {
-        VehicleWheel* w = wheelList[i];
-        if (w->inContact && !w->impactPosted &&
-            (!track || ((VehicleMaterialSet*)track)->environment[0x400 + w->surfaceMaterial])) {
-            w->impactPosted = 1;
-            ev->impactSink->SetPosition(w->groundPoint, 0.0f);
+        VehicleWheel* wheel = wheelList[i];
+        if (wheel->inContact && !wheel->impactPosted &&
+            (!track || ((VehicleMaterialSet*)track)->environment[0x400 + wheel->surfaceMaterial])) {
+            wheel->impactPosted = 1;
+            ev->impactSink->SetPosition(wheel->groundPoint, 0.0f);
             VehCommitImpact(ev, &ev->impactSink);
             return;
         }
     } while (++i < wheelCount);
     i = 0;
     if (collisionPointCount > 0) do {
-        VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
-        if (c->contactActive && !c->impactPosted &&
-            (!track || ((VehicleMaterialSet*)track)->environment[0x400 + c->surfaceMaterial])) {
-            c->impactPosted = 1;
-            ev->impactSink->SetPosition(c->impactPosition, 0.0f);
+        VehicleContact* contact = ((VehicleContact**)collisionPoints)[i];
+        if (contact->contactActive && !contact->impactPosted &&
+            (!track || ((VehicleMaterialSet*)track)->environment[0x400 + contact->surfaceMaterial])) {
+            contact->impactPosted = 1;
+            ev->impactSink->SetPosition(contact->impactPosition, 0.0f);
             VehCommitImpact(ev, &ev->impactSink);
             return;
         }
@@ -765,20 +765,20 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* attachment)
     VehicleImpactEvent* ev = (VehicleImpactEvent*)attachment;
     int i = 0;
     if (wheelCount > 0) do {
-        VehicleWheel* w = wheelList[i];
-        if (w->aux && w->inContact && !w->slidePosted &&
-            (!track || ((VehicleMaterialSet*)track)->environment[0x408 + w->surfaceMaterial])) {
-            if (!(w->driveShare < 0.95f))
+        VehicleWheel* wheel = wheelList[i];
+        if (wheel->aux && wheel->inContact && !wheel->slidePosted &&
+            (!track || ((VehicleMaterialSet*)track)->environment[0x408 + wheel->surfaceMaterial])) {
+            if (!(wheel->driveShare < 0.95f))
                 return;
-            w->slidePosted = 1;
-            ev->slideSink->SetPosition(w->groundPoint);
+            wheel->slidePosted = 1;
+            ev->slideSink->SetPosition(wheel->groundPoint);
             VehCommitImpact(ev, &ev->slideSink);
-            scratchVector2.x = (turnAngle >= 0.0f ? -1.0f : 1.0f) * w->tangentSin;
+            scratchVector2.x = (turnAngle >= 0.0f ? -1.0f : 1.0f) * wheel->tangentSin;
             scratchVector2.y = 0.0f;
-            scratchVector2.z = -w->tangentCos;
+            scratchVector2.z = -wheel->tangentCos;
             scratchVector = modelNode->LocalToWorldDirection(scratchVector2);
-            scratchVector.y = w->driveShareComplement * 3.0f;
-            scratchVector *= w->driveDistance * invStepTime;
+            scratchVector.y = wheel->driveShareComplement * 3.0f;
+            scratchVector *= wheel->driveDistance * invStepTime;
             scratchVector.x = VehMinF(scratchVector.x, 15.0f);
             scratchVector.y = VehMinF(scratchVector.y, 18.0f);
             scratchVector.z = VehMinF(scratchVector.z, 15.0f);
@@ -788,11 +788,11 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* attachment)
     } while (++i < wheelCount);
     i = 0;
     if (wheelCount > 0) do {
-        VehicleWheel* w = wheelList[i];
-        if (w->inContact && !w->slidePosted &&
-            (!track || ((VehicleMaterialSet*)track)->environment[0x408 + w->surfaceMaterial])) {
-            w->slidePosted = 1;
-            if (w->tangentSin > 0.2f) {
+        VehicleWheel* wheel = wheelList[i];
+        if (wheel->inContact && !wheel->slidePosted &&
+            (!track || ((VehicleMaterialSet*)track)->environment[0x408 + wheel->surfaceMaterial])) {
+            wheel->slidePosted = 1;
+            if (wheel->tangentSin > 0.2f) {
                 VehCommitImpact(ev, &ev->slideSink);
             }
             return;
@@ -807,19 +807,19 @@ void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* attachment)
     VehicleImpactEvent* ev = (VehicleImpactEvent*)attachment;
     int i;
     for (i = 0; i < wheelCount; i++) {
-        VehicleWheel* w = wheelList[i];
-        if (w->aux && w->inContact && !w->scrapePosted) {
-            if (!(w->driveShare < 0.95f))
+        VehicleWheel* wheel = wheelList[i];
+        if (wheel->aux && wheel->inContact && !wheel->scrapePosted) {
+            if (!(wheel->driveShare < 0.95f))
                 return;
-            w->scrapePosted = 1;
-            ev->scrapeSink->SetPosition(w->groundPoint);
+            wheel->scrapePosted = 1;
+            ev->scrapeSink->SetPosition(wheel->groundPoint);
             VehCommitImpact(ev, &ev->scrapeSink);
-            scratchVector2.x = (turnAngle >= 0.0f ? -1.0f : 1.0f) * w->tangentSin;
+            scratchVector2.x = (turnAngle >= 0.0f ? -1.0f : 1.0f) * wheel->tangentSin;
             scratchVector2.y = 0.0f;
-            scratchVector2.z = -w->tangentCos;
+            scratchVector2.z = -wheel->tangentCos;
             scratchVector = modelNode->LocalToWorldDirection(scratchVector2);
-            scratchVector.y = w->driveShareComplement * 3.0f;
-            scratchVector *= w->driveDistance * invStepTime;
+            scratchVector.y = wheel->driveShareComplement * 3.0f;
+            scratchVector *= wheel->driveDistance * invStepTime;
             scratchVector.x = VehMinF(scratchVector.x, 15.0f);
             scratchVector.y = VehMinF(scratchVector.y, 18.0f);
             scratchVector.z = VehMinF(scratchVector.z, 15.0f);
@@ -828,10 +828,10 @@ void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* attachment)
         }
     }
     for (i = 0; i < wheelCount; i++) {
-        VehicleWheel* w = wheelList[i];
-        if (w->inContact && !w->scrapePosted) {
-            w->scrapePosted = 1;
-            if (w->tangentSin > 0.2f) {
+        VehicleWheel* wheel = wheelList[i];
+        if (wheel->inContact && !wheel->scrapePosted) {
+            wheel->scrapePosted = 1;
+            if (wheel->tangentSin > 0.2f) {
                 VehCommitImpact(ev, &ev->scrapeSink);
             }
             return;
@@ -1480,10 +1480,10 @@ static inline Vec3 VehNormalizedV(Vec3 v)
 Vec3* Vehicle::GetAverageGroundNormal(Vec3* out)
 {
     Vec3 sum = wheelList[0]->groundNormal;
-    int n = wheelCount;
-    for (int i = 1; i < n; i++)
+    int count = wheelCount;
+    for (int i = 1; i < count; i++)
         sum += wheelList[i]->groundNormal;
-    Vec3 avg = VehMean(sum, n);
+    Vec3 avg = VehMean(sum, count);
     *out = VehNormalizedV(avg);
     return out;
 }
@@ -1500,13 +1500,13 @@ Vec3* Vehicle::UnknownVirtualSlot54(Vec3* out)
     Vec3 sum;
     int first = 1;
     for (int i = 0; i < wheelCount; i++) {
-        VehicleWheel* w = wheelList[i];
-        if (w->inContact) {
+        VehicleWheel* wheel = wheelList[i];
+        if (wheel->inContact) {
             if (first) {
-                sum = w->groundNormal;
+                sum = wheel->groundNormal;
                 first = 0;
             } else {
-                sum += w->groundNormal;
+                sum += wheel->groundNormal;
             }
         }
     }
@@ -1526,9 +1526,9 @@ void Vehicle::UnknownVirtualSlot1(float extraWeight)
     forwardSpeed = 0.0f;
     movingForward = 1;
     for (int i = 0; i < collisionPointCount; i++) {
-        VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
-        if (c->ownerNode != 0)
-            c->contactActive = 0;
+        VehicleContact* contact = ((VehicleContact**)collisionPoints)[i];
+        if (contact->ownerNode != 0)
+            contact->contactActive = 0;
     }
     crashState = 0;
     crashTimer = 0.0f;
@@ -1553,16 +1553,17 @@ void Vehicle::UnknownVirtualSlot1(float extraWeight)
     throttleOn = false;
     driveDisengaged = false;
     backingUp = 0;
-    VehicleSpeedState* s = engineState;
-    if (s) {
-        s->gear = 0;
-        s->currentRpm = 0;
-        s->lastUpdateRpm = 0;
-        s->throttleFraction = 0.0f;
-        s->gearTimer = 0.0f;
-        s->driveCut = 1;
+    VehicleSpeedState* speedState = engineState;
+    if (speedState) {
+        speedState->gear = 0;
+        speedState->currentRpm = 0;
+        speedState->lastUpdateRpm = 0;
+        speedState->throttleFraction = 0.0f;
+        speedState->gearTimer = 0.0f;
+        speedState->driveCut = 1;
         float unit = (float)rand() * 3.05175781e-05f;
-        s->randomStart = unit * s->shiftWindowWidths[s->gear] + s->shiftRanges[s->gear].a;
+        speedState->randomStart = unit * speedState->shiftWindowWidths[speedState->gear]
+                                  + speedState->shiftRanges[speedState->gear].a;
     }
     RunTickers();
     ResetWheelContacts();
@@ -1572,12 +1573,12 @@ void Vehicle::UnknownVirtualSlot1(float extraWeight)
 // squared length, otherwise the square root.
 static inline float VehLengthAcc(const Vec3& v)
 {
-    float s = v.x * v.x;
-    s += v.y * v.y;
-    s += v.z * v.z;
-    if (s == 1.0f)
+    float lenSq = v.x * v.x;
+    lenSq += v.y * v.y;
+    lenSq += v.z * v.z;
+    if (lenSq == 1.0f)
         return 1.0f;
-    return (float)sqrt(s);
+    return (float)sqrt(lenSq);
 }
 
 // Same solver call as SoultreePhysicsBaseObject slot 3, but while crashState is set it uses a
@@ -1620,8 +1621,8 @@ int Vehicle::UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForwar
     PlaceWheels();
     UnknownVirtualSlot58((Vec3*)settleUp, keepPlacement);
     for (int i = 0; i < wheelCount; i++) {
-        VehicleWheel* w = wheelList[i];
-        w->sceneNode->GetPositionIn(0, &w->nodePosition);
+        VehicleWheel* wheel = wheelList[i];
+        wheel->sceneNode->GetPositionIn(0, &wheel->nodePosition);
     }
     centerNode->GetPositionIn(0, &centerOfMass);
     ApplyRestPose();
