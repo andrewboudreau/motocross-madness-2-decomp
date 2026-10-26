@@ -573,7 +573,7 @@ class UnknownBikeRaceProjector {
 public:
     // 0x00507c10 (Terrain::QueryGround): puts `point` on the ground; the
     // ground normal goes to `normal` when given.
-    void QueryGround(Vector3* point, Vector3* normal, int a, unsigned char* b);
+    void QueryGround(Vector3* point, Vector3* normal, int flatShaded, unsigned char* surface);
 
     unsigned char field_0x00[0x40];
     float gridCellSize;  // +0x40  Terrain+0x40 gridCellSize (Terrain.h); scales the start grid (0x004210f0)

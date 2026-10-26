@@ -41,7 +41,7 @@ public:
                      LightManager* lights, int a4, int a5, int a6);
     void* FindMotion(const char* name, int unused); // 0x004a6b30 (FindMotion)
     void SetMotion(void* motion);          // 0x004a8b40 (SetMotion)
-    int AdvanceMotion(float time, int a, int b); // 0x004a6bb0: advances the motion
+    int AdvanceMotion(float time, int mirror, int mask); // 0x004a6bb0: advances the motion
 
     unsigned char field_0x008[0x0c - 0x08];
     int motionStopped;                        // +0xC  Character +0x0c (D3DIMSoultreeCharacter.h motionStopped): set when a non-looping motion ends, cleared by SetMotion 0x004a8b40; AdvanceMotion returns 0 while set

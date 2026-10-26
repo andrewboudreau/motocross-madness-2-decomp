@@ -197,9 +197,9 @@ struct UnknownKrustyBikeViewReplay {
 // EventManager use it as a GameObject (slot 5, the +0x25 flag bits), which
 // fits KrustyBike's primary base chain; its class is not established.
 struct UnknownKrustyBikeView : public GameObject {
-    void NextCameraTarget(int a, int b, int c); // 0x0041f1d0 (InGameProcs.cpp)
+    void NextCameraTarget(int forward, int racers, int objects); // 0x0041f1d0 (InGameProcs.cpp)
     void ToggleReplayPause(int value);   // 0x0041f550 (InGameProcs.cpp)
-    void RestartRace(int a, int b, int c); // 0x00420650 (InGameProcs.cpp ExitDlg)
+    void RestartRace(int mode, int path, int description); // 0x00420650 (InGameProcs.cpp ExitDlg)
     void ResetStartCountdown();             // 0x00421050 (dlgprocs.cpp LoadingDlg)
     void HandlePlayerLeft(int player);  // 0x00420590 (EventManager slot 24)
     void SetDetailLevel(int level);   // 0x00423790: detail level (QuarryStuntEvent.cpp)

@@ -357,7 +357,8 @@ struct VehicleWheel {
     char pad_0x2B4[0x4];
     float driveShare;  // +0x2B8 UpdateDriveShare (0x00513f90) stores the drive share here (fst [esi+0x2b8]; 1.0 on the other path)
     float driveShareComplement;  // +0x2BC UpdateDriveShare (0x00513f90) stores 1 - driveShare here (0 on the other path)
-    void UpdateRoll(float a, float b, int c, int d, int e, float f);   // 0x005143d0
+    // 0x005143d0
+    void UpdateRoll(float dt, float distanceScale, int locked, int driven, int a5, float driveScale);
     void UpdateContactPatch(Vec3* origin, Vec3 position, Vec3 velocity, float speed, float* outA, int* outB);   // 0x005135f0 (Tire.h name)
     void UpdateShock(float bias, int flag, int crashState, float speed, Vec3* velocity, Vec3* anchor);   // 0x00513c70 (Tire.h UpdateShock, tier 3 name; sets shockEngaged/shockExtending)
     void UpdateDriveShare(Vehicle* owner);       // 0x00513f90, Tire.h: drive share +0x2b8 from the vehicle speed
