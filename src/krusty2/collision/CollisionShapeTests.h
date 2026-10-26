@@ -57,11 +57,13 @@ struct CollisionModelBody {
     CollisionHullBody* elements;   // +0x14, elements are 0x198 bytes apart
     CollisionVec3 center;          // +0x18 model bounds center
     CollisionVec3 halfExtents;     // +0x24 model bounds half extents
-    CollisionVec3 field_0x30;
-    CollisionVec3 field_0x3c;
-    Matrix4 field_0x48;            // +0x48 SetTransform keeps the previous field_0x88 here
-    Matrix4 field_0x88;
-    Matrix4 field_0xc8;
+    CollisionVec3 prevCenter;      // +0x30 UpdateModelBounds saves center here before refitting
+    CollisionVec3 prevHalfExtents; // +0x3c UpdateModelBounds saves halfExtents here; the swept
+                                   // tests grow it by motionTransform (0x00437ef0)
+    Matrix4 prevBodyTransform;     // +0x48 SetTransform keeps the previous bodyTransform here
+    Matrix4 bodyTransform;         // +0x88 SetTransform stores the new body matrix here
+    Matrix4 motionTransform;       // +0xc8 SetTransform: CollisionRelativeTransform of the new
+                                   // and previous body matrices (the hull's +0x08 role)
     CollisionVec3 sweptCenter;     // +0x108 written by the swept variants (0x00437ef0)
     CollisionVec3 sweptHalfExtents;  // +0x114 second output of GrowBoxByTransformedBox, passed as A half extents to 0x00424730
 };
@@ -69,8 +71,9 @@ struct CollisionModelBody {
 // View of a type-2 static-mesh payload (only the parts 0x00436100 / 0x00438c90 read).
 struct CollisionMeshBody {
     void* field_0x00;
-    CollisionBoxBounds* field_0x04;   // bounds object (center at +4, half extents at +0x10)
-    Matrix4 field_0x08;               // mesh -> world transform
+    CollisionBoxBounds* boxTree;      // +0x04 tree root; bounds object (center at +4, half
+                                      // extents at +0x10)
+    Matrix4 bodyTransform;            // +0x08 mesh -> world; SetTransform stores the matrix here
 };
 
 // ---------------------------------------------------------------------------

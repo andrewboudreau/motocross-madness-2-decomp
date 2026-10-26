@@ -40,7 +40,7 @@ int CollisionCharacter::UnknownVirtualSlot14()
 //  * velocity = (node position - previous position) / dt, and the position is remembered;
 //  * when the collision object has a contact record (QueryCollisions), the record's vector at +0
 //    scaled by 1.005 is subtracted from the translation row (+0xf8..+0x100) of the shape's
-//    matrix history (the hull's field_0xc8 matrix), for every hull of a model shape (type 1)
+//    matrix history (the hull's bodyTransform, +0xc8), for every hull of a model shape (type 1)
 //    or for the single payload otherwise.
 int CollisionCharacter::Tick(float dt)
 {

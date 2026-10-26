@@ -45,7 +45,7 @@ int Fn_00439600(CollisionVec3* ends, float radius, float radiusSq, CollisionObje
             }
             case 1: {
                 CollisionModelBody* model = (CollisionModelBody*)object->shape;
-                if (BoxCapsuleOverlap(&model->center, &model->halfExtents, ends, radius, radiusSq, &model->field_0x88)) {
+                if (BoxCapsuleOverlap(&model->center, &model->halfExtents, ends, radius, radiusSq, &model->bodyTransform)) {
                     for (int i = 0; i < model->elementCount; i++) {
                         CollisionHullBody* hull = &model->elements[i];
                         if (CapsuleTreeQueryWithVertices(reinterpret_cast<const Vec3*>(ends), radius, radiusSq,

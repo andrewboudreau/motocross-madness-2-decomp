@@ -132,7 +132,8 @@ public:
     void SetTransform(const Matrix4* m);
     // 0x00434eb0 (thiscall, no arguments; called by SetTransform's model case): refits the
     // model's bounds (center, halfExtents) around the enabled elements, expressed in the
-    // model frame (inverse of field_0x88), after saving the old bounds in field_0x30/field_0x3c.
+    // model frame (inverse of bodyTransform), after saving the old bounds in prevCenter/
+    // prevHalfExtents.
     void UpdateModelBounds();
     // 0x00439400, thiscall, ret 4: ignoreListMode = mode (tier 1).
     void SetIgnoreListMode(int mode);
