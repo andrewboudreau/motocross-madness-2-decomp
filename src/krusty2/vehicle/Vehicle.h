@@ -220,8 +220,11 @@ struct VehicleTicker {               // elements of Vehicle+0x554/+0x560 (provis
     virtual void UnknownVirtualSlot0();
 };
 class SoultreeContact;
-// 0x0043a570: appends a contact to the owner's contact array (provisional).
-extern void __cdecl VehAddContact(int capacity, SoultreeContact** arr, int a2, int* count, void* contact);
+// 0x0043a570: appends a contact to the owner's contact array.  The same function as
+// AddExistingCollisionPoint, whose third argument is the float penetration threshold;
+// this view passes its bits as an int.
+extern void __cdecl VehAddContact(int capacity, SoultreeContact** arr, int threshold, int* count,
+                                  void* contact);
 class Vehicle;
 // Suspension objects hung on a wheel (VehicleWheel+0x2b0 / +0x2ac).  PlaceWheels retracts
 // them by a fraction of the last step and clears their forces while the wheel is in contact;

@@ -1722,8 +1722,10 @@ int Vehicle::AddLateTicker(VehicleTicker* t)
 }
 
 // 0x00525d30: appends a wheel (with its two attachment values and optional aux object) and registers
-// its collision point (wheel + 0xb8) with the owner's contact array.
-int Vehicle::AddWheel(VehicleWheel* wheel, int a2, int primaryAux, int secondaryAux, VehicleWheelAux* aux)
+// its collision point (wheel + 0xb8) with the owner's contact array, with contactThreshold as its
+// penetration threshold (Bike passes 0).
+int Vehicle::AddWheel(VehicleWheel* wheel, int contactThreshold, int primaryAux, int secondaryAux,
+                      VehicleWheelAux* aux)
 {
     if (wheelCount < wheelCapacity) {
         wheel->primaryAux = primaryAux;
@@ -1731,7 +1733,7 @@ int Vehicle::AddWheel(VehicleWheel* wheel, int a2, int primaryAux, int secondary
         wheel->aux = aux;
         wheelList[wheelCount] = wheel;
         void* contact = wheel ? (char*)wheel + 0xb8 : 0;
-        VehAddContact(collisionPointCapacity, collisionPoints, a2, &collisionPointCount, contact);
+        VehAddContact(collisionPointCapacity, collisionPoints, contactThreshold, &collisionPointCount, contact);
         wheelCount++;
         if (aux)
             auxWheelCount++;

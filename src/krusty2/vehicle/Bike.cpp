@@ -289,9 +289,9 @@ static inline float BikeAbsRef(const float& x)
     return r;
 }
 
-int Bike::UnknownVirtualSlot5(int arg)
+int Bike::UnknownVirtualSlot5(int value)
 {
-    if (arg)
+    if (value)
         return BikeAbsRef(savedRoll) > 0.2618f;
     return BikeAbsRef(savedRoll) > 0.2618f || BikeAbsRef(savedPitch) > 1.05f;
 }

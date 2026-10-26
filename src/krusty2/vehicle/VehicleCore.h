@@ -140,7 +140,7 @@ public:
     int Method_00478FE0();      // 0x00478fe0, shared `xor eax,eax; ret` stub (direct call from CheckCrash)
     int AddEarlyTicker(VehicleTicker* ticker);                  // 0x00525cb0, append to earlyTickers
     int AddLateTicker(VehicleTicker* ticker);                   // 0x00525cf0, append to lateTickers
-    int AddWheel(VehicleWheel* wheel, int a2, int primaryAux, int secondaryAux, VehicleWheelAux* aux);   // 0x00525d30, appends a wheel and registers its contact point
+    int AddWheel(VehicleWheel* wheel, int contactThreshold, int primaryAux, int secondaryAux, VehicleWheelAux* aux); // 0x00525d30, appends a wheel and registers its contact point
     // 0x00528400: normalized average of the wheels' contact normals (+0xe4); returns out.
     Vec3* GetAverageGroundNormal(Vec3* out);
     int   UpdateWheelRampLevels();       // 0x00529280, ramps each wheel's rampLevel by its slot 83 answer
