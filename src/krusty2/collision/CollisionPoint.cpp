@@ -71,30 +71,30 @@ static inline CollisionVec3 DividedVec3(const CollisionVec3& v, float s) {
 }
 
 // 0x0043a640 (thiscall, ret 0x14).  Tier 3 semantics.  With the contact normal n:
-//   relativePosition = worldPosition - a1
-//   c = (n * (n . a2)) x a4          (normal component of a2 crossed with a4)
-//   a5 > 0.001: t = a3 with its component along n removed, normalised; tangentSpeed = t . a3;
+//   relativePosition = worldPosition - center
+//   c = (n * (n . angularVelocity)) x leverArm   (the spin about the normal at the lever arm)
+//   speed > 0.001: t = velocity with its component along n removed, normalised; tangentSpeed = t . velocity;
 //               if that is above 0.001 the direction is normalise(c + t * tangentSpeed)
 //               and spinSpeed = |c|; otherwise tangentSpeed = 0 and the direction is
 //               normalise(c) with spinSpeed = |c|
 //   otherwise:  tangentSpeed = 0, direction normalise(c), spinSpeed = |c|
 // The direction goes to frictionDirection; a degenerate one (|c| <= 0.001) is zero with
 // spinSpeed 0.
-void CollisionPoint::UpdateRelativeMotion(const CollisionVec3* a1, const CollisionVec3* a2, const CollisionVec3* a3,
-                                          const CollisionVec3* a4, float a5)
+void CollisionPoint::UpdateRelativeMotion(const CollisionVec3* center, const CollisionVec3* angularVelocity,
+                                          const CollisionVec3* velocity, const CollisionVec3* leverArm, float speed)
 {
-    relativePosition = worldPosition - *a1;
-    float s = CollisionPointDot(surfaceNormal, *a2);
+    relativePosition = worldPosition - *center;
+    float s = CollisionPointDot(surfaceNormal, *angularVelocity);
     CollisionVec3 u = surfaceNormal * s;
-    CollisionVec3 c = CollisionPointCross(u, *a4);
+    CollisionVec3 c = CollisionPointCross(u, *leverArm);
     CollisionVec3 w;
-    if (a5 > 0.001f) {
+    if (speed > 0.001f) {
         CollisionVec3 t;
-        if (CollisionRejectFrom(&t, a3, &surfaceNormal)) {
+        if (CollisionRejectFrom(&t, velocity, &surfaceNormal)) {
             CollisionVec3 n;
             t = *Vec3Normalize(&n, &t);
         }
-        float f = CollisionPointDot(t, *a3);
+        float f = CollisionPointDot(t, *velocity);
         tangentSpeed = f;
         if (f > 0.001f) {
             CollisionVec3 v1 = ScaledVec3(t, f);

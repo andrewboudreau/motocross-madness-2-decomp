@@ -28,8 +28,10 @@ public:
     // 0x0043a640 (thiscall, ret 0x14).  Recomputes the relative position (relativePosition) and the
     // tangent direction/magnitude pair (frictionDirection/spinSpeed) from the contact normal
     // surfaceNormal (tier 3 semantics, see CollisionPoint.cpp).
-    void UpdateRelativeMotion(const CollisionVec3* a1, const CollisionVec3* a2, const CollisionVec3* a3,
-                     const CollisionVec3* a4, float a5);
+    // Its one caller (SoultreePhysicsBaseObject slot 31) passes the body's centerOfMass,
+    // worldAngularVelocity, velocity, the point's leverArm and linearSpeed.
+    void UpdateRelativeMotion(const CollisionVec3* center, const CollisionVec3* angularVelocity,
+                              const CollisionVec3* velocity, const CollisionVec3* leverArm, float speed);
 
     CollisionContactOwner* ownerNode;       // +0x04 owner; may be null (set by AddCollisionPoint)
     CollisionVec3 localPosition;  // +0x08 AddCollisionPoint stores its position argument here; 0x0043ad80 converts it with ownerNode->LocalToWorldPoint
@@ -47,7 +49,7 @@ public:
     float normalForce;  // +0x88 inlined ctor argument a (AddCollisionPoint a6); slot 1 negates it, so it holds a negative load
     float surfaceGrip;  // +0x8c 0x0043ad80: = surface table[surfaceType] (table at owner+0xa4, +0x3a0) or 1.0f without an owner; slot 1 multiplies it in
     float tangentSpeed;  // +0x90 UpdateRelativeMotion: dot(tangent, a3), the slip component along the surface; slot 1 tests it against 0.001
-    float spinSpeed;  // +0x94 UpdateRelativeMotion: |cross(n*(n.a2), a4)|, contact speed from rotation about the normal; slot 1 tests it against 0.001
+    float spinSpeed;  // +0x94 UpdateRelativeMotion: |cross(n*(n.angularVelocity), leverArm)|, contact speed from rotation about the normal; slot 1 tests it against 0.001
     float penetration;  // +0x98 0x0043ad80: = (surfacePosition.y - worldPosition.y) * surfaceNormal.y; AddCollisionPoint initialises it to threshold - 999
     float penetrationThreshold;  // +0x9c AddCollisionPoint a4; 0x0043ad80: inContact = (penetration >= penetrationThreshold)
     float blendWeight;  // +0xa0 Vehicle/Bike view (VehicleContact, VehicleWheel::loadWeight +0x158): per-point blend weight; ctor 0.5f, Tire ctor a14

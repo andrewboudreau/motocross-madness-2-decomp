@@ -39,7 +39,7 @@ public:
     char materialId;  // +0xbc slot 18 indexes the track's per-material byte table (+0x400) with (unsigned char)materialId
 
     // 0x0043a640, thiscall, callee pops 5 args
-    void UpdateRelativeMotion(Vec3* a, Vec3* b, Vec3* c, Vec3* d, float e);
+    void UpdateRelativeMotion(Vec3* center, Vec3* angularVelocity, Vec3* velocity, Vec3* leverArm, float speed);
 };
 
 // The object at SoultreePhysicsBaseObject::collisionObject (+0x128) is a CollisionObject
