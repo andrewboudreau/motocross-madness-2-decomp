@@ -99,29 +99,30 @@ int Vehicle::UnknownVirtualSlot70(float dt)
 // Provisional: wheelBase / sin(steer angle), zero when the angle is zero.
 float Vehicle::UnknownVirtualSlot73(const Vec3* a, const Vec3* b)
 {
-    VehicleSteerState* s = steerState;
-    float m = s->angle;
-    if (m < 0.0f)
-        m = -m;
-    if (m == 0.0f)
+    VehicleSteerState* steer = steerState;
+    float absAngle = steer->angle;
+    if (absAngle < 0.0f)
+        absAngle = -absAngle;
+    if (absAngle == 0.0f)
         return 0.0f;
-    return wheelBase / sinf(s->angle);
+    return wheelBase / sinf(steer->angle);
 }
 
 // Clears contactActive (+0xa4) on every contact that has an owner node, then resets state.
 void Vehicle::UnknownVirtualSlot67()
 {
     for (int i = 0; i < collisionPointCount; i++) {
-        VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
-        if (c->ownerNode != 0)
-            c->contactActive = 0;
+        VehicleContact* contact = ((VehicleContact**)collisionPoints)[i];
+        if (contact->ownerNode != 0)
+            contact->contactActive = 0;
     }
     crashState = 0;
     crashTimer = 0.0f;
     prevCrashState = 0;
 }
 
-// Reads a float through the input map's value source (written back into the argument slot).
+// Asks the active joystick (inputMap+0x0c) for POV hat 0's angle, written back into the
+// argument slot; true when arg is set and the hat is not centred (-1).
 // Tier 2: retail tests the argument as an int (callers pass a bool/flag) and then reuses
 // that same stack slot as the float out-buffer.  Retyping it as float (tried) changes the
 // test to an FPU compare and the callers' pushes, and loses the exact match of slots
@@ -174,9 +175,9 @@ void Vehicle::UnknownVirtualSlot60(float steerAxis, float maxAngle, int steps)
 {
     if (crashState == 0) {
         steerRate = -(steerAxis * maxAngle) - steerState->angle;
-        float m = steerRate;
-        if (m < 0.0f) m = -m;
-        if (m < 0.00001f) {
+        float absRate = steerRate;
+        if (absRate < 0.0f) absRate = -absRate;
+        if (absRate < 0.00001f) {
             steerRate = 0.0f;
         } else {
             if (stepRemainder > 0.0001f)
@@ -191,25 +192,25 @@ void Vehicle::UnknownVirtualSlot60(float steerAxis, float maxAngle, int steps)
 
 void Vehicle::UnknownVirtualSlot85()
 {
-    float v = movingForward ? stepTime : -stepTime;
-    int flag = wheelsInContact == 0;
+    float distanceScale = movingForward ? stepTime : -stepTime;
+    int noContact = wheelsInContact == 0;
     for (int i = 0; i < wheelCount; i++)
-        wheelList[i]->UpdateRoll(stepTime, v, flag, allWheelsInContact, crashState, invMass);
+        wheelList[i]->UpdateRoll(stepTime, distanceScale, noContact, allWheelsInContact, crashState, invMass);
 }
 
 void Vehicle::UnknownVirtualSlot86()
 {
     for (int i = 0; i < wheelCount; i++) {
-        VehicleWheel* w = wheelList[i];
-        if (w->inContact) {
-            if (w->aux) {
-                float sp = linearSpeed;
+        VehicleWheel* wheel = wheelList[i];
+        if (wheel->inContact) {
+            if (wheel->aux) {
+                float speed = linearSpeed;
                 float scale = driveForceScale;
-                reinterpret_cast<UnknownEngineGearbox*>(w->aux)->DriveForce(
-                    sp, reinterpret_cast<const Vector3*>(&w->rollDirection), scale, backingUp, 100.0f,
-                    reinterpret_cast<Vector3*>(&w->driveForce), &w->driveMagnitude);
+                reinterpret_cast<UnknownEngineGearbox*>(wheel->aux)->DriveForce(
+                    speed, reinterpret_cast<const Vector3*>(&wheel->rollDirection), scale, backingUp, 100.0f,
+                    reinterpret_cast<Vector3*>(&wheel->driveForce), &wheel->driveMagnitude);
             }
-            w->UpdateDriveShare(this);
+            wheel->UpdateDriveShare(this);
         }
     }
 }
@@ -1359,9 +1360,9 @@ int Vehicle::UnknownVirtualSlot39(float dt)
 void Vehicle::UnknownVirtualSlot63(float dt)
 {
     if (inputDevice && throttleAxis) {
-        float v = throttleAxis->axisValue;
-        if (v > 0.2f)
-            throttleInput = v;
+        float throttle = throttleAxis->axisValue;
+        if (throttle > 0.2f)
+            throttleInput = throttle;
         else
             throttleInput = 0.0f;
     } else {
@@ -1374,8 +1375,8 @@ void Vehicle::UnknownVirtualSlot63(float dt)
     // likewise only calls through).
     if (src && !reinterpret_cast<InputDevice*>(src)->IsDeviceSubtype(4)
         && (steerAxis->axisSource->kindCode == 2 || steerAxis->axisSource->kindCode == 3)) {
-        float v = steerInput;
-        float sq = v * v;
+        float steer = steerInput;
+        float sq = steer * steer;
         controlInput.z = 0.0f;
         controlInput.x = sq * steerInput;
     } else {
@@ -1385,25 +1386,25 @@ void Vehicle::UnknownVirtualSlot63(float dt)
 }
 
 // Tier 3 reading: classifies the (controlInput.y, steerInput) input pair into one of eight
-// directions: -1 inside the dead zone (|v|^2 <= 0.25), else the sector of the pair relative to
-// the band +-0.52057 * |v| (0..7).
+// directions: -1 inside the dead zone (magnitudeSq <= 0.25), else the sector of the pair
+// relative to the band +-0.52057 * |v| (0..7).
 int Vehicle::UnknownVirtualSlot88()
 {
-    float m2 = steerInput * steerInput + controlInput.y * controlInput.y;
-    if (m2 > 0.25f) {
-        float m = FastSqrt(m2) * 0.52057f;
-        if (controlInput.y > m) {
-            if (steerInput > m)
+    float magnitudeSq = steerInput * steerInput + controlInput.y * controlInput.y;
+    if (magnitudeSq > 0.25f) {
+        float band = FastSqrt(magnitudeSq) * 0.52057f;
+        if (controlInput.y > band) {
+            if (steerInput > band)
                 return 3;
-            if (-m > steerInput)
+            if (-band > steerInput)
                 return 0;
             return 4;
         }
-        float n = -m;
-        if (controlInput.y < n) {
-            if (steerInput > m)
+        float negBand = -band;
+        if (controlInput.y < negBand) {
+            if (steerInput > band)
                 return 2;
-            if (steerInput < n)
+            if (steerInput < negBand)
                 return 1;
             return 6;
         }
@@ -1426,15 +1427,15 @@ static inline float VehLenSqZ(const Vec3& v)
 float Vehicle::UnknownVirtualSlot75()
 {
     Vec3 sum = kVec3Zero;
-    int n = 0;
+    int count = 0;
     for (int i = 0; i < wheelCount; i++) {
-        VehicleWheel* w = wheelList[i];
-        if (!w->ownerRef) {
-            sum += w->rollDirection;
-            n++;
+        VehicleWheel* wheel = wheelList[i];
+        if (!wheel->ownerRef) {
+            sum += wheel->rollDirection;
+            count++;
         }
     }
-    if (n > 1) {
+    if (count > 1) {
         float scale = VehLenSqZ(sum);
         if (scale == 0.0f) {
             sum = kVec3Zero;
@@ -1444,13 +1445,13 @@ float Vehicle::UnknownVirtualSlot75()
             sum.y = sum.y * scale;
             sum.z = sum.z * scale;
         }
-    } else if (n == 0) {
+    } else if (count == 0) {
         return 1.0f;
     }
-    float d = sum.z * savedForward.z + (sum.x * savedForward.x + sum.y * savedForward.y);
-    if (d < 0.0f)
-        d = -d;
-    return d;
+    float alignment = sum.z * savedForward.z + (sum.x * savedForward.x + sum.y * savedForward.y);
+    if (alignment < 0.0f)
+        alignment = -alignment;
+    return alignment;
 }
 
 // Mean of a sum over n entries.  VC6 keeps the x87 order of the retail products (`fld st(0);
