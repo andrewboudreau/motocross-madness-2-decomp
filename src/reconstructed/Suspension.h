@@ -62,18 +62,18 @@ public:
 // The same provisional shape is declared in samples/physics/tire/Tire.h.
 class MovingPart {
 public:
-    MovingPart(void* a, int b, int c);
+    MovingPart(void* name, int root, int ownerRef);
     ~MovingPart();
 
     char field_0x00[0x40];
     ShockNode* sceneNode;   // +0x40 (+0x44 in a Shock): the node the shocks move
-    int ownerRef;           // +0x44 ctor arg c
+    int ownerRef;           // +0x44 ctor arg ownerRef
     int field_0x48;
 };
 
 class Shock : public MovingPart {
 public:
-    Shock(void* node, int b, float stiffnessMin, float stiffnessMax, float dampingRatio, float speedThreshold,
+    Shock(void* name, int root, float stiffnessMin, float stiffnessMax, float dampingRatio, float speedThreshold,
           float retractScale);                                                   // 0x004f9a60 (ret 0x1c)
     ~Shock();                                                                    // 0x004f9b80
     virtual void Reset();            // slot 0, 0x004f9ba0
@@ -110,7 +110,7 @@ struct ShockCarrier {
 
 class InlineShock : public Shock {
 public:
-    InlineShock(void* node, int b, ShockNode* anchorNode, float minLength, float stiffnessMin,
+    InlineShock(void* name, int root, ShockNode* anchorNode, float minLength, float stiffnessMin,
                 float stiffnessMax, float dampingRatio, float speedThreshold,
                 float retractScale);                                  // 0x004f9ee0 (ret 0x24)
     ~InlineShock();                                                   // 0x004f9f80
@@ -134,7 +134,7 @@ ShockVec3 ShockProject(const ShockVec3& v, const ShockVec3& onto);
 
 class RotatingShock : public Shock {
 public:
-    RotatingShock(void* node, int b, float maxAngle, float armLength, float stiffnessMin,
+    RotatingShock(void* name, int root, float maxAngle, float armLength, float stiffnessMin,
                   float stiffnessMax, float dampingRatio, float speedThreshold, float retractScale,
                   int axisId, const ShockVec3* axisOverride);         // 0x004fa700 (ret 0x2c)
     ~RotatingShock();                                                 // 0x004fa8a0

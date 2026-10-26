@@ -833,9 +833,11 @@ inline CollisionPoint::CollisionPoint(float force, int owner)
     field_0x68 = kVec3Zero;
 }
 
-Tire::Tire(void* a1, int a2, float a3, float a4, int a5, int a6, float a7, float a8,
-           float a9, float a10, float a11, float a12, float a13, float a14, int a15)
-    : CollisionObject(1), MovingPart(a1, a2, a6), CollisionPoint(a4, a15)
+Tire::Tire(void* name, int root, float rollFriction_, float sideFriction_, int field_0x298_,
+           int steer, float field_0x2b4_, float rollFrictionScale_, float sideFrictionScale_,
+           float field_0x2a0_, float field_0x1d8_, float field_0x1dc_, float field_0x1e0_,
+           float blendWeight_, int track)
+    : CollisionObject(1), MovingPart(name, root, steer), CollisionPoint(sideFriction_, track)
 {
     CollisionVec3 boundsCenter;
     CollisionVec3 halfExtent;
@@ -853,16 +855,16 @@ Tire::Tire(void* a1, int a2, float a3, float a4, int a5, int a6, float a7, float
     field_0x280 = 0;
     field_0x254 = kVec3Zero;
     tangentCos = 0;
-    rollFriction = a3;
-    sideFriction = a4;
-    field_0x294 = a14;
-    CollisionPoint::blendWeight = a14;
-    field_0x298 = a5;
-    field_0x2b4 = a7;
-    rollFrictionScale = a8;
-    sideFrictionScale = a9;
-    field_0x2a0 = a10;
-    field_0x1d8 = a11;
+    rollFriction = rollFriction_;
+    sideFriction = sideFriction_;
+    field_0x294 = blendWeight_;
+    CollisionPoint::blendWeight = blendWeight_;
+    field_0x298 = field_0x298_;
+    field_0x2b4 = field_0x2b4_;
+    rollFrictionScale = rollFrictionScale_;
+    sideFrictionScale = sideFrictionScale_;
+    field_0x2a0 = field_0x2a0_;
+    field_0x1d8 = field_0x1d8_;
     tangentSin = 1.0f;
     field_0x2a8 = 0;
     field_0x2ac = 0;
@@ -872,8 +874,8 @@ Tire::Tire(void* a1, int a2, float a3, float a4, int a5, int a6, float a7, float
     reportContactOutputs = 0;
     field_0x268 = 0;
     rampLevel = 0;
-    field_0x1dc = a12;
-    field_0x1e0 = a13;
+    field_0x1dc = field_0x1dc_;
+    field_0x1e0 = field_0x1e0_;
     field_0x290 = 0;
     wheelUpAxis = kVec3ZAxis;
     surfaceScaleB = 1.0f;

@@ -35,18 +35,19 @@
 
 #include "collision/CollisionPoint.h"
 
-// Provisional (see above).  Constructor args (a, b, c): a is a scene node/name handle
-// handed to 0x004fdae0, c is stored at +0x44.
+// Provisional (see above); src/reconstructed/MovingPart.cpp is the matched constructor.
+// Constructor args (name, root, ownerRef): root->FindByName(name) (0x004fdae0) gives the
+// node, ownerRef is stored at +0x44.
 class TireNode;
 
 class MovingPart {
 public:
-    MovingPart(void* a, int b, int c);      // 0x004a23a0 (ret 0xc)
+    MovingPart(void* name, int root, int ownerRef); // 0x004a23a0 (ret 0xc)
     ~MovingPart();                          // 0x00464e90, an empty out-of-line dtor
 
     char field_0x00[0x40];
-    TireNode* sceneNode;                   // +0x40 result of 0x004fdae0(b)
-    int ownerRef;                         // +0x44 ctor arg c
+    TireNode* sceneNode;                   // +0x40 root->FindByName(name) (0x004fdae0)
+    int ownerRef;                         // +0x44 ctor arg ownerRef
     int field_0x48;                         // 0
 };
 
@@ -154,10 +155,13 @@ struct TireAux {
 class Tire : public CollisionObject, public MovingPart, public CollisionPoint {
 public:
     // 0x00512f10, ret 0x3c: 15 dwords.  Argument roles come from the stores in the body.
-    // Types follow the destination fields (tier 3): a1 goes to MovingPart, a4 to CollisionPoint's
-    // field_0x88, a15 to CollisionPoint::field_0xc0.
-    Tire(void* a1, int a2, float a3, float a4, int a5, int a6, float a7, float a8,
-         float a9, float a10, float a11, float a12, float a13, float a14, int a15);
+    // Types follow the destination fields (tier 3): name, root and steer go to MovingPart,
+    // sideFriction_ also to CollisionPoint::normalForce (+0x88), track to
+    // CollisionPoint::surfaceOwner (+0xc0).
+    Tire(void* name, int root, float rollFriction_, float sideFriction_, int field_0x298_,
+         int steer, float field_0x2b4_, float rollFrictionScale_, float sideFrictionScale_,
+         float field_0x2a0_, float field_0x1d8_, float field_0x1dc_, float field_0x1e0_,
+         float blendWeight_, int track);
     virtual ~Tire();                            // slot 0 @12 (0x005133a0), core 0x005133d0
     virtual GameObject* SetRenderContext(void* context);        // 0x00513490
     virtual void CollisionPointVirtualSlot1();  // CollisionPoint slot 1 @184, 0x00515b50

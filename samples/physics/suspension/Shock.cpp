@@ -17,9 +17,9 @@ const ShockVec3 kShockAxisZ = ShockVec3(0.0f, 0.0f, 1.0f);
 // Shock
 // ---------------------------------------------------------------------------
 
-Shock::Shock(void* node, int b, float stiffnessMin_, float stiffnessMax_, float dampingRatio_,
+Shock::Shock(void* name, int root, float stiffnessMin_, float stiffnessMax_, float dampingRatio_,
              float speedThreshold_, float retractScale_)
-    : MovingPart(node, b, 0)
+    : MovingPart(name, root, 0)
 {
     stiffnessMin = stiffnessMin_;
     stiffnessMax = stiffnessMax_;
@@ -97,9 +97,9 @@ void Shock::ApplyDamping(float a, float b, float c, float d)
 // InlineShock
 // ---------------------------------------------------------------------------
 
-InlineShock::InlineShock(void* node, int b, ShockNode* anchorNode_, float minLength_, float stiffnessMin_,
+InlineShock::InlineShock(void* name, int root, ShockNode* anchorNode_, float minLength_, float stiffnessMin_,
                          float stiffnessMax_, float dampingRatio_, float speedThreshold_, float retractScale_)
-    : Shock(node, b, stiffnessMin_, stiffnessMax_, dampingRatio_, speedThreshold_, retractScale_)
+    : Shock(name, root, stiffnessMin_, stiffnessMax_, dampingRatio_, speedThreshold_, retractScale_)
 {
     minLength = minLength_;
     axisLength = minLength_;
@@ -234,10 +234,10 @@ ShockVec3 ShockProject(const ShockVec3& v, const ShockVec3& onto)
     return onto * s;
 }
 
-RotatingShock::RotatingShock(void* node, int b, float maxAngle_, float armLength_, float stiffnessMin_,
+RotatingShock::RotatingShock(void* name, int root, float maxAngle_, float armLength_, float stiffnessMin_,
                              float stiffnessMax_, float dampingRatio_, float speedThreshold_,
                              float retractScale_, int axisId_, const ShockVec3* axisOverride)
-    : Shock(node, b, stiffnessMin_, stiffnessMax_, dampingRatio_, speedThreshold_, retractScale_)
+    : Shock(name, root, stiffnessMin_, stiffnessMax_, dampingRatio_, speedThreshold_, retractScale_)
 {
     maxAngle = maxAngle_;
     armLengthSq = armLength_ * armLength_;

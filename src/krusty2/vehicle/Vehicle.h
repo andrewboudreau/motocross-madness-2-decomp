@@ -289,9 +289,11 @@ struct VehicleWheel {
     // 0x00512f10 (ret 0x3c; samples/physics/tire/Tire.h Tire::Tire): wheel name, model node,
     // twelve tuning values, the steer state of a steered wheel (else 0) and the track
     // (0x2c0 bytes, `new(__FILE__, 0x6b8)` in Bike's loader).
-    VehicleWheel(const char* name, SoultreeObject* root, float a3, float a4, int a5,
-                 VehicleSteerState* steer, float a7, float a8, float a9, float a10, float a11,
-                 float a12, float a13, float a14, SoultreeSlot1f0* track);
+    VehicleWheel(const char* name, SoultreeObject* root, float rollFriction_, float sideFriction_,
+                 int field_0x298_, VehicleSteerState* steer, float field_0x2b4_,
+                 float rollFrictionScale_, float sideFrictionScale_, float field_0x2a0_,
+                 float field_0x1d8_, float field_0x1dc_, float field_0x1e0_, float blendWeight_,
+                 SoultreeSlot1f0* track);
     char pad_0x00[0xB8];
     VehicleContactPoint contactPoint;  // +0xb8 AddWheel registers it in collisionPoints
     char pad_0xBC[0x10];
