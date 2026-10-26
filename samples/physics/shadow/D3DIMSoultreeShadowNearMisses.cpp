@@ -140,19 +140,20 @@ static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIM
 // decides inCameraView (the flag slot 14 draws with); returns inCameraView.
 int D3DIMSoultreeShadow::UnknownVirtualSlot29()
 {
-    D3DIMShadowCasterView* c = (D3DIMShadowCasterView*)caster;
+    D3DIMShadowCasterView* casterView = (D3DIMShadowCasterView*)caster;
     inCameraView = 0;
-    if (!c->field_0x14c && inShadowView) {
+    if (!casterView->field_0x14c && inShadowView) {
         D3DIMShadowMatrix4 local;
         ShadowVec3 center, extent;
-        D3DIMShadowMatrix4 m;
-        reinterpret_cast<SoultreeObject*>(c)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&local));
+        D3DIMShadowMatrix4 localToView;
+        reinterpret_cast<SoultreeObject*>(casterView)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&local));
         reinterpret_cast<SoultreeObject*>(caster)->GetSubtreeBounds(reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&extent));
         D3DIMShadowCameraView* camera = ((D3DIMShadowHostView*)renderContext)->camera;
         const D3DIMShadowMatrix4& view = camera->matrix_0xec;
-        D3DIMShadowMatrixProduct(&m, local, view);
-        if (reinterpret_cast<D3DIMShadowClipper*>(g_visibilityClipper)->TestBox(((D3DIMShadowHostView*)renderContext)->camera, &m._11, &center.x,
-                                         &extent.x, 0, 0, 0))
+        D3DIMShadowMatrixProduct(&localToView, local, view);
+        if (reinterpret_cast<D3DIMShadowClipper*>(g_visibilityClipper)->TestBox(
+                ((D3DIMShadowHostView*)renderContext)->camera, &localToView._11, &center.x, &extent.x,
+                0, 0, 0))
             inCameraView = 1;
     }
     return inCameraView;
@@ -184,9 +185,9 @@ void D3DIMSoultreeShadow::UnknownVirtualSlot30()
 {
     if (!inShadowView)
         return;
-    ProjectedShadow* s = shadow;
-    g_clipRectangle->Set((float)s->clipRect.left, (float)s->clipRect.top, (float)s->clipRect.right,
-                         (float)s->clipRect.bottom);
+    ProjectedShadow* projected = shadow;
+    g_clipRectangle->Set((float)projected->clipRect.left, (float)projected->clipRect.top,
+                         (float)projected->clipRect.right, (float)projected->clipRect.bottom);
     int pitch;
     short* pixels = shadow->texture->LockPixels(0, &pitch, 0);
     unsigned int color;
@@ -195,9 +196,9 @@ void D3DIMSoultreeShadow::UnknownVirtualSlot30()
     else
         color = ((0xff - (shadow->shadowColor & 0xff)) << 24) | 0xffffff;
     vertexCount = 0;
-    D3DIMShadowCasterView* c = (D3DIMShadowCasterView*)caster;
-    if (c->field_0x18c)
-        c->TransformVertexGroups(-1);
+    D3DIMShadowCasterView* casterView = (D3DIMShadowCasterView*)caster;
+    if (casterView->field_0x18c)
+        casterView->TransformVertexGroups(-1);
     for (int i = 0; i < ((D3DIMShadowCasterView*)caster)->lods[((D3DIMShadowCasterView*)caster)->currentLod].meshCount; i++) {
         D3DIMShadowMesh* mesh = &((D3DIMShadowCasterView*)caster)->lods[((D3DIMShadowCasterView*)caster)->currentLod].meshes[i];
         if (mesh->vertexCount > s_shadowPointCapacity) {
@@ -213,30 +214,30 @@ void D3DIMSoultreeShadow::UnknownVirtualSlot30()
         else
             ShadowTransformPointsProjective(s_shadowPoints, mesh->vertices, &shadow->lightMatrix, mesh->vertexCount, 0xc, 0x20);
 
-        ShadowVec3* v = s_shadowPoints;
+        ShadowVec3* point = s_shadowPoints;
         int* code = g_d3dimShadowOutcodes;
         for (int n = 0; n < mesh->vertexCount; n++) {
             *code = 0;
             if (shadow->updateThisFrame) {
-                if ((float)shadow->clipRect.left > v->x)
+                if ((float)shadow->clipRect.left > point->x)
                     *code = 1;
-                if ((float)shadow->clipRect.right < v->x)
+                if ((float)shadow->clipRect.right < point->x)
                     *code |= 2;
-                if ((float)shadow->clipRect.top > v->y)
+                if ((float)shadow->clipRect.top > point->y)
                     *code |= 4;
-                if ((float)shadow->clipRect.bottom < v->y)
+                if ((float)shadow->clipRect.bottom < point->y)
                     *code |= 8;
             } else {
-                if ((float)(shadow->clipRect.left * 2) > v->x)
+                if ((float)(shadow->clipRect.left * 2) > point->x)
                     *code = 1;
-                if ((float)(shadow->clipRect.right * 2) < v->x)
+                if ((float)(shadow->clipRect.right * 2) < point->x)
                     *code |= 2;
-                if ((float)(shadow->clipRect.top * 2) > v->y)
+                if ((float)(shadow->clipRect.top * 2) > point->y)
                     *code |= 4;
-                if ((float)(shadow->clipRect.bottom * 2) < v->y)
+                if ((float)(shadow->clipRect.bottom * 2) < point->y)
                     *code |= 8;
             }
-            v++;
+            point++;
             code++;
         }
 
