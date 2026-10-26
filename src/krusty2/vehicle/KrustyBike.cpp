@@ -382,9 +382,9 @@ int KrustyBike::Fn_00495C00()
     return 0;
 }
 
-void KrustyBike::Fn_00496E20(KbRecorder* a)
+void KrustyBike::Fn_00496E20(KbRecorder* recorder)
 {
-    netRecorder = a;
+    netRecorder = recorder;
 }
 
 // ---- non-virtual state reset (0x0048D8B0) ----

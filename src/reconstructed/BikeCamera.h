@@ -59,7 +59,7 @@ public:
 
     virtual Vector3 UnknownVirtualSlot34(float dt);
     virtual Vector3 UnknownVirtualSlot37();
-    virtual void UnknownVirtualSlot40(float a);
+    virtual void UnknownVirtualSlot40(float dt);
     virtual Vector3 UnknownVirtualSlot50();
     virtual float UnknownVirtualSlot51();
     virtual void UnknownVirtualSlot53();

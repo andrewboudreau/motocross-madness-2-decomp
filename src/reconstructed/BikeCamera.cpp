@@ -40,7 +40,7 @@ BikeCamera* BikeCamera::SetupBikeCamera(void* value, float rate294, float rate29
 
 // 0x00416ed0: table entries 0 (rider's head) and 1 (target point) with two
 // values that depend on bike state 6, then slot 38.
-void BikeCamera::UnknownVirtualSlot40(float a) {
+void BikeCamera::UnknownVirtualSlot40(float dt) {
     bool special = bike->crashReason == 6;
     float value10;
     float value14;
@@ -56,7 +56,7 @@ void BikeCamera::UnknownVirtualSlot40(float a) {
     headPart->GetPositionIn(0, reinterpret_cast<Vec3*>(&head));
     SetTableEntry(0, &head, 0, &value10, &value14, 0, 0);
     SetTableEntry(1, &targetPoint, 0, &value10, &value14, 0, 0);
-    UnknownVirtualSlot38(a, bike->wrecker->wreckState != 1, special);
+    UnknownVirtualSlot38(dt, bike->wrecker->wreckState != 1, special);
 }
 
 // 0x00416fb0: 38% of the way from the rider's head to the target point.

@@ -223,10 +223,10 @@ void FollowCamera::UnknownVirtualSlot38(float dt, bool blend, bool pitch) {
 
 // 0x004639f0: with a non-empty table, entry 0 takes the target point before
 // slot 38 runs.
-void FollowCamera::UnknownVirtualSlot40(float a) {
+void FollowCamera::UnknownVirtualSlot40(float dt) {
     if (pointCount > 0) {
         SetTableEntry(0, &targetPoint, 0, 0, 0, 0, 0);
-        UnknownVirtualSlot38(a, 0, 0);
+        UnknownVirtualSlot38(dt, 0, 0);
     }
 }
 

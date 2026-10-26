@@ -96,7 +96,7 @@ public:
     KrustyBike* FindNearestRival(float* outDistance);
     void Fn_0048E280();
     void Fn_004925A0(Vehicle* who, bool flag);
-    void Fn_00496E20(KbRecorder* a);
+    void Fn_00496E20(KbRecorder* recorder);
     int Fn_00495C00();
     void Fn_00496DA0();
     void Fn_00496D20();
