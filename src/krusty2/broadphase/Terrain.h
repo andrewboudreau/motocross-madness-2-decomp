@@ -58,9 +58,12 @@ class TextureMapManager;
 class TerrainSurfaceBase : public BaseObject {
 public:
     TerrainSurfaceBase(TextureMapManager* manager, int flags);                           // 0x004c5f00
-    virtual int CreateSurface(int a1, int a2, int a3, int a4, int a5, int a6, int a7, BaseObject* a8,
-                              int a9, TerrainComObject* a10, int a11, int a12, int a13, int a14,
-                              void* a15, int a16, int a17);     // slot 4, +0x10
+    // Slot 4 (+0x10); argument names from PCTextureMap::CreateSurface.
+    virtual int CreateSurface(int bits, int width, int height, int stride, int minimumSize,
+                              int sourceFormat, int format, BaseObject* palette, int flags,
+                              TerrainComObject* surfacePalette, int checkMemory, int unused,
+                              int addressU, int addressV, void* choice, int alphaThreshold,
+                              int key);
     // Slot 5 (+0x14, 15 stack arguments): loads the texture from a stream (TextureMap.h's
     // LoadSurface; argument roles from there, tier 3).
     virtual int LoadSurface(TerrainStream* stream, int width, int height, int minimumSize,

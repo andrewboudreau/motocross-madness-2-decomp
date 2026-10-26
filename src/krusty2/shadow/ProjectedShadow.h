@@ -83,24 +83,30 @@ public:
     virtual long __stdcall PageUnlock(unsigned long flags);  // slot 38 (tier 3)
 };
 
-// The shadow texture object (allocated 0x80 bytes, ctor 0x004c5f00(arg, 1)).  PROVISIONAL
-// stand-in; only the members ProjectedShadow touches are declared.
+// The shadow texture: allocated 0x80 bytes and built by 0x004c5f00(owner, 1), PCTextureMap's
+// constructor (src/reconstructed/PCTextureMap.h).  This is an ABI view declaring only what
+// the shadow code touches; argument names follow PCTextureMap's slots.
 class ShadowTexture : public BaseObject {
 public:
     ShadowTexture(void* owner, int flag);               // 0x004c5f00
-    // vtable slot 4 (0x10): called with 17 stack words, returns nonzero on success (Init).
-    virtual int Create(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j,
-                       int k, int l, int m, int n, int o, int p, int q);
+    // vtable slot 4 (0x10, CreateSurface): 17 stack words, nonzero on success (Init).
+    virtual int Create(int bits, int width, int height, int stride, int minimumSize,
+                       int sourceFormat, int format, int palette, int flags, int surfacePalette,
+                       int checkMemory, int unused, int addressU, int addressV, int choice,
+                       int alphaThreshold, int key);
     virtual void UnknownVirtualSlot5();
     virtual void UnknownVirtualSlot6();
     virtual void UnknownVirtualSlot7();
-    virtual int UnknownVirtualSlot8(int a, int b, int c);          // 0x20: (1, 0, 1) in Init
-    virtual int UnknownVirtualSlot9(int* rect, int count);          // 0x24: (rect, -1) in slot 13
+    // 0x20 (CreateTextureSurface): (1, 0, 1) in Init
+    virtual int UnknownVirtualSlot8(int upload, int asRenderTarget, int localVideo);
+    virtual int UnknownVirtualSlot9(int* rect, int mode);          // 0x24 (Upload): (rect, -1) in slot 13
     virtual void UnknownVirtualSlot10();
     virtual void UnknownVirtualSlot11();
     virtual void UnknownVirtualSlot12();
-    virtual short* LockPixels(int a, int* pitch, int c);           // 0x34 (slot 13): (0,0,0) in 0x004db8c0, result stored at +0x64; TerrainShadow slot 30 passes a local for the 2nd argument
-    virtual void UnlockPixels(int a);                              // 0x38 (slot 14): (0) at the end of 0x004db8c0
+    // 0x34 (slot 13, LockSurface): (0,0,0) in 0x004db8c0, result stored at +0x64; TerrainShadow
+    // slot 30 passes a local for the pitch.
+    virtual short* LockPixels(int rect, int* pitch, int flags);
+    virtual void UnlockPixels(int rect);  // 0x38 (slot 14, UnlockSurface): (0) at the end of 0x004db8c0
     char pad_0x08[0x14 - 0x08];
     int size;                    // +0x14 texture edge (the clip rect is 0..size-1)
     int height;                  // +0x18 copied to the render target's +0x10 by Init
