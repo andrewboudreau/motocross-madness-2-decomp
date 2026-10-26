@@ -133,11 +133,11 @@ void InlineShock::ClampAndStep(float maxDelta, float dt, ShockVec3& pos)
     float delta = prevLength - length;
     if (length != 0.0f) {
         if (delta >= 0.0f) {
-            float t = (delta < maxDelta) ? delta : maxDelta;
-            velocity = displacement * (t / (dt * length));
+            float clamped = (delta < maxDelta) ? delta : maxDelta;
+            velocity = displacement * (clamped / (dt * length));
         } else {
-            float t = (delta > -maxDelta) ? delta : -maxDelta;
-            velocity = displacement * (t / (dt * length));
+            float clamped = (delta > -maxDelta) ? delta : -maxDelta;
+            velocity = displacement * (clamped / (dt * length));
         }
         stepDisplacement = displacement * -(delta / length);
     } else {
@@ -151,14 +151,14 @@ void InlineShock::ClampAndStep(float maxDelta, float dt, ShockVec3& pos)
 void InlineShock::Retract(float amount, const ShockCarrier* carrier)
 {
     if (ratio != 0.0f) {
-        float v = amount * (minLength / (carrier->field_0x2a4 * retractScale));
-        if (!_finite(v) || v < 0.0f)
+        float retraction = amount * (minLength / (carrier->field_0x2a4 * retractScale));
+        if (!_finite(retraction) || retraction < 0.0f)
             return;
-        if (v >= length) {
+        if (retraction >= length) {
             Reset();
             return;
         }
-        length = length - v;
+        length = length - retraction;
         ratio = length / minLength;
         sceneNode->SetPosition(axis * -length);
     }
@@ -166,7 +166,7 @@ void InlineShock::Retract(float amount, const ShockCarrier* carrier)
 }
 
 // *out = the projection of v onto `onto` (zero when `onto` is zero).  Writing through
-// an out pointer lets VC6 place the result in the dead `d` slot like retail.
+// an out pointer lets VC6 place the result in the dead `toPoint` slot like retail.
 static inline void ProjectInto(ShockVec3* out, const ShockVec3& v, const ShockVec3& onto)
 {
     if (onto.x == kShockZero.x && onto.y == kShockZero.y && onto.z == kShockZero.z)
@@ -179,7 +179,7 @@ void InlineShock::SolveContact(float dt, const ShockVec3* offset, const ShockVec
                                float* outLoad, int* outActive)
 {
     int miss;
-    float t;
+    float contactRatio;
     ShockVec3 anchor;
     anchorNode->GetPositionIn(0, &anchor);
     ShockVec3 toPoint = *point - anchor;
@@ -187,10 +187,10 @@ void InlineShock::SolveContact(float dt, const ShockVec3* offset, const ShockVec
     if (dist >= 0.0f)
         dist = ShockDot(toPoint, ShockVec3(-normal->x, normal->y, -normal->z));
     if (dist < 0.0) {
-        t = limit / dist;
+        contactRatio = limit / dist;
         miss = 0;
     } else {
-        t = 0.0f;
+        contactRatio = 0.0f;
         miss = 1;
     }
     float len = toPoint.LengthSquared();
@@ -198,14 +198,14 @@ void InlineShock::SolveContact(float dt, const ShockVec3* offset, const ShockVec
     float over = axisLength - len;
     if (!(over > 0.0f))
         over = 0.0f;
-    length = over - len * t;
+    length = over - len * contactRatio;
     float scale = -(length / len);
     displacement = toPoint * scale;
     ShockVec3 pos = axis * -length;
-    ShockVec3 w = *base + *offset;
+    ShockVec3 pointVelocity = *base + *offset;
     {
         ShockVec3 proj;
-        ProjectInto(&proj, w, displacement);
+        ProjectInto(&proj, pointVelocity, displacement);
         float speedSq = ShockDotCall(proj, proj);
         speed = (speedSq == 1.0f) ? 1.0f : FastSqrt(speedSq);
     }
@@ -271,14 +271,14 @@ RotatingShock::~RotatingShock()
 void RotatingShock::Retract(float amount, const ShockCarrier* carrier)
 {
     if (ratio != 0.0f) {
-        float v = amount * (chord / (carrier->field_0x2a4 * retractScale));
-        if (!_finite(v) || v < 0.0f)
+        float retraction = amount * (chord / (carrier->field_0x2a4 * retractScale));
+        if (!_finite(retraction) || retraction < 0.0f)
             return;
-        if (v >= length) {
+        if (retraction >= length) {
             Reset();
             return;
         }
-        length = length - v;
+        length = length - retraction;
         float delta = length / armLength - angle;
         if (_finite(delta)) {
             sceneNode->Rotate(rotationAxis, delta);
@@ -292,11 +292,11 @@ void RotatingShock::Retract(float amount, const ShockCarrier* carrier)
 void RotatingShock::ClampAndStep(float maxDelta, float dt)
 {
     if (length >= chord) {
-        float s = chord / length;
+        float limitScale = chord / length;
         atLimit = 1;
         ratio = 1.0f;
         angle = maxAngle;
-        displacement = displacement * s;
+        displacement = displacement * limitScale;
         length = chord;
     } else {
         angle = length / armLength;
@@ -310,11 +310,11 @@ void RotatingShock::ClampAndStep(float maxDelta, float dt)
     float delta = prevLength - length;
     if (length != 0.0f) {
         if (delta >= 0.0f) {
-            float t = (delta < maxDelta) ? delta : maxDelta;
-            velocity = displacement * (t / (dt * length));
+            float clamped = (delta < maxDelta) ? delta : maxDelta;
+            velocity = displacement * (clamped / (dt * length));
         } else {
-            float t = (delta > -maxDelta) ? delta : -maxDelta;
-            velocity = displacement * (t / (dt * length));
+            float clamped = (delta > -maxDelta) ? delta : -maxDelta;
+            velocity = displacement * (clamped / (dt * length));
         }
         stepDisplacement = displacement * -(delta / length);
     } else {
@@ -338,18 +338,18 @@ void RotatingShock::SolveContact(float dt, const ShockVec3* axisA, const ShockVe
                                  float* outLoad, int* outActive)
 {
     int miss = 0;
-    float t;
+    float contactRatio;
     ShockVec3 anchor;
     sceneNode->GetPositionIn(0, &anchor);
-    ShockVec3 d = *point - anchor;
-    ShockVec3 r;
+    ShockVec3 toPoint = *point - anchor;
+    ShockVec3 swing;
     switch (axisId) {
-    case 0: r = ShockCross(*axisA, d); break;
-    case 1: r = ShockCross(d, *axisA); break;
-    case 2: r = ShockCross(*axisB, d); break;
-    case 3: r = ShockCross(d, *axisB); break;
+    case 0: swing = ShockCross(*axisA, toPoint); break;
+    case 1: swing = ShockCross(toPoint, *axisA); break;
+    case 2: swing = ShockCross(*axisB, toPoint); break;
+    case 3: swing = ShockCross(toPoint, *axisB); break;
     }
-    float dist = (r.x * normal->x + r.y * normal->y) + r.z * normal->z;
+    float dist = (swing.x * normal->x + swing.y * normal->y) + swing.z * normal->z;
     if (dist >= 0.0f) {
         if (dist == 0.0f) {
             *outLoad = limit;
@@ -358,16 +358,16 @@ void RotatingShock::SolveContact(float dt, const ShockVec3* axisA, const ShockVe
             speed = 0.0f;
             return;
         }
-        dist = ShockDot(r, ShockVec3(-normal->x, normal->y, -normal->z));
+        dist = ShockDot(swing, ShockVec3(-normal->x, normal->y, -normal->z));
     }
     if (dist < 0.0) {
-        t = limit / dist;
+        contactRatio = limit / dist;
     } else {
-        t = 0.0f;
+        contactRatio = 0.0f;
         miss = 1;
     }
-    length = clearedLength - t * armLength;
-    displacement = ShockScaleCall(r, (-length) / armLength);
+    length = clearedLength - contactRatio * armLength;
+    displacement = ShockScaleCall(swing, (-length) / armLength);
     speed = ShockLength(ShockProject(ShockAddCall(*offsetA, *offsetB), displacement));
     ClampAndStep(speed * dt, dt);
     if (atLimit == 0 && miss == 0) {
