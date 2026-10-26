@@ -61,7 +61,7 @@ struct TrackListItem {
     unsigned char flags;                      // +0x00 bit 1: walked in reverse (0x00517ea0)
     unsigned char field_0x01[3];
     TrackNode* node;                          // +0x04
-    TrackListItem* field_0x08;
+    TrackListItem* previous;                  // +0x08 the item MoveAlongPath steps to instead of next when walking with flag 2
     TrackListItem* next;                      // +0xC  next item: the walks push items on the list head and step through it
 };
 

@@ -1971,11 +1971,11 @@ int KrustyBike::Fn_00414370(float dt)
                 list = (KbTrackItem*)DebugCalloc(1, 0x10, __FILE__, 0x99f);
                 if (!list)
                     return 0;
-                list->field_0x04 = race->raceTrack->startNode;
-                list->field_0x0c = (KbTrackItem*)DebugCalloc(1, 0x10, __FILE__, 0x9a3);
-                if (!list->field_0x0c)
+                list->node = race->raceTrack->startNode;
+                list->next = (KbTrackItem*)DebugCalloc(1, 0x10, __FILE__, 0x9a3);
+                if (!list->next)
                     return 0;
-                list->field_0x0c->field_0x04 = race->raceTrack->startNode;
+                list->next->node = race->raceTrack->startNode;
                 if (list && bikeAhead < gateAhead) {
                     aiPath.count = 100;
                     t = 0.0f;
@@ -2047,7 +2047,7 @@ int KrustyBike::Fn_00414370(float dt)
             return 0;
         tail = &list;
         while (*tail)
-            tail = &(*tail)->field_0x0c;
+            tail = &(*tail)->next;
         from = race->finishProbePos;
         from.t += 0.01f;
         if (!race->raceTrack->ShortestPath(from, race->finishProbePos, tail, &distance))

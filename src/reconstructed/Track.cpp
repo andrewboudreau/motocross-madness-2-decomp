@@ -750,7 +750,7 @@ int Track::MoveAlongPath(TrackPos pos, TrackPos* out, TrackListItem** path, floa
             if (cur.t == 0.0f) {
                 if (!cur.segment->previous) {
                     if (flags & 2)
-                        item = item->field_0x08;
+                        item = item->previous;
                     else
                         item = item->next;
                     if (!item)
@@ -774,7 +774,7 @@ int Track::MoveAlongPath(TrackPos pos, TrackPos* out, TrackListItem** path, floa
             if (cur.t == 1.0f) {
                 if (!cur.segment->next) {
                     if (flags & 2)
-                        item = item->field_0x08;
+                        item = item->previous;
                     else
                         item = item->next;
                     if (!item)

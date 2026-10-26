@@ -336,10 +336,10 @@ struct KbBonusTable {
 // Work-list entry of the track's graph walks (src/reconstructed/Track.h TrackListItem,
 // calloc(1, 0x10)); 0x00414370 builds a two-entry list starting at the track's first node.
 struct KbTrackItem {
-    int field_0x00;
-    int* field_0x04;               // node
-    KbTrackItem* field_0x08;
-    KbTrackItem* field_0x0c;       // next
+    int flags;                     // +0x00 TrackListItem::flags (byte; bit 1: walked in reverse)
+    int* node;                     // +0x04
+    KbTrackItem* previous;         // +0x08
+    KbTrackItem* next;             // +0x0c
 };
 // The race's Track (src/reconstructed/Track.h; tier 3 view): field_0x0 is the start node.
 // Positions on the track are KbRaw3 {node, segment, t} passed by value.
