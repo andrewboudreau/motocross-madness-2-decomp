@@ -198,16 +198,16 @@ public:
 
     // 0x00463450: writes entry `index` of the +0x2e4 table; each non-null
     // pointer supplies one field. Returns false when index >= +0x2e0.
-    bool SetTableEntry(int index, const Vector3* position, const float* a,
-                               const float* b, const float* c, const float* d,
-                               const float* e);
+    bool SetTableEntry(int index, const Vector3* position, const float* distanceRate,
+                       const float* raiseRate, const float* lowerRate, const float* tiltRate,
+                       const float* yawRate);
 
     // 0x00463140 (VehicleCamera's constructor caller 0x0052ba12): Camera slot 8,
     // then the +0x294/+0x298 values (FollowCam.cpp lines 0x78/0x79), presets,
     // the point table (line 0x88) and the state list; states 5-7 and values
     // outside 0..7 are dropped. Releases itself and returns 0 when no state
     // is left.
-    FollowCamera* SetupFollowCamera(void* value, float rate294, float rate298,
+    FollowCamera* SetupFollowCamera(void* context, float rate294, float rate298,
                                         float value228, float value2d0, float value2e8,
                                         int capacity, int count, const int* list);
     // 0x004650e0 (KrustyBikeCamera's constructor): loads the "CAMERA" records
@@ -215,8 +215,8 @@ public:
     // 0x3c7, 0x3e1, 0x3e2).
     void LoadCameraFile(const char* path);
     // 0x00463520: appends a table entry while below capacity.
-    bool AppendTableEntry(const Vector3& position, float a, float b, float c,
-                          float d, float e);
+    bool AppendTableEntry(const Vector3& position, float distanceRate, float raiseRate,
+                          float lowerRate, float tiltRate, float yawRate);
     // 0x00463600: stores the subject and copies its +0x40.
     void SetSubject(UnknownFollowCameraSubject* subject);
 

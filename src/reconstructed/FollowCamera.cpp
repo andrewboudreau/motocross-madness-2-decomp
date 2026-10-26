@@ -65,37 +65,37 @@ void FollowCamera::UnknownVirtualSlot73(const Vector3& from, const Vector3& to, 
 }
 
 // 0x00463450
-bool FollowCamera::SetTableEntry(int index, const Vector3* position, const float* a,
-                                         const float* b, const float* c, const float* d,
-                                         const float* e) {
+bool FollowCamera::SetTableEntry(int index, const Vector3* position, const float* distanceRate,
+                                 const float* raiseRate, const float* lowerRate, const float* tiltRate,
+                                 const float* yawRate) {
     if (index < pointCount) {
         if (position)
             points[index].position = *position;
-        if (a)
-            points[index].distanceRate = *a;
-        if (b)
-            points[index].raiseRate = *b;
-        if (c)
-            points[index].lowerRate = *c;
-        if (d)
-            points[index].tiltRate = *d;
-        if (e)
-            points[index].yawRate = *e;
+        if (distanceRate)
+            points[index].distanceRate = *distanceRate;
+        if (raiseRate)
+            points[index].raiseRate = *raiseRate;
+        if (lowerRate)
+            points[index].lowerRate = *lowerRate;
+        if (tiltRate)
+            points[index].tiltRate = *tiltRate;
+        if (yawRate)
+            points[index].yawRate = *yawRate;
         return true;
     }
     return false;
 }
 
 // 0x00463520
-bool FollowCamera::AppendTableEntry(const Vector3& position, float a, float b, float c,
-                                    float d, float e) {
+bool FollowCamera::AppendTableEntry(const Vector3& position, float distanceRate, float raiseRate,
+                                    float lowerRate, float tiltRate, float yawRate) {
     if (pointCount < pointCapacity) {
         points[pointCount].position = position;
-        points[pointCount].distanceRate = a;
-        points[pointCount].raiseRate = b;
-        points[pointCount].lowerRate = c;
-        points[pointCount].tiltRate = d;
-        points[pointCount].yawRate = e;
+        points[pointCount].distanceRate = distanceRate;
+        points[pointCount].raiseRate = raiseRate;
+        points[pointCount].lowerRate = lowerRate;
+        points[pointCount].tiltRate = tiltRate;
+        points[pointCount].yawRate = yawRate;
         pointCount++;
         return true;
     }
@@ -105,10 +105,10 @@ bool FollowCamera::AppendTableEntry(const Vector3& position, float a, float b, f
 // 0x00463140: Camera slot 8, then the +0x294/+0x298 values, presets, the
 // point table and the state list (states 5-7 and values outside 0..7 are
 // dropped); releases itself when no state is left.
-FollowCamera* FollowCamera::SetupFollowCamera(void* value, float rate294, float rate298,
+FollowCamera* FollowCamera::SetupFollowCamera(void* context, float rate294, float rate298,
                                                   float value228, float value2d0, float value2e8,
                                                   int capacity, int count, const int* list) {
-    if (!Camera::SetRenderContext(value))
+    if (!Camera::SetRenderContext(context))
         return 0;
     fieldOfViewEase = new(__FILE__, 0x78) UnknownFollowCameraValue(fieldOfView, rate294);
     distanceEase = new(__FILE__, 0x79) UnknownFollowCameraValue(followDistance, rate298);
