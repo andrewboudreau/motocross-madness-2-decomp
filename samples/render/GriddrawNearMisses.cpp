@@ -83,14 +83,14 @@
 // box centre, re-reads indexTotal for the index byte count and stores a dead
 // vertexStart * 32 (10 bytes longer). Tried: all 24 declaration orders of
 // x, z, indexTotal and bx (no effect), x and bx as one variable (VC6 merges
-// them; retail keeps both, so x steps inside the body), three m/n
-// initialisations and the origin taken from x/z.
+// them; retail keeps both, so x steps inside the body), three
+// triangles/prevTriangles initialisations and the origin taken from x/z.
 //
 // DrawableGridNode 0x004815e0 (detail update, 1082 bytes; candidate 1083):
 // computes the squared near and far distances of the viewer to the node's
 // x and z range, the y delta, the distance (FastSqrt), and the two
-// 16-bit detail words from (dy² / q + q) * +0x174 * +0x74 with q the
-// nearest of the three distances. Control flow, calls and clamps match
+// 16-bit detail words from (dy² / nearest + nearest) * +0x174 * +0x74,
+// nearest being the closest of the three distances. Control flow, calls and clamps match
 // (the 65535 clamps are ternaries; `0xffff` immediates stay immediates
 // once they are). Retail keeps the two axis deltas on the x87 stack across
 // the three-way branch (fcom on the first, the second loaded before the
@@ -100,8 +100,8 @@
 // Tried: locals, block scopes, const/register, repeated expressions, an
 // inline helper with reference, pointer or by-value arguments, and an
 // accumulating form (which enregisters only the first delta).
-// The two 65535 clamps are written `w >= 65535.0f ? 0xffff : ...`, which gives
-// retail's branch polarity (64 of 1083; the `<` form 60). Also tried for the
+// The two 65535 clamps are written `upperError >= 65535.0f ? 0xffff : ...`, which
+// gives retail's branch polarity (64 of 1083; the `<` form 60). Also tried for the
 // deltas: no named deltas (expressions throughout), only one of them named,
 // the delta assigned inside the test (`(ax = ...) < 0`, comma forms), copies
 // of the bounds overwritten by the deltas (the form that made 0x00481b30
@@ -466,7 +466,7 @@ int DrawableGridNode::RebuildBlockBuffers()
     int indexTotal = 0;
     int before = data->triangleCount;
     terrain->bufferRebuilds++;
-    int b = 0;
+    int block = 0;
     int vertexTotal = 0;
     int bz;
     float saved = data->texStep;
@@ -474,9 +474,9 @@ int DrawableGridNode::RebuildBlockBuffers()
         x = 0;
         for (int bx = 0; bx < 16; bx += 4) {
             int closed;
-            int n;
-            int m;
-            int size = UnknownVirtualSlot8(b);
+            int triangles;
+            int prevTriangles;
+            int size = UnknownVirtualSlot8(block);
             data->texStep = saved;
             if (size == 0x40)
                 data->texStep *= 4.0f;
@@ -485,29 +485,30 @@ int DrawableGridNode::RebuildBlockBuffers()
             g_gridOriginZ = bz;
             int vertexStart = vertexTotal;
             int indexStart = indexTotal;
-            n = 0;
-            m = n;
-            n = EmitDiagonalTriangles(4, n, x, z + 4, 2, -2, &closed);
-            if (n == m && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
+            triangles = 0;
+            prevTriangles = triangles;
+            triangles = EmitDiagonalTriangles(4, triangles, x, z + 4, 2, -2, &closed);
+            if (triangles == prevTriangles && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
                 ((DrawableGridNode*)parent)->extra->texture == 0)
-                n = AppendCornerTriangle(n, x, z + 4, 4, -4);
-            m = n;
+                triangles = AppendCornerTriangle(triangles, x, z + 4, 4, -4);
+            prevTriangles = triangles;
             x += 4;
-            n = EmitDiagonalTriangles(4, n, x, z, -2, 2, &closed);
-            if (n == m && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
+            triangles = EmitDiagonalTriangles(4, triangles, x, z, -2, 2, &closed);
+            if (triangles == prevTriangles && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
                 ((DrawableGridNode*)parent)->extra->texture == 0)
-                n = AppendCornerTriangle(n, x, z, -4, 4);
+                triangles = AppendCornerTriangle(triangles, x, z, -4, 4);
             vertexTotal += g_gridVertexCache.count;
-            indexTotal += n * 3;
-            ((GridBlockRange*)data->blockRanges)[b].centerY = (g_gridVertexCache.maxY + g_gridVertexCache.minY) * 0.5f;
-            ((GridBlockRange*)data->blockRanges)[b].extentY =
+            indexTotal += triangles * 3;
+            ((GridBlockRange*)data->blockRanges)[block].centerY =
+                (g_gridVertexCache.maxY + g_gridVertexCache.minY) * 0.5f;
+            ((GridBlockRange*)data->blockRanges)[block].extentY =
                 (g_gridVertexCache.maxY - g_gridVertexCache.minY) * terrain->gridCellSize * 0.5f;
-            ((GridBlockRange*)data->blockRanges)[b].end = vertexTotal;
-            ((GridBlockRange*)data->blockRanges)[b].indexEnd = indexTotal;
-            extra->blockRecords[b].mappingScale = 1.0f;
-            extra->blockRecords[b].mappingOffsetU = 0;
-            extra->blockRecords[b].mappingOffsetV = 0;
-            if (n != 0) {
+            ((GridBlockRange*)data->blockRanges)[block].end = vertexTotal;
+            ((GridBlockRange*)data->blockRanges)[block].indexEnd = indexTotal;
+            extra->blockRecords[block].mappingScale = 1.0f;
+            extra->blockRecords[block].mappingOffsetU = 0;
+            extra->blockRecords[block].mappingOffsetV = 0;
+            if (triangles != 0) {
                 int vertexBytes = vertexTotal * 32;
                 int indexBytes = (indexTotal + vertexTotal) * 2;
                 if (data->vertexBuffer == 0 || vertexBytes > data->vertexBufferBytes) {
@@ -556,7 +557,7 @@ int DrawableGridNode::RebuildBlockBuffers()
                 memcpy((unsigned short*)data->indexBuffer + indexStart, g_gridIndices,
                        (indexTotal - indexStart) * 2);
             }
-            b++;
+            block++;
         }
         z += 4;
     }
@@ -600,8 +601,9 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
         farX = ax * ax;
     } else {
         nearX = 0.0f;
-        float f = ((t->viewerX + t->viewerX < d->gridMinX + d->gridMaxX) ? d->gridMaxX : d->gridMinX) - t->viewerX;
-        farX = f * f;
+        float farOffset =
+            ((t->viewerX + t->viewerX < d->gridMinX + d->gridMaxX) ? d->gridMaxX : d->gridMinX) - t->viewerX;
+        farX = farOffset * farOffset;
     }
     float az = t->viewerZ - d->gridMinZ;
     float bz = t->viewerZ - d->gridMaxZ;
@@ -613,8 +615,9 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
         farZ = az * az;
     } else {
         nearZ = 0.0f;
-        float f = ((t->viewerZ + t->viewerZ < d->gridMaxZ + d->gridMinZ) ? d->gridMaxZ : d->gridMinZ) - t->viewerZ;
-        farZ = f * f;
+        float farOffset =
+            ((t->viewerZ + t->viewerZ < d->gridMaxZ + d->gridMinZ) ? d->gridMaxZ : d->gridMinZ) - t->viewerZ;
+        farZ = farOffset * farOffset;
     }
     float near2 = nearZ + nearX;
     float far2 = farZ + farX;
@@ -647,35 +650,38 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
     } else {
         float nearDist = FastSqrt(near2);
         float farDist = FastSqrt(far2);
-        float q;
+        float nearest;
         if (dySq < near2)
-            q = nearDist;
+            nearest = nearDist;
         else if (dySq > far2)
-            q = farDist;
+            nearest = farDist;
         else
-            q = dy;
-        float v = (dySq / q + q) * data->inverseErrorScale * terrain->drawDistanceRatio;
-        data->lowerErrorLimit = (v >= 65535.0f) ? 0xffff : (unsigned short)(int)v;
+            nearest = dy;
+        float lowerError = (dySq / nearest + nearest) * data->inverseErrorScale * terrain->drawDistanceRatio;
+        data->lowerErrorLimit = (lowerError >= 65535.0f) ? 0xffff : (unsigned short)(int)lowerError;
         if (dyLo < 0.0f)
             dyLo = -dyLo;
         if (dyHi < 0.0f)
             dyHi = -dyHi;
-        float m = (dyLo > dyHi) ? dyLo : dyHi;
-        m = m * m;
-        float ratioNear = (m + near2) / nearDist;
-        float ratioFar = (m + far2) / farDist;
-        float w = ((ratioNear > ratioFar) ? ratioNear : ratioFar) * (data->inverseErrorScale * terrain->drawDistanceRatio);
-        data->upperErrorLimit = (w >= 65535.0f) ? 0xffff : (unsigned short)(int)w;
+        float maxDy = (dyLo > dyHi) ? dyLo : dyHi;
+        maxDy = maxDy * maxDy;
+        float ratioNear = (maxDy + near2) / nearDist;
+        float ratioFar = (maxDy + far2) / farDist;
+        float upperError = ((ratioNear > ratioFar) ? ratioNear : ratioFar)
+            * (data->inverseErrorScale * terrain->drawDistanceRatio);
+        data->upperErrorLimit = (upperError >= 65535.0f) ? 0xffff : (unsigned short)(int)upperError;
         return distance;
     }
-    float q;
+    float nearest;
     if (dySq < near2)
-        q = FastSqrt(near2);
+        nearest = FastSqrt(near2);
     else if (dySq > far2)
-        q = FastSqrt(far2);
+        nearest = FastSqrt(far2);
     else
-        q = dy;
-    data->lowerErrorLimit = (unsigned short)(int)((dySq / q + q) * data->inverseErrorScale * terrain->drawDistanceRatio);
+        nearest = dy;
+    data->lowerErrorLimit =
+        (unsigned short)(int)((dySq / nearest + nearest) * data->inverseErrorScale
+                              * terrain->drawDistanceRatio);
     if (data->lowerErrorLimit > 0xffff)
         data->lowerErrorLimit = 0xffff;
     return distance;
