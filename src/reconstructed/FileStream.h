@@ -11,7 +11,7 @@ class UnknownTextureStream {
 public:
     UnknownTextureStream(UnknownResourceManager* manager);              // 0x00460d10
     ~UnknownTextureStream();                  // 0x00460d60
-    int Open(const char* path, const char* mode, int a); // 0x00460f50: opens `path`
+    int Open(const char* path, const char* mode, int encoded); // 0x00460f50: opens `path`
     int Seek(int offset, int origin, int flag); // 0x00461340: seeks
     int Tell();
     int Read(void* buffer, int size, int count);

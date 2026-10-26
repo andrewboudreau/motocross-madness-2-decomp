@@ -78,7 +78,7 @@ public:
     virtual void UnknownVirtualSlot58(Vec3* settleUp, int keepPlacement);
     virtual float UnknownVirtualSlot59();
     virtual void UnknownVirtualSlot60(float steerAxis, float maxAngle, int steps);
-    virtual float UnknownVirtualSlot61(float arg);
+    virtual float UnknownVirtualSlot61(float threshold);
     virtual int UnknownVirtualSlot62(float arg);
     virtual void UnknownVirtualSlot63(float dt);
     // void: 0x00528e50 leaves eax as whatever the last store used (no return value is
@@ -115,7 +115,7 @@ public:
     virtual int UnknownVirtualSlot89(float frame);      // Bike 0x0040ae50 passes a float (tier 2)
     virtual void UnknownVirtualSlot90(int* steps, float frame);
     virtual void UnknownVirtualSlot91();  // entry is the shared empty stub 0x00464e90
-    virtual void UnknownVirtualSlot92(const Vec3* a, const Vec3* b);
+    virtual void UnknownVirtualSlot92(const Vec3* worldDir, const Vec3* point);
     virtual void UnknownVirtualSlot93();
     virtual void UnknownVirtualSlot94();  // entry is the shared empty stub 0x00464e90
     virtual void UnknownVirtualSlot95();

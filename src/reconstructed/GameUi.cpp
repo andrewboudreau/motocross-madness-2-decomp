@@ -153,9 +153,9 @@ int UIControl::IsEnabled() {
 }
 
 // 0x00470730
-void UIControl::SetImage(int a, void* image) {
-    stateImages[a] = (UIAnim*)image;
-    if (a == 1)
+void UIControl::SetImage(int state, void* image) {
+    stateImages[state] = (UIAnim*)image;
+    if (state == 1)
         stateImages[3] = (UIAnim*)image;
     RequestRedraw();
 }
@@ -166,9 +166,9 @@ void UIControl::SetSound(int index, Sound* sound) {
 }
 
 // 0x00470830
-void UIControl::SetAnchor(UIControl* next, int a) {
-    anchorControl = next;
-    relAnchor = a;
+void UIControl::SetAnchor(UIControl* anchor, int relative) {
+    anchorControl = anchor;
+    relAnchor = relative;
 }
 
 // 0x00470850
@@ -221,8 +221,8 @@ void UIControl::SetDropColor(int value) {
 }
 
 // 0x00470da0
-void UIControl::SetTextAlign(int value) {
-    textAlign = value;
+void UIControl::SetTextAlign(int flags) {
+    textAlign = flags;
     RequestRedraw();
 }
 
@@ -1202,7 +1202,7 @@ UIListBox::~UIListBox() {
 }
 
 // 0x00476860
-int UIListBox::ScrollToRow(int row, int a) {
+int UIListBox::ScrollToRow(int row, int updateScrollBars) {
     int last = rowCount - lastPageRowCount;
     if (row < last)
         last = row;
@@ -1210,7 +1210,7 @@ int UIListBox::ScrollToRow(int row, int a) {
     if (visibleRowCount == 1)
         SetSelectedRow(firstVisibleRow);
     RequestRedraw();
-    if (a)
+    if (updateScrollBars)
         UpdateScrollBars();
     return 1;
 }
@@ -2039,25 +2039,25 @@ void UIDialog::SetShown(int value) {
 }
 
 // 0x0046ea80
-void UIDialog::EnableGroup(int id, int value) {
+void UIDialog::EnableGroup(int id, int enable) {
     GameObjectIterator iterator(controlContainer, 1, "UIControl");
     UIControl* control;
     while ((control = (UIControl*)iterator.Next()) != 0) {
         int group = control->groupId;
         if (group == id)
-            control->SetEnabled(value);
+            control->SetEnabled(enable);
     }
 }
 
 // 0x0046eb30
-void UIDialog::ShowGroup(int id, int value) {
+void UIDialog::ShowGroup(int id, int show) {
     GameObjectIterator iterator(controlContainer, 1, "UIControl");
     UIControl* control;
     while ((control = (UIControl*)iterator.Next()) != 0) {
         if (control->groupId == id)
-            control->Show(value, 1);
+            control->Show(show, 1);
     }
-    if (!value && dialogBackground)
+    if (!show && dialogBackground)
         dialogBackground->MarkAllDirty();
 }
 
@@ -2401,11 +2401,11 @@ void UIControl::Show(int show, int animate) {
 }
 
 // 0x00470760
-void UIControl::SetImageFile(int a, const char* image) {
+void UIControl::SetImageFile(int state, const char* image) {
     if (ownerDialog) {
         UIAnim* anim = new(__FILE__, 0xc10) UIAnim(ownerDialog->dialogTextures, 0);
         anim->LoadFile(image, ownerDialog->dialogPalette);
-        SetImage(a, anim);
+        SetImage(state, anim);
     }
     RequestRedraw();
 }
@@ -2896,14 +2896,14 @@ int UIListBox::AddRow(const char* text, int data, int a) {
     return 0;
 }
 
-// 0x00477110: adds a row for an image file: with `a` the file is loaded as a
+// 0x00477110: adds a row for an image file: with `loadImage` the file is loaded as a
 // UIAnim (only when the stream can open it), otherwise the row keeps the TGA
 // file's name and the size from its header.
-int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
+int UIListBox::AddImageFileRow(const char* file, int data, int loadImage, int rowFlags) {
     if (rowCount >= rowCapacity && !ReserveRows(rowCount + 1))
         return 0;
     UnknownGameUiListRow row;
-    if (a) {
+    if (loadImage) {
         UnknownTextureStream* stream =
             new(__FILE__, 0x1e20) UnknownTextureStream(g_ResourceManager);
         if (stream->Open(file, "r", 0)) {
@@ -2917,7 +2917,7 @@ int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
             UIFrame* frame = image->frameList[0];
             row.width = frame->frameWidth;
             row.height = frame->frameHeight;
-            row.flags = b;
+            row.flags = rowFlags;
             row.field_0x30 = 0;
             delete stream;
         } else {
@@ -2929,7 +2929,7 @@ int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
         row.text = 0;
         row.image = 0;
         char* name = (char*)DebugMalloc(strlen(file) + 1, __FILE__, 0x1e37);
-        row.flags = b;
+        row.flags = rowFlags;
         row.imageFile = name;
         strcpy(name, file);
         row.textLines = 0;

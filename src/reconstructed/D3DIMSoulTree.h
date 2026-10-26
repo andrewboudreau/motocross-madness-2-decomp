@@ -82,7 +82,7 @@ public:
     void CollectDescendants(int* index, SoultreeObject** nodes);    // 0x004fda60: collects the subtree
     void SetFlag14c();                                  // 0x004fdb40
     void ClearFlag14c();                                  // 0x004fdb50
-    void LoadFromParameters(UnknownTextureStream* stream, int a);    // 0x004fdb60: reads a .slt stream
+    void LoadFromParameters(UnknownTextureStream* stream, int offset); // 0x004fdb60: reads a .slt stream
     void GetLocalBounds(Vec3* center, Vec3* halfExtent);            // 0x004fe0a0
     void UpdateSubtreeBounds();                                  // 0x004fe0f0
     void InvalidateWorldMatrix();                                 // 0x004fb850: invalidate dependent caches

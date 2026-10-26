@@ -252,7 +252,7 @@ public:
     void PushProbesOutOfBox(float frameTime); // 0x005329e0: pushImpulse (samples/race/WreckerNearMisses.cpp)
     void AddProbe(Vector3 offset, int bone); // 0x00532900: a probe point and its position/hit slots
     void SprayContactParticles(Vector3 a, Vector3 b, Vector3 normal, float frameTime);
-    void EmitProbeTrail(Vector3 a, Vector3 b, float frameTime);
+    void EmitProbeTrail(Vector3 from, Vector3 to, float frameTime);
     void EmitProbeEffects(float frameTime); // 0x00532020: trail and spray for each probe that hit
     void UpdateInertia();             // 0x00532150: box inertia from the skeleton's bounds
     void StartAnimatedWreck(int index); // 0x00532220: state 1, indexed animation, body disabled

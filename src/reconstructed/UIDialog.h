@@ -116,7 +116,7 @@ public:
     void GrabBackground(int dim, CameraRect* rect); // 0x004700b0: grabs the screen behind it
     void ReleaseBackgroundGrab();             // 0x00470110: releases the grab
     // 0x0046f890: splits `text` into lines for a control; returns 0 when it fits on one.
-    char* SplitTextLines(char* text, unsigned int color, void* font, void* a, int* size);
+    char* SplitTextLines(char* text, unsigned int color, void* font, void* table, int* size);
 
     // The render target (GameObject +0x18) as the controls read it.
     void* UnknownInlineField18() { return renderContext; }

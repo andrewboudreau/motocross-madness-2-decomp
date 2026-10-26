@@ -44,7 +44,7 @@ public:
     virtual void UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up);
     virtual float UnknownVirtualSlot57();
     virtual float UnknownVirtualSlot59();
-    virtual float UnknownVirtualSlot61(float arg);
+    virtual float UnknownVirtualSlot61(float threshold);
     virtual int UnknownVirtualSlot62(float arg);
     virtual void UnknownVirtualSlot65(float dt);
     virtual int UnknownVirtualSlot66();
@@ -57,7 +57,7 @@ public:
     virtual int UnknownVirtualSlot89(float frame);
     virtual void UnknownVirtualSlot90(int* steps, float frame);
     virtual void UnknownVirtualSlot91();
-    virtual void UnknownVirtualSlot92(const Vec3* a, const Vec3* b);
+    virtual void UnknownVirtualSlot92(const Vec3* worldDir, const Vec3* point);
     virtual void UnknownVirtualSlot96();
 
     // slots introduced by Bike

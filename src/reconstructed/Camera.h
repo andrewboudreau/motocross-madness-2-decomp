@@ -38,7 +38,7 @@ public:
     // Pure: Camera's vtable holds LIBCMT _purecall (0x00534cfe) in slot 27.
     virtual void TakeScreenshot() = 0;
     virtual void UpdateMatrices();
-    virtual int LookAt(Vector3 value);
+    virtual int LookAt(Vector3 target);
     virtual int SetWorldMatrix(const Matrix4* value);
     virtual int SetViewMatrix(const Matrix4* value);
     virtual int SetProjectionMatrix(const Matrix4* value);

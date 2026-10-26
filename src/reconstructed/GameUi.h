@@ -516,7 +516,7 @@ public:
     int CountVisibleRows();                   // 0x00476ee0: the rows that fit from the first shown
     int ReserveRows(int rows);      // 0x00476f50: grows the rows to `rows`
     void SetRowText(int row, const char* text); // 0x00476ff0
-    int AddImageFileRow(const char* image, int a, int b, int c); // 0x00477110
+    int AddImageFileRow(const char* file, int data, int loadImage, int rowFlags); // 0x00477110
     int AddImageRow(UIAnim* image, int data, int a); // 0x004773a0 ("Item%d" starting with '@')
     int RemoveRow(int row);                   // 0x00477490
     void RemoveAllRows();                     // 0x004775f0

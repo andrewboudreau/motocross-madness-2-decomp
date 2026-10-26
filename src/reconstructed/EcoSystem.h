@@ -82,7 +82,7 @@ struct UnknownEcoSphereShape {              // type 4
 class CollisionObject : public UnknownEcoQuadTreeObject, public GameObject {
 public:
     explicit CollisionObject(int flags);      // 0x00431e70
-    void Configure(void* a, int b, int c, int d);          // 0x004320f0
+    void Configure(void* context, int useBroadphase, int collisionEnabled, int collidable); // 0x004320f0
     void SetTriangleMeshHullShape(const Vector3* vertices, const int* indices, int triangleCount,
                                int vertexCount);                       // 0x004328b0: hull
     void SetSphereShape(Vector3 center, float radius);          // 0x004329a0: sphere

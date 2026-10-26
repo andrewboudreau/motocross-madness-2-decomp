@@ -23,7 +23,7 @@ int Vehicle::UnknownVirtualSlot42()
     return crashState == 0 && motionIndex >= 0 && motionActive;
 }
 
-void Vehicle::UnknownVirtualSlot50(int protect, float duration, int c)
+void Vehicle::UnknownVirtualSlot50(int protect, float duration, int forced)
 {
     spawnProtected = protect;
     spawnProtectTimer = duration;
@@ -44,7 +44,7 @@ Vec3* Vehicle::UnknownVirtualSlot55(Vec3* out, Vec3* pos)
 
 float Vehicle::UnknownVirtualSlot57() { return leanAngle; }
 float Vehicle::UnknownVirtualSlot59() { return steerState->maxAngle; }
-float Vehicle::UnknownVirtualSlot61(float arg) { return 0.0f; }
+float Vehicle::UnknownVirtualSlot61(float threshold) { return 0.0f; }
 
 int Vehicle::UnknownVirtualSlot62(float arg)
 {
