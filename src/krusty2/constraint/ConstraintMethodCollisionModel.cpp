@@ -13,7 +13,7 @@
 //   Structure of one step (UnknownVirtualSlot11 at 0x0043ba70, called every tick by slot 10):
 //     1. Save dt (+0xc0). If the model is active (+0xec) refresh the collision node
 //        (0x435fb0/0x435fe0); when the base reports an overlap (0x438e70) push the body
-//        back along the recorded contact normal by 1.005 (projection) and refresh again.
+//        back by the record's contact offset (+0x00) * 1.005 (projection) and refresh again.
 //     2. For every probe point (32-byte records, AddProbePoint 0x0043c7f0): transform the
 //        local point to world space, ask the ground query object (+0xe4, 0x507c10) for the
 //        surface height/normal below it. A probe whose world y is below the surface
@@ -28,7 +28,7 @@
 //        only matches with a literal.
 //   ApplyContactImpulse (0x0043bdb0) accumulates nothing across iterations; per call it
 //   computes  j = -(1+e) * (vA - vB).n / (1/mA + 1/mB + n.((Iinv (rA x n)) x rA) + ...),
-//   scales j by (1 - field_0xf4), clamps to maxImpulse (+0xf8, 0 = unlimited), updates ONLY body A's linear
+//   scales j by (1 - impulseLoss, +0xf4), clamps to maxImpulse (+0xf8, 0 = unlimited), updates ONLY body A's linear
 //   velocity (P' = m*v + j*n, damped by 1 - dt*damping) and angular momentum (L' = I*w + rA x J),
 //   and clamps the speed to maxSpeed (+0xfc). Body B (the other party, may be null) only
 //   contributes to the denominator and to the relative velocity (null -> zero vector 0x579830).
@@ -108,7 +108,8 @@ void ConstraintMethodCollisionModel::SetBody(ConBody* b, int useNodeModel, const
 // Slot 11 (0x0043ba70, ret 4; this == the subobject at +0xc): one solver step, see the overview
 // above.  Source shapes that retail's bytes require: the refresh and the overlap push-out are two
 // separate if statements (one block keeps the CollisionObject base pointer in ebx across both);
-// the loop's p, probeY and n are declared in the ground-query block, not in the loop body
+// the loop's surfacePoint, probeY and surfaceNormal are declared in the ground-query block,
+// not in the loop body
 // (in the loop body they share frame slots with the push-out's locals, giving a different
 // frame); the offset products carry redundant parentheses (docs/VC6_OPERAND_ORDER.md section 3),
 // without which VC6 schedules the argument copies of the ApplyContactImpulse call differently.
@@ -124,45 +125,45 @@ int ConstraintMethodCollisionModel::UnknownVirtualSlot11(float t)
         }
     }
     if (shapeCollisionEnabled && QueryCollisions()) {
-        const ConVec3* n = (const ConVec3*)contactRecord;
+        const ConVec3* contactOffset = (const ConVec3*)contactRecord;
         ConVec3 pos;
         reinterpret_cast<SoultreeObject*>(body->node)->GetPositionIn(
             0, reinterpret_cast<Vec3*>(&pos));
-        ConVec3 d;
-        d.x = n->x * 1.005f;
-        d.y = n->y * 1.005f;
-        d.z = n->z * 1.005f;
-        pos.x -= d.x;
-        pos.y -= d.y;
-        pos.z -= d.z;
+        ConVec3 push;
+        push.x = contactOffset->x * 1.005f;
+        push.y = contactOffset->y * 1.005f;
+        push.z = contactOffset->z * 1.005f;
+        pos.x -= push.x;
+        pos.y -= push.y;
+        pos.z -= push.z;
         reinterpret_cast<SoultreeObject*>(body->node)->SetPositionInFrame(
             0, reinterpret_cast<const Vec3*>(&pos));
         UpdatePlacement();
     }
     if (groundQuery) {
-        float maxPen = 0.0f;
+        float maxPenetration = 0.0f;
         int anyHit = 0;
         ConVec3 bestNormal;
         ConVec3 bestPoint;
-        ConVec3 p;
+        ConVec3 surfacePoint;
         float probeY;
-        ConVec3 n;
+        ConVec3 surfaceNormal;
         for (int i = 0; i < probeCount; i++) {
             // The probe stores a primary scene-node pointer. Its returned
             // xyz value remains alive through this assignment's full expression.
-            p = reinterpret_cast<const ConVec3&>(static_cast<const Vec3&>(
+            surfacePoint = reinterpret_cast<const ConVec3&>(static_cast<const Vec3&>(
                 reinterpret_cast<SoultreeObject*>(probes[i].node)->LocalToWorldPoint(
                     reinterpret_cast<const Vec3&>(probes[i].localPoint))));
-            probeY = p.y;
-            groundQuery->QueryPoint(&p, &n, 0, 0);
-            if (probeY < p.y) {
+            probeY = surfacePoint.y;
+            groundQuery->QueryPoint(&surfacePoint, &surfaceNormal, 0, 0);
+            if (probeY < surfacePoint.y) {
                 anyHit = 1;
                 probes[i].hit = 1;
-                float pen = p.y - probeY;
-                if (pen > maxPen) {
-                    maxPen = pen;
-                    bestNormal = n;
-                    bestPoint = p;
+                float penetration = surfacePoint.y - probeY;
+                if (penetration > maxPenetration) {
+                    maxPenetration = penetration;
+                    bestNormal = surfaceNormal;
+                    bestPoint = surfacePoint;
                 }
                 probes[i].normal = bestNormal;
             } else {
@@ -170,11 +171,11 @@ int ConstraintMethodCollisionModel::UnknownVirtualSlot11(float t)
             }
         }
         if (anyHit && applyImpulses) {
-            float d = -maxPen;
+            float negPenetration = -maxPenetration;
             ConVec3 offset;
-            offset.x = (bestNormal.x * d);
-            offset.y = (bestNormal.y * d);
-            offset.z = (bestNormal.z * d);
+            offset.x = (bestNormal.x * negPenetration);
+            offset.y = (bestNormal.y * negPenetration);
+            offset.z = (bestNormal.z * negPenetration);
             ApplyContactImpulse(0, 1.0f, offset, bestPoint, bestNormal);
             ConVec3 pos;
             reinterpret_cast<SoultreeObject*>(body->node)->GetPositionIn(
@@ -221,13 +222,14 @@ static const ConStaticVec3 g_ConZAxis = ConStaticVec3(0.0f, 0.0f, 1.0f);
 
 // ---- Contact callback (0x0043b800) ----------------------------------------------
 // Stored into field_0x88 by slot 8 (with 0x464e90 in field_0x8c). cdecl; self is the
-// constraint model, b the other collision object. The contact record at a->field_0x5c
-// holds three Vec3 (+0x00, +0x0c, +0x18) and a float (+0x24); tier 3 semantics.
+// constraint model, b the other collision object. The contact record at a->contactRecord
+// (+0x5c) is the CollisionSweepQuery of CollisionShapeTests.h viewed with a float fraction;
+// tier 3 semantics.
 struct ConContactRecord {
-    ConVec3 v0;       // +0x00
-    ConVec3 v0c;      // +0x0c (normal, passed as the last argument)
-    ConVec3 v18;      // +0x18
-    float t;          // +0x24 time fraction
+    ConVec3 contactOffset;  // +0x00 passed as ApplyContactImpulse's offset
+    ConVec3 contactNormal;  // +0x0c passed as the normal (last argument)
+    ConVec3 contact;        // +0x18 passed as the base point
+    float t;                // +0x24 time fraction
 };
 
 void ConstraintContactCallback(CollisionObject* self, CollisionObject* b)
@@ -235,7 +237,7 @@ void ConstraintContactCallback(CollisionObject* self, CollisionObject* b)
     ConstraintMethodCollisionModel* a = (ConstraintMethodCollisionModel*)self;
     ConContactRecord* rec = (ConContactRecord*)a->contactRecord;
     if (b->ownerType == 0x3ea)
-        a->ApplyContactImpulse(*(ConBody**)((char*)b + 0xc4), rec->t, rec->v0, rec->v18, rec->v0c);
+        a->ApplyContactImpulse(*(ConBody**)((char*)b + 0xc4), rec->t, rec->contactOffset, rec->contact, rec->contactNormal);
     else
-        a->ApplyContactImpulse(0, rec->t, rec->v0, rec->v18, rec->v0c);
+        a->ApplyContactImpulse(0, rec->t, rec->contactOffset, rec->contact, rec->contactNormal);
 }

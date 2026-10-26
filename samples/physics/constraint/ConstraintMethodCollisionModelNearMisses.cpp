@@ -93,16 +93,16 @@ static inline float ConDotGroupedY(const ConVec3& a, const ConVec3& b)
     return (a.x * b.x + (a.y * b.y)) + a.z * b.z;
 }
 
-// 0x0043bdb0 (ret 0x2c): impulse response of the body for one contact.  'a' is the
-// penetration offset, 'b' the surface point (the contact point is a + b), 'c' the contact
-// normal, 't' the time fraction used to interpolate the linear velocity, 'other' the other
-// body or null.  Decoded steps (instruction behaviour tier 1, names tier 3):
-//   vLin = prev + (vel - prev) * t; rA = (a + b) - centre of mass (world);
-//   vA = vLin + wA x rA;  vB = other ? vB + wB x rB : 0;  vn = (vA - vB) . c;
-//   j = -(1 + e) vn / (1/mA + ((I_A^-1 (rl x nl)) x rl) . nl + 1/mB + ((M_B (rB x c)) x rB) . c)
+// 0x0043bdb0 (ret 0x2c): impulse response of the body for one contact.  'offset' is
+// the penetration offset, 'point' the surface point (the contact point is point + offset),
+// 'normal' (n below) the contact normal, 't' the time fraction used to interpolate the
+// linear velocity, 'other' the other body or null.  Decoded steps (instruction behaviour tier 1, names tier 3):
+//   vLin = prev + (vel - prev) * t; rA = (point + offset) - centre of mass (world);
+//   vA = vLin + wA x rA;  vB = other ? vB + wB x rB : 0;  vn = (vA - vB) . n;
+//   j = -(1 + e) vn / (1/mA + ((I_A^-1 (rl x nl)) x rl) . nl + 1/mB + ((M_B (rB x n)) x rB) . n)
 //   (body A's term in its local frame, body B's in world with the translation row of B's
 //   inverse-inertia matrix), scaled by 1 - impulseLoss and clamped to maxImpulse;
-//   P = m vLin + j c; L = I w + rl x local(j c); v = P / m;
+//   P = m vLin + j n; L = I w + rl x local(j n); v = P / m;
 //   velocity = v (1 - dt damping), clamped to maxSpeed; w = I^-1 L (1 - dt damping).
 // The last statement forms v + w' x local(rA) and discards it (retail computes and drops it).
 // Retail recomputes local(J) twice into the same local and converts rA to the local frame in
@@ -114,8 +114,8 @@ static inline float ConDotGroupedY(const ConVec3& a, const ConVec3& b)
 // accumulate it in the cross product's y register as retail does (removes the extra
 // fstp st(2), the old 2-byte size gap; 1570 -> 2471), and vA's cross through ConCrossParen
 // moves the rl copy ahead of the subtractions (2471 -> 2499). What still differs:
-//  - the copy of the LocalToWorldPoint result is interleaved with the a + b adds differently
-//    (0x43beb4..0x43bf02);
+//  - the copy of the LocalToWorldPoint result is interleaved with the point + offset adds
+//    differently (0x43beb4..0x43bf02);
 //  - the rl copy's last two dwords and one fsubp of the wA x rA cross (0x43bff5);
 //  - one dword move against an fld in the 'other' path (0x43c1ce);
 //  - the `test edi, edi` of `if (other)`: retail issues it inside the termA rotation, three
@@ -139,19 +139,20 @@ static inline float ConDotGroupedY(const ConVec3& a, const ConVec3& b)
 // Also identical: termB's transform or either cross computed into float locals before the
 // result is filled (the store-schedule lever of docs/VC6_OPERAND_ORDER.md 1.3); with both
 // crosses and the transform in that form the inline budget runs out (ConScale is called).
-// Kept: b = b + a (a's components load first), vn = c . vRel, the zero vector copied as a
-// whole struct (needed for the frame: component copies put vB in the wrong slot).
+// Kept: point = point + offset (offset's components load first), vn = normal . vRel, the
+// zero vector copied as a whole struct (needed for the frame: component copies put vB in the
+// wrong slot).
 void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t,
-                                                         ConVec3 a, ConVec3 b, ConVec3 c)
+                                                         ConVec3 offset, ConVec3 point, ConVec3 normal)
 {
     ConVec3 wA = body->GetWorldAngularVelocity();
     ConVec3 vLin = ConAdd(ConScale(ConSub(body->velocity, body->prevVelocity), t), body->prevVelocity);
     ConVec3 rA = body->node->LocalToWorldPoint(body->centerOfMass);
-    b = ConAdd(b, a);
-    rA = ConDiff(b, rA);
-    contactPoint = b;
+    point = ConAdd(point, offset);
+    rA = ConDiff(point, rA);
+    contactPoint = point;
     ConVec3 rl = body->node->WorldToLocalDirection(rA);
-    ConVec3 nl = body->node->WorldToLocalDirection(c);
+    ConVec3 nl = body->node->WorldToLocalDirection(normal);
     ConVec3 vA = ConAdd(vLin, ConCrossParen(wA, rA));
     ConVec3 vB;
     ConVec3 rB;
@@ -161,11 +162,11 @@ void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t
         ConVec3 vbLin = other->velocity;
         ConVec3 wB = other->GetWorldAngularVelocity();
         other->node->GetPositionIn(0, &rB);
-        rB = ConDiff(b, rB);
+        rB = ConDiff(point, rB);
         vB = ConAdd(vbLin, ConCross(wB, rB));
     }
     ConVec3 vRel = ConDiff(vA, vB);
-    float num = -((restitution + 1.0f) * ConDot(c, vRel));
+    float num = -((restitution + 1.0f) * ConDot(normal, vRel));
 
     float invMassA = 1.0f / body->mass;
     ConVec3 axisA = ConRotate(ConCrossParen(rl, nl), body->invInertia);
@@ -174,15 +175,15 @@ void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t
     float termB = 0.0f;
     if (other) {
         invMassB = 1.0f / other->mass;
-        ConVec3 axisB = ConTransform(ConCross(rB, c), other->invInertia);
-        termB = ConDotGroupedY(ConCross(axisB, rB), c);
+        ConVec3 axisB = ConTransform(ConCross(rB, normal), other->invInertia);
+        termB = ConDotGroupedY(ConCross(axisB, rB), normal);
     }
     float j = num / (invMassA + termA + invMassB + termB);
     j *= 1.0f - impulseLoss;
     if (maxImpulse != 0 && j > maxImpulse)
         j = maxImpulse;
 
-    ConVec3 J = ConScale(c, j);
+    ConVec3 J = ConScale(normal, j);
     ConVec3 P = vLin * body->mass;
     ConVec3 L = RotateVector(body->angularVelocity, body->inertia);
     P += J;
