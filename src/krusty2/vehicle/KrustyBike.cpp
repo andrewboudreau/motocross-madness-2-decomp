@@ -222,8 +222,8 @@ void KrustyBike::UnknownVirtualSlot44()
 
 float KrustyBike::UnknownVirtualSlot45()
 {
-    KbRacer* r = reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent;
-    if (r && r->field_0xa8 == this)
+    KbRacer* tagRacer = reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent;
+    if (tagRacer && tagRacer->field_0xa8 == this)
         return 0.0f;
     return 3.0f;
 }
@@ -342,8 +342,8 @@ int KrustyBike::UnknownVirtualSlot83(VehicleWheel* wheel)
 int KrustyBike::UnknownVirtualSlot84(int control, int modifier)
 {
     if (!aiKind && !isRemote && !isGhost) {
-        KbSensor* s = race->chatOverlay;
-        if (!s || !s->typing) {
+        KbSensor* chat = race->chatOverlay;
+        if (!chat || !chat->typing) {
             Bike::UnknownVirtualSlot84(control, modifier);
             return inputMap->UnknownVirtualSlot2(control, modifier);
         }
@@ -409,9 +409,9 @@ void KrustyBike::UnknownVirtualSlot67()
 {
     Fn_00496DA0();
     for (int i = 0; i < collisionPointCount; i++) {
-        KbChild* c = ((KbChild**)collisionPoints)[i];
-        if (c->field_0x4)
-            c->field_0xa4 = 0;
+        KbChild* point = ((KbChild**)collisionPoints)[i];
+        if (point->field_0x4)
+            point->field_0xa4 = 0;
     }
     crashState = 0;
     crashTimer = 0;
@@ -478,8 +478,8 @@ void KrustyBike::UnknownVirtualSlot48()
 // halved; the wheel is then always updated.
 void KrustyBike::UnknownVirtualSlot86()
 {
-    BikeWheel* w = rearWheel;
-    if (!w->inContact)
+    BikeWheel* wheel = rearWheel;
+    if (!wheel->inContact)
         return;
     if (race->isRacing) {
         float ramp;
@@ -487,11 +487,11 @@ void KrustyBike::UnknownVirtualSlot86()
             ramp = (0.4762f - backUpPhase) * (360.0f / 0.3562f);
         else
             ramp = 0;
-        if (w->aux)
-            reinterpret_cast<UnknownEngineGearbox*>(w->aux)->DriveForce(
-                KbFloat(linearSpeed), reinterpret_cast<const Vector3*>(&w->rollDirection),
-                KbFloat(driveForceScale), backingUp, ramp, reinterpret_cast<Vector3*>(&w->driveForce),
-                &w->driveForceMagnitude);
+        if (wheel->aux)
+            reinterpret_cast<UnknownEngineGearbox*>(wheel->aux)->DriveForce(
+                KbFloat(linearSpeed), reinterpret_cast<const Vector3*>(&wheel->rollDirection),
+                KbFloat(driveForceScale), backingUp, ramp, reinterpret_cast<Vector3*>(&wheel->driveForce),
+                &wheel->driveForceMagnitude);
         if (reinterpret_cast<KbGame*>(g_TrackGame)->raceMode && !onTrack) {
             rearWheel->driveForce *= 0.5f;
             rearWheel->driveForceMagnitude *= 0.5f;
@@ -563,17 +563,19 @@ int KrustyBike::UnknownVirtualSlot28(int steps)
     lastCollisionType = 0;
     if (isGhost) return steps;
     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4) {
-        KbPlayer* p = reinterpret_cast<KbPlayer*>(reinterpret_cast<EventManager*>(
+        KbPlayer* raceMode = reinterpret_cast<KbPlayer*>(reinterpret_cast<EventManager*>(
             reinterpret_cast<KbGame*>(g_TrackGame)->eventManager)->FindRaceMode());
-        if (this != p->followedRacer && this == race->localRacer) {
-            Vehicle* v = p->followedRacer;
-            if (v) {
-                if (collisionObject->TestMeshBounds(v->collisionObject))
+        if (this != raceMode->followedRacer && this == race->localRacer) {
+            Vehicle* followed = raceMode->followedRacer;
+            if (followed) {
+                if (collisionObject->TestMeshBounds(followed->collisionObject))
                     Fn_004925A0(this, 1);
-            } else if (p->ball) {
-                if (collisionObject->TestMeshBounds(p->ball->collisionObject)) {
-                    if (reinterpret_cast<KbGame*>(g_TrackGame)->network->isHost) p->Fn_004A9E80(this, 0, 1);
-                    else Fn_004925A0(this, 1);
+            } else if (raceMode->ball) {
+                if (collisionObject->TestMeshBounds(raceMode->ball->collisionObject)) {
+                    if (reinterpret_cast<KbGame*>(g_TrackGame)->network->isHost)
+                        raceMode->Fn_004A9E80(this, 0, 1);
+                    else
+                        Fn_004925A0(this, 1);
                 }
             }
         }
@@ -799,14 +801,14 @@ void KrustyBike::UnknownVirtualSlot43()
     forceGatePass = 0;
     nextLapGate = 1;
     if (statusNode) {
-        KbRaceSub* p = race->raceTrack;
-        if (p) {
+        KbRaceSub* track = race->raceTrack;
+        if (track) {
             if (race->hasStartProbe) {
                 statusNode->progressPos.a = race->startProbeNode;
                 statusNode->progressPos.b = race->startProbeSegment;
                 statusNode->progressPos.c = race->startProbeT;
             } else {
-                statusNode->progressPos.a = (int)p->startNode;
+                statusNode->progressPos.a = (int)track->startNode;
                 statusNode->progressPos.b = race->raceTrack->startNode[2];
                 statusNode->progressPos.c = 0;
             }
@@ -1295,8 +1297,8 @@ void KrustyCollisionCallbackA(CollisionObject* self, CollisionObject* other)
     if ((bike->UnknownVirtualSlot51() || bike->hasFinished) && kind != 0x66 && kind != 0x6a)
         return;
     if (kind == 0x64) {
-        KrustyBike* o = (KrustyBike*)other->ownerObject;
-        if (o->UnknownVirtualSlot51() || o->hasFinished)
+        KrustyBike* otherBike = (KrustyBike*)other->ownerObject;
+        if (otherBike->UnknownVirtualSlot51() || otherBike->hasFinished)
             return;
     } else if (kind == 0x65) {
         return;
@@ -1345,25 +1347,26 @@ void KrustyCollisionCallbackB(CollisionObject* self, CollisionObject* other)
 KrustyBike* KrustyBike::FindNearestRival(float* outDistance)
 {
     int cursor = 0;
-    KrustyBike* b = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
-    while (b && b->outOfRace)
-        b = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
+    KrustyBike* candidate =
+        reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
+    while (candidate && candidate->outOfRace)
+        candidate = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
     KrustyBike* best = 0;
     float bestSq = 3.4028235e38f;
-    while (b) {
-        if (b != this) {
-            float dx = b->position.x - position.x;
-            float dz = b->position.z - position.z;
+    while (candidate) {
+        if (candidate != this) {
+            float dx = candidate->position.x - position.x;
+            float dz = candidate->position.z - position.z;
             float sq = dx * dx;
             sq += dz * dz;
             if (sq < bestSq) {
                 bestSq = sq;
-                best = b;
+                best = candidate;
             }
         }
-        b = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
-        while (b && b->outOfRace)
-            b = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
+        candidate = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
+        while (candidate && candidate->outOfRace)
+            candidate = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor));
     }
     if (outDistance)
         *outDistance = FastSqrt(bestSq);
@@ -1485,11 +1488,11 @@ int KrustyBike::Tick(float dt)
             Fn_00492AD0(dt, 0);
     }
     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4) {
-        KbPlayer* p = reinterpret_cast<KbPlayer*>(reinterpret_cast<EventManager*>(
+        KbPlayer* raceMode = reinterpret_cast<KbPlayer*>(reinterpret_cast<EventManager*>(
             reinterpret_cast<KbGame*>(g_TrackGame)->eventManager)->FindRaceMode());
-        if (p->ball && p->followedRacer == this && crashState) {
+        if (raceMode->ball && raceMode->followedRacer == this && crashState) {
             if (reinterpret_cast<KbGame*>(g_TrackGame)->network->isHost)
-                p->Fn_004A9E80(0, this, 1);
+                raceMode->Fn_004A9E80(0, this, 1);
             else
                 Fn_004925A0(0, 1);
         }
