@@ -26,7 +26,7 @@ Shock::Shock(void* node, int b, float a3, float a4, float a5, float a6, float a7
     atLimit = 0;
     extending = 0;
     prevLength = 0.0f;
-    field_0x90 = 0.0f;
+    clearedLength = 0.0f;
     length = 0.0f;
     ratio = 0.0f;
     speedThreshold = a6;
@@ -34,7 +34,7 @@ Shock::Shock(void* node, int b, float a3, float a4, float a5, float a6, float a7
     spring = kShockZero;
     damper = kShockZero;
     displacement = kShockZero;
-    field_0x80 = kShockZero;
+    stepDisplacement = kShockZero;
     velocity = kShockZero;
     speed = 0.0f;
     field_0x94 = 0;
@@ -52,12 +52,12 @@ void Shock::Reset()
     spring = kShockZero;
     damper = kShockZero;
     displacement = kShockZero;
-    field_0x80 = kShockZero;
+    stepDisplacement = kShockZero;
     velocity = kShockZero;
     speed = 0.0f;
     extending = 0;
     prevLength = 0.0f;
-    field_0x90 = 0.0f;
+    clearedLength = 0.0f;
     field_0x94 = 0;
 }
 
@@ -66,11 +66,11 @@ void Shock::ClearForces()
     atLimit = 0;
     spring = kShockZero;
     damper = kShockZero;
-    field_0x90 = length;
+    clearedLength = length;
     extending = 0;
     speed = 0.0f;
     displacement = kShockZero;
-    field_0x80 = kShockZero;
+    stepDisplacement = kShockZero;
     velocity = kShockZero;
 }
 
@@ -138,10 +138,10 @@ void InlineShock::ClampAndStep(float maxDelta, float dt, ShockVec3& pos)
             float t = (delta > -maxDelta) ? delta : -maxDelta;
             velocity = displacement * (t / (dt * length));
         }
-        field_0x80 = displacement * -(delta / length);
+        stepDisplacement = displacement * -(delta / length);
     } else {
         velocity = kShockZero;
-        field_0x80 = kShockZero;
+        stepDisplacement = kShockZero;
     }
     extending = (length > prevLength);
     prevLength = length;
@@ -214,7 +214,7 @@ void InlineShock::SolveContact(float dt, const ShockVec3* offset, const ShockVec
         *outActive = 0;
         return;
     }
-    float load = ShockDot(field_0x80, *normal);
+    float load = ShockDot(stepDisplacement, *normal);
     *outLoad = limit - load;
     *outActive = 1;
 }
@@ -314,10 +314,10 @@ void RotatingShock::ClampAndStep(float maxDelta, float dt)
             float t = (delta > -maxDelta) ? delta : -maxDelta;
             velocity = displacement * (t / (dt * length));
         }
-        field_0x80 = displacement * -(delta / length);
+        stepDisplacement = displacement * -(delta / length);
     } else {
         velocity = kShockZero;
-        field_0x80 = kShockZero;
+        stepDisplacement = kShockZero;
     }
     extending = (length > prevLength);
     prevLength = length;
@@ -364,7 +364,7 @@ void RotatingShock::SolveContact(float dt, const ShockVec3* axisA, const ShockVe
         t = 0.0f;
         miss = 1;
     }
-    length = field_0x90 - t * armLength;
+    length = clearedLength - t * armLength;
     displacement = ShockScaleCall(r, (-length) / armLength);
     speed = ShockLength(ShockProject(ShockAddCall(*offsetA, *offsetB), displacement));
     ClampAndStep(speed * dt, dt);
@@ -373,6 +373,6 @@ void RotatingShock::SolveContact(float dt, const ShockVec3* axisA, const ShockVe
         *outActive = 0;
         return;
     }
-    *outLoad = limit - ShockDotCall(*normal, field_0x80);
+    *outLoad = limit - ShockDotCall(*normal, stepDisplacement);
     *outActive = 1;
 }

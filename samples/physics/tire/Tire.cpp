@@ -1160,7 +1160,7 @@ static inline void TireAddIn(CollisionVec3& w, const CollisionVec3& d)
 // component-wise in the body (attachment x loaded first, as retail); the
 // rotating path adds it through TireAddIn, after which the contact's x loads
 // first like retail (793 -> 797). Written in the body (`+=`, `w = w + d`,
-// `w = d + w`, the hinge local, a reference or copy of field_0x80, a reference
+// `w = d + w`, the hinge local, a reference or copy of stepDisplacement, a reference
 // to worldPosition) the attachment's x loads first; TireAddIn in the inline
 // path as well costs 8 differing lines.
 void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offset,
@@ -1179,9 +1179,9 @@ void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offse
                 if (active || crashed)
                     CollisionPoint::inContact = 1;
                 CollisionPoint::penetration = load;
-                CollisionPoint::worldPosition.x += field_0x2b0->field_0x80.x;
-                CollisionPoint::worldPosition.y += field_0x2b0->field_0x80.y;
-                CollisionPoint::worldPosition.z += field_0x2b0->field_0x80.z;
+                CollisionPoint::worldPosition.x += field_0x2b0->stepDisplacement.x;
+                CollisionPoint::worldPosition.y += field_0x2b0->stepDisplacement.y;
+                CollisionPoint::worldPosition.z += field_0x2b0->stepDisplacement.z;
                 if (active)
                     CollisionPoint::surfacePosition = TireSum(TireTimes(load, CollisionPoint::surfaceNormal), CollisionPoint::worldPosition);
                 else
@@ -1203,7 +1203,7 @@ void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offse
                 if (active || crashed)
                     CollisionPoint::inContact = 1;
                 CollisionPoint::penetration = load;
-                TireAddIn(CollisionPoint::worldPosition, field_0x2ac->field_0x80);
+                TireAddIn(CollisionPoint::worldPosition, field_0x2ac->stepDisplacement);
                 if (active)
                     CollisionPoint::surfacePosition = TireSum(TireTimes(load, CollisionPoint::surfaceNormal), CollisionPoint::worldPosition);
                 else

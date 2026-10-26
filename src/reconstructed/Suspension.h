@@ -85,9 +85,10 @@ public:
     ShockVec3 damper;                // +0x64
     float ratio;                     // +0x70
     ShockVec3 displacement;          // +0x74
-    ShockVec3 field_0x80;            // +0x80
+    ShockVec3 stepDisplacement;      // +0x80 ClampAndStep: displacement * (length - prevLength) / length, zero at length 0;
+                                     //       SolveContact's load subtracts its normal component, Tire::UpdateShock adds it to the contact
     float prevLength;                // +0x8c
-    float field_0x90;                // +0x90
+    float clearedLength;             // +0x90 ClearForces copies length here (ctor/Reset 0); RotatingShock::SolveContact measures from it
     int field_0x94;                  // +0x94
     float length;                    // +0x98
     float stiffnessMin;              // +0x9c

@@ -19,7 +19,7 @@ public:
     char field_0x58[0x70 - 0x58];
     float ratio;                         // +0x70
     char field_0x74[0x80 - 0x74];
-    CollisionVec3 field_0x80;            // +0x80
+    CollisionVec3 stepDisplacement;      // +0x80 Shock::stepDisplacement
     char field_0x8c[0x98 - 0x8c];
     float position;                      // +0x98
     char field_0x9c[0xc0 - 0x9c];
@@ -40,7 +40,7 @@ public:
     char field_0x58[0x70 - 0x58];
     float ratio;                         // +0x70
     char field_0x74[0x80 - 0x74];
-    CollisionVec3 field_0x80;            // +0x80
+    CollisionVec3 stepDisplacement;      // +0x80 Shock::stepDisplacement
     char field_0x8c[0x98 - 0x8c];
     float position;                      // +0x98
     char field_0x9c[0xc8 - 0x9c];
