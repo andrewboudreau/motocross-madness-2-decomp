@@ -964,8 +964,9 @@ void Vehicle::UnknownVirtualSlot49(float frame)
     pointsTouching = 0;
     respawn = UnknownVirtualSlot39(frame);
     if (!respawn && !crashState && steps != 1) {
-        VehContactsA(UnknownVirtualSlot5(0), &touchingPointCount, collisionPointCount, ((VehicleContact**)collisionPoints), terrain,
-                     &centerOfMass, collisionShape, collisionRadius);
+        VehContactsA(UnknownVirtualSlot5(0), &touchingPointCount, collisionPointCount,
+                     ((VehicleContact**)collisionPoints), terrain, &centerOfMass, collisionShape,
+                     collisionRadius);
         pointsTouching = touchingPointCount > 0;
     }
     justLanded = 0;
@@ -1016,8 +1017,9 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         Vec3 savedOut;
         Vec3 basis = *UnknownVirtualSlot55(&savedOut, &pivot);
         UnknownVirtualSlot56(&basis, 1, 0);
-        res = VehContactsA(crashState || (steps == 1 && UnknownVirtualSlot5(0)), &touchingPointCount, collisionPointCount, ((VehicleContact**)collisionPoints),
-                           terrain, &centerOfMass, collisionShape, collisionRadius);
+        res = VehContactsA(crashState || (steps == 1 && UnknownVirtualSlot5(0)), &touchingPointCount,
+                           collisionPointCount, ((VehicleContact**)collisionPoints), terrain,
+                           &centerOfMass, collisionShape, collisionRadius);
         if (res)
             pointsTouching = touchingPointCount > 0;
         UpdateWheelsInContact();

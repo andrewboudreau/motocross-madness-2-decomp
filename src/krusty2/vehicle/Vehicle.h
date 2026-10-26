@@ -49,10 +49,12 @@ extern Vec3 g_VehZeroVec3_005778c8;
 // ../contact/ContactImpulse.h.
 struct VehicleContact;
 // 0x0043ad80 / 0x0043aa30 / 0x0043aff0: contact-array helpers used by slot 49 (provisional).
-extern int  __cdecl VehContactsA(int a, int* count, int n, VehicleContact** arr, SoultreeProbe* b, Vec3* pos, int c, float d);
-extern void __cdecl VehContactsB(int n, VehicleContact** arr, Vec3* scale, Vec3* p, Vec3* v,
-                                 Vec3* pos18, Vec3* pos0c, Vec3* outArm, Vec3* outNormal,
-                                 Vec3* outVel);
+// Parameter names follow SoultreeRefreshContacts / SoultreeMergeContacts (SoulTreePhysics.cpp).
+extern int  __cdecl VehContactsA(int enabled, int* activeCount, int count, VehicleContact** contacts,
+                                 SoultreeProbe* terrain, Vec3* center, int mode, float radius);
+extern void __cdecl VehContactsB(int count, VehicleContact** contacts, Vec3* scale, Vec3* angVel,
+                                 Vec3* vel, Vec3* center, Vec3* pos, Vec3* outArm,
+                                 Vec3* outNormal, Vec3* outVel);
 extern void __cdecl VehContactsC(int n, VehicleContact** arr);
 extern void __cdecl VehBasisToBlock(Vec3 a, Vec3 b, float* p0, float* p1, float* p2,
                                     float* p3, float* p4, float* p5, float* p6);

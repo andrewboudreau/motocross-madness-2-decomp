@@ -485,11 +485,11 @@ void CollisionObject::SetMeshShape(int count, void* points)
 }
 
 // 0x00432120: toggles useBroadphase; the object is only in the quadtree while it is set.
-void CollisionObject::SetUseBroadphase(int a)
+void CollisionObject::SetUseBroadphase(int requested)
 {
     if (g_collisionQuadTree) {
         int wasSet = useBroadphase;
-        int enable = a;
+        int enable = requested;
         if (wasSet) {
             if (!enable) {
                 g_collisionQuadTree->Remove(this, quadtreeCell);
@@ -502,7 +502,7 @@ void CollisionObject::SetUseBroadphase(int a)
         }
         useBroadphase = enable;
     } else {
-        useBroadphase = a;
+        useBroadphase = requested;
     }
 }
 

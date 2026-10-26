@@ -19,9 +19,10 @@ extern "C++" {
 
 // TU-local solver helper (cdecl), 0x00500220 (12 args).  0x005004a0 is declared in
 // ../contact/ContactImpulse.h and 0x004b0df0 in ../contact/ObjectPlacement.h.
-void ResolveContactImpulse(float a, float b, SoultreeObject* node, const Vec3* a1, const Vec3* a2,
-               const Vec3* a3, Vec3* e4, const Vec3* a4, Vec3* d8,
-               Vec3* v64, float* a7, int a6);
+void ResolveContactImpulse(float restitution, float invMass, SoultreeObject* node,
+                           const Vec3* normal, const Vec3* relVel, const Vec3* arm,
+                           Vec3* invInertia, const Vec3* angScale, Vec3* angVel,
+                           Vec3* velocity, float* impulseOut, int scaleBits);
 
 
 // 0x005015b0 is Vec3ScaleCall (../common/Math3D.h out-of-line call views).
