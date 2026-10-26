@@ -7,7 +7,7 @@
 // the path evaluation. The key search loops, the Hermite weights call (its
 // fourth weight written over the `time` parameter, as retail's
 // `lea ecx,[esp+0x60]` shows), the tangent temporaries and the final
-// h0*a + h1*b + t0*h2 + t1*h3 sum order match. Retail inlines all fourteen
+// h0*fromKey + h1*toKey + t0*h2 + t1*h3 sum order match. Retail inlines all fourteen
 // vector operators; written with operators throughout, VC6 runs out of
 // inline budget (docs/PHYSICS_VALIDATION.md) and calls the Vector3
 // constructor and operator+ out of line. With the chord written per
@@ -110,27 +110,27 @@ Vector3 CarProcedural::PositionAtTime(float time)
         HermiteWeights((t - keys[currentPathKey].time) / (keys[next].time - keys[currentPathKey].time),
                        &h0, &h1, &h2, &time);
 
-        CarProceduralKey* a = &pathKeys[currentPathKey];
-        CarProceduralKey* b = &pathKeys[next];
+        CarProceduralKey* fromKey = &pathKeys[currentPathKey];
+        CarProceduralKey* toKey = &pathKeys[next];
         Vector3 chord;
-        chord.x = b->position.x - a->position.x;
-        chord.y = b->position.y - a->position.y;
-        chord.z = b->position.z - a->position.z;
+        chord.x = toKey->position.x - fromKey->position.x;
+        chord.y = toKey->position.y - fromKey->position.y;
+        chord.z = toKey->position.z - fromKey->position.z;
         Vector3 t0;
         if (currentPathKey == 0) {
             t0 = chord;
         } else {
-            float s = (b->time - a->time) / (b->time - a[-1].time);
-            t0 = ((a->position - a[-1].position) + chord) * s;
+            float spacing = (toKey->time - fromKey->time) / (toKey->time - fromKey[-1].time);
+            t0 = ((fromKey->position - fromKey[-1].position) + chord) * spacing;
         }
         Vector3 t1;
         if (next == pathKeyCount - 1) {
             t1 = chord;
         } else {
-            float s = (b->time - a->time) / (b[1].time - a->time);
-            t1 = ((b[1].position - b->position) + chord) * s;
+            float spacing = (toKey->time - fromKey->time) / (toKey[1].time - fromKey->time);
+            t1 = ((toKey[1].position - toKey->position) + chord) * spacing;
         }
-        return h0 * a->position + h1 * b->position + t0 * h2 + t1 * time;
+        return h0 * fromKey->position + h1 * toKey->position + t0 * h2 + t1 * time;
     }
     return kVec3Zero;
 }
