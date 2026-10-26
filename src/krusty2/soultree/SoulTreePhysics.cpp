@@ -763,45 +763,49 @@ extern int g_SoultreeInstanceCounter;      // 0x00689f14: cycles 0..5 (field_0x2
 
 // cdecl 0x004b5a60 is OrientationAnglesFromVectors (../common/Math3D.h).
 
-// Initializer (tier 3 reading): stores the construction parameters (a3 position, a4 forward,
-// a5 up, a8 mass, a9/a10 contact and attachment capacities, a16/a17 sphere radius or box
-// inertia mode, ...), allocates the contact pointer array and attachment records, derives the
-// inverse inertia diagonal (sphere: 1/(0.4 m r^2), otherwise a box from the node extents with
-// m/12 (h^2 + d^2)), builds the collision body (a20) and orientation matrix, and optionally
-// creates a child node (a2).  Returns the GameObject virtual base (`this ? vbase : 0`).
-GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, Vec3 a3,
-                                                           Vec3 a4, Vec3 a5,
-                                                           void* a6, void* a7, float a8, int a9,
-                                                           int a10, SoultreeSlot1f0* a11, float a12,
-                                                           int a13, float a14, float a15, float a16,
-                                                           int a17, int a18, unsigned char a19,
-                                                           int a20)
+// Initializer (tier 3 reading): stores the construction parameters (start position, forward
+// and up, weight, contact and attachment capacities, sphere radius or box inertia mode, ...),
+// allocates the contact pointer array and attachment records, derives the inverse inertia
+// diagonal (sphere: 1/(0.4 m r^2), otherwise a box from the node extents with
+// m/12 (h^2 + d^2)), builds the collision body (createCollision) and orientation matrix, and
+// optionally creates a child node (createCenterNode).  Returns the GameObject virtual base (`this ? vbase : 0`).
+GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int renderContext, int createCenterNode,
+                                                           Vec3 startPosition, Vec3 startForward,
+                                                           Vec3 startUp, void* terrainProbe,
+                                                           void* linkedObject, float weight,
+                                                           int contactCapacity, int attachmentSlots,
+                                                           SoultreeSlot1f0* trackObject,
+                                                           float fixedStep, int maxSteps, float drag,
+                                                           float elasticity, float radius,
+                                                           int shapeMode, int restThreshold,
+                                                           unsigned char probeMask,
+                                                           int createCollision)
 {
-    restContactThreshold = a18;
-    field_0x124 = (GameObject*)a7;
-    terrain = (SoultreeProbe*)a6;
-    baseWeight = a8;
-    track = a11;
-    fixedStepTime = a12;
-    maxStepsPerFrame = a13;
-    dragCoefficient = a14;
-    restitution = a15;
-    collisionShape = a17;
-    collisionRadius = a16;
-    respawnPosition = a3;
-    respawnHeading = a4;
-    groundProbeMask = a19;
-    if (a6)
-        terrainScale = ((SoultreeProbe*)a6)->worldScale;
-    collisionPointCapacity = a9;
-    if (a9 > 0) {
-        collisionPoints = new(SP_FILE, 0x202) SoultreeContact*[a9];
+    restContactThreshold = restThreshold;
+    field_0x124 = (GameObject*)linkedObject;
+    terrain = (SoultreeProbe*)terrainProbe;
+    baseWeight = weight;
+    track = trackObject;
+    fixedStepTime = fixedStep;
+    maxStepsPerFrame = maxSteps;
+    dragCoefficient = drag;
+    restitution = elasticity;
+    collisionShape = shapeMode;
+    collisionRadius = radius;
+    respawnPosition = startPosition;
+    respawnHeading = startForward;
+    groundProbeMask = probeMask;
+    if (terrainProbe)
+        terrainScale = ((SoultreeProbe*)terrainProbe)->worldScale;
+    collisionPointCapacity = contactCapacity;
+    if (contactCapacity > 0) {
+        collisionPoints = new(SP_FILE, 0x202) SoultreeContact*[contactCapacity];
         for (int i = 0; i < collisionPointCapacity; i++)
             collisionPoints[i] = 0;
     }
-    attachmentCapacity = a10;
-    if (a10 > 0)
-        attachments = new(SP_FILE, 0x20d) SoultreeAttachment[a10];
+    attachmentCapacity = attachmentSlots;
+    if (attachmentSlots > 0)
+        attachments = new(SP_FILE, 0x20d) SoultreeAttachment[attachmentSlots];
     staggerPhase = g_SoultreeInstanceCounter;
     staggerCounter = 0;
     if (++g_SoultreeInstanceCounter > 5)
@@ -823,11 +827,11 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, Vec3 
     memset(ident, 0, sizeof(ident));
     ident[0] = ident[4] = ident[8] = 1.0f;
     // Inverse inertia diagonal (tier 3 names; the formulas are decoded).  Sphere mode
-    // (a17 == 1): I = 0.4 * m * r^2 (solid sphere), stored as 1/I on all three axes.  Otherwise a
+    // (shapeMode == 1): I = 0.4 * m * r^2 (solid sphere), stored as 1/I on all three axes.  Otherwise a
     // solid box of full sizes (sx,sy,sz) = 2 * extents: I_x = m/12 * (sy^2 + sz^2), etc.
     if (inertia) {
-        if (a17 == 1) {
-            float inv = 1.0f / ((mass * 0.4f) * (a16 * a16));
+        if (shapeMode == 1) {
+            float inv = 1.0f / ((mass * 0.4f) * (radius * radius));
             inertia->x = inv;
             inertia->y = inv;
             inertia->z = inv;
@@ -848,18 +852,18 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, Vec3 
     invInertia = shapeInvInertia;
 
     int prevTag = g_MemTagStack->Push("Collision");
-    if (a20) {
+    if (createCollision) {
         collisionObject = new(SP_FILE, 0x245) CollisionObject(1);
         InstallCollisionCallbacks();
-        collisionObject->Configure((void*)a1, 0, 1, 1);
+        collisionObject->Configure((void*)renderContext, 0, 1, 1);
     } else {
         collisionObject = 0;
     }
     g_MemTagStack->Pop(prevTag);
 
-    bodyForward = a4;
-    bodyUp = a5;
-    sceneNode->SetPosition(a3.x, a3.y, a3.z);
+    bodyForward = startForward;
+    bodyUp = startUp;
+    sceneNode->SetPosition(startPosition.x, startPosition.y, startPosition.z);
     sceneNode->GetPosition(&position);
     UnknownVirtualSlot35(1, 0);
     UnknownVirtualSlot34();
@@ -874,7 +878,7 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, Vec3 
     savedCosRoll = bodyCosRoll;
     savedCosPitch = bodyCosPitch;
     savedSinPitch = bodySinPitch;
-    if (a2) {
+    if (createCenterNode) {
         centerNode = new(SP_FILE, 0x266) SoultreeObject(1);
         sceneNode->AddChild(centerNode);
         centerNode->SetPosition(center);

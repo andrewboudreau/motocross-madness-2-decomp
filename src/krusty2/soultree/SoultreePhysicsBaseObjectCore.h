@@ -56,26 +56,33 @@ public:
     // Slot 2 (0x00500c50): `ret 0x68` = 26 argument dwords (tier 1).  Grouping and types
     // are tier 2, from the body's stores and the struct-copy shape at both callers
     // (SoultreePhysicsCharacter slot 40 0x00503de0, SoultreePhysicsObject slot 40 0x00503970):
-    //   a1 -> collisionObject->Configure(a1, 0, 1, 1) after the CollisionObject is created
-    //   a2 != 0: new node (0x1a4 bytes, ctor 0x004fb2b0(1)) stored in centerNode
-    //   a3 -> respawnPosition and the node position (sceneNode->SetPosition(a3.x, a3.y, a3.z))
-    //   a4 -> respawnHeading and bodyForward;  a5 -> bodyUp
-    //   a6 -> terrain (pointer: if non-null, its float at +0x40 goes to terrainScale)
-    //   a7 -> field_0x124;  a8 -> baseWeight
-    //   a9 -> collisionPointCapacity (count; collisionPoints = zeroed array of a9 dwords)
-    //   a10 -> attachmentCapacity (count; attachments = a10 records of 40 bytes)
-    //   a11 -> track;  a12 -> fixedStepTime;  a13 -> maxStepsPerFrame
-    //   a14 -> dragCoefficient;  a15 -> restitution
-    //   a16 -> collisionRadius (squared as the radius when a17 == 1: 1/(0.4*m*r*r))
-    //   a17 -> collisionShape (1 = sphere inertia, else box from the node extents)
-    //   a18 -> restContactThreshold;  a19 -> byte groundProbeMask
-    //   a20 != 0: new CollisionObject (0xb8 bytes, ctor 0x00431e70(1)) stored in collisionObject
+    //   renderContext (a1) -> collisionObject->Configure(renderContext, 0, 1, 1) after the
+    //       CollisionObject is created
+    //   createCenterNode (a2) != 0: new node (0x1a4 bytes, ctor 0x004fb2b0(1)) in centerNode
+    //   startPosition (a3) -> respawnPosition and the node position (sceneNode->SetPosition)
+    //   startForward (a4) -> respawnHeading and bodyForward;  startUp (a5) -> bodyUp
+    //   terrainProbe (a6) -> terrain (if non-null, its float at +0x40 goes to terrainScale)
+    //   linkedObject (a7) -> field_0x124;  weight (a8) -> baseWeight
+    //   contactCapacity (a9) -> collisionPointCapacity (collisionPoints = zeroed array of it)
+    //   attachmentSlots (a10) -> attachmentCapacity (attachments = records of 40 bytes)
+    //   trackObject (a11) -> track;  fixedStep (a12) -> fixedStepTime;
+    //   maxSteps (a13) -> maxStepsPerFrame
+    //   drag (a14) -> dragCoefficient;  elasticity (a15) -> restitution
+    //   radius (a16) -> collisionRadius (squared in the inertia when shapeMode == 1:
+    //       1/(0.4*m*r*r))
+    //   shapeMode (a17) -> collisionShape (1 = sphere inertia, else box from the node extents)
+    //   restThreshold (a18) -> restContactThreshold;  probeMask (a19) -> byte groundProbeMask
+    //   createCollision (a20) != 0: new CollisionObject (0xb8 bytes, ctor 0x00431e70(1))
+    //       stored in collisionObject
     // Returns the GameObject virtual base (`this ? vbase : 0` at 0x005011f0).
-    virtual GameObject* UnknownVirtualSlot2(int a1, int a2, Vec3 a3, Vec3 a4,
-                                            Vec3 a5, void* a6, void* a7, float a8,
-                                            int a9, int a10, SoultreeSlot1f0* a11, float a12,
-                                            int a13, float a14, float a15, float a16, int a17,
-                                            int a18, unsigned char a19, int a20);
+    virtual GameObject* UnknownVirtualSlot2(int renderContext, int createCenterNode,
+                                            Vec3 startPosition, Vec3 startForward, Vec3 startUp,
+                                            void* terrainProbe, void* linkedObject, float weight,
+                                            int contactCapacity, int attachmentSlots,
+                                            SoultreeSlot1f0* trackObject, float fixedStep,
+                                            int maxSteps, float drag, float elasticity,
+                                            float radius, int shapeMode, int restThreshold,
+                                            unsigned char probeMask, int createCollision);
     // Slot 3 (ret 0x1c), static-contact impulse.  Pointer types are tier 2: Vehicle callers
     // (slots 38, 49) pass Vec3 addresses for normal..angScale; eventKind is the event code
     // KrustyBike 0x0048dbf0 compares with 1000 and 0x67.  impulseOut is the address of the
