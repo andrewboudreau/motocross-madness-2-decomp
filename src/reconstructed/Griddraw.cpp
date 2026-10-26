@@ -347,33 +347,33 @@ int DrawableGridNode::RebuildWholeNodeBuffers()
     int closed;
     int before = data->triangleCount;
     int n;
-    int m;
+    int halfStart;
     terrain->bufferRebuilds++;
     g_gridOriginX = 0;
     g_gridOriginZ = 0;
     g_gridVertexCache.Reset(this);
     if ((childIndex & 0x11) != 0x11 && (childIndex & 0x11) != 0) {
         n = 0;
-        m = n;
+        halfStart = n;
         n = EmitDiagonalTriangles(8, n, 0, 0, 8, 8, &closed);
-        if (n == m && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
+        if (n == halfStart && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
             ((DrawableGridNode*)parent)->extra->texture == 0)
             n = AppendCornerTriangle(n, 0, 0, 16, 16);
-        m = n;
+        halfStart = n;
         n = EmitDiagonalTriangles(8, n, 16, 16, -8, -8, &closed);
-        if (n == m && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
+        if (n == halfStart && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
             ((DrawableGridNode*)parent)->extra->texture == 0)
             n = AppendCornerTriangle(n, 16, 16, -16, -16);
     } else {
         n = 0;
-        m = n;
+        halfStart = n;
         n = EmitDiagonalTriangles(8, n, 0, 16, 8, -8, &closed);
-        if (n == m && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
+        if (n == halfStart && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
             ((DrawableGridNode*)parent)->extra->texture == 0)
             n = AppendCornerTriangle(n, 0, 16, 16, -16);
-        m = n;
+        halfStart = n;
         n = EmitDiagonalTriangles(8, n, 16, 0, -8, 8, &closed);
-        if (n == m && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
+        if (n == halfStart && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
             ((DrawableGridNode*)parent)->extra->texture == 0)
             n = AppendCornerTriangle(n, 16, 0, -16, 16);
     }
@@ -439,8 +439,8 @@ int DrawableGridNode::RebuildWholeNodeBuffers()
 // vertex (x + dx, z + dz) is in use.
 int DrawableGridNode::EmitDiagonalTriangles(int level, int n, int x, int z, int dx, int dz, int* closed)
 {
-    int a;
-    int b;
+    int firstClosed;
+    int secondClosed;
     level--;
     x += dx;
     z += dz;
@@ -449,23 +449,23 @@ int DrawableGridNode::EmitDiagonalTriangles(int level, int n, int x, int z, int 
         return n;
     }
     if (level != 0) {
-        n = EmitEdgeTriangles(level, n, x, z, -dx, 0, &a);
-        n = EmitEdgeTriangles(level, n, x, z, 0, -dz, &b);
+        n = EmitEdgeTriangles(level, n, x, z, -dx, 0, &firstClosed);
+        n = EmitEdgeTriangles(level, n, x, z, 0, -dz, &secondClosed);
     } else {
         if (children) {
             *closed = 1;
             return n;
         }
-        a = b = 0;
+        firstClosed = secondClosed = 0;
     }
-    if (!a) {
+    if (!firstClosed) {
         int k = n * 3;
         g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
         g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x - dx, z - dx);
         g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x - dx, z + dx);
         n++;
     }
-    if (!b) {
+    if (!secondClosed) {
         int k = n * 3;
         g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
         g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x + dz, z - dz);
@@ -482,45 +482,45 @@ void DrawableGridNode::EmitLeafEdgeFan(int x, int z, int dx, int dz, int n)
 {
     int k = n * 3;
     int i = g_gridRow17[z] + x;
-    int f;
+    int shift;
     if (dx == 0) {
         if (dz == 1) {
-            f = block->cells[i - 18].field_0x7_b0 && (data->vertexFlags[i - 18] & 0x80);
+            shift = block->cells[i - 18].field_0x7_b0 && (data->vertexFlags[i - 18] & 0x80);
             g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x, z - 1);
-            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x - 1, z - f);
-            f = (1 - block->cells[i - 17].field_0x7_b0) && (data->vertexFlags[i - 16] & 0x80);
+            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x - 1, z - shift);
+            shift = (1 - block->cells[i - 17].field_0x7_b0) && (data->vertexFlags[i - 16] & 0x80);
             g_gridIndices[k + 3] = g_gridVertexCache.GetVertex(x, z);
-            g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x + 1, z - f);
+            g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x + 1, z - shift);
             g_gridIndices[k + 5] = g_gridVertexCache.GetVertex(x, z - 1);
         } else {
-            f = block->cells[i].field_0x7_b0 && (data->vertexFlags[i + 18] & 0x80);
+            shift = block->cells[i].field_0x7_b0 && (data->vertexFlags[i + 18] & 0x80);
             g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x, z + 1);
-            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x + 1, z + f);
-            f = (1 - block->cells[i - 1].field_0x7_b0) && (data->vertexFlags[i + 16] & 0x80);
+            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x + 1, z + shift);
+            shift = (1 - block->cells[i - 1].field_0x7_b0) && (data->vertexFlags[i + 16] & 0x80);
             g_gridIndices[k + 3] = g_gridVertexCache.GetVertex(x, z);
-            g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x - 1, z + f);
+            g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x - 1, z + shift);
             g_gridIndices[k + 5] = g_gridVertexCache.GetVertex(x, z + 1);
         }
     } else {
         if (dx == 1) {
-            f = block->cells[i - 18].field_0x7_b0 && (data->vertexFlags[i - 18] & 0x80);
+            shift = block->cells[i - 18].field_0x7_b0 && (data->vertexFlags[i - 18] & 0x80);
             g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x, z - 1);
-            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x - 1, z - f);
-            f = (1 - block->cells[i - 1].field_0x7_b0) && (data->vertexFlags[i + 16] & 0x80);
+            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x - 1, z - shift);
+            shift = (1 - block->cells[i - 1].field_0x7_b0) && (data->vertexFlags[i + 16] & 0x80);
             g_gridIndices[k + 3] = g_gridVertexCache.GetVertex(x, z);
-            g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x - 1, z + f);
+            g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x - 1, z + shift);
             g_gridIndices[k + 5] = g_gridVertexCache.GetVertex(x, z + 1);
         } else {
-            f = block->cells[i].field_0x7_b0 && (data->vertexFlags[i + 18] & 0x80);
+            shift = block->cells[i].field_0x7_b0 && (data->vertexFlags[i + 18] & 0x80);
             g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x, z + 1);
-            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x + 1, z + f);
-            f = (1 - block->cells[i - 17].field_0x7_b0) && (data->vertexFlags[i - 16] & 0x80);
+            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x + 1, z + shift);
+            shift = (1 - block->cells[i - 17].field_0x7_b0) && (data->vertexFlags[i - 16] & 0x80);
             g_gridIndices[k + 3] = g_gridVertexCache.GetVertex(x, z);
-            g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x + 1, z - f);
+            g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x + 1, z - shift);
             g_gridIndices[k + 5] = g_gridVertexCache.GetVertex(x, z - 1);
         }
     }
@@ -538,8 +538,8 @@ static inline int Blocked(DrawableGridNode* c)
 // Leaf nodes without children emit the full fan through 0x0047fe70.
 int DrawableGridNode::EmitEdgeTriangles(int level, int n, int x, int z, int dx, int dz, int* closed)
 {
-    int a;
-    int b;
+    int firstClosed;
+    int secondClosed;
     level--;
     if (dx == 0)
         z += dz;
@@ -551,32 +551,32 @@ int DrawableGridNode::EmitEdgeTriangles(int level, int n, int x, int z, int dx, 
     }
     if (level != 0) {
         if (dx == 0) {
-            int h = dz < 0 ? -dz >> 1 : -(dz >> 1);
-            n = EmitDiagonalTriangles(level, n, x, z, h, h, &a);
-            n = EmitDiagonalTriangles(level, n, x, z, -h, h, &b);
+            int half = dz < 0 ? -dz >> 1 : -(dz >> 1);
+            n = EmitDiagonalTriangles(level, n, x, z, half, half, &firstClosed);
+            n = EmitDiagonalTriangles(level, n, x, z, -half, half, &secondClosed);
         } else {
-            int h = dx < 0 ? -dx >> 1 : -(dx >> 1);
-            n = EmitDiagonalTriangles(level, n, x, z, h, h, &a);
-            n = EmitDiagonalTriangles(level, n, x, z, h, -h, &b);
+            int half = dx < 0 ? -dx >> 1 : -(dx >> 1);
+            n = EmitDiagonalTriangles(level, n, x, z, half, half, &firstClosed);
+            n = EmitDiagonalTriangles(level, n, x, z, half, -half, &secondClosed);
         }
     } else if (children != 0) {
         if (data->b0) {
-            a = b = 0;
+            firstClosed = secondClosed = 0;
         } else {
             if (dx == 0) {
                 if (dz > 0) {
-                    a = Blocked((DrawableGridNode*)children[g_gridRow16[z - 1] + x - 1]);
-                    b = Blocked((DrawableGridNode*)children[g_gridRow16[z - 1] + x]);
+                    firstClosed = Blocked((DrawableGridNode*)children[g_gridRow16[z - 1] + x - 1]);
+                    secondClosed = Blocked((DrawableGridNode*)children[g_gridRow16[z - 1] + x]);
                 } else {
-                    a = Blocked((DrawableGridNode*)children[g_gridRow16[z] + x]);
-                    b = Blocked((DrawableGridNode*)children[g_gridRow16[z] + x - 1]);
+                    firstClosed = Blocked((DrawableGridNode*)children[g_gridRow16[z] + x]);
+                    secondClosed = Blocked((DrawableGridNode*)children[g_gridRow16[z] + x - 1]);
                 }
             } else if (dx > 0) {
-                a = Blocked((DrawableGridNode*)children[g_gridRow16[z - 1] + x - 1]);
-                b = Blocked((DrawableGridNode*)children[g_gridRow16[z] + x - 1]);
+                firstClosed = Blocked((DrawableGridNode*)children[g_gridRow16[z - 1] + x - 1]);
+                secondClosed = Blocked((DrawableGridNode*)children[g_gridRow16[z] + x - 1]);
             } else {
-                a = Blocked((DrawableGridNode*)children[g_gridRow16[z] + x]);
-                b = Blocked((DrawableGridNode*)children[g_gridRow16[z - 1] + x]);
+                firstClosed = Blocked((DrawableGridNode*)children[g_gridRow16[z] + x]);
+                secondClosed = Blocked((DrawableGridNode*)children[g_gridRow16[z - 1] + x]);
             }
         }
     } else {
@@ -584,7 +584,7 @@ int DrawableGridNode::EmitEdgeTriangles(int level, int n, int x, int z, int dx, 
         *closed = 1;
         return n + 2;
     }
-    if (!a) {
+    if (!firstClosed) {
         int k = n * 3;
         if (dx == 0) {
             g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
@@ -597,7 +597,7 @@ int DrawableGridNode::EmitEdgeTriangles(int level, int n, int x, int z, int dx, 
         }
         n++;
     }
-    if (!b) {
+    if (!secondClosed) {
         int k = n * 3;
         if (dx == 0) {
             g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
