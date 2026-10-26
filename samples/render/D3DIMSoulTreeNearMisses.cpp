@@ -310,13 +310,13 @@ void D3DIMSoultreeObject::DrawCurrentLod()
     else
         ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
     int k;
-    for (int s = 0; s < lodTable[currentLod].surfaceCount; s++) {
-        UnknownSoultreeSurface* surface = &lodTable[currentLod].surfaces[s];
+    for (int surfaceIndex = 0; surfaceIndex < lodTable[currentLod].surfaceCount; surfaceIndex++) {
+        UnknownSoultreeSurface* surface = &lodTable[currentLod].surfaces[surfaceIndex];
         int count = surface->vertexCount;
         int modified = 0;
         int restore = 0;
-        for (int m = 0; m < surface->materialCount; m++) {
-            SoultreeMaterial* material = materialTable[surface->materialIndices[m]];
+        for (int materialIndex = 0; materialIndex < surface->materialCount; materialIndex++) {
+            SoultreeMaterial* material = materialTable[surface->materialIndices[materialIndex]];
             if (useLighting)
                 ((RenderTarget*)renderContext)->SetTextureBlend(2, 0);
             material->ApplyRenderStates();
@@ -461,12 +461,14 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     for (int v = 0; v < count; v++) {
                         Vector3 direction = NormalizedCallingConstructor(group->sourceVertices[v].position - eye);
                         Vector3 normal = group->normals[v];
-                        Vector3 n(normal.x * world->m[0][0] + normal.y * world->m[1][0] + normal.z * world->m[2][0],
-                                  normal.x * world->m[0][1] + normal.y * world->m[1][1] + normal.z * world->m[2][1],
-                                  normal.x * world->m[0][2] + normal.y * world->m[1][2] + normal.z * world->m[2][2]);
-                        Vector3 twice = n + n;
-                        float d = direction.x * n.x + direction.y * n.y + direction.z * n.z;
-                        Vector3 reflected = twice * d - direction;
+                        Vector3 worldNormal(
+                            normal.x * world->m[0][0] + normal.y * world->m[1][0] + normal.z * world->m[2][0],
+                            normal.x * world->m[0][1] + normal.y * world->m[1][1] + normal.z * world->m[2][1],
+                            normal.x * world->m[0][2] + normal.y * world->m[1][2] + normal.z * world->m[2][2]);
+                        Vector3 twice = worldNormal + worldNormal;
+                        float facing = direction.x * worldNormal.x + direction.y * worldNormal.y
+                                       + direction.z * worldNormal.z;
+                        Vector3 reflected = twice * facing - direction;
                         Vector3 half = reflected * 0.5f;
                         group->sourceVertices[v].tu = half.x + 0.5f;
                         group->sourceVertices[v].tv = half.y + 0.5f - scroll;
@@ -530,13 +532,14 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         segment[0] = position;
                         Vector3 direction = Normalized(position - viewPosition);
                         Vector3 normal = group->normals[v];
-                        Vector3 n(normal.x * world->m[0][0] + normal.z * world->m[2][0] + normal.y * world->m[1][0],
-                                  normal.x * world->m[0][1] + normal.y * world->m[1][1] + normal.z * world->m[2][1],
-                                  normal.x * world->m[0][2] + normal.y * world->m[1][2] + normal.z * world->m[2][2]);
-                        float facing = direction.x * n.x;
-                        facing += direction.y * n.y;
-                        facing += direction.z * n.z;
-                        Vector3 offset = n * facing;
+                        Vector3 worldNormal(
+                            normal.x * world->m[0][0] + normal.z * world->m[2][0] + normal.y * world->m[1][0],
+                            normal.x * world->m[0][1] + normal.y * world->m[1][1] + normal.z * world->m[2][1],
+                            normal.x * world->m[0][2] + normal.y * world->m[1][2] + normal.z * world->m[2][2]);
+                        float facing = direction.x * worldNormal.x;
+                        facing += direction.y * worldNormal.y;
+                        facing += direction.z * worldNormal.z;
+                        Vector3 offset = worldNormal * facing;
                         Vector3 reflected = direction - (offset + offset);
                         Vector3 target = position + reflected;
                         // Where the reflected ray meets the vertical cylinder of
@@ -604,8 +607,9 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         Vector3 toLight = Normalized(position - lightPosition);
                         Vector3 toEye = Normalized(eye - position);
                         Vector3& normal = group->normals[v];
-                        float d = (toLight.x * normal.x + toLight.y * normal.y + toLight.z * normal.z) * 2.0f;
-                        Vector3 reflected = toLight - normal * d;
+                        float twiceDot =
+                            (toLight.x * normal.x + toLight.y * normal.y + toLight.z * normal.z) * 2.0f;
+                        Vector3 reflected = toLight - normal * twiceDot;
                         float specular = toEye.x * reflected.x;
                         specular += toEye.y * reflected.y;
                         specular += toEye.z * reflected.z;
