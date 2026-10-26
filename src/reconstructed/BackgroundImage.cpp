@@ -427,12 +427,12 @@ int BackgroundImage::OnActivate() {
 // Vec3 constructor copy (0x00404e60); ownership by position only. Flags
 // the +0x58 objects of the two entries the owner currently picks, then
 // picks `a` and `b` and clears theirs.
-void TrackGameViewOwner::SelectLapGates(int a, int b, void* racer) {
+void TrackGameViewOwner::SelectLapGates(int gate, int nextGate, void* racer) {
     if (gates[lapGate]->field_0x58) {
         gates[lapGate]->field_0x58->field_0x44 = 1;
         gates[nextLapGate]->field_0x58->field_0x44 = 1;
-        lapGate = a;
-        nextLapGate = b;
+        lapGate = gate;
+        nextLapGate = nextGate;
         gates[lapGate]->field_0x58->field_0x44 = 0;
         gates[nextLapGate]->field_0x58->field_0x44 = 0;
     }

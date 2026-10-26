@@ -1167,7 +1167,7 @@ void D3DIMSoultreeObject::CopySubtree(SoultreeObject* sourceNode, SoultreeObject
 }
 
 // 0x00444c70
-int D3DIMSoultreeObject::ReplaceMaterialTexture(int index, const char* name, int a)
+int D3DIMSoultreeObject::ReplaceMaterialTexture(int index, const char* name, int unused)
 {
     if (index > materialCount)
         return 0;

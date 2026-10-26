@@ -76,7 +76,7 @@ struct TrackGameViewOwner : public GameObject {
     // 0x00404df0: bikerace.cpp passes a racer's +0x7b8, +0x7bc and the racer
     // (0x00420650 passes 0, 1): picks entries `a` and `b` at +0x420 after
     // flagging the two it leaves; `racer` is unused.
-    void SelectLapGates(int a, int b, void* racer);
+    void SelectLapGates(int gate, int nextGate, void* racer);
 
     UnknownTrackGameViewPart* eventScene;     // +0x2C  BaseQuarryEvent::eventScene (0x004df108 stores the Scene that 0x004ea7e0 sets up)
     unsigned char field_0x30[0x34 - 0x30];

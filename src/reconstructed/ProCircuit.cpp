@@ -157,11 +157,11 @@ void UnknownTrackGameObject3444::FreeSchedule(UnknownProCircuitSchedule* schedul
 }
 
 // 0x004d3b00
-void UnknownTrackGameObject3444::StartCareer(const char* name, int a, int b, int count)
+void UnknownTrackGameObject3444::StartCareer(const char* name, int level, int classRule, int count)
 {
     racerCount = count;
-    difficulty = a;
-    bikeClassRule = b;
+    difficulty = level;
+    bikeClassRule = classRule;
     series = 5;
     raceIndex = 1;
     maxModelKind = 1;

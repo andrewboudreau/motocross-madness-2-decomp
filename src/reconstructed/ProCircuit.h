@@ -63,7 +63,7 @@ public:
     ~UnknownTrackGameObject3444();            // 0x004d39f0
     void FreeSchedule(UnknownProCircuitSchedule* schedule); // 0x004d3a60: frees a schedule
     // 0x004d3b00: starts a career for `name` with `count` racers.
-    void StartCareer(const char* name, int a, int b, int count);
+    void StartCareer(const char* name, int level, int classRule, int count);
     int LoadSaved(const char* path); // 0x004d4100: loads the saved part
     int Save(const char* path); // 0x004d4150: saves it
     int AdvanceAfterRace();              // 0x004d41a0: advances after a race

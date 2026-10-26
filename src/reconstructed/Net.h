@@ -374,7 +374,7 @@ public:
     int QueryPlayerName(int player, NetName** name);  // 0x004ad0f0
     NetPlayer* FindPlayer(int player);  // 0x004ac800
     int Send(int type, void* data, int size, int from, int to);  // 0x004ac830
-    int StartKeepAlive(float a, float b);  // 0x004ac8d0
+    int StartKeepAlive(float timeout, float interval);  // 0x004ac8d0
     int StopKeepAlive();  // 0x004ac950
     void AddPlayer(int player, const char* name);  // 0x004ac980
     void RemovePlayer(int player);  // 0x004aca80

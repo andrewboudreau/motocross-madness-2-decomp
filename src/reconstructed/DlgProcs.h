@@ -83,7 +83,7 @@ class SPRaceInfoDlg;
 // names it from `name`).
 class UnknownModelTexture {
 public:
-    void ReplaceMaterialTexture(int a, const char* name, TextureMapManager** textures);
+    void ReplaceMaterialTexture(int index, const char* name, TextureMapManager** textures);
 };
 
 // RTTI: SinglePlayerDlg : UIDialog (vtable 0x00551a94; 0x7f64 bytes, the

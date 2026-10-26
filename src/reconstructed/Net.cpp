@@ -958,12 +958,12 @@ int NetworkInterface::Send(int type, void* data, int size, int from, int to)
 }
 
 // 0x004ac8d0
-int NetworkInterface::StartKeepAlive(float a, float b)
+int NetworkInterface::StartKeepAlive(float timeout, float interval)
 {
     EnterCriticalSection(NET_LOCK(keepAliveLock));
     keepAliveRunning = 1;
-    keepAliveTimeout = a;
-    keepAliveInterval = b;
+    keepAliveTimeout = timeout;
+    keepAliveInterval = interval;
     int index = 0;
     unsigned int time = ReadClock();
     NetPlayer* player;
