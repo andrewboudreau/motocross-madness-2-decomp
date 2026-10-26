@@ -1984,20 +1984,20 @@ struct HitOwner {
     virtual void Slot38(int a);
     virtual void s39(); virtual void s40(); virtual void s41(); virtual void s42(); virtual void s43(); virtual void s44(); virtual void s45(); virtual void s46(); virtual void s47(); virtual void s48(); virtual void s49();
     virtual void s50(); virtual void s51();
-    virtual int Slot52(int a, CollisionObject* b);
+    virtual int Slot52(int tag, CollisionObject* other);
     char pad[0x134-4];
     int hitTag;
 };
-void VehicleHit(CollisionObject* a, CollisionObject* b)
+void VehicleHit(CollisionObject* self, CollisionObject* other)
 {
-    HitOwner* owner = (HitOwner*)a->ownerObject;
-    int tag = b->ownerType;
+    HitOwner* owner = (HitOwner*)self->ownerObject;
+    int tag = other->ownerType;
     owner->hitTag = tag;
-    owner->Slot38(owner->Slot52(tag, b));
+    owner->Slot38(owner->Slot52(tag, other));
 }
-void VehicleHitBy(CollisionObject* a, CollisionObject* b)
+void VehicleHitBy(CollisionObject* self, CollisionObject* other)
 {
-    VehicleHit(a, b);
+    VehicleHit(self, other);
 }
 
 // 0x00525e20: the vehicle loader (`ret 0x94`; Bike's loader 0x004079c0 calls it directly).  Allocates the wheel and

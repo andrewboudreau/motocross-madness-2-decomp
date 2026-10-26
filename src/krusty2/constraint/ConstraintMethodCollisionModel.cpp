@@ -232,12 +232,13 @@ struct ConContactRecord {
     float t;                // +0x24 time fraction
 };
 
-void ConstraintContactCallback(CollisionObject* self, CollisionObject* b)
+void ConstraintContactCallback(CollisionObject* self, CollisionObject* other)
 {
-    ConstraintMethodCollisionModel* a = (ConstraintMethodCollisionModel*)self;
-    ConContactRecord* rec = (ConContactRecord*)a->contactRecord;
-    if (b->ownerType == 0x3ea)
-        a->ApplyContactImpulse(*(ConBody**)((char*)b + 0xc4), rec->t, rec->contactOffset, rec->contact, rec->contactNormal);
+    ConstraintMethodCollisionModel* model = (ConstraintMethodCollisionModel*)self;
+    ConContactRecord* rec = (ConContactRecord*)model->contactRecord;
+    if (other->ownerType == 0x3ea)
+        model->ApplyContactImpulse(*(ConBody**)((char*)other + 0xc4), rec->t, rec->contactOffset, rec->contact,
+                                   rec->contactNormal);
     else
-        a->ApplyContactImpulse(0, rec->t, rec->contactOffset, rec->contact, rec->contactNormal);
+        model->ApplyContactImpulse(0, rec->t, rec->contactOffset, rec->contact, rec->contactNormal);
 }

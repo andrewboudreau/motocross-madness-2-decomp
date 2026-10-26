@@ -23,19 +23,19 @@ static const CollisionVec3 kVec3XAxis = TireVec3(1.0f, 0.0f, 0.0f);
 static const CollisionVec3 kVec3YAxis = TireVec3(0.0f, 1.0f, 0.0f);
 static const CollisionVec3 kVec3ZAxis = TireVec3(0.0f, 0.0f, 1.0f);
 
-// Callback stored in CollisionObject::field_0x88 by slot 8 (0x00512e30).  a is the
-// tire's own CollisionObject (field_0x60 = owner, the Tire), b is the object that was hit.
-static void TireCollisionCallback(CollisionObject* a, CollisionObject* b)
+// Callback stored in CollisionObject::field_0x88 by slot 8 (0x00512e30).  self is the
+// tire's own CollisionObject (field_0x60 = owner, the Tire), other is the object that was hit.
+static void TireCollisionCallback(CollisionObject* self, CollisionObject* other)
 {
-    Tire* tire = (Tire*)a->ownerObject;
-    int tag = b->ownerType;
+    Tire* tire = (Tire*)self->ownerObject;
+    int tag = other->ownerType;
     if (tag == 0x64) {
-        // virtual call, vtable offset 0xcc, on b's owner
-        if ((*(int (__fastcall**)(void*))(**(int**)&b->ownerObject + 0xcc))(b->ownerObject))
+        // virtual call, vtable offset 0xcc, on other's owner
+        if ((*(int (__fastcall**)(void*))(**(int**)&other->ownerObject + 0xcc))(other->ownerObject))
             return;
     } else if (tag == 0x65)
         return;
-    tire->HandleContact(1, tag, b);
+    tire->HandleContact(1, tag, other);
 }
 
 // 0x0040ae30 (cdecl, out of line): dot product of two vectors, result in st(0).
