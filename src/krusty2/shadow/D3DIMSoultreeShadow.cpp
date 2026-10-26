@@ -77,7 +77,7 @@ public:
     void GetMatrixIn(void* frame, D3DIMShadowMatrix4* out);           // 0x004fca80
     void GetBounds(ShadowVec3* center, ShadowVec3* halfExtents);      // 0x004fe850
     char pad_0x00[0x14c];
-    int field_0x14c;                // +0x14c nonzero skips the visibility test
+    int hidden;                     // +0x14c (D3DIMSoulTree.h): nonzero skips the visibility test
 };
 class D3DIMShadowCameraView {
 public:
@@ -126,7 +126,7 @@ int D3DIMSoultreeShadow::UnknownVirtualSlot27()
     D3DIMShadowCasterView* casterView = (D3DIMShadowCasterView*)caster;
     inCameraView = 0;
     inShadowView = 0;
-    if (!casterView->field_0x14c) {
+    if (!casterView->hidden) {
         D3DIMShadowMatrix4 local;
         ShadowVec3 center, extent;
         D3DIMShadowMatrix4 m;

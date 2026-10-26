@@ -83,9 +83,9 @@ public:
     void GetBounds(ShadowVec3* center, ShadowVec3* halfExtents);      // 0x004fe850
     void TransformVertexGroups(int lod);                              // 0x00440d40 (D3DIMSoulTree.h)
     char pad_0x00[0x14c];
-    int field_0x14c;                // +0x14c nonzero skips the visibility test
+    int hidden;                     // +0x14c (D3DIMSoulTree.h): nonzero skips the visibility test
     char pad_0x150[0x18c - 0x150];
-    int field_0x18c;                // +0x18c nonzero: slot 30 calls TransformVertexGroups(-1) first
+    int subtreeDirty;               // +0x18c nonzero: slot 30 calls TransformVertexGroups(-1) first
     char pad_0x190[0x27c - 0x190];
     int currentLod;                 // +0x27c
     char pad_0x280[0x28c - 0x280];
@@ -142,7 +142,7 @@ int D3DIMSoultreeShadow::UnknownVirtualSlot29()
 {
     D3DIMShadowCasterView* casterView = (D3DIMShadowCasterView*)caster;
     inCameraView = 0;
-    if (!casterView->field_0x14c && inShadowView) {
+    if (!casterView->hidden && inShadowView) {
         D3DIMShadowMatrix4 local;
         ShadowVec3 center, extent;
         D3DIMShadowMatrix4 localToView;
@@ -197,7 +197,7 @@ void D3DIMSoultreeShadow::UnknownVirtualSlot30()
         color = ((0xff - (shadow->shadowColor & 0xff)) << 24) | 0xffffff;
     vertexCount = 0;
     D3DIMShadowCasterView* casterView = (D3DIMShadowCasterView*)caster;
-    if (casterView->field_0x18c)
+    if (casterView->subtreeDirty)
         casterView->TransformVertexGroups(-1);
     for (int i = 0; i < ((D3DIMShadowCasterView*)caster)->lods[((D3DIMShadowCasterView*)caster)->currentLod].meshCount; i++) {
         D3DIMShadowMesh* mesh = &((D3DIMShadowCasterView*)caster)->lods[((D3DIMShadowCasterView*)caster)->currentLod].meshes[i];
