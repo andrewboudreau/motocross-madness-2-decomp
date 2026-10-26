@@ -94,7 +94,7 @@ void GraphicsTest::DrawCircle(const Vec3* center, float radius, const Vec3* axis
     points[segments] = points[0];
     for (i = 0; i < segments * 2; i++) {
         vertices[i].color = drawColor;
-        vertices[i].specular = field_0x30;
+        vertices[i].specular = specularColor;
         vertices[i].tu = 0;
         vertices[i].tv = 0;
     }

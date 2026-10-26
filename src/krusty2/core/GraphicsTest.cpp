@@ -55,7 +55,7 @@ GraphicsTest::GraphicsTest(int flags)
     : GameObject(flags)
 {
     SetDrawColor(0xff, 0xff, 0xff);
-    field_0x30 = 0;
+    specularColor = 0;
 }
 
 // 0x0047bd00 (deleting wrapper 0x0047bce0)
@@ -143,7 +143,7 @@ void GraphicsTest::DrawLine(const Vec3* a, const Vec3* b)
     GraphicsTestVertex vertices[2];
     for (int i = 0; i < 2; i++) {
         vertices[i].color = drawColor;
-        vertices[i].specular = field_0x30;
+        vertices[i].specular = specularColor;
         vertices[i].tu = 0;
         vertices[i].tv = 0;
     }
@@ -162,7 +162,7 @@ void GraphicsTest::DrawMarker(const Vec3* p, float size)
     GraphicsTestVertex vertices[2];
     for (int i = 0; i < 2; i++) {
         vertices[i].color = drawColor;
-        vertices[i].specular = field_0x30;
+        vertices[i].specular = specularColor;
         vertices[i].tu = 0;
         vertices[i].tv = 0;
     }

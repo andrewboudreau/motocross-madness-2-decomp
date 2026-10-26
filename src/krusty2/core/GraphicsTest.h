@@ -9,7 +9,7 @@
 //    (scalar deleting dtor 0x0047bce0, core 0x0047bd00): tier 1 (analysis/vtables.json).
 //  * Ctor 0x0047bc70 (thiscall, ret 4): GameObject(a) with its own argument, vptr
 //    0x00553de4, SetDrawColor(0xff, 0xff, 0xff) (0x0047c690, packs into +0x2c), then
-//    field_0x30 = 0.  Tier 1 decoded.  CollisionObject passes 1; PhysicsBody forwards its own
+//    specularColor = 0.  Tier 1 decoded.  CollisionObject passes 1; PhysicsBody forwards its own
 //    constructor argument.
 //  * Size 0x34 (tier 2): the constructor initializes only +0x2c/+0x30;
 //    CarProcedural/Wrecker store their first pointers at +0x34, the renderer
@@ -51,7 +51,7 @@ public:
     void DrawMarker(const Vec3* p, float size);                                  // 0x0047c570
 
     int drawColor;                   // +0x2c packed draw color (SetDrawColor)
-    int field_0x30;                   // zeroed by the GraphicsTest constructor
+    int specularColor;                // +0x30 zeroed by the ctor; the debug lines copy it into each vertex's specular
 };
 
 typedef char graphics_test_assert_sizeof[(sizeof(GraphicsTest) == 0x34) ? 1 : -1];
