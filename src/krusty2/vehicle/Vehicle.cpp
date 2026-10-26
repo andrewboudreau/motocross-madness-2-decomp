@@ -432,17 +432,17 @@ void Vehicle::UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up)
         leanCos = bodyCosRoll;
         return;
     }
-    Vec3 n;
+    Vec3 normal;
     if (!up) {
-        Vec3 t;
-        n = *GetAverageGroundNormal(&t);
+        Vec3 averageNormal;
+        normal = *GetAverageGroundNormal(&averageNormal);
     } else
-        n = *up;
+        normal = *up;
     Vec3* perp = &scratchVector2;
-    Vec3 s;
-    Vec3 proj = *Vec3ScaleCall(&s, forward, Vec3DotCall(&n, forward));
-    Vec3 d;
-    *perp = *Vec3SubtractCall(&d, &n, &proj);
+    Vec3 scaled;
+    Vec3 proj = *Vec3ScaleCall(&scaled, forward, Vec3DotCall(&normal, forward));
+    Vec3 difference;
+    *perp = *Vec3SubtractCall(&difference, &normal, &proj);
     if (!(perp->x == 0.0f && perp->y == 0.0f && perp->z == 0.0f) && perp) {
         *perp = Vec3Normalize(*perp);
         scratchVector = VehCross56(sideAxis, *forward);
@@ -469,7 +469,7 @@ void Vehicle::UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up)
 
 // Snaps the body pose to the wheel contact state (tier 3): with one wheel only the height
 // (position.y) follows that wheel; with several the body basis is rebuilt from the wheel
-// normal (or the supplied direction a), the highest wheel sets the height, and a two-wheel
+// normal (or the supplied settleUp), the highest wheel sets the height, and a two-wheel
 // bike additionally re-aims the frame by the lean angle (leanAngle). Finally the 7-float
 // orientation block is rebuilt from the basis vectors and the previous copy is refreshed.
 static inline float VehAbsT(float x) { return x < 0.0f ? -x : x; }
@@ -481,47 +481,48 @@ void Vehicle::UnknownVirtualSlot58(Vec3* settleUp, int keepPlacement)
     RunTickers();
     if (wheelCount == 1) {
         if (keepPlacement == 0) {
-            float y = primaryWheel->groundPoint.y;
-            position.y = y;
-            modelNode->SetPosition(position.x, y, position.z);
+            float height = primaryWheel->groundPoint.y;
+            position.y = height;
+            modelNode->SetPosition(position.x, height, position.z);
         }
         primaryWheel->penetration = 0.0f;
     } else {
         VehicleWheel* top = wheelList[0];
         Vec3 dir;
-        Vec3 t;
+        Vec3 axis;
         if (keepPlacement) {
             dir = *settleUp;
         } else {
             VehicleWheel* second = wheelList[1];
             for (int i = 1; i < wheelCount; i++) {
-                VehicleWheel* w = wheelList[i];
-                if (w->groundPoint.y > top->groundPoint.y) {
+                VehicleWheel* wheel = wheelList[i];
+                if (wheel->groundPoint.y > top->groundPoint.y) {
                     top = wheelList[i];
                     second = top;
-                } else if (w->groundPoint.y > second->groundPoint.y) {
-                    second = w;
+                } else if (wheel->groundPoint.y > second->groundPoint.y) {
+                    second = wheel;
                 }
             }
-            dir = *GetAverageGroundNormal(&t);
+            dir = *GetAverageGroundNormal(&axis);
         }
         modelNode->SetAxesIn(0, &bodyForward, &dir, 1, 0);
         UnknownVirtualSlot34();
         modelNode->GetPositionIn(0, &position);
         if (keepPlacement == 0) {
-            float y = top->field_0x228 - top->wheelPosition.y + top->groundPoint.y;
-            position.y = y;
-            modelNode->SetPosition(position.x, y, position.z);
+            float height = top->field_0x228 - top->wheelPosition.y + top->groundPoint.y;
+            position.y = height;
+            modelNode->SetPosition(position.x, height, position.z);
         }
         if (wheelCount == 2) {
-            Vec3 v0;
-            t = *UnknownVirtualSlot55(&v0, &rotationPivot);
-            UnknownVirtualSlot56(&t, 0, &dir);
-            v0 = modelNode->WorldToLocalDirection(t);
+            Vec3 localAxis;
+            axis = *UnknownVirtualSlot55(&localAxis, &rotationPivot);
+            UnknownVirtualSlot56(&axis, 0, &dir);
+            localAxis = modelNode->WorldToLocalDirection(axis);
             float lean = leanAngle;
             if (VehAbsT(lean) > 0.001f) {
-                if (VehAbsT(v0.z) > 0.001f || VehAbsT(v0.y) > 0.001f || VehAbsT(v0.x) > 0.001f) {
-                    modelNode->RotateAboutPoint(rotationPivot, v0, lean);
+                if (VehAbsT(localAxis.z) > 0.001f || VehAbsT(localAxis.y) > 0.001f
+                    || VehAbsT(localAxis.x) > 0.001f) {
+                    modelNode->RotateAboutPoint(rotationPivot, localAxis, lean);
                     UnknownVirtualSlot34();
                     modelNode->GetPositionIn(0, &position);
                 }
