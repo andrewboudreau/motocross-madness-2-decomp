@@ -28,7 +28,7 @@
 //   as the parameter type gives 171 with every operand order of the
 //   x/z terms (512 forms); reached through a cast local it gives 121.
 //   One term per statement (`float z = a; z += b; ...`): the z row alone in
-//   all 24 term orders, with `q->z = z * w` or `z *= w`, gives 164 at best;
+//   all 24 term orders, with `dstPoint->z = z * w` or `z *= w`, gives 164 at best;
 //   all four rows accumulated, products in each of their 6 orders and the
 //   translation last (1296 forms), give 164 at best.
 //   The operand order inside each of the twelve products (all 4096
@@ -43,18 +43,21 @@
 void ProjectPoints(void* target, const void* source, const Matrix4* matrix, int count,
                            int targetStride, int sourceStride)
 {
-    const Vector3* p = (const Vector3*)source;
-    Vector3* q = (Vector3*)target;
+    const Vector3* srcPoint = (const Vector3*)source;
+    Vector3* dstPoint = (Vector3*)target;
     if (!sourceStride)
         sourceStride = targetStride;
     while (count > 0) {
-        float w = 1.0f / (p->x * matrix->m[0][3] + p->y * matrix->m[1][3] + p->z * matrix->m[2][3]
-                          + matrix->m[3][3]);
-        q->x = (p->x * matrix->m[0][0] + p->y * matrix->m[1][0] + p->z * matrix->m[2][0] + matrix->m[3][0]) * w;
-        q->y = (p->x * matrix->m[0][1] + p->y * matrix->m[1][1] + p->z * matrix->m[2][1] + matrix->m[3][1]) * w;
-        q->z = (p->x * matrix->m[0][2] + p->y * matrix->m[1][2] + p->z * matrix->m[2][2] + matrix->m[3][2]) * w;
-        p = (const Vector3*)((const char*)p + sourceStride);
-        q = (Vector3*)((char*)q + targetStride);
+        float w = 1.0f / (srcPoint->x * matrix->m[0][3] + srcPoint->y * matrix->m[1][3]
+                          + srcPoint->z * matrix->m[2][3] + matrix->m[3][3]);
+        dstPoint->x = (srcPoint->x * matrix->m[0][0] + srcPoint->y * matrix->m[1][0]
+                       + srcPoint->z * matrix->m[2][0] + matrix->m[3][0]) * w;
+        dstPoint->y = (srcPoint->x * matrix->m[0][1] + srcPoint->y * matrix->m[1][1]
+                       + srcPoint->z * matrix->m[2][1] + matrix->m[3][1]) * w;
+        dstPoint->z = (srcPoint->x * matrix->m[0][2] + srcPoint->y * matrix->m[1][2]
+                       + srcPoint->z * matrix->m[2][2] + matrix->m[3][2]) * w;
+        srcPoint = (const Vector3*)((const char*)srcPoint + sourceStride);
+        dstPoint = (Vector3*)((char*)dstPoint + targetStride);
         count--;
     }
 }

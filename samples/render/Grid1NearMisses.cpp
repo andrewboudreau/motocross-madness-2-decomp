@@ -116,8 +116,8 @@ retry:
     switch (stage) {
     case 0:
         if (parent) {
-            Grid1NodeExtra* p = ((DrawableGridNodeSharedTextures*)parent)->Extra();
-            if (p->index != -1 && !p->own)
+            Grid1NodeExtra* parentExtra = ((DrawableGridNodeSharedTextures*)parent)->Extra();
+            if (parentExtra->index != -1 && !parentExtra->own)
                 goto parentTexture;
         }
     case 1:

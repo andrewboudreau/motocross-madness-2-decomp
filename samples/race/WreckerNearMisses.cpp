@@ -134,15 +134,18 @@ void Wrecker::PushProbesOutOfBox(float frameTime) {
     Vector3 sum = Vector3(0.0f, 0.0f, 0.0f);
     int hits = 0;
     for (int i = 0; i < collisionModel->probeCount; i++) {
-        Vector3 p = reinterpret_cast<const Vector3&>(collisionModel->probes[i].node->LocalToWorldPoint(reinterpret_cast<const Vec3&>(collisionModel->probes[i].localPoint)));
-        probePositions[i] = p;
-        p = reinterpret_cast<const Vector3&>(boxFrame->WorldToLocalPoint(reinterpret_cast<const Vec3&>(p))) - boxCenter;
-        if (fabs(p.x) < boxHalfExtents.x && fabs(p.y) < boxHalfExtents.y && fabs(p.z) < boxHalfExtents.z) {
+        Vector3 point = reinterpret_cast<const Vector3&>(collisionModel->probes[i].node->LocalToWorldPoint(
+            reinterpret_cast<const Vec3&>(collisionModel->probes[i].localPoint)));
+        probePositions[i] = point;
+        point = reinterpret_cast<const Vector3&>(
+                    boxFrame->WorldToLocalPoint(reinterpret_cast<const Vec3&>(point))) - boxCenter;
+        if (fabs(point.x) < boxHalfExtents.x && fabs(point.y) < boxHalfExtents.y
+            && fabs(point.z) < boxHalfExtents.z) {
             Vector3 push = Vector3(0.0f, 0.0f, 0.0f);
             Vector3 previousPush = Vector3(0.0f, 0.0f, 0.0f);
-            WreckerClipAxis(p.x, boxHalfExtents.x, probePositions[i].y, push.x, previousPush.x);
-            WreckerClipAxis(p.y, boxHalfExtents.y, probePositions[i].y, push.y, previousPush.y);
-            WreckerClipAxis(p.z, boxHalfExtents.z, probePositions[i].z, push.z, previousPush.z);
+            WreckerClipAxis(point.x, boxHalfExtents.x, probePositions[i].y, push.x, previousPush.x);
+            WreckerClipAxis(point.y, boxHalfExtents.y, probePositions[i].y, push.y, previousPush.y);
+            WreckerClipAxis(point.z, boxHalfExtents.z, probePositions[i].z, push.z, previousPush.z);
             if (push.x != 0.0f || push.y != boxHalfExtents.y || push.z != boxHalfExtents.z) {
                 sum += push;
                 hits++;

@@ -129,11 +129,11 @@ int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const floa
 {
     float nx;
     float ny;
-    float d;
-    if (LineThrough(a, b, &nx, &ny, &d))
+    float lineOffset;
+    if (LineThrough(a, b, &nx, &ny, &lineOffset))
         return -1;
     float scale = 1.0f / (nx * nx + ny * ny);
-    float t = -(scale * d);
+    float t = -(scale * lineOffset);
     float px = t * nx;
     float py = t * ny;
     float root = FastSqrt(scale);
@@ -145,21 +145,21 @@ int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const floa
     float ex = circle[0] - px;
     float ey = circle[1] - py;
     float cross = ey * dx - ex * dy;
-    float r = circle[2];
-    float disc = r * r * lengthSquared - cross * cross;
+    float radius = circle[2];
+    float disc = radius * radius * lengthSquared - cross * cross;
     if (disc < -1e-14f)
         return -1;
     float proj = (ex * dx) + ey * dy;
     if (disc < 1e-14f) {
-        float k = proj / lengthSquared;
-        point[0] = k * dx + px;
-        point[1] = k * dy + py;
+        float along = proj / lengthSquared;
+        point[0] = along * dx + px;
+        point[1] = along * dy + py;
         return 1;
     }
-    float q = FastSqrt(disc);
+    float halfChord = FastSqrt(disc);
     float inverse = 1.0f / lengthSquared;
-    float k1 = (proj - q) * inverse;
-    float k2 = (proj + q) * inverse;
+    float k1 = (proj - halfChord) * inverse;
+    float k2 = (proj + halfChord) * inverse;
     float x1 = k1 * dx + px;
     float y1 = k1 * dy + py;
     float x2 = k2 * dx + px;

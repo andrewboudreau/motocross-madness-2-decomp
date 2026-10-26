@@ -111,7 +111,7 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
     int digit;
     int count = 0;
     int prefixed;
-    int n;
+    int nameLength;
     if (series == 5 || series == 1)
         prefixed = 1;
     else
@@ -123,16 +123,16 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
     directory->Scan();
     if (directory->CurrentName(found)) {
         if (prefixed) {
-            n = strlen(found) - 1;
-            strncpy(track, found, n);
-            digit = found[n] - '0';
+            nameLength = strlen(found) - 1;
+            strncpy(track, found, nameLength);
+            digit = found[nameLength] - '0';
         } else {
             digit = 0;
             int length = strlen(found);
-            n = length > 127 ? 127 : length;
-            strncpy(track, found, n);
+            nameLength = length > 127 ? 127 : length;
+            strncpy(track, found, nameLength);
         }
-        track[n] = 0;
+        track[nameLength] = 0;
         for (;;) {
             int directoryIndex = g_TrackGame->mode.GetSelectedSeries();
             sprintf(path, "%s\\%s%s", (const char*)g_TrackGame->mode.currentSeriesDirectory, found,
@@ -156,10 +156,10 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
             if (!directory->NextName(found))
                 break;
             if (prefixed) {
-                n = strlen(found) - 1;
-                strncpy(track, found, n);
-                digit = found[n] - '0';
-                track[n] = 0;
+                nameLength = strlen(found) - 1;
+                strncpy(track, found, nameLength);
+                digit = found[nameLength] - '0';
+                track[nameLength] = 0;
             } else {
                 digit = 0;
                 strcpy(track, found);

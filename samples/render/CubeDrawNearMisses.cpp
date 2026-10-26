@@ -112,38 +112,38 @@ int DrawableCube::BuildFaceGeometry()
         }
         for (int cellRow = 0; cellRow < 4; cellRow++) {
             for (int cellColumn = 0; cellColumn < 4; cellColumn++) {
-                UnknownCubeVertex* v = s_cellVertices[face][cellRow * 4 + cellColumn];
-                UnknownCubeVertex* p = &grid[cellRow][cellColumn];
-                v[0].position = p[0].position;
-                v[0].diffuse = 0xffffffff;
-                v[0].specular = 0;
-                v[0].tu = 0.0f;
-                v[0].tv = 0.0f;
-                v[1].position = p[1].position;
-                v[1].diffuse = 0xffffffff;
-                v[1].specular = 0;
-                v[1].tu = 1.0f;
-                v[1].tv = 0.0f;
-                v[2].position = p[6].position;
-                v[2].diffuse = 0xffffffff;
-                v[2].specular = 0;
-                v[2].tu = 1.0f;
-                v[2].tv = 1.0f;
-                v[3].position = p[0].position;
-                v[3].diffuse = 0xffffffff;
-                v[3].specular = 0;
-                v[3].tu = 0.0f;
-                v[3].tv = 0.0f;
-                v[4].position = p[6].position;
-                v[4].diffuse = 0xffffffff;
-                v[4].specular = 0;
-                v[4].tu = 1.0f;
-                v[4].tv = 1.0f;
-                v[5].position = p[5].position;
-                v[5].diffuse = 0xffffffff;
-                v[5].specular = 0;
-                v[5].tu = 0.0f;
-                v[5].tv = 1.0f;
+                UnknownCubeVertex* cell = s_cellVertices[face][cellRow * 4 + cellColumn];
+                UnknownCubeVertex* corner = &grid[cellRow][cellColumn];
+                cell[0].position = corner[0].position;
+                cell[0].diffuse = 0xffffffff;
+                cell[0].specular = 0;
+                cell[0].tu = 0.0f;
+                cell[0].tv = 0.0f;
+                cell[1].position = corner[1].position;
+                cell[1].diffuse = 0xffffffff;
+                cell[1].specular = 0;
+                cell[1].tu = 1.0f;
+                cell[1].tv = 0.0f;
+                cell[2].position = corner[6].position;
+                cell[2].diffuse = 0xffffffff;
+                cell[2].specular = 0;
+                cell[2].tu = 1.0f;
+                cell[2].tv = 1.0f;
+                cell[3].position = corner[0].position;
+                cell[3].diffuse = 0xffffffff;
+                cell[3].specular = 0;
+                cell[3].tu = 0.0f;
+                cell[3].tv = 0.0f;
+                cell[4].position = corner[6].position;
+                cell[4].diffuse = 0xffffffff;
+                cell[4].specular = 0;
+                cell[4].tu = 1.0f;
+                cell[4].tv = 1.0f;
+                cell[5].position = corner[5].position;
+                cell[5].diffuse = 0xffffffff;
+                cell[5].specular = 0;
+                cell[5].tu = 0.0f;
+                cell[5].tv = 1.0f;
             }
         }
         for (int i = 0; i < 25; i++)
@@ -160,20 +160,20 @@ int DrawableCube::LoadTexturesAndCoords(Cube* cube, UnknownCubeTextureContext* c
     if (HasMipLevels(cubeObject->fileFormat)) {
         for (int face = 0; face < 6; face++) {
             for (int row = 0; row < 4; row++) {
-                UnknownCubeVertex* v = s_cellVertices[face][row * 4];
-                for (int column = 0; column < 4; column++, v += 6) {
-                    v[0].tu = 0.03125f;
-                    v[0].tv = 0.03125f;
-                    v[1].tu = 0.96875f;
-                    v[1].tv = 0.03125f;
-                    v[2].tu = 0.96875f;
-                    v[2].tv = 0.96875f;
-                    v[3].tu = 0.03125f;
-                    v[3].tv = 0.03125f;
-                    v[4].tu = 0.96875f;
-                    v[4].tv = 0.96875f;
-                    v[5].tu = 0.03125f;
-                    v[5].tv = 0.96875f;
+                UnknownCubeVertex* cell = s_cellVertices[face][row * 4];
+                for (int column = 0; column < 4; column++, cell += 6) {
+                    cell[0].tu = 0.03125f;
+                    cell[0].tv = 0.03125f;
+                    cell[1].tu = 0.96875f;
+                    cell[1].tv = 0.03125f;
+                    cell[2].tu = 0.96875f;
+                    cell[2].tv = 0.96875f;
+                    cell[3].tu = 0.03125f;
+                    cell[3].tv = 0.03125f;
+                    cell[4].tu = 0.96875f;
+                    cell[4].tv = 0.96875f;
+                    cell[5].tu = 0.03125f;
+                    cell[5].tv = 0.96875f;
                 }
             }
         }
@@ -181,23 +181,23 @@ int DrawableCube::LoadTexturesAndCoords(Cube* cube, UnknownCubeTextureContext* c
     }
     for (int face = 0; face < 6; face++) {
         for (int row = 0; row < 4; row++) {
-            UnknownCubeVertex* v = s_cellVertices[face][row * 4];
-            for (int column = 0; column < 4; column++, v += 6) {
+            UnknownCubeVertex* cell = s_cellVertices[face][row * 4];
+            for (int column = 0; column < 4; column++, cell += 6) {
                 int size = DecodeTextureSize(cubeObject->faces[face].sizeCodes, column, row);
                 float low = 1.0f / (float)size;
-                v[0].tu = low;
-                v[0].tv = low;
+                cell[0].tu = low;
+                cell[0].tv = low;
                 float high = 1.0f - low;
-                v[1].tu = high;
-                v[1].tv = low;
-                v[2].tu = high;
-                v[2].tv = high;
-                v[3].tu = low;
-                v[3].tv = low;
-                v[4].tu = high;
-                v[4].tv = high;
-                v[5].tu = low;
-                v[5].tv = high;
+                cell[1].tu = high;
+                cell[1].tv = low;
+                cell[2].tu = high;
+                cell[2].tv = high;
+                cell[3].tu = low;
+                cell[3].tv = low;
+                cell[4].tu = high;
+                cell[4].tv = high;
+                cell[5].tu = low;
+                cell[5].tv = high;
             }
         }
     }

@@ -9,7 +9,7 @@
 // the vertex fill, one x87 load scheduled later in the point loop and the operand order of
 // `points[i] += *center` (retail loads the centre first).
 //
-// A `Vec3* p = &points[i]` local for the transform and the centre sum gives 818 (the same
+// A `Vec3* point = &points[i]` local for the transform and the centre sum gives 818 (the same
 // pointer local made DrawBox 0x0047c270 exact, now in src/krusty2/core/GraphicsTest.cpp);
 // using it for the cos/sin stores as well gives 799.
 #include <math.h>
@@ -51,7 +51,7 @@ inline void GraphicsTestTransform(Vec3* out, Vec3 v, const Matrix4* m)
 // circle's normal; null draws it in the xz plane).
 void GraphicsTest::DrawCircle(const Vec3* center, float radius, const Vec3* axis, int segments)
 {
-    Matrix4 m;
+    Matrix4 basis;
     Vec3 points[64];
     GraphicsTestVertex vertices[64];
     int i;
@@ -67,29 +67,29 @@ void GraphicsTest::DrawCircle(const Vec3* center, float radius, const Vec3* axis
         n = Vec3Normalize(n);
         u = Vec3Normalize(u);
         v = CrossProductCall(n, u);
-        m._11 = v.x;
-        m._12 = v.y;
-        m._13 = v.z;
-        m._21 = n.x;
-        m._22 = n.y;
-        m._23 = n.z;
-        m._31 = u.x;
-        m._32 = u.y;
-        m._33 = u.z;
-        m._41 = 0;
-        m._42 = 0;
-        m._43 = 0;
+        basis._11 = v.x;
+        basis._12 = v.y;
+        basis._13 = v.z;
+        basis._21 = n.x;
+        basis._22 = n.y;
+        basis._23 = n.z;
+        basis._31 = u.x;
+        basis._32 = u.y;
+        basis._33 = u.z;
+        basis._41 = 0;
+        basis._42 = 0;
+        basis._43 = 0;
     }
     for (i = 0; i < segments; i++) {
         float angle = i * (6.2831855f / segments);
         points[i].x = cos(angle) * radius;
         points[i].y = 0;
         points[i].z = sin(angle) * radius;
-        Vec3* p = &points[i];
+        Vec3* point = &points[i];
         if (axis) {
-            GraphicsTestTransform(p, *p, &m);
+            GraphicsTestTransform(point, *point, &basis);
         }
-        *p += *center;
+        *point += *center;
     }
     points[segments] = points[0];
     for (i = 0; i < segments * 2; i++) {
