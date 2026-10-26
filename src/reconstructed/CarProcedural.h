@@ -103,9 +103,9 @@ public:
     virtual ~CarProcedural();                                        // 0x0042f590 (slot 0 0x0042f570)
     virtual int Tick(float frameTime);                               // 0x0042fd80
     // Slot 27 (0x0042f600, ret 0x40): sets the car up; returns this.
-    virtual CarProcedural* UnknownVirtualSlot27(void* a0, const char* name, const char* collisionFile,
-                                                int a3, int a4, void* a5, const char* pathFile,
-                                                const Vector3* a7, float speed, int a9, float a10,
+    virtual CarProcedural* UnknownVirtualSlot27(void* renderContext, const char* name, const char* collisionFile,
+                                                int a3, int a4, void* ground, const char* pathFile,
+                                                const Vector3* offset, float speed, int steerFront, float trail,
                                                 int a11, unsigned int wheelCount, float a13, float a14,
                                                 float a15);
 
@@ -120,7 +120,7 @@ public:
     CarProceduralCollision* bodyCollider;     // +0x3c the body's hull collider (slot 27's collision file)
     Vector3 pathVelocity;                     // +0x40 flat path direction times velocityScale
     float groundSpeed;                        // +0x4c |pathVelocity|
-    int steersFrontWheels;                    // +0x50 wheels 0 and 1 steer (slot 27's a9)
+    int steersFrontWheels;                    // +0x50 wheels 0 and 1 steer (slot 27's steerFront)
     int started;                              // +0x54 set once slot 10 has run its first update
     int field_0x58;
     int skipSmoothing;                        // +0x5C  provisional: while set slot 10 takes the raw back direction and ground normal; the constructor sets it and Scene::RestartEntry (0x004eb040) rewrites it (0 when the restart time was clamped)
@@ -140,7 +140,7 @@ public:
     float steeringAngle;                      // +0x190 clamped to +-30 degrees
     float pathTime;                           // +0x194 seconds, wrapped at the path's period
     float frontWheelZ;                        // +0x198 z of a wheel ahead of the origin (first update)
-    float trailDistance;                      // +0x19c slot 27's a10: distance behind pathTime
+    float trailDistance;                      // +0x19c slot 27's trail: distance behind pathTime
     float trailTimeOffset;                    // +0x1a0 the time offset for trailDistance
     float lookAheadTime;                      // +0x1a4 0.1
     float velocityScale;                      // +0x1a8 10
@@ -149,7 +149,7 @@ public:
     CarProceduralKey* pathKeys;               // +0x1b4 path keys
     Vector3 field_0x1b8;
     Vector3 pathPosition;                     // +0x1c4 path position at pathTime less the trail
-    Vector3 pathOffset;                       // +0x1d0 slot 27's a7, added to the path position
+    Vector3 pathOffset;                       // +0x1d0 slot 27's offset, added to the path position
     Vector3 bodyOffset;                       // +0x1dc the "Body" node's position
     Vector3 field_0x1e8;
     Vector3 smoothedBack;                     // +0x1f4 smoothed direction to the path behind

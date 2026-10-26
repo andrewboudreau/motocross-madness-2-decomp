@@ -102,26 +102,26 @@ void CarProcedural::HermiteWeights(float t, float* h0, float* h1, float* h2, flo
 
 // 0x0042f600: slot 27 sets the car up from its parameters: the model and
 // its wheels, the two collision objects and the path.
-CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, const char* collisionFile,
-                                                   int a3, int a4, void* a5, const char* pathFile,
-                                                   const Vector3* a7, float speed, int a9, float a10,
+CarProcedural* CarProcedural::UnknownVirtualSlot27(void* renderContext, const char* name, const char* collisionFile,
+                                                   int a3, int a4, void* ground, const char* pathFile,
+                                                   const Vector3* offset, float speed, int steerFront, float trail,
                                                    int a11, unsigned int wheelCount, float a13,
                                                    float a14, float a15)
 {
-    GameObject::SetRenderContext(a0);
+    GameObject::SetRenderContext(renderContext);
     int n = strlen(name);
     int length = n > 0xff ? 0xff : n;
     strncpy(carName, name, length);
     carName[length] = 0;
 
     carModel = reinterpret_cast<CarProceduralModel*>(new (__FILE__, 99) D3DIMSoultreeObject(1));
-    carModel->UnknownNodeVirtualSlot9(a0, name, a3, a4, 1);
+    carModel->UnknownNodeVirtualSlot9(renderContext, name, a3, a4, 1);
     AppendChild(carModel, -1);
-    pathOffset = *a7;
-    trailDistance = a10;
+    pathOffset = *offset;
+    trailDistance = trail;
     pathTime = 0.0f;
     smoothedBack = kVec3Zero;
-    steersFrontWheels = a9;
+    steersFrontWheels = steerFront;
     wheelSpinAngle = 0.0f;
     CarProceduralNode* body = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("Body"));
     reinterpret_cast<SoultreeObject*>(body)->GetPosition(reinterpret_cast<Vec3*>(&bodyOffset));
@@ -147,17 +147,17 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
             reinterpret_cast<Vec3*>(&minimum), reinterpret_cast<Vec3*>(&maximum));
         inverseWheelRadius = 1.0f / maximum.y;
     }
-    groundProvider = a5;
+    groundProvider = ground;
 
     sensorCollider = new (__FILE__, 149) CarProceduralCollision(1);
-    sensorCollider->Configure(a0, 1, 1, 0);
+    sensorCollider->Configure(renderContext, 1, 1, 0);
     sensorCollider->ignoreVegetation = 1;
     AppendChild(sensorCollider, -1);
     sensorHalfHeight = 5.0f;
 
     int tag = g_MemTagStack->Push("Collision");
     bodyCollider = new (__FILE__, 162) CarProceduralCollision(1);
-    bodyCollider->Configure(a0, 1, 1, 1);
+    bodyCollider->Configure(renderContext, 1, 1, 1);
     bodyCollider->ignoreVegetation = 1;
     AppendChild(bodyCollider, -1);
     if (collisionFile && *collisionFile)
