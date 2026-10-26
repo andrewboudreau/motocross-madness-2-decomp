@@ -164,11 +164,11 @@ int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* 
         KbPlayer* r = (KbPlayer*)reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent;
         const Vec3* l = 0;
         const Vec3* k = 0;
-        if (r->field_0xdc) l = &r->field_0xdc->position;
-        else if (r->field_0xa8 == this) { *a3 = bodyForward; k = &bodyForward; }
-        else l = &r->field_0xa8->position;
+        if (r->ball) l = &r->ball->position;
+        else if (r->followedRacer == this) { *a3 = bodyForward; k = &bodyForward; }
+        else l = &r->followedRacer->position;
         float i = 9.0f;
-        if (((KbPlayer*)reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent)->field_0xa8 != this) i = 3.0f;
+        if (((KbPlayer*)reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent)->followedRacer != this) i = 3.0f;
         return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, flag, lim, lim,
                            hit, i, 8, k, l, !respawnPending, a2, a3, a4, a5);
     }

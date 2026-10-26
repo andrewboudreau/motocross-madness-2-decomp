@@ -130,12 +130,12 @@ int KrustyBike::UnknownVirtualSlot12(int a)
         float lo = terrainScale * 105.0f;
         if (position.x < lo)
             return 1;
-        KbTrackB* t = ((KbTrackA*)track)->field_0xa4;
-        if ((t->field_0x394 * 256.0f - 105.0f) * terrainScale < position.x)
+        KbTrackB* t = ((KbTrackA*)track)->trackData;
+        if ((t->sizeX * 256.0f - 105.0f) * terrainScale < position.x)
             return 2;
         if (position.z < lo)
             return 3;
-        if ((t->field_0x398 * 256.0f - 105.0f) * terrainScale < position.z)
+        if ((t->sizeZ * 256.0f - 105.0f) * terrainScale < position.z)
             return 4;
     }
     return 0;
@@ -564,14 +564,14 @@ int KrustyBike::UnknownVirtualSlot28(int a)
     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4) {
         KbPlayer* p = reinterpret_cast<KbPlayer*>(reinterpret_cast<EventManager*>(
             reinterpret_cast<KbGame*>(g_TrackGame)->eventManager)->FindRaceMode());
-        if (this != p->field_0xa8 && this == race->localRacer) {
-            Vehicle* v = p->field_0xa8;
+        if (this != p->followedRacer && this == race->localRacer) {
+            Vehicle* v = p->followedRacer;
             if (v) {
                 if (collisionObject->TestMeshBounds(v->collisionObject))
                     Fn_004925A0(this, 1);
-            } else if (p->field_0xdc) {
-                if (collisionObject->TestMeshBounds(p->field_0xdc->collisionObject)) {
-                    if (reinterpret_cast<KbGame*>(g_TrackGame)->network->field_0x10) p->Fn_004A9E80(this, 0, 1);
+            } else if (p->ball) {
+                if (collisionObject->TestMeshBounds(p->ball->collisionObject)) {
+                    if (reinterpret_cast<KbGame*>(g_TrackGame)->network->isHost) p->Fn_004A9E80(this, 0, 1);
                     else Fn_004925A0(this, 1);
                 }
             }
@@ -600,9 +600,9 @@ int KrustyBike::UnknownVirtualSlot99(float a, float b, int c, float d)
 {
     if (crashState) return crashState;
     if (UnknownVirtualSlot12(anyWheelInContact)) {
-        KbTrackB* t = ((KbTrackA*)track)->field_0xa4;
-        scratchVector = Vec3(t->field_0x394 * terrainScale * 128.0f, 20.0f,
-                             t->field_0x398 * terrainScale * 128.0f);
+        KbTrackB* t = ((KbTrackA*)track)->trackData;
+        scratchVector = Vec3(t->sizeX * terrainScale * 128.0f, 20.0f,
+                             t->sizeZ * terrainScale * 128.0f);
         Vec3 off = scratchVector - position;
         velocity = off * 0.055f;
         velocity.y = 120.0f;
@@ -1220,9 +1220,9 @@ void KrustyBike::Fn_00496E30(int a)
             if (other != this)
                 Fn_00496F90(other);
         }
-        if (((KbTrackA*)track)->field_0xb4 && !isRemote) {
-            for (int i = 0; i < ((KbTrackA*)track)->field_0xb4->count; i++) {
-                KbPart* part = ((KbTrackA*)track)->field_0xb4->items + i;
+        if (((KbTrackA*)track)->partList && !isRemote) {
+            for (int i = 0; i < ((KbTrackA*)track)->partList->count; i++) {
+                KbPart* part = ((KbTrackA*)track)->partList->items + i;
                 if (!(part->flags & 8))
                     part->obj->collider->RemoveIgnoredOwner((void*)collisionObject);
             }
@@ -1232,10 +1232,10 @@ void KrustyBike::Fn_00496E30(int a)
             if (other != this && (!isRemote || !other->isRemote))
                 Fn_00497370(other);
         }
-        if (((KbTrackA*)track)->field_0xb4 && !isRemote) {
-            for (int i = 0; i < ((KbTrackA*)track)->field_0xb4->count; i++) {
-                if (!(((KbTrackA*)track)->field_0xb4->items[i].flags & 8)) {
-                    KbPart* part = ((KbTrackA*)track)->field_0xb4->items + i;
+        if (((KbTrackA*)track)->partList && !isRemote) {
+            for (int i = 0; i < ((KbTrackA*)track)->partList->count; i++) {
+                if (!(((KbTrackA*)track)->partList->items[i].flags & 8)) {
+                    KbPart* part = ((KbTrackA*)track)->partList->items + i;
                     KbPartObj* obj = part->obj;
                     obj->collider->AddIgnoredOwner(bikeCollision);
                     obj->collider->AddIgnoredOwner(bikeAndRiderCollision);
@@ -1483,8 +1483,8 @@ int KrustyBike::Tick(float dt)
     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4) {
         KbPlayer* p = reinterpret_cast<KbPlayer*>(reinterpret_cast<EventManager*>(
             reinterpret_cast<KbGame*>(g_TrackGame)->eventManager)->FindRaceMode());
-        if (p->field_0xdc && p->field_0xa8 == this && crashState) {
-            if (reinterpret_cast<KbGame*>(g_TrackGame)->network->field_0x10)
+        if (p->ball && p->followedRacer == this && crashState) {
+            if (reinterpret_cast<KbGame*>(g_TrackGame)->network->isHost)
                 p->Fn_004A9E80(0, this, 1);
             else
                 Fn_004925A0(0, 1);

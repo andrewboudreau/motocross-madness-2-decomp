@@ -65,7 +65,7 @@ extern Vec3 g_kbZeroVec;
 struct KbTrackRec { Vec3 field_0x00; char pad_0x0C[0xC]; };
 struct KbMode { char pad_0x00[0x94]; int GetSelectedSeries(); };
 struct KbGameCfg {
-    char pad_0x0000[0x10]; int field_0x10;
+    char pad_0x0000[0x10]; int isHost;  // +0x10 NetworkInterface::isHost (Net.h)
     // 0x004AC830 (Net.cpp): send a message (type, data, size, destination id, flags); returns 1 on success.
     int Send(int type, void* data, int size, int dest, int flags);
 };
@@ -292,16 +292,18 @@ struct KbWheel { void SetRollDistance(float d); };
 struct KbPartObj { char pad_0x00[0x3C]; CollisionObject* collider; };  // +0x3c: AddIgnoredOwner 0x00439410 is called on it
 struct KbPart { unsigned char flags; char pad_0x01[7]; KbPartObj* obj; char pad_0x0C[0x38]; };
 struct KbPartList { int count; KbPart* items; };
+// The bike's track object (SoultreePhysicsBaseObject::track, SoultreeSlot1f0); tier 3 names.
 struct KbTrackA {
     char pad_0x0000[0xA4];
-    KbTrackB* field_0xa4; // 0xA4
+    KbTrackB* trackData;   // +0xa4 SoultreeSlot1f0::trackData
     char pad_0x00A8[0xC];
-    KbPartList* field_0xb4; // 0xB4
+    KbPartList* partList;  // +0xb4 parts whose colliders take the bike as an ignored owner
 };
 struct KbTrackB {
     char pad_0x0000[0x394];
-    float field_0x394; // 0x394
-    float field_0x398; // 0x398
+    float sizeX;           // +0x394 map extent along x in 256-unit cells (slot 12's bounds;
+                           //        slot 99 aims at sizeX * 128 * terrainScale, the centre)
+    float sizeZ;           // +0x398 the same along z
 };
 struct KbSensor {
     char pad_0x0000[0x3DC];
@@ -489,12 +491,16 @@ struct KbMessage;
 struct KbMsgSink { void ReplaceHeadMessage(KbMessage* m); };
 struct KbSession { KbPlayer* FindRaceMode(); KbMsgSink* FindTextQueue(); };
 class Vehicle;
+// View of the race view owner (TrackGameViewOwner, src/reconstructed/TrackGame.h); the names
+// follow that view.  In the tag event (type 4) followedRacer is the racer who is IT.
 struct KbPlayer {
     char pad_0x0000[0xA8];
-    Vehicle* field_0xa8;   // 0xA8: vehicle this player is bound to
+    Vehicle* followedRacer;  // +0xa8 TrackGameViewOwner::followedRacer
     char pad_0x00AC[0x30];
-    Vehicle* field_0xdc;   // 0xDC
-    void Fn_004A9E80(Vehicle* a, Vehicle* b, int c);   // 0x004A9E80: b is a vehicle (tested and read at +0x75c)
+    Vehicle* ball;           // +0xdc TrackGameViewOwner::ball (a ghost bike; "FREE BALL!" while set)
+    // 0x004A9E80 (TrackGameViewOwner::SetFollowedRacer): follows a after b; b is a vehicle
+    // (tested and read at +0x75c).
+    void Fn_004A9E80(Vehicle* a, Vehicle* b, int c);
 };
 // Bounds/collision body at Vehicle::field_0x128 (canonical: CollisionObject::TestMeshBounds).
 struct KbBody { int TestMeshBounds(KbBody* other); };
