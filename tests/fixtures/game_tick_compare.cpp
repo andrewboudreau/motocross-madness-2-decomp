@@ -52,8 +52,8 @@ static Event& Record(int kind, const void* receiver, int arg) {
     e.phaseTimes[1] = referenceRun ? *(int*)0x65b538 : g_PrepFrameTime;
     e.phaseTimes[2] = referenceRun ? *(int*)0x65b53c : g_UpdateScreenTime;
     e.phaseTimes[3] = referenceRun ? *(int*)0x65b540 : g_NetTime;
-    e.currentStamp = CurrentGame()->field_0x2d8;
-    e.previousStamp = CurrentGame()->field_0x2dc;
+    e.currentStamp = CurrentGame()->frameClock;
+    e.previousStamp = CurrentGame()->previousFrameClock;
     memcpy(&e.frameTimeBits, &CurrentGame()->frameTime, 4);
     return e;
 }
@@ -64,7 +64,7 @@ static void SelectMeter(int n) {
 static void Touch(int kind) {
     if (!scenario.mutate) return;
     Game* game = CurrentGame();
-    game->field_0x2d8 += kind * 13;
+    game->frameClock += kind * 13;
     if (kind == 4) {
         game->inputSuspended = !game->inputSuspended;
         game->network = (NetworkInterface*)(tokens + 160);
@@ -85,7 +85,7 @@ unsigned int ReadClock() {
 }
 void Game::ResetClock() {
     Record(3, this, 0);
-    field_0x2d8 = ReadClock(); field_0x2dc = field_0x2d8;
+    frameClock = ReadClock(); previousFrameClock = frameClock;
 }
 int ControlInterface::DispatchInput(int bits) { Record(4, this, bits); Touch(4); return -8; }
 int NetworkInterface::Update(int bits) { Record(5, this, bits); Touch(5); return 0; }
@@ -238,8 +238,8 @@ static void Run(int reference) {
     game->controlInterface = scenario.controls ? (ControlInterface*)(tokens + 96) : 0;
     game->network = scenario.network ? (NetworkInterface*)(tokens + 128) : 0;
     game->inputSuspended = scenario.suspended; game->stepOneFrame = scenario.step;
-    game->field_0x2dc = scenario.clockMode ? 0 : 0xfffffff0u;
-    game->field_0x2d8 = 73;
+    game->previousFrameClock = scenario.clockMode ? 0 : 0xfffffff0u;
+    game->frameClock = 73;
     for (int m = 0; m < 2; ++m) {
         HiResMeter* meter = Meter(m); meter->timerCount = scenario.count;
         meter->field_0x38 = -31;

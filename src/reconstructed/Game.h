@@ -135,8 +135,8 @@ public:
     unsigned char useZBuffer : 1;             // +0x2d5 bit 3: set by the constructor; Z enable/write and the render target's z-buffer
     unsigned char field_0x2d5_bits : 4;
     unsigned char field_0x02d6[2];
-    unsigned int field_0x2d8;                 // time stamps (0x00468880)
-    unsigned int field_0x2dc;
+    unsigned int frameClock;                  // +0x2d8 ReadClock ms at the start of this frame's slot-10 tick; ResetClock sets both stamps
+    unsigned int previousFrameClock;          // +0x2dc frameClock of the previous tick (0 until the first one); frameTime is the difference
     float replaySpeed;                        // +0x2e0: 1.0 normal; the replay dialog sets 2/8 for TogFF/TogFFF, 0 reversing, 30 for ButEnd; scales replay time
     float field_0x2e4;
     float field_0x2e8;

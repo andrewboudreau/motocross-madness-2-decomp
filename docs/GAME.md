@@ -105,8 +105,11 @@ The constructor (`0x00467990`) is exact. It:
 - decodes two static strings in place (XOR 0x5b): "SOFTWARE\Rainbow
   Studios\" and "TestKey".
 
-`0x00468880` (called by PCCamera slot 27) stamps +0x2d8/+0x2dc with the
-time from `0x004bfa80`.
+`0x00468880` (called by PCCamera slot 27) (`ResetClock`) stamps `frameClock` (+0x2d8) and
+`previousFrameClock` (+0x2dc) with the time from `0x004bfa80`. The slot 10 tick
+reads the clock into `frameClock` (resetting both first while
+`previousFrameClock` is 0) and copies it to `previousFrameClock` at the end;
+`frameTime` is their difference in seconds.
 
 ## Slot 8 and the profile pages
 

@@ -55,11 +55,11 @@ int Game::Tick() {
     entry->startStampLow = (unsigned long)stamp;
     entry->startStampHigh = (unsigned long)(stamp >> 32);
 
-    if (!field_0x2dc)
+    if (!previousFrameClock)
         ResetClock();
     else
-        field_0x2d8 = ReadClock();
-    double seconds = (double)(field_0x2d8 - field_0x2dc) * 0.001f;
+        frameClock = ReadClock();
+    double seconds = (double)(frameClock - previousFrameClock) * 0.001f;
     float delta = (float)seconds;
     // Retail overwrites the profiling peak with the unclamped frame duration.
     ((HiResMeter*)g_HiResMeter)->timers[gameTickTimer].peakMs = (float)(seconds * 1000.0f);
@@ -95,7 +95,7 @@ int Game::Tick() {
         rootObject->ReleaseDetached();
         renderTarget->AdvanceFrame();
     }
-    field_0x2dc = field_0x2d8;
+    previousFrameClock = frameClock;
     if (stepOneFrame) {
         paused = 1;
         stepOneFrame = 0;

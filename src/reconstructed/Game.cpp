@@ -97,8 +97,8 @@ Game::Game() {
     debugOverlay = 0;
     s_UnknownFile65b4ac = 0;
     strcpy(field_0x40, "");
-    field_0x2dc = 0;
-    field_0x2d8 = 0;
+    previousFrameClock = 0;
+    frameClock = 0;
     replaySpeed = 1.0f;
     allowDither = 1;
     allowMipMapping = 1;
@@ -339,7 +339,7 @@ int Game::PresentFrame() {
 
 // 0x00468880
 void Game::ResetClock() {
-    field_0x2d8 = field_0x2dc = ReadClock();
+    frameClock = previousFrameClock = ReadClock();
 }
 
 // 0x004688a0
