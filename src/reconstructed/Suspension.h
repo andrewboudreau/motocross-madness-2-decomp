@@ -78,7 +78,7 @@ public:
     ~Shock();                                                                    // 0x004f9b80
     virtual void Reset();            // slot 0, 0x004f9ba0
     virtual void ClearForces();      // slot 1, 0x004f9c70 (shared by InlineShock/RotatingShock)
-    void ApplyDamping(float a, float b, float c, float d);                       // 0x004f9d30 (ret 0x10)
+    void ApplyDamping(float loadWeight, float massFactor, float dt, float speedOut); // 0x004f9d30 (ret 0x10)
 
     int atLimit;                     // +0x50
     int extending;                   // +0x54

@@ -251,7 +251,7 @@ struct VehicleShock {
     void ClearForces();                                         // 0x004f9c70
     // 0x004f9d30 (ret 0x10): Suspension.h's Shock::ApplyDamping; Method_005293E0 passes the
     // wheel's load weight, Vehicle+0x4dc suspensionMass, the last step time and its speed output.
-    void ApplyDamping(float weight, float a, float dt, float* speed);
+    void ApplyDamping(float loadWeight, float massFactor, float dt, float* speed);
 };
 struct VehicleInlineShock : VehicleShock {
     // 0x004f9ee0 (ret 0x24): Bike's loader builds it with the shock name, the model node, the

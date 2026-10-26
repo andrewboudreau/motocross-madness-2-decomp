@@ -75,21 +75,21 @@ void Shock::ClearForces()
     velocity = kShockZero;
 }
 
-void Shock::ApplyDamping(float a, float b, float c, float d)
+void Shock::ApplyDamping(float loadWeight, float massFactor, float dt, float speedOut)
 {
-    float k = stiffnessMin + (stiffnessMax - stiffnessMin) * ratio;
-    float m = a * b;
+    float stiffness = stiffnessMin + (stiffnessMax - stiffnessMin) * ratio;
+    float mass = loadWeight * massFactor;
     float len = velocity.LengthSquared();
     len = (len == 1.0f) ? 1.0f : FastSqrt(len);
     if (len <= speedThreshold) {
-        float coeff = FastSqrt(m * k) * dampingRatio * -2.0f;
+        float coeff = FastSqrt(mass * stiffness) * dampingRatio * -2.0f;
         damper = velocity * coeff;
     } else {
-        float coeff = FastSqrt(m * k) * dampingRatio * -2.0f;
+        float coeff = FastSqrt(mass * stiffness) * dampingRatio * -2.0f;
         coeff *= ((len - speedThreshold) * 0.5f + speedThreshold) / len;
         damper = velocity * coeff;
     }
-    spring = displacement * k;
+    spring = displacement * stiffness;
     spring += damper;
 }
 
@@ -182,10 +182,10 @@ void InlineShock::SolveContact(float dt, const ShockVec3* offset, const ShockVec
     float t;
     ShockVec3 anchor;
     anchorNode->GetPositionIn(0, &anchor);
-    ShockVec3 d = *point - anchor;
-    float dist = ShockDot(d, *normal);
+    ShockVec3 toPoint = *point - anchor;
+    float dist = ShockDot(toPoint, *normal);
     if (dist >= 0.0f)
-        dist = ShockDot(d, ShockVec3(-normal->x, normal->y, -normal->z));
+        dist = ShockDot(toPoint, ShockVec3(-normal->x, normal->y, -normal->z));
     if (dist < 0.0) {
         t = limit / dist;
         miss = 0;
@@ -193,21 +193,21 @@ void InlineShock::SolveContact(float dt, const ShockVec3* offset, const ShockVec
         t = 0.0f;
         miss = 1;
     }
-    float len = d.LengthSquared();
+    float len = toPoint.LengthSquared();
     len = (len == 1.0f) ? 1.0f : (float)sqrt(len);
     float over = axisLength - len;
     if (!(over > 0.0f))
         over = 0.0f;
     length = over - len * t;
-    float k = -(length / len);
-    displacement = d * k;
+    float scale = -(length / len);
+    displacement = toPoint * scale;
     ShockVec3 pos = axis * -length;
     ShockVec3 w = *base + *offset;
     {
         ShockVec3 proj;
         ProjectInto(&proj, w, displacement);
-        float u = ShockDotCall(proj, proj);
-        speed = (u == 1.0f) ? 1.0f : FastSqrt(u);
+        float speedSq = ShockDotCall(proj, proj);
+        speed = (speedSq == 1.0f) ? 1.0f : FastSqrt(speedSq);
     }
     ClampAndStep(speed * dt, dt, pos);
     if (atLimit == 0 && miss == 0) {
@@ -230,8 +230,8 @@ ShockVec3 ShockProject(const ShockVec3& v, const ShockVec3& onto)
 {
     if (onto.x == kShockZero.x && onto.y == kShockZero.y && onto.z == kShockZero.z)
         return kShockZero;
-    float s = ShockDot(v, onto) / ShockDot(onto, onto);
-    return onto * s;
+    float scale = ShockDot(v, onto) / ShockDot(onto, onto);
+    return onto * scale;
 }
 
 RotatingShock::RotatingShock(void* name, int root, float maxAngle_, float armLength_, float stiffnessMin_,
