@@ -807,11 +807,11 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
             ->AddCaster(((UnknownQuarryRace*)raceView)->field_0x38->riderCharacter->modelNode);
         ((UnknownQuarryShadow*)projectedShadow)->SetLight(&shadowLight->position, &shadowLight->look, 3);
         ((UnknownQuarryShadow*)projectedShadow)->SetShadowStrength(0x80);
-        int ambient = (int)(ambientLight->field_0x54[1] * 255.0f);
+        int ambient = (int)(ambientLight->ambientRGBA[1] * 255.0f);
         if (!ambientLight)
             ambientLight = lightManager->FindLightOfType(6);
         if (ambientLight)
-            ambient = (int)(ambientLight->field_0x54[1] * 255.0f);
+            ambient = (int)(ambientLight->ambientRGBA[1] * 255.0f);
         ((UnknownQuarryShadow*)projectedShadow)->SetShadowGrey(ambient);
     }
     if (progress)

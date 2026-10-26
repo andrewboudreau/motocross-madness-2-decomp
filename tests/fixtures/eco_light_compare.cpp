@@ -9,7 +9,7 @@
 typedef char Layout[(sizeof(LightManager)==0x11c && sizeof(LightEmitter)==0xac &&
     offsetof(LightManager,lightCount)==0x2c && offsetof(LightManager,lights)==0x30 &&
     offsetof(LightEmitter,lightType)==0x2c && offsetof(LightEmitter,manager)==0xa4 &&
-    offsetof(LightEmitter,field_0x54)==0x54 && offsetof(LightEmitter,lightDirection)==0x70 &&
+    offsetof(LightEmitter,ambientRGBA)==0x54 && offsetof(LightEmitter,lightDirection)==0x70 &&
     sizeof(LightEmitter*(LightManager::*)(int))==4 &&
     sizeof(void(LightManager::*)(LightEmitter*))==4)?1:-1];
 

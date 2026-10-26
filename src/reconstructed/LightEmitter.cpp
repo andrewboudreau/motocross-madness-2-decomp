@@ -27,7 +27,7 @@ void UnknownLightEmitterTarget::SetPosition(const Vector3* position) {
 LightEmitter::LightEmitter(int flags) : GameObject(flags) {
     lightType = 0;
     debugSphere = 0;
-    field_0x9c = 0;
+    linkedTarget = 0;
     d3dLightType = 3;
     colorRGBA[0] = 1.0f;
     colorRGBA[1] = 1.0f;
@@ -37,10 +37,10 @@ LightEmitter::LightEmitter(int flags) : GameObject(flags) {
     specularRGBA[1] = 1.0f;
     specularRGBA[2] = 1.0f;
     specularRGBA[3] = 0.0f;
-    field_0x54[0] = 1.0f;
-    field_0x54[1] = 1.0f;
-    field_0x54[2] = 1.0f;
-    field_0x54[3] = 0.0f;
+    ambientRGBA[0] = 1.0f;
+    ambientRGBA[1] = 1.0f;
+    ambientRGBA[2] = 1.0f;
+    ambientRGBA[3] = 0.0f;
     lightPosition = Vector3(0.0f, 0.0f, 0.0f);
     lightDirection = Vector3(1.0f, 0.0f, 0.0f);
     lightRange = (float)sqrt(FLT_MAX);
@@ -82,12 +82,12 @@ void LightEmitter::SetColor(unsigned int color) {
     specularRGBA[1] = colorRGBA[1];
     specularRGBA[2] = colorRGBA[2];
     specularRGBA[3] = 0.0f;
-    field_0x54[0] = colorRGBA[0];
-    field_0x54[1] = colorRGBA[1];
-    field_0x54[2] = colorRGBA[2];
-    field_0x54[3] = 0.0f;
-    if (field_0x9c)
-        field_0x9c->SetRgbColor(color);
+    ambientRGBA[0] = colorRGBA[0];
+    ambientRGBA[1] = colorRGBA[1];
+    ambientRGBA[2] = colorRGBA[2];
+    ambientRGBA[3] = 0.0f;
+    if (linkedTarget)
+        linkedTarget->SetRgbColor(color);
     if (manager)
         manager->MarkChanged();
 }
@@ -109,8 +109,8 @@ void LightEmitter::SetPosition(const Vector3* position) {
         if (debugSphere)
             debugSphere->SetPositionVec3(*position);
         lightPosition = *position;
-        if (field_0x9c)
-            field_0x9c->SetPosition(position);
+        if (linkedTarget)
+            linkedTarget->SetPosition(position);
         if (manager)
             manager->MarkChanged();
     }

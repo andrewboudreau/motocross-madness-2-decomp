@@ -9,7 +9,7 @@
 // (vtable 0x005550cc) and LightManager : GameObject (vtable 0x00555144).
 // Field and method names are provisional.
 
-// The object at LightEmitter+0x9c; only these two helpers (both in this
+// LightEmitter::linkedTarget (+0x9c); only these two helpers (both in this
 // file) are known.
 class UnknownLightEmitterTarget {
 public:
@@ -52,7 +52,7 @@ public:
     int d3dLightType;                       // +0x30 dltType, default 3
     float colorRGBA[4];                     // colour (r, g, b, a)
     float specularRGBA[4];                  // +0x44 dcvSpecular
-    float field_0x54[4];                    // dcvAmbient (named in the loader near miss's lane)
+    float ambientRGBA[4];                   // +0x54 dcvAmbient; SetColor copies the diffuse colour here too
     Vector3 lightPosition;                  // position
     Vector3 lightDirection;                 // direction
     float lightRange;                       // range, sqrt(FLT_MAX) when unbounded
@@ -63,7 +63,7 @@ public:
     float spotInnerAngle;                   // +0x90 dvTheta, pi / 4
     float spotOuterAngle;                   // +0x94 dvPhi, pi / 2
     D3DIMSoultreeObject* debugSphere;       // "sphere.slt" model
-    UnknownLightEmitterTarget* field_0x9c;
+    UnknownLightEmitterTarget* linkedTarget; // +0x9c ctor 0; SetColor and SetPosition forward the colour and position to it
     int lightIndex;                         // +0xa0 Create's last argument, -1 by default
     LightManager* manager;                  // owner (set by 0x0049e470)
     unsigned int field_0xa8;                // compared, never written here
