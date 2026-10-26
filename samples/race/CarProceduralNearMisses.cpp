@@ -60,6 +60,7 @@
 #include <math.h>
 
 #include "../../src/reconstructed/CarProcedural.h"
+#include "../../src/reconstructed/D3DIMSoulTree.h"
 
 static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
 
@@ -249,7 +250,7 @@ int CarProcedural::Tick(float frameTime)
         sensorCollider->SetMeshShape(1, box);
         for (unsigned int i = 0; i < numWheels; i++) {
             Vector3 position;
-            wheelNodes[i]->GetPosition(&position);
+            reinterpret_cast<SoultreeObject*>(wheelNodes[i])->GetPosition(reinterpret_cast<Vec3*>(&position));
             if (position.z > 0.0)
                 frontWheelZ = position.z;
         }
