@@ -33,9 +33,9 @@
 // matches): same instructions, different register/stack assignment.
 // fontStride declared after `end` gives retail's ebp for it (stride at
 // [esp+0x34]); differing instructions 54 -> 30 (DrawTextInto) and 55 -> 31
-// (the 16-bit pair). Left: retail keeps w in esi and v in the slot later
-// reused for the row count, VC6 here the reverse (w before v or u is worse:
-// 39, 51), and the row offsets are formed in other registers.
+// (the 16-bit pair). Left: retail keeps glyphWidth in esi and srcY in the
+// slot later reused for the row count, VC6 here the reverse (glyphWidth
+// declared before srcY or srcX is worse: 39, 51), and the row offsets are formed in other registers.
 // Pointer-walking rows, fully indexed rows, top-of-function declarations,
 // signed coordinates and inline pitch expressions are all further off.
 //
@@ -102,26 +102,26 @@ int UnknownOverlayText::DrawTextInto(TextureMap* texture, int x, int y, const ch
         CharacterCell* character = currentFont->FindCell(text[i]);
         if (character) {
             cell = character->GetRect();
-            unsigned int u = (unsigned int)(fontWidth * cell.field_0x04.x);
-            unsigned int v = (unsigned int)(fontHeight * cell.field_0x04.y);
-            unsigned int w = (unsigned int)((cell.field_0x10.x - cell.field_0x04.x) * fontWidth);
-            unsigned int h = (unsigned int)((cell.field_0x10.y - cell.field_0x04.y) * fontHeight);
-            if (px + w >= width) {
+            unsigned int srcX = (unsigned int)(fontWidth * cell.field_0x04.x);
+            unsigned int srcY = (unsigned int)(fontHeight * cell.field_0x04.y);
+            unsigned int glyphWidth = (unsigned int)((cell.field_0x10.x - cell.field_0x04.x) * fontWidth);
+            unsigned int glyphHeight = (unsigned int)((cell.field_0x10.y - cell.field_0x04.y) * fontHeight);
+            if (px + glyphWidth >= width) {
                 px = x;
-                py += h;
+                py += glyphHeight;
             }
-            unsigned int source = fontStride * v;
+            unsigned int source = fontStride * srcY;
             unsigned int dest = py * stride;
-            for (unsigned int row = 0; row < h; row++) {
+            for (unsigned int row = 0; row < glyphHeight; row++) {
                 end = px;
-                for (unsigned int column = u; column < u + w; column++) {
+                for (unsigned int column = srcX; column < srcX + glyphWidth; column++) {
                     bits[dest + end] = BlendFontTexel32(fontBits[source + column], bits[dest + end], color);
                     end++;
                 }
                 source += fontStride;
                 dest += stride;
             }
-            px += w;
+            px += glyphWidth;
         }
     }
     texture->UnlockSurface(0);
@@ -153,26 +153,26 @@ int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const ch
         CharacterCell* character = currentFont->FindCell(text[i]);
         if (character) {
             cell = character->GetRect();
-            unsigned int u = (unsigned int)(fontWidth * cell.field_0x04.x);
-            unsigned int v = (unsigned int)(fontHeight * cell.field_0x04.y);
-            unsigned int w = (unsigned int)((cell.field_0x10.x - cell.field_0x04.x) * fontWidth);
-            unsigned int h = (unsigned int)((cell.field_0x10.y - cell.field_0x04.y) * fontHeight);
-            if (px + w >= width) {
+            unsigned int srcX = (unsigned int)(fontWidth * cell.field_0x04.x);
+            unsigned int srcY = (unsigned int)(fontHeight * cell.field_0x04.y);
+            unsigned int glyphWidth = (unsigned int)((cell.field_0x10.x - cell.field_0x04.x) * fontWidth);
+            unsigned int glyphHeight = (unsigned int)((cell.field_0x10.y - cell.field_0x04.y) * fontHeight);
+            if (px + glyphWidth >= width) {
                 px = x;
-                py += h;
+                py += glyphHeight;
             }
-            unsigned int source = fontStride * v;
+            unsigned int source = fontStride * srcY;
             unsigned int dest = py * stride;
-            for (unsigned int row = 0; row < h; row++) {
+            for (unsigned int row = 0; row < glyphHeight; row++) {
                 end = px;
-                for (unsigned int column = u; column < u + w; column++) {
+                for (unsigned int column = srcX; column < srcX + glyphWidth; column++) {
                     bits[dest + end] = BlendFontTexel4444(fontBits[source + column], bits[dest + end], color);
                     end++;
                 }
                 source += fontStride;
                 dest += stride;
             }
-            px += w;
+            px += glyphWidth;
         }
     }
     texture->UnlockSurface(0);
@@ -204,26 +204,26 @@ int UnknownOverlayText::DrawText1555(TextureMap* texture, int x, int y, const ch
         CharacterCell* character = currentFont->FindCell(text[i]);
         if (character) {
             cell = character->GetRect();
-            unsigned int u = (unsigned int)(fontWidth * cell.field_0x04.x);
-            unsigned int v = (unsigned int)(fontHeight * cell.field_0x04.y);
-            unsigned int w = (unsigned int)((cell.field_0x10.x - cell.field_0x04.x) * fontWidth);
-            unsigned int h = (unsigned int)((cell.field_0x10.y - cell.field_0x04.y) * fontHeight);
-            if (px + w >= width) {
+            unsigned int srcX = (unsigned int)(fontWidth * cell.field_0x04.x);
+            unsigned int srcY = (unsigned int)(fontHeight * cell.field_0x04.y);
+            unsigned int glyphWidth = (unsigned int)((cell.field_0x10.x - cell.field_0x04.x) * fontWidth);
+            unsigned int glyphHeight = (unsigned int)((cell.field_0x10.y - cell.field_0x04.y) * fontHeight);
+            if (px + glyphWidth >= width) {
                 px = x;
-                py += h;
+                py += glyphHeight;
             }
-            unsigned int source = fontStride * v;
+            unsigned int source = fontStride * srcY;
             unsigned int dest = py * stride;
-            for (unsigned int row = 0; row < h; row++) {
+            for (unsigned int row = 0; row < glyphHeight; row++) {
                 end = px;
-                for (unsigned int column = u; column < u + w; column++) {
+                for (unsigned int column = srcX; column < srcX + glyphWidth; column++) {
                     bits[dest + end] = BlendFontTexel1555(fontBits[source + column], bits[dest + end], color);
                     end++;
                 }
                 source += fontStride;
                 dest += stride;
             }
-            px += w;
+            px += glyphWidth;
         }
     }
     texture->UnlockSurface(0);
