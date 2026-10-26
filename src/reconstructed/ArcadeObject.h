@@ -48,8 +48,8 @@ public:
                                         int pixels, UnknownArcadeView* view, float size,
                                         float screenXFraction, float screenYFraction, unsigned char alpha);
     void SetPosition(const Vector3* position);  // 0x004014f0
-    // 0x00401520: forwards two axes and two flags to the model (0x004fbd70).
-    void SetAxes(const Vector3* a, const Vector3* b, int c, int d);
+    // 0x00401520: forwards the axes and flags to the model's SetAxesPtr (0x004fbd70).
+    void SetAxes(const Vector3* axisZ, const Vector3* axisY, int orthogonalize, int keepZ);
     // 0x00401540 (ret 0x18): builds the collision object (line 154) from
     // "<name>.col" when the archive has it, under the "Collision" category.
     int BuildCollision(const char* name, int value, UnknownPickCallback callback, void* context,

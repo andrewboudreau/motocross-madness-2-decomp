@@ -91,8 +91,9 @@ void ArcadeObject::SetPosition(const Vector3* position) {
 }
 
 // 0x00401520
-void ArcadeObject::SetAxes(const Vector3* a, const Vector3* b, int c, int d) {
-    arcadeModel->SetAxesPtr(reinterpret_cast<const Vec3*>(a), reinterpret_cast<const Vec3*>(b), c, d);
+void ArcadeObject::SetAxes(const Vector3* axisZ, const Vector3* axisY, int orthogonalize, int keepZ) {
+    arcadeModel->SetAxesPtr(reinterpret_cast<const Vec3*>(axisZ), reinterpret_cast<const Vec3*>(axisY),
+                            orthogonalize, keepZ);
 }
 
 // 0x00401540
