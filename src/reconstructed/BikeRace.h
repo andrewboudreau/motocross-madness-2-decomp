@@ -839,7 +839,7 @@ extern Vector3 g_PathTargetDebugLine[2];    // 0x00578dc0 position to path targe
 
 // 0x004230e0 (cdecl; an UnknownRecorderCallback, its address is passed at
 // 0x0041918a and later): the replay time in milliseconds, then 0x00421d50.
-int RecorderCallback(int a, void* data, int flag, int b, int* keep, int time,
+int RecorderCallback(int kind, void* data, int flag, int recorderId, int* keep, int time,
                      int* milliseconds);
 // 0x00417b30 (cdecl): sorts `keys` in descending order, moving `values`
 // along with them.

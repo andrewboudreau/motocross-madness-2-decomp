@@ -26,8 +26,8 @@ struct UnknownRecorderRecord {
 };
 
 // The function pointer at VCRInterface+0x80 (cdecl, seven arguments). Slot 10
-// passes -2 and -3 as `a` for control calls; the result selects its next step.
-typedef int (*UnknownRecorderCallback)(int a, void* data, int flag, int b, int* keep, int time,
+// passes -2 and -3 as `kind` for control calls; the result selects its next step.
+typedef int (*UnknownRecorderCallback)(int kind, void* data, int flag, int recorderId, int* keep, int time,
                                        int* milliseconds);
 
 // What 0x004e7a90 passes to the worker thread (VCRInterface+0x90).

@@ -1498,10 +1498,10 @@ static inline UnknownBikeRaceGhost* GhostBike() {
 }
 
 // 0x00421d50
-int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int time) {
+int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* keep, int time) {
     *keep = 0;
-    lastRecordKind = a;
-    if (replayPaused && a == -1) {
+    lastRecordKind = kind;
+    if (replayPaused && kind == -1) {
         replayTime = ((UnknownBikeRaceVcrTick*)data)->time;
         replayStepFrame = false;
         return 5;
@@ -1509,7 +1509,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
     if (g_TrackGame->uiInteractionBlocked) {
         return 0;
     }
-    if (a == -2) {
+    if (kind == -2) {
         ClearRacerParts();
         g_TrackGame->replaySpeed = 1.0f;
         if (g_TrackGame->ui->playingDemo) {
@@ -1537,7 +1537,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
             return 11;
         }
         return 1;
-    } else if (a == -3) {
+    } else if (kind == -3) {
         ClearRacerParts();
         g_TrackGame->replaySpeed = 1.0f;
         if (replayMode == 14) {
@@ -1558,7 +1558,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
         replayTime = 0;
         replayMode = 4;
         return 1;
-    } else if (a == -1) {
+    } else if (kind == -1) {
         UnknownBikeRaceVcrTick* tick = (UnknownBikeRaceVcrTick*)data;
         if (replayStepFrame) {
             replayTime = tick->time;
@@ -1614,15 +1614,15 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
         }
         s_UnknownStatic578e8c = tick->time;
         return 1;
-    } else if (a == 6) {
+    } else if (kind == 6) {
         if (replayPaused) {
             ToggleReplayPause(0);
         }
         return replayMode == 11 ? 11 : 1;
-    } else if (a == 1) {
+    } else if (kind == 1) {
         UnknownBikeRaceNetState* state = (UnknownBikeRaceNetState*)data;
         UnknownBikeRaceRacer* racer = localRacer;
-        if (b == racer->recorderId && racer->netIndex == state->racerIndex) {
+        if (recorderId == racer->recorderId && racer->netIndex == state->racerIndex) {
             if (g_TrackGame->mode.raceSettings.raceMode == 4) {
                 racer = aiRacers[0];
             }
@@ -1671,7 +1671,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
             return 1;
         }
         for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
-            if (aiRacers[i] != 0 && b == aiRacers[i]->recorderId &&
+            if (aiRacers[i] != 0 && recorderId == aiRacers[i]->recorderId &&
                 aiRacers[i]->netIndex == state->racerIndex) {
                 aiRacers[i]->hasFullState = 1;
                 UnknownBikeRaceRacerPart* oldest;
@@ -1715,13 +1715,13 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
                 return 1;
             }
         }
-    } else if (a == 13) {
+    } else if (kind == 13) {
         UnknownBikeRaceNetMessage13* message = (UnknownBikeRaceNetMessage13*)data;
         if (flag) {
             return 1;
         }
         UnknownBikeRaceRacer* racer = localRacer;
-        if (b == racer->recorderId && racer->netIndex == message->racerIndex) {
+        if (recorderId == racer->recorderId && racer->netIndex == message->racerIndex) {
             if (g_TrackGame->mode.raceSettings.raceMode == 4) {
                 racer = aiRacers[0];
             }
@@ -1751,7 +1751,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
             return 1;
         }
         for (; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
-            if (aiRacers[i] != 0 && b == aiRacers[i]->recorderId &&
+            if (aiRacers[i] != 0 && recorderId == aiRacers[i]->recorderId &&
                 aiRacers[i]->netIndex == message->racerIndex) {
                 if (!aiRacers[i]->hasFullState) {
                     return 0;
@@ -1770,10 +1770,10 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
                 return 1;
             }
         }
-    } else if (a == 10) {
+    } else if (kind == 10) {
         UnknownBikeRaceNetScore* score = (UnknownBikeRaceNetScore*)data;
         UnknownBikeRaceRacer* racer = localRacer;
-        if (b == racer->recorderId && racer->netIndex == score->racerIndex) {
+        if (recorderId == racer->recorderId && racer->netIndex == score->racerIndex) {
             if (racer == 0) {
                 return 0;
             }
@@ -1782,14 +1782,14 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
             return 1;
         }
         for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
-            if (aiRacers[i] != 0 && b == aiRacers[i]->recorderId &&
+            if (aiRacers[i] != 0 && recorderId == aiRacers[i]->recorderId &&
                 aiRacers[i]->netIndex == score->racerIndex) {
                 aiRacers[i]->score = score->racerScore;
                 *keep = 1;
                 return 1;
             }
         }
-    } else if (a == 0x11) {
+    } else if (kind == 0x11) {
         UnknownBikeRaceGhostRecord* record = (UnknownBikeRaceGhostRecord*)data;
         if (g_TrackGame->tagEvent != 0 && g_TrackGame->tagEvent->ball != 0) {
             GhostBike()->hasState = 1;
@@ -1824,7 +1824,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
             }
             return 1;
         }
-    } else if (a == 0x10) {
+    } else if (kind == 0x10) {
         if (flag) {
             return 1;
         }
@@ -1842,7 +1842,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
             GhostBike()->receivedStates[0]->fresh = 0;
             return 1;
         }
-    } else if (a == 0x87) {
+    } else if (kind == 0x87) {
         UnknownBikeRaceVcrFollow* follow = (UnknownBikeRaceVcrFollow*)data;
         if (g_TrackGame->tagEvent != 0) {
             g_TrackGame->tagEvent->followedRacer = 0;
@@ -1891,11 +1891,11 @@ void BikeRace::ClearRacerParts() {
 }
 
 // 0x004230e0
-int RecorderCallback(int a, void* data, int flag, int b, int* keep, int time,
+int RecorderCallback(int kind, void* data, int flag, int recorderId, int* keep, int time,
                      int* milliseconds) {
     BikeRace* race = (BikeRace*)g_TrackGame->eventManager->FindRaceView();
     *milliseconds = (int)(race->replayTime * 1000.0f);
-    return race->RecordFrame(a, data, flag, b, keep, time);
+    return race->RecordFrame(kind, data, flag, recorderId, keep, time);
 }
 
 // 0x00423140

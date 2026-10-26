@@ -97,7 +97,7 @@ public:
     void WriteRelativePositions(Vector3* a, Vector3* b, void* reference, int flags);
     void ResetStartCountdown();             // 0x00421050
     // 0x00421d50: the recorder callback's work (0x004230e0 forwards to it).
-    int RecordFrame(int a, void* data, int flag, int b, int* keep, int time);
+    int RecordFrame(int kind, void* data, int flag, int recorderId, int* keep, int time);
     void ClearRacerParts();             // 0x00422ec0: zeroes every racer's parts
     void DrawTrack(Track* track); // 0x00423140: draws the track
     void ClearAiRacerParts(int index);    // 0x00423040: zeroes an AI racer's parts
