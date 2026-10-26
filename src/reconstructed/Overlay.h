@@ -27,10 +27,10 @@ public:
     // 0x004b5f50: binds the render target (slot 8), the texture (+0x2c), the
     // screen rectangle (+0xe8) and an optional source rectangle (+0xf8).
     Overlay* Attach(RenderTarget* target, TextureMap* texture,
-                                   const UnknownOverlayRect* rect, int a4,
+                                   const UnknownOverlayRect* rect, int scaleRect,
                                    const UnknownOverlayRect* source, float depth,
-                                   char a7, const char* a8, const char** a9, int a10,
-                                   int a11, int a12);
+                                   char withText, const char* textArchive, const char** fontNames,
+                                   int fontCount, int textFormat, int a12);
 
     // 0x004b6710: copies `rect` of the backing texture (+0x30) into the
     // overlay texture (ChatOverlay calls it before redrawing a line); 0 when
@@ -55,7 +55,7 @@ public:
     OverlayIconService* iconService;          // +0x3c
     int field_0x40;
     UnknownOverlayVertex quadVertices[5];     // cleared by the constructor
-    int field_0xe4;                           // 1
+    int scaleRect;                            // +0xe4 ctor 1, Attach's argument: LayOutQuad scales screenRect from 640x480 to the viewport
     UnknownOverlayRect screenRect;            // screen rectangle
     UnknownOverlayRect sourceRect;            // source rectangle
     int hasSourceRect;                        // has a source rectangle

@@ -22,7 +22,7 @@ Overlay::Overlay(int flags, int value) : GameObject(flags) {
     overlayTexture = 0;
     backingTexture = 0;
     field_0x40 = 0;
-    field_0xe4 = 1;
+    scaleRect = 1;
     memset(quadVertices, 0, sizeof(quadVertices));
     memset(&sourceRect, 0, sizeof(sourceRect));
     hasSourceRect = 0;
@@ -54,14 +54,14 @@ Overlay::~Overlay() {
 
 // 0x004b5f50
 Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
-                                        const UnknownOverlayRect* rect, int a4,
+                                        const UnknownOverlayRect* rect, int scaleRect,
                                         const UnknownOverlayRect* source, float depth,
-                                        char a7, const char* a8, const char** a9, int a10,
-                                        int a11, int a12) {
+                                        char withText, const char* textArchive, const char** fontNames,
+                                        int fontCount, int textFormat, int a12) {
     GameObject::SetRenderContext(target);
     overlayDepth = depth;
     overlayTexture = texture;
-    field_0xe4 = a4;
+    this->scaleRect = scaleRect;
     // Through the Target() accessor VC6 allocates the registers differently.
     field_0x40 = ((RenderTarget*)renderContext)->surfacePixelFormat;
     screenRect = *rect;
@@ -71,9 +71,9 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
     }
     LayOutQuad();
 
-    if (a7)
+    if (withText)
         textService = UnknownOverlayText::Create(
-            a8, a9, a10, a11, g_TrackGame->textureManager, quadVertices[0].sx, quadVertices[0].sy,
+            textArchive, fontNames, fontCount, textFormat, g_TrackGame->textureManager, quadVertices[0].sx, quadVertices[0].sy,
             quadVertices[2].sx - quadVertices[0].sx, quadVertices[2].sy - quadVertices[0].sy, a12);
     else
         textService = 0;
@@ -184,7 +184,7 @@ void Overlay::LayOutQuad() {
     }
 
     float originX, originY, x0, y0, x1, y1;
-    if (field_0xe4) {
+    if (scaleRect) {
         float scaleX = (float)maxX * (1.0f / 640.0f);
         originX = (float)left;
         x0 = (float)screenRect.left * scaleX + originX;

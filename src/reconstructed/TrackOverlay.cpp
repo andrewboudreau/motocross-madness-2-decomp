@@ -261,19 +261,19 @@ NameOverlay::~NameOverlay()
 
 // 0x00518e30
 NameOverlay* NameOverlay::Create(RenderTarget* target, TextureMap* texture,
-                                                const UnknownOverlayRect* rect, int a4,
-                                                const UnknownOverlayRect* source, UnknownEventRacer* a6,
-                                                UnknownNameOverlayWorld* a7, int a8)
+                                                const UnknownOverlayRect* rect, int scaleRect,
+                                                const UnknownOverlayRect* source, UnknownEventRacer* racer,
+                                                UnknownNameOverlayWorld* nameWorld, int phase)
 {
-    if (!Attach(target, texture, rect, a4, source, 0.00001f, 0, 0, 0, 0, 1555, 0)) {
+    if (!Attach(target, texture, rect, scaleRect, source, 0.00001f, 0, 0, 0, 0, 1555, 0)) {
         Release();
         return 0;
     }
-    world = a7;
-    trackedRacer = a6;
+    world = nameWorld;
+    trackedRacer = racer;
     sourceWidth = source->right - source->left + 1;
     sourceHeight = source->bottom - source->top + 1;
-    testPhase = a8 % 4;
+    testPhase = phase % 4;
     frameCounter = 0;
     drawLeftOfAnchor = 0;
     anchorOutsideMap = 1;

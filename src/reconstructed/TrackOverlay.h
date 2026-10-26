@@ -117,9 +117,9 @@ public:
     virtual int UnknownVirtualSlot14();       // 0x005190e0
 
     NameOverlay* Create(RenderTarget* target, TextureMap* texture,
-                                       const UnknownOverlayRect* rect, int a4,
-                                       const UnknownOverlayRect* source, UnknownEventRacer* a6,
-                                       UnknownNameOverlayWorld* a7, int a8); // 0x00518e30
+                                       const UnknownOverlayRect* rect, int scaleRect,
+                                       const UnknownOverlayRect* source, UnknownEventRacer* racer,
+                                       UnknownNameOverlayWorld* nameWorld, int phase); // 0x00518e30
     int IsPointVisible(const Vector3* point);                           // 0x00519000
     void SetFixedPosition(Vector3 point);                // 0x00519080
     void SetRadarAnchor(Vector3 point, int leftOfAnchor, int outsideMap); // 0x005190a0
