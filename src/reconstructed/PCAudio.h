@@ -175,7 +175,8 @@ public:
     int ApplyCachedSettings();                          // 0x004bbdc0: reapplies the cached settings
     int LoadWave(UnknownTextureStream* stream, unsigned long flags, unsigned long controls,
         int duplicates, int streamBytes); // 0x004bbef0: loads a .wav
-    int Load(const char* name, UnknownTextureStream* stream, int flags, int a, int b, int c);
+    int Load(const char* name, UnknownTextureStream* stream, int flags, int controls, int duplicates,
+             int streamBytes);
     unsigned long GetBufferControlFlags(unsigned long flags); // 0x004bc490: control flags
     int DuplicateFrom(Sound* source);                   // 0x004bc4c0: duplicates `source`
     int SupportsProperty(const UnknownGuid* set, unsigned long id, unsigned long support);
@@ -257,7 +258,8 @@ public:
 };
 
 // 0x004bb890: loads (or finds) a sound by name; not a member.
-Sound* LoadEntrySound(SoundGroup* group, const char* name, int flags, int a, int b, int c);
+Sound* LoadEntrySound(SoundGroup* group, const char* name, int flags, int controls, int duplicates,
+                      int streamBytes);
 
 // 0x54-byte sound memory manager PCSoundInterface owns at +0x46c (not
 // RTTI-typed): streamed sounds are queued for its thread, which creates and

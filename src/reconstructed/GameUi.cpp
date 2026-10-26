@@ -2412,8 +2412,8 @@ void UIControl::SetImageFile(int a, const char* image) {
 }
 
 // 0x00470870
-void UIControl::StartTransition(int type, int a, int b, int delay, int c) {
-    if (b) {
+void UIControl::StartTransition(int type, int sound, int show, int delay, int frameCount) {
+    if (show) {
         Show(1, 1);
         transitionState = 1;
     }
@@ -2442,12 +2442,12 @@ void UIControl::StartTransition(int type, int a, int b, int delay, int c) {
         break;
     }
     transitionTime = 0;
-    transitionFrameCount = c;
+    transitionFrameCount = frameCount;
     if (delay == 0xffff)
         transitionDelay = rand() % 2000;
     else
         transitionDelay = delay;
-    slideSound = (Sound*)a;
+    slideSound = (Sound*)sound;
     RequestRedraw();
 }
 

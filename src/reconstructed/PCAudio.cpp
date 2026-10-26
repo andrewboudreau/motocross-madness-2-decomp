@@ -148,7 +148,8 @@ UnknownSoundNotifier::~UnknownSoundNotifier() {
 // three load failures share one delete-and-fail tail, which retail lays
 // out inside the last branch; the two early failures keep their own
 // epilogues.
-Sound* LoadEntrySound(SoundGroup* group, const char* name, int flags, int a, int b, int c) {
+Sound* LoadEntrySound(SoundGroup* group, const char* name, int flags, int controls, int duplicates,
+                      int streamBytes) {
     UnknownResourceEntry* entry = g_ResourceManager->FindItem(name, 0);
     if (!entry)
         return 0;
@@ -159,14 +160,14 @@ Sound* LoadEntrySound(SoundGroup* group, const char* name, int flags, int a, int
     if (loaded) {
         if (loaded->soundFlags & 4) {
             entry->archive->Seek(entry->offset, 0, 0);
-            if (!sound->LoadWave(entry->archive, flags, a, b, c))
+            if (!sound->LoadWave(entry->archive, flags, controls, duplicates, streamBytes))
                 goto failed;
         } else if (!sound->DuplicateFrom(loaded)) {
             goto failed;
         }
     } else {
         entry->archive->Seek(entry->offset, 0, 0);
-        if (!sound->LoadWave(entry->archive, flags, a, b, c)) {
+        if (!sound->LoadWave(entry->archive, flags, controls, duplicates, streamBytes)) {
 failed:
             delete sound;
             return 0;
@@ -382,7 +383,8 @@ failed:
 // 0x004bc320: loads the sound from `stream`, or from the file `name`.
 // Static sounds (flags 1 and 4) are read completely; streamed sounds
 // (flag 2) keep the stream.
-int Sound::Load(const char* name, UnknownTextureStream* stream, int flags, int a, int b, int c) {
+int Sound::Load(const char* name, UnknownTextureStream* stream, int flags, int controls, int duplicates,
+                int streamBytes) {
     UnknownTextureStream* file;
 
     if (!SoundSystem() || !SoundSystem()->audioStarted)
@@ -397,13 +399,13 @@ int Sound::Load(const char* name, UnknownTextureStream* stream, int flags, int a
         file = stream;
     }
     if (flags & 5) {
-        if (!LoadWave(file, flags, a, b, -1))
+        if (!LoadWave(file, flags, controls, duplicates, -1))
             goto failed;
         if (!stream)
             delete file;
     } else if (flags & 2) {
         sourceStream = file;
-        if (!LoadWave(file, flags, a, b, c))
+        if (!LoadWave(file, flags, controls, duplicates, streamBytes))
             goto failed;
     }
     CopySoundName(soundName, name);

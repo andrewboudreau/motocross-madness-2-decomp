@@ -235,7 +235,7 @@ public:
     void UnknownInlineSetField18(void* value) { renderContext = value; }
     // 0x00470870: starts transition `type` (100-106: the loader's "FX" GROW,
     // LSLIDE, RSLIDE, TSLIDE, BSLIDE and ANIM).
-    void StartTransition(int type, int a, int b, int delay, int c);
+    void StartTransition(int type, int sound, int show, int delay, int frameCount);
     int RunTransition();              // 0x00471500
     void DeleteControlIterator(GameObjectIterator* iterator); // 0x00472730: deletes it
     // 0x00472750: the next control with this control's attach id.

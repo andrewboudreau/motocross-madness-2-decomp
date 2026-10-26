@@ -272,7 +272,7 @@ public:
     int WorldToMap(Vector3 point, int* x, int* y, float* rimX, float* rimY);
     // 0x0051c460: the line through a and b (x, y only) as a unit normal
     // (*nx, *ny) and offset *d; -1 when a and b coincide.
-    int LineThrough(const float* a, const float* b, float* nx, float* ny, float* d);
+    int LineThrough(const float* p0, const float* p1, float* nx, float* ny, float* d);
     // 0x0051c4f0: intersects the line through a and b with the circle
     // (circle[0], circle[1]) of radius circle[2]. Returns -1 for no
     // intersection (or a degenerate line), 1 for a tangent point and 2 for

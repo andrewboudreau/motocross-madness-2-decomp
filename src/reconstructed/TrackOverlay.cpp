@@ -1335,17 +1335,17 @@ int RadarOverlay::WorldToMap(Vector3 point, int* x, int* y, float* rimX, float* 
 }
 
 // 0x0051c460
-int RadarOverlay::LineThrough(const float* a, const float* b, float* nx, float* ny, float* d)
+int RadarOverlay::LineThrough(const float* p0, const float* p1, float* nx, float* ny, float* d)
 {
-    float dx = b[0] - a[0];
-    float dy = b[1] - a[1];
+    float dx = p1[0] - p0[0];
+    float dy = p1[1] - p0[1];
     float lengthSquared = dx * dx + dy * dy;
     if (lengthSquared < 1e-14f)
         return -1;
     float scale = 1.0f / FastSqrt(lengthSquared);
     *nx = -(dy * scale);
     *ny = dx * scale;
-    *d = (a[0] * b[1] - b[0] * a[1]) * scale;
+    *d = (p0[0] * p1[1] - p1[0] * p0[1]) * scale;
     return 0;
 }
 
