@@ -59,7 +59,7 @@ public:
     virtual void UnknownVirtualSlot43();
     virtual void UnknownVirtualSlot44();
     virtual float UnknownVirtualSlot45();
-    virtual Vec3* UnknownVirtualSlot46(Vec3* out, float arg);
+    virtual Vec3* UnknownVirtualSlot46(Vec3* out, float slideAngle);
     // pure virtual: entry is _purecall (0x00534cfe).  Bike's override 0x0040cbb0 is
     // `ret 4` and returns a float (tier 1 via its byte match), hence float(float).
     virtual float UnknownVirtualSlot47(float arg) = 0;
@@ -79,7 +79,7 @@ public:
     virtual float UnknownVirtualSlot59();
     virtual void UnknownVirtualSlot60(float steerAxis, float maxAngle, int steps);
     virtual float UnknownVirtualSlot61(float threshold);
-    virtual int UnknownVirtualSlot62(float arg);
+    virtual int UnknownVirtualSlot62(float slideAngle);
     virtual void UnknownVirtualSlot63(float dt);
     // void: 0x00528e50 leaves eax as whatever the last store used (no return value is
     // materialised) and the only caller, slot 49, ignores eax; byte-exact as void (tier 2).

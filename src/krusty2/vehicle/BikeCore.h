@@ -35,7 +35,7 @@ public:
     virtual void UnknownVirtualSlot41();
     virtual int UnknownVirtualSlot42();
     virtual void UnknownVirtualSlot44();
-    virtual Vec3* UnknownVirtualSlot46(Vec3* out, float t);
+    virtual Vec3* UnknownVirtualSlot46(Vec3* out, float slideAngle);
     virtual float UnknownVirtualSlot47(float arg);
     virtual void UnknownVirtualSlot49(float dt);
     virtual float UnknownVirtualSlot53();
@@ -45,7 +45,7 @@ public:
     virtual float UnknownVirtualSlot57();
     virtual float UnknownVirtualSlot59();
     virtual float UnknownVirtualSlot61(float threshold);
-    virtual int UnknownVirtualSlot62(float arg);
+    virtual int UnknownVirtualSlot62(float slideAngle);
     virtual void UnknownVirtualSlot65(float dt);
     virtual int UnknownVirtualSlot66();
     virtual void UnknownVirtualSlot67();

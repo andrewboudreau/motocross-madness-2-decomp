@@ -46,7 +46,7 @@ float Vehicle::UnknownVirtualSlot57() { return leanAngle; }
 float Vehicle::UnknownVirtualSlot59() { return steerState->maxAngle; }
 float Vehicle::UnknownVirtualSlot61(float threshold) { return 0.0f; }
 
-int Vehicle::UnknownVirtualSlot62(float arg)
+int Vehicle::UnknownVirtualSlot62(float slideAngle)
 {
     return anyWheelInContact && crashState == 0;
 }
@@ -883,7 +883,7 @@ static inline Vec3 VehOffset(const Vec3& a, const Vec3& b)
 // sum) as retail's 0x24 frame shows.  The Math3D operators (constructor-return temporaries)
 // give retail's store and return-pointer schedule; VehOffset's member-wise temporaries
 // store the last component one instruction late.
-Vec3* Vehicle::UnknownVirtualSlot46(Vec3* out, float arg)
+Vec3* Vehicle::UnknownVirtualSlot46(Vec3* out, float slideAngle)
 {
     if (!airborne && !pointsTouching && wheelsInContact <= 2) {
         if (wheelsInContact == 2) {
@@ -1096,10 +1096,10 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         }
         UnknownVirtualSlot14(&force, &localTorque, &worldTorque);
         smoothedVerticalAccel = VehSmooth(verticalAccelSmoother, (velocity.y - prevVelocity.y) * invStepTime, stepTime);
-        float k = UnknownVirtualSlot61(turnMagnitude);
+        float slideAngle = UnknownVirtualSlot61(turnMagnitude);
         Vec3 aimOut;
-        Vec3 aim = *UnknownVirtualSlot46(&aimOut, k);
-        int mode = UnknownVirtualSlot62(k);
+        Vec3 aim = *UnknownVirtualSlot46(&aimOut, slideAngle);
+        int mode = UnknownVirtualSlot62(slideAngle);
         UnknownVirtualSlot26();
         UnknownVirtualSlot48();
         UnknownVirtualSlot85();
@@ -1112,7 +1112,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
                 UnknownVirtualSlot91();
             } else if (mode) {
                 if (mode == 1 || mode == 2) {
-                    if (turnMagnitude >= 0.0001f || VehAbsT(k) > 0.0001f) {
+                    if (turnMagnitude >= 0.0001f || VehAbsT(slideAngle) > 0.0001f) {
                         if (turnMagnitude >= 0.0001f) {
                             tiltAxisLocal = modelNode->WorldToLocalDirection(lift);
                         } else {
@@ -1120,10 +1120,10 @@ void Vehicle::UnknownVirtualSlot49(float frame)
                             scratchVector = *UnknownVirtualSlot54(&contactNormal);
                             tiltAxisLocal = modelNode->WorldToLocalDirection(scratchVector);
                         }
-                        if (k != 0.0f && turnMagnitude < 0.003f)
-                            modelNode->RotateAboutPoint(aim, tiltAxisLocal, k);
+                        if (slideAngle != 0.0f && turnMagnitude < 0.003f)
+                            modelNode->RotateAboutPoint(aim, tiltAxisLocal, slideAngle);
                         else
-                            modelNode->RotateAboutPoint(aim, tiltAxisLocal, k + turnAngle);
+                            modelNode->RotateAboutPoint(aim, tiltAxisLocal, slideAngle + turnAngle);
                         angularVelocity.x *= 0.85f;
                         angularVelocity.y *= 0.85f;
                         angularVelocity.z *= 0.85f;

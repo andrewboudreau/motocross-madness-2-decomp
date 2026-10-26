@@ -896,12 +896,12 @@ int Bike::UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, 
     return r;
 }
 
-int Bike::UnknownVirtualSlot62(float arg)
+int Bike::UnknownVirtualSlot62(float slideAngle)
 {
     if (frontWheelLifted)
         return 2;
     if (anyWheelInContact && crashState == 0) {
-        if (allWheelsInContact || turnRate != 0.0f || arg != 0.0f)
+        if (allWheelsInContact || turnRate != 0.0f || slideAngle != 0.0f)
             return 1;
         if (rearWheel->inContact) {
             if (frontWheel->penetration > -5.2f)
@@ -1457,8 +1457,8 @@ int Bike::UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, float 
     // both pass-through paths.
     float step;
     if (dt < fixedStepTime) {
-        float m = fixedStepTime * 0.8f;
-        step = m > dt ? m : dt;
+        float minStep = fixedStepTime * 0.8f;
+        step = minStep > dt ? minStep : dt;
     } else
         step = dt;
     if (UnknownVirtualSlot51()) {
@@ -1621,12 +1621,12 @@ void Bike::UnknownVirtualSlot7(const Vec3* force)
 void Bike::UnknownVirtualSlot91()
 {
     float dt = stepTime * 0.83f;
-    float f = controlResponse[1] * controlInput.y * dt;
+    float leanForce = controlResponse[1] * controlInput.y * dt;
     Vec3 force;
     if (motionActive)
-        force = Vec3(f * 0.5f, 0.0f, 0.0f);
+        force = Vec3(leanForce * 0.5f, 0.0f, 0.0f);
     else
-        force = Vec3(f, controlInput.x * stepTime * -0.2f, 0.0f);
+        force = Vec3(leanForce, controlInput.x * stepTime * -0.2f, 0.0f);
     if (crossoverPose && rearWheel->penetration < -2.0f) {
         if (brakeGyro && rearWheel->rampLevel > 0.0f)
             force.x += dt * rearWheel->rampLevel;
@@ -1636,12 +1636,12 @@ void Bike::UnknownVirtualSlot91()
         float inv = 1.0f / speed;
         Vec3* heading = &scratchVector;
         *heading = Vec3(inv * velocity.x, inv * velocity.y, inv * velocity.z);
-        float d = BikeDot(&savedForward, heading);
-        if (d > 0.55f && d < 0.984f) {
+        float headingDot = BikeDot(&savedForward, heading);
+        if (headingDot > 0.55f && headingDot < 0.984f) {
             // steer the velocity toward the lean plane
             scratchVector2 = Vec3(scratchVector.z, 0.0f, -heading->x);
             float side = (poseParam < 0.5f) ? 1.0f : -1.0f;
-            float misalignment = (1.0f - d) * 3.41296911f;
+            float misalignment = (1.0f - headingDot) * 3.41296911f;
             float deflection = side * (misalignment * linearSpeed * 0.075f) * stepTime;
             velocity += scratchVector2 * deflection;
             velocity *= linearSpeed / (deflection + linearSpeed);
@@ -1663,8 +1663,8 @@ void Bike::UnknownVirtualSlot91()
         if (lenSq == 0.0f) {
             force = kVec3Zero;
         } else {
-            float s = FastInvSqrt(lenSq);
-            force *= s;
+            float invLen = FastInvSqrt(lenSq);
+            force *= invLen;
         }
         const Vec3& pivot = rotationPivot;
         modelNode->RotateAboutPoint(pivot, force, mag);
@@ -1672,18 +1672,18 @@ void Bike::UnknownVirtualSlot91()
     // operator*= keeps the wobbleStage load below the decay stores
     angularVelocity *= 0.9f;
     // wobble: ramps a short-lived oscillation on field_0xd8.z (cnt 1..2)
-    float t = wobbleTime + stepTime;
+    float elapsed = wobbleTime + stepTime;
     int cnt = wobbleStage;
-    wobbleTime = t;
+    wobbleTime = elapsed;
     if (cnt > 0 && cnt <= 2) {
         float sgn = (bodyRoll < 0.0f) ? -1.0f : 1.0f;
-        float v = invStepTime * bodyRoll;
-        if (v < 0.0f)
-            v = -v;
-        float cube = t * t * t * 0.357792467f;
-        if (cube < v)
-            v = cube;
-        angularVelocity.z = sgn * v + wobbleOffset;
+        float rollRate = invStepTime * bodyRoll;
+        if (rollRate < 0.0f)
+            rollRate = -rollRate;
+        float cube = elapsed * elapsed * elapsed * 0.357792467f;
+        if (cube < rollRate)
+            rollRate = cube;
+        angularVelocity.z = sgn * rollRate + wobbleOffset;
         wobbleOffset = wobbleOffset * 0.9f;
         if (sgn != wobbleSign) {
             wobbleStage = cnt + 1;
@@ -1691,7 +1691,7 @@ void Bike::UnknownVirtualSlot91()
                 wobbleStage = 1;
             wobbleSign = sgn;
             wobbleOffset = angularVelocity.z;
-            wobbleTime = t * 0.5f;
+            wobbleTime = elapsed * 0.5f;
         }
     }
 }
@@ -1711,25 +1711,25 @@ static inline Vec3 BikeOolHalf(const Vec3& v)
 
 // Slot 46: focus/anchor point of the bike in local space.  Airborne or flagged
 // bikes return the stored anchor (field_0x194); otherwise it is the front
-// wheel position (t != 0) or a blend toward the rear wheel, relative to the
+// wheel position (slideAngle != 0) or a blend toward the rear wheel, relative to the
 // body, mapped through the transform.
-Vec3* Bike::UnknownVirtualSlot46(Vec3* out, float t)
+Vec3* Bike::UnknownVirtualSlot46(Vec3* out, float slideAngle)
 {
     if (airborne || pointsTouching) {
         *out = rotationPivot;
         return out;
     }
     if (wheelsInContact == 2) {
-        if (t != 0.0f) {
+        if (slideAngle != 0.0f) {
             *out = modelNode->WorldToLocalDirection(scratchVector = frontWheel->wheelPosition - position);
             return out;
         } else if (rearWheel->driveShare < 0.9f) {
-            float s = rearWheel->driveShare - 0.4f;
-            if (!(s > 0.0f))
-                s = 0.0f;
-            Vec3 d = rearWheel->wheelPosition - frontWheel->wheelPosition;
-            Vec3 p = d * s + frontWheel->wheelPosition;
-            *out = modelNode->WorldToLocalDirection(scratchVector = p - position);
+            float rearBias = rearWheel->driveShare - 0.4f;
+            if (!(rearBias > 0.0f))
+                rearBias = 0.0f;
+            Vec3 span = rearWheel->wheelPosition - frontWheel->wheelPosition;
+            Vec3 anchor = span * rearBias + frontWheel->wheelPosition;
+            *out = modelNode->WorldToLocalDirection(scratchVector = anchor - position);
             return out;
         } else {
             // the midpoint chain goes through the out-of-line Vec3 constructor;
@@ -1821,12 +1821,13 @@ void Bike::UnknownVirtualSlot92(const Vec3* worldDir, const Vec3* point)
         if (mag > lim)
             leanError = ((leanError < 0.0f) ? -1.0f : 1.0f) * stepTime * lim;
         if (anyWheelInContact) {
-            Vec3 w = modelNode->WorldToLocalDirection(*worldDir);
-            if (((w.z < 0.0f) ? -w.z : w.z) > 0.001f || ((w.y < 0.0f) ? -w.y : w.y) > 0.001f ||
-                ((w.x < 0.0f) ? -w.x : w.x) > 0.001f) {
-                modelNode->RotateAboutPoint(*point, w, leanError);
-                Vec3 t = BikeScale92(w, leanError);
-                scratchVector2 = BikeScale92(t, invStepTime);
+            Vec3 localAxis = modelNode->WorldToLocalDirection(*worldDir);
+            if (((localAxis.z < 0.0f) ? -localAxis.z : localAxis.z) > 0.001f
+                || ((localAxis.y < 0.0f) ? -localAxis.y : localAxis.y) > 0.001f
+                || ((localAxis.x < 0.0f) ? -localAxis.x : localAxis.x) > 0.001f) {
+                modelNode->RotateAboutPoint(*point, localAxis, leanError);
+                Vec3 scaled = BikeScale92(localAxis, leanError);
+                scratchVector2 = BikeScale92(scaled, invStepTime);
                 BikeCancelToward(&angularVelocity.x, scratchVector2.x);
                 BikeCancelToward(&angularVelocity.y, scratchVector2.y);
                 BikeCancelToward(&angularVelocity.z, scratchVector2.z);
