@@ -194,9 +194,9 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
             for (lod = 0; lod < lodCount; lod++) {
                 int faces;
                 int i;
-                int a;
-                int b;
-                int c;
+                int corner0;
+                int corner1;
+                int corner2;
                 sprintf(section, "LOD %d - Surface 0", lod);
                 block->SelectSection(section);
                 block->GetInt("NumberOfVertices", 0, &modelVertexCount[lod]);
@@ -233,12 +233,12 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
                 unsigned short* index = modelIndices[lod];
                 for (i = 0; i < modelIndexCount[lod] / 3; i++) {
                     block->ReadRow(0);
-                    block->GetRowInt(0, &a);
-                    block->GetRowInt(1, &b);
-                    block->GetRowInt(2, &c);
-                    *index++ = (unsigned short)a;
-                    *index++ = (unsigned short)b;
-                    *index++ = (unsigned short)c;
+                    block->GetRowInt(0, &corner0);
+                    block->GetRowInt(1, &corner1);
+                    block->GetRowInt(2, &corner2);
+                    *index++ = (unsigned short)corner0;
+                    *index++ = (unsigned short)corner1;
+                    *index++ = (unsigned short)corner2;
                 }
             }
             if (block)

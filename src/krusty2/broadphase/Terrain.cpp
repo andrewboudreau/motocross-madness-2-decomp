@@ -228,9 +228,10 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&ownedObjectCount, 4, 1);
     reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&surfaceRecords, 4, 1);
     reinterpret_cast<UnknownTextureStream*>(this->stream)->Seek(ownedObjectCount * 4, 1, 1);
-    int b;
-    for (b = 0; b < blockRecords; b++)
-        blocks[b] = new(__FILE__, 0x1ab) GridBaseBlock(reinterpret_cast<UnknownTextureStream*>(this->stream));
+    int blockIndex;
+    for (blockIndex = 0; blockIndex < blockRecords; blockIndex++)
+        blocks[blockIndex] = new(__FILE__, 0x1ab)
+            GridBaseBlock(reinterpret_cast<UnknownTextureStream*>(this->stream));
 
     if (surfaceRecords) {
         int width;
@@ -613,10 +614,10 @@ int Terrain::UnknownVirtualSlot14()
 // 0x00507bb0.
 void Terrain::ComputeRatios()
 {
-    int a = appliedDrawDistance;
-    int b = cameraFocalLength;
-    distanceRatioSq = (float)(a * a) / (b * b);
-    distanceRatio = (float)a / b;
+    int drawDistance = appliedDrawDistance;
+    int focalLength = cameraFocalLength;
+    distanceRatioSq = (float)(drawDistance * drawDistance) / (focalLength * focalLength);
+    distanceRatio = (float)drawDistance / focalLength;
     invDistanceRatioSq = 1.0f / distanceRatioSq;
     invDistanceRatio = 1.0f / distanceRatio;
 }
