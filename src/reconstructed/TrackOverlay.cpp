@@ -86,11 +86,11 @@ InstrumentOverlay::InstrumentOverlay(int flags) : Overlay(flags, 1)
 
 // 0x00518770: loads the dial texture and places the needle for the
 // render target's size (the layout is for 640x480).
-InstrumentOverlay* InstrumentOverlay::Setup(RenderTarget* target, TextureMapManager* manager, UnknownInstrumentSource* a3)
+InstrumentOverlay* InstrumentOverlay::Setup(RenderTarget* target, TextureMapManager* manager, UnknownInstrumentSource* source)
 {
     UnknownOverlayRect rect;
     char name[260];
-    instrumentSource = a3;
+    instrumentSource = source;
     strcpy(name, "instr1.tga");
     rect.left = 511;
     rect.right = 639;
@@ -1539,17 +1539,17 @@ void ChatOverlay::HideInputLine()
 }
 
 // 0x0051dd70: names longer than ten characters are cut to eight and "..".
-void ChatOverlay::AddMessage(const char* name, int a2, int a3)
+void ChatOverlay::AddMessage(const char* name, int text, int value)
 {
-    char text[32];
+    char shown[32];
     if (strlen(name) > 10) {
-        strncpy(text, name, 8);
-        text[8] = '\0';
-        strcat(text, "..");
+        strncpy(shown, name, 8);
+        shown[8] = '\0';
+        strcat(shown, "..");
     } else {
-        strncpy(text, name, 10);
+        strncpy(shown, name, 10);
     }
-    chatInput->AddHistory(text, (const char*)a2, a3);
+    chatInput->AddHistory(shown, (const char*)text, value);
 }
 
 // 0x0051e200

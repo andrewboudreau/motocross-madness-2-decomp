@@ -71,7 +71,7 @@ public:
     virtual ~InstrumentOverlay();             // 0x00518c00 (deleting wrapper 0x00518750)
     virtual int UnknownVirtualSlot14();       // 0x00518940
 
-    InstrumentOverlay* Setup(RenderTarget* target, TextureMapManager* manager, UnknownInstrumentSource* a3); // 0x00518770
+    InstrumentOverlay* Setup(RenderTarget* target, TextureMapManager* manager, UnknownInstrumentSource* source); // 0x00518770
     void PlaceNeedle(UnknownGauge* gauge, UnknownOverlayVertex* vertices);           // 0x00518c60
     void PlaceNeedleTip(UnknownGauge* gauge, UnknownOverlayVertex* vertex);          // 0x00518cc0
 
@@ -429,7 +429,7 @@ public:
     int HandleChatInput(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
     void ShowInputLine();             // 0x0051dd10: shows the input line
     void HideInputLine();             // 0x0051dd40: hides it
-    void AddMessage(const char* name, int a2, int a3); // 0x0051dd70: a2 is the text (0x0051eb40)
+    void AddMessage(const char* name, int text, int value); // 0x0051dd70: text is a string (0x0051eb40)
     // 0x0051de10: redraws the input line and the history; 0 when the
     // surface's device context is not available.
     int RedrawChat();
