@@ -71,23 +71,23 @@ void CollisionHullShape_Free(CollisionHullShape* s) {
 }
 
 void CollisionModelShape_Free(void* shape) {
-    CollisionModelShapeData* s = (CollisionModelShapeData*)shape;
-    // Indexing through the reference (not s->hulls[i]) makes VC6 rebuild each
+    CollisionModelShapeData* shapeData = (CollisionModelShapeData*)shape;
+    // Indexing through the reference (not shapeData->hulls[i]) makes VC6 rebuild each
     // hull address as ebx + edx from a fresh hulls load, as retail does.
-    CollisionModelShapeData& model = *s;
+    CollisionModelShapeData& model = *shapeData;
     for (int i = 0; i < model.hullCount; i++)
         CollisionHullShape_Free((CollisionHullShape*)&model.hulls[i]);
-    operator delete(s->hulls);
-    operator delete(s->field_0x04);
-    operator delete(s->field_0x08);
-    operator delete(s);
+    operator delete(shapeData->hulls);
+    operator delete(shapeData->field_0x04);
+    operator delete(shapeData->field_0x08);
+    operator delete(shapeData);
 }
 
 void CollisionMeshShape_Free(void* shape) {
-    CollisionMeshShapeData* s = (CollisionMeshShapeData*)shape;
-    if (s->boxTree)
-        FreeBoxTree(static_cast<QueryTreeNode*>(s->boxTree));
-    operator delete(s);
+    CollisionMeshShapeData* shapeData = (CollisionMeshShapeData*)shape;
+    if (shapeData->boxTree)
+        FreeBoxTree(static_cast<QueryTreeNode*>(shapeData->boxTree));
+    operator delete(shapeData);
 }
 
 void CollisionObject::FreeShape() {
@@ -442,45 +442,45 @@ struct CollisionMeshShapeBlock {                 // type 2, 0x48 bytes
 void CollisionObject::SetSphereShape(CollisionVec3 center, float radius)
 {
     FreeShape();
-    CollisionSphereShape* s = (CollisionSphereShape*)operator new(0x5c, __FILE__, 0x15b);
+    CollisionSphereShape* sphere = (CollisionSphereShape*)operator new(0x5c, __FILE__, 0x15b);
     shapeType = 4;
-    shape = s;
-    s->center = center;
-    s->radius = radius;
-    s->radiusSquared = radius * radius;
-    s->radiusScale = 1.0f;
-    s->centerScale = 1.0f;
-    SetIdentity(&s->transform);
+    shape = sphere;
+    sphere->center = center;
+    sphere->radius = radius;
+    sphere->radiusSquared = radius * radius;
+    sphere->radiusScale = 1.0f;
+    sphere->centerScale = 1.0f;
+    SetIdentity(&sphere->transform);
 }
 
 // 0x00432a20
 void CollisionObject::SetCapsuleShape(CollisionVec3 p0, CollisionVec3 p1, float radius)
 {
     FreeShape();
-    CollisionCapsuleShape* s = (CollisionCapsuleShape*)operator new(0x68, __FILE__, 0x16e);
+    CollisionCapsuleShape* capsule = (CollisionCapsuleShape*)operator new(0x68, __FILE__, 0x16e);
     shapeType = 3;
-    shape = s;
-    s->p0 = p0;
-    s->radiusSquared = radius * radius;
-    s->radiusScale = 1.0f;
-    s->endpointScale = 1.0f;
-    s->p1 = p1;
-    s->radius = radius;
-    SetIdentity(&s->transform);
+    shape = capsule;
+    capsule->p0 = p0;
+    capsule->radiusSquared = radius * radius;
+    capsule->radiusScale = 1.0f;
+    capsule->endpointScale = 1.0f;
+    capsule->p1 = p1;
+    capsule->radius = radius;
+    SetIdentity(&capsule->transform);
 }
 
 // 0x00432ab0
 void CollisionObject::SetMeshShape(int count, void* points)
 {
     FreeShape();
-    CollisionMeshShapeBlock* s = (CollisionMeshShapeBlock*)operator new(0x48, __FILE__, 0x183);
+    CollisionMeshShapeBlock* mesh = (CollisionMeshShapeBlock*)operator new(0x48, __FILE__, 0x183);
     shapeType = 2;
-    shape = s;
-    s->field_0x00 = 0;
-    s->boxTree = operator new(0x24, __FILE__, 0x18a);
-    SetIdentity(&s->bodyTransform);
-    BuildModelBoxTree(reinterpret_cast<BoxTreeNode*>(s->boxTree),
-                      reinterpret_cast<const TreeMatrix4*>(&s->bodyTransform),
+    shape = mesh;
+    mesh->field_0x00 = 0;
+    mesh->boxTree = operator new(0x24, __FILE__, 0x18a);
+    SetIdentity(&mesh->bodyTransform);
+    BuildModelBoxTree(reinterpret_cast<BoxTreeNode*>(mesh->boxTree),
+                      reinterpret_cast<const TreeMatrix4*>(&mesh->bodyTransform),
                       reinterpret_cast<TreeVec3*>(points), count);
 }
 
@@ -590,26 +590,26 @@ void CollisionObject::GetShapePosition(CollisionVec3* out)
     switch (shapeType) {
     case 0:
         {
-            HullPositionView* v = (HullPositionView*)shape;
-            out->x = v->position.x;
-            out->y = v->position.y;
-            out->z = v->position.z;
+            HullPositionView* view = (HullPositionView*)shape;
+            out->x = view->position.x;
+            out->y = view->position.y;
+            out->z = view->position.z;
         }
         break;
     case 1:
         {
-            ModelPositionView* v = (ModelPositionView*)shape;
-            out->x = v->position.x;
-            out->y = v->position.y;
-            out->z = v->position.z;
+            ModelPositionView* view = (ModelPositionView*)shape;
+            out->x = view->position.x;
+            out->y = view->position.y;
+            out->z = view->position.z;
         }
         break;
     case 2:
         {
-            MeshPositionView* v = (MeshPositionView*)shape;
-            out->x = v->position.x;
-            out->y = v->position.y;
-            out->z = v->position.z;
+            MeshPositionView* view = (MeshPositionView*)shape;
+            out->x = view->position.x;
+            out->y = view->position.y;
+            out->z = view->position.z;
         }
         break;
     }
@@ -677,31 +677,31 @@ void CollisionObject::ResetHitState()
         if (contactRecord == 0)
             contactRecord = operator new(0x2c, __FILE__, 0x34b);
         SetCollisionBoxResult((CollisionBoxResult*)contactRecord);
-        CollisionSweepQuery* q = (CollisionSweepQuery*)contactRecord;
-        *(Vec3*)&q->contactOffset = Vec3(0.0f, 0.0f, 0.0f);
-        *(Vec3*)&q->contactNormal = Vec3(0.0f, 0.0f, 0.0f);
-        q->contactCount = 0;
-        *(float*)&q->fraction = 1.0f;
+        CollisionSweepQuery* record = (CollisionSweepQuery*)contactRecord;
+        *(Vec3*)&record->contactOffset = Vec3(0.0f, 0.0f, 0.0f);
+        *(Vec3*)&record->contactNormal = Vec3(0.0f, 0.0f, 0.0f);
+        record->contactCount = 0;
+        *(float*)&record->fraction = 1.0f;
         break;
     }
     case 1: {
         if (contactRecord == 0)
             contactRecord = operator new(0x2c, __FILE__, 0x35a);
         SetCollisionBoxResult((CollisionBoxResult*)contactRecord);
-        CollisionSweepQuery* q = (CollisionSweepQuery*)contactRecord;
-        *(Vec3*)&q->contactOffset = Vec3(0.0f, 0.0f, 0.0f);
-        *(Vec3*)&q->contactNormal = Vec3(0.0f, 0.0f, 0.0f);
-        q->contactCount = 0;
-        *(float*)&q->fraction = 1.0f;
+        CollisionSweepQuery* record = (CollisionSweepQuery*)contactRecord;
+        *(Vec3*)&record->contactOffset = Vec3(0.0f, 0.0f, 0.0f);
+        *(Vec3*)&record->contactNormal = Vec3(0.0f, 0.0f, 0.0f);
+        record->contactCount = 0;
+        *(float*)&record->fraction = 1.0f;
         break;
     }
     case 2: {
         if (contactRecord == 0)
             contactRecord = operator new(0x14, __FILE__, 0x369);
         SetCollisionBoxResult((CollisionBoxResult*)contactRecord);
-        int* r = (int*)contactRecord;
-        r[1] = 0;
-        *(float*)&r[0] = 1.0f;
+        int* record = (int*)contactRecord;
+        record[1] = 0;
+        *(float*)&record[0] = 1.0f;
         break;
     }
     }
@@ -727,9 +727,9 @@ void CollisionObject::StoreHitResult()
 {
     if ((unsigned int)shapeType > 1)
         return;
-    CollisionSweepQuery* q = (CollisionSweepQuery*)contactRecord;
-    hitPoint = q->contact;
-    Vec3* sum = (Vec3*)&q->contactNormal;
+    CollisionSweepQuery* record = (CollisionSweepQuery*)contactRecord;
+    hitPoint = record->contact;
+    Vec3* sum = (Vec3*)&record->contactNormal;
     *sum = Vec3(0.0f, 0.0f, 0.0f);
     // Vec3::operator+= gives retail's p.x + sum.x, p.y + sum.y but sum.z + p.z
     for (int i = g_CollisionScratchHits; i < g_CollisionScratchCount; i++) {
@@ -747,8 +747,8 @@ void CollisionObject::StoreHitNormal()
 {
     if ((unsigned int)shapeType > 1)
         return;
-    CollisionSweepQuery* q = (CollisionSweepQuery*)contactRecord;
-    Vec3* sum = (Vec3*)&q->contactNormal;
+    CollisionSweepQuery* record = (CollisionSweepQuery*)contactRecord;
+    Vec3* sum = (Vec3*)&record->contactNormal;
     *sum = Vec3(0.0f, 0.0f, 0.0f);
     if (g_CollisionScratchCount > 0) {
         for (int i = 0; i < g_CollisionScratchCount; i++) {
@@ -756,7 +756,7 @@ void CollisionObject::StoreHitNormal()
         }
         *sum = ContactNormalized(*sum);
     }
-    Vec3* offset = (Vec3*)&q->contactOffset;
+    Vec3* offset = (Vec3*)&record->contactOffset;
     Vec3 direction = ContactNormalized(*offset);
     Vec3 push = Vec3(direction.x * 0.075f, direction.y * 0.075f, direction.z * 0.075f);
     offset->x += push.x;
@@ -1752,8 +1752,8 @@ int CollisionObject::ModelVsHull(CollisionModelBody* a, CollisionHullBody* b, Co
         int count = 0;
         for (int i = 0; i < a->elementCount; i++) {
             if (a->elementEnabled[i]) {
-                CollisionHullBody* e = &a->elements[i];
-                if (HullVsHull(e, b, q)) {
+                CollisionHullBody* element = &a->elements[i];
+                if (HullVsHull(element, b, q)) {
                     sum += QueryContact(q);
                     hit = 1;
                     count++;
@@ -1803,8 +1803,8 @@ int CollisionObject::ModelVsHullSwept(CollisionModelBody* a, CollisionHullBody* 
         int count = 0;
         for (int i = 0; i < a->elementCount; i++) {
             if (a->elementEnabled[i]) {
-                CollisionHullBody* e = &a->elements[i];
-                if (HullVsHullSwept(e, b, q)) {
+                CollisionHullBody* element = &a->elements[i];
+                if (HullVsHullSwept(element, b, q)) {
                     sum += QueryContact(q);
                     hit = 1;
                     count++;
@@ -1843,8 +1843,8 @@ int CollisionObject::ModelVsModel(CollisionModelBody* a, CollisionModelBody* b, 
         sum = Vec3(0.0f, 0.0f, 0.0f);
         int count = 0;
         for (int i = 0; i < b->elementCount; i++) {
-            CollisionHullBody* e = &b->elements[i];
-            if (ModelVsHull(a, e, q)) {
+            CollisionHullBody* element = &b->elements[i];
+            if (ModelVsHull(a, element, q)) {
                 sum += QueryContact(q);
                 hit = 1;
                 count++;
@@ -1902,8 +1902,8 @@ int CollisionObject::ModelVsModelSwept(CollisionModelBody* a, CollisionModelBody
         Vec3 last;
         last = Vec3(0.0f, 0.0f, 0.0f);
         for (int i = 0; i < b->elementCount; i++) {
-            CollisionHullBody* e = &b->elements[i];
-            if (ModelVsHullSwept(a, e, q)) {
+            CollisionHullBody* element = &b->elements[i];
+            if (ModelVsHullSwept(a, element, q)) {
                 hit = 1;
                 last = QueryContact(q);
             }
@@ -2101,8 +2101,8 @@ int CollisionObject::HullVsModelSwept(CollisionHullBody* a, CollisionModelBody* 
             0, reinterpret_cast<Vec3*>(&nodePos));
         for (int i = 0; i < b->elementCount; i++) {
             if (b->elementEnabled[i]) {
-                CollisionHullBody* e = &b->elements[i];
-                if (HullVsHullSwept(a, e, q)) {
+                CollisionHullBody* element = &b->elements[i];
+                if (HullVsHullSwept(a, element, q)) {
                     sum += QueryContact(q);
                     hit = 1;
                     count++;
@@ -2177,8 +2177,8 @@ int CollisionObject::HullVsModel(CollisionHullBody* a, CollisionModelBody* b, Co
             0, reinterpret_cast<Vec3*>(&elementPos));
             if (!b->elementEnabled[i])
                 continue;
-            CollisionHullBody* e = &b->elements[i];
-            const Matrix4* xf = &e->worldTransform;
+            CollisionHullBody* element = &b->elements[i];
+            const Matrix4* xf = &element->worldTransform;
             CollisionRotateRowsTo(&q->contactOffset, q->contactOffset, xf);
             CollisionRotateRowsTo(&q->contactNormal, q->contactNormal, xf);
             q->contact = CollisionVec3(0.0f, 0.0f, 0.0f);
@@ -2186,8 +2186,8 @@ int CollisionObject::HullVsModel(CollisionHullBody* a, CollisionModelBody* b, Co
             for (int j = 0; j < g_CollisionScratchCount; j++)
                 CollisionRotateRowsTo(&g_CollisionScratchPoints[j], g_CollisionScratchPoints[j], xf);
             if (TreeTreeQuery(reinterpret_cast<QueryTreeNode*>(a->pointTree),
-                reinterpret_cast<QueryTreeNode*>(e->triangleTree), &a->worldTransform, xf, 2,
-                reinterpret_cast<Vec3*>(e->vertices), &a->motionTransform)) {
+                reinterpret_cast<QueryTreeNode*>(element->triangleTree), &a->worldTransform, xf, 2,
+                reinterpret_cast<Vec3*>(element->vertices), &a->motionTransform)) {
                 CollisionVec3 mean;
                 q->contact = *CollisionDivide(&mean, &q->contact, (float)q->contactCount);
                 CollisionTransformPointTo(&q->contact, q->contact, xf);
@@ -2319,14 +2319,15 @@ int CollisionObject::TestMeshAgainst(CollisionObject* other)
         int hit = 0;
         if (TestMeshBounds(other)) {
             for (int i = 0; i < model->elementCount; i++) {
-                CollisionHullBody* e = &model->elements[i];
+                CollisionHullBody* element = &model->elements[i];
                 if (model->elementEnabled[i]) {
                     if (TreeTreeQuery(reinterpret_cast<QueryTreeNode*>(mesh->boxTree),
-                        reinterpret_cast<QueryTreeNode*>(e->triangleTree), &mesh->bodyTransform, &e->worldTransform,
-                        1, reinterpret_cast<Vec3*>(e->vertices), 0)) {
+                        reinterpret_cast<QueryTreeNode*>(element->triangleTree), &mesh->bodyTransform,
+                        &element->worldTransform, 1, reinterpret_cast<Vec3*>(element->vertices), 0)) {
                         hit = 1;
                         CollisionRotateColsInPlace(&reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->normal,
-                            reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->normal, &e->worldTransform);
+                            reinterpret_cast<CollisionBoxResult*>(g_CollisionBoxResult)->normal,
+                            &element->worldTransform);
                     }
                 }
             }
@@ -2534,22 +2535,22 @@ void CollisionObject::UpdateModelBounds()
         do {
             if (!model->elementEnabled[i])
                 continue;
-            CollisionHullBody* e = &model->elements[i];
-            Vec3 ax = Vec3(e->triangleTree->halfExtents.x, 0.0f, 0.0f);
-            Vec3 ay = Vec3(0.0f, e->triangleTree->halfExtents.y, 0.0f);
-            Vec3 az = Vec3(0.0f, 0.0f, e->triangleTree->halfExtents.z);
-            CollisionRotateInline(&ax, ax, &e->worldTransform);
+            CollisionHullBody* element = &model->elements[i];
+            Vec3 ax = Vec3(element->triangleTree->halfExtents.x, 0.0f, 0.0f);
+            Vec3 ay = Vec3(0.0f, element->triangleTree->halfExtents.y, 0.0f);
+            Vec3 az = Vec3(0.0f, 0.0f, element->triangleTree->halfExtents.z);
+            CollisionRotateInline(&ax, ax, &element->worldTransform);
             CollisionRotateInline(&ax, ax, toModel);
-            CollisionRotateInline(&ay, ay, &e->worldTransform);
+            CollisionRotateInline(&ay, ay, &element->worldTransform);
             CollisionRotateInline(&ay, ay, toModel);
-            CollisionRotateInline(&az, az, &e->worldTransform);
+            CollisionRotateInline(&az, az, &element->worldTransform);
             CollisionRotateInline(&az, az, toModel);
             Vec3 extent;
             extent.x = CollisionAbs(ax.x) + CollisionAbs(ay.x) + CollisionAbs(az.x);
             extent.y = CollisionAbs(ax.y) + CollisionAbs(ay.y) + CollisionAbs(az.y);
             extent.z = CollisionAbs(ax.z) + CollisionAbs(ay.z) + CollisionAbs(az.z);
             Vec3 center;
-            DebugTransformPoint(&center, *(Vec3*)&e->triangleTree->center, &e->worldTransform);
+            DebugTransformPoint(&center, *(Vec3*)&element->triangleTree->center, &element->worldTransform);
             DebugTransformPoint(&center, center, toModel);
             if (i != 0) {
                 Vec3 lo = center - extent;
@@ -2753,16 +2754,17 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                 InvertRigidTransform(&inv);
                 if (SegmentBoxOverlap((Vec3*)&model->center, (Vec3*)&model->halfExtents, p[0], p[1], &inv)) {
                     for (int i = 0; i < model->elementCount; i++) {
-                        CollisionHullBody* e = &model->elements[i];
-                        inv = e->worldTransform;
+                        CollisionHullBody* element = &model->elements[i];
+                        inv = element->worldTransform;
                         InvertRigidTransform(&inv);
-                        if (SegmentTreeQueryWithVertices(p, reinterpret_cast<QueryTreeNode*>(e->triangleTree),
-                                &inv, (Vec3*)e->vertices)) {
+                        if (SegmentTreeQueryWithVertices(p,
+                                reinterpret_cast<QueryTreeNode*>(element->triangleTree), &inv,
+                                (Vec3*)element->vertices)) {
                             Vec3 d = SubtractCtorCall(p[1], p[0]);
                             Vec3 scaled = ScaleCtorCall(d, hit.fraction);
                             *(Vec3*)outPoint = SegmentAdd(scaled, p[0]);
                             Vec3TransformNormal(reinterpret_cast<Vec3*>(outNormal),
-                                reinterpret_cast<const Vec3&>(hit.normal), &e->worldTransform);
+                                reinterpret_cast<const Vec3&>(hit.normal), &element->worldTransform);
                             return 1;
                         }
                     }
