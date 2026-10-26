@@ -17,27 +17,28 @@ const ShockVec3 kShockAxisZ = ShockVec3(0.0f, 0.0f, 1.0f);
 // Shock
 // ---------------------------------------------------------------------------
 
-Shock::Shock(void* node, int b, float a3, float a4, float a5, float a6, float a7)
+Shock::Shock(void* node, int b, float stiffnessMin_, float stiffnessMax_, float dampingRatio_,
+             float speedThreshold_, float retractScale_)
     : MovingPart(node, b, 0)
 {
-    stiffnessMin = a3;
-    stiffnessMax = a4;
-    dampingRatio = a5;
+    stiffnessMin = stiffnessMin_;
+    stiffnessMax = stiffnessMax_;
+    dampingRatio = dampingRatio_;
     atLimit = 0;
     extending = 0;
     prevLength = 0.0f;
     clearedLength = 0.0f;
     length = 0.0f;
     ratio = 0.0f;
-    speedThreshold = a6;
-    field_0xac = a7;
+    speedThreshold = speedThreshold_;
+    retractScale = retractScale_;
     spring = kShockZero;
     damper = kShockZero;
     displacement = kShockZero;
     stepDisplacement = kShockZero;
     velocity = kShockZero;
     speed = 0.0f;
-    field_0x94 = 0;
+    impulseScale = 0.0f;
 }
 
 Shock::~Shock()
@@ -58,7 +59,7 @@ void Shock::Reset()
     extending = 0;
     prevLength = 0.0f;
     clearedLength = 0.0f;
-    field_0x94 = 0;
+    impulseScale = 0.0f;
 }
 
 void Shock::ClearForces()
@@ -96,13 +97,13 @@ void Shock::ApplyDamping(float a, float b, float c, float d)
 // InlineShock
 // ---------------------------------------------------------------------------
 
-InlineShock::InlineShock(void* node, int b, ShockNode* a3, float a4, float a5, float a6, float a7,
-                         float a8, float a9)
-    : Shock(node, b, a5, a6, a7, a8, a9)
+InlineShock::InlineShock(void* node, int b, ShockNode* anchorNode_, float minLength_, float stiffnessMin_,
+                         float stiffnessMax_, float dampingRatio_, float speedThreshold_, float retractScale_)
+    : Shock(node, b, stiffnessMin_, stiffnessMax_, dampingRatio_, speedThreshold_, retractScale_)
 {
-    minLength = a4;
-    axisLength = a4;
-    anchorNode = a3;
+    minLength = minLength_;
+    axisLength = minLength_;
+    anchorNode = anchorNode_;
     axis = ShockVec3(-kShockAxisY.x, -kShockAxisY.y, -kShockAxisY.z);
 }
 
@@ -150,7 +151,7 @@ void InlineShock::ClampAndStep(float maxDelta, float dt, ShockVec3& pos)
 void InlineShock::Retract(float amount, const ShockCarrier* carrier)
 {
     if (ratio != 0.0f) {
-        float v = amount * (minLength / (carrier->field_0x2a4 * field_0xac));
+        float v = amount * (minLength / (carrier->field_0x2a4 * retractScale));
         if (!_finite(v) || v < 0.0f)
             return;
         if (v >= length) {
@@ -233,15 +234,16 @@ ShockVec3 ShockProject(const ShockVec3& v, const ShockVec3& onto)
     return onto * s;
 }
 
-RotatingShock::RotatingShock(void* node, int b, float a3, float a4, float a5, float a6, float a7,
-                             float a8, float a9, int axisId_, const ShockVec3* axisOverride)
-    : Shock(node, b, a5, a6, a7, a8, a9)
+RotatingShock::RotatingShock(void* node, int b, float maxAngle_, float armLength_, float stiffnessMin_,
+                             float stiffnessMax_, float dampingRatio_, float speedThreshold_,
+                             float retractScale_, int axisId_, const ShockVec3* axisOverride)
+    : Shock(node, b, stiffnessMin_, stiffnessMax_, dampingRatio_, speedThreshold_, retractScale_)
 {
-    maxAngle = a3;
-    armLengthSq = a4 * a4;
-    armLength = a4;
+    maxAngle = maxAngle_;
+    armLengthSq = armLength_ * armLength_;
+    armLength = armLength_;
     axisId = axisId_;
-    chord = 2.0f * (float)sin(a3 * 0.5f) * a4;
+    chord = 2.0f * (float)sin(maxAngle_ * 0.5f) * armLength_;
     if (axisOverride) {
         rotationAxis = *axisOverride;
         return;
@@ -269,7 +271,7 @@ RotatingShock::~RotatingShock()
 void RotatingShock::Retract(float amount, const ShockCarrier* carrier)
 {
     if (ratio != 0.0f) {
-        float v = amount * (chord / (carrier->field_0x2a4 * field_0xac));
+        float v = amount * (chord / (carrier->field_0x2a4 * retractScale));
         if (!_finite(v) || v < 0.0f)
             return;
         if (v >= length) {

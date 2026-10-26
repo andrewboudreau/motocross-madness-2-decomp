@@ -73,7 +73,8 @@ public:
 
 class Shock : public MovingPart {
 public:
-    Shock(void* node, int b, float a3, float a4, float a5, float a6, float a7);   // 0x004f9a60 (ret 0x1c)
+    Shock(void* node, int b, float stiffnessMin, float stiffnessMax, float dampingRatio, float speedThreshold,
+          float retractScale);                                                   // 0x004f9a60 (ret 0x1c)
     ~Shock();                                                                    // 0x004f9b80
     virtual void Reset();            // slot 0, 0x004f9ba0
     virtual void ClearForces();      // slot 1, 0x004f9c70 (shared by InlineShock/RotatingShock)
@@ -89,13 +90,13 @@ public:
                                      //       SolveContact's load subtracts its normal component, Tire::UpdateShock adds it to the contact
     float prevLength;                // +0x8c
     float clearedLength;             // +0x90 ClearForces copies length here (ctor/Reset 0); RotatingShock::SolveContact measures from it
-    int field_0x94;                  // +0x94
+    float impulseScale;              // +0x94 zeroed here; Vehicle.h's VehicleShock view: Bike slot 65 sets it, the wheel update consumes it
     float length;                    // +0x98
     float stiffnessMin;              // +0x9c
     float stiffnessMax;              // +0xa0
     float dampingRatio;              // +0xa4
     float speedThreshold;            // +0xa8
-    float field_0xac;                // +0xac
+    float retractScale;              // +0xac Retract divides the retraction by carrier->field_0x2a4 * it
     ShockVec3 velocity;              // +0xb0
     float speed;                     // +0xbc
 };
@@ -109,8 +110,9 @@ struct ShockCarrier {
 
 class InlineShock : public Shock {
 public:
-    InlineShock(void* node, int b, ShockNode* a3, float a4, float a5, float a6, float a7,
-                float a8, float a9);                                  // 0x004f9ee0 (ret 0x24)
+    InlineShock(void* node, int b, ShockNode* anchorNode, float minLength, float stiffnessMin,
+                float stiffnessMax, float dampingRatio, float speedThreshold,
+                float retractScale);                                  // 0x004f9ee0 (ret 0x24)
     ~InlineShock();                                                   // 0x004f9f80
     virtual void Reset();                                             // slot 0, 0x004fa2f0
     void UpdateAxis(ShockNode* a, ShockNode* b);                      // 0x004f9f90 (ret 8)
@@ -121,9 +123,9 @@ public:
                       float* outLoad, int* outActive);                // 0x004fa400 (ret 0x20)
 
     ShockVec3 axis;                  // +0xc0
-    float minLength;                 // +0xcc ctor a4; lowered to the measured length by 0x004f9f90
-    ShockNode* anchorNode;           // +0xd0 ctor a3; GetPositionIn is called on it in 0x004fa400
-    float axisLength;                // +0xd4 ctor a4; stores the measured |axis| in 0x004f9f90
+    float minLength;                 // +0xcc ctor; lowered to the measured length by 0x004f9f90
+    ShockNode* anchorNode;           // +0xd0 ctor; GetPositionIn is called on it in 0x004fa400
+    float axisLength;                // +0xd4 ctor minLength; stores the measured |axis| in 0x004f9f90
 };
 
 // 0x004fb110: projection of v onto 'onto' (zero when 'onto' is the zero vector), cdecl with a
@@ -132,8 +134,9 @@ ShockVec3 ShockProject(const ShockVec3& v, const ShockVec3& onto);
 
 class RotatingShock : public Shock {
 public:
-    RotatingShock(void* node, int b, float a3, float a4, float a5, float a6, float a7, float a8,
-                  float a9, int axisId, const ShockVec3* axisOverride);   // 0x004fa700 (ret 0x2c)
+    RotatingShock(void* node, int b, float maxAngle, float armLength, float stiffnessMin,
+                  float stiffnessMax, float dampingRatio, float speedThreshold, float retractScale,
+                  int axisId, const ShockVec3* axisOverride);         // 0x004fa700 (ret 0x2c)
     ~RotatingShock();                                                 // 0x004fa8a0
     virtual void Reset();                                             // slot 0, 0x004fab30
     void Retract(float amount, const ShockCarrier* carrier);          // 0x004fab60 (ret 8)
@@ -143,13 +146,13 @@ public:
                       const ShockVec3* offsetB, float limit, float* outLoad,
                       int* outActive);                                // 0x004fac60 (ret 0x28)
 
-    float maxAngle;                  // +0xc0 ctor a3; the chord below is 2*sin(maxAngle/2)*armLength
-    float chord;                     // +0xc4 ctor 2 * sin(a3 * 0.5) * a4
-    float armLength;                 // +0xc8 ctor a4
-    float armLengthSq;               // +0xcc ctor a4 * a4
+    float maxAngle;                  // +0xc0 ctor; the chord below is 2*sin(maxAngle/2)*armLength
+    float chord;                     // +0xc4 ctor 2 * sin(maxAngle * 0.5) * armLength
+    float armLength;                 // +0xc8 ctor
+    float armLengthSq;               // +0xcc ctor armLength * armLength
     float angle;                     // +0xd0 zeroed in Reset, accumulates the rotation applied by Retract
     ShockVec3 rotationAxis;          // +0xd4 copy of the ctor's vector, else +/-X or +/-Z picked by axisId
-    int axisId;                      // +0xe0 ctor a10: 1 = -X, 2 = -Z, 3 = +Z, otherwise +X
+    int axisId;                      // +0xe0 ctor: 1 = -X, 2 = -Z, 3 = +Z, otherwise +X
 };
 
 #endif

@@ -245,18 +245,22 @@ struct VehicleShock {
 };
 struct VehicleInlineShock : VehicleShock {
     // 0x004f9ee0 (ret 0x24): Bike's loader builds it with the shock name, the model node, the
-    // handlebar node and six floats (0xd8 bytes, `new(__FILE__, 0x696)`); parameter roles tier 3.
-    VehicleInlineShock(const char* name, SoultreeObject* root, SoultreeObject* anchor, float a4,
-                       float a5, float a6, float a7, float a8, float a9);
+    // handlebar node and six floats (0xd8 bytes, `new(__FILE__, 0x696)`); parameter roles from the
+    // stores in Suspension.h's InlineShock constructor.
+    VehicleInlineShock(const char* name, SoultreeObject* root, SoultreeObject* anchor, float minLength,
+                       float stiffnessMin, float stiffnessMax, float dampingRatio, float speedThreshold,
+                       float retractScale);
     void Retract(float amount, const VehicleWheel* carrier);   // 0x004fa310
     void UpdateAxis(SoultreeObject* a, SoultreeObject* b);     // 0x004f9f90 (ret 8)
     char pad_0x98[0x40];             // 0xd8 bytes (the loader's allocation)
 };
 struct VehicleRotatingShock : VehicleShock {
     // 0x004fa700 (ret 0x2c): name, model node, seven floats, the wheel kind and an optional axis
-    // (0xe4 bytes, `new(__FILE__, 0x683)`); parameter roles tier 3.
-    VehicleRotatingShock(const char* name, SoultreeObject* root, float a3, float a4, float a5,
-                         float a6, float a7, float a8, float a9, int axisId, const Vec3* axisOverride);
+    // (0xe4 bytes, `new(__FILE__, 0x683)`); parameter roles from the stores in Suspension.h's
+    // RotatingShock constructor.
+    VehicleRotatingShock(const char* name, SoultreeObject* root, float swingAngle, float armLength,
+                         float stiffnessMin, float stiffnessMax, float dampingRatio, float speedThreshold,
+                         float retractScale, int axisId, const Vec3* axisOverride);
     void Retract(float amount, const VehicleWheel* carrier);   // 0x004fab60
     char pad_0x98[0x28];
     float swingAngle;                // +0xc0 Bike's loader: sin(swingAngle * 0.5) * 2 * armLength -> chord
