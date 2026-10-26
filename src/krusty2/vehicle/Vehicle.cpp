@@ -51,7 +51,7 @@ int Vehicle::UnknownVirtualSlot62(float arg)
     return anyWheelInContact && crashState == 0;
 }
 
-int Vehicle::UnknownVirtualSlot89(float arg)
+int Vehicle::UnknownVirtualSlot89(float frame)
 {
     return UnknownVirtualSlot66();
 }
@@ -146,26 +146,26 @@ void Vehicle::UnknownVirtualSlot64(float arg)
     throttleInput = 0.0f;
 }
 
-// Provisional semantics: a cross product returned through out (a x b).
-Vec3 Vehicle::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
+// The drive torque arm x force, which AccumulateWheelContacts adds per driving wheel.
+Vec3 Vehicle::UnknownVirtualSlot76(const Vec3* arm, const Vec3* force)
 {
     Vec3 r;
-    const Vec3& p = *b; const Vec3& q = *a;
+    const Vec3& p = *force; const Vec3& q = *arm;
     r.x = p.z * q.y - p.y * q.z;
     r.y = p.x * q.z - p.z * q.x;
     r.z = p.y * q.x - p.x * q.y;
     return r;
 }
 
-void Vehicle::UnknownVirtualSlot90(int* a, float b)
+void Vehicle::UnknownVirtualSlot90(int* steps, float frame)
 {
     if (CheckCrash()) {
-        *a = 1;
+        *steps = 1;
         stepRemainder = 0.0f;
         return;
     }
-    if (*a == 1 && stepRemainder <= 0.0001f)
-        UnknownVirtualSlot89(b);
+    if (*steps == 1 && stepRemainder <= 0.0001f)
+        UnknownVirtualSlot89(frame);
 }
 
 // steerRate turns the steer angle to -(steerAxis * maxAngle) over the remaining steps (plus

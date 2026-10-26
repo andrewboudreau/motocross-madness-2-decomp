@@ -388,13 +388,13 @@ float Bike::UnknownVirtualSlot73(const Vec3* a, const Vec3* b)
     return r * d;
 }
 
-void Bike::UnknownVirtualSlot90(int* flag, float arg)
+void Bike::UnknownVirtualSlot90(int* steps, float frame)
 {
     if (UnknownVirtualSlot100(stepTime, 0, 0)) {
-        *flag = 1;
+        *steps = 1;
         stepRemainder = 0.0f;
-    } else if (*flag == 1 && stepRemainder <= 0.0001f) {
-        UnknownVirtualSlot89(arg);
+    } else if (*steps == 1 && stepRemainder <= 0.0001f) {
+        UnknownVirtualSlot89(frame);
     }
 }
 
@@ -1038,9 +1038,9 @@ void Bike::UnknownVirtualSlot8()
     frontWheelLifted = (wheelsInContact > 0 && frontWheel->penetration < -2.5f);
 }
 
-Vec3 Bike::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
+Vec3 Bike::UnknownVirtualSlot76(const Vec3* arm, const Vec3* force)
 {
-    Vec3 v = Vehicle::UnknownVirtualSlot76(a, b);
+    Vec3 v = Vehicle::UnknownVirtualSlot76(arm, force);
     if (linearSpeed < 10.0f && savedPitch > 0.8727f && frontWheel->inContact) {
         v = kVec3Zero;
         if (angularVelocity.x < 0.0f)
@@ -1056,7 +1056,7 @@ Vec3 Bike::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
         k = (0.0f > k) ? 0.0f : k;
         // Retail multiplies v.x by the freshly computed scale (fld st(0); fmul [v.x]) and
         // v.y/v.z by the stored copy; only the assignment-expression form reproduces that
-        // (a named `s` first, then `v *= s` or per-component scaling, loads v.x first: 389/395).
+        // (arm named `s` first, then `v *= s` or per-component scaling, loads v.x first: 389/395).
         float s;
         v.x *= (s = (1.4f - lean) * k * 1.6f);
         v.y *= s;

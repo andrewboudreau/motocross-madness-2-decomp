@@ -97,7 +97,7 @@ public:
     virtual float UnknownVirtualSlot75();
     // ret 0xc = hidden result pointer + two arguments; KrustyBike 0x00491ca0 byte-matches
     // as a by-value Vec3 return (tier 1 for the ABI shape, tier 2 for the Vec3 pointers).
-    virtual Vec3 UnknownVirtualSlot76(const Vec3* a, const Vec3* b);
+    virtual Vec3 UnknownVirtualSlot76(const Vec3* arm, const Vec3* force);
     virtual int UnknownVirtualSlot77(int arg);
     virtual int UnknownVirtualSlot78();
     virtual int UnknownVirtualSlot79();
@@ -112,8 +112,8 @@ public:
     virtual void UnknownVirtualSlot86();
     virtual void UnknownVirtualSlot87();  // entry is the shared empty stub 0x00464e90
     virtual int UnknownVirtualSlot88();
-    virtual int UnknownVirtualSlot89(float arg);      // Bike 0x0040ae50 passes a float (tier 2)
-    virtual void UnknownVirtualSlot90(int* a, float b);
+    virtual int UnknownVirtualSlot89(float frame);      // Bike 0x0040ae50 passes a float (tier 2)
+    virtual void UnknownVirtualSlot90(int* steps, float frame);
     virtual void UnknownVirtualSlot91();  // entry is the shared empty stub 0x00464e90
     virtual void UnknownVirtualSlot92(const Vec3* a, const Vec3* b);
     virtual void UnknownVirtualSlot93();

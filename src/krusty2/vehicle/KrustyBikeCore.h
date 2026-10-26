@@ -72,7 +72,7 @@ public:
     virtual void UnknownVirtualSlot69();
     virtual int UnknownVirtualSlot70(float dt);
     virtual void UnknownVirtualSlot71(int nowAirborne);
-    virtual Vec3 UnknownVirtualSlot76(const Vec3* a, const Vec3* b);
+    virtual Vec3 UnknownVirtualSlot76(const Vec3* arm, const Vec3* force);
     virtual int UnknownVirtualSlot80();
     virtual int UnknownVirtualSlot81();
     virtual int UnknownVirtualSlot82();

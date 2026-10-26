@@ -53,9 +53,9 @@ public:
     virtual void UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel);
     virtual float UnknownVirtualSlot73(const Vec3* a, const Vec3* b);
     virtual float UnknownVirtualSlot75();
-    virtual Vec3 UnknownVirtualSlot76(const Vec3* a, const Vec3* b);
-    virtual int UnknownVirtualSlot89(float arg);
-    virtual void UnknownVirtualSlot90(int* flag, float arg);
+    virtual Vec3 UnknownVirtualSlot76(const Vec3* arm, const Vec3* force);
+    virtual int UnknownVirtualSlot89(float frame);
+    virtual void UnknownVirtualSlot90(int* steps, float frame);
     virtual void UnknownVirtualSlot91();
     virtual void UnknownVirtualSlot92(const Vec3* a, const Vec3* b);
     virtual void UnknownVirtualSlot96();

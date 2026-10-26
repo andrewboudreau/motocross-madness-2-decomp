@@ -292,11 +292,11 @@ void KrustyBike::UnknownVirtualSlot71(int nowAirborne)
     Bike::UnknownVirtualSlot71(nowAirborne);
 }
 
-Vec3 KrustyBike::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
+Vec3 KrustyBike::UnknownVirtualSlot76(const Vec3* arm, const Vec3* force)
 {
     if (aiKind)
         return kVec3Zero;
-    return Bike::UnknownVirtualSlot76(a, b);
+    return Bike::UnknownVirtualSlot76(arm, force);
 }
 
 int KrustyBike::UnknownVirtualSlot80()
