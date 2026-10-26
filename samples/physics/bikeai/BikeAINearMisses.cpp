@@ -10,23 +10,25 @@
 //    `seg.y = 0` store between the x*x and z*z products (BikeAILength's plain form
 //    is needed at the takeoff-speed site; one helper for all sites loses the frame
 //    slot of that site);
-//  * BikeAIDotZ parenthesises y*y, which puts the ground-branch `p.y = ground.y`
-//    store after the z*z product;
+//  * BikeAIDotZ parenthesises y*y, which puts the ground-branch
+//    `simPos.y = ground.y` store after the z*z product;
 //  * before the loop the segment (single-point path) and the direction are taken
-//    from `p` rather than from `pos` (the loop does the same), which gives p.z an
-//    earlier leaf so `p += dt * v` loads the product's z first (`fld t.z; fadd p.z`).
+//    from `simPos` rather than from `pos` (the loop does the same), which gives
+//    simPos.z an earlier leaf so `simPos += dt * simVel` loads the product's z first
+//    (`fld t.z; fadd simPos.z`).
 // Tried without effect on those spots: the parentheses on BikeAILength at the other
 // sites, by-value/pointer helpers with the plain body, the declaration and
-// constructor forms of p, ground and target, and 96 forms of `p += dt * v; p.y +=
-// g * halfDtSq; v.y += g * dt` (operator order, parentheses, written-out sums).
+// constructor forms of simPos, ground and target, and 96 forms of `simPos += dt *
+// simVel; simPos.y += gravity * halfDtSq; simVel.y += gravity * dt` (operator order,
+// parentheses, written-out sums).
 //
 // 0x0040e510 (1936 bytes, AI path steering direction): every branch, call and
 // constant is reconstructed; the candidate is 1935 bytes (retail's extent ends in one
 // nop) and aligns 1:1 except the y product's operand order and frame slots.  The walk along the
 // path uses its own index (`index = best`): with one variable for the nearest search
 // and the walk, VC6 swaps esi/edi against retail (path in esi, index in edi).  The
-// three perpendiculars are built component-wise (`n.x = seg.z; n.y = 0; n.z =
-// -seg.x; n = SafeNormalize(n)`) as in 0x0040d200, which copies seg.z with integer
+// three perpendiculars are built component-wise (`perp.x = seg.z; perp.y = 0;
+// perp.z = -seg.x; perp = SafeNormalize(perp)`) as in 0x0040d200, which copies seg.z with integer
 // moves like retail.  The walk reuses `seg` for its direction (1844 -> 1846 over a
 // separate `dir`), and the final step is written per component with the parameter
 // assigned in the first product (`step.x = (t = ahead / len + bestT) * seg.x; step.y =
@@ -35,19 +37,19 @@
 // FPU stack for all three, a separate `t = ...;` gives `fstp t; fld x; fmul t`, and a
 // `const float&` scale helper gives the same as the latter).  Left: the y product loads
 // seg.y before t (retail t first; z already loads t first, seg.z having an older x87
-// leaf from `n.x = seg.z`; operand order, the y/z store order, the step declaration's
+// leaf from `perp.x = seg.z`; operand order, the y/z store order, the step declaration's
 // position, a dead `seg.y = 0` after the segment differences and component-wise
 // segment differences do not change it; nor do the walk lengths written out in the
 // body, by-value or by-pointer length helpers, `seg` read through a reference or
 // `(&seg)->y`, by-reference scale helpers for y or y and z, or brackets around single
 // products of the step rows, `ahead / len`, the length-helper terms and the outDir sum,
-// all 1884) and frame slots.  One perpendicular `n` at the
+// all 1884) and frame slots.  One perpendicular `perp` at the
 // enclosing scope serves both intersection blocks and the final shift, which puts it at
-// retail's +0x14 (block-local `n`s in the two blocks: 1865; hoisting one of them: 1872;
+// retail's +0x14 (block-local `perp`s in the two blocks: 1865; hoisting one of them: 1872;
 // all three as one: 1884).  Left in the frame: retail pairs `seg` with `step` at +0x20
 // and the segment difference temporary with `target` at +0x2c; here `seg` shares
 // `target`'s slot and the temporary takes +0x20, with `step` alone at +0x38 (hoisting
-// `step`, `target` or `dist`, block-local segments and n/seg declaration order are
+// `step`, `target` or `dist`, block-local segments and perp/seg declaration order are
 // inert or lose a byte).  The walk's two segment
 // lengths use BikeAISegmentLength, as 0x0040d200 does: its `(x*x)` parentheses issue
 // the named copy's z store after the z*z product like retail (BikeAILength issues it
@@ -221,15 +223,15 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         float t;
         float offset;
         Vec3 seg;
-        Vec3 n;
+        Vec3 perp;
         if (nearest > 0) {
             seg = path->points[nearest] - path->points[nearest - 1];
-            n.x = seg.z;
-            n.y = 0.0f;
-            n.z = -seg.x;
-            n = SafeNormalize(n);
+            perp.x = seg.z;
+            perp.y = 0.0f;
+            perp.z = -seg.x;
+            perp = SafeNormalize(perp);
             if (!IntersectLines(path->points[nearest - 1].x, path->points[nearest - 1].z, seg.x, seg.z,
-                                       pos.x, pos.z, n.x, n.z, &t, &offset))
+                                       pos.x, pos.z, perp.x, perp.z, &t, &offset))
                 return 0;
             if (t >= 0.0f && t <= 1.0f && offset < bestDist) {
                 bestDist = offset;
@@ -239,12 +241,12 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         }
         if (nearest < path->count - 1) {
             seg = path->points[nearest + 1] - path->points[nearest];
-            n.x = seg.z;
-            n.y = 0.0f;
-            n.z = -seg.x;
-            n = SafeNormalize(n);
+            perp.x = seg.z;
+            perp.y = 0.0f;
+            perp.z = -seg.x;
+            perp = SafeNormalize(perp);
             if (!IntersectLines(path->points[nearest].x, path->points[nearest].z, seg.x, seg.z,
-                                       pos.x, pos.z, n.x, n.z, &t, &offset))
+                                       pos.x, pos.z, perp.x, perp.z, &t, &offset))
                 return 0;
             if (t >= 0.0f && t <= 1.0f && offset < bestDist) {
                 best = nearest;
@@ -269,10 +271,10 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
                 len = BikeAISegmentLength(seg);
             }
         }
-        n.x = seg.z;
-        n.y = 0.0f;
-        n.z = -seg.x;
-        n = SafeNormalize(n);
+        perp.x = seg.z;
+        perp.y = 0.0f;
+        perp.z = -seg.x;
+        perp = SafeNormalize(perp);
         Vec3 target;
         if (index >= path->count - 1) {
             t = 0.0f;
@@ -286,7 +288,7 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         }
         path->index = index;
         path->t = t;
-        *outDir = (target - pos) + n * side;
+        *outDir = (target - pos) + perp * side;
         outDir->y = 0.0f;
         if (outDir->x == 0.0f && outDir->z == 0.0f) {
             outDir->z = 1.0f;
@@ -295,12 +297,12 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         *outDir = SafeNormalize(*outDir);
         return 1;
     }
-    Vec3 d = path->points[0] - pos;
-    d.y = 0.0f;
+    Vec3 toFirst = path->points[0] - pos;
+    toFirst.y = 0.0f;
     if (outDir->x == 0.0f && outDir->z == 0.0f)
         outDir->z = 1.0f;
     else
-        *outDir = SafeNormalize(d);
+        *outDir = SafeNormalize(toFirst);
     path->index = 0;
     path->t = 0.0f;
     return 1;
@@ -311,8 +313,8 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
 extern Vec3 g_PathTargetDebugLine[2];
 
 // Dot product in the operand order retail 0x0040d200 evaluates: (y + x) + z.  The
-// parentheses around y*y place the ground-branch `p.y = ground.y` store after the
-// z*z product (retail); without them it is issued before the first faddp.
+// parentheses around y*y place the ground-branch `simPos.y = ground.y` store after
+// the z*z product (retail); without them it is issued before the first faddp.
 inline float BikeAIDotZ(const Vec3& a, const Vec3& b)
 {
     return a.z * b.z + (a.x * b.x + (a.y * b.y));
@@ -367,12 +369,12 @@ int PredictPathMotion(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* outDir,
     float takeoffTime = 10.0f;
     float landTimer = -1.0f;
     float t = path->t;
-    Vec3 p = pos;
+    Vec3 simPos = pos;
     float halfDtSq = dt * dt * 0.5f;
     float flatSpeed = FastSqrt(vel.x * vel.x + vel.z * vel.z);
     Vec3 seg;
     if (path->count == 1)
-        seg = path->points[idx] - p;
+        seg = path->points[idx] - simPos;
     else if (idx < path->count - 1)
         seg = path->points[idx + 1] - path->points[idx];
     else
@@ -380,16 +382,16 @@ int PredictPathMotion(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* outDir,
     seg.y = 0.0f;
     float len = BikeAISegmentLength(seg);
     float invLen = len > 0.0f ? 1.0f / len : 0.0f;
-    Vec3 n;
-    n.x = seg.z;
-    n.y = 0.0f;
-    n.z = -seg.x;
-    n = SafeNormalize(n);
-    Vec3 target = path->points[idx] + seg * t + n * side;
-    Vec3 dir = target - p;
+    Vec3 perp;
+    perp.x = seg.z;
+    perp.y = 0.0f;
+    perp.z = -seg.x;
+    perp = SafeNormalize(perp);
+    Vec3 target = path->points[idx] + seg * t + perp * side;
+    Vec3 dir = target - simPos;
     dir.y = 0.0f;
     dir = SafeNormalize(dir);
-    Vec3 v(dir.x * flatSpeed, vel.y, dir.z * flatSpeed);
+    Vec3 simVel(dir.x * flatSpeed, vel.y, dir.z * flatSpeed);
     float align = 1.0f;
     Vec3 normal;
     Vec3 takeoffVel;
@@ -397,52 +399,52 @@ int PredictPathMotion(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* outDir,
     Vec3 takeoffPos;
     Vec3 flatDir;
     while ((elapsed < maxTime || airborne) && !done) {
-        float speedSq = (v.x * v.x + v.y * v.y) + v.z * v.z;
+        float speedSq = (simVel.x * simVel.x + simVel.y * simVel.y) + simVel.z * simVel.z;
         float speed = speedSq == 1.0f ? 1.0f : FastSqrt(speedSq);
-        flatSpeed = FastSqrt(v.x * v.x + v.z * v.z);
-        Vec3 ground = p;
+        flatSpeed = FastSqrt(simVel.x * simVel.x + simVel.z * simVel.z);
+        Vec3 ground = simPos;
         terrain->QueryGround((TerrainVec3*)&ground, (TerrainVec3*)&normal, 0, 0);
-        float g;
-        if (ground.y + 0.5f >= p.y) {
+        float gravity;
+        if (ground.y + 0.5f >= simPos.y) {
             if (airborne && takeoffTime < 0.5f) {
-                target = p;
+                target = simPos;
                 landTimer = 0.0f;
             }
-            float d = BikeAIDotZ(normal, v);
-            p.y = ground.y;
-            if (d < 0.0f) {
-                v -= normal * d;
-                if (!(d < speed * -0.70755f))
-                    v = SafeNormalize(v) * speed;
+            float intoGround = BikeAIDotZ(normal, simVel);
+            simPos.y = ground.y;
+            if (intoGround < 0.0f) {
+                simVel -= normal * intoGround;
+                if (!(intoGround < speed * -0.70755f))
+                    simVel = SafeNormalize(simVel) * speed;
             }
-            g = 0.0f;
+            gravity = 0.0f;
             airborne = 0;
         } else {
             if (!airborne) {
-                takeoffVel = v;
-                takeoffSpeed = BikeAILength(v);
-                takeoffPos = p;
-                flatDir = v;
+                takeoffVel = simVel;
+                takeoffSpeed = BikeAILength(simVel);
+                takeoffPos = simPos;
+                flatDir = simVel;
                 flatDir.y = 0.0f;
                 flatDir = BikeAINormalize(flatDir);
                 takeoffTime = elapsed;
             } else if (align < 0.70755f) {
                 done = 1;
-                target = p;
+                target = simPos;
             }
-            g = -32.0f;
+            gravity = -32.0f;
             airborne = 1;
         }
-        p += dt * v;
-        p.y += g * halfDtSq;
-        v.y += g * dt;
+        simPos += dt * simVel;
+        simPos.y += gravity * halfDtSq;
+        simVel.y += gravity * dt;
         t += invLen * flatSpeed * dt;
-        flatSpeed = FastSqrt(v.x * v.x + v.z * v.z);
+        flatSpeed = FastSqrt(simVel.x * simVel.x + simVel.z * simVel.z);
         while (t > 1.0f && idx < path->count - 1) {
             t -= 1.0f;
             idx++;
             if (path->count == 1)
-                seg = path->points[idx] - p;
+                seg = path->points[idx] - simPos;
             else if (idx < path->count - 1)
                 seg = path->points[idx + 1] - path->points[idx];
             else
@@ -450,22 +452,22 @@ int PredictPathMotion(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* outDir,
             seg.y = 0.0f;
             len = BikeAISegmentLength(seg);
             invLen = len > 0.0f ? 1.0f / len : 0.0f;
-            n.x = seg.z;
-            n.y = 0.0f;
-            n.z = -seg.x;
-            n = SafeNormalize(n);
+            perp.x = seg.z;
+            perp.y = 0.0f;
+            perp.z = -seg.x;
+            perp = SafeNormalize(perp);
         }
-        Vec3 aim = path->points[idx] + seg * t + n * side;
+        Vec3 aim = path->points[idx] + seg * t + perp * side;
         if (airborne && idx == path->count - 1) {
-            target = p;
+            target = simPos;
             done = 1;
         }
-        flatSpeed = FastSqrt(v.x * v.x + v.z * v.z);
-        dir = aim - p;
+        flatSpeed = FastSqrt(simVel.x * simVel.x + simVel.z * simVel.z);
+        dir = aim - simPos;
         dir.y = 0.0f;
         dir = SafeNormalize(dir);
-        v.x = dir.x * flatSpeed;
-        v.z = dir.z * flatSpeed;
+        simVel.x = dir.x * flatSpeed;
+        simVel.z = dir.z * flatSpeed;
         if (airborne)
             align = BikeAIDotZ(seg * invLen, flatDir);
         else
@@ -476,8 +478,8 @@ int PredictPathMotion(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* outDir,
     }
     if (done) {
         float dy = target.y - takeoffPos.y;
-        Vec3 d = target - takeoffPos;
-        float dist = FastSqrt(d.x * d.x + d.z * d.z);
+        Vec3 toLanding = target - takeoffPos;
+        float dist = FastSqrt(toLanding.x * toLanding.x + toLanding.z * toLanding.z);
         flatSpeed = FastSqrt(takeoffVel.x * takeoffVel.x + takeoffVel.z * takeoffVel.z);
         if (dist > 20.0f) {
             float sinA, secA;   // left unset when the takeoff has no flat speed (as retail)
