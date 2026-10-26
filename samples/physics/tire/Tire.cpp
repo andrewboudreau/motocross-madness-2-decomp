@@ -801,10 +801,10 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
 // is inlined here (it is only declared in CollisionPoint.h).  Same body as the one in
 // CollisionPoint.cpp but with this translation unit's zero/unit vector globals (tier 2:
 // the stores read 0x0068a3d0 / 0x0068a3f0, not the collision globals).
-inline CollisionPoint::CollisionPoint(float a, int b)
+inline CollisionPoint::CollisionPoint(float force, int owner)
 {
-    normalForce = a;
-    surfaceOwner = b;
+    normalForce = force;
+    surfaceOwner = owner;
     localPosition = kVec3Zero;
     ownerNode = 0;
     worldPosition = kVec3Zero;

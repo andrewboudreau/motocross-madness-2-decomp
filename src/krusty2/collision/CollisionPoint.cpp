@@ -22,15 +22,15 @@
 float Vec3DotCall(const Vec3* a, const Vec3* b);
 
 CollisionPoint* AddCollisionPoint(int capacity, CollisionPoint** points, const CollisionVec3* position,
-                                  CollisionContactOwner* owner, float a4, int* count, float a6,
-                                  int a7) {
+                                  CollisionContactOwner* owner, float threshold, int* count, float normalForce,
+                                  int surfaceOwner) {
     if (*count < capacity) {
-        points[*count] = new(__FILE__, 27) CollisionPoint(a6, a7);
+        points[*count] = new(__FILE__, 27) CollisionPoint(normalForce, surfaceOwner);
         CollisionPoint* p = points[*count];
         p->localPosition = *position;
-        p->penetration = a4 - 999.0f;
+        p->penetration = threshold - 999.0f;
         p->ownerNode = owner;
-        p->penetrationThreshold = a4;
+        p->penetrationThreshold = threshold;
         (*count)++;
         return p;
     }
@@ -150,16 +150,16 @@ void CollisionPoint::UpdateRelativeMotion(const CollisionVec3* center, const Col
 
 // 0x0043a570: AddCollisionPoint for a point the caller already owns (`point` may be null to reuse the
 // slot's current pointer): resets its position to zero and records the penetration threshold.
-CollisionPoint* AddExistingCollisionPoint(int capacity, CollisionPoint** points, float a4, int* count,
+CollisionPoint* AddExistingCollisionPoint(int capacity, CollisionPoint** points, float threshold, int* count,
                                           CollisionPoint* point) {
     if (*count < capacity) {
         if (point)
             points[*count] = point;
         CollisionPoint* p = points[*count];
         p->localPosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
-        p->penetration = a4 - 999.0f;
+        p->penetration = threshold - 999.0f;
         p->ownerNode = 0;
-        p->penetrationThreshold = a4;
+        p->penetrationThreshold = threshold;
         (*count)++;
         return p;
     }

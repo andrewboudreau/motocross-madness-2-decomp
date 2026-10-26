@@ -18,7 +18,7 @@ public:
 
 class CollisionPoint {
 public:
-    CollisionPoint(float a, int b);
+    CollisionPoint(float force, int owner);
     virtual ~CollisionPoint() {}               // slot 0 (deleting destructor 0x0043b300; core inlined)
     // slot 1 (0x0043b240).  Named apart from QuadTreeObject::UnknownVirtualSlot1 so that
     // Tire, which derives from both, can override this one alone.
@@ -46,12 +46,12 @@ public:
     float frictionCoefficient;  // +0x74 slot 1: frictionMagnitude = -normalForce * surfaceGrip * frictionCoefficient; Tire overrides the same expression with its own coefficients
     CollisionVec3 frictionForce;  // +0x78 slot 1: = frictionDirection * frictionMagnitude (zero when both slip terms are below 0.001)
     float frictionMagnitude;  // +0x84 slot 1: = -normalForce*surfaceGrip*coefficient, then made non-negative
-    float normalForce;  // +0x88 inlined ctor argument a (AddCollisionPoint a6); slot 1 negates it, so it holds a negative load
+    float normalForce;  // +0x88 inlined ctor argument force (AddCollisionPoint normalForce); slot 1 negates it, so it holds a negative load
     float surfaceGrip;  // +0x8c 0x0043ad80: = surface table[surfaceType] (table at owner+0xa4, +0x3a0) or 1.0f without an owner; slot 1 multiplies it in
     float tangentSpeed;  // +0x90 UpdateRelativeMotion: dot(tangent, a3), the slip component along the surface; slot 1 tests it against 0.001
     float spinSpeed;  // +0x94 UpdateRelativeMotion: |cross(n*(n.angularVelocity), leverArm)|, contact speed from rotation about the normal; slot 1 tests it against 0.001
     float penetration;  // +0x98 0x0043ad80: = (surfacePosition.y - worldPosition.y) * surfaceNormal.y; AddCollisionPoint initialises it to threshold - 999
-    float penetrationThreshold;  // +0x9c AddCollisionPoint a4; 0x0043ad80: inContact = (penetration >= penetrationThreshold)
+    float penetrationThreshold;  // +0x9c AddCollisionPoint threshold; 0x0043ad80: inContact = (penetration >= penetrationThreshold)
     float blendWeight;  // +0xa0 Vehicle/Bike view (VehicleContact, VehicleWheel::loadWeight +0x158): per-point blend weight; ctor 0.5f, Tire ctor a14
     int inContact;  // +0xa4 0x0043ad80 stores the integer 1/0 (mov eax, 1 / xor eax, eax) from the penetration test and counts it; 0x0043aa30 only merges points with it set; Tire 0x00513c70 stores 1/0 the same way
     float field_0xa8;
@@ -60,7 +60,7 @@ public:
     float field_0xb4;
     float field_0xb8;
     char surfaceType;  // +0xbc low three bits of the flag byte written by the ground query (&= 7 in 0x0043ad80); indexes the per-surface grip table
-    int surfaceOwner;  // +0xc0 inlined ctor argument b (AddCollisionPoint a7); 0x0043ad80 reads the surface table from [this+0xa4]+0x3a0 when nonzero
+    int surfaceOwner;  // +0xc0 inlined ctor argument owner (AddCollisionPoint surfaceOwner); 0x0043ad80 reads the surface table from [this+0xa4]+0x3a0 when nonzero
 };
 
 // Vector helpers used by the collision code (see CollisionVectorHelpers.cpp / CollisionPoint.cpp).
@@ -72,8 +72,8 @@ CollisionVec3* Vec3Normalize(CollisionVec3* out, const CollisionVec3* src);     
 
 // 0x0043a330 (cdecl).  Allocates a CollisionPoint into points[*count] if *count < capacity.
 CollisionPoint* AddCollisionPoint(int capacity, CollisionPoint** points, const CollisionVec3* position,
-                                  CollisionContactOwner* owner, float a4, int* count, float a6,
-                                  int a7);
+                                  CollisionContactOwner* owner, float threshold, int* count, float normalForce,
+                                  int surfaceOwner);
 
 // 0x0043a5e0: remove the first matching pointer and clear the vacated slot.
 void RemoveCollisionPoint(CollisionPoint** points, CollisionPoint* point, int* count);

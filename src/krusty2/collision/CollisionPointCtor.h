@@ -5,8 +5,8 @@
 
 #include "collision/CollisionPoint.h"
 
-inline CollisionPoint::CollisionPoint(float a, int b)
-    : normalForce(a), surfaceOwner(b) {
+inline CollisionPoint::CollisionPoint(float force, int owner)
+    : normalForce(force), surfaceOwner(owner) {
     localPosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
     ownerNode = 0;
     worldPosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
