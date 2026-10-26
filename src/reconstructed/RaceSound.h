@@ -46,15 +46,15 @@ struct UnknownRaceSoundChannel {
     int fillHalf;                          // +0x1c, half being filled (1 or 2)
     int nextSampleKind;                    // +0x20, kind to stream after this one (0: loop it)
     int wasThrottleOn;                     // +0x24, racer throttle last frame (written by slot 10)
-    int field_0x28;
+    int wasDriveEngaged;                   // +0x28, driveEngaged last frame (a throttle after the drive drops out plays a rev)
     int wasAirborne;                       // +0x2c, racer +0x108 last frame (the LandHard cue)
     int airRevArmed;                       // +0x30, throttle released after 0.2 s airborne: the next throttle plays a rev
-    int groundRevArmed;                    // +0x34, throttle released on the ground: the next throttle plays a rev (when +0x48 is clear)
+    int groundRevArmed;                    // +0x34, throttle released on the ground: the next throttle plays a rev (when driveEngaged is clear)
     void* streamSample;                     // sample being streamed
     float airborneTime;                     // seconds airborne
     int field_0x40;
     int speed;                             // +0x44, racer +0xb8 * 0.68182 against the *MaxSpeed limits
-    int field_0x48;
+    int driveEngaged;                      // +0x48, 1 unless the racer's driveDisengaged is set (UpdateRacerSounds, every frame)
     int cameraDistance;                    // +0x4c, GroundDistance from the camera; 1000000 when reset
     void* sampleBuffer;                     // 44100-byte buffer
 };

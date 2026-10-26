@@ -468,13 +468,13 @@ void RaceSound::AssignChannels() {
         engineChannels[i].nextSampleKind = 0;
         engineChannels[i].fillHalf = 1;
         engineChannels[i].wasThrottleOn = 0;
-        engineChannels[i].field_0x28 = 0;
+        engineChannels[i].wasDriveEngaged = 0;
         engineChannels[i].wasAirborne = 0;
         engineChannels[i].airRevArmed = 0;
         engineChannels[i].groundRevArmed = 0;
         engineChannels[i].airborneTime = 0;
         engineChannels[i].speed = 0;
-        engineChannels[i].field_0x48 = 0;
+        engineChannels[i].driveEngaged = 0;
         engineChannels[i].cameraDistance = 1000000;
     }
 
@@ -625,9 +625,9 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
     for (i = 0; i < channelsInUse; i++) {
         streamChannel = &engineChannels[i];
         if (streamChannel->channelRacer->driveDisengaged)
-            streamChannel->field_0x48 = 0;
+            streamChannel->driveEngaged = 0;
         else
-            streamChannel->field_0x48 = 1;
+            streamChannel->driveEngaged = 1;
         if (streamChannel->channelRacer->airborne) {
             streamChannel->airborneTime += frameTime;
             if (streamChannel->airborneTime >= 0.2f) {
@@ -666,7 +666,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                 PlayIfEnabled(landHardSound, 0, 0, 0, 0);
             if (!streamChannel->channelRacer->throttleOn)
                 streamChannel->groundRevArmed = 1;
-            if (streamChannel->field_0x48) {
+            if (streamChannel->driveEngaged) {
                 if (streamChannel->channelRacer->throttleOn) {
                     if (streamChannel->sampleKind == 6) {
                         j = rand() % highTorqueCount[streamChannel->engine];
@@ -721,7 +721,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                     StartStream();
                 }
             } else if (streamChannel->channelRacer->throttleOn == true &&
-                       (streamChannel->groundRevArmed == 1 || streamChannel->field_0x28 == 1)) {
+                       (streamChannel->groundRevArmed == 1 || streamChannel->wasDriveEngaged == 1)) {
                 streamChannel->groundRevArmed = 0;
                 j = rand() % 1;
                 streamChannel->streamSample = revSamples[streamChannel->engine][j];
@@ -735,7 +735,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                 StartStream();
             }
         }
-        streamChannel->field_0x28 = streamChannel->field_0x48;
+        streamChannel->wasDriveEngaged = streamChannel->driveEngaged;
         streamChannel->wasThrottleOn = (unsigned char)streamChannel->channelRacer->throttleOn;
         streamChannel->wasAirborne = (unsigned char)streamChannel->channelRacer->airborne;
         RefillStream();
