@@ -97,7 +97,7 @@ int Vehicle::UnknownVirtualSlot70(float dt)
 }
 
 // Provisional: wheelBase / sin(steer angle), zero when the angle is zero.
-float Vehicle::UnknownVirtualSlot73(const Vec3* a, const Vec3* b)
+float Vehicle::UnknownVirtualSlot73(const Vec3* point, const Vec3* dir)
 {
     VehicleSteerState* steer = steerState;
     float absAngle = steer->angle;

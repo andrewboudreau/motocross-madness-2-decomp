@@ -92,7 +92,7 @@ public:
     virtual int UnknownVirtualSlot70(float dt);
     virtual void UnknownVirtualSlot71(int nowAirborne);
     virtual void UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel);
-    virtual float UnknownVirtualSlot73(const Vec3* a, const Vec3* b);  // only read (Bike 0x00406090)
+    virtual float UnknownVirtualSlot73(const Vec3* point, const Vec3* dir);  // only read (Bike 0x00406090)
     virtual float UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d);
     virtual float UnknownVirtualSlot75();
     // ret 0xc = hidden result pointer + two arguments; KrustyBike 0x00491ca0 byte-matches
