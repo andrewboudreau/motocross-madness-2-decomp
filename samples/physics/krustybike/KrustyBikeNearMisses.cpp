@@ -144,14 +144,14 @@ int KrustyBike::UnknownVirtualSlot11(int respawn, Vec3* outPosition, Vec3* outFo
             position = *outPosition;
             break;
         } else {
-            Vec3 v = respawnPosition;
+            Vec3 target = respawnPosition;
             *outPosition = position;
-            *outForward = Vec3(v.x - outPosition->x, -outPosition->y, v.z - outPosition->z);
-            float d = outForward->x * outForward->x;
-            d += outForward->y * outForward->y;
-            d += outForward->z * outForward->z;
-            if (d == 0.0f) *outForward = g_kbZeroVec;
-            else *outForward *= FastInvSqrt(d);
+            *outForward = Vec3(target.x - outPosition->x, -outPosition->y, target.z - outPosition->z);
+            float lengthSq = outForward->x * outForward->x;
+            lengthSq += outForward->y * outForward->y;
+            lengthSq += outForward->z * outForward->z;
+            if (lengthSq == 0.0f) *outForward = g_kbZeroVec;
+            else *outForward *= FastInvSqrt(lengthSq);
             return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, flag, 0x64,
                                0x65, hit, 3.0f, 8, 0, &respawnPosition, !respawnPending, outPosition, outForward, outUp, outKeepPlacement);
         }
@@ -699,15 +699,15 @@ void KrustyBike::Fn_00493660(float dt, int a)
 
         // wheel roll from the horizontal speed
         if (!(this->race->replayPaused && this->race->lastRecordKind != -2)) {
-            float d;
+            float speedSq;
             float roll;
             scratchVector = velocity;
             scratchVector.y = 0.0f;
-            d = SquareMagnitude(scratchVector);
-            if (d == 1.0f)
+            speedSq = SquareMagnitude(scratchVector);
+            if (speedSq == 1.0f)
                 roll = 1.0f;
             else
-                roll = FastSqrt(d);
+                roll = FastSqrt(speedSq);
             ((KbWheel*)frontWheel)->SetRollDistance(roll * reinterpret_cast<KbGame*>(g_TrackGame)->frameTime);
             ((KbWheel*)rearWheel)->SetRollDistance(roll * reinterpret_cast<KbGame*>(g_TrackGame)->frameTime);
         }
@@ -718,33 +718,34 @@ void KrustyBike::Fn_00493660(float dt, int a)
 
         // pose parameter; the clamp follows both modes
         if (!g_kbInterpolate) {
-            int d = interpTarget->poseParam - interpSource->poseParam;
-            if (KB_ABS(d) >= 0x40) {
+            int delta = interpTarget->poseParam - interpSource->poseParam;
+            if (KB_ABS(delta) >= 0x40) {
                 poseParam = (float)states[0]->poseParam * KB_BYTE_SCALE;
             } else {
-                float p = (float)states[0]->poseParam * KB_BYTE_SCALE;
-                poseParam = p;
+                float current = (float)states[0]->poseParam * KB_BYTE_SCALE;
+                poseParam = current;
                 if (!(g_kbUseLatencyThreshold && stateIntervalElapsed > g_kbLatencyThreshold))
-                    poseParam = (p - (float)states[1]->poseParam * KB_BYTE_SCALE) * ratio + p;
+                    poseParam = (current - (float)states[1]->poseParam * KB_BYTE_SCALE) * ratio + current;
             }
         } else {
-            int b = interpSource->poseParam;
-            unsigned char c = interpTarget->poseParam;
-            int d = c - b;
-            if (KB_ABS(d) >= 0x40 && KB_ABS(d) <= 0x7c) {
+            int from = interpSource->poseParam;
+            unsigned char to = interpTarget->poseParam;
+            int delta = to - from;
+            if (KB_ABS(delta) >= 0x40 && KB_ABS(delta) <= 0x7c) {
                 if (!poseParamLatched) {
                     poseParamLatched = 1;
                     latchedPoseParam = interpSource->poseParam;
                 }
                 poseParam = (float)latchedPoseParam * KB_BYTE_SCALE;
             } else if (poseParamLatched) {
-                if (c <= 3 || (c >= 0x7e && c <= 0x82))
+                if (to <= 3 || (to >= 0x7e && to <= 0x82))
                     poseParamLatched = 0;
                 poseParam = (float)latchedPoseParam * KB_BYTE_SCALE;
-            } else if (KB_ABS(d) <= 0x18) {
-                poseParam = (float)((int)((float)(c - interpSource->poseParam) * ratio) + b) * KB_BYTE_SCALE;
+            } else if (KB_ABS(delta) <= 0x18) {
+                poseParam = (float)((int)((float)(to - interpSource->poseParam) * ratio) + from)
+                    * KB_BYTE_SCALE;
             } else {
-                poseParam = (float)b * KB_BYTE_SCALE;
+                poseParam = (float)from * KB_BYTE_SCALE;
             }
         }
         if (poseParam > 1.0f)
@@ -754,36 +755,37 @@ void KrustyBike::Fn_00493660(float dt, int a)
 
         // pose lean blend
         if (!g_kbInterpolate) {
-            int a = states[0]->poseLeanBlend;
-            int d = a - states[1]->poseLeanBlend;
-            float v;
-            d = KB_ABS(d);
-            v = (float)a * KB_BYTE_SCALE;
-            if (d >= 0x40) {
-                poseLeanBlend = v;
+            int current = states[0]->poseLeanBlend;
+            int delta = current - states[1]->poseLeanBlend;
+            float value;
+            delta = KB_ABS(delta);
+            value = (float)current * KB_BYTE_SCALE;
+            if (delta >= 0x40) {
+                poseLeanBlend = value;
             } else {
-                poseLeanBlend = v;
+                poseLeanBlend = value;
                 if (!(g_kbUseLatencyThreshold && stateIntervalElapsed > g_kbLatencyThreshold))
-                    poseLeanBlend = (v - (float)states[1]->poseLeanBlend * KB_BYTE_SCALE) * ratio + v;
+                    poseLeanBlend = (value - (float)states[1]->poseLeanBlend * KB_BYTE_SCALE) * ratio + value;
             }
         } else {
-            int b = interpSource->poseLeanBlend;
-            unsigned char c = interpTarget->poseLeanBlend;
-            int d = c - b;
-            if (KB_ABS(d) >= 0x40 && KB_ABS(d) <= 0x7c) {
+            int from = interpSource->poseLeanBlend;
+            unsigned char to = interpTarget->poseLeanBlend;
+            int delta = to - from;
+            if (KB_ABS(delta) >= 0x40 && KB_ABS(delta) <= 0x7c) {
                 if (!poseLeanBlendLatched) {
                     poseLeanBlendLatched = 1;
                     latchedPoseParam = interpSource->poseLeanBlend;   // retail stores +0x1408 but reads +0x140c
                 }
                 poseLeanBlend = (float)latchedPoseLeanBlend * KB_BYTE_SCALE;
             } else if (poseLeanBlendLatched) {
-                if (c <= 2 || (c >= 0x7f && c <= 0x81))
+                if (to <= 2 || (to >= 0x7f && to <= 0x81))
                     poseLeanBlendLatched = 0;
                 poseLeanBlend = (float)latchedPoseLeanBlend * KB_BYTE_SCALE;
-            } else if (KB_ABS(d) <= 0x20) {
-                poseLeanBlend = (float)((int)((float)(c - interpSource->poseLeanBlend) * ratio) + b) * KB_BYTE_SCALE;
+            } else if (KB_ABS(delta) <= 0x20) {
+                poseLeanBlend = (float)((int)((float)(to - interpSource->poseLeanBlend) * ratio) + from)
+                    * KB_BYTE_SCALE;
             } else {
-                poseLeanBlend = (float)b * KB_BYTE_SCALE;
+                poseLeanBlend = (float)from * KB_BYTE_SCALE;
             }
         }
         if (poseLeanBlend > 1.0f)
@@ -795,33 +797,33 @@ void KrustyBike::Fn_00493660(float dt, int a)
         if (!g_kbInterpolate) {
             int b1 = states[1]->poseBlend;
             int b0 = states[0]->poseBlend;
-            int d = b0 - b1;
-            if (KB_ABS(d) >= 0x40)
+            int delta = b0 - b1;
+            if (KB_ABS(delta) >= 0x40)
                 poseBlend = (float)b1 * KB_BYTE_SCALE;
             else
                 poseBlend = (float)b0 * KB_BYTE_SCALE;
         } else {
-            int b = interpSource->poseBlend;
-            int c = interpTarget->poseBlend;
-            int d = c - b;
-            float v;
+            int from = interpSource->poseBlend;
+            int to = interpTarget->poseBlend;
+            int delta = to - from;
+            float value;
             float lim;
-            float t;
-            float r;
-            if (KB_ABS(d) >= 0x40)
-                v = (float)b;
+            float step;
+            float rate;
+            if (KB_ABS(delta) >= 0x40)
+                value = (float)from;
             else
-                v = (float)((int)((float)(c - b) * ratio) + b);
-            v *= KB_BYTE_SCALE;
+                value = (float)((int)((float)(to - from) * ratio) + from);
+            value *= KB_BYTE_SCALE;
             lim = steerAxis->l_0x4;
-            t = reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
-            if (t >= lim)
-                t = lim;
-            r = t / steerAxis->l_0x4;
-            steerAxis->l_0x8 = r;
-            v = (v - steerAxis->steerValue) * r + steerAxis->steerValue;
-            steerAxis->steerValue = v;
-            poseBlend = v;
+            step = reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
+            if (step >= lim)
+                step = lim;
+            rate = step / steerAxis->l_0x4;
+            steerAxis->l_0x8 = rate;
+            value = (value - steerAxis->steerValue) * rate + steerAxis->steerValue;
+            steerAxis->steerValue = value;
+            poseBlend = value;
         }
         if (poseBlend > 1.0f)
             poseBlend = 1.0f;
