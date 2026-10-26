@@ -126,9 +126,9 @@ public:
     virtual void UnknownVirtualSlot15(const Vec3* worldTorque, Vec3* angularAccel);
     virtual Vec3 UnknownVirtualSlot16(const Vec3* localTorque);
     virtual Vec3 UnknownVirtualSlot17();
-    virtual void UnknownVirtualSlot18(SoultreeAttachment* a);
-    virtual void UnknownVirtualSlot19(SoultreeAttachment* a);
-    virtual void UnknownVirtualSlot20(SoultreeAttachment* a);
+    virtual void UnknownVirtualSlot18(SoultreeAttachment* attachment);
+    virtual void UnknownVirtualSlot19(SoultreeAttachment* attachment);
+    virtual void UnknownVirtualSlot20(SoultreeAttachment* attachment);
     virtual void UnknownVirtualSlot21();
     virtual int UnknownVirtualSlot22();
     virtual int UnknownVirtualSlot23();

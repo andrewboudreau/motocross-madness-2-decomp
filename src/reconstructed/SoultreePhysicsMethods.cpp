@@ -20,7 +20,7 @@ int SoultreePhysicsBaseObject::UnknownVirtualSlot22()
     return staggerCounter == staggerPhase;
 }
 
-void SoultreePhysicsBaseObject::UnknownVirtualSlot19(SoultreeAttachment* a)
+void SoultreePhysicsBaseObject::UnknownVirtualSlot19(SoultreeAttachment* attachment)
 {
 }
 

@@ -18,7 +18,7 @@
 
 #define g_Zero kVec3Zero
 
-void SoultreePhysicsBaseObject::UnknownVirtualSlot20(SoultreeAttachment* a)
+void SoultreePhysicsBaseObject::UnknownVirtualSlot20(SoultreeAttachment* attachment)
 {
 }
 
@@ -259,19 +259,19 @@ Vec3 SoultreePhysicsBaseObject::UnknownVirtualSlot17()
 }
 
 // slot 18 (0x00502420)
-void SoultreePhysicsBaseObject::UnknownVirtualSlot18(SoultreeAttachment* a)
+void SoultreePhysicsBaseObject::UnknownVirtualSlot18(SoultreeAttachment* attachment)
 {
     for (int i = 0; i < collisionPointCount; i++) {
         SoultreeContact* c = collisionPoints[i];
         if (c->touching && !c->effectSpawned &&
             track->trackData->materialEffectFlags[(unsigned char)c->materialId] != 0) {
             c->effectSpawned = 1;
-            reinterpret_cast<DustParticleEmitter*>(a->contactEmitter)->SetPosition(
+            reinterpret_cast<DustParticleEmitter*>(attachment->contactEmitter)->SetPosition(
                 reinterpret_cast<const ParticleVec3&>(c->field_0x20), 0.0f);
-            if (a->resetTrail)
-                a->contactEmitter->previousPosition = a->contactEmitter->currentPosition;
-            a->contactEmitter->activeThisFrame = 1;
-            a->resetTrail = 0;
+            if (attachment->resetTrail)
+                attachment->contactEmitter->previousPosition = attachment->contactEmitter->currentPosition;
+            attachment->contactEmitter->activeThisFrame = 1;
+            attachment->resetTrail = 0;
             return;
         }
     }

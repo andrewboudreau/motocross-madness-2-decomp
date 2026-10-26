@@ -38,9 +38,9 @@ public:
     virtual void UnknownVirtualSlot7(const Vec3* force);
     // Slots 18..20 take the canonical 40-byte record; the bodies view it as
     // VehicleImpactEvent (same offsets: +0x04/+0x08/+0x0c sinks, +0x24 resetTrail).
-    virtual void UnknownVirtualSlot18(SoultreeAttachment* arg);
-    virtual void UnknownVirtualSlot19(SoultreeAttachment* arg);
-    virtual void UnknownVirtualSlot20(SoultreeAttachment* arg);
+    virtual void UnknownVirtualSlot18(SoultreeAttachment* attachment);
+    virtual void UnknownVirtualSlot19(SoultreeAttachment* attachment);
+    virtual void UnknownVirtualSlot20(SoultreeAttachment* attachment);
     virtual void UnknownVirtualSlot21();
     virtual int  UnknownVirtualSlot23();
     virtual int  UnknownVirtualSlot24();

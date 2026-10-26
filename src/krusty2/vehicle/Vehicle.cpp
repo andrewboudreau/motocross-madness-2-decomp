@@ -717,9 +717,9 @@ static inline void VehCommitImpact(VehicleImpactEvent* ev, VehicleImpactSink** s
 // surface material is flagged in the material table and which has not yet reported one.
 // Slots 18 and 19 scan with guarded do-while loops (retail's unrotated `jge exit; jmp top`
 // back edges), slot 20 with for loops (rotated `jl top`).
-void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
+void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* attachment)
 {
-    VehicleImpactEvent* ev = (VehicleImpactEvent*)arg;
+    VehicleImpactEvent* ev = (VehicleImpactEvent*)attachment;
     int i = 0;
     if (wheelCount > 0) do {
         VehicleWheel* w = wheelList[i];
@@ -758,9 +758,9 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
 
 // Slide/scrape impact: like slot 18 but posts a clamped scrape vector (wheel normal-ish frame
 // scaled by the wheel's 0x290 gain and dt) into the sink's +0x74 vector.
-void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
+void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* attachment)
 {
-    VehicleImpactEvent* ev = (VehicleImpactEvent*)arg;
+    VehicleImpactEvent* ev = (VehicleImpactEvent*)attachment;
     int i = 0;
     if (wheelCount > 0) do {
         VehicleWheel* w = wheelList[i];
@@ -800,9 +800,9 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
 
 // Second scrape channel: like slot 19 (sink at event+0x0c, no per-material table gate) but posts a clamped scrape vector (wheel normal-ish frame
 // scaled by the wheel's 0x290 gain and dt) into the sink's +0x74 vector.
-void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* arg)
+void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* attachment)
 {
-    VehicleImpactEvent* ev = (VehicleImpactEvent*)arg;
+    VehicleImpactEvent* ev = (VehicleImpactEvent*)attachment;
     int i;
     for (i = 0; i < wheelCount; i++) {
         VehicleWheel* w = wheelList[i];

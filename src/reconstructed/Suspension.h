@@ -115,7 +115,7 @@ public:
                 float retractScale);                                  // 0x004f9ee0 (ret 0x24)
     ~InlineShock();                                                   // 0x004f9f80
     virtual void Reset();                                             // slot 0, 0x004fa2f0
-    void UpdateAxis(ShockNode* a, ShockNode* b);                      // 0x004f9f90 (ret 8)
+    void UpdateAxis(ShockNode* wheelNode, ShockNode* mountNode);      // 0x004f9f90 (ret 8)
     void Retract(float amount, const ShockCarrier* carrier);          // 0x004fa310 (ret 8)
     void ClampAndStep(float maxDelta, float dt, ShockVec3& pos);      // 0x004fa090 (ret 0xc)
     void SolveContact(float dt, const ShockVec3* offset, const ShockVec3* base,

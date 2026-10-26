@@ -251,7 +251,7 @@ struct VehicleInlineShock : VehicleShock {
                        float stiffnessMin, float stiffnessMax, float dampingRatio, float speedThreshold,
                        float retractScale);
     void Retract(float amount, const VehicleWheel* carrier);   // 0x004fa310
-    void UpdateAxis(SoultreeObject* a, SoultreeObject* b);     // 0x004f9f90 (ret 8)
+    void UpdateAxis(SoultreeObject* wheelNode, SoultreeObject* mountNode); // 0x004f9f90 (ret 8)
     char pad_0x98[0x40];             // 0xd8 bytes (the loader's allocation)
 };
 struct VehicleRotatingShock : VehicleShock {
