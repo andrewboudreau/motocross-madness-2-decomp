@@ -431,15 +431,15 @@ unsigned char Character::FindNode(const char* name)
 
 // owner: bracket only
 // slots 4, 5 and 6 (0x004a6ba0, one body after identical-COMDAT folding): empty in Character.
-void Character::CharacterVirtualSlot4(int a, int b)
+void Character::CharacterVirtualSlot4(int poseRecord, int rowMask)
 {
 }
 
-void Character::CharacterVirtualSlot5(int a, int b)
+void Character::CharacterVirtualSlot5(int poseRecord, int rowMask)
 {
 }
 
-void Character::CharacterVirtualSlot6(int a, int b)
+void Character::CharacterVirtualSlot6(int poseRecord, int rowMask)
 {
 }
 

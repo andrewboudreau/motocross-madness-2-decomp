@@ -66,12 +66,12 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot8(int a)
     Character::CharacterVirtualSlot8(a);
 }
 
-// slot 6 (0x00446480, ret 8): applies a pose record to its node.  'b' is an optional per-row enable
-// mask indexed by the record's node index.  Argument types are tier 3 (the header uses int).
-void D3DIMSoultreeCharacter::CharacterVirtualSlot6(int a, int b)
+// slot 6 (0x00446480, ret 8): applies a pose record to its node.  'rowMask' is an optional per-row
+// enable mask indexed by the record's node index.  Argument types are tier 3 (the header uses int).
+void D3DIMSoultreeCharacter::CharacterVirtualSlot6(int poseRecord, int rowMask)
 {
-    const CharacterPose* pose = (const CharacterPose*)a;
-    const int* mask = (const int*)b;
+    const CharacterPose* pose = (const CharacterPose*)poseRecord;
+    const int* mask = (const int*)rowMask;
     if (mask && mask[pose->nodeIndex] == 0)
         return;
     SoultreeObject* node = nodeNames[pose->nodeIndex].node;
@@ -106,10 +106,10 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot3(int a)
 }
 
 // slot 4 (0x00446210, ret 8): like slot 6 but honours the per-row applyRotation / applyTranslation enables.
-void D3DIMSoultreeCharacter::CharacterVirtualSlot4(int a, int b)
+void D3DIMSoultreeCharacter::CharacterVirtualSlot4(int poseRecord, int rowMask)
 {
-    const CharacterPose* pose = (const CharacterPose*)a;
-    const int* mask = (const int*)b;
+    const CharacterPose* pose = (const CharacterPose*)poseRecord;
+    const int* mask = (const int*)rowMask;
     if (mask && mask[pose->nodeIndex] == 0)
         return;
     SoultreeObject* node = nodeNames[pose->nodeIndex].node;
@@ -129,10 +129,10 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot4(int a, int b)
 // slot 5 (0x00446300, ret 8): mirrored variant of slot 4.  The target node comes from the mirror map
 // (+0x18c, indexed by the record's node index) and the x components of both axes and the position are
 // negated.  The per-row enables are still read from the unmapped row.
-void D3DIMSoultreeCharacter::CharacterVirtualSlot5(int a, int b)
+void D3DIMSoultreeCharacter::CharacterVirtualSlot5(int poseRecord, int rowMask)
 {
-    const CharacterPose* pose = (const CharacterPose*)a;
-    const int* mask = (const int*)b;
+    const CharacterPose* pose = (const CharacterPose*)poseRecord;
+    const int* mask = (const int*)rowMask;
     if (mask && mask[pose->nodeIndex] == 0)
         return;
     NodeNameEntry* table = nodeNames;

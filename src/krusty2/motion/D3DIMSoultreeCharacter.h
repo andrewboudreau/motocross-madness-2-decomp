@@ -66,9 +66,9 @@ public:
     virtual void CharacterVirtualSlot1();         // 0x004a6930
     virtual void CharacterVirtualSlot2();         // 0x00464e90 (ret)
     virtual void CharacterVirtualSlot3(int a);    // 0x00464e80 (ret 4; shared empty stub)
-    virtual void CharacterVirtualSlot4(int a, int b);   // 0x004a6ba0 (ret 8; shared by 4..6)
-    virtual void CharacterVirtualSlot5(int a, int b);   // 0x004a6ba0
-    virtual void CharacterVirtualSlot6(int a, int b);   // 0x004a6ba0
+    virtual void CharacterVirtualSlot4(int poseRecord, int rowMask);   // 0x004a6ba0 (ret 8; shared by 4..6)
+    virtual void CharacterVirtualSlot5(int poseRecord, int rowMask);   // 0x004a6ba0
+    virtual void CharacterVirtualSlot6(int poseRecord, int rowMask);   // 0x004a6ba0
     virtual int CharacterVirtualSlot7(float time, int a, int b);  // 0x004a70c0 (ret 0xc): fld of the first argument, added to +0x10
     virtual void CharacterVirtualSlot8(int a);    // 0x004a98b0 (ret 4)
     virtual void CharacterVirtualSlot9(int a);    // 0x00464e80 (ret 4)
@@ -156,9 +156,9 @@ public:
     virtual void CharacterVirtualSlot0();         // 0x00445a70
     virtual void CharacterVirtualSlot2();         // 0x00445fc0
     virtual void CharacterVirtualSlot3(int a);    // 0x00446110
-    virtual void CharacterVirtualSlot4(int a, int b);   // 0x00446210
-    virtual void CharacterVirtualSlot5(int a, int b);   // 0x00446300
-    virtual void CharacterVirtualSlot6(int a, int b);   // 0x00446480
+    virtual void CharacterVirtualSlot4(int poseRecord, int rowMask);   // 0x00446210
+    virtual void CharacterVirtualSlot5(int poseRecord, int rowMask);   // 0x00446300
+    virtual void CharacterVirtualSlot6(int poseRecord, int rowMask);   // 0x00446480
     virtual void CharacterVirtualSlot8(int a);    // 0x00445e70
     virtual void CharacterVirtualSlot9(int a);    // 0x00445ec0
     virtual void CharacterVirtualSlot10();        // 0x00446520
