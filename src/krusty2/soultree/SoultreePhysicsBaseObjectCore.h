@@ -105,8 +105,8 @@ public:
                                      const Vec3* armB, Vec3* invInertiaB, Vec3* angVelB,
                                      int velBOrNull, float* impulseOut, float scale);
     virtual int UnknownVirtualSlot5(int value);
-    virtual void UnknownVirtualSlot6(Vec3* a, float* b);
-    virtual void UnknownVirtualSlot7(const Vec3* a);  // only read (0x005019e0, tier 2)
+    virtual void UnknownVirtualSlot6(Vec3* force, float* speedBudget);
+    virtual void UnknownVirtualSlot7(const Vec3* force);  // only read (0x005019e0, tier 2)
     virtual void UnknownVirtualSlot8();
     virtual void UnknownVirtualSlot9(float dt, int* steps);
     virtual int UnknownVirtualSlot10();

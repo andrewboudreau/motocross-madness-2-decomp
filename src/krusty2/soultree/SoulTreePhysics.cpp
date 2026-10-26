@@ -417,11 +417,11 @@ static inline float VecLengthFast(const Vec3& v)
     return FastSqrt(s);
 }
 
-// slot 7 (0x005019e0): distributes the vector *a over the contacts, weighting each
+// slot 7 (0x005019e0): distributes the force *force over the contacts, weighting each
 // active contact by 1 - (its distance / summed distance).  Tier 3 reading.
 // This is an inverse-distance weighting: contacts closer to the body position get the larger
 // share (a lone active contact gets the whole vector, weight 1).  Vehicle slot 7 is a near copy.
-void SoultreePhysicsBaseObject::UnknownVirtualSlot7(const Vec3* a)
+void SoultreePhysicsBaseObject::UnknownVirtualSlot7(const Vec3* force)
 {
     float dist[128];
     int i;
@@ -445,14 +445,14 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot7(const Vec3* a)
         }
         if (n == 1) {
             collisionPoints[last]->loadShare = 1.0f;
-            collisionPoints[last]->forceShare = *a;
+            collisionPoints[last]->forceShare = *force;
             return;
         }
         for (i = 0; n > 0; i++) {
             SoultreeContact* c = collisionPoints[i];
             if (c->touching) {
                 c->loadShare = 1.0f - dist[i] / sum;
-                c->forceShare = *a * c->loadShare;
+                c->forceShare = *force * c->loadShare;
                 n--;
             }
         }

@@ -300,7 +300,7 @@ static inline float VehDistance(const Vec3& a, const Vec3& b)
     return FastSqrt(d2);
 }
 
-void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
+void Vehicle::UnknownVirtualSlot7(const Vec3* force)
 {
     float total;
     float dist[128];
@@ -326,7 +326,7 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
         }
         if (active == 1) {
             ((VehicleContact**)collisionPoints)[last]->blendWeight = 1.0f;
-            ((VehicleContact**)collisionPoints)[last]->appliedShare = *arg;
+            ((VehicleContact**)collisionPoints)[last]->appliedShare = *force;
             return;
         }
         for (i = 0; active > 0; i++) {
@@ -334,7 +334,7 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
             if (c->contactActive) {
                 float w = 1.0f - dist[i] / total;
                 c->blendWeight = w;
-                c->appliedShare = *arg * w;
+                c->appliedShare = *force * w;
                 active--;
             }
         }
@@ -344,7 +344,7 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
         for (i = 0; i < wheelCount; i++) {
             wheelList[i]->loadWeight = wheelList[i]->restLoadWeight;
             float w = wheelList[i]->loadWeight;
-            wheelList[i]->appliedShare = *arg * w;
+            wheelList[i]->appliedShare = *force * w;
         }
         return;
     }
@@ -365,7 +365,7 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
             if (w->inContact) {
                 float k = 1.0f - dist[i] / total;
                 w->loadWeight = k;
-                w->appliedShare = *arg * k;
+                w->appliedShare = *force * k;
             }
         }
     } else if (wheelsInContact == 1) {
@@ -374,7 +374,7 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
             wheelList[i]->appliedShare = Vec3(0.0f);
         }
         primaryWheel->loadWeight = 1.0f;
-        primaryWheel->appliedShare = *arg;
+        primaryWheel->appliedShare = *force;
     } else {
         for (i = 0; i < wheelCount; i++) {
             wheelList[i]->loadWeight = 0.0f;

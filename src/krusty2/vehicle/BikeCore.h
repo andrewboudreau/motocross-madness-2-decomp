@@ -23,7 +23,7 @@ public:
     // overrides of Vehicle slots (signatures: SoultreePhysicsBaseObject.h, Vehicle.h)
     virtual void UnknownVirtualSlot1(float extraWeight);
     virtual int UnknownVirtualSlot5(int arg);
-    virtual void UnknownVirtualSlot7(const Vec3* dir);
+    virtual void UnknownVirtualSlot7(const Vec3* force);
     virtual void UnknownVirtualSlot8();
     virtual Vec3 UnknownVirtualSlot16(const Vec3* localTorque);
     virtual void UnknownVirtualSlot29(int arg);

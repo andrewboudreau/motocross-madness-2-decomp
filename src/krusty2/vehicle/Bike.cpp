@@ -1530,7 +1530,7 @@ static inline float BikeContactDistance(const Vec3& a, const Vec3& b)
     return BikeLength((dy * dy + dx * dx) + dz * dz);
 }
 
-void Bike::UnknownVirtualSlot7(const Vec3* dir)
+void Bike::UnknownVirtualSlot7(const Vec3* force)
 {
     float total;
     float dist[128];
@@ -1556,7 +1556,7 @@ void Bike::UnknownVirtualSlot7(const Vec3* dir)
         }
         if (active == 1) {
             ((VehicleContact**)collisionPoints)[last]->blendWeight = 1.0f;
-            ((VehicleContact**)collisionPoints)[last]->appliedShare = *dir;
+            ((VehicleContact**)collisionPoints)[last]->appliedShare = *force;
             return;
         }
         for (i = 0; active > 0; i++) {
@@ -1564,7 +1564,7 @@ void Bike::UnknownVirtualSlot7(const Vec3* dir)
             if (c->contactActive) {
                 float w = 1.0f - dist[i] / total;
                 c->blendWeight = w;
-                c->appliedShare = *dir * w;
+                c->appliedShare = *force * w;
                 active--;
             }
         }
@@ -1573,9 +1573,9 @@ void Bike::UnknownVirtualSlot7(const Vec3* dir)
     if (motionActive) {
         BikeSteerToward(steerAxis, 0.5f, stepTime);
         rearWheel->loadWeight = rearWheel->restLoadWeight;
-        rearWheel->appliedShare = *dir * rearWheel->loadWeight;
+        rearWheel->appliedShare = *force * rearWheel->loadWeight;
         frontWheel->loadWeight = frontWheel->restLoadWeight;
-        frontWheel->appliedShare = *dir * frontWheel->loadWeight;
+        frontWheel->appliedShare = *force * frontWheel->loadWeight;
         return;
     }
     int mode = wheelsInContact;
@@ -1585,21 +1585,21 @@ void Bike::UnknownVirtualSlot7(const Vec3* dir)
         float lf = BikeWheelDistance(centerOfMass, frontWheel->wheelPosition);
         float lr = BikeWheelDistance(centerOfMass, rearWheel->wheelPosition);
         rearWheel->loadWeight = lf / (lr + lf);
-        rearWheel->appliedShare = *dir * rearWheel->loadWeight;
+        rearWheel->appliedShare = *force * rearWheel->loadWeight;
         frontWheel->loadWeight = 1.0f - rearWheel->loadWeight;
-        frontWheel->appliedShare = *dir * frontWheel->loadWeight;
+        frontWheel->appliedShare = *force * frontWheel->loadWeight;
     } else if (mode == 1) {
         BikeSteerToward(steerAxis, controlInput.y * 0.25f + 0.5f, stepTime);
         if (frontWheel->inContact) {
             frontWheel->loadWeight = 1.0f;
-            frontWheel->appliedShare = *dir;
+            frontWheel->appliedShare = *force;
             rearWheel->loadWeight = 0.0f;
             rearWheel->appliedShare = kVec3Zero;
         } else {
             frontWheel->loadWeight = 0.0f;
             frontWheel->appliedShare = kVec3Zero;
             rearWheel->loadWeight = 1.0f;
-            rearWheel->appliedShare = *dir;
+            rearWheel->appliedShare = *force;
         }
     } else {
         BikeSteerToward(steerAxis, controlInput.y * 0.25f + 0.5f, stepTime);

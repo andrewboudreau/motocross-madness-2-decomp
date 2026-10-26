@@ -35,7 +35,7 @@ public:
                                      const Vec3* velB, const Vec3* worldAngVelB,
                                      const Vec3* armB, Vec3* invInertiaB, Vec3* angVelB,
                                      int velBOrNull, float* impulseOut, float scale);
-    virtual void UnknownVirtualSlot7(const Vec3* arg);
+    virtual void UnknownVirtualSlot7(const Vec3* force);
     // Slots 18..20 take the canonical 40-byte record; the bodies view it as
     // VehicleImpactEvent (same offsets: +0x04/+0x08/+0x0c sinks, +0x24 resetTrail).
     virtual void UnknownVirtualSlot18(SoultreeAttachment* arg);

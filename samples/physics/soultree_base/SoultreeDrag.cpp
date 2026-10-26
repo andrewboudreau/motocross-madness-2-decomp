@@ -9,8 +9,8 @@
 // The member names and drag/budget interpretation remain provisional. Retail first
 // stores squared magnitude, then overwrites that same float with FastSqrt's result.
 // Its clamp and budget charge therefore use magnitude, not squared magnitude.
-// The unscaled branch charges *b before reading scratchVector: aliases observe it.
-void SoultreePhysicsBaseObject::UnknownVirtualSlot6(Vec3* a, float* b)
+// The unscaled branch charges *speedBudget before reading scratchVector: aliases observe it.
+void SoultreePhysicsBaseObject::UnknownVirtualSlot6(Vec3* force, float* speedBudget)
 {
     if (prevSpeed <= 0.001f)
         return;
@@ -31,8 +31,8 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot6(Vec3* a, float* b)
     float den = stepTime;
     float num = bodyMass;
     float t = linearSpeed;
-    if (!(t <= *b))
-        t = *b;
+    if (!(t <= *speedBudget))
+        t = *speedBudget;
     if (t <= 0.0f)
         t = 0.0f;
     float q = num / den;
@@ -40,11 +40,11 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot6(Vec3* a, float* b)
     Vec3 v;
     if (length > r) {
         v = scratchVector * (r / length);
-        *b -= t;
+        *speedBudget -= t;
     } else {
-        *b -= length / q;
+        *speedBudget -= length / q;
         v = scratchVector;
     }
     scratchVector2 = v;
-    *a += scratchVector2;
+    *force += scratchVector2;
 }
