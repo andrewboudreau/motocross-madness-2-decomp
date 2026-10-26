@@ -52,12 +52,12 @@ static inline float KbRandUnit() { float r = rand() * (1.0f / 32768.0f); return 
 // pooled 1.0f through the FPU, which a plain member store of 1.0f does not reproduce).
 static inline float KbLength(const Vec3& v)
 {
-    float d = v.x * v.x;   // accumulated term by term: a one-line sum loads in a different order
-    d += v.y * v.y;
-    d += v.z * v.z;
-    if (d == 1.0f)
+    float lengthSq = v.x * v.x;   // accumulated term by term: a one-line sum loads in a different order
+    lengthSq += v.y * v.y;
+    lengthSq += v.z * v.z;
+    if (lengthSq == 1.0f)
         return 1.0f;
-    return (float)sqrt(d);
+    return (float)sqrt(lengthSq);
 }
 
 // Destructor body (0x00491540, reached through the vbase-adjusted scalar deleting
@@ -276,10 +276,10 @@ void KrustyBike::UnknownVirtualSlot69()
         crashTimer = airCrashTimerReload;
         return;
     }
-    float t = crashTimerReload;
-    crashTimer = t;
+    float reload = crashTimerReload;
+    crashTimer = reload;
     if (!reinterpret_cast<KbGame*>(g_TrackGame)->raceMode && !reinterpret_cast<KbGame*>(g_TrackGame)->eventType)
-        crashTimer = t + 1.0f;
+        crashTimer = reload + 1.0f;
 }
 
 void KrustyBike::UnknownVirtualSlot71(int nowAirborne)
@@ -426,35 +426,35 @@ void KrustyBike::UnknownVirtualSlot67()
 // Slot 16: localTorque scaled per axis by invInertia, or by shapeInvInertia while crashed.
 Vec3 KrustyBike::UnknownVirtualSlot16(const Vec3* localTorque)
 {
-    Vec3 r;
+    Vec3 accel;
     if (!crashState) {
-        r.x = invInertia.x * localTorque->x;
-        r.y = invInertia.y * localTorque->y;
-        r.z = invInertia.z * localTorque->z;
+        accel.x = invInertia.x * localTorque->x;
+        accel.y = invInertia.y * localTorque->y;
+        accel.z = invInertia.z * localTorque->z;
     } else {
-        r.x = shapeInvInertia.x * localTorque->x;
-        r.y = shapeInvInertia.y * localTorque->y;
-        r.z = shapeInvInertia.z * localTorque->z;
+        accel.x = shapeInvInertia.x * localTorque->x;
+        accel.y = shapeInvInertia.y * localTorque->y;
+        accel.z = shapeInvInertia.z * localTorque->z;
     }
-    return r;
+    return accel;
 }
 
 // Slot 15: worldTorque into the body frame, scaled per axis as in slot 16, then 0x4CB6E0
 // (which looks like a clamp/settle step on angularVelocity) with angularAccel.
 void KrustyBike::UnknownVirtualSlot15(const Vec3* worldTorque, Vec3* angularAccel)
 {
-    Vec3 s;
-    Vec3 t = ((KbXform*)modelNode)->WorldToLocalDirection(worldTorque);
+    Vec3 localAccel;
+    Vec3 localTorque = ((KbXform*)modelNode)->WorldToLocalDirection(worldTorque);
     if (!crashState) {
-        s.x = t.x * invInertia.x;
-        s.y = t.y * invInertia.y;
-        s.z = t.z * invInertia.z;
+        localAccel.x = localTorque.x * invInertia.x;
+        localAccel.y = localTorque.y * invInertia.y;
+        localAccel.z = localTorque.z * invInertia.z;
     } else {
-        s.x = t.x * shapeInvInertia.x;
-        s.y = t.y * shapeInvInertia.y;
-        s.z = t.z * shapeInvInertia.z;
+        localAccel.x = localTorque.x * shapeInvInertia.x;
+        localAccel.y = localTorque.y * shapeInvInertia.y;
+        localAccel.z = localTorque.z * shapeInvInertia.z;
     }
-    UnknownAxisSettle_4cb6e0(&angularVelocity.x, &angularAccel->x, &s.x, stepTime, 0);
+    UnknownAxisSettle_4cb6e0(&angularVelocity.x, &angularAccel->x, &localAccel.x, stepTime, 0);
 }
 
 // Slot 48: field_0x0c update from the (field_0x64*3 - field_0x7c) * 0.5 * dt step.
@@ -464,9 +464,9 @@ void KrustyBike::UnknownVirtualSlot48()
         Bike::UnknownVirtualSlot48();
         return;
     }
-    Vec3 v = velocity * 3.0f;
-    Vec3 d = (v - prevVelocity) * 0.5f;
-    position += d * stepTime;
+    Vec3 tripled = velocity * 3.0f;
+    Vec3 stepVelocity = (tripled - prevVelocity) * 0.5f;
+    position += stepVelocity * stepTime;
     rearWheel->driveForce = kVec3Zero;
     rearWheel->driveForceMagnitude = 0;
 }
@@ -579,7 +579,7 @@ int KrustyBike::UnknownVirtualSlot28(int steps)
         }
         if (isRemote) return steps;
     }
-    int r = Vehicle::UnknownVirtualSlot28(steps);
+    int result = Vehicle::UnknownVirtualSlot28(steps);
     if (crashState && !prevCrashState) {
         if (aiKind) {
             repairDamage += KbRandUnit() * 0.15f;
@@ -589,7 +589,7 @@ int KrustyBike::UnknownVirtualSlot28(int steps)
             injuryDamage += KbRandUnit() * 0.667f;
         }
     }
-    return r;
+    return result;
 }
 
 // Slot 99 (0x004916a0): tier 3 -- out-of-bounds / off-track recovery.  When slot 12 reports
@@ -1320,20 +1320,20 @@ void KrustyCollisionCallbackB(CollisionObject* self, CollisionObject* other)
     if (kind == 0x64 || kind == 0x65)
         return;
     if (kind == 0x2711) {
-        Vec3* p = &bike->position;
-        Vec3* d = (Vec3*)other->contactRecord;
-        p->x = p->x + d->x;
-        p->y = d->y + p->y;
-        p->z = d->z + p->z;
-        bike->modelNode->SetPosition(*p);
+        Vec3* pos = &bike->position;
+        Vec3* offset = (Vec3*)other->contactRecord;
+        pos->x = pos->x + offset->x;
+        pos->y = offset->y + pos->y;
+        pos->z = offset->z + pos->z;
+        bike->modelNode->SetPosition(*pos);
         bike->collisionObject->UpdatePlacement();
     } else if (kind == 0x69) {
-        Vec3* p = &bike->position;
-        Vec3* d = (Vec3*)other->contactRecord;
-        p->x = d->x + p->x;
-        p->y = d->y + p->y;
-        p->z = d->z + p->z;
-        bike->modelNode->SetPosition(*p);
+        Vec3* pos = &bike->position;
+        Vec3* offset = (Vec3*)other->contactRecord;
+        pos->x = offset->x + pos->x;
+        pos->y = offset->y + pos->y;
+        pos->z = offset->z + pos->z;
+        bike->modelNode->SetPosition(*pos);
         bike->collisionObject->UpdatePlacement();
     }
     KrustyCollisionCallbackA(self, other);
@@ -1382,8 +1382,8 @@ void KrustyBike::Fn_0048E280()
     nearestRival = FindNearestRival(0);
     if (!nearestRival)
         return;
-    Vec3 d = nearestRival->position - position;
-    float angle = (float)(atan2(d.x, d.z)) - savedYaw;
+    Vec3 toRival = nearestRival->position - position;
+    float angle = (float)(atan2(toRival.x, toRival.z)) - savedYaw;
     if (angle < -3.14159274f)
         angle += 6.28318548f;
     else if (angle > 3.14159274f)
