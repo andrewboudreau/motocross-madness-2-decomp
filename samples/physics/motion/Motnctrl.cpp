@@ -54,27 +54,27 @@ int MotionManager::LoadVue(Character* character, const char* path, Motion* motio
         list->poses = (CharacterPose*)DebugMalloc(poses * sizeof(CharacterPose), __FILE__, 0x1f9);
         list->frameIndex = frame;
         list->count = poses;
-        int k = 0;
-        for (int t = 0; t < transforms; t++) {
+        int kept = 0;
+        for (int transform = 0; transform < transforms; transform++) {
             file->ReadLine(line, 0xff);
             strtok(line, " ");
             int node = character->FindNode(strtok(0, " \""));
             if (node != 0xff) {
-                list->poses[k].nodeIndex = node;
-                list->poses[k].hasPose = 0;
+                list->poses[kept].nodeIndex = node;
+                list->poses[kept].hasPose = 0;
                 strtok(0, " ");
                 strtok(0, " ");
                 strtok(0, " ");
-                list->poses[k].axisZ.x = atof(strtok(0, " "));
-                list->poses[k].axisZ.z = atof(strtok(0, " "));
-                list->poses[k].axisZ.y = atof(strtok(0, " "));
-                list->poses[k].axisY.x = atof(strtok(0, " "));
-                list->poses[k].axisY.z = atof(strtok(0, " "));
-                list->poses[k].axisY.y = atof(strtok(0, " "));
-                list->poses[k].position.x = atof(strtok(0, " "));
-                list->poses[k].position.z = atof(strtok(0, " "));
-                list->poses[k].position.y = atof(strtok(0, " "));
-                k++;
+                list->poses[kept].axisZ.x = atof(strtok(0, " "));
+                list->poses[kept].axisZ.z = atof(strtok(0, " "));
+                list->poses[kept].axisZ.y = atof(strtok(0, " "));
+                list->poses[kept].axisY.x = atof(strtok(0, " "));
+                list->poses[kept].axisY.z = atof(strtok(0, " "));
+                list->poses[kept].axisY.y = atof(strtok(0, " "));
+                list->poses[kept].position.x = atof(strtok(0, " "));
+                list->poses[kept].position.z = atof(strtok(0, " "));
+                list->poses[kept].position.y = atof(strtok(0, " "));
+                kept++;
             }
         }
         frame++;
@@ -421,13 +421,13 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
             }
         } else {
             for (int i = 0; i < from->count; i++) {
-                CharacterPose* a = &from->poses[i];
-                int flag = nodeNames[a->nodeIndex].applyTranslation;
-                float t = chr_field_0x10;
+                CharacterPose* fromPose = &from->poses[i];
+                int flag = nodeNames[fromPose->nodeIndex].applyTranslation;
+                float frameTime = chr_field_0x10;
                 int fps = currentMotion->fps;
-                CharacterPose* b = &to->poses[i];
+                CharacterPose* toPose = &to->poses[i];
                 CharacterPose out;
-                ExtrapolatePose7(a, b, &out, flag, t, fps);
+                ExtrapolatePose7(fromPose, toPose, &out, flag, frameTime, fps);
                 if (mirror == 0)
                     CharacterVirtualSlot4((int)&out, mask);
                 else
@@ -441,14 +441,14 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
 
         blendFromTime += time;
         lastFrameTime += time;
-        float r = blendFromTime / blendDuration;
-        float w;
-        if (r < 0.0f)
-            w = 0.0f;
-        else if (r >= 1.0f)
-            w = 1.0f;
+        float blendProgress = blendFromTime / blendDuration;
+        float blendWeight;
+        if (blendProgress < 0.0f)
+            blendWeight = 0.0f;
+        else if (blendProgress >= 1.0f)
+            blendWeight = 1.0f;
         else
-            w = SmoothStep(r);
+            blendWeight = SmoothStep(blendProgress);
         int ok2 = AdvanceClamped(blendFromMotion, &lastFrame, &from2, &to2, &lastFrameTime, &weight2) != 0;
         for (int j = 0; j < from->count; j++) {
             CharacterPose pose2;
@@ -458,42 +458,42 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
             if (ok2) {
                 InterpolatePose(&from2->poses[j], &to2->poses[j], &pose2, weight2);
             } else {
-                CharacterPose* a = &from2->poses[j];
-                int flag = nodeNames[a->nodeIndex].applyTranslation;
-                float t = lastFrameTime;
+                CharacterPose* fromPose = &from2->poses[j];
+                int flag = nodeNames[fromPose->nodeIndex].applyTranslation;
+                float frameTime = lastFrameTime;
                 int fps = blendFromMotion->fps;
-                CharacterPose* b = &to2->poses[j];
+                CharacterPose* toPose = &to2->poses[j];
                 Vec3 axis;
                 float angle;
-                PoseRotation(a, b, &axis, &angle);
+                PoseRotation(fromPose, toPose, &axis, &angle);
                 float ffps = (float)fps;
-                pose2.hasPose = a->hasPose;
-                angle = (angle * t) * ffps;
-                pose2.nodeIndex = a->nodeIndex;
+                pose2.hasPose = fromPose->hasPose;
+                angle = (angle * frameTime) * ffps;
+                pose2.nodeIndex = fromPose->nodeIndex;
                 if (angle != 0.0f) {
-                    RotatePose(b, &pose2, axis, angle);
+                    RotatePose(toPose, &pose2, axis, angle);
                 } else {
-                    pose2.axisZ = b->axisZ;
-                    pose2.axisY = b->axisY;
+                    pose2.axisZ = toPose->axisZ;
+                    pose2.axisY = toPose->axisY;
                 }
                 if (flag) {
                     // Retail calls each vector operator separately. Preserve the float
                     // result of each call before the next operation: an inlined chain
                     // retains x87 precision and changes the applied translation.
                     Vec3 delta, velocity, step;
-                    Vec3SubtractCall(&delta, &b->position, &a->position);
+                    Vec3SubtractCall(&delta, &toPose->position, &fromPose->position);
                     Vec3ScaleCall(&velocity, &delta, ffps);
-                    Vec3ScaleCall(&step, &velocity, t);
-                    Vec3AddCall(&pose2.position, &b->position, &step);
+                    Vec3ScaleCall(&step, &velocity, frameTime);
+                    Vec3AddCall(&pose2.position, &toPose->position, &step);
                 } else {
-                    pose2.position = b->position;
+                    pose2.position = toPose->position;
                 }
             }
-            InterpolatePose(&pose2, &out, &result, w);
+            InterpolatePose(&pose2, &out, &result, blendWeight);
             if (nodeNames[pose2.nodeIndex].applyTranslation)
                 result = pose2;
             else
-                InterpolatePose(&pose2, &out, &result, w);
+                InterpolatePose(&pose2, &out, &result, blendWeight);
             if (mirror == 0)
                 CharacterVirtualSlot4((int)&result, mask);
             else
