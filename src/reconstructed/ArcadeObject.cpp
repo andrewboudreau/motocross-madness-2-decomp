@@ -43,7 +43,7 @@ ArcadeObject::~ArcadeObject() {
 }
 
 // 0x00401310
-ArcadeObject* ArcadeObject::Create(void* context, int a, int b, const char* name,
+ArcadeObject* ArcadeObject::Create(void* context, int lights, int options, const char* name,
                                                   Vector3 position, int pixels, UnknownArcadeView* view,
                                                   float size, float screenXFraction, float screenYFraction, unsigned char alpha) {
     Vector3 low;
@@ -51,7 +51,7 @@ ArcadeObject* ArcadeObject::Create(void* context, int a, int b, const char* name
 
     GameObject::SetRenderContext(context);
     arcadeModel = new (__FILE__, 78) D3DIMSoultreeObject(1);
-    if (!AppendChild(arcadeModel->UnknownVirtualSlot9(renderContext, name, a, b, 1), -1)) {
+    if (!AppendChild(arcadeModel->UnknownVirtualSlot9(renderContext, name, lights, options, 1), -1)) {
         Release();
         return 0;
     }

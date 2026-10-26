@@ -90,15 +90,16 @@ D3DIMSoultreeObject::~D3DIMSoultreeObject()
 }
 
 // 0x0043f4b0
-GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* path, int a, int b, int c)
+GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* path, int lights, int options,
+                                                     int useOptions)
 {
     GameObject::SetRenderContext(owner);
-    if (c) {
-        memcpy(textureOptions, (const int*)b, sizeof(textureOptions));
-        textureManager = *(TextureMapManager**)b;
+    if (useOptions) {
+        memcpy(textureOptions, (const int*)options, sizeof(textureOptions));
+        textureManager = *(TextureMapManager**)options;
     }
-    loadFlag = c;
-    lightManager = (LightManager*)a;
+    loadFlag = useOptions;
+    lightManager = (LightManager*)lights;
     if (*path) {
         char drive[_MAX_DRIVE + 1];
         char dir[_MAX_DIR];

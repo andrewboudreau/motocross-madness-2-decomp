@@ -60,7 +60,8 @@ RunwayLights::RunwayLights(int flags) : GameObject(flags) {
 }
 
 // 0x0048a600
-RunwayLights* RunwayLights::SetupLights(void* context, int a, int b, UnknownRunwayTerrain* terrain) {
+RunwayLights* RunwayLights::SetupLights(void* context, int lights, int options,
+                                        UnknownRunwayTerrain* terrain) {
     char name[0x104];
 
     GameObject::SetRenderContext(context);
@@ -70,7 +71,7 @@ RunwayLights* RunwayLights::SetupLights(void* context, int a, int b, UnknownRunw
     Vector3 position(0.0f, 0.0f, 0.0f);
     for (; i < 5; i++) {
         lightModels[i] = (new (__FILE__, 0x40) ArcadeObject(1))
-                            ->Create(context, a, b, name, position, 0, 0, 2.0f, 0.5f, 0.5f, 0);
+                            ->Create(context, lights, options, name, position, 0, 0, 2.0f, 0.5f, 0.5f, 0);
         if (!AppendChild(lightModels[i], -1)) {
             Release();
             return 0;
@@ -174,14 +175,15 @@ VisualCue::VisualCue(int flags) : ArcadeObject(flags) {
 }
 
 // 0x0048adf0
-VisualCue* VisualCue::LoadVisualCue(void* context, int a, int b, UnknownRunwayTerrain* terrain, Vector3 position,
-                                            UnknownVisualCueView* view, int pixels, UnknownArcadeView* camera,
-                                            float size, float screenXFraction, float screenYFraction) {
+VisualCue* VisualCue::LoadVisualCue(void* context, int lights, int options, UnknownRunwayTerrain* terrain,
+                                    Vector3 position, UnknownVisualCueView* view, int pixels,
+                                    UnknownArcadeView* camera, float size, float screenXFraction,
+                                    float screenYFraction) {
     char name[0x104];
 
     if (pixels && camera && screenXFraction != 0.0f && screenYFraction != 0.0f) {
         sprintf(name, "%s\\%s", "Res", "viscue.slt");
-        if (ArcadeObject::Create(context, a, b, name, position, pixels, camera, size,
+        if (ArcadeObject::Create(context, lights, options, name, position, pixels, camera, size,
                                  screenXFraction, screenYFraction, 0)) {
             cueView = view;
             builtFieldOfView = 0;
@@ -280,7 +282,7 @@ NumberObjectManager::NumberObjectManager(int flags) : GameObject(flags) {
 }
 
 // 0x0048bd00
-NumberObjectManager* NumberObjectManager::SetupDigits(void* context, int b, UnknownNumberRacer* racer,
+NumberObjectManager* NumberObjectManager::SetupDigits(void* context, int options, UnknownNumberRacer* racer,
                                                       int pixels, UnknownNumberCamera* camera,
                                                       float size) {
     char name[0x104];
@@ -298,7 +300,7 @@ NumberObjectManager* NumberObjectManager::SetupDigits(void* context, int b, Unkn
     for (int i = 0; i < 5; i++) {
         sprintf(name, "%s\\%s", "Res", names[i]);
         digitModels[i] = (new (__FILE__, 0x240) ArcadeObject(1))
-                            ->Create(context, 0, b, name, position, pixels,
+                            ->Create(context, 0, options, name, position, pixels,
                                                     (UnknownArcadeView*)camera, size, 0.5f, 0.1f, 0);
         if (!AppendChild(digitModels[i], -1)) {
             Release();
@@ -398,7 +400,7 @@ BonusObjectManager::~BonusObjectManager() {
 }
 
 // 0x0048c330
-int BonusObjectManager::LoadDigitModels(void* context, int a, int b) {
+int BonusObjectManager::LoadDigitModels(void* context, int lights, int options) {
     char name[0x104];
     Vector3 position;
     int digit;
@@ -407,13 +409,13 @@ int BonusObjectManager::LoadDigitModels(void* context, int a, int b) {
     position = Vector3(0.74f, 0.0f, 0.0f);
     sprintf(name, "%s\\%1d.slt", "Res", 0);
     digitModels[0][0] = new (__FILE__, 0x2d3) D3DIMSoultreeObject(isEnabled);
-    digitModels[0][0]->UnknownVirtualSlot9(context, name, a, b, 1);
+    digitModels[0][0]->UnknownVirtualSlot9(context, name, lights, options, 1);
     digitModels[0][0]->SetPosition(*reinterpret_cast<const Vec3*>(&position));
     baseFrame->AppendChild(digitModels[0][0], -1);
     digitModels[0][0]->ClearScreenRects();
     position.x = 0.37f;
     digitModels[0][1] = new (__FILE__, 0x2da) D3DIMSoultreeObject(isEnabled);
-    digitModels[0][1]->UnknownVirtualSlot9(context, name, a, b, 1);
+    digitModels[0][1]->UnknownVirtualSlot9(context, name, lights, options, 1);
     digitModels[0][1]->SetPosition(*reinterpret_cast<const Vec3*>(&position));
     baseFrame->AppendChild(digitModels[0][1], -1);
     digitModels[0][1]->ClearScreenRects();
@@ -426,7 +428,7 @@ int BonusObjectManager::LoadDigitModels(void* context, int a, int b) {
         position.x = 0.0f;
         for (place = 2; place < 5; place++) {
             digitModels[digit][place] = new (__FILE__, 0x2ec) D3DIMSoultreeObject(isEnabled);
-            digitModels[digit][place]->UnknownVirtualSlot9(context, name, a, b, 1);
+            digitModels[digit][place]->UnknownVirtualSlot9(context, name, lights, options, 1);
             digitModels[digit][place]->SetPosition(*reinterpret_cast<const Vec3*>(&position));
             baseFrame->AppendChild(digitModels[digit][place], -1);
             digitModels[digit][place]->ClearScreenRects();
@@ -438,14 +440,14 @@ int BonusObjectManager::LoadDigitModels(void* context, int a, int b) {
     position.x = 1.18f;
     sprintf(name, "%s\\x.slt", "Res", 0);
     timesModel = new (__FILE__, 0x2fe) D3DIMSoultreeObject(isEnabled);
-    timesModel->UnknownVirtualSlot9(context, name, a, b, 1);
+    timesModel->UnknownVirtualSlot9(context, name, lights, options, 1);
     timesModel->SetPosition(*reinterpret_cast<const Vec3*>(&position));
     baseFrame->AppendChild(timesModel, -1);
     timesModel->ClearScreenRects();
     position.x = 1.67f;
     sprintf(name, "%s\\DecimalPoint.slt", "Res", 0);
     decimalPointModel = new (__FILE__, 0x307) D3DIMSoultreeObject(isEnabled);
-    decimalPointModel->UnknownVirtualSlot9(context, name, a, b, 1);
+    decimalPointModel->UnknownVirtualSlot9(context, name, lights, options, 1);
     decimalPointModel->SetPosition(*reinterpret_cast<const Vec3*>(&position));
     baseFrame->AppendChild(decimalPointModel, -1);
     decimalPointModel->ClearScreenRects();
@@ -454,7 +456,7 @@ int BonusObjectManager::LoadDigitModels(void* context, int a, int b) {
         position.x = 1.87f;
         for (place = 0; place < 2; place++) {
             fractionDigitModels[digit][place] = new (__FILE__, 0x312) D3DIMSoultreeObject(isEnabled);
-            fractionDigitModels[digit][place]->UnknownVirtualSlot9(context, name, a, b, 1);
+            fractionDigitModels[digit][place]->UnknownVirtualSlot9(context, name, lights, options, 1);
             fractionDigitModels[digit][place]->SetPosition(*reinterpret_cast<const Vec3*>(&position));
             baseFrame->AppendChild(fractionDigitModels[digit][place], -1);
             fractionDigitModels[digit][place]->ClearScreenRects();
@@ -467,9 +469,9 @@ int BonusObjectManager::LoadDigitModels(void* context, int a, int b) {
 }
 
 // 0x0048c8a0
-int BonusObjectManager::CreateFrameNode(void* context, int a, int b) {
+int BonusObjectManager::CreateFrameNode(void* context, int lights, int options) {
     baseFrame = new (__FILE__, 0x326) D3DIMSoultreeObject(1);
-    if (!AppendChild(baseFrame->UnknownVirtualSlot9(context, "", a, b, 1), -1))
+    if (!AppendChild(baseFrame->UnknownVirtualSlot9(context, "", lights, options, 1), -1))
         return 0;
     strcpy(baseFrame->nodeName, "Base Bonus Frame");
     baseFrame->subtreeBoundsCenter = kVec3Zero;
@@ -483,16 +485,16 @@ int BonusObjectManager::CreateFrameNode(void* context, int a, int b) {
 }
 
 // 0x0048ca60
-BonusObjectManager* BonusObjectManager::SetupCounter(void* context, int a, int b, UnknownBonusRacer* racer,
-                                                     UnknownBonusCamera* camera) {
+BonusObjectManager* BonusObjectManager::SetupCounter(void* context, int lights, int options,
+                                                     UnknownBonusRacer* racer, UnknownBonusCamera* camera) {
     GameObject::SetRenderContext(context);
     raceView = racer;
     this->camera = camera;
-    if (!CreateFrameNode(context, a, b)) {
+    if (!CreateFrameNode(context, lights, options)) {
         Release();
         return 0;
     }
-    if (!LoadDigitModels(context, a, b)) {
+    if (!LoadDigitModels(context, lights, options)) {
         Release();
         return 0;
     }

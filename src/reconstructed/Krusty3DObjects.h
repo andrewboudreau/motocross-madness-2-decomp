@@ -122,7 +122,7 @@ public:
     virtual int Tick(float frameTime);                 // 0x0048a760
 
     // 0x0048a600 (ret 0x10): slot 8, then loads the five lights (line 0x40).
-    RunwayLights* SetupLights(void* context, int a, int b, UnknownRunwayTerrain* terrain);
+    RunwayLights* SetupLights(void* context, int lights, int options, UnknownRunwayTerrain* terrain);
     void SetRacer(UnknownRunwayRacer* racer); // 0x0048ad50: sets +0x30
 
     float blinkTimer;                          // blink timer
@@ -164,9 +164,10 @@ public:
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x0048afa0
 
     // 0x0048adf0 (ret 0x34): loads "viscue.slt"; returns this, or 0.
-    VisualCue* LoadVisualCue(void* context, int a, int b, UnknownRunwayTerrain* terrain, Vector3 position,
-                                     UnknownVisualCueView* view, int pixels, UnknownArcadeView* camera,
-                                     float size, float screenXFraction, float screenYFraction);
+    VisualCue* LoadVisualCue(void* context, int lights, int options, UnknownRunwayTerrain* terrain,
+                             Vector3 position, UnknownVisualCueView* view, int pixels,
+                             UnknownArcadeView* camera, float size, float screenXFraction,
+                             float screenYFraction);
     // 0x0048af20 (ret 4): collects the view's racers.
     void CollectRacers(UnknownVisualCueView* view);
     int NextCueIndex();               // 0x0048bc30: the next cue index when it changed, else -1
@@ -200,7 +201,7 @@ public:
     virtual int UnknownVirtualSlot14();        // 0x0048c290
 
     // 0x0048bd00 (ret 0x18): loads the five digits (lines 0x23d, 0x240).
-    NumberObjectManager* SetupDigits(void* context, int b, UnknownNumberRacer* racer, int pixels,
+    NumberObjectManager* SetupDigits(void* context, int options, UnknownNumberRacer* racer, int pixels,
                                      UnknownNumberCamera* camera, float size);
 
     UnknownNumberRacer* countdownRacer;       // +0x2c whose count-down the digits show
@@ -335,11 +336,11 @@ public:
     virtual int UnknownVirtualSlot14();        // 0x0048d620
 
     // 0x0048c330 (ret 0xc): loads the digit, "x" and decimal point models.
-    int LoadDigitModels(void* context, int a, int b);
+    int LoadDigitModels(void* context, int lights, int options);
     // 0x0048c8a0 (ret 0xc): creates the frame node (line 0x326).
-    int CreateFrameNode(void* context, int a, int b);
+    int CreateFrameNode(void* context, int lights, int options);
     // 0x0048ca60 (ret 0x14): slot 8, then both loaders; returns this, or 0.
-    BonusObjectManager* SetupCounter(void* context, int a, int b, UnknownBonusRacer* racer,
+    BonusObjectManager* SetupCounter(void* context, int lights, int options, UnknownBonusRacer* racer,
                                      UnknownBonusCamera* camera);
     void NextKey();              // 0x0048cad0: steps to the next key
     void ShowValue(float value, float fraction); // 0x0048d1e0 (ret 8): shows a value

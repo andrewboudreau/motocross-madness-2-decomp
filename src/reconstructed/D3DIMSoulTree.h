@@ -219,11 +219,13 @@ public:
     // Slot 9 (0x0043f4b0, ret 0x14): loads the model `name` (".slb" from
     // the resource manager, else ".slt") and returns the GameObject base;
     // callers hand it straight to GameObject 0x00469190. `owner` goes to
-    // GameObject slot 8, `a` is the LightManager kept at +0x1bc, `b` points
-    // to the six-dword texture options copied to +0x248 when `c` is set,
-    // and `c` is the load flag handed to the materials. The int types are
+    // GameObject slot 8, `lights` is the LightManager kept at +0x1bc,
+    // `options` points to the six-dword texture options copied to +0x248
+    // when `useOptions` is set, and `useOptions` is also the load flag
+    // handed to the materials. The int types are
     // kept from the first (LightEmitter.cpp, ArcadeObject.cpp) callers.
-    virtual GameObject* UnknownVirtualSlot9(void* owner, const char* name, int a, int b, int c);
+    virtual GameObject* UnknownVirtualSlot9(void* owner, const char* name, int lights, int options,
+                                            int useOptions);
 
     // GameObject slots (`this` is the GameObject subobject).
     virtual void Disable();                        // 0x00444540
