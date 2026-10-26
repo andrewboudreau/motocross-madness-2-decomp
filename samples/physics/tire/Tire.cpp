@@ -95,39 +95,39 @@ void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const Colli
         c.x = (y.y * z.z) - y.z * z.y;   // grouped: retail tests keepZ after the second product
         c.y = y.z * z.x - y.x * z.z;
         c.z = y.x * z.y - y.y * z.x;
-        CollisionVec3 r;
+        CollisionVec3 perpendicular;
         if (keepZ) {
-            r.x = c.z * z.y - c.y * z.z;
-            r.y = (c.x * z.z) - c.z * z.x;
-            r.z = c.y * z.x - c.x * z.y;
-            y = r;
+            perpendicular.x = c.z * z.y - c.y * z.z;
+            perpendicular.y = (c.x * z.z) - c.z * z.x;
+            perpendicular.z = c.y * z.x - c.x * z.y;
+            y = perpendicular;
         } else {
-            r.x = c.y * y.z - c.z * y.y;
-            r.y = c.z * y.x - c.x * y.z;
-            r.z = (c.x * y.y) - c.y * y.x;
-            z = r;
+            perpendicular.x = c.y * y.z - c.z * y.y;
+            perpendicular.y = c.z * y.x - c.x * y.z;
+            perpendicular.z = (c.x * y.y) - c.y * y.x;
+            z = perpendicular;
         }
     }
 
     y = TireNormalizeY(y);
 
-    CollisionVec3 n = TireNormalizeZ(z);
+    CollisionVec3 unitZ = TireNormalizeZ(z);
 
-    CollisionVec3 t;
-    t.x = y.y * n.z - y.z * n.y;
-    t.y = (n.x * y.z) - y.x * n.z;
-    t.z = (y.x * n.y) - n.x * y.y;
-    out->m[0] = t.x;
-    out->m[1] = t.y;
-    out->m[2] = t.z;
+    CollisionVec3 xAxis;
+    xAxis.x = y.y * unitZ.z - y.z * unitZ.y;
+    xAxis.y = (unitZ.x * y.z) - y.x * unitZ.z;
+    xAxis.z = (y.x * unitZ.y) - unitZ.x * y.y;
+    out->m[0] = xAxis.x;
+    out->m[1] = xAxis.y;
+    out->m[2] = xAxis.z;
     out->m[3] = 0.0f;
     out->m[4] = y.x;
     out->m[5] = y.y;
     out->m[6] = y.z;
     out->m[7] = 0.0f;
-    out->m[8] = n.x;
-    out->m[9] = n.y;
-    out->m[10] = n.z;
+    out->m[8] = unitZ.x;
+    out->m[9] = unitZ.y;
+    out->m[10] = unitZ.z;
     out->m[11] = 0.0f;
     out->m[12] = pos->x;
     out->m[13] = pos->y;
@@ -628,19 +628,19 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     world->QueryGround(&this->CollisionPoint::surfacePosition, &this->CollisionPoint::surfaceNormal, 0, TireSurfaceByte(this));
 
     if (MovingPart::ownerRef) {
-        CollisionVec3 b;
-        CollisionVec3 t;
-        wheelUpAxis = *((TireOwnerRef*)MovingPart::ownerRef)->node->LocalToWorldDirection(&b, &kVec3ZAxis);
-        b = *((TireOwnerRef*)MovingPart::ownerRef)->node->LocalToWorldDirection(&t, &kVec3YAxis);
-        sideAxis = TireCross(wheelUpAxis, b);
+        CollisionVec3 nodeY;
+        CollisionVec3 scratch;
+        wheelUpAxis = *((TireOwnerRef*)MovingPart::ownerRef)->node->LocalToWorldDirection(&nodeY, &kVec3ZAxis);
+        nodeY = *((TireOwnerRef*)MovingPart::ownerRef)->node->LocalToWorldDirection(&scratch, &kVec3YAxis);
+        sideAxis = TireCross(wheelUpAxis, nodeY);
         TireNormalizeInPlace(sideAxis);
     } else {
         CollisionVec3& side = sideAxis;
         wheelUpAxis = *a6;
         if (a7 == 0) {
-            CollisionVec3 t;
-            CollisionVec3 b = *a8->LocalToWorldDirection(&t, &kVec3YAxis);
-            side = TireCross(*a6, b);
+            CollisionVec3 scratch;
+            CollisionVec3 nodeY = *a8->LocalToWorldDirection(&scratch, &kVec3YAxis);
+            side = TireCross(*a6, nodeY);
         } else {
             side = TireCross(*a6, *a7);
         }
@@ -659,9 +659,9 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     }
 
     // First probe: the wheel centre pushed out along the lateral axis by field_0x274.
-    CollisionVec3 p = TireSumGroupedZ(TireScaleCopy(lateral, wheelRadius), origin);
-    this->CollisionPoint::worldPosition = p;
-    this->CollisionPoint::surfacePosition = p;
+    CollisionVec3 firstProbe = TireSumGroupedZ(TireScaleCopy(lateral, wheelRadius), origin);
+    this->CollisionPoint::worldPosition = firstProbe;
+    this->CollisionPoint::surfacePosition = firstProbe;
     CollisionVec3 n1;
     world->QueryGround(&this->CollisionPoint::surfacePosition, &n1, 0, TireSurfaceByte(this));
     this->CollisionPoint::penetration = (this->CollisionPoint::surfacePosition.y - this->CollisionPoint::worldPosition.y) * n1.y;
@@ -672,34 +672,34 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     if (mag != 1.5707964f) {
         if (MovingPart::ownerRef) {
             CollisionVec3 base = rollDirection * wheelRadius + origin;
-            CollisionVec3 c = TireCrossGrouped(rollDirection, kVec3YAxis);
-            float cLenSq = TireDotGroupedLast(c, c);
+            CollisionVec3 rimDirection = TireCrossGrouped(rollDirection, kVec3YAxis);
+            float cLenSq = TireDotGroupedLast(rimDirection, rimDirection);
             if (cLenSq == 0.0f) {
-                c = kVec3Zero;
+                rimDirection = kVec3Zero;
             } else {
                 float inv = FastInvSqrt(cLenSq);
-                c.x = c.x * inv;
-                c.y = c.y * inv;
-                c.z = c.z * inv;
+                rimDirection.x = rimDirection.x * inv;
+                rimDirection.y = rimDirection.y * inv;
+                rimDirection.z = rimDirection.z * inv;
             }
             float reach = radiusScale * wheelRadius;
-            pt = c * reach + base;
+            pt = rimDirection * reach + base;
         } else {
-            CollisionVec3 v;
-            D3DRMVectorRotate(&v, &kVec3ZAxis, &kVec3YAxis, a5);
-            CollisionVec3 base = v * -wheelRadius + origin;
-            CollisionVec3 c = TireCrossGrouped(v, kVec3YAxis);
-            float cLenSq = TireDot(&c, &c);
+            CollisionVec3 rotated;
+            D3DRMVectorRotate(&rotated, &kVec3ZAxis, &kVec3YAxis, a5);
+            CollisionVec3 base = rotated * -wheelRadius + origin;
+            CollisionVec3 rimDirection = TireCrossGrouped(rotated, kVec3YAxis);
+            float cLenSq = TireDot(&rimDirection, &rimDirection);
             if (cLenSq == 0.0f) {
-                c = kVec3Zero;
+                rimDirection = kVec3Zero;
             } else {
                 float inv = FastInvSqrt(cLenSq);
-                c.x = c.x * inv;
-                c.y = c.y * inv;
-                c.z = c.z * inv;
+                rimDirection.x = rimDirection.x * inv;
+                rimDirection.y = rimDirection.y * inv;
+                rimDirection.z = rimDirection.z * inv;
             }
             float reach = radiusScale * wheelRadius;
-            pt = c * reach + base;
+            pt = rimDirection * reach + base;
         }
     } else {
         pt = *a7 * -wheelRadius + origin;
@@ -709,20 +709,20 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     CollisionVec3 n2;
     unsigned char kind;
     world->QueryGround(&pt, &n2, 0, &kind);
-    CollisionVec3 v = TireNormalizeOr(TireCross(n2, sideAxis), wheelUpAxis);
-    CollisionVec3 u = TireCrossGrouped(v, sideAxis);
-    CollisionVec3 lateral2 = u;
-    if (u.z * n2.z + (u.y * n2.y + (u.x * n2.x)) > 0.0f) {
-        // retail reads x from u and negates y and z in lateral2 (an in-place negate
+    CollisionVec3 probeRoll = TireNormalizeOr(TireCross(n2, sideAxis), wheelUpAxis);
+    CollisionVec3 probeLateral = TireCrossGrouped(probeRoll, sideAxis);
+    CollisionVec3 lateral2 = probeLateral;
+    if (probeLateral.z * n2.z + (probeLateral.y * n2.y + (probeLateral.x * n2.x)) > 0.0f) {
+        // retail reads x from probeLateral and negates y and z in lateral2 (an in-place negate
         // helper gives the same reads but computes the scaled x argument early)
-        lateral2.x = u.x * -1.0f;
+        lateral2.x = probeLateral.x * -1.0f;
         lateral2.y = lateral2.y * -1.0f;
         lateral2.z = lateral2.z * -1.0f;
     }
 
     CollisionVec3 scaled = TireScaledCtorCopyYZ(lateral2, wheelRadius);
-    CollisionVec3 r = CollisionVec3(scaled.x + origin.x, scaled.y + origin.y, scaled.z + origin.z);
-    pt = r;
+    CollisionVec3 rimPoint = CollisionVec3(scaled.x + origin.x, scaled.y + origin.y, scaled.z + origin.z);
+    pt = rimPoint;
     CollisionVec3 n3;
     world->QueryGround(&pt, &n3, 0, &kind);
     // delta is assigned inside the score expression: retail keeps it with `fst` and the
@@ -730,10 +730,10 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     // test, which compares it with `fcom` as retail does (assigned inside the test, VC6
     // copies it with `fld st(0)` and compares with `fcomp`).
     float delta;
-    float score = (delta = pt.y - r.y) * n3.y;
+    float score = (delta = pt.y - rimPoint.y) * n3.y;
     if (score > this->CollisionPoint::penetration) {
         lateral = lateral2;
-        this->CollisionPoint::worldPosition = r;
+        this->CollisionPoint::worldPosition = rimPoint;
         this->CollisionPoint::penetration = score;
         this->CollisionPoint::surfacePosition = pt;
         *TireSurfaceByte(this) = kind & 7;
@@ -743,7 +743,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
         } else {
             this->CollisionPoint::surfaceNormal = n2;
             this->CollisionPoint::penetration = delta * n2.y;
-            rollDirection = v;
+            rollDirection = probeRoll;
         }
     } else {
         *TireSurfaceByte(this) = *TireSurfaceByte(this) & 7;
@@ -763,9 +763,9 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
 
     if (CollisionObject::hasContact) {
         TireBoundsRef* bounds = (TireBoundsRef*)CollisionObject::contactRecord;
-        float s = (1.0f - bounds->scale) * wheelRadius;
-        if (s > this->CollisionPoint::penetration) {
-            this->CollisionPoint::penetration = s;
+        float boxDepth = (1.0f - bounds->scale) * wheelRadius;
+        if (boxDepth > this->CollisionPoint::penetration) {
+            this->CollisionPoint::penetration = boxDepth;
             CollisionVec3 ext = CollisionVec3(bounds->box->max[0] - bounds->box->min[0], bounds->box->max[1] - bounds->box->min[1], bounds->box->max[2] - bounds->box->min[2]);
             CollisionVec3 e2 = TireScaledCtor(ext, bounds->scale);
             CollisionVec3 e3 = CollisionVec3(e2.x + bounds->box->min[0], e2.y + bounds->box->min[1], e2.z + bounds->box->min[2]);
