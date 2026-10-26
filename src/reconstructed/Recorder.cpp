@@ -94,15 +94,15 @@ void VCRInterface::SignalAndWait(HANDLE event, DWORD interval) {
 }
 
 // 0x004e7a90
-int VCRInterface::Start(int a1, int a2, int a3, int mode, int a5, unsigned int size,
-                                        UnknownRecorderOwner* owner) {
+int VCRInterface::Start(int callback, int header, int headerSize, int mode, int fileName,
+                        unsigned int size, UnknownRecorderOwner* owner) {
     DWORD interval;
 
     frameRing = new (__FILE__, 477) UnknownVcr(size);
     if (!frameRing)
         return 0;
     vcrFile = owner;
-    recordCallback = (UnknownRecorderCallback)a1;
+    recordCallback = (UnknownRecorderCallback)callback;
     writeEvent = CreateEventA(0, 0, 0, 0);
     createFileEvent = CreateEventA(0, 0, 0, 0);
     reopenFileEvent = CreateEventA(0, 0, 0, 0);
@@ -118,9 +118,9 @@ int VCRInterface::Start(int a1, int a2, int a3, int mode, int a5, unsigned int s
         !readReverseEvent || !seekEvent || !rewindEvent || !stopReadingEvent || !closeFileEvent)
         return 0;
     recordMode = mode;
-    threadParameters.header = a2;
-    threadParameters.headerSize = a3;
-    threadParameters.fileName = a5;
+    threadParameters.header = header;
+    threadParameters.headerSize = headerSize;
+    threadParameters.fileName = fileName;
     threadParameters.owner = this;
     InitializeCriticalSection(&lock);
     workerThread = (HANDLE)_beginthreadex(0, 0, UnknownRecorderThread, &threadParameters, 0, &workerThreadId);

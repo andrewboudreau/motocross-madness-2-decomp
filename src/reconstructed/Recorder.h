@@ -58,8 +58,8 @@ public:
     void SignalAndWait(HANDLE event, DWORD interval);
     // 0x004e7a90: creates the ring (`size`), the events and the worker, then
     // starts `mode` (0, 1 or 2); 0 on failure.
-    int Start(int a1, int a2, int a3, int mode, int a5, unsigned int size,
-                              UnknownRecorderOwner* owner);
+    int Start(int callback, int header, int headerSize, int mode, int fileName,
+              unsigned int size, UnknownRecorderOwner* owner);
     // 0x004e86d0: stores the header for worker event 9 (rewrite it, close
     // the file) and signals it, waiting for the worker with `wait`.
     void CloseFile(int header, int headerSize, int wait);
