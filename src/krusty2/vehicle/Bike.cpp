@@ -1868,22 +1868,22 @@ struct BikeBodyObj {
     virtual void S40(); virtual void S41(); virtual void S42();
     virtual Vec3* UnknownVirtualSlot43(Vec3* out);
     char pad_0x004[0x150];
-    Vec3 f154;                  // current point
+    Vec3 currentPoint;          // +0x154
     char pad_0x160[0x0c];
-    Vec3 f16c;
-    float f178;
-    float f17c;
+    Vec3 angularVelocity;       // +0x16c, slot 38's otherAngVel
+    float field_0x178;
+    float invMass;              // +0x17c
     char pad_0x180[0x50];
-    float f1d0;
+    float invInertiaXX;         // +0x1d0: the inverse inertia diagonal, 0x14 apart
     char pad_0x1d4[0x10];
-    float f1e4;
+    float invInertiaYY;         // +0x1e4
     char pad_0x1e8[0x10];
-    float f1f8;
+    float invInertiaZZ;         // +0x1f8
     char pad_0x1fc[0x2c];
-    Vec3 f228;
-    SoultreeObject* f234;
+    Vec3 localCenter;           // +0x228, mapped through node for the contact arm
+    SoultreeObject* node;       // +0x234
     char pad_0x238[4];
-    Vec3 f23c;                  // previous point
+    Vec3 previousPoint;         // +0x23c
 };
 struct BikeKindInfo {           // reached through the other party's +0x5c
     char pad_0x00[0x24];
@@ -2008,21 +2008,21 @@ void Bike::UnknownVirtualSlot38(int notify, int eventKind, void* event)
         BikeKindInfo* kind = other->kind;
         otherWorldAngVel = *other->body->UnknownVirtualSlot43(&tmp);
         otherVel = &blend;
-        otherAngVel = &other->body->f16c;
-        // other point: interpolate body->f23c toward body->f154 by kind->field_0x24; retail
-        // adds a struct copy of f23c (int moves into the low temporaries) as a named copy does
+        otherAngVel = &other->body->angularVelocity;
+        // other point: interpolate body->previousPoint toward body->currentPoint by kind->field_0x24; retail
+        // adds a struct copy of previousPoint (int moves into the low temporaries) as a named copy does
         {
-            Vec3 prev = other->body->f23c;
-            blend = (other->body->f154 - prev) * kind->field_0x24 + prev;
+            Vec3 prev = other->body->previousPoint;
+            blend = (other->body->currentPoint - prev) * kind->field_0x24 + prev;
         }
-        otherInvMass = other->body->f17c;
-        otherInvInertia.x = other->body->f1d0;
-        otherInvInertia.y = other->body->f1e4;
-        otherInvInertia.z = other->body->f1f8;
-        Vec3 wp = other->body->f234->LocalToWorldPoint(other->body->f228);
+        otherInvMass = other->body->invMass;
+        otherInvInertia.x = other->body->invInertiaXX;
+        otherInvInertia.y = other->body->invInertiaYY;
+        otherInvInertia.z = other->body->invInertiaZZ;
+        Vec3 wp = other->body->node->LocalToWorldPoint(other->body->localCenter);
         hasBody = 1;
         otherArm = ((BikeContactSet*)collisionObject)->hitPoint - wp;
-        otherNode = (int)other->body->f234;
+        otherNode = (int)other->body->node;
         break;
     }
     case 0x2711: {
