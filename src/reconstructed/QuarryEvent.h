@@ -54,8 +54,8 @@ public:
     int CanCycleCues();
 
     unsigned char field_0x2c[0x48 - 0x2c];
-    float screenX;                            // +0x48 ArcadeObject::Create's c: screen x, fraction of the width
-    float screenY;                            // +0x4c ArcadeObject::Create's d: screen y, fraction of the height
+    float screenX;                            // +0x48 ArcadeObject::Create's screenXFraction: fraction of the width
+    float screenY;                            // +0x4c ArcadeObject::Create's screenYFraction: fraction of the height
     unsigned char field_0x50[0xc8 - 0x50];
     int skippedRacer;                         // +0xc8 Tick copies RadarOverlay::followedIndex; NextCueIndex steps past it (Krusty3DObjects.h)
     unsigned char field_0xcc[0xfc - 0xcc];

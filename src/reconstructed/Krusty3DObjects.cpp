@@ -60,17 +60,17 @@ RunwayLights::RunwayLights(int flags) : GameObject(flags) {
 }
 
 // 0x0048a600
-RunwayLights* RunwayLights::SetupLights(void* value, int a, int b, UnknownRunwayTerrain* terrain) {
+RunwayLights* RunwayLights::SetupLights(void* context, int a, int b, UnknownRunwayTerrain* terrain) {
     char name[0x104];
 
-    GameObject::SetRenderContext(value);
+    GameObject::SetRenderContext(context);
     groundTerrain = terrain;
     sprintf(name, "%s\\%s", "Res", "pointer.slt");
     int i = 0;
     Vector3 position(0.0f, 0.0f, 0.0f);
     for (; i < 5; i++) {
         lightModels[i] = (new (__FILE__, 0x40) ArcadeObject(1))
-                            ->Create(value, a, b, name, position, 0, 0, 2.0f, 0.5f, 0.5f, 0);
+                            ->Create(context, a, b, name, position, 0, 0, 2.0f, 0.5f, 0.5f, 0);
         if (!AppendChild(lightModels[i], -1)) {
             Release();
             return 0;
@@ -174,14 +174,15 @@ VisualCue::VisualCue(int flags) : ArcadeObject(flags) {
 }
 
 // 0x0048adf0
-VisualCue* VisualCue::LoadVisualCue(void* value, int a, int b, UnknownRunwayTerrain* terrain, Vector3 position,
+VisualCue* VisualCue::LoadVisualCue(void* context, int a, int b, UnknownRunwayTerrain* terrain, Vector3 position,
                                             UnknownVisualCueView* view, int pixels, UnknownArcadeView* camera,
-                                            float size, float c, float d) {
+                                            float size, float screenXFraction, float screenYFraction) {
     char name[0x104];
 
-    if (pixels && camera && c != 0.0f && d != 0.0f) {
+    if (pixels && camera && screenXFraction != 0.0f && screenYFraction != 0.0f) {
         sprintf(name, "%s\\%s", "Res", "viscue.slt");
-        if (ArcadeObject::Create(value, a, b, name, position, pixels, camera, size, c, d, 0)) {
+        if (ArcadeObject::Create(context, a, b, name, position, pixels, camera, size,
+                                 screenXFraction, screenYFraction, 0)) {
             cueView = view;
             builtFieldOfView = 0;
             groundTerrain = terrain;
@@ -279,12 +280,12 @@ NumberObjectManager::NumberObjectManager(int flags) : GameObject(flags) {
 }
 
 // 0x0048bd00
-NumberObjectManager* NumberObjectManager::SetupDigits(void* value, int b, UnknownNumberRacer* racer,
+NumberObjectManager* NumberObjectManager::SetupDigits(void* context, int b, UnknownNumberRacer* racer,
                                                       int pixels, UnknownNumberCamera* camera,
                                                       float size) {
     char name[0x104];
 
-    GameObject::SetRenderContext(value);
+    GameObject::SetRenderContext(context);
     countdownRacer = racer;
     char names[5][16] = {"one.slt", "two.slt", "three.slt", "four.slt", "five.slt"};
     if (!pixels || !camera) {
@@ -297,7 +298,7 @@ NumberObjectManager* NumberObjectManager::SetupDigits(void* value, int b, Unknow
     for (int i = 0; i < 5; i++) {
         sprintf(name, "%s\\%s", "Res", names[i]);
         digitModels[i] = (new (__FILE__, 0x240) ArcadeObject(1))
-                            ->Create(value, 0, b, name, position, pixels,
+                            ->Create(context, 0, b, name, position, pixels,
                                                     (UnknownArcadeView*)camera, size, 0.5f, 0.1f, 0);
         if (!AppendChild(digitModels[i], -1)) {
             Release();

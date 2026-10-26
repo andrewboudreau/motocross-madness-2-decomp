@@ -44,9 +44,9 @@ public:
     // 0x00401310 (ret 0x34): slot 8 of the base, then loads the model `name`
     // (line 78), places it and optionally scales it to `pixels` and attaches
     // a TransparencyMod with `alpha` (line 104). 0 when the model fails.
-    ArcadeObject* Create(void* value, int a, int b, const char* name, Vector3 position,
-                                        int pixels, UnknownArcadeView* view, float size, float c, float d,
-                                        unsigned char alpha);
+    ArcadeObject* Create(void* context, int a, int b, const char* name, Vector3 position,
+                                        int pixels, UnknownArcadeView* view, float size,
+                                        float screenXFraction, float screenYFraction, unsigned char alpha);
     void SetPosition(const Vector3* position);  // 0x004014f0
     // 0x00401520: forwards two axes and two flags to the model (0x004fbd70).
     void SetAxes(const Vector3* a, const Vector3* b, int c, int d);
