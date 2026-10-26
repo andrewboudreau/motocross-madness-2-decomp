@@ -59,14 +59,15 @@ struct ParticleRenderContext {
 };
 
 // The texture 0x0050a590 returns (a TextureMap; BaseObject slot 2 releases it in the dtor).
-// Slot 27 calls its slot 8 with (1, 0, 0).
+// Slot 27 calls its slot 8 with (1, 0, 0).  Slots 4-8 are TextureMap's CreateSurface,
+// LoadSurface, Clone, IsResident and CreateTextureSurface (argument names from there).
 class ParticleTexture : public BaseObject {
 public:
     virtual int UnknownVirtualSlot4();
     virtual int UnknownVirtualSlot5();
     virtual ParticleTexture* UnknownVirtualSlot6();
     virtual int UnknownVirtualSlot7();
-    virtual int UnknownVirtualSlot8(int a, int b, int c);
+    virtual int UnknownVirtualSlot8(int upload, int asRenderTarget, int localVideo);
 };
 class TextureMapManager;
 // 0x0050a590 (cdecl; src/reconstructed/TextureMap.h TerrainLoadTexture): the texture
