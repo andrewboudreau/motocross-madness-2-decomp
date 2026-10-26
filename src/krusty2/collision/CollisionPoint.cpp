@@ -26,13 +26,13 @@ CollisionPoint* AddCollisionPoint(int capacity, CollisionPoint** points, const C
                                   int surfaceOwner) {
     if (*count < capacity) {
         points[*count] = new(__FILE__, 27) CollisionPoint(normalForce, surfaceOwner);
-        CollisionPoint* p = points[*count];
-        p->localPosition = *position;
-        p->penetration = threshold - 999.0f;
-        p->ownerNode = owner;
-        p->penetrationThreshold = threshold;
+        CollisionPoint* added = points[*count];
+        added->localPosition = *position;
+        added->penetration = threshold - 999.0f;
+        added->ownerNode = owner;
+        added->penetrationThreshold = threshold;
         (*count)++;
-        return p;
+        return added;
     }
     return 0;
 }
@@ -72,44 +72,46 @@ static inline CollisionVec3 DividedVec3(const CollisionVec3& v, float s) {
 
 // 0x0043a640 (thiscall, ret 0x14).  Tier 3 semantics.  With the contact normal n:
 //   relativePosition = worldPosition - center
-//   c = (n * (n . angularVelocity)) x leverArm   (the spin about the normal at the lever arm)
-//   speed > 0.001: t = velocity with its component along n removed, normalised; tangentSpeed = t . velocity;
-//               if that is above 0.001 the direction is normalise(c + t * tangentSpeed)
-//               and spinSpeed = |c|; otherwise tangentSpeed = 0 and the direction is
-//               normalise(c) with spinSpeed = |c|
-//   otherwise:  tangentSpeed = 0, direction normalise(c), spinSpeed = |c|
-// The direction goes to frictionDirection; a degenerate one (|c| <= 0.001) is zero with
+//   spin = (n * (n . angularVelocity)) x leverArm   (the spin about the normal at the lever arm)
+//   speed > 0.001: tangent = velocity with its component along n removed, normalised;
+//               tangentSpeed = tangent . velocity;
+//               if that is above 0.001 the direction is normalise(spin + tangent * tangentSpeed)
+//               and spinSpeed = |spin|; otherwise tangentSpeed = 0 and the direction is
+//               normalise(spin) with spinSpeed = |spin|
+//   otherwise:  tangentSpeed = 0, direction normalise(spin), spinSpeed = |spin|
+// The direction goes to frictionDirection; a degenerate one (|spin| <= 0.001) is zero with
 // spinSpeed 0.
 void CollisionPoint::UpdateRelativeMotion(const CollisionVec3* center, const CollisionVec3* angularVelocity,
                                           const CollisionVec3* velocity, const CollisionVec3* leverArm, float speed)
 {
     relativePosition = worldPosition - *center;
-    float s = CollisionPointDot(surfaceNormal, *angularVelocity);
-    CollisionVec3 u = surfaceNormal * s;
-    CollisionVec3 c = CollisionPointCross(u, *leverArm);
-    CollisionVec3 w;
+    float spinRate = CollisionPointDot(surfaceNormal, *angularVelocity);
+    CollisionVec3 normalSpin = surfaceNormal * spinRate;
+    CollisionVec3 spin = CollisionPointCross(normalSpin, *leverArm);
+    CollisionVec3 direction;
     if (speed > 0.001f) {
-        CollisionVec3 t;
-        if (CollisionRejectFrom(&t, velocity, &surfaceNormal)) {
-            CollisionVec3 n;
-            t = *Vec3Normalize(&n, &t);
+        CollisionVec3 tangent;
+        if (CollisionRejectFrom(&tangent, velocity, &surfaceNormal)) {
+            CollisionVec3 normalized;
+            tangent = *Vec3Normalize(&normalized, &tangent);
         }
-        float f = CollisionPointDot(t, *velocity);
-        tangentSpeed = f;
-        if (f > 0.001f) {
-            CollisionVec3 v1 = ScaledVec3(t, f);
-            w = SummedVec3(c, v1);
-            float m = Vec3DotCall(reinterpret_cast<const Vec3*>(&w), reinterpret_cast<const Vec3*>(&w));
+        float along = CollisionPointDot(tangent, *velocity);
+        tangentSpeed = along;
+        if (along > 0.001f) {
+            CollisionVec3 v1 = ScaledVec3(tangent, along);
+            direction = SummedVec3(spin, v1);
+            float lenSq = Vec3DotCall(reinterpret_cast<const Vec3*>(&direction),
+                                   reinterpret_cast<const Vec3*>(&direction));
             float len;
-            if (m == 0.0f)
+            if (lenSq == 0.0f)
                 len = 0.0f;
-            else if (m == 1.0f)
+            else if (lenSq == 1.0f)
                 len = 1.0f;
             else
-                len = 1.0f / FastInvSqrt(m);
-            float k = 1.0f / len;
-            frictionDirection = ScaledVec3(w, k);
-            float cm = Vec3DotCall(reinterpret_cast<const Vec3*>(&c), reinterpret_cast<const Vec3*>(&c));
+                len = 1.0f / FastInvSqrt(lenSq);
+            float inv = 1.0f / len;
+            frictionDirection = ScaledVec3(direction, inv);
+            float cm = Vec3DotCall(reinterpret_cast<const Vec3*>(&spin), reinterpret_cast<const Vec3*>(&spin));
             float cl;
             if (cm == 1.0f)
                 cl = 1.0f;
@@ -118,8 +120,9 @@ void CollisionPoint::UpdateRelativeMotion(const CollisionVec3* center, const Col
             spinSpeed = cl;
         } else {
             tangentSpeed = 0.0f;
-            w = c;
-            float cm = Vec3DotCall(reinterpret_cast<const Vec3*>(&w), reinterpret_cast<const Vec3*>(&w));
+            direction = spin;
+            float cm = Vec3DotCall(reinterpret_cast<const Vec3*>(&direction),
+                                   reinterpret_cast<const Vec3*>(&direction));
             float len;
             if (cm == 1.0f)
                 len = 1.0f;
@@ -127,7 +130,7 @@ void CollisionPoint::UpdateRelativeMotion(const CollisionVec3* center, const Col
                 len = FastSqrt(cm);
             spinSpeed = len;
             if (len > 0.001f) {
-                frictionDirection = DividedVec3(w, len);
+                frictionDirection = DividedVec3(direction, len);
             } else {
                 frictionDirection = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
                 spinSpeed = 0.0f;
@@ -135,12 +138,12 @@ void CollisionPoint::UpdateRelativeMotion(const CollisionVec3* center, const Col
         }
     } else {
         tangentSpeed = 0.0f;
-        w = c;
-        float len = CollisionLength(&w);
+        direction = spin;
+        float len = CollisionLength(&direction);
         spinSpeed = len;
         if (len > 0.001f) {
-            CollisionVec3 d;
-            frictionDirection = *CollisionDivide(&d, &w, len);
+            CollisionVec3 divided;
+            frictionDirection = *CollisionDivide(&divided, &direction, len);
         } else {
             frictionDirection = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
             spinSpeed = 0.0f;
@@ -155,13 +158,13 @@ CollisionPoint* AddExistingCollisionPoint(int capacity, CollisionPoint** points,
     if (*count < capacity) {
         if (point)
             points[*count] = point;
-        CollisionPoint* p = points[*count];
-        p->localPosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
-        p->penetration = threshold - 999.0f;
-        p->ownerNode = 0;
-        p->penetrationThreshold = threshold;
+        CollisionPoint* added = points[*count];
+        added->localPosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+        added->penetration = threshold - 999.0f;
+        added->ownerNode = 0;
+        added->penetrationThreshold = threshold;
         (*count)++;
-        return p;
+        return added;
     }
     return 0;
 }
@@ -185,11 +188,11 @@ void RemoveCollisionPoint(CollisionPoint** points, CollisionPoint* point, int* c
 // return uses the same hidden 12-byte result buffer as the old call view.
 void UpdateCollisionPointWorldPositions(int count, CollisionPoint** points) {
     for (int i = count; i > 0; i--, points++) {
-        CollisionPoint* p = *points;
-        if (p->ownerNode && p->inContact) {
+        CollisionPoint* point = *points;
+        if (point->ownerNode && point->inContact) {
             reinterpret_cast<Vec3&>((*points)->worldPosition) =
                 reinterpret_cast<SoultreeObject*>((*points)->ownerNode)->LocalToWorldPoint(
-                    reinterpret_cast<const Vec3&>(p->localPosition));
+                    reinterpret_cast<const Vec3&>(point->localPosition));
         }
     }
 }
