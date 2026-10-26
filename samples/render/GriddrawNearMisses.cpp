@@ -589,10 +589,10 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
     float farX;
     float nearZ;
     float farZ;
-    GridTerrain* t = terrain;
-    GridNodeDrawData* d = data;
-    float ax = t->viewerX - d->gridMinX;
-    float bx = t->viewerX - d->gridMaxX;
+    GridTerrain* grid = terrain;
+    GridNodeDrawData* drawData = data;
+    float ax = grid->viewerX - drawData->gridMinX;
+    float bx = grid->viewerX - drawData->gridMaxX;
     if (ax < 0.0f) {
         nearX = ax * ax;
         farX = bx * bx;
@@ -602,11 +602,12 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
     } else {
         nearX = 0.0f;
         float farOffset =
-            ((t->viewerX + t->viewerX < d->gridMinX + d->gridMaxX) ? d->gridMaxX : d->gridMinX) - t->viewerX;
+            ((grid->viewerX + grid->viewerX < drawData->gridMinX + drawData->gridMaxX)
+                 ? drawData->gridMaxX : drawData->gridMinX) - grid->viewerX;
         farX = farOffset * farOffset;
     }
-    float az = t->viewerZ - d->gridMinZ;
-    float bz = t->viewerZ - d->gridMaxZ;
+    float az = grid->viewerZ - drawData->gridMinZ;
+    float bz = grid->viewerZ - drawData->gridMaxZ;
     if (az < 0.0f) {
         nearZ = az * az;
         farZ = bz * bz;
@@ -616,13 +617,14 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
     } else {
         nearZ = 0.0f;
         float farOffset =
-            ((t->viewerZ + t->viewerZ < d->gridMaxZ + d->gridMinZ) ? d->gridMaxZ : d->gridMinZ) - t->viewerZ;
+            ((grid->viewerZ + grid->viewerZ < drawData->gridMaxZ + drawData->gridMinZ)
+                 ? drawData->gridMaxZ : drawData->gridMinZ) - grid->viewerZ;
         farZ = farOffset * farOffset;
     }
     float near2 = nearZ + nearX;
     float far2 = farZ + farX;
-    float dyLo = t->viewerY - minHeight;
-    float dyHi = t->viewerY - maxHeight;
+    float dyLo = grid->viewerY - minHeight;
+    float dyHi = grid->viewerY - maxHeight;
     float dy;
     float dySq;
     if (dyLo < 0.0f) {

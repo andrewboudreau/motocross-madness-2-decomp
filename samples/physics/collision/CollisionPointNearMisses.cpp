@@ -61,18 +61,18 @@ int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec
         deepest = 0.0f;
     }
     for (int i = 1; i < count; ++i) {
-        CollisionPoint* p = points[i];
-        if (p->inContact) {
-            float pen = p->penetration;
+        CollisionPoint* point = points[i];
+        if (point->inContact) {
+            float pen = point->penetration;
             if (pen > 0.0f && pen > deepest)
-                deepest = p->penetration;
+                deepest = point->penetration;
             ++merged;
-            sum.x += p->worldPosition.x;
-            sum.y += p->worldPosition.y;
-            sum.z += p->worldPosition.z;
-            normal->x += p->surfaceNormal.x;
-            normal->y += p->surfaceNormal.y;
-            normal->z += p->surfaceNormal.z;
+            sum.x += point->worldPosition.x;
+            sum.y += point->worldPosition.y;
+            sum.z += point->worldPosition.z;
+            normal->x += point->surfaceNormal.x;
+            normal->y += point->surfaceNormal.y;
+            normal->z += point->surfaceNormal.z;
         }
     }
     if (merged > 0) {

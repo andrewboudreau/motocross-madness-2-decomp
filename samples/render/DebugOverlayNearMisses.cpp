@@ -69,9 +69,9 @@ int DebugOverlay::LoadFont()
         font.lfItalic = 0;
         font.lfWeight = 0;
         int length = strlen("Courier");
-        int n = length > 31 ? 31 : length;
-        strncpy(font.lfFaceName, "Courier", n);
-        font.lfFaceName[n] = 0;
+        int copyLength = length > 31 ? 31 : length;
+        strncpy(font.lfFaceName, "Courier", copyLength);
+        font.lfFaceName[copyLength] = 0;
         HFONT handle = CreateFontIndirectA(&font);
         if (handle == 0) {
             Release();

@@ -65,20 +65,22 @@ int DirtSprayParticleEmitter::Tick(float dt)
             field_0x68 = 0;
             return 1;
         }
-        ParticleVec3 d(position.x - previousPosition.x, position.y - previousPosition.y, position.z - previousPosition.z);
+        ParticleVec3 travel(position.x - previousPosition.x, position.y - previousPosition.y,
+                            position.z - previousPosition.z);
         dt += emitRemainder;
-        float n = dt * emitRate;
-        emitRemainder = dt - n / emitRate;
-        float inv = 1.0f / n;
-        ParticleVec3 step = d * inv;
+        float spawnCount = dt * emitRate;
+        emitRemainder = dt - spawnCount / emitRate;
+        float inv = 1.0f / spawnCount;
+        ParticleVec3 step = travel * inv;
         ParticleVec3 velStep = (dt * launchVelocity) * inv;
         // The scalar-first form below gives velStep's first component retail's operand order.
         ParticleVec3 gravStep = inv * (dt * manager->gravity);
         int i;
-        for (i = 0; (float)i < n; i++) {
+        for (i = 0; (float)i < spawnCount; i++) {
             if (manager->activeCount == 1000) return 1;
             manager->particles[manager->activeCount]->age = 375.0f;
-            manager->particles[manager->activeCount]->position = (previousPosition + step * (float)i) + (n - (float)i) * velStep;
+            manager->particles[manager->activeCount]->position =
+                (previousPosition + step * (float)i) + (spawnCount - (float)i) * velStep;
             manager->particles[manager->activeCount]->frame = nextFrame;
             manager->particles[manager->activeCount]->size = randomTable[randomTableIndex];
             manager->particles[manager->activeCount]->lifetime = particleLifetime;
@@ -86,7 +88,7 @@ int DirtSprayParticleEmitter::Tick(float dt)
             // (n - i) scale, so the x product loads the component first like retail
             // (`fld [esp+N]; fmul st(1)`); using gravStep directly gives `fld st(0); fmul`.
             ParticleVec3 g(gravStep.x, gravStep.y, gravStep.z);
-            manager->particles[manager->activeCount]->velocity = launchVelocity + (n - (float)i) * g;
+            manager->particles[manager->activeCount]->velocity = launchVelocity + (spawnCount - (float)i) * g;
             manager->particles[manager->activeCount]->velocity.x = randomVectors[randomVectorIndex].x * manager->particles[manager->activeCount]->velocity.x;
             manager->particles[manager->activeCount]->velocity.y = randomVectors[randomVectorIndex].y * manager->particles[manager->activeCount]->velocity.y;
             manager->particles[manager->activeCount]->velocity.z = randomVectors[randomVectorIndex].z * manager->particles[manager->activeCount]->velocity.z;
