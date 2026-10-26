@@ -85,10 +85,10 @@ void QuadTree::Init(float x0, float z0, float x1, float z1, float minCell)
     worldMaxZ = z1;
     // The extents are kept in locals as well (chained assignment): retail stores z1 - z0 with
     // fst into field_0x54 and spills the same value for the compare (0x4dc6c0).
-    float w = extentX = x1 - x0;
-    float h = extentZ = z1 - z0;
+    float spanX = extentX = x1 - x0;
+    float spanZ = extentZ = z1 - z0;
 
-    quantScale = 32768.0f / (w > h ? w : h);
+    quantScale = 32768.0f / (spanX > spanZ ? spanX : spanZ);
     g_quadTreeInvScale = 1.0f / quantScale;
 
     int limit = (int)(minCell * quantScale);
@@ -143,13 +143,13 @@ unsigned int QuadTree::ComputeCode(float x0, float z0, float x1, float z1)
     int iz0 = (int)(z0 * quantScale);
     int ix1 = (int)(x1 * quantScale) + 1;
     int iz1 = (int)(z1 * quantScale) + 1;
-    int w = ix1 - ix0;
-    int h = iz1 - iz0;
+    int spanX = ix1 - ix0;
+    int spanZ = iz1 - iz0;
 
     int depth = 0;
     for (; depth <= maxDepth; depth++) {
         int cell = cellSizes[depth];
-        if (w >= cell || h >= cell)
+        if (spanX >= cell || spanZ >= cell)
             break;
     }
     if (depth > maxDepth)
@@ -415,11 +415,11 @@ int QuadTreeNode::RemoveObject(QuadTreeObject* obj)
             int empty = 1;
             int found = 0;
             for (int i = 0; i < 4; i++) {
-                QuadTreeObject* o = link->objects[i];
-                if (o == obj) {
+                QuadTreeObject* object = link->objects[i];
+                if (object == obj) {
                     link->objects[i] = 0;
                     found = 1;
-                } else if (o) {
+                } else if (object) {
                     empty = 0;
                 }
             }
@@ -579,14 +579,14 @@ QuadTreeObject* QuadTree::NextObject()
     return 0;
 }
 
-// qsort comparator for NextObjectSorted: orders objects by QuadTreeObject::field_0x06.
+// qsort comparator for NextObjectSorted: orders objects by QuadTreeObject::sortKey (+0x06).
 static int CompareObjectKey(const void* a, const void* b)
 {
-    int d = (unsigned short)(*(QuadTreeObject**)a)->sortKey -
-            (unsigned short)(*(QuadTreeObject**)b)->sortKey;
-    if (d < 0)
+    int order = (unsigned short)(*(QuadTreeObject**)a)->sortKey -
+                (unsigned short)(*(QuadTreeObject**)b)->sortKey;
+    if (order < 0)
         return -1;
-    return d != 0;
+    return order != 0;
 }
 
 // Tier 3 name.  Like NextObject, but gathers the objects of one node at a time into the
