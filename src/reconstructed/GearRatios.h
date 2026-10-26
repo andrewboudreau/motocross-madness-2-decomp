@@ -59,7 +59,7 @@ public:
     float field_0x80;
     float lastUpdateRpm;                      // +0x84 rpm at the last update
     float shiftTime;                          // +0x88 shift time
-    float field_0x8c;
+    float throttleTimeScale;                  // +0x8c ctor 1.0; UpdateThrottle raises the throttle by dt / it * throttleRiseRate
     int gearCount;                            // +0x90 gear count
     int curvePointCount;                      // +0x94 curve point count
     float curveRpm[15];                       // +0x98 curve rpm
@@ -73,6 +73,6 @@ public:
     float curvePower[15];                     // +0x160 power
     float powerSlope[15];                     // +0x19c power slope
     int field_0x1d8;
-    float field_0x1dc;
-    float field_0x1e0;
+    float throttleRiseRate;                   // +0x1dc ctor riseRate
+    float throttleFallRate;                   // +0x1e0 ctor fallRate; off the throttle it falls by dt * it * 0.6 (0.2 while shifting)
 };

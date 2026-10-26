@@ -37,8 +37,8 @@ UnknownEngineGearbox::UnknownEngineGearbox(const char* name, float unused, int* 
     int i;
 
     field_0x1d8 = arg6;
-    field_0x1dc = riseRate;
-    field_0x1e0 = fallRate;
+    throttleRiseRate = riseRate;
+    throttleFallRate = fallRate;
     shiftTime = 0.05f;
     gearRatios[0] = 2.0f;
     gearRatios[1] = 1.97f;
@@ -171,7 +171,7 @@ UnknownEngineGearbox::UnknownEngineGearbox(const char* name, float unused, int* 
 
     downShiftRpm = 1500.0f;
     field_0x80 = 3000.0f;
-    field_0x8c = 1.0f;
+    throttleTimeScale = 1.0f;
     currentGear = 0;
     currentRpm = 0;
     lastUpdateRpm = 0;
@@ -188,13 +188,13 @@ void UnknownEngineGearbox::UpdateThrottle(float dt, int engaged, unsigned char a
     if (engaged && shiftTimer == 0.0f) {
         driveCut = arg2;
         if (throttleFraction < 1.0f) {
-            throttleFraction += dt / field_0x8c * field_0x1dc;
+            throttleFraction += dt / throttleTimeScale * throttleRiseRate;
             throttleFraction = UnknownMin(throttleFraction, 1.0f);
         }
     } else {
         driveCut = 1;
         if (throttleFraction > 0.0f) {
-            throttleFraction -= (shiftTimer != 0.0f ? dt * field_0x1e0 * 0.2f : dt * field_0x1e0 * 0.6f);
+            throttleFraction -= (shiftTimer != 0.0f ? dt * throttleFallRate * 0.2f : dt * throttleFallRate * 0.6f);
             throttleFraction = UnknownMax(throttleFraction, 0.0f);
         }
     }

@@ -13,7 +13,7 @@ FIELD(throttleFraction, throttleFraction); FIELD(currentRpm, currentRpm);
 FIELD(driveCut, driveCut); FIELD(gearTimer, shiftTimer); FIELD(gear, currentGear);
 FIELD(shiftRanges, shiftRanges); FIELD(shiftWindowWidths, shiftWindowWidths);
 FIELD(randomStart, upShiftRpm); FIELD(lastUpdateRpm, lastUpdateRpm);
-CHECK(aux_field8c, offsetof(VehicleWheelAux, field_0x8c) == offsetof(UnknownEngineGearbox, field_0x8c));
+CHECK(aux_field8c, offsetof(VehicleWheelAux, field_0x8c) == offsetof(UnknownEngineGearbox, throttleTimeScale));
 CHECK(aux_field90, offsetof(VehicleWheelAux, field_0x90) == offsetof(UnknownEngineGearbox, gearCount));
 CHECK(vehicle_aux, offsetof(VehicleWheel, aux) == 0x2a8);
 CHECK(bike_aux, offsetof(BikeWheel, aux) == 0x2a8);
