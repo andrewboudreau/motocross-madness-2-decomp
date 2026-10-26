@@ -47,7 +47,7 @@
 void ConstraintContactCallback(CollisionObject* self, CollisionObject* other);  // 0x0043b800, below
 void CollisionEmptyCallback(CollisionObject* self, CollisionObject* other);     // 0x00464e90, shared empty function
 
-ConstraintMethodCollisionModel::ConstraintMethodCollisionModel(int a) : CollisionObject(a)
+ConstraintMethodCollisionModel::ConstraintMethodCollisionModel(int flags) : CollisionObject(flags)
 {
     // Statement order found by a placement search against the retail store schedule
     // (0x0043b8d0); the order of these independent stores has no semantic meaning.

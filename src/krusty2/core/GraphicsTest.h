@@ -47,7 +47,7 @@ public:
     //    (callers pass CollisionBoxBounds-style center/half-extent pairs).
     void SetDrawColor(int r, int g, int b);                                      // 0x0047c690
     void DrawBox(const Vec3* center, const Vec3* halfExtents, const Matrix4* xf); // 0x0047c270
-    void DrawLine(const Vec3* a, const Vec3* b);                                 // 0x0047c4f0
+    void DrawLine(const Vec3* from, const Vec3* to);                                 // 0x0047c4f0
     void DrawMarker(const Vec3* p, float size);                                  // 0x0047c570
 
     int drawColor;                   // +0x2c packed draw color (SetDrawColor)

@@ -24,8 +24,8 @@ int MediaControl::IsDirectShowInstalled()
 }
 
 // 0x004a2410
-MediaControl::MediaControl(int a)
-    : GameObject(a)
+MediaControl::MediaControl(int flags)
+    : GameObject(flags)
 {
     pausedTimeLow = 0;
     resumeAfterPause = 0;

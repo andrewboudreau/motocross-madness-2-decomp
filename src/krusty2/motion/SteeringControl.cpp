@@ -59,12 +59,12 @@ int SteeringControl::SetAxisFromDirection(const Vec3* worldDir, SoultreeObject* 
     return 0;
 }
 
-void SteeringControl::SetAngle(float a, SoultreeObject* frame)
+void SteeringControl::SetAngle(float newAngle, SoultreeObject* frame)
 {
-    if (_finite(a)) {
-        if (Abs(a) < 0.001f)
-            a = 0.0f;
-        angle = a;
+    if (_finite(newAngle)) {
+        if (Abs(newAngle) < 0.001f)
+            newAngle = 0.0f;
+        angle = newAngle;
         Matrix4 m;
         frame->GetMatrixIn(0, &m);
         node->SetMatrixIn(0, &m);

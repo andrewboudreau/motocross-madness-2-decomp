@@ -10,7 +10,7 @@ public:
     ~SteeringControl();
     int SetAxisFromDirection(const Vec3* worldDir, SoultreeObject* frame);
     int SetAxisFromPoints(SoultreeObject* from, SoultreeObject* to, SoultreeObject* frame);
-    void SetAngle(float a, SoultreeObject* frame);
+    void SetAngle(float newAngle, SoultreeObject* frame);
     void AddAngle(float delta, SoultreeObject* frame);
 
     SoultreeObject* node; // +0x00 scene node allocated by the ctor (0x1a4 bytes, line 0x17)

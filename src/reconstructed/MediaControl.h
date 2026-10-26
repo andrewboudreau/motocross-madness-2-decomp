@@ -92,7 +92,7 @@ struct UnknownMultiMediaStreamInterface {
 
 class MediaControl : public GameObject {
 public:
-    MediaControl(int a);                      // 0x004a2410
+    MediaControl(int flags);                      // 0x004a2410
     virtual ~MediaControl();                  // 0x004a2490 (deleting wrapper 0x004a2470)
     virtual int Tick(float frameTime);                 // 0x004a27f0: next frame, end of movie
     virtual int SetPaused(int value);            // 0x004a2970: pauses (value != 0) or resumes

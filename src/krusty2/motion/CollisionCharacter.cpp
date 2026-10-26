@@ -21,7 +21,7 @@ static inline Vec3 CharacterDivide(const Vec3& v, float s)
     return Vec3(inv * v.x, inv * v.y, inv * v.z);
 }
 
-CollisionCharacter::CollisionCharacter(int a) : GameObject(1), D3DIMSoultreeCharacter(a)
+CollisionCharacter::CollisionCharacter(int flags) : GameObject(1), D3DIMSoultreeCharacter(flags)
 {
     collisionObject = 0;
 }

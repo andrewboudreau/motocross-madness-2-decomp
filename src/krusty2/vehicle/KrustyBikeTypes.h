@@ -475,7 +475,7 @@ struct KbAnim;
 struct KbA5C4 {
     char pad_0x00[0x10];
     int field_0x10; // 0x10
-    KbAnim* FindMotion(const char* name, int a);
+    KbAnim* FindMotion(const char* name, int unused);
     void SetMotion(int a);
     void Fn_004A8BF0(int a, float b);   // 0x004A8BF0 (ret 8): same as D3DIMSoultreeCharacter::Method_0x004a8bf0
     void ApplyRestPose();               // 0x004A8B00 (Character::ApplyRestPose)

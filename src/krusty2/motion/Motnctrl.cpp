@@ -319,8 +319,8 @@ int Character::LoadMotions()
 
 // owner: bracket only (Character method contiguous with its Motnctrl.cpp methods)
 // 0x004a6780 (ret 8: the argument plus the hidden most-derived flag).
-Character::Character(int a)
-    : GameObject(a)
+Character::Character(int flags)
+    : GameObject(flags)
 {
     motionStopped = 1;
     motionCount = 0;
@@ -413,9 +413,9 @@ void Character::SortPoseList(void* poseList)
 
 // owner: bracket only
 // 0x004a6b30: looks a motion up by name in the global manager.
-Motion* Character::FindMotion(const char* name, int a)
+Motion* Character::FindMotion(const char* name, int unused)
 {
-    return g_pMotionManager->Find(name, a);
+    return g_pMotionManager->Find(name, unused);
 }
 
 // owner: bracket only

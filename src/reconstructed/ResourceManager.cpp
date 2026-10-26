@@ -120,12 +120,12 @@ void UnknownResourceManager::SetItemObject(void* entry, void* object)
 // samples/render/ResourceManagerNearMisses.cpp.
 
 // 0x004e9360
-ResourceItem* UnknownResourceManager::FindItem(const char* name, int a)
+ResourceItem* UnknownResourceManager::FindItem(const char* name, int seek)
 {
     for (int i = 0; i < itemCount; i++) {
         if (!_stricmp(items[i]->name, name)) {
             UnknownTextureStream* archive = items[i]->archive;
-            if (archive && (a || archive->IsEncoded()))
+            if (archive && (seek || archive->IsEncoded()))
                 items[i]->archive->Seek(items[i]->offset, 0, 0);
             return items[i];
         }

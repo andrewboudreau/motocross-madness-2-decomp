@@ -21,7 +21,7 @@ struct ConstraintProbe {
 
 class ConstraintMethodCollisionModel : public CollisionObject {
 public:
-    ConstraintMethodCollisionModel(int a);                   // 0x0043b8d0
+    ConstraintMethodCollisionModel(int flags);                   // 0x0043b8d0
     virtual void UnknownVirtualSlot2();                      // 0x0044d710 (bare ret)
 
     // Secondary vtable (this == subobject at +12) overrides.

@@ -168,7 +168,7 @@ struct BikeA5C4 {
     void Method_0x004a8c50(int a, int b, float c, float d);
     // The rider is a D3DIMSoultreeCharacter (the loader builds it with 0x004455b0): Character's
     // FindMotion 0x004a6b30 and Method_0x004a8bf0 seen through this view.
-    int FindMotion(const char* name, int a);
+    int FindMotion(const char* name, int unused);
     void Method_0x004a8bf0(int a, float b);
 };
 

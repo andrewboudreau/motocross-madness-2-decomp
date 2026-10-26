@@ -47,7 +47,7 @@ public:
     void SetItemObject(void* entry, void* object);
     // 0x004e9030: opens the "RS2" archive `path` and adds its items.
     UnknownTextureStream* AddArchive(const char* path, int flags);
-    ResourceItem* FindItem(const char* name, int a); // finds `name`
+    ResourceItem* FindItem(const char* name, int seek); // finds `name`
     void* FindItemByObject(void* object);       // the item recording `object`
     int AddLooseFile(const char* name, const char* path); // adds a loose file
     int AddObject(const char* name, void* object);     // adds an object

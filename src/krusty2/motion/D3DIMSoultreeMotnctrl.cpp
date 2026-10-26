@@ -254,7 +254,7 @@ void D3DIMSoultreeCharacter::Enable()
 // Constructor 0x004455b0 (ret 8: one argument plus the hidden most-derived flag).  Builds the GameObject
 // virtual base with 1, runs Character's constructor (0x004a6780, which receives the argument) and clears
 // the D3DIM members plus Character's name table pointer.
-D3DIMSoultreeCharacter::D3DIMSoultreeCharacter(int a) : GameObject(1), Character(a)
+D3DIMSoultreeCharacter::D3DIMSoultreeCharacter(int flags) : GameObject(1), Character(flags)
 {
     modelNode = 0;
     d3d_field_0x1a4[0] = 0;

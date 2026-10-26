@@ -18,15 +18,15 @@ static const SphereConstVec3 kVec3ZAxis = SphereConstVec3(0.0f, 0.0f, 1.0f);
 // (the allocation in the $E initialiser, 0x00504950).
 class SphereManager : public GameObject {
 public:
-    explicit SphereManager(int a);
+    explicit SphereManager(int flags);
     virtual ~SphereManager();
     virtual GameObject* SetRenderContext(void* context);
     char field_0x2c[0x3e8];  // +0x2c..0x413 not accessed in this TU
     int field_0x414;  // +0x414 zeroed by the ctor, nothing else seen yet
 };
 
-SphereManager::SphereManager(int a)
-    : GameObject(a)
+SphereManager::SphereManager(int flags)
+    : GameObject(flags)
 {
     field_0x414 = 0;
 }

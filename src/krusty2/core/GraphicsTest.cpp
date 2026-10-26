@@ -138,7 +138,7 @@ void GraphicsTest::DrawBox(const Vec3* center, const Vec3* halfExtents, const Ma
 }
 
 // 0x0047c4f0
-void GraphicsTest::DrawLine(const Vec3* a, const Vec3* b)
+void GraphicsTest::DrawLine(const Vec3* from, const Vec3* to)
 {
     GraphicsTestVertex vertices[2];
     for (int i = 0; i < 2; i++) {
@@ -147,12 +147,12 @@ void GraphicsTest::DrawLine(const Vec3* a, const Vec3* b)
         vertices[i].tu = 0;
         vertices[i].tv = 0;
     }
-    vertices[0].x = a->x;
-    vertices[0].y = a->y;
-    vertices[0].z = a->z;
-    vertices[1].x = b->x;
-    vertices[1].y = b->y;
-    vertices[1].z = b->z;
+    vertices[0].x = from->x;
+    vertices[0].y = from->y;
+    vertices[0].z = from->z;
+    vertices[1].x = to->x;
+    vertices[1].y = to->y;
+    vertices[1].z = to->z;
     RENDERER()->DrawPrimitive(2, 0x1e2, vertices, 2, 0);
 }
 

@@ -59,7 +59,7 @@ class Character : public virtual GameObject {
 public:
     // ctor 0x004455b0's callee 0x004a6780 takes (a, most-derived flag): one source argument plus
     // the hidden flag (tier 2, from the D3DIM ctor's pushes). The argument's role is tier 3.
-    explicit Character(int a);
+    explicit Character(int flags);
     virtual ~Character();                       // core 0x004a69d0, deleting 0x004a68d0
     // --- vtable 0x00555318 (offset 0), slots 0..10, all introduced here ---
     virtual void CharacterVirtualSlot0();         // 0x00464e90 (ret; shared empty stub)
@@ -93,7 +93,7 @@ public:
     int LoadMotions();                                      // 0x004a66c0
     void CaptureMotion(Motion* motion);                     // 0x004a6a60, ret 4
     void SortMotion(Motion* motion);                        // 0x004a6ab0, ret 4
-    Motion* FindMotion(const char* name, int a);            // 0x004a6b30, ret 8
+    Motion* FindMotion(const char* name, int unused);            // 0x004a6b30, ret 8
     unsigned char FindNode(const char* name);               // 0x004a6b50, ret 4
     void ApplyPoseListSlot4(MotionPoseList* list, int mask);  // 0x004a8a80, ret 8
     void ApplyPoseListSlot6(MotionPoseList* list, int mask);  // 0x004a8ac0, ret 8
@@ -148,7 +148,7 @@ class D3DIMSoultreeCharacter : public Character {
 public:
     // ctor 0x004455b0 takes one argument plus the hidden most-derived flag (callers push
     // `a, 1` or `a, 0` before the call, e.g. 0x00418b52, 0x00503cec).  Type is tier 3.
-    D3DIMSoultreeCharacter(int a);
+    D3DIMSoultreeCharacter(int flags);
     virtual ~D3DIMSoultreeCharacter();          // core 0x004459a0, deleting 0x00446680
     virtual void Disable();                     // 0x00446640 via vtordisp thunk 0x004466c0
     virtual void Enable();                      // 0x00446620 via vtordisp thunk 0x004466d0
