@@ -165,8 +165,8 @@ static void BuildEdgeTable()
 }
 
 // 0x0047e540
-DrawableGridNode::DrawableGridNode(int a0, int a1, GridNode* parent, GridTerrain* terrain, int a4,
-                                   int a5, int a6, int a7, int a8, int a9, int a10)
+DrawableGridNode::DrawableGridNode(int stream, int a1, GridNode* parent, GridTerrain* terrain, int level,
+                                   int shift, int x, int z, int index, int boundsMin, int boundsMax)
 {
     this->terrain = terrain;
     if (g_gridEdgesBuilt == 0) {

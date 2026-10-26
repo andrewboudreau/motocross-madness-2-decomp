@@ -39,10 +39,11 @@ DrawableGridNodeSharedTextures::DrawableGridNodeSharedTextures(UnknownTextureStr
 GridNode* DrawableGridNodeSharedTextures::UnknownVirtualSlot2(UnknownTextureStream* stream, int a1,
                                                               DrawableGridNode* parent, int level,
                                                               int shift, int x, int z, int index,
-                                                              void* a8, void* a9)
+                                                              void* boundsMin, void* boundsMax)
 {
     return new (__FILE__, 61) DrawableGridNodeSharedTextures(stream, a1, this, parent->terrain, level,
-                                                             shift, x, z, index, (float*)a8, (float*)a9);
+                                                             shift, x, z, index, (float*)boundsMin,
+                                                             (float*)boundsMax);
 }
 
 // 0x0047ca00: eviction callback for the node-wide texture.

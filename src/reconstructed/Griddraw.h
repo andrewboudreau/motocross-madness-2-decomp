@@ -291,15 +291,17 @@ struct GridBlockRange {
 
 class DrawableGridNode : public GridNode {
 public:
-    DrawableGridNode(int a0, int a1, GridNode* parent, GridTerrain* terrain, int a4, int a5,
-                     int a6, int a7, int a8, int a9, int a10);  // 0x0047e540 (ret 0x2c)
+    // Only terrain and parent are used; the rest are DrawableGridNodeSharedTextures' arguments
+    // (the stream and bounds passed as ints).
+    DrawableGridNode(int stream, int a1, GridNode* parent, GridTerrain* terrain, int level, int shift,
+                     int x, int z, int index, int boundsMin, int boundsMax);  // 0x0047e540 (ret 0x2c)
     virtual ~DrawableGridNode();                                // 0x0047ec60 (slot 0 0x0047e5e0)
     DrawableGridNode* ReadNode(UnknownTextureStream* stream, int a1, DrawableGridNode* parent,
                                int level, int shift, int x, int z, int index,
                                float* boundsMin, float* boundsMax); // 0x0047e600 (ret 0x28)
     virtual GridNode* UnknownVirtualSlot2(UnknownTextureStream* stream, int a1, DrawableGridNode* parent,
                                           int level, int shift, int x, int z, int index,
-                                          void* a8, void* a9) { return 0; }   // 0x004806e0
+                                          void* boundsMin, void* boundsMax) { return 0; }   // 0x004806e0
     virtual void UnknownVirtualSlot3(float a) {}                // 0x004806f0 (shared)
     virtual void UnknownVirtualSlot4(int a) {}                  // 0x004806f0 (shared)
     virtual void UnknownVirtualSlot5(UnknownTextureStream* stream) {} // 0x004806f0 (shared)

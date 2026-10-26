@@ -93,7 +93,7 @@ public:
 
     virtual GridNode* UnknownVirtualSlot2(UnknownTextureStream* stream, int a1, DrawableGridNode* parent,
                                           int level, int shift, int x, int z, int index,
-                                          void* a8, void* a9);  // 0x0047c960
+                                          void* boundsMin, void* boundsMax);  // 0x0047c960
     virtual void UnknownVirtualSlot3(float a);                  // 0x0047caa0
     virtual void UnknownVirtualSlot4(int block);                // 0x0047d160
     virtual void UnknownVirtualSlot6();                         // 0x0047d310
