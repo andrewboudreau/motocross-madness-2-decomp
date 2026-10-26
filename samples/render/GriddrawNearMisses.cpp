@@ -363,7 +363,7 @@ allocated:
 
 // 0x00480ad0: draws one 4-cell block from this node's buffers when it has
 // geometry and passed the frustum test, then walks the child nodes.
-int DrawableGridNode::DrawVisibleBlock(void* target, int x, int z, int size, int quad, int a5)
+int DrawableGridNode::DrawVisibleBlock(void* target, int x, int z, int size, int quad, int detailPass)
 {
     int vertexStart = 0;
     GridBlockRange* ranges = (GridBlockRange*)data->blockRanges;
@@ -384,11 +384,11 @@ int DrawableGridNode::DrawVisibleBlock(void* target, int x, int z, int size, int
         }
         if (vertexCount != 0 && (data->visibleBlockMask & (1 << block))) {
             if (terrain->lowestQualityOverride)
-                SubmitLitRange(a5, (GridVertex*)data->vertexBuffer + vertexStart, vertexCount,
+                SubmitLitRange(detailPass, (GridVertex*)data->vertexBuffer + vertexStart, vertexCount,
                                       (unsigned short*)data->indexBuffer + indexStart, indexCount,
                                       g_gridQuadOrder[quad]);
             else
-                SubmitUnlitRange(a5, (GridVertex*)data->vertexBuffer + vertexStart, vertexCount,
+                SubmitUnlitRange(detailPass, (GridVertex*)data->vertexBuffer + vertexStart, vertexCount,
                                       (unsigned short*)data->indexBuffer + indexStart, indexCount,
                                       g_gridQuadOrder[quad]);
         }
@@ -400,17 +400,17 @@ int DrawableGridNode::DrawVisibleBlock(void* target, int x, int z, int size, int
                 if (child && child->childMask) {
                     if (child->data->vertexCount != 0 && !child->data->b3) {
                         if (terrain->lowestQualityOverride)
-                            child->SubmitLitRange(a5, (GridVertex*)child->data->vertexBuffer,
+                            child->SubmitLitRange(detailPass, (GridVertex*)child->data->vertexBuffer,
                                                          child->data->vertexCount,
                                                          (unsigned short*)child->data->indexBuffer,
                                                          child->data->indexCount, -1);
                         else
-                            child->SubmitUnlitRange(a5, (GridVertex*)child->data->vertexBuffer,
+                            child->SubmitUnlitRange(detailPass, (GridVertex*)child->data->vertexBuffer,
                                                          child->data->vertexCount,
                                                          (unsigned short*)child->data->indexBuffer,
                                                          child->data->indexCount, -1);
                     }
-                    child->DrawVisibleQuadrants(target, 0, 0, 16, 0, a5);
+                    child->DrawVisibleQuadrants(target, 0, 0, 16, 0, detailPass);
                 }
             }
         }
@@ -682,8 +682,8 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
 }
 
 // 0x00481de0: the visibility walk (see the note at the top).
-int DrawableGridNode::WalkVisibilityQuadrants(void* a0, void* a1, float* center, float* extent, int a4, int a5,
-                                            int size, int a7, int a8, int a9)
+int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* center, float* extent, int x, int z,
+                                            int size, int depth, int path, int coarse)
 {
     int count = 0;
     int changed = 0;
@@ -699,7 +699,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* a0, void* a1, float* center,
             corners = 0;
         if (size == 16) {
             if (visible) {
-                UpdateLevelOfDetail((UnknownTextureStream*)a0, a1, 0, a9);
+                UpdateLevelOfDetail((UnknownTextureStream*)stream, a1, 0, coarse);
                 if (data->b0) {
                     count = 1;
                     if (childMask == 0) {
@@ -728,21 +728,21 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* a0, void* a1, float* center,
                 GridVec3 c2 = GridVec3(childExtent.x + c.x, c.y, c.z - childExtent.z);
                 GridVec3 c3 = GridVec3(c.x - childExtent.x, c.y, childExtent.z + c.z);
                 GridVec3 c4 = GridVec3(childExtent.x + c.x, c.y, childExtent.z + c.z);
-                count += WalkVisibilityQuadrants(a0, a1, &c1.x, &childExtent.x, a4, a5, size, a7 + 1, a8 * 4, a9);
-                count += WalkVisibilityQuadrants(a0, a1, &c2.x, &childExtent.x, a4 + size, a5, size, a7 + 1, a8 * 4 + 1, a9);
-                count += WalkVisibilityQuadrants(a0, a1, &c3.x, &childExtent.x, a4, a5 + size, size, a7 + 1, a8 * 4 + 2, a9);
-                count += WalkVisibilityQuadrants(a0, a1, &c4.x, &childExtent.x, a4 + size, a5 + size, size, a7 + 1, a8 * 4 + 3, a9);
-                if (a7 + 1 == 8 || size == 16) {
+                count += WalkVisibilityQuadrants(stream, a1, &c1.x, &childExtent.x, x, z, size, depth + 1, path * 4, coarse);
+                count += WalkVisibilityQuadrants(stream, a1, &c2.x, &childExtent.x, x + size, z, size, depth + 1, path * 4 + 1, coarse);
+                count += WalkVisibilityQuadrants(stream, a1, &c3.x, &childExtent.x, x, z + size, size, depth + 1, path * 4 + 2, coarse);
+                count += WalkVisibilityQuadrants(stream, a1, &c4.x, &childExtent.x, x + size, z + size, size, depth + 1, path * 4 + 3, coarse);
+                if (depth + 1 == 8 || size == 16) {
                     if (count == 0)
                         childMask = 0;
                     else if (childMask == 0)
                         changed = 1;
                 }
             } else {
-                DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[a5] + a4];
+                DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[z] + x];
                 if (child) {
                     if (child->children) {
-                        count += child->WalkVisibilityQuadrants(a0, a1, &child->center.x, &child->extent.x, 0, 0, 16, 0, 0, a9);
+                        count += child->WalkVisibilityQuadrants(stream, a1, &child->center.x, &child->extent.x, 0, 0, 16, 0, 0, coarse);
                         child->data->b1 = 1;
                     } else {
                         int dummy;
@@ -753,7 +753,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* a0, void* a1, float* center,
                                 child->childMask = 0x1fffff;
                                 changed = 1;
                             }
-                            child->UpdateLevelOfDetail((UnknownTextureStream*)a0, a1, 0, a9);
+                            child->UpdateLevelOfDetail((UnknownTextureStream*)stream, a1, 0, coarse);
                             count++;
                         } else if (child->childMask) {
                             child->childMask = 0;
@@ -766,7 +766,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* a0, void* a1, float* center,
         } else {
             for (j = 0; j < size; j++) {
                 for (i = 0; i < size; i++) {
-                    DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[a5 + j] + i + a4];
+                    DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[z + j] + i + x];
                     if (child) {
                         if (child->childMask != 0x3fffff) {
                             child->childMask = 0x3fffff;
@@ -774,17 +774,17 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* a0, void* a1, float* center,
                             if (child->children)
                                 child->data->b1 = 1;
                         }
-                        child->UpdateLevelOfDetail((UnknownTextureStream*)a0, a1, 1, a9);
+                        child->UpdateLevelOfDetail((UnknownTextureStream*)stream, a1, 1, coarse);
                         count++;
                     }
                 }
             }
-            switch (a7) {
+            switch (depth) {
             case 0:
                 childMask = 0x1fffff;
                 break;
             case 1:
-                childMask |= 0x1e0 << (a8 * 4);
+                childMask |= 0x1e0 << (path * 4);
                 break;
             }
             if (size == 16) {
@@ -794,21 +794,21 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* a0, void* a1, float* center,
                     changed = 1;
             }
         }
-        switch (a7) {
+        switch (depth) {
         case 0:
             childMask |= 1;
             goto finish;
         case 1:
-            childMask |= 2 << a8;
+            childMask |= 2 << path;
             return count;
         case 2:
-            childMask |= 0x20 << a8;
+            childMask |= 0x20 << path;
             return count;
         }
     } else {
         for (j = 0; j < size; j++) {
             for (i = 0; i < size; i++) {
-                DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[a5 + j] + i + a4];
+                DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[z + j] + i + x];
                 if (child && child->childMask) {
                     child->childMask = 0;
                     changed = 1;
@@ -817,7 +817,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* a0, void* a1, float* center,
             }
         }
     }
-    if (a7 != 0)
+    if (depth != 0)
         return count;
 finish:
     if (count == 0x100)

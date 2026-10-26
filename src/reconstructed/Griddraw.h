@@ -319,12 +319,12 @@ public:
     int EmitEdgeTriangles(int level, int n, int x, int z, int dx, int dz, int* closed); // 0x00480200 (ret 0x1c)
     int AppendCornerTriangle(int n, int x, int z, int dx, int dz); // 0x00480700 (ret 0x14)
     int DrawVisible(void* target);                    // 0x00480900 (ret 4)
-    int DrawVisibleWithDetail(void* target, int a5);            // 0x00480920 (ret 8)
-    int DrawVisibleQuadrants(void* target, int x, int z, int size, int quad, int a5); // 0x00480940 (ret 0x18)
-    int DrawVisibleBlock(void* target, int x, int z, int size, int quad, int a5); // 0x00480ad0 (ret 0x18)
-    void SubmitUnlitRange(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
+    int DrawVisibleWithDetail(void* target, int detailPass);            // 0x00480920 (ret 8)
+    int DrawVisibleQuadrants(void* target, int x, int z, int size, int quad, int detailPass); // 0x00480940 (ret 0x18)
+    int DrawVisibleBlock(void* target, int x, int z, int size, int quad, int detailPass); // 0x00480ad0 (ret 0x18)
+    void SubmitUnlitRange(int detailPass, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                int indexCount, int block);      // 0x00480c90 (ret 0x18)
-    void SubmitLitRange(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
+    void SubmitLitRange(int detailPass, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                int indexCount, int block);      // 0x00480fb0 (ret 0x18)
     int WalkSlot4FromRoot();                                // 0x00481170: WalkSlot4Quadrants(0, 0, 16, 0)
     int WalkSlot4Quadrants(int x, int z, int size, int quad); // 0x00481180 (ret 0x10): quadrant walk calling slot 4
@@ -337,12 +337,12 @@ public:
     float BlockDistance(int block);                     // 0x00481b30 (ret 4)
     float ComputeViewerDetail(int coarse);                    // 0x004815e0 (ret 4): from the viewer's distance to the bounds
     int CanDropVertex(int x, int z);                    // 0x00481cc0 (ret 8)
-    int TestVisibility(void* a0, void* a1);              // 0x00481db0 (ret 8)
+    int TestVisibility(void* stream, void* a1);              // 0x00481db0 (ret 8)
     // 0x00481de0 (ret 0x28): tests the box against the clipper and recurses
-    // into the four quadrant boxes (x, z, size; level and quadrant path)
+    // into the four quadrant boxes (x, z, size; depth and quadrant path)
     // down to the child blocks, updating childMask; returns the visible count.
-    int WalkVisibilityQuadrants(void* a0, void* a1, float* center, float* extent, int x, int z,
-                                int size, int level, int path, int a9);
+    int WalkVisibilityQuadrants(void* stream, void* a1, float* center, float* extent, int x, int z,
+                                int size, int depth, int path, int coarse);
     void UpdateLevelOfDetail(UnknownTextureStream* stream, void* a1, int recurse,
                                int coarse);                     // 0x004824c0 (ret 0x10)
     void PropagateFullMask();                               // 0x004826d0

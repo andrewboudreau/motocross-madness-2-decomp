@@ -638,46 +638,46 @@ int DrawableGridNode::DrawVisible(void* target)
 }
 
 // 0x00480920: the same walk with the detail-pass argument (Terrain slot 14 passes its detail texture)
-int DrawableGridNode::DrawVisibleWithDetail(void* target, int a5)
+int DrawableGridNode::DrawVisibleWithDetail(void* target, int detailPass)
 {
-    return DrawVisibleQuadrants(target, 0, 0, 16, 0, a5);
+    return DrawVisibleQuadrants(target, 0, 0, 16, 0, detailPass);
 }
 
 // 0x00480940: the same quadrant walk as 0x0047ef80; 4-cell blocks go to
 // 0x00480ad0.
-int DrawableGridNode::DrawVisibleQuadrants(void* target, int x, int z, int size, int quad, int a5)
+int DrawableGridNode::DrawVisibleQuadrants(void* target, int x, int z, int size, int quad, int detailPass)
 {
     if (!data->b0 || data->b3) {
         size >>= 1;
         if (size == 8) {
             if (childMask & 2)
-                DrawVisibleQuadrants(target, x, z, 8, 0, a5);
+                DrawVisibleQuadrants(target, x, z, 8, 0, detailPass);
             if (childMask & 4)
-                DrawVisibleQuadrants(target, x + 8, z, 8, 4, a5);
+                DrawVisibleQuadrants(target, x + 8, z, 8, 4, detailPass);
             if (childMask & 8)
-                DrawVisibleQuadrants(target, x, z + 8, 8, 8, a5);
+                DrawVisibleQuadrants(target, x, z + 8, 8, 8, detailPass);
             if (childMask & 0x10)
-                DrawVisibleQuadrants(target, x + 8, z + 8, 8, 12, a5);
+                DrawVisibleQuadrants(target, x + 8, z + 8, 8, 12, detailPass);
         } else if (size == 4) {
             if (childMask & (0x20 << quad))
-                DrawVisibleBlock(target, x, z, 4, quad, a5);
+                DrawVisibleBlock(target, x, z, 4, quad, detailPass);
             if (childMask & (0x40 << quad))
-                DrawVisibleBlock(target, x + 4, z, 4, quad + 1, a5);
+                DrawVisibleBlock(target, x + 4, z, 4, quad + 1, detailPass);
             if (childMask & (0x80 << quad))
-                DrawVisibleBlock(target, x, z + 4, 4, quad + 2, a5);
+                DrawVisibleBlock(target, x, z + 4, 4, quad + 2, detailPass);
             if (childMask & (0x100 << quad))
-                DrawVisibleBlock(target, x + 4, z + 4, 4, quad + 3, a5);
+                DrawVisibleBlock(target, x + 4, z + 4, 4, quad + 3, detailPass);
         }
     }
     return 1;
 }
 
 // 0x00480c90: submits a node's or one block's vertex range on the unlit
-// path. With a detail texture (Terrain+0xc3c detailTexture) and `a5` clear the
+// path. With a detail texture (Terrain+0xc3c detailTexture) and `detailPass` clear the
 // base pass gets flat colours (white close up, the terrain's unlit colours
-// further away); with `a5` set, close-up ranges get detail texture coordinates
+// further away); with `detailPass` set, close-up ranges get detail texture coordinates
 // from the packed offsets. Without a detail texture only the base pass runs.
-void DrawableGridNode::SubmitUnlitRange(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
+void DrawableGridNode::SubmitUnlitRange(int detailPass, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                             int indexCount, int block)
 {
     float detail;
@@ -692,7 +692,7 @@ void DrawableGridNode::SubmitUnlitRange(int a5, GridVertex* vertices, int vertex
             terrain->renderer->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
     }
     if (terrain->detailTexture) {
-        if (a5) {
+        if (detailPass) {
             if (terrain->qualityParamA < detail) {
                 float scale = g_gridDrawNormalScale;
                 if (level)
@@ -769,10 +769,10 @@ void DrawableGridNode::SubmitUnlitRange(int a5, GridVertex* vertices, int vertex
 // selects the texture through slot 6 or 7, lets the managed texture update
 // the texture coordinates, switches the close-up stage states on or off by
 // the detail limit, marks the buffers used and draws.
-void DrawableGridNode::SubmitLitRange(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
+void DrawableGridNode::SubmitLitRange(int detailPass, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                             int indexCount, int block)
 {
-    if (reinterpret_cast<GridGameSettings*>(g_TrackGame)->softwareRenderer || !a5)
+    if (reinterpret_cast<GridGameSettings*>(g_TrackGame)->softwareRenderer || !detailPass)
         return;
     float detail;
     if (block == -1)
@@ -1517,9 +1517,9 @@ float DrawableGridNode::BlockDistance(int block)
 
 // 0x00481db0: the root call of the visibility walk 0x00481de0 with the
 // node's bounding box (+0x44 centre, +0x50 half extents).
-int DrawableGridNode::TestVisibility(void* a0, void* a1)
+int DrawableGridNode::TestVisibility(void* stream, void* a1)
 {
-    return WalkVisibilityQuadrants(a0, a1, &center.x, &extent.x, 0, 0, 16, 0, 0, 0);
+    return WalkVisibilityQuadrants(stream, a1, &center.x, &extent.x, 0, 0, 16, 0, 0, 0);
 }
 
 // 0x00481cc0: screen-space error test of vertex (x, z): returns 1 when the
