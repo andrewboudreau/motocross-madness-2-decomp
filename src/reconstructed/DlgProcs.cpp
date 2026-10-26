@@ -1549,7 +1549,7 @@ void ProfileExistsDlg::HandleEvent(UnknownDialogEvent* event) {
         button = FindControl("ButMiddle", 1);
         button->Show(0, 1);
         g_TrackGame->LoadResourceString(0x13cf, label, 128);
-        sprintf(text, "'%s' %s", (const char*)event->field_0x18, label);
+        sprintf(text, "'%s' %s", (const char*)event->param, label);
         title->SetText(text);
         UIControl* prompt = FindControl("TxtPrompt", 12);
         prompt->wordWrap = 1;
@@ -1583,7 +1583,7 @@ void RemoveProfileDlg::HandleEvent(UnknownDialogEvent* event) {
         g_TrackGame->LoadResourceString(0xfef, text, 128);
         title->SetTextAlign(10);
         title->SetText(text);
-        sprintf(text, "\"%s\"", (const char*)event->field_0x18);
+        sprintf(text, "\"%s\"", (const char*)event->param);
         UIControl* prompt = FindControl("TxtPrompt", 12);
         prompt->SetText(text);
         UIControl* button = FindControl("ButLeft", 0);

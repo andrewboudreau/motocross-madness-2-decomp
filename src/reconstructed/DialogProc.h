@@ -17,7 +17,11 @@ struct UnknownDialogEvent {
     UIDialog* dialog;                         // +0x0c the dialog the message is for
     GUIManager* gui;                          // +0x10 (OptionsDlg opens its sub-dialogs on it)
     UIControl* control;            // +0x14 the sending control (VCRDlg)
-    int field_0x18;                           // cleared by OptControlsDlg for kinds 11 and 12
+    int param;                                // +0x18 message argument.  kDialogInit: UIDialog slot 28's value
+                                              // (ProfileExistsDlg/RemoveProfileDlg print it as a name, OptionsDlg
+                                              // picks a page from it, MainDlg tests 0x63).  Kinds 11/12: the
+                                              // control sends 1; a handler that clears it (OptControlsDlg)
+                                              // skips the control's default key handling.
     int key;                                  // +0x1c a kind 11 message's key (dlgprocs.cpp RemoveProfileDlg)
     int handled;                              // +0x20 set to 1 once handled
 };

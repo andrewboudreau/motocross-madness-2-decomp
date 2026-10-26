@@ -386,7 +386,7 @@ void OptControlsDlg::HandleEvent(UnknownDialogEvent* event)
     }
     case 11:
     case 12:
-        event->field_0x18 = 0;
+        event->param = 0;
         break;
     case 3:
         if (_stricmp("InputDeviceDDL", event->controlName) != 0 && _stricmp("ListboxScroll", event->controlName) != 0) {
@@ -715,10 +715,10 @@ void OptionsDlg::HandleEvent(UnknownDialogEvent* event)
         tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x13e2);
         tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x13e2);
         tab->SetTextAlign(0x22);
-        if (event->field_0x18 == 1) {
+        if (event->param == 1) {
             OpenPage(3);
             static_cast<UIRadioButton*>(FindControl("Controls", 4))->SelectInGroup(0);
-        } else if (event->field_0x18 == 2) {
+        } else if (event->param == 2) {
             OpenPage(5);
             static_cast<UIRadioButton*>(FindControl("Garage", 4))->SelectInGroup(0);
         } else {

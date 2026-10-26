@@ -2010,7 +2010,7 @@ void UIDialog::UnknownVirtualSlot28(int value) {
     event.code = 0;
     event.controlName = 0;
     event.control = 0;
-    event.field_0x18 = value;
+    event.param = value;
     event.gui = guiManager;
     event.dialog = this;
     HandleEvent(&event);
@@ -2615,11 +2615,11 @@ int UIControl::OnChar(int value) {
         event.gui = ownerGui;
         event.control = this;
         event.key = value;
-        event.field_0x18 = 1;
+        event.param = 1;
         ownerDialog->HandleEvent(&event);
         if (event.handled)
             return 1;
-        if (!event.field_0x18)
+        if (!event.param)
             return 1;
     }
     return GameObject::OnChar(value);
@@ -2637,11 +2637,11 @@ int UIControl::OnKeyDown(int value) {
         event.gui = ownerGui;
         event.control = this;
         event.key = value;
-        event.field_0x18 = 1;
+        event.param = 1;
         ownerDialog->HandleEvent(&event);
         if (event.handled)
             return 1;
-        if (!event.field_0x18)
+        if (!event.param)
             return 1;
     }
     return GameObject::OnKeyDown(value);
