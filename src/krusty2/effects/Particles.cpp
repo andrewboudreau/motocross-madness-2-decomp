@@ -80,21 +80,21 @@ int ParticleManager::Tick(float dt)
     for (int i = 0; i < activeCount; i++) {
         Particle** slot = &particles[i];
         (*slot)->age += ms;
-        Particle* p = *slot;
-        if (p->age > p->lifetime) {
+        Particle* particle = *slot;
+        if (particle->age > particle->lifetime) {
             *slot = particles[activeCount - 1];
-            particles[activeCount - 1] = p;
+            particles[activeCount - 1] = particle;
             activeCount--;
         } else {
-            if (p->flags & Particle::Grow)
-                p->size += dt * p->growth;
-            p = *slot;
-            if (p->flags & Particle::IntegratePosition) {
-                p->position += p->velocity * dt;
+            if (particle->flags & Particle::Grow)
+                particle->size += dt * particle->growth;
+            particle = *slot;
+            if (particle->flags & Particle::IntegratePosition) {
+                particle->position += particle->velocity * dt;
             }
-            p = *slot;
-            if (p->flags & Particle::ApplyGravity) {
-                p->velocity += gravity * dt;
+            particle = *slot;
+            if (particle->flags & Particle::ApplyGravity) {
+                particle->velocity += gravity * dt;
             }
         }
     }
