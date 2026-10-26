@@ -912,8 +912,8 @@ int GUIInputDevice::Tick(float frameTime) {
 }
 
 // 0x004873b0
-int GUIInputDevice::AttachRenderContext(void* value) {
-    GameObject::AttachRenderContext(value);
+int GUIInputDevice::AttachRenderContext(void* context) {
+    GameObject::AttachRenderContext(context);
     Rebind();
     return 1;
 }

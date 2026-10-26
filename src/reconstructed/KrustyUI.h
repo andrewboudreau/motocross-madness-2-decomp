@@ -57,7 +57,7 @@ public:
     virtual int OnActivate();                 // 0x00499af0
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00499a40
     virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);     // 0x00499a70
-    virtual int AttachRenderContext(void* value);  // 0x00499980
+    virtual int AttachRenderContext(void* context);  // 0x00499980
     void ShowScene(GameObject* parent); // 0x004999f0: shows the +0x464 scene
     void HideScene();             // 0x00499a20: hides it
     // 0x0049b560 / 0x0049b7f0 (bikerace.cpp passes TrackGame+0x1f2c and

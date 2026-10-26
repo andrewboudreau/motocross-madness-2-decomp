@@ -26,7 +26,7 @@ public:
 
     virtual void Disable();
     virtual void Enable();
-    virtual GameObject* SetRenderContext(void* value);
+    virtual GameObject* SetRenderContext(void* context);
     // 0x0042e690: per-frame update from the +0x170/+0x17c vectors (FollowCamera
     // slots 10 and 47 call it directly).
     virtual int Tick(float frameTime);

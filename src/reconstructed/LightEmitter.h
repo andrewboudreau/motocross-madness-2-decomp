@@ -74,7 +74,7 @@ public:
     explicit LightManager(int flags);               // 0x0049e390
     virtual ~LightManager();                        // 0x0049e400 (deleting wrapper 0x0049e3e0)
     // Slot 8 is the shared base-forwarding body 0x004452e0.
-    virtual GameObject* SetRenderContext(void* value);
+    virtual GameObject* SetRenderContext(void* context);
 
     void AddLight(LightEmitter* light);      // 0x0049e470: adds a light
     void MarkChanged();                         // 0x0049e490: counts a change

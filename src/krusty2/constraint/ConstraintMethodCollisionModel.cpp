@@ -74,9 +74,9 @@ ConstraintMethodCollisionModel::~ConstraintMethodCollisionModel()
 {
 }
 
-GameObject* ConstraintMethodCollisionModel::SetRenderContext(void* a)
+GameObject* ConstraintMethodCollisionModel::SetRenderContext(void* context)
 {
-    Configure(a, 1, 1, 1);
+    Configure(context, 1, 1, 1);
     onHitCallback = ConstraintContactCallback;
     onHitByCallback = CollisionEmptyCallback;
     ownerObject = this;

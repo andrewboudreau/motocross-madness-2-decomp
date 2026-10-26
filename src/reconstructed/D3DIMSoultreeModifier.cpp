@@ -16,9 +16,9 @@ D3DIMSoultreeModifier::~D3DIMSoultreeModifier()
     DetachFromAll();
 }
 
-GameObject* D3DIMSoultreeModifier::SetRenderContext(void* value)
+GameObject* D3DIMSoultreeModifier::SetRenderContext(void* context)
 {
-    return GameObject::SetRenderContext(value);
+    return GameObject::SetRenderContext(context);
 }
 
 void D3DIMSoultreeModifier::AddObject(D3DIMSoultreeObject* object)

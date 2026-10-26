@@ -60,7 +60,7 @@ public:
 class FogOff : public GameObject {
 public:
     explicit FogOff(int flags);               // 0x00462e10 (ret 4)
-    virtual GameObject* SetRenderContext(void* value);    // 0x00462e30 (folded)
+    virtual GameObject* SetRenderContext(void* context);    // 0x00462e30 (folded)
     virtual int UnknownVirtualSlot14();       // 0x00462e50
 };
 

@@ -26,7 +26,7 @@ public:
     virtual ~HiResMeter();                    // 0x00488430 (deleting wrapper 0x00488410)
     // 0x00488440: retail calibrates RDTSC. The functional candidate uses
     // the same calibration algorithm with a QPC profiling counter.
-    virtual GameObject* SetRenderContext(void* value);
+    virtual GameObject* SetRenderContext(void* context);
     virtual int Tick(float frameTime);                 // 0x004885c0
 
     void ClearTickTimes();                    // 0x00488510: per-tick counts (each game tick, 0x00468807)

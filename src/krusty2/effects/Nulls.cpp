@@ -14,7 +14,7 @@ class NullManager : public GameObject {
 public:
     explicit NullManager(int flags);
     virtual ~NullManager();
-    virtual GameObject* SetRenderContext(void* parentArg);
+    virtual GameObject* SetRenderContext(void* context);
 
     char field_0x2c[0x414 - 0x2c];
     int field_0x414;    // +0x414 zeroed by the ctor 0x004b0160; no other access seen in the bracket
@@ -33,8 +33,8 @@ NullManager::~NullManager()
 NullManager* g_nullManager = new(__FILE__, 5) NullManager(1);
 
 // RTTI slot 8 points to the shared body at 0x00462e30.
-GameObject* NullManager::SetRenderContext(void* parentArg)
+GameObject* NullManager::SetRenderContext(void* context)
 {
-    GameObject::SetRenderContext((void*)parentArg);
+    GameObject::SetRenderContext((void*)context);
     return this;
 }

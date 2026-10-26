@@ -20,7 +20,7 @@ class SphereManager : public GameObject {
 public:
     explicit SphereManager(int a);
     virtual ~SphereManager();
-    virtual GameObject* SetRenderContext(void* parentArg);
+    virtual GameObject* SetRenderContext(void* context);
     char field_0x2c[0x3e8];  // +0x2c..0x413 not accessed in this TU
     int field_0x414;  // +0x414 zeroed by the ctor, nothing else seen yet
 };
@@ -40,8 +40,8 @@ SphereManager::~SphereManager()
 SphereManager* g_pSphereManager = new(__FILE__, 4) SphereManager(1);
 
 // RTTI slot 8 points to the shared body at 0x00462e30.
-GameObject* SphereManager::SetRenderContext(void* parentArg)
+GameObject* SphereManager::SetRenderContext(void* context)
 {
-    GameObject::SetRenderContext((void*)parentArg);
+    GameObject::SetRenderContext((void*)context);
     return this;
 }

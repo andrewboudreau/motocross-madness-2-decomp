@@ -89,8 +89,8 @@ void GameObject::MarkPendingRelease() {
 }
 
 // 0x004692f0
-GameObject* GameObject::SetRenderContext(void* value) {
-    renderContext = value;
+GameObject* GameObject::SetRenderContext(void* context) {
+    renderContext = context;
     return this;
 }
 
@@ -286,15 +286,15 @@ int GameObject::Release() {
 }
 
 // 0x00469720: hands the value to every child, then stores it in field_0x18.
-int GameObject::AttachRenderContext(void* value) {
+int GameObject::AttachRenderContext(void* context) {
     GameObject* child = firstChild;
     while (child) {
         GameObject* next = child->nextSibling;
         if (!child->pendingRelease)
-            child->AttachRenderContext(value);
+            child->AttachRenderContext(context);
         child = next;
     }
-    renderContext = value;
+    renderContext = context;
     return 1;
 }
 

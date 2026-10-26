@@ -118,11 +118,11 @@ int BackgroundImage::RenderPost3D() {
 
 // 0x00403f30: creates the off-screen copy with the back buffer's size and
 // format and four regions; releases the object on failure.
-GameObject* BackgroundImage::SetRenderContext(void* value) {
+GameObject* BackgroundImage::SetRenderContext(void* context) {
     UnknownSurfaceDesc desc;
     int i;
 
-    GameObject::SetRenderContext(value);
+    GameObject::SetRenderContext(context);
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     desc.flags = 0x1006;

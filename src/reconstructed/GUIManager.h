@@ -230,7 +230,7 @@ public:
     GUIInputDevice();                         // 0x00486e80
     virtual ~GUIInputDevice();                // 0x00486f20 (deleting wrapper 0x00486f00)
     virtual int Tick(float frameTime);                 // 0x00487320
-    virtual int AttachRenderContext(void* value);      // 0x004873b0
+    virtual int AttachRenderContext(void* context);      // 0x004873b0
 
     // 0x00486fb0: binds to `device` within [minX, maxX] x [minY, maxY]
     // (all 0: the target's size).

@@ -256,9 +256,9 @@ class ShadowReceiver : public GameObject {
 public:
     explicit ShadowReceiver(int flags) : GameObject(flags) {}
     virtual ~ShadowReceiver() {}
-    virtual GameObject* SetRenderContext(void* a)
+    virtual GameObject* SetRenderContext(void* context)
     {
-        GameObject::SetRenderContext(a);
+        GameObject::SetRenderContext(context);
         return this;
     }
     virtual int UnknownVirtualSlot14() { return 1; }

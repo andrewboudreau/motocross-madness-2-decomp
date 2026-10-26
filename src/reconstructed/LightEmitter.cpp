@@ -189,8 +189,8 @@ LightManager::~LightManager() {
 }
 
 // 0x004452e0 (shared body)
-GameObject* LightManager::SetRenderContext(void* value) {
-    return GameObject::SetRenderContext(value);
+GameObject* LightManager::SetRenderContext(void* context) {
+    return GameObject::SetRenderContext(context);
 }
 
 // 0x0049e470

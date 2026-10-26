@@ -148,8 +148,8 @@ EventManager::EventManager(int flags) : GameObject(flags) {
 EventManager::~EventManager() {}
 
 // 0x0045caf0
-GameObject* EventManager::SetRenderContext(void* value) {
-    GameObject::SetRenderContext(value);
+GameObject* EventManager::SetRenderContext(void* context) {
+    GameObject::SetRenderContext(context);
     keepAliveTimeout = (float)g_TrackGame->GetRegistryInt("KeepAliveTimeout", 20);
     return this;
 }

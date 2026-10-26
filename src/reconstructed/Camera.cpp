@@ -55,8 +55,8 @@ void Camera::Disable() {
 // 0x0042e500: after the GameObject version, 0x0042e550 must succeed or the
 // camera releases itself and returns 0; otherwise slot 28 runs and, when
 // bit 0 is set, the owner is handed the camera.
-GameObject* Camera::SetRenderContext(void* value) {
-    GameObject::SetRenderContext(value);
+GameObject* Camera::SetRenderContext(void* context) {
+    GameObject::SetRenderContext(context);
     if (!UpdateViewport()) {
         Release();
         return 0;

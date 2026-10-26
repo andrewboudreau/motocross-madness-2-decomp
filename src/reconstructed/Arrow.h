@@ -19,7 +19,7 @@ class ArrowManager : public GameObject {
 public:
     explicit ArrowManager(int flags);          // 0x004019d0
     virtual ~ArrowManager();                   // 0x00401a20 (deleting wrapper 0x00401a00)
-    virtual GameObject* SetRenderContext(void* value);    // shared body 0x00462e30
+    virtual GameObject* SetRenderContext(void* context);    // shared body 0x00462e30
 
     unsigned char field_0x2c[0x414 - 0x2c];
     int field_0x414;

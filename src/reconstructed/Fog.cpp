@@ -247,9 +247,9 @@ FogOff::FogOff(int flags)
 }
 
 // 0x00462e30 (the linker keeps one copy of this body for several classes)
-GameObject* FogOff::SetRenderContext(void* value)
+GameObject* FogOff::SetRenderContext(void* context)
 {
-    GameObject::SetRenderContext(value);
+    GameObject::SetRenderContext(context);
     return this;
 }
 

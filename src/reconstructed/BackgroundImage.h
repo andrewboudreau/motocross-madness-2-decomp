@@ -37,7 +37,7 @@ public:
     explicit BackgroundImage(int flags);  // 0x00403d50
     virtual ~BackgroundImage();           // 0x00404010 (deleting wrapper 0x00403da0)
 
-    virtual GameObject* SetRenderContext(void* value);    // 0x00403f30: creates the off-screen copy
+    virtual GameObject* SetRenderContext(void* context);    // 0x00403f30: creates the off-screen copy
     virtual int RenderPre3D();            // 0x00403dc0: restores the background
     virtual int RenderPost3D();           // 0x00403ec0: draws the image
     virtual int OnActivate();             // 0x00404de0

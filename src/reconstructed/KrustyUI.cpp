@@ -419,10 +419,10 @@ int KrustyUI::OnNetworkMessage(int type, void* data, int from, int to, int flags
 }
 
 // 0x00499980: also hands the value to the +0x464 scene.
-int KrustyUI::AttachRenderContext(void* value) {
-    GameObject::AttachRenderContext(value);
+int KrustyUI::AttachRenderContext(void* context) {
+    GameObject::AttachRenderContext(context);
     if (garageScene)
-        garageScene->AttachRenderContext(value);
+        garageScene->AttachRenderContext(context);
     return 1;
 }
 

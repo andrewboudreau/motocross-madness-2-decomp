@@ -14,7 +14,7 @@ ArrowManager::~ArrowManager() {
 }
 
 // Folded with the identical overrides of other managers into 0x00462e30.
-GameObject* ArrowManager::SetRenderContext(void* value) {
-    GameObject::SetRenderContext(value);
+GameObject* ArrowManager::SetRenderContext(void* context) {
+    GameObject::SetRenderContext(context);
     return this;
 }

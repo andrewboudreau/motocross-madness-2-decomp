@@ -45,7 +45,7 @@ public:
     virtual void Enable();
     virtual void OnDisable();
     virtual void OnEnable();
-    virtual GameObject* SetRenderContext(void* value);
+    virtual GameObject* SetRenderContext(void* context);
     virtual int UnknownVirtualSlot9(int value);
     virtual int Tick(float frameTime);
     // Physics overrides 0x0043ba70 and 0x004f9890 consume a float timestep;
@@ -66,7 +66,7 @@ public:
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
     // Network messages (Game slot 17 forwards NetworkInterface 0x004aced0's).
     virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);
-    virtual int AttachRenderContext(void* value);
+    virtual int AttachRenderContext(void* context);
     virtual void MarkPendingRelease();
 
 

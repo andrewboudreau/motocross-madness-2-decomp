@@ -1017,11 +1017,11 @@ void SoultreeObject::CopySubtree(SoultreeObject* src, SoultreeObject* dst)
 }
 
 // 0x004fec30. GameObject slot 25: forwards to the children first.
-int SoultreeObject::AttachRenderContext(void* a)
+int SoultreeObject::AttachRenderContext(void* context)
 {
     for (SoultreeObject* c = firstChild; c; c = c->nextSibling)
-        c->AttachRenderContext(a);
-    return GameObject::AttachRenderContext(a);
+        c->AttachRenderContext(context);
+    return GameObject::AttachRenderContext(context);
 }
 
 // 0x004fec70. Slot 6: identity local matrices for this node, its later siblings and its

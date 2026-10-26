@@ -111,7 +111,7 @@ class EventManager : public GameObject {
 public:
     explicit EventManager(int flags);              // 0x0045c9e0
     virtual ~EventManager();                       // 0x0045cae0 (deleting wrapper 0x0045cac0)
-    virtual GameObject* SetRenderContext(void* value);    // 0x0045caf0
+    virtual GameObject* SetRenderContext(void* context);    // 0x0045caf0
     virtual int Tick(float frameTime);                     // 0x0045f200: per-frame update
     // 0x0045f3a0: while UI interaction is blocked (TrackGame+0x3430), control 1,
     // 0x1c or 0x39 (keyboard) or any joystick press resumes it.

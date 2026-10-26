@@ -250,9 +250,9 @@ int DebugOverlay::ShowNextPage()
     return 0;
 }
 
-int DebugOverlay::AttachRenderContext(void* value)
+int DebugOverlay::AttachRenderContext(void* context)
 {
-    GameObject::AttachRenderContext(value);
+    GameObject::AttachRenderContext(context);
     if (!fontTexture->RestoreTextureSurface()) {
         fontTexture->Release();
         return LoadFont();

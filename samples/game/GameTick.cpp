@@ -103,8 +103,8 @@ int Game::Tick() {
     return 1;
 }
 
-GameObject* HiResMeter::SetRenderContext(void* value) {
-    GameObject::SetRenderContext(value);
+GameObject* HiResMeter::SetRenderContext(void* context) {
+    GameObject::SetRenderContext(context);
     LARGE_INTEGER frequency, previous, current;
     if (!QueryPerformanceFrequency(&frequency))
         return 0;
