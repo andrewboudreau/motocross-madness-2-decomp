@@ -284,11 +284,11 @@ int GridNode::UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVe
             Vector3 v2(fx, fy1, h01);
             LinePlaneIntersection(from, to, &v0, &v1, &v2, &hit);
             if (hit.x <= fx1 && hit.x >= fx && hit.y <= fy1 && hit.y >= fy) {
-                float a = hit.x - fx;
-                float b = hit.y - fy;
-                float c = hit.x - fx1;
-                float d = hit.y - fy1;
-                if (!(c * c + d * d < a * a + b * b)) {
+                float dx0 = hit.x - fx;
+                float dy0 = hit.y - fy;
+                float dx1 = hit.x - fx1;
+                float dy1 = hit.y - fy1;
+                if (!(dx1 * dx1 + dy1 * dy1 < dx0 * dx0 + dy0 * dy0)) {
                     found = 1;
                 }
             }
@@ -298,11 +298,11 @@ int GridNode::UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVe
                 Vector3 w2(fx, fy1, h01);
                 LinePlaneIntersection(from, to, &w0, &w1, &w2, &hit);
                 if (hit.x <= fx1 && hit.x >= fx && hit.y <= fy1 && hit.y >= fy) {
-                    float a = hit.x - fx;
-                    float b = hit.y - fy;
-                    float c = hit.x - fx1;
-                    float d = hit.y - fy1;
-                    if (!(a * a + b * b < c * c + d * d)) {
+                    float dx0 = hit.x - fx;
+                    float dy0 = hit.y - fy;
+                    float dx1 = hit.x - fx1;
+                    float dy1 = hit.y - fy1;
+                    if (!(dx0 * dx0 + dy0 * dy0 < dx1 * dx1 + dy1 * dy1)) {
                         found = 1;
                     }
                 }
@@ -313,11 +313,11 @@ int GridNode::UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVe
             Vector3 v2(fx1, fy1, h11);
             LinePlaneIntersection(from, to, &v0, &v1, &v2, &hit);
             if (hit.x <= fx1 && hit.x >= fx && hit.y <= fy1 && hit.y >= fy) {
-                float a = hit.x - fx1;
-                float b = hit.y - fy;
-                float c = hit.x - fx;
-                float d = hit.y - fy1;
-                if (!(c * c + d * d < a * a + b * b)) {
+                float dx0 = hit.x - fx1;
+                float dy0 = hit.y - fy;
+                float dx1 = hit.x - fx;
+                float dy1 = hit.y - fy1;
+                if (!(dx1 * dx1 + dy1 * dy1 < dx0 * dx0 + dy0 * dy0)) {
                     found = 1;
                 }
             }
@@ -327,11 +327,11 @@ int GridNode::UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVe
                 Vector3 w2(fx, fy1, h01);
                 LinePlaneIntersection(from, to, &w0, &w1, &w2, &hit);
                 if (hit.x <= fx1 && hit.x >= fx && hit.y <= fy1 && hit.y >= fy) {
-                    float a = hit.x - fx1;
-                    float b = hit.y - fy;
-                    float c = hit.x - fx;
-                    float d = hit.y - fy1;
-                    if (!(a * a + b * b < c * c + d * d)) {
+                    float dx0 = hit.x - fx1;
+                    float dy0 = hit.y - fy;
+                    float dx1 = hit.x - fx;
+                    float dy1 = hit.y - fy1;
+                    if (!(dx0 * dx0 + dy0 * dy0 < dx1 * dx1 + dy1 * dy1)) {
                         found = 1;
                     }
                 }
