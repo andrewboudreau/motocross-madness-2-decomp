@@ -23,10 +23,10 @@ int Vehicle::UnknownVirtualSlot42()
     return crashState == 0 && motionIndex >= 0 && motionActive;
 }
 
-void Vehicle::UnknownVirtualSlot50(int a, float b, int c)
+void Vehicle::UnknownVirtualSlot50(int protect, float duration, int c)
 {
-    spawnProtected = a;
-    spawnProtectTimer = b;
+    spawnProtected = protect;
+    spawnProtectTimer = duration;
 }
 
 float Vehicle::UnknownVirtualSlot53()
@@ -89,10 +89,11 @@ int Vehicle::UnknownVirtualSlot84(int a, int b)
     return inputMap->UnknownVirtualSlot2(a, b);
 }
 
-// Provisional semantics: true when the accumulated travel (0xbc - 0xb8) is less than arg * 0x450.
-int Vehicle::UnknownVirtualSlot70(float arg)
+// True when the speed change this step (linearSpeed - prevSpeed) is below dt * speedGainLimit;
+// Bike slot 99 passes its clamped step time and treats a true answer as crash reason 4.
+int Vehicle::UnknownVirtualSlot70(float dt)
 {
-    return linearSpeed - prevSpeed < arg * speedGainLimit;
+    return linearSpeed - prevSpeed < dt * speedGainLimit;
 }
 
 // Provisional: wheelBase / sin(steer angle), zero when the angle is zero.
@@ -167,21 +168,21 @@ void Vehicle::UnknownVirtualSlot90(int* a, float b)
         UnknownVirtualSlot89(b);
 }
 
-// Provisional: steering-error style term, t = -(a*b) - angle; result is t / (c*mass + damping)
-// unless |t| is tiny or the vehicle is in state 0x444.
-void Vehicle::UnknownVirtualSlot60(float a, float b, int c)
+// steerRate turns the steer angle to -(steerAxis * maxAngle) over the remaining steps (plus
+// stepRemainder); zero when the error is tiny or the vehicle is crashed.
+void Vehicle::UnknownVirtualSlot60(float steerAxis, float maxAngle, int steps)
 {
     if (crashState == 0) {
-        steerRate = -(a * b) - steerState->angle;
+        steerRate = -(steerAxis * maxAngle) - steerState->angle;
         float m = steerRate;
         if (m < 0.0f) m = -m;
         if (m < 0.00001f) {
             steerRate = 0.0f;
         } else {
             if (stepRemainder > 0.0001f)
-                steerRate = steerRate / ((float)c * stepTime + stepRemainder);
+                steerRate = steerRate / ((float)steps * stepTime + stepRemainder);
             else
-                steerRate = steerRate / ((float)c * stepTime);
+                steerRate = steerRate / ((float)steps * stepTime);
         }
     } else {
         steerRate = 0.0f;
@@ -234,17 +235,17 @@ void Vehicle::UnknownVirtualSlot48()
     position.z += f.z;
 }
 
-void Vehicle::UnknownVirtualSlot71(int arg)
+void Vehicle::UnknownVirtualSlot71(int nowAirborne)
 {
     if (crashState) {
         landingLatched = 0;
-        if (airborne && !arg)
+        if (airborne && !nowAirborne)
             justLanded = 1;
-    } else if (airborne && !arg && !landingLatched) {
+    } else if (airborne && !nowAirborne && !landingLatched) {
         landingLatched = 1;
         justLanded = 1;
     }
-    if (!airborne && arg) {
+    if (!airborne && nowAirborne) {
         takeoffVelocity = velocity;
         takeoffPosition = position;
     }
@@ -423,7 +424,7 @@ static inline Vec3 VehCross56(const Vec3& u, const Vec3& v)
     r.z = v.y * u.x - v.x * u.y;
     return r;
 }
-void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
+void Vehicle::UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up)
 {
     if (wheelCount == 0) {
         leanAngle = savedRoll;
@@ -431,23 +432,23 @@ void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
         return;
     }
     Vec3 n;
-    if (!c) {
+    if (!up) {
         Vec3 t;
         n = *GetAverageGroundNormal(&t);
     } else
-        n = *c;
+        n = *up;
     Vec3* perp = &scratchVector2;
     Vec3 s;
-    Vec3 proj = *Vec3ScaleCall(&s, a, Vec3DotCall(&n, a));
+    Vec3 proj = *Vec3ScaleCall(&s, forward, Vec3DotCall(&n, forward));
     Vec3 d;
     *perp = *Vec3SubtractCall(&d, &n, &proj);
     if (!(perp->x == 0.0f && perp->y == 0.0f && perp->z == 0.0f) && perp) {
         *perp = Vec3Normalize(*perp);
-        scratchVector = VehCross56(sideAxis, *a);
+        scratchVector = VehCross56(sideAxis, *forward);
         Vec3 side = VehNormalizedD(scratchVector);
         scratchVector = ((VehV3&)scratchVector2).Cross(side);
         float sign = -1.0f;
-        if (VehDotG(*a, scratchVector) < 0.0f)
+        if (VehDotG(*forward, scratchVector) < 0.0f)
             sign = 1.0f;
         float len2 = VehLen2(scratchVector);
         float len;
@@ -457,7 +458,7 @@ void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
             len = 1.0f;
         double angle = asin(len * sign);
         leanAngle = (float)angle;
-        if (b)
+        if (updateLeanCos)
             leanCos = (float)cos(angle);
         return;
     }
@@ -1024,13 +1025,13 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         UnknownVirtualSlot6(&force, &speed);
         UnknownVirtualSlot7(&force);
         wheelForwardAlignment = UnknownVirtualSlot75();
-        int settled;
+        int nowAirborne;
         if (!anyWheelInContact && !pointsTouching)
-            settled = 1;
+            nowAirborne = 1;
         else
-            settled = 0;
-        UnknownVirtualSlot71(settled);
-        airborne = settled;
+            nowAirborne = 0;
+        UnknownVirtualSlot71(nowAirborne);
+        airborne = nowAirborne;
         if (airborne)
             landingLatched = 0;
         Vec3 lift;
@@ -1307,8 +1308,9 @@ int Vehicle::UnknownVirtualSlot83(VehicleWheel* wheel)
 }
 
 // Tier 3 reading: re-seats the collision object (0x00435fb0 before and after), removes the
-// contact offset from the position when one is recorded, and clears the dirty byte at 0x138.
-int Vehicle::UnknownVirtualSlot28(int arg)
+// contact offset from the position when one is recorded (a crash that starts there leaves
+// one remaining sub-step), then runs slot 27 when slot27Pending is set and clears it.
+int Vehicle::UnknownVirtualSlot28(int steps)
 {
     collisionObject->UpdatePlacement();
     int wasSet = crashState != 0;
@@ -1318,7 +1320,7 @@ int Vehicle::UnknownVirtualSlot28(int arg)
         modelNode->SetPosition(position);
         collisionObject->UpdatePlacement();
         if (crashState && !wasSet) {
-            arg = 1;
+            steps = 1;
             stepRemainder = 0.0f;
         }
     }
@@ -1326,7 +1328,7 @@ int Vehicle::UnknownVirtualSlot28(int arg)
         UnknownVirtualSlot27();
         slot27Pending = 0;
     }
-    return arg;
+    return steps;
 }
 
 // Tier 3: with the 0x109 flag the saved position is restored; otherwise slot 68 supplies a

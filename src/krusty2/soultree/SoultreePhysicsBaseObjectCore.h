@@ -135,8 +135,8 @@ public:
     virtual int UnknownVirtualSlot25();
     virtual void UnknownVirtualSlot26();
     virtual void UnknownVirtualSlot27();
-    virtual int UnknownVirtualSlot28(int a);
-    virtual void UnknownVirtualSlot29(int a);
+    virtual int UnknownVirtualSlot28(int steps);
+    virtual void UnknownVirtualSlot29(int lastStep);
     virtual void UnknownVirtualSlot30();
     virtual void UnknownVirtualSlot31();
     virtual float UnknownVirtualSlot32();
@@ -147,7 +147,7 @@ public:
     // of eax, identical for either return type; the Vehicle overrides 0x0040c4c0 and
     // 0x0040c540 return nothing (tier 2).
     virtual void UnknownVirtualSlot34();
-    virtual void UnknownVirtualSlot35(int a, int b);
+    virtual void UnknownVirtualSlot35(int orthogonalize, int keepZ);
     virtual void UnknownVirtualSlot36();
     virtual SoultreeAttachment* UnknownVirtualSlot37(int type, void* target, SoultreeAttachTarget* anchor,
                                                      const Vec3* v);

@@ -282,14 +282,14 @@ void KrustyBike::UnknownVirtualSlot69()
         crashTimer = t + 1.0f;
 }
 
-void KrustyBike::UnknownVirtualSlot71(int a)
+void KrustyBike::UnknownVirtualSlot71(int nowAirborne)
 {
     if (crashState) {
         trickLandTimer = 0;
-    } else if (airborne && !a && !landingLatched && motionCompleted && trickLandTimer <= 0.0f) {
+    } else if (airborne && !nowAirborne && !landingLatched && motionCompleted && trickLandTimer <= 0.0f) {
         trickLandTimer = 0.3f;
     }
-    Bike::UnknownVirtualSlot71(a);
+    Bike::UnknownVirtualSlot71(nowAirborne);
 }
 
 Vec3 KrustyBike::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
@@ -558,10 +558,10 @@ void KrustyBike::UnknownVirtualSlot96()
 // re-targets the session's player record onto this bike, then runs the base update and,
 // while airborne (field_0x444 set, field_0x5b4 clear), jitters the two 0x7ac/0x7b0
 // accumulators with random noise (0.15 scale for an aiKind bike, 0.667 otherwise).
-int KrustyBike::UnknownVirtualSlot28(int a)
+int KrustyBike::UnknownVirtualSlot28(int steps)
 {
     lastCollisionType = 0;
-    if (isGhost) return a;
+    if (isGhost) return steps;
     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4) {
         KbPlayer* p = reinterpret_cast<KbPlayer*>(reinterpret_cast<EventManager*>(
             reinterpret_cast<KbGame*>(g_TrackGame)->eventManager)->FindRaceMode());
@@ -577,9 +577,9 @@ int KrustyBike::UnknownVirtualSlot28(int a)
                 }
             }
         }
-        if (isRemote) return a;
+        if (isRemote) return steps;
     }
-    int r = Vehicle::UnknownVirtualSlot28(a);
+    int r = Vehicle::UnknownVirtualSlot28(steps);
     if (crashState && !prevCrashState) {
         if (aiKind) {
             repairDamage += KbRandUnit() * 0.15f;
@@ -684,7 +684,7 @@ void KrustyBike::UnknownVirtualSlot94()
 // Normally they are recomputed from the node's world axes; while neither crossoverPose nor
 // motionActive is set the old values are just copied.  Then the bike's matrix is mirrored
 // onto the 0x5c4 node when the wrecker's mode is 0 or 1, and the 0x141c timer is advanced.
-void KrustyBike::UnknownVirtualSlot29(int a)
+void KrustyBike::UnknownVirtualSlot29(int lastStep)
 {
     if (!crossoverPose && !motionActive) {
         savedForward = bodyForward;
@@ -716,15 +716,15 @@ void KrustyBike::UnknownVirtualSlot29(int a)
     }
 }
 
-// Slot 50: switch the 0x4f0 state (and the attached 0x15e8 object) on or off.  The base slot
-// only runs for the forced (c != 0) case; otherwise the state is latched here with b stored
-// as the countdown at 0x4f4.
-void KrustyBike::UnknownVirtualSlot50(int a, float b, int c)
+// Slot 50: switch spawn protection (and the ghost modifier) on or off.  The base slot only
+// runs for the forced case; otherwise the state is latched here with duration stored as
+// spawnProtectTimer.
+void KrustyBike::UnknownVirtualSlot50(int protect, float duration, int forced)
 {
     if (race->networkStartPending)
         return;
-    if (c) {
-        if (a) {
+    if (forced) {
+        if (protect) {
             if (!spawnProtected) {
                 if (isGhost) {
                     ((D3DIMSoultreeObject*)modelNode)->AddModifier((GameObject*)ghostMod);
@@ -741,22 +741,22 @@ void KrustyBike::UnknownVirtualSlot50(int a, float b, int c)
             if (spawnProtected)
                 spawnProtectEndPending = 1;
         }
-        Vehicle::UnknownVirtualSlot50(a, 0, 0);
+        Vehicle::UnknownVirtualSlot50(protect, 0, 0);
         return;
     }
     if (spawnProtectForced)
         return;
-    if (a) {
+    if (protect) {
         if (!spawnProtected) {
             if (isGhost) {
                 ((D3DIMSoultreeObject*)modelNode)->AddModifier((GameObject*)ghostMod);
                 ((D3DIMSoultreeObject*)riderCharacter->c_0x1a0)->AddModifier((GameObject*)ghostMod);
-                ((GhostMod1*)ghostMod)->StartFade(b);
+                ((GhostMod1*)ghostMod)->StartFade(duration);
             }
             Fn_00496E30(1);
         }
         spawnProtected = 1;
-        spawnProtectTimer = b;
+        spawnProtectTimer = duration;
     } else if (spawnProtected) {
         spawnProtectEndPending = 1;
     }

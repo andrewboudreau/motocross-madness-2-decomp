@@ -45,11 +45,11 @@ public:
     virtual int  UnknownVirtualSlot23();
     virtual int  UnknownVirtualSlot24();
     virtual int  UnknownVirtualSlot25();
-    virtual int  UnknownVirtualSlot28(int arg);
+    virtual int  UnknownVirtualSlot28(int steps);
     virtual int  UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                       const Vec3* settleUp, int keepPlacement, float extraWeight);   // 0x00527430
     virtual void UnknownVirtualSlot34();
-    virtual void UnknownVirtualSlot35(int a, int b);
+    virtual void UnknownVirtualSlot35(int orthogonalize, int keepZ);
     virtual void UnknownVirtualSlot36();
     virtual void UnknownVirtualSlot38(int notify, int eventKind, void* event);
     virtual int  UnknownVirtualSlot39(float dt);
@@ -67,17 +67,17 @@ public:
     // 0x0052a940 forwards its argument unchanged to slots 9 (float dt), 39, 64 and 65,
     // so it and they take the float time step (tier 2).
     virtual void UnknownVirtualSlot49(float dt);
-    virtual void UnknownVirtualSlot50(int a, float b, int c);
+    virtual void UnknownVirtualSlot50(int protect, float duration, int forced);
     virtual int UnknownVirtualSlot51();
     virtual int UnknownVirtualSlot52();
     virtual float UnknownVirtualSlot53();
     virtual Vec3* UnknownVirtualSlot54(Vec3* out);
     virtual Vec3* UnknownVirtualSlot55(Vec3* out, Vec3* pos);
-    virtual void UnknownVirtualSlot56(Vec3* a, int b, Vec3* c);
+    virtual void UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up);
     virtual float UnknownVirtualSlot57();
     virtual void UnknownVirtualSlot58(Vec3* settleUp, int keepPlacement);
     virtual float UnknownVirtualSlot59();
-    virtual void UnknownVirtualSlot60(float a, float b, int c);
+    virtual void UnknownVirtualSlot60(float steerAxis, float maxAngle, int steps);
     virtual float UnknownVirtualSlot61(float arg);
     virtual int UnknownVirtualSlot62(float arg);
     virtual void UnknownVirtualSlot63(float dt);
@@ -89,8 +89,8 @@ public:
     virtual void UnknownVirtualSlot67();
     virtual int UnknownVirtualSlot68(int* out);
     virtual void UnknownVirtualSlot69();
-    virtual int UnknownVirtualSlot70(float arg);
-    virtual void UnknownVirtualSlot71(int arg);
+    virtual int UnknownVirtualSlot70(float dt);
+    virtual void UnknownVirtualSlot71(int nowAirborne);
     virtual void UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel);
     virtual float UnknownVirtualSlot73(const Vec3* a, const Vec3* b);  // only read (Bike 0x00406090)
     virtual float UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d);
@@ -168,7 +168,7 @@ public:
     int crashState;  // +0x444 nonzero disables input (slots 52/62/64/60 test ==0), switches solver vectors (+0xf0, 0.1 scale, 1,1,1 mask); Bike slot 99 writes it and runs the crash timer 0x454 while set
     int crashDirection;          // +0x448 Bike slot 99 (0x00409b30) stores small codes (1..5)
     float impactAccelLimit;                   // +0x44C  LoadVehicle sets 200; Bike slot 99 reports a crash when impulse * invMass > a * impactAccelLimit (tier 2)
-    float speedGainLimit;  // +0x450 slot 70: true when (speed field_0xbc - previous speed field_0xb8) < arg * speedGainLimit
+    float speedGainLimit;  // +0x450 slot 70: true when (linearSpeed - prevSpeed) < dt * speedGainLimit
     // 0x454/0x458: Bike slot 39 (0x0040a1f0) decrements 0x454 by the frame time and
     // compares it with 0.0f/-2.0f, so both are floats (tier 2; slot 69 copies 0x458).
     float crashTimer;  // +0x454 Bike slot 39 decrements it by the frame time while crashed and compares with 0/-0.1/-2.0; slots 1/67 clear it
@@ -196,7 +196,7 @@ public:
     float leanCos;  // +0x4b0 slot 56 stores cos(leanAngle) there
     float wheelForwardAlignment;              // +0x4B4  slot 49: = slot 75, |dot(mean wheel rollDirection, savedForward)| (1 with no wheels); Bike slot 99 (nose-over test) and slot 92 (lean target) use it (tier 2)
     float turnAngle;  // +0x4b8 result of slot 74 (signed deflection angle of the velocity), see turnRate
-    float steerRate;  // +0x4bc slot 60: -(a*b) - steerAngle divided by (c*dt+...); slot 53 feeds steerRate*dt to the steer state
+    float steerRate;  // +0x4bc slot 60: -(steerAxis*maxAngle) - steerAngle divided by (steps*dt+...); slot 53 feeds steerRate*dt to the steer state
     Vec3 tiltAxisLocal;  // +0x4c0 slot 49: WorldToLocalDirection of the lift axis, used as the RotateAboutPoint axis
     Vec3 sideAxis;  // +0x4cc slots 34/35: cross product of the two basis vectors field_0x88 and field_0x94
     float suspensionWeightScale;              // +0x4D8  LoadVehicle's float argument after the weight (Bike passes 0.9); slot 0 multiplies baseWeight by it (provisional)
@@ -205,7 +205,7 @@ public:
     float leanError;        // +0x4e4 Bike slot 92 (0x0040ba30): _finite()/fabs on it (float, tier 2)
     float field_0x4e8;
     float wheelBase;  // +0x4ec slot 73 returns wheelBase / sin(steer angle) (bicycle-model turn radius)
-    int spawnProtected;  // +0x4f0 slot 50 stores arg a here, slot 51 returns it; slot 33 (respawn) sets it using slot 45 (3.0)
+    int spawnProtected;  // +0x4f0 slot 50 stores protect here, slot 51 returns it; slot 33 (respawn) sets it using slot 45 (3.0)
     float spawnProtectTimer;   // +0x4f4 tier 2: countdown; slot 49 tests > 0 and subtracts field_0x13c (frame dt), slot 50 stores it
     VehicleAxis* steerAxis;  // +0x4f8 slot 63 reads its value into steerInput and 0x504.x
     VehicleAxis* leanAxis;  // +0x4fc slot 63 reads -value into controlInput.y

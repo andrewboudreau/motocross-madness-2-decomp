@@ -308,22 +308,22 @@ void Bike::UnknownVirtualSlot44()
     reinterpret_cast<D3DIMSoultreeObject*>(riderCharacter->c_0x1a0)->ClearScreenRects();
 }
 
-void Bike::UnknownVirtualSlot71(int arg)
+void Bike::UnknownVirtualSlot71(int nowAirborne)
 {
     if (crashState == 0) {
         if (airborne) {
-            if (arg == 0 && landingLatched == 0) {
-                wobbleTime = arg;
-                Vehicle::UnknownVirtualSlot71(arg);
+            if (nowAirborne == 0 && landingLatched == 0) {
+                wobbleTime = nowAirborne;
+                Vehicle::UnknownVirtualSlot71(nowAirborne);
                 return;
             }
-        } else if (arg) {
+        } else if (nowAirborne) {
             wobbleStage = 1;
             wobbleSign = (savedRoll < 0.0f) ? -1.0f : 1.0f;
             wobbleOffset = angularVelocity.z;
         }
     }
-    Vehicle::UnknownVirtualSlot71(arg);
+    Vehicle::UnknownVirtualSlot71(nowAirborne);
 }
 
 static inline float BikeAbs(float x)
@@ -345,10 +345,10 @@ float Bike::UnknownVirtualSlot57()
     return r;
 }
 
-void Bike::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
+void Bike::UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up)
 {
-    Vehicle::UnknownVirtualSlot56(a, b, c);
-    if (b) {
+    Vehicle::UnknownVirtualSlot56(forward, updateLeanCos, up);
+    if (updateLeanCos) {
         rearWheel->w_0x2a4 = leanCos;
         frontWheel->w_0x2a4 = leanCos;
     }

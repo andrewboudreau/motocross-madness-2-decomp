@@ -18,9 +18,9 @@ void Vehicle::UnknownVirtualSlot34()
     sideAxis = side;
 }
 
-void Vehicle::UnknownVirtualSlot35(int a, int b)
+void Vehicle::UnknownVirtualSlot35(int orthogonalize, int keepZ)
 {
-    modelNode->SetAxesIn(0, &bodyForward, &bodyUp, a, b);
+    modelNode->SetAxesIn(0, &bodyForward, &bodyUp, orthogonalize, keepZ);
     sideAxis = ((VehV3&)bodyForward).CrossB(bodyUp);
 }
 

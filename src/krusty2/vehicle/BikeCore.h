@@ -26,7 +26,7 @@ public:
     virtual void UnknownVirtualSlot7(const Vec3* force);
     virtual void UnknownVirtualSlot8();
     virtual Vec3 UnknownVirtualSlot16(const Vec3* localTorque);
-    virtual void UnknownVirtualSlot29(int arg);
+    virtual void UnknownVirtualSlot29(int lastStep);
     virtual float UnknownVirtualSlot32();
     virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                      const Vec3* settleUp, int keepPlacement, float extraWeight);
@@ -41,7 +41,7 @@ public:
     virtual float UnknownVirtualSlot53();
     virtual Vec3* UnknownVirtualSlot54(Vec3* out);
     virtual Vec3* UnknownVirtualSlot55(Vec3* out, Vec3* pos);
-    virtual void UnknownVirtualSlot56(Vec3* a, int b, Vec3* c);
+    virtual void UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up);
     virtual float UnknownVirtualSlot57();
     virtual float UnknownVirtualSlot59();
     virtual float UnknownVirtualSlot61(float arg);
@@ -49,7 +49,7 @@ public:
     virtual void UnknownVirtualSlot65(float arg);
     virtual int UnknownVirtualSlot66();
     virtual void UnknownVirtualSlot67();
-    virtual void UnknownVirtualSlot71(int arg);
+    virtual void UnknownVirtualSlot71(int nowAirborne);
     virtual void UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel);
     virtual float UnknownVirtualSlot73(const Vec3* a, const Vec3* b);
     virtual float UnknownVirtualSlot75();

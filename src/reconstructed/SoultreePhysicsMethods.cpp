@@ -57,9 +57,9 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot34()
 }
 
 // slot 35 (0x004aa1e0)
-void SoultreePhysicsBaseObject::UnknownVirtualSlot35(int a, int b)
+void SoultreePhysicsBaseObject::UnknownVirtualSlot35(int orthogonalize, int keepZ)
 {
-    sceneNode->SetAxesIn(0, &bodyForward, &bodyUp, a, b);
+    sceneNode->SetAxesIn(0, &bodyForward, &bodyUp, orthogonalize, keepZ);
 }
 
 int SoultreePhysicsBaseObject::UnknownVirtualSlot12(int value)

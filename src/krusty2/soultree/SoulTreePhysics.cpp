@@ -278,7 +278,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot18(SoultreeAttachment* a)
 }
 
 // slot 28 (0x00502950)
-int SoultreePhysicsBaseObject::UnknownVirtualSlot28(int a)
+int SoultreePhysicsBaseObject::UnknownVirtualSlot28(int steps)
 {
     collisionObject->UpdatePlacement();
     collisionObject->QueryCollisions();
@@ -291,11 +291,11 @@ int SoultreePhysicsBaseObject::UnknownVirtualSlot28(int a)
         UnknownVirtualSlot27();
         slot27Pending = 0;
     }
-    return a;
+    return steps;
 }
 
 // slot 29 (0x005029d0)
-void SoultreePhysicsBaseObject::UnknownVirtualSlot29(int a)
+void SoultreePhysicsBaseObject::UnknownVirtualSlot29(int lastStep)
 {
     savedForward = bodyForward;
     savedUp = bodyUp;

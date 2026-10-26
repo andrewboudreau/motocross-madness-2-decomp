@@ -52,10 +52,10 @@ public:
     virtual int UnknownVirtualSlot25();
     virtual void UnknownVirtualSlot27();
     virtual void UnknownVirtualSlot43();
-    virtual void UnknownVirtualSlot29(int a);
+    virtual void UnknownVirtualSlot29(int lastStep);
     virtual void UnknownVirtualSlot49(float dt);
-    virtual void UnknownVirtualSlot50(int a, float b, int c);
-    virtual int UnknownVirtualSlot28(int a);
+    virtual void UnknownVirtualSlot50(int protect, float duration, int forced);
+    virtual int UnknownVirtualSlot28(int steps);
     virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                      const Vec3* settleUp, int keepPlacement, float extraWeight);
     virtual int UnknownVirtualSlot39(float a);
@@ -70,8 +70,8 @@ public:
     virtual void UnknownVirtualSlot67();
     virtual int UnknownVirtualSlot68(int* out);
     virtual void UnknownVirtualSlot69();
-    virtual int UnknownVirtualSlot70(float a);
-    virtual void UnknownVirtualSlot71(int a);
+    virtual int UnknownVirtualSlot70(float dt);
+    virtual void UnknownVirtualSlot71(int nowAirborne);
     virtual Vec3 UnknownVirtualSlot76(const Vec3* a, const Vec3* b);
     virtual int UnknownVirtualSlot80();
     virtual int UnknownVirtualSlot81();
@@ -257,7 +257,7 @@ public:
     CollisionObject* probeSegment;  // +0x15E0  AI bike's vertical probe segment (0,4,0)-(0,-1,0)
     char aiTricksEnabled;  // +0x15E4 the loader sets it for an AI bike (aiKind) and clears it otherwise; gates BikeAI's trick roll
     char field_0x15e5; // 0x15E5
-    char spawnProtectForced;  // +0x15E6  slot 50's forced (c != 0) path sets/clears it; unforced slot 50 calls return early while it is set (tier 3)
+    char spawnProtectForced;  // +0x15E6  slot 50's forced path sets/clears it; unforced slot 50 calls return early while it is set (tier 3)
     char pad_0x15E7[0x1];
     KbObj128* ghostMod;  // +0x15E8  GhostMod1 the loader creates for a ghost (isGhost)
     float stateIntervalElapsed;  // +0x15EC  seconds into the current state interval (0x00493660)

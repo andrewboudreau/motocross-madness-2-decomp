@@ -85,17 +85,17 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 // order, flat sums, `== 3 ? 0 : 1`, `!(== 3)`, `3 !=`, `else` arms and a scale local
 // give the base bytes or fewer; a `>` compare, a shared speedGain or limit local and a
 // conditional row pointer lose more (123, 59, 26, 22).
-int KrustyBike::UnknownVirtualSlot70(float arg)
+int KrustyBike::UnknownVirtualSlot70(float dt)
 {
     float b[2][3] = { { 4.0f, 3.25f, 2.5f }, { 3.75f, 3.25f, 2.5f } };
     float a[3] = { 1.15f, 1.05f, 1.0f };
     if (aiKind) {
         float speedGain = linearSpeed - prevSpeed;
-        if (speedGain * b[reinterpret_cast<KbGame*>(g_TrackGame)->eventType != 3][reinterpret_cast<KbGame*>(g_TrackGame)->difficulty - 1] < arg * speedGainLimit)
+        if (speedGain * b[reinterpret_cast<KbGame*>(g_TrackGame)->eventType != 3][reinterpret_cast<KbGame*>(g_TrackGame)->difficulty - 1] < dt * speedGainLimit)
             return 1;
         return 0;
     }
-    if (linearSpeed - prevSpeed < a[reinterpret_cast<KbGame*>(g_TrackGame)->difficulty - 1] * speedGainLimit * arg)
+    if (linearSpeed - prevSpeed < a[reinterpret_cast<KbGame*>(g_TrackGame)->difficulty - 1] * speedGainLimit * dt)
         return 1;
     return 0;
 }
@@ -443,7 +443,7 @@ static inline int KbWithinWarpBandOf(float dist2, float limitSq, float frame, fl
 // `const unsigned char&` c and reading interpTarget in the lerp too. The poseBlend lerp
 // keeps `c - b` (its member-read form recomputes but scores 2182). Before this:
 // Writing the rider placement in both orientation-save branches, extra `= 1` stores
-// before PlaceWheels, moving `movingForward = 1` or an int `settled` do not move it; a
+// before PlaceWheels, moving `movingForward = 1` or an int `nowAirborne` do not move it; a
 // probe third SetAxesPtr call removes the middle zero register and the tail then matches
 // (233). Named locals for the 1 (SetAxesPtr arguments, movingForward, the latch stores),
 // for the 0 arguments or for g_kbAllowWarping read before the dist2 sum are propagated away
@@ -689,10 +689,10 @@ void KrustyBike::Fn_00493660(float dt, int a)
         anyWheelInContact = wheelsInContact != 0;
         UpdateWheelsInContact();
         {
-            bool settled = !anyWheelInContact;
-            UnknownVirtualSlot71(settled);
-            airborne = settled;
-            if (settled)
+            bool nowAirborne = !anyWheelInContact;
+            UnknownVirtualSlot71(nowAirborne);
+            airborne = nowAirborne;
+            if (nowAirborne)
                 landingLatched = 0;
         }
         movingForward = 1;
