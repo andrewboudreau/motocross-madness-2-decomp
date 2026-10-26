@@ -135,10 +135,10 @@ int Vehicle::UnknownVirtualSlot77(int arg)
     return 0;
 }
 
-void Vehicle::UnknownVirtualSlot64(float arg)
+void Vehicle::UnknownVirtualSlot64(float dt)
 {
     if (crashState == 0) {
-        UnknownVirtualSlot63(arg);
+        UnknownVirtualSlot63(dt);
         return;
     }
     controlInput = kVec3Zero;

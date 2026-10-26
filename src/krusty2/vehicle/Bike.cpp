@@ -296,10 +296,10 @@ int Bike::UnknownVirtualSlot5(int arg)
     return BikeAbsRef(savedRoll) > 0.2618f || BikeAbsRef(savedPitch) > 1.05f;
 }
 
-void Bike::UnknownVirtualSlot49(float arg)
+void Bike::UnknownVirtualSlot49(float dt)
 {
-    Vehicle::UnknownVirtualSlot49(arg);
-    UnknownVirtualSlot102(arg);
+    Vehicle::UnknownVirtualSlot49(dt);
+    UnknownVirtualSlot102(dt);
 }
 
 void Bike::UnknownVirtualSlot44()
