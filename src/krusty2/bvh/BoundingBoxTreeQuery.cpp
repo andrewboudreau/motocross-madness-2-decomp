@@ -83,11 +83,11 @@ int SweptBoxOverlap(Vec3 aCenter, Vec3 aHalf, const Vec3* bCenter, const Vec3* b
     Vec3 delta;
     {
         Vec3 moved;
-        const Vec3* c = &aCenter;
-        TransformPointPtr(&moved, c, xfA);
-        delta.x = moved.x - c->x;
-        delta.y = moved.y - c->y;
-        delta.z = moved.z - c->z;
+        const Vec3* origin = &aCenter;
+        TransformPointPtr(&moved, origin, xfA);
+        delta.x = moved.x - origin->x;
+        delta.y = moved.y - origin->y;
+        delta.z = moved.z - origin->z;
     }
     {
         Vec3 center;
@@ -164,22 +164,22 @@ int SegmentBoxOverlap(const Vec3* center, const Vec3* halfExtents, Vec3 p0, Vec3
     p0 -= *center;
     p1 -= *center;
     Vec3 mid = ScaleCtorCall(AddCtorCall(p0, p1), 0.5f);
-    Vec3 d = SubtractCtorCall(mid, p0);
+    Vec3 halfSpan = SubtractCtorCall(mid, p0);
     Vec3 ad;
-    ad.x = QueryAbs(d.x);
+    ad.x = QueryAbs(halfSpan.x);
     if (QueryAbs(mid.x) > ad.x + halfExtents->x)
         return 0;
-    ad.y = QueryAbs(d.y);
+    ad.y = QueryAbs(halfSpan.y);
     if (QueryAbs(mid.y) > ad.y + halfExtents->y)
         return 0;
-    ad.z = QueryAbs(d.z);
+    ad.z = QueryAbs(halfSpan.z);
     if (QueryAbs(mid.z) > ad.z + halfExtents->z)
         return 0;
-    if (QueryAbs(mid.y * d.z - mid.z * d.y) > halfExtents->y * ad.z + halfExtents->z * ad.y)
+    if (QueryAbs(mid.y * halfSpan.z - mid.z * halfSpan.y) > halfExtents->y * ad.z + halfExtents->z * ad.y)
         return 0;
-    if (QueryAbs(mid.x * d.z - mid.z * d.x) > halfExtents->x * ad.z + halfExtents->z * ad.x)
+    if (QueryAbs(mid.x * halfSpan.z - mid.z * halfSpan.x) > halfExtents->x * ad.z + halfExtents->z * ad.x)
         return 0;
-    if (QueryAbs(mid.x * d.y - mid.y * d.x) > halfExtents->x * ad.y + halfExtents->y * ad.x)
+    if (QueryAbs(mid.x * halfSpan.y - mid.y * halfSpan.x) > halfExtents->x * ad.y + halfExtents->y * ad.x)
         return 0;
     return 1;
 }
@@ -294,21 +294,21 @@ int PointInTriangle(const Vec3* p, const QueryTriangle* tri)
 {
     Vec3 e0 = s_vertices[tri->vertex[2]] - s_vertices[tri->vertex[1]];
     Vec3 e1 = s_vertices[tri->vertex[0]] - s_vertices[tri->vertex[1]];
-    Vec3 d = *p - s_vertices[tri->vertex[1]];
-    Vec3 c = CrossProduct(e0, d);
-    if (QueryDot(c, tri->normal) < 0.0f)
+    Vec3 toPoint = *p - s_vertices[tri->vertex[1]];
+    Vec3 cross = CrossProduct(e0, toPoint);
+    if (QueryDot(cross, tri->normal) < 0.0f)
         return 0;
-    c = CrossProduct(d, e1);
-    if (QueryDot(c, tri->normal) < 0.0f)
+    cross = CrossProduct(toPoint, e1);
+    if (QueryDot(cross, tri->normal) < 0.0f)
         return 0;
     e0 = SubtractCtorCall(s_vertices[tri->vertex[0]], s_vertices[tri->vertex[2]]);
     e1 = SubtractCtorCall(s_vertices[tri->vertex[1]], s_vertices[tri->vertex[2]]);
-    d = SubtractCtorCall(*p, s_vertices[tri->vertex[2]]);
-    c = CrossProductCall(e0, d);
-    if (Vec3DotCall(&tri->normal, &c) < 0.0f)
+    toPoint = SubtractCtorCall(*p, s_vertices[tri->vertex[2]]);
+    cross = CrossProductCall(e0, toPoint);
+    if (Vec3DotCall(&tri->normal, &cross) < 0.0f)
         return 0;
-    c = CrossProductCall(d, e1);
-    if (Vec3DotCall(&tri->normal, &c) < 0.0f)
+    cross = CrossProductCall(toPoint, e1);
+    if (Vec3DotCall(&tri->normal, &cross) < 0.0f)
         return 0;
     return 1;
 }
@@ -436,12 +436,12 @@ int SphereTreeQuery(const Vec3* center, float radius, float radiusSq, QueryTreeN
         }
         {
             Vec3 p = ((QueryPointLeaf*)node)->point;
-            Vec3 w;
-            w.x = p.x * xf->_11 + p.y * xf->_21 + p.z * xf->_31 + xf->_41;
-            w.y = p.x * xf->_12 + p.y * xf->_22 + p.z * xf->_32 + xf->_42;
-            w.z = p.x * xf->_13 + p.y * xf->_23 + p.z * xf->_33 + xf->_43;
-            Vec3 d = w - *center;
-            if (QueryDot(d, d) < radiusSq)
+            Vec3 world;
+            world.x = p.x * xf->_11 + p.y * xf->_21 + p.z * xf->_31 + xf->_41;
+            world.y = p.x * xf->_12 + p.y * xf->_22 + p.z * xf->_32 + xf->_42;
+            world.z = p.x * xf->_13 + p.y * xf->_23 + p.z * xf->_33 + xf->_43;
+            Vec3 offset = world - *center;
+            if (QueryDot(offset, offset) < radiusSq)
                 return 1;
         }
     } else if (BoxSphereOverlap(&node->center, &node->halfExtents, *center, radius, radiusSq, xf)) {
@@ -688,9 +688,9 @@ float PointSegmentDistance(const Vec3* p, const Vec3* a, const Vec3* b)
         t = 1.0f;
     else if (t <= 0.0f)
         t = 0.0f;
-    Vec3 q = *a + ab * t;
-    Vec3 d = *p - q;
-    float distSq = QuerySquareMagnitude(d);
+    Vec3 closest = *a + ab * t;
+    Vec3 offset = *p - closest;
+    float distSq = QuerySquareMagnitude(offset);
     if (distSq == 1.0f)
         return 1.0f;
     return FastSqrt(distSq);
