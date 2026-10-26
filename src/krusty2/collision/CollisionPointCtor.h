@@ -13,7 +13,7 @@ inline CollisionPoint::CollisionPoint(float a, int b)
     surfacePosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
     surfaceNormal = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointYAxis));
     relativePosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
-    field_0x44 = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+    appliedShare = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
     frictionDirection = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
     field_0x5c = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
     tangentSpeed = 0;
@@ -27,7 +27,7 @@ inline CollisionPoint::CollisionPoint(float a, int b)
     field_0xac = 0;
     field_0xb0 = 0;
     field_0xb4 = 0;
-    field_0xa0 = 0.5f;
+    blendWeight = 0.5f;
     surfaceType = 0;
     frictionMagnitude = 0;
     frictionForce = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));

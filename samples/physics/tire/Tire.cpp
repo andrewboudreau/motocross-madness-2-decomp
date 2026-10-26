@@ -811,7 +811,7 @@ inline CollisionPoint::CollisionPoint(float a, int b)
     surfacePosition = kVec3Zero;
     surfaceNormal = kVec3YAxis;
     relativePosition = kVec3Zero;
-    field_0x44 = kVec3Zero;
+    appliedShare = kVec3Zero;
     frictionDirection = kVec3Zero;
     field_0x5c = kVec3Zero;
     tangentSpeed = 0;
@@ -823,7 +823,7 @@ inline CollisionPoint::CollisionPoint(float a, int b)
     field_0xac = 0;
     field_0xb0 = 0;
     field_0xb4 = 0;
-    field_0xa0 = 0.5f;
+    blendWeight = 0.5f;
     field_0xb8 = 1.0f;
     surfaceType = 0;
     surfaceGrip = 1.0f;
@@ -856,7 +856,7 @@ Tire::Tire(void* a1, int a2, float a3, float a4, int a5, int a6, float a7, float
     rollFriction = a3;
     sideFriction = a4;
     field_0x294 = a14;
-    CollisionPoint::field_0xa0 = a14;
+    CollisionPoint::blendWeight = a14;
     field_0x298 = a5;
     field_0x2b4 = a7;
     rollFrictionScale = a8;

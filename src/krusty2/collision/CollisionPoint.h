@@ -37,7 +37,7 @@ public:
     CollisionVec3 surfacePosition;  // +0x20 copy of worldPosition passed in/out to the ground query 0x00507c10 which snaps it to the surface; penetration uses (surfacePosition.y - worldPosition.y)
     CollisionVec3 surfaceNormal;  // +0x2c normal output of the ground query 0x00507c10 (2nd argument); projection axis in UpdateRelativeMotion, summed in 0x0043aa30
     CollisionVec3 relativePosition;  // +0x38 UpdateRelativeMotion: = worldPosition - a1 (position relative to the body); Tire computes the same
-    CollisionVec3 field_0x44;
+    CollisionVec3 appliedShare;  // +0x44 Vehicle/Bike view (VehicleContact, VehicleWheel +0xfc): per-point share of the applied vector; zeroed by the ctor
     CollisionVec3 frictionDirection;                // +0x50 scaled by frictionMagnitude into frictionForce (slot 1)
     CollisionVec3 field_0x5c;
     CollisionVec3 field_0x68;
@@ -50,7 +50,7 @@ public:
     float spinSpeed;  // +0x94 UpdateRelativeMotion: |cross(n*(n.a2), a4)|, contact speed from rotation about the normal; slot 1 tests it against 0.001
     float penetration;  // +0x98 0x0043ad80: = (surfacePosition.y - worldPosition.y) * surfaceNormal.y; AddCollisionPoint initialises it to threshold - 999
     float penetrationThreshold;  // +0x9c AddCollisionPoint a4; 0x0043ad80: inContact = (penetration >= penetrationThreshold)
-    float field_0xa0;
+    float blendWeight;  // +0xa0 Vehicle/Bike view (VehicleContact, VehicleWheel::loadWeight +0x158): per-point blend weight; ctor 0.5f, Tire ctor a14
     int inContact;  // +0xa4 0x0043ad80 stores the integer 1/0 (mov eax, 1 / xor eax, eax) from the penetration test and counts it; 0x0043aa30 only merges points with it set; Tire 0x00513c70 stores 1/0 the same way
     float field_0xa8;
     float field_0xac;
