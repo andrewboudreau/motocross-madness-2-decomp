@@ -1153,8 +1153,8 @@ void Bike::UnknownVirtualSlot102(float)
             next = 13;
     } else if (idx > 2) {
         if (!(cnt == 10 && idx == 5)) {
-            float sp = BikeMaxF(BikeMin(smoothedVerticalAccel, 32.2f), -32.2f);
-            poseLeanBlend = (sp * 0.0310559f + 1.0f) * 0.5f;
+            float verticalAccel = BikeMaxF(BikeMin(smoothedVerticalAccel, 32.2f), -32.2f);
+            poseLeanBlend = (verticalAccel * 0.0310559f + 1.0f) * 0.5f;
         }
         next = idx + 2;
         if (idx == 10)
@@ -1264,18 +1264,19 @@ float Bike::UnknownVirtualSlot61(float threshold)
     if (allWheelsInContact) {
         BikeWheel* rear = rearWheel;
         if (rear->driveShare < 0.9f && rear->driveForceMagnitude > 0.0f) {
-            float t = wheelBase * 0.5f;
-            float u = (t + t * rear->driveShareComplement) * invInertia.y * stepTime * rear->driveShareComplement * rear->driveForceMagnitude;
-            float a = leanAngle;
-            if (a < 0.0f)
-                a = -a;
-            if (a > 0.005f) {
-                u *= 32.0f;
-                u = BikeMin(u, 1.57f);
-                float b = a * 5.0f;
-                b = BikeMin(b, 1.5f);
-                u = u * stepTime * b;
-                driveSlideAngle = (leanAngle < 0.0f) ? -u : u;
+            float halfWheelBase = wheelBase * 0.5f;
+            float slide = (halfWheelBase + halfWheelBase * rear->driveShareComplement) * invInertia.y * stepTime
+                          * rear->driveShareComplement * rear->driveForceMagnitude;
+            float absLean = leanAngle;
+            if (absLean < 0.0f)
+                absLean = -absLean;
+            if (absLean > 0.005f) {
+                slide *= 32.0f;
+                slide = BikeMin(slide, 1.57f);
+                float leanFactor = absLean * 5.0f;
+                leanFactor = BikeMin(leanFactor, 1.5f);
+                slide = slide * stepTime * leanFactor;
+                driveSlideAngle = (leanAngle < 0.0f) ? -slide : slide;
                 driveSlideAngleStep = fixedStepTime * -1.333f * driveSlideAngle;
                 driveSlideStepsLeft = (int)(0.75f / fixedStepTime - 0.5f);
             } else {
@@ -1409,11 +1410,11 @@ int Bike::UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, float 
         crashReason = 7;
         return 1;
     }
-    float d1 = BikeDot(&kVec3YAxis, &savedForward);
-    if (d1 < 0.0f)
-        d1 = -d1;
+    float forwardVertical = BikeDot(&kVec3YAxis, &savedForward);
+    if (forwardVertical < 0.0f)
+        forwardVertical = -forwardVertical;
     float lieLimit = sideLieThreshold;
-    if (d1 > lieLimit) {
+    if (forwardVertical > lieLimit) {
         // bike is lying on its side
         if (savedForward.y > 0.0f) {
             crashDirection = 3;
@@ -1512,10 +1513,10 @@ int Bike::UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, float 
 // Otherwise splits the force between front and rear wheel.
 static inline void BikeSteerToward(BikeA640* p, float target, float dt)
 {
-    float f = BikeMin(dt, p->l_0x4);
-    float r = f / p->l_0x4;
-    p->l_0x8 = r;
-    p->steerValue = (target - p->steerValue) * r + p->steerValue;
+    float step = BikeMin(dt, p->l_0x4);
+    float fraction = step / p->l_0x4;
+    p->l_0x8 = fraction;
+    p->steerValue = (target - p->steerValue) * fraction + p->steerValue;
 }
 static inline float BikeWheelDistance(const Vec3& a, const Vec3& b)
 {
@@ -1635,11 +1636,11 @@ void Bike::UnknownVirtualSlot91()
         if (d > 0.55f && d < 0.984f) {
             // steer the velocity toward the lean plane
             scratchVector2 = Vec3(scratchVector.z, 0.0f, -heading->x);
-            float s = (poseParam < 0.5f) ? 1.0f : -1.0f;
-            float a = (1.0f - d) * 3.41296911f;
-            float k = s * (a * linearSpeed * 0.075f) * stepTime;
-            velocity += scratchVector2 * k;
-            velocity *= linearSpeed / (k + linearSpeed);
+            float side = (poseParam < 0.5f) ? 1.0f : -1.0f;
+            float misalignment = (1.0f - d) * 3.41296911f;
+            float deflection = side * (misalignment * linearSpeed * 0.075f) * stepTime;
+            velocity += scratchVector2 * deflection;
+            velocity *= linearSpeed / (deflection + linearSpeed);
             // Component copies: retail loads y, x and z once and squares the registers.
             float y = velocity.y;
             float x = velocity.x;
