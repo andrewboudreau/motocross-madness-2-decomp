@@ -172,10 +172,10 @@ public:
     int NextCueIndex();               // 0x0048bc30: the next cue index when it changed, else -1
     int CanCycleCues();               // 0x0048bc80: a cue is active and more than one racer exists
 
-    // ArcadeObject.h types +0x48/+0x4c as int (0x00401310's `c` and `d`);
-    // the cue stores screen fractions there (0.5f, 0.1f from its callers).
-    float UnknownScreenX() { return *(float*)&field_0x48; }
-    float UnknownScreenY() { return *(float*)&field_0x4c; }
+    // The cue's screen fractions (0.5f, 0.1f from its callers). A plain
+    // `return screenX;` emits the same code but renumbers VC6's $L/$T labels.
+    float UnknownScreenX() { return *(float*)&screenX; }
+    float UnknownScreenY() { return *(float*)&screenY; }
     // The placement block slot 10 repeats in each mode.
     void UnknownPlace();
 

@@ -14,8 +14,8 @@
 ArcadeObject::ArcadeObject(int flags) : GameObject(flags) {
     arcadeModel = 0;
     isVisible = 0;
-    field_0x38 = 0;
-    field_0x3c = 0;
+    targetPixels = 0;
+    modelSize = 0;
     arcadeView = 0;
     collisionObject = 0;
     collisionBuilt = 0;
@@ -35,7 +35,7 @@ ArcadeObject::ArcadeObject(int flags) : GameObject(flags) {
     modelHeight = 0;
     transparency = 0;
     modelScale = 1.0f;
-    field_0x74 = 1;
+    active = 1;
 }
 
 // 0x00401300
@@ -57,27 +57,27 @@ ArcadeObject* ArcadeObject::Create(void* value, int a, int b, const char* name,
     }
     SetPosition(&position);
     isVisible = 1;
-    field_0x44 = size;
+    viewDistance = size;
     arcadeView = view;
     arcadeModel->GetSubtreeBounds(reinterpret_cast<Vec3*>(&low), reinterpret_cast<Vec3*>(&extent));
     modelWidth = extent.x + extent.x;
     modelHeight = extent.y + extent.y;
     if (pixels && arcadeView) {
-        field_0x48 = c;
-        field_0x4c = d;
+        screenX = c;
+        screenY = d;
         float largest = extent.x > extent.y ? extent.x : extent.y;
         if (!(largest > extent.z))
             largest = extent.z;
-        field_0x3c = largest + largest;
-        field_0x38 = (float)pixels;
-        float scale = field_0x38 * field_0x44 / (field_0x3c * arcadeView->focalLength);
+        modelSize = largest + largest;
+        targetPixels = (float)pixels;
+        float scale = targetPixels * viewDistance / (modelSize * arcadeView->focalLength);
         modelScale = scale;
         arcadeModel->Scale(scale, scale, scale);
     }
     if (alpha) {
         transparency = new (__FILE__, 104) TransparencyMod(1);
         AppendChild(transparency, -1);
-        transparency->field_0x48 = alpha;
+        transparency->alpha = alpha;
         arcadeModel->AddModifier(transparency);
     }
     return this;
@@ -146,17 +146,17 @@ int ArcadeObject::Tick(float frameTime) {
         else
             elapsedLifetime += g_TrackGame->frameTime;
     }
-    if (delayEnabled && !field_0x74) {
+    if (delayEnabled && !active) {
         elapsedDelay += g_TrackGame->frameTime;
         if (elapsedDelay > delay) {
             if (repeatCount < repeatLimit || repeatLimit == 999) {
                 repeatCount++;
-                field_0x74 = 1;
+                active = 1;
             }
             elapsedDelay = 0;
         }
     }
-    if (field_0x74 && spinning) {
+    if (active && spinning) {
         spinAngle = g_TrackGame->frameTime * spinSpeed;
         while (spinAngle > 6.2831855f)
             spinAngle -= 6.2831855f;
@@ -167,7 +167,7 @@ int ArcadeObject::Tick(float frameTime) {
 
 // 0x00401920
 int ArcadeObject::UnknownVirtualSlot14() {
-    if (field_0x74 && isVisible)
+    if (active && isVisible)
         return GameObject::UnknownVirtualSlot14();
     return 1;
 }

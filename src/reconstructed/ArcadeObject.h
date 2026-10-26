@@ -60,12 +60,12 @@ public:
     D3DIMSoultreeObject* arcadeModel;           // model
     int isVisible;                            // visible
     float modelScale;                          // scale, 1 by default
-    float field_0x38;
-    float field_0x3c;
+    float targetPixels;                       // +0x38 0x00401310's `pixels`: the on-screen size the scale aims for
+    float modelSize;                          // +0x3c twice the largest bounds half-extent
     UnknownArcadeView* arcadeView;
-    float field_0x44;
-    float field_0x48;                          // screen fraction (0x00401310's c)
-    float field_0x4c;                          // screen fraction (0x00401310's d)
+    float viewDistance;                       // +0x44 0x00401310's `size`; modelScale = targetPixels * viewDistance / (modelSize * focalLength), and VisualCue places the cue this far in front of the camera
+    float screenX;                            // +0x48 0x00401310's `c`: VisualCue's horizontal screen fraction
+    float screenY;                            // +0x4c 0x00401310's `d`: VisualCue's vertical screen fraction
     float modelWidth;                          // model width
     float modelHeight;                        // +0x54 model height
     TransparencyMod* transparency;            // +0x58
@@ -75,7 +75,7 @@ public:
     float lifetime;                           // +0x68 lifetime
     int field_0x6c;
     float elapsedLifetime;                    // +0x70 elapsed lifetime
-    int field_0x74;
+    int active;                               // +0x74 ctor 1; the delay timer runs only while it is clear and sets it again; gates the spin and slot 14
     int delayEnabled;                         // +0x78 delay enabled
     float delay;                              // +0x7c delay
     float elapsedDelay;                       // +0x80 elapsed delay

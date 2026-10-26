@@ -194,13 +194,13 @@ struct UnknownCueOwner {
     Vector3 right = Vector3(arcadeView->cameraMatrix[0][0], arcadeView->cameraMatrix[1][0], arcadeView->cameraMatrix[2][0]); \
     if (arcadeView->fieldOfView != builtFieldOfView) { \
         builtFieldOfView = arcadeView->fieldOfView; \
-        float half = (float)tan(UNKNOWN_DEGREES_TO_RADIANS(builtFieldOfView * 0.5f)) * field_0x44; \
+        float half = (float)tan(UNKNOWN_DEGREES_TO_RADIANS(builtFieldOfView * 0.5f)) * viewDistance; \
         screenOffsetX = (UnknownScreenX() - 0.5f) * half * 2.0f; \
         screenOffsetY = (0.5f - UnknownScreenY()) * arcadeView->aspectRatio * half * 2.0f; \
-        modelScale = field_0x38 * field_0x44 / (arcadeView->focalLength * field_0x3c); \
+        modelScale = targetPixels * viewDistance / (arcadeView->focalLength * modelSize); \
     } \
     Vector3 position = arcadeView->cameraPosition; \
-    position += direction * field_0x44; \
+    position += direction * viewDistance; \
     position += right * screenOffsetX; \
     position += up * screenOffsetY; \
     SetPosition(&position); \

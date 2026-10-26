@@ -11,10 +11,10 @@
 // trkgame.cpp (first xref 0x00521086). No __FILE__ literal, so the file
 // name 'TransparencyMod.cpp' is ours (tier 3), as are the member names.
 //
-// What slot 27 does (tier 3): while field_0x44 differs from field_0x40 it
-// counts the surfaces drawn (field_0x49); after a whole level of detail it
-// latches field_0x44 into field_0x40. Each surface gets the alpha byte
-// field_0x48 in its vertex colours when field_0x44 is set, opaque colours
+// What slot 27 does (tier 3): while isTransparent differs from appliedState
+// it counts the surfaces drawn; after a whole level of detail it latches
+// isTransparent into appliedState. Each surface gets the alpha byte in its
+// vertex colours when isTransparent is set, opaque colours
 // otherwise, and the object's materials get the matching alpha flag.
 
 #include "D3DIMSoultreeModifier.h"
@@ -27,8 +27,8 @@ public:
     virtual void UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
                                       UnknownSoultreeMesh** out); // 0x005206f0
 
-    int appliedState;                          // state last applied to a whole level of detail
-    int isTransparent;                         // 1: transparent
-    unsigned char field_0x48;                  // alpha, 0x80 by default
-    unsigned char surfacesDrawn;               // surfaces drawn since field_0x44 changed
+    int appliedState;                          // +0x40 state last applied to a whole level of detail
+    int isTransparent;                         // +0x44 1: transparent
+    unsigned char alpha;                       // +0x48 0x80 by default; ArcadeObject 0x00401310 stores its `alpha`
+    unsigned char surfacesDrawn;               // +0x49 surfaces drawn since isTransparent changed
 };

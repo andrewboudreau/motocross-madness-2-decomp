@@ -12,7 +12,7 @@ TransparencyMod::TransparencyMod(int flags)
     appliedState = 0;
     surfacesDrawn = 0;
     isTransparent = 1;
-    field_0x48 = 0x80;
+    alpha = 0x80;
 }
 
 // 0x005206f0
@@ -30,7 +30,7 @@ void TransparencyMod::UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownS
     }
 
     UnknownSoultreeVertex* vertices;
-    unsigned int alpha = field_0x48 << 24;
+    unsigned int alphaBits = alpha << 24;
     int i;
     if (isTransparent) {
         for (i = 0; i < object->materialCount; i++) {
@@ -38,7 +38,7 @@ void TransparencyMod::UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownS
         }
         for (i = 0; i < mesh->vertexCount; i++) {
             ((UnknownSoultreeVertex*)mesh->vertices)[i].diffuse &= 0xffffff;
-            ((UnknownSoultreeVertex*)mesh->vertices)[i].diffuse |= alpha;
+            ((UnknownSoultreeVertex*)mesh->vertices)[i].diffuse |= alphaBits;
         }
     } else {
         for (i = 0; i < object->materialCount; i++) {
