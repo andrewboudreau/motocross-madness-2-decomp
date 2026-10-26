@@ -80,9 +80,9 @@ void KrustyBike::UnknownVirtualSlot27()
     UnknownVirtualSlot101();
 }
 
-void KrustyBike::UnknownVirtualSlot1(float a)
+void KrustyBike::UnknownVirtualSlot1(float extraWeight)
 {
-    Bike::UnknownVirtualSlot1(a);
+    Bike::UnknownVirtualSlot1(extraWeight);
     Fn_0048D8B0();
     aiTrickHoldLeft = 0;
     headTurningToRival = 0;
@@ -179,10 +179,10 @@ int KrustyBike::UnknownVirtualSlot25()
     return 0;
 }
 
-int KrustyBike::UnknownVirtualSlot33(const Vec3* a0, const Vec3* a1, const Vec3* a2,
-                                     const Vec3* a3, int a4, float a5)
+int KrustyBike::UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
+                                     const Vec3* settleUp, int keepPlacement, float extraWeight)
 {
-    int result = Bike::UnknownVirtualSlot33(a0, a1, a2, a3, a4, a5);
+    int result = Bike::UnknownVirtualSlot33(newPosition, newForward, newUp, settleUp, keepPlacement, extraWeight);
     lastFramePosition = position;
     wrecker->skipProbeEffects = 1;
     return result;

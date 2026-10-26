@@ -413,9 +413,9 @@ Vec3 Bike::UnknownVirtualSlot16(const Vec3* v)
     return r;
 }
 
-void Bike::UnknownVirtualSlot1(float arg)
+void Bike::UnknownVirtualSlot1(float extraWeight)
 {
-    Vehicle::UnknownVirtualSlot1(arg);
+    Vehicle::UnknownVirtualSlot1(extraWeight);
     BikeA644* p = poseSmoother;
     if (p) {
         float v = poseSmoothTime;
@@ -881,12 +881,12 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     return this;
 }
 
-int Bike::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,
-                               const Vec3* d, int e, float f)
+int Bike::UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
+                               const Vec3* settleUp, int keepPlacement, float extraWeight)
 {
     Matrix4 tmp;
     RunTickers();
-    int r = Vehicle::UnknownVirtualSlot33(a, b, c, d, e, f);
+    int r = Vehicle::UnknownVirtualSlot33(newPosition, newForward, newUp, settleUp, keepPlacement, extraWeight);
     int mode = wrecker->wreckState;
     if (mode == 0 || mode == 1) {
         modelNode->GetMatrixIn(0, &tmp);

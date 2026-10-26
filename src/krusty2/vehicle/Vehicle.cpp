@@ -12,10 +12,10 @@
 #include "collision/CollisionPoint.h"
 #include "../../reconstructed/ParticleEmitters.h"
 
-void Vehicle::UnknownVirtualSlot0(float dt)
+void Vehicle::UnknownVirtualSlot0(float extraWeight)
 {
-    SoultreePhysicsCharacter::UnknownVirtualSlot0(dt);
-    suspensionMass = (suspensionWeightScale * baseWeight + dt) * 0.0310558993f;   // 1/32.2
+    SoultreePhysicsCharacter::UnknownVirtualSlot0(extraWeight);
+    suspensionMass = (suspensionWeightScale * baseWeight + extraWeight) * 0.0310558993f;   // 1/32.2
 }
 
 int Vehicle::UnknownVirtualSlot42()
@@ -472,13 +472,13 @@ void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
 // orientation block is rebuilt from the basis vectors and the previous copy is refreshed.
 static inline float VehAbsT(float x) { return x < 0.0f ? -x : x; }
 
-void Vehicle::UnknownVirtualSlot58(Vec3* a, int b)
+void Vehicle::UnknownVirtualSlot58(Vec3* settleUp, int keepPlacement)
 {
     if (wheelCount < 1)
         return;
     RunTickers();
     if (wheelCount == 1) {
-        if (b == 0) {
+        if (keepPlacement == 0) {
             float y = primaryWheel->groundPoint.y;
             position.y = y;
             modelNode->SetPosition(position.x, y, position.z);
@@ -488,8 +488,8 @@ void Vehicle::UnknownVirtualSlot58(Vec3* a, int b)
         VehicleWheel* top = wheelList[0];
         Vec3 dir;
         Vec3 t;
-        if (b) {
-            dir = *a;
+        if (keepPlacement) {
+            dir = *settleUp;
         } else {
             VehicleWheel* second = wheelList[1];
             for (int i = 1; i < wheelCount; i++) {
@@ -506,7 +506,7 @@ void Vehicle::UnknownVirtualSlot58(Vec3* a, int b)
         modelNode->SetAxesIn(0, &bodyForward, &dir, 1, 0);
         UnknownVirtualSlot34();
         modelNode->GetPositionIn(0, &position);
-        if (b == 0) {
+        if (keepPlacement == 0) {
             float y = top->field_0x228 - top->wheelPosition.y + top->groundPoint.y;
             position.y = y;
             modelNode->SetPosition(position.x, y, position.z);
@@ -1512,9 +1512,9 @@ Vec3* Vehicle::UnknownVirtualSlot54(Vec3* out)
 // state counters are cleared exactly as in slot 67, the lean/steer/wheel members get their
 // defaults, and the speed state at +0x480 is re-seeded with a random start value
 // (rand() / 32768 scaled by a table entry).
-void Vehicle::UnknownVirtualSlot1(float value)
+void Vehicle::UnknownVirtualSlot1(float extraWeight)
 {
-    SoultreePhysicsCharacter::UnknownVirtualSlot1(value);
+    SoultreePhysicsCharacter::UnknownVirtualSlot1(extraWeight);
     field_0x4e8 = 0.0f;
     forwardSpeed = 0.0f;
     movingForward = 1;
@@ -1590,27 +1590,28 @@ void Vehicle::UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel, const 
         worldAngularVelocity = modelNode->LocalToWorldDirection(angularVelocity);
 }
 
-// Tier 3 reading: places the vehicle at a (with its y forced to -1000 when e is zero), takes
-// the orientation vectors b/c, settles the wheels twice via slot 58 (d, e), refreshes the wheel
-// and body node positions and finishes with slot 50 (flag, slot 45 value, 0).
-int Vehicle::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c, const Vec3* d,
-                                  int e, float f)
+// Tier 3 reading: places the vehicle at newPosition (with its y forced to -1000 unless
+// keepPlacement), takes newForward/newUp, settles the wheels twice via slot 58 (which with
+// keepPlacement keeps the height and takes settleUp as the up axis, else the ground normal),
+// refreshes the wheel and body node positions and finishes with slot 50 (flag, slot 45 value, 0).
+int Vehicle::UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp, const Vec3* settleUp,
+                                  int keepPlacement, float extraWeight)
 {
-    UnknownVirtualSlot1(f);
-    bodyForward = *b;
-    bodyUp = *c;
+    UnknownVirtualSlot1(extraWeight);
+    bodyForward = *newForward;
+    bodyUp = *newUp;
     float y;
-    if (e)
-        y = a->y;
+    if (keepPlacement)
+        y = newPosition->y;
     else
         y = -1000.0f;
-    modelNode->SetPosition(a->x, y, a->z);
+    modelNode->SetPosition(newPosition->x, y, newPosition->z);
     modelNode->GetPosition(&position);
     UnknownVirtualSlot36();
     PlaceWheels();
-    UnknownVirtualSlot58((Vec3*)d, e);
+    UnknownVirtualSlot58((Vec3*)settleUp, keepPlacement);
     PlaceWheels();
-    UnknownVirtualSlot58((Vec3*)d, e);
+    UnknownVirtualSlot58((Vec3*)settleUp, keepPlacement);
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* w = wheelList[i];
         w->sceneNode->GetPositionIn(0, &w->nodePosition);

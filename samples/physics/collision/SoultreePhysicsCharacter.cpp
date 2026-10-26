@@ -10,9 +10,9 @@
 // (`new` of 0xb8 bytes, ctor 0x00431e70, tier 1).
 
 // slot 1 (0x005040c0): base slot 1 then clears four flag bytes.
-void SoultreePhysicsCharacter::UnknownVirtualSlot1(float value)
+void SoultreePhysicsCharacter::UnknownVirtualSlot1(float extraWeight)
 {
-    SoultreePhysicsBaseObject::UnknownVirtualSlot1(value);
+    SoultreePhysicsBaseObject::UnknownVirtualSlot1(extraWeight);
     motionActive = 0;
     motionCompleted = 0;
     motionJustStarted = 0;
@@ -35,14 +35,14 @@ int SoultreePhysicsCharacter::UnknownVirtualSlot42()
 }
 
 // slot 33 (0x005040f0), retail `ret 0x18`
-int SoultreePhysicsCharacter::UnknownVirtualSlot33(const Vec3* a1, const Vec3* a2,
-                                                   const Vec3* a3, const Vec3* a4,
-                                                   int a5, float a6)
+int SoultreePhysicsCharacter::UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward,
+                                                   const Vec3* newUp, const Vec3* settleUp,
+                                                   int keepPlacement, float extraWeight)
 {
-    UnknownVirtualSlot1(a6);
-    bodyForward = *a2;
-    bodyUp = *a3;
-    sceneNode->SetPosition(a1->x, a1->y, a1->z);
+    UnknownVirtualSlot1(extraWeight);
+    bodyForward = *newForward;
+    bodyUp = *newUp;
+    sceneNode->SetPosition(newPosition->x, newPosition->y, newPosition->z);
     sceneNode->GetPosition(&position);
     UnknownVirtualSlot36();
     if (centerNode) {

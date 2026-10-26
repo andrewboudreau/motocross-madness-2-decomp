@@ -109,18 +109,18 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot4(const Vec3* normal, Vec3* ve
 }
 
 // slot 0 (0x005008d0): stores value + field_0x150 and derived quantities.
-void SoultreePhysicsBaseObject::UnknownVirtualSlot0(float value)
+void SoultreePhysicsBaseObject::UnknownVirtualSlot0(float extraWeight)
 {
-    totalWeight = value + baseWeight;
+    totalWeight = extraWeight + baseWeight;
     weightForce.y = -totalWeight;
     bodyMass = totalWeight * 0.0310559f;
     invMass = 1.0f / bodyMass;
 }
 
 // slot 1 (0x00500910): reset dynamic state.
-void SoultreePhysicsBaseObject::UnknownVirtualSlot1(float value)
+void SoultreePhysicsBaseObject::UnknownVirtualSlot1(float extraWeight)
 {
-    UnknownVirtualSlot0(value);
+    UnknownVirtualSlot0(extraWeight);
     velocity = g_Zero;
     prevVelocity = g_Zero;
     prevSpeed = 0.0f;
@@ -338,14 +338,14 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot31()
 }
 
 // slot 33 (0x00501c20)
-int SoultreePhysicsBaseObject::UnknownVirtualSlot33(const Vec3* a1, const Vec3* a2,
-                                                    const Vec3* a3, const Vec3* a4,
-                                                    int a5, float a6)
+int SoultreePhysicsBaseObject::UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward,
+                                                    const Vec3* newUp, const Vec3* settleUp,
+                                                    int keepPlacement, float extraWeight)
 {
-    UnknownVirtualSlot1(a6);
-    bodyForward = *a2;
-    bodyUp = *a3;
-    sceneNode->SetPosition(a1->x, a1->y, a1->z);
+    UnknownVirtualSlot1(extraWeight);
+    bodyForward = *newForward;
+    bodyUp = *newUp;
+    sceneNode->SetPosition(newPosition->x, newPosition->y, newPosition->z);
     sceneNode->GetPosition(&position);
     UnknownVirtualSlot36();
     if (centerNode)

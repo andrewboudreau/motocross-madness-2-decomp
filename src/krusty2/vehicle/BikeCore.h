@@ -21,15 +21,15 @@ public:
     virtual ~Bike();              // vbase vtable 0x0055085c slot 0 -> 0x0040ca40
 
     // overrides of Vehicle slots (signatures: SoultreePhysicsBaseObject.h, Vehicle.h)
-    virtual void UnknownVirtualSlot1(float value);
+    virtual void UnknownVirtualSlot1(float extraWeight);
     virtual int UnknownVirtualSlot5(int arg);
     virtual void UnknownVirtualSlot7(const Vec3* dir);
     virtual void UnknownVirtualSlot8();
     virtual Vec3 UnknownVirtualSlot16(const Vec3* v);
     virtual void UnknownVirtualSlot29(int arg);
     virtual float UnknownVirtualSlot32();
-    virtual int UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,
-                                     const Vec3* d, int e, float f);
+    virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
+                                     const Vec3* settleUp, int keepPlacement, float extraWeight);
     virtual void UnknownVirtualSlot38(int notify, int eventKind, void* event);
     virtual int UnknownVirtualSlot39(float dt);
     virtual void UnknownVirtualSlot41();

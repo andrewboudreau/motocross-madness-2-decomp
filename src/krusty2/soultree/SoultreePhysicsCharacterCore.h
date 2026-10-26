@@ -38,11 +38,11 @@ public:
     virtual ~SoultreePhysicsCharacter();        // core 0x00503d40, deleting 0x005042f0
     virtual int Tick(float dt);                     // 0x00504210 via vtordisp thunk 0x00504350 (ret 4)
     // --- vtable 0x005580a8 (offset 0) ---
-    virtual void UnknownVirtualSlot1(float value);                // 0x005040c0
+    virtual void UnknownVirtualSlot1(float extraWeight);                // 0x005040c0
     virtual void UnknownVirtualSlot8();                           // 0x005041c0
-    virtual int UnknownVirtualSlot33(const Vec3* a1, const Vec3* a2,
-                                     const Vec3* a3, const Vec3* a4, int a5,
-                                     float a6);                  // 0x005040f0
+    virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward,
+                                     const Vec3* newUp, const Vec3* settleUp, int keepPlacement,
+                                     float extraWeight);                  // 0x005040f0
     // Slot 40 (0x00503de0, `ret 0x6c` = 27 argument dwords, tier 1).  Grouping (tier 2):
     //  * a6..a8 (dwords 5..13, 0-based) are three Vec3 by value.  Both the body and the one direct caller
     //    (Vehicle.cpp 0x005261e3, `call 0x00503de0`) copy them with the `sub esp,0xc;

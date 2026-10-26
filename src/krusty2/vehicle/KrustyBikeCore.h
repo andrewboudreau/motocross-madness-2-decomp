@@ -31,7 +31,7 @@ public:
     virtual ~KrustyBike();
     virtual int Tick(float dt);                      // 0x004977a0 (vbase vtable slot 10)
 
-    virtual void UnknownVirtualSlot1(float a);
+    virtual void UnknownVirtualSlot1(float extraWeight);
     virtual void UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel, const Vec3* arm,
                                      const Vec3* angScale, int eventKind, int scaleBits,
                                      float* impulseOut);
@@ -56,8 +56,8 @@ public:
     virtual void UnknownVirtualSlot49(float dt);
     virtual void UnknownVirtualSlot50(int a, float b, int c);
     virtual int UnknownVirtualSlot28(int a);
-    virtual int UnknownVirtualSlot33(const Vec3* a0, const Vec3* a1, const Vec3* a2,
-                                     const Vec3* a3, int a4, float a5);
+    virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
+                                     const Vec3* settleUp, int keepPlacement, float extraWeight);
     virtual int UnknownVirtualSlot39(float a);
     virtual int UnknownVirtualSlot42();
     virtual void UnknownVirtualSlot44();

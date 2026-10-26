@@ -25,8 +25,8 @@ public:
     virtual int Tick(float dt);                     // 0x0052a830 via vtordisp thunk 0x0040cab0
 
     // ---- overrides of inherited slots (order as in the vtable) ----
-    virtual void UnknownVirtualSlot0(float dt);
-    virtual void UnknownVirtualSlot1(float value);                               // 0x00525550
+    virtual void UnknownVirtualSlot0(float extraWeight);
+    virtual void UnknownVirtualSlot1(float extraWeight);                               // 0x00525550
     virtual void UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel, const Vec3* arm,
                                      const Vec3* angScale, int eventKind, int scaleBits,
                                      float* impulseOut);                   // 0x005264c0
@@ -46,8 +46,8 @@ public:
     virtual int  UnknownVirtualSlot24();
     virtual int  UnknownVirtualSlot25();
     virtual int  UnknownVirtualSlot28(int arg);
-    virtual int  UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,
-                                      const Vec3* d, int e, float f);   // 0x00527430
+    virtual int  UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
+                                      const Vec3* settleUp, int keepPlacement, float extraWeight);   // 0x00527430
     virtual void UnknownVirtualSlot34();
     virtual void UnknownVirtualSlot35(int a, int b);
     virtual void UnknownVirtualSlot36();
@@ -75,7 +75,7 @@ public:
     virtual Vec3* UnknownVirtualSlot55(Vec3* out, Vec3* pos);
     virtual void UnknownVirtualSlot56(Vec3* a, int b, Vec3* c);
     virtual float UnknownVirtualSlot57();
-    virtual void UnknownVirtualSlot58(Vec3* a, int b);
+    virtual void UnknownVirtualSlot58(Vec3* settleUp, int keepPlacement);
     virtual float UnknownVirtualSlot59();
     virtual void UnknownVirtualSlot60(float a, float b, int c);
     virtual float UnknownVirtualSlot61(float arg);

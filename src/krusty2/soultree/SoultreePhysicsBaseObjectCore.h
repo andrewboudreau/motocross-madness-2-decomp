@@ -51,8 +51,8 @@ public:
     virtual ~SoultreePhysicsBaseObject();       // deleting dtor 0x00504290 via vbase vtable slot 0
     virtual int Tick(float dt);                    // override, thunk 0x005042d0 -> 0x005036f0
     // --- vtable 0x00557d90 (offset 0), slots 0..39, all introduced here ---
-    virtual void UnknownVirtualSlot0(float value);
-    virtual void UnknownVirtualSlot1(float value);
+    virtual void UnknownVirtualSlot0(float extraWeight);
+    virtual void UnknownVirtualSlot1(float extraWeight);
     // Slot 2 (0x00500c50): `ret 0x68` = 26 argument dwords (tier 1).  Grouping and types
     // are tier 2, from the body's stores and the struct-copy shape at both callers
     // (SoultreePhysicsCharacter slot 40 0x00503de0, SoultreePhysicsObject slot 40 0x00503970):
@@ -139,9 +139,9 @@ public:
     virtual void UnknownVirtualSlot30();
     virtual void UnknownVirtualSlot31();
     virtual float UnknownVirtualSlot32();
-    virtual int UnknownVirtualSlot33(const Vec3* a1, const Vec3* a2,
-                                     const Vec3* a3, const Vec3* a4, int a5,
-                                     float a6);  // a4 unused here; Vehicle passes a Vec3 address (tier 2)
+    virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward,
+                                     const Vec3* newUp, const Vec3* settleUp, int keepPlacement,
+                                     float extraWeight);  // settleUp and keepPlacement are unused here; Vehicle passes a Vec3 address (tier 2)
     // Slots 34/35 are declared void: 0x004aa1c0/0x004aa1e0 end in `call; ret` with no use
     // of eax, identical for either return type; the Vehicle overrides 0x0040c4c0 and
     // 0x0040c540 return nothing (tier 2).
