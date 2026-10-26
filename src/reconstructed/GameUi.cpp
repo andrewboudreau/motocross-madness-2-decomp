@@ -521,8 +521,8 @@ int UIControl::RenderPre3D() {
 }
 
 // 0x00472250
-int UIControl::ButtonUp(int a, int* position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a && currentState == 2) {
+int UIControl::ButtonUp(int button, int* position) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && currentState == 2) {
         SetState(3);
         PlayControlSound(3, ownerDialog->field_0x180);
     }
@@ -531,8 +531,8 @@ int UIControl::ButtonUp(int a, int* position) {
 }
 
 // 0x004722b0
-void UIControl::ButtonHeld(int a, int* position) {
-    if (moveable && a == 1) {
+void UIControl::ButtonHeld(int button, int* position) {
+    if (moveable && button == 1) {
         RequestRedraw();
         int width = GetWidth();
         int height = GetHeight();
@@ -644,10 +644,10 @@ UIButton::UIButton(int id, CameraRect* area, UIDialog* owner)
 }
 
 // 0x00473410
-int UIButton::ButtonUp(int a, int* position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a && currentState == 2) {
+int UIButton::ButtonUp(int button, int* position) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && currentState == 2) {
         UnknownDialogEvent event;
-        event.handled = a;
+        event.handled = button;
         if (sortList)
             sortList->Sort(1);
         event.kind = kDialogCommand;
@@ -660,7 +660,7 @@ int UIButton::ButtonUp(int a, int* position) {
         if (event.handled)
             return 1;
     }
-    return UIControl::ButtonUp(a, position);
+    return UIControl::ButtonUp(button, position);
 }
 
 // ---------------------------------------------------------------------------
@@ -775,9 +775,9 @@ void UIEditBox::KillFocus(int value) {
 }
 
 // 0x00474120
-int UIEditBox::ButtonDown(int a, int b) {
+int UIEditBox::ButtonDown(int button, int position) {
     if (ownerDialog->guiUser->focusControl != (UnknownGuiControl*)this)
-        return UIControl::ButtonDown(a, b);
+        return UIControl::ButtonDown(button, position);
     return 0;
 }
 
@@ -795,8 +795,8 @@ UIScrollCtl::~UIScrollCtl() {
 }
 
 // 0x00474880: a click scrolls the arrow's lists by a row, then repeats on a timer.
-int UIScrollCtl::ButtonDown(int a, int b) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a) {
+int UIScrollCtl::ButtonDown(int button, int position) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
         UnknownDialogEvent event;
         event.handled = 0;
         GameObjectIterator* iterator;
@@ -845,7 +845,7 @@ int UIScrollCtl::ButtonDown(int a, int b) {
             ownerDialog->AddTimer(0x101, 0xfa, (int)this);
         }
     }
-    return UIControl::ButtonDown(a, b);
+    return UIControl::ButtonDown(button, position);
 }
 
 // 0x004749f0: the scroll timer (0x101 starts the repeat timer 0x102, which
@@ -900,10 +900,10 @@ void UIScrollCtl::HandleTimer(int value) {
 }
 
 // 0x00474b10
-int UIScrollCtl::ButtonUp(int a, int* position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a && currentState == 2) {
+int UIScrollCtl::ButtonUp(int button, int* position) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && currentState == 2) {
         UnknownDialogEvent event;
-        event.handled = a;
+        event.handled = button;
         event.kind = kDialogCommand;
         event.code = eventCode;
         event.controlName = GetName();
@@ -914,7 +914,7 @@ int UIScrollCtl::ButtonUp(int a, int* position) {
         if (event.handled)
             return 1;
     }
-    return UIControl::ButtonUp(a, position);
+    return UIControl::ButtonUp(button, position);
 }
 
 // ---------------------------------------------------------------------------
@@ -1347,8 +1347,8 @@ void UIListBox::SetPartialRows(int value) {
 }
 
 // 0x00478190
-void UIListBox::ButtonHeld(int a, int* position) {
-    if (a == 1 && position) {
+void UIListBox::ButtonHeld(int button, int* position) {
+    if (button == 1 && position) {
         int delta = position[0] - dragStartX;
         dragOffsetX = delta;
         if (delta >= -scrollOffsetX)
@@ -1356,7 +1356,7 @@ void UIListBox::ButtonHeld(int a, int* position) {
         dragOffsetX = delta;
         RequestRedraw();
     }
-    UIControl::ButtonHeld(a, position);
+    UIControl::ButtonHeld(button, position);
 }
 
 // 0x00479220
@@ -1544,10 +1544,10 @@ int UIStaticText::Draw() {
 }
 
 // 0x00479190
-int UIStaticText::ButtonDown(int a, int b) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a) {
+int UIStaticText::ButtonDown(int button, int position) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
         UnknownDialogEvent event;
-        event.handled = a;
+        event.handled = button;
         event.kind = kDialogCommand;
         event.code = eventCode;
         event.controlName = GetName();
@@ -1558,7 +1558,7 @@ int UIStaticText::ButtonDown(int a, int b) {
         if (event.handled)
             return 1;
     }
-    return UIControl::ButtonDown(a, b);
+    return UIControl::ButtonDown(button, position);
 }
 
 // ---------------------------------------------------------------------------
@@ -1626,8 +1626,8 @@ UIDDLButton::UIDDLButton(int id, CameraRect* area, UIDialog* owner, UIDropDownLi
 }
 
 // 0x00479c90
-int UIDDLButton::ButtonDown(int a, int b) {
-    UIControl::ButtonDown(a, b);
+int UIDDLButton::ButtonDown(int button, int position) {
+    UIControl::ButtonDown(button, position);
     if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this)
         ownerList->SetOpen(1 - ownerList->isOpen);
     return 0;
@@ -1764,13 +1764,13 @@ void UIDropDownList::SyncBoundValue(int value) {
 }
 
 // 0x0047add0
-int UIDropDownList::ButtonDown(int a, int b) {
+int UIDropDownList::ButtonDown(int button, int position) {
     if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this) {
         SetOpen(isOpen == 0);
         ownerDialog->guiUser->RequestFocus((UnknownGuiControl*)this, 0, 0);
         return 1;
     }
-    return UIControl::ButtonDown(a, b);
+    return UIControl::ButtonDown(button, position);
 }
 
 // ---------------------------------------------------------------------------
@@ -2584,14 +2584,14 @@ end:
 // UIControl: input
 
 // 0x004721b0
-int UIControl::ButtonDown(int a, int b) {
+int UIControl::ButtonDown(int button, int position) {
     if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this) {
-        if (!a) {
+        if (!button) {
             SetState(2);
             PlayControlSound(2, ownerDialog->field_0x180);
         }
-        heldButton = a;
-        if (a == 1 && ownerDialog->dialogBackground)
+        heldButton = button;
+        if (button == 1 && ownerDialog->dialogBackground)
             ownerDialog->dialogBackground->MarkAllDirty();
         ownerDialog->guiUser->RequestFocus((UnknownGuiControl*)this, 0, 0);
         ToolTip* tip = ownerDialog->guiUser->userToolTip;
@@ -3072,10 +3072,10 @@ void UIMultiState::SetStateText(int index, const char* text) {
 }
 
 // 0x00478d70
-int UIMultiState::ButtonDown(int a, int b) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a) {
+int UIMultiState::ButtonDown(int button, int position) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
         UnknownDialogEvent event;
-        event.handled = a;
+        event.handled = button;
         SelectNextState();
         event.kind = kDialogCommand;
         event.code = eventCode;
@@ -3087,7 +3087,7 @@ int UIMultiState::ButtonDown(int a, int b) {
         if (event.handled)
             return 1;
     }
-    return UIControl::ButtonDown(a, b);
+    return UIControl::ButtonDown(button, position);
 }
 
 // 0x00479310
@@ -3130,10 +3130,10 @@ int UIRadioButton::GetGroupSelection() {
 }
 
 // 0x004794c0
-int UIRadioButton::ButtonDown(int a, int b) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a) {
+int UIRadioButton::ButtonDown(int button, int position) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
         UnknownDialogEvent event;
-        event.handled = a;
+        event.handled = button;
         if (!GetSelectedState()) {
             SetCurrentState(1);
             GameObjectIterator* iterator = (GameObjectIterator*)CreateControlIterator();
@@ -3156,7 +3156,7 @@ int UIRadioButton::ButtonDown(int a, int b) {
         if (event.handled)
             return 1;
     }
-    return UIControl::ButtonDown(a, b);
+    return UIControl::ButtonDown(button, position);
 }
 
 // 0x00477490
@@ -3916,7 +3916,7 @@ int UIControl::SlideBottomStep() {
 // UIScrollBar
 
 // 0x00475880
-int UIScrollBar::ButtonUp(int a, int* position) {
+int UIScrollBar::ButtonUp(int button, int* position) {
     UnknownDialogEvent event;
     event.handled = 0;
     if (dragging) {
@@ -3929,7 +3929,7 @@ int UIScrollBar::ButtonUp(int a, int* position) {
         ownerDialog->HandleEvent(&event);
     }
     dragging = 0;
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a && currentState == 2) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && currentState == 2) {
         event.kind = kDialogCommand;
         event.code = eventCode;
         event.controlName = GetName();
@@ -3940,7 +3940,7 @@ int UIScrollBar::ButtonUp(int a, int* position) {
         if (event.handled)
             return 1;
     }
-    return UIControl::ButtonUp(a, position);
+    return UIControl::ButtonUp(button, position);
 }
 
 // ---------------------------------------------------------------------------
@@ -4497,16 +4497,16 @@ failed:
 }
 
 // 0x004755d0: a click on the bar moves the thumb (slider) or pages the lists.
-int UIScrollBar::ButtonDown(int a, int b) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a && b) {
+int UIScrollBar::ButtonDown(int button, int position) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && position) {
         GameObjectIterator* iterator;
         UIControl* list;
         if (controlType == 8) {
             if (snapSteps) {
                 thumbOffset = (float)UnknownMinInt(GetWidth() - thumbWidth,
-                                                         UnknownMaxInt(((int*)b)[0] - screenArea[0], 0));
+                                                         UnknownMaxInt(((int*)position)[0] - screenArea[0], 0));
             } else {
-                float x = (float)((int*)b)[0];
+                float x = (float)((int*)position)[0];
                 float left = (float)screenArea[0];
                 if (x > thumbOffset + (left + thumbWidth)) {
                     iterator = (GameObjectIterator*)CreateControlIterator();
@@ -4533,9 +4533,9 @@ int UIScrollBar::ButtonDown(int a, int b) {
         } else {
             if (snapSteps) {
                 thumbOffset = (float)UnknownMinInt(GetHeight() - thumbHeight,
-                                                         UnknownMaxInt(((int*)b)[1] - screenArea[1], 0));
+                                                         UnknownMaxInt(((int*)position)[1] - screenArea[1], 0));
             } else {
-                float y = (float)((int*)b)[1];
+                float y = (float)((int*)position)[1];
                 float top = (float)screenArea[1];
                 if (y > thumbOffset + (top + thumbHeight)) {
                     iterator = (GameObjectIterator*)CreateControlIterator();
@@ -4563,15 +4563,15 @@ int UIScrollBar::ButtonDown(int a, int b) {
         if (snapSteps)
             SetThumbPosition(ScaleThumbPosition(snapSteps), snapSteps);
     }
-    return UIControl::ButtonDown(a, b);
+    return UIControl::ButtonDown(button, position);
 }
 
 // 0x00475970: dragging the thumb; holding it still repeats kind 0x11.
-void UIScrollBar::ButtonHeld(int a, int* position) {
-    UIControl::ButtonHeld(a, position);
+void UIScrollBar::ButtonHeld(int button, int* position) {
+    UIControl::ButtonHeld(button, position);
     UnknownDialogEvent event;
     event.handled = 0;
-    if (!a && position) {
+    if (!button && position) {
         int width = GetWidth();
         int height = GetHeight();
         RequestRedraw();
@@ -4845,11 +4845,11 @@ failed:
 }
 
 // 0x00479710: dragging the thumb; holding it still repeats kind 0x11.
-void UIDDLScrollBar::ButtonHeld(int a, int* position) {
-    UIControl::ButtonHeld(a, position);
+void UIDDLScrollBar::ButtonHeld(int button, int* position) {
+    UIControl::ButtonHeld(button, position);
     UnknownDialogEvent event;
     event.handled = 0;
-    if (!a && position) {
+    if (!button && position) {
         int width = GetWidth();
         int height = GetHeight();
         RequestRedraw();
@@ -4918,14 +4918,14 @@ void UIDDLScrollBar::ButtonHeld(int a, int* position) {
 }
 
 // 0x00479a00: a click on the bar moves the thumb (slider) or pages the list.
-int UIDDLScrollBar::ButtonDown(int a, int b) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a && b) {
+int UIDDLScrollBar::ButtonDown(int button, int position) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && position) {
         UIListBox* list = ownerList->listPart;
         if (snapSteps) {
             thumbOffset = (float)UNKNOWN_MIN(GetHeight() - thumbHeight,
-                                                   UNKNOWN_MAX(((int*)b)[1] - screenArea[1], 0));
+                                                   UNKNOWN_MAX(((int*)position)[1] - screenArea[1], 0));
         } else {
-            float y = (float)((int*)b)[1];
+            float y = (float)((int*)position)[1];
             float top = (float)screenArea[1];
             if (y > thumbOffset + (top + thumbHeight))
             {
@@ -4939,7 +4939,7 @@ int UIDDLScrollBar::ButtonDown(int a, int b) {
     }
     if (snapSteps)
         SetThumbPosition(ScaleThumbPosition(snapSteps), snapSteps);
-    return UIControl::ButtonDown(a, b);
+    return UIControl::ButtonDown(button, position);
 }
 
 // 0x0047ab20
@@ -5223,12 +5223,12 @@ void UIListBox::ScrollBy(int delta) {
 }
 
 // 0x00477ff0
-int UIListBox::ButtonUp(int a, int* position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && a == 1) {
+int UIListBox::ButtonUp(int button, int* position) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && button == 1) {
         scrollOffsetX += dragOffsetX;
         dragOffsetX = 0;
     }
-    return UIControl::ButtonUp(a, position);
+    return UIControl::ButtonUp(button, position);
 }
 
 // 0x00478040

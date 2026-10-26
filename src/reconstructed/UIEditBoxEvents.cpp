@@ -6,10 +6,10 @@
 
 // 0x00474b10, 144 bytes: report an unmodified release inside the pressed edit
 // control, then retain the base release behavior unless the event was handled.
-int UIEditBox::ButtonUp(int a, int* position) {
-    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a && currentState == 2) {
+int UIEditBox::ButtonUp(int button, int* position) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && currentState == 2) {
         UnknownDialogEvent event;
-        event.handled = a;
+        event.handled = button;
         event.kind = kDialogCommand;
         event.code = eventCode;
         event.controlName = GetName();
@@ -20,7 +20,7 @@ int UIEditBox::ButtonUp(int a, int* position) {
         if (event.handled)
             return 1;
     }
-    return UIControl::ButtonUp(a, position);
+    return UIControl::ButtonUp(button, position);
 }
 
 // 0x00479100, 107 bytes: empty, hidden or obscured controls age redraw frames.

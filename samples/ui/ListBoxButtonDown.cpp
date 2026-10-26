@@ -4,10 +4,10 @@
 #include "../../src/reconstructed/UIDialog.h"
 #include "../../src/reconstructed/GUIManager.h"
 
-int UIListBox::ButtonDown(int a, int b) {
-    POINT* point = (POINT*)b;
+int UIListBox::ButtonDown(int button, int position) {
+    POINT* point = (POINT*)position;
     if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && point) {
-        if (a == 0) {
+        if (button == 0) {
             if (selectable) {
                 int found = 0;
                 RECT rect = *(RECT*)screenArea;
@@ -29,10 +29,10 @@ int UIListBox::ButtonDown(int a, int b) {
                 if (found)
                     return 1;
             }
-        } else if (a == 1 && allowWScroll) {
+        } else if (button == 1 && allowWScroll) {
             dragStartX = point->x;
-            return UIControl::ButtonDown(a, b);
+            return UIControl::ButtonDown(button, position);
         }
     }
-    return UIControl::ButtonDown(a, b);
+    return UIControl::ButtonDown(button, position);
 }
