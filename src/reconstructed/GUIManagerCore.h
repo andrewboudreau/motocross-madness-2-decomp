@@ -92,8 +92,8 @@ public:
                       const char* font, short fontSize, const char* cursor,
                       int callback);
     // 0x00485a70: shows `dialog`.
-    UIDialog* ShowDialog(UIDialog* dialog, int a, int flags, int b,
-                                            UIDialog* parent, int c, int d, int wait);
+    UIDialog* ShowDialog(UIDialog* dialog, int menu, int flags, int area,
+                                            UIDialog* parent, int c, int name, int wait);
     void AttachDialog(UIDialog* dialog, int a, int wait); // 0x00485bd0: adds a shown dialog to its container
     int OpenDialogResource(const char* resource); // 0x00485c80: opens a dialog resource
     void CloseDialogResource();             // 0x00485d50: closes it

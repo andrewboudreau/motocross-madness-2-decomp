@@ -52,7 +52,7 @@ public:
 
     // The dialog's own slots (gameui.cpp).
     // 0x0046a300: creates the controls from the resource; this, or 0 when it fails.
-    virtual UIDialog* UnknownVirtualSlot27(void* target, CameraRect* area, int a, int flags,
+    virtual UIDialog* UnknownVirtualSlot27(void* target, CameraRect* area, int menu, int flags,
                                            SoundGroup* sound, void* textures, const char* directory,
                                            UIDialog* parent, BackgroundImage* background,
                                            const char* font, int fontSize, GUIManager* gui,
@@ -128,7 +128,7 @@ public:
     UnknownTextureStream* resourceArchive;    // +0xb8: its archive (slot 27)
     int isShown;                              // +0xbc
     int field_0xc0;
-    int openingMenu;                          // +0xc4: the menu id it was shown for (GUIManager::ShowDialog's `a`)
+    int openingMenu;                          // +0xc4: the menu id it was shown for (GUIManager::ShowDialog's `menu`)
     int animatesControls;                     // +0xc8: animates its controls
     void (*eventProc)(UnknownDialogEvent* event); // +0xcc: the procedure HandleEvent calls
     void (*syncProc)(UIDialog* dialog, int value); // +0xd0: called by SyncValues

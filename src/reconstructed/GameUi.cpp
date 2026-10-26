@@ -4057,7 +4057,7 @@ void UIDropDownList::SetOpen(int open) {
 // Drawing and input slots
 
 // 0x0046a300
-UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, int flags,
+UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int menu, int flags,
                                                                SoundGroup* sound, void* textures,
                                                                const char* directory, UIDialog* parent,
                                                                BackgroundImage* background, const char* font,
@@ -4082,7 +4082,7 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
         previousModalDialog = gui->SwapModalDialog((int)this);
     if (parent)
         dialogPalette = parent->dialogPalette;
-    openingMenu = a;
+    openingMenu = menu;
     dialogBackground = background;
     soundGroup = sound;
     dialogTextures = textures;
