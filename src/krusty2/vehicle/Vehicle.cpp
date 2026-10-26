@@ -837,25 +837,28 @@ void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* arg)
 }
 
 // ---- slot 4 / slot 46 ----
-// Slot 4: builds two lever-arm offsets (a1 + a2 x a3, a7 + a8 x a9), each scaled by a14, and hands
-// them with the frame data to helper 0x5004a0. Afterwards it caches |*a1| in field_0xbc and
-// field_0xcc = the frame transform of field_0xd8 (tier 3).  The offsets are Math3D operator
+// Slot 4: builds each body's velocity at its contact arm (velA + worldAngVelA x armA, likewise
+// for B), each scaled by `scale`, and hands them with the frame data to ContactSolveImpulse
+// 0x5004a0.  Afterwards it caches |*velA| in linearSpeed and worldAngularVelocity = the frame
+// transform of angularVelocity (tier 3).  The offsets are Math3D operator
 // expressions (retail stores each sum and product through its own temporary).  Left: two
 // products of each cross load a before b, and VC6 evaluates the inertia ?: argument ahead of
 // the pushes where retail branches between them (spellings of the ?: measured identical).
-void Vehicle::UnknownVirtualSlot4(const Vec3* a0, Vec3* a1, const Vec3* a2,
-                                  const Vec3* a3, int a4, float a5, int a6, const Vec3* a7,
-                                  const Vec3* a8, const Vec3* a9, Vec3* a10, Vec3* a11,
-                                  int a12, float* a13, float a14)
+void Vehicle::UnknownVirtualSlot4(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
+                                  const Vec3* armA, int eventKind, float invMassB, int nodeB,
+                                  const Vec3* velB, const Vec3* worldAngVelB, const Vec3* armB,
+                                  Vec3* invInertiaB, Vec3* angVelB, int velBOrNull,
+                                  float* impulseOut, float scale)
 {
-    scratchVector = CrossProduct(*a2, *a3);
-    Vec3 p = (*a1 + scratchVector) * a14;
-    scratchVector = CrossProduct(*a8, *a9);
-    Vec3 q = (scratchVector + *a7) * a14;
-    ContactSolveImpulse(restitution, a0, invMass, modelNode, &p, a3,
-                        crashState ? &shapeInvInertia : &invInertia, &angularVelocity, a1, a5,
-                        (SoultreeObject*)a6, &q, a9, a10, a11, (Vec3*)a12, a13);
-    float len2 = a1->z * a1->z + (a1->x * a1->x + a1->y * a1->y);
+    scratchVector = CrossProduct(*worldAngVelA, *armA);
+    Vec3 pointVelA = (*velA + scratchVector) * scale;
+    scratchVector = CrossProduct(*worldAngVelB, *armB);
+    Vec3 pointVelB = (scratchVector + *velB) * scale;
+    ContactSolveImpulse(restitution, normal, invMass, modelNode, &pointVelA, armA,
+                        crashState ? &shapeInvInertia : &invInertia, &angularVelocity, velA, invMassB,
+                        (SoultreeObject*)nodeB, &pointVelB, armB, invInertiaB, angVelB,
+                        (Vec3*)velBOrNull, impulseOut);
+    float len2 = velA->z * velA->z + (velA->x * velA->x + velA->y * velA->y);
     linearSpeed = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
     worldAngularVelocity = modelNode->LocalToWorldDirection(angularVelocity);
 }
@@ -1152,9 +1155,10 @@ void Vehicle::UnknownVirtualSlot49(float frame)
 
 // ---- slot 38: collision response dispatch (tier 3 names) ----
 // Called with an event code and the other party of a collision. Builds the relative contact
-// geometry (contact point minus our position, other body's velocity/normal) and hands it to the
-// impulse solver in slot 4 (other body present) or slot 3 (static/no body). Afterwards kills
-// residual creep velocity and, if requested, runs the post-collision update.
+// geometry (contact point minus each centre of mass, the other body's velocity, angular state
+// and inverse inertia) and hands it to the impulse solver in slot 4 (other body present) or
+// slot 3 (static/no body). Afterwards kills residual creep velocity and, if `notify` is set,
+// runs CheckCrash.
 static inline Vec3 VehOnes()
 {
     Vec3 r;
@@ -1173,26 +1177,26 @@ struct VehicleCollisionEvent {     // 'c' argument (provisional)
     Vehicle* otherBody;           // +0x60 other body
 };
 
-void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
+void Vehicle::UnknownVirtualSlot38(int notify, int eventKind, void* event)
 {
-    float l10;                     // the other body's field_0x24 (float) or 0
-    int l14;
-    Vec3 s;                     // scale/mask vector (1,1,1)
-    Vec3 v30;
-    Vec3 v3c;
-    Vec3 v48;
-    int ctx;
+    float otherInvMass;         // the other body's invMass or 0; then slot 3/4's impulse result
+    int otherVelOrNull;         // the other body's velocity, or 0 for static parties
+    Vec3 angScale;              // per-axis angular response scale (1,1,1)
+    Vec3 otherInvInertia;       // the other body's inverse inertia diagonal
+    Vec3 otherArm;              // contact point relative to the other body's centre of mass
+    Vec3 otherWorldAngVel;      // the other body's world angular velocity
+    int otherNode;              // the other body's scene node, passed as an int
     int hasBody;
     Vec3* otherVel = 0;
     Vehicle* other = 0;
     Vec3* otherAngVel;          // the other body's angularVelocity, or 0
-    Vec3 rel;
+    Vec3 arm;                   // contact point relative to our centre of mass
 
-    s = VehOnes();
-    switch (b) {
+    angScale = VehOnes();
+    switch (eventKind) {
     case 0x66:
     case 0x6a:
-        s = VehOnes();
+        angScale = VehOnes();
         hasBody = 0;
         if (field_0x124 && (field_0x124->isEnabled)) {
             reinterpret_cast<SparkParticleEmitter*>(sparkEmitter)->SetPosition(
@@ -1202,40 +1206,40 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         }
         break;
     case 0x3e9:
-        s = VehOnes();
+        angScale = VehOnes();
         hasBody = 0;
         break;
     case 0:
     case 1:
         hasBody = 1;
-        other = ((VehicleCollisionEvent*)c)->otherBody;
-        l10 = other->invMass;
+        other = ((VehicleCollisionEvent*)event)->otherBody;
+        otherInvMass = other->invMass;
         otherVel = &other->velocity;
-        ctx = (int)other->modelNode;
-        v3c = VehOffset(((VehicleContactSet*)collisionObject)->contactPoint, other->centerOfMass);
-        v48 = other->worldAngularVelocity;
+        otherNode = (int)other->modelNode;
+        otherArm = VehOffset(((VehicleContactSet*)collisionObject)->contactPoint, other->centerOfMass);
+        otherWorldAngVel = other->worldAngularVelocity;
         otherAngVel = &other->angularVelocity;
-        v30 = other->invInertia;
+        otherInvInertia = other->invInertia;
         break;
     case 0x69: {
-        l10 = 0;
-        char* body = (char*)((VehicleCollisionEvent*)c)->otherBody;
-        ctx = *(int*)(body + 0x34);
-        v3c = kVec3Zero; v48 = kVec3Zero; v30 = kVec3Zero;
+        otherInvMass = 0;
+        char* body = (char*)((VehicleCollisionEvent*)event)->otherBody;
+        otherNode = *(int*)(body + 0x34);
+        otherArm = kVec3Zero; otherWorldAngVel = kVec3Zero; otherInvInertia = kVec3Zero;
         otherVel = (Vec3*)(body + 0x40);
         otherAngVel = 0;
-        s = VehOnes();
+        angScale = VehOnes();
         hasBody = 1;
         break;
     }
     case 0x2711: {
-        l10 = 0;
-        char* body = (char*)((VehicleCollisionEvent*)c)->otherBody;
-        ctx = *(int*)(body + 0x1a0);
-        v3c = kVec3Zero; v48 = kVec3Zero; v30 = kVec3Zero;
+        otherInvMass = 0;
+        char* body = (char*)((VehicleCollisionEvent*)event)->otherBody;
+        otherNode = *(int*)(body + 0x1a0);
+        otherArm = kVec3Zero; otherWorldAngVel = kVec3Zero; otherInvInertia = kVec3Zero;
         otherVel = (Vec3*)(body + 0x224);
         otherAngVel = 0;
-        s = VehOnes();
+        angScale = VehOnes();
         hasBody = 1;
         break;
     }
@@ -1243,11 +1247,13 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         return;
     }
 
-    rel = VehOffset(((VehicleContactSet*)collisionObject)->contactPoint, centerOfMass);
+    arm = VehOffset(((VehicleContactSet*)collisionObject)->contactPoint, centerOfMass);
     if (hasBody) {
-        l14 = (b == 0x2711 || b == 0x69) ? 0 : (int)otherVel;
-        UnknownVirtualSlot4(&((VehicleContactSet*)collisionObject)->contactNormal, &velocity, &worldAngularVelocity, &rel, b, l10, ctx,
-                            otherVel, &v48, &v3c, &v30, otherAngVel, l14, &l10, 1.0f);
+        otherVelOrNull = (eventKind == 0x2711 || eventKind == 0x69) ? 0 : (int)otherVel;
+        UnknownVirtualSlot4(&((VehicleContactSet*)collisionObject)->contactNormal, &velocity,
+                            &worldAngularVelocity, &arm, eventKind, otherInvMass, otherNode,
+                            otherVel, &otherWorldAngVel, &otherArm, &otherInvInertia, otherAngVel,
+                            otherVelOrNull, &otherInvMass, 1.0f);
         if (other) {
             *((char*)other + 0x10a) = 0;
             float len2 = VehLen2(*otherVel);
@@ -1256,19 +1262,20 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         }
     } else {
         Vec3 t = worldAngularVelocity;
-        t.x *= s.x;
-        t.y *= s.y;
-        t.z *= s.z;
-        scratchVector = CrossProduct(t, rel);
+        t.x *= angScale.x;
+        t.y *= angScale.y;
+        t.z *= angScale.z;
+        scratchVector = CrossProduct(t, arm);
         Vec3 q = velocity + scratchVector;
-        UnknownVirtualSlot3(&((VehicleContactSet*)collisionObject)->contactNormal, &q, &rel, &s, b, 0, &l10);
+        UnknownVirtualSlot3(&((VehicleContactSet*)collisionObject)->contactNormal, &q, &arm,
+                            &angScale, eventKind, 0, &otherInvMass);
     }
     if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
         velocity = kVec3Zero;
         angularVelocity.y = 0.0f;
         linearSpeed = 0;
     }
-    if (a)
+    if (notify)
         CheckCrash();
 }
 
@@ -1566,20 +1573,20 @@ static inline float VehLengthAcc(const Vec3& v)
     return (float)sqrt(s);
 }
 
-// Same solver call as SoultreePhysicsBaseObject slot 3, but while the vehicle is in state
-// 0x444 it uses a fixed 0.1 time scale, the vector at +0xf0 and no a6 (tier 3 reading).
-// The world-space copy of the local velocity (+0xcc) is skipped for the event code 0x67.
-void Vehicle::UnknownVirtualSlot3(const Vec3* a, const Vec3* b, const Vec3* c, const Vec3* d,
-                                  int e, int f, float* g)
+// Same solver call as SoultreePhysicsBaseObject slot 3, but while crashState is set it uses a
+// fixed 0.1 restitution, shapeInvInertia (+0xf0) and a zero scale (tier 3 reading).  The
+// world-space copy of the angular velocity (+0xcc) is skipped for the event code 0x67.
+void Vehicle::UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel, const Vec3* arm,
+                                  const Vec3* angScale, int eventKind, int scaleBits, float* impulseOut)
 {
     if (crashState)
-        ResolveContactImpulse(0.1f, invMass, modelNode, a, b, c, &shapeInvInertia, d, &angularVelocity,
-                  &velocity, g, 0);
+        ResolveContactImpulse(0.1f, invMass, modelNode, normal, relVel, arm, &shapeInvInertia, angScale,
+                              &angularVelocity, &velocity, impulseOut, 0);
     else
-        ResolveContactImpulse(restitution, invMass, modelNode, a, b, c, &invInertia, d, &angularVelocity,
-                  &velocity, g, f);
+        ResolveContactImpulse(restitution, invMass, modelNode, normal, relVel, arm, &invInertia, angScale,
+                              &angularVelocity, &velocity, impulseOut, scaleBits);
     linearSpeed = VehLengthAcc(velocity);
-    if (e != 0x67)
+    if (eventKind != 0x67)
         worldAngularVelocity = modelNode->LocalToWorldDirection(angularVelocity);
 }
 

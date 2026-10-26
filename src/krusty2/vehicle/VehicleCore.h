@@ -27,12 +27,14 @@ public:
     // ---- overrides of inherited slots (order as in the vtable) ----
     virtual void UnknownVirtualSlot0(float dt);
     virtual void UnknownVirtualSlot1(float value);                               // 0x00525550
-    virtual void UnknownVirtualSlot3(const Vec3* a, const Vec3* b, const Vec3* c,
-                                     const Vec3* d, int e, int f, float* g); // 0x005264c0
-    virtual void UnknownVirtualSlot4(const Vec3* a0, Vec3* a1, const Vec3* a2,
-                                     const Vec3* a3, int a4, float a5, int a6,
-                                     const Vec3* a7, const Vec3* a8, const Vec3* a9,
-                                     Vec3* a10, Vec3* a11, int a12, float* a13, float a14);
+    virtual void UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel, const Vec3* arm,
+                                     const Vec3* angScale, int eventKind, int scaleBits,
+                                     float* impulseOut);                   // 0x005264c0
+    virtual void UnknownVirtualSlot4(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
+                                     const Vec3* armA, int eventKind, float invMassB, int nodeB,
+                                     const Vec3* velB, const Vec3* worldAngVelB,
+                                     const Vec3* armB, Vec3* invInertiaB, Vec3* angVelB,
+                                     int velBOrNull, float* impulseOut, float scale);
     virtual void UnknownVirtualSlot7(const Vec3* arg);
     // Slots 18..20 take the canonical 40-byte record; the bodies view it as
     // VehicleImpactEvent (same offsets: +0x04/+0x08/+0x0c sinks, +0x24 flag).
@@ -49,7 +51,7 @@ public:
     virtual void UnknownVirtualSlot34();
     virtual void UnknownVirtualSlot35(int a, int b);
     virtual void UnknownVirtualSlot36();
-    virtual void UnknownVirtualSlot38(int a, int b, void* c);
+    virtual void UnknownVirtualSlot38(int notify, int eventKind, void* event);
     virtual int  UnknownVirtualSlot39(float dt);
     virtual int  UnknownVirtualSlot42();
 

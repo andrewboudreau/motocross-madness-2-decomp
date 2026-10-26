@@ -94,25 +94,27 @@ void KrustyBike::UnknownVirtualSlot1(float a)
     contactTime = 0;
 }
 
-void KrustyBike::UnknownVirtualSlot3(const Vec3* a0, const Vec3* a1, const Vec3* a2,
-                                     const Vec3* a3, int a4, int a5, float* a6)
+void KrustyBike::UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel, const Vec3* arm,
+                                     const Vec3* angScale, int eventKind, int scaleBits, float* impulseOut)
 {
-    if (a4 == 1000) {
-        race->handler->Fn_004DE580(this, 0, a4);
+    if (eventKind == 1000) {
+        race->handler->Fn_004DE580(this, 0, eventKind);
         return;
     }
-    Bike::UnknownVirtualSlot3(a0, a1, a2, a3, a4, a5, a6);
-    if (a4 != 0x67)
-        race->handler->Fn_004DE580(this, *a6, a4);
+    Bike::UnknownVirtualSlot3(normal, relVel, arm, angScale, eventKind, scaleBits, impulseOut);
+    if (eventKind != 0x67)
+        race->handler->Fn_004DE580(this, *impulseOut, eventKind);
 }
 
-void KrustyBike::UnknownVirtualSlot4(const Vec3* a0, Vec3* a1, const Vec3* a2,
-                                     const Vec3* a3, int a4, float a5, int a6,
-                                     const Vec3* a7, const Vec3* a8, const Vec3* a9,
-                                     Vec3* a10, Vec3* a11, int a12, float* a13, float a14)
+void KrustyBike::UnknownVirtualSlot4(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
+                                     const Vec3* armA, int eventKind, float invMassB, int nodeB,
+                                     const Vec3* velB, const Vec3* worldAngVelB, const Vec3* armB,
+                                     Vec3* invInertiaB, Vec3* angVelB, int velBOrNull,
+                                     float* impulseOut, float scale)
 {
-    Bike::UnknownVirtualSlot4(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14);
-    race->handler->Fn_004DE580(this, *a13, a4);
+    Bike::UnknownVirtualSlot4(normal, velA, worldAngVelA, armA, eventKind, invMassB, nodeB, velB,
+                              worldAngVelB, armB, invInertiaB, angVelB, velBOrNull, impulseOut, scale);
+    race->handler->Fn_004DE580(this, *impulseOut, eventKind);
 }
 
 void KrustyBike::UnknownVirtualSlot8()

@@ -76,23 +76,27 @@ public:
                                             int a9, int a10, SoultreeSlot1f0* a11, float a12,
                                             int a13, float a14, float a15, float a16, int a17,
                                             int a18, unsigned char a19, int a20);
-    // Slot 3 (ret 0x1c).  Pointer types are tier 2: Vehicle callers (slots 38, 49) pass
-    // Vec3 addresses for a1..a4; a5 is the event code KrustyBike 0x0048dbf0 compares with
-    // 1000 and 0x67.  a7 is the address of the same local whose value Vehicle slot 38
-    // passes as slot 4's a5 (the other body's invMass float), hence float* (tier 2).
-    virtual void UnknownVirtualSlot3(const Vec3* a1, const Vec3* a2,
-                                     const Vec3* a3, const Vec3* a4,
-                                     int a5, int a6, float* a7);
-    // Slot 4 (ret 0x3c).  a2..a4/a8..a10 are dereferenced as Vec3 by this body (tier 1);
-    // a1, a11, a12 receive Vec3 addresses at the Vehicle slot 38 call site (tier 2).  That
-    // call (0x00526c59..0x00526cb1) pushes the event kind (its own a2) as a5 and the local
-    // holding the other body's invMass (a float, 1/bodyMass) as a6, with that local's
-    // address as a14 (tier 1 push order); KrustyBike 0x0048dc60 reads *a14 (tier 2).
-    virtual void UnknownVirtualSlot4(const Vec3* a1, Vec3* a2, const Vec3* a3,
-                                     const Vec3* a4, int a5, float a6, int a7,
-                                     const Vec3* a8, const Vec3* a9,
-                                     const Vec3* a10, Vec3* a11, Vec3* a12,
-                                     int a13, float* a14, float a15);
+    // Slot 3 (ret 0x1c), static-contact impulse.  Pointer types are tier 2: Vehicle callers
+    // (slots 38, 49) pass Vec3 addresses for normal..angScale; eventKind is the event code
+    // KrustyBike 0x0048dbf0 compares with 1000 and 0x67.  impulseOut is the address of the
+    // same local whose value Vehicle slot 38 passes as slot 4's invMassB (the other body's
+    // invMass float), hence float* (tier 2).  Parameter names follow ResolveContactImpulse
+    // (tier 3).
+    virtual void UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel,
+                                     const Vec3* arm, const Vec3* angScale,
+                                     int eventKind, int scaleBits, float* impulseOut);
+    // Slot 4 (ret 0x3c), body-body contact impulse.  velA..armA and velB..armB are
+    // dereferenced as Vec3 by this body (tier 1); normal, invInertiaB and angVelB receive
+    // Vec3 addresses at the Vehicle slot 38 call site (tier 2).  That call
+    // (0x00526c59..0x00526cb1) pushes its own event kind as eventKind and the local holding
+    // the other body's invMass (a float, 1/bodyMass) as invMassB, with that local's address
+    // as impulseOut (tier 1 push order); KrustyBike 0x0048dc60 reads *impulseOut (tier 2).
+    // Parameter names follow ContactSolveImpulse's A/B (tier 3).
+    virtual void UnknownVirtualSlot4(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
+                                     const Vec3* armA, int eventKind, float invMassB, int nodeB,
+                                     const Vec3* velB, const Vec3* worldAngVelB,
+                                     const Vec3* armB, Vec3* invInertiaB, Vec3* angVelB,
+                                     int velBOrNull, float* impulseOut, float scale);
     virtual int UnknownVirtualSlot5(int value);
     virtual void UnknownVirtualSlot6(Vec3* a, float* b);
     virtual void UnknownVirtualSlot7(const Vec3* a);  // only read (0x005019e0, tier 2)
@@ -138,9 +142,9 @@ public:
     virtual void UnknownVirtualSlot35(int a, int b);
     virtual void UnknownVirtualSlot36();
     virtual SoultreeAttachment* UnknownVirtualSlot37(int type, void* a2, SoultreeAttachTarget* a3, const Vec3* v);
-    // Slot 38 (ret 0xc): 0x00501600 switches on a2 (0x66/0x68/0x69/0x6a/0x2711) and reads
-    // a3->+0x60 as the other body (tier 1); a3's type is provisional.
-    virtual void UnknownVirtualSlot38(int a1, int a2, void* a3);
+    // Slot 38 (ret 0xc): 0x00501600 switches on eventKind (0x66/0x68/0x69/0x6a/0x2711) and reads
+    // event->+0x60 as the other body (tier 1); event's type is provisional.
+    virtual void UnknownVirtualSlot38(int notify, int eventKind, void* event);
     // Slot 39 (ret 4): argument unused here; Vehicle slot 49 0x0052a940 passes it the same
     // dword it passes to slot 9 (float dt), so float (tier 2).
     virtual int UnknownVirtualSlot39(float dt);

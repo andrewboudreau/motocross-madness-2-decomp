@@ -32,12 +32,14 @@ public:
     virtual int Tick(float dt);                      // 0x004977a0 (vbase vtable slot 10)
 
     virtual void UnknownVirtualSlot1(float a);
-    virtual void UnknownVirtualSlot3(const Vec3* a0, const Vec3* a1, const Vec3* a2,
-                                     const Vec3* a3, int a4, int a5, float* a6);
-    virtual void UnknownVirtualSlot4(const Vec3* a0, Vec3* a1, const Vec3* a2,
-                                     const Vec3* a3, int a4, float a5, int a6,
-                                     const Vec3* a7, const Vec3* a8, const Vec3* a9,
-                                     Vec3* a10, Vec3* a11, int a12, float* a13, float a14);
+    virtual void UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel, const Vec3* arm,
+                                     const Vec3* angScale, int eventKind, int scaleBits,
+                                     float* impulseOut);
+    virtual void UnknownVirtualSlot4(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
+                                     const Vec3* armA, int eventKind, float invMassB, int nodeB,
+                                     const Vec3* velB, const Vec3* worldAngVelB,
+                                     const Vec3* armB, Vec3* invInertiaB, Vec3* angVelB,
+                                     int velBOrNull, float* impulseOut, float scale);
     virtual void UnknownVirtualSlot8();
     virtual int UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* a5);
     virtual int UnknownVirtualSlot12(int a);

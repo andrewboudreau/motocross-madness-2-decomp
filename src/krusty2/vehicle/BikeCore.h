@@ -30,7 +30,7 @@ public:
     virtual float UnknownVirtualSlot32();
     virtual int UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,
                                      const Vec3* d, int e, float f);
-    virtual void UnknownVirtualSlot38(int a, int b, void* c);
+    virtual void UnknownVirtualSlot38(int notify, int eventKind, void* event);
     virtual int UnknownVirtualSlot39(float dt);
     virtual void UnknownVirtualSlot41();
     virtual int UnknownVirtualSlot42();
