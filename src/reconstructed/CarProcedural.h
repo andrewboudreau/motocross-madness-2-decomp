@@ -47,7 +47,7 @@ public:
     void SetPositionInFrame(CarProceduralNode* frame, Vector3* position);   // 0x004fc740 (ret 8)
     Vector3 WorldToLocalDirection(const Vector3& direction);                  // 0x004fd710 (ret 8) world -> local
     Vector3 LocalToWorldDirection(const Vector3& direction);                  // 0x004fd5c0 (ret 8) local -> world
-    void SetAxesPtr(const Vector3* axisA, const Vector3* axisB, int frame, int flag); // 0x004fbd70 (ret 0x10)
+    void SetAxesPtr(const Vector3* axisZ, const Vector3* axisY, int orthogonalize, int keepZ); // 0x004fbd70
 
     int field_0x04;
     int field_0x08;

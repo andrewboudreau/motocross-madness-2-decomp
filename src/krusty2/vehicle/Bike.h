@@ -177,7 +177,7 @@ struct BikeA1A0 {
     SoultreeObject* d_0x140;           // SoultreeObject::firstChild
     int FindByName(const char* name);     // 0x004fdae0, SoultreeObject::FindByName (soultree.cpp)
     void GetSubtreeBounds(Vec3* center, Vec3* extents);   // 0x004fe850 (SoultreeObject::GetSubtreeBounds)
-    void SetMatrixIn(int a, Matrix4* b);
+    void SetMatrixIn(int frame, Matrix4* m);
 };
 
 struct BikeA128 {

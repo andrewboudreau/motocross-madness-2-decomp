@@ -19,7 +19,7 @@ struct UnknownSound3DParameters;
 // D3DIMSoultreeObject methods of D3DIMSoulTree.h). A view: the scene reaches
 // it through character +0x1a0, object +0x34 and each shadow caster.
 struct UnknownSceneLodObject {
-    void SetAxesPtr(const Vector3* look, const Vector3* up, int a, int b); // 0x004fbd70
+    void SetAxesPtr(const Vector3* look, const Vector3* up, int orthogonalize, int keepZ); // 0x004fbd70
     void SetPosition(const Vector3* position); // 0x004fc660
 };
 

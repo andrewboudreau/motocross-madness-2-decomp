@@ -20,7 +20,7 @@ public:
     // name (slots 18/19 program ALPHAREF/ALPHATESTENABLE/ALPHAFUNC).
     virtual int BeginScene() = 0;
     virtual int EndScene() = 0;
-    virtual int Blit(void* a, void* b, void* c, int d) = 0;
+    virtual int Blit(void* destination, void* source, void* sourceRect, int flags) = 0;
     virtual void* LockSurface(void* rect, long* pitch, int flags) = 0; // locks the surface
     virtual int UnlockSurface(void* rect) = 0;
     virtual long GetTextureStageState(int stage, int type, int* value) = 0;
@@ -30,11 +30,13 @@ public:
     virtual void SetTextureBlend(int mode, int flag) = 0;
     virtual long ClearTexture(int stage) = 0;
     virtual int Clear(const CameraRect* rect, int flags) = 0;
-    virtual int SupportsTextureFormat(int a) = 0;
+    virtual int SupportsTextureFormat(int format) = 0;
     virtual int SetViewport(void* viewport) = 0;
-    virtual int DrawIndexedPrimitive(int a, int b, int c, int d, int e, int f, int g) = 0;
-    virtual int DrawPrimitive(int a, int b, int c, int d, int e) = 0;
-    virtual int DrawIndexedPrimitiveVB(int a, int b, int c, int d, int e, int f, int g) = 0;
+    virtual int DrawIndexedPrimitive(int type, int vertexFormat, int vertices, int vertexCount,
+                                     int indices, int indexCount, int flags) = 0;
+    virtual int DrawPrimitive(int type, int vertexFormat, int vertices, int count, int flags) = 0;
+    virtual int DrawIndexedPrimitiveVB(int type, int vertexBuffer, int start, int vertexCount,
+                                       int indices, int indexCount, int flags) = 0;
     virtual void SetAlphaTest(int value); // 0x004806f0 (shared empty body)
     virtual void DisableAlphaTest();      // 0x0044d710 (shared empty body)
 

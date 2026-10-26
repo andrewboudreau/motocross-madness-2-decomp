@@ -132,7 +132,7 @@ struct UnknownBikeRaceMesh {
     // setup places the flag girl and the scene's start objects.
     void SetUseLighting(int value);    // 0x004444c0
     void SetPositionVec3(Vector3 position); // 0x004fc630: sets the translation
-    void SetAxesPtr(const Vector3* look, const Vector3* up, int a, int b); // 0x004fbd70
+    void SetAxesPtr(const Vector3* look, const Vector3* up, int orthogonalize, int keepZ); // 0x004fbd70
 
     unsigned char field_0x000[0x274];
     int groupCount;                           // +0x274 group count

@@ -405,7 +405,7 @@ struct VehV3 : Vec3
 // Scene-node method 0x004444e0 (purpose unknown) is not in SoultreeObject yet; view the
 // node through a local stand-in that declares it.
 struct VehSceneNodeView {
-    void SetAxesPtr(const Vec3* axisZ, const Vec3* axisY, int a, int b);   // 0x004fbd70, purpose unknown
+    void SetAxesPtr(const Vec3* axisZ, const Vec3* axisY, int orthogonalize, int keepZ); // 0x004fbd70
 };
 
 #endif

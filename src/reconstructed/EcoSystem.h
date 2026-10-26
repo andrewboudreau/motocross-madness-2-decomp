@@ -168,7 +168,7 @@ public:
     virtual void UnknownVirtualSlot0();
     virtual int BeginScene();
     virtual int EndScene();
-    virtual int Blit(void* a, void* b, void* c, int d);
+    virtual int Blit(void* destination, void* source, void* sourceRect, int flags);
     virtual void* LockSurface(void* rect, long* pitch, int flags);
     virtual int UnlockSurface(void* rect);
     virtual long GetTextureStageState(int stage, int type, int* value);
@@ -178,12 +178,13 @@ public:
     virtual void SetTextureBlend(int mode, int flag);
     virtual long ClearTexture(int stage);
     virtual int Clear(const void* rect, int flags);
-    virtual int SupportsTextureFormat(int a);
+    virtual int SupportsTextureFormat(int format);
     virtual int SetViewport(void* viewport);
     virtual int DrawIndexedPrimitive(int primitive, int format, void* vertices, int vertexCount,
                                      void* indices, int indexCount, int flags);
-    virtual int DrawPrimitive(int a, int b, int c, int d, int e);
-    virtual int DrawIndexedPrimitiveVB(int a, int b, int c, int d, int e, int f, int g);
+    virtual int DrawPrimitive(int type, int vertexFormat, int vertices, int count, int flags);
+    virtual int DrawIndexedPrimitiveVB(int type, int vertexBuffer, int start, int vertexCount,
+                                       int indices, int indexCount, int flags);
     virtual void SetAlphaReference(int value);
     virtual void DisableAlphaTest();
 

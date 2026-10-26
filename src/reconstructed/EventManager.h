@@ -63,7 +63,7 @@ struct UnknownPodiumTextureEntry {
 struct UnknownPodiumSoultree {
     void SetUseLighting(int value);                      // 0x004444c0
     void SetPosition(const Vector3* position);        // 0x004fc660
-    void SetAxesPtr(const Vector3* look, const Vector3* up, int a, int b); // 0x004fbd70
+    void SetAxesPtr(const Vector3* look, const Vector3* up, int orthogonalize, int keepZ); // 0x004fbd70
     void ReplaceMaterialTexture(int index, const char* name, void* context); // 0x00444c70
 
     unsigned char field_0x000[0x290];
