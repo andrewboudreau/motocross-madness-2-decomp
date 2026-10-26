@@ -169,10 +169,10 @@ int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
                     strcat(buffer, extension);
                     textMode = (char)0xfa;
                     int length = strlen(buffer);
-                    char* p = buffer;
+                    char* cursor = buffer;
                     for (int i = 0; i < length; i++) {
-                        char c = *p++;
-                        textMode = ((textMode + 3) ^ c) + textMode;
+                        char ch = *cursor++;
+                        textMode = ((textMode + 3) ^ ch) + textMode;
                     }
                     nameKey = textMode;
                 }
@@ -266,13 +266,13 @@ int UnknownTextureStream::ReadByte()
         bufferPos = readBuffer;
         bufferEnd = bufferPos + count;
     }
-    char* p = bufferPos;
-    if (p < bufferEnd) {
+    char* cursor = bufferPos;
+    if (cursor < bufferEnd) {
         if (fileEncoded) {
-            char c = *p;
-            char decoded = textMode ^ c;
-            textMode += c;
-            *p = decoded;
+            char encoded = *cursor;
+            char decoded = textMode ^ encoded;
+            textMode += encoded;
+            *cursor = decoded;
             return (unsigned char)*bufferPos++;
         }
         return (unsigned char)*bufferPos++;
@@ -311,32 +311,32 @@ int UnknownTextureStream::ReadLine(char* buffer, int size)
         }
         return innerStream->ReadLine(buffer, size);
     }
-    char* p = buffer;
-    *p = (char)ReadByte();
-    if (*p == (char)-1) {
+    char* out = buffer;
+    *out = (char)ReadByte();
+    if (*out == (char)-1) {
         return 0;
     }
     int count = 1;
     while (count < size - 1) {
-        if (*p == '\n') {
-            if (p[-1] == '\n' && count > 1) {
-                *p = 0;
+        if (*out == '\n') {
+            if (out[-1] == '\n' && count > 1) {
+                *out = 0;
                 return (int)buffer;
             }
             break;
         }
-        if (*p == '\r') {
-            *p = '\n';
+        if (*out == '\r') {
+            *out = '\n';
         }
-        p++;
-        *p = (char)ReadByte();
-        if (*p == (char)-1) {
-            *p = 0;
+        out++;
+        *out = (char)ReadByte();
+        if (*out == (char)-1) {
+            *out = 0;
             break;
         }
         count++;
     }
-    p[1] = 0;
+    out[1] = 0;
     return (int)buffer;
 }
 #pragma inline_depth()

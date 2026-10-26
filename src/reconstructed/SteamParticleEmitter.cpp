@@ -23,13 +23,13 @@ SteamParticleEmitter::SteamParticleEmitter(int flags) : GameObject(flags)
     pulseDuration = 0.25f;
     pulseTimeLeft = 0;
     particleFlags = 0x80a;
-    float* t = randomTable;
-    for (i = 0; i < 64; i++, t += 4) {
-        float r = (float)rand() * (1.0f / 32768.0f);
-        float v = (r + r) + 1.0f;
+    float* row = randomTable;
+    for (i = 0; i < 64; i++, row += 4) {
+        float unit = (float)rand() * (1.0f / 32768.0f);
+        float value = (unit + unit) + 1.0f;
         int k;
         for (k = 0; k < 4; k++)
-            t[k] = v;
+            row[k] = value;
     }
     randomTableIndex = 0;
     bursting = 0;
@@ -108,8 +108,8 @@ int SteamParticleEmitter::Tick(float dt)
         for (i = 0; (float)i < count; i++) {
             if (manager == 0)
                 break;
-            ParticleVec3 p = position - step * (float)i;
-            if (!manager->AddParticle(0.0f, &p, nextFrame, (float)i * grow + startSize, particleLifetime,
+            ParticleVec3 point = position - step * (float)i;
+            if (!manager->AddParticle(0.0f, &point, nextFrame, (float)i * grow + startSize, particleLifetime,
                                       randomTable[randomTableIndex], particleFlags, color))
                 break;
             randomTableIndex++;

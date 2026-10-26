@@ -1468,8 +1468,8 @@ void ChatOverlay::SetCueRacer(float squaredDistance, const char* name)
     cueSquaredDistance = squaredDistance;
     if (_stricmp(name, cueRacerName))
         nameChanged = 1;
-    int n = strlen(name);
-    int length = n > 0x103 ? 0x103 : n;
+    int sourceLength = strlen(name);
+    int length = sourceLength > 0x103 ? 0x103 : sourceLength;
     strncpy(cueRacerName, name, length);
     cueRacerName[length] = '\0';
 }
@@ -1481,8 +1481,8 @@ int ChatOverlay::HandleChatKey(int key, int* result)
     if (inputShown) {
         *result = 0;
         if (key == 0xd || key == 0xa) {
-            int n = strlen(chatInput->GetLine());
-            int length = n > 0x49 ? 0x49 : n;
+            int sourceLength = strlen(chatInput->GetLine());
+            int length = sourceLength > 0x49 ? 0x49 : sourceLength;
             strncpy(message.text, chatInput->GetLine(), length);
             message.text[length] = '\0';
             if (strlen(message.text)) {
@@ -1646,8 +1646,8 @@ int ChatOverlay::RedrawChat()
     DrawTextA(dc, text, strlen(text), &rect, 0x124);
     int i;
     for (i = 0; i <= chatInput->historyCount; i++) {
-        int n = strlen(chatInput->GetHistory(i, &value));
-        int length = n > 0x7f ? 0x7f : n;
+        int sourceLength = strlen(chatInput->GetHistory(i, &value));
+        int length = sourceLength > 0x7f ? 0x7f : sourceLength;
         strncpy(text, chatInput->GetHistory(i, &value), length);
         rect.top = (i + 1) * lineHeight + 7;
         rect.bottom = rect.top + lineHeight;
