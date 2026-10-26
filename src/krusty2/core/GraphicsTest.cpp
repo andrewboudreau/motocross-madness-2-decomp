@@ -68,22 +68,22 @@ void GraphicsTest::DrawSphere(const Vec3* center, float radius, int segments)
 {
     int i;
     Vec3 axis = Vec3(0.0f, 1.0f, 0.0f);
-    Vec3 p = *center;
-    p.y -= radius;
+    Vec3 ringCenter = *center;
+    ringCenter.y -= radius;
     for (i = 0; i < segments; i++) {
-        float h = radius - i * (radius / (segments * 0.5f));
-        float r = FastSqrt(radius * radius - h * h);
-        DrawCircle(&p, r, &axis, segments);
-        p.y += radius / (segments * 0.5f);
+        float height = radius - i * (radius / (segments * 0.5f));
+        float ringRadius = FastSqrt(radius * radius - height * height);
+        DrawCircle(&ringCenter, ringRadius, &axis, segments);
+        ringCenter.y += radius / (segments * 0.5f);
     }
     axis = Vec3(0.0f, 0.0f, 1.0f);
-    p = *center;
-    p.z -= radius;
+    ringCenter = *center;
+    ringCenter.z -= radius;
     for (i = 0; i < segments; i++) {
-        float h = radius - i * (radius / (segments * 0.5f));
-        float r = FastSqrt(radius * radius - h * h);
-        DrawCircle(&p, r, &axis, segments);
-        p.z += radius / (segments * 0.5f);
+        float height = radius - i * (radius / (segments * 0.5f));
+        float ringRadius = FastSqrt(radius * radius - height * height);
+        DrawCircle(&ringCenter, ringRadius, &axis, segments);
+        ringCenter.z += radius / (segments * 0.5f);
     }
 }
 

@@ -377,16 +377,16 @@ int D3DIMSoultreeObject::ReadLods()
             sprintf(section, "LOD %i - Surface %i - Faces", lod, s);
             parameterBlock->BeginRows(section);
             for (int f = 0; f < surface->faceCount; f++) {
-                int a;
-                int b;
-                int c;
+                int corner0;
+                int corner1;
+                int corner2;
                 parameterBlock->ReadRow(0);
-                parameterBlock->GetRowInt(0, &a);
-                parameterBlock->GetRowInt(1, &b);
-                parameterBlock->GetRowInt(2, &c);
-                surface->indices[f * 3] = a;
-                surface->indices[f * 3 + 1] = b;
-                surface->indices[f * 3 + 2] = c;
+                parameterBlock->GetRowInt(0, &corner0);
+                parameterBlock->GetRowInt(1, &corner1);
+                parameterBlock->GetRowInt(2, &corner2);
+                surface->indices[f * 3] = corner0;
+                surface->indices[f * 3 + 1] = corner1;
+                surface->indices[f * 3 + 2] = corner2;
             }
             sprintf(section, "LOD %i - Surface %i - Object Pointer List", lod, s);
             parameterBlock->BeginRows(section);

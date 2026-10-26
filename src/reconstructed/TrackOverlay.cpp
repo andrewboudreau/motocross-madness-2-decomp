@@ -1367,8 +1367,8 @@ static inline Vector3 RadarCross(const Vector3& a, const Vector3& b)
 // 0x0051cb20
 void RadarOverlay::DrawGates()
 {
-    int x;
-    int y;
+    int mapX;
+    int mapY;
     Vector3 left;
     Vector3 right;
     Vector3 rim;
@@ -1378,7 +1378,7 @@ void RadarOverlay::DrawGates()
             continue;
         if (i != RadarRace()->currentGate && i != RadarRace()->nextGate)
             continue;
-        if (WorldToMap(RadarRace()->gates[i].position, &x, &y, &rim.x, &rim.y) != 0)
+        if (WorldToMap(RadarRace()->gates[i].position, &mapX, &mapY, &rim.x, &rim.y) != 0)
             continue;
         left = RadarCross(RadarRace()->gates[i].direction, Vector3(0.0f, 1.0f, 0.0f));
         left.x *= width;
@@ -1395,12 +1395,12 @@ void RadarOverlay::DrawGates()
             lineStart.color = 0xffffff;
             lineEnd.color = 0xffffff;
         }
-        WorldToMap(left, &x, &y, &rim.x, &rim.y);
-        lineStart.sx = (float)x;
-        lineStart.sy = (float)y;
-        WorldToMap(right, &x, &y, &rim.x, &rim.y);
-        lineEnd.sx = (float)x;
-        lineEnd.sy = (float)y;
+        WorldToMap(left, &mapX, &mapY, &rim.x, &rim.y);
+        lineStart.sx = (float)mapX;
+        lineStart.sy = (float)mapY;
+        WorldToMap(right, &mapX, &mapY, &rim.x, &rim.y);
+        lineEnd.sx = (float)mapX;
+        lineEnd.sy = (float)mapY;
         Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
     }
 }

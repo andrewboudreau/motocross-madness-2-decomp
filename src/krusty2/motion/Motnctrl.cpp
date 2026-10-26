@@ -285,10 +285,10 @@ void Character::LoadMir()
     mirrorMap = (int*)operator new(nodeCount << 2, __FILE__, 0x2ab);
     while (file->ReadLine(line, 0xff)) {
         _strupr(line);
-        int a = FindNode(strtok(line, "=,"));
-        int b = FindNode(strtok(0, "=, \n"));
-        mirrorMap[a] = b;
-        mirrorMap[b] = a;
+        int node = FindNode(strtok(line, "=,"));
+        int mirror = FindNode(strtok(0, "=, \n"));
+        mirrorMap[node] = mirror;
+        mirrorMap[mirror] = node;
     }
     delete file;
 }
