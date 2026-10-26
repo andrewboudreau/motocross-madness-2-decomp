@@ -206,7 +206,7 @@ void Vehicle::UnknownVirtualSlot86()
                 float scale = driveForceScale;
                 reinterpret_cast<UnknownEngineGearbox*>(w->aux)->DriveForce(
                     sp, reinterpret_cast<const Vector3*>(&w->rollDirection), scale, backingUp, 100.0f,
-                    reinterpret_cast<Vector3*>(&w->driveForce), reinterpret_cast<float*>(&w->field_0x280));
+                    reinterpret_cast<Vector3*>(&w->driveForce), &w->driveMagnitude);
             }
             w->UpdateDriveShare(this);
         }
@@ -770,7 +770,7 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
             w->slidePosted = 1;
             ev->slideSink->SetPosition(w->groundPoint);
             VehCommitImpact(ev, &ev->slideSink);
-            scratchVector2.x = (turnAngle >= 0.0f ? -1.0f : 1.0f) * w->field_0x280.z;
+            scratchVector2.x = (turnAngle >= 0.0f ? -1.0f : 1.0f) * w->tangentSin;
             scratchVector2.y = 0.0f;
             scratchVector2.z = -w->tangentCos;
             scratchVector = modelNode->LocalToWorldDirection(scratchVector2);
@@ -789,7 +789,7 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
         if (w->inContact && !w->slidePosted &&
             (!track || ((VehicleMaterialSet*)track)->environment[0x408 + w->surfaceMaterial])) {
             w->slidePosted = 1;
-            if (w->field_0x280.z > 0.2f) {
+            if (w->tangentSin > 0.2f) {
                 VehCommitImpact(ev, &ev->slideSink);
             }
             return;
@@ -811,7 +811,7 @@ void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* arg)
             w->scrapePosted = 1;
             ev->scrapeSink->SetPosition(w->groundPoint);
             VehCommitImpact(ev, &ev->scrapeSink);
-            scratchVector2.x = (turnAngle >= 0.0f ? -1.0f : 1.0f) * w->field_0x280.z;
+            scratchVector2.x = (turnAngle >= 0.0f ? -1.0f : 1.0f) * w->tangentSin;
             scratchVector2.y = 0.0f;
             scratchVector2.z = -w->tangentCos;
             scratchVector = modelNode->LocalToWorldDirection(scratchVector2);
@@ -828,7 +828,7 @@ void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* arg)
         VehicleWheel* w = wheelList[i];
         if (w->inContact && !w->scrapePosted) {
             w->scrapePosted = 1;
-            if (w->field_0x280.z > 0.2f) {
+            if (w->tangentSin > 0.2f) {
                 VehCommitImpact(ev, &ev->scrapeSink);
             }
             return;
@@ -1936,10 +1936,10 @@ void Vehicle::ResetWheelContacts()
         wheel->field_0x2a4 = 1.0f;
         wheel->slipVector = kVec3Zero;
         wheel->driveForce = kVec3Zero;
-        wheel->field_0x280.x = 0.0f;
+        wheel->driveMagnitude = 0.0f;
         wheel->field_0x254 = kVec3Zero;
         wheel->driveShare = 1.0f;
-        wheel->field_0x280.z = 1.0f;
+        wheel->tangentSin = 1.0f;
         wheel->driveShareComplement = 0.0f;
         wheel->rampLevel = 0.0f;
         wheel->driveDistance = 0.0f;

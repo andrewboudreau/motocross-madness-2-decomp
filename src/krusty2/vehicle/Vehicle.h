@@ -337,7 +337,9 @@ struct VehicleWheel {
     char pad_0x270[8];
     int rollAngle;  // +0x278 Tire.h rollAngle (float there; only cleared here)
     int slipSpeed;  // +0x27C Tire.h slipSpeed (float there; only cleared here)
-    Vec3 field_0x280;
+    float driveMagnitude;          // +0x280 DriveForce's magnitude output (slot 86; Tire.h: drive factor)
+    float surfaceScaleB;           // +0x284 Tire.h surfaceScaleB
+    float tangentSin;              // +0x288 Tire.h: sqrt(1 - tangentCos^2); slots 19/20 scale the slide vector by it
     float tangentCos;              // +0x28c Tire.h: |tangent . rollDirection| clamped to 1
     float driveDistance;                      // +0x290  Tire 0x005143d0: driveShareComplement * drive magnitude * dt * scale; slots 19/20 turn it into a speed with invStepTime
     float restLoadWeight;                     // +0x294  Tire ctor argument a14; Bike's loader stores the static weight split (rear = share / wheelBase, front = 1 - rear); loadWeight is reset to it
