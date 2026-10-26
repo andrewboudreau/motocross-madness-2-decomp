@@ -146,10 +146,10 @@ public:
     int   UpdateWheelRampLevels();       // 0x00529280, ramps each wheel's rampLevel by its slot 83 answer
     void  PlaceWheels();                 // 0x00528eb0, retracts the shocks and probes each wheel against the ground
     void  UpdateWheelsInContact();       // 0x00529a20, updates in-contact wheels, resets the aux ramp of the others
-    void  Method_00527A20(float* speed, Vec3* zero, Vec3* up);   // 0x00527a20
+    void  Method_00527A20(float* speed, Vec3* worldTorque, Vec3* force);   // 0x00527a20
     void  Method_005293E0(float* speed);                         // 0x005293e0
-    void  Method_00529450(Vec3* up, Vec3* zero);           // 0x00529450
-    void  AccumulateWheelContacts(Vec3* up, Vec3* zero, float d);  // 0x00529c20, folds in-contact wheel vectors into the accumulators
+    void  Method_00529450(Vec3* force, Vec3* localTorque);           // 0x00529450
+    void  AccumulateWheelContacts(Vec3* force, Vec3* localTorque, float torqueScale);  // 0x00529c20, folds in-contact wheel vectors into the accumulators
     // 0x00525c60: calls virtual slot 0 of every object in the two owned arrays (+0x554/+0x55c, +0x560/+0x568).
     void RunTickers();
     void ResetWheelContacts();           // 0x00525a90, resets every wheel's contact state and vectors

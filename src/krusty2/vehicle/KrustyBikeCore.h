@@ -43,7 +43,7 @@ public:
     virtual void UnknownVirtualSlot8();
     virtual int UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* a5);
     virtual int UnknownVirtualSlot12(int a);
-    virtual void UnknownVirtualSlot14(Vec3* a, const Vec3* b, const Vec3* c);
+    virtual void UnknownVirtualSlot14(Vec3* force, const Vec3* localTorque, const Vec3* worldTorque);
     virtual void UnknownVirtualSlot15(const Vec3* v, Vec3* out);
     virtual Vec3 UnknownVirtualSlot16(const Vec3* v);
     virtual int UnknownVirtualSlot22();

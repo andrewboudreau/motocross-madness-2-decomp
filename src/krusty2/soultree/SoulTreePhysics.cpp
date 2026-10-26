@@ -465,8 +465,8 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot7(const Vec3* a)
     }
 }
 
-// slot 13 (0x00501e90): per-contact response; accumulates into *a1 / *a2.
-void SoultreePhysicsBaseObject::UnknownVirtualSlot13(Vec3* a1, Vec3* a2, float a3)
+// slot 13 (0x00501e90): per-contact response; accumulates into *force / *localTorque.
+void SoultreePhysicsBaseObject::UnknownVirtualSlot13(Vec3* force, Vec3* localTorque, float torqueScale)
 {
     if (!touchingPointCount)
         return;
@@ -476,9 +476,9 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot13(Vec3* a1, Vec3* a2, float a
             continue;
         Vec3 t;
         float w = c->loadShare;
-        t.x = w * a1->x;
-        t.y = w * a1->y;
-        t.z = w * a1->z;
+        t.x = w * force->x;
+        t.y = w * force->y;
+        t.z = w * force->z;
         float d = SoultreeDot(t, c->contactNormal);
         c->normalForceMagnitude = d;
         if (d >= 0.0f) {
@@ -490,24 +490,24 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot13(Vec3* a1, Vec3* a2, float a
             c->normalForce = *Vec3ScaleCall(&scaled, &c->contactNormal, -d);
         }
         c->UnknownVirtualSlot1();
-        *a1 += c->frictionForce;
-        *a2 += sceneNode->WorldToLocalDirection(SoultreeCrossCtor(c->leverArm, c->frictionForce));
+        *force += c->frictionForce;
+        *localTorque += sceneNode->WorldToLocalDirection(SoultreeCrossCtor(c->leverArm, c->frictionForce));
         if (c->contactState == 2) {
-            *a2 *= a3;
+            *localTorque *= torqueScale;
             c->contactState = 0;
         }
     }
 }
 
 // slot 14 (0x00502080): integrates the accumulated force/torque estimates.
-void SoultreePhysicsBaseObject::UnknownVirtualSlot14(Vec3* a1, const Vec3* a2,
-                                                     const Vec3* a3)
+void SoultreePhysicsBaseObject::UnknownVirtualSlot14(Vec3* force, const Vec3* localTorque,
+                                                     const Vec3* worldTorque)
 {
-    angularAcceleration = UnknownVirtualSlot16(a2);
-    UnknownVirtualSlot15(a3, &angularAcceleration);
+    angularAcceleration = UnknownVirtualSlot16(localTorque);
+    UnknownVirtualSlot15(worldTorque, &angularAcceleration);
     angularVelocity += angularAcceleration * stepTime;
     angularVelocity *= 0.999f;
-    acceleration = *a1 * invMass;
+    acceleration = *force * invMass;
     velocity += acceleration * stepTime;
     linearSpeed = VecLength(velocity);
 }
@@ -1253,14 +1253,14 @@ static inline float VecLengthRsq(const Vec3& v)
 // the cold respawn block needs disp32 displacements (1804/1930).
 void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
 {
-    Vec3 up;
+    Vec3 force;
     float speed;
 
     if (steps <= 0)
         return;
     do {
         int res;
-        Vec3 zero = kVec3Zero;
+        Vec3 worldTorque = kVec3Zero;
         prevSpeed = linearSpeed;
         if (prevSpeed < 0.001f || !_finite(prevSpeed)) {
             prevSpeed = 0.0f;
@@ -1280,15 +1280,15 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
         else
             sceneNode->GetPositionIn(0, &centerOfMass);
         speed = prevSpeed;
-        up = weightForce;
+        force = weightForce;
         res = SoultreeRefreshContacts(UnknownVirtualSlot5(0), &touchingPointCount, collisionPointCount,
                                       collisionPoints, terrain, &centerOfMass, collisionShape,
                                       collisionRadius);
         if (res)
             pointsTouching = touchingPointCount > 0;
         UnknownVirtualSlot8();
-        UnknownVirtualSlot6(&up, &speed);
-        UnknownVirtualSlot7(&up);
+        UnknownVirtualSlot6(&force, &speed);
+        UnknownVirtualSlot7(&force);
         airborne = !pointsTouching;
         if (pointsTouching) {
             if (!res)
@@ -1314,10 +1314,10 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
                 linearSpeed = 0.0f;
             }
         }
-        Vec3 zeroB = kVec3Zero;
-        UnknownVirtualSlot13(&up, &zeroB, 1.0f);
+        Vec3 localTorque = kVec3Zero;
+        UnknownVirtualSlot13(&force, &localTorque, 1.0f);
         UpdateRestState();
-        UnknownVirtualSlot14(&up, &zeroB, &zero);
+        UnknownVirtualSlot14(&force, &localTorque, &worldTorque);
         UnknownVirtualSlot26();
         position += (velocity * 3.0f - prevVelocity) * 0.5f * stepTime;
         sceneNode->SetPosition(position);

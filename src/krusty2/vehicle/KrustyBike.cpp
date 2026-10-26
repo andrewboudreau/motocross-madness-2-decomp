@@ -1041,24 +1041,24 @@ float KrustyBike::Fn_00495FF0()
     return 0.0f;
 }
 
-// 0x004965e0 (slot 14, exact): apply an impulse.  field_0x24 behaves as an inverse mass
-// (dv = k * impulse) after the impulse's x and z are cleared.  Written as `invMass * *a`:
+// 0x004965e0 (slot 14, exact): outside a race, the base integration with the force's x and
+// z cleared first.  Written as `invMass * *force`:
 // VC6 forwards the two zero stores into the scaled vector and folds k * 0 into one pooled
 // 0.0f on the FPU stack (fld/fst shared by x and z), as retail does; the explicit
-// Vec3(0.0f, invMass * a->y, 0.0f) stores immediates instead.
-void KrustyBike::UnknownVirtualSlot14(Vec3* a, const Vec3* b, const Vec3* c)
+// Vec3(0.0f, invMass * force->y, 0.0f) stores immediates instead.
+void KrustyBike::UnknownVirtualSlot14(Vec3* force, const Vec3* localTorque, const Vec3* worldTorque)
 {
     if (race->isRacing) {
-        Bike::UnknownVirtualSlot14(a, b, c);
+        Bike::UnknownVirtualSlot14(force, localTorque, worldTorque);
         return;
     }
-    angularAcceleration = UnknownVirtualSlot16(b);
-    UnknownVirtualSlot15(c, &angularAcceleration);
+    angularAcceleration = UnknownVirtualSlot16(localTorque);
+    UnknownVirtualSlot15(worldTorque, &angularAcceleration);
     angularVelocity += stepTime * angularAcceleration;
     angularVelocity *= 0.999f;
-    a->x = 0;
-    a->z = 0;
-    acceleration = invMass * *a;
+    force->x = 0;
+    force->z = 0;
+    acceleration = invMass * *force;
     velocity += stepTime * acceleration;
     linearSpeed = KbLength(velocity);
 }

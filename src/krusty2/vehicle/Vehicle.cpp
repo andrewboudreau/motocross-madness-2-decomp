@@ -947,7 +947,7 @@ static inline float VehSmooth(VehicleSmoother* s, float target, float dt)
 void Vehicle::UnknownVirtualSlot49(float frame)
 {
     int steps;
-    Vec3 up;          // frame reference vector (from weightForce)
+    Vec3 force;       // force accumulator, seeded with weightForce
     Vec3 pivot;
     float speed;
     int hit;
@@ -970,7 +970,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
     justLanded = 0;
     if (steps > 0) do {
         engineState->TickGearTimer(stepTime);
-        Vec3 zero = kVec3Zero;
+        Vec3 worldTorque = kVec3Zero;
         Vec3 o2;          // VehContactsB's second output (loop scope: see the slot 49 note)
         if (crashState == 0) {
             if (UpdateWheelRampLevels())
@@ -1011,7 +1011,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         allWheelsInContact = wheels == wheelCount;
         anyWheelInContact = wheels != 0;
         speed = prevSpeed;
-        up = weightForce;
+        force = weightForce;
         Vec3 savedOut;
         Vec3 basis = *UnknownVirtualSlot55(&savedOut, &pivot);
         UnknownVirtualSlot56(&basis, 1, 0);
@@ -1021,8 +1021,8 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             pointsTouching = touchingPointCount > 0;
         UpdateWheelsInContact();
         UnknownVirtualSlot8();
-        UnknownVirtualSlot6(&up, &speed);
-        UnknownVirtualSlot7(&up);
+        UnknownVirtualSlot6(&force, &speed);
+        UnknownVirtualSlot7(&force);
         wheelForwardAlignment = UnknownVirtualSlot75();
         int settled;
         if (!anyWheelInContact && !pointsTouching)
@@ -1078,17 +1078,17 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             }
         }
         float aq = VehAbsT(turnAngle);
-        Vec3 zeroB = kVec3Zero;
-        UnknownVirtualSlot13(&up, &zeroB, t53);
+        Vec3 localTorque = kVec3Zero;
+        UnknownVirtualSlot13(&force, &localTorque, t53);
         if (anyWheelInContact) {
-            Method_00527A20(&speed, &zero, &up);
+            Method_00527A20(&speed, &worldTorque, &force);
             if (crashState == 0 || !pointsTouching) {
                 Method_005293E0(&speed);
-                Method_00529450(&up, &zeroB);
+                Method_00529450(&force, &localTorque);
             }
-            AccumulateWheelContacts(&up, &zeroB, t53);
+            AccumulateWheelContacts(&force, &localTorque, t53);
         }
-        UnknownVirtualSlot14(&up, &zeroB, &zero);
+        UnknownVirtualSlot14(&force, &localTorque, &worldTorque);
         smoothedVerticalAccel = VehSmooth(verticalAccelSmoother, (velocity.y - prevVelocity.y) * invStepTime, stepTime);
         float k = UnknownVirtualSlot61(aq);
         Vec3 aimOut;
@@ -1812,7 +1812,7 @@ static inline Vec3 VehProjectFirst(const Vec3& v, const Vec3& onto)
 // (impulseScale * displacement, projected on the Y axis and scaled the same way) is added to
 // *up and consumed.  Then scratchVector is added to the wheel's applied share and to *up,
 // and its moment about relativePosition (in body space, x only) to *zero.
-void Vehicle::Method_00529450(Vec3* up, Vec3* zero)
+void Vehicle::Method_00529450(Vec3* force, Vec3* localTorque)
 {
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* wheel = wheelList[i];
@@ -1826,7 +1826,7 @@ void Vehicle::Method_00529450(Vec3* up, Vec3* zero)
                          * ((VehicleShock*)wheel->primaryAux)->displacement;
                 Vec3 q = VehProjectTail(v, kVec3YAxis);
                 scratchVector2 = VehScaleCtorCall(q, leanCos);
-                *up += scratchVector2;
+                *force += scratchVector2;
                 ((VehicleShock*)wheel->primaryAux)->impulseScale = 0.0f;
             }
         } else if (wheel->secondaryAux) {
@@ -1838,17 +1838,17 @@ void Vehicle::Method_00529450(Vec3* up, Vec3* zero)
                 Vec3 q = VehProjectTail(v, kVec3YAxis);
                 Vec3& impulse = scratchVector2;
                 impulse = VehScaleCtorCall(q, leanCos);
-                *up += impulse;   // through the reference: loads impulse.x first (byte-exact)
+                *force += impulse;   // through the reference: loads impulse.x first (byte-exact)
                 ((VehicleShock*)wheel->secondaryAux)->impulseScale = 0.0f;
             }
         }
         wheel->appliedShare += scratchVector;
-        *up += scratchVector;
+        *force += scratchVector;
         scratchVector2 = CrossProductCall(wheel->relativePosition, scratchVector);
         scratchVector = modelNode->WorldToLocalDirection(scratchVector2);
         scratchVector.y = 0.0f;
         scratchVector.z = 0.0f;
-        *zero += scratchVector;
+        *localTorque += scratchVector;
     }
 }
 
@@ -1906,23 +1906,23 @@ void Vehicle::UpdateWheelsInContact()
 }
 
 // 0x00529c20: folds each in-contact wheel's contact vectors into the two accumulators.
-void Vehicle::AccumulateWheelContacts(Vec3* up, Vec3* zero, float d)
+void Vehicle::AccumulateWheelContacts(Vec3* force, Vec3* localTorque, float torqueScale)
 {
     if (!airborne) {
         for (int i = 0; i < wheelCount; i++) {
             VehicleWheel* wheel = wheelList[i];
             if (wheel->inContact) {
                 if (wheel->field_0x16c == 2) {
-                    zero->x = d * zero->x;
-                    zero->y = d * zero->y;
-                    zero->z = d * zero->z;
+                    localTorque->x = torqueScale * localTorque->x;
+                    localTorque->y = torqueScale * localTorque->y;
+                    localTorque->z = torqueScale * localTorque->z;
                     wheel->field_0x16c = 0;
                 }
                 if (wheel->aux) {
-                    *up += wheel->driveForce;
+                    *force += wheel->driveForce;
                     scratchVector2 = UnknownVirtualSlot76(&wheel->relativePosition, &wheel->driveForce);
                     scratchVector = modelNode->WorldToLocalDirection(scratchVector2);
-                    *zero += scratchVector;
+                    *localTorque += scratchVector;
                 }
             }
         }
@@ -2276,9 +2276,9 @@ void Vehicle::PlaceWheels()
 // point's friction update runs, and while the wheel's time scale and its load budget
 // (tangentSpeed + spinSpeed) are positive an impulse limited by min(*speed, budget) is taken
 // from *speed: the wheel's frictionForce scaled by (mass/dt * m) / timeScale, or unscaled when
-// the time scale is the smaller, is added to *force and its moment about relativePosition to *torque.
+// the time scale is the smaller, is added to *force and its moment about relativePosition to *worldTorque.
 static inline void VehSetV(Vec3& d, const Vec3& s) { d.x = s.x; d.y = s.y; d.z = s.z; }
-void Vehicle::Method_00527A20(float* speed, Vec3* torque, Vec3* force)
+void Vehicle::Method_00527A20(float* speed, Vec3* worldTorque, Vec3* force)
 {
     int i;
     float driven = 0.0f;
@@ -2290,7 +2290,7 @@ void Vehicle::Method_00527A20(float* speed, Vec3* torque, Vec3* force)
     if (crashState == 0 && driven != 0.0f) {
         float share = 1.0f / driven;
         for (i = 0; i < wheelCount; i++)
-            wheelList[i]->ApplyDrive(share, stepTime, movingForward, bodyMass, speed, torque, force);
+            wheelList[i]->ApplyDrive(share, stepTime, movingForward, bodyMass, speed, worldTorque, force);
     }
     for (i = 0; i < wheelCount; i++) {
         VehicleWheel* w = wheelList[i];
@@ -2327,7 +2327,7 @@ void Vehicle::Method_00527A20(float* speed, Vec3* torque, Vec3* force)
                 VehSetV(v, w->frictionForce);
             }
             *force += v;
-            *torque += CrossProduct(w->relativePosition, v);
+            *worldTorque += CrossProduct(w->relativePosition, v);
         }
     }
 }

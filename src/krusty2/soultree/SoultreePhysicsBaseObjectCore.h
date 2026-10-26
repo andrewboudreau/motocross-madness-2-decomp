@@ -115,12 +115,13 @@ public:
     virtual int UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4,
                                      int* a5);
     virtual int UnknownVirtualSlot12(int value);
-    virtual void UnknownVirtualSlot13(Vec3* a, Vec3* b, float c);
-    // Slot 14 (ret 0xc): retail 0x00502080 passes a2 to slot 16, a3 to slot 15 and later
-    // dereferences a1 (tier 1 decoded stack offsets); all three are Vec3 pointers.
-    // a1 is not const: the KrustyBike override 0x004965e0 zeroes a1->x and a1->z (tier 1).
-    virtual void UnknownVirtualSlot14(Vec3* a1, const Vec3* a2,
-                                      const Vec3* a3);
+    virtual void UnknownVirtualSlot13(Vec3* force, Vec3* localTorque, float torqueScale);
+    // Slot 14 (ret 0xc): retail 0x00502080 passes localTorque to slot 16, worldTorque to slot
+    // 15 and later multiplies *force by invMass (tier 1 decoded stack offsets); all three are
+    // Vec3 pointers.  force is not const: the KrustyBike override 0x004965e0 zeroes force->x
+    // and force->z (tier 1).
+    virtual void UnknownVirtualSlot14(Vec3* force, const Vec3* localTorque,
+                                      const Vec3* worldTorque);
     virtual void UnknownVirtualSlot15(const Vec3* a, Vec3* b);
     virtual Vec3 UnknownVirtualSlot16(const Vec3* a);
     virtual Vec3 UnknownVirtualSlot17();
