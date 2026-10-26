@@ -139,14 +139,14 @@ Motion* MotionManager::Load(Character* character, const char* section)
     motion->refCount = 0;
     totalBytes += sizeof(Motion);
     int len = strlen(name);
-    int n = len > 0x50 ? 0x50 : len;
-    strncpy(motion->name, name, n);
-    motion->name[n] = 0;
+    int copyLength = len > 0x50 ? 0x50 : len;
+    strncpy(motion->name, name, copyLength);
+    motion->name[copyLength] = 0;
     character->sltFile->GetString("VUE", "NONE", fileName, -1);
     len = strlen(fileName);
-    n = len > 0x50 ? 0x50 : len;
-    strncpy(motion->fileName, fileName, n);
-    motion->fileName[n] = 0;
+    copyLength = len > 0x50 ? 0x50 : len;
+    strncpy(motion->fileName, fileName, copyLength);
+    motion->fileName[copyLength] = 0;
     strcpy(path, "");
     strcat(path, character->contentDirectory);
     strcat(path, motion->fileName);
@@ -238,9 +238,9 @@ void Character::LoadVut()
         return;
     UnknownTextureStream* file = new(__FILE__, 0x26b) UnknownTextureStream(g_ResourceManager);
     int len = strlen(contentDirectory);
-    int n = len > 0xff ? 0xff : len;
-    strncpy(line, contentDirectory, n);
-    line[n] = 0;
+    int copyLength = len > 0xff ? 0xff : len;
+    strncpy(line, contentDirectory, copyLength);
+    line[copyLength] = 0;
     strcat(line, vutFilename);
     if (!file->Open(line, "r", 0))
         return;
@@ -274,9 +274,9 @@ void Character::LoadMir()
     char line[0x100];
     UnknownTextureStream* file = new(__FILE__, 0x29d) UnknownTextureStream(g_ResourceManager);
     int len = strlen(contentDirectory);
-    int n = len > 0xff ? 0xff : len;
-    strncpy(line, contentDirectory, n);
-    line[n] = 0;
+    int copyLength = len > 0xff ? 0xff : len;
+    strncpy(line, contentDirectory, copyLength);
+    line[copyLength] = 0;
     strcat(line, mirFilename);
     if (!file->Open(line, "r", 0)) {
         delete file;
@@ -523,16 +523,16 @@ int Character::AdvanceMotion(float dt, int mirror, int mask)
         }
     } else {
         blendFromTime += dt;
-        float w = blendFromTime / blendDuration;
-        if (w < 0.0f)
-            w = 0.0f;
-        else if (w >= 1.0f)
-            w = 1.0f;
+        float blendWeight = blendFromTime / blendDuration;
+        if (blendWeight < 0.0f)
+            blendWeight = 0.0f;
+        else if (blendWeight >= 1.0f)
+            blendWeight = 1.0f;
         else
-            w = SmoothStep(w);
+            blendWeight = SmoothStep(blendWeight);
         for (int j = 0; j < currentFrame->count; j++) {
             CharacterPose pose;
-            BlendPose(&lastFrame->poses[j], &currentFrame->poses[j], &pose, w);
+            BlendPose(&lastFrame->poses[j], &currentFrame->poses[j], &pose, blendWeight);
             if (mirror == 0)
                 CharacterVirtualSlot4((int)&pose, mask);
             else
