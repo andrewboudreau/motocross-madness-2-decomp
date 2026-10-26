@@ -1209,14 +1209,15 @@ void KrustyBike::Fn_00497370(KrustyBike* other)
     ((CollisionObject*)wrecker->collisionModel)->RemoveIgnoredOwner((void*)other->wrecker->collisionModel);
 }
 
-// 0x00496E30: a != 0 makes this bike's collision objects ignore every other bike (0x00496F90)
-// and stops the part collision objects ignoring its main body; a == 0 does the reverse
-// (0x00497370) and makes the part collision objects ignore both of its scene bodies.
-void KrustyBike::Fn_00496E30(int a)
+// 0x00496E30 (spawn protection on/off): `protect` makes this bike's collision objects ignore
+// every other bike (0x00496F90) and stops the part collision objects ignoring its main body;
+// without it, the reverse (0x00497370), and the part collision objects ignore both of its
+// scene bodies.
+void KrustyBike::Fn_00496E30(int protect)
 {
     int cursor = 0;
     KrustyBike* other;
-    if (a) {
+    if (protect) {
         for (other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor)); other; other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor))) {
             if (other != this)
                 Fn_00496F90(other);

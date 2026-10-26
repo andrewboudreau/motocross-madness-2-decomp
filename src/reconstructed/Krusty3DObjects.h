@@ -112,7 +112,7 @@ struct UnknownRunwayRacer {
 
 // The terrain (NationalRace.cpp's +0x40): 0x00507c10 drops `point` onto it.
 struct UnknownRunwayTerrain {
-    void QueryGround(Vector3* point, Vector3* normal, int a, int b);
+    void QueryGround(Vector3* point, Vector3* normal, int flatShaded, int surface);
 };
 
 // 0x4c bytes (NationalRace.cpp 0x004aa8cd): five "pointer.slt" models.

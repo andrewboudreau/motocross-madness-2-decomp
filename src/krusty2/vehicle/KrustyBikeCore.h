@@ -105,7 +105,7 @@ public:
     float Fn_00495FF0();
     // 0x004933e0: adds message 13's deltas to the decoded network state and copies it out.
     void Fn_004933E0(const KbNetDelta* delta, KbNetState* state);
-    void Fn_00496E30(int a);
+    void Fn_00496E30(int protect);
     // 0x00413200 (in BikeAI.cpp; called by slot 49 for AI bikes): one physics step of the
     // two-point look-ahead model 0x0040eca0 instead of the Vehicle step; returns 1.
     int Fn_00413200(float dt);
