@@ -134,15 +134,15 @@ void MemTagStack::SubtractDirectXBytes(int bytes)
 // 0x004a2e20
 void* DebugMalloc(unsigned int size, const char* file, int line)
 {
-    void* p = malloc(size);
-    if (p) {
+    void* block = malloc(size);
+    if (block) {
         if (g_MemTagStack && g_MemTagStack->ours) {
             g_MemTagStack->ours[g_MemTagStack->current] += size;
         } else {
             g_UnclaimedBytes += size;
         }
     }
-    return p;
+    return block;
 }
 
 // 0x004a2e60
@@ -176,8 +176,8 @@ void* DebugRealloc(void* p, unsigned int size, const char* file, int line)
             return 0;
         }
     }
-    void* q = malloc(size);
-    if (q) {
+    void* moved = malloc(size);
+    if (moved) {
         if (g_MemTagStack && g_MemTagStack->ours) {
             g_MemTagStack->ours[g_MemTagStack->current] += size;
         } else {
@@ -187,10 +187,10 @@ void* DebugRealloc(void* p, unsigned int size, const char* file, int line)
             if (oldSize >= (int)size) {
                 oldSize = size;
             }
-            DebugMemcpy(q, p, oldSize, file, line);
+            DebugMemcpy(moved, p, oldSize, file, line);
             free(p);
         }
-        return q;
+        return moved;
     }
     if (p) {
         if (g_MemTagStack && g_MemTagStack->ours) {
@@ -206,15 +206,15 @@ void* DebugRealloc(void* p, unsigned int size, const char* file, int line)
 void* DebugCalloc(unsigned int count, unsigned int size, const char* file, int line)
 {
     unsigned int bytes = count * size;
-    void* p = calloc(count, size);
-    if (p) {
+    void* block = calloc(count, size);
+    if (block) {
         if (g_MemTagStack && g_MemTagStack->ours) {
             g_MemTagStack->ours[g_MemTagStack->current] += bytes;
         } else {
             g_UnclaimedBytes += bytes;
         }
     }
-    return p;
+    return block;
 }
 
 // 0x004a3010: counts before allocating, even when malloc fails.

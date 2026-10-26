@@ -60,9 +60,9 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot8(int other)
 {
     D3DIMSoultreeCharacter* src = (D3DIMSoultreeCharacter*)other;
     int len = strlen(src->d3d_field_0x1a4);
-    int n = len > 0x4f ? 0x4f : len;
-    strncpy(d3d_field_0x1a4, src->d3d_field_0x1a4, n);
-    d3d_field_0x1a4[n] = 0;
+    int copyLength = len > 0x4f ? 0x4f : len;
+    strncpy(d3d_field_0x1a4, src->d3d_field_0x1a4, copyLength);
+    d3d_field_0x1a4[copyLength] = 0;
     Character::CharacterVirtualSlot8(other);
 }
 
@@ -323,9 +323,9 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
 {
     char name[0x104];
     int len = strlen(contentDirectory);
-    int n = len > 0x103 ? 0x103 : len;
-    strncpy(name, contentDirectory, n);
-    name[n] = 0;
+    int copyLength = len > 0x103 ? 0x103 : len;
+    strncpy(name, contentDirectory, copyLength);
+    name[copyLength] = 0;
     strcat(name, d3d_field_0x1a4);
 
     ModelObject* frame = reinterpret_cast<ModelObject*>(new(__FILE__, 0xd6) D3DIMSoultreeObject(isEnabled));
@@ -335,9 +335,9 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
     AppendChild(frameChild, -1);
     modelNode->RegisterNode();
     len = strlen("Base Character Frame");
-    n = len > 0x7f ? 0x7f : len;
-    strncpy(modelNode->name, "Base Character Frame", n);
-    modelNode->name[n] = 0;
+    copyLength = len > 0x7f ? 0x7f : len;
+    strncpy(modelNode->name, "Base Character Frame", copyLength);
+    modelNode->name[copyLength] = 0;
 
     ModelObject* loaded = reinterpret_cast<ModelObject*>(new(__FILE__, 0xdf) D3DIMSoultreeObject(isEnabled));
     loaded->Load(renderContext, name, *(int*)(d3d_field_0x1a4 + 0x60), *(int*)(d3d_field_0x1a4 + 0x64),
@@ -424,9 +424,9 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int context, const char* 
     file->Open(fname, "rb", 0);
     file->SetBufferSize(0x4000);
     int len = strlen(path);
-    int n = len > 0x4f ? 0x4f : len;
-    strncpy(sltPath, path, n);
-    sltPath[n] = 0;
+    int copyLength = len > 0x4f ? 0x4f : len;
+    strncpy(sltPath, path, copyLength);
+    sltPath[copyLength] = 0;
     sltFile = new(__FILE__, 0xa5) UnknownParameterBlock();
     sltFile->Attach((UnknownParameterStream*)file, 0, 1);
     sltFile->SelectSection("General info");

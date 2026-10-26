@@ -667,17 +667,19 @@ void KrustyUI::LoadBikesAndRiders() {
             block.GetInt("Availability", 1, &availability);
             manufacturers = ResizeDebugBlock(manufacturers, (manufacturerCount + 1) * sizeof(UnknownKrustyUIModelEntry));
             int length = strlen(name);
-            int n = length > 63 ? 63 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].name, name, n);
-            ((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].name[n] = 0;
+            int copyLength = length > 63 ? 63 : length;
+            strncpy(((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].name, name, copyLength);
+            ((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].name[copyLength] = 0;
             length = strlen(model);
-            n = length > 63 ? 63 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].modelFile, model, n);
-            ((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].modelFile[n] = 0;
+            copyLength = length > 63 ? 63 : length;
+            strncpy(((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].modelFile, model,
+                    copyLength);
+            ((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].modelFile[copyLength] = 0;
             length = strlen(uiModel);
-            n = length > 63 ? 63 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].uiModelFile, uiModel, n);
-            ((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].uiModelFile[n] = 0;
+            copyLength = length > 63 ? 63 : length;
+            strncpy(((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].uiModelFile, uiModel,
+                    copyLength);
+            ((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].uiModelFile[copyLength] = 0;
             ((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].availability = availability;
             for (int j = 1; j <= manufacturerBikeCount; j++) {
                 if (j != 2)
@@ -692,13 +694,13 @@ void KrustyUI::LoadBikesAndRiders() {
                 ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].manufacturer = manufacturerCount;
                 ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].engineSizeSelectable = 0;
                 length = strlen(bikeName);
-                n = length > 63 ? 63 : length;
-                strncpy(((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].name, bikeName, n);
-                ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].name[n] = 0;
+                copyLength = length > 63 ? 63 : length;
+                strncpy(((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].name, bikeName, copyLength);
+                ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].name[copyLength] = 0;
                 length = strlen(texture);
-                n = length > 63 ? 63 : length;
-                strncpy(((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].texture, texture, n);
-                ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].texture[n] = 0;
+                copyLength = length > 63 ? 63 : length;
+                strncpy(((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].texture, texture, copyLength);
+                ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].texture[copyLength] = 0;
                 sprintf(key, "BikeEngineSize_%02d", j);
                 block.GetInt(key, 250, &((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].engineSize);
                 sprintf(key, "BikeFourStroke_%02d", j);
@@ -727,13 +729,13 @@ void KrustyUI::LoadBikesAndRiders() {
             riders = ResizeDebugBlock(riders, (riderCount + 1) * sizeof(UnknownKrustyUIModelEntry));
             ((UnknownKrustyUIModelEntry*)riders)[riderCount].uiModel = 0;
             int length = strlen(riderName);
-            int n = length > 63 ? 63 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)riders)[riderCount].name, riderName, n);
-            ((UnknownKrustyUIModelEntry*)riders)[riderCount].name[n] = 0;
+            int copyLength = length > 63 ? 63 : length;
+            strncpy(((UnknownKrustyUIModelEntry*)riders)[riderCount].name, riderName, copyLength);
+            ((UnknownKrustyUIModelEntry*)riders)[riderCount].name[copyLength] = 0;
             length = strlen(file);
-            n = length > 127 ? 127 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)riders)[riderCount].modelFile, file, n);
-            ((UnknownKrustyUIModelEntry*)riders)[riderCount].modelFile[n] = 0;
+            copyLength = length > 127 ? 127 : length;
+            strncpy(((UnknownKrustyUIModelEntry*)riders)[riderCount].modelFile, file, copyLength);
+            ((UnknownKrustyUIModelEntry*)riders)[riderCount].modelFile[copyLength] = 0;
             ((UnknownKrustyUIModelEntry*)riders)[riderCount].availability = availability;
             riderCount++;
         }

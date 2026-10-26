@@ -47,12 +47,12 @@ void UnknownVcrFile::Load(char* path, char* name) {
     if (!memory) return;
     for (int i = 0; i < count; i++) {
         if (!entries[i].field_0x00 && !entries[i].size) {
-            int n = strlen(name);
-            int length = n > 0x103 ? 0x103 : n;
+            int sourceLength = strlen(name);
+            int length = sourceLength > 0x103 ? 0x103 : sourceLength;
             strncpy(entries[i].name, name, length);
             entries[i].name[length] = 0;
-            n = strlen("rb");
-            length = n > 7 ? 7 : n;
+            sourceLength = strlen("rb");
+            length = sourceLength > 7 ? 7 : sourceLength;
             strncpy(entries[i].mode, "rb", length);
             entries[i].mode[length] = 0;
             entries[i].position = 0;
@@ -104,8 +104,8 @@ int UnknownVcrFile::Open(char* name, char* mode) {
     if (memory) {
         for (i = 0; i < count; i++) {
             if (!strcmp(name, entries[i].name)) {
-                int n = strlen(mode);
-                int length = n > 7 ? 7 : n;
+                int sourceLength = strlen(mode);
+                int length = sourceLength > 7 ? 7 : sourceLength;
                 strncpy(entries[i].mode, mode, length);
                 entries[i].mode[length] = 0;
                 entries[i].position = 0;
@@ -115,12 +115,12 @@ int UnknownVcrFile::Open(char* name, char* mode) {
         }
         for (i = 0; i < count; i++) {
             if (!entries[i].field_0x00 && !entries[i].size) {
-                int n = strlen(name);
-                int length = n > 0x103 ? 0x103 : n;
+                int sourceLength = strlen(name);
+                int length = sourceLength > 0x103 ? 0x103 : sourceLength;
                 strncpy(entries[i].name, name, length);
                 entries[i].name[length] = 0;
-                n = strlen(mode);
-                length = n > 7 ? 7 : n;
+                sourceLength = strlen(mode);
+                length = sourceLength > 7 ? 7 : sourceLength;
                 strncpy(entries[i].mode, mode, length);
                 entries[i].mode[length] = 0;
                 entries[i].position = 0;

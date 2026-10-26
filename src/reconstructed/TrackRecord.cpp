@@ -13,8 +13,8 @@
 // 0x0051ee90: an empty name and no value.
 UnknownTrackRecord::UnknownTrackRecord()
 {
-    int n = strlen("");
-    int length = n > 15 ? 15 : n;
+    int sourceLength = strlen("");
+    int length = sourceLength > 15 ? 15 : sourceLength;
     strncpy(racerName, "", length);
     racerName[length] = 0;
     score = 0.0f;
@@ -141,8 +141,8 @@ void UnknownTrackGameObject3400::ReadListedRecord(int unused, const char* name)
 int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
 {
     char name[16];
-    int n = strlen(g_TrackGame->eventManager->results[racer].name);
-    int length = n > 15 ? 15 : n;
+    int sourceLength = strlen(g_TrackGame->eventManager->results[racer].name);
+    int length = sourceLength > 15 ? 15 : sourceLength;
     strncpy(name, g_TrackGame->eventManager->results[racer].name, length);
     name[length] = 0;
     float value = 0.0f;
@@ -180,8 +180,8 @@ int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
     recordCount++;
     if (recordCount >= 10)
         recordCount = 9;
-    n = strlen(name);
-    length = n > 15 ? 15 : n;
+    sourceLength = strlen(name);
+    length = sourceLength > 15 ? 15 : sourceLength;
     strncpy(records[9].racerName, name, length);
     records[9].racerName[length] = 0;
     records[9].score = value;
@@ -280,8 +280,8 @@ void TrackRecordDlg::HandleEvent(UnknownDialogEvent* event)
         if (!_stricmp("LstTrack", event->controlName)) {
             g_TrackGame->highScores->Clear();
             if (static_cast<UIListBox*>(event->control)->GetSelectedRow() != -1 && rows) {
-                int n = strlen(static_cast<UIListBox*>(event->control)->GetRowText(-1));
-                int length = n > 0x7f ? 0x7f : n;
+                int sourceLength = strlen(static_cast<UIListBox*>(event->control)->GetRowText(-1));
+                int length = sourceLength > 0x7f ? 0x7f : sourceLength;
                 strncpy(name, static_cast<UIListBox*>(event->control)->GetRowText(-1), length);
                 name[length] = '\0';
                 static_cast<UIListBox*>(FindControl("LstStats1", 3))->RemoveAllRows();
