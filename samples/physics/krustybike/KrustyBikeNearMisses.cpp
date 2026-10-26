@@ -156,21 +156,23 @@ int KrustyBike::UnknownVirtualSlot11(int respawn, Vec3* outPosition, Vec3* outFo
                                0x65, hit, 3.0f, 8, 0, &respawnPosition, !respawnPending, outPosition, outForward, outUp, outKeepPlacement);
         }
     case 0: {
-        const Vec3* p = respawnPending ? &respawnHeading : &bodyForward;
+        const Vec3* heading = respawnPending ? &respawnHeading : &bodyForward;
         return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, flag, lim, lim,
-                           hit, 6.0f, 8, p, 0, !respawnPending, outPosition, outForward, outUp, outKeepPlacement);
+                           hit, 6.0f, 8, heading, 0, !respawnPending, outPosition, outForward, outUp, outKeepPlacement);
     }
     case 4: {
-        KbPlayer* r = (KbPlayer*)reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent;
-        const Vec3* l = 0;
-        const Vec3* k = 0;
-        if (r->ball) l = &r->ball->position;
-        else if (r->followedRacer == this) { *outForward = bodyForward; k = &bodyForward; }
-        else l = &r->followedRacer->position;
-        float i = 9.0f;
-        if (((KbPlayer*)reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent)->followedRacer != this) i = 3.0f;
+        KbPlayer* tagRacer = (KbPlayer*)reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent;
+        const Vec3* target = 0;
+        const Vec3* heading = 0;
+        if (tagRacer->ball) target = &tagRacer->ball->position;
+        else if (tagRacer->followedRacer == this) { *outForward = bodyForward; heading = &bodyForward; }
+        else target = &tagRacer->followedRacer->position;
+        float radius = 9.0f;
+        if (((KbPlayer*)reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent)->followedRacer != this)
+            radius = 3.0f;
         return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, flag, lim, lim,
-                           hit, i, 8, k, l, !respawnPending, outPosition, outForward, outUp, outKeepPlacement);
+                           hit, radius, 8, heading, target, !respawnPending, outPosition, outForward, outUp,
+                           outKeepPlacement);
     }
     case 1:
     case 5: {
@@ -480,8 +482,9 @@ void KrustyBike::Fn_00493660(float dt, int a)
     if (reinterpret_cast<KbGame*>(g_TrackGame)->frameTime <= 0.0f)
         return;
     // the newest state that is old enough to be complete (3 in a replay)
-    int k = reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay ? 3 : 2;
-    if (states[k]->position.x != 0.0f && states[k]->position.y != 0.0f && states[k]->position.z != 0.0f) {
+    int newest = reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay ? 3 : 2;
+    if (states[newest]->position.x != 0.0f && states[newest]->position.y != 0.0f &&
+        states[newest]->position.z != 0.0f) {
         if (reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay == 0 && reinterpret_cast<KbGame*>(g_TrackGame)->raceMode != 4) {
             if (lastTimeReceived != states[0]->timeReceived) {
                 lastTimeReceived = states[0]->timeReceived;
@@ -918,16 +921,16 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 motionActive = 0;
                 motionIndex = 0;
             } else if (!motionActive) {
-                char m = states[0]->motion;
-                if (m) {
-                    if (m < 0x11)
-                        Fn_0048D910(m - 1);
-                    else if (m == 0x11)
+                char motion = states[0]->motion;
+                if (motion) {
+                    if (motion < 0x11)
+                        Fn_0048D910(motion - 1);
+                    else if (motion == 0x11)
                         Fn_0048E280();
                 }
             } else if (!trickChained) {
-                char m = interpSource->motion;
-                if (m > 0x11 && m - 0x11 == motionIndex)
+                char motion = interpSource->motion;
+                if (motion > 0x11 && motion - 0x11 == motionIndex)
                     Fn_0048D990(motionIndex);
             }
         } else {
@@ -1016,16 +1019,16 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 motionActive = 0;
                 motionIndex = 0;
             } else if (!motionActive) {
-                char m = interpSource->motion;
-                if (m) {
-                    if (m < 0x11)
-                        Fn_0048D910(m - 1);
-                    else if (m == 0x11)
+                char motion = interpSource->motion;
+                if (motion) {
+                    if (motion < 0x11)
+                        Fn_0048D910(motion - 1);
+                    else if (motion == 0x11)
                         Fn_0048E280();
                 }
             } else if (!trickChained) {
-                char m = interpSource->motion;
-                if (m > 0x11 && m - 0x11 == motionIndex)
+                char motion = interpSource->motion;
+                if (motion > 0x11 && motion - 0x11 == motionIndex)
                     Fn_0048D990(motionIndex);
             }
         }
@@ -1225,8 +1228,8 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                         headTurnAngle = 0.24f;
                         look = rivalBearing * 0.1837f;
                     } else if (rivalBearingScaled - 0.1f < head) {
-                        Vec3 d = nearestRival->position - position;
-                        float angle = (float)(atan2(d.x, d.z)) - savedYaw;
+                        Vec3 toRival = nearestRival->position - position;
+                        float angle = (float)(atan2(toRival.x, toRival.z)) - savedYaw;
                         if (angle < -3.14159274f)
                             angle += 6.28318548f;
                         else if (angle > 3.14159274f)
@@ -1261,8 +1264,8 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                         headTurnAngle = 0.24f;
                         look = rivalBearing * 0.1837f;
                     } else if (rivalBearingScaled + 0.1f > head) {
-                        Vec3 d = nearestRival->position - position;
-                        float angle = (float)(atan2(d.x, d.z)) - savedYaw;
+                        Vec3 toRival = nearestRival->position - position;
+                        float angle = (float)(atan2(toRival.x, toRival.z)) - savedYaw;
                         if (angle < -3.14159274f)
                             angle += 6.28318548f;
                         else if (angle > 3.14159274f)
@@ -1352,7 +1355,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                 other = 8;
             blend = 1;
         }
-        float w = 1.0f - poseBlend;
+        float inverseBlend = 1.0f - poseBlend;
         if (idx > 2)
             blend = 0;
         if (poseIndex == 16) {
@@ -1371,19 +1374,19 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
             reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8bf0(riderPoseHandles[17], backUpPhase);
         } else if (blend) {
             ((Character*)riderCharacter)->Method_0x004a9050(riderPoseHandles[idx], riderPoseHandles[next],
-                riderPoseHandles[cnt], riderPoseHandles[other], poseParam, w, poseLeanBlend);
+                riderPoseHandles[cnt], riderPoseHandles[other], poseParam, inverseBlend, poseLeanBlend);
         } else {
-            reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8c50(riderPoseHandles[idx], riderPoseHandles[next], poseParam, w);
+            reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8c50(riderPoseHandles[idx], riderPoseHandles[next], poseParam, inverseBlend);
         }
         if (idx >= 11 && idx <= 13) {
-            D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, w);
+            D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, inverseBlend);
         } else if (poseIndex == 16) {
             D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[16], poseParam);
         } else if (blend) {
             D3DIMSoultreeCharacter::Method_0x004a9050(bikePoseHandles[idx], bikePoseHandles[next],
-                bikePoseHandles[cnt], bikePoseHandles[other], poseParam, w, poseLeanBlend);
+                bikePoseHandles[cnt], bikePoseHandles[other], poseParam, inverseBlend, poseLeanBlend);
         } else {
-            D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, w);
+            D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, inverseBlend);
         }
     }
     int mode = wrecker->wreckState;

@@ -3384,10 +3384,10 @@ void UIEditBox::SetCapacity(int size) {
     controlText = (char*)DebugMalloc(capacity, __FILE__, 0x16a3);
     if (kept) {
         int max = textCapacity - 1;
-        int n = strlen(saved);
+        int sourceLength = strlen(saved);
         int length;
-        if (n < max)
-            length = n;
+        if (sourceLength < max)
+            length = sourceLength;
         else
             length = max;
         strncpy(controlText, saved, length);
@@ -3403,10 +3403,10 @@ void UIEditBox::SetEditText(char* text) {
     if (!controlText)
         controlText = (char*)DebugMalloc(textCapacity, __FILE__, 0x16c0);
     int max = textCapacity - 1;
-    int n = strlen(text);
+    int sourceLength = strlen(text);
     int length;
-    if (n < max)
-        length = n;
+    if (sourceLength < max)
+        length = sourceLength;
     else
         length = max;
     strncpy(controlText, text, length);
