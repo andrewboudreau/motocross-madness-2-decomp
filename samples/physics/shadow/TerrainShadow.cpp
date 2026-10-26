@@ -83,7 +83,7 @@ int TerrainShadow::UnknownVirtualSlot29()
 // two-mode matrix build as ProjectedShadow::ComputeBounds: mode 1 is a perspective camera whose
 // field of view comes from the texture area over the larger rectangle edge, otherwise an
 // orthographic scale by lensScale.  Returns 0 when the rectangle does not fit the texture.
-// Each branch owns its matrix: with one shared `m` VC6 cross-jumps the whole Multiply argument
+// Each branch owns its matrix: with one shared `projection` VC6 cross-jumps the whole Multiply argument
 // copy, retail only merges from the final push.  The chained stores give retail's fst order.
 // Larger-extent dead end (about 18 forms): retail's else arm stores the extent back over
 // itself (`mov edx, [S]; fstp st0; mov [S], edx`) and reloads texture; if/else, ternary,
@@ -100,12 +100,12 @@ ShadowMatrix* TerrainMatrixMultiplyInto(ShadowMatrix* out, ShadowMatrix a, Shado
 
 int TerrainShadow::UnknownVirtualSlot28()
 {
-    float k;
+    float texelScale;
     if (shadow->field_0x98)
-        k = 0.5f;
+        texelScale = 0.5f;
     else
-        k = 1.0f;
-    field_0x677c = k / shadow->texture->size;
+        texelScale = 1.0f;
+    field_0x677c = texelScale / shadow->texture->size;
     float extentX = field_0x666c - field_0x6668;
     float extent = field_0x6674 - field_0x6670;
     if (extentX > extent)
@@ -113,22 +113,24 @@ int TerrainShadow::UnknownVirtualSlot28()
     if (shadow->texture->size > extent) {
         float fov;
         if (shadow->mode == 1) {
-            ShadowMatrix m;
+            ShadowMatrix projection;
             fov = (float)atan2((float)(shadow->texture->size * shadow->texture->size) / extent * 0.5,
                                shadow->camera->field_0x198) * 114.59156f;
             shadow->camera->SetLookAt(&shadow->camera->eyePosition, 0, 0, 0, &fov);
             shadow->camera->UnknownVirtualSlot28();
-            m = *TerrainMatrixIdentityInto(&m);
-            m.m[0][0] = m.m[1][1] = (float)shadow->texture->size;
-            shadow->lightMatrix = *TerrainMatrixMultiplyInto(&m, m, shadow->camera->matrix_0xec);
+            projection = *TerrainMatrixIdentityInto(&projection);
+            projection.m[0][0] = projection.m[1][1] = (float)shadow->texture->size;
+            shadow->lightMatrix = *TerrainMatrixMultiplyInto(&projection, projection,
+                                                             shadow->camera->matrix_0xec);
         } else {
-            ShadowMatrix m;
-            m = *TerrainMatrixIdentityInto(&m);
+            ShadowMatrix projection;
+            projection = *TerrainMatrixIdentityInto(&projection);
             float half = (float)shadow->texture->size * 0.5f;
-            m.m[0][0] = 0.5f / shadow->lensScale * fov;
-            m.m[1][1] = -m.m[0][0];
-            m.m[3][1] = m.m[3][0] = half;
-            shadow->lightMatrix = *TerrainMatrixMultiplyInto(&m, m, shadow->camera->matrix_0xac);
+            projection.m[0][0] = 0.5f / shadow->lensScale * fov;
+            projection.m[1][1] = -projection.m[0][0];
+            projection.m[3][1] = projection.m[3][0] = half;
+            shadow->lightMatrix = *TerrainMatrixMultiplyInto(&projection, projection,
+                                                             shadow->camera->matrix_0xac);
         }
         return 1;
     }
@@ -242,14 +244,15 @@ void TerrainShadow::UnknownVirtualSlot30()
         vertexCount = 0;
         return;
     }
-    ProjectedShadow* s = shadow;
-    if (s->updateThisFrame)
-        g_clipRectangle->Set((float)s->clipRect.left, (float)s->clipRect.top, (float)s->clipRect.right,
-                             (float)s->clipRect.bottom);
+    ProjectedShadow* projected = shadow;
+    if (projected->updateThisFrame)
+        g_clipRectangle->Set((float)projected->clipRect.left, (float)projected->clipRect.top,
+                             (float)projected->clipRect.right, (float)projected->clipRect.bottom);
     else
-        g_clipRectangle->Set((float)s->clipRect.left * 2.0f, (float)s->clipRect.top * 2.0f,
-                             (float)s->clipRect.right * 2.0f, (float)s->clipRect.bottom * 2.0f);
-    short* pixels = s->texture->LockPixels(0, &pitch, 0);
+        g_clipRectangle->Set((float)projected->clipRect.left * 2.0f, (float)projected->clipRect.top * 2.0f,
+                             (float)projected->clipRect.right * 2.0f,
+                             (float)projected->clipRect.bottom * 2.0f);
+    short* pixels = projected->texture->LockPixels(0, &pitch, 0);
     unsigned int color;
     if (shadow->surfaceFormat == 0x613)
         color = 0x7fffffff;
@@ -268,35 +271,35 @@ void TerrainShadow::UnknownVirtualSlot30()
         else
             ShadowTransformPointsProjective(transformed, mesh->vertices, &shadow->lightMatrix, mesh->vertexCount, 0xc, 0x20);
 
-        int n = mesh->vertexCount;
-        if (n > 0) {
+        int remaining = mesh->vertexCount;
+        if (remaining > 0) {
             ProjectedShadow* ps = shadow;
             int* code = outcodes;
-            ShadowVec3* v = transformed;
+            ShadowVec3* point = transformed;
             do {
                 *code = 0;
                 if (ps->updateThisFrame) {
-                    if ((float)ps->clipRect.left > v->x)
+                    if ((float)ps->clipRect.left > point->x)
                         *code |= 1;
-                    if ((float)ps->clipRect.right < v->x)
+                    if ((float)ps->clipRect.right < point->x)
                         *code |= 2;
-                    if ((float)ps->clipRect.top > v->y)
+                    if ((float)ps->clipRect.top > point->y)
                         *code |= 4;
-                    if ((float)ps->clipRect.bottom < v->y)
+                    if ((float)ps->clipRect.bottom < point->y)
                         *code |= 8;
                 } else {
-                    if ((float)(ps->clipRect.left * 2) > v->x)
+                    if ((float)(ps->clipRect.left * 2) > point->x)
                         *code |= 1;
-                    if ((float)(ps->clipRect.right * 2) < v->x)
+                    if ((float)(ps->clipRect.right * 2) < point->x)
                         *code |= 2;
-                    if ((float)(ps->clipRect.top * 2) > v->y)
+                    if ((float)(ps->clipRect.top * 2) > point->y)
                         *code |= 4;
-                    if ((float)(ps->clipRect.bottom * 2) < v->y)
+                    if ((float)(ps->clipRect.bottom * 2) < point->y)
                         *code |= 8;
                 }
-                v++;
+                point++;
                 code++;
-            } while (--n);
+            } while (--remaining);
         }
 
         int sectionCount = 1;
@@ -319,8 +322,8 @@ void TerrainShadow::UnknownVirtualSlot30()
                 indexCount = mesh->sections[sec].indexEnd - indexStart;
                 vertexBase = mesh->sections[sec - 1].vertexBase;
             }
-            for (int t = 0; t < indexCount; t += 3) {
-                const short* index = mesh->indices + indexStart + t;
+            for (int triStart = 0; triStart < indexCount; triStart += 3) {
+                const short* index = mesh->indices + indexStart + triStart;
                 corner[0] = index[0];
                 corner[1] = index[1];
                 corner[2] = index[2];
