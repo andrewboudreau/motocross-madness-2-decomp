@@ -97,7 +97,7 @@ struct VehicleInputMap {
 
 struct VehicleContact {              // elements of Vehicle+0x12c
     char pad_0x00[4];
-    int  field_0x04;
+    int  ownerNode;                    // +0x04 CollisionPoint::ownerNode (null for unowned points)
     char pad_0x08[0xC];
     Vec3 contactPosition;              // +0x14 contact position (distance source in slot 7)
     Vec3 impactPosition;              // +0x20 second contact point (impact position in slot 18)
@@ -134,7 +134,7 @@ struct VehicleImpactEvent {          // argument of slots 18..20 (provisional)
     VehicleImpactSink* slideSink;  // +0x08 slot 19 target
     VehicleImpactSink* scrapeSink;  // +0x0c slot 20 target
     char pad_0x10[0x14];
-    char field_0x24;
+    char resetTrail;                // +0x24 SoultreeAttachment::resetTrail: VehCommitImpact latches the vector, then clears it
 };
 // Object at Vehicle+0x480: the engine gearbox (ctor 0x004d2940, 0x1e4 bytes), the same object as
 // src/reconstructed/GearRatios.h's UnknownEngineGearbox; slots 42/57 read throttleFraction.

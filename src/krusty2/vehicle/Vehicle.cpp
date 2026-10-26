@@ -107,12 +107,12 @@ float Vehicle::UnknownVirtualSlot73(const Vec3* a, const Vec3* b)
     return wheelBase / sinf(s->angle);
 }
 
-// Clears the per-contact flag at +0xa4 for contacts whose +4 field is set, then resets state.
+// Clears contactActive (+0xa4) on every contact that has an owner node, then resets state.
 void Vehicle::UnknownVirtualSlot67()
 {
     for (int i = 0; i < collisionPointCount; i++) {
         VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
-        if (c->field_0x04 != 0)
+        if (c->ownerNode != 0)
             c->contactActive = 0;
     }
     crashState = 0;
@@ -706,10 +706,10 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
 // Commit an impact to a sink: latch the current vector into the previous one, mark it dirty.
 static inline void VehCommitImpact(VehicleImpactEvent* ev, VehicleImpactSink** sink)
 {
-    if (ev->field_0x24)
+    if (ev->resetTrail)
         (*sink)->previousVector = (*sink)->currentVector;
     (*sink)->updatePending = 1;
-    ev->field_0x24 = 0;
+    ev->resetTrail = 0;
 }
 
 // Posts a one-shot impact for the first wheel (aux-driven first, then any) or contact whose
@@ -1520,7 +1520,7 @@ void Vehicle::UnknownVirtualSlot1(float value)
     movingForward = 1;
     for (int i = 0; i < collisionPointCount; i++) {
         VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
-        if (c->field_0x04 != 0)
+        if (c->ownerNode != 0)
             c->contactActive = 0;
     }
     crashState = 0;
