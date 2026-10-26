@@ -364,16 +364,17 @@ void KrustyBike::Fn_004925A0(Vehicle* who, bool flag)
     }
 }
 
-// 0x00495C00: true when the two cells referenced at +0x11c8/+0x11cc (both fully set) differ in
-// their integer x or z (tier 3 semantics).
+// 0x00495C00: true when the two newest received states (+0x11c8/+0x11cc), both with a
+// nonzero position x and z, differ in their integer x or z (tier 3 semantics).
 int KrustyBike::Fn_00495C00()
 {
     if (isRemote) {
-        KbCell* a = ((KbNetBike*)this)->field_0x11c8;
-        if (a->field_0x8 != 0 && a->field_0x10 != 0) {
-            KbCell* b = ((KbNetBike*)this)->field_0x11cc;
-            if (b->field_0x8 != 0 && b->field_0x10 != 0) {
-                if ((int)a->field_0x8 != (int)b->field_0x8 || (int)a->field_0x10 != (int)b->field_0x10)
+        KbBikeNetState* newest = states[0];
+        if (newest->position.x != 0 && newest->position.z != 0) {
+            KbBikeNetState* previous = states[1];
+            if (previous->position.x != 0 && previous->position.z != 0) {
+                if ((int)newest->position.x != (int)previous->position.x
+                    || (int)newest->position.z != (int)previous->position.z)
                     return 1;
             }
         }
@@ -1615,16 +1616,16 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
             pingTimer -= reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
             if (pingTimer < 0.0f) {
                 KbBikePing ping;
-                ping.field_0x04 = score;
-                ping.field_0x01 = loaderKind;
+                ping.score = score;
+                ping.loaderKind = loaderKind;
                 reinterpret_cast<NetworkInterface*>(reinterpret_cast<KbGame*>(g_TrackGame)->network)->Send(10, &ping, sizeof(ping), netId, 0);
                 pingTimer = 2.0f;
             }
         }
     } else if (netRecorder && race->scoreRecordDue) {
         KbBikePing ping;
-        ping.field_0x04 = score;
-        ping.field_0x01 = loaderKind;
+        ping.score = score;
+        ping.loaderKind = loaderKind;
         reinterpret_cast<VCRInterface*>(netRecorder)->QueueRecord(10, netId, &ping, sizeof(ping));
     }
 }

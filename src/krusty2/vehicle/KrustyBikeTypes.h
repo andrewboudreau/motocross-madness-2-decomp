@@ -72,13 +72,9 @@ struct KbGameCfg {
 // Object behind KrustyBike+0x13fc (tier 3); 0x004E8720 appends a record (type, id, data, flag).
 struct KbRecorder { int QueueRecord(int type, int id, void* data, int flag); };
 // Entity-level view used for the id at +0x11bc of any bike (tier 3, offset confirmed by decoded loads).
-struct KbCell { char pad_0x00[8]; float field_0x8; char pad_0xc[4]; float field_0x10; };
 struct KbNetBike {
     char pad_0x0000[0x11bc];
     int netId;  // +0x11BC  KrustyBike::netId seen through the entity view
-    char pad_0x11c0[8];
-    KbCell* field_0x11c8;
-    KbCell* field_0x11cc;
 };
 // 12-byte message built by KrustyBike::Fn_004925A0 (tier 3: the leading dword is never written).
 // Network message 13 (bikerace.cpp's 0x0041fb.. handlers pass it to 0x004933e0):
@@ -123,9 +119,9 @@ struct KbNetState {
 // Message type 10 (8 bytes): the bike's +0x11c0 flag and +0x768.
 struct KbBikePing {
     char field_0x00;
-    unsigned char field_0x01;
+    unsigned char loaderKind;    // +0x01 KrustyBike::loaderKind (+0x11c0)
     char pad_0x02[2];
-    float field_0x04;
+    float score;                 // +0x04 KrustyBike::score (+0x768)
 };
 // The state 0x00492670 keeps of the last message (caller-owned; tier 3).
 

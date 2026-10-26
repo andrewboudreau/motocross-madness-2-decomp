@@ -359,15 +359,15 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                             (!reinterpret_cast<KbGame*>(g_TrackGame)->eventType || (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4 && reinterpret_cast<KbGame*>(g_TrackGame)->stuntMode))) {
                                             pingTimer -= reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
                                             if (pingTimer < 0.0f) {
-                                                ping.field_0x04 = score;
-                                                ping.field_0x01 = loaderKind;
+                                                ping.score = score;
+                                                ping.loaderKind = loaderKind;
                                                 reinterpret_cast<NetworkInterface*>(reinterpret_cast<KbGame*>(g_TrackGame)->network)->Send(10, &ping, sizeof(ping), netId, 0);
                                                 pingTimer = 2.0f;
                                             }
                                         }
                                     } else if (netRecorder && race->scoreRecordDue) {
-                                        ping.field_0x04 = score;
-                                        ping.field_0x01 = loaderKind;
+                                        ping.score = score;
+                                        ping.loaderKind = loaderKind;
                                         reinterpret_cast<VCRInterface*>(netRecorder)->QueueRecord(10, netId, &ping, sizeof(ping));
                                     }
                                     return;
