@@ -126,8 +126,8 @@ static char g_CollisionObjectTypeId = (char)0xff;   // 0x00568610
 static char g_VegetationTypeId = (char)0xff;        // 0x00568611
 
 // 0x00431e70
-CollisionObject::CollisionObject(int a)
-    : GraphicsTest(a)
+CollisionObject::CollisionObject(int flags)
+    : GraphicsTest(flags)
 {
     if (g_CollisionObjectTypeId == (char)0xff)
         g_CollisionObjectTypeId = g_TypeRegistry->FindTypeId("CollisionObject");

@@ -87,7 +87,7 @@ typedef void (*CollisionCallback)(CollisionObject* self, CollisionObject* other)
 
 class CollisionObject : public QuadTreeObject, public GraphicsTest {
 public:
-    CollisionObject(int a);                     // 0x00431e70
+    CollisionObject(int flags);                     // 0x00431e70
     virtual ~CollisionObject();                 // slot 0 @12: 0x00431fd0 -> core 0x00432000
     virtual int Tick(float dt);    // 0x00499ae0
     virtual int UnknownVirtualSlot14();            // 0x00434540 (draw, then returns GameObject slot 14; ConstraintMethodCollisionModel overrides it again)

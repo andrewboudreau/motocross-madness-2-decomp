@@ -300,7 +300,7 @@ public:
     void RetireOwnedObject(BaseObject* object);
     void SetField0xbec(int value);                              // 0x00507930 (ret 4)
     void SelectQuality(int index);                              // 0x00507960 (ret 4)
-    explicit Terrain(int a);                                    // 0x00505830 (ret 4), forwards a to GameObject(int)
+    explicit Terrain(int flags);                                // 0x00505830 (ret 4), forwards flags to GameObject(int)
     // 0x005059d0 (thiscall, ret 0x20; called from QuarryStuntEvent).  Reads the "TRN" version 5
     // terrain file from `stream`; returns this, or 0 after Release() on a bad header or a failed
     // palette.  Name and argument roles are tier 3; the third argument is never read.

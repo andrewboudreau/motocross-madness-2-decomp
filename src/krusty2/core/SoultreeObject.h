@@ -59,7 +59,7 @@ class SoultreeObject {
 public:
     // 0x004fb2b0, thiscall, ret 4 (tier 1). SoultreePhysicsBaseObject slot 2 passes 1.
     // The argument's meaning is unknown.
-    explicit SoultreeObject(int a);
+    explicit SoultreeObject(int flags);
 
     // ---- transform helpers (all __thiscall, callee pops) --------------------
 
@@ -237,7 +237,7 @@ public:
     void SetPositionInFrame(SoultreeObject* frame, const Vec3* p);
 
     // 0x004fc850, ret 4: adds *d to the local translation and invalidates the world matrix.
-    void Translate(const Vec3* d);
+    void Translate(const Vec3* delta);
 
     // 0x004fca30, ret 4: localMatrix = *m, then InvalidateWorldMatrix.
     void SetLocalMatrix(const Matrix4* m);

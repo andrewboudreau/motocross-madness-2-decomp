@@ -131,8 +131,8 @@ static inline void RotateByRowsTo(Vec3* r, Vec3 v, const Matrix4& m)
 // 0x004fb2b0. QuadTreeObject's inline constructor, then GameObject(a); identity local
 // matrix, zero world matrix, empty links and bounds; both type-id bytes get the
 // "SoultreeObject" id.
-SoultreeObject::SoultreeObject(int a)
-    : GameObject(a)
+SoultreeObject::SoultreeObject(int flags)
+    : GameObject(flags)
 {
     parent = 0;
     firstChild = 0;
@@ -398,11 +398,11 @@ void SoultreeObject::SetPositionInFrame(SoultreeObject* frame, const Vec3* p)
 }
 
 // 0x004fc850.
-void SoultreeObject::Translate(const Vec3* d)
+void SoultreeObject::Translate(const Vec3* delta)
 {
-    localMatrix._41 = d->x + localMatrix._41;
-    localMatrix._42 = d->y + localMatrix._42;
-    localMatrix._43 = d->z + localMatrix._43;
+    localMatrix._41 = delta->x + localMatrix._41;
+    localMatrix._42 = delta->y + localMatrix._42;
+    localMatrix._43 = delta->z + localMatrix._43;
     InvalidateWorldMatrix();
 }
 

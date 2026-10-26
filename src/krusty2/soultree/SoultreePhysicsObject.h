@@ -42,7 +42,7 @@ class UnknownTextureStream;
 class D3DIMSoultreeObject : public QuadTreeObject, public GameObject {
 public:
     int NodeMovesVertices(SoultreeObject* node, int lod); // 0x00445060
-    explicit D3DIMSoultreeObject(int a);          // 0x0043f160 (thiscall, ret 4)
+    explicit D3DIMSoultreeObject(int flags);          // 0x0043f160 (thiscall, ret 4)
     virtual ~D3DIMSoultreeObject();               // core 0x0043f2b0, deleting 0x0043f280
     virtual void Disable();                       // 0x00444540
     virtual void Enable();                        // 0x00444520

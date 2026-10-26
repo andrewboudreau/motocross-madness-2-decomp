@@ -26,8 +26,8 @@ float Vec3DotCall(const Vec3* a, const Vec3* b);
 #define RGBA_GETGREEN(rgb) (((rgb) >> 8) & 0xff)
 #define RGBA_GETBLUE(rgb) ((rgb) & 0xff)
 
-Terrain::Terrain(int a)
-    : GameObject(a)
+Terrain::Terrain(int flags)
+    : GameObject(flags)
 {
     gridCellSize = 1.0f;
     stream = 0;
