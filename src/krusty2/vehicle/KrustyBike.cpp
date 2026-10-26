@@ -1661,9 +1661,9 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
                              const KbBikeSetup* setup, int a19, int a20, int a21, int a22,
                              KbRecorder* recorder, void* a24, int withRider)
 {
-    field_0x7c4 = 1.1f;
-    field_0x7c8 = 1.3f;
-    field_0x7cc = 1.5f;
+    aiAccelScale1 = 1.1f;
+    aiAccelScale2 = 1.3f;
+    aiAccelScale3 = 1.5f;
     trickDelay1 = 25.0f;
     trickDelay2 = 15.0f;
     trickDelay3 = 5.0f;
@@ -1973,9 +1973,9 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         roamTarget.z = 3000.0f;
         roamTarget.y = 0;
         if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType != 5 && reinterpret_cast<KbGame*>(g_TrackGame)->eventType != 1)
-            field_0x824 = KbRandUnit() * 14.0f - 7.0f;
+            aiLineOffset = KbRandUnit() * 14.0f - 7.0f;
         else
-            field_0x824 = KbRandUnit() * 6.0f - 3.0f;
+            aiLineOffset = KbRandUnit() * 6.0f - 3.0f;
     } else {
         probeSegment = 0;
         field_0x810 = 0;
@@ -1988,8 +1988,8 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         field_0x778 = 100.0f;
     else
         field_0x778 = 100.0f;
-    field_0x7e0 = Vec3(0.0f, 0.0f, 0.0f);
-    field_0x7ec = Vec3(0.0f, 0.0f, 0.0f);
+    lookAheadFrontVelocity = Vec3(0.0f, 0.0f, 0.0f);
+    lookAheadRearVelocity = Vec3(0.0f, 0.0f, 0.0f);
     lookAheadFrontTravel = 0;
     lookAheadRearTravel = 0;
     ((CollisionObject*)frontWheel)->SetIgnoreListMode(1);

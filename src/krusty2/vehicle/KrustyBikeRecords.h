@@ -7,9 +7,9 @@ struct UnknownBikeAIPath {
     int index;          // +0x004 current segment
     float t;            // +0x008 parameter along the current segment
     Vec3 points[200];   // +0x00c
-    float field_0x96c;  // +0x96c target speed: 0x00414370 writes 40 or 1000, 0x0040d200 the
+    float targetSpeed;  // +0x96c 0x00414370 writes 40 or 1000, 0x0040d200 the
                         //        takeoff speed (clamped to >= 40.0f)
-    float field_0x970;  // +0x970 read by 0x0040eca0 (1.5f when there is no path)
+    float accelLimitScale;  // +0x970 0x0040eca0 caps the rear wheel's acceleration at it x speedTable[speed] (1.5f when there is no path)
     float lookAhead;    // +0x974
 };
 

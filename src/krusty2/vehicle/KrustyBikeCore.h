@@ -171,15 +171,15 @@ public:
     int lapGate;  // +0x7B8  RaceView/BikeRace +0x7b8 gate of the lap (AdvanceGate's gateIndex)
     int nextLapGate;  // +0x7BC  RaceView/BikeRace +0x7bc lapGate + 1 wrapped by the gate count
     int forceGatePass;  // +0x7C0  RaceStatus passes it as CountLap/AdvanceGate `forced`: with isRemote the gate/lap counts only when set
-    float field_0x7c4; // 0x7C4  loader constants 1.1, 1.3, 1.5, 25, 15, 5, 0 (tier 3 purpose)
-    float field_0x7c8; // 0x7C8
-    float field_0x7cc; // 0x7CC
+    float aiAccelScale1;  // +0x7C4 loader 1.1; BikeAI copies it to aiPath.accelLimitScale at difficulty 1
+    float aiAccelScale2;  // +0x7C8 loader 1.3; the same at difficulty 2
+    float aiAccelScale3;  // +0x7CC loader 1.5; the same at difficulty 3 and BikeAI's default
     float trickDelay1;  // +0x7D0 loader 25.0; BikeAI's delay between AI tricks at difficulty 1
     float trickDelay2;  // +0x7D4 loader 15.0; BikeAI's delay between AI tricks at difficulty 2
     float trickDelay3;  // +0x7D8 loader 5.0; BikeAI's delay between AI tricks at difficulty 3
     float trickTimer;  // +0x7DC time since the last AI trick: BikeAI adds dt, clears it on a trick, and rolls for one once it reaches the delay
-    Vec3 field_0x7e0; // 0x7E0
-    Vec3 field_0x7ec; // 0x7EC
+    Vec3 lookAheadFrontVelocity;  // +0x7E0 front wheel point velocity (centre + forward * 3.5) passed to and returned by the look-ahead 0x0040eca0
+    Vec3 lookAheadRearVelocity;  // +0x7EC rear wheel point velocity, likewise
     float lookAheadFrontTravel;  // +0x7F8  front suspension travel of the look-ahead model (0x00413200)
     float lookAheadRearTravel;  // +0x7FC  rear suspension travel of the look-ahead model
     char pad_0x0800[0x4];
@@ -190,11 +190,11 @@ public:
     char pad_0x0811[0x3];
     float contactTime;  // +0x814  seconds with the collision object in contact (0x00413200)
     Vec3 roamTarget;  // +0x818 BikeAI's free-ride target; x and z 3000.0 from the loader for an AI bike, re-picked at random within 50 units (y 0); 0x00414370 copies it whole into the racing line
-    float field_0x824; // 0x824  random in [-7,7) (or [-3,3) in modes 1/5)
+    float aiLineOffset;  // +0x824 random in [-7,7) (or [-3,3) in event types 1/5); the look-ahead's sideways shift from the AI path (0x0040e510 `side`)
     Vec3 predictedLandingNormal;  // +0x828  ground normal under the predicted landing (0x00413200)
     float predictedLandingTime;  // +0x834  predicted time to landing (PredictLanding 0x0040e370)
     UnknownBikeAIPath aiPath; // 0x838  racing line rebuilt by 0x00414370 each frame
-    int field_0x11b0;  // 0x11B0  last argument of the look-ahead simulation 0x0040eca0
+    int avoidNearOnly;  // +0x11B0 last argument of the look-ahead 0x0040eca0, forwarded to the obstacle query: when set only hits within 10 count
     float aiOffTrackTime;  // +0x11B4  BikeAI: seconds the AI bike is off the track (onTrack clear) while raceMode is 0; at 5 it is put back
     char hasFullState;  // +0x11B8  BikeRace racer +0x11b8: set when a message 1 state arrives; message 13 deltas wait for it
     char pad_0x11B9[0x3];

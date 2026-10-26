@@ -341,7 +341,7 @@ inline Vec3 BikeAINormalize(const Vec3& v)
 // offset sideways by 'side'.  It records the first takeoff (time, position, velocity,
 // flat direction) and stops at the landing (direction change below cos 45 deg, or
 // the last path point).  For a jump longer than 20 units it computes the takeoff
-// speed that would cover the distance and stores it in path->field_0x96c, raised to
+// speed that would cover the distance and stores it in path->targetSpeed, raised to
 // 40 when below 40, otherwise to takeoffSpeed - 20 when it is more than 20 below the
 // takeoff speed.  The takeoff velocity is rescaled to that speed.
 // Writes the reached segment/parameter to the path, the flat direction to the
@@ -486,14 +486,14 @@ int PredictPathMotion(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* outDir,
                 sinA = takeoffVel.y / spd;
                 secA = spd / flatSpeed;
             }
-            path->field_0x96c = FastSqrt(dist * dist * 32.0f / ((sinA * dist + dy) * 2.0f)) * secA;
-            float need = path->field_0x96c;
+            path->targetSpeed = FastSqrt(dist * dist * 32.0f / ((sinA * dist + dy) * 2.0f)) * secA;
+            float need = path->targetSpeed;
             Vec3 nv = SafeNormalize(takeoffVel) * need;
-            if (path->field_0x96c < 40.0f)
-                path->field_0x96c = 40.0f;
-            else if (takeoffSpeed - path->field_0x96c > 20.0f)
-                path->field_0x96c = takeoffSpeed - 20.0f;
-            takeoffVel = SafeNormalize(nv) * path->field_0x96c;
+            if (path->targetSpeed < 40.0f)
+                path->targetSpeed = 40.0f;
+            else if (takeoffSpeed - path->targetSpeed > 20.0f)
+                path->targetSpeed = takeoffSpeed - 20.0f;
+            takeoffVel = SafeNormalize(nv) * path->targetSpeed;
         }
     }
     path->index = idx;
@@ -913,7 +913,7 @@ int QuerySegmentObstacles(Vec3* seg, float radius, int skipVegetation, int ignor
 // dt (at most 0.05).  Per step: terrain and probe-object ground under each wheel, spring
 // (k = 90) and damper on the suspension travel, velocity reflection on contact, AI aim
 // along the path (0x0040e510 / 0x0040d200) or the steering input, obstacle avoidance
-// through 0x00415640, target speed from path->field_0x96c and the speed table, sharing
+// through 0x00415640, target speed from path->targetSpeed and the speed table, sharing
 // of the longitudinal acceleration (0.65 / 0.35), integration, and the side axis leaning
 // towards the lateral acceleration.  Writes back center, forward, side, both wheel
 // velocities, their mean and its length, the suspension values, the contact flags, the
@@ -938,7 +938,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
     float frontC;
     float rearC;
     frontC = rearC = ((dt - 0.005f) * 4.21053f + 0.6f) * 0.6f;
-    float speedScale = path ? path->field_0x970 : 1.5f;
+    float speedScale = path ? path->accelLimitScale : 1.5f;
     float halfDtSq = dt * dt * 0.5f;
     Matrix4 xf;
     memset(&xf, 0, sizeof(xf));
@@ -1261,7 +1261,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                 accR -= right * w;
                 if (rearContact) {
                     if (path) {
-                        float accel = (path->field_0x96c - speedR) * invDt;
+                        float accel = (path->targetSpeed - speedR) * invDt;
                         if (speedTable) {
                             int i = (int)speedR;
                             if (i < 0)
@@ -1522,7 +1522,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 // VC6 folds it here; by-value, `v * s` and operand-order helper forms do not change that.
 // The local declaration order is inert.  Writing the gate tail after the loop with gotos
 // compiles to identical code: the block order comes from the flow graph, and retail's has
-// an extra `xor ebp, ebp` re-zero edge after the loop (its tail stores field_0x11b0 from
+// an extra `xor ebp, ebp` re-zero edge after the loop (its tail stores avoidNearOnly from
 // the zero register, the candidate an immediate). Both builds give the loop
 // counter ebp (`xor ebp, ebp ; ... inc ebp`); retail then restores the zero web
 // in ebp for the tail, the candidate ends the zero web at the loop.
@@ -1701,7 +1701,7 @@ int KrustyBike::Fn_00413200(float dt)
                     lean = -1.0f;
             }
         }
-        float speedGap = aiPath.field_0x96c - linearSpeed;
+        float speedGap = aiPath.targetSpeed - linearSpeed;
         if (!airborne && speedGap > 0.0f) {
             aiThrottleRequest = 1.0f;
             aiBrakeRequest = 0.0f;
@@ -1725,15 +1725,15 @@ int KrustyBike::Fn_00413200(float dt)
     worldAngularVelocity = *fwd * angularVelocity.z + *up * angularVelocity.y
                            - CrossProduct(*fwd, *up) * angularVelocity.x;
     Vec3* w = &worldAngularVelocity;
-    field_0x7e0 = CrossProduct(*w, bodyForward) * 3.5f + velocity;
-    field_0x7ec = velocity - CrossProduct(worldAngularVelocity, *fwd) * 3.5f;
+    lookAheadFrontVelocity = CrossProduct(*w, bodyForward) * 3.5f + velocity;
+    lookAheadRearVelocity = velocity - CrossProduct(worldAngularVelocity, *fwd) * 3.5f;
     unsigned char airborneOut = airborne;
-    SimulateLookAhead(&steer, &field_0x7e0, &field_0x7ec, &velocity, 0, &position,
+    SimulateLookAhead(&steer, &lookAheadFrontVelocity, &lookAheadRearVelocity, &velocity, 0, &position,
                           &bodyForward, &bodyUp, dt, dt, race->raceTerrain, &airborneOut,
                           &impact, probeSegment, &lookAheadFrontTravel, &lookAheadRearTravel,
                           &frontWheel->inContact, &rearWheel->inContact, &aiPath,
-                          g_BikeAISpeedTable_00566f74[engineClass], field_0x824, field_0x11b0);
-    worldAngularVelocity = -CrossProduct(field_0x7e0 - velocity, bodyForward) * 0.2857f;
+                          g_BikeAISpeedTable_00566f74[engineClass], aiLineOffset, avoidNearOnly);
+    worldAngularVelocity = -CrossProduct(lookAheadFrontVelocity - velocity, bodyForward) * 0.2857f;
     angularVelocity = modelNode->WorldToLocalDirection(worldAngularVelocity);
     linearSpeed = BikeAILength(velocity);
     turnRate = 0.0f;
@@ -1921,8 +1921,8 @@ int KrustyBike::Fn_00414370(float dt)
             } else {
                 aiPath.points[0] = roamTarget;
             }
-            aiPath.field_0x96c = 1000.0f;
-            aiPath.field_0x970 = field_0x7cc;
+            aiPath.targetSpeed = 1000.0f;
+            aiPath.accelLimitScale = aiAccelScale3;
             aiPath.lookAhead = linearSpeed * 0.25f;
             aiStuntChance = race->aiStuntChance3;
             if (difficulty == 3)
@@ -1939,10 +1939,10 @@ int KrustyBike::Fn_00414370(float dt)
                     aiPath.points[0].y = 0.0f;
                     aiPath.points[0].x = bodyForward.z * 40.0f + position.x;
                     aiPath.points[0].z = position.z - bodyForward.x * 40.0f;
-                    aiPath.field_0x96c = 40.0f;
+                    aiPath.targetSpeed = 40.0f;
                     return 1;
                 }
-                aiPath.field_0x96c = 0.0f;
+                aiPath.targetSpeed = 0.0f;
                 return 1;
             }
             speed = linearSpeed;
@@ -2018,23 +2018,23 @@ int KrustyBike::Fn_00414370(float dt)
             dz = position.z - gate->position.z;
             if (FastSqrt(dx * dx + dz * dz) < speed) {
                 if (BikeAIDot(SafeNormalize(velocity), SafeNormalize(gate->position - position)) < 0.70755f)
-                    aiPath.field_0x96c = 40.0f;
+                    aiPath.targetSpeed = 40.0f;
                 else
-                    aiPath.field_0x96c = 1000.0f;
+                    aiPath.targetSpeed = 1000.0f;
                 aiPath.lookAhead = 20.0f;
-                field_0x11b0 = 1;
+                avoidNearOnly = 1;
             } else {
-                aiPath.field_0x96c = 1000.0f;
-                aiPath.field_0x970 = field_0x7cc;
-                field_0x11b0 = 0;
+                aiPath.targetSpeed = 1000.0f;
+                aiPath.accelLimitScale = aiAccelScale3;
+                avoidNearOnly = 0;
                 aiPath.lookAhead = linearSpeed * 0.25f;
             }
             if (difficulty == 3)
-                aiPath.field_0x970 = field_0x7cc;
+                aiPath.accelLimitScale = aiAccelScale3;
             else if (difficulty == 2)
-                aiPath.field_0x970 = field_0x7c8;
+                aiPath.accelLimitScale = aiAccelScale2;
             else if (difficulty == 1)
-                aiPath.field_0x970 = field_0x7c4;
+                aiPath.accelLimitScale = aiAccelScale1;
             aiPath.lookAhead = linearSpeed * 0.25f;
         }
     } else {
@@ -2101,7 +2101,7 @@ int KrustyBike::Fn_00414370(float dt)
                     aiPath.points[i].y = position.y + 2.0f;
                     lenSq = SquareMagnitude(aiPath.points[i] - position);
                     if (lenSq == 1.0f || FastSqrt(lenSq) < 100.0f)
-                        aiPath.field_0x96c = 40.0f;
+                        aiPath.targetSpeed = 40.0f;
                     i++;
                     t += 0.1f;
                     if (t > 1.0f)
@@ -2113,23 +2113,23 @@ int KrustyBike::Fn_00414370(float dt)
                     return 0;
             }
         }
-        aiPath.field_0x96c = 1000.0f;
-        aiPath.field_0x970 = field_0x7cc;
+        aiPath.targetSpeed = 1000.0f;
+        aiPath.accelLimitScale = aiAccelScale3;
         aiPath.lookAhead = linearSpeed * 0.25f;
         if (difficulty == 3)
-            aiPath.field_0x970 = field_0x7cc;
+            aiPath.accelLimitScale = aiAccelScale3;
         else if (difficulty == 2)
-            aiPath.field_0x970 = field_0x7c8;
+            aiPath.accelLimitScale = aiAccelScale2;
         else if (difficulty == 1)
-            aiPath.field_0x970 = field_0x7c4;
+            aiPath.accelLimitScale = aiAccelScale1;
         if (hasFinished) {
             onTrack = race->raceTrack->PlaceNear(position, statusNode->progressPos,
                                                                         -1.0f, -1.0f, 0, 0);
             if (!onTrack) {
-                aiPath.field_0x96c = 0.0f;
+                aiPath.targetSpeed = 0.0f;
                 goto done;
             }
-            aiPath.field_0x96c = 40.0f;
+            aiPath.targetSpeed = 40.0f;
             Vec3 dir;
             if (!race->raceTrack->SegmentDirection(statusNode->progressPos.b, &dir))
                 return 0;
@@ -2147,12 +2147,12 @@ int KrustyBike::Fn_00414370(float dt)
             dir.y = 0.0f;
             dir = SafeNormalize(dir);
             aiPath.count = 1;
-            aiPath.points[0] = aiPath.field_0x96c * dir + position;
+            aiPath.points[0] = aiPath.targetSpeed * dir + position;
         }
         if (onTrack)
-            field_0x11b0 = 1;
+            avoidNearOnly = 1;
         else
-            field_0x11b0 = 0;
+            avoidNearOnly = 0;
     }
     if (aiTricksEnabled && !(trickDelay > trickTimer)) {
         if (!motionActive && airborne) {
