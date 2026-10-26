@@ -263,8 +263,8 @@ integrate:
 float Bike::UnknownVirtualSlot53()
 {
     if (crashState == 0) {
-        float f = steerRate * stepTime;
-        steerState->AddAngle(f, poseNode);
+        float angle = steerRate * stepTime;
+        steerState->AddAngle(angle, poseNode);
         return 1.0f;
     }
     return 1.0f - Method_0x0040a520();

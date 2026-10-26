@@ -726,8 +726,8 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* attachment)
         if (w->aux && w->inContact && !w->impactPosted &&
             (!track || ((VehicleMaterialSet*)track)->environment[0x400 + w->surfaceMaterial])) {
             w->impactPosted = 1;
-            float v = w->driveShareComplement * 20.0f;
-            ev->impactSink->SetPosition(w->groundPoint, (v > 1.0f) ? v : 1.0f);
+            float intensity = w->driveShareComplement * 20.0f;
+            ev->impactSink->SetPosition(w->groundPoint, (intensity > 1.0f) ? intensity : 1.0f);
             VehCommitImpact(ev, &ev->impactSink);
             return;
         }
@@ -1001,7 +1001,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             linearSpeed = 0.0f;
         }
         centerNode->GetPositionIn(0, &centerOfMass);
-        float t53 = UnknownVirtualSlot53();
+        float torqueScale = UnknownVirtualSlot53();
         PlaceWheels();
         if (spawnProtectTimer > 0.0f) {
             spawnProtectTimer -= stepTime;
@@ -1078,20 +1078,20 @@ void Vehicle::UnknownVirtualSlot49(float frame)
                 linearSpeed = 0.0f;
             }
         }
-        float aq = VehAbsT(turnAngle);
+        float turnMagnitude = VehAbsT(turnAngle);
         Vec3 localTorque = kVec3Zero;
-        UnknownVirtualSlot13(&force, &localTorque, t53);
+        UnknownVirtualSlot13(&force, &localTorque, torqueScale);
         if (anyWheelInContact) {
             Method_00527A20(&speed, &worldTorque, &force);
             if (crashState == 0 || !pointsTouching) {
                 Method_005293E0(&speed);
                 Method_00529450(&force, &localTorque);
             }
-            AccumulateWheelContacts(&force, &localTorque, t53);
+            AccumulateWheelContacts(&force, &localTorque, torqueScale);
         }
         UnknownVirtualSlot14(&force, &localTorque, &worldTorque);
         smoothedVerticalAccel = VehSmooth(verticalAccelSmoother, (velocity.y - prevVelocity.y) * invStepTime, stepTime);
-        float k = UnknownVirtualSlot61(aq);
+        float k = UnknownVirtualSlot61(turnMagnitude);
         Vec3 aimOut;
         Vec3 aim = *UnknownVirtualSlot46(&aimOut, k);
         int mode = UnknownVirtualSlot62(k);
@@ -1107,15 +1107,15 @@ void Vehicle::UnknownVirtualSlot49(float frame)
                 UnknownVirtualSlot91();
             } else if (mode) {
                 if (mode == 1 || mode == 2) {
-                    if (aq >= 0.0001f || VehAbsT(k) > 0.0001f) {
-                        if (aq >= 0.0001f) {
+                    if (turnMagnitude >= 0.0001f || VehAbsT(k) > 0.0001f) {
+                        if (turnMagnitude >= 0.0001f) {
                             tiltAxisLocal = modelNode->WorldToLocalDirection(lift);
                         } else {
                             Vec3 contactNormal;
                             scratchVector = *UnknownVirtualSlot54(&contactNormal);
                             tiltAxisLocal = modelNode->WorldToLocalDirection(scratchVector);
                         }
-                        if (k != 0.0f && aq < 0.003f)
+                        if (k != 0.0f && turnMagnitude < 0.003f)
                             modelNode->RotateAboutPoint(aim, tiltAxisLocal, k);
                         else
                             modelNode->RotateAboutPoint(aim, tiltAxisLocal, k + turnAngle);
