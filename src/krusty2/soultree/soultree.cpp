@@ -376,7 +376,7 @@ void SoultreeObject::TranslateIn(SoultreeObject* frame, Vec3 delta)
 // 0x004fc740.
 void SoultreeObject::SetPositionInFrame(SoultreeObject* frame, const Vec3* p)
 {
-    Vec3 t;
+    Vec3 localPos;
     if (frame == this) {
         localMatrix._41 += p->x;
         localMatrix._42 += p->y;
@@ -385,16 +385,16 @@ void SoultreeObject::SetPositionInFrame(SoultreeObject* frame, const Vec3* p)
         return;
     }
     if (frame) {
-        t = frame->LocalToWorldPoint(*p);
-        t = parent->WorldToLocalPoint(t);
-        SetPosition(t);
+        localPos = frame->LocalToWorldPoint(*p);
+        localPos = parent->WorldToLocalPoint(localPos);
+        SetPosition(localPos);
         return;
     }
     if (parent)
-        t = parent->WorldToLocalPoint(*p);
+        localPos = parent->WorldToLocalPoint(*p);
     else
-        t = *p;
-    SetPosition(t);
+        localPos = *p;
+    SetPosition(localPos);
 }
 
 // 0x004fc850.
@@ -409,22 +409,22 @@ void SoultreeObject::Translate(const Vec3* delta)
 // 0x004fc890.
 void SoultreeObject::SetPositionIn(SoultreeObject* frame, const Vec3* p)
 {
-    Vec3 t;
+    Vec3 localDelta;
     if (frame == this) {
         Translate(p);
         return;
     }
     if (frame) {
-        t = frame->LocalToWorldDirection(*p);
-        t = parent->WorldToLocalDirection(t);
-        Translate(&t);
+        localDelta = frame->LocalToWorldDirection(*p);
+        localDelta = parent->WorldToLocalDirection(localDelta);
+        Translate(&localDelta);
         return;
     }
     if (parent)
-        t = parent->WorldToLocalPoint(*p);
+        localDelta = parent->WorldToLocalPoint(*p);
     else
-        t = *p;
-    Translate(&t);
+        localDelta = *p;
+    Translate(&localDelta);
 }
 
 // 0x004fc970. Writes the local translation to *out and returns out.
@@ -485,17 +485,17 @@ void SoultreeObject::GetMatrixIn(SoultreeObject* frame, Matrix4* out)
         frame->parent->UpdateWorldMatrix();
         Matrix4 parentWorld = frame->parent->worldMatrix;
         Matrix4 m = *out;
-        Vec3 d;
-        d.x = m._41 - parentWorld._41;
-        d.y = m._42 - parentWorld._42;
-        d.z = m._43 - parentWorld._43;
+        Vec3 offset;
+        offset.x = m._41 - parentWorld._41;
+        offset.y = m._42 - parentWorld._42;
+        offset.z = m._43 - parentWorld._43;
         TransposeRotation(m);
         CollisionMatrixMultiply(out, &m, &parentWorld);
         TransposeRotation(*out);
-        RotateByRowsTo(&d, d, parentWorld);
-        out->_41 = d.x;
-        out->_42 = d.y;
-        out->_43 = d.z;
+        RotateByRowsTo(&offset, offset, parentWorld);
+        out->_41 = offset.x;
+        out->_42 = offset.y;
+        out->_43 = offset.z;
         return;
       }
       *out = worldMatrix;
@@ -943,30 +943,30 @@ void SoultreeObject::AccumulateBounds(int* have, Vec3* lo, Vec3* hi, const Matri
         Vec3 ax = Vec3(localBoundsHalfExtent.x, 0.0f, 0.0f);
         Vec3 ay = Vec3(0.0f, localBoundsHalfExtent.y, 0.0f);
         Vec3 az = Vec3(0.0f, 0.0f, localBoundsHalfExtent.z);
-        Vec3 c = LocalToWorldPoint(localBoundsCenter);
+        Vec3 center = LocalToWorldPoint(localBoundsCenter);
         ax = LocalToWorldDirection(ax);
         ay = LocalToWorldDirection(ay);
         az = LocalToWorldDirection(az);
-        FramePointTo(&c, c, *frame);
+        FramePointTo(&center, center, *frame);
         RotateByRowsTo(&ax, ax, *frame);
         RotateByRowsTo(&ay, ay, *frame);
         RotateByRowsTo(&az, az, *frame);
-        Vec3 ext;
-        ext.x = AbsValue(ax.x) + AbsValue(ay.x) + AbsValue(az.x);
-        ext.y = AbsValue(ax.y) + AbsValue(ay.y) + AbsValue(az.y);
-        ext.z = AbsValue(ax.z) + AbsValue(ay.z) + AbsValue(az.z);
+        Vec3 extent;
+        extent.x = AbsValue(ax.x) + AbsValue(ay.x) + AbsValue(az.x);
+        extent.y = AbsValue(ax.y) + AbsValue(ay.y) + AbsValue(az.y);
+        extent.z = AbsValue(ax.z) + AbsValue(ay.z) + AbsValue(az.z);
         if (*have) {
-            Vec3 l = c - ext;
-            Vec3 h = SoultreeOolVec3(c.x + ext.x, c.y + ext.y, c.z + ext.z);
-            lo->x = MinValue(lo->x, l.x);
-            lo->y = MinValue(lo->y, l.y);
-            lo->z = MinValue(lo->z, l.z);
-            hi->x = MaxValue(hi->x, h.x);
-            hi->y = MaxValue(hi->y, h.y);
-            hi->z = MaxValue(hi->z, h.z);
+            Vec3 boxLo = center - extent;
+            Vec3 boxHi = SoultreeOolVec3(center.x + extent.x, center.y + extent.y, center.z + extent.z);
+            lo->x = MinValue(lo->x, boxLo.x);
+            lo->y = MinValue(lo->y, boxLo.y);
+            lo->z = MinValue(lo->z, boxLo.z);
+            hi->x = MaxValue(hi->x, boxHi.x);
+            hi->y = MaxValue(hi->y, boxHi.y);
+            hi->z = MaxValue(hi->z, boxHi.z);
         } else {
-            *lo = c - ext;
-            *hi = c + ext;
+            *lo = center - extent;
+            *hi = center + extent;
             *have = 1;
         }
     }
