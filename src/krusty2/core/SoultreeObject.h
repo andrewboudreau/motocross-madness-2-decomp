@@ -257,7 +257,7 @@ public:
     // 'angle' (radians), keeping the local translation.
     void SetRotation(float x, float y, float z, float angle);
 
-    // 0x004fdb40 / 0x004fdb50: set / clear field_0x14c.
+    // 0x004fdb40 / 0x004fdb50: set / clear hidden (+0x14c).
     void SetFlag14c();
     void ClearFlag14c();
 
@@ -327,7 +327,8 @@ public:
     // 0x14c..0x188 are zeroed by the constructor. The stream load (slot 2,
     // 0x004fdc00) reads 0x14c, 0x154..0x18b in this order; the clone (slot 8)
     // copies 0x14c and clears 0x154 (tier 1 offsets, tier 3 roles).
-    int field_0x14c;               // 0x14c, set/cleared by 0x004fdb40 / 0x004fdb50
+    int hidden;                    // 0x14c, set/cleared by 0x004fdb40 / 0x004fdb50; read from
+                                   // the node record; nonzero skips drawing (provisional name)
     int field_0x150;               // 0x150
     int localBoundsValid;          // 0x154, 0 makes 0x004fe0a0 call slot 5 first
     Vec3 localBoundsCenter;        // 0x158, returned by 0x004fe0a0

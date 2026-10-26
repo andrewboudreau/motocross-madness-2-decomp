@@ -169,7 +169,7 @@ struct UnknownSoultreeMatrix {
 int D3DIMSoultreeObject::PrepareGeometry()
 {
     visible = 0;
-    if (!field_0x14c && field_0x190) {
+    if (!hidden && field_0x190) {
         if (subtreeDirty)
             UpdateSubtreeBounds();
         Matrix4 world;

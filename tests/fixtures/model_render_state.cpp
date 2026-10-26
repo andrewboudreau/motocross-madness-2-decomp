@@ -77,7 +77,7 @@ int main() {
             model->SetUseLighting(requests[lightingValue]); CHECK();
         }
         Reset(seed); memset(&wanted->screenRect, 0, 16); memset(&wanted->field_0x2a8, 0, 16);
-        wanted->field_0x14c = 1; model->ClearScreenRects(); CHECK();
+        wanted->hidden = 1; model->ClearScreenRects(); CHECK();
         for (table = 0; table < 2; ++table) for (int setting = 0; setting < 10; ++setting) {
             Reset(seed); g_ActiveLodSettings = tables[table];
             wanted->inverseLodThreshold = 1.0f / tables[table][setting].lodThreshold;

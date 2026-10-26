@@ -1337,7 +1337,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
         for (int i = 0; i < count; i++) {
             entry->archive->Read(node->nodeName, 0x80, 1);
             entry->archive->Read(&node->localMatrix, 0x40, 1);
-            entry->archive->Read(&node->field_0x14c, 4, 1);
+            entry->archive->Read(&node->hidden, 4, 1);
             entry->archive->Read(&node->localBoundsValid, 4, 1);
             entry->archive->Read(&node->localBoundsCenter, 0xc, 1);
             entry->archive->Read(&node->localBoundsHalfExtent, 0xc, 1);

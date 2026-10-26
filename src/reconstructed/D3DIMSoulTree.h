@@ -107,7 +107,7 @@ public:
     SoultreeObject* firstChild;                // first child
     SoultreeObject* nextSibling;               // next sibling
     unsigned char field_0x148[0x14c - 0x148];
-    int field_0x14c;                           // Krusty3DObjects.cpp: hidden
+    int hidden;                                // +0x14c (Krusty3DObjects.cpp; provisional)
     int boundsFound;                           // bounds found (slot 5)
     int localBoundsValid;                      // +0x154 local bounds valid
     Vector3 localBoundsCenter;                 // +0x158 local bounds centre

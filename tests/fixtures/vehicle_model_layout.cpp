@@ -15,7 +15,7 @@ typedef char render_node_size[sizeof(D3DIMSoultreeObject) == 0x2d8 ? 1 : -1];
 typedef char local_matrix[offsetof(SoultreeObject, localMatrix) == 0xb8 ? 1 : -1];
 typedef char world_matrix[offsetof(SoultreeObject, worldMatrix) == 0xf8 ? 1 : -1];
 typedef char node_child[offsetof(SoultreeObject, firstChild) == 0x140 ? 1 : -1];
-typedef char node_flag[offsetof(SoultreeObject, field_0x14c) == 0x14c ? 1 : -1];
+typedef char node_flag[offsetof(SoultreeObject, hidden) == 0x14c ? 1 : -1];
 typedef char screen_rect[offsetof(D3DIMSoultreeObject, screenRect) == 0x298 ? 1 : -1];
 typedef char second_rect[offsetof(D3DIMSoultreeObject, field_0x2a8) == 0x2a8 ? 1 : -1];
 typedef char vehicle_node[offsetof(UnknownCameraVehicle, modelNode) == 0x3bc ? 1 : -1];

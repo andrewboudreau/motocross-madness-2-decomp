@@ -63,7 +63,7 @@ int SoultreeQuadTreeRenderer::PrepareGeometry()
     while (QuadTreeObject* obj = g_collisionQuadTree->NextObject()) {
         if (obj->objectTypeId == nodeTypeId) {
             D3DIMSoultreeObject* node = (D3DIMSoultreeObject*)obj;
-            if (node->field_0x14c == 0) {
+            if (node->hidden == 0) {
                 node->field_0x2d4 = 1;
                 node->SelectLod(0, 0);
                 visibleCount++;

@@ -158,16 +158,16 @@ int BonusObjectManager::Tick(float frameTime) {
         Vector3 scale = t * keyScaleChange + keyScale;
         scale *= sizeFactor;
         baseFrame->Scale(scale.x, scale.y, scale.z);
-        digitModels[0][0]->subtreeDirty = !digitModels[0][0]->field_0x14c;
-        digitModels[0][1]->subtreeDirty = !digitModels[0][0]->field_0x14c;
+        digitModels[0][0]->subtreeDirty = !digitModels[0][0]->hidden;
+        digitModels[0][1]->subtreeDirty = !digitModels[0][0]->hidden;
         for (digit = 0; digit < 10; digit++)
             for (place = 2; place < 5; place++)
-                digitModels[digit][place]->subtreeDirty = !digitModels[digit][place]->field_0x14c;
+                digitModels[digit][place]->subtreeDirty = !digitModels[digit][place]->hidden;
         for (digit = 0; digit < 10; digit++)
             for (place = 0; place < 2; place++)
-                fractionDigitModels[digit][place]->subtreeDirty = !fractionDigitModels[digit][place]->field_0x14c;
-        timesModel->subtreeDirty = !timesModel->field_0x14c;
-        decimalPointModel->subtreeDirty = !decimalPointModel->field_0x14c;
+                fractionDigitModels[digit][place]->subtreeDirty = !fractionDigitModels[digit][place]->hidden;
+        timesModel->subtreeDirty = !timesModel->hidden;
+        decimalPointModel->subtreeDirty = !decimalPointModel->hidden;
     } else {
         HideDigits();
     }

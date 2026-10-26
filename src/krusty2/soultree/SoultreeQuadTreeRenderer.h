@@ -31,7 +31,7 @@
 class SoultreeObject : public QuadTreeObject, public GameObject {
 public:
     char pad_0x38[0x14c - 0x38];
-    int field_0x14c;                  // tested by slot 12
+    int hidden;                       // +0x14c tested by slot 12
     char pad_0x150[0x18c - 0x150];
     int subtreeDirty;                 // +0x18c (common/SoultreeObject.h); set to 1 by 0x5046e0
     int field_0x190;                  // +0x190 cleared by InsertNodesInQuadtree, set to 1 by RemoveNodesFromQuadtree

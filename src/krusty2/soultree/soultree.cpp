@@ -144,7 +144,7 @@ SoultreeObject::SoultreeObject(int flags)
     field_0x190 = 1;
     quadtreeCell = 15;
     inQuadtree = 0;
-    field_0x14c = 0;
+    hidden = 0;
     field_0x150 = 0;
     localBoundsValid = 0;
     localBoundsCenter.x = 0;
@@ -753,13 +753,13 @@ SoultreeObject* SoultreeObject::FindByName(const char* n)
 // 0x004fdb40.
 void SoultreeObject::SetFlag14c()
 {
-    field_0x14c = 1;
+    hidden = 1;
 }
 
 // 0x004fdb50.
 void SoultreeObject::ClearFlag14c()
 {
-    field_0x14c = 0;
+    hidden = 0;
 }
 
 // 0x004fdb60.
@@ -786,7 +786,7 @@ void SoultreeObject::LoadHierarchy(UnknownTextureStream* stream)
             CreateNode(&nodes[i]);
         stream->Read(nodes[i]->name, 0x80, 1);
         stream->Read(&nodes[i]->localMatrix, 0x40, 1);
-        stream->Read(&nodes[i]->field_0x14c, 4, 1);
+        stream->Read(&nodes[i]->hidden, 4, 1);
         stream->Read(&nodes[i]->localBoundsValid, 4, 1);
         stream->Read(&nodes[i]->localBoundsCenter, 0xc, 1);
         stream->Read(&nodes[i]->localBoundsHalfExtent, 0xc, 1);
@@ -997,7 +997,7 @@ void SoultreeObject::CopySubtree(SoultreeObject* src, SoultreeObject* dst)
     strcpy(dst->name, src->name);
     dst->localMatrix = src->localMatrix;
     dst->worldValid = 0;
-    dst->field_0x14c = src->field_0x14c;
+    dst->hidden = src->hidden;
     dst->localBoundsValid = 0;
     if (src->nextSibling) {
         CreateNode(&dst->nextSibling);
