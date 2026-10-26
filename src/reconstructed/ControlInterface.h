@@ -34,7 +34,7 @@ struct UnknownControlBinding {
     ~UnknownControlBinding();                                 // 0x0043cd00: unbinds
 
     void Reset();                                             // 0x0043cca0: clears everything, ids -1
-    void SetKeys(int a, int b);                               // 0x0043cce0: +0x0c and +0x10 (the keyboard's keys)
+    void SetKeys(int first, int second);                      // 0x0043cce0: +0x0c and +0x10 (the keyboard's keys)
     void Recenter();                                          // 0x0043cd10: value = centre
     void SetFromAxis(float value, float range);               // 0x0043cd20: maps value/range, dead zone
     void Adjust(float delta);                                 // 0x0043cd90: adds delta, clamped

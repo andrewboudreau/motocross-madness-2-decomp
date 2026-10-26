@@ -2005,14 +2005,14 @@ GameObject* UIDialog::AddControl(GameObject* control, int group, int region) {
 }
 
 // 0x0046e8c0
-void UIDialog::UnknownVirtualSlot28(int value) {
+void UIDialog::UnknownVirtualSlot28(int initParam) {
     UnknownDialogEvent event;
     event.handled = 0;
     event.kind = kDialogInit;
     event.code = 0;
     event.controlName = 0;
     event.control = 0;
-    event.param = value;
+    event.param = initParam;
     event.gui = guiManager;
     event.dialog = this;
     HandleEvent(&event);

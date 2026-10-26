@@ -120,9 +120,9 @@ void UnknownControlBinding::Reset() {
 }
 
 // 0x0043cce0
-void UnknownControlBinding::SetKeys(int a, int b) {
-    firstKey = a;
-    secondKey = b;
+void UnknownControlBinding::SetKeys(int first, int second) {
+    firstKey = first;
+    secondKey = second;
 }
 
 // 0x0043cd00

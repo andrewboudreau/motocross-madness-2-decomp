@@ -348,7 +348,7 @@ int GUIManager::RenderPost3D() {
 
 // 0x00485a70
 UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int menu, int flags, int area,
-                                 UIDialog* parent, int c, int name, int wait) {
+                                 UIDialog* parent, int initParam, int name, int wait) {
     CameraRect screen;
     CameraRect* rect;
 
@@ -374,7 +374,7 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int menu, int flags, int area
                                      parent, guiBackground, dialogFontName, dialogFontSize, this, users[0],
                                      (const char*)name)) {
         dialog->showFlags = flags;
-        AttachDialog(dialog, c, wait);
+        AttachDialog(dialog, initParam, wait);
         return dialog;
     }
     if (wait)
@@ -383,7 +383,7 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int menu, int flags, int area
 }
 
 // 0x00485bd0
-void GUIManager::AttachDialog(UIDialog* dialog, int a, int wait) {
+void GUIManager::AttachDialog(UIDialog* dialog, int initParam, int wait) {
     int visible = dialog->isEnabled;
 
     dialog->SetShown(0);
@@ -391,7 +391,7 @@ void GUIManager::AttachDialog(UIDialog* dialog, int a, int wait) {
         dialog->parentDialog->controlContainer->AppendSibling(dialog, -1);
     else
         dialogContainer->AppendChild(dialog, -1);
-    dialog->UnknownVirtualSlot28(a);
+    dialog->UnknownVirtualSlot28(initParam);
     dialog->animatesControls = uiAnimations;
     if (guiBackground)
         guiBackground->MarkAllDirty();

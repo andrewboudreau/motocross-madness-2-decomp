@@ -93,8 +93,9 @@ public:
                       int callback);
     // 0x00485a70: shows `dialog`.
     UIDialog* ShowDialog(UIDialog* dialog, int menu, int flags, int area,
-                                            UIDialog* parent, int c, int name, int wait);
-    void AttachDialog(UIDialog* dialog, int a, int wait); // 0x00485bd0: adds a shown dialog to its container
+                         UIDialog* parent, int initParam, int name, int wait);
+    // 0x00485bd0: adds a shown dialog to its container.
+    void AttachDialog(UIDialog* dialog, int initParam, int wait);
     int OpenDialogResource(const char* resource); // 0x00485c80: opens a dialog resource
     void CloseDialogResource();             // 0x00485d50: closes it
     void SetDialogDirectory(const char* directory); // 0x00485d70

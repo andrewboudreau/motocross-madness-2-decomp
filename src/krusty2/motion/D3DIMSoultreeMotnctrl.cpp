@@ -56,14 +56,14 @@ int FillNodeNames(int index, NodeNameEntry* table, SoultreeObject* node)
 // slot 8 (0x00445e70, ret 4): copies the 0x4f-char name at +0x1a4 from the argument object, then runs
 // Character's slot 8 (0x004a98b0, direct call).  The header types the argument as int; it is a pointer to
 // another D3DIMSoultreeCharacter (tier 3).
-void D3DIMSoultreeCharacter::CharacterVirtualSlot8(int a)
+void D3DIMSoultreeCharacter::CharacterVirtualSlot8(int other)
 {
-    D3DIMSoultreeCharacter* src = (D3DIMSoultreeCharacter*)a;
+    D3DIMSoultreeCharacter* src = (D3DIMSoultreeCharacter*)other;
     int len = strlen(src->d3d_field_0x1a4);
     int n = len > 0x4f ? 0x4f : len;
     strncpy(d3d_field_0x1a4, src->d3d_field_0x1a4, n);
     d3d_field_0x1a4[n] = 0;
-    Character::CharacterVirtualSlot8(a);
+    Character::CharacterVirtualSlot8(other);
 }
 
 // slot 6 (0x00446480, ret 8): applies a pose record to its node.  'rowMask' is an optional per-row
@@ -86,9 +86,9 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot6(int poseRecord, int rowMask)
 
 // slot 3 (0x00446110, ret 4): refreshes every record of the list from the live nodes.  The records are
 // first passed (last to first) to slot 4, then each is overwritten with its node's current pose.
-void D3DIMSoultreeCharacter::CharacterVirtualSlot3(int a)
+void D3DIMSoultreeCharacter::CharacterVirtualSlot3(int records)
 {
-    MotionPoseList* list = (MotionPoseList*)a;
+    MotionPoseList* list = (MotionPoseList*)records;
     for (int i = list->count - 1; i >= 0; i--)
         CharacterVirtualSlot4((int)&list->poses[i], 0);
     for (int j = 0; j < list->count; j++) {
@@ -300,9 +300,9 @@ public:
 
 // slot 9 (0x00445ec0, ret 4): clones the argument character's node model, makes it a child of this object's
 // GameObject, then rebuilds the node name table (line 0x11b) and re-registers the model's nodes.
-void D3DIMSoultreeCharacter::CharacterVirtualSlot9(int a)
+void D3DIMSoultreeCharacter::CharacterVirtualSlot9(int other)
 {
-    SoultreeObject* source = ((D3DIMSoultreeCharacter*)a)->modelNode;
+    SoultreeObject* source = ((D3DIMSoultreeCharacter*)other)->modelNode;
     ModelObject* model = reinterpret_cast<ModelObject*>(new(__FILE__, 0x116) D3DIMSoultreeObject(1));
     modelNode = (SoultreeObject*)model;
     ((ModelObject*)modelNode)->CopyFrom((ModelObject*)source);

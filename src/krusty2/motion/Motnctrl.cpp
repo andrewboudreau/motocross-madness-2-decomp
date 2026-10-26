@@ -612,9 +612,9 @@ void Character::BlendToMotion(Motion* motion, float time)
 // owner: Motnctrl.cpp (__FILE__ 0x56e034, line 0x585)
 // slot 8 (0x004a98b0): copies the motion state, the file names, the node model (slot 9) and the rest
 // pose list of another character.
-void Character::CharacterVirtualSlot8(int a)
+void Character::CharacterVirtualSlot8(int other)
 {
-    Character* source = (Character*)a;
+    Character* source = (Character*)other;
     motionStopped = source->motionStopped;
     chr_field_0x10 = source->chr_field_0x10;
     motionCount = source->motionCount;
@@ -629,7 +629,7 @@ void Character::CharacterVirtualSlot8(int a)
     strcpy(vutFilename, source->vutFilename);
     strcpy(mirFilename, source->mirFilename);
     strcpy(contentDirectory, source->contentDirectory);
-    CharacterVirtualSlot9(a);
+    CharacterVirtualSlot9(other);
     poseList = source->poseList;
     poseList.poses = (CharacterPose*)DebugMalloc(poseList.count * sizeof(CharacterPose), __FILE__, 0x585);
     for (int i = 0; i < poseList.count; i++)
