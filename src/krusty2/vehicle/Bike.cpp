@@ -568,15 +568,15 @@ static inline int BikeFindWheelKind(const char* name, const BikeWheelKind* kinds
     return 0;
 }
 
-GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const char* riderModel,
+GameObject* Bike::LoadBike(int context, const char* engineName, const char* modelPath, const char* riderModel,
                            const SoultreeLoadDesc* desc, const BikeA5C8* info, Vec3 startPosition,
-                           Vec3 forward, Vec3 up, void* a9, VehicleInputMap* map,
+                           Vec3 forward, Vec3 up, void* terrainProbe, VehicleInputMap* map,
                            const char* name, int a19, int defaultEngine, int* torqueTable,
                            int rpmLow, int rpmHigh, int rpmStep, float frontSpring, float frontDamper,
                            float rearSpring, float rearDamper, float frontRatio, float rearRatio,
-                           int a31, int a32, void* a10, void* device, VehicleAxis* steer,
+                           int a31, int a32, void* linkedObject, void* device, VehicleAxis* steer,
                            VehicleAxis* lean, VehicleAxis* throttle, SoultreeSlot1f0* trackObject,
-                           float a11, int a21)
+                           float weight, int createCollision)
 {
     int i;
     char partName[64];
@@ -594,11 +594,12 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     float maxZ;
     float minZ;
 
-    if (a11 <= 0.0f)
-        a11 = 230.0f;
-    LoadVehicle(a1, engineName, a3, desc, (int)info, startPosition, forward, up, a9, map, a10, a11,
+    if (weight <= 0.0f)
+        weight = 230.0f;
+    LoadVehicle(context, engineName, modelPath, desc, (int)info, startPosition, forward, up, terrainProbe,
+                map, linkedObject, weight,
                 0.9f, 40.0f * 0.01745329f, device, 2, 3, 3, 1, 1, defaultEngine, torqueTable, rpmLow, rpmHigh,
-                rpmStep, 0.18f, steer, lean, throttle, trackObject, a21);
+                rpmStep, 0.18f, steer, lean, throttle, trackObject, createCollision);
     gasGyro = a31;
     brakeGyro = a32;
     BIKE_COPY_TEXT(riderName, name, 16);

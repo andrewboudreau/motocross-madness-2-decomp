@@ -74,15 +74,15 @@ public:
     // Vehicle::LoadVehicle, builds the rider character, the handlebar part, the two wheels
     // with their shocks, the three contact points, the particle emitters and the pose handles.
     // Argument names are tier 3 except where a callee's parameter fixes them; a19 is unused.
-    GameObject* LoadBike(int a1, const char* engineName, const char* a3, const char* riderModel,
+    GameObject* LoadBike(int context, const char* engineName, const char* modelPath, const char* riderModel,
                          const SoultreeLoadDesc* desc, const BikeA5C8* info, Vec3 position,
-                         Vec3 forward, Vec3 up, void* a9, VehicleInputMap* map,
+                         Vec3 forward, Vec3 up, void* terrainProbe, VehicleInputMap* map,
                          const char* name, int a19, int defaultEngine, int* torqueTable,
                          int rpmLow, int rpmHigh, int rpmStep, float frontSpring, float frontDamper,
                          float rearSpring, float rearDamper, float frontRatio, float rearRatio,
-                         int a31, int a32, void* a10, void* device, VehicleAxis* steer,
+                         int a31, int a32, void* linkedObject, void* device, VehicleAxis* steer,
                          VehicleAxis* lean, VehicleAxis* throttle, SoultreeSlot1f0* track,
-                         float a11, int a21);
+                         float weight, int createCollision);
 
     // 0x0040a520 (2272 bytes): integrates a steering torque from the angular velocity, the
     // front wheel's contact and the two +0x5f8/+0x5fc contacts, turns it by the steer state

@@ -2000,13 +2000,14 @@ void VehicleHitBy(CollisionObject* a, CollisionObject* b)
 // the caller's tables or with zeros, runs the base loader, then the spark emitter
 // (0x004b9830, registered as a child through its slot 27) and the steering control
 // (0x00504b60) aligned with the negated third axis, and installs the hit callbacks.
-GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3, const SoultreeLoadDesc* a4, int a5,
-                                 Vec3 a6, Vec3 a7, Vec3 a8, void* a9, VehicleInputMap* map, void* a10,
-                                 float a11, float arg18, float steerScale, void* device, int wheelCap,
-                                 int extraContacts, int a13, int earlyCap, int lateCap, int defaultEngine,
+GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char* modelPath,
+                                 const SoultreeLoadDesc* desc, int a5, Vec3 startPosition, Vec3 startForward,
+                                 Vec3 startUp, void* terrainProbe, VehicleInputMap* map, void* linkedObject,
+                                 float weight, float arg18, float steerScale, void* device, int wheelCap,
+                                 int extraContacts, int attachmentSlots, int earlyCap, int lateCap, int defaultEngine,
                                  int* torqueTable, int rpmLow, int rpmHigh, int rpmStep, float gearArg,
                                  VehicleAxis* steer, VehicleAxis* lean, VehicleAxis* throttle,
-                                 SoultreeSlot1f0* a14, int a21)
+                                 SoultreeSlot1f0* trackObject, int createCollision)
 {
     int i;
 
@@ -2055,18 +2056,19 @@ GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3,
         engineState = reinterpret_cast<VehicleSpeedState*>(new(__FILE__, 0x1b5) UnknownEngineGearbox(
             engineName, 0.02f, torqueTable, rpmLow, rpmHigh, rpmStep, reinterpret_cast<const int&>(gearArg),
             controlResponse[2], controlResponse[3]));
-    SoultreePhysicsCharacter::UnknownVirtualSlot40(a1, 0, a3, a4, a5, a6, a7, a8, a9, a10, a11,
-                                                   wheelCap + extraContacts, a13, a14, 0.02f,
-                                                   100, 0.001f, 0.1f, 3,
-                                                   a14 ? ((VehicleTrackView*)a14)->field_0x88 : 0,
-                                                   a21);
+    SoultreePhysicsCharacter::UnknownVirtualSlot40(context, 0, modelPath, desc, a5, startPosition,
+                                                   startForward, startUp, terrainProbe, linkedObject,
+                                                   weight, wheelCap + extraContacts, attachmentSlots,
+                                                   trackObject, 0.02f, 100, 0.001f, 0.1f, 3,
+                                                   trackObject ? ((VehicleTrackView*)trackObject)->field_0x88 : 0,
+                                                   createCollision);
     if (particleManager) {
         sparkEmitter = reinterpret_cast<VehicleSparkEmitter*>(
             new(__FILE__, 0x1dc) SparkParticleEmitter(1));
         GameObject::AppendChild((GameObject*)sparkEmitter->UnknownVirtualSlot27(renderContext, particleManager), -1);
     }
-    steerState = new(__FILE__, 0x1e0) VehicleSteerState(steerScale, controlResponse[0], &a7, &a8);
-    Vec3 down = a8 * -1.0f;
+    steerState = new(__FILE__, 0x1e0) VehicleSteerState(steerScale, controlResponse[0], &startForward, &startUp);
+    Vec3 down = startUp * -1.0f;
     steerState->SetAxisFromDirection(&down, modelNode);
     steerState->SetAngle(0, modelNode);
     spawnProtectTimer = 0.0f;

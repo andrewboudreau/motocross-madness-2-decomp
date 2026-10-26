@@ -125,16 +125,18 @@ public:
     // clears the controls and records the heading; returns it (tier 3 name).
     int CheckCrash();
     // 0x00525e20 (`ret 0x94` = 37 argument dwords; not in any vtable: Bike's loader 0x004079c0
-    // calls it directly).  Forwards a1..a11, a13, a14 and a21 to SoultreePhysicsCharacter slot
-    // 40 with (0.02f, 100, 0.001f, 0.1f, 3) and the track byte; the other arguments configure
-    // the vehicle (names tier 3).
-    GameObject* LoadVehicle(int a1, const char* engineName, const char* a3, const SoultreeLoadDesc* a4, int a5,
-                            Vec3 a6, Vec3 a7, Vec3 a8, void* a9, VehicleInputMap* map, void* a10,
-                            float a11, float arg18, float steerScale, void* device, int wheelCap,
-                            int extraContacts, int a13, int earlyCap, int lateCap, int defaultEngine,
+    // calls it directly).  Forwards the arguments named after slot 40's parameters (context is
+    // its renderContext; a5 is Bike's info record) to SoultreePhysicsCharacter slot 40 with
+    // (0.02f, 100, 0.001f, 0.1f, 3) and the track byte; the other arguments configure the
+    // vehicle (names tier 3).
+    GameObject* LoadVehicle(int context, const char* engineName, const char* modelPath,
+                            const SoultreeLoadDesc* desc, int a5, Vec3 startPosition, Vec3 startForward,
+                            Vec3 startUp, void* terrainProbe, VehicleInputMap* map, void* linkedObject,
+                            float weight, float arg18, float steerScale, void* device, int wheelCap,
+                            int extraContacts, int attachmentSlots, int earlyCap, int lateCap, int defaultEngine,
                             int* torqueTable, int rpmLow, int rpmHigh, int rpmStep, float gearArg,
                             VehicleAxis* steer, VehicleAxis* lean, VehicleAxis* throttle,
-                            SoultreeSlot1f0* a14, int a21);
+                            SoultreeSlot1f0* trackObject, int createCollision);
     int Method_00478FE0();      // 0x00478fe0, shared `xor eax,eax; ret` stub (direct call from CheckCrash)
     int AddEarlyTicker(VehicleTicker* ticker);                  // 0x00525cb0, append to earlyTickers
     int AddLateTicker(VehicleTicker* ticker);                   // 0x00525cf0, append to lateTickers
