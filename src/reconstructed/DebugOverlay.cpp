@@ -58,24 +58,24 @@ DebugOverlay::~DebugOverlay()
     }
 }
 
-// 0x00447de0. `i` is set before `y` takes `e`, so the two cannot share
-// a register: `e` stays in ebx until the loop, which then holds the row
+// 0x00447de0. `i` is set before `y` takes `top`, so the two cannot share
+// a register: `top` stays in ebx until the loop, which then holds the row
 // colour there, and edi is saved only on the success path.
-DebugOverlay* DebugOverlay::Setup(RenderTarget* a, TextureMapManager* b,
-                                                  int c, int d, int e)
+DebugOverlay* DebugOverlay::Setup(RenderTarget* target, TextureMapManager* textures,
+                                  int height, int left, int top)
 {
-    GameObject::SetRenderContext(a);
-    fontHeight = c;
-    rowsTop = e;
-    rowsLeft = d;
-    textureManager = b;
+    GameObject::SetRenderContext(target);
+    fontHeight = height;
+    rowsTop = top;
+    rowsLeft = left;
+    textureManager = textures;
     if (LoadFont()) {
         int i = 0;
-        int y = e;
+        int y = top;
         do {
             rows[i].y = y;
             rows[i].bottom = lineHeight + y;
-            rows[i].x = d;
+            rows[i].x = left;
             rows[i].right = 0x100;
             rows[i].text[0] = 0;
             rows[i].color = 0xffffff;

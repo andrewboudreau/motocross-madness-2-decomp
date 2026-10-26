@@ -55,8 +55,8 @@ public:
     virtual int AttachRenderContext(void* value);  // 0x00448520
 
     // 0x00447de0: sets the overlay up; returns it, or 0.
-    DebugOverlay* Setup(RenderTarget* a, TextureMapManager* b,
-                                        int c, int d, int e);
+    DebugOverlay* Setup(RenderTarget* target, TextureMapManager* textures,
+                        int height, int left, int top);
     // 0x00447a00: loads "DebugOverlayText.tga", or renders the font
     // ("Courier", height fontHeight) into a new 256x256 texture through GDI.
     int LoadFont();
