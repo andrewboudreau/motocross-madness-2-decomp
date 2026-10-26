@@ -914,12 +914,12 @@ int Bike::UnknownVirtualSlot62(float arg)
     return 0;
 }
 
-int Bike::UnknownVirtualSlot100(float a, int b, float c)
+int Bike::UnknownVirtualSlot100(float dt, int impact, float impulse)
 {
-    float thr = 0.766f;
+    float noseOverLimit = 0.766f;
     if (((BikeA1F4*)terrain)->i_0xbe8 != 1)
-        thr = 0.342f;
-    crashState = UnknownVirtualSlot99(a, thr, b, c);
+        noseOverLimit = 0.342f;
+    crashState = UnknownVirtualSlot99(dt, noseOverLimit, impact, impulse);
     if (crashState) {
         crashHeading = Vec3(savedForward.x, 0.0f, savedForward.z);
         motionIndex = 0;
@@ -1372,9 +1372,9 @@ void Bike::UnknownVirtualSlot97()
 }
 
 // Slot 99: crash test.  Classifies the current impact/attitude and, if the
-// rider is thrown, records the crash direction (field_0x448: 1..5) and the
-// reason code (field_0x460) and returns 1.
-int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
+// rider is thrown, records the crash direction (crashDirection: 1..5) and the
+// reason code (crashReason) and returns 1.
+int Bike::UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, float impulse)
 {
     // Retail returns the nonzero state itself (the branch reaches the epilogue with
     // the loaded crashState still in eax).
@@ -1404,7 +1404,7 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
     }
     // front wheel planted, rear wheel not: nose-over crash
     if ((airborne || crossoverPose == 0) && frontWheel->inContact && !rearWheel->inContact
-        && wheelForwardAlignment < b && angularVelocity.x > 0.0f) {
+        && wheelForwardAlignment < noseOverLimit && angularVelocity.x > 0.0f) {
         crashDirection = 1;
         crashReason = 7;
         return 1;
@@ -1448,14 +1448,14 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
         crashReason = 13;
         return 1;
     }
-    // The clamped step is a new local (sharing a's slot): retail copies a into it on
+    // The clamped step is its own local (sharing dt's slot): retail copies dt into it on
     // both pass-through paths.
     float step;
-    if (a < fixedStepTime) {
+    if (dt < fixedStepTime) {
         float m = fixedStepTime * 0.8f;
-        step = m > a ? m : a;
+        step = m > dt ? m : dt;
     } else
-        step = a;
+        step = dt;
     if (UnknownVirtualSlot51()) {
         linkedVehicle = 0;
         return 0;
@@ -1465,7 +1465,7 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
         crashReason = 4;
         return 1;
     }
-    if (c && d * invMass > step * impactAccelLimit) {
+    if (impact && impulse * invMass > step * impactAccelLimit) {
         if (angularVelocity.z > 0.0f) {
             crashDirection = 4;
             crashReason = 10;

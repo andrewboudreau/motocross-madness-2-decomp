@@ -167,7 +167,7 @@ public:
     int movingForward;  // +0x440 slot 85 passes +dt when set and -dt when clear to every wheel; slot 74 flips the sign of its result on it; slot 1 resets it to 1
     int crashState;  // +0x444 nonzero disables input (slots 52/62/64/60 test ==0), switches solver vectors (+0xf0, 0.1 scale, 1,1,1 mask); Bike slot 99 writes it and runs the crash timer 0x454 while set
     int crashDirection;          // +0x448 Bike slot 99 (0x00409b30) stores small codes (1..5)
-    float impactAccelLimit;                   // +0x44C  LoadVehicle sets 200; Bike slot 99 reports a crash when impulse * invMass > a * impactAccelLimit (tier 2)
+    float impactAccelLimit;                   // +0x44C  LoadVehicle sets 200; Bike slot 99 reports a crash when impulse * invMass > dt * impactAccelLimit (tier 2)
     float speedGainLimit;  // +0x450 slot 70: true when (linearSpeed - prevSpeed) < dt * speedGainLimit
     // 0x454/0x458: Bike slot 39 (0x0040a1f0) decrements 0x454 by the frame time and
     // compares it with 0.0f/-2.0f, so both are floats (tier 2; slot 69 copies 0x458).

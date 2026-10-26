@@ -63,8 +63,8 @@ public:
     // slots introduced by Bike
     virtual void UnknownVirtualSlot97();
     virtual int UnknownVirtualSlot98();
-    virtual int UnknownVirtualSlot99(float a, float b, int c, float d);
-    virtual int UnknownVirtualSlot100(float a, int b, float c);
+    virtual int UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, float impulse);
+    virtual int UnknownVirtualSlot100(float dt, int impact, float impulse);
     // Primary vtable 0x00550900 slot 101 is CRT _purecall (0x00534cfe).
     // KrustyBike supplies the concrete override at 0x00496d10.
     virtual void UnknownVirtualSlot101() = 0;

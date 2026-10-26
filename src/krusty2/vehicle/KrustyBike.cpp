@@ -597,7 +597,7 @@ int KrustyBike::UnknownVirtualSlot28(int steps)
 // sets velocity to a 0.055 fraction of the offset, and gives a small random kick to
 // field_0xd8; otherwise it may enter recovery states 2 (both wheels loaded past -3.5)
 // or 1/3/4/5/9, and falls through to the base handler when nothing applies.
-int KrustyBike::UnknownVirtualSlot99(float a, float b, int c, float d)
+int KrustyBike::UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, float impulse)
 {
     if (crashState) return crashState;
     if (UnknownVirtualSlot12(anyWheelInContact)) {
@@ -633,7 +633,7 @@ int KrustyBike::UnknownVirtualSlot99(float a, float b, int c, float d)
         return 1;
     }
     if (UnknownVirtualSlot51()) return 0;
-    return Bike::UnknownVirtualSlot99(a, b, c, d);
+    return Bike::UnknownVirtualSlot99(dt, noseOverLimit, impact, impulse);
 }
 
 // Slot 93: when the pad device (input map +0x0c) is in mode 3, reset one effect channel and

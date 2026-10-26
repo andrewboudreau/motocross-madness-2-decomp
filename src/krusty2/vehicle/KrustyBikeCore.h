@@ -83,7 +83,7 @@ public:
     virtual void UnknownVirtualSlot97();
     virtual void UnknownVirtualSlot94();
     virtual void UnknownVirtualSlot96();
-    virtual int UnknownVirtualSlot99(float a, float b, int c, float d);
+    virtual int UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, float impulse);
     virtual void UnknownVirtualSlot101();
     virtual void UnknownVirtualSlot102(float dt);   // 0x0048eea0: rider/bike pose update (trick clips, head turn)
 
