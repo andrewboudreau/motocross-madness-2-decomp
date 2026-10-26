@@ -646,7 +646,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
 {
     if (!attachmentCount)
         return;
-    if (!field_0x124 || !(field_0x124->isEnabled))
+    if (!particleManager || !(particleManager->isEnabled))
         return;
     if (!shadowLight) {
         SoultreeLightList* list = *(SoultreeLightList**)((char*)sceneNode + 0x1bc);
@@ -782,7 +782,7 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int renderContext, in
                                                            int createCollision)
 {
     restContactThreshold = restThreshold;
-    field_0x124 = (GameObject*)linkedObject;
+    particleManager = (GameObject*)linkedObject;
     terrain = (SoultreeProbe*)terrainProbe;
     baseWeight = weight;
     track = trackObject;
@@ -934,7 +934,7 @@ SoultreePhysicsBaseObject::SoultreePhysicsBaseObject(int flags)
     weightForce = g_Zero;
     terrainScale = 1.0f;
     terrain = 0;
-    field_0x124 = 0;
+    particleManager = 0;
     inShadow = 0;
     shadowLight = 0;
     attachmentResetPending = 0;

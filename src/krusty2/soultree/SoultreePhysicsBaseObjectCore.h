@@ -62,7 +62,7 @@ public:
     //   startPosition (a3) -> respawnPosition and the node position (sceneNode->SetPosition)
     //   startForward (a4) -> respawnHeading and bodyForward;  startUp (a5) -> bodyUp
     //   terrainProbe (a6) -> terrain (if non-null, its float at +0x40 goes to terrainScale)
-    //   linkedObject (a7) -> field_0x124;  weight (a8) -> baseWeight
+    //   linkedObject (a7) -> particleManager;  weight (a8) -> baseWeight
     //   contactCapacity (a9) -> collisionPointCapacity (collisionPoints = zeroed array of it)
     //   attachmentSlots (a10) -> attachmentCapacity (attachments = records of 40 bytes)
     //   trackObject (a11) -> track;  fixedStep (a12) -> fixedStepTime;
@@ -207,8 +207,8 @@ public:
     char asleep;  // +0x10a rest check UpdateRestState (0x00502c40) zeroes the velocities and sets it once the body has rested 0.5 s on its contacts; GameObject slot 10 (0x005036f0) skips the whole update while it is set; slot 38 clears the other body's flag on a body-to-body hit; the ctor clears it
     Vec3 respawnPosition;  // +0x10c slot 2 stores the start position (a3) here; Vehicle slot 43 snapshots position into it; slot 39 restores position from it
     Vec3 respawnHeading;  // +0x118 slot 2 stores the start forward vector (a4); Vehicle slot 43 stores the horizontal, normalised savedForward; the placement search uses it as the reference direction while respawning
-    GameObject* field_0x124;            // tier 3: only its byte +0x25 bit 0 is read (slot 21, Vehicle slot 38);
-                                        // that offset is GameObject::field_0x25
+    GameObject* particleManager;        // +0x124 slot 2's linkedObject (a7): the ParticleManager the Bike/Vehicle emitters attach to
+                                        // (their slot 27) and Bike hands to its Wrecker; slot 21 and the emitters test its isEnabled (tier 2)
     CollisionObject* collisionObject;  // +0x128 CollisionObject (0xb8 bytes, ctor 0x00431e70) built by slot 2; slot 28 runs its collision test (0x00435fb0) and pushes the body out by its +0x5c vector; slot 38 reads its contact point/normal (+0xa0/+0xac); 0x00501230 installs the collision callbacks at its +0x88/+0x8c
     SoultreeContact** collisionPoints;      // +0x12c array of collisionPointCount pointers
     int collisionPointCount;  // +0x130 loop bound over collisionPoints in slots 7, 13, 18, 30, 31

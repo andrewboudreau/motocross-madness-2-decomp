@@ -1198,7 +1198,7 @@ void Vehicle::UnknownVirtualSlot38(int notify, int eventKind, void* event)
     case 0x6a:
         angScale = VehOnes();
         hasBody = 0;
-        if (field_0x124 && (field_0x124->isEnabled)) {
+        if (particleManager && (particleManager->isEnabled)) {
             reinterpret_cast<SparkParticleEmitter*>(sparkEmitter)->SetPosition(
                 reinterpret_cast<const ParticleVec3&>(((VehicleContactSet*)collisionObject)->contactPoint));
             sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
@@ -2060,10 +2060,10 @@ GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3,
                                                    100, 0.001f, 0.1f, 3,
                                                    a14 ? ((VehicleTrackView*)a14)->field_0x88 : 0,
                                                    a21);
-    if (field_0x124) {
+    if (particleManager) {
         sparkEmitter = reinterpret_cast<VehicleSparkEmitter*>(
             new(__FILE__, 0x1dc) SparkParticleEmitter(1));
-        GameObject::AppendChild((GameObject*)sparkEmitter->UnknownVirtualSlot27(renderContext, field_0x124), -1);
+        GameObject::AppendChild((GameObject*)sparkEmitter->UnknownVirtualSlot27(renderContext, particleManager), -1);
     }
     steerState = new(__FILE__, 0x1e0) VehicleSteerState(steerScale, controlResponse[0], &a7, &a8);
     Vec3 down = a8 * -1.0f;
@@ -2092,7 +2092,7 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     weightForce = kVec3Zero;
     leanCos = 1.0f;
     wheelForwardAlignment = 1.0f;
-    field_0x124 = 0;
+    particleManager = 0;
     sparkEmitter = 0;
     inShadow = 0;
     shadowLight = 0;

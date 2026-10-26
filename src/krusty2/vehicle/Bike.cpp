@@ -734,13 +734,13 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     delete wheelPos;
     centerNode = modelNode->FindByName("NullFrame");
 
-    if (field_0x124) {
+    if (particleManager) {
         dustEmitter = reinterpret_cast<BikeDustEmitter*>(new(__FILE__, 0x70f) DustParticleEmitter(1));
-        GameObject::AppendChild((GameObject*)dustEmitter->UnknownVirtualSlot27(GameObject::renderContext, field_0x124), -1);
+        GameObject::AppendChild((GameObject*)dustEmitter->UnknownVirtualSlot27(GameObject::renderContext, particleManager), -1);
         dirtChunkEmitter = reinterpret_cast<BikeDirtChunkEmitter*>(new(__FILE__, 0x710) DirtChunkParticleEmitter(1));
-        GameObject::AppendChild((GameObject*)dirtChunkEmitter->UnknownVirtualSlot27(GameObject::renderContext, field_0x124), -1);
+        GameObject::AppendChild((GameObject*)dirtChunkEmitter->UnknownVirtualSlot27(GameObject::renderContext, particleManager), -1);
         steamEmitter = reinterpret_cast<BikeSteamEmitter*>(new(__FILE__, 0x711) SteamParticleEmitter(1));
-        GameObject::AppendChild((GameObject*)steamEmitter->UnknownVirtualSlot27(GameObject::renderContext, field_0x124), -1);
+        GameObject::AppendChild((GameObject*)steamEmitter->UnknownVirtualSlot27(GameObject::renderContext, particleManager), -1);
         steamEmitter->emitting = 1;
     }
 
@@ -1366,7 +1366,7 @@ void Bike::UnknownVirtualSlot97()
         BikeAttachBone(this, "LwrLegR", 0.0f, 0.0f, 0.0f);
         BikeAttachBone(this, "FootR", 0.0f, -0.5f, 0.75f);
         BikeAttachBone(this, "FootR", 0.0f, -1.0f, 0.0f);
-        wrecker->particles = (UnknownWreckerParticles*)field_0x124;
+        wrecker->particles = (UnknownWreckerParticles*)particleManager;
     }
 }
 
@@ -1940,7 +1940,7 @@ void Bike::UnknownVirtualSlot38(int notify, int eventKind, void* event)
             else
                 impulseScale = 1.0f;
         }
-        if (field_0x124 && (field_0x124->isEnabled)) {
+        if (particleManager && (particleManager->isEnabled)) {
             reinterpret_cast<SparkParticleEmitter*>(sparkEmitter)->SetPosition(
                 reinterpret_cast<const ParticleVec3&>(((BikeContactSet*)collisionObject)->hitPoint));
             sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
@@ -1967,7 +1967,7 @@ void Bike::UnknownVirtualSlot38(int notify, int eventKind, void* event)
     case 0x6a:
         angScale = Vec3(1.0f, 1.0f, 1.0f);
         hasBody = 0;
-        if (field_0x124 && (field_0x124->isEnabled)) {
+        if (particleManager && (particleManager->isEnabled)) {
             reinterpret_cast<SparkParticleEmitter*>(sparkEmitter)->SetPosition(
                 reinterpret_cast<const ParticleVec3&>(((BikeContactSet*)collisionObject)->hitPoint));
             sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
