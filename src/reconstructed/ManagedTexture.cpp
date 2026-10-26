@@ -15,8 +15,8 @@ ManagedTexture::ManagedTexture(TextureMapManager* manager) : PCTextureMap(manage
     largestUse = 0;
     lastUseFrame = 0;
     group = 0;
-    field_0x98 = 0;
-    field_0x9c = 0;
+    copiedSkipLevels = 0;
+    blitSkipLevels = 0;
     mapFlags |= 1;
     pageScale = 1.0f;
 }
@@ -56,8 +56,8 @@ void ManagedTexture::Reregister() {
     lastUseFrame = 0;
     plannedLevel = -1;
     allocatedLevel = -1;
-    field_0x98 = 0;
-    field_0x9c = 0;
+    copiedSkipLevels = 0;
+    blitSkipLevels = 0;
     group->AddTexture(this);
 }
 

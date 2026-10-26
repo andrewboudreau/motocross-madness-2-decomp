@@ -294,7 +294,7 @@ int CacheTexture::PlaceTextures(ContainerList<ManagedTexture*>* textures,
         textures->RemoveOrdered(texture);
         if (placed) {
             placed->Add(texture);
-            texture->field_0x98 = 0;
+            texture->copiedSkipLevels = 0;
         } else {
             CopyMipLevels(region, 0);
         }

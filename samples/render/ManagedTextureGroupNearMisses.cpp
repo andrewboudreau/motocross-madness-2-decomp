@@ -506,7 +506,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
     while (i < usedTextures.m_count) {
         managed = usedTextures.Get(i);
         if (managed->IsResident()) {
-            if (managed->field_0x98)
+            if (managed->copiedSkipLevels)
                 blitTextures.Add(managed);
             usedTextures.Remove(managed);
         } else {
@@ -539,7 +539,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         int blitted = 0;
         for (i = 0; i < blitTextures.m_count; i++) {
             managed = blitTextures.Get(i);
-            managed->field_0x9c = 0;
+            managed->blitSkipLevels = 0;
             blitted += LevelArea(managed->plannedLevel);
         }
         int j = 0;
@@ -547,12 +547,12 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         while (pass < 3 && blitTextures.m_count > 0 && blitted > blitBudget) {
             managed = blitTextures.Get(j);
             if (managed->allocatedLevel - pass >= 5) {
-                blitted -= LevelArea(managed->plannedLevel - managed->field_0x9c);
-                managed->field_0x9c = pass;
-                if (pass == managed->field_0x98 && managed->IsResident()) {
+                blitted -= LevelArea(managed->plannedLevel - managed->blitSkipLevels);
+                managed->blitSkipLevels = pass;
+                if (pass == managed->copiedSkipLevels && managed->IsResident()) {
                     blitTextures.RemoveOrdered(managed);
                 } else {
-                    blitted += LevelArea(managed->plannedLevel - managed->field_0x9c);
+                    blitted += LevelArea(managed->plannedLevel - managed->blitSkipLevels);
                     j++;
                 }
             } else {
@@ -565,8 +565,8 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         }
         for (i = 0; i < blitTextures.m_count; i++) {
             managed = blitTextures.Get(i);
-            managed->field_0x98 = managed->field_0x9c;
-            managed->page->CopyMipLevels(managed->region, managed->field_0x9c);
+            managed->copiedSkipLevels = managed->blitSkipLevels;
+            managed->page->CopyMipLevels(managed->region, managed->blitSkipLevels);
         }
     }
 

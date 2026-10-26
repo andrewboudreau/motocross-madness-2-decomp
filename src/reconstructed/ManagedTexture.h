@@ -37,8 +37,8 @@ public:
     float pageOffsetV;                        // +0x8c v offset within the page
     ManagedTextureGroup* group;               // +0x90
     UnknownTextureRegion* region;             // +0x94
-    int field_0x98;
-    int field_0x9c;
+    int copiedSkipLevels;                     // +0x98 top mip levels its last page copy left out (CopyMipLevels' level); nonzero makes the repack blit it again
+    int blitSkipLevels;                       // +0x9c top mip levels the partial-blit repack leaves out to keep under blitBudget
     int useCount;                             // +0xa0 uses (0x00510820)
     float largestUse;                         // +0xa4 largest recorded value (0x00510820)
     int allocatedLevel;                       // +0xa8 size level of its page region (+0x18), -1 when unplaced; WriteDebugReport's "Allocd=%d"
