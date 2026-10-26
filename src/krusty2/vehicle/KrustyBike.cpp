@@ -423,28 +423,28 @@ void KrustyBike::UnknownVirtualSlot67()
 
 // ---- physics ----
 
-// Slot 16: per-axis scale of v by one of two Vec3 tables (0xe4 or 0xf0), chosen by field_0x444.
-Vec3 KrustyBike::UnknownVirtualSlot16(const Vec3* v)
+// Slot 16: localTorque scaled per axis by invInertia, or by shapeInvInertia while crashed.
+Vec3 KrustyBike::UnknownVirtualSlot16(const Vec3* localTorque)
 {
     Vec3 r;
     if (!crashState) {
-        r.x = invInertia.x * v->x;
-        r.y = invInertia.y * v->y;
-        r.z = invInertia.z * v->z;
+        r.x = invInertia.x * localTorque->x;
+        r.y = invInertia.y * localTorque->y;
+        r.z = invInertia.z * localTorque->z;
     } else {
-        r.x = shapeInvInertia.x * v->x;
-        r.y = shapeInvInertia.y * v->y;
-        r.z = shapeInvInertia.z * v->z;
+        r.x = shapeInvInertia.x * localTorque->x;
+        r.y = shapeInvInertia.y * localTorque->y;
+        r.z = shapeInvInertia.z * localTorque->z;
     }
     return r;
 }
 
-// Slot 15: transform v by the matrix at +0x3bc, scale per axis as slot 16, then hand to 0x4CB6E0
-// (which looks like a clamp/settle step on the accumulator at +0xd8).
-void KrustyBike::UnknownVirtualSlot15(const Vec3* v, Vec3* out)
+// Slot 15: worldTorque into the body frame, scaled per axis as in slot 16, then 0x4CB6E0
+// (which looks like a clamp/settle step on angularVelocity) with angularAccel.
+void KrustyBike::UnknownVirtualSlot15(const Vec3* worldTorque, Vec3* angularAccel)
 {
     Vec3 s;
-    Vec3 t = ((KbXform*)modelNode)->WorldToLocalDirection(v);
+    Vec3 t = ((KbXform*)modelNode)->WorldToLocalDirection(worldTorque);
     if (!crashState) {
         s.x = t.x * invInertia.x;
         s.y = t.y * invInertia.y;
@@ -454,7 +454,7 @@ void KrustyBike::UnknownVirtualSlot15(const Vec3* v, Vec3* out)
         s.y = t.y * shapeInvInertia.y;
         s.z = t.z * shapeInvInertia.z;
     }
-    UnknownAxisSettle_4cb6e0(&angularVelocity.x, &out->x, &s.x, stepTime, 0);
+    UnknownAxisSettle_4cb6e0(&angularVelocity.x, &angularAccel->x, &s.x, stepTime, 0);
 }
 
 // Slot 48: field_0x0c update from the (field_0x64*3 - field_0x7c) * 0.5 * dt step.

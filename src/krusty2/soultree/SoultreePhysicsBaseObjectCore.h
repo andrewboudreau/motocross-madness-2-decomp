@@ -122,8 +122,8 @@ public:
     // and force->z (tier 1).
     virtual void UnknownVirtualSlot14(Vec3* force, const Vec3* localTorque,
                                       const Vec3* worldTorque);
-    virtual void UnknownVirtualSlot15(const Vec3* a, Vec3* b);
-    virtual Vec3 UnknownVirtualSlot16(const Vec3* a);
+    virtual void UnknownVirtualSlot15(const Vec3* worldTorque, Vec3* angularAccel);
+    virtual Vec3 UnknownVirtualSlot16(const Vec3* localTorque);
     virtual Vec3 UnknownVirtualSlot17();
     virtual void UnknownVirtualSlot18(SoultreeAttachment* a);
     virtual void UnknownVirtualSlot19(SoultreeAttachment* a);

@@ -398,17 +398,17 @@ void Bike::UnknownVirtualSlot90(int* flag, float arg)
     }
 }
 
-Vec3 Bike::UnknownVirtualSlot16(const Vec3* v)
+Vec3 Bike::UnknownVirtualSlot16(const Vec3* localTorque)
 {
     Vec3 r;
     if (crashState == 0) {
-        r.x = invInertia.x * v->x;
+        r.x = invInertia.x * localTorque->x;
         r.y = 0.0f;
         r.z = 0.0f;
     } else {
-        r.x = shapeInvInertia.x * v->x;
-        r.y = shapeInvInertia.y * v->y;
-        r.z = shapeInvInertia.z * v->z;
+        r.x = shapeInvInertia.x * localTorque->x;
+        r.y = shapeInvInertia.y * localTorque->y;
+        r.z = shapeInvInertia.z * localTorque->z;
     }
     return r;
 }

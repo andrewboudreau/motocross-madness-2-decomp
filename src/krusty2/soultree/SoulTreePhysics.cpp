@@ -193,9 +193,9 @@ int SoultreePhysicsBaseObject::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3,
 }
 
 // slot 15 (0x00502200)
-void SoultreePhysicsBaseObject::UnknownVirtualSlot15(const Vec3* a, Vec3* b)
+void SoultreePhysicsBaseObject::UnknownVirtualSlot15(const Vec3* worldTorque, Vec3* angularAccel)
 {
-    Vec3 v = sceneNode->WorldToLocalDirection(*a);
+    Vec3 v = sceneNode->WorldToLocalDirection(*worldTorque);
     Vec3 w;
     if (UnknownVirtualSlot10()) {
         w.x = v.x * shapeInvInertia.x;
@@ -206,21 +206,21 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot15(const Vec3* a, Vec3* b)
         w.y = v.y * invInertia.y;
         w.z = v.z * invInertia.z;
     }
-    UnknownAxisSettle_4cb6e0(&angularVelocity.x, &b->x, &w.x, stepTime, 0);
+    UnknownAxisSettle_4cb6e0(&angularVelocity.x, &angularAccel->x, &w.x, stepTime, 0);
 }
 
 // slot 16 (0x005022b0)
-Vec3 SoultreePhysicsBaseObject::UnknownVirtualSlot16(const Vec3* in)
+Vec3 SoultreePhysicsBaseObject::UnknownVirtualSlot16(const Vec3* localTorque)
 {
     Vec3 t;
     if (UnknownVirtualSlot10()) {
-        t.x = shapeInvInertia.x * in->x;
-        t.y = shapeInvInertia.y * in->y;
-        t.z = shapeInvInertia.z * in->z;
+        t.x = shapeInvInertia.x * localTorque->x;
+        t.y = shapeInvInertia.y * localTorque->y;
+        t.z = shapeInvInertia.z * localTorque->z;
     } else {
-        t.x = invInertia.x * in->x;
-        t.y = invInertia.y * in->y;
-        t.z = invInertia.z * in->z;
+        t.x = invInertia.x * localTorque->x;
+        t.y = invInertia.y * localTorque->y;
+        t.z = invInertia.z * localTorque->z;
     }
     return t;
 }
