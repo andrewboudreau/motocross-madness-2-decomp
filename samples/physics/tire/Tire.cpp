@@ -369,8 +369,8 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
     if (minLength > 0.001f) {
         CollisionVec3 tangent;
         if (CollisionRejectFrom(&tangent, &ref, &this->CollisionPoint::surfaceNormal)) {
-            CollisionVec3 n;
-            tangent = *Vec3Normalize(&n, &tangent);
+            CollisionVec3 normalized;
+            tangent = *Vec3Normalize(&normalized, &tangent);
         }
         float d = ref.z * tangent.z + ref.x * tangent.x + ref.y * tangent.y;
         this->CollisionPoint::tangentSpeed = d;
@@ -1129,10 +1129,10 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
     force->y += push.y;
     force->z += push.z;
     CollisionVec3 moment = TireCrossGrouped(CollisionPoint::relativePosition, push);
-    float s = field_0x1d8;
-    moment.x *= s;
-    moment.y *= s;
-    moment.z *= s;
+    float momentScale = field_0x1d8;
+    moment.x *= momentScale;
+    moment.y *= momentScale;
+    moment.z *= momentScale;
     torque->x += moment.x;
     torque->y += moment.y;
     torque->z += moment.z;
