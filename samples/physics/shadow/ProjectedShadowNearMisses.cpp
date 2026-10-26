@@ -168,7 +168,7 @@ static inline void ShadowTransformExtents(ShadowVec3* out, ShadowVec3 h, const S
 }
 
 // 0x004db0d0 (2020 B): recomputes the light-space bounds of all casters and derives the shadow
-// camera set-up.  Each caster's local bounds (centre c, half extents h) are carried through the
+// camera set-up.  Each caster's local bounds (casterCenter, half extents ext) are carried through the
 // caster's world matrix at +0xf8 (extents by the sum of absolute row contributions, centre as a
 // row vector); the running min/max give this->center / this->halfExtents, and lensScale is the
 // length of halfExtents.  Mode 3 (directional) builds an orthographic matrix and looks along
@@ -180,74 +180,75 @@ static inline void ShadowTransformExtents(ShadowVec3* out, ShadowVec3 h, const S
 // built through by-value temporaries, and the mode-1 normalisation is written out with the
 // out-of-line constructor.  PARTIAL: retail copies the GetBounds extents into three separate
 // slots before the products (VC6 elides that copy here), which shifts every frame slot.
-// One product buffer t serves both modes (0x134 -> 0xf4, 177 -> 188 strict).
-// Retail's frame (tools/frame_layout.py, 0xc0 against 0xf4 here) has no 64-byte buffer beside m:
-// the identity call and the product's result pointer are both m's own slot (0x64), with
-// fov 0xc, c 0x1c, mn 0x28, mx 0x34, ext 0x40, eye 0x4c and sq 0x78, and 12-byte temporaries
-// at 0, 0x10 and 0x58.  Passing &m as the product's result instead keeps a 64-byte identity
-// temporary (0xf4, 1970 bytes, 185 strict, 244 differing instructions); `m = ShadowMatrixIdentity()` after the declaration
+// One product buffer serves both modes (0x134 -> 0xf4, 177 -> 188 strict).
+// Retail's frame (tools/frame_layout.py, 0xc0 against 0xf4 here) has no 64-byte buffer beside
+// projection: the identity call and the product's result pointer are both projection's own
+// slot (0x64), with fov 0xc, casterCenter 0x1c, boundsMin 0x28, boundsMax 0x34, ext 0x40, eye
+// 0x4c and sq 0x78, and 12-byte temporaries at 0, 0x10 and 0x58.  Passing &projection as the
+// product's result instead keeps a 64-byte identity temporary (0xf4, 1970 bytes, 185 strict,
+// 244 differing instructions); `projection = ShadowMatrixIdentity()` after the declaration
 // compiles the same as the initialisation.
 int ProjectedShadow::ComputeBounds()
 {
     if (!casters)
         return 1;
-    ShadowMatrix t;
-    ShadowVec3 mn, mx;
-    mn.x = mn.y = mn.z = 3.4028235e38f;
-    mx.x = mx.y = mx.z = -3.4028235e38f;
+    ShadowMatrix product;
+    ShadowVec3 boundsMin, boundsMax;
+    boundsMin.x = boundsMin.y = boundsMin.z = 3.4028235e38f;
+    boundsMax.x = boundsMax.y = boundsMax.z = -3.4028235e38f;
     for (int i = 0; i < casterCount; i++) {
-        ShadowVec3 c, ext;
-        casters[i]->GetBounds(&c, &ext);
+        ShadowVec3 casterCenter, ext;
+        casters[i]->GetBounds(&casterCenter, &ext);
         ShadowTransformExtents(&ext, ext, casters[i]);
-        ShadowTransformCoord(&c, c, casters[i]->world);
-        ShadowVec3 lo = ShadowDifference(c, ext);
-        ShadowVec3 hi = ShadowSum(c, ext);
-        if (lo.x < mn.x) mn.x = lo.x;
-        if (lo.y < mn.y) mn.y = lo.y;
-        if (lo.z < mn.z) mn.z = lo.z;
-        if (hi.x > mx.x) mx.x = hi.x;
-        if (hi.y > mx.y) mx.y = hi.y;
-        if (hi.z > mx.z) mx.z = hi.z;
+        ShadowTransformCoord(&casterCenter, casterCenter, casters[i]->world);
+        ShadowVec3 lo = ShadowDifference(casterCenter, ext);
+        ShadowVec3 hi = ShadowSum(casterCenter, ext);
+        if (lo.x < boundsMin.x) boundsMin.x = lo.x;
+        if (lo.y < boundsMin.y) boundsMin.y = lo.y;
+        if (lo.z < boundsMin.z) boundsMin.z = lo.z;
+        if (hi.x > boundsMax.x) boundsMax.x = hi.x;
+        if (hi.y > boundsMax.y) boundsMax.y = hi.y;
+        if (hi.z > boundsMax.z) boundsMax.z = hi.z;
     }
-    center = ShadowScale(ShadowSum(mx, mn), 0.5f);
-    halfExtents = ShadowScale(ShadowDifference(mx, mn), 0.5f);
+    center = ShadowScale(ShadowSum(boundsMax, boundsMin), 0.5f);
+    halfExtents = ShadowScale(ShadowDifference(boundsMax, boundsMin), 0.5f);
     lensScale = ShadowMagnitude(halfExtents);
 
     if (mode == 3) {
-        ShadowMatrix m = ShadowMatrixIdentity();
+        ShadowMatrix projection = ShadowMatrixIdentity();
         float half = (float)texture->size * 0.5f;
-        m.m[0][0] = half / lensScale;
-        m.m[1][1] = -(half / lensScale);
-        m.m[3][0] = half;
-        m.m[3][1] = half;
+        projection.m[0][0] = half / lensScale;
+        projection.m[1][1] = -(half / lensScale);
+        projection.m[3][0] = half;
+        projection.m[3][1] = half;
         ShadowVec3 eye = ShadowDifference(center, ShadowScale(lightDir, 1000.0f));
         camera->SetLookAt(&eye, 0, 0, 0, 0);
         camera->UnknownVirtualSlot29(center);
         camera->UnknownVirtualSlot28();
-        lightMatrix = *ShadowMatrixMultiplyInto(&t, m, camera->matrix_0xac);
+        lightMatrix = *ShadowMatrixMultiplyInto(&product, projection, camera->matrix_0xac);
         return 1;
     } else if (mode == 1) {
         lightDir = ShadowDifference(center, lightVec2);
         float dist = ShadowMagnitude(lightDir);
         float fov = (float)atan2(lensScale, dist) * 114.59156f;
         camera->SetLookAt(&lightVec2, 0, 0, 0, &fov);
-        ShadowVec3& d = lightDir;
-        float y = d.y, x = d.x, z = d.z;
+        ShadowVec3& dir = lightDir;
+        float y = dir.y, x = dir.x, z = dir.z;
         float sq = z * z + (x * x + y * y);
-        ShadowVec3 n;
+        ShadowVec3 unitDir;
         if (sq == 1.0f) {
-            n = d;
+            unitDir = dir;
         } else {
             float inv = FastInvSqrt(sq);
-            n = ShadowVec3Call(d.x * inv, d.y * inv, d.z * inv);
+            unitDir = ShadowVec3Call(dir.x * inv, dir.y * inv, dir.z * inv);
         }
-        d = n;
+        dir = unitDir;
         camera->UnknownVirtualSlot29(center);
         camera->UnknownVirtualSlot28();
-        ShadowMatrix m = ShadowMatrixIdentity();
-        m.m[0][0] = (float)texture->size;
-        m.m[1][1] = (float)texture->size;
-        lightMatrix = *ShadowMatrixMultiplyInto(&t, m, camera->matrix_0xec);
+        ShadowMatrix projection = ShadowMatrixIdentity();
+        projection.m[0][0] = (float)texture->size;
+        projection.m[1][1] = (float)texture->size;
+        lightMatrix = *ShadowMatrixMultiplyInto(&product, projection, camera->matrix_0xec);
     }
     return 1;
 }
@@ -423,15 +424,15 @@ void ProjectedShadow::Present()
     if (formatA == 9) {
         unsigned int key = colorKeyLow;
         unsigned int alpha = (unsigned short)shadowPixel;
-        unsigned int n = key & 0xf;
+        unsigned int keyLevel = key & 0xf;
         unsigned int sumMixA = (alpha + key) * 2;
         unsigned int sumMixB = key + alpha * 2 + alpha;
         unsigned int sumAlpha = alpha * 4;
-        unsigned int m = (unsigned char)((unsigned char)shadowPixel >> 1) & 7;
-        unsigned int pp = (unsigned char)((unsigned char)shadowPixel >> 2) & 3;
-        unsigned short outMixA = (unsigned short)(n * 0x111 - m * 0x111);
-        unsigned short outMixB = (unsigned short)(n * 0x111 - (pp + m) * 0x111);
-        unsigned short outMixC = (unsigned short)(n * 0x111 - pp * 0x111);
+        unsigned int halfShade = (unsigned char)((unsigned char)shadowPixel >> 1) & 7;
+        unsigned int quarterShade = (unsigned char)((unsigned char)shadowPixel >> 2) & 3;
+        unsigned short outMixA = (unsigned short)(keyLevel * 0x111 - halfShade * 0x111);
+        unsigned short outMixB = (unsigned short)(keyLevel * 0x111 - (quarterShade + halfShade) * 0x111);
+        unsigned short outMixC = (unsigned short)(keyLevel * 0x111 - quarterShade * 0x111);
         for (y = clipRect.top; y <= clipRect.bottom; y++) {
             unsigned short* srcTop = srcRow;
             unsigned short* srcBottom = srcRow + texture->size;
