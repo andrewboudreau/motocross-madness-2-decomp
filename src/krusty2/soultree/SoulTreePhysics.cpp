@@ -675,10 +675,10 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
                 case 1:
                     if (hit) {
                         reinterpret_cast<DustParticleEmitter*>(attachments[i].contactEmitter)->SetColor(0x40, 0x40, 0x40);
-                        attachments[i].contactEmitter->renderFlags |= 0x800;
+                        attachments[i].contactEmitter->particleFlags |= 0x800;
                     } else {
                         reinterpret_cast<DustParticleEmitter*>(attachments[i].contactEmitter)->SetColor(0xff, 0xff, 0xff);
-                        attachments[i].contactEmitter->renderFlags &= ~0x800;
+                        attachments[i].contactEmitter->particleFlags &= ~0x800;
                     }
                     break;
                 case 4:

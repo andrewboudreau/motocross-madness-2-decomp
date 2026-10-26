@@ -56,7 +56,7 @@ public:
     int pad_0x5c;     // placeholder so +0x60 below lines up
     int activeThisFrame;  // +0x60 slot 21 clears it every frame; slot 18 sets it to 1 when the emitter is placed at a contact
     char field_0x64[0x10];
-    int renderFlags;                          // +0x74 flag word (slot 21 sets/clears bit 0x800)
+    int particleFlags;                        // +0x74 DustParticleEmitter::particleFlags, passed to each new particle (slot 21 sets/clears bit 0x800)
     void SetPosition(Vec3 v, int a);   // 0x004b8d90 emitter position setter (ParticleEmitters.h: float intensity); thiscall, callee pops 0x10
     void SetColor(int r, int g, int b);      // 0x004b8dd0 DustParticleEmitter::SetColor (ParticleEmitters.h): +0x7c = (r << 16) | (g << 8) | (b & 0xff); slot 21 tints 0x40/0xff
 };

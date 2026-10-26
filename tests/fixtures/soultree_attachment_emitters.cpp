@@ -9,9 +9,9 @@ typedef char Layout[(sizeof(ParticleVec3)==12 && sizeof(DustParticleEmitter)==0x
  offsetof(DustParticleEmitter,position)==0x44 && offsetof(DustParticleEmitter,previousPosition)==0x50 &&
  offsetof(DustParticleEmitter,intensity)==0x78 && offsetof(DustParticleEmitter,color)==0x7c &&
  offsetof(SteamParticleEmitter,position)==0x48 && offsetof(SteamParticleEmitter,previousPosition)==0x54 &&
- offsetof(SteamParticleEmitter,field_0x40)==0x40 && offsetof(SteamParticleEmitter,field_0x44)==0x44 &&
- offsetof(SteamParticleEmitter,emitting)==0x60 && offsetof(SteamParticleEmitter,field_0x6c)==0x6c &&
- offsetof(SteamParticleEmitter,field_0x70)==0x70 && offsetof(SteamParticleEmitter,color)==0x478 &&
+ offsetof(SteamParticleEmitter,pulseDuration)==0x40 && offsetof(SteamParticleEmitter,pulseTimeLeft)==0x44 &&
+ offsetof(SteamParticleEmitter,emitting)==0x60 && offsetof(SteamParticleEmitter,pulseActive)==0x6c &&
+ offsetof(SteamParticleEmitter,bursting)==0x70 && offsetof(SteamParticleEmitter,color)==0x478 &&
  sizeof(void(DustParticleEmitter::*)(ParticleVec3,float))==4 &&
  sizeof(void(DustParticleEmitter::*)(unsigned char,unsigned char,int))==4 &&
  sizeof(void(SteamParticleEmitter::*)(ParticleVec3))==4 && sizeof(void(SteamParticleEmitter::*)())==4 &&

@@ -9,20 +9,20 @@ SteamParticleEmitter::SteamParticleEmitter(int flags) : GameObject(flags)
 {
     int i;
     firstUpdate = 1;
-    field_0x34 = 500.0f;
-    field_0x3c = 0.1f;
+    particleLifetime = 500.0f;
+    startSize = 0.1f;
     field_0x38 = 3.0f;
     position.x = 0;
     position.y = 0;
     position.z = 0;
     previousPosition = position;
     emitting = 0;
-    field_0x64 = 14;
+    nextFrame = 14;
     manager = 0;
-    field_0x6c = 0;
-    field_0x40 = 0.25f;
-    field_0x44 = 0;
-    field_0x68 = 0x80a;
+    pulseActive = 0;
+    pulseDuration = 0.25f;
+    pulseTimeLeft = 0;
+    particleFlags = 0x80a;
     float* t = randomTable;
     for (i = 0; i < 64; i++, t += 4) {
         float r = (float)rand() * (1.0f / 32768.0f);
@@ -31,8 +31,8 @@ SteamParticleEmitter::SteamParticleEmitter(int flags) : GameObject(flags)
         for (k = 0; k < 4; k++)
             t[k] = v;
     }
-    field_0x474 = 0;
-    field_0x70 = 0;
+    randomTableIndex = 0;
+    bursting = 0;
     color = 0xffffff;
 }
 
@@ -57,16 +57,16 @@ void SteamParticleEmitter::SetPosition(ParticleVec3 p)
 
 void SteamParticleEmitter::Restart()
 {
-    field_0x6c = 1;
-    field_0x44 = field_0x40;
+    pulseActive = 1;
+    pulseTimeLeft = pulseDuration;
     emitting = 1;
 }
 
 void SteamParticleEmitter::Burst()
 {
-    field_0x44 = 0.0001f;
-    field_0x6c = 1;
-    field_0x70 = 1;
+    pulseTimeLeft = 0.0001f;
+    pulseActive = 1;
+    bursting = 1;
 }
 
 void SteamParticleEmitter::StopEmitting()
@@ -83,11 +83,11 @@ void SteamParticleEmitter::SetColor(unsigned char r, unsigned char g, int b)
 // 0x004ba070.  Emits a trail of puffs between the previous and the current position each tick.
 int SteamParticleEmitter::Tick(float dt)
 {
-    if (reinterpret_cast<ParticleGameContext*>(g_TrackGame)->frozen == 0 && emitting != 0 && field_0x6c != 0) {
-        if (field_0x44 <= 0.0f) {
-            field_0x44 = 0;
-            field_0x6c = 0;
-            field_0x70 = 0;
+    if (reinterpret_cast<ParticleGameContext*>(g_TrackGame)->frozen == 0 && emitting != 0 && pulseActive != 0) {
+        if (pulseTimeLeft <= 0.0f) {
+            pulseTimeLeft = 0;
+            pulseActive = 0;
+            bursting = 0;
             return 1;
         }
         if (firstUpdate) {
@@ -95,29 +95,29 @@ int SteamParticleEmitter::Tick(float dt)
             previousPosition = position;
             return 1;
         }
-        field_0x44 -= dt;
+        pulseTimeLeft -= dt;
         ParticleVec3 d(position.x - previousPosition.x, position.y - previousPosition.y, position.z - previousPosition.z);
         float lenSq = d.LengthSquared();
         float len = (lenSq == 1.0f) ? 1.0f : FastSqrt(lenSq);
-        float count = len / (field_0x3c * 0.3f);
+        float count = len / (startSize * 0.3f);
         ParticleVec3 step = (1.0f / count) * d;
-        if (field_0x70)
+        if (bursting)
             count = 5.0f;
         int i;
-        float grow = (dt * 3.0f - field_0x3c) / count;
+        float grow = (dt * 3.0f - startSize) / count;
         for (i = 0; (float)i < count; i++) {
             if (manager == 0)
                 break;
             ParticleVec3 p = position - step * (float)i;
-            if (!manager->AddParticle(0.0f, &p, field_0x64, (float)i * grow + field_0x3c, field_0x34,
-                                      randomTable[field_0x474], field_0x68, color))
+            if (!manager->AddParticle(0.0f, &p, nextFrame, (float)i * grow + startSize, particleLifetime,
+                                      randomTable[randomTableIndex], particleFlags, color))
                 break;
-            field_0x474++;
-            if (field_0x474 >= 256)
-                field_0x474 = 0;
-            field_0x64++;
-            if (field_0x64 >= 0x12)
-                field_0x64 = 0xe;
+            randomTableIndex++;
+            if (randomTableIndex >= 256)
+                randomTableIndex = 0;
+            nextFrame++;
+            if (nextFrame >= 0x12)
+                nextFrame = 0xe;
         }
     }
     return 1;
