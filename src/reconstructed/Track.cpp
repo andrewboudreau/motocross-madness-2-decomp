@@ -106,7 +106,7 @@ struct TrackProbe {
     TrackVec3 centre;               // +0x00
     TrackVec3 direction;            // +0x0c
     TrackVec3 halfExtents;          // +0x18
-    float field_0x24;
+    float width;                    // +0x24, as BikeRaceNode.h
     float field_0x28;               // 150 after loading
     TrackPos pos;                   // +0x2c
 };
@@ -274,9 +274,9 @@ int Track::LoadTrack(UnknownTextureStream* stream, void* start, void* finish, in
             stream->Read(&probe->halfExtents.x, 4, 1);
             stream->Read(&probe->halfExtents.y, 4, 1);
             stream->Read(&probe->halfExtents.z, 4, 1);
-            stream->Read(&probe->field_0x24, 4, 1);
+            stream->Read(&probe->width, 4, 1);
             ScaleTrackVec3(&probe->halfExtents, scale);
-            probe->field_0x24 *= scale;
+            probe->width *= scale;
             probe->centre.x = probe->centre.x * scale + offsetX;
             probe->centre.y *= scale;
             probe->centre.z = probe->centre.z * scale + offsetZ;
@@ -292,9 +292,9 @@ int Track::LoadTrack(UnknownTextureStream* stream, void* start, void* finish, in
             stream->Read(&probe->halfExtents.x, 4, 1);
             stream->Read(&probe->halfExtents.y, 4, 1);
             stream->Read(&probe->halfExtents.z, 4, 1);
-            stream->Read(&probe->field_0x24, 4, 1);
+            stream->Read(&probe->width, 4, 1);
             ScaleTrackVec3(&probe->halfExtents, scale);
-            probe->field_0x24 *= scale;
+            probe->width *= scale;
             probe->centre.x = probe->centre.x * scale + offsetX;
             probe->centre.y *= scale;
             probe->centre.z = probe->centre.z * scale + offsetZ;

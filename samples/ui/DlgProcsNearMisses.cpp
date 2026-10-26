@@ -475,7 +475,7 @@ int SPBikeRiderDlg::Tick(float frameTime) {
 // at +0x34 and the garage engine size and stroke at +0x33c.
 struct UnknownReplayTapeHeader {
     unsigned char field_0x00[0x34];
-    UnknownTrackGameModeSettings field_0x34;
+    UnknownTrackGameModeSettings raceSettings;      // +0x34
     unsigned char field_0x220[0x33c - 0x220];
     int engineSize;
     int fourStroke;
@@ -588,7 +588,7 @@ void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
             if (file) {
                 fread(&header, sizeof(header), 1, file);
                 fclose(file);
-                g_TrackGame->mode.raceSettings = header.field_0x34;
+                g_TrackGame->mode.raceSettings = header.raceSettings;
                 g_TrackGame->mode.SelectSeries(g_TrackGame->mode.raceSettings.eventType);
                 g_TrackGame->playingReplay = 1;
                 g_TrackGame->useReplayTape = 1;

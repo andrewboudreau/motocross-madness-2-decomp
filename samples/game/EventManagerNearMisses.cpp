@@ -78,8 +78,8 @@ struct UnknownPodiumOwner : public GameObject {     // TrackGameViewOwner
     unsigned char field_0x38[0x7c - 0x38];
     GameObject* lights;                             // +0x7c
     unsigned char field_0x80[0x94 - 0x80];
-    int field_0x94;
-    int field_0x98;
+    int opaqueTextureGroup;                         // +0x94, as BaseQuarryEvent.h
+    int alphaTextureGroup;                          // +0x98
 };
 struct UnknownPodiumTrackObject {                   // the view's +0x4c
     void QueryGround(Vector3* point, int a, int b, int c); // 0x00507c10
@@ -110,14 +110,15 @@ struct UnknownPodiumRacer {
     unsigned char field_0x5c8[0x784 - 0x5c8];
     int place;                                      // +0x784
 };
-// Game+0x1c's resource context, as the podium characters' slot 11 takes it.
+// Game+0x1c's resource context, as the podium characters' slot 11 takes it
+// (laid out like TextureMap.h's UnknownTextureFormatChoice).
 struct UnknownPodiumContext {
     TextureMapManager* textureManager;              // +0x00
-    int field_0x04;
-    int field_0x08;
-    int pixelFormat;                                // +0x0c
-    int field_0x10;
-    int field_0x14;
+    int opaqueGroup;                                // +0x04
+    int alphaGroup;                                 // +0x08
+    int opaqueFormat;                               // +0x0c
+    int alphaFormat;                                // +0x10
+    int halvings;                                   // +0x14
 };
 class UnknownPodiumSound {                          // PCAudio.h's Sound
 public:
@@ -277,11 +278,11 @@ int EventManager::CreatePodiumScene() {
     }
     UnknownPodiumContext context;
     context.textureManager = g_TrackGame->textureManager;
-    context.field_0x04 = PODIUM_OWNER(owner)->field_0x94;
-    context.field_0x08 = PODIUM_OWNER(owner)->field_0x98;
-    context.pixelFormat = ((RenderTarget*)renderContext)->surfacePixelFormat;
-    context.field_0x10 = 0x115c;
-    context.field_0x14 = 0;
+    context.opaqueGroup = PODIUM_OWNER(owner)->opaqueTextureGroup;
+    context.alphaGroup = PODIUM_OWNER(owner)->alphaTextureGroup;
+    context.opaqueFormat = ((RenderTarget*)renderContext)->surfacePixelFormat;
+    context.alphaFormat = 0x115c;
+    context.halvings = 0;
     PODIUM_ARCADE->UnknownVirtualSlot5();
     PODIUM_ARCADE->SetPosition(&podiumPosition);
     PODIUM_ARCADE->SetAxes(&direction, &up, 0, 1);

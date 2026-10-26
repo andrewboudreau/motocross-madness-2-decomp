@@ -17,8 +17,8 @@
 // The 0x14-byte message 0x89 that a network player sends when it leaves
 // (EventManager slot 24 marks the sender done).
 struct UnknownPlayerLeftMessage {
-    int field_0x00;
-    char field_0x04[16];                      // player name
+    int header;                               // +0x00
+    char playerName[16];                      // +0x04
 };
 
 // 0x004886e0
@@ -51,8 +51,8 @@ void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
                     if (strcmp(name, "") != 0) {
                         int length = strlen(name);
                         int count = length > 15 ? 15 : length;
-                        strncpy(message.field_0x04, name, count);
-                        message.field_0x04[count] = 0;
+                        strncpy(message.playerName, name, count);
+                        message.playerName[count] = 0;
                         g_TrackGame->network->Send(
                             0x89, &message, sizeof(message), player, 0);
                     }

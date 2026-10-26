@@ -83,23 +83,23 @@ public:
 // A physics static model (Scene caster +0x08).
 struct UnknownQuarryPhysicsObject {
     unsigned char field_0x000[0x128];
-    UnknownQuarryCollision* field_0x128;
+    UnknownQuarryCollision* collisionObject;   // +0x128 SoultreePhysicsBaseObjectCore.h
     unsigned char field_0x12c[0x1f4 - 0x12c];
-    UnknownTerrain* field_0x1f4;
-    void* field_0x1f8;
+    UnknownTerrain* terrain;                   // +0x1f4
+    void* terrainScale;                        // +0x1f8 copied from the terrain's +0x40
 };
 
 // The terrain as the loader reads it.
 struct UnknownQuarryTerrain {
     unsigned char field_0x00[0x40];
-    void* field_0x40;
+    void* worldScale;                          // +0x40 SoultreeProbe::worldScale
 };
 
 // CarProcedural's terrain pointer (Scene's UnknownSceneAnimatedObject
 // leaves +0x20c unnamed).
 struct UnknownQuarryCar {
     unsigned char field_0x000[0x20c];
-    UnknownTerrain* field_0x20c;
+    UnknownTerrain* groundProvider;            // +0x20c CarProcedural.h
 };
 
 // A racer as the loader reads it.
@@ -109,11 +109,11 @@ struct UnknownQuarryRacerRider {
 };
 struct UnknownQuarryRacerState {
     unsigned char field_0x00[0x38];
-    UnknownQuarryCollision* field_0x38;
+    UnknownQuarryCollision* collisionModel;    // +0x38 Wrecker.h
 };
 struct UnknownQuarryRaceView {
     unsigned char field_0x000[0x18c];
-    unsigned char field_0x18c;
+    unsigned char forceHighLod;                // +0x18c BikeRace.h's "ForceHighLOD"
 };
 struct UnknownQuarryRacer {
     unsigned char field_0x000[0x3bc];
@@ -151,12 +151,12 @@ public:
     void SetDetailLevel(int level);                     // 0x00423790: detail level
 
     unsigned char field_0x2c[0x38 - 0x2c];
-    UnknownQuarryRacer* field_0x38;                            // the player's racer
+    UnknownQuarryRacer* localRacer;                     // +0x38 the player's racer
     unsigned char field_0x3c[0x64 - 0x3c];
-    UnknownQuarryRaceCharacter* field_0x64;
-    int field_0x68;
-    UnknownQuarryRaceCharacter* field_0x6c;
-    int field_0x70;
+    UnknownQuarryRaceCharacter* startGate;              // +0x64 (BikeRaceCore.h)
+    int startGateEntry;                                 // +0x68
+    UnknownQuarryRaceCharacter* thirtySecondMan;        // +0x6c
+    int thirtySecondManEntry;                           // +0x70
     unsigned char field_0x74[0x400 - 0x74];
 };
 
@@ -690,25 +690,25 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
             if (caster->physics) {
                 UnknownTerrain* terrain = eventTerrain;
                 UnknownQuarryPhysicsObject* physics = (UnknownQuarryPhysicsObject*)caster->physicsObject;
-                physics->field_0x1f4 = terrain;
+                physics->terrain = terrain;
                 if (terrain)
-                    physics->field_0x1f8 = ((UnknownQuarryTerrain*)terrain)->field_0x40;
-                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x128->SnapPlacement();
-                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x128->SetUseBroadphase(1);
-                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x128->SetOwner(caster->physicsObject, 0x68);
+                    physics->terrainScale = ((UnknownQuarryTerrain*)terrain)->worldScale;
+                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->collisionObject->SnapPlacement();
+                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->collisionObject->SetUseBroadphase(1);
+                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->collisionObject->SetOwner(caster->physicsObject, 0x68);
             } else if (caster->collisionObject && ((D3DIMSoultreeObject*)caster->model)->CountNodes() == 1) {
                 ((UnknownQuarryCollision*)caster->collisionObject)->SnapPlacement();
                 ((UnknownQuarryCollision*)caster->collisionObject)->SetUseBroadphase(1);
             }
         }
     }
-    if (((UnknownQuarryRace*)raceView)->field_0x6c && ((UnknownQuarryRace*)raceView)->field_0x6c->collisionObject) {
-        ((UnknownQuarryRace*)raceView)->field_0x6c->collisionObject->Release();
-        ((UnknownQuarryRace*)raceView)->field_0x6c->collisionObject = 0;
+    if (((UnknownQuarryRace*)raceView)->thirtySecondMan && ((UnknownQuarryRace*)raceView)->thirtySecondMan->collisionObject) {
+        ((UnknownQuarryRace*)raceView)->thirtySecondMan->collisionObject->Release();
+        ((UnknownQuarryRace*)raceView)->thirtySecondMan->collisionObject = 0;
     }
-    if (((UnknownQuarryRace*)raceView)->field_0x64 && ((UnknownQuarryRace*)raceView)->field_0x64->collisionObject) {
-        ((UnknownQuarryRace*)raceView)->field_0x64->collisionObject->Release();
-        ((UnknownQuarryRace*)raceView)->field_0x64->collisionObject = 0;
+    if (((UnknownQuarryRace*)raceView)->startGate && ((UnknownQuarryRace*)raceView)->startGate->collisionObject) {
+        ((UnknownQuarryRace*)raceView)->startGate->collisionObject->Release();
+        ((UnknownQuarryRace*)raceView)->startGate->collisionObject = 0;
     }
     if (eventScene->animationTable) {
         for (int i = 0; i < eventScene->animationTable->entryCount; i++) {
@@ -718,7 +718,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                     ((UnknownQuarryCollision*)character->collisionObject)->SnapPlacement();
                     ((UnknownQuarryCollision*)character->collisionObject)->SetUseBroadphase(1);
                     ((UnknownQuarryCollision*)character->collisionObject)->SetIgnoreListMode(0);
-                    if (i != ((UnknownQuarryRace*)raceView)->field_0x70 && i != ((UnknownQuarryRace*)raceView)->field_0x68) {
+                    if (i != ((UnknownQuarryRace*)raceView)->thirtySecondManEntry && i != ((UnknownQuarryRace*)raceView)->startGateEntry) {
                         int iterator = 0;
                         for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator);
                              racer; racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator)) {
@@ -728,7 +728,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                                 ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->frontWheel);
                                 ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->rearWheel);
                                 ((UnknownQuarryCollision*)character->collisionObject)
-                                    ->AddIgnoredOwner(racer->wrecker->field_0x38);
+                                    ->AddIgnoredOwner(racer->wrecker->collisionModel);
                             }
                         }
                     } else if (character->collisionObject) {
@@ -738,7 +738,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                 }
             } else {
                 UnknownSceneAnimatedObject* car = eventScene->animationTable->entries[i].proceduralObject;
-                ((UnknownQuarryCar*)car)->field_0x20c = eventTerrain;
+                ((UnknownQuarryCar*)car)->groundProvider = eventTerrain;
                 ((UnknownQuarryCollision*)car->sensorCollider)->SetIgnoreListMode(1);
                 for (int j = 0; j < eventScene->animationTable->entryCount; j++) {
                     UnknownSceneEntry* entry = &eventScene->animationTable->entries[j];
@@ -761,7 +761,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                         ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->bikeAndRiderCollision);
                         ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->frontWheel);
                         ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->rearWheel);
-                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->wrecker->field_0x38);
+                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->wrecker->collisionModel);
                     }
                 }
             }
@@ -802,9 +802,9 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         AppendChild((GameObject*)projectedShadow, -1);
-        ((UnknownQuarryShadow*)projectedShadow)->AddCaster(((UnknownQuarryRace*)raceView)->field_0x38->modelNode);
+        ((UnknownQuarryShadow*)projectedShadow)->AddCaster(((UnknownQuarryRace*)raceView)->localRacer->modelNode);
         ((UnknownQuarryShadow*)projectedShadow)
-            ->AddCaster(((UnknownQuarryRace*)raceView)->field_0x38->riderCharacter->modelNode);
+            ->AddCaster(((UnknownQuarryRace*)raceView)->localRacer->riderCharacter->modelNode);
         ((UnknownQuarryShadow*)projectedShadow)->SetLight(&shadowLight->position, &shadowLight->look, 3);
         ((UnknownQuarryShadow*)projectedShadow)->SetShadowStrength(0x80);
         int ambient = (int)(ambientLight->ambientRGBA[1] * 255.0f);
@@ -821,12 +821,12 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     if (!UnknownVirtualSlot31())
         return 0;
     g_MemTagStack->Push("3DObjects");
-    UnknownVirtualSlot33((int)((UnknownQuarryRace*)raceView)->field_0x38);
+    UnknownVirtualSlot33((int)((UnknownQuarryRace*)raceView)->localRacer);
     g_MemTagStack->Push("BikeRace");
     ((UnknownQuarryBikeCamera*)raceCamera)->SetSubject(eventTerrain);
     UnknownQuarryBikeCamera* camera = (UnknownQuarryBikeCamera*)raceCamera;
-    UnknownQuarryRacer* bike = ((UnknownQuarryRace*)raceView)->field_0x38;
-    if (camera->bike && !bike->race->field_0x18c) {
+    UnknownQuarryRacer* bike = ((UnknownQuarryRace*)raceView)->localRacer;
+    if (camera->bike && !bike->race->forceHighLod) {
         camera->bike->modelNode->SetLowestLod(1);
         camera->bike->riderCharacter->modelNode->SetLowestLod(1);
         if (!camera->bike->modelNode->currentLod)
@@ -844,7 +844,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     camera->bike = bike;
     camera->isSettled = 0;
     camera->krustyBike = bike;
-    if (!bike->race->field_0x18c) {
+    if (!bike->race->forceHighLod) {
         bike->modelNode->SetLowestLod(0);
         camera->bike->riderCharacter->modelNode->SetLowestLod(0);
     }

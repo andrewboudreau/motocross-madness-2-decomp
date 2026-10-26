@@ -225,7 +225,7 @@ int ChatOverlay::CollectRacers(UnknownChatView* view)
 // The view RadarOverlay draws (+0x12c) holds its track at +0x48.
 struct UnknownRadarView {
     unsigned char field_0x00[0x48];
-    Track* field_0x48;
+    Track* track;                              // +0x48
 };
 
 // 0x0051c720: draws the track outline (mode 1: the +0x18 edge of every
@@ -235,7 +235,7 @@ void RadarOverlay::DrawTrackOutline(int mode)
 {
     TrackListItem* list = 0;
     TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1992);
-    item->node = ((UnknownRadarView*)radarView)->field_0x48->startNode;
+    item->node = ((UnknownRadarView*)radarView)->track->startNode;
     item->next = list;
     list = item;
     while (list) {
