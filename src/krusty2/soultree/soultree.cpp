@@ -147,12 +147,12 @@ SoultreeObject::SoultreeObject(int a)
     field_0x14c = 0;
     field_0x150 = 0;
     localBoundsValid = 0;
-    localBoundsA.x = 0;
-    localBoundsA.y = 0;
-    localBoundsA.z = 0;
-    localBoundsB.x = 0;
-    localBoundsB.y = 0;
-    localBoundsB.z = 0;
+    localBoundsCenter.x = 0;
+    localBoundsCenter.y = 0;
+    localBoundsCenter.z = 0;
+    localBoundsHalfExtent.x = 0;
+    localBoundsHalfExtent.y = 0;
+    localBoundsHalfExtent.z = 0;
     field_0x170 = 0;
     subtreeBoundsA.x = 0;
     subtreeBoundsA.y = 0;
@@ -788,8 +788,8 @@ void SoultreeObject::LoadHierarchy(UnknownTextureStream* stream)
         stream->Read(&nodes[i]->localMatrix, 0x40, 1);
         stream->Read(&nodes[i]->field_0x14c, 4, 1);
         stream->Read(&nodes[i]->localBoundsValid, 4, 1);
-        stream->Read(&nodes[i]->localBoundsA, 0xc, 1);
-        stream->Read(&nodes[i]->localBoundsB, 0xc, 1);
+        stream->Read(&nodes[i]->localBoundsCenter, 0xc, 1);
+        stream->Read(&nodes[i]->localBoundsHalfExtent, 0xc, 1);
         stream->Read(&nodes[i]->field_0x170, 4, 1);
         stream->Read(&nodes[i]->subtreeBoundsA, 0xc, 1);
         stream->Read(&nodes[i]->subtreeBoundsB, 0xc, 1);
@@ -859,12 +859,12 @@ void SoultreeObject::CreateNode(SoultreeObject** out)
 }
 
 // 0x004fe0a0.
-void SoultreeObject::GetLocalBounds(Vec3* a, Vec3* b)
+void SoultreeObject::GetLocalBounds(Vec3* center, Vec3* halfExtent)
 {
     if (!localBoundsValid)
         UpdateLocalBounds();
-    *a = localBoundsA;
-    *b = localBoundsB;
+    *center = localBoundsCenter;
+    *halfExtent = localBoundsHalfExtent;
 }
 
 // 0x004fe0f0. Bounding box of this node (local bounds as center +- half size, when
@@ -883,8 +883,8 @@ void SoultreeObject::UpdateSubtreeBounds()
     have = 0;
     if (field_0x150) {
         have = 1;
-        lo = localBoundsA - localBoundsB;
-        hi = localBoundsA + localBoundsB;
+        lo = localBoundsCenter - localBoundsHalfExtent;
+        hi = localBoundsCenter + localBoundsHalfExtent;
     }
     for (SoultreeObject* c = firstChild; c; c = c->nextSibling)
         c->AccumulateBounds(&have, &lo, &hi, &worldMatrix);
@@ -940,10 +940,10 @@ static inline void FramePointTo(Vec3* r, Vec3 p, const Matrix4& m)
 void SoultreeObject::AccumulateBounds(int* have, Vec3* lo, Vec3* hi, const Matrix4* frame)
 {
     if (field_0x150) {
-        Vec3 ax = Vec3(localBoundsB.x, 0.0f, 0.0f);
-        Vec3 ay = Vec3(0.0f, localBoundsB.y, 0.0f);
-        Vec3 az = Vec3(0.0f, 0.0f, localBoundsB.z);
-        Vec3 c = LocalToWorldPoint(localBoundsA);
+        Vec3 ax = Vec3(localBoundsHalfExtent.x, 0.0f, 0.0f);
+        Vec3 ay = Vec3(0.0f, localBoundsHalfExtent.y, 0.0f);
+        Vec3 az = Vec3(0.0f, 0.0f, localBoundsHalfExtent.z);
+        Vec3 c = LocalToWorldPoint(localBoundsCenter);
         ax = LocalToWorldDirection(ax);
         ay = LocalToWorldDirection(ay);
         az = LocalToWorldDirection(az);

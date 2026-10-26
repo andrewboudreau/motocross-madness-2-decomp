@@ -837,11 +837,11 @@ Tire::Tire(void* a1, int a2, float a3, float a4, int a5, int a6, float a7, float
            float a9, float a10, float a11, float a12, float a13, float a14, int a15)
     : CollisionObject(1), MovingPart(a1, a2, a6), CollisionPoint(a4, a15)
 {
-    CollisionVec3 extentA;
-    CollisionVec3 extentB;
-    MovingPart::sceneNode->GetLocalBounds(&extentA, &extentB);
-    wheelRadius = extentB.y;
-    invWheelRadius = 1.0f / extentB.y;
+    CollisionVec3 boundsCenter;
+    CollisionVec3 halfExtent;
+    MovingPart::sceneNode->GetLocalBounds(&boundsCenter, &halfExtent);
+    wheelRadius = halfExtent.y;
+    invWheelRadius = 1.0f / halfExtent.y;
     rollAngle = 0.0f;
     MovingPart::sceneNode->GetPositionIn(0, &wheelCenter);
     slipVector = kVec3Zero;

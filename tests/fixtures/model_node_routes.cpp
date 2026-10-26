@@ -16,8 +16,8 @@ LAYOUT(node_matrix, offsetof(SoultreeObject, localMatrix) == 0xb8);
 LAYOUT(node_child, offsetof(SoultreeObject, firstChild) == 0x140);
 LAYOUT(node_sibling, offsetof(SoultreeObject, nextSibling) == 0x144);
 LAYOUT(bounds_flag, offsetof(SoultreeObject, localBoundsValid) == 0x154);
-LAYOUT(bounds_a, offsetof(SoultreeObject, localBoundsA) == 0x158);
-LAYOUT(bounds_b, offsetof(SoultreeObject, localBoundsB) == 0x164);
+LAYOUT(bounds_a, offsetof(SoultreeObject, localBoundsCenter) == 0x158);
+LAYOUT(bounds_b, offsetof(SoultreeObject, localBoundsHalfExtent) == 0x164);
 
 static unsigned int storage[128], expected[128], nodes[4][0x1a4 / 4];
 static unsigned int callbackSeed;

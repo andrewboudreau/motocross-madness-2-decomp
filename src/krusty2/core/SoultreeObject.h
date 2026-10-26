@@ -266,9 +266,9 @@ public:
     // The stream type is the one src/reconstructed/Parameterblocks.h names.
     void LoadFromParameters(UnknownParameterStream* stream, int offset);
 
-    // 0x004fe0a0, ret 8: *a / *b = localBoundsA / localBoundsB, after slot 5 when
+    // 0x004fe0a0, ret 8: *center / *halfExtent = localBoundsCenter / localBoundsHalfExtent, after slot 5 when
     // localBoundsValid is 0.
-    void GetLocalBounds(Vec3* a, Vec3* b);
+    void GetLocalBounds(Vec3* center, Vec3* halfExtent);
 
     // 0x004fe0f0: refreshes subtreeBoundsA/B (center and half extents) from this node's
     // local bounds (when field_0x150 is set) and every child's 0x004fe2e0.
@@ -330,8 +330,8 @@ public:
     int field_0x14c;               // 0x14c, set/cleared by 0x004fdb40 / 0x004fdb50
     int field_0x150;               // 0x150
     int localBoundsValid;          // 0x154, 0 makes 0x004fe0a0 call slot 5 first
-    Vec3 localBoundsA;             // 0x158, returned by 0x004fe0a0
-    Vec3 localBoundsB;             // 0x164
+    Vec3 localBoundsCenter;        // 0x158, returned by 0x004fe0a0
+    Vec3 localBoundsHalfExtent;    // 0x164, half size per axis
     int field_0x170;               // 0x170
     Vec3 subtreeBoundsA;           // 0x174, returned by 0x004fe850 (refreshed when subtreeDirty)
     Vec3 subtreeBoundsB;           // 0x180

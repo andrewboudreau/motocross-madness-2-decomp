@@ -141,11 +141,11 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* renderContext, const ch
             wheelNodes[4] = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("TireMidL"));
         if (numWheels > 5)
             wheelNodes[5] = reinterpret_cast<CarProceduralNode*>(reinterpret_cast<SoultreeObject*>(carModel)->FindByName("TireMidR"));
-        Vector3 minimum;
-        Vector3 maximum;
+        Vector3 center;
+        Vector3 halfExtent;
         reinterpret_cast<SoultreeObject*>(wheelNodes[0])->GetLocalBounds(
-            reinterpret_cast<Vec3*>(&minimum), reinterpret_cast<Vec3*>(&maximum));
-        inverseWheelRadius = 1.0f / maximum.y;
+            reinterpret_cast<Vec3*>(&center), reinterpret_cast<Vec3*>(&halfExtent));
+        inverseWheelRadius = 1.0f / halfExtent.y;
     }
     groundProvider = ground;
 
