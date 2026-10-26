@@ -39,9 +39,9 @@ DirtChunkParticleEmitter::DirtChunkParticleEmitter(int flags) : GameObject(flags
 
 DirtChunkParticleEmitter::~DirtChunkParticleEmitter() {}
 
-int DirtChunkParticleEmitter::UnknownVirtualSlot27(void* a, ParticleManager* m)
+int DirtChunkParticleEmitter::UnknownVirtualSlot27(void* context, ParticleManager* m)
 {
-    GameObject::SetRenderContext((void*)a);
+    GameObject::SetRenderContext((void*)context);
     if (m) {
         manager = m;
         return (int)this;

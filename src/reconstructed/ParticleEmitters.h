@@ -21,7 +21,7 @@ public:
     explicit DustParticleEmitter(int flags);
     virtual ~DustParticleEmitter();
     virtual int Tick(float dt);
-    virtual int UnknownVirtualSlot27(void* a, ParticleManager* manager);
+    virtual int UnknownVirtualSlot27(void* context, ParticleManager* manager);
     void SetPosition(ParticleVec3 p, float intensity);   // 0x004b8d90
     void SetColor(unsigned char r, unsigned char g, int b);          // 0x004b8dd0
 
@@ -52,7 +52,7 @@ public:
     explicit DirtChunkParticleEmitter(int flags);
     virtual ~DirtChunkParticleEmitter();
     virtual int Tick(float dt);
-    virtual int UnknownVirtualSlot27(void* a, ParticleManager* manager);
+    virtual int UnknownVirtualSlot27(void* context, ParticleManager* manager);
 
     int firstUpdate;          // +0x2c ctor 1
     ParticleManager* manager; // +0x30 stored by slot 27 (null in the ctor)
@@ -82,7 +82,7 @@ public:
     explicit DirtSprayParticleEmitter(int flags);
     virtual ~DirtSprayParticleEmitter();
     virtual int Tick(float dt);
-    virtual int UnknownVirtualSlot27(void* a, ParticleManager* manager);
+    virtual int UnknownVirtualSlot27(void* context, ParticleManager* manager);
 
     int firstUpdate;          // +0x2c ctor 1
     ParticleManager* manager; // +0x30 stored by slot 27 (null in the ctor)
@@ -112,7 +112,7 @@ public:
     explicit SparkParticleEmitter(int flags);
     virtual ~SparkParticleEmitter();
     virtual int Tick(float dt);
-    virtual int UnknownVirtualSlot27(void* a, ParticleManager* manager);
+    virtual int UnknownVirtualSlot27(void* context, ParticleManager* manager);
     void SetPosition(ParticleVec3 p);   // 0x004b9dc0
 
     int firstUpdate;          // +0x2c ctor 1
@@ -145,7 +145,7 @@ public:
     explicit SteamParticleEmitter(int flags);
     virtual ~SteamParticleEmitter();
     virtual int Tick(float dt);
-    virtual int UnknownVirtualSlot27(void* a, ParticleManager* manager);
+    virtual int UnknownVirtualSlot27(void* context, ParticleManager* manager);
     void SetPosition(ParticleVec3 p);   // 0x004ba2c0
     void Restart();                                   // 0x004ba300
     void Burst();                                     // 0x004ba320

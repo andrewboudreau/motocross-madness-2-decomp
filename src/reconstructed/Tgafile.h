@@ -77,13 +77,13 @@ int ReadTgaPixels32(UnknownTgaFile* file, UnknownTextureStream* stream);
 int ReadTgaPixels16(UnknownTgaFile* file, UnknownTextureStream* stream);
 
 // 0x00511d00: opens `path` and reads its header (0x00511b40).
-UnknownTgaFile* OpenAndReadHeader(const char* path, UnknownTgaFile* file, int a);
+UnknownTgaFile* OpenAndReadHeader(const char* path, UnknownTgaFile* file, int resources);
 
 // 0x00511dd0: reads a whole file from `stream`; 0 on failure.
 UnknownTgaFile* ReadWholeFile(UnknownTextureStream* stream, UnknownTgaFile* file, int offset);
 
 // 0x005125c0: loads the whole file at `path`, named after it; 0 on failure.
-UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* file, int a);
+UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* file, int resources);
 
 // 0x00512dd0: frees a loaded file.
 void FreeFile(UnknownTgaFile* file);

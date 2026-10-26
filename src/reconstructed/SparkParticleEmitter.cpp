@@ -40,9 +40,9 @@ SparkParticleEmitter::SparkParticleEmitter(int flags) : GameObject(flags)
 
 SparkParticleEmitter::~SparkParticleEmitter() {}
 
-int SparkParticleEmitter::UnknownVirtualSlot27(void* a, ParticleManager* m)
+int SparkParticleEmitter::UnknownVirtualSlot27(void* context, ParticleManager* m)
 {
-    GameObject::SetRenderContext((void*)a);
+    GameObject::SetRenderContext((void*)context);
     if (m) {
         manager = m;
         return (int)this;
