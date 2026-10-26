@@ -1157,8 +1157,10 @@ inline CollisionVec3 DebugNormalized(const CollisionVec3& v)
     return CollisionVec3(v.x * inverseLength, v.y * inverseLength, v.z * inverseLength);
 }
 
-// Device behind GameObject::renderContext as slot 14 drives it (render-state style calls with
-// small enum arguments); tier 3 stand-in, only the slots used here.
+// Device behind GameObject::renderContext as slot 14 drives it; tier 3 stand-in, only the
+// slots used here.  The slot order and arguments match RenderTarget (src/reconstructed/
+// RenderTarget.h): 7 SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE), 8
+// SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0) and 10 SetTextureBlend(7, 0).
 class CollisionDebugDevice {
 public:
     virtual void UnknownVirtualSlot0();
@@ -1168,10 +1170,10 @@ public:
     virtual void UnknownVirtualSlot4();
     virtual void UnknownVirtualSlot5();
     virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7(int a, int b, int c);   // +0x1c
-    virtual void UnknownVirtualSlot8(int a, int b, int c);   // +0x20
+    virtual void UnknownVirtualSlot7(int stage, int type, int value);   // +0x1c
+    virtual void UnknownVirtualSlot8(int state, int value, int force);  // +0x20
     virtual void UnknownVirtualSlot9();
-    virtual void UnknownVirtualSlot10(int a, int b);         // +0x28
+    virtual void UnknownVirtualSlot10(int mode, int flag);              // +0x28
 };
 
 // Math3D views of the sphere / capsule payloads (same layouts as CollisionSphereShape and
