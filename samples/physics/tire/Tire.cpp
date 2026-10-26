@@ -254,13 +254,13 @@ void Tire::CollisionPointVirtualSlot1()
         CollisionPoint::frictionMagnitude = 0.0f;
         CollisionPoint::frictionForce = kVec3Zero;
     } else {
-        float c = TireDotInline(CollisionPoint::frictionDirection, rollDirection);
-        if (c < 0.0f)
-            c = -c;
-        if (c >= 1.0f)
-            c = 1.0f;
-        tangentCos = c;
-        float sinA = sqrt(1.0f - c * c);
+        float rollCos = TireDotInline(CollisionPoint::frictionDirection, rollDirection);
+        if (rollCos < 0.0f)
+            rollCos = -rollCos;
+        if (rollCos >= 1.0f)
+            rollCos = 1.0f;
+        tangentCos = rollCos;
+        float sinA = sqrt(1.0f - rollCos * rollCos);
         tangentSin = sinA;   // the side term below reads the member back, not sinA
         float rollTerm = (-rollFriction) * rollFrictionScale * tangentCos * CollisionPoint::frictionCoefficient;
         CollisionPoint::frictionMagnitude = (rollTerm + (-sideFriction) * sideFrictionScale * tangentSin
@@ -390,13 +390,13 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
             this->CollisionPoint::frictionDirection = TireScaled(slipVector, inv);
             lenSq = TireDot(&normalLeverCross, &normalLeverCross);
             this->CollisionPoint::spinSpeed = TireLengthFromSq(lenSq);
-            float c = TireDotInline(this->CollisionPoint::frictionDirection, rollDirection);
-            if (c >= 0.0f) {
-                slipSpeed = TireLengthFromSq(TireDot(&slipVector, &slipVector)) * c;
+            float rollCos = TireDotInline(this->CollisionPoint::frictionDirection, rollDirection);
+            if (rollCos >= 0.0f) {
+                slipSpeed = TireLengthFromSq(TireDot(&slipVector, &slipVector)) * rollCos;
                 if (reportContactOutputs)
                     *outSign = 1;
             } else {
-                slipSpeed = (-c) * TireLengthFromSq(TireDot(&slipVector, &slipVector));
+                slipSpeed = (-rollCos) * TireLengthFromSq(TireDot(&slipVector, &slipVector));
                 if (reportContactOutputs)
                     *outSign = 0;
             }
@@ -415,13 +415,13 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
             this->CollisionPoint::frictionDirection = kVec3Zero;
             this->CollisionPoint::spinSpeed = 0.0f;
         }
-        float c = TireDotInline(this->CollisionPoint::frictionDirection, rollDirection);
-        if (c >= 0.0f) {
-            slipSpeed = c * this->CollisionPoint::spinSpeed;
+        float rollCos = TireDotInline(this->CollisionPoint::frictionDirection, rollDirection);
+        if (rollCos >= 0.0f) {
+            slipSpeed = rollCos * this->CollisionPoint::spinSpeed;
             if (reportContactOutputs)
                 *outSign = 1;
         } else {
-            slipSpeed = (-c) * this->CollisionPoint::spinSpeed;
+            slipSpeed = (-rollCos) * this->CollisionPoint::spinSpeed;
             if (reportContactOutputs)
                 *outSign = 0;
         }
@@ -438,13 +438,13 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
             this->CollisionPoint::frictionDirection = kVec3Zero;
             this->CollisionPoint::spinSpeed = 0.0f;
         }
-        float c = TireDot(&this->CollisionPoint::frictionDirection, &rollDirection);
-        if (c >= 0.0f) {
-            slipSpeed = c * this->CollisionPoint::spinSpeed;
+        float rollCos = TireDot(&this->CollisionPoint::frictionDirection, &rollDirection);
+        if (rollCos >= 0.0f) {
+            slipSpeed = rollCos * this->CollisionPoint::spinSpeed;
             if (reportContactOutputs)
                 *outSign = 1;
         } else {
-            slipSpeed = (-c) * this->CollisionPoint::spinSpeed;
+            slipSpeed = (-rollCos) * this->CollisionPoint::spinSpeed;
             if (reportContactOutputs)
                 *outSign = 0;
         }
@@ -682,8 +682,8 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
                 c.y = c.y * inv;
                 c.z = c.z * inv;
             }
-            float s = radiusScale * wheelRadius;
-            pt = c * s + base;
+            float reach = radiusScale * wheelRadius;
+            pt = c * reach + base;
         } else {
             CollisionVec3 v;
             D3DRMVectorRotate(&v, &kVec3ZAxis, &kVec3YAxis, a5);
@@ -698,8 +698,8 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
                 c.y = c.y * inv;
                 c.z = c.z * inv;
             }
-            float s = radiusScale * wheelRadius;
-            pt = c * s + base;
+            float reach = radiusScale * wheelRadius;
+            pt = c * reach + base;
         }
     } else {
         pt = *a7 * -wheelRadius + origin;
