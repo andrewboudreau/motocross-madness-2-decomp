@@ -972,7 +972,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
     if (steps > 0) do {
         engineState->TickGearTimer(stepTime);
         Vec3 worldTorque = kVec3Zero;
-        Vec3 o2;          // VehContactsB's second output (loop scope: see the slot 49 note)
+        Vec3 mergedNormal;  // VehContactsB's merged normal (loop scope, as in RunSteps)
         if (crashState == 0) {
             if (UpdateWheelRampLevels())
                 engineState->driveCut = 1;
@@ -1062,11 +1062,12 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             } else {
                 scale = Vec3(0.3f, 0.1f, 0.3f);
             }
-            Vec3 o1, o3;
-            VehContactsB(collisionPointCount, ((VehicleContact**)collisionPoints), &scale, &worldAngularVelocity, &velocity, &centerOfMass,
-                         &position, &o3, &o2, &o1);
+            Vec3 mergedVelocity, mergedArm;
+            VehContactsB(collisionPointCount, ((VehicleContact**)collisionPoints), &scale,
+                         &worldAngularVelocity, &velocity, &centerOfMass, &position, &mergedArm,
+                         &mergedNormal, &mergedVelocity);
             float slot3Out;
-            UnknownVirtualSlot3(&o2, &o1, &o3, &scale, 0x67, 0, &slot3Out);
+            UnknownVirtualSlot3(&mergedNormal, &mergedVelocity, &mergedArm, &scale, 0x67, 0, &slot3Out);
             if (prevSpeed * 1.3f < linearSpeed && linearSpeed > 5.0f) {
                 float r = prevSpeed / linearSpeed;
                 velocity *= r;

@@ -42,9 +42,10 @@ inline transform through a local pointer (`const Vec3* point = center`) makes it
 components newer leaves than the matrix elements, so the z row loads them first as
 retail does; grouping the x row's first two products does the same for that row.
 SoultreePhysicsBaseObject::RunSteps `0x00502f60` (class c, 1804/1930) is exact
-too: declaring the merge output `o2` at loop scope instead of in the touching
-block lets the respawn block's `b`/`c` pair with `o3`/`o1` and frees `a` for
-the integration temporary. When only displacement sizes differ, read the
+too: declaring the merge output `mergedNormal` at loop scope instead of in the
+touching block lets the respawn block's `placedForward`/`placedUp` pair with
+`mergedArm`/`mergedVelocity` and frees `placedPosition` for the integration
+temporary. When only displacement sizes differ, read the
 `/FAs` symbol table for which sibling-block locals share a slot.
 
 | TU | VA | score | class | what differs |

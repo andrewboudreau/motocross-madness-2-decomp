@@ -1213,8 +1213,8 @@ GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int renderContext, in
 // feed slot 3.  0x0043aff0 (cdecl) resets the contact records when the refresh did not run.
 // Parameter names tier 3; the Vehicle step 0x0052a940 calls the same three helpers.
 void SoultreeMergeContacts(int count, SoultreeContact** contacts, Vec3* scale, Vec3* angVel,
-                           Vec3* vel, Vec3* center, Vec3* pos, Vec3* outArm, Vec3* outVel,
-                           Vec3* outNormal);
+                           Vec3* vel, Vec3* center, Vec3* pos, Vec3* outArm, Vec3* outNormal,
+                           Vec3* outVel);
 void SoultreeResetContacts(int count, SoultreeContact** contacts);
 
 // Squared length with the components read into locals first (retail loads y, x, z; the
@@ -1246,11 +1246,13 @@ static inline float VecLengthRsq(const Vec3& v)
 // remainder after the last step is run as one extra short step.  `refreshed` is unused.
 // While slot 39 asks for a respawn (`respawn`), the placement search (slot 11) and reset (slot 33)
 // replace the step.
-// Exact once `o2` lives at loop scope.  The respawn block's locals then share slots with
-// its sibling blocks as in retail: dummy with sq, b with o3 (-76), c with o1 (-52), and `a`
-// is left for the integration result temporary (-136); o2 gets its own slot next to
-// impulse.  With all three outputs in the touching block, VC6 pairs a/o3, b/o1, c/o2 and
-// the cold respawn block needs disp32 displacements (1804/1930).
+// Exact once `mergedNormal` lives at loop scope.  The respawn block's locals then share
+// slots with its sibling blocks as in retail: keepPlacement with sq, placedForward with
+// mergedArm (-76), placedUp with mergedVelocity (-52), and placedPosition is left for the
+// integration result temporary (-136); mergedNormal gets its own slot next to impulse.
+// With all three outputs in the touching block, VC6 pairs placedPosition/mergedArm,
+// placedForward/mergedVelocity, placedUp/mergedNormal and the cold respawn block needs
+// disp32 displacements (1804/1930).
 void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
 {
     Vec3 force;
@@ -1296,15 +1298,16 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
                     reinterpret_cast<CollisionPoint**>(collisionPoints));
             UnknownVirtualSlot31();
         }
-        Vec3 o2;
+        Vec3 mergedNormal;
         if (pointsTouching) {
             Vec3 scale;
-            Vec3 o1, o3;
+            Vec3 mergedVelocity, mergedArm;
             float impulse;
             scale = Vec3(1.0f, 1.0f, 1.0f);
             SoultreeMergeContacts(collisionPointCount, collisionPoints, &scale, &worldAngularVelocity,
-                                  &velocity, &centerOfMass, &position, &o3, &o2, &o1);
-            UnknownVirtualSlot3(&o2, &o1, &o3, &scale, 0x67, 0, &impulse);
+                                  &velocity, &centerOfMass, &position, &mergedArm, &mergedNormal,
+                                  &mergedVelocity);
+            UnknownVirtualSlot3(&mergedNormal, &mergedVelocity, &mergedArm, &scale, 0x67, 0, &impulse);
             if (prevSpeed * 5.0f < linearSpeed && linearSpeed > 5.0f) {
                 velocity *= prevSpeed / linearSpeed;
                 linearSpeed = prevSpeed;

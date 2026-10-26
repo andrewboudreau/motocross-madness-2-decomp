@@ -482,10 +482,12 @@ Strict exact under `vc6_o2_ml` with `SoulTreePhysics.bindings.json`:
   (steps > 0);` (the rematerialised `xor ebx,ebx` sits on the back edge); the leftover
   remainder block reads `stepRemainder` once into a local (`stepTime = t; invStepTime =
   1.0f / t;`); the speed clamp and angular damping are `Vec3 *= float`.  The frame needs the
-  merge output `o2` at loop scope: VC6 then pairs the respawn block's `b`/`c` with the
-  touching block's `o3`/`o1` and leaves `a` free for the integration temporary, as retail
-  does (with all three outputs in the touching block it pairs a/o3, b/o1, c/o2 and the
-  respawn block needs 9 bytes of disp32 displacements).
+  merge output `mergedNormal` at loop scope: VC6 then pairs the respawn block's
+  `placedForward`/`placedUp` with the touching block's `mergedArm`/`mergedVelocity` and
+  leaves `placedPosition` free for the integration temporary, as retail does (with all
+  three outputs in the touching block it pairs placedPosition/mergedArm,
+  placedForward/mergedVelocity, placedUp/mergedNormal and the respawn block needs 9 bytes
+  of disp32 displacements).
 - Slot 38 `0x00501600` (contact response) is exact. The static arm scales a local copy
   of `worldAngularVelocity` in place (`t.x *= s.x; ...`) before `CrossProduct(t, r)`;
   a by-value scaling helper consumes the scaled components in place (919 bytes, not 925).
