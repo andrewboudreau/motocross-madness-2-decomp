@@ -112,7 +112,7 @@ public:
     // else 2); see samples/ui/GameUiNearMisses.cpp.
     void SetPopupAlignment(int value);
     void SetBackground(void* background); // 0x0046ffd0: the background, also for its parents
-    void SetModalPause(int a, int b, CameraRect* rect); // 0x00470070
+    void SetModalPause(int pause, int dim, CameraRect* rect); // 0x00470070
     void GrabBackground(int dim, CameraRect* rect); // 0x004700b0: grabs the screen behind it
     void ReleaseBackgroundGrab();             // 0x00470110: releases the grab
     // 0x0046f890: splits `text` into lines for a control; returns 0 when it fits on one.

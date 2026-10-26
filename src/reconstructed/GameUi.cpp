@@ -2225,12 +2225,12 @@ void UIDialog::SyncValues(int value) {
 }
 
 // 0x00470070
-void UIDialog::SetModalPause(int a, int b, CameraRect* rect) {
-    if (a)
-        GrabBackground(b, rect);
+void UIDialog::SetModalPause(int pause, int dim, CameraRect* rect) {
+    if (pause)
+        GrabBackground(dim, rect);
     else
         ReleaseBackgroundGrab();
-    GameObject::SetPaused(a);
+    GameObject::SetPaused(pause);
 }
 
 // 0x004700b0
@@ -2374,17 +2374,17 @@ UIControl::~UIControl() {
 }
 
 // 0x00470660
-void UIControl::Show(int a, int b) {
+void UIControl::Show(int show, int animate) {
     if (transitionStep) {
-        if (a) {
+        if (show) {
             transitionState = 1;
             if (transitionType == 0x6a)
                 transitionStep = &UIControl::AnimInStep;
             drawnTexture = 0;
-            shown = a;
+            shown = show;
             return;
         }
-        if (transitionType == 0x6a && b && ownerDialog->animatesControls) {
+        if (transitionType == 0x6a && animate && ownerDialog->animatesControls) {
             drawnTexture = 0;
             transitionState = 2;
             transitionStep = &UIControl::AnimOutStep;
@@ -2397,7 +2397,7 @@ void UIControl::Show(int a, int b) {
         return;
     }
     transitionState = 0;
-    shown = a;
+    shown = show;
     RequestRedraw();
 }
 
