@@ -140,10 +140,10 @@ public:
                                              int minPoints, char a21, int a22);
 
     int field_0x04;
-    void* field_0x08;                     // the scene node the collision points follow
+    void* followedNode;                   // +0x08: the scene node the collision points follow
     unsigned char field_0x0c[0x12c - 0x0c];
-    void** field_0x12c;                   // collision points
-    int field_0x130;                      // collision point count
+    void** collisionPoints;               // +0x12c
+    int collisionPointCount;              // +0x130
     unsigned char field_0x134[0x21c - 0x134];
 };
 class UnknownScenePhysicsObject : public UnknownScenePhysicsBody, public D3DIMSoultreeObject {
@@ -164,7 +164,7 @@ public:
     void SnapPlacement();                      // 0x00435fe0
 
     unsigned char field_0x38[0x60 - 0x38];
-    D3DIMSoultreeObject* field_0x60;
+    D3DIMSoultreeObject* ownerObject;           // +0x60, CollisionObject.h's owner
     unsigned char field_0x64[0xb8 - 0x64];
 };
 
@@ -315,8 +315,9 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                     ReadVector(&position, model, key, "0.0,0.0,0.0", 0, 0);
                     sprintf(key, "FrictionCoefficient%d", p + 1);
                     parameters.GetFloat(key, 0.6f, &friction);
-                    AddCollisionPoint(points, object->field_0x12c, &position,
-                                      object->UnknownScenePhysicsBody::field_0x08, 0, &object->field_0x130,
+                    AddCollisionPoint(points, object->collisionPoints, &position,
+                                      object->UnknownScenePhysicsBody::followedNode, 0,
+                                      &object->collisionPointCount,
                                       friction, (int)this);
                 }
             if (a2) {
@@ -341,7 +342,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                             UnknownSceneDustEmitter* emitter = new(__FILE__, 1917) UnknownSceneDustEmitter(1);
                             D3DIMSoultreeObject* node = object;
                             node->AppendChild(emitter->UnknownVirtualSlot27(renderContext, a2), -1);
-                            object->UnknownVirtualSlot37(1, emitter, *object->field_0x12c, 0);
+                            object->UnknownVirtualSlot37(1, emitter, *object->collisionPoints, 0);
                             dust = 1;
                         }
                         break;
@@ -353,7 +354,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                             UnknownSceneChunkEmitter* emitter = new(__FILE__, 1927) UnknownSceneChunkEmitter(1);
                             D3DIMSoultreeObject* node = object;
                             node->AppendChild(emitter->UnknownVirtualSlot27(renderContext, a2), -1);
-                            object->UnknownVirtualSlot37(2, emitter, *object->field_0x12c, 0);
+                            object->UnknownVirtualSlot37(2, emitter, *object->collisionPoints, 0);
                             chunk = 1;
                         }
                         break;
@@ -365,7 +366,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                             UnknownSceneSprayEmitter* emitter = new(__FILE__, 1937) UnknownSceneSprayEmitter(1);
                             D3DIMSoultreeObject* node = object;
                             node->AppendChild(emitter->UnknownVirtualSlot27(renderContext, a2), -1);
-                            object->UnknownVirtualSlot37(3, emitter, *object->field_0x12c, 0);
+                            object->UnknownVirtualSlot37(3, emitter, *object->collisionPoints, 0);
                             spray = 1;
                         }
                         break;
@@ -397,7 +398,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                 g_MemTagStack->Push("Collision");
                 staticModels->casters[i].collisionObject = new(__FILE__, 1974) UnknownSceneCollisionObject(1);
                 staticModels->casters[i].collisionObject->Configure(renderContext, 1, 0, 1);
-                staticModels->casters[i].collisionObject->field_0x60 =
+                staticModels->casters[i].collisionObject->ownerObject =
                     (D3DIMSoultreeObject*)staticModels->casters[i].model;
                 if (!colPath[0])
                     staticModels->casters[i].collisionObject->SetHullShape(
