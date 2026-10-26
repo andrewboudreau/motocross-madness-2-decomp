@@ -887,26 +887,26 @@ Vec3* Vehicle::UnknownVirtualSlot46(Vec3* out, float arg)
 {
     if (!airborne && !pointsTouching && wheelsInContact <= 2) {
         if (wheelsInContact == 2) {
-            // a has the aux object, b is the other wheel
-            VehicleWheel* a;
-            VehicleWheel* b = secondaryWheel;
-            if (b->aux) {
-                a = b;
-                b = primaryWheel;
+            // driven has the aux (drive) object, other is the remaining wheel
+            VehicleWheel* driven;
+            VehicleWheel* other = secondaryWheel;
+            if (other->aux) {
+                driven = other;
+                other = primaryWheel;
             } else {
-                a = primaryWheel;
-                if (!a->aux) {
+                driven = primaryWheel;
+                if (!driven->aux) {
                     *out = rotationPivot;
                     return out;
                 }
             }
-            if (a->driveShare < 0.9f) {
-                scratchVector = b->wheelPosition - position;
+            if (driven->driveShare < 0.9f) {
+                scratchVector = other->wheelPosition - position;
                 *out = modelNode->WorldToLocalDirection(scratchVector);
             } else {
-                Vec3 d = a->wheelPosition - b->wheelPosition;
-                Vec3 half = d * 0.5f;
-                Vec3 mid = half + b->wheelPosition;
+                Vec3 span = driven->wheelPosition - other->wheelPosition;
+                Vec3 half = span * 0.5f;
+                Vec3 mid = half + other->wheelPosition;
                 scratchVector = mid - position;
                 *out = modelNode->WorldToLocalDirection(scratchVector);
             }
@@ -1070,11 +1070,11 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             VehContactsB(collisionPointCount, ((VehicleContact**)collisionPoints), &scale,
                          &worldAngularVelocity, &velocity, &centerOfMass, &position, &mergedArm,
                          &mergedNormal, &mergedVelocity);
-            float slot3Out;
-            UnknownVirtualSlot3(&mergedNormal, &mergedVelocity, &mergedArm, &scale, 0x67, 0, &slot3Out);
+            float impulse;
+            UnknownVirtualSlot3(&mergedNormal, &mergedVelocity, &mergedArm, &scale, 0x67, 0, &impulse);
             if (prevSpeed * 1.3f < linearSpeed && linearSpeed > 5.0f) {
-                float r = prevSpeed / linearSpeed;
-                velocity *= r;
+                float ratio = prevSpeed / linearSpeed;
+                velocity *= ratio;
                 linearSpeed = prevSpeed;
             }
             if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
