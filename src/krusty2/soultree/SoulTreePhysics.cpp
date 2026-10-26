@@ -164,10 +164,10 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot8()
 void SoultreePhysicsBaseObject::UnknownVirtualSlot9(float dt, int* steps)
 {
     frameTime = dt + stepRemainder;
-    int n = (int)(frameTime / fixedStepTime);
-    *steps = n;
-    if (n) {
-        stepRemainder = frameTime - n * fixedStepTime;
+    int wholeSteps = (int)(frameTime / fixedStepTime);
+    *steps = wholeSteps;
+    if (wholeSteps) {
+        stepRemainder = frameTime - wholeSteps * fixedStepTime;
         *steps = (*steps > maxStepsPerFrame) ? maxStepsPerFrame : *steps;
         stepTime = fixedStepTime;
     } else {
@@ -195,34 +195,34 @@ int SoultreePhysicsBaseObject::UnknownVirtualSlot11(int respawn, Vec3* outPositi
 // slot 15 (0x00502200)
 void SoultreePhysicsBaseObject::UnknownVirtualSlot15(const Vec3* worldTorque, Vec3* angularAccel)
 {
-    Vec3 v = sceneNode->WorldToLocalDirection(*worldTorque);
-    Vec3 w;
+    Vec3 localTorque = sceneNode->WorldToLocalDirection(*worldTorque);
+    Vec3 localAccel;
     if (UnknownVirtualSlot10()) {
-        w.x = v.x * shapeInvInertia.x;
-        w.y = v.y * shapeInvInertia.y;
-        w.z = v.z * shapeInvInertia.z;
+        localAccel.x = localTorque.x * shapeInvInertia.x;
+        localAccel.y = localTorque.y * shapeInvInertia.y;
+        localAccel.z = localTorque.z * shapeInvInertia.z;
     } else {
-        w.x = v.x * invInertia.x;
-        w.y = v.y * invInertia.y;
-        w.z = v.z * invInertia.z;
+        localAccel.x = localTorque.x * invInertia.x;
+        localAccel.y = localTorque.y * invInertia.y;
+        localAccel.z = localTorque.z * invInertia.z;
     }
-    UnknownAxisSettle_4cb6e0(&angularVelocity.x, &angularAccel->x, &w.x, stepTime, 0);
+    UnknownAxisSettle_4cb6e0(&angularVelocity.x, &angularAccel->x, &localAccel.x, stepTime, 0);
 }
 
 // slot 16 (0x005022b0)
 Vec3 SoultreePhysicsBaseObject::UnknownVirtualSlot16(const Vec3* localTorque)
 {
-    Vec3 t;
+    Vec3 accel;
     if (UnknownVirtualSlot10()) {
-        t.x = shapeInvInertia.x * localTorque->x;
-        t.y = shapeInvInertia.y * localTorque->y;
-        t.z = shapeInvInertia.z * localTorque->z;
+        accel.x = shapeInvInertia.x * localTorque->x;
+        accel.y = shapeInvInertia.y * localTorque->y;
+        accel.z = shapeInvInertia.z * localTorque->z;
     } else {
-        t.x = invInertia.x * localTorque->x;
-        t.y = invInertia.y * localTorque->y;
-        t.z = invInertia.z * localTorque->z;
+        accel.x = invInertia.x * localTorque->x;
+        accel.y = invInertia.y * localTorque->y;
+        accel.z = invInertia.z * localTorque->z;
     }
-    return t;
+    return accel;
 }
 
 // Division through the reciprocal. Inlined, it gives slot 17's mixed schedule (x as
@@ -411,10 +411,10 @@ int SoultreePhysicsBaseObject::UnknownVirtualSlot39(float dt)
 // otherwise the table-driven square root at 0x00460b50.
 static inline float VecLengthFast(const Vec3& v)
 {
-    float s = v.z * v.z + (v.x * v.x + v.y * v.y);
-    if (s == 1.0f)
+    float lengthSq = v.z * v.z + (v.x * v.x + v.y * v.y);
+    if (lengthSq == 1.0f)
         return 1.0f;
-    return FastSqrt(s);
+    return FastSqrt(lengthSq);
 }
 
 // slot 7 (0x005019e0): distributes the force *force over the contacts, weighting each
@@ -426,34 +426,34 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot7(const Vec3* force)
     float dist[128];
     int i;
     if (pointsTouching) {
-        float sum = 0.0f;
-        int n = 0;
+        float total = 0.0f;
+        int active = 0;
         int last;
         for (i = 0; i < collisionPointCount; i++) {
             SoultreeContact* c = collisionPoints[i];
             if (c->touching) {
-                Vec3 d = centerOfMass - c->worldPosition;
-                float len = VecLengthFast(d);
+                Vec3 offset = centerOfMass - c->worldPosition;
+                float len = VecLengthFast(offset);
                 dist[i] = len;
-                sum += len;
-                n++;
+                total += len;
+                active++;
                 last = i;
             } else {
                 c->loadShare = 0.0f;
                 c->forceShare = g_Zero;
             }
         }
-        if (n == 1) {
+        if (active == 1) {
             collisionPoints[last]->loadShare = 1.0f;
             collisionPoints[last]->forceShare = *force;
             return;
         }
-        for (i = 0; n > 0; i++) {
+        for (i = 0; active > 0; i++) {
             SoultreeContact* c = collisionPoints[i];
             if (c->touching) {
-                c->loadShare = 1.0f - dist[i] / sum;
+                c->loadShare = 1.0f - dist[i] / total;
                 c->forceShare = *force * c->loadShare;
-                n--;
+                active--;
             }
         }
     } else {
@@ -474,20 +474,20 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot13(Vec3* force, Vec3* localTor
         SoultreeContact* c = collisionPoints[i];
         if (!c->contactState)
             continue;
-        Vec3 t;
-        float w = c->loadShare;
-        t.x = w * force->x;
-        t.y = w * force->y;
-        t.z = w * force->z;
-        float d = SoultreeDot(t, c->contactNormal);
-        c->normalForceMagnitude = d;
-        if (d >= 0.0f) {
+        Vec3 share;
+        float weight = c->loadShare;
+        share.x = weight * force->x;
+        share.y = weight * force->y;
+        share.z = weight * force->z;
+        float normalComponent = SoultreeDot(share, c->contactNormal);
+        c->normalForceMagnitude = normalComponent;
+        if (normalComponent >= 0.0f) {
             c->normalForceMagnitude = 0.0f;
             c->normalForce = Vec3(0.0f, 0.0f, 0.0f);
         } else {
-            c->normalForceMagnitude = -d;
+            c->normalForceMagnitude = -normalComponent;
             Vec3 scaled;
-            c->normalForce = *Vec3ScaleCall(&scaled, &c->contactNormal, -d);
+            c->normalForce = *Vec3ScaleCall(&scaled, &c->contactNormal, -normalComponent);
         }
         c->UnknownVirtualSlot1();
         *force += c->frictionForce;
@@ -579,14 +579,14 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot38(int notify, int eventKind, 
             other->worldAngularVelocity = other->sceneNode->LocalToWorldDirection(*(Vec3*)event);
         }
     } else {
-        Vec3 t = worldAngularVelocity;
-        t.x *= angScale.x;
-        t.y *= angScale.y;
-        t.z *= angScale.z;
-        scratchVector = CrossProduct(t, arm);
-        Vec3 p = velocity + scratchVector;
-        UnknownVirtualSlot3((Vec3*)&collisionObject->hitNormal, &p, &arm, &angScale, eventKind, 0,
-                            (float*)&eventKind);
+        Vec3 scaledAngVel = worldAngularVelocity;
+        scaledAngVel.x *= angScale.x;
+        scaledAngVel.y *= angScale.y;
+        scaledAngVel.z *= angScale.z;
+        scratchVector = CrossProduct(scaledAngVel, arm);
+        Vec3 contactVelocity = velocity + scratchVector;
+        UnknownVirtualSlot3((Vec3*)&collisionObject->hitNormal, &contactVelocity, &arm, &angScale, eventKind,
+                            0, (float*)&eventKind);
     }
     if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
         velocity = g_Zero;
