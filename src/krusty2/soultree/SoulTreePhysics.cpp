@@ -227,7 +227,7 @@ Vec3 SoultreePhysicsBaseObject::UnknownVirtualSlot16(const Vec3* localTorque)
 
 // Division through the reciprocal. Inlined, it gives slot 17's mixed schedule (x as
 // `fld st0; fmul [sum.x]`, y as `fld [sum.y]; fmul st1`, z consuming the reciprocal);
-// the product written in the caller (`sum * (1.0f / n)`, per-component constructors, a
+// the product written in the caller (`sum * (1.0f / count)`, per-component constructors, a
 // named reciprocal) or `(1.0f / s) * v` in the helper give other orders.
 static inline Vec3 DivideVec(const Vec3& v, float s)
 {
@@ -238,22 +238,22 @@ static inline Vec3 DivideVec(const Vec3& v, float s)
 Vec3 SoultreePhysicsBaseObject::UnknownVirtualSlot17()
 {
     Vec3 sum;
-    int n = 0;
+    int count = 0;
     int first = 1;
     for (int i = 0; i < attachmentCount; i++) {
-        SoultreeAttachment* a = &attachments[i];
-        if (a->type == 4)
+        SoultreeAttachment* attachment = &attachments[i];
+        if (attachment->type == 4)
             continue;
         if (first) {
-            sum = a->anchor->anchorPosition;
+            sum = attachment->anchor->anchorPosition;
             first = 0;
         } else {
-            sum += a->anchor->anchorPosition;
+            sum += attachment->anchor->anchorPosition;
         }
-        n++;
+        count++;
     }
-    if (n) {
-        return DivideVec(sum, (float)n);
+    if (count) {
+        return DivideVec(sum, (float)count);
     }
     return g_Zero;
 }
@@ -262,12 +262,12 @@ Vec3 SoultreePhysicsBaseObject::UnknownVirtualSlot17()
 void SoultreePhysicsBaseObject::UnknownVirtualSlot18(SoultreeAttachment* attachment)
 {
     for (int i = 0; i < collisionPointCount; i++) {
-        SoultreeContact* c = collisionPoints[i];
-        if (c->touching && !c->effectSpawned &&
-            track->trackData->materialEffectFlags[(unsigned char)c->materialId] != 0) {
-            c->effectSpawned = 1;
+        SoultreeContact* contact = collisionPoints[i];
+        if (contact->touching && !contact->effectSpawned &&
+            track->trackData->materialEffectFlags[(unsigned char)contact->materialId] != 0) {
+            contact->effectSpawned = 1;
             reinterpret_cast<DustParticleEmitter*>(attachment->contactEmitter)->SetPosition(
-                reinterpret_cast<const ParticleVec3&>(c->field_0x20), 0.0f);
+                reinterpret_cast<const ParticleVec3&>(contact->field_0x20), 0.0f);
             if (attachment->resetTrail)
                 attachment->contactEmitter->previousPosition = attachment->contactEmitter->currentPosition;
             attachment->contactEmitter->activeThisFrame = 1;
@@ -322,17 +322,17 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot30()
 void SoultreePhysicsBaseObject::UnknownVirtualSlot31()
 {
     for (int i = 0; i < collisionPointCount; i++) {
-        SoultreeContact* c = collisionPoints[i];
-        if (c->ownerNode && c->field_0x98 >= 0.0f) {
-            if (c->contactState != 2)
-                c->contactState = 1;
-            reinterpret_cast<CollisionPoint*>(c)->UpdateRelativeMotion(
+        SoultreeContact* contact = collisionPoints[i];
+        if (contact->ownerNode && contact->field_0x98 >= 0.0f) {
+            if (contact->contactState != 2)
+                contact->contactState = 1;
+            reinterpret_cast<CollisionPoint*>(contact)->UpdateRelativeMotion(
                 reinterpret_cast<const CollisionVec3*>(&centerOfMass),
                 reinterpret_cast<const CollisionVec3*>(&worldAngularVelocity),
                 reinterpret_cast<const CollisionVec3*>(&velocity),
-                reinterpret_cast<const CollisionVec3*>(&c->leverArm), linearSpeed);
+                reinterpret_cast<const CollisionVec3*>(&contact->leverArm), linearSpeed);
         } else {
-            c->contactState = 0;
+            contact->contactState = 0;
         }
     }
 }
@@ -367,33 +367,33 @@ SoultreeAttachment* SoultreePhysicsBaseObject::UnknownVirtualSlot37(int type, vo
 {
     if (attachmentCount >= attachmentCapacity || type == 0)
         return 0;
-    SoultreeAttachment* a = &attachments[attachmentCount];
-    a->type = type;
-    a->anchor = anchor;
-    a->contactEmitter = 0;
-    a->slideEmitter = 0;
-    a->scrapeEmitter = 0;
-    a->pointEmitter = 0;
-    a->localOffset = g_Zero;
-    a->resetTrail = 0;
+    SoultreeAttachment* attachment = &attachments[attachmentCount];
+    attachment->type = type;
+    attachment->anchor = anchor;
+    attachment->contactEmitter = 0;
+    attachment->slideEmitter = 0;
+    attachment->scrapeEmitter = 0;
+    attachment->pointEmitter = 0;
+    attachment->localOffset = g_Zero;
+    attachment->resetTrail = 0;
     switch (type) {
     case 1:
-        a->contactEmitter = (SoultreeAttachedObject*)target;
+        attachment->contactEmitter = (SoultreeAttachedObject*)target;
         break;
     case 2:
-        a->slideEmitter = target;
+        attachment->slideEmitter = target;
         break;
     case 3:
-        a->scrapeEmitter = target;
+        attachment->scrapeEmitter = target;
         break;
     case 4:
-        a->pointEmitter = target;
-        a->localOffset = *v;
-        a->anchor = 0;
+        attachment->pointEmitter = target;
+        attachment->localOffset = *v;
+        attachment->anchor = 0;
         break;
     }
     attachmentCount++;
-    return a;
+    return attachment;
 }
 
 // slot 39 (0x005019a0)
@@ -430,17 +430,17 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot7(const Vec3* force)
         int active = 0;
         int last;
         for (i = 0; i < collisionPointCount; i++) {
-            SoultreeContact* c = collisionPoints[i];
-            if (c->touching) {
-                Vec3 offset = centerOfMass - c->worldPosition;
+            SoultreeContact* contact = collisionPoints[i];
+            if (contact->touching) {
+                Vec3 offset = centerOfMass - contact->worldPosition;
                 float len = VecLengthFast(offset);
                 dist[i] = len;
                 total += len;
                 active++;
                 last = i;
             } else {
-                c->loadShare = 0.0f;
-                c->forceShare = g_Zero;
+                contact->loadShare = 0.0f;
+                contact->forceShare = g_Zero;
             }
         }
         if (active == 1) {
@@ -449,18 +449,18 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot7(const Vec3* force)
             return;
         }
         for (i = 0; active > 0; i++) {
-            SoultreeContact* c = collisionPoints[i];
-            if (c->touching) {
-                c->loadShare = 1.0f - dist[i] / total;
-                c->forceShare = *force * c->loadShare;
+            SoultreeContact* contact = collisionPoints[i];
+            if (contact->touching) {
+                contact->loadShare = 1.0f - dist[i] / total;
+                contact->forceShare = *force * contact->loadShare;
                 active--;
             }
         }
     } else {
         for (i = 0; i < collisionPointCount; i++) {
-            SoultreeContact* c = collisionPoints[i];
-            c->loadShare = 0.0f;
-            c->forceShare = g_Zero;
+            SoultreeContact* contact = collisionPoints[i];
+            contact->loadShare = 0.0f;
+            contact->forceShare = g_Zero;
         }
     }
 }
@@ -471,30 +471,31 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot13(Vec3* force, Vec3* localTor
     if (!touchingPointCount)
         return;
     for (int i = 0; i < collisionPointCount; i++) {
-        SoultreeContact* c = collisionPoints[i];
-        if (!c->contactState)
+        SoultreeContact* contact = collisionPoints[i];
+        if (!contact->contactState)
             continue;
         Vec3 share;
-        float weight = c->loadShare;
+        float weight = contact->loadShare;
         share.x = weight * force->x;
         share.y = weight * force->y;
         share.z = weight * force->z;
-        float normalComponent = SoultreeDot(share, c->contactNormal);
-        c->normalForceMagnitude = normalComponent;
+        float normalComponent = SoultreeDot(share, contact->contactNormal);
+        contact->normalForceMagnitude = normalComponent;
         if (normalComponent >= 0.0f) {
-            c->normalForceMagnitude = 0.0f;
-            c->normalForce = Vec3(0.0f, 0.0f, 0.0f);
+            contact->normalForceMagnitude = 0.0f;
+            contact->normalForce = Vec3(0.0f, 0.0f, 0.0f);
         } else {
-            c->normalForceMagnitude = -normalComponent;
+            contact->normalForceMagnitude = -normalComponent;
             Vec3 scaled;
-            c->normalForce = *Vec3ScaleCall(&scaled, &c->contactNormal, -normalComponent);
+            contact->normalForce = *Vec3ScaleCall(&scaled, &contact->contactNormal, -normalComponent);
         }
-        c->UnknownVirtualSlot1();
-        *force += c->frictionForce;
-        *localTorque += sceneNode->WorldToLocalDirection(SoultreeCrossCtor(c->leverArm, c->frictionForce));
-        if (c->contactState == 2) {
+        contact->UnknownVirtualSlot1();
+        *force += contact->frictionForce;
+        *localTorque += sceneNode->WorldToLocalDirection(
+            SoultreeCrossCtor(contact->leverArm, contact->frictionForce));
+        if (contact->contactState == 2) {
             *localTorque *= torqueScale;
-            c->contactState = 0;
+            contact->contactState = 0;
         }
     }
 }
@@ -651,23 +652,23 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
     if (!shadowLight) {
         SoultreeLightList* list = *(SoultreeLightList**)((char*)sceneNode + 0x1bc);
         for (int i = 0; i < list->count; i++) {
-            SoultreeLight* h = list->items[i];
-            if (h->kind == 2 || h->kind == 4)
-                shadowLight = h;
+            SoultreeLight* light = list->items[i];
+            if (light->kind == 2 || light->kind == 4)
+                shadowLight = light;
         }
     }
     if (UnknownVirtualSlot22()) {
         int hit;
         Vec3 pos = UnknownVirtualSlot17();
         pos.y += 1.5f;
-        SoultreeLight* h = shadowLight;
+        SoultreeLight* light = shadowLight;
         Vec3 out;
-        if (h->kind == 2) {
-            Vec3 to = pos + Vec3(h->lightDirX * -3000.0f, h->lightDirY * -3000.0f,
-                                 h->lightDirZ * -3000.0f);
+        if (light->kind == 2) {
+            Vec3 to = pos + Vec3(light->lightDirX * -3000.0f, light->lightDirY * -3000.0f,
+                                 light->lightDirZ * -3000.0f);
             hit = terrain->CastSegment(&pos, &to, &out, 0, 0, 0);
         } else {
-            hit = terrain->CastSegment(&pos, &h->lightPosition, &out, 0, 0, 0);
+            hit = terrain->CastSegment(&pos, &light->lightPosition, &out, 0, 0, 0);
         }
         if (hit != (unsigned char)inShadow) {
             for (int i = 0; i < attachmentCount; i++) {
@@ -697,37 +698,37 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
     int moving = UnknownVirtualSlot23();
     int settled = UnknownVirtualSlot24();
     for (int i = 0; i < attachmentCount; i++) {
-        SoultreeAttachment* a = &attachments[i];
-        a->resetTrail = (justReset || a->resetTrail) ? 1 : 0;
-        switch (a->type) {
+        SoultreeAttachment* attachment = &attachments[i];
+        attachment->resetTrail = (justReset || attachment->resetTrail) ? 1 : 0;
+        switch (attachment->type) {
         case 1:
-            a->contactEmitter->activeThisFrame = 0;
+            attachment->contactEmitter->activeThisFrame = 0;
             if (moving)
-                UnknownVirtualSlot18(a);
+                UnknownVirtualSlot18(attachment);
             break;
         case 2:
-            ((SoultreePadObject*)a->slideEmitter)->activeThisFrame = 0;
+            ((SoultreePadObject*)attachment->slideEmitter)->activeThisFrame = 0;
             if (moving)
-                UnknownVirtualSlot19(a);
+                UnknownVirtualSlot19(attachment);
             break;
         case 3:
-            ((SoultreePadObject*)a->scrapeEmitter)->activeThisFrame = 0;
+            ((SoultreePadObject*)attachment->scrapeEmitter)->activeThisFrame = 0;
             if (moving)
-                UnknownVirtualSlot20(a);
+                UnknownVirtualSlot20(attachment);
             break;
         case 4:
             if (!justReset) {
-                scratchVector = sceneNode->LocalToWorldPoint(a->localOffset);
-                reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(a))->SetPosition(
+                scratchVector = sceneNode->LocalToWorldPoint(attachment->localOffset);
+                reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(attachment))->SetPosition(
                     reinterpret_cast<const ParticleVec3&>(scratchVector));
-                if (a->resetTrail) {
-                    AttachmentSink(a)->previousPosition = AttachmentSink(a)->currentPosition;
-                    a->resetTrail = 0;
+                if (attachment->resetTrail) {
+                    AttachmentSink(attachment)->previousPosition = AttachmentSink(attachment)->currentPosition;
+                    attachment->resetTrail = 0;
                 }
                 if (settled && !field_0x20e)
-                    reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(a))->Restart();
+                    reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(attachment))->Restart();
                 else if (UnknownVirtualSlot25())
-                    reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(a))->Burst();
+                    reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(attachment))->Burst();
             }
             break;
         }
@@ -841,11 +842,11 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int renderContext, in
             float sz = extents.z + extents.z;
             float zz = sz * sz;
             float yy = sy * sy;
-            float k = mass * (1.0f / 12.0f);
-            inertia->x = 1.0f / ((yy + zz) * k);
+            float boxScale = mass * (1.0f / 12.0f);
+            inertia->x = 1.0f / ((yy + zz) * boxScale);
             float xx = sx * sx;
-            inertia->y = 1.0f / ((xx + zz) * k);
-            inertia->z = 1.0f / ((xx + yy) * k);
+            inertia->y = 1.0f / ((xx + zz) * boxScale);
+            inertia->z = 1.0f / ((xx + yy) * boxScale);
         }
     }
     memcpy(field_0x164, ident, sizeof(ident));
@@ -1130,9 +1131,9 @@ GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int renderContext, const
     }
 
     int len = strlen(modelPath);
-    int n = len > 0x103 ? 0x103 : len;
-    strncpy(name, modelPath, n);
-    name[n] = 0;
+    int copyLength = len > 0x103 ? 0x103 : len;
+    strncpy(name, modelPath, copyLength);
+    name[copyLength] = 0;
     strcpy(strrchr(name, '.'), ".col");
 
     UnknownTextureStream* file = new(SP_FILE, 0x84e) UnknownTextureStream(g_ResourceManager);
@@ -1181,9 +1182,9 @@ GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int renderContext, in
     }
 
     int len = strlen(modelPath);
-    int n = len > 0x103 ? 0x103 : len;
-    strncpy(name, modelPath, n);
-    name[n] = 0;
+    int copyLength = len > 0x103 ? 0x103 : len;
+    strncpy(name, modelPath, copyLength);
+    name[copyLength] = 0;
     strcpy(strrchr(name, '.'), ".col");
 
     UnknownTextureStream* file = new(SP_FILE, 0x8cd) UnknownTextureStream(g_ResourceManager);
