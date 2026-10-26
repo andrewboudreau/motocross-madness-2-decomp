@@ -1086,21 +1086,21 @@ void DrawableGridNode::TestNodeVertices()
 // rectangle, skipping vertices pinned by a direction bit. Retail loads the
 // row offset before x, which the row pointer and the inner loop's own copy
 // of x reproduce.
-void DrawableGridNode::TestRectangleLevel(int x0, int z0, int w, int h, int half, int start,
+void DrawableGridNode::TestRectangleLevel(int x0, int z0, int width, int depth, int half, int start,
                                              int step, int rowStep)
 {
     int row = 0;
     int z = z0 + start;
-    int zEnd = z0 + h;
+    int zEnd = z0 + depth;
     for (; z <= zEnd; z += rowStep, row++) {
         int x;
         if (start == 0)
             x = (row & 1) ? 0 : half;
         else
             x = half;
-        int* r = &g_gridRow17[z];
-        for (int n = x0 + x; n <= x0 + w; n += step) {
-            int i = *r + n;
+        int* rowBase = &g_gridRow17[z];
+        for (int n = x0 + x; n <= x0 + width; n += step) {
+            int i = *rowBase + n;
             if (data->vertexFlags[i] & 0xf)
                 continue;
             if (!CanDropVertex(n, z)) {

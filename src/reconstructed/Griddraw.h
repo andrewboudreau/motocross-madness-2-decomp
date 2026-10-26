@@ -351,7 +351,7 @@ public:
     void RetestChangedVertices();                               // 0x00482760
     void TestVertex(int x, int z);                   // 0x00482a40 (ret 8)
     void TestNodeVertices();                               // 0x00482ae0
-    void TestRectangleLevel(int x0, int z0, int x1, int z1, int half, int start, int step,
+    void TestRectangleLevel(int x0, int z0, int width, int depth, int half, int start, int step,
                                int rowStep);                    // 0x00482b40 (ret 0x20)
     void PropagateVertexChange(int x, int z, int flag);         // 0x00482c90 (ret 0xc)
     void SetVertexDirection(int x, int z, int flag, int dir, GridBaseCell* origin); // 0x00482dd0 (ret 0x14)
