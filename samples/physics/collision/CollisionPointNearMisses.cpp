@@ -144,10 +144,10 @@ static inline void CollisionRefreshContact(CollisionPoint* p, CollisionFrameHelp
 // `if (count > 0)` guard: then VC6 loads points before frame and homes the loop counter in
 // points' dead argument slot, as retail does (with the pointer local but no guard the points
 // load moves above the count test; walking points itself homes the counter in a1's slot).
-// Still differs (604/615): in the single-contact path retail stores w.y into worldPosition
-// after the fstp of w.z.  No gain from reordered, chained, pointer, component-wise or
-// assigned-after-declaration copies of w, a named product or -k local, the operands of the
-// sum swapped, or a component-wise sum.
+// Still differs (604/615): in the single-contact path retail stores contactPos.y into
+// worldPosition after the fstp of contactPos.z.  No gain from reordered, chained, pointer,
+// component-wise or assigned-after-declaration copies of contactPos, a named product or -k
+// local, the operands of the sum swapped, or a component-wise sum.
 int SoultreeRefreshContacts(void* a1, int* penetrating, int count, CollisionPoint** points,
                             CollisionFrameHelper* frame, CollisionVec3* offset, int mode, float k)
 {
@@ -155,26 +155,27 @@ int SoultreeRefreshContacts(void* a1, int* penetrating, int count, CollisionPoin
         return 0;
     *penetrating = 0;
     if (mode == 1 && count == 1) {
-        CollisionPoint* p = points[0];
-        if (p->ownerNode) {
+        CollisionPoint* point = points[0];
+        if (point->ownerNode) {
             CollisionVec3 tmp = *offset;
-            frame->QueryGround(&tmp, &p->surfaceNormal, 0, 0);
-            CollisionVec3 w = p->surfaceNormal * -k + *offset;
-            p->worldPosition = w;
-            p->surfacePosition = w;
-            CollisionRefreshContact(p, frame, penetrating);
+            frame->QueryGround(&tmp, &point->surfaceNormal, 0, 0);
+            CollisionVec3 contactPos = point->surfaceNormal * -k + *offset;
+            point->worldPosition = contactPos;
+            point->surfacePosition = contactPos;
+            CollisionRefreshContact(point, frame, penetrating);
         }
     } else {
         if (count > 0) {
             CollisionPoint** pp = points;
             for (; count > 0; count--, pp++) {
-                CollisionPoint* q = *pp;
-                if (q->ownerNode) {
-                    CollisionVec3 t;
-                    CollisionVec3* r = (*pp)->ownerNode->LocalToWorldPoint(&t, &q->localPosition);
-                    q->worldPosition = *r;
-                    q->surfacePosition = *r;
-                    CollisionRefreshContact(q, frame, penetrating);
+                CollisionPoint* point = *pp;
+                if (point->ownerNode) {
+                    CollisionVec3 worldBuffer;
+                    CollisionVec3* worldPoint =
+                        (*pp)->ownerNode->LocalToWorldPoint(&worldBuffer, &point->localPosition);
+                    point->worldPosition = *worldPoint;
+                    point->surfacePosition = *worldPoint;
+                    CollisionRefreshContact(point, frame, penetrating);
                 }
             }
         }
