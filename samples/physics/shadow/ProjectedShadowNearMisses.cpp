@@ -433,12 +433,12 @@ void ProjectedShadow::Present()
         unsigned short outMixB = (unsigned short)(n * 0x111 - (pp + m) * 0x111);
         unsigned short outMixC = (unsigned short)(n * 0x111 - pp * 0x111);
         for (y = clipRect.top; y <= clipRect.bottom; y++) {
-            unsigned short* s = srcRow;
-            unsigned short* s2 = srcRow + texture->size;
-            short* d = dstRow;
-            int w = clipRect.right - clipRect.left;
-            for (int x = 0; x <= w; x++) {
-                unsigned int sum = s[0] + s[1] + s2[0] + s2[1];
+            unsigned short* srcTop = srcRow;
+            unsigned short* srcBottom = srcRow + texture->size;
+            short* dst = dstRow;
+            int span = clipRect.right - clipRect.left;
+            for (int x = 0; x <= span; x++) {
+                unsigned int sum = srcTop[0] + srcTop[1] + srcBottom[0] + srcBottom[1];
                 short out;
                 if (sum == key * 4)
                     out = colorKeyLow;
@@ -448,26 +448,26 @@ void ProjectedShadow::Present()
                     out = outMixA;
                 else
                     out = sum == sumMixB ? outMixB : outMixC;
-                *d++ = out;
-                s += 2;
-                s2 += 2;
+                *dst++ = out;
+                srcTop += 2;
+                srcBottom += 2;
             }
-            FillShortsUnrolled(d, rowTail, colorKeyLow, colorKeyPair);
+            FillShortsUnrolled(dst, rowTail, colorKeyLow, colorKeyPair);
             dstRow += texture->size;
             srcRow += texture->size * 2;
         }
     } else {
         for (y = clipRect.top; y <= clipRect.bottom; y++) {
-            unsigned short* s = srcRow;
-            unsigned short* s2 = srcRow + texture->size;
-            short* d = dstRow;
-            int w = clipRect.right - clipRect.left;
-            for (int x = 0; x <= w; x++) {
-                *d++ = (short)((int)(s[0] + s[1] + s2[0] + s2[1]) >> 2);
-                s += 2;
-                s2 += 2;
+            unsigned short* srcTop = srcRow;
+            unsigned short* srcBottom = srcRow + texture->size;
+            short* dst = dstRow;
+            int span = clipRect.right - clipRect.left;
+            for (int x = 0; x <= span; x++) {
+                *dst++ = (short)((int)(srcTop[0] + srcTop[1] + srcBottom[0] + srcBottom[1]) >> 2);
+                srcTop += 2;
+                srcBottom += 2;
             }
-            FillShortsUnrolled(d, rowTail, colorKeyLow, colorKeyPair);
+            FillShortsUnrolled(dst, rowTail, colorKeyLow, colorKeyPair);
             dstRow += texture->size;
             srcRow += texture->size * 2;
         }
