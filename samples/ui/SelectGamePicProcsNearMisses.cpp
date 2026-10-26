@@ -287,20 +287,20 @@ void MultiPlayerDlg::SendStartMessage(short start) {
     UnknownLobbyStartMessage message;
     message.start = start;
     message.raceSettings = g_TrackGame->mode.raceSettings;
-    message.field_0x1f4 = g_TrackGame->mode.difficulty;
+    message.difficulty = g_TrackGame->mode.difficulty;
     memcpy(message.raceSettings.field_0x18c, lobbySlots.slots, sizeof(lobbySlots.slots));
     if (start) {
         char name[0x80];
-        message.field_0x1f8[0] = g_TrackGame->mode.plateNumber;
+        message.plateNumbers[0] = g_TrackGame->mode.plateNumber;
         g_TrackGame->network->GetPlayerName(g_TrackGame->network->localPlayer, name);
         strcpy(message.playerNames[0], name);
         int humans = g_LobbyRemotePlayerCount + 1;
         for (i = 1; i < humans; i++) {
-            message.field_0x1f8[i] = g_TrackGame->mode.racers[i].plateNumber;
+            message.plateNumbers[i] = g_TrackGame->mode.racers[i].plateNumber;
             strcpy(message.playerNames[i], g_TrackGame->mode.racers[i].playerName);
         }
         for (i = humans; i < total; i++) {
-            message.field_0x1f8[i] = g_TrackGame->mode.racers[i].plateNumber;
+            message.plateNumbers[i] = g_TrackGame->mode.racers[i].plateNumber;
             strcpy(message.playerNames[i], g_TrackGame->mode.racers[i].playerName);
             strcpy(message.bikeModelNames[i], g_TrackGame->mode.racers[i].bikeModelName);
             strcpy(message.bikeNames[i], g_TrackGame->mode.racers[i].bikeName);

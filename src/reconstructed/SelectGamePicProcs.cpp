@@ -111,13 +111,13 @@ struct UnknownPlayerStateMessage {
     char bikeName[0x40];                      // +0x02: bike name (racer slot +0x40)
     char bikeModelName[0x40];                 // +0x42: bike model name (racer slot +0x00)
     char riderName[0x40];                     // +0x82: rider name (racer slot +0x80)
-    unsigned char field_0xc2;                 // racer slot +0xc4
+    unsigned char bikeIndex;                  // +0xc2: racer slot +0xc4
     unsigned char requestedRacers;            // +0xc3: requested racers
     int sendTime;                             // +0xc4: send time
     int engineSize;                           // +0xc8: engine size (racer slot +0xec)
     unsigned char fourStroke;                 // +0xcc: four-stroke (racer slot +0xf0)
-    unsigned char field_0xcd;                 // racer slot +0xf4
-    int field_0xd0;                           // racer slot +0xc0
+    unsigned char hasMprSkin;                 // +0xcd: racer slot +0xf4
+    int plateNumber;                          // +0xd0: racer slot +0xc0
 };
 
 // The player removal message (type 0x8e).
@@ -145,8 +145,8 @@ struct UnknownLobbyStartMessage {
     int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     short start;                              // +0x04: start
     UnknownTrackGameModeSettings raceSettings; // +0x08: TrackGame+0x2d70
-    int field_0x1f4;                          // TrackGame+0x60c
-    int field_0x1f8[8];                       // racer slot +0xc0
+    int difficulty;                           // +0x1f4: TrackGame+0x60c (mode.difficulty)
+    int plateNumbers[8];                      // +0x1f8: racer slot +0xc0 (plate number)
     char playerNames[8][0x10];                // +0x218: racer slot +0xdc (name)
     char bikeModelNames[8][0x40];             // +0x298: racer slot +0x00 (bike model name)
     char bikeNames[8][0x40];                  // +0x498: racer slot +0x40 (bike name)
@@ -737,9 +737,9 @@ int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int
                                                                                  state->riderName);
             g_TrackGame->mode.racers[i + 1].engineSize = state->engineSize;
             g_TrackGame->mode.racers[i + 1].fourStroke = state->fourStroke;
-            g_TrackGame->mode.racers[i + 1].hasMprSkin = state->field_0xcd;
-            g_TrackGame->mode.racers[i + 1].plateNumber = state->field_0xd0;
-            g_TrackGame->mode.racers[i + 1].bikeIndex = state->field_0xc2;
+            g_TrackGame->mode.racers[i + 1].hasMprSkin = state->hasMprSkin;
+            g_TrackGame->mode.racers[i + 1].plateNumber = state->plateNumber;
+            g_TrackGame->mode.racers[i + 1].bikeIndex = state->bikeIndex;
             float delay = ((float)(unsigned int)flags - (float)(unsigned int)state->sendTime);
             if (delay < g_TrackGame->mode.racers[i + 1].lowestMessageDelay)
                 g_TrackGame->mode.racers[i + 1].lowestMessageDelay = delay;
@@ -764,11 +764,11 @@ int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int
     } else if (from && type == 0x83) {
         UnknownLobbyStartMessage* start = (UnknownLobbyStartMessage*)data;
         g_TrackGame->mode.raceSettings = start->raceSettings;
-        g_TrackGame->mode.difficulty = start->field_0x1f4;
+        g_TrackGame->mode.difficulty = start->difficulty;
         int total = g_TrackGame->mode.raceSettings.networkPlayerCount + g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
         if (start->start) {
             for (i = g_TrackGame->mode.raceSettings.networkPlayerCount; i < total; i++) {
-                g_TrackGame->mode.racers[i].plateNumber = start->field_0x1f8[i];
+                g_TrackGame->mode.racers[i].plateNumber = start->plateNumbers[i];
                 COPY_TEXT(g_TrackGame->mode.racers[i].playerName, start->playerNames[i], 0x10);
                 g_TrackGame->mode.racers[i].racerIndex = i;
                 COPY_TEXT(g_TrackGame->mode.racers[i].bikeModelName, start->bikeModelNames[i], 0x40);
@@ -1190,13 +1190,13 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         COPY_TEXT(state.bikeModelName, g_TrackGame->mode.racerChoice.bikeModel, 0x40);
         COPY_TEXT(state.bikeName, g_TrackGame->mode.racerChoice.bikeName, 0x40);
         COPY_TEXT(state.riderName, g_TrackGame->mode.racerChoice.riderName, 0x40);
-        state.field_0xc2 = g_TrackGame->mode.racerChoice.bikeIndex;
+        state.bikeIndex = g_TrackGame->mode.racerChoice.bikeIndex;
         state.requestedRacers = g_TrackGame->mode.maxAIBikes;
         state.engineSize = UNKNOWN_GARAGE_SETTINGS->engineSize;
         state.fourStroke = UNKNOWN_GARAGE_SETTINGS->fourStroke;
         if (g_TrackGame->mode.lobbyRank > 0 && g_TrackGame->mode.lobbyRank < 0x65)
             g_TrackGame->mode.plateNumber = g_TrackGame->mode.lobbyRank;
-        state.field_0xd0 = g_TrackGame->mode.plateNumber;
+        state.plateNumber = g_TrackGame->mode.plateNumber;
         state.sendTime = ReadClock();
         g_TrackGame->network->Send(2, &state, sizeof(state),
                                                                g_TrackGame->network->localPlayer, 0);
