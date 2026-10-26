@@ -75,13 +75,13 @@ void ManagedTexture::ReleasePage() {
 }
 
 // 0x00510750
-int ManagedTexture::CreateTextureSurface(int a, int b, int c) {
+int ManagedTexture::CreateTextureSurface(int upload, int asRenderTarget, int localVideo) {
     return 0;
 }
 
 // 0x00510760
-int ManagedTexture::CreateOwnSurface(int a, int b, int c) {
-    return PCTextureMap::CreateTextureSurface(a, b, c);
+int ManagedTexture::CreateOwnSurface(int upload, int asRenderTarget, int localVideo) {
+    return PCTextureMap::CreateTextureSurface(upload, asRenderTarget, localVideo);
 }
 
 // 0x00510780

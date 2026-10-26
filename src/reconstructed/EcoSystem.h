@@ -208,7 +208,7 @@ public:
     virtual int LoadSurface();
     virtual int Clone();
     virtual int IsResident();
-    virtual int CreateTextureSurface(int a, int b, int c);
+    virtual int CreateTextureSurface(int upload, int asRenderTarget, int localVideo);
     virtual int Upload();
     virtual int ReleaseTextureSurface();
     virtual int SetAsTexture();

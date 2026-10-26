@@ -12,14 +12,14 @@ public:
     explicit ManagedTexture(TextureMapManager* manager); // 0x00510500: sets TextureMap+0x68 bit 0
     virtual ~ManagedTexture();                // 0x005105a0 (deleting wrapper 0x00510580)
     virtual int IsResident();                 // 0x00510980: whether it is placed (+0x94)
-    virtual int CreateTextureSurface(int a, int b, int c); // 0x00510750: 0
+    virtual int CreateTextureSurface(int upload, int asRenderTarget, int localVideo); // 0x00510750: 0
     virtual int SetAsTexture();               // 0x005108f0: binds the page or itself
     virtual void Bind();                      // 0x00510870
 
     void UpdatePageCoords(int level);    // 0x00510610: takes the scale and offset of its region
     void Reregister();             // 0x00510670: resets and re-adds itself to its group
     void ReleasePage();             // 0x00510700: leaves its page
-    int CreateOwnSurface(int a, int b, int c); // 0x00510760: PCTextureMap's slot 8 (its own surface, not the page's)
+    int CreateOwnSurface(int upload, int asRenderTarget, int localVideo); // 0x00510760: PCTextureMap's slot 8 (its own surface, not the page's)
     // 0x00510780: maps `count` (u, v) pairs, `stride` bytes apart, from the
     // given scale/offset to this texture's, and returns its scale/offset.
     void RemapTexCoords(float* scale, float* offsetU, float* offsetV, float* u, float* v, int count,

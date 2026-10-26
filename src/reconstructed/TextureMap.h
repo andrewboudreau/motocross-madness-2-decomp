@@ -64,7 +64,7 @@ public:
                             UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key) = 0;
     virtual TextureMap* Clone() = 0;
     virtual int IsResident() = 0;
-    virtual int CreateTextureSurface(int a, int b, int c) = 0;
+    virtual int CreateTextureSurface(int upload, int asRenderTarget, int localVideo) = 0;
     virtual int Upload(struct UnknownRect* rect, int mode) = 0;
     virtual void ReleaseTextureSurface() = 0;
     virtual int SetAsTexture() = 0;

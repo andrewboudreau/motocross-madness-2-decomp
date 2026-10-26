@@ -52,7 +52,7 @@ public:
     virtual TextureMap* Clone();               // 0x004c71c0: a copy of the texture
     virtual int IsResident();                 // 0x004c7470: whether +0x74 exists
     // 0x004c7480: creates the texture surface from +0x70 (or shares it).
-    virtual int CreateTextureSurface(int a, int b, int c);
+    virtual int CreateTextureSurface(int upload, int asRenderTarget, int localVideo);
     // 0x004c7640: uploads +0x70 into +0x74, level by level.
     virtual int Upload(struct UnknownRect* rect, int mode);
     virtual void ReleaseTextureSurface();     // 0x004c7610: releases the texture surface

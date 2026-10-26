@@ -34,7 +34,7 @@ struct UnknownDisplay : public VideoCard {
     UnknownDisplay();                             // 0x004c9760
     // Implicit destructor 0x004c9820 (jumps to VideoCard's; deleting wrapper 0x004c9800).
     virtual void ReleaseResources();              // 0x004c9ba0: releases everything
-    virtual int SetDisplayMode(int width, int height, int bitDepth, int a, int b,
+    virtual int SetDisplayMode(int width, int height, int bitDepth, int a, int refreshRate,
                                int windowed, int c);      // 0x004c9ec0
     virtual int Present();                        // 0x004ca270: presents a frame
     virtual void RetryFlip(int value);            // 0x004ca4a0

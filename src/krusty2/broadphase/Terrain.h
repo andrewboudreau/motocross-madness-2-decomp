@@ -69,7 +69,7 @@ public:
                             int addressV, void* choice, int alphaThreshold, unsigned int key);
     virtual TerrainSurfaceBase* Clone();
     virtual int IsResident();
-    virtual int CreateTextureSurface(int a, int b, int c);      // slot 8, +0x20
+    virtual int CreateTextureSurface(int upload, int asRenderTarget, int localVideo);      // slot 8, +0x20
     virtual int Upload(void* rect, int mode);                   // PCTextureMap.h slot names
     virtual void ReleaseTextureSurface();                       // 0x004c7610: releases the texture surface
     virtual int SetAsTexture();                                 // 0x004c7970: sets it as texture stage 0 (Terrain slot 14, detail pass)

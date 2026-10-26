@@ -447,16 +447,17 @@ void PCTextureMap::WriteLevel(UnknownSurfaceDesc* desc, const char* name) {
 }
 
 // 0x004c7480: creates the texture surface from +0x70 (or shares +0x70 when
-// it is already in video memory and `c` is clear, or when Game+0x2d0 is
-// set); `a` then asks slot 9 to upload it.
-int PCTextureMap::CreateTextureSurface(int a, int b, int c) {
+// it is already in non-local video memory and `localVideo` is clear, or
+// when Game+0x2d0 is set); `asRenderTarget` adds DDSCAPS_3DDEVICE and
+// `upload` then asks slot 9 to upload it.
+int PCTextureMap::CreateTextureSurface(int upload, int asRenderTarget, int localVideo) {
     if (textureSurface)
         goto done;
     if (systemSurface) {
         UnknownSurfaceCaps caps;
         if (systemSurface->GetCaps(&caps))
             goto failed;
-        if (caps.caps & DDSCAPS_NONLOCALVIDMEM && !c || g_TrackGame->bladeRenderer) {
+        if (caps.caps & DDSCAPS_NONLOCALVIDMEM && !localVideo || g_TrackGame->bladeRenderer) {
             textureSurface = systemSurface;
             systemSurface->AddRef();
         } else {
@@ -466,8 +467,8 @@ int PCTextureMap::CreateTextureSurface(int a, int b, int c) {
             if (systemSurface->GetSurfaceDesc(&desc))
                 goto failed;
             desc.flags &= 0x3f087;
-            desc.caps[0] = desc.caps[0] & 0xcffff7ff | (b ? 0x2000 : 0) | DDSCAPS_VIDEOMEMORY;
-            if (g_TrackGame->display->isAGP && c)
+            desc.caps[0] = desc.caps[0] & 0xcffff7ff | (asRenderTarget ? 0x2000 : 0) | DDSCAPS_VIDEOMEMORY;
+            if (g_TrackGame->display->isAGP && localVideo)
                 desc.caps[0] |= DDSCAPS_LOCALVIDMEM;
             desc.pitch = 0;
             if (!textureSurface &&
@@ -479,7 +480,7 @@ int PCTextureMap::CreateTextureSurface(int a, int b, int c) {
                 ownerManager->CountTextureMemory();
         }
     }
-    if (a && textureSurface != systemSurface)
+    if (upload && textureSurface != systemSurface)
         Upload(0, -1);
     if (!textureSurface)
         goto failed;

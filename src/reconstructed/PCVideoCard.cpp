@@ -265,11 +265,11 @@ int UnknownDisplay::SetWindowedCooperativeLevel(int x, int y, int width, int hei
 }
 
 // 0x004c9ec0
-int UnknownDisplay::SetDisplayMode(int width, int height, int bitDepth, int a, int b, int windowed,
+int UnknownDisplay::SetDisplayMode(int width, int height, int bitDepth, int a, int refreshRate, int windowed,
                                    int c) {
     if (cooperativeLevel & DDSCL_NORMAL)
         return CreateWindowedSurfaces(width, height, windowed);
-    int mode = FindDisplayMode(width, height, bitDepth, a, b);
+    int mode = FindDisplayMode(width, height, bitDepth, a, refreshRate);
     if (mode == -1)
         return 0;
     return SetFullscreenDisplayMode(mode, windowed);
