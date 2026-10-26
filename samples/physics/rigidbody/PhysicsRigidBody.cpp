@@ -21,8 +21,8 @@
 // slot 27, 0x004cc060.
 void PhysicsBody::SetName(const char* s)
 {
-    int n = strlen(s);
-    int len = n > 255 ? 255 : n;
+    int sourceLength = strlen(s);
+    int len = sourceLength > 255 ? 255 : sourceLength;
     strncpy(name, s, len);          // 0x00534b10
     name[len] = 0;
 }
@@ -185,10 +185,10 @@ int PhysicsRigidBody::UnknownVirtualSlot11(float dt)
         dPosition[0].z = velocity.z;
         if (mass > 0.0) {     // double compare against 0.0 is intentional (retail loads a double zero)
             float m = mass;
-            Vec3 a = force * (1.0f / m);
-            dVelocity[0].x = a.x;
-            dVelocity[0].y = a.y;
-            dVelocity[0].z = a.z;
+            Vec3 acceleration = force * (1.0f / m);
+            dVelocity[0].x = acceleration.x;
+            dVelocity[0].y = acceleration.y;
+            dVelocity[0].z = acceleration.z;
         } else {
             dVelocity[0].x = 0.0f;
             dVelocity[0].y = 0.0f;

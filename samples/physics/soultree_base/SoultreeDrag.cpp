@@ -14,8 +14,8 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot6(Vec3* force, float* speedBud
 {
     if (prevSpeed <= 0.001f)
         return;
-    float k = -(dragCoefficient * linearSpeed);
-    scratchVector = velocity * k;
+    float dragScale = -(dragCoefficient * linearSpeed);
+    scratchVector = velocity * dragScale;
     float length = scratchVector.z * scratchVector.z + (scratchVector.x * scratchVector.x + scratchVector.y * scratchVector.y);
     if (length == 1.0f) {
         length = 1.0f;
@@ -30,21 +30,21 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot6(Vec3* force, float* speedBud
     // order reproduces (num first loads 0x13c first).
     float den = stepTime;
     float num = bodyMass;
-    float t = linearSpeed;
-    if (!(t <= *speedBudget))
-        t = *speedBudget;
-    if (t <= 0.0f)
-        t = 0.0f;
-    float q = num / den;
-    float r = q * t;
-    Vec3 v;
-    if (length > r) {
-        v = scratchVector * (r / length);
-        *speedBudget -= t;
+    float charge = linearSpeed;
+    if (!(charge <= *speedBudget))
+        charge = *speedBudget;
+    if (charge <= 0.0f)
+        charge = 0.0f;
+    float massRate = num / den;
+    float limit = massRate * charge;
+    Vec3 drag;
+    if (length > limit) {
+        drag = scratchVector * (limit / length);
+        *speedBudget -= charge;
     } else {
-        *speedBudget -= length / q;
-        v = scratchVector;
+        *speedBudget -= length / massRate;
+        drag = scratchVector;
     }
-    scratchVector2 = v;
+    scratchVector2 = drag;
     *force += scratchVector2;
 }
