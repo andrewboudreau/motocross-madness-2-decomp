@@ -1655,10 +1655,10 @@ static const float kbSecondsPerMillisecond = 0.001f;
 //  * a local `BikeA640* axis` keeps the steer axis in one register for its three stores and
 //    0.42210004f is needed for retail's 0x3ed81d7f (0.4221f rounds to 0x3ed81d7e);
 //  * 0.001f comes from the TU-local kbSecondsPerMillisecond, not the shared pool.
-GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoadDesc* desc, int a5, int a6,
-                             Vec3 a7, Vec3 a8, Vec3 a9, int a10, VehicleInputMap* map, unsigned char kind,
-                             unsigned char a13, KbRace* race, int a15, int a16, int netId,
-                             const KbBikeSetup* setup, int a19, int a20, int a21, int a22,
+GameObject* KrustyBike::Load(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc, int a5, int a6,
+                             Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe, VehicleInputMap* map, unsigned char kind,
+                             unsigned char remote, KbRace* race, int a15, int a16, int netId,
+                             const KbBikeSetup* setup, int gasGyroOption, int brakeGyroOption, int linkedObject, int trackObject,
                              KbRecorder* recorder, void* a24, int withRider)
 {
     aiAccelScale1 = 1.1f;
@@ -1677,7 +1677,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         aiKind = kind;
     }
     loaderKind = kind;
-    isRemote = a13;
+    isRemote = remote;
     memset(&netState, 0, sizeof(netState));
     netState.timer = reinterpret_cast<KbGame*>(g_TrackGame)->fullNetPacketIntervalSec;
     shortMessageTimer = reinterpret_cast<KbGame*>(g_TrackGame)->shortNetPacketIntervalSec;
@@ -1714,7 +1714,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         GameObject::AppendChild((GameObject*)ghostMod, -1);
     }
     statusNode = 0;
-    ((KbBikeLoader*)this)->Fn_004079C0(a1, a2, name, desc, a5, a6, a7, a8, a9, a10, map, a15, a16,
+    ((KbBikeLoader*)this)->Fn_004079C0(context, a2, modelPath, desc, a5, a6, startPosition, forward, up, terrainProbe, map, a15, a16,
                                        setup == 0,
                                        setup ? (void*)setup->setupName : 0,
                                        setup ? setup->field_0x50 : 0,
@@ -1726,9 +1726,9 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
                                        setup ? setup->field_0x18 : 0,
                                        setup ? setup->field_0x1c : 0,
                                        setup ? setup->field_0x20 : 0,
-                                       a19, a20, a21, localFlag,
+                                       gasGyroOption, brakeGyroOption, linkedObject, localFlag,
                                        reinterpret_cast<KbGame*>(g_TrackGame)->steerBinding, reinterpret_cast<KbGame*>(g_TrackGame)->leanBinding, reinterpret_cast<KbGame*>(g_TrackGame)->throttleBinding,
-                                       a22, setupFloat, 0);
+                                       trackObject, setupFloat, 0);
     if (isRemote) {
         BikeA640* axis = steerAxis;
         axis->steerValue = 0.5f;
@@ -1857,11 +1857,11 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     animSetC[15] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("DCanCanAlt", 1);
 
     bikeAndRiderCollision = new(__FILE__, 0x77e) CollisionObject(1);
-    bikeAndRiderCollision->Configure((void*)a1, 1, 1, 1);
+    bikeAndRiderCollision->Configure((void*)context, 1, 1, 1);
     bikeAndRiderCollision->LoadShape(modelNode->firstChild, "BikeAndRider.col");
     GameObject::AppendChild((GraphicsTest*)bikeAndRiderCollision, -1);
     bikeCollision = new(__FILE__, 0x784) CollisionObject(1);
-    bikeCollision->Configure((void*)a1, 1, 1, 1);
+    bikeCollision->Configure((void*)context, 1, 1, 1);
     bikeCollision->LoadShape(modelNode->firstChild, "Bike.col");
     GameObject::AppendChild((GraphicsTest*)bikeCollision, -1);
     bikeCollision->Disable();
@@ -2028,7 +2028,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         Vec3 axisZ(0.0f, 0.0f, 1.0f);
         ((SoultreeObject*)riderCharacter->c_0x1a0)->SetAxesIn(0, &axisZ, &axisY, 0, 1);
         KbMorphMod* morph = (KbMorphMod*)new(__FILE__, 0x891) MorphBastardModifier(1);
-        morph->LoadParameterFile((void*)a1, "RiderMorph.mbf", (SoultreeObject*)riderCharacter->c_0x1a0);
+        morph->LoadParameterFile((void*)context, "RiderMorph.mbf", (SoultreeObject*)riderCharacter->c_0x1a0);
         GameObject::AppendChild((GameObject*)morph, -1);
         ((D3DIMSoultreeObject*)riderCharacter->c_0x1a0)->AddSecondModifier((GameObject*)morph);
     }

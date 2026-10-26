@@ -80,7 +80,7 @@ public:
                          const char* name, int a19, int defaultEngine, int* torqueTable,
                          int rpmLow, int rpmHigh, int rpmStep, float frontSpring, float frontDamper,
                          float rearSpring, float rearDamper, float frontRatio, float rearRatio,
-                         int a31, int a32, void* linkedObject, void* device, VehicleAxis* steer,
+                         int gasGyroOption, int brakeGyroOption, void* linkedObject, void* device, VehicleAxis* steer,
                          VehicleAxis* lean, VehicleAxis* throttle, SoultreeSlot1f0* track,
                          float weight, int createCollision);
 
@@ -95,8 +95,8 @@ public:
     // functions were tried and cost the exact match of slot 8 (0x00406750): VC6 then
     // loads field_0x42c before the float arguments instead of after them.
 
-    int gasGyro;  // +0x5BC  0 from the constructor, Load's a31: TrackGameMode gasGyro (key 0x22, reset 0)
-    int brakeGyro;  // +0x5C0  1 from the constructor, Load's a32: TrackGameMode brakeGyro (key 0x30, reset 1)
+    int gasGyro;  // +0x5BC  0 from the constructor, LoadBike's gasGyroOption: TrackGameMode gasGyro (key 0x22, reset 0)
+    int brakeGyro;  // +0x5C0  1 from the constructor, LoadBike's brakeGyroOption: TrackGameMode brakeGyro (key 0x30, reset 1)
     BikeA5C4* riderCharacter;  // +0x5c4 slot 8/89 (0x406ae0): calls Method_0x004a8c50(poseA, poseB, poseParam, w) on it and riderCharacter->c_0x1a0 scene node; slot 97 passes it with "rider.col" to the 0x604 object
     BikeA5C8 field_0x5c8;         // +0x5c8 copy of the loader's info block (when given)
     char riderName[16];           // +0x5e0 ctor strcpy from global 0x00577738 (empty string in the image); tier 3 name

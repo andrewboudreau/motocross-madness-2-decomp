@@ -531,11 +531,11 @@ struct KbMorphMod {
 // Bike's own loader 0x004079c0 (`ret 0xa0`, 40 argument dwords; not a vtable entry).  It is a
 // Bike member in truth; vehicle/Bike.h is canonical, so it is reached through this view.
 struct KbBikeLoader {
-    GameObject* Fn_004079C0(int a1, int a2, const char* name, const SoultreeLoadDesc* desc, int a5, int a6,
-                            Vec3 a7, Vec3 a8, Vec3 a9, int a10, VehicleInputMap* map, int a12, int a13,
+    GameObject* Fn_004079C0(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc, int a5, int a6,
+                            Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe, VehicleInputMap* map, int a12, int a13,
                             int noSetup, void* setupName, int s50, int s54, int s58, float s0c, float s10,
-                            float s14, float s18, float s1c, float s20, int a25, int a26, int a27, int localFlag,
-                            void* t0, void* t1, void* t2, int a32, float setupFloat, int a34);
+                            float s14, float s18, float s1c, float s20, int gasGyro, int brakeGyro, int linkedObject, int device,
+                            void* steer, void* lean, void* throttle, int trackObject, float weight, int createCollision);
 };
 // 0x004a2fc0 (cdecl): zeroed debug-heap allocation of count x size bytes tagged with the source line.
 void* DebugCalloc(unsigned int count, unsigned int size, const char* file, int line);

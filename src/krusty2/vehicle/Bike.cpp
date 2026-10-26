@@ -574,7 +574,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
                            const char* name, int a19, int defaultEngine, int* torqueTable,
                            int rpmLow, int rpmHigh, int rpmStep, float frontSpring, float frontDamper,
                            float rearSpring, float rearDamper, float frontRatio, float rearRatio,
-                           int a31, int a32, void* linkedObject, void* device, VehicleAxis* steer,
+                           int gasGyroOption, int brakeGyroOption, void* linkedObject, void* device, VehicleAxis* steer,
                            VehicleAxis* lean, VehicleAxis* throttle, SoultreeSlot1f0* trackObject,
                            float weight, int createCollision)
 {
@@ -600,8 +600,8 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
                 map, linkedObject, weight,
                 0.9f, 40.0f * 0.01745329f, device, 2, 3, 3, 1, 1, defaultEngine, torqueTable, rpmLow, rpmHigh,
                 rpmStep, 0.18f, steer, lean, throttle, trackObject, createCollision);
-    gasGyro = a31;
-    brakeGyro = a32;
+    gasGyro = gasGyroOption;
+    brakeGyro = brakeGyroOption;
     BIKE_COPY_TEXT(riderName, name, 16);
     loadWeight = 165.0f;
     leanSpeedThreshold = 32.0f;

@@ -121,16 +121,18 @@ public:
     // 0x0048fc80 (ret 0x7c = 31 argument dwords; not a vtable entry, like Vehicle::LoadVehicle):
     // the bike loader.  Runs Bike's loader 0x004079c0, then builds the collision bodies, the
     // trick animation tables, the network settings and the optional rider morph.  Returns the
-    // GameObject base.  Parameter names are tier 3; `kind` 0xff marks a ghost bike.
-    GameObject* Load(int a1, int a2, const char* name, const SoultreeLoadDesc* desc, int a5, int a6,
-                     Vec3 a7, Vec3 a8, Vec3 a9, int a10, VehicleInputMap* map, unsigned char kind,
-                     unsigned char a13, KbRace* race, int a15, int a16, int netId,
-                     const KbBikeSetup* setup, int a19, int a20, int a21, int a22,
+    // GameObject base.  Parameter names are tier 3; `kind` 0xff marks a ghost bike.  The
+    // forwarded ones follow Bike::LoadBike's parameter in the same position (desc sits in
+    // its riderModel slot and a5 in its desc slot; the types are this view's).
+    GameObject* Load(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc, int a5, int a6,
+                     Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe, VehicleInputMap* map, unsigned char kind,
+                     unsigned char remote, KbRace* race, int a15, int a16, int netId,
+                     const KbBikeSetup* setup, int gasGyroOption, int brakeGyroOption, int linkedObject, int trackObject,
                      KbRecorder* recorder, void* a24, int withRider);
 
 public:
     char aiKind;  // +0x734  loader kind (0 for a ghost); nonzero bikes take the BikeAI step 0x00413200 and racing line 0x00414370
-    char isRemote;  // +0x735  Load's a13: BikeRace's loader passes 1 for network/remote racers, 0 for the local player; RaceStatus skips the gate test
+    char isRemote;  // +0x735  Load's remote: BikeRace's loader passes 1 for network/remote racers, 0 for the local player; RaceStatus skips the gate test
     char isGhost;  // +0x736  set for loader kind 0xff (a ghost); the loader then creates the KbGhostMod at +0x15e8
     char fourStroke;  // +0x737  KbBikeSetup+4; racesnd.cpp selects engine 2 over 1 by it (RaceView +0x737)
     int engineSize;  // +0x738  KbBikeSetup+0 (250 without a setup); +0x79c classes it (<=125, <500); racesnd below 250 uses engine 0
