@@ -95,7 +95,7 @@ int Vehicle::UnknownVirtualSlot70(float arg)
     return linearSpeed - prevSpeed < arg * speedGainLimit;
 }
 
-// Provisional: field_0x4ec / sin(steer angle), zero when the angle is zero.
+// Provisional: wheelBase / sin(steer angle), zero when the angle is zero.
 float Vehicle::UnknownVirtualSlot73(const Vec3* a, const Vec3* b)
 {
     VehicleSteerState* s = steerState;
@@ -221,7 +221,7 @@ struct VehVecOps : Vec3
 };
 
 // Provisional: position += dt * (3*v - v_prev) / 2   (2-step Adams-Bashforth style advance:
-// field_0x64 = velocity, field_0x7c = previous velocity, field_0x0c = position).
+// v = velocity, v_prev = prevVelocity, advancing position).
 void Vehicle::UnknownVirtualSlot48()
 {
     Vec3 a = ((VehVecOps&)velocity) * 3.0f;
@@ -250,7 +250,7 @@ void Vehicle::UnknownVirtualSlot71(int arg)
     }
 }
 
-// Provisional: snapshot position (0x10c) and a horizontal heading vector (0x118 = field_0xa0
+// Provisional: snapshot respawnPosition and a horizontal respawnHeading (savedForward
 // with y forced to 0), normalised with FastInvSqrt; zero vector if degenerate.
 static inline float VehLen2(const Vec3& v) { return (v.x * v.x + v.y * v.y) + v.z * v.z; }
 void Vehicle::UnknownVirtualSlot43()
@@ -393,7 +393,7 @@ static inline float VehAbs(float x)
 // Tilt/lean angle of the body about the given axis (tier 3 names). The reference normal
 // (arg c, or the average wheel contact normal) is projected perpendicular to the axis and
 // normalised; the angle is asin(|axis-perp-normal x right-vector-side|) signed by the
-// handedness, stored in field_0x4ac; its cosine goes to field_0x4b0 when b is set.
+// handedness, stored in leanAngle; its cosine goes to leanCos when b is set.
 static inline float VehDotI(const Vec3* a, const Vec3* b)
 {
     return a->y * b->y + a->x * b->x + a->z * b->z;
@@ -466,9 +466,9 @@ void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
 }
 
 // Snaps the body pose to the wheel contact state (tier 3): with one wheel only the height
-// (field_0x0c.y) follows that wheel; with several the body basis is rebuilt from the wheel
+// (position.y) follows that wheel; with several the body basis is rebuilt from the wheel
 // normal (or the supplied direction a), the highest wheel sets the height, and a two-wheel
-// bike additionally re-aims the frame by the lean angle (field_0x4ac). Finally the 7-float
+// bike additionally re-aims the frame by the lean angle (leanAngle). Finally the 7-float
 // orientation block is rebuilt from the basis vectors and the previous copy is refreshed.
 static inline float VehAbsT(float x) { return x < 0.0f ? -x : x; }
 
@@ -569,9 +569,9 @@ static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
 // r = -m^2/k * dt is the impulse magnitude, and the deflected velocity is v' = v + min(1.5c,1) * r * dir,
 // rescaled to keep the old speed (a pure turn); the returned value is the signed angle between
 // v and v' (acos of the normalised dot product).
-// Deflects the velocity (field_0x64) by an impulse applied at `point` along `dir` (tier 3).
+// Deflects the velocity by an impulse applied at `point` along `dir` (tier 3).
 // k = slot73(effective mass/stiffness) * d; the change is dir * (-(m*m)/k * dt) scaled by
-// min(1.5*c, 1); the new velocity is renormalised to the old speed (field_0xbc) and the signed
+// min(1.5*c, 1); the new velocity is renormalised to the old speed (linearSpeed) and the signed
 // deflection angle is returned (0 when the change is negligible or not finite).  The angle is
 // its own local: written back into `sign`, its home moved to the d argument slot and len/sign
 // traded the point/dir slots (retail: sign, len, angle in point, dir, c).  The Math3D
@@ -631,7 +631,7 @@ static inline float VehMinF(float a, float b) { return (a < b) ? a : b; }
 // one contact normalises the sum.
 // Sums the contact normals (and, for wheels with ownerRef set, their rollDirection vectors) of the
 // wheels and pushes the vehicle along the resulting cross direction (tier 3). *out receives the
-// summed normal (normalised when more than one contact); field_0x4b8/0x43c receive the result
+// summed normal (normalised when more than one contact); turnAngle/turnRate receive the result
 // of slot 74 (deflection angle and angle*dt) using the last flagged wheel's point (+0x23c).
 // Retail keeps the argument wheel (tested from its stack slot, also in the reset test) apart
 // from the last flagged wheel (edi, initialised from the argument): flagged wheels are read
@@ -874,7 +874,7 @@ static inline Vec3 VehOffset(const Vec3& a, const Vec3& b)
 
 // Slot 46: the point the follow/aim logic looks at, relative to the vehicle position: toward the
 // lead wheel (or the midpoint of two wheels when only the aux one is not yet fully settled),
-// rotated by the frame transform; falls back to field_0x194 when disabled or > 2 wheels.
+// rotated by the frame transform; falls back to rotationPivot when disabled or > 2 wheels.
 // Each branch converts through its own WorldToLocalDirection call (retail has three) and VC6
 // merges the `*out = ` copies; the midpoint goes through three temporaries (difference, half,
 // sum) as retail's 0x24 frame shows.  The Math3D operators (constructor-return temporaries)
@@ -924,7 +924,7 @@ Vec3* Vehicle::UnknownVirtualSlot46(Vec3* out, float arg)
 //                   than one substep is pending.
 //   B. per substep, in order:
 //        1. input/state  - decay the speed-state timer, poll slots 80-82 (input flags), and
-//                          the field_0x4f4 countdown (slot 50 clears it);
+//                          the spawnProtectTimer countdown (slot 50 clears it);
 //        2. ground query - contact query, then slots 8/6/7 (position sample, drag, weighting
 //                          of contact reactions) and slots 71/72/86 (support normal, wheel loads);
 //        3. dynamics     - slots 13/14 (force/torque accumulation), Methods 00527A20/005293E0/
@@ -937,7 +937,7 @@ Vec3* Vehicle::UnknownVirtualSlot46(Vec3* out, float arg)
 // count, updates the smoothed speed/lean state, gathers contact reactions, integrates the
 // frame transform from the wheels/contacts, and refreshes the cached basis block.
 // Exponential smoother (tier 3 reading): x += (target - x) * a with a = min(dt, tau) / tau,
-// where tau is field_0x04, field_0x08 is the blend factor a, and field_0x00 the smoothed value.
+// where tau is timeConstant, a is blendFactor and x is smoothedValue.
 static inline float VehSmooth(VehicleSmoother* s, float target, float dt)
 {
     s->blendFactor = VehMinF(dt, s->timeConstant) / s->timeConstant;
@@ -947,7 +947,7 @@ static inline float VehSmooth(VehicleSmoother* s, float target, float dt)
 void Vehicle::UnknownVirtualSlot49(float frame)
 {
     int steps;
-    Vec3 up;          // frame reference vector (from field_0x188)
+    Vec3 up;          // frame reference vector (from weightForce)
     Vec3 pivot;
     float speed;
     int hit;
@@ -1322,9 +1322,9 @@ int Vehicle::UnknownVirtualSlot28(int arg)
             stepRemainder = 0.0f;
         }
     }
-    if (field_0x138) {
+    if (slot27Pending) {
         UnknownVirtualSlot27();
-        field_0x138 = 0;
+        slot27Pending = 0;
     }
     return arg;
 }
@@ -1348,7 +1348,7 @@ int Vehicle::UnknownVirtualSlot39(float dt)
     return 0;
 }
 
-// Tier 3 reading: latches the throttle-like axis (+0x500) into field_0x470 (dead zone 0.2,
+// Tier 3 reading: latches the throttle-like axis (+0x500) into throttleInput (dead zone 0.2,
 // -1 when there is no control), mirrors the two other axes into the steer/lean members and
 // writes the 0x504 vector (cubed lean for axis kinds 2 and 3).
 void Vehicle::UnknownVirtualSlot63(float dt)
@@ -1379,7 +1379,7 @@ void Vehicle::UnknownVirtualSlot63(float dt)
     }
 }
 
-// Tier 3 reading: classifies the (field_0x504.y, field_0x474) input pair into one of eight
+// Tier 3 reading: classifies the (controlInput.y, steerInput) input pair into one of eight
 // directions: -1 inside the dead zone (|v|^2 <= 0.25), else the sector of the pair relative to
 // the band +-0.52057 * |v| (0..7).
 int Vehicle::UnknownVirtualSlot88()
@@ -1410,7 +1410,7 @@ int Vehicle::UnknownVirtualSlot88()
 }
 
 // Tier 3 reading: sums the +0x230 vectors of the wheels without the +0x1c0 flag, normalises
-// the sum when more than one wheel contributed (zero stays zero) and returns |sum . field_0xa0|;
+// the sum when more than one wheel contributed (zero stays zero) and returns |sum . savedForward|;
 // 1.0 when no wheel contributed.
 // z*z + (x*x + y*y) through a reference: the grouping and the helper give retail's x87 order.
 static inline float VehLenSqZ(const Vec3& v)
@@ -1482,7 +1482,7 @@ Vec3* Vehicle::GetAverageGroundNormal(Vec3* out)
 }
 
 // Same average restricted to the wheels in contact (+0x260), divided by the contact count
-// field_0x4a8; with no contacts the first wheel's normal is returned unchanged.
+// wheelsInContact; with no contacts the first wheel's normal is returned unchanged.
 Vec3* Vehicle::UnknownVirtualSlot54(Vec3* out)
 {
     int count = wheelsInContact;
@@ -1671,7 +1671,7 @@ void Vehicle::UnknownVirtualSlot95()
 
 // 0x00526830: asks the shared stub 0x00478fe0 (always zero here) whether the vehicle crashed; when it
 // did, the control state is cleared and the horizontal heading is recorded (tier 3 reading;
-// field_0x444 is the crash state, see Bike slot 99).
+// the result goes to crashState, see Bike slot 99).
 int Vehicle::CheckCrash()
 {
     int crashed = Method_00478FE0();
@@ -1681,10 +1681,10 @@ int Vehicle::CheckCrash()
         motionActive = 0;
         motionCompleted = 0;
         motionIndex = 0;
-        field_0x574 = heading;
+        crashHeading = heading;
         crashedUpsideDown = savedUp.y < 0.0f;
         crashYaw = savedYaw;
-        field_0x138 = 1;
+        slot27Pending = 1;
     }
     return crashed;
 }
@@ -2129,7 +2129,7 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     primaryWheel = 0;
     secondaryWheel = 0;
     wheelsInContact = 0;
-    field_0x550 = 0;
+    ownedWheelsInContact = 0;
     steerRate = 0;
     stepTime = 0.025f;
     invStepTime = 40.0f;
@@ -2205,7 +2205,7 @@ int Vehicle::Tick(float dt)
 // step and the wheel is probed against the ground; a wheel that is not in contact is retracted
 // by three quarters and probed again, one in contact has its shock forces cleared.  The second
 // loop counts the wheels in contact (primary/secondary wheel = first/second), counts those with
-// ownerRef into field_0x550 and flags (field_0x264) the first in-contact wheel without it,
+// ownerRef into ownedWheelsInContact and flags (reportContactOutputs) the first in-contact wheel without it,
 // else wheel 0.
 void Vehicle::PlaceWheels()
 {
@@ -2215,7 +2215,7 @@ void Vehicle::PlaceWheels()
         return;
     wheelsInContact = 0;
     unflagged = 1;
-    field_0x550 = 0;
+    ownedWheelsInContact = 0;
     for (i = 0; i < wheelCount; i++) {
         VehicleWheel* wheel = wheelList[i];
         if (wheel->primaryAux)
@@ -2241,7 +2241,7 @@ void Vehicle::PlaceWheels()
         VehicleWheel* wheel = wheelList[i];
         if (wheel->inContact) {
             if (wheel->ownerRef) {
-                field_0x550++;
+                ownedWheelsInContact++;
             } else if (unflagged) {
                 wheel->reportContactOutputs = 1;
                 unflagged = 0;

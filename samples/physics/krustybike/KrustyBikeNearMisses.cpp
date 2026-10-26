@@ -892,7 +892,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
             driveDisengaged = states[0]->flag8;
             trickPoseHeld = states[0]->flag9;
             if (crashState && !prevCrash) {
-                field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);
+                crashHeading = Vec3(bodyForward.x, 0.0f, bodyForward.z);
                 crashedUpsideDown = bodyUp.y < 0.0f;
                 crashYaw = savedYaw;
                 if (motionActive)
@@ -990,7 +990,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
             driveDisengaged = interpSource->flag8;
             trickPoseHeld = interpSource->flag9;
             if (crashState && !prevCrash) {
-                field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);
+                crashHeading = Vec3(bodyForward.x, 0.0f, bodyForward.z);
                 crashedUpsideDown = bodyUp.y < 0.0f;
                 crashYaw = savedYaw;
                 if (motionActive)

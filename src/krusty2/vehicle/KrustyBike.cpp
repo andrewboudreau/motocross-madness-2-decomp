@@ -1789,7 +1789,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     savedCosRoll = bodyCosRoll;
     savedCosPitch = bodyCosPitch;
     savedSinPitch = bodySinPitch;
-    field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);
+    crashHeading = Vec3(bodyForward.x, 0.0f, bodyForward.z);
 
     animSetB[0] = (int)FindMotion("bBarKneel", 1);
     animSetB[1] = (int)FindMotion("bSplitX", 1);

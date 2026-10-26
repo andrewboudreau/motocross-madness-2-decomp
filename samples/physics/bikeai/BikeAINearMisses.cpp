@@ -1823,7 +1823,7 @@ int KrustyBike::Fn_00413200(float dt)
         crashDirection = 1;
         crashReason = 4;
         UnknownVirtualSlot41();
-        field_0x574 = Vec3(savedForward.x, 0.0f, savedForward.z);
+        crashHeading = Vec3(savedForward.x, 0.0f, savedForward.z);
         motionCompleted = 0;
         motionIndex = 0;
         crashedUpsideDown = savedUp.y < 0.0f ? 1 : 0;

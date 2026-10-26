@@ -835,7 +835,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     savedCosPitch = bodyCosPitch;
     savedSinPitch = bodySinPitch;
     UnknownVirtualSlot33(&position, &bodyForward, &bodyUp, &kVec3YAxis, 0, loadWeight);
-    field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);
+    crashHeading = Vec3(bodyForward.x, 0.0f, bodyForward.z);
 
     riderPoseHandles[0] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LeanR01", 1);
     riderPoseHandles[1] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LeanR02", 1);
@@ -920,12 +920,12 @@ int Bike::UnknownVirtualSlot100(float a, int b, float c)
         thr = 0.342f;
     crashState = UnknownVirtualSlot99(a, thr, b, c);
     if (crashState) {
-        field_0x574 = Vec3(savedForward.x, 0.0f, savedForward.z);
+        crashHeading = Vec3(savedForward.x, 0.0f, savedForward.z);
         motionIndex = 0;
         int neg = savedUp.y < 0.0f;
         crashYaw = savedYaw;
         crashedUpsideDown = neg;
-        field_0x138 = 1;
+        slot27Pending = 1;
         UnknownVirtualSlot69();
         UnknownVirtualSlot41();
         motionCompleted = 0;

@@ -213,7 +213,7 @@ public:
     SoultreeContact** collisionPoints;      // +0x12c array of collisionPointCount pointers
     int collisionPointCount;  // +0x130 loop bound over collisionPoints in slots 7, 13, 18, 30, 31
     int lastCollisionType;  // +0x134 collision callbacks 0x00500c00/0x00500c30 store the other collision object's type tag (+0x64; 0x68 = another physics body) here before calling slot 38
-    char field_0x138;
+    char slot27Pending;  // +0x138 set on a crash (Bike slot 100, Vehicle::CheckCrash); slot 28 (base and Vehicle) then calls slot 27 once and clears it; slot 1 clears it (tier 3)
     float stepTime;  // +0x13c slot 9: length of the current sub-step (fixedStepTime, or the whole frame when shorter); slot 14 integrates with it (v += a * stepTime, w += alpha * stepTime); invStepTime = 1/stepTime
     float invStepTime;  // +0x140 slot 9: invStepTime = 1.0f / stepTime
     float frameTime;  // +0x144 slot 9: frameTime = dt + stepRemainder (time to simulate this frame including the carried remainder); clamped to one fixed step when shorter

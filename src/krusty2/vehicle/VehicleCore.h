@@ -218,7 +218,7 @@ public:
     int wheelCount;  // +0x544 loop bound over wheelList in every wheel loop
     VehicleWheel* primaryWheel;  // +0x548 slot 7 (single contact) and slot 58 (single wheel) use it as the lead wheel; slot 46 pairs it with secondaryWheel
     VehicleWheel* secondaryWheel;  // +0x54c partner of primaryWheel in slot 46 (two-wheel case)
-    int field_0x550;
+    int ownedWheelsInContact;  // +0x550 PlaceWheels: wheels in contact whose ownerRef is set (no reader decoded)
     VehicleTicker** lateTickers;   // +0x554 owned arrays of objects with a virtual slot 0 (RunTickers)
     int lateTickerCapacity;               // +0x558 capacity of lateTickers
     int lateTickerCount;               // +0x55c count of lateTickers
@@ -227,7 +227,7 @@ public:
     int earlyTickerCount;               // +0x568 count of earlyTickers
     int auxWheelCount;               // +0x56c wheels added with an aux object (AddWheel)
     int contactTotal;  // +0x570 = field_0x1cc + wheelsInContact (body contacts plus wheels in contact) in slot 7; slot 49 branches on > 0
-    Vec3 field_0x574;      // Bike slot 100 (0x0040a090) builds (a0.x, 0, a0.z) here
+    Vec3 crashHeading;     // +0x574 horizontal forward (x, 0, z) stored on a crash (Bike slot 100, Vehicle::CheckCrash) and by the Bike and KrustyBike loaders (no reader decoded)
     float maxLeanAngle;  // +0x580 Bike clamps the target lean to +-maxLeanAngle
     float maxLeanRate;  // +0x584 Bike limits the lean error change to maxLeanRate * dt
     float smoothedVerticalAccel;  // +0x588 slot 49: = verticalAccelSmoother->value, fed with (vy - prev vy) * (1/dt)

@@ -147,7 +147,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot1(float value)
     savedSinPitch = 0.0f;
     airborne = 0;
     restTimer = 0;
-    field_0x138 = 0;
+    slot27Pending = 0;
 }
 
 // slot 8 (0x00501bd0)
@@ -287,9 +287,9 @@ int SoultreePhysicsBaseObject::UnknownVirtualSlot28(int a)
         sceneNode->SetPosition(position);
         collisionObject->UpdatePlacement();
     }
-    if (field_0x138) {
+    if (slot27Pending) {
         UnknownVirtualSlot27();
-        field_0x138 = 0;
+        slot27Pending = 0;
     }
     return a;
 }
