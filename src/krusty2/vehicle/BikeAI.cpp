@@ -56,8 +56,8 @@ Vec3 SafeNormalize(Vec3 v)
 {
     if (v.x == 0.0f && v.y == 0.0f && v.z == 0.0f)
         return v;
-    float s = FastInvSqrt((v.x * v.x + v.y * v.y) + v.z * v.z);
-    return Vec3(v.x * s, v.y * s, v.z * s);
+    float invLen = FastInvSqrt((v.x * v.x + v.y * v.y) + v.z * v.z);
+    return Vec3(v.x * invLen, v.y * invLen, v.z * invLen);
 }
 
 static Vec3 s_BikeAIUnknownStatic_3;

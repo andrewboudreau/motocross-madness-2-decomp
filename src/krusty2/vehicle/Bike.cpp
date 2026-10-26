@@ -942,8 +942,8 @@ static inline Vec3 BikeNormalized(const Vec3& v)
     lenSq += v.z * v.z;
     if (lenSq == 1.0f)
         return v;
-    float s = FastInvSqrt(lenSq);
-    return v * s;
+    float invLen = FastInvSqrt(lenSq);
+    return v * invLen;
 }
 
 Vec3* Bike::UnknownVirtualSlot55(Vec3* out, Vec3* pos)

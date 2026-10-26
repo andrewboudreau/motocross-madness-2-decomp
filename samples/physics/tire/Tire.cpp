@@ -54,8 +54,8 @@ static inline CollisionVec3 TireNormalizeY(const CollisionVec3& v)
     float lenSq = TireDotInline(v, v);
     if (lenSq == 1.0f)
         return v;
-    float s = FastInvSqrt(lenSq);
-    return CollisionVec3(v.x * s, v.y * s, v.z * s);
+    float invLen = FastInvSqrt(lenSq);
+    return CollisionVec3(v.x * invLen, v.y * invLen, v.z * invLen);
 }
 
 // Normalised copy of v (returned unchanged when |v|^2 is exactly 1); retail's z-axis path.

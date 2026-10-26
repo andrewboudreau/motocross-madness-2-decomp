@@ -1666,10 +1666,10 @@ void Vehicle::UnknownVirtualSlot95()
         if (sq == 0.0f) {
             scratchVector = kVec3Zero;
         } else {
-            float s = FastInvSqrt(sq);
-            scratchVector.x *= s;
-            scratchVector.y *= s;
-            scratchVector.z *= s;
+            float invLen = FastInvSqrt(sq);
+            scratchVector.x *= invLen;
+            scratchVector.y *= invLen;
+            scratchVector.z *= invLen;
         }
         modelNode->RotateAboutPoint(rotationPivot, scratchVector, angle);
     }

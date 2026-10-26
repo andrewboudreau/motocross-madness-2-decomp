@@ -330,8 +330,8 @@ inline Vec3 BikeAINormalize(const Vec3& v)
     float lenSq = Vec3DotCall(&v, &v);
     if (lenSq == 1.0f)
         return v;
-    float s = FastInvSqrt(lenSq);
-    return BikeAIVec3Call(v.x * s, v.y * s, v.z * s);
+    float invLen = FastInvSqrt(lenSq);
+    return BikeAIVec3Call(v.x * invLen, v.y * invLen, v.z * invLen);
 }
 
 // 0x0040d200, 4464 bytes, cdecl: predicts the bike's motion along the AI path.
@@ -564,8 +564,8 @@ inline Vec3 BikeAINormalizeSV(const Vec3& v)
     float lenSq = Vec3DotCall(&v, &v);
     if (lenSq == 1.0f)
         return v;
-    float s = FastInvSqrt(lenSq);
-    return BikeAIVec3Call(s * v.x, s * v.y, s * v.z);
+    float invLen = FastInvSqrt(lenSq);
+    return BikeAIVec3Call(invLen * v.x, invLen * v.y, invLen * v.z);
 }
 
 // Squared distance and dot product of the owner branches of 0x00415640, grouped
@@ -602,8 +602,8 @@ inline Vec3 BikeAINormalizeVS(const Vec3& v)
     float lenSq = Vec3DotCall(&v, &v);
     if (lenSq == 1.0f)
         return v;
-    float s = FastInvSqrt(lenSq);
-    return BikeAIVec3Call(v.x * s, v.y * s, v.z * s);
+    float invLen = FastInvSqrt(lenSq);
+    return BikeAIVec3Call(v.x * invLen, v.y * invLen, v.z * invLen);
 }
 // By-value view of operator*(const Vec3&, float) 0x005015b0.
 Vec3 BikeAIVec3Scale(const Vec3& v, float s);
@@ -612,8 +612,8 @@ inline Vec3 BikeAINormalizeScaleCall(const Vec3& v)
     float lenSq = Vec3DotCall(&v, &v);
     if (lenSq == 1.0f)
         return v;
-    float s = FastInvSqrt(lenSq);
-    return BikeAIVec3Scale(v, s);
+    float invLen = FastInvSqrt(lenSq);
+    return BikeAIVec3Scale(v, invLen);
 }
 
 // Owners of the obstacle collision objects (CollisionObject::ownerObject) by ownerType:
@@ -1865,8 +1865,8 @@ inline Vec3 BikeAINormalizeInline(const Vec3& v)
     float lenSq = SquareMagnitude(v);
     if (lenSq == 1.0f)
         return v;
-    float s = FastInvSqrt(lenSq);
-    return Vec3(s * v.x, s * v.y, s * v.z);
+    float invLen = FastInvSqrt(lenSq);
+    return Vec3(invLen * v.x, invLen * v.y, invLen * v.z);
 }
 
 // 0x00414370, 4802 bytes (ret 4): rebuilds the AI racing line aiPath for this frame and

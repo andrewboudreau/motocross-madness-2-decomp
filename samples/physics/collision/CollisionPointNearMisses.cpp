@@ -84,10 +84,10 @@ int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec
             if (len2 == 0.0f) {
                 *normal = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
             } else {
-                float s = FastInvSqrt(len2);
-                normal->x *= s;
-                normal->y *= s;
-                normal->z *= s;
+                float invLen = FastInvSqrt(len2);
+                normal->x *= invLen;
+                normal->y *= invLen;
+                normal->z *= invLen;
             }
         }
         *delta = InlineDifference(sum, *origin);
