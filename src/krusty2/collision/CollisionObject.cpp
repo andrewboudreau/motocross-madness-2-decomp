@@ -1625,15 +1625,15 @@ int CollisionObject::TestModelAgainst(CollisionObject* other)
 // field_0x14 * radius.  The contact generator 0x00429570 does the rest.
 int CollisionObject::HullVsSphere(CollisionHullBody* hull, CollisionSphereShape* sphere)
 {
-    CollisionVec3 c = sphere->center * sphere->centerScale;
-    CollisionVec3 world = c;
+    CollisionVec3 localCenter = sphere->center * sphere->centerScale;
+    CollisionVec3 world = localCenter;
     const float* m = sphere->transform.m;
-    world.x = c.z * m[8] + c.y * m[4] + c.x * m[0] + m[12];
-    world.y = c.z * m[9] + c.y * m[5] + c.x * m[1] + m[13];
-    world.z = c.z * m[10] + c.y * m[6] + c.x * m[2] + m[14];
-    float r = sphere->radiusScale * sphere->radius;
-    float rr = r * r;
-    return SphereTreeQuery(reinterpret_cast<const Vec3*>(&world), r, rr,
+    world.x = localCenter.z * m[8] + localCenter.y * m[4] + localCenter.x * m[0] + m[12];
+    world.y = localCenter.z * m[9] + localCenter.y * m[5] + localCenter.x * m[1] + m[13];
+    world.z = localCenter.z * m[10] + localCenter.y * m[6] + localCenter.x * m[2] + m[14];
+    float scaledRadius = sphere->radiusScale * sphere->radius;
+    float scaledRadiusSq = scaledRadius * scaledRadius;
+    return SphereTreeQuery(reinterpret_cast<const Vec3*>(&world), scaledRadius, scaledRadiusSq,
         reinterpret_cast<QueryTreeNode*>(hull->pointTree), &hull->worldTransform, 0);
 }
 
@@ -1643,19 +1643,20 @@ int CollisionObject::HullVsSphere(CollisionHullBody* hull, CollisionSphereShape*
 int CollisionObject::HullVsCapsule(CollisionHullBody* hull, CollisionCapsuleShape* capsule)
 {
     CollisionVec3 ends[2];
-    CollisionVec3 a = capsule->p0 * capsule->endpointScale;
-    ends[0] = a;
-    CollisionVec3 b = capsule->p1 * capsule->endpointScale;
-    ends[1] = b;
+    CollisionVec3 localStart = capsule->p0 * capsule->endpointScale;
+    ends[0] = localStart;
+    CollisionVec3 localEnd = capsule->p1 * capsule->endpointScale;
+    ends[1] = localEnd;
     const float* m = capsule->transform.m;
-    ends[0].x = (a.z * m[8] + a.y * m[4]) + a.x * m[0] + m[12];
-    ends[0].y = (a.z * m[9] + a.y * m[5]) + a.x * m[1] + m[13];
-    ends[0].z = (a.z * m[10] + a.y * m[6]) + a.x * m[2] + m[14];
-    ends[1].x = (b.z * m[8] + b.y * m[4]) + b.x * m[0] + m[12];
-    ends[1].y = (b.z * m[9] + b.y * m[5]) + b.x * m[1] + m[13];
-    ends[1].z = (b.z * m[10] + b.y * m[6]) + b.x * m[2] + m[14];
-    float r = capsule->radiusScale * capsule->radius;
-    return CapsuleTreeQueryWithVertices(reinterpret_cast<const Vec3*>(ends), r, r * r,
+    ends[0].x = (localStart.z * m[8] + localStart.y * m[4]) + localStart.x * m[0] + m[12];
+    ends[0].y = (localStart.z * m[9] + localStart.y * m[5]) + localStart.x * m[1] + m[13];
+    ends[0].z = (localStart.z * m[10] + localStart.y * m[6]) + localStart.x * m[2] + m[14];
+    ends[1].x = (localEnd.z * m[8] + localEnd.y * m[4]) + localEnd.x * m[0] + m[12];
+    ends[1].y = (localEnd.z * m[9] + localEnd.y * m[5]) + localEnd.x * m[1] + m[13];
+    ends[1].z = (localEnd.z * m[10] + localEnd.y * m[6]) + localEnd.x * m[2] + m[14];
+    float scaledRadius = capsule->radiusScale * capsule->radius;
+    return CapsuleTreeQueryWithVertices(reinterpret_cast<const Vec3*>(ends), scaledRadius,
+        scaledRadius * scaledRadius,
         reinterpret_cast<QueryTreeNode*>(hull->pointTree), &hull->worldTransform, 0,
         reinterpret_cast<Vec3*>(hull->vertices));
 }
@@ -1665,19 +1666,20 @@ int CollisionObject::HullVsCapsule(CollisionHullBody* hull, CollisionCapsuleShap
 // with 0x00429570 until one reports a contact.
 int CollisionObject::ModelVsSphere(CollisionModelBody* model, CollisionSphereShape* sphere)
 {
-    CollisionVec3 c = sphere->center * sphere->centerScale;
-    CollisionVec3 world = c;
+    CollisionVec3 localCenter = sphere->center * sphere->centerScale;
+    CollisionVec3 world = localCenter;
     const float* m = sphere->transform.m;
-    world.x = c.z * m[8] + c.y * m[4] + c.x * m[0] + m[12];
-    world.y = c.z * m[9] + c.y * m[5] + c.x * m[1] + m[13];
-    world.z = c.z * m[10] + c.y * m[6] + c.x * m[2] + m[14];
-    float r = sphere->radiusScale * sphere->radius;
-    float rr = r * r;
+    world.x = localCenter.z * m[8] + localCenter.y * m[4] + localCenter.x * m[0] + m[12];
+    world.y = localCenter.z * m[9] + localCenter.y * m[5] + localCenter.x * m[1] + m[13];
+    world.z = localCenter.z * m[10] + localCenter.y * m[6] + localCenter.x * m[2] + m[14];
+    float scaledRadius = sphere->radiusScale * sphere->radius;
+    float scaledRadiusSq = scaledRadius * scaledRadius;
     if (BoxSphereOverlap(reinterpret_cast<const Vec3*>(&model->center),
-        reinterpret_cast<const Vec3*>(&model->halfExtents), reinterpret_cast<const Vec3&>(world), r, rr,
+        reinterpret_cast<const Vec3*>(&model->halfExtents), reinterpret_cast<const Vec3&>(world),
+        scaledRadius, scaledRadiusSq,
         &model->bodyTransform)) {
         for (int i = 0; i < model->elementCount; i++) {
-            if (SphereTreeQuery(reinterpret_cast<const Vec3*>(&world), r, rr,
+            if (SphereTreeQuery(reinterpret_cast<const Vec3*>(&world), scaledRadius, scaledRadiusSq,
                 reinterpret_cast<QueryTreeNode*>(model->elements[i].pointTree),
                 &model->elements[i].worldTransform, 0))
                 return 1;
@@ -1691,22 +1693,23 @@ int CollisionObject::ModelVsSphere(CollisionModelBody* model, CollisionSphereSha
 int CollisionObject::ModelVsCapsule(CollisionModelBody* model, CollisionCapsuleShape* capsule)
 {
     CollisionVec3 ends[2];
-    CollisionVec3 a = capsule->p0 * capsule->endpointScale;
-    ends[0] = a;
-    CollisionVec3 b = capsule->p1 * capsule->endpointScale;
-    ends[1] = b;
+    CollisionVec3 localStart = capsule->p0 * capsule->endpointScale;
+    ends[0] = localStart;
+    CollisionVec3 localEnd = capsule->p1 * capsule->endpointScale;
+    ends[1] = localEnd;
     const float* m = capsule->transform.m;
-    ends[0].x = (a.z * m[8] + a.y * m[4]) + a.x * m[0] + m[12];
-    ends[0].y = (a.z * m[9] + a.y * m[5]) + a.x * m[1] + m[13];
-    ends[0].z = (a.z * m[10] + a.y * m[6]) + a.x * m[2] + m[14];
-    ends[1].x = (b.z * m[8] + b.y * m[4]) + b.x * m[0] + m[12];
-    ends[1].y = (b.z * m[9] + b.y * m[5]) + b.x * m[1] + m[13];
-    ends[1].z = (b.z * m[10] + b.y * m[6]) + b.x * m[2] + m[14];
-    float r = capsule->radiusScale * capsule->radius;
-    float rr = r * r;
-    if (BoxCapsuleOverlap(&model->center, &model->halfExtents, ends, r, rr, &model->bodyTransform)) {
+    ends[0].x = (localStart.z * m[8] + localStart.y * m[4]) + localStart.x * m[0] + m[12];
+    ends[0].y = (localStart.z * m[9] + localStart.y * m[5]) + localStart.x * m[1] + m[13];
+    ends[0].z = (localStart.z * m[10] + localStart.y * m[6]) + localStart.x * m[2] + m[14];
+    ends[1].x = (localEnd.z * m[8] + localEnd.y * m[4]) + localEnd.x * m[0] + m[12];
+    ends[1].y = (localEnd.z * m[9] + localEnd.y * m[5]) + localEnd.x * m[1] + m[13];
+    ends[1].z = (localEnd.z * m[10] + localEnd.y * m[6]) + localEnd.x * m[2] + m[14];
+    float scaledRadius = capsule->radiusScale * capsule->radius;
+    float scaledRadiusSq = scaledRadius * scaledRadius;
+    if (BoxCapsuleOverlap(&model->center, &model->halfExtents, ends, scaledRadius, scaledRadiusSq,
+                          &model->bodyTransform)) {
         for (int i = 0; i < model->elementCount; i++) {
-            if (CapsuleTreeQueryWithVertices(reinterpret_cast<const Vec3*>(ends), r, rr,
+            if (CapsuleTreeQueryWithVertices(reinterpret_cast<const Vec3*>(ends), scaledRadius, scaledRadiusSq,
                 reinterpret_cast<QueryTreeNode*>(model->elements[i].pointTree),
                 &model->elements[i].worldTransform, 0, reinterpret_cast<Vec3*>(model->elements[i].vertices)))
                 return 1;
