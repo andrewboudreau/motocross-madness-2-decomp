@@ -210,15 +210,15 @@ void SoultreeObject::InvalidateWorldMatrix()
 // 0x004fb880.
 void SoultreeObject::InvalidateSiblingChain()
 {
-    SoultreeObject* n = this;
+    SoultreeObject* node = this;
     for (;;) {
-        if (n->nextSibling)
-            n->nextSibling->InvalidateSiblingChain();
-        if (!n->worldValid)
+        if (node->nextSibling)
+            node->nextSibling->InvalidateSiblingChain();
+        if (!node->worldValid)
             break;
-        n->worldValid = 0;
-        n = n->firstChild;
-        if (!n)
+        node->worldValid = 0;
+        node = node->firstChild;
+        if (!node)
             break;
     }
 }
@@ -652,9 +652,9 @@ static inline Vec3 TransformPoint(const Vec3& p, const Matrix4& m)
 Vec3 SoultreeObject::WorldToLocalPoint(const Vec3& p)
 {
     UpdateWorldMatrix();
-    Matrix4 m = worldMatrix;
-    InvertRigid(m);
-    return TransformPoint(p, m);
+    Matrix4 inverse = worldMatrix;
+    InvertRigid(inverse);
+    return TransformPoint(p, inverse);
 }
 
 // 0x004fd910.
@@ -685,53 +685,53 @@ void SoultreeObject::AppendSibling(SoultreeObject* node)
 void SoultreeObject::RemoveChild(SoultreeObject* child)
 {
     child->InvalidateWorldMatrix();
-    SoultreeObject* n = firstChild;
-    while (n != child)
-        n = n->nextSibling;
-    if (n == firstChild)
-        firstChild = n->nextSibling;
-    if (n->nextSibling)
-        n->nextSibling->prevSibling = n->prevSibling;
-    if (n->prevSibling)
-        n->prevSibling->nextSibling = n->nextSibling;
-    if (n->parent)
-        n->parent = 0;
-    if (n->nextSibling)
-        n->nextSibling = 0;
-    if (n->prevSibling)
-        n->prevSibling = 0;
+    SoultreeObject* node = firstChild;
+    while (node != child)
+        node = node->nextSibling;
+    if (node == firstChild)
+        firstChild = node->nextSibling;
+    if (node->nextSibling)
+        node->nextSibling->prevSibling = node->prevSibling;
+    if (node->prevSibling)
+        node->prevSibling->nextSibling = node->nextSibling;
+    if (node->parent)
+        node->parent = 0;
+    if (node->nextSibling)
+        node->nextSibling = 0;
+    if (node->prevSibling)
+        node->prevSibling = 0;
 }
 
 // 0x004fda30. Nodes in this node's sibling chain and below it, this node included.
 int SoultreeObject::CountNodes()
 {
-    int n = 0;
+    int total = 0;
     if (nextSibling)
-        n = nextSibling->CountNodes();
+        total = nextSibling->CountNodes();
     if (firstChild)
-        n += firstChild->CountNodes();
-    return n + 1;
+        total += firstChild->CountNodes();
+    return total + 1;
 }
 
 // 0x004fda60.
 void SoultreeObject::CollectDescendants(int* count, SoultreeObject** out)
 {
-    SoultreeObject* c = firstChild;
-    while (c) {
-        out[*count] = c;
-        c = c->nextSibling;
+    SoultreeObject* child = firstChild;
+    while (child) {
+        out[*count] = child;
+        child = child->nextSibling;
         (*count)++;
     }
-    for (c = firstChild; c; c = c->nextSibling)
-        c->CollectDescendants(count, out);
+    for (child = firstChild; child; child = child->nextSibling)
+        child->CollectDescendants(count, out);
 }
 
 // 0x004fdab0.
 void SoultreeObject::MarkSubtreeDirty()
 {
     subtreeDirty = 1;
-    for (SoultreeObject* p = parent; p; p = p->parent)
-        p->subtreeDirty = 1;
+    for (SoultreeObject* ancestor = parent; ancestor; ancestor = ancestor->parent)
+        ancestor->subtreeDirty = 1;
 }
 
 // 0x004fdae0. Depth-first, case-insensitive: siblings before children.
