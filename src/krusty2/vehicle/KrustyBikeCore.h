@@ -136,7 +136,7 @@ public:
     int engineSize;  // +0x738  KbBikeSetup+0 (250 without a setup); +0x79c classes it (<=125, <500); racesnd below 250 uses engine 0
     int plateNumber;  // +0x73C  0x65 from the constructor; BikeRace racer +0x73c plate number (the setup paints it)
     KbRace* race;  // +0x740  loader race argument
-    KbGhost* statusNode;  // +0x744  race status node (RaceView/BikeRace +0x744); its +0x44 track position is seeded from the start probe
+    KbGhost* statusNode;  // +0x744  race status node (RaceView/BikeRace +0x744); its progressPos (+0x44) is seeded from the start probe
     int finishTimeStamp;  // +0x748  RaceView +0x748 time stamp; 0x7ffffffe until finished
     float lastLapTime;  // +0x74C  RaceView/BikeRace +0x74c last lap time; FormatLapTime (0x00518690) takes it as a float
     float fastestLap;  // +0x750  RaceView/BikeRace +0x750; EventManager copies it to ZoneReport "FastestLap"; FormatLapTime float

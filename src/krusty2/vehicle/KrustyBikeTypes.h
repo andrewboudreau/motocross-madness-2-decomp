@@ -45,7 +45,7 @@ struct KbRaw3 {
     };
 };
 
-// Object at KbGhost+0x34 / KbRace+0xc8 (tier 3 view): a point with a direction and its
+// Object at KbGhost::nextGate (+0x34) / KbRace+0xc8 (tier 3 view): a point with a direction and its
 // track position, which 0x00414370 places on the track when it is still unset.
 struct KbGate {
     Vec3 position;          // +0x00
@@ -97,20 +97,21 @@ struct KbNetDelta {
 };
 #pragma pack(pop)
 
-// The state a message is decoded into (BikeRace.h's UnknownBikeRaceNetState).
+// The state a message is decoded into (BikeRace.h's UnknownBikeRaceNetState; the names
+// follow that view and the KrustyBike delta bases 0x004933e0 copies in).
 struct KbNetState {
     short field_0x00;
     unsigned short step;         // +0x02
     int field_0x04;
-    Vec3 field_0x08;             // KrustyBike+0x1364
-    float field_0x14;            // +0x137c
-    float field_0x18;            // +0x1380
-    float field_0x1c;            // +0x1384
+    Vec3 position;               // +0x08 KrustyBike+0x1364 deltaBasePosition
+    float roll;                  // +0x14 +0x137c deltaBaseRoll
+    float pitch;                 // +0x18 +0x1380 deltaBasePitch
+    float yaw;                   // +0x1c +0x1384 deltaBaseYaw
     char pad_0x20[0x10];
-    Vec3 field_0x30;             // +0x1370
-    Vec3 field_0x3c;             // +0x1358
+    Vec3 angularVelocity;        // +0x30 +0x1370 deltaBaseAngularVelocity
+    Vec3 velocity;               // +0x3c +0x1358 deltaBaseVelocity
     int field_0x48;
-    int field_0x4c;              // running step total (+0x1388)
+    int time;                    // +0x4c running step total (+0x1388 deltaBaseTime)
     int field_0x50;
 };
 
@@ -406,15 +407,18 @@ struct KbRace {
     char scoreRecordDue;  // +0x3FB  BikeRace+0x3fb; 0x00492670 records message 10 (score) when set
 };
 // Record at KrustyBike+0x744 (tier 3): per-bike state block reset by slot 43.
+// The race status node at KrustyBike+0x744; member names follow the canonical view
+// UnknownEventRacerPart (src/reconstructed/RaceView.h).  The four dwords +0x0c..+0x18 stay
+// ints here (the loader only zeroes them), although the canonical +0x0c..+0x14 are floats.
 struct KbGhost {
     char pad_0x00[0x8];
-    float field_0x08;   // 0x00414370 compares it with 300.0f
-    int field_0x0c, field_0x10, field_0x14, field_0x18;
-    Vec3 field_0x1c;
-    Vec3 field_0x28;
-    KbGate* field_0x34;
-    KbRaw3 field_0x38;
-    KbRaw3 field_0x44;
+    float goalDistance;      // +0x08 0x00414370 compares it with 300.0f
+    int gateDistance, progressStep, progressTotal, lapOffset;   // +0x0c..+0x18
+    Vec3 previousPosition;   // +0x1c
+    Vec3 currentPosition;    // +0x28
+    KbGate* nextGate;        // +0x34
+    KbRaw3 placedPos;        // +0x38
+    KbRaw3 progressPos;      // +0x44 seeded from the start probe by the loader reset
 };
 
 struct KbSink {
@@ -500,8 +504,8 @@ struct KbBody { int TestMeshBounds(KbBody* other); };
 // names): +0 -> KrustyBike+0x738, +4 -> +0x737, +8 is converted to float, +0x24 is passed by
 // address, the rest by value.
 struct KbBikeSetup {
-    int field_0x0;
-    char field_0x4;
+    int engineSize;              // +0x00 -> KrustyBike::engineSize
+    char fourStroke;             // +0x04 -> KrustyBike::fourStroke
     char pad_0x05[0x3];
     int field_0x8;
     // Floats: the loader's `setup ? setup->f : 0` arguments zero their temporaries with
@@ -512,7 +516,7 @@ struct KbBikeSetup {
     float field_0x18;
     float field_0x1c;
     float field_0x20;
-    char field_0x24[0x2c];
+    char setupName[0x2c];        // +0x24 passed by address as the loader's setupName
     int field_0x50;
     int field_0x54;
     int field_0x58;

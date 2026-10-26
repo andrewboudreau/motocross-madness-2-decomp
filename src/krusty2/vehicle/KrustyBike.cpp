@@ -799,24 +799,24 @@ void KrustyBike::UnknownVirtualSlot43()
         KbRaceSub* p = race->raceTrack;
         if (p) {
             if (race->hasStartProbe) {
-                statusNode->field_0x44.a = race->startProbeNode;
-                statusNode->field_0x44.b = race->startProbeSegment;
-                statusNode->field_0x44.c = race->startProbeT;
+                statusNode->progressPos.a = race->startProbeNode;
+                statusNode->progressPos.b = race->startProbeSegment;
+                statusNode->progressPos.c = race->startProbeT;
             } else {
-                statusNode->field_0x44.a = (int)p->startNode;
-                statusNode->field_0x44.b = race->raceTrack->startNode[2];
-                statusNode->field_0x44.c = 0;
+                statusNode->progressPos.a = (int)p->startNode;
+                statusNode->progressPos.b = race->raceTrack->startNode[2];
+                statusNode->progressPos.c = 0;
             }
-            statusNode->field_0x38 = statusNode->field_0x44;
+            statusNode->placedPos = statusNode->progressPos;
         }
-        statusNode->field_0x34 = race->gateList;
-        statusNode->field_0x08 = 0;
-        statusNode->field_0x0c = 0;
-        statusNode->field_0x10 = 0;
-        statusNode->field_0x14 = 0;
-        statusNode->field_0x18 = 0;
-        statusNode->field_0x1c = Vec3(0.0f, 0.0f, 0.0f);
-        statusNode->field_0x28 = Vec3(0.0f, 0.0f, 0.0f);
+        statusNode->nextGate = race->gateList;
+        statusNode->goalDistance = 0;
+        statusNode->gateDistance = 0;
+        statusNode->progressStep = 0;
+        statusNode->progressTotal = 0;
+        statusNode->lapOffset = 0;
+        statusNode->previousPosition = Vec3(0.0f, 0.0f, 0.0f);
+        statusNode->currentPosition = Vec3(0.0f, 0.0f, 0.0f);
     }
     netState.timer = reinterpret_cast<KbGame*>(g_TrackGame)->fullNetPacketIntervalSec;
     shortMessageTimer = reinterpret_cast<KbGame*>(g_TrackGame)->shortNetPacketIntervalSec;
@@ -1429,13 +1429,13 @@ void KrustyBike::Fn_004933E0(const KbNetDelta* delta, KbNetState* state)
         step = delta->step >> 1;
     state->step = step;
     deltaBaseTime += state->step;
-    state->field_0x4c = deltaBaseTime;
-    state->field_0x3c = deltaBaseVelocity;
-    state->field_0x08 = deltaBasePosition;
-    state->field_0x30 = deltaBaseAngularVelocity;
-    state->field_0x14 = deltaBaseRoll;
-    state->field_0x18 = deltaBasePitch;
-    state->field_0x1c = deltaBaseYaw;
+    state->time = deltaBaseTime;
+    state->velocity = deltaBaseVelocity;
+    state->position = deltaBasePosition;
+    state->angularVelocity = deltaBaseAngularVelocity;
+    state->roll = deltaBaseRoll;
+    state->pitch = deltaBasePitch;
+    state->yaw = deltaBaseYaw;
     state->field_0x50 = delta->field_0x0e;
     state->field_0x48 = delta->field_0x12;
 }
@@ -1705,8 +1705,8 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     if (setup) {
         KbBikeSetup copy = *setup;
         setupFloat = (float)copy.field_0x8;
-        engineSize = copy.field_0x0;
-        fourStroke = copy.field_0x4;
+        engineSize = copy.engineSize;
+        fourStroke = copy.fourStroke;
     }
     if (isGhost) {
         ghostMod = (KbObj128*)new(__FILE__, 0x690) GhostMod1(1);
@@ -1715,7 +1715,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     statusNode = 0;
     ((KbBikeLoader*)this)->Fn_004079C0(a1, a2, name, desc, a5, a6, a7, a8, a9, a10, map, a15, a16,
                                        setup == 0,
-                                       setup ? (void*)setup->field_0x24 : 0,
+                                       setup ? (void*)setup->setupName : 0,
                                        setup ? setup->field_0x50 : 0,
                                        setup ? setup->field_0x54 : 0,
                                        setup ? setup->field_0x58 : 0,
