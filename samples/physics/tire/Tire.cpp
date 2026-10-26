@@ -148,7 +148,7 @@ struct TireContactOwner {
 // 0x00512e80.  Records a contact vector taken from the other object's owner:
 // field_0x1e4 = "contact valid", field_0x1f4 = the vector.  Which vector is chosen by the
 // tag of the other object (tier 3 semantics; the owner offsets 0x40/0x64/0x224 are literal).
-void Tire::HandleContact(int a, int tag, CollisionObject* other)
+void Tire::HandleContact(int unused, int tag, CollisionObject* other)
 {
     // Each case copies its own vector (VC6 merges the three copies into one tail and keeps
     // the source in edx); selecting a source pointer first gives a different register plan.
@@ -959,7 +959,7 @@ CollisionVec3* Tire::Fn_00515c90(CollisionVec3* out, const CollisionVec3* a, con
 }
 
 // 0x005143d0
-void Tire::UpdateRoll(float dt, float distanceScale, int locked, int driven, int a5, float driveScale)
+void Tire::UpdateRoll(float dt, float distanceScale, int locked, int driven, int crashState, float driveScale)
 {
     if (locked) {
         if (rampLevel != 0.0f) {
@@ -1165,7 +1165,7 @@ static inline void TireAddIn(CollisionVec3& w, const CollisionVec3& d)
 // `w = d + w`, the hinge local, a reference or copy of stepDisplacement, a reference
 // to worldPosition) the attachment's x loads first; TireAddIn in the inline
 // path as well costs 8 differing lines.
-void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offset,
+void Tire::UpdateShock(float dt, int pointsTouching, int crashed, const CollisionVec3* offset,
                        const CollisionVec3* velocity, const CollisionVec3* axisB)
 {
     float depth;

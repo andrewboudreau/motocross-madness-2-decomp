@@ -167,7 +167,7 @@ public:
     virtual void CollisionPointVirtualSlot1();  // CollisionPoint slot 1 @184, 0x00515b50
 
     // Non-virtual members (this == complete object).
-    void HandleContact(int a, int tag, CollisionObject* other);   // 0x00512e80 (ret 0xc)
+    void HandleContact(int unused, int tag, CollisionObject* other);   // 0x00512e80 (ret 0xc)
     // 0x00514550 (thiscall, ret 0x20), tier 3 name: places the wheel on the ground.  Recomputes
     // the wheel axes (wheelUpAxis/0x230/0x23c), probes the world/terrain for the contact point
     // and normal, builds the wheel frame and reports the contact through CollisionPoint's
@@ -181,7 +181,6 @@ public:
     void ApplyRollAngle();
     // 0x00515660: poses the attached part (+0x2b0 first, else +0x2ac) from its value.
     void UpdateAttachment();
-    // 0x005143d0 (ret 0x18): advances the wheel's roll angle for a step; a5 is unused.
     // 0x00513f90 (ret 4): sets the drive share +0x2b8 (and +0x2bc = 1 - it) from the
     // vehicle's speed while the wheel slips less than +0x2b4; scales +0x248 by it.
     void UpdateDriveShare(TireVehicle* vehicle);
@@ -190,13 +189,16 @@ public:
     // moment about the contact (times +0x1d8) to *torque.
     void ApplyDrive(float share, float stepTime, int forward, float mass, float* speed,
                     CollisionVec3* torque, CollisionVec3* force);
-    void UpdateRoll(float dt, float distanceScale, int locked, int driven, int a5, float driveScale);
+    // 0x005143d0 (ret 0x18): advances the wheel's roll angle for a step; crashState (what
+    // Vehicle passes) is unused.
+    void UpdateRoll(float dt, float distanceScale, int locked, int driven, int crashState,
+                    float driveScale);
     // 0x00513c70 (ret 0x18), tier 3 name: runs the attached shock (+0x2b0, else +0x2ac)
     // against the contact while the wheel touches; the solve's load and active flag
     // become the contact's penetration and inContact. Vehicle.cpp 0x00529ad4 is the
-    // only caller (dt = +0x1e8, a2 = byte +0x1d0, crashed = +0x444, offset = +0xbc,
-    // velocity = &+0x64, axisB = &+0xa0); a2 and offset are unused.
-    void UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offset,
+    // only caller (dt = +0x1e8, pointsTouching = byte +0x1d0, crashed = +0x444, offset = +0xbc,
+    // velocity = &+0x64, axisB = &+0xa0); pointsTouching and offset are unused.
+    void UpdateShock(float dt, int pointsTouching, int crashed, const CollisionVec3* offset,
                      const CollisionVec3* velocity, const CollisionVec3* axisB);
 
     // 0x00515c90 (thiscall, three vector pointers and a hidden result pointer first).
