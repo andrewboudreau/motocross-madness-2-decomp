@@ -261,50 +261,53 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
     {
         KbBikeDeltaMessage message;
         KbBikePing ping;
-        Vec3 d;
+        Vec3 carried;
         Vec3 diff;
         message.field_0x16 = loaderKind;
         KbSub(&diff, velocity, state->velocity);
-        d = diff + state->velocityError;
-        if (KB_DELTA_FITS(d.x, 30.0f) && KB_DELTA_FITS(d.y, 30.0f) && KB_DELTA_FITS(d.z, 30.0f)) {
-            message.velocity[0] = (signed char)(d.x * 4.2666669f);
-            state->velocityError.x = d.x - message.velocity[0] * 0.234375f;
-            message.velocity[1] = (signed char)(d.y * 4.2666669f);
-            state->velocityError.y = d.y - message.velocity[1] * 0.234375f;
-            message.velocity[2] = (signed char)(d.z * 4.2666669f);
-            state->velocityError.z = d.z - message.velocity[2] * 0.234375f;
+        carried = diff + state->velocityError;
+        if (KB_DELTA_FITS(carried.x, 30.0f) &&
+            KB_DELTA_FITS(carried.y, 30.0f) && KB_DELTA_FITS(carried.z, 30.0f)) {
+            message.velocity[0] = (signed char)(carried.x * 4.2666669f);
+            state->velocityError.x = carried.x - message.velocity[0] * 0.234375f;
+            message.velocity[1] = (signed char)(carried.y * 4.2666669f);
+            state->velocityError.y = carried.y - message.velocity[1] * 0.234375f;
+            message.velocity[2] = (signed char)(carried.z * 4.2666669f);
+            state->velocityError.z = carried.z - message.velocity[2] * 0.234375f;
             KbSub(&diff, position, state->position);
-            d = diff + state->positionError;
-            if (KB_DELTA_FITS(d.x, 30.0f) && KB_DELTA_FITS(d.y, 30.0f) && KB_DELTA_FITS(d.z, 30.0f)) {
-                message.position[0] = (signed char)(d.x * 4.2666669f);
-                state->positionError.x = d.x - message.position[0] * 0.234375f;
-                message.position[1] = (signed char)(d.y * 4.2666669f);
-                state->positionError.y = d.y - message.position[1] * 0.234375f;
-                message.position[2] = (signed char)(d.z * 4.2666669f);
-                state->positionError.z = d.z - message.position[2] * 0.234375f;
+            carried = diff + state->positionError;
+            if (KB_DELTA_FITS(carried.x, 30.0f) &&
+                KB_DELTA_FITS(carried.y, 30.0f) && KB_DELTA_FITS(carried.z, 30.0f)) {
+                message.position[0] = (signed char)(carried.x * 4.2666669f);
+                state->positionError.x = carried.x - message.position[0] * 0.234375f;
+                message.position[1] = (signed char)(carried.y * 4.2666669f);
+                state->positionError.y = carried.y - message.position[1] * 0.234375f;
+                message.position[2] = (signed char)(carried.z * 4.2666669f);
+                state->positionError.z = carried.z - message.position[2] * 0.234375f;
                 scratchVector = angularVelocity;
                 scratchVector[1] += turnRate;
                 KbSub(&diff, scratchVector, state->angularVelocity);
-                d = diff + state->angularVelocityError;
-                if (KB_DELTA_FITS(d.x, 6.28318548f) && KB_DELTA_FITS(d.y, 6.28318548f) && KB_DELTA_FITS(d.z, 6.28318548f)) {
-                    message.angularVelocity[0] = (signed char)(d.x * 20.371832f);
-                    state->angularVelocityError.x = d.x - message.angularVelocity[0] * 0.049087387f;
-                    message.angularVelocity[1] = (signed char)(d.y * 20.371832f);
-                    state->angularVelocityError.y = d.y - message.angularVelocity[1] * 0.049087387f;
-                    message.angularVelocity[2] = (signed char)(d.z * 20.371832f);
-                    state->angularVelocityError.z = d.z - message.angularVelocity[2] * 0.049087387f;
-                    float a = bodyYaw - state->yaw + state->yawError;
-                    if (KB_DELTA_FITS(a, 6.28318548f)) {
-                        message.yaw = (signed char)(a * 20.371832f);
-                        state->yawError = a - message.yaw * 0.049087387f;
-                        a = bodyRoll - state->roll + state->rollError;
-                        if (KB_DELTA_FITS(a, 6.28318548f)) {
-                            message.roll = (signed char)(a * 20.371832f);
-                            state->rollError = a - message.roll * 0.049087387f;
-                            a = bodyPitch - state->pitch + state->pitchError;
-                            if (KB_DELTA_FITS(a, 6.28318548f)) {
-                                message.pitch = (signed char)(a * 20.371832f);
-                                state->pitchError = a - message.pitch * 0.049087387f;
+                carried = diff + state->angularVelocityError;
+                if (KB_DELTA_FITS(carried.x, 6.28318548f) &&
+                    KB_DELTA_FITS(carried.y, 6.28318548f) && KB_DELTA_FITS(carried.z, 6.28318548f)) {
+                    message.angularVelocity[0] = (signed char)(carried.x * 20.371832f);
+                    state->angularVelocityError.x = carried.x - message.angularVelocity[0] * 0.049087387f;
+                    message.angularVelocity[1] = (signed char)(carried.y * 20.371832f);
+                    state->angularVelocityError.y = carried.y - message.angularVelocity[1] * 0.049087387f;
+                    message.angularVelocity[2] = (signed char)(carried.z * 20.371832f);
+                    state->angularVelocityError.z = carried.z - message.angularVelocity[2] * 0.049087387f;
+                    float angleDelta = bodyYaw - state->yaw + state->yawError;
+                    if (KB_DELTA_FITS(angleDelta, 6.28318548f)) {
+                        message.yaw = (signed char)(angleDelta * 20.371832f);
+                        state->yawError = angleDelta - message.yaw * 0.049087387f;
+                        angleDelta = bodyRoll - state->roll + state->rollError;
+                        if (KB_DELTA_FITS(angleDelta, 6.28318548f)) {
+                            message.roll = (signed char)(angleDelta * 20.371832f);
+                            state->rollError = angleDelta - message.roll * 0.049087387f;
+                            angleDelta = bodyPitch - state->pitch + state->pitchError;
+                            if (KB_DELTA_FITS(angleDelta, 6.28318548f)) {
+                                message.pitch = (signed char)(angleDelta * 20.371832f);
+                                state->pitchError = angleDelta - message.pitch * 0.049087387f;
                                 unsigned int now = ReadClock();
                                 unsigned int elapsed = now - state->time;
                                 if (elapsed < 1000) {
