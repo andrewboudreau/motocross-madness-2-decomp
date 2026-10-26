@@ -170,7 +170,7 @@ SoundEmitter::SoundEmitter(AuralScape* scape, SoundGroup* group, int type, int f
     oneShotFired = 0;
     audible = 0;
     field_0x1a0_bit2 = 0;
-    field_0x1a0_bit3 = 0;
+    forced2D = 0;
     started = 0;
     serialNumber = s_UnknownEmitterCount577734++;
     listenerDistance = 0;
@@ -196,7 +196,7 @@ SoundEmitter* SoundEmitter::Create(void* target, const char* name, UnknownSound3
         ownerScape->AddRef();
         if (!(flags & 2) || (flags & 4) || is2D)
             field_0x1a0_bit2 = 1;
-        field_0x1a0_bit3 = force2D;
+        forced2D = force2D;
         params.size = sizeof(params);
         emitterFlags = flags;
         soundParameters = params;
@@ -316,7 +316,7 @@ int SoundEmitter::LoadSound(unsigned long flags) {
     if (loadedSound || oneShotFired)
         return 0;
     emitterFlags &= ~0x30;
-    if (field_0x1a0_bit3)
+    if (forced2D)
         emitterFlags |= 0x20;
     else
         emitterFlags |= flags;

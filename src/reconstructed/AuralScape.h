@@ -88,7 +88,7 @@ public:
     unsigned char oneShotFired : 1;           // +0x1a0 one-shot fired
     unsigned char audible : 1;                // +0x1a0 audible
     unsigned char field_0x1a0_bit2 : 1;
-    unsigned char field_0x1a0_bit3 : 1;
+    unsigned char forced2D : 1;               // +0x1a0 Create's force2D argument; LoadSound then selects buffer kind 0x20
     unsigned char started : 1;                // +0x1a0 started
 };
 
