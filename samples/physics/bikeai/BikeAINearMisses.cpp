@@ -1520,8 +1520,9 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 // into the racing line with one struct copy and builds `roamTarget - position` as a vector
 // temporary (component-wise floats: 1052 aligned, Vec3: 1076).  The random roam target is written x, z,
 // then y (retail's zero store follows the second rand call; 1049 -> 1052 aligned of 1302).
-// Retail keeps `s * d.y` in the inline normalize (d.y is the zero register's value) while
-// VC6 folds it here; by-value, `v * s` and operand-order helper forms do not change that.
+// Retail keeps `invLen * roamOffset.y` in the inline normalize (roamOffset.y is the zero
+// register's value) while VC6 folds it here; by-value, `v * invLen` and operand-order helper
+// forms do not change that.
 // The local declaration order is inert.  Writing the gate tail after the loop with gotos
 // compiles to identical code: the block order comes from the flow graph, and retail's has
 // an extra `xor ebp, ebp` re-zero edge after the loop (its tail stores avoidNearOnly from
@@ -1889,13 +1890,13 @@ int KrustyBike::Fn_00414370(float dt)
     KbTrackItem* list;
     KbTrackItem** tail;
     KbRaw3 from;
-    KbRaw3 p;
+    KbRaw3 pathPos;
     KbGate* gate;
     Vec3 a, b, c;
     float distance;
     float right, left;
     float gateAhead, bikeAhead;
-    float speed, t, n, lenSq, dx, dz;
+    float speed, t, divisor, lenSq, dx, dz;
     float trickDelay;
     int dummy;
     int count;
@@ -1909,17 +1910,17 @@ int KrustyBike::Fn_00414370(float dt)
     if (kind != 3 && kind != 2) {
         if (kind != 1 && kind != 5) {
             aiPath.count = 1;
-            Vec3 d;
-            d = roamTarget - position;
-            d.y = 0.0f;
-            if (d.z * d.z + d.x * d.x < 2500.0f) {
-                d.x = rand() * (1.0f / 32768.0f);
-                d.z = rand() * (1.0f / 32768.0f);
-                d.y = 0.0f;
-                d = BikeAINormalizeInline(d) * 444.0f * terrain->worldScale;
-                roamTarget.x = terrain->worldScale * 666.66f + d.x;
+            Vec3 roamOffset;
+            roamOffset = roamTarget - position;
+            roamOffset.y = 0.0f;
+            if (roamOffset.z * roamOffset.z + roamOffset.x * roamOffset.x < 2500.0f) {
+                roamOffset.x = rand() * (1.0f / 32768.0f);
+                roamOffset.z = rand() * (1.0f / 32768.0f);
+                roamOffset.y = 0.0f;
+                roamOffset = BikeAINormalizeInline(roamOffset) * 444.0f * terrain->worldScale;
+                roamTarget.x = terrain->worldScale * 666.66f + roamOffset.x;
                 roamTarget.y = 0.0f;
-                roamTarget.z = terrain->worldScale * 666.66f + d.z;
+                roamTarget.z = terrain->worldScale * 666.66f + roamOffset.z;
             } else {
                 aiPath.points[0] = roamTarget;
             }
@@ -1985,10 +1986,10 @@ int KrustyBike::Fn_00414370(float dt)
                     while (1) {
                         if (i >= aiPath.count)
                             break;
-                        if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &p, &list,
+                        if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &pathPos, &list,
                                                             t * linearSpeed, 0))
                             return 0;
-                        if (!race->raceTrack->PointAt(p, &aiPath.points[i]))
+                        if (!race->raceTrack->PointAt(pathPos, &aiPath.points[i]))
                             return 0;
                         aiPath.points[i].y = position.y + 2.0f;
                         i++;
@@ -2062,10 +2063,10 @@ int KrustyBike::Fn_00414370(float dt)
                 while (1) {
                     if (i >= aiPath.count)
                         break;
-                    if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &p, &list,
+                    if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &pathPos, &list,
                                                         t * linearSpeed, 0))
                         return 0;
-                    if (!race->raceTrack->PointAt(p, &aiPath.points[i]))
+                    if (!race->raceTrack->PointAt(pathPos, &aiPath.points[i]))
                         return 0;
                     aiPath.points[i].y = position.y + 2.0f;
                     i++;
@@ -2095,10 +2096,10 @@ int KrustyBike::Fn_00414370(float dt)
                 for (i = 0;;) {
                     if (i >= aiPath.count)
                         break;
-                    if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &p, &list,
+                    if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &pathPos, &list,
                                                         g_BikeAILookAhead_00572988 * t, 0))
                         return 0;
-                    if (!race->raceTrack->PointAt(p, &aiPath.points[i]))
+                    if (!race->raceTrack->PointAt(pathPos, &aiPath.points[i]))
                         return 0;
                     aiPath.points[i].y = position.y + 2.0f;
                     lenSq = SquareMagnitude(aiPath.points[i] - position);
@@ -2110,7 +2111,7 @@ int KrustyBike::Fn_00414370(float dt)
                         break;
                 }
             } else {
-                p = statusNode->progressPos;
+                pathPos = statusNode->progressPos;
                 if (!race->raceTrack->PointAt(statusNode->progressPos, &aiPath.points[0]))
                     return 0;
             }
@@ -2160,11 +2161,11 @@ int KrustyBike::Fn_00414370(float dt)
         if (!motionActive && airborne) {
             PredictLanding(position, velocity, &predictedLandingTime, 0, 0, (Terrain*)terrain);
             if (BikeAIRandUnit() * 100.0f <= aiStuntChance) {
-                for (n = 5.0f; n >= 1.0f; n -= 1.0f) {
-                    if (Fn_0048D780(&field_0x15d4, predictedLandingTime / n - 0.5f, 0))
+                for (divisor = 5.0f; divisor >= 1.0f; divisor -= 1.0f) {
+                    if (Fn_0048D780(&field_0x15d4, predictedLandingTime / divisor - 0.5f, 0))
                         break;
                 }
-                if (n > 0.0f) {
+                if (divisor > 0.0f) {
                     Fn_0048D910(field_0x15d4);
                     trickTimer = 0;
                 }
