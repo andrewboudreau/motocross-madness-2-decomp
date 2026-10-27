@@ -326,6 +326,13 @@ static inline CollisionVec3 TireScaleCopy(const CollisionVec3& v, float s)
     return r;
 }
 
+// a x b as a Math3D Vec3 temporary built by its constructor, each first product grouped
+// (UpdateContactPatch: retail's frame slots and copy schedule for both crosses).
+static inline Vec3 TireCrossCtor(const CollisionVec3& a, const CollisionVec3& b)
+{
+    return Vec3((a.y * b.z) - a.z * b.y, (a.z * b.x) - a.x * b.z, (a.x * b.y) - a.y * b.x);
+}
+
 // 0x005135f0.  Semantics are tier 3.  `this` is the complete Tire; the CollisionPoint
 // members are addressed through the subobject (+0xb8).
 //   field_0x38 = contact position - *pos, field_0x5c = axis x field_0x38;
@@ -336,23 +343,28 @@ static inline CollisionVec3 TireScaleCopy(const CollisionVec3& v, float s)
 // also zeroes field_0x90) field_0x1e8 = field_0x218.
 // field_0x50 is field_0x1e8 normalised, field_0x94 its length, and the outputs report
 // |field_0x50 . field_0x230| scaled by that length in field_0x27c plus its sign.
-// Near miss, 1588 of 1664 bytes. `tangent` is a local so VC6 homes it (and the
-// projection) in the dead `axis` argument slot like retail; `(-c) * x` keeps retail's
-// fchs-then-fmul where `-c * x` lets VC6 hoist c * x above the branch. The slip
+// Near miss, 1630 of 1664 bytes (strict, full length). `tangent` is a local so VC6 homes
+// it (and the projection) in the dead `axis` argument slot like retail; `(-c) * x` keeps
+// retail's fchs-then-fmul where `-c * x` lets VC6 hoist c * x above the branch. The slip
 // vector is scaled through TireScaleCopy (retail's `fld mem; fmul st(1)`) and summed
-// and normalised through TireSum/TireScaled (retail's copy-store schedule). Left:
-// the lever's `lea edi` and store are scheduled later, the second TireDot push comes
-// before the y product instead of after it, and the cross temporaries' frame slots.
+// and normalised through TireSum/TireScaled (retail's copy-store schedule). Session 16:
+// both crosses as Math3D Vec3 constructor temporaries (TireCrossCtor) and the projection
+// as a named local give retail's cross frame slots and the rollCos operand order
+// (1588 -> 1630); the field_0x5c cross needs every first product grouped, the lever
+// cross is insensitive to grouping. Left: retail forms the lever's `lea edi` and loads
+// its first component during the z product (VC6: after it), and the second TireDot push
+// comes before the y product instead of after it.
 // The d-path dot is written `ref.z * tangent.z + ref.x * tangent.x + ref.y * tangent.y`:
 // VC6 emits a three-term chain in reverse source order with each product's operands
 // swapped, which gives retail's `t.y * ref.y`, `t.x * ref.x`, `t.z * ref.z` (1584 -> 1588).
-// No gain from a products-first cross or projection for the lever
-// (1571), a named lever or projection local (1575), a pointer or reference alias of
-// the lever member (767), a TireScaleCopy that copies all three components or none (1548..1555),
-// the d-path dot through a helper with copied or swapped x operands (1575..1582),
-// a named scaled vector or the TireSum operands swapped, or any parenthesisation of the
-// six products of either cross (64 forms each through a local helper; only the
-// unparenthesised form keeps 1588).
+// Before Session 16 (CollisionVec3 crosses), no gain from a products-first cross or
+// projection for the lever (1571), a named lever or projection local (1575), a pointer or
+// reference alias of the lever member (767), a TireScaleCopy that copies all three
+// components or none (1548..1555), the d-path dot through a helper with copied or swapped
+// x operands (1575..1582), a named scaled vector or the TireSum operands swapped, or any
+// parenthesisation of the six products of either cross (64 forms each through a local
+// helper; only the unparenthesised form kept 1588). With the Vec3 crosses, the 64
+// groupings, an unnamed or Vec3-view copy and a Vec3 projection stay at 1623..1630.
 void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, CollisionVec3 ref,
                               float minLength, float* outValue, int* outSign)
 {
@@ -362,10 +374,12 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
     rel.z = this->CollisionPoint::worldPosition.z - pos->z;
     this->CollisionPoint::relativePosition = rel;
 
-    this->CollisionPoint::field_0x5c = CollisionCross(axis, this->CollisionPoint::relativePosition);
+    Vec3 axisCross = TireCrossCtor(axis, this->CollisionPoint::relativePosition);
+    this->CollisionPoint::field_0x5c = *(CollisionVec3*)&axisCross;
 
-    normalLeverCross = CollisionCross(TireProjectOnto(axis, this->CollisionPoint::surfaceNormal),
-                                      this->CollisionPoint::relativePosition);
+    CollisionVec3 projected = TireProjectOnto(axis, this->CollisionPoint::surfaceNormal);
+    Vec3 lever = TireCrossCtor(projected, this->CollisionPoint::relativePosition);
+    normalLeverCross = *(CollisionVec3*)&lever;
 
     if (minLength > 0.001f) {
         CollisionVec3 tangent;

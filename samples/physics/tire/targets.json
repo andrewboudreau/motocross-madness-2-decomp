@@ -85,7 +85,7 @@
     "target_va": "0x005135f0",
     "target_size": 1664,
     "expect": "partial",
-    "notes": "1588/1664 strict (tier 3 name): contact-patch update. The reject output is a `tangent` local, so VC6 reuses the dead `axis` slot like retail; `(-c) * x` keeps the negation inside each branch; the slip vector is built through TireScaleCopy/TireSum and normalised through TireScaled, which give retail's scale operand order and copy-store schedule. Left: scheduling of the lever store, one TireDot argument push and the cross temporaries' frame slots (see Tire.cpp); the dot is written in reverse term order, which VC6 flips back to retail's.",
+    "notes": "1630/1664 strict (tier 3 name): contact-patch update. The reject output is a `tangent` local, so VC6 reuses the dead `axis` slot like retail; `(-c) * x` keeps the negation inside each branch; the slip vector is built through TireScaleCopy/TireSum and normalised through TireScaled, which give retail's scale operand order and copy-store schedule. Session 16: both crosses as Math3D Vec3 constructor temporaries (TireCrossCtor, field_0x5c needs grouped first products) with a named projection local fix the cross frame slots and the rollCos operand order (1588 -> 1630). Left: the lever's lea edi and first component load are scheduled after the z product, and one TireDot argument push comes earlier (see Tire.cpp); the dot is written in reverse term order, which VC6 flips back to retail's.",
     "bindings": "Tire.bindings.json"
   },
   {
