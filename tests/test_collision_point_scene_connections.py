@@ -29,8 +29,8 @@ WORLD = '?LocalToWorldPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z'
 OLD_WORLD = '?LocalToWorldPoint@CollisionContactOwner@@QAEPAUCollisionVec3@@PAU2@PBU2@@Z'
 # Complete resolved partial bodies from the published pre-connection source.
 PARTIALS = (
-    ('SoultreeMergeContacts', 0x43aa30, 845, 820,
-     'b53bd4eb847c2470008cdc15f71c20f908d8ce8a8b3f181ac1c4a8376975428b'),
+    ('SoultreeMergeContacts', 0x43aa30, 845, 838,
+     '699f914a2a998fbad7da6a31db1faa9d9d024a5f37a8943edf1d4a94bf34c8f6'),
     ('SoultreeRefreshContacts', 0x43ad80, 615, 604,
      'c1eebf9abd629e2092a54ff39359ae46985dfdb896f6d660bba1e17e974271f1'),
 )

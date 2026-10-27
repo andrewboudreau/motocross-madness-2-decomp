@@ -23,6 +23,15 @@ static inline CollisionVec3 ComponentProduct(CollisionVec3 a, const CollisionVec
     r.z = a.z * b.z;
     return r;
 }
+// CollisionCross with each product parenthesised: retail's operand order for the angular
+// term of 0x0043aa30 (the shared helper's bare form schedules the products differently).
+static inline CollisionVec3 GroupedCross(const CollisionVec3& a, const CollisionVec3& b) {
+    CollisionVec3 r;
+    r.x = (a.y * b.z) - (a.z * b.y);
+    r.y = (a.z * b.x) - (a.x * b.z);
+    r.z = (a.x * b.y) - (a.y * b.x);
+    return r;
+}
 
 // 0x0043aa30 (cdecl, provisional signature; near miss).  Merges the penetrating contacts of a
 // manifold (tier 3 semantics): mean position, summed and normalised normal, deepest
@@ -32,12 +41,14 @@ static inline CollisionVec3 ComponentProduct(CollisionVec3 a, const CollisionVec
 // Matches retail's frame, block layout, first-contact clamp (a by-value clamp keeps the
 // value on the x87 stack across the compare), the loop's single penetration load, the
 // copies through by-value/inline-constructor helpers and the trailing `return 0` block.
-// Still differs: (1) in sum * (1/merged) retail multiplies x and z scalar-first and y
+// The angular term crosses through GroupedCross (each product parenthesised); the shared
+// CollisionCross schedules the push's fstp of z and the linA load one copy later (820).
+// Still differs: in sum * (1/merged) retail multiplies x and z scalar-first and y
 // component-first (`fld sum.y; fmul st(1)`), the candidate all scalar-first; explicit,
 // operator, helper and accumulation forms (+= per component, a += helper, sum = sum + p),
-// a separately named scale, by-value or scale-first helpers, y written `sum.y * s` and a
-// named temporary do not move it; (2) the push's fstp of z and the linA load are scheduled
-// one copy later.  The normal's squared length is accumulated y, then x, then z (retail
+// a separately named scale, by-value or scale-first helpers, every s * v.c / v.c * s and
+// bare/parenthesised product combination of a local scale helper and a named temporary do
+// not move it.  The normal's squared length is accumulated y, then x, then z (retail
 // squares y in place, consumed by fmulp, and pops through fxch); the one-expression
 // z * z + (x * x + y * y) and (y * y + x * x) + z * z forms give Vec3Normalize's order
 // and the frame offsets after it shift (409 bytes).
@@ -91,7 +102,7 @@ int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec
             }
         }
         *delta = InlineDifference(sum, *origin);
-        *angular = CollisionCross(ComponentProduct(*scaleB, *scaleA), *delta);
+        *angular = GroupedCross(ComponentProduct(*scaleB, *scaleA), *delta);
         *angular = InlineSum(*bias, *angular);
         CollisionVec3 push = *normal * deepest;
         linA->x += push.x;

@@ -86,7 +86,7 @@
     "target_va": "0x0043aa30",
     "target_size": 845,
     "expect": "partial",
-    "notes": "Near miss (CollisionPoint.cpp extent). Frame, blocks, clamp, loop, by-value product copy and trailing return 0 match; the normal's squared length accumulated y, x, z (len2 = y*y; len2 += x*x; len2 += z*z) gives retail's in-place squaring (409 -> 820/845). Left: the sum * (1/merged) y component is component-first in retail, and one fstp of the push is scheduled later. Session 14: scaling sum in place (float inv = 1.0f / merged; sum.x *= inv; ..., 409) or through a scaled copy assigned back (391, 873 bytes) is worse. Session 14: a scaled copy of *scaleB (t.x *= scaleA->x and so on) crossed in place of ComponentProduct gives the same bytes.",
+    "notes": "Near miss (CollisionPoint.cpp extent). Frame, blocks, clamp, loop, by-value product copy and trailing return 0 match; the normal's squared length accumulated y, x, z (len2 = y*y; len2 += x*x; len2 += z*z) gives retail's in-place squaring (409 -> 820/845). Crossing through the sample's GroupedCross (each product parenthesised) fixes the push's fstp/linA scheduling (820 -> 838/845). Left: the sum * (1/merged) y component is component-first in retail; all 64 per-component order/paren forms of a local scale helper are inert. Session 14: scaling sum in place (float inv = 1.0f / merged; sum.x *= inv; ..., 409) or through a scaled copy assigned back (391, 873 bytes) is worse. Session 14: a scaled copy of *scaleB (t.x *= scaleA->x and so on) crossed in place of ComponentProduct gives the same bytes.",
     "bindings": "../../../src/krusty2/collision/CollisionPoint.bindings.json"
   },
   {

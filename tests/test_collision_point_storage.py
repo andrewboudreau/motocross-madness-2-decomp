@@ -94,7 +94,7 @@ class CollisionPointStorageTests(unittest.TestCase):
                  if t.get('source')=='CollisionPoint.cpp']
         self.assertEqual(len(targets),16)
         baseline={POINT:(30,111,'b12c78bc10b13113f1f4a29ee39b8b6b68cf162928567171d769a4a8fbd08046'),
-                  SAMPLE:(32,128,'cf1f3a8f32e134633f4c56a3b6b0c69f1c65333d0fb7bc8e22c396a9c75a5ac5')}
+                  SAMPLE:(32,128,'40f2d5bcda818a1cb92d8cea44c1aaf4abff65c2eb6b9e40c9cfcabc35b92ff9')}
         with tempfile.TemporaryDirectory(prefix='mcm2-contact-storage-') as directory:
             for index,source in enumerate((POINT,SAMPLE)):
                 output=Path(directory)/('unit%d.obj'%index)
