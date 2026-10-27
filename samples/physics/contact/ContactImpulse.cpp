@@ -17,6 +17,14 @@ static inline Vec3 ContactCrossCtor(const Vec3& a, const Vec3& b)
     return Vec3(a.y * b.z - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
 }
 
+// uB's cross with every product parenthesised (940 strict against 931 for Math3D
+// CrossProduct and 933 for ContactCrossCtor there; provisional spelling).  The fully
+// parenthesised form at torque B as well gives 919, and either helper at uA loses.
+static inline Vec3 ContactCrossParen(const Vec3& a, const Vec3& b)
+{
+    return Vec3((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
+}
+
 // 0x005004a0 (1062 bytes).  Impulse between two bodies A and B at a contact.
 //   restitution  first argument (SoultreePhysicsBaseObject::field_0x14c)
 //   n            contact normal
@@ -38,7 +46,7 @@ static inline Vec3 ContactCrossCtor(const Vec3& a, const Vec3& b)
 // The two torque blocks are written at function scope with distinct names; with
 // sibling { } scopes VC6 shares their slots and the frame shrinks to 0x54 (retail 0x60).
 // closingXY is written (y*y') + x*x' so the y product is loaded first, as retail does.
-// 931/1062 strict.  Remaining: the torque cross products load r before n where retail
+// 940/1062 strict.  Remaining: the torque cross products load r before n where retail
 // loads n first, and most temporaries sit in other frame slots.  The product order
 // follows leaf age, so neither operand order nor parentheses in the cross move it (all
 // 2^6 operand orders measured in the member-store and constructor forms, also written
@@ -71,7 +79,7 @@ void ContactSolveImpulse(float restitution, const Vec3* n, float invMassA, Soult
     angB.y = localB.y * invInertiaB->y;
     angB.z = localB.z * invInertiaB->z;
     Vec3 worldB = nodeB->LocalToWorldDirection(angB);
-    Vec3 uB = CrossProduct(worldB, *rB);
+    Vec3 uB = ContactCrossParen(worldB, *rB);
     sum = ContactSum(uA, uB);
     float num = -((closingXY + closingZ) * (restitution + 1.0f));
     float j = num / (ContactDot(sum, *n) + invMassA + invMassB);
