@@ -2272,15 +2272,16 @@ void Vehicle::PlaceWheels()
         wheelList[0]->reportContactOutputs = 1;
 }
 
-// 0x00527a20 (PARTIAL, 350/870, 866 bytes): the first 0x120 bytes (count loop, drive
-// loop, dot product and the branch on its sign) match.  Retail copies Vec3 values into the
-// wheel with direct [wheel+disp] moves, while VC6 forms the destination (or source) address
-// of a struct assignment in a register (lea).  The memberwise VehSetV gives the direct
-// moves for the scaled normal and the friction copy, and the impulse block then matches.
-// Left: the (0,0,0) store.  Retail materialises the temporary on the stack and copies it
-// with direct stores; the struct assignment keeps the lea, and VehSetV (also via a named
-// zero, a reference, an inline wheel method or a by-value helper) lets VC6 fold the
-// temporary into immediate stores (832-836 bytes).
+// 0x00527a20 (PARTIAL, 840/870 strict, full length): one store is scheduled differently,
+// retail writes normalLoad = 0 between the second and third zero-temporary loads.
+// Retail copies Vec3 values into and out of the wheel with direct [wheel+disp] moves.
+// VC6 forms the address of a struct assignment (or memcpy) in a register (lea), and
+// memberwise float copies let it fold a constant temporary into immediates.  A
+// dword-wise copy (VehCopyBits) keeps retail's stack temporary with direct moves for the
+// (0,0,0) store; the friction copy matches only as dword moves too, and the scaled
+// impulse matches when it is named, *speed is updated, and then it is assigned.  The
+// helper's long-typed view is provisional: it reproduces the code shape, but the
+// original copy form is not known.
 // Wheel drive and contact impulse pass (tier 3 reading).  Counts the in-contact
 // wheels with a nonzero +0x2a0 and, unless crashed, lets each wheel apply its share of the
 // drive (0x00514170).  Then for every wheel in contact: the load pushing into the ground
@@ -2291,6 +2292,12 @@ void Vehicle::PlaceWheels()
 // when the time scale is the smaller, is added to *force and its moment about
 // relativePosition to *worldTorque.
 static inline void VehSetV(Vec3& d, const Vec3& s) { d.x = s.x; d.y = s.y; d.z = s.z; }
+static inline void VehCopyBits(Vec3& d, const Vec3& s)
+{
+    ((long*)&d)[0] = ((const long*)&s)[0];
+    ((long*)&d)[1] = ((const long*)&s)[1];
+    ((long*)&d)[2] = ((const long*)&s)[2];
+}
 void Vehicle::Method_00527A20(float* speed, Vec3* worldTorque, Vec3* force)
 {
     int i;
@@ -2312,7 +2319,7 @@ void Vehicle::Method_00527A20(float* speed, Vec3* worldTorque, Vec3* force)
         float load = VehDotG(wheel->appliedShare, wheel->groundNormal);
         wheel->normalLoad = load;
         if (load >= 0.0f) {
-            wheel->normalLoadVector = Vec3(0.0f, 0.0f, 0.0f);
+            VehCopyBits(wheel->normalLoadVector, Vec3(0.0f, 0.0f, 0.0f));
             wheel->normalLoad = 0.0f;
         } else {
             Vec3 scaled;
@@ -2333,11 +2340,12 @@ void Vehicle::Method_00527A20(float* speed, Vec3* worldTorque, Vec3* force)
             Vec3 impulse;
             if (timeScale > rate * taken) {
                 float fraction = rate * taken / timeScale;
-                impulse = wheel->frictionForce * fraction;
+                Vec3 scaled = wheel->frictionForce * fraction;
                 *speed = *speed - taken;
+                impulse = scaled;
             } else {
                 *speed = *speed - timeScale / rate;
-                VehSetV(impulse, wheel->frictionForce);
+                VehCopyBits(impulse, wheel->frictionForce);
             }
             *force += impulse;
             *worldTorque += CrossProduct(wheel->relativePosition, impulse);

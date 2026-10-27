@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 119, c 89, total 210. The three class (a) functions of the
+Counts: a 2, b 118, c 90, total 210. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -108,7 +108,7 @@ temporary. When only displacement sizes differ, read the
 | krusty2/vehicle/Bike | `0x0040c000` | 162/1015 | b | retail has a bare `fistp` (inline `__asm`, docs/REBUILD_GAPS.md), hence its ebp frame; 60 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `fld [A]`; slot order differs |
 | krusty2/vehicle/Vehicle | `0x005257a0` | 693/745 | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |
 | krusty2/vehicle/Vehicle | `0x005265d0` | 381/555 | b | same size, 0.82 ratio: two products per cross load a before b; the crashState ?: argument is hoisted above the pushes |
-| krusty2/vehicle/Vehicle | `0x00527a20` | 350/870 | b | 25 code diffs, all in the (0,0,0) store: retail copies its stack temporary with direct `[esi + 0x120]` moves, VC6 keeps `lea edx, [esi + 0x120]` (4 bytes short) |
+| krusty2/vehicle/Vehicle | `0x00527a20` | 840/870 | c | `normalLoad = 0` scheduled after the dword-wise zero copy (retail: between its second and third temporary loads) |
 | krusty2/vehicle/Vehicle | `0x005281b0` | 528/539 | c | 1 code diff: retail stores field_0x4e8 before the abs `fcom` (`fst ; fld st(0) ; fcom`). The clamp assigned inside the first product gives retail's dup form for u.x |
 | krusty2/vehicle/Vehicle | `0x005286a0` | 754/784 | c | slot 56: two side-cross products load their multiplicands in the other order (retail side.y*a.z, a.x*side.z); source operand order has no effect |
 | krusty2/vehicle/Vehicle | `0x0052a940` | 2339/3254 | b | 40 differing instructions (3257 B; backingUp and DriveForce's reversing are char). The lift tilt-axis arm is laid out after the Rotate(k) arm (30 control-flow forms, dead end); prevSpeed is loaded before the wheel-count store; some local slots differ |

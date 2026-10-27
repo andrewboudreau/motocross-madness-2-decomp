@@ -96,9 +96,9 @@
       "?Method_00527A20@Vehicle@@QAEXPAMPAUVec3@@1@Z",
       5405216,
       870,
-      866,
-      350,
-      "1756a3e5450749e50601d9adb11ef80371c6bc2b107479ac40c5d3539ceb1bb7"
+      870,
+      840,
+      "20efe2de81564dc2c8f01c3baad6fa06c3c8e4d13b5d5d7f80496c947cb44b24"
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",

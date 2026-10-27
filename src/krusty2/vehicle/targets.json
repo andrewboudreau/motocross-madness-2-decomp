@@ -1616,7 +1616,7 @@
     "target_va": "0x00527a20",
     "target_size": 870,
     "expect": "partial",
-    "notes": "350/870 (866 bytes). First 0x120 bytes exact (driven-wheel count, 0x514170 drive loop, (x*x+y*y)+z*z dot, zero branch first). The memberwise VehSetV gives retail's direct [wheel+disp] moves for the scaled normal and the friction copy; only the (0,0,0) store remains: the struct assignment keeps a lea, and memberwise forms fold the stack temporary retail keeps. Session 14: a user-declared member-wise Vec3::operator= folds this store too (304/870, 792 bytes); SoulTreePhysics slot 13 0x00501e90 has the same zero-store pattern and the same forms fail there. Session 14: normalLoad = 0 before the vector, kVec3Zero (either order), a named zero assigned or through VehSetV, Vec3(d, d, d) after d = 0 and groundNormal scaled by 0 are the same or worse (350, 324/320, 350/320, 350, 354).",
+    "notes": "840/870 strict at full length (2 instructions differ): only the normalLoad = 0 store is scheduled after the zero copy (retail: between its second and third temporary loads). Session 16: VC6 forms the address of a Vec3 struct assignment or memcpy in a register and folds memberwise float copies of a constant temporary into immediates; the dword-wise VehCopyBits keeps the stack temporary with direct [wheel+disp] moves (350 -> 706). The friction copy also needs VehCopyBits, and the scaled impulse matches as a named Vec3 assigned after the *speed update (706 -> 840). Inert for the remaining store: normalLoad = 0 before the copy or between named-zero forms (841/840), loads-first or pointer-view copy helpers, and an explicit mid-copy store (835/833). SoulTreePhysics slot 13 0x00501e90 has the same zero-store pattern.",
     "bindings": "Vehicle.bindings.json"
   },
   {

@@ -358,11 +358,12 @@ x87 operand order facts measured on these targets (they add to the list below):
 - Bike slot 76 scales v.x by the freshly computed factor and v.y/v.z by its stored
   copy, then pops it: only `v.x *= (s = expr); v.y *= s; v.z *= s;` reproduces that
   (a named `s` first, `v *= s`, `Vec3::operator*=` or a scaling helper give 389/395).
-- VC6 always forms the destination address of a `Vec3` struct assignment in a register
-  (`lea`/`add`); retail `Method_00527A20` `0x00527a20` stores through `[wheel+disp]`
-  directly, which memberwise helpers reproduce for member copies but not for the
-  `(0,0,0)` temporary (VC6 folds it).  That function stays `partial` (349/866, first
-  0x120 bytes exact).  Vehicle slot 55 `0x0052b6d0` reloads `out` between its two
+- VC6 always forms the destination address of a `Vec3` struct assignment or `memcpy`
+  in a register (`lea`/`add`); retail `Method_00527A20` `0x00527a20` stores through
+  `[wheel+disp]` directly.  Memberwise float helpers reproduce that for member copies
+  but fold the `(0,0,0)` temporary into immediates; a dword-wise copy (`VehCopyBits`)
+  keeps retail's stack temporary with direct moves (840/870, one store scheduled
+  differently).  Vehicle slot 55 `0x0052b6d0` reloads `out` between its two
   copies (VC6 keeps it in a register: 28/59).  Bike slot 72 `0x00405db0` is exact once
   the in-place normalisation of `*out` goes through an inline helper, which resets the
   operand tracking for the following cross product.
@@ -404,8 +405,8 @@ Large functions of the two units (all registered in `src/krusty2/vehicle/targets
   remains is the local slot layout (retail: result 0xc, len 0x10, cross temp 0x14, offset
   0x20, torque 0x2c, base 0x38, temps 0x44, unmoved by declaration order), `frontWheel` in
   eax and the constant 2 of the state stores kept in edi.
-- `Method_00527A20` `0x00527a20` stays at 349/866: references to the wheel or to the
-  destination vector do not change the struct-assignment addressing.
+- `Method_00527A20` `0x00527a20`: references to the wheel or to the destination vector
+  do not change the struct-assignment addressing; the dword-wise copy does (840/870).
 - `Bike::LoadBike` `0x004079c0` (6745 bytes, `ret 0xa0` = 40 argument dwords, 8 EH states,
   0x2cc-byte frame) is written out as a partial (strict 6428/6745, instruction ratio 0.88,
   every call, EH state and x87 sequence in retail order).  It runs `LoadVehicle` with
