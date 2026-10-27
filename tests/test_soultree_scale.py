@@ -100,7 +100,7 @@ class SoultreeScaleTests(unittest.TestCase):
                              [('.drectve',40),('.text',640)])
             rows = complete_object(aggregate)
             self.assertEqual((len(rows),sum(len(r[3]) for r in rows)),(14,32))
-            self.assertEqual(hashlib.sha256(json.dumps(rows).encode()).hexdigest(),'f06c109e47a2b473dc48f25a546a8a45cc3484a8b67a79182bc24f812cff67e1')
+            self.assertEqual(hashlib.sha256(json.dumps(rows).encode()).hexdigest(),'64e9e5afc10962ceb6d09d7d417b3fdb284b787eb229e2ebba6cad567ae28ffd')
             spec = json.loads((ROOT/'config/game_build.json').read_text())
             built = build_compile_source(ROOT/SOURCE,output/'game-command',compiler,
                 [ROOT/p for p in spec['includes']],spec['profile'],{**os.environ,'PYTHONPATH':str(ROOT)})

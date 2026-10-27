@@ -22,21 +22,18 @@
 //   with this form every count 0..31 stays at 618, and the written k order with 0..31
 //   locals is no better. Locals of any type count one each; uninitialised unused ones
 //   and extra statements count nothing.
-// GetWorldBounds (0x004fe8a0, 618 bytes; 551/610): the subtree box through the world matrix,
-//   the half extents through |R| (a diagonal matrix times R, inline fabs). The instruction
-//   stream matches up to the tail; retail places the diagonal matrix at esp+0x10 below the
-//   centre and the product (frame order c, e, w, a; here c, w, a, e, which no use-count change
-//   reproduces) and computes hi = w + ext with w as the destination, keeping ext on the x87
-//   stack until three final pops.
-//   0..33 dead initialised int locals at the top of the function change nothing.
-//   Session 12: the diagonal as three Vec3 locals (`Vec3 ex(b.x, 0, 0)`, ey, ez; zero
-//   stores dead) gives retail's frame exactly (c, e, w, a: all 12-byte keys under the
-//   small-frame size rule), but VC6 then adds an fxch pair to the ext.x sum (394-396).
-//   Tail forms that change nothing: w + ext operand order, `+=` from a copy, Vec3
-//   operators, inline Set helpers by reference/pointer/value, six ext sum orders.
-//   Session 14: the centre as one expression per row, x + (y + z) + translation (or
-//   (y + z) + x), places the pop esi as retail (541 -> 551); per-statement accumulation
-//   pops it one instruction late. Declaring ext before or with w does not move the tail.
+// GetWorldBounds (0x004fe8a0, 618 bytes; 606/618): the subtree box through the world matrix,
+//   the half extents through |R| (the diagonal half-extent axes times R, inline fabs).
+//   Session 16: three Math3D Vec3 axis locals (zero stores dead) give retail's frame
+//   (c, axes, w, a), the centre w built by the Vec3 constructor makes VC6 consume w in the
+//   hi adds and pop ext at the end as retail does, and naming the nine |a| terms as float
+//   locals removes the fxch pairs the plain sums get (551/610 -> 606/618, full length).
+//   Left: pop esi is scheduled after the first fcom/fnstsw/test instead of before the
+//   a[2][2] store. Centre row groupings, the c copy form, product operand order, ext
+//   declaration placement, AbsValue spellings and 0..11 dead locals do not move it.
+//   Earlier forms: a reinterpret_cast Vec3 row store of the diagonal (same frame), six
+//   ext sum orders, w/ext operand orders, Vec3 operators, inline Set helpers and += forms
+//   for hi, and storing hi before lo (rejected: retail stores lo first).
 #include <string.h>
 #include "math/Math3D.h"
 
@@ -60,45 +57,41 @@ static inline float AbsValue(float v)
     return v < 0.0f ? -v : v;
 }
 
-static inline void DiagonalMatrix(float m[3][3], float x, float y, float z)
-{
-    m[0][0] = x;
-    m[0][1] = 0.0f;
-    m[0][2] = 0.0f;
-    m[1][0] = 0.0f;
-    m[1][1] = y;
-    m[1][2] = 0.0f;
-    m[2][0] = 0.0f;
-    m[2][1] = 0.0f;
-    m[2][2] = z;
-}
-
 void SoultreeObject::GetWorldBounds(Vec3* lo, Vec3* hi)
 {
     if (subtreeDirty)
         UpdateSubtreeBounds();
-    float e[3][3];
-    DiagonalMatrix(e, subtreeBoundsB.x, subtreeBoundsB.y, subtreeBoundsB.z);
+    Vec3 axisX(subtreeBoundsB.x, 0.0f, 0.0f);
+    Vec3 axisY(0.0f, subtreeBoundsB.y, 0.0f);
+    Vec3 axisZ(0.0f, 0.0f, subtreeBoundsB.z);
     UpdateWorldMatrix();
     Vec3 c = subtreeBoundsA;
-    Vec3 w;
-    w.x = c.x * worldMatrix._11 + (c.y * worldMatrix._21 + c.z * worldMatrix._31) + worldMatrix._41;
-    w.y = c.x * worldMatrix._12 + (c.y * worldMatrix._22 + c.z * worldMatrix._32) + worldMatrix._42;
-    w.z = c.x * worldMatrix._13 + (c.y * worldMatrix._23 + c.z * worldMatrix._33) + worldMatrix._43;
+    Vec3 w(c.x * worldMatrix._11 + (c.y * worldMatrix._21 + c.z * worldMatrix._31) + worldMatrix._41,
+           c.x * worldMatrix._12 + (c.y * worldMatrix._22 + c.z * worldMatrix._32) + worldMatrix._42,
+           c.x * worldMatrix._13 + (c.y * worldMatrix._23 + c.z * worldMatrix._33) + worldMatrix._43);
     float a[3][3];
-    a[0][0] = e[0][0] * worldMatrix._11;
-    a[0][1] = e[0][0] * worldMatrix._12;
-    a[0][2] = e[0][0] * worldMatrix._13;
-    a[1][0] = e[1][1] * worldMatrix._21;
-    a[1][1] = e[1][1] * worldMatrix._22;
-    a[1][2] = e[1][1] * worldMatrix._23;
-    a[2][0] = e[2][2] * worldMatrix._31;
-    a[2][1] = e[2][2] * worldMatrix._32;
-    a[2][2] = e[2][2] * worldMatrix._33;
+    a[0][0] = axisX.x * worldMatrix._11;
+    a[0][1] = axisX.x * worldMatrix._12;
+    a[0][2] = axisX.x * worldMatrix._13;
+    a[1][0] = axisY.y * worldMatrix._21;
+    a[1][1] = axisY.y * worldMatrix._22;
+    a[1][2] = axisY.y * worldMatrix._23;
+    a[2][0] = axisZ.z * worldMatrix._31;
+    a[2][1] = axisZ.z * worldMatrix._32;
+    a[2][2] = axisZ.z * worldMatrix._33;
     Vec3 ext;
-    ext.x = AbsValue(a[0][0]) + AbsValue(a[1][0]) + AbsValue(a[2][0]);
-    ext.y = AbsValue(a[0][1]) + AbsValue(a[1][1]) + AbsValue(a[2][1]);
-    ext.z = AbsValue(a[0][2]) + AbsValue(a[1][2]) + AbsValue(a[2][2]);
+    float x0 = AbsValue(a[0][0]);
+    float x1 = AbsValue(a[1][0]);
+    float x2 = AbsValue(a[2][0]);
+    ext.x = x0 + x1 + x2;
+    float y0 = AbsValue(a[0][1]);
+    float y1 = AbsValue(a[1][1]);
+    float y2 = AbsValue(a[2][1]);
+    ext.y = y0 + y1 + y2;
+    float z0 = AbsValue(a[0][2]);
+    float z1 = AbsValue(a[1][2]);
+    float z2 = AbsValue(a[2][2]);
+    ext.z = z0 + z1 + z2;
     lo->x = w.x - ext.x;
     lo->y = w.y - ext.y;
     lo->z = w.z - ext.z;
