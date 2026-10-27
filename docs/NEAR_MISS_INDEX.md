@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 116, c 92, total 210. The three class (a) functions of the
+Counts: a 2, b 115, c 92, total 209. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -47,6 +47,11 @@ touching block lets the respawn block's `placedForward`/`placedUp` pair with
 `mergedArm`/`mergedVelocity` and frees `placedPosition` for the integration
 temporary. When only displacement sizes differ, read the
 `/FAs` symbol table for which sibling-block locals share a slot.
+SoultreeObject::GetWorldBounds `0x004fe8a0` (class b, 606/618) is exact too, in
+soultree.cpp: the centre's x row written flat (`c.x * _11 + c.y * _21 + c.z * _31 + _41`)
+with the y and z rows still grouping their last two products moves `pop esi` before the
+a[2][2] store. Grouping all three rows alike had been tried; a per-row sweep of the
+twelve sum shapes (orders x groupings) found it.
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
@@ -132,7 +137,6 @@ temporary. When only displacement sizes differ, read the
 | physics/contact/ContactImpulse | `0x005004a0` | 940/1062 | b | size and frame 0x60 exact (torque blocks at function scope, `(y*y') + x*x'`, torque B and uB via parenthesised Vec3-constructor crosses); temporaries in other frame slots; torque cross loads r before n (leaf age; n aliases inert), one tail mov/push schedule |
 | physics/helpers/GraphicsTest | `0x0047bd10` | 818/917 | b | DrawCircle: frame 0xb84 vs 0xb78, the `[eax - 4]` store and the centre-sum operand order; a `Vec3* p = &points[i]` local gave +4 |
 | physics/helpers/SoultreeBounds | `0x004fd340` | 618/630 | c | rows _11.._13 written k = 1,3,2,4 and _14 k = 3,1,2,4; the s13 product of _11.._14 loads its operands the other way (retail m3j first) and two _44 products differ (samples/physics/helpers/SoultreeBounds.cpp) |
-| physics/helpers/SoultreeBounds | `0x004fe8a0` | 606/618 | b | pop esi scheduled four instructions late (retail: before the a[2][2] store) |
 | physics/helpers/SoultreeMatrix | `0x004fb8c0` | 262/1096 | b | 13 code diffs: `mov ecx, [esp + N] ; mov edx, [esp + N]~` vs `lea ecx, [esp + N] ; push ecx`; `fld [esp + N] ; mov [esp + N], ecx ; le~` vs `call A`; slot order differs |
 | physics/helpers/SoultreeMatrix | `0x004fc050` | 1137/1171 | b | same instructions, order and length (bracketed products in the inline cross); three 12-byte slots ordered temporaries, pos, r where retail has r (shared with the delta copy), temporaries, pos; dropping the z/y/x block gives the r/d sharing but demotes z (1093) |
 | physics/helpers/SoultreeTransform | `0x004fd710` | 203/205 (masked) | c | FPU operand order: one `fld/fmul` pair loads the other operand first (2 bytes) ; x-row, transpose-order, y/z-order and ~10k structural forms (constructor return, reference plus copy, pointer/by-value matrix, out pointer, Swap helper, inline transpose) do not move `v.x * m._11` |

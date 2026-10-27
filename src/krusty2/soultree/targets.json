@@ -972,6 +972,16 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
+    "candidate_symbol_contains": "?GetWorldBounds@SoultreeObject@@QAEXPAUVec3@@0@Z",
+    "target_va": "0x004fe8a0",
+    "target_size": 618,
+    "expect": "exact",
+    "notes": "strict exact (was 606/618 in samples/physics/helpers/SoultreeBounds.cpp): the x row of the centre written flat, the y and z rows with their last two products grouped, place retail's pop esi before the a[2][2] store",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
     "candidate_symbol_contains": "?CloneFrom@SoultreeObject@@UAEXPAV1@@Z",
     "target_va": "0x004feb10",
     "target_size": 24,

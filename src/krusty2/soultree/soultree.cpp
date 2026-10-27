@@ -16,7 +16,7 @@
 // Every function below is strict exact. Near misses of the same unit (WorldToLocalDirection
 // 0x004fd710, SetMatrixIn 0x004fb8c0 with the transpose COMDAT 0x004fefb0, SetAxesIn 0x004fc050)
 // are in samples/physics/helpers/.
-// Scale 0x004fd340 (inline 4x4 product) and GetWorldBounds 0x004fe8a0 are near misses in
+// Scale 0x004fd340 (inline 4x4 product) is a near miss in
 // samples/physics/helpers/SoultreeBounds.cpp.
 #define SOULTREE_OBJECT_WITH_BASES
 #include <math.h>
@@ -981,6 +981,55 @@ void SoultreeObject::GetSubtreeBounds(Vec3* center, Vec3* extents)
         UpdateSubtreeBounds();
     *center = subtreeBoundsA;
     *extents = subtreeBoundsB;
+}
+
+// 0x004fe8a0. World-space box of the subtree: the centre through the world matrix, the half
+// extents as the sum of |axis| for the diagonal half-extent axes times its 3x3. The Math3D Vec3
+// axis locals (zero stores dead) give retail's frame (c, axes, w, a); w through the Vec3
+// constructor makes VC6 consume w in the hi adds and pop ext at the end; the nine |a| terms as
+// float locals avoid the fxch pairs of plain sums; the x row of w written flat and the y and z
+// rows with their last two products grouped place retail's pop esi.
+void SoultreeObject::GetWorldBounds(Vec3* lo, Vec3* hi)
+{
+    if (subtreeDirty)
+        UpdateSubtreeBounds();
+    Vec3 axisX(subtreeBoundsB.x, 0.0f, 0.0f);
+    Vec3 axisY(0.0f, subtreeBoundsB.y, 0.0f);
+    Vec3 axisZ(0.0f, 0.0f, subtreeBoundsB.z);
+    UpdateWorldMatrix();
+    Vec3 c = subtreeBoundsA;
+    Vec3 w(c.x * worldMatrix._11 + c.y * worldMatrix._21 + c.z * worldMatrix._31 + worldMatrix._41,
+           c.x * worldMatrix._12 + (c.y * worldMatrix._22 + c.z * worldMatrix._32) + worldMatrix._42,
+           c.x * worldMatrix._13 + (c.y * worldMatrix._23 + c.z * worldMatrix._33) + worldMatrix._43);
+    float a[3][3];
+    a[0][0] = axisX.x * worldMatrix._11;
+    a[0][1] = axisX.x * worldMatrix._12;
+    a[0][2] = axisX.x * worldMatrix._13;
+    a[1][0] = axisY.y * worldMatrix._21;
+    a[1][1] = axisY.y * worldMatrix._22;
+    a[1][2] = axisY.y * worldMatrix._23;
+    a[2][0] = axisZ.z * worldMatrix._31;
+    a[2][1] = axisZ.z * worldMatrix._32;
+    a[2][2] = axisZ.z * worldMatrix._33;
+    Vec3 ext;
+    float x0 = AbsValue(a[0][0]);
+    float x1 = AbsValue(a[1][0]);
+    float x2 = AbsValue(a[2][0]);
+    ext.x = x0 + x1 + x2;
+    float y0 = AbsValue(a[0][1]);
+    float y1 = AbsValue(a[1][1]);
+    float y2 = AbsValue(a[2][1]);
+    ext.y = y0 + y1 + y2;
+    float z0 = AbsValue(a[0][2]);
+    float z1 = AbsValue(a[1][2]);
+    float z2 = AbsValue(a[2][2]);
+    ext.z = z0 + z1 + z2;
+    lo->x = w.x - ext.x;
+    lo->y = w.y - ext.y;
+    lo->z = w.z - ext.z;
+    hi->x = ext.x + w.x;
+    hi->y = ext.y + w.y;
+    hi->z = ext.z + w.z;
 }
 
 // 0x004feb10. Slot 7: makes this node a parentless copy of src's subtree.

@@ -1,5 +1,4 @@
 {
-  "?GetWorldBounds@SoultreeObject@@QAEXPAUVec3@@0@Z": "0x004fe8a0",
   "?InvalidateWorldMatrix@SoultreeObject@@QAEXXZ": "0x004fb850",
   "?Scale@SoultreeObject@@QAEXMMM@Z": "0x004fd340",
   "?UpdateSubtreeBounds@SoultreeObject@@QAEXXZ": "0x004fe0f0",
