@@ -125,7 +125,8 @@
 //
 // The game reads (race kind, tree collision, object root, difficulty, race mode) go
 // through the complete TrackGame class, with no view cast: aligned 3731 of 3966, frame
-// 0x968 vs 0x93c (the cast views gave 3402).  The read's member-path depth moves the
+// 0x968 vs 0x93c (the cast views gave 3402); 3740 with dir2's double cross in the
+// BikeAICrossCtor form.  The read's member-path depth moves the
 // inline switch-over although the global loads are identical: a flat member of a plain
 // struct pointer gives 3760, a one-level nested member 3402 (frame 0x978), the complete
 // two-level TrackGame path 3731 (the 0x00410d00 `aim = fwd +- right` site inlines one more
@@ -906,6 +907,14 @@ int QuerySegmentObstacles(Vec3* seg, float radius, int skipVegetation, int ignor
 }
 
 
+// dir2's double cross in the Vec3(x, y, z) constructor form with every product
+// parenthesised (provisional spelling): 1479 strict and aligned 3740 against 1432/3731
+// for Math3D CrossProduct at both levels; either level alone gives 1472/3665.
+static inline Vec3 BikeAICrossCtor(const Vec3& a, const Vec3& b)
+{
+    return Vec3((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
+}
+
 // ---------------------------------------------------------------------------
 // 0x0040eca0.
 // ---------------------------------------------------------------------------
@@ -1097,7 +1106,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
             right = rearCross;
             if (right.x != 0.0f || right.y != 0.0f || right.z != 0.0f)
                 right = SafeNormalize(right);
-            dir2 = CrossProduct(CrossProduct(dir2, normalF), normalF);
+            dir2 = BikeAICrossCtor(BikeAICrossCtor(dir2, normalF), normalF);
             if (dir2.x != 0.0f || dir2.y != 0.0f || dir2.z != 0.0f)
                 dir2 = SafeNormalize(dir2);
             float speedF = BikeAILengthCall(vF);

@@ -36,7 +36,7 @@
     "target_va": "0x0040eca0",
     "target_size": 17585,
     "expect": "partial",
-    "notes": "two-wheel look-ahead simulation, fully reconstructed with natural Math3D operators (VC6's inline budget reproduces retail's inline/constructor-call/operator-call switch-over); 1218/17585 strict, 3402 aligned instructions since the reads go through casts of the shared g_TrackGame (any type-changing cast of it here moves the frame; a pointer declared with the view type gave 1561 strict, 3760 aligned); the loop's right cross is built in a named copy; the int/K initialisations precede the dt clamp (retail schedules their stores into the clamp's compare); frame 0x95c vs 0x93c, see the file header.",
+    "notes": "two-wheel look-ahead simulation, fully reconstructed with natural Math3D operators (VC6's inline budget reproduces retail's inline/constructor-call/operator-call switch-over); 1479/17585 strict, 3740 of 3966 aligned instructions (candidate 17384 bytes); the game reads go through the complete TrackGame with no cast (casts of the shared g_TrackGame gave 1218/3402, a pointer declared with the view type 1561/3760); dir2's double cross is the parenthesised Vec3-constructor helper BikeAICrossCtor (1432/3731 with Math3D CrossProduct, 1472/3665 at one level only); the loop's right cross is built in a named copy; the int/K initialisations precede the dt clamp (retail schedules their stores into the clamp's compare); frame 0x95c vs 0x93c, see the file header.",
     "bindings": "BikeAINearMisses.bindings.json"
   },
   {
