@@ -616,7 +616,8 @@ trying on other `[base+index]` / `add r, r` order near misses.
 - A transformed point goes the other way. CollisionObject::GetWorldBounds `0x436100`
   emits the z, y, x products either way. Only the one-expression form
   `r.x = v.x*m00 + v.y*m10 + v.z*m20 + m30` lets VC6 group the unrelated integer zero
-  stores and the `pop edi/esi` where retail has them (727 -> 798 of 804).
+  stores and the `pop edi/esi` where retail has them (727 -> 798 of 804; the Vec3 row
+  assignments below made it exact).
   `r.x = v.z*m20; r.x += ...` scatters them. The same holds for a call's argument push:
   SoultreeObject::RotateAboutPoint `0x4fd1f0` became exact (302 -> 334) once its first
   point transform was written `x*m1j + (z*m3j + y*m2j) + m4j` per row instead of
@@ -1134,4 +1135,8 @@ try on similar code. None is a rule.
   x and z each other's register. `Vec3 zero; zero = Vec3(0.0f, 0.0f, 0.0f);` (the inline
   constructor, then the inline assignment) gives retail's x edi, y edx, z ebx. The
   initialised `Vec3 zero(0.0f, 0.0f, 0.0f)` keeps the old allocation, and the one-argument
-  splat constructor is worse.
+  splat constructor is worse. The same form fixed the frame of CollisionObject
+  GetWorldBounds (`0x00436100`, 798 to 804 of 804): its diag(half) rows written
+  `rows[0] = Vec3(h->x, 0.0f, 0.0f)` (rows a `Vec3*` view of `float hm[3][3]`) give
+  retail's zero temporary slots where element-wise stores swap two of them. Inside an
+  inline helper the same assignments emit a longer body (861 bytes).

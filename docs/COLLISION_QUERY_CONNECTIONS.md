@@ -79,7 +79,7 @@ relocations** are preserved under the same substitutions.
 This connects supplied implementations; it does not complete the collision
 subsystem or the game link.
 
-`tests/test_collision_query_connections.py` checks **193 strict cases**, **31
+`tests/test_collision_query_connections.py` checks **195 strict cases**, **29
 complete partial fingerprints**, all eleven providers and the 36 retail direct
 call boundaries. The sample aggregate's included production bodies are checked
 as separate emitted functions. Partial fingerprints come from the published

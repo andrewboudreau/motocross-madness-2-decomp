@@ -43,7 +43,7 @@ without asserting equivalence of surrounding game classes.
 
 `tests/test_vector_constructors.py` pins the private retail image, checks the
 complete decoded extent and padding, compiles the actual sources with VC6 SP3,
-and verifies **355 strict comparisons**. It also preserves **28 complete
+and verifies **356 strict comparisons**. It also preserves **27 complete
 resolved partial-body fingerprints**, including candidate sizes and matching
 positions; these partial functions are not claimed as retail matches.
 

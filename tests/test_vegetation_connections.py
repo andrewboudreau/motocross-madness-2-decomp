@@ -119,6 +119,6 @@ class VegetationConnectionsTests(unittest.TestCase):
             self.assertEqual(r.returncode,0,r.stdout+r.stderr)
             r=subprocess.run([str(exeout)],capture_output=True,text=True,timeout=45);self.assertEqual(r.returncode,0,r.stdout+r.stderr)
             self.assertEqual(r.stdout.strip(),'Vegetation getters: 65807 cases, 15 independent read AV')
-        self.assertEqual(strict,119)
+        self.assertEqual(strict,120)
         print('%d strict; four complete objects; ten joined loads/calls; %s'%(strict,r.stdout.strip()))
 if __name__=='__main__':unittest.main()

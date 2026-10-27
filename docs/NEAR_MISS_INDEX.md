@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 119, c 90, total 211. The three class (a) functions of the
+Counts: a 2, b 119, c 89, total 210. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -86,7 +86,6 @@ temporary. When only displacement sizes differ, read the
 | krusty2/broadphase/Terrain | `0x00507c10` | 71/2731 (masked) | b | out of reach under the rules: retail inlines an `__asm` float-to-int helper (`fld [ebp-0x30] ; mov eax, [ebp-0x2c] ; fistp dword ptr [eax]`), which forces the EBP frame; candidate 3225 B vs 2963 B |
 | krusty2/broadphase/Terrain | `0x005059d0` | 894/2116 | c | TRN loader, 28 differing instructions (2117 B): VC6 caches 3 in ebx where retail caches -1 after the palette branch (about 80 forms tried, dead end); the ownedObjects slot pointer is set before the loop guard; one colour-key move order |
 | krusty2/collision/CollisionObject | `0x00432260` | 441/458 | b | 2 code diffs: retail adds `mov [esp + N], eax`; retail lacks `mov [esp + N], eax`; slots differ |
-| krusty2/collision/CollisionObject | `0x00436100` | 798/804 | c | same instructions and order; two of the diagonal's zero temporaries trade stack slots (0x3c/0x40); helper text, statement order and signature forms recorded at the target |
 | krusty2/collision/CollisionObject | `0x00436720` | 936/962 | c | same size, frame and registers; the scratch loop's rows are grouped (x + z first) to match; the second forward rotation's x row still sums x, z, y where retail sums z, y, x (no term order or grouping of that row, nor an xf/direct/local-pointer matrix source, fixes it without breaking the loop) |
 | krusty2/collision/CollisionObject | `0x00436af0` | 809/852 | c | same size, frame and registers; the zero-vector and contactCount stores are scheduled into the neighbouring rotation/call setup in another order |
 | krusty2/collision/CollisionObject | `0x00436e50` | 2109/2205 | b | HullVsModel: same instructions as retail; the x87 tail of the inlined product (rel._43/_44) is scheduled after the first SweptBoxOverlap pushes |

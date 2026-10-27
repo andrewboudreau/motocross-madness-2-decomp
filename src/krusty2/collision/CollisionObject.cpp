@@ -2209,13 +2209,6 @@ int CollisionObject::HullVsModel(CollisionHullBody* a, CollisionModelBody* b, Co
     return 0;
 }
 
-inline void CollisionDiagonal(float d[3][3], float x, float y, float z)
-{
-    d[0][0] = x; d[0][1] = 0.0f; d[0][2] = 0.0f;
-    d[1][0] = 0.0f; d[1][1] = y; d[1][2] = 0.0f;
-    d[2][0] = 0.0f; d[2][1] = 0.0f; d[2][2] = z;
-}
-
 // r = d * M (upper 3x3), fully unrolled.
 inline void CollisionMul3x3(float r[3][3], const float d[3][3], const Matrix4& m)
 {
@@ -2240,7 +2233,8 @@ inline void CollisionMul3x3(float r[3][3], const float d[3][3], const Matrix4& m
 // by M fully unrolled.  The center is one sum per component written x, y, z, translation
 // (CollisionTransformPoint); VC6 emits the z product first.  Accumulating it one term per
 // statement gives the same products but schedules the diagonal's zero stores and the pop
-// edi/esi pair elsewhere (727).  798/804: two of the zero temporaries trade stack slots.
+// edi/esi pair elsewhere (727).  Element-wise diagonal stores trade two of the zero
+// temporaries' stack slots (798/804); Vec3 row assignments give retail's slots.
 void CollisionObject::GetWorldBounds(CollisionVec3* outMin, CollisionVec3* outMax)
 {
     Matrix4 m;
@@ -2269,8 +2263,13 @@ void CollisionObject::GetWorldBounds(CollisionVec3* outMin, CollisionVec3* outMa
         break;
     }
     }
+    // diag(half), each row assigned from a Math3D Vec3 temporary (in a helper VC6 emits
+    // a longer body).
     float hm[3][3];
-    CollisionDiagonal(hm, h->x, h->y, h->z);
+    Vec3* rows = reinterpret_cast<Vec3*>(hm);
+    rows[0] = Vec3(h->x, 0.0f, 0.0f);
+    rows[1] = Vec3(0.0f, h->y, 0.0f);
+    rows[2] = Vec3(0.0f, 0.0f, h->z);
     CollisionVec3 center = CollisionTransformPoint(*c, &m);
     float r[3][3];
     CollisionMul3x3(r, hm, m);

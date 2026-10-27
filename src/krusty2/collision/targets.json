@@ -375,8 +375,8 @@
     "candidate_symbol_contains": "GetWorldBounds",
     "target_va": "0x00436100",
     "target_size": 804,
-    "expect": "partial",
-    "notes": "798/804: Arvo transformed AABB via diag(half) x M unrolled, same size/frame. Session 14: CollisionTransformPoint written as one sum per component in x, y, z, translation order (VC6 emits the z product first; y, z, x also works) places the zero stores and the pop edi/esi pair as retail (727 -> 798); the accumulate-per-statement form, partial sums and bracketed sums do not. Left: the zero temporaries at 0x3c and 0x40 are swapped. Not moved by: zero store order in CollisionDiagonal (zeros first, columns, chained), int zeros, a vector or pointer parameter (658), Mul3x3 product order, operand order or bracketing (162-798), r before hm, hm at function scope, the center before the diagonal (580), inline case casts (761), an ext vector or the c/h declaration order.",
+    "expect": "exact",
+    "notes": "Strict exact. Arvo transformed AABB via diag(half) x M unrolled. CollisionTransformPoint is one sum per component in x, y, z, translation order (VC6 emits the z product first), which places the zero stores and the pop edi/esi pair as retail (727 -> 798). The diagonal rows are assigned from Math3D Vec3 temporaries in the body (`rows[0] = Vec3(h->x, 0.0f, 0.0f)`), which gives retail's zero temporary slots (798 -> 804); element-wise stores in any order, int zeros, vector or pointer parameters and the same row assignments inside an inline helper (861 bytes) do not.",
     "bindings": "CollisionObject.bindings.json"
   },
   {

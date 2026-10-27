@@ -75,7 +75,7 @@ exclusions. Portable retained pins normalize only the four explicitly listed
 complete source filename prefixes. Both EcoSystem objects need no applicable
 symbol mapping.
 
-The retained test passes **119 full strict comparisons**, including the full
+The retained test passes **120 full strict comparisons**, including the full
 1,102-byte QueryCollisions caller, both primary constructors, placement and
 global lifecycle producers, both getters and the actual radius helper. Three
 of these checks independently compare the exact source-extracted native
