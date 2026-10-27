@@ -840,22 +840,31 @@ void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* attachment)
 }
 
 // ---- slot 4 / slot 46 ----
+// Cross product in the Vec3(x, y, z) constructor form with every product parenthesised
+// (provisional spelling; the grouping, not the operand order, sets VC6's product loads).
+static inline Vec3 VehCrossCtor(const Vec3& a, const Vec3& b)
+{
+    return Vec3((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
+}
+
 // Slot 4: builds each body's velocity at its contact arm (velA + worldAngVelA x armA, likewise
 // for B), each scaled by `scale`, and hands them with the frame data to ContactSolveImpulse
 // 0x5004a0.  Afterwards it caches |*velA| in linearSpeed and worldAngularVelocity = the frame
 // transform of angularVelocity (tier 3).  The offsets are Math3D operator
-// expressions (retail stores each sum and product through its own temporary).  Left: two
-// products of each cross load a before b, and VC6 evaluates the inertia ?: argument ahead of
-// the pushes where retail branches between them (spellings of the ?: measured identical).
+// expressions (retail stores each sum and product through its own temporary); the crosses
+// go through VehCrossCtor, which gives retail's product loads (381 -> 405/555 strict).
+// Left: VC6 evaluates the inertia ?: argument ahead of the pushes where retail tests first
+// and branches between them (ternary, lvalue, inline-helper and if/else-local spellings
+// measured identical or worse), and the A-offset sum's y/z temporaries sit 0xc lower.
 void Vehicle::UnknownVirtualSlot4(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
                                   const Vec3* armA, int eventKind, float invMassB, int nodeB,
                                   const Vec3* velB, const Vec3* worldAngVelB, const Vec3* armB,
                                   Vec3* invInertiaB, Vec3* angVelB, int velBOrNull,
                                   float* impulseOut, float scale)
 {
-    scratchVector = CrossProduct(*worldAngVelA, *armA);
+    scratchVector = VehCrossCtor(*worldAngVelA, *armA);
     Vec3 pointVelA = (*velA + scratchVector) * scale;
-    scratchVector = CrossProduct(*worldAngVelB, *armB);
+    scratchVector = VehCrossCtor(*worldAngVelB, *armB);
     Vec3 pointVelB = (scratchVector + *velB) * scale;
     ContactSolveImpulse(restitution, normal, invMass, modelNode, &pointVelA, armA,
                         crashState ? &shapeInvInertia : &invInertia, &angularVelocity, velA, invMassB,

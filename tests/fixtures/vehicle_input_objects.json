@@ -3,7 +3,7 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "21ae827d3a6cd6f63a79d9bddde057d2b3c8b76248e11d846419a6daccff89c7"
+      "sha256": "1b09ca6460e73a6a5d9fb8092097bf349ffc1687fb563f1f8ce6570736f8aa21"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
@@ -1739,7 +1739,7 @@
       "va": "0x5265d0",
       "extent": 555,
       "candidate": 555,
-      "matching": 381
+      "matching": 405
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",

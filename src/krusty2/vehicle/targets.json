@@ -606,7 +606,7 @@
     "target_va": "0x5265d0",
     "target_size": 555,
     "expect": "partial",
-    "notes": "381/555 strict, same size, instruction ratio 0.82. Two lever-arm offsets (*a1 + a2xa3, a8xa9 + *a7) * a14 through Math3D operators into helper 0x5004a0, then |a1| (z term last) -> field_0xbc, field_0xcc = xform(field_0xd8). Left: two products in each cross load a before b; VC6 hoists the crashState ?: argument above the pushes where retail branches between them.",
+    "notes": "405/555 strict, same size. Two lever-arm offsets (*a1 + a2xa3, a8xa9 + *a7) * a14 through Math3D operators into helper 0x5004a0, then |a1| (z term last) -> field_0xbc, field_0xcc = xform(field_0xd8). Both crosses through the fully parenthesised Vec3-constructor VehCrossCtor give retail's product loads (381 -> 405; Math3D CrossProduct and member-store forms load a before b). Left: VC6 hoists the crashState ?: argument above the pushes where retail tests first and branches between them (negated, != 0, lvalue, cast, inline-helper and if/else-local spellings identical; a pointer local defaulted then overridden 408, a ternary local 313), and the A offset's y/z sum temporaries sit 0xc lower.",
     "bindings": "Vehicle.bindings.json"
   },
   {
