@@ -74,8 +74,12 @@ static inline CollisionVec3 TireNormalizeZ(const CollisionVec3& v)
 // Both axes are normalised (skipped when |v|^2 is exactly 1).  When `orthogonalize` is set
 // the vectors are first made perpendicular using c = y x z:
 //   keepZ != 0 : y = z x c  (z is kept)      keepZ == 0 : z = c x y  (y is kept).
-// Near miss (695 of 703): retail loads z.z and z.y before y.x in c.y's and c.z's
-// y.x products.  Inert or worse (session 14): operand order and grouping of each
+// Near miss (699 of 703): c built as a Math3D Vec3 temporary loads z first in the two
+// y.x products like retail (695 -> 699), but c.x's second and c.y's first products now
+// load y.z before z.y/z.x where retail loads z first; the Vec3 form's 64 operand orders
+// and groupings are inert apart from c.x's first-product bracket.
+// Earlier member-wise c (695), where retail loads z.z and z.y before y.x in c.y's and
+// c.z's y.x products.  Inert or worse (session 14): operand order and grouping of each
 // product, negated c.y, declaring y and z apart from their copies (either order),
 // member-wise copies of y and z (53-55 slot lines), and a cross helper taking y and z
 // by reference, pointer or value in either order (y then loads first everywhere).
@@ -92,10 +96,9 @@ void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const Colli
     CollisionVec3 y = *yAxis;
 
     if (orthogonalize) {
-        CollisionVec3 c;
-        c.x = (y.y * z.z) - y.z * z.y;   // grouped: retail tests keepZ after the second product
-        c.y = y.z * z.x - y.x * z.z;
-        c.z = y.x * z.y - y.y * z.x;
+        // c = y x z as a Math3D Vec3 temporary; the first product is grouped: retail tests
+        // keepZ after the second product.
+        Vec3 c((y.y * z.z) - y.z * z.y, y.z * z.x - y.x * z.z, y.x * z.y - y.y * z.x);
         CollisionVec3 perpendicular;
         if (keepZ) {
             perpendicular.x = c.z * z.y - c.y * z.z;
