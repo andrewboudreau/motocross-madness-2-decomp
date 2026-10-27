@@ -14,7 +14,7 @@ public:
     virtual ~PCControlInterface();         // 0x004bf600 (deleting wrapper 0x004bf220)
     virtual int CreateDevices();           // 0x004bf240
     virtual int IsControlDown(int control, int modifier);                             // 0x004bf560
-    // 0x004bf4f0, near miss in samples/control
+    // 0x004bf4f0
     virtual int IsDeviceButtonDown(int control, int kind, int modifier, int device);
     virtual int ModifierHolds(int modifier);                                          // 0x004bf5e0
 

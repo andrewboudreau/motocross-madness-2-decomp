@@ -1,4 +1,4 @@
-"""Whole per-device dispatcher with virtual-boundary and real input-helper proof."""
+"""Strict per-device dispatcher with virtual-boundary and real input-helper proof."""
 import os
 from pathlib import Path
 import struct
@@ -67,19 +67,6 @@ class DeviceButtonQueryTests(unittest.TestCase):
                     cwd=ROOT,capture_output=True,text=True,encoding='latin1',env={**os.environ,'PYTHONPATH':str(ROOT)})
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)
                 return obj,CoffObject(obj)
-            candidate_path,candidate=compile_source(ROOT/'samples/control/DeviceButtonQuery.cpp','candidate')
-            fixture_path,_=compile_source(ROOT/'tests/fixtures/device_button_query_compare.cpp','fixture',True)
-            self.assertEqual(candidate.symbol_extent(candidate.find_symbol(SYMBOL))[1],124)
-            self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number>0 and s.type==0x20},{SYMBOL})
-            self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0},set())
-            self.assertFalse(any(s.name.startswith(('.CRT','.text$x','.xdata')) for s in candidate.sections))
-            bindings=ROOT/'samples/control/DeviceButtonQuery.bindings.json'
-            report=compare(image,candidate,SYMBOL,0x4bf4f0,104,bindings)
-            self.assertFalse(report['strict_exact'])
-            self.assertEqual(report['strict_match']['matching_positions'],43)
-            _,aggregate=compile_source(ROOT/'samples/control/ControlInterfaceNearMisses.cpp','aggregate')
-            self.assertEqual(aggregate.symbol_extent(aggregate.find_symbol(SYMBOL))[1],104)
-            self.assertEqual(compare(image,aggregate,SYMBOL,0x4bf4f0,104,bindings)['strict_match']['matching_positions'],76)
             def extract(text,signature):
                 start=text.index(signature)
                 end,depth=text.index('{',start)+1,1
@@ -87,6 +74,22 @@ class DeviceButtonQueryTests(unittest.TestCase):
                     depth+=(text[end]=='{')-(text[end]=='}')
                     end+=1
                 return text[start:end]
+            _,control=compile_source(ROOT/'src/reconstructed/PCControl.cpp','control')
+            self.assertEqual(control.symbol_extent(control.find_symbol(SYMBOL))[1],104)
+            self.assertTrue(compare(image,control,SYMBOL,0x4bf4f0,104,ROOT/'src/reconstructed/PCControl.bindings.json')['strict_exact'])
+            table=control.find_symbol('??_7PCControlInterface@@6B@')
+            reloc=next(r for r in control.relocations if r.section_number==table.section_number and r.virtual_address==table.value+12)
+            self.assertEqual(control.symbol_by_index[reloc.symbol_index].name,SYMBOL)
+            # The native comparison links the canonical body alone, without the
+            # rest of PCControl.cpp (DirectInput creation and enumeration).
+            candidate_file=output/'candidate.cpp'
+            candidate_file.write_text('#include "PCControl.h"\n#include "JoystickDevice.h"\n#include "KeyboardDevice.h"\n#include "MouseDevice.h"\n'
+                +extract((ROOT/'src/reconstructed/PCControl.cpp').read_text(),'int PCControlInterface::IsDeviceButtonDown(')+'\n')
+            candidate_path,candidate=compile_source(candidate_file,'candidate')
+            self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number>0 and s.type==0x20},{SYMBOL})
+            self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0},set())
+            self.assertFalse(any(s.name.startswith(('.CRT','.text$x','.xdata')) for s in candidate.sections))
+            fixture_path,_=compile_source(ROOT/'tests/fixtures/device_button_query_compare.cpp','fixture',True)
             helper_file=output/'helpers.cpp'
             helper_source='#include "PCKeyboardDevice.h"\n#include "PCMouseDevice.h"\n#include "JoystickDevice.h"\n#include "TrackGame.h"\n'
             providers=[('PCKeyboardDevice','ActualKeyboard',0x4c4570,110),
@@ -114,10 +117,6 @@ class DeviceButtonQueryTests(unittest.TestCase):
                 symbol='?ModifierHolds@KeyboardDevice@@QAEHH@Z'
                 self.assertEqual(obj.symbol_extent(obj.find_symbol(symbol))[1],139)
                 self.assertTrue(compare(image,obj,symbol,0x48a240,139,ROOT/'src/reconstructed/KeyboardDevice.bindings.json')['strict_exact'])
-            _,control=compile_source(ROOT/'src/reconstructed/PCControl.cpp','control')
-            table=control.find_symbol('??_7PCControlInterface@@6B@')
-            reloc=next(r for r in control.relocations if r.section_number==table.section_number and r.virtual_address==table.value+12)
-            self.assertEqual(control.symbol_by_index[reloc.symbol_index].name,SYMBOL)
             layout=output/'layout.cpp'
             layout.write_text('#include "PCControl.h"\n#include "PCKeyboardDevice.h"\n#include "PCMouseDevice.h"\n#include "JoystickDevice.h"\n#include <stddef.h>\n'
                 'typedef char ControlLayout[(offsetof(ControlInterface,keyboard)==0x34 && offsetof(ControlInterface,mouse)==0x30 && offsetof(ControlInterface,joysticks)==0x10 && sizeof(PCControlInterface)==0xcc8)?1:-1];\n'

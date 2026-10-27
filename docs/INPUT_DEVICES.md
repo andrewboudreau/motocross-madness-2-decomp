@@ -272,12 +272,10 @@ That one missing case shifted VC6's eax/ecx/edx rotation for the
 `lea r, [esp]` of each case, so VC6 cross-jumped the eax cases into the
 shared sprintf tail where retail cross-jumps the ecx ones.
 
-All are strict exact except the nonexact **slot 3** device query at
-`0x004bf4f0`. Its unchanged standalone candidate emits 124 bytes with 43
-matching positions against the complete 104-byte retail extent; the historical
-aggregate emits 104 bytes with 76 positions. The
-[functional review](DEVICE_BUTTON_QUERY.md#functional-build-review) preserves
-that distinction and uses the actual strict device-query/modifier helpers.
+All are strict exact, including the **slot 3** device query at `0x004bf4f0`
+(104 bytes with its switch table, in PCControl.cpp). Its
+[functional review](DEVICE_BUTTON_QUERY.md#functional-build-review) uses the
+actual strict device-query/modifier helpers.
 
 ## ContainerList.h
 

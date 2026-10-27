@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 120, c 92, total 214. The three class (a) functions of the
+Counts: a 2, b 120, c 91, total 213. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -58,7 +58,6 @@ temporary. When only displacement sizes differ, read the
 | camera/FollowCamera | `0x004650e0` | 519/1014 | b | frame 0x18c as retail (second cross product normalised straight from the call); retail keeps the first product's components in memory temporaries and reads them for the second; branch targets of the two `je` tests |
 | camera/FollowCamera | `0x00465c20` | 3659/3672 | b | 4 code diffs: retail adds `lea ecx, [esp + N]`; retail lacks `lea ecx, [esp + N]`; slots differ |
 | camera/KrustyBikeCamera | `0x00497e20` | 337/376 | c | 10 code diffs: `mov ecx, [A]` vs `mov edx, [A]`; retail lacks `lea eax, [esp + N] ; mov edx, [ecx + 0x~` |
-| control/ControlInterface | `0x004bf4f0` | 76/104 (inside ControlInterface.cpp) | c | tails merged as in retail; retail places the mouse pointer load after the shared block's `ret` and jumps back, VC6 places it after the keyboard load |
 | ecosystem/EcoSystem | `0x00456890` | 356/369 | c | 2 code diffs: retail lacks `fmul [eax + 0x5a8]`; retail adds `fmul [eax + 0x5a8]`; redundant parentheses on the differences, products and detail-band casts (225 combinations) do not move it |
 | ecosystem/EcoSystem | `0x004570a0` | 103/386 | b | retail keeps the definition-table entry in `edi` across the position conversions (`mov edi, [eax + ecx*4 + 0x58]`); register choice in the shape store blocks |
 | ecosystem/EcoSystem | `0x00457480` | 561/2629 (in the unit) | c | 3 code diffs: `mov edi, 1 ; mov [esi + 0x30], edi` vs `mov dword ptr [esi + 0x30], 1`; `mov [esp + N], edi` vs `mov dword ptr [esp + N], 1` (the constant 1 of `method = 1` / `i = 1` kept in `edi`); VC6 over-caches: two counted stores with `edi` already pushed for the string expansions, reproduced by a probe ([VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md)) |
@@ -286,8 +285,8 @@ compiled inside its unit (`#include "../../src/reconstructed/X.cpp"` at the
 top of the sample); the cause is not isolated, the differences show in tail
 merging, block placement and epilogue copies. Game `0x00467b70` (406 -> 761, now exact),
 Wrecker `0x005329e0` (763 -> 1200, with the unit's own vector operators
-instead of copies) and ControlInterface slot 3 `0x004bf4f0` (43 -> 76) are
-measured that way. Every other sample that did not include its unit was
+instead of copies) and PCControlInterface slot 3 `0x004bf4f0` (43 -> 76 inside
+ControlInterface.cpp, now exact in PCControl.cpp) were measured that way. Every other sample that did not include its unit was
 also compiled inside it (2026-10-12 scan, duplicate statics and helpers
 removed): no other function's bytes changed except PCAudio `0x004bc6b0` (now
 exact in PCAudio.cpp), EcoSystem `0x00457480` (its row is already measured in

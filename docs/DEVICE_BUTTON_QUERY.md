@@ -28,40 +28,29 @@ PCKeyboardDevice `0x00555f58` slot 5, PCMouseDevice `0x00555f78` slot 5,
 JoystickDevice `0x005541fc` slot 2 and PCJoystickDevice `0x00555ef8` slot 2.
 The canonical source vtables select the same existing query implementations.
 
-## Compilation context and preservation
+## Source and strict match
 
-The [standalone candidate](../samples/control/DeviceButtonQuery.cpp) contains
-only the unchanged readable switch body and header dependencies. It emits
-**124 bytes, 43 matching positions against the complete 104-byte retail body**
-under authentic VC6 SP3 `vc6_o2_mt`. It remains nonexact source in samples.
-Original translation-unit ownership is unproven.
+The body lives in canonical [PCControl.cpp](../src/reconstructed/PCControl.cpp)
+between `SetDevicesAcquired` (`0x004bf490`) and `IsControlDown` (`0x004bf560`),
+the gap its address occupies among that unit's other PCControlInterface
+methods; the placement is by address. Compiled there under authentic VC6 SP3
+`vc6_o2_mt`, it emits the complete **104-byte extent strictly exact** with
+resolved relocations, including the switch table. Every other function in
+PCControl.cpp keeps its bytes.
 
-The old ControlInterfaceNearMisses.cpp includes the complete canonical
-ControlInterface.cpp before this function. That compilation context emits
-**104 bytes, 76 matching positions**: keyboard/mouse tails share code, with
-different block placement from retail. The standalone keeps those tails
-separate. Its lower score is an explicit compilation-context difference;
-the C++ function body was not changed or replaced by a wrapper.
-
-The aggregate now includes the standalone source at the former body location.
-Private `work/control-query32/check_extraction.py` and `extraction-proof.json`
-compare against commit `b6655bd0`: **all 27 full function bodies and 35 nondebug
-COFF sections are preserved**, including bytes, characteristics and named
-relocation destinations/addends. Local compiler labels are normalized by
-section/offset. There is no filename or data exception. The aggregate is a
-historical validation context and must not be admitted to the functional build,
-since doing so would duplicate canonical definitions.
-
-The standalone contains one function and its switch data, has no unresolved
-imports and has no CRT initializer or EH section. Its only runtime dependencies
-are the selected device's virtual query implementation.
+Each case returns its own zero. A `break` to a shared `return 0` places the
+mouse load after the keyboard load (76 positions), where retail places it after
+the keyboard tail's `ret` and jumps back into the shared call. The keyboard
+and mouse calls share one tail only when the body is compiled inside
+PCControl.cpp; alone, with only the headers, the same source keeps both tails
+(108 bytes). The cause of that context difference is not isolated.
 
 ## Functional build review
 
-[The retained test](../tests/test_device_button_query_behavior.py) separately
-compiles the actual standalone, aggregate and private fixture with authentic
-VC6. It pins the retail SHA-256, checks the complete extent/table and both
-indirect call sites, and verifies the primary vtable identities and actual
+[The retained test](../tests/test_device_button_query_behavior.py) compiles
+PCControl.cpp and requires the strict match, then links the canonical body,
+extracted alone, with the private fixture under authentic VC6. It pins the
+retail SHA-256, checks the complete extent/table and both indirect call sites, and verifies the primary vtable identities and actual
 source layouts. Production contains no retail mapping or dispatch.
 
 **45,489 native source/reference scenarios pass.** The private reference body
@@ -111,10 +100,8 @@ real DirectInput polling, concurrent callbacks or working gameplay. No cleanup
 is invented for thrown callbacks or faults. The overall game still needs its
 remaining providers and runtime validation.
 
-The isolated real link in `work/game-build/build-w7963nyq` compiles all 226
-translation units and removes this one unresolved name: 342 to 341, with no
-new missing symbols. Source/header/configuration hashes bind that report to
-the reviewed composition. Linking, startup, menus and racing remain incomplete.
+The functional build compiles the body as part of PCControl.cpp; the former
+`samples/control` candidate and its aggregate were removed.
 
 ```powershell
 $env:PYTHONPATH='.'
