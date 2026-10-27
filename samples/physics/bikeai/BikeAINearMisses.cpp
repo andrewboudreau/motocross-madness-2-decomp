@@ -907,6 +907,15 @@ int QuerySegmentObstacles(Vec3* seg, float radius, int skipVegetation, int ignor
 }
 
 
+// Fn_00413200's rear look-ahead cross in the Vec3(x, y, z) constructor form with no
+// parentheses (provisional spelling): 2044 strict, aligned 1104 of 1120, against
+// 2026/1105 for Math3D CrossProduct; best of the 64 product groupings at each of the
+// function's four crosses, and no other site or combination gains.
+static inline Vec3 BikeAICrossPlain(const Vec3& a, const Vec3& b)
+{
+    return Vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+}
+
 // The wheel penetration dots with y + z grouped (provisional spelling): 1542 strict
 // against 1479 for Math3D DotProduct at both wheels (front alone 1481, rear alone 1540);
 // the grouping, not the parentheses on the products, moves the code, and `y + z + x`
@@ -1611,7 +1620,7 @@ inline void BikeAIClampUnit(float& v)
 // bike is then advanced by the look-ahead model 0x0040eca0 as two wheel points, and the
 // angular velocity, speed, suspension, wheel roll, crash test and orientation are derived
 // from the result.  Names tier 3.
-// Retail shapes reproduced (654 -> 2026 strict, candidate size 4114): the crash flag
+// Retail shapes reproduced (654 -> 2044 strict, candidate size 4114): the crash flag
 // +0x464 as a `?:` (retail `mov eax, 1` / `xor eax, eax` and one store), airborneOut as an
 // unsigned char (retail zero-extends it with `and ecx, 0xff` for slot 71), the travel
 // argument written as `-field_0x7f8` twice (retail keeps the negated value with `fst` and
@@ -1624,7 +1633,8 @@ inline void BikeAIClampUnit(float& v)
 // products name one operand as the member and one through the pointer: VC6 loads the
 // newer leaf first (docs/VC6_OPERAND_ORDER.md 1.2), which puts the first two cross
 // products in retail's operand order (2026; all-pointer or all-member forms 2023..2026
-// with fewer aligned instructions).
+// with fewer aligned instructions).  The rear look-ahead cross as BikeAICrossPlain
+// gives 2044.
 // Remaining: slot order (retail steps, impact, steerDiff, airborneOut, lean, steer, start,
 // b from esp; ours puts lean first and `a` at the top, where its slot 11 address needs a
 // disp32, 6 bytes early; tools/frame_layout.py finds no use-count change for it), the
@@ -1747,7 +1757,7 @@ int KrustyBike::Fn_00413200(float dt)
                            - CrossProduct(*fwd, *up) * angularVelocity.x;
     Vec3* spin = &worldAngularVelocity;
     lookAheadFrontVelocity = CrossProduct(*spin, bodyForward) * 3.5f + velocity;
-    lookAheadRearVelocity = velocity - CrossProduct(worldAngularVelocity, *fwd) * 3.5f;
+    lookAheadRearVelocity = velocity - BikeAICrossPlain(worldAngularVelocity, *fwd) * 3.5f;
     unsigned char airborneOut = airborne;
     SimulateLookAhead(&steer, &lookAheadFrontVelocity, &lookAheadRearVelocity, &velocity, 0, &position,
                           &bodyForward, &bodyUp, dt, dt, race->raceTerrain, &airborneOut,
