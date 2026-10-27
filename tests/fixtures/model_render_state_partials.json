@@ -15,9 +15,9 @@
       "UnknownVirtualSlot13@SoultreePhysicsBaseObject",
       5250704,
       483,
-      487,
-      169,
-      "15920eaef57d2a361dea3f477a2de119ed1270aa995bf359a6c20206476f44ba"
+      483,
+      450,
+      "bfcea7c7313c376828c5cdbb8fad8bd46f49c9ac14e439780d86c6631165af86"
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",

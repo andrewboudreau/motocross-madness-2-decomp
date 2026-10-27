@@ -465,7 +465,22 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot7(const Vec3* force)
     }
 }
 
+// Dword-wise Vec3 copy: VC6 addresses a struct-assignment destination through a register
+// (lea) and folds memberwise float copies of a constant temporary; retail slot 13 keeps the
+// stack temporary and stores to [contact+disp] directly, which only this form reproduces.
+// The long-typed view is provisional (code shape, not a known original form).
+static inline void SoultreeCopyBits(Vec3& d, const Vec3& s)
+{
+    ((long*)&d)[0] = ((const long*)&s)[0];
+    ((long*)&d)[1] = ((const long*)&s)[1];
+    ((long*)&d)[2] = ((const long*)&s)[2];
+}
+
 // slot 13 (0x00501e90): per-contact response; accumulates into *force / *localTorque.
+// PARTIAL at full length: normalForceMagnitude = 0 is scheduled after the zero copy
+// (retail: between its second and third temporary loads, as in Vehicle 0x00527a20), and
+// the y and z cross terms that use leverArm.x load it before frictionForce (operand order,
+// a by-value, pointer, swapped-parameter or contact-member cross are inert or worse).
 void SoultreePhysicsBaseObject::UnknownVirtualSlot13(Vec3* force, Vec3* localTorque, float torqueScale)
 {
     if (!touchingPointCount)
@@ -483,16 +498,16 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot13(Vec3* force, Vec3* localTor
         contact->normalForceMagnitude = normalComponent;
         if (normalComponent >= 0.0f) {
             contact->normalForceMagnitude = 0.0f;
-            contact->normalForce = Vec3(0.0f, 0.0f, 0.0f);
+            SoultreeCopyBits(contact->normalForce, Vec3(0.0f, 0.0f, 0.0f));
         } else {
             contact->normalForceMagnitude = -normalComponent;
             Vec3 scaled;
-            contact->normalForce = *Vec3ScaleCall(&scaled, &contact->contactNormal, -normalComponent);
+            SoultreeCopyBits(contact->normalForce, *Vec3ScaleCall(&scaled, &contact->contactNormal, -normalComponent));
         }
         contact->UnknownVirtualSlot1();
         *force += contact->frictionForce;
         *localTorque += sceneNode->WorldToLocalDirection(
-            SoultreeCrossCtor(contact->leverArm, contact->frictionForce));
+            CrossProduct(contact->leverArm, contact->frictionForce));
         if (contact->contactState == 2) {
             *localTorque *= torqueScale;
             contact->contactState = 0;
