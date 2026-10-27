@@ -51,17 +51,6 @@ static inline float VecLength(const Vec3& v)
     return (float)sqrt(s);
 }
 
-// Cross product in the operand order the retail code uses: r.x = b.z * a.y - b.y * a.z
-// (the product with b comes first in every fmul; see slots 4 and 13).
-static inline Vec3 SoultreeCross(const Vec3& a, const Vec3& b)
-{
-    Vec3 r;
-    r.x = b.z * a.y - b.y * a.z;
-    r.y = b.x * a.z - b.z * a.x;
-    r.z = b.y * a.x - b.x * a.y;
-    return r;
-}
-
 // Dot product with the z term first, the shape the retail code uses.
 static inline float SoultreeDot(const Vec3& a, const Vec3& b)
 {
@@ -1391,8 +1380,11 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
 // body-space angular velocity gains I^-1 (arm x n) * j, scaled per axis by *angScale.
 // Slot 3 passes field_0x14c, field_0x24, field_0x08, &field_0xe4 (body-space inverse
 // inertia diagonal), &field_0xd8 and &field_0x64.
-// Matching levers (541/639, size exact): the denominator dot is SoultreeDot (retail sums
-// (x + y) + z), and `scaled` is assigned member-wise; the constructor form costs 4 bytes.
+// Matching levers (570/639, size exact): the denominator dot is SoultreeDot (retail sums
+// (x + y) + z), `scaled` is assigned member-wise (the constructor form costs 4 bytes), and
+// the axis is Math3D's CrossProduct.  Left: the axis cross loads the other operand first
+// in four products (written operand order is inert), and retail gives the WorldToLocal
+// result the lower frame slot and `scaled` the higher one.
 void ResolveContactImpulse(float restitution, float invMass, SoultreeObject* node, const Vec3* normal,
                const Vec3* relVel, const Vec3* arm, Vec3* invInertia, const Vec3* angScale,
                Vec3* angVel, Vec3* velocity, float* impulseOut, int scaleBits)
@@ -1402,7 +1394,7 @@ void ResolveContactImpulse(float restitution, float invMass, SoultreeObject* nod
     float scale = *(float*)&scaleBits;
     float approach = SoultreeDot(*relVel, *normal);
     if (approach < 0.0) {
-        Vec3 axis = SoultreeCross(*arm, *normal);
+        Vec3 axis = CrossProduct(*arm, *normal);
         Vec3 local = node->WorldToLocalDirection(axis);
         Vec3 scaled;
         scaled.x = local.x * invInertia->x;

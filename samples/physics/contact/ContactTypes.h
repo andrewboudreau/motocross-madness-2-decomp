@@ -18,7 +18,7 @@ struct ContactVec3 : public Vec3 {
 };
 
 // Cross product written the way the retail solver expands it: every fmul takes the
-// second operand first (same shape as SoultreeCross in SoulTreePhysics.cpp).
+// second operand first.
 static inline Vec3 ContactCross(const Vec3& a, const Vec3& b)
 {
     Vec3 r;
