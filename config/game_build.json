@@ -105,7 +105,7 @@
     {
       "path": "samples/physics/soultree_base/SoultreeDrag.cpp",
       "status": "reviewed-nonexact",
-      "reason": "Complete physics slot 6 corrects a demonstrated discarded-square-root bug and passes 78305 whole-state, actual FastSqrt, alias, floating-point-mode and progressive access-fault cases. The corrected body emits 440 bytes with 126 matching positions against 432 retail bytes, replacing a nonexact 432/287 candidate; all other aggregate sections remain unchanged. FP exceptions are masked in this finite comparison; integrated physics remains unverified.",
+      "reason": "Complete physics slot 6 corrects a demonstrated discarded-square-root bug and passes 78305 whole-state, actual FastSqrt, alias, floating-point-mode and progressive access-fault cases. The body emits 432 bytes with 426 matching positions against 432 retail bytes (the first correction emitted 440/126, replacing a nonexact 432/287 candidate); all other aggregate sections remain unchanged. FP exceptions are masked in this finite comparison; integrated physics remains unverified.",
       "evidence": "docs/SOULTREE_DRAG.md#functional-build-review"
     },
     {

@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 120, c 90, total 212. The three class (a) functions of the
+Counts: a 2, b 119, c 91, total 212. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -158,7 +158,7 @@ temporary. When only displacement sizes differ, read the
 | physics/shadow/TerrainShadow | `0x005097d0` | 121/486 | b | 6 code diffs: retail copies extent onto its own slot through edx on the `extentX <= extentZ` path (`mov edx, [esp + 0xc] ; mov [esp + 0xc], edx`) and reloads `shadow->texture` in eax/edx where the candidate keeps edx; frame and both matrix branches match |
 | physics/shadow/TerrainShadow | `0x00508bc0` | 1563/3087 | b | slot 27 footprint: frame and slots match (lensScale read once into a local); 48 differing instructions: mode 1 right/up copy scheduling, mode 2 cross-product store order, push order around ProjectVertices; the inline budget needs the per-mode accumulate/finish text repeated (macros) |
 | physics/shadow/TerrainShadow | `0x00509aa0` | 86/1548 (masked) | b | out of reach under the rules: retail converts clipped points with an inlined `__asm` fistp helper (`fld ; mov eax, [ptr] ; fistp dword ptr [eax]`), which forces its EBP frame; the candidate calls `__ftol` |
-| physics/soultree_base/SoultreePhysicsInlines | `0x0040b410` | 287/432 | b | 18 code diffs: `fld [edi + 0x1b0]` vs `fld [esi + 4]`; `fld [edi + 0x1b4]` vs `fld [esi + 8]`; slots differ |
+| physics/soultree_base/SoultreePhysicsInlines | `0x0040b410` | 426/432 | c | magnitude through a `scratchVector` reference and the `*speedBudget < charge` clamp give retail's loads and fcom; left: the scaled branch's budget `fsub` scheduled after the copy's z load (samples/physics/soultree_base/SoultreeDrag.cpp) |
 | physics/tire/Tire | `0x00513490` | 199/201 | c | 2 code diffs: `mov [ebp + N], ebx` vs `mov [ebp + N], edi`; `mov [ebp + N], edi` vs `mov [ebp + N], ebx` in the pts[i].origin stores; store/declaration order, chained/comma assignment, member-wise copy, pointer/reference and typedef shifts, splat/setter helpers and scalar zero locals give no gain |
 | physics/tire/Tire | `0x005135f0` | 1588/1664 | b | UpdateContactPatch: lever `lea edi`/store scheduled later; second TireDot push earlier; cross temporaries' frame slots |
 | physics/tire/Tire | `0x00514550` | 2566/4258 | b | aligned 1176, frame 0xc0 matches (function-scope `rolled`); 0x53304c is stdcall D3DRMVectorRotate; the score as a statement before the n3 test gives retail's `fcom`; retail keeps four call/ctor temporaries in rolled's slot (disp32 leas, the whole 12-byte size gap; rolled is already first assigned at its single use, so this is slot order among tied 12-byte symbols, not liveness; block-scoping the frame matrix, moving rolled's declaration, copying through it or block-scoping it are inert or worse); left: owner branch loads the side pointer late (the reference forms that fix it commute the lateral cross instead), the lateral x products load b first, a few copy-store orders |

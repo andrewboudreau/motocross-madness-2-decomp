@@ -10,13 +10,20 @@
 // stores squared magnitude, then overwrites that same float with FastSqrt's result.
 // Its clamp and budget charge therefore use magnitude, not squared magnitude.
 // The unscaled branch charges *speedBudget before reading scratchVector: aliases observe it.
+// Near miss (426/432): the scaled branch's `*speedBudget -= charge` subtracts before the
+// copy's z load in retail, after it here. Reading the magnitude through `s` gives retail's
+// [esi] loads (the members directly give [edi + 0x1b0]); `*speedBudget < charge` gives
+// its fcom (`!(charge <= *speedBudget)` and `charge > *speedBudget` add a dup and fcomp).
+// Not moved by the declaration places of `s` and `drag`, assigning through `s`, `s` in
+// either branch (worse), the zero clamp's spellings, `limit`'s operand order or a scale local.
 void SoultreePhysicsBaseObject::UnknownVirtualSlot6(Vec3* force, float* speedBudget)
 {
     if (prevSpeed <= 0.001f)
         return;
     float dragScale = -(dragCoefficient * linearSpeed);
     scratchVector = velocity * dragScale;
-    float length = scratchVector.z * scratchVector.z + (scratchVector.x * scratchVector.x + scratchVector.y * scratchVector.y);
+    const Vec3& s = scratchVector;
+    float length = s.z * s.z + (s.x * s.x + s.y * s.y);
     if (length == 1.0f) {
         length = 1.0f;
     } else {
@@ -31,7 +38,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot6(Vec3* force, float* speedBud
     float den = stepTime;
     float num = bodyMass;
     float charge = linearSpeed;
-    if (!(charge <= *speedBudget))
+    if (*speedBudget < charge)
         charge = *speedBudget;
     if (charge <= 0.0f)
         charge = 0.0f;

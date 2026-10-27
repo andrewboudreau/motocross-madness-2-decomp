@@ -153,11 +153,11 @@ class SoultreePhysicsMethodTests(unittest.TestCase):
                                      int(target['target_va'], 0))
                     self.assertEqual(result['strict_exact'], slot != 6, result)
                     if slot == 6:
-                        # The complete nonexact candidate now retains FastSqrt's
-                        # result; the previous 432-byte body used squared length.
+                        # The complete nonexact candidate retains FastSqrt's result
+                        # at retail's 432 bytes; one fsub is scheduled differently.
                         # Native behavior evidence is in test_soultree_drag_behavior.
-                        self.assertEqual(result['candidate_size'], 440)
-                        self.assertEqual(result['strict_match']['matching_positions'], 126)
+                        self.assertEqual(result['candidate_size'], 432)
+                        self.assertEqual(result['strict_match']['matching_positions'], 426)
                     else:
                         self.assertEqual(result['candidate_size'], target['target_size'])
                     if promoted:

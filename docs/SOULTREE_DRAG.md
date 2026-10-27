@@ -65,6 +65,12 @@ The repair deliberately changes a previously partial candidate:
 | --- | --- | --- | --- |
 | Original candidate | 432 | 432 | 287 |
 | Corrected candidate | 440 | 432 | 126 |
+| Current candidate | 432 | 432 | 426 |
+
+The current candidate reads the magnitude through a `scratchVector` reference
+(retail's `[esi]` loads) and clamps with `*speedBudget < charge` (retail's
+`fcom`). The remaining difference is the scaled branch's budget `fsub`, which
+retail schedules before the copy's z load.
 
 The complete extent is never trimmed. Lower positional similarity is recorded
 explicitly; the corrected body remains nonexact. The source also now naturally
@@ -130,7 +136,7 @@ Of **17 sections and 35 relocations**, only the slot 6 code section changes;
 the other **16 sections** remain identical, without a filename exception.
 Slot 36 retains all 305 emitted bytes and eight relocations. The existing exact
 methods regression keeps all strict assertions; only its partial slot 6 size
-assertion changes from 432 to the explicitly checked 440/126 result.
+assertion changed, now to the current 432/426 result.
 
 Private evidence is in `work/soultree-drag37/`: `before.obj`, `after.obj`,
 `original.cpp`, `first.log`, `retail.txt`, `candidate-original.txt`,
@@ -141,8 +147,8 @@ repository inputs.
 ### Functional build review
 
 This complete source candidate is suitable for individual reviewed-nonexact
-admission with the finite validation limits above. Its 440-byte body is not a
-strict byte match to the 432-byte retail body, and it is not an original-TU
+admission with the finite validation limits above. Its 432-byte body is not a
+strict byte match to the retail body, and it is not an original-TU
 reconstruction. A linked game, startup, and racing remain separate checks.
 
 Reproduce the retained native and neighboring strict checks on Windows:

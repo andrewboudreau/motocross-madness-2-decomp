@@ -104,7 +104,7 @@ class SoultreeDragBehaviorTests(unittest.TestCase):
                 report = compare(image,objects[name],SYMBOL,0x40b410,432,
                                  ROOT/SOURCE.replace('.cpp','.bindings.json'))
                 self.assertEqual((report['candidate_size'],report['strict_match']['matching_positions']),
-                                 (440,126))
+                                 (432,426))
                 self.assertFalse(report['strict_exact'])
             self.assertEqual(complete(candidate,SYMBOL),complete(objects['aggregate'],SYMBOL))
             body, size, relocations = complete(objects['aggregate'],SLOT36)
@@ -118,7 +118,7 @@ class SoultreeDragBehaviorTests(unittest.TestCase):
                 (164,6,'?g_SoultreeVec3_685190@@3UVec3@@A'),
                 (172,6,'?g_SoultreeVec3_685190@@3UVec3@@A')])
             self.assertEqual(hashlib.sha256(complete(candidate,SYMBOL)[0]).hexdigest(),
-                             'adae6e8eabb616d3a7b66b9fb31e86f1fff84663f445c69181d1ef32af193048')
+                             'd2f7066a2dd4cdf5bcc2418d51d218d38ab30796b18da607eca6731452c83354')
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0},
                              {'__fltused','?FastSqrt@@YAMM@Z'})
             self.assertNotIn(SLOT36,{s.name for s in candidate.symbols})
