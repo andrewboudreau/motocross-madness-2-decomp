@@ -126,7 +126,7 @@
 // The game reads (race kind, tree collision, object root, difficulty, race mode) go
 // through the complete TrackGame class, with no view cast: aligned 3731 of 3966, frame
 // 0x968 vs 0x93c (the cast views gave 3402); 3740 with dir2's double cross in the
-// BikeAICrossCtor form.  The read's member-path depth moves the
+// BikeAICrossCtor form, 3739 (1542 strict) with the BikeAIDotYZ penetration dots.  The read's member-path depth moves the
 // inline switch-over although the global loads are identical: a flat member of a plain
 // struct pointer gives 3760, a one-level nested member 3402 (frame 0x978), the complete
 // two-level TrackGame path 3731 (the 0x00410d00 `aim = fwd +- right` site inlines one more
@@ -907,6 +907,15 @@ int QuerySegmentObstacles(Vec3* seg, float radius, int skipVegetation, int ignor
 }
 
 
+// The wheel penetration dots with y + z grouped (provisional spelling): 1542 strict
+// against 1479 for Math3D DotProduct at both wheels (front alone 1481, rear alone 1540);
+// the grouping, not the parentheses on the products, moves the code, and `y + z + x`
+// is inert.
+static inline float BikeAIDotYZ(const Vec3& a, const Vec3& b)
+{
+    return a.x * b.x + (a.y * b.y + a.z * b.z);
+}
+
 // dir2's double cross in the Vec3(x, y, z) constructor form with every product
 // parenthesised (provisional spelling): 1479 strict and aligned 3740 against 1432/3731
 // for Math3D CrossProduct at both levels; either level alone gives 1472/3665.
@@ -1116,7 +1125,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
             float kF = frontS * frontK;
             float sideDotF = DotProduct(sideF, normalF);
             Vec3 contactF = front + sideF * frontS;
-            float pen = DotProduct(contactF - groundF, normalF);
+            float pen = BikeAIDotYZ(contactF - groundF, normalF);
             float dampF;
             float rollF;
             if (pen <= 0.5f) {
@@ -1159,7 +1168,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
             float kR = rearS * rearK;
             float sideDotR = DotProduct(normalR, sideR);
             Vec3 contactR = back + sideR * rearS;
-            pen = DotProduct(contactR - groundR, normalR);
+            pen = BikeAIDotYZ(contactR - groundR, normalR);
             float dampR;
             float rollR;
             if (pen <= 0.5f) {
