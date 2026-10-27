@@ -759,7 +759,7 @@ without effect, as noted.
   if/else block moves the `pop edi` placement (ToolTip `0x00486b10`, +3).
 - **Not moved by any of these:** byte-store parity in EcoSystem `0x00458da0` (each
   variable-index byte store toggles the later SIB order), the `memset` + `.size`
-  store placement in PCGame `0x004c0d10`, Tire `0x00513490`'s origin-store registers,
+  store placement in PCGame `0x004c0d10`,
   the D3DIMSoultreeCharacter `0x00445fc0` SIB byte, and the Track `0x00516ef0` edge
   tie-break (~5,500 forms).
 
@@ -1128,3 +1128,10 @@ try on similar code. None is a rule.
   computes a named factor at its statement, and moves the whole mass product after the
   diameter when the statement follows it). The factor's home also joins the wheelPos/rider
   factor slot, which put the loop spills back into retail's frame order.
+- **Assigning a constant vector from a Math3D temporary changes its register allocation.**
+  Tire SetRenderContext (`0x00513490`, 199 to 201 of 201): a CollisionVec3 zero filled
+  component by component from a float local stays in registers across the loop but gives
+  x and z each other's register. `Vec3 zero; zero = Vec3(0.0f, 0.0f, 0.0f);` (the inline
+  constructor, then the inline assignment) gives retail's x edi, y edx, z ebx. The
+  initialised `Vec3 zero(0.0f, 0.0f, 0.0f)` keeps the old allocation, and the one-argument
+  splat constructor is worse.

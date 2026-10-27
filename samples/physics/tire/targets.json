@@ -35,8 +35,8 @@
     "candidate_symbol_contains": "SetRenderContext@Tire",
     "target_va": "0x00513490",
     "target_size": 201,
-    "expect": "partial",
-    "notes": "199/201 strict (175/177 masked): zero Vec3 now built from a float zeroValue local (stays in registers) and i=0 hoisted; remaining difference is an edi/ebx register swap in the origin stores (retail x<-edi, y<-edx, z<-ebx). Also tried without gain: permuted zero.x/y/z store order (worse), chained `zero.x = zero.y = zero.z` and comma forms, zero declared before/after i/zeroValue (`i` last much worse), member-wise copies into pts[i].origin (worse), rim stores first, while loop, pointer/reference to pts[i], scoped zero block, a second zero local, `float zeroValue = 0`, prepended typedefs 0..63 (no change). Lever sweep, no gain: every store order with each component taken from zeroValue or an earlier component (36 forms), origin/point/zero reference or pointer locals, a copied zero inside the loop. Also inert (199): a splat helper returning the zero vector, a three-argument setter helper for zero, stores through a float pointer into zero, and the copy written as a copy-constructor call. Worse: three scalar zero locals in every declaration, assignment and store order (216 forms; VC6 propagates the constant and drops the zero slots, 18), a component loop (17), and the origin stored through the setter helper (18).",
+    "expect": "exact",
+    "notes": "Strict exact. The zero origin is assigned from a Math3D Vec3 temporary (`Vec3 zero; zero = Vec3(0.0f, 0.0f, 0.0f);`, TirePoint::origin a Vec3): VC6 then keeps its components in edi/edx/ebx as retail. The previous CollisionVec3 zero built from a float zeroValue local swapped the x and z registers (199/201) under every store order, chained, member-wise, helper and scalar-local form; a Vec3(zeroValue) splat, an initialised `Vec3 zero(0.0f, 0.0f, 0.0f)` and declaring zero before i do not give retail's allocation.",
     "bindings": "Tire.bindings.json"
   },
   {

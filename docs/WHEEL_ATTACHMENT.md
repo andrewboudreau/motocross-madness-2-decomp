@@ -109,7 +109,7 @@ sections. Its external dependencies are the three genuine scene methods,
 ## Native validation
 
 `tests/test_wheel_attachment.py` and
-`tests/fixtures/wheel_attachment_compare.cpp` pass **48 strict comparisons**,
+`tests/fixtures/wheel_attachment_compare.cpp` pass **49 strict comparisons**,
 two complete-object pins, and **47,006 native scenarios**. The separately
 compiled actual provider object also equals the complete output of the real
 game-build compiler command. The retail image is pinned to SHA-256

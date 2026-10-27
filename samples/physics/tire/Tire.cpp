@@ -1,5 +1,6 @@
 // Tire.cpp -- Tire (CollisionObject + MovingPart + CollisionPoint), see Tire.h.
 #include "Tire.h"
+#include "math/Vec3.h"
 #include <float.h>
 #include <math.h>
 
@@ -192,20 +193,17 @@ Tire::~Tire()
 GameObject* Tire::SetRenderContext(void* context)
 {
     struct TirePoint {
-        CollisionVec3 origin;
+        Vec3 origin;
         CollisionVec3 rim;
     };
     TirePoint pts[8];
 
     Configure(context, 1, 1, 1);
-    // The zero vector is built from a zero float (not three literals): VC6 then keeps the
-    // zero in registers across the loop instead of reloading it from the stack.
-    float zeroValue = 0.0f;
+    // The zero vector is assigned from a Math3D Vec3 temporary: VC6 keeps its three
+    // components in registers across the loop with retail's allocation (x edi, y edx, z ebx).
     int i = 0;
-    CollisionVec3 zero;
-    zero.x = zeroValue;
-    zero.y = zeroValue;
-    zero.z = zeroValue;
+    Vec3 zero;
+    zero = Vec3(0.0f, 0.0f, 0.0f);
     for (; i < 8; i++) {
         float t = i * 0.142857149f;
         float angle = t * TIRE_PI + 1.57079637f;
