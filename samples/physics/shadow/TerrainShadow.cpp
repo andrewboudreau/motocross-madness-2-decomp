@@ -396,14 +396,18 @@ full:
 // cell 0x3c, up 0x40, right 0x4c, code 0x58, the corners 0x5c, the near corners 0x94; the
 // mode 2 sum/difference results sit at 0 and 0xc4 and 8 bytes of select temporaries at 0x8c.
 // This form has all of them.
-// Remaining (1563/3099, 48 differing instructions): the scheduling of the mode 1 right/up
-// component copies and corner loads, the mode 2 cross product's x87 store order, push order
-// around ProjectVertices and two `add eax, 0x170/0x17c` row pointers.  One footprint test
+// The cross product parenthesises the x term's second product and both y products
+// (TerrainShadowCross; best of its 64 groupings, at both call sites): 1563/3099 -> 2749/3092,
+// aligned instructions 791 -> 810 of 824.  Provisional: the grouping is a codegen lever.
+// Remaining (18 differing instructions in 9 hunks): the scheduling of the mode 1 right/up
+// component copies and corner loads, push order around ProjectVertices and two
+// `add eax, 0x170/0x17c` row pointers.  One footprint test
 // after the if/else shrinks the function to 2938 bytes (496): the inline budget needs both
 // copies.
 // Retail's `add eax, 0x17c` before the mode 2 step is a reference to look: a scale helper
 // taking `const TerrainShadowVec&` gives it (3094 bytes, 51 differing instructions) but 1557
-// strict here.  The 16 operand orders of the cross product's x and y terms compile the same.
+// strict here (before the cross grouping).  The 16 operand orders of the cross product's x
+// and y terms compile the same.
 // ---------------------------------------------------------------------------------------------
 
 // The unit's vector with the d3dvec.inl constructors (ProjectedShadow.h's ShadowVec3 has none;
@@ -478,7 +482,7 @@ static inline TerrainShadowVec& operator+=(TerrainShadowVec& a, const TerrainSha
 }
 static inline TerrainShadowVec TerrainShadowCross(const TerrainShadowVec& a, const TerrainShadowVec& b)
 {
-    return TerrainShadowVec(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+    return TerrainShadowVec(a.y * b.z - (a.z * b.y), (a.z * b.x) - (a.x * b.z), a.x * b.y - a.y * b.x);
 }
 static inline TerrainShadowVec TerrainShadowSubtractCtorCall(const TerrainShadowVec& a, const TerrainShadowVec& b)
 {
