@@ -51,8 +51,9 @@
 //   0x00579668 is set) are updated; the two flag branches are literal (the set-flag branch
 //   adds the push vector a second time and replaces the contact).  Differences: retail keeps
 //   the constant 1 in ebp (count, scratch count and result), so its register plan and the
-//   copy of segment[1] at entry differ, and the dot product of the set-flag branch loads z
-//   first.
+//   copy of segment[1] at entry differ.  A z-first push dot in the clear-flag arm
+//   (QueryDotZFirst) gives 374 (349 with DotProduct in both arms); the same helper in the
+//   set-flag arm loses (332 alone, 357 in both).
 //
 // - BoxCapsuleOverlap 0x00425900 (4314 bytes, 4276 here): first draft with the decoded
 //   structure (box axes, axes crossed with the segment direction, three corner directions).
@@ -444,6 +445,13 @@ struct QuerySweepRecord {
 
 int Vec3Equal(const Vec3* a, const Vec3* b);   // 0x005299e0
 
+// The clear-flag arm's push dot accumulates z first (measured: this grouping moves the arm
+// to retail's load order; the set-flag arm keeps DotProduct).  Provisional.
+static inline float QueryDotZFirst(const Vec3& a, const Vec3& b)
+{
+    return a.z * b.z + (a.x * b.x + a.y * b.y);
+}
+
 int SegmentTriangleQuery(const QueryTriangle* tri, const Vec3* segment, const Matrix4* m)
 {
     Vec3 start;
@@ -461,7 +469,7 @@ int SegmentTriangleQuery(const QueryTriangle* tri, const Vec3* segment, const Ma
     Vec3 hit = dir * t + start;
     Vec3 push;
     if (!g_unknown579668)
-        push = -DotProduct(dir * t, tri->normal) * tri->normal;
+        push = -QueryDotZFirst(dir * t, tri->normal) * tri->normal;
     else
         push = -DotProduct(dir * t, tri->normal) * tri->normal;
     if (!PointInTriangle(&hit, tri))

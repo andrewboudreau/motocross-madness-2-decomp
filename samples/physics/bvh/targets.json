@@ -26,7 +26,7 @@
     "target_va": "0x00427c10",
     "target_size": 1101,
     "expect": "partial",
-    "notes": "natural operator form: retail's inline/out-of-line helper sequence; retail keeps 1 in ebp and loads segment[1] at entry (see the file header).",
+    "notes": "natural operator form: retail's inline/out-of-line helper sequence; z-first push dot in the clear-flag arm; retail keeps 1 in ebp and loads segment[1] at entry (see the file header).",
     "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
   },
   {
