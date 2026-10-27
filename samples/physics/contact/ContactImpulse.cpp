@@ -8,6 +8,15 @@ ContactVec3 ContactScaleCall(const Vec3& v, float s);
 inline ContactVec3 ContactScaled(const Vec3& v, float s) { return ContactVec3(v.x * s, v.y * s, v.z * s); }
 inline ContactVec3 ContactSum(const Vec3& a, const Vec3& b) { return ContactVec3(a.x + b.x, a.y + b.y, a.z + b.z); }
 
+// Torque B's cross in the Vec3(x, y, z) constructor form with the products parenthesised
+// except x's first one (931 strict against 874 for Math3D CrossProduct there).  Retail
+// spelling unknown (provisional): only the grouping moves VC6's frame slots; product
+// operand order is inert (all 64 forms measured).
+static inline Vec3 ContactCrossCtor(const Vec3& a, const Vec3& b)
+{
+    return Vec3(a.y * b.z - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
+}
+
 // 0x005004a0 (1062 bytes).  Impulse between two bodies A and B at a contact.
 //   restitution  first argument (SoultreePhysicsBaseObject::field_0x14c)
 //   n            contact normal
@@ -29,11 +38,14 @@ inline ContactVec3 ContactSum(const Vec3& a, const Vec3& b) { return ContactVec3
 // The two torque blocks are written at function scope with distinct names; with
 // sibling { } scopes VC6 shares their slots and the frame shrinks to 0x54 (retail 0x60).
 // closingXY is written (y*y') + x*x' so the y product is loaded first, as retail does.
-// Remaining: the torque cross products load r before n where retail loads n first.
-// The product order follows leaf age, so neither operand order nor parentheses in the
-// cross move it (all 2^6 forms measured), nor do pointer/reference aliases of n, a Vec3
-// copy of n (worse), placing the closing dot after the first cross, or naming the tail
-// temporaries.  The tail also schedules `mov edi, [esp+0xb0]` before a push.
+// 931/1062 strict.  Remaining: the torque cross products load r before n where retail
+// loads n first, and most temporaries sit in other frame slots.  The product order
+// follows leaf age, so neither operand order nor parentheses in the cross move it (all
+// 2^6 operand orders measured in the member-store and constructor forms, also written
+// as n x r with the subtraction swapped), nor do pointer/reference aliases of n, a Vec3 copy of n (worse), placing
+// the closing dot after the first cross, or naming the tail temporaries.  The
+// constructor helper at torque A as well scores 896 (910 at A alone).  The tail also
+// schedules `mov edi, [esp+0xb0]` before a push.
 void ContactSolveImpulse(float restitution, const Vec3* n, float invMassA, SoultreeObject* nodeA,
                          const Vec3* dispA, const Vec3* rA, const Vec3* invInertiaA,
                          Vec3* angVelA, Vec3* velA, float invMassB, SoultreeObject* nodeB,
@@ -53,7 +65,7 @@ void ContactSolveImpulse(float restitution, const Vec3* n, float invMassA, Soult
     angA.z = localA.z * invInertiaA->z;
     Vec3 worldA = nodeA->LocalToWorldDirection(angA);
     uA = CrossProduct(worldA, *rA);
-    Vec3 torqueB = CrossProduct(*rB, *n);
+    Vec3 torqueB = ContactCrossCtor(*rB, *n);
     Vec3 localB = nodeB->WorldToLocalDirection(torqueB);
     angB.x = localB.x * invInertiaB->x;
     angB.y = localB.y * invInertiaB->y;
