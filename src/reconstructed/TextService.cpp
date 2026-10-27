@@ -1,5 +1,5 @@
-// TextService.cpp (see TextService.h). 0x0050ade0, 0x0050b080, 0x0050b400,
-// 0x0050b700 and 0x0050ba00 are near misses kept in
+// TextService.cpp (see TextService.h). 0x0050b080, 0x0050b400, 0x0050b700
+// and 0x0050ba00 are near misses kept in
 // samples/render/TextServiceNearMisses.cpp.
 
 #include <string.h>
@@ -49,6 +49,24 @@ UnknownOverlayText::~UnknownOverlayText() {
     currentFont = 0;
     delete fonts;
     fonts = 0;
+}
+
+// 0x0050ade0: the count test and the match leave the loop by `return` and
+// `break` (a `for` or `while (i < count)` loop is rotated).
+void UnknownOverlayText::SelectFont(const char* font) {
+    unsigned int count;
+    unsigned int i;
+
+    count = fonts->Count();
+    i = 0;
+    while (1) {
+        if (i >= count)
+            return;
+        if (!strcmp(font, (*fonts)[i]->GetFontName()))
+            break;
+        i++;
+    }
+    currentFont = (*fonts)[i];
 }
 
 // 0x0050ae60

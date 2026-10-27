@@ -10,6 +10,7 @@
   "??3@YAXPAXPBDH@Z": "0x004a3060",
   "??_C@_04LCGE@?4tga?$AA@": "0x00570560",
   "??_C@_05BAJA@?4cell?$AA@": "0x00574b58",
+  "?GetFontName@FontTexture@@QAEPBDXZ": "0x004673b0",
   "?GetTexture@FontTexture@@QAEPAVTextureMap@@XZ": "0x004673c0",
   "?Load@FontTexture@@SAPAV1@PBD00HPAVTextureMapManager@@H@Z": "0x004673d0",
   "?DeleteFont@UnknownStatic65b478@@QAEXPAVFontTexture@@@Z": "0x00467760",

@@ -313,8 +313,8 @@ operand form: no x87 rule applies, so they need a different lever.
 - FollowCamera `0x00465c20`: `lea` differences.
 - EcoSystem `0x00456890`: an `fmul` scheduled after integer moves.
 - EcoSystem `0x00457ed0`: the cylinder height load is scheduled earlier.
-- TextService `0x0050ade0`, `0x0050ba00`: integer register choice and
-  store scheduling.
+- TextService `0x0050ba00`: store scheduling (`0x0050ade0`, the register
+  choice, is exact through a named offset in `EArray::operator[]`).
 - D3DIMSoulTree `0x00443aa0`: sum term order, row 1 (see its sample).
 
 D3DIMSoulTree `0x00440f30` has two swaps of stored frame words, which are

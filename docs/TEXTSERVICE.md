@@ -19,12 +19,14 @@ RenderTarget; `0x0050b080`, `0x0050b400` and `0x0050b700` blit text into
 (RTTI, vtable `0x00556f78`) and Rectangle2D's two points and
 `operator=` (`0x004e8c20`).
 
-Exact: 6 calibration cases (constructor, destructor, set font, factory,
-draw, and the out-of-line `CharacterCell::GetRect` checked
-from the sample). Near misses
-(`samples/render/TextServiceNearMisses.cpp`, notes there): select font
-`0x0050ade0` (117/125: the `while (1)` form keeps the loop test at the top;
-only the element load's register roles differ), the layout
+Exact: 7 calibration cases (constructor, destructor, select font, set
+font, factory, draw, and the out-of-line `CharacterCell::GetRect` checked
+from the sample). Select font `0x0050ade0` closed from 117/125 when
+`EArray::operator[]` named its offset (`unsigned int offset = index -
+m_base;`): retail forms the offset in eax with the array in ecx, which the
+direct `m_data[index - m_base]` does not; no other EArray.h includer
+changes. Near misses (`samples/render/TextServiceNearMisses.cpp`, notes
+there): the layout
 `0x0050ba00` (store scheduling) and the three blitters (register and
 stack-slot assignment).
 

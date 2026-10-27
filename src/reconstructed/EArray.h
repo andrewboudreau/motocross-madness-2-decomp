@@ -22,8 +22,11 @@ public:
         m_data = 0;
     }
 
+    // The offset is named: retail's SelectFont (0x0050ade0) forms it in
+    // eax with the array in ecx, as a direct `m_data[index - m_base]` does not.
     T& operator[](unsigned int index) {
-        return m_data[index - m_base];
+        unsigned int offset = index - m_base;
+        return m_data[offset];
     }
 
     unsigned int Count() {

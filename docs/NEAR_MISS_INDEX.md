@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 120, c 91, total 213. The three class (a) functions of the
+Counts: a 2, b 120, c 90, total 212. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -219,7 +219,6 @@ temporary. When only displacement sizes differ, read the
 | render/Pixtrans | `0x004cee30` | 1121/1125 masked | b | after the keyed x loop retail reloads the source stride before the width |
 | render/Pixtrans | `0x004cf2a0` | 242/1735 | b | draft: format, pixel size and palette in ebx/esi/edi where retail uses edi/ebx/esi; frame 0x50 vs 0x54 |
 | render/ResourceManager | `0x004e9030` | 100/804 | b | 5 code diffs, all from retail homing `archive` in the `new` temporary's slot: `mov [esp+0x14], ebx` after the EH state reset and `mov eax, [esp+0x14]` for the success return (the 6 missing bytes) |
-| render/TextService | `0x0050ade0` | 117/125 | c | 1 code diffs: `mov eax, [ebp + N] ; mov edx, edi ; mov~` vs `mov ecx, [ebp + N] ; mov eax, edi ; mov~` |
 | render/TextService | `0x0050b080` | 530/890 | b | 30 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
 | render/TextService | `0x0050b400` | 398/758 | b | 31 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
 | render/TextService | `0x0050b700` | 398/758 | b | 31 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |

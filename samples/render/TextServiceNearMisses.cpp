@@ -1,32 +1,6 @@
 // Near-miss TextService.cpp candidates (src/reconstructed/TextService.cpp),
 // kept out of src/reconstructed until they match.
 //
-// UnknownOverlayText::SelectFont (0x0050ade0, 125 bytes): the
-// font lookup by name. 117 of 125: written as `while (1)` with the count
-// test and the match as breaks (the form that makes FontTexture.cpp's
-// 0x00467340 and FontTextureManager.cpp's 0x004677f0 exact), the loop
-// test stays at the top as in retail. Only the element load in the loop
-// differs: retail computes `i - base` in eax with the list in ecx, VC6
-// here keeps the list in eax and the index in edx. Declaration order,
-// `++i`, `== 0`, a named element or name local do not change it; `for`
-// and `while (i < count)` loops rotate. Also unchanged: the assignment and
-// return inside the loop, explicit `operator[]` calls, int/unsigned index
-// and count in all combinations, and the count read after `i = 0`; a
-// 0..63 typedef prefix scan leaves it at 117 (not a tie-break window).
-// Retail schedules `sub eax,edx` before loading the data pointer (as the
-// exact FindCell 0x00467340 does); also unchanged at 117: an inline
-// FontAt(list, i) helper in the loop and/or for the result, a named index
-// copy, m_data[i - m_base] spelled three ways, a by-value accessor struct,
-// `i -= base`, pointer arithmetic, signed/`-base + i`/`i + 0` indices, a
-// cast, `fonts[0][i]` and extra parentheses. A list pointer or reference
-// local (in any subset of the count, loop and result reads) caches the
-// list in a register (8 of 125); declared inside the loop it stays 117.
-// A 144-form sweep (count/i statement order, `while (1)`/`for (;;)`, three
-// bound tests, four strcmp operand orders and `== 0`, i++/++i/i += 1) also
-// stays at 117. Not TU context either: compiled alone with only its
-// headers, or in its retail position between the destructor and SetFont,
-// it is unchanged (s14).
-//
 // DrawText4444 (0x0050b400, 758 bytes; 4444 texels),
 // DrawText1555 (0x0050b700, 758 bytes; 1555 texels) and the 32-bit
 // body of DrawTextInto (0x0050b080, 890 bytes; its format dispatch
@@ -56,23 +30,6 @@
 
 // The canonical translation unit comes first.
 #include "../../src/reconstructed/TextService.cpp"
-
-// 0x0050ade0
-void UnknownOverlayText::SelectFont(const char* font) {
-    unsigned int count;
-    unsigned int i;
-
-    count = fonts->Count();
-    i = 0;
-    while (1) {
-        if (i >= count)
-            return;
-        if (!strcmp(font, (*fonts)[i]->GetFontName()))
-            break;
-        i++;
-    }
-    currentFont = (*fonts)[i];
-}
 
 // 0x0050b080
 int UnknownOverlayText::DrawTextInto(TextureMap* texture, int x, int y, const char* text, int color) {
