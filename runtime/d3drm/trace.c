@@ -312,7 +312,7 @@ static LONG WINAPI TraceRegQueryValueExA(HKEY key, LPCSTR name, LPDWORD reserved
 
 typedef struct ImportHook {
     const char* module;
-    const char* name;     /* NULL: match by ordinal */
+    const char* name;     /* NULL: match by ordinal only */
     WORD ordinal;
     void* replacement;
     void** original;
@@ -332,10 +332,10 @@ static ImportHook s_hooks[] = {
     {"USER32.dll", "SetWindowLongA", 0, TraceSetWindowLongA, (void**)&s_SetWindowLongA},
     {"USER32.dll", "ShowWindow", 0, TraceShowWindow, (void**)&s_ShowWindow},
     {"USER32.dll", "GetCursorPos", 0, GameGetCursorPos, (void**)&s_GetCursorPos},
-    {"blade.dll", "DirectDrawCreateEx", 0, TraceDirectDrawCreateEx, (void**)&s_DirectDrawCreateEx},
-    {"blade.dll", "DirectDrawEnumerateA", 0, TraceDirectDrawEnumerateA,
+    {"blade.dll", "DirectDrawCreateEx", 3, TraceDirectDrawCreateEx, (void**)&s_DirectDrawCreateEx},
+    {"blade.dll", "DirectDrawEnumerateA", 4, TraceDirectDrawEnumerateA,
      (void**)&s_DirectDrawEnumerateA},
-    {"DINPUT.dll", "DirectInputCreateEx", 0, TraceDirectInputCreateEx,
+    {"DINPUT.dll", "DirectInputCreateEx", 2, TraceDirectInputCreateEx,
      (void**)&s_DirectInputCreateEx},
     {"DSOUND.dll", NULL, 1, TraceDirectSoundCreate, (void**)&s_DirectSoundCreate},
     {"WINMM.dll", "timeBeginPeriod", 0, GameTimeBeginPeriod, (void**)&s_timeBeginPeriod},
@@ -367,7 +367,7 @@ static int PatchImport(BYTE* base, const ImportHook* hook)
         slots = (IMAGE_THUNK_DATA*)(base + desc->FirstThunk);
         for (; names->u1.AddressOfData; names++, slots++) {
             if (IMAGE_SNAP_BY_ORDINAL(names->u1.Ordinal)) {
-                match = !hook->name && IMAGE_ORDINAL(names->u1.Ordinal) == hook->ordinal;
+                match = hook->ordinal && IMAGE_ORDINAL(names->u1.Ordinal) == hook->ordinal;
             } else {
                 byName = (IMAGE_IMPORT_BY_NAME*)(base + (DWORD)names->u1.AddressOfData);
                 match = hook->name && !strcmp((char*)byName->Name, hook->name);
