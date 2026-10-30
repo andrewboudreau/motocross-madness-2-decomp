@@ -113,6 +113,8 @@ static LONG s_calls[KINDS];
 static LONG s_toPrimary[KINDS];
 static LONG s_failed[KINDS];
 static int s_nextDump;
+static DWORD s_nextExtraDump;
+static DWORD s_lastTriggerCheck;
 static DWORD s_nextSummary;
 
 /* Seconds after the primary surface exists at which the front buffer is saved
@@ -206,6 +208,20 @@ static void CountCall(int kind, void* self, HRESULT result)
     if (!s_primary)
         return;
     seconds = (GetTickCount() - s_traceStart) / 1000;
+    if (GetTickCount() - s_lastTriggerCheck >= 500) {
+        /* A file named "dumpframe" next to the executable saves the current
+           front buffer as frames\frame_NNNs.bmp and is then removed. */
+        char trigger[MAX_PATH];
+        char* slash;
+        s_lastTriggerCheck = GetTickCount();
+        GetModuleFileNameA(NULL, trigger, sizeof(trigger));
+        slash = strrchr(trigger, '\\');
+        lstrcpyA(slash ? slash + 1 : trigger, "dumpframe");
+        if (GetFileAttributesA(trigger) != 0xFFFFFFFFUL) {
+            DeleteFileA(trigger);
+            DumpFrontBuffer(seconds);
+        }
+    }
     if (seconds < s_nextSummary)
         return;
     s_nextSummary = seconds + 5;
@@ -218,6 +234,10 @@ static void CountCall(int kind, void* self, HRESULT result)
         while (s_nextDump < sizeof(kDumpSeconds) / sizeof(kDumpSeconds[0]) &&
                seconds >= kDumpSeconds[s_nextDump])
             s_nextDump++;
+        DumpFrontBuffer(seconds);
+    } else if (seconds > 60 && seconds <= 900 && seconds >= s_nextExtraDump) {
+        /* Past the fixed table, keep a frame every 10 seconds (15 minutes). */
+        s_nextExtraDump = seconds + 10;
         DumpFrontBuffer(seconds);
     }
 }
@@ -312,6 +332,7 @@ static void TracePrimarySurface(void* surface)
         surface = RealSurface(surface);
     s_traceStart = GetTickCount();
     s_nextDump = 0;
+    s_nextExtraDump = 0;
     s_nextSummary = 0;
     PatchSlots(s_surface, surface, slots, wrappers, 6, "IDirectDrawSurface7");
 }

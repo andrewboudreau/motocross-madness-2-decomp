@@ -202,6 +202,15 @@ D3DVector* __stdcall D3DRMVectorRotate(D3DVector* r, D3DVector* v,
     return r;
 }
 
+/* Stand-in for EBUEula.dll's entry point, used only when MCM2_AUTO_EULA is set
+   (trace.c redirects the game's LoadLibraryA("EBUEula.dll") here): unattended
+   test launches skip the dialog. The user opts in per launch; without the
+   variable the game shows the real dialog. */
+int __cdecl EBUEula(const char* key, const char* path, int a, int b)
+{
+    return 1;
+}
+
 BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)
 {
     if (reason == DLL_PROCESS_ATTACH) {

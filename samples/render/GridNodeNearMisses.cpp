@@ -36,6 +36,9 @@
 // (test ah, 1 against 0x41, 0xc, 0x18) were not traced further.
 #include "../../src/reconstructed/Griddraw.h"
 #include "../../src/reconstructed/MatrixUtil.h"
+#include <math.h>
+#include <stdio.h>
+extern "C" void __stdcall OutputDebugStringA(const char*);
 
 static int g_gridRow16[17] = {
     0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80,
@@ -74,7 +77,7 @@ static inline float GridCornerHeight(const GridNode* node, const GridBaseCell* c
 // (a + b) / (2 * cellSize) - 0.5 with a bare fistp (round to nearest).
 static inline int GridMidCell(float a, float b, float twoCells)
 {
-    return (int)((a + b) / twoCells - 0.5f);
+    return (int)floor((a + b) / twoCells - 0.5f + 0.5f);
 }
 
 // Crossing of the segment with one grid-line family: `coord` is the stepped
@@ -249,6 +252,9 @@ int GridNode::UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVe
     for (k = 0; k < count - 1; k++) {
         int ix = GridMidCell(cross[k].x, cross[k + 1].x, twoCells);
         int iy = GridMidCell(cross[k].y, cross[k + 1].y, twoCells);
+        if (ix < 0 || ix > 16 || iy < 0 || iy > 16) {
+            continue;
+        }
         GridBaseCell* cell = &block->cells[g_gridRow17[iy] + ix];
         float h00 = GridCornerHeight(this, cell);
         float h10 = GridCornerHeight(this, cell + 1);

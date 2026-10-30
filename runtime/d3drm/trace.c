@@ -171,8 +171,14 @@ static HWND WINAPI TraceCreateWindowExA(DWORD exStyle, LPCSTR className, LPCSTR 
 
 static HMODULE WINAPI TraceLoadLibraryA(LPCSTR name)
 {
-    HMODULE result = s_LoadLibraryA(name);
-    DWORD error = GetLastError();
+    HMODULE result;
+    DWORD error;
+    if (name && !lstrcmpiA(name, "EBUEula.dll") && GetEnvironmentVariableA("MCM2_AUTO_EULA", NULL, 0)) {
+        LogLine("MCM2_AUTO_EULA set: EBUEula.dll replaced by the runtime's stand-in (no dialog)");
+        return GetModuleHandleA("d3drm.dll");
+    }
+    result = s_LoadLibraryA(name);
+    error = GetLastError();
     LogLine("LoadLibraryA(\"%s\") -> %p", name ? name : "(null)", result);
     SetLastError(error);
     return result;
