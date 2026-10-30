@@ -9,6 +9,7 @@
  * src/reconstructed/RenderInterfaces.h).
  */
 #include <windows.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "runtime.h"
@@ -383,6 +384,7 @@ static void TraceDirect3DObject(void* object)
 typedef HRESULT(__stdcall* QueryInterfaceProc)(void*, const GUID*, void**);
 typedef HRESULT(__stdcall* CreateSurfaceProc)(void*, void*, void**, void*);
 typedef HRESULT(__stdcall* GetCapsProc)(void*, void*, void*);
+typedef HRESULT(__stdcall* GetDeviceIdentifierProc)(void*, void*, DWORD);
 typedef HRESULT(__stdcall* SetCooperativeLevelProc)(void*, HWND, DWORD);
 typedef HRESULT(__stdcall* SetDisplayModeProc)(void*, DWORD, DWORD, DWORD, DWORD, DWORD);
 typedef HRESULT(__stdcall* GetAvailableVidMemProc)(void*, void*, DWORD*, DWORD*);
@@ -398,6 +400,8 @@ typedef struct ModeCount {
     int byDepth[33];
     int addTwins;
     int addEights;
+    int haveTemplate;
+    DWORD mode32[31];
 } ModeCount;
 
 /* DDSURFACEDESC2 pixel format dwRGBBitCount is DWORD 21. With emulated full
@@ -408,6 +412,10 @@ static HRESULT __stdcall CountMode(void* desc, void* context)
     DWORD depth = ((DWORD*)desc)[21];
     DWORD twin[31];
     count->byDepth[depth <= 32 ? depth : 0]++;
+    if (depth == 32 && !count->haveTemplate) {
+        memcpy(count->mode32, desc, sizeof(count->mode32));
+        count->haveTemplate = 1;
+    }
     if (count->callback(desc, count->context) == 0)
         return 0; /* DDENUMRET_CANCEL */
     if (depth != 32)
@@ -532,6 +540,24 @@ static HRESULT __stdcall DDEnumDisplayModes(void* self, DWORD flags, void* desc,
     }
     result = ((EnumDisplayModesProc)Original(s_directDraw, self, 8))(self, flags, desc, &count,
                                                                      CountMode);
+    /* A remote desktop (or no monitor) offers one or two modes; the game needs
+       640x480 and then its usual 4:3 sizes, which the emulated full screen can
+       serve on any desktop. */
+    if (EmulatesFullscreen() && count.haveTemplate && count.byDepth[32] < 4) {
+        static const DWORD sizes[4][2] = {{640, 480}, {800, 600}, {1024, 768}, {1280, 960}};
+        DWORD base[31];
+        int i;
+        memcpy(base, count.mode32, sizeof(base));
+        for (i = 0; i < 4; i++) {
+            DWORD mode[31];
+            memcpy(mode, base, sizeof(mode));
+            mode[2] = sizes[i][1];
+            mode[3] = sizes[i][0];
+            mode[4] = sizes[i][0] * 4;
+            if (CountMode(mode, &count) == 0)
+                break;
+        }
+    }
     LogLine("IDirectDraw7(%p)::EnumDisplayModes -> 0x%08lx: %d 8-bit, %d 16-bit, %d 24-bit, "
             "%d 32-bit modes", self, result, count.byDepth[8], count.byDepth[16],
             count.byDepth[24], count.byDepth[32]);
@@ -620,15 +646,22 @@ static HRESULT __stdcall DDGetAvailableVidMem(void* self, void* caps, DWORD* tot
     return result;
 }
 
+static HRESULT __stdcall DDGetDeviceIdentifier(void* self, void* identifier, DWORD flags)
+{
+    HRESULT result = ((GetDeviceIdentifierProc)Original(s_directDraw, self, 27))(self, identifier, flags);
+    LogLine("IDirectDraw7(%p)::GetDeviceIdentifier(0x%lx) -> 0x%08lx", self, flags, result);
+    return result;
+}
+
 void TraceDirectDrawObject(void* object)
 {
-    static const int slots[] = {0, 6, 8, 10, 11, 12, 14, 20, 21, 23};
+    static const int slots[] = {0, 6, 8, 10, 11, 12, 14, 20, 21, 23, 27};
     static void* const wrappers[] = {DDQueryInterface,   DDCreateSurface,       DDEnumDisplayModes,
                                      DDFlipToGDISurface, DDGetCaps,             DDGetDisplayMode,
                                      DDGetGDISurface,    DDSetCooperativeLevel, DDSetDisplayMode,
-                                     DDGetAvailableVidMem};
+                                     DDGetAvailableVidMem, DDGetDeviceIdentifier};
     if (object)
-        PatchSlots(s_directDraw, object, slots, wrappers, 10, "IDirectDraw7");
+        PatchSlots(s_directDraw, object, slots, wrappers, 11, "IDirectDraw7");
 }
 
 /* ---- blade's own system IDirectDraw7 objects ---- */
@@ -746,11 +779,58 @@ static HRESULT __stdcall DIDAcquire(void* self)
     return result;
 }
 
+/*
+ * Scripted mouse for unattended runs: when an `inject.txt` appears next to the
+ * exe (cwd) it is read once and deleted. Each line is `dx dy buttons calls`:
+ * the mouse state returned to the game gets that relative move and button
+ * mask (bit 0 = left) for that many GetDeviceState calls (about two a frame).
+ */
+typedef struct InjectStep { LONG dx, dy, buttons, calls; } InjectStep;
+static InjectStep s_inject[256];
+static int s_injectCount, s_injectPos;
+static LONG s_injectLeft, s_injectPoll;
+
+static void LoadInjectScript(void)
+{
+    FILE* f = fopen("inject.txt", "r");
+    int n = 0;
+    InjectStep step;
+    if (!f)
+        return;
+    while (n < 256 && fscanf(f, "%ld %ld %ld %ld", &step.dx, &step.dy, &step.buttons, &step.calls) == 4)
+        s_inject[n++] = step;
+    fclose(f);
+    remove("inject.txt");
+    s_injectCount = n;
+    s_injectPos = 0;
+    s_injectLeft = n ? s_inject[0].calls : 0;
+    LogLine("inject: loaded %d mouse steps", n);
+}
+
+static void ApplyInject(LONG* m)
+{
+    if (s_injectPos >= s_injectCount) {
+        if ((++s_injectPoll % 30) == 0)
+            LoadInjectScript();
+        return;
+    }
+    m[0] += s_inject[s_injectPos].dx;
+    m[1] += s_inject[s_injectPos].dy;
+    ((BYTE*)m)[12] = (BYTE)((s_inject[s_injectPos].buttons & 1) ? 0x80 : 0);
+    if (--s_injectLeft <= 0) {
+        s_injectPos++;
+        if (s_injectPos < s_injectCount)
+            s_injectLeft = s_inject[s_injectPos].calls;
+    }
+}
+
 static HRESULT __stdcall DIDGetDeviceState(void* self, DWORD size, void* data)
 {
     HRESULT result =
         ((HRESULT(__stdcall*)(void*, DWORD, void*))Original(s_inputDevice, self, 9))(self, size,
                                                                                       data);
+    if (result == 0 && size == 16)
+        ApplyInject((LONG*)data);
     if (result && InterlockedIncrement(&s_inputFailures) <= 20)
         LogLine("IDirectInputDevice7(%p)::GetDeviceState(%lu) -> 0x%08lx", self, size, result);
     {
