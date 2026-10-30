@@ -37,7 +37,7 @@ def source_files(root: Path, spec: dict) -> list[Path]:
         if (relative.parts[0] != 'samples' or path.suffix != '.cpp'
                 or not path.is_file()):
             raise ValueError(f'candidate must name an existing samples C++ file: {relative}')
-        if (candidate.get('status') != 'reviewed-nonexact'
+        if (candidate.get('status') not in ('reviewed-nonexact', 'best-guess-unreviewed')
                 or not candidate.get('reason') or not candidate.get('evidence')):
             raise ValueError(f'candidate lacks nonexact review evidence: {relative}')
         flags = candidate.get('extra_flags', [])

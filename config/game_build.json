@@ -1,6 +1,8 @@
 {
   "profile": "vc6_o2_mt",
-  "source_roots": ["src"],
+  "source_roots": [
+    "src"
+  ],
   "candidate_sources": [
     {
       "path": "samples/ecosystem/VegetationCollisionObject.cpp",
@@ -89,7 +91,9 @@
     {
       "path": "samples/physics/motion/CharacterMotionStart.cpp",
       "status": "reviewed-nonexact",
-      "extra_flags": ["/QIfist"],
+      "extra_flags": [
+        "/QIfist"
+      ],
       "reason": "Complete motion-start implementation passes 320999 state, actual pose-helper, callback, rounding and exception scenarios. The 93-byte method and 368-byte ordinary C++ conversion helper preserve signed32 current-rounding results and invalid unmasked no-store behavior. This candidate uses /QIfist to avoid __ftol changing the rounding mode on a trap. The actual 59-byte pose walker remains strict. Slot4 is scripted; transient x87 stack context and integrated animation are not claimed equivalent.",
       "evidence": "docs/CHARACTER_MOTION_START.md#functional-build-review"
     },
@@ -347,14 +351,111 @@
       "status": "reviewed-nonexact",
       "reason": "Complete AddArchive loader checked in 17292 native differential scenarios including constructor unwind paths; VC6 emits 798 bytes versus 804 retail bytes.",
       "evidence": "docs/RESOURCEMANAGER.md#functional-build-review"
+    },
+    {
+      "path": "samples/game/QuarryStuntEventNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "Near-miss body admitted so the source build can link and run; defines BaseQuarryEvent::PrepareGeometry. Behavior unverified against retail; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+    },
+    {
+      "path": "samples/net/NetNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "Near-miss body admitted so the source build can link and run; defines NetworkInterface::DispatchMessages. Behavior unverified against retail; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+    },
+    {
+      "path": "samples/net/NetThreadNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "Near-miss body admitted so the source build can link and run; defines ReceiveMessages. Behavior unverified against retail; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+    },
+    {
+      "path": "samples/physics/collision/SoultreePhysicsCharacter.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "Near-miss body admitted so the source build can link and run; defines SoultreePhysicsCharacter::UnknownVirtualSlot1, SoultreePhysicsCharacter::UnknownVirtualSlot41, SoultreePhysicsCharacter::UnknownVirtualSlot8. Behavior unverified against retail; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+    },
+    {
+      "path": "samples/physics/helpers/GraphicsTestNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "Near-miss body admitted so the source build can link and run; defines GraphicsTest::DrawCircle. Behavior unverified against retail; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+    },
+    {
+      "path": "samples/physics/visibility/VisibilityQuadTreeTraversal.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "Near-miss body admitted so the source build can link and run; defines VisibilityQuadTreeNode::Traverse. Behavior unverified against retail; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+    },
+    {
+      "path": "samples/render/CubeDrawNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "Near-miss body admitted so the source build can link and run; defines DrawableCube::BuildFaceGeometry, DrawableCube::LoadTexturesAndCoords. Behavior unverified against retail; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+    },
+    {
+      "path": "samples/render/DebugOverlayNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "Near-miss body admitted so the source build can link and run; defines DebugOverlay::LoadFont. Behavior unverified against retail; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+    },
+    {
+      "path": "samples/render/GridNodeNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "Near-miss body admitted so the source build can link and run; defines GridNode::UnknownVirtualSlot1. Behavior unverified against retail; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+    },
+    {
+      "path": "samples/render/GriddrawNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "Near-miss body admitted so the source build can link and run; defines DrawableGridNode::ComputeViewerDetail, DrawableGridNode::DrawVisibleBlock, DrawableGridNode::ReadNode, DrawableGridNode::RebuildBlockBuffers, DrawableGridNode::WalkSlot4Block, DrawableGridNode::WalkVisibilityQuadrants.... Behavior unverified against retail; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+    },
+    {
+      "path": "samples/render/PixtransNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "Near-miss body admitted so the source build can link and run; defines DitherConvert, Halve1555, Halve8, Halve8888. Behavior unverified against retail; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+    },
+    {
+      "path": "samples/render/TgafileNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "Near-miss body admitted so the source build can link and run; defines WriteTga. Behavior unverified against retail; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+    },
+    {
+      "path": "samples/track/TrackNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "Near-miss body admitted so the source build can link and run; defines Track::PlaceNear, TrackRecordDlg::ListHighScoreTracks. Behavior unverified against retail; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
     }
   ],
-  "includes": ["src/krusty2", "src/reconstructed"],
-  "import_definitions": ["config/game-imports/blade.def", "config/game-imports/dinput.def"],
+  "includes": [
+    "src/krusty2",
+    "src/reconstructed"
+  ],
+  "import_definitions": [
+    "config/game-imports/blade.def",
+    "config/game-imports/dinput.def"
+  ],
   "libraries": [
-    "kernel32.lib", "user32.lib", "gdi32.lib", "advapi32.lib",
-    "shell32.lib", "ole32.lib", "d3drm.lib", "winmm.lib", "vfw32.lib",
-    "imm32.lib", "dsound.lib", "wsock32.lib", "dinput.lib", "dplayx.lib",
-    "dxguid.lib", "strmiids.lib", "amstrmid.lib"
+    "kernel32.lib",
+    "user32.lib",
+    "gdi32.lib",
+    "advapi32.lib",
+    "shell32.lib",
+    "ole32.lib",
+    "d3drm.lib",
+    "winmm.lib",
+    "vfw32.lib",
+    "imm32.lib",
+    "dsound.lib",
+    "wsock32.lib",
+    "dinput.lib",
+    "dplayx.lib",
+    "dxguid.lib",
+    "strmiids.lib",
+    "amstrmid.lib"
   ]
 }

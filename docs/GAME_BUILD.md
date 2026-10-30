@@ -584,3 +584,21 @@ The existing `runtime/build.py` route stages the retail demo executable and
 does not prove any of those source-build requirements. Source-byte matching
 remains a separate check through the existing VC6 calibration and physics
 suites.
+
+## Best-guess admissions
+
+Goal: a source-built game that links, runs and races. Near-miss bodies in
+`samples/` whose behavior has not been differentially tested are admitted
+with status `best-guess-unreviewed` (distinct from `reviewed-nonexact`) so the
+link frontier can move. They are guesses until each is reviewed; none of them
+is a strict match and none replaces a `src/` definition.
+
+Selection is a greedy link-only search over the compiled objects: add the
+candidate that lowers the unresolved count most, reject any that creates a
+duplicate (LNK2005) definition. Whole near-miss files often duplicate `src/`
+functions (GameUi, DlgProcs, KrustyBike, SelectGamePicProcs, BikeRace,
+ProCircuitProcs, Wrecker, ProjectedShadow and others), so those need
+function-level extraction rather than file admission. Admitting code also
+exposes new dependencies: all 44 files together raise the count from 175 to
+249, the 13 chosen files lower it from **175 to 152** with no strict match
+changed (separate objects; `src/` is untouched).
