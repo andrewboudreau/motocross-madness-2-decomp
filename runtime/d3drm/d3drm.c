@@ -148,7 +148,9 @@ static void Startup(void)
     g_retailVerified = strcmp(hex, kRetailSha256) == 0;
     LogLine("executable sha256 %s (%s)", hex,
             g_retailVerified ? "matches the demo build" : "UNKNOWN build; hooks stay off");
-    if (!g_retailVerified)
+    /* A source-built executable has other addresses but the same imports; the
+       import hooks and install keys still apply when asked for. */
+    if (!g_retailVerified && !GetEnvironmentVariableA("MCM2_FORCE_RUNTIME", NULL, 0))
         return;
 
     slash = strrchr(exePath, '\\');
