@@ -228,6 +228,10 @@ int GridNode::UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVe
             if (iy == 16) {
                 iy = 15;
             }
+            // best guess: a segment that leaves the 16x16 block would index a stray child
+            if (ix < 0 || ix > 15 || iy < 0 || iy > 15) {
+                continue;
+            }
             GridNode* child = children[g_gridRow16[iy] + ix];
             if (child == 0) {
                 continue;
