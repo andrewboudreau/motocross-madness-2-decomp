@@ -602,3 +602,28 @@ function-level extraction rather than file admission. Admitting code also
 exposes new dependencies: all 44 files together raise the count from 175 to
 249, the 13 chosen files lower it from **175 to 152** with no strict match
 changed (separate objects; `src/` is untouched).
+
+## Source-built run status
+
+The source-built `mcm2.exe` (391/391 translation units, zero unresolved
+symbols) links, starts on current Windows with the runtime shim, loads a track
+and renders a race (rider, HUD, radar, speedometer) next to the retail
+`blade.dll`/assets. Verified by launching it with `MCM2_FORCE_RUNTIME=1` (the
+shim otherwise leaves its hooks off for an unknown executable hash) and reading
+`frames/frame_*.bmp` and `mcm2_runtime.log`. This is a boot-to-race smoke test
+only; the best-guess bodies above remain unreviewed and long play is untested.
+
+Two environment details matter for the source build:
+
+- The generated import libraries (`config/game-imports/*.def`) import
+  `blade.dll`/`DINPUT.dll` by ordinal; retail imports by name. The runtime's
+  import hooks therefore match these three by ordinal too, which is what lets
+  its 16-bit display-mode emulation apply (otherwise
+  `UnknownDisplay::SetDisplayMode(640, 480, 16)` finds no mode and
+  `PCGame::StartUp` exits silently).
+- The EULA dialog (`EBUEula.dll`) is shown by the game itself and must be
+  accepted by the user.
+
+No matched `src/` code was unmatched: the only edits to existing sources are
+the `g_CollisionScratchPoints` extern retype in `CollisionShapeTests.h`, its
+bindings key, and four cast call sites in `CollisionObject.cpp`.
