@@ -12,6 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 import json
 import os
 from pathlib import Path
+import struct
 import subprocess
 import sys
 import tempfile
@@ -134,6 +135,31 @@ def response_file(path: Path, args: list[str]) -> None:
                     encoding='ascii')
 
 
+def write_alias_object(path: Path, aliases: dict) -> None:
+    """Emit a COFF object of weak externals: each alias resolves to its target.
+
+    The retail binary has one object where reconstructed sources spell the same
+    address with two C++ types (two mangled names). Run-only link aid; it adds
+    no code or data and never changes a matched translation unit.
+    """
+    strings = bytearray(4)
+    def name_field(name: str) -> bytes:
+        raw = name.encode('ascii')
+        if len(raw) <= 8:
+            return raw.ljust(8, bytes(1))
+        offset = len(strings)
+        strings.extend(raw + bytes(1))
+        return struct.pack('<II', 0, offset)
+    symbols = bytearray()
+    for index, (alias, target) in enumerate(sorted(aliases.items())):
+        symbols += name_field(target) + struct.pack('<IhHBB', 0, 0, 0, 2, 0)
+        symbols += name_field(alias) + struct.pack('<IhHBB', 0, 0, 0, 105, 1)
+        symbols += struct.pack('<II10x', index * 3, 3)
+    struct.pack_into('<I', strings, 0, len(strings))
+    header = struct.pack('<HHIIIHH', 0x14c, 0, 0, 20, len(symbols) // 18, 0, 0)
+    path.write_bytes(header + bytes(symbols) + bytes(strings))
+
+
 def link_game(build: Path, objects: list[Path], libraries: list[Path],
               vc6: Path, runner: str, env: dict) -> dict:
     linker = find_child_ci(find_vc6_bin(vc6), 'link.exe')
@@ -217,7 +243,12 @@ def build_game(vc6: Path, jobs: int, compile_only: bool = False) -> tuple[dict, 
                 raise ValueError(f'missing import library: {name}')
             libraries.append(library)
         report['stage'] = 'link'
-        report['link'] = link_game(build, [Path(r['object']) for r in report['sources']],
+        alias_objects = []
+        if spec.get('link_aliases'):
+            alias_object = build / 'link-aliases.obj'
+            write_alias_object(alias_object, spec['link_aliases'])
+            alias_objects.append(alias_object)
+        report['link'] = link_game(build, [Path(r['object']) for r in report['sources']] + alias_objects,
                                    libraries, vc6, runner, env)
         report['linked'] = report['link']['linked']
         if report['linked']:

@@ -3,6 +3,9 @@
   "source_roots": [
     "src"
   ],
+  "link_aliases": {
+    "?g_CollisionScratchPoints@@3PAUCollisionVec3@@A": "?g_CollisionScratchPoints@@3PAUVec3@@A"
+  },
   "candidate_sources": [
     {
       "path": "samples/ecosystem/VegetationCollisionObject.cpp",

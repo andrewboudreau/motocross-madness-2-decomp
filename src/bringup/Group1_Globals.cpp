@@ -5,9 +5,9 @@
 // noted, so zero initialization is faithful.
 //
 // Not provided here: ?g_CollisionScratchPoints@@3PAUCollisionVec3@@A (0x00579068).
-// BoundingBoxTreeQuery.cpp already defines the same retail array as Vec3[128]; a second
-// CollisionVec3 array would be separate storage and silently break the contact-point
-// hand-off, so that one needs the extern in collision/CollisionShapeTests.h retyped instead.
+// BoundingBoxTreeQuery.cpp already defines the same retail array as Vec3[128]; the
+// CollisionVec3 spelling used by CollisionObject.cpp is bound to it by the
+// `link_aliases` weak external in config/game_build.json, so both share one storage.
 
 #include "visibility/VisibilityClipper.h"
 #include "ManagedTexture.h"

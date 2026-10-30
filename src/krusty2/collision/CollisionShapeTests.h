@@ -100,7 +100,7 @@ struct CollisionBoxResult {
 };
 
 #include "bvh/BoundingBoxTreeQueryState.h"
-extern Vec3 g_CollisionScratchPoints[]; // 0x00579068; defined in bvh/BoundingBoxTreeQuery.cpp.
+extern CollisionVec3 g_CollisionScratchPoints[]; // Existing provisional array view.
 
 // Contact/sweep record passed to the hull-vs-hull family (tier 3 layout): two input
 // vectors, an accumulated contact position and a contact counter.
