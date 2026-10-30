@@ -429,6 +429,12 @@
       "status": "best-guess-unreviewed",
       "reason": "Near-miss body admitted so the source build can link and run; defines Track::PlaceNear, TrackRecordDlg::ListHighScoreTracks. Behavior unverified against retail; bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+    },
+    {
+      "path": "samples/physics/shadow/TerrainShadow.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "Near-miss body admitted so the source build can link and run; defines TerrainShadow::TerrainShadow, Attach and slots. Behavior unverified against retail; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
     }
   ],
   "includes": [

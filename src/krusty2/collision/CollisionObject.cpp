@@ -2015,7 +2015,7 @@ int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, Coll
     q->contact = zero;
     q->contactCount = 0;
     for (int i = 0; i < g_CollisionScratchCount; i++)
-        CollisionRotateRowsGrouped(&g_CollisionScratchPoints[i], g_CollisionScratchPoints[i], xf);
+        CollisionRotateRowsGrouped((CollisionVec3*)&g_CollisionScratchPoints[i], *(CollisionVec3*)&g_CollisionScratchPoints[i], xf);
 
     int hit = TreeTreeQuery(reinterpret_cast<QueryTreeNode*>(a->pointTree),
         reinterpret_cast<QueryTreeNode*>(b->triangleTree), &a->worldTransform, &b->worldTransform, 2,
@@ -2046,7 +2046,7 @@ int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, Coll
 int CollisionObject::HullVsHullSwept(CollisionHullBody* a, CollisionHullBody* b, CollisionSweepQuery* q)
 {
     for (int i = 0; i < g_CollisionScratchCount; i++)
-        CollisionRotateRowsTo(&g_CollisionScratchPoints[i], g_CollisionScratchPoints[i], &a->worldTransform);
+        CollisionRotateRowsTo((CollisionVec3*)&g_CollisionScratchPoints[i], *(CollisionVec3*)&g_CollisionScratchPoints[i], &a->worldTransform);
     const Matrix4* xf = &a->worldTransform;
     CollisionRotateRowsNegated(&q->contactOffset, xf);
     CollisionRotateRowsNegated(&q->contactNormal, &a->worldTransform);
@@ -2184,7 +2184,7 @@ int CollisionObject::HullVsModel(CollisionHullBody* a, CollisionModelBody* b, Co
             q->contact = CollisionVec3(0.0f, 0.0f, 0.0f);
             q->contactCount = 0;
             for (int j = 0; j < g_CollisionScratchCount; j++)
-                CollisionRotateRowsTo(&g_CollisionScratchPoints[j], g_CollisionScratchPoints[j], xf);
+                CollisionRotateRowsTo((CollisionVec3*)&g_CollisionScratchPoints[j], *(CollisionVec3*)&g_CollisionScratchPoints[j], xf);
             if (TreeTreeQuery(reinterpret_cast<QueryTreeNode*>(a->pointTree),
                 reinterpret_cast<QueryTreeNode*>(element->triangleTree), &a->worldTransform, xf, 2,
                 reinterpret_cast<Vec3*>(element->vertices), &a->motionTransform)) {
@@ -2198,7 +2198,7 @@ int CollisionObject::HullVsModel(CollisionHullBody* a, CollisionModelBody* b, Co
             CollisionRotateColsTo(&q->contactOffset, q->contactOffset, xf);
             CollisionRotateColsTo(&q->contactNormal, q->contactNormal, xf);
             for (int k = 0; k < g_CollisionScratchCount; k++)
-                CollisionRotateColsTo(&g_CollisionScratchPoints[k], g_CollisionScratchPoints[k], xf);
+                CollisionRotateColsTo((CollisionVec3*)&g_CollisionScratchPoints[k], *(CollisionVec3*)&g_CollisionScratchPoints[k], xf);
         }
         if (hit) {
             CollisionVec3 mean;
