@@ -165,6 +165,16 @@ void MakeSixteenBitMode(DWORD* desc)
     SetRgb565(desc);
 }
 
+/* Turns a 32-bit display mode description into a palettized 8-bit twin. */
+void MakeEightBitMode(DWORD* desc)
+{
+    memset(desc + SD_PF_SIZE, 0, 8 * sizeof(DWORD));
+    desc[SD_PF_SIZE] = 32;
+    desc[SD_PF_FLAGS] = DDPF_RGB | 0x20; /* DDPF_PALETTEINDEXED8 */
+    desc[SD_PF_BITS] = 8;
+    desc[SD_PITCH] = desc[SD_WIDTH];
+}
+
 /* Surfaces without an explicit format would get the 32-bit desktop format;
    the game expects the 16-bit display format. */
 void InjectDisplayFormat(DWORD* desc)

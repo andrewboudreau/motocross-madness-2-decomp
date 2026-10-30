@@ -376,6 +376,7 @@ typedef struct ModeCount {
     void* context;
     int byDepth[33];
     int addTwins;
+    int addEights;
 } ModeCount;
 
 /* DDSURFACEDESC2 pixel format dwRGBBitCount is DWORD 21. With emulated full
@@ -388,7 +389,16 @@ static HRESULT __stdcall CountMode(void* desc, void* context)
     count->byDepth[depth <= 32 ? depth : 0]++;
     if (count->callback(desc, count->context) == 0)
         return 0; /* DDENUMRET_CANCEL */
-    if (depth != 32 || !count->addTwins)
+    if (depth != 32)
+        return 1;
+    if (count->addEights) {
+        memcpy(twin, desc, sizeof(twin));
+        MakeEightBitMode(twin);
+        count->byDepth[8]++;
+        if (count->callback(twin, count->context) == 0)
+            return 0;
+    }
+    if (!count->addTwins)
         return 1;
     memcpy(twin, desc, sizeof(twin));
     MakeSixteenBitMode(twin);
@@ -475,8 +485,9 @@ static HRESULT __stdcall DDFlipToGDISurface(void* self)
 
 static HRESULT __stdcall CountSixteenBitModes(void* desc, void* context)
 {
-    if (((DWORD*)desc)[21] == 16)
-        ++*(int*)context;
+    DWORD depth = ((DWORD*)desc)[21];
+    if (depth == 16 || depth == 8)
+        ++((int*)context)[depth == 8];
     return 1;
 }
 
@@ -490,10 +501,13 @@ static HRESULT __stdcall DDEnumDisplayModes(void* self, DWORD flags, void* desc,
     count.context = context;
     if (EmulatesFullscreen()) {
         /* Twins only when the system offers no 16-bit modes itself. */
-        int sixteen = 0;
-        ((EnumDisplayModesProc)Original(s_directDraw, self, 8))(self, flags, desc, &sixteen,
+        /* Likewise 8-bit twins: the game's mode choice treats a 640x480x16
+           entry at index 0 as "none" (retail lists 8-bit modes first). */
+        int native[2] = {0, 0};
+        ((EnumDisplayModesProc)Original(s_directDraw, self, 8))(self, flags, desc, native,
                                                                 CountSixteenBitModes);
-        count.addTwins = sixteen == 0;
+        count.addTwins = native[0] == 0;
+        count.addEights = native[1] == 0;
     }
     result = ((EnumDisplayModesProc)Original(s_directDraw, self, 8))(self, flags, desc, &count,
                                                                      CountMode);

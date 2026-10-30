@@ -18,6 +18,7 @@ DWORD EmulatedCooperativeLevel(HWND window, DWORD flags);
 void SetEmulatedDisplayMode(DWORD width, DWORD height, DWORD depth);
 void GetEmulatedDisplayMode(DWORD* desc);
 void MakeSixteenBitMode(DWORD* desc);
+void MakeEightBitMode(DWORD* desc);
 void InjectDisplayFormat(DWORD* desc);
 void NameSurfaceType(DWORD* desc);
 void* RealSurface(void* surface);
