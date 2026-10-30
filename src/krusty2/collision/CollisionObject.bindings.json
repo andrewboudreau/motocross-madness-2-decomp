@@ -154,7 +154,7 @@
   "?g_CollisionBoxResult@@3PAUQueryHit@@A": "0x00579058",
   "?g_CollisionScratchCount@@3HA": "0x00579014",
   "?g_CollisionScratchHits@@3HA": "0x00579060",
-  "?g_CollisionScratchPoints@@3PAUCollisionVec3@@A": "0x00579068",
+  "?g_CollisionScratchPoints@@3PAUVec3@@A": "0x00579068",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_TypeRegistry@@3PAVTypeRegistry@@A": "0x00575744",
   "?g_collisionQuadTree@@3PAVQuadTree@@A": "0x0068aba4",
