@@ -9,6 +9,8 @@
 //   UnknownBikeRaceProjector::QueryGround  0x00507c10 = Terrain::QueryGround
 //   UnknownBikeRaceRacer::UnknownFunction496e20 0x00496e20 = KrustyBike::Fn_00496E20
 //     (the racer pointer is KrustyBike's primary pointer; docs/BIKE_RACE_STATE_CONNECTIONS.md)
+//   UnknownBikeRaceModel::ReplaceMaterialTexture 0x00444c70 = D3DIMSoultreeObject::ReplaceMaterialTexture
+//   UnknownBikeRaceRacer::Load             0x0048fc80 = KrustyBike::Load (ret 0x7c both)
 //   UnknownBikeRaceDemoDlg::Tick           0x00455b20 = DemoDlg::Tick
 //   UnknownBikeRaceDemoDlg::OnControlPress 0x00455ae0 = DemoDlg::OnControlPress
 //     (Group6_BikeRaceCreate.cpp's local stand-in for DlgProcs.h's DemoDlg, which
@@ -19,13 +21,26 @@
 // None of these classes gets a constructor here, so no vtable is emitted.
 // Vec3/TerrainVec3/Vector3 are all three packed floats.
 
-struct Vec3;
+struct Vec3 {
+    float x, y, z;
+};
 struct Vector3 {
     float x, y, z;
 };
 struct TerrainVec3;
 struct KbRecorder;
+struct SoultreeLoadDesc;
+struct VehicleInputMap;
+struct KbRace;
+struct KbBikeSetup;
 class KrustyVCR;
+class GameObject;
+class LightManager;
+struct UnknownTextureFormatChoice;
+class ControlInterface;
+class BikeRace;
+struct UnknownBikeRaceBikeSetup;
+class Scene;
 struct UnknownControlEvent;
 struct UnknownInputEntry;
 
@@ -38,6 +53,7 @@ public:
 class D3DIMSoultreeObject {
 public:
     void SetUseLighting(int value);
+    int ReplaceMaterialTexture(int index, const char* name, int textures);
     void SetPositionVec3(Vector3 position);
 };
 
@@ -49,6 +65,12 @@ public:
 class KrustyBike {
 public:
     void Fn_00496E20(KbRecorder* recorder);
+    GameObject* Load(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc, int a5,
+                     int a6, Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe,
+                     VehicleInputMap* map, unsigned char kind, unsigned char remote, KbRace* race,
+                     int a15, int a16, int netId, const KbBikeSetup* setup, int gasGyroOption,
+                     int brakeGyroOption, int linkedObject, int trackObject, KbRecorder* recorder,
+                     void* a24, int withRider);
 };
 
 class DemoDlg {
@@ -68,6 +90,7 @@ struct UnknownBikeRaceMesh {
 class UnknownBikeRaceModel {
 public:
     void GetPosition(Vector3* position);
+    int ReplaceMaterialTexture(int index, const char* name, int textures);
 };
 
 class UnknownBikeRaceProjector {
@@ -78,6 +101,12 @@ public:
 class UnknownBikeRaceRacer {
 public:
     void UnknownFunction496e20(KrustyVCR* vcr);
+    GameObject* Load(void* owner, const char* a, const char* bikeFile, const char* riderFile,
+                     LightManager* lights, UnknownTextureFormatChoice* textures, Vector3 position,
+                     Vector3 direction, Vector3 up, UnknownBikeRaceProjector* terrain,
+                     ControlInterface* control, char ai, int remote, BikeRace* race,
+                     const char* name, int b, int id, UnknownBikeRaceBikeSetup* setup, int c, int d,
+                     int particles, Scene* scene, KrustyVCR* vcr, float skill, int e);
 };
 
 class UnknownBikeRaceDemoDlg {
@@ -122,6 +151,44 @@ void UnknownBikeRaceProjector::QueryGround(Vector3* point, Vector3* normal, int 
 void UnknownBikeRaceRacer::UnknownFunction496e20(KrustyVCR* vcr)
 {
     reinterpret_cast<KrustyBike*>(this)->Fn_00496E20(reinterpret_cast<KbRecorder*>(vcr));
+}
+
+int UnknownBikeRaceModel::ReplaceMaterialTexture(int index, const char* name, int textures)
+{
+    return reinterpret_cast<D3DIMSoultreeObject*>(this)->ReplaceMaterialTexture(index, name, textures);
+}
+
+static inline Vec3 UnknownAsVec3(const Vector3& v)
+{
+    Vec3 result;
+    result.x = v.x;
+    result.y = v.y;
+    result.z = v.z;
+    return result;
+}
+
+// best guess: the two views pass the same 25 stack words to 0x0048fc80; each view
+// argument goes to the canonical parameter in the same position.  The skill float is
+// the word KrustyBike::Load keeps as `a24` (+0x15d8), so its bits are passed unchanged.
+GameObject* UnknownBikeRaceRacer::Load(void* owner, const char* a, const char* bikeFile,
+                                       const char* riderFile, LightManager* lights,
+                                       UnknownTextureFormatChoice* textures, Vector3 position,
+                                       Vector3 direction, Vector3 up,
+                                       UnknownBikeRaceProjector* terrain,
+                                       ControlInterface* control, char ai, int remote,
+                                       BikeRace* race, const char* name, int b, int id,
+                                       UnknownBikeRaceBikeSetup* setup, int c, int d,
+                                       int particles, Scene* scene, KrustyVCR* vcr, float skill,
+                                       int e)
+{
+    void* skillWord = *reinterpret_cast<void**>(&skill);
+    return reinterpret_cast<KrustyBike*>(this)->Load(
+        (int)owner, (int)a, bikeFile, reinterpret_cast<const SoultreeLoadDesc*>(riderFile),
+        (int)lights, (int)textures, UnknownAsVec3(position), UnknownAsVec3(direction),
+        UnknownAsVec3(up), (int)terrain, reinterpret_cast<VehicleInputMap*>(control),
+        (unsigned char)ai, (unsigned char)remote, reinterpret_cast<KbRace*>(race), (int)name, b,
+        id, reinterpret_cast<const KbBikeSetup*>(setup), c, d, particles, (int)scene,
+        reinterpret_cast<KbRecorder*>(vcr), skillWord, e);
 }
 
 int UnknownBikeRaceDemoDlg::Tick(float frameTime)
