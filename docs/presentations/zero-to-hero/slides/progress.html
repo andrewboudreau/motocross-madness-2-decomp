@@ -4,31 +4,31 @@
 <h2 style="font-family:'Barlow Condensed', sans-serif;font-size:72px;font-weight:700;line-height:1.1">Where the decomp stands</h2>
 </div>
 <div style="display:flex;gap:48px;align-items:flex-end">
-<p style="font-family:'Barlow Condensed', sans-serif;font-size:200px;font-weight:800;color:#f26a2e;line-height:0.85">56.3%</p>
+<p style="font-family:'Barlow Condensed', sans-serif;font-size:200px;font-weight:800;color:#f26a2e;line-height:0.85">66.0%</p>
 <p style="font-size:36px;line-height:1.25;width:760px">of game-code bytes already match the retail EXE byte for byte</p>
 </div>
 <div style="display:flex;flex-direction:column;gap:16px">
 <div style="display:flex;width:1664px;height:56px;border-radius:6px">
-<div style="flex:56.3;background:#f26a2e"></div>
-<div style="flex:36.4;background:#5b9cf0"></div>
+<div style="flex:66.0;background:#f26a2e"></div>
+<div style="flex:28.0;background:#5b9cf0"></div>
 <div style="flex:3.4;background:#c9c0b0"></div>
 <div style="flex:2.5;background:#5a5145"></div>
-<div style="flex:1.4;background:#f2ece1"></div>
+<div style="flex:0.03;background:#f2ece1"></div>
 </div>
 <div style="display:flex;gap:40px;font-size:24px;color:#c9c0b0">
-<p style="font-size:24px"><span style="color:#f26a2e">■</span> Exact 56.3%</p>
-<p style="font-size:24px"><span style="color:#5b9cf0">■</span> Near miss 36.4%</p>
+<p style="font-size:24px"><span style="color:#f26a2e">■</span> Exact 66.0%</p>
+<p style="font-size:24px"><span style="color:#5b9cf0">■</span> Near miss 28.0%</p>
 <p style="font-size:24px"><span style="color:#c9c0b0">■</span> Inline asm 3.4%</p>
 <p style="font-size:24px"><span style="color:#5a5145">■</span> Padding 2.5%</p>
-<p style="font-size:24px"><span style="color:#f2ece1">■</span> Unregistered 1.4%</p>
+<p style="font-size:24px"><span style="color:#f2ece1">■</span> Unregistered 0.03%</p>
 </div>
 </div>
 <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:24px;border-top:1px solid #3a342b;padding:28px 0px 0px 0px">
-<div style="display:flex;flex-direction:column;gap:4px"><p style="font-family:'Barlow Condensed', sans-serif;font-size:56px;font-weight:700">705,475</p><p style="font-size:24px;color:#a89f8f">exact bytes</p></div>
-<div style="display:flex;flex-direction:column;gap:4px"><p style="font-family:'Barlow Condensed', sans-serif;font-size:56px;font-weight:700">2,923 / 2,936</p><p style="font-size:24px;color:#a89f8f">selected targets exact</p></div>
-<div style="display:flex;flex-direction:column;gap:4px"><p style="font-family:'Barlow Condensed', sans-serif;font-size:56px;font-weight:700">98,696</p><p style="font-size:24px;color:#a89f8f">lines of C++</p></div>
-<div style="display:flex;flex-direction:column;gap:4px"><p style="font-family:'Barlow Condensed', sans-serif;font-size:56px;font-weight:700">0</p><p style="font-size:24px;color:#a89f8f">links so far</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><p style="font-family:'Barlow Condensed', sans-serif;font-size:56px;font-weight:700">827,765</p><p style="font-size:24px;color:#a89f8f">exact bytes</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><p style="font-family:'Barlow Condensed', sans-serif;font-size:56px;font-weight:700">2,980 / 2,990</p><p style="font-size:24px;color:#a89f8f">selected targets exact</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><p style="font-family:'Barlow Condensed', sans-serif;font-size:56px;font-weight:700">107,377</p><p style="font-size:24px;color:#a89f8f">lines of C++</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><p style="font-family:'Barlow Condensed', sans-serif;font-size:56px;font-weight:700">392</p><p style="font-size:24px;color:#a89f8f">translation units linked into a running game</p></div>
 </div>
-<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#a89f8f">Source: REBUILD_GAPS (2026-10-10), DECOMPILATION_PROGRESS (2026-10-11)</p><p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#a89f8f">21</p></div>
-<aside>The honest headline: 56.3 percent of game-code bytes, 705,475 bytes, are strict exact, about 4 percent of that only in samples. Another 36.4 percent is registered but not exact, 3.4 percent needs inline assembly and is excluded under current rules, 2.5 percent is alignment padding, and 1.4 percent has no registration at all. The project is explicit that its 99.6 percent figure, 2,923 of 2,936 selected targets, is "not 99.6% of MCM2": targets are chosen for usefulness and tractability, and the full function inventory isn't established. No game function is yet a complete original translation unit, and, as of that snapshot, nothing had been linked (the game has linked and raced since). The game-code denominator is 1,253,440 bytes, ending at 0x533040.</aside>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#a89f8f">Source: REBUILD_GAPS (2026-10-30), DECOMPILATION_PROGRESS (2026-10-21)</p><p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#a89f8f">21</p></div>
+<aside>The honest headline: 66.0 percent of game-code bytes, 827,765 bytes, are strict exact, about 4 percent of that only in samples. Another 28.0 percent is registered but not exact, 3.4 percent needs inline assembly and is excluded under current rules, 2.5 percent is alignment padding, and 0.03 percent has no registration at all. The project is explicit that its 99.7 percent figure, 2,980 of 2,990 selected targets, is "not 99.7% of MCM2": targets are chosen for usefulness and tractability, and the full function inventory isn't established. No game function is yet a complete original translation unit. But all 392 translation units now compile and link into a runnable executable that loads a track and races, with near-miss and unregistered bodies standing in as best-effort code. So it plays, but it is not byte-identical to retail. The game-code denominator is 1,253,440 bytes, ending at 0x533040.</aside>
 </section>
