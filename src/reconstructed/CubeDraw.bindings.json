@@ -70,5 +70,10 @@
   "?g_visibilityClipper@@3PAVVisibilityClipper@@A": "0x00575a98",
   "_s_faceNormals": "0x00579a70",
   "_s_facePoints": "0x00579af8",
-  "_s_viewPoints": "0x00579930"
+  "_s_viewPoints": "0x00579930",
+  "?s_cellMappings@@3PAY0BA@UUnknownCubeTextureMapping@@A": "0x0057ea10",
+  "?s_cellVertices@@3PAY1BA@5UUnknownCubeVertex@@A": "0x0057a210",
+  "?s_faceNormals@@3PAUVector3@@A": "0x00579a70",
+  "?s_facePoints@@3PAY0BJ@UVector3@@A": "0x00579af8",
+  "?s_viewPoints@@3PAUVector3@@A": "0x00579930"
 }

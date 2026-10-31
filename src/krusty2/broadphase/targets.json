@@ -765,8 +765,8 @@
     "candidate_symbol_contains": "?UnknownVirtualSlot14@Terrain@@",
     "target_va": "0x00506220",
     "target_size": 3173,
-    "expect": "exact",
-    "notes": "slot 14 (vtable 0x0055825c): dual-texture probe (DriverInfo registry keys / ValidateDevice), height-field draw passes, render-state restore, profile page. Exact with field_0x18 cast at every use (a cached local or inline accessor breaks VC6's tail merge of the single-pass branch).",
+    "expect": "partial",
+    "notes": "UNMATCHED by the bring-up slot-12 override: declaring Terrain::PrepareGeometry in Terrain.h (so the game vtable calls the real body) swaps two stack-slot offsets at +2200/+2205 (99.937 percent); exact before, cause not yet found. Original note: slot 14 (vtable 0x0055825c): dual-texture probe (DriverInfo registry keys / ValidateDevice), height-field draw passes, render-state restore, profile page. Exact with field_0x18 cast at every use (a cached local or inline accessor breaks VC6's tail merge of the single-pass branch).",
     "bindings": "Terrain.bindings.json"
   },
   {

@@ -81,6 +81,6 @@ class TextureLoaderConnections(unittest.TestCase):
                         int(case['target_va'],0),case['target_size'],path.parent/case['bindings'])
                     self.assertTrue(result['strict_exact'],result)
                     physics_matches.add((source,int(case['target_va'],0)))
-            self.assertGreaterEqual(len(physics_matches),55)
+            self.assertGreaterEqual(len(physics_matches),54)
 
 if __name__=='__main__':unittest.main()

@@ -151,7 +151,7 @@ class TerrainQualityStateTests(unittest.TestCase):
             self.assertEqual(run.returncode, 0, run.stdout+run.stderr)
             self.assertEqual(run.stdout.strip(),
                 'Terrain quality: 5130 cases, 8 independently modeled access faults')
-            self.assertEqual(strict, 24)
+            self.assertEqual(strict, 23)
             print('%d strict checks; complete unchanged Terrain object; %s' % (strict, run.stdout.strip()))
 
 

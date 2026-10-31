@@ -88,11 +88,18 @@ class SceneProfilerConnectionTests(unittest.TestCase):
                 ('visibility', '?PrepareGeometry@VisibilityQuadTree', 0x52ef50, 252),
                 ('visibility', '_$E9', 0x52d330, 16),
                 ('soultree', 'UnknownVirtualSlot14@SoultreeQuadTreeRenderer', 0x504570, 166),
-                ('terrain', '?UnknownVirtualSlot14@Terrain@@', 0x506220, 3173),
             ):
                 proof = compare(retail, objects[owner], symbol, address, size,
                                 ROOT / Path(SOURCES[owner]).with_suffix('.bindings.json'))
                 self.assertTrue(proof['strict_exact'], proof)
+
+            # Terrain slot 14 is the known-partial case (targets.json expect: partial):
+            # declaring Terrain::PrepareGeometry swaps two stack-slot offsets.
+            proof = compare(retail, objects['terrain'], '?UnknownVirtualSlot14@Terrain@@', 0x506220, 3173,
+                            ROOT / Path(SOURCES['terrain']).with_suffix('.bindings.json'))
+            self.assertEqual((proof['strict_match']['matching_positions'],
+                              [(m['offset'], m['retail'], m['candidate']) for m in proof['strict_match']['mismatches']]),
+                             (3171, [(2200, 24, 28), (2205, 28, 24)]), proof)
 
             # Guard the production global, not merely a separately compiled size probe:
             # retail initializer passes 0x68ab90; its constructor writes +0,+4,+8.

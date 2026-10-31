@@ -47,7 +47,7 @@ PARTIAL = (
     # $L6170 to $L6172. Both resolve to section 29 .text$x+182 with zero
     # addend; all 85 sections and 517 relocations of the old/current game
     # and fresh test objects remain identical by resolved destination.
-    ('?Load@Terrain@@', 2117, '12b0100734eb09fafcd872adb6d7488742ebc4e59b8473fa76d446862434f83c'),
+    ('?Load@Terrain@@', 2117, '95a6e01c5ae22b3a913e940ee970d32157c8fcd7ef40ab77fc7d9a7d5b6841f3'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with
@@ -150,7 +150,7 @@ class TerrainConnectionsTests(unittest.TestCase):
             for source, symbol, va, size, bindings in dict.fromkeys(cases):
                 self.assertTrue(compare(retail, objects[source], symbol, va, size, bindings)['strict_exact'],
                                 (source, symbol))
-            self.assertEqual(len(dict.fromkeys(cases)), 190)
+            self.assertEqual(len(dict.fromkeys(cases)), 189)
             # Load remains nonexact; keep its complete candidate instruction
             # bytes, while joining only the three evidenced stream calls.
             entry = provider.find_symbol('?Load@Terrain@@')

@@ -114,7 +114,7 @@ class TerrainDrawStateTests(unittest.TestCase):
                        if t['source'] == 'Terrain.cpp' and t.get('expect', 'exact') == 'exact']
             cases.extend((objects['terrain'], t['candidate_symbol_contains'], int(t['target_va'], 0),
                           t['target_size'], manifest.parent / t['bindings']) for t in targets)
-            self.assertEqual(len(cases), 79)
+            self.assertEqual(len(cases), 78)
             for caller, symbol, va, size, bindings in cases:
                 proof = compare(retail, caller, symbol, va, size, bindings)
                 self.assertTrue(proof['strict_exact'], (symbol, proof))

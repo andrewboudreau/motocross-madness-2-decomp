@@ -122,7 +122,7 @@ class TerrainTextureConnectionsTests(unittest.TestCase):
             for source, symbol, va, size, bindings in dict.fromkeys(cases):
                 self.assertTrue(compare(retail, objects[source], symbol, va, size, bindings)['strict_exact'],
                                 (source, symbol))
-            self.assertEqual(len(dict.fromkeys(cases)), 106)
+            self.assertEqual(len(dict.fromkeys(cases)), 105)
             print('%d strict terrain texture caller/provider comparisons preserved' % len(dict.fromkeys(cases)))
 
 

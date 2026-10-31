@@ -12,7 +12,7 @@
     "src/reconstructed/CubeDraw.cpp": {
       "sections": 47,
       "relocations": 174,
-      "sha256": "b18f1da5eb7da0aeb2d25da152397fc8458647d670bc4fcde8ee39d386064b9d"
+      "sha256": "e53e6153df6819a6f370ff36ea81e5fa19eb9a7c769f9cdaf682cc560f3bb925"
     },
     "src/reconstructed/FollowCamera.cpp": {
       "sections": 98,
@@ -45,9 +45,9 @@
       "sha256": "47cf02499bf52c21c38dab9a00f203624a0dc51d24a01ce4058541922ee0172a"
     },
     "samples/render/CubeDrawNearMisses.cpp": {
-      "sections": 17,
-      "relocations": 55,
-      "sha256": "f34401ebda6eaf1cc94d872fe440566d1a2aa11703af90e01e3b4219d803fd3e"
+      "sections": 7,
+      "relocations": 47,
+      "sha256": "3b747d1c8b05975861366dbdf9f4ffc878f0f64258ea5838fa115683e6c5c9a3"
     },
     "samples/camera/FollowCameraNearMisses.cpp": {
       "sections": 66,
@@ -72,7 +72,7 @@
     "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp": {
       "sections": 7,
       "relocations": 51,
-      "sha256": "b902332e94f7ada273a090e00c67e382bd62ab8921a3de63f360478a0e7d8482"
+      "sha256": "1331e0c4be34c78b885ecf40171cad37c1759187ecafa9ca2ca1d1cde0a149ce"
     },
     "samples/physics/visibility/VisibilityQuadTreeTraversal.cpp": {
       "sections": 2,
@@ -80,9 +80,9 @@
       "sha256": "128c7efffa87aff26cfb4d6f575ea209c535e1eb0c55c5d8609cf1128d99e823"
     },
     "src/krusty2/broadphase/Terrain.cpp": {
-      "sections": 85,
+      "sections": 86,
       "relocations": 517,
-      "sha256": "ef2e81dd804e8b60b539541978862b60eb35cab41615831ef1801f4b3f344f6e"
+      "sha256": "dcec108c086afc50bf19f2e433c4fdb0d054c8da8d19e2f1ca3bd8b719d3d117"
     }
   },
   "pointer_imports": {

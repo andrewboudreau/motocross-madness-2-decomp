@@ -180,9 +180,9 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
                 self.assertTrue(report['strict_exact'], (source, symbol, report))
                 strict += 1
             # The actual frozen PCCamera emits one strict implicit destructor COMDAT.
-            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 1036)
+            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 1027)
             # The corrected camera loader adds its explicit first-cross call relocation.
-            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4714)
+            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4706)
         print('Clipper global:', strict, 'strict checks; 15 whole objects; 46 retail pointer loads; storage remains unresolved')
 
 
