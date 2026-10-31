@@ -71,7 +71,7 @@ Message-display integration is not exercised by this clock fixture.
 
 The isolated real link in `build-fidfd7u5` compiles **216/216 translation units**
 and changes unresolved names **377 → 375**, with exactly those two removals and
-no additions. The game remains unlinked; loading-screen completion, menus and
+no additions. At this slice the game was still unlinked (it has linked and raced since; see [GAME_BUILD](GAME_BUILD.md)); loading-screen completion, menus and
 racing still require integrated runtime verification.
 
 ```powershell

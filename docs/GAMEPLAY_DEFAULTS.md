@@ -126,5 +126,5 @@ nondebug relocations. The actual-path retained test passes 211 strict checks
 and 3,072 native calls. Three new calibration rows are strict; two share one
 retail address/extent, and no new retail address is claimed.
 
-The final source build remains unlinked. Successful startup, integrated menus
+At this slice the final source build was still unlinked (it has linked and raced since; see [GAME_BUILD](GAME_BUILD.md)). Successful startup, integrated menus
 and racing are not established by these default implementations.

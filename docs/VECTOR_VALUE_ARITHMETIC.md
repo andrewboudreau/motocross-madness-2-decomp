@@ -54,4 +54,4 @@ python -m unittest test_vector_values -v
 
 The isolated real link compiles 243 translation units and removes exactly
 these three unresolved names, **275 -> 272**, with no new missing dependencies
-(`work/game-build/build-2u175dm8/report.json`). The game remains unlinked.
+(`work/game-build/build-2u175dm8/report.json`). At this slice the game was still unlinked (it has linked and raced since; see [GAME_BUILD](GAME_BUILD.md)).

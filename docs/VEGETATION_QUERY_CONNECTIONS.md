@@ -151,6 +151,6 @@ and 45,813 relocations under exactly these three names, without filename
 exclusions. The four affected canonical/aggregate objects independently retain
 all 501 sections and 2,618 relocations at their actual source paths.
 
-The source-built game remains unlinked; startup, integrated menus and racing
+At this slice the source-built game was still unlinked (it has linked and raced since; see [GAME_BUILD](GAME_BUILD.md)); startup, integrated menus and racing
 have not been tested. The separate placement slice now supplies GetObject; its nonexact behavior
 evidence and transform correction are documented independently.
