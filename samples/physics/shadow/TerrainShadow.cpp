@@ -332,7 +332,8 @@ void TerrainShadow::UnknownVirtualSlot30()
                 int i2 = (unsigned short)corner[2] + vertexBase;
                 // Bring-up guard (not in retail): a section/index mismatch in this near-miss body
                 // can yield indices past the transformed vertex array; skip such triangles.
-                if (i0 >= mesh->vertexCount || i1 >= mesh->vertexCount || i2 >= mesh->vertexCount)
+                if ((unsigned)i0 >= (unsigned)mesh->vertexCount || (unsigned)i1 >= (unsigned)mesh->vertexCount ||
+                    (unsigned)i2 >= (unsigned)mesh->vertexCount)
                     continue;
                 if (outcodes[i0] & outcodes[i1] & outcodes[i2])
                     continue;
