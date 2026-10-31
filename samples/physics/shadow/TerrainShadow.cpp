@@ -235,7 +235,7 @@ void TerrainShadow::UnknownVirtualSlot30()
     ShadowVec3 transformed[kMaxMeshVertices];
     int outcodes[kMaxMeshVertices];
     ClipPoint clipped[8];
-    ClipPoint tri[3];
+    ClipPoint tri[4];  // ClipPolygon stores points[count] = points[0], so a triangle needs a fourth slot
     int points[6];
     short corner[3];
     int pitch;
@@ -330,6 +330,10 @@ void TerrainShadow::UnknownVirtualSlot30()
                 int i0 = (unsigned short)corner[0] + vertexBase;
                 int i1 = (unsigned short)corner[1] + vertexBase;
                 int i2 = (unsigned short)corner[2] + vertexBase;
+                // Bring-up guard (not in retail): a section/index mismatch in this near-miss body
+                // can yield indices past the transformed vertex array; skip such triangles.
+                if (i0 >= mesh->vertexCount || i1 >= mesh->vertexCount || i2 >= mesh->vertexCount)
+                    continue;
                 if (outcodes[i0] & outcodes[i1] & outcodes[i2])
                     continue;
                 tri[0] = *(ClipPoint*)&transformed[i0];

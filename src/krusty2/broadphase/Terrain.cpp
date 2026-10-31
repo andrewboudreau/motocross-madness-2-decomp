@@ -704,7 +704,9 @@ Terrain::~Terrain()
 }
 
 int g_terrainToggle314;
-int g_terrainToggle718;
+// 0x00574718 lives in retail .data and starts at 1 (the executable image holds a 1 there);
+// a zero start makes Terrain slot 14 return before drawing anything.
+int g_terrainToggle718 = 1;
 
 // Slot 23 (0x00508850): debug key handler.  The three TestInputEvent kinds 0x43, 2 and 3
 // each flip one toggle and return 1 (tier 3 semantics).

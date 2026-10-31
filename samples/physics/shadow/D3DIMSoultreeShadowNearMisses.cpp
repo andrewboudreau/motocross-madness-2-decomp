@@ -252,7 +252,7 @@ void D3DIMSoultreeShadow::UnknownVirtualSlot30()
             int i2 = (unsigned short)corner[2];
             if (g_d3dimShadowOutcodes[i0] & g_d3dimShadowOutcodes[i1] & g_d3dimShadowOutcodes[i2])
                 continue;
-            ClipPoint tri[3];
+            ClipPoint tri[4];  // ClipPolygon stores points[count] = points[0], so a triangle needs a fourth slot
             tri[0] = *(ClipPoint*)&s_shadowPoints[i0];
             tri[1] = *(ClipPoint*)&s_shadowPoints[i1];
             tri[2] = *(ClipPoint*)&s_shadowPoints[i2];
