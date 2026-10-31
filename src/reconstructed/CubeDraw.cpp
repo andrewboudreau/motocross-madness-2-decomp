@@ -29,15 +29,15 @@ static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // 0x00579930: the current face's grid points relative to the camera.
-static Vector3 s_viewPoints[25];
+Vector3 s_viewPoints[25];
 // 0x00579a70: the face normals.
-static Vector3 s_faceNormals[6];
+Vector3 s_faceNormals[6];
 // 0x00579af8: each face's 5x5 grid of points.
-static Vector3 s_facePoints[6][25];
+Vector3 s_facePoints[6][25];
 // 0x0057a210: two triangles per cell, 16 cells per face.
-static UnknownCubeVertex s_cellVertices[6][16][6];
+UnknownCubeVertex s_cellVertices[6][16][6];
 // 0x0057ea10
-static UnknownCubeTextureMapping s_cellMappings[6][16];
+UnknownCubeTextureMapping s_cellMappings[6][16];
 // The cell arrays viewed flat: cell = face * 16 + i, whose first vertex is
 // cell * 6. Slot 14 indexes them this way (retail recomputes the addresses
 // from the cell and its first vertex instead of stepping pointers).

@@ -46,12 +46,12 @@
 #include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/Tgafile.h"
 
-// CubeDraw.cpp's file statics (same names and addresses).
-static Vector3 s_viewPoints[25];
-static Vector3 s_faceNormals[6];
-static Vector3 s_facePoints[6][25];
-static UnknownCubeVertex s_cellVertices[6][16][6];
-static UnknownCubeTextureMapping s_cellMappings[6][16];
+// CubeDraw.cpp's tables (same names and addresses); one storage shared with CubeDraw.cpp.
+extern Vector3 s_viewPoints[25];
+extern Vector3 s_faceNormals[6];
+extern Vector3 s_facePoints[6][25];
+extern UnknownCubeVertex s_cellVertices[6][16][6];
+extern UnknownCubeTextureMapping s_cellMappings[6][16];
 
 // 0x0043dc60
 int DrawableCube::BuildFaceGeometry()
