@@ -256,6 +256,8 @@ def physics_sources(root: Path) -> frozenset:
 def compile_one(root: Path, vc6_root: str, cpp: Path, obj: Path) -> str | None:
     cmd = [sys.executable, str(root / 'tools/compile.py'), '--compiler', 'vc6', '--vc6-root', vc6_root,
            '--profile', 'vc6_o2_mt', str(cpp), '-o', str(obj)]
+    for f in os.environ.get('MCM2_EXTRA_FLAGS', '').split():
+        cmd += ['--extra', f]
     rel = cpp.resolve().relative_to(root).as_posix()
     if 'krusty2' in rel or rel.startswith('samples/physics/') or cpp.resolve() in physics_sources(root):
         cmd += ['--include', str(root / 'src/krusty2')]
