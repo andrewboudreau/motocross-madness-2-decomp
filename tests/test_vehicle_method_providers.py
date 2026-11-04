@@ -73,7 +73,8 @@ class VehicleMethodProviderTests(unittest.TestCase):
                               'StoreBodyAxes': 35, 'ResolveSubstepCollisions': 28,
                               'SaveBodyOrientation': 29, 'ClearContactEffectFlags': 30,
                               'UpdateContactStates': 31, 'ResetToPlacement': 33,
-                              'ApplyPendingRespawn': 39}[symbol.split('@')[0]])
+                              'ApplyPendingRespawn': 39, 'ResetBodyOrientation': 36,
+                              'ApplyCollisionEvent': 38}[symbol.split('@')[0]])
                 promoted = slot in slots
                 self.assertEqual(source, ROOT / sources['reset' if slot == 36 else 'methods'])
                 obj = objects['reset' if slot == 36 else 'methods']
@@ -90,7 +91,7 @@ class VehicleMethodProviderTests(unittest.TestCase):
                         self.assertIn(table_refs[slot * 4], definitions)
                     checked.add(slot)
             self.assertEqual(checked, slots)
-            self.assertIn('?UnknownVirtualSlot36@Vehicle@@UAEXXZ', definitions)
+            self.assertIn('?ResetBodyOrientation@Vehicle@@UAEXXZ', definitions)
 
             methods = objects['methods']
             self.assertEqual({s.name for s in methods.symbols if s.section_number == 0}, {

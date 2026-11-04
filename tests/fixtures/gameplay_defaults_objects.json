@@ -4,17 +4,17 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "be8c45623173cf337af1e33bb48c4e45bf81b791ce2493408b5a8100f59ac945"
+      "sha256": "a3f6c5dc975124de817b5192748fff4fe41e77b2d06dcae25b362528818cb1d5"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
       "relocations": 1054,
-      "sha256": "e3789383d54e7354c1713a3ac98a5e0bc470fb14fad66d02420ff24fa03da7f4"
+      "sha256": "6721a678d65bf8cdfc8d989dbfaa6d345c587a4a913be4aa84f81fe90eb6a1b1"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "b3f9de76c57323dda681acf8713b5933f93743cf6a6314b3efaf4ea722a2c1aa"
+      "sha256": "edeb96cee892c45ab1a455227e77f1380629204e2cb958cf58ecd93e42f94d42"
     },
     "src/reconstructed/VehicleDefaults.cpp": {
       "sections": 13,
@@ -29,7 +29,7 @@
     "src/reconstructed/VehicleReset.cpp": {
       "sections": 15,
       "relocations": 32,
-      "sha256": "0a07905867177d183e7ab189c3abd3851bf1451dc2d3241b43a0e11cf9174c73"
+      "sha256": "3a8fadbf90024f7b07ccbb90cc2388395c1faf48107d2d7dfe9fe8cca38ddea8"
     },
     "src/reconstructed/VehicleWheelAttachment.cpp": {
       "sections": 12,
@@ -44,7 +44,7 @@
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "7100c7ae1ac8c465aa6444525186d7b72782ff0c0132db754acd8526490c9bfb"
+      "sha256": "4ecf01713839a0e568094f9d9ff6ddfb6c33e1632f3ffad21e07904c3a0fa255"
     }
   }
 }

@@ -13,7 +13,7 @@ from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'src/reconstructed/VehicleReset.cpp'
-SYMBOL = '?UnknownVirtualSlot36@Vehicle@@UAEXXZ'
+SYMBOL = '?ResetBodyOrientation@Vehicle@@UAEXXZ'
 TREE = 'src/krusty2/soultree/soultree.cpp'
 STEERING = 'src/krusty2/motion/SteeringControl.cpp'
 PROVIDERS = (

@@ -21,7 +21,7 @@
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",
-      "UnknownVirtualSlot38@Bike",
+      "ApplyCollisionEvent@Bike",
       4215184,
       2874,
       2865,

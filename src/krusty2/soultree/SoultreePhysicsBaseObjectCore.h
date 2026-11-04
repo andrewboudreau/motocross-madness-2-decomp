@@ -149,12 +149,12 @@ public:
     // 0x0040c540 return nothing (tier 2).
     virtual void LoadBodyAxes();
     virtual void StoreBodyAxes(int orthogonalize, int keepZ);
-    virtual void UnknownVirtualSlot36();
+    virtual void ResetBodyOrientation();
     virtual SoultreeAttachment* AddAttachment(int type, void* target, SoultreeAttachTarget* anchor,
                                                      const Vec3* v);
     // Slot 38 (ret 0xc): 0x00501600 switches on eventKind (0x66/0x68/0x69/0x6a/0x2711) and reads
     // event->+0x60 as the other body (tier 1); event's type is provisional.
-    virtual void UnknownVirtualSlot38(int notify, int eventKind, void* event);
+    virtual void ApplyCollisionEvent(int notify, int eventKind, void* event);
     // Slot 39 (ret 4): argument unused here; Vehicle slot 49 0x0052a940 passes it the same
     // dword it passes to slot 9 (float dt), so float (tier 2).
     virtual int ApplyPendingRespawn(float dt);

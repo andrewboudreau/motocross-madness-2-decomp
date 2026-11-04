@@ -1896,7 +1896,7 @@ struct BikeKindParty {          // other party of kind 0x3ea
     BikeBodyObj* body;          // +0xc4
 };
 
-void Bike::UnknownVirtualSlot38(int notify, int eventKind, void* event)
+void Bike::ApplyCollisionEvent(int notify, int eventKind, void* event)
 {
     float impulse;              // slot 3/4 impulse result, forwarded to slot 100
     Vec3 angScale;              // per-axis angular response scale (1,1,1 for static parties)
@@ -2305,7 +2305,7 @@ void BikeCollisionCallback(CollisionObject* self, CollisionObject* other)
         } else if (kind == 0x65) {
             return;
         }
-        vehicle->UnknownVirtualSlot38(vehicle->UnknownVirtualSlot52() && kind != 0x3e8 ? 1 : 0, kind, other);
+        vehicle->ApplyCollisionEvent(vehicle->UnknownVirtualSlot52() && kind != 0x3e8 ? 1 : 0, kind, other);
     }
 }
 

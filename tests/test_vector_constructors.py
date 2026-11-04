@@ -34,7 +34,7 @@ SOURCES = tuple(v[1] for v in VIEWS) + (
 # Complete resolved fingerprints captured before adding any constructor bodies.
 # These preserve the existing partial candidates without asserting retail identity.
 PARTIAL = [('src/krusty2/vehicle/Bike.cpp',
-  'UnknownVirtualSlot38@Bike',
+  'ApplyCollisionEvent@Bike',
   4215184,
   2874,
   2865,

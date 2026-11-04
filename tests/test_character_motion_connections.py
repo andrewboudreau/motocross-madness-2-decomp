@@ -32,7 +32,7 @@ PROVIDERS = (
 # Full resolved candidates captured before this connection. These hashes guard
 # preservation, including the five complete BikeRace sample methods, not fidelity.
 PARTIAL = [['src/krusty2/vehicle/Bike.cpp',
-  'UnknownVirtualSlot38@Bike',
+  'ApplyCollisionEvent@Bike',
   4215184,
   2874,
   2865,

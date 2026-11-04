@@ -10,7 +10,7 @@
 #include "SoultreeDrag.cpp"
 
 // slot 36 (0x004aa210): resolve the initial orientation vectors and reset the pose state.
-void SoultreePhysicsBaseObject::UnknownVirtualSlot36()
+void SoultreePhysicsBaseObject::ResetBodyOrientation()
 {
     if (bodyForward.x == 0.0f && bodyForward.z == 0.0f) {
         float s = (bodyForward.y >= 0.0f) ? -1.0f : 1.0f;

@@ -22,7 +22,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot38@Bike",
+    "candidate_symbol_contains": "ApplyCollisionEvent@Bike",
     "target_va": "0x00405190",
     "target_size": 2874,
     "expect": "partial",
@@ -632,7 +632,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot38@Vehicle",
+    "candidate_symbol_contains": "ApplyCollisionEvent@Vehicle",
     "target_va": "0x5268d0",
     "target_size": 1578,
     "expect": "exact",

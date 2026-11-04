@@ -3,12 +3,12 @@
   "partials": [
     [
       "src/krusty2/vehicle/Bike.cpp",
-      "UnknownVirtualSlot38@Bike",
+      "ApplyCollisionEvent@Bike",
       4215184,
       2874,
       2865,
       1758,
-      "2bcaa14d07883b3438e39400d443d92653f0a636f492a7deccc5424782e54948"
+      "760f59c5e33e6f25be9afecd30a58857a158b8f6550048f96b9836c35b627cfd"
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",

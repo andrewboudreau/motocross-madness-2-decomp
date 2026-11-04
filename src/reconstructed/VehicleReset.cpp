@@ -10,7 +10,7 @@
 // Tier 3 reading: when the facing vector (0x88) has no horizontal part it is rebuilt from the
 // previous up vector (0x94) with the sign of its y, then the basis block is reset to the
 // identity-like values and pushed to the scene node.
-void Vehicle::UnknownVirtualSlot36()
+void Vehicle::ResetBodyOrientation()
 {
     if (bodyForward.x == 0.0f && bodyForward.z == 0.0f) {
         float s = bodyForward.y >= 0.0f ? -1.0f : 1.0f;

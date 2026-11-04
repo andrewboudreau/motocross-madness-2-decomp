@@ -44,7 +44,7 @@ int SoultreePhysicsCharacter::ResetToPlacement(const Vec3* newPosition, const Ve
     bodyUp = *newUp;
     sceneNode->SetPosition(newPosition->x, newPosition->y, newPosition->z);
     sceneNode->GetPosition(&position);
-    UnknownVirtualSlot36();
+    ResetBodyOrientation();
     if (centerNode) {
         centerNode->GetPositionIn(0, &centerOfMass);
     } else {

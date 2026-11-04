@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'samples/physics/soultree_base/SoultreeDrag.cpp'
 AGGREGATE = 'samples/physics/soultree_base/SoultreePhysicsInlines.cpp'
 SYMBOL = '?UnknownVirtualSlot6@SoultreePhysicsBaseObject@@UAEXPAUVec3@@PAM@Z'
-SLOT36 = '?UnknownVirtualSlot36@SoultreePhysicsBaseObject@@UAEXXZ'
+SLOT36 = '?ResetBodyOrientation@SoultreePhysicsBaseObject@@UAEXXZ'
 
 
 def complete(obj, name):

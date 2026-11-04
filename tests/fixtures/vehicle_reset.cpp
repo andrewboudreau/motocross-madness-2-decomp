@@ -97,7 +97,7 @@ int main() {
     table[35]=Address(&Slots::WriteAxes); table[34]=Address(&Slots::ReadAxes);
     for(seed=0;seed<64;++seed) for(variant=0;variant<16;++variant) for(throwAt=0;throwAt<=5;++throwAt) {
         Prepare(); int caught=0;
-        try { VehicleIn(actual)->Vehicle::UnknownVirtualSlot36(); }
+        try { VehicleIn(actual)->Vehicle::ResetBodyOrientation(); }
         catch(int code) { CHECK(code==1234); caught=1; }
         CHECK(caught==(throwAt!=0)); CHECK(calls==(throwAt?throwAt:5)); Same(); ++cases;
     }

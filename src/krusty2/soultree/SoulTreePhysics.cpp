@@ -344,7 +344,7 @@ int SoultreePhysicsBaseObject::ResetToPlacement(const Vec3* newPosition, const V
     bodyUp = *newUp;
     sceneNode->SetPosition(newPosition->x, newPosition->y, newPosition->z);
     sceneNode->GetPosition(&position);
-    UnknownVirtualSlot36();
+    ResetBodyOrientation();
     if (centerNode)
         centerNode->GetPositionIn(0, &centerOfMass);
     else
@@ -546,7 +546,7 @@ struct SoultreeCollisionEvent {
 // retail copies worldAngularVelocity to the frame, keeps the three scaled components on the x87
 // stack through the cross product and pops them afterwards.  A by-value Scale3 helper
 // returning a fresh vector consumes them in place instead (919 bytes, not 925).
-void SoultreePhysicsBaseObject::UnknownVirtualSlot38(int notify, int eventKind, void* event)
+void SoultreePhysicsBaseObject::ApplyCollisionEvent(int notify, int eventKind, void* event)
 {
     Vec3 angScale;
     float otherInvMass;
@@ -917,7 +917,7 @@ static void SoultreeCollisionCallback(CollisionObject* self, CollisionObject* ot
     SoultreePhysicsBaseObject* body = (SoultreePhysicsBaseObject*)self->ownerObject;
     int kind = other->ownerType;
     body->lastCollisionType = kind;
-    body->UnknownVirtualSlot38(0, kind, other);
+    body->ApplyCollisionEvent(0, kind, other);
 }
 
 // Second callback: the same response, except for body-to-body contacts (tag 0x68).

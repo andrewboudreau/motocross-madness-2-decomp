@@ -50,8 +50,8 @@ public:
                                       const Vec3* settleUp, int keepPlacement, float extraWeight);   // 0x00527430
     virtual void LoadBodyAxes();
     virtual void StoreBodyAxes(int orthogonalize, int keepZ);
-    virtual void UnknownVirtualSlot36();
-    virtual void UnknownVirtualSlot38(int notify, int eventKind, void* event);
+    virtual void ResetBodyOrientation();
+    virtual void ApplyCollisionEvent(int notify, int eventKind, void* event);
     virtual int  ApplyPendingRespawn(float dt);
     virtual int  UnknownVirtualSlot42();
 

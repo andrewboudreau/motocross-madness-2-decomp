@@ -1,7 +1,7 @@
 # Vehicle orientation reset
 
 `src/reconstructed/VehicleReset.cpp` supplies the complete **368-byte**
-`Vehicle::UnknownVirtualSlot36` at `0x0040c710`. The primary Vehicle, Bike and
+`Vehicle::ResetBodyOrientation` at `0x0040c710`. The primary Vehicle, Bike and
 KrustyBike tables at `0x00558a84`, `0x00550900` and `0x00554548` each select this
 body in slot 36. Their RTTI object offset is zero; secondary tables are not
 used to infer this method identity. The semantic reset name and new source

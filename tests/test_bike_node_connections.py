@@ -25,7 +25,7 @@ MATRIX = '?SetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z'
 # Complete relocation-resolved hashes captured before connecting these callers.
 # They preserve existing nonexact bodies, not establish retail byte identity.
 PARTIAL = [
-    ('src/krusty2/vehicle/Bike.cpp', 'UnknownVirtualSlot38@Bike', 4215184, 2874, 2865, 1758, '2ee145a08a8327876d857cb620c7c7e00da6085641564e4882ba36aca63c9f30'),
+    ('src/krusty2/vehicle/Bike.cpp', 'ApplyCollisionEvent@Bike', 4215184, 2874, 2865, 1758, '2ee145a08a8327876d857cb620c7c7e00da6085641564e4882ba36aca63c9f30'),
     ('src/krusty2/vehicle/Bike.cpp', 'UnknownVirtualSlot7@Bike', 4219072, 1678, 1678, 1677, 'aaa8295baf0865125e0a657a14607ee3f28d8ad2446b0dd2a609d03475342193'),
     ('src/krusty2/vehicle/Bike.cpp', 'UnknownVirtualSlot89@Bike', 4221664, 2396, 2120, 115, '229fbd5f8409e5a532e1c2e25d98e2f2bdb7d79f1e8583547ca7542fd7cc6dc5'),
     ('src/krusty2/vehicle/Bike.cpp', 'UnknownVirtualSlot102@Bike', 4224064, 485, 474, 188, 'b54d0bbdb1c68a8d8c58a2368d2f31f5f0df23c1f6d12380fa84191bd009289e'),

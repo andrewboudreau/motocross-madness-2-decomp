@@ -1303,7 +1303,7 @@ void KrustyCollisionCallbackA(CollisionObject* self, CollisionObject* other)
     } else if (kind == 0x65) {
         return;
     }
-    bike->UnknownVirtualSlot38(bike->UnknownVirtualSlot52() && kind != 0x3e8, kind, other);
+    bike->ApplyCollisionEvent(bike->UnknownVirtualSlot52() && kind != 0x3e8, kind, other);
 }
 
 // owner: bracket only (0x48dd80; referenced by pointer from the collision setup)

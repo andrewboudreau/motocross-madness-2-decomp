@@ -1192,7 +1192,7 @@ struct VehicleCollisionEvent {     // 'c' argument (provisional)
     Vehicle* otherBody;           // +0x60 other body
 };
 
-void Vehicle::UnknownVirtualSlot38(int notify, int eventKind, void* event)
+void Vehicle::ApplyCollisionEvent(int notify, int eventKind, void* event)
 {
     float otherInvMass;         // the other body's invMass or 0; then slot 3/4's impulse result
     int otherVelOrNull;         // the other body's velocity, or 0 for static parties
@@ -1624,7 +1624,7 @@ int Vehicle::ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, c
         y = -1000.0f;
     modelNode->SetPosition(newPosition->x, y, newPosition->z);
     modelNode->GetPosition(&position);
-    UnknownVirtualSlot36();
+    ResetBodyOrientation();
     PlaceWheels();
     UnknownVirtualSlot58((Vec3*)settleUp, keepPlacement);
     PlaceWheels();

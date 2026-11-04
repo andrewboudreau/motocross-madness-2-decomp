@@ -132,7 +132,7 @@
  {
   "class": "Vehicle",
   "source": "../../../src/reconstructed/VehicleReset.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot36@Vehicle",
+  "candidate_symbol_contains": "ResetBodyOrientation@Vehicle",
   "target_va": "0x0040c710",
   "target_size": 368,
   "expect": "exact",

@@ -30,7 +30,7 @@ public:
     virtual float EffectiveLoadWeight();
     virtual int ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                      const Vec3* settleUp, int keepPlacement, float extraWeight);
-    virtual void UnknownVirtualSlot38(int notify, int eventKind, void* event);
+    virtual void ApplyCollisionEvent(int notify, int eventKind, void* event);
     virtual int ApplyPendingRespawn(float dt);
     virtual void UnknownVirtualSlot41();
     virtual int UnknownVirtualSlot42();
