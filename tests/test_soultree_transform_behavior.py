@@ -15,11 +15,23 @@ from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
+TREE = 'src/krusty2/soultree/soultree.cpp'
+DIRECTION = ('static inline void TransposeRotation(', 'static inline void InvertRigid(',
+             'static inline Vec3 RotateDirection(', 'Vec3 SoultreeObject::WorldToLocalDirection(')
 FUNCTIONS = (
     ('?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z', 0x4fd710, 209),
     ('?SetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z', 0x4fb8c0, 1096),
     ('?SetAxesIn@SoultreeObject@@QAEXPAV1@PBUVec3@@1HH@Z', 0x4fc050, 1171),
 )
+
+
+def definition(text, start):
+    at = text.index(start)
+    end, depth = text.index('{', at) + 1, 1
+    while depth:
+        depth += (text[end] == '{') - (text[end] == '}')
+        end += 1
+    return text[at:end]
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),
@@ -62,7 +74,12 @@ class SoultreeTransformBehaviorTests(unittest.TestCase):
             output = Path(directory)
             objects = []
             candidates = {}
-            for source in ('samples/physics/helpers/SoultreeTransform.cpp',
+            # The promoted direction transform, cut out of soultree.cpp with its helpers.
+            direction = output / 'SoultreeTransform.cpp'
+            text = (ROOT / TREE).read_text()
+            direction.write_text('#include "math/Math3D.h"\n' +
+                                 '\n'.join(definition(text, s) for s in DIRECTION) + '\n')
+            for source in (str(direction),
                            'samples/physics/helpers/SoultreeMatrix.cpp',
                            'tests/fixtures/soultree_transform_compare.cpp'):
                 obj = output / (Path(source).stem + '.obj')
@@ -79,6 +96,9 @@ class SoultreeTransformBehaviorTests(unittest.TestCase):
                 entry = obj.find_symbol(symbol)
                 self.assertEqual(entry.extent_source, 'coff_function_aux')
                 self.assertEqual(entry.function_size, 1134 if va == 0x4fb8c0 else size)
+            exact = compare(retail, candidates['SoultreeTransform'], FUNCTIONS[0][0], 0x4fd710, 209,
+                            (ROOT / TREE).with_suffix('.bindings.json'))
+            self.assertTrue(exact['strict_exact'], exact)
             transpose = compare(retail, candidates['SoultreeMatrix'], 'TransposeRotation3x3',
                                 0x4fefb0, 41, ROOT / 'samples/physics/helpers/SoultreeMatrix.bindings.json')
             self.assertTrue(transpose['strict_exact'], transpose)

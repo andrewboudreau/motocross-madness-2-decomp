@@ -255,11 +255,9 @@ the 2026-10-20 ranking, `work/s14/x87/nearmiss.py`):
 | ours dup, retail load | shell | Krusty3DObjects `0x0048b100` | 4 / 102 |
 | | shell | CarProcedural `0x0042fd80` | 1 / 138 |
 | ours load, retail dup | body | Vehicle slot 74 `0x005281b0` | 1 / 3 |
-| two memory operands swapped, frame and frame | body | SoultreeTransform `0x004fd710` | 1 / 1 |
-| | body | SoultreeBounds `0x004fd340` | 4 / 6 |
+| two memory operands swapped, frame and frame | body | SoultreeBounds `0x004fd340` | 4 / 6 |
 | | body | GraphicsTest `0x0047bd10` | 9 / 16 |
 | | body | SoultreeMatrix `0x004fb8c0` | 2 / 37 |
-| | rider | Tire `0x00515880` | 2 / 4 |
 | | rider | BikeAI `0x0040e510` | 2 / 23 |
 | | rider | Bike `0x0040a520` | 6 / 67 |
 | two memory operands swapped, frame and indirect | body | SoulTreePhysics `0x00501600` | 1 / 13 |
@@ -280,11 +278,11 @@ the 2026-10-20 ranking, `work/s14/x87/nearmiss.py`):
 | `fld st(N)` against a reload | body | Vehicle `0x00527a20` | 1 / 17 |
 
 Rows whose remaining hunks are all x87 (operand form or scheduling):
-- body: `0x004fd710`, `0x005281b0`, `0x0040b410`, `0x004fd340`,
+- body: `0x005281b0`, `0x0040b410`, `0x004fd340`,
   `0x00436720`, `0x00436e50`, `0x00446c30`;
 - render: `0x00456890`, `0x004a1a50`, `0x0047e600`, `0x00443aa0` (none
   of them operand form that a rule above flips; see below);
-- rider: `0x00504d30`, `0x00515880`, `0x004a7fd0`;
+- rider: `0x00504d30`, `0x004a7fd0`;
 - shell: `0x00516ef0`.
 
 Across all ranked rows, 295 hunks are x87 instructions moved past other code
@@ -339,10 +337,11 @@ Leads from the rules:
   with `scaled->x *= (range *= 0.25f)` in the short range, is strict exact.
   Other spellings of the same two facts are also exact: a pointer-taking
   helper in the first arm, or `s = range * 0.25f` as the assignment.
-- **SoultreeTransform `0x004fd710`.** The two memory operands are frame
-  words. Rule 6 predicts the earlier finding that a store to `m._11` gives
-  209/209: retail's `m._11` has a direct store, such as a transpose or
-  copy that writes every element.
+- **SoultreeTransform `0x004fd710`** (exact, in soultree.cpp). The two
+  memory operands are frame words. A store to `m._11` gave 209/209 as a
+  probe, but the source had no store: it is a read of `m._11` in the rigid
+  inverse's translation row, which VC6 removes as dead after creating the
+  leaf. Rule 6's "direct store" also covers a read in removed code.
 
 ## 7. A byte widened in registers or through the stack
 

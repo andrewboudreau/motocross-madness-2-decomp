@@ -22,6 +22,8 @@
 // only retail hoists there. Also worse: building the viewport (identity, or
 // identity and stores) before the projection (29-40 of 492) and /G6
 // (42 of 492); a `projection` copy right before the product is inert (487).
+// Session 18: `Matrix4 viewportScale(IdentityMatrix());` is inert (487) and a
+// named `Matrix4& screen = screenMatrix[1]` for the second product is worse (350).
 #include <math.h>
 
 #include "../../src/reconstructed/Camera.h"

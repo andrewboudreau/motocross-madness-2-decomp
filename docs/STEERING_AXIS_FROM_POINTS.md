@@ -46,14 +46,11 @@ The source and reference each execute their own real scene/cache math:
 | `GetPositionIn` at `0x4fc9a0` | 134 | Complete strict canonical and extracted validation bodies |
 | `UpdateWorldMatrix` at `0x4fb4f0` | 858 | Complete strict canonical and extracted validation bodies |
 | `WorldToLocalPoint` at `0x4fd7f0` | 285 | Complete strict canonical and extracted validation bodies |
-| `WorldToLocalDirection` at `0x4fd710` | 209 | Existing reviewed nonexact standalone, 207 matching positions |
+| `WorldToLocalDirection` at `0x4fd710` | 209 | Complete strict canonical and extracted validation bodies |
 
-The first three definitions and their original inline math helpers are copied
+The four definitions and their original inline math helpers are copied
 verbatim into a temporary validation-only TU and independently compared against
-both the complete canonical object and retail before linking. The actual whole
-`SoultreeTransform.cpp` supplies the direction method. Its existing two-byte
-operand-order difference is retained; this review does not make it universally
-exact. There are **no reference call patches, mocked math, CRT substitutions or
+both the complete canonical object and retail before linking. There are **no reference call patches, mocked math, CRT substitutions or
 scripted callbacks** in this fixture. The reference runs its complete retail
 helpers. Production never maps or dispatches to retail code.
 

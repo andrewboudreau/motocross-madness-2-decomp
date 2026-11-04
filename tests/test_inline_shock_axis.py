@@ -181,8 +181,9 @@ class InlineShockAxisTests(unittest.TestCase):
                                      t['target_size'],ROOT/folder/t['bindings'])
                     self.assertTrue(report['strict_exact'],report);strict += 1
             starts = ['static inline void MatrixProduct(', 'static inline void TransposeRotation(',
-                'static inline void InvertRigid(', 'static inline Vec3 TransformPoint(',
-                'void SoultreeObject::UpdateWorldMatrix()', 'Vec3 SoultreeObject::WorldToLocalPoint(',
+                'static inline void InvertRigid(', 'static inline Vec3 RotateDirection(',
+                'static inline Vec3 TransformPoint(', 'void SoultreeObject::UpdateWorldMatrix()',
+                'Vec3 SoultreeObject::WorldToLocalDirection(', 'Vec3 SoultreeObject::WorldToLocalPoint(',
                 'void SoultreeObject::GetPositionIn(']
             helper_source = output/'helpers.cpp'
             text = (ROOT/TREE).read_text()

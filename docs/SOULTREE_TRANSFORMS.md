@@ -1,12 +1,13 @@
 # Soultree transform candidates
 
-These complete methods remain in `samples/physics/helpers/` and are explicitly
-included in the functional build through `config/game_build.json`. They are
-reviewed nonexact candidates, not additions to the strict-exact census.
+SetMatrixIn and SetAxesIn remain in `samples/physics/helpers/` and are
+explicitly included in the functional build through `config/game_build.json`.
+They are reviewed nonexact candidates, not additions to the strict-exact census.
+WorldToLocalDirection is strict exact in `src/krusty2/soultree/soultree.cpp`.
 
 | Method | Retail VA | Retail / VC6 bytes | Remaining difference |
 | --- | --- | ---: | --- |
-| WorldToLocalDirection | `0x004fd710` | 209 / 209 | One x87 multiply loads its operands in the other order |
+| WorldToLocalDirection | `0x004fd710` | 209 / 209 | Strict exact in `soultree.cpp` |
 | SetMatrixIn | `0x004fb8c0` | 1096 / 1134 | Transpose inlining and stack-slot assignment |
 | SetAxesIn | `0x004fc050` | 1171 / 1171 | Stack-slot assignment |
 | TransposeRotation3x3 | `0x004fefb0` | 41 / 41 | Strict exact helper, unchanged |
@@ -19,9 +20,13 @@ The existing physics view receives the complete node pointer without a base
 adjustment. Local and world matrices are at `+0xb8/+0xf8`, world validity at
 `+0x138` and the parent pointer at `+0x13c`.
 
-WorldToLocalDirection updates the world matrix, copies it, transposes its
-rotation and returns the transformed direction through the x86 hidden result
-buffer. This uses a transpose, not a general matrix inverse.
+WorldToLocalDirection updates the world matrix, copies it, inverts the copy
+with the same InvertRigid as WorldToLocalPoint and returns the rotated direction
+through the x86 hidden result buffer. VC6 removes the inverse's translation row,
+which nothing reads, so the code is a transpose of the rotation. The removed
+products still decide retail's x87 load order: the `m._11` leaf is created before
+`v` is copied, so the x row loads `v.x` first. The y row groups its x and y
+products.
 
 SetMatrixIn delegates to SetLocalMatrix when the frame is the node itself.
 Otherwise it converts the caller's matrix in place through a nonnull frame,
@@ -43,7 +48,8 @@ order are retained from the full decoded retail body.
 `tests/test_soultree_transform_behavior.py` links the actual standalone VC6
 candidate objects and executes all three complete methods against the
 hash-pinned retail image. It checks their COFF function extents independently,
-the strict 41-byte transpose, all external direct-call destinations and the
+the strict 41-byte transpose, the strict WorldToLocalDirection (cut out of
+`soultree.cpp` with its inline helpers), all external direct-call destinations and the
 nine node-cache call sites instrumented by the private fixture. No production
 instructions or production linker behavior are changed for the test.
 
@@ -71,6 +77,6 @@ $env:PYTHONPATH = '.'
 $env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path
 $env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
 python -m unittest discover -s tests -p test_soultree_transform_behavior.py -v
-python tools/run_physics_samples.py --compiler vc6 --vc6-root $env:VC6_ROOT --profile vc6_o2_mt --strict --source samples/physics/helpers/SoultreeMatrix.cpp --source samples/physics/helpers/SoultreeTransform.cpp
+python tools/run_physics_samples.py --compiler vc6 --vc6-root $env:VC6_ROOT --profile vc6_o2_mt --strict --source samples/physics/helpers/SoultreeMatrix.cpp --root src/krusty2/soultree
 python tools/build_game.py -j6
 ```

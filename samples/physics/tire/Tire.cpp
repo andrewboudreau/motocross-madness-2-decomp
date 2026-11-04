@@ -74,21 +74,12 @@ static inline CollisionVec3 TireNormalizeZ(const CollisionVec3& v)
 // Both axes are normalised (skipped when |v|^2 is exactly 1).  When `orthogonalize` is set
 // the vectors are first made perpendicular using c = y x z:
 //   keepZ != 0 : y = z x c  (z is kept)      keepZ == 0 : z = c x y  (y is kept).
-// Near miss (699 of 703): c built as a Math3D Vec3 temporary loads z first in the two
-// y.x products like retail (695 -> 699), but c.x's second and c.y's first products now
-// load y.z before z.y/z.x where retail loads z first; the Vec3 form's 64 operand orders
-// and groupings are inert apart from c.x's first-product bracket.
-// Earlier member-wise c (695), where retail loads z.z and z.y before y.x in c.y's and
-// c.z's y.x products.  Inert or worse (session 14): operand order and grouping of each
-// product, negated c.y, declaring y and z apart from their copies (either order),
-// member-wise copies of y and z (53-55 slot lines), and a cross helper taking y and z
-// by reference, pointer or value in either order (y then loads first everywhere).
-// A 256-variant sweep bracketing each single product of the cross (the OrientationAxes
-// lever) with both operand orders of the two y.x products tops out at 695: only the
-// bracket on c.x's first product changes the code, and not towards retail.
-// Retail loads z first in all six c products; ours loads y.x first in its two. Rule 6
-// stores (VC6_PATTERN_CORPUS section 6) do not reach it: y member-wise 28, y.x stored
-// again 32, z member-wise 668, either one before the other's copy 14-29.
+// y's components are read into scalars before the cross c = y x z: their leaves are then
+// older than z's, and every c product loads its z operand first as retail does
+// (VC6_OPERAND_ORDER.md section 1). Without the copies the two y.z products load y.z
+// first (699/703); a dead read of y.z alone before c also gives 703, so it is the age of
+// the y leaves that matters (strong inference: the Vec3 arguments seem to be generated
+// right to left, which creates y.z after z.x and z.y).
 void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const CollisionVec3* zAxis,
                            const CollisionVec3* yAxis, int orthogonalize, int keepZ)
 {
@@ -98,7 +89,8 @@ void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const Colli
     if (orthogonalize) {
         // c = y x z as a Math3D Vec3 temporary; the first product is grouped: retail tests
         // keepZ after the second product.
-        Vec3 c((y.y * z.z) - y.z * z.y, y.z * z.x - y.x * z.z, y.x * z.y - y.y * z.x);
+        float yx = y.x, yy = y.y, yz = y.z;
+        Vec3 c((yy * z.z) - yz * z.y, yz * z.x - yx * z.z, yx * z.y - yy * z.x);
         CollisionVec3 perpendicular;
         if (keepZ) {
             perpendicular.x = c.z * z.y - c.y * z.z;

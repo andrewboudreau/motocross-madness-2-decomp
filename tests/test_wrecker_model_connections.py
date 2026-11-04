@@ -20,11 +20,10 @@ EXE = Path(os.environ.get('MCM2_EXE', ROOT / 'work/game/mcm2.exe'))
 PROVIDERS = {
     0x4a8ac0, 0x4a8b10, 0x4a8b40, 0x4a8b80,
     0x4fc690, 0x4fc740, 0x4fc890, 0x4fc9a0,
-    0x4fca80, 0x4fcc70, 0x4fd660, 0x4fe850,
+    0x4fca80, 0x4fcc70, 0x4fd660, 0x4fd710, 0x4fe850,
 }
 REMAINING = {
     '?SetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z',
-    '?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z',
 }
 
 

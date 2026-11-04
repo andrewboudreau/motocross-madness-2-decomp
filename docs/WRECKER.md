@@ -113,9 +113,10 @@ Twelve existing source bodies now satisfy thirteen former decorated aliases
 | `0x004fe850` | 74 | SoultreeObject::GetSubtreeBounds |
 
 Two additional aliases name the shared SetMatrixIn (`0x004fb8c0`) and
-WorldToLocalDirection (`0x004fd710`) methods. Their complete bodies now have
-separate [reviewed nonexact functional admission](SOULTREE_TRANSFORMS.md),
-remaining in samples; the alias connection itself added no implementation.
+WorldToLocalDirection (`0x004fd710`) methods. SetMatrixIn has separate
+[reviewed nonexact functional admission](SOULTREE_TRANSFORMS.md) and remains in
+samples; WorldToLocalDirection is strict exact in `src/krusty2/soultree/soultree.cpp`.
+The alias connection itself added no implementation.
 The retained PushProbesOutOfBox sample
 also calls the shared WorldToLocalPoint declaration.
 

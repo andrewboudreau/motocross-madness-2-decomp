@@ -792,6 +792,16 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
+    "candidate_symbol_contains": "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
+    "target_va": "0x004fd710",
+    "target_size": 209,
+    "expect": "exact",
+    "notes": "inverts the copy with the same InvertRigid as WorldToLocalPoint (VC6 drops the unread translation row, but its products age the m._11 leaf before v is copied); the y row groups its x and y products (207 -> 209; moved from samples/physics/helpers/SoultreeTransform.cpp)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
     "candidate_symbol_contains": "?WorldToLocalPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
     "target_va": "0x004fd7f0",
     "target_size": 285,

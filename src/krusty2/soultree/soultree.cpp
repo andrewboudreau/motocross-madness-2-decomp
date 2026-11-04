@@ -13,9 +13,8 @@
 //    .bss and only RegisterNode/UnregisterNode write it.
 // Class identity and offsets: core/SoultreeObject.h. Method names are tier 3.
 //
-// Every function below is strict exact. Near misses of the same unit (WorldToLocalDirection
-// 0x004fd710, SetMatrixIn 0x004fb8c0 with the transpose COMDAT 0x004fefb0, SetAxesIn 0x004fc050)
-// are in samples/physics/helpers/.
+// Every function below is strict exact. Near misses of the same unit (SetMatrixIn 0x004fb8c0
+// with the transpose COMDAT 0x004fefb0, SetAxesIn 0x004fc050) are in samples/physics/helpers/.
 // Scale 0x004fd340 (inline 4x4 product) is a near miss in
 // samples/physics/helpers/SoultreeBounds.cpp.
 #define SOULTREE_OBJECT_WITH_BASES
@@ -635,6 +634,31 @@ static inline void InvertRigid(Matrix4& m)
     m._41 = t.x;
     m._42 = t.y;
     m._43 = t.z;
+}
+
+// v * (upper 3x3 of m), no translation. v is taken by value (retail copies it to the
+// stack). The y row groups its x and y products: the flat sum loads them in the other
+// order.
+static inline Vec3 RotateDirection(Vec3 v, const Matrix4& m)
+{
+    Vec3 r;
+    r.x = v.x * m._11 + v.y * m._21 + v.z * m._31;
+    r.y = v.z * m._32 + (v.x * m._12 + v.y * m._22);
+    r.z = v.x * m._13 + v.y * m._23 + v.z * m._33;
+    return r;
+}
+
+// 0x004fd710. v * inverse(worldMatrix) for a rigid transform, without the translation:
+// the copy is inverted with the same InvertRigid as WorldToLocalPoint, and VC6 drops the
+// translation row that nothing reads. Retail loads v.x before m._11 in the x row; a bare
+// transpose loads m._11 first. Strong inference: the removed translation products read
+// m._11 before v is copied, so m._11's leaf is the older one.
+Vec3 SoultreeObject::WorldToLocalDirection(const Vec3& v)
+{
+    UpdateWorldMatrix();
+    Matrix4 inverse = worldMatrix;
+    InvertRigid(inverse);
+    return RotateDirection(v, inverse);
 }
 
 // p * m with the translation row added.

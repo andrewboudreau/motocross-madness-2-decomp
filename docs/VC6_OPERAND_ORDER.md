@@ -138,8 +138,13 @@ leaf. Bike slot 76 (`v.x *= (s = ...)`) makes `s` newer than `v.x`; a named
   its leaf before `fromStart` is computed, so `fromStart` is the newer leaf and VC6
   emits `fld fromStart; fadd length`; the function is exact with it. Moving the
   `length = toEnd` store up instead folds `toEnd` away and changes the frame.
-- MatrixUtil `0x004a1a50`, SoultreeTransform `0x004fd710` (`v.x * m._11`,
-  the only matrix element the transpose does not touch), Bike slot 54 and the
+- Code that the optimiser removes still creates leaves: SoultreeObject
+  WorldToLocalDirection `0x004fd710` inverts its matrix copy with the rigid
+  inverse of WorldToLocalPoint. Nothing reads the translation row, so VC6
+  emits only the transpose, but the row's products read `m._11` before `v` is
+  copied, and retail's `fld v.x; fmul m._11` follows. A bare transpose leaves
+  `m._11` untouched and loads it first.
+- MatrixUtil `0x004a1a50`, Bike slot 54 and the
   particle emitters' normalisations (`fld st(0); fmul` on the first
   component only) are not reproduced by any reference-order change tried
   (loop update order, `for` forms, term order, by-value helpers, helper
@@ -731,6 +736,9 @@ without effect, as noted.
   with `float x = v.x, y = v.y, z = v.z;` and a z row `x * m->_13 + (y * m->_23 + z * m->_33)
   + m->_43`. Reading `v.x` in place with the same bracketing stayed 1-3 products off. It did
   not help SoultreeObject::WorldToLocalDirection `0x004fd710` (207 -> 203).
+  TireBuildFrame `0x00515880` (699 to 703) reads only y's components into scalars before
+  the cross `c = y x z` (`float yx = y.x, yy = y.y, yz = y.z;`): the y leaves are then
+  older than z's, and every c product loads its z operand first, as retail does.
 - **Written operand order of a product between two struct copies.** For FollowCamera
   slot 47 `0x00465720` `b.m[k][j] * a.m[i][k]` (not `a * b`) gives retail's hoisted
   `a(0,3)` load, and `m[r][c]` access instead of `operator()` lets VC6 interleave the
@@ -1091,16 +1099,16 @@ try on similar code. None is a rule.
   (`0x004b5d00`, 265 to 274 of 274): retail loads `mov eax, 1` before the last `faddp`. With
   `t = c * f->z - (s * f->x); f->x = (c * f->x) + s * f->z;` VC6 schedules it there; unbracketed,
   or with only one of those two products bracketed, it lands between the closing `fstp`s.
-- **Non-source probe: a no-op store ages an untouched operand.** SoultreeObject
-  WorldToLocalDirection (`0x004fd710`, 207 of 209): retail loads `v.x` before `m._11` in
-  the last x product, where `m._11` is the only element of the product the inline
-  transpose does not write. As a probe only, `m._11 = m._11;` (or `m._11 *= 1.0f`) at the
-  end of the transpose emits nothing yet gives 209/209, which supports section 1.2 (the
-  store makes `m._11` the newer leaf). It is a matching-only distortion and is not kept in
-  the sample. Natural shapes that write the diagonal (a loop over `j <= i`, a SwapF helper,
-  a full copy back, a nine-entry transpose into a destination matrix, a by-value
-  `Matrix3 Transposed()`) change the code shape (50 or more lines differ). The same
-  probe on the matrix operands of SoultreeBounds Scale (`0x004fd340`) does not move s13.
+- **Dead code ages an untouched operand.** SoultreeObject WorldToLocalDirection
+  (`0x004fd710`, 207 to 209 of 209): retail loads `v.x` before `m._11` in the last x
+  product, where `m._11` is the only element of the product a transpose does not write. A
+  no-op `m._11 = m._11;` probe gave 209/209 but is not source. The source is the sibling's
+  rigid inverse (`InvertRigid`, shared with WorldToLocalPoint `0x004fd7f0`): its
+  translation row reads `m._11`, and VC6 deletes the row because nothing reads it, after
+  the leaf exists. Natural shapes that write the diagonal (a loop over `j <= i`, a SwapF
+  helper, a full copy back, a nine-entry transpose into a destination matrix, a by-value
+  `Matrix3 Transposed()`) change the code shape. The no-op probe on the matrix operands of
+  SoultreeBounds Scale (`0x004fd340`) does not move s13.
 - **A guarded pointer-local loop moves the loop counter's home.** SoultreeRefreshContacts
   (`0x0043ad80`, 597 to 604 of 615): `for (; count > 0; count--, points++)` homes the
   counter in a1's dead argument slot; retail uses points' slot and loads points after the

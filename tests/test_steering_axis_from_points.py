@@ -22,12 +22,12 @@ SOURCE = 'samples/physics/motion/SteeringAxisFromPoints.cpp'
 AGGREGATE = 'samples/physics/motion/SteeringControl.cpp'
 CANONICAL = 'src/krusty2/motion/SteeringControl.cpp'
 TREE = 'src/krusty2/soultree/soultree.cpp'
-TRANSFORM = 'samples/physics/helpers/SoultreeTransform.cpp'
 SYMBOL = '?SetAxisFromPoints@SteeringControl@@QAEHPAVSoultreeObject@@00@Z'
 HELPERS = (
  ('?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z',0x4fc9a0,134),
  ('?UpdateWorldMatrix@SoultreeObject@@QAEXXZ',0x4fb4f0,858),
  ('?WorldToLocalPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z',0x4fd7f0,285),
+ ('?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z',0x4fd710,209),
 )
 
 
@@ -170,7 +170,6 @@ class SteeringAxisFromPointsTests(unittest.TestCase):
             self.assertEqual(caller_fingerprint(bike, '?LoadBike@Bike@@'),
                              '70f599f7d80e0211525484f6b33710483fa20d92edacf6d319d58ea726353220')
             self.assertEqual(sum(name==SYMBOL for _,_,name in caller_relocs),1)
-            transform_path,transform = compile_source(ROOT/TRANSFORM,'transform')
             self.assertEqual(signature(candidate,SYMBOL),signature(aggregate,SYMBOL))
             entry = candidate.find_symbol(SYMBOL)
             self.assertEqual((entry.function_size,entry.extent_source),(230,'coff_function_aux'))
@@ -204,8 +203,9 @@ class SteeringAxisFromPointsTests(unittest.TestCase):
                                      target['target_size'],ROOT/'src/krusty2/motion'/target['bindings'])
                     self.assertTrue(result['strict_exact'],result);strict += 1
             starts = ['static inline void MatrixProduct(', 'static inline void TransposeRotation(',
-                'static inline void InvertRigid(', 'static inline Vec3 TransformPoint(',
-                'void SoultreeObject::UpdateWorldMatrix()', 'Vec3 SoultreeObject::WorldToLocalPoint(',
+                'static inline void InvertRigid(', 'static inline Vec3 RotateDirection(',
+                'static inline Vec3 TransformPoint(', 'void SoultreeObject::UpdateWorldMatrix()',
+                'Vec3 SoultreeObject::WorldToLocalDirection(', 'Vec3 SoultreeObject::WorldToLocalPoint(',
                 'void SoultreeObject::GetPositionIn(']
             helper_source = output/'helpers.cpp'
             text = (ROOT/TREE).read_text()
@@ -216,14 +216,11 @@ class SteeringAxisFromPointsTests(unittest.TestCase):
                     result = compare(retail,obj,symbol,va,size,(ROOT/TREE).with_suffix('.bindings.json'))
                     self.assertTrue(result['strict_exact'],result);strict += 1
                 self.assertEqual(signature(helpers,symbol),signature(tree,symbol))
-            direction = '?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z'
-            result = compare(retail,transform,direction,0x4fd710,209,(ROOT/TRANSFORM).with_suffix('.bindings.json'))
-            self.assertEqual((result['candidate_size'],result['strict_match']['matching_positions']),(209,207))
             # No patching: the source links actual source helpers; the reference runs its own full helpers.
             fixture,_ = compile_source(ROOT/'tests/fixtures/steering_axis_from_points_compare.cpp','fixture')
             executable = output/'steering.exe'
             result = subprocess.run([str(linker),'/nologo','/subsystem:console','/base:0x100000','/fixed','/opt:ref',
-                f'/out:{executable}',f'/libpath:{libraries}',str(candidate_path),str(helper_path),str(transform_path),
+                f'/out:{executable}',f'/libpath:{libraries}',str(candidate_path),str(helper_path),
                 str(fixture),'kernel32.lib'],capture_output=True,text=True,encoding='latin1')
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             result = subprocess.run([str(executable),str(image)],capture_output=True,text=True,timeout=120)

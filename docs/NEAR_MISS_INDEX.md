@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 114, c 91, total 207. The three class (a) functions of the
+Counts: a 2, b 114, c 89, total 205. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -63,6 +63,18 @@ Griddraw.cpp: each arm assigns all four range values and the counts are differen
 the range records (`ranges[block].end - ranges[block - 1].end`), the form the sibling
 block walk `0x00481300` uses, not `- vertexStart`. That gives retail's eax zero and its
 esi/edi roles; about 90 placements of the zero initialisers had not.
+SoultreeObject::WorldToLocalDirection `0x004fd710` (class c, 203/205 masked) is exact too,
+in soultree.cpp: the copy is inverted with the same `InvertRigid` as its sibling
+WorldToLocalPoint, not transposed. VC6 drops the translation row that nothing reads, but
+its products were turned into IL first, so `m._11` gets its leaf before `v` is copied and
+the x row loads `v.x` first. The y row is then `v.z * m._32 + (v.x * m._12 + v.y * m._22)`
+(best of the twelve sum shapes). Optimised-away code still ages leaves: when retail's order
+needs an operand to be older, look for the computation a sibling performs and discards.
+TireBuildFrame `0x00515880` (class c, 699/703) is exact too, in samples/physics/tire/Tire.cpp:
+y's components are read into scalars (`float yx = y.x, yy = y.y, yz = y.z;`) before the
+cross c = y x z, so all six c products load their z operand first as retail does. A dead
+read of `y.z` alone does the same; the operand orders and groupings tried before could not
+make the y leaves older than the z leaves.
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
@@ -150,7 +162,6 @@ esi/edi roles; about 90 placements of the zero initialisers had not.
 | physics/helpers/SoultreeBounds | `0x004fd340` | 618/630 | c | rows _11.._13 written k = 1,3,2,4 and _14 k = 3,1,2,4; the s13 product of _11.._14 loads its operands the other way (retail m3j first) and two _44 products differ (samples/physics/helpers/SoultreeBounds.cpp) |
 | physics/helpers/SoultreeMatrix | `0x004fb8c0` | 262/1096 | b | 13 code diffs: `mov ecx, [esp + N] ; mov edx, [esp + N]~` vs `lea ecx, [esp + N] ; push ecx`; `fld [esp + N] ; mov [esp + N], ecx ; le~` vs `call A`; slot order differs |
 | physics/helpers/SoultreeMatrix | `0x004fc050` | 1137/1171 | b | same instructions, order and length (bracketed products in the inline cross); three 12-byte slots ordered temporaries, pos, r where retail has r (shared with the delta copy), temporaries, pos; dropping the z/y/x block gives the r/d sharing but demotes z (1093) |
-| physics/helpers/SoultreeTransform | `0x004fd710` | 203/205 (masked) | c | FPU operand order: one `fld/fmul` pair loads the other operand first (2 bytes) ; x-row, transpose-order, y/z-order and ~10k structural forms (constructor return, reference plus copy, pointer/by-value matrix, out pointer, Swap helper, inline transpose) do not move `v.x * m._11` |
 | physics/krustybike/KrustyBike | `0x0048eea0` | 608/2952 | c | slot 102, frame 0x50 exact; VC6 cross-jumps the head-turn arms differently (retail keeps the + side hold block and the - side retarget tail), `jne call ; jmp skip` vs retail `je skip ; jmp call` in the trick-chain switch, the `+0x153c = 0` else block before the shared advance, and the crash clamp keeps t on the x87 stack where retail spills it to the dt slot |
 | physics/krustybike/KrustyBike | `0x0048fa60` | 472/532 | c | 4 code diffs: retail hoists `mov [esi + 0x11b8], bl ; mov [esi + 0x604], ebx` into the load delay of the +0x1540 kVec3Zero copy where the candidate hoists `+0x7c0/+0x7bc` (pick index = units after the copy - 32) |
 | physics/krustybike/KrustyBike | `0x004919a0` | 151/230 | c | 8 code diffs: retail adds `mov edx, [edx + 0x60c] ; fsub [ecx + 0x~`; retail lacks `fsub [ecx + 0xb8]` |
@@ -175,7 +186,6 @@ esi/edi roles; about 90 placements of the zero initialisers had not.
 | physics/soultree_base/SoultreePhysicsInlines | `0x0040b410` | 426/432 | c | magnitude through a `scratchVector` reference and the `*speedBudget < charge` clamp give retail's loads and fcom; left: the scaled branch's budget `fsub` scheduled after the copy's z load (samples/physics/soultree_base/SoultreeDrag.cpp) |
 | physics/tire/Tire | `0x005135f0` | 1630/1664 | c | UpdateContactPatch: Math3D Vec3 constructor crosses and a named projection give retail's frame slots; left: the lever `lea edi`/first load scheduled after the z product, second TireDot push earlier |
 | physics/tire/Tire | `0x00514550` | 2566/4258 | b | aligned 1176, frame 0xc0 matches (function-scope `rolled`); 0x53304c is stdcall D3DRMVectorRotate; the score as a statement before the n3 test gives retail's `fcom`; retail keeps four call/ctor temporaries in rolled's slot (disp32 leas, the whole 12-byte size gap; rolled is already first assigned at its single use, so this is slot order among tied 12-byte symbols, not liveness; block-scoping the frame matrix, moving rolled's declaration, copying through it or block-scoping it are inert or worse); left: owner branch loads the side pointer late (the reference forms that fix it commute the lateral cross instead), the lateral x products load b first, a few copy-store orders |
-| physics/tire/Tire | `0x00515880` | 699/703 | c | keepZ test placed by grouping c.x's first product; c = y x z as a Math3D Vec3 temporary loads z first in the y.x products; left: the two y.z products load y.z before z (4 bytes); operand order and grouping of the c products inert |
 | physics/visibility/VisibilityQuadTreeTraversal | `0x0052d610` | 2265/3027 | c | 23 differing instructions (3022 B): VC6 cross-jumps two recursive-call tails that retail keeps apart (retail merges two slot-2 call tails instead); argument-expression, helper and arm-shape forms do not move the choice |
 | race/BikeRace | `0x00417ed0` | 2828/6768 | c | retail stores `z*z` of each vector length to a stack temporary (`fstp [t]; faddp; fadd [t]`); the girl block's temporaries sit 4 to 12 bytes apart |
 | race/BikeRace | `0x00419970` | 13396/13428 | b | every scalar slot is retail's; left are three early register choices, two prologue stores, one SIB order and two 0x40-byte pairs swapped (own textures, replay recorded bike/rider) |
