@@ -46,10 +46,10 @@ public:
     virtual void IntegrateMotion(Vec3* force, const Vec3* localTorque, const Vec3* worldTorque);
     virtual void ApplyWorldTorque(const Vec3* worldTorque, Vec3* angularAccel);
     virtual Vec3 LocalTorqueToAngularAcceleration(const Vec3* localTorque);
-    virtual int UnknownVirtualSlot22();
-    virtual int UnknownVirtualSlot23();
-    virtual int UnknownVirtualSlot24();
-    virtual int UnknownVirtualSlot25();
+    virtual int ShouldUpdateShadowLight();
+    virtual int ShouldEmitMovingEffects();
+    virtual int ShouldRestartSteamEffect();
+    virtual int ShouldBurstSteamEffect();
     virtual void UnknownVirtualSlot27();
     virtual void UnknownVirtualSlot43();
     virtual void UnknownVirtualSlot29(int lastStep);

@@ -22,7 +22,7 @@ void SoultreePhysicsBaseObject::UpdateScrapeEffect(SoultreeAttachment* attachmen
 {
 }
 
-int SoultreePhysicsBaseObject::UnknownVirtualSlot25()
+int SoultreePhysicsBaseObject::ShouldBurstSteamEffect()
 {
     return 0;
 }
@@ -194,7 +194,7 @@ void SoultreePhysicsBaseObject::ApplyWorldTorque(const Vec3* worldTorque, Vec3* 
 {
     Vec3 localTorque = sceneNode->WorldToLocalDirection(*worldTorque);
     Vec3 localAccel;
-    if (UnknownVirtualSlot10()) {
+    if (IsAtBaseWeight()) {
         localAccel.x = localTorque.x * shapeInvInertia.x;
         localAccel.y = localTorque.y * shapeInvInertia.y;
         localAccel.z = localTorque.z * shapeInvInertia.z;
@@ -210,7 +210,7 @@ void SoultreePhysicsBaseObject::ApplyWorldTorque(const Vec3* worldTorque, Vec3* 
 Vec3 SoultreePhysicsBaseObject::LocalTorqueToAngularAcceleration(const Vec3* localTorque)
 {
     Vec3 accel;
-    if (UnknownVirtualSlot10()) {
+    if (IsAtBaseWeight()) {
         accel.x = shapeInvInertia.x * localTorque->x;
         accel.y = shapeInvInertia.y * localTorque->y;
         accel.z = shapeInvInertia.z * localTorque->z;
@@ -669,7 +669,7 @@ void SoultreePhysicsBaseObject::UpdateAttachmentEffects()
                 shadowLight = light;
         }
     }
-    if (UnknownVirtualSlot22()) {
+    if (ShouldUpdateShadowLight()) {
         int hit;
         Vec3 pos = AverageAttachmentPosition();
         pos.y += 1.5f;
@@ -707,8 +707,8 @@ void SoultreePhysicsBaseObject::UpdateAttachmentEffects()
     }
     if (++staggerCounter > 5)
         staggerCounter = 0;
-    int moving = UnknownVirtualSlot23();
-    int settled = UnknownVirtualSlot24();
+    int moving = ShouldEmitMovingEffects();
+    int settled = ShouldRestartSteamEffect();
     for (int i = 0; i < attachmentCount; i++) {
         SoultreeAttachment* attachment = &attachments[i];
         attachment->resetTrail = (justReset || attachment->resetTrail) ? 1 : 0;
@@ -739,7 +739,7 @@ void SoultreePhysicsBaseObject::UpdateAttachmentEffects()
                 }
                 if (settled && !field_0x20e)
                     reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(attachment))->Restart();
-                else if (UnknownVirtualSlot25())
+                else if (ShouldBurstSteamEffect())
                     reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(attachment))->Burst();
             }
             break;

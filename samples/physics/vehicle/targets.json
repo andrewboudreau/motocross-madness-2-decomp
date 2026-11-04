@@ -72,7 +72,7 @@
  {
   "class": "Vehicle",
   "source": "../../../src/reconstructed/VehicleMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot23@Vehicle",
+  "candidate_symbol_contains": "ShouldEmitMovingEffects@Vehicle",
   "target_va": "0x0040caf0",
   "target_size": 38,
   "expect": "exact",
@@ -82,7 +82,7 @@
  {
   "class": "Vehicle",
   "source": "../../../src/reconstructed/VehicleMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot24@Vehicle",
+  "candidate_symbol_contains": "ShouldRestartSteamEffect@Vehicle",
   "target_va": "0x0040cb20",
   "target_size": 59,
   "expect": "exact",
@@ -92,7 +92,7 @@
  {
   "class": "Vehicle",
   "source": "../../../src/reconstructed/VehicleMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot25@Vehicle",
+  "candidate_symbol_contains": "ShouldBurstSteamEffect@Vehicle",
   "target_va": "0x0040cb60",
   "target_size": 59,
   "expect": "exact",

@@ -109,7 +109,7 @@ public:
     virtual void UnknownVirtualSlot7(const Vec3* force);  // only read (0x005019e0, tier 2)
     virtual void UnknownVirtualSlot8();
     virtual void UnknownVirtualSlot9(float dt, int* steps);
-    virtual int UnknownVirtualSlot10();
+    virtual int IsAtBaseWeight();
     // Slot 11 (ret 0x14): returns the FindObjectPlacement (0x004b0df0) result (tier 1).
     // respawn is slot 39's answer; the four outputs are what the step loops pass to slot 33
     // as newPosition, newForward, settleUp and keepPlacement (tier 2).
@@ -130,10 +130,10 @@ public:
     virtual void UpdateSlideEffect(SoultreeAttachment* attachment);
     virtual void UpdateScrapeEffect(SoultreeAttachment* attachment);
     virtual void UpdateAttachmentEffects();
-    virtual int UnknownVirtualSlot22();
-    virtual int UnknownVirtualSlot23();
-    virtual int UnknownVirtualSlot24();
-    virtual int UnknownVirtualSlot25();
+    virtual int ShouldUpdateShadowLight();
+    virtual int ShouldEmitMovingEffects();
+    virtual int ShouldRestartSteamEffect();
+    virtual int ShouldBurstSteamEffect();
     virtual void UnknownVirtualSlot26();
     virtual void UnknownVirtualSlot27();
     virtual int UnknownVirtualSlot28(int steps);

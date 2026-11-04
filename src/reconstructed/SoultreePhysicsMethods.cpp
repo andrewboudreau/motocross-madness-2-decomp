@@ -8,14 +8,14 @@
 #include "soultree/SoultreePhysicsCallees.h"
 #include "soultree/SoultreePhysicsContact.h"
 
-int SoultreePhysicsBaseObject::UnknownVirtualSlot10()
+int SoultreePhysicsBaseObject::IsAtBaseWeight()
 {
     if (totalWeight == baseWeight)
         return 1;
     return 0;
 }
 
-int SoultreePhysicsBaseObject::UnknownVirtualSlot22()
+int SoultreePhysicsBaseObject::ShouldUpdateShadowLight()
 {
     return staggerCounter == staggerPhase;
 }
@@ -34,19 +34,19 @@ int SoultreePhysicsBaseObject::UnknownVirtualSlot5(int value)
     return value == 0;
 }
 
-int SoultreePhysicsBaseObject::UnknownVirtualSlot23()
+int SoultreePhysicsBaseObject::ShouldEmitMovingEffects()
 {
     return !airborne && linearSpeed >= 1.0f;
 }
 
-int SoultreePhysicsBaseObject::UnknownVirtualSlot24()
+int SoultreePhysicsBaseObject::ShouldRestartSteamEffect()
 {
     return 0;
 }
 
 float SoultreePhysicsBaseObject::UnknownVirtualSlot32()
 {
-    if (UnknownVirtualSlot10())
+    if (IsAtBaseWeight())
         return 0.0f;
     return loadWeight;
 }

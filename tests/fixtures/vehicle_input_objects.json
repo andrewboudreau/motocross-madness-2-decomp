@@ -3,17 +3,17 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "2c5093b18866ec0937076362135354d5875442ef4decaf2ee849095c7dca6f6b"
+      "sha256": "dfecf903132858cb0300753a9be227ce187804c23f9daef4386ba75fd4ebcac9"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "acedaeeb1cbda18f72aa2b85f4a77ea47991f1a37d057441acc4c5334110ff57"
+      "sha256": "95639e7971276351638185bc7310814a87bd7dfa86cd9742184b0606b90c1482"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
       "relocations": 1054,
-      "sha256": "0b2ada4fba3dbf9a302087215a91415725b84ed58abfa85750c434bb5bf5b373"
+      "sha256": "cbea9c0260fe6936638ccc3998497e39f582e84887af2d15825d72a5cce3ddfd"
     },
     "src/reconstructed/VehicleDefaults.cpp": {
       "sections": 13,
@@ -23,7 +23,7 @@
     "src/reconstructed/VehicleMethods.cpp": {
       "sections": 27,
       "relocations": 26,
-      "sha256": "f768a01910966ec30529f25efb3b937a22844915ddfedda3657efd98255a0968"
+      "sha256": "518458419b76d6fd7e94f82eda7d549ccd3c891282fb02bf2e0cfd76d64b4d1b"
     },
     "src/reconstructed/VehicleReset.cpp": {
       "sections": 15,
@@ -43,7 +43,7 @@
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "34317c0965858410903d4b86a368974223cb61827fbfa774a98bee30bca83ac6"
+      "sha256": "ce72fcb19329f8a8b9a935b492fd951827ea385db3688c3e3c14653c89083d07"
     },
     "src/reconstructed/InputDevice.cpp": {
       "sections": 11,
@@ -1160,14 +1160,14 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot24@KrustyBike",
+      "symbol": "ShouldRestartSteamEffect@KrustyBike",
       "va": "0x4958d0",
       "extent": 123,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot25@KrustyBike",
+      "symbol": "ShouldBurstSteamEffect@KrustyBike",
       "va": "0x495950",
       "extent": 123,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1223,14 +1223,14 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot22@KrustyBike",
+      "symbol": "ShouldUpdateShadowLight@KrustyBike",
       "va": "0x495de0",
       "extent": 42,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot23@KrustyBike",
+      "symbol": "ShouldEmitMovingEffects@KrustyBike",
       "va": "0x495e10",
       "extent": 56,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1608,21 +1608,21 @@
     },
     {
       "source": "src/reconstructed/VehicleMethods.cpp",
-      "symbol": "UnknownVirtualSlot23@Vehicle",
+      "symbol": "ShouldEmitMovingEffects@Vehicle",
       "va": "0x40caf0",
       "extent": 38,
       "bindings": "src/reconstructed/VehicleMethods.bindings.json"
     },
     {
       "source": "src/reconstructed/VehicleMethods.cpp",
-      "symbol": "UnknownVirtualSlot24@Vehicle",
+      "symbol": "ShouldRestartSteamEffect@Vehicle",
       "va": "0x40cb20",
       "extent": 59,
       "bindings": "src/reconstructed/VehicleMethods.bindings.json"
     },
     {
       "source": "src/reconstructed/VehicleMethods.cpp",
-      "symbol": "UnknownVirtualSlot25@Vehicle",
+      "symbol": "ShouldBurstSteamEffect@Vehicle",
       "va": "0x40cb60",
       "extent": 59,
       "bindings": "src/reconstructed/VehicleMethods.bindings.json"

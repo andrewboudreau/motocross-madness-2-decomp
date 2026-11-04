@@ -1872,7 +1872,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot24@KrustyBike",
+    "candidate_symbol_contains": "ShouldRestartSteamEffect@KrustyBike",
     "target_va": "0x004958d0",
     "target_size": 123,
     "expect": "exact",
@@ -1882,7 +1882,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot25@KrustyBike",
+    "candidate_symbol_contains": "ShouldBurstSteamEffect@KrustyBike",
     "target_va": "0x00495950",
     "target_size": 123,
     "expect": "exact",
@@ -1962,7 +1962,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot22@KrustyBike",
+    "candidate_symbol_contains": "ShouldUpdateShadowLight@KrustyBike",
     "target_va": "0x00495de0",
     "target_size": 42,
     "expect": "exact",
@@ -1972,7 +1972,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot23@KrustyBike",
+    "candidate_symbol_contains": "ShouldEmitMovingEffects@KrustyBike",
     "target_va": "0x00495e10",
     "target_size": 56,
     "expect": "exact",

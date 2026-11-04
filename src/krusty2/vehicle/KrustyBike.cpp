@@ -141,21 +141,21 @@ int KrustyBike::UnknownVirtualSlot12(int grounded)
     return 0;
 }
 
-int KrustyBike::UnknownVirtualSlot22()
+int KrustyBike::ShouldUpdateShadowLight()
 {
     if (staggerCounter == staggerPhase || race->raceCamera->followedRacer == this)
         return 1;
     return 0;
 }
 
-int KrustyBike::UnknownVirtualSlot23()
+int KrustyBike::ShouldEmitMovingEffects()
 {
     if (!airborne && forwardSpeed >= 0.2f && race->raceCamera->cameraState != 3)
         return 1;
     return 0;
 }
 
-int KrustyBike::UnknownVirtualSlot24()
+int KrustyBike::ShouldRestartSteamEffect()
 {
     if (isRemote) {
         if (prevSpeed < linearSpeed && !crashState && linearSpeed < 22.0f)
@@ -167,7 +167,7 @@ int KrustyBike::UnknownVirtualSlot24()
     return 0;
 }
 
-int KrustyBike::UnknownVirtualSlot25()
+int KrustyBike::ShouldBurstSteamEffect()
 {
     if (isRemote) {
         if (prevSpeed > linearSpeed && !crashState && linearSpeed < 22.0f)

@@ -22,7 +22,7 @@
  {
   "class": "SoultreePhysicsBaseObject",
   "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot10@SoultreePhysicsBaseObject",
+  "candidate_symbol_contains": "IsAtBaseWeight@SoultreePhysicsBaseObject",
   "target_va": "0x0040b5c0",
   "target_size": 28,
   "expect": "exact",
@@ -52,7 +52,7 @@
  {
   "class": "SoultreePhysicsBaseObject",
   "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot22@SoultreePhysicsBaseObject",
+  "candidate_symbol_contains": "ShouldUpdateShadowLight@SoultreePhysicsBaseObject",
   "target_va": "0x0040b5e0",
   "target_size": 24,
   "expect": "exact",
@@ -62,7 +62,7 @@
  {
   "class": "SoultreePhysicsBaseObject",
   "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot23@SoultreePhysicsBaseObject",
+  "candidate_symbol_contains": "ShouldEmitMovingEffects@SoultreePhysicsBaseObject",
   "target_va": "0x004aa160",
   "target_size": 38,
   "expect": "exact",
@@ -72,7 +72,7 @@
  {
   "class": "SoultreePhysicsBaseObject",
   "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot24@SoultreePhysicsBaseObject",
+  "candidate_symbol_contains": "ShouldRestartSteamEffect@SoultreePhysicsBaseObject",
   "target_va": "0x004aa190",
   "target_size": 3,
   "expect": "exact",

@@ -989,7 +989,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             if (UpdateWheelRampLevels())
                 engineState->driveCut = 1;
         } else if (totalWeight != baseWeight) {
-            if (UnknownVirtualSlot10())
+            if (IsAtBaseWeight())
                 UnknownVirtualSlot0(0.0f);
         }
         backingUp = UnknownVirtualSlot82();

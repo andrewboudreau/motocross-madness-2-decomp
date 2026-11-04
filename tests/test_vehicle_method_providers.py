@@ -66,7 +66,10 @@ class VehicleMethodProviderTests(unittest.TestCase):
                 source = (path.parent / target['source']).resolve()
                 if source not in {ROOT / sources['methods'], ROOT / sources['reset']}:
                     continue
-                slot = int(re.search(r'Slot(\d+)@', target['candidate_symbol_contains'])[1])
+                symbol = target['candidate_symbol_contains']
+                slot = (int(re.search(r'Slot(\d+)@', symbol)[1]) if 'Slot' in symbol
+                        else {'ShouldEmitMovingEffects': 23, 'ShouldRestartSteamEffect': 24,
+                              'ShouldBurstSteamEffect': 25}[symbol.split('@')[0]])
                 promoted = slot in slots
                 self.assertEqual(source, ROOT / sources['reset' if slot == 36 else 'methods'])
                 obj = objects['reset' if slot == 36 else 'methods']

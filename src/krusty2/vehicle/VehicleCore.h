@@ -42,9 +42,9 @@ public:
     virtual void UpdateSlideEffect(SoultreeAttachment* attachment);
     virtual void UpdateScrapeEffect(SoultreeAttachment* attachment);
     virtual void UpdateAttachmentEffects();
-    virtual int  UnknownVirtualSlot23();
-    virtual int  UnknownVirtualSlot24();
-    virtual int  UnknownVirtualSlot25();
+    virtual int  ShouldEmitMovingEffects();
+    virtual int  ShouldRestartSteamEffect();
+    virtual int  ShouldBurstSteamEffect();
     virtual int  UnknownVirtualSlot28(int steps);
     virtual int  UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                       const Vec3* settleUp, int keepPlacement, float extraWeight);   // 0x00527430

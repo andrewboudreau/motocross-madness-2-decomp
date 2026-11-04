@@ -38,17 +38,17 @@ int Vehicle::UnknownVirtualSlot68(int* out)
 
 void Vehicle::UnknownVirtualSlot69() { crashTimer = crashTimerReload; }
 
-int Vehicle::UnknownVirtualSlot23()
+int Vehicle::ShouldEmitMovingEffects()
 {
     return !airborne && forwardSpeed >= 0.2f;
 }
 
-int Vehicle::UnknownVirtualSlot24()
+int Vehicle::ShouldRestartSteamEffect()
 {
     return prevThrottleFraction < engineState->throttleFraction && crashState == 0 && linearSpeed < 22.0f;
 }
 
-int Vehicle::UnknownVirtualSlot25()
+int Vehicle::ShouldBurstSteamEffect()
 {
     return prevThrottleFraction > engineState->throttleFraction && crashState == 0 && linearSpeed < 22.0f;
 }
