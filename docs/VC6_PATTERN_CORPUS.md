@@ -52,7 +52,6 @@ Exact examples:
 - NetworkInterface::ConnectUsingLobby `0x004ab960`: giving the size query its own failure test, so its error path no longer runs through the second query's test, gives retail's `cmp esi, ebx` against the entry zero.
 
 Near misses that differ in this shape:
-- Griddraw `0x00480ad0` (render).
 - BikeRace `0x0041f1d0` (race): retail keeps 0 in edx from the first instruction.
 - GUIManager `0x00486170` (ui): retail has no `xor ebx, ebx`.
 - KrustyBike `0x00493660` (physics): retail keeps 0 in edi up to the pose section. The candidate now matches it (section 7).
@@ -61,11 +60,10 @@ Near misses that differ in this shape:
 The rule says which way to move each of these: make the zero a constant
 that is never redefined, or make it a variable that is redefined.
 
-In Griddraw `0x00480ad0`, retail's eax behaves as such a constant. It is
-compared with `ranges` and `block` and stored to `indexStart`. The forms
-tried so far, and why each misses, are in VC6_ZERO_REGISTER's Griddraw
-entry: no source found yet keeps the zero at the top without a
-redefinition.
+Griddraw `0x00480ad0` was listed here and is now exact, but not through
+this rule: retail's eax zero came from the count expressions
+(`ranges[block].end - ranges[block - 1].end` rather than `- vertexStart`),
+see VC6_ZERO_REGISTER's Griddraw entry.
 
 ## 2. A loop bottom of `jcc exit ; jmp top`
 

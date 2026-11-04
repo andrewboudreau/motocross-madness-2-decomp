@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 115, c 91, total 208. The three class (a) functions of the
+Counts: a 2, b 114, c 91, total 207. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -58,6 +58,11 @@ again (`int more = CurrentName(found); if (more) {...} while (more) {... more =
 NextName(found); if (more) {...}}`) makes VC6 compare it with the ebx zero
 (`cmp eax, ebx`) as retail does. `if (CurrentName(found))`, an `ok` local tested once,
 `!= 0` and `> 0` give `test eax, eax` ([VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md)).
+DrawableGridNode::DrawVisibleBlock `0x00480ad0` (class b, 395/438) is exact too, in
+Griddraw.cpp: each arm assigns all four range values and the counts are differences of
+the range records (`ranges[block].end - ranges[block - 1].end`), the form the sibling
+block walk `0x00481300` uses, not `- vertexStart`. That gives retail's eax zero and its
+esi/edi roles; about 90 placements of the zero initialisers had not.
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
@@ -204,7 +209,6 @@ NextName(found); if (more) {...}}`) makes VC6 compare it with the ebx zero
 | render/Griddraw | `0x0047de90` | 977/1083 (masked) | c | 30 code diffs: retail lacks `mov esi, [esp + N]`; `mov edi, [ebp*N + N]` vs `mov edi, [esp + N]` |
 | render/Griddraw | `0x0047e600` | 1605/1617 (masked) | c | frame matches; the extent.x/extent.y products load the cell size first (`fld [edx + 0x40] ; fmul [ecx + 0x164]`), retail the minimum ; the order follows which fields are read (+0x168 gives min-first, +0x164/+0x18 cell-first), not source order or parentheses (432 forms) |
 | render/Griddraw | `0x0047f210` | 361/543 (masked) | b | 29 code diffs: retail adds `xor esi, esi`; retail lacks `xor edi, edi`; slot order differs |
-| render/Griddraw | `0x00480ad0` | 395/438 | b | retail keeps the zero vertexStart in eax and compares ranges/block against it (`cmp esi,eax`, `indexStart = eax`), ranges in esi and data in edi; VC6 uses `test` and swaps esi/edi; ~20 init/type/declaration forms unchanged or worse; top `int indexStart = 0` gives the `cmp reg, eax` compares but hoists the store, in-branch `vertexStart = 0; indexStart = 0;` gives the esi/edi roles (14 diffs, 1 byte short) ([VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md)) |
 | render/Griddraw | `0x00481300` | 121/216 (masked) | c | child index: `lea ecx, [edi + ebp] ; add ecx, table[quad]` vs `mov edx, table[quad] ; add edx, edi ; add edx, ebp` |
 | render/Griddraw | `0x004815e0` | 64/1083 | b | retail keeps both axis deltas on the x87 stack across the near/far branch (`fcom`, spilled in the arms) and pushes edi after the coarse return; VC6 stores them, which shifts the frame (the 65535 clamps now branch as retail) |
 | render/Griddraw | `0x00481de0` | 133/1616 (masked) | b | 85 code diffs: retail adds `mov ebx, [esp + N]`; retail adds `mov ebp, [esp + N]`; slots differ |

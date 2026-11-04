@@ -6313,6 +6313,15 @@ CASES = [
         'reason': 'size >>= 1 quadrant recursion into 0x480ad0',
     },
     {
+        'name': 'Griddraw DrawableGridNode block draw',
+        'bindings': 'src/reconstructed/Griddraw.bindings.json',
+        'source': 'src/reconstructed/Griddraw.cpp',
+        'symbol': '?DrawVisibleBlock@DrawableGridNode@@QAEHPAXHHHHH@Z',
+        'target_va': '0x00480ad0',
+        'target_size': 438,
+        'reason': 'block range counts as differences of the range records, then the child walk',
+    },
+    {
         'name': 'Griddraw DrawableGridNode reset edges',
         'bindings': 'src/reconstructed/Griddraw.bindings.json',
         'source': 'src/reconstructed/Griddraw.cpp',

@@ -119,6 +119,10 @@ Then the block distance `0x00481b30` and the direction-bit update
   `[n * 3 + j]` index or a 6-byte triangle struct make VC6 scale by 6.
 - `0x00481cc0` computes the limit `distance * factor * distance` into a
   local before the counter increment, and tests `<= limit` to return 1.
+- `0x00480ad0` assigns all four range values in each arm and computes the
+  counts from the range records (`ranges[block].end - ranges[block -
+  1].end`), as `0x00481300` does. Subtracting the start locals gives a
+  different register plan (395 of 438).
 - `0x00481a20` re-reads the block range through the draw data for each
   field. A range-pointer local turns the float copies into integer moves.
 - `0x004824c0` stores the 0x004815e0 result in a float local before passing
@@ -161,7 +165,6 @@ See the notes at the top of `samples/render/GriddrawNearMisses.cpp`:
 |---|---:|---|
 | `GridVertexCache::GetVertex` `0x0047de90` | 1069/1187 | x/z/index register assignment; the packed-word expression |
 | `0x0047e600` (node loader) | 1605/1617 | x87 operand order of the extent.x/extent.y products (the 0.1 test reads the extent through a reference) |
-| `0x00480ad0` (block draw) | 395/438 | the zero offset kept in eax for compares; esi/edi swapped |
 | `0x00481300` (block walk) | 114/216 | child index term order |
 | `0x0047f210` (per-block rebuild) | 426/1586 | x/count-copy registers, frame slots, minY/maxY load order |
 | `0x004815e0` (detail update) | 64/1083 | the two axis deltas stay on the x87 stack across the branch in retail; VC6 stores them, which shifts the frame and keeps `push edi` in the prologue |

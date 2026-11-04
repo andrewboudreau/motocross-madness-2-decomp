@@ -193,39 +193,15 @@ value in one function:
     immediates.
   - So both "bracketing" rows are the same direction (VC6 over-caches with
     two counted stores and an already-pushed register). Neither is solved.
-- Griddraw DrawVisibleBlock `0x00480ad0`: retail's `xor eax, eax` at the
-  top, with `cmp esi, eax` / `cmp ecx, eax` and `indexStart = eax`, is the
-  "compares use an allocated constant" case.
-  - With both starts initialised at the top (`int vertexStart = 0; int
-    indexStart = 0;`), VC6 gives retail's `cmp reg, eax` compares. But it
-    hoists the `indexStart` store out of the `block == 0` branch (355/438).
-  - Assigning `vertexStart = 0; indexStart = 0;` inside the branch (no
-    top initialiser) gives retail's esi/edi roles: 14 instead of 28
-    differing instructions. It is one byte short (60/438 strict, offsets
-    shift), and the zero stays in the branch.
-  - The missing byte is a scheduling change, not a zero encoding. In the
-    `block != 0` arm, the in-branch form loads `vertexStart` after `lea
-    esi, [esi + edx*4]` as `movsx eax, word ptr [esi - 0xc]` (no SIB, 4
-    bytes). Retail loads it before the `lea` as `movsx eax, word ptr
-    [esi + edx*4 - 0xc]` (5 bytes).
-  - The in-branch form also holds `ranges` in `eax` with `test eax, eax`,
-    because no zero lives at the top. Both effects come from the zero web
-    starting inside the branch.
-  - Reordering the four `block != 0` assignments or adding a `prev` pointer
-    does not restore the order: 374 and 378 of 438 with 19 and 16 diffs.
-  - Swapping the arms and `block == vertexStart` compares do not help
-    either. No form found yet. Variants are in `work/s14/cz/gd/`.
-  - A sweep of 72 forms (`vertexStart`/`indexStart` initialised at the
-    top, inside the `ranges` block or not at all; `vertexStart = 0`,
-    `indexStart = 0` or `indexStart = vertexStart` in the arm; `ranges`
-    or `ranges != 0`) reaches nothing better than 14 differing.
-    - Arm `vertexStart = 0` plus an arm `indexStart` store gives the
-      in-branch web (14). Without the arm `indexStart` store it gives 30.
-    - A top `vertexStart = 0` with an arm `indexStart` store gives 28.
-      With `indexStart` initialised at the top or in its declaration
-      instead, it gives 31, 32 or 49.
-    - `ranges != 0`, declaring `vertexStart` after `ranges` and hoisting
-      `j` change nothing. Variants are in `work/s14/cz/gd2/`.
+- Griddraw DrawVisibleBlock `0x00480ad0` (now exact): retail's `xor eax,
+  eax` at the top, the `cmp esi, eax` / `cmp ecx, eax` compares and
+  `indexStart = eax` were not a zero-web placement. Over 90 placements of
+  the zero initialisers missed. The lever was the count expressions: with
+  `vertexCount = ranges[block].end - ranges[block - 1].end` (and the index
+  count alike) instead of subtracting the start locals, and all four values
+  assigned in each arm, VC6 compiles all 438 bytes exactly. That is the
+  form the sibling block walk `0x00481300` already used for its count. The
+  same counts with a top `int vertexStart = 0;` are exact too.
 - Griddraw RebuildBlockBuffers `0x0047f210` and CubeDraw BuildFaceGeometry
   `0x0043dc60`: both functions allocate the constant as retail does. The
   rows differ in which register it gets (`esi`/`edi` swapped with a pointer

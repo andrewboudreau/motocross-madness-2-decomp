@@ -412,7 +412,7 @@
     {
       "path": "samples/render/GriddrawNearMisses.cpp",
       "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines DrawableGridNode::ComputeViewerDetail, DrawableGridNode::DrawVisibleBlock, DrawableGridNode::ReadNode, DrawableGridNode::RebuildBlockBuffers, DrawableGridNode::WalkSlot4Block, DrawableGridNode::WalkVisibilityQuadrants.... Behavior unverified against retail; bytes nonexact.",
+      "reason": "Near-miss body admitted so the source build can link and run; defines DrawableGridNode::ComputeViewerDetail, DrawableGridNode::ReadNode, DrawableGridNode::RebuildBlockBuffers, DrawableGridNode::WalkSlot4Block, DrawableGridNode::WalkVisibilityQuadrants.... Behavior unverified against retail; bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
     },
     {

@@ -674,6 +674,68 @@ int DrawableGridNode::DrawVisibleQuadrants(void* target, int x, int z, int size,
     return 1;
 }
 
+// 0x00480ad0: draws one 4-cell block from this node's buffers when it has
+// geometry and passed the frustum test, then walks the child nodes. Each arm
+// sets all four range values, and the counts are differences of the range
+// records (`ranges[block].end - ranges[block - 1].end`), as 0x00481300 writes
+// its count. Subtracting the start locals instead keeps retail's zero in eax
+// but gives VC6 a different register plan (395/438).
+int DrawableGridNode::DrawVisibleBlock(void* target, int x, int z, int size, int quad, int detailPass)
+{
+    int vertexStart;
+    int indexStart;
+    GridBlockRange* ranges = (GridBlockRange*)data->blockRanges;
+    if (ranges) {
+        int block = g_gridQuadOrder[quad];
+        int vertexCount;
+        int indexCount;
+        if (block == 0) {
+            vertexStart = 0;
+            indexStart = 0;
+            vertexCount = ranges[0].end;
+            indexCount = ranges[0].indexEnd;
+        } else {
+            vertexStart = ranges[block - 1].end;
+            indexStart = ranges[block - 1].indexEnd;
+            vertexCount = ranges[block].end - ranges[block - 1].end;
+            indexCount = ranges[block].indexEnd - ranges[block - 1].indexEnd;
+        }
+        if (vertexCount != 0 && (data->visibleBlockMask & (1 << block))) {
+            if (terrain->lowestQualityOverride)
+                SubmitLitRange(detailPass, (GridVertex*)data->vertexBuffer + vertexStart, vertexCount,
+                               (unsigned short*)data->indexBuffer + indexStart, indexCount,
+                               g_gridQuadOrder[quad]);
+            else
+                SubmitUnlitRange(detailPass, (GridVertex*)data->vertexBuffer + vertexStart, vertexCount,
+                                 (unsigned short*)data->indexBuffer + indexStart, indexCount,
+                                 g_gridQuadOrder[quad]);
+        }
+    }
+    if (children && !data->b0) {
+        for (int j = 0; j < 64; j += 16) {
+            for (int i = 0; i < 4; i++) {
+                DrawableGridNode* child = (DrawableGridNode*)children[g_gridQuadCell[quad] + i + j];
+                if (child && child->childMask) {
+                    if (child->data->vertexCount != 0 && !child->data->b3) {
+                        if (terrain->lowestQualityOverride)
+                            child->SubmitLitRange(detailPass, (GridVertex*)child->data->vertexBuffer,
+                                                  child->data->vertexCount,
+                                                  (unsigned short*)child->data->indexBuffer,
+                                                  child->data->indexCount, -1);
+                        else
+                            child->SubmitUnlitRange(detailPass, (GridVertex*)child->data->vertexBuffer,
+                                                    child->data->vertexCount,
+                                                    (unsigned short*)child->data->indexBuffer,
+                                                    child->data->indexCount, -1);
+                    }
+                    child->DrawVisibleQuadrants(target, 0, 0, 16, 0, detailPass);
+                }
+            }
+        }
+    }
+    return 1;
+}
+
 // 0x00480c90: submits a node's or one block's vertex range on the unlit
 // path. With a detail texture (Terrain+0xc3c detailTexture) and `detailPass` clear the
 // base pass gets flat colours (white close up, the terrain's unlit colours

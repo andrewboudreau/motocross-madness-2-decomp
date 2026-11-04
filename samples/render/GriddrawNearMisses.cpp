@@ -45,21 +45,6 @@
 // the 0.1 test or the terrain reload flips neither. See
 // docs/VC6_PATTERN_CORPUS.md section 6 (two indirect words).
 //
-// DrawableGridNode 0x00480ad0 (4-cell block draw, 438 bytes; 395 of 438):
-// retail keeps the zero start offset in eax from the prologue and compares
-// the range pointer and block index against it (`cmp esi,eax`), with the
-// draw data in edi and the ranges in esi; VC6 here uses `test` and swaps
-// esi/edi. Five placements of the zero initialisers were tried. Also
-// unchanged (395): `indexStart = vertexStart`, `ranges != 0`, `!block`, an
-// assignment inside the test, a draw-data local, unsigned/long vertexStart
-// and all four block locals declared at the top; initialising indexStart
-// with vertexStart at the top (four spellings) gives 355, short types and a
-// vertexStart assigned only in the else are far worse.
-// Comparing ranges with `(GridBlockRange*)vertexStart`, testing
-// `data->field_0x17c` first, `ranges = 0` and an assignment in the test, and
-// zero-initialised vertexCount/indexStart/indexCount all keep `test`: VC6
-// folds a known zero into the compare (probes never produce `cmp r, zero`).
-//
 // DrawableGridNode 0x00481300 (4-cell block walk, 216 bytes; 114 of 216):
 // retail forms the child index as `lea ecx,[edi+ebp]; add ecx,table[quad]`;
 // every order of the three terms gives VC6's `mov edx,table[quad];
@@ -358,64 +343,6 @@ allocated:
         }
     }
     return this;
-}
-
-
-// 0x00480ad0: draws one 4-cell block from this node's buffers when it has
-// geometry and passed the frustum test, then walks the child nodes.
-int DrawableGridNode::DrawVisibleBlock(void* target, int x, int z, int size, int quad, int detailPass)
-{
-    int vertexStart = 0;
-    GridBlockRange* ranges = (GridBlockRange*)data->blockRanges;
-    if (ranges) {
-        int block = g_gridQuadOrder[quad];
-        int vertexCount;
-        int indexStart;
-        int indexCount;
-        if (block == 0) {
-            vertexCount = ranges[0].end;
-            indexCount = ranges[0].indexEnd;
-            indexStart = 0;
-        } else {
-            vertexStart = ranges[block - 1].end;
-            indexStart = ranges[block - 1].indexEnd;
-            vertexCount = ranges[block].end - vertexStart;
-            indexCount = ranges[block].indexEnd - indexStart;
-        }
-        if (vertexCount != 0 && (data->visibleBlockMask & (1 << block))) {
-            if (terrain->lowestQualityOverride)
-                SubmitLitRange(detailPass, (GridVertex*)data->vertexBuffer + vertexStart, vertexCount,
-                                      (unsigned short*)data->indexBuffer + indexStart, indexCount,
-                                      g_gridQuadOrder[quad]);
-            else
-                SubmitUnlitRange(detailPass, (GridVertex*)data->vertexBuffer + vertexStart, vertexCount,
-                                      (unsigned short*)data->indexBuffer + indexStart, indexCount,
-                                      g_gridQuadOrder[quad]);
-        }
-    }
-    if (children && !data->b0) {
-        for (int j = 0; j < 64; j += 16) {
-            for (int i = 0; i < 4; i++) {
-                DrawableGridNode* child = (DrawableGridNode*)children[g_gridQuadCell[quad] + i + j];
-                if (child && child->childMask) {
-                    if (child->data->vertexCount != 0 && !child->data->b3) {
-                        if (terrain->lowestQualityOverride)
-                            child->SubmitLitRange(detailPass, (GridVertex*)child->data->vertexBuffer,
-                                                         child->data->vertexCount,
-                                                         (unsigned short*)child->data->indexBuffer,
-                                                         child->data->indexCount, -1);
-                        else
-                            child->SubmitUnlitRange(detailPass, (GridVertex*)child->data->vertexBuffer,
-                                                         child->data->vertexCount,
-                                                         (unsigned short*)child->data->indexBuffer,
-                                                         child->data->indexCount, -1);
-                    }
-                    child->DrawVisibleQuadrants(target, 0, 0, 16, 0, detailPass);
-                }
-            }
-        }
-    }
-    return 1;
 }
 
 
