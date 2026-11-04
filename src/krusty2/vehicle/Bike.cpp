@@ -260,7 +260,7 @@ integrate:
     return 0.0f;
 }
 
-float Bike::UnknownVirtualSlot53()
+float Bike::ApplySteerRate()
 {
     if (crashState == 0) {
         float angle = steerRate * stepTime;
@@ -897,7 +897,7 @@ int Bike::ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, cons
     return result;
 }
 
-int Bike::UnknownVirtualSlot62(float slideAngle)
+int Bike::ClassifyGroundContact(float slideAngle)
 {
     if (frontWheelLifted)
         return 2;

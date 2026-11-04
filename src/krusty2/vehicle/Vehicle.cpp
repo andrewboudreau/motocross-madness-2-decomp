@@ -29,7 +29,7 @@ void Vehicle::SetSpawnProtection(int protect, float duration, int forced)
     spawnProtectTimer = duration;
 }
 
-float Vehicle::UnknownVirtualSlot53()
+float Vehicle::ApplySteerRate()
 {
     steerState->AddAngle(steerRate * stepTime, poseNode);
     return 1.0f;
@@ -46,7 +46,7 @@ float Vehicle::GetLeanAngle() { return leanAngle; }
 float Vehicle::GetMaxSteerAngle() { return steerState->maxAngle; }
 float Vehicle::UnknownVirtualSlot61(float threshold) { return 0.0f; }
 
-int Vehicle::UnknownVirtualSlot62(float slideAngle)
+int Vehicle::ClassifyGroundContact(float slideAngle)
 {
     return anyWheelInContact && crashState == 0;
 }
@@ -1020,7 +1020,7 @@ void Vehicle::SimulateFrame(float frame)
             linearSpeed = 0.0f;
         }
         centerNode->GetPositionIn(0, &centerOfMass);
-        float torqueScale = UnknownVirtualSlot53();
+        float torqueScale = ApplySteerRate();
         PlaceWheels();
         if (spawnProtectTimer > 0.0f) {
             spawnProtectTimer -= stepTime;
@@ -1115,7 +1115,7 @@ void Vehicle::SimulateFrame(float frame)
         float slideAngle = UnknownVirtualSlot61(turnMagnitude);
         Vec3 aimOut;
         Vec3 aim = *UnknownVirtualSlot46(&aimOut, slideAngle);
-        int mode = UnknownVirtualSlot62(slideAngle);
+        int mode = ClassifyGroundContact(slideAngle);
         UnknownVirtualSlot26();
         AdvancePosition();
         UpdateWheelRolls();

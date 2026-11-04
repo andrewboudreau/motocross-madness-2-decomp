@@ -70,7 +70,7 @@ public:
     virtual void SetSpawnProtection(int protect, float duration, int forced);
     virtual int IsSpawnProtected();
     virtual int UnknownVirtualSlot52();
-    virtual float UnknownVirtualSlot53();
+    virtual float ApplySteerRate();
     virtual Vec3* GetContactGroundNormal(Vec3* out);
     virtual Vec3* UnknownVirtualSlot55(Vec3* out, Vec3* pos);
     virtual void UpdateLeanFromNormal(Vec3* forward, int updateLeanCos, Vec3* up);
@@ -79,7 +79,7 @@ public:
     virtual float GetMaxSteerAngle();
     virtual void ComputeSteerRate(float steerAxis, float maxAngle, int steps);
     virtual float UnknownVirtualSlot61(float threshold);
-    virtual int UnknownVirtualSlot62(float slideAngle);
+    virtual int ClassifyGroundContact(float slideAngle);
     virtual void ReadControlAxes(float dt);
     // void: 0x00528e50 leaves eax as whatever the last store used (no return value is
     // materialised) and the only caller, slot 49, ignores eax; byte-exact as void (tier 2).

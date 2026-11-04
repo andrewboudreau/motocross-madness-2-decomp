@@ -312,7 +312,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot62@Bike",
+    "candidate_symbol_contains": "ClassifyGroundContact@Bike",
     "target_va": "0x0040c400",
     "target_size": 189,
     "expect": "exact",
@@ -462,7 +462,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot53@Bike",
+    "candidate_symbol_contains": "ApplySteerRate@Bike",
     "target_va": "0x0040cff0",
     "target_size": 63,
     "expect": "exact",
@@ -1132,7 +1132,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot62@Vehicle",
+    "candidate_symbol_contains": "ClassifyGroundContact@Vehicle",
     "target_va": "0x0052a5c0",
     "target_size": 33,
     "expect": "exact",
@@ -1192,7 +1192,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot53@Vehicle",
+    "candidate_symbol_contains": "ApplySteerRate@Vehicle",
     "target_va": "0x0052b6a0",
     "target_size": 41,
     "expect": "exact",
