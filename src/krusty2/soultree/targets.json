@@ -242,7 +242,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot17@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "AverageAttachmentPosition@SoultreePhysicsBaseObject",
     "target_va": "0x00502330",
     "target_size": 239,
     "expect": "exact",

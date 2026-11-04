@@ -232,7 +232,7 @@ static inline Vec3 DivideVec(const Vec3& v, float s)
 }
 
 // slot 17 (0x00502330): average of the target positions of the non-type-4 attachments.
-Vec3 SoultreePhysicsBaseObject::UnknownVirtualSlot17()
+Vec3 SoultreePhysicsBaseObject::AverageAttachmentPosition()
 {
     Vec3 sum;
     int count = 0;
@@ -671,7 +671,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
     }
     if (UnknownVirtualSlot22()) {
         int hit;
-        Vec3 pos = UnknownVirtualSlot17();
+        Vec3 pos = AverageAttachmentPosition();
         pos.y += 1.5f;
         SoultreeLight* light = shadowLight;
         Vec3 out;

@@ -3,12 +3,12 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "99f1c86115bb232dde727478b7fe45be2dc0667b99cb1cd64af6f46eca2f6ad9"
+      "sha256": "b21475f151b6d296bad3c8a577ca9616ca317abfb3b55ac864e5eb1fbd0b9467"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "0f15f85d5f36ccb61b217b7cde251eec9c2e5424bba27da37df840524fadaefe"
+      "sha256": "d6b4ca8bd7a8071a3b5c380d365a21b724d7e043bcfedc469fd25973d55d71ce"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,

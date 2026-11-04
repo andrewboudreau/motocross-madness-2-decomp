@@ -3,7 +3,7 @@
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
       "sections": 128,
       "relocations": 625,
-      "sha256": "e1c1fdc69d2328491bf842a2e0d273ed8a375ae9abc6a2b50c9050b1ed9e1932"
+      "sha256": "6b429e8fe712dae850ab4d55474cee75ea896ed22368102a8e8e463ecfbf1ae6"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -18,7 +18,7 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "99f1c86115bb232dde727478b7fe45be2dc0667b99cb1cd64af6f46eca2f6ad9"
+      "sha256": "b21475f151b6d296bad3c8a577ca9616ca317abfb3b55ac864e5eb1fbd0b9467"
     },
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,
@@ -164,7 +164,7 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot17@SoultreePhysicsBaseObject",
+      "symbol": "AverageAttachmentPosition@SoultreePhysicsBaseObject",
       "va": "0x00502330",
       "extent": 239
     },

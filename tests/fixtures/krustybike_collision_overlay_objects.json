@@ -9,12 +9,12 @@
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
       "relocations": 1054,
-      "sha256": "822a9b291f9a772a0ccdb062a3d0a2b5a22c3713108057250e44f29c3be62a96"
+      "sha256": "4d199af1a7f99671a4d9f2865b69a0e575d601bcf6a37ff120408357ec0fd19e"
     },
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "3fc01cd4d33620d885f80b4f7076fc09349479952cfeccda01e5bec98ab015da"
+      "sha256": "72870efc8ffefd02af6471519d48d86fee8d85ef74d61303bd2cefb4f3096692"
     }
   }
 }

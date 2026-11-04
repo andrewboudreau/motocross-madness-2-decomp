@@ -125,7 +125,7 @@ public:
                                       const Vec3* worldTorque);
     virtual void ApplyWorldTorque(const Vec3* worldTorque, Vec3* angularAccel);
     virtual Vec3 LocalTorqueToAngularAcceleration(const Vec3* localTorque);
-    virtual Vec3 UnknownVirtualSlot17();
+    virtual Vec3 AverageAttachmentPosition();
     virtual void UnknownVirtualSlot18(SoultreeAttachment* attachment);
     virtual void UnknownVirtualSlot19(SoultreeAttachment* attachment);
     virtual void UnknownVirtualSlot20(SoultreeAttachment* attachment);
