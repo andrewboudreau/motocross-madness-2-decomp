@@ -35,6 +35,9 @@
 // unchanged. The extent and previous copies have four accesses each in both
 // builds (the z extent five in retail), so the per-byte use count does not
 // explain retail ranking the extent copies among the vectors.
+// Also worse (s17): separate world and local probe vectors (320), assigning
+// probePositions[i] directly and reading it back (212), previousPush or
+// previousSum copied from the other zero vector (208, 85).
 //
 // SprayContactParticles (0x00531740, 1624 bytes; 1606/1624): the contact
 // particle spray. Frame, slot order and every instruction but two match
