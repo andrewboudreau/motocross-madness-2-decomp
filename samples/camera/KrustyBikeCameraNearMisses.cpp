@@ -61,11 +61,11 @@ int KrustyBikeCamera::Tick(float frameTime) {
         if (!s_UnknownActive67c3f4) {
             s_UnknownActive67c3f4 = true;
             raceView->WriteRelativePositions(&second, &first, g_TrackGame->bajaEnduroEvent, 0);
-            FollowCamera::UnknownVirtualSlot46(&first, &s_UnknownVector67c3e8);
+            FollowCamera::BuildOrientationBasis(&first, &s_UnknownVector67c3e8);
         }
         raceView->WriteRelativePositions(&first, &second, g_TrackGame->bajaEnduroEvent, 0);
         first.y = raceView->localRacer->position.y + 2.0f;
-        FollowCamera::UnknownVirtualSlot47(frameTime, &first);
+        FollowCamera::PlayRecordedFrame(frameTime, &first);
         return 1;
     }
     if (s_UnknownActive67c3f4) {

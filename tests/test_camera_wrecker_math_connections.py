@@ -71,7 +71,7 @@ class CameraWreckerMathConnections(unittest.TestCase):
                         and caller.value <= r.virtual_address < caller.value + caller.function_size}
 
             self.assertIn(CROSS, calls('FollowCamera',
-                '?UnknownVirtualSlot46@FollowCamera@@UAEXPAUVector3@@0@Z'))
+                '?BuildOrientationBasis@FollowCamera@@UAEXPAUVector3@@0@Z'))
             self.assertTrue({CROSS, NORMALIZE, CTOR} <= calls('Wrecker', '?Tick@Wrecker@@UAEHM@Z'))
             former = {'?CrossProduct@@YA?AUVector3@@ABU1@0@Z',
                       '?WreckerCrossCall@@YA?AUVector3@@ABU1@0@Z',

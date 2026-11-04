@@ -27,9 +27,9 @@
 // `position = direction * k + target` are all worse.
 // 0..15 dead initialised int locals at the top of the function change nothing.
 //
-// FollowCamera::UnknownVirtualSlot46 (0x004654e0) is exact in src/reconstructed/FollowCamera.cpp.
+// FollowCamera::BuildOrientationBasis (0x004654e0) is exact in src/reconstructed/FollowCamera.cpp.
 //
-// FollowCamera::UnknownVirtualSlot47 (0x00465720) is exact in src/reconstructed/FollowCamera.cpp.
+// FollowCamera::PlayRecordedFrame (0x00465720) is exact in src/reconstructed/FollowCamera.cpp.
 //
 // FollowCamera::UnknownVirtualSlot45 (0x00463a30, 4058 complete bytes):
 // the previous 4055-byte estimate omitted the final three-byte ret 8.

@@ -155,9 +155,9 @@ public:
     // 0x00463a30: keyboard/joystick camera controls; returns whether it moved.
     virtual bool UnknownVirtualSlot45(bool active, float dt);
     // 0x004654e0: builds the +0x344 orientation from a forward and an up vector.
-    virtual void UnknownVirtualSlot46(Vector3* forward, Vector3* up);
+    virtual void BuildOrientationBasis(Vector3* forward, Vector3* up);
     // 0x00465720: plays back the loaded CAMERA records.
-    virtual bool UnknownVirtualSlot47(float dt, const Vector3* offset);
+    virtual bool PlayRecordedFrame(float dt, const Vector3* offset);
     virtual Vector3 SelectFollowPoint(int a, bool flag, float dt);
     // 0x00464b30: the camera position for this frame.
     virtual Vector3 UnknownVirtualSlot49(bool orbit, const Vector3& base, float dt);

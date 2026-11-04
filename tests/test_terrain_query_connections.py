@@ -17,7 +17,7 @@ from tools.run_calibration import CASES
 ROOT = Path(__file__).resolve().parents[1]
 PROVIDER = '?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z'
 CALLERS = (
-    ('FollowCamera', '?UnknownVirtualSlot47@FollowCamera@@', 0x465720, 1267, 1),
+    ('FollowCamera', '?PlayRecordedFrame@FollowCamera@@', 0x465720, 1267, 1),
     ('VehicleCamera', '?UnknownVirtualSlot68@VehicleCamera@@', 0x52bcf0, 684, 1),
     ('VehicleCamera', '?UnknownVirtualSlot35@VehicleCamera@@', 0x52c510, 1267, 1),
     ('KrustyBikeCamera', '?UnknownVirtualSlot52@KrustyBikeCamera@@', 0x497fa0, 217, 1),

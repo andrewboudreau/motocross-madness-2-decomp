@@ -565,7 +565,7 @@ inline Vector3 FollowCameraNormalize(const Vector3& v) {
 // 0x004654e0: an orthonormal basis from `forward` and `up` (up is made
 // perpendicular to forward, both are normalised) stored with the side vector
 // as rows 0-2 of the +0x344 matrix.
-void FollowCamera::UnknownVirtualSlot46(Vector3* forward, Vector3* up) {
+void FollowCamera::BuildOrientationBasis(Vector3* forward, Vector3* up) {
     Vector3 z = *forward;
     Vector3 y = *up;
     y = FollowCameraCross(z, FollowCameraCross(y, z));
@@ -598,7 +598,7 @@ void FollowCamera::UnknownVirtualSlot46(Vector3* forward, Vector3* up) {
 // orientation's element first in the (0, 0) sum (retail hoists a(0, 3) above
 // the second copy), and operator() or other copy orders lose the interleaved
 // row copies.
-bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
+bool FollowCamera::PlayRecordedFrame(float dt, const Vector3* offset) {
     if (Owner()->currentCamera == this) {
         frameTime += dt;
         unsigned int count = frameCount;
