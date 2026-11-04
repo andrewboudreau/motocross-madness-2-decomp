@@ -283,8 +283,8 @@ Rows whose remaining hunks are all x87 (operand form or scheduling):
   below);
 - render: `0x00456890`, `0x004a1a50`, `0x0047e600`, `0x00443aa0` (none
   of them operand form that a rule above flips; see below);
-- rider: `0x00504d30`, `0x004a7fd0`;
-- shell: `0x00516ef0`.
+- rider: `0x00504d30`, `0x004a7fd0` (shell `0x00516ef0` is now exact: an
+  edge macro with local pointers to the centre points).
 
 Across all ranked rows, 295 hunks are x87 instructions moved past other code
 (such as `fcom` placed after `fst ; fld st(0)` in Vehicle slot 74), 1427

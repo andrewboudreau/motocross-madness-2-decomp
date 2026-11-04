@@ -560,6 +560,44 @@ int Track::ClosestPointOnNode(TrackVec3 p, TrackNode* node, TrackPos* out, float
     return 1;
 }
 
+// One edge of the crossing-number test in 0x00516ef0: whether the edge a-b
+// crosses the ray from p. A macro over the edge pointers: written as an
+// inline function, VC6's parameter copies make the factor order of the
+// second product a tie-break that no spelling of the six expansions got
+// right (1032/1042 at best).
+#define TRACK_EDGE_CROSSES(a, b) \
+    (((a)->x <= p.x || (b)->x <= p.x) \
+     && (p.z >= (a)->z && p.z < (b)->z || p.z >= (b)->z && p.z < (a)->z) \
+     && ((((b)->x - (a)->x) * (p.z - (a)->z) <= (p.x - (a)->x) * ((b)->z - (a)->z)) == (p.z >= (a)->z)))
+
+// 0x00516ef0: whether p lies, in the horizontal plane, inside the strip
+// between segment and next (edge points at +0x0c and +0x18, centre at
+// +0x00), by the crossing-number rule over six edges. The two centres go
+// through pointer locals: retail computes b.z - a.z first in the second
+// product of edge 3 (edge B to the centre), which VC6 does only when the
+// centre is a local pointer (MoveBox 0x00428db0 uses the same lever).
+int Track::IsInsideStrip(TrackVec3 p, TrackSegment* segment, TrackSegment* next)
+{
+    int inside = 0;
+    const TrackVec3* centre = (TrackVec3*)&segment->pointX;
+    const TrackVec3* nextCentre = (TrackVec3*)&next->pointX;
+    if (TRACK_EDGE_CROSSES((TrackVec3*)&segment->edgeAX, (TrackVec3*)&next->edgeAX))
+        inside = 1 - inside;
+    if (TRACK_EDGE_CROSSES((TrackVec3*)&segment->edgeAX, centre))
+        inside = 1 - inside;
+    if (TRACK_EDGE_CROSSES((TrackVec3*)&segment->edgeBX, centre))
+        inside = 1 - inside;
+    if (TRACK_EDGE_CROSSES((TrackVec3*)&segment->edgeBX, (TrackVec3*)&next->edgeBX))
+        inside = 1 - inside;
+    if (TRACK_EDGE_CROSSES((TrackVec3*)&next->edgeAX, nextCentre))
+        inside = 1 - inside;
+    if (TRACK_EDGE_CROSSES((TrackVec3*)&next->edgeBX, nextCentre))
+        inside = 1 - inside;
+    return inside;
+}
+
+#undef TRACK_EDGE_CROSSES
+
 // 0x00517310: whether `segment` belongs to `node`.
 int Track::NodeHasSegment(TrackSegment* segment, TrackNode* node)
 {

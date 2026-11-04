@@ -26895,6 +26895,15 @@ CASES = [
         'reason': 'segment projection clamped to [0, 1] before selecting the difference; VC6 recomputes p - segment in the t == 0 copies as retail',
     },
     {
+        'name': 'Track.cpp strip test 0x516ef0',
+        'bindings': 'src/reconstructed/Track.bindings.json',
+        'source': 'src/reconstructed/Track.cpp',
+        'symbol': '?IsInsideStrip@Track@@QAEHUTrackVec3@@PAUTrackSegment@@1@Z',
+        'target_va': '0x00516ef0',
+        'target_size': 1042,
+        'reason': 'six-edge crossing-number test; edge macro over the edge pointers, centre points through local pointers so edge 3 loads b.z - a.z first',
+    },
+    {
         'name': 'FileStream.cpp open 0x460f50',
         'bindings': 'src/reconstructed/FileStream.bindings.json',
         'source': 'src/reconstructed/FileStream.cpp',

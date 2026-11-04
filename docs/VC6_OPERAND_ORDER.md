@@ -768,9 +768,11 @@ without effect, as noted.
   if/else block moves the `pop edi` placement (ToolTip `0x00486b10`, +3).
 - **Not moved by any of these:** byte-store parity in EcoSystem `0x00458da0` (each
   variable-index byte store toggles the later SIB order), the `memset` + `.size`
-  store placement in PCGame `0x004c0d10`,
-  the D3DIMSoultreeCharacter `0x00445fc0` SIB byte, and the Track `0x00516ef0` edge
-  tie-break (~5,500 forms).
+  store placement in PCGame `0x004c0d10`
+  and the D3DIMSoultreeCharacter `0x00445fc0` SIB byte. The Track `0x00516ef0` edge
+  tie-break resisted ~5,500 helper forms; it is exact with the edge test written as
+  a macro over the edge pointers and the two centres held in local pointers (the
+  MoveBox `0x00428db0` lever).
 
 ## Levers from the second 2026-10-11 pass
 

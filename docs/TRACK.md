@@ -41,7 +41,7 @@ to finish at Track+0x04.
 
 ## Status
 
-The following 16 functions are exact under `vc6_o2_mt`, with every
+The following 17 functions are exact under `vc6_o2_mt`, with every
 relocation bound:
 
 | VA | Bytes | Body |
@@ -53,6 +53,7 @@ relocation bound:
 | `0x00516870` | 262 | frees every node reachable from the start |
 | `0x00516980` | 786 | the closest position on the track to a point (horizontal plane) |
 | `0x00516ca0` | 586 | the closest position on one node to a point |
+| `0x00516ef0` | 1042 | whether a point is inside the strip between a segment and the next |
 | `0x00517310` | 39 | whether a segment belongs to a node |
 | `0x00517930` | 99 | frees a work list |
 | `0x005179a0` | 67 | whether b is at or after a on the same node |
@@ -80,12 +81,15 @@ and, as retail, recomputes `p - segment` in the `t == 0` copies; with the
 differences computed inside each clamping branch it reused the projection's
 values there instead (576/586).
 
-Near miss: the strip test `0x00516ef0` (1042/1042 bytes, 98.18%). It is a
-point-in-polygon parity test over six edges of the strip between a segment
-and the next. On two of the edges retail multiplies the cross-product
-factors in the other order. An inline helper that takes the point by value
-and the edge points by pointer gives the other four edges' load order; a
-macro over plain floats loses it.
+Exact: the strip test `0x00516ef0` (1042 bytes). It is a point-in-polygon
+parity test over six edges of the strip between a segment and the next.
+Each edge is a file-local macro over the two edge points (an inline
+function's parameter copies make the factor order of the second product a
+symbol tie-break that cycles with dead locals and never gave all six edges,
+1032/1042 at best). The two centre points go through local pointers: retail
+computes `b.z - a.z` first in the second product of the third edge (edge B
+to the centre), which VC6 does only when the centre is a local pointer, the
+lever of MoveBox `0x00428db0`.
 
 Near miss: the placement search `0x00517340` (1509 bytes, to `0x00517925`;
 the block at `0x00517610` is part of it: it jumps back to `0x00517559` and
@@ -167,8 +171,8 @@ renames changed no calibration bytes.
 Provisional names taken from the behaviour each function's comment records:
 `FreeNodeArray` `0x00515e70`, `FreeNode` `0x00516800`, `FreeReachableNodes`
 `0x00516870`, `NodeHasSegment` `0x00517310`, `IsAtOrAfter` `0x005179a0`,
-`ClosestPointOnTrack` `0x00516980` and `ClosestPointOnNode` `0x00516ca0`;
-the near misses `IsInsideStrip` `0x00516ef0` and `PlaceNear` `0x00517340` (physics' own views keep the address names). The high-score
+`ClosestPointOnTrack` `0x00516980`, `ClosestPointOnNode` `0x00516ca0` and
+`IsInsideStrip` `0x00516ef0`; the near miss `PlaceNear` `0x00517340` (physics' own views keep the address names). The high-score
 lister `0x0051ffe0` is `TrackRecordDlg::ListHighScoreTracks`, exact in TrackRecord.cpp.
 The path and distance helpers `0x00517930`, `0x005179f0`, `0x00517da0`,
 `0x00517ea0`, `0x00518080`, `0x00518130` and `0x00518230` keep their address

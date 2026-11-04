@@ -1,30 +1,6 @@
 // Near-miss Track.cpp candidates, kept out of src/reconstructed until they
 // match. See docs/TRACK.md.
 //
-// Track::IsInsideStrip (0x00516ef0, 1042 bytes): 1032/1042. Edge 2
-// (retail computes b.x - a.x before p.z - a.z) matches with the first factor
-// written `((b->x - a->x))` (docs/VC6_OPERAND_ORDER.md section 3); edge 6
-// still evaluates p.x - a.x before b.z - a.z (retail the other way). All 256
-// combinations of factor/product parentheses, factor order and comparison
-// direction give 1032 at best; no declaration count (k = 0..63) changes it.
-// Factor and comparison order in the source do not move it. A macro over
-// plain floats is much further off, because VC6 then loads the segment
-// operands before p; the inline helper with a by-value TrackVec3 and
-// pointers to the edge points fixes that. Edge points by reference give the
-// same 1023; by value, or p by reference or pointer, the helper is no longer
-// inlined; p after the edge pointers in the parameter list is worse (994).
-// Also 1032 at best: 100 argument parenthesis/cast forms for edge 6, 648
-// parenthesis depths of the four factors, both products and `p.z >= a->z`,
-// 256 forms of the condition comparisons, and the edge points as struct
-// locals, inline struct casts, TrackVec3 locals, `+ i`/`[i]` indexing or six
-// named locals, each with 324 parenthesis forms (4536 compiles). Retail
-// computes b.z - a.z first in edges 2, 5 and 6 and p.x - a.x first in 1, 3
-// and 4; edges 3 and 6 differ only in their base pointer, so the tie-break
-// is not structural.
-// 2026-10-11: 1..31 dead initialised int locals before any of the six edge tests repeat
-// 1002, 992, 1012, 1032 with period 4 wherever they go (top or before edge 2..6);
-// locals inside UnknownEdgeCrosses stop it being inlined from 4 on.
-//
 // Track::PlaceNear (0x00517340, 1509 bytes; the candidate is
 // 1533): the walk, the strip test, the candidate list and the acceptance
 // tests follow retail instruction for instruction, but VC6 here gives the
@@ -50,36 +26,6 @@
 #include "../../src/reconstructed/Track.h"
 #include "../../src/reconstructed/TrackGame.h"
 #include "../../src/krusty2/math/FastMath.h"
-
-// One edge of the crossing-number test in 0x00516ef0: whether the edge a-b
-// crosses the ray from p.
-static inline int UnknownEdgeCrosses(TrackVec3 p, const TrackVec3* a, const TrackVec3* b)
-{
-    return (a->x <= p.x || b->x <= p.x)
-        && (p.z >= a->z && p.z < b->z || p.z >= b->z && p.z < a->z)
-        && (((b->x - a->x)) * (p.z - a->z) <= (p.x - a->x) * (b->z - a->z)) == (p.z >= a->z);
-}
-
-// 0x00516ef0: whether p lies, in the horizontal plane, inside the strip
-// between segment and next (edge points at +0x0c and +0x18, centre at
-// +0x00), by the crossing-number rule over six edges.
-int Track::IsInsideStrip(TrackVec3 p, TrackSegment* segment, TrackSegment* next)
-{
-    int inside = 0;
-    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->edgeAX, (TrackVec3*)&next->edgeAX))
-        inside = 1 - inside;
-    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->edgeAX, (TrackVec3*)&segment->pointX))
-        inside = 1 - inside;
-    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->edgeBX, (TrackVec3*)&segment->pointX))
-        inside = 1 - inside;
-    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->edgeBX, (TrackVec3*)&next->edgeBX))
-        inside = 1 - inside;
-    if (UnknownEdgeCrosses(p, (TrackVec3*)&next->edgeAX, (TrackVec3*)&next->pointX))
-        inside = 1 - inside;
-    if (UnknownEdgeCrosses(p, (TrackVec3*)&next->edgeBX, (TrackVec3*)&next->pointX))
-        inside = 1 - inside;
-    return inside;
-}
 
 // 0x00517340
 int Track::PlaceNear(Vector3 p, TrackPos from, float distance, float range, int path, TrackPos* out)

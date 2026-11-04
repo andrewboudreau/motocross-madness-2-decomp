@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 114, c 87, total 203. The three class (a) functions of the
+Counts: a 2, b 114, c 86, total 202. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -52,6 +52,11 @@ soultree.cpp: the centre's x row written flat (`c.x * _11 + c.y * _21 + c.z * _3
 with the y and z rows still grouping their last two products moves `pop esi` before the
 a[2][2] store. Grouping all three rows alike had been tried; a per-row sweep of the
 twelve sum shapes (orders x groupings) found it.
+Track::IsInsideStrip `0x00516ef0` (class c, 1032/1042) is exact too, in Track.cpp: each
+edge test is a macro over the edge pointers (an inline helper's parameter copies made the
+second product's factor order a symbol tie-break), and the two centre points are local
+pointers, which makes `b.z - a.z` the first factor loaded on the edge to the centre as in
+MoveBox `0x00428db0` ([VC6_OPERAND_ORDER](VC6_OPERAND_ORDER.md)).
 TrackRecordDlg::ListHighScoreTracks `0x0051ffe0` (class c, 926/932) is exact too, in
 TrackRecord.cpp: the scan result held in a `more` local that the loop condition reads
 again (`int more = CurrentName(found); if (more) {...} while (more) {... more =
@@ -259,7 +264,6 @@ Subtracting before the product is worse (164/434).
 | render/Tgafile | `0x00512990` | 354/982 (masked) | c | 49 code diffs |
 | track/SceneManager | `0x004ecd60` | 4534/4536 | c | the name terminator adds the count before the element offset (`add edx, esi`; retail `add edx, ebx`); ReadAnimations' identical terminator matches. Only deleting the whole later `if (auralScape)` block flips it; declaration shifts 0-63, 0-33 dead locals, count/length forms, aliases and pointer arithmetic do not |
 | track/SceneManager | `0x004edfe0` | 5113/5335 | b | instruction stream aligned; the frame is 0xd00 for retail 0xcfc (one scalar slot too many, low slots ordered spill/dot/j for retail j/dot/spill), and three [base + index] operand orders (NumberOfMotions, random-set keyFramed test) |
-| track/Track | `0x00516ef0` | 1032/1042 | c | edge 6 of the crossing test computes `b.z - a.z` before `p.x - a.x` in retail; edge 2 matches with the helper's first factor written `((b->x - a->x))` ; retail orders edges 2, 5, 6 one way and 1, 3, 4 the other; ~5,500 parenthesis/cast/struct/local forms give 1032 at best |
 | track/Track | `0x00517340` | 57/655 (masked) | b | 44 code diffs: retail lacks `mov [esp + N], 0`; `add esp, 0x24` vs `add esp, 0x20`; frame 0x24 vs 0x20 |
 | track/TrackOverlay | `0x00519a20` | 535/894 (masked) | c | 31 code diffs: retail lacks `mov ebp, ecx`; retail adds `push edi ; mov edi, ecx ; xor ebx, ebx` |
 | track/TrackOverlay | `0x0051bed0` | 1057/1088 (masked) | b | 3 code diffs: retail lacks `add edx, 0x5e0 ; push edx ; push ecx`; retail adds `add edx, 0x5e0`; slots differ |
