@@ -1462,7 +1462,7 @@ int Bike::UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, float 
         step = minStep > dt ? minStep : dt;
     } else
         step = dt;
-    if (UnknownVirtualSlot51()) {
+    if (IsSpawnProtected()) {
         linkedVehicle = 0;
         return 0;
     }
@@ -2298,9 +2298,9 @@ void BikeCollisionCallback(CollisionObject* self, CollisionObject* other)
     Vehicle* vehicle = (Vehicle*)self->ownerObject;
     int kind = other->ownerType;
     vehicle->lastCollisionType = kind;
-    if (!vehicle->UnknownVirtualSlot51() || kind == 0x66 || kind == 0x3e9 || kind == 0x6a) {
+    if (!vehicle->IsSpawnProtected() || kind == 0x66 || kind == 0x3e9 || kind == 0x6a) {
         if (kind == 0x64) {
-            if (((Vehicle*)other->ownerObject)->UnknownVirtualSlot51())
+            if (((Vehicle*)other->ownerObject)->IsSpawnProtected())
                 return;
         } else if (kind == 0x65) {
             return;
@@ -2313,6 +2313,6 @@ void BikeStaticCollisionCallback(CollisionObject* self, CollisionObject* other)
 {
     Vehicle* vehicle = (Vehicle*)self->ownerObject;
     int kind = other->ownerType;
-    if (!vehicle->UnknownVirtualSlot51() && kind != 0x64 && kind != 0x65 && kind != 0x68)
+    if (!vehicle->IsSpawnProtected() && kind != 0x64 && kind != 0x65 && kind != 0x68)
         BikeCollisionCallback(self, other);
 }

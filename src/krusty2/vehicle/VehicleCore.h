@@ -68,7 +68,7 @@ public:
     // so it and they take the float time step (tier 2).
     virtual void SimulateFrame(float dt);
     virtual void SetSpawnProtection(int protect, float duration, int forced);
-    virtual int UnknownVirtualSlot51();
+    virtual int IsSpawnProtected();
     virtual int UnknownVirtualSlot52();
     virtual float UnknownVirtualSlot53();
     virtual Vec3* GetContactGroundNormal(Vec3* out);

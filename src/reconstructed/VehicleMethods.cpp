@@ -26,7 +26,7 @@ void Vehicle::StoreBodyAxes(int orthogonalize, int keepZ)
 
 float Vehicle::UnknownVirtualSlot45() { return 3.0f; }
 
-int Vehicle::UnknownVirtualSlot51() { return spawnProtected; }
+int Vehicle::IsSpawnProtected() { return spawnProtected; }
 
 int Vehicle::UnknownVirtualSlot52() { return crashState == 0; }
 

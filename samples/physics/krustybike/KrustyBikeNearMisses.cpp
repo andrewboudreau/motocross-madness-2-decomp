@@ -338,7 +338,7 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                     message.flag9 = trickPoseHeld;
                                     message.crashDirection = crashDirection;
                                     message.crashed = crashState;
-                                    message.flag4 = UnknownVirtualSlot51();
+                                    message.flag4 = IsSpawnProtected();
                                     message.flag5 = hasFinished != 0;
                                     message.flag6 = onTrack;
                                     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 2 || reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 3)

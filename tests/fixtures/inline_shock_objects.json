@@ -4,7 +4,7 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "91c4e63a2b02e5ece533d82a5bf9840d2509460ceb5523b7f9697cb5b4eccd84"
+      "sha256": "d6c76a58fb71724c8af63299c1247a6b6452c021f7d7066d440d0c38c16b59e1"
     },
     "samples/physics/suspension/Shock.cpp": {
       "sections": 56,

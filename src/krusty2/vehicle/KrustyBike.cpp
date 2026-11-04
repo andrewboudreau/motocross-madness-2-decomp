@@ -634,7 +634,7 @@ int KrustyBike::UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, 
         Fn_0048D8B0();
         return 1;
     }
-    if (UnknownVirtualSlot51()) return 0;
+    if (IsSpawnProtected()) return 0;
     return Bike::UnknownVirtualSlot99(dt, noseOverLimit, impact, impulse);
 }
 
@@ -1193,7 +1193,7 @@ void KrustyBike::Fn_00497370(KrustyBike* other)
     ((CollisionObject*)other->wrecker->collisionModel)->RemoveIgnoredOwner((void*)frontWheel);
     ((CollisionObject*)other->wrecker->collisionModel)->RemoveIgnoredOwner((void*)rearWheel);
     ((CollisionObject*)other->wrecker->collisionModel)->RemoveIgnoredOwner((void*)wrecker->collisionModel);
-    if (other->UnknownVirtualSlot51())
+    if (other->IsSpawnProtected())
         return;
     collisionObject->RemoveIgnoredOwner((void*)other->collisionObject);
     collisionObject->RemoveIgnoredOwner((void*)other->frontWheel);
@@ -1294,11 +1294,11 @@ void KrustyCollisionCallbackA(CollisionObject* self, CollisionObject* other)
     KrustyBike* bike = (KrustyBike*)self->ownerObject;
     int kind = other->ownerType;
     bike->lastCollisionType = kind;
-    if ((bike->UnknownVirtualSlot51() || bike->hasFinished) && kind != 0x66 && kind != 0x6a)
+    if ((bike->IsSpawnProtected() || bike->hasFinished) && kind != 0x66 && kind != 0x6a)
         return;
     if (kind == 0x64) {
         KrustyBike* otherBike = (KrustyBike*)other->ownerObject;
-        if (otherBike->UnknownVirtualSlot51() || otherBike->hasFinished)
+        if (otherBike->IsSpawnProtected() || otherBike->hasFinished)
             return;
     } else if (kind == 0x65) {
         return;
@@ -1313,7 +1313,7 @@ void KrustyCollisionCallbackB(CollisionObject* self, CollisionObject* other)
 {
     KrustyBike* bike = (KrustyBike*)self->ownerObject;
     int kind = other->ownerType;
-    if (bike->UnknownVirtualSlot51())
+    if (bike->IsSpawnProtected())
         return;
     if (bike->isRemote)
         return;
@@ -1502,7 +1502,7 @@ int KrustyBike::Tick(float dt)
         int overlap = 0;
         KrustyBike* bike;
         for (bike = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor)); bike; bike = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor))) {
-            if (!bike->outOfRace && !bike->UnknownVirtualSlot51() && bike != this) {
+            if (!bike->outOfRace && !bike->IsSpawnProtected() && bike != this) {
                 overlap = collisionObject->TestMeshBounds(bike->collisionObject);
                 if (overlap)
                     break;
@@ -1586,7 +1586,7 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
     message.flag9 = trickPoseHeld;
     message.crashDirection = crashDirection;
     message.crashed = crashState;
-    message.flag4 = UnknownVirtualSlot51();
+    message.flag4 = IsSpawnProtected();
     message.flag5 = hasFinished != 0;
     message.flag6 = onTrack;
     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 2 || reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 3)
