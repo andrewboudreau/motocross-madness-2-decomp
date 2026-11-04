@@ -711,9 +711,9 @@ void DrawableGridNode::SubmitUnlitRange(int detailPass, GridVertex* vertices, in
         } else {
             terrain->vertexLighter.FogVertices(vertices, vertexCount);
             if (block >= 0)
-                UnknownVirtualSlot7(block);
+                BindBlockTexture(block);
             else
-                UnknownVirtualSlot6();
+                BindNodeTexture();
             if (terrain->updateTextureCoordinates && extra->texture && (extra->texture->mapFlags & 1)) {
                 if (block >= 0) {
                     GridBlockRecord* record = &extra->blockRecords[block];
@@ -747,9 +747,9 @@ void DrawableGridNode::SubmitUnlitRange(int detailPass, GridVertex* vertices, in
     } else {
         terrain->vertexLighter.FogVertices(vertices, vertexCount);
         if (block >= 0)
-            UnknownVirtualSlot7(block);
+            BindBlockTexture(block);
         else
-            UnknownVirtualSlot6();
+            BindNodeTexture();
         if (terrain->updateTextureCoordinates && extra->texture && (extra->texture->mapFlags & 1)) {
             if (block >= 0) {
                 GridBlockRecord* record = &extra->blockRecords[block];
@@ -770,7 +770,7 @@ void DrawableGridNode::SubmitUnlitRange(int detailPass, GridVertex* vertices, in
 }
 
 // 0x00480fb0: submits a node's (block == -1) or one block's lit vertex range:
-// selects the texture through slot 6 or 7, lets the managed texture update
+// selects the texture through BindNodeTexture or BindBlockTexture, lets the managed texture update
 // the texture coordinates, switches the close-up stage states on or off by
 // the detail limit, marks the buffers used and draws.
 void DrawableGridNode::SubmitLitRange(int detailPass, GridVertex* vertices, int vertexCount, unsigned short* indices,
@@ -784,9 +784,9 @@ void DrawableGridNode::SubmitLitRange(int detailPass, GridVertex* vertices, int 
     else
         detail = extra->blockRecords[block].detail;
     if (block >= 0)
-        UnknownVirtualSlot7(block);
+        BindBlockTexture(block);
     else
-        UnknownVirtualSlot6();
+        BindNodeTexture();
     if (terrain->updateTextureCoordinates && extra->texture && (extra->texture->mapFlags & 1)) {
         if (block >= 0) {
             GridBlockRecord* record = &extra->blockRecords[block];

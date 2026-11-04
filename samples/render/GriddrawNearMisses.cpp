@@ -476,7 +476,7 @@ int DrawableGridNode::RebuildBlockBuffers()
             int closed;
             int triangles;
             int prevTriangles;
-            int size = UnknownVirtualSlot8(block);
+            int size = GetBlockTextureSize(block);
             data->texStep = saved;
             if (size == 0x40)
                 data->texStep *= 4.0f;

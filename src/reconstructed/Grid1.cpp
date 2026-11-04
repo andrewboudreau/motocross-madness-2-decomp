@@ -127,7 +127,7 @@ void DrawableGridNodeSharedTextures::RequestTextureSize(int block)
 }
 
 // 0x0047d310: binds the node-wide texture, or turns texturing off.
-void DrawableGridNodeSharedTextures::UnknownVirtualSlot6()
+void DrawableGridNodeSharedTextures::BindNodeTexture()
 {
     if (Extra()->texture) {
         Extra()->texture->Bind();
@@ -142,7 +142,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot6()
 // 0x0047d370: selects and binds one block's texture. The record's index
 // and own bits share one word, read once through `extra->blocks[block]`
 // (retail's single load, `test dl, 1`).
-void DrawableGridNodeSharedTextures::UnknownVirtualSlot7(int block)
+void DrawableGridNodeSharedTextures::BindBlockTexture(int block)
 {
     Grid1NodeExtra* extra = Extra();
     int index = extra->blocks[block].index;
@@ -164,7 +164,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot7(int block)
 }
 
 // 0x0047d420: the texture size of one block (width << level), 0 without one.
-int DrawableGridNodeSharedTextures::UnknownVirtualSlot8(int block)
+int DrawableGridNodeSharedTextures::GetBlockTextureSize(int block)
 {
     Grid1BlockTexture* record = &Extra()->blocks[block];
     int index = record->index;

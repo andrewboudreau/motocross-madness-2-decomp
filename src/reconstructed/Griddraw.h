@@ -307,9 +307,9 @@ public:
     virtual void UnknownVirtualSlot3(float a) {}                // 0x004806f0 (shared)
     virtual void RequestTextureSize(int a) {}                  // 0x004806f0 (shared)
     virtual void UnknownVirtualSlot5(UnknownTextureStream* stream) {} // 0x004806f0 (shared)
-    virtual void UnknownVirtualSlot6() {}                       // 0x0044d710 (shared)
-    virtual void UnknownVirtualSlot7(int a) {}                  // 0x004806f0 (shared)
-    virtual int UnknownVirtualSlot8(int a) { return 0; }        // 0x004da550 (shared)
+    virtual void BindNodeTexture() {}                       // 0x0044d710 (shared)
+    virtual void BindBlockTexture(int a) {}                  // 0x004806f0 (shared)
+    virtual int GetBlockTextureSize(int a) { return 0; }        // 0x004da550 (shared)
 
     void ReleaseVertexBuffers(int recurse);                    // 0x0047edb0 (ret 4)
     int WalkVisibleFromRoot();                                // 0x0047ef70

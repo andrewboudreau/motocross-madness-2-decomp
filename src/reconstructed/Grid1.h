@@ -96,9 +96,9 @@ public:
                                           void* boundsMin, void* boundsMax);  // 0x0047c960
     virtual void UnknownVirtualSlot3(float a);                  // 0x0047caa0
     virtual void RequestTextureSize(int block);                // 0x0047d160
-    virtual void UnknownVirtualSlot6();                         // 0x0047d310
-    virtual void UnknownVirtualSlot7(int block);                // 0x0047d370
-    virtual int UnknownVirtualSlot8(int block);                 // 0x0047d420
+    virtual void BindNodeTexture();                         // 0x0047d310
+    virtual void BindBlockTexture(int block);                // 0x0047d370
+    virtual int GetBlockTextureSize(int block);                 // 0x0047d420
 
     // 0x0047d470 / 0x0047d780: build the node-wide texture (or one block's)
     // from the node's run-length texture indices (tier 3 names).
