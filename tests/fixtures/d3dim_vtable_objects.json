@@ -20,32 +20,32 @@
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
       "sections": 128,
       "relocations": 625,
-      "sha256": "6e519cc0485f3ee6463509619adb14876b0a80b3673f3bac744f380128eb3c59"
+      "sha256": "cc1879dc789257de3065cf319c93a56cfbfae114038b62b6a5127d092d21261c"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "1b09ca6460e73a6a5d9fb8092097bf349ffc1687fb563f1f8ce6570736f8aa21"
+      "sha256": "c13d4036e3e133de9df774455d80cf18ae8645cc1d81af4636f2103db838dca7"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "89f1e889f9bc656b50a616af835038ab70b95cabf4287c950451f1c9b0080c10"
+      "sha256": "b96aa6b68f51a711cd49a1609cf7482b5fc2da1c96c5dc495ee63f8d19df7387"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
       "relocations": 1054,
-      "sha256": "154f6344186e5213e9a8eb08ca388eb7b51221089a586b26b40c07697b0b8c0c"
+      "sha256": "e3228e6cf083a83f99e10d6e6be8226b282bd419dc7ab3c088244259a3a26979"
     },
     "src/krusty2/collision/CollisionObject.cpp": {
       "sections": 135,
       "relocations": 722,
-      "sha256": "6744166496613ffa07654b5d261630ed3061112681fe1c38176217224daf884a"
+      "sha256": "a5bb8716dcf7af2d3b0ffeae125694129bfc6f5b5f47e92a5986ad41d3108edc"
     },
     "src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp": {
       "sections": 62,
       "relocations": 273,
-      "sha256": "e7eac6c0454d4ac1493ec4d6d052f2c4cb3e1989c84899dac66acb8541a4e841"
+      "sha256": "a9a21b9bb795894f5fd121528c2f55c349ba9990951cff8d1563cac2bc231615"
     },
     "samples/physics/collision/SoultreePhysicsCharacter.cpp": {
       "sections": 16,
@@ -55,12 +55,12 @@
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "90f00e90f7394bae5b8691df34c8d782fadd8b4cd9e072441eb890b12254a3db"
+      "sha256": "4f43b78b5abe7291bc413d4f1429a40b19f4edb8860c113d548ec8834e9872ed"
     },
     "samples/physics/collision/CollisionObjectNearMisses.cpp": {
       "sections": 136,
       "relocations": 732,
-      "sha256": "0c4d521bffaebed2534655e7f0361d92679d603faccc98bd51776ebad9265580"
+      "sha256": "32c54cdfc5432fa84619c9cd6c90df6558bd8a41bb261bae29f7dbe955e4b86f"
     }
   },
   "strict": [

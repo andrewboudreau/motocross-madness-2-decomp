@@ -22,7 +22,7 @@ public:
     Overlay(int flags, int value);
     virtual ~Overlay();                       // 0x004b5ec0 (deleting wrapper 0x004b5ea0)
     virtual int Tick(float frameTime);                 // 0x00499ae0
-    virtual int UnknownVirtualSlot14();       // 0x004b61a0: draws the overlay quad
+    virtual int Render3D();       // 0x004b61a0: draws the overlay quad
 
     // 0x004b5f50: binds the render target (slot 8), the texture (+0x2c), the
     // screen rectangle (+0xe8) and an optional source rectangle (+0xf8).

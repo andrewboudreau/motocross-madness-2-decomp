@@ -219,7 +219,7 @@ void Camera::ClampLimits(float minimum, float maximum) {
 }
 
 // 0x00467ae0 (shared return-1 body)
-int Camera::UnknownVirtualSlot14() {
+int Camera::Render3D() {
     return 1;
 }
 

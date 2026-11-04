@@ -762,7 +762,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot14@CollisionObject",
+    "candidate_symbol_contains": "Render3D@CollisionObject",
     "target_va": "0x00434540",
     "target_size": 1068,
     "expect": "exact",

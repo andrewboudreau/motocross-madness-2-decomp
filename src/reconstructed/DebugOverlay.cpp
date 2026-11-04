@@ -127,7 +127,7 @@ void DebugOverlay::SetRowHighlight(int page, int row, int flag)
         rows[row].highlighted = flag;
 }
 
-int DebugOverlay::UnknownVirtualSlot14()
+int DebugOverlay::Render3D()
 {
     fontTexture->Bind();
     ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_FOGENABLE, 0, 0);

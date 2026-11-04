@@ -224,7 +224,7 @@ public:
 // with the shadow texture, an identity world matrix and modulating texture stages; the address
 // mode and render state 4 are restored afterwards.  Format 0x613 textures also switch render
 // state 0x21 on around the draw.
-int D3DIMSoultreeShadow::UnknownVirtualSlot14()
+int D3DIMSoultreeShadow::Render3D()
 {
     if (inCameraView && inShadowView && vertexCount) {
         ShadowMatrix world;

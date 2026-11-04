@@ -75,8 +75,8 @@ Vec3 PhysicsBody::GetWorldAngularVelocity()
 }
 
 // slot 14, 0x004cbf10.
-int PhysicsBody::UnknownVirtualSlot14()
+int PhysicsBody::Render3D()
 {
-    GraphicsTest::UnknownVirtualSlot14();
+    GraphicsTest::Render3D();
     return 1;
 }

@@ -919,7 +919,7 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
 
 
 // 0x00444030
-int D3DIMSoultreeObject::UnknownVirtualSlot14()
+int D3DIMSoultreeObject::Render3D()
 {
     if (!visible)
         return 1;
@@ -929,7 +929,7 @@ int D3DIMSoultreeObject::UnknownVirtualSlot14()
         ComputeSubtreeBounds();
         DrawAxisGizmo();
     }
-    GameObject::UnknownVirtualSlot14();
+    GameObject::Render3D();
     screenRect.right++;
     screenRect.bottom++;
     return 1;

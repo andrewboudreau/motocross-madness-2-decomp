@@ -102,7 +102,7 @@ struct UnknownFogBackdropVertex {
 // failures leave through one `return 0` (retail shares a single block that
 // reloads eax, which separate `return 0` statements do not give), and each
 // corner stores rhw after its colours, as retail schedules it.
-int Fog::UnknownVirtualSlot14()
+int Fog::Render3D()
 {
     if (isEnabled) {
         TARGET()->currentCamera->ClampLimits(1.0f, fogEnd);
@@ -254,7 +254,7 @@ GameObject* FogOff::SetRenderContext(void* context)
 }
 
 // 0x00462e50
-int FogOff::UnknownVirtualSlot14()
+int FogOff::Render3D()
 {
     TARGET()->currentCamera->ReapplyDefaultLimits();
     TARGET()->currentCamera->SetProjectionMatrix(&TARGET()->currentCamera->projectionMatrix);
@@ -269,10 +269,10 @@ FogOn::FogOn(int flags)
 }
 
 // 0x00462eb0
-int FogOn::UnknownVirtualSlot14()
+int FogOn::Render3D()
 {
     fog->drawnByFogOn = 1;
-    fog->UnknownVirtualSlot14();
+    fog->Render3D();
     fog->drawnByFogOn = 0;
     return 1;
 }

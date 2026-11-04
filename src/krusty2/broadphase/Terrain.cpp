@@ -379,7 +379,7 @@ unsigned int ReadClock();                // 0x004bfa80
 // Its two tick loads before the "Total" sum are a scheduling tie-break that depends on the
 // declarations before it (docs/VC6_OPERAND_ORDER.md section 2): it is exact with the
 // destructor defined at its retail position after SelectQuality, not before this function.
-int Terrain::UnknownVirtualSlot14()
+int Terrain::Render3D()
 {
     if (!g_terrainToggle718)
         return 1;
@@ -542,7 +542,7 @@ int Terrain::UnknownVirtualSlot14()
     ((TerrainRenderTarget*)renderContext)->SetRenderState(4, savedPerspective, 0);
     ((TerrainRenderTarget*)renderContext)->SetRenderState(9, savedShade, 0);
     indicesDrawn /= 3;
-    GameObject::UnknownVirtualSlot14();
+    GameObject::Render3D();
     g_terrainRender3DTicks = ReadClock() - start;
 
     if ((reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->debugFlags & 4) && reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->overlay) {

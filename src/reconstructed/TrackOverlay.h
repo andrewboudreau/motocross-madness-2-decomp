@@ -69,7 +69,7 @@ class InstrumentOverlay : public Overlay {
 public:
     explicit InstrumentOverlay(int flags);    // 0x00518720
     virtual ~InstrumentOverlay();             // 0x00518c00 (deleting wrapper 0x00518750)
-    virtual int UnknownVirtualSlot14();       // 0x00518940
+    virtual int Render3D();       // 0x00518940
 
     InstrumentOverlay* Setup(RenderTarget* target, TextureMapManager* manager, UnknownInstrumentSource* source); // 0x00518770
     void PlaceNeedle(UnknownGauge* gauge, UnknownOverlayVertex* vertices);           // 0x00518c60
@@ -114,7 +114,7 @@ class NameOverlay : public Overlay {
 public:
     explicit NameOverlay(int flags);          // 0x00518d80
     virtual ~NameOverlay();                   // 0x00518e20 (deleting wrapper 0x00518e00)
-    virtual int UnknownVirtualSlot14();       // 0x005190e0
+    virtual int Render3D();       // 0x005190e0
 
     NameOverlay* Create(RenderTarget* target, TextureMap* texture,
                                        const UnknownOverlayRect* rect, int scaleRect,
@@ -170,7 +170,7 @@ public:
     virtual ~StatsOverlay();                  // 0x00519420 (deleting wrapper 0x00519400)
     virtual int Tick(float frameTime);                 // 0x00519900
     virtual int RenderPre3D();                // 0x00519940
-    virtual int UnknownVirtualSlot14();       // 0x00519980
+    virtual int Render3D();       // 0x00519980
 
     // 0x005194b0 (QuarryStuntEvent.cpp 0x004e0a9c): loads the panel for the
     // screen rectangle `screen`; returns this, or 0.
@@ -247,7 +247,7 @@ public:
     explicit RadarOverlay(int flags);         // 0x0051b690
     virtual ~RadarOverlay();                  // 0x0051b7d0 (deleting wrapper 0x0051b7b0)
     virtual int Tick(float frameTime);                 // 0x0051bcd0
-    virtual int UnknownVirtualSlot14();       // 0x0051bd20
+    virtual int Render3D();       // 0x0051bd20
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x0051bb60
 
     // 0x0051b840: loads the map for the screen rectangle `screen` (only its
@@ -411,7 +411,7 @@ public:
     virtual ~ChatOverlay();                   // 0x0051cee0 (deleting wrapper 0x0051cec0)
     virtual int Tick(float frameTime);                 // 0x0051e200
     virtual int RenderPre3D();                // 0x0051e240
-    virtual int UnknownVirtualSlot14();       // 0x0051e390
+    virtual int Render3D();       // 0x0051e390
 
     // 0x0051cf80 (QuarryStuntEvent.cpp 0x004e0965): sets the overlay up for
     // the screen and the cue rectangle; returns this, or 0.

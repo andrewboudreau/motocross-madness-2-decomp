@@ -128,7 +128,7 @@
   "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?RenderPre3D@GameObject@@UAEHXZ": "0x00469330",
-  "?UnknownVirtualSlot14@GameObject@@UAEHXZ": "0x00469360",
+  "?Render3D@GameObject@@UAEHXZ": "0x00469360",
   "?RenderPost3D@GameObject@@UAEHXZ": "0x004693a0",
   "?SetPaused@GameObject@@UAEHH@Z": "0x00469480",
   "?OnDeactivate@GameObject@@UAEHXZ": "0x00469500",

@@ -148,7 +148,7 @@ static inline void Group1Normalize(float* out, float x, float y, float z)
 }
 
 // 0x004bac60
-int ParticleManager::UnknownVirtualSlot14()
+int ParticleManager::Render3D()
 {
     int i;
     unsigned int color = 0;

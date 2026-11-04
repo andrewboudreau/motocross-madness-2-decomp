@@ -99,7 +99,7 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
 
 // 0x004b61a0: draws the quad with the overlay texture, saving and restoring
 // texture stage 0 state 0xc.
-int Overlay::UnknownVirtualSlot14() {
+int Overlay::Render3D() {
     int saved;
 
     overlayTexture->Bind();

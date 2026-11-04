@@ -162,7 +162,7 @@
   {
     "class": "PhysicsBody",
     "source": "PhysicsBody.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot14@PhysicsBody@@",
+    "candidate_symbol_contains": "?Render3D@PhysicsBody@@",
     "target_va": "0x004cbf10",
     "target_size": 11,
     "expect": "exact",
@@ -432,7 +432,7 @@
   {
     "class": "PhysicsRigidBody",
     "source": "PhysicsRigidBody.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot14@PhysicsRigidBody@@",
+    "candidate_symbol_contains": "?Render3D@PhysicsRigidBody@@",
     "target_va": "0x004cca80",
     "target_size": 5,
     "expect": "exact",

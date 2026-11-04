@@ -472,7 +472,7 @@
   {
     "class": "SoultreeQuadTreeRenderer",
     "source": "SoultreeQuadTreeRenderer.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot14@SoultreeQuadTreeRenderer",
+    "candidate_symbol_contains": "Render3D@SoultreeQuadTreeRenderer",
     "target_va": "0x00504570",
     "target_size": 166,
     "expect": "exact",

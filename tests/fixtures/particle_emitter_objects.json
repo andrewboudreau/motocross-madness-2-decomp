@@ -3,37 +3,37 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "89f1e889f9bc656b50a616af835038ab70b95cabf4287c950451f1c9b0080c10"
+      "sha256": "b96aa6b68f51a711cd49a1609cf7482b5fc2da1c96c5dc495ee63f8d19df7387"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "1b09ca6460e73a6a5d9fb8092097bf349ffc1687fb563f1f8ce6570736f8aa21"
+      "sha256": "c13d4036e3e133de9df774455d80cf18ae8645cc1d81af4636f2103db838dca7"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
       "relocations": 65,
-      "sha256": "f2f760a624631b247c13567bacce5371d84a1061bc3c2c3eb957de2919a1bf4e"
+      "sha256": "4665e88a012c62dac515dfac2190ed61d88e29ca59b656bd197a6e70e9eca5d6"
     },
     "src/reconstructed/DirtChunkParticleEmitter.cpp": {
       "sections": 22,
       "relocations": 63,
-      "sha256": "9391f70274576311e6969bb61f002af263b8fe7632e54a13f304ebc88a6f35a0"
+      "sha256": "1dbada067bf4ad0891d958458b3b97619ad6e5562bea044dd74ec43bf057aabd"
     },
     "src/reconstructed/SteamParticleEmitter.cpp": {
       "sections": 26,
       "relocations": 61,
-      "sha256": "6e40249eec255a635aaf8bd8f86b8f39b387507498800b4afdfeff58f1450b69"
+      "sha256": "2270338ef8812c77744fccfbe8e5241f5e53dec23637cb86912e0d817c4e5274"
     },
     "src/reconstructed/SparkParticleEmitter.cpp": {
       "sections": 25,
       "relocations": 67,
-      "sha256": "6de4b9c11367a8c2db026fbd0fc1a9fb2c493020339b8a76d40f3721295a5b36"
+      "sha256": "67fc82f33cb53ac0d1dc8c0d728fac6bc1043509a8124853dbfce2aa493d9cac"
     },
     "samples/physics/effects/DirtSprayParticleEmitter.cpp": {
       "sections": 23,
       "relocations": 59,
-      "sha256": "e535ebbb79b154e122f587a5d09fb7789a2b626444a62b7866ff7be40d5a2633"
+      "sha256": "7e58d17863738b351b68ce0f6d31abae10a4206cbc6c40d256150627bdaaf132"
     }
   },
   "renames": {
@@ -1058,7 +1058,7 @@
         },
         {
           "slot": 14,
-          "symbol": "?UnknownVirtualSlot14@GameObject@@UAEHXZ",
+          "symbol": "?Render3D@GameObject@@UAEHXZ",
           "va": "0x469360",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 55,
@@ -1263,7 +1263,7 @@
         },
         {
           "slot": 14,
-          "symbol": "?UnknownVirtualSlot14@GameObject@@UAEHXZ",
+          "symbol": "?Render3D@GameObject@@UAEHXZ",
           "va": "0x469360",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 55,
@@ -1468,7 +1468,7 @@
         },
         {
           "slot": 14,
-          "symbol": "?UnknownVirtualSlot14@GameObject@@UAEHXZ",
+          "symbol": "?Render3D@GameObject@@UAEHXZ",
           "va": "0x469360",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 55,
@@ -1673,7 +1673,7 @@
         },
         {
           "slot": 14,
-          "symbol": "?UnknownVirtualSlot14@GameObject@@UAEHXZ",
+          "symbol": "?Render3D@GameObject@@UAEHXZ",
           "va": "0x469360",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 55,

@@ -173,7 +173,7 @@ public:
 // shadow texture and modulating texture stages; D3DIMSoultreeShadow slot 14 without the world
 // matrix.  The address mode and render state 4 are restored afterwards; format 0x613 textures
 // also switch render state 0x21 on around the draw.
-int TerrainShadow::UnknownVirtualSlot14()
+int TerrainShadow::Render3D()
 {
     if (vertexCount) {
         ((TerrainShadowTextureView*)shadow->texture)->Bind();

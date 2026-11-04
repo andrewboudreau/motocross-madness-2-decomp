@@ -141,7 +141,7 @@ int VisibilityQuadTree::PrepareGeometry()
     return 1;
 }
 
-int VisibilityQuadTree::UnknownVirtualSlot14()
+int VisibilityQuadTree::Render3D()
 {
     if (!g_visibilityDebugDraw)
         return 1;

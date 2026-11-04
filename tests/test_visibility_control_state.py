@@ -20,7 +20,7 @@ CELLS = {
     '?g_visibilityFreeze@@3HA': (0x68aba0, [0x52ef11, 0x52ef1e, 0x52ef5c]),
 }
 USERS = [
-    ('?UnknownVirtualSlot14@VisibilityQuadTree@@', 0x52e3b0, 148),
+    ('?Render3D@VisibilityQuadTree@@', 0x52e3b0, 148),
     ('?OnControlPress@VisibilityQuadTree@@', 0x52eec0, 135),
     ('?PrepareGeometry@VisibilityQuadTree@@', 0x52ef50, 252),
 ]

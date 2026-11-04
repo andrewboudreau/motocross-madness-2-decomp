@@ -40,7 +40,10 @@ public:
     //  25    AttachRenderContext: Game::AttachRenderTarget hands the root the
     //        render target; every child gets it, then renderContext is set.
     //  26    MarkPendingRelease: sets pendingRelease on the subtree.
-    // Slots 9, 11, 14 and 19 keep placeholder names.
+    // Slot 14 is Render3D: Game::RenderFrame calls it on the root between
+    // BeginScene and EndScene, timed as its `render3D` between the RenderPre3D
+    // and RenderPost3D passes.
+    // Slots 9, 11 and 19 keep placeholder names.
     virtual void Disable();
     virtual void Enable();
     virtual void OnDisable();
@@ -53,7 +56,7 @@ public:
     virtual int UnknownVirtualSlot11(float frameTime);
     virtual int PrepareGeometry();
     virtual int RenderPre3D();
-    virtual int UnknownVirtualSlot14();
+    virtual int Render3D();
     virtual int RenderPost3D();
     virtual int SetPaused(int value);
     virtual int OnDeactivate();

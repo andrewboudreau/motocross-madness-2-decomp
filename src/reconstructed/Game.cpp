@@ -225,7 +225,7 @@ int Game::RenderFrame() {
         renderTarget->Clear(0, 0);
         SetRenderStates();
         last = ReadClock();
-        rootObject->UnknownVirtualSlot14();
+        rootObject->Render3D();
         render3D = ReadClock() - last;
         if (!renderTarget->EndScene()) {
         failed:

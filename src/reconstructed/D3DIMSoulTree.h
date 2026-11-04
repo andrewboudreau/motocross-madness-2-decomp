@@ -232,7 +232,7 @@ public:
     virtual void Enable();                         // 0x00444520
     virtual int Tick(float frameTime);                 // 0x00443490
     virtual int PrepareGeometry();                 // 0x00443aa0
-    virtual int UnknownVirtualSlot14();            // 0x00444030
+    virtual int Render3D();            // 0x00444030
 
     void SetPositionVec3(Vector3 position);  // 0x004fc630: sets the local translation
     void Scale(float x, float y, float z); // 0x004fd340

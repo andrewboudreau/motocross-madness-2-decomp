@@ -92,7 +92,7 @@
   {
     "class": "VisibilityQuadTree",
     "source": "VisibilityQuadTree.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot14",
+    "candidate_symbol_contains": "Render3D",
     "target_va": "0x0052e3b0",
     "target_size": 148,
     "expect": "exact",

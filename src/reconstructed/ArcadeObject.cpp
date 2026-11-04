@@ -167,8 +167,8 @@ int ArcadeObject::Tick(float frameTime) {
 }
 
 // 0x00401920
-int ArcadeObject::UnknownVirtualSlot14() {
+int ArcadeObject::Render3D() {
     if (active && isVisible)
-        return GameObject::UnknownVirtualSlot14();
+        return GameObject::Render3D();
     return 1;
 }

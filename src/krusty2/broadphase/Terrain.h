@@ -288,7 +288,7 @@ public:
     // Slot 12 (0x00507610): per-frame terrain preparation; best-guess body in
     // src/bringup/Group3_TerrainPrepareGeometry.cpp (not byte-matched).
     virtual int PrepareGeometry();
-    virtual int UnknownVirtualSlot14();
+    virtual int Render3D();
     virtual int UnknownVirtualSlot19(int a);                 // 0x00507920 returns 0
     void GetHeightRange(float* outMin, float* outMax);          // 0x00508970
     virtual int OnControlRelease(UnknownControlEvent* a, UnknownInputEntry* b);                 // 0x004dc4c0 returns 0 (shared stub)

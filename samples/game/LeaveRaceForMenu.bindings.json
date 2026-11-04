@@ -27,7 +27,7 @@
   "??0UIDialog@@QAE@HPBD@Z": "0x00469db0",
   "?Release@UIDialog@@UAEHXZ": "0x0046a010",
   "?RenderPre3D@UIDialog@@UAEHXZ": "0x0046f1c0",
-  "?UnknownVirtualSlot14@UIDialog@@UAEHXZ": "0x0046f300",
+  "?Render3D@UIDialog@@UAEHXZ": "0x0046f300",
   "?RenderPost3D@UIDialog@@UAEHXZ": "0x0046f320",
   "?OnControlRelease@UIDialog@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x0046a7d0",
   "?OnControlPress@UIDialog@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x0046a780",

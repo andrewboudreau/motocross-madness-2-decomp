@@ -31,9 +31,9 @@ CollisionCharacter::~CollisionCharacter()
 }
 
 // Slot 14 (0x00431cf0): tail call to the base implementation (0x00469360).
-int CollisionCharacter::UnknownVirtualSlot14()
+int CollisionCharacter::Render3D()
 {
-    return GameObject::UnknownVirtualSlot14();
+    return GameObject::Render3D();
 }
 
 // Slot 10 (0x00431b30, ret 4): per-frame update.  Tier 3 semantics:

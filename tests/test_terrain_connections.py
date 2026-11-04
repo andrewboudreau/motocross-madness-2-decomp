@@ -27,8 +27,8 @@ CONSTRUCTION_PROVIDERS = (
     ('Gridbase', '??0GridBaseBlock@@QAE@PAVUnknownTextureStream@@@Z', 0x47dc20, 382, '?Load@Terrain@@', 0x5059d0, 2116, 1),
     ('Grid1', '??0DrawableGridNodeSharedTextures@@QAE@PAVUnknownTextureStream@@HPAVGridNode@@PAUGridTerrain@@HHHHHPAM3@Z',
      0x47c880, 176, '?Load@Terrain@@', 0x5059d0, 2116, 1),
-    ('Griddraw', '?DrawVisible@DrawableGridNode@@QAEHPAX@Z', 0x480900, 23, '?UnknownVirtualSlot14@Terrain@@', 0x506220, 3173, 2),
-    ('Griddraw', '?DrawVisibleWithDetail@DrawableGridNode@@QAEHPAXH@Z', 0x480920, 26, '?UnknownVirtualSlot14@Terrain@@', 0x506220, 3173, 2),
+    ('Griddraw', '?DrawVisible@DrawableGridNode@@QAEHPAX@Z', 0x480900, 23, '?Render3D@Terrain@@', 0x506220, 3173, 2),
+    ('Griddraw', '?DrawVisibleWithDetail@DrawableGridNode@@QAEHPAXH@Z', 0x480920, 26, '?Render3D@Terrain@@', 0x506220, 3173, 2),
     ('Griddraw', '?ReleaseVertexBuffers@DrawableGridNode@@QAEXH@Z', 0x47edb0, 441, '??1Terrain@@', 0x5079f0, 441, 1),
 )
 PROVIDERS = (

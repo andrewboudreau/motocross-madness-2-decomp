@@ -193,7 +193,7 @@ void DrawableCube::MarkVisibleCells()
 // the four side faces' lower halves in the target's colour. Returns 0 when a
 // draw fails. The static matrix is built once from IdentityMatrix; its
 // atexit thunk is 0x0043e840.
-int DrawableCube::UnknownVirtualSlot14()
+int DrawableCube::Render3D()
 {
     static Matrix4 s_world = IdentityMatrix();
     int fog;

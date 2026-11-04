@@ -131,7 +131,7 @@ class BikeRaceDebugStateTests(unittest.TestCase):
                     self.assertEqual(len(writes), 5)
                 # Compiler references use direct array addresses and the +12 addend.
                 if size == 24:
-                    fn = consumer.find_symbol('?UnknownVirtualSlot14@BikeRace@@UAEHXZ')
+                    fn = consumer.find_symbol('?Render3D@BikeRace@@UAEHXZ')
                     body, _, relocs = consumer.symbol_extent(fn)
                     self.assertEqual(sorted(struct.unpack_from('<I', body, r.virtual_address - fn.value)[0]
                         for r in relocs if consumer.symbol_by_index[r.symbol_index].name == symbol.name), [0, 12])

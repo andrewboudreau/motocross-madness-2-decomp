@@ -244,9 +244,9 @@ int VisualCue::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* ent
 }
 
 // 0x0048bc10
-int VisualCue::UnknownVirtualSlot14() {
+int VisualCue::Render3D() {
     if (isVisible)
-        return ArcadeObject::UnknownVirtualSlot14();
+        return ArcadeObject::Render3D();
     return 1;
 }
 
@@ -360,9 +360,9 @@ int NumberObjectManager::Tick(float frameTime) {
 }
 
 // 0x0048c290
-int NumberObjectManager::UnknownVirtualSlot14() {
+int NumberObjectManager::Render3D() {
     if (drawEnabled)
-        return GameObject::UnknownVirtualSlot14();
+        return GameObject::Render3D();
     return 1;
 }
 
@@ -545,8 +545,8 @@ void BonusObjectManager::HideDigits() {
 }
 
 // 0x0048d620
-int BonusObjectManager::UnknownVirtualSlot14() {
+int BonusObjectManager::Render3D() {
     if (baseFrame->visible)
-        return GameObject::UnknownVirtualSlot14();
+        return GameObject::Render3D();
     return 1;
 }

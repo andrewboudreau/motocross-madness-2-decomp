@@ -62,7 +62,7 @@ class WreckerModelConnections(unittest.TestCase):
                                  ROOT / case['bindings'])
                 self.assertTrue(result['strict_exact'], result)
             folded = compare(image, objects['wrecker'],
-                             '?UnknownVirtualSlot14@Wrecker@@UAEHXZ', 0x4de400, 5,
+                             '?Render3D@Wrecker@@UAEHXZ', 0x4de400, 5,
                              ROOT / 'src/reconstructed/Wrecker.bindings.json')
             self.assertTrue(folded['strict_exact'], folded)
 

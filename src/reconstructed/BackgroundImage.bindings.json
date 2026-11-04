@@ -32,7 +32,7 @@
   "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?RenderPre3D@BackgroundImage@@UAEHXZ": "0x00403dc0",
-  "?UnknownVirtualSlot14@GameObject@@UAEHXZ": "0x00469360",
+  "?Render3D@GameObject@@UAEHXZ": "0x00469360",
   "?RenderPost3D@BackgroundImage@@UAEHXZ": "0x00403ec0",
   "?SetPaused@GameObject@@UAEHH@Z": "0x00469480",
   "?OnDeactivate@GameObject@@UAEHXZ": "0x00469500",

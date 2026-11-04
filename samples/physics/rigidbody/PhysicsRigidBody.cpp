@@ -221,7 +221,7 @@ int PhysicsRigidBody::UnknownVirtualSlot11(float dt)
 }
 
 // slot 14, 0x004cca80.
-int PhysicsRigidBody::UnknownVirtualSlot14()
+int PhysicsRigidBody::Render3D()
 {
-    return PhysicsBody::UnknownVirtualSlot14();
+    return PhysicsBody::Render3D();
 }

@@ -76,7 +76,7 @@ FAIL_VOID(GameObject,Disable,()) FAIL_VOID(GameObject,Enable,())
 FAIL_VOID(GameObject,OnDisable,()) FAIL_VOID(GameObject,OnEnable,())
 FAIL_INT(GameObject,UnknownVirtualSlot9,(int)) FAIL_INT(GameObject,Tick,(float))
 FAIL_INT(GameObject,UnknownVirtualSlot11,(float)) FAIL_INT(GameObject,PrepareGeometry,())
-FAIL_INT(GameObject,RenderPre3D,()) FAIL_INT(GameObject,UnknownVirtualSlot14,()) FAIL_INT(GameObject,RenderPost3D,())
+FAIL_INT(GameObject,RenderPre3D,()) FAIL_INT(GameObject,Render3D,()) FAIL_INT(GameObject,RenderPost3D,())
 FAIL_INT(GameObject,SetPaused,(int)) FAIL_INT(GameObject,OnDeactivate,()) FAIL_INT(GameObject,OnActivate,())
 FAIL_INT(GameObject,UnknownVirtualSlot19,(int)) FAIL_INT(GameObject,OnChar,(int)) FAIL_INT(GameObject,OnKeyDown,(int))
 FAIL_INT(GameObject,OnControlRelease,(UnknownControlEvent*,UnknownInputEntry*))
@@ -91,7 +91,7 @@ FAIL_INT(GUIManager,OnControlPress,(UnknownControlEvent*,UnknownInputEntry*))
 UIDialog::UIDialog(int flags,const char* resource):GameObject(flags){if((void*)this!=world.intro)Fail(90);EventAt(21,0,flags,0,0,0,resource);strcpy(resourceName,resource);}
 UIDialog::~UIDialog(){}
 FAIL_INT(UIDialog,Release,()) FAIL_INT(UIDialog,Tick,(float)) FAIL_INT(UIDialog,RenderPre3D,())
-FAIL_INT(UIDialog,UnknownVirtualSlot14,()) FAIL_INT(UIDialog,RenderPost3D,())
+FAIL_INT(UIDialog,Render3D,()) FAIL_INT(UIDialog,RenderPost3D,())
 FAIL_INT(UIDialog,OnControlRelease,(UnknownControlEvent*,UnknownInputEntry*))
 FAIL_INT(UIDialog,OnControlPress,(UnknownControlEvent*,UnknownInputEntry*))
 UIDialog* UIDialog::UnknownVirtualSlot27(void*,CameraRect*,int,int,SoundGroup*,void*,const char*,UIDialog*,BackgroundImage*,const char*,int,GUIManager*,GUIUser*,const char*){Fail(88);return 0;}

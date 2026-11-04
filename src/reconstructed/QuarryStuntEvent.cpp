@@ -80,8 +80,8 @@ BaseQuarryEvent* BaseQuarryEvent::Create(RenderTarget* target, UnknownProgressCa
 }
 
 // 0x004de400
-int BaseQuarryEvent::UnknownVirtualSlot14() {
-    return GameObject::UnknownVirtualSlot14();
+int BaseQuarryEvent::Render3D() {
+    return GameObject::Render3D();
 }
 
 // 0x004de410

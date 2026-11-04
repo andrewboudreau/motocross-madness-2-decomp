@@ -45,7 +45,7 @@ public:
     // NetProcs.cpp and InGameProcs.cpp (provisional names).
     virtual int Tick(float frameTime);                 // 0x0046ef00
     virtual int RenderPre3D();                // 0x0046f1c0 (dlgprocs.cpp)
-    virtual int UnknownVirtualSlot14();       // 0x0046f300 (gameui.cpp)
+    virtual int Render3D();       // 0x0046f300 (gameui.cpp)
     virtual int RenderPost3D();               // 0x0046f320 (gameui.cpp)
     virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x0046a7d0 (dlgprocs.cpp)
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x0046a780 (SelectGamePicProcs.cpp)

@@ -762,7 +762,7 @@
   {
     "class": "Terrain",
     "source": "Terrain.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot14@Terrain@@",
+    "candidate_symbol_contains": "?Render3D@Terrain@@",
     "target_va": "0x00506220",
     "target_size": 3173,
     "expect": "partial",

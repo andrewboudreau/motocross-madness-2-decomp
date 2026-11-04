@@ -38,7 +38,7 @@ SoultreeQuadTreeRenderer::~SoultreeQuadTreeRenderer()
 }
 
 // slot 14, 0x00504570: publishes the node counters on the statistics overlay.
-int SoultreeQuadTreeRenderer::UnknownVirtualSlot14()
+int SoultreeQuadTreeRenderer::Render3D()
 {
     DebugOverlay* log = reinterpret_cast<SoultreeStats*>(g_TrackGame)->log;
     if (log) {
@@ -51,7 +51,7 @@ int SoultreeQuadTreeRenderer::UnknownVirtualSlot14()
         reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Print(statsId, "Objects Visible        : %i\n", visibleCount);
         reinterpret_cast<SoultreeStats*>(g_TrackGame)->log->Print(statsId, "Objects in list        : %i\n", g_soultreeNodeCount);
     }
-    return GraphicsTest::UnknownVirtualSlot14();
+    return GraphicsTest::Render3D();
 }
 
 // slot 12, 0x00504620: flags every quadtree object of the renderer's type that has no

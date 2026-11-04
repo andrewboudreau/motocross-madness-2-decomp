@@ -19,7 +19,7 @@
   "?SetPositionInFrame@SoultreeObject@@QAEXPAV1@PBUVec3@@@Z": "0x004fc740",
   "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?Tick@CollisionObject@@UAEHM@Z": "0x00499ae0",
-  "?UnknownVirtualSlot14@CollisionObject@@UAEHXZ": "0x00434540",
+  "?Render3D@CollisionObject@@UAEHXZ": "0x00434540",
   "?UpdatePlacement@CollisionObject@@QAEXXZ": "0x00435fb0",
   "_$E1": "0x0043c8f0",
   "_$E10": "0x0043c9e0",

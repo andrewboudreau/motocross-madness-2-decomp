@@ -92,7 +92,7 @@
   {
     "class": "ConstraintMethodCollisionModel",
     "source": "ConstraintMethodCollisionModel.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot14@ConstraintMethodCollisionModel",
+    "candidate_symbol_contains": "Render3D@ConstraintMethodCollisionModel",
     "target_va": "0x43c880",
     "target_size": 5,
     "expect": "exact",

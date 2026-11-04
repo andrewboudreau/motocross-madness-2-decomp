@@ -31,7 +31,7 @@ public:
     // slots 10 and 47 call it directly).
     virtual int Tick(float frameTime);
     virtual int RenderPre3D();
-    virtual int UnknownVirtualSlot14();
+    virtual int Render3D();
     virtual int OnActivate();
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
 

@@ -90,9 +90,9 @@ int ConstraintMethodCollisionModel::Tick(float t)
     return CollisionObject::Tick(t);
 }
 
-int ConstraintMethodCollisionModel::UnknownVirtualSlot14()
+int ConstraintMethodCollisionModel::Render3D()
 {
-    return CollisionObject::UnknownVirtualSlot14();
+    return CollisionObject::Render3D();
 }
 
 void ConstraintMethodCollisionModel::SetBody(ConBody* b, int useNodeModel, const char* shapePath)

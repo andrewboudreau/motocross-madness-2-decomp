@@ -82,7 +82,7 @@ public:
     virtual ~DrawableCube();                  // 0x0043e290 (deleting wrapper 0x0043d960)
     virtual int PrepareGeometry();            // 0x0043e850: visibility, then texture use
     virtual int RenderPre3D();                // 0x00467ae0 (shared `return 1` body)
-    virtual int UnknownVirtualSlot14();       // 0x0043e4c0: draws the visible cells
+    virtual int Render3D();       // 0x0043e4c0: draws the visible cells
 
     // 0x0043d980: reads the palettes and cubes listed in `stream`.
     DrawableCube* Load(void* value, UnknownTextureStream* stream,

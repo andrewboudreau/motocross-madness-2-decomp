@@ -32,7 +32,7 @@ public:
     virtual int Tick(float frameTime);
     // 0x00423410: debug drawing (the track, the probes and the debug lines
     // other files leave in globals) while +0x34 is set.
-    virtual int UnknownVirtualSlot14();
+    virtual int Render3D();
     virtual int SetPaused(int value);            // 0x0041d260
     virtual int OnChar(int value);               // 0x0041f590
     // 0x00420040: network messages 1 (racer state), 13, 10 (score), 0x85

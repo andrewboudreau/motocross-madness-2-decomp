@@ -29,7 +29,7 @@ public:
     virtual GameObject* SetRenderContext(void* context);             // 0x0043b9a0
     virtual int Tick(float dt);                              // 0x0043ba40
     virtual int UnknownVirtualSlot11(float dt);           // 0x0043ba70
-    virtual int UnknownVirtualSlot14();                   // 0x0043c880 (tail jump)
+    virtual int Render3D();                   // 0x0043c880 (tail jump)
 
     void SetBody(ConBody* b, int useNodeModel, const char* shapePath);     // 0x0043b9e0
     void AddProbePoint(ConVec3 point, ConNode* node);   // 0x0043c7f0

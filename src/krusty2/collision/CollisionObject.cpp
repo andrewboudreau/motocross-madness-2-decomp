@@ -1204,7 +1204,7 @@ struct CollisionCapsuleView {
 // shared transform for both ends retail's operand orders are out of reach (1054-1058).
 // The ring step is d / 10.0f: VC6 turns it into a multiply by the reciprocal constant
 // 0x005511cc, a separate pool entry from the literal 0.1f at 0x005507d0.
-int CollisionObject::UnknownVirtualSlot14()
+int CollisionObject::Render3D()
 {
     ((CollisionDebugDevice*)renderContext)->UnknownVirtualSlot8(0x1b, 0, 0);
     ((CollisionDebugDevice*)renderContext)->UnknownVirtualSlot10(7, 0);
@@ -1257,7 +1257,7 @@ int CollisionObject::UnknownVirtualSlot14()
         }
     }
     queryTouched = 0;
-    return GameObject::UnknownVirtualSlot14();
+    return GameObject::Render3D();
 }
 
 // 0x00432d30 (ret 0xc).  Draws one hull's trees; `mode` (1..7) picks the view.  Mode 4

@@ -140,7 +140,7 @@
   "?TestModelAgainst@CollisionObject@@QAEHPAV1@@Z": "0x00438c10",
   "?TreeBoxOverlap@@YAHPAUQueryTreeNode@@0PBUMatrix4@@1@Z": "0x00428c20",
   "?TreeTreeQuery@@YAHPAUQueryTreeNode@@0PBUMatrix4@@1HPAUVec3@@1@Z": "0x00428950",
-  "?UnknownVirtualSlot14@GameObject@@UAEHXZ": "0x00469360",
+  "?Render3D@GameObject@@UAEHXZ": "0x00469360",
   "?UpdateModelBounds@CollisionObject@@QAEXXZ": "0x00434eb0",
   "?UpdatePlacement@CollisionObject@@QAEXXZ": "0x00435fb0",
   "?UpdateQuadtreeCell@CollisionObject@@QAEXXZ": "0x00436080",

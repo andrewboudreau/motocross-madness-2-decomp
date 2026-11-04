@@ -183,7 +183,7 @@
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?RenderPre3D@GUIManager@@UAEHXZ": "0x004858d0",
   "?RenderPre3D@GameObject@@UAEHXZ": "0x00469330",
-  "?UnknownVirtualSlot14@GameObject@@UAEHXZ": "0x00469360",
+  "?Render3D@GameObject@@UAEHXZ": "0x00469360",
   "?RenderPost3D@GUICursor@@UAEHXZ": "0x00485170",
   "?RenderPost3D@GUIManager@@UAEHXZ": "0x00485970",
   "?RenderPost3D@GUIUser@@UAEHXZ": "0x00487620",

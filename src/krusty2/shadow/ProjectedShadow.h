@@ -267,7 +267,7 @@ public:
         GameObject::SetRenderContext(context);
         return this;
     }
-    virtual int UnknownVirtualSlot14() { return 1; }
+    virtual int Render3D() { return 1; }
     virtual int UnknownVirtualSlot27() { return 1; }
     virtual int UnknownVirtualSlot28() { return 0; }
     virtual int UnknownVirtualSlot29() { return 1; }

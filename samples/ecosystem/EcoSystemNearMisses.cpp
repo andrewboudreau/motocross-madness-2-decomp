@@ -693,7 +693,7 @@ static inline float UnknownEcoLightOn(const EcoSystem* eco, const Vector3* n) {
 // view-aligned quads (or, when the band lights them, as three lit faces
 // folded towards the camera) and drawn in one call. The timings and counts
 // go to the "EcoSystem" debug overlay page.
-int EcoSystem::UnknownVirtualSlot14() {
+int EcoSystem::Render3D() {
     Matrix4 identity;
     int savedPerspective;
     int savedShadeMode;
@@ -933,5 +933,5 @@ int EcoSystem::UnknownVirtualSlot14() {
     ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->minFilter);
     ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->mipFilter);
     ECO_VIEW->DisableAlphaTest();
-    return GameObject::UnknownVirtualSlot14();
+    return GameObject::Render3D();
 }

@@ -39,7 +39,7 @@ public:
     explicit ArcadeObject(int flags);          // 0x00401260
     virtual ~ArcadeObject();                   // 0x00401300 (deleting wrapper 0x004012e0)
     virtual int Tick(float frameTime);                 // 0x00401800
-    virtual int UnknownVirtualSlot14();        // 0x00401920
+    virtual int Render3D();        // 0x00401920
 
     // 0x00401310 (ret 0x34): slot 8 of the base, then loads the model `name`
     // (line 78), places it and optionally scales it to `pixels` and attaches

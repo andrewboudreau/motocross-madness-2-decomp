@@ -27,7 +27,7 @@ public:
     virtual ~Fog();                           // 0x00462670 (deleting wrapper 0x00462650)
     virtual int Tick(float frameTime);                 // 0x004627f0 (folded with BackgroundImage slot 27)
     virtual int PrepareGeometry();            // 0x00462800: camera range to the fog end
-    virtual int UnknownVirtualSlot14();       // 0x00462850: backdrop and device fog
+    virtual int Render3D();       // 0x00462850: backdrop and device fog
     // 0x00462c20: key 0x57 toggles "DriverInfo\<driver>\RenderFog", keys 0x21 / 0x22
     // move the fog in and out.
     virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
@@ -61,13 +61,13 @@ class FogOff : public GameObject {
 public:
     explicit FogOff(int flags);               // 0x00462e10 (ret 4)
     virtual GameObject* SetRenderContext(void* context);    // 0x00462e30 (folded)
-    virtual int UnknownVirtualSlot14();       // 0x00462e50
+    virtual int Render3D();       // 0x00462e50
 };
 
 class FogOn : public GameObject {
 public:
     explicit FogOn(int flags);                // 0x00462e90 (ret 4)
-    virtual int UnknownVirtualSlot14();       // 0x00462eb0
+    virtual int Render3D();       // 0x00462eb0
     GameObject* Create(void* target, Fog* fog); // 0x00486a10
 
     Fog* fog;                                 // the Fog it redraws

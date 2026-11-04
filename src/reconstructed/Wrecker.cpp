@@ -588,8 +588,8 @@ void Wrecker::EndWreck() {
     }
 }
 
-int Wrecker::UnknownVirtualSlot14() {
-    return GameObject::UnknownVirtualSlot14();
+int Wrecker::Render3D() {
+    return GameObject::Render3D();
 }
 
 int Wrecker::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {

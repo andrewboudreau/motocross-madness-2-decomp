@@ -117,11 +117,11 @@ int GameObject::RenderPre3D() {
 }
 
 // 0x00469360: stops at the first child that returns 0.
-int GameObject::UnknownVirtualSlot14() {
+int GameObject::Render3D() {
     if (childFlags & 0x08) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->isEnabled && !child->pendingRelease) {
-                if (!child->UnknownVirtualSlot14())
+                if (!child->Render3D())
                     return 0;
             }
         }

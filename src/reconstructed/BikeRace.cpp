@@ -1966,11 +1966,11 @@ void BikeRace::DrawTrack(Track* track) {
 }
 
 // 0x00423410
-int BikeRace::UnknownVirtualSlot14() {
+int BikeRace::Render3D() {
     Vector3 a;
     Vector3 b;
     if (drawChildren) {
-        GameObject::UnknownVirtualSlot14();
+        GameObject::Render3D();
     }
     if (debugDraw) {
         if (raceTrack != 0) {

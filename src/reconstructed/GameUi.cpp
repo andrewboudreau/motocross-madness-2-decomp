@@ -2115,9 +2115,9 @@ int UIDialog::RenderPre3D() {
 }
 
 // 0x0046f300
-int UIDialog::UnknownVirtualSlot14() {
+int UIDialog::Render3D() {
     if (!isPaused)
-        return GameObject::UnknownVirtualSlot14();
+        return GameObject::Render3D();
     return 1;
 }
 

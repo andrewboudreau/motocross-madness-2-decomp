@@ -7,42 +7,42 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "bee71269987ec98dd50c2343ae52dc7d0c2e0eeab9cf1b4214e8aa81cf283f0d"
+      "sha256": "95a55613a014eda56eec615943f2e5c1243d06be010d9a7cdc0713a8dcc76a70"
     },
     "src/reconstructed/LightEmitter.cpp": {
       "sections": 57,
       "relocations": 172,
-      "sha256": "41c790eaf9d623b2f5c54ace757375c410e191462c6530b458df411fe84bdd99"
+      "sha256": "692c292db56d326b9e245457ff759262e927ff61b44f9361e353a1a0a6fc6cc9"
     },
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
       "relocations": 1273,
-      "sha256": "70bfbb8b2e0aba03a6108d91e7cca3c90d17b5585ef95681f41c5c5d4c28283f"
+      "sha256": "8c25fb561d125037c71affee1a476cc5b79aab11ce2c30312b856f8edcaf621e"
     },
     "src/reconstructed/KrustyUI.cpp": {
       "sections": 296,
       "relocations": 1722,
-      "sha256": "e0a9f4311077bf4ad790899457d4a02c326546a309a9a18d0624437f991d8833"
+      "sha256": "1f10e5eeda6b4b978cac44c09fe3740ffea77352b5d734c253f2eb7e828c9b1d"
     },
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 86,
       "relocations": 393,
-      "sha256": "37a7a6b50a62a145889f23f06c28e3c0bc9ab5c5cbf694cff31e08a969effbbd"
+      "sha256": "b71d7ce03e923c873c85b0cce0eeec7466e47f760046d6047fe6ba9a0f5f47b4"
     },
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,
       "relocations": 127,
-      "sha256": "e82e48c1c21df0d28aec4843180877f705d28c4e2b4360f386d33a93b8b8547f"
+      "sha256": "0419f74737a004a22b5a51d938e663b38fa424095a996efaec557f4ae289a820"
     },
     "src/reconstructed/D3DIMSoultreeModifier.cpp": {
       "sections": 23,
       "relocations": 75,
-      "sha256": "80a55fd012f2204870c8d6bec641496654ec6b21ca35c76bbdf532bd0ffed779"
+      "sha256": "da1a6a0321df09468d408b3d2dccda04a7e38a8eee9d1ab915e9812428bee880"
     },
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,
       "relocations": 444,
-      "sha256": "a4edaa1d283330a35b29e49adddfeaf0d2a821c5e35909f5084bb856a50c5159"
+      "sha256": "4e5dea1c6e362e1b412b034626b874561d16018e864c25fa6cdde13f17102f44"
     },
     "samples/ecosystem/VegetationCollisionObject.cpp": {
       "sections": 2,

@@ -39,7 +39,7 @@ public:
     virtual int PrepareGeometry();            // 0x004e14a0: the "Atmosphere" debug page
     // Slot 14, 0x004de400: `jmp GameObject slot 14` (folded with the same
     // body of other classes).
-    virtual int UnknownVirtualSlot14();
+    virtual int Render3D();
     virtual int OnActivate();                 // 0x00499af0 (folded with KrustyUI's)
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004e0ce0
     virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);       // 0x004e1cc0

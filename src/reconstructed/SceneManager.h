@@ -242,7 +242,7 @@ public:
     virtual void Enable();                           // 0x004eaa60
     virtual void OnEnable();                         // 0x004eaab0
     virtual int Tick(float frameTime);                 // 0x004eab00, not reconstructed
-    virtual int UnknownVirtualSlot14();              // 0x004f0040
+    virtual int Render3D();              // 0x004f0040
     virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
 

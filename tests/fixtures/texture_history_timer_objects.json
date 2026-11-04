@@ -13,12 +13,12 @@
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
       "relocations": 1273,
-      "sha256": "70bfbb8b2e0aba03a6108d91e7cca3c90d17b5585ef95681f41c5c5d4c28283f"
+      "sha256": "8c25fb561d125037c71affee1a476cc5b79aab11ce2c30312b856f8edcaf621e"
     },
     "src/reconstructed/ProCircuitProcs.cpp": {
       "sections": 334,
       "relocations": 2083,
-      "sha256": "c3ac3bec1cf278f2d060dcd1f987ea7c57d4b96007166650fd0d83c94e8469ee"
+      "sha256": "07ca3a835a93a831a5c29bca4da44a040f5fff04f4df219f603c0c7958879941"
     }
   },
   "note": "Four same-path old objects independently preserved with no symbol joins. Portable pins normalize only these four source filenames and the two exact canonical/sample-relative ContainerList.h spellings; old private pins were reproduced before the exact header-filename portability repair, and all four live-root objects equal the private mirror under this normalization."

@@ -18,7 +18,7 @@
   "?ShowNextPage@DebugOverlay@@QAEHXZ": "0x004484f0",
   "?ReadClock@@YAIXZ": "0x004bfa80",
   "?RestoreTextureSurface@PCTextureMap@@QAEHXZ": "0x004c7420",
-  "?UnknownVirtualSlot14@DebugOverlay@@UAEHXZ": "0x00448030",
+  "?Render3D@DebugOverlay@@UAEHXZ": "0x00448030",
   "?AttachRenderContext@DebugOverlay@@UAEHPAX@Z": "0x00448520",
   "?AttachRenderContext@GameObject@@UAEHPAX@Z": "0x00469720",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",

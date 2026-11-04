@@ -1089,10 +1089,10 @@ void Scene::ReadSoundSettings(const char* section, char* file, int is3D,
 }
 
 // 0x004f0040
-int Scene::UnknownVirtualSlot14()
+int Scene::Render3D()
 {
     if (visible)
-        return GameObject::UnknownVirtualSlot14();
+        return GameObject::Render3D();
     return 1;
 }
 
