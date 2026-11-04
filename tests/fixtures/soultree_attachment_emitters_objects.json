@@ -3,7 +3,7 @@
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
       "sections": 128,
       "relocations": 625,
-      "sha256": "c703e5430271a78cd6ec035f65dcdceb5c59ee68fada9ed8a2e255eb771bdbf7"
+      "sha256": "e1c1fdc69d2328491bf842a2e0d273ed8a375ae9abc6a2b50c9050b1ed9e1932"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -18,7 +18,7 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "f69c4cf124eab6d95763e5a557ed35707f4f97a7add9dbf73c518230448fd9a8"
+      "sha256": "99f1c86115bb232dde727478b7fe45be2dc0667b99cb1cd64af6f46eca2f6ad9"
     },
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,
@@ -152,13 +152,13 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot15@SoultreePhysicsBaseObject",
+      "symbol": "ApplyWorldTorque@SoultreePhysicsBaseObject",
       "va": "0x00502200",
       "extent": 174
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot16@SoultreePhysicsBaseObject",
+      "symbol": "LocalTorqueToAngularAcceleration@SoultreePhysicsBaseObject",
       "va": "0x005022b0",
       "extent": 127
     },
@@ -2203,7 +2203,7 @@
     ],
     [
       "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "UnknownVirtualSlot13@SoultreePhysicsBaseObject",
+      "AccumulateContactForces@SoultreePhysicsBaseObject",
       5250704,
       483,
       483,

@@ -12,7 +12,7 @@
     ],
     [
       "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "UnknownVirtualSlot13@SoultreePhysicsBaseObject",
+      "AccumulateContactForces@SoultreePhysicsBaseObject",
       5250704,
       483,
       483,

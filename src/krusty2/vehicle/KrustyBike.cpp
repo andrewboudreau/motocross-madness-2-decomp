@@ -424,7 +424,7 @@ void KrustyBike::UnknownVirtualSlot67()
 // ---- physics ----
 
 // Slot 16: localTorque scaled per axis by invInertia, or by shapeInvInertia while crashed.
-Vec3 KrustyBike::UnknownVirtualSlot16(const Vec3* localTorque)
+Vec3 KrustyBike::LocalTorqueToAngularAcceleration(const Vec3* localTorque)
 {
     Vec3 accel;
     if (!crashState) {
@@ -441,7 +441,7 @@ Vec3 KrustyBike::UnknownVirtualSlot16(const Vec3* localTorque)
 
 // Slot 15: worldTorque into the body frame, scaled per axis as in slot 16, then 0x4CB6E0
 // (which looks like a clamp/settle step on angularVelocity) with angularAccel.
-void KrustyBike::UnknownVirtualSlot15(const Vec3* worldTorque, Vec3* angularAccel)
+void KrustyBike::ApplyWorldTorque(const Vec3* worldTorque, Vec3* angularAccel)
 {
     Vec3 localAccel;
     Vec3 localTorque = ((KbXform*)modelNode)->WorldToLocalDirection(worldTorque);
@@ -1056,8 +1056,8 @@ void KrustyBike::IntegrateMotion(Vec3* force, const Vec3* localTorque, const Vec
         Bike::IntegrateMotion(force, localTorque, worldTorque);
         return;
     }
-    angularAcceleration = UnknownVirtualSlot16(localTorque);
-    UnknownVirtualSlot15(worldTorque, &angularAcceleration);
+    angularAcceleration = LocalTorqueToAngularAcceleration(localTorque);
+    ApplyWorldTorque(worldTorque, &angularAcceleration);
     angularVelocity += stepTime * angularAcceleration;
     angularVelocity *= 0.999f;
     force->x = 0;

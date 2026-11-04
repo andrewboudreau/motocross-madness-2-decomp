@@ -25,7 +25,7 @@ public:
     virtual int UnknownVirtualSlot5(int value);
     virtual void UnknownVirtualSlot7(const Vec3* force);
     virtual void UnknownVirtualSlot8();
-    virtual Vec3 UnknownVirtualSlot16(const Vec3* localTorque);
+    virtual Vec3 LocalTorqueToAngularAcceleration(const Vec3* localTorque);
     virtual void UnknownVirtualSlot29(int lastStep);
     virtual float UnknownVirtualSlot32();
     virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,

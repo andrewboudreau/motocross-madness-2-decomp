@@ -20,22 +20,22 @@
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
       "sections": 128,
       "relocations": 625,
-      "sha256": "c703e5430271a78cd6ec035f65dcdceb5c59ee68fada9ed8a2e255eb771bdbf7"
+      "sha256": "e1c1fdc69d2328491bf842a2e0d273ed8a375ae9abc6a2b50c9050b1ed9e1932"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "a733f4dda3a783d84082f19f14c6bfdf3ae06e8eb701ea7d167e5f528c4ba9da"
+      "sha256": "0f15f85d5f36ccb61b217b7cde251eec9c2e5424bba27da37df840524fadaefe"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "f69c4cf124eab6d95763e5a557ed35707f4f97a7add9dbf73c518230448fd9a8"
+      "sha256": "99f1c86115bb232dde727478b7fe45be2dc0667b99cb1cd64af6f46eca2f6ad9"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
       "relocations": 1054,
-      "sha256": "ca142d73794ffc0e6b99281b018fee39ecc53820571446a4e3a6a360a84f807f"
+      "sha256": "15861cff89e73981aa9692bab84387e662c2f9cec80882b4079d8c43c2838078"
     },
     "src/krusty2/collision/CollisionObject.cpp": {
       "sections": 135,
@@ -55,7 +55,7 @@
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "795a00ce223bf6bc92e19c40e4df7ea49a1d05836a28aee1c8efdfb2aada94fe"
+      "sha256": "ab8f74ed208ec745a65e6412d130697a41a9ab43d0760d8873472da92c0e59ef"
     },
     "samples/physics/collision/CollisionObjectNearMisses.cpp": {
       "sections": 136,
@@ -262,14 +262,14 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "?UnknownVirtualSlot15@SoultreePhysicsBaseObject@@UAEXPBUVec3@@PAU2@@Z",
+      "symbol": "?ApplyWorldTorque@SoultreePhysicsBaseObject@@UAEXPBUVec3@@PAU2@@Z",
       "target_va": "0x00502200",
       "target_size": 174,
       "bindings": "src/krusty2/soultree/SoulTreePhysics.bindings.json"
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "?UnknownVirtualSlot16@SoultreePhysicsBaseObject@@UAE?AUVec3@@PBU2@@Z",
+      "symbol": "?LocalTorqueToAngularAcceleration@SoultreePhysicsBaseObject@@UAE?AUVec3@@PBU2@@Z",
       "target_va": "0x005022b0",
       "target_size": 127,
       "bindings": "src/krusty2/soultree/SoulTreePhysics.bindings.json"
@@ -490,7 +490,7 @@
     ],
     [
       "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "UnknownVirtualSlot13@SoultreePhysicsBaseObject",
+      "AccumulateContactForces@SoultreePhysicsBaseObject",
       5250704,
       483,
       483,

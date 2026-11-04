@@ -3,12 +3,12 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "f69c4cf124eab6d95763e5a557ed35707f4f97a7add9dbf73c518230448fd9a8"
+      "sha256": "99f1c86115bb232dde727478b7fe45be2dc0667b99cb1cd64af6f46eca2f6ad9"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "a733f4dda3a783d84082f19f14c6bfdf3ae06e8eb701ea7d167e5f528c4ba9da"
+      "sha256": "0f15f85d5f36ccb61b217b7cde251eec9c2e5424bba27da37df840524fadaefe"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -82,7 +82,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot16@Bike",
+      "symbol": "LocalTorqueToAngularAcceleration@Bike",
       "target_va": "0x004069d0",
       "target_size": 121,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"

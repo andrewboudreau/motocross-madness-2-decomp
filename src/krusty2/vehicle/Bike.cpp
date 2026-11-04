@@ -398,7 +398,7 @@ void Bike::UnknownVirtualSlot90(int* steps, float frame)
     }
 }
 
-Vec3 Bike::UnknownVirtualSlot16(const Vec3* localTorque)
+Vec3 Bike::LocalTorqueToAngularAcceleration(const Vec3* localTorque)
 {
     Vec3 r;
     if (crashState == 0) {

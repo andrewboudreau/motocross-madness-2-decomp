@@ -82,7 +82,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot16@Bike",
+    "candidate_symbol_contains": "LocalTorqueToAngularAcceleration@Bike",
     "target_va": "0x004069d0",
     "target_size": 121,
     "expect": "exact",
@@ -1942,7 +1942,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot15@KrustyBike",
+    "candidate_symbol_contains": "ApplyWorldTorque@KrustyBike",
     "target_va": "0x00495cb0",
     "target_size": 176,
     "expect": "exact",
@@ -1952,7 +1952,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot16@KrustyBike",
+    "candidate_symbol_contains": "LocalTorqueToAngularAcceleration@KrustyBike",
     "target_va": "0x00495d60",
     "target_size": 124,
     "expect": "exact",

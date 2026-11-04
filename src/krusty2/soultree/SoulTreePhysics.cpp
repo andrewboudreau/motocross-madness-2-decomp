@@ -190,7 +190,7 @@ int SoultreePhysicsBaseObject::UnknownVirtualSlot11(int respawn, Vec3* outPositi
 }
 
 // slot 15 (0x00502200)
-void SoultreePhysicsBaseObject::UnknownVirtualSlot15(const Vec3* worldTorque, Vec3* angularAccel)
+void SoultreePhysicsBaseObject::ApplyWorldTorque(const Vec3* worldTorque, Vec3* angularAccel)
 {
     Vec3 localTorque = sceneNode->WorldToLocalDirection(*worldTorque);
     Vec3 localAccel;
@@ -207,7 +207,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot15(const Vec3* worldTorque, Ve
 }
 
 // slot 16 (0x005022b0)
-Vec3 SoultreePhysicsBaseObject::UnknownVirtualSlot16(const Vec3* localTorque)
+Vec3 SoultreePhysicsBaseObject::LocalTorqueToAngularAcceleration(const Vec3* localTorque)
 {
     Vec3 accel;
     if (UnknownVirtualSlot10()) {
@@ -478,7 +478,7 @@ static inline void SoultreeCopyBits(Vec3& d, const Vec3& s)
 // (retail: between its second and third temporary loads, as in Vehicle 0x00527a20), and
 // the y and z cross terms that use leverArm.x load it before frictionForce (operand order,
 // a by-value, pointer, swapped-parameter or contact-member cross are inert or worse).
-void SoultreePhysicsBaseObject::UnknownVirtualSlot13(Vec3* force, Vec3* localTorque, float torqueScale)
+void SoultreePhysicsBaseObject::AccumulateContactForces(Vec3* force, Vec3* localTorque, float torqueScale)
 {
     if (!touchingPointCount)
         return;
@@ -516,8 +516,8 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot13(Vec3* force, Vec3* localTor
 void SoultreePhysicsBaseObject::IntegrateMotion(Vec3* force, const Vec3* localTorque,
                                                      const Vec3* worldTorque)
 {
-    angularAcceleration = UnknownVirtualSlot16(localTorque);
-    UnknownVirtualSlot15(worldTorque, &angularAcceleration);
+    angularAcceleration = LocalTorqueToAngularAcceleration(localTorque);
+    ApplyWorldTorque(worldTorque, &angularAcceleration);
     angularVelocity += angularAcceleration * stepTime;
     angularVelocity *= 0.999f;
     acceleration = *force * invMass;
@@ -1331,7 +1331,7 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
             }
         }
         Vec3 localTorque = kVec3Zero;
-        UnknownVirtualSlot13(&force, &localTorque, 1.0f);
+        AccumulateContactForces(&force, &localTorque, 1.0f);
         UpdateRestState();
         IntegrateMotion(&force, &localTorque, &worldTorque);
         UnknownVirtualSlot26();

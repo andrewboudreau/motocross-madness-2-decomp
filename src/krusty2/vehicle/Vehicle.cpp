@@ -1094,7 +1094,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         }
         float turnMagnitude = VehAbsT(turnAngle);
         Vec3 localTorque = kVec3Zero;
-        UnknownVirtualSlot13(&force, &localTorque, torqueScale);
+        AccumulateContactForces(&force, &localTorque, torqueScale);
         if (anyWheelInContact) {
             Method_00527A20(&speed, &worldTorque, &force);
             if (crashState == 0 || !pointsTouching) {

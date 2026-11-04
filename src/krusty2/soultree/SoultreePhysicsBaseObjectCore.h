@@ -116,15 +116,15 @@ public:
     virtual int UnknownVirtualSlot11(int respawn, Vec3* outPosition, Vec3* outForward, Vec3* outUp,
                                      int* outKeepPlacement);
     virtual int UnknownVirtualSlot12(int value);
-    virtual void UnknownVirtualSlot13(Vec3* force, Vec3* localTorque, float torqueScale);
+    virtual void AccumulateContactForces(Vec3* force, Vec3* localTorque, float torqueScale);
     // Slot 14 (ret 0xc): retail 0x00502080 passes localTorque to slot 16, worldTorque to slot
     // 15 and later multiplies *force by invMass (tier 1 decoded stack offsets); all three are
     // Vec3 pointers.  force is not const: the KrustyBike override 0x004965e0 zeroes force->x
     // and force->z (tier 1).
     virtual void IntegrateMotion(Vec3* force, const Vec3* localTorque,
                                       const Vec3* worldTorque);
-    virtual void UnknownVirtualSlot15(const Vec3* worldTorque, Vec3* angularAccel);
-    virtual Vec3 UnknownVirtualSlot16(const Vec3* localTorque);
+    virtual void ApplyWorldTorque(const Vec3* worldTorque, Vec3* angularAccel);
+    virtual Vec3 LocalTorqueToAngularAcceleration(const Vec3* localTorque);
     virtual Vec3 UnknownVirtualSlot17();
     virtual void UnknownVirtualSlot18(SoultreeAttachment* attachment);
     virtual void UnknownVirtualSlot19(SoultreeAttachment* attachment);

@@ -202,7 +202,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot13@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "AccumulateContactForces@SoultreePhysicsBaseObject",
     "target_va": "0x00501e90",
     "target_size": 483,
     "expect": "partial",
@@ -222,7 +222,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot15@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "ApplyWorldTorque@SoultreePhysicsBaseObject",
     "target_va": "0x00502200",
     "target_size": 174,
     "expect": "exact",
@@ -232,7 +232,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot16@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "LocalTorqueToAngularAcceleration@SoultreePhysicsBaseObject",
     "target_va": "0x005022b0",
     "target_size": 127,
     "expect": "exact",
