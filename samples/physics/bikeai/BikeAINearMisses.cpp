@@ -1657,7 +1657,7 @@ int KrustyBike::Fn_00413200(float dt)
     stepTime = dt;
     invStepTime = 1.0f / dt;
     int steps = 1;
-    UnknownVirtualSlot30();
+    ClearContactEffectFlags();
     UnknownVirtualSlot64(dt);
     pointsTouching = 0;
     int hit = UnknownVirtualSlot39(dt);
@@ -1841,7 +1841,7 @@ int KrustyBike::Fn_00413200(float dt)
             UnknownVirtualSlot91();
         UnknownVirtualSlot90(&steps, dt);
     }
-    UnknownVirtualSlot28(steps);
+    ResolveSubstepCollisions(steps);
 
     if (collisionObject->hasContact && lastCollisionType != 1000 &&
         lastCollisionType != 100 && lastCollisionType != 101)
@@ -1868,7 +1868,7 @@ int KrustyBike::Fn_00413200(float dt)
     LoadBodyAxes();
     OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
                                  &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
-    UnknownVirtualSlot29(1);
+    SaveBodyOrientation(1);
     prevSpeed = linearSpeed;
     Vec3 moved = position - start;
     frontWheel->groundPoint += moved;

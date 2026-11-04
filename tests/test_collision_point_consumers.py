@@ -30,7 +30,7 @@ FAST = 'src/reconstructed/FastMath.cpp'
 DIVIDE = 'src/reconstructed/CollisionVectorHelpers.cpp'
 CTOR = 'src/reconstructed/CollisionVectorConstructor.cpp'
 FIXTURE = 'tests/fixtures/collision_point_consumers.cpp'
-SLOT = '?UnknownVirtualSlot31@SoultreePhysicsBaseObject@@UAEXXZ'
+SLOT = '?UpdateContactStates@SoultreePhysicsBaseObject@@UAEXXZ'
 RELATIVE = '?UpdateRelativeMotion@CollisionPoint@@QAEXPBUCollisionVec3@@000M@Z'
 WORLD = '?UpdateCollisionPointWorldPositions@@YAXHPAPAVCollisionPoint@@@Z'
 NORMALIZE = '?Vec3Normalize@@YA?AUVec3@@ABU1@@Z'
@@ -161,7 +161,7 @@ class CollisionPointConsumersTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-contact-consumers-') as directory:
             output = Path(directory)
             extracted = {
-                'slot': '#include "soultree/SoultreePhysicsBaseObject.h"\n#include "soultree/SoultreePhysicsContact.h"\n#include "collision/CollisionPoint.h"\n' + definition((ROOT/SOUL).read_text(), 'SoultreePhysicsBaseObject::UnknownVirtualSlot31'),
+                'slot': '#include "soultree/SoultreePhysicsBaseObject.h"\n#include "soultree/SoultreePhysicsContact.h"\n#include "collision/CollisionPoint.h"\n' + definition((ROOT/SOUL).read_text(), 'SoultreePhysicsBaseObject::UpdateContactStates'),
                 'length': '#include "collision/CollisionPoint.h"\n' + definition((ROOT/COLLISION).read_text(), 'CollisionLength'),
                 'scene': '#include "math/Vec3.h"\n#include "' + (ROOT/'src/reconstructed/Matrix4.h').as_posix() + '"\n#include "core/SoultreeObject.h"\n' + '\n'.join(definition((ROOT/NODE).read_text(), n) for n in ('MatrixProduct', 'SoultreeObject::UpdateWorldMatrix', 'SoultreeObject::LocalToWorldPoint')),
             }

@@ -52,10 +52,10 @@ public:
     virtual int ShouldBurstSteamEffect();
     virtual void UnknownVirtualSlot27();
     virtual void UnknownVirtualSlot43();
-    virtual void UnknownVirtualSlot29(int lastStep);
+    virtual void SaveBodyOrientation(int lastStep);
     virtual void UnknownVirtualSlot49(float dt);
     virtual void UnknownVirtualSlot50(int protect, float duration, int forced);
-    virtual int UnknownVirtualSlot28(int steps);
+    virtual int ResolveSubstepCollisions(int steps);
     virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                      const Vec3* settleUp, int keepPlacement, float extraWeight);
     virtual int UnknownVirtualSlot39(float dt);

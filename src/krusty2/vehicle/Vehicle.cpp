@@ -967,7 +967,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
 
     justReset = 0;
     UnknownVirtualSlot9(frame, &steps);
-    UnknownVirtualSlot30();
+    ClearContactEffectFlags();
     prevControlInput = controlInput;
     UnknownVirtualSlot64(frame);
     UnknownVirtualSlot60(controlInput.x, UnknownVirtualSlot59(), steps);
@@ -1061,7 +1061,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
                 if (!res)
                     UpdateCollisionPointWorldPositions(collisionPointCount,
                         reinterpret_cast<CollisionPoint**>(collisionPoints));
-                UnknownVirtualSlot31();
+                UpdateContactStates();
             }
         } else {
             wheelPointInContact = 0;
@@ -1146,7 +1146,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         modelNode->GetPosition(&position);
         centerNode->GetPositionIn(0, &centerOfMass);
         worldAngularVelocity = modelNode->LocalToWorldDirection(angularVelocity);
-        steps = UnknownVirtualSlot28(steps);
+        steps = ResolveSubstepCollisions(steps);
         lastStepTime = stepTime;
         steps--;
         if (steps == 0 && stepRemainder > 0.0001f) {
@@ -1160,7 +1160,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
                         &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
         prevVelocity = velocity;
         prevCrashState = crashState;
-        UnknownVirtualSlot29(steps == 0);
+        SaveBodyOrientation(steps == 0);
     } while (steps > 0);
     UpdateAttachmentEffects();
     scratchVector = modelNode->WorldToLocalDirection(velocity);
@@ -1324,7 +1324,7 @@ int Vehicle::UnknownVirtualSlot83(VehicleWheel* wheel)
 // Tier 3 reading: re-seats the collision object (0x00435fb0 before and after), removes the
 // contact offset from the position when one is recorded (a crash that starts there leaves
 // one remaining sub-step), then runs slot 27 when slot27Pending is set and clears it.
-int Vehicle::UnknownVirtualSlot28(int steps)
+int Vehicle::ResolveSubstepCollisions(int steps)
 {
     collisionObject->UpdatePlacement();
     int wasSet = crashState != 0;

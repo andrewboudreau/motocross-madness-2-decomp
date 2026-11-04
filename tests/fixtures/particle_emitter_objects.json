@@ -3,12 +3,12 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "61f729bce0e20f6cd07542afde3906d81c2e06224185e688387f764b99454574"
+      "sha256": "f73ae05b4e3c2f7f3326e34886803119c908df5190b3ca6c7390ec79b58e578f"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "7ac8c3f37c0f063e0591e1e9259a104a4c52389ed8abd4e1a7c220f98b8882b0"
+      "sha256": "a995eb28e28cc2f7655565ed0f388fd22c77b3a69366afa68fcf8c08917d9e84"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -215,7 +215,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot29@Bike",
+      "symbol": "SaveBodyOrientation@Bike",
       "target_va": "0x0040bec0",
       "target_size": 306,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -852,7 +852,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot28@Vehicle",
+      "symbol": "ResolveSubstepCollisions@Vehicle",
       "target_va": "0x0052a5f0",
       "target_size": 173,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"

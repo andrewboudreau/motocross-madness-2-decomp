@@ -20,22 +20,22 @@
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
       "sections": 128,
       "relocations": 625,
-      "sha256": "be7f2da9e83a0a5f29a63cdc397087f033c7544f30cc074d990c2da97efa6c63"
+      "sha256": "640e74a0b41046478ad2a9cba1bf750907108e565747126240f99e16ac7a2859"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "7ac8c3f37c0f063e0591e1e9259a104a4c52389ed8abd4e1a7c220f98b8882b0"
+      "sha256": "a995eb28e28cc2f7655565ed0f388fd22c77b3a69366afa68fcf8c08917d9e84"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "61f729bce0e20f6cd07542afde3906d81c2e06224185e688387f764b99454574"
+      "sha256": "f73ae05b4e3c2f7f3326e34886803119c908df5190b3ca6c7390ec79b58e578f"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
       "relocations": 1054,
-      "sha256": "f2cd51e82c2ca27f422fc15179b6ee04a81b30ef984323023f1be59ed5f69d8e"
+      "sha256": "54674cb38140c16523ff27deeb5272f7c1d1a8c5d3054399475db5bf3e4fbff5"
     },
     "src/krusty2/collision/CollisionObject.cpp": {
       "sections": 135,
@@ -55,7 +55,7 @@
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "f9d08be1bb2e1fe66fbc813b9aaac094cc41e7999f4e4fe5aec47bac7aab2259"
+      "sha256": "86410b528c2541fd8aee7e4324f8a2a595b9616110baef831ab27e1e97bf29bb"
     },
     "samples/physics/collision/CollisionObjectNearMisses.cpp": {
       "sections": 136,
@@ -248,7 +248,7 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "?UnknownVirtualSlot31@SoultreePhysicsBaseObject@@UAEXXZ",
+      "symbol": "?UpdateContactStates@SoultreePhysicsBaseObject@@UAEXXZ",
       "target_va": "0x00501e10",
       "target_size": 127,
       "bindings": "src/krusty2/soultree/SoulTreePhysics.bindings.json"
@@ -297,14 +297,14 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "?UnknownVirtualSlot28@SoultreePhysicsBaseObject@@UAEHH@Z",
+      "symbol": "?ResolveSubstepCollisions@SoultreePhysicsBaseObject@@UAEHH@Z",
       "target_va": "0x00502950",
       "target_size": 120,
       "bindings": "src/krusty2/soultree/SoulTreePhysics.bindings.json"
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "?UnknownVirtualSlot29@SoultreePhysicsBaseObject@@UAEXH@Z",
+      "symbol": "?SaveBodyOrientation@SoultreePhysicsBaseObject@@UAEXH@Z",
       "target_va": "0x005029d0",
       "target_size": 103,
       "bindings": "src/krusty2/soultree/SoulTreePhysics.bindings.json"
@@ -381,7 +381,7 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "?UnknownVirtualSlot30@SoultreePhysicsBaseObject@@UAEXXZ",
+      "symbol": "?ClearContactEffectFlags@SoultreePhysicsBaseObject@@UAEXXZ",
       "target_va": "0x00502f10",
       "target_size": 76,
       "bindings": "src/krusty2/soultree/SoulTreePhysics.bindings.json"

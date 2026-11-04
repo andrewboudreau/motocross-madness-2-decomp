@@ -558,7 +558,7 @@ void KrustyBike::UnknownVirtualSlot96()
 // re-targets the session's player record onto this bike, then runs the base update and,
 // while airborne (field_0x444 set, field_0x5b4 clear), jitters the two 0x7ac/0x7b0
 // accumulators with random noise (0.15 scale for an aiKind bike, 0.667 otherwise).
-int KrustyBike::UnknownVirtualSlot28(int steps)
+int KrustyBike::ResolveSubstepCollisions(int steps)
 {
     lastCollisionType = 0;
     if (isGhost) return steps;
@@ -581,7 +581,7 @@ int KrustyBike::UnknownVirtualSlot28(int steps)
         }
         if (isRemote) return steps;
     }
-    int result = Vehicle::UnknownVirtualSlot28(steps);
+    int result = Vehicle::ResolveSubstepCollisions(steps);
     if (crashState && !prevCrashState) {
         if (aiKind) {
             repairDamage += KbRandUnit() * 0.15f;
@@ -688,7 +688,7 @@ void KrustyBike::UnknownVirtualSlot94()
 // Normally they are recomputed from the node's world axes; while neither crossoverPose nor
 // motionActive is set the old values are just copied.  Then the bike's matrix is mirrored
 // onto the 0x5c4 node when the wrecker's mode is 0 or 1, and the 0x141c timer is advanced.
-void KrustyBike::UnknownVirtualSlot29(int lastStep)
+void KrustyBike::SaveBodyOrientation(int lastStep)
 {
     if (!crossoverPose && !motionActive) {
         savedForward = bodyForward;

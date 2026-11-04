@@ -134,7 +134,7 @@ static void Run(int retail) {
     __try {
         if(scenario.task==0) {
             if(retail){union{void(RetailCall::*method)();DWORD address;}call;call.address=0x501e10;(((RetailCall*)body)->*call.method)();}
-            else body->SoultreePhysicsBaseObject::UnknownVirtualSlot31();
+            else body->SoultreePhysicsBaseObject::UpdateContactStates();
         } else if(scenario.task==1) {
             if(retail)((void(__cdecl*)(int,CollisionPoint**))0x43aff0)(scenario.count,list);
             else UpdateCollisionPointWorldPositions(scenario.count,list);

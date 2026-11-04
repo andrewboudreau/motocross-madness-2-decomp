@@ -136,10 +136,10 @@ public:
     virtual int ShouldBurstSteamEffect();
     virtual void UnknownVirtualSlot26();
     virtual void UnknownVirtualSlot27();
-    virtual int UnknownVirtualSlot28(int steps);
-    virtual void UnknownVirtualSlot29(int lastStep);
-    virtual void UnknownVirtualSlot30();
-    virtual void UnknownVirtualSlot31();
+    virtual int ResolveSubstepCollisions(int steps);
+    virtual void SaveBodyOrientation(int lastStep);
+    virtual void ClearContactEffectFlags();
+    virtual void UpdateContactStates();
     virtual float EffectiveLoadWeight();
     virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward,
                                      const Vec3* newUp, const Vec3* settleUp, int keepPlacement,

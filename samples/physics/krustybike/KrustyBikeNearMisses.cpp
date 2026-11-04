@@ -1033,7 +1033,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
             }
         }
 
-        UnknownVirtualSlot30();
+        ClearContactEffectFlags();
         justReset = reset;
         attachmentResetPending = reset;
         UpdateAttachmentEffects();
@@ -1060,7 +1060,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
     if (!reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay) {
         collisionObject->UpdatePlacement();
         if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4)
-            UnknownVirtualSlot28(1);
+            ResolveSubstepCollisions(1);
     }
     prevVelocity = velocity;
     position = savedPos;

@@ -3,7 +3,7 @@
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
       "sections": 128,
       "relocations": 625,
-      "sha256": "be7f2da9e83a0a5f29a63cdc397087f033c7544f30cc074d990c2da97efa6c63"
+      "sha256": "640e74a0b41046478ad2a9cba1bf750907108e565747126240f99e16ac7a2859"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -18,7 +18,7 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "61f729bce0e20f6cd07542afde3906d81c2e06224185e688387f764b99454574"
+      "sha256": "f73ae05b4e3c2f7f3326e34886803119c908df5190b3ca6c7390ec79b58e578f"
     },
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,
@@ -140,7 +140,7 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot31@SoultreePhysicsBaseObject",
+      "symbol": "UpdateContactStates@SoultreePhysicsBaseObject",
       "va": "0x00501e10",
       "extent": 127
     },
@@ -182,13 +182,13 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot28@SoultreePhysicsBaseObject",
+      "symbol": "ResolveSubstepCollisions@SoultreePhysicsBaseObject",
       "va": "0x00502950",
       "extent": 120
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot29@SoultreePhysicsBaseObject",
+      "symbol": "SaveBodyOrientation@SoultreePhysicsBaseObject",
       "va": "0x005029d0",
       "extent": 103
     },
@@ -254,7 +254,7 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot30@SoultreePhysicsBaseObject",
+      "symbol": "ClearContactEffectFlags@SoultreePhysicsBaseObject",
       "va": "0x00502f10",
       "extent": 76
     },

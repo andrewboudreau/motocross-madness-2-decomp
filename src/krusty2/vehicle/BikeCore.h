@@ -26,7 +26,7 @@ public:
     virtual void UnknownVirtualSlot7(const Vec3* force);
     virtual void UnknownVirtualSlot8();
     virtual Vec3 LocalTorqueToAngularAcceleration(const Vec3* localTorque);
-    virtual void UnknownVirtualSlot29(int lastStep);
+    virtual void SaveBodyOrientation(int lastStep);
     virtual float EffectiveLoadWeight();
     virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                      const Vec3* settleUp, int keepPlacement, float extraWeight);

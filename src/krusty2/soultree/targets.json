@@ -192,7 +192,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot31@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "UpdateContactStates@SoultreePhysicsBaseObject",
     "target_va": "0x00501e10",
     "target_size": 127,
     "expect": "exact",
@@ -272,7 +272,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot28@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "ResolveSubstepCollisions@SoultreePhysicsBaseObject",
     "target_va": "0x00502950",
     "target_size": 120,
     "expect": "exact",
@@ -282,7 +282,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot29@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "SaveBodyOrientation@SoultreePhysicsBaseObject",
     "target_va": "0x005029d0",
     "target_size": 103,
     "expect": "exact",
@@ -392,7 +392,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot30@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "ClearContactEffectFlags@SoultreePhysicsBaseObject",
     "target_va": "0x00502f10",
     "target_size": 76,
     "expect": "exact",

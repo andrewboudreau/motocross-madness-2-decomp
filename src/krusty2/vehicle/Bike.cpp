@@ -1066,7 +1066,7 @@ Vec3 Bike::UnknownVirtualSlot76(const Vec3* arm, const Vec3* force)
     return v;
 }
 
-void Bike::UnknownVirtualSlot29(int)
+void Bike::SaveBodyOrientation(int)
 {
     if (crossoverPose == 0 && motionActive == 0) {
         savedForward = bodyForward;

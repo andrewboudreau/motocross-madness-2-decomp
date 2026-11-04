@@ -275,7 +275,7 @@ void SoultreePhysicsBaseObject::UpdateContactEffect(SoultreeAttachment* attachme
 }
 
 // slot 28 (0x00502950)
-int SoultreePhysicsBaseObject::UnknownVirtualSlot28(int steps)
+int SoultreePhysicsBaseObject::ResolveSubstepCollisions(int steps)
 {
     collisionObject->UpdatePlacement();
     collisionObject->QueryCollisions();
@@ -292,7 +292,7 @@ int SoultreePhysicsBaseObject::UnknownVirtualSlot28(int steps)
 }
 
 // slot 29 (0x005029d0)
-void SoultreePhysicsBaseObject::UnknownVirtualSlot29(int lastStep)
+void SoultreePhysicsBaseObject::SaveBodyOrientation(int lastStep)
 {
     savedForward = bodyForward;
     savedUp = bodyUp;
@@ -306,7 +306,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot29(int lastStep)
 }
 
 // slot 30 (0x00502f10)
-void SoultreePhysicsBaseObject::UnknownVirtualSlot30()
+void SoultreePhysicsBaseObject::ClearContactEffectFlags()
 {
     for (int i = 0; i < collisionPointCount; i++) {
         collisionPoints[i]->effectSpawned = 0;
@@ -316,7 +316,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot30()
 }
 
 // slot 31 (0x00501e10)
-void SoultreePhysicsBaseObject::UnknownVirtualSlot31()
+void SoultreePhysicsBaseObject::UpdateContactStates()
 {
     for (int i = 0; i < collisionPointCount; i++) {
         SoultreeContact* contact = collisionPoints[i];
@@ -1060,7 +1060,7 @@ int SoultreePhysicsBaseObject::Tick(float dt)
     if (asleep)
         return 1;
     UnknownVirtualSlot9(dt, &steps);
-    UnknownVirtualSlot30();
+    ClearContactEffectFlags();
     pointsTouching = 0;
     int respawn = UnknownVirtualSlot39(dt);
     if (!respawn) {
@@ -1309,7 +1309,7 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
             if (!res)
                 UpdateCollisionPointWorldPositions(collisionPointCount,
                     reinterpret_cast<CollisionPoint**>(collisionPoints));
-            UnknownVirtualSlot31();
+            UpdateContactStates();
         }
         Vec3 mergedNormal;
         if (pointsTouching) {
@@ -1361,7 +1361,7 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
         else
             centerOfMass = position;
         worldAngularVelocity = sceneNode->LocalToWorldDirection(angularVelocity);
-        steps = UnknownVirtualSlot28(steps);
+        steps = ResolveSubstepCollisions(steps);
         lastStepTime = stepTime;
         steps--;
         if (steps == 0 && stepRemainder > 0.0001f) {
@@ -1375,7 +1375,7 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
         OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll, &bodySinRoll,
                                      &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
         prevVelocity = velocity;
-        UnknownVirtualSlot29(steps == 0);
+        SaveBodyOrientation(steps == 0);
     } while (steps > 0);
 }
 

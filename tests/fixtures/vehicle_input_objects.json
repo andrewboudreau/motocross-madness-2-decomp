@@ -3,17 +3,17 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "7ac8c3f37c0f063e0591e1e9259a104a4c52389ed8abd4e1a7c220f98b8882b0"
+      "sha256": "a995eb28e28cc2f7655565ed0f388fd22c77b3a69366afa68fcf8c08917d9e84"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "61f729bce0e20f6cd07542afde3906d81c2e06224185e688387f764b99454574"
+      "sha256": "f73ae05b4e3c2f7f3326e34886803119c908df5190b3ca6c7390ec79b58e578f"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
       "relocations": 1054,
-      "sha256": "f2cd51e82c2ca27f422fc15179b6ee04a81b30ef984323023f1be59ed5f69d8e"
+      "sha256": "54674cb38140c16523ff27deeb5272f7c1d1a8c5d3054399475db5bf3e4fbff5"
     },
     "src/reconstructed/VehicleDefaults.cpp": {
       "sections": 13,
@@ -43,7 +43,7 @@
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "f9d08be1bb2e1fe66fbc813b9aaac094cc41e7999f4e4fe5aec47bac7aab2259"
+      "sha256": "86410b528c2541fd8aee7e4324f8a2a595b9616110baef831ab27e1e97bf29bb"
     },
     "src/reconstructed/InputDevice.cpp": {
       "sections": 11,
@@ -278,7 +278,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot29@Bike",
+      "symbol": "SaveBodyOrientation@Bike",
       "va": "0x40bec0",
       "extent": 306,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -838,7 +838,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot28@Vehicle",
+      "symbol": "ResolveSubstepCollisions@Vehicle",
       "va": "0x52a5f0",
       "extent": 173,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -1258,7 +1258,7 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot28@KrustyBike",
+      "symbol": "ResolveSubstepCollisions@KrustyBike",
       "va": "0x48da50",
       "extent": 416,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1314,7 +1314,7 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot29@KrustyBike",
+      "symbol": "SaveBodyOrientation@KrustyBike",
       "va": "0x495e50",
       "extent": 401,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"

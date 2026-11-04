@@ -292,7 +292,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot29@Bike",
+    "candidate_symbol_contains": "SaveBodyOrientation@Bike",
     "target_va": "0x0040bec0",
     "target_size": 306,
     "expect": "exact",
@@ -1142,7 +1142,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot28@Vehicle",
+    "candidate_symbol_contains": "ResolveSubstepCollisions@Vehicle",
     "target_va": "0x0052a5f0",
     "target_size": 173,
     "expect": "exact",
@@ -2012,7 +2012,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot28@KrustyBike",
+    "candidate_symbol_contains": "ResolveSubstepCollisions@KrustyBike",
     "target_va": "0x0048da50",
     "target_size": 416,
     "expect": "exact",
@@ -2092,7 +2092,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot29@KrustyBike",
+    "candidate_symbol_contains": "SaveBodyOrientation@KrustyBike",
     "target_va": "0x00495e50",
     "target_size": 401,
     "expect": "exact",

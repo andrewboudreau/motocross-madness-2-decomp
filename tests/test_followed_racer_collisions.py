@@ -103,7 +103,7 @@ class FollowedRacerCollisionTests(unittest.TestCase):
      for checked in (objects[source],obj):
       entry=checked.find_symbol(symbol);self.assertEqual((entry.function_size,entry.extent_source),(size,'coff_function_aux'))
       r=compare(pe,checked,symbol,va,size,(ROOT/source).with_suffix('.bindings.json'));self.assertTrue(r['strict_exact'],r);strict+=1
-   for symbol,va,size in [('?UnknownVirtualSlot28@KrustyBike',0x48da50,416),('?Tick@KrustyBike@@UAEHM@Z',0x4977a0,1153)]:
+   for symbol,va,size in [('?ResolveSubstepCollisions@KrustyBike',0x48da50,416),('?Tick@KrustyBike@@UAEHM@Z',0x4977a0,1153)]:
     source=GROUPS['bike'][0];r=compare(pe,objects[source],symbol,va,size,(ROOT/source).with_suffix('.bindings.json'));self.assertTrue(r['strict_exact'],r);strict+=1
    joined=next(iter(pins['renames'].values()))
    for source in SOURCES[:2]:

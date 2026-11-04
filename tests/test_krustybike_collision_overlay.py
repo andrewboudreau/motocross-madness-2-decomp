@@ -138,7 +138,7 @@ class KrustyBikeCollisionOverlayTests(unittest.TestCase):
                                  (ROOT/source).with_suffix('.bindings.json'))
                 self.assertTrue(report['strict_exact'], report); strict += 1
             joined = set(pins['renames'].values())
-            for symbol, va, expected in [('?UnknownVirtualSlot28@KrustyBike', 0x48da50, 2),
+            for symbol, va, expected in [('?ResolveSubstepCollisions@KrustyBike', 0x48da50, 2),
                                          ('?Tick@KrustyBike@@UAEHM@Z', 0x4977a0, 6)]:
                 actual = [(va + offset - 1, name) for offset, kind, name in signature(objects[BIKE], symbol)[2]
                           if name in joined]

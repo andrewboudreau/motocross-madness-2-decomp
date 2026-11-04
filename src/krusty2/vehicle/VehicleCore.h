@@ -45,7 +45,7 @@ public:
     virtual int  ShouldEmitMovingEffects();
     virtual int  ShouldRestartSteamEffect();
     virtual int  ShouldBurstSteamEffect();
-    virtual int  UnknownVirtualSlot28(int steps);
+    virtual int  ResolveSubstepCollisions(int steps);
     virtual int  UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                       const Vec3* settleUp, int keepPlacement, float extraWeight);   // 0x00527430
     virtual void LoadBodyAxes();
