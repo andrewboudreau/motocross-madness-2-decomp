@@ -214,6 +214,15 @@ void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 // section 6 is not decided by the pointer pair alone. Also inert: `else if` / `else`
 // chaining and `*&` operands; swapped axisZ compares with or without swapped dot
 // arguments give 1089-1093.
+// Session 17 (count window, not adopted): `const Vec3& from = a->axisZ; const Vec3& to =
+// b->axisZ;` used in the axisZ cross and both unit vectors, plus five dead initialised
+// locals (int or float, any position) is strict exact (1121/1121); the references alone fix
+// the y/z rows, the count the x row (about seven symbols over this form). Not kept: the
+// count is not a real source feature (docs/VC6_OPERAND_ORDER.md section 2). No real local
+// supplies it: uninitialised or file-scope dummies are inert; unused Vec3 locals (4 diffs
+// at best), a named final axis, a named cross or unit-vector result, a PoseLengthSquared
+// local, CharacterPose* copies, dead component reads, axisY references in the test or
+// cross (4+) and top-declared references or pointers for both axes (139) all miss.
 void PoseRotation(CharacterPose* a, CharacterPose* b, Vec3* axis, float* angle)
 {
     if (a->axisY.x != b->axisY.x || a->axisY.y != b->axisY.y || a->axisY.z != b->axisY.z) {

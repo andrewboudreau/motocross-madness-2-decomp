@@ -396,6 +396,11 @@ static inline float VehAbs(float x)
 // (arg c, or the average wheel contact normal) is projected perpendicular to the axis and
 // normalised; the angle is asin(|axis-perp-normal x right-vector-side|) signed by the
 // handedness, stored in leanAngle; its cosine goes to leanCos when b is set.
+// 0x005286a0 PARTIAL (754/784): 7 frame-slot and 6 operand-order differences.  Session 17:
+// pointer parameters to VehCross56 are inert; a reference or pointer to sideAxis or
+// *forward, the VehV3 Cross/CrossB members (15) and the cross written out with or without
+// a component alias (44..50, size 765) are worse.  As a diagnostic, 0..15 dead locals fix
+// at most one more cross row (11) and never the frame slots.
 static inline float VehDotI(const Vec3* a, const Vec3* b)
 {
     return a->y * b->y + a->x * b->x + a->z * b->z;
@@ -2293,6 +2298,12 @@ void Vehicle::PlaceWheels()
 // impulse matches when it is named, *speed is updated, and then it is assigned.  The
 // helper's long-typed view is provisional: it reproduces the code shape, but the
 // original copy form is not known.
+// Session 17, no gain for the normalLoad store: before the copy (4), a named zero
+// temporary before or after it (2/4), the copy written out or through long locals with
+// the store between the y and z words (4), `load = 0` then the store, a long-typed store,
+// a helper that copies the vector and stores the magnitude (3/4), a zero-copy helper, a
+// reference to the destination and the inverted branch (25).  SoulTreePhysics 0x00501e90
+// has the same store written before its copy and misses the same way.
 // Wheel drive and contact impulse pass (tier 3 reading).  Counts the in-contact
 // wheels with a nonzero +0x2a0 and, unless crashed, lets each wheel apply its share of the
 // drive (0x00514170).  Then for every wheel in contact: the load pushing into the ground

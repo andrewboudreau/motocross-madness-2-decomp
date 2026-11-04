@@ -1516,6 +1516,9 @@ int Bike::UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, float 
 // Slot 7: distributes an applied force/direction over the tyre contacts.
 // Mode field_0x1d0: weights the active contact elements by distance.
 // Otherwise splits the force between front and rear wheel.
+// 0x004060c0 PARTIAL (1677/1678, one SIB order; docs/NEAR_MISS_INDEX.md).  Session 17:
+// BikeContactDistance for one or both wheel distances (3/5) and BikeWheelDistance in the
+// contact loop (55/79) are worse.
 static inline void BikeSteerToward(BikeA640* p, float target, float dt)
 {
     float step = BikeMin(dt, p->l_0x4);

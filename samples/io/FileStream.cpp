@@ -28,7 +28,9 @@
 //   store after `char* p = name;` puts the lea esi where retail has it (one
 //   instruction difference, 255/282) but sinks the store to just before the
 //   jle; `strlen(strcat(..))` (183), `p = strcat(..)` (172) and strcat or
-//   strlen through `p` (225) are worse.
+//   strlen through `p` (225) are worse. Session 17: the seed at every statement
+//   position with `unsigned char`, a for-init seed and a SetTextMode-style helper
+//   stay at 257 or below; VC6 keeps the store out of the rep movsd/movsb pair.
 // - 0x004618e0: retail loads buffer/size/count into registers before the pushes;
 //   VC6 here pushes them from the stack. Register locals, a helper for the fseek
 //   block and an unsigned count do not change it.
