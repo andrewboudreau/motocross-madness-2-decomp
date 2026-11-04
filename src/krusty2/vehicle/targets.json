@@ -232,7 +232,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot71@Bike",
+    "candidate_symbol_contains": "UpdateAirborneState@Bike",
     "target_va": "0x0040a480",
     "target_size": 124,
     "expect": "exact",
@@ -782,7 +782,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot71@Vehicle",
+    "candidate_symbol_contains": "UpdateAirborneState@Vehicle",
     "target_va": "0x00527d90",
     "target_size": 154,
     "expect": "exact",
@@ -982,7 +982,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot85@Vehicle",
+    "candidate_symbol_contains": "UpdateWheelRolls@Vehicle",
     "target_va": "0x00529360",
     "target_size": 128,
     "expect": "exact",
@@ -1032,7 +1032,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot86@Vehicle",
+    "candidate_symbol_contains": "UpdateWheelDriveForces@Vehicle",
     "target_va": "0x00529ba0",
     "target_size": 127,
     "expect": "exact",
@@ -1162,7 +1162,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot48@Vehicle",
+    "candidate_symbol_contains": "AdvancePosition@Vehicle",
     "target_va": "0x0052a890",
     "target_size": 171,
     "expect": "exact",
@@ -1832,7 +1832,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot71@KrustyBike",
+    "candidate_symbol_contains": "UpdateAirborneState@KrustyBike",
     "target_va": "0x00492530",
     "target_size": 105,
     "expect": "exact",
@@ -1982,7 +1982,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot48@KrustyBike",
+    "candidate_symbol_contains": "AdvancePosition@KrustyBike",
     "target_va": "0x004964e0",
     "target_size": 249,
     "expect": "exact",
@@ -2002,7 +2002,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot86@KrustyBike",
+    "candidate_symbol_contains": "UpdateWheelDriveForces@KrustyBike",
     "target_va": "0x00491b70",
     "target_size": 298,
     "expect": "exact",

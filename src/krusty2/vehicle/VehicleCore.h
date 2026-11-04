@@ -63,7 +63,7 @@ public:
     // pure virtual: entry is _purecall (0x00534cfe).  Bike's override 0x0040cbb0 is
     // `ret 4` and returns a float (tier 1 via its byte match), hence float(float).
     virtual float UnknownVirtualSlot47(float arg) = 0;
-    virtual void UnknownVirtualSlot48();
+    virtual void AdvancePosition();
     // 0x0052a940 forwards its argument unchanged to slots 9 (float dt), 39, 64 and 65,
     // so it and they take the float time step (tier 2).
     virtual void UnknownVirtualSlot49(float dt);
@@ -90,7 +90,7 @@ public:
     virtual int UnknownVirtualSlot68(int* out);
     virtual void UnknownVirtualSlot69();
     virtual int UnknownVirtualSlot70(float dt);
-    virtual void UnknownVirtualSlot71(int nowAirborne);
+    virtual void UpdateAirborneState(int nowAirborne);
     virtual void UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel);
     virtual float UnknownVirtualSlot73(const Vec3* point, const Vec3* dir);  // only read (Bike 0x00406090)
     virtual float UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d);
@@ -108,8 +108,8 @@ public:
     // Returns the input-map query (KrustyBike 0x00491630 uses the result; the Vehicle
     // body 0x00529250 leaves it in eax) (tier 2).
     virtual int UnknownVirtualSlot84(int control, int modifier);
-    virtual void UnknownVirtualSlot85();
-    virtual void UnknownVirtualSlot86();
+    virtual void UpdateWheelRolls();
+    virtual void UpdateWheelDriveForces();
     virtual void UnknownVirtualSlot87();  // entry is the shared empty stub 0x00464e90
     virtual int UnknownVirtualSlot88();
     virtual int UnknownVirtualSlot89(float frame);      // Bike 0x0040ae50 passes a float (tier 2)

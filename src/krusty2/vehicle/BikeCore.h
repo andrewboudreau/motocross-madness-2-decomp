@@ -49,7 +49,7 @@ public:
     virtual void UnknownVirtualSlot65(float dt);
     virtual int UnknownVirtualSlot66();
     virtual void UnknownVirtualSlot67();
-    virtual void UnknownVirtualSlot71(int nowAirborne);
+    virtual void UpdateAirborneState(int nowAirborne);
     virtual void UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel);
     virtual float UnknownVirtualSlot73(const Vec3* point, const Vec3* dir);
     virtual float UnknownVirtualSlot75();

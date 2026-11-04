@@ -190,7 +190,7 @@ void Vehicle::UnknownVirtualSlot60(float steerAxis, float maxAngle, int steps)
     }
 }
 
-void Vehicle::UnknownVirtualSlot85()
+void Vehicle::UpdateWheelRolls()
 {
     float distanceScale = movingForward ? stepTime : -stepTime;
     int noContact = wheelsInContact == 0;
@@ -198,7 +198,7 @@ void Vehicle::UnknownVirtualSlot85()
         wheelList[i]->UpdateRoll(stepTime, distanceScale, noContact, allWheelsInContact, crashState, invMass);
 }
 
-void Vehicle::UnknownVirtualSlot86()
+void Vehicle::UpdateWheelDriveForces()
 {
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* wheel = wheelList[i];
@@ -224,7 +224,7 @@ struct VehVecOps : Vec3
 
 // Provisional: position += dt * (3*v - v_prev) / 2   (2-step Adams-Bashforth style advance:
 // v = velocity, v_prev = prevVelocity, advancing position).
-void Vehicle::UnknownVirtualSlot48()
+void Vehicle::AdvancePosition()
 {
     Vec3 tripled = ((VehVecOps&)velocity) * 3.0f;
     float dt = stepTime;
@@ -236,7 +236,7 @@ void Vehicle::UnknownVirtualSlot48()
     position.z += displacement.z;
 }
 
-void Vehicle::UnknownVirtualSlot71(int nowAirborne)
+void Vehicle::UpdateAirborneState(int nowAirborne)
 {
     if (crashState) {
         landingLatched = 0;
@@ -1043,7 +1043,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             nowAirborne = 1;
         else
             nowAirborne = 0;
-        UnknownVirtualSlot71(nowAirborne);
+        UpdateAirborneState(nowAirborne);
         airborne = nowAirborne;
         if (airborne)
             landingLatched = 0;
@@ -1051,7 +1051,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         if (contactTotal > 0) {
             if (anyWheelInContact) {
                 UnknownVirtualSlot72(&lift, 0);
-                UnknownVirtualSlot86();
+                UpdateWheelDriveForces();
             } else {
                 wheelPointInContact = 0;
                 turnAngle = 0.0f;
@@ -1110,8 +1110,8 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         Vec3 aim = *UnknownVirtualSlot46(&aimOut, slideAngle);
         int mode = UnknownVirtualSlot62(slideAngle);
         UnknownVirtualSlot26();
-        UnknownVirtualSlot48();
-        UnknownVirtualSlot85();
+        AdvancePosition();
+        UpdateWheelRolls();
         modelNode->SetPosition(position);
         UnknownVirtualSlot95();
         if (crashState) {

@@ -128,7 +128,7 @@
   "?UnknownVirtualSlot44@Vehicle@@UAEXXZ": "0x005283d0",
   "?UnknownVirtualSlot49@Vehicle@@UAEXM@Z": "0x0052a940",
   "?UnknownVirtualSlot56@Vehicle@@UAEXPAUVec3@@H0@Z": "0x005286a0",
-  "?UnknownVirtualSlot71@Vehicle@@UAEXH@Z": "0x00527d90",
+  "?UpdateAirborneState@Vehicle@@UAEXH@Z": "0x00527d90",
   "?UnknownVirtualSlot73@Vehicle@@UAEMPBUVec3@@0@Z": "0x00528170",
   "?UnknownVirtualSlot76@Vehicle@@UAE?AUVec3@@PBU2@0@Z": "0x00529b40",
   "?UnknownVirtualSlot97@Bike@@UAEXXZ$ehhandler": "0x005498d7",

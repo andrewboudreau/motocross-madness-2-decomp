@@ -1974,7 +1974,7 @@ int KrustyBike::Fn_00413200(float dt)
     else
         ((KbWheel*)rearWheel)->SetRollDistance(forwardSpeed / rearWheel->wheelRadius * dt);
     modelNode->SetPosition(position);
-    UnknownVirtualSlot71(airborneOut);
+    UpdateAirborneState(airborneOut);
     airborne = airborneOut;
     if (airborneOut)
         landingLatched = 0;

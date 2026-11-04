@@ -3,12 +3,12 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "3e1673180fca6ca251980344c103239ccfbb9de2c13b27a9d447d19982092267"
+      "sha256": "53bf8b073c2299eb84cdaa7a2b0d0c26fe5e97da070921c78f466dab972e3292"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "c6c67056827f522177c16ecc62a96fcf22358f122d19c04693d1382054684912"
+      "sha256": "be4e7fe3163012383cecc654850e5c2109c1e6921ce8fbecd8436d95941fc23a"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -173,7 +173,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot71@Bike",
+      "symbol": "UpdateAirborneState@Bike",
       "target_va": "0x0040a480",
       "target_size": 124,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -614,7 +614,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot71@Vehicle",
+      "symbol": "UpdateAirborneState@Vehicle",
       "target_va": "0x00527d90",
       "target_size": 154,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -740,7 +740,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot85@Vehicle",
+      "symbol": "UpdateWheelRolls@Vehicle",
       "target_va": "0x00529360",
       "target_size": 128,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -775,7 +775,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot86@Vehicle",
+      "symbol": "UpdateWheelDriveForces@Vehicle",
       "target_va": "0x00529ba0",
       "target_size": 127,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -866,7 +866,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot48@Vehicle",
+      "symbol": "AdvancePosition@Vehicle",
       "target_va": "0x0052a890",
       "target_size": 171,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"

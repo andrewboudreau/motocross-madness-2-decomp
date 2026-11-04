@@ -839,7 +839,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
         UpdateWheelsInContact();
         {
             bool nowAirborne = !anyWheelInContact;
-            UnknownVirtualSlot71(nowAirborne);
+            UpdateAirborneState(nowAirborne);
             airborne = nowAirborne;
             if (nowAirborne)
                 landingLatched = 0;

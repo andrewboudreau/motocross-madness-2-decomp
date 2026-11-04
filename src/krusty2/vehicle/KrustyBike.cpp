@@ -282,14 +282,14 @@ void KrustyBike::UnknownVirtualSlot69()
         crashTimer = reload + 1.0f;
 }
 
-void KrustyBike::UnknownVirtualSlot71(int nowAirborne)
+void KrustyBike::UpdateAirborneState(int nowAirborne)
 {
     if (crashState) {
         trickLandTimer = 0;
     } else if (airborne && !nowAirborne && !landingLatched && motionCompleted && trickLandTimer <= 0.0f) {
         trickLandTimer = 0.3f;
     }
-    Bike::UnknownVirtualSlot71(nowAirborne);
+    Bike::UpdateAirborneState(nowAirborne);
 }
 
 Vec3 KrustyBike::UnknownVirtualSlot76(const Vec3* arm, const Vec3* force)
@@ -458,10 +458,10 @@ void KrustyBike::ApplyWorldTorque(const Vec3* worldTorque, Vec3* angularAccel)
 }
 
 // Slot 48: field_0x0c update from the (field_0x64*3 - field_0x7c) * 0.5 * dt step.
-void KrustyBike::UnknownVirtualSlot48()
+void KrustyBike::AdvancePosition()
 {
     if (race->isRacing) {
-        Bike::UnknownVirtualSlot48();
+        Bike::AdvancePosition();
         return;
     }
     Vec3 tripled = velocity * 3.0f;
@@ -476,7 +476,7 @@ void KrustyBike::UnknownVirtualSlot48()
 // scaled by 360 / 0.3562 = 1010.66815f, the float retail holds, so 360 at 0.12) feeds the
 // wheel's helper object, and in one game mode the wheel's two force accumulators are
 // halved; the wheel is then always updated.
-void KrustyBike::UnknownVirtualSlot86()
+void KrustyBike::UpdateWheelDriveForces()
 {
     BikeWheel* wheel = rearWheel;
     if (!wheel->inContact)
