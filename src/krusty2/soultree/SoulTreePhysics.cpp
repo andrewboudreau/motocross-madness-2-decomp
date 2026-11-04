@@ -513,7 +513,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot13(Vec3* force, Vec3* localTor
 }
 
 // slot 14 (0x00502080): integrates the accumulated force/torque estimates.
-void SoultreePhysicsBaseObject::UnknownVirtualSlot14(Vec3* force, const Vec3* localTorque,
+void SoultreePhysicsBaseObject::IntegrateMotion(Vec3* force, const Vec3* localTorque,
                                                      const Vec3* worldTorque)
 {
     angularAcceleration = UnknownVirtualSlot16(localTorque);
@@ -1333,7 +1333,7 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
         Vec3 localTorque = kVec3Zero;
         UnknownVirtualSlot13(&force, &localTorque, 1.0f);
         UpdateRestState();
-        UnknownVirtualSlot14(&force, &localTorque, &worldTorque);
+        IntegrateMotion(&force, &localTorque, &worldTorque);
         UnknownVirtualSlot26();
         position += (velocity * 3.0f - prevVelocity) * 0.5f * stepTime;
         sceneNode->SetPosition(position);

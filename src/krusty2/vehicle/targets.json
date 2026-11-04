@@ -2062,7 +2062,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot14@KrustyBike",
+    "candidate_symbol_contains": "IntegrateMotion@KrustyBike",
     "target_va": "0x004965e0",
     "target_size": 431,
     "expect": "exact",

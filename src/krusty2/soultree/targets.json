@@ -212,7 +212,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot14@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "IntegrateMotion@SoultreePhysicsBaseObject",
     "target_va": "0x00502080",
     "target_size": 373,
     "expect": "exact",

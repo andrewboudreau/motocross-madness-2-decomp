@@ -121,7 +121,7 @@ public:
     // 15 and later multiplies *force by invMass (tier 1 decoded stack offsets); all three are
     // Vec3 pointers.  force is not const: the KrustyBike override 0x004965e0 zeroes force->x
     // and force->z (tier 1).
-    virtual void UnknownVirtualSlot14(Vec3* force, const Vec3* localTorque,
+    virtual void IntegrateMotion(Vec3* force, const Vec3* localTorque,
                                       const Vec3* worldTorque);
     virtual void UnknownVirtualSlot15(const Vec3* worldTorque, Vec3* angularAccel);
     virtual Vec3 UnknownVirtualSlot16(const Vec3* localTorque);

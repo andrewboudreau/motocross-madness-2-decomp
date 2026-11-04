@@ -347,7 +347,7 @@
   "_s_kbTimeTo60": "0x0067c3b0",
   "_s_kbTimeTo60Armed": "0x0056d0a0",
   "_sprintf": "0x00534aaf",
-  "?UnknownVirtualSlot14@SoultreePhysicsBaseObject@@UAEXPAUVec3@@PBU2@1@Z": "0x00502080",
+  "?IntegrateMotion@SoultreePhysicsBaseObject@@UAEXPAUVec3@@PBU2@1@Z": "0x00502080",
   "__real@4@3ffeffbe770000000000": "0x00554744",
   "?Remove@QuadTree@@QAEXPAVQuadTreeObject@@I@Z": "0x004dcf20",
   "?g_collisionQuadTree@@3PAVQuadTree@@A": "0x0068aba4",

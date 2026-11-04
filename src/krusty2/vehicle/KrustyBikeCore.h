@@ -43,7 +43,7 @@ public:
     virtual void UnknownVirtualSlot8();
     virtual int UnknownVirtualSlot11(int respawn, Vec3* outPosition, Vec3* outForward, Vec3* outUp, int* outKeepPlacement);
     virtual int UnknownVirtualSlot12(int grounded);
-    virtual void UnknownVirtualSlot14(Vec3* force, const Vec3* localTorque, const Vec3* worldTorque);
+    virtual void IntegrateMotion(Vec3* force, const Vec3* localTorque, const Vec3* worldTorque);
     virtual void UnknownVirtualSlot15(const Vec3* worldTorque, Vec3* angularAccel);
     virtual Vec3 UnknownVirtualSlot16(const Vec3* localTorque);
     virtual int UnknownVirtualSlot22();

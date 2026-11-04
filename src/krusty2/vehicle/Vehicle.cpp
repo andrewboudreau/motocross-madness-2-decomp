@@ -1103,7 +1103,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             }
             AccumulateWheelContacts(&force, &localTorque, torqueScale);
         }
-        UnknownVirtualSlot14(&force, &localTorque, &worldTorque);
+        IntegrateMotion(&force, &localTorque, &worldTorque);
         smoothedVerticalAccel = VehSmooth(verticalAccelSmoother, (velocity.y - prevVelocity.y) * invStepTime, stepTime);
         float slideAngle = UnknownVirtualSlot61(turnMagnitude);
         Vec3 aimOut;

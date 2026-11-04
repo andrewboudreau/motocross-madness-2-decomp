@@ -1050,10 +1050,10 @@ float KrustyBike::Fn_00495FF0()
 // VC6 forwards the two zero stores into the scaled vector and folds k * 0 into one pooled
 // 0.0f on the FPU stack (fld/fst shared by x and z), as retail does; the explicit
 // Vec3(0.0f, invMass * force->y, 0.0f) stores immediates instead.
-void KrustyBike::UnknownVirtualSlot14(Vec3* force, const Vec3* localTorque, const Vec3* worldTorque)
+void KrustyBike::IntegrateMotion(Vec3* force, const Vec3* localTorque, const Vec3* worldTorque)
 {
     if (race->isRacing) {
-        Bike::UnknownVirtualSlot14(force, localTorque, worldTorque);
+        Bike::IntegrateMotion(force, localTorque, worldTorque);
         return;
     }
     angularAcceleration = UnknownVirtualSlot16(localTorque);
