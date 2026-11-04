@@ -60,7 +60,7 @@ void BikeCamera::SteerToKeepTargetOnScreen(float dt) {
 }
 
 // 0x00416fb0: 38% of the way from the rider's head to the target point.
-Vector3 BikeCamera::UnknownVirtualSlot37() {
+Vector3 BikeCamera::GetTargetPoint() {
     SoultreeObject* headPart = bike->riderCharacter->modelNode->FindByName("Head");
     Vector3 head;
     headPart->GetPositionIn(0, reinterpret_cast<Vec3*>(&head));

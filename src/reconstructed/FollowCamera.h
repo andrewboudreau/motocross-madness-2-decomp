@@ -141,8 +141,8 @@ public:
     // VehicleCamera's override tests `a` as a byte (slot 48 passes its int).
     virtual Vector3 UnknownVirtualSlot35(unsigned char a, float dt) = 0;
     // 0x00465000 (near miss: samples/camera)
-    virtual bool UnknownVirtualSlot36(const Vector3& point, bool enable, bool force);
-    virtual Vector3 UnknownVirtualSlot37();
+    virtual bool TrySettleOnPoint(const Vector3& point, bool enable, bool force);
+    virtual Vector3 GetTargetPoint();
     // 0x004636e0
     virtual void SteerToKeepPointsOnScreen(float dt, bool blend, bool pitch);
     virtual float UnknownVirtualSlot39() = 0;

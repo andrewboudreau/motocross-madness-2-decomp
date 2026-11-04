@@ -67,7 +67,7 @@
 // non-retail fill (526 at best, with more diffs); 0..33 dead int locals
 // change nothing.
 //
-// FollowCamera::UnknownVirtualSlot36 (0x00465000) is exact in src/reconstructed/FollowCamera.cpp.
+// FollowCamera::TrySettleOnPoint (0x00465000) is exact in src/reconstructed/FollowCamera.cpp.
 #include "../../src/reconstructed/FollowCamera.h"
 
 #include "../../src/reconstructed/DebugAlloc.h"

@@ -102,7 +102,7 @@ public:
     virtual void UnknownVirtualSlot42(bool flag);
     virtual Vector3 UnknownVirtualSlot50();
     virtual float UnknownVirtualSlot51();
-    virtual bool UnknownVirtualSlot36(const Vector3& point, bool enable, bool force);
+    virtual bool TrySettleOnPoint(const Vector3& point, bool enable, bool force);
     virtual Vector3 UnknownVirtualSlot57(float dt);
     virtual void UnknownVirtualSlot67();
     virtual void UnknownVirtualSlot68();

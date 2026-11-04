@@ -58,7 +58,7 @@ public:
                                       const int* list);
 
     virtual Vector3 GetStateFiveFollowPoint(float dt);
-    virtual Vector3 UnknownVirtualSlot37();
+    virtual Vector3 GetTargetPoint();
     virtual void SteerToKeepTargetOnScreen(float dt);
     virtual Vector3 UnknownVirtualSlot50();
     virtual float UnknownVirtualSlot51();

@@ -422,7 +422,7 @@ void VehicleCamera::UnknownVirtualSlot42(bool flag) {
 // shapes: a constant `return` gets an immediate +0x277 store and shares the
 // final `return false` tail, where retail materialises the 0 in al
 // (`xor al, al; mov [esi+0x277], al`) and keeps a separate final tail.
-bool VehicleCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool force) {
+bool VehicleCamera::TrySettleOnPoint(const Vector3& point, bool enable, bool force) {
     if (cameraState == 6)
         return true;
     if (enable) {

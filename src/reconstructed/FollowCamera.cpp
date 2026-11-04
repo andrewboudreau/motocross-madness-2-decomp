@@ -244,7 +244,7 @@ Vector3 FollowCamera::SelectFollowPoint(int a, bool flag, float dt) {
     } else if (flag) {
         result = UnknownVirtualSlot35(a, dt);
     } else {
-        result = UnknownVirtualSlot37();
+        result = GetTargetPoint();
     }
     return result;
 }
@@ -473,7 +473,7 @@ void FollowCamera::UnknownVirtualSlot70(unsigned char value) {
 }
 
 // 0x00464a10: the target point.
-Vector3 FollowCamera::UnknownVirtualSlot37() {
+Vector3 FollowCamera::GetTargetPoint() {
     Vector3 result = targetPoint;
     return result;
 }
@@ -513,7 +513,7 @@ bool FollowCamera::UnknownVirtualSlot56() {
 // joined at a single return: retail's disabled exit stores the zero from al
 // (`xor al, al; mov [esi+0x277], al`), which `field_0x277 = false;
 // return false;` does not give (VC6 stores the immediate).
-bool FollowCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool force) {
+bool FollowCamera::TrySettleOnPoint(const Vector3& point, bool enable, bool force) {
     bool result;
     if (enable) {
         if (!force && !isSettled &&

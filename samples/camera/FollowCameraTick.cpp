@@ -100,7 +100,7 @@ int FollowCamera::Tick(float dt) {
         if (cameraState != 3) {
             if (cameraState == 4)
                 UnknownVirtualSlot59();
-            isSettled = UnknownVirtualSlot36(position, wide, moved);
+            isSettled = TrySettleOnPoint(position, wide, moved);
         }
     } else if (UnknownVirtualSlot74()) {
         isCrashView = 1;

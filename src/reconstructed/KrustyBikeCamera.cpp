@@ -199,7 +199,7 @@ Vector3 KrustyBikeCamera::SelectFollowPoint(int a, bool flag, float dt) {
     } else if (flag) {
         result = UnknownVirtualSlot35(a, dt);
     } else {
-        result = UnknownVirtualSlot37();
+        result = GetTargetPoint();
     }
     return result;
 }
