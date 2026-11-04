@@ -3,12 +3,12 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "c59c960d5c51f3f2410560664cbf0270c1389c4b1f45a17354dd4ebd2d8f6e89"
+      "sha256": "304facec0deb0e901a1b7b7cd0942b04e1878f6a9d0606c69a045ee186329465"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "99e01f304e4f47d9939403dbbe01da09f17c37e71df6e62d8aea49c67fafa1cc"
+      "sha256": "c5dd1aa1f383f2f6ca48a6e76b951e2e65f7e7f02c38139cfa6a86e7fdd44a6b"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -432,7 +432,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot43@Vehicle",
+      "symbol": "SnapshotRespawnPose@Vehicle",
       "target_va": "0x005256d0",
       "target_size": 199,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -663,7 +663,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot58@Vehicle",
+      "symbol": "SettleBodyToWheels@Vehicle",
       "target_va": "0x005289c0",
       "target_size": 938,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"

@@ -3,17 +3,17 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "99e01f304e4f47d9939403dbbe01da09f17c37e71df6e62d8aea49c67fafa1cc"
+      "sha256": "c5dd1aa1f383f2f6ca48a6e76b951e2e65f7e7f02c38139cfa6a86e7fdd44a6b"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "c59c960d5c51f3f2410560664cbf0270c1389c4b1f45a17354dd4ebd2d8f6e89"
+      "sha256": "304facec0deb0e901a1b7b7cd0942b04e1878f6a9d0606c69a045ee186329465"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
       "relocations": 1054,
-      "sha256": "6a9ff3887d04b9f5b343641f79af64af26d1866f7ec3530e4ae5427dc8a797b3"
+      "sha256": "23295b0b03c7bbfa1d7ade95e96a61e3b722961b1bc8b683fbdd52d3216dacfe"
     },
     "src/reconstructed/VehicleDefaults.cpp": {
       "sections": 13,
@@ -43,7 +43,7 @@
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "115398ae075cfd7e05706f03db4c7a85cd34b618fcdd43a9aee9fbe3c566f5ae"
+      "sha256": "cd09e707b38a7f33c00716e30ed1ebaecbebf6a7539aa5c22ba0250e8e469ed7"
     },
     "src/reconstructed/InputDevice.cpp": {
       "sections": 11,
@@ -418,7 +418,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot43@Vehicle",
+      "symbol": "SnapshotRespawnPose@Vehicle",
       "va": "0x5256d0",
       "extent": 199,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -649,7 +649,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot58@Vehicle",
+      "symbol": "SettleBodyToWheels@Vehicle",
       "va": "0x5289c0",
       "extent": 938,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -1328,7 +1328,7 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot43@KrustyBike",
+      "symbol": "SnapshotRespawnPose@KrustyBike",
       "va": "0x48dee0",
       "extent": 580,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"

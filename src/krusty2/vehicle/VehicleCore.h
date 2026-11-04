@@ -56,7 +56,7 @@ public:
     virtual int  UnknownVirtualSlot42();
 
     // ---- slots introduced by Vehicle (43..96) ----
-    virtual void UnknownVirtualSlot43();
+    virtual void SnapshotRespawnPose();
     virtual void UnknownVirtualSlot44();
     virtual float UnknownVirtualSlot45();
     virtual Vec3* UnknownVirtualSlot46(Vec3* out, float slideAngle);
@@ -75,7 +75,7 @@ public:
     virtual Vec3* UnknownVirtualSlot55(Vec3* out, Vec3* pos);
     virtual void UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up);
     virtual float GetLeanAngle();
-    virtual void UnknownVirtualSlot58(Vec3* settleUp, int keepPlacement);
+    virtual void SettleBodyToWheels(Vec3* settleUp, int keepPlacement);
     virtual float GetMaxSteerAngle();
     virtual void ComputeSteerRate(float steerAxis, float maxAngle, int steps);
     virtual float UnknownVirtualSlot61(float threshold);

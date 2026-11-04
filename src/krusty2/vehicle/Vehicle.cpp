@@ -255,7 +255,7 @@ void Vehicle::UpdateAirborneState(int nowAirborne)
 // Provisional: snapshot respawnPosition and a horizontal respawnHeading (savedForward
 // with y forced to 0), normalised with FastInvSqrt; zero vector if degenerate.
 static inline float VehLen2(const Vec3& v) { return (v.x * v.x + v.y * v.y) + v.z * v.z; }
-void Vehicle::UnknownVirtualSlot43()
+void Vehicle::SnapshotRespawnPose()
 {
     respawnPosition = position;
     respawnHeading = savedForward;
@@ -474,7 +474,7 @@ void Vehicle::UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up)
 // orientation block is rebuilt from the basis vectors and the previous copy is refreshed.
 static inline float VehAbsT(float x) { return x < 0.0f ? -x : x; }
 
-void Vehicle::UnknownVirtualSlot58(Vec3* settleUp, int keepPlacement)
+void Vehicle::SettleBodyToWheels(Vec3* settleUp, int keepPlacement)
 {
     if (wheelCount < 1)
         return;
@@ -1626,9 +1626,9 @@ int Vehicle::ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, c
     modelNode->GetPosition(&position);
     ResetBodyOrientation();
     PlaceWheels();
-    UnknownVirtualSlot58((Vec3*)settleUp, keepPlacement);
+    SettleBodyToWheels((Vec3*)settleUp, keepPlacement);
     PlaceWheels();
-    UnknownVirtualSlot58((Vec3*)settleUp, keepPlacement);
+    SettleBodyToWheels((Vec3*)settleUp, keepPlacement);
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* wheel = wheelList[i];
         wheel->sceneNode->GetPositionIn(0, &wheel->nodePosition);

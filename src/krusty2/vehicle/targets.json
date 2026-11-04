@@ -502,7 +502,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot43@Vehicle",
+    "candidate_symbol_contains": "SnapshotRespawnPose@Vehicle",
     "target_va": "0x005256d0",
     "target_size": 199,
     "expect": "exact",
@@ -872,7 +872,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot58@Vehicle",
+    "candidate_symbol_contains": "SettleBodyToWheels@Vehicle",
     "target_va": "0x005289c0",
     "target_size": 938,
     "expect": "exact",
@@ -2112,7 +2112,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot43@KrustyBike",
+    "candidate_symbol_contains": "SnapshotRespawnPose@KrustyBike",
     "target_va": "0x0048dee0",
     "target_size": 580,
     "expect": "exact",

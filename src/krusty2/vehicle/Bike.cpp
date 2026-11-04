@@ -818,7 +818,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     steerTorqueGains.x = 1.0f / ((diameterSq + h2) * (wheelMass * (1.0f / 12.0f)));
     steerTorqueGains.y = 1.0f / ((w2 + diameterSq) * (wheelMass * (1.0f / 12.0f)));
     steerTorqueGains.z = 1.0f / ((wheelMass * (1.0f / 12.0f)) * wh2);
-    UnknownVirtualSlot43();
+    SnapshotRespawnPose();
 
     bodyForward = forward;
     bodyUp = up;

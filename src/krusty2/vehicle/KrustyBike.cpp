@@ -769,9 +769,9 @@ void KrustyBike::SetSpawnProtection(int protect, float duration, int forced)
 // Slot 43: reset of the per-bike state (runs the Vehicle reset, then clears the 0x74c..0x7c0
 // block, the statusNode record and a few late fields).  The record's 0x44 vector is taken from
 // the race context (0xf8..0x100, or from the object at +0x48 when no 0x144 object exists).
-void KrustyBike::UnknownVirtualSlot43()
+void KrustyBike::SnapshotRespawnPose()
 {
-    Vehicle::UnknownVirtualSlot43();
+    Vehicle::SnapshotRespawnPose();
     onTrack = 1;
     offTrackTime = 0;
     lapCount = 0;
@@ -1766,7 +1766,7 @@ GameObject* KrustyBike::Load(int context, int a2, const char* modelPath, const S
     stateBuffers[3].timeReceived = 0;
     interpTarget = states[1];
     interpSource = states[2];
-    UnknownVirtualSlot43();
+    SnapshotRespawnPose();
 
     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType != 0 && reinterpret_cast<KbGame*>(g_TrackGame)->eventType != 5 && reinterpret_cast<KbGame*>(g_TrackGame)->eventType != 1) {
         heapBufferA = DebugCalloc(100, 4, __FILE__, 0x6fa);
