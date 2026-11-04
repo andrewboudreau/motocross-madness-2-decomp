@@ -365,7 +365,7 @@ float Bike::GetMaxSteerAngle()
     return (maxAngle < limit) ? maxAngle : limit;
 }
 
-void Bike::UnknownVirtualSlot67()
+void Bike::ClearCrashState()
 {
     int i;
     for (i = 0; i < collisionPointCount; i++) {
@@ -380,9 +380,9 @@ void Bike::UnknownVirtualSlot67()
     steerTorque = kVec3Zero;
 }
 
-float Bike::UnknownVirtualSlot73(const Vec3* point, const Vec3* dir)
+float Bike::GetTurnRadius(const Vec3* point, const Vec3* dir)
 {
-    float radius = Vehicle::UnknownVirtualSlot73(point, dir);
+    float radius = Vehicle::GetTurnRadius(point, dir);
     float alignment = point->y * dir->y + point->x * dir->x;
     alignment += point->z * dir->z;
     return radius * alignment;
@@ -986,17 +986,17 @@ int Bike::ApplyPendingRespawn(float dt)
                 if (crashTimer == 0.0f)
                     crashTimer = -0.1f;
                 if (rearWheel->groundNormal.y > 0.866 || prevSpeed < 1.0f) {
-                    UnknownVirtualSlot67();
+                    ClearCrashState();
                     return 1;
                 }
                 if (crashTimer <= -2.0f) {
-                    UnknownVirtualSlot67();
+                    ClearCrashState();
                     return 1;
                 }
             }
         }
         if (crashState == 0) {
-            UnknownVirtualSlot67();
+            ClearCrashState();
             return 1;
         }
     }

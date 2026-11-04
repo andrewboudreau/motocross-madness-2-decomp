@@ -97,7 +97,7 @@ int Vehicle::UnknownVirtualSlot70(float dt)
 }
 
 // Provisional: wheelBase / sin(steer angle), zero when the angle is zero.
-float Vehicle::UnknownVirtualSlot73(const Vec3* point, const Vec3* dir)
+float Vehicle::GetTurnRadius(const Vec3* point, const Vec3* dir)
 {
     VehicleSteerState* steer = steerState;
     float absAngle = steer->angle;
@@ -109,7 +109,7 @@ float Vehicle::UnknownVirtualSlot73(const Vec3* point, const Vec3* dir)
 }
 
 // Clears contactActive (+0xa4) on every contact that has an owner node, then resets state.
-void Vehicle::UnknownVirtualSlot67()
+void Vehicle::ClearCrashState()
 {
     for (int i = 0; i < collisionPointCount; i++) {
         VehicleContact* contact = ((VehicleContact**)collisionPoints)[i];
@@ -586,7 +586,7 @@ static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
 // k = d * slot73 or reusing d for k; VehAbs or an if-negated copy costs 6 bytes.
 float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
 {
-    float k = UnknownVirtualSlot73(point, dir) * d;
+    float k = GetTurnRadius(point, dir) * d;
     field_0x4e8 = k;
     if (!(VehAbsT(k) <= 0.0f)) {
         float m = forwardSpeed;
@@ -1351,14 +1351,14 @@ int Vehicle::ApplyPendingRespawn(float dt)
 {
     int code;
     if (respawnPending) {
-        UnknownVirtualSlot67();
+        ClearCrashState();
         position = respawnPosition;
         modelNode->SetPosition(position);
         return 1;
     }
     if (UnknownVirtualSlot68(&code) && inputMap
         && inputMap->keyTable->UnknownVirtualSlot5(code, 0x3f, 0)) {
-        UnknownVirtualSlot67();
+        ClearCrashState();
         return 2;
     }
     return 0;

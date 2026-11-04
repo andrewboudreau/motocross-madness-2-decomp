@@ -192,7 +192,7 @@ int KrustyBike::ApplyPendingRespawn(float dt)
 {
     if (!respawnPending && reinterpret_cast<KbGame*>(g_TrackGame)->raceMode && offTrackTime > 6.0f) {
         if (crashState)
-            UnknownVirtualSlot67();
+            ClearCrashState();
         return 1;
     }
     return Bike::ApplyPendingRespawn(dt);
@@ -405,7 +405,7 @@ void KrustyBike::Fn_0048D8B0()
     field_0x15e5 = 0;
 }
 
-void KrustyBike::UnknownVirtualSlot67()
+void KrustyBike::ClearCrashState()
 {
     Fn_00496DA0();
     for (int i = 0; i < collisionPointCount; i++) {

@@ -3,12 +3,12 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "53bf8b073c2299eb84cdaa7a2b0d0c26fe5e97da070921c78f466dab972e3292"
+      "sha256": "1bb73fbb474853127cd058d9d9b4c5c57b4ddd265dfe1968002ad521cb6dbc29"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "be4e7fe3163012383cecc654850e5c2109c1e6921ce8fbecd8436d95941fc23a"
+      "sha256": "671c1ff2eda13ad5bacabfdd25e3f0b17a9860e4561aa3d592257f271ec5a28e"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -61,7 +61,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot73@Bike",
+      "symbol": "GetTurnRadius@Bike",
       "target_va": "0x00406090",
       "target_size": 44,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -138,7 +138,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot67@Bike",
+      "symbol": "ClearCrashState@Bike",
       "target_va": "0x0040a180",
       "target_size": 103,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -628,7 +628,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot73@Vehicle",
+      "symbol": "GetTurnRadius@Vehicle",
       "target_va": "0x00528170",
       "target_size": 60,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -901,7 +901,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot67@Vehicle",
+      "symbol": "ClearCrashState@Vehicle",
       "target_va": "0x0052b740",
       "target_size": 66,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"

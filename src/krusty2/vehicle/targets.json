@@ -42,7 +42,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot73@Bike",
+    "candidate_symbol_contains": "GetTurnRadius@Bike",
     "target_va": "0x00406090",
     "target_size": 44,
     "expect": "exact",
@@ -182,7 +182,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot67@Bike",
+    "candidate_symbol_contains": "ClearCrashState@Bike",
     "target_va": "0x0040a180",
     "target_size": 103,
     "expect": "exact",
@@ -802,7 +802,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot73@Vehicle",
+    "candidate_symbol_contains": "GetTurnRadius@Vehicle",
     "target_va": "0x00528170",
     "target_size": 60,
     "expect": "exact",
@@ -1222,7 +1222,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot67@Vehicle",
+    "candidate_symbol_contains": "ClearCrashState@Vehicle",
     "target_va": "0x0052b740",
     "target_size": 66,
     "expect": "exact",
@@ -1742,7 +1742,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot67@KrustyBike",
+    "candidate_symbol_contains": "ClearCrashState@KrustyBike",
     "target_va": "0x00491a90",
     "target_size": 121,
     "expect": "exact",

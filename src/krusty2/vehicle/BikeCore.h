@@ -48,10 +48,10 @@ public:
     virtual int UnknownVirtualSlot62(float slideAngle);
     virtual void UnknownVirtualSlot65(float dt);
     virtual int UnknownVirtualSlot66();
-    virtual void UnknownVirtualSlot67();
+    virtual void ClearCrashState();
     virtual void UpdateAirborneState(int nowAirborne);
     virtual void UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel);
-    virtual float UnknownVirtualSlot73(const Vec3* point, const Vec3* dir);
+    virtual float GetTurnRadius(const Vec3* point, const Vec3* dir);
     virtual float UnknownVirtualSlot75();
     virtual Vec3 UnknownVirtualSlot76(const Vec3* arm, const Vec3* force);
     virtual int UnknownVirtualSlot89(float frame);

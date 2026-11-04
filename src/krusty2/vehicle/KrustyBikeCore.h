@@ -67,7 +67,7 @@ public:
     virtual void UnknownVirtualSlot63(float dt);
     virtual void UnknownVirtualSlot64(float dt);
     virtual int UnknownVirtualSlot66();
-    virtual void UnknownVirtualSlot67();
+    virtual void ClearCrashState();
     virtual int UnknownVirtualSlot68(int* out);
     virtual void UnknownVirtualSlot69();
     virtual int UnknownVirtualSlot70(float dt);

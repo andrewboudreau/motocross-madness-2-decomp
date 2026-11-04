@@ -86,13 +86,13 @@ public:
     virtual void UnknownVirtualSlot64(float dt);
     virtual void UnknownVirtualSlot65(float dt);  // entry is the shared empty stub 0x00464e80
     virtual int UnknownVirtualSlot66() = 0;  // pure virtual: entry is _purecall (0x00534cfe)
-    virtual void UnknownVirtualSlot67();
+    virtual void ClearCrashState();
     virtual int UnknownVirtualSlot68(int* out);
     virtual void UnknownVirtualSlot69();
     virtual int UnknownVirtualSlot70(float dt);
     virtual void UpdateAirborneState(int nowAirborne);
     virtual void UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel);
-    virtual float UnknownVirtualSlot73(const Vec3* point, const Vec3* dir);  // only read (Bike 0x00406090)
+    virtual float GetTurnRadius(const Vec3* point, const Vec3* dir);  // only read (Bike 0x00406090)
     virtual float UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d);
     virtual float UnknownVirtualSlot75();
     // ret 0xc = hidden result pointer + two arguments; KrustyBike 0x00491ca0 byte-matches
