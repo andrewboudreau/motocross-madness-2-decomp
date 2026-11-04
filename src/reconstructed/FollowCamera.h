@@ -137,7 +137,7 @@ public:
     // dt as slot 48's last argument, which slot 48 forwards to slot 34 and
     // (with `a`) to slot 35; BikeCamera's and KrustyBikeCamera's slot 34 load
     // it with fld/fmul. VehicleCamera's slot 35 (0x0052c510) never reads it.
-    virtual Vector3 UnknownVirtualSlot34(float dt);
+    virtual Vector3 GetStateFiveFollowPoint(float dt);
     // VehicleCamera's override tests `a` as a byte (slot 48 passes its int).
     virtual Vector3 UnknownVirtualSlot35(unsigned char a, float dt) = 0;
     // 0x00465000 (near miss: samples/camera)
@@ -158,7 +158,7 @@ public:
     virtual void UnknownVirtualSlot46(Vector3* forward, Vector3* up);
     // 0x00465720: plays back the loaded CAMERA records.
     virtual bool UnknownVirtualSlot47(float dt, const Vector3* offset);
-    virtual Vector3 UnknownVirtualSlot48(int a, bool flag, float dt);
+    virtual Vector3 SelectFollowPoint(int a, bool flag, float dt);
     // 0x00464b30: the camera position for this frame.
     virtual Vector3 UnknownVirtualSlot49(bool orbit, const Vector3& base, float dt);
     virtual Vector3 UnknownVirtualSlot50() = 0;

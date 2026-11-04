@@ -44,9 +44,9 @@ public:
     virtual int Tick(float frameTime);                 // 0x00497e20 (near miss: samples/camera)
 
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual Vector3 UnknownVirtualSlot34(float dt);
+    virtual Vector3 GetStateFiveFollowPoint(float dt);
     virtual void UnknownVirtualSlot42(bool flag);
-    virtual Vector3 UnknownVirtualSlot48(int a, bool flag, float dt);
+    virtual Vector3 SelectFollowPoint(int a, bool flag, float dt);
     virtual void UnknownVirtualSlot52(Vector3* point);
     virtual unsigned char UnknownVirtualSlot55();
     virtual bool UnknownVirtualSlot56();

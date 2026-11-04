@@ -76,7 +76,7 @@ Vector3 BikeCamera::UnknownVirtualSlot37() {
 // 4 - 0.006 * height below height 500); otherwise the target point plus the
 // +0x29c direction times a distance built from the dot product with slot
 // 33, the fov/zoom ratio and vehicle +0x438. Raised by 3.
-Vector3 BikeCamera::UnknownVirtualSlot34(float dt) {
+Vector3 BikeCamera::GetStateFiveFollowPoint(float dt) {
     Vector3 result;
     if (isCrashView) {
         bike->riderCharacter->modelNode->GetPositionIn(0, reinterpret_cast<Vec3*>(&result));

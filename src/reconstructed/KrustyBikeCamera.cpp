@@ -155,7 +155,7 @@ void KrustyBikeCamera::UnknownVirtualSlot58() {
 
 // 0x00498340: BikeCamera slot 34 (0x00417050) with a raw-target case while
 // the +0x3b8 view's +0x3f8 flag is set.
-Vector3 KrustyBikeCamera::UnknownVirtualSlot34(float dt) {
+Vector3 KrustyBikeCamera::GetStateFiveFollowPoint(float dt) {
     Vector3 result;
     if (isCrashView) {
         bike->riderCharacter->modelNode->GetPositionIn(0, reinterpret_cast<Vec3*>(&result));
@@ -184,13 +184,13 @@ Vector3 KrustyBikeCamera::UnknownVirtualSlot34(float dt) {
 
 // 0x004985b0: FollowCamera slot 48 plus a raw-target case while the +0x3b8
 // view flags are set.
-Vector3 KrustyBikeCamera::UnknownVirtualSlot48(int a, bool flag, float dt) {
+Vector3 KrustyBikeCamera::SelectFollowPoint(int a, bool flag, float dt) {
     Vector3 result;
     if (cameraState == 5) {
         if (overrideActive)
             result = cachedTarget;
         else
-            result = UnknownVirtualSlot34(dt);
+            result = GetStateFiveFollowPoint(dt);
     } else if (cameraState == 7) {
         result = targetPoint;
         result.y += 3.0f;

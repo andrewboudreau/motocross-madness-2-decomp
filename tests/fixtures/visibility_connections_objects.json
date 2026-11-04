@@ -16,7 +16,7 @@
     "src/reconstructed/FollowCamera.cpp": {
       "sections": 98,
       "relocations": 250,
-      "sha256": "6a6e3faf21313ec3b8b4355ddcecbe2751f3c3b7da8b5640bb94fa5484601b64"
+      "sha256": "cd19e8a8a1ce2ac489aa41bd8678c50cf7b61f02d75d7f3109d6b7d75f3f540a"
     },
     "src/reconstructed/TrackOverlay.cpp": {
       "sections": 207,
@@ -31,7 +31,7 @@
     "samples/camera/FollowCameraNearMisses.cpp": {
       "sections": 66,
       "relocations": 337,
-      "sha256": "9b9d0d8ab01ebd36dda408022fb3922a4e2e10c253dfdfe076edcb0107f0f6d3"
+      "sha256": "bee0197692718fd85b50252d567d0ac35f928844896caff22d55410052edb6f0"
     },
     "samples/track/TrackOverlayNearMisses.cpp": {
       "sections": 37,
