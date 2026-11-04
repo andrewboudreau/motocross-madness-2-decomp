@@ -13,7 +13,11 @@ void ToolTip::ShowControlToolTip(UnknownGuiControl* control) {
     ShowText(control->toolTipText, position, 1.0f);
 }
 
-// 0x00488120
+// 0x00488120 SetPointerDevice (48/52 bytes, 16 vs retail's 18 instructions): retail materialises
+// the ternary (`xor edx, edx` arm, then `test edx, edx`); VC6 threads the null arm straight to the
+// assign path in every spelling tried: owner-first and this-first nesting, `owner != this` early
+// return, `owner != 0 && owner != this`, if/else instead of `?:`, `owner = 0; if (device) ...`, and a
+// static inline OwnerOf(device) helper (48-49 bytes, all 16 instructions).
 int GUIUser::SetPointerDevice(GUIInputDevice* device) {
     GUIUser* owner = device ? device->ownerUser : 0;
 
