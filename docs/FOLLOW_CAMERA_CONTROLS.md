@@ -1,7 +1,7 @@
 # FollowCamera control handler
 
 `samples/camera/FollowCameraControls.cpp` contains the unchanged complete
-`FollowCamera::UnknownVirtualSlot45(bool, float)` candidate. The aggregate
+`FollowCamera::ProcessCameraInput(bool, float)` candidate. The aggregate
 `FollowCameraNearMisses.cpp` includes it, with the original input macros and
 angle helpers shared through `FollowCameraControlSupport.h`. The slot name and
 original translation-unit ownership remain provisional. No shared production
@@ -100,7 +100,7 @@ this operation does not supply or substitute them.
 
 The isolated real build `build-3r0sggzf` compiles **204/204 translation units**.
 Against `build-3bhn75px`, unresolved names decrease from **493 to 492**:
-only `FollowCamera::UnknownVirtualSlot45(bool, float)` disappears, and no new
+only `FollowCamera::ProcessCameraInput(bool, float)` disappears, and no new
 missing name appears. The executable still does not link; startup and live
 camera operation remain unverified.
 

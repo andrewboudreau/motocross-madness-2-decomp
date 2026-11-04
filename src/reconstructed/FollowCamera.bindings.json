@@ -15,7 +15,7 @@
   "?OnControlPress@Camera@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x0042f090",
   "?OnControlPress@FollowCamera@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x00466ad0",
   "?SteerToKeepPointsOnScreen@FollowCamera@@UAEXM_N0@Z": "0x004636e0",
-  "?UnknownVirtualSlot49@FollowCamera@@UAE?AUVector3@@_NABU2@M@Z": "0x00464b30",
+  "?ComputeCameraPosition@FollowCamera@@UAE?AUVector3@@_NABU2@M@Z": "0x00464b30",
   "?UnknownVirtualSlot71@FollowCamera@@UAEXH@Z": "0x00466e50",
   "?SetRenderContext@Camera@@UAEPAVGameObject@@PAX@Z": "0x0042e500",
   "?g_visibilityClipper@@3PAVVisibilityClipper@@A": "0x00575a98",

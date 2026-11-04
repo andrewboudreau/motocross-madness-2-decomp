@@ -13,7 +13,7 @@ extern "C" __declspec(noreturn) void FixtureUnvisited() {
 }
 // These real declarations are never reached by the constructor graph. Keep
 // their vtable slots explicit and fail immediately if the tested domain grows.
-bool FollowCamera::UnknownVirtualSlot45(bool,float) { FixtureUnvisited(); }
+bool FollowCamera::ProcessCameraInput(bool,float) { FixtureUnvisited(); }
 int FollowCamera::Tick(float) { FixtureUnvisited(); }
 void Camera::UpdateMatrices() { FixtureUnvisited(); }
 

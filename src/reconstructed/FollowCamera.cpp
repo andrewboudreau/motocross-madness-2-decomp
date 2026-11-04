@@ -256,7 +256,7 @@ Vector3 FollowCamera::SelectFollowPoint(int a, bool flag, float dt) {
 // outside state 6 that also snapshots the presets and +0x23c. Otherwise
 // +0x23c is re-based when it dropped below -8, then slot 40 runs and the camera
 // sits +0x220 behind `base` at yaw +0x234 + +0x23c, raised by +0x2d4.
-Vector3 FollowCamera::UnknownVirtualSlot49(bool orbit, const Vector3& base, float dt) {
+Vector3 FollowCamera::ComputeCameraPosition(bool orbit, const Vector3& base, float dt) {
     Vector3 result;
     if (cameraState == 5 || cameraState == 7) {
         result = eyePosition;
@@ -486,7 +486,7 @@ Vector3 FollowCamera::GetStateFiveFollowPoint(float) {
 }
 
 // 0x00464e80 and 0x00464e90 (slots 53, 54 and 58-62 share the empty body).
-void FollowCamera::UnknownVirtualSlot52(Vector3*) {}
+void FollowCamera::ClampPositionAboveGround(Vector3*) {}
 void FollowCamera::UnknownVirtualSlot53() {}
 void FollowCamera::UnknownVirtualSlot54() {}
 void FollowCamera::UnknownVirtualSlot58() {}

@@ -20,7 +20,7 @@ CALLERS = (
     ('FollowCamera', '?PlayRecordedFrame@FollowCamera@@', 0x465720, 1267, 1),
     ('VehicleCamera', '?UnknownVirtualSlot68@VehicleCamera@@', 0x52bcf0, 684, 1),
     ('VehicleCamera', '?UnknownVirtualSlot35@VehicleCamera@@', 0x52c510, 1267, 1),
-    ('KrustyBikeCamera', '?UnknownVirtualSlot52@KrustyBikeCamera@@', 0x497fa0, 217, 1),
+    ('KrustyBikeCamera', '?ClampPositionAboveGround@KrustyBikeCamera@@', 0x497fa0, 217, 1),
     ('AuralScape', '?Tick@AuralScape@@', 0x403710, 1025, 1),
     ('EcoSystem', '?PlaceAuthoredObjects@EcoSystem@@', 0x459b40, 412, 1),
     ('Krusty3DObjects', '?Tick@RunwayLights@@', 0x48a760, 1509, 5),

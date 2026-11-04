@@ -78,7 +78,7 @@ static void Invoke(int retail){
     FollowCamera* camera=(FollowCamera*)world.camera;
     union {bool(FollowCamera::*method)(bool,float);DWORD address;}call;call.address=0x463a30;
     __try {observed.result=retail?(camera->*call.method)(scenario.active!=0,scenario.dt):
-        camera->FollowCamera::UnknownVirtualSlot45(scenario.active!=0,scenario.dt);}
+        camera->FollowCamera::ProcessCameraInput(scenario.active!=0,scenario.dt);}
     __except(Filter(GetExceptionInformation())){}
 }
 static void Run(int retail){

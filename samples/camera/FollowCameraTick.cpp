@@ -61,11 +61,11 @@ int FollowCamera::Tick(float dt) {
         float dz = eyePosition.z - targetPoint.z;
         targetDistance = FastSqrt(dz * dz + dx * dx + dy);
     }
-    bool moved = UnknownVirtualSlot45(current, dt);
+    bool moved = ProcessCameraInput(current, dt);
     UnknownVirtualSlot42(wide);
     bool following = UnknownVirtualSlot75();
     target = SelectFollowPoint(wide || isSettled, following, dt);
-    position = UnknownVirtualSlot49(following, target, dt);
+    position = ComputeCameraPosition(following, target, dt);
     if (!positionEaseX) {
         targetEaseZ = new(__FILE__, 0x4b0) UnknownFollowCameraValue(target.z, 0.3f);
         targetEaseX = new(__FILE__, 0x4b1) UnknownFollowCameraValue(target.x, 0.3f);
@@ -142,7 +142,7 @@ int FollowCamera::Tick(float dt) {
         if (!overrideActive)
             cachedTarget = target;
     }
-    UnknownVirtualSlot52(&smoothed);
+    ClampPositionAboveGround(&smoothed);
     if (current) {
         float roll;
         if (cameraState == 3 && following) {

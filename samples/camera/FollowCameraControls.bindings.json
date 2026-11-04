@@ -16,5 +16,5 @@
   "__real@4@c000c90fdb0000000000": "0x0055296c",
   "__real@8@00000000000000000000": "0x005507e8",
   "__real@8@4004c800000000000000": "0x00552978",
-  "?UnknownVirtualSlot45@FollowCamera@@UAE_N_NM@Z": "0x00463a30"
+  "?ProcessCameraInput@FollowCamera@@UAE_N_NM@Z": "0x00463a30"
 }

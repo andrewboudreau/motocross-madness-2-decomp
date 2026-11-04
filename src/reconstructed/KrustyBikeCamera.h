@@ -47,7 +47,7 @@ public:
     virtual Vector3 GetStateFiveFollowPoint(float dt);
     virtual void UnknownVirtualSlot42(bool flag);
     virtual Vector3 SelectFollowPoint(int a, bool flag, float dt);
-    virtual void UnknownVirtualSlot52(Vector3* point);
+    virtual void ClampPositionAboveGround(Vector3* point);
     virtual unsigned char UnknownVirtualSlot55();
     virtual bool UnknownVirtualSlot56();
     virtual void UnknownVirtualSlot58();

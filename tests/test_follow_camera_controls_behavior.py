@@ -14,7 +14,7 @@ from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-SYMBOL = '?UnknownVirtualSlot45@FollowCamera@@UAE_N_NM@Z'
+SYMBOL = '?ProcessCameraInput@FollowCamera@@UAE_N_NM@Z'
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),

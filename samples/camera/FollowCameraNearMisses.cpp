@@ -31,7 +31,7 @@
 //
 // FollowCamera::PlayRecordedFrame (0x00465720) is exact in src/reconstructed/FollowCamera.cpp.
 //
-// FollowCamera::UnknownVirtualSlot45 (0x00463a30, 4058 complete bytes):
+// FollowCamera::ProcessCameraInput (0x00463a30, 4058 complete bytes):
 // the previous 4055-byte estimate omitted the final three-byte ret 8.
 // the control flow, the stack frame (0x20, with ebp/edi holding the 1.55/7.0
 // constants) and every FPU sequence agree, but the code drifts by a few bytes

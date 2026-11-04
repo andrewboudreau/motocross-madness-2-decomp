@@ -16,7 +16,7 @@
 // (+0x234, wrapped to +-pi) and the distance (+0x220, at least 7). Steps are
 // 300 or 30 units per second; below distance 50 the turn rate grows by
 // 3 - 0.04 * distance. Returns whether the camera moved.
-bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
+bool FollowCamera::ProcessCameraInput(bool active, float dt) {
     bool moved = false;
     if (active) {
     if (overrideActive && isMovingTarget) {
