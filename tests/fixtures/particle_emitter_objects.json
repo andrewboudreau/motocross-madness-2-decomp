@@ -3,12 +3,12 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "ca8452081ebc97299b61c2662dd80de7e8344d4e3a190cf419959f8777c795ab"
+      "sha256": "3e1673180fca6ca251980344c103239ccfbb9de2c13b27a9d447d19982092267"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "5d5243e3fbcea6edfc5196699f182cd7c56e873e793b197fbaa5240331c642f2"
+      "sha256": "c6c67056827f522177c16ecc62a96fcf22358f122d19c04693d1382054684912"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -236,7 +236,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot54@Bike",
+      "symbol": "GetContactGroundNormal@Bike",
       "target_va": "0x0040c8b0",
       "target_size": 354,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -649,7 +649,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot54@Vehicle",
+      "symbol": "GetContactGroundNormal@Vehicle",
       "target_va": "0x00528530",
       "target_size": 358,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"

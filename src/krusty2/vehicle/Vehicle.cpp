@@ -1126,7 +1126,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
                             tiltAxisLocal = modelNode->WorldToLocalDirection(lift);
                         } else {
                             Vec3 contactNormal;
-                            scratchVector = *UnknownVirtualSlot54(&contactNormal);
+                            scratchVector = *GetContactGroundNormal(&contactNormal);
                             tiltAxisLocal = modelNode->WorldToLocalDirection(scratchVector);
                         }
                         if (slideAngle != 0.0f && turnMagnitude < 0.003f)
@@ -1499,7 +1499,7 @@ Vec3* Vehicle::GetAverageGroundNormal(Vec3* out)
 
 // Same average restricted to the wheels in contact (+0x260), divided by the contact count
 // wheelsInContact; with no contacts the first wheel's normal is returned unchanged.
-Vec3* Vehicle::UnknownVirtualSlot54(Vec3* out)
+Vec3* Vehicle::GetContactGroundNormal(Vec3* out)
 {
     int count = wheelsInContact;
     if (count == 0) {

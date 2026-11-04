@@ -71,7 +71,7 @@ public:
     virtual int UnknownVirtualSlot51();
     virtual int UnknownVirtualSlot52();
     virtual float UnknownVirtualSlot53();
-    virtual Vec3* UnknownVirtualSlot54(Vec3* out);
+    virtual Vec3* GetContactGroundNormal(Vec3* out);
     virtual Vec3* UnknownVirtualSlot55(Vec3* out, Vec3* pos);
     virtual void UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up);
     virtual float GetLeanAngle();

@@ -954,7 +954,7 @@ Vec3* Bike::UnknownVirtualSlot55(Vec3* out, Vec3* pos)
     return out;
 }
 
-Vec3* Bike::UnknownVirtualSlot54(Vec3* out)
+Vec3* Bike::GetContactGroundNormal(Vec3* out)
 {
     if (wheelsInContact == 0) {
         *out = rearWheel->groundNormal;

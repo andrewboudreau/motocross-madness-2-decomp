@@ -332,7 +332,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot54@Bike",
+    "candidate_symbol_contains": "GetContactGroundNormal@Bike",
     "target_va": "0x0040c8b0",
     "target_size": 354,
     "expect": "exact",
@@ -842,7 +842,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot54@Vehicle",
+    "candidate_symbol_contains": "GetContactGroundNormal@Vehicle",
     "target_va": "0x00528530",
     "target_size": 358,
     "expect": "exact",
