@@ -440,7 +440,7 @@ int DrawableGridNode::WalkSlot4Block(int x, int z, int size, int quad)
         else
             count = ranges[block].end - ranges[block - 1].end;
         if (count != 0 && TestBlockFrustum(block))
-            UnknownVirtualSlot4(block);
+            RequestTextureSize(block);
     }
     if (children && !data->b0) {
         for (int j = 0; j < 64; j += 16) {
@@ -448,7 +448,7 @@ int DrawableGridNode::WalkSlot4Block(int x, int z, int size, int quad)
                 DrawableGridNode* child = (DrawableGridNode*)children[i + j + g_gridQuadCell[quad]];
                 if (child && child->childMask) {
                     if (child->data->vertexCount != 0 && !child->data->b3)
-                        child->UnknownVirtualSlot4(-1);
+                        child->RequestTextureSize(-1);
                     child->WalkSlot4Quadrants(0, 0, 16, 0);
                 }
             }

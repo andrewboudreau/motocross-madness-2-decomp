@@ -11545,7 +11545,7 @@ CASES = [
         'name': 'Grid1.cpp DrawableGridNodeSharedTextures slot 4',
         'bindings': 'src/reconstructed/Grid1.bindings.json',
         'source': 'src/reconstructed/Grid1.cpp',
-        'symbol': '?UnknownVirtualSlot4@DrawableGridNodeSharedTextures@@UAEXH@Z',
+        'symbol': '?RequestTextureSize@DrawableGridNodeSharedTextures@@UAEXH@Z',
         'target_va': '0x0047d160',
         'target_size': 419,
         'reason': 'slot 4 of 0x00553e54',

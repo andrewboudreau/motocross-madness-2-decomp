@@ -305,7 +305,7 @@ public:
                                           int level, int shift, int x, int z, int index,
                                           void* boundsMin, void* boundsMax) { return 0; }   // 0x004806e0
     virtual void UnknownVirtualSlot3(float a) {}                // 0x004806f0 (shared)
-    virtual void UnknownVirtualSlot4(int a) {}                  // 0x004806f0 (shared)
+    virtual void RequestTextureSize(int a) {}                  // 0x004806f0 (shared)
     virtual void UnknownVirtualSlot5(UnknownTextureStream* stream) {} // 0x004806f0 (shared)
     virtual void UnknownVirtualSlot6() {}                       // 0x0044d710 (shared)
     virtual void UnknownVirtualSlot7(int a) {}                  // 0x004806f0 (shared)

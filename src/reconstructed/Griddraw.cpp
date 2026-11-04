@@ -826,7 +826,7 @@ int DrawableGridNode::WalkSlot4FromRoot()
 int DrawableGridNode::WalkSlot4Quadrants(int x, int z, int size, int quad)
 {
     if (data->vertexCount != 0 && childMask != 0 && size == 16 && extra->texture != 0 && !data->b3)
-        UnknownVirtualSlot4(-1);
+        RequestTextureSize(-1);
     if (!data->b0 || data->b3) {
         size >>= 1;
         if (size == 8) {

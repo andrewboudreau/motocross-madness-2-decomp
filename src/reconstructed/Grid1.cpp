@@ -70,7 +70,7 @@ int EvictBlockTexture(void* owner, int block)
 
 // 0x0047d160: records the texture detail the node (block -1) or one block
 // needs and keeps the largest size per texture in the use table.
-void DrawableGridNodeSharedTextures::UnknownVirtualSlot4(int block)
+void DrawableGridNodeSharedTextures::RequestTextureSize(int block)
 {
     ManagedTexture* texture;
     if (block == -1)
