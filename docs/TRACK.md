@@ -169,7 +169,7 @@ Provisional names taken from the behaviour each function's comment records:
 `0x00516870`, `NodeHasSegment` `0x00517310`, `IsAtOrAfter` `0x005179a0`,
 `ClosestPointOnTrack` `0x00516980` and `ClosestPointOnNode` `0x00516ca0`;
 the near misses `IsInsideStrip` `0x00516ef0` and `PlaceNear` `0x00517340` (physics' own views keep the address names). The high-score
-lister `0x0051ffe0` keeps its placeholder because TrackRecord.cpp calls it.
+lister `0x0051ffe0` is `TrackRecordDlg::ListHighScoreTracks`, exact in TrackRecord.cpp.
 The path and distance helpers `0x00517930`, `0x005179f0`, `0x00517da0`,
 `0x00517ea0`, `0x00518080`, `0x00518130` and `0x00518230` keep their address
 names because physics declarations (`src/krusty2/vehicle/KrustyBikeTypes.h`)

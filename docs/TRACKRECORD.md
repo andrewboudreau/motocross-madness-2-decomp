@@ -76,15 +76,13 @@ relocation bound:
 | `0x0051fc40` | 567 | tab captions for the series |
 | `0x0051fe80` | 188 | selects the series tab |
 | `0x0051ff40` | 149 | frees the track rows |
+| `0x0051ffe0` | 932 | lists the tracks that have a high-score file |
 | `0x00520390` | 240 | shows a series |
 | `0x00520480` | 93 | adds a score row |
 | `0x005204e0` | 437 | shows one track's scores |
 
-`0x0051ffe0` (932 bytes, lists the tracks that have a high-score file) is a
-near miss in `samples/track/TrackNearMisses.cpp`. The candidate is 964
-bytes. Retail cross-jumps its two copies of the digit-suffix branch, and
-VC6 here allocates a different register in the second copy, which blocks
-the merge.
+`0x0051ffe0` (932 bytes, lists the tracks that have a high-score file) is
+strict-exact in TrackRecord.cpp.
 
 ## Source shapes that mattered
 
@@ -103,8 +101,15 @@ the merge.
 - `if (!times) f(0x938, ...); else f(0xbc5, ...);` matches `0x005204e0`;
   the hoisted push of the common arguments is VC6's doing. A ternary
   argument gives `neg/sbb/and`.
-- `0x0051ffe0`: the frame is 0x350 only with a 260-byte buffer. Declaration
-  order does not change VC6's slot order.
+- `0x0051ffe0`:
+  - The frame is 0x350 only with a 260-byte buffer. Declaration order does
+    not change VC6's slot order.
+  - `digit = 0` is set in the first name's unprefixed branch, not at the
+    declaration. That keeps n in edi in both digit-suffix copies, so VC6
+    cross-jumps them as retail does.
+  - The scan result is a `more` local that `while (more)` reads again. That
+    later use makes VC6 compare it with the ebx zero (`cmp eax, ebx`).
+    `if (CurrentName(found))` with a `for (;;)` loop gives `test eax, eax`.
 
 ## Reproduce
 

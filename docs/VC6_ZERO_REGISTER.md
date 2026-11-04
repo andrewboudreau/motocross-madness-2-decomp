@@ -28,6 +28,15 @@ function's bytes. Measured with small probe units under `vc6_o2_mt`.
   prologue, argument offsets and block layout as retail; now exact). With the clears
   written once after the `if`/`else` chain it compiles without the
   register.
+- **A call result is compared with the zero register only if it is a
+  named local that is read again.** Within the zero register's range,
+  `int r = Cur(); if (r) { ... g(r); }` or a later loop test of `r` gives
+  `cmp eax, ebx`. These forms all give `test eax, eax`: `if (Cur())`,
+  `!= 0`, a local tested once, and a local that a later call only
+  overwrites. Probe units confirmed it, and
+  TrackRecordDlg::ListHighScoreTracks `0x0051ffe0` became exact with it.
+  The `more` scan flag there is tested once and then read by
+  `while (more)`.
 
 ## Measured thresholds (session 14 probe study)
 

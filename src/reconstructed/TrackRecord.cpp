@@ -381,6 +381,88 @@ void TrackRecordDlg::FreeRows()
     rowCount = 0;
 }
 
+// 0x0051ffe0: lists the tracks that have a high-score file. For series 1 and
+// 5 the last character of the name is a digit that selects the variant. The
+// scan result lives in `more`, which the loop condition reads again; that
+// later use is what makes VC6 test it against the ebx zero (`cmp eax, ebx`)
+// as retail does, where `if (CurrentName(...))` gives `test eax, eax`.
+void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directory, int series)
+{
+    char found[128];
+    char track[128];
+    char display[64];
+    char path[256];
+    char pattern[260];
+    int digit;
+    int count = 0;
+    int prefixed;
+    int nameLength;
+    if (series == 5 || series == 1)
+        prefixed = 1;
+    else
+        prefixed = 0;
+    FreeRows();
+    directory->SetDirectory((const char*)g_TrackGame->mode.currentSeriesDirectory);
+    sprintf(pattern, "*%s", g_TrackGame->highScores->extensions[g_TrackGame->highScores->extensionIndex]);
+    directory->SetPattern(pattern, 1);
+    directory->Scan();
+    int more = directory->CurrentName(found);
+    if (more) {
+        if (prefixed) {
+            nameLength = strlen(found) - 1;
+            strncpy(track, found, nameLength);
+            digit = found[nameLength] - '0';
+        } else {
+            digit = 0;
+            int length = strlen(found);
+            nameLength = length > 127 ? 127 : length;
+            strncpy(track, found, nameLength);
+        }
+        track[nameLength] = 0;
+    }
+    while (more) {
+        int directoryIndex = g_TrackGame->mode.GetSelectedSeries();
+        sprintf(path, "%s\\%s%s", (const char*)g_TrackGame->mode.currentSeriesDirectory, found,
+                g_TrackGame->highScores->extensions[g_TrackGame->highScores->extensionIndex]);
+        FILE* file = fopen(path, "r");
+        if (file) {
+            fread(&directoryIndex, 4, 1, file);
+            fclose(file);
+        }
+        g_TrackGame->mode.FindFileDirectory((int)g_TrackGame->mode.seriesDirectories[directoryIndex],
+                                            track, "env", pattern);
+        g_TrackGame->sceneObject->SetSceneDirectory(pattern);
+        g_TrackGame->sceneObject->ReadSceneName(display, track, digit, "scn", 0, 0);
+        static_cast<UIListBox*>(list)->AddRow(display, rowCount, 0);
+        count++;
+        rows = (UnknownTrackRecordRow**)DebugRealloc(rows, (rowCount + 1) * 4, __FILE__, 534);
+        rows[rowCount] = new(__FILE__, 535) UnknownTrackRecordRow;
+        rows[rowCount]->fileName = strdup(found);
+        rows[rowCount]->field_0x04 = 0;
+        rowCount++;
+        more = directory->NextName(found);
+        if (more) {
+            if (prefixed) {
+                nameLength = strlen(found) - 1;
+                strncpy(track, found, nameLength);
+                digit = found[nameLength] - '0';
+                track[nameLength] = 0;
+            } else {
+                digit = 0;
+                strcpy(track, found);
+            }
+        }
+    }
+    static_cast<UIListBox*>(list)->Sort(1);
+    if (count == 0) {
+        g_TrackGame->LoadResourceString(0x142e, path, 128);
+        static_cast<UIListBox*>(list)->AddRow(path, 0, 0);
+        static_cast<UIListBox*>(list)->SetSelectable(0);
+    } else {
+        static_cast<UIListBox*>(list)->SetSelectable(1);
+    }
+}
+
 // 0x00520390: selects the series, then fills the track list; `event` is
 // unused.
 void TrackRecordDlg::FillLists(UnknownDialogEvent* event, int series)

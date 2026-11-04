@@ -23542,6 +23542,14 @@ CASES = [
         'target_size': 149,
     },
     {
+        'name': 'TrackRecord.cpp 0x51ffe0 lists tracks with a high-score file',
+        'bindings': 'src/reconstructed/TrackRecord.bindings.json',
+        'source': 'src/reconstructed/TrackRecord.cpp',
+        'symbol': '?ListHighScoreTracks@TrackRecordDlg@@QAEXPAVUIControl@@PAVDirectoryList@@H@Z',
+        'target_va': '0x0051ffe0',
+        'target_size': 932,
+    },
+    {
         'name': 'TrackRecord.cpp 0x520390 shows a series',
         'bindings': 'src/reconstructed/TrackRecord.bindings.json',
         'source': 'src/reconstructed/TrackRecord.cpp',

@@ -42,23 +42,6 @@
 // around the path loop, where ebp holds start.t. Dropping the dead
 // `list = 0` removes its store (1525 bytes) but retail has it.
 //
-// TrackRecordDlg::ListHighScoreTracks (TrackRecord.cpp, 0x0051ffe0, 932
-// bytes): same size and layout as retail; 926 of 932 bytes match. Setting
-// `digit = 0` in the first file's unprefixed branch (as the loop's later
-// copy does), instead of initialising it at the declaration, keeps n in
-// edi in both digit-suffix copies, so VC6 cross-jumps them as retail does
-// (186 -> 926; before this the later copy kept n in esi and reloaded
-// `directory`). The one remaining difference: retail compares the
-// CurrentName result with the zero in ebx (`cmp eax, ebx`) where VC6 here
-// emits `test eax, eax`; `!= 0`, `!= count` and an `ok` local leave it, and
-// so do `> 0`, `!= prefixed - prefixed` and `digit = 0` before the test
-// (moving it to the head of the found branch costs 286 bytes). Both builds
-// already compare `prefixed` with ebx in the next block and keep digit in
-// ebx, so the ebx zero web is the same; only the call-result test misses it.
-// Session 14: an early `if (!CurrentName(found)) goto done;` failure test
-// (the ConnectUsingLobby lever) leaves 926; `prefixed = 0;` before an
-// `if (series == 5 || series == 1) prefixed = 1;` costs a hunk (267
-// aligned), with or without `!= count` on the test.
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -66,7 +49,6 @@
 #include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/Track.h"
 #include "../../src/reconstructed/TrackGame.h"
-#include "../../src/reconstructed/TrackRecordDlg.h"
 #include "../../src/krusty2/math/FastMath.h"
 
 // One edge of the crossing-number test in 0x00516ef0: whether the edge a-b
@@ -97,83 +79,6 @@ int Track::IsInsideStrip(TrackVec3 p, TrackSegment* segment, TrackSegment* next)
     if (UnknownEdgeCrosses(p, (TrackVec3*)&next->edgeBX, (TrackVec3*)&next->pointX))
         inside = 1 - inside;
     return inside;
-}
-
-// 0x0051ffe0: lists the tracks with a high-score file. For series 1 and 5
-// the name's last character is a digit that selects the variant.
-void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directory, int series)
-{
-    char found[128];
-    char track[128];
-    char display[64];
-    char path[256];
-    char pattern[260];
-    int digit;
-    int count = 0;
-    int prefixed;
-    int nameLength;
-    if (series == 5 || series == 1)
-        prefixed = 1;
-    else
-        prefixed = 0;
-    FreeRows();
-    directory->SetDirectory((const char*)g_TrackGame->mode.currentSeriesDirectory);
-    sprintf(pattern, "*%s", g_TrackGame->highScores->extensions[g_TrackGame->highScores->extensionIndex]);
-    directory->SetPattern(pattern, 1);
-    directory->Scan();
-    if (directory->CurrentName(found)) {
-        if (prefixed) {
-            nameLength = strlen(found) - 1;
-            strncpy(track, found, nameLength);
-            digit = found[nameLength] - '0';
-        } else {
-            digit = 0;
-            int length = strlen(found);
-            nameLength = length > 127 ? 127 : length;
-            strncpy(track, found, nameLength);
-        }
-        track[nameLength] = 0;
-        for (;;) {
-            int directoryIndex = g_TrackGame->mode.GetSelectedSeries();
-            sprintf(path, "%s\\%s%s", (const char*)g_TrackGame->mode.currentSeriesDirectory, found,
-                    g_TrackGame->highScores->extensions[g_TrackGame->highScores->extensionIndex]);
-            FILE* file = fopen(path, "r");
-            if (file) {
-                fread(&directoryIndex, 4, 1, file);
-                fclose(file);
-            }
-            g_TrackGame->mode.FindFileDirectory((int)g_TrackGame->mode.seriesDirectories[directoryIndex],
-                                                              track, "env", pattern);
-            g_TrackGame->sceneObject->SetSceneDirectory(pattern);
-            g_TrackGame->sceneObject->ReadSceneName(display, track, digit, "scn", 0, 0);
-            static_cast<UIListBox*>(list)->AddRow(display, rowCount, 0);
-            count++;
-            rows = (UnknownTrackRecordRow**)DebugRealloc(rows, (rowCount + 1) * 4, __FILE__, 534);
-            rows[rowCount] = new(__FILE__, 535) UnknownTrackRecordRow;
-            rows[rowCount]->fileName = strdup(found);
-            rows[rowCount]->field_0x04 = 0;
-            rowCount++;
-            if (!directory->NextName(found))
-                break;
-            if (prefixed) {
-                nameLength = strlen(found) - 1;
-                strncpy(track, found, nameLength);
-                digit = found[nameLength] - '0';
-                track[nameLength] = 0;
-            } else {
-                digit = 0;
-                strcpy(track, found);
-            }
-        }
-    }
-    static_cast<UIListBox*>(list)->Sort(1);
-    if (count == 0) {
-        g_TrackGame->LoadResourceString(0x142e, path, 128);
-        static_cast<UIListBox*>(list)->AddRow(path, 0, 0);
-        static_cast<UIListBox*>(list)->SetSelectable(0);
-    } else {
-        static_cast<UIListBox*>(list)->SetSelectable(1);
-    }
 }
 
 // 0x00517340
