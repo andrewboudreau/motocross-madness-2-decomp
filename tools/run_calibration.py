@@ -2290,6 +2290,15 @@ CASES = [
         'reason': 'member re-read after each call',
     },
     {
+        'name': 'PCControl PCControlInterface slot 3 device button',
+        'bindings': 'src/reconstructed/PCControl.bindings.json',
+        'source': 'src/reconstructed/PCControl.cpp',
+        'symbol': '?IsDeviceButtonDown@PCControlInterface@@UAEHHHHH@Z',
+        'target_va': '0x004bf4f0',
+        'target_size': 104,
+        'reason': 'vtable 0x555e2c slot 3; per-case return 0, jump table inside the extent',
+    },
+    {
         'name': 'PCControl PCControlInterface slot 2 control state',
         'bindings': 'src/reconstructed/PCControl.bindings.json',
         'source': 'src/reconstructed/PCControl.cpp',
@@ -9407,6 +9416,15 @@ CASES = [
         'target_va': '0x0050ad30',
         'target_size': 173,
         'reason': 'Overlay 0x4b5f0a caller; per-font 0x467760, EArray delete, ~Rectangle2D',
+    },
+    {
+        'name': 'TextService.cpp UnknownOverlayText select font 0x50ade0',
+        'bindings': 'src/reconstructed/TextService.bindings.json',
+        'source': 'src/reconstructed/TextService.cpp',
+        'symbol': '?SelectFont@UnknownOverlayText@@QAEXPBD@Z',
+        'target_va': '0x0050ade0',
+        'target_size': 125,
+        'reason': 'strcmp loop over the EArray fonts; named EArray offset',
     },
     {
         'name': 'TextService.cpp UnknownOverlayText set font 0x50ae60',
