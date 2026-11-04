@@ -23,7 +23,7 @@
   "?UnknownVirtualSlot41@VehicleCamera@@UAE?AUVector3@@XZ": "0x0052c030",
   "?UnknownVirtualSlot42@VehicleCamera@@UAEX_N@Z": "0x0052cc00",
   "?UnknownVirtualSlot50@VehicleCamera@@UAE?AUVector3@@XZ": "0x0052cb80",
-  "?UnknownVirtualSlot51@VehicleCamera@@UAEMXZ": "0x0052cec0",
+  "?GetRoll@VehicleCamera@@UAEMXZ": "0x0052cec0",
   "?UnknownVirtualSlot57@VehicleCamera@@UAE?AUVector3@@M@Z": "0x0052ca10",
   "?UnknownVirtualSlot67@VehicleCamera@@UAEXXZ": "0x0052bfa0",
   "?UnknownVirtualSlot72@FollowCamera@@UAEXXZ": "0x00466fb0",

@@ -122,7 +122,7 @@ void BikeCamera::UnknownVirtualSlot54() {
 }
 
 // 0x00417340
-float BikeCamera::UnknownVirtualSlot51() {
+float BikeCamera::GetRoll() {
     return bike->savedCosRoll * bike->savedRoll;
 }
 

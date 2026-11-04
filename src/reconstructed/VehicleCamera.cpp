@@ -474,7 +474,7 @@ bool VehicleCamera::TrySettleOnPoint(const Vector3& point, bool enable, bool for
 }
 
 // 0x0052cec0
-float VehicleCamera::UnknownVirtualSlot51() {
+float VehicleCamera::GetRoll() {
     return vehicle->savedRoll;
 }
 

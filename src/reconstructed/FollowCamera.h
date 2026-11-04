@@ -162,7 +162,7 @@ public:
     // 0x00464b30: the camera position for this frame.
     virtual Vector3 ComputeCameraPosition(bool orbit, const Vector3& base, float dt);
     virtual Vector3 UnknownVirtualSlot50() = 0;
-    virtual float UnknownVirtualSlot51() = 0;
+    virtual float GetRoll() = 0;
     virtual void ClampPositionAboveGround(Vector3* point);
     virtual void UnknownVirtualSlot53();
     virtual void UnknownVirtualSlot54();

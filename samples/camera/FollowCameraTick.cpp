@@ -146,7 +146,7 @@ int FollowCamera::Tick(float dt) {
     if (current) {
         float roll;
         if (cameraState == 3 && following) {
-            roll = UnknownVirtualSlot51();
+            roll = GetRoll();
             UnknownVirtualSlot53();
         } else {
             roll = 0.0f;
