@@ -140,7 +140,8 @@ class SoultreePhysicsMethodTests(unittest.TestCase):
             path = ROOT / 'samples/physics/soultree_base/targets.json'
             checked = set()
             renamed_slots = {'UpdateSlideEffect': 19, 'IsAtBaseWeight': 10, 'ShouldUpdateShadowLight': 22,
-                             'ShouldEmitMovingEffects': 23, 'ShouldRestartSteamEffect': 24}
+                             'ShouldEmitMovingEffects': 23, 'ShouldRestartSteamEffect': 24,
+                             'EffectiveLoadWeight': 32, 'LoadBodyAxes': 34, 'StoreBodyAxes': 35}
             for target in json.loads(path.read_text()):
                 symbol = target['candidate_symbol_contains']
                 slot = (int(re.search(r'Slot(\d+)@', symbol)[1])

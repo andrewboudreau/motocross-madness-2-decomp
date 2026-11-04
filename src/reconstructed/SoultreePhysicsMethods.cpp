@@ -44,20 +44,20 @@ int SoultreePhysicsBaseObject::ShouldRestartSteamEffect()
     return 0;
 }
 
-float SoultreePhysicsBaseObject::UnknownVirtualSlot32()
+float SoultreePhysicsBaseObject::EffectiveLoadWeight()
 {
     if (IsAtBaseWeight())
         return 0.0f;
     return loadWeight;
 }
 
-void SoultreePhysicsBaseObject::UnknownVirtualSlot34()
+void SoultreePhysicsBaseObject::LoadBodyAxes()
 {
     sceneNode->GetAxesIn(0, &bodyForward, &bodyUp);
 }
 
 // slot 35 (0x004aa1e0)
-void SoultreePhysicsBaseObject::UnknownVirtualSlot35(int orthogonalize, int keepZ)
+void SoultreePhysicsBaseObject::StoreBodyAxes(int orthogonalize, int keepZ)
 {
     sceneNode->SetAxesIn(0, &bodyForward, &bodyUp, orthogonalize, keepZ);
 }

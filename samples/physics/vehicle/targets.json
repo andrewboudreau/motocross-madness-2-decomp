@@ -2,7 +2,7 @@
  {
   "class": "Vehicle",
   "source": "../../../src/reconstructed/VehicleMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot34@Vehicle",
+  "candidate_symbol_contains": "LoadBodyAxes@Vehicle",
   "target_va": "0x0040c4c0",
   "target_size": 118,
   "expect": "exact",
@@ -12,7 +12,7 @@
  {
   "class": "Vehicle",
   "source": "../../../src/reconstructed/VehicleMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot35@Vehicle",
+  "candidate_symbol_contains": "StoreBodyAxes@Vehicle",
   "target_va": "0x0040c540",
   "target_size": 130,
   "expect": "exact",

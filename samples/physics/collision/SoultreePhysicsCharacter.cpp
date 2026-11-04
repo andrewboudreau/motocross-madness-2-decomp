@@ -65,7 +65,7 @@ void SoultreePhysicsCharacter::UnknownVirtualSlot41()
     modelNode->SetAxesIn(0, &savedForward, &savedUp, 1, 0);
     ApplyRestPose();
     motionActive = 0;
-    UnknownVirtualSlot34();
+    LoadBodyAxes();
     OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll, &bodySinRoll,
               &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
     savedForward = bodyForward;

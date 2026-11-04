@@ -48,8 +48,8 @@ public:
     virtual int  UnknownVirtualSlot28(int steps);
     virtual int  UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                       const Vec3* settleUp, int keepPlacement, float extraWeight);   // 0x00527430
-    virtual void UnknownVirtualSlot34();
-    virtual void UnknownVirtualSlot35(int orthogonalize, int keepZ);
+    virtual void LoadBodyAxes();
+    virtual void StoreBodyAxes(int orthogonalize, int keepZ);
     virtual void UnknownVirtualSlot36();
     virtual void UnknownVirtualSlot38(int notify, int eventKind, void* event);
     virtual int  UnknownVirtualSlot39(float dt);

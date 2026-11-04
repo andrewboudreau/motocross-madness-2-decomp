@@ -19,7 +19,7 @@ static inline float BikeMin(float a, float b) { return a < b ? a : b; }
 static inline float BikeMaxF(float a, float b) { return a > b ? a : b; }
 static inline float BikeAbs(float x);   // defined below (slot 99 region)
 
-float Bike::UnknownVirtualSlot32()
+float Bike::EffectiveLoadWeight()
 {
     return loadWeight;
 }
@@ -631,8 +631,8 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
         field_0x5c8 = *info;
     bodyForward = kVec3ZAxis;
     bodyUp = kVec3YAxis;
-    UnknownVirtualSlot35(1, 1);
-    UnknownVirtualSlot34();
+    StoreBodyAxes(1, 1);
+    LoadBodyAxes();
     savedForward = bodyForward;
     savedUp = bodyUp;
     poseNode = modelNode->FindByName("Bike");
@@ -822,8 +822,8 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
 
     bodyForward = forward;
     bodyUp = up;
-    UnknownVirtualSlot35(1, 1);
-    UnknownVirtualSlot34();
+    StoreBodyAxes(1, 1);
+    LoadBodyAxes();
     savedForward = bodyForward;
     savedUp = bodyUp;
     OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
@@ -1099,7 +1099,7 @@ void Bike::UnknownVirtualSlot41()
     modelNode->SetAxesIn(0, &savedForward, &savedUp, 1, 0);
     D3DIMSoultreeCharacter::ApplyRestPose();
     motionActive = 0;
-    UnknownVirtualSlot34();
+    LoadBodyAxes();
     OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
                         &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
     savedForward = bodyForward;

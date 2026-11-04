@@ -18,8 +18,8 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot36()
     }
     bodyUp = g_SoultreeVec3_685190;
     bodyForward.y = 0.0f;
-    UnknownVirtualSlot35(1, 0);
-    UnknownVirtualSlot34();
+    StoreBodyAxes(1, 0);
+    LoadBodyAxes();
     bodyRoll = 0.0f;
     bodyPitch = 0.0f;
     bodySinRoll = 0.0f;

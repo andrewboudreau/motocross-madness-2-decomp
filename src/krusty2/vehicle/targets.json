@@ -372,7 +372,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot32@Bike",
+    "candidate_symbol_contains": "EffectiveLoadWeight@Bike",
     "target_va": "0x0040cba0",
     "target_size": 7,
     "expect": "exact",

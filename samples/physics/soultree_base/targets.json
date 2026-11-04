@@ -92,7 +92,7 @@
  {
   "class": "SoultreePhysicsBaseObject",
   "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot32@SoultreePhysicsBaseObject",
+  "candidate_symbol_contains": "EffectiveLoadWeight@SoultreePhysicsBaseObject",
   "target_va": "0x004aa1a0",
   "target_size": 28,
   "expect": "exact",
@@ -102,7 +102,7 @@
  {
   "class": "SoultreePhysicsBaseObject",
   "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot34@SoultreePhysicsBaseObject",
+  "candidate_symbol_contains": "LoadBodyAxes@SoultreePhysicsBaseObject",
   "target_va": "0x004aa1c0",
   "target_size": 25,
   "expect": "exact",
@@ -112,7 +112,7 @@
  {
   "class": "SoultreePhysicsBaseObject",
   "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot35@SoultreePhysicsBaseObject",
+  "candidate_symbol_contains": "StoreBodyAxes@SoultreePhysicsBaseObject",
   "target_va": "0x004aa1e0",
   "target_size": 37,
   "expect": "exact",

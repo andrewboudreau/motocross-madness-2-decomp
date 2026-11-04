@@ -11,14 +11,14 @@
 // bodyForward.z / .y before bodyUp.x in the y and z terms; any extra live symbol in the
 // function (this local, a node or axis pointer local, or slot 35's two parameters) gives
 // retail's bodyUp.x-first order. An unused int local does not.
-void Vehicle::UnknownVirtualSlot34()
+void Vehicle::LoadBodyAxes()
 {
     modelNode->GetAxesIn(0, &bodyForward, &bodyUp);
     Vec3 side = ((VehV3&)bodyForward).CrossB(bodyUp);
     sideAxis = side;
 }
 
-void Vehicle::UnknownVirtualSlot35(int orthogonalize, int keepZ)
+void Vehicle::StoreBodyAxes(int orthogonalize, int keepZ)
 {
     modelNode->SetAxesIn(0, &bodyForward, &bodyUp, orthogonalize, keepZ);
     sideAxis = ((VehV3&)bodyForward).CrossB(bodyUp);

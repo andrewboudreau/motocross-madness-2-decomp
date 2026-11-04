@@ -506,7 +506,7 @@ void Vehicle::UnknownVirtualSlot58(Vec3* settleUp, int keepPlacement)
             dir = *GetAverageGroundNormal(&axis);
         }
         modelNode->SetAxesIn(0, &bodyForward, &dir, 1, 0);
-        UnknownVirtualSlot34();
+        LoadBodyAxes();
         modelNode->GetPositionIn(0, &position);
         if (keepPlacement == 0) {
             float height = top->field_0x228 - top->wheelPosition.y + top->groundPoint.y;
@@ -523,7 +523,7 @@ void Vehicle::UnknownVirtualSlot58(Vec3* settleUp, int keepPlacement)
                 if (VehAbsT(localAxis.z) > 0.001f || VehAbsT(localAxis.y) > 0.001f
                     || VehAbsT(localAxis.x) > 0.001f) {
                     modelNode->RotateAboutPoint(rotationPivot, localAxis, lean);
-                    UnknownVirtualSlot34();
+                    LoadBodyAxes();
                     modelNode->GetPositionIn(0, &position);
                 }
             }
@@ -1001,7 +1001,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             Vec3 placedPosition, placedForward, placedUp;
             int keepPlacement = 0;
             UnknownVirtualSlot11(respawn, &placedPosition, &placedForward, &placedUp, &keepPlacement);
-            UnknownVirtualSlot33(&placedPosition, &placedForward, &bodyUp, &placedUp, keepPlacement, UnknownVirtualSlot32());
+            UnknownVirtualSlot33(&placedPosition, &placedForward, &bodyUp, &placedUp, keepPlacement, EffectiveLoadWeight());
             steps = 0;
             stepRemainder = 0.0f;
             break;
@@ -1155,7 +1155,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             invStepTime = 1.0f / stepTime;
             stepRemainder = 0.0f;
         }
-        UnknownVirtualSlot34();
+        LoadBodyAxes();
         VehBasisToBlock(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
                         &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
         prevVelocity = velocity;

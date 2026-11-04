@@ -18,8 +18,8 @@ void Vehicle::UnknownVirtualSlot36()
     }
     bodyUp = kVec3YAxis;
     bodyForward.y = 0.0f;
-    UnknownVirtualSlot35(1, 0);
-    UnknownVirtualSlot34();
+    StoreBodyAxes(1, 0);
+    LoadBodyAxes();
     bodyCosRoll = 1.0f;
     bodyCosPitch = 1.0f;
     bodyRoll = 0.0f;

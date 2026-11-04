@@ -140,15 +140,15 @@ public:
     virtual void UnknownVirtualSlot29(int lastStep);
     virtual void UnknownVirtualSlot30();
     virtual void UnknownVirtualSlot31();
-    virtual float UnknownVirtualSlot32();
+    virtual float EffectiveLoadWeight();
     virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward,
                                      const Vec3* newUp, const Vec3* settleUp, int keepPlacement,
                                      float extraWeight);  // settleUp and keepPlacement are unused here; Vehicle passes a Vec3 address (tier 2)
     // Slots 34/35 are declared void: 0x004aa1c0/0x004aa1e0 end in `call; ret` with no use
     // of eax, identical for either return type; the Vehicle overrides 0x0040c4c0 and
     // 0x0040c540 return nothing (tier 2).
-    virtual void UnknownVirtualSlot34();
-    virtual void UnknownVirtualSlot35(int orthogonalize, int keepZ);
+    virtual void LoadBodyAxes();
+    virtual void StoreBodyAxes(int orthogonalize, int keepZ);
     virtual void UnknownVirtualSlot36();
     virtual SoultreeAttachment* UnknownVirtualSlot37(int type, void* target, SoultreeAttachTarget* anchor,
                                                      const Vec3* v);

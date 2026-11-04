@@ -1783,7 +1783,7 @@ GameObject* KrustyBike::Load(int context, int a2, const char* modelPath, const S
         heapBufferB = 0;
     }
 
-    UnknownVirtualSlot34();
+    LoadBodyAxes();
     OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
                                  &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
     savedForward = bodyForward;

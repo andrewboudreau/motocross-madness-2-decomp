@@ -878,8 +878,8 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int renderContext, in
     bodyUp = startUp;
     sceneNode->SetPosition(startPosition.x, startPosition.y, startPosition.z);
     sceneNode->GetPosition(&position);
-    UnknownVirtualSlot35(1, 0);
-    UnknownVirtualSlot34();
+    StoreBodyAxes(1, 0);
+    LoadBodyAxes();
     OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll, &bodySinRoll,
               &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
     savedForward = bodyForward;
@@ -1286,7 +1286,7 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
             int keepPlacement;
             Vec3 placedPosition, placedForward, placedUp;
             UnknownVirtualSlot11(respawn, &placedPosition, &placedForward, &placedUp, &keepPlacement);
-            UnknownVirtualSlot33(&placedPosition, &placedForward, &bodyUp, &placedUp, keepPlacement, UnknownVirtualSlot32());
+            UnknownVirtualSlot33(&placedPosition, &placedForward, &bodyUp, &placedUp, keepPlacement, EffectiveLoadWeight());
             stepRemainder = 0.0f;
             break;
         }
@@ -1371,7 +1371,7 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
             stepTime = t;
             invStepTime = 1.0f / t;
         }
-        UnknownVirtualSlot34();
+        LoadBodyAxes();
         OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll, &bodySinRoll,
                                      &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
         prevVelocity = velocity;

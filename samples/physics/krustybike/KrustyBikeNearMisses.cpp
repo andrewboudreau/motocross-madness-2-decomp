@@ -666,7 +666,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
         savedPos = position;
         modelNode->SetPosition(position);
         modelNode->SetAxesPtr(&bodyForward, &bodyUp, 1, 1);
-        UnknownVirtualSlot34();
+        LoadBodyAxes();
         OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
                                      &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
         if (!crossoverPose && !motionActive) {
