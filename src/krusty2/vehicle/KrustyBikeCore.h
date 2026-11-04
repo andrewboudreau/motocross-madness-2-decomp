@@ -64,8 +64,8 @@ public:
     virtual float UnknownVirtualSlot45();
     virtual void AdvancePosition();
     virtual int UnknownVirtualSlot52();
-    virtual void UnknownVirtualSlot63(float dt);
-    virtual void UnknownVirtualSlot64(float dt);
+    virtual void ReadControlAxes(float dt);
+    virtual void UpdateControlInput(float dt);
     virtual int UnknownVirtualSlot66();
     virtual void ClearCrashState();
     virtual int UnknownVirtualSlot68(int* out);

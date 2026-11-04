@@ -136,10 +136,10 @@ int Vehicle::UnknownVirtualSlot77(int arg)
     return 0;
 }
 
-void Vehicle::UnknownVirtualSlot64(float dt)
+void Vehicle::UpdateControlInput(float dt)
 {
     if (crashState == 0) {
-        UnknownVirtualSlot63(dt);
+        ReadControlAxes(dt);
         return;
     }
     controlInput = kVec3Zero;
@@ -171,7 +171,7 @@ void Vehicle::UnknownVirtualSlot90(int* steps, float frame)
 
 // steerRate turns the steer angle to -(steerAxis * maxAngle) over the remaining steps (plus
 // stepRemainder); zero when the error is tiny or the vehicle is crashed.
-void Vehicle::UnknownVirtualSlot60(float steerAxis, float maxAngle, int steps)
+void Vehicle::ComputeSteerRate(float steerAxis, float maxAngle, int steps)
 {
     if (crashState == 0) {
         steerRate = -(steerAxis * maxAngle) - steerState->angle;
@@ -969,8 +969,8 @@ void Vehicle::UnknownVirtualSlot49(float frame)
     UnknownVirtualSlot9(frame, &steps);
     ClearContactEffectFlags();
     prevControlInput = controlInput;
-    UnknownVirtualSlot64(frame);
-    UnknownVirtualSlot60(controlInput.x, GetMaxSteerAngle(), steps);
+    UpdateControlInput(frame);
+    ComputeSteerRate(controlInput.x, GetMaxSteerAngle(), steps);
     UnknownVirtualSlot65(frame);
     pointsTouching = 0;
     respawn = ApplyPendingRespawn(frame);
@@ -1367,7 +1367,7 @@ int Vehicle::ApplyPendingRespawn(float dt)
 // Tier 3 reading: latches the throttle-like axis (+0x500) into throttleInput (dead zone 0.2,
 // -1 when there is no control), mirrors the two other axes into the steer/lean members and
 // writes the 0x504 vector (cubed lean for axis kinds 2 and 3).
-void Vehicle::UnknownVirtualSlot63(float dt)
+void Vehicle::ReadControlAxes(float dt)
 {
     if (inputDevice && throttleAxis) {
         float throttle = throttleAxis->axisValue;
@@ -1398,7 +1398,7 @@ void Vehicle::UnknownVirtualSlot63(float dt)
 // Tier 3 reading: classifies the (controlInput.y, steerInput) input pair into one of eight
 // directions: -1 inside the dead zone (magnitudeSq <= 0.25), else the sector of the pair
 // relative to the band +-0.52057 * |v| (0..7).
-int Vehicle::UnknownVirtualSlot88()
+int Vehicle::ClassifyInputDirection()
 {
     float magnitudeSq = steerInput * steerInput + controlInput.y * controlInput.y;
     if (magnitudeSq > 0.25f) {

@@ -67,7 +67,7 @@ class VehicleInputSubtypeTests(unittest.TestCase):
             self.assertEqual(strict, 233)
             caller = compiled[VEHICLE]
             self.assertFalse(any(s.name == OLD for s in caller.symbols))
-            call = caller.find_symbol('?UnknownVirtualSlot63@Vehicle@@')
+            call = caller.find_symbol('?ReadControlAxes@Vehicle@@')
             body, size, relocs = caller.symbol_extent(call)
             self.assertEqual(size, 209)
             self.assertEqual([(r.virtual_address-call.value, r.type) for r in relocs

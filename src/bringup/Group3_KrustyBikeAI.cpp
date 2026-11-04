@@ -1802,7 +1802,7 @@ int KrustyBike::Fn_00413200(float dt)
     invStepTime = 1.0f / dt;
     int steps = 1;
     UnknownVirtualSlot30();
-    UnknownVirtualSlot64(dt);
+    UpdateControlInput(dt);
     pointsTouching = 0;
     int hit = UnknownVirtualSlot39(dt);
     justLanded = 0;

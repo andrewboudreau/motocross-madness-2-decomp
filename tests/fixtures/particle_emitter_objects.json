@@ -3,12 +3,12 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "1bb73fbb474853127cd058d9d9b4c5c57b4ddd265dfe1968002ad521cb6dbc29"
+      "sha256": "c59c960d5c51f3f2410560664cbf0270c1389c4b1f45a17354dd4ebd2d8f6e89"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "671c1ff2eda13ad5bacabfdd25e3f0b17a9860e4561aa3d592257f271ec5a28e"
+      "sha256": "99e01f304e4f47d9939403dbbe01da09f17c37e71df6e62d8aea49c67fafa1cc"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -537,7 +537,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot88@Vehicle",
+      "symbol": "ClassifyInputDirection@Vehicle",
       "target_va": "0x005275a0",
       "target_size": 288,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -670,14 +670,14 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot63@Vehicle",
+      "symbol": "ReadControlAxes@Vehicle",
       "target_va": "0x00528d70",
       "target_size": 209,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot64@Vehicle",
+      "symbol": "UpdateControlInput@Vehicle",
       "target_va": "0x00528e50",
       "target_size": 81,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -831,7 +831,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot60@Vehicle",
+      "symbol": "ComputeSteerRate@Vehicle",
       "target_va": "0x0052a530",
       "target_size": 126,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"

@@ -19,10 +19,10 @@ RETIRED={'?Method_0x004a8bf0@BikeA5C4@@QAEXHM@Z','?Fn_004A8BF0@KbA5C4@@QAEXHM@Z'
 # Both blend-call views preserve the complete objects under the proven Character destination.
 SOURCES={
  # Emitter joins preserve every prior byte/target under the verified constructor and Spark setter names.
- 'src/krusty2/vehicle/Bike.cpp':(242,1089,3,'5a6df6809b7d6a850f9b700fe74b3685fd943427cd0b8430a0d706f60b09be2f'),
+ 'src/krusty2/vehicle/Bike.cpp':(242,1089,3,'889e915d0c0b9e07cd559c456fb537da69fc67bd2b2e956c9b9de14a75304e26'),
  # Verified collision/debug-overlay connections change only three external names.
- 'src/krusty2/vehicle/KrustyBike.cpp':(243,1054,2,'73fa0fc661eb03fef4a0c75b4b1a542c95717118939b3f6aec7b60706dc5bf0b'),
- 'samples/physics/krustybike/KrustyBikeNearMisses.cpp':(271,1443,8,'9c831123be4614e91c73f862a875d2e1132a88fd6ac53718ddf1e46b2f7abdcb'),
+ 'src/krusty2/vehicle/KrustyBike.cpp':(243,1054,2,'b61b62b456dc2ccef9abadc623392e3e952916281140dfda077c920e774ae1e1'),
+ 'samples/physics/krustybike/KrustyBikeNearMisses.cpp':(271,1443,8,'a7baf719e45142d36f55bef92feaf4f204430f420457ed8050513f8fcbd73298'),
 }
 
 def view(obj, normalize_paths=()):

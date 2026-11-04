@@ -235,7 +235,7 @@ int KrustyBike::UnknownVirtualSlot52()
     return 1;
 }
 
-void KrustyBike::UnknownVirtualSlot63(float dt)
+void KrustyBike::ReadControlAxes(float dt)
 {
     if (aiKind) {
         Fn_00414370(dt);
@@ -243,16 +243,16 @@ void KrustyBike::UnknownVirtualSlot63(float dt)
     }
     aiThrottleRequest = 0;
     aiBrakeRequest = 0;
-    Bike::UnknownVirtualSlot63(dt);
+    Bike::ReadControlAxes(dt);
 }
 
-void KrustyBike::UnknownVirtualSlot64(float dt)
+void KrustyBike::UpdateControlInput(float dt)
 {
     if (crashState) {
         aiThrottleRequest = 0;
         aiBrakeRequest = 0;
     }
-    Bike::UnknownVirtualSlot64(dt);
+    Bike::UpdateControlInput(dt);
 }
 
 int KrustyBike::UnknownVirtualSlot66()

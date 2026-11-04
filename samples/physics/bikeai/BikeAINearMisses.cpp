@@ -1658,7 +1658,7 @@ int KrustyBike::Fn_00413200(float dt)
     invStepTime = 1.0f / dt;
     int steps = 1;
     ClearContactEffectFlags();
-    UnknownVirtualSlot64(dt);
+    UpdateControlInput(dt);
     pointsTouching = 0;
     int hit = ApplyPendingRespawn(dt);
     justLanded = 0;

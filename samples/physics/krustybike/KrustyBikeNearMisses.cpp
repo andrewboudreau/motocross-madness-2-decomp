@@ -1164,7 +1164,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                     } else {
                         if (trickPoseHeld && motionIndex < 16 && animSetC[motionIndex]) {
                             trickPoseHeld = 0;
-                            int input = UnknownVirtualSlot88();
+                            int input = ClassifyInputDirection();
                             if (input != -1 && KbTrickChains(motionIndex, input))
                                 Fn_0048D990(motionIndex);
                         } else {

@@ -77,13 +77,13 @@ public:
     virtual float GetLeanAngle();
     virtual void UnknownVirtualSlot58(Vec3* settleUp, int keepPlacement);
     virtual float GetMaxSteerAngle();
-    virtual void UnknownVirtualSlot60(float steerAxis, float maxAngle, int steps);
+    virtual void ComputeSteerRate(float steerAxis, float maxAngle, int steps);
     virtual float UnknownVirtualSlot61(float threshold);
     virtual int UnknownVirtualSlot62(float slideAngle);
-    virtual void UnknownVirtualSlot63(float dt);
+    virtual void ReadControlAxes(float dt);
     // void: 0x00528e50 leaves eax as whatever the last store used (no return value is
     // materialised) and the only caller, slot 49, ignores eax; byte-exact as void (tier 2).
-    virtual void UnknownVirtualSlot64(float dt);
+    virtual void UpdateControlInput(float dt);
     virtual void UnknownVirtualSlot65(float dt);  // entry is the shared empty stub 0x00464e80
     virtual int UnknownVirtualSlot66() = 0;  // pure virtual: entry is _purecall (0x00534cfe)
     virtual void ClearCrashState();
@@ -111,7 +111,7 @@ public:
     virtual void UpdateWheelRolls();
     virtual void UpdateWheelDriveForces();
     virtual void UnknownVirtualSlot87();  // entry is the shared empty stub 0x00464e90
-    virtual int UnknownVirtualSlot88();
+    virtual int ClassifyInputDirection();
     virtual int UnknownVirtualSlot89(float frame);      // Bike 0x0040ae50 passes a float (tier 2)
     virtual void UnknownVirtualSlot90(int* steps, float frame);
     virtual void UnknownVirtualSlot91();  // entry is the shared empty stub 0x00464e90

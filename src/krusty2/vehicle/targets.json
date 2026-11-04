@@ -672,7 +672,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot88@Vehicle",
+    "candidate_symbol_contains": "ClassifyInputDirection@Vehicle",
     "target_va": "0x005275a0",
     "target_size": 288,
     "expect": "exact",
@@ -882,7 +882,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot63@Vehicle",
+    "candidate_symbol_contains": "ReadControlAxes@Vehicle",
     "target_va": "0x00528d70",
     "target_size": 209,
     "expect": "exact",
@@ -892,7 +892,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot64@Vehicle",
+    "candidate_symbol_contains": "UpdateControlInput@Vehicle",
     "target_va": "0x00528e50",
     "target_size": 81,
     "expect": "exact",
@@ -1112,7 +1112,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot60@Vehicle",
+    "candidate_symbol_contains": "ComputeSteerRate@Vehicle",
     "target_va": "0x0052a530",
     "target_size": 126,
     "expect": "exact",
@@ -1812,7 +1812,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot63@KrustyBike",
+    "candidate_symbol_contains": "ReadControlAxes@KrustyBike",
     "target_va": "0x004924c0",
     "target_size": 50,
     "expect": "exact",
@@ -1822,7 +1822,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot64@KrustyBike",
+    "candidate_symbol_contains": "UpdateControlInput@KrustyBike",
     "target_va": "0x00492500",
     "target_size": 37,
     "expect": "exact",
