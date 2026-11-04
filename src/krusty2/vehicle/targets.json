@@ -212,7 +212,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot56@Bike",
+    "candidate_symbol_contains": "UpdateLeanFromNormal@Bike",
     "target_va": "0x0040a3b0",
     "target_size": 71,
     "expect": "exact",
@@ -852,7 +852,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot56@Vehicle",
+    "candidate_symbol_contains": "UpdateLeanFromNormal@Vehicle",
     "target_va": "0x005286a0",
     "target_size": 784,
     "expect": "partial",

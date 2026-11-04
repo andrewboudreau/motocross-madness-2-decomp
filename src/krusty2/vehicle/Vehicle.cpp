@@ -425,7 +425,7 @@ static inline Vec3 VehCross56(const Vec3& u, const Vec3& v)
     r.z = v.y * u.x - v.x * u.y;
     return r;
 }
-void Vehicle::UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up)
+void Vehicle::UpdateLeanFromNormal(Vec3* forward, int updateLeanCos, Vec3* up)
 {
     if (wheelCount == 0) {
         leanAngle = savedRoll;
@@ -516,7 +516,7 @@ void Vehicle::SettleBodyToWheels(Vec3* settleUp, int keepPlacement)
         if (wheelCount == 2) {
             Vec3 localAxis;
             axis = *UnknownVirtualSlot55(&localAxis, &rotationPivot);
-            UnknownVirtualSlot56(&axis, 0, &dir);
+            UpdateLeanFromNormal(&axis, 0, &dir);
             localAxis = modelNode->WorldToLocalDirection(axis);
             float lean = leanAngle;
             if (VehAbsT(lean) > 0.001f) {
@@ -1027,7 +1027,7 @@ void Vehicle::SimulateFrame(float frame)
         force = weightForce;
         Vec3 savedOut;
         Vec3 basis = *UnknownVirtualSlot55(&savedOut, &pivot);
-        UnknownVirtualSlot56(&basis, 1, 0);
+        UpdateLeanFromNormal(&basis, 1, 0);
         res = VehContactsA(crashState || (steps == 1 && UnknownVirtualSlot5(0)), &touchingPointCount,
                            collisionPointCount, ((VehicleContact**)collisionPoints), terrain,
                            &centerOfMass, collisionShape, collisionRadius);

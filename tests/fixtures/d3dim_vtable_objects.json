@@ -25,17 +25,17 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "b437adb3ab31b0649ae83e80ef5950ae33b34e77704376e67bfbe0e3358425a4"
+      "sha256": "2cb24fbab31a062c996e4465e95a174d23b93c06c46cbef24aa626181c182fb4"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "951455fb291be83f9eb21a64e5081d7528fb4c71986fc9b52ad0d5484188560d"
+      "sha256": "b0ffe0a052cd39b8a1beeaa2e2dfe602cfc95b275c5499897229775b4caa61c1"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
       "relocations": 1054,
-      "sha256": "5890a0f2720e66896d7e7eb656cffdc38ed74221057c9294bd050ea9d3012d0b"
+      "sha256": "7bc8f5751d358f107b9d04fc32348d14fafb462e453435344cabd3f00a66659f"
     },
     "src/krusty2/collision/CollisionObject.cpp": {
       "sections": 135,
@@ -55,7 +55,7 @@
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "411cfc089f61ab452ed3134666cbb75cc208fcdefe25869ff3993f2b0fd976b7"
+      "sha256": "09863d0784ac7192feeffdd76b77f3b1f5055a9d1bd918d5a2f1f6ae1b1dcb96"
     },
     "samples/physics/collision/CollisionObjectNearMisses.cpp": {
       "sections": 136,

@@ -345,9 +345,9 @@ float Bike::GetLeanAngle()
     return lean;
 }
 
-void Bike::UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up)
+void Bike::UpdateLeanFromNormal(Vec3* forward, int updateLeanCos, Vec3* up)
 {
-    Vehicle::UnknownVirtualSlot56(forward, updateLeanCos, up);
+    Vehicle::UpdateLeanFromNormal(forward, updateLeanCos, up);
     if (updateLeanCos) {
         rearWheel->w_0x2a4 = leanCos;
         frontWheel->w_0x2a4 = leanCos;

@@ -93,7 +93,7 @@
     ],
     [
       "src/krusty2/vehicle/Vehicle.cpp",
-      "UnknownVirtualSlot56@Vehicle",
+      "UpdateLeanFromNormal@Vehicle",
       5408416,
       784,
       784,

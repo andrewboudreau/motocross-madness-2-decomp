@@ -41,7 +41,7 @@ public:
     virtual float UnknownVirtualSlot53();
     virtual Vec3* GetContactGroundNormal(Vec3* out);
     virtual Vec3* UnknownVirtualSlot55(Vec3* out, Vec3* pos);
-    virtual void UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up);
+    virtual void UpdateLeanFromNormal(Vec3* forward, int updateLeanCos, Vec3* up);
     virtual float GetLeanAngle();
     virtual float GetMaxSteerAngle();
     virtual float UnknownVirtualSlot61(float threshold);
