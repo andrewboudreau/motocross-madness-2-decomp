@@ -70,7 +70,7 @@
   "?RemapTexCoordsIfMoved@GridManagedTexture@@QAEHPAM0000HI@Z": "0x00510910",
   "?UnknownVirtualSlot1@GridNode@@UAEHPAX00HHH@Z": "0x00483d40",
   "?UnknownVirtualSlot2@DrawableGridNode@@UAEPAVGridNode@@PAVUnknownTextureStream@@HPAV1@HHHHHPAX2@Z": "0x004806e0",
-  "?UnknownVirtualSlot3@DrawableGridNode@@UAEXM@Z": "0x004806f0",
+  "?SelectTexture@DrawableGridNode@@UAEXM@Z": "0x004806f0",
   "?g_gridBaseCurve@@3PAGA": "0x006752a4",
   "?g_gridBaseCurveInverse@@3PAEA": "0x006652a4",
   "?g_gridBoxTests@@3HA": "0x0068a084",

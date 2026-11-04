@@ -40,7 +40,7 @@ int g_grid1OwnTextureCount;
 // node's own texture and 3 one texture per 4 x 4 block. A stage that is
 // unavailable falls back to the next coarser one; textures are built only
 // for the stage the detail asks for.
-void DrawableGridNodeSharedTextures::UnknownVirtualSlot3(float distance)
+void DrawableGridNodeSharedTextures::SelectTexture(float distance)
 {
     int block = 0;
     int keep = 0;

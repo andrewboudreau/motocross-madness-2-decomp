@@ -920,7 +920,7 @@ void DrawableGridNode::TestDroppableVertices()
 void DrawableGridNode::UpdateLevelOfDetail(UnknownTextureStream* stream, void* a1, int recurse, int coarse)
 {
     float detail = ComputeViewerDetail(coarse);
-    UnknownVirtualSlot3(detail);
+    SelectTexture(detail);
     if (maxError <= data->lowerErrorLimit && extra->texture) {
         if (data->b0)
             return;

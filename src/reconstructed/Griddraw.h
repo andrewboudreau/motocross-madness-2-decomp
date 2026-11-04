@@ -304,7 +304,7 @@ public:
     virtual GridNode* UnknownVirtualSlot2(UnknownTextureStream* stream, int a1, DrawableGridNode* parent,
                                           int level, int shift, int x, int z, int index,
                                           void* boundsMin, void* boundsMax) { return 0; }   // 0x004806e0
-    virtual void UnknownVirtualSlot3(float a) {}                // 0x004806f0 (shared)
+    virtual void SelectTexture(float a) {}                // 0x004806f0 (shared)
     virtual void RequestTextureSize(int a) {}                  // 0x004806f0 (shared)
     virtual void UnknownVirtualSlot5(UnknownTextureStream* stream) {} // 0x004806f0 (shared)
     virtual void BindNodeTexture() {}                       // 0x0044d710 (shared)
