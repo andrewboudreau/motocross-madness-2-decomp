@@ -3,12 +3,12 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "a3f6c5dc975124de817b5192748fff4fe41e77b2d06dcae25b362528818cb1d5"
+      "sha256": "ca8452081ebc97299b61c2662dd80de7e8344d4e3a190cf419959f8777c795ab"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "edeb96cee892c45ab1a455227e77f1380629204e2cb958cf58ecd93e42f94d42"
+      "sha256": "5d5243e3fbcea6edfc5196699f182cd7c56e873e793b197fbaa5240331c642f2"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -152,7 +152,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot59@Bike",
+      "symbol": "GetMaxSteerAngle@Bike",
       "target_va": "0x0040a330",
       "target_size": 125,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -166,7 +166,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot57@Bike",
+      "symbol": "GetLeanAngle@Bike",
       "target_va": "0x0040a400",
       "target_size": 117,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -656,7 +656,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot57@Vehicle",
+      "symbol": "GetLeanAngle@Vehicle",
       "target_va": "0x005289b0",
       "target_size": 7,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -824,7 +824,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot59@Vehicle",
+      "symbol": "GetMaxSteerAngle@Vehicle",
       "target_va": "0x0052a520",
       "target_size": 10,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -873,7 +873,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot50@Vehicle",
+      "symbol": "SetSpawnProtection@Vehicle",
       "target_va": "0x0052b600",
       "target_size": 23,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"

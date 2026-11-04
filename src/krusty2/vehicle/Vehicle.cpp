@@ -23,7 +23,7 @@ int Vehicle::UnknownVirtualSlot42()
     return crashState == 0 && motionIndex >= 0 && motionActive;
 }
 
-void Vehicle::UnknownVirtualSlot50(int protect, float duration, int forced)
+void Vehicle::SetSpawnProtection(int protect, float duration, int forced)
 {
     spawnProtected = protect;
     spawnProtectTimer = duration;
@@ -42,8 +42,8 @@ Vec3* Vehicle::UnknownVirtualSlot55(Vec3* out, Vec3* pos)
     return out;
 }
 
-float Vehicle::UnknownVirtualSlot57() { return leanAngle; }
-float Vehicle::UnknownVirtualSlot59() { return steerState->maxAngle; }
+float Vehicle::GetLeanAngle() { return leanAngle; }
+float Vehicle::GetMaxSteerAngle() { return steerState->maxAngle; }
 float Vehicle::UnknownVirtualSlot61(float threshold) { return 0.0f; }
 
 int Vehicle::UnknownVirtualSlot62(float slideAngle)
@@ -970,7 +970,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
     ClearContactEffectFlags();
     prevControlInput = controlInput;
     UnknownVirtualSlot64(frame);
-    UnknownVirtualSlot60(controlInput.x, UnknownVirtualSlot59(), steps);
+    UnknownVirtualSlot60(controlInput.x, GetMaxSteerAngle(), steps);
     UnknownVirtualSlot65(frame);
     pointsTouching = 0;
     respawn = ApplyPendingRespawn(frame);
@@ -1018,7 +1018,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         if (spawnProtectTimer > 0.0f) {
             spawnProtectTimer -= stepTime;
             if (spawnProtectTimer <= 0.0f)
-                UnknownVirtualSlot50(0, 0, 0);
+                SetSpawnProtection(0, 0, 0);
         }
         int wheels = wheelsInContact;
         allWheelsInContact = wheels == wheelCount;
@@ -1643,7 +1643,7 @@ int Vehicle::ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, c
     int flag = 1;
     if (UnknownVirtualSlot45() == 0.0f)
         flag = 0;
-    UnknownVirtualSlot50(flag, UnknownVirtualSlot45(), 0);
+    SetSpawnProtection(flag, UnknownVirtualSlot45(), 0);
     return 0;
 }
 

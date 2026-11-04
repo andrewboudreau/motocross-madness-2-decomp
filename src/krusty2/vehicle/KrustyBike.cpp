@@ -723,7 +723,7 @@ void KrustyBike::SaveBodyOrientation(int lastStep)
 // Slot 50: switch spawn protection (and the ghost modifier) on or off.  The base slot only
 // runs for the forced case; otherwise the state is latched here with duration stored as
 // spawnProtectTimer.
-void KrustyBike::UnknownVirtualSlot50(int protect, float duration, int forced)
+void KrustyBike::SetSpawnProtection(int protect, float duration, int forced)
 {
     if (race->networkStartPending)
         return;
@@ -745,7 +745,7 @@ void KrustyBike::UnknownVirtualSlot50(int protect, float duration, int forced)
             if (spawnProtected)
                 spawnProtectEndPending = 1;
         }
-        Vehicle::UnknownVirtualSlot50(protect, 0, 0);
+        Vehicle::SetSpawnProtection(protect, 0, 0);
         return;
     }
     if (spawnProtectForced)
@@ -2024,7 +2024,7 @@ GameObject* KrustyBike::Load(int context, int a2, const char* modelPath, const S
         reinterpret_cast<D3DIMSoultreeObject*>(riderCharacter->c_0x1a0)->SetLod(1);
     }
     if (isGhost) {
-        UnknownVirtualSlot50(1, 0.0f, 1);
+        SetSpawnProtection(1, 0.0f, 1);
         collisionObject->Disable();
     }
     if (withRider) {

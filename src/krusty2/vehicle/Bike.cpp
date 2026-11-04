@@ -333,7 +333,7 @@ static inline float BikeAbs(float x)
     return x;
 }
 
-float Bike::UnknownVirtualSlot57()
+float Bike::GetLeanAngle()
 {
     if (crashState == 0 && prevSpeed < leanSpeedThreshold)
         return savedRoll;
@@ -354,7 +354,7 @@ void Bike::UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up)
     }
 }
 
-float Bike::UnknownVirtualSlot59()
+float Bike::GetMaxSteerAngle()
 {
     if (poseState == 10)
         return steerState->maxAngle;
@@ -1809,7 +1809,7 @@ void Bike::UnknownVirtualSlot92(const Vec3* worldDir, const Vec3* point)
         else
             targetLeanAngle = maxLeanAngle;
     }
-    float err = UnknownVirtualSlot57() - targetLeanAngle;
+    float err = GetLeanAngle() - targetLeanAngle;
     leanError = err;
     if (_finite(leanError) && BikeAbs(leanError) >= 0.0001f) {
         int errSign = (leanError < 0.0f) ? -1 : 1;

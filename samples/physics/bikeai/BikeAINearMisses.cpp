@@ -1682,7 +1682,7 @@ int KrustyBike::Fn_00413200(float dt)
         if (spawnProtectTimer > 0.0f) {
             spawnProtectTimer -= stepTime;
             if (spawnProtectTimer <= 0.0f)
-                UnknownVirtualSlot50(0, 0, 0);
+                SetSpawnProtection(0, 0, 0);
         }
     }
     UnknownVirtualSlot26();

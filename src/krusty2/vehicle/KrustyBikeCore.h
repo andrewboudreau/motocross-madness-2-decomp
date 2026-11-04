@@ -54,7 +54,7 @@ public:
     virtual void UnknownVirtualSlot43();
     virtual void SaveBodyOrientation(int lastStep);
     virtual void UnknownVirtualSlot49(float dt);
-    virtual void UnknownVirtualSlot50(int protect, float duration, int forced);
+    virtual void SetSpawnProtection(int protect, float duration, int forced);
     virtual int ResolveSubstepCollisions(int steps);
     virtual int ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                      const Vec3* settleUp, int keepPlacement, float extraWeight);

@@ -1027,7 +1027,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 }
             }
             if (!isGhost) {
-                UnknownVirtualSlot50(states[0]->flag4, 5.0f, 0);
+                SetSpawnProtection(states[0]->flag4, 5.0f, 0);
                 if (spawnProtectEndPending) {
                     Fn_00496E30(0);
                     spawnProtectEndPending = 0;
@@ -1122,7 +1122,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 }
             }
             if (!isGhost) {
-                UnknownVirtualSlot50(interpSource->flag4, 5.0f, 0);
+                SetSpawnProtection(interpSource->flag4, 5.0f, 0);
                 if (spawnProtectEndPending) {
                     Fn_00496E30(0);
                     spawnProtectEndPending = 0;
@@ -1191,13 +1191,13 @@ void KrustyBike::Fn_00493660(float dt, int a)
     if (!a && !hasFinished) {
         if (stateIntervalElapsed >= g_kbStallThreshold) {
             stallHoldTimer = g_kbStallHoldSec;
-            UnknownVirtualSlot50(1, 0.0f, 0);
+            SetSpawnProtection(1, 0.0f, 0);
         } else if (stallHoldTimer > 0.0f) {
             stallHoldTimer -= reinterpret_cast<KbGame*>(g_TrackGame)->frameTime;
             if (stallHoldTimer < 0.0f)
                 stallHoldTimer = 0.0f;
         } else if (!isGhost) {
-            UnknownVirtualSlot50(0, 0.0f, 0);
+            SetSpawnProtection(0, 0.0f, 0);
         }
     }
     if (!reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay) {

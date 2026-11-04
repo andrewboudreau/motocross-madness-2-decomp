@@ -42,8 +42,8 @@ public:
     virtual Vec3* UnknownVirtualSlot54(Vec3* out);
     virtual Vec3* UnknownVirtualSlot55(Vec3* out, Vec3* pos);
     virtual void UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up);
-    virtual float UnknownVirtualSlot57();
-    virtual float UnknownVirtualSlot59();
+    virtual float GetLeanAngle();
+    virtual float GetMaxSteerAngle();
     virtual float UnknownVirtualSlot61(float threshold);
     virtual int UnknownVirtualSlot62(float slideAngle);
     virtual void UnknownVirtualSlot65(float dt);

@@ -202,7 +202,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot59@Bike",
+    "candidate_symbol_contains": "GetMaxSteerAngle@Bike",
     "target_va": "0x0040a330",
     "target_size": 125,
     "expect": "exact",
@@ -222,7 +222,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot57@Bike",
+    "candidate_symbol_contains": "GetLeanAngle@Bike",
     "target_va": "0x0040a400",
     "target_size": 117,
     "expect": "exact",
@@ -862,7 +862,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot57@Vehicle",
+    "candidate_symbol_contains": "GetLeanAngle@Vehicle",
     "target_va": "0x005289b0",
     "target_size": 7,
     "expect": "exact",
@@ -1102,7 +1102,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot59@Vehicle",
+    "candidate_symbol_contains": "GetMaxSteerAngle@Vehicle",
     "target_va": "0x0052a520",
     "target_size": 10,
     "expect": "exact",
@@ -1182,7 +1182,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot50@Vehicle",
+    "candidate_symbol_contains": "SetSpawnProtection@Vehicle",
     "target_va": "0x0052b600",
     "target_size": 23,
     "expect": "exact",
@@ -2102,11 +2102,11 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot50@KrustyBike",
+    "candidate_symbol_contains": "SetSpawnProtection@KrustyBike",
     "target_va": "0x00497630",
     "target_size": 365,
     "expect": "exact",
-    "notes": "Slot 50 override. Exact when the c!=0 branch has ONE shared Vehicle::UnknownVirtualSlot50(a,0,0) call after an inner if/else on a (two separate calls let VC6 fold a==0 into push 0).",
+    "notes": "Slot 50 override. Exact when the c!=0 branch has ONE shared Vehicle::SetSpawnProtection(a,0,0) call after an inner if/else on a (two separate calls let VC6 fold a==0 into push 0).",
     "bindings": "KrustyBike.bindings.json"
   },
   {

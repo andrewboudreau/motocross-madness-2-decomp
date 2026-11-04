@@ -67,16 +67,16 @@ public:
     // 0x0052a940 forwards its argument unchanged to slots 9 (float dt), 39, 64 and 65,
     // so it and they take the float time step (tier 2).
     virtual void UnknownVirtualSlot49(float dt);
-    virtual void UnknownVirtualSlot50(int protect, float duration, int forced);
+    virtual void SetSpawnProtection(int protect, float duration, int forced);
     virtual int UnknownVirtualSlot51();
     virtual int UnknownVirtualSlot52();
     virtual float UnknownVirtualSlot53();
     virtual Vec3* UnknownVirtualSlot54(Vec3* out);
     virtual Vec3* UnknownVirtualSlot55(Vec3* out, Vec3* pos);
     virtual void UnknownVirtualSlot56(Vec3* forward, int updateLeanCos, Vec3* up);
-    virtual float UnknownVirtualSlot57();
+    virtual float GetLeanAngle();
     virtual void UnknownVirtualSlot58(Vec3* settleUp, int keepPlacement);
-    virtual float UnknownVirtualSlot59();
+    virtual float GetMaxSteerAngle();
     virtual void UnknownVirtualSlot60(float steerAxis, float maxAngle, int steps);
     virtual float UnknownVirtualSlot61(float threshold);
     virtual int UnknownVirtualSlot62(float slideAngle);

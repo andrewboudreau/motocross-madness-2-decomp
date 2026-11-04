@@ -48,7 +48,7 @@ void KbPlayer::Fn_004A9E80(Vehicle* a, Vehicle* b, int c)
         previous->bestTagRun = previous->tagRun < previous->bestTagRun
                                    ? previous->bestTagRun : previous->tagRun;
         previous->tagRun = 0.0f;
-        previous->UnknownVirtualSlot50(1, 5.0f, 0);
+        previous->SetSpawnProtection(1, 5.0f, 0);
         if (ball)
             ball->asleep = 0;
     }
@@ -57,7 +57,7 @@ void KbPlayer::Fn_004A9E80(Vehicle* a, Vehicle* b, int c)
         view->localRacer->Fn_004925A0(racer, false);
     if (racer) {
         view->raceSound->PlayItSound();
-        racer->UnknownVirtualSlot50(1, 5.0f, 0);
+        racer->SetSpawnProtection(1, 5.0f, 0);
     }
     ((TrackGameViewOwner*)this)->AnnounceFollowedRacer((UnknownEventRacer*)racer,
                                                        (UnknownEventRacer*)previous);

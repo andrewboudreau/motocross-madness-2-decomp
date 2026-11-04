@@ -51,7 +51,7 @@ struct UnknownFollowedRacerSlots {
     virtual void UnknownVirtualSlot43(); virtual void UnknownVirtualSlot44(); virtual void UnknownVirtualSlot45();
     virtual void UnknownVirtualSlot46(); virtual void UnknownVirtualSlot47(); virtual void UnknownVirtualSlot48();
     virtual void UnknownVirtualSlot49();
-    virtual void UnknownVirtualSlot50(int a, float seconds, int b);
+    virtual void SetSpawnProtection(int a, float seconds, int b);
 };
 #define FOLLOWED_RACER_SLOTS(racer) ((UnknownFollowedRacerSlots*)(racer))
 
@@ -70,7 +70,7 @@ void TrackGameViewOwner::SetFollowedRacer(UnknownEventRacer* racer, UnknownEvent
         float run = previous->tagRun;
         previous->bestTagRun = best > run ? previous->bestTagRun : previous->tagRun;
         previous->tagRun = 0.0f;
-        FOLLOWED_RACER_SLOTS(previous)->UnknownVirtualSlot50(1, 5.0f, 0);
+        FOLLOWED_RACER_SLOTS(previous)->SetSpawnProtection(1, 5.0f, 0);
         if (ball)
             ball->field_0x10a = 0;
     }
@@ -79,7 +79,7 @@ void TrackGameViewOwner::SetFollowedRacer(UnknownEventRacer* racer, UnknownEvent
         raceView->localRacer->UnknownFunction4925a0(racer, false);
     if (racer) {
         ((RaceSound*)raceView->raceSound)->PlayItSound();
-        FOLLOWED_RACER_SLOTS(racer)->UnknownVirtualSlot50(1, 5.0f, 0);
+        FOLLOWED_RACER_SLOTS(racer)->SetSpawnProtection(1, 5.0f, 0);
     }
     AnnounceFollowedRacer(racer, previous);
     if (racer == raceView->localRacer && previous && previous != racer) {
