@@ -179,23 +179,23 @@ int KrustyBike::ShouldBurstSteamEffect()
     return 0;
 }
 
-int KrustyBike::UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
+int KrustyBike::ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                      const Vec3* settleUp, int keepPlacement, float extraWeight)
 {
-    int result = Bike::UnknownVirtualSlot33(newPosition, newForward, newUp, settleUp, keepPlacement, extraWeight);
+    int result = Bike::ResetToPlacement(newPosition, newForward, newUp, settleUp, keepPlacement, extraWeight);
     lastFramePosition = position;
     wrecker->skipProbeEffects = 1;
     return result;
 }
 
-int KrustyBike::UnknownVirtualSlot39(float dt)
+int KrustyBike::ApplyPendingRespawn(float dt)
 {
     if (!respawnPending && reinterpret_cast<KbGame*>(g_TrackGame)->raceMode && offTrackTime > 6.0f) {
         if (crashState)
             UnknownVirtualSlot67();
         return 1;
     }
-    return Bike::UnknownVirtualSlot39(dt);
+    return Bike::ApplyPendingRespawn(dt);
 }
 
 int KrustyBike::UnknownVirtualSlot42()

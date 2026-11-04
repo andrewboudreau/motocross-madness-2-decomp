@@ -973,7 +973,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
     UnknownVirtualSlot60(controlInput.x, UnknownVirtualSlot59(), steps);
     UnknownVirtualSlot65(frame);
     pointsTouching = 0;
-    respawn = UnknownVirtualSlot39(frame);
+    respawn = ApplyPendingRespawn(frame);
     if (!respawn && !crashState && steps != 1) {
         VehContactsA(UnknownVirtualSlot5(0), &touchingPointCount, collisionPointCount,
                      ((VehicleContact**)collisionPoints), terrain, &centerOfMass, collisionShape,
@@ -1001,7 +1001,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             Vec3 placedPosition, placedForward, placedUp;
             int keepPlacement = 0;
             UnknownVirtualSlot11(respawn, &placedPosition, &placedForward, &placedUp, &keepPlacement);
-            UnknownVirtualSlot33(&placedPosition, &placedForward, &bodyUp, &placedUp, keepPlacement, EffectiveLoadWeight());
+            ResetToPlacement(&placedPosition, &placedForward, &bodyUp, &placedUp, keepPlacement, EffectiveLoadWeight());
             steps = 0;
             stepRemainder = 0.0f;
             break;
@@ -1347,7 +1347,7 @@ int Vehicle::ResolveSubstepCollisions(int steps)
 
 // Tier 3: with the 0x109 flag the saved position is restored; otherwise slot 68 supplies a
 // code that the key table at input-map+0x34 must accept before slot 67 runs again.
-int Vehicle::UnknownVirtualSlot39(float dt)
+int Vehicle::ApplyPendingRespawn(float dt)
 {
     int code;
     if (respawnPending) {
@@ -1611,7 +1611,7 @@ void Vehicle::UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel, const 
 // keepPlacement), takes newForward/newUp, settles the wheels twice via slot 58 (which with
 // keepPlacement keeps the height and takes settleUp as the up axis, else the ground normal),
 // refreshes the wheel and body node positions and finishes with slot 50 (flag, slot 45 value, 0).
-int Vehicle::UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp, const Vec3* settleUp,
+int Vehicle::ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp, const Vec3* settleUp,
                                   int keepPlacement, float extraWeight)
 {
     UnknownVirtualSlot1(extraWeight);

@@ -141,7 +141,7 @@ public:
     virtual void ClearContactEffectFlags();
     virtual void UpdateContactStates();
     virtual float EffectiveLoadWeight();
-    virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward,
+    virtual int ResetToPlacement(const Vec3* newPosition, const Vec3* newForward,
                                      const Vec3* newUp, const Vec3* settleUp, int keepPlacement,
                                      float extraWeight);  // settleUp and keepPlacement are unused here; Vehicle passes a Vec3 address (tier 2)
     // Slots 34/35 are declared void: 0x004aa1c0/0x004aa1e0 end in `call; ret` with no use
@@ -150,14 +150,14 @@ public:
     virtual void LoadBodyAxes();
     virtual void StoreBodyAxes(int orthogonalize, int keepZ);
     virtual void UnknownVirtualSlot36();
-    virtual SoultreeAttachment* UnknownVirtualSlot37(int type, void* target, SoultreeAttachTarget* anchor,
+    virtual SoultreeAttachment* AddAttachment(int type, void* target, SoultreeAttachTarget* anchor,
                                                      const Vec3* v);
     // Slot 38 (ret 0xc): 0x00501600 switches on eventKind (0x66/0x68/0x69/0x6a/0x2711) and reads
     // event->+0x60 as the other body (tier 1); event's type is provisional.
     virtual void UnknownVirtualSlot38(int notify, int eventKind, void* event);
     // Slot 39 (ret 4): argument unused here; Vehicle slot 49 0x0052a940 passes it the same
     // dword it passes to slot 9 (float dt), so float (tier 2).
-    virtual int UnknownVirtualSlot39(float dt);
+    virtual int ApplyPendingRespawn(float dt);
 
     // Non-virtual helper 0x00501230 (thiscall, no args): installs the two TU-local contact
     // callbacks 0x00500c00/0x00500c30 into collisionObject (+0x88/+0x8c).  Tier 2; called by slot 2.

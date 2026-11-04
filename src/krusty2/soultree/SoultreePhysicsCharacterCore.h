@@ -40,7 +40,7 @@ public:
     // --- vtable 0x005580a8 (offset 0) ---
     virtual void UnknownVirtualSlot1(float extraWeight);                // 0x005040c0
     virtual void UnknownVirtualSlot8();                           // 0x005041c0
-    virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward,
+    virtual int ResetToPlacement(const Vec3* newPosition, const Vec3* newForward,
                                      const Vec3* newUp, const Vec3* settleUp, int keepPlacement,
                                      float extraWeight);                  // 0x005040f0
     // Slot 40 (0x00503de0, `ret 0x6c` = 27 argument dwords, tier 1).  Grouping (tier 2):

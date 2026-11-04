@@ -760,10 +760,10 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
         reinterpret_cast<CollisionPoint**>(collisionPoints), reinterpret_cast<const CollisionVec3*>(&tailPoint),
         reinterpret_cast<CollisionContactOwner*>(modelNode), -0.3f, &collisionPointCount, 0.6f,
         reinterpret_cast<int>(track)));
-    UnknownVirtualSlot37(1, dustEmitter, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
-    UnknownVirtualSlot37(2, dirtChunkEmitter, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
+    AddAttachment(1, dustEmitter, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
+    AddAttachment(2, dirtChunkEmitter, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
     Vec3 steamOffset = Vec3(0.0f, 2.5f, -2.75f);
-    UnknownVirtualSlot37(4, steamEmitter, 0, &steamOffset);
+    AddAttachment(4, steamEmitter, 0, &steamOffset);
     if (centerNode == 0) {
         Release();
         return 0;
@@ -835,7 +835,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     savedCosRoll = bodyCosRoll;
     savedCosPitch = bodyCosPitch;
     savedSinPitch = bodySinPitch;
-    UnknownVirtualSlot33(&position, &bodyForward, &bodyUp, &kVec3YAxis, 0, loadWeight);
+    ResetToPlacement(&position, &bodyForward, &bodyUp, &kVec3YAxis, 0, loadWeight);
     crashHeading = Vec3(bodyForward.x, 0.0f, bodyForward.z);
 
     riderPoseHandles[0] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LeanR01", 1);
@@ -881,12 +881,12 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     return this;
 }
 
-int Bike::UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
+int Bike::ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                const Vec3* settleUp, int keepPlacement, float extraWeight)
 {
     Matrix4 tmp;
     RunTickers();
-    int result = Vehicle::UnknownVirtualSlot33(newPosition, newForward, newUp, settleUp, keepPlacement,
+    int result = Vehicle::ResetToPlacement(newPosition, newForward, newUp, settleUp, keepPlacement,
                                                extraWeight);
     int mode = wrecker->wreckState;
     if (mode == 0 || mode == 1) {
@@ -972,9 +972,9 @@ Vec3* Bike::UnknownVirtualSlot54(Vec3* out)
     return out;
 }
 
-int Bike::UnknownVirtualSlot39(float dt)
+int Bike::ApplyPendingRespawn(float dt)
 {
-    int result = Vehicle::UnknownVirtualSlot39(dt);
+    int result = Vehicle::ApplyPendingRespawn(dt);
     if (result)
         return result;
     if (crashState) {

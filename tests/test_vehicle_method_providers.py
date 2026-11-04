@@ -72,7 +72,8 @@ class VehicleMethodProviderTests(unittest.TestCase):
                               'ShouldBurstSteamEffect': 25, 'LoadBodyAxes': 34,
                               'StoreBodyAxes': 35, 'ResolveSubstepCollisions': 28,
                               'SaveBodyOrientation': 29, 'ClearContactEffectFlags': 30,
-                              'UpdateContactStates': 31}[symbol.split('@')[0]])
+                              'UpdateContactStates': 31, 'ResetToPlacement': 33,
+                              'ApplyPendingRespawn': 39}[symbol.split('@')[0]])
                 promoted = slot in slots
                 self.assertEqual(source, ROOT / sources['reset' if slot == 36 else 'methods'])
                 obj = objects['reset' if slot == 36 else 'methods']

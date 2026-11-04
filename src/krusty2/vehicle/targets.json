@@ -92,7 +92,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot33@Bike",
+    "candidate_symbol_contains": "ResetToPlacement@Bike",
     "target_va": "0x00406a50",
     "target_size": 135,
     "expect": "exact",
@@ -192,7 +192,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot39@Bike",
+    "candidate_symbol_contains": "ApplyPendingRespawn@Bike",
     "target_va": "0x0040a1f0",
     "target_size": 306,
     "expect": "exact",
@@ -642,7 +642,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot39@Vehicle",
+    "candidate_symbol_contains": "ApplyPendingRespawn@Vehicle",
     "target_va": "0x00526f00",
     "target_size": 150,
     "expect": "exact",
@@ -662,7 +662,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot33@Vehicle",
+    "candidate_symbol_contains": "ResetToPlacement@Vehicle",
     "target_va": "0x00527430",
     "target_size": 365,
     "expect": "exact",
@@ -1702,7 +1702,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot33@KrustyBike",
+    "candidate_symbol_contains": "ResetToPlacement@KrustyBike",
     "target_va": "0x0048e130",
     "target_size": 87,
     "expect": "exact",
@@ -1752,7 +1752,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot39@KrustyBike",
+    "candidate_symbol_contains": "ApplyPendingRespawn@KrustyBike",
     "target_va": "0x00491b10",
     "target_size": 83,
     "expect": "exact",

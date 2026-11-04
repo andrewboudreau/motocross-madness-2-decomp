@@ -56,9 +56,9 @@ public:
     virtual void UnknownVirtualSlot49(float dt);
     virtual void UnknownVirtualSlot50(int protect, float duration, int forced);
     virtual int ResolveSubstepCollisions(int steps);
-    virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
+    virtual int ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                      const Vec3* settleUp, int keepPlacement, float extraWeight);
-    virtual int UnknownVirtualSlot39(float dt);
+    virtual int ApplyPendingRespawn(float dt);
     virtual int UnknownVirtualSlot42();
     virtual void UnknownVirtualSlot44();
     virtual float UnknownVirtualSlot45();

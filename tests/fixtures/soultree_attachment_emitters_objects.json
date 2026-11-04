@@ -3,7 +3,7 @@
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
       "sections": 128,
       "relocations": 625,
-      "sha256": "640e74a0b41046478ad2a9cba1bf750907108e565747126240f99e16ac7a2859"
+      "sha256": "8ccbdb80679bed27cedf7c3bf7f076c3e228e1844e80fd0a57a60567233ffe51"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -18,7 +18,7 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "f73ae05b4e3c2f7f3326e34886803119c908df5190b3ca6c7390ec79b58e578f"
+      "sha256": "be8c45623173cf337af1e33bb48c4e45bf81b791ce2493408b5a8100f59ac945"
     },
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,
@@ -104,7 +104,7 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot39@SoultreePhysicsBaseObject",
+      "symbol": "ApplyPendingRespawn@SoultreePhysicsBaseObject",
       "va": "0x005019a0",
       "extent": 63
     },
@@ -122,7 +122,7 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot33@SoultreePhysicsBaseObject",
+      "symbol": "ResetToPlacement@SoultreePhysicsBaseObject",
       "va": "0x00501c20",
       "extent": 186
     },
@@ -194,7 +194,7 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot37@SoultreePhysicsBaseObject",
+      "symbol": "AddAttachment@SoultreePhysicsBaseObject",
       "va": "0x00502a40",
       "extent": 272
     },

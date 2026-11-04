@@ -1660,7 +1660,7 @@ int KrustyBike::Fn_00413200(float dt)
     ClearContactEffectFlags();
     UnknownVirtualSlot64(dt);
     pointsTouching = 0;
-    int hit = UnknownVirtualSlot39(dt);
+    int hit = ApplyPendingRespawn(dt);
     justLanded = 0;
     BikeAITickGearTimer(engineState, stepTime);
     if (!hasFinished)
@@ -1674,7 +1674,7 @@ int KrustyBike::Fn_00413200(float dt)
         Vec3 b;
         int dummy = 0;
         UnknownVirtualSlot11(hit, &a, &b, &c, &dummy);
-        UnknownVirtualSlot33(&a, &b, &bodyUp, &c, dummy, EffectiveLoadWeight());
+        ResetToPlacement(&a, &b, &bodyUp, &c, dummy, EffectiveLoadWeight());
         steps = 0;
         stepRemainder = 0.0f;
     } else {
@@ -2114,7 +2114,7 @@ int KrustyBike::Fn_00414370(float dt)
                 aiOffTrackTime += dt;
                 if (aiOffTrackTime >= 5.0f) {
                     UnknownVirtualSlot11(count, &a, &b, &c, &dummy);
-                    UnknownVirtualSlot33(&a, &b, &bodyUp, &c, dummy, EffectiveLoadWeight());
+                    ResetToPlacement(&a, &b, &bodyUp, &c, dummy, EffectiveLoadWeight());
                     aiOffTrackTime = 0.0f;
                 }
             }

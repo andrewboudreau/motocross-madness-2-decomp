@@ -28,10 +28,10 @@ public:
     virtual Vec3 LocalTorqueToAngularAcceleration(const Vec3* localTorque);
     virtual void SaveBodyOrientation(int lastStep);
     virtual float EffectiveLoadWeight();
-    virtual int UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
+    virtual int ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                      const Vec3* settleUp, int keepPlacement, float extraWeight);
     virtual void UnknownVirtualSlot38(int notify, int eventKind, void* event);
-    virtual int UnknownVirtualSlot39(float dt);
+    virtual int ApplyPendingRespawn(float dt);
     virtual void UnknownVirtualSlot41();
     virtual int UnknownVirtualSlot42();
     virtual void UnknownVirtualSlot44();

@@ -335,7 +335,7 @@ void SoultreePhysicsBaseObject::UpdateContactStates()
 }
 
 // slot 33 (0x00501c20)
-int SoultreePhysicsBaseObject::UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward,
+int SoultreePhysicsBaseObject::ResetToPlacement(const Vec3* newPosition, const Vec3* newForward,
                                                     const Vec3* newUp, const Vec3* settleUp,
                                                     int keepPlacement, float extraWeight)
 {
@@ -358,7 +358,7 @@ int SoultreePhysicsBaseObject::UnknownVirtualSlot33(const Vec3* newPosition, con
 }
 
 // slot 37 (0x00502a40): append an attachment record.
-SoultreeAttachment* SoultreePhysicsBaseObject::UnknownVirtualSlot37(int type, void* target,
+SoultreeAttachment* SoultreePhysicsBaseObject::AddAttachment(int type, void* target,
                                                                    SoultreeAttachTarget* anchor,
                                                                    const Vec3* v)
 {
@@ -394,7 +394,7 @@ SoultreeAttachment* SoultreePhysicsBaseObject::UnknownVirtualSlot37(int type, vo
 }
 
 // slot 39 (0x005019a0)
-int SoultreePhysicsBaseObject::UnknownVirtualSlot39(float dt)
+int SoultreePhysicsBaseObject::ApplyPendingRespawn(float dt)
 {
     if (respawnPending) {
         position = respawnPosition;
@@ -1062,7 +1062,7 @@ int SoultreePhysicsBaseObject::Tick(float dt)
     UnknownVirtualSlot9(dt, &steps);
     ClearContactEffectFlags();
     pointsTouching = 0;
-    int respawn = UnknownVirtualSlot39(dt);
+    int respawn = ApplyPendingRespawn(dt);
     if (!respawn) {
         refreshed = SoultreeRefreshContacts(UnknownVirtualSlot5(1), &touchingPointCount, collisionPointCount,
                                             collisionPoints, terrain, &centerOfMass, collisionShape,
@@ -1286,7 +1286,7 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
             int keepPlacement;
             Vec3 placedPosition, placedForward, placedUp;
             UnknownVirtualSlot11(respawn, &placedPosition, &placedForward, &placedUp, &keepPlacement);
-            UnknownVirtualSlot33(&placedPosition, &placedForward, &bodyUp, &placedUp, keepPlacement, EffectiveLoadWeight());
+            ResetToPlacement(&placedPosition, &placedForward, &bodyUp, &placedUp, keepPlacement, EffectiveLoadWeight());
             stepRemainder = 0.0f;
             break;
         }

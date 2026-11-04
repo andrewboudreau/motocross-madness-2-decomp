@@ -132,7 +132,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot39@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "ApplyPendingRespawn@SoultreePhysicsBaseObject",
     "target_va": "0x005019a0",
     "target_size": 63,
     "expect": "exact",
@@ -162,7 +162,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot33@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "ResetToPlacement@SoultreePhysicsBaseObject",
     "target_va": "0x00501c20",
     "target_size": 186,
     "expect": "exact",
@@ -292,7 +292,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot37@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "AddAttachment@SoultreePhysicsBaseObject",
     "target_va": "0x00502a40",
     "target_size": 272,
     "expect": "exact",

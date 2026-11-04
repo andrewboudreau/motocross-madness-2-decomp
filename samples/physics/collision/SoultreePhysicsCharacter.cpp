@@ -35,7 +35,7 @@ int SoultreePhysicsCharacter::UnknownVirtualSlot42()
 }
 
 // slot 33 (0x005040f0), retail `ret 0x18`
-int SoultreePhysicsCharacter::UnknownVirtualSlot33(const Vec3* newPosition, const Vec3* newForward,
+int SoultreePhysicsCharacter::ResetToPlacement(const Vec3* newPosition, const Vec3* newForward,
                                                    const Vec3* newUp, const Vec3* settleUp,
                                                    int keepPlacement, float extraWeight)
 {

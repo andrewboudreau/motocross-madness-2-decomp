@@ -12,7 +12,7 @@
   {
     "class": "SoultreePhysicsCharacter",
     "source": "SoultreePhysicsCharacter.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot33@SoultreePhysicsCharacter",
+    "candidate_symbol_contains": "ResetToPlacement@SoultreePhysicsCharacter",
     "target_va": "0x005040f0",
     "target_size": 193,
     "expect": "exact",

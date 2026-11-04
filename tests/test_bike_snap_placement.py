@@ -116,7 +116,7 @@ class BikeSnapPlacementTests(unittest.TestCase):
                 self.assertTrue(compare(retail, obj, symbol, va, size, bindings)['strict_exact'], symbol)
             obj = objects[BIKE]
             self.assertNotIn('?Method_0x00435fe0@BikeA38@@QAEXXZ', {s.name for s in obj.symbols})
-            _, _, relocations = obj.symbol_extent(obj.find_symbol('UnknownVirtualSlot33@Bike'))
+            _, _, relocations = obj.symbol_extent(obj.find_symbol('ResetToPlacement@Bike'))
             self.assertEqual([r.virtual_address for r in relocations if obj.symbol_by_index[r.symbol_index].name == SNAP], [121])
             executable = output / 'snap.exe'
             result = subprocess.run([str(find_child_ci(find_vc6_bin(compiler), 'link.exe')), '/nologo',
