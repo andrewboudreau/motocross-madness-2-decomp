@@ -581,14 +581,16 @@ static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
 // operator sum (`u + velocity`) schedules scratchVector's y store as retail (512 -> 523/539).
 // Clamping s inside the first product (`u.x = t.x * (s = ...)`) gives retail's dup form
 // (fld st(0); fmul [t.x]) for u.x only (523 -> 528/539).
-// Left: retail stores field_0x4e8 before the abs compare (fst; fld st(0); fcom).  No gain from
-// assigning k through field_0x4e8, ?: or a nested store, `> 0.0f`, an inline or named abs,
-// k = d * slot73 or reusing d for k; VehAbs or an if-negated copy costs 6 bytes.
+// The product is stored straight into field_0x4e8 and the member is what the abs test reads;
+// k is copied from it inside the branch.  Then VC6 stores the member before the abs compare
+// (fst; fld st(0); fcom) as retail does (528 -> 539/539).  With a local k stored to the
+// member, k copied from the member before the test, or `!= 0.0f`, the fcom moves ahead of
+// the store.
 float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
 {
-    float k = GetTurnRadius(point, dir) * d;
-    field_0x4e8 = k;
-    if (!(VehAbsT(k) <= 0.0f)) {
+    field_0x4e8 = GetTurnRadius(point, dir) * d;
+    if (VehAbsT(field_0x4e8) > 0.0f) {
+        float k = field_0x4e8;
         float m = forwardSpeed;
         float nk = -k;
         float r = m * m / nk * stepTime;

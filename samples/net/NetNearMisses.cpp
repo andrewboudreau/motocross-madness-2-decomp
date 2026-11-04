@@ -21,6 +21,9 @@
 // Also unchanged or worse: `value` reused as `last`, an inverted head test
 // (326), a `NetMessage* base` local (83), `++index >= 0x100`, a split
 // increment with `== 0x100` (360) and an `== 0xff` reset (318/372).
+// Session 15, worse: `last = nextMessage - 1` hoisted above the if/else (16),
+// `last` assigned before `index` in both arms (18), `offset` computed before
+// `more` (190).
 // Session 14: `messages + index`, `&(messages[index])` and `(int*)(..)`
 // spellings keep 361. `&MessageAt(messages, offset)` for the pointer with
 // `message->from` (or a reference) gives retail's ebx/ebp and the system

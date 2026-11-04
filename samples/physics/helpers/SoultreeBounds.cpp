@@ -22,6 +22,9 @@
 //   with this form every count 0..31 stays at 618, and the written k order with 0..31
 //   locals is no better. Locals of any type count one each; uninitialised unused ones
 //   and extra statements count nothing.
+//   Session 15: the 13 products written out in Scale itself on a `Matrix4 m = localMatrix`
+//   copy (no helper parameters), in written or the k = 1,3,2,4 order: 45-52 (661 bytes)
+//   stored to the member, 580-586 through the `local` pointer; s13 stays s-first.
 #include <string.h>
 #include "math/Math3D.h"
 

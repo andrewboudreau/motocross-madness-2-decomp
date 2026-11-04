@@ -31,6 +31,9 @@
 // length assignment, both denominator factors and the operands swapped give
 // 1299; `(targetScreenWidth)` alone, `num * (w / den)` and two divisions
 // give 555-600.
+// Session 15: a length local with a camera pointer local and a separate
+// field_0x1ec store, or a const camera local, keep 1299; a zoom float local
+// (562/1314) and CameraZoom of the re-read g_TrackGame camera (561/1317) are worse.
 //
 // VisualCue::Tick (0x0048b100, 2796 bytes, jump table at
 // 0x0048bbec): places the cue in front of the camera by camera mode

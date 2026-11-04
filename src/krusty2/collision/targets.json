@@ -970,6 +970,16 @@
     "bindings": "CollisionPoint.bindings.json"
   },
   {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "SoultreeRefreshContacts",
+    "target_va": "0x0043ad80",
+    "target_size": 615,
+    "expect": "exact",
+    "notes": "Exact: if/else with one trailing return 1 (delayed callee-saved pushes), a pp pointer local behind if (count > 0) (loop header and counter home), the single contact's offset - k * normal summed through InlineSum (constructor return; the member-store operator+ stored w.y before the fstp of w.z, 604/615), and the owner transform through SoultreeObject::LocalToWorldPoint bound to a const reference (both copies read the returned pointer). The same call copied into a const Vec3& and cast per copy is 395/627.",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
     "class": "QuadTreeObject",
     "source": "CollisionObject.cpp",
     "candidate_symbol_contains": "?UnknownVirtualSlot1@QuadTreeObject@@",

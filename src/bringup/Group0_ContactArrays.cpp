@@ -6,8 +6,8 @@
 //   0x004b5a60 VehBasisToBlock
 // The contact elements are CollisionPoint objects (collision/CollisionPoint.h);
 // SoultreeContact and VehicleContact are views of them. The refresh and merge
-// bodies follow samples/physics/collision/CollisionPointNearMisses.cpp
-// (604/615 and near-exact there); VehBasisToBlock is decoded from retail.
+// bodies follow src/krusty2/collision/CollisionPoint.cpp (both exact
+// there); VehBasisToBlock is decoded from retail.
 // Byte matching was not attempted.
 #include <math.h>
 

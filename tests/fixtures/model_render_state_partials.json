@@ -84,15 +84,6 @@
     ],
     [
       "src/krusty2/vehicle/Vehicle.cpp",
-      "UnknownVirtualSlot74@Vehicle",
-      5407152,
-      539,
-      539,
-      528,
-      "1008f678cbeb2454ffc2aa3e637bd6cb5682d900434ac3fee195ed30dfbf6a1f"
-    ],
-    [
-      "src/krusty2/vehicle/Vehicle.cpp",
       "UpdateLeanFromNormal@Vehicle",
       5408416,
       784,

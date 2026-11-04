@@ -93,8 +93,9 @@ Functions (all in the extent)
   deleting destructor `0x0043b300`.
 - Exact in `src/reconstructed/CollisionQueries.cpp` (ownership open, see above):
   SphereContainsPointXZ `0x0043a1e0`, BoundingSpheresOverlap `0x0043a270`.
-- Near miss in `samples/physics/collision/CollisionPointNearMisses.cpp` (includes this file): the
-  contact refresh `0x0043ad80`; its note lists what differs.
+- The contact refresh `0x0043ad80` is exact here: the single contact's sum goes through
+  InlineSum (constructor return), and the owner transform through the canonical
+  `SoultreeObject::LocalToWorldPoint` bound to a const reference.
 
 Source shapes that matter (tier 3: they reproduce retail, the original text is unknown)
 - UpdateRelativeMotion uses header-shaped inline helpers: a dot product grouped `z + (x + (y))` at both
@@ -110,7 +111,6 @@ Source shapes that matter (tier 3: they reproduce retail, the original text is u
 ```bash
 python tools/run_physics_samples.py --strict \
   --source src/krusty2/collision/CollisionPoint.cpp \
-  --source samples/physics/collision/CollisionPointNearMisses.cpp \
   --source src/reconstructed/CollisionQueries.cpp \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```

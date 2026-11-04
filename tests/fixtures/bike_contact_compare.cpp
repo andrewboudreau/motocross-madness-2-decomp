@@ -36,6 +36,9 @@ float FastInvSqrt(float) { ExitProcess(94); return 0; }
 float Vec3DotCall(const Vec3*,const Vec3*) { ExitProcess(95); return 0; }
 CollisionVec3* Vec3Normalize(CollisionVec3*,const CollisionVec3*) { ExitProcess(96); return 0; }
 Vec3 SoultreeObject::LocalToWorldPoint(const Vec3&) { ExitProcess(97); return Vec3(); }
+// The contact refresh 0x0043ad80's frame view (declared in CollisionPoint.cpp); not exercised.
+class CollisionFrameHelper { public: void QueryGround(CollisionVec3*,const CollisionVec3*,int,char*); };
+void CollisionFrameHelper::QueryGround(CollisionVec3*,const CollisionVec3*,int,char*) { ExitProcess(98); }
 static BYTE referenceSpace[0x800000] = {1};
 struct State {
     DWORD allocation[0xc4/4+4];

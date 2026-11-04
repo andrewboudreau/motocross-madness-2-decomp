@@ -15,7 +15,6 @@ from tools.match import compare
 
 ROOT=Path(__file__).resolve().parents[1]
 POINT='src/krusty2/collision/CollisionPoint.cpp'
-SAMPLE='samples/physics/collision/CollisionPointNearMisses.cpp'
 ZERO='?kCollisionPointZero@@3UCollisionPointConstVec3@@B'
 AXIS='?kCollisionPointYAxis@@3UCollisionPointConstVec3@@B'
 OLD_ZERO='?g_CollisionZeroVec3@@3UCollisionVec3@@A'
@@ -92,11 +91,10 @@ class CollisionPointStorageTests(unittest.TestCase):
             self.assertLessEqual(rva-section.virtual_address+12,section.virtual_size)
         targets=[t for t in json.loads((ROOT/'src/krusty2/collision/targets.json').read_text())
                  if t.get('source')=='CollisionPoint.cpp']
-        self.assertEqual(len(targets),17)
-        baseline={POINT:(31,124,'bba11d2288133f2a7e41cccf6f9ca1046cf843d1fab3bff9742cd35ae9ef28c8'),
-                  SAMPLE:(32,128,'77d4e64d74d41a9ab5ea0e34806641452b9bb1f065ac78dded930a2b776081e1')}
+        self.assertEqual(len(targets),18)
+        baseline={POINT:(32,128,'a40c05a32aed25891aa84b418f55a7a87457275aed61c4239647d87725dc9a46')}
         with tempfile.TemporaryDirectory(prefix='mcm2-contact-storage-') as directory:
-            for index,source in enumerate((POINT,SAMPLE)):
+            for index,source in enumerate((POINT,)):
                 output=Path(directory)/('unit%d.obj'%index)
                 result=subprocess.run([sys.executable,str(ROOT/'tools/compile.py'),str(ROOT/source),'-o',str(output),
                     '--vc6-root',os.environ['VC6_ROOT'],'--profile','vc6_o2_mt','--include',str(ROOT/'src/krusty2'),
@@ -136,7 +134,7 @@ class CollisionPointStorageTests(unittest.TestCase):
                     proof=compare(retail,obj,target['candidate_symbol_contains'],int(target['target_va'],0),
                                   target['target_size'],(ROOT/POINT).with_suffix('.bindings.json'))
                     self.assertTrue(proof['strict_exact'],proof)
-            print('34 strict checks; two complete objects,63 sections,252 relocations; actual shared BSS/CRT preserved')
+            print('18 strict checks; one complete object,32 sections,128 relocations; actual shared BSS/CRT preserved')
 
 
 if __name__=='__main__':

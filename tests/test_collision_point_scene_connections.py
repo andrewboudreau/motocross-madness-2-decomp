@@ -10,28 +10,20 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
 
 from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
-from mcm2tool.resolved_match import match_object
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
 POINT = 'src/krusty2/collision/CollisionPoint.cpp'
-SAMPLE = 'samples/physics/collision/CollisionPointNearMisses.cpp'
 NODE = 'src/krusty2/soultree/soultree.cpp'
 VECTOR = 'src/reconstructed/VectorCalls.cpp'
 PART = 'src/reconstructed/MovingPart.cpp'
 DOT = '?Vec3DotCall@@YAMPBUVec3@@0@Z'
 WORLD = '?LocalToWorldPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z'
 OLD_WORLD = '?LocalToWorldPoint@CollisionContactOwner@@QAEPAUCollisionVec3@@PAU2@PBU2@@Z'
-# Complete resolved partial body from the published pre-connection source.
-PARTIALS = (
-    ('SoultreeRefreshContacts', 0x43ad80, 615, 604,
-     'c1eebf9abd629e2092a54ff39359ae46985dfdb896f6d660bba1e17e974271f1'),
-)
 
 
 def definition(text, name):
@@ -112,7 +104,7 @@ class CollisionPointSceneConnectionsTests(unittest.TestCase):
                           ('MatrixProduct', 'SoultreeObject::UpdateWorldMatrix', 'SoultreeObject::LocalToWorldPoint')) + '\n')
             fixture = 'tests/fixtures/collision_point_scene.cpp'
             objects, paths = {}, {}
-            for index, source in enumerate((POINT, SAMPLE, NODE, VECTOR, PART, str(scene_source), fixture)):
+            for index, source in enumerate((POINT, NODE, VECTOR, PART, str(scene_source), fixture)):
                 path = output / ('unit%d.obj' % index)
                 command = [sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source), '-o', str(path),
                            '--vc6-root', os.environ['VC6_ROOT'], '--profile', 'vc6_o2_mt',
@@ -128,10 +120,9 @@ class CollisionPointSceneConnectionsTests(unittest.TestCase):
                 if target.get('source') != 'CollisionPoint.cpp':
                     continue
                 symbol, va, size = target['candidate_symbol_contains'], int(target['target_va'], 0), target['target_size']
-                for source in (POINT, SAMPLE):
-                    result = compare(retail, objects[source], symbol, va, size, (ROOT / POINT).with_suffix('.bindings.json'))
-                    self.assertTrue(result['strict_exact'], (source, symbol))
-                    strict_count += 1
+                result = compare(retail, objects[POINT], symbol, va, size, (ROOT / POINT).with_suffix('.bindings.json'))
+                self.assertTrue(result['strict_exact'], symbol)
+                strict_count += 1
             for source, symbol, va, size in ((VECTOR, DOT, 0x40ae30, 29),
                     (NODE, WORLD, 0x4fd660, 168),
                     (NODE, '?UpdateWorldMatrix@SoultreeObject@@', 0x4fb4f0, 858),
@@ -150,23 +141,9 @@ class CollisionPointSceneConnectionsTests(unittest.TestCase):
             imported = Counter(objects[POINT].symbol_by_index[r.symbol_index].name
                                for r in objects[POINT].relocations if r.type == 20)
             self.assertEqual(imported[DOT], 3)
-            self.assertEqual(imported[WORLD], 1)
+            self.assertEqual(imported[WORLD], 2)
             self.assertEqual(imported[OLD_WORLD], 0)
             self.assertEqual(imported['?Vec3DotCall@@YAMPBUCollisionVec3@@0@Z'], 0)
-            # The nonadmitted sample keeps its own explicit-output scene call.
-            sample_imports = Counter(objects[SAMPLE].symbol_by_index[r.symbol_index].name
-                                    for r in objects[SAMPLE].relocations if r.type == 20)
-            self.assertEqual(sample_imports[WORLD], 1)
-            self.assertEqual(sample_imports[OLD_WORLD], 1)
-            for symbol, va, size, positions, digest in PARTIALS:
-                bindings = (ROOT / SAMPLE).with_suffix('.bindings.json')
-                result = compare(retail, objects[SAMPLE], symbol, va, size, bindings)
-                self.assertEqual((result['candidate_size'], result['strict_match']['matching_positions']), (size, positions))
-                with patch('mcm2tool.resolved_match.compare_bytes',
-                           lambda original, candidate: {'digest': hashlib.sha256(candidate).hexdigest()}):
-                    resolved = match_object(objects[SAMPLE], symbol, va, b'',
-                        {k: int(v, 0) for k, v in json.loads(bindings.read_text()).items()})
-                self.assertEqual(resolved['digest'], digest)
             compiler = Path(os.environ['VC6_ROOT'])
             linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
             libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
@@ -178,7 +155,7 @@ class CollisionPointSceneConnectionsTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Contact scene: 19541 native allocation, cache, transform and dot cases passed', result.stdout)
-            print('%d complete strict checks, 1 preserved partial; %s' % (strict_count, result.stdout.strip()))
+            print('%d complete strict checks; %s' % (strict_count, result.stdout.strip()))
 
 
 if __name__ == '__main__':

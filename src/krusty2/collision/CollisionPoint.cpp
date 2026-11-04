@@ -6,8 +6,7 @@
 // (vtable 0x005511d8: deleting destructor 0x0043b300, slot 1 0x0043b240) and the
 // .CRT$XCU 62-65 vector set 0x0043b050..0x0043b18b sit inside it.  The functions here
 // are the unit's strict exact ones (src/krusty2/collision/targets.json).  The other
-// functions of the extent: the contact refresh 0x0043ad80 is a near miss in
-// samples/physics/collision/CollisionPointNearMisses.cpp (which includes this file); the
+// functions of the extent: the
 // two sphere tests 0x0043a1e0/0x0043a270 are exact in
 // src/reconstructed/CollisionQueries.cpp (whether they open this unit or close
 // CollisionObject.cpp is open).
@@ -364,4 +363,79 @@ int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec
         return merged;
     }
     return 0;
+}
+
+// Provisional view of the frame object passed to 0x0043ad80 (thiscall callee, owner class
+// unknown).  The contact owner view (0x004fd660) is in CollisionPoint.h.
+class CollisionFrameHelper {
+public:
+    // 0x00507c10, ret 0x10: snaps v to the surface along n; the last argument receives the
+    // surface flag byte.
+    void QueryGround(CollisionVec3* v, const CollisionVec3* n, int a, char* flagOut);
+};
+
+// Recomputes the contact position/penetration and tallies the penetrating contacts; expanded
+// in both paths of 0x0043ad80 (retail repeats it, including the grip store and return).
+static inline void CollisionRefreshContact(CollisionPoint* p, CollisionFrameHelper* frame, int* penetrating)
+{
+    frame->QueryGround(&p->surfacePosition, &p->surfaceNormal, 0, &p->surfaceType);
+    p->penetration = (p->surfacePosition.y - p->worldPosition.y) * p->surfaceNormal.y;
+    p->surfaceType &= 7;
+    p->inContact = (p->penetration >= p->penetrationThreshold) ? 1 : 0;
+    if (p->inContact)
+        ++*penetrating;
+    if (p->surfaceOwner) {
+        // surfaceOwner -> object whose +0xa4 table holds per-surface grip values at +0x3a0 (tier 3).
+        char* table = *(char**)(p->surfaceOwner + 0xa4);
+        p->surfaceGrip = ((float*)(table + 0x3a0))[(unsigned char)p->surfaceType];
+    } else {
+        p->surfaceGrip = 1.0f;
+    }
+}
+
+// 0x0043ad80 (cdecl, provisional signature).  Refreshes every owned contact's world and
+// surface position (a single contact in mode 1 is placed at offset - k * normal instead) and
+// its penetration, flag and grip.  The two paths are an if/else with one trailing
+// `return 1`: with a return inside the single-contact path VC6 pushes ebx/ebp/esi/edi at
+// entry, with a single exit after the null-a1 return it delays them past it as retail does.
+// The loop walks a pointer local `pp` copied from points after an `if (count > 0)` guard:
+// then VC6 loads points before frame and homes the loop counter in points' dead argument
+// slot, as retail does.  The single contact's position is summed through InlineSum (the
+// sum returned through the three-float constructor): with the member-store operator+ VC6
+// stores its y before the fstp of z, retail after.  The owner's transform is the canonical
+// SoultreeObject::LocalToWorldPoint, its returned temporary bound to a const reference, so
+// both copies read the result through the returned pointer as in retail.
+int SoultreeRefreshContacts(void* a1, int* penetrating, int count, CollisionPoint** points,
+                            CollisionFrameHelper* frame, CollisionVec3* offset, int mode, float k)
+{
+    if (!a1)
+        return 0;
+    *penetrating = 0;
+    if (mode == 1 && count == 1) {
+        CollisionPoint* point = points[0];
+        if (point->ownerNode) {
+            CollisionVec3 tmp = *offset;
+            frame->QueryGround(&tmp, &point->surfaceNormal, 0, 0);
+            CollisionVec3 contactPos = InlineSum(point->surfaceNormal * -k, *offset);
+            point->worldPosition = contactPos;
+            point->surfacePosition = contactPos;
+            CollisionRefreshContact(point, frame, penetrating);
+        }
+    } else {
+        if (count > 0) {
+            CollisionPoint** pp = points;
+            for (; count > 0; count--, pp++) {
+                CollisionPoint* point = *pp;
+                if (point->ownerNode) {
+                    const CollisionVec3& world = reinterpret_cast<const CollisionVec3&>(
+                        reinterpret_cast<SoultreeObject*>((*pp)->ownerNode)->LocalToWorldPoint(
+                            reinterpret_cast<const Vec3&>(point->localPosition)));
+                    point->worldPosition = world;
+                    point->surfacePosition = world;
+                    CollisionRefreshContact(point, frame, penetrating);
+                }
+            }
+        }
+    }
+    return 1;
 }

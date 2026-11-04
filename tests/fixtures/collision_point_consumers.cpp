@@ -52,6 +52,9 @@ static void Matrix(Matrix4& m,int seed) {
 // Unreachable allocation is a fail-fast boundary, not a simulated math provider.
 void* operator new(unsigned int,const char*,int) { ExitProcess(90);return 0; }
 void operator delete(void*,const char*,int) { ExitProcess(91); }
+// The contact refresh 0x0043ad80's frame view (declared in CollisionPoint.cpp); not exercised.
+class CollisionFrameHelper { public: void QueryGround(CollisionVec3*,const CollisionVec3*,int,char*); };
+void CollisionFrameHelper::QueryGround(CollisionVec3*,const CollisionVec3*,int,char*) { ExitProcess(92); }
 static int MapReference(const char* path,const char* patches) {
     BYTE* mapped=(BYTE*)0x400000;DWORD old;
     if((DWORD)referenceSpace>0x400000||(DWORD)referenceSpace+sizeof(referenceSpace)<0x690000||!VirtualProtect(mapped,0x290000,PAGE_EXECUTE_READWRITE,&old))return 0;

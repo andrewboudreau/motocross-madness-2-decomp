@@ -13,6 +13,12 @@
 // A `static const` or extern row table, the column term first in the index
 // sum and unsigned shifted coordinates are unchanged as well.
 // 0..33 prepended typedefs (section 2 tie-break) give 81 at every count.
+// Session 15, also 81: a `const unsigned char&` alias of node->shift, a `const GridNode&`
+// leaf alias, local copies of the coordinates, a row pointer into the table, the walk
+// as `while ((table = node->children) != 0)` and a test-first `for (;;)` with a table
+// local. Worse: tail-recursive lookups (three spellings, 20/93; they give retail's
+// ecx/edx final compare but another loop), `while (1)` test-first (34/90), do-while
+// (57/131) and assignment-in-condition with coordinate locals (20/93).
 //
 // 0x00483910 (cell sampler) is exact and lives in src/reconstructed/GridNode.cpp.
 // It closed (cycle 3) from 1040/1067 with two levers: `level` read through a

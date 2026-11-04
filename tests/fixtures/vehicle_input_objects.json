@@ -3,7 +3,7 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "8411a4a0ea0ba92b472f1b698a9f390b0a6af4ff7a1ddedc8205d04012ef7ef1"
+      "sha256": "e3db66827addd05aa5ea98f99ea0019d20fb066515798795f1e40c4896a662da"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
@@ -1740,14 +1740,6 @@
       "extent": 555,
       "candidate": 555,
       "matching": 405
-    },
-    {
-      "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot74@Vehicle",
-      "va": "0x5281b0",
-      "extent": 539,
-      "candidate": 539,
-      "matching": 528
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",

@@ -29,7 +29,6 @@ VIEWS = (
 SOURCES = tuple(v[1] for v in VIEWS) + (
     'src/krusty2/collision/CollisionPoint.cpp',
     'samples/physics/collision/CollisionObjectNearMisses.cpp',
-    'samples/physics/collision/CollisionPointNearMisses.cpp',
 )
 # Complete resolved fingerprints captured before adding any constructor bodies.
 # These preserve the existing partial candidates without asserting retail identity.
@@ -181,13 +180,6 @@ PARTIAL = [('src/krusty2/vehicle/Bike.cpp',
   405,
   'a051248b7e90e2736ca315f85dfcd9af6feb99e93e9f89a71dafe34b4a5f6723'),
  ('src/krusty2/vehicle/Vehicle.cpp',
-  'UnknownVirtualSlot74@Vehicle',
-  5407152,
-  539,
-  539,
-  528,
-  '1008f678cbeb2454ffc2aa3e637bd6cb5682d900434ac3fee195ed30dfbf6a1f'),
- ('src/krusty2/vehicle/Vehicle.cpp',
   'UpdateLeanFromNormal@Vehicle',
   5408416,
   784,
@@ -207,14 +199,7 @@ PARTIAL = [('src/krusty2/vehicle/Bike.cpp',
   870,
   870,
   840,
-  '238f4dc861a5571c099b02121d0e364461f08fd576fd5427eabc8a72d1a72e61'),
- ('samples/physics/collision/CollisionPointNearMisses.cpp',
-  'SoultreeRefreshContacts',
-  4435328,
-  615,
-  615,
-  604,
-  'c1eebf9abd629e2092a54ff39359ae46985dfdb896f6d660bba1e17e974271f1')]
+  '238f4dc861a5571c099b02121d0e364461f08fd576fd5427eabc8a72d1a72e61')]
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),
@@ -321,7 +306,7 @@ class VectorConstructorTests(unittest.TestCase):
                         resolved = match_object(obj, symbol, va, b'', bindings)
                     self.assertEqual(resolved['digest'], digest, key)
                     partial_count += 1
-            self.assertEqual((strict_count, partial_count), (359, 26))
+            self.assertEqual((strict_count, partial_count), (361, 24))
             compiler = Path(os.environ['VC6_ROOT'])
             linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
             libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
@@ -333,7 +318,7 @@ class VectorConstructorTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Vector constructors: 72240 raw-bit, placement and overlap cases passed', result.stdout)
-            print('357 strict checks and 26 complete partial fingerprints; ' + result.stdout.strip())
+            print('361 strict checks and 24 complete partial fingerprints; ' + result.stdout.strip())
 
 
 if __name__ == '__main__':

@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 114, c 86, total 202. The three class (a) functions of the
+Counts: a 2, b 114, c 84, total 200. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -52,6 +52,15 @@ soultree.cpp: the centre's x row written flat (`c.x * _11 + c.y * _21 + c.z * _3
 with the y and z rows still grouping their last two products moves `pop esi` before the
 a[2][2] store. Grouping all three rows alike had been tried; a per-row sweep of the
 twelve sum shapes (orders x groupings) found it.
+Vehicle slot 74 `0x005281b0` (class c, 528/539) is exact too, in Vehicle.cpp: the product is
+stored straight into `field_0x4e8` and the abs test reads the member (`k` is copied from it
+inside the branch), so VC6 stores the member before the `fcom` as retail does. A local `k`
+stored to the member, or copied from it before the test, leaves the compare ahead of the store.
+SoultreeRefreshContacts `0x0043ad80` (class c, 604/615) is exact too, in CollisionPoint.cpp:
+the single contact's `offset - k * normal` is summed through InlineSum (returned through the
+three-float constructor), which stores the copy's y after the `fstp` of z as retail does; the
+member-store `operator+` stored it before. The owner transform is the canonical
+`SoultreeObject::LocalToWorldPoint` with its returned temporary bound to a const reference.
 Track::IsInsideStrip `0x00516ef0` (class c, 1032/1042) is exact too, in Track.cpp: each
 edge test is a macro over the edge pointers (an inline helper's parameter copies made the
 second product's factor order a symbol tie-break), and the two centre points are local
@@ -155,7 +164,6 @@ Subtracting before the product is worse (164/434).
 | krusty2/vehicle/Vehicle | `0x005257a0` | 693/745 | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |
 | krusty2/vehicle/Vehicle | `0x005265d0` | 405/555 | b | same size; parenthesised Vec3-constructor crosses give retail's product loads; the crashState ?: argument is hoisted above the pushes, A-offset temporaries 0xc lower |
 | krusty2/vehicle/Vehicle | `0x00527a20` | 840/870 | c | `normalLoad = 0` scheduled after the dword-wise zero copy (retail: between its second and third temporary loads) |
-| krusty2/vehicle/Vehicle | `0x005281b0` | 528/539 | c | 1 code diff: retail stores field_0x4e8 before the abs `fcom` (`fst ; fld st(0) ; fcom`). The clamp assigned inside the first product gives retail's dup form for u.x |
 | krusty2/vehicle/Vehicle | `0x005286a0` | 754/784 | c | slot 56: two side-cross products load their multiplicands in the other order (retail side.y*a.z, a.x*side.z); source operand order has no effect |
 | krusty2/vehicle/Vehicle | `0x0052a940` | 2339/3254 | b | 40 differing instructions (3257 B; backingUp and DriveForce's reversing are char). The lift tilt-axis arm is laid out after the Rotate(k) arm (30 control-flow forms, dead end); prevSpeed is loaded before the wheel-count store; some local slots differ |
 | net/Net | `0x004aced0` | 361/370 | c | ring slot addressed through a byte-offset helper (fixes every SIB order); retail loads `from` before `lea ebx, [edx + edi]` for the system-message pointer, VC6 forms the pointer first (`mov ebx, edi ; add ebx, ecx`) and pushes system[2] from edx instead of eax |
@@ -172,7 +180,6 @@ Subtracting before the product is worse (164/434).
 | physics/bvh/BoundingBoxTreeQuery | `0x00427c10` | 374/1110 | b | natural operator form: retail's helper call sequence; retail keeps the constant 1 in ebp and copies segment[1] at entry, so registers and slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x004280e0` | 453/2228 | b | inline BoxOverlap copy: one constructor still expanded and the recursion tails cross-jumped differently |
 | physics/bvh/BoundingBoxTreeQuery | `0x0042a640` | 41/1428 | b | retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80); cross-product operand order of the x term |
-| physics/collision/CollisionPoint | `0x0043ad80` | 604/615 | c | if/else with one exit gives retail's delayed pushes; a `pp` pointer local behind `if (count > 0)` gives the loop header and counter home; retail stores the copy's w.y after the fstp of w.z |
 | physics/constraint/ConstraintMethodCollisionModel | `0x0043bdb0` | 2515/2619 | c | ApplyContactImpulse, frame 0xb8, slot order and size match; termB's dot (ConDotGroupedY), vA's cross and rl x nl go through the fully parenthesised ConCrossParen; left: scheduling of the LocalToWorldPoint and rl struct copies, one dword move, the `test edi` of `if (other)` and one fld/fmul order in termB's cross |
 | physics/contact/ContactImpulse | `0x005004a0` | 940/1062 | b | size and frame 0x60 exact (torque blocks at function scope, `(y*y') + x*x'`, torque B and uB via parenthesised Vec3-constructor crosses); temporaries in other frame slots; torque cross loads r before n (leaf age; n aliases inert), one tail mov/push schedule |
 | physics/helpers/GraphicsTest | `0x0047bd10` | 818/917 | b | DrawCircle: frame 0xb84 vs 0xb78, the `[eax - 4]` store and the centre-sum operand order; a `Vec3* p = &points[i]` local gave +4 |

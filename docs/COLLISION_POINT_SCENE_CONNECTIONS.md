@@ -56,8 +56,8 @@ relocation kinds/addends and resolved local section/offset destinations are
 preserved. The aggregate's two complete partial bodies remain 845 bytes with
 820 matching positions and 615 bytes with 604 matching positions, with their
 previous resolved-byte hashes unchanged. (Since then the 845-byte contact merge
-`0x43aa30` has become strict exact and moved into `CollisionPoint.cpp`; the
-aggregate keeps only the refresh.)
+`0x43aa30` and the 615-byte refresh `0x43ad80` have become strict exact and
+moved into `CollisionPoint.cpp`; the aggregate sample is gone.)
 
 The isolated authentic build compiled all 216 sources and reduced unresolved
 symbols from 375 to 373, removing exactly these two names and adding none.
@@ -98,13 +98,14 @@ canonical return-value trial changed the strict 1,003-byte caller's operand
 order; a named-result form grew it to 1,005 bytes. No arithmetic or baseline
 was changed to accommodate that trial.
 
-The nonadmitted `SoultreeRefreshContacts` sample retains its own explicit-output
-scene call: the tested canonical rewrite changed its 615-byte body to 627
-bytes. Its old declaration and binding remain for that sample. Both binding
-files retain this key because the physics manifest currently routes the
-sample's partial comparisons through the production binding file. No such
-import remains in the production object. The sample body remains nonexact
-and excluded from the game build.
+`SoultreeRefreshContacts` (`0x43ad80`) now calls the canonical
+`SoultreeObject::LocalToWorldPoint` too. Its returned temporary is bound to a
+`const CollisionVec3&`, so both contact copies read through the returned
+pointer as in retail. Copying the call into a `const Vec3&` and casting it at
+each copy changed the 615-byte body to 627 bytes. The production object imports
+the canonical method twice and the old explicit-output view not at all. The
+old declaration and its binding key remain in `CollisionPoint.h` and the
+binding files, but no compiled object uses them.
 
 Reproduce with native private inputs configured:
 

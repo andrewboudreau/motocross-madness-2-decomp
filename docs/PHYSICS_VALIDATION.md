@@ -162,7 +162,7 @@ extents is exact, a near miss or excluded:
   (unit open). The contact merge `0x43aa30` is exact here too (its loop adds y through a
   pointer to the sum, so only y takes the load form in the mean, rule 6 of
   `docs/VC6_PATTERN_CORPUS.md`). The refresh `0x43ad80` (formerly `CollisionContactUpdate.cpp`)
-  is a near miss in `samples/physics/collision/CollisionPointNearMisses.cpp`.
+  is exact here too (the single contact's sum goes through InlineSum's constructor return).
 - `src/krusty2/shadow/ProjectedShadow.cpp` (extent `0x4da570..0x4dc610`) passes 21
   targets. New: SetLight `0x4dae50`, whose mode is the third argument (the callers push
   it first). Init, ComputeBounds and Present are near misses in
@@ -173,7 +173,6 @@ extents is exact, a near miss or excluded:
 ```bash
 python tools/run_physics_samples.py --strict \
   --source src/krusty2/collision/CollisionPoint.cpp \
-  --source samples/physics/collision/CollisionPointNearMisses.cpp \
   --source src/krusty2/shadow/ProjectedShadow.cpp \
   --source samples/physics/shadow/ProjectedShadowNearMisses.cpp \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
@@ -458,8 +457,7 @@ Strict exact under `vc6_o2_ml` with `SoulTreePhysics.bindings.json`:
 
 - The GameObject slot 10 override `0x005036f0` was `masked` only because the contact
   refresh it calls had no binding; `SoultreeRefreshContacts` is `0x0043ad80`
-  (CollisionPoint.cpp's extent; near miss in
-  `samples/physics/collision/CollisionPointNearMisses.cpp`) and the target is strict exact.
+  (exact in CollisionPoint.cpp) and the target is strict exact.
 - SoultreePhysicsObject (`soultree/SoultreePhysicsObject.h`, formerly a collision sample
   header): ctor `0x005037c0` (`GameObject(1)`, `SoultreePhysicsBaseObject(flags)`,
   `D3DIMSoultreeObject(flags)`, then `sceneNode = this` converted to the D3DIM subobject),

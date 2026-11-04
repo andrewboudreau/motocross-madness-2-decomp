@@ -1,5 +1,10 @@
 // Complete nonexact candidate: retail 974 bytes, candidate 974, 966 matching positions.
 // Member/field names and original translation-unit ownership remain provisional.
+// Left: retail holds the racer in eax and the buffer in ecx in the "%.3f" branch and
+// g_TrackGame in edx in the positions block. Session 15, unchanged (966): rect.left =
+// rect.left + ..., a per-branch length, a racer local in the "%.3f" branch, a (double)
+// cast, `!= 0`, one or two dead int locals in the cue or the else branch (so not a
+// round-robin register state); dropping the inner `size` shadow is worse (933).
 #include <stdio.h>
 #include <string.h>
 #include "../../src/reconstructed/TrackOverlay.h"
