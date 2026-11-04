@@ -59,7 +59,7 @@ public:
 
     virtual Vector3 GetStateFiveFollowPoint(float dt);
     virtual Vector3 UnknownVirtualSlot37();
-    virtual void UnknownVirtualSlot40(float dt);
+    virtual void SteerToKeepTargetOnScreen(float dt);
     virtual Vector3 UnknownVirtualSlot50();
     virtual float UnknownVirtualSlot51();
     virtual void UnknownVirtualSlot53();

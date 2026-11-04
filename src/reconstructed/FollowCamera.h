@@ -144,9 +144,9 @@ public:
     virtual bool UnknownVirtualSlot36(const Vector3& point, bool enable, bool force);
     virtual Vector3 UnknownVirtualSlot37();
     // 0x004636e0
-    virtual void UnknownVirtualSlot38(float dt, bool blend, bool pitch);
+    virtual void SteerToKeepPointsOnScreen(float dt, bool blend, bool pitch);
     virtual float UnknownVirtualSlot39() = 0;
-    virtual void UnknownVirtualSlot40(float dt);
+    virtual void SteerToKeepTargetOnScreen(float dt);
     // Slot 10 stores the returned vector at +0x29c.
     virtual Vector3 UnknownVirtualSlot41() = 0;
     virtual void UnknownVirtualSlot42(bool flag) = 0;

@@ -33,7 +33,7 @@
   "?Tick@Camera@@UAEHM@Z": "0x0042e690",
   "?OnControlPress@Camera@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x0042f090",
   "?OnControlPress@FollowCamera@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x00466ad0",
-  "?UnknownVirtualSlot38@FollowCamera@@UAEXM_N0@Z": "0x004636e0",
+  "?SteerToKeepPointsOnScreen@FollowCamera@@UAEXM_N0@Z": "0x004636e0",
   "?UnknownVirtualSlot47@FollowCamera@@UAE_NMPBUVector3@@@Z": "0x00465720",
   "?UnknownVirtualSlot49@FollowCamera@@UAE?AUVector3@@_NABU2@M@Z": "0x00464b30",
   "?UnknownVirtualSlot71@FollowCamera@@UAEXH@Z": "0x00466e50",

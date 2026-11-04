@@ -201,7 +201,7 @@ class VisibilityConnectionsTests(unittest.TestCase):
             joined = set(pins['renames'].values())
             observed_sites = {}
             for source, symbol, va in [(SOURCES[0], '?MarkVisibleCells@DrawableCube', 0x43e330),
-                    (SOURCES[1], '?UnknownVirtualSlot38@FollowCamera', 0x4636e0),
+                    (SOURCES[1], '?SteerToKeepPointsOnScreen@FollowCamera', 0x4636e0),
                     (SOURCES[2], '?Render3D@NameOverlay', 0x5190e0)]:
                 bindings = json.loads((ROOT/source).with_suffix('.bindings.json').read_text())
                 for offset, kind, name in signature(objects[source], symbol)[2]:

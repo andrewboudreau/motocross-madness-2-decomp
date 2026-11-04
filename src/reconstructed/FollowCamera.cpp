@@ -176,7 +176,7 @@ inline void FollowCameraTilt(float& angle, float step) {
 // (codes 1/2, wrapped to [-pi, pi]), changes +0x2d4 (codes 4/8) and, when
 // `pitch` is set, the pitch at +0x22c (code 4, clamped to +-1.55). With every
 // entry on screen, the two nearest screen points (by depth) go to slot 73.
-void FollowCamera::UnknownVirtualSlot38(float dt, bool blend, bool pitch) {
+void FollowCamera::SteerToKeepPointsOnScreen(float dt, bool blend, bool pitch) {
     if (pointCount == 0)
         return;
     Vector3 nearest = Vector3(0.0f, 0.0f, FLT_MAX);
@@ -223,10 +223,10 @@ void FollowCamera::UnknownVirtualSlot38(float dt, bool blend, bool pitch) {
 
 // 0x004639f0: with a non-empty table, entry 0 takes the target point before
 // slot 38 runs.
-void FollowCamera::UnknownVirtualSlot40(float dt) {
+void FollowCamera::SteerToKeepTargetOnScreen(float dt) {
     if (pointCount > 0) {
         SetTableEntry(0, &targetPoint, 0, 0, 0, 0, 0);
-        UnknownVirtualSlot38(dt, 0, 0);
+        SteerToKeepPointsOnScreen(dt, 0, 0);
     }
 }
 
@@ -312,7 +312,7 @@ Vector3 FollowCamera::UnknownVirtualSlot49(bool orbit, const Vector3& base, floa
                 worldYaw -= 6.2831855f;
             distanceEase->Set(followDistance, FLT_MAX);
         }
-        UnknownVirtualSlot40(dt);
+        SteerToKeepTargetOnScreen(dt);
         Vector3 direction;
         D3DRMVectorRotate(&direction, &kVec3ZAxis, &kVec3YAxis,
                           followYaw + worldYaw);
