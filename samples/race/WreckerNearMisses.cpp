@@ -38,6 +38,10 @@
 // Also worse (s17): separate world and local probe vectors (320), assigning
 // probePositions[i] directly and reading it back (212), previousPush or
 // previousSum copied from the other zero vector (208, 85).
+// Also unchanged (s18, 1200): `const` by-value clip parameters, a
+// non-static `inline` clip, push and previousPush in one declaration. Worse:
+// a `const Vector3& previous = probePositions[i]` alias for the previous
+// reads (391).
 //
 // SprayContactParticles (0x00531740, 1624 bytes; 1606/1624): the contact
 // particle spray. Frame, slot order and every instruction but two match
