@@ -3,8 +3,8 @@
 // nothing defines.  None of this is a byte-match claim; it exists so the source-built game
 // links.  Where the retail VA already has a definition under its owner's name, the view
 // forwards to it:
-//   0x00484d70 TerrainShutdownObject::LookupCell -> written out (GridNode::FindLeaf has no
-//              src/ definition; the body is samples/render/GridNodeNearMisses.cpp's)
+//   0x00484d70 TerrainShutdownObject::LookupCell -> written out (an older walk spelling of
+//              GridNode::FindLeaf, now exact in src/reconstructed/GridNode.cpp)
 //   0x004a1410 TerrainMatrixIdentityInto  -> ShadowMatrixIdentity (-> IdentityMatrix)
 //   0x004a1860 TerrainMatrixMultiplyInto  -> ShadowMatrixMultiply (-> MatrixMult)
 //   0x00421cb0 TerrainShadowSum           -> Vec3AddCall
@@ -50,7 +50,7 @@ Vec3* Vec3SubtractCall(Vec3* out, const Vec3* a, const Vec3* b);   // 0x00421d00
 // 0x00484d70 (thiscall, ret 8): the heightField is the root GridNode (src/reconstructed/
 // Griddraw.h); children at +0x04 (16 x 16 table), shift at +0x29, grid position at +0x24/+0x26.
 // The row table at 0x0056c2ac is g_gridRow16 (row * 16), written here as the multiply.
-// best guess: GridNodeNearMisses.cpp's FindLeaf body (81/90, same instructions) over a local view.
+// best guess: the old 81/90 walk spelling of GridNode::FindLeaf (exact form in GridNode.cpp) over a local view.
 struct Group6TerrainGridNodeView {
     void* vtable;                                   // +0x00
     Group6TerrainGridNodeView** children;           // +0x04

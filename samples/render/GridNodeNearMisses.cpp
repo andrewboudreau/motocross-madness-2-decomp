@@ -1,24 +1,9 @@
 // Near-miss GridNode.cpp candidates (src/reconstructed/GridNode.cpp), kept out of
 // src/reconstructed until they match.
 //
-// 0x00484d70 (leaf lookup, 90 bytes): 81/90. Same instructions; retail forms the table
-// index in eax (reusing the node register) and compares gridX through ecx and gridZ
-// through edx, VC6 here swaps them. Index locals, operand order, pointer walks, the
-// shape of the final test, recursive forms, /G6, /O1 and /Oy- (about thirty
-// spellings) do not change it. Nor do 82 more forms: `while (table)`,
-// `for (;;) ... break` or `while (node->children)` walks (a child local or
-// not), row/col/index/shift locals, `*(table + ...)`, redundant parentheses
-// in the index or the test, `&&`/`||`/two-if/ternary tests, swapped or
-// z-first comparisons and int casts or locals for gridX/gridZ (77/86 at best).
-// A `static const` or extern row table, the column term first in the index
-// sum and unsigned shifted coordinates are unchanged as well.
-// 0..33 prepended typedefs (section 2 tie-break) give 81 at every count.
-// Session 15, also 81: a `const unsigned char&` alias of node->shift, a `const GridNode&`
-// leaf alias, local copies of the coordinates, a row pointer into the table, the walk
-// as `while ((table = node->children) != 0)` and a test-first `for (;;)` with a table
-// local. Worse: tail-recursive lookups (three spellings, 20/93; they give retail's
-// ecx/edx final compare but another loop), `while (1)` test-first (34/90), do-while
-// (57/131) and assignment-in-condition with coordinate locals (20/93).
+// 0x00484d70 (leaf lookup) is exact and lives in src/reconstructed/GridNode.cpp:
+// a tail call into the child through an index local, the child slot read
+// twice (session 18). The ~110 walk spellings recorded before stayed at 81/90.
 //
 // 0x00483910 (cell sampler) is exact and lives in src/reconstructed/GridNode.cpp.
 // It closed (cycle 3) from 1040/1067 with two levers: `level` read through a
@@ -54,24 +39,6 @@ static int g_gridRow17[18] = {
     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
     0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x110, 0x121,
 };
-
-// 0x00484d70
-GridNode* GridNode::FindLeaf(int x, int z)
-{
-    GridNode* node = this;
-    GridNode** table = children;
-    while (table) {
-        node = table[g_gridRow16[(z >> node->shift) & 0xf] + ((x >> node->shift) & 0xf)];
-        if (!node) {
-            return 0;
-        }
-        table = node->children;
-    }
-    if (node->gridX != x || node->gridZ != z) {
-        return 0;
-    }
-    return node;
-}
 
 // Height of a cell corner in world units (the formula of 0x00483910).
 static inline float GridCornerHeight(const GridNode* node, const GridBaseCell* cell)

@@ -5,8 +5,8 @@
 // 0x0055cb08, vtable 0x00553ec0) is tier 1; the class is declared in
 // Griddraw.h. There is no __FILE__ literal: the file name is ours (tier 3).
 // Its .data is the third copy of the shared row tables (0x0056c2ac), which
-// 0x00483910 and 0x00484d70 read. The cell sampler 0x00483910 is exact; slot 1
-// (segment intersection) and 0x00484d70 are near misses
+// 0x00483910 and 0x00484d70 read. The cell sampler 0x00483910 and the leaf
+// lookup 0x00484d70 are exact; slot 1 (segment intersection) is a near miss
 // (samples/render/GridNodeNearMisses.cpp).
 
 #include "Griddraw.h"
@@ -150,4 +150,24 @@ missing:
         bytes[i] = 0;
     }
     return 0;
+}
+
+// 0x00484d70: the leaf holding grid cell (x, z), or 0 when that branch is
+// missing or the leaf is another cell. Written, like GetCellCorners, as a
+// tail call into the child: retail's loop is VC6's tail-recursion
+// elimination. The child slot is read twice through the index (test, then
+// call), which gives retail's eax index and ecx/edx compare registers; with
+// a child local VC6 reloads `children` and builds another loop, and the
+// explicit walks of the old sample swap the registers (81/90).
+GridNode* GridNode::FindLeaf(int x, int z)
+{
+    if (children) {
+        int index = g_gridRow16[(z >> shift) & 0xf] + ((x >> shift) & 0xf);
+        if (!children[index])
+            return 0;
+        return children[index]->FindLeaf(x, z);
+    }
+    if (gridX != x || gridZ != z)
+        return 0;
+    return this;
 }

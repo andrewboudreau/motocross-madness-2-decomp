@@ -26047,13 +26047,13 @@ CASES = [
         'reason': 'attaches a binding to the axis list (ContainerList::Add inlined with the containerlist.h __FILE__)',
     },
     {
-        'name': 'GridNodeNearMisses.cpp 0x484d70 GridNode::FindLeaf',
-        'bindings': 'samples/render/GridNodeNearMisses.bindings.json',
-        'source': 'samples/render/GridNodeNearMisses.cpp',
+        'name': 'GridNode 0x484d70 FindLeaf',
+        'bindings': 'src/reconstructed/GridNode.bindings.json',
+        'source': 'src/reconstructed/GridNode.cpp',
         'symbol': '?FindLeaf@GridNode@@QAEPAV1@HH@Z',
         'target_va': '0x00484d70',
         'target_size': 90,
-        'reason': 'near miss (90%): leaf lookup; VC6 swaps the gridX/gridZ compare registers',
+        'reason': 'leaf lookup; tail call into the child (eliminated to a loop) with the child slot read twice through an index local',
     },
     {
         'name': 'BackgroundImage.cpp 0x404df0 TrackGameViewOwner::SelectLapGates',

@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 114, c 84, total 200. The three class (a) functions of the
+Counts: a 2, b 114, c 83, total 199. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -102,6 +102,14 @@ src/reconstructed/SoultreeDrag.cpp: the scaled branch builds its product in a na
 temporary (`Vec3 scaled = scratchVector * (limit / length); *speedBudget -= charge;
 drag = scaled;`), so the budget `fsub` comes before the copy's z load as in retail.
 Subtracting before the product is worse (164/434).
+GridNode::FindLeaf `0x00484d70` (class c, 81/90) is exact too, in
+src/reconstructed/GridNode.cpp: written as a tail call into the child (as GetCellCorners
+in the same unit is), through an index local with the child slot read twice
+(`if (!children[index]) return 0; return children[index]->FindLeaf(x, z);`). VC6
+eliminates the tail call into retail's loop with the index in eax and gridX/gridZ
+compared through ecx/edx. A child local makes VC6 reload `children` (20/93), and the
+~110 explicit walks stayed at 81. When retail loops where a sibling recursion was
+eliminated, try the recursive form with the sibling's spelling.
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
@@ -237,7 +245,6 @@ Subtracting before the product is worse (164/434).
 | render/Grid1 | `0x0047caa0` | 213/1728 | b | slot 3 texture stage switch; with the terrain/extra casts 63 instructions differ, mostly after the stage ladder, whose fourth compare VC6 folds (20 bytes short) |
 | render/Grid1 | `0x0047d470` | 313/786 | b | `rest` before `line`; line pointer still spilled (frame 0x838 vs 0x834), first/row in ebx/edx where retail has edx/eax |
 | render/Grid1 | `0x0047d780` | 227/1010 | b | 50 code diffs: `je @321 ; mov esi, [esp + N]` vs `je @315`; `mov eax, [esi]` vs `mov edi, [esp + N]`; slot order differs |
-| render/GridNode | `0x00484d70` | 81/90 | c | 3 code diffs: `mov ecx, [eax*4 + A] ; add ecx, ebx ; m~` vs `mov eax, [eax*4 + A] ; add eax, ebx ; m~`; retail adds `xor ecx, ecx ; mov cx, word ptr [eax + ~` ; ~110 loop, index-local, final-test and parenthesis spellings unchanged |
 | render/GridNode | `0x00483d40` | 96/4189 | b | slot 1: ebp frame and four bare `fistp [eax]` from an `__asm` rounding helper (`__ftol` still used elsewhere), so unreachable under the no-inline-asm rule; `/Oy-` changes nothing else |
 | render/Griddraw | `0x0047de90` | 977/1083 (masked) | c | 30 code diffs: retail lacks `mov esi, [esp + N]`; `mov edi, [ebp*N + N]` vs `mov edi, [esp + N]` |
 | render/Griddraw | `0x0047e600` | 1605/1617 (masked) | c | frame matches; the extent.x/extent.y products load the cell size first (`fld [edx + 0x40] ; fmul [ecx + 0x164]`), retail the minimum ; the order follows which fields are read (+0x168 gives min-first, +0x164/+0x18 cell-first), not source order or parentheses (432 forms) |

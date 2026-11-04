@@ -226,13 +226,14 @@ destructor `0x004838a0`, its deleting wrapper `0x004838f0` and the cell
 sampler `0x00483910` `GetCellCorners` (1067 bytes, in GridNode.cpp: reading
 `level` through a `const unsigned char&` makes VC6 reuse the leaf-test byte,
 `and eax, 0xff ; shl eax, 2`, and `mask`/`one` must be computed before the
-cell coordinates `cx`/`cz`). Near misses
-(`samples/render/GridNodeNearMisses.cpp`):
+cell coordinates `cx`/`cz`), and the leaf lookup `0x00484d70` `FindLeaf`
+(90 bytes, a tail call into the child through an index local with the
+child slot read twice; VC6 eliminates the tail call into retail's loop).
+Near miss (`samples/render/GridNodeNearMisses.cpp`):
 
 | Function | Bytes | What differs |
 |---|---:|---|
 | `0x00483d40` (GridNode slot 1, 4140 B) | 96/4189 | ebp frame and four bare `fistp dword ptr [eax]` (0x4844aa, 0x4844be, 0x484670, 0x484687) from an `__asm fld/fistp` rounding helper while `__ftol` is still called for the other casts, which the no-inline-asm rule rules out; `/Oy-` only fakes the frame and leaves the x87 crossing loops different |
-| `0x00484d70` (leaf lookup) | 81/90 | register choice for the table index (eax vs ecx) and the gridX/gridZ compare order; invariant under ~30 spellings, /G6, /O1 and /Oy- |
 
 What the two large functions do (names tier 3; `0x00483910` is
 `GetCellCorners` in Griddraw.h): `0x00483910(x, z, heights,
@@ -297,6 +298,6 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x0047db60` `BuildCurveTables` (Gridbase.cpp)
 - `0x0047d470` `DrawableGridNodeSharedTextures::BuildNodeTexture` (Grid1.h)
 - `0x0047d780` `DrawableGridNodeSharedTextures::BuildBlockTexture` (Grid1.h)
-- `0x00484d70` `GridNode::FindLeaf` (GridNode near-miss sample)
+- `0x00484d70` `GridNode::FindLeaf` (GridNode.cpp)
 - `0x0047e600` `ReadNode`, `0x0047ef80` `WalkVisibleQuadrants`, `0x00480940`
   `DrawVisibleQuadrants` and `0x004826d0` `PropagateFullMask` (near-miss sample)
