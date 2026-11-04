@@ -868,7 +868,7 @@ void KrustyBike::UnknownVirtualSlot97()
 // on-screen messages to the local player (string ids 0x1481.. / 0x14d6 / 0x14d7 / 0x14e1; tier 3
 // semantics), advances the 0x7a4 state, and runs the Bike update unless the race context
 // takes over.
-void KrustyBike::UnknownVirtualSlot49(float dt)
+void KrustyBike::SimulateFrame(float dt)
 {
     if (drawnAtLastPosition) {
         modelNode->SetPosition(position);
@@ -957,7 +957,7 @@ void KrustyBike::UnknownVirtualSlot49(float dt)
         if (race->isRacing)
             Fn_00413200(dt);
     } else {
-        Bike::UnknownVirtualSlot49(dt);
+        Bike::SimulateFrame(dt);
     }
     if (race->raceCamera->cameraState == 3 && race->raceCamera->followedBike == this) {
         modelNode->SetPosition(lastFramePosition);

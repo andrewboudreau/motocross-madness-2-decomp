@@ -342,7 +342,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot49@Bike",
+    "candidate_symbol_contains": "SimulateFrame@Bike",
     "target_va": "0x0040ca20",
     "target_size": 30,
     "expect": "exact",
@@ -1172,7 +1172,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot49@Vehicle",
+    "candidate_symbol_contains": "SimulateFrame@Vehicle",
     "target_va": "0x52a940",
     "target_size": 3254,
     "expect": "partial",
@@ -2132,7 +2132,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot49@KrustyBike",
+    "candidate_symbol_contains": "SimulateFrame@KrustyBike",
     "target_va": "0x00496790",
     "target_size": 1400,
     "expect": "exact",

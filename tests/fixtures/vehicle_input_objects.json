@@ -3,17 +3,17 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "c5dd1aa1f383f2f6ca48a6e76b951e2e65f7e7f02c38139cfa6a86e7fdd44a6b"
+      "sha256": "b437adb3ab31b0649ae83e80ef5950ae33b34e77704376e67bfbe0e3358425a4"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "304facec0deb0e901a1b7b7cd0942b04e1878f6a9d0606c69a045ee186329465"
+      "sha256": "951455fb291be83f9eb21a64e5081d7528fb4c71986fc9b52ad0d5484188560d"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
       "relocations": 1054,
-      "sha256": "23295b0b03c7bbfa1d7ade95e96a61e3b722961b1bc8b683fbdd52d3216dacfe"
+      "sha256": "5890a0f2720e66896d7e7eb656cffdc38ed74221057c9294bd050ea9d3012d0b"
     },
     "src/reconstructed/VehicleDefaults.cpp": {
       "sections": 13,
@@ -43,7 +43,7 @@
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "cd09e707b38a7f33c00716e30ed1ebaecbebf6a7539aa5c22ba0250e8e469ed7"
+      "sha256": "411cfc089f61ab452ed3134666cbb75cc208fcdefe25869ff3993f2b0fd976b7"
     },
     "src/reconstructed/InputDevice.cpp": {
       "sections": 11,
@@ -306,7 +306,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot49@Bike",
+      "symbol": "SimulateFrame@Bike",
       "va": "0x40ca20",
       "extent": 30,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -1342,7 +1342,7 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot49@KrustyBike",
+      "symbol": "SimulateFrame@KrustyBike",
       "va": "0x496790",
       "extent": 1400,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1759,7 +1759,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot49@Vehicle",
+      "symbol": "SimulateFrame@Vehicle",
       "va": "0x52a940",
       "extent": 3254,
       "candidate": 3254,

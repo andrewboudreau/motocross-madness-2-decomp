@@ -37,7 +37,7 @@ public:
     virtual void UnknownVirtualSlot44();
     virtual Vec3* UnknownVirtualSlot46(Vec3* out, float slideAngle);
     virtual float UnknownVirtualSlot47(float arg);
-    virtual void UnknownVirtualSlot49(float dt);
+    virtual void SimulateFrame(float dt);
     virtual float UnknownVirtualSlot53();
     virtual Vec3* GetContactGroundNormal(Vec3* out);
     virtual Vec3* UnknownVirtualSlot55(Vec3* out, Vec3* pos);

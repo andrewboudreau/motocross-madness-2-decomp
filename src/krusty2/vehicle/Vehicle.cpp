@@ -956,7 +956,7 @@ static inline float VehSmooth(VehicleSmoother* s, float target, float dt)
     return s->smoothedValue = (target - s->smoothedValue) * s->blendFactor + s->smoothedValue;
 }
 
-void Vehicle::UnknownVirtualSlot49(float frame)
+void Vehicle::SimulateFrame(float frame)
 {
     int steps;
     Vec3 force;       // force accumulator, seeded with weightForce
@@ -2221,7 +2221,7 @@ int Vehicle::Tick(float dt)
         motionActive = 0;
         motionCompleted = 1;
     }
-    UnknownVirtualSlot49(dt);
+    SimulateFrame(dt);
     return GameObject::Tick(dt);
 }
 

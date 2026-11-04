@@ -296,9 +296,9 @@ int Bike::UnknownVirtualSlot5(int value)
     return BikeAbsRef(savedRoll) > 0.2618f || BikeAbsRef(savedPitch) > 1.05f;
 }
 
-void Bike::UnknownVirtualSlot49(float dt)
+void Bike::SimulateFrame(float dt)
 {
-    Vehicle::UnknownVirtualSlot49(dt);
+    Vehicle::SimulateFrame(dt);
     UnknownVirtualSlot102(dt);
 }
 

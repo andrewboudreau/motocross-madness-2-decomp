@@ -210,7 +210,7 @@ class CollisionPointConsumersTests(unittest.TestCase):
                         (ROOT/source).with_suffix('.bindings.json'))['strict_exact'], (extract, symbol))
                     strict += 1
             for source, caller, callee in ((SOUL, SLOT, RELATIVE), (SOUL, '?RunSteps@SoultreePhysicsBaseObject@@', WORLD),
-                                          (VEHICLE, '?UnknownVirtualSlot49@Vehicle@@', WORLD)):
+                                          (VEHICLE, '?SimulateFrame@Vehicle@@', WORLD)):
                 obj = objects[source]
                 _, _, rels = obj.symbol_extent(obj.find_symbol(caller))
                 names = Counter(obj.symbol_by_index[r.symbol_index].name for r in rels if r.type==20)
@@ -237,11 +237,11 @@ class CollisionPointConsumersTests(unittest.TestCase):
                                   for r in relocations if r.type==6], [destination]*3)
                 self.assertEqual(sorted(struct.unpack_from('<I', body, r.virtual_address-entry.value)[0]
                                         for r in relocations if r.type==6), [0,4,8])
-            result = compare(retail, objects[VEHICLE], '?UnknownVirtualSlot49@Vehicle@@', 0x52a940, 3254,
+            result = compare(retail, objects[VEHICLE], '?SimulateFrame@Vehicle@@', 0x52a940, 3254,
                              (ROOT/VEHICLE).with_suffix('.bindings.json'))
             self.assertEqual((result['candidate_size'], result['strict_match']['matching_positions']), (3254, 3229))
             with patch('mcm2tool.resolved_match.compare_bytes', lambda a,b: {'digest': hashlib.sha256(b).hexdigest()}):
-                resolved = match_object(objects[VEHICLE], '?UnknownVirtualSlot49@Vehicle@@', 0x52a940, b'',
+                resolved = match_object(objects[VEHICLE], '?SimulateFrame@Vehicle@@', 0x52a940, b'',
                     {k:int(v,0) for k,v in json.loads((ROOT/VEHICLE).with_suffix('.bindings.json').read_text()).items()})
             self.assertEqual(resolved['digest'], '00b155aafdae0021e18ba64055e46609f5ad556b2eb37f6db07844362940ec7d')
             native_point = output/'point_native.obj'

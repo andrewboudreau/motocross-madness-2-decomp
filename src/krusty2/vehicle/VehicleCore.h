@@ -66,7 +66,7 @@ public:
     virtual void AdvancePosition();
     // 0x0052a940 forwards its argument unchanged to slots 9 (float dt), 39, 64 and 65,
     // so it and they take the float time step (tier 2).
-    virtual void UnknownVirtualSlot49(float dt);
+    virtual void SimulateFrame(float dt);
     virtual void SetSpawnProtection(int protect, float duration, int forced);
     virtual int UnknownVirtualSlot51();
     virtual int UnknownVirtualSlot52();
