@@ -1,10 +1,13 @@
 # Physics slot 6: magnitude and budget update
 
-`samples/physics/soultree_base/SoultreeDrag.cpp` reconstructs the complete
+`src/reconstructed/SoultreeDrag.cpp` reconstructs the complete
 `SoultreePhysicsBaseObject::UnknownVirtualSlot6(Vec3*, float*)` body at
-`0x0040b410`. The member names and drag/budget interpretation remain provisional.
-Original translation-unit ownership is not established. The existing
-`SoultreePhysicsInlines.cpp` includes this one definition and retains slot 36.
+`0x0040b410`. It is a strict byte match under `vc6_o2_mt`. The member names and
+drag/budget interpretation remain provisional. Original translation-unit
+ownership is not established: the body lies in Bike.cpp's address range and is
+most likely an inline member kept from the first unit that emitted it. The file
+is a reconstruction grouping like `SoultreePhysicsMethods.cpp`. The sample
+`samples/physics/soultree_base/SoultreePhysicsInlines.cpp` keeps only slot 36.
 
 ## Identity and complete extent
 
@@ -65,23 +68,34 @@ The repair deliberately changes a previously partial candidate:
 | --- | --- | --- | --- |
 | Original candidate | 432 | 432 | 287 |
 | Corrected candidate | 440 | 432 | 126 |
-| Current candidate | 432 | 432 | 426 |
+| Reference and clamp forms | 432 | 432 | 426 |
+| Current source | 432 | 432 | 432 (exact) |
 
-The current candidate reads the magnitude through a `scratchVector` reference
-(retail's `[esi]` loads) and clamps with `*speedBudget < charge` (retail's
-`fcom`). The remaining difference is the scaled branch's budget `fsub`, which
-retail schedules before the copy's z load.
+The source reads the magnitude through a `scratchVector` reference (retail's
+`[esi]` loads) and clamps with `*speedBudget < charge` (retail's `fcom`). The
+scaled branch builds its product in a named temporary, charges the budget and
+then assigns it to `drag`:
 
-The complete extent is never trimmed. Lower positional similarity is recorded
-explicitly; the corrected body remains nonexact. The source also now naturally
+```cpp
+Vec3 scaled = scratchVector * (limit / length);
+*speedBudget -= charge;
+drag = scaled;
+```
+
+VC6 then schedules the budget `fsub` before the copy's z load, as retail does.
+Assigning the product to `drag` directly leaves the `fsub` after it (426/432).
+Subtracting before computing the product is worse (164/434).
+
+The complete extent is never trimmed. The source also now naturally
 stores and reloads the squared magnitude before testing equality with 1, as
 retail does. No unrelated method was changed to obtain this emission.
 
 ## Native validation
 
-`tests/test_soultree_drag_behavior.py` compiles the actual standalone candidate
-with authentic VC6 SP3 `/O2 /MT`, separately from the fixture. It also compiles
-the aggregate and the existing `FastMath.cpp`. Both `FastSqrt` (85 bytes) and
+`tests/test_soultree_drag_behavior.py` compiles the canonical source with
+authentic VC6 SP3 `/O2 /MT`, separately from the fixture, and requires a strict
+match. It also compiles the sample aggregate, which no longer defines slot 6,
+and the existing `FastMath.cpp`. Both `FastSqrt` (85 bytes) and
 `InitFastSqrtTable` (97 bytes) are independently strict against retail. The
 native fixture executes the real initializer and real table-driven helper.
 
@@ -119,37 +133,29 @@ equivalence.
 
 ## Preservation and dependencies
 
-The standalone imports only `FastSqrt` and the normal CRT `__fltused` marker.
+The source imports only `FastSqrt` and the normal CRT `__fltused` marker.
 It adds no game-owned dependency beyond an existing strict provider. Slot 36
 and its unsupplied orientation-vector global remain outside this candidate.
 
 The unchanged Math3D header emits four local vector initializers and associated
 storage in this source unit. The regression compares their eight complete
-initializer functions with the aggregate, checks its four-entry `.CRT$XCU`,
+initializer functions with the sample aggregate, checks its four-entry `.CRT$XCU`,
 and validates referenced float literals against retail. Their emission is not
 evidence for an original translation-unit assignment or whole-object retail
 identity. They are ordinary private source globals, not aliases to retail data.
 
-A same-path pre-edit aggregate object from base `51120f51` was compared with
-the final aggregate, including every nondebug section and relocation target.
-Of **17 sections and 35 relocations**, only the slot 6 code section changes;
-the other **16 sections** remain identical, without a filename exception.
-Slot 36 retains all 305 emitted bytes and eight relocations. The existing exact
-methods regression keeps all strict assertions; only its partial slot 6 size
-assertion changed, now to the current 432/426 result.
+Slot 36 keeps all 305 emitted bytes and eight relocations in the sample
+aggregate (pinned by the regression). The exact methods regression
+(`tests/test_soultree_physics_methods.py`) checks slot 6 strictly against the
+primary vtable entry, together with the other promoted slots.
 
-Private evidence is in `work/soultree-drag37/`: `before.obj`, `after.obj`,
-`original.cpp`, `first.log`, `retail.txt`, `candidate-original.txt`,
-`candidate-fixed.txt`, and `same-path-preservation.json` (reproduced by
-`check_preservation.py`). These private binaries and retail material are not
-repository inputs.
+### Build admission
 
-### Functional build review
-
-This complete source candidate is suitable for individual reviewed-nonexact
-admission with the finite validation limits above. Its 432-byte body is not a
-strict byte match to the retail body, and it is not an original-TU
-reconstruction. A linked game, startup, and racing remain separate checks.
+`src/reconstructed/SoultreeDrag.cpp` is an ordinary source of the game build
+(`config/game_build.json` source root `src`). It replaces the earlier
+reviewed-nonexact sample admission. The byte match and the finite native
+validation above are separate claims. Neither establishes the original TU, and a
+linked game, startup and racing remain separate checks.
 
 Reproduce the retained native and neighboring strict checks on Windows:
 

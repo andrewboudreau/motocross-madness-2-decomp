@@ -27,10 +27,8 @@ PART = 'src/reconstructed/MovingPart.cpp'
 DOT = '?Vec3DotCall@@YAMPBUVec3@@0@Z'
 WORLD = '?LocalToWorldPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z'
 OLD_WORLD = '?LocalToWorldPoint@CollisionContactOwner@@QAEPAUCollisionVec3@@PAU2@PBU2@@Z'
-# Complete resolved partial bodies from the published pre-connection source.
+# Complete resolved partial body from the published pre-connection source.
 PARTIALS = (
-    ('SoultreeMergeContacts', 0x43aa30, 845, 838,
-     '699f914a2a998fbad7da6a31db1faa9d9d024a5f37a8943edf1d4a94bf34c8f6'),
     ('SoultreeRefreshContacts', 0x43ad80, 615, 604,
      'c1eebf9abd629e2092a54ff39359ae46985dfdb896f6d660bba1e17e974271f1'),
 )
@@ -180,7 +178,7 @@ class CollisionPointSceneConnectionsTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Contact scene: 19541 native allocation, cache, transform and dot cases passed', result.stdout)
-            print('%d complete strict checks, 2 preserved partials; %s' % (strict_count, result.stdout.strip()))
+            print('%d complete strict checks, 1 preserved partial; %s' % (strict_count, result.stdout.strip()))
 
 
 if __name__ == '__main__':

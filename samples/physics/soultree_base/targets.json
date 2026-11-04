@@ -11,13 +11,13 @@
  },
  {
   "class": "SoultreePhysicsBaseObject",
-  "source": "SoultreePhysicsInlines.cpp",
+  "source": "../../../src/reconstructed/SoultreeDrag.cpp",
   "candidate_symbol_contains": "UnknownVirtualSlot6@SoultreePhysicsBaseObject",
   "target_va": "0x0040b410",
   "target_size": 432,
-  "expect": "partial",
-  "notes": "Complete 432-byte retail body. The standalone SoultreeDrag.cpp is included here. Corrected a demonstrated semantic error: FastSqrt overwrites the working magnitude float; the old candidate discarded the root and incorrectly used squared length. Current candidate 440 bytes/126 strict matching positions; previous 432/287. Native regression uses actual strict FastSqrt and covers FP modes, aliases, and progressive faults. See docs/SOULTREE_DRAG.md. Other aggregate bodies and initializers unchanged.",
-  "bindings": "SoultreePhysicsInlines.bindings.json"
+  "expect": "exact",
+  "notes": "Exact complete 432-byte body in src/reconstructed/SoultreeDrag.cpp. FastSqrt overwrites the working magnitude float (an earlier candidate discarded the root and used squared length). The magnitude is read through a scratchVector reference, the clamp is *speedBudget < charge, and the scaled branch builds its product in a named temporary copied to drag after the budget charge, so the fsub precedes the copy's z load as in retail (direct assignment 426/432, subtraction first 164/434). Native regression uses actual strict FastSqrt and covers FP modes, aliases, and progressive faults. See docs/SOULTREE_DRAG.md.",
+  "bindings": "../../../src/reconstructed/SoultreeDrag.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",

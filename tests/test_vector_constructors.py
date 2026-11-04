@@ -209,13 +209,6 @@ PARTIAL = [('src/krusty2/vehicle/Bike.cpp',
   840,
   '238f4dc861a5571c099b02121d0e364461f08fd576fd5427eabc8a72d1a72e61'),
  ('samples/physics/collision/CollisionPointNearMisses.cpp',
-  'SoultreeMergeContacts',
-  4434480,
-  845,
-  845,
-  838,
-  '699f914a2a998fbad7da6a31db1faa9d9d024a5f37a8943edf1d4a94bf34c8f6'),
- ('samples/physics/collision/CollisionPointNearMisses.cpp',
   'SoultreeRefreshContacts',
   4435328,
   615,
@@ -328,7 +321,7 @@ class VectorConstructorTests(unittest.TestCase):
                         resolved = match_object(obj, symbol, va, b'', bindings)
                     self.assertEqual(resolved['digest'], digest, key)
                     partial_count += 1
-            self.assertEqual((strict_count, partial_count), (358, 27))
+            self.assertEqual((strict_count, partial_count), (359, 26))
             compiler = Path(os.environ['VC6_ROOT'])
             linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
             libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
@@ -340,7 +333,7 @@ class VectorConstructorTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Vector constructors: 72240 raw-bit, placement and overlap cases passed', result.stdout)
-            print('356 strict checks and 27 complete partial fingerprints; ' + result.stdout.strip())
+            print('357 strict checks and 26 complete partial fingerprints; ' + result.stdout.strip())
 
 
 if __name__ == '__main__':

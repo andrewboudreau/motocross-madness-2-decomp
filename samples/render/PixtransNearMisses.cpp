@@ -56,6 +56,9 @@
 // `*(from + sourceStride)`. The two differing loads are the reloads of
 // sourceStride (eax) and width (edx) at the keyed x loop's exit, both
 // carried into the y loop's head.
+// Session 15: a `stride` copy of sourceStride for the keyed branch is propagated back to
+// the argument (1129); an end-pointer x loop (`to < end`) loses retail's width down-counter
+// (225).
 //
 // DitherConvert (0x004cf2a0, 1759 bytes; candidate 1735, 242 match): the
 // Floyd-Steinberg ditherer behind the dithered converters. Two 16.16 error

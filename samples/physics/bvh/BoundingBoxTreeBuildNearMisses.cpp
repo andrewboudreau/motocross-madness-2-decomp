@@ -19,6 +19,8 @@
 // For the reload order, numCorners set just before the 0x348 allocation (from numTris, n or
 // numTaken) or numTris * 3 as the size reshape the function (300+); declaration order does not
 // matter.  Both spots look like register-allocation choices with no source lever found.
+// Session 15: walking the corners with a pointer local (`int* corner = corners; ...
+// keep[*corner]`) in the remap pass keeps [offset + keep] and reshapes the pass (1370/1623).
 void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* triCount,
                           int* vertCount, int** indices, TreeVec3** verts)
 {

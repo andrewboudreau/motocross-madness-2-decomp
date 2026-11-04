@@ -87,13 +87,14 @@ Evidence
 Functions (all in the extent)
 - Exact in `CollisionPoint.cpp`: AddCollisionPoint `0x0043a330` (inline constructor from
   `CollisionPointCtor.h`), AddExistingCollisionPoint `0x0043a570`, RemoveCollisionPoint `0x0043a5e0`,
-  UpdateRelativeMotion `0x0043a640`, UpdateCollisionPointWorldPositions `0x0043aff0`, the eight `$E`
+  UpdateRelativeMotion `0x0043a640`, the contact merge SoultreeMergeContacts `0x0043aa30`,
+  UpdateCollisionPointWorldPositions `0x0043aff0`, the eight `$E`
   functions `0x0043b050..0x0043b150`, CollisionRejectFrom `0x0043b190`, slot 1 `0x0043b240` and the
   deleting destructor `0x0043b300`.
 - Exact in `src/reconstructed/CollisionQueries.cpp` (ownership open, see above):
   SphereContainsPointXZ `0x0043a1e0`, BoundingSpheresOverlap `0x0043a270`.
-- Near misses in `samples/physics/collision/CollisionPointNearMisses.cpp` (includes this file): the
-  contact merge `0x0043aa30` and the contact refresh `0x0043ad80`; their notes list what differs.
+- Near miss in `samples/physics/collision/CollisionPointNearMisses.cpp` (includes this file): the
+  contact refresh `0x0043ad80`; its note lists what differs.
 
 Source shapes that matter (tier 3: they reproduce retail, the original text is unknown)
 - UpdateRelativeMotion uses header-shaped inline helpers: a dot product grouped `z + (x + (y))` at both

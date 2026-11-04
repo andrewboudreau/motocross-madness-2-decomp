@@ -15,7 +15,7 @@ from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = 'samples/physics/soultree_base/SoultreeDrag.cpp'
+SOURCE = 'src/reconstructed/SoultreeDrag.cpp'
 AGGREGATE = 'samples/physics/soultree_base/SoultreePhysicsInlines.cpp'
 SYMBOL = '?UnknownVirtualSlot6@SoultreePhysicsBaseObject@@UAEXPAUVec3@@PAM@Z'
 SLOT36 = '?ResetBodyOrientation@SoultreePhysicsBaseObject@@UAEXXZ'
@@ -100,13 +100,12 @@ class SoultreeDragBehaviorTests(unittest.TestCase):
             compile_source('src/reconstructed/FastMath.cpp','math')
             compile_source('tests/fixtures/soultree_drag_compare.cpp','fixture',True)
             candidate = objects['candidate']
-            for name in ('candidate','aggregate'):
-                report = compare(image,objects[name],SYMBOL,0x40b410,432,
-                                 ROOT/SOURCE.replace('.cpp','.bindings.json'))
-                self.assertEqual((report['candidate_size'],report['strict_match']['matching_positions']),
-                                 (432,426))
-                self.assertFalse(report['strict_exact'])
-            self.assertEqual(complete(candidate,SYMBOL),complete(objects['aggregate'],SYMBOL))
+            report = compare(image,candidate,SYMBOL,0x40b410,432,
+                             ROOT/SOURCE.replace('.cpp','.bindings.json'))
+            self.assertEqual(report['candidate_size'],432)
+            self.assertTrue(report['strict_exact'],report)
+            # Slot 6 is provided only by the canonical source, not the sample aggregate.
+            self.assertNotIn(SYMBOL,{s.name for s in objects['aggregate'].symbols})
             body, size, relocations = complete(objects['aggregate'],SLOT36)
             self.assertEqual(size,305)
             self.assertEqual(hashlib.sha256(body).hexdigest(),
@@ -118,7 +117,7 @@ class SoultreeDragBehaviorTests(unittest.TestCase):
                 (164,6,'?g_SoultreeVec3_685190@@3UVec3@@A'),
                 (172,6,'?g_SoultreeVec3_685190@@3UVec3@@A')])
             self.assertEqual(hashlib.sha256(complete(candidate,SYMBOL)[0]).hexdigest(),
-                             'd2f7066a2dd4cdf5bcc2418d51d218d38ab30796b18da607eca6731452c83354')
+                             '1c8b1c9f1c06ca535327483d543370a1e1f764d59ccd4d6c2960d6fa4d63fc5c')
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0},
                              {'__fltused','?FastSqrt@@YAMM@Z'})
             self.assertNotIn(SLOT36,{s.name for s in candidate.symbols})

@@ -35,7 +35,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 |---|---|
 | `core/` | `GameObject.h`, `GraphicsTest.h`, `DebugAlloc.h` (debug malloc/`new`/`delete`/realloc), `MemTag.h`; `GraphicsTest.cpp`: 17 strict cases |
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
-| `collision/` | `CollisionObject.cpp` (+ `CollisionObject.h`, `CollisionShapeTests.h`, `CollisionTypes.h`): 65 strict cases of 79; `CollisionPoint.cpp` (+ `CollisionPoint.h`, `CollisionPointCtor.h`): 16 strict cases, its two near misses in `samples/physics/collision/CollisionPointNearMisses.cpp` |
+| `collision/` | `CollisionObject.cpp` (+ `CollisionObject.h`, `CollisionShapeTests.h`, `CollisionTypes.h`): 65 strict cases of 79; `CollisionPoint.cpp` (+ `CollisionPoint.h`, `CollisionPointCtor.h`): 17 strict cases, its near miss in `samples/physics/collision/CollisionPointNearMisses.cpp` |
 | `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts); `ObjectPlacement.cpp`: 8 strict cases |
 | `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 47 strict cases of 52; `SoultreeQuadTreeRenderer.cpp`: 9 strict cases; `soultree.cpp` (SoultreeObject): 65 strict cases |
 | `gravity/` | `SelectiveGravityModel.cpp`: 15 strict cases |
@@ -156,10 +156,10 @@ Their complete callers retain strict matches and the primary scene pointers.
   The class tables point at these copies, so they are most likely inline members kept
   from the first TU that emitted each COMDAT. Thirteen Vehicle methods and eleven
   SoultreePhysicsBaseObject methods are strict exact in the reconstruction groups
-  `src/reconstructed/VehicleMethods.cpp` and `SoultreePhysicsMethods.cpp`; these
-  groups do not claim original TU placement. Vehicle slot 36 and Soultree slots
-  6/36 remain in their respective sample files because of matching or dependency
-  gaps. See [Vehicle methods](../../docs/VEHICLE_METHODS.md) and
+  `src/reconstructed/VehicleMethods.cpp` and `SoultreePhysicsMethods.cpp`, and Soultree
+  slot 6 in `src/reconstructed/SoultreeDrag.cpp`; these groups do not claim original TU
+  placement. Vehicle slot 36 and Soultree slot 36 remain in their respective sample
+  files because of matching or dependency gaps. See [Vehicle methods](../../docs/VEHICLE_METHODS.md) and
   [Soultree methods](../../docs/SOULTREE_PHYSICS_METHODS.md).
 
 Bindings (`*.bindings.json` next to each `.cpp`) were proposed by

@@ -9,6 +9,7 @@
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?QueryGround@CollisionFrameHelper@@QAEXPAUCollisionVec3@@PBU2@HPAD@Z": "0x00507c10",
+  "?SoultreeMergeContacts@@YAHHPAPAVCollisionPoint@@PBUCollisionVec3@@11PAU2@2222@Z": "0x0043aa30",
   "?Vec3Normalize@@YAPAUCollisionVec3@@PAU1@PBU1@@Z": "0x005087b0",
   "?kCollisionPointYAxis@@3UCollisionPointConstVec3@@B": "0x00579810",
   "?kCollisionPointZero@@3UCollisionPointConstVec3@@B": "0x005797f0",

@@ -278,8 +278,9 @@ the 2026-10-20 ranking, `work/s14/x87/nearmiss.py`):
 | `fld st(N)` against a reload | body | Vehicle `0x00527a20` | 1 / 17 |
 
 Rows whose remaining hunks are all x87 (operand form or scheduling):
-- body: `0x005281b0`, `0x0040b410`, `0x004fd340`,
-  `0x00436720`, `0x00436e50`, `0x00446c30`;
+- body: `0x005281b0`, `0x004fd340`,
+  `0x00436720`, `0x00436e50`, `0x00446c30` (`0x0040b410` is now exact, see
+  below);
 - render: `0x00456890`, `0x004a1a50`, `0x0047e600`, `0x00443aa0` (none
   of them operand form that a rule above flips; see below);
 - rider: `0x00504d30`, `0x004a7fd0`;
@@ -342,6 +343,19 @@ Leads from the rules:
   probe, but the source had no store: it is a read of `m._11` in the rigid
   inverse's translation row, which VC6 removes as dead after creating the
   leaf. Rule 6's "direct store" also covers a read in removed code.
+- **SoultreeMergeContacts `0x0043aa30`** (exact, in CollisionPoint.cpp).
+  In `sum = ScaleVec3(sum, 1.0f / merged)` retail takes x and z in the dup
+  form and y in the load form. The loop accumulates x and z directly
+  (`sum.x += ...`) and y through a pointer
+  (`CollisionVec3* total = &sum; total->y += ...`). The pointer store does
+  not count (rule 6), so y alone is never stored directly. Accumulating all
+  three through the pointer gives the load form for all three.
+- **SoultreePhysicsBaseObject slot 6 `0x0040b410`** (exact, in
+  src/reconstructed/SoultreeDrag.cpp). This was scheduling, not operand
+  form. Retail's budget `fsub` comes before the z load of the scaled copy.
+  Building the product in a named temporary, charging the budget and then
+  assigning (`Vec3 scaled = v * k; *budget -= c; drag = scaled;`) gives that
+  order. Assigning `drag = v * k` directly before the charge does not.
 
 ## 7. A byte widened in registers or through the stack
 

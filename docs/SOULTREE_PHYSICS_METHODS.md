@@ -36,9 +36,10 @@ COMDAT selection is a strong explanation for this distribution, not confirmed
 original source ownership. The reconstruction filename is organizational;
 semantic member names remain provisional.
 
-Slot 6 stays a partial 432-byte sample (68.0693% comparable bytes). Slot 36 stays
-an exact 305-byte sample because it introduces the still-unsupplied
-`g_SoultreeVec3_685190` dependency. Both retain their previous matching results.
+Slot 6 is exact in its own reconstruction file, `src/reconstructed/SoultreeDrag.cpp`
+(432 bytes, [SOULTREE_DRAG](SOULTREE_DRAG.md)). The regression checks it with the
+promoted slots. Slot 36 stays an exact 305-byte sample because it introduces the
+still-unsupplied `g_SoultreeVec3_685190` dependency.
 Slot 35 calls `SoultreeObject::SetAxesIn`, which is already unresolved from
 other canonical callers and remains sample-only in SoultreeMatrix.cpp. Slot 34
 calls the canonical `SoultreeObject::GetAxesIn`. The only other undefined symbol

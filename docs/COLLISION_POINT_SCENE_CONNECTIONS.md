@@ -55,7 +55,9 @@ explicit external-name substitutions. Raw bytes, section properties,
 relocation kinds/addends and resolved local section/offset destinations are
 preserved. The aggregate's two complete partial bodies remain 845 bytes with
 820 matching positions and 615 bytes with 604 matching positions, with their
-previous resolved-byte hashes unchanged.
+previous resolved-byte hashes unchanged. (Since then the 845-byte contact merge
+`0x43aa30` has become strict exact and moved into `CollisionPoint.cpp`; the
+aggregate keeps only the refresh.)
 
 The isolated authentic build compiled all 216 sources and reduced unresolved
 symbols from 375 to 373, removing exactly these two names and adding none.
@@ -63,8 +65,8 @@ Its complete comparison against the preceding build preserved all 216 old
 objects: 10,468 nondebug sections and 45,323 relocation records under the
 same two substitutions. Ignored evidence is in `work/game-build/contact28/`.
 
-`tests/test_collision_point_scene_connections.py` verifies 39 complete strict
-comparisons, both partial hashes, provider imports, decoded producer/callee
+`tests/test_collision_point_scene_connections.py` verifies 41 complete strict
+comparisons, the refresh's partial hash, provider imports, decoded producer/callee
 instructions, RTTI and native layouts. Its native executable links the actual
 complete `CollisionPoint.obj` and `VectorCalls.obj`. The scene cache and point
 transform are unchanged source extractions; both emitted methods must match

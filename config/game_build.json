@@ -110,12 +110,6 @@
       "evidence": "docs/CHARACTER_MOTION_BLEND.md#functional-build-review"
     },
     {
-      "path": "samples/physics/soultree_base/SoultreeDrag.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete physics slot 6 corrects a demonstrated discarded-square-root bug and passes 78305 whole-state, actual FastSqrt, alias, floating-point-mode and progressive access-fault cases. The body emits 432 bytes with 426 matching positions against 432 retail bytes (the first correction emitted 440/126, replacing a nonexact 432/287 candidate); all other aggregate sections remain unchanged. FP exceptions are masked in this finite comparison; integrated physics remains unverified.",
-      "evidence": "docs/SOULTREE_DRAG.md#functional-build-review"
-    },
-    {
       "path": "samples/render/BackgroundImageNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete background drawing-context selection passes 21611 native region, cache, actual-helper, COM, alias and fault comparisons. The unchanged 678-byte body has 115 matching positions against 678 retail bytes; all three source helpers and the full dialog caller remain strict. Scratch globals have independently checked writable zero storage. COM DC acquisition/release are scripted; real DirectDraw/GDI and integrated menus remain untested.",

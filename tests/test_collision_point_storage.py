@@ -92,9 +92,9 @@ class CollisionPointStorageTests(unittest.TestCase):
             self.assertLessEqual(rva-section.virtual_address+12,section.virtual_size)
         targets=[t for t in json.loads((ROOT/'src/krusty2/collision/targets.json').read_text())
                  if t.get('source')=='CollisionPoint.cpp']
-        self.assertEqual(len(targets),16)
-        baseline={POINT:(30,111,'b12c78bc10b13113f1f4a29ee39b8b6b68cf162928567171d769a4a8fbd08046'),
-                  SAMPLE:(32,128,'40f2d5bcda818a1cb92d8cea44c1aaf4abff65c2eb6b9e40c9cfcabc35b92ff9')}
+        self.assertEqual(len(targets),17)
+        baseline={POINT:(31,124,'bba11d2288133f2a7e41cccf6f9ca1046cf843d1fab3bff9742cd35ae9ef28c8'),
+                  SAMPLE:(32,128,'77d4e64d74d41a9ab5ea0e34806641452b9bb1f065ac78dded930a2b776081e1')}
         with tempfile.TemporaryDirectory(prefix='mcm2-contact-storage-') as directory:
             for index,source in enumerate((POINT,SAMPLE)):
                 output=Path(directory)/('unit%d.obj'%index)
@@ -131,12 +131,12 @@ class CollisionPointStorageTests(unittest.TestCase):
                                      [(6,symbol,0),(6,symbol,4),(6,symbol,8)])
                 references=Counter(obj.symbol_by_index[r.symbol_index].name for r in obj.relocations
                                    if not obj.sections[r.section_number-1].name.startswith('.debug'))
-                self.assertEqual((references[ZERO],references[AXIS]),(39 if source==POINT else 47,6))
+                self.assertEqual((references[ZERO],references[AXIS]),(47,6))
                 for target in targets:
                     proof=compare(retail,obj,target['candidate_symbol_contains'],int(target['target_va'],0),
                                   target['target_size'],(ROOT/POINT).with_suffix('.bindings.json'))
                     self.assertTrue(proof['strict_exact'],proof)
-            print('32 strict checks; two complete objects,62 sections,239 relocations; actual shared BSS/CRT preserved')
+            print('34 strict checks; two complete objects,63 sections,252 relocations; actual shared BSS/CRT preserved')
 
 
 if __name__=='__main__':

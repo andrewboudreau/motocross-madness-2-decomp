@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 114, c 89, total 205. The three class (a) functions of the
+Counts: a 2, b 114, c 87, total 203. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -75,6 +75,19 @@ y's components are read into scalars (`float yx = y.x, yy = y.y, yz = y.z;`) bef
 cross c = y x z, so all six c products load their z operand first as retail does. A dead
 read of `y.z` alone does the same; the operand orders and groupings tried before could not
 make the y leaves older than the z leaves.
+SoultreeMergeContacts `0x0043aa30` (class c, 838/845) is exact too, in CollisionPoint.cpp:
+the loop adds the contact's y into the sum through a pointer to it
+(`CollisionVec3* total = &sum; ... total->y += ...`), x and z directly. sum.y is then never
+stored directly, so `sum * (1/merged)` multiplies it component-first (`fld sum.y; fmul st(1)`)
+and x and z scalar-first, as retail does (rule 6 of
+[VC6_PATTERN_CORPUS](VC6_PATTERN_CORPUS.md)). All three through the pointer makes all three
+component-first; CollisionObject's mean idiom is inert. When one component of a
+stack aggregate takes the other x87 form, look for how that component alone was stored.
+SoultreePhysicsBaseObject slot 6 `0x0040b410` (class c, 426/432) is exact too, in
+src/reconstructed/SoultreeDrag.cpp: the scaled branch builds its product in a named
+temporary (`Vec3 scaled = scratchVector * (limit / length); *speedBudget -= charge;
+drag = scaled;`), so the budget `fsub` comes before the copy's z load as in retail.
+Subtracting before the product is worse (164/434).
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
@@ -154,7 +167,6 @@ make the y leaves older than the z leaves.
 | physics/bvh/BoundingBoxTreeQuery | `0x00427c10` | 374/1110 | b | natural operator form: retail's helper call sequence; retail keeps the constant 1 in ebp and copies segment[1] at entry, so registers and slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x004280e0` | 453/2228 | b | inline BoxOverlap copy: one constructor still expanded and the recursion tails cross-jumped differently |
 | physics/bvh/BoundingBoxTreeQuery | `0x0042a640` | 41/1428 | b | retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80); cross-product operand order of the x term |
-| physics/collision/CollisionPoint | `0x0043aa30` | 838/845 | c | frame, blocks, the y, x, z accumulated squared normal length and the product-grouped angular cross match (samples/physics/collision/CollisionPointNearMisses.cpp); sum * (1/merged) loads y component-first in retail |
 | physics/collision/CollisionPoint | `0x0043ad80` | 604/615 | c | if/else with one exit gives retail's delayed pushes; a `pp` pointer local behind `if (count > 0)` gives the loop header and counter home; retail stores the copy's w.y after the fstp of w.z |
 | physics/constraint/ConstraintMethodCollisionModel | `0x0043bdb0` | 2515/2619 | c | ApplyContactImpulse, frame 0xb8, slot order and size match; termB's dot (ConDotGroupedY), vA's cross and rl x nl go through the fully parenthesised ConCrossParen; left: scheduling of the LocalToWorldPoint and rl struct copies, one dword move, the `test edi` of `if (other)` and one fld/fmul order in termB's cross |
 | physics/contact/ContactImpulse | `0x005004a0` | 940/1062 | b | size and frame 0x60 exact (torque blocks at function scope, `(y*y') + x*x'`, torque B and uB via parenthesised Vec3-constructor crosses); temporaries in other frame slots; torque cross loads r before n (leaf age; n aliases inert), one tail mov/push schedule |
@@ -183,7 +195,6 @@ make the y leaves older than the z leaves.
 | physics/shadow/TerrainShadow | `0x005097d0` | 121/486 | b | 6 code diffs: retail copies extent onto its own slot through edx on the `extentX <= extentZ` path (`mov edx, [esp + 0xc] ; mov [esp + 0xc], edx`) and reloads `shadow->texture` in eax/edx where the candidate keeps edx; frame and both matrix branches match |
 | physics/shadow/TerrainShadow | `0x00508bc0` | 2749/3087 | b | slot 27 footprint: frame and slots match (lensScale read once into a local; TerrainShadowCross parenthesises the x term's second and both y products); 18 differing instructions: mode 1 right/up copy scheduling, push order around ProjectVertices; the inline budget needs the per-mode accumulate/finish text repeated (macros) |
 | physics/shadow/TerrainShadow | `0x00509aa0` | 86/1548 (masked) | b | out of reach under the rules: retail converts clipped points with an inlined `__asm` fistp helper (`fld ; mov eax, [ptr] ; fistp dword ptr [eax]`), which forces its EBP frame; the candidate calls `__ftol` |
-| physics/soultree_base/SoultreePhysicsInlines | `0x0040b410` | 426/432 | c | magnitude through a `scratchVector` reference and the `*speedBudget < charge` clamp give retail's loads and fcom; left: the scaled branch's budget `fsub` scheduled after the copy's z load (samples/physics/soultree_base/SoultreeDrag.cpp) |
 | physics/tire/Tire | `0x005135f0` | 1630/1664 | c | UpdateContactPatch: Math3D Vec3 constructor crosses and a named projection give retail's frame slots; left: the lever `lea edi`/first load scheduled after the z product, second TireDot push earlier |
 | physics/tire/Tire | `0x00514550` | 2566/4258 | b | aligned 1176, frame 0xc0 matches (function-scope `rolled`); 0x53304c is stdcall D3DRMVectorRotate; the score as a statement before the n3 test gives retail's `fcom`; retail keeps four call/ctor temporaries in rolled's slot (disp32 leas, the whole 12-byte size gap; rolled is already first assigned at its single use, so this is slot order among tied 12-byte symbols, not liveness; block-scoping the frame matrix, moving rolled's declaration, copying through it or block-scoping it are inert or worse); left: owner branch loads the side pointer late (the reference forms that fix it commute the lateral cross instead), the lateral x products load b first, a few copy-store orders |
 | physics/visibility/VisibilityQuadTreeTraversal | `0x0052d610` | 2265/3027 | c | 23 differing instructions (3022 B): VC6 cross-jumps two recursive-call tails that retail keeps apart (retail merges two slot-2 call tails instead); argument-expression, helper and arm-shape forms do not move the choice |

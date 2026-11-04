@@ -1,13 +1,11 @@
-// Remaining sample-only methods: slot 6 is partial; slot 36 requires an
-// unsupplied orientation-vector global. Exact methods are in
-// src/reconstructed/SoultreePhysicsMethods.cpp.
+// Remaining sample-only method: slot 36 requires an unsupplied orientation-vector
+// global. Exact methods are in src/reconstructed/SoultreePhysicsMethods.cpp and
+// src/reconstructed/SoultreeDrag.cpp (slot 6).
 #include <math.h>
 #include <string.h>
 #include "soultree/SoultreePhysicsBaseObject.h"
 #include "soultree/SoultreePhysicsCallees.h"
 #include "soultree/SoultreePhysicsContact.h"
-
-#include "SoultreeDrag.cpp"
 
 // slot 36 (0x004aa210): resolve the initial orientation vectors and reset the pose state.
 void SoultreePhysicsBaseObject::ResetBodyOrientation()

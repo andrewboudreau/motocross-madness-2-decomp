@@ -43,11 +43,12 @@ in its middle component during startup; it is not replaced by loader-zero data.
 
 ## Complete preservation
 
-`tests/test_collision_point_storage.py` checks all 16 registered strict functions
-in both the canonical and aggregate objects: **32 strict comparisons**. It also
-pins both complete objects, including both near-miss functions, all data and CRT
-sections, section flags, and every relocation location/type/addend/destination:
-**62 nondebug sections and 239 relocations**. No partial body is shortened or
+`tests/test_collision_point_storage.py` checks all 17 registered strict functions
+in both the canonical and aggregate objects: **34 strict comparisons**. It also
+pins both complete objects, including the remaining near-miss function, all data
+and CRT sections, section flags, and every relocation location/type/addend/destination:
+**63 nondebug sections and 252 relocations** (62 and 239 before the contact merge
+`0x43aa30` became exact and moved into the canonical object). No partial body is shortened or
 rescored to accept this connection.
 
 Changing the variables' linkage changes COFF section placement and public names.
@@ -80,8 +81,8 @@ The focused suites pass:
   source contact, mixed-array, alias, FP and fault comparisons.
 - `test_bike_contact_connections.py`: 68 strict checks, seven unchanged complete
   partial fingerprints and **13,056** native allocation/contact cases.
-- `test_collision_point_scene_connections.py`: 39 strict checks, two unchanged
-  complete partial fingerprints and **19,541** native allocation/cache/transform
+- `test_collision_point_scene_connections.py`: 41 strict checks, one unchanged
+  complete partial fingerprint and **19,541** native allocation/cache/transform
   cases.
 
 These suites retain their documented finite domains and scripted boundaries.

@@ -6,9 +6,9 @@
 // (vtable 0x005511d8: deleting destructor 0x0043b300, slot 1 0x0043b240) and the
 // .CRT$XCU 62-65 vector set 0x0043b050..0x0043b18b sit inside it.  The functions here
 // are the unit's strict exact ones (src/krusty2/collision/targets.json).  The other
-// functions of the extent: the contact merge 0x0043aa30 and refresh 0x0043ad80 are near
-// misses in samples/physics/collision/CollisionPointNearMisses.cpp (which includes this
-// file); the two sphere tests 0x0043a1e0/0x0043a270 are exact in
+// functions of the extent: the contact refresh 0x0043ad80 is a near miss in
+// samples/physics/collision/CollisionPointNearMisses.cpp (which includes this file); the
+// two sphere tests 0x0043a1e0/0x0043a270 are exact in
 // src/reconstructed/CollisionQueries.cpp (whether they open this unit or close
 // CollisionObject.cpp is open).
 #include "collision/CollisionPoint.h"
@@ -258,3 +258,110 @@ const CollisionPointConstVec3 kCollisionPointZero = CollisionPointConstVec3(0.0f
 static const CollisionPointConstVec3 kCollisionPointXAxis = CollisionPointConstVec3(1.0f, 0.0f, 0.0f);
 const CollisionPointConstVec3 kCollisionPointYAxis = CollisionPointConstVec3(0.0f, 1.0f, 0.0f);
 static const CollisionPointConstVec3 kCollisionPointZAxis = CollisionPointConstVec3(0.0f, 0.0f, 1.0f);
+
+// Helpers of the contact merge 0x0043aa30, in the header-inline shapes the rest of the unit
+// uses (results through the inline constructor of CollisionPointVec3).  Tier 3 names.
+static inline float ClampNonNegative(float v) { return v > 0.0f ? v : 0.0f; }
+static inline CollisionPointVec3 InlineSum(const CollisionVec3& a, const CollisionVec3& b) {
+    return CollisionPointVec3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+static inline CollisionPointVec3 InlineDifference(const CollisionVec3& a, const CollisionVec3& b) {
+    return CollisionPointVec3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+// a is taken by value: retail copies *scaleB to a stack temporary before the product
+// (the output may alias it).
+static inline CollisionVec3 ComponentProduct(CollisionVec3 a, const CollisionVec3& b) {
+    CollisionVec3 r;
+    r.x = a.x * b.x;
+    r.y = a.y * b.y;
+    r.z = a.z * b.z;
+    return r;
+}
+// CollisionCross with each product parenthesised: retail's operand order for the angular
+// term of 0x0043aa30 (the shared helper's bare form schedules the products differently).
+static inline CollisionVec3 GroupedCross(const CollisionVec3& a, const CollisionVec3& b) {
+    CollisionVec3 r;
+    r.x = (a.y * b.z) - (a.z * b.y);
+    r.y = (a.z * b.x) - (a.x * b.z);
+    r.z = (a.x * b.y) - (a.y * b.x);
+    return r;
+}
+
+// 0x0043aa30 (cdecl, provisional signature).  Merges the penetrating contacts of a manifold
+// (tier 3 semantics): mean position, summed and normalised normal, deepest penetration, and
+// the resulting linear (linA/origin) and angular response terms.  Returns the merged count.
+// The deepest penetration is homed in the dead `points` argument slot and the normal's
+// squared length in the `normal` slot, as in retail.  The first-contact clamp is by value
+// (the value stays on the x87 stack across the compare), the loop loads the penetration
+// once, the normal's squared length is accumulated y, then x, then z (retail squares y in
+// place), and the angular term crosses through GroupedCross.
+// The loop adds the contact's y into the sum through a pointer to it.  sum.y is then never
+// stored directly, so in sum * (1/merged) VC6 multiplies it component-first
+// (`fld sum.y; fmul st(1)`) while x and z, stored directly, are scalar-first, as in retail
+// (docs/VC6_PATTERN_CORPUS.md section 6).  Accumulating all three through the pointer gives
+// the component-first form for all three; direct accumulation, every scale helper shape and
+// CollisionObject's mean idiom give it for none.
+int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec3* scaleA, const CollisionVec3* scaleB,
+                          const CollisionVec3* bias, CollisionVec3* origin, CollisionVec3* linA,
+                          CollisionVec3* delta, CollisionVec3* normal, CollisionVec3* angular)
+{
+    CollisionVec3 sum;
+    float deepest;
+    int merged;
+    CollisionPoint* first = points[0];
+    if (first->inContact) {
+        merged = 1;
+        deepest = ClampNonNegative(first->penetration);
+        sum = first->worldPosition;
+        *normal = first->surfaceNormal;
+    } else {
+        sum = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+        *normal = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+        merged = 0;
+        deepest = 0.0f;
+    }
+    for (int i = 1; i < count; ++i) {
+        CollisionPoint* point = points[i];
+        if (point->inContact) {
+            CollisionVec3* total = &sum;
+            float pen = point->penetration;
+            if (pen > 0.0f && pen > deepest)
+                deepest = point->penetration;
+            ++merged;
+            sum.x += point->worldPosition.x;
+            total->y += point->worldPosition.y;
+            sum.z += point->worldPosition.z;
+            normal->x += point->surfaceNormal.x;
+            normal->y += point->surfaceNormal.y;
+            normal->z += point->surfaceNormal.z;
+        }
+    }
+    if (merged > 0) {
+        if (merged > 1) {
+            sum = ScaleVec3(sum, 1.0f / merged);
+            float len2 = normal->y * normal->y;
+            len2 += normal->x * normal->x;
+            len2 += normal->z * normal->z;
+            if (len2 == 0.0f) {
+                *normal = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+            } else {
+                float invLen = FastInvSqrt(len2);
+                normal->x *= invLen;
+                normal->y *= invLen;
+                normal->z *= invLen;
+            }
+        }
+        *delta = InlineDifference(sum, *origin);
+        *angular = GroupedCross(ComponentProduct(*scaleB, *scaleA), *delta);
+        *angular = InlineSum(*bias, *angular);
+        CollisionVec3 push = *normal * deepest;
+        linA->x += push.x;
+        linA->y += push.y;
+        linA->z += push.z;
+        origin->x += push.x;
+        origin->y += push.y;
+        origin->z += push.z;
+        return merged;
+    }
+    return 0;
+}

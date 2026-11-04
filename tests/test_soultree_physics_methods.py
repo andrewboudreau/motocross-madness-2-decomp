@@ -113,6 +113,7 @@ class SoultreePhysicsMethodTests(unittest.TestCase):
         sources = {
             'methods': 'src/reconstructed/SoultreePhysicsMethods.cpp',
             'owner': 'src/krusty2/soultree/SoulTreePhysics.cpp',
+            'drag': 'src/reconstructed/SoultreeDrag.cpp',
             'remaining': 'samples/physics/soultree_base/SoultreePhysicsInlines.cpp',
             'node': 'src/krusty2/soultree/soultree.cpp',
         }
@@ -151,24 +152,20 @@ class SoultreePhysicsMethodTests(unittest.TestCase):
                 slot = (int(re.search(r'Slot(\d+)@', symbol)[1])
                         if 'Slot' in symbol else renamed_slots[symbol.split('@')[0]])
                 promoted = slot in slots
+                key = 'methods' if promoted else 'drag' if slot == 6 else 'remaining'
                 source = (path.parent / target['source']).resolve()
-                self.assertEqual(source, ROOT / sources['methods' if promoted else 'remaining'])
-                obj = objects['methods' if promoted else 'remaining']
+                self.assertEqual(source, ROOT / sources[key])
+                obj = objects[key]
                 result = compare(retail, obj, target['candidate_symbol_contains'],
                                  int(target['target_va'], 0), target['target_size'],
                                  path.parent / target['bindings'])
                 with self.subTest(slot=slot):
                     self.assertEqual(struct.unpack('<I', retail.bytes_at_va(0x557d90 + slot * 4, 4))[0],
                                      int(target['target_va'], 0))
-                    self.assertEqual(result['strict_exact'], slot != 6, result)
-                    if slot == 6:
-                        # The complete nonexact candidate retains FastSqrt's result
-                        # at retail's 432 bytes; one fsub is scheduled differently.
-                        # Native behavior evidence is in test_soultree_drag_behavior.
-                        self.assertEqual(result['candidate_size'], 432)
-                        self.assertEqual(result['strict_match']['matching_positions'], 426)
-                    else:
-                        self.assertEqual(result['candidate_size'], target['target_size'])
+                    # Slot 6 (SoultreeDrag.cpp) keeps FastSqrt's result; its native
+                    # behavior evidence is in test_soultree_drag_behavior.
+                    self.assertTrue(result['strict_exact'], result)
+                    self.assertEqual(result['candidate_size'], target['target_size'])
                     if promoted:
                         self.assertEqual(table_refs[slot * 4], result['symbol'])
                         self.assertIn(table_refs[slot * 4], definitions)

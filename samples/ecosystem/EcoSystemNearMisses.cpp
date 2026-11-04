@@ -66,7 +66,10 @@
 //               alias of `name` in any subset of the four head uses
 //               and `(vegetation + i)->`; an element pointer/reference
 //               (180), a vegetation base local (205) and index or
-//               byte-offset element helpers (257) are far worse
+//               byte-offset element helpers (257) are far worse. Session
+//               15, also 457: the discarded RadiusForParameter call (or
+//               both discarded calls) as a bare statement instead of a
+//               named local, and `i` declared in the for statement
 //   0x00459ce0  the frame slots: same size, the locals and temporaries
 //               are assigned in a different order (323/3300); retail
 //               keeps the first sample's TGA in ebx and reloads

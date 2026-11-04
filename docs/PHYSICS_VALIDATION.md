@@ -154,13 +154,15 @@ Both units moved from `samples/physics/` to `src/krusty2/`; every function of th
 extents is exact, a near miss or excluded:
 
 - `src/krusty2/collision/CollisionPoint.cpp` (with `CollisionPointCtor.h`, extent
-  `0x43a1e0..0x43b320`) passes 16 targets. New: UpdateRelativeMotion `0x43a640`
+  `0x43a1e0..0x43b320`) passes 17 targets. New: UpdateRelativeMotion `0x43a640`
   (header-shaped inline helpers whose constructor calls go out of line under the
   inline budget), CollisionRejectFrom `0x43b190` (moved from
   `src/reconstructed/CollisionVectorHelpers.cpp`) and slot 1 `0x43b240`. The
   sphere tests `0x43a1e0`/`0x43a270` stay exact in `src/reconstructed/CollisionQueries.cpp`
-  (unit open). The contact merge `0x43aa30` and refresh `0x43ad80` (formerly
-  `CollisionContactUpdate.cpp`) are near misses in `samples/physics/collision/CollisionPointNearMisses.cpp`.
+  (unit open). The contact merge `0x43aa30` is exact here too (its loop adds y through a
+  pointer to the sum, so only y takes the load form in the mean, rule 6 of
+  `docs/VC6_PATTERN_CORPUS.md`). The refresh `0x43ad80` (formerly `CollisionContactUpdate.cpp`)
+  is a near miss in `samples/physics/collision/CollisionPointNearMisses.cpp`.
 - `src/krusty2/shadow/ProjectedShadow.cpp` (extent `0x4da570..0x4dc610`) passes 21
   targets. New: SetLight `0x4dae50`, whose mode is the third argument (the callers push
   it first). Init, ComputeBounds and Present are near misses in
