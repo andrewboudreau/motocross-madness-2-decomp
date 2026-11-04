@@ -18,7 +18,7 @@
 
 #define g_Zero kVec3Zero
 
-void SoultreePhysicsBaseObject::UnknownVirtualSlot20(SoultreeAttachment* attachment)
+void SoultreePhysicsBaseObject::UpdateScrapeEffect(SoultreeAttachment* attachment)
 {
 }
 
@@ -256,7 +256,7 @@ Vec3 SoultreePhysicsBaseObject::AverageAttachmentPosition()
 }
 
 // slot 18 (0x00502420)
-void SoultreePhysicsBaseObject::UnknownVirtualSlot18(SoultreeAttachment* attachment)
+void SoultreePhysicsBaseObject::UpdateContactEffect(SoultreeAttachment* attachment)
 {
     for (int i = 0; i < collisionPointCount; i++) {
         SoultreeContact* contact = collisionPoints[i];
@@ -655,7 +655,7 @@ static inline SoultreeSinkObject* AttachmentSink(const SoultreeAttachment* a)
 // re-running the slot 18/19/20 updaters, or for type 4 moving the sink to the node-local
 // point and calling its 4ba300/4ba320 depending on slots 24/25; (5) finally clear field_0x60
 // of every attachment when field_0x20c was set.
-void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
+void SoultreePhysicsBaseObject::UpdateAttachmentEffects()
 {
     if (!attachmentCount)
         return;
@@ -716,17 +716,17 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
         case 1:
             attachment->contactEmitter->activeThisFrame = 0;
             if (moving)
-                UnknownVirtualSlot18(attachment);
+                UpdateContactEffect(attachment);
             break;
         case 2:
             ((SoultreePadObject*)attachment->slideEmitter)->activeThisFrame = 0;
             if (moving)
-                UnknownVirtualSlot19(attachment);
+                UpdateSlideEffect(attachment);
             break;
         case 3:
             ((SoultreePadObject*)attachment->scrapeEmitter)->activeThisFrame = 0;
             if (moving)
-                UnknownVirtualSlot20(attachment);
+                UpdateScrapeEffect(attachment);
             break;
         case 4:
             if (!justReset) {
@@ -1071,7 +1071,7 @@ int SoultreePhysicsBaseObject::Tick(float dt)
             pointsTouching = touchingPointCount > 0;
     }
     RunSteps(steps, respawn, refreshed);
-    UnknownVirtualSlot21();
+    UpdateAttachmentEffects();
     return 1;
 }
 

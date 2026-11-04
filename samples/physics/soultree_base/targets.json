@@ -42,7 +42,7 @@
  {
   "class": "SoultreePhysicsBaseObject",
   "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot19@SoultreePhysicsBaseObject",
+  "candidate_symbol_contains": "UpdateSlideEffect@SoultreePhysicsBaseObject",
   "target_va": "0x00464e80",
   "target_size": 3,
   "expect": "exact",

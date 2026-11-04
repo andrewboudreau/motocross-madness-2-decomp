@@ -1036,7 +1036,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
         UnknownVirtualSlot30();
         justReset = reset;
         attachmentResetPending = reset;
-        UnknownVirtualSlot21();
+        UpdateAttachmentEffects();
         prevCrashState = crashState;
         UnknownVirtualSlot102(reinterpret_cast<KbGame*>(g_TrackGame)->frameTime);
     } else {

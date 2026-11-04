@@ -1873,7 +1873,7 @@ int KrustyBike::Fn_00413200(float dt)
     Vec3 moved = position - start;
     frontWheel->groundPoint += moved;
     rearWheel->groundPoint += moved;
-    UnknownVirtualSlot21();
+    UpdateAttachmentEffects();
     scratchVector = modelNode->WorldToLocalDirection(velocity);
     smoothedForwardAccel = BikeAISmoothValue(forwardAccelSmoother, frameTime,
                                              (scratchVector.z - prevLocalForwardVelocity) / frameTime);

@@ -68,9 +68,9 @@ void Vehicle::UnknownVirtualSlot96()
     controlResponse[5] = 1.0f;
 }
 
-void Vehicle::UnknownVirtualSlot21()
+void Vehicle::UpdateAttachmentEffects()
 {
-    SoultreePhysicsCharacter::UnknownVirtualSlot21();
+    SoultreePhysicsCharacter::UpdateAttachmentEffects();
     prevThrottleFraction = engineState->throttleFraction;
 }
 
@@ -719,7 +719,7 @@ static inline void VehCommitImpact(VehicleImpactEvent* ev, VehicleImpactSink** s
 // surface material is flagged in the material table and which has not yet reported one.
 // Slots 18 and 19 scan with guarded do-while loops (retail's unrotated `jge exit; jmp top`
 // back edges), slot 20 with for loops (rotated `jl top`).
-void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* attachment)
+void Vehicle::UpdateContactEffect(SoultreeAttachment* attachment)
 {
     VehicleImpactEvent* ev = (VehicleImpactEvent*)attachment;
     int i = 0;
@@ -760,7 +760,7 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* attachment)
 
 // Slide/scrape impact: like slot 18 but posts a clamped scrape vector (wheel normal-ish frame
 // scaled by the wheel's 0x290 gain and dt) into the sink's +0x74 vector.
-void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* attachment)
+void Vehicle::UpdateSlideEffect(SoultreeAttachment* attachment)
 {
     VehicleImpactEvent* ev = (VehicleImpactEvent*)attachment;
     int i = 0;
@@ -802,7 +802,7 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* attachment)
 
 // Second scrape channel: like slot 19 (sink at event+0x0c, no per-material table gate) but posts a clamped scrape vector (wheel normal-ish frame
 // scaled by the wheel's 0x290 gain and dt) into the sink's +0x74 vector.
-void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* attachment)
+void Vehicle::UpdateScrapeEffect(SoultreeAttachment* attachment)
 {
     VehicleImpactEvent* ev = (VehicleImpactEvent*)attachment;
     int i;
@@ -1162,7 +1162,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         prevCrashState = crashState;
         UnknownVirtualSlot29(steps == 0);
     } while (steps > 0);
-    UnknownVirtualSlot21();
+    UpdateAttachmentEffects();
     scratchVector = modelNode->WorldToLocalDirection(velocity);
     smoothedForwardAccel = VehSmooth(forwardAccelSmoother, (scratchVector.z - prevLocalForwardVelocity) / frameTime, frameTime);
     prevLocalForwardVelocity = scratchVector.z;

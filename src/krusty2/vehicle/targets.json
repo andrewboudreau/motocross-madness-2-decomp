@@ -1062,7 +1062,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot18@Vehicle",
+    "candidate_symbol_contains": "UpdateContactEffect@Vehicle",
     "target_va": "0x529dc0",
     "target_size": 529,
     "expect": "exact",
@@ -1072,7 +1072,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot19@Vehicle",
+    "candidate_symbol_contains": "UpdateSlideEffect@Vehicle",
     "target_va": "0x529fe0",
     "target_size": 679,
     "expect": "exact",
@@ -1082,7 +1082,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot20@Vehicle",
+    "candidate_symbol_contains": "UpdateScrapeEffect@Vehicle",
     "target_va": "0x52a290",
     "target_size": 614,
     "expect": "exact",
@@ -1092,7 +1092,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot21@Vehicle",
+    "candidate_symbol_contains": "UpdateAttachmentEffects@Vehicle",
     "target_va": "0x0052a500",
     "target_size": 24,
     "expect": "exact",

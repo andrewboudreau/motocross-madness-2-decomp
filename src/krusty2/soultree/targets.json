@@ -252,7 +252,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot18@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "UpdateContactEffect@SoultreePhysicsBaseObject",
     "target_va": "0x00502420",
     "target_size": 193,
     "expect": "exact",
@@ -262,7 +262,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot21@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "UpdateAttachmentEffects@SoultreePhysicsBaseObject",
     "target_va": "0x005024f0",
     "target_size": 1116,
     "expect": "exact",
