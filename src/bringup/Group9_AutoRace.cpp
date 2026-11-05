@@ -22,6 +22,10 @@
 #include "../reconstructed/TrackGame.h"
 #include "../reconstructed/TrackGameGlobal.h"
 
+// Nothing in the game calls it; the runtime shim finds it in mcm2.map.  A global that points
+// at it keeps it past the linker's unreferenced-function removal.
+void AutoRaceTick();
+void (*g_AutoRaceTickHook)() = AutoRaceTick;
 void AutoRaceTick()
 {
     static bool saved = false;
