@@ -21,12 +21,12 @@ TABLES = {
 }
 ENTRIES = {
     'Vehicle': {87: ('?UnknownVirtualSlot87@Vehicle@@UAEXXZ', 0x464e90),
-                94: ('?UnknownVirtualSlot94@Vehicle@@UAEXXZ', 0x464e90)},
+                94: ('?UpdateForceFeedback@Vehicle@@UAEXXZ', 0x464e90)},
     'Bike': {87: ('?UnknownVirtualSlot87@Vehicle@@UAEXXZ', 0x464e90),
-             94: ('?UnknownVirtualSlot94@Vehicle@@UAEXXZ', 0x464e90),
+             94: ('?UpdateForceFeedback@Vehicle@@UAEXXZ', 0x464e90),
              101: ('__purecall', 0x534cfe)},
     'KrustyBike': {87: ('?UnknownVirtualSlot87@Vehicle@@UAEXXZ', 0x464e90),
-                   94: ('?UnknownVirtualSlot94@KrustyBike@@UAEXXZ', 0x4963f0),
+                   94: ('?UpdateForceFeedback@KrustyBike@@UAEXXZ', 0x4963f0),
                    101: ('?UnknownVirtualSlot101@KrustyBike@@UAEXXZ', 0x496d10)},
 }
 
@@ -81,9 +81,9 @@ class VehicleDefaultSlotsTests(unittest.TestCase):
                             self.assertEqual(relocs[entry.value + 4 * slot].name, symbol, (name, slot))
                 self.assertEqual(actual_offsets, {offset for _, offset in tables})
                 self.assertFalse(any('UnknownVirtualSlot101@Bike@@' in s.name for s in obj.symbols))
-            for slot in (87, 94):
+            for method in ('UnknownVirtualSlot87', 'UpdateForceFeedback'):
                 self.assertTrue(compare(retail, objects['VehicleDefaults'],
-                    '?UnknownVirtualSlot%d@Vehicle@@UAEXXZ' % slot, 0x464e90, 1,
+                    '?%s@Vehicle@@UAEXXZ' % method, 0x464e90, 1,
                     ROOT / 'src/reconstructed/VehicleDefaults.bindings.json')['strict_exact'])
             compiler = Path(os.environ['VC6_ROOT'])
             executable = output / 'defaults.exe'

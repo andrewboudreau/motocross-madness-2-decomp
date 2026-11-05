@@ -55,7 +55,7 @@ class BikeMotionConnectionsTests(unittest.TestCase):
                 function_text((ROOT / MOTION).read_text(), signature) for signature, _, _, _ in PROVIDERS))
             zero_source = output / 'bike_zero.cpp'
             zero_source.write_text('#include "vehicle/KrustyBike.h"\n#include "math/Math3D.h"\n' +
-                function_text((ROOT / CALLERS[0]).read_text(), 'Vec3 KrustyBike::UnknownVirtualSlot76(') +
+                function_text((ROOT / CALLERS[0]).read_text(), 'Vec3 KrustyBike::ComputeDriveTorque(') +
                 '\nextern "C" const Vec3* BikeLocalZero() { return &kVec3Zero; }\n')
             fixture = 'tests/fixtures/bike_motion_routes.cpp'
             paths, objects = {}, {}
@@ -96,7 +96,7 @@ class BikeMotionConnectionsTests(unittest.TestCase):
                     obj.sections[r.section_number - 1].name == '.CRT$XCU' for r in obj.relocations), 1)
                 if source != CALLERS[1]:
                     self.assertFalse(any('g_kbZeroVec' in s.name for s in obj.symbols))
-                self.assertTrue(compare(retail, obj, 'UnknownVirtualSlot76@KrustyBike', 0x491ca0, 103, binding)['strict_exact'])
+                self.assertTrue(compare(retail, obj, 'ComputeDriveTorque@KrustyBike', 0x491ca0, 103, binding)['strict_exact'])
             addresses = {symbol: va for _, symbol, va, _ in CONNECTED}
             rows = [r for r in gearbox_cases() if r[0] in CALLERS]
             for target in json.loads((ROOT / 'src/krusty2/motion/targets.json').read_text()):

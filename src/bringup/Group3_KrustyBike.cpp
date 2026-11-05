@@ -225,7 +225,7 @@ static void G3FourPoseBlend(Character* self, int a, int b, int c, int d, float p
 // order, flat sums, `== 3 ? 0 : 1`, `!(== 3)`, `3 !=`, `else` arms and a scale local
 // give the base bytes or fewer; a `>` compare, a shared speedGain or limit local and a
 // conditional row pointer lose more (123, 59, 26, 22).
-int KrustyBike::UnknownVirtualSlot70(float dt)
+int KrustyBike::IsSpeedGainBelowLimit(float dt)
 {
     float b[2][3] = { { 4.0f, 3.25f, 2.5f }, { 3.75f, 3.25f, 2.5f } };
     float a[3] = { 1.15f, 1.05f, 1.0f };
@@ -1181,7 +1181,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
         attachmentResetPending = reset;
         UnknownVirtualSlot21();
         prevCrashState = crashState;
-        UnknownVirtualSlot102(reinterpret_cast<KbGame*>(g_TrackGame)->frameTime);
+        UpdateRiderPose(reinterpret_cast<KbGame*>(g_TrackGame)->frameTime);
     } else {
         savedPos = position;
     }
@@ -1265,7 +1265,7 @@ static inline float KbMinF(float a, float b) { return a < b ? a : b; }
 // t on the x87 stack where retail spills it to the dead dt slot (Bike's own slot 102 spills
 // with the same text; t as a separate statement, the dt parameter itself, if/else and an
 // inline max do not).
-void KrustyBike::UnknownVirtualSlot102(float dt)
+void KrustyBike::UpdateRiderPose(float dt)
 {
     if (crashState || *(int*)pad_0x5B8) {
         if (!isRemote && !reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay) {
@@ -1287,7 +1287,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
             } else {
                 int remote = isRemote || reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay;
                 int held;
-                if (!aiKind && !remote && (UnknownVirtualSlot84(6, 0x3f) || UnknownVirtualSlot84(7, 0x3f)))
+                if (!aiKind && !remote && (QueryControlInput(6, 0x3f) || QueryControlInput(7, 0x3f)))
                     held = 1;
                 else
                     held = 0;

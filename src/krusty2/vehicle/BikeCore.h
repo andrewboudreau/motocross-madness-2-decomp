@@ -34,7 +34,7 @@ public:
     virtual int ApplyPendingRespawn(float dt);
     virtual void UnknownVirtualSlot41();
     virtual int UnknownVirtualSlot42();
-    virtual void UnknownVirtualSlot44();
+    virtual void RemoveFromRace();
     virtual Vec3* ComputeRotationPivot(Vec3* out, float slideAngle);
     virtual float UnknownVirtualSlot47(float arg);
     virtual void SimulateFrame(float dt);
@@ -44,31 +44,31 @@ public:
     virtual void UpdateLeanFromNormal(Vec3* forward, int updateLeanCos, Vec3* up);
     virtual float GetLeanAngle();
     virtual float GetMaxSteerAngle();
-    virtual float UnknownVirtualSlot61(float threshold);
+    virtual float ComputeSlideAngle(float threshold);
     virtual int ClassifyGroundContact(float slideAngle);
     virtual void UnknownVirtualSlot65(float dt);
     virtual int UnknownVirtualSlot66();
     virtual void ClearCrashState();
     virtual void UpdateAirborneState(int nowAirborne);
-    virtual void UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel);
+    virtual void ComputeGroundNormalAndTurn(Vec3* out, VehicleWheel* wheel);
     virtual float GetTurnRadius(const Vec3* point, const Vec3* dir);
-    virtual float UnknownVirtualSlot75();
-    virtual Vec3 UnknownVirtualSlot76(const Vec3* arm, const Vec3* force);
+    virtual float ComputeWheelForwardAlignment();
+    virtual Vec3 ComputeDriveTorque(const Vec3* arm, const Vec3* force);
     virtual int UnknownVirtualSlot89(float frame);
     virtual void UnknownVirtualSlot90(int* steps, float frame);
     virtual void UnknownVirtualSlot91();
-    virtual void UnknownVirtualSlot92(const Vec3* worldDir, const Vec3* point);
-    virtual void UnknownVirtualSlot96();
+    virtual void ApplyLeanCorrection(const Vec3* worldDir, const Vec3* point);
+    virtual void InitControlResponses();
 
     // slots introduced by Bike
-    virtual void UnknownVirtualSlot97();
+    virtual void CreateWrecker();
     virtual int UnknownVirtualSlot98();
-    virtual int UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, float impulse);
-    virtual int UnknownVirtualSlot100(float dt, int impact, float impulse);
+    virtual int EvaluateCrash(float dt, float noseOverLimit, int impact, float impulse);
+    virtual int UpdateCrashState(float dt, int impact, float impulse);
     // Primary vtable 0x00550900 slot 101 is CRT _purecall (0x00534cfe).
     // KrustyBike supplies the concrete override at 0x00496d10.
     virtual void UnknownVirtualSlot101() = 0;
-    virtual void UnknownVirtualSlot102(float arg);
+    virtual void UpdateRiderPose(float arg);
 
     // 0x004079c0 (6745 bytes, `ret 0xa0` = 40 argument dwords): the bike loader.  Runs
     // Vehicle::LoadVehicle, builds the rider character, the handlebar part, the two wheels

@@ -57,8 +57,8 @@ public:
 
     // ---- slots introduced by Vehicle (43..96) ----
     virtual void SnapshotRespawnPose();
-    virtual void UnknownVirtualSlot44();
-    virtual float UnknownVirtualSlot45();
+    virtual void RemoveFromRace();
+    virtual float GetSpawnProtectionDuration();
     virtual Vec3* ComputeRotationPivot(Vec3* out, float slideAngle);
     // pure virtual: entry is _purecall (0x00534cfe).  Bike's override 0x0040cbb0 is
     // `ret 4` and returns a float (tier 1 via its byte match), hence float(float).
@@ -78,7 +78,7 @@ public:
     virtual void SettleBodyToWheels(Vec3* settleUp, int keepPlacement);
     virtual float GetMaxSteerAngle();
     virtual void ComputeSteerRate(float steerAxis, float maxAngle, int steps);
-    virtual float UnknownVirtualSlot61(float threshold);
+    virtual float ComputeSlideAngle(float threshold);
     virtual int ClassifyGroundContact(float slideAngle);
     virtual void ReadControlAxes(float dt);
     // void: 0x00528e50 leaves eax as whatever the last store used (no return value is
@@ -87,27 +87,27 @@ public:
     virtual void UnknownVirtualSlot65(float dt);  // entry is the shared empty stub 0x00464e80
     virtual int UnknownVirtualSlot66() = 0;  // pure virtual: entry is _purecall (0x00534cfe)
     virtual void ClearCrashState();
-    virtual int UnknownVirtualSlot68(int* out);
-    virtual void UnknownVirtualSlot69();
-    virtual int UnknownVirtualSlot70(float dt);
+    virtual int GetRespawnKey(int* out);
+    virtual void ResetCrashTimer();
+    virtual int IsSpeedGainBelowLimit(float dt);
     virtual void UpdateAirborneState(int nowAirborne);
-    virtual void UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel);
+    virtual void ComputeGroundNormalAndTurn(Vec3* out, VehicleWheel* wheel);
     virtual float GetTurnRadius(const Vec3* point, const Vec3* dir);  // only read (Bike 0x00406090)
-    virtual float UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d);
-    virtual float UnknownVirtualSlot75();
+    virtual float DeflectVelocity(Vec3* point, Vec3* dir, float c, float d);
+    virtual float ComputeWheelForwardAlignment();
     // ret 0xc = hidden result pointer + two arguments; KrustyBike 0x00491ca0 byte-matches
     // as a by-value Vec3 return (tier 1 for the ABI shape, tier 2 for the Vec3 pointers).
-    virtual Vec3 UnknownVirtualSlot76(const Vec3* arm, const Vec3* force);
+    virtual Vec3 ComputeDriveTorque(const Vec3* arm, const Vec3* force);
     virtual int UnknownVirtualSlot77(int arg);
     virtual int UnknownVirtualSlot78();
     virtual int UnknownVirtualSlot79();
-    virtual int UnknownVirtualSlot80();
+    virtual int IsThrottleRequested();
     virtual int UnknownVirtualSlot81();
-    virtual int UnknownVirtualSlot82();
-    virtual int UnknownVirtualSlot83(VehicleWheel* wheel);
+    virtual int IsReverseRequested();
+    virtual int IsBrakeRequested(VehicleWheel* wheel);
     // Returns the input-map query (KrustyBike 0x00491630 uses the result; the Vehicle
     // body 0x00529250 leaves it in eax) (tier 2).
-    virtual int UnknownVirtualSlot84(int control, int modifier);
+    virtual int QueryControlInput(int control, int modifier);
     virtual void UpdateWheelRolls();
     virtual void UpdateWheelDriveForces();
     virtual void UnknownVirtualSlot87();  // entry is the shared empty stub 0x00464e90
@@ -115,11 +115,11 @@ public:
     virtual int UnknownVirtualSlot89(float frame);      // Bike 0x0040ae50 passes a float (tier 2)
     virtual void UnknownVirtualSlot90(int* steps, float frame);
     virtual void UnknownVirtualSlot91();  // entry is the shared empty stub 0x00464e90
-    virtual void UnknownVirtualSlot92(const Vec3* worldDir, const Vec3* point);
-    virtual void UnknownVirtualSlot93();
-    virtual void UnknownVirtualSlot94();  // entry is the shared empty stub 0x00464e90
-    virtual void UnknownVirtualSlot95();
-    virtual void UnknownVirtualSlot96();
+    virtual void ApplyLeanCorrection(const Vec3* worldDir, const Vec3* point);
+    virtual void InitForceFeedback();
+    virtual void UpdateForceFeedback();  // entry is the shared empty stub 0x00464e90
+    virtual void RotateByAngularVelocity();
+    virtual void InitControlResponses();
 
     // 0x00526830 (next to slot 70): stores the crash answer in crashState and, when crashed,
     // clears the controls and records the heading; returns it (tier 3 name).

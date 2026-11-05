@@ -22,7 +22,7 @@
  {
   "class": "Vehicle",
   "source": "../../../src/reconstructed/VehicleMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot45@Vehicle",
+  "candidate_symbol_contains": "GetSpawnProtectionDuration@Vehicle",
   "target_va": "0x0040c880",
   "target_size": 7,
   "expect": "exact",
@@ -52,7 +52,7 @@
  {
   "class": "Vehicle",
   "source": "../../../src/reconstructed/VehicleMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot68@Vehicle",
+  "candidate_symbol_contains": "GetRespawnKey@Vehicle",
   "target_va": "0x0040cac0",
   "target_size": 18,
   "expect": "exact",
@@ -62,7 +62,7 @@
  {
   "class": "Vehicle",
   "source": "../../../src/reconstructed/VehicleMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot69@Vehicle",
+  "candidate_symbol_contains": "ResetCrashTimer@Vehicle",
   "target_va": "0x0040cae0",
   "target_size": 13,
   "expect": "exact",
@@ -122,7 +122,7 @@
  {
   "class": "Vehicle",
   "source": "../../../src/reconstructed/VehicleMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot92@Vehicle",
+  "candidate_symbol_contains": "ApplyLeanCorrection@Vehicle",
   "target_va": "0x004a6ba0",
   "target_size": 3,
   "expect": "exact",

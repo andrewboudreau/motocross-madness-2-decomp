@@ -57,7 +57,7 @@ static inline float BikeDot(const Vec3* a, const Vec3* b)
     return d;
 }
 
-float Bike::UnknownVirtualSlot75()
+float Bike::ComputeWheelForwardAlignment()
 {
     float alignment = BikeDot(&savedForward, &rearWheel->rollDirection);
     if (alignment < 0.0f)
@@ -270,7 +270,7 @@ float Bike::ApplySteerRate()
     return 1.0f - Method_0x0040a520();
 }
 
-void Bike::UnknownVirtualSlot96()
+void Bike::InitControlResponses()
 {
     controlResponse[0] = 0.675f;
     crossupScale = 1.0f;
@@ -299,12 +299,12 @@ int Bike::UnknownVirtualSlot5(int value)
 void Bike::SimulateFrame(float dt)
 {
     Vehicle::SimulateFrame(dt);
-    UnknownVirtualSlot102(dt);
+    UpdateRiderPose(dt);
 }
 
-void Bike::UnknownVirtualSlot44()
+void Bike::RemoveFromRace()
 {
-    Vehicle::UnknownVirtualSlot44();
+    Vehicle::RemoveFromRace();
     reinterpret_cast<D3DIMSoultreeObject*>(riderCharacter->c_0x1a0)->ClearScreenRects();
 }
 
@@ -390,7 +390,7 @@ float Bike::GetTurnRadius(const Vec3* point, const Vec3* dir)
 
 void Bike::UnknownVirtualSlot90(int* steps, float frame)
 {
-    if (UnknownVirtualSlot100(stepTime, 0, 0)) {
+    if (UpdateCrashState(stepTime, 0, 0)) {
         *steps = 1;
         stepRemainder = 0.0f;
     } else if (*steps == 1 && stepRemainder <= 0.0001f) {
@@ -771,7 +771,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
 
     modelNode->GetMatrixIn(0, &riderMatrix);
     reinterpret_cast<SoultreeObject*>(riderCharacter->c_0x1a0)->SetMatrixIn(0, &riderMatrix);
-    UnknownVirtualSlot97();
+    CreateWrecker();
     steerState->SetAxisFromPoints(frontWheel->sceneNode, handlebars->node, poseNode);
     steerState->SetAngle(0.0f, poseNode);
     frontWheel->sceneNode->GetPositionIn(0, &frontPoint);
@@ -915,12 +915,12 @@ int Bike::ClassifyGroundContact(float slideAngle)
     return 0;
 }
 
-int Bike::UnknownVirtualSlot100(float dt, int impact, float impulse)
+int Bike::UpdateCrashState(float dt, int impact, float impulse)
 {
     float noseOverLimit = 0.766f;
     if (((BikeA1F4*)terrain)->i_0xbe8 != 1)
         noseOverLimit = 0.342f;
-    crashState = UnknownVirtualSlot99(dt, noseOverLimit, impact, impulse);
+    crashState = EvaluateCrash(dt, noseOverLimit, impact, impulse);
     if (crashState) {
         crashHeading = Vec3(savedForward.x, 0.0f, savedForward.z);
         motionIndex = 0;
@@ -928,7 +928,7 @@ int Bike::UnknownVirtualSlot100(float dt, int impact, float impulse)
         crashYaw = savedYaw;
         crashedUpsideDown = neg;
         slot27Pending = 1;
-        UnknownVirtualSlot69();
+        ResetCrashTimer();
         UnknownVirtualSlot41();
         motionCompleted = 0;
     }
@@ -1039,9 +1039,9 @@ void Bike::UnknownVirtualSlot8()
     frontWheelLifted = (wheelsInContact > 0 && frontWheel->penetration < -2.5f);
 }
 
-Vec3 Bike::UnknownVirtualSlot76(const Vec3* arm, const Vec3* force)
+Vec3 Bike::ComputeDriveTorque(const Vec3* arm, const Vec3* force)
 {
-    Vec3 v = Vehicle::UnknownVirtualSlot76(arm, force);
+    Vec3 v = Vehicle::ComputeDriveTorque(arm, force);
     if (linearSpeed < 10.0f && savedPitch > 0.8727f && frontWheel->inContact) {
         v = kVec3Zero;
         if (angularVelocity.x < 0.0f)
@@ -1131,7 +1131,7 @@ void Bike::UnknownVirtualSlot41()
         wheelList[i]->UpdateAttachment();
 }
 
-void Bike::UnknownVirtualSlot102(float)
+void Bike::UpdateRiderPose(float)
 {
     if (crashState) {
         float steerPose = -(steerState->angle / steerState->maxAngle);
@@ -1194,7 +1194,7 @@ static inline void BikeNormalizeInPlace(Vec3* v)
     }
 }
 
-void Bike::UnknownVirtualSlot72(Vec3* out, VehicleWheel*)
+void Bike::ComputeGroundNormalAndTurn(Vec3* out, VehicleWheel*)
 {
     if (crashState)
         return;
@@ -1224,7 +1224,7 @@ void Bike::UnknownVirtualSlot72(Vec3* out, VehicleWheel*)
                 scale = 1.0f;
             }
             float clampedWeight = (weight < 1.0f) ? weight : 1.0f;
-            turnAngle = UnknownVirtualSlot74(&frontWheel->sideAxis, &perp, clampedWeight, scale);
+            turnAngle = DeflectVelocity(&frontWheel->sideAxis, &perp, clampedWeight, scale);
             turnRate = turnAngle * invStepTime;
             return;
         }
@@ -1233,7 +1233,7 @@ void Bike::UnknownVirtualSlot72(Vec3* out, VehicleWheel*)
     turnRate = 0.0f;
 }
 
-float Bike::UnknownVirtualSlot61(float threshold)
+float Bike::ComputeSlideAngle(float threshold)
 {
     float result = 0.0f;
     if (allWheelsInContact) {
@@ -1351,7 +1351,7 @@ static __forceinline void BikeAttachBone(Bike* self, const char* name, float x, 
     self->wrecker->AddProbe(offset, bone);
 }
 
-void Bike::UnknownVirtualSlot97()
+void Bike::CreateWrecker()
 {
     wrecker = new(__FILE__, 2023) Wrecker(1);
     if (wrecker->SetupWrecker(GameObject::renderContext, (UnknownWreckerCharacter*)riderCharacter, "rider.col")) {
@@ -1380,7 +1380,7 @@ void Bike::UnknownVirtualSlot97()
 // Slot 99: crash test.  Classifies the current impact/attitude and, if the
 // rider is thrown, records the crash direction (crashDirection: 1..5) and the
 // reason code (crashReason) and returns 1.
-int Bike::UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, float impulse)
+int Bike::EvaluateCrash(float dt, float noseOverLimit, int impact, float impulse)
 {
     // Retail returns the nonzero state itself (the branch reaches the epilogue with
     // the loaded crashState still in eax).
@@ -1466,7 +1466,7 @@ int Bike::UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, float 
         linkedVehicle = 0;
         return 0;
     }
-    if (UnknownVirtualSlot70(step)) {
+    if (IsSpeedGainBelowLimit(step)) {
         crashDirection = 1;
         crashReason = 4;
         return 1;
@@ -1794,7 +1794,7 @@ static inline Vec3 BikeScale92(const Vec3& v, float k)
 // Byte-exact: the error goes through a float local (retail stores leanError before reserving
 // _finite's argument), the cancel clamp is written `0.0f > n`, and both scales go through
 // BikeScale92.  Tried: BikeAbsRef in the condition, az/ay/ax locals, explicit t/r scale.
-void Bike::UnknownVirtualSlot92(const Vec3* worldDir, const Vec3* point)
+void Bike::ApplyLeanCorrection(const Vec3* worldDir, const Vec3* point)
 {
     float target = (steerState->angle * 0.05f + turnRate * 0.2f) * wheelForwardAlignment;
     targetLeanAngle = target;
@@ -2076,9 +2076,9 @@ void Bike::ApplyCollisionEvent(int notify, int eventKind, void* event)
         impulse = 0.0f;
     }
     if (notify)
-        UnknownVirtualSlot100(fixedStepTime, hasBody, impulse);
+        UpdateCrashState(fixedStepTime, hasBody, impulse);
     if (notifyOther && other->UnknownVirtualSlot52())
-        ((Bike*)other)->UnknownVirtualSlot100(((Bike*)other)->fixedStepTime, 1, impulse);
+        ((Bike*)other)->UpdateCrashState(((Bike*)other)->fixedStepTime, 1, impulse);
 }
 
 // ---- slot 89: rider pose blend (tier 3 names) ----

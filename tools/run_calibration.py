@@ -27008,7 +27008,7 @@ CASES = [
         'includes': ['src/krusty2', 'src/reconstructed'],
         'bindings': 'src/reconstructed/VehicleDefaults.bindings.json',
         'source': 'src/reconstructed/VehicleDefaults.cpp',
-        'symbol': '?UnknownVirtualSlot94@Vehicle@@UAEXXZ',
+        'symbol': '?UpdateForceFeedback@Vehicle@@UAEXXZ',
         'target_va': '0x00464e90',
         'target_size': 1,
         'reason': 'Vehicle primary slot 94, inherited by Bike but overridden by KrustyBike; complete RET body',

@@ -87,9 +87,9 @@ class BikeWreckerConnectionTests(unittest.TestCase):
                                 ROOT / 'src/reconstructed/Wrecker.bindings.json')
                 self.assertTrue(proof['strict_exact'], proof)
             for name, symbol, address, size in (
-                ('Bike', '?UnknownVirtualSlot97@Bike@@UAEXXZ', 0x409420, 1516),
-                ('Bike', '?UnknownVirtualSlot99@Bike@@UAEHMMHM@Z', 0x409b30, 1374),
-                ('KrustyBike', '?UnknownVirtualSlot97@KrustyBike@@UAEXXZ', 0x4912d0, 624),
+                ('Bike', '?CreateWrecker@Bike@@UAEXXZ', 0x409420, 1516),
+                ('Bike', '?EvaluateCrash@Bike@@UAEHMMHM@Z', 0x409b30, 1374),
+                ('KrustyBike', '?CreateWrecker@KrustyBike@@UAEXXZ', 0x4912d0, 624),
             ):
                 proof = compare(retail, objects[name], symbol, address, size,
                                 ROOT / f'src/krusty2/vehicle/{name}.bindings.json')

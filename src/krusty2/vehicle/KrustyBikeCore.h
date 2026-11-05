@@ -60,32 +60,32 @@ public:
                                      const Vec3* settleUp, int keepPlacement, float extraWeight);
     virtual int ApplyPendingRespawn(float dt);
     virtual int UnknownVirtualSlot42();
-    virtual void UnknownVirtualSlot44();
-    virtual float UnknownVirtualSlot45();
+    virtual void RemoveFromRace();
+    virtual float GetSpawnProtectionDuration();
     virtual void AdvancePosition();
     virtual int UnknownVirtualSlot52();
     virtual void ReadControlAxes(float dt);
     virtual void UpdateControlInput(float dt);
     virtual int UnknownVirtualSlot66();
     virtual void ClearCrashState();
-    virtual int UnknownVirtualSlot68(int* out);
-    virtual void UnknownVirtualSlot69();
-    virtual int UnknownVirtualSlot70(float dt);
+    virtual int GetRespawnKey(int* out);
+    virtual void ResetCrashTimer();
+    virtual int IsSpeedGainBelowLimit(float dt);
     virtual void UpdateAirborneState(int nowAirborne);
-    virtual Vec3 UnknownVirtualSlot76(const Vec3* arm, const Vec3* force);
-    virtual int UnknownVirtualSlot80();
+    virtual Vec3 ComputeDriveTorque(const Vec3* arm, const Vec3* force);
+    virtual int IsThrottleRequested();
     virtual int UnknownVirtualSlot81();
-    virtual int UnknownVirtualSlot82();
-    virtual int UnknownVirtualSlot83(VehicleWheel* wheel);
+    virtual int IsReverseRequested();
+    virtual int IsBrakeRequested(VehicleWheel* wheel);
     virtual void UpdateWheelDriveForces();
-    virtual int UnknownVirtualSlot84(int control, int modifier);
-    virtual void UnknownVirtualSlot93();
-    virtual void UnknownVirtualSlot97();
-    virtual void UnknownVirtualSlot94();
-    virtual void UnknownVirtualSlot96();
-    virtual int UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, float impulse);
+    virtual int QueryControlInput(int control, int modifier);
+    virtual void InitForceFeedback();
+    virtual void CreateWrecker();
+    virtual void UpdateForceFeedback();
+    virtual void InitControlResponses();
+    virtual int EvaluateCrash(float dt, float noseOverLimit, int impact, float impulse);
     virtual void UnknownVirtualSlot101();
-    virtual void UnknownVirtualSlot102(float dt);   // 0x0048eea0: rider/bike pose update (trick clips, head turn)
+    virtual void UpdateRiderPose(float dt);   // 0x0048eea0: rider/bike pose update (trick clips, head turn)
 
     // 0x00414370 (in BikeAI.cpp; called by slot 63 0x004924c0, which ignores the result):
     // rebuilds the AI racing line aiPath for this frame; 0 when a track query fails.

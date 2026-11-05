@@ -24,19 +24,19 @@ void Vehicle::StoreBodyAxes(int orthogonalize, int keepZ)
     sideAxis = ((VehV3&)bodyForward).CrossB(bodyUp);
 }
 
-float Vehicle::UnknownVirtualSlot45() { return 3.0f; }
+float Vehicle::GetSpawnProtectionDuration() { return 3.0f; }
 
 int Vehicle::IsSpawnProtected() { return spawnProtected; }
 
 int Vehicle::UnknownVirtualSlot52() { return crashState == 0; }
 
-int Vehicle::UnknownVirtualSlot68(int* out)
+int Vehicle::GetRespawnKey(int* out)
 {
     *out = 15;
     return 1;
 }
 
-void Vehicle::UnknownVirtualSlot69() { crashTimer = crashTimerReload; }
+void Vehicle::ResetCrashTimer() { crashTimer = crashTimerReload; }
 
 int Vehicle::ShouldEmitMovingEffects()
 {
@@ -67,4 +67,4 @@ int Vehicle::UnknownVirtualSlot79()
     return inputMap->UnknownVirtualSlot3(0x2d, 0, 0x3f, 0) != 0;
 }
 
-void Vehicle::UnknownVirtualSlot92(const Vec3*, const Vec3*) {}
+void Vehicle::ApplyLeanCorrection(const Vec3*, const Vec3*) {}

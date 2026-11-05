@@ -1808,7 +1808,7 @@ int KrustyBike::Fn_00413200(float dt)
     justLanded = 0;
     BikeAITickGearTimer(engineState, stepTime);
     if (!hasFinished)
-        throttleOn = crashState == 0 && UnknownVirtualSlot80() && race->isRacing;
+        throttleOn = crashState == 0 && IsThrottleRequested() && race->isRacing;
     else
         throttleOn = 0;
     driveDisengaged = crashState == 0 && UnknownVirtualSlot81();
@@ -1836,7 +1836,7 @@ int KrustyBike::Fn_00413200(float dt)
     if (!aiKind) {
         steer.x = controlInput.x;
         steer.y = controlInput.y;
-        if (UnknownVirtualSlot80())
+        if (IsThrottleRequested())
             steer.z = 1.0f;
         else if (UpdateWheelRampLevels())
             steer.z = -1.0f;
@@ -2004,7 +2004,7 @@ int KrustyBike::Fn_00413200(float dt)
         crashedUpsideDown = savedUp.y < 0.0f ? 1 : 0;
         crashYaw = savedYaw;
         wrecker->StartAnimatedWreck(crashDirection);
-        UnknownVirtualSlot69();
+        ResetCrashTimer();
     }
     savedForward = bodyForward;
     savedUp = bodyUp;
@@ -2022,7 +2022,7 @@ int KrustyBike::Fn_00413200(float dt)
     smoothedForwardAccel = BikeAISmoothValue(forwardAccelSmoother, frameTime,
                                              (scratchVector.z - prevLocalForwardVelocity) / frameTime);
     prevLocalForwardVelocity = scratchVector.z;
-    UnknownVirtualSlot102(dt);
+    UpdateRiderPose(dt);
     return 1;
 }
 

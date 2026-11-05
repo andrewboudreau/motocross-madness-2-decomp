@@ -18,7 +18,7 @@ int main() {
         // separately through the production compiler's complete vtables.
         view->Vehicle::UnknownVirtualSlot87();
         if (memcmp(actual.bytes, expected.bytes, sizeof(actual.bytes))) return 1;
-        view->Vehicle::UnknownVirtualSlot94();
+        view->Vehicle::UpdateForceFeedback();
         if (memcmp(actual.bytes, expected.bytes, sizeof(actual.bytes))) return 2;
     }
     printf("Vehicle defaults: 512 complete-storage calls passed\n");

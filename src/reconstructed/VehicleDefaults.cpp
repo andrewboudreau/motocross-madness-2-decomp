@@ -6,5 +6,5 @@
 void Vehicle::UnknownVirtualSlot87() {
 }
 
-void Vehicle::UnknownVirtualSlot94() {
+void Vehicle::UpdateForceFeedback() {
 }

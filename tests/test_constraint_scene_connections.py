@@ -114,7 +114,7 @@ class ConstraintSceneConnectionsTests(unittest.TestCase):
                     self.assertTrue(compare(retail, objects[source], target['candidate_symbol_contains'],
                         int(target['target_va'], 0), target['target_size'], binding)['strict_exact'], (source, target))
                     strict += 1
-            for source, symbol, va, size in ((BIKE, '?UnknownVirtualSlot97@Bike@@UAEXXZ', 0x409420, 1516),
+            for source, symbol, va, size in ((BIKE, '?CreateWrecker@Bike@@UAEXXZ', 0x409420, 1516),
                 (WRECKER, '?CreateBodies@Wrecker@@QAEXPAVD3DIMSoultreeCharacter@@PBD@Z', 0x5301c0, 995),
                 (WRECKER, '?AddProbe@Wrecker@@QAEXUVector3@@H@Z', 0x532900, 210)):
                 self.assertTrue(compare(retail, objects[source], symbol, va, size,

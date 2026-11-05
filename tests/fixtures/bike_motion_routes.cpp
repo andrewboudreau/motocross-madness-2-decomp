@@ -6,7 +6,7 @@
 #include "vehicle/KrustyBike.h"
 
 extern "C" const Vec3* BikeLocalZero();
-Vec3 Bike::UnknownVirtualSlot76(const Vec3*,const Vec3*) {
+Vec3 Bike::ComputeDriveTorque(const Vec3*,const Vec3*) {
     // The bounded zero-vector test must never leave its selected branch.
     ExitProcess(90);return Vec3(1,2,3);
 }
@@ -67,7 +67,7 @@ static int TestZero() {
         bike->aiKind=(seed%255)+1;memcpy(before,words,sizeof(words));
         struct Guarded { DWORD first;Vec3 value;DWORD last; } result;
         memset(&result,0xc7,sizeof(result));
-        result.value=bike->KrustyBike::UnknownVirtualSlot76(&a,&b);
+        result.value=bike->KrustyBike::ComputeDriveTorque(&a,&b);
         if(memcmp(&result.value,bits,12) || result.first!=0xc7c7c7c7 || result.last!=0xc7c7c7c7 ||
            memcmp(before,words,sizeof(words)) || memcmp(zero,bits,12) ||
            memcmp(&a,beforeA,12) || memcmp(&b,beforeB,12))return 4;

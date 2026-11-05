@@ -44,7 +44,7 @@ Vec3* Vehicle::GetPivotAndForwardAxis(Vec3* out, Vec3* pos)
 
 float Vehicle::GetLeanAngle() { return leanAngle; }
 float Vehicle::GetMaxSteerAngle() { return steerState->maxAngle; }
-float Vehicle::UnknownVirtualSlot61(float threshold) { return 0.0f; }
+float Vehicle::ComputeSlideAngle(float threshold) { return 0.0f; }
 
 int Vehicle::ClassifyGroundContact(float slideAngle)
 {
@@ -56,9 +56,9 @@ int Vehicle::UnknownVirtualSlot89(float frame)
     return UnknownVirtualSlot66();
 }
 
-void Vehicle::UnknownVirtualSlot93() { forceFeedbackGain = 0.5f; }
+void Vehicle::InitForceFeedback() { forceFeedbackGain = 0.5f; }
 
-void Vehicle::UnknownVirtualSlot96()
+void Vehicle::InitControlResponses()
 {
     controlResponse[0] = 1.0f;
     controlResponse[1] = 1.0f;
@@ -74,7 +74,7 @@ void Vehicle::UpdateAttachmentEffects()
     prevThrottleFraction = engineState->throttleFraction;
 }
 
-int Vehicle::UnknownVirtualSlot82()
+int Vehicle::IsReverseRequested()
 {
     return inputMap->UnknownVirtualSlot3(0xe, 0, 0x3f, 0) != 0;
 }
@@ -84,14 +84,14 @@ int Vehicle::UnknownVirtualSlot81()
     return inputMap->UnknownVirtualSlot3(0x1d, 0, 0x3f, 0) != 0;
 }
 
-int Vehicle::UnknownVirtualSlot84(int control, int modifier)
+int Vehicle::QueryControlInput(int control, int modifier)
 {
     return inputMap->UnknownVirtualSlot2(control, modifier);
 }
 
 // True when the speed change this step (linearSpeed - prevSpeed) is below dt * speedGainLimit;
 // Bike slot 99 passes its clamped step time and treats a true answer as crash reason 4.
-int Vehicle::UnknownVirtualSlot70(float dt)
+int Vehicle::IsSpeedGainBelowLimit(float dt)
 {
     return linearSpeed - prevSpeed < dt * speedGainLimit;
 }
@@ -148,7 +148,7 @@ void Vehicle::UpdateControlInput(float dt)
 }
 
 // The drive torque arm x force, which AccumulateWheelContacts adds per driving wheel.
-Vec3 Vehicle::UnknownVirtualSlot76(const Vec3* arm, const Vec3* force)
+Vec3 Vehicle::ComputeDriveTorque(const Vec3* arm, const Vec3* force)
 {
     Vec3 r;
     const Vec3& p = *force; const Vec3& q = *arm;
@@ -591,7 +591,7 @@ static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
 // (fst; fld st(0); fcom) as retail does (528 -> 539/539).  With a local k stored to the
 // member, k copied from the member before the test, or `!= 0.0f`, the fcom moves ahead of
 // the store.
-float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
+float Vehicle::DeflectVelocity(Vec3* point, Vec3* dir, float c, float d)
 {
     field_0x4e8 = GetTurnRadius(point, dir) * d;
     if (VehAbsT(field_0x4e8) > 0.0f) {
@@ -649,7 +649,7 @@ static inline float VehMinF(float a, float b) { return (a < b) ? a : b; }
 // share a tail.  Load is declared first (frame slot 0), then the three counters ahead of the
 // two zero copies (retail's esi copy temp, the dead `out` slot reused for len2), and the
 // average divides by a float count (fild/fdivp, not fidiv).
-void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
+void Vehicle::ComputeGroundNormalAndTurn(Vec3* out, VehicleWheel* wheel)
 {
     if (crashState != 0)
         return;
@@ -708,7 +708,7 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
     }
     Vec3 turnCross = ((VehV3&)sum).Cross(*out);
     Vec3 axis = VehNormalized(turnCross);
-    turnAngle = UnknownVirtualSlot74(&last->sideAxis, &axis, VehMinF(load, 1.0f), 1.0f);
+    turnAngle = DeflectVelocity(&last->sideAxis, &axis, VehMinF(load, 1.0f), 1.0f);
     turnRate = turnAngle * invStepTime;
 }
 
@@ -999,9 +999,9 @@ void Vehicle::SimulateFrame(float frame)
             if (IsAtBaseWeight())
                 UnknownVirtualSlot0(0.0f);
         }
-        backingUp = UnknownVirtualSlot82();
+        backingUp = IsReverseRequested();
         driveDisengaged = crashState == 0 && (backingUp || UnknownVirtualSlot81());
-        throttleOn = crashState == 0 && UnknownVirtualSlot80();
+        throttleOn = crashState == 0 && IsThrottleRequested();
         reinterpret_cast<UnknownEngineGearbox*>(engineState)->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
         reinterpret_cast<UnknownEngineGearbox*>(engineState)->AutoShift(throttleOn, linearSpeed);
         if (respawn) {
@@ -1044,7 +1044,7 @@ void Vehicle::SimulateFrame(float frame)
         UnknownVirtualSlot8();
         UnknownVirtualSlot6(&force, &speed);
         UnknownVirtualSlot7(&force);
-        wheelForwardAlignment = UnknownVirtualSlot75();
+        wheelForwardAlignment = ComputeWheelForwardAlignment();
         int nowAirborne;
         if (!anyWheelInContact && !pointsTouching)
             nowAirborne = 1;
@@ -1057,7 +1057,7 @@ void Vehicle::SimulateFrame(float frame)
         Vec3 lift;
         if (contactTotal > 0) {
             if (anyWheelInContact) {
-                UnknownVirtualSlot72(&lift, 0);
+                ComputeGroundNormalAndTurn(&lift, 0);
                 UpdateWheelDriveForces();
             } else {
                 wheelPointInContact = 0;
@@ -1112,7 +1112,7 @@ void Vehicle::SimulateFrame(float frame)
         }
         IntegrateMotion(&force, &localTorque, &worldTorque);
         smoothedVerticalAccel = VehSmooth(verticalAccelSmoother, (velocity.y - prevVelocity.y) * invStepTime, stepTime);
-        float slideAngle = UnknownVirtualSlot61(turnMagnitude);
+        float slideAngle = ComputeSlideAngle(turnMagnitude);
         Vec3 aimOut;
         Vec3 aim = *ComputeRotationPivot(&aimOut, slideAngle);
         int mode = ClassifyGroundContact(slideAngle);
@@ -1120,7 +1120,7 @@ void Vehicle::SimulateFrame(float frame)
         AdvancePosition();
         UpdateWheelRolls();
         modelNode->SetPosition(position);
-        UnknownVirtualSlot95();
+        RotateByAngularVelocity();
         if (crashState) {
             UnknownVirtualSlot87();
         } else {
@@ -1146,7 +1146,7 @@ void Vehicle::SimulateFrame(float frame)
                     }
                 }
                 if (mode == 1 || mode == 3)
-                    UnknownVirtualSlot92(&basis, &pivot);
+                    ApplyLeanCorrection(&basis, &pivot);
             }
             UnknownVirtualSlot90(&steps, frame);
         }
@@ -1303,7 +1303,7 @@ void Vehicle::ApplyCollisionEvent(int notify, int eventKind, void* event)
 
 // ---- wave 2 ----
 
-void Vehicle::UnknownVirtualSlot44()
+void Vehicle::RemoveFromRace()
 {
     outOfRace = 1;
     Disable();
@@ -1311,7 +1311,7 @@ void Vehicle::UnknownVirtualSlot44()
 }
 
 // Input-map driven state test (provisional): the 0x46c/0x470 pair short-circuits to "true".
-int Vehicle::UnknownVirtualSlot80()
+int Vehicle::IsThrottleRequested()
 {
     if ((inputDevice && throttleInput > 0.33f)
         || (inputMap->UnknownVirtualSlot3(0, 2, 0x3f, 0)
@@ -1320,7 +1320,7 @@ int Vehicle::UnknownVirtualSlot80()
     return inputMap->UnknownVirtualSlot3(200, 0, 0x3f, 0) != 0;
 }
 
-int Vehicle::UnknownVirtualSlot83(VehicleWheel* wheel)
+int Vehicle::IsBrakeRequested(VehicleWheel* wheel)
 {
     if (inputMap->UnknownVirtualSlot3(1, 2, 0x3f, 0)
         && !UnknownVirtualSlot77(wheel->rampLevel == 0.0f))
@@ -1363,7 +1363,7 @@ int Vehicle::ApplyPendingRespawn(float dt)
         modelNode->SetPosition(position);
         return 1;
     }
-    if (UnknownVirtualSlot68(&code) && inputMap
+    if (GetRespawnKey(&code) && inputMap
         && inputMap->keyTable->UnknownVirtualSlot5(code, 0x3f, 0)) {
         ClearCrashState();
         return 2;
@@ -1441,7 +1441,7 @@ static inline float VehLenSqZ(const Vec3& v)
     return v.z * v.z + (v.x * v.x + v.y * v.y);
 }
 
-float Vehicle::UnknownVirtualSlot75()
+float Vehicle::ComputeWheelForwardAlignment()
 {
     Vec3 sum = kVec3Zero;
     int count = 0;
@@ -1648,9 +1648,9 @@ int Vehicle::ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, c
     attachmentResetPending = 1;
     respawnPending = 0;
     int flag = 1;
-    if (UnknownVirtualSlot45() == 0.0f)
+    if (GetSpawnProtectionDuration() == 0.0f)
         flag = 0;
-    SetSpawnProtection(flag, UnknownVirtualSlot45(), 0);
+    SetSpawnProtection(flag, GetSpawnProtectionDuration(), 0);
     return 0;
 }
 
@@ -1674,7 +1674,7 @@ static inline float VehMagnitude(const Vec3& v)
 // Tier 3 reading: turns the scene node about rotationPivot by |angularVelocity| * stepTime,
 // around the angular velocity's direction (kept in scratchVector), when that angle is finite
 // and at least 1e-4.
-void Vehicle::UnknownVirtualSlot95()
+void Vehicle::RotateByAngularVelocity()
 {
     float angle = VehMagnitude(angularVelocity) * stepTime;
     if (_finite(angle) && angle >= 0.0001f) {
@@ -1886,7 +1886,7 @@ int Vehicle::UpdateWheelRampLevels()
 {
     int first = 0;
     for (int i = 0; i < wheelCount; i++) {
-        int answer = UnknownVirtualSlot83(wheelList[i]);
+        int answer = IsBrakeRequested(wheelList[i]);
         if (!first)
             first = answer;
         float step = stepTime;
@@ -1948,7 +1948,7 @@ void Vehicle::AccumulateWheelContacts(Vec3* force, Vec3* localTorque, float torq
                 }
                 if (wheel->aux) {
                     *force += wheel->driveForce;
-                    scratchVector2 = UnknownVirtualSlot76(&wheel->relativePosition, &wheel->driveForce);
+                    scratchVector2 = ComputeDriveTorque(&wheel->relativePosition, &wheel->driveForce);
                     scratchVector = modelNode->WorldToLocalDirection(scratchVector2);
                     *localTorque += scratchVector;
                 }
@@ -2074,7 +2074,7 @@ GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char
     speedGainLimit = -1000.0f;
     verticalAccelSmoother = new(__FILE__, 0x19d) VehicleSmoother(0.14f);
     forwardAccelSmoother = new(__FILE__, 0x1a0) VehicleSmoother(0.5f);
-    UnknownVirtualSlot96();
+    InitControlResponses();
     // The provisional float gearArg is passed as an unchanged DWORD in retail;
     // the canonical constructor stores it at +0x1d8 without numeric conversion.
     if (defaultEngine)

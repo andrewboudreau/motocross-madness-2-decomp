@@ -2,7 +2,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBikeNearMisses.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot70@KrustyBike",
+    "candidate_symbol_contains": "IsSpeedGainBelowLimit@KrustyBike",
     "target_va": "0x004919a0",
     "target_size": 229,
     "expect": "partial",
@@ -52,7 +52,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBikeNearMisses.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot102@KrustyBike",
+    "candidate_symbol_contains": "UpdateRiderPose@KrustyBike",
     "target_va": "0x0048eea0",
     "target_size": 2920,
     "expect": "partial",

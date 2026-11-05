@@ -74,7 +74,9 @@ class VehicleMethodProviderTests(unittest.TestCase):
                               'SaveBodyOrientation': 29, 'ClearContactEffectFlags': 30,
                               'UpdateContactStates': 31, 'ResetToPlacement': 33,
                               'ApplyPendingRespawn': 39, 'ResetBodyOrientation': 36,
-                              'ApplyCollisionEvent': 38}[symbol.split('@')[0]])
+                              'ApplyCollisionEvent': 38, 'GetSpawnProtectionDuration': 45,
+                              'GetRespawnKey': 68, 'ResetCrashTimer': 69,
+                              'ApplyLeanCorrection': 92}[symbol.split('@')[0]])
                 promoted = slot in slots
                 self.assertEqual(source, ROOT / sources['reset' if slot == 36 else 'methods'])
                 obj = objects['reset' if slot == 36 else 'methods']

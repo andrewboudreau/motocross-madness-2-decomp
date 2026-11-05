@@ -177,7 +177,7 @@ class WreckerConstraintConnections(unittest.TestCase):
                     value=match_object(objects['sample'],symbol,va,b'',{k:int(v,0) for k,v in binding.items()})
                 self.assertEqual(value['digest'],digest)
             for label,symbol,va,size,binding_path in (
-                ('bike','?UnknownVirtualSlot97@Bike@@',0x409420,1516,'src/krusty2/vehicle/Bike.bindings.json'),
+                ('bike','?CreateWrecker@Bike@@',0x409420,1516,'src/krusty2/vehicle/Bike.bindings.json'),
                 ('rigid','??0PhysicsRigidBody@@',0x4cc120,160,'samples/physics/rigidbody/PhysicsRigidBody.bindings.json'),
                 ('scene','?FindByName@SoultreeObject@@',0x4fdae0,84,'src/krusty2/soultree/soultree.bindings.json'),
                 ('body','?SetNode@PhysicsBody@@',0x4cbdf0,17,'samples/physics/rigidbody/PhysicsBody.bindings.json')):

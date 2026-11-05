@@ -32,7 +32,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot72@Bike",
+    "candidate_symbol_contains": "ComputeGroundNormalAndTurn@Bike",
     "target_va": "0x00405db0",
     "target_size": 724,
     "expect": "exact",
@@ -72,7 +72,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot76@Bike",
+    "candidate_symbol_contains": "ComputeDriveTorque@Bike",
     "target_va": "0x00406840",
     "target_size": 395,
     "expect": "exact",
@@ -112,7 +112,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot102@Bike",
+    "candidate_symbol_contains": "UpdateRiderPose@Bike",
     "target_va": "0x00407440",
     "target_size": 485,
     "expect": "partial",
@@ -142,7 +142,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot97@Bike",
+    "candidate_symbol_contains": "CreateWrecker@Bike",
     "target_va": "0x00409420",
     "target_size": 1516,
     "expect": "exact",
@@ -162,7 +162,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot99@Bike",
+    "candidate_symbol_contains": "EvaluateCrash@Bike",
     "target_va": "0x00409b30",
     "target_size": 1374,
     "expect": "exact",
@@ -172,7 +172,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot100@Bike",
+    "candidate_symbol_contains": "UpdateCrashState@Bike",
     "target_va": "0x0040a090",
     "target_size": 232,
     "expect": "exact",
@@ -242,7 +242,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot44@Bike",
+    "candidate_symbol_contains": "RemoveFromRace@Bike",
     "target_va": "0x0040a500",
     "target_size": 27,
     "expect": "exact",
@@ -282,7 +282,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot92@Bike",
+    "candidate_symbol_contains": "ApplyLeanCorrection@Bike",
     "target_va": "0x0040ba30",
     "target_size": 1157,
     "expect": "exact",
@@ -302,7 +302,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot61@Bike",
+    "candidate_symbol_contains": "ComputeSlideAngle@Bike",
     "target_va": "0x0040c000",
     "target_size": 1015,
     "expect": "partial",
@@ -422,7 +422,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot75@Bike",
+    "candidate_symbol_contains": "ComputeWheelForwardAlignment@Bike",
     "target_va": "0x0040ce20",
     "target_size": 64,
     "expect": "exact",
@@ -472,7 +472,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot96@Bike",
+    "candidate_symbol_contains": "InitControlResponses@Bike",
     "target_va": "0x0040d030",
     "target_size": 52,
     "expect": "exact",
@@ -612,7 +612,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot70@Vehicle",
+    "candidate_symbol_contains": "IsSpeedGainBelowLimit@Vehicle",
     "target_va": "0x00526800",
     "target_size": 44,
     "expect": "exact",
@@ -792,7 +792,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot72@Vehicle",
+    "candidate_symbol_contains": "ComputeGroundNormalAndTurn@Vehicle",
     "target_va": "0x00527e30",
     "target_size": 831,
     "expect": "exact",
@@ -812,7 +812,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot74@Vehicle",
+    "candidate_symbol_contains": "DeflectVelocity@Vehicle",
     "target_va": "0x005281b0",
     "target_size": 539,
     "expect": "exact",
@@ -822,7 +822,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot44@Vehicle",
+    "candidate_symbol_contains": "RemoveFromRace@Vehicle",
     "target_va": "0x005283d0",
     "target_size": 43,
     "expect": "exact",
@@ -902,7 +902,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot82@Vehicle",
+    "candidate_symbol_contains": "IsReverseRequested@Vehicle",
     "target_va": "0x005290b0",
     "target_size": 26,
     "expect": "exact",
@@ -922,7 +922,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot80@Vehicle",
+    "candidate_symbol_contains": "IsThrottleRequested@Vehicle",
     "target_va": "0x005290f0",
     "target_size": 137,
     "expect": "exact",
@@ -932,7 +932,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot83@Vehicle",
+    "candidate_symbol_contains": "IsBrakeRequested@Vehicle",
     "target_va": "0x00529180",
     "target_size": 114,
     "expect": "exact",
@@ -952,7 +952,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot84@Vehicle",
+    "candidate_symbol_contains": "QueryControlInput@Vehicle",
     "target_va": "0x00529250",
     "target_size": 24,
     "expect": "exact",
@@ -962,7 +962,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot93@Vehicle",
+    "candidate_symbol_contains": "InitForceFeedback@Vehicle",
     "target_va": "0x00529270",
     "target_size": 11,
     "expect": "exact",
@@ -1022,7 +1022,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot76@Vehicle",
+    "candidate_symbol_contains": "ComputeDriveTorque@Vehicle",
     "target_va": "0x00529b40",
     "target_size": 93,
     "expect": "exact",
@@ -1122,7 +1122,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot61@Vehicle",
+    "candidate_symbol_contains": "ComputeSlideAngle@Vehicle",
     "target_va": "0x0052a5b0",
     "target_size": 9,
     "expect": "exact",
@@ -1152,7 +1152,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot95@Vehicle",
+    "candidate_symbol_contains": "RotateByAngularVelocity@Vehicle",
     "target_va": "0x0052a6a0",
     "target_size": 399,
     "expect": "exact",
@@ -1232,7 +1232,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot75@Vehicle",
+    "candidate_symbol_contains": "ComputeWheelForwardAlignment@Vehicle",
     "target_va": "0x0052b790",
     "target_size": 337,
     "expect": "exact",
@@ -1242,7 +1242,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot96@Vehicle",
+    "candidate_symbol_contains": "InitControlResponses@Vehicle",
     "target_va": "0x0052b8f0",
     "target_size": 42,
     "expect": "exact",
@@ -1732,7 +1732,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot84@KrustyBike",
+    "candidate_symbol_contains": "QueryControlInput@KrustyBike",
     "target_va": "0x00491630",
     "target_size": 103,
     "expect": "exact",
@@ -1762,7 +1762,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot76@KrustyBike",
+    "candidate_symbol_contains": "ComputeDriveTorque@KrustyBike",
     "target_va": "0x00491ca0",
     "target_size": 103,
     "expect": "exact",
@@ -1772,7 +1772,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot80@KrustyBike",
+    "candidate_symbol_contains": "IsThrottleRequested@KrustyBike",
     "target_va": "0x004922c0",
     "target_size": 155,
     "expect": "exact",
@@ -1782,7 +1782,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot83@KrustyBike",
+    "candidate_symbol_contains": "IsBrakeRequested@KrustyBike",
     "target_va": "0x00492360",
     "target_size": 100,
     "expect": "exact",
@@ -1802,7 +1802,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot82@KrustyBike",
+    "candidate_symbol_contains": "IsReverseRequested@KrustyBike",
     "target_va": "0x00492430",
     "target_size": 134,
     "expect": "exact",
@@ -1842,7 +1842,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot45@KrustyBike",
+    "candidate_symbol_contains": "GetSpawnProtectionDuration@KrustyBike",
     "target_va": "0x004957d0",
     "target_size": 37,
     "expect": "exact",
@@ -1892,7 +1892,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot69@KrustyBike",
+    "candidate_symbol_contains": "ResetCrashTimer@KrustyBike",
     "target_va": "0x004959d0",
     "target_size": 85,
     "expect": "exact",
@@ -1902,7 +1902,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot68@KrustyBike",
+    "candidate_symbol_contains": "GetRespawnKey@KrustyBike",
     "target_va": "0x00495a30",
     "target_size": 49,
     "expect": "exact",
@@ -1922,7 +1922,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot96@KrustyBike",
+    "candidate_symbol_contains": "InitControlResponses@KrustyBike",
     "target_va": "0x00495aa0",
     "target_size": 352,
     "expect": "exact",
@@ -1932,7 +1932,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot44@KrustyBike",
+    "candidate_symbol_contains": "RemoveFromRace@KrustyBike",
     "target_va": "0x00495ca0",
     "target_size": 5,
     "expect": "exact",
@@ -2022,7 +2022,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot99@KrustyBike",
+    "candidate_symbol_contains": "EvaluateCrash@KrustyBike",
     "target_va": "0x004916a0",
     "target_size": 757,
     "expect": "exact",
@@ -2032,7 +2032,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot93@KrustyBike",
+    "candidate_symbol_contains": "InitForceFeedback@KrustyBike",
     "target_va": "0x00496370",
     "target_size": 113,
     "expect": "exact",
@@ -2042,7 +2042,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot94@KrustyBike",
+    "candidate_symbol_contains": "UpdateForceFeedback@KrustyBike",
     "target_va": "0x004963f0",
     "target_size": 236,
     "expect": "exact",
@@ -2122,7 +2122,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot97@KrustyBike",
+    "candidate_symbol_contains": "CreateWrecker@KrustyBike",
     "target_va": "0x004912d0",
     "target_size": 624,
     "expect": "exact",

@@ -48,7 +48,7 @@
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",
-      "UnknownVirtualSlot102@Bike",
+      "UpdateRiderPose@Bike",
       4224064,
       485,
       474,
@@ -57,7 +57,7 @@
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",
-      "UnknownVirtualSlot61@Bike",
+      "ComputeSlideAngle@Bike",
       4243456,
       1015,
       946,
@@ -129,7 +129,7 @@
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "UnknownVirtualSlot70@KrustyBike",
+      "IsSpeedGainBelowLimit@KrustyBike",
       4790688,
       229,
       230,
@@ -174,7 +174,7 @@
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "UnknownVirtualSlot102@KrustyBike",
+      "UpdateRiderPose@KrustyBike",
       4779680,
       2920,
       2952,

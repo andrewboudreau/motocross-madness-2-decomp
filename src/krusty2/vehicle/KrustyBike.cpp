@@ -215,12 +215,12 @@ int KrustyBike::UnknownVirtualSlot42()
     return 0;
 }
 
-void KrustyBike::UnknownVirtualSlot44()
+void KrustyBike::RemoveFromRace()
 {
-    Bike::UnknownVirtualSlot44();
+    Bike::RemoveFromRace();
 }
 
-float KrustyBike::UnknownVirtualSlot45()
+float KrustyBike::GetSpawnProtectionDuration()
 {
     KbRacer* tagRacer = reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent;
     if (tagRacer && tagRacer->field_0xa8 == this)
@@ -262,7 +262,7 @@ int KrustyBike::UnknownVirtualSlot66()
     return hasFinished != 0 && hasFinished < 3;
 }
 
-int KrustyBike::UnknownVirtualSlot68(int* out)
+int KrustyBike::GetRespawnKey(int* out)
 {
     *out = 15;
     if (reinterpret_cast<KbGame*>(g_TrackGame)->raceMode && !hasFinished)
@@ -270,7 +270,7 @@ int KrustyBike::UnknownVirtualSlot68(int* out)
     return 1;
 }
 
-void KrustyBike::UnknownVirtualSlot69()
+void KrustyBike::ResetCrashTimer()
 {
     if (crashDirection == 2) {
         crashTimer = airCrashTimerReload;
@@ -292,36 +292,36 @@ void KrustyBike::UpdateAirborneState(int nowAirborne)
     Bike::UpdateAirborneState(nowAirborne);
 }
 
-Vec3 KrustyBike::UnknownVirtualSlot76(const Vec3* arm, const Vec3* force)
+Vec3 KrustyBike::ComputeDriveTorque(const Vec3* arm, const Vec3* force)
 {
     if (aiKind)
         return kVec3Zero;
-    return Bike::UnknownVirtualSlot76(arm, force);
+    return Bike::ComputeDriveTorque(arm, force);
 }
 
-int KrustyBike::UnknownVirtualSlot80()
+int KrustyBike::IsThrottleRequested()
 {
     if (!race->isRacing && !driveDisengaged)
         return 0;
     if (aiThrottleRequest > 0.0f || (inputDevice && throttleInput > 0.33f) ||
-        (UnknownVirtualSlot84(4, 0x3f) && !UnknownVirtualSlot77(engineState->throttleFraction == 0.0f)))
+        (QueryControlInput(4, 0x3f) && !UnknownVirtualSlot77(engineState->throttleFraction == 0.0f)))
         return 1;
     return 0;
 }
 
 int KrustyBike::UnknownVirtualSlot81()
 {
-    if (!aiKind && !isRemote && !isGhost && UnknownVirtualSlot84(12, 0x3f)) {
+    if (!aiKind && !isRemote && !isGhost && QueryControlInput(12, 0x3f)) {
         if (!UnknownVirtualSlot77(!driveDisengaged))
             return 1;
     }
     return 0;
 }
 
-int KrustyBike::UnknownVirtualSlot82()
+int KrustyBike::IsReverseRequested()
 {
     if (!aiKind && !isRemote && !isGhost) {
-        if (forwardSpeed < 6.0f && UnknownVirtualSlot84(13, 0x3f)) {
+        if (forwardSpeed < 6.0f && QueryControlInput(13, 0x3f)) {
             if (!UnknownVirtualSlot77(engineState->throttleFraction == 0.0f))
                 return 1;
         }
@@ -330,21 +330,21 @@ int KrustyBike::UnknownVirtualSlot82()
     return 0;
 }
 
-int KrustyBike::UnknownVirtualSlot83(VehicleWheel* wheel)
+int KrustyBike::IsBrakeRequested(VehicleWheel* wheel)
 {
     BikeWheel* input = (BikeWheel*)wheel;
     if (aiBrakeRequest > 0.0f ||
-        (UnknownVirtualSlot84(5, 0x3f) && !UnknownVirtualSlot77(input->rampLevel == 0.0f)))
+        (QueryControlInput(5, 0x3f) && !UnknownVirtualSlot77(input->rampLevel == 0.0f)))
         return 1;
     return 0;
 }
 
-int KrustyBike::UnknownVirtualSlot84(int control, int modifier)
+int KrustyBike::QueryControlInput(int control, int modifier)
 {
     if (!aiKind && !isRemote && !isGhost) {
         KbSensor* chat = race->chatOverlay;
         if (!chat || !chat->typing) {
-            Bike::UnknownVirtualSlot84(control, modifier);
+            Bike::QueryControlInput(control, modifier);
             return inputMap->UnknownVirtualSlot2(control, modifier);
         }
     }
@@ -501,7 +501,7 @@ void KrustyBike::UpdateWheelDriveForces()
 }
 
 // Slot 96: control responses derived from the Options sliders (TrackGame 0xfe0..0xff8).
-void KrustyBike::UnknownVirtualSlot96()
+void KrustyBike::InitControlResponses()
 {
     if (aiKind)
         controlResponse[0] = 0.675f;
@@ -599,7 +599,7 @@ int KrustyBike::ResolveSubstepCollisions(int steps)
 // sets velocity to a 0.055 fraction of the offset, and gives a small random kick to
 // field_0xd8; otherwise it may enter recovery states 2 (both wheels loaded past -3.5)
 // or 1/3/4/5/9, and falls through to the base handler when nothing applies.
-int KrustyBike::UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, float impulse)
+int KrustyBike::EvaluateCrash(float dt, float noseOverLimit, int impact, float impulse)
 {
     if (crashState) return crashState;
     if (UnknownVirtualSlot12(anyWheelInContact)) {
@@ -635,13 +635,13 @@ int KrustyBike::UnknownVirtualSlot99(float dt, float noseOverLimit, int impact, 
         return 1;
     }
     if (IsSpawnProtected()) return 0;
-    return Bike::UnknownVirtualSlot99(dt, noseOverLimit, impact, impulse);
+    return Bike::EvaluateCrash(dt, noseOverLimit, impact, impulse);
 }
 
 // Slot 93: when the joystick (input map +0x0c) is of kind 3, recreates constant-force effects
 // 1 (magnitude 10000, infinite) and 0 (scaled by FeedbackSlider, 70 s), then derives
 // forceFeedbackGain from the same FeedbackSlider value.
-void KrustyBike::UnknownVirtualSlot93()
+void KrustyBike::InitForceFeedback()
 {
     KbPad* pad = (KbPad*)inputMap->valueSource;
     if (pad && pad->deviceKind == 3) {
@@ -655,7 +655,7 @@ void KrustyBike::UnknownVirtualSlot93()
 // Slot 94: force-feedback update; effect 1's magnitude is smoothedForwardAccel *
 // forceFeedbackGain * 180 clamped to [-10000, 10000] while not in state 1, and the effect is
 // started or stopped on slot 80's result; effect 0 restarts on landing.
-void KrustyBike::UnknownVirtualSlot94()
+void KrustyBike::UpdateForceFeedback()
 {
     KbPad* pad = (KbPad*)inputMap->valueSource;
     if (pad && pad->deviceKind == 3) {
@@ -668,7 +668,7 @@ void KrustyBike::UnknownVirtualSlot94()
                 force = 10000;
             pad = (KbPad*)inputMap->valueSource;
             pad->UnknownVirtualSlot7(1, &params, force);
-            if (UnknownVirtualSlot80())
+            if (IsThrottleRequested())
                 ((KbPad*)inputMap->valueSource)->UnknownVirtualSlot12(1, 1, 0);
             else
                 ((KbPad*)inputMap->valueSource)->UnknownVirtualSlot11(1);
@@ -841,9 +841,9 @@ static KrustyTrickName s_KrustyTricks[6] = {
 
 // Slot 97: after the Bike set-up, registers the rider's animation clips (by name) with the
 // wrecker object, binds both wheels and attaches the scene node (tier 3 semantics).
-void KrustyBike::UnknownVirtualSlot97()
+void KrustyBike::CreateWrecker()
 {
-    Bike::UnknownVirtualSlot97();
+    Bike::CreateWrecker();
     wrecker->AddRandomAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Fall01", 1));
     wrecker->AddRandomAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Fall02", 1));
     wrecker->AddRandomAnimation((int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Fall03", 1));
@@ -2038,6 +2038,6 @@ GameObject* KrustyBike::Load(int context, int a2, const char* modelPath, const S
         GameObject::AppendChild((GameObject*)morph, -1);
         ((D3DIMSoultreeObject*)riderCharacter->c_0x1a0)->AddSecondModifier((GameObject*)morph);
     }
-    UnknownVirtualSlot102(0.001f);
+    UpdateRiderPose(0.001f);
     return this;
 }
