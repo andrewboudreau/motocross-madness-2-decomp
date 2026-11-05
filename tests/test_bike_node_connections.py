@@ -26,7 +26,7 @@ MATRIX = '?SetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z'
 # They preserve existing nonexact bodies, not establish retail byte identity.
 PARTIAL = [
     ('src/krusty2/vehicle/Bike.cpp', 'ApplyCollisionEvent@Bike', 4215184, 2874, 2865, 1758, '2ee145a08a8327876d857cb620c7c7e00da6085641564e4882ba36aca63c9f30'),
-    ('src/krusty2/vehicle/Bike.cpp', 'UnknownVirtualSlot7@Bike', 4219072, 1678, 1678, 1677, 'aaa8295baf0865125e0a657a14607ee3f28d8ad2446b0dd2a609d03475342193'),
+    ('src/krusty2/vehicle/Bike.cpp', 'DistributeContactForce@Bike', 4219072, 1678, 1678, 1677, 'aaa8295baf0865125e0a657a14607ee3f28d8ad2446b0dd2a609d03475342193'),
     ('src/krusty2/vehicle/Bike.cpp', 'UnknownVirtualSlot89@Bike', 4221664, 2396, 2120, 115, '229fbd5f8409e5a532e1c2e25d98e2f2bdb7d79f1e8583547ca7542fd7cc6dc5'),
     ('src/krusty2/vehicle/Bike.cpp', 'UpdateRiderPose@Bike', 4224064, 485, 474, 188, 'b54d0bbdb1c68a8d8c58a2368d2f31f5f0df23c1f6d12380fa84191bd009289e'),
     ('src/krusty2/vehicle/Bike.cpp', 'ComputeSlideAngle@Bike', 4243456, 1015, 946, 162, '32acc17b8099039c96f1a4f5576778df600564fea8905fa707f1b8937d6ead76'),
@@ -35,7 +35,7 @@ PARTIAL = [
     ('samples/physics/helpers/SoultreeMatrix.cpp', 'SetAxesIn', 5226576, 1171, 1171, 1137, '38091e34c86106b38f4d932e661d248cb46eae64419bc394554958ccaa7d31aa'),
     ('samples/physics/helpers/SoultreeMatrix.cpp', 'SetMatrixIn', 5224640, 1096, 1134, 262, '21bd27d95aad6a35851bd016a070df65b6d2ad9cbd4acf8205d6fba7d06e08b3'),
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'IsSpeedGainBelowLimit@KrustyBike', 4790688, 229, 230, 151, '3124025ed125d088a9cf9d706154f76eb28d5e8661543863782a91d540c2e19f'),
-    ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'UnknownVirtualSlot11@KrustyBike', 4791568, 1296, 1288, 526, '2260143a9d880dfabfff868e69178f34173f372aa53195cc6d885ed5f14bc576'),
+    ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'FindPlacement@KrustyBike', 4791568, 1296, 1288, 526, '2260143a9d880dfabfff868e69178f34173f372aa53195cc6d885ed5f14bc576'),
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'Fn_00492AD0@KrustyBike', 4795088, 2315, 2312, 192, '1941ddbc72fdfd7b01b5ad4ea65fcace024e8e828a4019450c91e9f4d1fb6a95'),
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'Fn_00493660@KrustyBike', 4798048, 8545, 8558, 2305, 'ffc638804e115abac59baeed51fe496e2c2167f5f006b1c337aaee4f7e249815'),
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', '??0KrustyBike@@QAE@H@Z', 4782688, 532, 532, 472, 'f333644c75f0d39f6e5af3c3d8c898b85d85f9467e953b8d0e6f4c5771d00276'),

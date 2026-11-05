@@ -89,7 +89,7 @@ class SoultreePhysicsMethodTests(unittest.TestCase):
                               if not s.name.startswith('.debug')], [('.drectve', 40), ('.bss', 4)])
             self.assertEqual([r for r in provider.relocations
                               if not provider.section(r.section_number).name.startswith('.debug')], [])
-            function = consumer.find_symbol('?UnknownVirtualSlot2@SoultreePhysicsBaseObject@@')
+            function = consumer.find_symbol('?InitializePhysics@SoultreePhysicsBaseObject@@')
             _, extent, relocations = consumer.symbol_extent(function)
             self.assertEqual(extent, 1500)
             self.assertEqual([(0x500c50 + r.virtual_address - function.value, r.type)
@@ -146,7 +146,11 @@ class SoultreePhysicsMethodTests(unittest.TestCase):
                              'ResolveSubstepCollisions': 28, 'SaveBodyOrientation': 29,
                              'ClearContactEffectFlags': 30, 'UpdateContactStates': 31, 'ResetToPlacement': 33, 'ApplyPendingRespawn': 39,
                              'AddAttachment': 37, 'ApplyCollisionEvent': 38,
-                             'ResetBodyOrientation': 36}
+                             'ResetBodyOrientation': 36, 'UpdateMass': 0, 'ResetDynamicState': 1,
+                             'InitializePhysics': 2, 'ApplyStaticContactImpulse': 3,
+                             'ApplyBodyContactImpulse': 4, 'ApplyDrag': 6, 'DistributeContactForce': 7,
+                             'UpdateLocalCenterOfMass': 8, 'ComputeFrameSteps': 9, 'FindPlacement': 11,
+                             'ClassifyOutOfBounds': 12}
             for target in json.loads(path.read_text()):
                 symbol = target['candidate_symbol_contains']
                 slot = (int(re.search(r'Slot(\d+)@', symbol)[1])
@@ -171,7 +175,7 @@ class SoultreePhysicsMethodTests(unittest.TestCase):
                         self.assertIn(table_refs[slot * 4], definitions)
                         checked.add(slot)
             self.assertEqual(checked, slots)
-            self.assertFalse(any(re.search(r'Slot(?:6|36)@', name) for name in definitions))
+            self.assertFalse(any(re.search(r'Slot(?:6|36)@|^\?ApplyDrag@', name) for name in definitions))
 
             methods = objects['methods']
             imports = {methods.symbol_by_index[r.symbol_index].name for r in methods.relocations

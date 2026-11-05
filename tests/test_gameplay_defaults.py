@@ -130,8 +130,8 @@ class GameplayDefaultTests(unittest.TestCase):
             for source,query,start,destination,sites in (
                 ('Bike','??1Bike@@',0x409a10,PROVIDERS[0][0],[0x409acc]),
                 ('Vehicle','??1Vehicle@@',0x526380,PROVIDERS[1][0],[0x52640f]),
-                ('KrustyBike','?UnknownVirtualSlot3@KrustyBike@@',0x48dbf0,PROVIDERS[2][0],[0x48dc0e,0x48dc52]),
-                ('KrustyBike','?UnknownVirtualSlot4@KrustyBike@@',0x48dc60,PROVIDERS[2][0],[0x48dcc5])):
+                ('KrustyBike','?ApplyStaticContactImpulse@KrustyBike@@',0x48dbf0,PROVIDERS[2][0],[0x48dc0e,0x48dc52]),
+                ('KrustyBike','?ApplyBodyContactImpulse@KrustyBike@@',0x48dc60,PROVIDERS[2][0],[0x48dcc5])):
                 caller=compiled['src/krusty2/vehicle/'+source+'.cpp'];entry=caller.find_symbol(query)
                 _,_,relocs=caller.symbol_extent(entry)
                 self.assertEqual([(r.type,start+r.virtual_address-entry.value-1)for r in relocs

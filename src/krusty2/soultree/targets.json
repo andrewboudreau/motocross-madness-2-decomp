@@ -22,7 +22,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot0@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "UpdateMass@SoultreePhysicsBaseObject",
     "target_va": "0x005008d0",
     "target_size": 54,
     "expect": "exact",
@@ -32,7 +32,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot1@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "ResetDynamicState@SoultreePhysicsBaseObject",
     "target_va": "0x00500910",
     "target_size": 399,
     "expect": "exact",
@@ -72,7 +72,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot2@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "InitializePhysics@SoultreePhysicsBaseObject",
     "target_va": "0x00500c50",
     "target_size": 1500,
     "expect": "exact",
@@ -102,7 +102,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot3@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "ApplyStaticContactImpulse@SoultreePhysicsBaseObject",
     "target_va": "0x00501310",
     "target_size": 185,
     "expect": "exact",
@@ -112,7 +112,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot4@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "ApplyBodyContactImpulse@SoultreePhysicsBaseObject",
     "target_va": "0x005013d0",
     "target_size": 473,
     "expect": "exact",
@@ -142,7 +142,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot7@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "DistributeContactForce@SoultreePhysicsBaseObject",
     "target_va": "0x005019e0",
     "target_size": 485,
     "expect": "exact",
@@ -152,7 +152,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot8@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "UpdateLocalCenterOfMass@SoultreePhysicsBaseObject",
     "target_va": "0x00501bd0",
     "target_size": 76,
     "expect": "exact",
@@ -172,7 +172,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot9@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "ComputeFrameSteps@SoultreePhysicsBaseObject",
     "target_va": "0x00501ce0",
     "target_size": 187,
     "expect": "exact",
@@ -182,7 +182,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot11@SoultreePhysicsBaseObject",
+    "candidate_symbol_contains": "FindPlacement@SoultreePhysicsBaseObject",
     "target_va": "0x00501da0",
     "target_size": 105,
     "expect": "exact",

@@ -80,9 +80,9 @@ void KrustyBike::UnknownVirtualSlot27()
     UnknownVirtualSlot101();
 }
 
-void KrustyBike::UnknownVirtualSlot1(float extraWeight)
+void KrustyBike::ResetDynamicState(float extraWeight)
 {
-    Bike::UnknownVirtualSlot1(extraWeight);
+    Bike::ResetDynamicState(extraWeight);
     Fn_0048D8B0();
     aiTrickHoldLeft = 0;
     headTurningToRival = 0;
@@ -94,37 +94,37 @@ void KrustyBike::UnknownVirtualSlot1(float extraWeight)
     contactTime = 0;
 }
 
-void KrustyBike::UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel, const Vec3* arm,
+void KrustyBike::ApplyStaticContactImpulse(const Vec3* normal, const Vec3* relVel, const Vec3* arm,
                                      const Vec3* angScale, int eventKind, int scaleBits, float* impulseOut)
 {
     if (eventKind == 1000) {
         race->handler->Fn_004DE580(this, 0, eventKind);
         return;
     }
-    Bike::UnknownVirtualSlot3(normal, relVel, arm, angScale, eventKind, scaleBits, impulseOut);
+    Bike::ApplyStaticContactImpulse(normal, relVel, arm, angScale, eventKind, scaleBits, impulseOut);
     if (eventKind != 0x67)
         race->handler->Fn_004DE580(this, *impulseOut, eventKind);
 }
 
-void KrustyBike::UnknownVirtualSlot4(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
+void KrustyBike::ApplyBodyContactImpulse(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
                                      const Vec3* armA, int eventKind, float invMassB, int nodeB,
                                      const Vec3* velB, const Vec3* worldAngVelB, const Vec3* armB,
                                      Vec3* invInertiaB, Vec3* angVelB, int velBOrNull,
                                      float* impulseOut, float scale)
 {
-    Bike::UnknownVirtualSlot4(normal, velA, worldAngVelA, armA, eventKind, invMassB, nodeB, velB,
+    Bike::ApplyBodyContactImpulse(normal, velA, worldAngVelA, armA, eventKind, invMassB, nodeB, velB,
                               worldAngVelB, armB, invInertiaB, angVelB, velBOrNull, impulseOut, scale);
     race->handler->Fn_004DE580(this, *impulseOut, eventKind);
 }
 
-void KrustyBike::UnknownVirtualSlot8()
+void KrustyBike::UpdateLocalCenterOfMass()
 {
-    Bike::UnknownVirtualSlot8();
+    Bike::UpdateLocalCenterOfMass();
     if (aiKind && frontWheelLifted)
         frontWheelLifted = 0;
 }
 
-int KrustyBike::UnknownVirtualSlot12(int grounded)
+int KrustyBike::ClassifyOutOfBounds(int grounded)
 {
     if (grounded && reinterpret_cast<KbGame*>(g_TrackGame)->eventType != 3) {
         float lo = terrainScale * 105.0f;
@@ -602,7 +602,7 @@ int KrustyBike::ResolveSubstepCollisions(int steps)
 int KrustyBike::EvaluateCrash(float dt, float noseOverLimit, int impact, float impulse)
 {
     if (crashState) return crashState;
-    if (UnknownVirtualSlot12(anyWheelInContact)) {
+    if (ClassifyOutOfBounds(anyWheelInContact)) {
         KbTrackB* grid = ((KbTrackA*)track)->trackData;
         scratchVector = Vec3(grid->sizeX * terrainScale * 128.0f, 20.0f,
                              grid->sizeZ * terrainScale * 128.0f);

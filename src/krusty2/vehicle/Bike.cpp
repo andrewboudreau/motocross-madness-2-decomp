@@ -413,9 +413,9 @@ Vec3 Bike::LocalTorqueToAngularAcceleration(const Vec3* localTorque)
     return r;
 }
 
-void Bike::UnknownVirtualSlot1(float extraWeight)
+void Bike::ResetDynamicState(float extraWeight)
 {
-    Vehicle::UnknownVirtualSlot1(extraWeight);
+    Vehicle::ResetDynamicState(extraWeight);
     BikeA644* smoother = poseSmoother;
     if (smoother) {
         float initialTime = poseSmoothTime;
@@ -479,7 +479,7 @@ Bike::Bike(int flags) : GameObject(1), Vehicle(flags)
     handlebars = 0;
     steerAxis = 0;
     poseSmoother = 0;
-    Bike::UnknownVirtualSlot1(165.0f);
+    Bike::ResetDynamicState(165.0f);
     gasGyro = 0;
     brakeGyro = 1;
     wrecker = 0;
@@ -615,10 +615,10 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
         field_0x28 = 32.2f / loadWeight;
     else
         field_0x28 = 1.0f;
-    UnknownVirtualSlot0(loadWeight);
+    UpdateMass(loadWeight);
     wobbleTime = 0.0f;
     crashGraceTime = crashTimerReload - 0.5f;
-    UnknownVirtualSlot1(loadWeight);
+    ResetDynamicState(loadWeight);
 
     riderCharacter = (BikeA5C4*)new(__FILE__, 0x583) D3DIMSoultreeCharacter(GameObject::isEnabled);
     if (!GameObject::AppendChild(
@@ -789,7 +789,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
         share = -share;
     rearWheel->restLoadWeight = share / wheelBase;
     frontWheel->restLoadWeight = 1.0f - rearWheel->restLoadWeight;
-    UnknownVirtualSlot8();
+    UpdateLocalCenterOfMass();
 
     // Box inertia of the bike (length from the model, width/height from the rider), of the
     // rider and of the steering integrator gains (tier 3 reading).
@@ -1026,7 +1026,7 @@ void Bike::UnknownVirtualSlot65(float arg)
         front->primaryAux->impulseScale = impulse;
 }
 
-void Bike::UnknownVirtualSlot8()
+void Bike::UpdateLocalCenterOfMass()
 {
     localCenterOfMass = poseNode->WorldToLocalPoint(centerOfMass);
     if (crashState == 0 && steerAxis) {
@@ -1539,7 +1539,7 @@ static inline float BikeContactDistance(const Vec3& a, const Vec3& b)
     return BikeLength((dy * dy + dx * dx) + dz * dz);
 }
 
-void Bike::UnknownVirtualSlot7(const Vec3* force)
+void Bike::DistributeContactForce(const Vec3* force)
 {
     float total;
     float dist[128];
@@ -1998,7 +1998,7 @@ void Bike::ApplyCollisionEvent(int notify, int eventKind, void* event)
     }
     case 0x3e8: {
         staticArm = ((BikeContactSet*)collisionObject)->hitPoint - centerOfMass;
-        UnknownVirtualSlot3(&((BikeContactSet*)collisionObject)->hitNormal, &velocity, &staticArm,
+        ApplyStaticContactImpulse(&((BikeContactSet*)collisionObject)->hitNormal, &velocity, &staticArm,
                             &angScale, 0x3e8, 0, &impulse);
         return;
     }
@@ -2050,7 +2050,7 @@ void Bike::ApplyCollisionEvent(int notify, int eventKind, void* event)
         int otherVelOrNull = (int)otherVel;
         if (eventKind == 0x2711 || eventKind == 0x69 || eventKind == 0x3ea)
             otherVelOrNull = 0;
-        UnknownVirtualSlot4(&((BikeContactSet*)collisionObject)->hitNormal, &velocity, &worldAngularVelocity,
+        ApplyBodyContactImpulse(&((BikeContactSet*)collisionObject)->hitNormal, &velocity, &worldAngularVelocity,
                             &arm, eventKind, otherInvMass, otherNode, otherVel, &otherWorldAngVel,
                             &otherArm, &otherInvInertia, otherAngVel, otherVelOrNull, &impulse,
                             impulseScale);
@@ -2066,7 +2066,7 @@ void Bike::ApplyCollisionEvent(int notify, int eventKind, void* event)
         tmp = worldAngularVelocity;
         scratchVector = CrossProduct(tmp, arm);
         tmp = velocity + scratchVector;
-        UnknownVirtualSlot3(&((BikeContactSet*)collisionObject)->hitNormal, &tmp, &arm, &angScale,
+        ApplyStaticContactImpulse(&((BikeContactSet*)collisionObject)->hitNormal, &tmp, &arm, &angScale,
                             eventKind, 0, &impulse);
         if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
             velocity = kVec3Zero;

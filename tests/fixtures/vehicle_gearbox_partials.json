@@ -12,7 +12,7 @@
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",
-      "UnknownVirtualSlot7@Bike",
+      "DistributeContactForce@Bike",
       4219072,
       1678,
       1678,
@@ -53,11 +53,11 @@
       745,
       745,
       693,
-      "f4424df2eaebc317f946ece278e0a06ea3ca223a8123823aafc3c53b6cfa1933"
+      "576cfb21413407767d113b271e45035be5d79ddebb7749b1ab27d76441ea028d"
     ],
     [
       "src/krusty2/vehicle/Vehicle.cpp",
-      "UnknownVirtualSlot4@Vehicle",
+      "ApplyBodyContactImpulse@Vehicle",
       5400016,
       555,
       555,
@@ -165,12 +165,12 @@
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "UnknownVirtualSlot11@KrustyBike",
+      "FindPlacement@KrustyBike",
       4791568,
       1296,
       1288,
       526,
-      "7226467bed566b784e72c2e134e2021a2719646daba01f4b44b9070129e949eb"
+      "d9ab4bb76a4ec54e1ff5fd9db1f3de9656d13b186ff6770194eb6cf9618578c5"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",

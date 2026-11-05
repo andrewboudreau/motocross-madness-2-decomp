@@ -12,7 +12,7 @@
  {
   "class": "SoultreePhysicsBaseObject",
   "source": "../../../src/reconstructed/SoultreeDrag.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot6@SoultreePhysicsBaseObject",
+  "candidate_symbol_contains": "ApplyDrag@SoultreePhysicsBaseObject",
   "target_va": "0x0040b410",
   "target_size": 432,
   "expect": "exact",
@@ -32,7 +32,7 @@
  {
   "class": "SoultreePhysicsBaseObject",
   "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot12@SoultreePhysicsBaseObject",
+  "candidate_symbol_contains": "ClassifyOutOfBounds@SoultreePhysicsBaseObject",
   "target_va": "0x00507920",
   "target_size": 5,
   "expect": "exact",

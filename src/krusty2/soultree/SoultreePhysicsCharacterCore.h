@@ -38,8 +38,8 @@ public:
     virtual ~SoultreePhysicsCharacter();        // core 0x00503d40, deleting 0x005042f0
     virtual int Tick(float dt);                     // 0x00504210 via vtordisp thunk 0x00504350 (ret 4)
     // --- vtable 0x005580a8 (offset 0) ---
-    virtual void UnknownVirtualSlot1(float extraWeight);                // 0x005040c0
-    virtual void UnknownVirtualSlot8();                           // 0x005041c0
+    virtual void ResetDynamicState(float extraWeight);                // 0x005040c0
+    virtual void UpdateLocalCenterOfMass();                           // 0x005041c0
     virtual int ResetToPlacement(const Vec3* newPosition, const Vec3* newForward,
                                      const Vec3* newUp, const Vec3* settleUp, int keepPlacement,
                                      float extraWeight);                  // 0x005040f0

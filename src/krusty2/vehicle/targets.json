@@ -52,7 +52,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot7@Bike",
+    "candidate_symbol_contains": "DistributeContactForce@Bike",
     "target_va": "0x004060c0",
     "target_size": 1678,
     "expect": "partial",
@@ -62,7 +62,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot8@Bike",
+    "candidate_symbol_contains": "UpdateLocalCenterOfMass@Bike",
     "target_va": "0x00406750",
     "target_size": 231,
     "expect": "exact",
@@ -122,7 +122,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot1@Bike",
+    "candidate_symbol_contains": "ResetDynamicState@Bike",
     "target_va": "0x00407630",
     "target_size": 205,
     "expect": "exact",
@@ -136,7 +136,7 @@
     "target_va": "0x00407700",
     "target_size": 374,
     "expect": "exact",
-    "notes": "ctor; exact with explicit Vehicle(int flags) (0x005257a0, vehicle agent's Vehicle.h). Stores in retail order: wheel pointers, 0x60c, steerAxis/poseSmoother, Bike::UnknownVirtualSlot1(165.0f) (direct call), flags, strcpy(riderName, global 0x00577738), constants.",
+    "notes": "ctor; exact with explicit Vehicle(int flags) (0x005257a0, vehicle agent's Vehicle.h). Stores in retail order: wheel pointers, 0x60c, steerAxis/poseSmoother, Bike::ResetDynamicState(165.0f) (direct call), flags, strcpy(riderName, global 0x00577738), constants.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -482,7 +482,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot0@Vehicle",
+    "candidate_symbol_contains": "UpdateMass@Vehicle",
     "target_va": "0x00525520",
     "target_size": 45,
     "expect": "exact",
@@ -492,7 +492,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot1@Vehicle",
+    "candidate_symbol_contains": "ResetDynamicState@Vehicle",
     "target_va": "0x00525550",
     "target_size": 372,
     "expect": "exact",
@@ -592,7 +592,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot3@Vehicle",
+    "candidate_symbol_contains": "ApplyStaticContactImpulse@Vehicle",
     "target_va": "0x005264c0",
     "target_size": 264,
     "expect": "exact",
@@ -602,7 +602,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot4@Vehicle",
+    "candidate_symbol_contains": "ApplyBodyContactImpulse@Vehicle",
     "target_va": "0x5265d0",
     "target_size": 555,
     "expect": "partial",
@@ -652,7 +652,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot7@Vehicle",
+    "candidate_symbol_contains": "DistributeContactForce@Vehicle",
     "target_va": "0x00526fa0",
     "target_size": 1161,
     "expect": "exact",
@@ -1672,7 +1672,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot3@KrustyBike",
+    "candidate_symbol_contains": "ApplyStaticContactImpulse@KrustyBike",
     "target_va": "0x0048dbf0",
     "target_size": 109,
     "expect": "exact",
@@ -1682,7 +1682,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot4@KrustyBike",
+    "candidate_symbol_contains": "ApplyBodyContactImpulse@KrustyBike",
     "target_va": "0x0048dc60",
     "target_size": 112,
     "expect": "exact",
@@ -1692,7 +1692,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot12@KrustyBike",
+    "candidate_symbol_contains": "ClassifyOutOfBounds@KrustyBike",
     "target_va": "0x0048de20",
     "target_size": 191,
     "expect": "exact",
@@ -1712,7 +1712,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot1@KrustyBike",
+    "candidate_symbol_contains": "ResetDynamicState@KrustyBike",
     "target_va": "0x0048fa10",
     "target_size": 74,
     "expect": "exact",
@@ -1722,7 +1722,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot8@KrustyBike",
+    "candidate_symbol_contains": "UpdateLocalCenterOfMass@KrustyBike",
     "target_va": "0x00491600",
     "target_size": 40,
     "expect": "exact",

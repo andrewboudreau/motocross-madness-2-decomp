@@ -19,7 +19,7 @@
 // named temporary and copies it to `drag` after the budget charge: retail subtracts before
 // the copy's z load. Assigning the product to `drag` directly puts the fsub after it
 // (426/432); subtracting before the product is worse (164/434).
-void SoultreePhysicsBaseObject::UnknownVirtualSlot6(Vec3* force, float* speedBudget)
+void SoultreePhysicsBaseObject::ApplyDrag(Vec3* force, float* speedBudget)
 {
     if (prevSpeed <= 0.001f)
         return;

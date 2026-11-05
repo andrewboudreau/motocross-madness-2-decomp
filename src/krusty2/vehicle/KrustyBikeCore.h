@@ -31,18 +31,18 @@ public:
     virtual ~KrustyBike();
     virtual int Tick(float dt);                      // 0x004977a0 (vbase vtable slot 10)
 
-    virtual void UnknownVirtualSlot1(float extraWeight);
-    virtual void UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel, const Vec3* arm,
+    virtual void ResetDynamicState(float extraWeight);
+    virtual void ApplyStaticContactImpulse(const Vec3* normal, const Vec3* relVel, const Vec3* arm,
                                      const Vec3* angScale, int eventKind, int scaleBits,
                                      float* impulseOut);
-    virtual void UnknownVirtualSlot4(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
+    virtual void ApplyBodyContactImpulse(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
                                      const Vec3* armA, int eventKind, float invMassB, int nodeB,
                                      const Vec3* velB, const Vec3* worldAngVelB,
                                      const Vec3* armB, Vec3* invInertiaB, Vec3* angVelB,
                                      int velBOrNull, float* impulseOut, float scale);
-    virtual void UnknownVirtualSlot8();
-    virtual int UnknownVirtualSlot11(int respawn, Vec3* outPosition, Vec3* outForward, Vec3* outUp, int* outKeepPlacement);
-    virtual int UnknownVirtualSlot12(int grounded);
+    virtual void UpdateLocalCenterOfMass();
+    virtual int FindPlacement(int respawn, Vec3* outPosition, Vec3* outForward, Vec3* outUp, int* outKeepPlacement);
+    virtual int ClassifyOutOfBounds(int grounded);
     virtual void IntegrateMotion(Vec3* force, const Vec3* localTorque, const Vec3* worldTorque);
     virtual void ApplyWorldTorque(const Vec3* worldTorque, Vec3* angularAccel);
     virtual Vec3 LocalTorqueToAngularAcceleration(const Vec3* localTorque);

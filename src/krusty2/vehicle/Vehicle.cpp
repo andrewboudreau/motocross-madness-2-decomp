@@ -12,9 +12,9 @@
 #include "collision/CollisionPoint.h"
 #include "../../reconstructed/ParticleEmitters.h"
 
-void Vehicle::UnknownVirtualSlot0(float extraWeight)
+void Vehicle::UpdateMass(float extraWeight)
 {
-    SoultreePhysicsCharacter::UnknownVirtualSlot0(extraWeight);
+    SoultreePhysicsCharacter::UpdateMass(extraWeight);
     suspensionMass = (suspensionWeightScale * baseWeight + extraWeight) * 0.0310558993f;   // 1/32.2
 }
 
@@ -302,7 +302,7 @@ static inline float VehDistance(const Vec3& a, const Vec3& b)
     return FastSqrt(d2);
 }
 
-void Vehicle::UnknownVirtualSlot7(const Vec3* force)
+void Vehicle::DistributeContactForce(const Vec3* force)
 {
     float total;
     float dist[128];
@@ -863,7 +863,7 @@ static inline Vec3 VehCrossCtor(const Vec3& a, const Vec3& b)
 // Left: VC6 evaluates the inertia ?: argument ahead of the pushes where retail tests first
 // and branches between them (ternary, lvalue, inline-helper and if/else-local spellings
 // measured identical or worse), and the A-offset sum's y/z temporaries sit 0xc lower.
-void Vehicle::UnknownVirtualSlot4(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
+void Vehicle::ApplyBodyContactImpulse(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
                                   const Vec3* armA, int eventKind, float invMassB, int nodeB,
                                   const Vec3* velB, const Vec3* worldAngVelB, const Vec3* armB,
                                   Vec3* invInertiaB, Vec3* angVelB, int velBOrNull,
@@ -973,7 +973,7 @@ void Vehicle::SimulateFrame(float frame)
     int res;
 
     justReset = 0;
-    UnknownVirtualSlot9(frame, &steps);
+    ComputeFrameSteps(frame, &steps);
     ClearContactEffectFlags();
     prevControlInput = controlInput;
     UpdateControlInput(frame);
@@ -997,7 +997,7 @@ void Vehicle::SimulateFrame(float frame)
                 engineState->driveCut = 1;
         } else if (totalWeight != baseWeight) {
             if (IsAtBaseWeight())
-                UnknownVirtualSlot0(0.0f);
+                UpdateMass(0.0f);
         }
         backingUp = IsReverseRequested();
         driveDisengaged = crashState == 0 && (backingUp || UnknownVirtualSlot81());
@@ -1007,7 +1007,7 @@ void Vehicle::SimulateFrame(float frame)
         if (respawn) {
             Vec3 placedPosition, placedForward, placedUp;
             int keepPlacement = 0;
-            UnknownVirtualSlot11(respawn, &placedPosition, &placedForward, &placedUp, &keepPlacement);
+            FindPlacement(respawn, &placedPosition, &placedForward, &placedUp, &keepPlacement);
             ResetToPlacement(&placedPosition, &placedForward, &bodyUp, &placedUp, keepPlacement, EffectiveLoadWeight());
             steps = 0;
             stepRemainder = 0.0f;
@@ -1041,9 +1041,9 @@ void Vehicle::SimulateFrame(float frame)
         if (res)
             pointsTouching = touchingPointCount > 0;
         UpdateWheelsInContact();
-        UnknownVirtualSlot8();
-        UnknownVirtualSlot6(&force, &speed);
-        UnknownVirtualSlot7(&force);
+        UpdateLocalCenterOfMass();
+        ApplyDrag(&force, &speed);
+        DistributeContactForce(&force);
         wheelForwardAlignment = ComputeWheelForwardAlignment();
         int nowAirborne;
         if (!anyWheelInContact && !pointsTouching)
@@ -1087,7 +1087,7 @@ void Vehicle::SimulateFrame(float frame)
                          &worldAngularVelocity, &velocity, &centerOfMass, &position, &mergedArm,
                          &mergedNormal, &mergedVelocity);
             float impulse;
-            UnknownVirtualSlot3(&mergedNormal, &mergedVelocity, &mergedArm, &scale, 0x67, 0, &impulse);
+            ApplyStaticContactImpulse(&mergedNormal, &mergedVelocity, &mergedArm, &scale, 0x67, 0, &impulse);
             if (prevSpeed * 1.3f < linearSpeed && linearSpeed > 5.0f) {
                 float ratio = prevSpeed / linearSpeed;
                 velocity *= ratio;
@@ -1272,7 +1272,7 @@ void Vehicle::ApplyCollisionEvent(int notify, int eventKind, void* event)
     arm = VehOffset(((VehicleContactSet*)collisionObject)->contactPoint, centerOfMass);
     if (hasBody) {
         otherVelOrNull = (eventKind == 0x2711 || eventKind == 0x69) ? 0 : (int)otherVel;
-        UnknownVirtualSlot4(&((VehicleContactSet*)collisionObject)->contactNormal, &velocity,
+        ApplyBodyContactImpulse(&((VehicleContactSet*)collisionObject)->contactNormal, &velocity,
                             &worldAngularVelocity, &arm, eventKind, otherInvMass, otherNode,
                             otherVel, &otherWorldAngVel, &otherArm, &otherInvInertia, otherAngVel,
                             otherVelOrNull, &otherInvMass, 1.0f);
@@ -1289,7 +1289,7 @@ void Vehicle::ApplyCollisionEvent(int notify, int eventKind, void* event)
         scaledAngVel.z *= angScale.z;
         scratchVector = CrossProduct(scaledAngVel, arm);
         Vec3 contactVelocity = velocity + scratchVector;
-        UnknownVirtualSlot3(&((VehicleContactSet*)collisionObject)->contactNormal, &contactVelocity, &arm,
+        ApplyStaticContactImpulse(&((VehicleContactSet*)collisionObject)->contactNormal, &contactVelocity, &arm,
                             &angScale, eventKind, 0, &otherInvMass);
     }
     if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
@@ -1535,9 +1535,9 @@ Vec3* Vehicle::GetContactGroundNormal(Vec3* out)
 // state counters are cleared exactly as in slot 67, the lean/steer/wheel members get their
 // defaults, and the speed state at +0x480 is re-seeded with a random start value
 // (rand() / 32768 scaled by a table entry).
-void Vehicle::UnknownVirtualSlot1(float extraWeight)
+void Vehicle::ResetDynamicState(float extraWeight)
 {
-    SoultreePhysicsCharacter::UnknownVirtualSlot1(extraWeight);
+    SoultreePhysicsCharacter::ResetDynamicState(extraWeight);
     field_0x4e8 = 0.0f;
     forwardSpeed = 0.0f;
     movingForward = 1;
@@ -1600,7 +1600,7 @@ static inline float VehLengthAcc(const Vec3& v)
 // Same solver call as SoultreePhysicsBaseObject slot 3, but while crashState is set it uses a
 // fixed 0.1 restitution, shapeInvInertia (+0xf0) and a zero scale (tier 3 reading).  The
 // world-space copy of the angular velocity (+0xcc) is skipped for the event code 0x67.
-void Vehicle::UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel, const Vec3* arm,
+void Vehicle::ApplyStaticContactImpulse(const Vec3* normal, const Vec3* relVel, const Vec3* arm,
                                   const Vec3* angScale, int eventKind, int scaleBits, float* impulseOut)
 {
     if (crashState)
@@ -1621,7 +1621,7 @@ void Vehicle::UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel, const 
 int Vehicle::ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp, const Vec3* settleUp,
                                   int keepPlacement, float extraWeight)
 {
-    UnknownVirtualSlot1(extraWeight);
+    ResetDynamicState(extraWeight);
     bodyForward = *newForward;
     bodyUp = *newUp;
     float y;
@@ -2179,7 +2179,7 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     throttleInput = 0;
     steerPoseState = 1;
     *(int*)&pad_0x5B8 = 0;
-    Vehicle::UnknownVirtualSlot1(165.0f);
+    Vehicle::ResetDynamicState(165.0f);
     spawnProtected = 0;
     takeoffVelocity = kVec3Zero;
     takeoffPosition = kVec3Zero;

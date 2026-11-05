@@ -119,7 +119,7 @@ int KrustyBike::IsSpeedGainBelowLimit(float dt)
 // Every game read goes through the shared global (no `KbGame* g` copy): retail keeps it in
 // ebx but reloads it after case 4's `*outForward = bodyForward`, a store that may alias the global
 // (aligned 275 -> 309, 526 strict, 1288 bytes).
-int KrustyBike::UnknownVirtualSlot11(int respawn, Vec3* outPosition, Vec3* outForward, Vec3* outUp, int* outKeepPlacement)
+int KrustyBike::FindPlacement(int respawn, Vec3* outPosition, Vec3* outForward, Vec3* outUp, int* outKeepPlacement)
 {
     int flag;
     if (reinterpret_cast<KbGame*>(g_TrackGame)->mode.GetSelectedSeries() == 3 || reinterpret_cast<KbGame*>(g_TrackGame)->mode.GetSelectedSeries() == 4)

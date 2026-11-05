@@ -62,7 +62,7 @@ void SoultreePhysicsBaseObject::StoreBodyAxes(int orthogonalize, int keepZ)
     sceneNode->SetAxesIn(0, &bodyForward, &bodyUp, orthogonalize, keepZ);
 }
 
-int SoultreePhysicsBaseObject::UnknownVirtualSlot12(int value)
+int SoultreePhysicsBaseObject::ClassifyOutOfBounds(int value)
 {
     return 0;
 }

@@ -12,7 +12,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBikeNearMisses.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot11@KrustyBike",
+    "candidate_symbol_contains": "FindPlacement@KrustyBike",
     "target_va": "0x00491d10",
     "target_size": 1296,
     "expect": "partial",

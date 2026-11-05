@@ -17,7 +17,7 @@ from tools.match import compare
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'src/reconstructed/SoultreeDrag.cpp'
 AGGREGATE = 'samples/physics/soultree_base/SoultreePhysicsInlines.cpp'
-SYMBOL = '?UnknownVirtualSlot6@SoultreePhysicsBaseObject@@UAEXPAUVec3@@PAM@Z'
+SYMBOL = '?ApplyDrag@SoultreePhysicsBaseObject@@UAEXPAUVec3@@PAM@Z'
 SLOT36 = '?ResetBodyOrientation@SoultreePhysicsBaseObject@@UAEXXZ'
 
 

@@ -10,9 +10,9 @@
 // (`new` of 0xb8 bytes, ctor 0x00431e70, tier 1).
 
 // slot 1 (0x005040c0): base slot 1 then clears four flag bytes.
-void SoultreePhysicsCharacter::UnknownVirtualSlot1(float extraWeight)
+void SoultreePhysicsCharacter::ResetDynamicState(float extraWeight)
 {
-    SoultreePhysicsBaseObject::UnknownVirtualSlot1(extraWeight);
+    SoultreePhysicsBaseObject::ResetDynamicState(extraWeight);
     motionActive = 0;
     motionCompleted = 0;
     motionJustStarted = 0;
@@ -20,7 +20,7 @@ void SoultreePhysicsCharacter::UnknownVirtualSlot1(float extraWeight)
 }
 
 // slot 8 (0x005041c0)
-void SoultreePhysicsCharacter::UnknownVirtualSlot8()
+void SoultreePhysicsCharacter::UpdateLocalCenterOfMass()
 {
     rotationPivot = localCenterOfMass = poseNode->WorldToLocalPoint(centerOfMass);
 }
@@ -39,7 +39,7 @@ int SoultreePhysicsCharacter::ResetToPlacement(const Vec3* newPosition, const Ve
                                                    const Vec3* newUp, const Vec3* settleUp,
                                                    int keepPlacement, float extraWeight)
 {
-    UnknownVirtualSlot1(extraWeight);
+    ResetDynamicState(extraWeight);
     bodyForward = *newForward;
     bodyUp = *newUp;
     sceneNode->SetPosition(newPosition->x, newPosition->y, newPosition->z);

@@ -1817,7 +1817,7 @@ int KrustyBike::Fn_00413200(float dt)
     if (hit) {
         Vec3 b;
         int dummy = 0;
-        UnknownVirtualSlot11(hit, &a, &b, &c, &dummy);
+        FindPlacement(hit, &a, &b, &c, &dummy);
         UnknownVirtualSlot33(&a, &b, &bodyUp, &c, dummy, UnknownVirtualSlot32());
         steps = 0;
         stepRemainder = 0.0f;
@@ -2257,7 +2257,7 @@ int KrustyBike::Fn_00414370(float dt)
             if (!g_TrackGame->mode.raceSettings.raceMode) {
                 aiOffTrackTime += dt;
                 if (aiOffTrackTime >= 5.0f) {
-                    UnknownVirtualSlot11(count, &a, &b, &c, &dummy);
+                    FindPlacement(count, &a, &b, &c, &dummy);
                     UnknownVirtualSlot33(&a, &b, &bodyUp, &c, dummy, UnknownVirtualSlot32());
                     aiOffTrackTime = 0.0f;
                 }

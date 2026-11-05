@@ -3,12 +3,12 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "0bb316ba6411e713e1ad4e1141eb1d6da6b7ad879138380536feefd458d6a2d7"
+      "sha256": "c64636a73c1d6cfd7a81326bf5af1d984a6fd48665c00fad8835ff8e38ef2cb5"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "b3c438efe9ef55a048580807272e70cfeec426742a97da673c1ec2443193260c"
+      "sha256": "6b397c84fa5d9ad6245a4eb01c1d947ef71cabcce816fac9ef018f84a92ddd11"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -68,7 +68,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot8@Bike",
+      "symbol": "UpdateLocalCenterOfMass@Bike",
       "target_va": "0x00406750",
       "target_size": 231,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -96,7 +96,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot1@Bike",
+      "symbol": "ResetDynamicState@Bike",
       "target_va": "0x00407630",
       "target_size": 205,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -418,14 +418,14 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot0@Vehicle",
+      "symbol": "UpdateMass@Vehicle",
       "target_va": "0x00525520",
       "target_size": 45,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot1@Vehicle",
+      "symbol": "ResetDynamicState@Vehicle",
       "target_va": "0x00525550",
       "target_size": 372,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -488,7 +488,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot3@Vehicle",
+      "symbol": "ApplyStaticContactImpulse@Vehicle",
       "target_va": "0x005264c0",
       "target_size": 264,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -523,7 +523,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot7@Vehicle",
+      "symbol": "DistributeContactForce@Vehicle",
       "target_va": "0x00526fa0",
       "target_size": 1161,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"

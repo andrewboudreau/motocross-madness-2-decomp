@@ -2,7 +2,7 @@
   {
     "class": "SoultreePhysicsCharacter",
     "source": "SoultreePhysicsCharacter.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot1@SoultreePhysicsCharacter",
+    "candidate_symbol_contains": "ResetDynamicState@SoultreePhysicsCharacter",
     "target_va": "0x005040c0",
     "target_size": 43,
     "expect": "exact",
@@ -22,7 +22,7 @@
   {
     "class": "SoultreePhysicsCharacter",
     "source": "SoultreePhysicsCharacter.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot8@SoultreePhysicsCharacter",
+    "candidate_symbol_contains": "UpdateLocalCenterOfMass@SoultreePhysicsCharacter",
     "target_va": "0x005041c0",
     "target_size": 79,
     "expect": "exact",

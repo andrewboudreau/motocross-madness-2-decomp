@@ -25,17 +25,17 @@ public:
     virtual int Tick(float dt);                     // 0x0052a830 via vtordisp thunk 0x0040cab0
 
     // ---- overrides of inherited slots (order as in the vtable) ----
-    virtual void UnknownVirtualSlot0(float extraWeight);
-    virtual void UnknownVirtualSlot1(float extraWeight);                               // 0x00525550
-    virtual void UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel, const Vec3* arm,
+    virtual void UpdateMass(float extraWeight);
+    virtual void ResetDynamicState(float extraWeight);                               // 0x00525550
+    virtual void ApplyStaticContactImpulse(const Vec3* normal, const Vec3* relVel, const Vec3* arm,
                                      const Vec3* angScale, int eventKind, int scaleBits,
                                      float* impulseOut);                   // 0x005264c0
-    virtual void UnknownVirtualSlot4(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
+    virtual void ApplyBodyContactImpulse(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
                                      const Vec3* armA, int eventKind, float invMassB, int nodeB,
                                      const Vec3* velB, const Vec3* worldAngVelB,
                                      const Vec3* armB, Vec3* invInertiaB, Vec3* angVelB,
                                      int velBOrNull, float* impulseOut, float scale);
-    virtual void UnknownVirtualSlot7(const Vec3* force);
+    virtual void DistributeContactForce(const Vec3* force);
     // Slots 18..20 take the canonical 40-byte record; the bodies view it as
     // VehicleImpactEvent (same offsets: +0x04/+0x08/+0x0c sinks, +0x24 resetTrail).
     virtual void UpdateContactEffect(SoultreeAttachment* attachment);

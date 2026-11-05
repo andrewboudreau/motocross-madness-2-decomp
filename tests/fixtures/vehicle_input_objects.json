@@ -3,17 +3,17 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "b3c438efe9ef55a048580807272e70cfeec426742a97da673c1ec2443193260c"
+      "sha256": "6b397c84fa5d9ad6245a4eb01c1d947ef71cabcce816fac9ef018f84a92ddd11"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "0bb316ba6411e713e1ad4e1141eb1d6da6b7ad879138380536feefd458d6a2d7"
+      "sha256": "c64636a73c1d6cfd7a81326bf5af1d984a6fd48665c00fad8835ff8e38ef2cb5"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
       "relocations": 1054,
-      "sha256": "2cdc3e37a0d7db7fdf1bcb1a39cbe5be7c29c95a175672e195deb21eedd062de"
+      "sha256": "df37c69b2fbd853007299379dbafed3941fa37a21ed7be398ab695b2427a4baf"
     },
     "src/reconstructed/VehicleDefaults.cpp": {
       "sections": 13,
@@ -43,7 +43,7 @@
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "765bffa0c99c22b885d76b50998b88e059bf8058aba53d3e626695379c7ec257"
+      "sha256": "0ee24c37a6a04ca1ea152d5a96c946ff4fc359ba360497f93f0463ad957b873e"
     },
     "src/reconstructed/InputDevice.cpp": {
       "sections": 11,
@@ -131,7 +131,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot8@Bike",
+      "symbol": "UpdateLocalCenterOfMass@Bike",
       "va": "0x406750",
       "extent": 231,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -159,7 +159,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot1@Bike",
+      "symbol": "ResetDynamicState@Bike",
       "va": "0x407630",
       "extent": 205,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -404,14 +404,14 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot0@Vehicle",
+      "symbol": "UpdateMass@Vehicle",
       "va": "0x525520",
       "extent": 45,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot1@Vehicle",
+      "symbol": "ResetDynamicState@Vehicle",
       "va": "0x525550",
       "extent": 372,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -474,7 +474,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot3@Vehicle",
+      "symbol": "ApplyStaticContactImpulse@Vehicle",
       "va": "0x5264c0",
       "extent": 264,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -509,7 +509,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot7@Vehicle",
+      "symbol": "DistributeContactForce@Vehicle",
       "va": "0x526fa0",
       "extent": 1161,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -1020,21 +1020,21 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot3@KrustyBike",
+      "symbol": "ApplyStaticContactImpulse@KrustyBike",
       "va": "0x48dbf0",
       "extent": 109,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot4@KrustyBike",
+      "symbol": "ApplyBodyContactImpulse@KrustyBike",
       "va": "0x48dc60",
       "extent": 112,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot12@KrustyBike",
+      "symbol": "ClassifyOutOfBounds@KrustyBike",
       "va": "0x48de20",
       "extent": 191,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1048,14 +1048,14 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot1@KrustyBike",
+      "symbol": "ResetDynamicState@KrustyBike",
       "va": "0x48fa10",
       "extent": 74,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot8@KrustyBike",
+      "symbol": "UpdateLocalCenterOfMass@KrustyBike",
       "va": "0x491600",
       "extent": 40,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1695,7 +1695,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot7@Bike",
+      "symbol": "DistributeContactForce@Bike",
       "va": "0x4060c0",
       "extent": 1678,
       "candidate": 1678,
@@ -1735,7 +1735,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot4@Vehicle",
+      "symbol": "ApplyBodyContactImpulse@Vehicle",
       "va": "0x5265d0",
       "extent": 555,
       "candidate": 555,
@@ -1831,7 +1831,7 @@
     },
     {
       "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "symbol": "UnknownVirtualSlot11@KrustyBike",
+      "symbol": "FindPlacement@KrustyBike",
       "va": "0x491d10",
       "extent": 1296,
       "candidate": 1288,

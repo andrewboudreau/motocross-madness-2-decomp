@@ -3,7 +3,7 @@
     "src/krusty2/soultree/SoulTreePhysics.cpp": {
       "sections": 128,
       "relocations": 625,
-      "sha256": "19309214dec81be504d94ae5c3c0d7ed343fda432cbec0c6d778df3bec73a213"
+      "sha256": "eb679132b0221d76fe080fc8ac3590e3aabc91959b000a768253728f24ba4069"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
@@ -18,7 +18,7 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "0bb316ba6411e713e1ad4e1141eb1d6da6b7ad879138380536feefd458d6a2d7"
+      "sha256": "c64636a73c1d6cfd7a81326bf5af1d984a6fd48665c00fad8835ff8e38ef2cb5"
     },
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,
@@ -38,13 +38,13 @@
   "strict": [
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot0@SoultreePhysicsBaseObject",
+      "symbol": "UpdateMass@SoultreePhysicsBaseObject",
       "va": "0x005008d0",
       "extent": 54
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot1@SoultreePhysicsBaseObject",
+      "symbol": "ResetDynamicState@SoultreePhysicsBaseObject",
       "va": "0x00500910",
       "extent": 399
     },
@@ -68,7 +68,7 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot2@SoultreePhysicsBaseObject",
+      "symbol": "InitializePhysics@SoultreePhysicsBaseObject",
       "va": "0x00500c50",
       "extent": 1500
     },
@@ -86,13 +86,13 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot3@SoultreePhysicsBaseObject",
+      "symbol": "ApplyStaticContactImpulse@SoultreePhysicsBaseObject",
       "va": "0x00501310",
       "extent": 185
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot4@SoultreePhysicsBaseObject",
+      "symbol": "ApplyBodyContactImpulse@SoultreePhysicsBaseObject",
       "va": "0x005013d0",
       "extent": 473
     },
@@ -110,13 +110,13 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot7@SoultreePhysicsBaseObject",
+      "symbol": "DistributeContactForce@SoultreePhysicsBaseObject",
       "va": "0x005019e0",
       "extent": 485
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot8@SoultreePhysicsBaseObject",
+      "symbol": "UpdateLocalCenterOfMass@SoultreePhysicsBaseObject",
       "va": "0x00501bd0",
       "extent": 76
     },
@@ -128,13 +128,13 @@
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot9@SoultreePhysicsBaseObject",
+      "symbol": "ComputeFrameSteps@SoultreePhysicsBaseObject",
       "va": "0x00501ce0",
       "extent": 187
     },
     {
       "source": "src/krusty2/soultree/SoulTreePhysics.cpp",
-      "symbol": "UnknownVirtualSlot11@SoultreePhysicsBaseObject",
+      "symbol": "FindPlacement@SoultreePhysicsBaseObject",
       "va": "0x00501da0",
       "extent": 105
     },

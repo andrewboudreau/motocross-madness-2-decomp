@@ -51,8 +51,8 @@ public:
     virtual ~SoultreePhysicsBaseObject();       // deleting dtor 0x00504290 via vbase vtable slot 0
     virtual int Tick(float dt);                    // override, thunk 0x005042d0 -> 0x005036f0
     // --- vtable 0x00557d90 (offset 0), slots 0..39, all introduced here ---
-    virtual void UnknownVirtualSlot0(float extraWeight);
-    virtual void UnknownVirtualSlot1(float extraWeight);
+    virtual void UpdateMass(float extraWeight);
+    virtual void ResetDynamicState(float extraWeight);
     // Slot 2 (0x00500c50): `ret 0x68` = 26 argument dwords (tier 1).  Grouping and types
     // are tier 2, from the body's stores and the struct-copy shape at both callers
     // (SoultreePhysicsCharacter slot 40 0x00503de0, SoultreePhysicsObject slot 40 0x00503970):
@@ -75,7 +75,7 @@ public:
     //   createCollision (a20) != 0: new CollisionObject (0xb8 bytes, ctor 0x00431e70(1))
     //       stored in collisionObject
     // Returns the GameObject virtual base (`this ? vbase : 0` at 0x005011f0).
-    virtual GameObject* UnknownVirtualSlot2(int renderContext, int createCenterNode,
+    virtual GameObject* InitializePhysics(int renderContext, int createCenterNode,
                                             Vec3 startPosition, Vec3 startForward, Vec3 startUp,
                                             void* terrainProbe, void* linkedObject, float weight,
                                             int contactCapacity, int attachmentSlots,
@@ -89,7 +89,7 @@ public:
     // same local whose value Vehicle slot 38 passes as slot 4's invMassB (the other body's
     // invMass float), hence float* (tier 2).  Parameter names follow ResolveContactImpulse
     // (tier 3).
-    virtual void UnknownVirtualSlot3(const Vec3* normal, const Vec3* relVel,
+    virtual void ApplyStaticContactImpulse(const Vec3* normal, const Vec3* relVel,
                                      const Vec3* arm, const Vec3* angScale,
                                      int eventKind, int scaleBits, float* impulseOut);
     // Slot 4 (ret 0x3c), body-body contact impulse.  velA..armA and velB..armB are
@@ -99,23 +99,23 @@ public:
     // the other body's invMass (a float, 1/bodyMass) as invMassB, with that local's address
     // as impulseOut (tier 1 push order); KrustyBike 0x0048dc60 reads *impulseOut (tier 2).
     // Parameter names follow ContactSolveImpulse's A/B (tier 3).
-    virtual void UnknownVirtualSlot4(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
+    virtual void ApplyBodyContactImpulse(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
                                      const Vec3* armA, int eventKind, float invMassB, int nodeB,
                                      const Vec3* velB, const Vec3* worldAngVelB,
                                      const Vec3* armB, Vec3* invInertiaB, Vec3* angVelB,
                                      int velBOrNull, float* impulseOut, float scale);
     virtual int UnknownVirtualSlot5(int value);
-    virtual void UnknownVirtualSlot6(Vec3* force, float* speedBudget);
-    virtual void UnknownVirtualSlot7(const Vec3* force);  // only read (0x005019e0, tier 2)
-    virtual void UnknownVirtualSlot8();
-    virtual void UnknownVirtualSlot9(float dt, int* steps);
+    virtual void ApplyDrag(Vec3* force, float* speedBudget);
+    virtual void DistributeContactForce(const Vec3* force);  // only read (0x005019e0, tier 2)
+    virtual void UpdateLocalCenterOfMass();
+    virtual void ComputeFrameSteps(float dt, int* steps);
     virtual int IsAtBaseWeight();
     // Slot 11 (ret 0x14): returns the FindObjectPlacement (0x004b0df0) result (tier 1).
     // respawn is slot 39's answer; the four outputs are what the step loops pass to slot 33
     // as newPosition, newForward, settleUp and keepPlacement (tier 2).
-    virtual int UnknownVirtualSlot11(int respawn, Vec3* outPosition, Vec3* outForward, Vec3* outUp,
+    virtual int FindPlacement(int respawn, Vec3* outPosition, Vec3* outForward, Vec3* outUp,
                                      int* outKeepPlacement);
-    virtual int UnknownVirtualSlot12(int value);
+    virtual int ClassifyOutOfBounds(int value);
     virtual void AccumulateContactForces(Vec3* force, Vec3* localTorque, float torqueScale);
     // Slot 14 (ret 0xc): retail 0x00502080 passes localTorque to slot 16, worldTorque to slot
     // 15 and later multiplies *force by invMass (tier 1 decoded stack offsets); all three are

@@ -1,7 +1,7 @@
 # Physics slot 6: magnitude and budget update
 
 `src/reconstructed/SoultreeDrag.cpp` reconstructs the complete
-`SoultreePhysicsBaseObject::UnknownVirtualSlot6(Vec3*, float*)` body at
+`SoultreePhysicsBaseObject::ApplyDrag(Vec3*, float*)` body at
 `0x0040b410`. It is a strict byte match under `vc6_o2_mt`. The member names and
 drag/budget interpretation remain provisional. Original translation-unit
 ownership is not established: the body lies in Bike.cpp's address range and is
