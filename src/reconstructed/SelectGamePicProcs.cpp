@@ -1145,7 +1145,7 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         break;
     case kDialogTimer: {
         for (i = 0; i < 7; i++)
-            g_LobbyRemotePlayers[i].UnknownVirtualSlot1();
+            g_LobbyRemotePlayers[i].Clear();
         int index = 0;
         g_LobbyRemotePlayerCount = 0;
         int me = g_TrackGame->network->localPlayer;

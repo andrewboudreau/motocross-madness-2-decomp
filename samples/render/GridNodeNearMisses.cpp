@@ -64,8 +64,8 @@ static inline int GridCrossingAccepted(float coord, float delta, float end)
 }
 
 // 0x00483d40
-int GridNode::UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVec3* out, GridNode** outNode,
-                                  int* outX, int* outZ)
+int GridNode::IntersectSegment(const GridVec3* p0, const GridVec3* p1, GridVec3* out, GridNode** outNode,
+                               int* outX, int* outZ)
 {
     GridVec3 cross[34];
     GridVec3 xCross[17];
@@ -219,7 +219,7 @@ int GridNode::UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVe
             float oy = iy * cellSize;
             GridVec3 a(cross[k].x - ox, cross[k].y - oy, cross[k].z);
             GridVec3 b(cross[k + 1].x - ox, cross[k + 1].y - oy, cross[k + 1].z);
-            if (child->UnknownVirtualSlot1(&a, &b, out, outNode, outX, outZ)) {
+            if (child->IntersectSegment(&a, &b, out, outNode, outX, outZ)) {
                 return 1;
             }
         }

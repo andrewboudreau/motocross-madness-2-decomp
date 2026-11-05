@@ -1010,8 +1010,8 @@ void DrawableGridNode::UpdateLevelOfDetail(UnknownTextureStream* stream, void* a
         for (int i = 0; i < 256; i++) {
             if (childOffsets[i]) {
                 stream->Seek(terrain->childTableOffset + childOffsets[i], 0, 1);
-                children[i] = UnknownVirtualSlot2(stream, 0, this, level - 1, shift - 4,
-                                                  (gridX + i % 16) * 16, (gridZ + i / 16) * 16, i, 0, 0);
+                children[i] = CreateChildNode(stream, 0, this, level - 1, shift - 4,
+                                              (gridX + i % 16) * 16, (gridZ + i / 16) * 16, i, 0, 0);
             } else {
                 children[i] = 0;
             }

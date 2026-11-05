@@ -36,10 +36,10 @@ DrawableGridNodeSharedTextures::DrawableGridNodeSharedTextures(UnknownTextureStr
 }
 
 // 0x0047c960
-GridNode* DrawableGridNodeSharedTextures::UnknownVirtualSlot2(UnknownTextureStream* stream, int a1,
-                                                              DrawableGridNode* parent, int level,
-                                                              int shift, int x, int z, int index,
-                                                              void* boundsMin, void* boundsMax)
+GridNode* DrawableGridNodeSharedTextures::CreateChildNode(UnknownTextureStream* stream, int a1,
+                                                          DrawableGridNode* parent, int level,
+                                                          int shift, int x, int z, int index,
+                                                          void* boundsMin, void* boundsMax)
 {
     return new (__FILE__, 61) DrawableGridNodeSharedTextures(stream, a1, this, parent->terrain, level,
                                                              shift, x, z, index, (float*)boundsMin,

@@ -32,7 +32,7 @@ static unsigned checks;
 static unsigned scaleChecks;
 static GridNode* Node(int index){return (GridNode*)state.nodes[index];}
 static GridBaseBlock* Block(int index){return (GridBaseBlock*)state.blocks[index];}
-int GridNode::UnknownVirtualSlot1(const GridVec3*,const GridVec3*,GridVec3*,GridNode**,int*,int*){ExitProcess(81);return 0;}
+int GridNode::IntersectSegment(const GridVec3*,const GridVec3*,GridVec3*,GridNode**,int*,int*){ExitProcess(81);return 0;}
 
 static int Map(const char* path){
     BYTE* mapped=(BYTE*)0x400000;DWORD old;

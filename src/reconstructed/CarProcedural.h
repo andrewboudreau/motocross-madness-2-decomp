@@ -38,7 +38,7 @@ public:
     virtual void UnknownNodeVirtualSlot8();
     // Slot 9 (+0x24): loads the model (CarProcedural passes its slot 27
     // arguments 0, 1, 3 and 4, then 1).
-    virtual void UnknownNodeVirtualSlot9(void* a0, const char* name, int a3, int a4, int a5);
+    virtual void LoadModel(void* a0, const char* name, int a3, int a4, int a5);
 
     // Frame-relative helpers slot 10 uses (src/krusty2/core/SoultreeObject.h
     // documents them): position in `frame` space, placement there, the

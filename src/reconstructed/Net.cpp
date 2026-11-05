@@ -1169,7 +1169,7 @@ int NetworkInterface::Update(int value)
     EnterCriticalSection(NET_LOCK(lock));
     DispatchMessages(value);
     if (connectionMode == 3 && isHost)
-        UnknownVirtualSlot0(value);
+        FlushHeldMessages(value);
     for (int i = 0; i < files.m_count; i++) {
         NetFile* file = files.Get(i);
         file->Update(value);
@@ -1184,7 +1184,7 @@ int NetworkInterface::Update(int value)
 }
 
 // 0x004ad050 (slot 0): sends the held messages to the group.
-void NetworkInterface::UnknownVirtualSlot0(int)
+void NetworkInterface::FlushHeldMessages(int)
 {
     for (int i = 0; i < heldMessages.m_count; i++) {
         NetIncomingMessage* message = heldMessages.Get(i);
@@ -1639,7 +1639,7 @@ long NetworkInterface::EnumSessions(SessionInfoType* sessions, int* count,
 {
     if (sessions) {
         for (int i = 0; i < 5; i++)
-            sessions[i].UnknownVirtualSlot1();
+            sessions[i].Clear();
     }
     if (!directPlay)
         return NET_DPERR_INVALIDOBJECT;
@@ -1688,7 +1688,7 @@ int __stdcall EnumSessionsCallback(const NetSessionDesc* desc, unsigned long*,
 long NetworkInterface::EnumPlayers(GUID* session, PlayerInfoType* entries, int* count)
 {
     for (int i = 0; i < 7; i++)
-        entries[i].UnknownVirtualSlot1();
+        entries[i].Clear();
     if (!directPlay)
         return NET_DPERR_INVALIDOBJECT;
     g_EnumPlayerCount = 0;
@@ -1711,14 +1711,14 @@ int __stdcall EnumPlayersCallback(unsigned long id, unsigned long, const NetName
 }
 
 // 0x004add00
-void PlayerInfoType::UnknownVirtualSlot1()
+void PlayerInfoType::Clear()
 {
     id = 0;
     name[0] = 0;
 }
 
 // 0x004adc90
-void SessionInfoType::UnknownVirtualSlot1()
+void SessionInfoType::Clear()
 {
     name[0] = 0;
     if (instance) {

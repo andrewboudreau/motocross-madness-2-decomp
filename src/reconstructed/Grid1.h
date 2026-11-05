@@ -91,9 +91,9 @@ public:
                                    GridTerrain* terrain, int level, int shift, int x, int z,
                                    int index, float* boundsMin, float* boundsMax);  // 0x0047c880 (ret 0x2c)
 
-    virtual GridNode* UnknownVirtualSlot2(UnknownTextureStream* stream, int a1, DrawableGridNode* parent,
-                                          int level, int shift, int x, int z, int index,
-                                          void* boundsMin, void* boundsMax);  // 0x0047c960
+    virtual GridNode* CreateChildNode(UnknownTextureStream* stream, int a1, DrawableGridNode* parent,
+                                      int level, int shift, int x, int z, int index,
+                                      void* boundsMin, void* boundsMax);  // 0x0047c960
     virtual void SelectTexture(float a);                  // 0x0047caa0
     virtual void RequestTextureSize(int block);                // 0x0047d160
     virtual void BindNodeTexture();                         // 0x0047d310

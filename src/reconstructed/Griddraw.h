@@ -224,8 +224,8 @@ public:
     // range the segment reaches and intersects the two cell triangles in a leaf.
     // Writes *out in parent units, the leaf to *outNode and the rounded hit
     // coordinates to *outX/*outZ (each when non-null); returns 1 on a hit.
-    virtual int UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVec3* out, GridNode** outNode,
-                                    int* outX, int* outZ); // 0x00483d40
+    virtual int IntersectSegment(const GridVec3* p0, const GridVec3* p1, GridVec3* out, GridNode** outNode,
+                                 int* outX, int* outZ); // 0x00483d40
     // 0x00484d70: the leaf whose grid position is (x, z), or 0 (GridNode.cpp).
     GridNode* FindLeaf(int x, int z);
     // 0x00483910 (ret 0x14, GridNode.cpp): descends to the leaf holding sample
@@ -301,9 +301,9 @@ public:
     DrawableGridNode* ReadNode(UnknownTextureStream* stream, int a1, DrawableGridNode* parent,
                                int level, int shift, int x, int z, int index,
                                float* boundsMin, float* boundsMax); // 0x0047e600 (ret 0x28)
-    virtual GridNode* UnknownVirtualSlot2(UnknownTextureStream* stream, int a1, DrawableGridNode* parent,
-                                          int level, int shift, int x, int z, int index,
-                                          void* boundsMin, void* boundsMax) { return 0; }   // 0x004806e0
+    virtual GridNode* CreateChildNode(UnknownTextureStream* stream, int a1, DrawableGridNode* parent,
+                                      int level, int shift, int x, int z, int index,
+                                      void* boundsMin, void* boundsMax) { return 0; }   // 0x004806e0
     virtual void SelectTexture(float a) {}                // 0x004806f0 (shared)
     virtual void RequestTextureSize(int a) {}                  // 0x004806f0 (shared)
     virtual void UnknownVirtualSlot5(UnknownTextureStream* stream) {} // 0x004806f0 (shared)

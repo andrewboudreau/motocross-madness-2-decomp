@@ -115,7 +115,7 @@ CarProcedural* CarProcedural::Create(void* renderContext, const char* name, cons
     carName[length] = 0;
 
     carModel = reinterpret_cast<CarProceduralModel*>(new (__FILE__, 99) D3DIMSoultreeObject(1));
-    carModel->UnknownNodeVirtualSlot9(renderContext, name, a3, a4, 1);
+    carModel->LoadModel(renderContext, name, a3, a4, 1);
     AppendChild(carModel, -1);
     pathOffset = *offset;
     trailDistance = trail;

@@ -340,9 +340,9 @@ allocated:
         for (i = 0; i < 256; i++) {
             if (childOffsets[i]) {
                 stream->Seek(terrain->childTableOffset + childOffsets[i], 0, 1);
-                children[i] = UnknownVirtualSlot2(stream, a1, this, this->level - 1, this->shift - 4,
-                                                  (gridX + i % 16) * 16, (gridZ + i / 16) * 16, i,
-                                                  boundsMin, boundsMax);
+                children[i] = CreateChildNode(stream, a1, this, this->level - 1, this->shift - 4,
+                                              (gridX + i % 16) * 16, (gridZ + i / 16) * 16, i,
+                                              boundsMin, boundsMax);
             } else {
                 children[i] = 0;
             }

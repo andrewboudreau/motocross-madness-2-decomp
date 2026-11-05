@@ -394,7 +394,7 @@
     {
       "path": "samples/render/GridNodeNearMisses.cpp",
       "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines GridNode::UnknownVirtualSlot1. Behavior unverified against retail; bytes nonexact.",
+      "reason": "Near-miss body admitted so the source build can link and run; defines GridNode::IntersectSegment. Behavior unverified against retail; bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
     },
     {

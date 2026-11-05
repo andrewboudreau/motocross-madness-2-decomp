@@ -302,7 +302,7 @@ public:
 class InfoType {
 public:
     virtual ~InfoType() {}
-    virtual void UnknownVirtualSlot1() {}
+    virtual void Clear() {}
 };
 
 // 0x18 bytes; NetworkInterface::Initialize builds seven of them.
@@ -314,7 +314,7 @@ public:
     }
     // 0x004add00 (Net.cpp). Out of line: SelectGamePicProcs.cpp 0x004f53c1
     // calls it on each 0x00689d08 record instead of inlining it.
-    virtual void UnknownVirtualSlot1();
+    virtual void Clear();
 
     int id;                                     // DirectPlay id
     char name[16];                                // name
@@ -340,7 +340,7 @@ public:
         name[0] = 0;
         instance = 0;
     }
-    virtual void UnknownVirtualSlot1();                 // 0x004adc90
+    virtual void Clear();                 // 0x004adc90
 
     char name[0x104];
     void* instance;
@@ -351,7 +351,7 @@ class NetworkInterface {
 public:
     NetworkInterface();                                 // 0x004ab480
     ~NetworkInterface();                                // 0x004ab570
-    virtual void UnknownVirtualSlot0(int value);        // 0x004ad050
+    virtual void FlushHeldMessages(int value);        // 0x004ad050
 
     long Initialize(int mode);  // 0x004ab6b0
     long ConnectUsingLobby();  // 0x004ab960
