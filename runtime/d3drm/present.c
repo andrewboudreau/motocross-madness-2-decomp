@@ -24,6 +24,7 @@
  * MCM2_NATIVE_FULLSCREEN=1 turns the emulation off.
  */
 #include <windows.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -212,7 +213,59 @@ void* CurrentEmulatedPrimary(void)
 
 /* ---- presentation ---- */
 
-static void Present(EmulatedPrimary* self)
+/*
+ * Game-thread hook for unattended test runs. With MCM2_AUTORACE set, and an
+ * executable built from source (its mcm2.map sits beside it), the decorated
+ * function ?AutoRaceTick@@YAXXZ (src/bringup/Group9_AutoRace.cpp) is called
+ * once per presented frame, on the game thread, so it can open dialogs and
+ * touch UI state safely. A thread cannot: dialogs opened from a second
+ * thread left the UI with no live dialog.
+ */
+static void RunAutoRaceTick(void)
+{
+    static int s_state; /* 0 untried, 1 active, 2 off */
+    static void (*s_tick)(void);
+    if (s_state == 0) {
+        char line[1024], path[MAX_PATH], *slash;
+        FILE* map;
+        s_state = 2;
+        if (!GetEnvironmentVariableA("MCM2_AUTORACE", NULL, 0))
+            return;
+        GetModuleFileNameA(NULL, path, sizeof(path));
+        slash = strrchr(path, 0x5c);
+        lstrcpyA(slash ? slash + 1 : path, "mcm2.map");
+        map = fopen(path, "r");
+        if (!map) {
+            LogLine("autorace: no mcm2.map next to the executable");
+            return;
+        }
+        while (fgets(line, sizeof(line), map)) {
+            char* name = strstr(line, "?AutoRaceTick@@YAXXZ");
+            if (name) {
+                DWORD address = 0;
+                char* p = name;
+                while (*p && *p != ' ')
+                    p++;
+                while (*p == ' ')
+                    p++;
+                address = (DWORD)strtoul(p, NULL, 16);
+                if (address) {
+                    s_tick = (void (*)(void))(UINT_PTR)address;
+                    s_state = 1;
+                    LogLine("autorace: AutoRaceTick at 0x%08lx", address);
+                }
+                break;
+            }
+        }
+        fclose(map);
+        if (s_state != 1)
+            LogLine("autorace: ?AutoRaceTick@@YAXXZ not in mcm2.map");
+    }
+    if (s_state == 1)
+        s_tick();
+}
+
+static void PresentFrame(EmulatedPrimary* self)
 {
     struct {
         BITMAPINFOHEADER header;
@@ -273,6 +326,12 @@ static void Present(EmulatedPrimary* self)
     if (InterlockedIncrement(&s_presents) == 1)
         LogLine("present: first frame %dx%d shown at %d,%d %dx%d in a %ldx%ld window", width,
                 height, x, y, drawWidth, drawHeight, client.right, client.bottom);
+}
+
+static void Present(EmulatedPrimary* self)
+{
+    RunAutoRaceTick();
+    PresentFrame(self);
 }
 
 /* ---- EmulatedPrimary: IDirectDrawSurface7 ---- */
