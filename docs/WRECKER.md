@@ -24,7 +24,7 @@ relocation resolved by the bindings. Two near misses are parked in
 - Slot 10 (`0x005306e0`) calls slot 11 of the gravity model, the rigid body
   and the collision model's GraphicsTest subobject (`lea ecx,[eax+0xc]`
   without a null check) with the sub-step length: the per-step update
-  `UnknownVirtualSlot11(float dt)` of the shared GameObject declaration.
+  `Step(float dt)` of the shared GameObject declaration.
   The `UnknownWreckerSteppable` view preserves the explicit secondary-base
   dispatch used by these callers.
 - Confirmed: Bike slot 97 (`0x00409420`) allocates 0x53c bytes and calls the

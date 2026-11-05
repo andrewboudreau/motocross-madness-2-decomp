@@ -370,7 +370,7 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int menu, int flags, int area
     }
     if (wait)
         RecreateCursors(waitCursorImage, paletteChanged == 0);
-    if (dialog->UnknownVirtualSlot27(renderContext, (CameraRect*)area, menu, flags, guiSoundGroup, guiTextures, dialogDirectory,
+    if (dialog->Create(renderContext, (CameraRect*)area, menu, flags, guiSoundGroup, guiTextures, dialogDirectory,
                                      parent, guiBackground, dialogFontName, dialogFontSize, this, users[0],
                                      (const char*)name)) {
         dialog->showFlags = flags;
@@ -391,7 +391,7 @@ void GUIManager::AttachDialog(UIDialog* dialog, int initParam, int wait) {
         dialog->parentDialog->controlContainer->AppendSibling(dialog, -1);
     else
         dialogContainer->AppendChild(dialog, -1);
-    dialog->UnknownVirtualSlot28(initParam);
+    dialog->SendInitEvent(initParam);
     dialog->animatesControls = uiAnimations;
     if (guiBackground)
         guiBackground->MarkAllDirty();
@@ -408,7 +408,7 @@ int GUIManager::OpenDialogResource(const char* resource) {
     CloseDialogResource();
     openedDialog = new(__FILE__, 523) UIDialog(0, resource);
     if (openedDialog) {
-        openedDialog->UnknownVirtualSlot27(renderContext, 0, 0, 0, guiSoundGroup, guiTextures, dialogDirectory, 0, 0, "Arial",
+        openedDialog->Create(renderContext, 0, 0, 0, guiSoundGroup, guiTextures, dialogDirectory, 0, 0, "Arial",
                                          14, 0, 0, 0);
         return 1;
     }

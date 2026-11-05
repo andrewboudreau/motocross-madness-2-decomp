@@ -124,7 +124,7 @@ class ConstraintSceneConnectionsTests(unittest.TestCase):
                                if i.mnemonic == 'call' and i.operands[0].type == capstone.x86.X86_OP_IMM)
             for source in (CALLER, SAMPLE):
                 obj = objects[source]
-                _, _, relocs = obj.symbol_extent(obj.find_symbol('UnknownVirtualSlot11@ConstraintMethodCollisionModel'))
+                _, _, relocs = obj.symbol_extent(obj.find_symbol('Step@ConstraintMethodCollisionModel'))
                 actual = Counter(obj.symbol_by_index[r.symbol_index].name for r in relocs if r.type == 0x14)
                 for _, symbol, va, _ in CONNECTED:
                     self.assertEqual(actual[symbol], 1 if va == 0x4fd660 else 2)

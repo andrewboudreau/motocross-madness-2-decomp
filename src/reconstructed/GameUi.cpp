@@ -2005,7 +2005,7 @@ GameObject* UIDialog::AddControl(GameObject* control, int group, int region) {
 }
 
 // 0x0046e8c0
-void UIDialog::UnknownVirtualSlot28(int initParam) {
+void UIDialog::SendInitEvent(int initParam) {
     UnknownDialogEvent event;
     event.handled = 0;
     event.kind = kDialogInit;
@@ -4058,7 +4058,7 @@ void UIDropDownList::SetOpen(int open) {
 // Drawing and input slots
 
 // 0x0046a300
-UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int menu, int flags,
+UIDialog* UIDialog::Create(void* target, CameraRect* area, int menu, int flags,
                                                                SoundGroup* sound, void* textures,
                                                                const char* directory, UIDialog* parent,
                                                                BackgroundImage* background, const char* font,

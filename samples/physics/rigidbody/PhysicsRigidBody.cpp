@@ -148,7 +148,7 @@ void PhysicsRigidBody::ResetState()
 int PhysicsRigidBody::Tick(float dt)
 {
     if (!stepDisabled)
-        UnknownVirtualSlot11(dt);
+        Step(dt);
     return GraphicsTest::Tick(dt);
 }
 
@@ -169,7 +169,7 @@ int PhysicsRigidBody::Tick(float dt)
 //  * 'float m = mass;' gives the retail 'fld mass; fdivr 1.0f' operand order.
 //  * The normalised quaternion is written back into 'orientation'. A separate named
 //    Quat adds 16 bytes of frame (0xcc instead of 0xbc).
-int PhysicsRigidBody::UnknownVirtualSlot11(float dt)
+int PhysicsRigidBody::Step(float dt)
 {
     GraphicsTest::Tick(dt);
     if (node && active) {

@@ -1232,7 +1232,7 @@
   {
     "class": "SoultreePhysicsObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot40@SoultreePhysicsObject",
+    "candidate_symbol_contains": "LoadPhysicsModel@SoultreePhysicsObject",
     "target_va": "0x00503970",
     "target_size": 724,
     "expect": "exact",
@@ -1242,7 +1242,7 @@
   {
     "class": "SoultreePhysicsCharacter",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot40@SoultreePhysicsCharacter",
+    "candidate_symbol_contains": "LoadPhysicsModel@SoultreePhysicsCharacter",
     "target_va": "0x00503de0",
     "target_size": 731,
     "expect": "exact",

@@ -2085,7 +2085,7 @@ GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char
         engineState = reinterpret_cast<VehicleSpeedState*>(new(__FILE__, 0x1b5) UnknownEngineGearbox(
             engineName, 0.02f, torqueTable, rpmLow, rpmHigh, rpmStep, reinterpret_cast<const int&>(gearArg),
             controlResponse[2], controlResponse[3]));
-    SoultreePhysicsCharacter::UnknownVirtualSlot40(context, 0, modelPath, desc, a5, startPosition,
+    SoultreePhysicsCharacter::LoadPhysicsModel(context, 0, modelPath, desc, a5, startPosition,
                                                    startForward, startUp, terrainProbe, linkedObject,
                                                    weight, wheelCap + extraContacts, attachmentSlots,
                                                    trackObject, 0.02f, 100, 0.001f, 0.1f, 3,

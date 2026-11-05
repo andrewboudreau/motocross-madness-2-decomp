@@ -3,6 +3,6 @@
   "baseline": "5c439bb",
   "sections": 733,
   "relocations": 3912,
-  "sha256": "d36e9b2426c4b3a56fa12a396fcfddaf2c159e33269bd7a87a8b9d2b6057adde",
+  "sha256": "5a35b43f3a8ff297d1d55b97b6665bb27f0b1bc87ac672e1c713ff62878eb19d",
   "scope": "All nondebug sections, public offsets, flags, bytes, relocations and addends. Only three verified source filenames normalize checkout prefix/include path spelling for this portable pin; actual same-path before/after equality uses no exclusions."
 }

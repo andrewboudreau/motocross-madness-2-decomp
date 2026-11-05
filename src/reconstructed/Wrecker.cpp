@@ -189,7 +189,7 @@ static inline Vector3& operator*=(Vector3& v, float s) {
 // probe the same window; the uninitialised ones are not counted).
 static inline void WreckerStep(GameObject* object, float step) {
     UnknownWreckerSteppable* steppable = (UnknownWreckerSteppable*)object;
-    steppable->UnknownVirtualSlot11(step);
+    steppable->Step(step);
 }
 
 // In-place inverse of a rigid transform (the InvertRigid helper of

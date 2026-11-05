@@ -422,7 +422,7 @@
   {
     "class": "PhysicsRigidBody",
     "source": "PhysicsRigidBody.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot11@PhysicsRigidBody@@",
+    "candidate_symbol_contains": "?Step@PhysicsRigidBody@@",
     "target_va": "0x004cc630",
     "target_size": 1102,
     "expect": "exact",

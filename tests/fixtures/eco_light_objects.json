@@ -7,37 +7,37 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "95a55613a014eda56eec615943f2e5c1243d06be010d9a7cdc0713a8dcc76a70"
+      "sha256": "aba226c5568d89ed17855bd5aee962acdc0bbeda4f10a5459f4ae77323ce51ba"
     },
     "src/reconstructed/LightEmitter.cpp": {
       "sections": 57,
       "relocations": 172,
-      "sha256": "692c292db56d326b9e245457ff759262e927ff61b44f9361e353a1a0a6fc6cc9"
+      "sha256": "c7f15c3abe1d8a7db0b3c7ec3d082ee04ea8bfa8ae7c9f9d6bf03d6fc25ff262"
     },
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
       "relocations": 1273,
-      "sha256": "8c25fb561d125037c71affee1a476cc5b79aab11ce2c30312b856f8edcaf621e"
+      "sha256": "60dff568b7692bd2954030b3a8a0c40660e3f830e58ff42ea3d65c920f8703d9"
     },
     "src/reconstructed/KrustyUI.cpp": {
       "sections": 296,
       "relocations": 1722,
-      "sha256": "1f10e5eeda6b4b978cac44c09fe3740ffea77352b5d734c253f2eb7e828c9b1d"
+      "sha256": "c9f071789d75d138693767769f8361c13af1576c896a610c53aff13dd18ba965"
     },
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 86,
       "relocations": 393,
-      "sha256": "2a54edb4689c40ad4f4a52f23722bf9d4a552bd5740298cb4702465307ae1fbb"
+      "sha256": "a373466b059f83233a3d7743dbe568c2f52a2072a698756108cb10db9be6033b"
     },
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,
       "relocations": 127,
-      "sha256": "0419f74737a004a22b5a51d938e663b38fa424095a996efaec557f4ae289a820"
+      "sha256": "246aba7aacb85bc68ba3d1c308e8751af24441ddee98a243641b80beadf579f9"
     },
     "src/reconstructed/D3DIMSoultreeModifier.cpp": {
       "sections": 23,
       "relocations": 75,
-      "sha256": "da1a6a0321df09468d408b3d2dccda04a7e38a8eee9d1ab915e9812428bee880"
+      "sha256": "699b8284f7dc2de313b77b061580b2790ece0f0685fbfe5eb3fdababfd6a0443"
     },
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,

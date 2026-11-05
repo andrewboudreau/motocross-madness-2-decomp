@@ -75,7 +75,7 @@ int GameObject::AppendSibling(GameObject* child,int value){if(this!=UI() || valu
 FAIL_VOID(GameObject,Disable,()) FAIL_VOID(GameObject,Enable,())
 FAIL_VOID(GameObject,OnDisable,()) FAIL_VOID(GameObject,OnEnable,())
 FAIL_INT(GameObject,UnknownVirtualSlot9,(int)) FAIL_INT(GameObject,Tick,(float))
-FAIL_INT(GameObject,UnknownVirtualSlot11,(float)) FAIL_INT(GameObject,PrepareGeometry,())
+FAIL_INT(GameObject,Step,(float)) FAIL_INT(GameObject,PrepareGeometry,())
 FAIL_INT(GameObject,RenderPre3D,()) FAIL_INT(GameObject,Render3D,()) FAIL_INT(GameObject,RenderPost3D,())
 FAIL_INT(GameObject,SetPaused,(int)) FAIL_INT(GameObject,OnDeactivate,()) FAIL_INT(GameObject,OnActivate,())
 FAIL_INT(GameObject,UnknownVirtualSlot19,(int)) FAIL_INT(GameObject,OnChar,(int)) FAIL_INT(GameObject,OnKeyDown,(int))
@@ -94,8 +94,8 @@ FAIL_INT(UIDialog,Release,()) FAIL_INT(UIDialog,Tick,(float)) FAIL_INT(UIDialog,
 FAIL_INT(UIDialog,Render3D,()) FAIL_INT(UIDialog,RenderPost3D,())
 FAIL_INT(UIDialog,OnControlRelease,(UnknownControlEvent*,UnknownInputEntry*))
 FAIL_INT(UIDialog,OnControlPress,(UnknownControlEvent*,UnknownInputEntry*))
-UIDialog* UIDialog::UnknownVirtualSlot27(void*,CameraRect*,int,int,SoundGroup*,void*,const char*,UIDialog*,BackgroundImage*,const char*,int,GUIManager*,GUIUser*,const char*){Fail(88);return 0;}
-FAIL_VOID(UIDialog,UnknownVirtualSlot28,(int)) FAIL_VOID(UIDialog,HandleEvent,(UnknownDialogEvent*))
+UIDialog* UIDialog::Create(void*,CameraRect*,int,int,SoundGroup*,void*,const char*,UIDialog*,BackgroundImage*,const char*,int,GUIManager*,GUIUser*,const char*){Fail(88);return 0;}
+FAIL_VOID(UIDialog,SendInitEvent,(int)) FAIL_VOID(UIDialog,HandleEvent,(UnknownDialogEvent*))
 FAIL_VOID(UIDialog,UnknownVirtualSlot30,()) FAIL_VOID(UIDialog,SyncValues,(int))
 FAIL_VOID(Intro1Dlg,HandleEvent,(UnknownDialogEvent*)) FAIL_INT(Intro1Dlg,Tick,(float))
 FAIL_INT(Intro1Dlg,OnControlPress,(UnknownControlEvent*,UnknownInputEntry*))

@@ -72,7 +72,7 @@
   {
     "class": "ConstraintMethodCollisionModel",
     "source": "ConstraintMethodCollisionModel.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot11@ConstraintMethodCollisionModel",
+    "candidate_symbol_contains": "Step@ConstraintMethodCollisionModel",
     "target_va": "0x43ba70",
     "target_size": 829,
     "expect": "exact",

@@ -339,7 +339,7 @@ void GameObject::AppendClassName(GameObject* object) {
 }
 
 // 0x004da540: shared by many classes (identical-code folding).
-int GameObject::UnknownVirtualSlot11(float) {
+int GameObject::Step(float) {
     return 1;
 }
 

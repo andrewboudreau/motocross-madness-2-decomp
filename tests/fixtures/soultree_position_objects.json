@@ -4,12 +4,12 @@
     "src/reconstructed/LightEmitter.cpp": {
       "sections": 57,
       "relocations": 172,
-      "sha256": "e042f68c09e550560e7a419212b9c3546cce40114956a2c45df0655d55322721"
+      "sha256": "17e7d218b6799fbfd3acd324b6aab4d042a164340f320d440d80df016c4958d8"
     },
     "src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp": {
       "sections": 62,
       "relocations": 273,
-      "sha256": "b5b2e5f0e28ef96c44af455fb2249fdf6bd89bfb8870e36782114bbd1121b497"
+      "sha256": "45f122e3f99e18ffc840ebacaa7a09b3db3a513d554b04d30280dfc9f37820d9"
     },
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,
@@ -19,12 +19,12 @@
     "samples/race/BikeRaceNearMisses.cpp": {
       "sections": 206,
       "relocations": 1929,
-      "sha256": "602b40a9eb75f01f16af866a2c26b7651b5e2ad5bf345de06aa47e401a27f222"
+      "sha256": "77e8780d9ef2ec61637d0cf0bf401b51938aa33bc180902ab24185f48e1e8a96"
     },
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
       "relocations": 1273,
-      "sha256": "5edc64bc04240d9ada26184ccf196995fcbdb7115bd9e121ff77e1caf346b75d"
+      "sha256": "f07e4c7f90cb53caff9e426092b8651566ff46d6edfb2a8d882c57843f46c4c7"
     }
   }
 }

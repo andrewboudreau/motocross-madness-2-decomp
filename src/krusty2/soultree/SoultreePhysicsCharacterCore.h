@@ -65,7 +65,7 @@ public:
     //  * Returns the GameObject virtual base (`this ? this+vbase : 0` at 0x0050408e).  The
     //    sibling SoultreePhysicsObject slot 40 (0x00503970, ret 0x70) has the same shape; its
     //    SceneManager caller 0x004ed3bf passes the result to GameObject::AppendChild.
-    virtual GameObject* UnknownVirtualSlot40(int renderContext, int createCenterNode,
+    virtual GameObject* LoadPhysicsModel(int renderContext, int createCenterNode,
                                              const char* modelPath,
                                              const SoultreeLoadDesc* desc, int a5,
                                              Vec3 startPosition, Vec3 startForward,

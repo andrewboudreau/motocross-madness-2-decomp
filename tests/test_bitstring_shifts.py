@@ -109,7 +109,7 @@ class BitStringShiftsTests(unittest.TestCase):
             # sections, flags, bytes, relocation addends and destinations are kept.
             self.assertEqual(object_fingerprint(objects[AGGREGATE]),{
                 'sections':22,'relocations':38,
-                'sha256':'312d3f5904cabc988e9257d15482b9e79c3a3f3477ba77d59592c8557c0de088'})
+                'sha256':'6d028d9205380f5cd155622d9ff1e2fcc6710e08ad211eda990b8d6625243af0'})
             candidate=objects[SOURCE]
             self.assertEqual({s.name for s in candidate.symbols if s.section_number==0},{MASK})
             self.assertEqual({s.name for s in candidate.symbols if s.section_number>0 and s.storage_class==2},

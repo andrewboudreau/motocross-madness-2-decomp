@@ -82,7 +82,11 @@ public:
                                   unsigned long* size) = 0;
     virtual int GetRegistryBinary(const char* name, void* data, unsigned long* size) = 0;
     virtual int SetRegistryInt(const char* name, int value) = 0;
-    virtual int UnknownVirtualSlot26(const char* name, int value) = 0;
+    // Slot 26 sits where the setters mirror GetRegistryFloat (Int, Float, Flag,
+    // String, Binary). GetRegistryFloat reads a REG_DWORD, so a float writer
+    // folds into SetRegistryInt (strong inference). The value's float type is not
+    // proven, so the parameter keeps int.
+    virtual int SetRegistryFloat(const char* name, int value) = 0;
     virtual int SetRegistryFlag(const char* name, int value) = 0;
     virtual int SetRegistryString(const char* name, const char* value) = 0;
     virtual int SetRegistryBinary(const char* name, const void* data, unsigned long size) = 0;

@@ -52,12 +52,12 @@ public:
 
     // The dialog's own slots (gameui.cpp).
     // 0x0046a300: creates the controls from the resource; this, or 0 when it fails.
-    virtual UIDialog* UnknownVirtualSlot27(void* target, CameraRect* area, int menu, int flags,
+    virtual UIDialog* Create(void* target, CameraRect* area, int menu, int flags,
                                            SoundGroup* sound, void* textures, const char* directory,
                                            UIDialog* parent, BackgroundImage* background,
                                            const char* font, int fontSize, GUIManager* gui,
                                            GUIUser* user, const char* name);
-    virtual void UnknownVirtualSlot28(int initParam); // 0x0046e8c0: a kDialogInit event carrying it
+    virtual void SendInitEvent(int initParam); // 0x0046e8c0: a kDialogInit event carrying it
     virtual void HandleEvent(UnknownDialogEvent* event); // slot 29, 0x00470020: the dialog's procedure (controls report events here)
     virtual void UnknownVirtualSlot30();      // 0x00470040
     // Slot 31, 0x00470050: UpdateBoundValues calls it after the controls'

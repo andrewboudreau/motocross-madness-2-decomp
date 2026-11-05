@@ -85,7 +85,7 @@ public:
     explicit UnknownWreckerGravityModel(int flags);           // 0x004f9760
     virtual ~UnknownWreckerGravityModel();                    // 0x004f97b0
     virtual int Tick(float frameTime);                        // slot 10, 0x004f9860
-    virtual int UnknownVirtualSlot11(float frameTime);        // slot 11, 0x004f9890
+    virtual int Step(float frameTime);        // slot 11, 0x004f9890
     virtual void UnknownVirtualSlot27(UnknownWreckerRigidBody* body); // slot 27, 0x004f9820
     virtual void UnknownVirtualSlot28(float value);           // slot 28, 0x004f9a50
 
@@ -117,13 +117,13 @@ int UnknownWreckerGravityModel::Tick(float frameTime)
 {
     GameObject::Tick(frameTime);
     if (!manualStep)
-        UnknownVirtualSlot11(frameTime);
+        Step(frameTime);
     return 1;
 }
 
 // 0x004f9890 (ret 4): applies the force (0, -mass * gravity, 0) to every
 // body. The timestep is not used.
-int UnknownWreckerGravityModel::UnknownVirtualSlot11(float frameTime)
+int UnknownWreckerGravityModel::Step(float frameTime)
 {
     for (int i = 0; i < bodyCount; i++) {
         Group0GravityBodyView* body = (Group0GravityBodyView*)bodies[i];

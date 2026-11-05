@@ -44,7 +44,7 @@ public:
                                   unsigned long* size);                     // 0x004c1fc0: string
     virtual int GetRegistryBinary(const char* name, void* data, unsigned long* size); // 0x004c2110: binary
     virtual int SetRegistryInt(const char* name, int value);              // 0x004c2240: write DWORD
-    virtual int UnknownVirtualSlot26(const char* name, int value);            // 0x004c2240 (folded)
+    virtual int SetRegistryFloat(const char* name, int value);            // 0x004c2240 (folded)
     virtual int SetRegistryFlag(const char* name, int value);             // 0x004c2240 (folded)
     virtual int SetRegistryString(const char* name, const char* value);   // 0x004c2370: write string
     virtual int SetRegistryBinary(const char* name, const void* data, unsigned long size); // 0x004c24b0

@@ -69,7 +69,7 @@
   "?ResetDynamicState@SoultreePhysicsCharacter@@UAEXM@Z": "0x005040c0",
   "?ResetDynamicState@Vehicle@@UAEXM@Z": "0x00525550",
   "?UpdateAttachmentEffects@SoultreePhysicsBaseObject@@UAEXXZ": "0x005024f0",
-  "?UnknownVirtualSlot40@SoultreePhysicsCharacter@@UAEPAVGameObject@@HHPBDPBUSoultreeLoadDesc@@HUVec3@@22PAX3MHHPAVSoultreeSlot1f0@@MHMMHEH@Z": "0x00503de0",
+  "?LoadPhysicsModel@SoultreePhysicsCharacter@@UAEPAVGameObject@@HHPBDPBUSoultreeLoadDesc@@HUVec3@@22PAX3MHHPAVSoultreeSlot1f0@@MHMMHEH@Z": "0x00503de0",
   "?UpdateContactPatch@VehicleWheel@@QAEXPAUVec3@@U2@1MPAMPAH@Z": "0x005135f0",
   "?UpdateDriveShare@VehicleWheel@@QAEXPAVVehicle@@@Z": "0x00513f90",
   "?UpdatePlacement@CollisionObject@@QAEXXZ": "0x00435fb0",

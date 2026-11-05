@@ -45,7 +45,7 @@ static void Run(int retail,int direction,int count,int bits,int fill,int offset,
  if(mode==11)v->data=page-4;
  __try {
   if(retail){DWORD target=wrapper==2?0x423e90:wrapper?(direction?0x423940:0x4238c0):(direction?0x423b70:0x4239c0);((Shift)target)(v,0,wrapper==2&&!direction?-count:count);}
-  else {GR_BitString* p=(GR_BitString*)v;if(wrapper==2)p->GR_BitString::UnknownVirtualSlot2(direction?count:-count);else if(wrapper){if(direction)p->ShiftTowardBack(count);else p->ShiftTowardFront(count);}else{if(direction)p->ShiftBitsTowardBack(count);else p->ShiftBitsTowardFront(count);}}
+  else {GR_BitString* p=(GR_BitString*)v;if(wrapper==2)p->GR_BitString::Shift(direction?count:-count);else if(wrapper){if(direction)p->ShiftTowardBack(count);else p->ShiftTowardFront(count);}else{if(direction)p->ShiftBitsTowardBack(count);else p->ShiftBitsTowardFront(count);}}
  }__except(Filter(GetExceptionInformation())){}
  memcpy(observed.storage,storage,sizeof(storage));memcpy(observed.page,page,4096);
 }

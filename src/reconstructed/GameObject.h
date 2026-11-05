@@ -43,7 +43,10 @@ public:
     // Slot 14 is Render3D: Game::RenderFrame calls it on the root between
     // BeginScene and EndScene, timed as its `render3D` between the RenderPre3D
     // and RenderPost3D passes.
-    // Slots 9, 11 and 19 keep placeholder names.
+    // Slot 11 is Step: Wrecker slot 10 calls slot 11 of its gravity model, rigid
+    // body and collision model with the sub-step length, and the physics models'
+    // Tick overrides call their own slot 11 with the frame time.
+    // Slots 9 and 19 keep placeholder names.
     virtual void Disable();
     virtual void Enable();
     virtual void OnDisable();
@@ -53,7 +56,7 @@ public:
     virtual int Tick(float frameTime);
     // Physics overrides 0x0043ba70 and 0x004f9890 consume a float timestep;
     // the shared base body 0x004da540 ignores its four-byte argument.
-    virtual int UnknownVirtualSlot11(float frameTime);
+    virtual int Step(float frameTime);
     virtual int PrepareGeometry();
     virtual int RenderPre3D();
     virtual int Render3D();

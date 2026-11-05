@@ -790,7 +790,7 @@ int PCGame::SetRegistryInt(const char* name, int value) {
     return result;
 }
 
-int PCGame::UnknownVirtualSlot26(const char* name, int value) {
+int PCGame::SetRegistryFloat(const char* name, int value) {
     int result = 1;
     char path[256];
     UNKNOWN_SETTING_PATH(path, name)

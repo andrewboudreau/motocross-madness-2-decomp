@@ -10,7 +10,7 @@
 // SOLVER OVERVIEW (semantic names are tier 3; instruction behaviour is tier 1)
 //   Method: single-contact IMPULSE (velocity-level rigid body response) plus a small
 //   PROJECTION step. There is no penalty force and no iterative solver in this file.
-//   Structure of one step (UnknownVirtualSlot11 at 0x0043ba70, called every tick by slot 10):
+//   Structure of one step (Step at 0x0043ba70, called every tick by slot 10):
 //     1. Save dt (+0xc0). If the model is active (+0xec) refresh the collision node
 //        (0x435fb0/0x435fe0); when the base reports an overlap (0x438e70) push the body
 //        back by the record's contact offset (+0x00) * 1.005 (projection) and refresh again.
@@ -86,7 +86,7 @@ GameObject* ConstraintMethodCollisionModel::SetRenderContext(void* context)
 int ConstraintMethodCollisionModel::Tick(float t)
 {
     if (!manualStep)
-        UnknownVirtualSlot11(t);
+        Step(t);
     return CollisionObject::Tick(t);
 }
 
@@ -113,7 +113,7 @@ void ConstraintMethodCollisionModel::SetBody(ConBody* b, int useNodeModel, const
 // (in the loop body they share frame slots with the push-out's locals, giving a different
 // frame); the offset products carry redundant parentheses (docs/VC6_OPERAND_ORDER.md section 3),
 // without which VC6 schedules the argument copies of the ApplyContactImpulse call differently.
-int ConstraintMethodCollisionModel::UnknownVirtualSlot11(float t)
+int ConstraintMethodCollisionModel::Step(float t)
 {
     dt = t;
     if (shapeCollisionEnabled) {

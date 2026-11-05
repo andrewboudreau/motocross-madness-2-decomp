@@ -173,7 +173,7 @@ GR_BitString::~GR_BitString() {
 }
 
 // 0x00423df0
-void GR_BitString::UnknownVirtualSlot1(int* value) {
+void GR_BitString::ReverseBytes(int* value) {
     unsigned char* front;
     unsigned char* back;
     unsigned char c;
@@ -195,15 +195,15 @@ void GR_BitString::UnknownVirtualSlot1(int* value) {
 }
 
 // 0x00423e70
-void GR_BitString::UnknownVirtualSlot0() {
+void GR_BitString::Reverse() {
     int shift;
 
-    UnknownVirtualSlot1(&shift);
-    UnknownVirtualSlot2(shift);
+    ReverseBytes(&shift);
+    Shift(shift);
 }
 
 // 0x00423e90
-void GR_BitString::UnknownVirtualSlot2(int value) {
+void GR_BitString::Shift(int value) {
     if (data && bitCount) {
         if (value < 0)
             ShiftTowardFront(-value);
@@ -213,7 +213,7 @@ void GR_BitString::UnknownVirtualSlot2(int value) {
 }
 
 // 0x00423ec0
-void GR_BitString::UnknownVirtualSlot3() {
+void GR_BitString::Invert() {
     unsigned int* p;
     int words;
 

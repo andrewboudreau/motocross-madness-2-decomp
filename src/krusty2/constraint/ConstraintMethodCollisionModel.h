@@ -11,7 +11,7 @@
 #include "../collision/CollisionObject.h"   // canonical CollisionObject chain (MIGRATION.md)
 #include "ConstraintTypes.h"
 
-// One probe point (32 bytes), see AddProbePoint / UnknownVirtualSlot11.
+// One probe point (32 bytes), see AddProbePoint / Step.
 struct ConstraintProbe {
     ConVec3 localPoint;    // +0x00 point in the owner node's space
     ConNode* node;         // +0x0c owner node
@@ -28,7 +28,7 @@ public:
     virtual ~ConstraintMethodCollisionModel();               // 0x0043b950 -> core 0x0043b980
     virtual GameObject* SetRenderContext(void* context);             // 0x0043b9a0
     virtual int Tick(float dt);                              // 0x0043ba40
-    virtual int UnknownVirtualSlot11(float dt);           // 0x0043ba70
+    virtual int Step(float dt);           // 0x0043ba70
     virtual int Render3D();                   // 0x0043c880 (tail jump)
 
     void SetBody(ConBody* b, int useNodeModel, const char* shapePath);     // 0x0043b9e0

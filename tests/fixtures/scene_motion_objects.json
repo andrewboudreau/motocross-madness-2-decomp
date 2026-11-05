@@ -4,7 +4,7 @@
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
       "relocations": 1273,
-      "sha256": "52fccb7bbcb40855e04f92d8148544feb03a2ca79f7f0015dc1c820952758fdd"
+      "sha256": "95f1a09f85e68439dbc54676016bcd4c542495720f443cf76d9436beff6506f5"
     },
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,

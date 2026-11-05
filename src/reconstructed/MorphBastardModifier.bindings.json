@@ -20,7 +20,7 @@
   "?GetLocalMatrix@SoultreeObject@@QAEXPAUMatrix4@@@Z": "0x004fca60",
   "?GetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fca80",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
-  "?UnknownVirtualSlot11@GameObject@@UAEHM@Z": "0x004da540",
+  "?Step@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",
   "?RenderPre3D@GameObject@@UAEHXZ": "0x00469330",
   "?Render3D@GameObject@@UAEHXZ": "0x00469360",

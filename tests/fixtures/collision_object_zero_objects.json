@@ -4,12 +4,12 @@
     "src/krusty2/collision/CollisionObject.cpp": {
       "sections": 135,
       "relocations": 722,
-      "sha256": "5926f5d99d3d92e0b92adc4baf4a4eca1aa39c6b80b91beaffd96306b0ec2604"
+      "sha256": "c1e222cd8df19293440dd0c89e6f1f58f6a2bf280d9b6d38a997974e44a5e739"
     },
     "samples/physics/collision/CollisionObjectNearMisses.cpp": {
       "sections": 136,
       "relocations": 732,
-      "sha256": "4b1d671f97e31bbbc0ab08ea6b026d9e2ac0c046f3ba466c05c5d2eaaa8eb314"
+      "sha256": "c1bece69c4079a72d4a7e684f417d4730d98daa1f2f4a48d69ec260edec70170"
     }
   }
 }

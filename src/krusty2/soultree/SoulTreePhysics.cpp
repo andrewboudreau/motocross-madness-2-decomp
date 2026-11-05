@@ -1121,7 +1121,7 @@ extern UnknownResourceManager* g_ResourceManager; // pointer stored at 0x00572b4
 // found it becomes the collision shape, otherwise the hull comes from the node (0x00432720).
 // SoultreePhysicsObject has two GameObjects, so field_0x08 and the GameObject call are
 // qualified.
-GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int renderContext, const char* modelPath,
+GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const char* modelPath,
                                                         const SoultreeLoadDesc* desc, int a4,
                                                         Vec3 startPosition, Vec3 startForward,
                                                         Vec3 startUp, void* terrainProbe, void* linkedObject,
@@ -1172,7 +1172,7 @@ GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int renderContext, const
 // SoultreePhysicsCharacter slot 40 (0x00503de0, `ret 0x6c`).  The same loader for the
 // character: D3DIM character slot 11 instead of the object's slot 9, line 0x8cd, the pose
 // node set from the model node, and shape setup 0x004324b0 when no ".col" file exists.
-GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int renderContext, int createCenterNode, const char* modelPath,
+GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int createCenterNode, const char* modelPath,
                                                            const SoultreeLoadDesc* desc, int a5,
                                                            Vec3 startPosition, Vec3 startForward,
                                                            Vec3 startUp, void* terrainProbe, void* linkedObject,

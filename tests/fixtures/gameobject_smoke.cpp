@@ -9,7 +9,7 @@ typedef char CheckGameObjectSize[sizeof(GameObject) == 0x2c ? 1 : -1];
 class PhysicsObject : public GameObject {
 public:
     PhysicsObject() : GameObject(1), timeStep(0), event(0), entry(0) {}
-    virtual int UnknownVirtualSlot11(float step) { timeStep = step; return 7; }
+    virtual int Step(float step) { timeStep = step; return 7; }
     virtual int OnControlPress(UnknownControlEvent* value, UnknownInputEntry* owner) {
         event = value;
         entry = owner;
@@ -30,7 +30,7 @@ int main() {
     GameObject* object = &child;
     if (object->AddRef() != 2 || object->Release() != 1 ||
         object->GetRefCount() != 1 || !object->isEnabled) return 2;
-    if (object->UnknownVirtualSlot11(0.125f) != 7 || child.timeStep != 0.125f) return 3;
+    if (object->Step(0.125f) != 7 || child.timeStep != 0.125f) return 3;
     int context, event, entry;
     if (object->SetRenderContext(&context) != object || child.Context() != &context) return 4;
     if (root.AppendChild(object, -1) != (int)object) return 5;

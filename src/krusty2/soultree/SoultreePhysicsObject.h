@@ -94,7 +94,7 @@ public:
     //  * The SceneManager caller 0x004ed3bf passes the result to GameObject::AppendChild.
     //  * Returns the D3DIMSoultreeObject GameObject (+0x228), not the virtual one: the tail
     //    0x00503c16 null-checks `this`, then this+0x21c, then adds 12.
-    virtual GameObject* UnknownVirtualSlot40(int renderContext, const char* modelPath,
+    virtual GameObject* LoadPhysicsModel(int renderContext, const char* modelPath,
                                              const SoultreeLoadDesc* desc, int a4,
                                              Vec3 startPosition, Vec3 startForward,
                                              Vec3 startUp, void* terrainProbe,

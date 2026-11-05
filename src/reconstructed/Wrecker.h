@@ -38,7 +38,7 @@ public:
     virtual void UnknownVirtualSlot8();
     virtual void UnknownVirtualSlot9();
     virtual void UnknownVirtualSlot10();
-    virtual int UnknownVirtualSlot11(float step);
+    virtual int Step(float step);
 };
 
 class SoultreeObject;
@@ -62,7 +62,7 @@ class UnknownWreckerCollisionModel : public UnknownWreckerCollisionObject {
 public:
     // Dispatch through the secondary GameObject base without a null conversion.
     void UnknownFunctionStep(float step) {
-        ((UnknownWreckerSteppable*)((char*)this + 0xc))->UnknownVirtualSlot11(step);
+        ((UnknownWreckerSteppable*)((char*)this + 0xc))->Step(step);
     }
     explicit UnknownWreckerCollisionModel(int flags);              // 0x0043b8d0
     // 0x0043b9e0 (thiscall, ret 0xc): binds the model to `body`; `name`

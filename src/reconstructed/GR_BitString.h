@@ -12,10 +12,10 @@
 //   +0x1c 1: the buffer is not owned (the destructor frees it when 0).
 class GR_PixelString {
 public:
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1(int* value);
-    virtual void UnknownVirtualSlot2(int value);
-    virtual void UnknownVirtualSlot3();
+    virtual void Reverse();
+    virtual void ReverseBytes(int* value);
+    virtual void Shift(int value);
+    virtual void Invert();
 };
 
 class GR_BitString : public GR_PixelString {
@@ -26,14 +26,14 @@ public:
     // 0x00423dd0 (slot 4's scalar deleting destructor 0x00423d30 calls it).
     virtual ~GR_BitString();
     // Slot 0 (0x00423e70): reverses the bit order, then drops the padding.
-    virtual void UnknownVirtualSlot0();
+    virtual void Reverse();
     // Slot 1 (0x00423df0): reverses the bytes and their bits; *value
     // receives minus the padding bits (0..7) now at the front.
-    virtual void UnknownVirtualSlot1(int* value);
+    virtual void ReverseBytes(int* value);
     // Slot 2 (0x00423e90): shifts toward the front (value < 0) or the back.
-    virtual void UnknownVirtualSlot2(int value);
+    virtual void Shift(int value);
     // Slot 3 (0x00423ec0): inverts every 32-bit word.
-    virtual void UnknownVirtualSlot3();
+    virtual void Invert();
     // 0x004238c0 / 0x00423940: shift by `count` bits toward the front / the
     // back, whole words first, then 0x004239c0 / 0x00423b70 for the rest.
     void ShiftTowardFront(int count);

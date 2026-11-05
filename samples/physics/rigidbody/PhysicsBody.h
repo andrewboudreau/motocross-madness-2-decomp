@@ -105,7 +105,7 @@ public:
     virtual ~PhysicsRigidBody();                        // 0x004cc1e0 (scalar deleting 0x004cc1c0)
 
     virtual int Tick(float dt);                         // 0x004cc600
-    virtual int UnknownVirtualSlot11(float dt);      // 0x004cc630, the integration step
+    virtual int Step(float dt);      // 0x004cc630, the integration step
     virtual int Render3D();              // 0x004cca80
 
     virtual void AddWorldForceAtWorldPoint(Vec3 force, Vec3 point);   // 0x004cc230
