@@ -59,6 +59,12 @@
 // Also unchanged: a `GridNode* (*)[16]` row view indexed `[r][...]`,
 // `(&children[i])[j + cell]`, `(children + i + j)[cell]` and inline child
 // lookups taking (cell, i + j), (i + j, cell), (i, j, cell) or (cell, i, j).
+// Session 19 (all 114 unless noted): a dead `g_gridQuadCell[quad] + 0` or
+// `* 2` local, five more index bracketings, i/j declared at the top (either
+// order) or at block scope, an `int* cell = &g_gridQuadCell[quad]` local
+// (block or top), a pointer-to-slot local; `GridNode** base = children +
+// table[quad]` 8, an `int cell` local 3 (block) or 2 (top), fully cast
+// repeated reads 8.
 //
 // DrawableGridNode 0x0047f210 (per-block buffer rebuild, 1576 bytes; 426 of
 // 1586): the calls, reallocations, copies and the bookkeeping after the loops

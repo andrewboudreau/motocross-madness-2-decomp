@@ -332,6 +332,8 @@ int UnknownTextureStream::Read(void* buffer, int size, int count)
 
 // 0x004618e0. Near miss (88%): retail loads every argument into a register before
 // the pushes; VC6 here pushes from memory.
+// Session 19: tail-recursive forms 136, a nested `fseek(..., ftell(..), ..)` 32, a
+// `count--` loop 101.
 int UnknownTextureStream::Write(const void* buffer, int size, int count)
 {
     UnknownTextureStream* stream = InnermostStream(this);

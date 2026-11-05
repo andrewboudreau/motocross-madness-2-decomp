@@ -53,6 +53,9 @@
 //   kVec3YAxis is this unit's own copy at 0x00689b28 (ProCircuitProcs.cpp's
 //   `$E` vector, as in the canonical bindings); the sample had bound
 //   ProCircuit.cpp's 0x00689ae8 (1125).
+//   Session 19: code-free separators between the copies (`if (0) {}`, `if (0)`
+//   around a statement, a zero-trip for, `while (0)`, `switch (0)`, a switch
+//   on a member) all stay 1237.
 
 #include "../../src/reconstructed/ProCircuitProcs.cpp"
 

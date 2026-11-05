@@ -23,6 +23,8 @@
 // the v3.tu store. Moving v1.tv, v3.sx or v5.sx alone to each position in
 // its block (512 forms) keeps 4 differing instructions at best; v3.sx
 // third gives 781 positions but 6 differing instructions.
+// Session 19: struct copies of vertex 0 into 3 (94), 1 into 5 (71) or both (87)
+// are far off.
 //
 // CharacterCell::GetRect (0x0050beb0, the out-of-line copy of
 // FontTexture.h's inline) is emitted only in a TU that calls it, so it is

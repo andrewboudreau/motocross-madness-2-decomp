@@ -1735,6 +1735,9 @@ static inline Vec3& QueryContact(CollisionSweepQuery* q)
 // 0x00437c20: model vs hull.  Forwards to ModelVsHullSwept when model->swept is set;
 // otherwise rel = inverse(model+0x88) * hull+0x48 and each enabled element is tested
 // against the hull with the box-box test 0x00436720; the contact is the mean of the hits.
+// Session 19 (712 of 716 kept, push scheduling of `add eax,4` only): a tree local before
+// the call, `(const Vec3*)` casts and an int overlap local give 712; the tree local at the
+// top of the function 144.
 int CollisionObject::ModelVsHull(CollisionModelBody* a, CollisionHullBody* b, CollisionSweepQuery* q)
 {
     if (a->swept)

@@ -9,6 +9,12 @@
 #include "../../src/reconstructed/TrackGame.h"
 
 // 0x004734c0: whether `point` is on an opaque pixel of the image.
+// Session 19, all 256 unless noted: a shared `goto failed` for Lock and
+// Unlock, an `int result = opaque` copy, Unlock without the if, `Unlock() == 0`
+// with two returns, `if (!Unlock) return`, `return Unlock ? opaque : opaque`,
+// a `format == 8 &&` pair, an empty then-arm; `format != 8` reversed 245, a
+// switch on format 245, a ternary condition 249, Unlock and return inside the
+// 8-bit arm 219.
 int UIButton::ContainsPoint(POINT point, int state) {
     int opaque = 0;
     int format = g_TrackGame->renderTarget->surfacePixelFormat;
