@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROVIDER = '?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z'
 CALLERS = (
     ('FollowCamera', '?PlayRecordedFrame@FollowCamera@@', 0x465720, 1267, 1),
-    ('VehicleCamera', '?UnknownVirtualSlot68@VehicleCamera@@', 0x52bcf0, 684, 1),
+    ('VehicleCamera', '?LookAtTargetPoint@VehicleCamera@@', 0x52bcf0, 684, 1),
     ('VehicleCamera', '?UnknownVirtualSlot35@VehicleCamera@@', 0x52c510, 1267, 1),
     ('KrustyBikeCamera', '?ClampPositionAboveGround@KrustyBikeCamera@@', 0x497fa0, 217, 1),
     ('AuralScape', '?Tick@AuralScape@@', 0x403710, 1025, 1),

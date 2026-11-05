@@ -70,8 +70,8 @@ int KrustyBikeCamera::Tick(float frameTime) {
     }
     if (s_UnknownActive67c3f4) {
         s_UnknownActive67c3f4 = false;
-        UnknownVirtualSlot62();
-        UnknownVirtualSlot71(cameraState);
+        RestoreCameraState();
+        SetCameraState(cameraState);
     }
     FollowCamera::Tick(frameTime);
     return 1;

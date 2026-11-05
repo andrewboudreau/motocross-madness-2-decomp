@@ -88,7 +88,7 @@ Vector3 BikeCamera::GetStateFiveFollowPoint(float dt) {
             result += bike->wrecker->rigidBody->velocity * dt;
         }
     } else {
-        float dot = BikeCameraDot(UnknownVirtualSlot33(), followHeading);
+        float dot = BikeCameraDot(GetTargetVelocity(), followHeading);
         float height = targetDistance * 0.009f + 1.0f;
         float ratio = fieldOfView / maxFieldOfView;
         float speed = vehicleMode ? vehicle->referenceSpeed : 180.0f;

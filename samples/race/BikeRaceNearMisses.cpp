@@ -863,7 +863,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 AppendChild(replayVcr, -1);
             }
             savedCameraState = UnknownFunctionCameraView()->cameraState;
-            raceCamera->UnknownVirtualSlot71(1);
+            raceCamera->SetCameraState(1);
         }
     }
     g_TrackGame->ui->StepProgressBar();

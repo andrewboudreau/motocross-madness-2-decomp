@@ -54,7 +54,7 @@ FollowCamera::~FollowCamera() {
 // 0x00463620: only while the two points are within a tenth of Camera's
 // +0x1c4/+0x1c8 in x and y, eases +0x220 toward a target that shrinks with
 // the source height (capped at 335), keeping it at 20 or more.
-void FollowCamera::UnknownVirtualSlot73(const Vector3& from, const Vector3& to, float dt) {
+void FollowCamera::UpdateFollowDistance(const Vector3& from, const Vector3& to, float dt) {
     if (to.x - from.x < targetWidth * 0.1f && to.y - from.y < targetHeight * 0.1f) {
         float height = FollowCameraMin(from.z, 335.0f);
         float target = followDistance - (height - 15.0f) * dt * 0.028f;
@@ -218,7 +218,7 @@ void FollowCamera::SteerToKeepPointsOnScreen(float dt, bool blend, bool pitch) {
         }
     }
     if (pointCount > 1 && blend)
-        UnknownVirtualSlot73(nearest, second, dt);
+        UpdateFollowDistance(nearest, second, dt);
 }
 
 // 0x004639f0: with a non-empty table, entry 0 takes the target point before
@@ -307,7 +307,7 @@ Vector3 FollowCamera::ComputeCameraPosition(bool orbit, const Vector3& base, flo
             } else {
                 worldYaw = yawOffset;
             }
-            worldYaw += UnknownVirtualSlot39();
+            worldYaw += GetCrashYaw();
             if (worldYaw >= 6.2831855f)
                 worldYaw -= 6.2831855f;
             distanceEase->Set(followDistance, FLT_MAX);
@@ -326,14 +326,14 @@ Vector3 FollowCamera::ComputeCameraPosition(bool orbit, const Vector3& base, flo
 
 // 0x00464ee0 and 0x00464f70: feed a vector into the +0x27c..+0x284 and
 // +0x288..+0x290 values with a rate chosen by the subject's +0xbe8.
-void FollowCamera::UnknownVirtualSlot43(const Vector3& value) {
+void FollowCamera::EaseTargetToward(const Vector3& value) {
     float rate = (subject->field_0xbe8 == 1) ? 0.25f : 0.3f;
     targetEaseX->Set(value.x, rate);
     targetEaseY->Set(value.y, rate);
     targetEaseZ->Set(value.z, rate);
 }
 
-void FollowCamera::UnknownVirtualSlot44(const Vector3& value) {
+void FollowCamera::EasePositionToward(const Vector3& value) {
     float rate = (subject->field_0xbe8 == 1) ? 0.25f : 0.3f;
     positionEaseX->Set(value.x, rate);
     positionEaseY->Set(value.y, rate);
@@ -345,14 +345,14 @@ void FollowCamera::UnknownVirtualSlot44(const Vector3& value) {
 // copies three dwords into this+0x2A8 and passes the cache to virtual slot 43.
 // Retail forms the cache address before the call and copies straight from the
 // returned buffer, i.e. the call result is assigned directly to the cache.
-void FollowCamera::UnknownVirtualSlot69() {
-    cachedTarget = UnknownVirtualSlot57(0);
-    UnknownVirtualSlot43(cachedTarget);
+void FollowCamera::RefreshCachedTarget() {
+    cachedTarget = GetLeadTargetPoint(0);
+    EaseTargetToward(cachedTarget);
 }
 
 // Semantically strong but compiler-sensitive: retail VC6 zeros EAX once and
 // reuses it. Modern clang emits immediate-zero stores instead.
-void FollowCamera::UnknownVirtualSlot63() {
+void FollowCamera::ApplyState3Preset() {
     followPitch = 0.0f;
     followYaw = 0.0f;
     followDistance = 0.0f;
@@ -360,19 +360,19 @@ void FollowCamera::UnknownVirtualSlot63() {
 
 // Slots 64-67 load fixed presets (retail stores the float bit patterns as
 // immediates).
-void FollowCamera::UnknownVirtualSlot64() {
+void FollowCamera::ApplyState2Preset() {
     followPitch = 0.9648179f;
     followYaw = -0.25621432f;
     followDistance = 75.98f;
 }
 
-void FollowCamera::UnknownVirtualSlot65() {
+void FollowCamera::ApplyState1Preset() {
     followPitch = 0.6832963f;
     followYaw = -0.6098179f;
     followDistance = 22.68f;
 }
 
-void FollowCamera::UnknownVirtualSlot66() {
+void FollowCamera::ApplyState0Preset() {
     followPitch = 1.0471975f;
     followYaw = 0.0f;
     followDistance = 11.72f;
@@ -391,7 +391,7 @@ void FollowCamera::UnknownVirtualSlot67() {
 // clamps it to [10, 70] and passes the triple by value to slot 29. The
 // parenthesized division matters: VC6 folds `/ 180.0f * 60.0f` into one
 // multiply, while retail multiplies by 1/180 and then by 60.
-void FollowCamera::UnknownVirtualSlot68() {
+void FollowCamera::LookAtTargetPoint() {
     Vector3 target = targetPoint;
     target.y += 3.0f;
     float dx = eyePosition.x - target.x;
@@ -407,27 +407,27 @@ void FollowCamera::UnknownVirtualSlot68() {
 // State dispatcher reconstructed from retail 0x00466E50.
 // States 0-4 dispatch through FollowCamera virtuals, then snapshot the exact
 // preset triplet before a final update virtual.
-void FollowCamera::UnknownVirtualSlot71(int value) {
+void FollowCamera::SetCameraState(int value) {
     cameraState = value;
-    UnknownVirtualSlot58();
+    ShowCameraStateName();
 
     switch (static_cast<unsigned int>(cameraState)) {
         case 0:
-            UnknownVirtualSlot66();
+            ApplyState0Preset();
             break;
         case 1:
-            UnknownVirtualSlot65();
+            ApplyState1Preset();
             break;
         case 2:
-            UnknownVirtualSlot64();
+            ApplyState2Preset();
             break;
         case 3:
             targetFieldOfView = state4FieldOfView;
-            UnknownVirtualSlot63();
+            ApplyState3Preset();
             break;
         case 4:
             state4FieldOfView = targetFieldOfView;
-            UnknownVirtualSlot60();
+            RestoreCameraPreset();
             break;
     }
 
@@ -435,25 +435,25 @@ void FollowCamera::UnknownVirtualSlot71(int value) {
     savedPitch = followPitch;
     savedYaw = followYaw;
 
-    UnknownVirtualSlot61();
+    SaveCameraState();
 }
 
 // Retail behavior strongly matches a simple cyclic state-list advance.
 // VC6 keeps the increment/store/compare/wrap sequence explicit; modern clang
 // folds the wrap through CMOV on P6+ CPU targets, making this another useful
 // historical compiler/profile calibration target.
-void FollowCamera::UnknownVirtualSlot72() {
+void FollowCamera::SelectNextCameraState() {
     stateIndex = stateIndex + 1;
     if (stateIndex >= stateCount)
         stateIndex = 0;
 
     int value = states[stateIndex];
     cameraState = value;
-    UnknownVirtualSlot71(value);
+    SetCameraState(value);
 }
 
 // Strong semantic reconstruction, but not a clang smoke target.
-void FollowCamera::UnknownVirtualSlot70(unsigned char value) {
+void FollowCamera::SetOverrideActive(unsigned char value) {
     overrideActive = value;
 
     if (value) {
@@ -489,11 +489,11 @@ Vector3 FollowCamera::GetStateFiveFollowPoint(float) {
 void FollowCamera::ClampPositionAboveGround(Vector3*) {}
 void FollowCamera::UnknownVirtualSlot53() {}
 void FollowCamera::UnknownVirtualSlot54() {}
-void FollowCamera::UnknownVirtualSlot58() {}
-void FollowCamera::UnknownVirtualSlot59() {}
-void FollowCamera::UnknownVirtualSlot60() {}
-void FollowCamera::UnknownVirtualSlot61() {}
-void FollowCamera::UnknownVirtualSlot62() {}
+void FollowCamera::ShowCameraStateName() {}
+void FollowCamera::SaveCameraPreset() {}
+void FollowCamera::RestoreCameraPreset() {}
+void FollowCamera::SaveCameraState() {}
+void FollowCamera::RestoreCameraState() {}
 
 // 0x00464ea0 and 0x00464ec0: slot 5 of the interface behind the 0x0056e26c
 // object, with codes 0x38 and 0x2a.
@@ -520,7 +520,7 @@ bool FollowCamera::TrySettleOnPoint(const Vector3& point, bool enable, bool forc
             FollowCameraAbs(positionEaseX->value - point.x) < 0.01f &&
             FollowCameraAbs(positionEaseZ->value - point.z) < 0.01f &&
             FollowCameraAbs(positionEaseY->value - point.y) < 0.01f) {
-            UnknownVirtualSlot44(point);
+            EasePositionToward(point);
             result = true;
             settleChecked = result;
         } else {
@@ -675,7 +675,7 @@ int FollowCamera::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* 
         return 0;
     if (g_TrackGame->allowFreezeCamera) {
         if (TestInputEvent(0x21, 0, event, 0xc) && cameraState != 6) {
-            UnknownVirtualSlot70(g_TrackGame->paused);
+            SetOverrideActive(g_TrackGame->paused);
             return 1;
         }
         if (overrideActive) {
@@ -684,7 +684,7 @@ int FollowCamera::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* 
             isMovingTarget = 1 - isMovingTarget;
             if (!isMovingTarget)
                 return 0;
-            UnknownVirtualSlot69();
+            RefreshCachedTarget();
             return 1;
         }
     }
@@ -700,21 +700,21 @@ int FollowCamera::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* 
             cameraState = 5;
             savedFieldOfView = targetFieldOfView;
         }
-        UnknownVirtualSlot58();
+        ShowCameraStateName();
         return 1;
     }
     if (control == 0x4c) {
         if (cameraState == 5) {
             cameraState = savedCameraState;
             targetFieldOfView = savedFieldOfView;
-            UnknownVirtualSlot58();
+            ShowCameraStateName();
             return 1;
         }
-        UnknownVirtualSlot72();
+        SelectNextCameraState();
         return 1;
     }
     if (control == 0x37 && cameraState < 5) {
-        UnknownVirtualSlot59();
+        SaveCameraPreset();
         return 1;
     }
     return 0;

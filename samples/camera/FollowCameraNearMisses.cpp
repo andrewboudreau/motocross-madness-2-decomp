@@ -147,7 +147,7 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     followHeight = 7.0f;
     subjectCellSize = 3.0f;
     cameraState = 0;
-    UnknownVirtualSlot71(0);
+    SetCameraState(0);
     resumeEyePosition = eyePosition;
     savedCameraState = cameraState;
     resumeState = cameraState;

@@ -197,7 +197,7 @@ BikeRace::~BikeRace() {
         vcrFile = 0;
         if (g_TrackGame->playingReplay) {
             UnknownFunctionCameraView()->cameraState = savedCameraState;
-            raceCamera->UnknownVirtualSlot61();
+            raceCamera->SaveCameraState();
         }
         g_TrackGame->playingReplay = 0;
         g_TrackGame->useReplayTape = 0;

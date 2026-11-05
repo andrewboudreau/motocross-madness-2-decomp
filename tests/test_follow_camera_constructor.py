@@ -158,9 +158,9 @@ class FollowCameraConstructorTests(unittest.TestCase):
             self.assertEqual(whole(candidate), whole(CoffObject(Path(built['object']))))
 
             keep = {'Camera': {'Camera', '~Camera'}, 'PCCamera': {'PCCamera'},
-                    'FollowCamera': {'UnknownVirtualSlot58', 'UnknownVirtualSlot59', 'UnknownVirtualSlot60',
-                        'UnknownVirtualSlot61', 'UnknownVirtualSlot62', 'UnknownVirtualSlot63', 'UnknownVirtualSlot64',
-                        'UnknownVirtualSlot65', 'UnknownVirtualSlot66', 'UnknownVirtualSlot67', 'UnknownVirtualSlot71'}}
+                    'FollowCamera': {'ShowCameraStateName', 'SaveCameraPreset', 'RestoreCameraPreset',
+                        'SaveCameraState', 'RestoreCameraState', 'ApplyState3Preset', 'ApplyState2Preset',
+                        'ApplyState1Preset', 'ApplyState0Preset', 'UnknownVirtualSlot67', 'SetCameraState'}}
             native = {}; canonical = {}; paths = [candidate_path]
             for name, retained in keep.items():
                 source = ROOT/'src/reconstructed'/(name+'.cpp')
@@ -204,8 +204,9 @@ class FollowCameraConstructorTests(unittest.TestCase):
                 self.assertEqual(function(obj, symbol), function(canonical[unit], symbol))
                 if unit == 'MemTag': self.assertEqual(function(obj, symbol), function(boundary, symbol))
                 strict += 1
-            for slot, va, size in ((58,0x464e90,1),(61,0x464e90,1),(66,0x466cf0,41),(71,0x466e50,192)):
-                symbol = '?UnknownVirtualSlot%d@FollowCamera@@UAEX'%slot+('H@Z' if slot==71 else 'XZ')
+            for slot, method, va, size in ((58,'ShowCameraStateName',0x464e90,1),(61,'SaveCameraState',0x464e90,1),
+                                           (66,'ApplyState0Preset',0x466cf0,41),(71,'SetCameraState',0x466e50,192)):
+                symbol = '?%s@FollowCamera@@UAEX'%method+('H@Z' if slot==71 else 'XZ')
                 self.assertEqual(struct.unpack('<I', image.bytes_at_va(0x55282c+4*slot,4))[0], va)
                 self.assertTrue(compare(image, native['FollowCamera'], symbol, va, size, ROOT/'src/reconstructed/FollowCamera.bindings.json')['strict_exact'])
                 self.assertEqual(function(native['FollowCamera'], symbol), function(canonical['FollowCamera'], symbol)); strict += 1
@@ -230,9 +231,9 @@ class FollowCameraConstructorTests(unittest.TestCase):
                            str(first),*[str(p) for p in paths[1:]],'kernel32.lib']
                 result = subprocess.run(command,capture_output=True,text=True);self.assertEqual(result.returncode,0,result.stdout+result.stderr)
                 mapping = {m[1]:m[2] for m in re.finditer(r'^\s+\S+:\S+\s+(\S+)\s+([0-9a-fA-F]{8})\s',mapping_path.read_text(),re.M)}
-                names = [SYMBOL,'??0PCCamera@@QAE@H@Z','?UnknownVirtualSlot71@FollowCamera@@UAEXH@Z',
-                         '?UnknownVirtualSlot58@FollowCamera@@UAEXXZ','?UnknownVirtualSlot61@FollowCamera@@UAEXXZ',
-                         '?UnknownVirtualSlot66@FollowCamera@@UAEXXZ','??_7FollowCamera@@6B@','??1PCCamera@@UAE@XZ','??_7BaseObject@@6B@']
+                names = [SYMBOL,'??0PCCamera@@QAE@H@Z','?SetCameraState@FollowCamera@@UAEXH@Z',
+                         '?ShowCameraStateName@FollowCamera@@UAEXXZ','?SaveCameraState@FollowCamera@@UAEXXZ',
+                         '?ApplyState0Preset@FollowCamera@@UAEXXZ','??_7FollowCamera@@6B@','??1PCCamera@@UAE@XZ','??_7BaseObject@@6B@']
                 return subprocess.run([str(executable),str(retail),*[mapping[n] for n in names]],capture_output=True,text=True,timeout=30)
             result = execute(candidate_path,'corrected')
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)

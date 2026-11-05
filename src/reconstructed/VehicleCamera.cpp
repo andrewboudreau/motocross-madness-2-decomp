@@ -38,7 +38,7 @@ VehicleCamera* VehicleCamera::SetupVehicleCamera(void* value, float rate294, flo
 
 // 0x0052ba30: the tracked point: the vehicle's in vehicle mode, else the
 // first set target, else the global default.
-Vector3 VehicleCamera::UnknownVirtualSlot33() {
+Vector3 VehicleCamera::GetTargetVelocity() {
     if (vehicleMode)
         return vehicle->velocity;
     if (targetCharacter)
@@ -55,7 +55,7 @@ Vector3 VehicleCamera::CachedTargetHeading() {
         return vehicle->takeoffVelocity;
     }
     if (!targetHeadingCached) {
-        cachedTargetHeading = UnknownVirtualSlot33();
+        cachedTargetHeading = GetTargetVelocity();
         targetHeadingCached = 1;
     }
     return cachedTargetHeading;
@@ -113,7 +113,7 @@ static inline Vector3 Add(const Vector3& a, const Vector3& b) {
 // multiplies by 1/32.2 and 1.5 separately (VC6 folds the two constants of a
 // plain product, hence the float cast), and the 0.19 lift reuses the y of
 // heading * lead.
-void VehicleCamera::UnknownVirtualSlot68() {
+void VehicleCamera::LookAtTargetPoint() {
     Vector3 heading = CachedTargetHeading();
     Vector3 base = CachedTargetPoint();
     float lead = (float)(heading.y * 0.0310559f) * 1.5f;
@@ -146,17 +146,17 @@ void VehicleCamera::UnknownVirtualSlot68() {
 
 // 0x0052ca10: 0x0052bb60's position, led by the tracked point (slot 33)
 // scaled by dt (at most 0.2) while the camera is free to follow.
-Vector3 VehicleCamera::UnknownVirtualSlot57(float dt) {
+Vector3 VehicleCamera::GetLeadTargetPoint(float dt) {
     Vector3 result = TargetPoint();
     if (cameraState != 7 && !g_TrackGame->paused) {
         if (vehicleMode) {
             if (!vehicle->crashState) {
                 float lead = 0.2f < dt ? 0.2f : dt;
-                result += UnknownVirtualSlot33() * lead;
+                result += GetTargetVelocity() * lead;
             }
         } else {
             float lead = 0.2f < dt ? 0.2f : dt;
-            result += UnknownVirtualSlot33() * lead;
+            result += GetTargetVelocity() * lead;
         }
     }
     return result;
@@ -172,14 +172,14 @@ void VehicleCamera::UnknownVirtualSlot67() {
 
 // 0x0052bff0: holds while the vehicle reports +0x444; otherwise cycles the
 // state list in vehicle mode or resets to state 0.
-void VehicleCamera::UnknownVirtualSlot72() {
+void VehicleCamera::SelectNextCameraState() {
     if (vehicleMode && vehicle && vehicle->crashState)
         return;
     if (!vehicleMode) {
         cameraState = 0;
-        UnknownVirtualSlot71(0);
+        SetCameraState(0);
     } else {
-        FollowCamera::UnknownVirtualSlot72();
+        FollowCamera::SelectNextCameraState();
     }
 }
 
@@ -200,11 +200,11 @@ static inline float LengthSquared(const Vector3& v) {
 // (or a squared length written in the body) turns into `fld st(0); fmul x`.
 // The lead weight is `/ 10.0f` (the reciprocal constant 0x005511cc, not the
 // literal 0.1f at 0x005507d0).
-Vector3 VehicleCamera::UnknownVirtualSlot41() {
+Vector3 VehicleCamera::ComputeFollowHeading() {
     Vector3 heading;
     if (vehicleMode) {
         if (FollowCameraAbs(vehicle->forwardSpeed) < 10.0f) {
-            Vector3 velocity = UnknownVirtualSlot33();
+            Vector3 velocity = GetTargetVelocity();
             if (!vehicle->movingForward)
                 velocity = Vector3(-velocity.x, -velocity.y, -velocity.z);
             velocity.y = 0.0f;
@@ -235,7 +235,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
             heading.y = followHeading.y * 0.82f + heading.y * 0.18f;
             heading.z = followHeading.z * 0.82f + heading.z * 0.18f;
         } else {
-            heading = UnknownVirtualSlot33();
+            heading = GetTargetVelocity();
             if (!vehicle->movingForward) {
                 heading = Vector3(-heading.x, -heading.y, -heading.z);
                 heading.y = (float)(heading.y * 0.5f) * 0.18f + followHeading.y * 0.82f;
@@ -320,7 +320,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
     float distance;
     float offset;
     if (cameraState != 3) {
-        Vector3 velocity = UnknownVirtualSlot33();
+        Vector3 velocity = GetTargetVelocity();
         float along = velocity.z * followHeading.z + (velocity.x * followHeading.x + velocity.y * followHeading.y);
         distance = AngleWeight(followYaw) * AngleWeight(followPitch);
         float zoom = fieldOfView / maxFieldOfView;
@@ -396,7 +396,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot50() {
 
 // 0x0052cbd0: the vehicle's +0x45c; also turns +0x23c by pi when the vehicle
 // flags +0x464.
-float VehicleCamera::UnknownVirtualSlot39() {
+float VehicleCamera::GetCrashYaw() {
     float value = vehicle->crashYaw;
     if (vehicle->crashedUpsideDown)
         worldYaw += 3.1415927f;
@@ -404,7 +404,7 @@ float VehicleCamera::UnknownVirtualSlot39() {
 }
 
 // 0x0052cc00: +0x308 from the fov/zoom ratio and the vehicle's +0x43c.
-void VehicleCamera::UnknownVirtualSlot42(bool flag) {
+void VehicleCamera::UpdateTurnYaw(bool flag) {
     float ratio = fieldOfView / maxFieldOfView;
     if (cameraState != 3) {
         if (!flag && vehicleMode)
@@ -432,8 +432,8 @@ bool VehicleCamera::TrySettleOnPoint(const Vector3& point, bool enable, bool for
                     FollowCameraAbs(positionEaseX->value - point.x) < 10.0f &&
                     FollowCameraAbs(positionEaseZ->value - point.z) < 10.0f &&
                     FollowCameraAbs(positionEaseY->value - point.y) < 10.0f) {
-                    UnknownVirtualSlot44(point);
-                    UnknownVirtualSlot43(cachedTarget);
+                    EasePositionToward(point);
+                    EaseTargetToward(cachedTarget);
                 }
             } else {
                 bool result;
@@ -444,8 +444,8 @@ bool VehicleCamera::TrySettleOnPoint(const Vector3& point, bool enable, bool for
                         FollowCameraAbs(positionEaseX->value - point.x) < 0.01f &&
                         FollowCameraAbs(positionEaseZ->value - point.z) < 0.01f &&
                         FollowCameraAbs(positionEaseY->value - point.y) < 0.01f) {
-                        UnknownVirtualSlot44(point);
-                        UnknownVirtualSlot43(cachedTarget);
+                        EasePositionToward(point);
+                        EaseTargetToward(cachedTarget);
                         settleChecked = true;
                         return true;
                     }
@@ -455,7 +455,7 @@ bool VehicleCamera::TrySettleOnPoint(const Vector3& point, bool enable, bool for
                 return result;
             }
         } else {
-            UnknownVirtualSlot44(point);
+            EasePositionToward(point);
         }
         settleChecked = true;
         return true;

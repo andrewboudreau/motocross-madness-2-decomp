@@ -132,7 +132,7 @@ public:
     virtual int Tick(float frameTime);                 // 0x00465c20 (near miss: samples/camera)
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00466ad0, not reconstructed
 
-    virtual Vector3 UnknownVirtualSlot33() = 0;
+    virtual Vector3 GetTargetVelocity() = 0;
     // Slots 34, 35 and 48 take the frame time as a float: slot 10 pushes its
     // dt as slot 48's last argument, which slot 48 forwards to slot 34 and
     // (with `a`) to slot 35; BikeCamera's and KrustyBikeCamera's slot 34 load
@@ -145,13 +145,13 @@ public:
     virtual Vector3 GetTargetPoint();
     // 0x004636e0
     virtual void SteerToKeepPointsOnScreen(float dt, bool blend, bool pitch);
-    virtual float UnknownVirtualSlot39() = 0;
+    virtual float GetCrashYaw() = 0;
     virtual void SteerToKeepTargetOnScreen(float dt);
     // Slot 10 stores the returned vector at +0x29c.
-    virtual Vector3 UnknownVirtualSlot41() = 0;
-    virtual void UnknownVirtualSlot42(bool flag) = 0;
-    virtual void UnknownVirtualSlot43(const Vector3& value);
-    virtual void UnknownVirtualSlot44(const Vector3& value);
+    virtual Vector3 ComputeFollowHeading() = 0;
+    virtual void UpdateTurnYaw(bool flag) = 0;
+    virtual void EaseTargetToward(const Vector3& value);
+    virtual void EasePositionToward(const Vector3& value);
     // 0x00463a30: keyboard/joystick camera controls; returns whether it moved.
     virtual bool ProcessCameraInput(bool active, float dt);
     // 0x004654e0: builds the +0x344 orientation from a forward and an up vector.
@@ -173,24 +173,24 @@ public:
     virtual bool UnknownVirtualSlot56();
     // The argument is a float: FollowCamera slot 10 passes its frame time and
     // VehicleCamera's override caps it at 0.2.
-    virtual Vector3 UnknownVirtualSlot57(float dt) = 0;
-    virtual void UnknownVirtualSlot58();
-    virtual void UnknownVirtualSlot59();
-    virtual void UnknownVirtualSlot60();
-    virtual void UnknownVirtualSlot61();
-    virtual void UnknownVirtualSlot62();
-    virtual void UnknownVirtualSlot63();
-    virtual void UnknownVirtualSlot64();
-    virtual void UnknownVirtualSlot65();
-    virtual void UnknownVirtualSlot66();
+    virtual Vector3 GetLeadTargetPoint(float dt) = 0;
+    virtual void ShowCameraStateName();
+    virtual void SaveCameraPreset();
+    virtual void RestoreCameraPreset();
+    virtual void SaveCameraState();
+    virtual void RestoreCameraState();
+    virtual void ApplyState3Preset();
+    virtual void ApplyState2Preset();
+    virtual void ApplyState1Preset();
+    virtual void ApplyState0Preset();
     virtual void UnknownVirtualSlot67();
-    virtual void UnknownVirtualSlot68();
-    virtual void UnknownVirtualSlot69();
+    virtual void LookAtTargetPoint();
+    virtual void RefreshCachedTarget();
     // The flag is a byte: slot 23 passes the low byte of the game's +0x1c4.
-    virtual void UnknownVirtualSlot70(unsigned char value);
-    virtual void UnknownVirtualSlot71(int value);
-    virtual void UnknownVirtualSlot72();
-    virtual void UnknownVirtualSlot73(const Vector3& from, const Vector3& to, float dt);
+    virtual void SetOverrideActive(unsigned char value);
+    virtual void SetCameraState(int value);
+    virtual void SelectNextCameraState();
+    virtual void UpdateFollowDistance(const Vector3& from, const Vector3& to, float dt);
     virtual bool UnknownVirtualSlot74() = 0;
     // Inline: retail's copy sits at 0x00404fc0, far from FollowCam.cpp, and
     // VehicleCamera slot 75 inlines the same test.

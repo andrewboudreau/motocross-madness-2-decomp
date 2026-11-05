@@ -232,9 +232,9 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
             if (owner->raceCamera->cameraState == 5) {
                 owner->raceCamera->cameraState = owner->raceCamera->savedCameraState;
                 owner->raceCamera->targetFieldOfView = owner->raceCamera->savedFieldOfView;
-                owner->raceCamera->UnknownVirtualSlot58();
+                owner->raceCamera->ShowCameraStateName();
             } else {
-                owner->raceCamera->UnknownVirtualSlot72();
+                owner->raceCamera->SelectNextCameraState();
             }
         } else if (!_stricmp("ButPrevRider", event->controlName) ||
                    !_stricmp("ButNextRider", event->controlName)) {

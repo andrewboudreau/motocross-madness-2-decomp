@@ -25,8 +25,8 @@ static inline float KrustyCameraDot(const Vector3& a, const Vector3& b) {
 // 0x00497cb0: restores the saved state (slot 62) and applies it; virtual
 // calls in a constructor bind statically.
 KrustyBikeCamera::KrustyBikeCamera(int flags) : BikeCamera(flags) {
-    UnknownVirtualSlot62();
-    UnknownVirtualSlot71(cameraState);
+    RestoreCameraState();
+    SetCameraState(cameraState);
     krustyBike = 0;
     raceView = 0;
     widthKeysEnabled = 0;
@@ -100,7 +100,7 @@ bool KrustyBikeCamera::UnknownVirtualSlot56() {
 }
 
 // 0x00498130: +0x308 from the fov/zoom ratio and the bike's +0x43c.
-void KrustyBikeCamera::UnknownVirtualSlot42(bool flag) {
+void KrustyBikeCamera::UpdateTurnYaw(bool flag) {
     float ratio = fieldOfView / maxFieldOfView;
     if (cameraState != 3) {
         if (vehicleMode && !flag &&
@@ -114,7 +114,7 @@ void KrustyBikeCamera::UnknownVirtualSlot42(bool flag) {
 }
 
 // 0x004981d0: saves the presets while in vehicle mode with the bike idle.
-void KrustyBikeCamera::UnknownVirtualSlot59() {
+void KrustyBikeCamera::SaveCameraPreset() {
     if (vehicleMode && !bike->crashState) {
         g_TrackGame->mode.savedCameraPitch = followPitch;
         g_TrackGame->mode.savedCameraYaw = followYaw;
@@ -124,7 +124,7 @@ void KrustyBikeCamera::UnknownVirtualSlot59() {
 }
 
 // 0x00498230: restores the saved presets.
-void KrustyBikeCamera::UnknownVirtualSlot60() {
+void KrustyBikeCamera::RestoreCameraPreset() {
     followPitch = g_TrackGame->mode.savedCameraPitch;
     followYaw = g_TrackGame->mode.savedCameraYaw;
     followDistance = g_TrackGame->mode.savedCameraDistance;
@@ -132,18 +132,18 @@ void KrustyBikeCamera::UnknownVirtualSlot60() {
 }
 
 // 0x00498280: restores the saved state.
-void KrustyBikeCamera::UnknownVirtualSlot62() {
+void KrustyBikeCamera::RestoreCameraState() {
     cameraState = g_TrackGame->mode.savedCameraState;
 }
 
 // 0x004982a0: saves the state.
-void KrustyBikeCamera::UnknownVirtualSlot61() {
+void KrustyBikeCamera::SaveCameraState() {
     g_TrackGame->mode.savedCameraState = cameraState;
 }
 
 // 0x004982c0: shows the state's name (string 0x13b9 + state) for 1.5 s,
 // except in state 6.
-void KrustyBikeCamera::UnknownVirtualSlot58() {
+void KrustyBikeCamera::ShowCameraStateName() {
     TextQueueOverlay* target = g_TrackGame->eventManager->FindTextQueue();
     if (target && cameraState != 6) {
         char text[260];
@@ -169,7 +169,7 @@ Vector3 KrustyBikeCamera::GetStateFiveFollowPoint(float dt) {
     } else if (raceView->replayPaused) {
         result = targetPoint;
     } else {
-        float dot = KrustyCameraDot(UnknownVirtualSlot33(), followHeading);
+        float dot = KrustyCameraDot(GetTargetVelocity(), followHeading);
         float height = targetDistance * 0.009f + 1.0f;
         float ratio = fieldOfView / maxFieldOfView;
         float speed = vehicleMode ? vehicle->referenceSpeed : 180.0f;

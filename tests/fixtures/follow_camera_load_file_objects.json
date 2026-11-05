@@ -7,7 +7,7 @@
   "aggregate": {
     "sections": 66,
     "relocations": 337,
-    "sha256": "b5caca39c5b23284daab300bd0cfb05399a9da04a96529619b3f13948b8fb62d"
+    "sha256": "c15c613672bdee760ca3505b27801584655a5d00bac5239de7279638aea7872c"
   },
   "note": "Private round53 pre-admission pins. Full same-path before/after proof accounts all66 nondebugsections: only corrected loader, its saved-stream EH displacement and verified diagnosticfilename change;63sections/302relocs unchanged. All static/public offsets,CRT/storage flags and other full methods retained.",
   "original_loader_raw_sha256": "7faa49b31e825e407e535a5e037a34dfd958455203d18300de47d26df6b39103"

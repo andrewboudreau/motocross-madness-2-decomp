@@ -1,7 +1,7 @@
 {
   "??0PCCamera@@QAE@H@Z": "0x004bed80",
   "??_7FollowCamera@@6B@": "0x0055282c",
-  "?UnknownVirtualSlot71@FollowCamera@@UAEXH@Z": "0x00466e50",
+  "?SetCameraState@FollowCamera@@UAEXH@Z": "0x00466e50",
   "_$E1": "0x00466f20",
   "_$E10": "0x004670c0",
   "_$E11": "0x004670b0",

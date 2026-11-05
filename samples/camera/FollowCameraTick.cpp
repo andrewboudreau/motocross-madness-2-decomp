@@ -23,10 +23,10 @@ int FollowCamera::Tick(float dt) {
     Vector3 target;
     Vector3 smoothed;
     bool current = ((RenderTarget*)renderContext)->currentCamera == this;
-    followHeading = UnknownVirtualSlot41();
+    followHeading = ComputeFollowHeading();
     if (!isPlaced) {
         isPlaced = 1;
-        targetPoint = UnknownVirtualSlot57(0);
+        targetPoint = GetLeadTargetPoint(0);
         position = followHeading * -followDistance;
         position += targetPoint;
         reinterpret_cast<Terrain*>(subject)->QueryGround(reinterpret_cast<TerrainVec3*>(&position), 0, 0, 0);
@@ -54,7 +54,7 @@ int FollowCamera::Tick(float dt) {
     if (overrideActive)
         targetPoint = cachedTarget;
     else
-        targetPoint = UnknownVirtualSlot57(dt);
+        targetPoint = GetLeadTargetPoint(dt);
     if (cameraState == 5) {
         float dx = eyePosition.x - targetPoint.x;
         float dy = eyePosition.y - targetPoint.y;
@@ -62,7 +62,7 @@ int FollowCamera::Tick(float dt) {
         targetDistance = FastSqrt(dz * dz + dx * dx + dy);
     }
     bool moved = ProcessCameraInput(current, dt);
-    UnknownVirtualSlot42(wide);
+    UpdateTurnYaw(wide);
     bool following = UnknownVirtualSlot75();
     target = SelectFollowPoint(wide || isSettled, following, dt);
     position = ComputeCameraPosition(following, target, dt);
@@ -70,11 +70,11 @@ int FollowCamera::Tick(float dt) {
         targetEaseZ = new(__FILE__, 0x4b0) UnknownFollowCameraValue(target.z, 0.3f);
         targetEaseX = new(__FILE__, 0x4b1) UnknownFollowCameraValue(target.x, 0.3f);
         targetEaseY = new(__FILE__, 0x4b2) UnknownFollowCameraValue(target.y, 0.3f);
-        UnknownVirtualSlot43(target);
+        EaseTargetToward(target);
         positionEaseX = new(__FILE__, 0x4b4) UnknownFollowCameraValue(position.x, 0.3f);
         positionEaseY = new(__FILE__, 0x4b5) UnknownFollowCameraValue(position.y, 0.3f);
         positionEaseZ = new(__FILE__, 0x4b6) UnknownFollowCameraValue(position.z, 0.3f);
-        UnknownVirtualSlot44(position);
+        EasePositionToward(position);
     }
     if (cameraState == 5) {
         if (!overrideActive) {
@@ -99,7 +99,7 @@ int FollowCamera::Tick(float dt) {
     } else if (following) {
         if (cameraState != 3) {
             if (cameraState == 4)
-                UnknownVirtualSlot59();
+                SaveCameraPreset();
             isSettled = TrySettleOnPoint(position, wide, moved);
         }
     } else if (UnknownVirtualSlot74()) {
@@ -112,7 +112,7 @@ int FollowCamera::Tick(float dt) {
     smoothed.y = positionEaseY->Update(position.y, dt);
     smoothed.z = positionEaseZ->Update(position.z, dt);
     if (isBlending) {
-        UnknownVirtualSlot33();
+        GetTargetVelocity();
         blendClock += dt;
         blendClock = FollowCameraMin(blendClock, 1.0f);
         float blend = blendClock;
@@ -121,8 +121,8 @@ int FollowCamera::Tick(float dt) {
         smoothed.y = (position.y - smoothed.y) * blend + smoothed.y;
         smoothed.z = (position.z - smoothed.z) * blend + smoothed.z;
         if (!moved && blend >= 1.0f) {
-            UnknownVirtualSlot44(position);
-            UnknownVirtualSlot43(cachedTarget);
+            EasePositionToward(position);
+            EaseTargetToward(cachedTarget);
             blendClock = 0.0f;
             isBlending = moved;
         }
@@ -133,8 +133,8 @@ int FollowCamera::Tick(float dt) {
             resumeState = cameraState;
         else
             savedCameraState = cameraState;
-        UnknownVirtualSlot44(position);
-        UnknownVirtualSlot43(target);
+        EasePositionToward(position);
+        EaseTargetToward(target);
         smoothed = position;
         cachedTarget = target;
     } else if (isSettled) {
@@ -163,7 +163,7 @@ int FollowCamera::Tick(float dt) {
                 initialDistance = followDistance;
                 cameraState = 7;
                 resumeEyePosition = eyePosition;
-                UnknownVirtualSlot68();
+                LookAtTargetPoint();
                 fieldOfViewEase->Set(targetFieldOfView, FLT_MAX);
             }
         } else if (cameraState == 7) {

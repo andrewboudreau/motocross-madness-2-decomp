@@ -94,19 +94,19 @@ public:
     // 0x0052bb60: the position of the followed part or target.
     Vector3 TargetPoint();
 
-    virtual Vector3 UnknownVirtualSlot33();
+    virtual Vector3 GetTargetVelocity();
     virtual Vector3 UnknownVirtualSlot35(unsigned char a, float dt);
 
-    virtual float UnknownVirtualSlot39();
-    virtual Vector3 UnknownVirtualSlot41();
-    virtual void UnknownVirtualSlot42(bool flag);
+    virtual float GetCrashYaw();
+    virtual Vector3 ComputeFollowHeading();
+    virtual void UpdateTurnYaw(bool flag);
     virtual Vector3 UnknownVirtualSlot50();
     virtual float GetRoll();
     virtual bool TrySettleOnPoint(const Vector3& point, bool enable, bool force);
-    virtual Vector3 UnknownVirtualSlot57(float dt);
+    virtual Vector3 GetLeadTargetPoint(float dt);
     virtual void UnknownVirtualSlot67();
-    virtual void UnknownVirtualSlot68();
-    virtual void UnknownVirtualSlot72();
+    virtual void LookAtTargetPoint();
+    virtual void SelectNextCameraState();
     // Inline: retail's copy (0x00417490) is emitted next to BikeCamera code.
     virtual bool UnknownVirtualSlot74() {
         if (vehicleMode) {

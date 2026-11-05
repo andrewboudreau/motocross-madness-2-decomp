@@ -45,16 +45,16 @@ public:
 
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual Vector3 GetStateFiveFollowPoint(float dt);
-    virtual void UnknownVirtualSlot42(bool flag);
+    virtual void UpdateTurnYaw(bool flag);
     virtual Vector3 SelectFollowPoint(int a, bool flag, float dt);
     virtual void ClampPositionAboveGround(Vector3* point);
     virtual unsigned char UnknownVirtualSlot55();
     virtual bool UnknownVirtualSlot56();
-    virtual void UnknownVirtualSlot58();
-    virtual void UnknownVirtualSlot59();
-    virtual void UnknownVirtualSlot60();
-    virtual void UnknownVirtualSlot61();
-    virtual void UnknownVirtualSlot62();
+    virtual void ShowCameraStateName();
+    virtual void SaveCameraPreset();
+    virtual void RestoreCameraPreset();
+    virtual void SaveCameraState();
+    virtual void RestoreCameraState();
 
 protected:
     UnknownKrustyBike* krustyBike;       // +0x3b4
