@@ -16,7 +16,7 @@ namespace {
 const Vec3 kSlot36UpAxis(0.0f, 1.0f, 0.0f);
 }
 
-void SoultreePhysicsBaseObject::UnknownVirtualSlot36()
+void SoultreePhysicsBaseObject::ResetBodyOrientation()
 {
     if (bodyForward.x == 0.0f && bodyForward.z == 0.0f) {
         float s = (bodyForward.y < 0.0f) ? 1.0f : -1.0f;
@@ -28,8 +28,8 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot36()
     }
     bodyUp = kSlot36UpAxis;
     bodyForward.y = 0.0f;
-    UnknownVirtualSlot35(1, 0);
-    UnknownVirtualSlot34();
+    StoreBodyAxes(1, 0);
+    LoadBodyAxes();
     bodyRoll = 0.0f;
     bodyPitch = 0.0f;
     bodySinRoll = 0.0f;

@@ -27,6 +27,20 @@ public:
     void QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded, unsigned char* surface);
 };
 
+// CollisionPoint.cpp (matched) calls the same query through its own provisional view of the
+// frame object; the object is the Terrain, so the call forwards to it.
+class CollisionFrameHelper {
+public:
+    void QueryGround(CollisionVec3* v, const CollisionVec3* n, int a, char* flagOut);
+};
+
+void CollisionFrameHelper::QueryGround(CollisionVec3* v, const CollisionVec3* n, int a, char* flagOut)
+{
+    reinterpret_cast<Terrain*>(this)->QueryGround(reinterpret_cast<TerrainVec3*>(v),
+                                                  reinterpret_cast<TerrainVec3*>(const_cast<CollisionVec3*>(n)), a,
+                                                  reinterpret_cast<unsigned char*>(flagOut));
+}
+
 static inline void ContactQueryGround(SoultreeProbe* terrain, CollisionVec3* pos,
                                       CollisionVec3* normal, char* surface)
 {

@@ -1801,10 +1801,10 @@ int KrustyBike::Fn_00413200(float dt)
     stepTime = dt;
     invStepTime = 1.0f / dt;
     int steps = 1;
-    UnknownVirtualSlot30();
+    ClearContactEffectFlags();
     UpdateControlInput(dt);
     pointsTouching = 0;
-    int hit = UnknownVirtualSlot39(dt);
+    int hit = ApplyPendingRespawn(dt);
     justLanded = 0;
     BikeAITickGearTimer(engineState, stepTime);
     if (!hasFinished)
@@ -1818,7 +1818,7 @@ int KrustyBike::Fn_00413200(float dt)
         Vec3 b;
         int dummy = 0;
         FindPlacement(hit, &a, &b, &c, &dummy);
-        UnknownVirtualSlot33(&a, &b, &bodyUp, &c, dummy, UnknownVirtualSlot32());
+        ResetToPlacement(&a, &b, &bodyUp, &c, dummy, EffectiveLoadWeight());
         steps = 0;
         stepRemainder = 0.0f;
     } else {
@@ -1950,7 +1950,7 @@ int KrustyBike::Fn_00413200(float dt)
         controlInput.y = -1.0f;
     float leanAxis = controlInput.y + 1.0f;
     steerAxis->steerValue = (leanAxis + 1.0f) * 0.25f;
-    UnknownVirtualSlot35(1, 1);
+    StoreBodyAxes(1, 1);
     if (aiKind && airborne)
         controlInput.x = 0.0f;
 
@@ -1985,7 +1985,7 @@ int KrustyBike::Fn_00413200(float dt)
             ApplyAirControl();
         ClampSubStepsOnCrash(&steps, dt);
     }
-    UnknownVirtualSlot28(steps);
+    ResolveSubstepCollisions(steps);
 
     if (collisionObject->hasContact && lastCollisionType != 1000 &&
         lastCollisionType != 100 && lastCollisionType != 101)
@@ -2009,15 +2009,15 @@ int KrustyBike::Fn_00413200(float dt)
     savedForward = bodyForward;
     savedUp = bodyUp;
     centerNode->GetPositionIn(0, &centerOfMass);
-    UnknownVirtualSlot34();
+    LoadBodyAxes();
     OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
                                  &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
-    UnknownVirtualSlot29(1);
+    SaveBodyOrientation(1);
     prevSpeed = linearSpeed;
     Vec3 moved = position - start;
     frontWheel->groundPoint += moved;
     rearWheel->groundPoint += moved;
-    UnknownVirtualSlot21();
+    UpdateAttachmentEffects();
     scratchVector = modelNode->WorldToLocalDirection(velocity);
     smoothedForwardAccel = BikeAISmoothValue(forwardAccelSmoother, frameTime,
                                              (scratchVector.z - prevLocalForwardVelocity) / frameTime);
@@ -2258,7 +2258,7 @@ int KrustyBike::Fn_00414370(float dt)
                 aiOffTrackTime += dt;
                 if (aiOffTrackTime >= 5.0f) {
                     FindPlacement(count, &a, &b, &c, &dummy);
-                    UnknownVirtualSlot33(&a, &b, &bodyUp, &c, dummy, UnknownVirtualSlot32());
+                    ResetToPlacement(&a, &b, &bodyUp, &c, dummy, EffectiveLoadWeight());
                     aiOffTrackTime = 0.0f;
                 }
             }

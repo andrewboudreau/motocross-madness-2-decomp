@@ -809,7 +809,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
         savedPos = position;
         modelNode->SetPosition(position);
         modelNode->SetAxesPtr(&bodyForward, &bodyUp, 1, 1);
-        UnknownVirtualSlot34();
+        LoadBodyAxes();
         OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
                                      &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
         if (!crossoverPose && !motionActive) {
@@ -1176,10 +1176,10 @@ void KrustyBike::Fn_00493660(float dt, int a)
             }
         }
 
-        UnknownVirtualSlot30();
+        ClearContactEffectFlags();
         justReset = reset;
         attachmentResetPending = reset;
-        UnknownVirtualSlot21();
+        UpdateAttachmentEffects();
         prevCrashState = crashState;
         UpdateRiderPose(reinterpret_cast<KbGame*>(g_TrackGame)->frameTime);
     } else {
@@ -1203,7 +1203,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
     if (!reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay) {
         collisionObject->UpdatePlacement();
         if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4)
-            UnknownVirtualSlot28(1);
+            ResolveSubstepCollisions(1);
     }
     prevVelocity = velocity;
     position = savedPos;
