@@ -20,6 +20,13 @@
 // the size through memset's return value is worse (1344). The canonical
 // PCRenderTarget::MeasureTextureMemory (0x004c5950) has the same three
 // statements and retail there does store the size after the pushes.
+// Session 20: also unchanged (still 1776/1790, one instruction out of place): a
+// `fmt = target->surfacePixelFormat` local, a PCRenderTarget cast for the
+// format, and storing flags or width/height right after the size (both much
+// worse, 1190 and 1197 masked). The candidate already walks `&surfaces[count]`
+// as a running pointer like retail ([esp+0x10]/[esp+0x14] set before the
+// clear), so the loop shape is not the difference; only the size store's
+// scheduling relative to the 0x005119c0 pushes is.
 #include <stdio.h>
 #include <string.h>
 
