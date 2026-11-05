@@ -35,12 +35,12 @@ public:
     virtual void UnknownVirtualSlot41();
     virtual int UnknownVirtualSlot42();
     virtual void UnknownVirtualSlot44();
-    virtual Vec3* UnknownVirtualSlot46(Vec3* out, float slideAngle);
+    virtual Vec3* ComputeRotationPivot(Vec3* out, float slideAngle);
     virtual float UnknownVirtualSlot47(float arg);
     virtual void SimulateFrame(float dt);
     virtual float ApplySteerRate();
     virtual Vec3* GetContactGroundNormal(Vec3* out);
-    virtual Vec3* UnknownVirtualSlot55(Vec3* out, Vec3* pos);
+    virtual Vec3* GetPivotAndForwardAxis(Vec3* out, Vec3* pos);
     virtual void UpdateLeanFromNormal(Vec3* forward, int updateLeanCos, Vec3* up);
     virtual float GetLeanAngle();
     virtual float GetMaxSteerAngle();

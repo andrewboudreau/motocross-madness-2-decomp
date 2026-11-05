@@ -59,7 +59,7 @@ public:
     virtual void SnapshotRespawnPose();
     virtual void UnknownVirtualSlot44();
     virtual float UnknownVirtualSlot45();
-    virtual Vec3* UnknownVirtualSlot46(Vec3* out, float slideAngle);
+    virtual Vec3* ComputeRotationPivot(Vec3* out, float slideAngle);
     // pure virtual: entry is _purecall (0x00534cfe).  Bike's override 0x0040cbb0 is
     // `ret 4` and returns a float (tier 1 via its byte match), hence float(float).
     virtual float UnknownVirtualSlot47(float arg) = 0;
@@ -72,7 +72,7 @@ public:
     virtual int UnknownVirtualSlot52();
     virtual float ApplySteerRate();
     virtual Vec3* GetContactGroundNormal(Vec3* out);
-    virtual Vec3* UnknownVirtualSlot55(Vec3* out, Vec3* pos);
+    virtual Vec3* GetPivotAndForwardAxis(Vec3* out, Vec3* pos);
     virtual void UpdateLeanFromNormal(Vec3* forward, int updateLeanCos, Vec3* up);
     virtual float GetLeanAngle();
     virtual void SettleBodyToWheels(Vec3* settleUp, int keepPlacement);

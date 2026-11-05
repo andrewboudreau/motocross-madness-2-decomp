@@ -3,17 +3,17 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "1fe46889b3cee34f13ad222b9e59ccaaeacd4ca6595d2a3f120fd1ed150cd033"
+      "sha256": "5b6b3b0962b830ee949b195ce23ac3a188b82dd4d67d7bd93a2ee3052d2c27e4"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "11f69c9bcc9a288ed9b092bace910f7a5eed97c9bceb71f1498c44fb14a9f887"
+      "sha256": "f187e4418d82d88cd7c6f03c013a0346f1e5cce024ffbafbe38df4248c0632f1"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
       "relocations": 1054,
-      "sha256": "560e65e03a12c7082fcc8ab30a20f3271f29255ab008ca7c56ef50016abf9393"
+      "sha256": "695fa58b0c67ddeb043ae0729e55d204d41311b2d9f15c166ae3934c3952b39c"
     },
     "src/reconstructed/VehicleDefaults.cpp": {
       "sections": 13,
@@ -43,7 +43,7 @@
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "63ec963c5aa7d1988c05f10c9f2c89b6c7da698cf65d41337b9256450fcd45dd"
+      "sha256": "dcd4118f590762d4944d5c9f8f61aad545ed9eee09f38fa333e6682e4a58e794"
     },
     "src/reconstructed/InputDevice.cpp": {
       "sections": 11,
@@ -264,7 +264,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot46@Bike",
+      "symbol": "ComputeRotationPivot@Bike",
       "va": "0x40b600",
       "extent": 1066,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -369,7 +369,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot55@Bike",
+      "symbol": "GetPivotAndForwardAxis@Bike",
       "va": "0x40ce60",
       "extent": 244,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -537,7 +537,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot46@Vehicle",
+      "symbol": "ComputeRotationPivot@Vehicle",
       "va": "0x5276d0",
       "extent": 523,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -873,7 +873,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot55@Vehicle",
+      "symbol": "GetPivotAndForwardAxis@Vehicle",
       "va": "0x52b6d0",
       "extent": 63,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"

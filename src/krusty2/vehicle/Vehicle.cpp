@@ -35,7 +35,7 @@ float Vehicle::ApplySteerRate()
     return 1.0f;
 }
 
-Vec3* Vehicle::UnknownVirtualSlot55(Vec3* out, Vec3* pos)
+Vec3* Vehicle::GetPivotAndForwardAxis(Vec3* out, Vec3* pos)
 {
     *pos = kVec3Zero;
     *out = savedForward;
@@ -520,7 +520,7 @@ void Vehicle::SettleBodyToWheels(Vec3* settleUp, int keepPlacement)
         }
         if (wheelCount == 2) {
             Vec3 localAxis;
-            axis = *UnknownVirtualSlot55(&localAxis, &rotationPivot);
+            axis = *GetPivotAndForwardAxis(&localAxis, &rotationPivot);
             UpdateLeanFromNormal(&axis, 0, &dir);
             localAxis = modelNode->WorldToLocalDirection(axis);
             float lean = leanAngle;
@@ -899,7 +899,7 @@ static inline Vec3 VehOffset(const Vec3& a, const Vec3& b)
 // sum) as retail's 0x24 frame shows.  The Math3D operators (constructor-return temporaries)
 // give retail's store and return-pointer schedule; VehOffset's member-wise temporaries
 // store the last component one instruction late.
-Vec3* Vehicle::UnknownVirtualSlot46(Vec3* out, float slideAngle)
+Vec3* Vehicle::ComputeRotationPivot(Vec3* out, float slideAngle)
 {
     if (!airborne && !pointsTouching && wheelsInContact <= 2) {
         if (wheelsInContact == 2) {
@@ -1033,7 +1033,7 @@ void Vehicle::SimulateFrame(float frame)
         speed = prevSpeed;
         force = weightForce;
         Vec3 savedOut;
-        Vec3 basis = *UnknownVirtualSlot55(&savedOut, &pivot);
+        Vec3 basis = *GetPivotAndForwardAxis(&savedOut, &pivot);
         UpdateLeanFromNormal(&basis, 1, 0);
         res = VehContactsA(crashState || (steps == 1 && UnknownVirtualSlot5(0)), &touchingPointCount,
                            collisionPointCount, ((VehicleContact**)collisionPoints), terrain,
@@ -1114,7 +1114,7 @@ void Vehicle::SimulateFrame(float frame)
         smoothedVerticalAccel = VehSmooth(verticalAccelSmoother, (velocity.y - prevVelocity.y) * invStepTime, stepTime);
         float slideAngle = UnknownVirtualSlot61(turnMagnitude);
         Vec3 aimOut;
-        Vec3 aim = *UnknownVirtualSlot46(&aimOut, slideAngle);
+        Vec3 aim = *ComputeRotationPivot(&aimOut, slideAngle);
         int mode = ClassifyGroundContact(slideAngle);
         UnknownVirtualSlot26();
         AdvancePosition();

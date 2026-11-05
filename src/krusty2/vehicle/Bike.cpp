@@ -947,7 +947,7 @@ static inline Vec3 BikeNormalized(const Vec3& v)
     return v * invLen;
 }
 
-Vec3* Bike::UnknownVirtualSlot55(Vec3* out, Vec3* pos)
+Vec3* Bike::GetPivotAndForwardAxis(Vec3* out, Vec3* pos)
 {
     *pos = modelNode->WorldToLocalPoint(rearWheel->wheelPosition);
     *out = BikeNormalized(frontWheel->wheelPosition - rearWheel->wheelPosition);
@@ -1717,7 +1717,7 @@ static inline Vec3 BikeOolHalf(const Vec3& v)
 // bikes return the stored anchor (field_0x194); otherwise it is the front
 // wheel position (slideAngle != 0) or a blend toward the rear wheel, relative to the
 // body, mapped through the transform.
-Vec3* Bike::UnknownVirtualSlot46(Vec3* out, float slideAngle)
+Vec3* Bike::ComputeRotationPivot(Vec3* out, float slideAngle)
 {
     if (airborne || pointsTouching) {
         *out = rotationPivot;

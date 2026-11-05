@@ -272,7 +272,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot46@Bike",
+    "candidate_symbol_contains": "ComputeRotationPivot@Bike",
     "target_va": "0x0040b600",
     "target_size": 1066,
     "expect": "exact",
@@ -432,7 +432,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot55@Bike",
+    "candidate_symbol_contains": "GetPivotAndForwardAxis@Bike",
     "target_va": "0x0040ce60",
     "target_size": 244,
     "expect": "exact",
@@ -692,7 +692,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot46@Vehicle",
+    "candidate_symbol_contains": "ComputeRotationPivot@Vehicle",
     "target_va": "0x5276d0",
     "target_size": 523,
     "expect": "exact",
@@ -1202,7 +1202,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot55@Vehicle",
+    "candidate_symbol_contains": "GetPivotAndForwardAxis@Vehicle",
     "target_va": "0x0052b6d0",
     "target_size": 63,
     "expect": "exact",

@@ -58,7 +58,7 @@ class BikeMathConnectionTests(unittest.TestCase):
             obj = objects[sources[0]]
             self.assertFalse(any('BikeOolVec3' in s.name or 'BikeVec3Add@@' in s.name
                                  for s in obj.symbols))
-            caller = obj.find_symbol('?UnknownVirtualSlot46@Bike@@UAEPAUVec3@@PAU2@M@Z')
+            caller = obj.find_symbol('?ComputeRotationPivot@Bike@@UAEPAUVec3@@PAU2@M@Z')
             calls = [obj.symbol_by_index[r.symbol_index].name for r in obj.relocations
                      if r.section_number == caller.section_number and r.type == 0x14
                      and caller.value <= r.virtual_address < caller.value + caller.function_size]
