@@ -766,7 +766,7 @@
     "target_va": "0x00506220",
     "target_size": 3173,
     "expect": "partial",
-    "notes": "UNMATCHED by the bring-up slot-12 override: declaring Terrain::PrepareGeometry in Terrain.h (so the game vtable calls the real body) swaps two stack-slot offsets at +2200/+2205 (99.937 percent); exact before, cause not yet found. Original note: slot 14 (vtable 0x0055825c): dual-texture probe (DriverInfo registry keys / ValidateDevice), height-field draw passes, render-state restore, profile page. Exact with field_0x18 cast at every use (a cached local or inline accessor breaks VC6's tail merge of the single-pass branch).",
+    "notes": "UNMATCHED by the bring-up slot-12 override: declaring Terrain::PrepareGeometry in Terrain.h (so the game vtable calls the real body) swaps two operand loads at +2200/+2205 (retail loads [0x68a318] into edx and [0x68a31c] into eax before the Total sum; candidate loads them the other way round; 3171/3173 bytes). Ruled out: any extra member declaration at any position in the class (virtual, non-virtual, renamed UnknownVirtualSlot12) reproduces it, commuting the sum operands, hoisting either operand into a local, reordering the extern declarations, an earlier reference to the global; commenting the declaration out restores exact. Looks like an internal compiler ordering artifact. Original note: slot 14 (vtable 0x0055825c): dual-texture probe (DriverInfo registry keys / ValidateDevice), height-field draw passes, render-state restore, profile page. Exact with field_0x18 cast at every use (a cached local or inline accessor breaks VC6's tail merge of the single-pass branch).",
     "bindings": "Terrain.bindings.json"
   },
   {
