@@ -22,6 +22,31 @@ is extracted unchanged from PCJoystickDeviceNearMisses.cpp. Authentic VC6 SP3
 `vc6_o2_mt` emits **453 bytes, 373 matching positions** against the complete
 454-byte reference. It remains nonexact source in samples.
 
+All 14 instruction differences come from register choice: the opcodes and
+stack slots match. In both QueueEvent blocks and in the POV copy, retail uses
+the next scratch register in the cycle eax, ecx, edx. For example, the release
+block loads `joystickIndex` and `g_TrackGame` into ecx/edx, where the
+candidate uses eax/ecx. The one-byte size difference follows from this:
+retail's first POV load uses edx, while the candidate's uses eax, which has the
+short `mov eax, [mem]` encoding.
+
+None of these forms moves the register cycle:
+- **Pressed value:** `/128`; an unsigned type; casts to uchar, int and uint;
+  `(x & 0x80) >> 7`; and a `& 0x80` test (worse, 321).
+- **Branches:** `if (pressed)` with the arms swapped (356); `!pressed`; one
+  QueueEvent call taking `pressed ? 1 : 0` (341).
+- **Previous state:** reading it before `pressed`; dropping the `previous`
+  local (368); copying it from the member (369).
+- **Stores:** chained timestamp zero stores in either order (369).
+- **Locals:** `joystickIndex` and ControlInterface* locals.
+- **Loop counters:** one shared `i` for both loops; `i`/`j` declared at the
+  top.
+- **Probes:** dead int locals at the loop head, in the release block or before
+  the loop.
+- **POV copy:** a struct copy (371) or unrolled assignments (460 bytes).
+- **Axes:** chained axis assignments, for each axis and for all of them;
+  unchaining axis 1 (109) or writing it in member form (116) is much worse.
+
 ## Behavior and existing providers
 
 A null device returns zero. COM slot 9 receives the device pointer, size 80

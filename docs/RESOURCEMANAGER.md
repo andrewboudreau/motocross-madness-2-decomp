@@ -25,6 +25,17 @@ redefine the global manager. Independent review accepted it for explicit
 reviewed-nonexact admission through `config/game_build.json`; its source
 remains in `samples/` and is not a strict-match provider.
 
+Under `vc6_o2_mt` the candidate scores 120/804 strict (798 bytes; 263/266
+aligned instructions). Retail stores EBX into the `new` temporary's slot
+(`[esp+0x14]`) after the unwind-state reset and returns from that slot; the
+candidate returns EBX directly. These forms leave that difference unchanged:
+declaring `archive` separately (at the top or after the other locals), every
+order of the `i`/`magic`/`count` declarations, a `result` local at the success
+return, separate `stream` and `archive` variables, and an inline `NewArchive`
+helper that returns the `new` expression or a named local. Rewriting the
+function with early returns is worse (126 strict, but 260/266 aligned and 801
+bytes).
+
 ## Existing provider connections
 
 Seven formerly unresolved identities now call existing strict providers:
