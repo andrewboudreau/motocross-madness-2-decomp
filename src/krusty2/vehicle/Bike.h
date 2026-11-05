@@ -59,7 +59,7 @@ struct BikeParticleEmitterView {
     virtual void UnknownVirtualSlot18(); virtual void UnknownVirtualSlot19(); virtual void UnknownVirtualSlot20();
     virtual void UnknownVirtualSlot21(); virtual void UnknownVirtualSlot22(); virtual void UnknownVirtualSlot23();
     virtual void UnknownVirtualSlot24(); virtual void UnknownVirtualSlot25(); virtual void UnknownVirtualSlot26();
-    virtual void* UnknownVirtualSlot27(void* a, GameObject* manager);
+    virtual void* Create(void* a, GameObject* manager);
 };
 struct BikeDustEmitter : BikeParticleEmitterView {
     explicit BikeDustEmitter(int flags);        // 0x004b8a00

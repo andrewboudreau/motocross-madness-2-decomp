@@ -78,8 +78,8 @@ void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
     rigidBody = new (__FILE__, 0x5f) UnknownWreckerRigidBody(1);
     rigidBody->SetRenderContext(renderContext);
     AppendChild(rigidBody, -1);
-    rigidBody->UnknownVirtualSlot28(character->modelNode);
-    gravityModel->UnknownVirtualSlot27(rigidBody);
+    rigidBody->SetNode(character->modelNode);
+    gravityModel->AddBody(rigidBody);
     collisionModel = reinterpret_cast<UnknownWreckerCollisionModel*>(
         new (__FILE__, 0x68) ConstraintMethodCollisionModel(1));
     collisionModel->SetRenderContext(renderContext);
@@ -94,7 +94,7 @@ void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
     collisionModel->impulseLoss = 0.95f;
     collisionModel->maxImpulse = 2000.0f;
     g_collisionQuadTree->Remove(collisionModel, collisionModel->quadtreeCell);
-    rigidBody->UnknownVirtualSlot29(200.0f);
+    rigidBody->SetMass(200.0f);
     inertiaFactor = rigidBody->mass * (1.0f / 12);
     rigidBody->inertia = ZeroMatrix();
     rigidBody->invInertia = ZeroMatrix();
@@ -104,9 +104,9 @@ void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
     character->modelNode->subtreeDirty = 1;
     character->SetMotionByName("Fall02");
     UpdateInertia();
-    rigidBody->UnknownVirtualSlot34(&Vector3(0.0f, 0.0f, 0.0f));
-    rigidBody->UnknownVirtualSlot33(&Vector3(0.0f, 0.0f, 0.0f));
-    rigidBody->UnknownVirtualSlot44();
+    rigidBody->SetInitialAngularVelocity(&Vector3(0.0f, 0.0f, 0.0f));
+    rigidBody->SetInitialVelocity(&Vector3(0.0f, 0.0f, 0.0f));
+    rigidBody->ResetState();
     poseNode = character->modelNode->firstChild;
     collisionModel->manualStep = 1;
     rigidBody->stepDisabled = 1;
@@ -347,7 +347,7 @@ int Wrecker::Tick(float frameTime) {
                     RebuildPoseSteps();
                     linearStep = linearStep * (1.0f / frameTime);
                     angularStep = angularStep * (1.0f / frameTime);
-                    rigidBody->UnknownVirtualSlot44();
+                    rigidBody->ResetState();
                     rigidBody->velocity = linearStep;
                     rigidBody->prevVelocity = linearStep;
                     rigidBody->angularVelocity = reinterpret_cast<const Vector3&>(rigidBody->node->WorldToLocalDirection(reinterpret_cast<const Vec3&>(angularStep)));
@@ -470,7 +470,7 @@ void Wrecker::StartAnimatedWreck(int index) {
     character->SetMotion(reinterpret_cast<Motion*>(indexedAnimations[index]));
     wreckState = 1;
     rigidBody->isEnabled = 0;
-    rigidBody->UnknownVirtualSlot44();
+    rigidBody->ResetState();
     rigidBody->angularVelocity = Vector3(0.0f, 0.0f, 0.0f);
     rigidBody->velocity = Vector3(0.0f, 0.0f, 0.0f);
     hadContact = 0;
@@ -488,7 +488,7 @@ void Wrecker::StartTumble() {
     blendStarted = 1;
     poseStepsPending = 1;
     rigidBody->isEnabled = 1;
-    rigidBody->UnknownVirtualSlot44();
+    rigidBody->ResetState();
     rigidBody->velocity = linearStep;
     rigidBody->prevVelocity = linearStep;
     rigidBody->angularVelocity = reinterpret_cast<const Vector3&>(rigidBody->node->WorldToLocalDirection(reinterpret_cast<const Vec3&>(angularStep)));

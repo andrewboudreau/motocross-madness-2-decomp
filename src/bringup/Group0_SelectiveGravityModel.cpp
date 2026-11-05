@@ -86,8 +86,8 @@ public:
     virtual ~UnknownWreckerGravityModel();                    // 0x004f97b0
     virtual int Tick(float frameTime);                        // slot 10, 0x004f9860
     virtual int Step(float frameTime);        // slot 11, 0x004f9890
-    virtual void UnknownVirtualSlot27(UnknownWreckerRigidBody* body); // slot 27, 0x004f9820
-    virtual void UnknownVirtualSlot28(float value);           // slot 28, 0x004f9a50
+    virtual void AddBody(UnknownWreckerRigidBody* body); // slot 27, 0x004f9820
+    virtual void SetGravity(float value);           // slot 28, 0x004f9a50
 
     float gravity;                            // +0x2c ctor 32.2f (0x4200cccd), set by slot 28
     UnknownWreckerRigidBody** bodies;         // +0x30 DebugRealloc'd by slot 27, freed by the destructor
@@ -138,7 +138,7 @@ int UnknownWreckerGravityModel::Step(float frameTime)
 }
 
 // 0x004f9820 (ret 4): appends `body` to the array (DebugRealloc, line 0x18).
-void UnknownWreckerGravityModel::UnknownVirtualSlot27(UnknownWreckerRigidBody* body)
+void UnknownWreckerGravityModel::AddBody(UnknownWreckerRigidBody* body)
 {
     bodies = (UnknownWreckerRigidBody**)DebugRealloc(bodies, bodyCount * 4 + 4,
                                                      kSelectiveGravityModelFile, 0x18);
@@ -147,7 +147,7 @@ void UnknownWreckerGravityModel::UnknownVirtualSlot27(UnknownWreckerRigidBody* b
 }
 
 // 0x004f9a50 (ret 4)
-void UnknownWreckerGravityModel::UnknownVirtualSlot28(float value)
+void UnknownWreckerGravityModel::SetGravity(float value)
 {
     gravity = value;
 }

@@ -29,7 +29,7 @@ DustParticleEmitter::DustParticleEmitter(int flags) : GameObject(flags)
 
 DustParticleEmitter::~DustParticleEmitter() {}
 
-int DustParticleEmitter::UnknownVirtualSlot27(void* context, ParticleManager* m)
+int DustParticleEmitter::Create(void* context, ParticleManager* m)
 {
     GameObject::SetRenderContext((void*)context);
     if (m) {

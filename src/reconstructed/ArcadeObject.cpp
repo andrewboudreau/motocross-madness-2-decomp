@@ -51,7 +51,7 @@ ArcadeObject* ArcadeObject::Create(void* context, int lights, int options, const
 
     GameObject::SetRenderContext(context);
     arcadeModel = new (__FILE__, 78) D3DIMSoultreeObject(1);
-    if (!AppendChild(arcadeModel->UnknownVirtualSlot9(renderContext, name, lights, options, 1), -1)) {
+    if (!AppendChild(arcadeModel->LoadModel(renderContext, name, lights, options, 1), -1)) {
         Release();
         return 0;
     }

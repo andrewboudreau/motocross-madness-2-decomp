@@ -18,8 +18,8 @@
 float FastInvSqrt(float x);  // 0x00460c00 (src/reconstructed/FastMath.cpp)
 
 // 0x004a4c60 (ret 0xc): blends the target deltas of every channel into the copied mesh.
-void MorphBastardModifier::UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
-                                                UnknownSoultreeMesh** out)
+void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
+                                      UnknownSoultreeMesh** out)
 {
     if (((MorphBastardSoultreeView*)object)->drawUnchanged) {
         *out = mesh;

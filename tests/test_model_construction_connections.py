@@ -113,7 +113,7 @@ class ModelConstructionConnectionsTests(unittest.TestCase):
             # Four actual allocation/constructor boundaries, and the complete
             # Car and render call paths. Assert the emitted and retail direct calls.
             callers = (
-                (CAR, 'UnknownVirtualSlot27@CarProcedural', 0x42f600, 1020,
+                (CAR, 'Create@CarProcedural', 0x42f600, 1020,
                  ((CONSTRUCTOR, 0x43f160, 1), (HELPERS[0][1], 0x4fc970, 1),
                   (HELPERS[1][1], 0x4fdae0, 7), (HELPERS[2][1], 0x4fe0a0, 1))),
                 (MOTION, 'CharacterVirtualSlot0@D3DIMSoultreeCharacter', 0x445a70, 1021,

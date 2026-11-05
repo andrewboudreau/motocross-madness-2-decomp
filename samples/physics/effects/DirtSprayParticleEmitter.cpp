@@ -39,7 +39,7 @@ DirtSprayParticleEmitter::DirtSprayParticleEmitter(int flags) : GameObject(flags
 
 DirtSprayParticleEmitter::~DirtSprayParticleEmitter() {}
 
-int DirtSprayParticleEmitter::UnknownVirtualSlot27(void* context, ParticleManager* m)
+int DirtSprayParticleEmitter::Create(void* context, ParticleManager* m)
 {
     GameObject::SetRenderContext((void*)context);
     if (m) {

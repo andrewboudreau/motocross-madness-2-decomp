@@ -45,7 +45,7 @@ public:
 class QuadTree {
 public:
     virtual ~QuadTree();                                         // 0x004dda90 -> core 0x004dc840
-    virtual QuadTreeNode* UnknownVirtualSlot1();                 // 0x004dc7e0 node factory
+    virtual QuadTreeNode* CreateNode();                 // 0x004dc7e0 node factory
 
     void Reset();                                                // 0x004dc620
     unsigned int ComputeCode(float x0, float z0, float x1, float z1); // 0x004dc8c0 (ret 0x10)

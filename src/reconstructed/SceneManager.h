@@ -61,11 +61,11 @@ public:
     explicit UnknownSceneAnimatedObject(int flags);    // 0x0042f390 (CarProcedural)
     // Slot 27 (0x0042f600, CarProcedural.h): loads the model and its path;
     // returns the object to add.
-    virtual GameObject* UnknownVirtualSlot27(void* owner, const char* name, const char* colPath,
-                                             LightManager* lights, int a4, int a5, const char* vuePath,
-                                             const Vector3* position, float fps, int frontWheelsTurn,
-                                             float lagDistance, float a11, int tires, float a13,
-                                             float a14, float a15);
+    virtual GameObject* Create(void* owner, const char* name, const char* colPath,
+                               LightManager* lights, int a4, int a5, const char* vuePath,
+                               const Vector3* position, float fps, int frontWheelsTurn,
+                               float lagDistance, float a11, int tires, float a13,
+                               float a14, float a15);
 
     unsigned char field_0x2c[0x34 - 0x2c];
     UnknownSceneLodObject* carModel;  // +0x34  CarProcedural +0x34 carModel; SetDetailLevel/BikeRace use it as the model node

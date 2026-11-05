@@ -20,7 +20,7 @@ static QuadTree* Tree(){return(QuadTree*)w.tree;}
 static void Require(int yes,int line){if(!yes){printf("oracle line%d case%u code%x rep%d move%d fail%d throw%d fault%d\n",line,checks,sc.code,sc.repeat,sc.move,sc.failAt,sc.throwAt,sc.fault);ExitProcess(3);}}
 #define CHECK(x) Require(!!(x),__LINE__)
 template<class T>static DWORD Address(T p){CHECK(sizeof(p)==4);union{T p;DWORD n;}u;u.p=p;return u.n;}
-class FactoryProbe{public:QuadTreeNode* Factory(){return((QuadTree*)this)->QuadTree::UnknownVirtualSlot1();}};
+class FactoryProbe{public:QuadTreeNode* Factory(){return((QuadTree*)this)->QuadTree::CreateNode();}};
 static Event& Boundary(int kind,void*p,unsigned size,const char*file,int line){
  CHECK(got.calls<512);Event&e=got.events[got.calls++];e.kind=kind;e.pointer=(DWORD)p;e.size=size;e.line=line;e.root=(DWORD)Tree()->rootNode;e.current=(DWORD)g_pQuadTree;e.count=Tree()->objectCount;e.nodes=Tree()->liveNodeCount;e.stamp=*(unsigned short*)(w.object+4);memcpy(e.pool,w.pool,40);
  const char*leaf=strrchr(file,'\\');if(!leaf)leaf=strrchr(file,'/');leaf=leaf?leaf+1:file;

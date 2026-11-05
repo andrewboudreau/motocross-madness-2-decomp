@@ -42,7 +42,7 @@
   {
     "class": "VisibilityQuadTree",
     "source": "VisibilityQuadTree.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot1@VisibilityQuadTree",
+    "candidate_symbol_contains": "CreateNode@VisibilityQuadTree",
     "target_va": "0x0052d4b0",
     "target_size": 94,
     "expect": "exact",

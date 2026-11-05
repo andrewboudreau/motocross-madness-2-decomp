@@ -266,7 +266,7 @@ Vegetation::Vegetation() {
 }
 
 // 0x00456690
-unsigned short Vegetation::UnknownVirtualSlot0() {
+unsigned short Vegetation::ComputeSortKey() {
     Matrix4* view = g_UnknownGlobal59af00;
     float depth = ((quantizedPosition.z * (*view)(2, 2) + quantizedPosition.x * (*view)(0, 2)) *
                        g_EcoSystem->unitsPerCoordinate +
@@ -281,7 +281,7 @@ unsigned short Vegetation::UnknownVirtualSlot0() {
 }
 
 // 0x00456720
-unsigned int Vegetation::UnknownVirtualSlot1(UnknownEcoQuadTree* tree) {
+unsigned int Vegetation::ComputeQuadTreeCode(UnknownEcoQuadTree* tree) {
     float radius = g_EcoSystem->definitionTable[definitionIndex]->RadiusForParameter(radiusParam);
     float x = quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
     float z = quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;

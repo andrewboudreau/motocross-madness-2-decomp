@@ -103,11 +103,11 @@ public:
     virtual ~CarProcedural();                                        // 0x0042f590 (slot 0 0x0042f570)
     virtual int Tick(float frameTime);                               // 0x0042fd80
     // Slot 27 (0x0042f600, ret 0x40): sets the car up; returns this.
-    virtual CarProcedural* UnknownVirtualSlot27(void* renderContext, const char* name, const char* collisionFile,
-                                                int a3, int a4, void* ground, const char* pathFile,
-                                                const Vector3* offset, float speed, int steerFront, float trail,
-                                                int a11, unsigned int wheelCount, float a13, float a14,
-                                                float a15);
+    virtual CarProcedural* Create(void* renderContext, const char* name, const char* collisionFile,
+                                  int a3, int a4, void* ground, const char* pathFile,
+                                  const Vector3* offset, float speed, int steerFront, float trail,
+                                  int a11, unsigned int wheelCount, float a13, float a14,
+                                  float a15);
 
     void ReadPath(const char* pathFile, const char* name); // 0x0042fa00 (ret 8)
     float FindOffsetAtDistance(float time, float distance);         // 0x004308e0 (ret 8)

@@ -175,8 +175,8 @@ public:
 class UnknownQuarryParticles : public GameObject {
 public:
     explicit UnknownQuarryParticles(int flags);                // 0x004ba390
-    virtual UnknownQuarryParticles* UnknownVirtualSlot27(void* target, TextureMapManager* manager,
-                                                         const char* texture, LightManager* lights);
+    virtual UnknownQuarryParticles* Create(void* target, TextureMapManager* manager,
+                                           const char* texture, LightManager* lights);
 
     unsigned char field_0x2c[0x2058 - 0x2c];
 };
@@ -658,8 +658,8 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Particles");
     if (particleManager)
         particleManager = ((UnknownQuarryParticles*)particleManager)
-                         ->UnknownVirtualSlot27(renderContext, g_TrackGame->textureManager,
-                                                eventScene->environment->particleTexture, lightManager);
+                         ->Create(renderContext, g_TrackGame->textureManager,
+                                  eventScene->environment->particleTexture, lightManager);
     g_MemTagStack->Push("3DObjects");
     if (!Create3DObjects((int)&modelTextures))
         return 0;

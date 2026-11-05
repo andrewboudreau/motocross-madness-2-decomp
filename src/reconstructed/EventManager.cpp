@@ -981,9 +981,9 @@ void EventManager::CloseRace(int mode) {
 class QuadTree;
 class QuadTreeObject {
 public:
-    virtual void UnknownVirtualSlot0();
+    virtual void ComputeSortKey();
     // 0x00456720 for Vegetation: the object's quadtree code (ret 4).
-    virtual unsigned int UnknownVirtualSlot1(QuadTree* tree);
+    virtual unsigned int ComputeQuadTreeCode(QuadTree* tree);
     short queryStamp;                              // +0x04, as CollisionObject.h
     short sortKey;                                 // +0x06
     char objectTypeId;                             // +0x08
@@ -1014,7 +1014,7 @@ void EventManager::RemoveVegetationInRect(float x0, float z0, float x1, float z1
             if (count < 1000) {
                 found[count].object = dynamic_cast<Vegetation*>(object);
                 if (found[count].object) {
-                    found[count].code = found[count].object->UnknownVirtualSlot1(g_collisionQuadTree);
+                    found[count].code = found[count].object->ComputeQuadTreeCode(g_collisionQuadTree);
                     count++;
                 }
             }

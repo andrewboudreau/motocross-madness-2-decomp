@@ -44,7 +44,7 @@
   "?TestDot@VisibilityClipper@@QAEHPBUVisibilityCamera@@PBUVisibilityBoxVec@@1@Z": "0x0052f140",
   "?TransformVectors@VisibilityClipper@@QAEXPBUVisibilityBoxVec@@PAU2@PBUVisibilityMatrix@@H@Z": "0x0052f0a0",
   "?Traverse@VisibilityQuadTreeNode@@QAEPAUQuadTreeResultLink@@HHPAU2@HHHPAUVisibilityCamera@@@Z": "0x52d610",
-  "?UnknownVirtualSlot1@VisibilityQuadTree@@UAEPAVQuadTreeNode@@XZ$ehhandler": "0x54f154",
+  "?CreateNode@VisibilityQuadTree@@UAEPAVQuadTreeNode@@XZ$ehhandler": "0x54f154",
   "?g_collisionQuadTree@@3PAVQuadTree@@A": "0x0068aba4",
   "?g_frozenCamera@@3VPCCamera@@A": "0x68a968",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x56df04",

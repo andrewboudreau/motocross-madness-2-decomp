@@ -32,7 +32,7 @@
   {
     "class": "DustParticleEmitter",
     "source": "../../../src/reconstructed/DustParticleEmitter.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot27@DustParticleEmitter",
+    "candidate_symbol_contains": "?Create@DustParticleEmitter",
     "target_va": "0x004ba040",
     "target_size": 43,
     "expect": "exact",
@@ -292,7 +292,7 @@
   {
     "class": "DirtChunkParticleEmitter",
     "source": "../../../src/reconstructed/DirtChunkParticleEmitter.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot27@DirtChunkParticleEmitter",
+    "candidate_symbol_contains": "?Create@DirtChunkParticleEmitter",
     "target_va": "0x004ba040",
     "target_size": 43,
     "expect": "exact",
@@ -302,7 +302,7 @@
   {
     "class": "DirtSprayParticleEmitter",
     "source": "DirtSprayParticleEmitter.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot27@DirtSprayParticleEmitter",
+    "candidate_symbol_contains": "?Create@DirtSprayParticleEmitter",
     "target_va": "0x004ba040",
     "target_size": 43,
     "expect": "exact",
@@ -312,7 +312,7 @@
   {
     "class": "SparkParticleEmitter",
     "source": "../../../src/reconstructed/SparkParticleEmitter.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot27@SparkParticleEmitter",
+    "candidate_symbol_contains": "?Create@SparkParticleEmitter",
     "target_va": "0x004ba040",
     "target_size": 43,
     "expect": "exact",
@@ -322,7 +322,7 @@
   {
     "class": "SteamParticleEmitter",
     "source": "../../../src/reconstructed/SteamParticleEmitter.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot27@SteamParticleEmitter",
+    "candidate_symbol_contains": "?Create@SteamParticleEmitter",
     "target_va": "0x004ba040",
     "target_size": 43,
     "expect": "exact",

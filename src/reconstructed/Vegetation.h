@@ -11,8 +11,8 @@ struct Vector3;
 class Vegetation : public UnknownEcoQuadTreeObject {
 public:
     Vegetation();                             // 0x00456650
-    virtual unsigned short UnknownVirtualSlot0(); // 0x00456690: view depth as a sort key
-    virtual unsigned int UnknownVirtualSlot1(UnknownEcoQuadTree* tree); // 0x00456720: cell code
+    virtual unsigned short ComputeSortKey(); // 0x00456690: view depth as a sort key
+    virtual unsigned int ComputeQuadTreeCode(UnknownEcoQuadTree* tree); // 0x00456720: cell code
 
     // 0x004567a0 / 0x004567e0: place the object (quantised or world
     // coordinates); the first argument (EcoSystem::textureManager) is not used.

@@ -2094,7 +2094,7 @@ GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char
     if (particleManager) {
         sparkEmitter = reinterpret_cast<VehicleSparkEmitter*>(
             new(__FILE__, 0x1dc) SparkParticleEmitter(1));
-        GameObject::AppendChild((GameObject*)sparkEmitter->UnknownVirtualSlot27(renderContext, particleManager), -1);
+        GameObject::AppendChild((GameObject*)sparkEmitter->Create(renderContext, particleManager), -1);
     }
     steerState = new(__FILE__, 0x1e0) VehicleSteerState(steerScale, controlResponse[0], &startForward, &startUp);
     Vec3 down = startUp * -1.0f;

@@ -52,7 +52,7 @@
   {
     "class": "QuadTree",
     "source": "Quadtree.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot1@QuadTree@@",
+    "candidate_symbol_contains": "?CreateNode@QuadTree@@",
     "target_va": "0x004dc7e0",
     "target_size": 94,
     "expect": "exact",
@@ -772,7 +772,7 @@
   {
     "class": "QuadTreeObject",
     "source": "Quadtree.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot0@QuadTreeObject@@",
+    "candidate_symbol_contains": "?ComputeSortKey@QuadTreeObject@@",
     "target_va": "0x004dc610",
     "target_size": 5,
     "expect": "exact",

@@ -50,8 +50,10 @@ emitter classes and the vector-constant initialisers, whose ownership is not pro
   (global 0x0056e26c) `+0x1c4` is nonzero. Ages particles by dt*1000, recycles dead ones, integrates size (flag 8), position (flag 4) and
   velocity with gravity (flag 0x10).
 * ParticleManager slot 14: the render pass (sorts the visible particles with `CompareParticleDepth`), not reconstructed.
-* Slot 27 (ParticleManager and all five emitters, ICF-folded for the emitters, body 0x004ba040): stays `UnknownVirtualSlot27`.
-  The emitter body calls `GameObject::slot 8(arg0)` and stores arg1 at +0x30 (the manager), or releases `this` when it is null.
+* Slot 27 `Create` (ParticleManager 0x004ba4d0; all five emitters ICF-folded into body 0x004ba040).
+  The emitter body calls `GameObject::slot 8(arg0)` and stores arg1 at +0x30 (the manager), returning `this`, or releases
+  `this` and returns 0 when it is null. Bike and Vehicle append the result as a child, the factory shape of
+  `EcoSystem::Create`/`ArcadeObject::Create`. The name is an inference from that shape (tier 3).
 
 ## Emitter slot 10 bodies (samples/physics/effects)
 

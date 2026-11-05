@@ -38,7 +38,7 @@ SteamParticleEmitter::SteamParticleEmitter(int flags) : GameObject(flags)
 
 SteamParticleEmitter::~SteamParticleEmitter() {}
 
-int SteamParticleEmitter::UnknownVirtualSlot27(void* context, ParticleManager* m)
+int SteamParticleEmitter::Create(void* context, ParticleManager* m)
 {
     GameObject::SetRenderContext((void*)context);
     if (m) {

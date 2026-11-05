@@ -9,11 +9,11 @@
   "before_joined": {
     "sections": 87,
     "relocations": 341,
-    "sha256": "35cbcc5256b5abaca79db2bfd9bfd5097d48b1fd73fe4c3602a0e8dd61ae1794"
+    "sha256": "31ba8078e317c59585997256b828f9228ab963316d76b83bb8555f4716e4b8b7"
   },
   "after": {
     "sections": 88,
     "relocations": 342,
-    "sha256": "869760354eadc029589c955ff259345b15f0c97d31ca01886c755be1fcec3403"
+    "sha256": "ad091397ec7625b565ff50b80a1d779f22c29845e8fc5ce6bee634f4869f9831"
   }
 }

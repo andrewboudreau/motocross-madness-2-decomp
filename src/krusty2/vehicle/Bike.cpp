@@ -737,11 +737,11 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
 
     if (particleManager) {
         dustEmitter = reinterpret_cast<BikeDustEmitter*>(new(__FILE__, 0x70f) DustParticleEmitter(1));
-        GameObject::AppendChild((GameObject*)dustEmitter->UnknownVirtualSlot27(GameObject::renderContext, particleManager), -1);
+        GameObject::AppendChild((GameObject*)dustEmitter->Create(GameObject::renderContext, particleManager), -1);
         dirtChunkEmitter = reinterpret_cast<BikeDirtChunkEmitter*>(new(__FILE__, 0x710) DirtChunkParticleEmitter(1));
-        GameObject::AppendChild((GameObject*)dirtChunkEmitter->UnknownVirtualSlot27(GameObject::renderContext, particleManager), -1);
+        GameObject::AppendChild((GameObject*)dirtChunkEmitter->Create(GameObject::renderContext, particleManager), -1);
         steamEmitter = reinterpret_cast<BikeSteamEmitter*>(new(__FILE__, 0x711) SteamParticleEmitter(1));
-        GameObject::AppendChild((GameObject*)steamEmitter->UnknownVirtualSlot27(GameObject::renderContext, particleManager), -1);
+        GameObject::AppendChild((GameObject*)steamEmitter->Create(GameObject::renderContext, particleManager), -1);
         steamEmitter->emitting = 1;
     }
 

@@ -61,7 +61,7 @@ class ParticleEmitterConnections(unittest.TestCase):
     fallback,search=struct.unpack_from('<II',obj.data,obj.sym_ptr+(weak.index+1)*18)
     self.assertEqual(search,2)
     self.assertEqual(obj.symbol_by_index[fallback].name,'??_G'+table['class']+'@@UAEPAXI@Z')
-    for slot,prefix in ((0,'??_G'),(10,'?Tick@'),(27,'?UnknownVirtualSlot27@')):
+    for slot,prefix in ((0,'??_G'),(10,'?Tick@'),(27,'?Create@')):
      name=prefix+table['class']
      target=next(x for x in targets if Path(x['source']).name==table['class']+'.cpp' and x['candidate_symbol_contains']==name)
      self.assertEqual(struct.unpack('<I',pe.bytes_at_va(va+slot*4,4))[0],int(target['target_va'],16))

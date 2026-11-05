@@ -9,12 +9,12 @@ extern "C" void qsort(void* base, unsigned int num, unsigned int width,
 QuadTree* g_pQuadTree;
 float g_quadTreeInvScale;
 
-short QuadTreeObject::UnknownVirtualSlot0()
+short QuadTreeObject::ComputeSortKey()
 {
     return -1;
 }
 
-QuadTreeNode* QuadTree::UnknownVirtualSlot1()
+QuadTreeNode* QuadTree::CreateNode()
 {
     return new(__FILE__, 0x7a) QuadTreeNode;
 }
@@ -78,7 +78,7 @@ void QuadTree::Reset()
 // size per depth (0x4000 >> depth) until the cell is no larger than minCell in grid units.
 void QuadTree::Init(float x0, float z0, float x1, float z1, float minCell)
 {
-    rootNode = UnknownVirtualSlot1();
+    rootNode = CreateNode();
     worldMinX = x0;
     worldMaxX = x1;
     worldMinZ = z0;
@@ -271,7 +271,7 @@ void QuadTree::Insert(QuadTreeObject* obj, unsigned int code, float y0, float y1
                 child = 0;
             }
             if (!child) {
-                QuadTreeNode* fresh = UnknownVirtualSlot1();
+                QuadTreeNode* fresh = CreateNode();
                 node->children[index] = fresh;
                 child = fresh;
             }
@@ -615,7 +615,7 @@ QuadTreeObject* QuadTree::NextObjectSorted()
                             if (sortedCount < 500) {
                                 sortedStack[sortedCount] = obj;
                                 sortedCount++;
-                                obj->UnknownVirtualSlot0();
+                                obj->ComputeSortKey();
                             }
                         }
                     }

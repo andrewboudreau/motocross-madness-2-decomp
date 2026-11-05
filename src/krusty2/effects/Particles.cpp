@@ -101,8 +101,8 @@ int ParticleManager::Tick(float dt)
     return 1;
 }
 
-ParticleManager* ParticleManager::UnknownVirtualSlot27(int parentArg, TextureMapManager* textures,
-                                                       const char* textureName, int field)
+ParticleManager* ParticleManager::Create(int parentArg, TextureMapManager* textures,
+                                         const char* textureName, int field)
 {
     GameObject::SetRenderContext((void*)parentArg);
     for (int i = 0; i < 1000; i++)

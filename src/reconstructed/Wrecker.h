@@ -137,14 +137,14 @@ typedef D3DIMSoultreeCharacter UnknownWreckerCharacter;
 class UnknownWreckerRigidBody : public GameObject {
 public:
     explicit UnknownWreckerRigidBody(int flags);                   // 0x004cc120
-    virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28(UnknownWreckerSkeleton* skeleton);
-    virtual void UnknownVirtualSlot29(float value);
-    virtual void UnknownVirtualSlot30();
+    virtual void SetName();
+    virtual void SetNode(UnknownWreckerSkeleton* skeleton);
+    virtual void SetMass(float value);
+    virtual void SetInertia();
     virtual void UnknownVirtualSlot31();
     virtual void UnknownVirtualSlot32();
-    virtual void UnknownVirtualSlot33(Vector3* value);
-    virtual void UnknownVirtualSlot34(Vector3* value);
+    virtual void SetInitialVelocity(Vector3* value);
+    virtual void SetInitialAngularVelocity(Vector3* value);
     virtual void UnknownVirtualSlot35();
     virtual void UnknownVirtualSlot36();
     virtual void UnknownVirtualSlot37();
@@ -154,7 +154,7 @@ public:
     virtual void UnknownVirtualSlot41();
     virtual void UnknownVirtualSlot42();
     virtual void UnknownVirtualSlot43();
-    virtual void UnknownVirtualSlot44();
+    virtual void ResetState();
 
     unsigned char field_0x02c[0x13c - 0x2c];
     Vector3 initialVelocity;   // +0x13c
@@ -178,7 +178,7 @@ public:
 class UnknownWreckerGravityModel : public GameObject {
 public:
     explicit UnknownWreckerGravityModel(int flags);                // 0x004f9760
-    virtual void UnknownVirtualSlot27(UnknownWreckerRigidBody* body);
+    virtual void AddBody(UnknownWreckerRigidBody* body);
     unsigned char field_0x02c[0x38 - 0x2c];
     int manualStep;                           // +0x38  SelectiveGravityModel slot 10 0x004f9860 calls slot 11 itself only while this is 0; Wrecker sets it like the collision model's manualStep
 };

@@ -182,7 +182,7 @@
   {
     "class": "ParticleManager",
     "source": "Particles.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot27@ParticleManager",
+    "candidate_symbol_contains": "?Create@ParticleManager",
     "target_va": "0x004ba4d0",
     "target_size": 1406,
     "expect": "exact",

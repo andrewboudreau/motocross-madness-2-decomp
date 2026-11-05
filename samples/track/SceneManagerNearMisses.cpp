@@ -66,7 +66,7 @@
 // slot 27 attaches them and returns the GameObject to add as a child.
 class UnknownSceneParticleEmitter : public GameObject {
 public:
-    virtual GameObject* UnknownVirtualSlot27(void* owner, int a);
+    virtual GameObject* Create(void* owner, int a);
 };
 class UnknownSceneDustEmitter : public UnknownSceneParticleEmitter {
 public:
@@ -341,7 +341,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                         } else {
                             UnknownSceneDustEmitter* emitter = new(__FILE__, 1917) UnknownSceneDustEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild(emitter->UnknownVirtualSlot27(renderContext, a2), -1);
+                            node->AppendChild(emitter->Create(renderContext, a2), -1);
                             object->UnknownVirtualSlot37(1, emitter, *object->collisionPoints, 0);
                             dust = 1;
                         }
@@ -353,7 +353,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                         } else {
                             UnknownSceneChunkEmitter* emitter = new(__FILE__, 1927) UnknownSceneChunkEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild(emitter->UnknownVirtualSlot27(renderContext, a2), -1);
+                            node->AppendChild(emitter->Create(renderContext, a2), -1);
                             object->UnknownVirtualSlot37(2, emitter, *object->collisionPoints, 0);
                             chunk = 1;
                         }
@@ -365,7 +365,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                         } else {
                             UnknownSceneSprayEmitter* emitter = new(__FILE__, 1937) UnknownSceneSprayEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild(emitter->UnknownVirtualSlot27(renderContext, a2), -1);
+                            node->AppendChild(emitter->Create(renderContext, a2), -1);
                             object->UnknownVirtualSlot37(3, emitter, *object->collisionPoints, 0);
                             spray = 1;
                         }
@@ -384,7 +384,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             staticModels->casters[i].physicsObject = 0;
             D3DIMSoultreeObject* object = new(__FILE__, 1956) D3DIMSoultreeObject(1);
             staticModels->casters[i].model = (ShadowCaster*)object;
-            AppendChild(object->UnknownVirtualSlot9(renderContext, sltPath, (int)lights, a4, 1), -1);
+            AppendChild(object->LoadModel(renderContext, sltPath, (int)lights, a4, 1), -1);
             int length = strcspn(sltPath, ".");
             int count = length < 0x14 ? length : 0x14;
             strncpy(staticModels->casters[i].fileName, sltPath, count);
@@ -606,7 +606,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         if (!animationTable->entries[i].keyFramed) {
             UnknownSceneAnimatedObject* car = new(__FILE__, 2305) UnknownSceneAnimatedObject(1);
             animationTable->entries[i].proceduralObject = car;
-            if (!AppendChild(car->UnknownVirtualSlot27(renderContext, sltPath, colPath, lights, a4, 0, vuePath,
+            if (!AppendChild(car->Create(renderContext, sltPath, colPath, lights, a4, 0, vuePath,
                                                                  &animationTable->entries[i].position, fps,
                                                                  frontWheelsTurn, lagDistance, 1.0f, tires, 0, 0, 0),
                                        -1)) {

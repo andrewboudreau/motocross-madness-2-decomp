@@ -90,8 +90,8 @@ D3DIMSoultreeObject::~D3DIMSoultreeObject()
 }
 
 // 0x0043f4b0
-GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* path, int lights, int options,
-                                                     int useOptions)
+GameObject* D3DIMSoultreeObject::LoadModel(void* owner, const char* path, int lights, int options,
+                                           int useOptions)
 {
     GameObject::SetRenderContext(owner);
     if (useOptions) {
@@ -540,7 +540,7 @@ void D3DIMSoultreeObject::TransformVertexGroups(int lod)
         UnknownSoultreeSurface* drawn;
         if (secondModifierCount > 0) {
             for (k = 0; k < secondModifierCount; k++)
-                ((D3DIMSoultreeModifier*)secondModifierList[k])->UnknownVirtualSlot27(
+                ((D3DIMSoultreeModifier*)secondModifierList[k])->ModifyMesh(
                     this, (UnknownSoultreeMesh*)surface, (UnknownSoultreeMesh**)&drawn);
         } else {
             drawn = surface;
@@ -940,7 +940,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot4(SoultreeObject** out)
 {
     D3DIMSoultreeObject* copy = new (__FILE__, 0x7d5) D3DIMSoultreeObject(isEnabled);
     *out = copy;
-    copy->UnknownVirtualSlot9(renderContext, "", (int)lightManager, (int)textureOptions, 1);
+    copy->LoadModel(renderContext, "", (int)lightManager, (int)textureOptions, 1);
 }
 
 static inline void Raise(float& bound, float value)

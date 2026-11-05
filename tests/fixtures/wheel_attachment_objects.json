@@ -2,7 +2,7 @@
   "samples/physics/tire/Tire.cpp": {
     "sections": 82,
     "relocations": 441,
-    "sha256": "1f9d2f78b17dd1e22837d25e6a5173e8cdfad27df31d41273492475399111b08"
+    "sha256": "159d6d2421b9d4849119fb8e36cdb932d1bfafe5ea9482a44dbf44aeae5d9cfc"
   },
   "src/krusty2/vehicle/Bike.cpp": {
     "sections": 242,

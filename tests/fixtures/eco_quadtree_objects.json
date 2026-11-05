@@ -12,7 +12,7 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "aba226c5568d89ed17855bd5aee962acdc0bbeda4f10a5459f4ae77323ce51ba"
+      "sha256": "672c73c185a8930dc349e19c8a3b9d6ec44d2798bbd5ac871913b894b1e04042"
     },
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,
@@ -22,18 +22,18 @@
     "src/krusty2/broadphase/Quadtree.cpp": {
       "sections": 51,
       "relocations": 126,
-      "sha256": "f1074481256560870f6c1b5f871c055ff92121b75bf1371a24d505a1251aeca0"
+      "sha256": "05cb6f5d995e53d437a417133cc6912dcffaf04a4baa2b013391d3e53bd50c85"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
       "sections": 88,
       "relocations": 342,
-      "sha256": "840aa13e4908201b80a655780590b0f725a9484871869b85aed126b1daeae995"
+      "sha256": "5fcafa2ab6157bb83d32c21472356c8698dce10b96e8929a60a529125d68bdac"
     }
   },
   "inventory": [
     [
       "src/reconstructed/EcoSystem.cpp",
-      "?UnknownVirtualSlot1@Vegetation@@UAEIPAVUnknownEcoQuadTree@@@Z",
+      "?ComputeQuadTreeCode@Vegetation@@UAEIPAVUnknownEcoQuadTree@@@Z",
       "?ComputeCode@QuadTree@@QAEIMMMM@Z",
       108,
       20

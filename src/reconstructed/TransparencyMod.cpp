@@ -16,8 +16,8 @@ TransparencyMod::TransparencyMod(int flags)
 }
 
 // 0x005206f0
-void TransparencyMod::UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
-                                           UnknownSoultreeMesh** out)
+void TransparencyMod::ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
+                                 UnknownSoultreeMesh** out)
 {
     *out = mesh;
     if (isTransparent == appliedState) {

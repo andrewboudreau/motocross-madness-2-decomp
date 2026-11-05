@@ -14,8 +14,8 @@ public:
     explicit MorphBastardModifier(int flags);        // 0x004a3150 (ret 4)
     virtual ~MorphBastardModifier();                 // 0x004a31a0 (deleting wrapper 0x004a3180)
     // 0x004a4c60 (ret 0xc)
-    virtual void UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
-                                      UnknownSoultreeMesh** out);
+    virtual void ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
+                            UnknownSoultreeMesh** out);
 
     // 0x004a33b0 (ret 0xc): slot 8 of the base, then loads `path` with the
     // nodes of `model`.

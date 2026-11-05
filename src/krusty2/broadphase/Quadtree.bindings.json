@@ -21,7 +21,7 @@
   "?Init@QuadTree@@QAEXMMMMM@Z$ehhandler": "0x0054d328",
   "?RemoveObject@QuadTreeNode@@QAEHPAVQuadTreeObject@@@Z": "0x004dd1b0",
   "?Reset@BlockAllocator@@QAEXXZ": "0x00424110",
-  "?UnknownVirtualSlot1@QuadTree@@UAEPAVQuadTreeNode@@XZ$ehhandler": "0x0054d354",
+  "?CreateNode@QuadTree@@UAEPAVQuadTreeNode@@XZ$ehhandler": "0x0054d354",
   "?g_pQuadTree@@3PAVQuadTree@@A": "0x00689b78",
   "?g_quadTreeInvScale@@3MA": "0x00689b74",
   "__FILE__:quadtree.cpp": "0x00572040",

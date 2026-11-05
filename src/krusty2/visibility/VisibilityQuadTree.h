@@ -165,7 +165,7 @@ class VisibilityQuadTree : public QuadTree, public GameObject {
 public:
     explicit VisibilityQuadTree(int flags);   // 0x0052d340 (ret 4)
     virtual ~VisibilityQuadTree();            // deleting 0x0052d3d0, core 0x0052d3f0
-    virtual QuadTreeNode* UnknownVirtualSlot1();   // 0x0052d4b0 node factory
+    virtual QuadTreeNode* CreateNode();   // 0x0052d4b0 node factory
 
     // 0x0052d460 (ret 0x18).
     GameObject* Setup(int parentArg, float x0, float z0, float x1, float z1, float minCell);

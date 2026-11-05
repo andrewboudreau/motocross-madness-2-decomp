@@ -43,7 +43,7 @@ VisibilityQuadTreeNode::VisibilityQuadTreeNode()
 {
 }
 
-QuadTreeNode* VisibilityQuadTree::UnknownVirtualSlot1()
+QuadTreeNode* VisibilityQuadTree::CreateNode()
 {
     return new(__FILE__, 0x4f) VisibilityQuadTreeNode;
 }

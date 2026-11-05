@@ -147,8 +147,8 @@ public:
     virtual int Render3D();
     // 0x004ba4d0 (ret 0x10): returns this, or 0 (after BaseObject slot 2) when a vertex buffer
     // or the index array is missing.
-    virtual ParticleManager* UnknownVirtualSlot27(int parentArg, TextureMapManager* textures,
-                                                  const char* textureName, int field);
+    virtual ParticleManager* Create(int parentArg, TextureMapManager* textures,
+                                    const char* textureName, int field);
 
     // 0x004baa50 (thiscall, ret 0x20).  Takes the next particle from the free tail of the table
     // and fills it in; returns 0 when all 1000 are in use.

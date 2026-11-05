@@ -39,7 +39,7 @@
 // base 1634); writing every product's operands the other way round
 // changes nothing.
 //
-// MorphBastardModifier::UnknownVirtualSlot27 (0x004a4c60, 1568 bytes): blends
+// MorphBastardModifier::ModifyMesh (0x004a4c60, 1568 bytes): blends
 // the target deltas of every channel into the copied mesh. The control flow,
 // calls and the signed /32 vertex base match; register allocation of the
 // object/channel loops differs (retail keeps the object offset in esi and
@@ -245,8 +245,8 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
 }
 
 // 0x004a4c60
-void MorphBastardModifier::UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
-                                                UnknownSoultreeMesh** out)
+void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
+                                      UnknownSoultreeMesh** out)
 {
     if (((MorphBastardSoultreeView*)object)->drawUnchanged) {
         *out = mesh;

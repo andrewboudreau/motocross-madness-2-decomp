@@ -626,7 +626,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
             UnknownSoultreeSurface* drawn;
             if (modifierCount > 0) {
                 for (int i = 0; i < modifierCount; i++)
-                    ((D3DIMSoultreeModifier*)modifierList[i])->UnknownVirtualSlot27(
+                    ((D3DIMSoultreeModifier*)modifierList[i])->ModifyMesh(
                         this, (UnknownSoultreeMesh*)surface, (UnknownSoultreeMesh**)&drawn);
             } else {
                 drawn = surface;

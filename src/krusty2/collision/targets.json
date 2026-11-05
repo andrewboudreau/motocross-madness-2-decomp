@@ -982,7 +982,7 @@
   {
     "class": "QuadTreeObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot1@QuadTreeObject@@",
+    "candidate_symbol_contains": "?ComputeQuadTreeCode@QuadTreeObject@@",
     "target_va": "0x00434ce0",
     "target_size": 8,
     "expect": "exact",

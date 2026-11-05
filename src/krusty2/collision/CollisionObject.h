@@ -37,8 +37,8 @@ struct Matrix4;
 
 class QuadTreeObject {
 public:
-    virtual short UnknownVirtualSlot0();        // 0x004dc610 (`or ax, 0xffff`; Quadtree.cpp); NextObjectSorted calls it and ignores the result
-    virtual unsigned int UnknownVirtualSlot1(QuadTree* tree) { return 15; }  // 0x00434ce0 (ret 4); Vegetation overrides it with the object's quadtree code (0x00456720)
+    virtual short ComputeSortKey();        // 0x004dc610 (`or ax, 0xffff`; Quadtree.cpp); NextObjectSorted calls it and ignores the result
+    virtual unsigned int ComputeQuadTreeCode(QuadTree* tree) { return 15; }  // 0x00434ce0 (ret 4); Vegetation overrides it with the object's quadtree code (0x00456720)
 
     QuadTreeObject() { queryStamp = 0; objectTypeId = (char)0xff; }
     short queryStamp;  // +0x04 Quadtree query code (NextObject) skips an object whose short at +4 equals the query counter (field_0x6c) and otherwise stores the counter there (Quadtree.cpp lines 568/612/676); Insert zeroes it

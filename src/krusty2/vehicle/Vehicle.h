@@ -209,7 +209,7 @@ struct VehicleSparkEmitter {
     virtual void UnknownVirtualSlot18(); virtual void UnknownVirtualSlot19(); virtual void UnknownVirtualSlot20();
     virtual void UnknownVirtualSlot21(); virtual void UnknownVirtualSlot22(); virtual void UnknownVirtualSlot23();
     virtual void UnknownVirtualSlot24(); virtual void UnknownVirtualSlot25(); virtual void UnknownVirtualSlot26();
-    virtual void* UnknownVirtualSlot27(void* a, GameObject* manager);
+    virtual void* Create(void* a, GameObject* manager);
     void SetPosition(Vec3 p);        // 0x004b9dc0 (SparkParticleEmitter::SetPosition)
     char pad_0x04[0x5c];
     int burstPending;  // +0x60  SparkParticleEmitter +0x60 burstPending; Bike slot 38 and the Vehicle impact handler set it to 1 after SetPosition

@@ -224,8 +224,8 @@ public:
     // when `useOptions` is set, and `useOptions` is also the load flag
     // handed to the materials. The int types are
     // kept from the first (LightEmitter.cpp, ArcadeObject.cpp) callers.
-    virtual GameObject* UnknownVirtualSlot9(void* owner, const char* name, int lights, int options,
-                                            int useOptions);
+    virtual GameObject* LoadModel(void* owner, const char* name, int lights, int options,
+                                  int useOptions);
 
     // GameObject slots (`this` is the GameObject subobject).
     virtual void Disable();                        // 0x00444540
