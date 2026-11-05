@@ -669,7 +669,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                          ->UnknownVirtualSlot27(renderContext, g_TrackGame->textureManager,
                                                 eventScene->environment->particleTexture, lightManager);
     g_MemTagStack->Push("3DObjects");
-    if (!UnknownVirtualSlot27((int)&modelTextures))
+    if (!Create3DObjects((int)&modelTextures))
         return 0;
     g_TrackGame->mode.networkGame = eventScene->crowdPresent;
     g_MemTagStack->Push("BikeRace");

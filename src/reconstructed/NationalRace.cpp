@@ -51,10 +51,10 @@ NationalRace* NationalRace::Create(RenderTarget* target, UnknownProgressCallback
 }
 
 // 0x004aa890
-int NationalRace::UnknownVirtualSlot27(int value) {
+int NationalRace::Create3DObjects(int value) {
     char message[0x104];
 
-    if (!BaseQuarryEvent::UnknownVirtualSlot27(value))
+    if (!BaseQuarryEvent::Create3DObjects(value))
         return 0;
     runwayLights = (new (__FILE__, 53) RunwayLights(g_TrackGame->mode.visualCuesOn))
                      ->SetupLights(renderContext, (int)lightManager, value, (UnknownRunwayTerrain*)eventTerrain);

@@ -196,7 +196,7 @@ int BaseQuarryEvent::EstimateRaceBytes() {
 }
 
 // 0x004e06a0
-int BaseQuarryEvent::UnknownVirtualSlot27(int value) {
+int BaseQuarryEvent::Create3DObjects(int value) {
     char message[388];
     visualCue = (new(__FILE__, 1369) VisualCue(g_TrackGame->mode.visualCuesOn))
                      ->LoadVisualCue(renderContext, lightManager, value, eventTerrain, Vector3(0.0f, 0.0f, 0.0f),
