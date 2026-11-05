@@ -18,7 +18,7 @@ void Vehicle::UpdateMass(float extraWeight)
     suspensionMass = (suspensionWeightScale * baseWeight + extraWeight) * 0.0310558993f;   // 1/32.2
 }
 
-int Vehicle::UnknownVirtualSlot42()
+int Vehicle::CheckMotionComplete()
 {
     return crashState == 0 && motionIndex >= 0 && motionActive;
 }
@@ -51,9 +51,9 @@ int Vehicle::ClassifyGroundContact(float slideAngle)
     return anyWheelInContact && crashState == 0;
 }
 
-int Vehicle::UnknownVirtualSlot89(float frame)
+int Vehicle::SelectRiderPose(float frame)
 {
-    return UnknownVirtualSlot66();
+    return IsRiderPoseLocked();
 }
 
 void Vehicle::InitForceFeedback() { forceFeedbackGain = 0.5f; }
@@ -79,7 +79,7 @@ int Vehicle::IsReverseRequested()
     return inputMap->UnknownVirtualSlot3(0xe, 0, 0x3f, 0) != 0;
 }
 
-int Vehicle::UnknownVirtualSlot81()
+int Vehicle::IsClutchRequested()
 {
     return inputMap->UnknownVirtualSlot3(0x1d, 0, 0x3f, 0) != 0;
 }
@@ -158,7 +158,7 @@ Vec3 Vehicle::ComputeDriveTorque(const Vec3* arm, const Vec3* force)
     return r;
 }
 
-void Vehicle::UnknownVirtualSlot90(int* steps, float frame)
+void Vehicle::ClampSubStepsOnCrash(int* steps, float frame)
 {
     if (CheckCrash()) {
         *steps = 1;
@@ -166,7 +166,7 @@ void Vehicle::UnknownVirtualSlot90(int* steps, float frame)
         return;
     }
     if (*steps == 1 && stepRemainder <= 0.0001f)
-        UnknownVirtualSlot89(frame);
+        SelectRiderPose(frame);
 }
 
 // steerRate turns the steer angle to -(steerAxis * maxAngle) over the remaining steps (plus
@@ -978,11 +978,11 @@ void Vehicle::SimulateFrame(float frame)
     prevControlInput = controlInput;
     UpdateControlInput(frame);
     ComputeSteerRate(controlInput.x, GetMaxSteerAngle(), steps);
-    UnknownVirtualSlot65(frame);
+    ApplyLaunchImpulse(frame);
     pointsTouching = 0;
     respawn = ApplyPendingRespawn(frame);
     if (!respawn && !crashState && steps != 1) {
-        VehContactsA(UnknownVirtualSlot5(0), &touchingPointCount, collisionPointCount,
+        VehContactsA(ShouldRefreshContacts(0), &touchingPointCount, collisionPointCount,
                      ((VehicleContact**)collisionPoints), terrain, &centerOfMass, collisionShape,
                      collisionRadius);
         pointsTouching = touchingPointCount > 0;
@@ -1000,7 +1000,7 @@ void Vehicle::SimulateFrame(float frame)
                 UpdateMass(0.0f);
         }
         backingUp = IsReverseRequested();
-        driveDisengaged = crashState == 0 && (backingUp || UnknownVirtualSlot81());
+        driveDisengaged = crashState == 0 && (backingUp || IsClutchRequested());
         throttleOn = crashState == 0 && IsThrottleRequested();
         reinterpret_cast<UnknownEngineGearbox*>(engineState)->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
         reinterpret_cast<UnknownEngineGearbox*>(engineState)->AutoShift(throttleOn, linearSpeed);
@@ -1035,7 +1035,7 @@ void Vehicle::SimulateFrame(float frame)
         Vec3 savedOut;
         Vec3 basis = *GetPivotAndForwardAxis(&savedOut, &pivot);
         UpdateLeanFromNormal(&basis, 1, 0);
-        res = VehContactsA(crashState || (steps == 1 && UnknownVirtualSlot5(0)), &touchingPointCount,
+        res = VehContactsA(crashState || (steps == 1 && ShouldRefreshContacts(0)), &touchingPointCount,
                            collisionPointCount, ((VehicleContact**)collisionPoints), terrain,
                            &centerOfMass, collisionShape, collisionRadius);
         if (res)
@@ -1122,10 +1122,10 @@ void Vehicle::SimulateFrame(float frame)
         modelNode->SetPosition(position);
         RotateByAngularVelocity();
         if (crashState) {
-            UnknownVirtualSlot87();
+            ApplyCrashedControl();
         } else {
             if (airborne) {
-                UnknownVirtualSlot91();
+                ApplyAirControl();
             } else if (mode) {
                 if (mode == 1 || mode == 2) {
                     if (turnMagnitude >= 0.0001f || VehAbsT(slideAngle) > 0.0001f) {
@@ -1148,7 +1148,7 @@ void Vehicle::SimulateFrame(float frame)
                 if (mode == 1 || mode == 3)
                     ApplyLeanCorrection(&basis, &pivot);
             }
-            UnknownVirtualSlot90(&steps, frame);
+            ClampSubStepsOnCrash(&steps, frame);
         }
         modelNode->GetPosition(&position);
         centerNode->GetPositionIn(0, &centerOfMass);
@@ -2224,7 +2224,7 @@ Vehicle::~Vehicle()
 // SoultreePhysicsCharacter's version (0x00504210).
 int Vehicle::Tick(float dt)
 {
-    if (UnknownVirtualSlot42()) {
+    if (CheckMotionComplete()) {
         motionActive = 0;
         motionCompleted = 1;
     }

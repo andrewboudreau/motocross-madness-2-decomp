@@ -29,7 +29,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot26()
 }
 
 // slot 5 (0x004aa150): shared with Vehicle/Character, compares its argument with zero.
-int SoultreePhysicsBaseObject::UnknownVirtualSlot5(int value)
+int SoultreePhysicsBaseObject::ShouldRefreshContacts(int value)
 {
     return value == 0;
 }

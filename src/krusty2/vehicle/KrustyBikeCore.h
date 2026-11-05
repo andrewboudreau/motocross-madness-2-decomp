@@ -59,14 +59,14 @@ public:
     virtual int ResetToPlacement(const Vec3* newPosition, const Vec3* newForward, const Vec3* newUp,
                                      const Vec3* settleUp, int keepPlacement, float extraWeight);
     virtual int ApplyPendingRespawn(float dt);
-    virtual int UnknownVirtualSlot42();
+    virtual int CheckMotionComplete();
     virtual void RemoveFromRace();
     virtual float GetSpawnProtectionDuration();
     virtual void AdvancePosition();
     virtual int UnknownVirtualSlot52();
     virtual void ReadControlAxes(float dt);
     virtual void UpdateControlInput(float dt);
-    virtual int UnknownVirtualSlot66();
+    virtual int IsRiderPoseLocked();
     virtual void ClearCrashState();
     virtual int GetRespawnKey(int* out);
     virtual void ResetCrashTimer();
@@ -74,7 +74,7 @@ public:
     virtual void UpdateAirborneState(int nowAirborne);
     virtual Vec3 ComputeDriveTorque(const Vec3* arm, const Vec3* force);
     virtual int IsThrottleRequested();
-    virtual int UnknownVirtualSlot81();
+    virtual int IsClutchRequested();
     virtual int IsReverseRequested();
     virtual int IsBrakeRequested(VehicleWheel* wheel);
     virtual void UpdateWheelDriveForces();
@@ -84,7 +84,7 @@ public:
     virtual void UpdateForceFeedback();
     virtual void InitControlResponses();
     virtual int EvaluateCrash(float dt, float noseOverLimit, int impact, float impulse);
-    virtual void UnknownVirtualSlot101();
+    virtual void SwitchToBikeCollision();
     virtual void UpdateRiderPose(float dt);   // 0x0048eea0: rider/bike pose update (trick clips, head turn)
 
     // 0x00414370 (in BikeAI.cpp; called by slot 63 0x004924c0, which ignores the result):

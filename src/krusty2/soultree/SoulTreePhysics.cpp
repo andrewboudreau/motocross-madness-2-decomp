@@ -1064,7 +1064,7 @@ int SoultreePhysicsBaseObject::Tick(float dt)
     pointsTouching = 0;
     int respawn = ApplyPendingRespawn(dt);
     if (!respawn) {
-        refreshed = SoultreeRefreshContacts(UnknownVirtualSlot5(1), &touchingPointCount, collisionPointCount,
+        refreshed = SoultreeRefreshContacts(ShouldRefreshContacts(1), &touchingPointCount, collisionPointCount,
                                             collisionPoints, terrain, &centerOfMass, collisionShape,
                                             collisionRadius);
         if (refreshed)
@@ -1296,7 +1296,7 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
             sceneNode->GetPositionIn(0, &centerOfMass);
         speed = prevSpeed;
         force = weightForce;
-        res = SoultreeRefreshContacts(UnknownVirtualSlot5(0), &touchingPointCount, collisionPointCount,
+        res = SoultreeRefreshContacts(ShouldRefreshContacts(0), &touchingPointCount, collisionPointCount,
                                       collisionPoints, terrain, &centerOfMass, collisionShape,
                                       collisionRadius);
         if (res)

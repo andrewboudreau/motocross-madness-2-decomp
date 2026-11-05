@@ -161,7 +161,7 @@ class WheelAttachmentTests(unittest.TestCase):
                  '?SetLocalMatrix@SoultreeObject@@QAEXPBUMatrix4@@@Z','?Rotate@SoultreeObject@@QAEXUVec3@@M@Z'})
             strict=0
             for source,symbol,va,size,bindings in ((SOURCE,SYMBOL,0x515660,195,(ROOT/SOURCE).with_suffix('.bindings.json')),
-                (CANONICAL,'?UnknownVirtualSlot41@Bike@@',0x40cbd0,486,(ROOT/CANONICAL).with_suffix('.bindings.json')),
+                (CANONICAL,'?EndMotion@Bike@@',0x40cbd0,486,(ROOT/CANONICAL).with_suffix('.bindings.json')),
                 ('src/krusty2/vehicle/Vehicle.cpp','?AddWheel@Vehicle@@',0x525d30,160,ROOT/'src/krusty2/vehicle/Vehicle.bindings.json'),
                 (POSITION,'?SetPositionVec3@SoultreeObject@@',0x4fc630,38,(ROOT/POSITION).with_suffix('.bindings.json'))):
                 result=compare(pe,objects[source],symbol,va,size,bindings);self.assertTrue(result['strict_exact'],result);strict+=1

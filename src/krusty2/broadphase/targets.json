@@ -172,7 +172,7 @@
   {
     "class": "QuadTreeNode",
     "source": "Quadtree.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot2@QuadTreeNode",
+    "candidate_symbol_contains": "?GatherNodesBackToFront@QuadTreeNode",
     "target_va": "0x004dd7a0",
     "target_size": 740,
     "expect": "exact",
@@ -182,7 +182,7 @@
   {
     "class": "QuadTreeNode",
     "source": "Quadtree.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot1@QuadTreeNode@@",
+    "candidate_symbol_contains": "?AppendItemsBackToFront@QuadTreeNode@@",
     "target_va": "0x004ddab0",
     "target_size": 551,
     "expect": "exact",

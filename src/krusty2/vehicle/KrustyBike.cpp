@@ -77,7 +77,7 @@ void KrustyBike::UnknownVirtualSlot27()
     } else {
         wrecker->StartAnimatedWreck(crashDirection);
     }
-    UnknownVirtualSlot101();
+    SwitchToBikeCollision();
 }
 
 void KrustyBike::ResetDynamicState(float extraWeight)
@@ -198,7 +198,7 @@ int KrustyBike::ApplyPendingRespawn(float dt)
     return Bike::ApplyPendingRespawn(dt);
 }
 
-int KrustyBike::UnknownVirtualSlot42()
+int KrustyBike::CheckMotionComplete()
 {
     if (!crashState && motionIndex >= 0 && motionActive && riderCharacter->c_0xc) {
         float sum = trickHoldTime + trickClipTime;
@@ -255,7 +255,7 @@ void KrustyBike::UpdateControlInput(float dt)
     Bike::UpdateControlInput(dt);
 }
 
-int KrustyBike::UnknownVirtualSlot66()
+int KrustyBike::IsRiderPoseLocked()
 {
     if (crashState || motionActive)
         return 1;
@@ -309,7 +309,7 @@ int KrustyBike::IsThrottleRequested()
     return 0;
 }
 
-int KrustyBike::UnknownVirtualSlot81()
+int KrustyBike::IsClutchRequested()
 {
     if (!aiKind && !isRemote && !isGhost && QueryControlInput(12, 0x3f)) {
         if (!UnknownVirtualSlot77(!driveDisengaged))
@@ -936,19 +936,19 @@ void KrustyBike::SimulateFrame(float dt)
             }
             if (finishPosition == 1) {
                 if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType) {
-                    UnknownVirtualSlot41();
+                    EndMotion();
                     motionCompleted = 0;
                     reinterpret_cast<Character*>(riderCharacter)->SetMotion(reinterpret_cast<Motion*>(riderPoseHandles[15]));
                     ((KbA5C4*)riderCharacter)->field_0x10 = 0;
                     hasFinished = 3;
                 } else {
                     hasFinished = 3;
-                    UnknownVirtualSlot41();
+                    EndMotion();
                     motionCompleted = 0;
                 }
             } else {
                 hasFinished = 3;
-                UnknownVirtualSlot41();
+                EndMotion();
                 motionCompleted = 0;
             }
         }
@@ -1069,7 +1069,7 @@ void KrustyBike::IntegrateMotion(Vec3* force, const Vec3* localTorque, const Vec
 
 // 0x00496d10 (exact): slot 101 forwards to the body below; VC6 compiles the call as a tail
 // `jmp 0x496d20`, followed by the usual nop alignment padding.
-void KrustyBike::UnknownVirtualSlot101()
+void KrustyBike::SwitchToBikeCollision()
 {
     Fn_00496D20();
 }
@@ -1258,7 +1258,7 @@ void KrustyBike::Fn_00496E30(int protect)
 // characters (rider and bike body) to the idx-th handle of the animSetA/animSetB tables.
 void KrustyBike::Fn_0048D910(int idx)
 {
-    UnknownVirtualSlot41();
+    EndMotion();
     motionActive = 1;
     motionCompleted = 0;
     motionJustStarted = 1;
@@ -1396,7 +1396,7 @@ void KrustyBike::Fn_0048E280()
         angle = -angle;
     if (angle <= 0.698f)
         return;
-    UnknownVirtualSlot41();
+    EndMotion();
     motionCompleted = 0;
     motionActive = 1;
     motionJustStarted = 1;

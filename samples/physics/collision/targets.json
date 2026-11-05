@@ -32,7 +32,7 @@
   {
     "class": "SoultreePhysicsCharacter",
     "source": "SoultreePhysicsCharacter.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot41@SoultreePhysicsCharacter",
+    "candidate_symbol_contains": "EndMotion@SoultreePhysicsCharacter",
     "target_va": "0x00504360",
     "target_size": 262,
     "expect": "exact",
@@ -42,7 +42,7 @@
   {
     "class": "SoultreePhysicsCharacter",
     "source": "SoultreePhysicsCharacter.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot42@SoultreePhysicsCharacter",
+    "candidate_symbol_contains": "CheckMotionComplete@SoultreePhysicsCharacter",
     "target_va": "0x00504470",
     "target_size": 29,
     "expect": "exact",

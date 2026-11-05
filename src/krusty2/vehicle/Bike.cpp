@@ -24,26 +24,26 @@ float Bike::EffectiveLoadWeight()
     return loadWeight;
 }
 
-float Bike::UnknownVirtualSlot47(float)
+float Bike::GetDriveShareScale(float)
 {
     return 1.05f - controlInput.y * 0.25f;
 }
 
-int Bike::UnknownVirtualSlot98()
+int Bike::IsWrecking()
 {
     if (crashState && wrecker->wreckState)
         return 1;
     return 0;
 }
 
-int Bike::UnknownVirtualSlot42()
+int Bike::CheckMotionComplete()
 {
     if (crashState == 0 && motionIndex >= 0 && motionActive && riderCharacter->c_0xc)
         return 1;
     return 0;
 }
 
-int Bike::UnknownVirtualSlot66()
+int Bike::IsRiderPoseLocked()
 {
     if (crashState || motionActive)
         return 1;
@@ -289,7 +289,7 @@ static inline float BikeAbsRef(const float& x)
     return r;
 }
 
-int Bike::UnknownVirtualSlot5(int value)
+int Bike::ShouldRefreshContacts(int value)
 {
     if (value)
         return BikeAbsRef(savedRoll) > 0.2618f;
@@ -388,13 +388,13 @@ float Bike::GetTurnRadius(const Vec3* point, const Vec3* dir)
     return radius * alignment;
 }
 
-void Bike::UnknownVirtualSlot90(int* steps, float frame)
+void Bike::ClampSubStepsOnCrash(int* steps, float frame)
 {
     if (UpdateCrashState(stepTime, 0, 0)) {
         *steps = 1;
         stepRemainder = 0.0f;
     } else if (*steps == 1 && stepRemainder <= 0.0001f) {
-        UnknownVirtualSlot89(frame);
+        SelectRiderPose(frame);
     }
 }
 
@@ -929,7 +929,7 @@ int Bike::UpdateCrashState(float dt, int impact, float impulse)
         crashedUpsideDown = neg;
         slot27Pending = 1;
         ResetCrashTimer();
-        UnknownVirtualSlot41();
+        EndMotion();
         motionCompleted = 0;
     }
     return crashState;
@@ -1003,7 +1003,7 @@ int Bike::ApplyPendingRespawn(float dt)
     return 0;
 }
 
-void Bike::UnknownVirtualSlot65(float arg)
+void Bike::ApplyLaunchImpulse(float arg)
 {
     if (smoothedVerticalAccel <= 5.0f || arg == 0.0f)
         return;
@@ -1091,7 +1091,7 @@ void Bike::SaveBodyOrientation(int)
     }
 }
 
-void Bike::UnknownVirtualSlot41()
+void Bike::EndMotion()
 {
     if (crossoverPose == 0 && motionActive == 0)
         return;
@@ -1622,7 +1622,7 @@ void Bike::DistributeContactForce(const Vec3* force)
 // Slot 91: per-step drive/lateral force.  Builds a force from throttle and
 // wheel state, turns the velocity toward the heading, applies the force
 // through the transform, then decays the accumulated lean terms.
-void Bike::UnknownVirtualSlot91()
+void Bike::ApplyAirControl()
 {
     float dt = stepTime * 0.83f;
     float leanForce = controlResponse[1] * controlInput.y * dt;
@@ -2106,9 +2106,9 @@ static inline float BikeRange(float x, float lo, float hi)
     return BikeAtMost(BikeAtLeast(x, lo), hi);
 }
 
-int Bike::UnknownVirtualSlot89(float t)
+int Bike::SelectRiderPose(float t)
 {
-    int result = UnknownVirtualSlot66();
+    int result = IsRiderPoseLocked();
     if (result)
         return result;
 
@@ -2138,7 +2138,7 @@ int Bike::UnknownVirtualSlot89(float t)
         }
         crossoverPose = 1;
     } else {
-        UnknownVirtualSlot41();
+        EndMotion();
         if (!airborne && lean > leanPoseMax) {
             poseBlend = 1.0f;
             poseIndex = 10;

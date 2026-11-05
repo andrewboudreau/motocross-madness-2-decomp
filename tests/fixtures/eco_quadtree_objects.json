@@ -22,12 +22,12 @@
     "src/krusty2/broadphase/Quadtree.cpp": {
       "sections": 51,
       "relocations": 126,
-      "sha256": "05cb6f5d995e53d437a417133cc6912dcffaf04a4baa2b013391d3e53bd50c85"
+      "sha256": "064052b332cd10e6dde69ae798a49fed5468a9f866404a083cf2ce72d8414b48"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
       "sections": 88,
       "relocations": 342,
-      "sha256": "5fcafa2ab6157bb83d32c21472356c8698dce10b96e8929a60a529125d68bdac"
+      "sha256": "4f278a23db3e7f5ecf053dcc0e2aece9074dea2b67e7c79a4e5d8dd347331d1b"
     }
   },
   "inventory": [

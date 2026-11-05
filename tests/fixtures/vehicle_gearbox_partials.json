@@ -21,12 +21,12 @@
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",
-      "UnknownVirtualSlot89@Bike",
+      "SelectRiderPose@Bike",
       4221664,
       2396,
       2120,
       115,
-      "ef3a7613603e70027975de63eaab474792a8807b356a4ccf51b5c411b06b0d22"
+      "b3a88ed532407207eb8eb3b9b3dc62a9cf7ff32c05bb6896fa38d5fbed9a9c14"
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",

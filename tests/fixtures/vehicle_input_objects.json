@@ -3,22 +3,22 @@
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "48c7c975b681983b2e0c495cfec1472c3297eb40ae5e5c91f191cbe083ca660a"
+      "sha256": "de4f91010ea125ebf89fd3935d32231e7f37581527b7af14ed82460fd0f192e4"
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
       "relocations": 1089,
-      "sha256": "f3cf8769621ba739974ffe8f6318ab1c3eae50cfb0204f21071e2d490eb0f55c"
+      "sha256": "8dd27f7bf55a5867aaa0273de241511fe6f2dc1e552cf39fb4a2af1a7e368d19"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
       "relocations": 1054,
-      "sha256": "9b683ab71007d654a1c30de69f52ddb1f968e7795886674c50d4f13849586d4f"
+      "sha256": "316e89cad2d741478a9b6981582aebfdc3242f748ac76f2daea757efdb61639b"
     },
     "src/reconstructed/VehicleDefaults.cpp": {
       "sections": 13,
       "relocations": 20,
-      "sha256": "2b7e3cc62027cd0ff10bdd6ae545f8b44ea69fa6e6bb28716947f12d6fabef58"
+      "sha256": "085a6bb57bca057822ba711fa8872654e1d64a6aafc9103c8ae07b117ec1fb8d"
     },
     "src/reconstructed/VehicleMethods.cpp": {
       "sections": 27,
@@ -43,7 +43,7 @@
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 271,
       "relocations": 1443,
-      "sha256": "02081a688f510b1c279b511cd05f6590af13c602397575eebf5e61d758e9b0df"
+      "sha256": "b9e71070cc66d3900d49cd69db68618f4ec5c660358d9fa743d5eec4a6916def"
     },
     "src/reconstructed/InputDevice.cpp": {
       "sections": 11,
@@ -82,7 +82,7 @@
     },
     {
       "source": "src/reconstructed/VehicleDefaults.cpp",
-      "symbol": "?UnknownVirtualSlot87@Vehicle@@UAEXXZ",
+      "symbol": "?ApplyCrashedControl@Vehicle@@UAEXXZ",
       "va": "0x464e90",
       "extent": 1,
       "bindings": "src/reconstructed/VehicleDefaults.bindings.json"
@@ -250,14 +250,14 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot90@Bike",
+      "symbol": "ClampSubStepsOnCrash@Bike",
       "va": "0x40ae50",
       "extent": 99,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot91@Bike",
+      "symbol": "ApplyAirControl@Bike",
       "va": "0x40aec0",
       "extent": 1353,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -292,7 +292,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot65@Bike",
+      "symbol": "ApplyLaunchImpulse@Bike",
       "va": "0x40c5d0",
       "extent": 307,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -334,28 +334,28 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot47@Bike",
+      "symbol": "GetDriveShareScale@Bike",
       "va": "0x40cbb0",
       "extent": 21,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot41@Bike",
+      "symbol": "EndMotion@Bike",
       "va": "0x40cbd0",
       "extent": 486,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot98@Bike",
+      "symbol": "IsWrecking@Bike",
       "va": "0x40cdc0",
       "extent": 32,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot42@Bike",
+      "symbol": "CheckMotionComplete@Bike",
       "va": "0x40cde0",
       "extent": 52,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -376,14 +376,14 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot5@Bike",
+      "symbol": "ShouldRefreshContacts@Bike",
       "va": "0x40cf60",
       "extent": 103,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot66@Bike",
+      "symbol": "IsRiderPoseLocked@Bike",
       "va": "0x40cfd0",
       "extent": 29,
       "bindings": "src/krusty2/vehicle/Bike.bindings.json"
@@ -530,7 +530,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot89@Vehicle",
+      "symbol": "SelectRiderPose@Vehicle",
       "va": "0x5276c0",
       "extent": 11,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -677,7 +677,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot81@Vehicle",
+      "symbol": "IsClutchRequested@Vehicle",
       "va": "0x5290d0",
       "extent": 26,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -775,7 +775,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot90@Vehicle",
+      "symbol": "ClampSubStepsOnCrash@Vehicle",
       "va": "0x529d60",
       "extent": 83,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -880,7 +880,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
-      "symbol": "UnknownVirtualSlot42@Vehicle",
+      "symbol": "CheckMotionComplete@Vehicle",
       "va": "0x52b710",
       "extent": 39,
       "bindings": "src/krusty2/vehicle/Vehicle.bindings.json"
@@ -1104,7 +1104,7 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot81@KrustyBike",
+      "symbol": "IsClutchRequested@KrustyBike",
       "va": "0x4923d0",
       "extent": 88,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1153,7 +1153,7 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot42@KrustyBike",
+      "symbol": "CheckMotionComplete@KrustyBike",
       "va": "0x495820",
       "extent": 164,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1188,7 +1188,7 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "UnknownVirtualSlot66@KrustyBike",
+      "symbol": "IsRiderPoseLocked@KrustyBike",
       "va": "0x495a70",
       "extent": 44,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1538,7 +1538,7 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "?UnknownVirtualSlot101@KrustyBike@@",
+      "symbol": "?SwitchToBikeCollision@KrustyBike@@",
       "va": "0x496d10",
       "extent": 5,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1703,7 +1703,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "UnknownVirtualSlot89@Bike",
+      "symbol": "SelectRiderPose@Bike",
       "va": "0x406ae0",
       "extent": 2396,
       "candidate": 2120,

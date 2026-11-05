@@ -1667,7 +1667,7 @@ int KrustyBike::Fn_00413200(float dt)
         throttleOn = crashState == 0 && IsThrottleRequested() && race->isRacing;
     else
         throttleOn = 0;
-    driveDisengaged = crashState == 0 && UnknownVirtualSlot81();
+    driveDisengaged = crashState == 0 && IsClutchRequested();
     reinterpret_cast<UnknownEngineGearbox*>(engineState)->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
     reinterpret_cast<UnknownEngineGearbox*>(engineState)->AutoShift(throttleOn, linearSpeed);
     if (hit) {
@@ -1835,11 +1835,11 @@ int KrustyBike::Fn_00413200(float dt)
     if (airborneOut)
         landingLatched = 0;
     if (crashState) {
-        UnknownVirtualSlot87();
+        ApplyCrashedControl();
     } else {
         if (airborneOut)
-            UnknownVirtualSlot91();
-        UnknownVirtualSlot90(&steps, dt);
+            ApplyAirControl();
+        ClampSubStepsOnCrash(&steps, dt);
     }
     ResolveSubstepCollisions(steps);
 
@@ -1853,7 +1853,7 @@ int KrustyBike::Fn_00413200(float dt)
         crashState = 1;
         crashDirection = 1;
         crashReason = 4;
-        UnknownVirtualSlot41();
+        EndMotion();
         crashHeading = Vec3(savedForward.x, 0.0f, savedForward.z);
         motionCompleted = 0;
         motionIndex = 0;

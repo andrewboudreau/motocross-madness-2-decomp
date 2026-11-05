@@ -702,7 +702,7 @@ int QuadTree::IsValidCode(unsigned int code)
 // (nodeX or nodeX+size, nodeZ or nodeZ+size): index = 2 * xBit + zBit (same as Insert).
 // The child that contains the point is visited last (tier 2, decoded from the four
 // unrolled orders 0-1-2-3 / 1-0-3-2 / 2-3-0-1 / 3-2-1-0).
-void QuadTreeNode::UnknownVirtualSlot1(int x0, int z0, int nodeX, int nodeZ, int size)
+void QuadTreeNode::AppendItemsBackToFront(int x0, int z0, int nodeX, int nodeZ, int size)
 {
     int midX = nodeX + size;
     int midZ = nodeZ + size;
@@ -710,33 +710,33 @@ void QuadTreeNode::UnknownVirtualSlot1(int x0, int z0, int nodeX, int nodeZ, int
     if (children) {
         if (x0 >= midX) {
             if (z0 >= midZ) {
-                if (children[0]) children[0]->UnknownVirtualSlot1(x0, z0, nodeX, nodeZ, size);
-                if (children[1]) children[1]->UnknownVirtualSlot1(x0, z0, nodeX, midZ, size);
-                if (children[2]) children[2]->UnknownVirtualSlot1(x0, z0, midX, nodeZ, size);
-                if (children[3]) children[3]->UnknownVirtualSlot1(x0, z0, midX, midZ, size);
+                if (children[0]) children[0]->AppendItemsBackToFront(x0, z0, nodeX, nodeZ, size);
+                if (children[1]) children[1]->AppendItemsBackToFront(x0, z0, nodeX, midZ, size);
+                if (children[2]) children[2]->AppendItemsBackToFront(x0, z0, midX, nodeZ, size);
+                if (children[3]) children[3]->AppendItemsBackToFront(x0, z0, midX, midZ, size);
             } else {
-                if (children[1]) children[1]->UnknownVirtualSlot1(x0, z0, nodeX, midZ, size);
-                if (children[0]) children[0]->UnknownVirtualSlot1(x0, z0, nodeX, nodeZ, size);
-                if (children[3]) children[3]->UnknownVirtualSlot1(x0, z0, midX, midZ, size);
-                if (children[2]) children[2]->UnknownVirtualSlot1(x0, z0, midX, nodeZ, size);
+                if (children[1]) children[1]->AppendItemsBackToFront(x0, z0, nodeX, midZ, size);
+                if (children[0]) children[0]->AppendItemsBackToFront(x0, z0, nodeX, nodeZ, size);
+                if (children[3]) children[3]->AppendItemsBackToFront(x0, z0, midX, midZ, size);
+                if (children[2]) children[2]->AppendItemsBackToFront(x0, z0, midX, nodeZ, size);
             }
         } else if (z0 >= midZ) {
-            if (children[2]) children[2]->UnknownVirtualSlot1(x0, z0, midX, nodeZ, size);
-            if (children[3]) children[3]->UnknownVirtualSlot1(x0, z0, midX, midZ, size);
-            if (children[0]) children[0]->UnknownVirtualSlot1(x0, z0, nodeX, nodeZ, size);
-            if (children[1]) children[1]->UnknownVirtualSlot1(x0, z0, nodeX, midZ, size);
+            if (children[2]) children[2]->AppendItemsBackToFront(x0, z0, midX, nodeZ, size);
+            if (children[3]) children[3]->AppendItemsBackToFront(x0, z0, midX, midZ, size);
+            if (children[0]) children[0]->AppendItemsBackToFront(x0, z0, nodeX, nodeZ, size);
+            if (children[1]) children[1]->AppendItemsBackToFront(x0, z0, nodeX, midZ, size);
         } else {
-            if (children[3]) children[3]->UnknownVirtualSlot1(x0, z0, midX, midZ, size);
-            if (children[2]) children[2]->UnknownVirtualSlot1(x0, z0, midX, nodeZ, size);
-            if (children[1]) children[1]->UnknownVirtualSlot1(x0, z0, nodeX, midZ, size);
-            if (children[0]) children[0]->UnknownVirtualSlot1(x0, z0, nodeX, nodeZ, size);
+            if (children[3]) children[3]->AppendItemsBackToFront(x0, z0, midX, midZ, size);
+            if (children[2]) children[2]->AppendItemsBackToFront(x0, z0, midX, nodeZ, size);
+            if (children[1]) children[1]->AppendItemsBackToFront(x0, z0, nodeX, midZ, size);
+            if (children[0]) children[0]->AppendItemsBackToFront(x0, z0, nodeX, nodeZ, size);
         }
     }
     g_pQuadTree->CollectItems(itemList);
 }
 
-QuadTreeResultLink* QuadTreeNode::UnknownVirtualSlot2(int x0, int z0, QuadTreeResultLink* tail,
-                                                      int nodeX, int nodeZ, int size)
+QuadTreeResultLink* QuadTreeNode::GatherNodesBackToFront(int x0, int z0, QuadTreeResultLink* tail,
+                                                         int nodeX, int nodeZ, int size)
 {
     int midX = nodeX + size;
     int midZ = nodeZ + size;
@@ -744,26 +744,26 @@ QuadTreeResultLink* QuadTreeNode::UnknownVirtualSlot2(int x0, int z0, QuadTreeRe
     if (children) {
         if (x0 >= midX) {
             if (z0 >= midZ) {
-                if (children[0]) tail = children[0]->UnknownVirtualSlot2(x0, z0, tail, nodeX, nodeZ, size);
-                if (children[1]) tail = children[1]->UnknownVirtualSlot2(x0, z0, tail, nodeX, midZ, size);
-                if (children[2]) tail = children[2]->UnknownVirtualSlot2(x0, z0, tail, midX, nodeZ, size);
-                if (children[3]) tail = children[3]->UnknownVirtualSlot2(x0, z0, tail, midX, midZ, size);
+                if (children[0]) tail = children[0]->GatherNodesBackToFront(x0, z0, tail, nodeX, nodeZ, size);
+                if (children[1]) tail = children[1]->GatherNodesBackToFront(x0, z0, tail, nodeX, midZ, size);
+                if (children[2]) tail = children[2]->GatherNodesBackToFront(x0, z0, tail, midX, nodeZ, size);
+                if (children[3]) tail = children[3]->GatherNodesBackToFront(x0, z0, tail, midX, midZ, size);
             } else {
-                if (children[1]) tail = children[1]->UnknownVirtualSlot2(x0, z0, tail, nodeX, midZ, size);
-                if (children[0]) tail = children[0]->UnknownVirtualSlot2(x0, z0, tail, nodeX, nodeZ, size);
-                if (children[3]) tail = children[3]->UnknownVirtualSlot2(x0, z0, tail, midX, midZ, size);
-                if (children[2]) tail = children[2]->UnknownVirtualSlot2(x0, z0, tail, midX, nodeZ, size);
+                if (children[1]) tail = children[1]->GatherNodesBackToFront(x0, z0, tail, nodeX, midZ, size);
+                if (children[0]) tail = children[0]->GatherNodesBackToFront(x0, z0, tail, nodeX, nodeZ, size);
+                if (children[3]) tail = children[3]->GatherNodesBackToFront(x0, z0, tail, midX, midZ, size);
+                if (children[2]) tail = children[2]->GatherNodesBackToFront(x0, z0, tail, midX, nodeZ, size);
             }
         } else if (z0 >= midZ) {
-            if (children[2]) tail = children[2]->UnknownVirtualSlot2(x0, z0, tail, midX, nodeZ, size);
-            if (children[3]) tail = children[3]->UnknownVirtualSlot2(x0, z0, tail, midX, midZ, size);
-            if (children[0]) tail = children[0]->UnknownVirtualSlot2(x0, z0, tail, nodeX, nodeZ, size);
-            if (children[1]) tail = children[1]->UnknownVirtualSlot2(x0, z0, tail, nodeX, midZ, size);
+            if (children[2]) tail = children[2]->GatherNodesBackToFront(x0, z0, tail, midX, nodeZ, size);
+            if (children[3]) tail = children[3]->GatherNodesBackToFront(x0, z0, tail, midX, midZ, size);
+            if (children[0]) tail = children[0]->GatherNodesBackToFront(x0, z0, tail, nodeX, nodeZ, size);
+            if (children[1]) tail = children[1]->GatherNodesBackToFront(x0, z0, tail, nodeX, midZ, size);
         } else {
-            if (children[3]) tail = children[3]->UnknownVirtualSlot2(x0, z0, tail, midX, midZ, size);
-            if (children[2]) tail = children[2]->UnknownVirtualSlot2(x0, z0, tail, midX, nodeZ, size);
-            if (children[1]) tail = children[1]->UnknownVirtualSlot2(x0, z0, tail, nodeX, midZ, size);
-            if (children[0]) tail = children[0]->UnknownVirtualSlot2(x0, z0, tail, nodeX, nodeZ, size);
+            if (children[3]) tail = children[3]->GatherNodesBackToFront(x0, z0, tail, midX, midZ, size);
+            if (children[2]) tail = children[2]->GatherNodesBackToFront(x0, z0, tail, midX, nodeZ, size);
+            if (children[1]) tail = children[1]->GatherNodesBackToFront(x0, z0, tail, nodeX, midZ, size);
+            if (children[0]) tail = children[0]->GatherNodesBackToFront(x0, z0, tail, nodeX, nodeZ, size);
         }
     }
     if (itemList) {

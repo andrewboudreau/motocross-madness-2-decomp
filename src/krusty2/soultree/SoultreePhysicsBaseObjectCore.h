@@ -104,7 +104,9 @@ public:
                                      const Vec3* velB, const Vec3* worldAngVelB,
                                      const Vec3* armB, Vec3* invInertiaB, Vec3* angVelB,
                                      int velBOrNull, float* impulseOut, float scale);
-    virtual int UnknownVirtualSlot5(int value);
+    // provisional name: the result is the enabled argument of the contact refresh in
+    // SoulTreePhysics.cpp; the base returns value == 0, Bike adds a roll/pitch limit.
+    virtual int ShouldRefreshContacts(int value);
     virtual void ApplyDrag(Vec3* force, float* speedBudget);
     virtual void DistributeContactForce(const Vec3* force);  // only read (0x005019e0, tier 2)
     virtual void UpdateLocalCenterOfMass();

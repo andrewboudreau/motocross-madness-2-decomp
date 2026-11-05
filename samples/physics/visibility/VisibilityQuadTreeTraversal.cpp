@@ -20,7 +20,7 @@ __forceinline QuadTreeResultLink* VisibilityQuadTreeNode::VisitChild(
     int childX = (i & 2) ? midX : nodeX;
     int childZ = (i & 1) ? midZ : nodeZ;
     if (*cornersInside == 8)
-        return children[i]->UnknownVirtualSlot2(x, z, tail, childX, childZ, half);
+        return children[i]->GatherNodesBackToFront(x, z, tail, childX, childZ, half);
     VisibilityQuadTreeNode* child = (VisibilityQuadTreeNode*)children[i];
     return child->Traverse(x, z, tail, childX, childZ, half, camera);
 }

@@ -222,7 +222,7 @@
   {
     "class": "PhysicsBody",
     "source": "PhysicsRigidBody.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot35@PhysicsBody@@",
+    "candidate_symbol_contains": "?SyncActiveWithEnabled@PhysicsBody@@",
     "target_va": "0x004cc110",
     "target_size": 15,
     "expect": "exact",

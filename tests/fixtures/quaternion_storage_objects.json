@@ -9,7 +9,7 @@
     "samples/physics/rigidbody/PhysicsRigidBody.cpp": {
       "sections": 49,
       "relocations": 142,
-      "sha256": "8712eaf127712757a4f7f6d8bb55b416a74e4091b4caa538aeb59c436e51ead5"
+      "sha256": "2144d8b994fe24cd037384ee55b37499090381b71aed45882fdc84b268fedf63"
     },
     "src/reconstructed/Math3D.cpp": {
       "sections": 19,

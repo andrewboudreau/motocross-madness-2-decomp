@@ -17,12 +17,12 @@ int Vehicle::Method_00478FE0()
 }
 
 // Slot 65 is the shared empty stub 0x00464e80 (`ret 4`).
-void Vehicle::UnknownVirtualSlot65(float)
+void Vehicle::ApplyLaunchImpulse(float)
 {
 }
 
 // Slot 91 is the shared empty stub 0x00464e90 (`ret`).
-void Vehicle::UnknownVirtualSlot91()
+void Vehicle::ApplyAirControl()
 {
 }
 

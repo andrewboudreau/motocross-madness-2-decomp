@@ -20,14 +20,14 @@ TABLES = {
     'KrustyBike': ((0x554548, 0), (0x554514, 540), (0x5544a4, 5644)),
 }
 ENTRIES = {
-    'Vehicle': {87: ('?UnknownVirtualSlot87@Vehicle@@UAEXXZ', 0x464e90),
+    'Vehicle': {87: ('?ApplyCrashedControl@Vehicle@@UAEXXZ', 0x464e90),
                 94: ('?UpdateForceFeedback@Vehicle@@UAEXXZ', 0x464e90)},
-    'Bike': {87: ('?UnknownVirtualSlot87@Vehicle@@UAEXXZ', 0x464e90),
+    'Bike': {87: ('?ApplyCrashedControl@Vehicle@@UAEXXZ', 0x464e90),
              94: ('?UpdateForceFeedback@Vehicle@@UAEXXZ', 0x464e90),
              101: ('__purecall', 0x534cfe)},
-    'KrustyBike': {87: ('?UnknownVirtualSlot87@Vehicle@@UAEXXZ', 0x464e90),
+    'KrustyBike': {87: ('?ApplyCrashedControl@Vehicle@@UAEXXZ', 0x464e90),
                    94: ('?UpdateForceFeedback@KrustyBike@@UAEXXZ', 0x4963f0),
-                   101: ('?UnknownVirtualSlot101@KrustyBike@@UAEXXZ', 0x496d10)},
+                   101: ('?SwitchToBikeCollision@KrustyBike@@UAEXXZ', 0x496d10)},
 }
 
 
@@ -80,8 +80,8 @@ class VehicleDefaultSlotsTests(unittest.TestCase):
                         for slot, (symbol, _) in ENTRIES[name].items():
                             self.assertEqual(relocs[entry.value + 4 * slot].name, symbol, (name, slot))
                 self.assertEqual(actual_offsets, {offset for _, offset in tables})
-                self.assertFalse(any('UnknownVirtualSlot101@Bike@@' in s.name for s in obj.symbols))
-            for method in ('UnknownVirtualSlot87', 'UpdateForceFeedback'):
+                self.assertFalse(any('SwitchToBikeCollision@Bike@@' in s.name for s in obj.symbols))
+            for method in ('ApplyCrashedControl', 'UpdateForceFeedback'):
                 self.assertTrue(compare(retail, objects['VehicleDefaults'],
                     '?%s@Vehicle@@UAEXXZ' % method, 0x464e90, 1,
                     ROOT / 'src/reconstructed/VehicleDefaults.bindings.json')['strict_exact'])

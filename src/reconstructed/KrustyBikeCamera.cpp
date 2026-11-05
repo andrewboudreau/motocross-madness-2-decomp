@@ -197,7 +197,7 @@ Vector3 KrustyBikeCamera::SelectFollowPoint(int a, bool flag, float dt) {
     } else if (raceView->replayPaused || raceView->replayStepFrame) {
         result = targetPoint;
     } else if (flag) {
-        result = UnknownVirtualSlot35(a, dt);
+        result = ComputeLookAheadPoint(a, dt);
     } else {
         result = GetTargetPoint();
     }

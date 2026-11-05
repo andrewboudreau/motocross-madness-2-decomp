@@ -3,7 +3,7 @@
 // method identity. This grouping does not establish original TU ownership.
 #include "../krusty2/vehicle/Vehicle.h"
 
-void Vehicle::UnknownVirtualSlot87() {
+void Vehicle::ApplyCrashedControl() {
 }
 
 void Vehicle::UpdateForceFeedback() {

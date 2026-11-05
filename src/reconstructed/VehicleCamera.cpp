@@ -163,7 +163,7 @@ Vector3 VehicleCamera::GetLeadTargetPoint(float dt) {
 }
 
 // 0x0052bfa0: preset; distance 17 in vehicle mode, else 60.
-void VehicleCamera::UnknownVirtualSlot67() {
+void VehicleCamera::ApplyReverseViewPreset() {
     followPitch = 0.75f;
     followYaw = 3.1415927f;
     followDistance = vehicleMode ? 17.0f : 60.0f;
@@ -316,7 +316,7 @@ static inline float ClimbScale(float y, float length, float value) {
 // range takes x with `fld st(0)` (docs/VC6_PATTERN_CORPUS.md section 6,
 // rules 5 and 6). The squared length is written `(x*x) + y*y + z*z` and
 // `a` is tested as a byte, as retail does.
-Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
+Vector3 VehicleCamera::ComputeLookAheadPoint(unsigned char a, float dt) {
     float distance;
     float offset;
     if (cameraState != 3) {
@@ -479,6 +479,6 @@ float VehicleCamera::GetRoll() {
 }
 
 // 0x0052d010
-bool VehicleCamera::UnknownVirtualSlot75() {
-    return FollowCamera::UnknownVirtualSlot75() || UnknownInlineIdle();
+bool VehicleCamera::ShouldFollowSubject() {
+    return FollowCamera::ShouldFollowSubject() || UnknownInlineIdle();
 }

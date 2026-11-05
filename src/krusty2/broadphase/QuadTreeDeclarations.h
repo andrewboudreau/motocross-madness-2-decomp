@@ -20,12 +20,15 @@ struct QuadTreeResultLink {
 class QuadTreeNode {
 public:
     virtual ~QuadTreeNode();                                     // 0x004dd0a0 -> core 0x004dd0c0
-    // Slots 1/2 (also overridden by VisibilityQuadTreeNode, vtable_overrides.json) walk the
+    // Slots 1/2 (VisibilityQuadTreeNode's vtable 0x00558e08 keeps both entries) walk the
     // node's four children back to front relative to the point (x0, z0); the child order is
     // decoded in the .cpp (tier 2).  Arguments: query point, node origin, node half size.
-    virtual void UnknownVirtualSlot1(int x0, int z0, int nodeX, int nodeZ, int size);   // 0x004ddab0 (ret 0x14)
-    virtual QuadTreeResultLink* UnknownVirtualSlot2(int x0, int z0, QuadTreeResultLink* tail,
-                                                    int nodeX, int nodeZ, int size);    // 0x004dd7a0 (ret 0x18)
+    // Provisional names: slot 1 hands each node's item list to QuadTree::CollectItems,
+    // slot 2 links every node that holds items into the result list (VisibilityQuadTreeNode's
+    // Traverse calls it for fully visible children).
+    virtual void AppendItemsBackToFront(int x0, int z0, int nodeX, int nodeZ, int size);   // 0x004ddab0 (ret 0x14)
+    virtual QuadTreeResultLink* GatherNodesBackToFront(int x0, int z0, QuadTreeResultLink* tail,
+                                                       int nodeX, int nodeZ, int size);    // 0x004dd7a0 (ret 0x18)
 
     QuadTreeNode();                                              // 0x004dd070
     void AddObject(QuadTreeObject* obj);                         // 0x004dd130 (ret 4)

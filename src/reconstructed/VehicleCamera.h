@@ -95,7 +95,7 @@ public:
     Vector3 TargetPoint();
 
     virtual Vector3 GetTargetVelocity();
-    virtual Vector3 UnknownVirtualSlot35(unsigned char a, float dt);
+    virtual Vector3 ComputeLookAheadPoint(unsigned char a, float dt);
 
     virtual float GetCrashYaw();
     virtual Vector3 ComputeFollowHeading();
@@ -104,18 +104,18 @@ public:
     virtual float GetRoll();
     virtual bool TrySettleOnPoint(const Vector3& point, bool enable, bool force);
     virtual Vector3 GetLeadTargetPoint(float dt);
-    virtual void UnknownVirtualSlot67();
+    virtual void ApplyReverseViewPreset();
     virtual void LookAtTargetPoint();
     virtual void SelectNextCameraState();
     // Inline: retail's copy (0x00417490) is emitted next to BikeCamera code.
-    virtual bool UnknownVirtualSlot74() {
+    virtual bool IsSubjectCrashed() {
         if (vehicleMode) {
             bool active = vehicle->crashState != 0;
             return active;
         }
         return false;
     }
-    virtual bool UnknownVirtualSlot75();
+    virtual bool ShouldFollowSubject();
 
     // Inlined by slot 75: no vehicle mode, or the vehicle's +0x444 is clear.
     int UnknownInlineIdle() {

@@ -844,7 +844,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
             poseIndex = states[0]->poseIndex;
             lean = poseIndex == 11 || poseIndex == 12;
             if (crossoverPose && !lean) {
-                UnknownVirtualSlot41();
+                EndMotion();
                 motionCompleted = 0;
             }
             crossoverPose = lean;
@@ -908,7 +908,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 else
                     wrecker->StartAnimatedWreck(states[0]->crashDirection);
                 motionIndex = 0;
-                UnknownVirtualSlot41();
+                EndMotion();
                 motionCompleted = 0;
                 Fn_00496D20();
             } else if (!crashState && prevCrash) {
@@ -917,7 +917,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 motionActive = 0;
                 motionIndex = 0;
                 reset = 1;
-            } else if (UnknownVirtualSlot42()) {
+            } else if (CheckMotionComplete()) {
                 motionActive = 0;
                 motionIndex = 0;
             } else if (!motionActive) {
@@ -939,7 +939,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
             poseIndex = interpSource->poseIndex;
             lean = poseIndex == 11 || poseIndex == 12;
             if (crossoverPose && !lean) {
-                UnknownVirtualSlot41();
+                EndMotion();
                 motionCompleted = 0;
             }
             crossoverPose = lean;
@@ -1006,7 +1006,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 else
                     wrecker->StartAnimatedWreck(interpSource->crashDirection);
                 motionIndex = 0;
-                UnknownVirtualSlot41();
+                EndMotion();
                 motionCompleted = 0;
                 Fn_00496D20();
             } else if (!crashState && prevCrash) {
@@ -1015,7 +1015,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 motionActive = 0;
                 motionIndex = 0;
                 reset = 1;
-            } else if (UnknownVirtualSlot42()) {
+            } else if (CheckMotionComplete()) {
                 motionActive = 0;
                 motionIndex = 0;
             } else if (!motionActive) {
@@ -1323,7 +1323,7 @@ void KrustyBike::UpdateRiderPose(float dt)
         }
         if (hasFinished > 2) {
             if (crossoverPose)
-                UnknownVirtualSlot41();
+                EndMotion();
             motionCompleted = 0;
         }
     } else {

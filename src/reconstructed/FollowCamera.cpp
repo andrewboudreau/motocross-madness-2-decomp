@@ -242,7 +242,7 @@ Vector3 FollowCamera::SelectFollowPoint(int a, bool flag, float dt) {
         result = targetPoint;
         result.y += 3.0f;
     } else if (flag) {
-        result = UnknownVirtualSlot35(a, dt);
+        result = ComputeLookAheadPoint(a, dt);
     } else {
         result = GetTargetPoint();
     }
@@ -379,7 +379,7 @@ void FollowCamera::ApplyState0Preset() {
     targetFieldOfView = 85.0f;
 }
 
-void FollowCamera::UnknownVirtualSlot67() {
+void FollowCamera::ApplyReverseViewPreset() {
     followPitch = 0.7f;
     followYaw = 3.1415927f;
     followDistance = 15.0f;
@@ -487,8 +487,8 @@ Vector3 FollowCamera::GetStateFiveFollowPoint(float) {
 
 // 0x00464e80 and 0x00464e90 (slots 53, 54 and 58-62 share the empty body).
 void FollowCamera::ClampPositionAboveGround(Vector3*) {}
-void FollowCamera::UnknownVirtualSlot53() {}
-void FollowCamera::UnknownVirtualSlot54() {}
+void FollowCamera::HideSubject() {}
+void FollowCamera::ShowSubject() {}
 void FollowCamera::ShowCameraStateName() {}
 void FollowCamera::SaveCameraPreset() {}
 void FollowCamera::RestoreCameraPreset() {}
@@ -661,7 +661,7 @@ bool FollowCamera::PlayRecordedFrame(float dt, const Vector3* offset) {
         Camera::Tick(dt);
         return true;
     }
-    UnknownVirtualSlot54();
+    ShowSubject();
     return true;
 }
 

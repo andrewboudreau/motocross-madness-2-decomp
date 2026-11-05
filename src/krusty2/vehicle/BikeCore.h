@@ -22,7 +22,7 @@ public:
 
     // overrides of Vehicle slots (signatures: SoultreePhysicsBaseObject.h, Vehicle.h)
     virtual void ResetDynamicState(float extraWeight);
-    virtual int UnknownVirtualSlot5(int value);
+    virtual int ShouldRefreshContacts(int value);
     virtual void DistributeContactForce(const Vec3* force);
     virtual void UpdateLocalCenterOfMass();
     virtual Vec3 LocalTorqueToAngularAcceleration(const Vec3* localTorque);
@@ -32,11 +32,11 @@ public:
                                      const Vec3* settleUp, int keepPlacement, float extraWeight);
     virtual void ApplyCollisionEvent(int notify, int eventKind, void* event);
     virtual int ApplyPendingRespawn(float dt);
-    virtual void UnknownVirtualSlot41();
-    virtual int UnknownVirtualSlot42();
+    virtual void EndMotion();
+    virtual int CheckMotionComplete();
     virtual void RemoveFromRace();
     virtual Vec3* ComputeRotationPivot(Vec3* out, float slideAngle);
-    virtual float UnknownVirtualSlot47(float arg);
+    virtual float GetDriveShareScale(float arg);
     virtual void SimulateFrame(float dt);
     virtual float ApplySteerRate();
     virtual Vec3* GetContactGroundNormal(Vec3* out);
@@ -46,28 +46,31 @@ public:
     virtual float GetMaxSteerAngle();
     virtual float ComputeSlideAngle(float threshold);
     virtual int ClassifyGroundContact(float slideAngle);
-    virtual void UnknownVirtualSlot65(float dt);
-    virtual int UnknownVirtualSlot66();
+    virtual void ApplyLaunchImpulse(float dt);
+    virtual int IsRiderPoseLocked();
     virtual void ClearCrashState();
     virtual void UpdateAirborneState(int nowAirborne);
     virtual void ComputeGroundNormalAndTurn(Vec3* out, VehicleWheel* wheel);
     virtual float GetTurnRadius(const Vec3* point, const Vec3* dir);
     virtual float ComputeWheelForwardAlignment();
     virtual Vec3 ComputeDriveTorque(const Vec3* arm, const Vec3* force);
-    virtual int UnknownVirtualSlot89(float frame);
-    virtual void UnknownVirtualSlot90(int* steps, float frame);
-    virtual void UnknownVirtualSlot91();
+    virtual int SelectRiderPose(float frame);
+    virtual void ClampSubStepsOnCrash(int* steps, float frame);
+    virtual void ApplyAirControl();
     virtual void ApplyLeanCorrection(const Vec3* worldDir, const Vec3* point);
     virtual void InitControlResponses();
 
     // slots introduced by Bike
     virtual void CreateWrecker();
-    virtual int UnknownVirtualSlot98();
+    // provisional name: crashState && wrecker->wreckState; no callers found.
+    virtual int IsWrecking();
     virtual int EvaluateCrash(float dt, float noseOverLimit, int impact, float impulse);
     virtual int UpdateCrashState(float dt, int impact, float impulse);
     // Primary vtable 0x00550900 slot 101 is CRT _purecall (0x00534cfe).
     // KrustyBike supplies the concrete override at 0x00496d10.
-    virtual void UnknownVirtualSlot101() = 0;
+    // provisional name: KrustyBike swaps collisionObject from bikeAndRiderCollision to
+    // bikeCollision; its slot 27 calls this after a wreck starts.
+    virtual void SwitchToBikeCollision() = 0;
     virtual void UpdateRiderPose(float arg);
 
     // 0x004079c0 (6745 bytes, `ret 0xa0` = 40 argument dwords): the bike loader.  Runs

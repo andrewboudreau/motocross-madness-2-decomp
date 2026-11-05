@@ -62,9 +62,9 @@ public:
     virtual void SteerToKeepTargetOnScreen(float dt);
     virtual Vector3 UnknownVirtualSlot50();
     virtual float GetRoll();
-    virtual void UnknownVirtualSlot53();
-    virtual void UnknownVirtualSlot54();
-    virtual bool UnknownVirtualSlot75();
+    virtual void HideSubject();
+    virtual void ShowSubject();
+    virtual bool ShouldFollowSubject();
 
 protected:
     UnknownCameraBike* bike; // +0x3b0

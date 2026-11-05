@@ -115,7 +115,7 @@ SoultreePhysicsCharacter::~SoultreePhysicsCharacter()
 // GameObject update (0x004693d0) run with the same frame time.  Tier 1 control flow.
 int SoultreePhysicsCharacter::Tick(float dt)
 {
-    if (UnknownVirtualSlot42()) {
+    if (CheckMotionComplete()) {
         motionActive = 0;
         motionCompleted = 1;
     }

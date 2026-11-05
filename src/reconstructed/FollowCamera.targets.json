@@ -21,7 +21,7 @@
     "class": "FollowCamera"
   },
   {
-    "candidate_symbol_contains": "UnknownVirtualSlot67@FollowCamera",
+    "candidate_symbol_contains": "ApplyReverseViewPreset@FollowCamera",
     "target_va": "0x00466d20",
     "target_size": 41,
     "notes": "four-literal FollowCamera preset over +0x22C/+0x234/+0x220/+0x258",

@@ -364,7 +364,7 @@
     {
       "path": "samples/physics/collision/SoultreePhysicsCharacter.cpp",
       "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines SoultreePhysicsCharacter::ResetDynamicState, SoultreePhysicsCharacter::UnknownVirtualSlot41, SoultreePhysicsCharacter::UpdateLocalCenterOfMass. Behavior unverified against retail; bytes nonexact.",
+      "reason": "Near-miss body admitted so the source build can link and run; defines SoultreePhysicsCharacter::ResetDynamicState, SoultreePhysicsCharacter::EndMotion, SoultreePhysicsCharacter::UpdateLocalCenterOfMass. Behavior unverified against retail; bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
     },
     {

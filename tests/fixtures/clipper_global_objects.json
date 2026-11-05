@@ -22,7 +22,7 @@
     "src/reconstructed/FollowCamera.cpp": {
       "sections": 98,
       "relocations": 250,
-      "sha256": "4bc6fc45fbd129bd3e99c200d05a912d9d5ae300baa794ae0706219fea3b1a94"
+      "sha256": "de48148bc87277273d6022a9322e86e05047e3d50c5738af016f1e7843de6787"
     },
     "src/reconstructed/TrackOverlay.cpp": {
       "sections": 207,
@@ -47,7 +47,7 @@
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
       "sections": 88,
       "relocations": 342,
-      "sha256": "ad091397ec7625b565ff50b80a1d779f22c29845e8fc5ce6bee634f4869f9831"
+      "sha256": "e8df8d2a3ceab80fcb29372f22a835317d5dfe733884da4158727faec5ade994"
     },
     "samples/render/CubeDrawNearMisses.cpp": {
       "sections": 7,
@@ -57,7 +57,7 @@
     "samples/camera/FollowCameraNearMisses.cpp": {
       "sections": 66,
       "relocations": 337,
-      "sha256": "a9d63424c95d9ad8a34d922990cf2dbfc3374d909216eb091fad50f41f7e4d19"
+      "sha256": "4a720667c875bc1d6523a22638a08f8e40b9b02ecd8fb810918345be8ad1b364"
     },
     "samples/track/TrackOverlayNearMisses.cpp": {
       "sections": 37,

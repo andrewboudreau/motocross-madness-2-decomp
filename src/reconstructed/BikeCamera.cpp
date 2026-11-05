@@ -110,13 +110,13 @@ Vector3 BikeCamera::UnknownVirtualSlot50() {
 }
 
 // 0x004172e0
-void BikeCamera::UnknownVirtualSlot53() {
+void BikeCamera::HideSubject() {
     static_cast<D3DIMSoultreeObject*>(bike->modelNode)->ClearScreenRects();
     static_cast<D3DIMSoultreeObject*>(bike->riderCharacter->modelNode)->ClearScreenRects();
 }
 
 // 0x00417310
-void BikeCamera::UnknownVirtualSlot54() {
+void BikeCamera::ShowSubject() {
     bike->modelNode->ClearFlag14c();
     bike->riderCharacter->modelNode->ClearFlag14c();
 }
@@ -127,7 +127,7 @@ float BikeCamera::GetRoll() {
 }
 
 // 0x004174b0
-bool BikeCamera::UnknownVirtualSlot75() {
-    return FollowCamera::UnknownVirtualSlot75() || !vehicleMode || !bike->crashState ||
+bool BikeCamera::ShouldFollowSubject() {
+    return FollowCamera::ShouldFollowSubject() || !vehicleMode || !bike->crashState ||
            (bike->crashReason == 6 && bike->wrecker->wreckState != 3);
 }

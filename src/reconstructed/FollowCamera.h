@@ -139,7 +139,9 @@ public:
     // it with fld/fmul. VehicleCamera's slot 35 (0x0052c510) never reads it.
     virtual Vector3 GetStateFiveFollowPoint(float dt);
     // VehicleCamera's override tests `a` as a byte (slot 48 passes its int).
-    virtual Vector3 UnknownVirtualSlot35(unsigned char a, float dt) = 0;
+    // provisional name: VehicleCamera returns targetPoint + rotated followHeading * distance *
+    // lookAheadDistance; used while following.
+    virtual Vector3 ComputeLookAheadPoint(unsigned char a, float dt) = 0;
     // 0x00465000 (near miss: samples/camera)
     virtual bool TrySettleOnPoint(const Vector3& point, bool enable, bool force);
     virtual Vector3 GetTargetPoint();
@@ -164,8 +166,10 @@ public:
     virtual Vector3 UnknownVirtualSlot50() = 0;
     virtual float GetRoll() = 0;
     virtual void ClampPositionAboveGround(Vector3* point);
-    virtual void UnknownVirtualSlot53();
-    virtual void UnknownVirtualSlot54();
+    // provisional names: BikeCamera hides / shows the bike and rider models; the tick hides
+    // them for the head view (state 3).
+    virtual void HideSubject();
+    virtual void ShowSubject();
     // A one-byte result: slot 10 tests `al`, and KrustyBikeCamera's override
     // returns ControlInterface slot 2's int with no conversion code, which a
     // bool return would add (neg/sbb/neg).
@@ -183,7 +187,9 @@ public:
     virtual void ApplyState2Preset();
     virtual void ApplyState1Preset();
     virtual void ApplyState0Preset();
-    virtual void UnknownVirtualSlot67();
+    // provisional name: applied on entering state 6 (LAlt held, slot 55), yaw pi; MCM2HELP
+    // indexes a reverse cam.
+    virtual void ApplyReverseViewPreset();
     virtual void LookAtTargetPoint();
     virtual void RefreshCachedTarget();
     // The flag is a byte: slot 23 passes the low byte of the game's +0x1c4.
@@ -191,10 +197,12 @@ public:
     virtual void SetCameraState(int value);
     virtual void SelectNextCameraState();
     virtual void UpdateFollowDistance(const Vector3& from, const Vector3& to, float dt);
-    virtual bool UnknownVirtualSlot74() = 0;
+    // provisional names: VehicleCamera slot 74 is vehicleMode && crashState (crash view); slot
+    // 75 gives the `following` flag passed to SelectFollowPoint and ComputeCameraPosition.
+    virtual bool IsSubjectCrashed() = 0;
     // Inline: retail's copy sits at 0x00404fc0, far from FollowCam.cpp, and
     // VehicleCamera slot 75 inlines the same test.
-    virtual bool UnknownVirtualSlot75() { return cameraState == 5 || cameraState == 2; }
+    virtual bool ShouldFollowSubject() { return cameraState == 5 || cameraState == 2; }
 
     // 0x00463450: writes entry `index` of the +0x2e4 table; each non-null
     // pointer supplies one field. Returns false when index >= +0x2e0.

@@ -28,7 +28,7 @@ SoultreePhysicsCharacter::~SoultreePhysicsCharacter()
 // update run with the same frame time.
 int SoultreePhysicsCharacter::Tick(float dt)
 {
-    if (UnknownVirtualSlot42()) {
+    if (CheckMotionComplete()) {
         motionActive = 0;
         motionCompleted = 1;
     }

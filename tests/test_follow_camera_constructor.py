@@ -160,7 +160,7 @@ class FollowCameraConstructorTests(unittest.TestCase):
             keep = {'Camera': {'Camera', '~Camera'}, 'PCCamera': {'PCCamera'},
                     'FollowCamera': {'ShowCameraStateName', 'SaveCameraPreset', 'RestoreCameraPreset',
                         'SaveCameraState', 'RestoreCameraState', 'ApplyState3Preset', 'ApplyState2Preset',
-                        'ApplyState1Preset', 'ApplyState0Preset', 'UnknownVirtualSlot67', 'SetCameraState'}}
+                        'ApplyState1Preset', 'ApplyState0Preset', 'ApplyReverseViewPreset', 'SetCameraState'}}
             native = {}; canonical = {}; paths = [candidate_path]
             for name, retained in keep.items():
                 source = ROOT/'src/reconstructed'/(name+'.cpp')

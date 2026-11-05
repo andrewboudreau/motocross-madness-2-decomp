@@ -42,7 +42,7 @@ int FollowCamera::Tick(float dt) {
         LookAt(target);
         wasWide = FollowCameraAbs(followYaw) > 2.0f;
     }
-    if (cameraState != 6 && isCrashView && !UnknownVirtualSlot74()) {
+    if (cameraState != 6 && isCrashView && !IsSubjectCrashed()) {
         isCrashView = 0;
         followDistance = savedDistance;
         followPitch = savedPitch;
@@ -63,7 +63,7 @@ int FollowCamera::Tick(float dt) {
     }
     bool moved = ProcessCameraInput(current, dt);
     UpdateTurnYaw(wide);
-    bool following = UnknownVirtualSlot75();
+    bool following = ShouldFollowSubject();
     target = SelectFollowPoint(wide || isSettled, following, dt);
     position = ComputeCameraPosition(following, target, dt);
     if (!positionEaseX) {
@@ -102,7 +102,7 @@ int FollowCamera::Tick(float dt) {
                 SaveCameraPreset();
             isSettled = TrySettleOnPoint(position, wide, moved);
         }
-    } else if (UnknownVirtualSlot74()) {
+    } else if (IsSubjectCrashed()) {
         isCrashView = 1;
     }
     cachedTarget.x = targetEaseX->Update(target.x, dt);
@@ -147,10 +147,10 @@ int FollowCamera::Tick(float dt) {
         float roll;
         if (cameraState == 3 && following) {
             roll = GetRoll();
-            UnknownVirtualSlot53();
+            HideSubject();
         } else {
             roll = 0.0f;
-            UnknownVirtualSlot54();
+            ShowSubject();
         }
         SetFrame(&smoothed, 0, 0, &roll, 0);
         LookAt(cachedTarget);
@@ -185,7 +185,7 @@ int FollowCamera::Tick(float dt) {
                     initialDistance = followDistance;
                     cameraState = 6;
                     savedFieldOfView = targetFieldOfView;
-                    UnknownVirtualSlot67();
+                    ApplyReverseViewPreset();
                     fieldOfViewEase->Set(targetFieldOfView, FLT_MAX);
                 }
             } else if (cameraState == 6) {
@@ -216,7 +216,7 @@ int FollowCamera::Tick(float dt) {
         wasWide = wide;
         return 1;
     }
-    UnknownVirtualSlot54();
+    ShowSubject();
     wasWide = wide;
     return 1;
 }

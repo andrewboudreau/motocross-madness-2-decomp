@@ -150,7 +150,7 @@ class SoultreePhysicsMethodTests(unittest.TestCase):
                              'InitializePhysics': 2, 'ApplyStaticContactImpulse': 3,
                              'ApplyBodyContactImpulse': 4, 'ApplyDrag': 6, 'DistributeContactForce': 7,
                              'UpdateLocalCenterOfMass': 8, 'ComputeFrameSteps': 9, 'FindPlacement': 11,
-                             'ClassifyOutOfBounds': 12}
+                             'ClassifyOutOfBounds': 12, 'ShouldRefreshContacts': 5}
             for target in json.loads(path.read_text()):
                 symbol = target['candidate_symbol_contains']
                 slot = (int(re.search(r'Slot(\d+)@', symbol)[1])

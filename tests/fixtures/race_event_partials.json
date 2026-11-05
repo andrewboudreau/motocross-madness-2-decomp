@@ -15,7 +15,7 @@
     ],
     [
       "src/reconstructed/QuarryStuntEvent.cpp",
-      "?UnknownVirtualSlot31@BaseQuarryEvent@@UAEHXZ",
+      "?CreateEventCollision@BaseQuarryEvent@@UAEHXZ",
       6,
       "19e61053eb0aac4a10120261c29cfa8b46438e26a0dc689ce1bb60c8c53647ef"
     ],
@@ -27,13 +27,13 @@
     ],
     [
       "src/reconstructed/QuarryStuntEvent.cpp",
-      "?UnknownVirtualSlot33@BaseQuarryEvent@@UAEXH@Z",
+      "?CreateRacer3DObjects@BaseQuarryEvent@@UAEXH@Z",
       3,
       "38fe9af4770dbe85954444b4ba5dca24575f8edbf3bd17304f57cfd562a64417"
     ],
     [
       "src/reconstructed/QuarryStuntEvent.cpp",
-      "?UnknownVirtualSlot35@BaseQuarryEvent@@UAEHXZ",
+      "?PrepareEvent3DObjects@BaseQuarryEvent@@UAEHXZ",
       6,
       "19e61053eb0aac4a10120261c29cfa8b46438e26a0dc689ce1bb60c8c53647ef"
     ],

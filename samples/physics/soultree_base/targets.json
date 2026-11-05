@@ -2,7 +2,7 @@
  {
   "class": "SoultreePhysicsBaseObject",
   "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot5@SoultreePhysicsBaseObject",
+  "candidate_symbol_contains": "ShouldRefreshContacts@SoultreePhysicsBaseObject",
   "target_va": "0x004aa150",
   "target_size": 14,
   "expect": "exact",

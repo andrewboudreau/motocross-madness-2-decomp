@@ -566,7 +566,7 @@ void BaseQuarryEvent::UnknownVirtualSlot28() {
 }
 
 // 0x00467ae0
-int BaseQuarryEvent::UnknownVirtualSlot31() {
+int BaseQuarryEvent::CreateEventCollision() {
     return 1;
 }
 
@@ -575,10 +575,10 @@ void BaseQuarryEvent::UnknownVirtualSlot32(int value) {
 }
 
 // 0x00464e80
-void BaseQuarryEvent::UnknownVirtualSlot33(int value) {
+void BaseQuarryEvent::CreateRacer3DObjects(int value) {
 }
 
 // 0x00467ae0
-int BaseQuarryEvent::UnknownVirtualSlot35() {
+int BaseQuarryEvent::PrepareEvent3DObjects() {
     return 1;
 }

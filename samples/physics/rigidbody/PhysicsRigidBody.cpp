@@ -53,7 +53,7 @@ void PhysicsBody::SetInitialAngularVelocity(const Vec3& w)
 }
 
 // slot 35, 0x004cc110.
-void PhysicsBody::UnknownVirtualSlot35(int)
+void PhysicsBody::SyncActiveWithEnabled(int)
 {
     active = isEnabled;
 }

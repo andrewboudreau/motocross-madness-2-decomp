@@ -76,8 +76,11 @@ public:
                                              int maxSteps, float drag, float elasticity,
                                              int restThreshold, unsigned char probeMask,
                                              int createCollision);
-    virtual void UnknownVirtualSlot41();                          // 0x00504360
-    virtual int UnknownVirtualSlot42();                           // 0x00504470
+    // provisional names: slot 41 clears motionActive, applies the rest pose and re-derives the
+    // orientation (called on a crash and before a new motion); Tick clears motionActive and
+    // sets motionCompleted when slot 42 returns nonzero.
+    virtual void EndMotion();                          // 0x00504360
+    virtual int CheckMotionComplete();                           // 0x00504470
 
     SoultreeObject* poseNode;  // +0x42c slot 40 sets it to the model node (same as sceneNode); Bike reads the rider/pose axes from it
     char motionActive;     // +0x430 set when a motion starts (KrustyBike 0x0048d910/0x0048d990/0x0048e280 SetMotion); slot 41 clears it with the rest pose (tier 3)

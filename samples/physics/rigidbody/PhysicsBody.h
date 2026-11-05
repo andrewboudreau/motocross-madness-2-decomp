@@ -55,7 +55,8 @@ public:
     virtual void SetInitialAngularVelocity(const Vec3& w);
     // slot 35, 0x004cc110: active = enabled bit of GameObject::field_0x25. The
     // argument is unused (ret 4).
-    virtual void UnknownVirtualSlot35(int unused);
+    // provisional name: body only, no caller found.
+    virtual void SyncActiveWithEnabled(int unused);
 
     // slots 36..41: pure virtual here (_purecall), implemented by PhysicsRigidBody.
     // "World" means world space. "Local" means the node's body space.

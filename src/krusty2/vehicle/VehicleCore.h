@@ -53,7 +53,7 @@ public:
     virtual void ResetBodyOrientation();
     virtual void ApplyCollisionEvent(int notify, int eventKind, void* event);
     virtual int  ApplyPendingRespawn(float dt);
-    virtual int  UnknownVirtualSlot42();
+    virtual int  CheckMotionComplete();
 
     // ---- slots introduced by Vehicle (43..96) ----
     virtual void SnapshotRespawnPose();
@@ -62,7 +62,9 @@ public:
     virtual Vec3* ComputeRotationPivot(Vec3* out, float slideAngle);
     // pure virtual: entry is _purecall (0x00534cfe).  Bike's override 0x0040cbb0 is
     // `ret 4` and returns a float (tier 1 via its byte match), hence float(float).
-    virtual float UnknownVirtualSlot47(float arg) = 0;
+    // provisional name: Bike returns 1.05 - 0.25 * controlInput.y; VehicleWheel 0x00513f90
+    // multiplies its drive share by it.
+    virtual float GetDriveShareScale(float arg) = 0;
     virtual void AdvancePosition();
     // 0x0052a940 forwards its argument unchanged to slots 9 (float dt), 39, 64 and 65,
     // so it and they take the float time step (tier 2).
@@ -84,8 +86,11 @@ public:
     // void: 0x00528e50 leaves eax as whatever the last store used (no return value is
     // materialised) and the only caller, slot 49, ignores eax; byte-exact as void (tier 2).
     virtual void UpdateControlInput(float dt);
-    virtual void UnknownVirtualSlot65(float dt);  // entry is the shared empty stub 0x00464e80
-    virtual int UnknownVirtualSlot66() = 0;  // pure virtual: entry is _purecall (0x00534cfe)
+    // provisional names: Bike slot 65 sets the shock impulse scale when the pitch input is
+    // pulled back under vertical acceleration > 5; slot 66 is crashState || motionActive in
+    // Bike (KrustyBike adds hasFinished 1..2) and only slot 89 reads it.
+    virtual void ApplyLaunchImpulse(float dt);  // entry is the shared empty stub 0x00464e80
+    virtual int IsRiderPoseLocked() = 0;  // pure virtual: entry is _purecall (0x00534cfe)
     virtual void ClearCrashState();
     virtual int GetRespawnKey(int* out);
     virtual void ResetCrashTimer();
@@ -102,7 +107,9 @@ public:
     virtual int UnknownVirtualSlot78();
     virtual int UnknownVirtualSlot79();
     virtual int IsThrottleRequested();
-    virtual int UnknownVirtualSlot81();
+    // provisional name: the result sets driveDisengaged (no engine torque); keyboard LCtrl
+    // 0x1d, KrustyBike control 12; MCM2HELP indexes the clutch.
+    virtual int IsClutchRequested();
     virtual int IsReverseRequested();
     virtual int IsBrakeRequested(VehicleWheel* wheel);
     // Returns the input-map query (KrustyBike 0x00491630 uses the result; the Vehicle
@@ -110,11 +117,16 @@ public:
     virtual int QueryControlInput(int control, int modifier);
     virtual void UpdateWheelRolls();
     virtual void UpdateWheelDriveForces();
-    virtual void UnknownVirtualSlot87();  // entry is the shared empty stub 0x00464e90
+    // provisional names: 87 by call-site role only (SimulateFrame calls it per step while
+    // crashed, in place of 91 and the ground handling); 89 runs the Bike rider pose state
+    // machine unless slot 66 holds; 90 runs per sub-step and on a crash forces a single
+    // remaining step and clears stepRemainder, calling 89 on the last step; 91 runs while
+    // airborne (lean/steer rotation, gyro, wobble).
+    virtual void ApplyCrashedControl();  // entry is the shared empty stub 0x00464e90
     virtual int ClassifyInputDirection();
-    virtual int UnknownVirtualSlot89(float frame);      // Bike 0x0040ae50 passes a float (tier 2)
-    virtual void UnknownVirtualSlot90(int* steps, float frame);
-    virtual void UnknownVirtualSlot91();  // entry is the shared empty stub 0x00464e90
+    virtual int SelectRiderPose(float frame);      // Bike 0x0040ae50 passes a float (tier 2)
+    virtual void ClampSubStepsOnCrash(int* steps, float frame);
+    virtual void ApplyAirControl();  // entry is the shared empty stub 0x00464e90
     virtual void ApplyLeanCorrection(const Vec3* worldDir, const Vec3* point);
     virtual void InitForceFeedback();
     virtual void UpdateForceFeedback();  // entry is the shared empty stub 0x00464e90

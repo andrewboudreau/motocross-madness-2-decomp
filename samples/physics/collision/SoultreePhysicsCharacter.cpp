@@ -26,7 +26,7 @@ void SoultreePhysicsCharacter::UpdateLocalCenterOfMass()
 }
 
 // slot 42 (0x00504470)
-int SoultreePhysicsCharacter::UnknownVirtualSlot42()
+int SoultreePhysicsCharacter::CheckMotionComplete()
 {
     if (motionIndex >= 0 && motionActive) {
         return 1;
@@ -59,7 +59,7 @@ int SoultreePhysicsCharacter::ResetToPlacement(const Vec3* newPosition, const Ve
 }
 
 // slot 41 (0x00504360)
-void SoultreePhysicsCharacter::UnknownVirtualSlot41()
+void SoultreePhysicsCharacter::EndMotion()
 {
     poseNode->GetAxesIn(0, &savedForward, &savedUp);
     modelNode->SetAxesIn(0, &savedForward, &savedUp, 1, 0);

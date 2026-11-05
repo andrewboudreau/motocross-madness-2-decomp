@@ -659,7 +659,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         progress(0);
 
     g_MemTagStack->Push("3DObjects");
-    if (!UnknownVirtualSlot35())
+    if (!PrepareEvent3DObjects())
         return 0;
     g_MemTagStack->Push("BikeRace");
     raceView = (UnknownKrustyBikeView*)new(__FILE__, 898) UnknownQuarryRace(0);
@@ -818,10 +818,10 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         progress(0);
 
     g_MemTagStack->Push("Collision");
-    if (!UnknownVirtualSlot31())
+    if (!CreateEventCollision())
         return 0;
     g_MemTagStack->Push("3DObjects");
-    UnknownVirtualSlot33((int)((UnknownQuarryRace*)raceView)->localRacer);
+    CreateRacer3DObjects((int)((UnknownQuarryRace*)raceView)->localRacer);
     g_MemTagStack->Push("BikeRace");
     ((UnknownQuarryBikeCamera*)raceCamera)->SetSubject(eventTerrain);
     UnknownQuarryBikeCamera* camera = (UnknownQuarryBikeCamera*)raceCamera;
