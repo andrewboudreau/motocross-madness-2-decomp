@@ -13,11 +13,13 @@
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "../reconstructed/BikeRaceCore.h"
 #include "../reconstructed/GUIManagerCore.h"
 #include "../reconstructed/KrustyUI.h"
 #include "../reconstructed/DlgProcs.h"
+#include "../reconstructed/EventManager.h"
 #include "../reconstructed/MenuId.h"
 #include "../reconstructed/SelectGamePicProcs.h"
 #include "../reconstructed/TrackGame.h"
@@ -53,6 +55,17 @@ void AutoRaceTick()
         } else if ((f = fopen("autorace.bin", "wb")) != 0) {
             fwrite(&game->mode.raceSettings, sizeof(game->mode.raceSettings), 1, f);
             fclose(f);
+        }
+    }
+    // MCM2_AUTORACE_EXIT=<seconds>: leave the race for the main menu after that many frames/60,
+    // to reproduce the return-to-menu path (#36).
+    static int raceTicks = 0;
+    static bool left = false;
+    if (started && !left && menu != kMenuMain && menu != kMenuLoading) {
+        const char* exitEnv = getenv("MCM2_AUTORACE_EXIT");
+        if (exitEnv && ++raceTicks >= atoi(exitEnv) * 60) {
+            left = true;
+            game->eventManager->LeaveRaceForMenu(kMenuMain);
         }
     }
     if (menu == kMenuMain && !started) {

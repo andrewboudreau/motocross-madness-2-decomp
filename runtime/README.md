@@ -169,3 +169,6 @@ menus. `Present()` runs on the game thread and calls `AutoRaceTick`
 Without `MCM2_AUTORACE` nothing is called. Run loop: build with `tools/build_game.py`, copy
 `mcm2.exe` and `mcm2.map` next to the staged game, run, then read `mcm2_runtime.log`,
 `errorlog.txt` (map the EIP through `mcm2.map`) and `frames/*.bmp`.
+
+`MCM2_AUTORACE_EXIT=<seconds>` also leaves the race for the main menu after that many
+seconds (`EventManager::LeaveRaceForMenu(kMenuMain)`), to exercise the return-to-menu path.
