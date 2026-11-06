@@ -75,9 +75,11 @@ void AutoRaceTick()
         if (!f)
             return;
         started = true;
+        { FILE* l = fopen("autorace.log", "a"); if (l) { fputs("starting\n", l); fclose(l); } }
         fread(&game->mode.raceSettings, sizeof(game->mode.raceSettings), 1, f);
         fclose(f);
         game->mode.SelectSeries(game->mode.raceSettings.eventType);    // sets currentSeriesDirectory, as the menus do
+        game->mode.LoadControllerChoice();    // installs the profile's control bindings, which the profile dialogs normally do
         UIDialog* mainDialog = game->ui->gui->FindInputDialog();
         LeaveMenusForRace();    // what the menus' start button calls: shuts the UI down, then opens loading
         if (mainDialog)

@@ -164,7 +164,8 @@ menus. `Present()` runs on the game thread and calls `AutoRaceTick`
 - Later launches wait about two seconds at the main menu, restore `autorace.bin`, and call
   `LeaveMenusForRace()`, so the saved event loads directly. Delete `autorace.bin` to pick a
   new event.
-- Menu changes are logged to `autorace.log`. The EULA still has to be accepted by hand.
+- Menu changes are logged to `autorace.log`. Add `MCM2_AUTO_EULA=1` to replace the EULA dialog with the runtime's stand-in; this is the
+  developer's own opt-in for test runs, and without it the EULA must be accepted by hand.
 
 Without `MCM2_AUTORACE` nothing is called. Run loop: build with `tools/build_game.py`, copy
 `mcm2.exe` and `mcm2.map` next to the staged game, run, then read `mcm2_runtime.log`,
