@@ -152,3 +152,20 @@ race uses about 22% of one core, against about 50% with Blade.
    2D (CPU surfaces, GDI through DIB sections) then 3D, replacing the
    software rasterizer.
 5. M5: windowed mode, resolution choice, movies.
+
+## Fast race start (`MCM2_AUTORACE`)
+
+Set `MCM2_AUTORACE=1` (with `MCM2_FORCE_RUNTIME=1` for a source build) to skip the
+menus. `Present()` runs on the game thread and calls `AutoRaceTick`
+(`src/bringup/Group9_AutoRace.cpp`, found by name in `mcm2.map` beside the exe):
+
+- The first time a race loads through the normal menus, the race settings are saved to
+  `autorace.bin` in the game directory.
+- Later launches wait about two seconds at the main menu, restore `autorace.bin`, and call
+  `LeaveMenusForRace()`, so the saved event loads directly. Delete `autorace.bin` to pick a
+  new event.
+- Menu changes are logged to `autorace.log`. The EULA still has to be accepted by hand.
+
+Without `MCM2_AUTORACE` nothing is called. Run loop: build with `tools/build_game.py`, copy
+`mcm2.exe` and `mcm2.map` next to the staged game, run, then read `mcm2_runtime.log`,
+`errorlog.txt` (map the EIP through `mcm2.map`) and `frames/*.bmp`.

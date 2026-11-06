@@ -19,6 +19,7 @@
 #include "../reconstructed/KrustyUI.h"
 #include "../reconstructed/DlgProcs.h"
 #include "../reconstructed/MenuId.h"
+#include "../reconstructed/SelectGamePicProcs.h"
 #include "../reconstructed/TrackGame.h"
 #include "../reconstructed/TrackGameGlobal.h"
 
@@ -35,6 +36,15 @@ void AutoRaceTick()
     if (!game || !game->ui)
         return;
     int menu = game->ui->currentMenu;
+    static int lastMenu = -1;
+    if (menu != lastMenu) {
+        lastMenu = menu;
+        FILE* log = fopen("autorace.log", "a");
+        if (log) {
+            fprintf(log, "menu %d\n", menu);
+            fclose(log);
+        }
+    }
     if ((menu == kMenuLoading || g_LoadingEventLoaded) && !saved) {
         saved = true;
         FILE* f = fopen("autorace.bin", "rb");
@@ -54,9 +64,10 @@ void AutoRaceTick()
         started = true;
         fread(&game->mode.raceSettings, sizeof(game->mode.raceSettings), 1, f);
         fclose(f);
+        game->mode.SelectSeries(game->mode.raceSettings.eventType);    // sets currentSeriesDirectory, as the menus do
         UIDialog* mainDialog = game->ui->gui->FindInputDialog();
-        game->ui->OpenMenu(kMenuLoading);
+        LeaveMenusForRace();    // what the menus' start button calls: shuts the UI down, then opens loading
         if (mainDialog)
-            mainDialog->EndDialog(0);
+            mainDialog->MarkPendingRelease();
     }
 }
