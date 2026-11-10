@@ -17,11 +17,14 @@
 // global): 214 of retail's 219 instructions align; the five that differ are retail's
 // float-to-int block `lea eax,[esi+0x70]; mov [ebp-8],eax; fld; fstp [ebp-0x10]; fld
 // [ebp-0x10]; mov eax,[ebp-8]; fistp dword ptr [eax]`, i.e. an inlined `__asm`
-// helper whose operands are forced to the frame.  Inline assembly is out of bounds,
-// so FloatToInt below is an ordinary conversion: with /QIfist it is `fistp qword` plus a
-// dword move (8 bytes shorter, one frame slot lower for the shared t/stale/dirty slot),
-// without it `__ftol` (truncation).  The `push ebp; mov ebp,esp` frame is the asm
-// helper's doing as well: every other Terrain.cpp body matches without /Oy-.
+// helper whose operands are forced to the frame.  Inline assembly is out of bounds.
+// Those counts were measured with FloatToInt as a plain `(int)` cast: with /QIfist it is
+// `fistp qword` plus a dword move (8 bytes shorter, one frame slot lower for the shared
+// t/stale/dirty slot), without it `__ftol` (truncation).  The game build compiles this
+// file without /QIfist, so FloatToInt now rounds through X87FloatToInt as retail's fistp
+// does (the focal length rounds to nearest instead of truncating).  The `push ebp; mov
+// ebp,esp` frame is the asm helper's doing as well: every other Terrain.cpp body matches
+// without /Oy-.
 // The rest of the body is exact: start/last clock locals (`last` first), block-scoped
 // stale/t locals, dirty flag before the texture peak-hold, member re-reads of
 // visibilityCamera and heightField at each use, the 12-byte viewer copy as a struct
@@ -31,6 +34,7 @@
 #include "AgeManager.h"
 #include "Griddraw.h"
 #include "Grid1.h"
+#include "X87FloatToInt.h"
 
 unsigned int ReadClock();   // 0x004bfa80
 
@@ -66,12 +70,12 @@ struct TerrainVisibilityCamera {
 #define GridRoot() (reinterpret_cast<DrawableGridNode*>(heightField))
 
 // Stand-in for retail's inline-asm FLD/FISTP helper (see the header comment).  The
-// pointer copy keeps the surrounding store order (focal length before the draw-distance
+// pointer copy kept the surrounding store order (focal length before the draw-distance
 // copy) that retail has.
 static inline void FloatToInt(int* destination, float value)
 {
     int* p = destination;
-    *p = (int)value;
+    *p = X87FloatToInt(value);
 }
 
 int Terrain::PrepareGeometry()

@@ -12,11 +12,13 @@
 //     shares an outside bit the box is rejected: the screen rect (if any) is zeroed and the
 //     result is 0.
 //   * With screenRect, the corners are projected (x * width / w, y * height / w, stored back
-//     into the array) and their rounded bounds become left/top/right/bottom, clamped to
+//     into the array) and their bounds, rounded as retail's fistp helper does
+//     (X87FloatToInt, ties to even), become left/top/right/bottom, clamped to
 //     [0, width] / [0, height] and offset by the camera's viewport origin.
 //   * cornersInside (if any) receives the number of inside corners; the result is 1.
 //   * a6 is unused.
 #include "../reconstructed/Griddraw.h"
+#include "X87FloatToInt.h"
 #include <math.h>
 
 namespace {
@@ -54,13 +56,6 @@ int OutCode(float x, float y, float z, float w)
     else if (w - z < 0.0)
         code |= 0x20;
     return code;
-}
-
-// best guess: retail rounds with fistp under the default round-to-nearest mode; ties
-// round away from zero here instead of to even.
-int RoundToInt(float v)
-{
-    return (int)floor(v + 0.5f);
 }
 
 } // namespace
@@ -154,8 +149,8 @@ int GridVisibilityClipper::TestBox(GridCamera* camera, const float* matrix, cons
         float inv = 1.0f / s_corners[0].w;
         s_corners[0].x = (float)view->viewportWidth * inv * s_corners[0].x;
         s_corners[0].y = (float)view->viewportHeight * inv * s_corners[0].y;
-        *left = RoundToInt(s_corners[0].x);
-        *top = RoundToInt(s_corners[0].y);
+        *left = X87FloatToInt(s_corners[0].x);
+        *top = X87FloatToInt(s_corners[0].y);
         *bottom = *top;
         *right = *left;
 
@@ -165,13 +160,13 @@ int GridVisibilityClipper::TestBox(GridCamera* camera, const float* matrix, cons
             c->x = (float)view->viewportWidth * inv * c->x;
             c->y = (float)view->viewportHeight * c->y * inv;
             if ((float)*left > c->x)
-                *left = RoundToInt(c->x);
+                *left = X87FloatToInt(c->x);
             else if ((float)*right < c->x)
-                *right = RoundToInt(c->x);
+                *right = X87FloatToInt(c->x);
             if ((float)*top > c->y)
-                *top = RoundToInt(c->y);
+                *top = X87FloatToInt(c->y);
             else if ((float)*bottom < c->y)
-                *bottom = RoundToInt(c->y);
+                *bottom = X87FloatToInt(c->y);
         }
 
         if (*left <= 0)

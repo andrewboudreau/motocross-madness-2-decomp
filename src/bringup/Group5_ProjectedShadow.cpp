@@ -9,9 +9,10 @@
 //    ShadowMatrixMultiply and an inline constructor, so nothing new is left
 //    unresolved;
 //  * retail rounds the projected coordinates with an inline `fistp` (current
-//    FPU rounding mode, round-to-nearest), not a truncating cast; RoundToInt
-//    below reproduces round-to-nearest without inline assembly.
+//    FPU rounding mode, round-to-nearest-even), not a truncating cast;
+//    X87FloatToInt reproduces it without inline assembly.
 #include "shadow/ProjectedShadow.h"
+#include "X87FloatToInt.h"
 
 #include <math.h>
 
@@ -19,13 +20,6 @@
 struct ShadowConstVec3 : ShadowVec3 {
     ShadowConstVec3(float x_, float y_, float z_) { x = x_; y = y_; z = z_; }
 };
-
-// best guess: retail's `fistp` under the default round-to-nearest mode;
-// exact .5 ties round up here instead of to even.
-static inline int RoundToInt(float value)
-{
-    return (int)floor(value + 0.5f);
-}
 
 // 0x004dc2b0 (352 B): paints shadowColor into the colour word (+0x10 of 0x20-byte vertices) of
 // every caster vertex whose projected position lands on a height-map cell equal to colorKeyLow.
@@ -42,8 +36,8 @@ void ProjectedShadow::TintCasterVertices()
             int indexCount;
             casters[c]->GetPart(part, (void**)&vertices, &count, &indices, &indexCount, 0, -1);
             for (int i = 0; i < count; i++) {
-                int x = RoundToInt(vertexBuffer[totalVertices + i].x - 0.5f);
-                int y = RoundToInt(vertexBuffer[totalVertices + i].y - 0.5f);
+                int x = X87FloatToInt(vertexBuffer[totalVertices + i].x - 0.5f);
+                int y = X87FloatToInt(vertexBuffer[totalVertices + i].y - 0.5f);
                 if (x >= 0 && y >= 0 && x <= texture->size && y <= texture->size
                     && heightMap[(y << sizeShift) + x] == colorKeyLow)
                     *(unsigned int*)(vertices + i * 0x20 + 0x10) = shadowColor;
@@ -251,8 +245,8 @@ void ProjectedShadow::RenderShadow()
                 bool inside = true;
                 for (int k = 0; k < 3; k++) {
                     ShadowVec3* vertex = &vertexBuffer[*(indices + i + k) + vertexBase];
-                    points[k * 2] = RoundToInt(vertex->x - 0.5f);
-                    points[k * 2 + 1] = RoundToInt(vertex->y - 0.5f);
+                    points[k * 2] = X87FloatToInt(vertex->x - 0.5f);
+                    points[k * 2 + 1] = X87FloatToInt(vertex->y - 0.5f);
                     if (points[k * 2] <= 1 || points[k * 2] >= texture->size - 1
                         || points[k * 2 + 1] <= 1 || points[k * 2 + 1] >= texture->size - 1) {
                         inside = false;

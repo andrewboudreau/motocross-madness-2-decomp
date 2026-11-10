@@ -13,6 +13,7 @@
 #include "core/SoultreeObject.h"
 #include "vehicle/KrustyBike.h"
 #include "Track.h"
+#include "X87FloatToInt.h"
 
 // ---------------------------------------------------------------------------------------
 // KbRaceSub: the race's Track (BikeRace+0x48).  Every method is the Track entry of the same
@@ -270,9 +271,10 @@ int KrustyBike::Fn_0048D780(int* out, float t, int group)
     default:
         return 0;
     }
-    // best guess: retail converts with `fistp` (round to nearest) after subtracting 0.5, i.e.
-    // floor() of rand/32768 * count; truncation gives the same index except at exact ties.
-    int index = (int)(rand() * (1.0f / 32768.0f) * (float)count);
+    // Retail rounds rand/32768 * count - 0.5 with its fistp helper (0x0048d834): floor()
+    // of the product, except that an exact integer product m rounds to the even of m - 1
+    // and m (truncation picked m there).
+    int index = X87FloatToInt(rand() * (1.0f / 32768.0f) * (float)count - 0.5f);
     int trick = r.tricks[index + first];
     *out = trick;
     if (aiKind) {

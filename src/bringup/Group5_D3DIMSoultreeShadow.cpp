@@ -2,8 +2,9 @@
 //
 // D3DIMSoultreeShadow slots 29 (0x00446c30) and 30 (0x00446f40), extracted from
 // samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp (slot 29 differs from
-// retail only in x87 operand order; slot 30 uses (int) casts where retail
-// rounds with an inline fld/fistp helper). Changes for the bring-up link:
+// retail only in x87 operand order; slot 30 rounds the clipped triangle corners with
+// X87FloatToInt where retail uses an inline fld/fistp helper). Changes for the
+// bring-up link:
 //  * the caster's TransformVertexGroups (0x00440d40) is called as
 //    D3DIMSoultreeObject's (D3DIMSoulTree.cpp defines it);
 //  * the receiver vertices are D3DIMSoultreeShadow.cpp's g_d3dimShadowVertices
@@ -17,6 +18,7 @@
 #include "Matrix4.h"
 #include "core/SoultreeObject.h"
 #include "ClipRectangle.h"
+#include "X87FloatToInt.h"
 
 // Row-major 4x4 matrix with the D3DMATRIX member names and the index view (Math3D.h's
 // Matrix4 shape; the shadow TU's ShadowMatrix only has m[4][4]).  Local view, tier 3.
@@ -251,13 +253,13 @@ void D3DIMSoultreeShadow::UnknownVirtualSlot30()
                 if (!shadow->updateThisFrame)
                     continue;
                 int points[6];
-                points[0] = (int)(clipped[0].x - 0.5f);
-                points[1] = (int)(clipped[0].y - 0.5f);
+                points[0] = X87FloatToInt(clipped[0].x - 0.5f);
+                points[1] = X87FloatToInt(clipped[0].y - 0.5f);
                 for (int k = 0; k < count - 2; k++) {
-                    points[2] = (int)(clipped[k + 1].x - 0.5f);
-                    points[3] = (int)(clipped[k + 1].y - 0.5f);
-                    points[4] = (int)(clipped[k + 2].x - 0.5f);
-                    points[5] = (int)(clipped[k + 2].y - 0.5f);
+                    points[2] = X87FloatToInt(clipped[k + 1].x - 0.5f);
+                    points[3] = X87FloatToInt(clipped[k + 1].y - 0.5f);
+                    points[4] = X87FloatToInt(clipped[k + 2].x - 0.5f);
+                    points[5] = X87FloatToInt(clipped[k + 2].y - 0.5f);
                     ShadowFillTriangle(shadow->sizeShift, pixels, shadow->colorKeyLow, points, 0);
                 }
             } else if (inCameraView) {

@@ -29,8 +29,8 @@
 //     for textures other than format 0x115c, render state 0x21; texture blend 4,
 //     restored to 2 afterwards.
 //
-// best guess: retail rounds with an inline x87 fistp (current rounding mode,
-// round-to-nearest); Group1RoundToInt rounds halves up instead.
+// Retail rounds the fog and fade alpha with an inline x87 fistp (0x004bb271,
+// 0x004bb2ab); X87FloatToInt reproduces it (ties to even, not up).
 // Faithful retail quirk kept: when no particle is visible the function returns with
 // the transformed buffer (+0x1f84) still locked.
 
@@ -41,6 +41,7 @@
 #include "Camera.h"
 #include "PCRenderTarget.h"
 #include "TextureMap.h"
+#include "X87FloatToInt.h"
 
 extern "C" void qsort(void* base, unsigned int num, unsigned int width,
                       int (*compare)(const void*, const void*));
@@ -114,11 +115,6 @@ struct Group1ParticleCamera {
 static inline Group1ParticleCamera* Group1CameraView(Camera* camera)
 {
     return reinterpret_cast<Group1ParticleCamera*>(camera);
-}
-
-static int Group1RoundToInt(float value)
-{
-    return (int)floor(value + 0.5f);   // best guess: see the header
 }
 
 static inline Group1ParticleRect* Group1Rect(Particle* particle)
@@ -275,12 +271,12 @@ int ParticleManager::Render3D()
                 fog = 0.0f;
             else if (fog > 1.0f)
                 fog = 1.0f;
-            specular = (unsigned int)Group1RoundToInt(fog * 255.0f) << 24;
+            specular = (unsigned int)X87FloatToInt(fog * 255.0f) << 24;
         }
         unsigned int flags = particle->flags;
         if (flags & 2) {
             if (!(flags & 1)) {
-                alpha = (unsigned int)Group1RoundToInt(
+                alpha = (unsigned int)X87FloatToInt(
                             (1.0f - particle->age / particle->lifetime) * 127.5f - 0.5f) << 24;
                 color = particle->color | alpha;
             }

@@ -22,7 +22,9 @@
 // still called for the other casts (0x483dd2, 0x483f96, 0x484d40, 0x484d57), so
 // /QIfist is excluded and the match is out of reach under the no-inline-asm rule;
 // `/Oy-` only fakes the frame (still 96/4189) and the x87 scheduling of the crossing
-// loops (running y/z kept on the stack) stays different. Written here as casts.
+// loops (running y/z kept on the stack) stays different. GridMidCell rounds them with
+// src/bringup/X87FloatToInt.h (fistp's ties-to-even; the earlier floor(v + 0.5) rounded
+// ties up).
 // s15 reference diff: the four extra __ftol calls are the fistp roundings; the immediates
 // (test ah, 1 against 0x41, 0xc, 0x18) were not traced further.
 // s20 logic fix: retail has no range test on the rounded cell indices in either loop
@@ -30,6 +32,7 @@
 // `ix < 0 || ix > 15` / `> 16` tests were removed (4308 -> 4278 bytes).
 #include "../../src/reconstructed/Griddraw.h"
 #include "../../src/reconstructed/MatrixUtil.h"
+#include "../../src/bringup/X87FloatToInt.h"
 #include <math.h>
 #include <stdio.h>
 extern "C" void __stdcall OutputDebugStringA(const char*);
@@ -50,10 +53,11 @@ static inline float GridCornerHeight(const GridNode* node, const GridBaseCell* c
 }
 
 // Cell index of a coordinate midway between two crossings: retail converts
-// (a + b) / (2 * cellSize) - 0.5 with a bare fistp (round to nearest).
+// (a + b) / (2 * cellSize) - 0.5 with a bare fistp (round to nearest even), i.e.
+// floor() of the midpoint cell coordinate except at exact ties.
 static inline int GridMidCell(float a, float b, float twoCells)
 {
-    return (int)floor((a + b) / twoCells - 0.5f + 0.5f);
+    return X87FloatToInt((a + b) / twoCells - 0.5f);
 }
 
 // Crossing of the segment with one grid-line family: `coord` is the stepped
