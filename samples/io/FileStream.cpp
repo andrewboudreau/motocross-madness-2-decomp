@@ -137,19 +137,25 @@ int UnknownTextureStream::CheckHeader()
     return 1;
 }
 
-// Restarts the key of `stream`: 0x00461d20 inlined one level.
-static inline void RestartKey(UnknownTextureStream* stream)
-{
-    if (stream->innerStream)
-        stream->innerStream->ResetTextMode();
-    else
-        stream->textMode = stream->nameKey;
-}
-
 // 0x00461340: seeks to `offset` (origin as fseek). An encoded file cannot
 // fseek into the middle of its key stream, so with `flag` it rewinds (or keeps
 // the decoded position +0x0c) and decodes forward through a scratch buffer.
-// Near miss (300 of 652 masked; same 702 bytes): the control flow and the
+// Session 21 (342 of 702, candidate 699 bytes): ResetTextMode is now an
+// in-class inline (FileStream.h), so calling it on the stream itself gives
+// retail's one inlined level and the out-of-line 0x00461d20 call; the old
+// RestartKey helper (which called it on the inner stream) now inlined a
+// second level (730 bytes, 132). The SEEK_END tail written `if (feof(..))
+// return 0; return 1;` (also as if/else-if/else) gives retail's `not al;
+// movsx eax, al; and 0x10; shr 4`; `!feof`, `feof == 0`, `?:`, `!=
+// _IOEOF`, char casts of the flag or of feof, and a `flags` local do not.
+// Still left: retail gives the fseek result edi and the position ebx (offset
+// reloaded from its home), VC6 here the reverse; the declaration order of
+// stream/buffer/result, `if ((result = fseek(..)) != 0)`, `offset -=
+// position` or `position = offset - position` for the skip, a
+// function-scope position, a tail-recursive Seek (not turned into a loop:
+// 732 bytes), the split `return 1` tests and four other position forms
+// do not move it.
+// Earlier (before the inline change; 300 of 652 masked; same 702 bytes): the
 // inner loop match, but retail keeps the next pointer and the zero in other
 // registers and swaps the origin/offset registers (ebp/ebx), so most
 // instructions differ by register. The 0x418-byte buffer reproduces
@@ -175,7 +181,7 @@ int UnknownTextureStream::Seek(int offset, int origin, int flag)
     }
     if (origin == SEEK_SET && offset == stream->Tell()) {
         if (stream->fileEncoded && !flag) {
-            RestartKey(stream);
+            stream->ResetTextMode();
             stream->keyStartOffset = offset;
         }
         stream->bufferPos = stream->bufferEnd;
@@ -213,11 +219,13 @@ int UnknownTextureStream::Seek(int offset, int origin, int flag)
                 ;
             if (ferror(stream->fileHandle))
                 return -1;
-            return !feof(stream->fileHandle);
+            if (feof(stream->fileHandle))
+                return 0;
+            return 1;
         }
     } else {
         if (stream->fileEncoded && !flag) {
-            RestartKey(stream);
+            stream->ResetTextMode();
             if (origin == SEEK_SET)
                 stream->keyStartOffset = offset;
         }
