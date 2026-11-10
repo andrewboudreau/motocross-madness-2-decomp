@@ -33,6 +33,7 @@
 #include "../reconstructed/MorphBastardModifierCore.h"
 #include "motion/MotionPose.h"
 #include <float.h>
+#include "X87FloatToInt.h"
 
 // Same as KrustyBike.cpp's TU-local KbLength (square root with an exact-one shortcut).
 static inline float KbLength(const Vec3& v)
@@ -141,23 +142,12 @@ struct G3MotionView {
     int posesPerFrame;        // +0xac
 };
 
-// best guess: retail converts with fistp in the FPU's current rounding mode; the game
-// runs with the default round-to-nearest, reproduced here (ties to even).
-static int G3RoundNearest(float v)
-{
-    double f = floor((double)v);
-    double frac = (double)v - f;
-    int i = (int)f;
-    if (frac > 0.5 || (frac == 0.5 && (i & 1)))
-        ++i;
-    return i;
-}
-
 static void G3SampleMotion(G3MotionView* m, float phase, MotionPoseList** frame,
                            MotionPoseList** next, float* fraction)
 {
     float position = (float)(m->frameCount - 1) * phase;
-    int index = G3RoundNearest(position - 0.5f);
+    // Retail's fistp helper (0x004a9092): floor(position) except at exact ties.
+    int index = X87FloatToInt(position - 0.5f);
     *fraction = position - (float)index;
     *frame = &m->frames[index];
     *next = index + 1 == m->frameCount ? *frame : &m->frames[index + 1];

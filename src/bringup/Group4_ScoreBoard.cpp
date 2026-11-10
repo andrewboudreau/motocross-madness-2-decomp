@@ -4,10 +4,10 @@
 // BonusObjectManager (Krusty3DObjects.h declares the same address as
 // BonusObjectManager::ShowValue). The body is written from the decoded
 // retail function against BonusObjectManager's layout; not a byte match
-// (retail rounds with a `fld; fistp` helper, see docs/KRUSTY3DOBJECTS.md).
-#include <math.h>
-
+// (retail rounds with a `fld; fistp` helper, see docs/KRUSTY3DOBJECTS.md;
+// X87FloatToInt stands in for it).
 #include "../reconstructed/Krusty3DObjects.h"
+#include "X87FloatToInt.h"
 
 float FastSqrt(float x); // 0x00460b50
 
@@ -16,18 +16,6 @@ float FastSqrt(float x); // 0x00460b50
 struct KbScoreBoard {
     void ShowValue(float points, float multiplier);
 };
-
-// fistp under the default x87 control word: round to nearest, ties to even.
-static int Group4Ovl_RoundNearest(double value)
-{
-    double low = floor(value);
-    double diff = value - low;
-    if (diff > 0.5)
-        return (int)low + 1;
-    if (diff < 0.5)
-        return (int)low;
-    return (fmod(low, 2.0) == 0.0) ? (int)low : (int)low + 1;
-}
 
 // Shows a model under the base frame (0x004fdb50, mark the subtree dirty,
 // 0x004fd910 AddChild).
@@ -51,7 +39,7 @@ void KbScoreBoard::ShowValue(float points, float multiplier)
     self->HideDigits();
     int places = points < 10000.0f ? 4 : 5;
     self->shownDigits[4] = -1;
-    int remaining = Group4Ovl_RoundNearest(points) / 100;
+    int remaining = X87FloatToInt(points) / 100;
     self->shownDigits[0] = 0;
     Group4Ovl_ShowModel(self, self->digitModels[0][0]);
     self->shownDigits[1] = 0;
@@ -64,7 +52,7 @@ void KbScoreBoard::ShowValue(float points, float multiplier)
     }
     int resize = 0;
     if (multiplier >= 1.05f) {
-        int tenths = Group4Ovl_RoundNearest(multiplier * 10.0f);
+        int tenths = X87FloatToInt(multiplier * 10.0f);
         for (place = 0; place < 2; place++) {
             int digit = tenths % 10;
             Group4Ovl_ShowModel(self, self->fractionDigitModels[digit][place]);

@@ -3,9 +3,8 @@
 //
 //  * VisibilityClipper::TestBox (0x0052f570, ret 0x1c) written from the
 //    decoded retail function. Retail rounds the screen rectangle with an
-//    inline x87 fistp helper (current rounding mode, round-to-nearest);
-//    best guess: Group4Vis_RoundNearest reproduces round-half-even without
-//    inline assembly.
+//    inline x87 fistp helper (current rounding mode, round-to-nearest-even);
+//    X87FloatToInt reproduces it without inline assembly.
 //  * UnknownEcoVisibilityClipper::SphereInFrustum (0x0052fbb0) is
 //    EcoSystem.h's boundary view of VisibilityClipper::SphereInFrustum,
 //    which src/krusty2/visibility/VisibilityQuadTree.cpp already defines; the
@@ -13,21 +12,12 @@
 #include <math.h>
 
 #include "visibility/VisibilityQuadTree.h"
+#include "X87FloatToInt.h"
 
 // The eight clip-space box corners (0x0068abc8, 8 x 0x20 bytes). TestBox
 // writes them and then turns the first two floats of each into screen
 // coordinates in place. Only TestBox touches them in this unit.
 static VisibilityClipPoint s_group4BoxCorners[8];
-
-// Round to nearest, ties to even (the x87 default mode retail's fistp uses).
-static int Group4Vis_RoundNearest(float value) {
-    double floorValue = floor((double)value);
-    double fraction = (double)value - floorValue;
-    int result = (int)floorValue;
-    if (fraction > 0.5 || (fraction == 0.5 && (result & 1)))
-        result++;
-    return result;
-}
 
 // Outcode of a clip-space point against 0 <= x, y, z <= w:
 // x 1/2, y 4/8, z 0x10/0x20 (below / above).
@@ -131,8 +121,8 @@ int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, co
         float inverse = 1.0f / corner->w;
         corner->x = (float)width * inverse * corner->x;
         corner->y = (float)height * inverse * corner->y;
-        screenRect[0] = Group4Vis_RoundNearest(corner->x);
-        screenRect[1] = Group4Vis_RoundNearest(corner->y);
+        screenRect[0] = X87FloatToInt(corner->x);
+        screenRect[1] = X87FloatToInt(corner->y);
         screenRect[3] = screenRect[1];
         screenRect[2] = screenRect[0];
         for (i = 1; i < 8; i++) {
@@ -141,13 +131,13 @@ int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, co
             corner->x = (float)width * inverse * corner->x;
             corner->y = (float)height * corner->y * inverse;
             if ((float)screenRect[0] > corner->x)
-                screenRect[0] = Group4Vis_RoundNearest(corner->x);
+                screenRect[0] = X87FloatToInt(corner->x);
             else if ((float)screenRect[2] < corner->x)
-                screenRect[2] = Group4Vis_RoundNearest(corner->x);
+                screenRect[2] = X87FloatToInt(corner->x);
             if ((float)screenRect[1] > corner->y)
-                screenRect[1] = Group4Vis_RoundNearest(corner->y);
+                screenRect[1] = X87FloatToInt(corner->y);
             else if ((float)screenRect[3] < corner->y)
-                screenRect[3] = Group4Vis_RoundNearest(corner->y);
+                screenRect[3] = X87FloatToInt(corner->y);
         }
         // Clamp to the viewport (signed compares, as retail) and offset by
         // its origin.

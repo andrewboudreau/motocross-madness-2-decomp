@@ -12,21 +12,7 @@
 #include "../reconstructed/SceneManager.h"
 #include "../krusty2/motion/D3DIMSoultreeCharacter.h"
 #include "../krusty2/motion/Motnctrl.h"
-
-// fistp under the default x87 control word: round to nearest, ties to even.
-static int Group4Scene_RoundNearestEven(float value)
-{
-    float floorValue = (float)(int)value;
-    if (floorValue > value) {
-        floorValue -= 1.0f;
-    }
-    float fraction = value - floorValue;
-    int result = (int)floorValue;
-    if (fraction > 0.5f || (fraction == 0.5f && (result & 1) != 0)) {
-        result++;
-    }
-    return result;
-}
+#include "X87FloatToInt.h"
 
 // Advances an entry's character by dt; "UseBlendedKeys" entries go through
 // Character slot 7 (0x004a70c0), the others through AdvanceMotion (0x004a6bb0).
@@ -121,7 +107,8 @@ int Scene::Tick(float frameTime)
             if (!gameObject->isEnabled || reinterpret_cast<Character*>(object)->motionStopped) {
                 // Swap in a random member of the set.
                 gameObject->Disable();
-                int pick = Group4Scene_RoundNearestEven(rand() * (1.0f / 32768.0f) * count - 0.5f);
+                // Retail's fistp helper (0x004eadf1): floor() of the scaled rand except at ties.
+                int pick = X87FloatToInt(rand() * (1.0f / 32768.0f) * count - 0.5f);
                 entry = &animationTable->entries[set->animationIndices[pick]];
                 entry->currentMotion = set->motionIndices[pick];
                 object = entry->character;

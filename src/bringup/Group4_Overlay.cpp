@@ -24,6 +24,7 @@
 #include "../reconstructed/ControlInterface.h"
 #include "../reconstructed/D3DConstants.h"
 #include "../reconstructed/PCRenderTarget.h"
+#include "X87FloatToInt.h"
 // GDI32 imports, as in TrackOverlay.cpp.
 struct UnknownLogFont {
     long lfHeight;
@@ -54,19 +55,9 @@ extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* t
 // TrackOverlay.cpp statics: the radar zoom (0x0057513c) and the ChatOverlay
 
 // Retail rounds these screen coordinates with a project `fld; fistp`
-// helper applied to (value - 0.5): the x87 default round-to-nearest-even of
-// value - 0.5, i.e. floor(value) except exact integers may round down by one
-// on ties. best guess: reproduce that rounding portably.
-static int Group4Ovl_FistpRound(double value)
-{
-    double low = floor(value);
-    double diff = value - low;
-    if (diff > 0.5)
-        return (int)low + 1;
-    if (diff < 0.5)
-        return (int)low;
-    return (fmod(low, 2.0) == 0.0) ? (int)low : (int)low + 1;
-}
+// helper applied to (value - 0.5) (0x0051af3e, 0x0051af64, 0x0051b0c3):
+// floor(value) except that exact integers round to the even neighbour.
+// X87FloatToInt reproduces it.
 
 // 0x0051af00 (ret 0x18): GameObject slot 8 (SetRenderContext) on `value`;
 // keeps dropSeconds; places the text given on a 640x480 screen; copies the
@@ -80,8 +71,8 @@ DropTextOverlay* DropTextOverlay::Setup(void* value, TextureMapManager* textures
     GameObject::SetRenderContext(value);
     this->dropSeconds = dropSeconds;
     PCRenderTarget* target = (PCRenderTarget*)renderContext;
-    textX = Group4Ovl_FistpRound((float)(target->targetWidth * (1.0f / 640.0f) * x) - 0.5f);
-    textYOffset = Group4Ovl_FistpRound((float)(target->targetHeight * (1.0f / 480.0f) * y) - 0.5f);
+    textX = X87FloatToInt(target->targetWidth * (1.0f / 640.0f) * x - 0.5f);
+    textYOffset = X87FloatToInt(target->targetHeight * (1.0f / 480.0f) * y - 0.5f);
     textY = textYOffset;
     strcpy(caption, text);
     logFont.lfHeight = 28;
@@ -123,8 +114,8 @@ int DropTextOverlay::Tick(float frameTime)
     GameObject::Tick(g_TrackGame->frameTime);
     if (visible) {
         elapsedTime += g_TrackGame->frameTime;
-        int drop = Group4Ovl_FistpRound((float)(elapsedTime / this->dropSeconds
-                                                * ((PCRenderTarget*)renderContext)->targetHeight) - 0.5f);
+        int drop = X87FloatToInt(elapsedTime / this->dropSeconds
+                                 * ((PCRenderTarget*)renderContext)->targetHeight - 0.5f);
         int y = textYOffset + drop;
         if (y > ((PCRenderTarget*)renderContext)->targetHeight)
             visible = 0;
