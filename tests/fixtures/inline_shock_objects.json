@@ -3,8 +3,8 @@
   "objects": {
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
-      "relocations": 1103,
-      "sha256": "374e1a02f4c52bcbab180d90de0d6eb8d5c9a09124ec85b56e4c99595358bba5"
+      "relocations": 1105,
+      "sha256": "7c99bf2afc5495d860a820a48b895ccbd8a2a0451aab59daed6e7287adc25c9b"
     },
     "samples/physics/suspension/Shock.cpp": {
       "sections": 56,

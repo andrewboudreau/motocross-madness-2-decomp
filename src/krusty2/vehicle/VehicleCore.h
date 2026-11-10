@@ -124,7 +124,11 @@ public:
     // airborne (lean/steer rotation, gyro, wobble).
     virtual void ApplyCrashedControl();  // entry is the shared empty stub 0x00464e90
     virtual int ClassifyInputDirection();
-    virtual int SelectRiderPose(float frame);      // Bike 0x0040ae50 passes a float (tier 2)
+    // Bike 0x0040ae50 passes a float (tier 2).  void: Bike 0x00406ae0 and KrustyBike
+    // 0x0048e3e0 never materialise a result (the locked early exit just keeps slot 66's
+    // eax), and its only callers, the void slot 90 bodies of Vehicle and Bike, ignore eax.
+    // Vehicle's 11-byte tail call stays exact either way (tier 2).
+    virtual void SelectRiderPose(float frame);
     virtual void ClampSubStepsOnCrash(int* steps, float frame);
     virtual void ApplyAirControl();  // entry is the shared empty stub 0x00464e90
     virtual void ApplyLeanCorrection(const Vec3* worldDir, const Vec3* point);

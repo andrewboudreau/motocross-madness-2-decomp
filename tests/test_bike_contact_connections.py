@@ -26,7 +26,7 @@ REMOVE = '?RemoveCollisionPoint@@YAXPAPAVCollisionPoint@@PAV1@PAH@Z'
 PARTIAL = [
     ('ApplyCollisionEvent@Bike', 4215184, 2874, 2865, 1758, '2ee145a08a8327876d857cb620c7c7e00da6085641564e4882ba36aca63c9f30'),
     ('DistributeContactForce@Bike', 4219072, 1678, 1678, 1677, 'aaa8295baf0865125e0a657a14607ee3f28d8ad2446b0dd2a609d03475342193'),
-    ('SelectRiderPose@Bike', 4221664, 2396, 2460, 94, '38dc86494d235e9c005cfa9f4e6d340c7fa63081c07c8d48b3f2e0f7549cadc2'),
+    ('SelectRiderPose@Bike', 4221664, 2396, 2436, 107, '9c789409acc4b118c57a6525880b37415b923e4aeb0cc833584955a14ffab1c7'),
     ('UpdateRiderPose@Bike', 4224064, 485, 474, 188, 'b54d0bbdb1c68a8d8c58a2368d2f31f5f0df23c1f6d12380fa84191bd009289e'),
     ('ComputeSlideAngle@Bike', 4243456, 1015, 1069, 154, 'c219454774f219d02b41449ceb143d1e05c68b7487c52611b82aee0a712ad48b'),
     ('Method_0x0040a520@Bike', 4236576, 2272, 2272, 2112, 'c9494a3e330380062a18ab3f5b21d4ee4ee8dcd628b7cd45f155c9ff10322a3e'),

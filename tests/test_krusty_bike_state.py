@@ -103,7 +103,8 @@ class KrustyBikeStateTests(unittest.TestCase):
                        if caller.symbol_by_index[r.symbol_index].section_number == 0}
             self.assertTrue(set(expected) <= imports)
             manifest = ROOT / 'src/krusty2/vehicle/targets.json'
-            targets = [t for t in json.loads(manifest.read_text()) if t['source'] == 'KrustyBike.cpp']
+            targets = [t for t in json.loads(manifest.read_text())
+                       if t['source'] == 'KrustyBike.cpp' and t.get('expect') != 'partial']
             self.assertEqual(len(targets), 76)
             for target in targets:
                 proof = compare(retail, caller, target['candidate_symbol_contains'],

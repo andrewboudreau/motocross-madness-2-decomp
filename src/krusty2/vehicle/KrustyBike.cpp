@@ -14,6 +14,7 @@
 // which includes this file.  Member and helper names are provisional (tier 3); see
 // KrustyBikeTypes.h.
 #include "../../reconstructed/TrackGameGlobal.h"
+#include <float.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1414,6 +1415,257 @@ void KrustyBike::Fn_0048E280()
     headTurnAngle = 0;
     reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8bf0(riderPoseHandles[14], 0.5f);
     D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[14], 0.5f);
+}
+
+// ---- slot 89: rider pose selection (0x0048e3e0, overrides Bike 0x00406ae0) ----
+// Decoded from retail (tier 2 shape; names tier 3).  Bike's version with three differences:
+//  - pad_0x5B8 set (Vehicle.cpp clears it; slot 102 tests it with crashState): fixed steer
+//    pose (poseIndex 3, poseState 4, poseBlend 1, poseLeanBlend 0) and the state-1 mapping
+//    of controlInput.x to poseParam, without touching steerPoseState;
+//  - a local (not AI, remote or ghost) rider airborne and uncrashed with both wheels more
+//    than 2.5 clear of the ground starts the head turn 0x0048e280 (control 9 while the
+//    crossover pose runs) or the knocked-off animation 0x0048d910 picked by controls 6/7
+//    and the stick sector (slot 88), and returns;
+//  - no lean pose (leanPoseMin/leanPoseMax): backingUp selects pose 16 (BackUp) instead.
+// The rest (crossover pose, slip/steer pose, both steerPoseState machines) is Bike's.
+// Retail rounds the pose index with the same inlined fistp helper as Bike; KbFloatToInt
+// gives the round-to-nearest-even result in ordinary C++ (see Bike.cpp BikeFloatToInt).
+// Before this override the source build ran Bike's slot 89 for KrustyBike, so player bikes
+// took Bike's lean poses and never started the in-air head turn or knocked-off animation
+// from here.
+static inline void KbFloatToInt(int* out, float value)
+{
+    int result = (int)value;
+    float fraction = value - (float)result;
+    if (fraction > 0.5f || (fraction == 0.5f && (result & 1)))
+        result++;
+    else if (-fraction > 0.5f || (-fraction == 0.5f && (result & 1)))
+        result--;
+    *out = result;
+}
+
+static inline float KbAtLeast(float x, float lo)
+{
+    return x <= lo ? lo : x;
+}
+
+static inline float KbAtMost(float x, float hi)
+{
+    return x >= hi ? hi : x;
+}
+
+static inline float KbRange(float x, float lo, float hi)
+{
+    return KbAtMost(KbAtLeast(x, lo), hi);
+}
+
+void KrustyBike::SelectRiderPose(float t)
+{
+    if (IsRiderPoseLocked())
+        return;
+
+    float x;
+    if (*(int*)pad_0x5B8) {
+        poseBlend = 1.0f;
+        poseState = 4;
+        poseIndex = 3;
+        poseLeanBlend = 0.0f;
+        if (controlInput.x < 0.0f) {
+            x = controlInput.x * -0.25f;
+            poseParam = KbRange(x, 0.0f, 0.25f);
+        } else {
+            x = controlInput.x * 0.25f + 0.5f;
+            poseParam = KbRange(x, 0.5f, 0.75f);
+        }
+        return;
+    }
+
+    if (!aiKind && !isRemote && !isGhost && airborne && !crashState
+        && frontWheel->penetration < -2.5f && rearWheel->penetration < -2.5f) {
+        if (QueryControlInput(9, 0x3f) && crossoverPose) {
+            Fn_0048E280();
+            return;
+        }
+        int first = QueryControlInput(6, 0x3f);
+        int second = QueryControlInput(7, 0x3f);
+        if (first || second) {
+            int direction = ClassifyInputDirection();
+            if (direction != -1) {
+                Fn_0048D910(direction + (first ? 0 : 8));
+                return;
+            }
+        }
+    }
+
+    float lean;
+    if (airborne || rearWheel->inContact)
+        lean = -frontWheel->penetration;
+    else
+        lean = 0.0f;
+
+    if (airborne && lean > 2.0f && rearWheel->penetration < -1.0f) {
+        float posePosition = (0.75f - steerAxis->steerValue) * 3.99f;
+        KbFloatToInt(&poseIndex, posePosition - 0.5f);
+        int idx = poseIndex;
+        poseIndex = idx + 11;
+        poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
+        if (crossoverPose == 0) {
+            BikeA644* smoother = poseSmoother;
+            float initialTime = poseSmoothTime;
+            *(float*)&smoother->smoothedValue = 0.0f;
+            if (initialTime != FLT_MAX) {
+                smoother->smoothTime = initialTime;
+                smoother->smoothRatio = 1.0f;
+            }
+            smoother->maxRise = 1.0f;
+            smoother->maxFall = -1.0f;
+            steerPoseState = 1;
+        }
+        crossoverPose = 1;
+    } else {
+        EndMotion();
+        if (rearWheel->slipSpeed > 14.0f) {
+            KbFloatToInt(&poseIndex, (0.75f - steerAxis->steerValue) * 3.99f - 0.5f);
+            int idx = poseIndex;
+            if (idx == 2) {
+                if (rearWheel->slipSpeed > 32.0f)
+                    poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - 2.0f;
+                else
+                    poseBlend = (rearWheel->slipSpeed - 14.0f) * 0.0555f;
+            } else {
+                poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
+            }
+            poseState = idx * 2 + 4;
+            poseIndex = poseState - 1;
+        } else if (backingUp) {
+            poseIndex = 16;
+            poseState = 5;
+        } else {
+            KbFloatToInt(&poseIndex, (0.75f - steerAxis->steerValue) * 3.99f - 0.5f);
+            int idx = poseIndex;
+            poseState = idx * 2 + 3;
+            poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
+            poseLeanBlend = (14.0f - rearWheel->slipSpeed) * 0.0714285746f;
+        }
+    }
+
+    if (crossoverPose) {
+        // advance the smoothed value toward controlInput.x, limited by its rate
+        BikeA644* smoother = poseSmoother;
+        float change = controlInput.x - *(float*)&smoother->smoothedValue;
+        if (change < 0.0f)
+            change = KbAtLeast(change, smoother->maxFall);
+        else
+            change = KbAtMost(change, smoother->maxRise);
+        float step = t < smoother->smoothTime ? t : smoother->smoothTime;
+        smoother->smoothRatio = step / smoother->smoothTime;
+        *(float*)&smoother->smoothedValue = change * smoother->smoothRatio + *(float*)&smoother->smoothedValue;
+        t = *(float*)&smoother->smoothedValue;
+        switch (steerPoseState) {
+        case 1:
+            x = t * -0.25f;
+            poseParam = x;
+            if (x < 0.0f) {
+                steerPoseState = 3;
+                poseParam = 0.5f - x;
+            } else if (x > 0.225f) {
+                steerPoseState = 2;
+                poseParam = 0.5f - x;
+            }
+            break;
+        case 2:
+            x = t * 0.25f + 0.5f;
+            poseParam = x;
+            if (x > 0.5f)
+                steerPoseState = 3;
+            break;
+        case 3:
+            x = t * 0.25f + 0.5f;
+            poseParam = x;
+            if (x < 0.5f) {
+                poseParam = 0.5f - x;
+                steerPoseState = 1;
+            } else if (x > 0.725f) {
+                poseParam = 1.5f - x;
+                steerPoseState = 4;
+            }
+            break;
+        case 4:
+            x = t * -0.25f + 1.0f;
+            poseParam = x;
+            if (x > 1.0f) {
+                poseParam = x - 1.0f;
+                steerPoseState = 1;
+            }
+            break;
+        }
+    } else {
+        switch (steerPoseState) {
+        case 1:
+            if (controlInput.x < 0.0f) {
+                if (controlInput.x < -0.9f)
+                    steerPoseState = 2;
+                x = controlInput.x * -0.25f;
+                poseParam = KbRange(x, 0.0f, 0.25f);
+            } else {
+                if (controlInput.x > 0.9f)
+                    steerPoseState = 4;
+                x = controlInput.x * 0.25f + 0.5f;
+                poseParam = KbRange(x, 0.5f, 0.75f);
+            }
+            break;
+        case 2:
+            if (controlInput.x > prevControlInput.x) {
+                steerPoseState = 3;
+                x = controlInput.x * 0.25f + 0.5f;
+                poseParam = KbRange(x, 0.25f, 0.5f);
+            } else {
+                x = controlInput.x * -0.25f;
+                poseParam = KbRange(x, 0.0f, 0.25f);
+            }
+            break;
+        case 3:
+            if (controlInput.x > -0.032f) {
+                steerPoseState = 1;
+                if (controlInput.x < 0.0f) {
+                    x = controlInput.x * -0.25f;
+                    poseParam = KbRange(x, 0.0f, 0.25f);
+                } else {
+                    x = controlInput.x * 0.25f + 0.5f;
+                    poseParam = KbRange(x, 0.5f, 0.75f);
+                }
+            } else {
+                x = controlInput.x * 0.25f + 0.5f;
+                poseParam = KbRange(x, 0.25f, 0.5f);
+            }
+            break;
+        case 4:
+            if (controlInput.x < prevControlInput.x) {
+                steerPoseState = 5;
+                x = controlInput.x * -0.25f + 1.0f;
+                poseParam = KbRange(x, 0.75f, 1.0f);
+            } else {
+                x = controlInput.x * 0.25f + 0.5f;
+                poseParam = KbRange(x, 0.5f, 0.75f);
+            }
+            break;
+        case 5:
+            if (controlInput.x < 0.032f) {
+                steerPoseState = 1;
+                if (controlInput.x < 0.0f) {
+                    x = controlInput.x * 0.25f + 0.5f;
+                    poseParam = KbRange(x, 0.5f, 0.75f);
+                } else {
+                    x = controlInput.x * -0.25f;
+                    poseParam = KbRange(x, 0.0f, 0.25f);
+                }
+            } else {
+                x = controlInput.x * -0.25f + 1.0f;
+                poseParam = KbRange(x, 0.75f, 1.0f);
+            }
+            break;
+        }
+    }
 }
 
 // 0x004933e0: the decoded network state (+0x1358..+0x1388) accumulates message 13's

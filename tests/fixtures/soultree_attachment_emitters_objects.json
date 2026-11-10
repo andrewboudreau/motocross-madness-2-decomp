@@ -17,8 +17,8 @@
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
-      "relocations": 1103,
-      "sha256": "6ee7a7228ba37cdb0ab2e673212f24f4c33d955d1140857af2a6edb2afcb9e00"
+      "relocations": 1105,
+      "sha256": "4f69fd4de038bb186f4f5088c9e4aa984ee3a617ea76778d103c8f413ed1da79"
     },
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,

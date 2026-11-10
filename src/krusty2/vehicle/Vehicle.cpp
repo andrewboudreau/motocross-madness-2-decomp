@@ -51,9 +51,9 @@ int Vehicle::ClassifyGroundContact(float slideAngle)
     return anyWheelInContact && crashState == 0;
 }
 
-int Vehicle::SelectRiderPose(float frame)
+void Vehicle::SelectRiderPose(float frame)
 {
-    return IsRiderPoseLocked();
+    IsRiderPoseLocked();
 }
 
 void Vehicle::InitForceFeedback() { forceFeedbackGain = 0.5f; }

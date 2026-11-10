@@ -106,7 +106,7 @@
     "target_va": "0x00406ae0",
     "target_size": 2396,
     "expect": "partial",
-    "notes": "strict 94/2396 (candidate 2460). Rider-pose blend state machine (steerPoseState states 1..5, field_0x65c output, field_0x644 smoothing); both jump tables decoded case by case against the source. Retail uses an ebp frame with [ebp-4]/[ebp-8] temps and fistp stores (inlined fistp float-to-int helper, i.e. inline asm in the original, out of reach under the no-asm rule). A plain (int) cast truncated through __ftol, so poseIndex was one too low (and poseBlend above 1) whenever the value before the -0.5 had a fraction below one half; BikeFloatToInt reproduces fistp round-to-nearest-even (checked against a real fistp over every |v| < 2^24 at stride 3 plus the steer range, 0 mismatches), costing strict 115 -> 94 for the correct pose index. Nested by-value clamp helpers (BikeAtLeast/BikeAtMost) reproduce retail's memory temps (strict 104 -> 115); retail still repeats each clamp per branch where ours shares one. Extent 0x00406ae0..0x0040743c includes the nop and the 9-entry jump table after the last ret.",
+    "notes": "strict 107/2436 (candidate 2436). void return (as KrustyBike 0x0048e3e0; no path materialises a result, the slot 90 callers ignore eax): the int form's `return 0` added xor eax,eax to every exit and stopped the shared tails merging (strict 94/2460 -> 107/2436). Rider-pose blend state machine (steerPoseState states 1..5, field_0x65c output, field_0x644 smoothing); both jump tables decoded case by case against the source. Retail uses an ebp frame with [ebp-4]/[ebp-8] temps and fistp stores (inlined fistp float-to-int helper, i.e. inline asm in the original, out of reach under the no-asm rule). A plain (int) cast truncated through __ftol, so poseIndex was one too low (and poseBlend above 1) whenever the value before the -0.5 had a fraction below one half; BikeFloatToInt reproduces fistp round-to-nearest-even (checked against a real fistp over every |v| < 2^24 at stride 3 plus the steer range, 0 mismatches), costing strict 115 -> 94 for the correct pose index. Nested by-value clamp helpers (BikeAtLeast/BikeAtMost) reproduce retail's memory temps (strict 104 -> 115); retail still repeats each clamp per branch where ours shares one. Extent 0x00406ae0..0x0040743c includes the nop and the 9-entry jump table after the last ret.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -2407,6 +2407,16 @@
     "target_size": 339,
     "expect": "exact",
     "notes": "Bearing to the nearest rival, head-turn start. Exact with `(float)(atan2(d.x, d.z)) - savedYaw`: the parenthesised cast operand keeps the dead fpatan duplicate and pops it before the yaw fsub; `(x * 0.36963f) * 0.7f` keeps the two multiplies.",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "SelectRiderPose@KrustyBike",
+    "target_va": "0x0048e3e0",
+    "target_size": 2744,
+    "expect": "partial",
+    "notes": "strict 171/2744 (candidate 2648). Slot 89 override, previously unreconstructed (the source build ran Bike's 0x00406ae0 for KrustyBike). Decoded from retail: pad_0x5B8 fixed steer pose with the state-1 poseParam clamp; the local-rider airborne trick start (controls 9/6/7, slot 88 sector -> 0x0048e280 / 0x0048d910(sector + (control 6 ? 0 : 8))); no leanPoseMin/Max branch; backingUp -> pose 16 / state 5; the rest is Bike's, both jump tables checked case by case (extent includes the 4- and 5-entry tables to 0x0048ee98). Retail keeps an ebp frame for the inlined fistp helper (inline asm, not reproducible); KbFloatToInt gives the same round-to-nearest-even index, which costs the rest of the frame shape. Ruled out: int return with `return 0` (strict ~101 masked, candidate 2880: xor eax,eax on every exit and the 0x5b8 branch no longer shares the switch tails).",
     "bindings": "KrustyBike.bindings.json"
   },
   {

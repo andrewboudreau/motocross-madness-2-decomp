@@ -24,9 +24,9 @@
       "SelectRiderPose@Bike",
       4221664,
       2396,
-      2460,
-      94,
-      "97fcf0ffd2da5d946d52360918ce97975f3cf37851c82dde086e1bcaf5744473"
+      2436,
+      107,
+      "ffed5d681393b109d8837e1337128dd49719dda09c28521a7b8f85e30a6647b1"
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",
@@ -243,6 +243,24 @@
       119,
       null,
       "c5d030fc75b6a6ec0d53d90752e8e35f2dc92f1aa102ccf486005ba343827dc3"
+    ],
+    [
+      "src/krusty2/vehicle/KrustyBike.cpp",
+      "SelectRiderPose@KrustyBike",
+      4776928,
+      2744,
+      2648,
+      171,
+      "21ac75f165a11f913ca8e3538107d4524918eba9cb3688304096a4251629c849"
+    ],
+    [
+      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
+      "SelectRiderPose@KrustyBike",
+      4776928,
+      2744,
+      2648,
+      null,
+      "21ac75f165a11f913ca8e3538107d4524918eba9cb3688304096a4251629c849"
     ]
   ]
 }

@@ -29,7 +29,14 @@ NATIVE = ((SOURCES[2], 'void GhostMod1::StartFade(', '?StartFade@GhostMod1@@', 0
           (SOURCES[5], 'void D3DIMSoultreeObject::RemoveModifier(', '?RemoveModifier@D3DIMSoultreeObject@@', 0x444de0, 145),
           (SOURCES[5], 'void D3DIMSoultreeObject::AddSecondModifier(', '?AddSecondModifier@D3DIMSoultreeObject@@', 0x444eb0, 84),
           (SOURCES[5], 'void D3DIMSoultreeObject::RemoveSecondModifier(', '?RemoveSecondModifier@D3DIMSoultreeObject@@', 0x444f10, 145))
-PARTIAL = [['samples/physics/krustybike/KrustyBikeNearMisses.cpp',
+PARTIAL = [['src/krusty2/vehicle/KrustyBike.cpp',
+  'SelectRiderPose@KrustyBike',
+  4776928,
+  2744,
+  2648,
+  171,
+  '47f2bc61d17b9dca6b6a2bd3b1d73527064c36b4c8d6f0871f198eef502dccdf'],
+ ['samples/physics/krustybike/KrustyBikeNearMisses.cpp',
   'IsSpeedGainBelowLimit@KrustyBike',
   4790688,
   229,
@@ -184,7 +191,7 @@ class BikeModifierConnectionsTests(unittest.TestCase):
                         resolved = match_object(objects[source], symbol, va, b'',
                             {k: int(v, 0) for k, v in json.loads((ROOT / binding).read_text()).items()})
                     self.assertEqual(resolved['digest'], digest, key); preserved += 1
-            self.assertEqual(preserved, 6)
+            self.assertEqual(preserved, 7)
             compiler = Path(os.environ['VC6_ROOT'])
             linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
             libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
@@ -197,7 +204,7 @@ class BikeModifierConnectionsTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Bike modifiers: 3712 attachment, removal and fade boundary cases passed', result.stdout)
-            print('%d strict checks, six complete partial fingerprints, 14 dual-strict body checks; %s' %
+            print('%d strict checks, seven complete partial fingerprints, 14 dual-strict body checks; %s' %
                   (strict, result.stdout.strip()))
 
 

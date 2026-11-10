@@ -42,9 +42,9 @@
       "SelectRiderPose@Bike",
       4221664,
       2396,
-      2460,
-      94,
-      "38dc86494d235e9c005cfa9f4e6d340c7fa63081c07c8d48b3f2e0f7549cadc2"
+      2436,
+      107,
+      "9c789409acc4b118c57a6525880b37415b923e4aeb0cc833584955a14ffab1c7"
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",
@@ -223,8 +223,17 @@
       4299120,
       13428,
       13428,
-      13396,
-      "a6159f61caafc2347d11f9ef24dfc6956a1da5b180cd6749c63609a4716f8482"
+      13390,
+      "dfc0ee81775e2529319f4644466baacd436755506630b8d402b6621e29cea48c"
+    ],
+    [
+      "src/krusty2/vehicle/KrustyBike.cpp",
+      "SelectRiderPose@KrustyBike",
+      4776928,
+      2744,
+      2648,
+      171,
+      "47f2bc61d17b9dca6b6a2bd3b1d73527064c36b4c8d6f0871f198eef502dccdf"
     ]
   ],
   "additional_functions": [

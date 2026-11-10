@@ -40,6 +40,7 @@ PARTIAL = [
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'Fn_00493660@KrustyBike', 4798048, 8545, 8558, 2305, 'ffc638804e115abac59baeed51fe496e2c2167f5f006b1c337aaee4f7e249815'),
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', '??0KrustyBike@@QAE@H@Z', 4782688, 532, 532, 472, 'f333644c75f0d39f6e5af3c3d8c898b85d85f9467e953b8d0e6f4c5771d00276'),
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'UpdateRiderPose@KrustyBike', 4779680, 2920, 2952, 608, '1bbe35c0f4249dd69e1255c94f129b84d7d0f79ae2e94173ce021cf0a3a4b87c'),
+    ('src/krusty2/vehicle/KrustyBike.cpp', 'SelectRiderPose@KrustyBike', 4776928, 2744, 2648, 171, '47f2bc61d17b9dca6b6a2bd3b1d73527064c36b4c8d6f0871f198eef502dccdf'),
 ]
 
 
@@ -135,7 +136,7 @@ class NextBikeConnectionsTests(unittest.TestCase):
                      for c in CASES if c['source'] in SOURCES]
             for manifest in (ROOT / 'src/krusty2').rglob('targets.json'):
                 for target in json.loads(manifest.read_text()):
-                    if 'source' not in target:
+                    if 'source' not in target or target.get('expect') == 'partial':
                         continue
                     source = (manifest.parent / target['source']).resolve().relative_to(ROOT).as_posix()
                     if source in SOURCES:

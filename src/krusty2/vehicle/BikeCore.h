@@ -54,7 +54,7 @@ public:
     virtual float GetTurnRadius(const Vec3* point, const Vec3* dir);
     virtual float ComputeWheelForwardAlignment();
     virtual Vec3 ComputeDriveTorque(const Vec3* arm, const Vec3* force);
-    virtual int SelectRiderPose(float frame);
+    virtual void SelectRiderPose(float frame);
     virtual void ClampSubStepsOnCrash(int* steps, float frame);
     virtual void ApplyAirControl();
     virtual void ApplyLeanCorrection(const Vec3* worldDir, const Vec3* point);

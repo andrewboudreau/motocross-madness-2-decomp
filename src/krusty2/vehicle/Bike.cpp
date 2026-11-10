@@ -2130,11 +2130,10 @@ static inline float BikeRange(float x, float lo, float hi)
     return BikeAtMost(BikeAtLeast(x, lo), hi);
 }
 
-int Bike::SelectRiderPose(float t)
+void Bike::SelectRiderPose(float t)
 {
-    int result = IsRiderPoseLocked();
-    if (result)
-        return result;
+    if (IsRiderPoseLocked())
+        return;
 
     float lean;
     if (airborne || rearWheel->inContact)
@@ -2312,7 +2311,6 @@ int Bike::SelectRiderPose(float t)
             break;
         }
     }
-    return 0;
 }
 
 // ---- collision callbacks (0x00405cd0, 0x00405d70) -------------------------------------

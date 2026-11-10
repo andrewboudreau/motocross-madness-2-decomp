@@ -86,6 +86,9 @@ public:
     virtual int EvaluateCrash(float dt, float noseOverLimit, int impact, float impulse);
     virtual void SwitchToBikeCollision();
     virtual void UpdateRiderPose(float dt);   // 0x0048eea0: rider/bike pose update (trick clips, head turn)
+    // 0x0048e3e0, slot 89 (overrides Bike 0x00406ae0): Bike's rider pose selection with the
+    // KrustyBike trick/head-turn starts and the back-up pose (tier 2 shape, tier 3 names).
+    virtual void SelectRiderPose(float t);
 
     // 0x00414370 (in BikeAI.cpp; called by slot 63 0x004924c0, which ignores the result):
     // rebuilds the AI racing line aiPath for this frame; 0 when a track query fails.

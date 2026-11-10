@@ -43,8 +43,17 @@
       4299120,
       13428,
       13428,
-      13396,
-      "466585fe01c0807835ba2ba10dea83649cbb54151c52c18fa36d055935053282"
+      13390,
+      "2e01aa42972e9d2abca94ce35551d26c1cb16a6e157472611b0e2ab2dfeb22b5"
+    ],
+    [
+      "src/krusty2/vehicle/KrustyBike.cpp",
+      "SelectRiderPose@KrustyBike",
+      4776928,
+      2744,
+      2648,
+      171,
+      "21ac75f165a11f913ca8e3538107d4524918eba9cb3688304096a4251629c849"
     ]
   ]
 }
