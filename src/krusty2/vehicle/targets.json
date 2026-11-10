@@ -106,7 +106,7 @@
     "target_va": "0x00406ae0",
     "target_size": 2396,
     "expect": "partial",
-    "notes": "5.0% (1984 vs 2359). Rider-pose blend state machine (steerPoseState states 1..5, field_0x65c output, field_0x644 smoothing). Retail uses an ebp frame with [ebp-4]/[ebp-8] temps and fistp stores (inlined fistp float-to-int helper, i.e. inline asm in the original, out of reach under the no-asm rule); plain (int) calls __ftol here. Nested by-value clamp helpers (BikeAtLeast/BikeAtMost) reproduce retail's memory temps (strict 104 -> 115); retail still repeats each clamp per branch where ours shares one. Extent 0x00406ae0..0x0040743c includes the nop and the 9-entry jump table after the last ret.",
+    "notes": "strict 94/2396 (candidate 2460). Rider-pose blend state machine (steerPoseState states 1..5, field_0x65c output, field_0x644 smoothing); both jump tables decoded case by case against the source. Retail uses an ebp frame with [ebp-4]/[ebp-8] temps and fistp stores (inlined fistp float-to-int helper, i.e. inline asm in the original, out of reach under the no-asm rule). A plain (int) cast truncated through __ftol, so poseIndex was one too low (and poseBlend above 1) whenever the value before the -0.5 had a fraction below one half; BikeFloatToInt reproduces fistp round-to-nearest-even (checked against a real fistp over every |v| < 2^24 at stride 3 plus the steer range, 0 mismatches), costing strict 115 -> 94 for the correct pose index. Nested by-value clamp helpers (BikeAtLeast/BikeAtMost) reproduce retail's memory temps (strict 104 -> 115); retail still repeats each clamp per branch where ours shares one. Extent 0x00406ae0..0x0040743c includes the nop and the 9-entry jump table after the last ret.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -306,7 +306,7 @@
     "target_va": "0x0040c000",
     "target_size": 1015,
     "expect": "partial",
-    "notes": "slot 61: retail has an ebp frame (push ebp; mov ebp,esp), ours does not; first divergence at insn 0 [16.8% match under vc6_o2_ml]",
+    "notes": "strict 154/1015 (candidate 1069). slot 61: retail has an ebp frame (push ebp; mov ebp,esp) from the inlined fistp float-to-int helper (inline asm in the original); ours does not. driveSlideStepsLeft = fistp(0.75 / fixedStepTime - 0.5) rounds to nearest-even; the former (int) cast truncated (one decay step short whenever 0.75 / fixedStepTime had a fraction below one half), now BikeFloatToInt (strict 162 -> 154). Retail also duplicates the decay block per branch where ours shares it through a flag; control flow otherwise decoded and matching.",
     "bindings": "Bike.bindings.json"
   },
   {

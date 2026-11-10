@@ -1233,6 +1233,29 @@ void Bike::ComputeGroundNormalAndTurn(Vec3* out, VehicleWheel*)
     turnRate = 0.0f;
 }
 
+// Retail converts slot 61's decay step count and slot 89's pose index with an inlined
+// fistp helper (fstp/fld of the float argument, then `mov eax, out; fistp dword ptr [eax]`
+// in an ebp frame): inline asm in the original, out of reach under the no-asm rule.
+// fistp rounds under the x87 control word: round-to-nearest-even by default (nothing in
+// the game is known to change it; provisional), so the callers' fistp(v - 0.5f) is floor(v),
+// except that an integral v (an exact tie) goes to the even neighbour.  A plain (int) cast
+// truncates through __ftol instead and is one too small whenever v's fraction is below one
+// half.  This helper gives the round-to-nearest-even result in ordinary C++ (the
+// destination-pointer signature follows retail's call shape):
+// truncate through __ftol, then step away from zero when the remainder passes one half or
+// is exactly one half beside an odd integer.  It is a behaviour repair, not the original
+// form, and it does not follow other x87 rounding modes.
+static inline void BikeFloatToInt(int* out, float value)
+{
+    int result = (int)value;
+    float fraction = value - (float)result;
+    if (fraction > 0.5f || (fraction == 0.5f && (result & 1)))
+        result++;
+    else if (-fraction > 0.5f || (-fraction == 0.5f && (result & 1)))
+        result--;
+    *out = result;
+}
+
 float Bike::ComputeSlideAngle(float threshold)
 {
     float result = 0.0f;
@@ -1283,7 +1306,7 @@ float Bike::ComputeSlideAngle(float threshold)
                 slide = slide * stepTime * leanFactor;
                 driveSlideAngle = (leanAngle < 0.0f) ? -slide : slide;
                 driveSlideAngleStep = fixedStepTime * -1.333f * driveSlideAngle;
-                driveSlideStepsLeft = (int)(0.75f / fixedStepTime - 0.5f);
+                BikeFloatToInt(&driveSlideStepsLeft, 0.75f / fixedStepTime - 0.5f);
             } else {
                 driveSlideAngle = 0.0f;
             }
@@ -2087,7 +2110,8 @@ void Bike::ApplyCollisionEvent(int notify, int eventKind, void* event)
 // (field_0x654/field_0x660) from the animation parameter at field_0x640, then advances a
 // smoothed value (field_0x644) toward field_0x504 and maps it through a small 5-state machine
 // (steerPoseState) to field_0x65c.  Retail converts the pose index with an inlined fistp helper
-// (round-to-nearest after the -0.5); plain (int) is used here.
+// (round-to-nearest after the -0.5); BikeFloatToInt gives the same index in ordinary C++
+// (a plain (int) truncated it, one index too low with poseBlend above 1 for half the steer range).
 // The clamps are small inline helpers: retail copies each memory limit into a frame temp
 // and keeps each clamped value in memory, the shape of a by-value inline argument, and it
 // rereads controlInput.x at every use rather than caching it.
@@ -2120,7 +2144,7 @@ int Bike::SelectRiderPose(float t)
 
     if (airborne && lean > 2.0f && rearWheel->penetration < -1.0f) {
         float posePosition = (0.75f - steerAxis->steerValue) * 3.99f;
-        poseIndex = (int)(posePosition - 0.5f);
+        BikeFloatToInt(&poseIndex, posePosition - 0.5f);
         int idx = poseIndex;
         poseIndex = idx + 11;
         poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
@@ -2149,7 +2173,7 @@ int Bike::SelectRiderPose(float t)
             poseBlend = (controlInput.y + 1.0f) * 0.5f;
             poseLeanBlend = (lean - leanPoseMin) / (leanPoseMax - leanPoseMin);
         } else if (rearWheel->slipSpeed > 14.0f) {
-            poseIndex = (int)((0.75f - steerAxis->steerValue) * 3.99f - 0.5f);
+            BikeFloatToInt(&poseIndex, (0.75f - steerAxis->steerValue) * 3.99f - 0.5f);
             int idx = poseIndex;
             if (idx == 2) {
                 if (rearWheel->slipSpeed > 32.0f)
@@ -2162,7 +2186,7 @@ int Bike::SelectRiderPose(float t)
             poseState = idx * 2 + 4;
             poseIndex = poseState - 1;
         } else {
-            poseIndex = (int)((0.75f - steerAxis->steerValue) * 3.99f - 0.5f);
+            BikeFloatToInt(&poseIndex, (0.75f - steerAxis->steerValue) * 3.99f - 0.5f);
             int idx = poseIndex;
             poseState = idx * 2 + 3;
             poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;

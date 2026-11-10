@@ -7,8 +7,8 @@
     },
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 242,
-      "relocations": 1089,
-      "sha256": "8dd27f7bf55a5867aaa0273de241511fe6f2dc1e552cf39fb4a2af1a7e368d19"
+      "relocations": 1103,
+      "sha256": "6ee7a7228ba37cdb0ab2e673212f24f4c33d955d1140857af2a6edb2afcb9e00"
     },
     "src/krusty2/vehicle/KrustyBike.cpp": {
       "sections": 243,
@@ -1706,8 +1706,8 @@
       "symbol": "SelectRiderPose@Bike",
       "va": "0x406ae0",
       "extent": 2396,
-      "candidate": 2120,
-      "matching": 115
+      "candidate": 2460,
+      "matching": 94
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
@@ -1722,8 +1722,8 @@
       "symbol": "ComputeSlideAngle@Bike",
       "va": "0x40c000",
       "extent": 1015,
-      "candidate": 946,
-      "matching": 162
+      "candidate": 1069,
+      "matching": 154
     },
     {
       "source": "src/krusty2/vehicle/Vehicle.cpp",
