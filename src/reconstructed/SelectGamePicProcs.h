@@ -195,6 +195,14 @@ public:
     virtual int Tick(float frameTime);                 // 0x004f8820: turns the bike view
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004f8780
     virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);     // 0x004f8620
+    // Slots 13, 22 and 26 hold bodies retail shares with the other bike
+    // pages (identical-code folding, so the owning TU is not known):
+    // 0x004d77d0 (= PCCentralBikeRiderDlg::RenderPre3D), 0x0044fab0
+    // (= SPBikeRiderDlg::OnControlRelease) and 0x004d72a0
+    // (= PCCentralBikeRiderDlg::MarkPendingRelease).
+    virtual int RenderPre3D();
+    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual void MarkPendingRelease();
     void SyncValues(int apply);     // 0x004f91e0: stores the chosen bike and rider
     void ApplyLargestOpponentClass();             // 0x004f8650: client: selects the host's largest opponent class
     void EnableLargestOpponent();             // 0x004f8700: enables "LargestOpponentDropDown" for the host only
@@ -229,6 +237,8 @@ class MPOptionsDlg : public UIDialog {
 public:
     MPOptionsDlg() : UIDialog(1, "MPOpt.dtm") {}
     virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);     // 0x004f9570
+    // Slot 31: the shared empty `ret 4` body 0x00464e80 (no syncProc call).
+    virtual void SyncValues(int apply);
     void HandleEvent(UnknownDialogEvent* event); // 0x004f93c0
     void RefreshValues();             // 0x004f95a0: UpdateBoundValues(0)
     void EnableHostOptions();             // 0x004f95b0: enables the host options and "ChkRecordRace"

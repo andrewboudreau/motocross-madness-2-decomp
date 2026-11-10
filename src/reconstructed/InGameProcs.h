@@ -30,6 +30,9 @@ public:
     // Inline at bikerace.cpp's `new` (0x00420650, line 0x1073).
     VCRDlg(int flags, const char* resource) : UIDialog(flags, resource) {}
     virtual int Tick(float frameTime);                    // 0x004893c0
+    // Slot 23: 0x00532890, folded with Wrecker::OnControlPress. It skips
+    // UIDialog's version and goes straight to GameObject's.
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
     void HandleEvent(UnknownDialogEvent* event); // 0x00488c90
     void ShowReplayMode();             // 0x004894c0: shows the replay mode on the toggles
 

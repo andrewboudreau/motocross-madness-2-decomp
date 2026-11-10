@@ -998,6 +998,32 @@ void PCCentralBikeRiderDlg::MarkPendingRelease()
     UIDialog::MarkPendingRelease();
 }
 
+// 0x0044fa00 (folded with SPBikeRiderDlg::OnControlPress): a click inside
+// the bike preview (inset by 50 and 30 pixels) starts dragging it and turns
+// automatic rotation off.
+int PCCentralBikeRiderDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (event->kind == 1 && event->control == 0) {
+        RECT area = previewArea;
+        area.left += 50;
+        area.top += 30;
+        area.right -= 50;
+        area.bottom -= 30;
+        if (PtInRect(&area, guiUser->pointerDevice->pointerPosition)) {
+            previewDragged = 1;
+            previewDragging = 1;
+            static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
+        }
+    }
+    return UIDialog::OnControlPress(event, entry);
+}
+
+// 0x0044fab0 (folded with SPBikeRiderDlg::OnControlRelease)
+int PCCentralBikeRiderDlg::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (event->kind == 1 && event->control == 0)
+        previewDragging = 0;
+    return UIDialog::OnControlRelease(event, entry);
+}
+
 // 0x004d78c0
 void PCCentralBikeRiderDlg::ApplyChosenRider()
 {

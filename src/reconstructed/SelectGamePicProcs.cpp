@@ -2169,6 +2169,10 @@ int MPOptionsDlg::OnNetworkMessage(int type, void* data, int from, int to, int f
     return 0;
 }
 
+// 0x00464e80: the shared empty body.
+void MPOptionsDlg::SyncValues(int) {
+}
+
 // 0x004f95a0
 void MPOptionsDlg::RefreshValues() {
     UpdateBoundValues(0);
@@ -2182,4 +2186,48 @@ void MPOptionsDlg::EnableHostOptions() {
         FindControl("ChkRecordRace", 0)->SetEnabled(0);
     else
         FindControl("ChkRecordRace", 0)->SetEnabled(1);
+}
+
+// Retail's MPBikeRiderDlg vtable
+// points at bodies it shares with SPBikeRiderDlg and PCCentralBikeRiderDlg
+// (see SelectGamePicProcs.h). The source is the same as theirs.
+
+// 0x0044fab0 (folded with SPBikeRiderDlg::OnControlRelease)
+int MPBikeRiderDlg::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (event->kind == 1 && event->control == 0)
+        previewDragging = 0;
+    return UIDialog::OnControlRelease(event, entry);
+}
+
+// 0x004d72a0 (folded with PCCentralBikeRiderDlg::MarkPendingRelease)
+void MPBikeRiderDlg::MarkPendingRelease()
+{
+    g_TrackGame->ui->HideScene();
+    UIDialog::MarkPendingRelease();
+}
+
+// The material replacement below consumes the canonical model declaration.
+#include "D3DIMSoulTree.h"
+
+// 0x004d77d0 (folded with PCCentralBikeRiderDlg::RenderPre3D)
+int MPBikeRiderDlg::RenderPre3D()
+{
+    if (bikeChanged) {
+        UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+        KrustyUI* ui = g_TrackGame->ui;
+        int bike = list->GetRowData(-1);
+        UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)ui->bikes)[bike];
+        reinterpret_cast<D3DIMSoultreeObject*>(((UnknownKrustyUIModel*)ui->manufacturers)[entry->model].uiModel->plateTexture)
+            ->ReplaceMaterialTexture(0, entry->texture, reinterpret_cast<int>(&g_TrackGame->textureContext));
+        bikeChanged = 0;
+    }
+    if (riderChanged) {
+        UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
+        KrustyUI* ui = g_TrackGame->ui;
+        UnknownKrustyUIModel* rider = &((UnknownKrustyUIModel*)ui->riders)[list->GetRowData(-1)];
+        reinterpret_cast<D3DIMSoultreeObject*>(ui->riderPreview->plateTexture)
+            ->ReplaceMaterialTexture(0, rider->modelName, reinterpret_cast<int>(&g_TrackGame->textureContext));
+        riderChanged = 0;
+    }
+    return UIDialog::RenderPre3D();
 }

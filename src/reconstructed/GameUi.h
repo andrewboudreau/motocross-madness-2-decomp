@@ -364,6 +364,7 @@ public:
     virtual ~UIStatic();                      // 0x00478fb0 (deleting wrapper 0x00478f90)
     virtual int IsInteractive(); // slot 30, 0x00478fe0
     virtual TextureMap* GetStateTexture(int state); // slot 48, 0x00478fc0
+    virtual int ButtonDown(int button, int position); // slot 55, 0x00479190 (shared with UIStaticText)
 };
 
 // RTTI: UIEditBox : UIControl (vtable 0x00552de8; 0x230 bytes, `new` at

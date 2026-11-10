@@ -454,6 +454,26 @@ int UIStatic::IsInteractive() {
     return 0;
 }
 
+// Slot 55, 0x00479190: retail folds this body with UIStaticText::ButtonDown,
+// and UIStatic, UIDDLStatic, UIProgressBar and UIVideoStatic all dispatch to it.
+// A click on a hovered static control sends a kDialogCommand to the dialog.
+int UIStatic::ButtonDown(int button, int position) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
+        UnknownDialogEvent event;
+        event.handled = button;
+        event.kind = kDialogCommand;
+        event.code = eventCode;
+        event.controlName = GetName();
+        event.dialog = ownerDialog;
+        event.gui = ownerGui;
+        event.control = this;
+        ownerDialog->HandleEvent(&event);
+        if (event.handled)
+            return 1;
+    }
+    return UIControl::ButtonDown(button, position);
+}
+
 // ---------------------------------------------------------------------------
 // UIControl (continued)
 

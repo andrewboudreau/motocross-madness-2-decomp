@@ -131,6 +131,8 @@ public:
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual int Tick(float frameTime);                 // 0x0044fae0: turns the bike view
     virtual int RenderPre3D();                // 0x0044ffc0: names the chosen bike's and rider's textures
+    // Slot 26: 0x004d72a0, folded with PCCentralBikeRiderDlg::MarkPendingRelease.
+    virtual void MarkPendingRelease();
     void SyncValues(int apply);     // 0x004505d0: stores the chosen bike and rider
     void FillBikeRiderLists();             // 0x0044f750: fills the bike and rider lists (a near miss)
     void PaintPlateNumber(int number);   // 0x0044f950: paints the plate number on every bike

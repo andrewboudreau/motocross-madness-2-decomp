@@ -83,6 +83,34 @@ MediaControl::~MediaControl()
     }
 }
 
+// 0x00401e20 (folded with SoundGroup::Disable)
+void MediaControl::Disable()
+{
+    GameObject::Disable();
+    SetPaused(1);
+}
+
+// 0x00401e40 (folded with SoundGroup::Enable)
+void MediaControl::Enable()
+{
+    GameObject::Enable();
+    SetPaused(0);
+}
+
+// 0x00401e60 (folded with SoundGroup::OnDisable)
+void MediaControl::OnDisable()
+{
+    GameObject::OnDisable();
+    SetPaused(1);
+}
+
+// 0x00401e80 (folded with SoundGroup::OnEnable)
+void MediaControl::OnEnable()
+{
+    GameObject::OnEnable();
+    SetPaused(0);
+}
+
 // 0x004a27f0
 int MediaControl::Tick(float frameTime)
 {

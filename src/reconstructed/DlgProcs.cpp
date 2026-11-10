@@ -1153,6 +1153,13 @@ int SPBikeRiderDlg::OnControlRelease(UnknownControlEvent* event, UnknownInputEnt
     return UIDialog::OnControlRelease(event, entry);
 }
 
+// 0x004d72a0 (folded with PCCentralBikeRiderDlg::MarkPendingRelease)
+void SPBikeRiderDlg::MarkPendingRelease()
+{
+    g_TrackGame->ui->HideScene();
+    UIDialog::MarkPendingRelease();
+}
+
 // 0x0044ffc0
 int SPBikeRiderDlg::RenderPre3D() {
     int result = UIDialog::RenderPre3D();

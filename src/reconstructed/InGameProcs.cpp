@@ -275,6 +275,11 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
     }
 }
 
+// 0x00532890 (folded with Wrecker::OnControlPress)
+int VCRDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    return GameObject::OnControlPress(event, entry);
+}
+
 // 0x004893c0
 int VCRDlg::Tick(float frameTime) {
     char text[32];

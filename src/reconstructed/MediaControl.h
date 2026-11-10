@@ -2,7 +2,7 @@
 
 // MediaControl.h -- RTTI .?AVMediaControl@@ (vtable 0x005551c0): MediaControl
 // : GameObject : BaseObject, single non-virtual at mdisp 0 (tier 1). It
-// overrides slots 0 (deleting destructor 0x004a2470), 10, 16, 17 and 18.
+// overrides slots 0 (deleting destructor 0x004a2470), 4..7, 10, 16, 17 and 18.
 // UIVideoStatic (gameui.cpp line 0x264d) creates it with new 0x80.
 //
 // Code 0x004a23d0..0x004a2abf, after the Math3D helpers and their vector set
@@ -94,6 +94,13 @@ class MediaControl : public GameObject {
 public:
     MediaControl(int flags);                      // 0x004a2410
     virtual ~MediaControl();                  // 0x004a2490 (deleting wrapper 0x004a2470)
+    // Slots 4..7: retail folds these with SoundGroup's identical bodies
+    // (0x00401e20, 0x00401e40, 0x00401e60, 0x00401e80): the GameObject
+    // version, then SetPaused (slot 16) with 1 for disable, 0 for enable.
+    virtual void Disable();
+    virtual void Enable();
+    virtual void OnDisable();
+    virtual void OnEnable();
     virtual int Tick(float frameTime);                 // 0x004a27f0: next frame, end of movie
     virtual int SetPaused(int value);            // 0x004a2970: pauses (value != 0) or resumes
     virtual int OnDeactivate();               // 0x004a28c0
