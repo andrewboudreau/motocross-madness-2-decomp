@@ -21,7 +21,9 @@
 //    what the two GameObject bases below produce.
 //  * D3DIMSoultreeObject primary vtable 0x005513ec: QuadTreeObject's two slots, then slots
 //    2..9 (slot 9 = 0x0043f4b0, `ret 0x14`).  Its GameObject vtable 0x0055137c overrides
-//    slots 0 (0x0043f280), 4 (0x00444540), 5 (0x00444520) and 10 (0x00443490).
+//    slots 0 (0x0043f280), 4 (0x00444540), 5 (0x00444520), 10 (0x00443490),
+//    12 (0x00443aa0), 14 (0x00444030) and 25 (0x004fec30, SoultreeObject's); the
+//    SoultreePhysicsObject vtable 0x00557eb8 (@552) keeps 4, 5, 12, 14 and 25.
 //
 // Deliberate simplification (listed in hierarchy/MIGRATION.md): the SoultreeObject level is
 // folded into D3DIMSoultreeObject, because core/SoultreeObject.h is the flat,
@@ -47,6 +49,12 @@ public:
     virtual void Disable();                       // 0x00444540
     virtual void Enable();                        // 0x00444520
     virtual int Tick(float dt);                    // 0x00443490
+    virtual int PrepareGeometry();                 // 0x00443aa0 (D3DIMSoulTree.cpp)
+    virtual int Render3D();                        // 0x00444030 (D3DIMSoulTree.cpp)
+    // 0x004fec30 is SoultreeObject::AttachRenderContext (soultree.cpp); with the
+    // SoultreeObject level folded into this view the build links this name to it
+    // through config/game_build.json link_aliases.
+    virtual int AttachRenderContext(void* context);
     virtual void LoadHierarchy(UnknownTextureStream* stream); // 0x0043f950, ret 4
     virtual void LoadHierarchyFromParameters();       // 0x0043fe40
     virtual void SoultreeVirtualSlot4(SoultreeObject** out); // 0x004440a0, ret 4

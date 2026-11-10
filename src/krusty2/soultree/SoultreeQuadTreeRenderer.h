@@ -3,9 +3,11 @@
 // (__FILE__ at 0x005743f4, referenced by 0x5046e0 and 0x5047f0).
 //
 // Evidence (tier 1 unless noted):
-//  * RTTI/vtable 0x00558168 (27 slots).  It differs from GraphicsTest's vtable only in slots
-//    0 (scalar deleting dtor 0x00504500, core 0x00504520), 10 (0x00504690), 12 (0x00504620)
-//    and 14 (0x00504570); analysis/vtable_overrides.json lists exactly those.
+//  * RTTI/vtable 0x00558168 (27 slots).  It differs from GraphicsTest's vtable in slots
+//    0 (scalar deleting dtor 0x00504500, core 0x00504520), 8 (0x004452e0, the base-forwarding
+//    body the linker shares with LightManager and D3DIMSoultreeModifier), 10 (0x00504690),
+//    12 (0x00504620), 14 (0x00504570) and 23 (0x005048d0); analysis/vtable_overrides.json
+//    lists exactly those.
 //  * Ctor 0x00504490 (thiscall, ret 4): GraphicsTest(a) (0x0047bc70), vptr, then +0x34 = 0,
 //    +0x38 = -1, +0x40 = 0 and +0x44 = FindTypeId("SoultreeObject") (0x00521ea0 on the
 //    registry at 0x00575744). GraphicsTest ends at 0x34; the renderer's
@@ -76,6 +78,7 @@ class SoultreeQuadTreeRenderer : public GraphicsTest {
 public:
     explicit SoultreeQuadTreeRenderer(int flags);                    // 0x00504490
     virtual ~SoultreeQuadTreeRenderer();                              // slot 0: deleting 0x00504500, core 0x00504520
+    virtual GameObject* SetRenderContext(void* context);              // 0x004452e0 (shared body)
     virtual int Tick(float dt);                                       // 0x00504690
     virtual int PrepareGeometry();                                    // 0x00504620
     virtual int Render3D();                            // 0x00504570

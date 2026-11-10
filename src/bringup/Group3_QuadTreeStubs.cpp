@@ -6,22 +6,21 @@
 //   slot 1 0x00434ce0: `mov eax, 0xf; ret 4`     (one stack argument, returns 15)
 // 0x00464e90 is the shared `ret` body.
 //
-// best guess / ABI caveat: the canonical declarations in D3DIMSoulTree.h are
-// `void QuadTreeVirtualSlot0()` and `int QuadTreeVirtualSlot1()`, which must be kept
-// for the mangled names.  Retail slot 1 pops one stack argument and slot 0 returns a
-// short; no reconstructed caller invokes either slot by name, so the bodies below only
-// fill the vtable entries.  A caller that pushes the retail argument for slot 1 would
-// be stack-imbalanced against this definition until the declaration is reconciled.
+// best guess: the D3DIMSoulTree.h declarations follow those bodies (a short return
+// for slot 0, one ignored stack argument for slot 1), as the canonical QuadTreeObject
+// in krusty2/collision/CollisionObject.h does.  Before they did, the build's slot 1
+// returned with a plain `ret`, unbalancing any caller that pushes the quadtree.
 #include "D3DIMSoulTree.h"
 #include "Griddraw.h"
 
-// Slot 0: 0x004dc610 (returns (short)-1 in ax; declared void here).
-void UnknownSoultreeQuadTreeObject::QuadTreeVirtualSlot0()
+// Slot 0: 0x004dc610 returns (short)-1 in ax.
+short UnknownSoultreeQuadTreeObject::QuadTreeVirtualSlot0()
 {
+    return -1;
 }
 
-// Slot 1: 0x00434ce0 returns 15 (argument ignored in retail).
-int UnknownSoultreeQuadTreeObject::QuadTreeVirtualSlot1()
+// Slot 1: 0x00434ce0 returns 15; the argument is ignored.
+unsigned int UnknownSoultreeQuadTreeObject::QuadTreeVirtualSlot1(void*)
 {
     return 15;
 }

@@ -36,12 +36,14 @@ class TextureMapManager;
 class UnknownParameterBlock;
 class UnknownTextureStream;
 
-// RTTI QuadTreeObject (vtable 0x005511c4: 0x004dc610 `ret`, 0x00434ce0
-// returns 15).
+// RTTI QuadTreeObject (vtable 0x005511c4: 0x004dc610 `or ax, 0xffff; ret`,
+// 0x00434ce0 `mov eax, 0xf; ret 4`). The return types and the one stack
+// argument follow those bodies, so a caller through QuadTreeObject slot 1
+// (EventManager passes the collision quadtree) stays stack-balanced.
 class UnknownSoultreeQuadTreeObject {
 public:
-    virtual void QuadTreeVirtualSlot0();
-    virtual int QuadTreeVirtualSlot1();
+    virtual short QuadTreeVirtualSlot0();
+    virtual unsigned int QuadTreeVirtualSlot1(void* tree);
 
     short field_0x04;
     short field_0x06;
@@ -62,6 +64,10 @@ public:
     virtual void ResetLocalMatrices();                                  // 0x004fec70
     virtual void CloneFrom(SoultreeObject* source);            // 0x004feb10 (ret 4): copies `source`
     virtual void CopySubtree(SoultreeObject* source, SoultreeObject* target); // 0x004feb30 (ret 8)
+    // GameObject slot 25 (0x004fec30, defined in soultree.cpp): hands the
+    // context to every child first. Retail SoultreeObject and
+    // D3DIMSoultreeObject GameObject vtables (+12) both hold it.
+    virtual int AttachRenderContext(void* context);
 
     // soultree.cpp helpers (thiscall).
     // Same complete-node pointer (+0), shared with the physics declaration.

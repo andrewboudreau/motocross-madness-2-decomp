@@ -4,7 +4,8 @@
     "src"
   ],
   "link_aliases": {
-    "?g_CollisionScratchPoints@@3PAUCollisionVec3@@A": "?g_CollisionScratchPoints@@3PAUVec3@@A"
+    "?g_CollisionScratchPoints@@3PAUCollisionVec3@@A": "?g_CollisionScratchPoints@@3PAUVec3@@A",
+    "?AttachRenderContext@D3DIMSoultreeObject@@UAEHPAX@Z": "?AttachRenderContext@SoultreeObject@@UAEHPAX@Z"
   },
   "included_sources": [
     {

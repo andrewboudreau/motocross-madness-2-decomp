@@ -135,3 +135,9 @@ int SoultreeQuadTreeRenderer::OnControlPress(UnknownControlEvent* a, UnknownInpu
     }
     return GraphicsTest::OnControlPress(a, b);
 }
+
+// slot 8, 0x004452e0 (shared body): forwards to the base.
+GameObject* SoultreeQuadTreeRenderer::SetRenderContext(void* context)
+{
+    return GameObject::SetRenderContext(context);
+}
