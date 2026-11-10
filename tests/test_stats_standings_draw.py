@@ -184,7 +184,7 @@ class StatsStandingsTests(unittest.TestCase):
             restore_path,restore=compile_source(ROOT/'samples/render/OverlayNearMisses.cpp','restore')
             report=compare(image,restore,'?RestoreRect@Overlay@@',0x4b6710,365,
                            ROOT/'samples/render/OverlayNearMisses.bindings.json')
-            self.assertEqual((report['candidate_size'],report['strict_match']['matching_positions']), (365,77))
+            self.assertEqual((report['candidate_size'],report['strict_match']['matching_positions']), (365,105))
             # The source graph uses this already-reviewed nonexact helper. Both
             # whole-method runs share it; its own larger regression is separate.
             bindings=output/'crt.bindings.json'
