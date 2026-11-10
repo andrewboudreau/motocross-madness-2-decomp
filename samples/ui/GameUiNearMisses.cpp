@@ -65,6 +65,8 @@
 //   comparison (249) do not give retail's two result homes, and neither
 //   does an inline pixel-test helper taking `opaque` by reference or by
 //   pointer (256, same code: the Lock-failure return still folds to 0).
+//   A further 28 tail forms (result copies, every if-Unlock variant, an
+//   else-if body) all compile to the same 256-position object.
 // 0x004738a0 UIEditBox slot 40 (206/975): retail keeps the width and the
 //   redraw count in memory. Retail reloads width into edi at the loop top
 //   (0x47396d) and consumes that copy in the scroll arms (`sub edi, ebx`),
@@ -92,6 +94,12 @@
 //   (9 differing instructions against 8); with both locals it saves ebp
 //   (236), one shared memmove or a `step` local drops a call (75-98), and a
 //   `text` or `end` pointer local is worse (99-338).
+//   Inline helpers (the lever that fixed KrustyUI::Create) are inert here:
+//   a memmove wrapper taking (to, text, cursor, length), an inline
+//   `TextAt(text, cursor)`, a length-shrinking or two-value setter after the
+//   memmove, and a whole remove helper given the loaded locals all give
+//   1018; the helper that loads both fields itself, or takes them as direct
+//   member arguments, gives 339.
 // 0x00478570 UIMultiState slot 40: complete retail 672 / candidate 682, 139
 //   resolved matching positions; included from MultiStateDraw.cpp. See
 //   docs/MULTI_STATE_DRAW.md for the finite actual-helper validation.

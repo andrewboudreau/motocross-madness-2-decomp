@@ -18,6 +18,9 @@
 //   (62) and an early return after the system branch (57) do not move it
 //   either; VC6 places a cross-jumped tail in the later block, retail
 //   keeps it in the player branch and jumps back from the system block.
+//   Also worse: the colour block duplicated into both branches (19), a
+//   `!= player` test with swapped arms (95), the colour loop as do/while
+//   (92) and an empty `if (imeLibrary) {} else if` chain (92).
 // MPBikeRiderDlg::FillBikeRiderLists (0x004f8220, 833 bytes): the same
 //   flow and calls; retail keeps the bike index in edi and KrustyUI in ebp
 //   and lays the locals out differently (VC6 here swaps the registers).

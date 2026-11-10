@@ -47,6 +47,10 @@
 //   but not its registers (135-141); `int fee = entryFee = ...` chains and
 //   member-only arithmetic give 225. Loading debt after fee or cash gives
 //   1048-1054.
+//   Inline setters for 0x004d8fc0's fee, cash and shortfall stores (one
+//   three-store helper given the loads or the locals, per-field setters,
+//   a cash-and-shortfall setter) are all worse than the locals form in the
+//   same standalone unit (485 or less against its 586).
 // PCCentralBikeRiderDlg::Tick (0x004d72c0, 1291 bytes, 1237
 //   match): as SPBikeRiderDlg slot 10 (DlgProcsNearMisses.cpp), only the
 //   scheduling of the by-value Vector3 copies for the camera call differs.
