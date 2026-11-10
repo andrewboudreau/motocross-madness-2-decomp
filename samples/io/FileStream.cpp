@@ -140,7 +140,11 @@ int UnknownTextureStream::CheckHeader()
 // 0x00461340: seeks to `offset` (origin as fseek). An encoded file cannot
 // fseek into the middle of its key stream, so with `flag` it rewinds (or keeps
 // the decoded position +0x0c) and decodes forward through a scratch buffer.
-// Session 21 (342 of 702, candidate 699 bytes): ResetTextMode is now an
+// Session 21 (343 of 702, candidate 695 bytes): the plain branch's key
+// reset tests only `fileEncoded`, as retail does. That branch is the else
+// of `fileEncoded && flag`, so the dropped `&& !flag` was always true there
+// (342, 699 bytes with it). The head now matches through the SEEK_CUR test.
+// ResetTextMode is now an
 // in-class inline (FileStream.h), so calling it on the stream itself gives
 // retail's one inlined level and the out-of-line 0x00461d20 call; the old
 // RestartKey helper (which called it on the inner stream) now inlined a
@@ -154,7 +158,8 @@ int UnknownTextureStream::CheckHeader()
 // position` or `position = offset - position` for the skip, a
 // function-scope position, a tail-recursive Seek (not turned into a loop:
 // 732 bytes), the split `return 1` tests and four other position forms
-// do not move it.
+// do not move it; nor do those skip forms or two position forms (an
+// if/else and a `position = 0` default) once the redundant test is gone.
 // Earlier (before the inline change; 300 of 652 masked; same 702 bytes): the
 // inner loop match, but retail keeps the next pointer and the zero in other
 // registers and swaps the origin/offset registers (ebp/ebx), so most
@@ -224,7 +229,7 @@ int UnknownTextureStream::Seek(int offset, int origin, int flag)
             return 1;
         }
     } else {
-        if (stream->fileEncoded && !flag) {
+        if (stream->fileEncoded) {
             stream->ResetTextMode();
             if (origin == SEEK_SET)
                 stream->keyStartOffset = offset;

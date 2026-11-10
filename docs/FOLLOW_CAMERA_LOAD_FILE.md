@@ -92,7 +92,7 @@ branches. AddArchive and WriteHeader are explicit fail-fast *unreached* fixture
 boundaries; no executed game helper returns a scripted result.
 
 The graph uses the already reviewed nonexact stream CheckHeader (176 versus 186 bytes)
-and Seek (730 versus 702 bytes). Their complete source bytes and named relocations equal
+and Seek (695 versus 702 bytes). Their complete source bytes and named relocations equal
 the existing admitted sample. Both loader runs share these helpers; this is not an
 untouched retail stream graph. Vec3Normalize (150 bytes), CrossProductCall (91 bytes),
 FastInvSqrt (107 bytes) and its table initializer (74 bytes) execute as strict actual source.

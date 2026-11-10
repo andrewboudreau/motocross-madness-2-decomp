@@ -78,7 +78,7 @@ The notes are in the source header.
 | VA | Retail bytes | Candidate bytes | Masked match | Function |
 |---|---|---|---|---|
 | `0x00460db0` | 186 | 176 | 16% | header check |
-| `0x00461340` | 702 | 699 | 49% (strict 342) | seek |
+| `0x00461340` | 702 | 695 | 49% (strict 343) | seek |
 | `0x00461640` | 663 | 670 | 71% | read |
 | `0x004618e0` | 152 | 152 | 88% | write |
 | `0x00461b90` | 282 | 282 | 90% | write the header |

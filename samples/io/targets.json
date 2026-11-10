@@ -15,7 +15,7 @@
     "target_size": 702,
     "expect": "partial",
     "bindings": "FileStream.bindings.json",
-    "status": "Complete behavior reviewed against retail; 699-byte VC6 candidate (342/702 strict) remains nonexact."
+    "status": "Complete behavior reviewed against retail; 695-byte VC6 candidate (343/702 strict) remains nonexact."
   },
   {
     "source": "FileStream.cpp",
