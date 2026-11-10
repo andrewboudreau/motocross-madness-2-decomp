@@ -1,11 +1,9 @@
 // Bring-up (best-guess-unreviewed): the particle emitters and procedural car
 // the Scene readers (src/bringup/Group4_SceneRead.cpp) construct.
 //
-// DirtSprayParticleEmitter (ctor 0x004b9310, vtable 0x00555ba8) has no src
-// provider yet; its reviewed-shape candidate samples/physics/effects/
-// DirtSprayParticleEmitter.cpp is compiled here unchanged (it links against
-// existing providers only). The other constructors already exist.
-#include "../../samples/physics/effects/DirtSprayParticleEmitter.cpp"
+// Every constructor named here is a canonical src/reconstructed provider; this
+// unit only gives the Scene readers' `new` sites a body.
+#include "../reconstructed/ParticleEmitters.h"
 #include "../reconstructed/CarProcedural.h"
 
 // 0x004b8a00 DustParticleEmitter(flags), `new` site of the caller.

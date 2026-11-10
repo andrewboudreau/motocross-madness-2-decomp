@@ -132,7 +132,7 @@ struct VehicleImpactSink {
     int updatePending;  // +0x60 set to 1 by VehCommitImpact
     char pad_0x64[0x10];
     Vec3 scrapeVector;  // +0x74 slots 19/20 write the clamped scrape vector
-    void SetPosition(Vec3 pos, float intensity);   // 0x004b8d90, emitter position setter (samples/physics/effects/ParticleEmitters.h)
+    void SetPosition(Vec3 pos, float intensity);   // 0x004b8d90, emitter position setter (src/reconstructed/ParticleEmitters.h)
     void SetPosition(Vec3 pos);                    // 0x004b9dc0, the other emitter class's position setter (ParticleEmitters.h)
 };
 struct VehicleImpactEvent {          // argument of slots 18..20 (provisional)
@@ -194,7 +194,7 @@ struct VehicleAxis {                 // objects at Vehicle+0x4f8/0x4fc/0x500 (pr
     float axisValue;                // +0x24 axis value (slot 63 reads it)
 };
 // Object at Vehicle+0x5ac: the SparkParticleEmitter (vtable 0x00555c1c, ctor 0x004b9830,
-// 0x60c bytes; samples/physics/effects/ParticleEmitters.h).  LoadVehicle builds it and hands the
+// 0x60c bytes; src/reconstructed/ParticleEmitters.h).  LoadVehicle builds it and hands the
 // result of its virtual slot 27 to GameObject::AppendChild; the impact handlers view
 // it as VehicleImpactSink.  Provisional view; Vehicle and Bike slot 38 store (0, 12, 0) at +0x78 and
 // set +0x60 after SetPosition, matching SparkParticleEmitter::launchVelocity / field_0x60.

@@ -1,5 +1,5 @@
 // DirtSprayParticleEmitter.cpp -- ownership uncertain, see ParticleEmitters.h.
-#include "../../../src/reconstructed/TrackGameGlobal.h"
+#include "TrackGameGlobal.h"
 #include "ParticleEmitters.h"
 #include <stdlib.h>
 

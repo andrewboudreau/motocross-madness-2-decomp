@@ -630,7 +630,7 @@ struct SoultreeSinkObject {        // attachment field_0x14 target (type 4)
     char pad_0x00[0x48];
     Vec3 currentPosition;  // +0x48 set by 0x004ba2c0 in slot 21; copied to previousPosition on a trail reset
     Vec3 previousPosition;  // +0x54 slot 21: previousPosition = currentPosition when the attachment's resetTrail is set
-    // SteamParticleEmitter's setters (samples/physics/effects/ParticleEmitters.h); the decoded
+    // SteamParticleEmitter's setters (src/reconstructed/ParticleEmitters.h); the decoded
     // stores agree. Restart/Burst are that sample's provisional names.
     void SetPosition(Vec3 v);  // 0x004ba2c0 thiscall, callee pops 0xc: previousPosition = +0x48, then +0x48 = v
     void Restart();            // 0x004ba300: +0x60 = 1, +0x44 = +0x40, +0x6c = 1

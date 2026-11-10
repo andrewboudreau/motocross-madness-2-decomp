@@ -111,43 +111,43 @@
   },
   {
     "class": "DirtSprayParticleEmitter",
-    "source": "DirtSprayParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DirtSprayParticleEmitter.cpp",
     "candidate_symbol_contains": "??0DirtSprayParticleEmitter",
     "target_va": "0x004b9310",
     "target_size": 281,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with two rand() fill loops. Exact with plain ParticleVec3 position/previousPosition, retail store order, previousPosition struct-copied from the zeroed position, and each random vector built in a temporary with a chained `v.x = v.y = v.z = ...` (retail stores z, y, x, then copies).",
-    "bindings": "DirtSprayParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DirtSprayParticleEmitter.bindings.json"
   },
   {
     "class": "DirtSprayParticleEmitter",
-    "source": "DirtSprayParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DirtSprayParticleEmitter.cpp",
     "candidate_symbol_contains": "?Tick@DirtSprayParticleEmitter",
     "target_va": "0x004b9460",
     "target_size": 970,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: same shape as DirtChunk (initial age 375, frame wraps at 13), including the scalar-first gravStep and the per-iteration copy used in the velocity product (see DirtChunk's note).",
-    "bindings": "DirtSprayParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DirtSprayParticleEmitter.bindings.json"
   },
   {
     "class": "DirtSprayParticleEmitter",
-    "source": "DirtSprayParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DirtSprayParticleEmitter.cpp",
     "candidate_symbol_contains": "??_GDirtSprayParticleEmitter",
     "target_va": "0x004b9430",
     "target_size": 30,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). scalar deleting destructor",
-    "bindings": "DirtSprayParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DirtSprayParticleEmitter.bindings.json"
   },
   {
     "class": "DirtSprayParticleEmitter",
-    "source": "DirtSprayParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DirtSprayParticleEmitter.cpp",
     "candidate_symbol_contains": "??1DirtSprayParticleEmitter",
     "target_va": "0x004b9450",
     "target_size": 11,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). dtor",
-    "bindings": "DirtSprayParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DirtSprayParticleEmitter.bindings.json"
   },
   {
     "class": "SparkParticleEmitter",
@@ -301,13 +301,13 @@
   },
   {
     "class": "DirtSprayParticleEmitter",
-    "source": "DirtSprayParticleEmitter.cpp",
+    "source": "../../../src/reconstructed/DirtSprayParticleEmitter.cpp",
     "candidate_symbol_contains": "?Create@DirtSprayParticleEmitter",
     "target_va": "0x004ba040",
     "target_size": 43,
     "expect": "exact",
     "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). slot 27, ICF-folded with the other emitters",
-    "bindings": "DirtSprayParticleEmitter.bindings.json"
+    "bindings": "../../../src/reconstructed/DirtSprayParticleEmitter.bindings.json"
   },
   {
     "class": "SparkParticleEmitter",

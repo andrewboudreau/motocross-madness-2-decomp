@@ -12,9 +12,9 @@ Retail files (all under `D:\aardvark\VC\krusty2\`):
 | Nulls.cpp | 0x0056ed14 | 0x4b0059..0x4b0239 | 0x4b0109 (the `new` at line 5) | 6 / 0 |
 | Particles.cpp | 0x0056fa00 | 0x4b8584..0x4bb8d8 | 0x004ba4f1 and 0x004ba5c8 (slot 27, line 0x48a and 0x4a8) | 7 / 0 (+ slot 14 unattempted) |
 
-19 strict cases, 0 partial in this directory. `samples/physics/effects/` adds 33 strict exact and 8 partial (41 entries) for the
-emitter classes and the vector-constant initialisers, whose ownership is not proven; 0 required failures
-(DirtChunk, DirtSpray and Spark slot 10 are 98.3% partials).
+19 strict cases, 0 partial in this directory. `samples/physics/effects/targets.json` adds 41 strict exact
+entries for the emitter classes (sources `src/reconstructed/*ParticleEmitter.cpp`) and the vector-constant
+initialisers (`samples/physics/effects/EmitterVec3Constants.cpp`), whose ownership is not proven.
 
 ## Ownership evidence
 
@@ -55,7 +55,7 @@ emitter classes and the vector-constant initialisers, whose ownership is not pro
   `this` and returns 0 when it is null. Bike and Vehicle append the result as a child, the factory shape of
   `EcoSystem::Create`/`ArcadeObject::Create`. The name is an inference from that shape (tier 3).
 
-## Emitter slot 10 bodies (samples/physics/effects)
+## Emitter slot 10 bodies (src/reconstructed/*ParticleEmitter.cpp)
 
 * Steam 590 (exact) and Dust 732 (exact) call `ParticleManager::AddParticle` along the segment moved this tick. Shapes that mattered:
   component-wise `d`, `lenSq` written `z*z + (y*y + x*x)` (the only term order VC6 compiles to retail's y, x, z sums),

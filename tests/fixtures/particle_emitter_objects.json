@@ -30,7 +30,7 @@
       "relocations": 67,
       "sha256": "801cf70cf624ac0b41d5bd4803e8f8ef1ede51fd96bb0430c33bc931a0ac7002"
     },
-    "samples/physics/effects/DirtSprayParticleEmitter.cpp": {
+    "src/reconstructed/DirtSprayParticleEmitter.cpp": {
       "sections": 23,
       "relocations": 59,
       "sha256": "63aa30892949897fb55702b4948e24cca456ba6586a4d2f41ac401908a67f4db"

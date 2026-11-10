@@ -46,7 +46,7 @@ struct BikeA38;
 // (tier 3: contents unknown, only the whole-block copy is decoded).
 #include "BikeLoaderRecord.h"
 
-// Particle emitters the loader hangs on the bike (samples/physics/effects/ParticleEmitters.h:
+// Particle emitters the loader hangs on the bike (src/reconstructed/ParticleEmitters.h:
 // Dust 0x80 bytes, DirtChunk 0x608, Steam 0x47c).  Provisional views: the constructor, the
 // GameObject-shaped virtual slot 27 that returns the child to register, and Steam's +0x60 flag.
 struct BikeParticleEmitterView {

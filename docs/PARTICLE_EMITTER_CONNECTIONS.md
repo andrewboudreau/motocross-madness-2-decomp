@@ -23,7 +23,8 @@ The complete existing emitter bodies match retail under authentic VC6 SP3:
 Dust's 58-byte position and 31-byte color setters, Steam's 49/18/19/30/34-byte
 position/restart/burst/stop/color methods, and Spark's 49-byte position setter
 also match completely: 28 complete methods in the four canonical source files.
-The unchanged DirtSpray header consumer has five further complete strict bodies.
+The unchanged DirtSpray header consumer has five further complete strict bodies
+(promoted since to `src/reconstructed/DirtSprayParticleEmitter.cpp`, unchanged).
 
 ## Construction and receiver boundaries
 

@@ -62,7 +62,7 @@
 #include "../../src/reconstructed/SceneManager.h"
 
 // The particle emitters a physics model may carry (0x004ecd60). Views of
-// classes reconstructed in samples/physics/effects: GameObjects whose own
+// classes reconstructed in src/reconstructed/*ParticleEmitter.cpp: GameObjects whose own
 // slot 27 attaches them and returns the GameObject to add as a child.
 class UnknownSceneParticleEmitter : public GameObject {
 public:
