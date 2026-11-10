@@ -34,6 +34,11 @@
 // Session 15: a length local with a camera pointer local and a separate
 // field_0x1ec store, or a const camera local, keep 1299; a zoom float local
 // (562/1314) and CameraZoom of the re-read g_TrackGame camera (561/1317) are worse.
+// Session 17: the KrustyUI::Create setter lever (value stored through a
+// file-local `static inline` setter taking the object pointer) is inert
+// here: a returning setter for the distance, a void setter then a reread, a
+// float& setter, a sizeFactor setter and a length local plus setter all
+// give the same 1299.
 //
 // VisualCue::Tick (0x0048b100, 2796 bytes, jump table at
 // 0x0048bbec): places the cue in front of the camera by camera mode
