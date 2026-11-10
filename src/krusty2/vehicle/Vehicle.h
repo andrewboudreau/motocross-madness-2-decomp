@@ -236,7 +236,7 @@ class Vehicle;
 // Suspension objects hung on a wheel (VehicleWheel+0x2b0 / +0x2ac).  PlaceWheels retracts
 // them by a fraction of the last step and clears their forces while the wheel is in contact;
 // the two Retract bodies differ (0x004fa310 / 0x004fab60), the ClearForces body 0x004f9c70 is
-// shared and called directly.  Provisional views; samples/physics/suspension/Suspension.h
+// shared and called directly.  Provisional views; src/reconstructed/Suspension.h
 // reads them as InlineShock / RotatingShock.
 struct VehicleWheel;
 struct VehicleShock {

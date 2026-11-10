@@ -10,7 +10,7 @@
 //
 // MovingPart is the non-polymorphic base the Tire (RTTI base array mdisp
 // 0x17c) and the Shock family (mdisp 4) carry: see
-// src/krusty2/tire/Tire.h and samples/physics/suspension/Suspension.h.
+// src/krusty2/tire/Tire.h and src/reconstructed/Suspension.h.
 
 #include "MatrixUtil.h"
 

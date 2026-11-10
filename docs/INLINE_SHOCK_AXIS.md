@@ -53,7 +53,8 @@ The existing expression `axis * (1.0f / (axisLength = len))` retains the observe
 store and rounding order. It uses the inline `sqrt` instruction; there is no
 new math wrapper, forced link alias, or copied implementation bytes.
 
-The sample's existing method body now includes the canonical source. All 27
+`src/krusty2/suspension/Shock.cpp` (promoted from `samples/physics/suspension/`)
+includes the canonical source, and the game build compiles the body only there. All 27
 registered suspension targets remain strict, including its constructors,
 other methods and private vector initializers. Same-path before/after proofs
 preserve every nondebug section byte, flag, relocation kind, addend and resolved

@@ -237,7 +237,7 @@ struct BikeA644 {
 };
 
 // Shock objects at BikeWheel+0x2ac (RotatingShock) / +0x2b0 (InlineShock); the classes are
-// in samples/physics/suspension/Suspension.h.
+// in src/reconstructed/Suspension.h.
 struct BikeQ {
     char pad_0x000[148];
     float impulseScale;                       // VehicleShock +0x94 impulseScale; slot 65 stores min(min(0.6 * smoothedVerticalAccel, 100) * rate * 5, 10000)

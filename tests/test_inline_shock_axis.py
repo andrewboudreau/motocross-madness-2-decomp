@@ -18,7 +18,7 @@ from test_steering_axis_from_points import signature, definition, HELPERS
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'src/reconstructed/InlineShockAxis.cpp'
 BIKE = 'src/krusty2/vehicle/Bike.cpp'
-SHOCK = 'samples/physics/suspension/Shock.cpp'
+SHOCK = 'src/krusty2/suspension/Shock.cpp'
 TREE = 'src/krusty2/soultree/soultree.cpp'
 SYMBOL = '?UpdateAxis@InlineShock@@QAEXPAVShockNode@@0@Z'
 RENAMES = {
@@ -172,7 +172,7 @@ class InlineShockAxisTests(unittest.TestCase):
             for obj in (provider,shock):
                 report = compare(retail,obj,SYMBOL,0x4f9f90,250,(ROOT/SOURCE).with_suffix('.bindings.json'))
                 self.assertTrue(report['strict_exact'],report);strict += 1
-            for folder,source,obj in [('samples/physics/suspension','Shock.cpp',shock),('src/krusty2/vehicle','Bike.cpp',bike)]:
+            for folder,source,obj in [('src/krusty2/suspension','Shock.cpp',shock),('src/krusty2/vehicle','Bike.cpp',bike)]:
                 targets = json.loads((ROOT/folder/'targets.json').read_text())
                 selected = [t for t in targets if t['source']==source and t['expect']=='exact']
                 self.assertEqual(len(selected),27 if source=='Shock.cpp' else 52)

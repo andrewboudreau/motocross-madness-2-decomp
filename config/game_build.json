@@ -6,6 +6,13 @@
   "link_aliases": {
     "?g_CollisionScratchPoints@@3PAUCollisionVec3@@A": "?g_CollisionScratchPoints@@3PAUVec3@@A"
   },
+  "included_sources": [
+    {
+      "path": "src/reconstructed/InlineShockAxis.cpp",
+      "included_by": "src/krusty2/suspension/Shock.cpp",
+      "reason": "InlineShock::UpdateAxis 0x004f9f90 belongs to the Shock family unit; Shock.cpp includes the body, which also stays a standalone calibration case and native-test provider (docs/INLINE_SHOCK_AXIS.md)."
+    }
+  ],
   "candidate_sources": [
     {
       "path": "samples/ecosystem/VegetationCollisionObject.cpp",

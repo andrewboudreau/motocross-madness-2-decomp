@@ -1,6 +1,6 @@
 // Shock.cpp -- candidate for the unnamed translation unit at 0x004f9a60..0x004fb1d7
 // (Shock, InlineShock, RotatingShock).  Not SelectiveGravityModel.cpp: see README.md.
-#include "Suspension.h"
+#include "../../reconstructed/Suspension.h"
 #include "core/DebugAlloc.h"
 #include "math/FastMath.h"
 #include <math.h>
@@ -114,7 +114,7 @@ InlineShock::~InlineShock()
 // The store to axisLength is embedded in the divisor: retail's `fld st(0); fdivr [1.0]` (the
 // only one in .text) needs it; a separate `axisLength = len;` statement gives `fld [1.0];
 // fdiv st(1)`, as do named inverse locals, `1.0f / axisLength` and parenthesised forms.
-#include "../../../src/reconstructed/InlineShockAxis.cpp"
+#include "../../reconstructed/InlineShockAxis.cpp"
 
 void InlineShock::ClampAndStep(float maxDelta, float dt, ShockVec3& pos)
 {

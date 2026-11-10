@@ -60,7 +60,7 @@ class TireNode;
 // 0x00513c70 (UpdateShock) reads +0x54 (an "extending" flag copied to Tire+0x26c),
 // +0x70 (a ratio tested against zero) and adds the vector at +0x80 to the contact's
 // world position after the shock solve: InlineShock::SolveContact 0x004fa400 and
-// RotatingShock::SolveContact 0x004fac60 (samples/physics/suspension/Suspension.h).
+// RotatingShock::SolveContact 0x004fac60 (src/reconstructed/Suspension.h).
 // The solves are declared as in Suspension.h; the caller's dt and velocity slots are
 // dead after the call and hold its `active` and `load` outputs.
 #include "../../reconstructed/TireAttachmentViews.h"

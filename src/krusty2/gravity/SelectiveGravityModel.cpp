@@ -9,7 +9,7 @@
 // The Shock family that follows at 0x004f9a60 builds a second, separate set of the same four
 // constants (0x00689e48..0x00689e78, initializers at 0x004fafd0..0x004fb10b).  One TU emits
 // that header's statics once, so Shock/InlineShock/RotatingShock belong to a different
-// translation unit (no __FILE__ string of its own); they stay in samples/physics/suspension/.
+// translation unit (no __FILE__ string of its own): src/krusty2/suspension/Shock.cpp.
 #include "gravity/SelectiveGravityModel.h"
 #include "core/DebugAlloc.h"
 

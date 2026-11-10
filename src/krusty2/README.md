@@ -39,6 +39,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts); `ObjectPlacement.cpp`: 8 strict cases |
 | `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 47 strict cases of 52; `SoultreeQuadTreeRenderer.cpp`: 9 strict cases; `soultree.cpp` (SoultreeObject): 65 strict cases |
 | `gravity/` | `SelectiveGravityModel.cpp`: 15 strict cases |
+| `suspension/` | `Shock.cpp` (unattested name, provisional; RTTI Shock/InlineShock/RotatingShock, extent `0x4f9a60..0x4fb1d7`): 27 strict cases; the class declarations are in `src/reconstructed/Suspension.h`, and `InlineShock::UpdateAxis` is the included body `src/reconstructed/InlineShockAxis.cpp`. The game build links it through the forwarding shims in `src/bringup/Group4_VehicleShock.cpp` |
 | `tire/` | `Tire.cpp`/`.h` (unattested name, provisional; RTTI Tire, extent `0x512e30..0x515dc0`): 26 strict cases of 28; the partials are UpdateContactPatch `0x005135f0` and UpdateSuspensionProbe `0x00514550`. The game build links it through the forwarding shims in `src/bringup/Group2_VehicleWheel.cpp` |
 | `vehicle/` | `Vehicle.cpp` (74 strict cases of 83 registered), `Bike.cpp` (44 strict cases of 55), `BikeAI.cpp` (23 strict cases) and `KrustyBike.cpp` (70 strict cases; its 11 partials are in `samples/physics/krustybike/KrustyBikeNearMisses.cpp`), `Vehicle.h`, `Bike.h`, `KrustyBike.h`, `KrustyBikeTypes.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h` (24 strict cases of 27), `Terrain.cpp`/`.h` (21 strict cases of 24) |
@@ -49,13 +50,13 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `shadow/` | D3DIMSoultreeShadow: 18 strict cases; `ProjectedShadow.cpp`: 21 strict cases, its near misses and the two inline-asm functions in `samples/physics/shadow/ProjectedShadowNearMisses.cpp`; TerrainShadow candidates in samples |
 | `visibility/` | VisibilityQuadTree: 39 strict cases; partial traversal in samples |
 
-Every `exact` target under `src/krusty2` is strict exact (859 of 893 targets; the rest are
+Every `exact` target under `src/krusty2` is strict exact (886 of 920 targets; the rest are
 `partial`). The reviewed slices and their exact reproduction commands are in [PHYSICS_VALIDATION.md](../../docs/PHYSICS_VALIDATION.md).
 SelectiveGravityModel.cpp (0x4f9760..0x4f9a59) is promoted on its own. The Shock
 family (0x4f9a60..0x4fb1d7) builds a second set of the Math3D.h constant vectors
-(0x689e48..0x689e78), so it is a separate TU (strong inference). It stays in
-`samples/physics/suspension/Shock.cpp` because its name is not attested. Motion control, steering and the box-tree
-builder also remain samples pending complete relocation verification.
+(0x689e48..0x689e78), so it is a separate TU (strong inference): `suspension/Shock.cpp`,
+whose name is ours (not attested). The box-tree builder remains a sample pending complete
+relocation verification.
 
 Shared headers use paths relative to this folder, e.g. `core/GameObject.h`.
 The physics runner adds `src/krusty2` to the include path.

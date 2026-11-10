@@ -6,7 +6,7 @@
       "relocations": 1105,
       "sha256": "7c99bf2afc5495d860a820a48b895ccbd8a2a0451aab59daed6e7287adc25c9b"
     },
-    "samples/physics/suspension/Shock.cpp": {
+    "src/krusty2/suspension/Shock.cpp": {
       "sections": 56,
       "relocations": 219,
       "sha256": "32d519acde3e30150aad20114a2824ea15b256c12f0ee7eaeb5c5d29271affbd"

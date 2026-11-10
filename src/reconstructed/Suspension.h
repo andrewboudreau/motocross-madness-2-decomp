@@ -1,5 +1,5 @@
 // Shock, InlineShock and RotatingShock views retained from the suspension sample.
-// Evidence: docs/INLINE_SHOCK_AXIS.md and samples/physics/suspension/README.md.
+// Evidence: docs/INLINE_SHOCK_AXIS.md and src/krusty2/suspension/README.md.
 // Semantic fields and original TU/header ownership remain provisional.
 #ifndef SUSPENSION_H
 #define SUSPENSION_H

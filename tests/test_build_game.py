@@ -56,6 +56,29 @@ class GameBuildTests(unittest.TestCase):
                 'src/krusty2/Bike.cpp', 'src/reconstructed/Bike.cpp',
                 'src/reconstructed/Main.cpp'])
 
+    def test_included_sources_compile_only_inside_their_owner(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'src/a').mkdir(parents=True)
+            (root / 'src/b').mkdir(parents=True)
+            (root / 'src/a/Body.cpp').write_text('void f() {}\n')
+            (root / 'src/b/Owner.cpp').write_text('#include "../a/Body.cpp"\n')
+            (root / 'src/b/Other.cpp').write_text('')
+            fragment = {'path': 'src/a/Body.cpp', 'included_by': 'src/b/Owner.cpp', 'reason': 'test'}
+            spec = {'source_roots': ['src'], 'included_sources': [fragment]}
+            self.assertEqual([p.relative_to(root).as_posix() for p in source_files(root, spec)],
+                             ['src/b/Other.cpp', 'src/b/Owner.cpp'])
+            fragment['included_by'] = 'src/b/Other.cpp'
+            with self.assertRaisesRegex(ValueError, 'does not #include'):
+                source_files(root, spec)
+            fragment['included_by'] = 'src/b/Missing.cpp'
+            with self.assertRaisesRegex(ValueError, 'two compiled sources'):
+                source_files(root, spec)
+            fragment['included_by'] = 'src/b/Owner.cpp'
+            fragment['reason'] = ''
+            with self.assertRaisesRegex(ValueError, 'lacks a reason'):
+                source_files(root, spec)
+
     def test_missing_sources_fail(self):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaisesRegex(ValueError, r'no C\+\+ sources'):

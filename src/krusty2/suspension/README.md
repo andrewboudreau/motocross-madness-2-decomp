@@ -4,7 +4,7 @@ Evidence
 - RTTI: Shock (vptr +0, non-polymorphic MovingPart base +4); InlineShock and
   RotatingShock derive from Shock.
 - The family occupies 0x4f9a60..0x4fb1d7, directly after SelectiveGravityModel.cpp's code
-  (promoted to `src/krusty2/gravity/`) and before soultree.cpp's first `__FILE__` xref
+  (`src/krusty2/gravity/`) and before soultree.cpp's first `__FILE__` xref
   (0x4fdb7d). It references no `__FILE__` string of its own.
 - It is a separate translation unit from SelectiveGravityModel.cpp (strong inference): each TU
   that includes math/Math3D.h builds its own four constant vectors, and the two code ranges
@@ -29,4 +29,14 @@ their bodies are bound).
 - RotatingShock::SolveContact 0x4fac60 needs the parenthesised first product of ShockCross
   (the `fsubp` falls between the load and the store of the copied component).
 
-Field and method names are tier 3 (provisional).
+Field and method names are tier 3 (provisional), and so is the folder: the unit was promoted
+from `samples/physics/suspension/` under its unattested name, like `bvh/BoundingBoxTreeQuery.cpp`.
+Its declarations are `src/reconstructed/Suspension.h`; `InlineShock::UpdateAxis` is the body
+`src/reconstructed/InlineShockAxis.cpp`, which Shock.cpp includes and which also stands alone as a
+calibration case and native-test provider (`docs/INLINE_SHOCK_AXIS.md`). The game build compiles
+that body only inside Shock.cpp (`included_sources` in `config/game_build.json`).
+
+The game links the unit through `src/bringup/Group4_VehicleShock.cpp`: Vehicle.h's
+VehicleShock/VehicleInlineShock/VehicleRotatingShock views and Tire's TireAttachA/B forward to
+the members above, and Suspension.h's ShockNode and Shock*Call names forward to SoultreeObject,
+`src/reconstructed/VectorCalls.cpp` and CollisionObject.cpp's CollisionLength.

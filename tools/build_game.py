@@ -12,6 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 import json
 import os
 from pathlib import Path
+import re
 import struct
 import subprocess
 import sys
@@ -45,6 +46,20 @@ def source_files(root: Path, spec: dict) -> list[Path]:
         if not isinstance(flags, list) or any(flag != '/QIfist' for flag in flags):
             raise ValueError(f'unsupported candidate compiler flags: {relative}')
         sources.add(path)
+    # A source file that another compiled source #includes is part of that
+    # translation unit (e.g. a method body shared by a calibration case and its
+    # owning unit); compiling it on its own as well would define it twice.
+    for fragment in spec.get('included_sources', []):
+        path = (root / fragment['path']).resolve()
+        owner = (root / fragment.get('included_by', '')).resolve()
+        if path not in sources or owner not in sources or path == owner:
+            raise ValueError(f"included source must name two compiled sources: {fragment['path']}")
+        if not fragment.get('reason'):
+            raise ValueError(f"included source lacks a reason: {fragment['path']}")
+        includes = re.findall(r'^\s*#\s*include\s+"([^"]+)"', owner.read_text(encoding='latin1'), re.M)
+        if not any((owner.parent / name).resolve() == path for name in includes):
+            raise ValueError(f"{fragment['included_by']} does not #include {fragment['path']}")
+        sources.discard(path)
     if not sources:
         raise ValueError('no C++ sources found')
     # Original source xrefs support alphabetical unit order. Relative paths
