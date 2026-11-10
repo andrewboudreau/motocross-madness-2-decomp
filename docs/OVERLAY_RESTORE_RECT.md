@@ -23,15 +23,26 @@ a rectangle pointer of 1 faults reading address 1 in retail and address 5 in
 the old candidate. With only left and top readable, the private old control
 faults four bytes beyond the retail fault address.
 
-The candidate now explicitly reads the four initial fields through a volatile
-view in retail order, then computes height and width from those values. The
-qualification is an **explicit reconstructed access-order model**, not proof
-that the original rectangle type was volatile. An ordinary-local control with
-the same four statements but no volatile qualifier emits the exact old
-350-byte body and relocations. The later top and left rereads after the lock
-callbacks remain unchanged.
+The candidate reads the rectangle through one volatile view: left, top,
+right (forming the width), then bottom (forming the height), matching the
+retail arithmetic order, and the later top and left rereads after the lock
+callbacks go through the same view. The qualification is an **explicit
+reconstructed access-order model**, not proof that the original rectangle type
+was volatile. An ordinary-local control with the same statements but no
+volatile qualifier emits a 350-byte body with 58 matching positions that reads
+right first (pointer 1 faults at address 9).
 
-The repaired candidate emits **365 bytes with 77 matching resolved positions**.
+The candidate emits **365 bytes with 105 matching resolved positions**. The
+earlier form (all four reads into locals before computing height and width,
+later rereads through the plain pointer) emitted 365 bytes with 77. Remaining
+differences are register allocation: retail does not keep the rectangle
+pointer in a register (it rereads the argument slot), holds the destination
+bits in `ebp` and spills the copy size, using a `0x18` frame against the
+candidate's `0x14`. Ruled out without gain: plain-pointer reads in either
+order (58), width/height directly from `rect` (58), countdown `for`/`while
+(height-- > 0)` loops (105/26), separate `from`/`to` loop pointers (14),
+`whole = width == textureWidth` (aligned 95/133 instructions but 348 bytes),
+and assigning `whole = 0` before the size (97).
 Equal extent does not make it byte-exact. Its complete function bytes and
 relocations are tested; no extent trimming, helper replacement, special
 compiler options or assembly is used. The standalone object has only two
@@ -154,7 +165,7 @@ destination storage as well.
 
 The current harness also runs the ordinary-local negative-control object. It
 must pass the preceding 12,966 cases and then exit at the explicit pointer-1
-oracle with retail read AV1 versus candidate read AV5. It does not reach the
+oracle with retail read AV1 versus candidate read AV9. It does not reach the
 last three partial-rectangle cases. The earlier private smaller harness's
 partial-rectangle failure is separate evidence, not a claim that it exercised
 the expanded matrix.

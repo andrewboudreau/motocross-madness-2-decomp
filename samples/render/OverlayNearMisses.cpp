@@ -8,15 +8,14 @@
 
 // 0x004b6710. A rectangle as wide as the texture is copied in one block.
 int Overlay::RestoreRect(const UnknownOverlayRect* rect) {
-    // Model the decoded left/top/right/bottom access order, including faults.
-    // This qualification describes reconstructed behavior, not an original type.
-    const volatile UnknownOverlayRect* initial = rect;
-    int initialLeft = initial->left;
-    int initialTop = initial->top;
-    int initialRight = initial->right;
-    int initialBottom = initial->bottom;
-    int height = initialBottom - initialTop;
-    int width = initialRight - initialLeft;
+    // Model the decoded left/top/right/bottom access order, including faults,
+    // and the two rereads after the lock callbacks. This qualification
+    // describes reconstructed behavior, not an original type.
+    const volatile UnknownOverlayRect* view = rect;
+    int left = view->left;
+    int initialTop = view->top;
+    int width = view->right - left;
+    int height = view->bottom - initialTop;
     int whole;
     int bytes;
     if (width == overlayTexture->textureWidth) {
@@ -33,12 +32,12 @@ int Overlay::RestoreRect(const UnknownOverlayRect* rect) {
     if (!source || !bits)
         return 0;
 
-    int top = rect->top;
+    int top = view->top;
     if (whole) {
         memcpy(bits + top * pitch, source + top * sourcePitch, bytes);
     } else {
         int offset = top * sourcePitch;
-        offset += PixelFormatBytesPerPixel(overlayTexture->mapFormat) * rect->left;
+        offset += PixelFormatBytesPerPixel(overlayTexture->mapFormat) * view->left;
         source += offset;
         bits += offset;
         for (int y = 0; y < height; y++) {

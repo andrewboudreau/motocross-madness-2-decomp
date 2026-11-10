@@ -100,18 +100,18 @@ class OverlayRestoreTests(unittest.TestCase):
                 return path,CoffObject(path)
             candidate_path,candidate=compile_source(SOURCE,'candidate')
             result=compare(image,candidate,SYMBOL,0x4b6710,365,SOURCE.with_suffix('.bindings.json'))
-            self.assertEqual((result['candidate_size'],result['strict_match']['matching_positions'],result['strict_exact']),(365,77,False))
-            self.assertEqual(hashlib.sha256(signature(candidate,SYMBOL)[0]).hexdigest(),'8e4dc3cc8b5796d421d5c7f4253f620002a1297324617b3382830f7da40e208d')
+            self.assertEqual((result['candidate_size'],result['strict_match']['matching_positions'],result['strict_exact']),(365,105,False))
+            self.assertEqual(hashlib.sha256(signature(candidate,SYMBOL)[0]).hexdigest(),'4e1a5be860f09530e028f97f7612e950583d8d806ad7077c6f0f2bc96cdc221b')
             self.assertEqual([(s.name,s.raw_size,s.characteristics) for s in candidate.sections if not s.name.startswith('.debug')],[('.drectve',40,0x100a00),('.text',368,0x60501020)])
             self.assertEqual([s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0],['?PixelFormatBytesPerPixel@@YAHH@Z'])
             self.assertEqual([s.name for s in candidate.symbols if s.storage_class==2 and s.section_number>0],[SYMBOL])
             # Ordinary sequenced locals are optimized back into the old fault order.
             ordinary=output/'ordinary.cpp'
-            ordinary.write_text(SOURCE.read_text().replace('const volatile UnknownOverlayRect* initial','const UnknownOverlayRect* initial').replace('../../src/reconstructed/',''))
+            ordinary.write_text(SOURCE.read_text().replace('const volatile UnknownOverlayRect* view','const UnknownOverlayRect* view').replace('../../src/reconstructed/',''))
             old_path,old=compile_source(ordinary,'ordinary')
             old_result=compare(image,old,SYMBOL,0x4b6710,365,SOURCE.with_suffix('.bindings.json'))
-            self.assertEqual((old_result['candidate_size'],old_result['strict_match']['matching_positions']),(350,63))
-            self.assertEqual(hashlib.sha256(signature(old,SYMBOL)[0]).hexdigest(),'ad0578915615ec27d40d139fd534635d60832a22aec3f22fdb14c6c36acc9cbd')
+            self.assertEqual((old_result['candidate_size'],old_result['strict_match']['matching_positions']),(350,58))
+            self.assertEqual(hashlib.sha256(signature(old,SYMBOL)[0]).hexdigest(),'e8cbbc2537ccb3e743524165750725804db88b8bab7110e4cc6266274641d31e')
             self.assertEqual([(r[0],r[1],r[2]) for r in signature(old,SYMBOL)[2]],[(49,20,'?PixelFormatBytesPerPixel@@YAHH@Z'),(80,20,'?PixelFormatBytesPerPixel@@YAHH@Z'),(218,20,'?PixelFormatBytesPerPixel@@YAHH@Z')])
             canonical={unit:compile_source(ROOT/f'src/reconstructed/{unit}.cpp',unit)[1] for unit in ('PCTextureMap','Tgafile','TrackOverlay','Overlay')}
             helper_source=output/'helpers.cpp'
@@ -160,7 +160,7 @@ class OverlayRestoreTests(unittest.TestCase):
             self.assertEqual(linked.returncode,0,linked.stdout+linked.stderr)
             failed=subprocess.run([str(negative),str(image_path)],cwd=ROOT,capture_output=True,text=True,timeout=120)
             self.assertEqual(failed.returncode,7,failed.stdout+failed.stderr)
-            self.assertIn('Invalid rect=1: retail AV 0:1, candidate AV 0:5',failed.stdout)
+            self.assertIn('Invalid rect=1: retail AV 0:1, candidate AV 0:9',failed.stdout)
             self.assertNotIn('cases match',failed.stdout)
             self.assertEqual(strict,17)
             print(f'Overlay RestoreRect: {strict} strict helper/producer/caller checks; eight calls; '+result.stdout.strip())
