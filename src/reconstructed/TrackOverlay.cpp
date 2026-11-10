@@ -589,6 +589,12 @@ int StatsOverlay::RenderPre3D()
     return 1;
 }
 
+// 0x004dc4c0 (folded with ProjectedShadow's slot 23 and Terrain's slot 22)
+int StatsOverlay::OnControlPress(UnknownControlEvent*, UnknownInputEntry*)
+{
+    return 0;
+}
+
 // 0x00519980
 int StatsOverlay::Render3D()
 {

@@ -800,6 +800,12 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
     return 1;
 }
 
+// 0x00499af0 (folded with KrustyUI::OnActivate)
+int RaceSound::OnActivate() {
+    GameObject::OnActivate();
+    return 1;
+}
+
 // 0x004e44e0: Ctrl+V toggles the EAX environment, Ctrl+C cycles the music
 // volume (race mode 3 only) and Ctrl+S turns all sound on or off.
 int RaceSound::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {

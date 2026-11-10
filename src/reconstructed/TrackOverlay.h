@@ -172,6 +172,8 @@ public:
     virtual int Tick(float frameTime);                 // 0x00519900
     virtual int RenderPre3D();                // 0x00519940
     virtual int Render3D();       // 0x00519980
+    // Slot 23: 0x004dc4c0, the shared "return 0" body.
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     // 0x005194b0 (QuarryStuntEvent.cpp 0x004e0a9c): loads the panel for the
     // screen rectangle `screen`; returns this, or 0.

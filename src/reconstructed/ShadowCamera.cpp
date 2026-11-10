@@ -3,6 +3,11 @@
 // 0x004da520: PCCamera(flags), then the ShadowCamera vptr.
 ShadowCamera::ShadowCamera(int flags) : PCCamera(flags) {}
 
+// 0x004da540 (folded with GameObject::Step): skips Camera::Tick entirely.
+int ShadowCamera::Tick(float) {
+    return 1;
+}
+
 // 0x004da550: no child search.
 int ShadowCamera::UnknownVirtualSlot19(int) {
     return 0;

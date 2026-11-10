@@ -10,8 +10,8 @@
 //
 // Confirmed (RTTI): RaceSound : GameObject : BaseObject, single non-virtual
 // inheritance; vtable 0x00557710 (27 slots, COL 0x0055eb78). RaceSound
-// overrides slot 0 (deleting destructor 0x004e2190), slot 10 (0x004e3730)
-// and slot 23 (0x004e44e0). bikerace.cpp allocates 0x12b0 bytes for it
+// overrides slot 0 (deleting destructor 0x004e2190), slot 10 (0x004e3730),
+// slot 18 (0x00499af0, a body shared with KrustyUI) and slot 23 (0x004e44e0). bikerace.cpp allocates 0x12b0 bytes for it
 // (0x004195e4) and constructs it with 1.
 
 struct UnknownEventRacer;
@@ -74,6 +74,7 @@ public:
     virtual ~RaceSound();                 // 0x004e21b0 (deleting wrapper 0x004e2190)
     virtual int Tick(float frameTime);                                                    // 0x004e3730
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004e44e0
+    virtual int OnActivate();                 // 0x00499af0 (folded with KrustyUI's)
 
     // 0x004e23f0 (thiscall, ret 0x10; bikerace.cpp 0x00419628 passes its
     // +0x18, itself, its +0x50 camera and 6): creates the sound groups and

@@ -252,6 +252,12 @@ int ProjectedShadow::PrepareGeometry()
     return 1;
 }
 
+// 0x004dc4c0 (slot 23, folded with Terrain's slot 22 and StatsOverlay's slot 23).
+int ProjectedShadow::OnControlPress(UnknownControlEvent*, UnknownInputEntry*)
+{
+    return 0;
+}
+
 // 0x004dc410 (slot 13): after a dirty update, uploads the union of the previous and current
 // dirty rectangles (previous 0x78..0x84, current clipRect) to the texture, then makes the
 // current one the previous one.

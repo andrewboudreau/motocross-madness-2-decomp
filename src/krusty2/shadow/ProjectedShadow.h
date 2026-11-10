@@ -5,7 +5,7 @@
 //    base GameObject (mdisp 0, no virtual base), base chain GameObject -> BaseObject.
 //  * Overrides (vtable_overrides.json): slot 0 (deleting dtor 0x004da6c0 -> core 0x004da6e0),
 //    10 0x004dafc0, 12 0x004db000, 13 0x004dc410, 23 0x004dc4c0 (the shared "return 0" stub,
-//    which is reconstructed in broadphase/Terrain.cpp).
+//    which Terrain's slot 22 and StatsOverlay's slot 23 share).
 //  * Ctor 0x004da570 (ret 4: one argument forwarded to the GameObject ctor 0x00468ca0).
 //  * Object size >= 0x134 (last ctor store at +0x130).
 //  * __FILE__ 0x00571fd8 "D:\aardvark\VC\krusty2\ProjectedShadow.cpp".
@@ -281,6 +281,7 @@ public:
     virtual int Tick(float dt);                     // 0x004dafc0
     virtual int PrepareGeometry();                  // 0x004db000
     virtual int RenderPre3D();                      // 0x004dc410
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);  // 0x004dc4c0: returns 0
 
     ProjectedShadow* Init(ShadowRenderTarget* target, void* textureOwner);  // 0x004da7b0
     ShadowRenderTarget* Host() const { return (ShadowRenderTarget*)renderContext; }  // GameObject::renderContext set by Init

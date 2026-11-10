@@ -58,6 +58,8 @@ public:
     virtual void ClampSubStepsOnCrash(int* steps, float frame);
     virtual void ApplyAirControl();
     virtual void ApplyLeanCorrection(const Vec3* worldDir, const Vec3* point);
+    // Slot 93: the shared empty stub 0x00464e90, replacing Vehicle's 0.5 gain.
+    virtual void InitForceFeedback();
     virtual void InitControlResponses();
 
     // slots introduced by Bike

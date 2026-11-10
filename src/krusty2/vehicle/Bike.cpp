@@ -270,6 +270,11 @@ float Bike::ApplySteerRate()
     return 1.0f - Method_0x0040a520();
 }
 
+// Slot 93: 0x00464e90, the shared empty body.
+void Bike::InitForceFeedback()
+{
+}
+
 void Bike::InitControlResponses()
 {
     controlResponse[0] = 0.675f;
