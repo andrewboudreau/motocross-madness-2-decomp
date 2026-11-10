@@ -219,6 +219,24 @@ int TerrainShadow::Render3D()
     return 1;
 }
 
+// Retail's inline fistp helper (fstp/fld of the float, then `mov eax, out; fistp dword ptr [eax]`
+// in an ebp frame) rounds under the x87 control word, round-to-nearest-even by default (nothing in
+// the game is known to change it; provisional), so fistp(v - 0.5f) is floor(v) apart from exact
+// ties.  A plain (int) cast truncates through __ftol and is one pixel too small whenever v's
+// fraction is below one half.  This gives the round-to-nearest-even result in ordinary C++ (same
+// helper as Bike.cpp's BikeFloatToInt; destination-pointer shape as retail's call); it is a
+// behaviour repair, not the original inline-asm form.
+static inline void TerrainShadowFloatToInt(int* out, float value)
+{
+    int result = (int)value;
+    float fraction = value - (float)result;
+    if (fraction > 0.5f || (fraction == 0.5f && (result & 1)))
+        result++;
+    else if (-fraction > 0.5f || (-fraction == 0.5f && (result & 1)))
+        result--;
+    *out = result;
+}
+
 // 0x00509aa0 (slot 30): builds the shadowed terrain vertices.  Every cell key slot 29 gathered has
 // its mesh transformed by the shadow's light matrix (perspective in mode 3), each triangle is
 // outcode-rejected against the clip rectangle (doubled while the shadow is not being updated),
@@ -226,9 +244,7 @@ int TerrainShadow::Render3D()
 // (all three corners nearer than minDepth) or copied into the vertex array with the shadow colour
 // and texture coordinates scaled by field_0x677c.  Cells that were drawn into are marked used.
 // Tier 3 semantics; the retail body converts with an inline __asm fistp helper, so this stays a
-// documented partial (see targets.json).
-// s15 reference diff: the six extra __ftol calls are those roundings, and the missing
-// immediates sit in the 240 bytes the asm helper's ebp frame adds (1788 retail, 1548 here).
+// documented partial (see targets.json); TerrainShadowFloatToInt reproduces its rounding.
 void TerrainShadow::UnknownVirtualSlot30()
 {
     enum { kMaxMeshVertices = 867 };
@@ -349,13 +365,13 @@ void TerrainShadow::UnknownVirtualSlot30()
                     used = 1;
                     if (!shadow->updateThisFrame)
                         continue;
-                    points[0] = (int)(clipped[0].x - 0.5f);
-                    points[1] = (int)(clipped[0].y - 0.5f);
+                    TerrainShadowFloatToInt(&points[0], clipped[0].x - 0.5f);
+                    TerrainShadowFloatToInt(&points[1], clipped[0].y - 0.5f);
                     for (int k = 0; k < count - 2; k++) {
-                        points[2] = (int)(clipped[k + 1].x - 0.5f);
-                        points[3] = (int)(clipped[k + 1].y - 0.5f);
-                        points[4] = (int)(clipped[k + 2].x - 0.5f);
-                        points[5] = (int)(clipped[k + 2].y - 0.5f);
+                        TerrainShadowFloatToInt(&points[2], clipped[k + 1].x - 0.5f);
+                        TerrainShadowFloatToInt(&points[3], clipped[k + 1].y - 0.5f);
+                        TerrainShadowFloatToInt(&points[4], clipped[k + 2].x - 0.5f);
+                        TerrainShadowFloatToInt(&points[5], clipped[k + 2].y - 0.5f);
                         ShadowFillTriangle(shadow->sizeShift, pixels, shadow->colorKeyLow, points, 0);
                     }
                 } else if (cell->field_0x40) {

@@ -91,11 +91,30 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
     return 0;
 }
 
+// Retail's inline fistp helper (fstp/fld of the float, then `mov eax, out; fistp dword ptr [eax]`
+// in an ebp frame) rounds under the x87 control word, round-to-nearest-even by default (provisional:
+// nothing in the game is known to change it), so fistp(v - 0.5f) is floor(v) apart from exact ties.
+// A plain (int) cast truncates toward zero through __ftol: one too small whenever v's fraction is
+// below one half, and 0 instead of -1 for v in (-0.5, 0.5), which let off-texture points pass the
+// x >= 0 / y >= 0 tests.  This gives the round-to-nearest-even result in ordinary C++ (same helper
+// as Bike.cpp's BikeFloatToInt); a behaviour repair, not the original inline-asm form.
+static inline void ProjectedShadowFloatToInt(int* out, float value)
+{
+    int result = (int)value;
+    float fraction = value - (float)result;
+    if (fraction > 0.5f || (fraction == 0.5f && (result & 1)))
+        result++;
+    else if (-fraction > 0.5f || (-fraction == 0.5f && (result & 1)))
+        result--;
+    *out = result;
+}
+
 // 0x004dc2b0 (352 B): paints shadowColor into the colour word (+0x10 of 0x20-byte vertices) of
 // every caster vertex whose projected position lands on a height-map cell equal to colorKeyLow.
 // PARTIAL by design: retail converts with an inline fistp helper (fstp/fld float temp, then
-// "fistp [ptr]" through a local address) that is inline asm; the no-asm rule forces the
-// (int) cast, which calls __ftol instead.  Same situation as Terrain QueryGround 0x507c10.
+// "fistp [ptr]" through a local address) that is inline asm; ProjectedShadowFloatToInt gives
+// its rounding in C++ (the cast inside still calls __ftol).  Same situation as Terrain QueryGround
+// 0x507c10.
 // Verified exclusion: retail 0x004dc351 and 0x004dc36c are bare `fistp dword ptr [eax]` in an
 // ebp frame (docs/REBUILD_GAPS.md inline-asm table).
 void ProjectedShadow::TintCasterVertices()
@@ -111,8 +130,9 @@ void ProjectedShadow::TintCasterVertices()
             int indexCount;
             casters[c]->GetPart(part, (void**)&vertices, &count, &indices, &indexCount, 0, -1);
             for (int i = 0; i < count; i++) {
-                int x = (int)(vertexBuffer[totalVertices + i].x - 0.5f);
-                int y = (int)(vertexBuffer[totalVertices + i].y - 0.5f);
+                int x, y;
+                ProjectedShadowFloatToInt(&x, vertexBuffer[totalVertices + i].x - 0.5f);
+                ProjectedShadowFloatToInt(&y, vertexBuffer[totalVertices + i].y - 0.5f);
                 if (x >= 0 && y >= 0 && x <= texture->size && y <= texture->size
                     && heightMap[(y << sizeShift) + x] == colorKeyLow)
                     *(unsigned int*)(vertices + i * 0x20 + 0x10) = shadowColor;
@@ -355,8 +375,8 @@ void ProjectedShadow::RenderShadow()
                 bool inside = true;
                 for (int k = 0; k < 3; k++) {
                     ShadowVec3* vertex = &vertexBuffer[*(indices + i + k) + vertexBase];
-                    points[k * 2] = (int)(vertex->x - 0.5f);
-                    points[k * 2 + 1] = (int)(vertex->y - 0.5f);
+                    ProjectedShadowFloatToInt(&points[k * 2], vertex->x - 0.5f);
+                    ProjectedShadowFloatToInt(&points[k * 2 + 1], vertex->y - 0.5f);
                     if (points[k * 2] <= 1 || points[k * 2] >= texture->size - 1
                         || points[k * 2 + 1] <= 1 || points[k * 2 + 1] >= texture->size - 1) {
                         inside = false;
