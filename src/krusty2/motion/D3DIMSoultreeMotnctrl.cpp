@@ -267,7 +267,7 @@ D3DIMSoultreeCharacter::D3DIMSoultreeCharacter(int flags) : GameObject(1), Chara
 }
 
 // The scene-node model that Character owns at +0x1a0: retail class D3DIMSoultreeObject (RTTI, vtable 0x005513ec, QuadTreeObject +0
-// and GameObject +0xc, 0x2d8 bytes).  samples/physics/collision/SoultreePhysicsObject.h declares it, but its slot 7
+// and GameObject +0xc, 0x2d8 bytes).  src/krusty2/soultree/SoultreePhysicsObject.h declares it, but its slot 7
 // (0x00444560, `ret 4`) takes the object to copy from and the header declares no argument, so this TU keeps a local
 // stand-in with the same layout and vtable shape (tier 3).
 #include "../../reconstructed/SoultreeMaterial.h"

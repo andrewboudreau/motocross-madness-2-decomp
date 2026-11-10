@@ -201,7 +201,7 @@ extern const TreeVec3 kVec3ZAxis;
 void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* triCount,
                           int* vertCount, int** indices, TreeVec3** verts);
 
-// Partition and bounds helpers (samples/physics/bvh/BoundingBoxTreeSplit.cpp, 0x0042ad30..).
+// Partition and bounds helpers (src/reconstructed/BoundingBoxTreeBuild.cpp, 0x0042ad30..).
 int SplitTriangles(const TreeBuildTriangle* tris, TreeBuildTriangle* left,
                    TreeBuildTriangle* right, int count, int* leftCount, int* rightCount,
                    float split, int axis);

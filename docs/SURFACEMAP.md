@@ -1,7 +1,7 @@
 # SurfaceMap provider
 
 `src/reconstructed/SurfaceMap.cpp` supplies the six complete functions formerly
-in `samples/physics/motion/SurfaceMap.cpp`. The class name is confirmed by RTTI;
+in `src/reconstructed/SurfaceMap.cpp`. The class name is confirmed by RTTI;
 the file is a reconstruction grouping, not an established original translation
 unit. No source literal identifies its retail owner. Proximity to SteeringControl
 and Terrain does not assign either file's ownership to these methods.

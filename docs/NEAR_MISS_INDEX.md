@@ -84,7 +84,7 @@ its products were turned into IL first, so `m._11` gets its leaf before `v` is c
 the x row loads `v.x` first. The y row is then `v.z * m._32 + (v.x * m._12 + v.y * m._22)`
 (best of the twelve sum shapes). Optimised-away code still ages leaves: when retail's order
 needs an operand to be older, look for the computation a sibling performs and discards.
-TireBuildFrame `0x00515880` (class c, 699/703) is exact too, in samples/physics/tire/Tire.cpp:
+TireBuildFrame `0x00515880` (class c, 699/703) is exact too, in src/krusty2/tire/Tire.cpp:
 y's components are read into scalars (`float yx = y.x, yy = y.y, yz = y.z;`) before the
 cross c = y x z, so all six c products load their z operand first as retail does. A dead
 read of `y.z` alone does the same; the operand orders and groupings tried before could not

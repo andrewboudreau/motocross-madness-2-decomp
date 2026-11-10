@@ -78,7 +78,7 @@ int KbRaceSub::DistanceToStripEdge(Vec3 p, int segment, float* out, int mode)
 }
 
 // ---------------------------------------------------------------------------------------
-// KbWheel::SetRollDistance, 0x00513560 (Tire::SetRollDistance, samples/physics/tire/Tire.cpp):
+// KbWheel::SetRollDistance, 0x00513560 (Tire::SetRollDistance, src/krusty2/tire/Tire.cpp):
 // rollAngle (+0x278) = distance * invWheelRadius (+0x1c8); a finite angle rolls the wheel's
 // scene node (+0x1bc) about its local X axis.
 // ---------------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ void KbWheel::SetRollDistance(float d)
 // BikeQ: the wheel's shock (InlineShock at BikeWheel+0x2b0, RotatingShock at +0x2ac).  The
 // layout is the Shock of src/reconstructed/Suspension.h (MovingPart at +0x04 with its local
 // matrix at +0x04 and scene node at +0x44).  Bodies from 0x004fa090 / 0x004fa8b0
-// (samples/physics/suspension/Shock.cpp, checked against the retail disassembly).
+// (src/krusty2/suspension/Shock.cpp, checked against the retail disassembly).
 // ---------------------------------------------------------------------------------------
 struct G3ShockView {
     void* vtable;                // +0x00

@@ -130,7 +130,7 @@ Both units moved from `samples/physics/` to `src/krusty2/`:
 - `src/krusty2/constraint/ConstraintMethodCollisionModel.cpp` (with
   `ConstraintTypes.h`, from `samples/physics/constraint/`) passes 19 targets: the
   unit's methods, callback and `$E` set, plus the shared bare `ret` `0x44d710`
-  that the removed duplicate `samples/physics/collision/ConstraintMethodCollisionModel.cpp`
+  that the removed duplicate `src/krusty2/constraint/ConstraintMethodCollisionModel.cpp`
   registered. Slot 11 `0x43ba70` is exact with the refresh and the push-out as
   two `if` statements, the probe-loop locals declared in the ground-query block
   and parenthesised offset products.

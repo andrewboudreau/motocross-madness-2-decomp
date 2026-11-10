@@ -1,6 +1,5 @@
 // GameCursor.cpp -- reconstruction of D:\aardvark\VC\krusty2\cursor.cpp.
-// See GameCursor.h for the TU extent and the class. Slot 15 (0x0043ed40)
-// is a near miss in samples/ui/GameCursorNearMisses.cpp.
+// See GameCursor.h for the TU extent and the class.
 
 #include <windows.h>
 

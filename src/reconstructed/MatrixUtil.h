@@ -12,7 +12,7 @@
 // 4x4 float matrix (D3DMATRIX layout, m[row][column]) with D3DMATRIX's
 // D3D_OVERLOADS members. Both matter to codegen: the empty user-declared
 // constructor makes VC6 copy a by-value result straight from the returned
-// pointer (see samples/physics/common/Math3D.h), and MatrixMult only matches
+// pointer (see src/krusty2/math/Math3D.h), and MatrixMult only matches
 // when written with the operator() accessor (plain m[][] indexing swaps the
 // fld/fmul operands).
 #include "Matrix4.h"
