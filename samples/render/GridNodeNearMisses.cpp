@@ -25,6 +25,9 @@
 // loops (running y/z kept on the stack) stays different. Written here as casts.
 // s15 reference diff: the four extra __ftol calls are the fistp roundings; the immediates
 // (test ah, 1 against 0x41, 0xc, 0x18) were not traced further.
+// s20 logic fix: retail has no range test on the rounded cell indices in either loop
+// (only the child loop's `== 16 -> 15` clamp, 0x4844c3/0x4844d3); the guessed
+// `ix < 0 || ix > 15` / `> 16` tests were removed (4308 -> 4278 bytes).
 #include "../../src/reconstructed/Griddraw.h"
 #include "../../src/reconstructed/MatrixUtil.h"
 #include <math.h>
@@ -201,10 +204,6 @@ int GridNode::IntersectSegment(const GridVec3* p0, const GridVec3* p1, GridVec3*
             if (iy == 16) {
                 iy = 15;
             }
-            // best guess: a segment that leaves the 16x16 block would index a stray child
-            if (ix < 0 || ix > 15 || iy < 0 || iy > 15) {
-                continue;
-            }
             GridNode* child = children[g_gridRow16[iy] + ix];
             if (child == 0) {
                 continue;
@@ -229,9 +228,6 @@ int GridNode::IntersectSegment(const GridVec3* p0, const GridVec3* p1, GridVec3*
     for (k = 0; k < count - 1; k++) {
         int ix = GridMidCell(cross[k].x, cross[k + 1].x, twoCells);
         int iy = GridMidCell(cross[k].y, cross[k + 1].y, twoCells);
-        if (ix < 0 || ix > 16 || iy < 0 || iy > 16) {
-            continue;
-        }
         GridBaseCell* cell = &block->cells[g_gridRow17[iy] + ix];
         float h00 = GridCornerHeight(this, cell);
         float h10 = GridCornerHeight(this, cell + 1);
