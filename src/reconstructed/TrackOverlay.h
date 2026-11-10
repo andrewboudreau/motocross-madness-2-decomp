@@ -114,6 +114,7 @@ class NameOverlay : public Overlay {
 public:
     explicit NameOverlay(int flags);          // 0x00518d80
     virtual ~NameOverlay();                   // 0x00518e20 (deleting wrapper 0x00518e00)
+    virtual int Tick(float frameTime);        // 0x00518f30: the fade (slot 10)
     virtual int Render3D();       // 0x005190e0
 
     NameOverlay* Create(RenderTarget* target, TextureMap* texture,
@@ -135,7 +136,7 @@ public:
     int becameHidden;                         // +0x13c set when the head goes out of sight
     int becameVisible;                        // +0x140 set when it comes back into sight
     float fadeTime;                           // fade time, 0.25
-    float field_0x148;
+    float fadeElapsed;                        // +0x148 time into the fade (0..fadeTime)
     int wasHidden;                            // +0x14c the head was out of sight last frame
     Vector3 fixedPosition;                    // +0x150 where the tag of no racer is drawn (SetFixedPosition)
     Vector3 radarAnchor;                      // +0x15c screen anchor from the radar, (-1, -1): none

@@ -141,7 +141,12 @@ linkage so the standalone uses the same mutable DWORD as `RenderPre3D`.
 ### Not reconstructed
 
 - **Inline-asm float-to-int.** `0x00518f30`, `0x0051af00` and `0x0051b070`
-  use a `fistp` helper that the project rules exclude.
+  use a `fistp` helper that the project rules exclude, so none can be
+  byte-exact. `0x00518f30` (NameOverlay slot 10, the name-tag fade) is
+  reconstructed for behaviour in `src/reconstructed/TrackOverlay.cpp`, with
+  `src/bringup/X87FloatToInt.h` standing in for the helper. It is not a
+  calibration target. `0x0051af00` and `0x0051b070` have bring-up bodies in
+  `src/bringup/Group4_Overlay.cpp`.
 - `0x00518c20` is not a function start (inside the InstrumentOverlay
   destructor `0x00518c00`).
 - `0x0051eae0` is a 3-byte `mov eax, ecx; ret`: UnknownChatInput's line

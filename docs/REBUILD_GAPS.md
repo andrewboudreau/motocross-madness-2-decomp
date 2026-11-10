@@ -365,7 +365,7 @@ None is strict exact. 23 are unregistered; 8 are registered near misses.
 | `0x00507610` | 783 (to padding) | fistp x1 | scan | unregistered | Terrain.cpp |
 | `0x00507c10` | 2963 (registered) | fistp x2 | scan + docs (`samples/physics/shadow/targets.json:259`) | registered near miss | Terrain.cpp |
 | `0x00509aa0` | 1788 (registered) | fistp x6 | scan + docs (`docs/PHYSICS_VALIDATION.md:589`) | registered near miss | Texmap.cpp |
-| `0x00518f30` | 205 (to padding) | fistp x1 | scan + docs (`docs/TRACKOVERLAY.md:119`) | unregistered | Track.cpp |
+| `0x00518f30` | 205 (to padding) | fistp x1 | scan + docs (`docs/TRACKOVERLAY.md:143`); behavioural body `NameOverlay::Tick` in `src/reconstructed/TrackOverlay.cpp` | unregistered | Track.cpp |
 | `0x0051af00` | 361 (to padding) | fistp x2 | scan | unregistered | TrackOverlay.cpp |
 | `0x0051b070` | 123 (to padding) | fistp x1 | scan | unregistered | TrackOverlay.cpp |
 | `0x0052f570` | 1358 (to padding) | fistp x6 | scan | unregistered | wrecker.cpp |

@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "TrackOverlay.h"
+#include "../bringup/X87FloatToInt.h"
 #include "D3DIMSoulTree.h"
 #include "DebugAlloc.h"
 #include "BikeCamera.h"
@@ -244,7 +245,7 @@ NameOverlay::NameOverlay(int flags) : Overlay(flags, 1)
     world = 0;
     becameHidden = 0;
     becameVisible = 0;
-    field_0x148 = 0;
+    fadeElapsed = 0;
     wasHidden = 0;
     drawWidth = 0;
     field_0x170 = 0;
@@ -297,6 +298,33 @@ int NameOverlay::IsPointVisible(const Vector3* point)
     if (frameCounter > 3)
         frameCounter = 0;
     return lastVisible;
+}
+
+// 0x00518f30 (slot 10): fades the tag in after Render3D sets becameVisible and
+// out after it sets becameHidden, over fadeTime seconds of g_TrackGame's frame
+// time (the argument is unused). Retail converts the alpha with its inline-asm
+// fistp helper (the frame-forced `lea edx,[ecx+0x10c]; mov [ebp-4],edx; ...;
+// fistp dword ptr [eax]`), which ordinary C++ cannot reproduce, so this body is
+// accurate but not byte-exact; X87FloatToInt rounds the way that FISTP does.
+int NameOverlay::Tick(float frameTime)
+{
+    if (becameVisible) {
+        fadeElapsed += g_TrackGame->frameTime;
+        if (fadeElapsed >= fadeTime) {
+            overlayAlpha = 0xff;
+            becameVisible = 0;
+        }
+    } else if (becameHidden) {
+        fadeElapsed -= g_TrackGame->frameTime;
+        if (fadeElapsed <= 0.0f) {
+            fadeElapsed = 0;
+            overlayAlpha = 0;
+            becameHidden = 0;
+        }
+    }
+    if (becameVisible || becameHidden)
+        overlayAlpha = X87FloatToInt(fadeElapsed / fadeTime * 255.0f - 0.5f);
+    return 1;
 }
 
 // 0x00519080
