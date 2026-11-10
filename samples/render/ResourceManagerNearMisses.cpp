@@ -6,6 +6,9 @@
 // each leading to -1, and no try blocks. See docs/RESOURCEMANAGER.md for the
 // bounded profile experiment and private behavioral validation boundary.
 // The other manager methods and storage belong to the canonical source.
+// s20: a separate `result = archive` local returned at the end is copy-propagated
+// back into EBX (unchanged, 120 strict of 804). The archives append only in the
+// grown-storage branch is retail behavior (checked against 0x004e9030).
 
 #include <string.h>
 #include "../../src/reconstructed/ResourceManager.h"

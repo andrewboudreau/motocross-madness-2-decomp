@@ -94,6 +94,14 @@ positions**, and remains nonexact. Its complete raw/resolved body hash changes
 from `6b429187dafd18f3021ce8f7027f8f7734e3ee7fdcb890768b1791777fbd925d` to
 `86776f81371b828a977dedfc5d00a1ad279e1c8a46e38623adfc6b8d65943596`.
 
+Retail zero-extends both WORD loads (`xor; mov si/dx`) with no `and 0xffff`,
+keeps the source row in ESI and the destination row in ECX (the candidate the
+other way round), spills `left` and enters each inner loop past its first
+reload. Non-volatile spellings (`from[column - left] << 8` with the byte read
+through `*pixel` inline, operands swapped, a `lookup` byte-pointer local, an
+ordinary `destinationPixel` local) all return to the 755-byte source-first
+body; `unsigned long` or `int` volatile locals emit the current 775 bytes.
+
 Private preservation checks against baseline `94c364f0` establish that the
 initial extraction retained all three aggregate functions and seven nondebug
 sections. After the correction, only CopyRectTo and its text section change.

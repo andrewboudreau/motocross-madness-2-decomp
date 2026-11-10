@@ -22,6 +22,15 @@ instruction bytes after relocation operands are normalized; the diagnostic
 source path and compiler-generated exception-label numbering change. Neither
 form is a strict match, and no extent is shortened to accommodate either one.
 
+Retail keeps the two `result = -3` stores of the mode search separate (the
+second one after reloading the loop counter, because `created` occupies ESI)
+and retests the render target after the loop's `break`; the candidate merges
+the stores. Tried without gain (s20): `continue` after the first `-3` (140,
+unchanged); assigning the created target straight to `render` (171 of 1170
+bytes, and the loop-exhausted path no longer skips to the final store); the
+temporary-target cleanup moved outside `if (render)` (143 of 1157, registers
+rotate).
+
 ## Functional build review
 
 The probe loads `partblt.tga`, uses the supplied target or searches for a

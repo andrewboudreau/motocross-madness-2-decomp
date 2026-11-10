@@ -40,6 +40,11 @@
 // }` ahead of the loop (braced or not) gives 545 bytes. In the exact
 // loop-bottom examples (docs/VC6_PATTERN_CORPUS.md) the early return is
 // the body's last test; here it is the first.
+// s20 (409/462 strict, both worse than the current form): `if (result) return 0;`
+// between the loops with the Blt failure as an in-loop `return 0` (545 bytes,
+// the return block lands after the first loop); a trailing `continue` or
+// `return 0` at the loop-body end (same); and the whole second loop plus the
+// upload inside `if (result == 0) { ... return 1; } return 0;` (462).
 
 #include <string.h>
 
