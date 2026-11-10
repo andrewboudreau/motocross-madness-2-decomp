@@ -11,7 +11,7 @@ from mcm2tool.toolchain import find_child_ci,find_vc6_bin,infer_vc98_root
 from tools.match import compare
 from tools.run_calibration import CASES
 import test_eco_quadtree_connections as object_view
-SOURCES=('src/krusty2/collision/CollisionObject.cpp','samples/physics/collision/CollisionObjectNearMisses.cpp',
+SOURCES=('src/krusty2/collision/CollisionObject.cpp',
          'src/reconstructed/EcoSystem.cpp','samples/ecosystem/EcoSystemNearMisses.cpp')
 RENAMES={'?GetObjectCount@CollisionVegetation@@QAEHXZ':'?GetCollisionCount@Vegetation@@QAEHXZ',
          '?GetRadius@CollisionVegetation@@QAEMXZ':'?GetRadius@Vegetation@@QAEMXZ',
@@ -94,7 +94,7 @@ class VegetationConnectionsTests(unittest.TestCase):
             for source,symbol,va,size,bindings in cases:
                 self.assertTrue(compare(image,objects[source],symbol,va,size,bindings)['strict_exact'],(source,symbol));strict+=1
             # The later placement slice separately connects the genuine primary receiver.
-            for source in SOURCES[:2]:
+            for source in SOURCES[:1]:
                 obj=objects[source];imports={s.name for s in obj.symbols if s.storage_class==2 and s.section_number==0}
                 self.assertFalse(imports&set(RENAMES));self.assertTrue(set(RENAMES.values())<=imports)
                 self.assertNotIn('?GetObject@CollisionVegetation@@QAEPAVCollisionObject@@H@Z',imports)
@@ -102,12 +102,12 @@ class VegetationConnectionsTests(unittest.TestCase):
                 symbol=obj.find_symbol('QueryCollisions@CollisionObject');_,size,rels=obj.symbol_extent(symbol);self.assertEqual(size,1102)
                 calls=[(r.virtual_address-symbol.value,obj.symbol_by_index[r.symbol_index].name)for r in rels if obj.symbol_by_index[r.symbol_index].name in RENAMES.values()]
                 self.assertEqual(calls,[(407,'?g_EcoSystem@@3PAVEcoSystem@@A'),(462,'?GetRadius@Vegetation@@QAEMXZ'),(471,'?GetRadius@Vegetation@@QAEMXZ'),(506,'?GetCollisionCount@Vegetation@@QAEHXZ'),(683,'?GetCollisionCount@Vegetation@@QAEHXZ')])
-            text=(ROOT/SOURCES[2]).read_text();extracted=output/'getters.cpp'
+            text=(ROOT/SOURCES[1]).read_text();extracted=output/'getters.cpp'
             self.assertIn('EcoSystem* g_EcoSystem;',text)
             extracted.write_text('#include "EcoSystem.h"\nEcoSystem* g_EcoSystem;\n'+'\n'.join(extract(text,prefix)for prefix,_,_,_ in GETTERS)+'\n')
             native_path,native=compile_source(extracted,'getters')
             for _,symbol,va,size in GETTERS:
-                self.assertEqual(signature(native,symbol),signature(objects[SOURCES[2]],symbol))
+                self.assertEqual(signature(native,symbol),signature(objects[SOURCES[1]],symbol))
                 self.assertTrue(compare(image,native,symbol,va,size,ROOT/'src/reconstructed/EcoSystem.bindings.json')['strict_exact']);strict+=1
             self.assertEqual({s.name for s in native.symbols if s.section_number==0 and s.storage_class==2},{'__fltused'})
             glob=native.find_symbol('?g_EcoSystem@@3PAVEcoSystem@@A');self.assertEqual(glob.value,0)
@@ -120,5 +120,5 @@ class VegetationConnectionsTests(unittest.TestCase):
             r=subprocess.run([str(exeout)],capture_output=True,text=True,timeout=45);self.assertEqual(r.returncode,0,r.stdout+r.stderr)
             self.assertEqual(r.stdout.strip(),'Vegetation getters: 65807 cases, 15 independent read AV')
         self.assertEqual(strict,120)
-        print('%d strict; four complete objects; ten joined loads/calls; %s'%(strict,r.stdout.strip()))
+        print('%d strict; three complete objects; ten joined loads/calls; %s'%(strict,r.stdout.strip()))
 if __name__=='__main__':unittest.main()

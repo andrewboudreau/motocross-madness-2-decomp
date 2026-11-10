@@ -48,15 +48,5 @@
     "expect": "exact",
     "notes": "Canonical member provider: callers pass ControlInterface in ecx; the body returns ++global at 0x57985c without accessing this. Original names/TU ownership remain provisional.",
     "bindings": "../../../src/reconstructed/ControlInterface.bindings.json"
-  },
-  {
-    "class": "CollisionObject",
-    "source": "CollisionObjectNearMisses.cpp",
-    "candidate_symbol_contains": "Fn_00439600",
-    "target_va": "0x00439600",
-    "target_size": 532,
-    "expect": "exact",
-    "notes": "capsule broad-phase query; the numerator and the distance use a by-reference inline dot grouped (x + y) + z (retail v.y*d.y and v.x*d.x before v.z*d.z); the same grouping inline in the expression keeps v.z alive (see the file header).",
-    "bindings": "../../../src/krusty2/collision/CollisionObject.bindings.json"
   }
 ]

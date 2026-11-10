@@ -1,14 +1,6 @@
 {
   "objects": {
     "src/krusty2/collision/CollisionObject.cpp": {
-      "sections": 135,
-      "relocations": 722,
-      "sha256": "757bcbe1b3bb5be7fffbedfc943f97ed857a2c734717b20d1f057b240c43d770",
-      "filenames": [
-        "src/krusty2/collision/CollisionObject.cpp"
-      ]
-    },
-    "samples/physics/collision/CollisionObjectNearMisses.cpp": {
       "sections": 136,
       "relocations": 732,
       "sha256": "49e639c6e9601407cc5022b9630a9e3b9e1c56b556706fe5a87fe1d14dd1c96d",

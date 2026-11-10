@@ -28,7 +28,6 @@ VIEWS = (
 )
 SOURCES = tuple(v[1] for v in VIEWS) + (
     'src/krusty2/collision/CollisionPoint.cpp',
-    'samples/physics/collision/CollisionObjectNearMisses.cpp',
 )
 # Complete resolved fingerprints captured before adding any constructor bodies.
 # These preserve the existing partial candidates without asserting retail identity.

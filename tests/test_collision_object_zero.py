@@ -14,8 +14,7 @@ from mcm2tool.pe import PEImage
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCES = ('src/krusty2/collision/CollisionObject.cpp',
-           'samples/physics/collision/CollisionObjectNearMisses.cpp')
+SOURCES = ('src/krusty2/collision/CollisionObject.cpp',)
 OLD = '?g_CollisionVec3_5797b0@@3UCollisionVec3@@A'
 
 
@@ -163,8 +162,8 @@ class CollisionObjectZeroTests(unittest.TestCase):
                     'offsetof(CollisionVec3,x)==0','offsetof(CollisionVec3,y)==4','offsetof(CollisionVec3,z)==8',
                     'offsetof(CollisionObject,hitPoint)==0xa0','offsetof(CollisionObject,hitNormal)==0xac')))+'\n')
             compile_source(layout,'layout')
-        self.assertEqual(strict,18)
-        print('CollisionObject zero:18 strict checks; two full objects; existing private BSS and CRT; nine references')
+        self.assertEqual(strict,9)
+        print('CollisionObject zero:9 strict checks; full object; existing private BSS and CRT; nine references')
 
 
 if __name__ == '__main__':

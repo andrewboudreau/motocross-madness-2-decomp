@@ -26,14 +26,13 @@ NODE = 'src/krusty2/soultree/soultree.cpp'
 VECTOR = 'src/reconstructed/VectorCalls.cpp'
 SOURCES = (COLLISION, QUERY, 'src/krusty2/motion/CollisionCharacter.cpp',
            'samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp',
-           'samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp',
-           'samples/physics/collision/CollisionObjectNearMisses.cpp')
+           'samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp')
 PROVIDERS = (
     ('TreeTreeQuery', 0x428950, 708, 5),
     ('TreeBoxOverlap', 0x428c20, 395, 4),
     ('SphereTreeQuery', 0x429570, 789, 2),
     ('SphereTreeQueryWithVertices', 0x429540, 48, 2),
-    ('CapsuleTreeQueryWithVertices', 0x429890, 48, 2),
+    ('CapsuleTreeQueryWithVertices', 0x429890, 48, 4),
     ('GetPositionIn@SoultreeObject', 0x4fc9a0, 134, 3),
     ('SweptBoxOverlap', 0x424730, 891, 6),
     ('BoxSphereOverlap', 0x425750, 419, 2),
@@ -145,7 +144,7 @@ class CollisionQueryConnectionsTests(unittest.TestCase):
                     self.assertEqual((other.function_size, other.extent_source), (size, 'coff_function_aux'))
                     self.assertTrue(compare(retail, objects[str(extracted)], symbol, va, size,
                         (ROOT / source).with_suffix('.bindings.json'))['strict_exact'], name)
-            self.assertEqual(sum(row[3] for row in PROVIDERS), 36)
+            self.assertEqual(sum(row[3] for row in PROVIDERS), 38)
             cases = [(c['source'], c['symbol'], int(c['target_va'], 0), c['target_size'], ROOT / c['bindings'])
                      for c in CASES if c['source'] in SOURCES]
             for base in ('src/krusty2', 'samples/physics'):
@@ -156,10 +155,6 @@ class CollisionQueryConnectionsTests(unittest.TestCase):
                         if source in SOURCES:
                             cases.append((source, target['candidate_symbol_contains'], int(target['target_va'], 0),
                                           target['target_size'], manifest.parent / target['bindings']))
-            # This aggregate includes the entire canonical CollisionObject.cpp;
-            # protect those emitted bodies as well as its additional capsule query.
-            cases += [('samples/physics/collision/CollisionObjectNearMisses.cpp', symbol, va, size, binding)
-                      for source, symbol, va, size, binding in list(cases) if source == COLLISION]
             partials = {tuple(row[:4]): row[4:] for row in evidence['partials']}
             strict = preserved = 0
             checked_callers = set()
@@ -195,8 +190,8 @@ class CollisionQueryConnectionsTests(unittest.TestCase):
                         resolved = match_object(objects[source], symbol, va, b'',
                             {k: int(v, 0) for k, v in json.loads(binding.read_text()).items()})
                     self.assertEqual(resolved['digest'], digest, key); preserved += 1
-            self.assertEqual(preserved, 29)
-            self.assertEqual(len(checked_callers), 17)
+            self.assertEqual(preserved, 17)
+            self.assertEqual(len(checked_callers), 18)
             compiler = Path(os.environ['VC6_ROOT'])
             linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
             libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
@@ -208,7 +203,7 @@ class CollisionQueryConnectionsTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Collision query boundaries: 10535 native cases passed', result.stdout)
-            print('%d strict cases, 29 complete partial fingerprints, 11 supplied providers, 36 call sites; %s' %
+            print('%d strict cases, 17 complete partial fingerprints, 11 supplied providers, 38 call sites; %s' %
                   (strict, result.stdout.strip()))
 
 

@@ -38,9 +38,9 @@
       "sha256": "677e09cbbabf3c1c85ccde965aed2590ddc46320dfd1ab04e215dc99f07d8a82"
     },
     "src/krusty2/collision/CollisionObject.cpp": {
-      "sections": 135,
-      "relocations": 722,
-      "sha256": "03954549c6c240ce0dc6380409701cda7c78a53bf63a92f31624fe5ca64176f6"
+      "sections": 136,
+      "relocations": 732,
+      "sha256": "bfd05e451b8db9239f188add6327e9dea77562c6e94d49f4ad538d3daddef4a4"
     },
     "src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp": {
       "sections": 62,
@@ -51,11 +51,6 @@
       "sections": 288,
       "relocations": 1564,
       "sha256": "4b61e878b816002a3ae3eb638cf622cf1ea3f2cf8b70cc14ff05b8ea9841e455"
-    },
-    "samples/physics/collision/CollisionObjectNearMisses.cpp": {
-      "sections": 136,
-      "relocations": 732,
-      "sha256": "bfd05e451b8db9239f188add6327e9dea77562c6e94d49f4ad538d3daddef4a4"
     }
   },
   "strict": [

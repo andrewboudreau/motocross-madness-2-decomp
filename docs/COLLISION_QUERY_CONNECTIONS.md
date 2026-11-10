@@ -13,7 +13,7 @@ existing provisional types and layouts, with explicit casts at the call boundary
 | TreeBoxOverlap | `0x00428c20` | 395 | 4 |
 | SphereTreeQuery | `0x00429570` | 789 | 2 |
 | SphereTreeQueryWithVertices | `0x00429540` | 48 | 2 |
-| CapsuleTreeQueryWithVertices | `0x00429890` | 48 | 2 |
+| CapsuleTreeQueryWithVertices | `0x00429890` | 48 | 4 |
 | SoultreeObject::GetPositionIn | `0x004fc9a0` | 134 | 3 |
 | SweptBoxOverlap | `0x00424730` | 891 | 6 |
 | BoxSphereOverlap | `0x00425750` | 419 | 2 |
@@ -23,10 +23,10 @@ existing provisional types and layouts, with explicit casts at the call boundary
 
 All eleven providers already exist in `BoundingBoxTreeQuery.cpp` or
 `soultree.cpp` and match their complete retail extents with resolved relocations.
-The 36 emitted calls belong to 17 CollisionObject methods. The extra capsule
-query in `samples/physics/collision/CollisionObjectNearMisses.cpp` also uses the
-canonical declaration at its two call sites; its complete 532-byte body remains
-strict. That aggregate uses the canonical CollisionObject bindings.
+The 38 emitted calls belong to 18 CollisionObject methods, including two
+in the capsule query `0x00439600` (moved from a sample aggregate into
+`CollisionObject.cpp`); its complete 532-byte body remains strict with the
+canonical CollisionObject bindings.
 
 ## Boundary evidence
 
@@ -67,8 +67,9 @@ Both the six pointer-only connections and the subsequent five by-value
 connections were compiled privately against `799f6e9d` before production changes.
 Across CollisionObject, the query provider, CollisionCharacter and the two BVH
 sample aggregates, all **315 nondebug sections and 2,116 relocation destinations**
-remain identical under the eleven named external substitutions. The additional
-collision sample aggregate preserves all **136 sections and 732 relocations**.
+remain identical under the eleven named external substitutions. The collision
+sample aggregate that then held the capsule query preserved all **136 sections and
+732 relocations**; that is now the canonical CollisionObject.cpp object.
 Comparisons use defined destination section/offset identity for local symbols;
 there are no instruction, extent, filename or other data exceptions.
 
@@ -79,10 +80,9 @@ relocations** are preserved under the same substitutions.
 This connects supplied implementations; it does not complete the collision
 subsystem or the game link.
 
-`tests/test_collision_query_connections.py` checks **195 strict cases**, **29
-complete partial fingerprints**, all eleven providers and the 36 retail direct
-call boundaries. The sample aggregate's included production bodies are checked
-as separate emitted functions. Partial fingerprints come from the published
+`tests/test_collision_query_connections.py` checks **195 strict cases**, **17
+complete partial fingerprints**, all eleven providers and the 38 retail direct
+call boundaries. Partial fingerprints come from the published
 baseline; no partial result is promoted to exactness. Registered target windows
 can contain jump-table data after code and are not asserted to be new CFG proofs.
 

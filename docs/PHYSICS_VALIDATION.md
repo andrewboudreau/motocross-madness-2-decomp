@@ -630,8 +630,7 @@ Strict exact with the units' existing sources (registration pending):
   +0x88/+0x8c (`0x004092c0`, `0x004092d0`).
 - CollisionObject.cpp: its Math3D.h set `0x004356f0..0x0043582b` (vectors `0x005797a0..`)
   and the sphere query `0x004394f0` (ObjectPicker.cpp's caller `0x004b0a46`). The capsule
-  query `0x00439600` is a near miss (516/532) in
-  `samples/physics/collision/CollisionObjectNearMisses.cpp`.
+  query `0x00439600` (532 bytes) is strict exact in `CollisionObject.cpp`.
   Also exact: the .col readers `0x00439ed0` (hull) and `0x0043a050` (model), the
   polyline-tree debug draws `0x004341b0` / `0x00434340` (segment leaves), the broad-phase
   query `0x00438e70` (quadtree, vegetation and game-object-tree paths; the three hit

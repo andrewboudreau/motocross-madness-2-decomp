@@ -22,17 +22,18 @@ destination offsets, and `sizeof(CollisionObject)==0xb8`.
 
 ## Preservation and limits
 
-Both the canonical source and its existing near-miss sample retain every
+Both the canonical source and its then near-miss sample retained every
 nondebug section, raw byte, flag, relocation addend and destination under exactly
 one connection: the old external zero-vector name now resolves to the existing
-private `_kVec3Zero` at BSS offset zero. Their complete objects contain respectively
-135 sections/722 relocations and 136 sections/732 relocations. The same 60-byte
+private `_kVec3Zero` at BSS offset zero. The sample's capsule query has since moved
+into the canonical source, whose complete object now has 136 sections/732
+relocations. The same 60-byte
 BSS and four `.CRT$XCU` entries remain; no other vector initializer changes.
 The private before/after comparison excludes no filename sections. Retained
 portable pins normalize only recognized source-path roots.
 
-`tests/test_collision_object_zero.py` checks 18 complete strict bodies across the
-two objects: the constructor and all four vector initializers and their wrappers.
+`tests/test_collision_object_zero.py` checks 9 complete strict bodies in the
+canonical object: the constructor and all four vector initializers and their wrappers.
 It checks the full objects, raw storage/reference evidence, CRT order and the
 nine relocations to the local zero vector. Existing collision query, query-state
 and point-storage suites also pass, including all 31 partial-body fingerprints.

@@ -998,5 +998,15 @@
     "expect": "exact",
     "notes": "Stores b,c,d into field_0x80/0x6c/0x70 then calls GameObject slot 8 (0x4692f0).",
     "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "Fn_00439600",
+    "target_va": "0x00439600",
+    "target_size": 532,
+    "expect": "exact",
+    "notes": "capsule broad-phase query; the numerator and the distance use a by-reference inline dot grouped (x + y) + z (retail v.y*d.y and v.x*d.x before v.z*d.z); the same grouping inline in the expression keeps v.z alive (see the comment above it). (moved from samples/physics/collision/CollisionObjectNearMisses.cpp)",
+    "bindings": "CollisionObject.bindings.json"
   }
 ]

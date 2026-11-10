@@ -292,8 +292,8 @@ public:
     CollisionObject* GetObject(int index);    // 0x004570a0
 };
 
-// CollisionObject.cpp: 0x00439820 (segment) and 0x00439600 (capsule, near miss in
-// samples/physics/collision) object tests.
+// CollisionObject.cpp: 0x00439820 (segment) and 0x00439600 (capsule) object tests, both in
+// src/krusty2/collision/CollisionObject.cpp.
 int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, CollisionVec3* outPoint,
                          CollisionVec3* outNormal);
 int Fn_00439600(CollisionVec3* ends, float radius, float radiusSq, CollisionObject* object);

@@ -140,7 +140,7 @@ class VegetationCollisionTests(unittest.TestCase):
             objects, paths = {}, {}
             sources = [CANDIDATE, ECO, COLLISION, QUERY,
                        'src/reconstructed/CollisionTransforms.cpp', 'src/reconstructed/VectorCalls.cpp',
-                       'src/reconstructed/FastMath.cpp', 'samples/physics/collision/CollisionObjectNearMisses.cpp',
+                       'src/reconstructed/FastMath.cpp',
                        'samples/ecosystem/EcoSystemNearMisses.cpp']
             for index, source in enumerate(sources):
                 paths[source], objects[source] = compile_source(ROOT/source, 'unit%d'%index,
@@ -303,7 +303,7 @@ class VegetationCollisionTests(unittest.TestCase):
                 else:
                     self.assertEqual(result.stdout.strip(), 'Vegetation with hull paths: 39936 cases, 3048 access faults')
             self.assertEqual(strict, 13)
-            print('13 strict checks; three complete object pins; 39936 cases, 3048 access faults; original control fails as expected')
+            print('13 strict checks; two complete object pins; 39936 cases, 3048 access faults; original control fails as expected')
 
 
 if __name__ == '__main__':

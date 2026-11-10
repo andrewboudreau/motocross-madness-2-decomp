@@ -11,9 +11,10 @@
 // look-ahead read through RaceStatus.cpp's g_TrackSearchAhead, the 0x00566f74 speed table
 // defined from retail .data, and bodies for the sample-local call views (BikeAIVec3Call,
 // BikeAIVec3Scale, BikeAIVegetation).  The view methods used here (KbRaceSub, KbWheel,
-// BikeQ, KrustyBike::Fn_0048D780) are in Group3_KrustyBikeAISupport.cpp and the capsule
-// test 0x00439600 in Group3_KrustyBikeAICapsule.cpp.  The per-function notes below are
-// the sample's matching notes (scores against retail); behaviour follows retail.
+// BikeQ, KrustyBike::Fn_0048D780) are in Group3_KrustyBikeAISupport.cpp; the capsule
+// test 0x00439600 is strict exact in src/krusty2/collision/CollisionObject.cpp.  The
+// per-function notes below are the sample's matching notes (scores against retail);
+// behaviour follows retail.
 //
 // Original sample notes:
 //
@@ -402,8 +403,8 @@ CollisionObject* BikeAIVegetation::GetObject(int index)
     return reinterpret_cast<Vegetation*>(this)->GetCollisionObject(index);
 }
 
-// CollisionObject.cpp: 0x00439820 (segment) and 0x00439600 (capsule, near miss in
-// samples/physics/collision) object tests.
+// CollisionObject.cpp: 0x00439820 (segment) and 0x00439600 (capsule) object tests, both in
+// src/krusty2/collision/CollisionObject.cpp.
 int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, CollisionVec3* outPoint,
                          CollisionVec3* outNormal);
 int Fn_00439600(CollisionVec3* ends, float radius, float radiusSq, CollisionObject* object);

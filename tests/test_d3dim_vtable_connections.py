@@ -77,5 +77,5 @@ class D3dimVtableConnections(unittest.TestCase):
    self.assertEqual(r.returncode,0,r.stdout+r.stderr)
    r=subprocess.run([str(exe)],capture_output=True,text=True,timeout=30);self.assertEqual(r.returncode,0,r.stdout+r.stderr)
    self.assertEqual(r.stdout.strip(),'896 cross-view dispatch cases preserve primary receiver and argument bits')
-   print('59 strict checks; eight complete objects; two unchanged partials; seven table entries; '+r.stdout.strip())
+   print('59 strict checks; seven complete objects; two unchanged partials; seven table entries; '+r.stdout.strip())
 if __name__=='__main__':unittest.main()
