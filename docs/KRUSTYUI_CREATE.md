@@ -1,12 +1,11 @@
 # GUI startup operation
 
-`samples/ui/KrustyUINearMisses.cpp` contains the complete, unchanged
-`KrustyUI::Create(RenderTarget*, int)` candidate. It connects the render
-target to the GUI, loads UI strings and settings, restores the profile and
-joystick preference, loads the bike/rider tables, and optionally opens the
+`KrustyUI::Create(RenderTarget*, int)` is canonical in
+`src/reconstructed/KrustyUI.cpp` and matches retail strictly. It connects the
+render target to the GUI, loads UI strings and settings, restores the profile
+and joystick preference, loads the bike/rider tables, and optionally opens the
 intro dialog. The retail diagnostic path is
-`D:\aardvark\VC\krusty2\krustyui.cpp`; this standalone sample does not claim
-to reconstruct that entire original translation unit.
+`D:\aardvark\VC\krusty2\krustyui.cpp`.
 
 ## Complete body and generated support
 
@@ -24,14 +23,25 @@ destinations are independently checked. All 36 direct dependency-call/jump
 sites across the body, cleanup funclets and handler are verified before the
 private reference calls are redirected.
 
-Authentic VC6 SP3 emits **1,102 bytes**, retaining **872 matching positions**
-against the full retail extent. The candidate remains explicitly nonexact.
-Its source bytes are unchanged from `c8444fa8`; all **30 nondebug COFF
-sections**, including generated methods, EH metadata, RTTI, tables and strings,
-are identical before and after the current shared-header composition, with
-generated labels compared by their section/offset destinations. The private
-report is `work/game-build/krusty-create-preservation.json`, with objects
-`krusty-create-audit.obj` and `krusty-create-final.obj` in the same directory.
+Authentic VC6 SP3 `/O2` emits the full **1,104 bytes strictly exact**, both
+in `KrustyUI.cpp` (calibration case `KrustyUI create 0x4988a0`) and in the
+standalone unit the behavior test builds from the same text. Two source
+shapes decide the register choice from the scale store on:
+
+- The tooltip store holds `gui->GetUser(0)->userToolTip` in a named `view`
+  local before clearing `enabled` (872 to 1,087 matching positions).
+- The tool-tip bold, font-size offset and sound-volume stores go through
+  small inline setters taking `(GUIManager*, value)`. VC6 then evaluates the
+  value before loading `gui`, as retail does; plain member stores load `gui`
+  first (1,087 to 1,104).
+
+The setters are file-local with provisional names. As `GUIManager` members in
+`GUIManagerCore.h` they also match, but the added declarations shift the
+declaration-count-sensitive `PCStartupDlg::AddCircuitRow` (`0x004d59a0`,
+756 to 747). Inert or worse forms: a `float` field type for `+0x3d0`,
+`if (scale)` or `0.0f != scale` tests, bit-copy or const-reference setters
+(1,105 bytes), every one of the 720 local declaration orders, a volume local or
+if/else volume, and manager, keyboard, user or mode locals.
 
 The inline `Intro1Dlg` construction emits its primary vtable and two methods.
 All 32 table destinations are checked against retail table `0x005548fc` at
@@ -44,9 +54,12 @@ address alone does not. The standalone object has no CRT initializer.
 ## Functional build review
 
 `tests/test_krusty_ui_create_behavior.py` runs **13,540 native scenarios**
-against the pinned complete retail operation. The entire production candidate
-object is linked, including its inline-constructor support. The sample uses
-VC6 `/O2`; the independent fixture uses `/Od`. The actual linked VC6 CRT
+against the pinned complete retail operation. The test copies `Create` and
+its three setters unchanged from `KrustyUI.cpp` into a unit named
+`krustyui.cpp` with the declarations they need, so the scripted fixture can
+supply every other boundary. That object is linked whole, including its
+inline-constructor support, and is checked strictly exact first. It uses VC6
+`/O2`; the independent fixture uses `/Od`. The actual linked VC6 CRT
 string and numeric conversions and C++ exception dispatcher execute for both
 paths. Production has no retail dispatch or fallback.
 
@@ -59,7 +72,7 @@ return value, exception/fault information and x87 status. The external object
 storage is a bounded fixture view, not proof of every runtime object's layout.
 
 Two narrowly checked representations are normalized: the diagnostic filenames
-of the retail and sample allocator calls, and the intro object's validated
+of the retail and source allocator calls, and the intro object's validated
 source/retail vptr addresses in comparison snapshots. The executing objects
 retain their actual vptrs. Test-only C++ GUI/UIDialog constructors exercise
 the genuine compiler constructor/unwind ABI; unused virtual slots fail
@@ -91,17 +104,10 @@ device implementation. Failed intro allocation reaches ShowDialog with null,
 whose return is scripted. No unobserved success semantics are inferred from
 those cases.
 
-This evidence supports explicit **reviewed-nonexact** admission. GUI rendering,
-resource archives, profile files, registry APIs, input devices, actual helper
-lifecycles and live menu navigation remain outside the scripted dependency
-boundary. The function's finite behavioral evidence does not establish a
-working source-built game.
-
-The isolated real build `build-uk70iui4` compiles **207/207 translation units**.
-Compared with `build-5te86usb`, unresolved names decrease from **476 to 475**:
-only `KrustyUI::Create(RenderTarget*, int)` disappears, with no new missing
-names. The executable still does not link, so startup and menus remain
-unverified in the running game.
+GUI rendering, resource archives, profile files, registry APIs, input
+devices, actual helper lifecycles and live menu navigation remain outside the
+scripted dependency boundary. The function's finite behavioral evidence does
+not establish a working source-built game.
 
 ```powershell
 $env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path

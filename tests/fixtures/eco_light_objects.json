@@ -20,9 +20,9 @@
       "sha256": "60dff568b7692bd2954030b3a8a0c40660e3f830e58ff42ea3d65c920f8703d9"
     },
     "src/reconstructed/KrustyUI.cpp": {
-      "sections": 296,
-      "relocations": 1722,
-      "sha256": "c9f071789d75d138693767769f8361c13af1576c896a610c53aff13dd18ba965"
+      "sections": 317,
+      "relocations": 1847,
+      "sha256": "e903c2d3a3cf9cca3e1c1babb21a0309e79db8c76876f6e3ec90f19421e16857"
     },
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 86,

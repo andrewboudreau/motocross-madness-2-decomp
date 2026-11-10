@@ -54,10 +54,9 @@ $env:MCM2_EXE = (Resolve-Path work/game/mcm2.exe).Path
 python -m unittest test_garage_setter_connections -v
 ```
 
-The regression checks 199 complete strict caller/provider cases, including
-all 26 registered character-model producer methods. It preserves the complete
-admitted nonexact `KrustyUI::Create` fingerprint (1,102-byte candidate;
-872 matching positions against 1,104 retail bytes). Reconstructed callers
+The regression checks 202 complete strict caller/provider cases, including
+all 26 registered character-model producer methods and `KrustyUI::Create`
+(exact in KrustyUI.cpp). Reconstructed callers
 compile without an extra project include directory, as in their normal gate.
 
 The native fixture executes unchanged extracted production definitions of
@@ -78,7 +77,7 @@ pointer offset, vector layout, and primary versus secondary conversions.
 These are bounded setter tests, not an end-to-end garage loading test.
 
 Private baseline/current comparisons also preserve every nondebug section and
-relocation destination of `KrustyUI.cpp` and standalone `KrustyUINearMisses.cpp`:
+relocation destination of `KrustyUI.cpp` and the then-standalone `KrustyUI::Create` sample:
 326 sections and 1,853 relocations, under only the two external name changes.
 Generated objects and comparison reports remain private under
 `work/game-build/garage-setters32`.

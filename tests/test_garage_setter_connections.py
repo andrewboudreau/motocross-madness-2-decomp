@@ -7,12 +7,10 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
 
 from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.rtti import parse_rtti
-from mcm2tool.resolved_match import match_object
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
 from tools.run_calibration import CASES
@@ -20,7 +18,6 @@ from test_garage_shadow_connections import function_text
 
 ROOT = Path(__file__).resolve().parents[1]
 GARAGE = 'src/reconstructed/KrustyUI.cpp'
-CREATE = 'samples/ui/KrustyUINearMisses.cpp'
 TREE = 'src/krusty2/soultree/soultree.cpp'
 RENDER = 'src/reconstructed/D3DIMSoulTree.cpp'
 CHARACTER = 'src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp'
@@ -88,7 +85,7 @@ class GarageSetterConnectionsTests(unittest.TestCase):
                 'extern "C" void* GarageModelPrimary(void* p) { return static_cast<SoultreeObject*>(reinterpret_cast<D3DIMSoultreeObject*>(p)); }\n'
                 'extern "C" void* GarageGameObject(void* p) { return static_cast<GameObject*>(reinterpret_cast<D3DIMSoultreeObject*>(p)); }\n')
             fixture = 'tests/fixtures/garage_setter_routes.cpp'
-            sources = (GARAGE, CREATE, TREE, RENDER, CHARACTER, *MATH)
+            sources = (GARAGE, TREE, RENDER, CHARACTER, *MATH)
             objects, paths = {}, {}
             for index, source in enumerate((*sources, str(extracted), str(layout), fixture)):
                 obj = output / ('unit%d.obj' % index)
@@ -131,14 +128,9 @@ class GarageSetterConnectionsTests(unittest.TestCase):
                 self.assertTrue(compare(retail, objects[source], symbol, va, size, binding)['strict_exact'],
                                 (source, symbol, va))
                 strict += 1
-            binding = (ROOT / CREATE).with_suffix('.bindings.json')
-            result = compare(retail, objects[CREATE], '?Create@KrustyUI@@', 0x4988a0, 1104, binding)
-            self.assertEqual((result['candidate_size'], result['strict_match']['matching_positions']), (1102, 872))
-            with patch('mcm2tool.resolved_match.compare_bytes',
-                       lambda original, candidate: {'digest': hashlib.sha256(candidate).hexdigest()}):
-                resolved = match_object(objects[CREATE], '?Create@KrustyUI@@', 0x4988a0, b'',
-                    {k: int(v, 0) for k, v in json.loads(binding.read_text()).items()})
-            self.assertEqual(resolved['digest'], 'a0c7fe2a846eb24d4bf7dfdab6fcbcff2e503af4e3ab5456d11aab1c01f7bb99')
+            # KrustyUI::Create (0x4988a0) is one of the strict KrustyUI.cpp cases.
+            self.assertIn((GARAGE, '?Create@KrustyUI@@QAEPAVGameObject@@PAVRenderTarget@@H@Z', 0x4988a0, 1104),
+                          [case[:4] for case in cases])
             compiler = Path(os.environ['VC6_ROOT'])
             linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
             libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
@@ -150,7 +142,7 @@ class GarageSetterConnectionsTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Garage setters: 8192 actual setter, alias, axes and cache cases passed', result.stdout)
-            print('%d full strict cases, 12 dual-strict setter/helper checks, one preserved partial; %s' %
+            print('%d full strict cases, 12 dual-strict setter/helper checks; %s' %
                   (strict, result.stdout.strip()))
 
 

@@ -8,36 +8,34 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
 
 from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
-from mcm2tool.resolved_match import match_object
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
 from tools.run_calibration import CASES
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCES = ('src/reconstructed/KrustyUI.cpp', 'samples/ui/KrustyUINearMisses.cpp',
+SOURCES = ('src/reconstructed/KrustyUI.cpp',
            'src/krusty2/shadow/ProjectedShadow.cpp', 'src/krusty2/shadow/D3DIMSoultreeShadow.cpp',
            'src/reconstructed/GameObject.cpp')
 ROUTES = (
-    ('??0ProjectedShadow@@QAE@H@Z', 0x4da570, 331, SOURCES[2]),
-    ('??0D3DIMSoultreeShadow@@QAE@H@Z', 0x446840, 67, SOURCES[3]),
-    ('?Attach@D3DIMSoultreeShadow@@', 0x4468b0, 58, SOURCES[3]),
-    ('?AddCaster@ProjectedShadow@@', 0x4dab00, 135, SOURCES[2]),
-    ('?SetShadowStrength@ProjectedShadow@@', 0x4dace0, 336, SOURCES[2]),
-    ('?SetShadowGrey@ProjectedShadow@@', 0x4dae30, 31, SOURCES[2]),
-    ('?SetLight@ProjectedShadow@@', 0x4dae50, 365, SOURCES[2]))
+    ('??0ProjectedShadow@@QAE@H@Z', 0x4da570, 331, SOURCES[1]),
+    ('??0D3DIMSoultreeShadow@@QAE@H@Z', 0x446840, 67, SOURCES[2]),
+    ('?Attach@D3DIMSoultreeShadow@@', 0x4468b0, 58, SOURCES[2]),
+    ('?AddCaster@ProjectedShadow@@', 0x4dab00, 135, SOURCES[1]),
+    ('?SetShadowStrength@ProjectedShadow@@', 0x4dace0, 336, SOURCES[1]),
+    ('?SetShadowGrey@ProjectedShadow@@', 0x4dae30, 31, SOURCES[1]),
+    ('?SetLight@ProjectedShadow@@', 0x4dae50, 365, SOURCES[1]))
 NATIVE = (
-    ('void ProjectedShadow::AddCaster(', '?AddCaster@ProjectedShadow@@', 0x4dab00, 135, SOURCES[2]),
-    ('void ProjectedShadow::AddReceiver(', '?AddReceiver@ProjectedShadow@@', 0x4daba0, 167, SOURCES[2]),
-    ('void ProjectedShadow::ResizeVertexBuffer(', '?ResizeVertexBuffer@ProjectedShadow@@', 0x4dac50, 138, SOURCES[2]),
-    ('void ProjectedShadow::SetShadowStrength(', '?SetShadowStrength@ProjectedShadow@@', 0x4dace0, 336, SOURCES[2]),
-    ('void ProjectedShadow::SetShadowGrey(', '?SetShadowGrey@ProjectedShadow@@', 0x4dae30, 31, SOURCES[2]),
-    ('int ProjectedShadow::SetLight(', '?SetLight@ProjectedShadow@@', 0x4dae50, 365, SOURCES[2]),
-    ('D3DIMSoultreeShadow* D3DIMSoultreeShadow::Attach(', '?Attach@D3DIMSoultreeShadow@@', 0x4468b0, 58, SOURCES[3]),
-    ('GameObject* GameObject::SetRenderContext(', '?SetRenderContext@GameObject@@', 0x4692f0, 12, SOURCES[4]))
+    ('void ProjectedShadow::AddCaster(', '?AddCaster@ProjectedShadow@@', 0x4dab00, 135, SOURCES[1]),
+    ('void ProjectedShadow::AddReceiver(', '?AddReceiver@ProjectedShadow@@', 0x4daba0, 167, SOURCES[1]),
+    ('void ProjectedShadow::ResizeVertexBuffer(', '?ResizeVertexBuffer@ProjectedShadow@@', 0x4dac50, 138, SOURCES[1]),
+    ('void ProjectedShadow::SetShadowStrength(', '?SetShadowStrength@ProjectedShadow@@', 0x4dace0, 336, SOURCES[1]),
+    ('void ProjectedShadow::SetShadowGrey(', '?SetShadowGrey@ProjectedShadow@@', 0x4dae30, 31, SOURCES[1]),
+    ('int ProjectedShadow::SetLight(', '?SetLight@ProjectedShadow@@', 0x4dae50, 365, SOURCES[1]),
+    ('D3DIMSoultreeShadow* D3DIMSoultreeShadow::Attach(', '?Attach@D3DIMSoultreeShadow@@', 0x4468b0, 58, SOURCES[2]),
+    ('GameObject* GameObject::SetRenderContext(', '?SetRenderContext@GameObject@@', 0x4692f0, 12, SOURCES[3]))
 
 
 def function_text(source, signature):
@@ -89,7 +87,7 @@ class GarageShadowConnectionsTests(unittest.TestCase):
             output = Path(directory)
             extracted = output / 'shadow_routes.cpp'
             texts = {source: (ROOT / source).read_text() for source in SOURCES}
-            text = texts[SOURCES[2]]
+            text = texts[SOURCES[1]]
             vector = text[text.index('struct ShadowConstVec3'):text.index('};', text.index('struct ShadowConstVec3')) + 2]
             extracted.write_text('#include "shadow/D3DIMSoultreeShadow.h"\n' + vector + '\n' +
                 function_text(text, 'static inline ShadowVec3 ShadowNormalize(') + '\n' + '\n\n'.join(
@@ -100,7 +98,7 @@ class GarageShadowConnectionsTests(unittest.TestCase):
                 path = output / (Path(source).stem + '.obj')
                 command = [sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source), '-o', str(path),
                            '--vc6-root', os.environ['VC6_ROOT'], '--profile', 'vc6_o2_mt']
-                if source in (*SOURCES[2:4], str(extracted), fixture):
+                if source in (*SOURCES[1:3], str(extracted), fixture):
                     command += ['--include', str(ROOT / 'src/krusty2')]
                 result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, encoding='latin-1',
                                         env={**os.environ, 'PYTHONPATH': str(ROOT)})
@@ -119,7 +117,7 @@ class GarageShadowConnectionsTests(unittest.TestCase):
             # Test extraction has no substituted function statements. Only its
             # compiler-generated __FILE__ literal relocation has a new name.
             bindings = {}
-            for source in SOURCES[2:]:
+            for source in SOURCES[1:]:
                 bindings.update(json.loads((ROOT / source).with_suffix('.bindings.json').read_text()))
             bindings['__FILE__'] = '0x00571fd8'
             extracted_object = objects[str(extracted)]
@@ -151,15 +149,6 @@ class GarageShadowConnectionsTests(unittest.TestCase):
                 self.assertTrue(compare(retail, objects[source], symbol, address, size, binding)['strict_exact'],
                                 (source, symbol, address))
                 strict += 1
-            # This admitted nonexact caller is unchanged by the boundary edits.
-            binding = (ROOT / SOURCES[1]).with_suffix('.bindings.json')
-            result = compare(retail, objects[SOURCES[1]], '?Create@KrustyUI@@', 0x4988a0, 1104, binding)
-            self.assertEqual((result['candidate_size'], result['strict_match']['matching_positions']), (1102, 872))
-            with patch('mcm2tool.resolved_match.compare_bytes',
-                       lambda original, candidate: {'digest': hashlib.sha256(candidate).hexdigest()}):
-                resolved = match_object(objects[SOURCES[1]], '?Create@KrustyUI@@', 0x4988a0, b'',
-                    {k: int(v, 0) for k, v in json.loads(binding.read_text()).items()})
-            self.assertEqual(resolved['digest'], 'a0c7fe2a846eb24d4bf7dfdab6fcbcff2e503af4e3ab5456d11aab1c01f7bb99')
             compiler = Path(os.environ['VC6_ROOT'])
             linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
             libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
@@ -171,7 +160,7 @@ class GarageShadowConnectionsTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Garage shadow: 3776 receiver, caster, color and light boundary cases passed', result.stdout)
-            print('%d strict caller/provider cases, 16 dual-strict native body checks, one complete partial; %s' %
+            print('%d strict caller/provider cases, 16 dual-strict native body checks; %s' %
                   (strict, result.stdout.strip()))
 
 

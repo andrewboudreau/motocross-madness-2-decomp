@@ -37,8 +37,7 @@ class GuiConnectionTests(unittest.TestCase):
         sources = {name: f'src/reconstructed/{name}.cpp' for name in (
             'GUIManager', 'KrustyUI', 'BikeRace', 'EventManager', 'TrackGame',
             'DlgProcs', 'OptionProcs', 'SelectGamePicProcs', 'TrackOverlay')}
-        sources.update({'startup_sample': 'samples/ui/KrustyUINearMisses.cpp',
-                        'event_sample': 'samples/game/EventManagerNearMisses.cpp',
+        sources.update({'event_sample': 'samples/game/EventManagerNearMisses.cpp',
                         'layout': 'tests/fixtures/gui_layout.cpp'})
         with tempfile.TemporaryDirectory(prefix='mcm2-gui-') as directory:
             objects = {}
@@ -58,8 +57,7 @@ class GuiConnectionTests(unittest.TestCase):
             providers = {s.name for s in objects['GUIManager'].symbols
                          if s.storage_class == 2 and s.section_number > 0}
             production = set().union(*(imports(obj) for name, obj in objects.items()
-                                      if name not in ('GUIManager', 'startup_sample',
-                                                      'event_sample', 'layout')))
+                                      if name not in ('GUIManager', 'event_sample', 'layout')))
             connected = {
                 '?ShowCursors@GUIManager@@QAEXH@Z',
                 '?GetUser@GUIManager@@QAEPAVGUIUser@@H@Z',
@@ -81,10 +79,10 @@ class GuiConnectionTests(unittest.TestCase):
                 '?AcceptDevice@GUIUser@@QAEHPAVGUIInputDevice@@@Z',
                 '?ForgetDevices@GUIUser@@QAEXXZ',
             }
-            self.assertTrue(startup <= imports(objects['startup_sample']))
+            self.assertTrue(startup <= imports(objects['KrustyUI']))
             self.assertTrue(startup <= providers)
             self.assertIn('?AppendSibling@GameObject@@QAEHPAV1@H@Z',
-                          imports(objects['startup_sample']))
+                          imports(objects['KrustyUI']))
             for obj in objects.values():
                 self.assertFalse(any('UnknownKrustyUIGui' in name for name in imports(obj)))
 

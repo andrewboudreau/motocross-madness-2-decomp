@@ -1,5 +1,5 @@
 // Private complete startup-operation comparison. GUI/profile/resource and
-// allocation boundaries are scripted; the unchanged standalone sample runs.
+// allocation boundaries are scripted; KrustyUI.cpp's unchanged Create runs.
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,7 +54,7 @@ static void EventAt(int kind,int who=0,int a=0,int b=0,int c=0,int d=0,const cha
     }}
     if(scenario.throwAt==observed.count)throw 0x721;
 }
-static int SourceFile(const char* path){const char* name=strrchr(path,'\\');const char* slash=strrchr(path,'/');if(!name || (slash && slash>name))name=slash;name=name?name+1:path;if(strcmp(name,"krustyui.cpp") && strcmp(name,"KrustyUINearMisses.cpp"))Fail(84);return 1;}
+static int SourceFile(const char* path){const char* name=strrchr(path,'\\');const char* slash=strrchr(path,'/');if(!name || (slash && slash>name))name=slash;name=name?name+1:path;if(strcmp(name,"krustyui.cpp"))Fail(84);return 1;}
 void* operator new(unsigned size,const char* file,int line){int n=size==sizeof(GUIManager)?0:1;if((n==0 && line!=121)||(n==1 && (size!=sizeof(Intro1Dlg)||line!=201)))Fail(85);EventAt(2,n,size,SourceFile(file),line);++observed.allocations;if(scenario.failAlloc==n+1)return 0;observed.live[n]=1;return n?(void*)world.intro:(void*)Gui(0);}
 void operator delete(void* p,const char* file,int line){int n=Which(p,Gui(0),world.intro);EventAt(3,n,SourceFile(file),line);if(!observed.live[n])Fail(86);observed.live[n]=0;}
 void operator delete(void* p){if(p)Fail(87);}

@@ -144,21 +144,18 @@ function-scope count swaps them; docs/VC6_FRAME_LAYOUT.md). The implicit
 `Exit1Dlg` destructor `0x00450fc0` (`jmp 0x0046a070`) is registered from the
 same file.
 
-Near misses (`samples/ui/KrustyUINearMisses.cpp`, own bindings file):
+`0x004988a0` (`Create`, TrackGame slot 4's initialiser, 1104 bytes) is exact
+in `KrustyUI.cpp`. It loads 36 short strings (resources 5000–5035) into
+`0x0068a498`, the GUI scale (0xfed) and font (0xff2, else "Arial"), creates the
+GUI (line 121), loads `ui`, `ui\wait.tga` and `ui\uires.res`, restores
+"MRUProfile" and "JoystickFilter", and offline opens `Intro1Dlg` (line 201).
+SetUp takes ten arguments and -1 goes to AppendSibling separately (see
+[GUI connections](GUIMANAGER.md)). The register-choice levers, ruled-out forms
+and its native startup comparison are in [GUI startup](KRUSTYUI_CREATE.md).
 
-- `0x004988a0`, TrackGame slot 4's initialiser (1102 emitted bytes versus 1104 retail bytes). It loads
-  36 short strings (resources 5000–5035) into `0x0068a498`, the GUI scale
-  (0xfed) and font (0xff2, else "Arial"), creates the GUI (line 121), loads
-  `ui`, `ui\wait.tga` and `ui\uires.res`, restores "MRUProfile" and
-  "JoystickFilter", and offline opens `Intro1Dlg` (line 201). From the scale
-  store on, retail picks different registers. The shared GUI declaration
-  also fixes SetUp to ten arguments and passes -1 to AppendSibling separately;
-  this candidate remains nonexact (see [GUI connections](GUIMANAGER.md)).
-  Its complete native startup comparison and admission limits are recorded in
-  [GUI startup review](KRUSTYUI_CREATE.md#functional-build-review).
-- `0x0049b0d0`, which picks distinct random bikes and riders for the AI
-  (880 of 916 bytes). Retail places the "class 1 above 0.2" arm after the
-  probe loop; every if/else, goto and ternary form tried keeps it before.
+`0x0049b0d0`, which picks distinct random bikes and riders for the AI, is
+also exact in `KrustyUI.cpp` (916 bytes; calibration case
+`KrustyUI random AI bikes and riders 0x49b0d0`).
 
 The GUI page and control classes are declared in
 `src/reconstructed/GameUi.h`, not `KrustyUI.h`. Declaring them in a header

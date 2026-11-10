@@ -20,14 +20,14 @@ from tools.run_calibration import CASES
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = tuple('src/reconstructed/' + name + '.cpp' for name in (
     'KrustyUI', 'DlgProcs', 'ProCircuitProcs', 'SelectGamePicProcs', 'ProCircuit', 'BikeNumberPainter')) + (
-    'samples/race/BikeRaceNearMisses.cpp', 'samples/ui/KrustyUINearMisses.cpp',
+    'samples/race/BikeRaceNearMisses.cpp',
     'src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp', 'src/krusty2/motion/Motnctrl.cpp')
 CHARACTER = '??0D3DIMSoultreeCharacter@@QAE@H@Z'
 ADVANCE = '?AdvanceMotion@Character@@QAEHMHH@Z'
 PAINTER = '??0UnknownBikeNumberPainter@@QAE@PAVTextureMapManager@@@Z'
 DESTROY = '??1UnknownBikeNumberPainter@@QAE@XZ'
 PAINT = '?PaintNumber@UnknownBikeNumberPainter@@QAEXPAVD3DIMSoultreeObject@@H@Z'
-PROVIDERS = ((CHARACTER, 0x4455b0, 195, SOURCES[8]), (ADVANCE, 0x4a6bb0, 1293, SOURCES[9]),
+PROVIDERS = ((CHARACTER, 0x4455b0, 195, SOURCES[7]), (ADVANCE, 0x4a6bb0, 1293, SOURCES[8]),
              (PAINTER, 0x417500, 97, SOURCES[5]), (DESTROY, 0x417570, 7, SOURCES[5]),
              (PAINT, 0x417670, 1157, SOURCES[5]))
 # Complete pre-change resolved bodies; partial preservation is not source acceptance.
@@ -68,14 +68,7 @@ PARTIAL = [['samples/race/BikeRaceNearMisses.cpp',
   13428,
   13428,
   13396,
-  'a6159f61caafc2347d11f9ef24dfc6956a1da5b180cd6749c63609a4716f8482'],
- ['samples/ui/KrustyUINearMisses.cpp',
-  '?Create@KrustyUI@@',
-  4819104,
-  1104,
-  1102,
-  872,
-  'a0c7fe2a846eb24d4bf7dfdab6fcbcff2e503af4e3ab5456d11aab1c01f7bb99']]
+  'a6159f61caafc2347d11f9ef24dfc6956a1da5b180cd6749c63609a4716f8482']]
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),
@@ -172,7 +165,7 @@ class GaragePreviewConnectionsTests(unittest.TestCase):
                         resolved = match_object(obj, symbol, va, b'', bindings)
                     self.assertEqual(resolved['digest'], digest, key)
                     partial_count += 1
-            self.assertEqual((strict_count, partial_count), (317, 6))
+            self.assertEqual((strict_count, partial_count), (318, 5))
             compiler = Path(os.environ['VC6_ROOT'])
             linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
             libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
@@ -184,7 +177,7 @@ class GaragePreviewConnectionsTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Garage painter: 192 resource, normal cleanup and exception lifetime cases passed', result.stdout)
-            print('317 strict checks, six complete partial fingerprints; ' + result.stdout.strip())
+            print('318 strict checks, five complete partial fingerprints; ' + result.stdout.strip())
 
 
 if __name__ == '__main__':

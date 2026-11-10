@@ -57,9 +57,8 @@ also compiles without an extra physics include directory.
 
 `tests/test_garage_shadow_connections.py` checks the retail image hash, RTTI,
 allocation constants, direct calls, native layouts, actual imported provider
-names, 130 strict caller/provider cases, and the full unchanged 1,102-byte
-`KrustyUI::Create` candidate fingerprint. That candidate remains nonexact
-against its 1,104-byte retail extent.
+names and 131 strict caller/provider cases, including `KrustyUI::Create`
+(exact in KrustyUI.cpp).
 
 The native fixture executes eight unchanged production function texts:
 the five connected nonconstructor methods plus `AddReceiver`,

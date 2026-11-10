@@ -1,4 +1,9 @@
-"""Private complete GUI startup operation and its two allocation unwind states."""
+"""Private complete GUI startup operation and its two allocation unwind states.
+
+KrustyUI::Create is canonical in src/reconstructed/KrustyUI.cpp. The test
+links its unchanged text (with the file-local setters it calls) into a small
+unit named krustyui.cpp, so the scripted fixture supplies every other boundary.
+"""
 import json
 import os
 from pathlib import Path
@@ -12,9 +17,28 @@ from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
+from test_garage_shadow_connections import function_text
 
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?Create@KrustyUI@@QAEPAVGameObject@@PAVRenderTarget@@H@Z'
+CANONICAL = 'src/reconstructed/KrustyUI.cpp'
+BINDINGS = ROOT / 'src/reconstructed/KrustyUI.bindings.json'
+PREAMBLE = '''#include "GUIManagerCore.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "DebugAlloc.h"
+#include "OptionProcs.h"
+#include "Parameterblocks.h"
+#include "TextureMap.h"
+#include "PCJoystickDevice.h"
+#include "TrackGame.h"
+#include "UIDialog.h"
+void GuiProgressCallback();
+extern char g_ResourceNames[36][16];
+'''
+FUNCTIONS = ('static inline void SetToolTipBold(', 'static inline void SetFontSizeOffset(',
+             'static inline void SetSoundVolume(', 'GameObject* KrustyUI::Create(')
 RANGES = {0x4988a0: 1104, 0x54be40: 23, 0x54be57: 26, 0x54be71: 10}
 DEPENDENCIES = {0x4692f0,0x521970,0x534b10,0x536340,0x4a3010,0x485190,0x4853b0,
                 0x469130,0x5476f0,0x4866c0,0x536057,0x485ef0,0x485d70,0x486560,
@@ -67,21 +91,30 @@ class KrustyUICreateBehaviorTests(unittest.TestCase):
         libraries=find_child_ci(infer_vc98_root(compiler),'lib')
         with tempfile.TemporaryDirectory(prefix='mcm2-ui-create-') as directory:
             output=Path(directory);objects=[]
-            for source in ('samples/ui/KrustyUINearMisses.cpp','tests/fixtures/krusty_ui_create_compare.cpp'):
-                obj=output/(Path(source).stem+'.obj')
+            canonical=(ROOT/CANONICAL).read_text()
+            unit=output/'krustyui.cpp'
+            unit.write_text(PREAMBLE+'\n\n'.join(function_text(canonical,f) for f in FUNCTIONS)+'\n')
+            for source in (CANONICAL,str(unit),'tests/fixtures/krusty_ui_create_compare.cpp'):
+                obj=output/(Path(source).stem+('_canonical' if source==CANONICAL else '')+'.obj')
                 result=subprocess.run([sys.executable,str(ROOT/'tools/compile.py'),str(ROOT/source),'-o',str(obj),
                     '--vc6-root',str(compiler),'--profile','vc6_o2_mt','--include',str(ROOT/'src/krusty2'),
+                    *(['--include',str(ROOT/'src/reconstructed')] if source==str(unit) else []),
                     *(['--extra','/Od'] if source.startswith('tests/') else [])],cwd=ROOT,capture_output=True,text=True,
                     encoding='latin-1',env={**os.environ,'PYTHONPATH':str(ROOT)})
-                self.assertEqual(result.returncode,0,result.stdout+result.stderr);objects.append(str(obj))
-                if source.startswith('samples/'):
+                self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+                if source==CANONICAL:
+                    canonical_obj=CoffObject(obj)
+                    self.assertEqual(canonical_obj.find_symbol(SYMBOL).function_size,1104)
+                    self.assertTrue(compare(image,canonical_obj,SYMBOL,0x4988a0,1104,BINDINGS)['strict_exact'])
+                    continue
+                objects.append(str(obj))
+                if source==str(unit):
                     candidate=CoffObject(obj);entry=candidate.find_symbol(SYMBOL)
-                    self.assertEqual(entry.function_size,1102)
+                    self.assertEqual(entry.function_size,1104)
                     self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number>0 and s.type==0x20},
                                      {SYMBOL,'??_GIntro1Dlg@@UAEPAXI@Z','??1Intro1Dlg@@UAE@XZ'})
-                    report=compare(image,candidate,SYMBOL,0x4988a0,1104,ROOT/'samples/ui/KrustyUINearMisses.bindings.json')
-                    self.assertFalse(report['strict_exact'])
-                    self.assertEqual(report['strict_match']['matching_positions'],872)
+                    report=compare(image,candidate,SYMBOL,0x4988a0,1104,BINDINGS)
+                    self.assertTrue(report['strict_exact'])
                     self.assertFalse(any(s.name.startswith('.CRT') for s in candidate.sections))
                     def relocated(section,offset):
                         rows=[r for r in candidate.relocations if r.section_number==section and r.virtual_address==offset]
@@ -103,7 +136,7 @@ class KrustyUICreateBehaviorTests(unittest.TestCase):
                     # wrapper and destructor. Their distinct class identity is
                     # supplied by the primary table and its direct call, not by
                     # the shared five-byte destructor address alone.
-                    binding_path=ROOT/'samples/ui/KrustyUINearMisses.bindings.json'
+                    binding_path=BINDINGS
                     for name,address,size in (('??_GIntro1Dlg@@UAEPAXI@Z',0x49bdb0,30),
                                               ('??1Intro1Dlg@@UAE@XZ',0x450fc0,5)):
                         self.assertTrue(compare(image,candidate,name,address,size,binding_path)['strict_exact'])

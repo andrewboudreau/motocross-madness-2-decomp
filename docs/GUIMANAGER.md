@@ -75,15 +75,14 @@ UIDialog at the method boundary; still-provisional dialog subclass views use
 explicit casts rather than asserting their complete inheritance. TrackGame's
 slot-26 dispatch is named by the shared base declaration, MarkPendingRelease.
 
-The startup sample now expresses SetUp's actual ten arguments (`ret 0x28` at
+KrustyUI::Create (`0x004988a0`, canonical and exact in KrustyUI.cpp) expresses SetUp's actual ten arguments (`ret 0x28` at
 `0x004857ea`) and AppendSibling's separate second argument, -1. Retail calls
 SetUp at `0x00498a6b`, then pushes its returned object and calls AppendSibling
 at `0x00498a73`; the -1 was pushed before SetUp's argument list. The font-size
 argument is a short, and GUIUser::AcceptDevice receives GUIInputDevice* and
-returns int. These corrections do not promote KrustyUI::Create: it remains a
-nonexact sample, currently 1102 emitted bytes against retail's 1104. The float
-font-size adjustment still uses the existing four-byte storage through an
-explicit float view; the canonical member layout is unchanged.
+returns int. The float font-size adjustment uses the existing four-byte
+storage through an explicit float view; the canonical member layout is
+unchanged.
 
 `tests/test_gui_connections.py` compiles the real callers and providers,
 checks these layouts and retail setup calls, and distinguishes production

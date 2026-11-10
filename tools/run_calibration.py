@@ -3532,6 +3532,15 @@ CASES = [
         'reason': 'inline-constructed 8-entry array before the vtable store',
     },
     {
+        'name': 'KrustyUI create 0x4988a0',
+        'bindings': 'src/reconstructed/KrustyUI.bindings.json',
+        'source': 'src/reconstructed/KrustyUI.cpp',
+        'symbol': '?Create@KrustyUI@@QAEPAVGameObject@@PAVRenderTarget@@H@Z',
+        'target_va': '0x004988a0',
+        'target_size': 1104,
+        'reason': 'krustyui.cpp lines 121/201 allocations; GUIManager inline setters for +0x34c/+0x3d0/+0x3d4',
+    },
+    {
         'name': 'KrustyUI scalar deleting destructor',
         'bindings': 'src/reconstructed/KrustyUI.bindings.json',
         'source': 'src/reconstructed/KrustyUI.cpp',
