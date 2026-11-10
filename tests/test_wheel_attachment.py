@@ -18,7 +18,7 @@ from tools.build_game import compile_source as build_compile_source
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'src/reconstructed/VehicleWheelAttachment.cpp'
-SAMPLE = 'samples/physics/tire/Tire.cpp'
+SAMPLE = 'src/krusty2/tire/Tire.cpp'
 CANONICAL = 'src/krusty2/vehicle/Bike.cpp'
 TREE = 'src/krusty2/soultree/soultree.cpp'
 MATRIX = 'src/krusty2/bvh/BoundingBoxTreeQuery.cpp'
@@ -165,9 +165,9 @@ class WheelAttachmentTests(unittest.TestCase):
                 ('src/krusty2/vehicle/Vehicle.cpp','?AddWheel@Vehicle@@',0x525d30,160,ROOT/'src/krusty2/vehicle/Vehicle.bindings.json'),
                 (POSITION,'?SetPositionVec3@SoultreeObject@@',0x4fc630,38,(ROOT/POSITION).with_suffix('.bindings.json'))):
                 result=compare(pe,objects[source],symbol,va,size,bindings);self.assertTrue(result['strict_exact'],result);strict+=1
-            for t in json.loads((ROOT/'samples/physics/tire/targets.json').read_text()):
+            for t in json.loads((ROOT/'src/krusty2/tire/targets.json').read_text()):
                 if t['source']=='Tire.cpp' and t['expect']=='exact':
-                    result=compare(pe,objects[SAMPLE],t['candidate_symbol_contains'],int(t['target_va'],0),t['target_size'],ROOT/'samples/physics/tire'/t.get('bindings','Tire.bindings.json'))
+                    result=compare(pe,objects[SAMPLE],t['candidate_symbol_contains'],int(t['target_va'],0),t['target_size'],ROOT/'src/krusty2/tire'/t.get('bindings','Tire.bindings.json'))
                     self.assertTrue(result['strict_exact'],result);strict+=1
             for name,va,size in HELPERS:
                 symbol='?'+name+'@SoultreeObject@@'

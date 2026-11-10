@@ -59,7 +59,7 @@ public:
 
 // MovingPart: the non-polymorphic 0x4c byte base placed at +4 of every Shock (RTTI base array
 // mdisp 4).  Ctor 0x004a23a0 (ret 0xc), dtor 0x00464e90 (out of line, empty).
-// The same provisional shape is declared in samples/physics/tire/Tire.h.
+// The same provisional shape is declared in src/krusty2/tire/Tire.h.
 class MovingPart {
 public:
     MovingPart(void* name, int root, int ownerRef);

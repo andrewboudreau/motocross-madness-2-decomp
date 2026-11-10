@@ -1,5 +1,5 @@
 {
-  "samples/physics/tire/Tire.cpp": {
+  "src/krusty2/tire/Tire.cpp": {
     "sections": 82,
     "relocations": 441,
     "sha256": "159d6d2421b9d4849119fb8e36cdb932d1bfafe5ea9482a44dbf44aeae5d9cfc"

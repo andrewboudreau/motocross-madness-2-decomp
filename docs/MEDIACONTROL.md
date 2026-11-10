@@ -15,7 +15,7 @@ reaches it, so every file name is ours (tier 3).
   copies the node's local matrix to `+0` (`0x004fca60`), and stores the
   node at `+0x40`, its third argument at `+0x44` and zero at `+0x48`.
   MovingPart is the non-polymorphic base of Tire (mdisp `0x17c`) and of the
-  Shock family (mdisp 4); see `samples/physics/tire/Tire.h`.
+  Shock family (mdisp 4); see `src/krusty2/tire/Tire.h`.
 - Open: whether these two belong to the Math3D unit before them, to
   MediaControl's unit, or to a unit of their own. Nothing calls across the
   boundaries.

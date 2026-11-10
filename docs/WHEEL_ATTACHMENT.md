@@ -7,7 +7,7 @@ all four call relocations resolved. No caller changes, forwarding wrapper,
 linker aliases or special compiler flags are involved.
 
 The existing `Tire::UpdateAttachment()` sample is another source view of the
-same retail body. Its body stays unchanged in `samples/physics/tire/Tire.cpp`.
+same retail body. Its body stays unchanged in `src/krusty2/tire/Tire.cpp`.
 Only the two existing attachment-field class declarations move verbatim to
 `src/reconstructed/TireAttachmentViews.h`; the sample header includes that
 shared declaration. This does not promote the rest of Tire, its constructors,

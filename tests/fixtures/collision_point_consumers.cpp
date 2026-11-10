@@ -10,7 +10,7 @@
 #include "soultree/SoultreePhysicsContact.h"
 #include "collision/CollisionPoint.h"
 #ifdef CONTACT_LAYOUT
-#include "../../samples/physics/tire/Tire.h"
+#include "../../src/krusty2/tire/Tire.h"
 extern "C" int TireContactOffset() {
     Tire* tire=(Tire*)0x10000;
     return (char*)static_cast<CollisionPoint*>(tire)-(char*)tire;

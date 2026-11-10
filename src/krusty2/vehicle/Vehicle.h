@@ -293,7 +293,7 @@ struct VehicleContactPoint {
 };
 // Elements of Vehicle+0x53c (provisional: only touched offsets are named).
 struct VehicleWheel {
-    // 0x00512f10 (ret 0x3c; samples/physics/tire/Tire.h Tire::Tire): wheel name, model node,
+    // 0x00512f10 (ret 0x3c; src/krusty2/tire/Tire.h Tire::Tire): wheel name, model node,
     // twelve tuning values, the steer state of a steered wheel (else 0) and the track
     // (0x2c0 bytes, `new(__FILE__, 0x6b8)` in Bike's loader).
     VehicleWheel(const char* name, SoultreeObject* root, float rollFriction_, float sideFriction_,
@@ -379,7 +379,7 @@ struct VehicleWheel {
     // reciprocal of the driven-wheel count, the body's step time, direction flag and mass.
     void ApplyDrive(float share, float stepTime, int movingForward, float bodyMass,
                          float* speed, Vec3* force, Vec3* torque);
-    // 0x00514550 (ret 0x20): places the wheel on the ground (samples/physics/tire/Tire.h
+    // 0x00514550 (ret 0x20): places the wheel on the ground (src/krusty2/tire/Tire.h
     // UpdateSuspensionProbe); PlaceWheels passes the body's probe, position, saved
     // pitch/sin-roll/yaw, saved forward/up and the pose node.
     void UpdateSuspensionProbe(SoultreeProbe* world, const Vec3* position, float pitch, float sinRoll,

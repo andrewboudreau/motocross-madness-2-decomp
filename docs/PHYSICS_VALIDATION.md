@@ -646,8 +646,8 @@ KrustyBike.cpp is promoted: its 75 exact targets are in
 `src/krusty2/vehicle/KrustyBike.cpp` (bindings `KrustyBike.bindings.json`, entries
 in `src/krusty2/vehicle/targets.json`), its 7 partial targets in
 `samples/physics/krustybike/KrustyBikeNearMisses.cpp`, which includes the canonical
-file. `samples/physics/tire/Tire.bindings.json` resolves every relocation of the
-Tire sample's exact targets:
+file. `src/krusty2/tire/Tire.bindings.json` resolves every relocation of the
+Tire unit's exact targets (promoted from `samples/physics/tire/`):
 
 - KrustyBike.cpp: the 56 exact targets of the first slice, plus the `.CRT$XCU` 155-158
   set (`0x00491190..0x004912cb`, vectors `0x0067c348`, `0x0067c358`,
@@ -714,7 +714,7 @@ Check:
 python tools/run_physics_samples.py --strict \
   --source src/krusty2/vehicle/KrustyBike.cpp \
   --source samples/physics/krustybike/KrustyBikeNearMisses.cpp \
-  --source samples/physics/tire/Tire.cpp \
+  --source src/krusty2/tire/Tire.cpp \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 

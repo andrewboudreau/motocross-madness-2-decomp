@@ -51,6 +51,7 @@ class RankNearMissesTests(unittest.TestCase):
         self.assertEqual(lane_for('krusty2/vehicle/Bike'), 'rider')
         self.assertEqual(lane_for('krusty2/collision/CollisionObject'), 'body')
         self.assertEqual(lane_for('physics/tire/Tire'), 'rider')
+        self.assertEqual(lane_for('krusty2/tire/Tire'), 'rider')
         self.assertEqual(lane_for('physics/bvh/Quadtree'), 'body')
 
     def test_diff_counts(self):

@@ -63,7 +63,7 @@ class TireNode;
 // RotatingShock::SolveContact 0x004fac60 (samples/physics/suspension/Suspension.h).
 // The solves are declared as in Suspension.h; the caller's dt and velocity slots are
 // dead after the call and hold its `active` and `load` outputs.
-#include "../../../src/reconstructed/TireAttachmentViews.h"
+#include "../../reconstructed/TireAttachmentViews.h"
 
 // Provisional area-local stand-ins for two scene-side classes only known by their calls.
 class TireNode {                                       // scene node, MovingPart::field_0x40

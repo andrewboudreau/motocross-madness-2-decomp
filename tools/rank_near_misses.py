@@ -84,7 +84,8 @@ def lane_for(tu: str) -> str:
     if top in SHELL:
         return 'shell'
     if top == 'krusty2':
-        return 'rider' if parts[-1] == 'Bike' else 'body'
+        rider = parts[-1] == 'Bike' or (len(parts) > 2 and parts[1] in ('tire', 'suspension'))
+        return 'rider' if rider else 'body'
     if top == 'physics':
         return 'rider' if len(parts) > 1 and parts[1] in RIDER_PHYSICS else 'body'
     return '?'

@@ -37,7 +37,7 @@ struct BikeA644;
 struct BikeQ;
 struct BikeA38;
 
-// Object at Bike+0x60c: the handlebar part (samples/physics/tire/Tire.h MovingPart, 0x4c bytes).
+// Object at Bike+0x60c: the handlebar part (src/krusty2/tire/Tire.h MovingPart, 0x4c bytes).
 // The loader builds it with `new(__FILE__, 0x660)` from the "Handlebars" node of the model and
 // the steer state; ~Bike deletes it through an out-of-line empty destructor (0x00464e90).
 #include "BikeHandlebarView.h"
