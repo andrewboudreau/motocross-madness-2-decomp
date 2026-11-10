@@ -1,7 +1,8 @@
 // Group 3 bring-up: KrustyBike::Fn_00413200 (0x00413200, AI physics step) and
 // KrustyBike::Fn_00414370 (0x00414370, AI racing line), with the BikeAI.cpp free functions
-// they need that no src/ file defines: 0x0040d200 PathSteeringDirection, 0x0040e510
-// PredictPathMotion, 0x00415640 QuerySegmentObstacles and 0x0040eca0 SimulateLookAhead.
+// they need that no src/ file defines: 0x0040e510 PathSteeringDirection, 0x00415640
+// QuerySegmentObstacles and 0x0040eca0 SimulateLookAhead.  0x0040d200 PredictPathMotion
+// is strict exact in the canonical src/krusty2/vehicle/BikeAI.cpp.
 //
 // Status: best-guess-unreviewed.  This is samples/physics/bikeai/BikeAINearMisses.cpp
 // (BikeAI.cpp near misses) with its `#include` of the canonical src/krusty2/vehicle/BikeAI.cpp
@@ -180,6 +181,9 @@ float Vec3Magnitude(const Vec3* v);                    // 0x00413190 (BikeAI.cpp
 int PredictLanding(Vec3 start, Vec3 velocity, float* outTime, Vec3* outDelta,
                    Vec3* outNormal, Terrain* terrain); // 0x0040e370 (BikeAI.cpp)
 #include "vehicle/KrustyBike.h"
+int PredictPathMotion(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* outDir,
+                      float maxTime, float dt, Terrain* terrain, float side,
+                      float* outTakeoffTime, Vec3* outVel);   // 0x0040d200 (BikeAI.cpp)
 #include "../reconstructed/GearRatios.h"
 #include "../reconstructed/Wrecker.h"
 #include "collision/CollisionObject.h"
@@ -340,19 +344,9 @@ int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
     return 1;
 }
 
-// Debug line endpoints at 0x00578dc0 drawn by BikeRace (BikeRace.h declares the same
-// array as Vector3 g_PathTargetDebugLine[2]).
-extern Vector3 g_PathTargetDebugLine[2];   // BikeRace.h / BikeRaceDebugState.cpp
-// The debug lines are Vector3 storage; BikeAI writes them as Vec3 (same three floats).
+// The debug lines (BikeRaceDebugState.cpp) are Vector3 storage; BikeAI writes them as
+// Vec3 (same three floats).
 #define G3_VEC3_VIEW(a) (reinterpret_cast<Vec3*>(a))
-
-// Dot product in the operand order retail 0x0040d200 evaluates: (y + x) + z.  The
-// parentheses around y*y place the ground-branch `simPos.y = ground.y` store after
-// the z*z product (retail); without them it is issued before the first faddp.
-inline float BikeAIDotZ(const Vec3& a, const Vec3& b)
-{
-    return a.z * b.z + (a.x * b.x + (a.y * b.y));
-}
 
 // Call view of the out-of-line Vec3 constructor 0x00404e60 (see math/Math3D.h).
 struct BikeAIVec3Call : Vec3 {
@@ -365,197 +359,6 @@ BikeAIVec3Call::BikeAIVec3Call(float x_, float y_, float z_)
     x = x_;
     y = y_;
     z = z_;
-}
-
-// Inline normalize with the same body as Vec3Normalize (0x005087b0); in 0x0040d200 the
-// dot product (0x0040ae30) and the constructor (0x00404e60) are out-of-line calls.
-inline Vec3 BikeAINormalize(const Vec3& v)
-{
-    float lenSq = Vec3DotCall(&v, &v);
-    if (lenSq == 1.0f)
-        return v;
-    float invLen = FastInvSqrt(lenSq);
-    return BikeAIVec3Call(v.x * invLen, v.y * invLen, v.z * invLen);
-}
-
-// 0x0040d200, 4464 bytes, cdecl: predicts the bike's motion along the AI path.
-// Starting at 'pos' with the flat speed of 'vel', it steps by 'dt' (gravity -32 when
-// more than 0.5 above the ground under it, ground contact removes the velocity into
-// the ground normal), advances the path parameter and steers towards the path point
-// offset sideways by 'side'.  It records the first takeoff (time, position, velocity,
-// flat direction) and stops at the landing (direction change below cos 45 deg, or
-// the last path point).  For a jump longer than 20 units it computes the takeoff
-// speed that would cover the distance and stores it in path->targetSpeed, raised to
-// 40 when below 40, otherwise to takeoffSpeed - 20 when it is more than 20 below the
-// takeoff speed.  The takeoff velocity is rescaled to that speed.
-// Writes the reached segment/parameter to the path, the flat direction to the
-// target in *outDir and the takeoff velocity in *outVel when the takeoff came
-// within 0.5 s, and the takeoff time (10 when none) in *outTakeoffTime.  Always
-// sets the debug line 0x00578dc0 (pos and target raised by 3).  Returns 0 for a
-// missing path/terrain, an index outside the path or dt <= 0, else 1.
-// Callers: 0x0040f2c9 and 0x00412654.  Arithmetic tier 1, names tier 3.
-int PredictPathMotion(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* outDir,
-                          float maxTime, float dt, Terrain* terrain, float side,
-                          float* outTakeoffTime, Vec3* outVel)
-{
-    float elapsed = 0.0f;
-    int airborne = 0;
-    if (!path || !terrain)
-        return 0;
-    int idx = path->index;
-    if (idx >= path->count || idx < 0)
-        return 0;
-    if (!(dt > 0.0f))
-        return 0;
-    int done = 0;
-    float takeoffTime = 10.0f;
-    float landTimer = -1.0f;
-    float t = path->t;
-    Vec3 simPos = pos;
-    float halfDtSq = dt * dt * 0.5f;
-    float flatSpeed = FastSqrt(vel.x * vel.x + vel.z * vel.z);
-    Vec3 seg;
-    if (path->count == 1)
-        seg = path->points[idx] - simPos;
-    else if (idx < path->count - 1)
-        seg = path->points[idx + 1] - path->points[idx];
-    else
-        seg = path->points[idx] - path->points[idx - 1];
-    seg.y = 0.0f;
-    float len = BikeAISegmentLength(seg);
-    float invLen = len > 0.0f ? 1.0f / len : 0.0f;
-    Vec3 perp;
-    perp.x = seg.z;
-    perp.y = 0.0f;
-    perp.z = -seg.x;
-    perp = SafeNormalize(perp);
-    Vec3 target = path->points[idx] + seg * t + perp * side;
-    Vec3 dir = target - simPos;
-    dir.y = 0.0f;
-    dir = SafeNormalize(dir);
-    Vec3 simVel(dir.x * flatSpeed, vel.y, dir.z * flatSpeed);
-    float align = 1.0f;
-    Vec3 normal;
-    Vec3 takeoffVel;
-    float takeoffSpeed;
-    Vec3 takeoffPos;
-    Vec3 flatDir;
-    while ((elapsed < maxTime || airborne) && !done) {
-        float speedSq = (simVel.x * simVel.x + simVel.y * simVel.y) + simVel.z * simVel.z;
-        float speed = speedSq == 1.0f ? 1.0f : FastSqrt(speedSq);
-        flatSpeed = FastSqrt(simVel.x * simVel.x + simVel.z * simVel.z);
-        Vec3 ground = simPos;
-        terrain->QueryGround((TerrainVec3*)&ground, (TerrainVec3*)&normal, 0, 0);
-        float gravity;
-        if (ground.y + 0.5f >= simPos.y) {
-            if (airborne && takeoffTime < 0.5f) {
-                target = simPos;
-                landTimer = 0.0f;
-            }
-            float intoGround = BikeAIDotZ(normal, simVel);
-            simPos.y = ground.y;
-            if (intoGround < 0.0f) {
-                simVel -= normal * intoGround;
-                if (!(intoGround < speed * -0.70755f))
-                    simVel = SafeNormalize(simVel) * speed;
-            }
-            gravity = 0.0f;
-            airborne = 0;
-        } else {
-            if (!airborne) {
-                takeoffVel = simVel;
-                takeoffSpeed = BikeAILength(simVel);
-                takeoffPos = simPos;
-                flatDir = simVel;
-                flatDir.y = 0.0f;
-                flatDir = BikeAINormalize(flatDir);
-                takeoffTime = elapsed;
-            } else if (align < 0.70755f) {
-                done = 1;
-                target = simPos;
-            }
-            gravity = -32.0f;
-            airborne = 1;
-        }
-        simPos += dt * simVel;
-        simPos.y += gravity * halfDtSq;
-        simVel.y += gravity * dt;
-        t += invLen * flatSpeed * dt;
-        flatSpeed = FastSqrt(simVel.x * simVel.x + simVel.z * simVel.z);
-        while (t > 1.0f && idx < path->count - 1) {
-            t -= 1.0f;
-            idx++;
-            if (path->count == 1)
-                seg = path->points[idx] - simPos;
-            else if (idx < path->count - 1)
-                seg = path->points[idx + 1] - path->points[idx];
-            else
-                seg = path->points[idx] - path->points[idx - 1];
-            seg.y = 0.0f;
-            len = BikeAISegmentLength(seg);
-            invLen = len > 0.0f ? 1.0f / len : 0.0f;
-            perp.x = seg.z;
-            perp.y = 0.0f;
-            perp.z = -seg.x;
-            perp = SafeNormalize(perp);
-        }
-        Vec3 aim = path->points[idx] + seg * t + perp * side;
-        if (airborne && idx == path->count - 1) {
-            target = simPos;
-            done = 1;
-        }
-        flatSpeed = FastSqrt(simVel.x * simVel.x + simVel.z * simVel.z);
-        dir = aim - simPos;
-        dir.y = 0.0f;
-        dir = SafeNormalize(dir);
-        simVel.x = dir.x * flatSpeed;
-        simVel.z = dir.z * flatSpeed;
-        if (airborne)
-            align = BikeAIDotZ(seg * invLen, flatDir);
-        else
-            align = 1.0f;
-        if (landTimer >= 0.0f)
-            landTimer += dt;
-        elapsed += dt;
-    }
-    if (done) {
-        float dy = target.y - takeoffPos.y;
-        Vec3 toLanding = target - takeoffPos;
-        float dist = FastSqrt(toLanding.x * toLanding.x + toLanding.z * toLanding.z);
-        flatSpeed = FastSqrt(takeoffVel.x * takeoffVel.x + takeoffVel.z * takeoffVel.z);
-        if (dist > 20.0f) {
-            float sinA, secA;   // left unset when the takeoff has no flat speed (as retail)
-            if (flatSpeed > 0.0f) {
-                float spd = BikeAILength(takeoffVel);
-                sinA = takeoffVel.y / spd;
-                secA = spd / flatSpeed;
-            }
-            path->targetSpeed = FastSqrt(dist * dist * 32.0f / ((sinA * dist + dy) * 2.0f)) * secA;
-            float need = path->targetSpeed;
-            Vec3 nv = SafeNormalize(takeoffVel) * need;
-            if (path->targetSpeed < 40.0f)
-                path->targetSpeed = 40.0f;
-            else if (takeoffSpeed - path->targetSpeed > 20.0f)
-                path->targetSpeed = takeoffSpeed - 20.0f;
-            takeoffVel = SafeNormalize(nv) * path->targetSpeed;
-        }
-    }
-    path->index = idx;
-    path->t = t;
-    if (outDir && takeoffTime < 0.5f) {
-        *outDir = target - pos;
-        outDir->y = 0.0f;
-        *outDir = SafeNormalize(*outDir);
-    }
-    if (outTakeoffTime)
-        *outTakeoffTime = takeoffTime;
-    if (outVel && takeoffTime < 0.5f)
-        *outVel = takeoffVel;
-    G3_VEC3_VIEW(g_PathTargetDebugLine)[0] = pos;
-    G3_VEC3_VIEW(g_PathTargetDebugLine)[0].y = pos.y + 3.0f;
-    G3_VEC3_VIEW(g_PathTargetDebugLine)[1] = target;
-    G3_VEC3_VIEW(g_PathTargetDebugLine)[1].y = target.y + 3.0f;
-    return 1;
 }
 
 // ---------------------------------------------------------------------------

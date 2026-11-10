@@ -1480,6 +1480,16 @@
     "bindings": "BikeAI.bindings.json"
   },
   {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "PredictPathMotion",
+    "target_va": "0x0040d200",
+    "target_size": 4464,
+    "expect": "exact",
+    "notes": "AI jump prediction along the path; strict exact. Needs the segment length with (x*x) parenthesised (BikeAISegmentLength), y*y parenthesised in BikeAIDotZ, and the pre-loop segment/direction taken from p rather than pos (leaf order of p.z in p += dt * v); see the comment above it. (moved from samples/physics/bikeai/BikeAINearMisses.cpp)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
     "class": "Bike",
     "source": "Bike.cpp",
     "candidate_symbol_contains": "?BikeCollisionCallback@@",

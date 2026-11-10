@@ -51,7 +51,6 @@
   "?g_ObstacleDebugLowerLine@@3PAUVec3@@A": "0x00577a48",
   "?g_ObstacleDebugHit@@3HA": "0x00578da8",
   "?g_ObstacleDebugLowerHit@@3HA": "0x00578dac",
-  "?g_PathTargetDebugLine@@3PAUVec3@@A": "0x00578dc0",
   "?g_ObstacleDebugRightHit@@3HA": "0x00578dd8",
   "?g_ObstacleDebugUpperLine@@3PAUVec3@@A": "0x00578de0",
   "?g_ObstacleDebugLeftHit@@3HA": "0x00578df8",
@@ -152,5 +151,6 @@
   "__real@4@40008000000000000000": "0x0055074c",
   "__real@4@40079600000000000000": "0x00550ac4",
   "__real@4@400a9c40000000000000": "0x00550bb8",
-  "_rand": "0x00534c1b"
+  "_rand": "0x00534c1b",
+  "?g_PathTargetDebugLine@@3PAUVector3@@A": "0x00578dc0"
 }

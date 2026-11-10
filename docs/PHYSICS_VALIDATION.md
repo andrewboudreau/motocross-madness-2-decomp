@@ -202,10 +202,12 @@ This run reports `23/23 strict exact`.
 
 ## Wave-9 BikeAI slice
 
-`src/krusty2/vehicle/BikeAI.cpp` passes 23 strict cases:
+`src/krusty2/vehicle/BikeAI.cpp` passes 24 strict cases:
 - the filter-static and five empty `$E` pairs;
 - the Math3D kVec3 `$E` set;
 - the Vec3 normalize `0x40d120`;
+- the jump prediction along the path `0x40d200` (4464 bytes), with the
+  segment-length, dot and normalize helpers the sample's near misses share;
 - the landing prediction `0x40e370`;
 - the length helper `0x413190`.
 
@@ -214,10 +216,8 @@ Extent: `0x40d070..0x416e1f` (strong inference). Bike.cpp ends at
 `0x415640`. A second Math3D set at `0x417350` means BikeCamera code
 (`0x416e20..0x417aff`) is a separate, unattested unit.
 
-Six near misses and one exact COMDAT are in `samples/physics/bikeai`:
+Five near misses and one exact COMDAT are in `samples/physics/bikeai`:
 - the steering direction `0x40e510` differs by an esi/edi swap and frame order;
-- the jump prediction `0x40d200` (4464 bytes, 4430/4464) differs only in the
-  scheduling of two stores;
 - the obstacle query `0x415640` (6112 bytes, 5987/6111) differs in the order of
   its one-use temporaries and two argument-push placements;
 - the two-wheel look-ahead simulation `0x40eca0` (17585 bytes, extent
@@ -252,8 +252,8 @@ python tools/run_physics_samples.py --strict \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-The first run reports `23/23 strict exact`, the second `1/7 strict exact` (the
-COMDAT; the six near misses are registered as partial).
+The first run reports `24/24 strict exact`, the second `1/6 strict exact` (the
+COMDAT; the five near misses are registered as partial).
 
 ## Wave-10 soultree and box-tree query slice
 
