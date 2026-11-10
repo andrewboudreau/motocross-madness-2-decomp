@@ -477,6 +477,12 @@ Strict exact under `vc6_o2_ml` with `SoulTreePhysics.bindings.json`:
   `.col` file object with `new(SP_FILE, 0x84e/0x8cd)`, and retail pushes this TU's
   `__FILE__` string `0x00574320` at `0x00503b13`/`0x00503f87`, so they belong here and
   bind strictly through `__FILE__:soultreephysics.cpp`.
+- The rest of SoultreePhysicsCharacter that was exact in samples also lives here now: the
+  constructor `0x00503c70`, destructor `0x00503d40`, `Tick` `0x00504210` with its vtordisp
+  thunk and the `??_G`/`??_E`/`W7` thunks VC6 emits beside the constructor (from
+  `samples/physics/hierarchy/LayoutProbe.cpp`), and slots 1, 8, 33, 41 and 42 (from the
+  former `samples/physics/collision/SoultreePhysicsCharacter.cpp`).  They replace the
+  `src/bringup/Group5_SoultreePhysicsCharacter.cpp` stand-ins in the game build.
 - The sub-step loop `RunSteps` `0x00502f60` (1921 bytes) is exact.  Levers:
   `prevSpeed = linearSpeed;` followed by a test of `prevSpeed` (not `linearSpeed`) gives
   retail's single `fld`/`fst`/`fcom`; the loop is `if (steps <= 0) return; do { ... } while

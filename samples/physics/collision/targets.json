@@ -1,55 +1,5 @@
 [
   {
-    "class": "SoultreePhysicsCharacter",
-    "source": "SoultreePhysicsCharacter.cpp",
-    "candidate_symbol_contains": "ResetDynamicState@SoultreePhysicsCharacter",
-    "target_va": "0x005040c0",
-    "target_size": 43,
-    "expect": "exact",
-    "notes": "calls base slot 1 then clears four bytes at +0x430..0x433",
-    "bindings": "SoultreePhysicsCharacter.bindings.json"
-  },
-  {
-    "class": "SoultreePhysicsCharacter",
-    "source": "SoultreePhysicsCharacter.cpp",
-    "candidate_symbol_contains": "ResetToPlacement@SoultreePhysicsCharacter",
-    "target_va": "0x005040f0",
-    "target_size": 193,
-    "expect": "exact",
-    "notes": "5.8%: retail passes &field_0x0c as hidden return pointer of 0x4fc970 (void GetPosition(Vec3*)); Agent A's decl returns Vec3 by value so a temp copy is emitted (219 vs 193 bytes); exact under vc6_o2_ml (no /G6), likely true retail profile",
-    "bindings": "SoultreePhysicsCharacter.bindings.json"
-  },
-  {
-    "class": "SoultreePhysicsCharacter",
-    "source": "SoultreePhysicsCharacter.cpp",
-    "candidate_symbol_contains": "UpdateLocalCenterOfMass@SoultreePhysicsCharacter",
-    "target_va": "0x005041c0",
-    "target_size": 79,
-    "expect": "exact",
-    "notes": "36%: same size; prologue/argument-lea scheduling differs; exact under vc6_o2_ml (no /G6), likely true retail profile",
-    "bindings": "SoultreePhysicsCharacter.bindings.json"
-  },
-  {
-    "class": "SoultreePhysicsCharacter",
-    "source": "SoultreePhysicsCharacter.cpp",
-    "candidate_symbol_contains": "EndMotion@SoultreePhysicsCharacter",
-    "target_va": "0x00504360",
-    "target_size": 262,
-    "expect": "exact",
-    "notes": "exact: node reset via 0x4fc540/0x4fc050, slot 34, OrientationAnglesFromVectors (0x4b5a60), then copies 0x88/0x94 to 0xa0/0xac and 0x2c..0x44 to 0x48..0x60",
-    "bindings": "SoultreePhysicsCharacter.bindings.json"
-  },
-  {
-    "class": "SoultreePhysicsCharacter",
-    "source": "SoultreePhysicsCharacter.cpp",
-    "candidate_symbol_contains": "CheckMotionComplete@SoultreePhysicsCharacter",
-    "target_va": "0x00504470",
-    "target_size": 29,
-    "expect": "exact",
-    "notes": "signed-char flag test",
-    "bindings": "SoultreePhysicsCharacter.bindings.json"
-  },
-  {
     "class": "CollisionQueries",
     "source": "../../../src/reconstructed/CollisionQueries.cpp",
     "candidate_symbol_contains": "SphereContainsPointXZ",

@@ -1258,5 +1258,135 @@
     "expect": "exact",
     "notes": "moved from samples/physics/helpers; inline cross products need Math3D.h's parenthesised first products",
     "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsCharacter",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "ResetDynamicState@SoultreePhysicsCharacter",
+    "target_va": "0x005040c0",
+    "target_size": 43,
+    "expect": "exact",
+    "notes": "calls base slot 1 then clears four bytes at +0x430..0x433 (moved from samples/physics/collision/SoultreePhysicsCharacter.cpp)",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsCharacter",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "ResetToPlacement@SoultreePhysicsCharacter",
+    "target_va": "0x005040f0",
+    "target_size": 193,
+    "expect": "exact",
+    "notes": "exact: retail passes &position to 0x4fc970 as void GetPosition(Vec3*); a by-value Vec3 return would emit a temp copy (219 vs 193 bytes) (moved from samples/physics/collision/SoultreePhysicsCharacter.cpp)",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsCharacter",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UpdateLocalCenterOfMass@SoultreePhysicsCharacter",
+    "target_va": "0x005041c0",
+    "target_size": 79,
+    "expect": "exact",
+    "notes": "exact: the WorldToLocalPoint result is chained into localCenterOfMass and rotationPivot (moved from samples/physics/collision/SoultreePhysicsCharacter.cpp)",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsCharacter",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "EndMotion@SoultreePhysicsCharacter",
+    "target_va": "0x00504360",
+    "target_size": 262,
+    "expect": "exact",
+    "notes": "exact: node reset via 0x4fc540/0x4fc050, slot 34, OrientationAnglesFromVectors (0x4b5a60), then copies 0x88/0x94 to 0xa0/0xac and 0x2c..0x44 to 0x48..0x60 (moved from samples/physics/collision/SoultreePhysicsCharacter.cpp)",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsCharacter",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "CheckMotionComplete@SoultreePhysicsCharacter",
+    "target_va": "0x00504470",
+    "target_size": 29,
+    "expect": "exact",
+    "notes": "signed-char flag test (moved from samples/physics/collision/SoultreePhysicsCharacter.cpp)",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsCharacter",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "??_GSoultreePhysicsCharacter@@UAEPAXI@Z",
+    "target_va": "0x005042f0",
+    "target_size": 51,
+    "expect": "exact",
+    "notes": "vbase deleting dtor: lea esi,[ecx-0x438] proves GameObject virtual base at 1080 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output (moved from samples/physics/hierarchy/LayoutProbe.cpp)",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsCharacter",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "?Disable@D3DIMSoultreeCharacter@@W7AEXXZ",
+    "target_va": "0x00504330",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "SoultreePhysicsCharacter vbase slot 4 adjustor sub ecx,0x8 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540 (moved from samples/physics/hierarchy/LayoutProbe.cpp)",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsCharacter",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "?Enable@D3DIMSoultreeCharacter@@W7AEXXZ",
+    "target_va": "0x00504340",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "SoultreePhysicsCharacter vbase slot 5 adjustor sub ecx,0x8 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540 (moved from samples/physics/hierarchy/LayoutProbe.cpp)",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsCharacter",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "??0SoultreePhysicsCharacter@@QAE@H@Z",
+    "target_va": "0x00503c70",
+    "target_size": 202,
+    "expect": "exact",
+    "notes": "constructor (retail TU SoulTreePhysics.cpp, bracket 0x00503c50..0x00503d40): GameObject(1) under the hidden most-derived flag, SoultreePhysicsBaseObject(flags) 0x00500aa0, D3DIMSoultreeCharacter(flags) 0x004455b0, three vptrs + vtordisp, field_0x42c = 0; EH frame from the base subobjects. 202 bytes + 6 padding. (moved from samples/physics/hierarchy/LayoutProbe.cpp)",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsCharacter",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "??1SoultreePhysicsCharacter@@UAE@XZ",
+    "target_va": "0x00503d40",
+    "target_size": 159,
+    "expect": "exact",
+    "notes": "destructor core (vbase-relative this): empty body; vptr/vtordisp restore, ~D3DIMSoultreeCharacter 0x004459a0 on the null-guarded secondary base, then ~SoultreePhysicsBaseObject 0x00501260. 159 bytes + 1 padding. (moved from samples/physics/hierarchy/LayoutProbe.cpp)",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsCharacter",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "?Tick@SoultreePhysicsCharacter@@UAEHM@Z",
+    "target_va": "0x00504210",
+    "target_size": 77,
+    "expect": "exact",
+    "notes": "GameObject slot 10 override: if slot 42 (vcall +0xa8) then motionActive = 0, motionCompleted = 1; then SoultreePhysicsBaseObject::Tick (0x005036f0) and GameObject::Tick (0x004693d0, result returned). 77 bytes + 3 padding. (moved from samples/physics/hierarchy/LayoutProbe.cpp)",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsCharacter",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "?Tick@SoultreePhysicsCharacter@@$4PPPPPPPM@A@AEHM@Z",
+    "target_va": "0x00504350",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "vtordisp thunk for slot 10 in the GameObject vbase vtable 0x00558004 (sub ecx,[ecx-4]; jmp 0x00504210); emitted with the definition. 8 bytes + 8 padding. (moved from samples/physics/hierarchy/LayoutProbe.cpp)",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsCharacter",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "??_ESoultreePhysicsCharacter@@$4PPPPPPPM@A@AEPAXI@Z",
+    "target_va": "0x005042e0",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "vtordisp thunk for slot 0 (deleting destructor) in the GameObject vbase vtable SoultreePhysicsCharacter+1080 (sub ecx,[ecx-4]; jmp 0x005042f0); same shape as Vehicle's 0x0052b620. 8 bytes + 8 padding. (moved from samples/physics/hierarchy/LayoutProbe.cpp)",
+    "bindings": "SoulTreePhysics.bindings.json"
   }
 ]

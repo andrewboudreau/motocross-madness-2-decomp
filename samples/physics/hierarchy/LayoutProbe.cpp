@@ -93,32 +93,6 @@ D3DIMSoultreeCharacter* LayoutProbe_SpcToD3DIM(SoultreePhysicsCharacter* p)
     return p;
 }
 
-// --- SoultreePhysicsCharacter constructor (0x00503c70, retail TU SoulTreePhysics.cpp) ----
-// A reconstruction, not a probe: the virtual base is built with GameObject(1) (`push 1`
-// before 0x00468ca0), both non-virtual bases receive the caller's argument, and the only
-// own-member store is the node pointer.
-SoultreePhysicsCharacter::SoultreePhysicsCharacter(int flags)
-    : GameObject(1), SoultreePhysicsBaseObject(flags), D3DIMSoultreeCharacter(flags)
-{
-    poseNode = 0;
-}
-
-// Destructor core (0x00503d40): no own cleanup; VC6 restores the vptrs/vtordisp and runs
-// ~D3DIMSoultreeCharacter (0x004459a0) then ~SoultreePhysicsBaseObject (0x00501260).
-SoultreePhysicsCharacter::~SoultreePhysicsCharacter()
-{
-}
-
-// GameObject slot 10 override (0x00504210, reached through the vtordisp thunk 0x00504350).
-// When slot 42 reports true, motionActive is cleared and motionCompleted set (both are cleared by
-// slot 1); then the physics update (SoultreePhysicsBaseObject, 0x005036f0) and the plain
-// GameObject update (0x004693d0) run with the same frame time.  Tier 1 control flow.
-int SoultreePhysicsCharacter::Tick(float dt)
-{
-    if (CheckMotionComplete()) {
-        motionActive = 0;
-        motionCompleted = 1;
-    }
-    SoultreePhysicsBaseObject::Tick(dt);
-    return GameObject::Tick(dt);
-}
+// The SoultreePhysicsCharacter constructor (0x00503c70), destructor (0x00503d40), Tick
+// (0x00504210) and the deleting destructor and thunks VC6 emits with its vtables are
+// reconstructed in their retail TU, src/krusty2/soultree/SoulTreePhysics.cpp.

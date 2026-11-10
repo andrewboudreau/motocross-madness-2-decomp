@@ -20,16 +20,6 @@
   "bindings": "LayoutProbe.bindings.json"
  },
  {
-  "class": "SoultreePhysicsCharacter",
-  "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "??_GSoultreePhysicsCharacter@@UAEPAXI@Z",
-  "target_va": "0x005042f0",
-  "target_size": 51,
-  "expect": "exact",
-  "notes": "vbase deleting dtor: lea esi,[ecx-0x438] proves GameObject virtual base at 1080 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output",
-  "bindings": "LayoutProbe.bindings.json"
- },
- {
   "class": "Vehicle",
   "source": "LayoutProbe.cpp",
   "candidate_symbol_contains": "??_GVehicle@@UAEPAXI@Z",
@@ -57,26 +47,6 @@
   "target_size": 51,
   "expect": "exact",
   "notes": "vbase deleting dtor: lea esi,[ecx-0x160c] proves GameObject virtual base at 5644 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output",
-  "bindings": "LayoutProbe.bindings.json"
- },
- {
-  "class": "SoultreePhysicsCharacter",
-  "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?Disable@D3DIMSoultreeCharacter@@W7AEXXZ",
-  "target_va": "0x00504330",
-  "target_size": 8,
-  "expect": "exact",
-  "notes": "SoultreePhysicsCharacter vbase slot 4 adjustor sub ecx,0x8 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540",
-  "bindings": "LayoutProbe.bindings.json"
- },
- {
-  "class": "SoultreePhysicsCharacter",
-  "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?Enable@D3DIMSoultreeCharacter@@W7AEXXZ",
-  "target_va": "0x00504340",
-  "target_size": 8,
-  "expect": "exact",
-  "notes": "SoultreePhysicsCharacter vbase slot 5 adjustor sub ecx,0x8 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540",
   "bindings": "LayoutProbe.bindings.json"
  },
  {
@@ -147,56 +117,6 @@
   "target_size": 14,
   "expect": "exact",
   "notes": "Bike vbase slot 10: sub ecx,[ecx-4]; sub ecx,0x178 (0x738 - 0x5c0) -> Vehicle 0x0052a830; proves Bike reads a vtordisp and the Vehicle/Bike vbase delta",
-  "bindings": "LayoutProbe.bindings.json"
- },
- {
-  "class": "SoultreePhysicsCharacter",
-  "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "??0SoultreePhysicsCharacter@@QAE@H@Z",
-  "target_va": "0x00503c70",
-  "target_size": 202,
-  "expect": "exact",
-  "notes": "constructor (retail TU SoulTreePhysics.cpp, bracket 0x00503c50..0x00503d40): GameObject(1) under the hidden most-derived flag, SoultreePhysicsBaseObject(flags) 0x00500aa0, D3DIMSoultreeCharacter(flags) 0x004455b0, three vptrs + vtordisp, field_0x42c = 0; EH frame from the base subobjects. 202 bytes + 6 padding.",
-  "bindings": "LayoutProbe.bindings.json"
- },
- {
-  "class": "SoultreePhysicsCharacter",
-  "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "??1SoultreePhysicsCharacter@@UAE@XZ",
-  "target_va": "0x00503d40",
-  "target_size": 159,
-  "expect": "exact",
-  "notes": "destructor core (vbase-relative this): empty body; vptr/vtordisp restore, ~D3DIMSoultreeCharacter 0x004459a0 on the null-guarded secondary base, then ~SoultreePhysicsBaseObject 0x00501260. 159 bytes + 1 padding.",
-  "bindings": "LayoutProbe.bindings.json"
- },
- {
-  "class": "SoultreePhysicsCharacter",
-  "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?Tick@SoultreePhysicsCharacter@@UAEHM@Z",
-  "target_va": "0x00504210",
-  "target_size": 77,
-  "expect": "exact",
-  "notes": "GameObject slot 10 override: if slot 42 (vcall +0xa8) then motionActive = 0, motionCompleted = 1; then SoultreePhysicsBaseObject::Tick (0x005036f0) and GameObject::Tick (0x004693d0, result returned). 77 bytes + 3 padding.",
-  "bindings": "LayoutProbe.bindings.json"
- },
- {
-  "class": "SoultreePhysicsCharacter",
-  "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?Tick@SoultreePhysicsCharacter@@$4PPPPPPPM@A@AEHM@Z",
-  "target_va": "0x00504350",
-  "target_size": 8,
-  "expect": "exact",
-  "notes": "vtordisp thunk for slot 10 in the GameObject vbase vtable 0x00558004 (sub ecx,[ecx-4]; jmp 0x00504210); emitted with the definition. 8 bytes + 8 padding.",
-  "bindings": "LayoutProbe.bindings.json"
- },
- {
-  "class": "SoultreePhysicsCharacter",
-  "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "??_ESoultreePhysicsCharacter@@$4PPPPPPPM@A@AEPAXI@Z",
-  "target_va": "0x005042e0",
-  "target_size": 8,
-  "expect": "exact",
-  "notes": "vtordisp thunk for slot 0 (deleting destructor) in the GameObject vbase vtable SoultreePhysicsCharacter+1080 (sub ecx,[ecx-4]; jmp 0x005042f0); same shape as Vehicle's 0x0052b620. 8 bytes + 8 padding.",
   "bindings": "LayoutProbe.bindings.json"
  }
 ]

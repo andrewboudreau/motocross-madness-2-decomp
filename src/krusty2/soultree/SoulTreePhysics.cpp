@@ -1169,6 +1169,26 @@ GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const cha
     return static_cast<D3DIMSoultreeObject*>(this);
 }
 
+// ---- SoultreePhysicsCharacter (0x00503c70..0x0050448c) ------------------------------------
+// The character's constructor, destructor, Tick and small virtuals sit around its slot 40
+// loader, between SoultreePhysicsObject's loader (0x00503970) and the step loop.
+
+// Constructor (0x00503c70): the virtual base is built with GameObject(1) (`push 1` before
+// 0x00468ca0), both non-virtual bases receive the caller's argument (0x00500aa0,
+// 0x004455b0), and the only own-member store is the node pointer.  The class layout is
+// proven by samples/physics/hierarchy/LayoutProbe.cpp.
+SoultreePhysicsCharacter::SoultreePhysicsCharacter(int flags)
+    : GameObject(1), SoultreePhysicsBaseObject(flags), D3DIMSoultreeCharacter(flags)
+{
+    poseNode = 0;
+}
+
+// Destructor core (0x00503d40): no own cleanup; VC6 restores the vptrs/vtordisp and runs
+// ~D3DIMSoultreeCharacter (0x004459a0) then ~SoultreePhysicsBaseObject (0x00501260).
+SoultreePhysicsCharacter::~SoultreePhysicsCharacter()
+{
+}
+
 // SoultreePhysicsCharacter slot 40 (0x00503de0, `ret 0x6c`).  The same loader for the
 // character: D3DIM character slot 11 instead of the object's slot 9, line 0x8cd, the pose
 // node set from the model node, and shape setup 0x004324b0 when no ".col" file exists.
@@ -1218,6 +1238,93 @@ GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int cr
         GameObject::AppendChild(child, -1);
     }
     return this;
+}
+
+// SoultreePhysicsCharacter small virtuals.  SoultreePhysicsBaseObject::field_0x128 is the
+// CollisionObject that slot 2 creates (`new` of 0xb8 bytes, ctor 0x00431e70, tier 1).
+
+// slot 1 (0x005040c0): base slot 1 then clears four flag bytes.
+void SoultreePhysicsCharacter::ResetDynamicState(float extraWeight)
+{
+    SoultreePhysicsBaseObject::ResetDynamicState(extraWeight);
+    motionActive = 0;
+    motionCompleted = 0;
+    motionJustStarted = 0;
+    motionIndex = 0;
+}
+
+// slot 8 (0x005041c0)
+void SoultreePhysicsCharacter::UpdateLocalCenterOfMass()
+{
+    rotationPivot = localCenterOfMass = poseNode->WorldToLocalPoint(centerOfMass);
+}
+
+// slot 42 (0x00504470)
+int SoultreePhysicsCharacter::CheckMotionComplete()
+{
+    if (motionIndex >= 0 && motionActive) {
+        return 1;
+    }
+    return 0;
+}
+
+// slot 33 (0x005040f0), retail `ret 0x18`
+int SoultreePhysicsCharacter::ResetToPlacement(const Vec3* newPosition, const Vec3* newForward,
+                                                   const Vec3* newUp, const Vec3* settleUp,
+                                                   int keepPlacement, float extraWeight)
+{
+    ResetDynamicState(extraWeight);
+    bodyForward = *newForward;
+    bodyUp = *newUp;
+    sceneNode->SetPosition(newPosition->x, newPosition->y, newPosition->z);
+    sceneNode->GetPosition(&position);
+    ResetBodyOrientation();
+    if (centerNode) {
+        centerNode->GetPositionIn(0, &centerOfMass);
+    } else {
+        sceneNode->GetPositionIn(0, &centerOfMass);
+    }
+    ApplyRestPose();
+    collisionObject->SnapPlacement();
+    respawnPending = 0;
+    justReset = 1;
+    attachmentResetPending = 1;
+    return 0;
+}
+
+// GameObject slot 10 override (0x00504210, reached through the vtordisp thunk 0x00504350).
+// When slot 42 reports true, motionActive is cleared and motionCompleted set (both are cleared by
+// slot 1); then the physics update (SoultreePhysicsBaseObject, 0x005036f0) and the plain
+// GameObject update (0x004693d0) run with the same frame time.  Tier 1 control flow.
+int SoultreePhysicsCharacter::Tick(float dt)
+{
+    if (CheckMotionComplete()) {
+        motionActive = 0;
+        motionCompleted = 1;
+    }
+    SoultreePhysicsBaseObject::Tick(dt);
+    return GameObject::Tick(dt);
+}
+
+// slot 41 (0x00504360)
+void SoultreePhysicsCharacter::EndMotion()
+{
+    poseNode->GetAxesIn(0, &savedForward, &savedUp);
+    modelNode->SetAxesIn(0, &savedForward, &savedUp, 1, 0);
+    ApplyRestPose();
+    motionActive = 0;
+    LoadBodyAxes();
+    OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll, &bodySinRoll,
+              &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
+    savedForward = bodyForward;
+    savedUp = bodyUp;
+    savedYaw = bodyYaw;
+    savedPitch = bodyPitch;
+    savedRoll = bodyRoll;
+    savedSinRoll = bodySinRoll;
+    savedCosRoll = bodyCosRoll;
+    savedCosPitch = bodyCosPitch;
+    savedSinPitch = bodySinPitch;
 }
 
 // ---- per-frame step loop (0x00502f60) ----------------------------------------------------

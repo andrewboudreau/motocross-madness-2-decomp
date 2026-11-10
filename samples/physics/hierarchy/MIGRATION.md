@@ -45,7 +45,7 @@ The committed files under `samples/physics/` are now the hand-edited source of t
 
 No generators wrote into `collision/` or `constraint/`. The scripts in `work/b2_collision`, `work/b_soultree_collision` and `work/f_constraint` only compile and match, so there was nothing to retire.
 
-- **`collision/SoultreePhysicsCharacter.h` is deleted.** `collision/SoultreePhysicsCharacter.cpp` includes the canonical header and `SoultreePhysicsCallees.h`.
+- **`collision/SoultreePhysicsCharacter.h` is deleted.** `collision/SoultreePhysicsCharacter.cpp` included the canonical header and `SoultreePhysicsCallees.h`; its bodies now live in `src/krusty2/soultree/SoulTreePhysics.cpp`.
   - `field_0x21c.Fn_4a8b00()` became `ApplyRestPose()`.
   - `field_0x3bc` became `d3d_field_0x1a0`.
   - Slot 33's `a4` is `const SoultreeVec3*`.

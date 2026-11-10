@@ -37,7 +37,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
 | `collision/` | `CollisionObject.cpp` (+ `CollisionObject.h`, `CollisionShapeTests.h`, `CollisionTypes.h`): 65 strict cases of 79; `CollisionPoint.cpp` (+ `CollisionPoint.h`, `CollisionPointCtor.h`): 18 strict cases |
 | `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts); `ObjectPlacement.cpp`: 8 strict cases |
-| `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 47 strict cases of 52; `SoultreeQuadTreeRenderer.cpp`: 9 strict cases; `soultree.cpp` (SoultreeObject): 65 strict cases |
+| `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 63 strict cases of 65; `SoultreeQuadTreeRenderer.cpp`: 9 strict cases; `soultree.cpp` (SoultreeObject): 65 strict cases |
 | `gravity/` | `SelectiveGravityModel.cpp`: 15 strict cases |
 | `rigidbody/` | `PhysicsBody.cpp` (`0x4cbc50..0x4cc05c`) and `PhysicsRigidBody.cpp` (`0x4cc060..0x4ccbcc`) with the shared `PhysicsBody.h` (unattested names, provisional; RTTI PhysicsBody/PhysicsRigidBody, one Math3D vector set each): 44 strict cases. The game build reaches the constructor through `src/bringup/Group5_WreckerRigidBody.cpp` |
 | `suspension/` | `Shock.cpp` (unattested name, provisional; RTTI Shock/InlineShock/RotatingShock, extent `0x4f9a60..0x4fb1d7`): 27 strict cases; the class declarations are in `src/reconstructed/Suspension.h`, and `InlineShock::UpdateAxis` is the included body `src/reconstructed/InlineShockAxis.cpp`. The game build links it through the forwarding shims in `src/bringup/Group4_VehicleShock.cpp` |
