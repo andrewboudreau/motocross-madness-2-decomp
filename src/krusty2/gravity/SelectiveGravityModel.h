@@ -18,7 +18,7 @@
 
 // The rigid body the model pushes on, as seen through its vtable.  Slots 0..26 are the
 // GameObject ones; slots 27..36 are placeholders and slot 37 is AddWorldForce (the PhysicsBody
-// vtable 0x00556e0c, samples/physics/rigidbody/PhysicsBody.h).  Identity of the body class is
+// vtable 0x00556e0c, src/krusty2/rigidbody/PhysicsBody.h).  Identity of the body class is
 // provisional (tier 3); the slot offset 0x94 and the mass at +0x178 are decoded (tier 1).
 class GravityBody : public GameObject {
 public:

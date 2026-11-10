@@ -4,7 +4,7 @@
 #include <string.h>
 #include <float.h>
 #include <stddef.h>
-#include "../../samples/physics/rigidbody/PhysicsBody.h"
+#include "../../src/krusty2/rigidbody/PhysicsBody.h"
 
 typedef Quat* (__cdecl *NormalizeFn)(Quat*,const Quat*);
 struct ResetCall { void Reset(); };

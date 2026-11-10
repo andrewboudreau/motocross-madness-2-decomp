@@ -22,7 +22,7 @@ import test_eco_quadtree_connections as views
 ROOT=Path(__file__).resolve().parents[1]
 STATE='src/reconstructed/QuatState.cpp'
 QUAT='src/reconstructed/QuatUtil.cpp'
-RIGID='samples/physics/rigidbody/PhysicsRigidBody.cpp'
+RIGID='src/krusty2/rigidbody/PhysicsRigidBody.cpp'
 VALUE='?g_QuatIdentity@@3UQuat@@A'
 NORMALIZE='?QuatNormalize@@YA?AUQuat@@ABU1@@Z'
 RESET='?ResetState@PhysicsRigidBody@@UAEXXZ'
@@ -122,10 +122,10 @@ class QuaternionStorageTests(unittest.TestCase):
                 self.assertEqual(fingerprint(whole(obj)),pin,source)
             full=objects['PhysicsRigidBody']
             original=(ROOT/RIGID).read_text();reset_source=out/'ResetState.cpp'
-            reset_source.write_text('#include <string.h>\n#include "'+str(ROOT/'samples/physics/rigidbody/PhysicsBody.h').replace('\\','/')+'"\n'+extract(original,'void PhysicsRigidBody::ResetState()')+'\n')
+            reset_source.write_text('#include <string.h>\n#include "'+str(ROOT/'src/krusty2/rigidbody/PhysicsBody.h').replace('\\','/')+'"\n'+extract(original,'void PhysicsRigidBody::ResetState()')+'\n')
             reset=compile_source(reset_source,'reset')
             self.assertEqual(function(reset,RESET),function(full,RESET))
-            self.assertTrue(compare(pe,reset,RESET,0x4cc500,256,ROOT/'samples/physics/rigidbody/PhysicsRigidBody.bindings.json')['strict_exact'])
+            self.assertTrue(compare(pe,reset,RESET,0x4cc500,256,ROOT/'src/krusty2/rigidbody/PhysicsRigidBody.bindings.json')['strict_exact'])
             strict=1
             for case in CASES:
                 if case['source']!=QUAT:continue
@@ -134,7 +134,7 @@ class QuaternionStorageTests(unittest.TestCase):
             # The extracted consumer's actual local zero vector is initialized
             # through the same complete strict code as the original sample.
             for va,size,name in ((0x4cca90,5,'_$E2'),(0x4ccaa0,60,'_$E1')):
-                self.assertTrue(compare(pe,reset,name,va,size,ROOT/'samples/physics/rigidbody/PhysicsRigidBody.bindings.json')['strict_exact'])
+                self.assertTrue(compare(pe,reset,name,va,size,ROOT/'src/krusty2/rigidbody/PhysicsRigidBody.bindings.json')['strict_exact'])
                 self.assertEqual(function(reset,name),function(full,name));strict+=1
             fixture=compile_source(ROOT/'tests/fixtures/quaternion_storage_compare.cpp','fixture')
             def execute(provider,label):

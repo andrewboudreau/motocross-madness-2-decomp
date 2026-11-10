@@ -150,8 +150,8 @@ class WreckerConstraintConnections(unittest.TestCase):
                 self.assertEqual(run.returncode,0,run.stdout+run.stderr)
                 objects[label]=CoffObject(dest);paths[label]=dest;return objects[label]
             for label,source in (('caller',CALLER),('sample',SAMPLE),('provider',PROVIDER),
-                ('bike','src/krusty2/vehicle/Bike.cpp'),('rigid','samples/physics/rigidbody/PhysicsRigidBody.cpp'),
-                ('body','samples/physics/rigidbody/PhysicsBody.cpp'),
+                ('bike','src/krusty2/vehicle/Bike.cpp'),('rigid','src/krusty2/rigidbody/PhysicsRigidBody.cpp'),
+                ('body','src/krusty2/rigidbody/PhysicsBody.cpp'),
                 ('scene','src/krusty2/soultree/soultree.cpp'),('allocator','src/reconstructed/MemTag.cpp')):
                 # These callers also belong to standalone calibration, where
                 # their shared header must resolve without project include flags.
@@ -178,9 +178,9 @@ class WreckerConstraintConnections(unittest.TestCase):
                 self.assertEqual(value['digest'],digest)
             for label,symbol,va,size,binding_path in (
                 ('bike','?CreateWrecker@Bike@@',0x409420,1516,'src/krusty2/vehicle/Bike.bindings.json'),
-                ('rigid','??0PhysicsRigidBody@@',0x4cc120,160,'samples/physics/rigidbody/PhysicsRigidBody.bindings.json'),
+                ('rigid','??0PhysicsRigidBody@@',0x4cc120,160,'src/krusty2/rigidbody/PhysicsRigidBody.bindings.json'),
                 ('scene','?FindByName@SoultreeObject@@',0x4fdae0,84,'src/krusty2/soultree/soultree.bindings.json'),
-                ('body','?SetNode@PhysicsBody@@',0x4cbdf0,17,'samples/physics/rigidbody/PhysicsBody.bindings.json')):
+                ('body','?SetNode@PhysicsBody@@',0x4cbdf0,17,'src/krusty2/rigidbody/PhysicsBody.bindings.json')):
                 self.assertTrue(compare(image,objects[label],symbol,va,size,ROOT/binding_path)['strict_exact'],symbol);strict+=1
             targets=set(RENAMES.values())
             for label in ('caller','sample'):

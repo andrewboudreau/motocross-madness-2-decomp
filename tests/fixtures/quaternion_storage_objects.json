@@ -6,7 +6,7 @@
       "relocations": 43,
       "sha256": "0f11d3514d06dea8d0cd99d15747b5125cf7cf1c5878771546cd3fc7319b9e2c"
     },
-    "samples/physics/rigidbody/PhysicsRigidBody.cpp": {
+    "src/krusty2/rigidbody/PhysicsRigidBody.cpp": {
       "sections": 49,
       "relocations": 142,
       "sha256": "2144d8b994fe24cd037384ee55b37499090381b71aed45882fdc84b268fedf63"
@@ -19,7 +19,7 @@
   },
   "filenames": [
     "src/reconstructed/QuatUtil.cpp",
-    "samples/physics/rigidbody/PhysicsRigidBody.cpp",
+    "src/krusty2/rigidbody/PhysicsRigidBody.cpp",
     "src/reconstructed/Math3D.cpp"
   ]
 }

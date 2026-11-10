@@ -8,7 +8,7 @@
 // math/Math3D.h defines the same operations inline, which VC6 would expand;
 // so the operators here are declared, not defined, to force the same calls.
 // The physics body / node classes are minimal views of PhysicsBody
-// (samples/physics/rigidbody/PhysicsBody.h) and SoultreeObject (core/SoultreeObject.h).
+// (src/krusty2/rigidbody/PhysicsBody.h) and SoultreeObject (core/SoultreeObject.h).
 #ifndef CONSTRAINT_TYPES_H
 #define CONSTRAINT_TYPES_H
 

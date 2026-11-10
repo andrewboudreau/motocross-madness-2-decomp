@@ -132,7 +132,7 @@ typedef D3DIMSoultreeCharacter UnknownWreckerCharacter;
 
 // Object at Wrecker+0x40: RTTI PhysicsRigidBody (new 0x2a8 at line 0x5f,
 // constructor 0x004cc120). Slots past GameObject's 27 are called by number.
-// Field names follow samples/physics/rigidbody/PhysicsBody.h (+0x178 is the
+// Field names follow src/krusty2/rigidbody/PhysicsBody.h (+0x178 is the
 // mass 0x00532150 scales by 1/12 for the box inertia).
 class UnknownWreckerRigidBody : public GameObject {
 public:

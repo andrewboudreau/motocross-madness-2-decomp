@@ -31,7 +31,7 @@ struct Group0GravityForce {
 // The body view slot 11 needs: PhysicsRigidBody slot 37 (0x004cc1f0,
 // ret 0xc) adds a world-space force to the accumulator at +0x210, and the
 // mass is at +0x178 (see Wrecker.h UnknownWreckerRigidBody,
-// samples/physics/rigidbody/PhysicsBody.h AddWorldForce). Never
+// src/krusty2/rigidbody/PhysicsBody.h AddWorldForce). Never
 // instantiated; only used to call through the body's own vtable.
 class Group0GravityBodyView {
 public:

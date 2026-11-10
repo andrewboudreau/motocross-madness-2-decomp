@@ -239,7 +239,7 @@ python -m unittest discover -s tests -p test_wrecker_model_connections.py -v
 
 Field names of the collaborator views follow the canonical krusty2 layouts:
 `CollisionObject.h` and `ConstraintMethodCollisionModel.h` (collision model,
-probe record), `samples/physics/rigidbody/PhysicsBody.h` (rigid body),
+probe record), `src/krusty2/rigidbody/PhysicsBody.h` (rigid body),
 `SoultreeObject.h` (`firstChild`, `subtreeDirty`) and `ParticleManager.h`
 (particle manager and particle). Wrecker's own fields are named from the
 data flow in the layout table: the three `int` arrays hold values passed to
