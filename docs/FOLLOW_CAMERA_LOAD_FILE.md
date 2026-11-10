@@ -59,6 +59,27 @@ assembly, machine-code embedding or production retail dispatch is used. The test
 retains both negative controls and requires their exact known failures under the
 current harness. A failing control stops early; it does not execute every case.
 
+### Inline first-cross forms ruled out
+
+Retail expands the first cross inline: it stores each component to float in a
+temporary, copies the temporary into the side vector, and reads the temporary
+for the second cross. It calls 0x515600 only for the final `cross(up, forward)`.
+Every inline form tried leaves the first cross on the x87 stack, or drops its
+stores as dead, which brings back the extra precision. None of these forms is
+retained (952-960 bytes, 489-520 strict positions):
+
+- **Helper bodies:**
+  - the constructor-return helper, with or without parenthesised first
+    products
+  - a named `Vec3 r` filled component by component
+  - d3dvec.inl's `result[0..2]` indexed form
+  - an out-reference `CrossInto(r, a, b)` helper
+- **Call sites:**
+  - `side` declared at the call versus assigned later
+  - the forward copy placed before versus after the cross
+  - crossing with `forward` instead of `direction`
+  - `up` as a separate local normalised in place
+
 ## Source helpers, CRT and exception boundaries
 
 The native test executes actual source stream construction (77 bytes) and destruction (15 bytes),
