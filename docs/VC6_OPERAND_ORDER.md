@@ -533,8 +533,11 @@ trying on other `[base+index]` / `add r, r` order near misses.
   top-tested loop instead, see FontTexture.)
   A loop with a count test at the head and a different exit test at the bottom
   (`cmp i, count; jge exit` at the top, `fcomp t, limit` as the back edge) is
-  `while (1) { if (i >= count) break; ...; i++; t += step; if (t > limit) break; }`;
-  `for (i = 0; i < count && ...; i++)` rotates it (KrustyBike `0x00414370`, +28).
+  `for (t = t0, i = 0; t <= limit; t += step) { if (i >= count) break; ...; i++; }`
+  (KrustyBike `0x00414370`: aligned 1092 -> 1157 of 1302 against the
+  `while (1) { ...; i++; t += step; if (t > limit) break; }` spelling, which keeps
+  the heads but not retail's `t <= limit` back edge); `for (i = 0; i < count && ...; i++)`
+  rotates it.
 - A trailing `return X;` after an if-block merges with an earlier identical return, so
   failure paths jump back to it; `goto failed` or an early return emits a second copy.
 - An error check folded into a later combined test (`if (r < 0 && r != E)` covering two

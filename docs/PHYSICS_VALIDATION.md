@@ -230,9 +230,9 @@ Five near misses and one exact COMDAT are in `samples/physics/bikeai`:
   and the 1120 instructions match, the 0x74 frame too, but slot 11's out-vectors sit
   at other offsets and the angular-velocity cross products load their operands in
   another order;
-- the KrustyBike racing-line builder `0x414370` (4802 bytes, 8.5%): block order and
-  calls match; frame 0x74 vs 0x78 and the kind 1/5 gate-distance test is placed
-  after the single-point and no-track paths instead of before them.
+- the KrustyBike racing-line builder `0x414370` (4802 bytes, 8.5%): block order,
+  calls and the 0x78 frame match (linked masked 0.962); register allocation and
+  statusNode reloads in the kind 1/5 gate line differ.
 
 `0x40eca0` exhausts VC6's per-function inline budget. Its first part expands every
 Vec3 operator; from `0x410d00` the operators are expanded but call the
