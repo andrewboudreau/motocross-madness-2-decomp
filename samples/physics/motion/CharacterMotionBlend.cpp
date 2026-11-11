@@ -5,8 +5,12 @@
 void InterpolatePose(CharacterPose*, CharacterPose*, CharacterPose*, float);
 
 
-// Retail's first interpolation expands through these out-of-line value operations.
-static void BlendFirst(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t)
+// Retail's first interpolation expands through these out-of-line value operations,
+// inline in the method body (retail has no out-of-line copy; `inline` gives the
+// same 22 calls in place). Audited 2026-11-11: no behavioural difference. Left:
+// retail's two CharacterPose constructor calls (0x004a8930) and its inline-asm
+// fistp (EBP frame) where this calls FloatToInt.
+static inline void BlendFirst(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t)
 {
     if (t < 0.0f) t = 0.0f;
     else if (t > 1.0f) t = 1.0f;

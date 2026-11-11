@@ -2,7 +2,7 @@
 
 `Character::Method_0x004a8c50(int, int, float, float)` is a reviewed-nonexact source implementation. The complete retail body is 1,011 bytes, ending with RET 16 at 0x004a9040..0x004a9042. The following 13 NOPs precede the next function at 0x004a9050. Every decoded branch stays inside that extent. Method naming and original translation-unit ownership remain provisional.
 
-Authentic VC6 emits a 441-byte method, a 652-byte private first-interpolation helper, and the existing 368-byte conversion helper. Ordinary helper calls change code layout and stack allocation. No production source contains copied retail instructions or retail dispatch.
+Authentic VC6 emits a 1,136-byte method (the private first-interpolation helper `BlendFirst` is `inline` and expands in place, as retail's does) and the existing 368-byte conversion helper. The conversion helper call, the missing CharacterPose constructor calls (retail calls 0x004a8930 twice) and retail's inline-assembly FISTP with its EBP frame change code layout and stack allocation. Before the helper was inlined, the method was 441 bytes plus a 652-byte out-of-line helper; inlining raised match_one's aligned instructions from 34 to 128 of 341 without changing any harness result. No production source contains copied retail instructions or retail dispatch.
 
 ## Receiver and call boundary
 
@@ -22,7 +22,7 @@ The start candidate's complete 14-section/24-relocation object is unchanged afte
 
 ## Actual helper closure and separate dot repair
 
-Retail's first interpolation expands through out-of-line vector operations. Replacing it with a third InterpolatePose call produces an observable PC24 mismatch. `BlendFirst` therefore retains the actual subtract, scale, add, normalize and cross providers. Its 22 direct calls are three subtractions, nine scales, six additions, two normalizations and two cross products. The final three add results are unused, but their six scales and three additions remain emitted; possible FP/read side effects are not deleted.
+Retail's first interpolation expands through out-of-line vector operations. Replacing it with a third InterpolatePose call produces an observable PC24 mismatch. `BlendFirst` therefore retains the actual subtract, scale, add, normalize and cross providers. Its 22 direct calls (now emitted in the method, like retail's 22 calls to 0x00421d00/0x005015b0/0x00421cb0/0x005087b0/0x00515600) are three subtractions, nine scales, six additions, two normalizations and two cross products. The final three add results are unused, but their six scales and three additions remain emitted; possible FP/read side effects are not deleted.
 
 The second interpolation and final blend call the existing full 1,205-byte InterpolatePose. Its old header-inline DotProduct emitted 29 bytes with a different addition association. The retained PC24 control demonstrates the resulting mismatch despite the strict calling body. Interpolation-specific inline length/unit helpers now call the actual strict Vec3DotCall. Exactly two relocation destinations change in InterpolatePose; all instruction bytes and its full extent remain identical. Every other Motion aggregate section is unchanged, including the old inline DotProduct used elsewhere. This is not a general repair/acceptance claim for those other methods.
 

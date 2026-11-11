@@ -132,12 +132,15 @@ class CharacterMotionBlendTests(unittest.TestCase):
             compile_file('src/reconstructed/Math3D.cpp', 'math')
             compile_file('src/reconstructed/CrossProduct.cpp', 'cross')
             compile_file('tests/fixtures/character_motion_blend_compare.cpp', 'fixture', ('/Od', '/Op'))
-            self.assertEqual(complete(candidate, SYMBOL)[1], 441)
-            self.assertEqual(complete(candidate, '?BlendFirst@@')[1], 652)
+            # BlendFirst is inlined into the method, as retail expands the first interpolation in place.
+            self.assertEqual(complete(candidate, SYMBOL)[1], 1136)
+            self.assertFalse([symbol for symbol in candidate.symbols if symbol.name.startswith('?BlendFirst@@')])
             self.assertEqual(complete(candidate, '?FloatToInt@@')[1], 368)
-            self.assertEqual(Counter(name.split('@@')[0] for _, kind, name in complete(candidate, '?BlendFirst@@')[2] if kind == 20),
+            # Retail 0x4a8c50 makes the same 22 vector calls and two InterpolatePose calls; its two
+            # CharacterPose constructor calls (0x4a8930) and inline fistp have no counterpart here.
+            self.assertEqual(Counter(name.split('@@')[0] for _, kind, name in complete(candidate, SYMBOL)[2] if kind == 20),
                 Counter({'?Vec3SubtractCall': 3, '?Vec3ScaleCall': 9, '?Vec3AddCall': 6,
-                         '?Vec3Normalize': 2, '?CrossProductCall': 2}))
+                         '?Vec3Normalize': 2, '?CrossProductCall': 2, '?InterpolatePose': 2, '?FloatToInt': 2}))
             bss = [section for section in candidate.sections if section.name == '.bss']
             crt = [section for section in candidate.sections if section.name == '.CRT$XCU']
             self.assertEqual([(section.raw_size, section.characteristics) for section in bss], [(60, 0xc0400080)])

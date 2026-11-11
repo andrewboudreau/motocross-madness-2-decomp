@@ -146,7 +146,7 @@
       "extra_flags": [
         "/QIfist"
       ],
-      "reason": "Complete 1011-byte retail two-motion blend reconstructed as ordinary 441-byte method, 652-byte first interpolation and shared 368-byte conversion helper. Passes 576692 finite native cases with actual strict math helpers and three failing controls. Separate InterpolatePose repair changes exactly two dot-call relocations while preserving its full strict 1205-byte body. Candidate-only /QIfist preserves current-rounding conversion exception behavior. Prepared storage and bounded slot4 callbacks; temporary pose padding and x87 TOP/register context/resumption are excluded. Integrated animation remains unverified.",
+      "reason": "Complete 1011-byte retail two-motion blend reconstructed as an ordinary 1136-byte method (inline first interpolation, as retail) and shared 368-byte conversion helper. Passes 576692 finite native cases with actual strict math helpers and three failing controls. Separate InterpolatePose repair changes exactly two dot-call relocations while preserving its full strict 1205-byte body. Candidate-only /QIfist preserves current-rounding conversion exception behavior. Prepared storage and bounded slot4 callbacks; temporary pose padding and x87 TOP/register context/resumption are excluded. Integrated animation remains unverified.",
       "evidence": "docs/CHARACTER_MOTION_BLEND.md#functional-build-review"
     },
     {
