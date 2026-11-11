@@ -18,6 +18,11 @@
 // (441 against 468 instructions and a 0.796 similarity when X87FloatToInt is called out of
 // line; inlined, each of its six sites adds about 60 instructions) and the frame (retail's
 // helper forces an ebp frame of 0xe4 bytes).
+// Kept as a stand-in instead of linking the sample (slot 30 linked 0.571, sample 0.871):
+// the sample rounds the clipped corners with `(int)(v - 0.5f)`, which truncates through
+// __ftol, so corners with a fraction below one half land one pixel low and values in
+// (-0.5, 0.5) give 0, where retail's fistp gives floor(v). Its outcode array is also a
+// one-entry placeholder that the per-vertex loop overruns.
 #include "shadow/D3DIMSoultreeShadow.h"
 #include "math/Vec3.h"
 #include "Matrix4.h"

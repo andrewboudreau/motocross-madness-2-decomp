@@ -4,7 +4,8 @@
 //   QuarryStuntEvent's argument types; Krusty3DObjects.cpp defines the same retail
 //   function with Krusty3DObjects.h's types.  The QuarryEvent overload forwards
 //   every argument unchanged (the light manager travels as the int `lights`).
-// * VisualCue::Tick (Group1_VisualCueTick.cpp) calls two provisional view methods
+// * VisualCue::Tick (samples/race/Krusty3DObjectsNearMisses.cpp, a game-build candidate
+//   source) calls two provisional view methods
 //   whose retail targets are already reconstructed under canonical classes:
 //     UnknownRunwayTerrain::QueryGround 0x00507c10 = Terrain::QueryGround
 //     UnknownBonusRacerPart::GetPosition 0x004fc970 = SoultreeObject::GetPosition

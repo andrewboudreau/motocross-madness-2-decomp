@@ -6,15 +6,16 @@
 // The view's position writer is retail 0x004210f0, bound in src as
 // BikeRace::WriteRelativePositions (BikeRace.bindings.json); RaceView.h's view
 // declares the same function on UnknownKrustyBikeView (a view of the same object,
-// BikeRace.h). It is called through a BikeRace view here so no second name is introduced.
+// BikeRace.h). The body calls it through the view, as the sample does, and a link_aliases
+// entry binds the view's name to BikeRace's definition (same arguments, no this
+// adjustment). The former BikeRace-view local changed the register assignment
+// (linked 0.938; the sample form scores 0.979).
+//
+// Kept as a stand-in instead of linking the sample: the sample's slot 46 vector is a
+// zero-initialised static, where retail's 0x0067c3e8 is the unit's kVec3YAxis (0, 1, 0);
+// this copy keeps the correct value.
 #include "../reconstructed/KrustyBikeCamera.h"
 #include "../reconstructed/TrackGame.h"
-
-class BikeRace {
-public:
-    // 0x004210f0: writes two positions relative to `reference`.
-    void WriteRelativePositions(Vector3* a, Vector3* b, void* reference, int flags);
-};
 
 namespace {
 
@@ -53,13 +54,12 @@ int KrustyBikeCamera::Tick(float frameTime) {
     if (raceView->networkStartPending) {
         Vector3 first;
         Vector3 second;
-        BikeRace* race = (BikeRace*)raceView;
         if (!s_networkStartViewActive) {
             s_networkStartViewActive = true;
-            race->WriteRelativePositions(&second, &first, g_TrackGame->bajaEnduroEvent, 0);
+            raceView->WriteRelativePositions(&second, &first, g_TrackGame->bajaEnduroEvent, 0);
             FollowCamera::BuildOrientationBasis(&first, &s_upAxis);
         }
-        race->WriteRelativePositions(&first, &second, g_TrackGame->bajaEnduroEvent, 0);
+        raceView->WriteRelativePositions(&first, &second, g_TrackGame->bajaEnduroEvent, 0);
         first.y = raceView->localRacer->position.y + 2.0f;
         FollowCamera::PlayRecordedFrame(frameTime, &first);
         return 1;

@@ -1,33 +1,128 @@
 // Group5 bring-up definitions (best-guess, link frontier). Not strict matches.
 //
-// ProjectedShadow::ComputeBounds (0x004db0d0), RenderShadow (0x004db8c0),
-// Present (0x004dbd30) and TintCasterVertices (0x004dc2b0), extracted from
-// samples/physics/shadow/ProjectedShadowNearMisses.cpp. Changes from the
-// sample, all behavior-preserving or closer to retail:
-//  * the sample's declared-only call views (ShadowMatrixMultiplyInto and the
-//    out-of-line ShadowVec3Call constructor) are replaced by the provided
-//    ShadowMatrixMultiply and an inline constructor, so nothing new is left
-//    unresolved;
-//  * retail rounds the projected coordinates with an inline `fistp` (current
-//    FPU rounding mode, round-to-nearest-even), not a truncating cast;
-//    X87FloatToInt reproduces it without inline assembly.
-// RenderShadow and Present were compared with retail instruction by
-// instruction and agree apart from the rounding sites.  They score below the
-// sample in linked_accuracy only because X87FloatToInt inlines to about 62
-// instructions a site; the sample's ProjectedShadowFloatToInt (an (int) cast
-// through __ftol and a ties-to-even fix) is shorter but ignores the FPU
-// rounding mode, and the sample's call views are declared without bodies, so
-// the sample cannot be linked as it stands.  Present has no rounding site and
-// is the same in both (0.701).
+// ProjectedShadow::Init (0x004da7b0), ComputeBounds (0x004db0d0), RenderShadow
+// (0x004db8c0), Present (0x004dbd30) and TintCasterVertices (0x004dc2b0), from
+// samples/physics/shadow/ProjectedShadowNearMisses.cpp.
+//  * Init and ComputeBounds are the sample's text. Their call views are bound by
+//    link_aliases to the providers at the same retail addresses: ShadowTexture's
+//    constructor to PCTextureMap's (0x004c5f00, both 0x80 bytes), ShadowCameraProxy's
+//    to ShadowCamera's (0x004da520, both 0x220 bytes), ShadowCameraProxy::SetLensScale
+//    to Camera::SetFieldOfView (0x0042e930), ShadowRenderTarget::SetOwner to
+//    RenderTarget::SetCamera (0x004e8cf0), ShadowMatrixMultiplyInto to MatrixMult
+//    (0x004a1860, hidden result pointer first) and the ShadowVec3Call constructor to
+//    Vec3Call's (0x00404e60). KrustyUI.cpp calls Init as UnknownKrustyUIShadow::Init
+//    (it reinterprets the 0x134-byte ProjectedShadow), aliased here too. The former
+//    copies (Group3_KrustyUIShadow.cpp, which called the providers under their own
+//    names, and an inline-constructor ComputeBounds) linked at 0.892 and 0.924.
+//  * RenderShadow and TintCasterVertices keep a deliberate difference from the
+//    sample: retail rounds the projected coordinates with an inline `fistp`
+//    (current FPU rounding mode), and X87FloatToInt reproduces that without inline
+//    assembly. The sample's ProjectedShadowFloatToInt (an (int) cast through __ftol
+//    and a ties-to-even fix) scores higher (0.688 and 0.638 against 0.545 and
+//    0.511, because X87FloatToInt inlines to about 62 instructions a site) and
+//    gives the same results in the default round-to-nearest mode, but ignores the
+//    FPU rounding mode, so these two are not switched. They were compared with
+//    retail instruction by instruction and agree apart from the rounding sites.
+//    Present has no rounding site and is the same in both (0.701).
+//  * The sample is not linked as a whole: it includes the canonical
+//    ProjectedShadow.cpp, which the game build compiles on its own.
+#include "TrackGameGlobal.h"
 #include "shadow/ProjectedShadow.h"
 #include "X87FloatToInt.h"
 
 #include <math.h>
+#include <stdio.h>
 
 // The per-file stand-in vector constructor (as in ProjectedShadow.cpp).
 struct ShadowConstVec3 : ShadowVec3 {
     ShadowConstVec3(float x_, float y_, float z_) { x = x_; y = y_; z = z_; }
 };
+
+// 0x004da7b0: binds the shadow to its render target, picks a surface format from the device
+// capabilities (and the DriverInfo\<driver>\DestColorShadow setting), creates the shadow
+// texture and camera and retargets the render target at the texture while the camera is built.
+// Returns this, or 0 after releasing the object when no usable format or allocation exists.
+// Near miss: block layout, frame and the tail match (the clip rectangle stored left, right,
+// top, bottom reproduces retail's reload of the texture size).  Nesting the texture and camera
+// success path under one shared release-and-return-0 gives retail's two failure blocks (the
+// surface-format failure keeps its own copy).  Left: register choice in the sprintf/QueryFlag
+// argument set-up and the saved render-target fields (retail keeps width in ebx, surface in
+// ebp and spills height; VC6 here spills width), 841 bytes against 842.
+ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* textureOwner)
+{
+    GameObject::SetRenderContext((void*)target);
+    field_0x5c = (int)target;
+
+    char name[0x100];
+    sprintf(name, "DriverInfo\\%s\\DestColorShadow", Host()->display->driverName);
+    if (reinterpret_cast<ShadowSettings*>(g_TrackGame)->QueryFlag(name, 0) && (Host()->capsA & 0x100) && (Host()->capsB & 1)) {
+        formatA = 9;
+        formatB = 1;
+    } else {
+        unsigned int caps = Host()->capsA;
+        if ((caps & 0x10) && (Host()->capsB & 0x20)) {
+            formatA = 5;
+            formatB = 6;
+        } else if ((caps & 1) && (Host()->capsB & 0x10)) {
+            formatA = 1;
+            formatB = 5;
+        } else if (caps & 0x800) {
+            formatA = 0xc;
+            formatB = 2;
+        } else {
+            Release();
+            return 0;
+        }
+    }
+
+    if (Host()->IsFormatSupported(0x115c)) {
+        surfaceFormat = 0x115c;
+    } else if (Host()->IsFormatSupported(0x613) && (Host()->capsC & 0x2000)) {
+        surfaceFormat = 0x613;
+        field_0x98 = 0;
+    } else {
+        Release();
+        return 0;
+    }
+
+    texture = new(__FILE__, 0xaa) ShadowTexture(textureOwner, 1);
+    if (texture
+        && texture->Create(0, 0x80, 0x80, 0x80, 0x80, surfaceFormat, surfaceFormat, 0, 8, 0, 0, 0,
+                           formatA, formatB, 0, 0x80, 0xff00ff)) {
+        texture->UnknownVirtualSlot8(1, 0, 1);
+        field_0x60 = texture->pixels;
+        if (field_0x60) {
+            texture->surface->PageLock(0);
+
+            int savedHeight = Host()->height;
+            void* savedSurface = Host()->surface;
+            int savedWidth = Host()->width;
+            Host()->width = texture->size;
+            Host()->height = texture->height;
+            Host()->surface = texture->pixels;
+            ShadowOwner* owner = Host()->owner;
+
+            camera = new(__FILE__, 0xcd) ShadowCameraProxy(1);
+            if (camera && camera->SetRenderContext((void*)Host())) {
+                Host()->surface = savedSurface;
+                Host()->width = savedWidth;
+                Host()->height = savedHeight;
+                Host()->SetOwner(owner);
+                Host()->device->SetTransformLike(owner->block_0x1a0);
+                camera->SetLensScale(0.3f);
+                for (int bits = 0x40; bits; bits >>= 1)
+                    sizeShift++;
+                clipRect.left = 0;
+                clipRect.right = texture->size - 1;
+                clipRect.top = 0;
+                clipRect.bottom = texture->size - 1;
+                return this;
+            }
+        }
+    }
+    Release();
+    return 0;
+}
 
 // 0x004dc2b0 (352 B): paints shadowColor into the colour word (+0x10 of 0x20-byte vertices) of
 // every caster vertex whose projected position lands on a height-map cell equal to colorKeyLow.
@@ -78,6 +173,14 @@ static inline void ShadowTransformCoord(ShadowVec3* r, ShadowVec3 v, const Shado
 static inline ShadowVec3 ShadowDifference(const ShadowVec3& a, const ShadowVec3& b) { return ShadowConstVec3(a.x - b.x, a.y - b.y, a.z - b.z); }
 static inline ShadowVec3 ShadowSum(const ShadowVec3& a, const ShadowVec3& b) { return ShadowConstVec3(a.x + b.x, a.y + b.y, a.z + b.z); }
 static inline ShadowVec3 ShadowScale(const ShadowVec3& a, float s) { return ShadowConstVec3(a.x * s, a.y * s, a.z * s); }
+// Out-of-line call views, declared only and bound to the retail copies: ShadowMatrixMultiply
+// 0x004a1860 with its hidden result pointer spelt out (ComputeBounds copies straight from the
+// returned pointer, so both modes share one tail), and the Vec3(float, float, float) COMDAT
+// constructor 0x00404e60 (thiscall, ret 0xc) that ComputeBounds calls instead of inlining.
+ShadowMatrix* ShadowMatrixMultiplyInto(ShadowMatrix* out, ShadowMatrix a, ShadowMatrix b);
+struct ShadowVec3Call : ShadowVec3 {
+    ShadowVec3Call(float x_, float y_, float z_);
+};
 static inline float AbsF(float v) { return v < 0.0f ? -v : v; }
 
 static inline void ShadowTransformExtents(ShadowVec3* out, ShadowVec3 h, const ShadowCaster* k)
@@ -103,6 +206,7 @@ int ProjectedShadow::ComputeBounds()
 {
     if (!casters)
         return 1;
+    ShadowMatrix product;
     ShadowVec3 boundsMin, boundsMax;
     boundsMin.x = boundsMin.y = boundsMin.z = 3.4028235e38f;
     boundsMax.x = boundsMax.y = boundsMax.z = -3.4028235e38f;
@@ -135,7 +239,7 @@ int ProjectedShadow::ComputeBounds()
         camera->SetLookAt(&eye, 0, 0, 0, 0);
         camera->UnknownVirtualSlot29(center);
         camera->UnknownVirtualSlot28();
-        lightMatrix = ShadowMatrixMultiply(projection, camera->matrix_0xac);
+        lightMatrix = *ShadowMatrixMultiplyInto(&product, projection, camera->matrix_0xac);
         return 1;
     } else if (mode == 1) {
         lightDir = ShadowDifference(center, lightVec2);
@@ -150,7 +254,7 @@ int ProjectedShadow::ComputeBounds()
             unitDir = dir;
         } else {
             float inv = FastInvSqrt(sq);
-            unitDir = ShadowConstVec3(dir.x * inv, dir.y * inv, dir.z * inv);
+            unitDir = ShadowVec3Call(dir.x * inv, dir.y * inv, dir.z * inv);
         }
         dir = unitDir;
         camera->UnknownVirtualSlot29(center);
@@ -158,7 +262,7 @@ int ProjectedShadow::ComputeBounds()
         ShadowMatrix projection = ShadowMatrixIdentity();
         projection.m[0][0] = (float)texture->size;
         projection.m[1][1] = (float)texture->size;
-        lightMatrix = ShadowMatrixMultiply(projection, camera->matrix_0xec);
+        lightMatrix = *ShadowMatrixMultiplyInto(&product, projection, camera->matrix_0xec);
     }
     return 1;
 }

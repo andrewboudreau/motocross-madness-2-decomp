@@ -31,7 +31,50 @@
     "?RotateVector@@YA?AUConVec3@@ABU1@ABUConMatrix@@@Z": "?CollisionRotateVector@@YAPAUCollisionVec3@@PAU1@PBU1@PBUMatrix4@@@Z",
     "?LocalToWorldPoint@ConNode@@QAE?AUConVec3@@ABU2@@Z": "?LocalToWorldPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
     "?WorldToLocalDirection@ConNode@@QAE?AUConVec3@@ABU2@@Z": "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
-    "?GetPositionIn@ConNode@@QAEXPAV1@PAUConVec3@@@Z": "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z"
+    "?GetPositionIn@ConNode@@QAEXPAV1@PAUConVec3@@@Z": "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z",
+    "??0UnknownSceneCollisionObject@@QAE@H@Z": "??0CollisionObject@@QAE@H@Z",
+    "?Configure@UnknownSceneCollisionObject@@QAEXPAXHHH@Z": "?Configure@CollisionObject@@QAEXPAXHHH@Z",
+    "?SetHullShape@UnknownSceneCollisionObject@@QAEXPAVD3DIMSoultreeObject@@HHHH@Z": "?SetHullShape@CollisionObject@@QAEXPAXHHHH@Z",
+    "?LoadShape@UnknownSceneCollisionObject@@QAEXPAVD3DIMSoultreeObject@@PBD@Z": "?LoadShape@CollisionObject@@QAEXPAXPBD@Z",
+    "?SnapPlacement@UnknownSceneCollisionObject@@QAEXXZ": "?SnapPlacement@CollisionObject@@QAEXXZ",
+    "??0UnknownSceneDustEmitter@@QAE@H@Z": "??0DustParticleEmitter@@QAE@H@Z",
+    "??0UnknownSceneChunkEmitter@@QAE@H@Z": "??0DirtChunkParticleEmitter@@QAE@H@Z",
+    "??0UnknownSceneSprayEmitter@@QAE@H@Z": "??0DirtSprayParticleEmitter@@QAE@H@Z",
+    "??0UnknownScenePhysicsObject@@QAE@HH@Z": "??0SoultreePhysicsObject@@QAE@H@Z",
+    "?AddCollisionPoint@@YAPAXHPAPAXPBUVector3@@PAXMPAHMH@Z": "?AddCollisionPoint@@YAPAVCollisionPoint@@HPAPAV1@PBUCollisionVec3@@PAVCollisionContactOwner@@MPAHMH@Z",
+    "?OrientationAxesFromAngles@@YAXPAUVector3@@0MMH@Z": "?OrientationAxesFromAngles@@YAHPAUVector3@@0MMM@Z",
+    "??0UnknownSceneObject@@QAE@H@Z": "??0CollisionCharacter@@QAE@H@Z",
+    "?Load@UnknownSceneObject@@QAEPAVGameObject@@PAXPBD1PAVLightManager@@HHH@Z": "?Load@CollisionCharacter@@QAEPAVGameObject@@HPBD0PBUSoultreeLoadDesc@@HHH@Z",
+    "?FindMotion@UnknownSceneObject@@QAEPAXPBDH@Z": "?FindMotion@Character@@QAEPAUMotion@@PBDH@Z",
+    "??0UnknownSceneAnimatedObject@@QAE@H@Z": "??0CarProcedural@@QAE@H@Z",
+    "?SetAxesPtr@UnknownSceneLodObject@@QAEXPBUVector3@@0HH@Z": "?SetAxesPtr@SoultreeObject@@QAEXPBUVec3@@0HH@Z",
+    "?SetPosition@UnknownSceneLodObject@@QAEXPBUVector3@@@Z": "?SetPosition@SoultreeObject@@QAEXABUVec3@@@Z",
+    "??0UnknownBikeRaceRacer@@QAE@H@Z": "??0KrustyBike@@QAE@H@Z",
+    "?SetMatrixIn@TreeSceneNode@@QAEXPAV1@PAUTreeMatrix4@@@Z": "?SetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z",
+    "?SetAxesIn@TreeSceneNode@@QAEXPAV1@PBUTreeVec3@@1HH@Z": "?SetAxesIn@SoultreeObject@@QAEXPAV1@PBUVec3@@1HH@Z",
+    "?SetPositionIn@TreeSceneNode@@QAEXPAV1@PBUTreeVec3@@@Z": "?SetPositionInFrame@SoultreeObject@@QAEXPAV1@PBUVec3@@@Z",
+    "?MarkSubtreeDirty@TreeSceneNode@@QAEXXZ": "?MarkSubtreeDirty@SoultreeObject@@QAEXXZ",
+    "?WriteRelativePositions@UnknownKrustyBikeView@@QAEXPAUVector3@@0PAXH@Z": "?WriteRelativePositions@BikeRace@@QAEXPAUVector3@@0PAXH@Z",
+    "?TranslateIn@SoultreeObject@@QAEXPAV1@UVector3@@@Z": "?TranslateIn@SoultreeObject@@QAEXPAV1@UVec3@@@Z",
+    "?AcquireOwnedObject@Grid1Terrain@@QAEPAVManagedTexture@@XZ": "?AcquireOwnedObject@Terrain@@QAEPAVBaseObject@@XZ",
+    "?Vec3ScaleCall@@YA?AUVector3@@ABU1@M@Z": "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z",
+    "??0WreckerVec3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",
+    "?WreckerAddCall@@YAPAUVector3@@PAU1@PBU1@1@Z": "?Vec3AddCall@@YAPAUVec3@@PAU1@PBU1@1@Z",
+    "?WreckerDotCall@@YAMPBUVector3@@0@Z": "?Vec3DotCall@@YAMPBUVec3@@0@Z",
+    "?SetCapsuleShape@CollisionObject@@QAEXUVector3@@0M@Z": "?SetCapsuleShape@CollisionObject@@QAEXUCollisionVec3@@0M@Z",
+    "?SetSphereShape@CollisionObject@@QAEXUVector3@@M@Z": "?SetSphereShape@CollisionObject@@QAEXUCollisionVec3@@M@Z",
+    "?SetTriangleMeshHullShape@CollisionObject@@QAEXPBUVector3@@PBHHH@Z": "?SetTriangleMeshHullShape@CollisionObject@@QAEXPBUCollisionVec3@@PBHHH@Z",
+    "?QueryGround@UnknownEcoTerrain@@QAEXPAUVector3@@0HPAE@Z": "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z",
+    "?GetHeightRange@UnknownEcoTerrain@@QAEXPAM0@Z": "?GetHeightRange@Terrain@@QAEXPAM0@Z",
+    "?OrientationAxesFromAngles@@YAXPAUVec3@@0MMM@Z": "?OrientationAxesFromAngles@@YAHPAUVector3@@0MMM@Z",
+    "?SelectLapGates@KbTrack@@QAEXHHPAVKrustyBike@@@Z": "?SelectLapGates@TrackGameViewOwner@@QAEXHHPAX@Z",
+    "?Init@UnknownKrustyUIShadow@@QAEPAV1@PAXPAVTextureMapManager@@@Z": "?Init@ProjectedShadow@@QAEPAV1@PAVShadowRenderTarget@@PAX@Z",
+    "??0ShadowTexture@@QAE@PAXH@Z": "??0PCTextureMap@@QAE@PAVTextureMapManager@@H@Z",
+    "??0ShadowCameraProxy@@QAE@H@Z": "??0ShadowCamera@@QAE@H@Z",
+    "?SetLensScale@ShadowCameraProxy@@QAEXM@Z": "?SetFieldOfView@Camera@@QAEXM@Z",
+    "?SetOwner@ShadowRenderTarget@@QAEXPAUShadowOwner@@@Z": "?SetCamera@RenderTarget@@QAEXPAVCamera@@@Z",
+    "?ShadowMatrixMultiplyInto@@YAPAUShadowMatrix@@PAU1@U1@1@Z": "?MatrixMult@@YA?AUMatrix4@@U1@0@Z",
+    "??0ShadowVec3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z"
   },
   "included_sources": [
     {
@@ -43,6 +86,11 @@
       "path": "src/reconstructed/UIDialogTick.cpp",
       "included_by": "src/reconstructed/GameUi.cpp",
       "reason": "UIDialog::Tick 0x0046ef00 (strict exact) belongs to GameUi.cpp; GameUi.cpp includes the body, which also stays a standalone calibration case and native-test provider (docs/GAMEUI.md)."
+    },
+    {
+      "path": "src/reconstructed/Wrecker.cpp",
+      "included_by": "samples/race/WreckerNearMisses.cpp",
+      "reason": "The near-miss file includes the canonical unit (its vector operators, WreckerCross and the inline operator/) and adds PushProbesOutOfBox 0x005329e0 and SprayContactParticles 0x00531740; the canonical file stays a standalone calibration case (docs/GAME_BUILD.md#near-miss-bodies-replacing-bring-up-copies)."
     },
     {
       "path": "src/krusty2/bvh/BoundingBoxTreeQuery.cpp",
@@ -463,6 +511,30 @@
       "status": "best-guess-unreviewed",
       "reason": "ConstraintMethodCollisionModel::ApplyContactImpulse 0x0043bdb0: 2619-byte near miss (size exact, 2515/2619 strict, call sequence and operands as retail) replacing the inline-arithmetic bring-up stand-in; includes the canonical unit (included_sources). Same formula; not differentially tested.",
       "evidence": "docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies"
+    },
+    {
+      "path": "samples/track/SceneManagerNearMisses.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Scene::ReadStaticModels 0x004ecd60 (4534/4536 strict) and ReadAnimations 0x004edfe0 (5113/5335 strict) replace the Group4_SceneRead bring-up copies of the same source. The copies differed only in calling bridge functions; here the bodies make retail's direct constructor and method calls, which link_aliases bind to the providers at the same retail addresses (allocation sizes, pushed argument counts and this pointers checked against the bridges). Not differentially tested.",
+      "evidence": "docs/GAME_BUILD.md#near-miss-bodies-replacing-bring-up-copies"
+    },
+    {
+      "path": "samples/race/Krusty3DObjectsNearMisses.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "VisualCue::Tick 0x0048b100 and BonusObjectManager::Tick 0x0048ccc0 (1299/1308) replace the Group1_VisualCueTick and Group0_BonusObjectManager bring-up copies of the same source. The BonusObjectManager copy reached GetPosition/TranslateIn through bridge functions; here the body calls retail's 0x004fc970 and 0x004fc690 directly, and link_aliases binds the by-value Vector3 TranslateIn to soultree.cpp's Vec3 definition (same 12-byte argument, no this adjustment). Not differentially tested.",
+      "evidence": "docs/GAME_BUILD.md#near-miss-bodies-replacing-bring-up-copies"
+    },
+    {
+      "path": "samples/render/Grid1NearMisses.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "DrawableGridNodeSharedTextures::SelectTexture 0x0047caa0, BuildNodeTexture 0x0047d470 and BuildBlockTexture 0x0047d780 replace the Group3_GridShared bring-up copies of the same source. The copy reached 0x00505600 through an out-of-line static wrapper; here the body calls it directly as Grid1.h's Grid1Terrain::AcquireOwnedObject, which link_aliases binds to TerrainSupport.cpp's Terrain::AcquireOwnedObject (no arguments, no this adjustment). Not differentially tested.",
+      "evidence": "docs/GAME_BUILD.md#near-miss-bodies-replacing-bring-up-copies"
+    },
+    {
+      "path": "samples/race/WreckerNearMisses.cpp",
+      "status": "reviewed-nonexact",
+      "reason": "Wrecker::PushProbesOutOfBox 0x005329e0 and SprayContactParticles 0x00531740 replace the Group1_WreckerContacts bring-up copies; the file includes the canonical Wrecker.cpp (included_sources). The copies replaced retail's out-of-line vector helper calls with inline arithmetic (the dot product summed in a different order); here the bodies make the calls and link_aliases binds them to the providers at the same retail addresses (0x00404e60, 0x0040ae30, 0x00421cb0, 0x005015b0). Not differentially tested.",
+      "evidence": "docs/GAME_BUILD.md#near-miss-bodies-replacing-bring-up-copies"
     }
   ],
   "includes": [

@@ -696,6 +696,158 @@ The existing native tests (`test_bvh_vector_connections`,
 `test_collision_helper_providers`) compile and check the unchanged sample and
 `src/` objects. No test runs the game-linked bodies.
 
+## Near-miss bodies replacing bring-up copies
+
+Many bring-up files in `src/bringup/` carried copies of `samples/` near
+misses. The copies were edited to reach their callees through forwarders or
+private reimplementations. Each such edit changed the linked body, so the
+copies scored below their samples. For every near miss in
+`docs/NEAR_MISS_INDEX.md` and every non-exact `targets.json` entry, the linked
+body and the sample object were scored against retail. Where the sample was
+clearly more faithful, the game now links the sample's text:
+
+- Whole near-miss files are now candidate sources with status
+  `reviewed-nonexact`:
+  - `samples/track/SceneManagerNearMisses.cpp`
+  - `samples/race/Krusty3DObjectsNearMisses.cpp`
+  - `samples/render/Grid1NearMisses.cpp`
+  - `samples/race/WreckerNearMisses.cpp`
+
+  The Wrecker file includes `src/reconstructed/Wrecker.cpp` (an
+  `included_sources` entry). Its canonical functions score as before.
+- The following bring-up files were deleted:
+  - `Group4_SceneRead.cpp`, `Group4_SceneBridges.cpp` and
+    `Group4_SceneEmitters.cpp`
+  - `Group0_BonusObjectManager.cpp` and `Group1_VisualCueTick.cpp`
+  - `Group3_GridShared.cpp`
+  - `Group1_WreckerContacts.cpp`
+  - `Group6_KrustyBikeCtor.cpp`
+  - `Group3_KrustyUIShadow.cpp`
+  - `Group0_SoultreeBridge.cpp` and `Group0_SoultreeBridge.h`
+- `Group4_EcoBridges.cpp` lost its five forwarders. It keeps only the shared
+  normal-distribution table.
+- Some samples also carry functions that other units of the build provide,
+  so they cannot be linked whole:
+  - `BikeRaceNearMisses`
+  - `BoundingBoxTreeBuildNearMisses`
+  - `EcoSystemNearMisses`
+  - `KrustyBikeNearMisses`
+  - `ProjectedShadowNearMisses`
+  - `KrustyBikeCameraNearMisses` (see below)
+
+  Their bring-up copies now use the sample's text for the functions listed
+  below.
+- `src/bringup/Group4_OrientationAxes.cpp` includes the exact
+  `samples/physics/helpers/OrientationAxes.cpp` (0x004b5d00). This gives the
+  Scene readers and `KrustyBike` the retail function in place of private
+  copies. Which unit owns it is still unsettled (tier 3).
+- `Character::Method_0x004a9050`, the four-pose blend, is now defined in
+  `Group3_KrustyBike.cpp`. It was a cdecl static with the same body, so
+  `UpdateRiderPose` can now make retail's thiscall. Its own linked score is
+  0.103: it is a reimplementation, not a near miss.
+- The sample bodies call retail's callees under view names. `link_aliases`
+  binds each view name to the provider at the same retail address. Each pair
+  was checked for the following:
+  - the allocation size pushed to `operator new`, for constructors;
+  - the pushed argument count and by-value vector size;
+  - the absence of a `this` adjustment.
+
+  | Retail | View name | Provider |
+  |---|---|---|
+  | 0x00431e70, 0x004320f0, 0x00432720, 0x00432800 | `UnknownSceneCollisionObject` constructor and methods | `CollisionObject` |
+  | 0x004318d0, 0x004319c0 | `UnknownSceneObject` constructor and `Load` | `CollisionCharacter` |
+  | 0x004328b0, 0x004329a0, 0x00432a20 | `CollisionObject` hull, sphere and capsule shapes taking `Vector3` | the `CollisionVec3` forms |
+  | 0x00507c10, 0x00508970 | `UnknownEcoTerrain::QueryGround`, `GetHeightRange` | `Terrain` |
+  | 0x0048fa60 | `UnknownBikeRaceRacer` constructor (0x1638 bytes) | `KrustyBike` |
+  | 0x004b5d00 | `OrientationAxesFromAngles` (`Vector3`/`int` and `Vec3`/`void` forms) | `Group4_OrientationAxes.cpp` |
+  | 0x004fc050, 0x004fc740, 0x004fdab0, 0x004fb8c0 | `TreeSceneNode` axes, position, dirty mark, matrix | `SoultreeObject` (`SetAxesIn`, `SetPositionInFrame`, `MarkSubtreeDirty`, `SetMatrixIn`) |
+  | 0x004fc690 | `SoultreeObject::TranslateIn` taking `Vector3` | the `Vec3` form |
+  | 0x00505600 | `Grid1Terrain::AcquireOwnedObject` | `Terrain::AcquireOwnedObject` |
+  | 0x004210f0 | `UnknownKrustyBikeView::WriteRelativePositions` | `BikeRace` |
+  | 0x00404df0 | `KbTrack::SelectLapGates` | `TrackGameViewOwner` |
+  | 0x00404e60, 0x0040ae30, 0x00421cb0, 0x005015b0 | Wrecker and shadow vector call views | `Vec3Call`, `Vec3DotCall`, `Vec3AddCall`, `Vec3ScaleCall` |
+  | 0x004da7b0 | `UnknownKrustyUIShadow::Init` | `ProjectedShadow::Init` |
+  | 0x004c5f00, 0x004da520 | `ShadowTexture`, `ShadowCameraProxy` constructors | `PCTextureMap`, `ShadowCamera` |
+  | 0x0042e930, 0x004e8cf0 | `SetLensScale`, `ShadowRenderTarget::SetOwner` | `Camera::SetFieldOfView`, `RenderTarget::SetCamera` |
+  | 0x004a1860 | `ShadowMatrixMultiplyInto` | `MatrixMult` |
+
+  Each alias was checked against both `*.bindings.json` files. The view's
+  address must equal the provider's. That check found one bug that predates
+  this work. `GatherModelTriangles` calls 0x004fc740, which sets the
+  position, but the former forwarder called `SoultreeObject::SetPositionIn`
+  (0x004fc890), which translates by the vector. So the model was never moved
+  to the origin before its triangles were gathered. The masked score cannot
+  see a wrong call target.
+
+  The full list is in `config/game_build.json`. The Scene readers also
+  depend on the emitter, physics object, collision point, character, motion
+  and LOD-object constructors and methods.
+
+Linked scores before and after, from the `linked_accuracy.py` masked score.
+The sample column is the standalone object's score.
+
+| VA | Function | Before | After | Sample | Now from |
+|---|---|---|---|---|---|
+| 0x004ecd60 | `Scene::ReadStaticModels` | 0.940 | 1.000 | 1.000 | sample file |
+| 0x004edfe0 | `Scene::ReadAnimations` | 0.955 | 0.998 | 0.998 | sample file |
+| 0x00419970 | `BikeRace::CreateRacers` | 0.963 | 1.000 | 0.999 | bring-up copy |
+| 0x0042c260 | `GatherModelTriangles` | 0.985 | 1.000 | 1.000 | bring-up copy |
+| 0x0048ccc0 | `BonusObjectManager::Tick` | 0.952 | 0.997 | 0.997 | sample file |
+| 0x0048b100 | `VisualCue::Tick` | 0.932 | 0.932 | 0.932 | sample file |
+| 0x0047caa0 | `DrawableGridNodeSharedTextures::SelectTexture` | 0.967 | 0.981 | 0.981 | sample file |
+| 0x005329e0 | `Wrecker::PushProbesOutOfBox` | 0.922 | 1.000 | 1.000 | sample file |
+| 0x00531740 | `Wrecker::SprayContactParticles` | 0.923 | 0.995 | 0.995 | sample file |
+| 0x00457ed0 | `EcoSystem::BuildCollisionObjects` | 0.888 | 0.994 | 0.994 | bring-up copy |
+| 0x00459ce0 | `EcoSystem::GenerateObjects` | 0.899 | 0.918 | 0.918 | bring-up copy |
+| 0x00456890 | `Vegetation::TestDistance` | 0.953 | 0.991 | 0.991 | bring-up copy |
+| 0x00497e20 | `KrustyBikeCamera::Tick` | 0.938 | 0.979 | 0.979 | bring-up copy |
+| 0x0048eea0 | `KrustyBike::UpdateRiderPose` | 0.958 | 0.971 | 0.971 | bring-up copy |
+| 0x00493660 | `KrustyBike::Fn_00493660` | 0.987 | 0.989 | 0.989 | bring-up copy |
+| 0x004da7b0 | `ProjectedShadow::Init` | 0.892 | 0.992 | 0.992 | bring-up copy |
+| 0x004db0d0 | `ProjectedShadow::ComputeBounds` | 0.924 | 0.985 | 0.985 | bring-up copy |
+
+Bytes at masked score 1.000 rose from 772244 to 795446. About 2300 of the
+increase is not from switched bodies:
+
+- exact providers such as the `CollisionObject` shapes and the
+  `UnknownBikeRaceRacer` constructor are now bound, because their alias names
+  appear in the map;
+- `OrientationAxesFromAngles` (274 bytes) is newly linked.
+
+The link covers every translation unit with no unresolved symbols.
+
+Not switched, and why:
+
+- `D3DIMSoultreeShadow` slot 30 (0x00446f40): linked 0.571, sample 0.871.
+  The sample rounds the clipped corners with `(int)(v - 0.5f)`, which
+  truncates. Corners with a fraction below one half land one pixel low,
+  where retail's `fistp` gives `floor(v)`. The sample's outcode array is also
+  a one-entry placeholder.
+- `ProjectedShadow::RenderShadow` and `TintCasterVertices` (0.545 and 0.511;
+  samples 0.688 and 0.638): `X87FloatToInt` follows the FPU rounding mode as
+  retail's `fistp` does. The sample's `ProjectedShadowFloatToInt` agrees only
+  in the default mode.
+- `KrustyBikeCamera::Tick`: the bring-up copy now has the sample's shape, but
+  the sample file is not linked. Its slot 46 vector is a zero-initialised
+  static, where retail's 0x0067c3e8 is (0, 1, 0).
+- `KrustyBike::FindPlacement` (0x00491d10) and the Recorder worker
+  (0x004e6f80): the samples score below the linked bodies.
+- `FollowCamera`'s constructor (0x00462ee0, 0.932 against 0.955) and
+  `ProbePartialTextureUploads` (0x004cab00, 0.786 against 0.801): the
+  linked bodies are reviewed candidates that correct observable behaviour,
+  and they are kept.
+- Owned by other work and left alone: `CarProcedural::Tick` and
+  `BaseQuarryEvent::LoadEventObjects`.
+
+None of the new bodies has been differentially tested. The switched bodies
+make the same calls in the same order as the copies they replace. The
+differences are:
+
+- the vector helpers (the Wrecker dot product now sums in retail's order);
+- the debug tag strings, because `__FILE__` is now the build path;
+- `Vegetation::TestDistance`, which reads the shared detail band pointer
+  that `EcoSystem.cpp` sets instead of recomputing it.
+
 ## Source-built run status
 
 The source-built `mcm2.exe` (391/391 translation units, zero unresolved

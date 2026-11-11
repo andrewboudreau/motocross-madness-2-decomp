@@ -7,6 +7,13 @@
 // function; they were re-read against the retail disassembly for behavior, not bytes.
 // The canonical headers are included exactly as KrustyBike.cpp includes them; the
 // TU-local helpers of KrustyBike.cpp that these bodies use are repeated here as statics.
+// Fn_00493660 and UpdateRiderPose now make the sample's calls: OrientationAxesFromAngles
+// (Group4_OrientationAxes.cpp), KbWheel::SetRollDistance, KbTrack::SelectLapGates (aliased
+// to TrackGameViewOwner's) and the four-pose blend, defined below as
+// Character::Method_0x004a9050. The former private copies were cdecl statics (linked 0.987
+// and 0.958; the sample scores 0.989 and 0.971). The sample is not linked as a whole: it
+// includes the canonical KrustyBike.cpp, and its slot 11 FindPlacement scores below this
+// copy (0.869 against 0.947).
 #include "../reconstructed/BikeRaceCore.h"
 #include "../reconstructed/TrackGameGlobal.h"
 #include <math.h>
@@ -80,54 +87,9 @@ static inline int G3SelectedSeries()
 int PointInPlacementSquare(const CollisionVec3* point, float x, float z, float size, float scale,
                            float* minX, float* maxX, float* minZ, float* maxZ);
 
-// 0x004b5d00 (cdecl, returns 1, or 0 for a null output): forward/up axes from yaw, pitch
-// and roll.  Start from forward (0,0,1) and up (0,1,0); roll turns up about z, pitch turns
-// both about x, yaw turns both about y, in that order (decoded from the retail x87 code).
-static int G3OrientationAxesFromAngles(Vec3* forward, Vec3* up, float yaw, float pitch, float roll)
-{
-    if (!up || !forward)
-        return 0;
-    up->x = 0.0f; up->y = 1.0f; up->z = 0.0f;
-    forward->x = 0.0f; forward->y = 0.0f; forward->z = 1.0f;
-
-    float c = (float)cos(roll);
-    float s = (float)sin(roll);
-    float y = c * up->y - s * up->x;
-    up->x = s * up->y + c * up->x;
-    up->y = y;
-
-    c = (float)cos(pitch);
-    s = (float)sin(pitch);
-    y = s * up->z + c * up->y;
-    up->z = c * up->z - s * up->y;
-    up->y = y;
-    y = c * forward->y + s * forward->z;
-    forward->z = c * forward->z - s * forward->y;
-    forward->y = y;
-
-    c = (float)cos(yaw);
-    s = (float)sin(yaw);
-    float x = c * up->x + s * up->z;
-    up->z = c * up->z - s * up->x;
-    up->x = x;
-    x = c * forward->x + s * forward->z;
-    forward->z = c * forward->z - s * forward->x;
-    forward->x = x;
-    return 1;
-}
-
-// 0x00513560 (BikeWheel, thiscall ret 4): roll angle = distance * (+0x1c8, the inverse
-// radius), stored at +0x278; when finite the wheel node (+0x1bc) turns about its x axis.
-static void G3SetRollDistance(void* wheel, float distance)
-{
-    char* w = (char*)wheel;
-    float angle = distance * *(float*)(w + 0x1c8);
-    *(float*)(w + 0x278) = angle;
-    if (_finite(angle))
-        (*(SoultreeObject**)(w + 0x1bc))->RotateAbout(1.0f, 0.0f, 0.0f, angle);
-}
-
 // ---- 0x004a9050, Character four-pose blend (thiscall ret 0x1c) ----
+// Defined as D3DIMSoultreeCharacter.h's Character::Method_0x004a9050 so that
+// UpdateRiderPose calls it as retail does (thiscall on the rider and on the bike).
 // Per node: motions a and b are sampled with the clamped-phase blend that 0x004a8c50 uses
 // for its first motion (the inline axis interpolation, re-orthogonalised), c and d with
 // InterpolatePose; then (a,b) and (c,d) are mixed by 1 - weight and the two results by
@@ -170,8 +132,8 @@ static void G3BlendFirst(CharacterPose* a, CharacterPose* b, CharacterPose* out,
     out->axisY = CrossProductCall(axisX, out->axisZ);
 }
 
-static void G3FourPoseBlend(Character* self, int a, int b, int c, int d, float phase,
-                            float weight, float lean)
+void Character::Method_0x004a9050(int a, int b, int c, int d, float phase, float weight,
+                                  float lean)
 {
     G3MotionView* ma = reinterpret_cast<G3MotionView*>(a);
     G3MotionView* mb = reinterpret_cast<G3MotionView*>(b);
@@ -180,14 +142,14 @@ static void G3FourPoseBlend(Character* self, int a, int b, int c, int d, float p
     MotionPoseList *fa, *na, *fb, *nb, *fc, *nc, *fd, *nd;
     float ta, tb, tc, td;
     G3SampleMotion(ma, phase, &fa, &na, &ta);
-    self->currentMotion = reinterpret_cast<Motion*>(ma);
-    self->currentFrame = fa;
+    this->currentMotion = reinterpret_cast<Motion*>(ma);
+    this->currentFrame = fa;
     G3SampleMotion(mb, phase, &fb, &nb, &tb);
     G3SampleMotion(mc, phase, &fc, &nc, &tc);
     G3SampleMotion(md, phase, &fd, &nd, &td);
     float pairWeight = 1.0f - weight;
     float leanWeight = 1.0f - lean;
-    for (int i = 0; i < reinterpret_cast<G3MotionView*>(self->currentMotion)->posesPerFrame; ++i) {
+    for (int i = 0; i < reinterpret_cast<G3MotionView*>(this->currentMotion)->posesPerFrame; ++i) {
         CharacterPose pa, pb, pc, pd, ab, cd, result;
         G3BlendFirst(&fa->poses[i], &na->poses[i], &pa, ta);
         G3BlendFirst(&fb->poses[i], &nb->poses[i], &pb, tb);
@@ -196,7 +158,7 @@ static void G3FourPoseBlend(Character* self, int a, int b, int c, int d, float p
         InterpolatePose(&pa, &pb, &ab, pairWeight);
         InterpolatePose(&pc, &pd, &cd, pairWeight);
         InterpolatePose(&ab, &cd, &result, leanWeight);
-        self->CharacterVirtualSlot4((int)&result, 0);
+        this->CharacterVirtualSlot4((int)&result, 0);
     }
 }
 
@@ -772,11 +734,11 @@ void KrustyBike::Fn_00493660(float dt, int a)
 
         // orientation
         if (!g_kbInterpolate) {
-            G3OrientationAxesFromAngles(&bodyForward, &bodyUp, states[0]->yaw, states[0]->pitch, states[0]->roll);
-            G3OrientationAxesFromAngles(&localFwd, &localUp, states[1]->yaw, states[1]->pitch, states[1]->roll);
+            OrientationAxesFromAngles(&bodyForward, &bodyUp, states[0]->yaw, states[0]->pitch, states[0]->roll);
+            OrientationAxesFromAngles(&localFwd, &localUp, states[1]->yaw, states[1]->pitch, states[1]->roll);
         } else {
-            G3OrientationAxesFromAngles(&bodyForward, &bodyUp, interpTarget->yaw, interpTarget->pitch, interpTarget->roll);
-            G3OrientationAxesFromAngles(&localFwd, &localUp, interpSource->yaw, interpSource->pitch, interpSource->roll);
+            OrientationAxesFromAngles(&bodyForward, &bodyUp, interpTarget->yaw, interpTarget->pitch, interpTarget->roll);
+            OrientationAxesFromAngles(&localFwd, &localUp, interpSource->yaw, interpSource->pitch, interpSource->roll);
         }
         if (!g_kbInterpolate) {
             if (g_kbLatencyHiding) {
@@ -847,8 +809,8 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 roll = 1.0f;
             else
                 roll = FastSqrt(speedSq);
-            G3SetRollDistance(frontWheel, roll * reinterpret_cast<KbGame*>(g_TrackGame)->frameTime);
-            G3SetRollDistance(rearWheel, roll * reinterpret_cast<KbGame*>(g_TrackGame)->frameTime);
+            ((KbWheel*)frontWheel)->SetRollDistance(roll * reinterpret_cast<KbGame*>(g_TrackGame)->frameTime);
+            ((KbWheel*)rearWheel)->SetRollDistance(roll * reinterpret_cast<KbGame*>(g_TrackGame)->frameTime);
         }
         if (!g_kbInterpolate)
             turnRate = states[0]->angularVelocity.y;
@@ -995,7 +957,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                             lapCount++;
                         nextLapGate = (lapGate + 1) % ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->field_0xac;
                         if (this == this->race->raceCamera->followedRacer)
-                            ((TrackGameViewOwner*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->SelectLapGates(lapGate, nextLapGate, this);
+                            ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->SelectLapGates(lapGate, nextLapGate, this);
                     }
                 }
             } else {
@@ -1090,7 +1052,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                             lapCount++;
                         nextLapGate = (lapGate + 1) % ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->field_0xac;
                         if (this == this->race->raceCamera->followedRacer)
-                            ((TrackGameViewOwner*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->SelectLapGates(lapGate, nextLapGate, this);
+                            ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->SelectLapGates(lapGate, nextLapGate, this);
                     }
                 }
             } else {
@@ -1504,7 +1466,7 @@ void KrustyBike::UpdateRiderPose(float dt)
             reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8bf0(riderPoseHandles[16], poseParam);
             reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8bf0(riderPoseHandles[17], backUpPhase);
         } else if (blend) {
-            G3FourPoseBlend((Character*)riderCharacter, riderPoseHandles[idx], riderPoseHandles[next],
+            ((Character*)riderCharacter)->Method_0x004a9050(riderPoseHandles[idx], riderPoseHandles[next],
                 riderPoseHandles[cnt], riderPoseHandles[other], poseParam, inverseBlend, poseLeanBlend);
         } else {
             reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8c50(riderPoseHandles[idx], riderPoseHandles[next], poseParam, inverseBlend);
@@ -1514,7 +1476,7 @@ void KrustyBike::UpdateRiderPose(float dt)
         } else if (poseIndex == 16) {
             D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[16], poseParam);
         } else if (blend) {
-            G3FourPoseBlend(this, bikePoseHandles[idx], bikePoseHandles[next],
+            D3DIMSoultreeCharacter::Method_0x004a9050(bikePoseHandles[idx], bikePoseHandles[next],
                 bikePoseHandles[cnt], bikePoseHandles[other], poseParam, inverseBlend, poseLeanBlend);
         } else {
             D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, inverseBlend);

@@ -10,6 +10,12 @@
 // tables are constant and the selection (bladeRenderer ? 1555 : 4444)
 // mirrors EcoSystem.cpp:801, the counters/peaks only feed the debug
 // overlay. The slot-23 draw toggle (s_drawEnabled) is not shared.
+//
+// BuildCollisionObjects (0x00457ed0) and GenerateObjects (0x00459ce0) are the
+// sample's text (linked 0.888 and 0.899 with the former forwarders). The sample
+// is not linked as a whole: it also carries Render3D (kept here) and the
+// Vegetation collision placement (VegetationCollisionObject.cpp, its own
+// candidate source).
 #include "../krusty2/broadphase/Terrain.h"
 #include "../reconstructed/TrackGameGlobal.h"
 #include <float.h>
@@ -47,15 +53,14 @@ extern UnknownEcoDetailBand* g_UnknownGlobal59af14;
 
 #define ECO_VIEW ((UnknownEcoRenderTarget*)renderContext)
 
-// Bridges to the real providers (src/bringup/Group4_EcoBridges.cpp); the
-// proxies EcoSystem.h declares mangle differently from them.
-void Group4Eco_SetTriangleMeshHullShape(void* object, const void* vertices, const int* indices,
-                                        int triangleCount, int vertexCount);
-void Group4Eco_SetSphereShape(void* object, const void* center, float radius);
-void Group4Eco_SetCapsuleShape(void* object, const void* p0, const void* p1, float radius);
-void Group4Eco_QueryGround(void* terrain, void* position, void* normal, int flatShaded,
-                           unsigned char* surface);
-void Group4Eco_GetHeightRange(void* terrain, float* outMin, float* outMax);
+// BuildCollisionObjects and GenerateObjects call the CollisionObject and
+// UnknownEcoTerrain proxies EcoSystem.h declares, as the sample does (retail
+// calls 0x004328b0, 0x004329a0, 0x00432a20, 0x00507c10 and 0x00508970 directly).
+// Their names mangle differently from the providers (Vector3 against
+// CollisionVec3/TerrainVec3, UnknownEcoTerrain against Terrain); link_aliases
+// binds each to the provider at the same retail address (same 12-byte vectors,
+// same pushed arguments, Terrain's GameObject base at offset 0). The former
+// forwarders (Group4_EcoBridges.cpp) cost both bodies their call shape.
 
 static inline void UnknownSetIdentity(Matrix4* m) {
     memset(m, 0, sizeof(Matrix4));
@@ -226,15 +231,15 @@ void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
                 hull[j].z = definition->modelVertices[0][j].position.z;
             }
             definition->collisionObjects[i]->ownerType = 0x3e9;
-            Group4Eco_SetTriangleMeshHullShape(definition->collisionObjects[i], hull, hullIndices,
-                                               definition->modelIndexCount[0] / 3, definition->modelVertexCount[0]);
+            definition->collisionObjects[i]->SetTriangleMeshHullShape(hull, hullIndices, definition->modelIndexCount[0] / 3,
+                                                               definition->modelVertexCount[0]);
             UnknownSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
             delete hull;
             delete hullIndices;
         } else if (shape->type == 2) {
-            Group4Eco_SetSphereShape(definition->collisionObjects[i], &shape->start, shape->radius);
+            definition->collisionObjects[i]->SetSphereShape(shape->start, shape->radius);
         } else if (shape->type == 3) {
-            Group4Eco_SetCapsuleShape(definition->collisionObjects[i], &shape->start, &shape->end, shape->radius);
+            definition->collisionObjects[i]->SetCapsuleShape(shape->start, shape->end, shape->radius);
         } else if (shape->type == 1) {
             definition->collisionObjects[i]->ownerType = 0x3e9;
             for (j = 0; j < 16; j++) {
@@ -257,7 +262,7 @@ void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
                 indices[j * 6 + 4] = next + 16;
                 indices[j * 6 + 5] = j + 16;
             }
-            Group4Eco_SetTriangleMeshHullShape(definition->collisionObjects[i], vertices, indices, 32, 32);
+            definition->collisionObjects[i]->SetTriangleMeshHullShape(vertices, indices, 32, 32);
             UnknownSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
         }
     }
@@ -369,7 +374,7 @@ int EcoSystem::GenerateObjects(int checkCodes) {
         if (definitionTable[i] && definitionTable[i]->probabilityTga[0])
             tgas[i] = LoadFile(definitionTable[i]->probabilityTga, 0, (int)g_ResourceManager);
     }
-    Group4Eco_GetHeightRange(groundTerrain, &minHeight, &maxHeight);
+    groundTerrain->GetHeightRange(&minHeight, &maxHeight);
     unsigned int attempt = 0;
     float total = 0.0f;
     int count = 0;
@@ -487,7 +492,7 @@ int EcoSystem::GenerateObjects(int checkCodes) {
             probability = UnknownEcoSampleTga(tgas[selected], probe.x, probe.z) * probability;
         if (probability <= threshold)
             continue;
-        Group4Eco_QueryGround(groundTerrain, &probe, &normal, 0, 0);
+        groundTerrain->QueryGround(&probe, &normal, 0, 0);
         float slope = (float)acos(normal.y);
         float altitude = probe.y;
         if (slope < 0.0f)
@@ -516,7 +521,7 @@ int EcoSystem::GenerateObjects(int checkCodes) {
                 probe = position;
             else
                 probe = Vector3(position.x + cluster[j].x, cluster[j].y, position.z + cluster[j].z);
-            Group4Eco_QueryGround(groundTerrain, &probe, 0, 0, 0);
+            groundTerrain->QueryGround(&probe, 0, 0, 0);
             code = g_collisionQuadTree->ComputeCode(probe.x - radius, probe.z - radius, probe.x + radius,
                                                     probe.z + radius);
             vegetation[placedCount].Place(textureManager, selected, &probe, heightParameter, radiusParameter);

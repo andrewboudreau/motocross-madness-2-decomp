@@ -4,9 +4,15 @@
 // samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp (that sample reports
 // the same size and instructions as retail apart from two register-allocation
 // spots), with __FILE__ replaced by the retail string at 0x005682bc. The
-// includes are BoundingBoxTreeBuild.cpp's own. The scene-node calls go
-// through Group0_SoultreeBridge: BoundingBoxTreeBuild.h's TreeSceneNode
-// stand-in methods are declared only, the SoultreeObject ones are defined.
+// includes are BoundingBoxTreeBuild.cpp's own. The scene-node calls are the
+// sample's direct TreeSceneNode calls (retail calls 0x004fc050, 0x004fc740,
+// 0x004fdab0 and 0x004fb8c0 on the model itself); BoundingBoxTreeBuild.h
+// declares them only, and config/game_build.json's link_aliases bind them to
+// the SoultreeObject definitions at those addresses (0.985 -> 1.000 linked;
+// the former bring-up forwarders added a call level). 0x004fc740 is
+// SoultreeObject::SetPositionInFrame, which sets the position. The former
+// forwarder called SetPositionIn (0x004fc890), which translates by the vector,
+// so the model was never moved to the origin before gathering.
 #include <math.h>
 #include <string.h>
 
@@ -14,7 +20,6 @@
 #include "TextureMap.h"
 #include "MatrixUtil.h"
 #include "D3DIMSoulTree.h"
-#include "Group0_SoultreeBridge.h"
 
 static const char kBoundingBoxTreeBuildFile[] = "D:\\aardvark\\VC\\krusty2\\BoundingBoxTreeBuild.cpp";
 
@@ -50,14 +55,14 @@ void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* tri
 
     numTris = 0;
     reinterpret_cast<SoultreeObject*>(model)->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&saved));
-    Group0_SoultreeSetAxesIn(model, 0, &kVec3ZAxis.x, &kVec3YAxis.x, 0, 1);
-    Group0_SoultreeSetPositionIn(model, 0, &kVec3Zero.x);
+    model->SetAxesIn(0, &kVec3ZAxis, &kVec3YAxis, 0, 1);
+    model->SetPositionIn(0, &kVec3Zero);
     savedField = model->field_0x1a4;
     model->field_0x1a4 = 0;
-    Group0_SoultreeMarkSubtreeDirty(model);
+    model->MarkSubtreeDirty();
     reinterpret_cast<D3DIMSoultreeObject*>(model)->TransformVertexGroups(-1);
     model->field_0x1a4 = savedField;
-    Group0_SoultreeMarkSubtreeDirty(model);
+    model->MarkSubtreeDirty();
 
     if (frame == 0) {
         for (i = 0; i < model->lods[model->currentLod].meshCount; i++)
@@ -190,5 +195,5 @@ void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* tri
     *indices = corners;
     *vertCount = numUnique;
     *triCount = numTris;
-    Group0_SoultreeSetMatrixIn(model, 0, &saved);
+    model->SetMatrixIn(0, &saved);
 }
