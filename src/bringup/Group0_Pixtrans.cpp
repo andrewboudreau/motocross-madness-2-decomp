@@ -240,23 +240,29 @@ int Halve565(void* destination, void* source, int width, int height, int destina
 // builds each four-index dword in ebx (bh/bl take the high/low pixel's index,
 // `shl ebx, 16` moves the pair up) and stores two dwords a step, so the bytes
 // land in source order as here. It preloads the next step's third and fourth
-// pixels and so reads 4 bytes past the source; that read is not reproduced.
-// The size gap (47 built vs 83 retail instructions) is that assembly: a C
-// version with the same dword reads and packed stores was tried and scored no
-// better (16 vs 15 of 83 aligned instructions) and reads worse.
+// pixels, so its last step reads bytes 4..7 past the end of the source; that
+// read is not reproduced.
+// The size gap (51 built vs 83 retail instructions) is that assembly. This
+// version reads a dword (two pixels) at a time as retail does, which took the
+// linked masked score from 0.369 to 0.418. Packing four indices per dword
+// store, with or without retail's count-down do-while loops, was tried and
+// scored lower (0.39). Fully unrolling the eight pixels scored 0.34.
 void Convert555To8Fast(void* source, void* destination, int destinationStride, int width, int height,
                        unsigned char* table)
 {
-    unsigned short* from = (unsigned short*)source;
+    const unsigned int* from = (const unsigned int*)source;
     unsigned char* row = (unsigned char*)destination;
     int groups = width / 8;
     for (int y = 0; y < height; y++) {
         unsigned char* to = row;
         for (int g = 0; g < groups; g++) {
-            for (int i = 0; i < 8; i++)
-                to[i] = table[from[i] & 0x7fff];
-            to += 8;
-            from += 8;
+            for (int i = 0; i < 4; i++) {
+                unsigned int pair = from[i];
+                to[0] = table[pair & 0x7fff];
+                to[1] = table[(pair >> 16) & 0x7fff];
+                to += 2;
+            }
+            from += 4;
         }
         row += destinationStride;
     }
