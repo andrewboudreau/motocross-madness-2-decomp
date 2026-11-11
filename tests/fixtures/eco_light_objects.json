@@ -22,7 +22,7 @@
     "src/reconstructed/KrustyUI.cpp": {
       "sections": 317,
       "relocations": 1847,
-      "sha256": "e903c2d3a3cf9cca3e1c1babb21a0309e79db8c76876f6e3ec90f19421e16857"
+      "sha256": "4f86fae4d1b35ed0146fbebde604a789b62f91b52a41877d5cea2943d825d430"
     },
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 86,
