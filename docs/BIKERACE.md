@@ -120,9 +120,13 @@ Facts the two functions establish:
 - The track file name comes from `strrchr(path, '.')` (`0x00534a60`).
 - `0x00515ed0` is Track's loader (start and finish probes); `new Track`
   inlines a constructor that clears +0.
-- The credits dialog is DemoDlg (vtable `0x00550e18`), constructed inline
-  as `UIDialog(1, "credits.dtm")`; DlgProcs.h declares no constructor, so
-  the sample uses a local stand-in class bound to that vtable.
+- A replay played while KrustyUI's `playingDemo` (+0x4a8) is set gets a
+  DemoDlg (vtable `0x00550e18`, 0x7f58 bytes, bikerace.cpp line 0x2fb),
+  constructed inline as `UIDialog(1, "credits.dtm")` then the vtable write
+  at `0x00419329`; otherwise a VCRDlg (line 0x2ff). DlgProcs.h declares the
+  constructor (defined in DemoDlg.h) and the game build creates the canonical class. The
+  sample `samples/race/BikeRaceNearMisses.cpp` still uses a local stand-in
+  bound to that vtable.
 
 ## Naming
 

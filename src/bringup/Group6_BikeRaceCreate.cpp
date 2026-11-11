@@ -14,6 +14,7 @@
 #include "ArcadeObject.h"
 #include "D3DIMSoulTree.h"
 #include "DebugAlloc.h"
+#include "DemoDlg.h"
 #include "EventManager.h"
 #include "BaseQuarryEvent.h"
 #include "../krusty2/vehicle/KrustyBikeCore.h"
@@ -101,16 +102,6 @@ static inline Vector3 Normalize(const Vector3& v) {
     return Scale(v, scale);
 }
 
-
-// DlgProcs.h's DemoDlg (vtable 0x00550e18, 0x7f58 bytes) with the inline
-// constructor the setup's `new` expands (UIDialog(1, "credits.dtm"), then
-// the vtable); DlgProcs.h declares no constructor for it.
-class UnknownBikeRaceDemoDlg : public UIDialog {
-public:
-    UnknownBikeRaceDemoDlg(int flags, const char* resource) : UIDialog(flags, resource) {}
-    virtual int Tick(float frameTime);                    // 0x00455b20
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00455ae0
-};
 
 // The length of `v` (1 without a square root for unit vectors); the setup
 // restores the lengths D3DRMVectorRotate's unit results lose.
@@ -435,7 +426,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     if (g_TrackGame->playingReplay && g_TrackGame->mode.raceSettings.raceMode != 4 &&
         g_TrackGame->useReplayTape) {
         if (g_TrackGame->ui->playingDemo) {
-            UnknownBikeRaceDemoDlg* dialog = new(__FILE__, 0x2fb) UnknownBikeRaceDemoDlg(1, "credits.dtm");
+            DemoDlg* dialog = new(__FILE__, 0x2fb) DemoDlg;
             g_TrackGame->ui->gui->ShowDialog(dialog, 0, 1, 0, 0, 0, 0, 1);
         } else {
             g_TrackGame->ui->gui->ShowCursors(1);

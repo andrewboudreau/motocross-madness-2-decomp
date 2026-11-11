@@ -11,11 +11,6 @@
 //     (the racer pointer is KrustyBike's primary pointer; docs/BIKE_RACE_STATE_CONNECTIONS.md)
 //   UnknownBikeRaceModel::ReplaceMaterialTexture 0x00444c70 = D3DIMSoultreeObject::ReplaceMaterialTexture
 //   UnknownBikeRaceRacer::Load             0x0048fc80 = KrustyBike::Load (ret 0x7c both)
-//   UnknownBikeRaceDemoDlg::Tick           0x00455b20 = DemoDlg::Tick
-//   UnknownBikeRaceDemoDlg::OnControlPress 0x00455ae0 = DemoDlg::OnControlPress
-//     (Group6_BikeRaceCreate.cpp's local stand-in for DlgProcs.h's DemoDlg, which
-//     adds no data members to UIDialog; the canonical bodies are called with a
-//     qualified, non-virtual call so the stand-in's vtable is not re-entered)
 // No project header is included: the declarations below repeat only the members
 // needed, with the same class keys, so every mangled name equals the canonical one.
 // None of these classes gets a constructor here, so no vtable is emitted.
@@ -41,8 +36,6 @@ class ControlInterface;
 class BikeRace;
 struct UnknownBikeRaceBikeSetup;
 class Scene;
-struct UnknownControlEvent;
-struct UnknownInputEntry;
 
 class SoultreeObject {
 public:
@@ -73,12 +66,6 @@ public:
                      void* a24, int withRider);
 };
 
-class DemoDlg {
-public:
-    virtual int Tick(float frameTime);
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
-};
-
 // ---- the views (same keys and signatures as BikeRace.h / Group6_BikeRaceCreate.cpp)
 
 struct UnknownBikeRaceMesh {
@@ -107,12 +94,6 @@ public:
                      ControlInterface* control, char ai, int remote, BikeRace* race,
                      const char* name, int b, int id, UnknownBikeRaceBikeSetup* setup, int c, int d,
                      int particles, Scene* scene, KrustyVCR* vcr, float skill, int e);
-};
-
-class UnknownBikeRaceDemoDlg {
-public:
-    virtual int Tick(float frameTime);
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
 };
 
 void UnknownBikeRaceMesh::SetUseLighting(int value)
@@ -189,14 +170,4 @@ GameObject* UnknownBikeRaceRacer::Load(void* owner, const char* a, const char* b
         (unsigned char)ai, (unsigned char)remote, reinterpret_cast<KbRace*>(race), (int)name, b,
         id, reinterpret_cast<const KbBikeSetup*>(setup), c, d, particles, (int)scene,
         reinterpret_cast<KbRecorder*>(vcr), skillWord, e);
-}
-
-int UnknownBikeRaceDemoDlg::Tick(float frameTime)
-{
-    return reinterpret_cast<DemoDlg*>(this)->DemoDlg::Tick(frameTime);
-}
-
-int UnknownBikeRaceDemoDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry)
-{
-    return reinterpret_cast<DemoDlg*>(this)->DemoDlg::OnControlPress(event, entry);
 }
