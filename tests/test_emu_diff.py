@@ -114,6 +114,8 @@ CLEAN_CASES = {
     'kb_ai_step': 100,
     'kb_net_interpolate': 100,
     'game_tick': 60,
+    # Third replay sweep: agreement within the case's FLOAT_ULPS/FLOAT_ABS (inline-dot grouping).
+    'kb_look_ahead': 40,
 }
 
 # Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).
@@ -134,6 +136,21 @@ PRE_FIX_SHAPES = [
                      '    s->blendFactor = step / s->timeConstant;\n'
                      '    s->smoothedValue = (target - s->smoothedValue) * s->blendFactor + s->smoothedValue;\n'
                      '    return s->smoothedValue;')], 100),
+    # SimulateLookAhead without a side vector built only the inner cross (a flat side axis).
+    ('kb_look_ahead', [('SafeNormalize(CrossProduct(fwd, Vec3(up.y * fwd.z - up.z * fwd.y, up.z * fwd.x - '
+                        'up.x * fwd.z, up.x * fwd.y - up.y * fwd.x)));',
+                        'SafeNormalize(Vec3(up.y * fwd.z - up.z * fwd.y, up.z * fwd.x - up.x * fwd.z, '
+                        'up.x * fwd.y - up.y * fwd.x));')], 40),
+    # ... and settled the end pose on a fresh (uninitialised) rear ground sample.
+    ('kb_look_ahead', [('    Vec3 groundR;\n    Vec3 normalF;\n    Vec3 normalR;\n    float t = 0.0f;',
+                        '    float t = 0.0f;'),
+                       ('            groundR = back;', '            Vec3 groundR = back;'),
+                       ('            float rearBrake = 0.0f;\n            if (terrain) {',
+                        '            float rearBrake = 0.0f;\n            Vec3 normalF;\n            Vec3 normalR;\n'
+                        '            if (terrain) {'),
+                       ('    Vec3 groundF = front;\n    if (terrain) {',
+                        '    Vec3 groundF = front;\n    Vec3 groundR;\n    Vec3 normalF;\n    Vec3 normalR;\n'
+                        '    if (terrain) {')], 40),
 ]
 
 
@@ -317,6 +334,86 @@ class DifferentialTests(unittest.TestCase):
                     summary = emu_diff.run_diff(module, obj, n=n, retail=Path(os.environ['MCM2_EXE']),
                                                 show=1)
                 self.assertGreater(summary.mismatches, 0)
+
+
+class ReplayPointeeAndToleranceTests(unittest.TestCase):
+    @unittest.skipUnless(importlib.util.find_spec('unicorn') is not None
+                         and importlib.util.find_spec('capstone') is not None, 'requires unicorn and capstone')
+    def test_inout_pointees_are_logged_and_left_for_the_effect(self):
+        import struct
+        from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UC_HOOK_CODE
+        from unicorn.x86_const import UC_X86_REG_ESP
+        query = 0x00401000                       # void __cdecl Q(Vec3*)
+
+        def run(spec):
+            uc = Uc(UC_ARCH_X86, UC_MODE_32)
+            for base, size in ((emu_diff.CAND, 0x1000), (emu_diff.STUB, emu_diff.STUB_SIZE),
+                               (emu_diff.HEAP, emu_diff.HEAP_SIZE),
+                               (emu_diff.STACK_TOP - emu_diff.STACK_SIZE, emu_diff.STACK_SIZE)):
+                uc.mem_map(base, size)
+            ctx = emu_diff.Context(uc, random.Random(1))
+            out = ctx.alloc(12)
+            code = bytearray(bytes.fromhex('83ec0c'))                 # sub esp, 12 (a Vec3 local)
+            for k, value in enumerate((1.0, 2.0, 3.0)):
+                code += bytes.fromhex('c74424') + bytes([4 * k]) + struct.pack('<f', value)
+            code += b'\x54'                                           # push esp (&local)
+            code += b'\xe8' + struct.pack('<i', query - (emu_diff.CAND + len(code) + 5))
+            code += bytes.fromhex('83c404')                           # add esp, 4
+            for k in range(3):                                        # copy the local to out
+                code += bytes.fromhex('8b4424') + bytes([4 * k]) + b'\xa3' + struct.pack('<I', out + 4 * k)
+            code += bytes.fromhex('83c40c')
+            end = emu_diff.CAND + len(code)
+            code += b'\xc3'
+            uc.mem_write(emu_diff.CAND, bytes(code))
+            seen = []
+
+            def effect(ctx, rec):
+                seen.append(ctx.unpack(rec.args[0], '3f'))
+                ctx.pack(rec.args[0] + 4, 'f', 9.0)                  # keeps x and z, writes y
+            replay = emu_diff.Replay(dict(spec, effects={query: effect}),
+                                     names={query: ['?Q@@YAXPAUVec3@@@Z']})
+            uc.hook_add(UC_HOOK_CODE, emu_diff.ReplayRun(replay, ctx, 'seed', emu_diff.CAND).hook)
+            uc.reg_write(UC_X86_REG_ESP, emu_diff.STACK_TOP - 0x100)
+            uc.emu_start(emu_diff.CAND, end)
+            return ctx.calls, seen, ctx.unpack(out, '3f')
+
+        passed = struct.pack('<3f', 1.0, 2.0, 3.0).hex()
+        calls, seen, result = run({'inout': {query: (0,)}})
+        self.assertEqual(calls[0][3], (('*arg0', passed),))
+        self.assertEqual(seen, [(1.0, 2.0, 3.0)])
+        self.assertEqual(result, (1.0, 9.0, 3.0))
+        # A plain stack out-pointer is neither logged nor kept: synthetic bytes replace it.
+        calls, seen, result = run({})
+        self.assertEqual(calls[0][3], ())
+        self.assertNotEqual(seen, [(1.0, 2.0, 3.0)])
+        # pointees with an explicit size log that many bytes.
+        calls, _, _ = run({'pointees': {query: ((0, 8),)}})
+        self.assertEqual(calls[0][3], (('*arg0', passed[:16]),))
+
+    def test_outcomes_within_ulps(self):
+        import struct
+
+        def word(f):
+            return struct.unpack('<I', struct.pack('<f', f))[0]
+
+        def outcome(x, arg, status='ret'):
+            return (status, ('eax', 1), ('calls', (('?F@@YAXM@Z', None, (arg,), ()),)),
+                    ('writes', ((0x40000000, struct.pack('<f', x).hex()),)))
+        one = word(1.0)
+        self.assertEqual(emu_diff.ulp_distance(one, one + 3), 3)
+        self.assertEqual(emu_diff.ulp_distance(word(-0.0), word(0.0)), 0)
+        self.assertEqual(emu_diff.ulp_distance(word(1e-45), word(-1e-45)), 2)
+        a = outcome(1.0, one)
+        self.assertEqual(emu_diff.outcomes_within_ulps(a, a, 4), 0)
+        b = outcome(struct.unpack('<f', struct.pack('<I', one + 3))[0], one + 2)
+        self.assertEqual(emu_diff.outcomes_within_ulps(a, b, 4), 3)
+        self.assertIsNone(emu_diff.outcomes_within_ulps(a, b, 2))
+        self.assertIsNone(emu_diff.outcomes_within_ulps(a, b, 0))
+        self.assertIsNone(emu_diff.outcomes_within_ulps(a, outcome(1.0, one, 'limit'), 4))
+        # Near zero an absolute bound also agrees; far apart values never do.
+        self.assertIsNone(emu_diff.outcomes_within_ulps(outcome(1e-7, one), outcome(-1e-7, one), 4))
+        self.assertEqual(emu_diff.outcomes_within_ulps(outcome(1e-7, one), outcome(-1e-7, one), 4, 1e-6), 0)
+        self.assertIsNone(emu_diff.outcomes_within_ulps(outcome(1.0, one), outcome(1.5, one), 4, 1e-6))
 
 
 if __name__ == '__main__':

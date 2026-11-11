@@ -849,7 +849,9 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
     Vec3 up;
     up = Vec3(0.0f, 0.0f, 0.0f);
     up.y = 1.0f;
-    sideV = side ? *side : SafeNormalize(Vec3(up.y * fwd.z - up.z * fwd.y, up.z * fwd.x - up.x * fwd.z, up.x * fwd.y - up.y * fwd.x));
+    // Without a side vector retail takes up's component across fwd, fwd x (up x fwd)
+    // (0x0040ede9..0x0040eede: the inner cross with up.y folded, then the outer one).
+    sideV = side ? *side : SafeNormalize(CrossProduct(fwd, Vec3(up.y * fwd.z - up.z * fwd.y, up.z * fwd.x - up.x * fwd.z, up.x * fwd.y - up.y * fwd.x)));
     Vec3 front = *center + fwd * 3.5f;
     Vec3 vF = *frontVel;
     Vec3 right;
@@ -922,6 +924,11 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
     }
 
     int airborne;
+    // The rear ground sample and the two normals outlive the loop: the final settle below
+    // queries groundR without setting it, so retail samples the last step's rear point.
+    Vec3 groundR;
+    Vec3 normalF;
+    Vec3 normalR;
     float t = 0.0f;
     if (0.0f < maxTime) {
         Vec3 rearForce = Vec3(0.0f, 0.0f, 0.0f);
@@ -937,13 +944,11 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
             Vec3 frontDrag = Vec3(0.0f, 0.0f, 0.0f);
             accF.y = -32.0f;
             accF -= frontDrag;
-            Vec3 groundR = back;
+            groundR = back;
             Vec3 groundF = front;
             float frontBrake = 0.0f;
             float impact = 0.0f;
             float rearBrake = 0.0f;
-            Vec3 normalF;
-            Vec3 normalR;
             if (terrain) {
                 terrain->QueryGround((TerrainVec3*)&groundF, (TerrainVec3*)&normalF, 0, 0);
                 terrain->QueryGround((TerrainVec3*)&groundR, (TerrainVec3*)&normalR, 0, 0);
@@ -1290,9 +1295,6 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
     }
 
     Vec3 groundF = front;
-    Vec3 groundR;
-    Vec3 normalF;
-    Vec3 normalR;
     if (terrain) {
         terrain->QueryGround((TerrainVec3*)&groundF, (TerrainVec3*)&normalF, 0, 0);
         terrain->QueryGround((TerrainVec3*)&groundR, (TerrainVec3*)&normalR, 0, 0);
