@@ -35,7 +35,7 @@ static inline int RegisterHiResTimer(HiResMeter* meter, const char* name) {
         }
     if (meter->timerCount >= 50)
         return 49;
-    strncpy(meter->timers[meter->timerCount].name, name, 31);
+    strncat(meter->timers[meter->timerCount].name, name, 31);
     meter->field_0x38 = meter->timerCount;
     return meter->timerCount++;
 }

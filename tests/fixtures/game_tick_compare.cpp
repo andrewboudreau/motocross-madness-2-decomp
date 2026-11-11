@@ -168,7 +168,7 @@ static DWORD Replacement(DWORD target) {
     case 0x469c80: return Address(&GameObject::ReleaseDetached);
     case 0x4e8cc0: return Address(&RenderTarget::AdvanceFrame);
     case 0x4692f0: return Address(&Probe::Context);
-    case 0x536b60: return (DWORD)&strncpy;
+    case 0x536b60: return (DWORD)&strncat;
     }
     return 0;
 }
