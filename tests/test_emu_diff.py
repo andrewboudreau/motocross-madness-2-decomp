@@ -156,6 +156,13 @@ CLEAN_CASES = {
     'track_game_mode_reset_defaults': 10,
     'pick_followed_racer': 100,
     'kb_select_rider_pose': 200,
+    # Third sweep, bodies the replay cases also cover.
+    'eco_generate_objects': 15,
+    'bikerace_aim_camera': 100,
+    'bikerace_next_camera_target': 100,
+    'bikerace_write_relative_positions': 150,
+    'visual_cue_tick': 100,
+    'kb_simulate_look_ahead': 20,
 }
 
 # Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).
@@ -176,21 +183,14 @@ PRE_FIX_SHAPES = [
                      '    s->blendFactor = step / s->timeConstant;\n'
                      '    s->smoothedValue = (target - s->smoothedValue) * s->blendFactor + s->smoothedValue;\n'
                      '    return s->smoothedValue;')], 100),
-    # SimulateLookAhead without a side vector built only the inner cross (a flat side axis).
-    ('kb_look_ahead', [('SafeNormalize(CrossProduct(fwd, Vec3(up.y * fwd.z - up.z * fwd.y, up.z * fwd.x - '
-                        'up.x * fwd.z, up.x * fwd.y - up.y * fwd.x)));',
-                        'SafeNormalize(Vec3(up.y * fwd.z - up.z * fwd.y, up.z * fwd.x - up.x * fwd.z, '
-                        'up.x * fwd.y - up.y * fwd.x));')], 40),
-    # ... and settled the end pose on a fresh (uninitialised) rear ground sample.
-    ('kb_look_ahead', [('    Vec3 groundR;\n    Vec3 normalF;\n    Vec3 normalR;\n    float t = 0.0f;',
-                        '    float t = 0.0f;'),
-                       ('            groundR = back;', '            Vec3 groundR = back;'),
-                       ('            float rearBrake = 0.0f;\n            if (terrain) {',
-                        '            float rearBrake = 0.0f;\n            Vec3 normalF;\n            Vec3 normalR;\n'
-                        '            if (terrain) {'),
-                       ('    Vec3 groundF = front;\n    if (terrain) {',
-                        '    Vec3 groundF = front;\n    Vec3 groundR;\n    Vec3 normalF;\n    Vec3 normalR;\n'
-                        '    if (terrain) {')], 40),
+    ('bikerace_write_relative_positions', [('float length = Vec3Dot(&v, &v);', 'float length = SquareMagnitude(v);'),
+                                           ('return Vec3ScaleCall(v, FastInvSqrt(length));',
+                                            'float scale = FastInvSqrt(length);\n    return Scale(v, scale);')], 200),
+    ('bikerace_write_relative_positions', [('*a = AddCall(ScaleCall(gridSlotStep, (float)count), gridFirstSlot);',
+                                           '*a = Scale(gridSlotStep, (float)count) + gridFirstSlot;')], 200),
+    ('kb_simulate_look_ahead', [('SafeNormalize(BikeAICrossCtor(fwd, ', 'SafeNormalize((')], 60),
+    ('kb_simulate_look_ahead', [('            groundR = back;', '            Vec3 groundR = back;')], 20),
+    ('kb_simulate_look_ahead', [('sideV = Vec3(lean.x * k, lean.y * k, lean.z * k);', 'sideV = lean * k;')], 20),
 ]
 
 

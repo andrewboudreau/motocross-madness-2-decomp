@@ -355,9 +355,12 @@ static inline int UnknownEcoTgaIsSet(UnknownTgaFile* tga, float x, float z) {
 // argument order, threshold, TGA clamps, slope/altitude terms, placement and
 // free loops agree. Retail weights the definition TGA as
 // (channel * probability) * 1/255 inside each format branch; this source does
-// (channel * 1/255) * probability. The first product is exact either way
-// (8-bit channel times a 24-bit float), so both round the same exact triple
-// product once and give identical floats. Spelling it in retail's order (an
+// (channel * 1/255) * probability. At 53-bit precision the first product is
+// exact either way (8-bit channel times a 24-bit float), so both round the same
+// exact triple product once and give identical floats. At 24-bit precision each
+// product rounds: 20333 of the 65025 channel/probability pairs then differ by
+// one ulp (exhaustive check, third emu_diff sweep); whether that ever flips a
+// placement draw is open. Spelling it in retail's order (an
 // inline `scale` helper, by value or by reference) reallocates ebx/ebp across
 // the whole body and lowers the linked score (0.918 -> 0.914), so it is not used.
 int EcoSystem::GenerateObjects(int checkCodes) {

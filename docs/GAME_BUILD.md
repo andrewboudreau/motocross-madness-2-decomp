@@ -1415,6 +1415,30 @@ Not emulated: `EventManager::LeaveRaceForMenu` 0x0045e710 (masked 1.0; every
 call is GUI, sound, display or allocation, so a case would test only its
 stubs).
 
+Bodies that the replay cases also cover were checked here first. These
+differed from retail and are fixed:
+
+| VA | Function | Runs | Differed before -> after | Cause and fix | Masked |
+|---|---|---|---|---|---|
+| 0x004210f0 | `BikeRace::WriteRelativePositions` | 300 | 22 -> 11 (53-bit), 11 -> 0 (24-bit) | the grid-step normalisation summed the square `x+y+z` and scaled inline; retail calls `Vec3Dot` (0x0040ae30, `(y+x)+z`) and `Vec3Scale` (0x005015b0) | 0.958 -> 0.981 |
+| 0x004210f0 | (same) | 300 | 11 -> 0 (53-bit) | grid-slot sums and scales stayed on the x87 stack through inline operators; retail rounds each scaled vector to binary32 in the out-of-line constructor (0x00404e60) or calls the cdecl add and subtract helpers 0x00421cb0/0x00421d00. Per-site call views (`Vector3Call`, `BikeRaceAddCall`, `BikeRaceSubtractCall`, link-aliased) say so | (same) |
+| 0x0040eca0 | `SimulateLookAhead` | 100 (53-bit) | 77 -> 0 | three causes: with no side axis retail crosses the up-cross with `fwd` again before `SafeNormalize` (0x0040ee7c); the final rear ground query starts from the last step's point and keeps the last step's normals, where the source read an unset local; the lean blend scales each component by the unrounded reciprocal (0x00412aa1) | 0.954 -> 0.954 |
+
+`SimulateLookAhead`'s `match_one` alignment fell from 3739 to 3672 of 3966
+instructions with these fixes. Its case runs at 53-bit only: at 24-bit 41 of
+60 runs differ by one ulp because VC6 reorders the inlined three-term dot
+products (retail sums x, y, z at 0x00411a44). One generated input (index 130)
+does not return within 200M instructions in either image; the clean count
+stays below it. `BikeRace::AimCamera` 0x0041eb20 and `NextCameraTarget`
+0x0041f1d0 (200 each), `VisualCue::Tick` 0x0048b100 (600) and
+`EcoSystem::GenerateObjects` 0x00459ce0 (30) agreed in every run.
+
+Open: `EcoSystem::GenerateObjects` weights a texture channel as
+`(channel * probability) / 255` where the source has
+`(channel / 255) * probability`. The two agree at 53-bit; at 24-bit 20333 of
+the 65025 channel and probability pairs differ by one ulp (exhaustive check).
+Whether that ever flips a placement draw is not known.
+
 ### Grid lighting workers
 
 The three workers in `Group4_GridLighting.cpp` were rewritten from the
