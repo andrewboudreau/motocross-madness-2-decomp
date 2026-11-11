@@ -135,7 +135,7 @@ static inline void ScaleTerrainVec3(TerrainVec3& v, float s)
 }
 
 // 0x005059d0.
-Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc* desc,
+Terrain* Terrain::Load(int host, TerrainStream* stream, int loadChildren, TerrainSurfaceDesc* desc,
                        int quality, int field0xc40, const char* textureName, int halfFormat)
 {
     GameObject::SetRenderContext((void*)host);
@@ -264,7 +264,7 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     boundsMin = TerrainVec3(FLT_MAX, FLT_MAX, FLT_MAX);
     boundsMax = TerrainVec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
     heightField = reinterpret_cast<TerrainShutdownObject*>(new(__FILE__, 0x1e6)
-        DrawableGridNodeSharedTextures(reinterpret_cast<UnknownTextureStream*>(this->stream), host,
+        DrawableGridNodeSharedTextures(reinterpret_cast<UnknownTextureStream*>(this->stream), loadChildren,
                                       0, reinterpret_cast<GridTerrain*>(this), gridSize,
                                       gridSize * 4, 0, 0, 0, &boundsMin.x, &boundsMax.x));
     boundsMax.x += 16.0f;

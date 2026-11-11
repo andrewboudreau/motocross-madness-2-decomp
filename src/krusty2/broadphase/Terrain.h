@@ -312,8 +312,10 @@ public:
     explicit Terrain(int flags);                                // 0x00505830 (ret 4), forwards flags to GameObject(int)
     // 0x005059d0 (thiscall, ret 0x20; called from QuarryStuntEvent).  Reads the "TRN" version 5
     // terrain file from `stream`; returns this, or 0 after Release() on a bad header or a failed
-    // palette.  Name and argument roles are tier 3; the third argument is never read.
-    Terrain* Load(int host, TerrainStream* stream, int unused, TerrainSurfaceDesc* desc,
+    // palette.  Name and argument roles are tier 3; the third argument goes to the height
+    // field's constructor (0x0047c880) as its second argument, which ReadNode tests before
+    // reading the child nodes (the quarry loader passes 1).
+    Terrain* Load(int host, TerrainStream* stream, int loadChildren, TerrainSurfaceDesc* desc,
                   int quality, int field0xc40, const char* textureName, int halfFormat);
     virtual ~Terrain();                                         // 0x005059b0 -> core 0x005079f0
 

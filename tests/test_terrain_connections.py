@@ -53,7 +53,9 @@ PARTIAL = (
     # Load's bytes and relocation types/targets are otherwise unchanged.
     # QueryGround's named partial heights renumber it again ($L6429 -> $L6433);
     # Load's 2117 bytes and other 64 relocation records are identical.
-    ('?Load@Terrain@@', 2117, '8f69769d788fbc2be9b28129feb3c34e918023819e6ec5927041fd2f682044b9'),
+    # Load now passes its third argument (retail 0x0050614c), not `host`, to the height field;
+    # the size and relocations are unchanged, one push source differs.
+    ('?Load@Terrain@@', 2117, 'caa090e03ea34171361119bfe73ce6c906afcddd8f3d34c5c5a4ec117eb4782a'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with
@@ -168,7 +170,7 @@ class TerrainConnectionsTests(unittest.TestCase):
             body, size, relocations = provider.symbol_extent(entry)
             self.assertEqual(size, 2117)
             self.assertEqual(hashlib.sha256(body).hexdigest(),
-                             '809febfee089efa6c3c7b4cd3ae3ff2e22f73f638260973ff5deb747d414bbaa')
+                             'f3030667d51c69b26e4c62732b2f44b8ec88dc4170252f9e8b4adaca72ef4ac2')
             stream_calls = {'?Read@UnknownTextureStream@@QAEHPAXHH@Z': (0x461640, 14),
                             '?Seek@UnknownTextureStream@@QAEHHHH@Z': (0x461340, 3),
                             '?Tell@UnknownTextureStream@@QAEHXZ': (0x461600, 1)}
