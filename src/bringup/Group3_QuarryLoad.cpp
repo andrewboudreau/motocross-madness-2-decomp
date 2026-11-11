@@ -376,7 +376,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         terrainTextures.halvings = 0;
         skyTextures.halvings = 0;
         modelTextures.halvings = 0;
-        if (((PCVideoCard*)g_TrackGame->display)->isAGP) {
+        if (g_TrackGame->display->isAGP) {
             g_TrackGame->texturesCached = 0;
             if (available - needed <= 0) {
                 if (forced) {

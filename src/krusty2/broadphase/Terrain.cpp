@@ -7,6 +7,7 @@
 #include "../../reconstructed/TextureMapManager.h"
 #include "../../reconstructed/FileStream.h"
 #include "../../reconstructed/DebugOverlay.h"
+#include "../../reconstructed/PCVideoCard.h"
 #include "../../reconstructed/Griddraw.h"
 #include "../../reconstructed/MatrixUtil.h"
 #include "../../reconstructed/Quantize.h"
@@ -96,10 +97,6 @@ void Terrain::RetireOwnedObject(BaseObject* object)
 
 // Boundary declarations for Terrain::Load (tier 1 addresses, tier 3 names).
 
-struct TerrainGameDisplay {                                     // PCVideoCard (src/reconstructed/PCVideoCard.h)
-    char pad_0x000[0x4bc];
-    char driverName[1];                                         // +0x4bc the DriverInfo registry key component
-};
 struct TerrainGameSettings {                                    // TrackGame (src/reconstructed/Game.h)
     virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
     virtual void Slot4(); virtual void Slot5(); virtual void Slot6(); virtual void Slot7();
@@ -110,7 +107,7 @@ struct TerrainGameSettings {                                    // TrackGame (sr
     virtual void Slot21(); virtual void Slot22(); virtual void Slot23(); virtual void Slot24();
     virtual int SetRegistryInt(const char* name, int value);          // slot 25 (+0x64)
     char pad_0x004[0x0c - 0x04];
-    TerrainGameDisplay* display;                                // +0x00c
+    PCVideoCard* display;                                       // +0x00c
     char pad_0x010[0x38 - 0x10];
     DebugOverlay* overlay;                               // +0x038 profile page printer
     char pad_0x03c[0x2d0 - 0x3c];
@@ -395,12 +392,12 @@ int Terrain::Render3D()
         } else {
             char key[256];
             sprintf(key, "DriverInfo\\%s\\CanRenderDualTextureInSinglePass",
-                    reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->display->driverName);
+                    reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->display->driverGuidText);
             int canDual = reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->GetRegistryInt(key, -1);
             if (canDual == 0 || canDual == 1) {
                 canSinglePassDual = canDual;
                 sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod",
-                        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->display->driverName);
+                        reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->display->driverGuidText);
                 int method = reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->GetRegistryInt(key, 1);
                 if (method < 0 || method > 2)
                     method = 1;
@@ -442,7 +439,7 @@ int Terrain::Render3D()
                         canSinglePassDual = 1;
                         lowestQualityOverride = 0;
                         sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod",
-                                reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->display->driverName);
+                                reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->display->driverGuidText);
                         reinterpret_cast<TerrainGameSettings*>(g_TrackGame)->SetRegistryInt(key, 1);
                     }
                     g_terrainQualityValue = g_pTerrainQualityTable[qualityIndex].hasDetailPass;

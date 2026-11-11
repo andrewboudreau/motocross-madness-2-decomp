@@ -47,7 +47,9 @@ PARTIAL = (
     # $L6170 to $L6172. Both resolve to section 29 .text$x+182 with zero
     # addend; all 85 sections and 517 relocations of the old/current game
     # and fresh test objects remain identical by resolved destination.
-    ('?Load@Terrain@@', 2117, '95a6e01c5ae22b3a913e940ee970d32157c8fcd7ef40ab77fc7d9a7d5b6841f3'),
+    # Including PCVideoCard.h for the +0xc display renumbers it again
+    # ($L6173 -> $L6423, still .text$x+0xb6); the body bytes are identical.
+    ('?Load@Terrain@@', 2117, '90f8b0156be8e7e164122b2a123eafa6e63d31f69d0fc5cfbbade355e34504dc'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with
