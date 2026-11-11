@@ -13,7 +13,7 @@
 #include "PCGame.h"
 #include "ControlInterface.h"
 #include "JoystickDevice.h"
-#include "Display.h"
+#include "PCVideoCard.h"
 
 // The display window (0x00689a2c..0x00689a48).
 HWND g_DisplayWindow;          // 0x00689a30
@@ -106,7 +106,7 @@ LRESULT CALLBACK DisplayWindowProc(HWND window, UINT message, WPARAM wParam, LPA
 // without asking (unless PCGame+0x544 forces the dialog), the display
 // "UseVideoCardIdx" names when `useLast` is set, or the dialog's choice;
 // `blade` is set when the software (Blade) entry was chosen.
-UnknownDisplay* ChooseDisplay(int flag, int useLast, int* blade)
+PCVideoCard* ChooseDisplay(int flag, int useLast, int* blade)
 {
     char key[0x100];
     int usable = 0;
@@ -114,7 +114,7 @@ UnknownDisplay* ChooseDisplay(int flag, int useLast, int* blade)
     int usableIndex;
     int i;
     for (i = 0; i < g_DisplayCount; i++) {
-        UnknownDisplay* display = g_Displays[i];
+        PCVideoCard* display = g_Displays[i];
         if (display->driverCaps & 1) {
             sprintf(key, "DriverInfo\\%s\\DisabledFullScreen", display->driverGuidText);
             int fullScreenDisabled = g_TrackGame->GetRegistryFlag(key, 0);

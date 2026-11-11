@@ -17,7 +17,7 @@ PCGame is the Windows layer. It holds:
 ## Game's display and render target
 
 Two of Game's members are now typed:
-- **+0x0c is the display (`Display.h`).** PCGame slot 31 hands it to
+- **+0x0c is the display (`PCVideoCard`, `PCVideoCard.h`).** PCGame slot 31 hands it to
   PCRenderTarget `0x004c4f80`, which stores it at RenderTarget+0x04 through
   `0x004e8ca0`. This is the same object Camera reads display modes from.
 - **+0x10 is a RenderTarget.** Slot 31 allocates 0xbc4 bytes and runs
@@ -102,7 +102,7 @@ or a reconstruction of the complete original translation unit.
 
 The functional build explicitly admits this candidate. Its initial admission
 supplied `ProfileDisplays` but exposed a previously unlinked dependency,
-`void UnknownDisplay::ProbePartialTextureUploads(RenderTarget*)`
+`void PCVideoCard::ProbePartialTextureUploads(RenderTarget*)`
 (`0x004cab00`, 1129 retail bytes). Its complete body is now independently
 reviewed and admitted from [PartialTextureUploads.cpp](PARTIAL_TEXTURE_UPLOADS.md),
 along with the [non-local memory probe](NONLOCAL_TEXTURE_MEMORY.md).

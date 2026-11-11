@@ -284,7 +284,7 @@ reviewed nonexact candidates. Their native comparisons pass 73,728 and 8,486
 scenarios respectively, including mutating UI callbacks and display resource
 ownership/unwind paths. Dialog ticking removes one missing name. Profiling
 supplies its entry point but initially exposes a reference to
-`UnknownDisplay::ProbePartialTextureUploads`, so that admission leaves the
+`PCVideoCard::ProbePartialTextureUploads`, so that admission leaves the
 missing-symbol count unchanged. Dependencies in these tests are scripted;
 real input, registry and display-driver integration remain untested.
 
@@ -619,7 +619,7 @@ Two environment details matter for the source build:
   `blade.dll`/`DINPUT.dll` by ordinal; retail imports by name. The runtime's
   import hooks therefore match these three by ordinal too, which is what lets
   its 16-bit display-mode emulation apply (otherwise
-  `UnknownDisplay::SetDisplayMode(640, 480, 16)` finds no mode and
+  `PCVideoCard::SetDisplayMode(640, 480, 16)` finds no mode and
   `PCGame::StartUp` exits silently).
 - The EULA dialog (`EBUEula.dll`) is shown by the game itself and must be
   accepted by the user.

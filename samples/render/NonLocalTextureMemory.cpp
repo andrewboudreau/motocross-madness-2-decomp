@@ -10,7 +10,7 @@ void FillPixelFormat(int format, void* pixelFormat);
 
 // 0x004ca5a0: whether a 128 x 128 texture of the target's format can be
 // created (with a temporary 640 x 480 x 16 target when `target` is 0).
-int UnknownDisplay::ProbeNonLocalTextureMemory(int* value, RenderTarget* target) {
+int PCVideoCard::ProbeNonLocalTextureMemory(int* value, RenderTarget* target) {
     RenderTarget* render = 0;
     UnknownSurfaceInterface* surface;
     UnknownSurfaceCaps caps;

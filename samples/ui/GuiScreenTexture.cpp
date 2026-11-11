@@ -23,7 +23,7 @@
 PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
     UnknownSurfaceDesc desc;
     UnknownSurfaceInterface* surface;
-    UnknownDisplay* display;
+    PCVideoCard* display;
     PCTextureMap* texture = 0;
     unsigned char* bits;
     unsigned char* row;

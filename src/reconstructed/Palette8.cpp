@@ -3,7 +3,7 @@
 #include "Palette8.h"
 
 #include "DebugAlloc.h"
-#include "Display.h"
+#include "PCVideoCard.h"
 #include "Quantize.h"
 #include "TextureMap.h"
 #include "TrackGame.h"

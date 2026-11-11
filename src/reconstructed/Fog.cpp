@@ -8,7 +8,7 @@
 #include "D3DConstants.h"
 #include "ControlInterface.h"
 #include "DebugAlloc.h"
-#include "Display.h"
+#include "PCVideoCard.h"
 #include "PCRenderTarget.h"
 #include "TrackGame.h"
 

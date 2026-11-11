@@ -12,16 +12,16 @@
 extern "C" void __cdecl __CxxFrameHandler();
 extern "C" const UnknownGuid IID_IDirect3DHALDevice =
     {0x84e63de0,0x46aa,0x11cf,{0x81,0x6f,0,0,0xc0,0x20,0x15,0x6e}};
-UnknownDisplay* g_Displays[4];
+PCVideoCard* g_Displays[4];
 int g_DisplayCount;
 static unsigned char referenceSpace[0x800000];
-static unsigned char gameStorage[sizeof(PCGame)], displayStorage[4][sizeof(UnknownDisplay)];
+static unsigned char gameStorage[sizeof(PCGame)], displayStorage[4][sizeof(PCVideoCard)];
 static unsigned char targetStorage[4][sizeof(PCRenderTarget)];
 static UnknownDisplayMode modes[4][4];
 static DWORD gameTable[38], displayTable[5], drawTable[30], surfaceTable[50];
 static DWORD drawObjects[4], surfaceObjects[4][11];
 static PCGame* Game() { return (PCGame*)gameStorage; }
-static UnknownDisplay* Display(int i) { return (UnknownDisplay*)displayStorage[i]; }
+static PCVideoCard* Display(int i) { return (PCVideoCard*)displayStorage[i]; }
 static PCRenderTarget* Target(int i) { return (PCRenderTarget*)targetStorage[i]; }
 struct Scenario {
     int count, loaded, disabled, fail, surfaceLimit, partial, platform, caps, deviceCaps;
@@ -116,7 +116,7 @@ int PCRenderTarget::DrawPrimitive(int,int,int,int,int){Fail(86);return 0;}
 int PCRenderTarget::DrawIndexedPrimitiveVB(int,int,int,int,int,int,int){Fail(86);return 0;}
 void PCRenderTarget::SetAlphaTest(int){Fail(86);}
 void PCRenderTarget::DisableAlphaTest(){Fail(86);}
-RenderTarget* PCRenderTarget::InitializeRenderTarget(UnknownDisplay* display,const UnknownGuid* id,
+RenderTarget* PCRenderTarget::InitializeRenderTarget(PCVideoCard* display,const UnknownGuid* id,
         UnknownSurfaceInterface* surface,int wantZ,int frames) {
     int n=Index(display);
     EventRecord& r=Event(6,n,this==(void*)Target(n),this==0,wantZ,frames,(int)surface);
@@ -128,29 +128,29 @@ RenderTarget* PCRenderTarget::InitializeRenderTarget(UnknownDisplay* display,con
     return this;
 }
 struct ConstructorCall { PCRenderTarget* Create(){return ::new(this) PCRenderTarget;} };
-int PCGame::LoadDisplayProfile(UnknownDisplay* d) {
+int PCGame::LoadDisplayProfile(PCVideoCard* d) {
     int n=Index(d); Event(7,n); d->textureCacheLimit=123+n;
     return (scenario.loaded>>n)&1;
 }
-int PCGame::LimitDisplayModes(UnknownDisplay* d,int width,int height) {
+int PCGame::LimitDisplayModes(PCVideoCard* d,int width,int height) {
     int n=Index(d); Event(8,n,width,height);
     for (int i=0;i<d->displayModeCount;++i) d->displayModes[i].hardwareUsable=(i+width+height)&1;
     return 1;
 }
-int UnknownDisplay::SetWindowedCooperativeLevel(int x,int y,int w,int h) {
+int PCVideoCard::SetWindowedCooperativeLevel(int x,int y,int w,int h) {
     int n=Index(this); Event(9,n,x,y,w,h); cooperativeLevel=w?8:16;
     return scenario.fail!=1;
 }
-int UnknownDisplay::SetFullscreenCooperativeLevel() {
+int PCVideoCard::SetFullscreenCooperativeLevel() {
     int n=Index(this); Event(10,n); cooperativeLevel=32; return scenario.fail!=2;
 }
-void UnknownDisplay::RefreshDriverCaps() {
+void PCVideoCard::RefreshDriverCaps() {
     activeDisplay=Index(this); Event(11,activeDisplay); driverCaps=scenario.caps;
 }
-int UnknownDisplay::ProbeNonLocalTextureMemory(int* value,RenderTarget* target) {
+int PCVideoCard::ProbeNonLocalTextureMemory(int* value,RenderTarget* target) {
     int n=Index(this); Event(12,n,(int)target); *value=321+n; return scenario.seed+n-1;
 }
-void UnknownDisplay::ProbePartialTextureUploads(RenderTarget* target) {
+void PCVideoCard::ProbePartialTextureUploads(RenderTarget* target) {
     int n=Index(this); Event(13,n,(int)target);
     if (Game()->display!=this || Game()->renderTarget!=target) Fail(87);
     partialTextureUploadResult=scenario.seed*17+n;
@@ -182,7 +182,7 @@ struct Hooks {
         EventRecord& r=Event(19,size,(int)data); strcpy(r.name,name);
         if (size>sizeof(r.data)) Fail(89); memcpy(r.data,data,size); return scenario.seed&1;
     }
-    int Filter(UnknownDisplay* d) {
+    int Filter(PCVideoCard* d) {
         Event(20,Index(d));
         for (int i=0;i<d->displayModeCount;++i) d->displayModes[i].textureMemory+=23+i;
         return 1;
@@ -226,16 +226,16 @@ static DWORD Replacement(DWORD a) {
     switch(a) {
     case 0x4c16f0:return Address(&PCGame::LoadDisplayProfile);
     case 0x534aaf:return (DWORD)sprintf;
-    case 0x4c9d20:return Address(&UnknownDisplay::SetWindowedCooperativeLevel);
-    case 0x4c9c90:return Address(&UnknownDisplay::SetFullscreenCooperativeLevel);
-    case 0x4c9b50:return Address(&UnknownDisplay::RefreshDriverCaps);
+    case 0x4c9d20:return Address(&PCVideoCard::SetWindowedCooperativeLevel);
+    case 0x4c9c90:return Address(&PCVideoCard::SetFullscreenCooperativeLevel);
+    case 0x4c9b50:return Address(&PCVideoCard::RefreshDriverCaps);
     case 0x4a3010:return (DWORD)(void*(__cdecl*)(unsigned int,const char*,int))operator new;
     case 0x4c4ee0:return Address(&ConstructorCall::Create);
     case 0x4c4f80:return Address(&PCRenderTarget::InitializeRenderTarget);
     case 0x4c0760:return Address(&PCGame::LimitDisplayModes);
-    case 0x4ca5a0:return Address(&UnknownDisplay::ProbeNonLocalTextureMemory);
+    case 0x4ca5a0:return Address(&PCVideoCard::ProbeNonLocalTextureMemory);
     case 0x5119c0:return (DWORD)FillPixelFormat;
-    case 0x4cab00:return Address(&UnknownDisplay::ProbePartialTextureUploads);
+    case 0x4cab00:return Address(&PCVideoCard::ProbePartialTextureUploads);
     case 0x4a3060:return (DWORD)(void(__cdecl*)(void*,const char*,int))operator delete;
     case 0x53471a:return (DWORD)__CxxFrameHandler;
     } return 0;
@@ -276,7 +276,7 @@ static void Run(int retail) {
     memset(gameStorage,0x53,sizeof(gameStorage));memset(displayStorage,0x61,sizeof(displayStorage));
     memset(targetStorage,0x74,sizeof(targetStorage));memset(modes,0,sizeof(modes));
     *(DWORD*)gameStorage=(DWORD)gameTable;Game()->osVersion.platformId=scenario.platform;
-    Game()->display=(UnknownDisplay*)0x12345678;Game()->renderTarget=(RenderTarget*)0x23456789;
+    Game()->display=(PCVideoCard*)0x12345678;Game()->renderTarget=(RenderTarget*)0x23456789;
     g_DisplayCount=scenario.count;activeDisplay=0;
     for (int n=0;n<4;++n) {
         g_Displays[n]=Display(n);*(DWORD*)Display(n)=(DWORD)displayTable;

@@ -15,11 +15,11 @@ extern "C" const UnknownGuid IID_IDirect3DHALDevice =
     {0x84e63de0,0x46aa,0x11cf,{0x81,0x6f,0,0,0xc0,0x20,0x15,0x6e}};
 static unsigned char referenceSpace[0x800000];
 struct World {
-    unsigned char display[sizeof(UnknownDisplay)], targets[2][sizeof(PCRenderTarget)];
+    unsigned char display[sizeof(PCVideoCard)], targets[2][sizeof(PCRenderTarget)];
     UnknownDisplayMode modes[5]; DWORD drawObjects[2][4], surfaceObjects[2][4]; int value;
 };
 static World world;
-static UnknownDisplay* Display(){return (UnknownDisplay*)world.display;}
+static PCVideoCard* Display(){return (PCVideoCard*)world.display;}
 static PCRenderTarget* Target(int i){return (PCRenderTarget*)world.targets[i];}
 static DWORD drawTable[30],surfaceTable[50],targetVptr;
 struct Scenario {int seed,supplied,modes,fail,caps,alias,mutation,throwAt;};
@@ -63,7 +63,7 @@ static int SourceFile(const char* file){
     if(!name ||(slash&&slash>name))name=slash;name=name?name+1:file;
     if(strcmp(name,"PCVideoCard.cpp")&&strcmp(name,"NonLocalTextureMemory.cpp"))Fail(83);return 1;
 }
-int UnknownDisplay::SetFullscreenDisplayMode(int index,int flag){
+int PCVideoCard::SetFullscreenDisplayMode(int index,int flag){
     if(this!=Display() ||index<0||index>=5)Fail(84);
     Event(1,index,flag);Callback(1);currentDisplayMode=index;return scenario.fail==1?0:1;
 }
@@ -115,7 +115,7 @@ int PCRenderTarget::DrawIndexedPrimitiveVB(int,int,int,int,int,int,int){Fail(86)
 void PCRenderTarget::SetAlphaTest(int){Fail(86);}
 void PCRenderTarget::DisableAlphaTest(){Fail(86);}
 
-RenderTarget* PCRenderTarget::InitializeRenderTarget(UnknownDisplay* display,const UnknownGuid* id,
+RenderTarget* PCRenderTarget::InitializeRenderTarget(PCVideoCard* display,const UnknownGuid* id,
     UnknownSurfaceInterface* surface,int wantZ,int frames){
     if(display!=Display() ||(this &&this!=Target(0)))Fail(89);
     EventRecord& r=Event(4,this==(void*)Target(0),this==0,(int)surface,wantZ,frames);
@@ -158,7 +158,7 @@ static long __stdcall Release(void* self){
 }
 static DWORD Replacement(DWORD a){
     switch(a){
-    case 0x4ca900:return Address(&UnknownDisplay::SetFullscreenDisplayMode);
+    case 0x4ca900:return Address(&PCVideoCard::SetFullscreenDisplayMode);
     case 0x4a3010:return (DWORD)(void*(__cdecl*)(unsigned int,const char*,int))operator new;
     case 0x4c4ee0:return Address(&ConstructorCall::Create);
     case 0x4c4f80:return Address(&PCRenderTarget::InitializeRenderTarget);
@@ -207,7 +207,7 @@ static int Filter(EXCEPTION_POINTERS* e){
     observed.faultAddress=e->ExceptionRecord->ExceptionInformation[1];return EXCEPTION_EXECUTE_HANDLER;
 }
 static int Invoke(DWORD address){
-    typedef int(UnknownDisplay::*Fn)(int*,RenderTarget*);Fn method;memcpy(&method,&address,4);
+    typedef int(PCVideoCard::*Fn)(int*,RenderTarget*);Fn method;memcpy(&method,&address,4);
     __try{return (Display()->*method)(valuePointer,scenario.supplied?Target(1):0);}
     __except(Filter(GetExceptionInformation())){return -500;}
 }
@@ -235,7 +235,7 @@ static void Run(int retail){
     case 7:valuePointer=&Display()->textureCacheLimit;break;
     case 8:valuePointer=0;break;
     }
-    DWORD address=retail?0x4ca5a0:Address(&UnknownDisplay::ProbeNonLocalTextureMemory);
+    DWORD address=retail?0x4ca5a0:Address(&PCVideoCard::ProbeNonLocalTextureMemory);
     observed.result=-501;
     try{observed.result=Invoke(address);}catch(int code){observed.exception=code;}
     observed.state=world;
@@ -287,11 +287,11 @@ static void Compare(){
 }
 int main(int argc,char**argv){
     if(argc!=3||!MapReference(argv[1],argv[2]))return 3;
-    if(sizeof(UnknownDisplay)!=0xb78||sizeof(PCRenderTarget)!=0xbc4||sizeof(UnknownDisplayMode)!=0x24||
+    if(sizeof(PCVideoCard)!=0xb78||sizeof(PCRenderTarget)!=0xbc4||sizeof(UnknownDisplayMode)!=0x24||
        sizeof(UnknownSurfaceDesc)!=0x7c||sizeof(UnknownSurfaceCaps)!=0x10||
-       offsetof(RenderTarget,surfacePixelFormat)!=0x28||offsetof(UnknownDisplay,directDraw)!=0x190||
-       offsetof(UnknownDisplay,backBuffer)!=0x1a0||offsetof(UnknownDisplay,frameBufferCount)!=0x78||
-       offsetof(UnknownDisplay,displayModeCount)!=8||offsetof(UnknownDisplay,displayModes)!=0x10)Fail(100);
+       offsetof(RenderTarget,surfacePixelFormat)!=0x28||offsetof(PCVideoCard,directDraw)!=0x190||
+       offsetof(PCVideoCard,backBuffer)!=0x1a0||offsetof(PCVideoCard,frameBufferCount)!=0x78||
+       offsetof(PCVideoCard,displayModeCount)!=8||offsetof(PCVideoCard,displayModes)!=0x10)Fail(100);
     for(int i=0;i<30;++i)drawTable[i]=(DWORD)abort;drawTable[6]=(DWORD)CreateSurface;
     for(i=0;i<50;++i)surfaceTable[i]=(DWORD)abort;surfaceTable[2]=(DWORD)Release;surfaceTable[14]=(DWORD)GetCaps;
     silent=1;::new(Target(1))PCRenderTarget;targetVptr=*(DWORD*)Target(1);silent=0;

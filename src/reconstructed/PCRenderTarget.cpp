@@ -408,7 +408,7 @@ void PCRenderTarget::SaveScreenshot() {
 // reads the surface size and pixel format, attaches a Z buffer of the same
 // depth when `zbuffer` is set, then creates the device and collects its caps
 // and texture formats. On any failure the target deletes itself.
-RenderTarget* PCRenderTarget::InitializeRenderTarget(UnknownDisplay* display, const UnknownGuid* deviceId,
+RenderTarget* PCRenderTarget::InitializeRenderTarget(PCVideoCard* display, const UnknownGuid* deviceId,
     UnknownSurfaceInterface* surface, int wantZBuffer, int frames) {
     UnknownPixelFormat format;
     UnknownSurfaceDesc desc;

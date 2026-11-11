@@ -18,7 +18,7 @@
 static int __stdcall EnumDisplayCallback(UnknownGuid* guid, char* description, char* name,
     void* context) {
     if (g_DisplayCount < 4) {
-        UnknownDisplay* display = new (__FILE__, 280) UnknownDisplay;
+        PCVideoCard* display = new (__FILE__, 280) PCVideoCard;
         display = display->InitializeDisplay(guid, description, name, *(void**)context);
         g_Displays[g_DisplayCount] = display;
         if (display)
@@ -31,7 +31,7 @@ static int __stdcall EnumDisplayCallback(UnknownGuid* guid, char* description, c
 static int __stdcall EnumDisplayExCallback(UnknownGuid* guid, char* description, char* name,
     void* context, void* monitor) {
     if (g_DisplayCount < 4) {
-        UnknownDisplay* display = new (__FILE__, 307) UnknownDisplay;
+        PCVideoCard* display = new (__FILE__, 307) PCVideoCard;
         display = display->InitializeDisplay(guid, description, name, *(void**)context);
         g_Displays[g_DisplayCount] = display;
         if (display)
@@ -64,7 +64,7 @@ int EnumerateDisplays(void* window) {
 // 0x004c9660: EnumDisplayModes callback; appends the mode, growing the
 // table by 20 entries.
 static long __stdcall EnumDisplayModeCallback(UnknownSurfaceDesc* desc, void* context) {
-    UnknownDisplay* display = (UnknownDisplay*)context;
+    PCVideoCard* display = (PCVideoCard*)context;
     if (display->displayModeCount >= display->displayModeCapacity - 1) {
         display->displayModeCapacity += 20;
         display->displayModes = (UnknownDisplayMode*)DebugRealloc(
@@ -90,7 +90,7 @@ static long __stdcall EnumDisplayModeCallback(UnknownSurfaceDesc* desc, void* co
 }
 
 // 0x004c9760
-UnknownDisplay::UnknownDisplay() {
+PCVideoCard::PCVideoCard() {
     memset(&driverGuid, 0, sizeof(driverGuid));
     memset(driverGuidText, 0, sizeof(driverGuidText));
     directDraw = 0;
@@ -112,7 +112,7 @@ UnknownDisplay::UnknownDisplay() {
 }
 
 // 0x004c9830
-UnknownDisplay* UnknownDisplay::InitializeDisplay(UnknownGuid* guid, char* description, char* name,
+PCVideoCard* PCVideoCard::InitializeDisplay(UnknownGuid* guid, char* description, char* name,
     void* window) {
     UnknownSurfaceCaps caps;
     unsigned long total;
@@ -174,7 +174,7 @@ failed:
 }
 
 // 0x004c9b50: re-reads the driver and emulation caps.
-void UnknownDisplay::RefreshDriverCaps() {
+void PCVideoCard::RefreshDriverCaps() {
     memset(&driverCapsSize, 0, 0x17c);
     driverCapsSize = 0x17c;
     memset(&emulationCapsSize, 0, 0x17c);
@@ -183,7 +183,7 @@ void UnknownDisplay::RefreshDriverCaps() {
 }
 
 // 0x004c9ba0
-void UnknownDisplay::ReleaseResources() {
+void PCVideoCard::ReleaseResources() {
     ReleasePrimarySurface();
     if (renderSurface != backBuffer && renderSurface) {
         renderSurface->Release();
@@ -203,7 +203,7 @@ void UnknownDisplay::ReleaseResources() {
 
 // 0x004c9c10: waits for the primary's blits, then releases it and the
 // gamma control.
-void UnknownDisplay::ReleasePrimarySurface() {
+void PCVideoCard::ReleasePrimarySurface() {
     if (gammaControl) {
         gammaControl->Release();
         gammaControl = 0;
@@ -219,7 +219,7 @@ void UnknownDisplay::ReleasePrimarySurface() {
 }
 
 // 0x004c9c90
-int UnknownDisplay::SetFullscreenCooperativeLevel() {
+int PCVideoCard::SetFullscreenCooperativeLevel() {
     SetWindowLongA((HWND)windowHandle, GWL_STYLE,
                    GetWindowLongA((HWND)windowHandle, GWL_STYLE) & (WS_POPUP | WS_SYSMENU));
     ShowWindow((HWND)windowHandle, SW_SHOW);
@@ -237,7 +237,7 @@ int UnknownDisplay::SetFullscreenCooperativeLevel() {
 
 // 0x004c9d20: a window of the client size `width` x `height` at (x, y),
 // kept inside the work area; hidden when the size is 0 x 0.
-int UnknownDisplay::SetWindowedCooperativeLevel(int x, int y, int width, int height) {
+int PCVideoCard::SetWindowedCooperativeLevel(int x, int y, int width, int height) {
     RECT rect;
     RECT workArea;
 
@@ -265,7 +265,7 @@ int UnknownDisplay::SetWindowedCooperativeLevel(int x, int y, int width, int hei
 }
 
 // 0x004c9ec0
-int UnknownDisplay::SetDisplayMode(int width, int height, int bitDepth, int a, int refreshRate, int windowed,
+int PCVideoCard::SetDisplayMode(int width, int height, int bitDepth, int a, int refreshRate, int windowed,
                                    int c) {
     if (cooperativeLevel & DDSCL_NORMAL)
         return CreateWindowedSurfaces(width, height, windowed);
@@ -277,7 +277,7 @@ int UnknownDisplay::SetDisplayMode(int width, int height, int bitDepth, int a, i
 
 // 0x004c9f30: creates the full-screen flipping chain with `backBuffers`
 // back buffers, clears and flips every buffer, then times ten flips.
-int UnknownDisplay::CreateFlipChain(int backBuffers) {
+int PCVideoCard::CreateFlipChain(int backBuffers) {
     UnknownSurfaceCaps caps;
     RECT rect;
     UnknownSurfaceDesc desc;
@@ -336,7 +336,7 @@ failed:
 
 // 0x004ca130: the primary surface (with `backBuffers` back buffers, if any)
 // and a system-memory render surface of the current mode's size.
-int UnknownDisplay::CreateSystemRenderSurface(int backBuffers) {
+int PCVideoCard::CreateSystemRenderSurface(int backBuffers) {
     UnknownSurfaceCaps caps;
     UnknownSurfaceDesc desc;
 
@@ -375,7 +375,7 @@ failed:
 
 // 0x004ca270: flips (full screen) or blits the render surface to the
 // primary, and records the frame time.
-int UnknownDisplay::Present() {
+int PCVideoCard::Present() {
     RECT rect;
     UnknownSurfaceInterface* source;
     unsigned int now;
@@ -423,7 +423,7 @@ failed:
 }
 
 // 0x004ca4a0
-void UnknownDisplay::RetryFlip(int value) {
+void PCVideoCard::RetryFlip(int value) {
     if (value)
         primarySurface->Flip(0, DDFLIP_WAIT);
     else
@@ -434,7 +434,7 @@ void UnknownDisplay::RetryFlip(int value) {
 
 // 0x004ca790: windowed surfaces: a primary clipped to the window and a
 // `width` x `height` render surface (video memory when `windowed`).
-int UnknownDisplay::CreateWindowedSurfaces(int width, int height, int windowed) {
+int PCVideoCard::CreateWindowedSurfaces(int width, int height, int windowed) {
     UnknownSurfaceDesc desc;
 
     ReleasePrimarySurface();
@@ -476,7 +476,7 @@ failed:
 
 // 0x004ca900: switches to display mode `mode` (retrying without the
 // refresh rate) and creates its surfaces.
-int UnknownDisplay::SetFullscreenDisplayMode(int mode, int windowed) {
+int PCVideoCard::SetFullscreenDisplayMode(int mode, int windowed) {
     UnknownSurfaceDesc desc;
 
     if (mode < 0 || mode >= displayModeCount)
@@ -555,7 +555,7 @@ struct UnknownViewport {
 // the frame back into it, then compares. 0: different, 1: same, 2: a
 // device call failed, 3: a lock failed.
 int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextureMap* image,
-    PCTextureMap* expected, PCTextureMap* rendered, UnknownDisplay* display,
+    PCTextureMap* expected, PCTextureMap* rendered, PCVideoCard* display,
     int present) {
     UnknownViewport viewport;
     UnknownRect clear;
@@ -650,7 +650,7 @@ int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextur
 // 0x004cb5b0: with `enable`, flips until the GDI surface is the primary (at
 // most back buffers + 1 times), then sets +0x6c; 0 when a flip, the GDI
 // surface query or the flip budget fails.
-int UnknownDisplay::SetGDISurfaceVisible(int enable) {
+int PCVideoCard::SetGDISurfaceVisible(int enable) {
     if (enable) {
         UnknownSurfaceInterface* gdi = 0;
         directDraw->GetGDISurface(&gdi);

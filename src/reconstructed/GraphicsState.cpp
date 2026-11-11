@@ -74,7 +74,7 @@ unsigned short g_GammaRamp[3][256] = {
 int g_DebugCountTextureMemory;
 UnknownSurfaceInterface* g_SharedMipTextureSurfaces[10];
 UnknownSurfaceInterface* g_SharedTextureSurfaces[10];
-UnknownDisplay* g_Displays[4];
+PCVideoCard* g_Displays[4];
 int g_DisplayCount;
 
 // Writable detail-level presets selected by Scene and BikeRace. The values

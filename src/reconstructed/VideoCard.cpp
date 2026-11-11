@@ -4,7 +4,7 @@
 #include "VideoCard.h"
 
 #include "DebugAlloc.h"
-#include "Display.h"
+#include "PCVideoCard.h"
 #include "Game.h"
 
 // VideoCard.cpp (literal __FILE__ at 0x0052d22a). Retail code

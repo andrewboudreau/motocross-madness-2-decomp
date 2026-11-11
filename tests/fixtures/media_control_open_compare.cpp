@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../../src/reconstructed/MediaControl.h"
-#include "../../src/reconstructed/Display.h"
+#include "../../src/reconstructed/PCVideoCard.h"
 #include "../../src/reconstructed/PCRenderTarget.h"
 extern "C" const UnknownGuid CLSID_AMMultiMediaStream,IID_IAMMultiMediaStream,MSPID_PrimaryVideo,MSPID_PrimaryAudio,IID_IDirectDrawMediaStream,IID_IDirectDraw,IID_IDirectDrawSurface4;
 static const UnknownGuid* guids[]={&CLSID_AMMultiMediaStream,&IID_IAMMultiMediaStream,&MSPID_PrimaryVideo,&MSPID_PrimaryAudio,&IID_IDirectDrawMediaStream,&IID_IDirectDraw,&IID_IDirectDrawSurface4};
@@ -13,7 +13,7 @@ static DWORD guidAddresses[]={0x558ec0,0x558ed0,0x558eb0,0x558ea0,0x558e90,0x556
 static BYTE referenceSpace[0x800000]={1};
 enum{Multi,Video,VideoDraw,DisplayDraw,Draw,Surface,Sample,SampleSurface,RenderSurface,FrameSurface};
 struct Object {DWORD table;int refs,calls;BYTE tail[20];};
-struct World {BYTE control[0x80],targets[2][sizeof(PCRenderTarget)],displays[2][sizeof(UnknownDisplay)];Object objects[20];char names[2][260];};
+struct World {BYTE control[0x80],targets[2][sizeof(PCRenderTarget)],displays[2][sizeof(PCVideoCard)];Object objects[20];char names[2][260];};
 static World world;
 static DWORD comTable[23],mediaTable[27];
 struct Event {int kind,who,args[8],releaseCount;BYTE payload[520];World state;};
@@ -28,7 +28,7 @@ static MediaControl* Media(){return (MediaControl*)world.control;}
 static int& Ref(){return *(int*)(world.control+4);}
 static void*& Context(){return *(void**)(world.control+0x18);}
 static PCRenderTarget* Target(int n){return (PCRenderTarget*)world.targets[n];}
-static UnknownDisplay* Display(int n){return (UnknownDisplay*)world.displays[n];}
+static PCVideoCard* Display(int n){return (PCVideoCard*)world.displays[n];}
 static void Fail(int code){printf("Invariant%d check%d ref%d installed%d stage%d status%x alias%d output%d/%d initial%d invalid%d throw%d mutation%d/%d count%d last%d\n",code,checks,retailActive,scenario.installed,scenario.resultAt,scenario.status,scenario.alias,scenario.outputMode,scenario.writeOnFailure,scenario.initial,scenario.invalid,scenario.throwAt,scenario.mutateAt,scenario.mutation,observed.count,observed.count?observed.events[observed.count-1].kind:-1);fflush(stdout);ExitProcess(code);}
 static int ObjectIndex(const void* p){if(!p)return -1;for(int n=0;n<20;++n)if(p==&world.objects[n])return n;Fail(81);return -1;}
 static int TargetIndex(const void* p){if(p==Target(0))return 0;if(p==Target(1))return 1;if(!p)return -1;Fail(81);return -1;}

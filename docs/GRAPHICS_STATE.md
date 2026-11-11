@@ -23,7 +23,7 @@ The earlier gamma declaration incorrectly described a zero-initialized array.
 The retail image contains a nonlinear, channel-specific table, with its first
 nonzero byte at `0x005705cf`. The source preserves all 768 values. Its exact
 formula is not established; it must not be replaced with a guessed linear
-curve or zero array. `UnknownDisplay::CreateFlipChain` passes this table at
+curve or zero array. `PCVideoCard::CreateFlipChain` passes this table at
 `0x004c9ffc` when `useGammaRamp` is enabled.
 
 `GraphicsState.bindings.json` records the existing callers' addresses. The

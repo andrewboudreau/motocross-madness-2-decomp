@@ -3,20 +3,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../src/reconstructed/Display.h"
+#include "../../src/reconstructed/PCVideoCard.h"
 
 static unsigned char referenceSpace[0x800000];
-static unsigned char displayStorage[sizeof(UnknownDisplay)];
+static unsigned char displayStorage[sizeof(PCVideoCard)];
 static UnknownDisplayMode modes[3];
 struct Observation {
     int result, calls, kind, argument;
-    unsigned char before[sizeof(UnknownDisplay)], after[sizeof(UnknownDisplay)];
+    unsigned char before[sizeof(PCVideoCard)], after[sizeof(PCVideoCard)];
     UnknownDisplayMode beforeModes[3], afterModes[3];
 };
 static Observation observed, expected;
 static int callbackResult, mutate;
-static UnknownDisplay* Display() { return (UnknownDisplay*)displayStorage; }
-static int Callback(UnknownDisplay* self,int kind,int argument) {
+static PCVideoCard* Display() { return (PCVideoCard*)displayStorage; }
+static int Callback(PCVideoCard* self,int kind,int argument) {
     if(self!=Display() || observed.calls++)ExitProcess(81);
     observed.kind=kind;observed.argument=argument;
     memcpy(observed.before,self,sizeof(displayStorage));
@@ -24,8 +24,8 @@ static int Callback(UnknownDisplay* self,int kind,int argument) {
     if(mutate) { self->videoMemoryBudget^=0x12345678;self->currentDisplayMode=2;modes[1].field_0x10=-17; }
     return callbackResult;
 }
-int UnknownDisplay::CreateFlipChain(int buffers) { return Callback(this,1,buffers); }
-int UnknownDisplay::CreateSystemRenderSurface(int buffers) { return Callback(this,2,buffers); }
+int PCVideoCard::CreateFlipChain(int buffers) { return Callback(this,1,buffers); }
+int PCVideoCard::CreateSystemRenderSurface(int buffers) { return Callback(this,2,buffers); }
 template<class T> static DWORD Address(T method) {
     if(sizeof(method)!=4)ExitProcess(82);DWORD value;memcpy(&value,&method,4);return value;
 }
@@ -44,7 +44,7 @@ static int MapReference(const char* path) {
         memcpy(mapped+section[i].VirtualAddress,raw+section[i].PointerToRawData,section[i].SizeOfRawData);
     }free(raw);
     const DWORD sites[]={0x4ca56b,0x4ca582}, targets[]={0x4c9f30,0x4ca130};
-    DWORD replacements[]={Address(&UnknownDisplay::CreateFlipChain),Address(&UnknownDisplay::CreateSystemRenderSurface)};
+    DWORD replacements[]={Address(&PCVideoCard::CreateFlipChain),Address(&PCVideoCard::CreateSystemRenderSurface)};
     for(i=0;i<2;++i) {
         if(*(BYTE*)sites[i]!=0xe8 || sites[i]+5+*(DWORD*)(sites[i]+1)!=targets[i])return 0;
         *(DWORD*)(sites[i]+1)=replacements[i]-sites[i]-5;
@@ -56,8 +56,8 @@ static void Run(int retail,int width,int height,int depth,int buffers,int budget
     memset(modes,0x61,sizeof(modes));Display()->displayModes=modes;Display()->currentDisplayMode=1;
     Display()->displayModeCount=3;Display()->videoMemoryBudget=budget;
     modes[1].width=width;modes[1].height=height;modes[1].bitDepth=depth;modes[1].field_0x10=buffers;
-    union { int(UnknownDisplay::*method)(int);DWORD address; } call;
-    call.method=&UnknownDisplay::CreateModeSurfaces;if(retail)call.address=0x4ca520;
+    union { int(PCVideoCard::*method)(int);DWORD address; } call;
+    call.method=&PCVideoCard::CreateModeSurfaces;if(retail)call.address=0x4ca520;
     observed.result=(Display()->*call.method)(full);
     memcpy(observed.after,displayStorage,sizeof(displayStorage));memcpy(observed.afterModes,modes,sizeof(modes));
 }
@@ -76,7 +76,7 @@ static void Compare(int width,int height,int depth,int buffers,int budget,int fu
 }
 int main(int argc,char** argv) {
     if(argc!=2 || !MapReference(argv[1]))return 3;
-    if(sizeof(UnknownDisplay)!=0xb78 || sizeof(UnknownDisplayMode)!=36)return 4;
+    if(sizeof(PCVideoCard)!=0xb78 || sizeof(UnknownDisplayMode)!=36)return 4;
     const int values[]={0,1,-1,2,-2,7,8,15,16,24,32,480,640,1024,0x7fffffff,(int)0x80000000};
     const int flags[]={0,1,-3}, returns[]={0,1,-1,7};unsigned int random=0x12345678;
     for(int seed=0;seed<16384;++seed) {

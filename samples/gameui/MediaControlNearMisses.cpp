@@ -33,7 +33,7 @@
 
 #include "../../src/reconstructed/MediaControl.h"
 
-#include "../../src/reconstructed/Display.h"
+#include "../../src/reconstructed/PCVideoCard.h"
 #include "../../src/reconstructed/PCRenderTarget.h"
 
 extern "C" const UnknownGuid CLSID_AMMultiMediaStream;    // 0x00558ec0

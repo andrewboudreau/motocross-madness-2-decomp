@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Display.h"
+#include "PCVideoCard.h"
 #include "FontTextureManager.h"
 #include "GameObject.h"
 #include "Net.h"
@@ -94,7 +94,7 @@ public:
     virtual RenderTarget* CreateRenderTarget() = 0;
     virtual int InitializeDisplay() = 0;
     virtual int AttachRenderTarget();         // 0x00467e80
-    virtual int FilterDisplayModes(UnknownDisplay* display) = 0;   // filters display modes
+    virtual int FilterDisplayModes(PCVideoCard* display) = 0;   // filters display modes
 
     // 0x00467b70: creates the root objects, sound, textures and (with the
     // "DebugOverlay" registry flag) the debug overlay.
@@ -103,7 +103,7 @@ public:
 
     SoundInterface* soundInterface;           // a PCSoundInterface (initialiser)
     NetworkInterface* network;                // created by slot 16, deleted by NetProcs.cpp's EndNetworkGame
-    UnknownDisplay* display;                  // video card and modes (slot 8's profile page)
+    PCVideoCard* display;                  // video card and modes (slot 8's profile page)
     RenderTarget* renderTarget;               // a PCRenderTarget (PCGame slot 31)
     ControlInterface* controlInterface;       // a PCControlInterface (slot 2)
     int playerCount;                          // +0x18 1 initially; KrustyBikeCamera slot 42 tests > 1

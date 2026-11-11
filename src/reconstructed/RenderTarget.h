@@ -6,7 +6,7 @@
 // before ResourceManager.cpp references; RenderTarget.cpp is not attested.
 
 #include "CameraRect.h"
-#include "Display.h"
+#include "PCVideoCard.h"
 
 class Camera;
 
@@ -40,11 +40,11 @@ public:
     virtual void SetAlphaTest(int value); // 0x004806f0 (shared empty body)
     virtual void DisableAlphaTest();      // 0x0044d710 (shared empty body)
 
-    void SetDisplay(UnknownDisplay* display); // 0x004e8ca0: sets +0x04
+    void SetDisplay(PCVideoCard* display); // 0x004e8ca0: sets +0x04
     void AdvanceFrame();                        // 0x004e8cc0: advances the frame counters
     void SetCamera(Camera* camera);          // 0x004e8cf0: sets the current camera
 
-    UnknownDisplay* targetDisplay;            // +0x04
+    PCVideoCard* targetDisplay;            // +0x04
     Camera* currentCamera;                    // +0x08 current camera
     int targetWidth;                          // +0x0c width
     int targetHeight;                         // +0x10 height

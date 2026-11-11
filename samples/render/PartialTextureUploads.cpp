@@ -19,7 +19,7 @@
 // partblt.tga through a texture and compares the drawn result. 1: works;
 // 0: wrong; -1: the full upload failed; -2: no image or texture; -3: no
 // 640 x 480 x 16 target; -4: no texture surface.
-void UnknownDisplay::ProbePartialTextureUploads(RenderTarget* target) {
+void PCVideoCard::ProbePartialTextureUploads(RenderTarget* target) {
     int result = 1;
     UnknownRect area;
     UnknownRect tile;

@@ -6,7 +6,7 @@
 unsigned int ReadClock();
 
 // RTTI: VideoCard (COL 0x0055fa28, vtable 0x00558d74), the base of
-// PCVideoCard (UnknownDisplay in Display.h). TU VideoCard.cpp (literal
+// PCVideoCard (PCVideoCard.h). TU VideoCard.cpp (literal
 // __FILE__ "D:\\aardvark\\VC\\krusty2\\VideoCard.cpp", 0x0052d22a). Its
 // table holds the deleting destructor (0x0052d200), slot 1 (0x0052d220) and
 // three _purecall slots. The constructor 0x0052d180 sets +0x04..+0x18f;

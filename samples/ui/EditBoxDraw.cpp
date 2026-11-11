@@ -32,7 +32,7 @@
 
 
 #include <imm.h>
-#include "../../src/reconstructed/Display.h"
+#include "../../src/reconstructed/PCVideoCard.h"
 
 int UIEditBox::Draw() {
     int width = GetWidth();

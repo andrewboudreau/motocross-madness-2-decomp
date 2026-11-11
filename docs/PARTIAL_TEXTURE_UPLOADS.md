@@ -1,8 +1,8 @@
 # Partial texture upload probe
 
 `samples/render/PartialTextureUploads.cpp` contains the complete provisional
-`void UnknownDisplay::ProbePartialTextureUploads(RenderTarget*)` body. The
-declaration in `Display.h` and its caller in `PCGame::ProfileDisplays` use the
+`void PCVideoCard::ProbePartialTextureUploads(RenderTarget*)` body. The
+declaration in `PCVideoCard.h` and its caller in `PCGame::ProfileDisplays` use the
 same thiscall symbol. Retail starts at `0x004cab00`; the extent is **1129 bytes**.
 The only `ret 4` is at `0x004caeae`, followed by a reachable upload-success block
 at `0x004caeb1` and a missing-file block at `0x004caf5c`. The latter ends with

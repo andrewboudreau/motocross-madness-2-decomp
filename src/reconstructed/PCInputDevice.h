@@ -246,7 +246,7 @@ public:
     int SetDwordProperty(int property, unsigned long object, unsigned long how,
         unsigned long data);
 
-    friend struct UnknownDisplay* ChooseDisplay(int flag, int useLast, int* blade); // PickDevice.cpp
+    friend class PCVideoCard* ChooseDisplay(int flag, int useLast, int* blade); // PickDevice.cpp
     friend int ChooseJoystick(int useLast);                                           // PickDevice.cpp
 
 protected:

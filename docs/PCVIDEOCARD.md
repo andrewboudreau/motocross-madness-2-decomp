@@ -9,16 +9,19 @@ calls (IIDs confirmed by their GUID bytes). PCVideoCard.cpp spans
 `0x004c94a0..0x004cb667`, VideoCard.cpp `0x0052d0d0..0x0052d2bc`. Names
 other than the RTTI classes are provisional.
 
-The display object (Game+0x0c) keeps the stand-in name `UnknownDisplay`
-in `Display.h`, now derived from `VideoCard`, because GUIManager,
-PCGame, Game and EventManager bind its mangled names. It enumerates
+The display object (Game+0x0c) is a `PCVideoCard`: its constructor
+`0x004c9760` writes vtable `0x00556df4` (`0x004c9771`), and both
+DirectDraw enumeration callbacks construct it. The class is declared in
+`PCVideoCard.h`; its callers (GUIManager, PCGame, Game, EventManager,
+PickDevice, PCRenderTarget, RenderTarget) bind the real mangled names, and
+the source-built game's `PCVideoCard` and `VideoCard` vtables match every
+retail slot (`tools/audit_game_vtables.py`). It enumerates
 DirectDraw devices and display modes (`DirectDrawEnumerateExA`,
 `EnumDisplayModes`, a sorted 36-byte mode table), creates the device,
 sets cooperative level and display mode (full screen or windowed with a
 clipper), builds the flip chain and render surfaces with a gamma ramp,
 presents frames, and reads the back buffer back for partial texture
-blits. `0x004ca790` and `0x004ca900` return int (PCGame and its near
-miss gained the new bindings keys).
+blits. `0x004ca790` and `0x004ca900` return int.
 
 ## Readable reconstruction names
 

@@ -10,7 +10,7 @@
   "?FindDisplayMode@VideoCard@@QAEHHHHHH@Z": "0x0052d250",
   "?ReleaseResources@VideoCard@@UAEXXZ": "0x0052d220",
   "?g_DisplayCount@@3HA": "0x0068a764",
-  "?g_Displays@@3PAPAUUnknownDisplay@@A": "0x0068a754",
+  "?g_Displays@@3PAPAVPCVideoCard@@A": "0x0068a754",
   "__FILE__": "0x005759f0",
   "_qsort": "0x00534426"
 }

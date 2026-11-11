@@ -14,7 +14,7 @@ from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-SYMBOL = '?ProbeNonLocalTextureMemory@UnknownDisplay@@QAEHPAHPAVRenderTarget@@@Z'
+SYMBOL = '?ProbeNonLocalTextureMemory@PCVideoCard@@QAEHPAHPAVRenderTarget@@@Z'
 RANGES = {0x4ca5a0: 486, 0x54cda0: 26, 0x54cdba: 10}
 DEPENDENCIES = {0x4ca900, 0x4a3010, 0x4c4ee0, 0x4c4f80,
                 0x5119c0, 0x4a3060, 0x53471a}
@@ -115,9 +115,9 @@ class NonLocalTextureMemoryBehaviorTests(unittest.TestCase):
                                if symbol.storage_class == 2 and symbol.section_number == 0}
                     self.assertEqual(imports, {
                         '??3@YAXPAXPBDH@Z', '?FillPixelFormat@@YAXHPAX@Z',
-                        '?InitializeRenderTarget@PCRenderTarget@@QAEPAVRenderTarget@@PAUUnknownDisplay@@PBUUnknownGuid@@PAUUnknownSurfaceInterface@@HH@Z',
+                        '?InitializeRenderTarget@PCRenderTarget@@QAEPAVRenderTarget@@PAVPCVideoCard@@PBUUnknownGuid@@PAUUnknownSurfaceInterface@@HH@Z',
                         '_IID_IDirect3DHALDevice', '??0PCRenderTarget@@QAE@XZ',
-                        '??2@YAPAXIPBDH@Z', '?SetFullscreenDisplayMode@UnknownDisplay@@QAEHHH@Z',
+                        '??2@YAPAXIPBDH@Z', '?SetFullscreenDisplayMode@PCVideoCard@@QAEHHH@Z',
                         '___CxxFrameHandler', '__except_list'})
                     self.assertFalse(any(section.name.startswith('.CRT') for section in candidate.sections))
                     entry = candidate.find_symbol(SYMBOL)

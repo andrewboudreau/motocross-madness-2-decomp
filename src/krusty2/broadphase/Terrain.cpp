@@ -96,7 +96,7 @@ void Terrain::RetireOwnedObject(BaseObject* object)
 
 // Boundary declarations for Terrain::Load (tier 1 addresses, tier 3 names).
 
-struct TerrainGameDisplay {                                     // Display (src/reconstructed/Display.h)
+struct TerrainGameDisplay {                                     // PCVideoCard (src/reconstructed/PCVideoCard.h)
     char pad_0x000[0x4bc];
     char driverName[1];                                         // +0x4bc the DriverInfo registry key component
 };

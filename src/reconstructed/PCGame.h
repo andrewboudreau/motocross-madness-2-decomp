@@ -50,7 +50,7 @@ public:
     virtual int SetRegistryBinary(const char* name, const void* data, unsigned long size); // 0x004c24b0
     virtual RenderTarget* CreateRenderTarget();   // 0x004c0a90: creates the render target
     virtual int InitializeDisplay();          // 0x004c0c60: sets the display mode
-    virtual int FilterDisplayModes(UnknownDisplay* display);   // 0x004c05a0: filters display modes
+    virtual int FilterDisplayModes(PCVideoCard* display);   // 0x004c05a0: filters display modes
     virtual int OnChar(int value);               // 0x004c0340: root slot 20 unless input is held
     virtual int OnKeyDown(int value);            // 0x004c0370: root slot 21 unless input is held
     virtual int CheckLobbyLaunch();           // 0x004c0c10: the "lobby" command-line switch
@@ -61,16 +61,16 @@ public:
     void SetWindowRect(const UnknownRect* rect);          // 0x004c0470
     // 0x004c0760: in full screen, marks modes larger than width x height
     // unusable (unless the display keeps them).
-    int LimitDisplayModes(UnknownDisplay* display, int width, int height);
+    int LimitDisplayModes(PCVideoCard* display, int width, int height);
     // 0x004bfc50: PCGame's start-up before Game's initialiser; fills
     // `message` on failure.
     int StartUp(char* message);
     int ProfileDisplays();                               // 0x004c0d10: profiles the displays, returns 1 (near miss, samples/game)
-    int SaveDisplayProfile(UnknownDisplay* display);     // 0x004c1610: saves its profile
+    int SaveDisplayProfile(PCVideoCard* display);     // 0x004c1610: saves its profile
     int ProfileEveryDisplay();                           // 0x004c16b0: profiles every display
     int IsAnyProfileStale();                             // 0x004c1410: 1 if any profile is stale
     int DeleteDisplayProfiles();                         // 0x004c1a00: deletes the profiles
-    int LoadDisplayProfile(UnknownDisplay* display);     // 0x004c16f0: loads its profile
+    int LoadDisplayProfile(PCVideoCard* display);     // 0x004c16f0: loads its profile
 
     UnknownGuid deviceGuid;                   // Direct3D device GUID ("Renderer" setting)
     UnknownRect windowRect;                    // +0x308: window rectangle (slot 32)

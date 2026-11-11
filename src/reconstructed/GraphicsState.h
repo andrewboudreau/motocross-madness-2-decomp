@@ -2,7 +2,7 @@
 
 #include "Guid.h"
 
-struct UnknownDisplay;
+class PCVideoCard;
 struct UnknownSurfaceInterface;
 
 // Shared storage used by camera, display enumeration and texture management.
@@ -15,5 +15,5 @@ extern unsigned short g_GammaRamp[3][256];         // 0x00570570
 extern int g_DebugCountTextureMemory;              // 0x00689964
 extern UnknownSurfaceInterface* g_SharedMipTextureSurfaces[10]; // 0x0068a36c
 extern UnknownSurfaceInterface* g_SharedTextureSurfaces[10];    // 0x0068a394
-extern UnknownDisplay* g_Displays[4];              // 0x0068a754
+extern PCVideoCard* g_Displays[4];              // 0x0068a754
 extern int g_DisplayCount;                         // 0x0068a764

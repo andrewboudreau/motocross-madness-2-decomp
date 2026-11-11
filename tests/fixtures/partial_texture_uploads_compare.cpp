@@ -14,10 +14,10 @@ extern "C" void __cdecl __CxxFrameHandler();
 extern "C" const UnknownGuid IID_IDirect3DHALDevice =
     {0x84e63de0,0x46aa,0x11cf,{0x81,0x6f,0,0,0xc0,0x20,0x15,0x6e}};
 static unsigned char referenceSpace[0x800000];
-static unsigned char gameStorage[sizeof(TrackGame)], displayStorage[sizeof(UnknownDisplay)];
+static unsigned char gameStorage[sizeof(TrackGame)], displayStorage[sizeof(PCVideoCard)];
 static unsigned char providedStorage[sizeof(PCRenderTarget)];
 TrackGame* g_TrackGame=(TrackGame*)gameStorage;
-static UnknownDisplay* Display(){return (UnknownDisplay*)displayStorage;}
+static PCVideoCard* Display(){return (PCVideoCard*)displayStorage;}
 static PCRenderTarget* Provided(){return (PCRenderTarget*)providedStorage;}
 struct Block { int size,alive; unsigned char bytes[sizeof(PCRenderTarget)]; };
 static Block heap[8];
@@ -37,7 +37,7 @@ struct EventRecord {
 struct Observation {
     int exception,fault,faultOperation,faultAddress,events,blocks,fileAlive;
     EventRecord trace[80];Block heap[8];
-    unsigned char display[sizeof(UnknownDisplay)],game[sizeof(TrackGame)],provided[sizeof(PCRenderTarget)];
+    unsigned char display[sizeof(PCVideoCard)],game[sizeof(TrackGame)],provided[sizeof(PCRenderTarget)];
     UnknownTgaFile file;UnknownDisplayMode modes[4];
 };
 static Observation observed,referenceResult;
@@ -87,7 +87,7 @@ PCRenderTarget::PCRenderTarget(){
     targetDisplay=Display();surfacePixelFormat=565;deviceCaps=0x1234;
 }
 PCRenderTarget::~PCRenderTarget(){Event(5,Identity(this));}
-RenderTarget* PCRenderTarget::InitializeRenderTarget(UnknownDisplay* d,const UnknownGuid* id,
+RenderTarget* PCRenderTarget::InitializeRenderTarget(PCVideoCard* d,const UnknownGuid* id,
         UnknownSurfaceInterface* surface,int wantZ,int frames) {
     EventRecord& r=Event(6,Identity(this),Identity(d),(int)surface,wantZ,frames);
     memcpy(r.args+5,id,sizeof(*id));
@@ -131,12 +131,12 @@ UnknownTgaFile* LoadFile(const char* name,UnknownTgaFile* output,int flags){
 void FreeFile(UnknownTgaFile* p){
     Event(13,Identity(p));if(p!=&file||!observed.fileAlive)Fail(88);observed.fileAlive=0;
 }
-int UnknownDisplay::SetFullscreenDisplayMode(int mode,int windowed){
+int PCVideoCard::SetFullscreenDisplayMode(int mode,int windowed){
     modeIndex=mode;Event(14,Identity(this),mode,windowed);currentDisplayMode=mode;
     return !(scenario.modeFailMask&(1<<mode));
 }
 int TestPartialTextureUpload(PCRenderTarget* target,UnknownRect* area,PCTextureMap* image,
-    PCTextureMap* expected,PCTextureMap* rendered,UnknownDisplay* display,int present){
+    PCTextureMap* expected,PCTextureMap* rendered,PCVideoCard* display,int present){
     EventRecord& r=Event(15,Identity(target),Identity(image),Identity(expected),Identity(rendered),Identity(display));
     r.args[5]=present;r.args[6]=passes;r.rect=*area;
     expected->field_0x40+=13;rendered->field_0x40+=passes+29;
@@ -150,7 +150,7 @@ struct ConstructorCalls {
 static DWORD Replacement(DWORD a){
     switch(a){
     case 0x5125c0:return (DWORD)LoadFile;
-    case 0x4ca900:return Address(&UnknownDisplay::SetFullscreenDisplayMode);
+    case 0x4ca900:return Address(&PCVideoCard::SetFullscreenDisplayMode);
     case 0x4a3010:return (DWORD)(void*(__cdecl*)(unsigned int,const char*,int))operator new;
     case 0x4c4ee0:return Address(&ConstructorCalls::Target);
     case 0x4c4f80:return Address(&PCRenderTarget::InitializeRenderTarget);
@@ -187,8 +187,8 @@ static int MapReference(const char* path,const char* patches){
     fclose(f);return FlushInstructionCache(GetCurrentProcess(),0,0)!=0;
 }
 static void Invoke(int retail){
-    union{void(UnknownDisplay::*method)(RenderTarget*);DWORD address;}call;
-    call.method=&UnknownDisplay::ProbePartialTextureUploads;if(retail)call.address=0x4cab00;
+    union{void(PCVideoCard::*method)(RenderTarget*);DWORD address;}call;
+    call.method=&PCVideoCard::ProbePartialTextureUploads;if(retail)call.address=0x4cab00;
     try{(Display()->*call.method)(scenario.provided?Provided():0);}catch(int e){observed.exception=e;}
 }
 static int FaultFilter(EXCEPTION_POINTERS* e){
@@ -207,7 +207,7 @@ static void Run(int retail){
     memset(&file,0x36,sizeof(file));memset(modes,0,sizeof(modes));memset(pixels,0xa7,sizeof(pixels));
     blocks=allocations=constructors=modeIndex=textureCalls=passes=0;
     g_TrackGame=(TrackGame*)gameStorage;*(TrackGame**)0x56e26c=g_TrackGame;
-    g_TrackGame->display=(UnknownDisplay*)0x12345678;g_TrackGame->renderTarget=(RenderTarget*)0x23456789;
+    g_TrackGame->display=(PCVideoCard*)0x12345678;g_TrackGame->renderTarget=(RenderTarget*)0x23456789;
     Display()->displayModeCount=scenario.modeCount;Display()->displayModes=modes;Display()->field_0x198=(void*)0x89abcdef;
     Display()->backBuffer=(UnknownSurfaceInterface*)0x13572468;Display()->frameBufferCount=3;
     for(int i=0;i<4;++i){modes[i].width=(scenario.matchMask&(1<<i))?640:800;modes[i].height=480;modes[i].bitDepth=16;}

@@ -93,7 +93,6 @@
   "?SaveProfile@TrackGameMode@@QAEXXZ": "0x00523580",
   "?FindFileDirectory@TrackGameMode@@QAEHHPADPBD0@Z": "0x00523a60",
   "?Save@UnknownVcrFile@@QAEXPAD@Z": "0x00524d00",
-  "?FindDisplayMode@UnknownDisplay@@QAEHHHHHH@Z": "0x0052d250",
   "?FindDisplayMode@VideoCard@@QAEHHHHHH@Z": "0x0052d250",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "?OnControlRelease@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x00469580",

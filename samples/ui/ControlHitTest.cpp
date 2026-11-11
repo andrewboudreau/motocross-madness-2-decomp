@@ -4,7 +4,7 @@
 #include <windows.h>
 #include "../../src/reconstructed/UIDialog.h"
 #include "../../src/reconstructed/GameUi.h"
-#include "../../src/reconstructed/Display.h"
+#include "../../src/reconstructed/PCVideoCard.h"
 #include "../../src/reconstructed/PCTextureMap.h"
 #include "../../src/reconstructed/TrackGame.h"
 

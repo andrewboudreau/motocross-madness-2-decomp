@@ -53,7 +53,7 @@ public:
     void SaveScreenshot();
     // 0x004c4f80: attaches the display (+0x04), the device GUID (+0x54), the
     // surface (+0x48) and the frame modulus (+0x14); returns the target or 0.
-    RenderTarget* InitializeRenderTarget(UnknownDisplay* display, const UnknownGuid* deviceId,
+    RenderTarget* InitializeRenderTarget(PCVideoCard* display, const UnknownGuid* deviceId,
         UnknownSurfaceInterface* surface, int wantZBuffer, int frames);
     // 0x004c5950 (PCGame slot 31): measures texture memory by creating 256x256,
     // then 32x32 surfaces until creation fails; *value gets the bytes.

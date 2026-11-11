@@ -19,7 +19,7 @@ RenderTarget::RenderTarget() {
 }
 
 // 0x004e8ca0
-void RenderTarget::SetDisplay(UnknownDisplay* display) {
+void RenderTarget::SetDisplay(PCVideoCard* display) {
     targetDisplay = display;
 }
 

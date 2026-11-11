@@ -15,7 +15,7 @@ from tools.eh_funcinfo import candidate, retail, shape
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-SYMBOL = '?ProbePartialTextureUploads@UnknownDisplay@@QAEXPAVRenderTarget@@@Z'
+SYMBOL = '?ProbePartialTextureUploads@PCVideoCard@@QAEXPAVRenderTarget@@@Z'
 RANGES = {0x4cab00: 1129, 0x54cdd0: 23, 0x54cde7: 23, 0x54cdfe: 23, 0x54ce15: 23, 0x54ce2c: 10}
 DEPENDENCIES = {0x5125c0, 0x4ca900, 0x4a3010, 0x4c4ee0, 0x4c4f80,
                 0x4c5f00, 0x512dd0, 0x4caf70, 0x4a3060, 0x53471a}

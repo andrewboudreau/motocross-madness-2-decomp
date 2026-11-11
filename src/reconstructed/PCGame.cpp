@@ -82,7 +82,7 @@ extern const UnknownGuid g_BladeDeviceGuid;   // 0x00556040: storage in Graphics
 // Display set-up outside PCGame (cdecl; names provisional).
 int EnumerateDisplays(void* window);                // 0x004c9600: enumerates the displays
 // 0x004ccd60: chooses the display (and whether the Blade renderer is used).
-UnknownDisplay* ChooseDisplay(int flag, int useLast, int* blade);
+PCVideoCard* ChooseDisplay(int flag, int useLast, int* blade);
 int ChooseJoystick(int useLast);                 // 0x004cd610: chooses the joystick
 // 0x005119c0: fills a pixel format for texture format `format`.
 void FillPixelFormat(int format, void* pixelFormat);
@@ -347,7 +347,7 @@ void PCGame::SetWindowRect(const UnknownRect* rect) {
 // 0x004c05a0: in full screen, drops duplicate modes ("HighestRefreshOnly"
 // keeps the last of each), modes other than 16-bit, and modes the video
 // memory cannot hold with "MinimumTextureMB" left over.
-int PCGame::FilterDisplayModes(UnknownDisplay* display) {
+int PCGame::FilterDisplayModes(PCVideoCard* display) {
     int reserve = g_TrackGame->GetRegistryInt("MinimumTextureMB", 2) << 20;
     if (fullScreen && !display->keepAllDisplayModes) {
         int i;
@@ -447,7 +447,7 @@ int PCGame::SetRenderStates() {
 }
 
 // 0x004c0760
-int PCGame::LimitDisplayModes(UnknownDisplay* display, int width, int height) {
+int PCGame::LimitDisplayModes(PCVideoCard* display, int width, int height) {
     if (fullScreen && !display->keepAllDisplayModes) {
         for (int i = 0; i < display->displayModeCount; i++) {
             UnknownDisplayMode* mode = &display->displayModes[i];
@@ -535,7 +535,7 @@ int PCGame::InitializeDisplay() {
 
 // 0x004c1610: records the display's identifier under "DriverInfo\\<name>"
 // and marks it profiled (version 7).
-int PCGame::SaveDisplayProfile(UnknownDisplay* display) {
+int PCGame::SaveDisplayProfile(PCVideoCard* display) {
     char name[256];
     sprintf(name, "DriverInfo\\%s\\DeviceIdentifier", display->driverGuidText);
     SetRegistryBinary(name, &display->deviceIdentifier, sizeof(display->deviceIdentifier));
@@ -585,7 +585,7 @@ int PCGame::ProfileEveryDisplay() {
 // mode list matches the display's; marks the display disabled (+0xb74 bit 1)
 // when the profile says so. The retail function returns without freeing the
 // saved modes on the two disabled paths.
-int PCGame::LoadDisplayProfile(UnknownDisplay* display) {
+int PCGame::LoadDisplayProfile(PCVideoCard* display) {
     char name[256];
     sprintf(name, "DriverInfo\\%s\\TextureCacheLimit", display->driverGuidText);
     display->textureCacheLimit = GetRegistryInt(name, 0);

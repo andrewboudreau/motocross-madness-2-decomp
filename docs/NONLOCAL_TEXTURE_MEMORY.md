@@ -1,6 +1,6 @@
 # Non-local texture memory probe
 
-`UnknownDisplay::ProbeNonLocalTextureMemory` at `0x004ca5a0` is a complete,
+`PCVideoCard::ProbeNonLocalTextureMemory` at `0x004ca5a0` is a complete,
 readable candidate in `samples/render/NonLocalTextureMemory.cpp`. It remains
 **nonexact**: authentic VC6 SP3 `/O2 /GR /GX /MT /Z7` emits 490 bytes versus
 486 retail bytes, with 66 matching positions after resolving relocations.

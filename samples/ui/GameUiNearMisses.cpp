@@ -143,7 +143,7 @@
 
 #include <imm.h>
 
-#include "../../src/reconstructed/Display.h"
+#include "../../src/reconstructed/PCVideoCard.h"
 #include "../../src/reconstructed/KeyboardDevice.h"
 #include "../../src/reconstructed/PCTextureMap.h"
 #include "../../src/reconstructed/Palette8.h"

@@ -96,7 +96,7 @@ int Camera::UpdateViewport() {
     RenderTarget* owner = Owner();
     targetWidth = owner->targetWidth;
     targetHeight = owner->targetHeight;
-    UnknownDisplay* display = owner->targetDisplay;
+    PCVideoCard* display = owner->targetDisplay;
     float width = (float)display->displayModes[display->currentDisplayMode].width;
     float height = (float)owner->targetDisplay->displayModes[owner->targetDisplay->currentDisplayMode].height;
     displayAspect = width / height;

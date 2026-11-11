@@ -7,7 +7,7 @@ reconstruction and do not assert original translation-unit ownership.
 
 | Standalone candidate | Retail address | Full retail / VC6 bytes | Matching positions |
 |---|---|---:|---:|
-| `ModeSurfaces.cpp`: `UnknownDisplay::CreateModeSurfaces` | `0x004ca520` | 116 / 124 | 26 |
+| `ModeSurfaces.cpp`: `PCVideoCard::CreateModeSurfaces` | `0x004ca520` | 116 / 124 | 26 |
 | `TextureChannelDifference.cpp`: `MeanTextureChannelDifference` | `0x004cb330` | 629 / 620 | 35 |
 
 The channel comparison's old 628-byte range ended inside a jump. Its complete

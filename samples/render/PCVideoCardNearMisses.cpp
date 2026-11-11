@@ -1,7 +1,7 @@
 // Near misses for src/reconstructed/PCVideoCard.cpp (TU PCVideoCard.cpp).
 // Each compiles from readable source but differs from retail as noted.
 //
-// UnknownDisplay::CreateModeSurfaces (0x004ca520, 116 bytes): logic and
+// PCVideoCard::CreateModeSurfaces (0x004ca520, 116 bytes): logic and
 //   calls match; retail loads +0x74 and all four mode fields into registers
 //   before testing the argument and computes the free memory as
 //   neg/lea (memory - pixels * 2); local orders and pixel temporaries tried,
@@ -38,7 +38,7 @@
 //   inline function given all five values, before the test or in the
 //   windowed branch, is removed before the decision (26); a `pixels` and
 //   `memory` local pair at the top gives 6.
-// UnknownDisplay::ProbeNonLocalTextureMemory (0x004ca5a0, 486 bytes): retail keeps
+// PCVideoCard::ProbeNonLocalTextureMemory (0x004ca5a0, 486 bytes): retail keeps
 //   `target` in ebp, caches 480/16 in registers for the mode search and has
 //   one more 4-byte local; the flow (EH-guarded new PCRenderTarget, 128x128
 //   probe surface, caps bit 0x20000000) is as written. Retail's ebp holds
@@ -54,7 +54,7 @@
 //   (retail: ebp = first, esi/edi = pixel pointers) and the x87 sequence for
 //   the three channel sums (retail keeps the green difference on the stack
 //   and stores the blue one) differ; the expansion and loop shapes match.
-// UnknownDisplay::ProbePartialTextureUploads (0x004cab00, 1129 bytes; ours
+// PCVideoCard::ProbePartialTextureUploads (0x004cab00, 1129 bytes; ours
 //   1113): the PartialTexBlt driver. Retail sets tile.top/bottom in the row
 //   loop, threads the loop exit straight to the result store (the created
 //   target is copied into `render` only on success, so `render` keeps its

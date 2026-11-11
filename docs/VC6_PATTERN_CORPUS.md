@@ -77,7 +77,7 @@ The exact examples are all a guarded do-while, or a `for`, whose early exit
 comes in the middle or at the end of the body:
 - Sound::SetPan, SetVolume and SetFrequency `0x004bcca0`, `0x004bcbe0`, `0x004bcb30`: `if (n > 0) do { if (... < 0) goto failed; i++; } while (i < n);`.
 - BackgroundImage::ClearRegionDepth `0x004043c0`: `return 0` as the last test of a guarded do-while.
-- UnknownDisplay::SetGDISurfaceVisible `0x004cb5b0`: three `return 0` tests after the body's first statement.
+- PCVideoCard::SetGDISurfaceVisible `0x004cb5b0`: three `return 0` tests after the body's first statement.
 - UnknownVcrFile Read and Write `0x00525070`, `0x005251f0`, and CacheTexture::ReserveRegions `0x0050f9b0`: a `for` whose `if` block holds the rest of the function.
 
 **Probe (confirmed):** in a guarded do-while whose *first* statement is a
@@ -109,7 +109,7 @@ first loop (17, two epilogues), and with a single `failed:` label (16).
 ## 3. A load hoisted above the first branch
 
 **Rule (exact example):** VC6 hoists a load above a test when both arms use
-the value. In UnknownDisplay::RetryFlip `0x004ca4a0`, `primarySurface` is
+the value. In PCVideoCard::RetryFlip `0x004ca4a0`, `primarySurface` is
 loaded between `test eax, eax` and `je` because both the `if` and the
 `else` call through it.
 

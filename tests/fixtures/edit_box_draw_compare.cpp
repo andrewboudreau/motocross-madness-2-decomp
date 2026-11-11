@@ -9,7 +9,7 @@
 #include "UIDialog.h"
 #include "BackgroundImage.h"
 #include "TrackGame.h"
-#include "Display.h"
+#include "PCVideoCard.h"
 TrackGame* g_TrackGame;
 MemTagStack* g_MemTagStack;int g_UnclaimedBytes;
 extern CameraRect* g_ControlDrawClipRect;extern CameraRect g_ControlDrawRect;

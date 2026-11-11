@@ -643,7 +643,7 @@ PCTextureMap* GUIManager::CreateFilledTexture(int width, int height, unsigned lo
 
 // 0x004868b0
 int GUIManager::EnableWindowClipper(int enable) {
-    UnknownDisplay* display;
+    PCVideoCard* display;
 
     if (enable) {
         if (windowClipper) {

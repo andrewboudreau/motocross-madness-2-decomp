@@ -8,7 +8,7 @@
 #include "../../src/reconstructed/BackgroundImage.h"
 
 #include "../../src/reconstructed/DebugAlloc.h"
-#include "../../src/reconstructed/Display.h"
+#include "../../src/reconstructed/PCVideoCard.h"
 #include "../../src/reconstructed/DisplayMode.h"
 #include "../../src/reconstructed/TrackGame.h"
 

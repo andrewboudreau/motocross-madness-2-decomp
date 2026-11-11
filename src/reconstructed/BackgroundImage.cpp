@@ -43,12 +43,12 @@ BackgroundImage::BackgroundImage(int flags) : GameObject(flags) {
 // The current display mode's size. Read through these helpers, each test
 // indexes the mode table afresh and loads the camera's field first, as
 // retail does in 0x00403dc0; written inline, VC6 shares the row address.
-static inline int ModeHeight(UnknownDisplay* display)
+static inline int ModeHeight(PCVideoCard* display)
 {
     return display->displayModes[display->currentDisplayMode].height;
 }
 
-static inline int ModeWidth(UnknownDisplay* display)
+static inline int ModeWidth(PCVideoCard* display)
 {
     return display->displayModes[display->currentDisplayMode].width;
 }

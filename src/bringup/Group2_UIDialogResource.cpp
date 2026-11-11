@@ -36,7 +36,7 @@
 
 #include <imm.h>
 
-#include "Display.h"
+#include "PCVideoCard.h"
 #include "Parameterblocks.h"
 
 // The dialog resource parser

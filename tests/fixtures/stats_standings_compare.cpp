@@ -10,7 +10,7 @@
 #include "TrackGame.h"
 #include "BikeRaceCore.h"
 #include "PCTextureMap.h"
-#include "Display.h"
+#include "PCVideoCard.h"
 TrackGame* g_TrackGame;
 extern "C" int __cdecl _output();
 extern "C" long __cdecl _ftol();
@@ -18,7 +18,7 @@ static BYTE referenceSpace[0x800000]={1};
 struct Surface{DWORD table;int locks,unlocks,held,dcHeld,blits;};
 struct World{
  BYTE overlay[sizeof(StatsOverlay)],game[2][sizeof(TrackGame)],race[sizeof(BikeRace)],owner[sizeof(TrackGameViewOwner)];
- BYTE racers[12][0x1700],texture[3][sizeof(PCTextureMap)],display[sizeof(UnknownDisplay)];
+ BYTE racers[12][0x1700],texture[3][sizeof(PCTextureMap)],display[sizeof(PCVideoCard)];
  BYTE pixels[6][4096],guards[2][4096];DWORD slots[12];Surface surfaces[6];
  DWORD font,gamePointer;int locks,unlocks,draws,blits;
 };
@@ -89,7 +89,7 @@ static void Setup(){
  memset(&w,0,sizeof(w));memset(&got,0,sizeof(got));receiver=OverlayObject();g_TrackGame=(TrackGame*)w.game[0];g_TrackGame->quarryEvent=(TrackGameViewOwner*)w.owner;g_TrackGame->quarryEvent->raceView=(UnknownKrustyBikeView*)w.race;
  g_TrackGame->playerCount=sc.count;g_TrackGame->mode.raceSettings.raceMode=sc.mode;g_TrackGame->mode.raceSettings.aiRacerCount=sc.count-1;g_TrackGame->mode.raceSettings.multiplayerAiRacerCount=0;g_TrackGame->mode.raceSettings.timeLimitMinutes=3.5f;g_TrackGame->quarryEvent->elapsedMinutes=1;g_TrackGame->quarryEvent->elapsedSeconds=15;
  if(sc.timeCase){float times[]={-75.0f,-0.5f,0.0f,59.75f,60.0f,60.25f,119.75f,120.0f,3599.0f};g_TrackGame->mode.raceSettings.timeLimitMinutes=0;g_TrackGame->quarryEvent->elapsedMinutes=0;g_TrackGame->quarryEvent->elapsedSeconds=-times[sc.timeCase-1];}
- g_TrackGame->resourceInstance=sc.resource?(void*)0x1111:0;g_TrackGame->display=(UnknownDisplay*)w.display;((UnknownDisplay*)w.display)->partialTextureUploadResult=sc.partial;
+ g_TrackGame->resourceInstance=sc.resource?(void*)0x1111:0;g_TrackGame->display=(PCVideoCard*)w.display;((PCVideoCard*)w.display)->partialTextureUploadResult=sc.partial;
  BikeRace*r=(BikeRace*)w.race;r->localRacer=(UnknownBikeRaceRacer*)w.racers[sc.own];r->racerSlots=(UnknownBikeRaceRacer**)w.slots;
  int order[12],used=0;for(int i=0;i<sc.count;i++){w.slots[i]=(DWORD)w.racers[i];At(w.racers[i],4)=(DWORD)vb;w.racers[i][0x1631]=(BYTE)(i!=sc.disabled);char*p=(char*)w.racers[i]+0x5e0;*p++='R';Number(p,i);*p=0;float value=(float)Score(i);if(sc.scoreVariant)value+=(sc.scoreVariant-3)*0.25f;*(float*)(w.racers[i]+0x768)=value;if(i!=sc.disabled)order[used++]=i;}
  if(sc.reverse&&!sc.tie)for(int j=0;j<used/2;j++){int t=order[j];order[j]=order[used-1-j];order[used-1-j]=t;}

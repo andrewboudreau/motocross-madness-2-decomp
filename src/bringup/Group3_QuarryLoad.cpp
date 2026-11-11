@@ -24,7 +24,7 @@
 #include "../reconstructed/ArcadeObject.h"
 #include "../reconstructed/AuralScape.h"
 #include "../reconstructed/DebugAlloc.h"
-#include "../reconstructed/Display.h"
+#include "../reconstructed/PCVideoCard.h"
 #include "../reconstructed/EventManager.h"
 #include "../reconstructed/LightEmitter.h"
 #include "../reconstructed/MemTag.h"
@@ -376,7 +376,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         terrainTextures.halvings = 0;
         skyTextures.halvings = 0;
         modelTextures.halvings = 0;
-        if (((UnknownDisplay*)g_TrackGame->display)->isAGP) {
+        if (((PCVideoCard*)g_TrackGame->display)->isAGP) {
             g_TrackGame->texturesCached = 0;
             if (available - needed <= 0) {
                 if (forced) {
