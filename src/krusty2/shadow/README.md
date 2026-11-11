@@ -25,8 +25,10 @@ Functions (all in the extent)
 - Near misses in `samples/physics/shadow/ProjectedShadowNearMisses.cpp` (includes the canonical file):
   Init 0x4da7b0, ComputeBounds 0x4db0d0, Present 0x4dbd30 (scores in docs/NEAR_MISS_INDEX.md).
 - Excluded (inline asm): RenderShadow 0x4db8c0 and TintCasterVertices 0x4dc2b0 round with bare
-  `fistp dword ptr [eax]` in an ebp frame (0x4dbb5c/0x4dbb8b, 0x4dc351/0x4dc36c); their C++ candidates use
-  `(int)` casts and stay registered partials.
+  `fistp dword ptr [eax]` in an ebp frame (0x4dbb5c/0x4dbb8b, 0x4dc351/0x4dc36c); their C++ candidates
+  (same file) round through `ProjectedShadowFloatToInt`, a 64-bit `fistp` under `/QIfist`, and stay
+  registered partials. The game build links all four near misses from that file
+  (docs/GAME_BUILD.md#projectedshadow-near-miss-bodies).
 
 Notes
 - The ctor 0x4da570: the previous-bounds fields are written per axis (min x, max x, min y, max y) after

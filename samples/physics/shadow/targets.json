@@ -56,7 +56,7 @@
     "target_va": "0x004db8c0",
     "target_size": 1136,
     "expect": "partial",
-    "notes": "Verified exclusion (inline asm): retail rounds with bare fistp dword ptr [eax] at 0x4dbb5c/0x4dbb8b in an ebp frame; kept as a partial. ProjectedShadowFloatToInt reproduces fistp's round-to-nearest-even (the former (int) casts truncated: corners one pixel low, and (-0.5, 0.5) gave 0 not -1); masked 48/1028 -> 61/1192 (__ftol unbound). The 16-bit clear goes through the shared Duff's-device fill (retail's 15-entry jump table), giving the full 1136 B.",
+    "notes": "Verified exclusion (inline asm): retail rounds with bare fistp dword ptr [eax] at 0x4dbb5c/0x4dbb8b in an ebp frame; kept as a partial. ProjectedShadowFloatToInt stores and reloads the argument as binary32, then casts to __int64: under /QIfist (the game build) a 64-bit fistp under the current rounding mode, with out-of-range results giving 0x80000000 as retail's 32-bit store does; without /QIfist (this runner) the cast truncates through __ftol, so only code shape is scored here. The 16-bit clear goes through the shared Duff's-device fill (retail's 15-entry jump table), giving the full 1136 B.",
     "bindings": "../../../src/krusty2/shadow/ProjectedShadow.bindings.json"
   },
   {
@@ -76,7 +76,7 @@
     "target_va": "0x004dc2b0",
     "target_size": 352,
     "expect": "partial",
-    "notes": "Verified exclusion (inline asm): retail rounds with bare fistp dword ptr [eax] at 0x4dc351/0x4dc36c in an ebp frame; kept as a partial. ProjectedShadowFloatToInt reproduces fistp's round-to-nearest-even (the former (int) casts truncated toward zero, so points just left of / above the texture passed the x >= 0 / y >= 0 tests and others hit the neighbouring cell); masked 29/326 -> 13/502 (__ftol unbound).",
+    "notes": "Verified exclusion (inline asm): retail rounds with bare fistp dword ptr [eax] at 0x4dc351/0x4dc36c in an ebp frame; kept as a partial. ProjectedShadowFloatToInt stores and reloads the argument as binary32, then casts to __int64: under /QIfist (the game build) a 64-bit fistp under the current rounding mode, with out-of-range results giving 0x80000000 as retail's 32-bit store does; without /QIfist (this runner) the cast truncates through __ftol, so only code shape is scored here.",
     "bindings": "../../../src/krusty2/shadow/ProjectedShadow.bindings.json"
   }
 ]

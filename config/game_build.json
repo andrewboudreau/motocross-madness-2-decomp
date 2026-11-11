@@ -10,7 +10,7 @@
     "??0Vector3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",
     "?AttachRenderContext@D3DIMSoultreeObject@@UAEHPAX@Z": "?AttachRenderContext@SoultreeObject@@UAEHPAX@Z",
     "?BoxCapsuleOverlap@@YAHPBUCollisionVec3@@00MMPBUMatrix4@@@Z": "?BoxCapsuleOverlap@@YAHPBUVec3@@00MMPBUMatrix4@@@Z",
-    "?Vec3Dot@@YAMABUVec3@@0@Z":"?Vec3DotCall@@YAMPBUVec3@@0@Z",
+    "?Vec3Dot@@YAMABUVec3@@0@Z": "?Vec3DotCall@@YAMPBUVec3@@0@Z",
     "?Vec3Sub@@YA?AUVec3@@ABU1@0@Z": "?Vec3SubtractCall@@YAPAUVec3@@PAU1@PBU1@1@Z",
     "?Vec3Add@@YA?AUVec3@@ABU1@0@Z": "?Vec3AddCall@@YAPAUVec3@@PAU1@PBU1@1@Z",
     "?Vec3Scale@@YA?AUVec3@@ABU1@M@Z": "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z",
@@ -109,6 +109,11 @@
       "path": "src/krusty2/constraint/ConstraintMethodCollisionModel.cpp",
       "included_by": "samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp",
       "reason": "The near-miss file includes the canonical unit (TU-local zero vector and helpers) and adds ApplyContactImpulse 0x0043bdb0; the canonical file stays a standalone calibration case (docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies)."
+    },
+    {
+      "path": "src/krusty2/shadow/ProjectedShadow.cpp",
+      "included_by": "samples/physics/shadow/ProjectedShadowNearMisses.cpp",
+      "reason": "The near-miss file includes the canonical unit (the class, its vector constants and the exact functions) and adds Init, ComputeBounds, RenderShadow, Present and TintCasterVertices; the canonical file stays a standalone calibration case (docs/GAME_BUILD.md#projectedshadow-near-miss-bodies)."
     }
   ],
   "candidate_sources": [
@@ -543,6 +548,15 @@
       "status": "reviewed-nonexact",
       "reason": "Wrecker::PushProbesOutOfBox 0x005329e0 and SprayContactParticles 0x00531740 replace the Group1_WreckerContacts bring-up copies; the file includes the canonical Wrecker.cpp (included_sources). The copies replaced retail's out-of-line vector helper calls with inline arithmetic (the dot product summed in a different order); here the bodies make the calls and link_aliases binds them to the providers at the same retail addresses (0x00404e60, 0x0040ae30, 0x00421cb0, 0x005015b0). Not differentially tested.",
       "evidence": "docs/GAME_BUILD.md#near-miss-bodies-replacing-bring-up-copies"
+    },
+    {
+      "path": "samples/physics/shadow/ProjectedShadowNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "ProjectedShadow ComputeBounds 0x004db0d0, RenderShadow 0x004db8c0, Present 0x004dbd30 and TintCasterVertices 0x004dc2b0 replace the bring-up stand-ins; includes the canonical unit (included_sources). /QIfist turns the rounding helper's cast into a 64-bit fistp under the current rounding mode, range-checked to retail's 32-bit result. Checked against the retail disassembly, not differentially tested.",
+      "evidence": "docs/GAME_BUILD.md#projectedshadow-near-miss-bodies"
     }
   ],
   "includes": [

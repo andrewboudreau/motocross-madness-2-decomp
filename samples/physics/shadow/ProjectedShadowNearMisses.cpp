@@ -91,22 +91,26 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
     return 0;
 }
 
-// Retail's inline fistp helper (fstp/fld of the float, then `mov eax, out; fistp dword ptr [eax]`
-// in an ebp frame) rounds under the x87 control word, round-to-nearest-even by default (provisional:
-// nothing in the game is known to change it), so fistp(v - 0.5f) is floor(v) apart from exact ties.
-// A plain (int) cast truncates toward zero through __ftol: one too small whenever v's fraction is
-// below one half, and 0 instead of -1 for v in (-0.5, 0.5), which let off-texture points pass the
-// x >= 0 / y >= 0 tests.  This gives the round-to-nearest-even result in ordinary C++ (same helper
-// as Bike.cpp's BikeFloatToInt); a behaviour repair, not the original inline-asm form.
+// Retail's inline fistp helper: the float argument is stored to a binary32 slot and reloaded
+// (`fstp [t]; fld [t]`, so v - 0.5f is rounded to float first), then `mov eax, out;
+// fistp dword ptr [eax]` in an ebp frame.  FISTP rounds under the x87 control word,
+// round-to-nearest-even by default (provisional: no game code loads the control word,
+// docs/REBUILD_GAPS.md), so fistp(v - 0.5f) is floor(v) apart from exact ties; out-of-range
+// values and NaNs give the integer indefinite 0x80000000.  A plain (int) cast truncates
+// toward zero through __ftol instead.
+// No inline asm: this file is compiled with /QIfist in the game build (config/game_build.json
+// candidate_sources), which turns the cast into a direct 64-bit fistp under the current
+// rounding mode.  The memcpy makes VC6 store and reload the argument as a float, as retail
+// does, and the range check gives the 32-bit store's 0x80000000 for any result outside int
+// (the 64-bit indefinite included).  Exception flags are not reproduced.  Without /QIfist
+// (the calibration and physics-runner compiles, which score code shape only) the cast still
+// goes through __ftol and truncates.
 static inline void ProjectedShadowFloatToInt(int* out, float value)
 {
-    int result = (int)value;
-    float fraction = value - (float)result;
-    if (fraction > 0.5f || (fraction == 0.5f && (result & 1)))
-        result++;
-    else if (-fraction > 0.5f || (-fraction == 0.5f && (result & 1)))
-        result--;
-    *out = result;
+    float stored;
+    memcpy(&stored, &value, sizeof(stored));
+    __int64 wide = (__int64)stored;
+    *out = wide == (int)wide ? (int)wide : (int)0x80000000;
 }
 
 // 0x004dc2b0 (352 B): paints shadowColor into the colour word (+0x10 of 0x20-byte vertices) of
@@ -448,8 +452,8 @@ void ProjectedShadow::Present()
         unsigned int sumMixA = (alpha + key) * 2;
         unsigned int sumMixB = key + alpha * 2 + alpha;
         unsigned int sumAlpha = alpha * 4;
-        unsigned int halfShade = (unsigned char)((unsigned char)shadowPixel >> 1) & 7;
-        unsigned int quarterShade = (unsigned char)((unsigned char)shadowPixel >> 2) & 3;
+        unsigned int halfShade = (unsigned char)((unsigned char)alpha >> 1) & 7;
+        unsigned int quarterShade = (unsigned char)((unsigned char)alpha >> 2) & 3;
         unsigned short outMixA = (unsigned short)(keyLevel * 0x111 - halfShade * 0x111);
         unsigned short outMixB = (unsigned short)(keyLevel * 0x111 - (quarterShade + halfShade) * 0x111);
         unsigned short outMixC = (unsigned short)(keyLevel * 0x111 - quarterShade * 0x111);

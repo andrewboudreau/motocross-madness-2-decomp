@@ -168,7 +168,8 @@ extents is exact, a near miss or excluded:
   it first). Init, ComputeBounds and Present are near misses in
   `samples/physics/shadow/ProjectedShadowNearMisses.cpp`; RenderShadow `0x4db8c0` and
   TintCasterVertices `0x4dc2b0` round with bare `fistp` (inline asm) and stay
-  partial. Slot 23 is the folded stub `0x4dc4c0`, registered with Terrain.cpp.
+  partial. The runner compiles without `/QIfist`, so their rounding helper
+  truncates there; the game build compiles the file with `/QIfist`. Slot 23 is the folded stub `0x4dc4c0`, registered with Terrain.cpp.
 
 ```bash
 python tools/run_physics_samples.py --strict \

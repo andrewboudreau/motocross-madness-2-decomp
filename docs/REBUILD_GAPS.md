@@ -400,7 +400,7 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 | `0x004a8bf0`, `0x004a8c50` | 1, 2 | `samples/physics/motion/CharacterMotionStart.cpp`, `CharacterMotionBlend.cpp` | `FloatToInt` (`CharacterMotionFloatToInt.h`) |
 | `0x004a9050` | 4 | `src/bringup/Group3_KrustyBike.cpp` (`G3SampleMotion`) | `X87FloatToInt` |
 | `0x004bac60` | 2 | `src/bringup/Group1_ParticleRender.cpp` | `X87FloatToInt` |
-| `0x004db8c0`, `0x004dc2b0` | 2, 2 | `src/bringup/Group5_ProjectedShadow.cpp` | `X87FloatToInt` |
+| `0x004db8c0`, `0x004dc2b0` | 2, 2 | `samples/physics/shadow/ProjectedShadowNearMisses.cpp` (`/QIfist`) | `ProjectedShadowFloatToInt` |
 | `0x004eab00` | 1 | `src/bringup/Group4_SceneTick.cpp` | `X87FloatToInt` |
 | `0x00507610` | 1 | `src/bringup/Group3_TerrainPrepareGeometry.cpp` | `X87FloatToInt` |
 | `0x00507c10` | 2 | `src/krusty2/broadphase/Terrain.cpp` (`QueryGround`; the `QueryGround` views forward to it) | `FloatToInt` |
@@ -455,8 +455,10 @@ contact near-miss bodies). Linked scores, before and after:
 
 It also flagged stand-ins with no sample: MorphBastard `ControllerAngles`
 (0.29, now 0.93) and Visibility `TestBox` (0.27, now 0.49). The ProjectedShadow
-bodies sit below their sample on purpose: the bring-up file rounds with
-`X87FloatToInt` and calls provided helpers instead.
+bodies used to sit below their sample because the sample's helper views did
+not link and its casts truncated. `link_aliases` and a `/QIfist` build now let
+the game link the sample
+([GAME_BUILD.md](GAME_BUILD.md#projectedshadow-near-miss-bodies)).
 
 Targets named only by `candidate_symbol_contains` in a `targets.json` are bound
 too when exactly one otherwise unbound linked symbol contains the substring.

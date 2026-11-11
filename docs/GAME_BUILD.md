@@ -30,9 +30,10 @@ are in the build directory. Failed compilation or linking returns nonzero;
 an old executable cannot satisfy a subsequent build.
 
 The default profile is `vc6_o2_mt`. A reviewed candidate may explicitly request
-`/QIfist` through `extra_flags`; this currently applies only to the motion-start
-conversion helper, preserving the incoming rounding mode on a floating-point
-trap. Every actual per-source command is recorded in the report. Other source
+`/QIfist` through `extra_flags`. Two candidates use it: the motion-start
+conversion helper, which preserves the incoming rounding mode on a
+floating-point trap, and the ProjectedShadow near-miss file
+([below](#projectedshadow-near-miss-bodies)). Every actual per-source command is recorded in the report. Other source
 files retain the default flags. Objects are ordered by source basename,
 then path. This is a reproducible working order, not proof that reconstructed
 files recover original translation units. Ordinary import libraries supply
@@ -732,7 +733,6 @@ clearly more faithful, the game now links the sample's text:
   - `BoundingBoxTreeBuildNearMisses`
   - `EcoSystemNearMisses`
   - `KrustyBikeNearMisses`
-  - `ProjectedShadowNearMisses`
   - `KrustyBikeCameraNearMisses` (see below)
 
   Their bring-up copies now use the sample's text for the functions listed
@@ -803,8 +803,8 @@ The sample column is the standalone object's score.
 | 0x00497e20 | `KrustyBikeCamera::Tick` | 0.938 | 0.979 | 0.979 | bring-up copy |
 | 0x0048eea0 | `KrustyBike::UpdateRiderPose` | 0.958 | 0.971 | 0.971 | bring-up copy |
 | 0x00493660 | `KrustyBike::Fn_00493660` | 0.987 | 0.989 | 0.989 | bring-up copy |
-| 0x004da7b0 | `ProjectedShadow::Init` | 0.892 | 0.992 | 0.992 | bring-up copy |
-| 0x004db0d0 | `ProjectedShadow::ComputeBounds` | 0.924 | 0.985 | 0.985 | bring-up copy |
+| 0x004da7b0 | `ProjectedShadow::Init` | 0.892 | 0.992 | 0.992 | bring-up copy (sample file since) |
+| 0x004db0d0 | `ProjectedShadow::ComputeBounds` | 0.924 | 0.985 | 0.985 | bring-up copy (sample file since) |
 
 Bytes at masked score 1.000 rose from 772244 to 795446. About 2300 of the
 increase is not from switched bodies:
@@ -823,10 +823,8 @@ Not switched, and why:
   truncates. Corners with a fraction below one half land one pixel low,
   where retail's `fistp` gives `floor(v)`. The sample's outcode array is also
   a one-entry placeholder.
-- `ProjectedShadow::RenderShadow` and `TintCasterVertices` (0.545 and 0.511;
-  samples 0.688 and 0.638): `X87FloatToInt` follows the FPU rounding mode as
-  retail's `fistp` does. The sample's `ProjectedShadowFloatToInt` agrees only
-  in the default mode.
+- ProjectedShadow is now linked from the whole sample file; see
+  [ProjectedShadow near-miss bodies](#projectedshadow-near-miss-bodies).
 - `KrustyBikeCamera::Tick`: the bring-up copy now has the sample's shape, but
   the sample file is not linked. Its slot 46 vector is a zero-initialised
   static, where retail's 0x0067c3e8 is (0, 1, 0).
@@ -847,6 +845,73 @@ differences are:
 - the debug tag strings, because `__FILE__` is now the build path;
 - `Vegetation::TestDistance`, which reads the shared detail band pointer
   that `EcoSystem.cpp` sets instead of recomputing it.
+
+## ProjectedShadow near-miss bodies
+
+`src/bringup/Group5_ProjectedShadow.cpp` used to provide ComputeBounds, RenderShadow,
+Present and TintCasterVertices. It rounded with `X87FloatToInt` and called
+helpers that the game build already provides, because the sample could not
+link or round like retail:
+
+- The sample calls declared-only views (`ShadowMatrixMultiplyInto`,
+  `ShadowVec3Call`, `ShadowTexture`, `ShadowCameraProxy`,
+  `ShadowRenderTarget::SetOwner`) that had no definitions in the game build.
+- Retail rounds with inline asm (`fstp [t]; fld [t]; mov eax, out;
+  fistp dword ptr [eax]` in an ebp frame). Without `/QIfist`, a cast goes
+  through `__ftol` and truncates.
+
+Now `samples/physics/shadow/ProjectedShadowNearMisses.cpp` is a
+`best-guess-unreviewed` candidate source compiled with `/QIfist`. It includes the
+canonical `src/krusty2/shadow/ProjectedShadow.cpp` (an `included_sources`
+entry), and the bring-up file was deleted. The sample also provides
+`ProjectedShadow::Init` (0x004da7b0), which the `UnknownKrustyUIShadow::Init`
+view is aliased to.
+
+`ProjectedShadowFloatToInt` copies its argument through `memcpy`. That makes
+VC6 store and reload it as binary32, as retail's helper does. It then casts to
+`__int64`, which `/QIfist` compiles as a 64-bit `fistp` under the current
+rounding mode. Any result outside `int` becomes `0x80000000`, which is the
+32-bit store's integer indefinite. Exception flags are not reproduced.
+Without `/QIfist` (calibration and the physics runner, which score shape
+only), the cast truncates through `__ftol`.
+
+`link_aliases` binds each view to the exact provider at the same retail
+address:
+
+| Address | View | Provider |
+|---|---|---|
+| 0x004a1860 | `ShadowMatrixMultiplyInto` | `MatrixMult` |
+| 0x00404e60 | `ShadowVec3Call` constructor | `Vec3Call` constructor |
+| 0x004c5f00 | `ShadowTexture` constructor | `PCTextureMap` constructor |
+| 0x004da520 | `ShadowCameraProxy` constructor | `ShadowCamera` constructor |
+| 0x0042e930 | `ShadowCameraProxy::SetLensScale` | `Camera::SetFieldOfView` |
+| 0x004e8cf0 | `ShadowRenderTarget::SetOwner` | `RenderTarget::SetCamera` |
+
+Linked-body scores (`tools/linked_accuracy.py`, masked):
+
+| VA | Function | Bring-up | Now linked |
+|---|---|---|---|
+| 0x004db0d0 | `ComputeBounds` | 0.924 | 0.985 |
+| 0x004db8c0 | `RenderShadow` | 0.545 | 0.738 |
+| 0x004dbd30 | `Present` | 0.837 | 0.837 |
+| 0x004dc2b0 | `TintCasterVertices` | 0.511 | 0.759 |
+
+RenderShadow and TintCasterVertices are capped mainly by retail's ebp frame,
+which comes from the inline asm and changes register allocation. Present
+differs in how retail loads the 16-bit colour key and shadow pixel, and in
+the byte operations it uses to derive the format-9 nibbles. The canonical
+exact functions are unchanged, and the bytes at score 1.000 are unchanged
+(772631).
+
+Behaviour was checked against the retail disassembly and not differentially
+tested. The checks covered GetPart argument order, the transform choice
+(mode 3 uses 0x004a1b00), the area cull at `<= 0`, the `1 < p < size - 1`
+bounds, the clip min/max, minDepth, and the ReleaseParts guard on
+`+0x27c != -1`. In TintCasterVertices they covered the inclusive size bounds
+and the signed height compared with the zero-extended key. In Present they
+covered the format-9 sums and outputs, the row tail and the clear loops. No
+behaviour bug was found. The rounding now follows the control word, whereas
+`X87FloatToInt` and the sample's old helper both assumed round-to-nearest-even.
 
 ## Source-built run status
 
