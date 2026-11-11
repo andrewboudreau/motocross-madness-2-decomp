@@ -20,11 +20,13 @@
 // Larger-extent dead end (about 18 forms): retail's else arm stores the extent back over
 // itself (`mov edx, [S]; fstp st0; mov [S], edx`) and reloads texture; if/else, ternary,
 // max-by-reference helpers and pointer-select forms all drop the self-copy.
-// The orthographic arm reads `fov` unset, in retail too (provisional reading: a source bug):
-// retail's `fmul [esp+0x4c]` there addresses fov's home [esp+0x10] (the slot SetLookAt gets
-// as &fov on the mode-1 path), and nothing on the orthographic path stores to it first.
-// Slot homes (work/s14/symmap.py on /FAs): ours packs fov with extent at [esp+0xc]; retail
-// keeps extent alone at 0xc and puts fov at 0x10 with the size*size temporary.
+// The orthographic arm scales by the larger extent: retail's `fmul [esp+0x4c]` at 0x00509949
+// sits under the identity call's pushed destination and the 0x3c-byte argument block (0x40),
+// so it reads [esp+0xc], the extent stored at 0x0050981b.  An earlier reading counted only
+// the 0x3c, took it for fov's home 0x10 and wrote `* fov`, unset on this path; VC6 then gave
+// fov extent's slot, so the old body behaved the same by accident, and `extent` moves fov to
+// retail's 0x10 (tools/emu_cases/terrain_shadow_slot28.py: 0/600 either way; `extentX` there
+// differs in 8/200).
 // Explicit-destination forms of 0x004a1410 / 0x004a1860 (cdecl, the destination is the first
 // argument and is returned), as Math3D.h's MatrixMultiply(Matrix4* out, a, b) declares them.
 ShadowMatrix* TerrainMatrixIdentityInto(ShadowMatrix* out);                       // 0x004a1410
@@ -58,7 +60,7 @@ int TerrainShadow::UnknownVirtualSlot28()
             ShadowMatrix projection;
             projection = *TerrainMatrixIdentityInto(&projection);
             float half = (float)shadow->texture->size * 0.5f;
-            projection.m[0][0] = 0.5f / shadow->lensScale * fov;
+            projection.m[0][0] = 0.5f / shadow->lensScale * extent;
             projection.m[1][1] = -projection.m[0][0];
             projection.m[3][1] = projection.m[3][0] = half;
             shadow->lightMatrix = *TerrainMatrixMultiplyInto(&projection, projection,
