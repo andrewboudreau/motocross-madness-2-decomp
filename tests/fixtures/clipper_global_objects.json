@@ -72,7 +72,7 @@
     "samples/render/GriddrawNearMisses.cpp": {
       "sections": 19,
       "relocations": 147,
-      "sha256": "fd1a4afc22bdcd85ed719e555ba9ee8d2248c3029f54da9cbf4f7c3bbd1fc5c3"
+      "sha256": "7dfebd93dbf83b4e47768cc7b3f617a17ef85d4a28e95c2e4dd8971ed84d0b9b"
     },
     "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp": {
       "sections": 7,

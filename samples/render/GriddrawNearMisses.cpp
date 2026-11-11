@@ -109,6 +109,18 @@
 // - ruled out here: center/extent through `const GridVec3&` vs indexed
 //   (0.710 vs 0.711), `size <= 1` first (0.563), visible/corners initialised
 //   at the declaration instead of the else block (0.631).
+// Linked-accuracy audit (masked 0.725 -> 0.719, 500/500 instructions):
+// - logic fix: the count test after the four recursive calls compared
+//   `depth + 1 == 8`; retail reloads esi from the halved `size` slot at
+//   0x4820fe (`mov esi,[esp+0x8c]` with three pushes outstanding) and tests
+//   `cmp esi,8` at 0x482370, so the condition is `size == 8 || size == 16`.
+// - retail shares one `count == 0 / childMask == 0` block (0x482370) between
+//   the all-visible path (reached only for size 16) and the subdivision path
+//   (size 8 or 16); the source writes it once after the corners if/else as
+//   `(corners == 0 && size == 8) || size == 16`. That is behaviourally the
+//   same: the child case reaches it with size 0. Two separate tests scored
+//   0.632; ordering `size == 16 ||` first 0.721 (larger body); a split or
+//   goto form 0.620-0.638.
 
 #include <float.h>
 #include <string.h>
@@ -635,12 +647,6 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* cen
                 childMask |= 0x1e0 << (path * 4);
                 break;
             }
-            if (size == 16) {
-                if (count == 0)
-                    childMask = 0;
-                else if (childMask == 0)
-                    changed = 1;
-            }
         } else {
             size >>= 1;
             if (size) {
@@ -653,12 +659,6 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* cen
                 count += WalkVisibilityQuadrants(stream, a1, &c2.x, &childExtent.x, x + size, z, size, depth + 1, path * 4 + 1, coarse);
                 count += WalkVisibilityQuadrants(stream, a1, &c3.x, &childExtent.x, x, z + size, size, depth + 1, path * 4 + 2, coarse);
                 count += WalkVisibilityQuadrants(stream, a1, &c4.x, &childExtent.x, x + size, z + size, size, depth + 1, path * 4 + 3, coarse);
-                if (depth + 1 == 8 || size == 16) {
-                    if (count == 0)
-                        childMask = 0;
-                    else if (childMask == 0)
-                        changed = 1;
-                }
             } else {
                 DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[z] + x];
                 if (child) {
@@ -684,6 +684,12 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* cen
                     }
                 }
             }
+        }
+        if ((corners == 0 && size == 8) || size == 16) {
+            if (count == 0)
+                childMask = 0;
+            else if (childMask == 0)
+                changed = 1;
         }
     } else {
         for (j = 0; j < size; j++) {
