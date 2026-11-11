@@ -10,8 +10,8 @@
 // Fn_00493660 and UpdateRiderPose now make the sample's calls: OrientationAxesFromAngles
 // (Group4_OrientationAxes.cpp), KbWheel::SetRollDistance, KbTrack::SelectLapGates (aliased
 // to TrackGameViewOwner's) and the four-pose blend Character::Method_0x004a9050
-// (Group3_CharacterPoseBlend.cpp). The former private copies were cdecl statics (linked 0.987
-// and 0.958; the sample scores 0.989 and 0.971). The sample is not linked as a whole: it
+// (samples/physics/motion/CharacterMotionFourPose.cpp). The former private copies were
+// cdecl statics (linked 0.987 and 0.958; the sample scores 0.989 and 0.971). The sample is not linked as a whole: it
 // includes the canonical KrustyBike.cpp, and its slot 11 FindPlacement scores below this
 // copy (0.869 against 0.947).
 #include "../reconstructed/BikeRaceCore.h"
@@ -85,10 +85,6 @@ static inline int G3SelectedSeries()
 // 0x004b0ac0 is PointInPlacementSquare (src/reconstructed/PlacementQueries.cpp).
 int PointInPlacementSquare(const CollisionVec3* point, float x, float z, float size, float scale,
                            float* minX, float* maxX, float* minZ, float* maxZ);
-
-// 0x004a9050, Character::Method_0x004a9050 (the four-pose blend UpdateRiderPose calls),
-// lives in Group3_CharacterPoseBlend.cpp: it is compiled with /QIfist for its fistp
-// rounding, which this unit cannot take (0x00492ad0 and 0x00493660 truncate through __ftol).
 
 // Slot 70: threshold test against a per-mode table; a[] and b[][] are static-init'd locals.
 // Same bytes (151/230): level/row int locals, a flat

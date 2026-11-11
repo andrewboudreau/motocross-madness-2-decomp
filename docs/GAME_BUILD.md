@@ -30,7 +30,8 @@ are in the build directory. Failed compilation or linking returns nonzero;
 an old executable cannot satisfy a subsequent build.
 
 The default profile is `vc6_o2_mt`. A reviewed candidate may explicitly request
-`/QIfist` through `extra_flags`. Two candidates use it: the motion-start
+`/QIfist` and `/Op` through `extra_flags` (`/Op` only for the
+[four-pose blend](#four-pose-motion-blend)). The first `/QIfist` users were the motion-start
 conversion helper, which preserves the incoming rounding mode on a
 floating-point trap, and the ProjectedShadow near-miss file
 ([below](#projectedshadow-near-miss-bodies)), plus the fistp samples further
@@ -744,10 +745,10 @@ clearly more faithful, the game now links the sample's text:
   `samples/physics/helpers/OrientationAxes.cpp` (0x004b5d00). This gives the
   Scene readers and `KrustyBike` the retail function in place of private
   copies. Which unit owns it is still unsettled (tier 3).
-- `Character::Method_0x004a9050`, the four-pose blend, is now defined in
-  `Group3_KrustyBike.cpp`. It was a cdecl static with the same body, so
-  `UpdateRiderPose` can now make retail's thiscall. Its own linked score is
-  0.103: it is a reimplementation, not a near miss.
+- `Character::Method_0x004a9050`, the four-pose blend that `UpdateRiderPose`
+  calls on the rider and the bike, is a candidate sample
+  ([below](#four-pose-motion-blend)); the bring-up reimplementation in
+  `Group3_KrustyBike.cpp` was removed.
 - The sample bodies call retail's callees under view names. `link_aliases`
   binds each view name to the provider at the same retail address. Each pair
   was checked for the following:
@@ -1053,9 +1054,9 @@ were moved out, not converted:
   `__ftol` at 0x0049e7b1 and the other worker sites) now live in
   `Group4_GridLightColor.cpp`, which is compiled without the flag. They were
   already called out of line before the split.
-- `Character::Method_0x004a9050` moved from `Group3_KrustyBike.cpp` to
-  `Group3_CharacterPoseBlend.cpp`. `Group3_KrustyBike.cpp` keeps the 15 and 3
-  `__ftol` truncations of 0x00492ad0 and 0x00493660, which retail also makes.
+- `Character::Method_0x004a9050` left `Group3_KrustyBike.cpp` (it is now the
+  candidate sample described under [Four-pose motion blend](#four-pose-motion-blend)).
+  `Group3_KrustyBike.cpp` keeps the 15 and 3 `__ftol` truncations of 0x00492ad0 and 0x00493660, which retail also makes.
 
 `/QIfist` stores 64 bits, so a site is safe when its value stays inside `int`
 or when only its low bits are kept. `FistpFloatToIntChecked` casts to
@@ -1070,7 +1071,7 @@ or when only its low bits are kept. `FistpFloatToIntChecked` casts to
 | 0x0049e6b0 | `LightAny` worker | same | same | 0.209 | 0.236 |
 | 0x0049f1c0 | `LightOne` worker | same | same | 0.168 | 0.240 |
 | 0x0049f8d0 | `LightAmbientPlusOne` worker | same | same | 0.206 | 0.213 |
-| 0x004a9050 | `Character::Method_0x004a9050` | `Group3_CharacterPoseBlend.cpp` | plain; frame index | 0.103 | 0.312 |
+| 0x004a9050 | `Character::Method_0x004a9050` | `CharacterMotionFourPose.cpp` (sample, `/QIfist /Op`) | plain; frame index | 0.103 | 0.727 |
 | 0x004bac60 | `ParticleManager::Render3D` | `Group1_ParticleRender.cpp` | plain; only the low byte is kept | 0.608 | 0.655 |
 | 0x004eab00 | `Scene::Tick` | `Group4_SceneTick.cpp` | plain; [-0.5, count - 0.5) | 0.637 | 0.686 |
 | 0x00507610 | `Terrain::PrepareGeometry` | `Group3_TerrainPrepareGeometry.cpp` | plain; focal length in pixels | 0.781 | 0.929 |
@@ -1107,8 +1108,76 @@ Left alone:
 
 Behaviour: each site now rounds under the current x87 control word, as
 retail's helper does. `X87FloatToInt` read the same mode through `_control87`,
-so results are unchanged for values inside `int`. No site was differentially
-tested.
+so the rounding itself is unchanged for values inside `int`. The old helper's
+`_control87` call also forced the converted value and any live float
+temporaries out to memory, though. Without that call VC6 may keep an
+intermediate in an 80-bit register where retail rounds it to binary32. The
+four-pose blend lost last-bit pose agreement this way (204 of 600 emulated
+cases) until it was compiled with `/Op`; the other sites have not been
+differentially tested for it.
+
+## Four-pose motion blend
+
+`Character::Method_0x004a9050` (thiscall, `ret 0x1c`, 2138 bytes) is the
+blend that `KrustyBike::UpdateRiderPose` (0x0048eea0) calls on the rider and
+on the bike. It is now `samples/physics/motion/CharacterMotionFourPose.cpp`, a
+`reviewed-nonexact` candidate compiled with `/QIfist /Op`. The
+reimplementation in `src/bringup/Group3_KrustyBike.cpp` was removed.
+
+What it does (decoded from the retail instructions):
+
+- Each of the four motions is sampled at the same phase. `position =
+  (frameCount - 1) * phase` is stored as binary32. `frameIndex =
+  fistp(position - 0.5f)` uses the current rounding mode, `fraction =
+  position - frameIndex`, and `next` is the frame itself on the last frame.
+- The first motion and its sampled frame become `currentMotion` (+0x18) and
+  `currentFrame` (+0x1c).
+- For each pose of `currentMotion` (`+0xac`, reloaded every iteration):
+  - motions a and b go through the clamped interpolation that 0x004a8c50
+    also expands;
+  - c and d go through `InterpolatePose` (0x004a8470);
+  - the results are mixed `(a, b)` and `(c, d)` by `1 - weight`, then by
+    `1 - lean`;
+  - the result goes to vtable +0x10 with a second argument of 0.
+
+Flags:
+
+- `/QIfist` makes `FistpFloatToInt` a `fistp`.
+- `/Op` stores `position` as binary32, as retail's asm helper does. Without
+  it, VC6 keeps the product in an x87 register, and the poses differ from
+  retail in their last bits. This sample without `/Op`, and a bring-up body
+  that inlined the sampling under `/QIfist` alone, each differed in about a
+  third of the emulated runs (204 of 600 for the bring-up body).
+
+The old bring-up body got the same rounding by accident: its `X87FloatToInt`
+calls `_control87`, which spills `position`.
+
+A differential run under unicorn found no behaviour difference. It ran retail
+0x004a9050 and the relocated candidate object inside the retail image, using
+retail's helpers, a stub vtable slot and random motions, with 1 to 61 frames,
+1 to 5 poses, edge phases and weights outside [0, 1]. It covered:
+
+- 3400 runs for the candidate, at 53-bit and 24-bit precision control;
+- 1000 runs for the old bring-up body.
+
+Both matched retail bit for bit: the recorded poses and the `currentMotion`
+and `currentFrame` fields.
+
+| VA | Function | Bring-up | Now linked |
+|---|---|---|---|
+| 0x004a9050 | `Character::Method_0x004a9050` | 0.103 | 0.727 |
+
+Retail's ebp frame and pointer `fistp` come from the inline asm. The other
+known differences are dead code:
+
+- Retail calls CharacterPose's generated constructor (0x004a8930) three
+  times in the first interpolation expansion and four times in the second.
+- Only the second expansion stores its unused weighted sums.
+
+Strong inference: the inline declares four pose locals, and the first
+expansion inlined its first constructor.
+
+Ruled-out forms are listed in `samples/physics/motion/targets.json`.
 
 ## Source-built run status
 

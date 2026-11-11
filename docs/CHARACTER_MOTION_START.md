@@ -134,7 +134,9 @@ with the required `/QIfist` source flag and the limits above. Existing source
 bodies, headers and matching targets are unchanged by its extraction. The later
 rider connections preserve complete caller bytes under the two documented
 symbol substitutions. The blend
-method at `0x4a8c50` and later method at `0x4a9050` remain missing. Linking,
+method at `0x4a8c50` ([CHARACTER_MOTION_BLEND](CHARACTER_MOTION_BLEND.md)) and
+the four-pose method at `0x4a9050`
+([GAME_BUILD](GAME_BUILD.md#four-pose-motion-blend)) are separate candidates. Linking,
 startup, full animation and racing remain separate validation gates.
 
 ```powershell

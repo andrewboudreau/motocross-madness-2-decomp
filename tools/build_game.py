@@ -43,7 +43,7 @@ def source_files(root: Path, spec: dict) -> list[Path]:
                 or not candidate.get('reason') or not candidate.get('evidence')):
             raise ValueError(f'candidate lacks nonexact review evidence: {relative}')
         flags = candidate.get('extra_flags', [])
-        if not isinstance(flags, list) or any(flag != '/QIfist' for flag in flags):
+        if not isinstance(flags, list) or any(flag not in ('/QIfist', '/Op') for flag in flags):
             raise ValueError(f'unsupported candidate compiler flags: {relative}')
         sources.add(path)
     # A source file that another compiled source #includes is part of that

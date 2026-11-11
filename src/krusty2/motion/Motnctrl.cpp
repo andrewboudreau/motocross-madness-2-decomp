@@ -15,8 +15,9 @@
 // samples/physics/motion/Motnctrl.cpp), with the exact 0x004a8440 (an out-of-line copy of an
 // inline only PoseRotation calls) and the CharacterPose constructor 0x004a8930 (called only
 // from slot 7 and the missing methods) kept beside their callers,
-// and the direct-FISTP methods: 0x004a8bf0 has a reviewed nonexact ordinary-C++ candidate
-// in samples/physics/motion/CharacterMotionStart.cpp; 0x004a8c50 and 0x004a9050 remain missing.
+// and the direct-FISTP methods, each a reviewed nonexact ordinary-C++ candidate in
+// samples/physics/motion: 0x004a8bf0 CharacterMotionStart.cpp, 0x004a8c50
+// CharacterMotionBlend.cpp and 0x004a9050 CharacterMotionFourPose.cpp.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

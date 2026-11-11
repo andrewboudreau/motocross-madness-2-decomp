@@ -197,8 +197,11 @@ stay in `samples/physics/motion/Motnctrl.cpp`.
   current rounding and preserves the old destination on unmasked invalid
   conversion. See [motion-start evidence](../../../docs/CHARACTER_MOTION_START.md)
   for the actual-helper native checks and finite exception-state limits.
-- **Not reconstructed**: `0x4a8c50`, `0x4a9050`, and the functions
-  after `0x4a9aa0`. The new motion-start evidence does not establish these bodies.
+- **Candidates outside this unit**: `0x4a8c50`
+  (`samples/physics/motion/CharacterMotionBlend.cpp`) and `0x4a9050`
+  (`samples/physics/motion/CharacterMotionFourPose.cpp`, linked with
+  `/QIfist /Op`; see [GAME_BUILD](../../../docs/GAME_BUILD.md#four-pose-motion-blend)).
+  Not reconstructed: the functions after `0x4a9aa0`.
 
 ## CollisionCharacter.cpp
 Extent: `0x004318d0..0x00431da0`. All 11 functions are strict exact in

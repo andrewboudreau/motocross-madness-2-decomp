@@ -336,7 +336,7 @@ intrinsic) or a `mov eax, fs:[4]` stack-top read. "to padding" extents can
 span more than one function. Instruction presence is confirmed by a
 linear decode of the extent; that it needs `__asm` is strong inference. Four
 rows have no such instruction and rest on documented shapes only (tier 3).
-None is strict exact. 23 are unregistered; 8 are registered near misses.
+None is strict exact. 22 are unregistered; 9 are registered near misses.
 
 | Function | Bytes (extent) | Instructions | Evidence | Registration | Nearest `__FILE__` |
 |---|---:|---|---|---|---|
@@ -359,7 +359,7 @@ None is strict exact. 23 are unregistered; 8 are registered near misses.
 | `0x004a1b00` | 196 (to padding) | - | docs only (`docs/MATRIX_UTIL.md:31`) | unregistered | MorphBastardModifier.cpp |
 | `0x004a8bf0` | 81 (to padding) | fistp x1 | scan | unregistered | Motnctrl.cpp |
 | `0x004a8c50` | 1011 (to padding) | fistp x2 | scan | unregistered | Motnctrl.cpp |
-| `0x004a9050` | 2138 (to padding) | fistp x4 | scan + docs (`docs/UNATTRIBUTED.md:76`) | unregistered | Motnctrl.cpp |
+| `0x004a9050` | 2138 (registered) | fistp x4 | scan + docs (`docs/UNATTRIBUTED.md:76`) | registered near miss | Motnctrl.cpp |
 | `0x004bac60` | 2495 (to padding) | fistp x2 | scan + docs (`src/krusty2/effects/README.md:79`) | unregistered | Particles.cpp |
 | `0x004db8c0` | 1074 (registered) | fistp x2 | scan | registered near miss | ProjectedShadow.cpp |
 | `0x004dc2b0` | 352 (registered) | fistp x2 | scan | registered near miss | Quadtree.cpp |
@@ -398,7 +398,7 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 | `0x0048e3e0` | 3 | `src/krusty2/vehicle/KrustyBike.cpp` (`SelectRiderPose`) | `KbFloatToInt` |
 | `0x0049e4a0`, `0x0049e6b0`, `0x0049f1c0`, `0x0049f8d0` | 3, 9, 9, 9 | `src/bringup/Group4_GridLighting.cpp` (`/QIfist` bring-up) | `FistpFloatToInt`; the light colours stay truncating casts, as retail's `__ftol`, in `Group4_GridLightColor.cpp` (no `/QIfist`) |
 | `0x004a8bf0`, `0x004a8c50` | 1, 2 | `samples/physics/motion/CharacterMotionStart.cpp`, `CharacterMotionBlend.cpp` | `FloatToInt` (`CharacterMotionFloatToInt.h`) |
-| `0x004a9050` | 4 | `src/bringup/Group3_CharacterPoseBlend.cpp` (`G3SampleMotion`, `/QIfist` bring-up) | `FistpFloatToInt` |
+| `0x004a9050` | 4 | `samples/physics/motion/CharacterMotionFourPose.cpp` (`/QIfist /Op`) | `FistpFloatToInt` |
 | `0x004bac60` | 2 | `src/bringup/Group1_ParticleRender.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
 | `0x004db8c0`, `0x004dc2b0` | 2, 2 | `samples/physics/shadow/ProjectedShadowNearMisses.cpp` (`/QIfist`) | `ProjectedShadowFloatToInt` |
 | `0x004eab00` | 1 | `src/bringup/Group4_SceneTick.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |

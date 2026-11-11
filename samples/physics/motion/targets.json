@@ -117,5 +117,15 @@
     "expect": "partial",
     "notes": "Complete nonexact functional candidate: 3333 emitted bytes versus 3327 retail. Playback/interpolation/extrapolation, transition and slot4/5 application match 835584 native complete-state and pose scenarios. Explicit vector call views preserve float rounding between blend extrapolation operations; playback rotation retains the integer fps in x87 while translation receives float fps. Blend rotation preserves its separate multiply order. All three existing strict helper cases remain exact. Original constructor-local counts remain inferred; register allocation and some inline decisions differ. See docs/MOTION_PLAYBACK.md for evidence and unresolved external provider boundaries. Unused CharacterPose counts in BlendPose7/BlendPose7B swept (linked masked score, 0x004a8930 ctor calls; retail calls it 6 times; current 3/5: 0.905, 5 calls): 4/5 0.904 (6 calls), 4/6 0.905 (8), 2/any 0.878-0.881, 4-5/4 0.480; 3/5 kept.",
     "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Character",
+    "source": "CharacterMotionFourPose.cpp",
+    "candidate_symbol_contains": "?Method_0x004a9050@Character@@QAEXHHHHMMM@Z",
+    "target_va": "0x004a9050",
+    "target_size": 2138,
+    "expect": "partial",
+    "notes": "Complete nonexact four-motion pose blend (KrustyBike::UpdateRiderPose calls it on the rider and the bike). Linked with /QIfist /Op (config/game_build.json); this runner compiles without them, so the conversions go through __ftol here. Bit-identical to retail in 3400 emulated cases under the linked flags. Retail's ebp frame and pointer fistp come from an inline-asm helper. Ruled out (linked masked, /QIfist /Op, 0.701 kept): plain inline BlendFirst (only the first call site expands, with 1-4 pose locals, natural operators or explicit call views; #pragma inline_depth does not help), natural operators under __forceinline (the vector ops inline), BlendFirst written out in the body (same), a direct (int) cast (0.730, but it skips the binary32 rounding of the argument).",
+    "bindings": "CharacterMotionFourPose.bindings.json"
   }
 ]

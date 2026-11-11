@@ -221,6 +221,16 @@
       "evidence": "docs/CHARACTER_MOTION_BLEND.md#functional-build-review"
     },
     {
+      "path": "samples/physics/motion/CharacterMotionFourPose.cpp",
+      "status": "reviewed-nonexact",
+      "extra_flags": [
+        "/QIfist",
+        "/Op"
+      ],
+      "reason": "Complete 2138-byte retail four-motion pose blend Character::Method_0x004a9050 as an ordinary method; replaces the Group3_KrustyBike bring-up reimplementation. /QIfist gives FistpFloatToInt retail's current-rounding fistp; /Op rounds the sampled frame position to binary32 as retail's asm-induced stack slot does (without it the fractions differ in the last bits). Bit-identical to retail in 3400 emulated cases (unicorn, retail helpers, 53- and 24-bit precision control).",
+      "evidence": "docs/GAME_BUILD.md#four-pose-motion-blend"
+    },
+    {
       "path": "samples/render/BackgroundImageNearMisses.cpp",
       "status": "reviewed-nonexact",
       "reason": "Complete background drawing-context selection passes 21611 native region, cache, actual-helper, COM, alias and fault comparisons. The unchanged 678-byte body has 115 matching positions against 678 retail bytes; all three source helpers and the full dialog caller remain strict. Scratch globals have independently checked writable zero storage. COM DC acquisition/release are scripted; real DirectDraw/GDI and integrated menus remain untested.",
@@ -609,14 +619,6 @@
         "/QIfist"
       ],
       "reason": "Particle render 0x004bac60: the fog byte and the age fade go through retail's inline fistp helper. Only the low byte of each result is kept and fog is clamped to 0..1, so the 64-bit FISTP store cannot change a kept bit. No other float-to-int conversion in the unit.",
-      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
-    },
-    {
-      "path": "src/bringup/Group3_CharacterPoseBlend.cpp",
-      "extra_flags": [
-        "/QIfist"
-      ],
-      "reason": "Character::Method_0x004a9050: the frame index is retail's fistp(position - 0.5) at 0x004a9092 and addresses the frame array, so it stays in [0, frameCount). No other float-to-int conversion in the unit; the truncating casts of Group3_KrustyBike.cpp stay there without the flag.",
       "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
     },
     {

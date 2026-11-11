@@ -105,7 +105,9 @@ class GameBuildTests(unittest.TestCase):
             self.assertEqual(source_files(root, spec), [root / candidate['path']])
             candidate['extra_flags'] = ['/QIfist']
             self.assertEqual(source_files(root, spec), [root / candidate['path']])
-            for flags in ('/QIfist', ['/FIreplacement.h'], [None]):
+            candidate['extra_flags'] = ['/QIfist', '/Op']
+            self.assertEqual(source_files(root, spec), [root / candidate['path']])
+            for flags in ('/QIfist', ['/FIreplacement.h'], ['/Od'], [None]):
                 candidate['extra_flags'] = flags
                 with self.assertRaisesRegex(ValueError, 'compiler flags'):
                     source_files(root, spec)
