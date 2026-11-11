@@ -223,7 +223,12 @@ static inline void FillSpan(short* cell, int count, unsigned long pair, short va
 // set-up and step, the top-left rule and the span fill agree (433 instructions
 // against 435).  linked_accuracy's larger count for this body comes from the
 // span fill's Duff jump tables, which VC6 places inside the function and the
-// tool decodes as instructions; it is not a code difference.
+// tool decodes as instructions; it is not a code difference.  The masked
+// score (0.866) is held by block placement: retail orders the edge-walk
+// loop blocks differently, sets up the Duff count with `add r, 0xf`
+// where VC6 emits `lea`, and returns 1.  An int return would rename the
+// symbol that ProjectedShadow.h, three samples and the bindings use, so it
+// stays void.
 void ShadowFillTriangle(int shift, short* buffer, short value, int* points, int plotVertices)
 {
     unsigned long pair = ((unsigned long)(unsigned short)value << 16) | (unsigned short)value;
