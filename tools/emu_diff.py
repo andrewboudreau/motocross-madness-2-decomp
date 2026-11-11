@@ -31,7 +31,9 @@ A case module (``tools/emu_cases/<name>.py`` or any path) supplies:
     def setup(ctx, case): ...        # builds memory and stubs, returns Call(...)
 
 ``setup`` runs once per run with ``ctx.rng`` seeded from the case, so retail and candidate
-see identical memory. See ``Context`` for the helpers (alloc, write, stub, stub_at, ...).
+see identical memory. See ``Context`` for the helpers (alloc, write, stub, stub_at, ...);
+``ctx.entry`` is the address under test (retail VA or placed candidate), for vtables that
+recurse into it, and ``ctx.call`` runs code such as a retail .bss table initializer.
 
     python tools/emu_diff.py four_pose [-n 300] [--object OBJ | --flags "/QIfist /Op"]
 
@@ -254,6 +256,7 @@ class Context:
         self.calls: list[tuple] = []
         self.stubs: dict[int, tuple] = {}
         self.data: dict[str, Any] = {}
+        self.entry: int | None = None   # the body under test, set before setup runs
 
     # memory -------------------------------------------------------
     def alloc(self, size: int, data: bytes | None = None, align: int = 16, fill: int = 0) -> int:
@@ -311,6 +314,33 @@ class Context:
         thunk = self.stub(name, **kw)
         self.uc.mem_write(va, b'\xe9' + struct.pack('<i', thunk - (va + 5)))
         return thunk
+
+    def call(self, va: int, args=(), ecx: int | None = None, fpcw: int = 0x027f,
+             max_insns: int = 10_000_000) -> int:
+        """Run ``va`` to its return during setup (no hooks, nothing logged); returns EAX.
+
+        For initializers whose output the target reads, e.g. retail .bss lookup tables. It
+        uses a scratch stack at the end of the stub area, which the comparison ignores.
+        """
+        from unicorn import UcError
+        ret = STUB + STUB_SIZE - 0x10
+        self.uc.mem_write(ret, bytes([0xf4]))                  # hlt (never reached)
+        stackargs = pack_args(args)
+        sp = STUB + STUB_SIZE - 0x100 - len(stackargs)
+        self.uc.mem_write(sp, stackargs)
+        sp -= 4
+        self.uc.mem_write(sp, struct.pack('<I', ret))
+        self.uc.reg_write(_reg('ESP'), sp)
+        if ecx is not None:
+            self.uc.reg_write(_reg('ECX'), u32(ecx))
+        self.uc.reg_write(_reg('FPCW'), fpcw)
+        try:
+            self.uc.emu_start(va, ret, count=max_insns)
+        except UcError as e:
+            raise RuntimeError('setup call %#x faulted: %s' % (va, e)) from e
+        if self.uc.reg_read(_reg('EIP')) != ret:
+            raise RuntimeError('setup call %#x did not return' % va)
+        return self.uc.reg_read(_reg('EAX'))
 
     def note(self, *items):
         """Append extra data to the compared call log (e.g. a buffer a stub was handed)."""
@@ -389,6 +419,7 @@ class Emulator:
         from unicorn import UC_HOOK_CODE, UC_HOOK_MEM_WRITE, UcError
         uc = self._new_uc()
         ctx = Context(uc, random.Random(repr(seed)))
+        ctx.entry = entry
         call = setup(ctx, case)
         if not isinstance(call, Call):
             call = Call(**call) if isinstance(call, dict) else Call(args=call)

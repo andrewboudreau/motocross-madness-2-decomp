@@ -40,6 +40,12 @@ CLEAN_CASES = {
     'd3dim_shadow_slot30': 200,
     # Out-of-int focal lengths differ by design (plain helper, see the case docstring).
     'terrain_prepare_geometry': (400, {'EXTREME_EVERY': 0}),
+    # Small counts that still catch, with the default seed: the corner-3 normal and height
+    # add order before d3c99491 (QueryGround), a reassociated transform-point row
+    # (SetTransform) and round-half-up at the midpoint fistp ties (IntersectSegment).
+    'terrain_query_ground': 40,
+    'collision_set_transform': 40,
+    'gridnode_intersect_segment': 80,
 }
 
 
@@ -61,6 +67,20 @@ class CaseModuleTests(unittest.TestCase):
     def test_clean_cases_exist(self):
         for name in CLEAN_CASES:
             self.assertTrue((emu_diff.CASES_DIR / (name + '.py')).is_file(), name)
+
+    @unittest.skipUnless(importlib.util.find_spec('unicorn') is not None, 'requires unicorn')
+    def test_context_call_runs_code_to_its_return(self):
+        from unicorn import Uc, UC_ARCH_X86, UC_MODE_32
+        uc = Uc(UC_ARCH_X86, UC_MODE_32)
+        uc.mem_map(emu_diff.STUB, emu_diff.STUB_SIZE)
+        uc.mem_map(emu_diff.HEAP, emu_diff.HEAP_SIZE)
+        ctx = emu_diff.Context(uc, random.Random(1))
+        self.assertEqual(ctx.alloc(16), emu_diff.HEAP)
+        # mov eax, [esp+4]; add eax, ecx; mov [0x40000000], eax; ret 4
+        code = bytes.fromhex('8b44240401c8a300000040c20400')
+        at = ctx.alloc(len(code), code)
+        self.assertEqual(ctx.call(at, [5], ecx=7), 12)
+        self.assertEqual(ctx.unpack(emu_diff.HEAP, 'I'), (12,))
 
     def test_pack_args(self):
         packed = emu_diff.pack_args([1, -1, 0.5, emu_diff.Double(0.25), b'ab'])

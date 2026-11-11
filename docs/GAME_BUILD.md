@@ -1436,9 +1436,26 @@ Three gameplay-critical linked bodies were run against retail under unicorn.
 Each harness places the compiled candidate function in the retail image,
 binds its calls to retail's helpers and runs both bodies on the same random
 inputs. The fast-math tables (.bss) come from retail's own initializers. The
-harnesses live in the ignored `work/` tree. Each one first caught a known-bad
-candidate (the old QueryGround, or one altered association or comparison)
-before its result was trusted.
+first runs used ad hoc harnesses. They are now `tools/emu_diff.py` cases:
+`terrain_query_ground`, `collision_set_transform` and
+`gridnode_intersect_segment`. `tests/test_emu_diff.py` runs them with small
+counts.
+
+Each case catches a known-bad object with the default seed:
+
+- QueryGround: the pre-d3c99491 `Terrain.cpp`.
+- SetTransform: one reassociated transform-point row.
+- IntersectSegment: round-half-up at the midpoint ties.
+
+```bash
+python tools/emu_diff.py terrain_query_ground --compile -n 500
+python tools/emu_diff.py terrain_query_ground --object OLD_TERRAIN.obj -n 40
+```
+
+The tables below come from the first runs. The cases compare status, EAX,
+ESP, callee-saved registers, the x87 stack top, calls and every byte written.
+Unlike the first harnesses, they do not compare the x87 status flags or the
+control word.
 
 | VA | Function | Cases | Behavior found | Linked before | After | Built/retail insns |
 |---|---|---|---|---|---|---|
@@ -1451,6 +1468,10 @@ Coverage and results:
 - **QueryGround.** GetCellCorners (0x00483910) is the same deterministic
   stub in both runs. Inputs: cell ties, diagonals, huge, NaN and infinite
   coordinates, optional outputs, and every x87 rounding and precision mode.
+  The first harness never reached the NaN, infinity and int-edge inputs,
+  because a later branch overwrote them. The committed case does reach them,
+  and they agree (500 seeds in each of six modes). `kVec3YAxis` is a file
+  static with a constructor, so the case binds it to retail's 0x0068a058.
   The [two repairs](TERRAIN_CELL_CONVERSION.md) are the corner set of the
   smooth (0, 1, 3) normal and the height addition order. 431 cases differed
   before them and none after. That includes the x87 status flags, control
@@ -1472,9 +1493,15 @@ Coverage and results:
   recurse through a stub vtable slot back into the body under test. The
   return value, out point, node, rounded hit and x87 status all match.
 
-  Under directed rounding, some cell indices round out of range and index past
-  the row tables. Retail and the candidate then both fault: 505 cases, none
-  under round-to-nearest. The sample is now `reviewed-nonexact`.
+  Under directed rounding, the midpoint `fistp` can round a cell index out of
+  range. Retail faults at the child and cell reads it indexes (0x004844ef,
+  0x004844ff, 0x004846a6). Both bodies then index before the row tables and fault on the
+  same inputs; none fault under round-to-nearest. The case binds the
+  file-static row tables to retail's copies (0x0056c2ac, 0x0056c2f0), so both
+  bodies see the same memory past them. With that binding, status, calls and
+  writes agree in every run (500 seeds in each directed mode). Only EAX/ESP
+  at the fault differ. The case therefore compares only round-to-nearest by
+  default. The sample is now `reviewed-nonexact`.
 
   The codegen gap is retail's EBP frame and its four inline `fistp`
   sequences. Both come from the inline-asm helper, which the rules exclude.
