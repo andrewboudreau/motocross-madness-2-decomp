@@ -27,7 +27,7 @@ struct UnknownOverlayVertex {
 // `format`; the others blend a font texel over a destination texel with
 // `color`: 0x0043b560 32-bit, 0x0043b320 16-bit 4444, 0x0043b440 16-bit
 // 1555.
-unsigned int ConvertColorToFormat(unsigned int color, int format);
+unsigned short ConvertColorToFormat(unsigned int color, int format);
 unsigned int BlendFontTexel32(unsigned int texel, unsigned int dest, unsigned int color);
 unsigned short BlendFontTexel4444(unsigned short texel, unsigned short dest, unsigned short color);
 unsigned short BlendFontTexel1555(unsigned short texel, unsigned short dest, unsigned short color);
@@ -60,8 +60,8 @@ public:
     // 0x0050b400 (format 4444) are the 16-bit versions; they take the
     // colour already converted.
     int DrawTextInto(TextureMap* texture, int x, int y, const char* text, int color);
-    int DrawText4444(TextureMap* texture, int x, int y, const char* text, int color);
-    int DrawText1555(TextureMap* texture, int x, int y, const char* text, int color);
+    int DrawText4444(TextureMap* texture, int x, int y, const char* text, unsigned short color);
+    int DrawText1555(TextureMap* texture, int x, int y, const char* text, unsigned short color);
 
     // 0x0050ba00: lays `text` out from the top left of `rect` as two
     // triangles per character; returns the vertices, their count in *count.

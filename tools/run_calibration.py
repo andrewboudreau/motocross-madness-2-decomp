@@ -27150,6 +27150,15 @@ CASES += [
         'reason': 'Called by DrawTextInto 0x0050b338; in place over dest, alpha / 255. Owner TU unknown',
     },
     {
+        'name': 'Font colour pack for 4444/1555 surfaces',
+        'source': 'src/reconstructed/PixelBlend.cpp',
+        'bindings': 'src/reconstructed/PixelBlend.bindings.json',
+        'symbol': '?ConvertColorToFormat@@YAGIH@Z',
+        'target_va': '0x0043b660', 'target_size': 409,
+        'reason': 'Called by DrawTextInto 0x0050b0bd/0x0050b0fb; unsigned short return (callers push eax unextended). '
+                  'Owner TU unknown',
+    },
+    {
         'name': 'TerrainShadow constructor',
         'source': 'src/reconstructed/TerrainShadow.cpp',
         'bindings': 'src/reconstructed/TerrainShadow.bindings.json',

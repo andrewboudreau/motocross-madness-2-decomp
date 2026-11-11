@@ -1,17 +1,13 @@
 // Group2_OverlayText.cpp -- bring-up (link) definitions for TextService.cpp
 // functions still missing from src/: UnknownOverlayText::DrawTextInto
 // (0x0050b080), its 16-bit variants DrawText4444 (0x0050b400) and
-// DrawText1555 (0x0050b700), LayoutText (0x0050ba00), and the cdecl pixel
-// helper ConvertColorToFormat (0x0043b660; name from TextService.h,
-// provisional). The three blends they call are strict exact in
-// src/reconstructed/PixelBlend.cpp.
+// DrawText1555 (0x0050b700) and LayoutText (0x0050ba00). The four cdecl
+// pixel helpers they call (ConvertColorToFormat and the three blends) are
+// strict exact in src/reconstructed/PixelBlend.cpp.
 //
 // Status: best-guess-unreviewed. The UnknownOverlayText bodies are the
 // near-miss bodies of samples/render/TextServiceNearMisses.cpp (register /
-// scheduling differences only, per that file). ConvertColorToFormat was
-// written from the retail disassembly for this bring-up; not byte-matched
-// and not differentially tested (the exact body, samples/physics/constraint/
-// PixelBlend.cpp, returns unsigned short where TextService.h has unsigned int).
+// scheduling differences only, per that file).
 
 #include <string.h>
 
@@ -19,31 +15,6 @@
 
 #include "FontTexture.h"
 #include "TextureMap.h"
-
-// 0x0043b660: converts a 32-bit ARGB colour to a 16-bit texel of `format`
-// (4444 or 1555); any other format gives 0. Channels are scaled by 1/255
-// and the 4-/5-bit maximum and truncated (_ftol); 1555's alpha bit is set
-// when alpha > 127.
-unsigned int ConvertColorToFormat(unsigned int color, int format) {
-    unsigned char a = (unsigned char)(color >> 24);
-    unsigned char r = (unsigned char)(color >> 16);
-    unsigned char g = (unsigned char)(color >> 8);
-    unsigned char b = (unsigned char)color;
-    if (format == 4444) {
-        unsigned int value = (unsigned char)(int)(a * 0.003921569f * 15.0f);
-        value = (value << 4) | (unsigned char)(int)(r * 0.003921569f * 15.0f);
-        value = (value << 4) | (unsigned char)(int)(g * 0.003921569f * 15.0f);
-        value = (value << 4) | (unsigned char)(int)(b * 0.003921569f * 15.0f);
-        return (unsigned short)value;
-    }
-    if (format == 1555) {
-        unsigned int value = (unsigned char)(int)(r * 0.003921569f * 31.0f) | ((a > 0x7f) << 5);
-        value = (value << 5) | (unsigned char)(int)(g * 0.003921569f * 31.0f);
-        value = (value << 5) | (unsigned char)(int)(b * 0.003921569f * 31.0f);
-        return (unsigned short)value;
-    }
-    return 0;
-}
 
 // 0x0050b080
 int UnknownOverlayText::DrawTextInto(TextureMap* texture, int x, int y, const char* text, int color) {
@@ -102,7 +73,7 @@ int UnknownOverlayText::DrawTextInto(TextureMap* texture, int x, int y, const ch
 }
 
 // 0x0050b400
-int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const char* text, int color) {
+int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const char* text, unsigned short color) {
     TextureMap* fontTexture = currentFont->GetTexture();
     unsigned int width = texture->textureWidth;
     long pitch = 0;
@@ -153,7 +124,7 @@ int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const ch
 }
 
 // 0x0050b700
-int UnknownOverlayText::DrawText1555(TextureMap* texture, int x, int y, const char* text, int color) {
+int UnknownOverlayText::DrawText1555(TextureMap* texture, int x, int y, const char* text, unsigned short color) {
     TextureMap* fontTexture = currentFont->GetTexture();
     unsigned int width = texture->textureWidth;
     long pitch = 0;

@@ -90,7 +90,7 @@ int UnknownOverlayText::DrawTextInto(TextureMap* texture, int x, int y, const ch
 }
 
 // 0x0050b400
-int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const char* text, int color) {
+int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const char* text, unsigned short color) {
     TextureMap* fontTexture = currentFont->GetTexture();
     unsigned int width = texture->textureWidth;
     long pitch = 0;
@@ -141,7 +141,7 @@ int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const ch
 }
 
 // 0x0050b700
-int UnknownOverlayText::DrawText1555(TextureMap* texture, int x, int y, const char* text, int color) {
+int UnknownOverlayText::DrawText1555(TextureMap* texture, int x, int y, const char* text, unsigned short color) {
     TextureMap* fontTexture = currentFont->GetTexture();
     unsigned int width = texture->textureWidth;
     long pitch = 0;

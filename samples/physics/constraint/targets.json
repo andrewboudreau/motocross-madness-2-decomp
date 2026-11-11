@@ -1,15 +1,5 @@
 [
   {
-    "class": "PixelBlend",
-    "source": "PixelBlend.cpp",
-    "candidate_symbol_contains": "PackColor",
-    "target_va": "0x43b660",
-    "target_size": 409,
-    "expect": "exact",
-    "notes": "surface-format colour pack. Alpha/red/green live in a 3-byte array ([esp+8..0xa]) and the 1555 alpha bit is an unsigned char (seta). External linkage (called from 0x0050b0bd/0x0050b0fb); code extent 409.",
-    "bindings": "PixelBlend.bindings.json"
-  },
-  {
     "class": "ConstraintMethodCollisionModel",
     "source": "ConstraintMethodCollisionModelNearMisses.cpp",
     "candidate_symbol_contains": "ApplyContactImpulse",
