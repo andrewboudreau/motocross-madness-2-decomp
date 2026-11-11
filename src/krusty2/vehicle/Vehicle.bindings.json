@@ -82,7 +82,7 @@
   "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z": "0x005015b0",
   "?Vec3SubtractCall@@YAPAUVec3@@PAU1@PBU1@1@Z": "0x00421d00",
   "?VehAddContact@@YAXHPAPAVSoultreeContact@@HPAHPAX@Z": "0x0043a570",
-  "?VehBasisToBlock@@YAXUVec3@@0PAM111111@Z": "0x004b5a60",
+  "?OrientationAnglesFromVectors@@YAHUVec3@@0PAM111111@Z": "0x004b5a60",
   "?VehContactsA@@YAHHPAHHPAPAUVehicleContact@@PAUSoultreeProbe@@PAUVec3@@HM@Z": "0x0043ad80",
   "?VehContactsB@@YAXHPAPAUVehicleContact@@PAUVec3@@1111111@Z": "0x0043aa30",
   "?UpdateCollisionPointWorldPositions@@YAXHPAPAVCollisionPoint@@@Z": "0x0043aff0",

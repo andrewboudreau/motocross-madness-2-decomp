@@ -536,8 +536,8 @@ void Vehicle::SettleBodyToWheels(Vec3* settleUp, int keepPlacement)
     }
     steerState->node->SetAxesIn(0, &bodyForward, &bodyUp, 0, 1);
     airborne = false;
-    VehBasisToBlock(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
-                    &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
+    OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
+                                 &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
     savedForward = bodyForward;
     savedUp = bodyUp;
     savedYaw = bodyYaw;
@@ -1163,8 +1163,8 @@ void Vehicle::SimulateFrame(float frame)
             stepRemainder = 0.0f;
         }
         LoadBodyAxes();
-        VehBasisToBlock(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
-                        &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
+        OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
+                                     &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
         prevVelocity = velocity;
         prevCrashState = crashState;
         SaveBodyOrientation(steps == 0);

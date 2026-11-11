@@ -932,9 +932,14 @@ initializer per image calls `GetVersionExA` (retail 0x004aa7b0, ours
 0x0059af5c-0x0065b3e0) stays unknown. No binding currently compares
 against it.
 
-97 VAs carry two or more different linked bodies (a bring-up stand-in next to the
+96 VAs carry two or more different linked bodies (a bring-up stand-in next to the
 reconstruction, or two reconstructions of one function); they are listed for
-review, not findings.
+review, not findings. 0x004b5a60 was one of them: `Vehicle.cpp` called a `void`
+`VehBasisToBlock` stand-in in `Group0_ContactArrays.cpp`, and the canonical
+`int OrientationAnglesFromVectors` (`src/reconstructed/OrientationAngles.cpp`)
+was linked too. The parameter order is the same, and none of retail's 13
+callers reads EAX. Vehicle now calls the canonical function, and the stand-in
+is gone.
 
 Fixed by the audit:
 

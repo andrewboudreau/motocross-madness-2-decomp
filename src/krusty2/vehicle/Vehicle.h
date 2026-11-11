@@ -56,8 +56,6 @@ extern void __cdecl VehContactsB(int count, VehicleContact** contacts, Vec3* sca
                                  Vec3* vel, Vec3* center, Vec3* pos, Vec3* outArm,
                                  Vec3* outNormal, Vec3* outVel);
 extern void __cdecl VehContactsC(int n, VehicleContact** arr);
-extern void __cdecl VehBasisToBlock(Vec3 a, Vec3 b, float* p0, float* p1, float* p2,
-                                    float* p3, float* p4, float* p5, float* p6);
 
 // Vehicle+0x468 holds the game's ControlInterface (src/reconstructed/ControlInterface.h):
 // BikeRace's view of KrustyBike::Load (0x0048fc80) passes a ControlInterface* in this
