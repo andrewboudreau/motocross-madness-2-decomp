@@ -412,6 +412,39 @@ therefore stays the assumed mode, which is inference.
 `samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp` keeps slot 30's
 `(int)` casts as a matching sample, and it is not linked.
 
+### Accuracy of linked bodies
+
+Calibration and the physics runner score the files they compile. The game,
+though, links whichever provider defines a symbol: canonical source, a
+`candidate_sources` sample, or a bring-up stand-in. `tools/linked_accuracy.py`
+scores each linked body against the retail VA that bindings or calibration
+claim for its symbol. The score is a difflib ratio over frame- and
+register-masked instructions; esp and ebp frames compare equal. Forwarders
+(argument moves around one call or jmp) are followed to their callee, and
+when several symbols claim one VA the best body counts. The score measures
+code shape, not behaviour: inlining or helper boundaries lower it without a
+logic change. Its output, worst first by `bytes x (1 - score)`, goes to
+`work/linked-accuracy/report.md` (ignored).
+
+```bash
+python tools/build_game.py --vc6-root "$VC6_ROOT"
+python tools/linked_accuracy.py --top 60
+```
+
+The first run on 2026-11-10 scored 2,711 bound retail functions (1,119,499
+bytes); 678,063 of those bytes score 1.000. It showed bring-up bodies that
+are well below the near-miss sample for the same function:
+
+- BVH `BoxTriangleQuery` 0.16 against the sample's 0.97, `TreeTreeQueryNodes`
+  0.23 against 0.92, and `SegmentSegmentDistance` 0.43 against 0.94;
+- `ConstraintMethodCollisionModel::ApplyContactImpulse` 0.50 against 0.98;
+- `ContactSolveImpulse` 0.58 against 0.96.
+
+It also flagged stand-ins with no sample: MorphBastard `ControllerAngles`
+(0.29) and Visibility `TestBox` (0.27). The ProjectedShadow bodies sit below
+their sample on purpose: the bring-up file rounds with `X87FloatToInt` and
+calls provided helpers instead.
+
 ## What is needed next
 
 1. **Code that exists but does not match**: 455,939 near-miss bytes in 373
