@@ -105,8 +105,9 @@
 // transpose and negated translation as MorphBastardInvertRigid, through a
 // pointer and with the x term summed last. Retail's two expansions in
 // 0x004a33b0 order their products differently, which suggests two source
-// forms; this one gives retail's term order for the channel (not yet its
-// operand order inside each product).
+// forms; this one gives retail's term order for the channel. The y term is
+// (m31*m11 + m32*m21) + m30*m01 as at 0x004a3846..0x004a3859 (see
+// src/bringup/Group0_KbMorphMod.cpp).
 inline void MorphBastardInvertRigidInPlace(Matrix4* m)
 {
     float t;
@@ -114,7 +115,7 @@ inline void MorphBastardInvertRigidInPlace(Matrix4* m)
     t = m->m[0][2]; m->m[0][2] = m->m[2][0]; m->m[2][0] = t;
     t = m->m[1][2]; m->m[1][2] = m->m[2][1]; m->m[2][1] = t;
     Vector3 p(-((m->m[3][2] * m->m[2][0] + m->m[3][1] * m->m[1][0]) + m->m[3][0] * m->m[0][0]),
-              -(m->m[3][0] * m->m[0][1] + m->m[3][1] * m->m[1][1] + m->m[3][2] * m->m[2][1]),
+              -((m->m[3][1] * m->m[1][1] + m->m[3][2] * m->m[2][1]) + m->m[3][0] * m->m[0][1]),
               -(m->m[3][0] * m->m[0][2] + m->m[3][1] * m->m[1][2] + m->m[3][2] * m->m[2][2]));
     m->m[3][0] = p.x;
     m->m[3][1] = p.y;
