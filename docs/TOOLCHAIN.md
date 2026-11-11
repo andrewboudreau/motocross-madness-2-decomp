@@ -6,6 +6,16 @@ an alternative on hosts that support 32-bit Linux executables. GNU `objdump` is
 needed for disassembly tools. Clang is optional for bootstrap comparisons; a
 native C++ compiler enables behavior-model tests.
 
+Optional Python packages: `capstone` (disassembly in several tools and tests) and
+`unicorn` (`pip install unicorn`, verified with 2.1.4) for the differential
+emulator `tools/emu_diff.py`, which runs a retail function and a compiled
+candidate on the same inputs (cases in `tools/emu_cases/`;
+`python tools/emu_diff.py visibility_testbox --compile`). `tests/test_emu_diff.py`
+skips its differential tests when unicorn, `VC6_ROOT` or `MCM2_EXE` is missing.
+Unicorn honours x87 precision and rounding control but not unmasked x87
+exceptions (it stores the integer indefinite where hardware raises #MF), so
+compare only masked control words.
+
 ## Private bundle
 
 Archive, EXE and component hashes are pinned in `config/private_bundle_expected.json`
