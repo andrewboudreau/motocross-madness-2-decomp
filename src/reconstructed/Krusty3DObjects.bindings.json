@@ -109,5 +109,14 @@
   "_kVec3ZAxis": "0x0067c2f8",
   "_kVec3Zero": "0x0067c308",
   "_sprintf": "0x00534aaf",
-  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10"
+  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10",
+  "?FastSqrt@@YAMM@Z": "0x00460b50",
+  "?SetAxesPtr@SoultreeObject@@QAEXPBUVec3@@0HH@Z": "0x004fbd70",
+  "?TranslateIn@SoultreeObject@@QAEXPAV1@UVector3@@@Z": "0x004fc690",
+  "?GetPosition@UnknownBonusRacerPart@@QAEXPAUVector3@@@Z": "0x004fc970",
+  "?SetRotation@SoultreeObject@@QAEXMMMM@Z": "0x004fd090",
+  "?Scale@D3DIMSoultreeObject@@QAEXMMM@Z": "0x004fd340",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
+  "__real@4@40008000000000000000": "0x0055074c",
+  "__real@4@4001a000000000000000": "0x00550794"
 }

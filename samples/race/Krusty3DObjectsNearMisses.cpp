@@ -4,42 +4,9 @@
 // and compare the symbol against retail with
 // samples/race/Krusty3DObjectsNearMisses.bindings.json.
 //
-// BonusObjectManager::Tick (0x0048ccc0, 1308 bytes): steps
-// and places the bonus frame. 1299 of 1308 bytes match. The size factor's
-// denominator multiplies `fld [camera+0x198]; fmul [this+0x1e4]` as in
-// retail once the camera's value is read through a by-value accessor
-// (CameraZoom below; written plainly VC6 loads this+0x1e4 first, 1295/1308,
-// whichever operand order). Left: retail loads camera before storing the
-// length to field_0x1ec, VC6 here after. A separate length local, a
-// chained assignment, the length stored in its own statement, a
-// reference parameter for the camera, a camera local or by-value camera
-// struct, BonusZoom/denominator/size helpers, ten parenthesisations of the
-// size expression, `field_0x1f0 = 0` moved, camera re-read, `this->`
-// spellings and Length helper forms (result local, ?:, != tests) leave
-// that order (at best 1299; parentheses around field_0x1e4 or a plain
-// camera->field_0x198 give 1295). Storing the length after the size
-// statement gives retail's `mov edx` first but keeps the length on the x87
-// stack (`fld st(0)`, store at the end; 544). Size helpers taking the length
-// by value, or the camera, `this` and the chained store in any argument
-// order, give 600 or the same 1299.
-// Cycle 3 sweep (156 forms): a `UnknownBonusCamera& view = *camera`
-// alias (1164), a `UnknownBonusCamera* const&` alias of camera (1299),
-// a `const float&` alias of the camera's +0x198 (1152), a `float&` alias of
-// field_0x1ec for the chained store, and all 24 orders of the alias, the
-// placedFieldOfView store, the delta and `field_0x1f0 = 0`: at best the same 1299.
-// Session 14 parentheses: the numerator product, the whole quotient, the
-// length assignment, both denominator factors and the operands swapped give
-// 1299; `(targetScreenWidth)` alone, `num * (w / den)` and two divisions
-// give 555-600.
-// Session 15: a length local with a camera pointer local and a separate
-// field_0x1ec store, or a const camera local, keep 1299; a zoom float local
-// (562/1314) and CameraZoom of the re-read g_TrackGame camera (561/1317) are worse.
-// Session 17: the KrustyUI::Create setter lever (value stored through a
-// file-local `static inline` setter taking the object pointer) is inert
-// here: a returning setter for the distance, a void setter then a reread, a
-// float& setter, a sizeFactor setter and a length local plus setter all
-// give the same 1299.
-// Session 21: /ML keeps 1299; /G6 gives 382.
+// BonusObjectManager::Tick (0x0048ccc0) is exact in
+// src/reconstructed/Krusty3DObjects.cpp: naming the size numerator before
+// the cameraDistance store lets VC6 load the camera ahead of the store.
 //
 // VisualCue::Tick (0x0048b100, 2796 bytes, jump table at
 // 0x0048bbec): places the cue in front of the camera by camera mode
@@ -81,11 +48,6 @@
 
 #include "../../src/reconstructed/Krusty3DObjects.h"
 
-// By-value read of the camera's +0x198 value (see slot 10 above).
-static inline float CameraZoom(const UnknownBonusCamera* camera) {
-    return camera->focalLength;
-}
-
 static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
     return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
@@ -101,88 +63,10 @@ static inline Vector3& operator*=(Vector3& v, float s) {
     return v;
 }
 
-// |v|, exact for unit vectors.
-static inline float Length(Vector3 v) {
-    float squared = v.z * v.z + (v.y * v.y + v.x * v.x);
-    if (squared == 1.0f)
-        return 1.0f;
-    return FastSqrt(squared);
-}
-
 static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 
 #define UNKNOWN_DEGREES_TO_RADIANS(degrees) ((degrees) * 0.01745329f)
-
-
-static const UnknownBonusKey g_UnknownBonusKeys[7] = {
-    {0, 0.0f, {0.0275f, 0.0275f, 0.0275f}, {0.0f, 8.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 0.0f},
-    {6, 0.4f, {2.78f, 2.78f, 2.78f}, {0.0f, 8.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 0.0f},
-    {8, 0.5333f, {2.09f, 2.09f, 2.09f}, {0.0f, 8.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 0.0f},
-    {25, 1.6667f, {2.09f, 2.09f, 2.09f}, {0.0f, 8.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 0.0f},
-    {33, 2.2f, {1.99f, 1.99f, 1.99f}, {0.0f, 18.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 3.1415923f},
-    {40, 2.6667f, {1.18f, 1.18f, 1.18f}, {0.0f, 29.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 4.607669f},
-    {90, 6.0f, {0.05f, 0.05f, 0.05f}, {0.0f, 117.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 15.079643f},
-};
-
-
-// 0x0048ccc0
-int BonusObjectManager::Tick(float frameTime) {
-    int digit;
-    int place;
-
-    if (currentKey == -1 || reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->uiInteractionBlocked)
-        return 1;
-    if (raceView->localRacer->crashState && elapsed > 2.0f) {
-        HideDigits();
-        return 1;
-    }
-    elapsed += frameTime;
-    if (elapsed < g_UnknownBonusKeys[6].time) {
-        while (elapsed > g_UnknownBonusKeys[currentKey + 1].time)
-            NextKey();
-        float t = (elapsed - g_UnknownBonusKeys[currentKey].time) / keyDuration;
-        Vector3 position;
-        raceView->localRacer->modelNode->GetPosition(&position);
-        position += t * keyPositionChange + keyPosition;
-        baseFrame->TranslateIn(0, position);
-        if (camera != reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->renderTarget->currentCamera || camera->fieldOfView != placedFieldOfView ||
-            isResizePending) {
-            camera = reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->renderTarget->currentCamera;
-            placedFieldOfView = camera->fieldOfView;
-            Vector3 delta = position - camera->eyePosition;
-            isResizePending = 0;
-            sizeFactor = (cameraDistance = Length(delta)) * targetScreenWidth / (CameraZoom(camera) * frameWidth);
-        }
-        position += raceView->localRacer->rearWheel->rollDirection * 5.0f;
-        if (keyAngleChange == 0.0f && keyAngle == 0.0f) {
-            eyeToFrame = position - camera->eyePosition;
-            Vector3 forward = eyeToFrame;
-            forward.y = 0.0f;
-            baseFrame->SetAxesPtr(reinterpret_cast<const Vec3*>(&forward), reinterpret_cast<const Vec3*>(&kVec3YAxis), 1, 1);
-        } else {
-            Vector3 axis = t * keyAxisChange + keyAxis;
-            baseFrame->SetRotation(axis.x, axis.y, axis.z, t * keyAngleChange + keyAngle);
-        }
-        Vector3 scale = t * keyScaleChange + keyScale;
-        scale *= sizeFactor;
-        baseFrame->Scale(scale.x, scale.y, scale.z);
-        digitModels[0][0]->subtreeDirty = !digitModels[0][0]->hidden;
-        digitModels[0][1]->subtreeDirty = !digitModels[0][0]->hidden;
-        for (digit = 0; digit < 10; digit++)
-            for (place = 2; place < 5; place++)
-                digitModels[digit][place]->subtreeDirty = !digitModels[digit][place]->hidden;
-        for (digit = 0; digit < 10; digit++)
-            for (place = 0; place < 2; place++)
-                fractionDigitModels[digit][place]->subtreeDirty = !fractionDigitModels[digit][place]->hidden;
-        timesModel->subtreeDirty = !timesModel->hidden;
-        decimalPointModel->subtreeDirty = !decimalPointModel->hidden;
-    } else {
-        HideDigits();
-    }
-    GameObject::Tick(frameTime);
-    return 1;
-}
 
 
 // The owner a VisualCue compares its camera with (its +0x18).

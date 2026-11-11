@@ -2,9 +2,9 @@
 
 `src/reconstructed/Krusty3DObjects.h` / `Krusty3DObjects.cpp` /
 `Krusty3DObjects.bindings.json` reconstruct part of
-`D:\aardvark\VC\krusty2\Krusty3DObjects.cpp`: 36 of the unit's 39
+`D:\aardvark\VC\krusty2\Krusty3DObjects.cpp`: 37 of the unit's 39
 functions are strict exact under `vc6_o2_mt` (VC6 SP3 `/O2 /GR /GX /MT`),
-with every relocation resolved by the bindings. Two near misses are parked
+with every relocation resolved by the bindings. One near miss is parked
 in `samples/race/Krusty3DObjectsNearMisses.cpp`.
 
 ## Evidence
@@ -74,6 +74,14 @@ in `samples/race/Krusty3DObjectsNearMisses.cpp`.
   assigned before their `sprintf`.
 - BonusObjectManager `0x0048cad0`: each next-key vector is built before the
   current one is stored.
+- BonusObjectManager slot 10 `0x0048ccc0`: the size numerator is named
+  before the length is stored (`float width = distance * targetScreenWidth;
+  cameraDistance = distance; sizeFactor = width / (CameraZoom(camera) *
+  frameWidth);`). VC6 does not move a load above an earlier store, so this
+  is the only tried shape that loads the camera (`mov edx, [esi+0x38]`)
+  before `fst [esi+0x1ec]` as retail does. The by-value `CameraZoom`
+  accessor gives retail's `fld [camera+0x198]; fmul [this+0x1e4]`; a plain
+  field read loads `+0x1e4` first.
 - RunwayLights slot 10 normalizes with `z*z + (x*x + y*y)` and a free
   `operator*=(Vector3&, float)`.
 - ArcadeObject.h gained the camera fields of UnknownArcadeView, and the
@@ -85,7 +93,6 @@ in `samples/race/Krusty3DObjectsNearMisses.cpp`.
 
 | VA | Size | Status |
 |---|---:|---|
-| `0x0048ccc0` | 1308 | near miss, 1299/1308: BonusObjectManager slot 10. Retail multiplies `fld [camera+0x198]; fmul [this+0x1e4]`; VC6 gives that order only when the camera value is read through a by-value accessor (otherwise it loads `+0x1e4` first, 1295/1308). Left: retail loads the camera pointer before the length store |
 | `0x0048b100` | 2796 | VisualCue slot 10 (jump table `0x0048bbec` on TrackGame `+0x2d74`). Data flow decoded in the samples file; retail expands the placement block and all its Vector3 operators in the four modes. The block as a macro reproduces that (retail's 16 calls in order, 604 of 748 instructions aligned); an inline member function leaves the constructor and `operator*` out of line. Every hide path written as an explicit `isVisible = 0; return 1;` makes VC6 cache 0 in a register like retail (strict 172 -> 254 of 2820), in `ebx` rather than retail's `edi`. One function-scope `direction`, filled by the block and overwritten by each mode, gives retail's integer-move copy of the third camera column (254 -> 401). Left: that zero register and the early returns' own epilogues |
 | `0x0048d1e0` | 864 | BonusObjectManager value display: rounds with the `fld; fistp [mem]` inline-assembly helper the project rules exclude |
 

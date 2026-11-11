@@ -19372,6 +19372,15 @@ CASES = [
         'reason': 'key table 0x56c820 stride 0x30',
     },
     {
+        'name': 'Krusty3DObjects.cpp BonusObjectManager slot10 tick',
+        'bindings': 'src/reconstructed/Krusty3DObjects.bindings.json',
+        'source': 'src/reconstructed/Krusty3DObjects.cpp',
+        'symbol': '?Tick@BonusObjectManager@@UAEHM@Z',
+        'target_va': '0x0048ccc0',
+        'target_size': 1308,
+        'reason': 'BonusObjectManager vtable 0x0055cfd8 slot 10',
+    },
+    {
         'name': 'Krusty3DObjects.cpp BonusObjectManager hide digits',
         'bindings': 'src/reconstructed/Krusty3DObjects.bindings.json',
         'source': 'src/reconstructed/Krusty3DObjects.cpp',

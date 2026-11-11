@@ -792,7 +792,7 @@ The sample column is the standalone object's score.
 | 0x004edfe0 | `Scene::ReadAnimations` | 0.955 | 0.998 | 0.998 | sample file |
 | 0x00419970 | `BikeRace::CreateRacers` | 0.963 | 1.000 | 0.999 | bring-up copy |
 | 0x0042c260 | `GatherModelTriangles` | 0.985 | 1.000 | 1.000 | bring-up copy |
-| 0x0048ccc0 | `BonusObjectManager::Tick` | 0.952 | 0.997 | 0.997 | sample file |
+| 0x0048ccc0 | `BonusObjectManager::Tick` | 0.952 | 1.000 | 1.000 | canonical src (exact since) |
 | 0x0048b100 | `VisualCue::Tick` | 0.932 | 0.932 | 0.932 | sample file |
 | 0x0047caa0 | `DrawableGridNodeSharedTextures::SelectTexture` | 0.967 | 0.981 | 0.981 | sample file |
 | 0x005329e0 | `Wrecker::PushProbesOutOfBox` | 0.922 | 1.000 | 1.000 | sample file |

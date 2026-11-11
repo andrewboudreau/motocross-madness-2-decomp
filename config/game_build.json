@@ -544,7 +544,7 @@
     {
       "path": "samples/race/Krusty3DObjectsNearMisses.cpp",
       "status": "reviewed-nonexact",
-      "reason": "VisualCue::Tick 0x0048b100 and BonusObjectManager::Tick 0x0048ccc0 (1299/1308) replace the Group1_VisualCueTick and Group0_BonusObjectManager bring-up copies of the same source. The BonusObjectManager copy reached GetPosition/TranslateIn through bridge functions; here the body calls retail's 0x004fc970 and 0x004fc690 directly, and link_aliases binds the by-value Vector3 TranslateIn to soultree.cpp's Vec3 definition (same 12-byte argument, no this adjustment). Not differentially tested.",
+      "reason": "VisualCue::Tick 0x0048b100 replaces the Group1_VisualCueTick bring-up copy of the same source. BonusObjectManager::Tick 0x0048ccc0 is now exact in canonical src/reconstructed/Krusty3DObjects.cpp; it calls retail's 0x004fc970 and 0x004fc690 directly, and link_aliases binds the by-value Vector3 TranslateIn to soultree.cpp's Vec3 definition (same 12-byte argument, no this adjustment). Not differentially tested.",
       "evidence": "docs/GAME_BUILD.md#near-miss-bodies-replacing-bring-up-copies"
     },
     {

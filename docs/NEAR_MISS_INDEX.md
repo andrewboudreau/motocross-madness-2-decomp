@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 113, c 80, total 195. The three class (a) functions of the
+Counts: a 2, b 112, c 79, total 193. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -108,6 +108,13 @@ src/reconstructed/SoultreeDrag.cpp: the scaled branch builds its product in a na
 temporary (`Vec3 scaled = scratchVector * (limit / length); *speedBudget -= charge;
 drag = scaled;`), so the budget `fsub` comes before the copy's z load as in retail.
 Subtracting before the product is worse (164/434).
+BonusObjectManager::Tick `0x0048ccc0` (class c, 1299/1308) is exact too, in
+src/reconstructed/Krusty3DObjects.cpp: the size numerator is computed into a named local
+before the length is stored (`float width = distance * targetScreenWidth; cameraDistance =
+distance; sizeFactor = width / (CameraZoom(camera) * frameWidth);`), so the camera load
+precedes `fst [esi + 0x1ec]` as in retail. VC6 does not move a load above an earlier
+store; when retail loads before a store, the load must already come first in the source.
+KrustyUI `0x004988a0` was already exact in src/reconstructed/KrustyUI.cpp (stale row).
 GridNode::FindLeaf `0x00484d70` (class c, 81/90) is exact too, in
 src/reconstructed/GridNode.cpp: written as a tail call into the child (as GetCellCorners
 in the same unit is), through an index local with the child slot read twice
@@ -243,7 +250,6 @@ hoists the wrong stores into a copy, move retail's pair to the position VC6 pick
 | race/CarProcedural | `0x0042fd80` | 580/2909 | b | slot 10, linked by the game: axisA at function scope gives retail's 0xdc frame (221 -> 580; the slot groups still differ in places), the hull correction through one `body` pointer (aligned 713 -> 719 of 782, candidate 2880 B); left: the steering clamp's memory local, component/scalar load order in the `back` normalisation and blend, argument-push scheduling |
 | race/CarProcedural | `0x00430b10` | 299/843 | b | 45 code diffs: retail adds `mov esi, ecx`; `mov edi, ecx ; mov esi, [edi + 0x6c] ; ~` vs `mov edi, [esi + 0x6c] ; mov ebp, [esi +~`; slots differ |
 | race/Krusty3DObjects | `0x0048b100` | 401/2820 | b | the field-of-view conversion keeps retail's two multiplies (0.5 then 0.01745329) through a parenthesised macro; one function-scope `direction` reused by the placement block and every mode gives retail's integer-move copy of the camera column; explicit hide returns cache 0 in ebx (retail edi, `finished` tested through cl) and still share one return where retail gives the two early ones their own epilogues |
-| race/Krusty3DObjects | `0x0048ccc0` | 1299/1308 | c | retail loads the camera (`mov edx, [esi + 0x38]`) before storing the length to field_0x1ec |
 | race/RaceSound | `0x004e4d10` | 806/2038 | c | two blocks: retail reloads the remainder for the first half's `field_0x18 = rest` (cross-jumped); the second half's looping path keeps half in ebp and the remainder in edx |
 | race/RaceStatus | `0x004e5d00` | 168/519 | c | 29 code diffs: retail adds `mov ebp, [esp + N]`; retail adds `test ebp, ebp` |
 | race/Recorder | `0x004e6f80` | 652/2180 | c | case 1 `goto opened` reproduces retail's jmp into case 2's tail; left: case 2's `[0xc8]=1; Leave` suffix still cross-jumps into case 4 (retail keeps it), and `name`/`headerSize` slots swap (0x08/0x10); real extent 2148 |
@@ -318,7 +324,6 @@ hoists the wrong stores into a copy, move retail's pair to the position VC6 pick
 | ui/GameUi | `0x00478e10` | 231/303 | c | frame and head are retail's (the area is tested in place, no RECT copy); the opaque-result tail differs as in UIButton slot 28 `0x004734c0` (retail returns through edi, 8-bit hit sets edi directly) |
 | ui/GameUi | `0x0047a400` | 702/962 | c | the area bottom written from the list gives retail's store order; VC6 forms it with `lea edx, [edi + edx - 2]` (retail adds the scroll bottom's `sub eax, 2` value) and swaps ebx/edi, shifting later scratch registers |
 | ui/GameUi | `0x0047b490` | 120/220 | c | the key pixel kept in the red term's variable stays in a register and the row counter spills into the key's slot as retail; VC6 ORs green and blue first where retail ORs red and green first, saves edi in the prologue (retail inside the row loop) and steps the row with one lea |
-| ui/KrustyUI | `0x004988a0` | 872/1104 | b | 8 code diffs: `mov edx, [esi + 0x2c] ; mov eax, [esp +~` vs `mov eax, [esi + 0x2c] ; mov ecx, [esp +~`; `mov edx, [eax + 0xc0] ; mov [edx + 0x5c~` vs `mov eax, [eax + 0xc0] ; mov [eax + 0x5c~`; slots differ |
 | ui/ProCircuitProcs | `0x004d72c0` | 1237/1291 | b | as DlgProcs `0x0044fae0`: only the scheduling of the by-value Vector3 copies for the camera call (`mov edi, esp` placement) differs; kVec3YAxis now bound to this unit's 0x00689b28 |
 | ui/ProCircuitProcs | `0x004d8c40` | 427/886 | c | 15 code diffs: retail lacks `mov edx, [esi + 8]`; retail lacks `mov ebx, [esi + 0x14]` |
 | ui/ProCircuitProcs | `0x004d8fc0` | 836/882 | c | 12 instruction diffs: retail loads the message kind into ecx before the circuit (VC6 here: circuit first, kind in eax) and stores the fee member first with other registers |

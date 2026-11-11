@@ -518,6 +518,84 @@ void BonusObjectManager::NextKey() {
     keyAxisChange = next - keyAxis;
 }
 
+// The camera's +0x198 value read by value: VC6 then multiplies
+// `fld [camera+0x198]; fmul [this+0x1e4]` as retail does (a plain
+// camera->focalLength loads this+0x1e4 first).
+static inline float CameraZoom(const UnknownBonusCamera* camera) {
+    return camera->focalLength;
+}
+
+// |v|, exact for unit vectors.
+static inline float Length(Vector3 v) {
+    float squared = v.z * v.z + (v.y * v.y + v.x * v.x);
+    if (squared == 1.0f)
+        return 1.0f;
+    return FastSqrt(squared);
+}
+
+// 0x0048ccc0: steps the bonus animation keys and places the frame. The
+// numerator is named and computed before the cameraDistance store, which
+// lets VC6 load the camera ahead of that store as retail does.
+int BonusObjectManager::Tick(float frameTime) {
+    int digit;
+    int place;
+
+    if (currentKey == -1 || reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->uiInteractionBlocked)
+        return 1;
+    if (raceView->localRacer->crashState && elapsed > 2.0f) {
+        HideDigits();
+        return 1;
+    }
+    elapsed += frameTime;
+    if (elapsed < g_UnknownBonusKeys[6].time) {
+        while (elapsed > g_UnknownBonusKeys[currentKey + 1].time)
+            NextKey();
+        float t = (elapsed - g_UnknownBonusKeys[currentKey].time) / keyDuration;
+        Vector3 position;
+        raceView->localRacer->modelNode->GetPosition(&position);
+        position += t * keyPositionChange + keyPosition;
+        baseFrame->TranslateIn(0, position);
+        if (camera != reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->renderTarget->currentCamera || camera->fieldOfView != placedFieldOfView ||
+            isResizePending) {
+            camera = reinterpret_cast<UnknownKrustyGame*>(g_TrackGame)->renderTarget->currentCamera;
+            placedFieldOfView = camera->fieldOfView;
+            Vector3 delta = position - camera->eyePosition;
+            isResizePending = 0;
+            float distance = Length(delta);
+            float width = distance * targetScreenWidth;
+            cameraDistance = distance;
+            sizeFactor = width / (CameraZoom(camera) * frameWidth);
+        }
+        position += raceView->localRacer->rearWheel->rollDirection * 5.0f;
+        if (keyAngleChange == 0.0f && keyAngle == 0.0f) {
+            eyeToFrame = position - camera->eyePosition;
+            Vector3 forward = eyeToFrame;
+            forward.y = 0.0f;
+            baseFrame->SetAxesPtr(reinterpret_cast<const Vec3*>(&forward), reinterpret_cast<const Vec3*>(&kVec3YAxis), 1, 1);
+        } else {
+            Vector3 axis = t * keyAxisChange + keyAxis;
+            baseFrame->SetRotation(axis.x, axis.y, axis.z, t * keyAngleChange + keyAngle);
+        }
+        Vector3 scale = t * keyScaleChange + keyScale;
+        scale *= sizeFactor;
+        baseFrame->Scale(scale.x, scale.y, scale.z);
+        digitModels[0][0]->subtreeDirty = !digitModels[0][0]->hidden;
+        digitModels[0][1]->subtreeDirty = !digitModels[0][0]->hidden;
+        for (digit = 0; digit < 10; digit++)
+            for (place = 2; place < 5; place++)
+                digitModels[digit][place]->subtreeDirty = !digitModels[digit][place]->hidden;
+        for (digit = 0; digit < 10; digit++)
+            for (place = 0; place < 2; place++)
+                fractionDigitModels[digit][place]->subtreeDirty = !fractionDigitModels[digit][place]->hidden;
+        timesModel->subtreeDirty = !timesModel->hidden;
+        decimalPointModel->subtreeDirty = !decimalPointModel->hidden;
+    } else {
+        HideDigits();
+    }
+    GameObject::Tick(frameTime);
+    return 1;
+}
+
 // 0x0048d540
 void BonusObjectManager::HideDigits() {
     if (currentKey < 0)
