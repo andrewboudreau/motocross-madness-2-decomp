@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from tools.frame_layout import disassemble
-from tools.linked_accuracy import drop_tables, forward_target, parse_functions, similarity, target_symbols
+from tools.linked_accuracy import compared_body, drop_tables, forward_target, parse_functions, similarity, target_symbols
 
 
 MAP = """\
@@ -58,6 +58,20 @@ class LinkedAccuracyTest(unittest.TestCase):
         # a by-value argument copied through `mov ecx, esp` still forwards
         byval = disassemble(bytes.fromhex('83ec0c' '8bcc' '8b442410' '8901' 'e8f00f0000' 'c3'), 0x1000)
         self.assertEqual(forward_target(byval), 0x2000)
+
+    def test_forwarder_is_not_followed_when_retail_forwards_too(self):
+        # push eax; call 0x2000; ret -- a linked forwarder at 0x1000 to a body at 0x2000
+        forwarder = disassemble(bytes.fromhex('50' 'e8fa0f0000' 'c3'), 0x1000)
+        callee = disassemble(bytes.fromhex('33c0' 'c3'), 0x2000)
+        bodies = [forwarder, callee]
+        funcs = [(0x1000, '?A@@YAXXZ', 'A.obj'), (0x2000, '?B@@YAXXZ', 'B.obj')]
+        index = {0x1000: 0, 0x2000: 1}
+        real = disassemble(bytes.fromhex('85c07405' 'e8f70f0000' 'c3'), 0x5000)
+        b, via = compared_body(0, real, index, bodies.__getitem__, funcs)
+        self.assertEqual((b, via), (callee, ['?B@@YAXXZ']))
+        retail_forwarder = disassemble(bytes.fromhex('51' 'e8fa0f0000' 'c3'), 0x5000)
+        b, via = compared_body(0, retail_forwarder, index, bodies.__getitem__, funcs)
+        self.assertEqual((b, via), (forwarder, []))
 
     def test_switch_tables_after_the_code_are_not_decoded(self):
         # xor ecx,ecx; mov cl,[eax+0x1014]; jmp [ecx*4+0x1010]; ret; then the jump table at 0x1010

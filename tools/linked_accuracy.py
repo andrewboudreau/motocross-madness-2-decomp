@@ -19,7 +19,8 @@ implementation is linked under another name. A symbol bound to several retail
 VAs is skipped (folded tiny bodies prove nothing about identity); when several
 linked symbols claim one retail VA the best-scoring body is reported and the
 rest are listed as ``other_bodies``. A forwarder (argument moves around a single
-call or jmp) is followed to the body it calls, recorded as ``via``.
+call or jmp) is followed to the body it calls, recorded as ``via``, unless the
+retail body is forwarder-shaped too.
 
     python tools/linked_accuracy.py [--build work/game-build/build-XXXX] [--min-size 64]
 
@@ -180,6 +181,26 @@ def forward_target(insns) -> int | None:
     return int(calls[0].op_str, 16)
 
 
+def compared_body(i: int, retail_insns, index: dict, linked_body, funcs):
+    """The linked body to score for function ``i`` and the forwarders followed to it.
+
+    Forwarders are followed (up to three) to the body they call, unless the retail
+    body is forwarder-shaped too: CullQuad 0x0052f4d0 gathers four points on the
+    stack and calls CullPolygon, and its own linked body is the one to compare.
+    """
+    b, via = linked_body(i), []
+    if forward_target(retail_insns) is not None:
+        return b, via
+    for _ in range(3):
+        target = forward_target(b)
+        if target is None or target not in index:
+            break
+        k = index[target]
+        b = linked_body(k)
+        via.append(funcs[k][1])
+    return b, via
+
+
 def score_build(build: Path, retail: Path, min_size: int, strict: bool,
                 libraries: bool = False) -> list[dict]:
     from tools.audit_game_vtables import function_size
@@ -208,15 +229,8 @@ def score_build(build: Path, retail: Path, min_size: int, strict: bool,
         rsize = sizes.get(rva) or function_size(ret, rva)
         if not rsize or rsize < min_size:
             continue
-        b, via = linked_body(i), []
-        for _ in range(3):      # follow forwarders to the body they call
-            target = forward_target(b)
-            if target not in index or forward_target(b) is None:
-                break
-            k = index[target]
-            b = linked_body(k)
-            via.append(funcs[k][1])
         r = body(ret, rva, rsize)
+        b, via = compared_body(i, r, index, linked_body, funcs)
         s = similarity(b, r, strict)
         row = dict(symbol=symbol, object=obj, retail_va=f'0x{rva:08x}', retail_bytes=rsize,
                    built_insns=len(b), retail_insns=len(r), score=round(s, 3),
