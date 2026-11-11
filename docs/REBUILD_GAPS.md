@@ -28,41 +28,41 @@ extent (1,253,440 bytes); everything after it is library or compiler tail.
 
 | Category | Bytes | % `.text` | % game code | Count | Evidence |
 |---|---:|---:|---:|---:|---|
-| `exact_src`: strict VC6 match, source under `src/` | 795,947 | 58.16 | 63.50 | 3,852 | 1: rerun verdicts, relocations resolved |
-| `exact_samples`: strict match, source only under `samples/` | 31,818 | 2.32 | 2.54 | 185 | 1 (not canonical source) |
+| `exact_src`: strict VC6 match, source under `src/` | 833,459 | 60.90 | 66.49 | 3,992 | 1: rerun verdicts, relocations resolved |
+| `exact_samples`: strict match, source only under `samples/` | 2,027 | 0.15 | 0.16 | 59 | 1 (not canonical source) |
 | `library_crt_atlas`: LIBCMT bodies | 77,929 | 5.69 | - | 443 | 1 masked match, [VC6_CRT_ATLAS](VC6_CRT_ATLAS.md) |
 | `library_import_thunk`: `jmp [IAT]` | 198 | 0.01 | - | 33 | 1 decoded IAT target |
 | `library_data`: DINPUT.LIB tables | 4,912 | 0.36 | - | 3 | 1 byte match against VC6 `DINPUT.LIB` |
 | `compiler_eh_text_x`: `$ehhandler` stubs + unwind funclets | 23,502 | 1.72 | - | 394 | 1 decoded `mov eax, FuncInfo; jmp ___CxxFrameHandler` |
 | `inline_asm_excluded` | 42,650 | 3.12 | 3.40 | 33 | 1 instruction (`fistp`/`rdtsc`/`fs:[4]`); 3 for the 4 docs-only rows |
-| `near_miss`: registered partials / near misses | 351,255 | 25.67 | 28.02 | 211 | 1 verdict; extent 2 where padding-delimited |
+| `near_miss`: registered partials / near misses | 343,763 | 25.12 | 27.43 | 199 | 1 verdict; extent 2 where padding-delimited |
 | `library_span_unlabeled`: LIBCMT span gaps | 5,813 | 0.42 | - | - | 2 |
 | `library_unknown`: after LIBCMT, before the EH tail | 2,722 | 0.20 | - | - | 3 |
 | `padding`: int3/nop alignment | 31,414 | 2.30 | 2.51 | - | 2 decoder rule |
-| `unattributed` | 358 | 0.03 | 0.03 | 7 | - |
+| `unattributed` | 129 | 0.01 | 0.01 | 5 | - |
 
 Counts are unique registered start addresses (by the category of their first
 byte); for libraries they are objects/thunks/stubs, for `unattributed` the
 padding-delimited ranges.
 
-Headline: **66.0% of game-code bytes (827,765) are strict exact**, 3.8% of it
-(31,818 bytes) only from `samples/`. 28.0% is registered but not exact, 3.4%
-needs inline assembly and 0.03% has no registration at all (7 ranges, 358
-bytes; only three exceed 16 bytes). No game function is a complete original
-translation unit yet. All 392 translation units now compile and link into a
-runnable `mcm2.exe` (`tools/build_game.py`, [GAME_BUILD](GAME_BUILD.md)); the
+Headline: **66.7% of game-code bytes (835,486) are strict exact**, 0.2% of it
+(2,027 bytes, inline COMDAT helpers and layout probes) only from `samples/`.
+27.4% is registered but not exact, 3.4% needs inline assembly and 0.01% has no
+registration at all (5 ranges, 129 bytes; only `0x00423ef0..0x00423f6d` in
+BlockAllocator.cpp exceeds 16 bytes). No game function is a complete original
+translation unit yet. All translation units compile and link into a runnable
+`mcm2.exe` (`tools/build_game.py`, [GAME_BUILD](GAME_BUILD.md)); the
 near-miss and unregistered bodies in that build are best-effort stand-ins, so
 the build races but is not byte-identical to retail.
 
-Verdicts were rerun for this snapshot:
-`tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt` gives 2980 of
-2990 unique address/extent pairs strict exact (the 10 recorded in
+Verdicts were rerun for this snapshot (main 38c69460, 2026-11-11):
+`tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt` gives 2997 of
+3006 unique address/extent pairs strict exact (the nine others are recorded in
 [DECOMPILATION_PROGRESS](DECOMPILATION_PROGRESS.md)), and
-`tools/run_physics_samples.py --strict --profile vc6_o2_mt` 1,088 of 1,162
+`tools/run_physics_samples.py --strict --profile vc6_o2_mt` 1,082 of 1,151
 `targets.json` entries under `samples/physics`, `src/krusty2` and the manual
-suite. The 74 others are 72 byte mismatches and 2 unresolved relocations;
-Terrain slot 14 (0x00506220) is one of them since the bring-up slot-12 override
-(issue #32).
+suite. Terrain slot 14 (0x00506220) is one of the 69 others since the bring-up
+slot-12 override (issue #32).
 
 ## .text coverage
 
