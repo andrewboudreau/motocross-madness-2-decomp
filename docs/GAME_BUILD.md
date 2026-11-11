@@ -1326,6 +1326,23 @@ because its `__FILE__` pointer is the bring-up file's own. The inputs cover:
 ModifyMesh agrees in all 200 runs. Scaling the blend weight's `upper` by
 1.0001 differs in 16 of 30.
 
+Three bodies were reviewed without a replay case:
+- `PredictLanding` 0x0040e370 and `BikeRace::CreateRacers` 0x00419970 have a
+  linked masked score of 1.000.
+- `BaseQuarryEvent::LoadEventObjects` 0x004de590 (`match_one` 1961 of 2209
+  aligned) makes 229 calls and reads half a dozen globals, which is too much
+  setup for a replay case. A reading of the full `match_one` diff found only:
+  - register and stack-slot allocation;
+  - load scheduling around calls;
+  - an integer budget sum added in another order;
+  - an `add` whose flags replace a `test`;
+  - the racer-ignore loop rotated, with the same five `AddIgnoredOwner`
+    calls in the same order.
+  It found no change to a branch condition, a call argument or the one float
+  expression (shadow grey, `ambientRGBA[1] * 255`).
+
+  This reading is not an emulation result.
+
 `Game::Tick` agrees except for a difference that is there by design. The
 candidate reads the profiling counter through `QueryPerformanceCounter`
 where retail executes RDTSC, so the case leaves that call out of the log and
