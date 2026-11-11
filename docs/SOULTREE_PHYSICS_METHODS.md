@@ -1,8 +1,8 @@
 # SoultreePhysicsBaseObject primary methods
 
-`src/reconstructed/SoultreePhysicsMethods.cpp` supplies eleven methods previously
-present only in `samples/physics/soultree_base/SoultreePhysicsInlines.cpp`.
-All eleven complete function extents match retail with relocations resolved
+`src/reconstructed/SoultreePhysicsMethods.cpp` supplies twelve methods previously
+present only in a sample (`SoultreePhysicsInlines.cpp`, since removed).
+All twelve complete function extents match retail with relocations resolved
 under VC6 SP3 `/O2 /GR /GX /MT /Z7`. No class layout, signature or method body
 was changed during promotion.
 
@@ -19,6 +19,7 @@ was changed during promotion.
 | 32 | `0x004aa1a0` | 28 | Calls virtual slot 10; returns zero or load weight |
 | 34 | `0x004aa1c0` | 25 | Reads node axes into the object's vectors |
 | 35 | `0x004aa1e0` | 37 | Writes those axes to the node |
+| 36 | `0x004aa210` | 305 | Flattens forward, resets up to the Y axis, re-derives axes, clears pose angles |
 
 The retail primary vtable at `0x00557d90` supplies each listed address in its
 specific slot. Its preceding pointer names COL `0x0055f0d0`, which has object
@@ -31,15 +32,17 @@ are not used to infer method identity or to add other slots.
 The bodies are scattered outside the SoulTreePhysics.cpp range: the Bike.cpp
 range contains `0x0040b5c0/0x0040b5e0`, FollowCam.cpp contains
 `0x00464e80/0x00464e90`, the Motnctrl.cpp-to-MSZoneInterface.cpp gap contains
-`0x004aa150..0x004aa205`, and Terrain.cpp contains `0x00507920`. Inline member
+`0x004aa150..0x004aa340`, and Terrain.cpp contains `0x00507920`. Inline member
 COMDAT selection is a strong explanation for this distribution, not confirmed
 original source ownership. The reconstruction filename is organizational;
 semantic member names remain provisional.
 
 Slot 6 is exact in its own reconstruction file, `src/reconstructed/SoultreeDrag.cpp`
 (432 bytes, [SOULTREE_DRAG](SOULTREE_DRAG.md)). The regression checks it with the
-promoted slots. Slot 36 stays an exact 305-byte sample because it introduces the
-still-unsupplied `g_SoultreeVec3_685190` dependency.
+promoted slots. Slot 36 loads Math3D.h's file-static `kVec3YAxis`; retail's copy
+reads MSZoneInterface.cpp's instance (`0x00685190`, initialised by that unit's
+`0x004aa0c0`), which fits the inline-COMDAT explanation: the body sits in that
+unit's code range. The bindings map this unit's `_kVec3YAxis` to that address.
 Slot 35 calls `SoultreeObject::SetAxesIn`, which is already unresolved from
 other canonical callers and remains sample-only in SoultreeMatrix.cpp. Slot 34
 calls the canonical `SoultreeObject::GetAxesIn`. The only other undefined symbol
@@ -52,9 +55,8 @@ whole-unit byte identity or original linked initializer order.
 
 `tests/test_soultree_physics_methods.py` independently reads the retail COL,
 type descriptor and every target slot, compiles the real class source and
-checks that its primary-vtable relocations name the eleven supplied methods,
-then checks complete function bytes and dependencies. It also recompiles both
-remaining samples to protect the promotion boundary.
+checks that its primary-vtable relocations name the twelve supplied methods,
+then checks complete function bytes and dependencies.
 
 ```powershell
 $env:VC6_ROOT = (Resolve-Path work/vc6sp3-disc).Path

@@ -62,6 +62,39 @@ void SoultreePhysicsBaseObject::StoreBodyAxes(int orthogonalize, int keepZ)
     sceneNode->SetAxesIn(0, &bodyForward, &bodyUp, orthogonalize, keepZ);
 }
 
+// slot 36 (0x004aa210): when the forward axis is vertical it becomes -/+ the up axis; the up
+// axis is reset to Math3D.h's kVec3YAxis, forward is flattened, slots 35 and 34 re-derive the
+// axes, then the pose angles and their saved copies are reset.  Retail's copy reads
+// MSZoneInterface.cpp's kVec3YAxis (0x00685190) and sits in that unit's code range
+// (0x004aa150..0x004aa340), so it looks like a header inline the linker kept from that unit
+// (inference); this grouping's own kVec3YAxis holds the same (0, 1, 0).
+void SoultreePhysicsBaseObject::ResetBodyOrientation()
+{
+    if (bodyForward.x == 0.0f && bodyForward.z == 0.0f) {
+        float s = (bodyForward.y >= 0.0f) ? -1.0f : 1.0f;
+        bodyForward = s * bodyUp;
+    }
+    bodyUp = kVec3YAxis;
+    bodyForward.y = 0.0f;
+    StoreBodyAxes(1, 0);
+    LoadBodyAxes();
+    bodyRoll = 0.0f;
+    bodyPitch = 0.0f;
+    bodySinRoll = 0.0f;
+    bodyCosRoll = 1.0f;
+    savedForward = bodyForward;
+    savedUp = bodyUp;
+    bodySinPitch = 0.0f;
+    bodyCosPitch = 1.0f;
+    savedPitch = 0.0f;
+    savedRoll = 0.0f;
+    savedYaw = bodyYaw;
+    savedSinRoll = 0.0f;
+    savedCosRoll = 1.0f;
+    savedCosPitch = 1.0f;
+    savedSinPitch = 0.0f;
+}
+
 int SoultreePhysicsBaseObject::ClassifyOutOfBounds(int value)
 {
     return 0;

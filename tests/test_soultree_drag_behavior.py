@@ -16,7 +16,7 @@ from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'src/reconstructed/SoultreeDrag.cpp'
-AGGREGATE = 'samples/physics/soultree_base/SoultreePhysicsInlines.cpp'
+AGGREGATE = 'src/reconstructed/SoultreePhysicsMethods.cpp'
 SYMBOL = '?ApplyDrag@SoultreePhysicsBaseObject@@UAEXPAUVec3@@PAM@Z'
 SLOT36 = '?ResetBodyOrientation@SoultreePhysicsBaseObject@@UAEXXZ'
 
@@ -104,7 +104,7 @@ class SoultreeDragBehaviorTests(unittest.TestCase):
                              ROOT/SOURCE.replace('.cpp','.bindings.json'))
             self.assertEqual(report['candidate_size'],432)
             self.assertTrue(report['strict_exact'],report)
-            # Slot 6 is provided only by the canonical source, not the sample aggregate.
+            # Slot 6 is provided only by SoultreeDrag.cpp, not the methods grouping.
             self.assertNotIn(SYMBOL,{s.name for s in objects['aggregate'].symbols})
             body, size, relocations = complete(objects['aggregate'],SLOT36)
             self.assertEqual(size,305)
@@ -113,9 +113,9 @@ class SoultreeDragBehaviorTests(unittest.TestCase):
             self.assertEqual(relocations,[(17,6,'__real@4@00000000000000000000'),
                 (42,6,'__real@4@00000000000000000000'),(61,6,'__real@4@00000000000000000000'),
                 (74,6,'__real@4@bfff8000000000000000'),(82,6,'__real@4@3fff8000000000000000'),
-                (143,6,'?g_SoultreeVec3_685190@@3UVec3@@A'),
-                (164,6,'?g_SoultreeVec3_685190@@3UVec3@@A'),
-                (172,6,'?g_SoultreeVec3_685190@@3UVec3@@A')])
+                (143,6,'_kVec3YAxis'),
+                (164,6,'_kVec3YAxis'),
+                (172,6,'_kVec3YAxis')])
             self.assertEqual(hashlib.sha256(complete(candidate,SYMBOL)[0]).hexdigest(),
                              '1c8b1c9f1c06ca535327483d543370a1e1f764d59ccd4d6c2960d6fa4d63fc5c')
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0},

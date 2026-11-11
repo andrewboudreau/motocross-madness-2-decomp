@@ -109,12 +109,11 @@ class SoultreePhysicsMethodTests(unittest.TestCase):
                          (0, 0, 0, 0x566c48, 0x55f0c0))
         name = b'.?AVSoultreePhysicsBaseObject@@\0'
         self.assertEqual(retail.bytes_at_va(0x566c50, len(name)), name)
-        slots = {5, 10, 12, 19, 22, 23, 24, 26, 32, 34, 35}
+        slots = {5, 10, 12, 19, 22, 23, 24, 26, 32, 34, 35, 36}
         sources = {
             'methods': 'src/reconstructed/SoultreePhysicsMethods.cpp',
             'owner': 'src/krusty2/soultree/SoulTreePhysics.cpp',
             'drag': 'src/reconstructed/SoultreeDrag.cpp',
-            'remaining': 'samples/physics/soultree_base/SoultreePhysicsInlines.cpp',
             'node': 'src/krusty2/soultree/soultree.cpp',
         }
         with tempfile.TemporaryDirectory(prefix='mcm2-soultree-methods-') as directory:
@@ -156,7 +155,7 @@ class SoultreePhysicsMethodTests(unittest.TestCase):
                 slot = (int(re.search(r'Slot(\d+)@', symbol)[1])
                         if 'Slot' in symbol else renamed_slots[symbol.split('@')[0]])
                 promoted = slot in slots
-                key = 'methods' if promoted else 'drag' if slot == 6 else 'remaining'
+                key = 'methods' if promoted else 'drag'
                 source = (path.parent / target['source']).resolve()
                 self.assertEqual(source, ROOT / sources[key])
                 obj = objects[key]

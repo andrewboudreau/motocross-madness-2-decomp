@@ -7,7 +7,6 @@
 #include "math/Math3D.h"
 
 // The zero vector 0x00689ee8 is this TU's Math3D.h kVec3Zero (its `$E` body is 0x00502b60).
-// 0x00685190 is the vector loaded by slot 36.
-extern Vec3 g_SoultreeVec3_685190; // 0x00685190
+// Slot 36 loads Math3D.h's kVec3YAxis (retail's copy is MSZoneInterface.cpp's, 0x00685190).
 
 #endif

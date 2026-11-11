@@ -121,12 +121,12 @@
  },
  {
   "class": "SoultreePhysicsBaseObject",
-  "source": "SoultreePhysicsInlines.cpp",
+  "source": "../../../src/reconstructed/SoultreePhysicsMethods.cpp",
   "candidate_symbol_contains": "ResetBodyOrientation@SoultreePhysicsBaseObject",
   "target_va": "0x004aa210",
   "target_size": 305,
   "expect": "exact",
-  "notes": "exact under vc6_o2_ml (wave 3: was 85.35%). Made it match: field_0x50 = field_0x34 is placed after the 0x4c/0x48 stores and before 0x54..0x5c.",
-  "bindings": "SoultreePhysicsInlines.bindings.json"
+  "notes": "exact under vc6_o2_ml (wave 3: was 85.35%). Made it match: field_0x50 = field_0x34 is placed after the 0x4c/0x48 stores and before 0x54..0x5c. Promoted to src/reconstructed/SoultreePhysicsMethods.cpp; reads Math3D.h kVec3YAxis (retail: MSZoneInterface.cpp copy at 0x00685190).",
+  "bindings": "../../../src/reconstructed/SoultreePhysicsMethods.bindings.json"
  }
 ]

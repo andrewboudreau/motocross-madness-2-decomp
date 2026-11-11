@@ -6,8 +6,8 @@
 drag/budget interpretation remain provisional. Original translation-unit
 ownership is not established: the body lies in Bike.cpp's address range and is
 most likely an inline member kept from the first unit that emitted it. The file
-is a reconstruction grouping like `SoultreePhysicsMethods.cpp`. The sample
-`samples/physics/soultree_base/SoultreePhysicsInlines.cpp` keeps only slot 36.
+is a reconstruction grouping like `SoultreePhysicsMethods.cpp`, which also holds
+slot 36.
 
 ## Identity and complete extent
 
