@@ -139,34 +139,6 @@ TrackGame::TrackGame() {
     g_DebugSocket = 0;
 }
 
-// 0x00521ae0: opens the requested web pages, deletes the owned objects,
-// releases lang.dll and (on Windows NT) re-enables the screen saver.
-TrackGame::~TrackGame() {
-    if (openStorePageOnExit)
-        ShellExecuteA(0, 0,
-                      "http://shop.microsoft.com/store/referral/selector.asp?siteid=10425&furl=2&"
-                      "sku=773%2d00042&skuqty=1",
-                      0, 0, 3);
-    if (openLocalizedWebPageOnExit) {
-        char url[128];
-        LoadResourceString(0x14df, url, 0x7f);
-        ShellExecuteA(0, 0, url, 0, 0, 3);
-    }
-    delete cdAudio;
-    delete profileDirectory;
-    delete controlMapping;
-    delete controlSetup;
-    delete highScores;
-    if (languageModule) {
-        FreeLibrary(languageModule);
-        languageModule = 0;
-    }
-    delete proCircuit;
-    delete g_DebugSocket;
-    if (osVersion.platformId == kWindowsNtPlatform && screenSaverWasActive)
-        SystemParametersInfoA(kSetScreenSaverActive, 1, 0, 2);
-}
-
 // 0x00520ab0: start-up checks: the first +0x578 check (error 0x13b3), the
 // second, retried until it passes or is cancelled (0x13b5), a warning below
 // 64 MB of available memory (0x14bb), then the EULA through EBUEula.dll.
@@ -230,6 +202,11 @@ int TrackGame::Startup() {
     if (!FindDataFile(name, path))                                  \
         return 0;                                                    \
     g_ResourceManager->AddArchive(path, 0);
+
+// 0x00520d00
+int TrackGame::Initialize() {
+    return PCGame::Initialize();
+}
 
 // 0x00520d10
 int TrackGame::OpenResources() {
@@ -332,19 +309,9 @@ int TrackGame::CreateGameObjects() {
     return 1;
 }
 
-// 0x00520d00
-int TrackGame::Initialize() {
-    return PCGame::Initialize();
-}
-
 // 0x00521660
 int TrackGame::Tick() {
     return Game::Tick() != 0;
-}
-
-// 0x00521840
-int TrackGame::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    return PCGame::OnControlRelease(event, entry);
 }
 
 // 0x00521670: input presses. With an IME open nothing happens. Control 0x1d
@@ -403,6 +370,11 @@ handled:
         return 1;
     }
     return 0;
+}
+
+// 0x00521840
+int TrackGame::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    return PCGame::OnControlRelease(event, entry);
 }
 
 // 0x00521860
@@ -486,6 +458,34 @@ int TrackGame::Shutdown() {
     SetLocaleInfoA(kLocaleUserDefault, kLocaleDecimalSeparator, savedDecimalSeparator);
     mode.SaveProfile();
     return 1;
+}
+
+// 0x00521ae0: opens the requested web pages, deletes the owned objects,
+// releases lang.dll and (on Windows NT) re-enables the screen saver.
+TrackGame::~TrackGame() {
+    if (openStorePageOnExit)
+        ShellExecuteA(0, 0,
+                      "http://shop.microsoft.com/store/referral/selector.asp?siteid=10425&furl=2&"
+                      "sku=773%2d00042&skuqty=1",
+                      0, 0, 3);
+    if (openLocalizedWebPageOnExit) {
+        char url[128];
+        LoadResourceString(0x14df, url, 0x7f);
+        ShellExecuteA(0, 0, url, 0, 0, 3);
+    }
+    delete cdAudio;
+    delete profileDirectory;
+    delete controlMapping;
+    delete controlSetup;
+    delete highScores;
+    if (languageModule) {
+        FreeLibrary(languageModule);
+        languageModule = 0;
+    }
+    delete proCircuit;
+    delete g_DebugSocket;
+    if (osVersion.platformId == kWindowsNtPlatform && screenSaverWasActive)
+        SystemParametersInfoA(kSetScreenSaverActive, 1, 0, 2);
 }
 
 // 0x00521cb0

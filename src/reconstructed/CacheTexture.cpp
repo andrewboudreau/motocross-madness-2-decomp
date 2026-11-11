@@ -200,6 +200,27 @@ void CacheTexture::FreeQuarters(UnknownTextureRegion* region) {
     }
 }
 
+// 0x0050fdb0
+int CacheTexture::PlaceTextures(ContainerList<ManagedTexture*>* textures,
+                                        ContainerList<ManagedTexture*>* placed) {
+    while (textures->m_count > 0) {
+        ManagedTexture* texture = textures->Get(0);
+        if (reservedLeaves[texture->plannedLevel].m_count == 0)
+            return 0;
+        UnknownTextureRegion* region = reservedLeaves[texture->plannedLevel].Get(0);
+        reservedLeaves[texture->plannedLevel].RemoveOrdered(region);
+        PlaceTexture(texture, region);
+        textures->RemoveOrdered(texture);
+        if (placed) {
+            placed->Add(texture);
+            texture->copiedSkipLevels = 0;
+        } else {
+            CopyMipLevels(region, 0);
+        }
+    }
+    return 1;
+}
+
 // 0x0050ffa0
 UnknownTextureRegion* CacheTexture::SplitRegion(UnknownTextureRegion* region) {
     float left = region->left;
@@ -279,25 +300,4 @@ int CacheTexture::PlaceTexture(ManagedTexture* texture, UnknownTextureRegion* re
 // 0x005102b0
 void CacheTexture::RemoveTexture(ManagedTexture* texture) {
     ReleaseRegion(texture->region, 1);
-}
-
-// 0x0050fdb0
-int CacheTexture::PlaceTextures(ContainerList<ManagedTexture*>* textures,
-                                        ContainerList<ManagedTexture*>* placed) {
-    while (textures->m_count > 0) {
-        ManagedTexture* texture = textures->Get(0);
-        if (reservedLeaves[texture->plannedLevel].m_count == 0)
-            return 0;
-        UnknownTextureRegion* region = reservedLeaves[texture->plannedLevel].Get(0);
-        reservedLeaves[texture->plannedLevel].RemoveOrdered(region);
-        PlaceTexture(texture, region);
-        textures->RemoveOrdered(texture);
-        if (placed) {
-            placed->Add(texture);
-            texture->copiedSkipLevels = 0;
-        } else {
-            CopyMipLevels(region, 0);
-        }
-    }
-    return 1;
 }

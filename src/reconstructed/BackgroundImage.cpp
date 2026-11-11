@@ -86,22 +86,6 @@ int BackgroundImage::RenderPre3D() {
     return 1;
 }
 
-// 0x00404010
-BackgroundImage::~BackgroundImage() {
-    if (heldDc && heldDcSurface)
-        heldDcSurface->ReleaseDC(heldDc);
-    if (offscreenCopy) {
-        offscreenCopy->Release();
-        offscreenCopy = 0;
-    }
-    if (currentImage) {
-        currentImage->Release();
-        currentImage = 0;
-    }
-    if (regionTable)
-        DebugFree(regionTable, __FILE__, 230);
-}
-
 // 0x00403ec0
 int BackgroundImage::RenderPost3D() {
     if (currentImage && imageVisible) {
@@ -142,6 +126,22 @@ GameObject* BackgroundImage::SetRenderContext(void* context) {
 failed:
     Release();
     return 0;
+}
+
+// 0x00404010
+BackgroundImage::~BackgroundImage() {
+    if (heldDc && heldDcSurface)
+        heldDcSurface->ReleaseDC(heldDc);
+    if (offscreenCopy) {
+        offscreenCopy->Release();
+        offscreenCopy = 0;
+    }
+    if (currentImage) {
+        currentImage->Release();
+        currentImage = 0;
+    }
+    if (regionTable)
+        DebugFree(regionTable, __FILE__, 230);
 }
 
 // 0x004040b0

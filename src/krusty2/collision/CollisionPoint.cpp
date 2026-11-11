@@ -36,6 +36,37 @@ CollisionPoint* AddCollisionPoint(int capacity, CollisionPoint** points, const C
     return 0;
 }
 
+// 0x0043a570: AddCollisionPoint for a point the caller already owns (`point` may be null to reuse the
+// slot's current pointer): resets its position to zero and records the penetration threshold.
+CollisionPoint* AddExistingCollisionPoint(int capacity, CollisionPoint** points, float threshold, int* count,
+                                          CollisionPoint* point) {
+    if (*count < capacity) {
+        if (point)
+            points[*count] = point;
+        CollisionPoint* added = points[*count];
+        added->localPosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+        added->penetration = threshold - 999.0f;
+        added->ownerNode = 0;
+        added->penetrationThreshold = threshold;
+        (*count)++;
+        return added;
+    }
+    return 0;
+}
+
+// 0x0043a5e0: removes `point` from the pointer list by shifting the tail down; the vacated last slot is cleared.
+void RemoveCollisionPoint(CollisionPoint** points, CollisionPoint* point, int* count) {
+    for (int i = 0; i < *count; i++) {
+        if (points[i] == point) {
+            for (int j = i; j < *count - 1; j++)
+                points[j] = points[j + 1];
+            (*count)--;
+            points[*count] = 0;
+            return;
+        }
+    }
+}
+
 // Inline vector helpers of UpdateRelativeMotion.  Their shapes are those of the header
 // inlines the original used (Math3D.h has the same operators): results returned through
 // the three-float constructor, the cross product with parenthesised first products, and
@@ -150,65 +181,6 @@ void CollisionPoint::UpdateRelativeMotion(const CollisionVec3* center, const Col
     }
 }
 
-// 0x0043a570: AddCollisionPoint for a point the caller already owns (`point` may be null to reuse the
-// slot's current pointer): resets its position to zero and records the penetration threshold.
-CollisionPoint* AddExistingCollisionPoint(int capacity, CollisionPoint** points, float threshold, int* count,
-                                          CollisionPoint* point) {
-    if (*count < capacity) {
-        if (point)
-            points[*count] = point;
-        CollisionPoint* added = points[*count];
-        added->localPosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
-        added->penetration = threshold - 999.0f;
-        added->ownerNode = 0;
-        added->penetrationThreshold = threshold;
-        (*count)++;
-        return added;
-    }
-    return 0;
-}
-
-// 0x0043a5e0: removes `point` from the pointer list by shifting the tail down; the vacated last slot is cleared.
-void RemoveCollisionPoint(CollisionPoint** points, CollisionPoint* point, int* count) {
-    for (int i = 0; i < *count; i++) {
-        if (points[i] == point) {
-            for (int j = i; j < *count - 1; j++)
-                points[j] = points[j + 1];
-            (*count)--;
-            points[*count] = 0;
-            return;
-        }
-    }
-}
-
-// 0x0043aff0: refreshes the world position (field_0x14) of every owned, active contact point from the
-// owner's transform of its local position (field_0x08).
-// Bike passes primary scene nodes to AddCollisionPoint; the canonical Vec3
-// return uses the same hidden 12-byte result buffer as the old call view.
-void UpdateCollisionPointWorldPositions(int count, CollisionPoint** points) {
-    for (int i = count; i > 0; i--, points++) {
-        CollisionPoint* point = *points;
-        if (point->ownerNode && point->inContact) {
-            reinterpret_cast<Vec3&>((*points)->worldPosition) =
-                reinterpret_cast<SoultreeObject*>((*points)->ownerNode)->LocalToWorldPoint(
-                    reinterpret_cast<const Vec3&>(point->localPosition));
-        }
-    }
-}
-
-// 0x0043b190 (cdecl): out = a - b * (a . b), the part of a perpendicular to the (unit)
-// vector b; returns 0 when the result is exactly the zero vector, else out.  Retail
-// emits the dot product's y term first with b's component loaded first; the
-// parenthesised middle product gives that order (docs/VC6_OPERAND_ORDER.md section 3).
-CollisionVec3* CollisionRejectFrom(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b)
-{
-    float d = a->x * b->x + (a->y * b->y) + a->z * b->z;
-    *out = *a - *b * d;
-    if (out->x == 0.0f && out->y == 0.0f && out->z == 0.0f)
-        return 0;
-    return out;
-}
-
 // The original vector type's three-float constructor and operators are inline in a
 // header (retail calls their out-of-line copies, e.g. the constructor 0x00404e60, only
 // where a function exhausts VC6's inline budget, docs/VC6_INLINE_BUDGET.md).
@@ -223,40 +195,6 @@ struct CollisionPointVec3 : CollisionVec3 {
 static inline CollisionPointVec3 ScaleVec3(const CollisionVec3& v, float s) {
     return CollisionPointVec3(s * v.x, s * v.y, s * v.z);
 }
-
-// 0x0043b240 (slot 1): the friction force of the contact.  Without tangential or
-// rotational slip (both <= 0.001) it is zero; otherwise its magnitude is
-// -normalForce * surfaceGrip * frictionCoefficient along frictionDirection, and the
-// stored magnitude is made non-negative.
-void CollisionPoint::CollisionPointVirtualSlot1() {
-    if (!(tangentSpeed > 0.001f) && !(spinSpeed > 0.001f)) {
-        frictionMagnitude = 0.0f;
-        frictionForce = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
-    } else {
-        frictionMagnitude = (-normalForce) * surfaceGrip * frictionCoefficient;
-        frictionForce = ScaleVec3(frictionDirection, frictionMagnitude);
-        if (frictionMagnitude < 0.0f)
-            frictionMagnitude = -frictionMagnitude;
-    }
-}
-
-// The file's four dynamically initialized vector constants, .CRT$XCU entries 62-65: thunks
-// 0x0043b050/0x0043b0a0/0x0043b0f0/0x0043b140 jump to 60-byte bodies that build the value in a
-// stack temporary and copy it out (copy-initialization from a constructor call, as for
-// ConstraintMethodCollisionModel.cpp's 0x00579830).  The zero vector 0x005797f0 and the y axis
-// 0x00579810 are the existing objects read through explicit CollisionVec3 views.
-// They have external linkage so all consumers use this storage and its original
-// initialization. The x/z axes remain local. This constructor-bearing type is a
-// provisional view of the unrecovered header vector
-// (CollisionVec3's three-float constructor is out of line, 0x00404e60).
-struct CollisionPointConstVec3 {
-    float x, y, z;
-    CollisionPointConstVec3(float a, float b, float c) : x(a), y(b), z(c) {}
-};
-const CollisionPointConstVec3 kCollisionPointZero = CollisionPointConstVec3(0.0f, 0.0f, 0.0f);
-static const CollisionPointConstVec3 kCollisionPointXAxis = CollisionPointConstVec3(1.0f, 0.0f, 0.0f);
-const CollisionPointConstVec3 kCollisionPointYAxis = CollisionPointConstVec3(0.0f, 1.0f, 0.0f);
-static const CollisionPointConstVec3 kCollisionPointZAxis = CollisionPointConstVec3(0.0f, 0.0f, 1.0f);
 
 // Helpers of the contact merge 0x0043aa30, in the header-inline shapes the rest of the unit
 // uses (results through the inline constructor of CollisionPointVec3).  Tier 3 names.
@@ -438,4 +376,66 @@ int SoultreeRefreshContacts(void* a1, int* penetrating, int count, CollisionPoin
         }
     }
     return 1;
+}
+
+// 0x0043aff0: refreshes the world position (field_0x14) of every owned, active contact point from the
+// owner's transform of its local position (field_0x08).
+// Bike passes primary scene nodes to AddCollisionPoint; the canonical Vec3
+// return uses the same hidden 12-byte result buffer as the old call view.
+void UpdateCollisionPointWorldPositions(int count, CollisionPoint** points) {
+    for (int i = count; i > 0; i--, points++) {
+        CollisionPoint* point = *points;
+        if (point->ownerNode && point->inContact) {
+            reinterpret_cast<Vec3&>((*points)->worldPosition) =
+                reinterpret_cast<SoultreeObject*>((*points)->ownerNode)->LocalToWorldPoint(
+                    reinterpret_cast<const Vec3&>(point->localPosition));
+        }
+    }
+}
+
+// The file's four dynamically initialized vector constants, .CRT$XCU entries 62-65: thunks
+// 0x0043b050/0x0043b0a0/0x0043b0f0/0x0043b140 jump to 60-byte bodies that build the value in a
+// stack temporary and copy it out (copy-initialization from a constructor call, as for
+// ConstraintMethodCollisionModel.cpp's 0x00579830).  The zero vector 0x005797f0 and the y axis
+// 0x00579810 are the existing objects read through explicit CollisionVec3 views.
+// They have external linkage so all consumers use this storage and its original
+// initialization. The x/z axes remain local. This constructor-bearing type is a
+// provisional view of the unrecovered header vector
+// (CollisionVec3's three-float constructor is out of line, 0x00404e60).
+struct CollisionPointConstVec3 {
+    float x, y, z;
+    CollisionPointConstVec3(float a, float b, float c) : x(a), y(b), z(c) {}
+};
+const CollisionPointConstVec3 kCollisionPointZero = CollisionPointConstVec3(0.0f, 0.0f, 0.0f);
+static const CollisionPointConstVec3 kCollisionPointXAxis = CollisionPointConstVec3(1.0f, 0.0f, 0.0f);
+const CollisionPointConstVec3 kCollisionPointYAxis = CollisionPointConstVec3(0.0f, 1.0f, 0.0f);
+static const CollisionPointConstVec3 kCollisionPointZAxis = CollisionPointConstVec3(0.0f, 0.0f, 1.0f);
+
+// 0x0043b190 (cdecl): out = a - b * (a . b), the part of a perpendicular to the (unit)
+// vector b; returns 0 when the result is exactly the zero vector, else out.  Retail
+// emits the dot product's y term first with b's component loaded first; the
+// parenthesised middle product gives that order (docs/VC6_OPERAND_ORDER.md section 3).
+CollisionVec3* CollisionRejectFrom(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b)
+{
+    float d = a->x * b->x + (a->y * b->y) + a->z * b->z;
+    *out = *a - *b * d;
+    if (out->x == 0.0f && out->y == 0.0f && out->z == 0.0f)
+        return 0;
+    return out;
+}
+
+// 0x0043b240 (slot 1): the friction force of the contact.  Without tangential or
+// rotational slip (both <= 0.001) it is zero; otherwise its magnitude is
+// -normalForce * surfaceGrip * frictionCoefficient along frictionDirection, and the
+// stored magnitude is made non-negative.
+void CollisionPoint::CollisionPointVirtualSlot1() {
+    if (!(tangentSpeed > 0.001f) && !(spinSpeed > 0.001f)) {
+        frictionMagnitude = 0.0f;
+        frictionForce = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+    } else {
+        frictionMagnitude = (-normalForce) * surfaceGrip * frictionCoefficient;
+        frictionForce = ScaleVec3(frictionDirection, frictionMagnitude);
+        if (frictionMagnitude < 0.0f)
+            frictionMagnitude = -frictionMagnitude;
+    }
 }

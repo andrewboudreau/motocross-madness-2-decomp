@@ -29,17 +29,33 @@ void hprintf(HANDLE LogFile, char* Format, ...)
     WriteFile(LogFile, buffer, lstrlen(buffer), &NumBytes, 0);
 }
 
-// 0x00460700: "m/d/yyyy hh:mm:ss" in local time, or an empty string.
-void PrintTime(char* output, FILETIME TimeToPrint)
+// 0x004604e0: walks the address space with VirtualQuery and reports every
+// new committed allocation base as a module.
+void RecordModuleList(HANDLE LogFile)
 {
-    WORD Date, Time;
-    if (FileTimeToLocalFileTime(&TimeToPrint, &TimeToPrint) &&
-        FileTimeToDosDateTime(&TimeToPrint, &Date, &Time)) {
-        wsprintf(output, "%d/%d/%d %02d:%02d:%02d",
-                 (Date / 32) & 15, Date & 31, (Date / 512) + 1980,
-                 (Time / 2048), (Time / 32) & 63, (Time & 31) * 2);
-    } else
-        output[0] = 0;
+    hprintf(LogFile, "\r\n"
+                     "\tModule list: names, addresses, sizes, time stamps "
+                     "and file times:\r\n");
+    SYSTEM_INFO SystemInfo;
+    GetSystemInfo(&SystemInfo);
+    const size_t PageSize = SystemInfo.dwPageSize;
+    const size_t NumPages = 4 * size_t(ONEG / PageSize);
+    size_t pageNum = 0;
+    void* LastAllocationBase = 0;
+    while (pageNum < NumPages) {
+        MEMORY_BASIC_INFORMATION MemInfo;
+        if (VirtualQuery((void*)(pageNum * PageSize), &MemInfo, sizeof(MemInfo))) {
+            if (MemInfo.RegionSize > 0) {
+                pageNum += MemInfo.RegionSize / PageSize;
+                if (MemInfo.State == MEM_COMMIT && MemInfo.AllocationBase > LastAllocationBase) {
+                    LastAllocationBase = MemInfo.AllocationBase;
+                    ShowModuleInfo(LogFile, (HINSTANCE)LastAllocationBase);
+                }
+            } else
+                pageNum += SIXTYFOURK / PageSize;
+        } else
+            pageNum += SIXTYFOURK / PageSize;
+    }
 }
 
 // 0x00460580: one line per code module (path, base, file size, link time
@@ -76,33 +92,17 @@ void ShowModuleInfo(HANDLE LogFile, HINSTANCE ModuleHandle)
     }
 }
 
-// 0x004604e0: walks the address space with VirtualQuery and reports every
-// new committed allocation base as a module.
-void RecordModuleList(HANDLE LogFile)
+// 0x00460700: "m/d/yyyy hh:mm:ss" in local time, or an empty string.
+void PrintTime(char* output, FILETIME TimeToPrint)
 {
-    hprintf(LogFile, "\r\n"
-                     "\tModule list: names, addresses, sizes, time stamps "
-                     "and file times:\r\n");
-    SYSTEM_INFO SystemInfo;
-    GetSystemInfo(&SystemInfo);
-    const size_t PageSize = SystemInfo.dwPageSize;
-    const size_t NumPages = 4 * size_t(ONEG / PageSize);
-    size_t pageNum = 0;
-    void* LastAllocationBase = 0;
-    while (pageNum < NumPages) {
-        MEMORY_BASIC_INFORMATION MemInfo;
-        if (VirtualQuery((void*)(pageNum * PageSize), &MemInfo, sizeof(MemInfo))) {
-            if (MemInfo.RegionSize > 0) {
-                pageNum += MemInfo.RegionSize / PageSize;
-                if (MemInfo.State == MEM_COMMIT && MemInfo.AllocationBase > LastAllocationBase) {
-                    LastAllocationBase = MemInfo.AllocationBase;
-                    ShowModuleInfo(LogFile, (HINSTANCE)LastAllocationBase);
-                }
-            } else
-                pageNum += SIXTYFOURK / PageSize;
-        } else
-            pageNum += SIXTYFOURK / PageSize;
-    }
+    WORD Date, Time;
+    if (FileTimeToLocalFileTime(&TimeToPrint, &TimeToPrint) &&
+        FileTimeToDosDateTime(&TimeToPrint, &Date, &Time)) {
+        wsprintf(output, "%d/%d/%d %02d:%02d:%02d",
+                 (Date / 32) & 15, Date & 31, (Date / 512) + 1980,
+                 (Time / 2048), (Time / 32) & 63, (Time & 31) * 2);
+    } else
+        output[0] = 0;
 }
 
 // 0x004607a0: time, executable, user, processor count/type and memory.

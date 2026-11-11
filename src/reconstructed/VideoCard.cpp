@@ -63,15 +63,15 @@ VideoCard::VideoCard() {
     totalVideoMemory = 0;
 }
 
-// 0x0052d240
-VideoCard::~VideoCard() {
-    ReleaseResources();
-}
-
 // 0x0052d220
 void VideoCard::ReleaseResources() {
     if (displayModes)
         DebugFree(displayModes, __FILE__, 63);
+}
+
+// 0x0052d240
+VideoCard::~VideoCard() {
+    ReleaseResources();
 }
 
 // 0x0052d250

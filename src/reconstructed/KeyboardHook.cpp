@@ -14,21 +14,6 @@ static HHOOK g_taskSwitchHook;             // 0x00689fdc
 static int InstallTaskSwitchHook();
 static void RemoveTaskSwitchHook();
 
-// 0x005053d0 (WH_KEYBOARD hook procedure). The key flags are the high word
-// of lParam; retail shifts the signed LPARAM (sar) and tests the 32-bit
-// result, which is the WORD cast of the signed shift (the SDK HIWORD macro
-// casts to DWORD first and would shift unsigned; the plain
-// `(lParam >> 16) & KF_ALTDOWN` folds into one test against 0x20000000).
-static LRESULT CALLBACK TaskSwitchHookProc(int code, WPARAM wParam, LPARAM lParam)
-{
-    if (!g_taskSwitchAllowed && code >= 0 && (wParam == VK_TAB || wParam == VK_ESCAPE)) {
-        if ((WORD)(lParam >> 16) & KF_ALTDOWN) {
-            return 1;
-        }
-    }
-    return CallNextHookEx(g_taskSwitchHook, code, wParam, lParam);
-}
-
 // 0x005053b0: records the flag and installs or removes the hook accordingly.
 void SetTaskSwitchAllowed(int allowed)
 {
@@ -38,6 +23,24 @@ void SetTaskSwitchAllowed(int allowed)
     } else {
         InstallTaskSwitchHook();
     }
+}
+
+// 0x005053d0 (WH_KEYBOARD hook procedure). The key flags are the high word
+// of lParam; retail shifts the signed LPARAM (sar) and tests the 32-bit
+// result, which is the WORD cast of the signed shift (the SDK HIWORD macro
+// casts to DWORD first and would shift unsigned; the plain
+// `(lParam >> 16) & KF_ALTDOWN` folds into one test against 0x20000000).
+// Retail emits it between SetTaskSwitchAllowed and InstallTaskSwitchHook, so
+// it is not static: VC6 would emit a static one after its caller
+// InstallTaskSwitchHook (docs/UNIT_LAYOUT.md).
+LRESULT CALLBACK TaskSwitchHookProc(int code, WPARAM wParam, LPARAM lParam)
+{
+    if (!g_taskSwitchAllowed && code >= 0 && (wParam == VK_TAB || wParam == VK_ESCAPE)) {
+        if ((WORD)(lParam >> 16) & KF_ALTDOWN) {
+            return 1;
+        }
+    }
+    return CallNextHookEx(g_taskSwitchHook, code, wParam, lParam);
 }
 
 // 0x00505420: installs the hook once while task switching is disallowed;
