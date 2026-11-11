@@ -76,27 +76,9 @@ int KbRaceSub::DistanceToStripEdge(Vec3 p, int segment, float* out, int mode)
                                               out, mode);
 }
 
-// ---------------------------------------------------------------------------------------
-// KbWheel::SetRollDistance, 0x00513560 (Tire::SetRollDistance, src/krusty2/tire/Tire.cpp):
-// rollAngle (+0x278) = distance * invWheelRadius (+0x1c8); a finite angle rolls the wheel's
-// scene node (+0x1bc) about its local X axis.
-// ---------------------------------------------------------------------------------------
-struct G3TireView {
-    char pad_0x000[0x1bc];
-    SoultreeObject* sceneNode;   // +0x1bc
-    char pad_0x1c0[0x1c8 - 0x1c0];
-    float invWheelRadius;        // +0x1c8
-    char pad_0x1cc[0x278 - 0x1cc];
-    float rollAngle;             // +0x278
-};
-
-void KbWheel::SetRollDistance(float d)
-{
-    G3TireView* tire = reinterpret_cast<G3TireView*>(this);
-    tire->rollAngle = d * tire->invWheelRadius;
-    if (_finite(tire->rollAngle))
-        tire->sceneNode->RotateAbout(1.0f, 0.0f, 0.0f, tire->rollAngle);
-}
+// KbWheel::SetRollDistance (0x00513560) is the strict-exact Tire::SetRollDistance of
+// src/krusty2/tire/Tire.cpp; a link_aliases entry binds the view name to it (same receiver,
+// one float argument, no this adjustment).
 
 // ---------------------------------------------------------------------------------------
 // BikeQ: the wheel's shock (InlineShock at BikeWheel+0x2b0, RotatingShock at +0x2ac).  The

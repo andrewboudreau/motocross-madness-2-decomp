@@ -66,6 +66,12 @@ provisional mixed-receiver setter stays unresolved. Its separate ordinary
 behavior provider would require its own complete prefix/ABI evidence; no
 inferred DirtChunk or DirtSpray method is added by this slice.
 
+The game build no longer compiles its own copy of the setter. A
+`link_aliases` entry binds the `VehicleImpactSink` view name to
+`SparkParticleEmitter::SetPosition`, because both bodies were identical and
+the linker had already folded them to 0x4b9dc0. This binds a call to an
+address. It says nothing about the receiver's class.
+
 ## Preservation and dependency closure
 
 The five verified external-name mappings preserve all seven affected complete
