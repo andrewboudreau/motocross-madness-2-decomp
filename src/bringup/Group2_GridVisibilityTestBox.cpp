@@ -12,7 +12,7 @@
 // by the body; Griddraw.h declares it as a pointer, VisibilityClipper.h as an int.
 //
 // The linked body rounds its six screen-rectangle values through FistpFloatToIntChecked
-// compiled with /QIfist (Group4_Visibility.cpp; 505 against retail's 464 instructions,
+// compiled with /QIfist (Group4_Visibility.cpp; 516 against retail's 464 instructions,
 // down from 836 with the former X87FloatToInt emulation).
 #include "../reconstructed/Griddraw.h"
 #include "visibility/VisibilityClipper.h"
