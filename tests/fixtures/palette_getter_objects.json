@@ -13,7 +13,7 @@
     "samples/render/PixtransNearMisses.cpp": {
       "sections": 7,
       "relocations": 29,
-      "sha256": "c89edd0d55d41aea364caa2a45d34f6461e49ba9e3bd5577e101b493048aa867"
+      "sha256": "b00b7dc6eb55d76e9323259a5a430b1191339424c6a6a1ba77bd6e7ce646d5f8"
     }
   },
   "getter_calls": {

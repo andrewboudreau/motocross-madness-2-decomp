@@ -497,7 +497,7 @@
     {
       "path": "samples/render/PixtransNearMisses.cpp",
       "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines DitherConvert, Halve1555, Halve8, Halve8888. Behavior unverified against retail; bytes nonexact.",
+      "reason": "Near-miss body admitted so the source build can link and run; defines DitherConvert, Halve1555, Halve8, Halve8888. Halve8888 and Halve1555 pass the native retail differential test (tests/test_pixtrans_halve_behavior.py); DitherConvert and Halve8 are checked against the retail disassembly only; bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
     },
     {

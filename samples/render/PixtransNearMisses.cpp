@@ -1,14 +1,21 @@
 // Near-miss Pixtrans.cpp candidates, kept out of src/reconstructed until they
 // match. See docs/PIXTRANS.md.
 //
-// Halve8888 (0x004cdf10, 636 bytes with its jump table): the
-// 8888 halver. Control flow, the count switch and the retail alpha quirk
-// line up, but retail keeps the upper row pointer in ecx and the lower one
-// on the stack, VC6 here the other way round, so most registers differ.
-// Accumulator declaration order (all 120), an indexed lower row, `bottom`
-// derived from `top` inside the loop, other for-increment orders and a
-// count-down x loop do not change it (declaring `bottom` before `top`
-// gives 64 of 636 strict but more masked differences).
+// Halve8888 (0x004cdf10, 636 bytes with its jump table; candidate 628, 110
+// strict, 182 of 203 aligned, 0.925 masked): the 8888 halver. Control flow,
+// the count switch and the retail alpha quirk line up. Retail derives the
+// block pointer from x (`sourceRow + x * 2` inside the x loop) and reads the
+// lower pixels as `top[sourceStride]`: separate `top`/`bottom` pointers
+// stepped by 2 in the for increment kept the upper pointer on the stack and
+// most registers differed (82 of 203 aligned). Retail reads the first alpha
+// twice rather than through a local; an `alpha0` local cost 0.23 masked.
+// Still differs: VC6 strength-reduces the lower row to `top + sourceStride`
+// (lea edx, [ecx+ebp*4]) where retail biases it to the alpha byte (+3) and
+// spills it; the order of the green/blue reads moves the upper pointer's
+// bias (+1 green first, +2 blue first) but not the lower one. Ruled out:
+// accumulator declaration orders, dropping the alpha1/alpha2 locals (same
+// code), fully indexed `sourceRow[x * 2 + k]` and `sourceRow[i + k]` forms,
+// `bottom` declared in the loop, a count-down x loop.
 //
 // Halve1555 (0x004ce420, 456 bytes; candidate 458, 280 strict): the 1555
 // halver behind 0x004d0170. The arithmetic, the >= 2 test and the packing
@@ -60,16 +67,27 @@
 // the argument (1129); an end-pointer x loop (`to < end`) loses retail's width down-counter
 // (225).
 //
-// DitherConvert (0x004cf2a0, 1759 bytes; candidate 1735, 242 match): the
-// Floyd-Steinberg ditherer behind the dithered converters. Two 16.16 error
-// rows (grown on demand, 0x00689a6c/0x00689a70/0x00689a74), each pixel
-// rounded to the nearest 5-bit level per channel and, with a palette, to
-// the palette entry when it is exactly that colour; errors spread 7/16
-// right, 5/16 below, 3/16 below left and the remainder below right. Draft:
-// the flow, calls and arithmetic follow retail, but VC6 here assigns the
-// format, the pixel size and the palette/width to ebx/esi/edi where retail
-// uses edi/ebx/esi, and the frame is 0x50 against retail's 0x54.
+// DitherConvert (0x004cf2a0, 1759 bytes; candidate 1745, 276 strict, 534 of
+// 566 aligned, 0.954 masked): the Floyd-Steinberg ditherer behind the
+// dithered converters. Two 16.16 error rows (grown on demand,
+// 0x00689a6c/0x00689a70/0x00689a74), each pixel rounded to the nearest 5-bit
+// level per channel and, with a palette, to the palette entry when it is
+// exactly that colour; errors spread 7/16 right, 5/16 below, 3/16 below left
+// and the remainder below right (retail forms that as e - 7e/16 - 5e/16 -
+// 3e/16 with the last term negated first, which is the same value). Checked
+// against retail: free/malloc lines 0x429/0x42c, width * 24 bytes, formats
+// 0x22b/0x235 select the 555/565 readers, the 555 palette lookup and the
+// output packings. Shape: retail uses the CRT abs() intrinsic (cdq/xor/sub;
+// a ternary gave jns/neg), stores each quantized level to its slot at once
+// (the out-parameter QuantizeChannel), loads the palette entry as
+// colors[index * 3 + k] and derives the four output row pointers and the
+// next source row from y (`base + y * stride`), which VC6 strength-reduces
+// into retail's shared induction variables; stepping separate row pointers
+// at the end of the y loop gave 385 of 566 aligned. Still differs: where
+// ebp is pushed, the order of the y loop's pointer setup and its rotated
+// loop entry jump.
 //
+#include <stdlib.h>
 #include <string.h>
 
 #include "../../src/reconstructed/DebugAlloc.h"
@@ -86,21 +104,19 @@ int Halve8888(void* destination, void* source, int width, int height, int destin
     UnknownPixel32* sourceRow = (UnknownPixel32*)source;
     UnknownPixel32* row = (UnknownPixel32*)destination;
     for (int y = 0; y < height; y++) {
-        UnknownPixel32* top = sourceRow;
-        UnknownPixel32* bottom = sourceRow + sourceStride;
         UnknownPixel32* to = row;
-        for (int x = 0; x < width; x++, to++, top += 2, bottom += 2) {
+        for (int x = 0; x < width; x++, to++) {
+            UnknownPixel32* top = sourceRow + x * 2;
             int red = 0;
             int green = 0;
             int blue = 0;
             int alpha = 0;
             int count = 0;
-            unsigned char alpha0 = top[0].alpha;
-            if (alpha0) {
+            if (top[0].alpha) {
                 red += top[0].red;
                 green += top[0].green;
                 blue += top[0].blue;
-                alpha += alpha0;
+                alpha += top[0].alpha;
                 count++;
             }
             unsigned char alpha1 = top[1].alpha;
@@ -111,18 +127,18 @@ int Halve8888(void* destination, void* source, int width, int height, int destin
                 alpha += alpha1;
                 count++;
             }
-            unsigned char alpha2 = bottom[0].alpha;
+            unsigned char alpha2 = top[sourceStride].alpha;
             if (alpha2) {
-                red += bottom[0].red;
-                green += bottom[0].green;
-                blue += bottom[0].blue;
+                red += top[sourceStride].red;
+                green += top[sourceStride].green;
+                blue += top[sourceStride].blue;
                 alpha += alpha2;
                 count++;
             }
-            if (bottom[1].alpha) {
-                red += bottom[1].red;
-                green += bottom[1].green;
-                blue += bottom[1].blue;
+            if (top[sourceStride + 1].alpha) {
+                red += top[sourceStride + 1].red;
+                green += top[sourceStride + 1].green;
+                blue += top[sourceStride + 1].blue;
                 alpha += alpha2;
                 count++;
             }
@@ -322,27 +338,25 @@ int Halve8(void* destination, void* source, int width, int height, int destinati
 int g_ditherCapacity;               // 0x00689a6c
 int* g_ditherRows[2];               // 0x00689a70, 0x00689a74
 
-// A 16.16 channel rounded to the nearest of the 32 5-bit levels.
-static inline int QuantizeChannel(int value)
+// A 16.16 channel rounded to the nearest of the 32 5-bit levels. Retail
+// stores each level to its frame slot as soon as it is formed, which the
+// out-parameter reproduces (returned by value, VC6 kept it in a register).
+static inline void QuantizeChannel(int value, int& level)
 {
     if (value < 0)
-        return 0;
-    if (value >= 0x1000000)
-        return 0xffffff;
-    int level = value / 0x80000 * 0x80000;
-    if (value - level > 0x40000)
-        level += 0x80000;
-    return level;
+        level = 0;
+    else if (value >= 0x1000000)
+        level = 0xffffff;
+    else {
+        level = value / 0x80000 * 0x80000;
+        if (value - level > 0x40000)
+            level += 0x80000;
+    }
 }
 
 static inline int ClampHigh(int value)
 {
     return value >= 0x1000000 ? 0xffffff : value;
-}
-
-static inline int Absolute(int value)
-{
-    return value < 0 ? -value : value;
 }
 
 static inline void ReadRow(int format, void* source, int* channels, int width)
@@ -377,37 +391,33 @@ int DitherConvert(void* source, int format, int width, int height, int sourceStr
         g_ditherRows[1] = g_ditherRows[0] + width * 3;
     }
     ReadRow(format, source, g_ditherRows[0], width);
-    int rowBytes = bytesPerPixel * sourceStride;
-    unsigned char* nextSource = (unsigned char*)source + rowBytes;
-    unsigned char* row24 = (unsigned char*)output24;
-    unsigned short* row565 = (unsigned short*)output565;
-    unsigned short* row555 = (unsigned short*)output555;
-    unsigned char* row8 = (unsigned char*)output8;
     for (int y = 0; y < height; y++) {
         int* current = g_ditherRows[y % 2];
         int* next = g_ditherRows[1 - y % 2];
-        unsigned char* to24 = row24;
-        unsigned short* to565 = row565;
-        unsigned short* to555 = row555;
-        unsigned char* to8 = row8;
+        unsigned char* to8 = (unsigned char*)output8 + y * destinationStride;
+        unsigned char* to24 = (unsigned char*)output24 + y * destinationStride * 3;
+        unsigned short* to565 = (unsigned short*)output565 + y * destinationStride;
+        unsigned short* to555 = (unsigned short*)output555 + y * destinationStride;
         if (y != height - 1)
-            ReadRow(format, nextSource, next, width);
+            ReadRow(format, (unsigned char*)source + (y + 1) * bytesPerPixel * sourceStride, next, width);
         for (int x = 0; x < width; x++) {
             int red = current[0];
-            int qr = QuantizeChannel(red);
+            int qr;
+            QuantizeChannel(red, qr);
             int green = current[1];
-            int qg = QuantizeChannel(green);
+            int qg;
+            QuantizeChannel(green, qg);
             int blue = current[2];
-            int qb = QuantizeChannel(blue);
-            unsigned char index;
+            int qb;
+            QuantizeChannel(blue, qb);
+            int index;
             if (palette) {
                 index = indices[(unsigned short)((ClampHigh(qr) >> 9 & 0xfc1f | ClampHigh(qg) >> 14) & 0xffe0
                                                  | ClampHigh(qb) >> 19)];
-                unsigned char* color = colors + index * 3;
-                int pr = color[0] << 16;
-                int pg = color[1] << 16;
-                int pb = color[2] << 16;
-                if (Absolute(red - pr) <= 0 && Absolute(green - pg) <= 0 && Absolute(blue - pb) <= 0) {
+                int pr = colors[index * 3] << 16;
+                int pg = colors[index * 3 + 1] << 16;
+                int pb = colors[index * 3 + 2] << 16;
+                if (abs(red - pr) <= 0 && abs(green - pg) <= 0 && abs(blue - pb) <= 0) {
                     qr = pr;
                     qg = pg;
                     qb = pb;
@@ -437,7 +447,7 @@ int DitherConvert(void* source, int format, int width, int height, int sourceStr
                 to555++;
             }
             if (output8) {
-                *to8 = index;
+                *to8 = (unsigned char)index;
                 to8++;
             }
             if (x < width - 1) {
@@ -462,11 +472,6 @@ int DitherConvert(void* source, int format, int width, int height, int sourceStr
             current += 3;
             next += 3;
         }
-        nextSource += rowBytes;
-        row24 += destinationStride * 3;
-        row565 += destinationStride;
-        row555 += destinationStride;
-        row8 += destinationStride;
     }
     return 1;
 }

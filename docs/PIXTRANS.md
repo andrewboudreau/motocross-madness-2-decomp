@@ -123,7 +123,8 @@ palette and 24-bit cases, `default: return 0;`). Near misses
 the tests and one reused upper `pixel` give retail's x loop; the source row
 stays in ebp from entry where retail copies it from eax at each row head); `0x004cdf10`, the 8888 halver, which
 averages colour over the 2x2 pixels with alpha set (the fourth pixel adds
-the third one's alpha in retail) and differs in register assignment;
+the third one's alpha in retail; 182 of 203 instructions aligned with the
+block pointer derived from x, only the lower row's induction bias and spill differ);
 `0x004cee30` (the palette halver, 1129/1133 strict: written as an if/else with one
 `return 1`, ebp is pushed after the palette checks as in retail; only the
 post-loop reload of the source stride and width comes in the other order).
@@ -140,9 +141,10 @@ halvers; their pixel loops accumulate into a zeroed argument slot in memory,
 `mov [ebp+0x1c], 0; add [ebp+0x1c], ebx; ...`, and count down `dec [ebp+0x24]`,
 which VC6 `/O2` does not emit for C locals). The ditherer `0x004cf2a0`
 (Floyd-Steinberg over two 16.16 error rows, 0x00689a6c..0x00689a74) is a
-draft near miss in `samples/render/PixtransNearMisses.cpp` (242 of 1735
-compared bytes: flow and arithmetic match, the format, pixel size and
-palette registers are permuted and the frame is 4 bytes smaller). The table getters
+near miss in `samples/render/PixtransNearMisses.cpp` (534 of 566
+instructions aligned, 276 of 1759 strict: the abs() intrinsic, quantized
+levels stored at once and row pointers derived from y give retail's
+registers and frame; the ebp push and the y loop's setup order differ). The table getters
 `0x004de280`/`0x004de290` are exact in `src/reconstructed/Quantize.cpp`.
 `0x004cf162` and `0x004d0000` are not function
 starts: the first is mid-instruction inside the palette halver

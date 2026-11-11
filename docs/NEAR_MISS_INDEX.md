@@ -282,10 +282,10 @@ hoists the wrong stores into a copy, move retail's pair to the position VC6 pick
 | render/NonLocalTextureMemory | `0x004ca5a0` | 66/486 (candidate 490) | c | Corrected full RET extent; complete native-reviewed candidate. See NONLOCAL_TEXTURE_MEMORY.md. |
 | render/PartialTextureUploads | `0x004cab00` | 140/1129 (candidate 1145) | b | Complete native-reviewed standalone candidate; aggregate context remains 1113 bytes/144 matching positions. See PARTIAL_TEXTURE_UPLOADS.md. |
 | render/TextureChannelDifference | `0x004cb330` | 35/629 (candidate 620) | b | Corrected full cold-tail extent; complete native-reviewed candidate. See DISPLAY_SURFACE_HELPERS.md. |
-| render/Pixtrans | `0x004cdf10` | 46/636 | b | 33 code diffs: retail adds `mov ecx, [esp + N] ; mov [esp + N], eax~`; retail lacks `mov [esp + N], eax ; mov eax, [esp + N]~`; slot order differs |
+| render/Pixtrans | `0x004cdf10` | 110/636 (candidate 628) | b | 182/203 aligned with `top = sourceRow + x * 2`; VC6 forms the lower row as `top + sourceStride` in edx where retail biases it to the alpha byte (+3) and spills it |
 | render/Pixtrans | `0x004ce420` | 280/458 | b | frame 0x10 and the x loop match; VC6 loads `source` into ebp at entry (ebp pushed before the height guard) and forms the next source row in ebp where retail uses eax and copies it at the row head; first pixel's zero extension in ecx (retail edi) |
 | render/Pixtrans | `0x004cee30` | 1121/1125 masked | b | after the keyed x loop retail reloads the source stride before the width |
-| render/Pixtrans | `0x004cf2a0` | 242/1735 | b | draft: format, pixel size and palette in ebx/esi/edi where retail uses edi/ebx/esi; frame 0x50 vs 0x54 |
+| render/Pixtrans | `0x004cf2a0` | 276/1759 (candidate 1745) | b | 534/566 aligned; abs() intrinsic, out-parameter quantize and y-derived row pointers; ebp push placement, y loop pointer setup order and the rotated loop entry differ |
 | render/ResourceManager | `0x004e9030` | 100/804 | b | 5 code diffs, all from retail homing `archive` in the `new` temporary's slot: `mov [esp+0x14], ebx` after the EH state reset and `mov eax, [esp+0x14]` for the success return (the 6 missing bytes) |
 | render/TextService | `0x0050b080` | 530/890 | b | 30 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
 | render/TextService | `0x0050b400` | 398/758 | b | 31 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
