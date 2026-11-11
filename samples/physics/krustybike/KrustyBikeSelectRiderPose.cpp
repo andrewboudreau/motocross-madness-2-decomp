@@ -33,8 +33,21 @@
 // runner, which scores shape only) the casts truncate through __ftol.
 //
 // Shape: retail's ebp frame comes from the inline asm; the frame pragma below keeps it
-// (linked 0.682 -> 0.729).  What remains is the shared clamp exits and the range check's extra
-// instructions per site.
+// (linked 0.682 -> 0.729).  Session 23 (linked masked 0.729 -> 0.789, strict 0.686 -> 0.745):
+//  - KbAtLeast as `x > lo ? x : lo`: retail branches to the shared lower-bound exit
+//    (`fcomp lo; test ah,0x41; jne LO`); KbAtMost's spelling is inert;
+//  - `(t * -0.25f) + 1.0f` keeps retail's `fmul -0.25; fadd 1.0` (unparenthesised, VC6 folds it
+//    to `1.0 - t*0.25`);
+//  - the crossover state machine's case 1 stores poseParam before the state (as case 3 does);
+//  - the smoother step through KbAtMost (`fld time; fld t; fcomp st(1)`);
+//  - steer case 1 written with the state store inside each arm, as retail lays it out.
+// What remains comes from retail's inline asm: retail cross-jumps none of its identical clamp
+// arms (VC6 merges them here, 2312 bytes against 2708), keeps 1 in edi where this body caches
+// the steer axis across the conversion, and stores 32 bits where /QIfist needs the 64-bit
+// store plus the range check.  Ruled out: a `const float&` conversion helper (drops the
+// binary32 store, a behaviour change at 53-bit precision); `1.0f - t * 0.25f`,
+// `1.0f + t * -0.25f`, `-(t * 0.25f) + 1.0f` (all fold); both clamp helpers flipped (same as
+// KbAtLeast alone); `smoothTime > t ? t : smoothTime`.
 #include <float.h>
 
 #include "vehicle/KrustyBike.h"
@@ -42,7 +55,7 @@
 
 static inline float KbAtLeast(float x, float lo)
 {
-    return x <= lo ? lo : x;
+    return x > lo ? x : lo;
 }
 
 static inline float KbAtMost(float x, float hi)
@@ -156,7 +169,7 @@ void KrustyBike::SelectRiderPose(float t)
             change = KbAtLeast(change, smoother->maxFall);
         else
             change = KbAtMost(change, smoother->maxRise);
-        float step = t < smoother->smoothTime ? t : smoother->smoothTime;
+        float step = KbAtMost(t, smoother->smoothTime);
         smoother->smoothRatio = step / smoother->smoothTime;
         *(float*)&smoother->smoothedValue = change * smoother->smoothRatio + *(float*)&smoother->smoothedValue;
         t = *(float*)&smoother->smoothedValue;
@@ -165,11 +178,11 @@ void KrustyBike::SelectRiderPose(float t)
             x = t * -0.25f;
             poseParam = x;
             if (x < 0.0f) {
+                poseParam = 0.5f - x;
                 steerPoseState = 3;
-                poseParam = 0.5f - x;
             } else if (x > 0.225f) {
-                steerPoseState = 2;
                 poseParam = 0.5f - x;
+                steerPoseState = 2;
             }
             break;
         case 2:
@@ -190,7 +203,7 @@ void KrustyBike::SelectRiderPose(float t)
             }
             break;
         case 4:
-            x = t * -0.25f + 1.0f;
+            x = (t * -0.25f) + 1.0f;
             poseParam = x;
             if (x > 1.0f) {
                 poseParam = x - 1.0f;
@@ -202,15 +215,23 @@ void KrustyBike::SelectRiderPose(float t)
         switch (steerPoseState) {
         case 1:
             if (controlInput.x < 0.0f) {
-                if (controlInput.x < -0.9f)
+                if (controlInput.x < -0.9f) {
                     steerPoseState = 2;
-                x = controlInput.x * -0.25f;
-                poseParam = KbRange(x, 0.0f, 0.25f);
+                    x = controlInput.x * -0.25f;
+                    poseParam = KbRange(x, 0.0f, 0.25f);
+                } else {
+                    x = controlInput.x * -0.25f;
+                    poseParam = KbRange(x, 0.0f, 0.25f);
+                }
             } else {
-                if (controlInput.x > 0.9f)
+                if (controlInput.x > 0.9f) {
                     steerPoseState = 4;
-                x = controlInput.x * 0.25f + 0.5f;
-                poseParam = KbRange(x, 0.5f, 0.75f);
+                    x = controlInput.x * 0.25f + 0.5f;
+                    poseParam = KbRange(x, 0.5f, 0.75f);
+                } else {
+                    x = controlInput.x * 0.25f + 0.5f;
+                    poseParam = KbRange(x, 0.5f, 0.75f);
+                }
             }
             break;
         case 2:
@@ -241,7 +262,7 @@ void KrustyBike::SelectRiderPose(float t)
         case 4:
             if (controlInput.x < prevControlInput.x) {
                 steerPoseState = 5;
-                x = controlInput.x * -0.25f + 1.0f;
+                x = (controlInput.x * -0.25f) + 1.0f;
                 poseParam = KbRange(x, 0.75f, 1.0f);
             } else {
                 x = controlInput.x * 0.25f + 0.5f;
@@ -259,7 +280,7 @@ void KrustyBike::SelectRiderPose(float t)
                     poseParam = KbRange(x, 0.0f, 0.25f);
                 }
             } else {
-                x = controlInput.x * -0.25f + 1.0f;
+                x = (controlInput.x * -0.25f) + 1.0f;
                 poseParam = KbRange(x, 0.75f, 1.0f);
             }
             break;
