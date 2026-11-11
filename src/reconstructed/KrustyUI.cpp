@@ -846,7 +846,7 @@ int KrustyUI::ResolveBikeFile(const char* name, char* text, int size) {
     UNKNOWN_COPY_SIZED(text, name, size);
     if (g_ResourceManager->FindItem(name, 1))
         return 1;
-    if (!strchr(name, '\\')) {
+    if (!strrchr(name, '\\')) {
         sprintf(path, "%s\\%s", "Res", name);
     } else {
         int length = strlen(name);
@@ -876,7 +876,7 @@ int KrustyUI::ResolveRiderFile(const char* name, char* text, int size) {
     UNKNOWN_COPY_SIZED(text, name, size);
     if (g_ResourceManager->FindItem(name, 1))
         return 1;
-    if (!strchr(name, '\\')) {
+    if (!strrchr(name, '\\')) {
         sprintf(path, "%s\\%s", "Res", name);
     } else {
         int length = strlen(name);

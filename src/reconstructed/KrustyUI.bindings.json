@@ -214,7 +214,7 @@
   "_rand": "0x00534c1b",
   "_sprintf": "0x00534aaf",
   "_srand": "0x00534c0e",
-  "_strchr": "0x00534a60",
+  "_strrchr": "0x00534a60",
   "_strncpy": "0x00534b10",
   "?g_BikeClassEngineSizes@@3PAHA": "0x0056cb6c",
   "__real@4@3ffccccccd0000000000": "0x005507b4",
