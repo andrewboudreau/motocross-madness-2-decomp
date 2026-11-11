@@ -11,6 +11,7 @@
 // that header's statics once, so Shock/InlineShock/RotatingShock belong to a different
 // translation unit (no __FILE__ string of its own): src/krusty2/suspension/Shock.cpp.
 #include "gravity/SelectiveGravityModel.h"
+#include "math/Math3D.h"   // Vec3 operators and the per-TU constant vectors (0x00689e08..0x00689e40)
 #include "core/DebugAlloc.h"
 
 // 0x004f9760

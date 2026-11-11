@@ -13,8 +13,12 @@
 #ifndef SELECTIVE_GRAVITY_MODEL_H
 #define SELECTIVE_GRAVITY_MODEL_H
 
-#include "core/GameObject.h"
-#include "math/Math3D.h"   // Vec3 and the per-TU constant vectors (0x00689e08..0x00689e40)
+// Relative includes: Wrecker.h (src/reconstructed) includes this header for the model
+// Wrecker creates at +0x3c, and Wrecker.cpp is compiled without src/krusty2 on the path.
+// math/Math3D.h is included by SelectiveGravityModel.cpp, not here: its per-TU constant
+// vectors would clash with the Vector3 set wrecker.cpp defines for itself.
+#include "../core/GameObject.h"
+#include "../math/Vec3.h"
 
 // The rigid body the model pushes on, as seen through its vtable.  Slots 0..26 are the
 // GameObject ones; slots 27..36 are placeholders and slot 37 is AddWorldForce (the PhysicsBody
