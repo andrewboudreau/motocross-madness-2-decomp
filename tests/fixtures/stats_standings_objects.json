@@ -2,9 +2,9 @@
   "baseline_commit": "22979f9e",
   "scope": "Only two DrawStandings iterator references change; same-path full-object proof in live-extraction.json. No filename exclusions.",
   "canonical": {
-    "sections": 210,
-    "relocations": 869,
-    "sha256": "8b00375f77da08da58b2b34d37332eaf56d0046d513c65a494484b74ca3ce707"
+    "sections": 215,
+    "relocations": 920,
+    "sha256": "a53785ff09749a8c45791313d92f64a72891431aca934869ce48be0129ae06ff"
   },
   "aggregate_before": {
     "sections": 37,
@@ -12,9 +12,9 @@
     "sha256": "3d1651fd1daa40bb9cd96170f11279b8e3181c640b427022170aeec2f3a9dffb"
   },
   "aggregate": {
-    "sections": 37,
-    "relocations": 162,
-    "sha256": "783467ae9f4890e1d47af630972251037e79e9322d116a5206c0462477bb1211"
+    "sections": 27,
+    "relocations": 111,
+    "sha256": "16f95b19ea71fac97f3b44b45105f4f34b675d0a7604c85f5f822d8cb69a7072"
   },
   "candidate": {
     "sections": 5,

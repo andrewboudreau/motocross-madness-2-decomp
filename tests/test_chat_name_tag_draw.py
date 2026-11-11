@@ -259,7 +259,7 @@ class ChatNameTagTests(unittest.TestCase):
             result=subprocess.run([str(executable),str(image_path)],cwd=ROOT,capture_output=True,text=True,timeout=180)
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             self.assertIn('NameTagDraw: 5864 scenarios match, actual sprintf and scripted GDI; 64 AV, 8 throws',result.stdout)
-            self.assertEqual(strict,94)
+            self.assertEqual(strict,95)
             print(f'NameTagDraw: {strict} game strict + 1 CRT strict;244 sections/1025 relocations; '+result.stdout.strip())
 
 

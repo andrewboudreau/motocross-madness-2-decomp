@@ -1,14 +1,14 @@
 {
   "baseline_commit": "ed3d06ce",
   "canonical": {
-    "sections": 210,
-    "relocations": 869,
-    "sha256": "8b00375f77da08da58b2b34d37332eaf56d0046d513c65a494484b74ca3ce707"
+    "sections": 215,
+    "relocations": 920,
+    "sha256": "a53785ff09749a8c45791313d92f64a72891431aca934869ce48be0129ae06ff"
   },
   "aggregate": {
-    "sections": 37,
-    "relocations": 162,
-    "sha256": "783467ae9f4890e1d47af630972251037e79e9322d116a5206c0462477bb1211"
+    "sections": 27,
+    "relocations": 111,
+    "sha256": "16f95b19ea71fac97f3b44b45105f4f34b675d0a7604c85f5f822d8cb69a7072"
   },
   "baseline": "Published ed3d06ce source baseline; round50 flag exposure is documented separately. Round51 StatsOverlay::DrawStandings extraction: the published old aggregate pin was independently reproduced; all 37 sections and 162 relocations preserve exactly under only its two iterator-call targets (function offsets 172 and 220) joining existing BikeRace::NextBike. Other aggregate functions and the canonical TrackOverlay record are unchanged."
 }

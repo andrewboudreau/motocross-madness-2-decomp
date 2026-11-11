@@ -182,7 +182,9 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
             # The actual frozen PCCamera emits one strict implicit destructor COMDAT.
             # QueryGround's retail dead smooth-normal store adds one Terrain section
             # and twelve relocations.
-            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 1031)
+            # ChatOverlay::Setup moves from the TrackOverlay sample into the canonical
+            # object (five sections into it, ten out of the sample).
+            self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 1026)
             # The corrected camera loader adds its explicit first-cross call relocation.
             # QueryGround's emulation-found normal/height repairs drop one Terrain relocation.
             # The D3DIMSoultreeShadow slot 30 frame pragma takes ebp, so the shadow-point
