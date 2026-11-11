@@ -22,6 +22,14 @@
 // the multiplier (>= 1), and the multiplier is a trick count plus 0.5, so both
 // results stay inside int, where the 64-bit store equals retail's 32-bit one.
 // The rest of the gap is retail's EBP frame from the asm helper.
+// Session 23 (ShowValue 0.69 -> 0.84 masked): the show helper inline with a reference
+// parameter (retail computes the slot address once and reloads the model after each call;
+// a non-inline static stayed out of line), places as one conditional, resize declared at
+// NextKey (retail zeroes ebx there), and eyeToFrame through a reference squared in
+// Normalize's order z*z + (x*x + y*y) (same sum as before). Ruled out: copying a file-local
+// zero vector (0.834, retail's 0x0067c308 belongs to Krusty3DObjects.cpp), scaling through
+// the reference (0.816), the y,x,z and x,y,z sum orders (0.816). Remaining: the asm fistp
+// helper, and retail's places = 5 block placed at the function end.
 #include "../reconstructed/Krusty3DObjects.h"
 #include "../../samples/common/FistpFloatToInt.h"
 
@@ -39,7 +47,7 @@ struct KbScoreBoard {
 // frame pointer for it and its helper, which retail expands inside it
 // (docs/GAME_BUILD.md#frame-pointer-units).
 #pragma optimize("y", off)
-static void Group4Ovl_ShowModel(BonusObjectManager* self, D3DIMSoultreeObject* model)
+static inline void Group4Ovl_ShowModel(BonusObjectManager* self, D3DIMSoultreeObject*& model)
 {
     model->ClearFlag14c();
     model->subtreeDirty = 1;
@@ -57,7 +65,7 @@ void KbScoreBoard::ShowValue(float points, float multiplier)
     BonusObjectManager* self = reinterpret_cast<BonusObjectManager*>(this);
     int place;
     self->HideDigits();
-    int places = points < 10000.0f ? 4 : 5;
+    int places = points >= 10000.0f ? 5 : 4;
     self->shownDigits[4] = -1;
     int remaining;
     FistpFloatToInt(&remaining, points);
@@ -72,7 +80,6 @@ void KbScoreBoard::ShowValue(float points, float multiplier)
         self->shownDigits[place] = digit;
         remaining /= 10;
     }
-    int resize = 0;
     if (multiplier >= 1.05f) {
         int tenths;
         FistpFloatToInt(&tenths, multiplier * 10.0f);
@@ -85,6 +92,7 @@ void KbScoreBoard::ShowValue(float points, float multiplier)
         Group4Ovl_ShowModel(self, self->timesModel);
         Group4Ovl_ShowModel(self, self->decimalPointModel);
     }
+    int resize = 0;
     self->NextKey();
     Vec3 position;
     reinterpret_cast<SoultreeObject*>(self->raceView->localRacer->modelNode)->GetPosition(&position);
@@ -96,14 +104,15 @@ void KbScoreBoard::ShowValue(float points, float multiplier)
     delta.x = position.x - self->camera->eyePosition.x;
     delta.y = position.y - self->camera->eyePosition.y;
     delta.z = position.z - self->camera->eyePosition.z;
-    self->eyeToFrame = delta;
-    float lengthSquared = self->eyeToFrame.x * self->eyeToFrame.x + self->eyeToFrame.y * self->eyeToFrame.y
-                        + self->eyeToFrame.z * self->eyeToFrame.z;
+    Vector3& v = self->eyeToFrame;
+    v = delta;
+    // Krusty3DObjects.cpp's Normalize order (z first, then x and y).
+    float lengthSquared = v.z * v.z + (v.x * v.x + v.y * v.y);
     if (lengthSquared == 0.0f) {
-        // 0x0067c308: the shared zero vector.
-        self->eyeToFrame.x = 0.0f;
-        self->eyeToFrame.y = 0.0f;
-        self->eyeToFrame.z = 0.0f;
+        // Retail copies Krusty3DObjects.cpp's zero vector (0x0067c308).
+        v.x = 0.0f;
+        v.y = 0.0f;
+        v.z = 0.0f;
         self->cameraDistance = 0.0f;
         self->isResizePending = 0;
         return;
