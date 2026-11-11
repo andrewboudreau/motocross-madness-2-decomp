@@ -1068,9 +1068,9 @@ or when only its low bits are kept. `FistpFloatToIntChecked` casts to
 |---|---|---|---|---|---|
 | 0x0048d1e0 | `KbScoreBoard::ShowValue` | `Group4_ScoreBoard.cpp` | plain; small scores | 0.485 | 0.615 |
 | 0x0049e4a0 | `GridVertexSink::LightVertices` | `Group4_GridLighting.cpp` | plain; colour bytes times facing values | 0.458 | 0.745 |
-| 0x0049e6b0 | `LightAny` worker | same | same | 0.209 | 0.236 |
-| 0x0049f1c0 | `LightOne` worker | same | same | 0.168 | 0.240 |
-| 0x0049f8d0 | `LightAmbientPlusOne` worker | same | same | 0.206 | 0.213 |
+| 0x0049e6b0 | `LightAny` worker | same | same | 0.209 | 0.774 |
+| 0x0049f1c0 | `LightOne` worker | same | same | 0.168 | 0.705 |
+| 0x0049f8d0 | `LightAmbientPlusOne` worker | same | same | 0.206 | 0.714 |
 | 0x004a9050 | `Character::Method_0x004a9050` | `CharacterMotionFourPose.cpp` (sample, `/QIfist /Op`) | plain; frame index | 0.103 | 0.727 |
 | 0x004bac60 | `ParticleManager::Render3D` | `Group1_ParticleRender.cpp` | plain; only the low byte is kept | 0.608 | 0.655 |
 | 0x004eab00 | `Scene::Tick` | `Group4_SceneTick.cpp` | plain; [-0.5, count - 0.5) | 0.637 | 0.686 |
@@ -1110,6 +1110,57 @@ intermediate in an 80-bit register where retail rounds it to binary32. The
 four-pose blend lost last-bit pose agreement this way (204 of 600 emulated
 cases) until it was compiled with `/Op`; the other sites have not been
 differentially tested for it.
+
+### Grid lighting workers
+
+The three workers in `Group4_GridLighting.cpp` were rewritten from the
+retail disassembly on 2026-11-11 (masked linked scores 0.236, 0.240 and
+0.213 before; the table gives the scores after). They are unbound, so they
+were scored against their retail VAs as above.
+
+- Retail's out-of-line calls are kept: `Vec3TransformNormal` (0x0042a450)
+  and the unary minus (0x0049f180) for directional lights in `LightAny` and
+  `LightOne`; `Vec3Dot` (0x0040ae30), `FastInvSqrt` (0x00460c00) and
+  `Vec3Scale` (0x005015b0) or the `Vector3` constructor (0x00404e60) for the
+  normalisations. The workers take `const Matrix4*`, and a link alias maps the
+  `Vector3` view of `Vec3TransformNormal` to the canonical `Vec3` symbol.
+- The inverse translation, point transform, rotation and dot products use
+  retail's fadd groupings, which differ per worker. They are written with
+  parentheses in the source. These sums round differently in the last bit;
+  at Direct3D's 24-bit precision that can move a colour byte.
+- `LightAmbientPlusOne` has one vertex loop per light type and takes both
+  lights' colours where the search finds the ambient light, as retail does.
+- The facing value is stored as binary32 before the colour multiplies
+  (`Group4Vis_Binary32`). Retail's inline-asm helper forces that value to
+  memory (`fst [facing]`); under `/QIfist` VC6 would keep the unrounded
+  register value. That changes exact ties by one, for example a 0.6/0.8 axis
+  normal at 53-bit precision.
+- `Group4Vis_Dot` and `Group4Vis_TransformPointAny` are `__forceinline`.
+  `LightAny` expands them at every site, but its later sites fall outside
+  VC6's inline budget.
+
+Differential check: the scratch emulator ran the linked objects and retail's
+bytes for `LightVertices` on random scenes. The scenes covered 0 to 5 lights
+of each type, rigid and non-rigid matrices, axis normals, strides 0xc, 0x10
+and 0x20, and both the colour-array and no-colour-array paths. Each scene ran
+at control words 0x27f and 0x7f.
+
+| Variant | Runs | Colour mismatches |
+|---|---:|---:|
+| Committed source | 6000 | 0 |
+| Without the binary32 store | 3000 | 12 |
+| With `/Op` | not counted | 253 |
+
+The binary32 store fixed the ties. `/Op` is therefore not needed. It rounds
+the intermediates of `LightVertices`' modulation, which retail keeps in
+registers.
+
+The remaining codegen gap is mostly the frame. Retail's asm blocks force an
+EBP frame, and `/QIfist` code uses ESP addressing. With `/Oy-` added,
+`match_one` aligned instructions for `LightAny`, `LightOne`,
+`LightAmbientPlusOne` and `LightVertices` rise from 252, 166, 188 and 80 to
+512, 368, 405 and 113 (of 728, 581, 697 and 167). `bringup_flags` admits
+only `/QIfist`, so this was not adopted.
 
 ## Rider pose selection rounding
 

@@ -85,6 +85,7 @@
     "?SetAxesPtr@CarProceduralNode@@QAEXPBUVector3@@0HH@Z": "?SetAxesPtr@SoultreeObject@@QAEXPBUVec3@@0HH@Z",
     "?UnknownFunction464e80@MorphBastardModifier@@QAEXH@Z": "?UnknownFunction464e80@StatsOverlay@@QAEXH@Z",
     "?Vec3Dot@@YAMPBUVector3@@0@Z": "?Vec3DotCall@@YAMPBUVec3@@0@Z",
+    "?Vec3TransformNormal@@YAXPAUVector3@@U1@PBUMatrix4@@@Z": "?Vec3TransformNormal@@YAXPAUVec3@@U1@PBUMatrix4@@@Z",
     "?CrossProduct@@YA?AUVector3@@PBU1@0@Z": "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z",
     "?AxisAngleMatrix@@YAXPAUMatrix4@@MMMM@Z": "?AxisAngleMatrix@@YAXPAUTreeMatrix4@@MMMM@Z",
     "??0MbVector3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",
@@ -643,7 +644,7 @@
       "extra_flags": [
         "/QIfist"
       ],
-      "reason": "LightVertices 0x0049e4a0 and its three workers round light terms with retail's inline fistp helper. The truncating light-colour casts live in Group4_GridLightColor.cpp, compiled without the flag; the terms are colour bytes times facing values and stay in int range.",
+      "reason": "LightVertices 0x0049e4a0 and its three workers round light terms with retail's inline fistp helper. The truncating light-colour casts live in Group4_GridLightColor.cpp, compiled without the flag; the terms are colour bytes times facing values and stay in int range. The facing values are stored as binary32 first, as retail spills them around its asm blocks; differential emulation against retail found no colour difference in 6000 runs at 53- and 24-bit precision.",
       "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
     },
     {

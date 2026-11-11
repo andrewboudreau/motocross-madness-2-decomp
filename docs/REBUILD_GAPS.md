@@ -396,7 +396,7 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 | `0x0048d1e0` | 2 | `src/bringup/Group4_ScoreBoard.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
 | `0x0048d780` | 1 | `samples/physics/bikeai/KrustyBikeTrickPick.cpp` (`/QIfist`) | `FistpFloatToInt` |
 | `0x0048e3e0` | 3 | `samples/physics/krustybike/KrustyBikeSelectRiderPose.cpp` (`/QIfist`) | `FistpFloatToIntChecked` (the steer value is unbounded) |
-| `0x0049e4a0`, `0x0049e6b0`, `0x0049f1c0`, `0x0049f8d0` | 3, 9, 9, 9 | `src/bringup/Group4_GridLighting.cpp` (`/QIfist` bring-up) | `FistpFloatToInt`; the light colours stay truncating casts, as retail's `__ftol`, in `Group4_GridLightColor.cpp` (no `/QIfist`) |
+| `0x0049e4a0`, `0x0049e6b0`, `0x0049f1c0`, `0x0049f8d0` | 3, 9, 9, 9 | `src/bringup/Group4_GridLighting.cpp` (`/QIfist` bring-up) | `FistpFloatToInt`; the light colours stay truncating casts, as retail's `__ftol`, in `Group4_GridLightColor.cpp` (no `/QIfist`); the facing value is stored as binary32 first, as retail's asm spill does (see [GAME_BUILD.md](GAME_BUILD.md#grid-lighting-workers)) |
 | `0x004a8bf0`, `0x004a8c50` | 1, 2 | `samples/physics/motion/CharacterMotionStart.cpp`, `CharacterMotionBlend.cpp` | `FloatToInt` (`CharacterMotionFloatToInt.h`) |
 | `0x004a9050` | 4 | `samples/physics/motion/CharacterMotionFourPose.cpp` (`/QIfist /Op`) | `FistpFloatToInt` |
 | `0x004bac60` | 2 | `src/bringup/Group1_ParticleRender.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
