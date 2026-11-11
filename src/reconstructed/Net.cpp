@@ -48,8 +48,8 @@ extern "C" const GUID DPSPGUID_SERIAL;                  // 0x005567f0
 extern "C" const GUID DPSPGUID_MODEM;                   // 0x00556800
 extern "C" const GUID DPAID_INet;                       // 0x00556940
 extern "C" const GUID DPAID_ServiceProvider;            // 0x005568e0
-extern "C" const GUID DPAID_Modem;                      // 0x00556900
-extern "C" const GUID DPAID_Phone;                      // 0x00556920
+extern "C" const GUID DPAID_Modem;                      // 0x00556920
+extern "C" const GUID DPAID_Phone;                      // 0x00556900
 extern "C" const GUID DPAID_INetPort;                   // 0x00556960
 extern "C" const GUID DPAID_ComPort;                    // 0x00556970
 
@@ -698,12 +698,12 @@ int NetworkInterface::CreateAddress(GUID provider, char* address, char* port,
         elements[0].data = (void*)&DPSPGUID_MODEM;
         count = 1;
         if (strcmp(port, "")) {
-            elements[1].type = DPAID_Phone;
+            elements[1].type = DPAID_Modem;
             elements[1].size = lstrlenA(port) + 1;
             elements[1].data = port;
             count = 2;
         }
-        elements[count].type = DPAID_Modem;
+        elements[count].type = DPAID_Phone;
         elements[count].size = lstrlenA(address) + 1;
         elements[count].data = address;
         count++;
