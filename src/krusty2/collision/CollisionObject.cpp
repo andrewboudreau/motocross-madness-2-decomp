@@ -2000,9 +2000,14 @@ inline CollisionVec3 CollisionScaledProducts(const CollisionVec3& v, float s)
 // Near miss (936/962, same size, frame and registers as retail).  The product order of each
 // inlined rotation follows the leaf age of its matrix operand: the first rotation reads
 // &b->worldTransform directly (retail z, y, x), the scratch loop reads it through xf after
-// xf's first use (retail x, z, y, with its y and z rows grouped x + z first).  Left: the
-// second forward rotation's x row sums x, z, y (retail z, y, x); no term order or grouping
-// of that row fixes it without breaking the loop.
+// xf's first use (retail x, z, y, with its y and z rows grouped x + z first).  The second
+// forward rotation is written out with each row grouped (y + z) + x: retail sums z, y, then
+// x, and through CollisionRotateRowsTo VC6 summed the x row x, z, y, which rounds
+// differently at 24-bit precision (tools/emu_cases/collision_hull_vs_hull.py).  Explicit
+// parentheses in an inline helper cost the inline budget (the last rotation goes out of
+// line); written in place they keep the byte score.  Left: VC6 stores that rotation
+// through edi instead of retail's ebx and swaps the loop's x and z products of the y and z
+// rows (the same sums).
 int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, CollisionSweepQuery* q)
 {
     if (a->swept)
@@ -2010,7 +2015,10 @@ int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, Coll
 
     CollisionRotateRowsTo(&q->contactOffset, q->contactOffset, &b->worldTransform);
     const Matrix4* xf = &b->worldTransform;
-    CollisionRotateRowsTo(&q->contactNormal, q->contactNormal, xf);
+    CollisionVec3 n = q->contactNormal;
+    q->contactNormal.x = (n.y * xf->m[0][1] + n.z * xf->m[0][2]) + n.x * xf->m[0][0];
+    q->contactNormal.y = (n.y * xf->m[1][1] + n.z * xf->m[1][2]) + n.x * xf->m[1][0];
+    q->contactNormal.z = (n.y * xf->m[2][1] + n.z * xf->m[2][2]) + n.x * xf->m[2][0];
     CollisionVec3 zero;
     zero.x = 0.0f;
     zero.y = 0.0f;
