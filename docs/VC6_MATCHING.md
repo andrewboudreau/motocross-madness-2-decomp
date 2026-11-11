@@ -102,6 +102,71 @@ The physics samples (`tools/run_physics_samples.py`) independently show the
 same split: 139/194 targets match without `/G6` versus 76/194 with it, and none
 match only under `/G6`.
 
+### Per-unit optimisation flags
+
+No per-unit `/Oa`, `/Ow` or `/Op` is supported (2026-11-11). `/Oa` or `/Ow` cut
+the aligned instruction diffs of three near misses, but every flag set that helps
+breaks exact functions of the same unit. `tools/unit_flag_matrix.py` scores every
+calibration, targets.json and bindings-only function of a source under each flag
+set. Cells give normalised instruction diffs and strict bytes for the near miss,
+and exact functions kept for the canonical unit:
+
+| Unit (exact under `vc6_o2_mt`) | Near miss | base | `/Oa` | `/Ow` | `/Op` |
+|---|---|---|---|---|---|
+| GR_BitString.cpp (9) | `0x00423b70` | 41/387, 9/9 | 10/204, 5/9 | 10/204, 5/9 | 41/387, 9/9 |
+| FileStream.cpp (13) | Seek `0x00461340` | 57/343, 13/13 | 15/265, 8/13 | 57/343, 11/13 | 57/343, 13/13 |
+| Wrecker.cpp (31) | `0x005329e0` | 1/1200, 31/31 | 37/95, 17/31 | 1/1200, 22/31 | 94/55, 18/31 |
+
+The mirror shift `0x004239c0` goes from 21 to 85 diffs under `/Oa` or `/Ow`.
+Wrecker's lead gain (189 -> 161) is in the unmasked frame-displacement count of
+`tools/rank_near_misses.py`; normalised, the function goes from 1 diff to 37.
+Combining `/Oa` or `/Ow` with `/QIfist`, `/Op`, `/Ob1`, `/Ob2`, `/Ox`, `/G6` or `/Gy`,
+or replacing `/O2` with `/Ox`, kept no unit whole. `/Oa /Ow` always scored as `/Ow`.
+
+The retail bytes rule out the alias flags directly. `0x00423c45` reloads
+`g_WordHighBitMasks[count]` after the store through `dst` at `0x00423c43`.
+`/Oa` and `/Ow` both drop that reload. Seek reloads the handle at `[esi + 0x14]`
+(`0x00461448`) after the call at `0x00461436`, which `/Oa` keeps in a register.
+These are confirmed instruction facts; that they rule out the flag is a strong
+inference, since VC6 does not rematerialise a load it may keep. The other
+differences are register allocation, so they are source-shape work.
+
+Whole-tree checks, with the flag appended to `vc6_o2_mt` (temporary profiles for
+the two runners):
+
+| Flag | calibration exact pairs | physics strict | units losing an exact function | functions gaining exact |
+|---|---:|---:|---:|---:|
+| none | 3000/3009 | 1084/1152 | - | - |
+| `/Oa` | 2137 | 798 | 159 of 226 | 0 |
+| `/Ow` | 2433 | 883 | 143 of 226 | 0 |
+| `/Op` | 2539 | 738 | 136 of 226 | 0 |
+
+The near-miss scan (`MCM2_EXTRA_FLAGS` of `rank_near_misses.py`, 192 rows) closed
+no row. `/Oa`: 8 better, 144 worse; `/Ow`: 3 better, 115 worse; `/Op`: 6 better,
+116 worse. The gains do not cluster by address. Each improved row has worse rows
+or lost exact functions in its own range. Terrain and MorphBastardModifier counts
+below are the scan's unmasked diffs; the others are normalised:
+
+- `/Oa`: 0x00423b70 (0x004239c0 worse), Seek (0x00460db0, 0x00461640 and 0x004618e0 worse).
+- `/Oa`: Terrain QueryGround 0x00507c10, 1340 -> 946 at 3544 bytes against retail's 2963
+  (0x005059d0 15 -> 180, 0x00508bc0 18 -> 379).
+- `/Oa`: SoultreeMatrix 0x004fb8c0 28 -> 18, inside soultree.cpp, which loses 23 of 65.
+- `/Oa` and `/Ow`: the four-pose blend 0x004a9050 254 -> 237, in Motnctrl.cpp's range,
+  which loses 21 (`/Oa`) and 12 (`/Ow`) of 42.
+- `/Ow`: ProjectedShadow 0x004dc2b0 79 -> 57 (0x004dbd30 256 -> 393; ProjectedShadow.cpp loses one).
+- `/Op`: MorphBastardModifier 0x004a3c80 946 -> 776 (0x004a33b0 76 -> 440).
+
+Only units with no flag-sensitive exact function stay open (67 for `/Oa`), and
+nothing there favours a flag. Ruling a flag out assumes each exact function's
+source is the original shape. That is strong, not proof.
+
+```bash
+export MSYS_NO_PATHCONV=1   # Git Bash: keep / flags
+python tools/unit_flag_matrix.py src/reconstructed/FileStream.cpp samples/io/FileStream.cpp --flags "/Oa" --flags "/Ow"
+python tools/unit_flag_matrix.py --all --json work/unit-flags.json
+MCM2_EXTRA_FLAGS=/Oa python tools/rank_near_misses.py --json work/rank-oa.json --work work/rank-oa
+```
+
 ## BaseObject
 
 Canonical source is `src/reconstructed/BaseObject.cpp` and `.h`. All six bodies

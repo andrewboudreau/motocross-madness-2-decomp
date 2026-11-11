@@ -138,6 +138,10 @@ TextService `0x0050ba00` and the FollowCamera constructor `0x00462ee0` are uncha
 with `/G3`, `/G4`, `/G5`, `/Ox` or `/Ob2`, and unchanged or worse with `/Oy-`, `/Op`,
 `/QIfist`, `/Oa` or `/Ow`; `/G6` is worse (`0x00456890` 356 -> 260). In Git Bash set
 `MSYS_NO_PATHCONV=1`, or the `/` flags are rewritten into paths and silently ignored.
+`/Oa` and `/Ow` cut the instruction diffs of GR_BitString `0x00423b70` and FileStream Seek
+`0x00461340`. They are not per-unit flags. Both break exact functions of the same unit,
+and `0x00423b70` reloads a mask after a pointer store, a load both flags drop. See
+[per-unit optimisation flags](VC6_MATCHING.md#per-unit-optimisation-flags).
 KrustyBike's constructor `0x0048fa60` (class c, 472/532) is exact too, in
 src/krusty2/vehicle/KrustyBike.cpp: VC6 fills the load delay of a struct copy with the two
 stores that sit a fixed number of statements before the end of the block, not the next
