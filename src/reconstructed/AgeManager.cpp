@@ -76,8 +76,11 @@ int AgeManager::TotalSize(int* stale) {
     return totalBytes;
 }
 
-// 0x00401180: qsort comparator, most recently used first.
-static int CompareByRecentUse(const void* a, const void* b) {
+// 0x00401180: qsort comparator, most recently used first. Not `static`: VC6
+// defers a static function until after its first caller (it would follow
+// EvictStale), while retail has it before EvictStale, in source order
+// (docs/UNIT_LAYOUT.md).
+int CompareByRecentUse(const void* a, const void* b) {
     int delta = (*(AgeEntry**)b)->age - (*(AgeEntry**)a)->age;
     if (delta < 0)
         return -1;

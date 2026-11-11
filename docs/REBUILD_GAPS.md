@@ -471,7 +471,8 @@ On main c31da12a (2026-11-11) the tool scores 2,683 functions (1,122,001 bytes);
 4. **Unit layout**: whole-object matching per retail unit (function order,
    COMDAT and `.text$x` placement), merging the `src/` files that do not fit
    the alphabetical link order into their owning units, and naming the units
-   between known extents.
+   between known extents. See [UNIT_LAYOUT.md](UNIT_LAYOUT.md): five units
+   already lay out byte-identically with `tools/unit_layout.py`.
 5. **Inline assembly**: decide on the functions above.
 6. **Libraries**: LIBCMT is pinned; the 5,813 unlabeled LIBCMT-span bytes
    still need member identification, the 2,722-byte x87 block at
