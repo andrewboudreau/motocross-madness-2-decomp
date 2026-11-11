@@ -9,11 +9,11 @@ vertex) and axis-aligned triangles give zero cross products. The axes are writte
 unit's static s_axes (0x00578f50), which both bodies share; CrossProduct, DotProduct, the
 normalisation and the vector operators run as retail code.
 
-Known open difference: about 1 in 300 boundary cases at 0x027f only (none at 0x007f), a
-1-ulp contact flip at axis 4. Decoded: retail keeps `p2 = p0 - Dot(e1)` on the x87 stack
-and compares it unrounded in the first QueryMin, where VC6 here stores and rounds it; that
-this is the cause of the flip is inference. Inline p1, an if-form min, assignment in the
-call and max before min left it unchanged. The test runs this case at n=60 (0 seen).
+Fixed difference: a 1-ulp contact flip at 53-bit precision only (2 of 2250 runs at -n 1500,
+0x027f; none at 0x007f). Retail keeps `p2 = p0 - Dot(e1)` on the x87 stack and compares it
+unrounded in the first min/max; a named `float p2` was stored and rounded to binary32. The
+QueryMinBFirst/QueryMaxBFirst expressions give retail's order: 0 of 2250 at both control
+words. The old shape shows the flip only at large n, so the test runs this case at n=60.
 """
 from tools.emu_cases.segment_triangle_query import (
     STATIC_BINDINGS, apply, matrix, retail_flip, rotation, triangle, unit, write_matrix,

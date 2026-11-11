@@ -95,7 +95,7 @@ CLEAN_CASES = {
     'collision_update_model_bounds': 60,
     'collision_segment_touches_object': 60,
     'box_capsule_overlap': 30,
-    # One open 1-ulp boundary flip at 53-bit (about 1 in 300, see the case); 0 at this size.
+    # The 53-bit 1-ulp boundary flip is fixed (see the case); the old shape needs n >= 600.
     'box_triangle_query': 60,
     'tree_tree_query': 60,
     'quadtree_insert': 100,

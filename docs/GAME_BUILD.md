@@ -1189,6 +1189,7 @@ run as retail code; only calls with side effects outside the function
 | 0x00414370 | `KrustyBike::Fn_00414370` (AI racing line) | 1000 | 114 of 1000 | outside free roam retail reads the trick delay from the difficulty's frame slot; an anonymous union says so | 0.899 |
 | 0x0048eea0 | `KrustyBike::UpdateRiderPose` | 1500 | 28 of 1500 | retail indexes the 16-entry `s_kbTrickFrame` (0x0056d060) with chained tricks (16..31) too and reads the next 16 words of `.data`; the bring-up copy now has 32 entries holding those words ([below](#chained-trick-frame-overread)) | 0.955 |
 | 0x005097d0 | `TerrainShadow` slot 28 | 600 | 0 | latent: the orthographic scale read an unset `fov` that VC6 happened to place in `extent`'s slot; it now reads `extent` (retail `fmul [esp+0x4c]` at 0x00509949) | 0.986 |
+| 0x00426be0 | `BoxTriangleQuery` (sample) | 4500 | 2 of 2250 at 53-bit (0 at 24-bit) | retail keeps `p2 = p0 - Dot(e1)` on the x87 stack (`fsubr ; fst`) and compares p1 against it unrounded; the named `float p2` was stored and rounded to binary32. `QueryMinBFirst`/`QueryMaxBFirst` on `(p0 - d2, p0 - d1)` evaluate and compare in retail's order | 1.000 (0.979 before) |
 
 These agreed with retail in every run at both control words (runs in
 brackets): `SegmentSegmentDistance` 0x0042a640, `BoxCapsuleOverlap`
@@ -1214,10 +1215,14 @@ hull/model pairs and their swept forms 0x00436af0..0x00438550,
 `KrustyBike::IsSpeedGainBelowLimit` 0x004919a0, `Fn_00492AD0` and `Vegetation::GetCollisionObject` 0x004570a0
 (1000 each).
 
-Open: `BoxTriangleQuery` 0x00426be0 flips one contact in about 300 boundary
-cases at 53-bit only (none at 24-bit). Retail keeps `p0 - Dot(e1)` on the x87
-stack where VC6 here stores and rounds it; that this causes the flip is
-inference.
+`BoxTriangleQuery` 0x00426be0 differed only at 53-bit precision, and only in
+boundary cases (the old shape needs about `-n 600` to show it). Retail at
+0x00427505..0x00427561 computes p2 first, `fst`s it to a spare slot and keeps
+it on the x87 stack, so the inner min/max compares p1 against the unrounded p2
+(`fcomp st(1)`). Without that extra precision the two shapes agree, which
+matches 0 differences at 24-bit. The fix keeps every instruction aligned with
+retail and the 0x164 frame; only stack-slot assignment differs (linked strict
+0.676 -> 0.709). The ruled-out source forms are in the sample's header.
 
 Negative controls: the pre-fix shapes of the radar, `PlaceNear`, `FindPlacement`,
 `HullVsHull` (29 of 600), `SegmentTriangleQuery` (20 of 600) and the bike
@@ -1435,6 +1440,7 @@ configured flags.
 | `TerrainShadow.cpp` (sample) | slot 30 0x00509aa0 | pragma | 0.718 -> 0.736 | 0.442 -> 0.450 | 0 / 2000 |
 | `D3DIMSoultreeShadowNearMisses.cpp` (sample) | slot 30 0x00446f40 | pragma | 0.862 -> 0.891 | 0.598 -> 0.665 | 0 / 2000 |
 | `ProjectedShadowNearMisses.cpp` (sample) | TintCasterVertices 0x004dc2b0 | pragma | 0.759 -> 0.774 | 0.330 -> 0.346 | 0 / 2000 |
+| `GridNodeNearMisses.cpp` (sample) | GridNode::IntersectSegment 0x00483d40 (no `/QIfist`: retail keeps four truncating `__ftol` casts) | pragma; then the leaf cell as an index and out->y stored before out->z | 0.832 -> 0.903 -> 0.916 | 0.449 -> 0.493 -> 0.520 | 0 / 3000 (three round-to-nearest control words; at -n 2000 one input faults in both bodies, as before) |
 | `ProjectedShadowNearMisses.cpp` (sample) | RenderShadow 0x004db8c0 (framed in retail) | none: the pragma lowers both scores | 0.738 (0.733 with it) | 0.452 (0.340 with it) | 0 / 2000 |
 | `Group4_Overlay.cpp` | ChatOverlay::Setup 0x0051cf80 (frameless) | no flags, no pragma | 1.000 | 0.964 | n/a |
 
@@ -1632,7 +1638,7 @@ control word.
 |---|---|---|---|---|---|---|
 | 0x00507c10 | `Terrain::QueryGround` (via the `TireWorld` view) | 6000 | two bugs, fixed | 0.864 | 0.899 | 1009 → 995 / 970 |
 | 0x00435830 | `CollisionObject::SetTransform` | 3000 | none | 0.833 | 0.833 | 513 / 512 |
-| 0x00483d40 | `GridNode::IntersectSegment` | 6000 | none | 0.832 | 0.832 | 1349 / 1387 |
+| 0x00483d40 | `GridNode::IntersectSegment` | 6000 | none | 0.832 | 0.832 (0.916 with the [frame pragma](#frame-pointer-units)) | 1349 / 1387 (now 1369) |
 
 Coverage and results:
 

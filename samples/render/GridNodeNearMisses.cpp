@@ -13,8 +13,8 @@
 // `const GridNode*` alias were worse) and the order of the shift-derived
 // locals: `mask` and `one` before `cx`/`cz` (12 of the 24 orders are exact).
 //
-// 0x00483d40 (GridNode slot 1, 4140 bytes): strict 68/4140 (masked linked-style 0.812,
-// 1349/1387 insns; was 0.602). Readable reconstruction of the decoded control flow
+// 0x00483d40 (GridNode slot 1, 4140 bytes): linked masked 0.920, strict 0.520
+// (1369/1387 insns; was 0.832/0.449 without the frame pragma, 0.602 before). Readable reconstruction of the decoded control flow
 // (grid-line crossings, merge, child recursion, leaf triangles).
 // Retail has an ebp frame (`sub esp, 0x43c`) and rounds the cell indices with four
 // bare `fistp dword ptr [eax]` (0x4844aa, 0x4844be, 0x484670, 0x484687; the
@@ -43,11 +43,15 @@
 // Ruled out: `twoCells` spelled cellSize + cellSize / * 2 / 2.0f (identical); a
 // GridCopy(dst, src) pointer helper (one strength-reduced pointer instead of the
 // per-member ones retail has); a struct-copy loop (becomes rep movsd); an inline
-// rounding helper (VC6 inlines the long X87FloatToInt body at some sites). `/Oy-`
-// gives retail-like register allocation (0.884 masked) but only fakes the frame and is
-// not adopted. The remaining diffs are the ebp-frame allocation (`this`/p1 reloaded
-// from memory, `fld st(0) ; fcomp`), the fistp sites as calls, and the order of the
-// final out writes.
+// rounding helper (VC6 inlines the long X87FloatToInt body at some sites).
+// Frame: `#pragma optimize("y", off)` on this function alone gives the EBP frame retail's
+// inline-asm helper forces (docs/GAME_BUILD.md#frame-pointer-units; the unit's other
+// functions are unchanged). With it the leaf cell is an index into block->cells (retail
+// addresses `[cells + idx*8 + disp]` per corner; a cell pointer became `lea` + offsets)
+// and out->y is stored before out->z, as retail does (0x484fa4..0x485029).
+// Remaining: retail keeps p1 in its argument slot (`mov edx, [ebp+0xc] ; fld st(0) ;
+// fcomp [edx]`, the asm helper's register cost) and nx/ny in ebx/edi, and its four
+// fistp sites are inline where GridRoundToInt is a call.
 #include "../../src/reconstructed/Griddraw.h"
 #include "../../src/reconstructed/MatrixUtil.h"
 #include "../../src/bringup/X87FloatToInt.h"
@@ -92,7 +96,9 @@ static inline float GridMax(float a, float b)
     return a > b ? a : b;
 }
 
-// 0x00483d40
+// 0x00483d40.  Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 int GridNode::IntersectSegment(const GridVec3* p0, const GridVec3* p1, GridVec3* out, GridNode** outNode,
                                int* outX, int* outZ)
 {
@@ -317,11 +323,11 @@ int GridNode::IntersectSegment(const GridVec3* p0, const GridVec3* p1, GridVec3*
         float cy = (cross[k].y + cross[k + 1].y) / twoCells;
         GridRoundToInt((cross[k].x + cross[k + 1].x) / twoCells - 0.5f, &ix);
         GridRoundToInt(cy - 0.5f, &iy);
-        GridBaseCell* cell = &block->cells[g_gridRow17[iy] + ix];
-        float h00 = GridCornerHeight(this, cell);
-        float h10 = GridCornerHeight(this, cell + 1);
-        float h01 = GridCornerHeight(this, cell + 17);
-        float h11 = GridCornerHeight(this, cell + 18);
+        int cell = g_gridRow17[iy] + ix;
+        float h00 = GridCornerHeight(this, &block->cells[cell]);
+        float h10 = GridCornerHeight(this, &block->cells[cell + 1]);
+        float h01 = GridCornerHeight(this, &block->cells[cell + 17]);
+        float h11 = GridCornerHeight(this, &block->cells[cell + 18]);
         float hmin = GridMin(GridMin(h00, h10), GridMin(h01, h11));
         float hmax = GridMax(GridMax(h00, h10), GridMax(h01, h11));
         if (cross[k].z < hmin && cross[k + 1].z < hmin) {
@@ -411,8 +417,8 @@ found:
         return 0;
     }
     out->x = (float)(gridX << (level * 4)) + hit.x;
-    out->z = hit.z;
     out->y = (float)(gridZ << (level * 4)) + hit.y;
+    out->z = hit.z;
     if (outNode) {
         *outNode = this;
     }
@@ -424,3 +430,4 @@ found:
     }
     return 1;
 }
+#pragma optimize("", on)

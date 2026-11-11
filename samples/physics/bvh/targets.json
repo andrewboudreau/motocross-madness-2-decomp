@@ -46,7 +46,7 @@
     "target_va": "0x00426be0",
     "target_size": 2576,
     "expect": "partial",
-    "notes": "13-axis SAT: helper call pattern matches; cross scheduling, min/max and a 4-byte slot differ (see the file header).",
+    "notes": "13-axis SAT: every instruction and the 0x164 frame match; stack-slot assignment differs (see the file header).",
     "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
   },
   {

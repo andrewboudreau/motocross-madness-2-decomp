@@ -2,20 +2,25 @@
 // (src/krusty2/bvh/BoundingBoxTreeQuery.cpp, 0x00424690..0x0042ad2f).  Names are tier 3.
 //
 // Status (VC6 SP3, vc6_o2_ml; tools/run_physics_samples.py scores):
-// - BoxTriangleQuery 0x00426be0 (2576 bytes, 2572 here, 1673 strict): the 13-axis
-//   box/triangle SAT.  The inline/out-of-line pattern, the jump table and (with the
-//   parenthesised CrossProduct) the cross products of cases 4-12 match.  Left: one operand
-//   pair of the second vertex transform's y row, the frame (0x164 vs 0x160; retail's locals
-//   sit 0x18 higher) and the min/max of the projections: retail keeps p2 on the x87 stack
-//   (`fst` to a spare slot), stores p1 twice (the variable and the first QueryMin's
-//   parameter, which shares the dead d1 slot) and selects with `fcomp st(1); fstp st(0);
-//   fld` instead of loading either operand after the branch.  Tried for the min/max: the
-//   helpers by value, by const reference, as if/return bodies, with swapped comparisons, as
-//   macros, as three-argument inlines (VC6 calls them out of line); QueryMin(p0, ...) and
-//   (p2, p1) argument orders; the min/max split into statements; the two tests split; p1
-//   declared before p2, p1 written as p0 - DotProduct(...), both dots named first, and
-//   local helpers with a result local, an assigned parameter or an inverted test (118 to
-//   123..147 differing instructions).
+// - BoxTriangleQuery 0x00426be0 (2576 bytes, 2576 here; linked masked 1.000, strict 0.709):
+//   the 13-axis box/triangle SAT.  Every instruction aligns with retail, and the frame
+//   (0x164) matches.  Left: stack-slot assignment only (the transformed vertices sit at
+//   esp+0x38.. here, esp+0x50.. in retail, and case 1..3 temporaries differ), so
+//   run_physics_samples' positional byte score is 64% (66% for the 2572-byte shape before).
+//   Edge projections: retail computes p2 = p0 - Dot(e1) first and keeps it on the x87
+//   stack (`fsubr [p0] ; fst [esp+0x80]`), then p1 = p0 - d1 (`fst` twice), and the inner
+//   min/max compares p1 against the unrounded p2 (`fcomp st(1)`).  The old named
+//   `float p2` was stored with `fstp` and reloaded, rounded to binary32, so at 53-bit
+//   precision (FPCW 0x027f) the separating test could flip by one ulp (2 of 2250 runs at
+//   -n 1500; 0 at 24-bit).  QueryMinBFirst/QueryMaxBFirst with (p0 - d2, p0 - d1) give
+//   retail's order: 0 of 2250 at both 0x027f and 0x007f.  Ruled out for this: p1 assigned
+//   inside the call (copy-propagated; the inline budget moves, 2532 bytes); p1 or p2 named
+//   with the other an expression (2528 bytes, or p1 evaluated first); d1 reused as p1; the
+//   min/max split into statements; a p[3] array; the plain QueryMin/QueryMax on
+//   expressions (p1 first, or a reversed test that differs at equality); `a > b ? b : a`
+//   forms; the BFirst helpers for the outer min/max too, or with swapped outer operands
+//   (16..20 differing instructions).  Earlier rounds (by value, by const reference,
+//   if/return bodies, macros, three-argument inlines, other argument orders) are in Git.
 // - TreeTreeQueryNodes 0x004280e0 (2160 bytes, 2228 here): expands the SAT of BoxOverlap
 //   inline with every helper called out of line except QueryAbs, which this source
 //   reproduces through an inline copy of the BoxOverlap body (BoxOverlapInline; BoxOverlap
@@ -219,6 +224,13 @@ int BoxCapsuleOverlap(const Vec3* center, const Vec3* halfExtents, const Vec3* e
     return 1;
 }
 
+// The min/max of the two edge projections in BoxTriangleQuery: the test reads the second
+// operand first.  VC6 expands an inline's arguments left to right, so with (p0 - d2, p0 - d1)
+// the first difference stays on the x87 stack (stored to its CSE slot with fst) while the
+// second is stored and compared against it, unrounded at 53-bit precision, as retail does.
+inline float QueryMinBFirst(float a, float b) { return b < a ? b : a; }
+inline float QueryMaxBFirst(float a, float b) { return b > a ? b : a; }
+
 // 0x00426be0.  Box (center, halfExtents) against a triangle moved by m: the 13-axis
 // separating-axis test (face normal, the box axes, the box axes crossed with two edges and
 // with the normalised third edge).  The third edge is v[2] - v[0] (the same direction as the
@@ -268,10 +280,9 @@ int BoxTriangleQuery(const Vec3* center, const Vec3* halfExtents, const QueryTri
         } else {
             float p0 = DotProduct(offset, s_axes[i]);
             float d1 = DotProduct(e0, s_axes[i]);
-            float p2 = p0 - DotProduct(e1, s_axes[i]);
-            float p1 = p0 - d1;
-            float mn = QueryMin(QueryMin(p1, p2), p0);
-            float mx = QueryMax(QueryMax(p1, p2), p0);
+            float d2 = DotProduct(e1, s_axes[i]);
+            float mn = QueryMin(QueryMinBFirst(p0 - d2, p0 - d1), p0);
+            float mx = QueryMax(QueryMaxBFirst(p0 - d2, p0 - d1), p0);
             if (-boxRadius > mx || boxRadius < mn)
                 return 0;
         }

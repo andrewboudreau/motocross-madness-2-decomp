@@ -132,9 +132,9 @@
       "?BoxTriangleQuery@@",
       4352992,
       2576,
-      2572,
-      1673,
-      "73002e7e8eabfd66af39c869314d4e0d386fc6ca2c37a0b55e41cf3b704f1d8f"
+      2576,
+      1542,
+      "4ea1694c29bb23ab0c1c2f63077c7f893fd8957a3383ff3ea318d6a043f08e73"
     ],
     [
       "samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp",
