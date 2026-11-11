@@ -10,10 +10,18 @@
 // Audited against the retail disassembly on 2026-11-11 for the linked game: no
 // behavioural difference (flag bits, the fild/fidiv remaining-time test, the
 // sequence wrap, RestartEntry's arguments, the random-set swap condition and the
-// fistp pick all agree). The gap is code shape: retail re-reads the entry as
-// animationTable->entries + i * 0x44 after every store (it does not cache the
-// pointer), keeps sequenceLength in a stack byte, and its inline-assembly fistp
-// gives the body an EBP frame.
+// fistp pick all agree). Retail re-reads the entry as animationTable->entries + i * 0x44
+// after every store (no cached entry pointer), keeps sequenceLength in a stack byte, and its
+// inline-assembly fistp gives the body an EBP frame.
+// Session 23 (linked 0.701 -> ~0.93): entries[i] and randomSets[j] written per use; the
+// character advance ("UseBlendedKeys" entries through Character slot 7 0x004a70c0, the others
+// through AdvanceMotion 0x004a6bb0) written out at both sites, as retail expands it (a static
+// helper stayed out of line); the random-set object's isEnabled/Disable/Enable used through
+// the object (a GameObject* local adds a null-checked virtual-base conversion) and the same
+// object advanced afterwards; (rand() * (1 / 32768)) * count parenthesised, as retail
+// multiplies by the constant first (exact either way: the constant is a power of two).
+// Remaining: esi/edi swapped in the random-set loop, the isEnabled address CSE'd into the
+// Disable call, and the fistp helper's pointer argument.
 // Rounding: the game build compiles this unit with /QIfist (config/game_build.json
 // bringup_flags), so FistpFloatToInt's cast is a FISTP under the current rounding
 // mode, as retail's helper at 0x004eadf1; the pick is the unit's only float-to-int
@@ -25,18 +33,6 @@
 #include "../krusty2/motion/D3DIMSoultreeCharacter.h"
 #include "../krusty2/motion/Motnctrl.h"
 #include "../../samples/common/FistpFloatToInt.h"
-
-// Advances an entry's character by dt; "UseBlendedKeys" entries go through
-// Character slot 7 (0x004a70c0), the others through AdvanceMotion (0x004a6bb0).
-static void Group4Scene_AdvanceEntry(UnknownSceneEntry* entry, float dt)
-{
-    Character* character = reinterpret_cast<Character*>(entry->character);
-    if (entry->useBlendedKeys) {
-        entry->motionFrame = character->CharacterVirtualSlot7(dt, 0, 0);
-    } else {
-        entry->motionFrame = character->AdvanceMotion(dt, 0, 0);
-    }
-}
 
 // 0x004eab00
 // Retail's inline-asm fistp helper gives this function an EBP frame; the
@@ -53,52 +49,55 @@ int Scene::Tick(float frameTime)
 
     if (animationTable) {
         for (int i = 0; i < animationTable->entryCount; i++) {
-            UnknownSceneEntry* entry = &animationTable->entries[i];
-            if (!entry->keyFramed) {
+            if (!animationTable->entries[i].keyFramed) {
                 continue;
             }
-            if (holdAnimations && !entry->animatesWhileHeld) {
+            if (holdAnimations && !animationTable->entries[i].animatesWhileHeld) {
                 continue;
             }
-            Character* character = reinterpret_cast<Character*>(entry->character);
-            if (entry->inRandomSet || !entry->automaticSequence) {
+            Character* character = reinterpret_cast<Character*>(animationTable->entries[i].character);
+            if (animationTable->entries[i].inRandomSet || !animationTable->entries[i].automaticSequence) {
                 continue;
             }
 
-            if (entry->sequenceLength) {
+            if (animationTable->entries[i].sequenceLength) {
                 Motion* current = character->currentMotion;
                 if (current) {
                     // Seconds left in the playing motion: blend into the next
                     // motion of the sequence once less than half its
                     // transition time remains.
-                    float remaining = (float)(current->frameCount - entry->motionFrame) / current->fps;
+                    float remaining = (float)(current->frameCount - animationTable->entries[i].motionFrame) / current->fps;
                     if (remaining < current->transitionTime * 0.5f) {
-                        entry->sequenceIndex++;
-                        if (entry->sequenceIndex >= entry->sequenceLength) {
-                            entry->sequenceIndex = 0;
+                        animationTable->entries[i].sequenceIndex++;
+                        if (animationTable->entries[i].sequenceIndex >= animationTable->entries[i].sequenceLength) {
+                            animationTable->entries[i].sequenceIndex = 0;
                         }
-                        entry->currentMotion = entry->motionSequence[entry->sequenceIndex] - 1;
-                        character->BlendToMotion((Motion*)entry->motions[entry->currentMotion],
+                        animationTable->entries[i].currentMotion = animationTable->entries[i].motionSequence[animationTable->entries[i].sequenceIndex] - 1;
+                        character->BlendToMotion((Motion*)animationTable->entries[i].motions[animationTable->entries[i].currentMotion],
                                                  remaining + remaining);
                     }
-                } else if (entry->sequenceLength == 1 &&
-                           !((Motion*)entry->motions[entry->currentMotion])->looping) {
+                } else if (animationTable->entries[i].sequenceLength == 1 &&
+                           !((Motion*)animationTable->entries[i].motions[animationTable->entries[i].currentMotion])->looping) {
                     // A one-motion sequence of a non-looping motion stops.
-                    entry->automaticSequence = 0;
+                    animationTable->entries[i].automaticSequence = 0;
                 } else {
-                    entry->sequenceIndex++;
-                    if (entry->sequenceIndex >= entry->sequenceLength) {
-                        entry->sequenceIndex = 0;
+                    animationTable->entries[i].sequenceIndex++;
+                    if (animationTable->entries[i].sequenceIndex >= animationTable->entries[i].sequenceLength) {
+                        animationTable->entries[i].sequenceIndex = 0;
                     }
-                    entry->currentMotion = entry->motionSequence[entry->sequenceIndex] - 1;
+                    animationTable->entries[i].currentMotion = animationTable->entries[i].motionSequence[animationTable->entries[i].sequenceIndex] - 1;
                     // best guess: retail passes the motion index (converted to
                     // float) as RestartEntry's time argument.
-                    RestartEntry(i, (float)entry->currentMotion, 0, 0);
+                    RestartEntry(i, (float)animationTable->entries[i].currentMotion, 0, 0);
                 }
             } else if (character->motionStopped) {
-                character->SetMotion((Motion*)entry->motions[entry->currentMotion]);
+                character->SetMotion((Motion*)animationTable->entries[i].motions[animationTable->entries[i].currentMotion]);
             }
-            Group4Scene_AdvanceEntry(entry, dt);
+            if (animationTable->entries[i].useBlendedKeys) {
+                animationTable->entries[i].motionFrame = character->CharacterVirtualSlot7(dt, 0, 0);
+            } else {
+                animationTable->entries[i].motionFrame = character->AdvanceMotion(dt, 0, 0);
+            }
         }
 
         if (holdAnimations) {
@@ -106,34 +105,37 @@ int Scene::Tick(float frameTime)
         }
 
         for (int j = 0; j < animationTable->randomSetCount; j++) {
-            UnknownSceneEntry2* set = &animationTable->randomSets[j];
-            int count = set->count;
+            int count = animationTable->randomSets[j].count;
             if (!count) {
                 continue;
             }
-            UnknownSceneEntry* entry = set->entry;
+            UnknownSceneEntry* entry = animationTable->randomSets[j].entry;
             // best guess: retail tests the key-framed bit of entries[j] (the
             // set's index into the entry table), not of the set's entry.
             if (!animationTable->entries[j].keyFramed) {
                 continue;
             }
             UnknownSceneObject* object = entry->character;
-            GameObject* gameObject = object;
-            if (!gameObject->isEnabled || reinterpret_cast<Character*>(object)->motionStopped) {
+            if (!object->isEnabled || reinterpret_cast<Character*>(object)->motionStopped) {
                 // Swap in a random member of the set.
-                gameObject->Disable();
+                object->Disable();
                 // Retail's fistp helper (0x004eadf1): floor() of the scaled rand except at ties.
                 int pick;
-                FistpFloatToInt(&pick, rand() * (1.0f / 32768.0f) * count - 0.5f);
-                entry = &animationTable->entries[set->animationIndices[pick]];
-                entry->currentMotion = set->motionIndices[pick];
+                FistpFloatToInt(&pick, (rand() * (1.0f / 32768.0f)) * count - 0.5f);
+                entry = &animationTable->entries[animationTable->randomSets[j].animationIndices[pick]];
+                entry->currentMotion = animationTable->randomSets[j].motionIndices[pick];
                 object = entry->character;
-                static_cast<GameObject*>(object)->Enable();
+                object->Enable();
                 animationTable->randomSets[j].entry = entry;
                 reinterpret_cast<Character*>(object)->SetMotion(
                     (Motion*)entry->motions[entry->currentMotion]);
             }
-            Group4Scene_AdvanceEntry(entry, dt);
+            Character* character = reinterpret_cast<Character*>(object);
+            if (entry->useBlendedKeys) {
+                entry->motionFrame = character->CharacterVirtualSlot7(dt, 0, 0);
+            } else {
+                entry->motionFrame = character->AdvanceMotion(dt, 0, 0);
+            }
         }
     }
     return GameObject::Tick(dt);
