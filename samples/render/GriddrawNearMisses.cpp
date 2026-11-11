@@ -96,6 +96,19 @@
 // `if (visible)`, `if (visible && corners == 0) ... else if (visible)`, and
 // the size branches swapped (`size <= 1` first) do not move the subdivision
 // block ahead of the tests.
+// Session 25 (masked linked-style 0.675 -> 0.711, strict 143 -> 81/1750):
+// - logic fix: on the size == 16 path with data->b0 set retail loads ebx = 1
+//   (0x481e8a), stores it to count/childMask/changed and then pushes ebx as
+//   the `coarse` argument of every later UpdateLevelOfDetail and recursive
+//   call (0x481eec, 0x4821b5, 0x48225a, 0x482335) without reloading it, so
+//   the walk continues with coarse = 1 there; the source now says so.
+// - the corners test is `if (corners) { loops } else { subdivide }` (retail
+//   falls into the loops and jumps back to the subdivision, 0x482144), the
+//   depth switch sits under its own `if (visible)` after the if/else, and
+//   the parent walk is a do/while (no null test of `this`, 0x482448).
+// - ruled out here: center/extent through `const GridVec3&` vs indexed
+//   (0.710 vs 0.711), `size <= 1` first (0.563), visible/corners initialised
+//   at the declaration instead of the else block (0.631).
 
 #include <float.h>
 #include <string.h>
@@ -580,6 +593,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* cen
             if (visible) {
                 UpdateLevelOfDetail((UnknownTextureStream*)stream, a1, 0, coarse);
                 if (data->b0) {
+                    coarse = 1;
                     count = 1;
                     if (childMask == 0) {
                         childMask = 1;
@@ -597,16 +611,44 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* cen
         corners = 0;
     }
     if (visible) {
-        if (corners == 0) {
+        if (corners != 0) {
+            for (j = 0; j < size; j++) {
+                for (i = 0; i < size; i++) {
+                    DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[z + j] + i + x];
+                    if (child) {
+                        if (child->childMask != 0x3fffff) {
+                            child->childMask = 0x3fffff;
+                            changed = 1;
+                            if (child->children)
+                                child->data->b1 = 1;
+                        }
+                        child->UpdateLevelOfDetail((UnknownTextureStream*)stream, a1, 1, coarse);
+                        count++;
+                    }
+                }
+            }
+            switch (depth) {
+            case 0:
+                childMask = 0x1fffff;
+                break;
+            case 1:
+                childMask |= 0x1e0 << (path * 4);
+                break;
+            }
+            if (size == 16) {
+                if (count == 0)
+                    childMask = 0;
+                else if (childMask == 0)
+                    changed = 1;
+            }
+        } else {
             size >>= 1;
             if (size) {
-                const GridVec3& e = *(const GridVec3*)extent;
-                const GridVec3& c = *(const GridVec3*)center;
-                GridVec3 childExtent = GridVec3(e.x * 0.5f, e.y, e.z * 0.5f);
-                GridVec3 c1 = GridVec3(c.x - childExtent.x, c.y, c.z - childExtent.z);
-                GridVec3 c2 = GridVec3(childExtent.x + c.x, c.y, c.z - childExtent.z);
-                GridVec3 c3 = GridVec3(c.x - childExtent.x, c.y, childExtent.z + c.z);
-                GridVec3 c4 = GridVec3(childExtent.x + c.x, c.y, childExtent.z + c.z);
+                GridVec3 childExtent = GridVec3(extent[0] * 0.5f, extent[1], extent[2] * 0.5f);
+                GridVec3 c1 = GridVec3(center[0] - childExtent.x, center[1], center[2] - childExtent.z);
+                GridVec3 c2 = GridVec3(childExtent.x + center[0], center[1], center[2] - childExtent.z);
+                GridVec3 c3 = GridVec3(center[0] - childExtent.x, center[1], childExtent.z + center[2]);
+                GridVec3 c4 = GridVec3(childExtent.x + center[0], center[1], childExtent.z + center[2]);
                 count += WalkVisibilityQuadrants(stream, a1, &c1.x, &childExtent.x, x, z, size, depth + 1, path * 4, coarse);
                 count += WalkVisibilityQuadrants(stream, a1, &c2.x, &childExtent.x, x + size, z, size, depth + 1, path * 4 + 1, coarse);
                 count += WalkVisibilityQuadrants(stream, a1, &c3.x, &childExtent.x, x, z + size, size, depth + 1, path * 4 + 2, coarse);
@@ -642,47 +684,6 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* cen
                     }
                 }
             }
-        } else {
-            for (j = 0; j < size; j++) {
-                for (i = 0; i < size; i++) {
-                    DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[z + j] + i + x];
-                    if (child) {
-                        if (child->childMask != 0x3fffff) {
-                            child->childMask = 0x3fffff;
-                            changed = 1;
-                            if (child->children)
-                                child->data->b1 = 1;
-                        }
-                        child->UpdateLevelOfDetail((UnknownTextureStream*)stream, a1, 1, coarse);
-                        count++;
-                    }
-                }
-            }
-            switch (depth) {
-            case 0:
-                childMask = 0x1fffff;
-                break;
-            case 1:
-                childMask |= 0x1e0 << (path * 4);
-                break;
-            }
-            if (size == 16) {
-                if (count == 0)
-                    childMask = 0;
-                else if (childMask == 0)
-                    changed = 1;
-            }
-        }
-        switch (depth) {
-        case 0:
-            childMask |= 1;
-            goto finish;
-        case 1:
-            childMask |= 2 << path;
-            return count;
-        case 2:
-            childMask |= 0x20 << path;
-            return count;
         }
     } else {
         for (j = 0; j < size; j++) {
@@ -696,14 +697,29 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* cen
             }
         }
     }
+    if (visible) {
+        switch (depth) {
+        case 0:
+            childMask |= 1;
+            break;
+        case 1:
+            childMask |= 2 << path;
+            return count;
+        case 2:
+            childMask |= 0x20 << path;
+            return count;
+        }
+    }
     if (depth != 0)
         return count;
-finish:
     if (count == 0x100)
         childMask |= 0x200000;
     if (changed || oldMask != childMask) {
-        for (DrawableGridNode* node = this; node; node = (DrawableGridNode*)node->parent)
+        DrawableGridNode* node = this;
+        do {
             node->data->b1 = 1;
+            node = (DrawableGridNode*)node->parent;
+        } while (node);
     }
     if (oldMask != 0 && childMask == 0)
         UnknownFunction464e90();
