@@ -63,6 +63,9 @@ int SteeringControl::SetAxisFromDirection(const Vec3* worldDir, SoultreeObject* 
 // (`fld st(0); fmul st(3)`) and reads y and z back from their frame slots. Without the
 // copies VC6 reaches 145/234; copying before the length 137, only y 145, only z 226,
 // all three 145, `d = fromPos - toPos` with the copies 145, direct-initialised dir 109.
+// Not the declaration-count window (docs/VC6_OPERAND_ORDER.md section 2): the copies left
+// unread, or one to six dead int locals here or at the top, give 137 (as member-wise d
+// alone), and an extra dead local after the copies keeps the exact match.
 int SteeringControl::SetAxisFromPoints(SoultreeObject* from, SoultreeObject* to, SoultreeObject* frame)
 {
     Vec3 fromPos;

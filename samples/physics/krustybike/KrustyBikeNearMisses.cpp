@@ -85,6 +85,10 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 // order, flat sums, `== 3 ? 0 : 1`, `!(== 3)`, `3 !=`, `else` arms and a scale local
 // give the base bytes or fewer; a `>` compare, a shared speedGain or limit local and a
 // conditional row pointer lose more (123, 59, 26, 22).
+// Session 20, base bytes (151): inline accessors for difficulty, eventType, the SX test or
+// the level (each alone or together), a row local before the speed gain, a separate level
+// local, a six-float flat table, and returning the comparison directly. Worse: a named
+// factor (93), `!= 3 ? 3 : 0` added to the flat index (95), a bool row (115).
 int KrustyBike::IsSpeedGainBelowLimit(float dt)
 {
     float b[2][3] = { { 4.0f, 3.25f, 2.5f }, { 3.75f, 3.25f, 2.5f } };
