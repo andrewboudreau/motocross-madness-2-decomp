@@ -833,22 +833,23 @@ Result for the 385-unit build:
 
 | Category | Symbols | Equal bytes (initialised) | Different | Unbound |
 |---|---:|---:|---:|---:|
-| game | 876 | 1,132,469 (10,470) | 3 B in 1 symbol | 174 (2,843 B, header statics; 3 nonzero) |
+| game | 875 | 1,132,460 (10,470) | 0 | 175 (2,851 B, header statics; 3 nonzero) |
 | string literals | 2,188 | 30,942 | 0 | 150 (143 local `__FILE__` paths, 7 port-only) |
 | `__real` constants | 337 | 1,412 | 0 | 4 |
 | GUIDs | 18 | 288 | 0 | 0 |
 
-Vtables, RTTI and EH tables are skipped. Binding evidence: 3,036 bindings,
-14 comment, 37 content, 2 name, 2 pointer. Every object symbol is placed.
+Vtables, RTTI and EH tables are skipped. Binding evidence: 3,035 bindings,
+13 comment, 37 content, 2 name, 2 pointer. Every object symbol is placed.
 
 - Fixed: `g_terrainQualityValue` (0x0057471c) starts at 1 in retail .data,
   so the detail pass is enabled until `SelectQuality` runs. Our build had 0 in
   .bss. Now `int g_terrainQualityValue = 1;` in `Terrain.cpp`.
-- Remaining: `g_terrainShadowClipper` (0x00575a98). Retail has one pointer, the
-  same one `g_visibilityClipper` names, initialised to 0x0068acd4. Our bring-up
-  alias in `Group6_TerrainShadow.cpp` is a second global with a dynamic
-  initializer. It holds the same value from startup on. Only the load image
-  differs.
+- Fixed: `g_terrainShadowClipper` (0x00575a98). Retail has one pointer, the
+  same one `g_visibilityClipper` names, initialised to 0x0068acd4. The bring-up
+  copy in `Group6_TerrainShadow.cpp` was a second global with a dynamic
+  initializer (zero in the load image). A `link_aliases` weak external now
+  binds the sample's name to `g_visibilityClipper`'s statically initialised
+  cell.
 - Size checks: `s_g3TrickFrame` (128 B, which reaches into `s_kbTimeTo60Armed`)
   is the documented chained-trick overread. `g_visibilityBoxVertices` and
   `g_visibilityEntries` overlap in retail `.bss` (12 B apart). Those two are
@@ -870,6 +871,56 @@ Vtables, RTTI and EH tables are skipped. Binding evidence: 3,036 bindings,
       static (unresolved);
     - the `Lzw.cpp` bit-mask table at 0x0056de58;
     - an int 1000 after the `D3DIMSoultreeShadow.cpp` path.
+
+### Binding audit
+
+Tool: `tools/audit_bindings.py`. Test: `tests/test_audit_bindings.py`
+(synthetic fixtures). A strict compare resolves relocations through the
+unit's bindings, so a binding to the wrong retail object compares exact
+whenever the code only takes the address; the swapped `DPAID_Modem`/`DPAID_Phone`
+bindings hid a `CreateAddress` bug that way. The audit checks the bound bytes.
+
+```bash
+python tools/build_game.py --vc6-root "$VC6_ROOT"
+python tools/audit_bindings.py --retail "$MCM2_EXE" --vc6-root "$VC6_ROOT"   # exit 1 on findings
+```
+
+It reads every `src/`/`samples/` `*.bindings.json`. For data it compares our
+definition (unit object first, then a public one, then a link alias provider)
+with retail at the bound VA, pointers by target and `.bss` as zeros. It decodes
+literal names, checks import slots, vtable classes with our COL offset, type
+descriptors, VAs spelt in names, and GUIDs our sources do not define against
+`DEFINE_GUID`/`OUR_GUID_ENTRY`/MIDL `DECLSPEC_UUID` in the headers under
+`VC6_ROOT` (read in place). For functions it checks for a function start and
+the LIBCMT atlas both ways. Across files it reports symbols bound to several
+VAs, VAs bound to names whose definitions or library identity disagree, and
+`link_aliases` whose names are bound apart. The report goes to
+`work/binding-audit/report.{json,md}` (ignored). It needs the retail image and
+a linked build, so `tools/static_check.py` does not run it; it takes about 6 s.
+
+Result (333 files, 19,279 bindings): 0 findings. Matches: 4,664 literals, 421
+imports, 389 vtables, 31 type descriptors, 109 SDK GUIDs, 366 data definitions,
+12,055 function starts; 811 `.bss` bindings with zero retail bytes. Unknown:
+178 data bindings: 47 name symbols no object defines (scope tables, CRT and
+`c_dfDI*` library data), 87 name header statics whose unit copies differ, and
+44 hold only pointers to unbound statics. 62 bindings are 0 placeholders.
+97 VAs carry two or more different linked bodies (a bring-up stand-in next to the reconstruction,
+or two reconstructions such as `OrientationAnglesFromVectors` and
+`VehBasisToBlock` at 0x004b5a60); they are listed for review, not findings.
+
+Fixed by the audit:
+
+- `Bike::LoadBike` 0x004079c0 compared the wheel names with `strcmp`, bound to
+  0x00536070. The LIBCMT atlas puts `_strcmp` at 0x005382a0; 0x00536070 is
+  `_stricmp` (30 other bindings). Retail calls it at 0x004080c0. The source now
+  calls `_stricmp`, so the linked build matches wheel names case-insensitively
+  as retail does. The strict score is unchanged (6,428/6,745); the earlier
+  disassembly review of `LoadBike` could not see this.
+- `KrustyUI::ResolveBikeFile`/`ResolveRiderFile` (0x0049b560/0x0049b7f0) used
+  `strchr`, bound to 0x00534a60, which is `_strrchr` (retail pushes `'\\'` and
+  calls it at 0x0049b5e7 and 0x0049b877). Now `strrchr`. Both test only for a
+  backslash, so behaviour is unchanged; both remain exact.
+- `g_terrainShadowClipper`: see above.
 
 ### What is needed next for data and linking
 

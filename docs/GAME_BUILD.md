@@ -1540,8 +1540,11 @@ One bug: in the modem branch, `CreateAddress` tagged the modem name as
 two GUIDs as well (0x00556900 holds DPAID_Phone and 0x00556920 holds DPAID_Modem),
 so neither the case nor the masked score could see the swap. With both fixed,
 the modem name is tagged `DPAID_Modem` and the number `DPAID_Phone`, as in retail,
-so a dial-up session gets the right modem and number. The following bodies were
-reviewed by disassembly and showed register or scheduling differences only:
+so a dial-up session gets the right modem and number. `tools/audit_bindings.py`
+([REBUILD_GAPS.md](REBUILD_GAPS.md#binding-audit)) now checks every binding's
+retail bytes; it found `LoadBike`'s wheel-name compare bound to `_stricmp` as
+`strcmp`. The following bodies were reviewed by disassembly and showed register
+or scheduling differences only:
 `LoadBike`, `SetRenderContext`, `SetPointerDevice`, the KrustyBike deleting
 destructor, `QuarryOverlayHooks`, `LoadEventObjects`, `SendStartMessage`, the
 audio loader thread 0x004bdc00, `LoadVue`, `CheckHeader`, TerrainShadow slot 27
