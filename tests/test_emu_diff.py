@@ -41,14 +41,12 @@ CLEAN_CASES = {
     'd3dim_shadow_slot30': 200,
     # Out-of-int focal lengths differ by design (plain helper, see the case docstring).
     'terrain_prepare_geometry': (400, {'EXTREME_EVERY': 0}),
-<<<<<<< HEAD
     # Small counts that still catch, with the default seed: the corner-3 normal and height
     # add order before d3c99491 (QueryGround), a reassociated transform-point row
     # (SetTransform) and round-half-up at the midpoint fistp ties (IntersectSegment).
     'terrain_query_ground': 40,
     'collision_set_transform': 40,
     'gridnode_intersect_segment': 80,
-=======
     # Second differential sweep (docs/GAME_BUILD.md): non-exact linked bodies that agree.
     'segment_segment_distance': 100,
     'rotate_pose': 100,
@@ -60,8 +58,66 @@ CLEAN_CASES = {
     'convert555_to8': 40,
     'bitstring_read': 200,
     'radar_line_circle': 200,
->>>>>>> d9eae4bf (emu_diff: cases for nine more non-exact linked bodies, radar negative control)
+    'halve8888': 60,
+    'texture_channel_difference': 60,
+    'shadow_fill_triangle': 100,
+    'car_position_at_time': 100,
+    'grid_viewer_detail': 100,
+    'bitstring_shift_front': 100,
+    'bitstring_shift_back': 100,
+    'texture_has_color': 100,
+    'button_contains_point': 60,
+    'multistate_contains_point': 60,
+    'd3dim_scale': 60,
+    'projected_shadow_bounds': 60,
+    'terrain_shadow_slot28': 100,
+    # Fixed by the second sweep: sized to show the old difference with the default seed.
+    'bike_steer_torque': 100,
+    'collision_hull_vs_hull': 300,
+    'segment_triangle_query': 300,
+    'soultree_set_matrix_in': 60,
+    'soultree_set_axes_in': 60,
+    'resolve_contact_impulse': 60,
+    'contact_solve_impulse': 60,
+    'constraint_contact_impulse': 60,
+    'vehicle_wheel_impulse': 60,
+    'vehicle_lean_from_normal': 60,
+    'vehicle_body_contact_impulse': 60,
+    'vehicle_ctor': 60,
+    'collision_relative_frame': 60,
+    'collision_hull_vs_hull_swept': 60,
+    'collision_hull_vs_model': 40,
+    'collision_hull_vs_model_swept': 40,
+    'collision_model_vs_hull': 40,
+    'collision_model_vs_hull_swept': 40,
+    'collision_model_vs_model': 20,
+    'collision_model_vs_model_swept': 20,
+    'collision_update_model_bounds': 60,
+    'collision_segment_touches_object': 60,
+    'box_capsule_overlap': 30,
+    # One open 1-ulp boundary flip at 53-bit (about 1 in 300, see the case); 0 at this size.
+    'box_triangle_query': 60,
+    'tree_tree_query': 60,
+    'quadtree_insert': 100,
+    'quadtree_remove': 100,
+    'visibility_traverse': 150,
+    'kb_speed_gain': 200,
+    'kb_find_placement': 200,
+    'kb_update_rider_pose': 500,
+    'kb_send_delta': 500,
+    'kb_ai_racing_line': 150,
+    'vegetation_collision_object': 200,
+    'track_place_near': 200,
 }
+
+# Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).
+# Each must still differ from retail, so the case keeps its power to see the bug.
+PRE_FIX_SHAPES = [
+    ('radar_line_circle', [('reference[1] - y', 'point[1] - y'), ('reference[0] - x', 'point[0] - x')], 60),
+    ('track_place_near', [('behind = DistanceAlong(start, from);',
+                           'behind = DistanceAlong(candidates->pos, start);')], 200),
+    ('kb_find_placement', [('return *(int*)&outPosition->z;', 'return (int)outPosition;')], 200),
+]
 
 
 class CaseModuleTests(unittest.TestCase):
@@ -109,14 +165,30 @@ class CaseModuleTests(unittest.TestCase):
                      and importlib.util.find_spec('unicorn') is not None,
                      'requires native Windows, VC6_ROOT, private MCM2_EXE and unicorn')
 class DifferentialTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory(prefix='emu-diff-test-')
+        cls.objects: dict[tuple, Path] = {}
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def compiled(self, source: str, flags: list[str] | None) -> Path:
+        # Several cases share a source; compile each (source, flags) once.
+        key = (source, None if flags is None else tuple(flags))
+        if key not in self.objects:
+            out = Path(self.tmp.name) / f'candidate{len(self.objects)}.obj'
+            self.objects[key] = emu_diff.compile_source(source, out, flags)
+        return self.objects[key]
+
     def run_case(self, name: str, n: int, flags: list[str] | None = None,
                  overrides: dict | None = None) -> emu_diff.Summary:
         module = emu_diff.load_case(name)
         for key, value in (overrides or {}).items():
             setattr(module, key, value)
-        with tempfile.TemporaryDirectory(prefix='emu-diff-test-') as tmp:
-            obj = emu_diff.compile_source(module.SOURCE, Path(tmp) / 'candidate.obj', flags)
-            return emu_diff.run_diff(module, obj, n=n, retail=Path(os.environ['MCM2_EXE']), show=3)
+        obj = self.compiled(module.SOURCE, flags)
+        return emu_diff.run_diff(module, obj, n=n, retail=Path(os.environ['MCM2_EXE']), show=3)
 
     def test_linked_fistp_bodies_agree_with_retail(self):
         for name, spec in CLEAN_CASES.items():
@@ -138,19 +210,23 @@ class DifferentialTests(unittest.TestCase):
         summary = self.run_case('krusty_trick_pick', 200, [])
         self.assertGreater(summary.mismatches, 0)
 
-    def test_radar_reference_from_hit_buffer_differs(self):
-        # The pre-fix shape measured the two hits against the output buffer, not the fourth argument.
-        module = emu_diff.load_case('radar_line_circle')
-        text = (ROOT / module.SOURCE).read_text(encoding='latin-1')
-        old = text.replace('reference[1] - y', 'point[1] - y').replace('reference[0] - x', 'point[0] - x')
-        self.assertNotEqual(old, text)
-        with tempfile.TemporaryDirectory(prefix='emu-diff-test-') as tmp:
-            source = Path(tmp) / 'radar_old.cpp'
-            source.write_text(old, encoding='latin-1')
-            obj = emu_diff.compile_source(str(source), Path(tmp) / 'candidate.obj',
-                                          ['/I' + str(ROOT / 'src' / 'bringup')])
-            summary = emu_diff.run_diff(module, obj, n=60, retail=Path(os.environ['MCM2_EXE']), show=1)
-        self.assertGreater(summary.mismatches, 0)
+    def test_pre_fix_shapes_differ(self):
+        for name, edits, n in PRE_FIX_SHAPES:
+            with self.subTest(case=name):
+                module = emu_diff.load_case(name)
+                path = ROOT / module.SOURCE
+                text = path.read_text(encoding='latin-1')
+                for current, previous in edits:
+                    self.assertIn(current, text)
+                    text = text.replace(current, previous)
+                with tempfile.TemporaryDirectory(prefix='emu-diff-test-') as tmp:
+                    source = Path(tmp) / path.name
+                    source.write_text(text, encoding='latin-1')
+                    obj = emu_diff.compile_source(str(source), Path(tmp) / 'candidate.obj',
+                                                  ['/I' + str(path.parent)])
+                    summary = emu_diff.run_diff(module, obj, n=n, retail=Path(os.environ['MCM2_EXE']),
+                                                show=1)
+                self.assertGreater(summary.mismatches, 0)
 
 
 if __name__ == '__main__':
