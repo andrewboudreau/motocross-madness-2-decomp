@@ -158,35 +158,5 @@
   "expect": "exact",
   "notes": "vtordisp adjustor thunk (sub ecx,[ecx-4]; jmp 0x0052a830) for the GameObject slot 10 override in the GameObject virtual-base vtable (Vehicle+1472 slot 10); emitted by the compiler from LayoutProbe.cpp. owner: Vehicle.cpp",
   "bindings": "../hierarchy/LayoutProbe.bindings.json"
- },
- {
-  "class": "StreamTable",
-  "source": "FileSlots.cpp",
-  "candidate_symbol_contains": "Seek@StreamTable",
-  "target_va": "0x005253d0",
-  "target_size": 107,
-  "expect": "exact",
-  "notes": "wave5: in-memory/CRT stream accessor (mode flag +0x23c); owner: bracket only (callers in recorder.cpp), not Vehicle.cpp",
-  "bindings": "FileSlots.bindings.json"
- },
- {
-  "class": "StreamTable",
-  "source": "FileSlots.cpp",
-  "candidate_symbol_contains": "Tell@StreamTable",
-  "target_va": "0x00525440",
-  "target_size": 93,
-  "expect": "exact",
-  "notes": "wave5: in-memory/CRT stream accessor (mode flag +0x23c); owner: bracket only (callers in recorder.cpp), not Vehicle.cpp",
-  "bindings": "FileSlots.bindings.json"
- },
- {
-  "class": "StreamTable",
-  "source": "FileSlots.cpp",
-  "candidate_symbol_contains": "Eof@StreamTable",
-  "target_va": "0x005254a0",
-  "target_size": 117,
-  "expect": "exact",
-  "notes": "wave5: in-memory/CRT stream accessor (mode flag +0x23c); owner: bracket only (callers in recorder.cpp), not Vehicle.cpp",
-  "bindings": "FileSlots.bindings.json"
  }
 ]
