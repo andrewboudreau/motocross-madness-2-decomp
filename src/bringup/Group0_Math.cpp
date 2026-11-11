@@ -25,6 +25,12 @@
 // expression `x*a + y*b + z*c + t` into `(y*b + z*c) + x*a + t`); every
 // coordinate is re-read from the source point; and all three results are
 // computed before the first store (an in-place transform reads the old point).
+// The loop is written as retail's: end-biased pointers and negated byte
+// offsets that count up to zero. That took the linked masked score from 0.275
+// to 0.336. Retail's x87 code keeps all three sums live at once and
+// interleaves them with fxch; VC6 finishes one sum at a time whatever the
+// statement order (also tried: retail's product order, nine named products,
+// translation added in the store).
 void TransformPoints(const void* destinationPoints, void* sourcePoints, const Matrix4* matrix,
                      int count, int destinationStride, int sourceStride)
 {
@@ -32,12 +38,15 @@ void TransformPoints(const void* destinationPoints, void* sourcePoints, const Ma
         return;
     if (sourceStride == 0)
         sourceStride = destinationStride;
-    unsigned char* to = (unsigned char*)destinationPoints;
-    const unsigned char* from = (const unsigned char*)sourcePoints;
-    const unsigned char* end = from + count * sourceStride;
+    int fromOffset = count * sourceStride;
+    int toOffset = count * destinationStride;
+    const unsigned char* fromEnd = (const unsigned char*)sourcePoints + fromOffset;
+    unsigned char* toEnd = (unsigned char*)destinationPoints + toOffset;
+    fromOffset = -fromOffset;
+    toOffset = -toOffset;
     do {
-        const float* p = (const float*)from;
-        float* out = (float*)to;
+        const float* p = (const float*)(fromEnd + fromOffset);
+        float* out = (float*)(toEnd + toOffset);
         float x = p[0] * matrix->_11;
         x += p[1] * matrix->_21;
         x += p[2] * matrix->_31;
@@ -53,9 +62,9 @@ void TransformPoints(const void* destinationPoints, void* sourcePoints, const Ma
         out[0] = x;
         out[1] = y;
         out[2] = z;
-        to += destinationStride;
-        from += sourceStride;
-    } while (from != end);
+        toOffset += destinationStride;
+        fromOffset += sourceStride;
+    } while (fromOffset != 0);
 }
 
 // 0x005087b0 (the pointer form the collision code declares): out = src / |src|
