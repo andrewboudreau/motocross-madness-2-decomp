@@ -17,12 +17,14 @@
 // candidates gets ebp in the strip loop, a slot at +0x20 and is reloaded
 // around the path loop, where ebp holds start.t. Dropping the dead
 // `list = 0` removes its store (1525 bytes) but retail has it.
-// Audited again as the linked body (KbRaceSub::PlaceNear forwards to it) on
-// 2026-11-11: a masked instruction diff against retail shows only the frame
-// size, register choice, load scheduling and the placement of the out-of-memory
-// FreeWorkList exit (inside the walk loop here, after it in retail); calls,
-// constants, branches and field offsets agree, so the 0.868 linked score is
-// code shape, not behaviour.
+// This is the linked body (KbRaceSub::PlaceNear forwards to it). The
+// differential run (tools/emu_cases/track_place_near.py) found one behaviour
+// difference, now fixed: the path loop's second DistanceAlong took
+// (candidate, start), where retail passes (start, from). The candidate failed
+// 44 of 600 runs before the fix and 0 of 600 after it. The remaining
+// differences are frame size, register choice, load scheduling and where the
+// out-of-memory FreeWorkList exit sits (inside the walk loop here, after it in
+// retail).
 //
 #include <math.h>
 #include <stdio.h>
@@ -124,8 +126,11 @@ int Track::PlaceNear(Vector3 p, TrackPos from, float distance, float range, int 
                 start.node = step->node;
                 start.segment = start.node->firstSegment;
                 start.t = 0.0f;
+                // Retail measures the second distance from the path node to `from`
+                // (0x00517737..0x0051776b: arguments start, from), not back from the
+                // candidate; the tests below then compare the two distances from start.
                 ahead = DistanceAlong(start, candidates->pos);
-                behind = DistanceAlong(candidates->pos, start);
+                behind = DistanceAlong(start, from);
                 if (NodeHasSegment(candidates->pos.segment, step->node)
                     && (!NodeHasSegment(from.segment, step->node)
                         || ahead >= 0.0f && behind >= 0.0f && ahead < behind)) {
