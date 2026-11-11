@@ -48,7 +48,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
 | `motion/` | SphereManager: 14 strict cases; `Motnctrl.cpp`: 40; `SteeringControl.cpp`: 21; `D3DIMSoultreeMotnctrl.cpp`: 26; `CollisionCharacter.cpp`: 11; shared motion layouts |
 | `constraint/` | `ConstraintMethodCollisionModel.cpp` (+ `ConstraintTypes.h`): 19 strict cases; its near miss ApplyContactImpulse is in `samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp` |
-| `shadow/` | D3DIMSoultreeShadow: 18 strict cases; `ProjectedShadow.cpp`: 21 strict cases, its near misses and the two inline-asm functions in `samples/physics/shadow/ProjectedShadowNearMisses.cpp`; TerrainShadow candidates in samples |
+| `shadow/` | D3DIMSoultreeShadow: 18 strict cases; `ProjectedShadow.cpp`: 21 strict cases, its near misses and the two inline-asm functions in `samples/physics/shadow/ProjectedShadowNearMisses.cpp`; TerrainShadow's exact functions in `src/reconstructed/TerrainShadow.cpp`, its near misses in samples |
 | `visibility/` | VisibilityQuadTree: 39 strict cases; partial traversal in samples |
 
 Every `exact` target under `src/krusty2` is strict exact (930 of 964 targets; the rest are

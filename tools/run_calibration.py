@@ -27149,6 +27149,46 @@ CASES += [
         'target_va': '0x0043b560', 'target_size': 243,
         'reason': 'Called by DrawTextInto 0x0050b338; in place over dest, alpha / 255. Owner TU unknown',
     },
+    {
+        'name': 'TerrainShadow constructor',
+        'source': 'src/reconstructed/TerrainShadow.cpp',
+        'bindings': 'src/reconstructed/TerrainShadow.bindings.json',
+        'symbol': '??0TerrainShadow@@QAE@H@Z',
+        'target_va': '0x00508ae0', 'target_size': 142,
+        'reason': "RTTI TerrainShadow (vtable 0x005582d4); owner TU unknown (bracket only). ctor: caster/index table/min-max sentinels; min/max stores in natural source order give retail's schedule",
+    },
+    {
+        'name': 'TerrainShadow TU ~ShadowReceiver COMDAT',
+        'source': 'src/reconstructed/TerrainShadow.cpp',
+        'bindings': 'src/reconstructed/TerrainShadow.bindings.json',
+        'symbol': '??1ShadowReceiver@@UAE@XZ',
+        'target_va': '0x00508b70', 'target_size': 11,
+        'reason': 'RTTI TerrainShadow (vtable 0x005582d4); owner TU unknown (bracket only). empty ~ShadowReceiver COMDAT copy for this TU',
+    },
+    {
+        'name': 'TerrainShadow Attach',
+        'source': 'src/reconstructed/TerrainShadow.cpp',
+        'bindings': 'src/reconstructed/TerrainShadow.bindings.json',
+        'symbol': '?Attach@TerrainShadow@@QAEPAV1@HPAVTerrain@@PAVProjectedShadow@@@Z',
+        'target_va': '0x00508b80', 'target_size': 58,
+        'reason': 'RTTI TerrainShadow (vtable 0x005582d4); owner TU unknown (bracket only). Attach(host,caster,shadow), same nested-if shape as D3DIM Attach',
+    },
+    {
+        'name': 'TerrainShadow slot 29 cell keys',
+        'source': 'src/reconstructed/TerrainShadow.cpp',
+        'bindings': 'src/reconstructed/TerrainShadow.bindings.json',
+        'symbol': '?UnknownVirtualSlot29@TerrainShadow@@UAEHXZ',
+        'target_va': '0x005099c0', 'target_size': 215,
+        'reason': 'RTTI TerrainShadow (vtable 0x005582d4); owner TU unknown (bracket only). slot 29: scans the cell rectangle in steps of 16, de-duplicates cell keys (cell reassigned to cell->key in place, as retail keeps it in eax); lists up to 0x40 then resets',
+    },
+    {
+        'name': 'TerrainShadow slot 14 render',
+        'source': 'src/reconstructed/TerrainShadow.cpp',
+        'bindings': 'src/reconstructed/TerrainShadow.bindings.json',
+        'symbol': '?Render3D@TerrainShadow@@UAEHXZ',
+        'target_va': '0x0050a1a0', 'target_size': 498,
+        'reason': 'RTTI TerrainShadow (vtable 0x005582d4); owner TU unknown (bracket only). slot 14 render: texture bind, saved address mode / render state 4, format 0x613 branch, indexed draw of the inline +0x34 vertices with indexTable; same statement order as D3DIMSoultreeShadow slot 14 minus the world matrix',
+    },
 ]
 
 

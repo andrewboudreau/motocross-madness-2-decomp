@@ -1,5 +1,5 @@
-ProjectedShadow.cpp and D3DIMSoultreeShadow.cpp are here; TerrainShadow candidates are preserved in
-`samples/physics/shadow/`. Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDATION.md).
+ProjectedShadow.cpp and D3DIMSoultreeShadow.cpp are here. TerrainShadow's exact functions are in
+`src/reconstructed/TerrainShadow.cpp` (owner TU unknown) and its near misses in `samples/physics/shadow/`. Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDATION.md).
 
 # ProjectedShadow.cpp (shadow)
 

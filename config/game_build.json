@@ -420,7 +420,7 @@
     {
       "path": "samples/physics/shadow/TerrainShadow.cpp",
       "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines TerrainShadow::TerrainShadow, Attach and slots. Behavior unverified against retail; bytes nonexact.",
+      "reason": "Near-miss bodies admitted so the source build can link and run; defines TerrainShadow slots 27, 28 and 30, which the vtable emitted by src/reconstructed/TerrainShadow.cpp (the exact constructor, Attach, slot 29 and Render3D) references. Behavior unverified against retail; bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
     }
   ],

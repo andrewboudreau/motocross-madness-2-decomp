@@ -11,8 +11,8 @@
 #ifndef BROADPHASE_TERRAINSHADOW_H
 #define BROADPHASE_TERRAINSHADOW_H
 
-#include "shadow/ProjectedShadow.h"
-#include "broadphase/Terrain.h"
+#include "../krusty2/shadow/ProjectedShadow.h"
+#include "../krusty2/broadphase/Terrain.h"
 
 // 32-byte lit vertex (FVF 0x1e2, the D3DLVERTEX layout) slot 14 draws from the inline array at
 // +0x34 (tier 2: the slot 14 draw call).  PROVISIONAL name.

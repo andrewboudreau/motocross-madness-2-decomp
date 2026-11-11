@@ -702,7 +702,8 @@ Tire unit's exact targets (promoted from `samples/physics/tire/`):
   dwords) is exact and the network update `0x00493660` (8.5 KB) is a partial.
 - TerrainShadow.cpp (`samples/physics/shadow`): slot 14 `0x0050a1a0` is exact
   (D3DIMSoultreeShadow slot 14's draw of the +0x34 vertices without the world
-  matrix). Slot 30 `0x00509aa0` rounds with inline-asm `fistp`; slot 27
+  matrix); it, the constructor, Attach, slot 29 and the ~ShadowReceiver COMDAT
+  now live in `src/reconstructed/TerrainShadow.cpp` (calibration cases). Slot 30 `0x00509aa0` rounds with inline-asm `fistp`; slot 27
   `0x00508bc0` (3087 bytes) calls the Vector3 helpers out of line (inline
   budget, see VC6_INLINE_BUDGET.md) and is not reconstructed.
 - Tire.cpp: the 5 existing exact targets, plus the `.CRT$XCU` 319-322 set

@@ -2,56 +2,6 @@
   {
     "class": "TerrainShadow",
     "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "??0TerrainShadow",
-    "target_va": "0x508ae0",
-    "target_size": 142,
-    "expect": "exact",
-    "notes": "ctor: caster/index table/min-max sentinels; min/max stores in natural source order give retail's schedule",
-    "bindings": "TerrainShadow.bindings.json"
-  },
-  {
-    "class": "TerrainShadow",
-    "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "?Attach@TerrainShadow",
-    "target_va": "0x508b80",
-    "target_size": 58,
-    "expect": "exact",
-    "notes": "Attach(host,caster,shadow), same nested-if shape as D3DIM Attach",
-    "bindings": "TerrainShadow.bindings.json"
-  },
-  {
-    "class": "ShadowReceiver",
-    "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "??1ShadowReceiver",
-    "target_va": "0x508b70",
-    "target_size": 11,
-    "expect": "exact",
-    "notes": "empty ~ShadowReceiver COMDAT copy for this TU",
-    "bindings": "TerrainShadow.bindings.json"
-  },
-  {
-    "class": "TerrainShadow",
-    "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot29@TerrainShadow",
-    "target_va": "0x005099c0",
-    "target_size": 215,
-    "expect": "exact",
-    "notes": "slot 29: scans the cell rectangle in steps of 16, de-duplicates cell keys (cell reassigned to cell->key in place, as retail keeps it in eax); lists up to 0x40 then resets",
-    "bindings": "TerrainShadow.bindings.json"
-  },
-  {
-    "class": "TerrainShadow",
-    "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "Render3D@TerrainShadow",
-    "target_va": "0x0050a1a0",
-    "target_size": 498,
-    "expect": "exact",
-    "notes": "slot 14 render: texture bind, saved address mode / render state 4, format 0x613 branch, indexed draw of the inline +0x34 vertices with indexTable; same statement order as D3DIMSoultreeShadow slot 14 minus the world matrix",
-    "bindings": "TerrainShadow.bindings.json"
-  },
-  {
-    "class": "TerrainShadow",
-    "source": "TerrainShadow.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot30@TerrainShadow",
     "target_va": "0x00509aa0",
     "target_size": 1788,

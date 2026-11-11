@@ -19,9 +19,9 @@ public:
     UnknownKrustyUIShadow* Init(void* target, TextureMapManager* manager);
 };
 
-// TerrainShadow (vtable 0x005582d4, 0x6780 bytes). No canonical declaration exists in src/;
-// these are the names samples/physics/shadow/TerrainShadow.h gives the constructor and
-// Attach, so an admitted TerrainShadow resolves them. The storage only fixes the size.
+// TerrainShadow (vtable 0x005582d4, 0x6780 bytes). A local view: these are the names
+// src/reconstructed/TerrainShadow.h gives the constructor and Attach, so the exact
+// src/reconstructed/TerrainShadow.cpp resolves them. The storage only fixes the size.
 class TerrainShadow {
 public:
     explicit TerrainShadow(int flags);                                       // 0x00508ae0 (ret 4)

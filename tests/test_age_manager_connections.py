@@ -21,7 +21,7 @@ SOURCES = (
     'src/reconstructed/Griddraw.cpp', 'src/reconstructed/Grid1.cpp',
     'samples/render/GriddrawNearMisses.cpp', 'samples/render/Grid1NearMisses.cpp',
     'samples/physics/shadow/TerrainShadow.cpp', 'src/reconstructed/AgeManager.cpp',
-    'src/reconstructed/EcoSystem.cpp',
+    'src/reconstructed/EcoSystem.cpp', 'src/reconstructed/TerrainShadow.cpp',
 )
 REGISTER = '?Register@AgeManager@@QAEXPAUAgeEntry@@P6AHPAXH@Z1HH@Z'
 UNREGISTER = '?Unregister@AgeManager@@QAEXPAUAgeEntry@@@Z'
