@@ -325,6 +325,28 @@ static inline float UnknownEcoSampleTga(UnknownTgaFile* tga, float x, float z) {
     return ((((unsigned short*)tga->bits)[index] >> 5) & 0x1f) * (1.0f / 31.0f);
 }
 
+// UnknownEcoSampleTga times `weight`, multiplied in retail's order: the
+// channel times the weight first, then the 1/255 (1/31) scale. At 24-bit
+// precision this rounds differently from scaling the channel first.
+static inline float UnknownEcoSampleTgaWeighted(UnknownTgaFile* tga, float x, float z, float weight) {
+    float worldX = g_collisionQuadTree->extentX;
+    int width = tga->width;
+    int column = (int)(x / worldX * width);
+    float worldZ = g_collisionQuadTree->extentZ;
+    int height = tga->height;
+    int row = (int)((1.0f - z / worldZ) * height);
+    if (column >= width)
+        column = width - 1;
+    if (row >= height)
+        row = height - 1;
+    int index = row * width + column;
+    if (tga->bitsPerPixel == 32)
+        return ((unsigned char*)tga->bits)[index * 4 + 1] * weight * (1.0f / 255.0f);
+    if (tga->bitsPerPixel == 24)
+        return ((unsigned char*)tga->bits)[index * 3 + 1] * weight * (1.0f / 255.0f);
+    return ((((unsigned short*)tga->bits)[index] >> 5) & 0x1f) * weight * (1.0f / 31.0f);
+}
+
 // Whether the probability TGA is nonzero at the terrain position.
 static inline int UnknownEcoTgaIsSet(UnknownTgaFile* tga, float x, float z) {
     float worldX = g_collisionQuadTree->extentX;
@@ -354,15 +376,15 @@ static inline int UnknownEcoTgaIsSet(UnknownTgaFile* tga, float x, float z) {
 // Audited against retail (2026-11-11): rings, cluster pick, ComputeCode
 // argument order, threshold, TGA clamps, slope/altitude terms, placement and
 // free loops agree. Retail weights the definition TGA as
-// (channel * probability) * 1/255 inside each format branch; this source does
+// (channel * probability) * 1/255 inside each format branch; the old source did
 // (channel * 1/255) * probability. At 53-bit precision the first product is
 // exact either way (8-bit channel times a 24-bit float), so both round the same
 // exact triple product once and give identical floats. At 24-bit precision each
 // product rounds: 20333 of the 65025 channel/probability pairs then differ by
 // one ulp (exhaustive check, third emu_diff sweep); whether that ever flips a
-// placement draw is open. Spelling it in retail's order (an
-// inline `scale` helper, by value or by reference) reallocates ebx/ebp across
-// the whole body and lowers the linked score (0.918 -> 0.914), so it is not used.
+// placement draw is open. The definition TGA is therefore weighted in retail's
+// order (UnknownEcoSampleTgaWeighted), at a small cost in linked score (VC6
+// reallocates ebx/ebp across the body): behaviour over code shape.
 int EcoSystem::GenerateObjects(int checkCodes) {
     UnknownTgaFile* tgas[256];
     float definitionIndex[256];
@@ -501,7 +523,7 @@ int EcoSystem::GenerateObjects(int checkCodes) {
         if (probability <= threshold)
             continue;
         if (tgas[selected])
-            probability = UnknownEcoSampleTga(tgas[selected], probe.x, probe.z) * probability;
+            probability = UnknownEcoSampleTgaWeighted(tgas[selected], probe.x, probe.z, probability);
         if (probability <= threshold)
             continue;
         groundTerrain->QueryGround(&probe, &normal, 0, 0);

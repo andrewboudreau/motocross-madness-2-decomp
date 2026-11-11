@@ -1408,11 +1408,13 @@ stays below it. `BikeRace::AimCamera` 0x0041eb20 and `NextCameraTarget`
 0x0041f1d0 (200 each), `VisualCue::Tick` 0x0048b100 (600) and
 `EcoSystem::GenerateObjects` 0x00459ce0 (30) agreed in every run.
 
-Open: `EcoSystem::GenerateObjects` weights a texture channel as
-`(channel * probability) / 255` where the source has
-`(channel / 255) * probability`. The two agree at 53-bit; at 24-bit 20333 of
-the 65025 channel and probability pairs differ by one ulp (exhaustive check).
-Whether that ever flips a placement draw is not known.
+`EcoSystem::GenerateObjects` weighted a definition's texture channel as
+`(channel / 255) * probability`; retail multiplies `(channel * probability)`
+first and then scales by 1/255. The two agree at 53-bit; at 24-bit 20333 of the
+65025 channel and probability pairs differ by one ulp (exhaustive check), which
+can flip a draw that lands on the threshold. The source now uses retail's order
+(`UnknownEcoSampleTgaWeighted`; `fild; fmul weight; fmul 1/255` as at retail
+0x0045a7e9), accepting VC6's different register allocation of the body.
 
 ### Grid lighting workers
 
