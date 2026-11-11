@@ -611,12 +611,12 @@ stand-ins. These were inline-arithmetic rewrites that compiled, but their
 linked bodies scored poorly against retail. The game build now links the
 near-miss bodies from `samples/` instead:
 
-- `src/bringup/Group0_BvhQuery.cpp` includes the canonical
+- `samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp` is a
+  `best-guess-unreviewed` candidate source. It includes the canonical
   `src/krusty2/bvh/BoundingBoxTreeQuery.cpp` (an `included_sources` entry) for
   its file statics: the vertex array, relative frames, motion matrix and axis
-  scratch. It then carries the near-miss bodies of
-  `samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp`. The sample file is
-  unchanged and keeps its pinned object.
+  scratch. It adds the five near-miss bodies and defines the never-written
+  0x00579668 flag. The bring-up copy `Group0_BvhQuery.cpp` was deleted.
 - `samples/physics/contact/ContactImpulse.cpp` and
   `samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp`
   are `best-guess-unreviewed` candidate sources. The second file includes

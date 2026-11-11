@@ -102,8 +102,8 @@
     },
     {
       "path": "src/krusty2/bvh/BoundingBoxTreeQuery.cpp",
-      "included_by": "src/bringup/Group0_BvhQuery.cpp",
-      "reason": "BoxCapsuleOverlap, BoxTriangleQuery, SegmentTriangleQuery, TreeTreeQueryNodes and SegmentSegmentDistance read the unit's file statics (vertex array, relative frames, motion matrix, axis scratch); the bring-up file includes the canonical unit and appends the near-miss bodies of samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp beside them. The canonical file stays a standalone calibration case (docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies)."
+      "included_by": "samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp",
+      "reason": "BoxCapsuleOverlap, BoxTriangleQuery, SegmentTriangleQuery, TreeTreeQueryNodes and SegmentSegmentDistance read the unit's file statics (vertex array, relative frames, motion matrix, axis scratch); the near-miss file includes the canonical unit and adds those five bodies beside it. The canonical file stays a standalone calibration case (docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies)."
     },
     {
       "path": "src/krusty2/constraint/ConstraintMethodCollisionModel.cpp",
@@ -542,6 +542,12 @@
       "status": "reviewed-nonexact",
       "reason": "DrawableGridNodeSharedTextures::SelectTexture 0x0047caa0, BuildNodeTexture 0x0047d470 and BuildBlockTexture 0x0047d780 replace the Group3_GridShared bring-up copies of the same source. The copy reached 0x00505600 through an out-of-line static wrapper; here the body calls it directly as Grid1.h's Grid1Terrain::AcquireOwnedObject, which link_aliases binds to TerrainSupport.cpp's Terrain::AcquireOwnedObject (no arguments, no this adjustment). Not differentially tested.",
       "evidence": "docs/GAME_BUILD.md#near-miss-bodies-replacing-bring-up-copies"
+    },
+    {
+      "path": "samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "BoxCapsuleOverlap 0x00425900, BoxTriangleQuery 0x00426be0, SegmentTriangleQuery 0x00427c10, TreeTreeQueryNodes 0x004280e0 and SegmentSegmentDistance 0x0042a640 replace the Group0_BvhQuery bring-up copies of the same bodies; the file includes the canonical BoundingBoxTreeQuery.cpp (included_sources) for the unit's file statics and defines the never-written 0x00579668 flag. The out-of-line vector call views resolve through link_aliases. Not differentially tested.",
+      "evidence": "docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies"
     },
     {
       "path": "samples/race/WreckerNearMisses.cpp",

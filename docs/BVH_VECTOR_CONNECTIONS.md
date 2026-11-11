@@ -32,10 +32,11 @@ header include and source expressions preserve complete emitted objects.
 Against published baseline `291e16b5` and its actual
 `build-3jal2tv5` object, the newly compiled canonical query object retains all
 **53 nondebug sections and 491 relocations** under precisely the four names
-above. The separate `BoundingBoxTreeQueryNearMisses.cpp` aggregate retains all
-**38 nondebug sections and 465 relocations**, with no name substitutions.
-It includes the unchanged query header, rather than the canonical cpp, and
-still uses its own provisional calls. Its existing bindings remain intact.
+above. The separate `BoundingBoxTreeQueryNearMisses.cpp` aggregate now
+includes the canonical cpp (for the unit's file statics, so the game build can
+link it directly) and pins **65 nondebug sections and 929 relocations**. Its
+five near-miss bodies still use their own provisional calls, and its bindings
+remain intact.
 
 The comparison retains every section payload, writable/code flags, extent,
 relocation type, location, raw addend and destination. Defined destinations

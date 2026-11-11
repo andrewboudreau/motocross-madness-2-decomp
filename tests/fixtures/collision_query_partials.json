@@ -123,9 +123,9 @@
       "?BoxCapsuleOverlap@@",
       4348160,
       4314,
-      4276,
-      734,
-      "fdafdc244c5aff1c444cc6ad684cc57ecb714a00ebf8c86b6e75abe3de72d90d"
+      4321,
+      2450,
+      "66cf6c8ce2a8994891e514a09c704603d69b7e4b64fe1d3734f31acd2c35fa0c"
     ],
     [
       "samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp",

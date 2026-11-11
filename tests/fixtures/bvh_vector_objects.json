@@ -7,9 +7,9 @@
       "sha256": "bfd9992cc869601d16a69ddf51bdeb5c766912f8ebcadb3cc9f7fdd7224be185"
     },
     "samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp": {
-      "sections": 38,
-      "relocations": 465,
-      "sha256": "ced0096e7b55981e9dba5c1bc9918c26e767dcd81e177916b2a0a1bbc4fe70fa"
+      "sections": 65,
+      "relocations": 929,
+      "sha256": "f2a8307030823e6b0a2c1f97e9cee3dc3ae563d876badb8bd051b4e633d0c61b"
     }
   }
 }

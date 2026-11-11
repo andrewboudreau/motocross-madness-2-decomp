@@ -32,7 +32,8 @@
 //   code (useMotion pushed per arm, hit cleared after the pushes), but VC6 then merges the
 //   box a-children call into the b-children one and the leaf arms into each other; 24
 //   hit/return layouts (shared, per-arm, early-return, function-level hit) do not give
-//   retail's merge.  The out-of-line Vec3Call for a[0] (or a[0] and a[1]) only moves the
+//   retail's merge (`else if (LeafNodeQuery(...))` changes nothing; an early `return 0`
+//   for a failed LeafNodeQuery merges every tail, 557/631).  The out-of-line Vec3Call for a[0] (or a[0] and a[1]) only moves the
 //   expansion to the next constructor (472/177, 469/161 bytes/differing; all three give
 //   93/235), so one call stays missing in the s15 reference diff; its 0x22/0x86 immediates
 //   are the jump table after the function's ret (0x00428914), a false positive.
@@ -55,40 +56,34 @@
 //   (QueryDotZFirst) gives 374 (349 with DotProduct in both arms); the same helper in the
 //   set-flag arm loses (332 alone, 357 in both).
 //
-// - BoxCapsuleOverlap 0x00425900 (4314 bytes, 4276 here): first draft with the decoded
-//   structure (box axes, axes crossed with the segment direction, three corner directions).
-//   The segment transform, the midpoint/half-segment constructor calls and the box-axis tests
-//   match.  The corner distances as six float locals (retail keeps the first corner's on
-//   the x87 stack and stores the second's) squared through QuerySquares bring the instruction
-//   stream in line with retail's (normalised diff 1552 -> 377 instructions; the seventh
-//   normalisation then calls operator* as retail does).  Writing the twelve corner signs
-//   through the QuerySigned helper spends the inline budget retail spent: both squared-corner
-//   constructors and the fifth normalisation's DotProduct are then calls as in retail
-//   (normalised diff 377 -> 291), and the normalisation helper's named result moves it to
-//   266 (734 bytes in place; the last normalisation's operator* is then a call as in
-//   retail).  Left: retail also calls DotProduct in the sixth and seventh normalisations
-//   (corner-distance or box-axis-test helpers spend more budget but leave those two
-//   expanded; dearer QuerySigned/QuerySquares bodies, corner differences passed inline,
-//   corner locals interleaved with their squares and a zero-constructed cornerDir each reshuffle the
-//   whole call pattern instead, normalised diff 268-975), copies each normalised axis twice (into a temporary that the
-//   test reads and into the axis), and in each separating-axis test retail sums the
-//   three projected radii before the segment's half-length projection (as `(r = ...) + D`
-//   would) and orders the z axis's dot product (0 + 0) + axis.z * hz.  A projected-radius inline
-//   helper (4430+ bytes) or DotProduct for both the mid and the half-segment projections
-//   (4543) spends too much budget.  A fresh axis local per test changes nothing (734 bytes,
-//   266 differing; the two missing 0x0040ae30 calls in the s15 reference diff).
-#include "bvh/BoundingBoxTreeQuery.h"
-
-// The unit's file statics (bound to the same addresses as in the src file).
-static Vec3* s_vertices;            // 0x00578f4c
-static Matrix4 s_relativeAB;        // 0x00578ef0
-static Matrix4 s_relativeBA;        // 0x00578eb0
-static Matrix4 s_motion;            // 0x00579018
-static int s_mode;                  // 0x0057905c
-extern QueryHit* g_CollisionBoxResult;   // 0x00579058
-
-// The 15 separating-axis candidates of the box/box test, filled lazily inside the loop.
-static Vec3 s_axes[15];             // 0x00578f50
+// - BoxCapsuleOverlap 0x00425900 (4314 bytes, 4321 here, 2450 strict, 1283/1300 aligned):
+//   the decoded structure (box axes, axes crossed with the segment direction, three corner
+//   directions).  Shape points that moved it from 734 strict / 1140 aligned:
+//   * six float corner distances squared through QuerySquares and the corner signs through
+//     QuerySigned spend the inline budget retail spent (squared-corner constructors and most
+//     normalisation DotProducts are calls as in retail); QuerySigned written as if/return
+//     (not ?:) is one step cheaper again (1273 -> 1277 equal instructions).
+//   * one `axis` written component by component and normalised in place
+//     (axis = Vec3NormalizeInline(axis), named result r): retail keeps the input and the axis
+//     in one slot.  `axis = Vec3(...)` copies through a temporary (1142); a by-value or
+//     in-place QueryNormalize(Vec3&) helper gives 1136/1219.
+//   * each separating-axis test as named `dist` and `ra` (three QueryDot projections) plus the
+//     z-first half-segment projection: retail's fadd st(1)/faddp st(2)/fstp st(0) sum, the
+//     (0 + 0) + z*hz order and the out-of-line DotProduct in the sixth normalisation.
+//   * the box tests read a named |halfSegment| extent first (separate floats per axis).
+//   Left (17 instructions): the seventh normalisation's DotProduct stays inline (retail calls
+//   it), two fxch in the fifth/sixth tests, c1z's slot (retail 0x48 beside c1x/c1y) and a
+//   permuted frame.  Ruled out (equal instructions of 1300): QueryDot for only boxAxes[2]
+//   (1089) or an explicit z-first boxAxes[2] (1171); QueryDot/DotProduct/a z-first helper
+//   for the half-segment too (inlines go out of line); `!(... >= ...)`, `<`, if/else and
+//   parenthesised box tests (1263-1264); a QueryGap corner helper, c1 as a Vec3, the squares
+//   as direct constructors (1206), the normalise helper without braces (1252), a
+//   zero-constructed cornerDir and `else return 1` (no change).
+// The canonical unit, whole: its file statics (vertex array, relative frames, motion matrix,
+// axis scratch, the scratch contact list and the hit record) are the ones these functions
+// read, and the game build links this file in place of a bring-up copy
+// (config/game_build.json included_sources / candidate_sources).
+#include "bvh/BoundingBoxTreeQuery.cpp"
 
 // v / |v| (returns v when |v|^2 == 1): the result of Math3D.h's Vec3Normalize
 // (0x005087b0), written with a named result (BoxCapsuleOverlap is closer to retail with
@@ -106,7 +101,7 @@ inline Vec3 Vec3NormalizeInline(const Vec3& v)
     return r;
 }
 
-inline float QuerySigned(float s, float p) { return p < 0.0f ? -s : s; }
+inline float QuerySigned(float s, float p) { if (p < 0.0f) return -s; return s; }
 // Component-wise squares of the corner distances (BoxCapsuleOverlap).
 inline Vec3 QuerySquares(float x, float y, float z)
 {
@@ -128,11 +123,14 @@ int BoxCapsuleOverlap(const Vec3* center, const Vec3* halfExtents, const Vec3* e
     p1 -= *center;
     Vec3 mid = (p0 + p1) * 0.5f;
     Vec3 halfSegment = mid - p0;
-    if (QueryAbs(mid.x) > QueryAbs(halfSegment.x) + halfExtents->x + radius)
+    float extent = QueryAbs(halfSegment.x);
+    if (QueryAbs(mid.x) > extent + halfExtents->x + radius)
         return 0;
-    if (QueryAbs(mid.y) > QueryAbs(halfSegment.y) + halfExtents->y + radius)
+    float extentY = QueryAbs(halfSegment.y);
+    if (QueryAbs(mid.y) > extentY + halfExtents->y + radius)
         return 0;
-    if (QueryAbs(mid.z) > QueryAbs(halfSegment.z) + radius + halfExtents->z)
+    float extentZ = QueryAbs(halfSegment.z);
+    if (QueryAbs(mid.z) > extentZ + radius + halfExtents->z)
         return 0;
     Vec3 boxAxes[3];
     boxAxes[0] = Vec3(halfExtents->x, 0.0f, 0.0f);
@@ -140,23 +138,33 @@ int BoxCapsuleOverlap(const Vec3* center, const Vec3* halfExtents, const Vec3* e
     boxAxes[2] = Vec3(0.0f, 0.0f, halfExtents->z);
     Vec3 dir = Vec3NormalizeInline(p1 - p0);
     Vec3 axis;
-    axis = Vec3NormalizeInline(Vec3(-dir.z, 0.0f, dir.x));
-    if (QueryAbs(axis.z * mid.z + (axis.x * mid.x + axis.y * mid.y)) >
-            QueryAbs(DotProduct(axis, boxAxes[0])) + QueryAbs(DotProduct(axis, boxAxes[1]))
-            + QueryAbs(DotProduct(axis, boxAxes[2]))
-            + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
+    float dist, ra;
+    axis.x = -dir.z;
+    axis.y = 0.0f;
+    axis.z = dir.x;
+    axis = Vec3NormalizeInline(axis);
+    dist = QueryAbs(QueryDot(axis, mid));
+    ra = QueryAbs(QueryDot(axis, boxAxes[0])) + QueryAbs(QueryDot(axis, boxAxes[1]))
+            + QueryAbs(QueryDot(axis, boxAxes[2]));
+    if (dist > ra + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
         return 0;
-    axis = Vec3NormalizeInline(Vec3(dir.y, -dir.x, 0.0f));
-    if (QueryAbs(axis.z * mid.z + (axis.x * mid.x + axis.y * mid.y)) >
-            QueryAbs(DotProduct(axis, boxAxes[0])) + QueryAbs(DotProduct(axis, boxAxes[1]))
-            + QueryAbs(DotProduct(axis, boxAxes[2]))
-            + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
+    axis.x = dir.y;
+    axis.y = -dir.x;
+    axis.z = 0.0f;
+    axis = Vec3NormalizeInline(axis);
+    dist = QueryAbs(QueryDot(axis, mid));
+    ra = QueryAbs(QueryDot(axis, boxAxes[0])) + QueryAbs(QueryDot(axis, boxAxes[1]))
+            + QueryAbs(QueryDot(axis, boxAxes[2]));
+    if (dist > ra + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
         return 0;
-    axis = Vec3NormalizeInline(Vec3(0.0f, dir.z, -dir.y));
-    if (QueryAbs(axis.z * mid.z + (axis.x * mid.x + axis.y * mid.y)) >
-            QueryAbs(DotProduct(axis, boxAxes[0])) + QueryAbs(DotProduct(axis, boxAxes[1]))
-            + QueryAbs(DotProduct(axis, boxAxes[2]))
-            + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
+    axis.x = 0.0f;
+    axis.y = dir.z;
+    axis.z = -dir.y;
+    axis = Vec3NormalizeInline(axis);
+    dist = QueryAbs(QueryDot(axis, mid));
+    ra = QueryAbs(QueryDot(axis, boxAxes[0])) + QueryAbs(QueryDot(axis, boxAxes[1]))
+            + QueryAbs(QueryDot(axis, boxAxes[2]));
+    if (dist > ra + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
         return 0;
     float c0x = QueryAbs(halfExtents->x) - QueryAbs(p0.x);
     float c0y = QueryAbs(halfExtents->y) - QueryAbs(p0.y);
@@ -166,48 +174,47 @@ int BoxCapsuleOverlap(const Vec3* center, const Vec3* halfExtents, const Vec3* e
     float c1z = QueryAbs(halfExtents->z) - QueryAbs(p1.z);
     Vec3 s0 = QuerySquares(c0x, c0y, c0z);
     Vec3 s1 = QuerySquares(c1x, c1y, c1z);
-    Vec3 cornerDir;
     if (s0.x + s0.y < s1.x + s1.y) {
-        cornerDir.x = QuerySigned(s0.x, p0.x);
-        cornerDir.y = QuerySigned(s0.y, p0.y);
+        axis.x = QuerySigned(s0.x, p0.x);
+        axis.y = QuerySigned(s0.y, p0.y);
     } else {
-        cornerDir.x = QuerySigned(s1.x, p1.x);
-        cornerDir.y = QuerySigned(s1.y, p1.y);
+        axis.x = QuerySigned(s1.x, p1.x);
+        axis.y = QuerySigned(s1.y, p1.y);
     }
-    cornerDir.z = 0.0f;
-    axis = Vec3NormalizeInline(cornerDir);
-    if (QueryAbs(axis.z * mid.z + (axis.x * mid.x + axis.y * mid.y)) >
-            QueryAbs(DotProduct(axis, boxAxes[0])) + QueryAbs(DotProduct(axis, boxAxes[1]))
-            + QueryAbs(DotProduct(axis, boxAxes[2]))
-            + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
+    axis.z = 0.0f;
+    axis = Vec3NormalizeInline(axis);
+    dist = QueryAbs(QueryDot(axis, mid));
+    ra = QueryAbs(QueryDot(axis, boxAxes[0])) + QueryAbs(QueryDot(axis, boxAxes[1]))
+            + QueryAbs(QueryDot(axis, boxAxes[2]));
+    if (dist > ra + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
         return 0;
     if (s0.x + s0.z < s1.x + s1.z) {
-        cornerDir.x = QuerySigned(s0.x, p0.x);
-        cornerDir.z = QuerySigned(s0.z, p0.z);
+        axis.x = QuerySigned(s0.x, p0.x);
+        axis.z = QuerySigned(s0.z, p0.z);
     } else {
-        cornerDir.x = QuerySigned(s1.x, p1.x);
-        cornerDir.z = QuerySigned(s1.z, p1.z);
+        axis.x = QuerySigned(s1.x, p1.x);
+        axis.z = QuerySigned(s1.z, p1.z);
     }
-    cornerDir.y = 0.0f;
-    axis = Vec3NormalizeInline(cornerDir);
-    if (QueryAbs(axis.z * mid.z + (axis.x * mid.x + axis.y * mid.y)) >
-            QueryAbs(DotProduct(axis, boxAxes[0])) + QueryAbs(DotProduct(axis, boxAxes[1]))
-            + QueryAbs(DotProduct(axis, boxAxes[2]))
-            + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
+    axis.y = 0.0f;
+    axis = Vec3NormalizeInline(axis);
+    dist = QueryAbs(QueryDot(axis, mid));
+    ra = QueryAbs(QueryDot(axis, boxAxes[0])) + QueryAbs(QueryDot(axis, boxAxes[1]))
+            + QueryAbs(QueryDot(axis, boxAxes[2]));
+    if (dist > ra + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
         return 0;
     if (s0.y + s0.z < s1.y + s1.z) {
-        cornerDir.y = QuerySigned(s0.y, p0.y);
-        cornerDir.z = QuerySigned(s0.z, p0.z);
+        axis.y = QuerySigned(s0.y, p0.y);
+        axis.z = QuerySigned(s0.z, p0.z);
     } else {
-        cornerDir.y = QuerySigned(s1.y, p1.y);
-        cornerDir.z = QuerySigned(s1.z, p1.z);
+        axis.y = QuerySigned(s1.y, p1.y);
+        axis.z = QuerySigned(s1.z, p1.z);
     }
-    cornerDir.x = 0.0f;
-    axis = Vec3NormalizeInline(cornerDir);
-    if (QueryAbs(axis.z * mid.z + (axis.x * mid.x + axis.y * mid.y)) >
-            QueryAbs(DotProduct(axis, boxAxes[0])) + QueryAbs(DotProduct(axis, boxAxes[1]))
-            + QueryAbs(DotProduct(axis, boxAxes[2]))
-            + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
+    axis.x = 0.0f;
+    axis = Vec3NormalizeInline(axis);
+    dist = QueryAbs(QueryDot(axis, mid));
+    ra = QueryAbs(QueryDot(axis, boxAxes[0])) + QueryAbs(QueryDot(axis, boxAxes[1]))
+            + QueryAbs(QueryDot(axis, boxAxes[2]));
+    if (dist > ra + QueryAbs(axis.z * halfSegment.z + (axis.x * halfSegment.x + axis.y * halfSegment.y)) + radius)
         return 0;
     return 1;
 }
@@ -426,9 +433,9 @@ float SegmentSegmentDistance(const Vec3* p0, const Vec3* d0, const Vec3* p1, con
 }
 
 // 0x00427c10.  Segment (moved by m) against a triangle, accumulating into the sweep record.
-extern Vec3 g_CollisionScratchPoints[128];   // 0x00579068
-extern int g_CollisionScratchCount;          // 0x00579014
-extern int g_unknown579668;                  // 0x00579668
+// 0x00579668: read here and never written anywhere in retail (.bss, so always 0); outside
+// the unit's .bss range, owner unknown.  Defined here for the link.
+int g_unknown579668;
 
 // The sweep record SegmentTriangleQuery accumulates into (the same pointer as
 // g_CollisionBoxResult; CollisionShapeTests.h's CollisionSweepQuery).
