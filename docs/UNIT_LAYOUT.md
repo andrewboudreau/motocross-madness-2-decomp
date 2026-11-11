@@ -38,7 +38,19 @@ Confirmed by strict byte comparison of the units below:
   Retail `AgeManager.cpp` has its qsort comparator at `0x00401180`, before
   `EvictStale` (`0x004011b0`), so in retail it was not `static`, or it was
   emitted differently. With `static` our object puts it after `EvictStale`.
-  Without `static` the whole unit is byte-identical.
+  Without `static` the whole unit is byte-identical. Moving the `static`
+  definition does not help. `KeyboardHook.cpp` with the hook procedure and
+  both static helpers defined first still emits `SetTaskSwitchAllowed`,
+  `InstallTaskSwitchHook`, hook procedure, `RemoveTaskSwitchHook`. Retail has
+  the hook procedure at `0x005053d0`, before `InstallTaskSwitchHook`
+  (`0x00505420`). It lays out exactly only as an extern function defined in
+  that place.
+- A dynamic initializer `_$E<n>` is emitted where its object is defined.
+  `CollisionPoint.cpp`'s four vector constants (`0x0043b050..0x0043b18b`) sit
+  between `UpdateCollisionPointWorldPositions` and `CollisionRejectFrom`.
+- Bodies that `/OPT:ICF` folds within one unit are bound to the same VA. The
+  tool keeps the first section and reports the later ones as `folded` (for
+  example `CharacterDefaults`, `GameplayDefaults`, `UIControlDefaults`).
 - Pick-any COMDATs are deleting destructors (`??_G`) and inline methods. Such a
   COMDAT keeps its section-table position in the first object that keeps it.
   `ArcadeObject`'s `??_G` sits right after its constructor in both builds.
@@ -83,33 +95,91 @@ Each of these was laid out strictly, with all relocations resolved:
 `tests/test_unit_layout.py` checks `AgeManager` and `ArcadeObject` when
 `VC6_ROOT` and `MCM2_EXE` are set.
 
-A survey of all 386 compiled `src/` objects ran with the anchors set to
-`auto` (bring-up files excluded). 90 objects lay out their `.text` strictly.
-25 of them have EH, and their `.text$x` and `.xdata$x` are strict too. Among
-them are `Parser`, `TextureMap`, `Tgafile`, `ZoneReport`, `PCControl` and
-`ManagedTextureGroup`. A strict object proves its own span. It does not prove
-that the object covers its whole retail unit: compare the span with the unit's
+The sweep below finds 101 identical units. They include these units except
+`Arrow`, which needs its `--drop`. A strict object proves its own span. It
+does not prove that the object covers its whole retail unit: compare the
+span with the unit's
 extent in [REBUILD_GAPS.md](REBUILD_GAPS.md#translation-units-and-link-order)
 first. `ArcadeObject` is an example of an object that is strict but does not
 cover its whole unit.
 
-## Blockers
+## Sweep of the strict units
 
-116 objects differ. Each was classified by the first problem in its first
-differing section:
+`tools/unit_layout_sweep.py` lays out every `src/` unit whose registered
+functions (calibration cases and `targets.json` entries) are all strict exact.
+It writes `report.json` and `report.md` to the ignored
+`work/unit-layout-sweep/`. Each laid-out unit gets a verdict. Every `.text`
+section that keeps a unit from being identical gets a finding with its cause.
+The module docstring lists the finding kinds.
 
-- **Unregistered functions (52):** the object emits a function that has no
-  retail address, so nothing anchors its bytes.
-- **Order (36):** a function lays out at a VA other than its bound one. Most
-  of these `src/` files do not follow retail unit boundaries. Some hold
-  functions from several retail units, or only part of one, for example
-  `FastMath.cpp` (`InitFastMath` is bound before the object's anchor),
-  `DebugOverlay.cpp`, `CollisionObject.cpp`, `Bike.cpp` and `GameUi.cpp`.
-  To fix these, merge or split the files into their owning units in source
-  order. The other order failures come from `static` deferral and from inline
-  helpers that VC6 places differently.
-- **Bytes (28):** the function sits at the right place but is a near miss.
-  This is ordinary matching work (see [REBUILD_GAPS.md](REBUILD_GAPS.md)).
+```bash
+export VC6_ROOT=... MCM2_EXE=work/game/mcm2.exe PYTHONPATH=.
+python tools/unit_layout_sweep.py --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+python tools/unit_layout_sweep.py --source src/reconstructed/KeyboardHook.cpp
+python -m unittest discover -s tests -p "test_unit_layout*.py"
+```
+
+There are 225 units (`src/bringup` excluded). 43 are not laid out: 35 have no
+registered function, and 8 `src/krusty2` units have registered functions
+that are not strict.
+
+| Verdict | Units |
+|---|---|
+| identical (every group strict, every bound function at its VA) | 101 |
+| identical, with functions that have no retail address | 2 (`BikeAI`, `BikeCamera`) |
+| differs | 79 |
+
+Eight units became identical through source order alone, without changing
+any function bytes. `BackgroundImage`, `CacheTexture`, `ControlInterface`,
+`ExceptionHandler`, `PCRenderTarget`, `TrackGame` and `VideoCard` now define
+their functions in retail address order. `KeyboardHook`'s hook procedure is
+extern. `CollisionPoint` is in retail order too, initializers included. Only
+its deleting destructor is still misplaced (see below).
+
+The 79 units that differ carry these finding kinds. A unit can carry several,
+and folds or pick-any COMDATs kept elsewhere are not counted:
+
+| Kind | Units | Only kind |
+|---|---|---|
+| `unregistered` (a function without a retail address) | 65 | 26 |
+| `gap_missing` (retail has code our object lacks) | 31 | 5 |
+| `order` | 27 | 1 |
+| `gap_extra` (more bytes than retail between two bound functions) | 23 | 0 |
+| `bytes` (at its VA, bytes differ) | 21 | 0 |
+| `static_deferred` | 2 | 0 |
+| `icf_duplicate` | 2 | 0 |
+
+Most `order` findings are in units that hold functions from several retail
+units, or only part of one, such as `FastMath`, `DebugOverlay`, `Bike` and
+`GameUi`. Fixing them takes moves between files. Those moves have not been
+made.
+
+Units whose retail range holds functions defined in other `src/` files:
+
+- `ExceptionHandler.cpp`: the retail unit opens with `RecordExceptionInfo`
+  (`0x0045ff80`), which is in `src/reconstructed/Main.cpp`. The object
+  starts at `hprintf`, so the sweep's anchor does not see this.
+- `BikeRace.cpp`: the gap `0x004210f0..0x00421d50` holds vector helpers
+  registered in `VectorCalls.cpp` and `VectorValueArithmetic.cpp`.
+- `MSZoneInterface.cpp`: the gap `0x004aa150..0x004aa350` holds seven
+  `SoultreePhysicsBaseObject` methods registered in
+  `SoultreePhysicsMethods.cpp`. Whether they belong to this unit or the
+  anchors are misbound is open.
+
+`gap_missing` findings name owners in `samples/` too. Two examples are
+`FileStream`'s `CheckHeader` in `samples/io/FileStream.cpp` and the vector
+helpers of `BikeRace` in `samples/physics/helpers/VectorOps.cpp`.
+
+Unexplained:
+
+- Deleting-destructor placement. Retail `FontTexture.cpp` has `??_GFontTexture`
+  (`0x00467160`) before the constructor. Our object emits it after the
+  constructor. Retail `Quantize.cpp` has `??_GColorMapper` (`0x004ddea0`)
+  right after `LoadShared`, before `Build16BitTables`. Ours comes later.
+  Retail `CollisionPoint.cpp` has `??_GCollisionPoint` (`0x0043b300`) last.
+  Ours follows `AddCollisionPoint`, which inlines the constructor that stores
+  the vtable. Which construct makes VC6 emit `??_G` where retail has it is
+  not known.
 
 Two blockers cut across these groups:
 
