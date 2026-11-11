@@ -37,8 +37,8 @@ the operator forms, about 30 extra trivial statements (dead code counts,
 retail (ratio 0.78; the tangent temporaries' slots differ). So the original
 caller was about 15% larger in front-end nodes than the decoded code shows,
 or its helpers cheaper; no padded source is kept. Slot 10 `0x0042fd80` (2909 bytes) is written
-in the same sample (221/2844 strict; with relocations and frame offsets
-masked 781 instructions like retail's, 88% aligned): the first update sets
+in the same sample and linked by the game build (580/2909 strict, 719 of
+retail's 782 instructions aligned, frame 0xdc like retail's): the first update sets
 a two-point mesh on the sensor collider and the wheel height; each frame it
 wraps `pathTime` with `fmod`, evaluates the path at the look-ahead
 (result named before the subtraction), behind (`-1.0f`) and steering

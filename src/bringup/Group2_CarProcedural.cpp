@@ -13,42 +13,14 @@
 #include "../krusty2/core/SoultreeObject.h"
 
 // The ground provider is the terrain (0x00507c10, Terrain::QueryGround in src); the
-// scene-node calls are SoultreeObject's (soultree.cpp). CarProcedural.h's own views of
-// them (CarProceduralTerrain, CarProceduralNode) have no definitions, so this unit calls
-// the defined names through file-local adapters.
-struct TerrainVec3;
-class Terrain {
-public:
-    void QueryGround(TerrainVec3* position, TerrainVec3* normal, int a, unsigned char* surface);
-};
-
+// scene-node calls are SoultreeObject's (soultree.cpp).  This unit calls them through
+// CarProcedural.h's own views (CarProceduralTerrain, CarProceduralNode), as the sample
+// does; config/game_build.json's link_aliases bind those names to the defined
+// Terrain/SoultreeObject methods at the same retail addresses (same thiscall ABI, the
+// Vector3/Vec3 views are both three floats).
 static inline SoultreeObject* CarNode(CarProceduralNode* node)
 {
     return reinterpret_cast<SoultreeObject*>(node);
-}
-static inline Vector3 CarToVector3(const Vec3& v)
-{
-    Vector3 r;
-    r.x = v.x;
-    r.y = v.y;
-    r.z = v.z;
-    return r;
-}
-static inline Vec3 CarToVec3(const Vector3& v)
-{
-    Vec3 r;
-    r.x = v.x;
-    r.y = v.y;
-    r.z = v.z;
-    return r;
-}
-static inline Vector3 CarWorldToLocal(CarProceduralNode* node, const Vector3& v)
-{
-    return CarToVector3(CarNode(node)->WorldToLocalDirection(CarToVec3(v)));
-}
-static inline Vector3 CarLocalToWorld(CarProceduralNode* node, const Vector3& v)
-{
-    return CarToVector3(CarNode(node)->LocalToWorldDirection(CarToVec3(v)));
 }
 
 static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
@@ -174,17 +146,10 @@ static int CarOrientationAxesFromAngles(Vector3* look, Vector3* up, float headin
 }
 
 // Out-of-line call views (docs/VC6_INLINE_BUDGET.md): the orthonormalisation
-// of the collider frame calls the COMDAT cross product and normalisation.
-Vec3 CrossProductCall(const Vec3& a, const Vec3& b);                      // 0x00515600
-Vec3 Vec3Normalize(const Vec3& v);                                        // 0x005087b0
-static inline Vector3 CarCrossCall(const Vector3& a, const Vector3& b)
-{
-    return CarToVector3(CrossProductCall(CarToVec3(a), CarToVec3(b)));
-}
-static inline Vector3 CarNormalizeCall(const Vector3& v)
-{
-    return CarToVector3(Vec3Normalize(CarToVec3(v)));
-}
+// of the collider frame calls the COMDAT cross product and normalisation
+// (link_aliases: CrossProductCall and Vec3Normalize, the same bodies).
+Vector3 CarCrossCall(const Vector3& a, const Vector3& b);                 // 0x00515600
+Vector3 CarNormalizeCall(const Vector3& v);                               // 0x005087b0
 
 static inline Vector3 CarCross(const Vector3& a, const Vector3& b)
 {
@@ -270,6 +235,7 @@ static inline float CarClamp(float v, float lo, float hi)
 
 int CarProcedural::Tick(float frameTime)
 {
+    Vector3 axisA;
     int result = GameObject::Tick(frameTime);
     if (frameTime <= 0.0)
         return result;
@@ -306,7 +272,7 @@ int CarProcedural::Tick(float frameTime)
     forward.y = 0.0f;
     pathVelocity = forward * velocityScale;
     groundSpeed = CarLength(pathVelocity);
-    Vector3 local = CarWorldToLocal(carModel, forward);
+    Vector3 local = carModel->WorldToLocalDirection(forward);
     if (numWheels > 0)
         wheelSpinAngle = (float)fmod(inverseWheelRadius * velocityScale * local.z * frameTime + wheelSpinAngle, 6.2831855f);
     float behind = FindOffsetAtDistance(t, -1.0f);
@@ -319,15 +285,15 @@ int CarProcedural::Tick(float frameTime)
     if (steersFrontWheels && numWheels > 0) {
         float wheelbase = FindOffsetAtDistance(t, -frontWheelZ);
         Vector3 side = PositionAtTime(t - wheelbase) - pathPosition;
-        Vector3 steer = CarWorldToLocal(carModel, side);
+        Vector3 steer = carModel->WorldToLocalDirection(side);
         steeringAngle = (float)atan2(steer.x, steer.z);
         steeringAngle = CarClamp(steeringAngle, -0.52359873f, 0.52359873f);
     }
     Vector3 position;
-    CarNode(carModel)->GetPositionIn(0, reinterpret_cast<Vec3*>(&position));
+    carModel->GetPositionIn(0, &position);
     Vector3 ground = position;
     Vector3 normal;
-    ((Terrain*)groundProvider)->QueryGround((TerrainVec3*)&ground, (TerrainVec3*)&normal, 0, 0);
+    ((CarProceduralTerrain*)groundProvider)->QueryGround(&ground, &normal, 0, 0);
     // The sensor collider's frame: the world axes orthonormalised.
     Matrix4 transform;
     CarFrame(&transform, kVec3ZAxis, kVec3YAxis, position);
@@ -346,13 +312,12 @@ int CarProcedural::Tick(float frameTime)
     else
         smoothedNormal = smoothedNormal * normalBlend + normal * (1.0f - normalBlend);
     Vector3 flat = smoothedBack - smoothedNormal * CarDot(smoothedBack, smoothedNormal);
-    CarNode(carModel)->SetAxesPtr((const Vec3*)&flat, (const Vec3*)&smoothedNormal, 0, 1);
+    carModel->SetAxesPtr(&flat, &smoothedNormal, 0, 1);
     Vector3 target(pathOffset.x + pathPosition.x, ground.y, pathOffset.z + pathPosition.z);
-    Vector3 offset = CarLocalToWorld(carModel, bodyOffset);
+    Vector3 offset = carModel->LocalToWorldDirection(bodyOffset);
     Vector3 placement = target - offset;
-    CarNode(carModel)->SetPositionInFrame(0, (const Vec3*)&placement);
+    carModel->SetPositionInFrame(0, &placement);
     for (unsigned int i = 0; i < numWheels; i++) {
-        Vector3 axisA;
         Vector3 axisB;
         if (steersFrontWheels && i < 2) {
             CarOrientationAxesFromAngles(&axisA, &axisB, steeringAngle, -wheelSpinAngle, 0.0f);
@@ -364,17 +329,17 @@ int CarProcedural::Tick(float frameTime)
             axisB.y = axisA.z;
             axisB.z = -axisA.y;
         }
-        CarNode(wheelNodes[i])->SetAxesPtr((const Vec3*)&axisA, (const Vec3*)&axisB, 0, 1);
+        wheelNodes[i]->SetAxesPtr(&axisA, &axisB, 0, 1);
     }
     bodyCollider->UpdatePlacement();
     if (bodyCollider->QueryCollisions()) {
         CarProceduralContact* contact = (CarProceduralContact*)bodyCollider->contactRecord;
         bodyContactPoint = contact->contactPoint;
         bodyContactNormal = contact->contactNormal;
-        Vector3& shapePosition = ((CarProceduralBody*)bodyCollider->shape)->position;
-        shapePosition.x -= contact->contactOffset.x * 1.005f;
-        shapePosition.y -= contact->contactOffset.y * 1.005f;
-        shapePosition.z -= contact->contactOffset.z * 1.005f;
+        CarProceduralBody* body = (CarProceduralBody*)bodyCollider->shape;
+        body->position.x -= contact->contactOffset.x * 1.005f;
+        body->position.y -= contact->contactOffset.y * 1.005f;
+        body->position.z -= contact->contactOffset.z * 1.005f;
     }
     return result;
 }

@@ -106,6 +106,11 @@
 // loop-head drag vectors keep their zero components in memory in retail (the
 // candidate's are constant-folded), the order of a few temporaries and stores
 // (0x00411dbc vF += (commuted operands), 0x00412883), and the frame layout.
+// Retail folds up.y = 1 into the start-up cross but loads up.x/up.z from the copy of
+// the Vec3(0, 0, 0) temporary, and that code sits after the `side` test; moving the
+// `up` set-up into an if/else arm (with `up` at function or block scope, either branch
+// order) still folds it and loses 111 aligned instructions (3628), and a comma
+// expression in the ternary's false arm still folds it (3740 aligned, 1468 strict).
 //
 // The game reads (race kind, tree collision, object root, difficulty, race mode) go
 // through the complete TrackGame class, with no view cast: aligned 3731 of 3966, frame
@@ -1278,8 +1283,8 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 // Not kept: `Vec3(0.0f)` zero temporaries (2033 strict but 27 differing instructions
 // against 17).
 //
-// 0x00414370 (4802 bytes): block order, calls and constants match (1279 vs 1302
-// instructions).  Retail's race-kind test lays out the default (free-roam) block first,
+// 0x00414370 (4802 bytes): block order, calls and constants match (1291 vs 1302
+// instructions linked; strict 644/4802, aligned 1094 of 1302).  Retail's race-kind test lays out the default (free-roam) block first,
 // then kinds 1/5, then 2/3, which the nested `kind != 3 && kind != 2` form reproduces (a
 // switch builds a jump table).  Differences: frame 0x74 vs 0x78 (retail keeps the
 // difficulty in a stack slot, which the uninitialised trick delay of the other kinds
@@ -1294,9 +1299,22 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 // into the racing line with one struct copy and builds `roamTarget - position` as a vector
 // temporary (component-wise floats: 1052 aligned, Vec3: 1076).  The random roam target is written x, z,
 // then y (retail's zero store follows the second rand call; 1049 -> 1052 aligned of 1302).
-// Retail keeps `invLen * roamOffset.y` in the inline normalize (roamOffset.y is the zero
-// register's value) while VC6 folds it here; by-value, `v * invLen` and operand-order helper
-// forms do not change that.
+// The roam offset is the function-scope `dir` that the finished-bike branch later fills
+// through SegmentDirection: retail keeps the offset's stores because that slot (esp+0x34)
+// is address-taken (505 -> 662 strict, 1076 -> 1082 aligned; a separate roamOffset at
+// function scope 505, reusing a 629, c 624).  Retail keeps `invLen * dir.y` in the
+// inline normalize (dir.y is the zero register's value) while VC6 folds it here;
+// by-value, `v * invLen` and operand-order helper forms do not change that.
+// The off-track (kinds 2/3) loop measures aiPath.points[0], not points[i] (retail reads
+// the fixed +0x844/+0x848/+0x84c fields; the loop runs once, so behaviour is the same),
+// with BikeAISquareMagnitude's (x + y) + z, and is written `i = 0; while (1)` like the
+// other two loops (a `for (i = 0;;)` lets VC6 drop the first count test): 662 -> 644
+// strict (frame-slot shift), 1082 -> 1094 aligned.  Its body now matches retail; left
+// there: retail holds the count constant 1 in ebp (`mov ebp, 1; push ebp; mov [count],
+// ebp`) and 40.0f in ebx, the candidate uses immediates and another register for i.
+// Ruled out: do/while loops with the t test as the condition (rotated, the count test
+// moves to the bottom: 691 strict but 1078 aligned), swapping or replacing the gate-tail
+// dot helper (inert or 223 strict), and declaring difficulty/kind elsewhere (inert).
 // The local declaration order is inert.  Writing the gate tail after the loop with gotos
 // compiles to identical code: the block order comes from the flow graph, and retail's has
 // an extra `xor ebp, ebp` re-zero edge after the loop (its tail stores avoidNearOnly from
@@ -1668,6 +1686,7 @@ int KrustyBike::Fn_00414370(float dt)
     KbRaw3 pathPos;
     KbGate* gate;
     Vec3 a, b, c;
+    Vec3 dir;  // the roam offset, later the strip direction (one slot in retail)
     float distance;
     float right, left;
     float gateAhead, bikeAhead;
@@ -1685,17 +1704,16 @@ int KrustyBike::Fn_00414370(float dt)
     if (kind != 3 && kind != 2) {
         if (kind != 1 && kind != 5) {
             aiPath.count = 1;
-            Vec3 roamOffset;
-            roamOffset = roamTarget - position;
-            roamOffset.y = 0.0f;
-            if (roamOffset.z * roamOffset.z + roamOffset.x * roamOffset.x < 2500.0f) {
-                roamOffset.x = rand() * (1.0f / 32768.0f);
-                roamOffset.z = rand() * (1.0f / 32768.0f);
-                roamOffset.y = 0.0f;
-                roamOffset = BikeAINormalizeInline(roamOffset) * 444.0f * terrain->worldScale;
-                roamTarget.x = terrain->worldScale * 666.66f + roamOffset.x;
+            dir = roamTarget - position;
+            dir.y = 0.0f;
+            if (dir.z * dir.z + dir.x * dir.x < 2500.0f) {
+                dir.x = rand() * (1.0f / 32768.0f);
+                dir.z = rand() * (1.0f / 32768.0f);
+                dir.y = 0.0f;
+                dir = BikeAINormalizeInline(dir) * 444.0f * terrain->worldScale;
+                roamTarget.x = terrain->worldScale * 666.66f + dir.x;
                 roamTarget.y = 0.0f;
-                roamTarget.z = terrain->worldScale * 666.66f + roamOffset.z;
+                roamTarget.z = terrain->worldScale * 666.66f + dir.z;
             } else {
                 aiPath.points[0] = roamTarget;
             }
@@ -1868,7 +1886,8 @@ int KrustyBike::Fn_00414370(float dt)
             aiPath.count = count;
             if (list) {
                 t = 1.0f;
-                for (i = 0;;) {
+                i = 0;
+                while (1) {
                     if (i >= aiPath.count)
                         break;
                     if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &pathPos, &list,
@@ -1877,7 +1896,7 @@ int KrustyBike::Fn_00414370(float dt)
                     if (!race->raceTrack->PointAt(pathPos, &aiPath.points[i]))
                         return 0;
                     aiPath.points[i].y = position.y + 2.0f;
-                    lenSq = SquareMagnitude(aiPath.points[i] - position);
+                    lenSq = BikeAISquareMagnitude(aiPath.points[0] - position);
                     if (lenSq == 1.0f || FastSqrt(lenSq) < 100.0f)
                         aiPath.targetSpeed = 40.0f;
                     i++;
@@ -1908,7 +1927,6 @@ int KrustyBike::Fn_00414370(float dt)
                 goto done;
             }
             aiPath.targetSpeed = 40.0f;
-            Vec3 dir;
             if (!race->raceTrack->SegmentDirection(statusNode->progressPos.b, &dir))
                 return 0;
             race->raceTrack->DistanceToStripEdge(position, statusNode->progressPos.b, &right, 10);

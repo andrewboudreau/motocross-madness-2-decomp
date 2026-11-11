@@ -74,7 +74,15 @@
     "?SetLensScale@ShadowCameraProxy@@QAEXM@Z": "?SetFieldOfView@Camera@@QAEXM@Z",
     "?SetOwner@ShadowRenderTarget@@QAEXPAUShadowOwner@@@Z": "?SetCamera@RenderTarget@@QAEXPAVCamera@@@Z",
     "?ShadowMatrixMultiplyInto@@YAPAUShadowMatrix@@PAU1@U1@1@Z": "?MatrixMult@@YA?AUMatrix4@@U1@0@Z",
-    "??0ShadowVec3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z"
+    "??0ShadowVec3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",
+    "?CarCrossCall@@YA?AUVector3@@ABU1@0@Z": "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z",
+    "?CarNormalizeCall@@YA?AUVector3@@ABU1@@Z": "?Vec3Normalize@@YA?AUVec3@@ABU1@@Z",
+    "?QueryGround@CarProceduralTerrain@@QAEXPAUVector3@@0HH@Z": "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z",
+    "?GetPositionIn@CarProceduralNode@@QAEXPAV1@PAUVector3@@@Z": "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z",
+    "?SetPositionInFrame@CarProceduralNode@@QAEXPAV1@PAUVector3@@@Z": "?SetPositionInFrame@SoultreeObject@@QAEXPAV1@PBUVec3@@@Z",
+    "?WorldToLocalDirection@CarProceduralNode@@QAE?AUVector3@@ABU2@@Z": "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
+    "?LocalToWorldDirection@CarProceduralNode@@QAE?AUVector3@@ABU2@@Z": "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
+    "?SetAxesPtr@CarProceduralNode@@QAEXPBUVector3@@0HH@Z": "?SetAxesPtr@SoultreeObject@@QAEXPBUVec3@@0HH@Z"
   },
   "included_sources": [
     {

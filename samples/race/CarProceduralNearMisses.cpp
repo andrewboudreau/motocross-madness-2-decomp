@@ -23,39 +23,45 @@
 //
 // CarProcedural::Tick (0x0042fd80, 2909 bytes): the
 // per-frame update along the path (wheel spin and steering, the collision
-// objects' transform and the body hull position). With relocations and frame
-// offsets masked the instruction stream is 781 instructions like retail's
-// and 88% aligned. Retail facts the source follows: the sensor contact's
+// objects' transform and the body hull position). 719 of retail's 782
+// instructions align (92%). Retail facts the source follows: the sensor contact's
 // normal is at +0x08 (`add ecx, 8`); the back and steering points subtract
 // pathPosition straight from the call result (no named copy) and keep the
 // time offset on the x87 stack (`fld t; fsub st(1)` ... `fstp st(0)`, a
 // float local); the collider frame is built by an inline helper taking
 // the axes by value (its locals share slots with the blocks' vectors); the
 // target is built per component (no y sum) and the 4fd5c0 result is a
-// named copy; the body hull position is corrected per component. Left: the
-// frame is 0xd0 against retail's 0xdc. Retail's slot groups (frame offsets)
-// are {temps, local, target, first-update position} 0x0, {side, forward
-// axis} 0xc, t 0x18, {box, ahead, right axis, offset} 0x1c, {back, up axis}
-// 0x34, a float spill 0x40, normal 0x44, {flat, axisA} 0x50, position 0x5c,
-// ground 0x68, forward 0x74, result 0x80, axisB 0x84, placement 0x90,
-// transform 0x9c: the wheel loop's axisA shares with flat and axisB with
-// nothing, here both share with the first-update and steering blocks. A
-// bare block or an inline helper around flat moves it into the box group
-// or runs out of inline budget (operator- called). The steering clamp
-// stores the angle to memory in retail (`fst [t's slot]`, reloaded twice
-// for the upper bound); by-value, const-reference, member-argument and
-// expression-argument clamp helpers and the if/else and ternary forms keep
-// it on the x87 stack. Also left: the normalisation of `back` loads its
-// components first in retail, the 1f4 blend the scalar first (here the
-// reverse), and argument-push scheduling around the steering call, the
-// frame helper's copies and the 4fd5c0 call. Declaring axisB (or axisA)
-// at function scope gives retail's 0xdc frame and 69 hunks (72 here), but
-// the other axis still joins the temporaries' group instead of flat's and
-// t stays below back, so it is a size coincidence and not kept; both axes
-// at function scope give 0xe8, a bare block around flat (alone or with
-// target/offset/placement) moves flat into the box or back group. Earlier form (one named ahead
-// for all three path points, the frame written in the body, the contact
-// normal at +0x0c): 807/3018 with frame 0xf4.
+// named copy; the body hull position is corrected per component through one
+// `body` pointer to the shape (aligned 713 -> 719, candidate 2865 -> 2880 bytes,
+// over a `Vector3&` to its position). The wheel loop's axisA is declared at
+// function scope (axisB stays in the loop): the frame becomes retail's 0xdc and
+// strict goes 220 -> 580 of 2909 (aligned 716 -> 719 of 782); axisB at function
+// scope instead gives 226, both axes 0xe8. Score: strict 580/2909, aligned
+// 719/782, candidate 2880 bytes, 63 instruction hunks; the game links this body
+// (src/bringup/Group2_CarProcedural.cpp compiles the same Tick through
+// CarProcedural.h's views, bound by config/game_build.json link_aliases).
+// Retail's slot groups (frame offsets) are {temps, local, target, first-update
+// position} 0x0, {side, forward axis} 0xc, t 0x18, {box, ahead, right axis,
+// offset} 0x1c, {back, up axis} 0x34, a float spill 0x40, normal 0x44, {flat,
+// axisA} 0x50, position 0x5c, ground 0x68, forward 0x74, result 0x80, axisB
+// 0x84, placement 0x90, transform 0x9c; a bare block or an inline helper around
+// flat moves it into the box group or runs out of inline budget (operator-
+// called). Left: the steering clamp stores the angle to memory in retail (`fst
+// [esi+0x190]; fst [t's slot]; fcomp lo`, reloaded twice, the `fld lo` arm out
+// of line); by-value, const-reference, member-argument, expression-argument and
+// nested clamp helpers, the if/else, `if (a > lo)` and ternary forms, a chained
+// `a = steeringAngle = atan2(...)`, reusing t, a pointer alias and a
+// `(float)(x * 1.0)` round trip all keep it on the x87 stack (a volatile local
+// reaches 699 strict but is a matching trick, not kept). Also left: the
+// normalisation of `back` loads its components first in retail, the 1f4 blend
+// the scalar first (here the reverse), load/store scheduling in the
+// forward/path-velocity section, and argument-push scheduling around the
+// steering call (OrientationAxesFromAngles: a float roll argument or a static
+// definition is inert), the frame helper's copies and the 4fd5c0 call. Earlier
+// forms: one named ahead for all three path points, the frame written in the
+// body and the contact normal at +0x0c gave 807/3018 with frame 0xf4; frame 0xd0
+// with both axes in the loop gave 221 strict (196 masked before GetPosition was
+// bound).
 
 #include <math.h>
 
@@ -236,6 +242,7 @@ static inline float CarClamp(float v, float lo, float hi)
 
 int CarProcedural::Tick(float frameTime)
 {
+    Vector3 axisA;
     int result = GameObject::Tick(frameTime);
     if (frameTime <= 0.0)
         return result;
@@ -318,7 +325,6 @@ int CarProcedural::Tick(float frameTime)
     Vector3 placement = target - offset;
     carModel->SetPositionInFrame(0, &placement);
     for (unsigned int i = 0; i < numWheels; i++) {
-        Vector3 axisA;
         Vector3 axisB;
         if (steersFrontWheels && i < 2) {
             OrientationAxesFromAngles(&axisA, &axisB, steeringAngle, -wheelSpinAngle, 0);
@@ -337,10 +343,10 @@ int CarProcedural::Tick(float frameTime)
         CarProceduralContact* contact = (CarProceduralContact*)bodyCollider->contactRecord;
         bodyContactPoint = contact->contactPoint;
         bodyContactNormal = contact->contactNormal;
-        Vector3& shapePosition = ((CarProceduralBody*)bodyCollider->shape)->position;
-        shapePosition.x -= contact->contactOffset.x * 1.005f;
-        shapePosition.y -= contact->contactOffset.y * 1.005f;
-        shapePosition.z -= contact->contactOffset.z * 1.005f;
+        CarProceduralBody* body = (CarProceduralBody*)bodyCollider->shape;
+        body->position.x -= contact->contactOffset.x * 1.005f;
+        body->position.y -= contact->contactOffset.y * 1.005f;
+        body->position.z -= contact->contactOffset.z * 1.005f;
     }
     return result;
 }

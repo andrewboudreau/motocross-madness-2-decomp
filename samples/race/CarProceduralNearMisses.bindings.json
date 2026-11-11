@@ -14,6 +14,7 @@
   "?SetAxesPtr@CarProceduralNode@@QAEXPBUVector3@@0HH@Z": "0x004fbd70",
   "?SetPositionInFrame@CarProceduralNode@@QAEXPAV1@PAUVector3@@@Z": "0x004fc740",
   "?GetPosition@CarProceduralNode@@QAEXPAUVector3@@@Z": "0x004fc970",
+  "?GetPosition@SoultreeObject@@QAEPAUVec3@@PAU2@@Z": "0x004fc970",
   "?GetPositionIn@CarProceduralNode@@QAEXPAV1@PAUVector3@@@Z": "0x004fc9a0",
   "?LocalToWorldDirection@CarProceduralNode@@QAE?AUVector3@@ABU2@@Z": "0x004fd5c0",
   "?WorldToLocalDirection@CarProceduralNode@@QAE?AUVector3@@ABU2@@Z": "0x004fd710",
