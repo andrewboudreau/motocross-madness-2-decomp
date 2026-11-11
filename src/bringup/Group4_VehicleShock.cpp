@@ -9,7 +9,9 @@
 //     (Bike.cpp builds them, Vehicle.cpp retracts and damps them) name the same retail
 //     functions. Each forwards to the canonical member at the same address; the
 //     constructors build the canonical object, with its real vtable, in the storage Bike's
-//     loader allocated (0xd8 / 0xe4 bytes).
+//     loader allocated (0xd8 / 0xe4 bytes). tools/linked_accuracy.py scores the
+//     placement-new wrapper here (EH frame, null test) against 0x004fa700, not the exact
+//     RotatingShock constructor it calls; the low score is that wrapper, not missing fields.
 //   * Tire.cpp reaches the wheel's shocks through TireAttachA/B (TireAttachmentViews.h).
 //   * Shock.cpp calls its callees through Suspension.h's provisional ShockNode and
 //     Shock*Call names; each is forwarded to the existing provider at the address its

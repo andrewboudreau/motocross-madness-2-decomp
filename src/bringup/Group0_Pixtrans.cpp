@@ -7,6 +7,10 @@
 //   Convert555To8Fast  0x004d0d40 (hand-written assembly in retail)
 //
 // All strides are in pixels, as in Pixtrans.h.
+// Re-checked against the retail disassembly on 2026-11-11: masks, shifts, rounding
+// constants, loop bounds and the source/destination steps of every path agree. The
+// remaining linked-accuracy gap is code shape (retail unrolls the four keyed pixels;
+// Convert555To8Fast is inline assembly in retail).
 #include "Pixtrans.h"
 
 // The two 16-bit halvers share one shape; only the channel layout differs.
