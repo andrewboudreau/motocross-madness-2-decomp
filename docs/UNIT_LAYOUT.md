@@ -154,32 +154,85 @@ units, or only part of one, such as `FastMath`, `DebugOverlay`, `Bike` and
 `GameUi`. Fixing them takes moves between files. Those moves have not been
 made.
 
-Units whose retail range holds functions defined in other `src/` files:
+Units whose retail range holds functions defined in other `src/` files.
+None of them was moved; the reasons are below.
 
 - `ExceptionHandler.cpp`: the retail unit opens with `RecordExceptionInfo`
-  (`0x0045ff80`), which is in `src/reconstructed/Main.cpp`. The object
-  starts at `hprintf`, so the sweep's anchor does not see this.
-- `BikeRace.cpp`: the gap `0x004210f0..0x00421d50` holds vector helpers
-  registered in `VectorCalls.cpp` and `VectorValueArithmetic.cpp`.
+  (`0x0045ff80`). `Main.cpp` only calls it. Its reconstruction is
+  `samples/game/RecordExceptionInfo.cpp`, a reviewed near miss: retail reads
+  `FS:[4]` at `0x004602ef` with inline assembly, which this project does not
+  use (see [EXCEPTIONHANDLER.md](EXCEPTIONHANDLER.md)). The object starts at
+  `hprintf` and is identical from there.
+- `BikeRace.cpp`: the gap `0x004210f0..0x00421d50` holds
+  `WriteRelativePositions` (`0x004210f0`, a near miss in
+  `samples/race/BikeRaceNearMisses.cpp`) and the vector helpers at
+  `0x00421cb0..0x00421d50`. The helpers are registered in `VectorCalls.cpp`
+  and `VectorValueArithmetic.cpp`; the latter is identical on its own. They have
+  callers in earlier units and fold across several vector types. That fits
+  header-inline operators that are kept out of line here and folded by ICF
+  (strong inference). `BikeRace.cpp` already declares `static inline`
+  `operator+`/`operator-`. Moving the helpers in as out-of-line definitions
+  would not make the unit identical: `WriteRelativePositions` and the unit's
+  `bytes` findings stay.
 - `MSZoneInterface.cpp`: the gap `0x004aa150..0x004aa350` holds seven
-  `SoultreePhysicsBaseObject` methods registered in
-  `SoultreePhysicsMethods.cpp`. Whether they belong to this unit or the
-  anchors are misbound is open.
+  `SoultreePhysicsBaseObject` methods (vtable `0x00557d90`), registered in
+  `SoultreePhysicsMethods.cpp`.
+  - Confirmed: they were compiled in `MSZoneInterface.obj`. They lie between
+    `_$E10` (ends `0x004aa14b`) and `SetDirectPlay` (`0x004aa350`). Slot 36
+    (`ResetBodyOrientation`) reads `kVec3YAxis` at `0x00685190`, which is this
+    unit's file-static `Math3D.h` constant.
+  - Strong inference: they are inline members that this object kept as
+    pick-any COMDATs, not `MSZoneInterface.cpp` definitions. The other five
+    methods of the same vtable sit in the `Bike`, `FollowCam` and `Terrain`
+    ranges, as described in
+    [SOULTREE_PHYSICS_METHODS.md](SOULTREE_PHYSICS_METHODS.md).
+  - Moving them into `MSZoneInterface.cpp` as out-of-line definitions would
+    be a matching-only form, so it was not done. The unit stays `differs`
+    until the inline headers are in place.
 
 `gap_missing` findings name owners in `samples/` too. Two examples are
 `FileStream`'s `CheckHeader` in `samples/io/FileStream.cpp` and the vector
 helpers of `BikeRace` in `samples/physics/helpers/VectorOps.cpp`.
 
-Unexplained:
+Deleting-destructor placement. These points are confirmed with VC6 SP3 `/O2`
+probes using the `config/game_build.json` profile:
 
-- Deleting-destructor placement. Retail `FontTexture.cpp` has `??_GFontTexture`
-  (`0x00467160`) before the constructor. Our object emits it after the
-  constructor. Retail `Quantize.cpp` has `??_GColorMapper` (`0x004ddea0`)
-  right after `LoadShared`, before `Build16BitTables`. Ours comes later.
-  Retail `CollisionPoint.cpp` has `??_GCollisionPoint` (`0x0043b300`) last.
-  Ours follows `AddCollisionPoint`, which inlines the constructor that stores
-  the vtable. Which construct makes VC6 emit `??_G` where retail has it is
-  not known.
+- `??_G<Class>` is emitted directly after the first function in the object
+  whose body stores `<Class>`'s vtable. This is the out-of-line constructor,
+  the destructor if it is defined first, or any function that expands an
+  inline constructor (`new C(v)` with an in-class constructor).
+- In-class inline virtual functions are emitted between that function and
+  `??_G`.
+- The following do not move `??_G`:
+  - a function before it that uses `delete`, `delete[]`, `new[]`, an explicit
+    destructor call, `dynamic_cast` or `typeid`;
+  - a local or global object;
+  - an inline constructor or inline virtual defined after the first user;
+  - an implicit constructor;
+  - `/YX` or `/Zi`.
+
+Minimal reproduction:
+
+```cpp
+class A { public: A(int v); virtual ~A(); int x; };
+void First(int* p) { *p = 1; }
+A::~A() { x = 0; }       // stores the vtable first
+A::A(int v) : x(v) {}
+// order: First, ??1A, ??_GA, ??0A   (swap the two definitions: ??0A, ??_GA, ??1A)
+```
+
+What this means for retail:
+
+- `FontTexture.cpp` has `??_GFontTexture` (`0x00467160`) before the
+  constructor. `Quantize.cpp` has `??_GColorMapper` (`0x004ddea0`) right after
+  `LoadShared`. By the rule, a function that stores the vtable came just
+  before each of them, but no such function is in the image. One possibility
+  is an unused function, such as a second constructor, that `/OPT:REF`
+  dropped. This is provisional. Adding one would invent code, so it was not
+  done.
+- `CollisionPoint.cpp` has `??_GCollisionPoint` (`0x0043b300`) last. That
+  contradicts the rule: retail `AddCollisionPoint` stores the vtable at
+  `0x0043a368`, and our object puts `??_G` after it. This is open.
 
 Two blockers cut across these groups:
 
