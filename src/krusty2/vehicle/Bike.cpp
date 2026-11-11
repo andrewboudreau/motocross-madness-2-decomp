@@ -11,9 +11,6 @@
 #include "../../reconstructed/Suspension.h"
 #include "../../reconstructed/ParticleEmitters.h"
 
-// The loader compares the wheel names with the library strcmp (0x00536070), not the
-// intrinsic expansion.
-#pragma function(strcmp)
 
 static inline float BikeMin(float a, float b) { return a < b ? a : b; }
 static inline float BikeMaxF(float a, float b) { return a > b ? a : b; }
@@ -566,12 +563,13 @@ struct BikeQuadTreeHead {
 struct BikeTireObject : BikeQuadTreeHead, GameObject {
 };
 
-// Wheel kind of a named wheel (0 when the name is not in the table). The early return keeps
+// Wheel kind of a named wheel (0 when the name is not in the table); the CRT _stricmp at
+// 0x00536070 compares the names case-insensitively. The early return keeps
 // the kind in a register: retail zeroes esi on the loop's exit and loads the match out of line.
 static inline int BikeFindWheelKind(const char* name, const BikeWheelKind* kinds)
 {
     for (int k = 0; k < 4; k++) {
-        if (strcmp(name, kinds[k].name) == 0)
+        if (_stricmp(name, kinds[k].name) == 0)
             return kinds[k].kind;
     }
     return 0;
