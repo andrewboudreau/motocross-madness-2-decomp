@@ -164,7 +164,12 @@ inline UnknownBikeRaceRacer* BikeRace::UnknownFunctionRacerAt(int index) {
     return aiRacers[index - g_TrackGame->playerCount];
 }
 
-// 0x0041f1d0
+// 0x0041f1d0. Open gap: retail keeps 0 in edx through the body and has three
+// AimCamera call copies. Ruled out (sweep, strict/aligned): `break` to one
+// shared AimCamera after the objects wrap (879 bytes, strict 209 against 297),
+// `caster = 0` once at the top instead of per branch (906-915 bytes),
+// `uiInteractionBlocked != 0`, `!objects` and `objects` reused as the caster
+// variable (all inert).
 void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
     int caster;
     if (g_TrackGame->uiInteractionBlocked) {

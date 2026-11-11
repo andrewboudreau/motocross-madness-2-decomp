@@ -76,7 +76,11 @@
 // the delta assigned inside the test (`(ax = ...) < 0`, comma forms), copies
 // of the bounds overwritten by the deltas (the form that made 0x00481b30
 // exact), and the far term written before the near term; none keeps both on
-// the x87 stack, and small probes never do either.
+// the x87 stack, and small probes never do either. Also inert or worse: the
+// second delta assigned in the else-if test (1067 bytes, strict 49), the
+// grid/data locals swapped or dropped, the far offset without a local, and
+// the early return as `coarse != 0`, a goto past it or with `distance`
+// declared first (the return still merges with the final epilogue).
 //
 // DrawableGridNode 0x00481de0 (visibility walk, 1750 bytes; candidate
 // 1712): tests the node's box (or the four quadrant boxes, recursively,
