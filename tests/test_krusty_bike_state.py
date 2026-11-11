@@ -105,7 +105,7 @@ class KrustyBikeStateTests(unittest.TestCase):
             manifest = ROOT / 'src/krusty2/vehicle/targets.json'
             targets = [t for t in json.loads(manifest.read_text())
                        if t['source'] == 'KrustyBike.cpp' and t.get('expect') != 'partial']
-            self.assertEqual(len(targets), 76)
+            self.assertEqual(len(targets), 77)
             for target in targets:
                 proof = compare(retail, caller, target['candidate_symbol_contains'],
                     int(target['target_va'], 0), target['target_size'], manifest.parent / target['bindings'])

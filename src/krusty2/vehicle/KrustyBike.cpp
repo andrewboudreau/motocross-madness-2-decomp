@@ -1893,6 +1893,59 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
 // update uses for its own 0.001f).  Only the loader's three millisecond settings read it.
 static const float kbSecondsPerMillisecond = 0.001f;
 
+// 0x0048fa60 (532 bytes, ret 8 = flags + the hidden most-derived flag; exact): the
+// GameObject virtual base is built only for the most-derived object (GameObject(1)), then
+// Bike(flags); SEH handler 0x0054bc9d.  The rest is member initialisation.  VC6 fills the
+// load delay of the +0x1540 kVec3Zero copy with the two stores at a fixed distance from
+// the end of the block (here hasFullState and wrecker, written after nextLapGate), which
+// is where retail has them; with those two written right after the copy, VC6 hoists
+// forceGatePass/nextLapGate instead (472/532).  The statement order is the evidence; the
+// original grouping of these stores is not otherwise known.
+KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
+{
+    plateNumber = 0x65;
+    lastFramePosition = kVec3Zero;
+    aiKind = 0;
+    isRemote = 0;
+    score = 0;
+    pingTimer = 0;
+    race = 0;
+    lapGate = 0;
+    forceGatePass = 0;
+    nextLapGate = 1;
+    hasFullState = 0;
+    wrecker = 0;
+    finishTimeStamp = 0;
+    netId = 0;
+    trickLandTimer = 0;
+    driveForceScale = 1.0f;
+    largestStuntPoints = 0;
+    totalTrickTime = 0;
+    bestTagRun = 0;
+    tagRun = 0;
+    totalTagRun = 0;
+    ghostMod = 0;
+    debugPage = -1;
+    spawnProtectForced = 0;
+    spawnProtectEndPending = 0;
+    isGhost = 0;
+    repairDamage = 0;
+    injuryDamage = 0;
+    stuntEarnings = 0;
+    deltaBaseVelocity = kVec3Zero;
+    deltaBasePosition = kVec3Zero;
+    deltaBaseAngularVelocity = kVec3Zero;
+    deltaBaseRoll = 0;
+    deltaBasePitch = 0;
+    deltaBaseYaw = 0;
+    deltaBaseTime = 0;
+    rivalBearing = 0;
+    field_0x15d4 = 0;
+    lastCollisionType = 0;
+    bikeCollision = 0;
+    bikeAndRiderCollision = 0;
+}
+
 // 0x0048fc80 (5366 bytes of code + 2 pad + the 4-entry jump table at 0x00491178 = 5384, ret
 // 0x7c; exact): the bike loader.  Not a vtable entry (KrustyBike's and Bike's slot 40 both
 // hold 0x00503de0); Bike's own loader 0x004079c0 (ret 0xa0) is called directly with `this`,

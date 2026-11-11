@@ -52,8 +52,8 @@
       5396384,
       745,
       745,
-      693,
-      "576cfb21413407767d113b271e45035be5d79ddebb7749b1ab27d76441ea028d"
+      734,
+      "3aa29998cf4382a038954ae549e184486cceabf27c6e330304a8afa0b2c73d68"
     ],
     [
       "src/krusty2/vehicle/Vehicle.cpp",
@@ -189,15 +189,6 @@
       8558,
       2305,
       "16972169649e3395c81b0b58eeb5c5aad47e0ab1b2c21bff449c400860bd6985"
-    ],
-    [
-      "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "??0KrustyBike@@QAE@H@Z",
-      4782688,
-      532,
-      532,
-      472,
-      "ac45a1cfeb7b694bfa1e756be4d480a21b76aaf21bea95bfe952c09fc8b44652"
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",

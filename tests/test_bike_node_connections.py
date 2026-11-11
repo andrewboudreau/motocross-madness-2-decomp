@@ -38,7 +38,6 @@ PARTIAL = [
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'FindPlacement@KrustyBike', 4791568, 1296, 1288, 526, '2260143a9d880dfabfff868e69178f34173f372aa53195cc6d885ed5f14bc576'),
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'Fn_00492AD0@KrustyBike', 4795088, 2315, 2312, 192, '1941ddbc72fdfd7b01b5ad4ea65fcace024e8e828a4019450c91e9f4d1fb6a95'),
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'Fn_00493660@KrustyBike', 4798048, 8545, 8558, 2305, 'ffc638804e115abac59baeed51fe496e2c2167f5f006b1c337aaee4f7e249815'),
-    ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', '??0KrustyBike@@QAE@H@Z', 4782688, 532, 532, 472, 'f333644c75f0d39f6e5af3c3d8c898b85d85f9467e953b8d0e6f4c5771d00276'),
     ('samples/physics/krustybike/KrustyBikeNearMisses.cpp', 'UpdateRiderPose@KrustyBike', 4779680, 2920, 2952, 608, '1bbe35c0f4249dd69e1255c94f129b84d7d0f79ae2e94173ce021cf0a3a4b87c'),
 ]
 

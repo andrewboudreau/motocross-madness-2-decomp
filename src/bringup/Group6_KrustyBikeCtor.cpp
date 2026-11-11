@@ -1,8 +1,5 @@
-// Group6_KrustyBikeCtor.cpp -- best-guess KrustyBike::KrustyBike(int) (0x0048fa60, ret 8 =
-// flags + the hidden most-derived flag), body taken unchanged from
-// samples/physics/krustybike/KrustyBikeNearMisses.cpp (86.36%, every store matches; one
-// scheduling pair differs; not byte-matched).  The canonical
-// src/krusty2/vehicle/KrustyBike.cpp does not define the constructor yet.
+// Group6_KrustyBikeCtor.cpp -- the racer allocation helper.  KrustyBike::KrustyBike(int)
+// (0x0048fa60) itself is strict exact in the canonical src/krusty2/vehicle/KrustyBike.cpp.
 //
 // BikeRace::CreateRacers (Group6_BikeRaceCreateRacers.cpp) `new`s its racers through
 // UnknownBikeRaceNewRacer below: BikeRace.h's UnknownBikeRaceRacer is the provisional
@@ -36,52 +33,6 @@
 #include "../reconstructed/GhostModCore.h"
 #include "../reconstructed/MorphBastardModifierCore.h"
 #include "../reconstructed/DebugAlloc.h"
-
-// best guess: sample body (samples/physics/krustybike/KrustyBikeNearMisses.cpp), unreviewed.
-KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
-{
-    plateNumber = 0x65;
-    lastFramePosition = kVec3Zero;
-    hasFullState = 0;
-    wrecker = 0;
-    aiKind = 0;
-    isRemote = 0;
-    score = 0;
-    pingTimer = 0;
-    race = 0;
-    lapGate = 0;
-    forceGatePass = 0;
-    nextLapGate = 1;
-    finishTimeStamp = 0;
-    netId = 0;
-    trickLandTimer = 0;
-    driveForceScale = 1.0f;
-    largestStuntPoints = 0;
-    totalTrickTime = 0;
-    bestTagRun = 0;
-    tagRun = 0;
-    totalTagRun = 0;
-    ghostMod = 0;
-    debugPage = -1;
-    spawnProtectForced = 0;
-    spawnProtectEndPending = 0;
-    isGhost = 0;
-    repairDamage = 0;
-    injuryDamage = 0;
-    stuntEarnings = 0;
-    deltaBaseVelocity = kVec3Zero;
-    deltaBasePosition = kVec3Zero;
-    deltaBaseAngularVelocity = kVec3Zero;
-    deltaBaseRoll = 0;
-    deltaBasePitch = 0;
-    deltaBaseYaw = 0;
-    deltaBaseTime = 0;
-    rivalBearing = 0;
-    field_0x15d4 = 0;
-    lastCollisionType = 0;
-    bikeCollision = 0;
-    bikeAndRiderCollision = 0;
-}
 
 class UnknownBikeRaceRacer;
 

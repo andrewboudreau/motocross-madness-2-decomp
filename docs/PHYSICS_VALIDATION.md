@@ -670,13 +670,11 @@ Tire unit's exact targets (promoted from `samples/physics/tire/`):
   Slot 97's six clip names come from a
   `{id, name[32]}` table at `0x0056cb88` (the two "BackOver" entries are
   separate records). The constructor `0x0048fa60` (`GameObject(1), Bike(flags)`,
-  ret 8) is a near miss (86.36%, 532/532): VC6 hoists two stores into the load
-  delay of the +0x1540 vector copy and picks them at a fixed distance from the
-  end of the block, counted in statements; retail's pick (+0x11b8/+0x604) is
-  reproduced only by dropping the last eight stores, so retail has eight fewer
-  scheduling units after the copy for a reason not found (statement order,
-  init-list members, copy forms, duplicate stores and inline helpers do not move
-  it). `0x0048d780` uses an inline-asm rounding helper and stays excluded.
+  ret 8) is exact: VC6 hoists two stores into the load delay of the +0x1540
+  vector copy and picks them at a fixed distance from the end of the block,
+  counted in statements, so retail's pair (+0x11b8/+0x604) is written at that
+  position (after nextLapGate) rather than next to the copy. `0x0048d780` uses
+  an inline-asm rounding helper and stays excluded.
   Exact as well: GameObject slot 10 `0x004977a0`
   (the per-frame update reached through the virtual base: update path by
   network state and mode, the mode 4 player re-target, the end of start-up

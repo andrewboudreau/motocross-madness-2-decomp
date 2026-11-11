@@ -42,16 +42,6 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBikeNearMisses.cpp",
-    "candidate_symbol_contains": "??0KrustyBike@@QAE@H@Z",
-    "target_va": "0x0048fa60",
-    "target_size": 532,
-    "expect": "partial",
-    "notes": "constructor, 86.36% (532/532). Sole divergence 0xb7..0xfa: VC6 hoists the +0x7c0/+0x7bc stores into the +0x1540 kVec3Zero copy, retail +0x11b8/+0x604. The pick index is (units after the copy) - 32, end-anchored only: leading units, chained assignments, 0.0f literals and moving the two stores ahead of the copy do not move it (retail needs eight fewer units after the copy); see the source comment.",
-    "bindings": "KrustyBikeNearMisses.bindings.json"
-  },
-  {
-    "class": "KrustyBike",
-    "source": "KrustyBikeNearMisses.cpp",
     "candidate_symbol_contains": "UpdateRiderPose@KrustyBike",
     "target_va": "0x0048eea0",
     "target_size": 2920,

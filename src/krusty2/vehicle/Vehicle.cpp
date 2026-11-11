@@ -2109,8 +2109,14 @@ GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char
     return this;
 }
 
-// owner: Vehicle.cpp (__FILE__ 0x005257a0 region), PARTIAL 90.89%: remaining diff is store
-// scheduling of the 0x4b0/0x4b4 vs 0x4fc/0x500 float stores around the weightForce copy.
+// owner: Vehicle.cpp (__FILE__ 0x005257a0 region), PARTIAL 734/745.  VC6 fills the load
+// delay of the weightForce copy with the two stores a fixed number of statements before the
+// end of the block (as in KrustyBike's constructor 0x0048fa60), so leanCos and
+// wheelForwardAlignment are written there, after throttleAxis, and land in the copy as in
+// retail.  Left: the 0.025f constant load (`mov eax, 0x3ccccccd`) is placed one store early,
+// before leanAxis' store; it rises at most 13 original-order units above stepTime, and
+// retail behaves as if one more unit sat between leanAxis and stepTime (a visible extra
+// store there moves it to retail's place).
 Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
 {
     field_0x28 = 1.0f;
@@ -2121,8 +2127,6 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     verticalAccelSmoother = 0;
     forwardAccelSmoother = 0;
     weightForce = kVec3Zero;
-    leanCos = 1.0f;
-    wheelForwardAlignment = 1.0f;
     particleManager = 0;
     sparkEmitter = 0;
     inShadow = 0;
@@ -2147,12 +2151,14 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     attachments = 0;
     attachmentCount = 0;
     attachmentCapacity = 0;
+    terrainScale = 1.0f;
+    inputMap = 0;
     steerAxis = 0;
     driveForceScale = 1.0f;
-    terrainScale = 1.0f;
-    throttleAxis = 0;
-    inputMap = 0;
     leanAxis = 0;
+    throttleAxis = 0;
+    leanCos = 1.0f;
+    wheelForwardAlignment = 1.0f;
     anyWheelInContact = 0;
     wheelPointInContact = 0;
     turnAngle = 0;

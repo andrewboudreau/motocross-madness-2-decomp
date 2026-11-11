@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 113, c 82, total 197. The three class (a) functions of the
+Counts: a 2, b 113, c 81, total 196. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -122,6 +122,13 @@ TextService `0x0050ba00` and the FollowCamera constructor `0x00462ee0` are uncha
 with `/G3`, `/G4`, `/G5`, `/Ox` or `/Ob2`, and unchanged or worse with `/Oy-`, `/Op`,
 `/QIfist`, `/Oa` or `/Ow`; `/G6` is worse (`0x00456890` 356 -> 260). In Git Bash set
 `MSYS_NO_PATHCONV=1`, or the `/` flags are rewritten into paths and silently ignored.
+KrustyBike's constructor `0x0048fa60` (class c, 472/532) is exact too, in
+src/krusty2/vehicle/KrustyBike.cpp: VC6 fills the load delay of a struct copy with the two
+stores that sit a fixed number of statements before the end of the block, not the next
+two. Writing the two stores retail hoists (+0x11b8/+0x604) at that position (after
+nextLapGate) reproduces retail; the earlier attempts kept them next to the copy. The same
+move takes Vehicle's constructor `0x005257a0` from 693 to 734/745. When a constructor
+hoists the wrong stores into a copy, move retail's pair to the position VC6 picks from.
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
@@ -181,7 +188,7 @@ with `/G3`, `/G4`, `/G5`, `/Ox` or `/Ob2`, and unchanged or worse with `/Oy-`, `
 | krusty2/vehicle/Bike | `0x00407440` | 188/485 | c | clamps are BikeMin(BikeMaxF(t,.25),.75) and BikeMaxF(BikeMin(a,32.2),-32.2), constants bound; left: retail's dead `cnt+=2` store (to the shared [esp+0x10] slot, tail-merged: the `idx > 2, idx != 10` arm also jumps into `add ecx, 2`), idx/next/step/cnt register roles swapped (declaration order of the four locals and `cnt += 2` placements in both arms are insensitive: VC6 drops the dead update), 0.0310559 read from the 0x550790 copy (binding gives 0x550ad0) |
 | krusty2/vehicle/Bike | `0x0040a520` | 2112/2272 | b | axis references and zero-first `if (d >= 0)` arms, the steerTorque update (gain float locals, named delta) and the angle product match; left: the operator return temporary and base swap slots, cross products load the first-stored multiplicand (spin.x, push.x) first where retail loads it second (operand order inert), the airborne `test al, al` is scheduled earlier |
 | krusty2/vehicle/Bike | `0x0040c000` | 162/1015 | b | retail has a bare `fistp` (inline `__asm`, docs/REBUILD_GAPS.md), hence its ebp frame; 60 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `fld [A]`; slot order differs |
-| krusty2/vehicle/Vehicle | `0x005257a0` | 693/745 | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |
+| krusty2/vehicle/Vehicle | `0x005257a0` | 734/745 | b | leanCos/wheelForwardAlignment written where VC6 picks the hoisted pair (after throttleAxis), so 0x4b0/0x4b4 go into the weightForce copy as in retail; left: the `mov eax, 0x3ccccccd` (0.025f) load is one store early (before leanAxis' 0x4fc store). The load rises at most 13 original-order units above its first use; retail behaves as if one more unit sat between leanAxis and stepTime |
 | krusty2/vehicle/Vehicle | `0x005265d0` | 405/555 | b | same size; parenthesised Vec3-constructor crosses give retail's product loads; the crashState ?: argument is hoisted above the pushes, A-offset temporaries 0xc lower |
 | krusty2/vehicle/Vehicle | `0x00527a20` | 840/870 | c | `normalLoad = 0` scheduled after the dword-wise zero copy (retail: between its second and third temporary loads) |
 | krusty2/vehicle/Vehicle | `0x005286a0` | 754/784 | c | slot 56: two side-cross products load their multiplicands in the other order (retail side.y*a.z, a.x*side.z); source operand order has no effect |
@@ -207,7 +214,6 @@ with `/G3`, `/G4`, `/G5`, `/Ox` or `/Ob2`, and unchanged or worse with `/Oy-`, `
 | physics/helpers/SoultreeMatrix | `0x004fb8c0` | 262/1096 | b | 13 code diffs: `mov ecx, [esp + N] ; mov edx, [esp + N]~` vs `lea ecx, [esp + N] ; push ecx`; `fld [esp + N] ; mov [esp + N], ecx ; le~` vs `call A`; slot order differs |
 | physics/helpers/SoultreeMatrix | `0x004fc050` | 1137/1171 | b | same instructions, order and length (bracketed products in the inline cross); three 12-byte slots ordered temporaries, pos, r where retail has r (shared with the delta copy), temporaries, pos; dropping the z/y/x block gives the r/d sharing but demotes z (1093) |
 | physics/krustybike/KrustyBike | `0x0048eea0` | 608/2952 | c | slot 102, frame 0x50 exact; VC6 cross-jumps the head-turn arms differently (retail keeps the + side hold block and the - side retarget tail), `jne call ; jmp skip` vs retail `je skip ; jmp call` in the trick-chain switch, the `+0x153c = 0` else block before the shared advance, and the crash clamp keeps t on the x87 stack where retail spills it to the dt slot |
-| physics/krustybike/KrustyBike | `0x0048fa60` | 472/532 | c | 4 code diffs: retail hoists `mov [esi + 0x11b8], bl ; mov [esi + 0x604], ebx` into the load delay of the +0x1540 kVec3Zero copy where the candidate hoists `+0x7c0/+0x7bc` (pick index = units after the copy - 32) |
 | physics/krustybike/KrustyBike | `0x004919a0` | 151/230 | c | 8 code diffs: retail adds `mov edx, [edx + 0x60c] ; fsub [ecx + 0x~`; retail lacks `fsub [ecx + 0xb8]` |
 | physics/krustybike/KrustyBike | `0x00491d10` | 526/1296 | b | every game read through g_TrackGame (retail reloads it after case 4's `*a3` store; aligned 275 -> 309); prologue, frame 0x20 and lim in ebp match (if/else flag/lim, mode 2/3 copy path breaks); the 2/3 normalise join sits after the invsqrt arm (retail after the zero arm), its query call is not cross-jumped into the shared call, and retail homes the case 0/4 call in case 4 (candidate in case 0); candidate 1288 bytes |
 | physics/krustybike/KrustyBike | `0x00492ad0` | 192/2315 | c | 10 code diffs (frame 0x34 exact): record-interval branch `je @end ; jmp @deltas` vs retail `jne @deltas ; jmp @end`, network branch conditional jump vs retail `push 0 ; jmp @end+1`, and the register choice it drags along |

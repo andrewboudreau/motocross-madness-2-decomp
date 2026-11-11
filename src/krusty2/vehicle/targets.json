@@ -516,7 +516,7 @@
     "target_va": "0x005257a0",
     "target_size": 745,
     "expect": "partial",
-    "notes": "91.84% (745/745). Remaining: compiler hoists leanAxis/throttleAxis (0x4fc/0x500) stores ahead of retail's 0x4b0/0x4b4 around the weightForce copy (retail also stores inputMap 0x468 before steerAxis). Store order steerAxis, field_0x4a4, terrainScale, throttleAxis, inputMap, leanAxis is the best of an exhaustive sweep (masked 585 vs 579; all 720 orders of those six stores x 6 orders of the weightForce/leanCos/0x4b4 stores). Unchanged or worse: a `Vehicle& self = *this` alias or `this->` on any one or two of them, on weightForce or on leanCos/0x4b4, and chained `leanAxis = throttleAxis = 0`. Session 14: the two early stores are inputMap (0x468) and leanAxis (0x4fc), which VC6 schedules into the gap of the weightForce copy where retail puts leanCos/0x4b4. Their declared types do not matter (float or other pointer stores through casts: unchanged); per-component, reference-alias and cast forms of the weightForce copy are unchanged or worse (115+). Parked.",
+    "notes": "734/745 strict, 1 differing instruction (was 693). VC6 fills the load delay of the weightForce copy with the two stores a fixed number of statements before the end of the block (same mechanism as KrustyBike 0x0048fa60), so leanCos/wheelForwardAlignment are written after throttleAxis and the group order is terrainScale, inputMap, steerAxis, driveForceScale, leanAxis, throttleAxis. Left: the 0.025f load (mov eax, 0x3ccccccd) sits before the leanAxis store where retail has it after; it rises at most 13 original-order units above its first use (stepTime), so retail behaves as if one more unit sat between leanAxis and stepTime (a visible crashDirection store there moves the load to retail's place). Session 20, unchanged (734): chains wheelForwardAlignment = leanCos = 1.0f, wheelForwardAlignment = leanCos, 1 / 1.0 literals, a float one local, duplicate leanCos/throttleAxis stores, an empty statement, inputMap = inputMap, leanCos = 0 then 1.0f, 0.0f literals for turnAngle/turnRate/steerRate, stepTime = 1.0f / 40.0f; worse: leanCos = wheelForwardAlignment = 1.0f and wheelForwardAlignment first (732), chains among the anyWheelInContact..ownedWheelsInContact stores (730-732), other insert positions of leanCos/wheelForwardAlignment in the group (720-737 strict with more differing instructions), dropping the pad_0x5B8 store (shifts the pick by one, load unchanged). Earlier notes: before the move, store order steerAxis, field_0x4a4, terrainScale, throttleAxis, inputMap, leanAxis was the best of all 720 orders of those six stores x 6 orders of the weightForce/leanCos/0x4b4 stores; Vehicle& self aliases, this-> forms, per-component, reference-alias and cast forms of the weightForce copy were unchanged or worse.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -2397,6 +2397,16 @@
     "target_size": 1106,
     "expect": "exact",
     "notes": "message 1 builder; +0x11c0/+0x74c/+0x750/+0x770 store order",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "??0KrustyBike@@QAE@H@Z",
+    "target_va": "0x0048fa60",
+    "target_size": 532,
+    "expect": "exact",
+    "notes": "constructor (SEH handler 0x0054bc9d): GameObject(1) for the most-derived object, then Bike(flags) and member stores. Exact (was 472/532 as a sample): VC6 fills the load delay of the +0x1540 kVec3Zero copy with the two stores a fixed distance from the end of the block, so hasFullState/wrecker (+0x11b8/+0x604) are written after nextLapGate, where they become the hoisted pair as in retail.",
     "bindings": "KrustyBike.bindings.json"
   },
   {

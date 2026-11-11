@@ -65,13 +65,6 @@ PARTIAL = [['src/krusty2/vehicle/KrustyBike.cpp',
   2305,
   'ffc638804e115abac59baeed51fe496e2c2167f5f006b1c337aaee4f7e249815'],
  ['samples/physics/krustybike/KrustyBikeNearMisses.cpp',
-  '??0KrustyBike@@QAE@H@Z',
-  4782688,
-  532,
-  532,
-  472,
-  'f333644c75f0d39f6e5af3c3d8c898b85d85f9467e953b8d0e6f4c5771d00276'],
- ['samples/physics/krustybike/KrustyBikeNearMisses.cpp',
   'UpdateRiderPose@KrustyBike',
   4779680,
   2920,
@@ -191,7 +184,7 @@ class BikeModifierConnectionsTests(unittest.TestCase):
                         resolved = match_object(objects[source], symbol, va, b'',
                             {k: int(v, 0) for k, v in json.loads((ROOT / binding).read_text()).items()})
                     self.assertEqual(resolved['digest'], digest, key); preserved += 1
-            self.assertEqual(preserved, 7)
+            self.assertEqual(preserved, 6)
             compiler = Path(os.environ['VC6_ROOT'])
             linker = find_child_ci(find_vc6_bin(compiler), 'link.exe')
             libraries = find_child_ci(infer_vc98_root(compiler), 'lib')
@@ -204,7 +197,7 @@ class BikeModifierConnectionsTests(unittest.TestCase):
             result = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('Bike modifiers: 3712 attachment, removal and fade boundary cases passed', result.stdout)
-            print('%d strict checks, seven complete partial fingerprints, 14 dual-strict body checks; %s' %
+            print('%d strict checks, six complete partial fingerprints, 14 dual-strict body checks; %s' %
                   (strict, result.stdout.strip()))
 
 
