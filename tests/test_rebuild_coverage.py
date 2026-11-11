@@ -94,6 +94,8 @@ class ParserTests(unittest.TestCase):
         cases = MODULE.load_calibration_cases()
         self.assertGreater(len(cases), 100)
         self.assertTrue(all('target_va' in c and 'target_size' in c for c in cases))
+        # Cases appended with `CASES += [...]` count too (InlineShock axis setup).
+        self.assertIn('0x004f9f90', {c['target_va'] for c in cases})
 
     def test_targets_resolve_sources_and_default_expectation(self):
         with tempfile.TemporaryDirectory() as directory:

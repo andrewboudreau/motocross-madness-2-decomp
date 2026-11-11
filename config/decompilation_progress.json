@@ -4,10 +4,10 @@
   "retail_text_bytes": 1368518,
   "retail_source_paths": 111,
   "rtti_types": 252,
-  "vc6_selected_targets": 2996,
-  "vc6_exact_targets": 2987,
-  "notes": "2987 of 2996 unique retail address/extent pairs passed strict comparison in 3040 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). There are 3032 strict rows and 3016 distinct source/address/extent cases; multiple source definitions may share a retail address. Every strict comparison resolves all relocations or has no relocation bytes. The 10 nonexact rows are BaseObject::Release, seven UI compiler-shape probes and two FollowRacer near misses (0x4a9d20, 0x4a9e80). The UIStatic zero-return probe remains nonexact while the independently identified UIStaticText body at the same address now matches strictly. The separately reviewed physics runner has 1094 strict exact results among 1162 comparisons; those results are not included in this calibration percentage. Neither suite is a census of retail functions or evidence that the source-built game links or runs. RTTI/source-path and .text figures retain their hash-pinned executable provenance.",
-  "vc6_case_count": 3040,
+  "vc6_selected_targets": 2997,
+  "vc6_exact_targets": 2988,
+  "notes": "2988 of 2997 unique retail address/extent pairs passed strict comparison in 3041 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). There are 3033 strict rows and 3017 distinct source/address/extent cases; multiple source definitions may share a retail address. Every strict comparison resolves all relocations or has no relocation bytes. The 10 nonexact rows are BaseObject::Release, seven UI compiler-shape probes and two FollowRacer near misses (0x4a9d20, 0x4a9e80). The UIStatic zero-return probe remains nonexact while the independently identified UIStaticText body at the same address now matches strictly. The separately reviewed physics runner has 1094 strict exact results among 1163 comparisons; those results are not included in this calibration percentage. Neither suite is a census of retail functions or evidence that the source-built game links or runs. RTTI/source-path and .text figures retain their hash-pinned executable provenance.",
+  "vc6_case_count": 3041,
   "vc6_profile": "vc6_o2_mt",
-  "reviewed_commit": "calibration rerun on main after the KrustyUI::Create promotion (efb1a2a8), 2026-11-10"
+  "reviewed_commit": "calibration rerun after the UIDialog::Tick promotion (worktree branch on ef6e6016), 2026-11-10"
 }

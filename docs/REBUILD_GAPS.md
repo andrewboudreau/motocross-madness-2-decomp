@@ -285,8 +285,9 @@ merged into, or renamed to, the retail unit that owns their address range.
 
 ## Classes
 
-> Refreshed **2026-11-10** at tree `3dd5f6a7` (with fresh VC6 verdicts and the
-> CRT atlas); the rest of this page is still the 2026-10-30 snapshot.
+> Refreshed **2026-11-10** after the UIDialog::Tick promotion (with fresh VC6
+> verdicts and the CRT atlas); the rest of this page is still the 2026-10-30
+> snapshot.
 
 From `analysis/rtti_classes.json` (249 classes with a complete object locator;
 of the 252 RTTI type descriptors, `GR_PixelString`, `GroundFogableObject` and
@@ -300,9 +301,9 @@ of the 252 RTTI type descriptors, `GR_PixelString`, `GroundFogableObject` and
 | only under `samples/`, under a stand-in name, or nowhere | 0 |
 
 A slot counts as reconstructed when its function start is strict exact (CRT
-slots such as `__purecall` are library). **122 classes have every slot
-reconstructed; 127 have 206 non-exact slot entries, which are 65 distinct
-functions** (52 near miss, 13 inline asm; 37 are used by only one vtable).
+slots such as `__purecall` are library). **171 classes have every slot
+reconstructed; 78 have 153 non-exact slot entries, which are 64 distinct
+functions** (51 near miss, 13 inline asm; 37 are used by only one vtable).
 The most shared:
 
 | Function | vtables | Category | Used by |
@@ -315,8 +316,8 @@ The most shared:
 | `0x00463a30` | 4 | near miss | BikeCamera, FollowCamera, KrustyBikeCamera, VehicleCamera |
 
 Per class (non-exact slot entries): KrustyBike 9, Bike 8, UIMultiState 8,
-UIRadioButton 8, Vehicle 5, UIEditBox 4, then 13 classes with 3, 17 with 2
-(mostly the UIDialog function above) and 91 with 1. The full per-vtable list
+UIRadioButton 8, Vehicle 5, UIEditBox 4, then 13 classes with 3, 13 with 2
+and 46 with 1. The full per-vtable list
 (with `object_offset`) is `classes[].vtables[].missing`.
 
 ## Inline-asm functions

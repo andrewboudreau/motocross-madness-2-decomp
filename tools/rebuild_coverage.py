@@ -72,13 +72,20 @@ def parse_va(value) -> int:
 # Repository loaders (no executable needed)
 
 def load_calibration_cases(root: Path = ROOT) -> list[dict]:
-    """Read CASES from tools/run_calibration.py without importing it."""
+    """Read CASES (and later `CASES += [...]` blocks) from tools/run_calibration.py
+    without importing it."""
     tree = ast.parse((root / 'tools' / 'run_calibration.py').read_text(encoding='utf-8'))
+    cases = None
     for node in tree.body:
         if isinstance(node, ast.Assign) and any(
                 isinstance(t, ast.Name) and t.id == 'CASES' for t in node.targets):
-            return ast.literal_eval(node.value)
-    raise ValueError('CASES not found in tools/run_calibration.py')
+            cases = list(ast.literal_eval(node.value))
+        elif (cases is not None and isinstance(node, ast.AugAssign) and isinstance(node.op, ast.Add)
+              and isinstance(node.target, ast.Name) and node.target.id == 'CASES'):
+            cases.extend(ast.literal_eval(node.value))
+    if cases is None:
+        raise ValueError('CASES not found in tools/run_calibration.py')
+    return cases
 
 
 def source_tree(path: str) -> str:
