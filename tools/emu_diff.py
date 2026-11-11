@@ -29,7 +29,8 @@ A case module (``tools/emu_cases/<name>.py`` or any path) supplies:
     FPCWS = (0x027f, 0x007f)         # optional control words
     FLOAT_ULPS = 0                   # optional: outcomes whose only differences are float32
                                      # words (writes, logged call arguments) within this many
-                                     # ulps count as ``within_ulps``, not as mismatches
+                                     # ulps count as ``within_ulps``, not as mismatches; a dict
+                                     # {fpcw: ulps} keeps the other control words exact
     FLOAT_ABS = 0.0                  # optional, with FLOAT_ULPS: words this close in value also
                                      # agree (cancellation near zero, where ulps mean little)
     def cases(rng, n): ...           # yields picklable case descriptions
@@ -1318,6 +1319,14 @@ def _calls_close(ca, cb, tol: tuple, worst: list) -> bool:
     return True
 
 
+def tolerance_for(module, fpcw: int) -> tuple:
+    """(ulps, absolute) a case allows at one control word; FLOAT_ULPS may map fpcw -> ulps."""
+    ulps = getattr(module, 'FLOAT_ULPS', 0)
+    if isinstance(ulps, dict):
+        ulps = ulps.get(fpcw, 0)
+    return ulps, (getattr(module, 'FLOAT_ABS', 0.0) if ulps else 0.0)
+
+
 def outcomes_within_ulps(a: tuple, b: tuple, ulps: int, absolute: float = 0.0) -> int | None:
     """The largest float32 ulp distance between two outcomes that differ only in float words
     (written memory, logged call arguments and pointees) by at most ``ulps`` (or by at most
@@ -1519,12 +1528,12 @@ def run_diff(module, obj_path: Path, n: int = 200, seed: int = 1, fpcws=None, re
     retail_va = retail_va or module.RETAIL_VA
     fpcws = fpcws or getattr(module, 'FPCWS', DEFAULT_FPCWS)
     probes = dict(getattr(module, 'PROBES', {}))
-    ulps, absolute = getattr(module, 'FLOAT_ULPS', 0), getattr(module, 'FLOAT_ABS', 0.0)
     summary = Summary(getattr(module, '__name__', 'case'), probes={va: 0 for va in probes})
     rng = random.Random(seed)
     case_list = list(module.cases(rng, n))
     for fpcw in fpcws:
         bad = 0
+        ulps, absolute = tolerance_for(module, fpcw)
         for index, case in enumerate(case_list):
             r = emu.run(retail_va, module.setup, case, fpcw, (seed, index), probes, replay)
             c = emu.run(placement.entry, module.setup, case, fpcw, (seed, index), (), replay)
@@ -1621,7 +1630,7 @@ def main(argv=None) -> int:
     for va, hits in summary.probes.items():
         print(f'probe {va:#x} {getattr(module, "PROBES")[va]}: reached in {hits} retail runs')
     if summary.within_ulps:
-        print(f'within {getattr(module, "FLOAT_ULPS", 0)} ulps: {summary.within_ulps} runs '
+        print(f'within FLOAT_ULPS {getattr(module, "FLOAT_ULPS", 0)}: {summary.within_ulps} runs '
               f'(worst {summary.worst_ulps})')
     print(f'{summary.case}: runs {summary.runs}, mismatches {summary.mismatches}, '
           f'retail faults {summary.retail_faults}')

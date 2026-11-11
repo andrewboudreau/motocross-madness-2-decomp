@@ -163,6 +163,8 @@ CLEAN_CASES = {
     'bikerace_write_relative_positions': 150,
     'visual_cue_tick': 100,
     'kb_simulate_look_ahead': 20,
+    # Replay sweep: exact at 53-bit, FLOAT_ULPS/FLOAT_ABS at 24-bit (inline-dot grouping).
+    'kb_look_ahead': 40,
 }
 
 # Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).
@@ -191,6 +193,8 @@ PRE_FIX_SHAPES = [
     ('kb_simulate_look_ahead', [('SafeNormalize(BikeAICrossCtor(fwd, ', 'SafeNormalize((')], 60),
     ('kb_simulate_look_ahead', [('            groundR = back;', '            Vec3 groundR = back;')], 20),
     ('kb_simulate_look_ahead', [('sideV = Vec3(lean.x * k, lean.y * k, lean.z * k);', 'sideV = lean * k;')], 20),
+    # The replay case sees the lean blend's rounding at 53-bit (13 of 30), which stays exact there.
+    ('kb_look_ahead', [('sideV = Vec3(lean.x * k, lean.y * k, lean.z * k);', 'sideV = lean * k;')], 30),
 ]
 
 
@@ -369,8 +373,9 @@ class DifferentialTests(unittest.TestCase):
                 with tempfile.TemporaryDirectory(prefix='emu-diff-test-') as tmp:
                     source = Path(tmp) / path.name
                     source.write_text(text, encoding='latin-1')
-                    obj = emu_diff.compile_source(str(source), Path(tmp) / 'candidate.obj',
-                                                  ['/I' + str(path.parent)])
+                    # The copy keeps its directory's headers and its configured flags (/QIfist ...).
+                    flags = ['/I' + str(path.parent)] + emu_diff.configured_flags(module.SOURCE)
+                    obj = emu_diff.compile_source(str(source), Path(tmp) / 'candidate.obj', flags)
                     summary = emu_diff.run_diff(module, obj, n=n, retail=Path(os.environ['MCM2_EXE']),
                                                 show=1)
                 self.assertGreater(summary.mismatches, 0)
@@ -429,6 +434,15 @@ class ReplayPointeeAndToleranceTests(unittest.TestCase):
         # pointees with an explicit size log that many bytes.
         calls, _, _ = run({'pointees': {query: ((0, 8),)}})
         self.assertEqual(calls[0][3], (('*arg0', passed[:16]),))
+
+    def test_tolerance_is_per_control_word(self):
+        import types
+        case = types.SimpleNamespace(FLOAT_ULPS={0x007f: 64}, FLOAT_ABS=1e-5)
+        self.assertEqual(emu_diff.tolerance_for(case, 0x007f), (64, 1e-5))
+        self.assertEqual(emu_diff.tolerance_for(case, 0x027f), (0, 0.0))
+        case = types.SimpleNamespace(FLOAT_ULPS=8)
+        self.assertEqual(emu_diff.tolerance_for(case, 0x027f), (8, 0.0))
+        self.assertEqual(emu_diff.tolerance_for(types.SimpleNamespace(), 0x027f), (0, 0.0))
 
     def test_outcomes_within_ulps(self):
         import struct

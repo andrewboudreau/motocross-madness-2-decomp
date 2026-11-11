@@ -1247,7 +1247,7 @@ nothing about the callees.
 | 0x00413200 | `KrustyBike::Fn_00413200` (AI physics step) | `kb_ai_step` | 300 | 0 after the fix below (20 of 100 at 53-bit before) |
 | 0x00493660 | `KrustyBike::Fn_00493660` (remote state interpolation) | `kb_net_interpolate` | 200 | 0 |
 | 0x004685d0 | `Game::Tick` (samples/game/GameTick.cpp, read-only) | `game_tick` | 200 | 0 |
-| 0x0040eca0 | `SimulateLookAhead` (AI two-wheel look-ahead) | `kb_look_ahead` | 150 | 0 within 256 ulps or 1e-5 after the fixes below |
+| 0x0040eca0 | `SimulateLookAhead` (AI two-wheel look-ahead) | `kb_look_ahead` | 200 | 0 at 53-bit; 0 at 24-bit within 256 ulps or 1e-5 (139 of 200 inexact, worst 142 ulps) |
 
 `Fn_00413200` smoothed the forward acceleration with `(dt, target)` and
 kept the target in an 80-bit register. Retail loads `dt` first and spills the
@@ -1258,34 +1258,29 @@ smoother's store, as `VehSmooth` does. This also raised the
 `match_one` score (masked 1862 to 1971 of 3744, aligned 1097 to 1102 of 1120).
 The pre-fix shape is kept as a negative control in `tests/test_emu_diff.py`.
 
-`SimulateLookAhead` had two logic differences in the linked Group 3 copy
-(`src/bringup/Group3_KrustyBikeAI.cpp`):
-- Without a side vector, retail normalises `fwd x (up x fwd)`
-  (0x0040ede9..0x0040eede: the inner cross with `up.y` folded, then the outer
-  one). The source built only the inner cross, which gave a flat side axis.
-- The final settle queries `groundR` without setting it, so retail samples the
-  last loop step's rear point. The source declared a fresh, uninitialised
-  `groundR` after the loop.
+`kb_look_ahead` is the replay counterpart of the third sweep's
+`kb_simulate_look_ahead` ([below](#third-sweep)), which runs the callees as
+retail code and so only compares at 53-bit. Here every callee except the
+vector math is replayed. That isolates the body at 24-bit too, and it reaches
+what the other case cannot steer: a failed `PredictPathMotion`, path braking
+to a stop and both steering signs. It found the same default side axis and
+final rear ground sample as the third sweep, whose fixes are the ones in the
+source. All three pre-fix shapes differ here at n = 30: the side axis in 6 of
+30 runs per control word, the ground sample in 27 of 30, and the lean blend
+(0x00412aa1) in 13 of 30 at 53-bit only.
 
-The `match_one` score moved from masked 1459 of 16501 to 1371 of 16513
-(aligned 3739 to 3678 of 3966). The linked body groups several inline dot
-products and `Vec3` temporaries in another order than retail (the VC6 inline
-budget noted in the source). An exact comparison therefore still differs in
-17 of 40 runs at 53-bit and 30 of 40 at 24-bit, but only in float32 words. The
-case declares `FLOAT_ULPS = 256` and `FLOAT_ABS = 1e-5`. `run_diff` counts
-outcomes whose only differences are whole float32 words within those bounds
-as `within_ulps`; the worst was 170 ulps in 300 runs. Before the fixes, the
-differences are far outside those bounds: both pre-fix shapes are negative
-controls in `tests/test_emu_diff.py`. Probes reach the front probe contact,
-an obstacle hit, the event 1/5 aim blend, the path brake stop, both steer
-signs and the failed `PredictPathMotion` return.
+At 24-bit the inlined three-term dots sum in another order than retail's, so
+the case declares `FLOAT_ULPS = {0x007f: 256}` and `FLOAT_ABS = 1e-5`. With
+those bounds, `run_diff` counts an outcome as `within_ulps` when its only
+differences are whole float32 words within bound; the 53-bit runs must still
+match exactly.
 
 Replay extensions used here (generic, unit-tested):
 - `inout` lists pointees that are logged on entry and left out of the
-  synthetic out-writes, so an effect sees what the body passed (the terrain
-  query keeps x and z and writes y).
+  synthetic out-writes, so an effect sees what the body passed. The terrain
+  query keeps x and z and writes y.
 - A `pointees` entry may be `(index, bytes)`.
-- `--ulps N` overrides a case's `FLOAT_ULPS`.
+- `FLOAT_ULPS` is an int or a `{fpcw: ulps}` dict, and `--ulps N` overrides it.
 
 `Game::Tick` agrees except for a difference that is there by design. The
 candidate reads the profiling counter through `QueryPerformanceCounter`
