@@ -14,7 +14,12 @@
 //    would keep a different low dword.
 //    Compared with retail instruction by instruction: the outcodes, the
 //    trivial accepts, the shared-bit reject, the projection, the clamp and
-//    the viewport offset agree.  Griddraw.h's and D3DIMSoultreeShadow.cpp's views
+//    the viewport offset agree.  The differential run
+//    (tools/emu_cases/visibility_testbox.py) found last-bit differences in
+//    the corners and the projection under 24-bit precision (333 of 2000
+//    runs) from VC6's reassociation of the sums and products; with the
+//    split arrays and the parenthesised x scale 0 of 6000 runs differ under
+//    53- and 24-bit precision.  Griddraw.h's and D3DIMSoultreeShadow.cpp's views
 //    of the clipper forward here (Group2_GridVisibilityTestBox.cpp,
 //    Group1_ShadowClipper.cpp), as retail has a single function.
 //  * UnknownEcoVisibilityClipper::SphereInFrustum (0x0052fbb0) is
@@ -97,38 +102,43 @@ int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, co
     }
 
     // Per-axis products of the low/high box faces with the matrix rows
-    // ([column][low/high]), in retail's straight-line order.
+    // (pxK[low/high] for column K), in retail's straight-line order.
+    // Separate arrays rather than px[4][2]: with one array VC6 reassociates
+    // the corner sums as x+z+y, which rounds differently from retail's
+    // x+y+z under 24-bit precision (tools/emu_cases/visibility_testbox.py).
     float lowX = center[0] - extent[0];
     float lowY = center[1] - extent[1];
     float lowZ = center[2] - extent[2];
     float highX = center[0] + extent[0];
     float highY = center[1] + extent[1];
     float highZ = center[2] + extent[2];
-    float px[4][2], py[4][2], pz[4][2];
-    px[0][0] = lowX * m[0];
-    px[1][0] = lowX * m[1];
-    px[2][0] = lowX * m[2];
-    px[3][0] = lowX * m[3];
-    px[0][1] = highX * m[0];
-    px[1][1] = highX * m[1];
-    px[2][1] = highX * m[2];
-    px[3][1] = highX * m[3];
-    py[0][0] = lowY * m[4];
-    py[1][0] = lowY * m[5];
-    py[2][0] = lowY * m[6];
-    py[3][0] = lowY * m[7];
-    py[0][1] = highY * m[4];
-    py[1][1] = highY * m[5];
-    py[2][1] = highY * m[6];
-    py[3][1] = highY * m[7];
-    pz[0][0] = lowZ * m[8];
-    pz[1][0] = lowZ * m[9];
-    pz[2][0] = lowZ * m[10];
-    pz[3][0] = lowZ * m[11];
-    pz[0][1] = highZ * m[8];
-    pz[1][1] = highZ * m[9];
-    pz[2][1] = highZ * m[10];
-    pz[3][1] = highZ * m[11];
+    float px0[2], px1[2], px2[2], px3[2];
+    float py0[2], py1[2], py2[2], py3[2];
+    float pz0[2], pz1[2], pz2[2], pz3[2];
+    px0[0] = lowX * m[0];
+    px1[0] = lowX * m[1];
+    px2[0] = lowX * m[2];
+    px3[0] = lowX * m[3];
+    px0[1] = highX * m[0];
+    px1[1] = highX * m[1];
+    px2[1] = highX * m[2];
+    px3[1] = highX * m[3];
+    py0[0] = lowY * m[4];
+    py1[0] = lowY * m[5];
+    py2[0] = lowY * m[6];
+    py3[0] = lowY * m[7];
+    py0[1] = highY * m[4];
+    py1[1] = highY * m[5];
+    py2[1] = highY * m[6];
+    py3[1] = highY * m[7];
+    pz0[0] = lowZ * m[8];
+    pz1[0] = lowZ * m[9];
+    pz2[0] = lowZ * m[10];
+    pz3[0] = lowZ * m[11];
+    pz0[1] = highZ * m[8];
+    pz1[1] = highZ * m[9];
+    pz2[1] = highZ * m[10];
+    pz3[1] = highZ * m[11];
 
     unsigned int common = 0xffffffff;
     for (i = 0; i < 8; i++) {
@@ -136,10 +146,10 @@ int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, co
         int b = (i >> 1) & 1;
         int c = i >> 2;
         VisibilityClipPoint* corner = &s_group4BoxCorners[i];
-        corner->w = px[3][a] + py[3][b] + pz[3][c] + m[15];
-        corner->x = px[0][a] + py[0][b] + pz[0][c] + m[12];
-        corner->y = px[1][a] + py[1][b] + pz[1][c] + m[13];
-        corner->z = px[2][a] + py[2][b] + pz[2][c] + m[14];
+        corner->w = px3[a] + py3[b] + pz3[c] + m[15];
+        corner->x = px0[a] + py0[b] + pz0[c] + m[12];
+        corner->y = px1[a] + py1[b] + pz1[c] + m[13];
+        corner->z = px2[a] + py2[b] + pz2[c] + m[14];
         unsigned int code = Group4Vis_OutCode(corner->x, corner->y, corner->z, corner->w);
         if (code == 0) {
             if (!screenRect && !cornersInside)
@@ -173,7 +183,7 @@ int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, co
         for (i = 1; i < 8; i++) {
             corner = &s_group4BoxCorners[i];
             inverse = 1.0f / corner->w;
-            corner->x = (float)width * inverse * corner->x;
+            corner->x = corner->x * ((float)width * inverse);
             corner->y = (float)height * corner->y * inverse;
             if ((float)screenRect[0] > corner->x)
                 FistpFloatToIntChecked(&screenRect[0], corner->x);

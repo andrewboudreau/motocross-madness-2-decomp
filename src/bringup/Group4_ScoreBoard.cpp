@@ -10,6 +10,10 @@
 // behavioural difference (places, the -1 sentinels, the hundred rounding, the
 // digit-model indexing, the 1.05 threshold, the multiplier*10 conversion, the
 // fraction digits, NextKey, the eye distance through FastSqrt and the scaling).
+// The differential run (tools/emu_cases/scoreboard_show_value.py) then found a
+// last-bit difference in the squared eye distance under 53-bit precision (18 of
+// 2000 runs), fixed by building the vector in a local; now 0 of 6000 runs differ
+// under 53- and 24-bit precision.
 // Rounding: the game build compiles this unit with /QIfist (config/game_build.json
 // bringup_flags), so FistpFloatToInt's cast is a FISTP under the current rounding
 // mode, as retail's helper; these two are the unit's only float-to-int conversions.
@@ -80,9 +84,15 @@ void KbScoreBoard::ShowValue(float points, float multiplier)
     self->NextKey();
     Vec3 position;
     reinterpret_cast<SoultreeObject*>(self->raceView->localRacer->modelNode)->GetPosition(&position);
-    self->eyeToFrame.x = position.x - self->camera->eyePosition.x;
-    self->eyeToFrame.y = position.y - self->camera->eyePosition.y;
-    self->eyeToFrame.z = position.z - self->camera->eyePosition.z;
+    // Retail stores the three differences, copies them into eyeToFrame and
+    // squares the stored floats; assigning the fields directly let VC6 keep
+    // the unrounded z in ST0 (a last-bit difference under 53-bit precision,
+    // tools/emu_cases/scoreboard_show_value.py).
+    Vector3 delta;
+    delta.x = position.x - self->camera->eyePosition.x;
+    delta.y = position.y - self->camera->eyePosition.y;
+    delta.z = position.z - self->camera->eyePosition.z;
+    self->eyeToFrame = delta;
     float lengthSquared = self->eyeToFrame.x * self->eyeToFrame.x + self->eyeToFrame.y * self->eyeToFrame.y
                         + self->eyeToFrame.z * self->eyeToFrame.z;
     if (lengthSquared == 0.0f) {

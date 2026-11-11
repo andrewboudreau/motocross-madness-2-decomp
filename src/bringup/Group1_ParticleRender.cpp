@@ -39,6 +39,12 @@
 // over 1.6e7 lifetimes; an infinity or NaN (lifetime 0) leaves a zero low byte in both
 // retail's 32-bit indefinite and the 64-bit one.  So the 64-bit store gives retail's
 // colours.
+// The differential run (tools/emu_cases/particle_render3d.py) found last-bit
+// differences in the light frame and the FastInvSqrt argument (both precisions) and,
+// under 53-bit precision, in the left-clipped u (retail keeps the unrounded value on
+// the x87 stack).  Retail's grouping is reproduced by the by-value Vector3 cross and
+// normalize helpers, the z*z + (x*x + y*y) length, the scaled view vector and the
+// left-clip assignment order; after them no run differs under 53- or 24-bit precision.
 // Faithful retail quirk kept: when no particle is visible the function returns with
 // the transformed buffer (+0x1f84) still locked.
 
@@ -136,19 +142,18 @@ static inline unsigned int& Group1CornerColor(ParticleCornerVertex& corner)
 }
 
 // The normalize retail inlines twice: unit vectors are kept as they are.
-static inline void Group1Normalize(float* out, float x, float y, float z)
+static inline Vector3 Group1Normalize(float x, float y, float z)
 {
-    float lengthSquared = x * x + y * y + z * z;
-    if (lengthSquared == 1.0f) {
-        out[0] = x;
-        out[1] = y;
-        out[2] = z;
-    } else {
-        float scale = FastInvSqrt(lengthSquared);
-        out[0] = scale * x;
-        out[1] = scale * y;
-        out[2] = scale * z;
-    }
+    float lengthSquared = z * z + (x * x + y * y);
+    if (lengthSquared == 1.0f)
+        return Vector3(x, y, z);
+    float scale = FastInvSqrt(lengthSquared);
+    return Vector3(scale * x, scale * y, scale * z);
+}
+
+static inline Vector3 Group1Cross(const Vector3& a, const Vector3& b)
+{
+    return Vector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 }
 
 // 0x004bac60
@@ -218,24 +223,20 @@ int ParticleManager::Render3D()
     // 5. Light the corners in a frame 100 units in front of the scene camera.
     Group1ParticleCamera* scene =
         Group1CameraView(reinterpret_cast<Group1ParticleGame*>(g_TrackGame)->renderTarget->currentCamera);
-    float lightX = scene->viewDirection.x * 100.0f + scene->eyePosition.x;
-    float lightY = scene->viewDirection.y * 100.0f + scene->eyePosition.y;
-    float lightZ = scene->viewDirection.z * 100.0f + scene->eyePosition.z;
-    float backX = -scene->viewDirection.x;
-    float backY = -scene->viewDirection.y;
-    float backZ = -scene->viewDirection.z;
-    float upX = scene->upDirection.x;
-    float upY = scene->upDirection.y;
-    float upZ = scene->upDirection.z;
+    Vector3 scaled;
+    scaled.x = scene->viewDirection.x * 100.0f;
+    scaled.y = scene->viewDirection.y * 100.0f;
+    scaled.z = scene->viewDirection.z * 100.0f;
+    float lightX = scaled.x + scene->eyePosition.x;
+    float lightY = scaled.y + scene->eyePosition.y;
+    float lightZ = scaled.z + scene->eyePosition.z;
+    Vector3 backward(-scene->viewDirection.x, -scene->viewDirection.y, -scene->viewDirection.z);
+    Vector3 upward = scene->upDirection;
     // side = up x back; up' = back x side (up made perpendicular to the view).
-    float sideX = backZ * upY - backY * upZ;
-    float sideY = upZ * backX - backZ * upX;
-    float sideZ = backY * upX - upY * backX;
-    float up[3];
-    Group1Normalize(up, backY * sideZ - backZ * sideY, backZ * sideX - backX * sideZ,
-                    sideY * backX - backY * sideX);
-    float back[3];
-    Group1Normalize(back, backX, backY, backZ);
+    Vector3 side = Group1Cross(upward, backward);
+    Vector3 perp = Group1Cross(backward, side);
+    Vector3 up = Group1Normalize(perp.x, perp.y, perp.z);
+    Vector3 back = Group1Normalize(backward.x, backward.y, backward.z);
     Matrix4 frame;
     frame.m[0][0] = up[1] * back[2] - up[2] * back[1];
     frame.m[0][1] = back[0] * up[2] - up[0] * back[2];
@@ -335,9 +336,9 @@ int ParticleManager::Render3D()
         }
         if (rect->left < 0.0f) {
             float t = -rect->left / (rect->right - rect->left);
-            uTopLeft = (cell.u1 - cell.u0) * t + cell.u0;
+            uBottomLeft = (cell.u1 - cell.u0) * t + cell.u0;
             rect->left = 0.0f;
-            uBottomLeft = uTopLeft;
+            uTopLeft = uBottomLeft;
         } else {
             uBottomLeft = cell.u3;
             uTopLeft = cell.u0;

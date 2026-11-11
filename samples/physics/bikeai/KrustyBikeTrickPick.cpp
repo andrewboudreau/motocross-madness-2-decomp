@@ -18,7 +18,8 @@
 // helper at 0x0048d834 (floor of the product, ties to even), the aiKind byte, the slack test
 // (`test ah, 1`: slack < 0.1 fails) and the hold-time product order.  Both tables equal
 // retail's 0x0056cc60..0x0056d060 bytes.  The index is in [-0.5, count - 0.5) with count <= 16,
-// so FistpFloatToInt's 64-bit store equals retail's 32-bit one.  Not differentially tested.
+// so FistpFloatToInt's 64-bit store equals retail's 32-bit one.  Differentially tested with
+// tools/emu_cases/krusty_trick_pick.py: 0 of 6000 runs differ (53- and 24-bit precision).
 //
 // Shape (linked_accuracy masked, /QIfist): 0.773, 110 against 97 instructions.  The named
 // `pick` and `hold` locals keep retail's product order (rand * 1/32768 first); written as one

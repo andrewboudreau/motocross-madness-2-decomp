@@ -16,9 +16,10 @@
 // gui+0x3d8, "" at 0x00577738 without a gui) and the failure path.  Retail rounds both
 // coordinates with its inline fistp helper (0x0051af3e, 0x0051af64): floor of the value apart
 // from exact ties, under the current rounding mode.  Screen coordinates are in int range, so
-// FistpFloatToInt's 64-bit store equals retail's 32-bit one.  Not differentially tested.
+// FistpFloatToInt's 64-bit store equals retail's 32-bit one.  Differentially tested with
+// tools/emu_cases/drop_text_setup.py: 0 of 4000 runs differ (53- and 24-bit precision).
 //
-// Shape (linked_accuracy masked, /QIfist): 0.624, 124 against 126 instructions.  Reading
+// Shape (linked_accuracy masked, /QIfist): 0.632, 124 against 126 instructions.  Reading
 // g_TrackGame->ui->gui at each use follows retail, which reloads it for the italic flag; a
 // `gui` local scores 0.613.  VC6 still schedules both coordinate products before the first
 // store, where retail's inline-asm helper finishes x (pointer kept in the `value` slot) before
@@ -57,8 +58,11 @@ DropTextOverlay* DropTextOverlay::Setup(void* value, TextureMapManager* textures
     GameObject::SetRenderContext(value);
     this->dropSeconds = dropSeconds;
     PCRenderTarget* target = (PCRenderTarget*)renderContext;
-    FistpFloatToInt(&textX, target->targetWidth * (1.0f / 640.0f) * x - 0.5f);
-    FistpFloatToInt(&textYOffset, target->targetHeight * (1.0f / 480.0f) * y - 0.5f);
+    // The parentheses are redundant in C but stop VC6 from reassociating the
+    // product as size * x * scale, which rounds differently under 24-bit
+    // precision (tools/emu_cases/drop_text_setup.py).
+    FistpFloatToInt(&textX, (target->targetWidth * (1.0f / 640.0f)) * x - 0.5f);
+    FistpFloatToInt(&textYOffset, (target->targetHeight * (1.0f / 480.0f)) * y - 0.5f);
     textY = textYOffset;
     strcpy(caption, text);
     logFont.lfHeight = 28;

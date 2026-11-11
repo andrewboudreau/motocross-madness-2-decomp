@@ -531,7 +531,7 @@
       "extra_flags": [
         "/QIfist"
       ],
-      "reason": "Near-miss bodies admitted so the source build can link and run; defines TerrainShadow slots 27, 28 and 30, which the vtable emitted by src/reconstructed/TerrainShadow.cpp (the exact constructor, Attach, slot 29 and Render3D) references. /QIfist turns slot 30's FistpFloatToInt cast into a FISTP under the current rounding mode, as retail's inline fistp helper; slot 30 is the file's only float-to-int conversion (slots 27 and 28 make no __ftol call with or without the flag). Not differentially tested; bytes nonexact.",
+      "reason": "Near-miss bodies admitted so the source build can link and run; defines TerrainShadow slots 27, 28 and 30, which the vtable emitted by src/reconstructed/TerrainShadow.cpp (the exact constructor, Attach, slot 29 and Render3D) references. /QIfist turns slot 30's FistpFloatToInt cast into a FISTP under the current rounding mode, as retail's inline fistp helper; slot 30 is the file's only float-to-int conversion (slots 27 and 28 make no __ftol call with or without the flag). Checked against the retail disassembly; slot 30 also differentially (tools/emu_cases/terrain_shadow_slot30.py: 0 of 3000 runs differ).",
       "evidence": "docs/GAME_BUILD.md#shadow-slot-30-rounding"
     },
     {
@@ -582,7 +582,7 @@
       "extra_flags": [
         "/QIfist"
       ],
-      "reason": "ProjectedShadow ComputeBounds 0x004db0d0, RenderShadow 0x004db8c0, Present 0x004dbd30 and TintCasterVertices 0x004dc2b0 replace the bring-up stand-ins; includes the canonical unit (included_sources). /QIfist turns the rounding helper's cast into a 64-bit fistp under the current rounding mode, range-checked to retail's 32-bit result. Checked against the retail disassembly, not differentially tested.",
+      "reason": "ProjectedShadow ComputeBounds 0x004db0d0, RenderShadow 0x004db8c0, Present 0x004dbd30 and TintCasterVertices 0x004dc2b0 replace the bring-up stand-ins; includes the canonical unit (included_sources). /QIfist turns the rounding helper's cast into a 64-bit fistp under the current rounding mode, range-checked to retail's 32-bit result. Differentially tested (tools/emu_cases/projected_shadow_render.py, projected_shadow_tint.py: 0 of 7000 runs differ); bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#projectedshadow-near-miss-bodies"
     },
     {
@@ -591,7 +591,7 @@
       "extra_flags": [
         "/QIfist"
       ],
-      "reason": "D3DIMSoultreeShadow slots 29 (0x00446c30) and 30 (0x00446f40) replace the Group5_D3DIMSoultreeShadow bring-up stand-ins. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper; the outcode array is sized to the 3000-entry vertex limit. Checked against the retail disassembly, not differentially tested.",
+      "reason": "D3DIMSoultreeShadow slots 29 (0x00446c30) and 30 (0x00446f40) replace the Group5_D3DIMSoultreeShadow bring-up stand-ins. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper; the outcode array is sized to the 3000-entry vertex limit. Checked against the retail disassembly and differentially (tools/emu_cases/d3dim_shadow_slot30.py: 0 of 3000 runs differ).",
       "evidence": "docs/GAME_BUILD.md#shadow-slot-30-rounding"
     },
     {
@@ -600,7 +600,7 @@
       "extra_flags": [
         "/QIfist"
       ],
-      "reason": "KrustyBike::Fn_0048D780 0x0048d780 (the AI trick pick) replaces the Group3_KrustyBikeAISupport bring-up copy. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x0048d834; the index stays in [-0.5, 15.5). Checked against the retail disassembly, not differentially tested.",
+      "reason": "KrustyBike::Fn_0048D780 0x0048d780 (the AI trick pick) replaces the Group3_KrustyBikeAISupport bring-up copy. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x0048d834; the index stays in [-0.5, 15.5). Checked against the retail disassembly and differentially (tools/emu_cases/krusty_trick_pick.py: 0 of 6000 runs differ at 53- and 24-bit precision).",
       "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
     },
     {
@@ -618,7 +618,7 @@
       "extra_flags": [
         "/QIfist"
       ],
-      "reason": "DropTextOverlay::Setup 0x0051af00 replaces the Group4_Overlay bring-up copy (Tick and ChatOverlay::Setup stay there). /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x0051af3e and 0x0051af64; screen coordinates stay in int range. Checked against the retail disassembly, not differentially tested.",
+      "reason": "DropTextOverlay::Setup 0x0051af00 replaces the Group4_Overlay bring-up copy (Tick and ChatOverlay::Setup stay there). /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x0051af3e and 0x0051af64; screen coordinates stay in int range. Checked against the retail disassembly and differentially (tools/emu_cases/drop_text_setup.py); the parenthesised scale products keep retail's (size * scale) * x order, which VC6 otherwise reassociates (96 of 2000 runs differed at 24-bit precision, now 0 of 4000).",
       "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
     }
   ],

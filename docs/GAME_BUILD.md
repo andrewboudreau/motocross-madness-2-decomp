@@ -942,8 +942,8 @@ the byte operations it uses to derive the format-9 nibbles. The canonical
 exact functions are unchanged, and the bytes at score 1.000 are unchanged
 (772631).
 
-Behaviour was checked against the retail disassembly and not differentially
-tested. The checks covered GetPart argument order, the transform choice
+Behaviour was checked against the retail disassembly and differentially
+([below](#bring-up-fistp-units)). The checks covered GetPart argument order, the transform choice
 (mode 3 uses 0x004a1b00), the area cull at `<= 0`, the `1 < p < size - 1`
 bounds, the clip min/max, minDepth, and the ReleaseParts guard on
 `+0x27c != -1`. In TintCasterVertices they covered the inclusive size bounds
@@ -993,8 +993,8 @@ default rounding mode, so its behaviour does not change; the shape does
 Ruled out for the helper (D3DIM slot 30, masked, `/QIfist`): the
 range-checked `__int64` cast of `ProjectedShadowFloatToInt` (0.807), and a
 plain cast without the `memcpy` (0.870, but it skips the binary32 rounding of
-the argument). Behaviour was checked against the retail disassembly and not
-differentially tested: the clip rectangle set order, colour, outcode senses,
+the argument). Behaviour was checked against the retail disassembly and
+differentially ([below](#bring-up-fistp-units)): the clip rectangle set order, colour, outcode senses,
 mode 3 transform 0x004a1b00, the cull at `<= 0`, the minDepth test, the
 ShadowFillTriangle arguments, vertex store order, the 3000 limit and the loop
 bounds.
@@ -1008,7 +1008,7 @@ Two more bring-up bodies that rounded with `X87FloatToInt` moved into
 | VA | Function | Sample | Before | Now linked |
 |---|---|---|---|---|
 | 0x0048d780 | `KrustyBike::Fn_0048D780` (AI trick pick) | `samples/physics/bikeai/KrustyBikeTrickPick.cpp` | 0.474 | 0.773 |
-| 0x0051af00 | `DropTextOverlay::Setup` | `samples/track/DropTextOverlaySetup.cpp` | 0.501 | 0.624 |
+| 0x0051af00 | `DropTextOverlay::Setup` | `samples/track/DropTextOverlaySetup.cpp` | 0.501 | 0.632 |
 
 The bodies were removed from `src/bringup/Group3_KrustyBikeAISupport.cpp`
 and `src/bringup/Group4_Overlay.cpp`. `DropTextOverlay::Tick` (0x0051b070)
@@ -1025,8 +1025,10 @@ expression, VC6 folds 1/32768 * 0.8 into a single constant, so the old body's
 hold time could differ from retail's in its last bit; that was the only
 behaviour difference found. Setup's offsets, scale constants, LOGFONT bytes,
 face and weight choice and failure path agree; reading
-`g_TrackGame->ui->gui` at each use follows retail's reload. Neither body was
-differentially tested.
+`g_TrackGame->ui->gui` at each use follows retail's reload. The differential
+run then found Setup's text position one pixel off under 24-bit precision
+(VC6 reassociated `targetWidth * (1/640) * x`); explicit parentheses fixed it
+([below](#bring-up-fistp-units)).
 
 Ruled out (masked): `rand() / 32768.0f` and an inline `Random01` helper
 compile like the single expression (0.757); a `gui` local in Setup scores
@@ -1066,17 +1068,17 @@ or when only its low bits are kept. `FistpFloatToIntChecked` casts to
 
 | VA | Function | Unit | Helper and range | Before | Now linked |
 |---|---|---|---|---|---|
-| 0x0048d1e0 | `KbScoreBoard::ShowValue` | `Group4_ScoreBoard.cpp` | plain; small scores | 0.485 | 0.615 |
+| 0x0048d1e0 | `KbScoreBoard::ShowValue` | `Group4_ScoreBoard.cpp` | plain; small scores | 0.485 | 0.681 |
 | 0x0049e4a0 | `GridVertexSink::LightVertices` | `Group4_GridLighting.cpp` | plain; colour bytes times facing values | 0.458 | 0.745 |
 | 0x0049e6b0 | `LightAny` worker | same | same | 0.209 | 0.774 |
 | 0x0049f1c0 | `LightOne` worker | same | same | 0.168 | 0.705 |
 | 0x0049f8d0 | `LightAmbientPlusOne` worker | same | same | 0.206 | 0.714 |
 | 0x004a9050 | `Character::Method_0x004a9050` | `CharacterMotionFourPose.cpp` (sample, `/QIfist /Op`) | plain; frame index | 0.103 | 0.727 |
-| 0x004bac60 | `ParticleManager::Render3D` | `Group1_ParticleRender.cpp` | plain; only the low byte is kept | 0.608 | 0.655 |
+| 0x004bac60 | `ParticleManager::Render3D` | `Group1_ParticleRender.cpp` | plain; only the low byte is kept | 0.608 | 0.675 |
 | 0x004eab00 | `Scene::Tick` | `Group4_SceneTick.cpp` | plain; [-0.5, count - 0.5) | 0.637 | 0.686 |
 | 0x00507610 | `Terrain::PrepareGeometry` | `Group3_TerrainPrepareGeometry.cpp` | plain; focal length in pixels | 0.781 | 0.929 |
 | 0x0051b070 | `DropTextOverlay::Tick` | `Group4_Overlay.cpp` | checked; `dropSeconds` may be near zero | 0.315 | 0.607 |
-| 0x0052f570 | `VisibilityClipper::TestBox` | `Group4_Visibility.cpp` | checked; a corner near the eye plane | 0.485 | 0.685 |
+| 0x0052f570 | `VisibilityClipper::TestBox` | `Group4_Visibility.cpp` | checked; a corner near the eye plane | 0.485 | 0.689 |
 
 Scores are masked linked-body scores. Bound functions come from
 `tools/linked_accuracy.py`. The unbound workers, Render3D, PrepareGeometry
@@ -1106,10 +1108,55 @@ retail's helper does. `X87FloatToInt` read the same mode through `_control87`,
 so the rounding itself is unchanged for values inside `int`. The old helper's
 `_control87` call also forced the converted value and any live float
 temporaries out to memory, though. Without that call VC6 may keep an
-intermediate in an 80-bit register where retail rounds it to binary32. The
-four-pose blend lost last-bit pose agreement this way (204 of 600 emulated
-cases) until it was compiled with `/Op`; the other sites have not been
-differentially tested for it.
+intermediate in an 80-bit register, or reassociate a sum or product, where
+retail rounds each step to binary32.
+
+Every linked fistp body was therefore run against retail with
+`tools/emu_diff.py` (unicorn; cases in `tools/emu_cases/`). Each case runs the
+retail function and the compiled candidate on the same random and edge inputs
+(fractions near .5, zero, negative and boundary values) and compares the
+return value, every byte written and every logged call. Each input runs under
+precision control 53 bits (0x027f, which the CRT start-up sets through
+`_controlfp(_PC_53, _MCW_PC)`) and 24 bits (0x007f). Inference from DirectX
+semantics: the game creates DirectDraw with `DDSCL_FPUSETUP`
+(`PCVideoCard.cpp`), so gameplay most likely runs at 24 bits.
+
+| VA | Function | Runs | Differed before | Fix | Now linked |
+|---|---|---|---|---|---|
+| 0x0048d1e0 | `KbScoreBoard::ShowValue` | 6000 | 18 of 2000 (53-bit) | eye vector built in a local, then copied | 0.681 |
+| 0x0048d780 | trick pick (sample) | 6000 | 0 | none | 0.773 |
+| 0x004a8bf0 | `Character::Method_0x004a8bf0` (motion start) | 6000 | 0 | none | unchanged |
+| 0x004a8c50 | `Character::Method_0x004a8c50` (motion blend) | 3000 | 0 | none | unchanged |
+| 0x004a9050 | four-pose blend (sample, `/Op`) | 600 | 0 (204 of 600 without `/Op`) | none here | 0.727 |
+| 0x004bac60 | `ParticleManager::Render3D` | 1000 | 234 of 300 (53-bit), 63 of 300 (24-bit) | light-frame grouping (cross, normalize, length) | 0.675 |
+| 0x004db8c0 | ProjectedShadow `RenderShadow` | 3000 | 0 | none | 0.738 |
+| 0x004dc2b0 | ProjectedShadow `TintCasterVertices` | 4000 | 0 | none | 0.759 |
+| 0x00446f40 | `D3DIMSoultreeShadow` slot 30 | 3000 | 0 | none | 0.862 |
+| 0x00509aa0 | `TerrainShadow` slot 30 | 3000 | 0 | none | 0.718 |
+| 0x004eab00 | `Scene::Tick` | 4000 | 0 | none | 0.686 |
+| 0x00507610 | `Terrain::PrepareGeometry` | 2000 | 28 of 1000 per word, all out of `int` | none (see below) | 0.929 |
+| 0x0051af00 | `DropTextOverlay::Setup` (sample) | 4000 | 96 of 2000 (24-bit) | parenthesised scale | 0.632 |
+| 0x0051b070 | `DropTextOverlay::Tick` | 6000 | 0 | none | 0.607 |
+| 0x0052f570 | `VisibilityClipper::TestBox` | 6000 | 333 of 2000 (24-bit) | split product arrays, parenthesised x scale | 0.689 |
+
+"Runs" counts both control words after the fix; every listed site now
+differs in none of them. Render3D's differences were in the light frame and
+`lengthSquared`, not in its fistp results. In-range fistp results never
+differed at any site; the negative controls (the trick pick, the drop tick,
+`Scene::Tick` and the shadows without `/QIfist`, the four-pose blend without
+`/Op`) all differ, so the cases see the rounding. `/Op` was tried at each
+differing site and was not needed (it lowers Render3D to 0.590), so
+`bringup_flags` still gives only `/QIfist`.
+
+PrepareGeometry's 28 differences are focal lengths outside `int`, which the
+plain helper stores as 64 bits where retail stores the indefinite. The
+checked helper would cost 0.929 to about 0.88; the plain helper stays on the
+inference that focal lengths in pixels stay inside `int`. The ScoreBoard case
+also drops out-of-`int` scores (retail then indexes its digit tables out of
+range). Unicorn honours precision and rounding control but not unmasked x87
+exceptions, so only masked control words were compared.
+`tests/test_emu_diff.py` repeats the clean runs and the negative controls when
+unicorn, `VC6_ROOT` and `MCM2_EXE` are available.
 
 ### Grid lighting workers
 
