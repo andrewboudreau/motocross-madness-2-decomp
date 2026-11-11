@@ -28,11 +28,11 @@ a caller at `0x00491dc6`.
   probes the ground (`0x00507c10`). Where the normal's y is below `0.707`
   it pushes the position `scale * 10` inward. It then writes
   `target - position`. Arguments 1, 6 and 7 are unused. No path sets eax
-  deliberately, so it is declared `void`. The sample's reading that
-  ObjectPlacement returns this call's result is therefore doubtful.
+  deliberately, so it is declared `void`. ObjectPlacement does not return
+  its result: after the call it falls off the end with eax unset.
 
-The sample `samples/physics/contact/ObjectPlacement.cpp` still declares
-these as `Fn_4b08f0`/`Fn_4b0ac0`/`Fn_4b0b80`.
+The canonical `src/krusty2/contact/ObjectPlacement.cpp` (strict exact) calls
+the three under these names, through local declarations.
 
 Source forms that mattered:
 

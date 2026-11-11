@@ -8,15 +8,5 @@
     "expect": "partial",
     "notes": "Impulse solver, semantics fully decoded (tier 3). 1062 bytes (size exact), 940/1062 strict, frame 0x60 as retail (torque blocks at function scope); torque B's cross is the parenthesised Vec3-constructor helper ContactCrossCtor (874 with Math3D CrossProduct there; 896 with the helper at A as well, 910 at A alone; product operand order inert across 64 forms) and uB's is the fully parenthesised ContactCrossParen (931 with CrossProduct, 933 with ContactCrossCtor; 919 with ContactCrossParen at torque B too). The tail calls 0x404e60, 0x5015b0 (ContactScaleCall) and 0x428060 where retail does. Remaining: most temporaries in other frame slots, torque cross loads r before n (leaf age; operand order, parentheses and n aliases measured without effect; an operator[] cross helper and a pointer-parameter helper are inert at 874; a reference-parameter helper in the TireAddIn style, at torque A, B or both and with either parameter order or product spelling, gives 823/849/816; the existing ContactCross(*n, *rA) form gives 823 or less), one tail mov/push schedule.",
     "bindings": "ContactImpulse.bindings.json"
-  },
-  {
-    "class": "ObjectPlacement",
-    "source": "ObjectPlacement.cpp",
-    "candidate_symbol_contains": "FindObjectPlacement",
-    "target_va": "0x004b0df0",
-    "target_size": 3971,
-    "expect": "exact",
-    "notes": "Strict exact (3971/3971; tier 3 names). Full reconstruction: loop, five probes, CollisionObject temp block, hit exit, worst-probe chain, m refinement, k/l output branches and the 0x4b0b80 tail call, with globals 0x688738/48/58/68 = (0,0,1)/(0,0,0)/(1,0,0)/(0,1,0) decoded from the static initialisers 0x4b1d80..0x4b1e70. Shapes that matched: the minus offsets negate radius inline per use; the normalise helper is inline with retail's z*z + (x*x + y*y) grouping; the basis is side = Y x Z, up = forward x side (0x515600 result stored to up's slot, then the 0x40ae30 dot of up with itself), up rescaled by the inline value-returning helper, side = up x forward, with the dead up = Y store kept (retail emits it); the first cross is the d3dvec.inl operator[] spelling (PlacementCross): the member-name Math3D.h CrossProduct loads Z.z/Z.y before Y.x, and giving Math3D.h the operator[] form loses five exact physics functions; forward = Z precedes up = Y; canPlace = 1 is declared before firstPass = 1 (store order); the minus-C fallback assigns bestOut, bestPt, nextOut, nextPt in that order and the m-refinement +C else-branch assigns nextOut before nextPt (lea order). The up = forward x side correction moves margin to retail's 0x1c and pairs w with side instead of up. Each output branch has its own tail call; the hit exit and the k-without-o / no-l paths return no value (retail jumps to the epilogue with eax unset, so the source falls off the end). Tier-3 TU ownership.",
-    "bindings": "ObjectPlacement.bindings.json"
   }
 ]
