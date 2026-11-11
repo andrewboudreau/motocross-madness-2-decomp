@@ -1353,6 +1353,68 @@ bounds; retail peers do not. Chained trick 0 is sent as code 17, the head-turn
 code, so receivers never chain it (their chain test needs a code above 17), a
 retail protocol quirk.
 
+#### Third sweep
+
+The third pass took the remaining bound linked bodies below a masked score of
+1.0, ranked by size times the missing score and weighted toward gameplay. It
+left out the bodies named under "Not emulated" above and the orchestration
+bodies that the call-record/replay cases cover. Each case is in
+`tools/emu_cases/` and runs at both control words unless noted; runs count
+both control words. These agreed with retail in every run (runs in brackets):
+
+- Physics and collision: `Tire::UpdateContactPatch` 0x005135f0 (600),
+  `Tire::UpdateSuspensionProbe` 0x00514550, `RotatingShock::SolveContact`
+  0x004fac60, `Wrecker::PushProbesOutOfBox` 0x005329e0 and
+  `SprayContactParticles` 0x00531740 (120 each), `BoxOverlap` 0x00424ab0 (80),
+  `CollisionObject::TestHullAgainst` 0x00438b90, `TestModelAgainst` 0x00438c10
+  and `FreeShape` 0x00432430 (200 each), `GatherModelTriangles` 0x0042c260,
+  `Vegetation::TestDistance` 0x00456890, `KrustyBike::SimulateFrame`
+  0x00496790 and `EcoSystem::BuildCollisionObjects` 0x00457ed0 (120 each).
+- AI and race: `PathSteeringDirection` 0x0040e510, `QuerySegmentObstacles`
+  0x00415640, `BuildStatusList` 0x004e5d00, `PCLastRaceDlg::PayOutRace`
+  0x004d8c40, `TrackGameViewOwner::PickFollowedRacer` 0x004a9d20 and
+  `KrustyBike::SelectRiderPose` 0x0048e3e0 (600 each),
+  `TrackGameMode::ResetDefaults` 0x00522440 (200), `KbPlayer::Fn_004A9E80`
+  0x004a9e80 (100).
+- Cameras and input: `Camera::UpdateMatrices` 0x0042ee30 (120),
+  `FollowCamera::Tick` 0x00465c20 (160), `ProcessCameraInput` 0x00463a30
+  (200), the constructor 0x00462ee0 (40) and `LoadCameraFile` 0x004650e0
+  (160), `KrustyBikeCamera::Tick` 0x00497e20 (100),
+  `PCJoystickDevice::ReadBufferedState` 0x004c3100 (160) and
+  `ReadImmediateState` 0x004c3790 (100), `VCRInterface::Tick` 0x004e7d60
+  (200).
+- Terrain, shadows and grid: `ShadowTransformPointsProjective` 0x004a1a50,
+  `TerrainShutdownObject::LookupCell` 0x00484d70, `GridVertexCache::GetVertex`
+  0x0047de90, `ShadowCaster::GetVertexCount` 0x00444fe0 (600 each),
+  `DrawableGridNode::WalkVisibilityQuadrants` 0x00481de0 (400),
+  `GridVertexSink::LightVertices` 0x0049e4a0 with its three workers linked
+  (600).
+- Network and overlays: `ReceiveMessages` 0x004af8e0 and
+  `HandleReceivedMessage` 0x004afa90 (600 each),
+  `NetworkInterface::DispatchMessages` 0x004aced0 (400),
+  `RadarOverlay::DrawRacers` 0x0051bed0 and `StatsOverlay::DrawStandings`
+  0x00519a20 (600 each; GDI, the surface calls and `sprintf` are stubbed).
+
+Every case has at least one negative control that differs, for example: the
+contact-patch dot regrouped `x+y+z` (8 of 200), the tire and shock cross
+products' arguments swapped (36 and 26 of 120), `TestModelAgainst` with
+`case 5` (18 of 120), `KrustyBike::SimulateFrame` with the frame limit 0x1488
+(4 of 120), `PathSteeringDirection` without its `fabs` (16 of 200),
+`PayOutRace` capped by the repair percentage (52 of 120), `LookupCell`'s z
+compared as `unsigned short` (16 of 200), the projective y divided by `1/w`
+(46 of 120), `LightVertices`' rounding offset `+0.5` (8 of 300),
+`ReceiveMessages` with `size > 4` (38 of 120), `DispatchMessages` with
+`type >= 0x40` (96 of 120) and `DrawStandings` capped at five rows (14 of 120).
+A few controls were equivalent rewrites and gave 0, for example
+`DrawStandings`' `own > shown`.
+
+Open: the follow-camera constructor copies axes from `.bss` that both images
+leave zero, so its case cannot tell a swapped axis component.
+
+Not emulated: `EventManager::LeaveRaceForMenu` 0x0045e710 (masked 1.0; every
+call is GUI, sound, display or allocation, so a case would test only its
+stubs).
+
 ### Grid lighting workers
 
 The three workers in `Group4_GridLighting.cpp` were rewritten from the
@@ -1392,6 +1454,9 @@ at control words 0x27f and 0x7f.
 | Committed source | 6000 | 0 |
 | Without the binary32 store | 3000 | 12 |
 | With `/Op` | not counted | 253 |
+
+`tools/emu_cases/grid_light_vertices.py` now runs the committed source the
+same way (third sweep).
 
 The binary32 store fixed the ties. `/Op` is therefore not needed. It rounds
 the intermediates of `LightVertices`' modulation, which retail keeps in
@@ -1451,7 +1516,7 @@ configured flags.
 |---|---|---|---|---|---|
 | `Group1_ParticleRender.cpp` | Render3D 0x004bac60 | pragma (was `/Oy-`, same bytes) | 0.675 -> 0.712 | 0.413 -> 0.446 | 0 / 2000 |
 | `Group3_TerrainPrepareGeometry.cpp` | PrepareGeometry 0x00507610 | pragma (was `/Oy-`) | 0.929 -> 0.979 | 0.777 -> 0.925 | 56 / 2000, all out of `int` (below) |
-| `Group4_GridLighting.cpp` | LightVertices 0x0049e4a0, LightAny 0x0049e6b0, LightOne 0x0049f1c0, LightAmbientPlusOne 0x0049f8d0 (one region) | pragma (was `/Oy-`) | 0.745 -> 0.752, 0.774 -> 0.823, 0.705 -> 0.719, 0.714 -> 0.718 | 0.497 -> 0.639, 0.345 -> 0.590, 0.302 -> 0.367, 0.293 -> 0.353 | no case |
+| `Group4_GridLighting.cpp` | LightVertices 0x0049e4a0, LightAny 0x0049e6b0, LightOne 0x0049f1c0, LightAmbientPlusOne 0x0049f8d0 (one region) | pragma (was `/Oy-`) | 0.745 -> 0.752, 0.774 -> 0.823, 0.705 -> 0.719, 0.714 -> 0.718 | 0.497 -> 0.639, 0.345 -> 0.590, 0.302 -> 0.367, 0.293 -> 0.353 | 0 / 600 (third sweep) |
 | `Group4_DropTextOverlayTick.cpp` | DropTextOverlay::Tick 0x0051b070 | pragma (was `/Oy-`) | 0.607 -> 0.674 | 0.517 -> 0.587 | 0 / 2000 |
 | `Group4_ScoreBoard.cpp` | ShowValue 0x0048d1e0, with `Group4Ovl_ShowModel` (no retail body) | pragma (was `/Oy-`) | 0.681 -> 0.715 | 0.334 -> 0.455 | 0 / 2000 |
 | `Group4_Visibility.cpp` | TestBox 0x0052f570 | pragma (was `/Oy-`) | 0.689 -> 0.697 | 0.342 -> 0.443 | 0 / 2000 |
@@ -1459,7 +1524,7 @@ configured flags.
 | `CharacterMotionFourPose.cpp` (sample) | Method_0x004a9050 | pragma (was `/Oy-`) | 0.727 -> 0.758 | 0.168 -> 0.414 | 0 / 3000 |
 | `Group4_SceneTick.cpp` | Scene::Tick 0x004eab00 | pragma | 0.686 -> 0.701 | 0.334 -> 0.363 | 0 / 2000 |
 | `KrustyBikeTrickPick.cpp` (sample) | Fn_0048D780 0x0048d780 | pragma | 0.773 -> 0.804 | 0.599 -> 0.776 | 0 / 2000 |
-| `KrustyBikeSelectRiderPose.cpp` (sample) | SelectRiderPose 0x0048e3e0 | pragma | 0.682 -> 0.729 | 0.652 -> 0.686 | no case |
+| `KrustyBikeSelectRiderPose.cpp` (sample) | SelectRiderPose 0x0048e3e0 | pragma | 0.682 -> 0.729 | 0.652 -> 0.686 | 0 / 600 (third sweep) |
 | `CharacterMotionStart.cpp` (sample) | Method_0x004a8bf0 | pragma | 0.633 -> 0.667 | 0.200 -> 0.381 | 0 / 2000 |
 | `CharacterMotionBlend.cpp` (sample) | Method_0x004a8c50 | pragma | 0.793 -> 0.879 | 0.348 -> 0.618 | 0 / 2000 |
 | `TerrainShadow.cpp` (sample) | slot 30 0x00509aa0 | pragma | 0.718 -> 0.736 | 0.442 -> 0.450 | 0 / 2000 |
