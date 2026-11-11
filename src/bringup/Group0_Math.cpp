@@ -16,6 +16,15 @@
 // and the last stride belongs to the source. A zero source stride means
 // "same as the destination stride". Strides are in bytes. The first
 // parameter keeps the declared `const void*` type so the symbol matches.
+// Retail is inline assembly (EBP frame, both pointers biased to the end and
+// indexed by a negated offset that counts up to zero). Audited for the linked
+// game 2026-11-11: as there, the loop is a do-while that stops when the
+// source offset reaches the end (so a zero stride on both sides transforms
+// one point); each sum adds the x, y and z products then the translation in
+// that order (written as compound adds: VC6 /O2 reassociates the single
+// expression `x*a + y*b + z*c + t` into `(y*b + z*c) + x*a + t`); every
+// coordinate is re-read from the source point; and all three results are
+// computed before the first store (an in-place transform reads the old point).
 void TransformPoints(const void* destinationPoints, void* sourcePoints, const Matrix4* matrix,
                      int count, int destinationStride, int sourceStride)
 {
@@ -25,16 +34,28 @@ void TransformPoints(const void* destinationPoints, void* sourcePoints, const Ma
         sourceStride = destinationStride;
     unsigned char* to = (unsigned char*)destinationPoints;
     const unsigned char* from = (const unsigned char*)sourcePoints;
-    for (int i = 0; i < count; i++) {
+    const unsigned char* end = from + count * sourceStride;
+    do {
         const float* p = (const float*)from;
-        float x = p[0], y = p[1], z = p[2];
         float* out = (float*)to;
-        out[0] = x * matrix->_11 + y * matrix->_21 + z * matrix->_31 + matrix->_41;
-        out[1] = x * matrix->_12 + y * matrix->_22 + z * matrix->_32 + matrix->_42;
-        out[2] = x * matrix->_13 + y * matrix->_23 + z * matrix->_33 + matrix->_43;
+        float x = p[0] * matrix->_11;
+        x += p[1] * matrix->_21;
+        x += p[2] * matrix->_31;
+        float y = p[0] * matrix->_12;
+        y += p[1] * matrix->_22;
+        y += p[2] * matrix->_32;
+        float z = p[0] * matrix->_13;
+        z += p[1] * matrix->_23;
+        z += p[2] * matrix->_33;
+        x += matrix->_41;
+        y += matrix->_42;
+        z += matrix->_43;
+        out[0] = x;
+        out[1] = y;
+        out[2] = z;
         to += destinationStride;
         from += sourceStride;
-    }
+    } while (from != end);
 }
 
 // 0x005087b0 (the pointer form the collision code declares): out = src / |src|
