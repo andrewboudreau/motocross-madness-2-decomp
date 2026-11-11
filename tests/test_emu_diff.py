@@ -109,6 +109,11 @@ CLEAN_CASES = {
     'vegetation_collision_object': 200,
     'track_place_near': 200,
     'car_procedural_tick': 200,
+    # Call-record/replay cases (docs/GAME_BUILD.md): every call leaving the body is replayed.
+    'vehicle_simulate_frame': 40,
+    'kb_ai_step': 100,
+    'kb_net_interpolate': 100,
+    'game_tick': 60,
 }
 
 # Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).
@@ -118,6 +123,17 @@ PRE_FIX_SHAPES = [
     ('track_place_near', [('behind = DistanceAlong(start, from);',
                            'behind = DistanceAlong(candidates->pos, start);')], 200),
     ('kb_find_placement', [('return *(int*)&outPosition->z;', 'return (int)outPosition;')], 200),
+    # The smoother kept its target in a register (53-bit only): 1 ulp in smoothedForwardAccel.
+    ('kb_ai_step', [('BikeAISmoothValue(VehicleSmoother* s, float target, float dt)',
+                     'BikeAISmoothValue(VehicleSmoother* s, float dt, float target)'),
+                    ('(scratchVector.z - prevLocalForwardVelocity) / frameTime, frameTime);',
+                     'frameTime, (scratchVector.z - prevLocalForwardVelocity) / frameTime);'),
+                    ('    s->blendFactor = (dt < timeConstant ? dt : timeConstant) / s->timeConstant;\n'
+                     '    return s->smoothedValue = (target - s->smoothedValue) * s->blendFactor + s->smoothedValue;',
+                     '    float step = dt;\n    if (!(step < timeConstant)) step = timeConstant;\n'
+                     '    s->blendFactor = step / s->timeConstant;\n'
+                     '    s->smoothedValue = (target - s->smoothedValue) * s->blendFactor + s->smoothedValue;\n'
+                     '    return s->smoothedValue;')], 100),
 ]
 
 
@@ -153,6 +169,79 @@ class CaseModuleTests(unittest.TestCase):
         at = ctx.alloc(len(code), code)
         self.assertEqual(ctx.call(at, [5], ecx=7), 12)
         self.assertEqual(ctx.unpack(emu_diff.HEAP, 'I'), (12,))
+
+    def test_demangle_signature(self):
+        sig = emu_diff.demangle_signature('?Add@@YGHHH@Z')            # int __stdcall Add(int, int)
+        self.assertEqual((sig.convention, sig.member, sig.ret.kind, sig.stack_words()), ('stdcall', False, 'int', 2))
+        sig = emu_diff.demangle_signature('?M@C@@QAEMM@Z')            # float __thiscall C::M(float)
+        self.assertEqual((sig.convention, sig.member, sig.ret.kind, sig.stack_words()), ('thiscall', True, 'float', 1))
+        # Vec3 __thiscall C::W(const Vec3&): a member returning a struct takes a hidden buffer.
+        sig = emu_diff.demangle_signature('?W@C@@QAE?AUVec3@@ABU2@@Z')
+        self.assertTrue(sig.hidden_return())
+        self.assertEqual(sig.stack_words(), 2)
+        self.assertTrue(sig.params[0].const)
+        self.assertEqual(sig.params[0].pointee.size, 12)
+        self.assertIsNone(emu_diff.demangle_signature('_strncat'))
+
+    def test_synthetic_results_depend_only_on_seed_target_and_occurrence(self):
+        def value(seed, target, occ, kind):
+            return emu_diff.synthetic_value(emu_diff.synthetic_rng(seed, target, occ), kind)
+        self.assertEqual(value((1, 2), 0x401000, 0, 'float'), value((1, 2), 0x401000, 0, 'float'))
+        self.assertNotEqual(value((1, 2), 0x401000, 0, 'int') + value((1, 2), 0x401000, 1, 'int')
+                            + value((1, 2), 0x401000, 2, 'int'),
+                            value((1, 3), 0x401000, 0, 'int') + value((1, 3), 0x401000, 1, 'int')
+                            + value((1, 3), 0x401000, 2, 'int'))
+        eax, fval = value(7, 0x401000, 0, 'ptr')
+        self.assertTrue(emu_diff.ARENA <= eax < emu_diff.ARENA + emu_diff.ARENA_SIZE)
+        self.assertIsNone(fval)
+
+    @unittest.skipUnless(importlib.util.find_spec('unicorn') is not None
+                         and importlib.util.find_spec('capstone') is not None, 'requires unicorn and capstone')
+    def test_replay_skips_logs_and_returns_synthetic_results(self):
+        import struct
+        from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UC_HOOK_CODE
+        from unicorn.x86_const import UC_X86_REG_ESP
+        add, get, count = 0x00401000, 0x00402000, 0x00403000
+        uc = Uc(UC_ARCH_X86, UC_MODE_32)
+        for base, size in ((emu_diff.CAND, 0x1000), (emu_diff.STUB, emu_diff.STUB_SIZE),
+                           (emu_diff.HEAP, emu_diff.HEAP_SIZE),
+                           (emu_diff.STACK_TOP - emu_diff.STACK_SIZE, emu_diff.STACK_SIZE)):
+            uc.mem_map(base, size)
+        ctx = emu_diff.Context(uc, random.Random(1))
+        out = ctx.alloc(16)
+        native = ctx.alloc(6, bytes.fromhex('b82a000000c3'))     # mov eax, 42; ret
+
+        code = bytearray()
+
+        def call(target):
+            code.extend(b'\xe8' + struct.pack('<i', target - (emu_diff.CAND + len(code) + 5)))
+        code += bytes.fromhex('6a076a05')                        # push 7; push 5
+        call(add)                                                # stdcall: replay pops 8
+        code += b'\xa3' + struct.pack('<I', out)                 # mov [out], eax
+        call(get)                                                # float return through ST0
+        code += b'\xd9\x1d' + struct.pack('<I', out + 4)         # fstp dword [out+4]
+        call(count)                                              # replayed, not logged
+        call(native)                                             # passthrough: runs natively
+        code += b'\xa3' + struct.pack('<I', out + 8)             # mov [out+8], eax
+        end = emu_diff.CAND + len(code)
+        code += b'\xc3'
+        uc.mem_write(emu_diff.CAND, bytes(code))
+
+        def effect(ctx, rec):
+            ctx.pack(out + 12, 'I', rec.args[0] + rec.args[1])
+        replay = emu_diff.Replay(dict(unlogged=('?Count@@YAXXZ',), passthrough=(native,),
+                                      effects={'?Add@@YGHHH@Z': effect}),
+                                 names={add: ['?Add@@YGHHH@Z'], get: ['?Get@@YAMXZ'], count: ['?Count@@YAXXZ']})
+        uc.hook_add(UC_HOOK_CODE, emu_diff.ReplayRun(replay, ctx, 'seed', emu_diff.CAND).hook)
+        esp = emu_diff.STACK_TOP - 0x100
+        uc.reg_write(UC_X86_REG_ESP, esp)
+        uc.emu_start(emu_diff.CAND, end)
+
+        self.assertEqual(ctx.calls, [('?Add@@YGHHH@Z', None, (5, 7), ()), ('?Get@@YAMXZ', None, (), ())])
+        self.assertEqual(uc.reg_read(UC_X86_REG_ESP), esp)
+        expect_eax, _ = emu_diff.synthetic_value(emu_diff.synthetic_rng('seed', add, 0), 'int')
+        _, expect_f = emu_diff.synthetic_value(emu_diff.synthetic_rng('seed', get, 0), 'float')
+        self.assertEqual(ctx.unpack(out, 'IfII'), (expect_eax, expect_f, 42, 12))
 
     def test_pack_args(self):
         packed = emu_diff.pack_args([1, -1, 0.5, emu_diff.Double(0.25), b'ab'])

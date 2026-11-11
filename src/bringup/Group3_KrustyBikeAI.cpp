@@ -1541,16 +1541,15 @@ inline float BikeAIFilterStep(UnknownBikeAIFilter* f, float dt, float target)
 
 // The same step on a Vehicle smoother (Vehicle.cpp's VehSmooth), returning the new
 // value. Retail reads the time constant before the step is clamped and stores the
-// result straight from the smoother.
-inline float BikeAISmoothValue(VehicleSmoother* s, float dt, float target)
+// result straight from the smoother. Target before dt, as VehSmooth: retail loads dt
+// first and spills the target to a float slot, so at 53-bit precision the target is
+// rounded to float. The (dt, target) order kept it in a register, one ulp off
+// smoothedForwardAccel (tools/emu_cases/kb_ai_step.py: 20 of 100 cases at 0x027f).
+inline float BikeAISmoothValue(VehicleSmoother* s, float target, float dt)
 {
     float timeConstant = s->timeConstant;
-    float step = dt;
-    if (!(step < timeConstant))
-        step = timeConstant;
-    s->blendFactor = step / s->timeConstant;
-    s->smoothedValue = (target - s->smoothedValue) * s->blendFactor + s->smoothedValue;
-    return s->smoothedValue;
+    s->blendFactor = (dt < timeConstant ? dt : timeConstant) / s->timeConstant;
+    return s->smoothedValue = (target - s->smoothedValue) * s->blendFactor + s->smoothedValue;
 }
 
 // Dot product with the x/y pair grouped (retail sums y*y' + x*x' first, then z*z').
@@ -1841,8 +1840,8 @@ int KrustyBike::Fn_00413200(float dt)
     rearWheel->groundPoint += moved;
     UpdateAttachmentEffects();
     scratchVector = modelNode->WorldToLocalDirection(velocity);
-    smoothedForwardAccel = BikeAISmoothValue(forwardAccelSmoother, frameTime,
-                                             (scratchVector.z - prevLocalForwardVelocity) / frameTime);
+    smoothedForwardAccel = BikeAISmoothValue(forwardAccelSmoother,
+                                             (scratchVector.z - prevLocalForwardVelocity) / frameTime, frameTime);
     prevLocalForwardVelocity = scratchVector.z;
     UpdateRiderPose(dt);
     return 1;

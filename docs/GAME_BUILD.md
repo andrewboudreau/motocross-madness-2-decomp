@@ -1225,14 +1225,48 @@ steer (50 of 200) all differ; so do a `ModelVsModel` reciprocal for its divide
 (13 of 600), `>=` and dropped-clear variants of the quadtree and visibility
 traversal, and `extentX` in TerrainShadow slot 28 (8 of 200).
 
-Not emulated: `Vehicle::SimulateFrame` (3254 bytes, about 45 virtual slots and
-20 callees), `KrustyBike::Fn_00493660` (8545 bytes, 25 direct and 16 virtual
-callees), `Fn_00413200` (4112 bytes, 15 direct callees including
-`SimulateLookAhead` and `PredictLanding`, about 21 virtual slots),
-`ProjectedShadow::Present` (Direct3D calls), `Game::Tick` and
-`MorphBastardModifier::ControllerAngles` (orchestration). Each would need
-stubs whose outputs feed the compared state, so a mismatch would test the
-stubs as much as the body.
+`ProjectedShadow::Present` (Direct3D calls) and
+`MorphBastardModifier::ControllerAngles` (orchestration) are not emulated.
+
+#### Call-record/replay cases
+
+The large orchestration bodies run in the replay mode of `tools/emu_diff.py`
+(a case declares `REPLAY`). Every call that leaves the body, direct or
+virtual, is logged with its target, ECX, stack words and const pointees,
+then skipped. The callee result and out-parameter writes are synthetic and
+seeded from (seed, target, occurrence), so both bodies see the same callee
+behaviour. The comparison checks the call sequence, the body's writes and its
+return. Callee behaviour the body depends on is declared per case, for example
+`PredictLanding`'s landing time and `SimulateLookAhead`'s airborne flag and
+suspension travel. Agreement here says the body's own logic matches; it says
+nothing about the callees.
+
+| VA | Function | Case | Cases per control word | Differ |
+|---|---|---|---|---|
+| 0x0052a940 | `Vehicle::SimulateFrame` (slot 49) | `vehicle_simulate_frame` | 100 | 0 |
+| 0x00413200 | `KrustyBike::Fn_00413200` (AI physics step) | `kb_ai_step` | 300 | 0 after the fix below (20 of 100 at 53-bit before) |
+| 0x00493660 | `KrustyBike::Fn_00493660` (remote state interpolation) | `kb_net_interpolate` | 200 | 0 |
+| 0x004685d0 | `Game::Tick` (samples/game/GameTick.cpp, read-only) | `game_tick` | 200 | 0 |
+
+`Fn_00413200` smoothed the forward acceleration with `(dt, target)` and
+kept the target in an 80-bit register. Retail loads `dt` first and spills the
+target to a float slot, so at 53-bit precision the target is rounded to binary32.
+The old shape put `smoothedForwardAccel` (bike+0x590) and the smoother's
+value 1 ulp off. `BikeAISmoothValue` now takes `(target, dt)` and returns the
+smoother's store, as `VehSmooth` does. This also raised the
+`match_one` score (masked 1862 to 1971 of 3744, aligned 1097 to 1102 of 1120).
+The pre-fix shape is kept as a negative control in `tests/test_emu_diff.py`.
+
+`Game::Tick` agrees except for a difference that is there by design. The
+candidate reads the profiling counter through `QueryPerformanceCounter`
+where retail executes RDTSC, so the case leaves that call out of the log and
+the counter-derived timer words out of the write comparison.
+
+Perturbation controls all differ:
+- a `SimulateFrame` constant 0.85 to 0.86 (22 of 120);
+- the `Fn_00493660` replay lag 0.27 to 0.28 (4 of 400);
+- the `Fn_00413200` steer division turned into a multiplication (12);
+- the `Game::Tick` frame clamp 0.2 to 0.25 (96).
 
 The candidate-sample twins follow the linked fixes where the score allows:
 `samples/physics/bikeai/BikeAINearMisses.cpp` takes the trick-delay union
