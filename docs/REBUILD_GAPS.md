@@ -806,6 +806,71 @@ Each missing definition needs:
 - the right `.data` or `.bss` placement, in unit and source order, because the
   link puts them in alphabetical object order.
 
+### Linked data accuracy
+
+Tool: `tools/linked_data_accuracy.py`. Test: `tests/test_linked_data_accuracy.py`
+(synthetic map/COFF fixtures; the integration case needs `MCM2_EXE` and a build).
+It compares the data the source build links with retail, symbol by symbol.
+
+```bash
+python tools/build_game.py --vc6-root "$VC6_ROOT"        # or pass --build to an existing one
+python tools/linked_data_accuracy.py --retail "$MCM2_EXE" [--build work/game-build/build-*]
+```
+
+It places every data symbol of each object: publics and static functions from
+`mcm2.map` fix a section's VA, and relocations place the static sections. It
+binds each symbol to a retail VA. The evidence, strongest first, is: unit
+bindings, link aliases, RTTI, imports/LIBCMT atlas, a VA in the name, a VA in the
+definition's comment, the retail value of a bound pointer, and unique string
+content. It then compares the initialised bytes with relocations resolved.
+Pointers to unknown targets are counted separately. Retail extents run to the
+next anchor (bound symbols, RTTI, code-reference targets, and copies of unbound
+header statics found by content). The report is `work/linked-data/report.md`
+(ignored). It lists differences with their int/float readings, size
+mismatches, unbound symbols, and retail game data that no bound symbol covers.
+
+Result for the 385-unit build:
+
+| Category | Symbols | Equal bytes (initialised) | Different | Unbound |
+|---|---:|---:|---:|---:|
+| game | 876 | 1,132,469 (10,470) | 3 B in 1 symbol | 174 (2,843 B, header statics; 3 nonzero) |
+| string literals | 2,188 | 30,942 | 0 | 150 (143 local `__FILE__` paths, 7 port-only) |
+| `__real` constants | 337 | 1,412 | 0 | 4 |
+| GUIDs | 18 | 288 | 0 | 0 |
+
+Vtables, RTTI and EH tables are skipped. Binding evidence: 3,036 bindings,
+14 comment, 37 content, 2 name, 2 pointer. Every object symbol is placed.
+
+- Fixed: `g_terrainQualityValue` (0x0057471c) starts at 1 in retail .data,
+  so the detail pass is enabled until `SelectQuality` runs. Our build had 0 in
+  .bss. Now `int g_terrainQualityValue = 1;` in `Terrain.cpp`.
+- Remaining: `g_terrainShadowClipper` (0x00575a98). Retail has one pointer, the
+  same one `g_visibilityClipper` names, initialised to 0x0068acd4. Our bring-up
+  alias in `Group6_TerrainShadow.cpp` is a second global with a dynamic
+  initializer. It holds the same value from startup on. Only the load image
+  differs.
+- Size checks: `s_g3TrickFrame` (128 B, which reaches into `s_kbTimeTo60Armed`)
+  is the documented chained-trick overread. `g_visibilityBoxVertices` and
+  `g_visibilityEntries` overlap in retail `.bss` (12 B apart). Those two are
+  separate arrays in our build, as their source comments say. No bound table
+  is shorter than retail's extent, apart from `kbSecondsPerMillisecond`, whose
+  tail is the next object.
+- Uncovered retail game data: 718 nonzero runs (12,891 B). Code refers to 198
+  of them (5,071 B), and 102 are text.
+  - Most of the referenced runs are `.rdata` constants our code does not
+    reference: DirectX IIDs and `__real` floats such as 0x0055258c (0.2f)
+    and 0x00557e38 (0.4f), plus EH scope tables. These belong to code
+    matching, not to data initialisers.
+  - Others are one-past-the-end compares: `0x0056cb80` for `g_BikeClassEngineSizes`
+    and `0x0056db1c` for `kBikeTypeCounts`.
+  - Two floats belong to the MASM span loops (0x00575adc 65536.0f,
+    0x00575ae0 1.0f).
+  - Unreferenced leftovers:
+    - an int 2 after `kBikeTypeCounts`, either an eighth entry or a separate
+      static (unresolved);
+    - the `Lzw.cpp` bit-mask table at 0x0056de58;
+    - an int 1000 after the `D3DIMSoultreeShadow.cpp` path.
+
 ### What is needed next for data and linking
 
 1. **Toolchain inputs not in VC6.**

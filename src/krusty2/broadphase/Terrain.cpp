@@ -620,7 +620,10 @@ void Terrain::ComputeRatios()
 }
 
 TerrainQualityEntry* g_pTerrainQualityTable;
-int g_terrainQualityValue;
+// Retail keeps this in initialised .data (0x0057471c) holding 1: the detail
+// pass starts enabled until SelectQuality copies hasDetailPass
+// (tools/linked_data_accuracy.py, bytes 01 00 00 00).
+int g_terrainQualityValue = 1;
 
 // Slot 19 (0x00507920) and slot 22 (0x004dc4c0) are the shared "return 0" stubs.
 int Terrain::UnknownVirtualSlot19(int)
