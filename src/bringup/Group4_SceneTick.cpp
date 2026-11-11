@@ -6,6 +6,14 @@
 // finally runs GameObject::Tick. The scene entries keep their characters as
 // UnknownSceneObject (SceneManager.h); like SceneManager.cpp, this unit uses
 // the real Character methods on them through reinterpret_cast.
+//
+// Audited against the retail disassembly on 2026-11-11 for the linked game: no
+// behavioural difference (flag bits, the fild/fidiv remaining-time test, the
+// sequence wrap, RestartEntry's arguments, the random-set swap condition and the
+// fistp pick all agree). The gap is code shape: retail re-reads the entry as
+// animationTable->entries + i * 0x44 after every store (it does not cache the
+// pointer), keeps sequenceLength in a stack byte, and its inline-assembly fistp
+// gives the body an EBP frame (X87FloatToInt emulates that fistp here).
 #include <stdlib.h>
 
 #include "../reconstructed/TrackGame.h"

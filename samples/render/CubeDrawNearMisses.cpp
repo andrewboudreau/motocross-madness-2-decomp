@@ -20,6 +20,11 @@
 // Session 15 reference diff: the three 100.0f loads retail has and this lacks are
 // the case tails VC6 cross-jumps here (fild; fmul 100.0f; fstp [eax+8] shared by
 // cases 1, 3 and 4), and 0x0057a220 against 0x0057a224 is the +4 pointer bias.
+// Behaviour audit 2026-11-11 (linked game): every case's coordinates, normal
+// stores and constants, the diffuse/tu/tv grid stores, the six vertices of each
+// cell (corner 0/1/6/0/6/5 with their tu/tv) and the 25 face points agree with
+// retail; nothing writes `reserved` or the grid's specular in either. The low
+// linked score is the shape described above.
 //
 // 0x0043e0b0 (352 bytes): the texture-coordinate arithmetic matches once the
 // low value is stored before the high one is computed. Retail keeps a row

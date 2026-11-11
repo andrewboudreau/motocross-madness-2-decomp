@@ -6,6 +6,12 @@
 // retail function against BonusObjectManager's layout; not a byte match
 // (retail rounds with a `fld; fistp` helper, see docs/KRUSTY3DOBJECTS.md;
 // X87FloatToInt stands in for it).
+// Audited against the retail disassembly on 2026-11-11 for the linked game: no
+// behavioural difference (places, the -1 sentinels, the hundred rounding, the
+// digit-model indexing, the 1.05 threshold, the multiplier*10 conversion, the
+// fraction digits, NextKey, the eye distance through FastSqrt and the scaling).
+// The gap is shape only: the two X87FloatToInt expansions (about 76 more
+// instructions than retail's fistp) and retail's EBP frame from the asm helper.
 #include "../reconstructed/Krusty3DObjects.h"
 #include "X87FloatToInt.h"
 
