@@ -1248,6 +1248,8 @@ nothing about the callees.
 | 0x00493660 | `KrustyBike::Fn_00493660` (remote state interpolation) | `kb_net_interpolate` | 200 | 0 |
 | 0x004685d0 | `Game::Tick` (samples/game/GameTick.cpp, read-only) | `game_tick` | 200 | 0 |
 | 0x0040eca0 | `SimulateLookAhead` (AI two-wheel look-ahead) | `kb_look_ahead` | 200 | 0 at 53-bit; 0 at 24-bit within 256 ulps or 1e-5 (139 of 200 inexact, worst 142 ulps) |
+| 0x004a3c80 | `MorphBastardModifier::ControllerAngles` | `morph_controller_angles` | 500 | 0 after the two fixes below (1 and 8 of 40 at 53/24-bit before) |
+| 0x004a4c60 | `MorphBastardModifier::ModifyMesh` (slot 27) | `morph_modify_mesh` | 200 | 0 |
 
 `Fn_00413200` smoothed the forward acceleration with `(dt, target)` and
 kept the target in an 80-bit register. Retail loads `dt` first and spills the
@@ -1281,6 +1283,48 @@ Replay extensions used here (generic, unit-tested):
   query keeps x and z and writes y.
 - A `pointees` entry may be `(index, bytes)`.
 - `FLOAT_ULPS` is an int or a `{fpcw: ulps}` dict, and `--ulps N` overrides it.
+
+`ControllerAngles` replays only `SoultreeObject::GetMatrixIn` 0x004fca80,
+which writes the controller's world matrix. The vector and matrix helpers and
+the angle helper 0x004a3be0 (acos) run as retail code. The inputs cover random
+and skewed rotations, half turns, small angles and the identity. They also
+cover exact rotations about one principal axis with an identity rest pose,
+which reach every block's zero-cross fallback axis. Two rounding differences
+in the linked Group 3 copy were found and fixed:
+- **Controller product.** Retail sums each element of `world * inverse` from
+  the last column (0x004a3cde: `w03*i30 + w02*i20` first). VC6 canonicalises a
+  flat four-term sum to start from `w00*i00`, whatever order the terms are
+  written in, so the source now groups each sum from the right:
+  `a + (b + (c + d))`. Reverting element (0, 0) alone differs in 4 of 60 runs
+  at 24-bit.
+- **x block rotation.** Retail computes `t*y` and `t*z` once, stores them as
+  binary32 and builds the rows from them (0x004a4395, 0x004a43c0). The out-of-line
+  `AxisAngleMatrix` 0x0042de90 instead shares `t*x`, so its text inlined does
+  not reproduce the block. The source now names `ty` and `tz`. VC6 still
+  multiplies the first use of each by the unrounded product (`fst` and
+  continue), which no run has told apart. Reverting this alone differs in 2 of
+  60 runs per control word.
+
+With both fixes `morph_controller_angles` agrees in 1000 of 1000 runs. Both
+pre-fix shapes are negative controls in `tests/test_emu_diff.py`. The
+`match_one` alignment drops from 812 to 803 of 896, with 84 to 93 differing
+instructions; the function was not exact before.
+`samples/render/MorphBastardModifierNearMisses.cpp` keeps the old form for its
+score.
+
+`ModifyMesh` replays CopyMesh 0x004a5290, whose effect allocates the copy
+with its own vertices, and UpdateChannels 0x004a4bb0, so the channel values
+are inputs. It also replays the empty stub 0x00464e80 and `operator new`
+0x004a3010. That last call is noted by size and line rather than logged,
+because its `__FILE__` pointer is the bring-up file's own. The inputs cover:
+- values at or below the first target, at or above the last, between two
+  targets and on a target;
+- targets with no deltas, and a group that does not start at vertex 0;
+- an existing mesh copy and existing delta arrays;
+- the draw-unchanged return.
+
+ModifyMesh agrees in all 200 runs. Scaling the blend weight's `upper` by
+1.0001 differs in 16 of 30.
 
 `Game::Tick` agrees except for a difference that is there by design. The
 candidate reads the profiling counter through `QueryPerformanceCounter`

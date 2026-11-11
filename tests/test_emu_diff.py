@@ -165,6 +165,8 @@ CLEAN_CASES = {
     'kb_simulate_look_ahead': 20,
     # Replay sweep: exact at 53-bit, FLOAT_ULPS/FLOAT_ABS at 24-bit (inline-dot grouping).
     'kb_look_ahead': 40,
+    'morph_controller_angles': 40,
+    'morph_modify_mesh': 40,
 }
 
 # Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).
@@ -195,6 +197,23 @@ PRE_FIX_SHAPES = [
     ('kb_simulate_look_ahead', [('sideV = Vec3(lean.x * k, lean.y * k, lean.z * k);', 'sideV = lean * k;')], 20),
     # The replay case sees the lean blend's rounding at 53-bit (13 of 30), which stays exact there.
     ('kb_look_ahead', [('sideV = Vec3(lean.x * k, lean.y * k, lean.z * k);', 'sideV = lean * k;')], 30),
+    # ControllerAngles: the flat four-term sum of the controller product (row 0, column 0 alone
+    # shows at 24-bit), and the x block's rotation with t*y and t*z kept unrounded.
+    ('morph_controller_angles',
+     [('(world(0, 1) * inverse(1, 0) + (world(0, 2) * inverse(2, 0) + world(0, 3) * inverse(3, 0)))',
+       'world(0, 1) * inverse(1, 0) + world(0, 2) * inverse(2, 0) + world(0, 3) * inverse(3, 0)')], 60),
+    ('morph_controller_angles',
+     [('    float ty = t * y;\n    rotation.m[0][1] = x * ty + s * z;\n    float tz = t * z;\n'
+       '    rotation.m[0][2] = x * tz - s * y;\n',
+       '    rotation.m[0][1] = t * x * y + s * z;\n    rotation.m[0][2] = t * x * z - s * y;\n'),
+      ('    rotation.m[1][0] = x * ty - s * z;\n    rotation.m[1][1] = y * ty + c;\n'
+       '    rotation.m[1][2] = z * ty + s * x;\n',
+       '    rotation.m[1][0] = t * x * y - s * z;\n    rotation.m[1][1] = t * y * y + c;\n'
+       '    rotation.m[1][2] = t * y * z + s * x;\n'),
+      ('    rotation.m[2][0] = x * tz + s * y;\n    rotation.m[2][1] = z * ty - s * x;\n'
+       '    rotation.m[2][2] = z * tz + c;\n',
+       '    rotation.m[2][0] = t * x * z + s * y;\n    rotation.m[2][1] = t * y * z - s * x;\n'
+       '    rotation.m[2][2] = t * z * z + c;\n')], 60),
 ]
 
 

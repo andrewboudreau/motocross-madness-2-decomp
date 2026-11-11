@@ -202,39 +202,41 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
     Matrix4 controller;
     channel->controller->GetMatrixIn(0, &controller);
     Matrix4 world = controller;
-    // controller = world * inverse, written out element by element as retail expands it.
-    controller(0, 0) = world(0, 0) * inverse(0, 0) + world(0, 1) * inverse(1, 0) + world(0, 2) * inverse(2, 0) +
-                       world(0, 3) * inverse(3, 0);
-    controller(0, 1) = world(0, 0) * inverse(0, 1) + world(0, 1) * inverse(1, 1) + world(0, 2) * inverse(2, 1) +
-                       world(0, 3) * inverse(3, 1);
-    controller(0, 2) = world(0, 0) * inverse(0, 2) + world(0, 1) * inverse(1, 2) + world(0, 2) * inverse(2, 2) +
-                       world(0, 3) * inverse(3, 2);
-    controller(0, 3) = world(0, 0) * inverse(0, 3) + world(0, 1) * inverse(1, 3) + world(0, 2) * inverse(2, 3) +
-                       world(0, 3) * inverse(3, 3);
-    controller(1, 0) = world(1, 0) * inverse(0, 0) + world(1, 1) * inverse(1, 0) + world(1, 2) * inverse(2, 0) +
-                       world(1, 3) * inverse(3, 0);
-    controller(1, 1) = world(1, 0) * inverse(0, 1) + world(1, 1) * inverse(1, 1) + world(1, 2) * inverse(2, 1) +
-                       world(1, 3) * inverse(3, 1);
-    controller(1, 2) = world(1, 0) * inverse(0, 2) + world(1, 1) * inverse(1, 2) + world(1, 2) * inverse(2, 2) +
-                       world(1, 3) * inverse(3, 2);
-    controller(1, 3) = world(1, 0) * inverse(0, 3) + world(1, 1) * inverse(1, 3) + world(1, 2) * inverse(2, 3) +
-                       world(1, 3) * inverse(3, 3);
-    controller(2, 0) = world(2, 0) * inverse(0, 0) + world(2, 1) * inverse(1, 0) + world(2, 2) * inverse(2, 0) +
-                       world(2, 3) * inverse(3, 0);
-    controller(2, 1) = world(2, 0) * inverse(0, 1) + world(2, 1) * inverse(1, 1) + world(2, 2) * inverse(2, 1) +
-                       world(2, 3) * inverse(3, 1);
-    controller(2, 2) = world(2, 0) * inverse(0, 2) + world(2, 1) * inverse(1, 2) + world(2, 2) * inverse(2, 2) +
-                       world(2, 3) * inverse(3, 2);
-    controller(2, 3) = world(2, 0) * inverse(0, 3) + world(2, 1) * inverse(1, 3) + world(2, 2) * inverse(2, 3) +
-                       world(2, 3) * inverse(3, 3);
-    controller(3, 0) = world(3, 0) * inverse(0, 0) + world(3, 1) * inverse(1, 0) + world(3, 2) * inverse(2, 0) +
-                       world(3, 3) * inverse(3, 0);
-    controller(3, 1) = world(3, 0) * inverse(0, 1) + world(3, 1) * inverse(1, 1) + world(3, 2) * inverse(2, 1) +
-                       world(3, 3) * inverse(3, 1);
-    controller(3, 2) = world(3, 0) * inverse(0, 2) + world(3, 1) * inverse(1, 2) + world(3, 2) * inverse(2, 2) +
-                       world(3, 3) * inverse(3, 2);
-    controller(3, 3) = world(3, 0) * inverse(0, 3) + world(3, 1) * inverse(1, 3) + world(3, 2) * inverse(2, 3) +
-                       world(3, 3) * inverse(3, 3);
+    // controller = world * inverse, written out element by element as retail expands it:
+    // each sum is grouped from the last column (0x004a3cde adds w03*i30 + w02*i20 first; a
+    // flat four-term sum adds w00*i00 + w01*i10 first, which rounds differently).
+    controller(0, 0) = world(0, 0) * inverse(0, 0) +
+                       (world(0, 1) * inverse(1, 0) + (world(0, 2) * inverse(2, 0) + world(0, 3) * inverse(3, 0)));
+    controller(0, 1) = world(0, 0) * inverse(0, 1) +
+                       (world(0, 1) * inverse(1, 1) + (world(0, 2) * inverse(2, 1) + world(0, 3) * inverse(3, 1)));
+    controller(0, 2) = world(0, 0) * inverse(0, 2) +
+                       (world(0, 1) * inverse(1, 2) + (world(0, 2) * inverse(2, 2) + world(0, 3) * inverse(3, 2)));
+    controller(0, 3) = world(0, 0) * inverse(0, 3) +
+                       (world(0, 1) * inverse(1, 3) + (world(0, 2) * inverse(2, 3) + world(0, 3) * inverse(3, 3)));
+    controller(1, 0) = world(1, 0) * inverse(0, 0) +
+                       (world(1, 1) * inverse(1, 0) + (world(1, 2) * inverse(2, 0) + world(1, 3) * inverse(3, 0)));
+    controller(1, 1) = world(1, 0) * inverse(0, 1) +
+                       (world(1, 1) * inverse(1, 1) + (world(1, 2) * inverse(2, 1) + world(1, 3) * inverse(3, 1)));
+    controller(1, 2) = world(1, 0) * inverse(0, 2) +
+                       (world(1, 1) * inverse(1, 2) + (world(1, 2) * inverse(2, 2) + world(1, 3) * inverse(3, 2)));
+    controller(1, 3) = world(1, 0) * inverse(0, 3) +
+                       (world(1, 1) * inverse(1, 3) + (world(1, 2) * inverse(2, 3) + world(1, 3) * inverse(3, 3)));
+    controller(2, 0) = world(2, 0) * inverse(0, 0) +
+                       (world(2, 1) * inverse(1, 0) + (world(2, 2) * inverse(2, 0) + world(2, 3) * inverse(3, 0)));
+    controller(2, 1) = world(2, 0) * inverse(0, 1) +
+                       (world(2, 1) * inverse(1, 1) + (world(2, 2) * inverse(2, 1) + world(2, 3) * inverse(3, 1)));
+    controller(2, 2) = world(2, 0) * inverse(0, 2) +
+                       (world(2, 1) * inverse(1, 2) + (world(2, 2) * inverse(2, 2) + world(2, 3) * inverse(3, 2)));
+    controller(2, 3) = world(2, 0) * inverse(0, 3) +
+                       (world(2, 1) * inverse(1, 3) + (world(2, 2) * inverse(2, 3) + world(2, 3) * inverse(3, 3)));
+    controller(3, 0) = world(3, 0) * inverse(0, 0) +
+                       (world(3, 1) * inverse(1, 0) + (world(3, 2) * inverse(2, 0) + world(3, 3) * inverse(3, 0)));
+    controller(3, 1) = world(3, 0) * inverse(0, 1) +
+                       (world(3, 1) * inverse(1, 1) + (world(3, 2) * inverse(2, 1) + world(3, 3) * inverse(3, 1)));
+    controller(3, 2) = world(3, 0) * inverse(0, 2) +
+                       (world(3, 1) * inverse(1, 2) + (world(3, 2) * inverse(2, 2) + world(3, 3) * inverse(3, 2)));
+    controller(3, 3) = world(3, 0) * inverse(0, 3) +
+                       (world(3, 1) * inverse(1, 3) + (world(3, 2) * inverse(2, 3) + world(3, 3) * inverse(3, 3)));
 
     // The x axes.
     Vector3 from = *(Vector3*)&identity.m[0][0];
@@ -253,18 +255,23 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
     float c = (float)cos(angle);
     float s = (float)sin(angle);
     float t = 1.0f - c;
+    // Unlike AxisAngleMatrix 0x0042de90 (which shares t*x), retail's x block stores t*y and
+    // t*z as binary32 and builds the rows from them (0x004a4395, 0x004a43c0).  VC6 still
+    // multiplies the first use of each by the unrounded product; emu_diff runs agree.
     Matrix4 rotation;
     rotation.m[0][0] = t * x * x + c;
-    rotation.m[0][1] = t * x * y + s * z;
-    rotation.m[0][2] = t * x * z - s * y;
+    float ty = t * y;
+    rotation.m[0][1] = x * ty + s * z;
+    float tz = t * z;
+    rotation.m[0][2] = x * tz - s * y;
     rotation.m[0][3] = 0.0f;
-    rotation.m[1][0] = t * x * y - s * z;
-    rotation.m[1][1] = t * y * y + c;
-    rotation.m[1][2] = t * y * z + s * x;
+    rotation.m[1][0] = x * ty - s * z;
+    rotation.m[1][1] = y * ty + c;
+    rotation.m[1][2] = z * ty + s * x;
     rotation.m[1][3] = 0.0f;
-    rotation.m[2][0] = t * x * z + s * y;
-    rotation.m[2][1] = t * y * z - s * x;
-    rotation.m[2][2] = t * z * z + c;
+    rotation.m[2][0] = x * tz + s * y;
+    rotation.m[2][1] = z * ty - s * x;
+    rotation.m[2][2] = z * tz + c;
     rotation.m[2][3] = 0.0f;
     rotation.m[3][0] = 0.0f;
     rotation.m[3][1] = 0.0f;
