@@ -30,6 +30,18 @@ bytes with the retail bytes at the bound VA:
   section) cut at the next retail anchor (another bound VA or vtable), and a
   difference confined to trailing alignment padding counts as equal.
 
+Data that C++ dynamic initializers write (header statics such as
+``kVec3XAxis``: ``.bss`` in each unit, valued by the unit's ``$E``) compares
+after both images ran their ``__xc_a..__xc_z`` tables
+(``tools/static_initializers.py``). The copy compared is the binding unit's own
+copy in the linked build, else the public definition, else every linked copy
+(they must agree). Bytes an initializer that could not be emulated may write
+are ``unknown``; bytes several initializers write (allocator counters) are
+running state, reported ``uninitialised``. A definition that is nothing but
+pointers to statics without a retail VA follows each pointer: the bytes our
+pointer names, after initializers, must equal the bytes the retail pointer
+names (``pointer target``).
+
 A data symbol that names its VA (``s_gridCounter68a088``) must be bound to that
 VA; a comment VA on the definition that disagrees is reported as a note
 (comments are provisional evidence).
@@ -319,6 +331,10 @@ class BuildIndex:
         values = {(d.data, tuple(r[:3] for r in d.relocs)) for d in defs}
         if len(values) == 1:
             return defs[0], 'static-copy'
+        if all(d.bss for d in defs):
+            # Zeros everywhere; the copies differ only in the padding before the
+            # next symbol. Their values, if any, come from dynamic initializers.
+            return min(defs, key=lambda d: len(d.data)), 'static-copy'
         return None, 'ambiguous-static'
 
     def is_static(self, name: str) -> bool:
@@ -444,6 +460,68 @@ class Retail:
         return raw
 
 
+# ------------------------------------------------------------------ initializers
+
+@dataclass
+class Placed:
+    """A data symbol of the linked build at its built VA (``linked_data_accuracy.place_build``)."""
+    name: str
+    source: str | None
+    static: bool
+    va: int
+    size: int
+
+
+class InitialisedImage:
+    """An image's load bytes overlaid with what its C++ dynamic initializers write.
+
+    ``read(va, n)`` -> (bytes, written by an initializer, touched by one that was not emulated);
+    ``lo``/``hi`` bound the image, so a word in that range reads as a pointer.
+    """
+
+    def __init__(self, read, init=None, lo: int = 0, hi: int = 0):
+        self._read = read
+        self.init = init
+        self.lo, self.hi = lo, hi
+
+    def read(self, va: int, size: int) -> tuple[bytes, bool, bool]:
+        raw = bytearray(self._read(va, size))
+        written = uncertain = False
+        if self.init is not None:
+            for k in range(size):
+                a = va + k
+                if a in self.init.values:
+                    raw[k] = self.init.values[a]
+                    written = True
+                if a in self.init.uncertain:
+                    uncertain = True
+        return bytes(raw), written, uncertain
+
+    def shared(self, va: int, size: int) -> bool:
+        """Whether several initializers write into [va, va+size) (running state)."""
+        shared = getattr(self.init, 'shared', ())
+        return any(a in shared for a in range(va, va + size))
+
+    def word(self, va: int) -> int:
+        return struct.unpack('<I', self.read(va, 4)[0])[0]
+
+    def masked(self, data: bytes) -> bytes:
+        """``data`` with aligned words that point into the image (or the initializers'
+        scratch heap) replaced by ``PTR!``."""
+        from static_initializers import HEAP, HEAP_END
+        out = bytearray(data)
+        for k in range(0, len(data) - 3, 4):
+            w = struct.unpack_from('<I', data, k)[0]
+            if self.lo <= w < self.hi or HEAP <= w < HEAP_END:
+                out[k:k + 4] = b'PTR!'
+        return bytes(out)
+
+
+def float_reading(data: bytes) -> str:
+    words = [struct.unpack_from('<f', data, k)[0] for k in range(0, len(data) - 3, 4)]
+    return '(' + ', '.join(f'{w:g}' for w in words[:6]) + ')'
+
+
 # ------------------------------------------------------------------ comparison
 
 def compare_data(ours: Defined, retail: bytes, expected: dict[int, int | None]) -> dict:
@@ -490,9 +568,19 @@ def bodies_equal(a: tuple[bytes, bytes], b: tuple[bytes, bytes]) -> bool:
 
 class Auditor:
     def __init__(self, retail: Retail, build: BuildIndex, guids: dict[str, set[bytes]],
-                 files: dict[str, dict[str, int]], root: Path = ROOT):
+                 files: dict[str, dict[str, int]], root: Path = ROOT,
+                 ours_image: InitialisedImage | None = None,
+                 retail_image: InitialisedImage | None = None,
+                 placed: list[Placed] | None = None):
         self.r = retail
         self.b = build
+        self.ours_image = ours_image
+        self.retail_image = retail_image
+        self.placed: dict[str, list[Placed]] = defaultdict(list)
+        for p in placed or ():
+            self.placed[p.name].append(p)
+        self.placed_by_va = sorted(placed or (), key=lambda p: p.va)
+        self.placed_vas = [p.va for p in self.placed_by_va]
         self.guids = guids
         self.files = files
         self.root = root
@@ -536,6 +624,91 @@ class Auditor:
             self.comments[path] = comment_addresses(text)
         ident = base_name(name)
         return self.comments[path].get(ident.split('::')[-1]) if ident else None
+
+    # -- dynamic initializers and pointer targets
+    def our_copies(self, name: str, source: str | None) -> tuple[list[Placed], str]:
+        """The built copies of ``name`` that stand for the binding in ``source``'s file."""
+        copies = self.placed.get(name, [])
+        own = [c for c in copies if c.source == source]
+        if own:
+            return own[:1], 'unit'
+        public = [c for c in copies if not c.static]
+        if public:
+            return public[:1], 'public'
+        return copies, f'{len(copies)} linked copies' if len(copies) > 1 else 'linked copy'
+
+    def compare_initialised(self, copies: list[Placed], how: str, va: int, size: int) -> dict | None:
+        """Our copies after their initializers vs retail at ``va`` after its initializers.
+
+        None when no initializer writes either side (a plain load-image compare stands).
+        """
+        if self.ours_image is None or self.retail_image is None or not copies:
+            return None
+        n = min([size] + [c.size for c in copies])
+        if n <= 0:
+            return None
+        rb, rw, ru = self.retail_image.read(va, n)
+        ours = [self.ours_image.read(c.va, n) for c in copies]
+        if not rw and not any(w for _, w, _ in ours):
+            return None
+        if ru or any(u for _, _, u in ours):
+            return {'status': 'unknown', 'evidence': 'initializer not emulated',
+                    'detail': 'an initializer that faulted or called out may write it'}
+        if self.retail_image.shared(va, n) or any(self.ours_image.shared(c.va, n) for c in copies):
+            # A counter every allocating initializer bumps: its value after them depends
+            # on the whole initializer set, not on this definition.
+            return {'status': 'uninitialised', 'evidence': 'several initializers write it'}
+        values = {self.ours_image.masked(b) for b, _, _ in ours}
+        if len(values) > 1:
+            return {'status': 'unknown', 'evidence': f'initializer ({how})',
+                    'detail': 'linked copies disagree: ' + '; '.join(
+                        f'{c.source} {float_reading(b)}' for c, (b, _, _) in zip(copies, ours))}
+        ob = ours[0][0]
+        mine, theirs = values.pop(), self.retail_image.masked(rb)
+        row = {'evidence': f'initializer ({how})', 'initialised': ob.hex()}
+        if mine == theirs:
+            return dict(row, status='match')
+        k = next(i for i in range(n) if mine[i] != theirs[i])
+        return dict(row, status='mismatch',
+                    detail=f'after initializers ours {ob[:16].hex()} {float_reading(ob)}, '
+                           f'retail {rb[:16].hex()} {float_reading(rb)} (first difference +0x{k:x})')
+
+    def follow_pointer(self, our_va: int, retail_va: int) -> dict:
+        """Compare the static our pointer names with what the retail pointer names."""
+        if self.ours_image is None or self.retail_image is None:
+            return {'status': 'unknown'}
+        target = self.ours_image.word(our_va)
+        k = bisect.bisect_right(self.placed_vas, target) - 1
+        if k < 0 or not self.placed_by_va[k].va <= target < self.placed_by_va[k].va + max(
+                self.placed_by_va[k].size, 1):
+            return {'status': 'unknown', 'detail': f'our pointer {hx(target)} names no placed symbol'}
+        p = self.placed_by_va[k]
+        delta = target - p.va
+        rword = struct.unpack('<I', self.r.read(retail_va, 4))[0]
+        rbase = rword - delta
+        if not self.r.is_mapped(rbase) or self.r.is_code(rbase):
+            return {'status': 'mismatch', 'target': p.name,
+                    'detail': f'retail points to {hx(rword)}, not data'}
+        n = p.size
+        nxt = self.next_anchor(rbase)
+        if nxt is not None and nxt - rbase < n:
+            n = nxt - rbase
+        if n <= 0:
+            return {'status': 'unknown', 'target': p.name, 'detail': 'empty extent'}
+        ob, _, ou = self.ours_image.read(p.va, n)
+        rb, _, ru = self.retail_image.read(rbase, n)
+        if ou or ru:
+            return {'status': 'unknown', 'target': p.name, 'detail': 'target initializer not emulated'}
+        mine, theirs = self.ours_image.masked(ob), self.retail_image.masked(rb)
+        diffs = [i for i in range(n) if mine[i] != theirs[i]]
+        if diffs and min(diffs) >= len(ob.rstrip(b'\0')) and min(diffs) >= n - PADDING_SLACK:
+            diffs = []
+        if diffs:
+            return {'status': 'mismatch', 'target': p.name,
+                    'detail': f'{p.name} at retail {hx(rbase)}: {len(diffs)} bytes differ from '
+                              f'+0x{diffs[0]:x}: ours {ob[diffs[0]:diffs[0] + 8].hex()} '
+                              f'retail {rb[diffs[0]:diffs[0] + 8].hex()}'}
+        return {'status': 'match', 'target': p.name, 'retail_target': hx(rbase), 'size': n}
 
     # -- one data binding
     def audit_data(self, path: str, name: str, va: int, unit: dict[str, int]) -> dict:
@@ -647,6 +820,12 @@ class Auditor:
                 return dict(row, status='mismatch',
                             detail=f'ours is zero-initialised; retail +0x{first:x} holds '
                                    f'{retail[first:first + 8].hex()}')
+            copies, which = self.our_copies(name, src)
+            if how.startswith('link alias') and not copies:
+                copies, which = self.our_copies(self.link_aliases[name], None)
+            init = self.compare_initialised(copies, which, va, size)
+            if init is not None:
+                return dict(row, **init)
             return dict(row, status='uninitialised')
         if res['diffs'] or res['pointer_diffs']:
             detail = []
@@ -659,7 +838,22 @@ class Auditor:
                               f'retail {p["retail"]}')
             return dict(row, status='mismatch', detail='; '.join(detail))
         if res['unknown_pointers'] and res['unknown_pointers'] * 4 >= size:
-            return dict(row, status='unknown', detail='only unresolved pointers')
+            copies, which = self.our_copies(name, src)
+            if how.startswith('link alias') and not copies:
+                copies, which = self.our_copies(self.link_aliases[name], None)
+            if len(copies) != 1:
+                return dict(row, status='unknown', detail='only unresolved pointers')
+            followed = [self.follow_pointer(copies[0].va + off, va + off)
+                        for off, want in sorted(expected.items()) if want is None and off < size]
+            bad = [f for f in followed if f['status'] == 'mismatch']
+            if bad:
+                return dict(row, status='mismatch', evidence='pointer target',
+                            detail='; '.join(f['detail'] for f in bad[:3]))
+            if followed and all(f['status'] == 'match' for f in followed):
+                return dict(row, status='match', evidence='pointer target',
+                            detail=', '.join(f'{f["target"]} at {f["retail_target"]}' for f in followed[:3]))
+            return dict(row, status='unknown', detail='only unresolved pointers; '
+                        + '; '.join(f.get('detail') or '' for f in followed if f['status'] != 'match'))
         return dict(row, status='match')
 
     def audit_function(self, path: str, name: str, va: int) -> dict:
@@ -840,6 +1034,27 @@ def render(report: dict) -> str:
     return '\n'.join(lines) + '\n'
 
 
+def initialised_images(retail: Retail, build: Path | None, root: Path = ROOT):
+    """(our image, retail image, our placed data symbols) after each image's C++ initializers."""
+    from mcm2tool.pe import PEImage
+    from linked_data_accuracy import iat_slots, place_build
+    from static_initializers import atlas_names, initializers
+    hi = retail.base + retail.pe.size_of_image
+    names = atlas_names(root)
+    retail_init = initializers(retail.pe, names.get('__initterm'), retail.iat, names)
+    retail_image = InitialisedImage(retail.read, retail_init, retail.base, hi)
+    if build is None or not (build / 'mcm2.exe').is_file() or not (build / 'mcm2.map').is_file():
+        return None, retail_image, None
+    built = place_build(build, root)
+    pe = PEImage(build / 'mcm2.exe')
+    names = {m.name: m.va for m in built.map_syms}
+    ours_init = initializers(pe, names.get('__initterm'), iat_slots(pe), names)
+    ours_image = InitialisedImage(built.image.read, ours_init, pe.image_base,
+                                  pe.image_base + pe.size_of_image)
+    placed = [Placed(s.name, s.source, s.static, s.va, s.size) for s in built.syms]
+    return ours_image, retail_image, placed
+
+
 def latest_build(root: Path = ROOT) -> Path | None:
     builds = sorted((root / 'work/game-build').glob('build-*/report.json'),
                     key=lambda p: p.stat().st_mtime)
@@ -862,7 +1077,10 @@ def main(argv=None) -> int:
               file=sys.stderr)
     paths = [p.resolve() for p in a.files] or binding_files(ROOT)
     files = {p.relative_to(ROOT).as_posix(): load_file(p) for p in paths}
-    auditor = Auditor(Retail(PEImage(a.retail)), BuildIndex(build), sdk_guids(a.vc6_root), files)
+    retail = Retail(PEImage(a.retail))
+    ours_image, retail_image, placed = initialised_images(retail, build)
+    auditor = Auditor(retail, BuildIndex(build), sdk_guids(a.vc6_root), files,
+                      ours_image=ours_image, retail_image=retail_image, placed=placed)
     report = auditor.run()
     report['build'] = str(build) if build else None
     out = a.json or ROOT / 'work/binding-audit/report.json'

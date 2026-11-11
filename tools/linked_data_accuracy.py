@@ -760,13 +760,25 @@ def build_objects(build: Path, root: Path) -> dict[str, Path]:
     return out
 
 
-def analyse(build: Path, retail_path: Path, root: Path = ROOT, code_refs: bool = True) -> dict:
+@dataclass
+class PlacedBuild:
+    """Every data symbol of a linked build's objects, placed at its built VA."""
+    syms: list[DataSymbol]
+    image: RetailImage
+    map_syms: list[MapSymbol]
+    funcs_by_va: dict[int, list[str]]
+    comments: dict[str, dict[str, int]]
+    unplaced: Counter
+
+    def word(self, va: int) -> int:
+        return struct.unpack('<I', self.image.read(va, 4))[0]
+
+
+def place_build(build: Path, root: Path = ROOT) -> PlacedBuild:
+    """Place each object's data symbols: map publics fix sections, relocations the static ones."""
     from mcm2tool.coff import CoffObject
     from mcm2tool.pe import PEImage
-    built_pe = PEImage(build / 'mcm2.exe')
-    retail_pe = PEImage(retail_path)
-    built_img = RetailImage(built_pe)
-    retail = RetailImage(retail_pe)
+    built_img = RetailImage(PEImage(build / 'mcm2.exe'))
     map_syms = parse_map((build / 'mcm2.map').read_text(encoding='latin-1'))
     publics_by_obj: dict[str, dict[str, int]] = defaultdict(dict)
     funcs_by_va: dict[int, list[str]] = defaultdict(list)
@@ -824,7 +836,16 @@ def analyse(build: Path, retail_path: Path, root: Path = ROOT, code_refs: bool =
             continue
         seen.add((s.name, s.va))
         uniq.append(s)
-    syms = uniq
+    return PlacedBuild(uniq, built_img, map_syms, funcs_by_va, comments, unplaced)
+
+
+def analyse(build: Path, retail_path: Path, root: Path = ROOT, code_refs: bool = True) -> dict:
+    from mcm2tool.pe import PEImage
+    retail_pe = PEImage(retail_path)
+    retail = RetailImage(retail_pe)
+    placed = place_build(build, root)
+    syms, funcs_by_va, comments, unplaced = placed.syms, placed.funcs_by_va, placed.comments, placed.unplaced
+    read_built = placed.word
 
     names = load_retail_names(root, retail_pe)
     strings = string_content_index(retail_pe)

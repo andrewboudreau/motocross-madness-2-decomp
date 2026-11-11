@@ -857,8 +857,10 @@ Vtables, RTTI and EH tables are skipped. Binding evidence: 3,035 bindings,
   separate arrays in our build, as their source comments say. No bound table
   is shorter than retail's extent, apart from `kbSecondsPerMillisecond`, whose
   tail is the next object.
-- Uncovered retail game data: 718 nonzero runs (12,891 B). Code refers to 198
-  of them (5,071 B), and 102 are text.
+- Uncovered retail game data: 479 nonzero runs (7,686 B). Code refers to 198
+  of them (5,071 B), and 102 are text. (Type descriptors anchor these runs:
+  the `??_R0` key drops the decorated name's leading `.`; before that fix 239
+  descriptors counted as uncovered data.)
   - Most of the referenced runs are `.rdata` constants our code does not
     reference: DirectX IIDs and `__real` floats such as 0x0055258c (0.2f)
     and 0x00557e38 (0.4f), plus EH scope tables. These belong to code
@@ -888,7 +890,16 @@ python tools/audit_bindings.py --retail "$MCM2_EXE" --vc6-root "$VC6_ROOT"   # e
 
 It reads every `src/`/`samples/` `*.bindings.json`. For data it compares our
 definition (unit object first, then a public one, then a link alias provider)
-with retail at the bound VA, pointers by target and `.bss` as zeros. It decodes
+with retail at the bound VA, pointers by target and `.bss` as zeros. Data that
+C++ dynamic initializers write is compared after them:
+`tools/static_initializers.py` (test `tests/test_static_initializers.py`) runs
+each image's `__xc_a..__xc_z` table under unicorn. It uses scratch-heap
+`malloc`/`HeapAlloc` and an SEH-capable `fs`, and undoes an entry that calls an
+unanswered import. A header static such as `kVec3XAxis` is compared per unit:
+the binding unit's own linked copy against the VA that unit binds. Units with no
+copy (samples) take every linked copy, and the copies must agree. A definition
+holding only pointers to unbound statics is checked by following each pointer
+and comparing the bytes our target and the retail target hold. It decodes
 literal names, checks import slots, vtable classes with our COL offset, type
 descriptors, VAs spelt in names, and GUIDs our sources do not define against
 `DEFINE_GUID`/`OUR_GUID_ENTRY`/MIDL `DECLSPEC_UUID` in the headers under
@@ -900,14 +911,30 @@ VAs, VAs bound to names whose definitions or library identity disagree, and
 a linked build, so `tools/static_check.py` does not run it; it takes about 6 s.
 
 Result (333 files, 19,279 bindings): 0 findings. Matches: 4,664 literals, 421
-imports, 389 vtables, 31 type descriptors, 109 SDK GUIDs, 366 data definitions,
-12,055 function starts; 811 `.bss` bindings with zero retail bytes. Unknown:
-178 data bindings: 47 name symbols no object defines (scope tables, CRT and
-`c_dfDI*` library data), 87 name header statics whose unit copies differ, and
-44 hold only pointers to unbound statics. 62 bindings are 0 placeholders.
-97 VAs carry two or more different linked bodies (a bring-up stand-in next to the reconstruction,
-or two reconstructions such as `OrientationAnglesFromVectors` and
-`VehBasisToBlock` at 0x004b5a60); they are listed for review, not findings.
+imports, 389 vtables, 31 type descriptors, 109 SDK GUIDs, 850 data definitions,
+12,055 function starts. Of the 850 data matches, 440 are after initializers
+(316 a unit's own copy, 24 a public definition, 100 linked copies in units
+without one: 92 against 2 to 103 agreeing copies, 8 against a single copy),
+44 are pointer targets and 366 are plain bytes. 458 `.bss` bindings are
+zero in retail and written by no initializer, or are running state:
+`g_UnclaimedBytes`, the allocator counter every allocating initializer bumps.
+Unknown: 47 data bindings, all names no object defines (scope tables, CRT and
+`c_dfDI*` library data). 62 bindings are 0 placeholders. Before the
+initializer pass: 366 data matches, 811 `.bss`, 178 unknown (87 header statics
+whose per-unit copies differed only in padding, 44 pointer-only).
+
+No header-static value bug was found. Every unit's copy equals retail at the
+VA its bindings name, and each group of 97 to 103 linked `kVec3*` copies
+agrees. A negative check swapped `kVec3XAxis`/`kVec3YAxis` in one unit's
+bindings and got two mismatches, `(1, 0, 0)` against `(0, 1, 0)`. One
+initializer per image calls `GetVersionExA` (retail 0x004aa7b0, ours
+0x004bc460) and is not emulated, so its large object (retail
+0x0059af5c-0x0065b3e0) stays unknown. No binding currently compares
+against it.
+
+97 VAs carry two or more different linked bodies (a bring-up stand-in next to the
+reconstruction, or two reconstructions of one function); they are listed for
+review, not findings.
 
 Fixed by the audit:
 

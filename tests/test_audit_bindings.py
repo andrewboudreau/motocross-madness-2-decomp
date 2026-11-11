@@ -5,9 +5,10 @@ import tempfile
 import unittest
 from collections import defaultdict
 from pathlib import Path
+from types import SimpleNamespace
 
 from tools.audit_bindings import (
-    REL_DIR32, Auditor, BuildIndex, Defined, address_in_name, base_name, compare_data,
+    REL_DIR32, Auditor, BuildIndex, Defined, InitialisedImage, Placed, address_in_name, base_name, compare_data,
     guid_identifier, parse_define_guids, vtable_class)
 
 TEXT_LO, TEXT_HI = 0x401000, 0x550000
@@ -208,6 +209,114 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(classes['0x00401300'], 'deleting-dtor')
         conflicts = {c['symbol']: c['class'] for c in report['symbol_conflicts']}
         self.assertEqual(conflicts, {'_kTwo': 'conflict'})
+
+
+# ------------------------------------------------------------------ dynamic initializers
+
+OURS_LO, OURS_HI = 0x600000, 0x700000
+AXIS = 'kVec3XAxis'     # a header static: one .bss copy per unit, valued by each unit's $E
+
+
+def vec(*xs):
+    return struct.pack(f'<{len(xs)}f', *xs)
+
+
+def init_image(read, values=None, uncertain=(), shared=(), lo=0, hi=0):
+    """An InitialisedImage over ``read`` whose initializers wrote ``values`` ({va: bytes})."""
+    flat = {}
+    for va, blob in (values or {}).items():
+        flat.update({va + k: b for k, b in enumerate(blob)})
+    init = SimpleNamespace(values=flat, uncertain=set(uncertain), shared=set(shared))
+    return InitialisedImage(read, init, lo, hi)
+
+
+def blocks_reader(blocks):
+    return FakeRetail(blocks).read
+
+
+def init_auditor(files, build, placed, ours_values, retail_values, retail=None,
+                 ours_blocks=None, ours_kw=None, retail_kw=None):
+    retail = retail or FakeRetail()
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / 'config').mkdir()
+        (root / 'config/game_build.json').write_text('{}')
+        return Auditor(retail, build, {}, files, root=root,
+                       ours_image=init_image(blocks_reader(ours_blocks or {}), ours_values,
+                                             lo=OURS_LO, hi=OURS_HI, **(ours_kw or {})),
+                       retail_image=init_image(retail.read, retail_values,
+                                               lo=TEXT_LO, hi=DATA_HI, **(retail_kw or {})),
+                       placed=placed)
+
+
+def axis_build(*units):
+    return FakeBuild([Defined(AXIS, u, '.bss', bytes(12 + 4 * k), static=True, bss=True)
+                      for k, u in enumerate(units)])
+
+
+class InitialiserTests(unittest.TestCase):
+    def rows(self, report):
+        return {(r['file'], r['symbol']): r for r in report['rows']}
+
+    def test_each_unit_copy_compares_with_its_own_binding(self):
+        build = axis_build('src/A.cpp', 'src/B.cpp')
+        placed = [Placed(AXIS, 'src/A.cpp', True, 0x600000, 12),
+                  Placed(AXIS, 'src/B.cpp', True, 0x600010, 16)]
+        ours = {0x600000: vec(1, 0, 0), 0x600010: vec(1, 0, 0)}
+        # B's binding names retail's Y axis: zeros in both load images, only the
+        # initializers tell the two apart.
+        theirs = {0x5a0000: vec(1, 0, 0), 0x5a0010: vec(0, 1, 0)}
+        files = {'src/A.bindings.json': {AXIS: 0x5a0000}, 'src/B.bindings.json': {AXIS: 0x5a0010}}
+        rows = self.rows(init_auditor(files, build, placed, ours, theirs).run())
+        a, b = rows['src/A.bindings.json', AXIS], rows['src/B.bindings.json', AXIS]
+        self.assertEqual((a['status'], a['evidence']), ('match', 'initializer (unit)'))
+        self.assertEqual(b['status'], 'mismatch')
+        self.assertIn('ours 0000803f', b['detail'])
+        self.assertIn('retail 000000000000803f', b['detail'])
+
+    def test_a_unit_without_a_copy_takes_the_linked_consensus(self):
+        build = axis_build('src/A.cpp', 'src/B.cpp')
+        placed = [Placed(AXIS, 'src/A.cpp', True, 0x600000, 12),
+                  Placed(AXIS, 'src/B.cpp', True, 0x600010, 12)]
+        files = {'samples/S.bindings.json': {AXIS: 0x5a0000}}
+        theirs = {0x5a0000: vec(1, 0, 0)}
+        same = {0x600000: vec(1, 0, 0), 0x600010: vec(1, 0, 0)}
+        row = init_auditor(files, build, placed, same, theirs).run()['rows'][0]
+        self.assertEqual((row['status'], row['evidence']), ('match', 'initializer (2 linked copies)'))
+        differ = {0x600000: vec(1, 0, 0), 0x600010: vec(0, 0, 1)}
+        row = init_auditor(files, build, placed, differ, theirs).run()['rows'][0]
+        self.assertEqual(row['status'], 'unknown')
+        self.assertIn('linked copies disagree', row['detail'])
+
+    def test_running_state_and_failed_initializers_are_not_evidence(self):
+        build = FakeBuild([Defined('_g_bytes', 'src/M.cpp', '.bss', bytes(4), bss=True)])
+        placed = [Placed('_g_bytes', 'src/M.cpp', False, 0x600000, 4)]
+        files = {'src/M.bindings.json': {'_g_bytes': 0x5a0000}}
+        ours, theirs = {0x600000: struct.pack('<I', 0x5c8)}, {0x5a0000: struct.pack('<I', 0x434)}
+        row = init_auditor(files, build, placed, ours, theirs,
+                           ours_kw={'shared': {0x600000}}).run()['rows'][0]
+        self.assertEqual((row['status'], row['evidence']), ('uninitialised', 'several initializers write it'))
+        row = init_auditor(files, build, placed, ours, theirs,
+                           retail_kw={'uncertain': {0x5a0002}}).run()['rows'][0]
+        self.assertEqual((row['status'], row['evidence']), ('unknown', 'initializer not emulated'))
+        row = init_auditor(files, build, placed, {}, {}).run()['rows'][0]
+        self.assertEqual(row['status'], 'uninitialised')
+
+    def test_pointer_to_a_static_compares_the_target(self):
+        # `_g_table` holds the address of a file-static table no binding names.
+        build = FakeBuild([Defined('_g_table', 'src/P.cpp', '.data', struct.pack('<I', 0),
+                                   relocs=[(0, REL_DIR32, '_s_rows', True, 0)])])
+        placed = [Placed('_g_table', 'src/P.cpp', False, 0x600100, 4),
+                  Placed('_s_rows', 'src/P.cpp', True, 0x600200, 8)]
+        files = {'src/P.bindings.json': {'_g_table': 0x5a0100}}
+        ours_blocks = {0x600100: struct.pack('<I', 0x600204), 0x600200: bytes(range(1, 9))}
+        retail = FakeRetail({0x5a0100: struct.pack('<I', 0x5a0304), 0x5a0300: bytes(range(1, 9))})
+        row = init_auditor(files, build, placed, {}, {}, retail, ours_blocks).run()['rows'][0]
+        self.assertEqual((row['status'], row['evidence']), ('match', 'pointer target'))
+        self.assertIn('_s_rows at 0x005a0300', row['detail'])
+        retail = FakeRetail({0x5a0100: struct.pack('<I', 0x5a0304), 0x5a0300: bytes(range(2, 10))})
+        row = init_auditor(files, build, placed, {}, {}, retail, ours_blocks).run()['rows'][0]
+        self.assertEqual((row['status'], row['evidence']), ('mismatch', 'pointer target'))
 
 
 if __name__ == '__main__':
