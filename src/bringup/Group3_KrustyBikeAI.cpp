@@ -1411,9 +1411,9 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 // Not kept: `Vec3(0.0f)` zero temporaries (2033 strict but 27 differing instructions
 // against 17).
 //
-// 0x00414370 (4802 bytes): block order, calls and constants match (linked 1294 vs 1302
-// instructions; masked 0.962, strict 0.914; match_one masked 725/4486, aligned 1181 of
-// 1302).  Retail's race-kind test lays out the default (free-roam) block first, then kinds
+// 0x00414370 (4802 bytes): block order, calls and constants match (linked 1291 vs 1302
+// instructions; masked 0.951, strict 0.921; match_one masked 727/4486, aligned 1188 of
+// 1302, 114 differing instructions).  Retail's race-kind test lays out the default (free-roam) block first, then kinds
 // 1/5, then 2/3, which the nested `kind != 3 && kind != 2` form reproduces (a switch builds
 // a jump table).  Levers, in order of size:
 //  * the point loops are `for (t = T0, i = 0; t <= T1; t += 0.1f)` whose body starts with
@@ -1428,13 +1428,19 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 //    if/else with the goto 1162);
 //  * difficulty and the trick delay are separate locals: the uninitialised delay shares
 //    the difficulty's slot (fld [esp+0x20]) exactly as the former anonymous union did,
-//    and the masked score is 7 higher (declaration order of the two is inert).
+//    and the masked score is 7 higher (declaration order of the two is inert);
+//  * kinds 1/5 store the point count through `path = &aiPath`: retail reloads statusNode
+//    after `mov [count], 3`, which an indirect store gives, and the 3-point line's
+//    points[1] copy then cross-jumps into the single-point arm's copy as in retail
+//    (aligned 1181 -> 1188, 121 -> 114 differing, linked strict 0.914 -> 0.921 though
+//    linked masked 0.962 -> 0.951).  Only the count stores matter: memset through
+//    `path` is inert, path-> count stores in the roam or kind 2/3 branches are inert or
+//    worse (1172..1179), and path->points in kinds 1/5 loses (1091..1132).
 // Differences left: register allocation (retail keeps difficulty in memory, ebp zero and
 // edi as a temporary; in the kind 2/3 off-track path retail holds the count constant 1 in
-// ebp and 40.0f in ebx); in the 3-point gate line retail treats the count store as
-// aliasing statusNode (reloads it after `mov [count], 3`, takes `&statusNode->nextGate`
-// once and reloads nextGate through it) and cross-jumps the points[1] copy into the
-// single-point arm's points[0] copy, the candidate keeps statusNode in edx; the random
+// ebp and 40.0f in ebx); in the 3-point gate line retail also reloads statusNode after
+// the points[0] store (takes `&statusNode->nextGate` once and reloads nextGate through
+// it), the candidate keeps statusNode in edx; the random
 // free-roam target scales through a stored temporary; the gate dot's x product operands
 // are swapped.  Ruled out: reloading statusNode->nextGate per use in the gate-distance
 // tail as retail does (G=0: 1151 aligned against 1181, difficulty moves into ebp); a
@@ -1919,6 +1925,9 @@ int KrustyBike::Fn_00414370(float dt)
     int dummy;
     int count;
     int i;
+    // Kinds 1/5 store the point count through a pointer: retail reloads statusNode after
+    // those stores as after an indirect store (aligned 1181 -> 1188 of 1302).
+    UnknownBikeAIPath* path = &aiPath;
 
     memset(&aiPath, 0, sizeof(aiPath));
     list = 0;
@@ -1955,7 +1964,7 @@ int KrustyBike::Fn_00414370(float dt)
             if (hasFinished) {
                 startRunUpTime += dt;
                 if (startRunUpTime < 2.0f) {
-                    aiPath.count = 1;
+                    path->count = 1;
                     aiPath.points[0].y = 0.0f;
                     aiPath.points[0].x = bodyForward.z * 40.0f + position.x;
                     aiPath.points[0].z = position.z - bodyForward.x * 40.0f;
@@ -1997,7 +2006,7 @@ int KrustyBike::Fn_00414370(float dt)
                     return 0;
                 list->next->node = race->raceTrack->startNode;
                 if (list && bikeAhead < gateAhead) {
-                    aiPath.count = 100;
+                    path->count = 100;
                     
                     for (t = 0.0f, i = 0; t <= 10.0f; t += 0.1f) {
                         if (i >= aiPath.count)
@@ -2011,11 +2020,11 @@ int KrustyBike::Fn_00414370(float dt)
                         i++;
                     }
                 } else {
-                    aiPath.count = 1;
+                    path->count = 1;
                     aiPath.points[0] = statusNode->nextGate->position;
                 }
             } else if (statusNode->goalDistance < 300.0f) {
-                aiPath.count = 3;
+                path->count = 3;
                 gate = statusNode->nextGate;
                 if (BikeAIDot(gate->position - position, gate->direction) < 0.0f) {
                     aiPath.points[0] = speed * gate->direction + gate->position;
@@ -2026,7 +2035,7 @@ int KrustyBike::Fn_00414370(float dt)
                 }
                 aiPath.points[1] = statusNode->nextGate->position;
             } else {
-                aiPath.count = 1;
+                path->count = 1;
                 aiPath.points[0] = statusNode->nextGate->position;
             }
             gate = statusNode->nextGate;

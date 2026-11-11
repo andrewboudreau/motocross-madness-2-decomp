@@ -231,7 +231,7 @@ Five near misses and one exact COMDAT are in `samples/physics/bikeai`:
   at other offsets and the angular-velocity cross products load their operands in
   another order;
 - the KrustyBike racing-line builder `0x414370` (4802 bytes, 8.5%): block order,
-  calls and the 0x78 frame match (linked masked 0.962); register allocation and
+  calls and the 0x78 frame match (linked masked 0.951, strict 0.921); register allocation and
   statusNode reloads in the kind 1/5 gate line differ.
 
 `0x40eca0` exhausts VC6's per-function inline budget. Its first part expands every
