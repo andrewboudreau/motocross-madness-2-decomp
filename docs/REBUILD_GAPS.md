@@ -31,19 +31,25 @@ extent (1,253,440 bytes); everything after it is library or compiler tail.
 | `exact_src`: strict VC6 match, source under `src/` | 833,459 | 60.90 | 66.49 | 3,992 | 1: rerun verdicts, relocations resolved |
 | `exact_samples`: strict match, source only under `samples/` | 2,027 | 0.15 | 0.16 | 59 | 1 (not canonical source) |
 | `library_crt_atlas`: LIBCMT bodies | 77,929 | 5.69 | - | 443 | 1 masked match, [VC6_CRT_ATLAS](VC6_CRT_ATLAS.md) |
-| `library_import_thunk`: `jmp [IAT]` | 198 | 0.01 | - | 33 | 1 decoded IAT target |
+| `library_span_tier1`: LIBCMT sections, atlas row or named by a decoded relocation | 4,696 | 0.34 | - | 86 | 1 whole-section masked match, [span attribution](VC6_CRT_ATLAS.md#span-attribution) |
+| `library_span_tier2`: LIBCMT sections matched in a gap | 860 | 0.06 | - | 35 | 2 |
+| `library_span_tier3`: short LIBCMT sections that fill a gap exactly | 14 | 0.00 | - | 2 | 3 |
+| `library_import_thunk`: `jmp [IAT]` | 186 | 0.01 | - | 31 | 1 decoded IAT target |
 | `library_data`: DINPUT.LIB tables | 4,912 | 0.36 | - | 3 | 1 byte match against VC6 `DINPUT.LIB` |
-| `compiler_eh_text_x`: `$ehhandler` stubs + unwind funclets | 23,502 | 1.72 | - | 394 | 1 decoded `mov eax, FuncInfo; jmp ___CxxFrameHandler` |
+| `compiler_eh_text_x`: `$ehhandler` stubs + unwind funclets | 23,542 | 1.72 | - | 394 | 1 decoded `mov eax, FuncInfo; jmp ___CxxFrameHandler` |
 | `inline_asm_excluded` | 42,650 | 3.12 | 3.40 | 33 | 1 instruction (`fistp`/`rdtsc`/`fs:[4]`); 3 for the 4 docs-only rows |
 | `near_miss`: registered partials / near misses | 343,763 | 25.12 | 27.43 | 199 | 1 verdict; extent 2 where padding-delimited |
-| `library_span_unlabeled`: LIBCMT span gaps | 5,813 | 0.42 | - | - | 2 |
-| `library_unknown`: after LIBCMT, before the EH tail | 2,722 | 0.20 | - | - | 3 |
-| `padding`: int3/nop alignment | 31,414 | 2.30 | 2.51 | - | 2 decoder rule |
+| `library_span_unlabeled`: LIBCMT span bytes nothing explains | 1 | 0.00 | - | - | - |
+| `library_unknown`: x87 span loops after LIBCMT, before the EH tail | 2,682 | 0.20 | - | - | 3 provider |
+| `padding`: int3/nop alignment | 31,668 | 2.31 | 2.51 | - | 2 decoder rule; 254 B span attribution |
 | `unattributed` | 129 | 0.01 | 0.01 | 5 | - |
 
 Counts are unique registered start addresses (by the category of their first
-byte); for libraries they are objects/thunks/stubs, for `unattributed` the
-padding-delimited ranges.
+byte). For libraries they count objects, thunks and stubs; for the
+`library_span_tier*` rows they count sections that keep bytes outside atlas
+rows. For `unattributed` they count the padding-delimited ranges. The library
+rows and `padding` were recounted on 2026-11-11 after the span attribution was
+added. The game rows are unchanged from the snapshot.
 
 Headline: **66.7% of game-code bytes (835,486) are strict exact**, 0.2% of it
 (2,027 bytes, inline COMDAT helpers and layout probes) only from `samples/`.
@@ -89,10 +95,10 @@ Rules (all in `tools/rebuild_coverage.py`):
 | `0x00533040..0x005330ee` | 29 import thunks: blade.dll 2 (`DirectDrawEnumerateA`, `DirectDrawCreateEx`), d3drm 1, MSVFW32 2, IMM32 11, DSOUND 2, WSOCK32 10, DINPUT 1 (`DirectInputCreateEx`) | 1 |
 | `0x005330f0..0x00534420` | DINPUT.LIB `dilib3.obj` `c_rgodfDIJoy` (704 B), `dilib2.obj` `c_rgodfDIKeyboard` (4,096 B), `dilib1.obj` `c_rgodfDIMouse` (112 B), contiguous | 1 bytes; 2 provider (see below) |
 | `0x00534420..0x00534426` | DPLAYX ordinal 4 thunk | 1 |
-| `0x00534426..0x00548b50` | LIBCMT: 443 atlas bodies in 165 object runs from `qsort.obj` on, 5,813 B unlabeled, two KERNEL32 thunks (`GetOEMCP`, `GetACP`) inside | 1 (atlas) / 2 (gaps) |
+| `0x00534426..0x00548b50` | LIBCMT: 443 atlas bodies in 165 object runs from `qsort.obj` on. The 5,825 gap bytes are LIBCMT sections (4,696 B tier 1, 874 B tier 2/3), 254 B alignment int3 and 1 unexplained byte (`0x0054550b`). The `jmp [IAT]` to `GetOEMCP`/`GetACP` at `0x0053e039`/`0x0053e04e` are tail calls inside `mbctype.obj` `_getSystemCP`, not thunks | 1 (atlas, tier 1) / 2-3 (rest), [span attribution](VC6_CRT_ATLAS.md#span-attribution) |
 | `0x00548b50..0x00548b56` | KERNEL32 `RtlUnwind` thunk | 1 |
-| `0x00548b60..0x005495f8` | x87 texture loops (`add esp,-0x28`, `fnstcw`/`fldcw`), no caller or pointer found; provider unknown | 3 |
-| `0x005495f8..0x0054f1c6` | `.text$x`: 394 `$ehhandler` stubs (all of them; none elsewhere) and unwind funclets | 1 |
+| `0x00548b56..0x005495d0` | int3, then two perspective-correct texture span loops (8-bit and 16-bit texels, `0x00548b60`, `0x00549038`), then int3. No caller or pointer was found. No VC6 SP3 library or object matches. The prologue suggests a MASM game module | 1 code / 2 MASM / 3 provider, [details](VC6_CRT_ATLAS.md#code-after-the-span-0x00548b560x005495d0) |
+| `0x005495d0..0x0054f1c6` | `.text$x`: 394 `$ehhandler` stubs (all of them; none elsewhere) and unwind funclets; the tail starts at the first funclet named by the stubs' FuncInfo | 1 |
 
 The DINPUT tables are byte-identical to the VC6 SP3 `DINPUT.LIB` members, but
 that library does not define `DirectInputCreateEx`, which retail imports from
@@ -474,10 +480,15 @@ On main c31da12a (2026-11-11) the tool scores 2,683 functions (1,122,001 bytes);
    between known extents. See [UNIT_LAYOUT.md](UNIT_LAYOUT.md): five units
    already lay out byte-identically with `tools/unit_layout.py`.
 5. **Inline assembly**: decide on the functions above.
-6. **Libraries**: LIBCMT is pinned; the 5,813 unlabeled LIBCMT-span bytes
-   still need member identification, the 2,722-byte x87 block at
-   `0x00548b60` a provider, and the DirectX 7-era `dinput.lib` and the
-   `blade.dll` import library a source.
+6. **Libraries**: LIBCMT is pinned, and the span attribution places LIBCMT
+   sections over all but one byte of the gaps between atlas rows (4,696 B
+   tier 1, 860 B tier 2, 14 B tier 3, 254 B alignment). Still open:
+   - the int3 at `0x0054550b`;
+   - the identity of the 2,682-byte block at `0x00548b56` (two x87 span
+     loops, 21 B of it int3). No VC6 library or object matches it, and the
+     bundle has no MASM;
+   - a source for the DirectX 7-era `dinput.lib` and the `blade.dll` import
+     library.
 7. **Link**: `tools/build_game.py` links a runnable image
    ([GAME_BUILD](GAME_BUILD.md)), but not in retail's layout: link order
    (alphabetical objects, then the library order above) is inferred, and the

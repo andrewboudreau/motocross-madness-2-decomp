@@ -26,8 +26,8 @@ the CollisionPoint and ConstraintMethodCollisionModel kVec3 sets, Terrain.cpp's 
 registered after the scan; their rows below are adjusted by hand). After the game
 code: 29 import thunks, 5,421 bytes of DirectInput data-format tables,
 the VC6 LIBCMT span (`0x00534426..0x00548b50`, 443 atlas functions), a
-2.7 KB x87 span filler of non-VC6 shape, and 393 `$ehhandler` stubs with
-their unwind funclets (`0x005495f8..0x0054f168`).
+2.7 KB of x87 span loops of non-VC6 shape, and 394 `$ehhandler` stubs with
+their unwind funclets (`0x005495d0..0x0054f1c6`).
 
 Signals used: `analysis/source_xrefs.json` (`__FILE__` literals),
 `analysis/vtables.json` and `rtti_classes.json` (vtable slot ownership),
@@ -107,9 +107,9 @@ neighbours' `__FILE__` xrefs).
 | `0x0052b91a..0x0052d0d0` | 6070 | 29 (4 unreg., 3764 B) | VehicleCamera.cpp (registered, name ours) + VfwDeco.cpp | RTTI VehicleCamera slots; XCU 336-339 between slot 51 (0x52cec0) and slot 75 (0x52d010), its zero vector 0x68a728 is read by the constructor, 0x52bb60 and slot 41, the z axis 0x68a718 by slot 41; left: slots 35/41/68 and slot 36 (near miss); 0x52d050 vfwdeco.cpp (__FILE__ 0x52d07e) | 2 |
 | `0x0053303c..0x005330f0` | 180 | 9 (9 unreg., 174 B) | import thunks | 29 jmp [IAT] thunks | 1 |
 | `0x005330f0..0x00534426` | 4918 | 1 (1 unreg., 5421 B) | DirectInput data-format tables (dinput.lib) | DIOBJECTDATAFORMAT records {GUID* 0x556a70.., dwOfs, dwType 0x80ffff03/0x8000000c, flags} = c_dfDIKeyboard/Mouse/Joystick; one jmp [IAT] thunk at 0x534420 | 2 |
-| `0x00534426..0x00548b50` | 83754 | 5 (5 unreg., 109481 B) | VC6 LIBCMT (docs/VC6_CRT_ATLAS.md) | 443 atlas functions; 11 unlabeled gaps > 96 B (3077 B) inside the span | 1 |
-| `0x00548b50..0x005495f8` | 2728 | 0 (0 unreg., 0 B) | x87 span filler, non-VC6 code shape (unknown library) | thunk 0x548b50; 0x548b60 uses 'add esp,-0x28', fnstcw/fldcw and unrolled texture loops, no direct E8 caller in .text | 3 |
-| `0x005495f8..0x0054f1c6` | 23502 | 0 (0 unreg., 0 B) | EH handlers and unwind funclets of game TUs | 393 '$ehhandler' stubs (mov eax, FuncInfo; jmp ___CxxFrameHandler) 0x5495f8..0x54f168 plus unwind funclets; excluded from TU extents by convention | 1 |
+| `0x00534426..0x00548b50` | 83754 | 5 (5 unreg., 109481 B) | VC6 LIBCMT (docs/VC6_CRT_ATLAS.md) | 443 atlas functions; the gaps between them are LIBCMT sections placed by the span attribution (tier 1-3), except one int3 at 0x54550b | 1 |
+| `0x00548b50..0x005495d0` | 2688 | 0 (0 unreg., 0 B) | x87 texture span loops, MASM-shaped (no VC6 library or object matches) | thunk 0x548b50; 0x548b60 and 0x549038 (8- and 16-bit texels) use 'add esp,-0x28', fnstcw/fldcw and subdivided loops, no caller or pointer in the image | 3 |
+| `0x005495d0..0x0054f1c6` | 23542 | 0 (0 unreg., 0 B) | EH handlers and unwind funclets of game TUs | 394 '$ehhandler' stubs (mov eax, FuncInfo; jmp ___CxxFrameHandler) from 0x5495f8, the first stub's unwind funclets at 0x5495d0/0x5495e4; excluded from TU extents by convention | 1 |
 
 ## Largest attributable work, by unregistered bytes
 
@@ -158,9 +158,11 @@ neighbours' `__FILE__` xrefs).
 - `0x00448560..0x00449e60`, `0x0045ff80..0x004624d0` and
   `0x004a05db..0x004a10e0` may each hold more than one unit; nothing in the
   binary separates them.
-- The `0x00548b60..0x005495f8` filler has no direct caller in `.text`; its
-  provider is unknown. The 11 unlabeled gaps inside the LIBCMT span (3,077
-  bytes) are short runtime functions the atlas does not admit, not game code.
+- The x87 span loops at `0x00548b60..0x005495c5` have no caller in `.text`;
+  their provider is unknown (see
+  [VC6_CRT_ATLAS](VC6_CRT_ATLAS.md#code-after-the-span-0x00548b560x005495d0)).
+  The gaps inside the LIBCMT span are whole LIBCMT sections the atlas does
+  not admit as rows, not game code.
 
 ## Reproduction
 
