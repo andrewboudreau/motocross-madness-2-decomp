@@ -459,13 +459,23 @@ static inline float QueryDotZFirst(const Vec3& a, const Vec3& b)
     return a.z * b.z + (a.x * b.x + a.y * b.y);
 }
 
+// The segment's second point is transformed with its y row summed (y + z) + x, as retail
+// does (retail copies segment[1] at entry; the natural TransformPointInline gives (x + z) + y
+// here, which rounds differently at 24-bit precision: tools/emu_cases/segment_triangle_query.py).
+inline void TransformPointYZX(Vec3* out, Vec3 v, const Matrix4* m)
+{
+    out->x = v.x * m->_11 + v.y * m->_21 + v.z * m->_31 + m->_41;
+    out->y = (v.y * m->_22 + v.z * m->_32) + v.x * m->_12 + m->_42;
+    out->z = v.x * m->_13 + v.y * m->_23 + v.z * m->_33 + m->_43;
+}
+
 int SegmentTriangleQuery(const QueryTriangle* tri, const Vec3* segment, const Matrix4* m)
 {
     Vec3 start;
     TransformPointInline(&start, segment[0], m);
     start -= g_SweepRecord->offset;
     Vec3 dir;
-    TransformPointInline(&dir, segment[1], m);
+    TransformPointYZX(&dir, segment[1], m);
     dir -= start;
     if (QueryDot(dir, tri->normal) <= 0.0f)
         return 0;
