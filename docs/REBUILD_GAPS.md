@@ -372,6 +372,46 @@ None is strict exact. 23 are unregistered; 8 are registered near misses.
 Under the current rule (no inline assembly) these 40,324 bytes cannot be
 rebuilt; allowing `__asm` for exactly these bodies is a project decision.
 
+### Rounding in the source build
+
+Gameplay still needs these conversions to round, since a VC6 `(int)` cast
+truncates through `__ftol`. Retail's helper stores the value to a binary32 slot,
+reloads it and runs `fistp`. Most sites convert `v - 0.5`, which is `floor(v)`
+except at exact ties. The 83 `mov eax, [dest]; fistp dword ptr [eax]` sites in
+.text all sit in the 26 `fistp` functions above. Each one rounds in the body
+that `tools/build_game.py` links. This was checked on 2026-11-10 against
+`mcm2.map` and a decode of the linked bodies:
+
+| Retail function | `fistp` | Linked body | Rounding |
+|---|---:|---|---|
+| `0x00406ae0`, `0x0040c000` | 3, 1 | `src/krusty2/vehicle/Bike.cpp` (`SelectRiderPose`, `ComputeSlideAngle`) | `BikeFloatToInt` |
+| `0x00446f40` | 6 | `src/bringup/Group5_D3DIMSoultreeShadow.cpp` | `X87FloatToInt` |
+| `0x00483d40` | 4 | `samples/render/GridNodeNearMisses.cpp` (`GridMidCell`) | `X87FloatToInt`; its 4 other casts are retail `__ftol` calls |
+| `0x0048d1e0` | 2 | `src/bringup/Group4_ScoreBoard.cpp` | `X87FloatToInt` |
+| `0x0048d780` | 1 | `src/bringup/Group3_KrustyBikeAISupport.cpp` | `X87FloatToInt` |
+| `0x0048e3e0` | 3 | `src/krusty2/vehicle/KrustyBike.cpp` (`SelectRiderPose`) | `KbFloatToInt` |
+| `0x0049e4a0`, `0x0049e6b0`, `0x0049f1c0`, `0x0049f8d0` | 3, 9, 9, 9 | `src/bringup/Group4_GridLighting.cpp` | `X87FloatToInt`; the light colours stay casts, as retail's `__ftol` |
+| `0x004a8bf0`, `0x004a8c50` | 1, 2 | `samples/physics/motion/CharacterMotionStart.cpp`, `CharacterMotionBlend.cpp` | `FloatToInt` (`CharacterMotionFloatToInt.h`) |
+| `0x004a9050` | 4 | `src/bringup/Group3_KrustyBike.cpp` (`G3SampleMotion`) | `X87FloatToInt` |
+| `0x004bac60` | 2 | `src/bringup/Group1_ParticleRender.cpp` | `X87FloatToInt` |
+| `0x004db8c0`, `0x004dc2b0` | 2, 2 | `src/bringup/Group5_ProjectedShadow.cpp` | `X87FloatToInt` |
+| `0x004eab00` | 1 | `src/bringup/Group4_SceneTick.cpp` | `X87FloatToInt` |
+| `0x00507610` | 1 | `src/bringup/Group3_TerrainPrepareGeometry.cpp` | `X87FloatToInt` |
+| `0x00507c10` | 2 | `src/krusty2/broadphase/Terrain.cpp` (`QueryGround`; the `QueryGround` views forward to it) | `FloatToInt` |
+| `0x00509aa0` | 6 | `samples/physics/shadow/TerrainShadow.cpp` | `TerrainShadowFloatToInt` |
+| `0x00518f30` | 1 | `src/reconstructed/TrackOverlay.cpp` (`NameOverlay::Tick`) | `X87FloatToInt` |
+| `0x0051af00`, `0x0051b070` | 2, 1 | `src/bringup/Group4_Overlay.cpp` | `X87FloatToInt` |
+| `0x0052f570` | 6 | `src/bringup/Group4_Visibility.cpp` and `Group2_GridVisibilityTestBox.cpp` (`D3DIMShadowClipper::TestBox` forwards) | `X87FloatToInt` |
+
+`BikeFloatToInt`, `KbFloatToInt` and `TerrainShadowFloatToInt` correct an
+`__ftol` truncation to nearest-even. They ignore the x87 rounding mode.
+`X87FloatToInt` and the two `FloatToInt` helpers read it. No game code loads
+the control word: every `fldcw` in .text is in LIBCMT or in the uncalled
+`0x00548b60` span, which restores the word it saved. Round-to-nearest-even
+therefore stays the assumed mode, which is inference.
+`samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp` keeps slot 30's
+`(int)` casts as a matching sample, and it is not linked.
+
 ## What is needed next
 
 1. **Code that exists but does not match**: 455,939 near-miss bytes in 373
