@@ -8,7 +8,7 @@
 // The canonical headers are included exactly as KrustyBike.cpp includes them; the
 // TU-local helpers of KrustyBike.cpp that these bodies use are repeated here as statics.
 // Fn_00493660 and UpdateRiderPose now make the sample's calls: OrientationAxesFromAngles
-// (Group4_OrientationAxes.cpp), KbWheel::SetRollDistance, KbTrack::SelectLapGates (aliased
+// (src/reconstructed/OrientationAxes.cpp), KbWheel::SetRollDistance, KbTrack::SelectLapGates (aliased
 // to TrackGameViewOwner's) and the four-pose blend Character::Method_0x004a9050
 // (samples/physics/motion/CharacterMotionFourPose.cpp). The former private copies were
 // cdecl statics (linked 0.987 and 0.958; the sample scores 0.989 and 0.971). The sample is not linked as a whole: it

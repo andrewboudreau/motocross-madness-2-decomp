@@ -26111,8 +26111,8 @@ CASES = [
     },
     {
         'name': 'OrientationAxes.cpp 0x4b5d00 OrientationAxesFromAngles',
-        'bindings': 'samples/physics/helpers/OrientationAxes.bindings.json',
-        'source': 'samples/physics/helpers/OrientationAxes.cpp',
+        'bindings': 'src/reconstructed/OrientationAxes.bindings.json',
+        'source': 'src/reconstructed/OrientationAxes.cpp',
         'symbol': '?OrientationAxesFromAngles@@YAHPAUVector3@@0MMM@Z',
         'target_va': '0x004b5d00',
         'target_size': 274,
