@@ -123,6 +123,11 @@ Then the block distance `0x00481b30` and the direction-bit update
   counts from the range records (`ranges[block].end - ranges[block -
   1].end`), as `0x00481300` does. Subtracting the start locals gives a
   different register plan (395 of 438).
+- `0x00481300` steps a row counter and names the row offset, `int j =
+  row * 16;`, so VC6 adds `i + j` first and the table entry last, as
+  retail does. The `j += 16` loop of `0x0047ef80` and `0x00480ad0`, an
+  inline `row * 16` or any order of the three index terms load the table
+  entry first; a `row << 4` local is worse.
 - `0x00481a20` re-reads the block range through the draw data for each
   field. A range-pointer local turns the float copies into integer moves.
 - `0x004824c0` stores the 0x004815e0 result in a float local before passing
@@ -165,7 +170,6 @@ See the notes at the top of `samples/render/GriddrawNearMisses.cpp`:
 |---|---:|---|
 | `GridVertexCache::GetVertex` `0x0047de90` | 1069/1187 | x/z/index register assignment; the packed-word expression |
 | `0x0047e600` (node loader) | 1605/1617 | x87 operand order of the extent.x/extent.y products (the 0.1 test reads the extent through a reference) |
-| `0x00481300` (block walk) | 114/216 | child index term order |
 | `0x0047f210` (per-block rebuild) | 426/1586 | x/count-copy registers, frame slots, minY/maxY load order |
 | `0x004815e0` (detail update) | 64/1083 | the two axis deltas stay on the x87 stack across the branch in retail; VC6 stores them, which shifts the frame and keeps `push edi` in the prologue |
 | `0x00481de0` (visibility walk) | 143/1712 | `extent`/`a1` in ebp/ebx where retail keeps `size`, `a9` and `a1`; the subdivision block's placement |

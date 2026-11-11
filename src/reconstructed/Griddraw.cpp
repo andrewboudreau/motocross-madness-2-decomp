@@ -915,6 +915,41 @@ int DrawableGridNode::WalkSlot4Quadrants(int x, int z, int size, int quad)
     return 1;
 }
 
+// 0x00481300: one 4-cell block; draws it when it has geometry and
+// 0x00481a20 accepts it, then walks the child nodes unless this node's
+// buffers stand in for them. The row counter with a named `j = row * 16`
+// keeps (i + j) grouped (`lea ecx, [edi + ebp]`, then the table entry is
+// added); the `j += 16` loop of 0x0047ef80/0x00480ad0 makes VC6 load the
+// entry first and add i and j to it.
+int DrawableGridNode::WalkSlot4Block(int x, int z, int size, int quad)
+{
+    GridBlockRange* ranges = (GridBlockRange*)data->blockRanges;
+    if (ranges) {
+        int block = g_gridQuadOrder[quad];
+        int count;
+        if (block == 0)
+            count = ranges[0].end;
+        else
+            count = ranges[block].end - ranges[block - 1].end;
+        if (count != 0 && TestBlockFrustum(block))
+            RequestTextureSize(block);
+    }
+    if (children && !data->b0) {
+        for (int row = 0; row < 4; row++) {
+            int j = row * 16;
+            for (int i = 0; i < 4; i++) {
+                DrawableGridNode* child = (DrawableGridNode*)children[i + j + g_gridQuadCell[quad]];
+                if (child && child->childMask) {
+                    if (child->data->vertexCount != 0 && !child->data->b3)
+                        child->RequestTextureSize(-1);
+                    child->WalkSlot4Quadrants(0, 0, 16, 0);
+                }
+            }
+        }
+    }
+    return 1;
+}
+
 // 0x004813e0: compares the shared edges of each child with its right and
 // lower neighbour (height, curve index and vertex bit 7) and counts the
 // differences, which nothing reads. Retail recurses into children[row]

@@ -45,6 +45,14 @@
 // the return block lands after the first loop); a trailing `continue` or
 // `return 0` at the loop-body end (same); and the whole second loop plus the
 // upload inside `if (result == 0) { ... return 1; } return 0;` (462).
+// s21 (all 466/558 strict, 9 differing instructions; VC6 moves the shared
+// `return 0` to the end and keeps a plain `jg top` latch): `if (result)
+// goto failed;` after the first loop (unbraced, braced, `!= 0`) with the
+// second loop as `while` and `failed: return 0;` in its Blt arm or `if
+// (Blt) goto failed;`; a `for (;;) { if (sourceSide <= 0) break; ... }`
+// with the label in the Blt arm; tails with no extra code, `if (0) {
+// failed: return 0; }`, or `goto upload; failed: return 0; upload:`. More
+// matching bytes than the kept form but more differing instructions.
 
 #include <string.h>
 

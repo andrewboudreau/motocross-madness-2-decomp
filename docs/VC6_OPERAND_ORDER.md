@@ -448,8 +448,10 @@ where the product of the choices is large).
   (D3DIMSoulTree `0x00444140`, also unmoved by them, is exact with the
   centre sum written per component). D3DIMSoulTree slot 12 `0x00443aa0` reaches
   826/832 only with a different bracketing per matrix element.
-- Integer and address arithmetic never changed: Griddraw `0x00481300` and
-  `0x0047e430` (`a + (b + c)`, `(a + b) + c`, parenthesised terms),
+- Integer and address arithmetic never changed: Griddraw `0x00481300`
+  (exact only through a named `j = row * 16` row offset, not by any
+  operand order) and `0x0047e430` (`a + (b + c)`, `(a + b) + c`,
+  parenthesised terms),
   PCTextureMap `0x004c8550` (the imul order, 432 forms) and D3DIMSoulTree
   `0x00440d40` (`&p->groups[j]`, `p->groups + j`, `(p->groups) + j`). The
   parenthesis node matters for the x87 expressions only.

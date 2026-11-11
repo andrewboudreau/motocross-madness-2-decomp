@@ -6916,6 +6916,15 @@ CASES = [
         'reason': 'one notify flag shared by the set and clear paths',
     },
     {
+        'name': 'Griddraw 4-cell block walk 0x481300',
+        'bindings': 'src/reconstructed/Griddraw.bindings.json',
+        'source': 'src/reconstructed/Griddraw.cpp',
+        'symbol': '?WalkSlot4Block@DrawableGridNode@@QAEHHHHH@Z',
+        'target_va': '0x00481300',
+        'target_size': 215,
+        'reason': 'row counter with a named j = row * 16 keeps i + j grouped (lea) before the table entry is added',
+    },
+    {
         'name': 'RaceSound.cpp constructor 0x4e1fb0',
         'bindings': 'src/reconstructed/RaceSound.bindings.json',
         'source': 'src/reconstructed/RaceSound.cpp',

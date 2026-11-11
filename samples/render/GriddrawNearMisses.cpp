@@ -45,27 +45,6 @@
 // the 0.1 test or the terrain reload flips neither. See
 // docs/VC6_PATTERN_CORPUS.md section 6 (two indirect words).
 //
-// DrawableGridNode 0x00481300 (4-cell block walk, 216 bytes; 114 of 216):
-// retail forms the child index as `lea ecx,[edi+ebp]; add ecx,table[quad]`;
-// every order of the three terms gives VC6's `mov edx,table[quad];
-// add edx,edi; add edx,ebp`, the form retail itself uses in 0x0047ef80. Also
-// tried: a row counter times 16, `(j << 4)`, an `int cell = i + j` local
-// (with `+=` of the table entry), unsigned counters, `(&children[j + i])[..]`,
-// `(children + table[quad])[i + j]`, a local copy of `children` and an inline
-// child-lookup helper taking the cell index; all keep VC6's form. Redundant
-// parentheses do not change it either (144 bracketings and orders of the
-// three terms, with the 0x0047e430 edge index's 8 forms), nor 0x0047e600's
-// extent/centre products (512 + 125 forms).
-// Also unchanged: a `GridNode* (*)[16]` row view indexed `[r][...]`,
-// `(&children[i])[j + cell]`, `(children + i + j)[cell]` and inline child
-// lookups taking (cell, i + j), (i + j, cell), (i, j, cell) or (cell, i, j).
-// Session 19 (all 114 unless noted): a dead `g_gridQuadCell[quad] + 0` or
-// `* 2` local, five more index bracketings, i/j declared at the top (either
-// order) or at block scope, an `int* cell = &g_gridQuadCell[quad]` local
-// (block or top), a pointer-to-slot local; `GridNode** base = children +
-// table[quad]` 8, an `int cell` local 3 (block) or 2 (top), fully cast
-// repeated reads 8.
-//
 // DrawableGridNode 0x0047f210 (per-block buffer rebuild, 1576 bytes; 426 of
 // 1586): the calls, reallocations, copies and the bookkeeping after the loops
 // match in shape. VC6 here gives x edi and the triangle-count copy esi
@@ -136,8 +115,6 @@ static int g_gridRow17[18] = {
 };
 
 extern float g_gridDrawNormalScale;
-extern int g_gridQuadCell[16];
-extern int g_gridQuadOrder[16];
 extern int g_gridOriginX;
 extern int g_gridOriginZ;
 extern int g_gridExtraBytes;
@@ -349,45 +326,6 @@ allocated:
         }
     }
     return this;
-}
-
-
-// 0x00481300 (215 bytes): all but the child index match. Retail forms
-// `lea ecx, [edi + ebp]` (i + j) and adds the table entry; VC6 here loads
-// the entry and adds i and j to it, as retail itself does in the
-// WalkVisibleQuadrants loop (0x0047ef80). The seven orders of the three
-// terms, (i + j) parenthesised, a named `cell = i + j` or table local, the
-// pointer offset applied first or last, and unsigned i or j all compile the
-// same or worse (s14 batch 3).
-// 0x00481300: one 4-cell block; draws it when it has geometry and
-// 0x00481a20 accepts it, then walks the child nodes unless this node's
-// buffers stand in for them.
-int DrawableGridNode::WalkSlot4Block(int x, int z, int size, int quad)
-{
-    GridBlockRange* ranges = (GridBlockRange*)data->blockRanges;
-    if (ranges) {
-        int block = g_gridQuadOrder[quad];
-        int count;
-        if (block == 0)
-            count = ranges[0].end;
-        else
-            count = ranges[block].end - ranges[block - 1].end;
-        if (count != 0 && TestBlockFrustum(block))
-            RequestTextureSize(block);
-    }
-    if (children && !data->b0) {
-        for (int j = 0; j < 64; j += 16) {
-            for (int i = 0; i < 4; i++) {
-                DrawableGridNode* child = (DrawableGridNode*)children[i + j + g_gridQuadCell[quad]];
-                if (child && child->childMask) {
-                    if (child->data->vertexCount != 0 && !child->data->b3)
-                        child->RequestTextureSize(-1);
-                    child->WalkSlot4Quadrants(0, 0, 16, 0);
-                }
-            }
-        }
-    }
-    return 1;
 }
 
 

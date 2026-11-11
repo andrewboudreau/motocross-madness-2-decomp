@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 113, c 83, total 198. The three class (a) functions of the
+Counts: a 2, b 113, c 82, total 197. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -77,6 +77,12 @@ Griddraw.cpp: each arm assigns all four range values and the counts are differen
 the range records (`ranges[block].end - ranges[block - 1].end`), the form the sibling
 block walk `0x00481300` uses, not `- vertexStart`. That gives retail's eax zero and its
 esi/edi roles; about 90 placements of the zero initialisers had not.
+That block walk, DrawableGridNode::WalkSlot4Block `0x00481300` (class c, 121/216), is exact
+too, in Griddraw.cpp: the outer loop steps a row counter and names the row offset
+(`int j = row * 16;`), which keeps `i + j` grouped (`lea ecx, [edi + ebp] ; add ecx,
+table[quad]`). The `j += 16` loop its siblings `0x0047ef80` and `0x00480ad0` use, every
+order and bracketing of the three index terms and an inline `row * 16` all compile VC6's
+`mov edx, table[quad] ; add edx, edi ; add edx, ebp`; a `row << 4` local is worse.
 SoultreeObject::WorldToLocalDirection `0x004fd710` (class c, 203/205 masked) is exact too,
 in soultree.cpp: the copy is inverted with the same `InvertRigid` as its sibling
 WorldToLocalPoint, not transposed. VC6 drops the translation row that nothing reads, but
@@ -110,6 +116,12 @@ eliminates the tail call into retail's loop with the index in eax and gridX/grid
 compared through ecx/edx. A child local makes VC6 reload `children` (20/93), and the
 ~110 explicit walks stayed at 81. When retail loops where a sibling recursion was
 eliminated, try the recursive form with the sibling's spelling.
+Compiler flags (s21, `MCM2_EXTRA_FLAGS` of `tools/rank_near_misses.py`): EcoSystem `0x00456890` and `0x00457ed0`,
+Griddraw `0x0047e600`, CacheTexture `0x005102d0`, ResourceManager `0x004e9030`,
+TextService `0x0050ba00` and the FollowCamera constructor `0x00462ee0` are unchanged
+with `/G3`, `/G4`, `/G5`, `/Ox` or `/Ob2`, and unchanged or worse with `/Oy-`, `/Op`,
+`/QIfist`, `/Oa` or `/Ow`; `/G6` is worse (`0x00456890` 356 -> 260). In Git Bash set
+`MSYS_NO_PATHCONV=1`, or the `/` flags are rewritten into paths and silently ignored.
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
@@ -248,7 +260,6 @@ eliminated, try the recursive form with the sibling's spelling.
 | render/Griddraw | `0x0047de90` | 977/1083 (masked) | c | 30 code diffs: retail lacks `mov esi, [esp + N]`; `mov edi, [ebp*N + N]` vs `mov edi, [esp + N]` |
 | render/Griddraw | `0x0047e600` | 1605/1617 (masked) | c | frame matches; the extent.x/extent.y products load the cell size first (`fld [edx + 0x40] ; fmul [ecx + 0x164]`), retail the minimum ; the order follows which fields are read (+0x168 gives min-first, +0x164/+0x18 cell-first), not source order or parentheses (432 forms) |
 | render/Griddraw | `0x0047f210` | 361/543 (masked) | b | 29 code diffs: retail adds `xor esi, esi`; retail lacks `xor edi, edi`; slot order differs |
-| render/Griddraw | `0x00481300` | 121/216 (masked) | c | child index: `lea ecx, [edi + ebp] ; add ecx, table[quad]` vs `mov edx, table[quad] ; add edx, edi ; add edx, ebp` |
 | render/Griddraw | `0x004815e0` | 64/1083 | b | retail keeps both axis deltas on the x87 stack across the near/far branch (`fcom`, spilled in the arms) and pushes edi after the coarse return; VC6 stores them, which shifts the frame (the 65535 clamps now branch as retail) |
 | render/Griddraw | `0x00481de0` | 133/1616 (masked) | b | 85 code diffs: retail adds `mov ebx, [esp + N]`; retail adds `mov ebp, [esp + N]`; slots differ |
 | render/ManagedTextureGroup | `0x0050c960` | 17/227 (masked) | c | 5 code diffs: `sub esp, 0x80` vs `sub esp, 0x78`; `je @167` vs `je A` |

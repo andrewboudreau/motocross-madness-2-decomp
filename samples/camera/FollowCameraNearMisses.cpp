@@ -65,7 +65,8 @@
 // +0x29c copy (29 positions) is worse. All orders of the six statements
 // after the copy (720) or of the six before the slot-71 call (720) keep a
 // non-retail fill (526 at best, with more diffs); 0..33 dead int locals
-// change nothing.
+// change nothing. s21: `isSettled` as unsigned char instead of bool in
+// FollowCamera.h (probe only) changes nothing.
 //
 // FollowCamera::TrySettleOnPoint (0x00465000) is exact in src/reconstructed/FollowCamera.cpp.
 #include "../../src/reconstructed/FollowCamera.h"

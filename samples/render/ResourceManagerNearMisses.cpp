@@ -9,6 +9,15 @@
 // s20: a separate `result = archive` local returned at the end is copy-propagated
 // back into EBX (unchanged, 120 strict of 804). The archives append only in the
 // grown-storage branch is retail behavior (checked against 0x004e9030).
+// s21 (all 120 strict unless noted; the copy is propagated into EBX):
+// `archive = result = new`, `result = archive = new`, `result = new;
+// archive = result`, `result = 0` or `archive = 0` first, a reference
+// `UnknownTextureStream*& result = archive`, an inline NewArchive helper
+// (two forms) and a cast return. `if ((archive = new ...) != 0) result =
+// archive; else result = 0;` is worse (131/820); a dead `slot = &result`
+// is eliminated. Retail homes the ResourceItem temporary in the dead
+// `flags` argument slot ([esp + 0x2c]); QuarryStuntEvent 0x004de590 (also a
+// near miss) shows the same new-temporary homing.
 
 #include <string.h>
 #include "../../src/reconstructed/ResourceManager.h"
