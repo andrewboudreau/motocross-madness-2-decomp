@@ -760,7 +760,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
 
                 // Every control's settings.
                 char fontName[0x80];
-                parameters.GetString("FontName", defaultFontName, fontName, -1);
+                parameters.GetString("FontName", defaultFontName, isDefault ? defaultFontName : fontName, -1);
                 float height;
                 parameters.GetFloat("FontHeight", (float)defaultFontHeight, &height);
                 int size = (int)height;
