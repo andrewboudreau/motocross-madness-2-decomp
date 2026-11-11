@@ -1357,8 +1357,8 @@ retail protocol quirk.
 
 The third pass took the remaining bound linked bodies below a masked score of
 1.0, ranked by size times the missing score and weighted toward gameplay. It
-left out the bodies named under "Not emulated" above and the orchestration
-bodies that the call-record/replay cases cover. Each case is in
+left out pure Direct3D bodies and the orchestration bodies that the
+call-record/replay cases cover. Each case is in
 `tools/emu_cases/` and runs at both control words unless noted; runs count
 both control words. These agreed with retail in every run (runs in brackets):
 
