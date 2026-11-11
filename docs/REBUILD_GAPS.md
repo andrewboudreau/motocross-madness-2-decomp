@@ -448,9 +448,14 @@ contact near-miss bodies). Linked scores, before and after:
 | `ContactSolveImpulse` `0x005004a0` | 0.58 | 0.96 |
 
 It also flagged stand-ins with no sample: MorphBastard `ControllerAngles`
-(0.29) and Visibility `TestBox` (0.27). The ProjectedShadow bodies sit below
-their sample on purpose: the bring-up file rounds with `X87FloatToInt` and
-calls provided helpers instead.
+(0.29, now 0.93) and Visibility `TestBox` (0.27, now 0.49). The ProjectedShadow
+bodies sit below their sample on purpose: the bring-up file rounds with
+`X87FloatToInt` and calls provided helpers instead.
+
+Targets named only by `candidate_symbol_contains` in a `targets.json` are bound
+too when exactly one otherwise unbound linked symbol contains the substring.
+On main c31da12a (2026-11-11) the tool scores 2,683 functions (1,122,001 bytes);
+684,675 of those bytes score 1.000.
 
 ## What is needed next
 

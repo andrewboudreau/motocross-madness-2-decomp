@@ -91,6 +91,27 @@ def retail_sizes(root: Path = ROOT) -> dict[int, int]:
     return out
 
 
+def target_symbols(funcs, bindings, root: Path = ROOT) -> dict[str, int]:
+    """Linked symbol -> VA for targets.json entries named only by ``candidate_symbol_contains``.
+
+    Used only when exactly one unbound linked symbol contains the substring.
+    """
+    out: dict[str, int] = {}
+    for path in sorted((root / 'samples').rglob('targets.json')):
+        try:
+            data = json.loads(path.read_text(encoding='utf-8'))
+        except ValueError:
+            continue
+        for t in data if isinstance(data, list) else []:
+            sub = t.get('candidate_symbol_contains') if isinstance(t, dict) else None
+            if not sub or not t.get('target_va'):
+                continue
+            hits = {name for _, name, _ in funcs if sub in name and name not in bindings}
+            if len(hits) == 1:
+                out[hits.pop()] = int(t['target_va'], 16)
+    return out
+
+
 def body(pe: PEImage, va: int, size: int):
     insns = disassemble(read_va(pe, va, size), va)
     while insns and insns[-1].mnemonic in PAD:
@@ -144,6 +165,8 @@ def score_build(build: Path, retail: Path, min_size: int, strict: bool,
     built = PEImage(build / 'mcm2.exe')
     ret = PEImage(retail)
     bindings = load_bindings()
+    for symbol, va in target_symbols(funcs, bindings).items():
+        bindings.setdefault(symbol, set()).add(va)
     sizes = retail_sizes()
     index = {va: k for k, (va, _, _) in enumerate(funcs)}
 

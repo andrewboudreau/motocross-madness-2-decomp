@@ -1,7 +1,10 @@
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
 from tools.frame_layout import disassemble
-from tools.linked_accuracy import forward_target, parse_functions, similarity
+from tools.linked_accuracy import forward_target, parse_functions, similarity, target_symbols
 
 
 MAP = """\
@@ -21,6 +24,24 @@ class LinkedAccuracyTest(unittest.TestCase):
             (0x401010, '_memmove', 'LIBCMT:memmove.obj'),
             (0x401020, '??_EFoo@@UAEPAXI@Z', 'Foo.obj'),
         ])
+
+    def test_target_symbols_bind_only_unique_unbound_matches(self):
+        funcs = [(0x401000, '?Insert@QuadTree@@QAEXPAX@Z', 'A.obj'),
+                 (0x401010, '?Draw@Foo@@QAEXXZ', 'B.obj'),
+                 (0x401020, '?Draw@Bar@@QAEXXZ', 'B.obj'),
+                 (0x401030, '?Bound@Baz@@QAEXXZ', 'C.obj')]
+        bindings = {'?Bound@Baz@@QAEXXZ': {0x460000}}
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp) / 'samples' / 'x'
+            d.mkdir(parents=True)
+            (d / 'targets.json').write_text(json.dumps([
+                {'target_va': '0x4a0000', 'candidate_symbol_contains': 'Insert@QuadTree'},
+                {'target_va': '0x4a0100', 'candidate_symbol_contains': '?Draw@'},
+                {'target_va': '0x4a0200', 'candidate_symbol_contains': 'Bound@Baz'},
+                {'target_va': '0x4a0300'},
+            ]), encoding='utf-8')
+            got = target_symbols(funcs, bindings, Path(tmp))
+        self.assertEqual(got, {'?Insert@QuadTree@@QAEXPAX@Z': 0x4a0000})
 
     def test_forwarder_is_followed_but_real_body_is_not(self):
         # mov eax,[esp+8]; push eax; mov ecx,[esp+8]; push ecx; call 0x2000; add esp,8; ret
