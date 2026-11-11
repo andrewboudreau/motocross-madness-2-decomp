@@ -743,10 +743,10 @@ clearly more faithful, the game now links the sample's text:
 
   Their bring-up copies now use the sample's text for the functions listed
   below.
-- `src/bringup/Group4_OrientationAxes.cpp` includes the exact
-  `samples/physics/helpers/OrientationAxes.cpp` (0x004b5d00). This gives the
-  Scene readers and `KrustyBike` the retail function in place of private
-  copies. Which unit owns it is still unsettled (tier 3).
+- The exact `OrientationAxesFromAngles` (0x004b5d00) is now
+  `src/reconstructed/OrientationAxes.cpp`; the Scene readers and `KrustyBike`
+  link it in place of private copies. Which unit owns it is still unsettled
+  (tier 3); the file is named for the function.
 - `Character::Method_0x004a9050`, the four-pose blend that `UpdateRiderPose`
   calls on the rider and the bike, is a candidate sample
   ([below](#four-pose-motion-blend)); the bring-up reimplementation in
@@ -765,7 +765,7 @@ clearly more faithful, the game now links the sample's text:
   | 0x004328b0, 0x004329a0, 0x00432a20 | `CollisionObject` hull, sphere and capsule shapes taking `Vector3` | the `CollisionVec3` forms |
   | 0x00507c10, 0x00508970 | `UnknownEcoTerrain::QueryGround`, `GetHeightRange` | `Terrain` |
   | 0x0048fa60 | `UnknownBikeRaceRacer` constructor (0x1638 bytes) | `KrustyBike` |
-  | 0x004b5d00 | `OrientationAxesFromAngles` (`Vector3`/`int` and `Vec3`/`void` forms) | `Group4_OrientationAxes.cpp` |
+  | 0x004b5d00 | `OrientationAxesFromAngles` (`Vector3`/`int` and `Vec3`/`void` forms) | `src/reconstructed/OrientationAxes.cpp` |
   | 0x004fc050, 0x004fc740, 0x004fdab0, 0x004fb8c0 | `TreeSceneNode` axes, position, dirty mark, matrix | `SoultreeObject` (`SetAxesIn`, `SetPositionInFrame`, `MarkSubtreeDirty`, `SetMatrixIn`) |
   | 0x004fc690 | `SoultreeObject::TranslateIn` taking `Vector3` | the `Vec3` form |
   | 0x00505600 | `Grid1Terrain::AcquireOwnedObject` | `Terrain::AcquireOwnedObject` |
@@ -848,6 +848,52 @@ differences are:
 - the debug tag strings, because `__FILE__` is now the build path;
 - `Vegetation::TestDistance`, which reads the shared detail band pointer
   that `EcoSystem.cpp` sets instead of recomputing it.
+
+## Bring-up bodies at masked 1.000
+
+Every linked body that a `src/bringup/` object provides and that scores at
+least 0.99 masked was checked for a strict match and for a registration
+(calibration case or any `targets.json`) at its VA. No strict-exact bring-up
+body was unregistered:
+
+- Most masked-1.000 rows (the Track, Tire, Shock, soultree, PCAudio and
+  similar views) are forwarders. `linked_accuracy.py` follows them to a
+  canonical provider that is already registered exact.
+- `CreateRacers` (0x00419970), `GatherModelTriangles` (0x0042c260),
+  `EcoSystem::WriteListing` (0x00458da0) and `ChatOverlay::Setup`
+  (0x0051cf80) score 1.000 masked but only 0.964-0.996 strict. Their
+  registers or frame offsets differ, so they remain near-miss work. Every
+  unregistered body between 0.99 and 1.000 masked is likewise below 1 strict.
+- Bring-up bodies that duplicated a strict-exact canonical body now link the
+  canonical one, through `link_aliases`:
+
+  | Retail | View name | Provider | Retired stand-in |
+  |---|---|---|---|
+  | 0x004b5d00 | `OrientationAxesFromAngles` | `src/reconstructed/OrientationAxes.cpp` (promoted from samples) | `Group4_OrientationAxes.cpp` |
+  | 0x00513560 | `KbWheel::SetRollDistance` | `Tire::SetRollDistance` | body in `Group3_KrustyBikeAISupport.cpp` |
+  | 0x004b8d90 | `VehicleImpactSink::SetPosition(Vec3, float)` | `DustParticleEmitter::SetPosition` | body in `Group3_VehicleStubs.cpp` |
+  | 0x004b9dc0 | `VehicleImpactSink::SetPosition(Vec3)` | `SparkParticleEmitter::SetPosition` | body in `Group3_VehicleStubs.cpp` |
+  | 0x004baa50 | `UnknownWreckerParticles::AddParticle` | `ParticleManager::AddParticle` | `Group1_WreckerParticles.cpp` |
+  | 0x004a23a0 | `BikeA60C` constructor | `MovingPart(const char*, SoultreeObject*, int)` | `Group2_BikeA60C.cpp` |
+
+  Each stand-in's bytes equalled the provider's apart from relocations, and
+  the linker already folded each pair (`/OPT:ICF`). The argument dwords and
+  the `ret` count agree, and neither side adjusts `this`. Every linked score
+  is unchanged. An alias binds a call to the code at one retail address. It
+  does not prove that the receivers have the same class: the `Vec3` setter
+  receiver is still unresolved
+  ([particle emitters](PARTICLE_EMITTER_CONNECTIONS.md#excluded-mixed-receiver)).
+- The other bring-up bodies that match a registered exact body (masked) are
+  left in place:
+  - the compiler-generated `??_GInfoType` (0x0044d720);
+  - stubs of 13 bytes or fewer, where a shared address alone does not prove
+    identity: 0x00464e90, 0x00478fe0, 0x004624d0, 0x004de270, 0x004500d0,
+    0x00499ae0 and 0x00523c80;
+  - bodies in files covered by other work:
+    - `Group2_OverlayText.cpp` (`CharacterCell::GetRect`);
+    - `Group2_ManagedTextureGroup.cpp` (the `PeakHold` pair and
+      `ContainerList::Reserve`);
+    - the `Vec3` helpers in `Group3_KrustyBikeAI.cpp`.
 
 ## Low-scoring linked bodies audited against retail
 
