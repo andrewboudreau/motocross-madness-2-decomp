@@ -214,9 +214,18 @@ public:
     int editBufferSize;                       // +0x7f5c: its size
 };
 
-// RTTI: DemoDlg : UIDialog (vtable 0x00550e18; 0x7f58 bytes).
+// RTTI: DemoDlg : UIDialog (vtable 0x00550e18; 0x7f58 bytes): the overlay
+// over a demo replay. BikeRace::Create (0x00417ed0, bikerace.cpp line 0x2fb)
+// allocates 0x7f58 bytes for it when it plays a replay with KrustyUI's
+// playingDemo set, calls UIDialog(1, "credits.dtm") and writes the vtable
+// (0x00419329), so its constructor is inline. Its destructor is the folded
+// implicit one (scalar deleting wrapper 0x0049bdb0).
 class DemoDlg : public UIDialog {
 public:
+    // Defined in DemoDlg.h: any inline body in this header, even unused,
+    // changes VC6's code for FillFileList 0x004f17a0 (SelectGamePicProcs.cpp
+    // includes this header); a declaration does not.
+    inline DemoDlg();
     void HandleEvent(UnknownDialogEvent* event); // 0x00455a10
     virtual int Tick(float frameTime);                    // 0x00455b20
     virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00455ae0
