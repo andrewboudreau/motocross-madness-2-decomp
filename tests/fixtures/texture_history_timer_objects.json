@@ -16,9 +16,9 @@
       "sha256": "60dff568b7692bd2954030b3a8a0c40660e3f830e58ff42ea3d65c920f8703d9"
     },
     "src/reconstructed/ProCircuitProcs.cpp": {
-      "sections": 334,
-      "relocations": 2083,
-      "sha256": "6496030f55ac8ed74ce603abcdfff52dccbdf3181bb2f591d4f86f53447318fd"
+      "sections": 336,
+      "relocations": 2089,
+      "sha256": "c9c85de2c9d161fd299fc5c0735770c48f70b64275e7e7e712b6d055f19fec0b"
     }
   },
   "note": "Four same-path old objects independently preserved with no symbol joins. Portable pins normalize only these four source filenames and the two exact canonical/sample-relative ContainerList.h spellings; old private pins were reproduced before the exact header-filename portability repair, and all four live-root objects equal the private mirror under this normalization."

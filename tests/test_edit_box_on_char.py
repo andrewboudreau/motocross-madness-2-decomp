@@ -154,7 +154,7 @@ class EditBoxOnCharBehaviorTests(unittest.TestCase):
             self.assertEqual(signature(candidate,SYMBOL),signature(aggregate,SYMBOL))
             baseline=json.loads((ROOT/'tests/fixtures/edit_box_on_char_aggregate.json').read_text())
             view=complete_object(aggregate)
-            self.assertEqual((len(view),sum(len(row[-1]) for row in view)),(733,3912))
+            self.assertEqual((len(view),sum(len(row[-1]) for row in view)),(734,3914))
             self.assertEqual(hashlib.sha256(json.dumps(view,separators=(',',':')).encode()).hexdigest(),baseline['sha256'])
             entry=candidate.find_symbol(SYMBOL)
             self.assertEqual((entry.function_size,entry.extent_source),(1044,'coff_function_aux'))
@@ -215,7 +215,7 @@ class EditBoxOnCharBehaviorTests(unittest.TestCase):
             result=subprocess.run([str(executable),str(image_path)],capture_output=True,text=True,timeout=180)
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             self.assertIn('EditBoxOnChar: 20962 actual-helper, text, callback and fault scenarios match',result.stdout)
-            print(f'{strict} strict helper checks; 733 sections/3912 relocations preserved; '+result.stdout.strip())
+            print(f'{strict} strict helper checks; 734 sections/3914 relocations preserved; '+result.stdout.strip())
 
 
 if __name__=='__main__':

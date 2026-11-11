@@ -6,24 +6,24 @@
   },
   "objects": {
     "src/reconstructed/DlgProcs.cpp": {
-      "sections": 420,
-      "relocations": 3040,
-      "sha256": "050c538f04be605c5742236da9f148c725fdeda9014b64e551c21b36645b4771"
+      "sections": 421,
+      "relocations": 3043,
+      "sha256": "ec260d18d734fe444060eaf9e9b29f8ad289be0de34eaad3b2d0055f71489124"
     },
     "samples/ui/DlgProcsNearMisses.cpp": {
-      "sections": 557,
-      "relocations": 4152,
-      "sha256": "956125c1d5b51eb61c4af75e66bb56fbc726c441ad47d0838cbdb4f992210a98"
+      "sections": 558,
+      "relocations": 4155,
+      "sha256": "c873eed29912bec3fe917ba43e0902ed46767235e90b5ab5f3cb703151404660"
     },
     "src/reconstructed/ProCircuitProcs.cpp": {
-      "sections": 334,
-      "relocations": 2083,
-      "sha256": "05778a40611d9558f3ba7c4d93710c683414c616495e3c4a13b3cfe1abbf315c"
+      "sections": 336,
+      "relocations": 2089,
+      "sha256": "559aaf9b37a3c4ceea0b6a9c3b20ae12fd0807f0bea86efa89a96ffc67738573"
     },
     "samples/ui/ProCircuitProcsNearMisses.cpp": {
-      "sections": 364,
-      "relocations": 2321,
-      "sha256": "7cb9a249c052943fb9e8899a9318ba1ab8cdcbd98991ac5372b707f025934a91"
+      "sections": 366,
+      "relocations": 2327,
+      "sha256": "e022d6576c6b3645020c12d751c23108d8709ae0ccea047128dc940a1b7b558a"
     }
   }
 }

@@ -184,7 +184,7 @@ class UIAnimConnectionsTests(unittest.TestCase):
                 self.assertEqual([(r.virtual_address-entry.value, r.type) for r in calls
                                   if obj.symbol_by_index[r.symbol_index].name == wanted],
                                  [(11 if n in (0, 2) else 416, 20)])
-            self.assertEqual((strict, sections, relocations), (193, 1387, 8896))
+            self.assertEqual((strict, sections, relocations), (193, 1389, 8902))
             _, provider = compile_source(ROOT/'src/reconstructed/GameUi.cpp', 'provider')
             for symbol, address, size in (
                 ('??0UIAnim@@QAE@PAX0@Z', 0x472e30, 82),

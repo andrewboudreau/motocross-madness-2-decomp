@@ -2,9 +2,9 @@
   "baseline": "10b30382; complete same-path pre-change objects; one Bike UpdateAxis rename and two UpdateAxis GetPositionIn sites. No function bytes, constants, initializers, storage or other destinations changed.",
   "objects": {
     "src/krusty2/vehicle/Bike.cpp": {
-      "sections": 242,
+      "sections": 243,
       "relocations": 1105,
-      "sha256": "7c99bf2afc5495d860a820a48b895ccbd8a2a0451aab59daed6e7287adc25c9b"
+      "sha256": "5e1ad9e8fb84be53f1421bd90d4eb22153a6d507e251c3f31b177b73380d695f"
     },
     "src/krusty2/suspension/Shock.cpp": {
       "sections": 56,

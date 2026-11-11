@@ -107,19 +107,19 @@
       "samples/ui/DlgProcsNearMisses.cpp",
       "?CreateProfile@@YAXPAUUnknownDialogEvent@@@Z",
       1130,
-      "5867c1603fb6cc1f097dc9ff820501ddad407dc537f8c28660b0c166d8983376"
+      "06cbf92f95f76e3109412b9183f5d045957f30ea0784e10e9078999faadb1f17"
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
       "?LeaveMenusForRace@@YAXXZ",
       1076,
-      "670ad6c72a32ee9e419ff9d0b355e6bf363e225b550cfd6b56a9cf4ccf2a3f24"
+      "3e3587e5a9f561bd0b73029dd089a9f9df229bf89a7ca3c7094ba8f15266f87f"
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
       "?HandleEvent@MainDlg@@UAEXPAUUnknownDialogEvent@@@Z",
       5292,
-      "7c5a0129399df494ecccc2a3df70980b69bbeb0b1ac82186cb57cd25c2e07407"
+      "8bd0a24e6e373073f822a04a905e972bd8986812f3ebcdeccb358c9f5c5edbb4"
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
@@ -131,13 +131,13 @@
       "samples/ui/DlgProcsNearMisses.cpp",
       "?HandleEvent@SPRaceInfoDlg@@UAEXPAUUnknownDialogEvent@@@Z",
       1652,
-      "b03b4306c0156db805a02a01b4e148acaa63d7419f272cda6a7e834e790df5a6"
+      "631722bee7b25ac5e38fa67d9d9e63bb94265402a5151d138e0fe285b454c7ed"
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
       "?HandleEvent@MPRaceInfoDlg@@UAEXPAUUnknownDialogEvent@@@Z",
       2004,
-      "c83fc28d39a4333562796bee91f231c307e9e5e90d94bfaca2d8c012933236fa"
+      "60e8b7061e1b67b637184034d1431c1162e7ecfe95c3d360a8e0e4e63c32eaaf"
     ],
     [
       "samples/race/RaceSoundNearMisses.cpp",

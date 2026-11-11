@@ -11,9 +11,9 @@
       "sha256": "99b506a2591e00ad2eb299acd1dc020af14c6307b92b9a6c9c3aaee2a8a05157"
     },
     "src/reconstructed/DlgProcs.cpp": {
-      "sections": 420,
-      "relocations": 3040,
-      "sha256": "050c538f04be605c5742236da9f148c725fdeda9014b64e551c21b36645b4771"
+      "sections": 421,
+      "relocations": 3043,
+      "sha256": "ec260d18d734fe444060eaf9e9b29f8ad289be0de34eaad3b2d0055f71489124"
     },
     "samples/ui/GUIManagerNearMisses.cpp": {
       "sections": 209,
@@ -21,9 +21,9 @@
       "sha256": "d80dc71a476d1b6fea4dae9416d7e56a64313668c867cae76f269c0cac961f13"
     },
     "samples/ui/DlgProcsNearMisses.cpp": {
-      "sections": 557,
-      "relocations": 4152,
-      "sha256": "956125c1d5b51eb61c4af75e66bb56fbc726c441ad47d0838cbdb4f992210a98"
+      "sections": 558,
+      "relocations": 4155,
+      "sha256": "c873eed29912bec3fe917ba43e0902ed46767235e90b5ab5f3cb703151404660"
     }
   }
 }

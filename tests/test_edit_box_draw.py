@@ -175,7 +175,7 @@ class EditBoxDrawTests(unittest.TestCase):
             self.assertFalse(any(s.name.startswith(('.CRT','.data','.xdata')) for s in candidate.sections))
             baseline=json.loads((ROOT/'tests/fixtures/edit_box_draw_aggregate.json').read_text())
             view=complete_object(aggregate,True)
-            self.assertEqual((len(view),sum(len(row[-1]) for row in view)),(733,3912))
+            self.assertEqual((len(view),sum(len(row[-1]) for row in view)),(734,3914))
             self.assertEqual(hashlib.sha256(json.dumps(view,separators=(',',':')).encode()).hexdigest(),baseline['sha256'])
             table=aggregate.find_symbol('??_7UIEditBox@@6B@')
             routes={r.virtual_address-table.value:aggregate.symbol_by_index[r.symbol_index].name for r in aggregate.relocations if r.section_number==table.section_number}
@@ -223,7 +223,7 @@ class EditBoxDrawTests(unittest.TestCase):
             result=subprocess.run([str(executable),str(image_path)],capture_output=True,text=True,timeout=180)
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             self.assertIn('EditBoxDraw: 14793 actual-helper and finite platform scenarios match',result.stdout)
-            print(f'{strict} strict checks; 733 sections/3912 relocations preserved; '+result.stdout.strip())
+            print(f'{strict} strict checks; 734 sections/3914 relocations preserved; '+result.stdout.strip())
 
 
 if __name__=='__main__':

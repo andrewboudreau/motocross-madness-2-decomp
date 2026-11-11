@@ -124,7 +124,7 @@ class MultiStateDrawTests(unittest.TestCase):
             expected=set(json.loads(SOURCE.with_suffix('.bindings.json').read_text()))-{SYMBOL}|{'__fltused'}
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0},expected)
             pin=json.loads((ROOT/'tests/fixtures/multi_state_draw_aggregate.json').read_text());view=complete_object(aggregate,True)
-            self.assertEqual((len(view),sum(len(r[-1])for r in view)),(733,3912))
+            self.assertEqual((len(view),sum(len(r[-1])for r in view)),(734,3914))
             self.assertEqual(hashlib.sha256(json.dumps(view,separators=(',',':')).encode()).hexdigest(),pin['sha256'])
             table=aggregate.find_symbol('??_7UIMultiState@@6B@')
             routes={r.virtual_address-table.value:aggregate.symbol_by_index[r.symbol_index].name for r in aggregate.relocations if r.section_number==table.section_number}
@@ -172,7 +172,7 @@ class MultiStateDrawTests(unittest.TestCase):
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             self.assertIn('MultiStateDraw: 16181 actual-helper scenarios match; reached 35 callback sites',result.stdout)
             self.assertEqual(strict,37)
-            print(f'MultiStateDraw: {strict} strict;733 sections/3912 relocations; '+result.stdout.strip())
+            print(f'MultiStateDraw: {strict} strict;734 sections/3914 relocations; '+result.stdout.strip())
 
 
 if __name__=='__main__':unittest.main()

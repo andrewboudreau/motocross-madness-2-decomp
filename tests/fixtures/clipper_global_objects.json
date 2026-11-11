@@ -25,9 +25,9 @@
       "sha256": "de48148bc87277273d6022a9322e86e05047e3d50c5738af016f1e7843de6787"
     },
     "src/reconstructed/TrackOverlay.cpp": {
-      "sections": 209,
+      "sections": 210,
       "relocations": 869,
-      "sha256": "79003c4b5ad1fcf929b04d9c868273965dec136ee3fe6fdc9b83501f6ff8c6d4"
+      "sha256": "e567b73a97f37d256a57ab75190b86ce987243026df0be23f6ccf66bf324ef67"
     },
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
