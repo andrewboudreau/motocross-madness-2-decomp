@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from tools.frame_layout import disassemble
-from tools.linked_accuracy import forward_target, parse_functions, similarity, target_symbols
+from tools.linked_accuracy import drop_tables, forward_target, parse_functions, similarity, target_symbols
 
 
 MAP = """\
@@ -58,6 +58,17 @@ class LinkedAccuracyTest(unittest.TestCase):
         # a by-value argument copied through `mov ecx, esp` still forwards
         byval = disassemble(bytes.fromhex('83ec0c' '8bcc' '8b442410' '8901' 'e8f00f0000' 'c3'), 0x1000)
         self.assertEqual(forward_target(byval), 0x2000)
+
+    def test_switch_tables_after_the_code_are_not_decoded(self):
+        # xor ecx,ecx; mov cl,[eax+0x1014]; jmp [ecx*4+0x1010]; ret; then the jump table at 0x1010
+        # and a byte index table, whose absolute entries differ in a relinked body.
+        code = bytes.fromhex('33c9' '8a8814100000' 'ff248d10100000' 'c3') + \
+            bytes.fromhex('0f100000') + bytes.fromhex('00000000')
+        insns = drop_tables(disassemble(code, 0x1000))
+        self.assertEqual([x.mnemonic for x in insns], ['xor', 'mov', 'jmp', 'ret'])
+        # a global array displacement outside the body is not a table
+        load = disassemble(bytes.fromhex('8b048d00305000' 'c3'), 0x1000)
+        self.assertEqual(drop_tables(load), load)
 
     def test_similarity_masks_frame_registers_and_ebp_frames(self):
         esp_frame = disassemble(bytes.fromhex('8b442404' 'c3'), 0)          # mov eax,[esp+4]; ret

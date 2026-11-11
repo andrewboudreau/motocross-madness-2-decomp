@@ -112,8 +112,30 @@ def target_symbols(funcs, bindings, root: Path = ROOT) -> dict[str, int]:
     return out
 
 
+TABLE_OPERAND = re.compile(r'\[[^\]]*\+ (0x[0-9a-f]+)\]')
+
+
+def drop_tables(insns):
+    """Cut a body at its first switch table (``jmp [reg*4 + T]``, ``mov cl, [eax + T]``).
+
+    VC6 places jump and byte-index tables after the code, inside the function's
+    extent. Decoded as instructions they are noise, and their absolute entries
+    differ between retail and a relinked body, so they would lower the score of
+    an exact switch."""
+    if not insns:
+        return insns
+    start, end = insns[0].address, insns[-1].address + insns[-1].size
+    tables = [int(m.group(1), 16) for x in insns if x.mnemonic in ('jmp', 'mov', 'movzx')
+              for m in [TABLE_OPERAND.search(x.op_str)] if m]
+    tables = [t for t in tables if start < t < end]
+    if not tables:
+        return insns
+    cut = min(tables)
+    return [x for x in insns if x.address < cut]
+
+
 def body(pe: PEImage, va: int, size: int):
-    insns = disassemble(read_va(pe, va, size), va)
+    insns = drop_tables(disassemble(read_va(pe, va, size), va))
     while insns and insns[-1].mnemonic in PAD:
         insns.pop()
     return insns
