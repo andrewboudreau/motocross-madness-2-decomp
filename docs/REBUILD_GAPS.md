@@ -459,28 +459,28 @@ On main c31da12a (2026-11-11) the tool scores 2,683 functions (1,122,001 bytes);
 
 ## What is needed next
 
-1. **Code that exists but does not match**: 455,939 near-miss bytes in 373
-   functions (largest: BikeRace `0x00419970`, 13 KB; GameUi `0x0046a920`,
-   16 KB to padding; D3DIMSoulTree `0x00440f30`, 7.9 KB; QuarryStuntEvent
-   `0x004de590`). See [NEAR_MISS_INDEX](NEAR_MISS_INDEX.md).
-2. **No registration**: 17,857 bytes in 17 ranges (table above); the five
-   BVH routines between bmpfile.cpp and BoundingBoxTreeBuild.cpp hold 12.8 KB
-   and KrustyBike `0x0048eea0` 2.9 KB of it. Every range over 16 bytes is
-   registered since (BoxOverlap and Wrecker `0x00532580` strict exact, the
-   rest near misses).
-3. **Promotion**: 51,969 strict-exact bytes live only in `samples/` (six retail
-   units and 15 classes have no canonical source).
+1. **Code that exists but does not match**: 343,763 near-miss bytes in 199
+   registered functions (summary table; largest BikeAI `0x0040eca0`, 17.6 KB,
+   and BikeRace `0x00419970`, 13 KB). See [NEAR_MISS_INDEX](NEAR_MISS_INDEX.md).
+   The linked bodies of these functions are what the game runs; the accuracy
+   audit above ranks the ones whose code differs most from retail.
+2. **No registration**: 5 ranges, 129 bytes; only `0x00423ef0..0x00423f6d` in
+   BlockAllocator.cpp exceeds 16 bytes.
+3. **Promotion**: 2,027 strict-exact bytes (inline COMDAT helpers and layout
+   probes) live only in `samples/`.
 4. **Unit layout**: whole-object matching per retail unit (function order,
-   COMDAT and `.text$x` placement), merging the 27 `src/` files that do not fit
+   COMDAT and `.text$x` placement), merging the `src/` files that do not fit
    the alphabetical link order into their owning units, and naming the units
    between known extents.
-5. **Inline assembly**: decide on the 31 functions above.
+5. **Inline assembly**: decide on the functions above.
 6. **Libraries**: LIBCMT is pinned; the 5,813 unlabeled LIBCMT-span bytes
    still need member identification, the 2,722-byte x87 block at
    `0x00548b60` a provider, and the DirectX 7-era `dinput.lib` and the
    `blade.dll` import library a source.
-7. **Link**: no linked image has been produced; link order (alphabetical
-   objects, then the library order above) is inferred, not tested.
+7. **Link**: `tools/build_game.py` links a runnable image
+   ([GAME_BUILD](GAME_BUILD.md)), but not in retail's layout: link order
+   (alphabetical objects, then the library order above) is inferred, and the
+   image is not byte-identical.
 
 ## Data, resources and link settings
 
