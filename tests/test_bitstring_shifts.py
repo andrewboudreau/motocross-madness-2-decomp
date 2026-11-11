@@ -22,7 +22,7 @@ FIXTURE = 'tests/fixtures/bitstring_shifts_compare.cpp'
 MASK = '?g_WordHighBitMasks@@3PAIA'
 TARGETS = (
  ('?ShiftBitsTowardFront@GR_BitString@@QAEXH@Z',0x4239c0,420,420,343,(0x423b48,0x423b61)),
- ('?ShiftBitsTowardBack@GR_BitString@@QAEXH@Z',0x423b70,442,438,93,(0x423d0c,0x423d27)),
+ ('?ShiftBitsTowardBack@GR_BitString@@QAEXH@Z',0x423b70,442,442,387,(0x423d0c,0x423d27)),
 )
 
 def object_fingerprint(obj, renames=None):
@@ -109,7 +109,7 @@ class BitStringShiftsTests(unittest.TestCase):
             # sections, flags, bytes, relocation addends and destinations are kept.
             self.assertEqual(object_fingerprint(objects[AGGREGATE]),{
                 'sections':22,'relocations':38,
-                'sha256':'6d028d9205380f5cd155622d9ff1e2fcc6710e08ad211eda990b8d6625243af0'})
+                'sha256':'fdf01992b932c42d773a3aed1eacad7ff64f3b31775f8f26cc3ae32116401f5b'})
             candidate=objects[SOURCE]
             self.assertEqual({s.name for s in candidate.symbols if s.section_number==0},{MASK})
             self.assertEqual({s.name for s in candidate.symbols if s.section_number>0 and s.storage_class==2},

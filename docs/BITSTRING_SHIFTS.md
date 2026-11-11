@@ -10,10 +10,10 @@ ownership is unproven. No assembly or retail dispatch is used in production.
 | Method | Retail VA | Complete retail bytes | Candidate bytes | Resolved matching positions |
 |---|---:|---:|---:|---:|
 | `ShiftBitsTowardFront(int)` | `0x004239c0` | 420 | 420 | 343 |
-| `ShiftBitsTowardBack(int)` | `0x00423b70` | 442 | 438 | 93 |
+| `ShiftBitsTowardBack(int)` | `0x00423b70` | 442 | 442 | 387 |
 
-Both bodies are unchanged from `GR_BitStringNearMisses.cpp`, which now includes
-the standalone source. Authentic VC6 SP3 `vc6_o2_mt` produces the same complete
+Both bodies are compiled through `GR_BitStringNearMisses.cpp` too, which
+includes the standalone source. Authentic VC6 SP3 `vc6_o2_mt` produces the same complete
 function bytes and relocation records in either context. The same-path aggregate
 before and after extraction preserves all 22 nondebug sections and 38 relocations,
 including flags, payloads, addends and destinations; no filename normalization or
