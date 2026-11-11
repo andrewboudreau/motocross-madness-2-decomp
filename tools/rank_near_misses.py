@@ -262,6 +262,8 @@ def compile_one(root: Path, vc6_root: str, cpp: Path, obj: Path) -> str | None:
     rel = cpp.resolve().relative_to(root).as_posix()
     if 'krusty2' in rel or rel.startswith('samples/physics/') or cpp.resolve() in physics_sources(root):
         cmd += ['--include', str(root / 'src/krusty2')]
+    elif rel.startswith('src/bringup/'):    # the game build's include path (config/game_build.json)
+        cmd += ['--include', str(root / 'src/krusty2'), '--include', str(root / 'src/reconstructed')]
     env = dict(os.environ, PYTHONPATH=str(root))
     p = subprocess.run(cmd, capture_output=True, text=True, encoding='latin-1', env=env, cwd=root)
     if p.returncode or not obj.exists():

@@ -8,9 +8,16 @@
 //
 // All strides are in pixels, as in Pixtrans.h.
 // Re-checked against the retail disassembly on 2026-11-11: masks, shifts, rounding
-// constants, loop bounds and the source/destination steps of every path agree. The
-// remaining linked-accuracy gap is code shape (retail unrolls the four keyed pixels;
-// Convert555To8Fast is inline assembly in retail).
+// constants, loop bounds and the source/destination steps of every path agree.
+// Audited again for the linked game (same day): no behavioural difference in any of
+// the three paths of either halver. The keyed path is now written out per pixel as
+// retail has it (the lower pair is read before the first key test, then the upper
+// pair in one reused `pixel`), which moved the linked score of both halvers from
+// 0.58 to 0.71. The rest is code shape this C cannot give: the packed (filter & 1) inner
+// loop is inline assembly in retail (its accumulator lives in sourceStride's
+// argument slot, `mov [ebp+0x1c], 0; add [ebp+0x1c], ebx`, and it counts down with
+// `dec [ebp+0x24]`), which also gives the whole body an ebp frame, so every other
+// path allocates registers without ebp. Convert555To8Fast is inline assembly too.
 #include "Pixtrans.h"
 
 // The two 16-bit halvers share one shape; only the channel layout differs.
@@ -61,19 +68,33 @@ int Halve555(void* destination, void* source, int width, int height, int destina
             unsigned short* from = sourceRow;
             unsigned short* to = row;
             for (int x = 0; x < width; x++) {
-                unsigned short pixels[4];
-                pixels[0] = from[0];
-                pixels[1] = from[1];
-                pixels[2] = from[sourceStride];
-                pixels[3] = from[sourceStride + 1];
                 int count = 0, red = 0, green = 0, blue = 0;
-                for (int i = 0; i < 4; i++) {
-                    unsigned int p = pixels[i];
-                    if (p == key)
-                        continue;
-                    red += (p >> 7) & 0xf8;
-                    green += (p >> 2) & 0xf8;
-                    blue += (p & 0x1f) << 3;
+                unsigned short lowerLeft = from[sourceStride];
+                unsigned short lowerRight = from[sourceStride + 1];
+                unsigned short pixel = from[0];
+                if (pixel != key) {
+                    red += (pixel >> 7) & 0xf8;
+                    green += (pixel >> 2) & 0xf8;
+                    blue += (pixel & 0x1f) << 3;
+                    count++;
+                }
+                pixel = from[1];
+                if (pixel != key) {
+                    red += (pixel >> 7) & 0xf8;
+                    green += (pixel >> 2) & 0xf8;
+                    blue += (pixel & 0x1f) << 3;
+                    count++;
+                }
+                if (lowerLeft != key) {
+                    red += (lowerLeft >> 7) & 0xf8;
+                    green += (lowerLeft >> 2) & 0xf8;
+                    blue += (lowerLeft & 0x1f) << 3;
+                    count++;
+                }
+                if (lowerRight != key) {
+                    red += (lowerRight >> 7) & 0xf8;
+                    green += (lowerRight >> 2) & 0xf8;
+                    blue += (lowerRight & 0x1f) << 3;
                     count++;
                 }
                 unsigned short out = key;
@@ -146,19 +167,33 @@ int Halve565(void* destination, void* source, int width, int height, int destina
             unsigned short* from = sourceRow;
             unsigned short* to = row;
             for (int x = 0; x < width; x++) {
-                unsigned short pixels[4];
-                pixels[0] = from[0];
-                pixels[1] = from[1];
-                pixels[2] = from[sourceStride];
-                pixels[3] = from[sourceStride + 1];
                 int count = 0, red = 0, green = 0, blue = 0;
-                for (int i = 0; i < 4; i++) {
-                    unsigned int p = pixels[i];
-                    if (p == key)
-                        continue;
-                    red += (p >> 8) & 0xf8;
-                    green += (p >> 3) & 0xfc;
-                    blue += (p & 0x1f) << 3;
+                unsigned short lowerLeft = from[sourceStride];
+                unsigned short lowerRight = from[sourceStride + 1];
+                unsigned short pixel = from[0];
+                if (pixel != key) {
+                    red += (pixel >> 8) & 0xf8;
+                    green += (pixel >> 3) & 0xfc;
+                    blue += (pixel & 0x1f) << 3;
+                    count++;
+                }
+                pixel = from[1];
+                if (pixel != key) {
+                    red += (pixel >> 8) & 0xf8;
+                    green += (pixel >> 3) & 0xfc;
+                    blue += (pixel & 0x1f) << 3;
+                    count++;
+                }
+                if (lowerLeft != key) {
+                    red += (lowerLeft >> 8) & 0xf8;
+                    green += (lowerLeft >> 3) & 0xfc;
+                    blue += (lowerLeft & 0x1f) << 3;
+                    count++;
+                }
+                if (lowerRight != key) {
+                    red += (lowerRight >> 8) & 0xf8;
+                    green += (lowerRight >> 3) & 0xfc;
+                    blue += (lowerRight & 0x1f) << 3;
                     count++;
                 }
                 unsigned short out = key;
