@@ -104,11 +104,12 @@ static inline Vector3 Normalize(const Vector3& v) {
 
 
 // The length of `v` (1 without a square root for unit vectors); the setup
-// restores the lengths D3DRMVectorRotate's unit results lose.
+// restores the lengths D3DRMVectorRotate's unit results lose. Retail adds z*z
+// last, rounded to a float temporary (0x004188d8); this sum has its order, so
+// the two agree at 24-bit precision.
 static inline float UnknownVectorLength(const Vector3& v) {
-    float xx = v.x * v.x;
-    float yy = v.y * v.y;
-    float lengthSquared = xx + yy + v.z * v.z;
+    float zz = v.z * v.z;
+    float lengthSquared = v.x * v.x + v.y * v.y + zz;
     if (lengthSquared == 1.0f)
         return 1.0f;
     return (float)sqrt(lengthSquared);

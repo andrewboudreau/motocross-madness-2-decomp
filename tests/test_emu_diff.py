@@ -261,6 +261,12 @@ PRE_FIX_SHAPES = [
                             'GetString("FontName", defaultFontName, fontName, -1);')], 40),
     # Terrain::Load gave the height field its host pointer instead of the load-children flag.
     ('terrain_load', [('(this->stream), loadChildren,', '(this->stream), host,')], 60),
+    # BikeRace::Create's vector length summed x*x + (y*y + z*z); retail adds a float z*z to
+    # x*x + y*y. Only 24-bit shows it, on the flag girl's and box's offsets (2 of 400).
+    ('bike_race_create',
+     [('    float zz = v.z * v.z;\n    float lengthSquared = v.x * v.x + v.y * v.y + zz;\n',
+       '    float xx = v.x * v.x;\n    float yy = v.y * v.y;\n    float lengthSquared = xx + yy + v.z * v.z;\n')],
+     400),
 ]
 
 

@@ -1549,11 +1549,27 @@ or scheduling differences only:
 destructor, `QuarryOverlayHooks`, `LoadEventObjects`, `SendStartMessage`, the
 audio loader thread 0x004bdc00, `LoadVue`, `CheckHeader`, TerrainShadow slot 27
 and `MainDlg::HandleEvent`. A scan of the linked bodies' float constants found no
-wrong values. Still open: the vector lengths in `CreatePodiumScene` 0x0045d480 and
-`BikeRace::Create` 0x00417ed0. Retail rounds z*z to a float temporary and adds it
-to x*x + y*y; the linked build sums (x*x + z*z) + y*y at extended precision. The
-effect is ulp-level, on podium and flag-girl placement. Eight source variants did
-not reproduce retail's order.
+wrong values. The vector lengths in `CreatePodiumScene` 0x0045d480 and
+`BikeRace::Create` 0x00417ed0 summed the squares in the wrong order: podium
+(x*x + z*z) + y*y, flag girl x*x + (y*y + z*z). Retail adds z*z last as
+(x*x + y*y) + z*z, with z*z rounded to a float temporary. Both helpers now sum in
+retail's order.
+- `BikeRace::Create` is `float zz = v.z * v.z;` then `v.x * v.x + v.y * v.y + zz`.
+  It is 1,736/1,819 aligned, up from 1,734.
+- The podium is named `xx`/`yy`/`zz` with `zz + (xx + yy)`. It keeps retail's
+  4,247-byte extent and its masked 3,587/3,691, at 1,009/1,067 aligned, down from
+  1,011. The `BikeRace` shape shrank it by 8 bytes.
+
+The two now agree at 24-bit precision, the game's D3D setting. At 53-bit, z*z
+stays unrounded, an ulp-level difference. Only a `volatile` local rounds it.
+
+The `bike_race_create` case now exercises the lengths. LoadTrack writes the full
+0x3c-byte probes with a finish width, the objects 0x00401310 creates carry a model
+width, and kVec3YAxis is (0, 1, 0). Before, the girl's vectors were around 1e9
+and rotated about a zero axis. The case is exact at both precisions over 1,000
+runs. The old flag-girl shape differs at 24-bit in 3 of 1,000, and
+`PRE_FIX_SHAPES` keeps it at 400 runs. No case covers the podium; its order was
+checked by disassembly.
 
 A loader sweep fed synthetic file contents to the linked file loaders and parsers below 1.000
 that no case covered (empty and over-long strings, unknown tokens, negative and huge numbers,

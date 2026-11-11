@@ -15,10 +15,15 @@ g_TrackGame's event type (0..5 and 7), race mode (0..4), player count, AI and mu
 counts (0..3), random gates, stunt mode, track name/number, playingReplay, useReplayTape, the
 ghost file's first byte, joystickOn, the player indicator, the plate number and the eight racer
 slots; KrustyUI's playingDemo; the scene's terrain file (with and without an extension, 0..254
-characters). Track::LoadTrack writes random start/finish probes and the has-start/has-finish
-flags; Scene::FindEntryByFileName answers null or an entry with a small index. sprintf is
-modelled (%s, %d, %02d) and compared through its text, D3DRMVectorRotate turns about the axis
+characters). Track::LoadTrack writes random start/finish probes (0x3c bytes each, a 5..60
+width at +0x24) and the has-start/has-finish flags; Scene::FindEntryByFileName answers null or
+an entry with a small index. sprintf is modelled (%s, %d, %02d) and compared through its text,
+D3DRMVectorRotate turns about the axis (kVec3YAxis, set to (0, 1, 0) as its initializer would)
 and normalises; strncpy/strrchr run natively; constructors answer `this`. fs:[0] is page 0.
+The three objects the body creates through 0x00401310 (the finish arch first) carry a model
+width (+0x50) of 5..40. The arch scale (finish width / model width, 0x004187c7) and the flag
+girl's and box's offsets built from it are then realistic; with arena cell pointers read as
+floats they were around 1e9 and the rotations had a zero axis.
 """
 import math
 import random
@@ -39,6 +44,7 @@ SPRINTF, NEW = 0x00534aaf, 0x004a3010
 STRNCPY, STRRCHR = 0x00534b10, 0x00534a60
 LOAD_TRACK, FIND_ENTRY = 0x00515ed0, 0x004eaec0
 ROTATE = 0x0053304c
+CREATE_OBJECT = 0x00401310
 TRACK_GAME = 0x0056e26c
 
 _patterns = {}
@@ -102,8 +108,10 @@ def _new(ctx, rec):
 def _load_track(ctx, rec):
     c = ctx.data['case']
     r = rec.rng
-    for at in rec.args[1:3]:     # the start and finish probes
-        ctx.pack(at, '8f', *(r.uniform(-300, 300) for _ in range(8)))
+    for at in rec.args[1:3]:     # the start and finish probes (0x3c bytes; the width at +0x24)
+        values = [r.uniform(-300, 300) for _ in range(15)]
+        values[9] = r.uniform(5, 60)
+        ctx.pack(at, '15f', *values)
     ctx.pack(rec.args[3], 'i', c['has_start'])
     ctx.pack(rec.args[4], 'i', c['has_finish'])
     return c['track_ok']
@@ -137,6 +145,11 @@ def _this(ctx, rec):
     return rec.ecx
 
 
+def _create_object(ctx, rec):
+    created = ctx.data['created']
+    return created[rec.occurrence % len(created)]
+
+
 CTORS = (0x00401260, 0x00417500, 0x004455b0, 0x00460d10, 0x00469db0, 0x0048bca0, 0x0048c2b0,
          0x004e1fb0, 0x004e77f0, 0x00524a50)
 # The retail statics the body reads (0x00418757) or hands out by address (SetAxesPtr 0x00418559).
@@ -148,7 +161,7 @@ BINDINGS = {'_kVec3Zero': 0x00578e60, '_kVec3YAxis': 0x00578e80}
 SLOT_POPS = {0xb: 0x18, 7: 0xc, 0x2d: 4, 0x32: 8, 0x47: 4, 5: 4}
 
 REPLAY = dict(returns={SPRINTF: _sprintf, NEW: _new, LOAD_TRACK: _load_track, FIND_ENTRY: _find_entry,
-                       ROTATE: _rotate,
+                       ROTATE: _rotate, CREATE_OBJECT: _create_object,
                        **{c: _this for c in CTORS}},
               pops={SPRINTF: 0, NEW: 0, ROTATE: 16}, args={SPRINTF: 2, NEW: 3, ROTATE: 4},
               ecx={SPRINTF: False, NEW: False, ROTATE: False},
@@ -192,6 +205,12 @@ def setup(ctx, c):
 
     # The scene entries (start/finish gates) and the racers have a virtual base.
     ctx.data['entries'] = [universal(0x400, True) for _ in range(2)]
+    # The objects 0x00401310 creates, with their model width.
+    ctx.data['created'] = []
+    for _ in range(3):
+        o = universal(0x100)
+        ctx.pack(o + 0x50, 'f', r.uniform(5, 40))
+        ctx.data['created'].append(o)
     game = universal(0x3600)
     ctx.pack(game + 0x18, 'i', c['players'])
     ui = universal(0x600)
@@ -213,6 +232,8 @@ def setup(ctx, c):
     ctx.pack(game + 0x2eb8, 'i', c['stunt'])
     ctx.pack(game + 0x3428, 'ii', c['replay'], c['tape'])
     ctx.pack(TRACK_GAME, 'I', game)
+    # The rotation axis (kVec3YAxis is set by a dynamic initializer, so the image holds zeros).
+    ctx.pack(BINDINGS['_kVec3YAxis'], '3f', 0.0, 1.0, 0.0)
 
     env = universal(0x400)
     ctx.write(env + 0x104, c['terrain'].encode()[:0x103] + b'\0')

@@ -114,11 +114,13 @@ public:
 extern "C" Vector3* __stdcall D3DRMVectorRotate(Vector3* result, Vector3* vector, Vector3* axis,
                                                 float theta);
 
-// |v|, exact for unit vectors.
+// |v|, exact for unit vectors. Retail adds z*z last, rounded to a float temporary
+// (0x0045dc05); this sum has its order, so the two agree at 24-bit precision.
 static inline float PodiumLength(const Vector3& v) {
     float xx = v.x * v.x;
     float yy = v.y * v.y;
-    float squared = xx + yy + v.z * v.z;
+    float zz = v.z * v.z;
+    float squared = zz + (xx + yy);
     if (squared == 1.0f)
         return 1.0f;
     return (float)sqrt(squared);
