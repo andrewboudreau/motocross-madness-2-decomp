@@ -1502,6 +1502,32 @@ can flip a draw that lands on the threshold. The source now uses retail's order
 (`UnknownEcoSampleTgaWeighted`; `fild; fmul weight; fmul 1/255` as at retail
 0x0045a7e9), accepting VC6's different register allocation of the body.
 
+A gameplay sweep added replay cases for linked bodies below 1.000 masked that no
+case covered: `net_create_address` (`NetworkInterface::CreateAddress`
+0x004abf10), `race_sound_refill_stream` (`RaceSound::RefillStream` 0x004e4d10),
+`sound_set_primary_format` (`PCSoundInterface::SetPrimaryFormat` 0x004be910),
+`recorder_thread` (the VCR worker 0x004e6f80, all eleven events),
+`bailout_dlg_handle_event` and `bunny_dlg_handle_event` (the career bail-out and
+loan dialogs 0x004d8fc0 and 0x004d9860) and `sp_race_info_handle_event`
+(`SPRaceInfoDlg::HandleEvent` 0x004507a0, results lists and replay tape load).
+Each agrees in 400 runs at both precisions, and edited negative controls differ.
+One bug: in the modem branch, `CreateAddress` tagged the modem name as
+`DPAID_Phone` and the phone number as `DPAID_Modem`. The bindings had swapped the
+two GUIDs as well (0x00556900 holds DPAID_Phone and 0x00556920 holds DPAID_Modem),
+so neither the case nor the masked score could see the swap. With both fixed,
+the modem name is tagged `DPAID_Modem` and the number `DPAID_Phone`, as in retail,
+so a dial-up session gets the right modem and number. The following bodies were
+reviewed by disassembly and showed register or scheduling differences only:
+`LoadBike`, `SetRenderContext`, `SetPointerDevice`, the KrustyBike deleting
+destructor, `QuarryOverlayHooks`, `LoadEventObjects`, `SendStartMessage`, the
+audio loader thread 0x004bdc00, `LoadVue`, `CheckHeader`, TerrainShadow slot 27
+and `MainDlg::HandleEvent`. A scan of the linked bodies' float constants found no
+wrong values. Still open: the vector lengths in `CreatePodiumScene` 0x0045d480 and
+`BikeRace::Create` 0x00417ed0. Retail rounds z*z to a float temporary and adds it
+to x*x + y*y; the linked build sums (x*x + z*z) + y*y at extended precision. The
+effect is ulp-level, on podium and flag-girl placement. Eight source variants did
+not reproduce retail's order.
+
 ### Grid lighting workers
 
 The three workers in `Group4_GridLighting.cpp` were rewritten from the
