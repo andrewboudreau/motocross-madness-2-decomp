@@ -36,6 +36,7 @@ def main() -> None:
         if not p.is_file(): continue
         rel=p.relative_to(ROOT)
         if any(part in IGNORED_DIRS for part in rel.parts): continue
+        if rel.parts[:2]==('.claude','worktrees'): continue  # agent worktrees are separate checkouts
         if p.suffix.lower() in FORBIDDEN_SUFFIXES: forbidden.append(rel.as_posix())
         if p.suffix.lower()=='.py': py_files.append(p)
         if p.suffix.lower()=='.json' and 'analysis' not in rel.parts: json_files.append(p)
