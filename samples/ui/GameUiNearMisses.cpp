@@ -24,18 +24,6 @@
 //   `return found` after Unlock; `if (!Unlock) return 0; return found;`
 //   becomes neg/sbb/and, early returns for a failed Lock duplicate the
 //   epilogue, and goto, result variable and while row loops do not give it.
-// 0x0046ef00 UIDialog slot 10 (352 matching positions, retail 543/candidate
-//   555 bytes; included from UIDialogTick.cpp): the timer's +0x0c is cleared before
-//   +0x14 is loaded, and the joystick branches after the first sit after the
-//   epilogue. `while (1)`/`for (;;)` device loops, `continue` per branch and
-//   the joystick test as an inline helper (with and without returns) keep
-//   them inline. So do `else continue` after the first branch's centred
-//   test or its `if (next)` call, a `continue` after the centring store, a
-//   `deviceKind != 2` continue and a `for` device loop (334); the x test
-//   inverted (`x > -1` first) gives 347. Reading the target through
-//   `timer->targetControl` twice moves the +0x0c store before the load as
-//   retail does, but changes the call's registers (172); a control local
-//   read before or after the store gives 352.
 // 0x004734c0 UIButton slot 28 (256 positions, retail 354/candidate 328)
 //   and 0x00478e10 UIMultiState slot 28 (231 positions, retail 329/candidate
 //   303; UIMultiState tests its own area in place, without UIButton's RECT
@@ -160,8 +148,8 @@
 #include "TextureHasColor.cpp"
 
 
-// The complete tick candidate is also compiled independently for the game build.
-#include "UIDialogTick.cpp"
+// UIDialog::Tick (0x0046ef00) is strict exact; it now comes in through
+// GameUi.cpp, which includes src/reconstructed/UIDialogTick.cpp.
 
 #include "ControlHitTest.cpp"
 

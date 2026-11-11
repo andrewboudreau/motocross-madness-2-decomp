@@ -12,6 +12,7 @@ import unittest
 
 from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
+from mcm2tool.resolved_match import match_object
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -83,7 +84,7 @@ class DialogTickBehaviorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-dialog-tick-') as directory:
             output = Path(directory)
             objects = []
-            for source in ('samples/ui/UIDialogTick.cpp', 'tests/fixtures/dialog_tick_compare.cpp'):
+            for source in ('src/reconstructed/UIDialogTick.cpp', 'tests/fixtures/dialog_tick_compare.cpp'):
                 obj = output / (Path(source).stem + '.obj')
                 result = subprocess.run([
                     sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
@@ -93,12 +94,14 @@ class DialogTickBehaviorTests(unittest.TestCase):
                     env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 objects.append(str(obj))
-                if source.startswith('samples/'):
+                if source.startswith('src/'):
                     candidate = CoffObject(obj)
                     entry = candidate.find_symbol(SYMBOL)
                     self.assertEqual(entry.extent_source, 'coff_function_aux')
-                    self.assertEqual(entry.function_size, 555)
-                    bindings = json.loads((ROOT / 'samples/ui/UIDialogTick.bindings.json').read_text())
+                    self.assertEqual(entry.function_size, SIZE)
+                    bindings = json.loads((ROOT / 'src/reconstructed/UIDialogTick.bindings.json').read_text())
+                    strict = match_object(candidate, SYMBOL, START, body, {k: int(v, 0) for k, v in bindings.items()})
+                    self.assertTrue(strict['strict_exact'])
                     imports = {candidate.symbol_by_index[r.symbol_index].name for r in candidate.relocations
                                if r.section_number == entry.section_number
                                and r.type == 0x14 and entry.value <= r.virtual_address < entry.value + entry.function_size}

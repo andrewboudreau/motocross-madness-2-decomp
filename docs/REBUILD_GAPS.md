@@ -307,7 +307,6 @@ The most shared:
 
 | Function | vtables | Category | Used by |
 |---|---:|---|---|
-| `0x0046ef00` | 53 | near miss | UIDialog family (ChoiceDlg, ...) |
 | `0x00470410`, `0x00470420` | 16 each | near miss (relocation-masked exact) | UIControl slots 61/62 |
 | `0x00405170` | 15 | near miss (relocation-masked exact) | BaseObject::Release |
 | `0x004a70c0` | 7 | near miss | Character family (Bike, CollisionCharacter, ...) |

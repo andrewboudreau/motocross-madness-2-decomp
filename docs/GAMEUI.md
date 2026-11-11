@@ -323,13 +323,31 @@ the unchanged candidate emits 975 bytes with 206 matching positions. Its
 14,793 native scenarios exercise the actual six direct game helpers while
 keeping explicit scripted DC, surface, GDI and IME boundaries.
 
-`samples/ui/UIDialogTick.cpp` supplies the complete dialog tick as an explicit
-nonexact game-build candidate. GameUiNearMisses.cpp includes this same source
-for its existing calibration; the larger sample is not added to the game link.
+`src/reconstructed/UIDialogTick.cpp` holds the complete dialog tick (UIDialog
+vtable slot 10, shared by 53 dialog vtables). It is strict exact: all 543
+bytes match with relocations resolved. `GameUi.cpp` includes the body
+(`included_sources` in `config/game_build.json`). The file also stays a
+standalone calibration case and the native-test provider.
 The reachable retail CFG spans `0x0046ef00..0x0046f11e` (543 bytes), including
 cold joystick branches beyond its sole return. The next byte is alignment.
-VC6 emits 555 bytes, with 352 matching positions after relocation resolution;
-timer-store scheduling and joystick block placement remain different.
+Two source shapes give retail's code:
+
+- Timer step. An inline `AdvanceTimer` helper clears the elapsed time and
+  reports expiry. Its result test keeps VC6 from hoisting the `+0x14` target
+  load above the `+0x0c` clear.
+- Joystick arms. The arms only choose the next control, and one shared
+  `if (next) RequestHover(next, 0, 0)` follows them. VC6 threads that test out
+  of the arms that leave `next` null, which places every arm after the first
+  beyond the epilogue, as in retail.
+
+Earlier forms reached only 352/555. These did not change that score:
+
+- the focus test inside each condition;
+- a `POINT` copy with a `for` loop;
+- an early return;
+- a fetch at the end of the loop.
+
+These were worse: merged y arms (342) and an inverted x test (347).
 
 The body retains the first-frame `0.001f` rule, frame-event flag reset after
 the callback, unsigned timer comparison, timer-list mutation visibility,

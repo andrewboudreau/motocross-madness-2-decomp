@@ -2110,6 +2110,10 @@ void UIDialog::UpdateBoundValues(int value) {
     SyncValues(value);
 }
 
+// 0x0046ef00: UIDialog::Tick (also a standalone calibration case and the
+// native-test provider).
+#include "UIDialogTick.cpp"
+
 // 0x0046f1c0
 int UIDialog::RenderPre3D() {
     if (!isPaused) {

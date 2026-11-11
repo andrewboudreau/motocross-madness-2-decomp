@@ -12,6 +12,11 @@
       "path": "src/reconstructed/InlineShockAxis.cpp",
       "included_by": "src/krusty2/suspension/Shock.cpp",
       "reason": "InlineShock::UpdateAxis 0x004f9f90 belongs to the Shock family unit; Shock.cpp includes the body, which also stays a standalone calibration case and native-test provider (docs/INLINE_SHOCK_AXIS.md)."
+    },
+    {
+      "path": "src/reconstructed/UIDialogTick.cpp",
+      "included_by": "src/reconstructed/GameUi.cpp",
+      "reason": "UIDialog::Tick 0x0046ef00 (strict exact) belongs to GameUi.cpp; GameUi.cpp includes the body, which also stays a standalone calibration case and native-test provider (docs/GAMEUI.md)."
     }
   ],
   "candidate_sources": [
@@ -278,12 +283,6 @@
       "status": "reviewed-nonexact",
       "reason": "Complete channel comparison passes 144944 native pixel, pitch, lock-failure and callback comparisons, including 256/512/1024-square images. The full retail CFG is 629 bytes, including its cold tail; VC6 emits 620 bytes.",
       "evidence": "docs/DISPLAY_SURFACE_HELPERS.md#functional-build-review"
-    },
-    {
-      "path": "samples/ui/UIDialogTick.cpp",
-      "status": "reviewed-nonexact",
-      "reason": "Complete UIDialog Tick passes 73728 native whole-state and mutating-callback comparisons. The retail CFG is 543 bytes including cold joystick branches; VC6 emits 555 bytes. Dependencies are scripted; end-to-end menus remain untested.",
-      "evidence": "docs/GAMEUI.md#functional-build-review"
     },
     {
       "path": "samples/game/PCGameNearMisses.cpp",

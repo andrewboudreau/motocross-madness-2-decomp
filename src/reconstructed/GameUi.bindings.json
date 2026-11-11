@@ -577,5 +577,7 @@
   "?LoadFile@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x005125c0",
   "?AddImageFileRow@UIListBox@@QAEHPBDHHH@Z": "0x00477110",
   "?AddImageFileRow@UIListBox@@QAEHPBDHHH@Z$ehhandler": "0x0054b39e",
-  "?OpenAndReadHeader@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x00511d00"
+  "?OpenAndReadHeader@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x00511d00",
+  "?SetCursorAnimation@GUIUser@@QAEXPAUUnknownCursorAnimation@@@Z": "0x00487fb0",
+  "?Tick@UIDialog@@UAEHM@Z": "0x0046ef00"
 }

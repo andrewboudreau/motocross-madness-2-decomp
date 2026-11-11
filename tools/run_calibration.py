@@ -27116,6 +27116,15 @@ CASES += [
         'reason': 'Primary InlineShock constructor and Bike receiver chain; see docs/INLINE_SHOCK_AXIS.md',
     },
     {
+        'name': 'UIDialog tick 0x46ef00',
+        'source': 'src/reconstructed/UIDialogTick.cpp',
+        'bindings': 'src/reconstructed/UIDialogTick.bindings.json',
+        'symbol': '?Tick@UIDialog@@UAEHM@Z',
+        'target_va': '0x0046ef00', 'target_size': 543,
+        'includes': ['src/krusty2', 'src/reconstructed'],
+        'reason': 'UIDialog vtable slot 10, shared by 53 dialog vtables; GameUi.cpp includes the body; see docs/GAMEUI.md',
+    },
+    {
         'name': 'Vehicle wheel attachment update',
         'source': 'src/reconstructed/VehicleWheelAttachment.cpp',
         'bindings': 'src/reconstructed/VehicleWheelAttachment.bindings.json',
