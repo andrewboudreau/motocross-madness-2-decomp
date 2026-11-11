@@ -603,6 +603,15 @@
       "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
     },
     {
+      "path": "samples/physics/krustybike/KrustyBikeSelectRiderPose.cpp",
+      "status": "reviewed-nonexact",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "KrustyBike::SelectRiderPose 0x0048e3e0 (slot 89), moved out of canonical KrustyBike.cpp, whose other casts truncate through __ftol as retail does. /QIfist turns FistpFloatToIntChecked's cast into a FISTP under the current rounding mode on the binary32 argument, as retail's inline fistp helper at 0x0048e61f, 0x0048e6f0 and 0x0048e7c5, with 0x80000000 outside int; no __ftol call remains. Bit-identical to retail in 18000 emulated cases (unicorn, scripted virtual calls, six x87 control words); /Op is not needed.",
+      "evidence": "docs/GAME_BUILD.md#rider-pose-selection-rounding"
+    },
+    {
       "path": "samples/track/DropTextOverlaySetup.cpp",
       "status": "best-guess-unreviewed",
       "extra_flags": [

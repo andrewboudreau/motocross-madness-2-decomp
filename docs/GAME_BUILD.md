@@ -1097,14 +1097,9 @@ Left alone:
   `__ftol` four times next to its four fistp sites, as retail does. The
   sample would need the rounding moved to another unit, for little gain
   (0.832). It keeps `X87FloatToInt`.
-- `KrustyBike::SelectRiderPose` (0x0048e3e0) is the one linked body that
-  calls `__ftol` (0x00534a88) where retail does not. The calls come from
-  `KbFloatToInt`'s round-to-nearest emulation in canonical
-  `src/krusty2/vehicle/KrustyBike.cpp`. That unit truncates through `__ftol`
-  in five other functions, as retail does (0x00492670, 0x00495c00,
-  0x00495ff0, InitForceFeedback, UpdateForceFeedback), and calibration
-  compiles it without `/QIfist`. Matching it needs either a split of the
-  canonical unit or a candidate sample, so it was not changed here.
+- `KrustyBike::SelectRiderPose` (0x0048e3e0) was left here at first. It has
+  since moved to a candidate sample; see
+  [Rider pose selection rounding](#rider-pose-selection-rounding).
 
 Behaviour: each site now rounds under the current x87 control word, as
 retail's helper does. `X87FloatToInt` read the same mode through `_control87`,
@@ -1115,6 +1110,92 @@ intermediate in an 80-bit register where retail rounds it to binary32. The
 four-pose blend lost last-bit pose agreement this way (204 of 600 emulated
 cases) until it was compiled with `/Op`; the other sites have not been
 differentially tested for it.
+
+## Rider pose selection rounding
+
+`KrustyBike::SelectRiderPose` (0x0048e3e0, slot 89, 2744 bytes including its
+two jump tables) was the last linked body that called `__ftol` (0x00534a88)
+where retail does not. Retail rounds the pose index three times with its
+inline fistp helper (0x0048e61f, 0x0048e6f0, 0x0048e7c5). The canonical body
+emulated that with `KbFloatToInt`, a round-to-nearest-even built on `__ftol`.
+
+Canonical `src/krusty2/vehicle/KrustyBike.cpp` cannot take `/QIfist`. It
+truncates through `__ftol` in five other functions, as retail does:
+0x00492670 (3 casts), 0x00495c00 (4), 0x00495ff0 (2), InitForceFeedback (1)
+and UpdateForceFeedback (1). So the body moved to
+`samples/physics/krustybike/KrustyBikeSelectRiderPose.cpp`. The game build
+compiles it with `/QIfist` (`config/game_build.json` `candidate_sources`),
+and the canonical definition was removed. The sample rounds with
+`FistpFloatToIntChecked`. The argument is
+`(0.75 - steerValue) * 3.99 - 0.5`, and no range argument bounds
+`steerValue`, so out-of-`int` values must store 0x80000000 as retail's 32-bit
+fistp does.
+
+The full extent was checked against the retail disassembly. This includes the
+4-entry table at 0x0048ee74 (crossover cases 1-4) and the 5-entry table at
+0x0048ee84 (cases 1-5). Thresholds, comparison senses, stored fields, pose
+indices and calls agree with the source. Rounding was the only behavioural
+difference.
+
+The old and new bodies were compared with retail by unicorn emulation: the
+compiled object was placed in the retail image and run over 3000 random
+states for each of six x87 control words. The trick paths (0x0048d910,
+0x0048e280) were included. The old body differed in 3334 of 18000 cases:
+
+| Control word | Old body mismatches (of 3000) |
+|---|---:|
+| 0x007f (24-bit, nearest) | 308 |
+| 0x027f (53-bit, nearest) | 454 |
+| 0x037f (64-bit, nearest) | 454 |
+| 0x0e7f (53-bit, truncate) | 533 |
+| 0x047f (24-bit, down) | 778 |
+| 0x087f (24-bit, up) | 807 |
+
+There were three causes:
+
+- **Out-of-range values.** Infinities, NaN and very large steer values gave a
+  wrong index where retail stores 0x80000000 and adds the pose base. This
+  accounts for the 308 cases in every mode.
+- **Precision.** At 53- and 64-bit precision the argument was not rounded to
+  binary32 first. There were 146 more cases at 0x027f; in 91 of them
+  |steer| <= 2, and the pose index moved by one at a boundary (two through
+  the pose state).
+- **Rounding mode.** The old body ignored the rounding mode, which caused the
+  extra cases in the directed modes.
+
+The `/QIfist` sample matches retail bit for bit in all 18000 cases. **`/Op` is
+not needed**: the helper's binary32 store already rounds the argument. With
+`/QIfist /Op` the candidate grows to 2768 bytes without any behaviour change.
+
+Cast audit of the sample unit:
+
+- Without `/QIfist`: three `__ftol` relocations, all of them the fistp sites
+  in SelectRiderPose.
+- With `/QIfist`: none. The unit's `_$E` initializers have no casts.
+
+The other functions in the canonical unit compile to the same bytes as
+before; only internal `$L` label numbers changed.
+
+Linked masked score: 0.650 -> 0.682 (637 instructions against retail's 703;
+the old body had 715). `tools/linked_accuracy.py` now lists no body that calls
+a function retail's body does not call.
+
+Code shape (`tools/match_one.py`):
+
+| Variant | Strict | Aligned | Candidate bytes |
+|---|---:|---:|---:|
+| Old canonical | 138/2744 | 439/718 | 2708 |
+| Checked helper, `/QIfist` (linked) | 152/2744 | 442/718 | 2552 |
+| Plain `FistpFloatToInt` | | 450/718 | 2452 |
+
+The plain helper keeps the low dword outside `int`, so it was not adopted.
+The rest of the gap is retail's ebp frame from the inline asm, which also
+moves the shared clamp exits. An `int` return with `return 0` was ruled out:
+about 101 strict masked, 2880 bytes, `xor eax,eax` on every exit, and the
+0x5b8 branch no longer shares the switch tails.
+
+The physics runner compiles the sample without `/QIfist`, so it scores only
+shape there (`expect: partial`).
 
 ## Four-pose motion blend
 

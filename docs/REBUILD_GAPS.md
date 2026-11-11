@@ -395,7 +395,7 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 | `0x00483d40` | 4 | `samples/render/GridNodeNearMisses.cpp` (`GridMidCell`) | `X87FloatToInt`; its 4 other casts are retail `__ftol` calls |
 | `0x0048d1e0` | 2 | `src/bringup/Group4_ScoreBoard.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
 | `0x0048d780` | 1 | `samples/physics/bikeai/KrustyBikeTrickPick.cpp` (`/QIfist`) | `FistpFloatToInt` |
-| `0x0048e3e0` | 3 | `src/krusty2/vehicle/KrustyBike.cpp` (`SelectRiderPose`) | `KbFloatToInt` |
+| `0x0048e3e0` | 3 | `samples/physics/krustybike/KrustyBikeSelectRiderPose.cpp` (`/QIfist`) | `FistpFloatToIntChecked` (the steer value is unbounded) |
 | `0x0049e4a0`, `0x0049e6b0`, `0x0049f1c0`, `0x0049f8d0` | 3, 9, 9, 9 | `src/bringup/Group4_GridLighting.cpp` (`/QIfist` bring-up) | `FistpFloatToInt`; the light colours stay truncating casts, as retail's `__ftol`, in `Group4_GridLightColor.cpp` (no `/QIfist`) |
 | `0x004a8bf0`, `0x004a8c50` | 1, 2 | `samples/physics/motion/CharacterMotionStart.cpp`, `CharacterMotionBlend.cpp` | `FloatToInt` (`CharacterMotionFloatToInt.h`) |
 | `0x004a9050` | 4 | `samples/physics/motion/CharacterMotionFourPose.cpp` (`/QIfist /Op`) | `FistpFloatToInt` |
@@ -410,8 +410,8 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 | `0x0051b070` | 1 | `src/bringup/Group4_Overlay.cpp` (`/QIfist` bring-up) | `FistpFloatToIntChecked` (`dropSeconds` may be near zero) |
 | `0x0052f570` | 6 | `src/bringup/Group4_Visibility.cpp` and `Group2_GridVisibilityTestBox.cpp` (`D3DIMShadowClipper::TestBox` forwards; `/QIfist` bring-up) | `FistpFloatToIntChecked` (a corner near the eye plane can project outside `int`) |
 
-`BikeFloatToInt` and `KbFloatToInt` correct an
-`__ftol` truncation to nearest-even. They ignore the x87 rounding mode.
+`BikeFloatToInt` corrects an `__ftol` truncation to nearest-even. It ignores
+the x87 rounding mode.
 `X87FloatToInt`, `FistpFloatToInt` (and its range-checked variant) and the two `FloatToInt` helpers read it.
 The `/QIfist` bring-up units and the truncating casts moved out of them are
 listed in [GAME_BUILD.md](GAME_BUILD.md#bring-up-fistp-units). No game code loads
@@ -466,8 +466,9 @@ too when exactly one otherwise unbound linked symbol contains the substring.
 On main c6568f54 (2026-11-11) the tool scores 2,694 functions (1,126,523
 bytes); 797,771 of those bytes score 1.000. It also lists linked bodies that
 call a function retail's body never calls (call targets are masked in the
-score); one remains, `KrustyBike::SelectRiderPose` calling `__ftol` where
-retail converts with inline `fistp`.
+score); none remain. The last one, `KrustyBike::SelectRiderPose` calling
+`__ftol` where retail converts with inline `fistp`, became a `/QIfist`
+sample ([GAME_BUILD.md](GAME_BUILD.md#rider-pose-selection-rounding)).
 
 ## What is needed next
 

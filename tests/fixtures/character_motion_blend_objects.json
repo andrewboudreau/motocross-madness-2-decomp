@@ -12,9 +12,9 @@
       "sha256": "9fad4c12187dda6f21af5d6fa9b25bd3f0377de131a844aee10dfabee41c9f19"
     },
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
-      "sections": 288,
-      "relocations": 1568,
-      "sha256": "4b3e8dd195152ffc4dea5939f2b5d250d930f4db79a78272414194fbc097929c"
+      "sections": 271,
+      "relocations": 1443,
+      "sha256": "fd65e047b4b090c51c31558e2245db1fa6d0dd94ef3fd654b06d0065f544f4cb"
     },
     "samples/physics/motion/Motnctrl.cpp": {
       "sections": 36,

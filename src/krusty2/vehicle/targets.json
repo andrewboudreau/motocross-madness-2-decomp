@@ -2432,16 +2432,6 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "SelectRiderPose@KrustyBike",
-    "target_va": "0x0048e3e0",
-    "target_size": 2744,
-    "expect": "partial",
-    "notes": "strict 171/2744 (candidate 2648). Slot 89 override, previously unreconstructed (the source build ran Bike's 0x00406ae0 for KrustyBike). Decoded from retail: pad_0x5B8 fixed steer pose with the state-1 poseParam clamp; the local-rider airborne trick start (controls 9/6/7, slot 88 sector -> 0x0048e280 / 0x0048d910(sector + (control 6 ? 0 : 8))); no leanPoseMin/Max branch; backingUp -> pose 16 / state 5; the rest is Bike's, both jump tables checked case by case (extent includes the 4- and 5-entry tables to 0x0048ee98). Retail keeps an ebp frame for the inlined fistp helper (inline asm, not reproducible); KbFloatToInt gives the same round-to-nearest-even index, which costs the rest of the frame shape. Ruled out: int return with `return 0` (strict ~101 masked, candidate 2880: xor eax,eax on every exit and the 0x5b8 branch no longer shares the switch tails).",
-    "bindings": "KrustyBike.bindings.json"
-  },
-  {
-    "class": "KrustyBike",
-    "source": "KrustyBike.cpp",
     "candidate_symbol_contains": "?SwitchToBikeCollision@KrustyBike@@",
     "target_va": "0x00496d10",
     "target_size": 5,

@@ -154,7 +154,7 @@ class ModelRenderStateConnectionsTests(unittest.TestCase):
                         resolved = match_object(objects[source], symbol, va, b'',
                             {k: int(v, 0) for k, v in json.loads(binding.read_text()).items()})
                     self.assertEqual(resolved['digest'], digest, key); preserved += 1
-            self.assertEqual(preserved, 25)
+            self.assertEqual(preserved, 24)
             for source, symbol, va, size, digest in evidence['additional_functions']:
                 self.assertEqual(objects[source].find_symbol(symbol).function_size, size)
                 bindings = {k: int(v, 0) for k, v in json.loads((ROOT / source).with_suffix('.bindings.json').read_text()).items()}
