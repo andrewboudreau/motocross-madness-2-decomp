@@ -71,6 +71,34 @@ def source_files(root: Path, spec: dict) -> list[Path]:
     return sorted(sources, key=lambda p: (p.name.casefold(), p.as_posix().casefold()))
 
 
+def compile_flags(root: Path, spec: dict) -> dict[Path, tuple[str, ...]]:
+    """Per-source extra compiler flags: reviewed candidates' `extra_flags` and
+    `bringup_flags` entries for src/bringup units. Bring-up stand-ins are compiled
+    only by this build (calibration and the physics runner compile canonical
+    source and samples), so a unit-wide flag there changes no scored object."""
+    flags = {(root / candidate['path']).resolve(): tuple(candidate.get('extra_flags', []))
+             for candidate in spec.get('candidate_sources', [])}
+    for entry in spec.get('bringup_flags', []):
+        path = (root / entry['path']).resolve()
+        try:
+            relative = path.relative_to(root.resolve())
+        except ValueError:
+            raise ValueError('bring-up flag source escapes repository') from None
+        if (relative.parts[:2] != ('src', 'bringup') or path.suffix != '.cpp'
+                or not path.is_file()):
+            raise ValueError(f'bring-up flags must name an existing src/bringup C++ file: {relative}')
+        unit_flags = entry.get('extra_flags')
+        if (not isinstance(unit_flags, list) or not unit_flags
+                or any(flag != '/QIfist' for flag in unit_flags)):
+            raise ValueError(f'unsupported bring-up compiler flags: {relative}')
+        if not entry.get('reason'):
+            raise ValueError(f'bring-up flags lack a reason: {relative}')
+        if path in flags:
+            raise ValueError(f'bring-up flags listed twice: {relative}')
+        flags[path] = tuple(unit_flags)
+    return flags
+
+
 def header_hashes(root: Path) -> dict[str, str]:
     """Conservative inventory including headers shared by admitted candidates."""
     return {p.relative_to(root).as_posix(): sha256_file(p)
@@ -221,11 +249,14 @@ def build_game(vc6: Path, jobs: int, compile_only: bool = False) -> tuple[dict, 
         env['LIB'] = windows_path(libdir, runner)
         env['PATH'] = str(find_vc6_bin(vc6)) + os.pathsep + env.get('PATH', '')
         sources = source_files(ROOT, spec)
-        source_flags = {(ROOT / candidate['path']).resolve(): tuple(candidate.get('extra_flags', []))
-                        for candidate in spec.get('candidate_sources', [])}
+        source_flags = compile_flags(ROOT, spec)
+        outside = sorted(str(path) for path in source_flags if path not in sources)
+        if outside:
+            raise ValueError(f'compiler flags name sources outside the build: {outside}')
         includes = [ROOT / name for name in spec['includes']]
         report['profile'] = spec['profile']
         report['candidate_sources'] = spec.get('candidate_sources', [])
+        report['bringup_flags'] = spec.get('bringup_flags', [])
         report['profile_sha256'] = sha256_file(ROOT / 'config/compile_profiles.json')
         report['headers'] = header_hashes(ROOT)
         report['stage'] = 'compile'

@@ -5,8 +5,8 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from tools.build_game import (compile_source, header_hashes, link_game, response_file, run_command,
-                             source_files, valid_object)
+from tools.build_game import (compile_flags, compile_source, header_hashes, link_game,
+                             response_file, run_command, source_files, valid_object)
 
 
 class GameBuildTests(unittest.TestCase):
@@ -119,6 +119,43 @@ class GameBuildTests(unittest.TestCase):
             candidate['path'] = '../outside.cpp'
             with self.assertRaisesRegex(ValueError, 'escapes repository'):
                 source_files(root, spec)
+
+    def test_bringup_flags_name_reviewed_bringup_units_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ('src/bringup/Unit.cpp', 'src/reconstructed/Canon.cpp', 'samples/s.cpp'):
+                (root / name).parent.mkdir(parents=True, exist_ok=True)
+                (root / name).write_text('')
+            entry = {'path': 'src/bringup/Unit.cpp', 'extra_flags': ['/QIfist'],
+                     'reason': 'every float-to-int conversion is a fistp site'}
+            candidate = {'path': 'samples/s.cpp', 'status': 'reviewed-nonexact', 'reason': 'r',
+                         'evidence': 'e', 'extra_flags': ['/QIfist']}
+            spec = {'source_roots': ['src'], 'candidate_sources': [candidate],
+                    'bringup_flags': [entry]}
+            self.assertEqual(compile_flags(root, spec),
+                             {(root / 'samples/s.cpp').resolve(): ('/QIfist',),
+                              (root / 'src/bringup/Unit.cpp').resolve(): ('/QIfist',)})
+            self.assertEqual(compile_flags(root, {'candidate_sources': []}), {})
+            for flags in ('/QIfist', [], ['/Oy-'], None):
+                entry['extra_flags'] = flags
+                with self.assertRaisesRegex(ValueError, 'compiler flags'):
+                    compile_flags(root, spec)
+            entry['extra_flags'] = ['/QIfist']
+            entry['reason'] = ''
+            with self.assertRaisesRegex(ValueError, 'reason'):
+                compile_flags(root, spec)
+            entry['reason'] = 'r'
+            for path in ('src/reconstructed/Canon.cpp', 'samples/s.cpp', 'src/bringup/Missing.cpp'):
+                entry['path'] = path
+                with self.assertRaisesRegex(ValueError, 'existing src/bringup'):
+                    compile_flags(root, spec)
+            entry['path'] = '../outside.cpp'
+            with self.assertRaisesRegex(ValueError, 'escapes repository'):
+                compile_flags(root, spec)
+            entry['path'] = 'src/bringup/Unit.cpp'
+            spec['bringup_flags'] = [entry, dict(entry)]
+            with self.assertRaisesRegex(ValueError, 'twice'):
+                compile_flags(root, spec)
 
     def test_candidate_flags_reach_only_the_selected_compilation_and_report(self):
         with tempfile.TemporaryDirectory() as tmp:
