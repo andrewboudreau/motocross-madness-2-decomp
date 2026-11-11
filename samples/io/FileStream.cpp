@@ -349,6 +349,9 @@ int UnknownTextureStream::Read(void* buffer, int size, int count)
 // the pushes; VC6 here pushes from memory.
 // Session 19: tail-recursive forms 136, a nested `fseek(..., ftell(..), ..)` 32, a
 // `count--` loop 101.
+// 2026-11-11: the fwrite through a FILE* local, an explicit else arm, a named result and
+// size_t casts keep 136 (same register rotation: retail's handle/size/textMode go to
+// edx/eax/ecx, here ecx/edx/eax); testing !fileEncoded first gives 29.
 int UnknownTextureStream::Write(const void* buffer, int size, int count)
 {
     UnknownTextureStream* stream = InnermostStream(this);

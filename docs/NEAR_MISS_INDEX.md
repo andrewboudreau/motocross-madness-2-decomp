@@ -115,6 +115,15 @@ distance; sizeFactor = width / (CameraZoom(camera) * frameWidth);`), so the came
 precedes `fst [esi + 0x1ec]` as in retail. VC6 does not move a load above an earlier
 store; when retail loads before a store, the load must already come first in the source.
 KrustyUI `0x004988a0` was already exact in src/reconstructed/KrustyUI.cpp (stale row).
+Two broad scans on 2026-11-11 closed no row. Dead initialised `int` locals (0..40) at
+function top, over about 45 rows: no row improved. Single extra compiler flags on top of
+`vc6_o2_mt`, over about 57 rows with gaps up to 15 bytes: `/Z7` dropped or replaced by
+`/Zi`/`/Zd`, `/J`, `/Zp1`-`/Zp16`, `/Gy`, `/GF`, `/Gf`, `/Oy-`, `/Op`, `/Oa`, `/Ow`, `/GB`,
+`/G4`-`/G6`, `/Gs`, `/GZ`, `/Za`, `/Ob1`, `/Ob2`, `/Oi-`, `/QIfist`, `/Ge`, `/Ox`, `/Ot`, `/Os`,
+`/MD`, `/ML`, `/GX-`, `/GR-`, `/Gi`, `/Gm`, `/Gd`, `/O1`, `/Og-`. A few partial rows gained a
+few bytes (ResourceManager `0x004e9030` `/Oa`, EcoSystem `0x00457480` `/Ow`, Terrain
+`0x005059d0` `/G6`, GR_BitString `0x00423b70` `/Ge`), but none closed and nothing else
+supports those flags for their units.
 GridNode::FindLeaf `0x00484d70` (class c, 81/90) is exact too, in
 src/reconstructed/GridNode.cpp: written as a tail call into the child (as GetCellCorners
 in the same unit is), through an index local with the child slot read twice
