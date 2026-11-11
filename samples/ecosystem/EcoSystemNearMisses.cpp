@@ -79,24 +79,34 @@
 //               g_collisionQuadTree after its first __ftol, where VC6
 //               here caches the tree in ebx (the s15 reference diff's
 //               missing load)
-//   0x0045b060  frame 0xe0 for 0xf0 and the slot order; retail leans the
-//               side normals through memory temporaries (no Vector3 /
-//               helper spelling of the lean produces them) and releases
-//               edi/ebp/ebx before the overlay rows (461/3967 compiled
-//               inside the unit; the retail function is 3967 bytes).
-//               Retail's frame (tools/frame_layout.py): the x87 int
-//               temporaries at +0, the three lights at +4/+8/+0xc shared
-//               with the loop's vertex offsets 1/3/2, the lengths, the
-//               lean's z and backColor at +0x10, `object` at +0x14, then
-//               right, left, offset5, back and `i` (+0x18..+0x40) unshared,
-//               `definition` in memory at +0x5c, 8 unused bytes at +0xa4
-//               and a second lean z temporary at +0xac below the matrix.
-//               Three float lights (not a Vector3, which VC6 lays over
-//               `right`) leave the normals unshared as retail does; the
-//               instruction stream is the same. Lean helpers taking
-//               floats by value or reference, a Vector3 by value or
-//               reference, inline locals, `-=`, `0.1f * x` and a double
-//               factor do not give retail's duplicated lean values.
+//   0x0045b060  3714/3967, same size and frame (1024/1045 aligned). Logic
+//               fix (session 16): the billboard width scale is
+//               2r / (uRight - uLeft); the sample had the quotient upside
+//               down (retail's fdivp st(1),st divides the doubled radius
+//               by the span), which drew near-zero-width billboards.
+//               Shape levers found the same session: vTop/uLeft/uRight
+//               read into locals in that order (flips the allocation:
+//               vertexCount in ebp, `definition` in memory, edi/ebp/ebx
+//               popped before the overlay rows as in retail); the alpha
+//               test as `isBillboard >= lodCount` (0xff000000 first);
+//               `next++` in the for increment; verticesBefore, camera,
+//               trianglesBefore declaration order; the page store through
+//               a local; and the lean as UnknownEcoLean(&side,
+//               UnknownEcoScaleXZ(back, 0.1f)) per side, a returned
+//               vector passed by value, which gives retail's duplicated
+//               x product and the twice-copied z temporary (and the
+//               0xf0 frame). Remaining: the first loop guard compares
+//               `remaining` with the zero register before the offset
+//               stores (ours tests it after them: `i = 0` before or after
+//               the zero locals, `i = vertexCount`, a chained zeroing,
+//               `remaining > i` and `if (i >= 120) break` do not move it),
+//               x87 scheduling in the lit-face block (+0x8d4..+0x931) and
+//               the alpha|leftColor load order at +0xc1c. Ruled out for
+//               the lean: float/reference helpers, a named Vector3 lean
+//               (with or without a copy), `back * 0.1f`, `-=`, `0.1f * x`
+//               and a double factor. Other permutations of the three
+//               field locals, dropping uRight or vTop and removing the
+//               offset1/2/3/5 locals are all worse.
 
 #include "../../src/reconstructed/TrackGameGlobal.h"
 #include <float.h>
@@ -688,6 +698,24 @@ static inline unsigned int UnknownEcoLitColor(const EcoSystem* eco, float intens
     return ((int)(r * 255.0f) << 16) | ((int)(g * 255.0f) << 8) | (int)(b * 255.0f);
 }
 
+// The xz part of `v` scaled, returned by value (y is left unset; the
+// normalise below clears it). Inline shape only: retail's lean keeps the
+// x product on the x87 stack and spills the z product to a by-value
+// temporary that is copied once more, which is what a returned vector
+// passed by value to UnknownEcoLean produces.
+static inline Vector3 UnknownEcoScaleXZ(const Vector3& v, float s) {
+    Vector3 r;
+    r.x = v.x * s;
+    r.z = v.z * s;
+    return r;
+}
+
+// `v` moved back by `lean` in the xz plane. Inline shape only.
+static inline void UnknownEcoLean(Vector3* v, Vector3 lean) {
+    v->x = v->x - lean.x;
+    v->z = v->z - lean.z;
+}
+
 // The light falling on a face with normal `n` (the dot product is summed
 // as z + (x + y), the order VC6 emits for retail; see UnknownSquareMagnitude).
 static inline float UnknownEcoLightOn(const EcoSystem* eco, const Vector3* n) {
@@ -711,8 +739,8 @@ int EcoSystem::Render3D() {
         return 1;
     unsigned int start = ReadClock();
     int category = g_MemTagStack->Push("EcoSystem");
-    UnknownEcoCamera* camera = ECO_VIEW->camera;
     int verticesBefore = ECO_VIEW->verticesDrawn;
+    UnknownEcoCamera* camera = ECO_VIEW->camera;
     int trianglesBefore = ECO_VIEW->trianglesDrawn;
     float projectionScale = camera->projectionScale;
     identity(0, 0) = 1.0f;
@@ -742,10 +770,8 @@ int EcoSystem::Render3D() {
     left.z = -camera->direction.x;
     back.x = -camera->direction.x;
     back.z = -camera->direction.z;
-    right.x = right.x - back.x * 0.1f;
-    right.z = right.z - back.z * 0.1f;
-    left.x = left.x - back.x * 0.1f;
-    left.z = left.z - back.z * 0.1f;
+    UnknownEcoLean(&right, UnknownEcoScaleXZ(back, 0.1f));
+    UnknownEcoLean(&left, UnknownEcoScaleXZ(back, 0.1f));
     UnknownEcoNormalizeXZ(&right);
     UnknownEcoNormalizeXZ(&left);
     UnknownEcoNormalizeXZ(&back);
@@ -798,7 +824,7 @@ int EcoSystem::Render3D() {
             int offset2 = 0x40;
             int offset1 = 0x20;
             int offset3 = 0x60;
-            for (i = 0; i < remaining && i < 120; i++) {
+            for (i = 0; i < remaining && i < 120; i++, next++) {
                 Vegetation* object = billboardList[next];
                 UnknownEcoDefinition* definition = definitionTable[object->definitionIndex];
                 float radius = definition->RadiusForParameter(object->radiusParam);
@@ -806,9 +832,12 @@ int EcoSystem::Render3D() {
                 float depth = depthKey * depthUnit;
                 if (depth < billboardRange && radius * projectionScale / depth > 2.0f) {
                     float height = definition->HeightForParameter(object->heightParam);
-                    float uScale = (definition->uRight - definition->uLeft) / (radius + radius);
-                    float uLeftWidth = (definition->vTop - definition->uLeft) * uScale;
-                    float uRightWidth = (definition->uRight - definition->vTop) * uScale;
+                    float vTop = definition->vTop;
+                    float uLeft = definition->uLeft;
+                    float uRight = definition->uRight;
+                    float uScale = (radius + radius) / (uRight - uLeft);
+                    float uLeftWidth = (vTop - uLeft) * uScale;
+                    float uRightWidth = (uRight - vTop) * uScale;
                     float x = object->quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
                     float y = object->quantizedPosition.y * g_EcoSystem->unitsPerCoordinate;
                     float z = object->quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
@@ -826,10 +855,10 @@ int EcoSystem::Render3D() {
                     VERTEX(offset0 + 0x40).position.y = height + VERTEX(offset0).position.y;
                     VERTEX(offset0 + 0x60).position.y = VERTEX(offset0 + 0x40).position.y;
                     unsigned int alpha;
-                    if (object->isBillboard < definition->lodCount)
-                        alpha = object->fadeLevel << 24;
-                    else
+                    if (object->isBillboard >= definition->lodCount)
                         alpha = 0xff000000;
+                    else
+                        alpha = object->fadeLevel << 24;
                     int stride;
                     if (billboardLimit && ((stageLighting && depth < 20.0f) || depth * widthScale < radius)) {
                         VERTEX(offset5).position.x = x;
@@ -900,7 +929,6 @@ int EcoSystem::Render3D() {
                     offset0 += stride;
                     s_billboardsDrawn++;
                 }
-                next++;
             }
             if (s_drawEnabled && vertexCount)
                 ECO_VIEW->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, billboardVertices, vertexCount,
@@ -912,7 +940,7 @@ int EcoSystem::Render3D() {
     UnknownEcoDebugOverlay* overlay = reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay;
     if (overlay) {
         if (s_debugPage < 0)
-            s_debugPage = overlay->nextPage++;
+            { int page = overlay->nextPage++; s_debugPage = page; }
         s_prepareGeometryPeak.Record(s_prepareGeometryTicks);
         s_renderPeak.Record(s_renderTicks);
         reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Title(s_debugPage, "Ecosystem:%d objects", totalObjects);

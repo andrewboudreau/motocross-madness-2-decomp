@@ -40,26 +40,10 @@ static int s_renderTicks;                    // 0x0059aee4 (local copy)
 static int s_prepareGeometryTicks;           // 0x0059aee8 (local copy, never set here)
 static int s_geometryDrawn;                  // 0x0059af04 (local copy)
 static int s_billboardsDrawn;                // 0x0059af08 (local copy)
-static UnknownEcoDetailBand g_UnknownGlobal56a600[10] = {
-    {0, 0, 1555, 256, 0, 0, 0, 0},   {0, 0, 1555, 256, 0, 0, 0, 0},   {0, 0, 1555, 256, 0, 0, 0, 0},
-    {10, 10, 1555, 384, 0, 0, 0, 0}, {20, 20, 1555, 384, 0, 1, 0, 0}, {20, 20, 1555, 448, 0, 1, 1, 0},
-    {30, 30, 1555, 512, 0, 1, 1, 0}, {40, 40, 1555, 512, 0, 1, 1, 0}, {75, 75, 1555, 640, 1, 1, 1, 0},
-    {150, 75, 1555, 768, 1, 1, 1, 1},
-};
-static UnknownEcoDetailBand g_UnknownGlobal56a740[10] = {
-    {20, 0, 4444, 256, 0, 1, 1, 1},   {35, 5, 4444, 256, 0, 1, 1, 1},   {45, 10, 4444, 320, 0, 1, 1, 1},
-    {60, 20, 4444, 384, 0, 1, 1, 1},  {75, 30, 4444, 448, 1, 1, 1, 1},  {90, 40, 4444, 512, 1, 1, 1, 1},
-    {105, 50, 4444, 576, 1, 1, 1, 1}, {120, 60, 4444, 640, 1, 1, 1, 1}, {135, 67, 4444, 768, 1, 1, 1, 1},
-    {150, 75, 4444, 768, 1, 1, 1, 1},
-};
-
-// best guess: EcoSystem.cpp:801 assigns 0x0059af14 from these two tables
-// on bladeRenderer; recompute the same choice here.
-static UnknownEcoDetailBand* UnknownEcoDetailBands() {
-    return reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->bladeRenderer ? g_UnknownGlobal56a600
-                                                                              : g_UnknownGlobal56a740;
-}
-#define g_UnknownGlobal59af14 (UnknownEcoDetailBands())
+// 0x0059af14, the detail band table: EcoSystem::Create (src/reconstructed/
+// EcoSystem.cpp, the linked provider) points it at 0x0056a600 or 0x0056a740
+// on bladeRenderer. Render3D reads the shared pointer, as retail does.
+extern UnknownEcoDetailBand* g_UnknownGlobal59af14;
 
 #define ECO_VIEW ((UnknownEcoRenderTarget*)renderContext)
 
@@ -72,18 +56,6 @@ void Group4Eco_SetCapsuleShape(void* object, const void* p0, const void* p1, flo
 void Group4Eco_QueryGround(void* terrain, void* position, void* normal, int flatShaded,
                            unsigned char* surface);
 void Group4Eco_GetHeightRange(void* terrain, float* outMin, float* outMax);
-
-// DebugOverlay.h's class, declared here with only the two cdecl formatters
-// (0x00447f40 Print, 0x00447fa0 Title); EcoSystem.h's UnknownEcoDebugOverlay
-// proxy names the same object.
-class DebugOverlay {
-public:
-    void Print(int page, const char* format, ...);
-    void Title(int page, const char* format, ...);
-};
-static inline DebugOverlay* Group4RealOverlay(UnknownEcoDebugOverlay* overlay) {
-    return reinterpret_cast<DebugOverlay*>(overlay);
-}
 
 static inline void UnknownSetIdentity(Matrix4* m) {
     memset(m, 0, sizeof(Matrix4));
@@ -590,6 +562,24 @@ static inline unsigned int UnknownEcoLitColor(const EcoSystem* eco, float intens
     return ((int)(r * 255.0f) << 16) | ((int)(g * 255.0f) << 8) | (int)(b * 255.0f);
 }
 
+// The xz part of `v` scaled, returned by value (y is left unset; the
+// normalise below clears it). Inline shape only: retail's lean keeps the
+// x product on the x87 stack and spills the z product to a by-value
+// temporary that is copied once more, which is what a returned vector
+// passed by value to UnknownEcoLean produces.
+static inline Vector3 UnknownEcoScaleXZ(const Vector3& v, float s) {
+    Vector3 r;
+    r.x = v.x * s;
+    r.z = v.z * s;
+    return r;
+}
+
+// `v` moved back by `lean` in the xz plane. Inline shape only.
+static inline void UnknownEcoLean(Vector3* v, Vector3 lean) {
+    v->x = v->x - lean.x;
+    v->z = v->z - lean.z;
+}
+
 // The light falling on a face with normal `n` (the dot product is summed
 // as z + (x + y), the order VC6 emits for retail; see UnknownSquareMagnitude).
 static inline float UnknownEcoLightOn(const EcoSystem* eco, const Vector3* n) {
@@ -613,8 +603,8 @@ int EcoSystem::Render3D() {
         return 1;
     unsigned int start = ReadClock();
     int category = g_MemTagStack->Push("EcoSystem");
-    UnknownEcoCamera* camera = ECO_VIEW->camera;
     int verticesBefore = ECO_VIEW->verticesDrawn;
+    UnknownEcoCamera* camera = ECO_VIEW->camera;
     int trianglesBefore = ECO_VIEW->trianglesDrawn;
     float projectionScale = camera->projectionScale;
     identity(0, 0) = 1.0f;
@@ -644,10 +634,8 @@ int EcoSystem::Render3D() {
     left.z = -camera->direction.x;
     back.x = -camera->direction.x;
     back.z = -camera->direction.z;
-    right.x = right.x - back.x * 0.1f;
-    right.z = right.z - back.z * 0.1f;
-    left.x = left.x - back.x * 0.1f;
-    left.z = left.z - back.z * 0.1f;
+    UnknownEcoLean(&right, UnknownEcoScaleXZ(back, 0.1f));
+    UnknownEcoLean(&left, UnknownEcoScaleXZ(back, 0.1f));
     UnknownEcoNormalizeXZ(&right);
     UnknownEcoNormalizeXZ(&left);
     UnknownEcoNormalizeXZ(&back);
@@ -700,7 +688,7 @@ int EcoSystem::Render3D() {
             int offset2 = 0x40;
             int offset1 = 0x20;
             int offset3 = 0x60;
-            for (i = 0; i < remaining && i < 120; i++) {
+            for (i = 0; i < remaining && i < 120; i++, next++) {
                 Vegetation* object = billboardList[next];
                 UnknownEcoDefinition* definition = definitionTable[object->definitionIndex];
                 float radius = definition->RadiusForParameter(object->radiusParam);
@@ -708,9 +696,12 @@ int EcoSystem::Render3D() {
                 float depth = depthKey * depthUnit;
                 if (depth < billboardRange && radius * projectionScale / depth > 2.0f) {
                     float height = definition->HeightForParameter(object->heightParam);
-                    float uScale = (definition->uRight - definition->uLeft) / (radius + radius);
-                    float uLeftWidth = (definition->vTop - definition->uLeft) * uScale;
-                    float uRightWidth = (definition->uRight - definition->vTop) * uScale;
+                    float vTop = definition->vTop;
+                    float uLeft = definition->uLeft;
+                    float uRight = definition->uRight;
+                    float uScale = (radius + radius) / (uRight - uLeft);
+                    float uLeftWidth = (vTop - uLeft) * uScale;
+                    float uRightWidth = (uRight - vTop) * uScale;
                     float x = object->quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
                     float y = object->quantizedPosition.y * g_EcoSystem->unitsPerCoordinate;
                     float z = object->quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
@@ -728,10 +719,10 @@ int EcoSystem::Render3D() {
                     VERTEX(offset0 + 0x40).position.y = height + VERTEX(offset0).position.y;
                     VERTEX(offset0 + 0x60).position.y = VERTEX(offset0 + 0x40).position.y;
                     unsigned int alpha;
-                    if (object->isBillboard < definition->lodCount)
-                        alpha = object->fadeLevel << 24;
-                    else
+                    if (object->isBillboard >= definition->lodCount)
                         alpha = 0xff000000;
+                    else
+                        alpha = object->fadeLevel << 24;
                     int stride;
                     if (billboardLimit && ((stageLighting && depth < 20.0f) || depth * widthScale < radius)) {
                         VERTEX(offset5).position.x = x;
@@ -802,7 +793,6 @@ int EcoSystem::Render3D() {
                     offset0 += stride;
                     s_billboardsDrawn++;
                 }
-                next++;
             }
             if (s_drawEnabled && vertexCount)
                 ECO_VIEW->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, billboardVertices, vertexCount,
@@ -814,24 +804,24 @@ int EcoSystem::Render3D() {
     UnknownEcoDebugOverlay* overlay = reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay;
     if (overlay) {
         if (s_debugPage < 0)
-            s_debugPage = overlay->nextPage++;
+            { int page = overlay->nextPage++; s_debugPage = page; }
         s_prepareGeometryPeak.Record(s_prepareGeometryTicks);
         s_renderPeak.Record(s_renderTicks);
-        Group4RealOverlay(overlay)->Title(s_debugPage, "Ecosystem:%d objects", totalObjects);
-        Group4RealOverlay(overlay)->Print(s_debugPage, "Visible  2D %d 3D %d", billboardCount,
+        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Title(s_debugPage, "Ecosystem:%d objects", totalObjects);
+        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Visible  2D %d 3D %d", billboardCount,
                                                        geometryCount);
-        Group4RealOverlay(overlay)->Print(s_debugPage, "Rendered 2D %d 3D %d",
+        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Rendered 2D %d 3D %d",
                                                        s_billboardsDrawn, s_geometryDrawn);
-        Group4RealOverlay(overlay)->Print(s_debugPage, "Memory %d",
+        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Memory %d",
                                                        g_MemTagStack->GetBytes("EcoSystem"));
-        Group4RealOverlay(overlay)->Print(s_debugPage, "PrepareGeometry %d %d",
+        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "PrepareGeometry %d %d",
                                                        s_prepareGeometryTicks, s_prepareGeometryPeak.Peak());
-        Group4RealOverlay(overlay)->Print(s_debugPage, "Render %d(3d:%d) %d",
+        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Render %d(3d:%d) %d",
                                                        s_renderTicks, s_geometryRenderTicks,
                                                        s_renderPeak.Peak());
-        Group4RealOverlay(overlay)->Print(s_debugPage, "Total Transforms %d",
+        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Total Transforms %d",
                                                        ECO_VIEW->verticesDrawn - verticesBefore);
-        Group4RealOverlay(overlay)->Print(s_debugPage, "Total Triangles  %d",
+        reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->debugOverlay->Print(s_debugPage, "Total Triangles  %d",
                                                        ECO_VIEW->trianglesDrawn - trianglesBefore);
     }
     g_MemTagStack->Pop(category);

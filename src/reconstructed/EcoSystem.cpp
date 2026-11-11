@@ -39,7 +39,7 @@ static int s_geometryDrawn;                  // 0x0059af04: geometry objects dra
 static int s_billboardsDrawn;                // 0x0059af08: billboards drawn ("Rendered 2D %d")
 static int g_UnknownGlobal59af0c;             // 0x0059af0c: geometry blocks alive
 static int g_UnknownGlobal59af10;             // 0x0059af10: textures preloaded
-static UnknownEcoDetailBand* g_UnknownGlobal59af14; // 0x0059af14: the detail band table
+UnknownEcoDetailBand* g_UnknownGlobal59af14; // 0x0059af14: the detail band table (external: the Group4 bring-up Render3D reads it)
 
 // The detail bands, by level: 0x0056a600 for the 1555 (software) path,
 // 0x0056a740 for 4444.
