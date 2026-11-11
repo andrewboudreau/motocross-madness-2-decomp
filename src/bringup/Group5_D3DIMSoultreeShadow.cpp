@@ -13,6 +13,11 @@
 //    best guess: retail's array runs up to the vertex array, 0x2ee4 bytes
 //    (3001 ints), and the meshes drawn here stay within it;
 //  * __FILE__ is the retail path string (0x00568cac).
+// Slot 30 was compared with retail instruction by instruction: the constants, branches,
+// member offsets, calls and float order agree, and what is left is the rounding shape
+// (441 against 468 instructions and a 0.796 similarity when X87FloatToInt is called out of
+// line; inlined, each of its six sites adds about 60 instructions) and the frame (retail's
+// helper forces an ebp frame of 0xe4 bytes).
 #include "shadow/D3DIMSoultreeShadow.h"
 #include "math/Vec3.h"
 #include "Matrix4.h"

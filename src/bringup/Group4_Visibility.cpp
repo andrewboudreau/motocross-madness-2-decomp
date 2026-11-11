@@ -5,6 +5,14 @@
 //    decoded retail function. Retail rounds the screen rectangle with an
 //    inline x87 fistp helper (current rounding mode, round-to-nearest-even);
 //    X87FloatToInt reproduces it without inline assembly.
+//    Compared with retail instruction by instruction: the outcodes, the
+//    trivial accepts, the shared-bit reject, the projection, the clamp and
+//    the viewport offset agree.  The linked body is 836 instructions against
+//    retail's 464 because each of the six roundings inlines X87FloatToInt
+//    (about 62 instructions) where retail has four; with the rounding out of
+//    line the body is 442.  Griddraw.h's and D3DIMSoultreeShadow.cpp's views
+//    of the clipper forward here (Group2_GridVisibilityTestBox.cpp,
+//    Group1_ShadowClipper.cpp), as retail has a single function.
 //  * UnknownEcoVisibilityClipper::SphereInFrustum (0x0052fbb0) is
 //    EcoSystem.h's boundary view of VisibilityClipper::SphereInFrustum,
 //    which src/krusty2/visibility/VisibilityQuadTree.cpp already defines; the

@@ -11,6 +11,14 @@
 //  * retail rounds the projected coordinates with an inline `fistp` (current
 //    FPU rounding mode, round-to-nearest-even), not a truncating cast;
 //    X87FloatToInt reproduces it without inline assembly.
+// RenderShadow and Present were compared with retail instruction by
+// instruction and agree apart from the rounding sites.  They score below the
+// sample in linked_accuracy only because X87FloatToInt inlines to about 62
+// instructions a site; the sample's ProjectedShadowFloatToInt (an (int) cast
+// through __ftol and a ties-to-even fix) is shorter but ignores the FPU
+// rounding mode, and the sample's call views are declared without bodies, so
+// the sample cannot be linked as it stands.  Present has no rounding site and
+// is the same in both (0.701).
 #include "shadow/ProjectedShadow.h"
 #include "X87FloatToInt.h"
 

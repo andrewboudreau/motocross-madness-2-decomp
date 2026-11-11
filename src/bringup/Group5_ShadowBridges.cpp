@@ -216,7 +216,14 @@ static inline void FillSpan(short* cell, int count, unsigned long pair, short va
 // 0x00461e60: rasterises the triangle `points` (three {x, y}) into the
 // (1 << shift)-wide buffer, top-left fill convention; with `plotVertices` the
 // three corners are written first. A single-row triangle fills [min x, max x].
-// Retail returns 1 (eax), which the declared void signature drops.
+// Retail returns 1 (eax), which the declared void signature drops; no caller
+// reads it (TerrainShadow slot 30, D3DIMSoultreeShadow slot 30 and
+// ProjectedShadow::RenderShadow all discard eax).
+// Compared with retail instruction by instruction: the vertex sort, the edge
+// set-up and step, the top-left rule and the span fill agree (433 instructions
+// against 435).  linked_accuracy's larger count for this body comes from the
+// span fill's Duff jump tables, which VC6 places inside the function and the
+// tool decodes as instructions; it is not a code difference.
 void ShadowFillTriangle(int shift, short* buffer, short value, int* points, int plotVertices)
 {
     unsigned long pair = ((unsigned long)(unsigned short)value << 16) | (unsigned short)value;
