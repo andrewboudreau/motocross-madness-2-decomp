@@ -19,21 +19,22 @@
 // coordinates in place. Only TestBox touches them in this unit.
 static VisibilityClipPoint s_group4BoxCorners[8];
 
-// Outcode of a clip-space point against 0 <= x, y, z <= w:
-// x 1/2, y 4/8, z 0x10/0x20 (below / above).
-static unsigned int Group4Vis_OutCode(float x, float y, float z, float w) {
+// Outcode of a clip-space corner against 0 <= x, y, z <= w:
+// x 1/2, y 4/8, z 0x10/0x20 (below / above). Inline in retail, which tests
+// y first here and compares with the double 0.0 at 0x005507e8.
+static inline unsigned int Group4Vis_OutCode(float x, float y, float z, float w) {
     unsigned int code = 0;
-    if (x < 0.0f)
-        code = 1;
-    else if (w - x < 0.0f)
-        code = 2;
-    if (y < 0.0f)
-        code |= 4;
-    else if (w - y < 0.0f)
-        code |= 8;
-    if (z < 0.0f)
+    if (y < 0.0)
+        code = 4;
+    else if (w - y < 0.0)
+        code = 8;
+    if (x < 0.0)
+        code |= 1;
+    else if (w - x < 0.0)
+        code |= 2;
+    if (z < 0.0)
         code |= 0x10;
-    else if (w - z < 0.0f)
+    else if (w - z < 0.0)
         code |= 0x20;
     return code;
 }
@@ -60,15 +61,31 @@ int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, co
     int inside = 0;
     int i;
     if (!screenRect && !cornersInside) {
-        float w = m[3] * center[0] + m[7] * center[1] + m[11] * center[2] + m[15];
-        float x = m[0] * center[0] + m[4] * center[1] + m[8] * center[2] + m[12];
-        float y = m[1] * center[0] + m[5] * center[1] + m[9] * center[2] + m[13];
-        float z = m[2] * center[0] + m[6] * center[1] + m[10] * center[2] + m[14];
-        if (Group4Vis_OutCode(x, y, z, w) == 0)
+        // Trivial accept when the centre is inside. Retail sums each row z term
+        // first and tests x, then y, then z on the unrounded sums.
+        float w = m[11] * center[2] + m[3] * center[0] + m[7] * center[1] + m[15];
+        float x = m[8] * center[2] + m[4] * center[1] + m[0] * center[0] + m[12];
+        unsigned int code = 0;
+        if (x < 0.0)
+            code = 1;
+        else if (w - x < 0.0)
+            code = 2;
+        float y = m[9] * center[2] + m[1] * center[0] + m[5] * center[1] + m[13];
+        if (y < 0.0)
+            code |= 4;
+        else if (w - y < 0.0)
+            code |= 8;
+        float z = m[10] * center[2] + m[2] * center[0] + m[6] * center[1] + m[14];
+        if (z < 0.0)
+            code |= 0x10;
+        else if (w - z < 0.0)
+            code |= 0x20;
+        if (code == 0)
             return 1;
     }
 
-    // Per-axis products of the low/high box faces with the matrix rows.
+    // Per-axis products of the low/high box faces with the matrix rows
+    // ([column][low/high]), in retail's straight-line order.
     float lowX = center[0] - extent[0];
     float lowY = center[1] - extent[1];
     float lowZ = center[2] - extent[2];
@@ -76,14 +93,30 @@ int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, co
     float highY = center[1] + extent[1];
     float highZ = center[2] + extent[2];
     float px[4][2], py[4][2], pz[4][2];
-    for (i = 0; i < 4; i++) {
-        px[i][0] = lowX * m[i];
-        px[i][1] = highX * m[i];
-        py[i][0] = lowY * m[4 + i];
-        py[i][1] = highY * m[4 + i];
-        pz[i][0] = lowZ * m[8 + i];
-        pz[i][1] = highZ * m[8 + i];
-    }
+    px[0][0] = lowX * m[0];
+    px[1][0] = lowX * m[1];
+    px[2][0] = lowX * m[2];
+    px[3][0] = lowX * m[3];
+    px[0][1] = highX * m[0];
+    px[1][1] = highX * m[1];
+    px[2][1] = highX * m[2];
+    px[3][1] = highX * m[3];
+    py[0][0] = lowY * m[4];
+    py[1][0] = lowY * m[5];
+    py[2][0] = lowY * m[6];
+    py[3][0] = lowY * m[7];
+    py[0][1] = highY * m[4];
+    py[1][1] = highY * m[5];
+    py[2][1] = highY * m[6];
+    py[3][1] = highY * m[7];
+    pz[0][0] = lowZ * m[8];
+    pz[1][0] = lowZ * m[9];
+    pz[2][0] = lowZ * m[10];
+    pz[3][0] = lowZ * m[11];
+    pz[0][1] = highZ * m[8];
+    pz[1][1] = highZ * m[9];
+    pz[2][1] = highZ * m[10];
+    pz[3][1] = highZ * m[11];
 
     unsigned int common = 0xffffffff;
     for (i = 0; i < 8; i++) {

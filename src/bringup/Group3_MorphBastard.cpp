@@ -139,32 +139,39 @@ void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultr
 }
 
 // ---------------------------------------------------------------------------
-// ControllerAngles helpers (TU-local copies of retail's out-of-line helpers).
+// ControllerAngles helpers: TU-local copies of the out-of-line helpers retail calls
+// from its second and third axis blocks, with retail's pointer signatures and
+// arithmetic.  (Their first uses, in the x axis block, are expanded inline in retail;
+// ControllerAngles writes that block out the same way.)
 
 // 0x0040ae30: a.b
-static float MbDot(const Vector3& a, const Vector3& b)
+static float MbDot(const Vector3* a, const Vector3* b)
 {
-    return a.x * b.x + a.y * b.y + a.z * b.z;
+    return a->x * b->x + a->y * b->y + a->z * b->z;
 }
 
 // 0x00515600: a x b
-static Vector3 MbCross(const Vector3& a, const Vector3& b)
+static Vector3 MbCross(const Vector3* a, const Vector3* b)
 {
-    return Vector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+    return Vector3(a->y * b->z - a->z * b->y, a->z * b->x - a->x * b->z, a->x * b->y - a->y * b->x);
 }
 
 // 0x004a2350: row `row` of m as a vector.
-static Vector3 MbRow(const Matrix4& m, int row)
+static Vector3 MbRow(const Matrix4* m, int row)
 {
-    return Vector3(m.m[row][0], m.m[row][1], m.m[row][2]);
+    return Vector3(m->m[row][0], m->m[row][1], m->m[row][2]);
 }
 
-// Normalise, or zero when the length is zero (0x0040ae30 + 0x00460c00 in retail).
-static void MbNormalizeOrZero(Vector3& v)
+// 0x006850f0: the shared zero vector the normalisation falls back to.
+static const Vector3 kMbZero = Vector3(0.0f, 0.0f, 0.0f);
+
+// Normalise, or zero when the length is zero (inline in retail around calls to
+// 0x0040ae30 and 0x00460c00).
+static inline void MbNormalizeOrZero(Vector3& v)
 {
-    float squared = MbDot(v, v);
+    float squared = MbDot(&v, &v);
     if (squared == 0.0f) {
-        v = Vector3(0.0f, 0.0f, 0.0f);
+        v = kMbZero;
     } else {
         float scale = FastInvSqrt(squared);
         v.x *= scale;
@@ -174,7 +181,7 @@ static void MbNormalizeOrZero(Vector3& v)
 }
 
 // 0x0042de90: rotation of `angle` radians about (x, y, z) (normalised here), row-vector
-// convention, no translation.
+// convention, no translation (the text of BoundingBoxTreeBuild.cpp's AxisAngleMatrix).
 static void MbAxisAngle(Matrix4* m, float x, float y, float z, float angle)
 {
     m->m[0][3] = 0.0f;
@@ -211,26 +218,16 @@ static void MbMultiply(Matrix4* out, const Matrix4* a, const Matrix4* b)
                            b->m[i][2] * a->m[2][j] + b->m[i][3] * a->m[3][j];
 }
 
-// Rotate `from` onto `to` (identity's axis onto the controller's) and return the
-// rotation; `fallback` is used when the two are parallel.
-static void MbAlign(Matrix4* aligned, const Matrix4& identity, const Vector3& from, const Vector3& to,
-                    const Vector3& fallback)
-{
-    Vector3 axis = MbCross(from, to);
-    float angle = AngleBetween(from, to);
-    if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
-        axis = fallback;
-    else
-        MbNormalizeOrZero(axis);
-    Matrix4 rotation;
-    MbAxisAngle(&rotation, axis.x, axis.y, axis.z, angle);
-    MbMultiply(aligned, &identity, &rotation);
-}
-
 // 0x004a3c80 (ret 0x44): the rotation of the channel's controller relative to its rest
 // pose (`inverse`), as three angles in degrees.  For each axis the identity's axis is
-// rotated onto the controller's; the angle left between the next axes is the rotation
-// about it, signed by the cross product.  Stores -x, -z, -y at +0x60/+0x64/+0x68.
+// rotated onto the controller's (cross product, 0x004a3be0 angle, normalise or fall back
+// to the unit axis, axis-angle matrix, 0x00436500); the angle left between the next rows
+// is the rotation about it, signed by the cross product.  Stores -x, -z, -y at
+// +0x60/+0x64/+0x68.  Follows retail's shape (the near miss in
+// samples/render/MorphBastardModifierNearMisses.cpp): the x axis block is written out
+// inline, with its own axis-angle expansion (the length summed z, y, x as retail sums
+// it), and the y and z blocks call the helpers above.  The z block's dot product of the
+// two x rows is in retail too; its result is unused.
 void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix4 inverse)
 {
     Matrix4 identity;
@@ -239,39 +236,119 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
     identity.m[1][1] = 1.0f;
     identity.m[2][2] = 1.0f;
     identity.m[3][3] = 1.0f;
-
-    Matrix4 world;
-    channel->controller->GetMatrixIn(0, &world);
     Matrix4 controller;
-    for (int r = 0; r < 4; r++)
-        for (int c = 0; c < 4; c++)
-            controller.m[r][c] = world.m[r][0] * inverse.m[0][c] + world.m[r][1] * inverse.m[1][c] +
-                                 world.m[r][2] * inverse.m[2][c] + world.m[r][3] * inverse.m[3][c];
+    channel->controller->GetMatrixIn(0, &controller);
+    Matrix4 world = controller;
+    // controller = world * inverse, written out element by element as retail expands it.
+    controller(0, 0) = world(0, 0) * inverse(0, 0) + world(0, 1) * inverse(1, 0) + world(0, 2) * inverse(2, 0) +
+                       world(0, 3) * inverse(3, 0);
+    controller(0, 1) = world(0, 0) * inverse(0, 1) + world(0, 1) * inverse(1, 1) + world(0, 2) * inverse(2, 1) +
+                       world(0, 3) * inverse(3, 1);
+    controller(0, 2) = world(0, 0) * inverse(0, 2) + world(0, 1) * inverse(1, 2) + world(0, 2) * inverse(2, 2) +
+                       world(0, 3) * inverse(3, 2);
+    controller(0, 3) = world(0, 0) * inverse(0, 3) + world(0, 1) * inverse(1, 3) + world(0, 2) * inverse(2, 3) +
+                       world(0, 3) * inverse(3, 3);
+    controller(1, 0) = world(1, 0) * inverse(0, 0) + world(1, 1) * inverse(1, 0) + world(1, 2) * inverse(2, 0) +
+                       world(1, 3) * inverse(3, 0);
+    controller(1, 1) = world(1, 0) * inverse(0, 1) + world(1, 1) * inverse(1, 1) + world(1, 2) * inverse(2, 1) +
+                       world(1, 3) * inverse(3, 1);
+    controller(1, 2) = world(1, 0) * inverse(0, 2) + world(1, 1) * inverse(1, 2) + world(1, 2) * inverse(2, 2) +
+                       world(1, 3) * inverse(3, 2);
+    controller(1, 3) = world(1, 0) * inverse(0, 3) + world(1, 1) * inverse(1, 3) + world(1, 2) * inverse(2, 3) +
+                       world(1, 3) * inverse(3, 3);
+    controller(2, 0) = world(2, 0) * inverse(0, 0) + world(2, 1) * inverse(1, 0) + world(2, 2) * inverse(2, 0) +
+                       world(2, 3) * inverse(3, 0);
+    controller(2, 1) = world(2, 0) * inverse(0, 1) + world(2, 1) * inverse(1, 1) + world(2, 2) * inverse(2, 1) +
+                       world(2, 3) * inverse(3, 1);
+    controller(2, 2) = world(2, 0) * inverse(0, 2) + world(2, 1) * inverse(1, 2) + world(2, 2) * inverse(2, 2) +
+                       world(2, 3) * inverse(3, 2);
+    controller(2, 3) = world(2, 0) * inverse(0, 3) + world(2, 1) * inverse(1, 3) + world(2, 2) * inverse(2, 3) +
+                       world(2, 3) * inverse(3, 3);
+    controller(3, 0) = world(3, 0) * inverse(0, 0) + world(3, 1) * inverse(1, 0) + world(3, 2) * inverse(2, 0) +
+                       world(3, 3) * inverse(3, 0);
+    controller(3, 1) = world(3, 0) * inverse(0, 1) + world(3, 1) * inverse(1, 1) + world(3, 2) * inverse(2, 1) +
+                       world(3, 3) * inverse(3, 1);
+    controller(3, 2) = world(3, 0) * inverse(0, 2) + world(3, 1) * inverse(1, 2) + world(3, 2) * inverse(2, 2) +
+                       world(3, 3) * inverse(3, 2);
+    controller(3, 3) = world(3, 0) * inverse(0, 3) + world(3, 1) * inverse(1, 3) + world(3, 2) * inverse(2, 3) +
+                       world(3, 3) * inverse(3, 3);
 
+    // The x axes.
+    Vector3 from = *(Vector3*)&identity.m[0][0];
+    Vector3 to = *(Vector3*)&controller.m[0][0];
+    Vector3 axis = Vector3(from.y * to.z - from.z * to.y, from.z * to.x - to.z * from.x,
+                           to.y * from.x - from.y * to.x);
+    float angle = AngleBetween(from, to);
+    if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
+        axis = Vector3(1.0f, 0.0f, 0.0f);
+    else
+        MbNormalizeOrZero(axis);
+    float length = (float)sqrt(axis.z * axis.z + axis.y * axis.y + axis.x * axis.x);
+    float x = axis.x / length;
+    float y = axis.y / length;
+    float z = axis.z / length;
+    float c = (float)cos(angle);
+    float s = (float)sin(angle);
+    float t = 1.0f - c;
+    Matrix4 rotation;
+    rotation.m[0][0] = t * x * x + c;
+    rotation.m[0][1] = t * x * y + s * z;
+    rotation.m[0][2] = t * x * z - s * y;
+    rotation.m[0][3] = 0.0f;
+    rotation.m[1][0] = t * x * y - s * z;
+    rotation.m[1][1] = t * y * y + c;
+    rotation.m[1][2] = t * y * z + s * x;
+    rotation.m[1][3] = 0.0f;
+    rotation.m[2][0] = t * x * z + s * y;
+    rotation.m[2][1] = t * y * z - s * x;
+    rotation.m[2][2] = t * z * z + c;
+    rotation.m[2][3] = 0.0f;
+    rotation.m[3][0] = 0.0f;
+    rotation.m[3][1] = 0.0f;
+    rotation.m[3][2] = 0.0f;
+    rotation.m[3][3] = 1.0f;
     Matrix4 aligned;
-
-    // The x axes: angle between the aligned and controller y rows.
-    Vector3 to = MbRow(controller, 0);
-    MbAlign(&aligned, identity, MbRow(identity, 0), to, Vector3(1.0f, 0.0f, 0.0f));
-    Vector3 cross = MbCross(MbRow(aligned, 1), MbRow(controller, 1));
-    float angleX = AngleBetween(MbRow(aligned, 1), MbRow(controller, 1)) * 57.2957764f;
-    if (MbDot(to, cross) < 0.0f)
+    MbMultiply(&aligned, &identity, &rotation);
+    Vector3 alignedY = *(Vector3*)&aligned.m[1][0];
+    Vector3 controllerY = *(Vector3*)&controller.m[1][0];
+    Vector3 cross(alignedY.y * controllerY.z - alignedY.z * controllerY.y,
+                  alignedY.z * controllerY.x - alignedY.x * controllerY.z,
+                  alignedY.x * controllerY.y - alignedY.y * controllerY.x);
+    float angleX = AngleBetween(alignedY, controllerY) * 57.2957764f;
+    if (cross.y * to.y + cross.x * to.x + cross.z * to.z < 0.0f)
         angleX = -angleX;
 
-    // The y axes: angle between the z rows.
-    to = MbRow(controller, 1);
-    MbAlign(&aligned, identity, MbRow(identity, 1), to, Vector3(0.0f, 1.0f, 0.0f));
-    cross = MbCross(MbRow(aligned, 2), MbRow(controller, 2));
-    float angleY = AngleBetween(MbRow(aligned, 2), MbRow(controller, 2)) * 57.2957764f;
-    if (MbDot(to, cross) < 0.0f)
+    // The y axes.
+    from = *(Vector3*)&identity.m[1][0];
+    to = *(Vector3*)&controller.m[1][0];
+    axis = MbCross(&from, &to);
+    angle = AngleBetween(from, to);
+    if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
+        axis = Vector3(0.0f, 1.0f, 0.0f);
+    else
+        MbNormalizeOrZero(axis);
+    MbAxisAngle(&rotation, axis.x, axis.y, axis.z, angle);
+    MbMultiply(&aligned, &identity, &rotation);
+    cross = MbCross(&MbRow(&aligned, 2), &MbRow(&controller, 2));
+    float angleY = AngleBetween(MbRow(&aligned, 2), MbRow(&controller, 2)) * 57.2957764f;
+    if (MbDot(&to, &cross) < 0.0f)
         angleY = -angleY;
 
-    // The z axes: angle between the x rows.
-    to = MbRow(controller, 2);
-    MbAlign(&aligned, identity, MbRow(identity, 2), to, Vector3(0.0f, 0.0f, 1.0f));
-    cross = MbCross(MbRow(aligned, 0), MbRow(controller, 0));
-    float angleZ = AngleBetween(MbRow(aligned, 0), MbRow(controller, 0)) * 57.2957764f;
-    if (MbDot(to, cross) < 0.0f)
+    // The z axes.
+    from = MbRow(&identity, 2);
+    to = MbRow(&controller, 2);
+    axis = MbCross(&from, &to);
+    angle = AngleBetween(from, to);
+    if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
+        axis = Vector3(0.0f, 0.0f, 1.0f);
+    else
+        MbNormalizeOrZero(axis);
+    MbAxisAngle(&rotation, axis.x, axis.y, axis.z, angle);
+    MbMultiply(&aligned, &identity, &rotation);
+    cross = MbCross(&MbRow(&aligned, 0), &MbRow(&controller, 0));
+    MbDot(&MbRow(&aligned, 0), &MbRow(&controller, 0));
+    float angleZ = AngleBetween(MbRow(&aligned, 0), MbRow(&controller, 0)) * 57.2957764f;
+    if (MbDot(&to, &cross) < 0.0f)
         angleZ = -angleZ;
 
     channel->currentValue = -angleX;

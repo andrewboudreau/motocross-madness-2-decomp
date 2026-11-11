@@ -155,7 +155,8 @@ void Group5ShadowEdge::SetUp(const int* points, int start, int end)
     errorAdjDown = dy;
 }
 
-void Group5ShadowEdge::Step()
+// Inline in retail: every row of 0x00461e60 steps its two edges in place.
+inline void Group5ShadowEdge::Step()
 {
     x += xStep;
     y++;
@@ -167,9 +168,12 @@ void Group5ShadowEdge::Step()
     }
 }
 
-// Fills `count` 16-bit cells; retail aligns to 4 bytes and stores the doubled
-// value as dwords (unrolled sixteen times through a jump table).
-static void FillSpan(short* cell, int count, short value)
+// Fills `count` 16-bit cells (inline at each of retail's three spans): one cell to
+// reach a 4-byte boundary, the cells in pairs as dwords of the doubled value `pair`,
+// then the odd last cell.  The pairs go in blocks of sixteen; each block switches on
+// the index of its last pair (15 or more: the whole block) and stores from the top
+// down, the jump-table dispatch retail has at every span.
+static inline void FillSpan(short* cell, int count, unsigned long pair, short value)
 {
     if (count <= 0)
         return;
@@ -177,10 +181,34 @@ static void FillSpan(short* cell, int count, short value)
         *cell++ = value;
         count--;
     }
-    unsigned long pair = ((unsigned long)(unsigned short)value << 16) | (unsigned short)value;
-    unsigned long* cells = (unsigned long*)cell;
-    for (int i = count >> 1; i > 0; i--)
-        *cells++ = pair;
+    int pairs = count >> 1;
+    if (pairs > 0) {
+        unsigned long* block = (unsigned long*)cell;
+        int last = pairs - 1;
+        unsigned blocks = (unsigned)(pairs + 15) >> 4;
+        do {
+            switch (last) {
+            default: block[15] = pair;
+            case 14: block[14] = pair;
+            case 13: block[13] = pair;
+            case 12: block[12] = pair;
+            case 11: block[11] = pair;
+            case 10: block[10] = pair;
+            case 9: block[9] = pair;
+            case 8: block[8] = pair;
+            case 7: block[7] = pair;
+            case 6: block[6] = pair;
+            case 5: block[5] = pair;
+            case 4: block[4] = pair;
+            case 3: block[3] = pair;
+            case 2: block[2] = pair;
+            case 1: block[1] = pair;
+            case 0: block[0] = pair;
+            }
+            last -= 16;
+            block += 16;
+        } while (--blocks);
+    }
     if (count & 1)
         cell[count - 1] = value;
 }
@@ -191,6 +219,7 @@ static void FillSpan(short* cell, int count, short value)
 // Retail returns 1 (eax), which the declared void signature drops.
 void ShadowFillTriangle(int shift, short* buffer, short value, int* points, int plotVertices)
 {
+    unsigned long pair = ((unsigned long)(unsigned short)value << 16) | (unsigned short)value;
     int y0 = points[1];
     int y1 = points[3];
     int y2 = points[5];
@@ -246,7 +275,7 @@ void ShadowFillTriangle(int shift, short* buffer, short value, int* points, int 
 
     if (points[bottom * 2 + 1] == points[top * 2 + 1]) {
         // Every vertex on one row.
-        FillSpan(buffer + (points[bottom * 2 + 1] << shift) + minX, maxX - minX + 1, value);
+        FillSpan(buffer + (points[bottom * 2 + 1] << shift) + minX, maxX - minX + 1, pair, value);
         return;
     }
 
@@ -281,7 +310,7 @@ void ShadowFillTriangle(int shift, short* buffer, short value, int* points, int 
     short* row = buffer + (left->y << shift);
     int rows;
     for (rows = upperEdge.count; rows; rows--) {
-        FillSpan(row + left->x, right->x - left->x + 1, value);
+        FillSpan(row + left->x, right->x - left->x + 1, pair, value);
         upperEdge.Step();
         longEdge.Step();
         row += rowWidth;
@@ -295,7 +324,7 @@ void ShadowFillTriangle(int shift, short* buffer, short value, int* points, int 
         right = &lowerEdge;
     }
     for (rows = lowerEdge.count; rows; rows--) {
-        FillSpan(row + left->x, right->x - left->x + 1, value);
+        FillSpan(row + left->x, right->x - left->x + 1, pair, value);
         lowerEdge.Step();
         longEdge.Step();
         row += rowWidth;
