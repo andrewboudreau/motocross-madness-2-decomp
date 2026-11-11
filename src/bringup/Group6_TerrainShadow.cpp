@@ -137,11 +137,10 @@ void TerrainShadowClipper::ProjectVertices(const void* camera, const void* matri
         reinterpret_cast<VisibilityBoxVec*>(screen), codes);
 }
 
-// 0x00575a98: the clipper pointer VisibilityClipperGlobal.h names g_visibilityClipper
-// (storage: src/bringup/Group1_Globals.cpp).  None of the clipper's methods reads its fields.
-// best guess: alias the same object.  This is a dynamic initializer, but g_visibilityClipper is
-// statically initialized (the address of a static), so it is set before this runs.
-TerrainShadowClipper* g_terrainShadowClipper = reinterpret_cast<TerrainShadowClipper*>(g_visibilityClipper);
+// 0x00575a98: g_terrainShadowClipper is the pointer VisibilityClipperGlobal.h names
+// g_visibilityClipper (storage: src/bringup/Group1_Globals.cpp, statically initialised to the
+// object at 0x0068acd4).  A `link_aliases` weak external in config/game_build.json binds the
+// sample's spelling to that one cell, as retail has one pointer there.
 
 // ---------------------------------------------------------------------------------------------
 // 0x00506e90 (thiscall, ret 0x18): Terrain::CastSegment.  The sample's caster is the

@@ -4,6 +4,7 @@
     "src"
   ],
   "link_aliases": {
+    "?g_terrainShadowClipper@@3PAVTerrainShadowClipper@@A": "?g_visibilityClipper@@3PAVVisibilityClipper@@A",
     "?g_CollisionScratchPoints@@3PAUCollisionVec3@@A": "?g_CollisionScratchPoints@@3PAUVec3@@A",
     "?Print@UnknownEcoDebugOverlay@@QAAXHPBDZZ": "?Print@DebugOverlay@@QAAXHPBDZZ",
     "?Title@UnknownEcoDebugOverlay@@QAAXHPBDZZ": "?Title@DebugOverlay@@QAAXHPBDZZ",
