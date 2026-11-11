@@ -2,36 +2,6 @@
   {
     "class": "PixelBlend",
     "source": "PixelBlend.cpp",
-    "candidate_symbol_contains": "BlendArgb4444",
-    "target_va": "0x43b320",
-    "target_size": 278,
-    "expect": "exact",
-    "notes": "ARGB4444 alpha blend, result written in place over B (retail stores the blended bytes back into the B array). External linkage (called from 0x0050b637), so the function has its own COMDAT and its /Z7 size record; target_size is the code extent (278, without the 10 padding bytes).",
-    "bindings": "PixelBlend.bindings.json"
-  },
-  {
-    "class": "PixelBlend",
-    "source": "PixelBlend.cpp",
-    "candidate_symbol_contains": "BlendArgb1555",
-    "target_va": "0x43b440",
-    "target_size": 274,
-    "expect": "exact",
-    "notes": "ARGB1555 blend, in place over B. External linkage (called from 0x0050b937); code extent 274.",
-    "bindings": "PixelBlend.bindings.json"
-  },
-  {
-    "class": "PixelBlend",
-    "source": "PixelBlend.cpp",
-    "candidate_symbol_contains": "BlendArgb8888",
-    "target_va": "0x43b560",
-    "target_size": 243,
-    "expect": "exact",
-    "notes": "ARGB8888 blend, in place over B. External linkage (called from 0x0050b338); code extent 243.",
-    "bindings": "PixelBlend.bindings.json"
-  },
-  {
-    "class": "PixelBlend",
-    "source": "PixelBlend.cpp",
     "candidate_symbol_contains": "PackColor",
     "target_va": "0x43b660",
     "target_size": 409,

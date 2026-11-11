@@ -27124,6 +27124,31 @@ CASES += [
         'includes': ['src/krusty2', 'src/reconstructed'],
         'reason': 'Existing Bike wheel receiver and Tire attachment field views; native transform closure verified',
     },
+    {
+        'name': 'Font texel 4444 blend',
+        'source': 'src/reconstructed/PixelBlend.cpp',
+        'bindings': 'src/reconstructed/PixelBlend.bindings.json',
+        'symbol': '?BlendFontTexel4444@@YAGGGG@Z',
+        'target_va': '0x0043b320', 'target_size': 278,
+        'reason': 'Called by DrawText4444 0x0050b637; in place over dest, alpha nibble / 15. Owner TU unknown '
+                  '(between CollisionPoint.cpp and ConstraintMethodCollisionModel.cpp, no literal)',
+    },
+    {
+        'name': 'Font texel 1555 blend',
+        'source': 'src/reconstructed/PixelBlend.cpp',
+        'bindings': 'src/reconstructed/PixelBlend.bindings.json',
+        'symbol': '?BlendFontTexel1555@@YAGGGG@Z',
+        'target_va': '0x0043b440', 'target_size': 274,
+        'reason': 'Called by DrawText1555 0x0050b937; in place over dest, alpha bit unscaled. Owner TU unknown',
+    },
+    {
+        'name': 'Font texel 32-bit blend',
+        'source': 'src/reconstructed/PixelBlend.cpp',
+        'bindings': 'src/reconstructed/PixelBlend.bindings.json',
+        'symbol': '?BlendFontTexel32@@YAIIII@Z',
+        'target_va': '0x0043b560', 'target_size': 243,
+        'reason': 'Called by DrawTextInto 0x0050b338; in place over dest, alpha / 255. Owner TU unknown',
+    },
 ]
 
 

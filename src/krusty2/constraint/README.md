@@ -14,7 +14,8 @@ Evidence
   vtable `0x005511f0` at object offset 12. sizeof `0x10c` (`new(0x10c, "wrecker.cpp", 0x68)` at `0x005302e8`).
 - `.CRT$XCU` 66-69 are the unit's four kVec3 initializer pairs `0x0043c8e0..0x0043ca1b`.
 - Start: the contact callback `0x0043b800`, which only slot 8 installs. The four pixel blend helpers before it
-  (`0x0043b320..0x0043b7f9`, `samples/physics/constraint/PixelBlend.cpp`, all exact) have no literal or caller
+  (`0x0043b320..0x0043b7f9`, all exact: the three blends in `src/reconstructed/PixelBlend.cpp`, `0x0043b660` in
+  `samples/physics/constraint/PixelBlend.cpp`) have no literal or caller
   tying them to this unit; their ownership is open.
 
 Functions (all in the extent)

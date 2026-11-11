@@ -1,15 +1,17 @@
 // Group2_OverlayText.cpp -- bring-up (link) definitions for TextService.cpp
 // functions still missing from src/: UnknownOverlayText::DrawTextInto
 // (0x0050b080), its 16-bit variants DrawText4444 (0x0050b400) and
-// DrawText1555 (0x0050b700), LayoutText (0x0050ba00), and the four cdecl
-// pixel helpers they call (0x0043b660, 0x0043b560, 0x0043b320, 0x0043b440;
-// names from TextService.h, provisional).
+// DrawText1555 (0x0050b700), LayoutText (0x0050ba00), and the cdecl pixel
+// helper ConvertColorToFormat (0x0043b660; name from TextService.h,
+// provisional). The three blends they call are strict exact in
+// src/reconstructed/PixelBlend.cpp.
 //
 // Status: best-guess-unreviewed. The UnknownOverlayText bodies are the
 // near-miss bodies of samples/render/TextServiceNearMisses.cpp (register /
-// scheduling differences only, per that file). The pixel helpers were
+// scheduling differences only, per that file). ConvertColorToFormat was
 // written from the retail disassembly for this bring-up; not byte-matched
-// and not differentially tested.
+// and not differentially tested (the exact body, samples/physics/constraint/
+// PixelBlend.cpp, returns unsigned short where TextService.h has unsigned int).
 
 #include <string.h>
 
@@ -41,80 +43,6 @@ unsigned int ConvertColorToFormat(unsigned int color, int format) {
         return (unsigned short)value;
     }
     return 0;
-}
-
-// 0x0043b560: blends a 32-bit ARGB font texel over `dest` with the texel's
-// alpha; a nonzero `color` replaces the texel's RGB (keeping its alpha).
-// All four channels (alpha too) are blended: d = t * a + d * (1 - a).
-unsigned int BlendFontTexel32(unsigned int texel, unsigned int dest, unsigned int color) {
-    unsigned char t[4];
-    unsigned char d[4];
-    t[0] = (unsigned char)(texel >> 24);
-    t[1] = (unsigned char)(texel >> 16);
-    t[2] = (unsigned char)(texel >> 8);
-    t[3] = (unsigned char)texel;
-    d[0] = (unsigned char)(dest >> 24);
-    d[1] = (unsigned char)(dest >> 16);
-    d[2] = (unsigned char)(dest >> 8);
-    d[3] = (unsigned char)dest;
-    float alpha = t[0] * 0.003921569f;
-    if (color) {
-        t[1] = (unsigned char)(color >> 16);
-        t[2] = (unsigned char)(color >> 8);
-        t[3] = (unsigned char)color;
-    }
-    float inverse = 1.0f - alpha;
-    for (unsigned int i = 0; i < 4; i++)
-        d[i] = (unsigned char)(int)(t[i] * alpha + d[i] * inverse);
-    return ((unsigned int)d[0] << 24) | ((unsigned int)d[1] << 16) | ((unsigned int)d[2] << 8) | d[3];
-}
-
-// 0x0043b320: the 4444 version (alpha nibble scaled by 1/15).
-unsigned short BlendFontTexel4444(unsigned short texel, unsigned short dest, unsigned short color) {
-    unsigned char t[4];
-    unsigned char d[4];
-    t[0] = (texel >> 12) & 0xf;
-    t[1] = (texel >> 8) & 0xf;
-    t[2] = (texel >> 4) & 0xf;
-    t[3] = texel & 0xf;
-    d[0] = (dest >> 12) & 0xf;
-    d[1] = (dest >> 8) & 0xf;
-    d[2] = (dest >> 4) & 0xf;
-    d[3] = dest & 0xf;
-    float alpha = t[0] * 0.06666667f;
-    if (color) {
-        t[1] = (color >> 8) & 0xf;
-        t[2] = (color >> 4) & 0xf;
-        t[3] = color & 0xf;
-    }
-    float inverse = 1.0f - alpha;
-    for (unsigned int i = 0; i < 4; i++)
-        d[i] = (unsigned char)(int)(t[i] * alpha + d[i] * inverse);
-    return (unsigned short)((d[0] << 12) | (d[1] << 8) | (d[2] << 4) | d[3]);
-}
-
-// 0x0043b440: the 1555 version; the alpha bit is used unscaled (0 or 1).
-unsigned short BlendFontTexel1555(unsigned short texel, unsigned short dest, unsigned short color) {
-    unsigned char t[4];
-    unsigned char d[4];
-    t[0] = (texel >> 15) & 1;
-    t[1] = (texel >> 10) & 0x1f;
-    t[2] = (texel >> 5) & 0x1f;
-    t[3] = texel & 0x1f;
-    d[0] = (dest >> 15) & 1;
-    d[1] = (dest >> 10) & 0x1f;
-    d[2] = (dest >> 5) & 0x1f;
-    d[3] = dest & 0x1f;
-    float alpha = (float)t[0];
-    if (color) {
-        t[1] = (color >> 10) & 0x1f;
-        t[2] = (color >> 5) & 0x1f;
-        t[3] = color & 0x1f;
-    }
-    float inverse = 1.0f - alpha;
-    for (unsigned int i = 0; i < 4; i++)
-        d[i] = (unsigned char)(int)(t[i] * alpha + d[i] * inverse);
-    return (unsigned short)((d[0] << 15) | (d[1] << 10) | (d[2] << 5) | d[3]);
 }
 
 // 0x0050b080
