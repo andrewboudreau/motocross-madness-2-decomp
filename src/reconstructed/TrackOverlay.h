@@ -279,9 +279,12 @@ public:
     // 0x0051c4f0: intersects the line through a and b with the circle
     // (circle[0], circle[1]) of radius circle[2]. Returns -1 for no
     // intersection (or a degenerate line), 1 for a tangent point and 2 for
-    // the intersection nearer to `point`, written to `point`; 3 when the
-    // direction vanishes. `a4` is not read.
-    int IntersectLineCircle(const float* a, const float* b, const float* circle, float* a4, float* point);
+    // the intersection nearer to `reference`; the point is written to `point`;
+    // 3 when the direction vanishes. Retail reads the two-hit reference from
+    // the fourth argument (0x0051c656, `mov eax, [esp+0x30]` with FastSqrt's
+    // argument still pushed) and writes through the fifth; DrawTrackOutline
+    // passes the unclamped map position there and an uninitialised local here.
+    int IntersectLineCircle(const float* a, const float* b, const float* circle, float* reference, float* point);
 
     float frameTimeSum;                       // frame time summed
     float frameCount;                         // frames summed

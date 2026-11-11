@@ -125,7 +125,7 @@ static int s_UnknownGlobal57513c = 2;
 static int s_UnknownGlobal68a444;
 
 // 0x0051c4f0
-int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const float* circle, float* a4, float* point)
+int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const float* circle, float* reference, float* point)
 {
     float nx;
     float ny;
@@ -164,10 +164,10 @@ int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const floa
     float y1 = k1 * dy + py;
     float x2 = k2 * dx + px;
     float y2 = k2 * dy + py;
-    float ay = point[1] - y1;
-    float ax = point[0] - x1;
-    float by = point[1] - y2;
-    float bx = point[0] - x2;
+    float ay = reference[1] - y1;
+    float ax = reference[0] - x1;
+    float by = reference[1] - y2;
+    float bx = reference[0] - x2;
     if (ax * ax + ay * ay < (by * by) + bx * bx) {
         point[0] = x1;
         point[1] = y1;

@@ -35,10 +35,12 @@
 #include "../reconstructed/D3DConstants.h"
 
 // 0x0051c4f0: intersects the line a-b with the circle (x, y, r); writes the
-// intersection nearest to the incoming `point` back into `point`.  Returns -1 for no
+// intersection nearest to `reference` into `point`.  Returns -1 for no
 // intersection (or a degenerate line), 1 for a tangent, 2 for two hits, 3 for a
-// zero-length direction.
-int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const float* circle, float* a4, float* point)
+// zero-length direction.  The two-hit choice used to compare against `point` (the
+// caller's uninitialised hit buffer); retail reads the fourth argument there
+// (tools/emu_cases/radar_line_circle.py).
+int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const float* circle, float* reference, float* point)
 {
     float nx;
     float ny;
@@ -77,10 +79,10 @@ int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const floa
     float y1 = k1 * dy + py;
     float x2 = k2 * dx + px;
     float y2 = k2 * dy + py;
-    float ay = point[1] - y1;
-    float ax = point[0] - x1;
-    float by = point[1] - y2;
-    float bx = point[0] - x2;
+    float ay = reference[1] - y1;
+    float ax = reference[0] - x1;
+    float by = reference[1] - y2;
+    float bx = reference[0] - x2;
     if (ax * ax + ay * ay < (by * by) + bx * bx) {
         point[0] = x1;
         point[1] = y1;
