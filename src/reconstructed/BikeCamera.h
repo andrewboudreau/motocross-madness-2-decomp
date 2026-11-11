@@ -7,11 +7,12 @@ struct UnknownCameraBikeRider {
     SoultreeObject* modelNode;            // +0x1a0 the rider model; has a "Head" part
 };
 
-// Object at UnknownCameraBikeState+0x40, Wrecker.h's UnknownWreckerRigidBody;
-// KrustyBikeCamera slot 34 leads the camera by its velocity.
+// Object at UnknownCameraBikeState+0x40, Wrecker's PhysicsRigidBody
+// (src/krusty2/rigidbody/PhysicsBody.h); KrustyBikeCamera slot 34 leads the
+// camera by its velocity.
 struct UnknownCameraBikeBody {
     unsigned char field_0x000[0x154];
-    Vector3 velocity;                    // +0x154 UnknownWreckerRigidBody::velocity
+    Vector3 velocity;                    // +0x154 PhysicsBody::velocity
 };
 
 // The racer's +0x604 object: the Wrecker (Wrecker.h) lines up at +0x40

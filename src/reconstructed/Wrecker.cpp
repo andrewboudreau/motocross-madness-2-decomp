@@ -75,7 +75,7 @@ void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
     gravityModel = new (__FILE__, 0x5b) SelectiveGravityModel(1);
     gravityModel->SetRenderContext(renderContext);
     AppendChild(gravityModel, -1);
-    rigidBody = new (__FILE__, 0x5f) UnknownWreckerRigidBody(1);
+    rigidBody = new (__FILE__, 0x5f) PhysicsRigidBody(1);
     rigidBody->SetRenderContext(renderContext);
     AppendChild(rigidBody, -1);
     rigidBody->SetNode(character->modelNode);
@@ -99,13 +99,13 @@ void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
     rigidBody->inertia = ZeroMatrix();
     rigidBody->invInertia = ZeroMatrix();
     rigidBody->isEnabled = 0;
-    rigidBody->initialAngularVelocity = Vector3(0.0f, 0.0f, 0.0f);
-    rigidBody->initialVelocity = Vector3(0.0f, 0.0f, 0.0f);
+    rigidBody->initialAngularVelocity = Vec3(0.0f, 0.0f, 0.0f);
+    rigidBody->initialVelocity = Vec3(0.0f, 0.0f, 0.0f);
     character->modelNode->subtreeDirty = 1;
     character->SetMotionByName("Fall02");
     UpdateInertia();
-    rigidBody->SetInitialAngularVelocity(&Vector3(0.0f, 0.0f, 0.0f));
-    rigidBody->SetInitialVelocity(&Vector3(0.0f, 0.0f, 0.0f));
+    rigidBody->SetInitialAngularVelocity(Vec3(0.0f, 0.0f, 0.0f));
+    rigidBody->SetInitialVelocity(Vec3(0.0f, 0.0f, 0.0f));
     rigidBody->ResetState();
     poseNode = character->modelNode->firstChild;
     collisionModel->manualStep = 1;
@@ -348,9 +348,9 @@ int Wrecker::Tick(float frameTime) {
                     linearStep = linearStep * (1.0f / frameTime);
                     angularStep = angularStep * (1.0f / frameTime);
                     rigidBody->ResetState();
-                    rigidBody->velocity = linearStep;
-                    rigidBody->prevVelocity = linearStep;
-                    rigidBody->angularVelocity = reinterpret_cast<const Vector3&>(rigidBody->node->WorldToLocalDirection(reinterpret_cast<const Vec3&>(angularStep)));
+                    rigidBody->velocity = reinterpret_cast<const Vec3&>(linearStep);
+                    rigidBody->prevVelocity = reinterpret_cast<const Vec3&>(linearStep);
+                    rigidBody->angularVelocity = rigidBody->node->WorldToLocalDirection(reinterpret_cast<const Vec3&>(angularStep));
                 }
             }
             if (blendStarted && !character->blendActive) {
@@ -451,7 +451,7 @@ void Wrecker::EmitProbeEffects(float frameTime) {
 
 void Wrecker::UpdateInertia() {
     Vector3 size;
-    character->modelNode->GetSubtreeBounds(reinterpret_cast<Vec3*>(&rigidBody->centerOfMass), reinterpret_cast<Vec3*>(&size));
+    character->modelNode->GetSubtreeBounds(&rigidBody->centerOfMass, reinterpret_cast<Vec3*>(&size));
     rigidBody->inertia(0, 0) = (size.y * size.y + size.z * size.z) * inertiaFactor;
     rigidBody->inertia(1, 1) = (size.x * size.x + size.z * size.z) * inertiaFactor;
     rigidBody->inertia(2, 2) = (size.x * size.x + size.y * size.y) * inertiaFactor;
@@ -471,8 +471,8 @@ void Wrecker::StartAnimatedWreck(int index) {
     wreckState = 1;
     rigidBody->isEnabled = 0;
     rigidBody->ResetState();
-    rigidBody->angularVelocity = Vector3(0.0f, 0.0f, 0.0f);
-    rigidBody->velocity = Vector3(0.0f, 0.0f, 0.0f);
+    rigidBody->angularVelocity = Vec3(0.0f, 0.0f, 0.0f);
+    rigidBody->velocity = Vec3(0.0f, 0.0f, 0.0f);
     hadContact = 0;
 }
 
@@ -489,9 +489,9 @@ void Wrecker::StartTumble() {
     poseStepsPending = 1;
     rigidBody->isEnabled = 1;
     rigidBody->ResetState();
-    rigidBody->velocity = linearStep;
-    rigidBody->prevVelocity = linearStep;
-    rigidBody->angularVelocity = reinterpret_cast<const Vector3&>(rigidBody->node->WorldToLocalDirection(reinterpret_cast<const Vec3&>(angularStep)));
+    rigidBody->velocity = reinterpret_cast<const Vec3&>(linearStep);
+    rigidBody->prevVelocity = reinterpret_cast<const Vec3&>(linearStep);
+    rigidBody->angularVelocity = rigidBody->node->WorldToLocalDirection(reinterpret_cast<const Vec3&>(angularStep));
     for (int i = 0; i < collisionModel->probeCount; i++)
         probePositions[i] = Vector3(0.0f, 0.0f, 0.0f);
     hadContact = 0;

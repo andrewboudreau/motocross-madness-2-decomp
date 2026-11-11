@@ -27,7 +27,7 @@ SAMPLE = 'samples/race/WreckerNearMisses.cpp'
 PROVIDER = 'src/krusty2/constraint/ConstraintMethodCollisionModel.cpp'
 RENAMES = {
     '??0UnknownWreckerCollisionModel@@QAE@H@Z': '??0ConstraintMethodCollisionModel@@QAE@H@Z',
-    '?SetBody@UnknownWreckerCollisionModel@@QAEXPAVUnknownWreckerRigidBody@@HPBD@Z':
+    '?SetBody@UnknownWreckerCollisionModel@@QAEXPAVPhysicsRigidBody@@HPBD@Z':
         '?SetBody@ConstraintMethodCollisionModel@@QAEXPAVConBody@@HPBD@Z',
     '?AddProbePoint@UnknownWreckerCollisionModel@@QAEXUVector3@@H@Z':
         '?AddProbePoint@ConstraintMethodCollisionModel@@QAEXUConVec3@@PAVConNode@@@Z',

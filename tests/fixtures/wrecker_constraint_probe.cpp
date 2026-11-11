@@ -16,7 +16,7 @@ typedef char Layout[(sizeof(Wrecker)==0x53c && sizeof(ConstraintMethodCollisionM
     offsetof(Wrecker,probeHits)==0x108 && offsetof(ConstraintMethodCollisionModel,body)==0xc4 &&
     offsetof(ConstraintMethodCollisionModel,probeCount)==0x100 &&
     offsetof(ConstraintMethodCollisionModel,probes)==0x104 && offsetof(ConBody,node)==0x234 &&
-    offsetof(UnknownWreckerRigidBody,initialVelocity)==0x13c)?1:-1];
+    offsetof(PhysicsRigidBody,initialVelocity)==0x13c)?1:-1];
 
 static void Check(int value,const char* label) { if(!value){printf("FAIL %s\n",label);ExitProcess(7);} }
 struct Block { void* p; unsigned size,actual; int alive; };

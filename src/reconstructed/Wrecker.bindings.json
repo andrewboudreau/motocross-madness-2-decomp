@@ -2,7 +2,7 @@
   "??0GraphicsTest@@QAE@H@Z": "0x0047bc70",
   "??0ConstraintMethodCollisionModel@@QAE@H@Z": "0x0043b8d0",
   "??0SelectiveGravityModel@@QAE@H@Z": "0x004f9760",
-  "??0UnknownWreckerRigidBody@@QAE@H@Z": "0x004cc120",
+  "??0PhysicsRigidBody@@QAE@H@Z": "0x004cc120",
   "??0Wrecker@@QAE@H@Z": "0x0052ff90",
   "??0Vec3@@QAE@MMM@Z": "0x00404e60",
   "??1GraphicsTest@@UAE@XZ": "0x0047bd00",

@@ -56,7 +56,7 @@ struct UnknownWreckerProbe {
 // Same complete CollisionObject, with GraphicsTest/GameObject at +0xc.
 typedef CollisionObject UnknownWreckerCollisionObject;
 
-class UnknownWreckerRigidBody;
+class PhysicsRigidBody;
 
 class UnknownWreckerCollisionModel : public UnknownWreckerCollisionObject {
 public:
@@ -67,7 +67,7 @@ public:
     explicit UnknownWreckerCollisionModel(int flags);              // 0x0043b8d0
     // 0x0043b9e0 (thiscall, ret 0xc): binds the model to `body`; `name`
     // is the collision file Bike passes ("rider.col").
-    void SetBody(UnknownWreckerRigidBody* body, int value, const char* name);
+    void SetBody(PhysicsRigidBody* body, int value, const char* name);
     // 0x0043c7f0 (thiscall, ret 0x10): adds a probe at `offset` on `bone`.
     void AddProbePoint(Vector3 offset, int bone);
 
@@ -131,47 +131,10 @@ struct UnknownWreckerMotion {
 typedef D3DIMSoultreeCharacter UnknownWreckerCharacter;
 
 // Object at Wrecker+0x40: RTTI PhysicsRigidBody (new 0x2a8 at line 0x5f,
-// constructor 0x004cc120). Slots past GameObject's 27 are called by number.
-// Field names follow src/krusty2/rigidbody/PhysicsBody.h (+0x178 is the
-// mass 0x00532150 scales by 1/12 for the box inertia).
-class UnknownWreckerRigidBody : public GameObject {
-public:
-    explicit UnknownWreckerRigidBody(int flags);                   // 0x004cc120
-    virtual void SetName();
-    virtual void SetNode(UnknownWreckerSkeleton* skeleton);
-    virtual void SetMass(float value);
-    virtual void SetInertia();
-    virtual void UnknownVirtualSlot31();
-    virtual void UnknownVirtualSlot32();
-    virtual void SetInitialVelocity(Vector3* value);
-    virtual void SetInitialAngularVelocity(Vector3* value);
-    virtual void UnknownVirtualSlot35();
-    virtual void UnknownVirtualSlot36();
-    virtual void UnknownVirtualSlot37();
-    virtual void UnknownVirtualSlot38();
-    virtual void UnknownVirtualSlot39();
-    virtual void UnknownVirtualSlot40();
-    virtual void UnknownVirtualSlot41();
-    virtual void UnknownVirtualSlot42();
-    virtual void UnknownVirtualSlot43();
-    virtual void ResetState();
-
-    unsigned char field_0x02c[0x13c - 0x2c];
-    Vector3 initialVelocity;   // +0x13c
-    Vector3 initialAngularVelocity; // +0x148
-    Vector3 velocity;          // +0x154
-    Vector3 prevVelocity;      // +0x160
-    Vector3 angularVelocity;   // +0x16c
-    float mass;                // +0x178
-    unsigned char field_0x17c[0x190 - 0x17c];
-    Matrix4 inertia;           // +0x190
-    Matrix4 invInertia;        // +0x1d0
-    unsigned char field_0x210[0x228 - 0x210];
-    Vector3 centerOfMass;      // +0x228
-    UnknownWreckerSkeleton* node; // +0x234
-    unsigned char field_0x238[0x2a4 - 0x238];
-    int stepDisabled;          // +0x2a4
-};
+// constructor 0x004cc120 writes vtable 0x00556ec0, COL 0x0055e558). Wrecker
+// calls it through slots 8, 28, 29, 33, 34 and 44 and reads mass (+0x178) for
+// the box inertia 0x00532150 scales by 1/12.
+#include "../krusty2/rigidbody/PhysicsBody.h"
 
 // Object at Wrecker+0x3c: RTTI SelectiveGravityModel (new 0x3c at line
 // 0x5b, constructor 0x004f9760). Wrecker adds the rigid body through slot 27
@@ -258,7 +221,7 @@ public:
     UnknownWreckerCharacter* character; // +0x34
     UnknownWreckerCollisionModel* collisionModel; // +0x38
     SelectiveGravityModel* gravityModel; // +0x3c
-    UnknownWreckerRigidBody* rigidBody; // +0x40
+    PhysicsRigidBody* rigidBody; // +0x40
     int wreckState;            // +0x44 wreck state (0 idle, 1..3)
     int* indexedAnimations;    // +0x48
     int indexedAnimationCount; // +0x4c

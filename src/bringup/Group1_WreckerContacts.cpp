@@ -129,7 +129,7 @@ void Wrecker::SprayContactParticles(Vector3 from, Vector3 to, Vector3 normal, fl
     if (wreckState == 0)
         velocity = linearStep;
     else
-        velocity = rigidBody->velocity;
+        velocity = reinterpret_cast<const Vector3&>(rigidBody->velocity);
     float speed = WreckerLength(velocity);
     if (speed < 1.0f)
         return;
