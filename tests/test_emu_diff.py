@@ -167,6 +167,14 @@ CLEAN_CASES = {
     'kb_look_ahead': 40,
     'morph_controller_angles': 40,
     'morph_modify_mesh': 40,
+    # Gameplay sweep: linked bodies below 1.000 masked that no case covered.
+    'net_create_address': 100,
+    'race_sound_refill_stream': 100,
+    'sound_set_primary_format': 100,
+    'recorder_thread': 100,
+    'bailout_dlg_handle_event': 100,
+    'bunny_dlg_handle_event': 100,
+    'sp_race_info_handle_event': 100,
 }
 
 # Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).
@@ -214,6 +222,9 @@ PRE_FIX_SHAPES = [
        '    rotation.m[2][2] = z * tz + c;\n',
        '    rotation.m[2][0] = t * x * z + s * y;\n    rotation.m[2][1] = t * y * z - s * x;\n'
        '    rotation.m[2][2] = t * z * z + c;\n')], 60),
+    # CreateAddress tagged the modem name DPAID_Phone and the phone number DPAID_Modem.
+    ('net_create_address', [('elements[1].type = DPAID_Modem;', 'elements[1].type = DPAID_Phone;'),
+                            ('elements[count].type = DPAID_Phone;', 'elements[count].type = DPAID_Modem;')], 60),
 ]
 
 
