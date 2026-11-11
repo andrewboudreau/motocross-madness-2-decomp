@@ -818,11 +818,8 @@ The link covers every translation unit with no unresolved symbols.
 
 Not switched, and why:
 
-- `D3DIMSoultreeShadow` slot 30 (0x00446f40): linked 0.571, sample 0.871.
-  The sample rounds the clipped corners with `(int)(v - 0.5f)`, which
-  truncates. Corners with a fraction below one half land one pixel low,
-  where retail's `fistp` gives `floor(v)`. The sample's outcode array is also
-  a one-entry placeholder.
+- `D3DIMSoultreeShadow` slot 30 (0x00446f40) is now linked from the sample;
+  see [Shadow slot 30 rounding](#shadow-slot-30-rounding).
 - ProjectedShadow is now linked from the whole sample file; see
   [ProjectedShadow near-miss bodies](#projectedshadow-near-miss-bodies).
 - `KrustyBikeCamera::Tick`: the bring-up copy now has the sample's shape, but
@@ -912,6 +909,53 @@ and the signed height compared with the zero-extended key. In Present they
 covered the format-9 sums and outputs, the row tail and the clear loops. No
 behaviour bug was found. The rounding now follows the control word, whereas
 `X87FloatToInt` and the sample's old helper both assumed round-to-nearest-even.
+
+## Shadow slot 30 rounding
+
+`D3DIMSoultreeShadow` slot 30 (0x00446f40) and `TerrainShadow` slot 30
+(0x00509aa0) round the six clipped corner coordinates with retail's inline
+fistp helper (`fstp [t]; fld [t]; mov eax, out; fistp dword ptr [eax]` at
+0x00447301 and 0x00509eef). Both samples now call `FistpFloatToInt`
+(`samples/common/FistpFloatToInt.h`) and are `candidate_sources` compiled with
+`/QIfist`. The helper stores and reloads the argument as binary32 through
+`memcpy`, then casts; `/QIfist` makes the cast a `fistp qword` under the
+current rounding mode. The 64-bit store equals retail's 32-bit store for every
+result inside `int`. ClipPolygon leaves every corner inside the clip
+rectangle, so the values stay in range.
+
+`src/bringup/Group5_D3DIMSoultreeShadow.cpp` was deleted; the sample provides
+slots 29 and 30. Before linking, two sample bugs were fixed:
+
+- `(int)(v - 0.5f)` truncated through `__ftol`, so a corner with a fraction
+  below one half landed one pixel low where retail's `fistp` gives `floor(v)`.
+- The outcode array was a one-entry placeholder. Retail's 0x0057efd8 array is
+  indexed up to the 3000-vertex limit and runs to the vertex array at
+  0x00581eb8 (0x2ee4 bytes). It is now `int[3000]`; the extent is inferred
+  from the neighbouring symbol, since nothing else in retail references it.
+
+`link_aliases` binds `D3DIMShadowCasterView::TransformVertexGroups` to
+`D3DIMSoultreeObject::TransformVertexGroups` (0x00440d40, the same retail
+body) and `g_d3dimShadowVertexArray` to `g_d3dimShadowVertices` (0x00581eb8).
+
+TerrainShadow's old `TerrainShadowFloatToInt` corrected the `__ftol`
+truncation to round-to-nearest-even in software. That equals retail in the
+default rounding mode, so its behaviour does not change; the shape does
+(683 instructions against retail's 518, now 491).
+
+| VA | Function | Before | Now linked |
+|---|---|---|---|
+| 0x00446c30 | `D3DIMSoultreeShadow` slot 29 | 0.945 | 0.945 |
+| 0x00446f40 | `D3DIMSoultreeShadow` slot 30 | 0.571 | 0.862 |
+| 0x00509aa0 | `TerrainShadow` slot 30 | 0.595 | 0.718 |
+
+Ruled out for the helper (D3DIM slot 30, masked, `/QIfist`): the
+range-checked `__int64` cast of `ProjectedShadowFloatToInt` (0.807), and a
+plain cast without the `memcpy` (0.870, but it skips the binary32 rounding of
+the argument). Behaviour was checked against the retail disassembly and not
+differentially tested: the clip rectangle set order, colour, outcode senses,
+mode 3 transform 0x004a1b00, the cull at `<= 0`, the minDepth test, the
+ShadowFillTriangle arguments, vertex store order, the 3000 limit and the loop
+bounds.
 
 ## Source-built run status
 

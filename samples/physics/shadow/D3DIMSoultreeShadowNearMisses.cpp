@@ -1,6 +1,8 @@
 // D3DIMSoultreeShadowNearMisses.cpp -- near misses of D:\aardvark\VC\krusty2\D3DIMSoultreeShadow.cpp
 // (canonical source src/krusty2/shadow/D3DIMSoultreeShadow.cpp; slots 27, 29 and 30 of
-// D3DIMSoultreeShadow, vtable 0x0055156c, vtable_overrides.json).  Kept here, not registered.
+// D3DIMSoultreeShadow, vtable 0x0055156c, vtable_overrides.json).  Not registered for
+// calibration; the game build links slots 29 and 30 from here with /QIfist
+// (config/game_build.json candidate_sources).
 //
 // Slot 29 (0x00446c30, 771 B, 730/771) is slot 27's visibility test (slot 27 0x004468f0 is exact
 // in src/krusty2/shadow/D3DIMSoultreeShadow.cpp) with the render target's camera: the caster's
@@ -33,8 +35,14 @@
 // Slot 30 (0x00446f40, 1524 B) builds the receiver's shadow vertices from the caster's current
 // LOD meshes (TerrainShadow slot 30 0x00509aa0 is its terrain twin).  Inherent near miss: retail
 // rounds the clipped points with an inline __asm fld/fistp helper (float temp at ebp-8 / ebp-0x14,
-// pointer at ebp-0x10, `fld; mov eax,[ptr]; fistp [eax]`), which forces its ebp frame; the
-// (int) casts here call __ftol instead.
+// pointer at ebp-0x10, `fld; mov eax,[ptr]; fistp [eax]`), which forces its ebp frame.
+// FistpFloatToInt gives its rounding when compiled with /QIfist, as the game build does
+// (config/game_build.json candidate_sources; linked 0.862 against the bring-up's 0.571).  The
+// former (int)(v - 0.5f) casts truncated through __ftol, putting corners with a fraction below
+// one half one pixel low.  Without /QIfist (this file's tests) the helper's cast still calls
+// __ftol, so only code shape is comparable there.  Ruled out: ProjectedShadowFloatToInt's
+// range-checked __int64 form (0.807 linked-style score: ten more instructions per site for
+// values ClipPolygon never produces).
 // The same frame explains the two s_shadowPoints loads the s15 reference diff misses: with
 // ebp taken retail reloads the pointer per triangle copy, where VC6 here keeps it in ebp.
 #include "shadow/D3DIMSoultreeShadow.h"
@@ -42,6 +50,7 @@
 #include "../../../src/reconstructed/Matrix4.h"
 #include "core/SoultreeObject.h"
 #include "../../../src/reconstructed/ClipRectangle.h"
+#include "../../common/FistpFloatToInt.h"
 
 // Row-major 4x4 matrix with the D3DMATRIX member names and the index view (Math3D.h's
 // Matrix4 shape; the shadow TU's ShadowMatrix only has m[4][4]).  Local view, tier 3.
@@ -161,11 +170,14 @@ int D3DIMSoultreeShadow::UnknownVirtualSlot29()
 
 // Slot 30 scratch (tier 2 from the code): the light-space positions of the current mesh, grown
 // on demand (DebugMalloc line 0xad, DebugFree line 0xaa; capacity 0x0059ad28, buffer 0x0059ad2c),
-// and the per-vertex outcodes (0x0057efd4).  The outcode array's size is unknown; it is followed
-// by other data in .bss.  PROVISIONAL names.
+// and the per-vertex outcodes (0x0057efd4).  The outcode array's size is inferred: no retail
+// instruction or data word refers to 0x0057efd8..0x00581eb4, so it runs up to the receiver
+// vertex array at 0x00581eb8 (0x2ee4 bytes); 3000 entries (the vertex limit) plus 4 bytes of
+// alignment is the best guess.  Retail does not bound the per-vertex loop either.  (It was a
+// one-entry placeholder that any mesh overran.)  PROVISIONAL names.
 static int s_shadowPointCapacity;
 static ShadowVec3* s_shadowPoints;
-int g_d3dimShadowOutcodes[1];
+int g_d3dimShadowOutcodes[3000];
 extern float g_d3dimShadowTexel;      // 0x0057efa4 (slot 28)
 
 struct D3DIMShadowVertexView {
@@ -266,13 +278,14 @@ void D3DIMSoultreeShadow::UnknownVirtualSlot30()
                 if (!shadow->updateThisFrame)
                     continue;
                 int points[6];
-                points[0] = (int)(clipped[0].x - 0.5f);
-                points[1] = (int)(clipped[0].y - 0.5f);
+                // ClipPolygon output lies in the clip rectangle, so every value is in int range.
+                FistpFloatToInt(&points[0], clipped[0].x - 0.5f);
+                FistpFloatToInt(&points[1], clipped[0].y - 0.5f);
                 for (int k = 0; k < count - 2; k++) {
-                    points[2] = (int)(clipped[k + 1].x - 0.5f);
-                    points[3] = (int)(clipped[k + 1].y - 0.5f);
-                    points[4] = (int)(clipped[k + 2].x - 0.5f);
-                    points[5] = (int)(clipped[k + 2].y - 0.5f);
+                    FistpFloatToInt(&points[2], clipped[k + 1].x - 0.5f);
+                    FistpFloatToInt(&points[3], clipped[k + 1].y - 0.5f);
+                    FistpFloatToInt(&points[4], clipped[k + 2].x - 0.5f);
+                    FistpFloatToInt(&points[5], clipped[k + 2].y - 0.5f);
                     ShadowFillTriangle(shadow->sizeShift, pixels, shadow->colorKeyLow, points, 0);
                 }
             } else if (inCameraView) {

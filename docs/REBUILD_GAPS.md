@@ -391,7 +391,7 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 | Retail function | `fistp` | Linked body | Rounding |
 |---|---:|---|---|
 | `0x00406ae0`, `0x0040c000` | 3, 1 | `src/krusty2/vehicle/Bike.cpp` (`SelectRiderPose`, `ComputeSlideAngle`) | `BikeFloatToInt` |
-| `0x00446f40` | 6 | `src/bringup/Group5_D3DIMSoultreeShadow.cpp` | `X87FloatToInt` |
+| `0x00446f40` | 6 | `samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp` (`/QIfist`) | `FistpFloatToInt` (`samples/common/FistpFloatToInt.h`) |
 | `0x00483d40` | 4 | `samples/render/GridNodeNearMisses.cpp` (`GridMidCell`) | `X87FloatToInt`; its 4 other casts are retail `__ftol` calls |
 | `0x0048d1e0` | 2 | `src/bringup/Group4_ScoreBoard.cpp` | `X87FloatToInt` |
 | `0x0048d780` | 1 | `src/bringup/Group3_KrustyBikeAISupport.cpp` | `X87FloatToInt` |
@@ -404,19 +404,17 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 | `0x004eab00` | 1 | `src/bringup/Group4_SceneTick.cpp` | `X87FloatToInt` |
 | `0x00507610` | 1 | `src/bringup/Group3_TerrainPrepareGeometry.cpp` | `X87FloatToInt` |
 | `0x00507c10` | 2 | `src/krusty2/broadphase/Terrain.cpp` (`QueryGround`; the `QueryGround` views forward to it) | `FloatToInt` |
-| `0x00509aa0` | 6 | `samples/physics/shadow/TerrainShadow.cpp` | `TerrainShadowFloatToInt` |
+| `0x00509aa0` | 6 | `samples/physics/shadow/TerrainShadow.cpp` (`/QIfist`) | `FistpFloatToInt` |
 | `0x00518f30` | 1 | `src/reconstructed/TrackOverlay.cpp` (`NameOverlay::Tick`) | `X87FloatToInt` |
 | `0x0051af00`, `0x0051b070` | 2, 1 | `src/bringup/Group4_Overlay.cpp` | `X87FloatToInt` |
 | `0x0052f570` | 6 | `src/bringup/Group4_Visibility.cpp` and `Group2_GridVisibilityTestBox.cpp` (`D3DIMShadowClipper::TestBox` forwards) | `X87FloatToInt` |
 
-`BikeFloatToInt`, `KbFloatToInt` and `TerrainShadowFloatToInt` correct an
+`BikeFloatToInt` and `KbFloatToInt` correct an
 `__ftol` truncation to nearest-even. They ignore the x87 rounding mode.
-`X87FloatToInt` and the two `FloatToInt` helpers read it. No game code loads
+`X87FloatToInt`, `FistpFloatToInt` and the two `FloatToInt` helpers read it. No game code loads
 the control word: every `fldcw` in .text is in LIBCMT or in the uncalled
 `0x00548b60` span, which restores the word it saved. Round-to-nearest-even
 therefore stays the assumed mode, which is inference.
-`samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp` keeps slot 30's
-`(int)` casts as a matching sample, and it is not linked.
 
 ### Accuracy of linked bodies
 

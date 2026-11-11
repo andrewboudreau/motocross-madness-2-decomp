@@ -8,6 +8,7 @@
 #include "../../../src/reconstructed/TerrainShadow.h"
 #include "../../../src/reconstructed/AgeManager.h"
 #include "../../../src/reconstructed/ClipRectangle.h"
+#include "../../common/FistpFloatToInt.h"
 #include <math.h>
 
 // 0x005097d0 (slot 28): sizes the shadow's light matrix to the terrain rectangle (tier 3).  Same
@@ -68,24 +69,6 @@ int TerrainShadow::UnknownVirtualSlot28()
     return 0;
 }
 
-// Retail's inline fistp helper (fstp/fld of the float, then `mov eax, out; fistp dword ptr [eax]`
-// in an ebp frame) rounds under the x87 control word, round-to-nearest-even by default (nothing in
-// the game is known to change it; provisional), so fistp(v - 0.5f) is floor(v) apart from exact
-// ties.  A plain (int) cast truncates through __ftol and is one pixel too small whenever v's
-// fraction is below one half.  This gives the round-to-nearest-even result in ordinary C++ (same
-// helper as Bike.cpp's BikeFloatToInt; destination-pointer shape as retail's call); it is a
-// behaviour repair, not the original inline-asm form.
-static inline void TerrainShadowFloatToInt(int* out, float value)
-{
-    int result = (int)value;
-    float fraction = value - (float)result;
-    if (fraction > 0.5f || (fraction == 0.5f && (result & 1)))
-        result++;
-    else if (-fraction > 0.5f || (-fraction == 0.5f && (result & 1)))
-        result--;
-    *out = result;
-}
-
 // 0x00509aa0 (slot 30): builds the shadowed terrain vertices.  Every cell key slot 29 gathered has
 // its mesh transformed by the shadow's light matrix (perspective in mode 3), each triangle is
 // outcode-rejected against the clip rectangle (doubled while the shadow is not being updated),
@@ -93,7 +76,7 @@ static inline void TerrainShadowFloatToInt(int* out, float value)
 // (all three corners nearer than minDepth) or copied into the vertex array with the shadow colour
 // and texture coordinates scaled by field_0x677c.  Cells that were drawn into are marked used.
 // Tier 3 semantics; the retail body converts with an inline __asm fistp helper, so this stays a
-// documented partial (see targets.json); TerrainShadowFloatToInt reproduces its rounding.
+// documented partial (see targets.json); FistpFloatToInt (samples/common/FistpFloatToInt.h) gives its rounding.
 // The section records are reached through the mesh's pointer at +0x17c (retail `mov edx,
 // [mesh + 0x17c]; movsx edx, word ptr [edx + 2]`).  An earlier Terrain.h laid them out inline
 // at +0x17c, so sectioned meshes read the pointer and the following bytes as index ranges and
@@ -216,13 +199,14 @@ void TerrainShadow::UnknownVirtualSlot30()
                     used = 1;
                     if (!shadow->updateThisFrame)
                         continue;
-                    TerrainShadowFloatToInt(&points[0], clipped[0].x - 0.5f);
-                    TerrainShadowFloatToInt(&points[1], clipped[0].y - 0.5f);
+                    // ClipPolygon output lies in the clip rectangle, so every value is in int range.
+                    FistpFloatToInt(&points[0], clipped[0].x - 0.5f);
+                    FistpFloatToInt(&points[1], clipped[0].y - 0.5f);
                     for (int k = 0; k < count - 2; k++) {
-                        TerrainShadowFloatToInt(&points[2], clipped[k + 1].x - 0.5f);
-                        TerrainShadowFloatToInt(&points[3], clipped[k + 1].y - 0.5f);
-                        TerrainShadowFloatToInt(&points[4], clipped[k + 2].x - 0.5f);
-                        TerrainShadowFloatToInt(&points[5], clipped[k + 2].y - 0.5f);
+                        FistpFloatToInt(&points[2], clipped[k + 1].x - 0.5f);
+                        FistpFloatToInt(&points[3], clipped[k + 1].y - 0.5f);
+                        FistpFloatToInt(&points[4], clipped[k + 2].x - 0.5f);
+                        FistpFloatToInt(&points[5], clipped[k + 2].y - 0.5f);
                         ShadowFillTriangle(shadow->sizeShift, pixels, shadow->colorKeyLow, points, 0);
                     }
                 } else if (cell->field_0x40) {

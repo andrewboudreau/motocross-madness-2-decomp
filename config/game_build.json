@@ -87,7 +87,9 @@
     "?Vec3Dot@@YAMPBUVector3@@0@Z": "?Vec3DotCall@@YAMPBUVec3@@0@Z",
     "?CrossProduct@@YA?AUVector3@@PBU1@0@Z": "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z",
     "?AxisAngleMatrix@@YAXPAUMatrix4@@MMMM@Z": "?AxisAngleMatrix@@YAXPAUTreeMatrix4@@MMMM@Z",
-    "??0MbVector3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z"
+    "??0MbVector3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",
+    "?TransformVertexGroups@D3DIMShadowCasterView@@QAEXH@Z": "?TransformVertexGroups@D3DIMSoultreeObject@@QAEXH@Z",
+    "?g_d3dimShadowVertexArray@@3PAUD3DIMShadowVertexView@@A": "?g_d3dimShadowVertices@@3PAUD3DIMShadowVertex@@A"
   },
   "included_sources": [
     {
@@ -515,8 +517,11 @@
     {
       "path": "samples/physics/shadow/TerrainShadow.cpp",
       "status": "best-guess-unreviewed",
-      "reason": "Near-miss bodies admitted so the source build can link and run; defines TerrainShadow slots 27, 28 and 30, which the vtable emitted by src/reconstructed/TerrainShadow.cpp (the exact constructor, Attach, slot 29 and Render3D) references. Behavior unverified against retail; bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "Near-miss bodies admitted so the source build can link and run; defines TerrainShadow slots 27, 28 and 30, which the vtable emitted by src/reconstructed/TerrainShadow.cpp (the exact constructor, Attach, slot 29 and Render3D) references. /QIfist turns slot 30's FistpFloatToInt cast into a FISTP under the current rounding mode, as retail's inline fistp helper; slot 30 is the file's only float-to-int conversion (slots 27 and 28 make no __ftol call with or without the flag). Not differentially tested; bytes nonexact.",
+      "evidence": "docs/GAME_BUILD.md#shadow-slot-30-rounding"
     },
     {
       "path": "samples/physics/contact/ContactImpulse.cpp",
@@ -568,6 +573,15 @@
       ],
       "reason": "ProjectedShadow ComputeBounds 0x004db0d0, RenderShadow 0x004db8c0, Present 0x004dbd30 and TintCasterVertices 0x004dc2b0 replace the bring-up stand-ins; includes the canonical unit (included_sources). /QIfist turns the rounding helper's cast into a 64-bit fistp under the current rounding mode, range-checked to retail's 32-bit result. Checked against the retail disassembly, not differentially tested.",
       "evidence": "docs/GAME_BUILD.md#projectedshadow-near-miss-bodies"
+    },
+    {
+      "path": "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "D3DIMSoultreeShadow slots 29 (0x00446c30) and 30 (0x00446f40) replace the Group5_D3DIMSoultreeShadow bring-up stand-ins. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper; the outcode array is sized to the 3000-entry vertex limit. Checked against the retail disassembly, not differentially tested.",
+      "evidence": "docs/GAME_BUILD.md#shadow-slot-30-rounding"
     }
   ],
   "includes": [
