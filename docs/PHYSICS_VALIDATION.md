@@ -503,13 +503,11 @@ Still partial in SoulTreePhysics.cpp:
 
 - Slot 4 `0x005013d0`: retail loads the a3 component first in all six products of the
   first cross product; VC6 loads a4 first in the term it evaluates second (87.5%).
-- SteeringControl::SetAxisFromPoints `0x00504d30` (samples/physics/motion): only the
-  scaling differs.  Retail keeps the inverse length duplicated (`fld st(0); fmul st(3)` for
-  x, `fld [d.y]; fmul st(1)` for y, `fxch; fmul` for z) and pops `d.x` at the end; the
-  `Vec3(d.x * inv, ...)`, `d * inv`, `inv * d` and `d * (1.0f / len)` forms all consume
-  `d.x` first (`fxch st(2); fmul st(2)`). The unchanged standalone now has a
-  [finite native behavior review](STEERING_AXIS_FROM_POINTS.md), including actual
-  cache/transform helpers; its 230-byte body remains nonexact against all 234 retail bytes.
+- SteeringControl::SetAxisFromPoints `0x00504d30` is now strict exact in
+  src/krusty2/motion/SteeringControl.cpp: a per-component difference with y and z read
+  through copies taken after the inverse length keeps `d.x` on the x87 stack across the
+  scale (`fld st(0); fmul st(3)`) like retail; see
+  [the behavior review](STEERING_AXIS_FROM_POINTS.md).
 
 ```bash
 python tools/run_physics_samples.py --strict --source src/krusty2/soultree/SoulTreePhysics.cpp \
@@ -579,7 +577,7 @@ InterpolatePose from 10.7% to 19.4%, with no other motion target changing.
 ## Preserved candidates
 
 The near misses of the tree builder, Motnctrl (the .VUE loader and pose
-helpers), steering (SetAxisFromPoints) and the visibility traversal remain under
+helpers) and the visibility traversal remain under
 `samples/physics/` until their remaining byte/relocation evidence is
 complete. Shared layout headers remain under `src/krusty2/` for both verified
 source and samples; a header alone does not claim a reconstructed

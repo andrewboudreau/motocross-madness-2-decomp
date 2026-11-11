@@ -56,11 +56,10 @@ class SteeringLinkTests(unittest.TestCase):
             for obj in objects.values():
                 self.assertFalse(any('VehicleSteerState@@' in s.name
                                      for s in obj.symbols))
-            # The unresolved partial reconstruction must not become an
-            # accidental source provider through inclusion of its sample.
-            partial = '?SetAxisFromPoints@SteeringControl@@QAEHPAVSoultreeObject@@00@Z'
-            self.assertIn(partial, bike_imports)
-            self.assertNotIn(partial, providers)
+            # Bike::LoadBike imports the promoted SetAxisFromPoints from the canonical unit.
+            points = '?SetAxisFromPoints@SteeringControl@@QAEHPAVSoultreeObject@@00@Z'
+            self.assertIn(points, bike_imports)
+            self.assertIn(points, providers)
 
 
 if __name__ == '__main__':

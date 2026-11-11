@@ -18,8 +18,6 @@ from tools.build_game import compile_source as build_compile_source
 from test_vehicle_gearbox_connections import fingerprint as caller_fingerprint
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = 'samples/physics/motion/SteeringAxisFromPoints.cpp'
-AGGREGATE = 'samples/physics/motion/SteeringControl.cpp'
 CANONICAL = 'src/krusty2/motion/SteeringControl.cpp'
 TREE = 'src/krusty2/soultree/soultree.cpp'
 SYMBOL = '?SetAxisFromPoints@SteeringControl@@QAEHPAVSoultreeObject@@00@Z'
@@ -152,8 +150,6 @@ class SteeringAxisFromPointsTests(unittest.TestCase):
                     cwd=ROOT,capture_output=True,text=True,encoding='latin1',env={**os.environ,'PYTHONPATH':str(ROOT)})
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)
                 return path,CoffObject(path)
-            candidate_path,candidate = compile_source(ROOT/SOURCE,'candidate')
-            _,aggregate = compile_source(ROOT/AGGREGATE,'aggregate')
             _,canonical = compile_source(ROOT/CANONICAL,'canonical')
             _,tree = compile_source(ROOT/TREE,'tree')
             _,bike = compile_source(ROOT/'src/krusty2/vehicle/Bike.cpp','bike')
@@ -170,38 +166,31 @@ class SteeringAxisFromPointsTests(unittest.TestCase):
             self.assertEqual(caller_fingerprint(bike, '?LoadBike@Bike@@'),
                              '70f599f7d80e0211525484f6b33710483fa20d92edacf6d319d58ea726353220')
             self.assertEqual(sum(name==SYMBOL for _,_,name in caller_relocs),1)
-            self.assertEqual(signature(candidate,SYMBOL),signature(aggregate,SYMBOL))
-            entry = candidate.find_symbol(SYMBOL)
-            self.assertEqual((entry.function_size,entry.extent_source),(230,'coff_function_aux'))
-            self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number==0},
-                {'__fltused',HELPERS[0][0],'?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z'})
-            report = compare(retail,candidate,SYMBOL,0x504d30,234,(ROOT/SOURCE).with_suffix('.bindings.json'))
-            self.assertFalse(report['strict_exact'])
-            self.assertEqual(report['strict_match']['matching_positions'],145)
-            # Ordinary Math3D.h private vector initializers remain; this is not original-TU proof.
-            initializers = ['_$E2','_$E1','_$E5','_$E4','_$E8','_$E7','_$E11','_$E10']
-            for name in initializers:
-                self.assertEqual(signature(candidate,name),signature(aggregate,name))
-            self.assertEqual({s.name for s in candidate.symbols if s.type==32 and s.section_number>0},
-                             set(initializers)|{SYMBOL})
-            rows = complete_object(aggregate)
+            # The promoted body sits in the canonical unit between SetAxisFromDirection and SetAngle.
+            entry = canonical.find_symbol(SYMBOL)
+            self.assertEqual((entry.function_size,entry.extent_source),(234,'coff_function_aux'))
+            report = compare(retail,canonical,SYMBOL,0x504d30,234,(ROOT/CANONICAL).with_suffix('.bindings.json'))
+            self.assertTrue(report['strict_exact'],report)
+            # Promotion pin: against the former sample aggregate (canonical unit plus the
+            # included candidate, 32 sections/90 relocations) only the SetAxisFromPoints
+            # section changed; every other row, the source string included, is identical.
+            rows = complete_object(canonical)
             self.assertEqual((len(rows),sum(len(r[3]) for r in rows)),(32,90))
             self.assertEqual(hashlib.sha256(json.dumps(rows).encode()).hexdigest(),
-                             'e531924a92d27f5b10d5c7ffb04c910d3346eaf0f90aabfee97511445d5470a1')
+                             'f15dccaafb12ce4e2f84740a516291c06c15cfe35e996b9cef66b2f0b4eb0954')
             spec = json.loads((ROOT/'config/game_build.json').read_text())
-            built = build_compile_source(ROOT/SOURCE,output/'game-command',compiler,
+            built = build_compile_source(ROOT/CANONICAL,output/'game-command',compiler,
                 [ROOT/p for p in spec['includes']],spec['profile'],{**os.environ,'PYTHONPATH':str(ROOT)})
             self.assertTrue(built['compiled'],Path(built['log']).read_text())
-            self.assertEqual(complete_object(candidate),complete_object(CoffObject(Path(built['object']))))
+            self.assertEqual(rows,complete_object(CoffObject(Path(built['object']))))
             strict = 0
             targets = json.loads((ROOT/'src/krusty2/motion/targets.json').read_text())
             selected = [t for t in targets if t['source']=='SteeringControl.cpp' and t['expect']=='exact']
-            self.assertEqual(len(selected),21)
+            self.assertEqual(len(selected),22)
             for target in selected:
-                for obj in (canonical,aggregate):
-                    result = compare(retail,obj,target['candidate_symbol_contains'],int(target['target_va'],0),
-                                     target['target_size'],ROOT/'src/krusty2/motion'/target['bindings'])
-                    self.assertTrue(result['strict_exact'],result);strict += 1
+                result = compare(retail,canonical,target['candidate_symbol_contains'],int(target['target_va'],0),
+                                 target['target_size'],ROOT/'src/krusty2/motion'/target['bindings'])
+                self.assertTrue(result['strict_exact'],result);strict += 1
             starts = ['static inline void MatrixProduct(', 'static inline void TransposeRotation(',
                 'static inline void InvertRigid(', 'static inline Vec3 RotateDirection(',
                 'static inline Vec3 TransformPoint(', 'void SoultreeObject::UpdateWorldMatrix()',
@@ -211,6 +200,15 @@ class SteeringAxisFromPointsTests(unittest.TestCase):
             text = (ROOT/TREE).read_text()
             helper_source.write_text('#include "math/Math3D.h"\n'+'\n'.join(definition(text,s) for s in starts)+'\n')
             helper_path,helpers = compile_source(helper_source,'helpers')
+            # The comparison links the canonical body alone (the rest of the unit needs
+            # allocator and node helpers the fixture does not provide).
+            steering_source = output/'steering.cpp'
+            steering_source.write_text('#include "math/Math3D.h"\n#include "motion/SteeringControl.h"\n#include <math.h>\n'
+                + definition((ROOT/CANONICAL).read_text(),'int SteeringControl::SetAxisFromPoints(')+'\n')
+            steering_path,steering = compile_source(steering_source,'steering')
+            self.assertEqual(signature(steering,SYMBOL),signature(canonical,SYMBOL))
+            self.assertEqual({s.name for s in steering.symbols if s.storage_class==2 and s.section_number==0},
+                {'__fltused',HELPERS[0][0],'?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z'})
             for symbol,va,size in HELPERS:
                 for obj in (helpers,tree):
                     result = compare(retail,obj,symbol,va,size,(ROOT/TREE).with_suffix('.bindings.json'))
@@ -220,7 +218,7 @@ class SteeringAxisFromPointsTests(unittest.TestCase):
             fixture,_ = compile_source(ROOT/'tests/fixtures/steering_axis_from_points_compare.cpp','fixture')
             executable = output/'steering.exe'
             result = subprocess.run([str(linker),'/nologo','/subsystem:console','/base:0x100000','/fixed','/opt:ref',
-                f'/out:{executable}',f'/libpath:{libraries}',str(candidate_path),str(helper_path),
+                f'/out:{executable}',f'/libpath:{libraries}',str(steering_path),str(helper_path),
                 str(fixture),'kernel32.lib'],capture_output=True,text=True,encoding='latin1')
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             result = subprocess.run([str(executable),str(image)],capture_output=True,text=True,timeout=120)

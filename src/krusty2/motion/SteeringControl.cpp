@@ -1,9 +1,8 @@
 // SteeringControl.cpp -- reconstruction of D:\aardvark\VC\krusty2\SteeringControl.cpp.
 // owner: SteeringControl.cpp (retail __FILE__ 0x005745ac, the constructor's debug new at
 // line 0x17; code 0x00504b60..0x005051ec after Spheres.cpp). Strict exact under the physics
-// profile: the constructor, destructor, SetAxisFromDirection, SetAngle, AddAngle and the
-// sixteen $E (two sets of four vectors). SetAxisFromPoints (0x00504d30) is a near miss in
-// samples/physics/motion/SteeringControl.cpp.
+// profile: the constructor, destructor, SetAxisFromDirection, SetAxisFromPoints, SetAngle,
+// AddAngle and the sixteen $E (two sets of four vectors).
 #include "core/GameObject.h"
 #include "core/DebugAlloc.h"
 #include "math/Math3D.h"
@@ -52,6 +51,35 @@ int SteeringControl::SetAxisFromDirection(const Vec3* worldDir, SoultreeObject* 
     float len = lenSq == 1.0f ? 1.0f : (float)sqrt(lenSq);
     float inv = 1.0f / len;
     Vec3 dir = Vec3(worldDir->x * inv, worldDir->y * inv, worldDir->z * inv);
+    if (frame) {
+        axis = frame->WorldToLocalDirection(dir);
+        return 1;
+    }
+    return 0;
+}
+
+// 0x00504d30. The difference is built per component and y/z are read through copies taken
+// after the inverse length: retail keeps d.x on the x87 stack across the scale
+// (`fld st(0); fmul st(3)`) and reads y and z back from their frame slots. Without the
+// copies VC6 reaches 145/234; copying before the length 137, only y 145, only z 226,
+// all three 145, `d = fromPos - toPos` with the copies 145, direct-initialised dir 109.
+int SteeringControl::SetAxisFromPoints(SoultreeObject* from, SoultreeObject* to, SoultreeObject* frame)
+{
+    Vec3 fromPos;
+    Vec3 toPos;
+    from->GetPositionIn(0, &fromPos);
+    to->GetPositionIn(0, &toPos);
+    Vec3 d;
+    d.x = fromPos.x - toPos.x;
+    d.y = fromPos.y - toPos.y;
+    d.z = fromPos.z - toPos.z;
+    float lenSq = d.x * d.x + d.y * d.y;
+    lenSq += d.z * d.z;
+    float len = lenSq == 1.0f ? 1.0f : (float)sqrt(lenSq);
+    float inv = 1.0f / len;
+    float y = d.y;
+    float z = d.z;
+    Vec3 dir = Vec3(d.x * inv, y * inv, z * inv);
     if (frame) {
         axis = frame->WorldToLocalDirection(dir);
         return 1;

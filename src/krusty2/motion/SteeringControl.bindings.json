@@ -43,5 +43,7 @@
   "_kVec3XAxis": "0x00689f80",
   "_kVec3YAxis": "0x00689f90",
   "_kVec3ZAxis": "0x00689f60",
-  "_kVec3Zero": "0x00689f70"
+  "_kVec3Zero": "0x00689f70",
+  "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
+  "?SetAxisFromPoints@SteeringControl@@QAEHPAVSoultreeObject@@00@Z": "0x00504d30"
 }

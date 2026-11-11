@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 114, c 83, total 199. The three class (a) functions of the
+Counts: a 2, b 113, c 83, total 198. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -204,7 +204,6 @@ eliminated, try the recursive form with the sibling's spelling.
 | physics/motion/Motnctrl | `0x004a70c0` | 234/3412 | b | aligned 693/958 (was 342): two blend inlines (3 and 5 unused poses) give retail's 2/4 CharacterPose ctor calls, the playback extrapolation is an inline helper with retail's call order; left: `this` in edi vs esi, the blend loop's unused sums/extrapolation (retail calls operator-/*/*/+), the frame |
 | physics/motion/Motnctrl | `0x004a7dc0` | 476/523 | b | 4 code diffs: `fld [esi + 0x20]` vs `mov [esp + N], ecx`; retail lacks `mov [esp + N], ecx`; slots differ |
 | physics/motion/Motnctrl | `0x004a7fd0` | 1097/1121 | c | axisZ cross product loads b's component first in each product (retail a's) |
-| physics/motion/SteeringControl | `0x00504d30` | 145/234 | b | 6 code diffs: `fxch st(2) ; fmul st(2)` vs `fld st(0) ; fmul st(3)`; `fmul st(2)` vs `fmul st(1)`; slots differ |
 | physics/shadow/D3DIMSoultreeShadow | `0x00446c30` | 730/771 | c | x87 term order of the inlined 4x4 product: one term pair in each of _11, _21, _31, _41 (retail's sum orders differ from slot 27's with the same helper) (samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp); 748/771 with 1, 2, 9, 10, 18, 25, 26, 33 or 34 locals at the top; exact only with 5-6 locals inside the shared helper, which break the exact slot 27 |
 | physics/shadow/D3DIMSoultreeShadow | `0x00446f40` | 180/1485 | b | retail's inline __asm fld/fistp rounding helper forces an ebp frame (0xe4 locals); the (int) casts call __ftol |
 | physics/shadow/ProjectedShadow | `0x004da7b0` | 153/777 (masked) | b | block layout, both release-and-return blocks and the clip rectangle match (841/842 B); register choice in the sprintf/QueryFlag set-up and the saved render-target fields |

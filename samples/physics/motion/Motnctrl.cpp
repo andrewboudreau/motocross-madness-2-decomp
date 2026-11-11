@@ -149,6 +149,11 @@ void AxisAngleMatrix(TreeMatrix4* m, float x, float y, float z, float angle);
 // remaining code difference is the fld of src->position.x scheduled right after the cross
 // product call (retail: four moves later); every order of the three axis rows and the position
 // block, and the position copied first or as chained assignments, keep it (452..476).
+// Session 20 (476 unless noted): block scopes around the normalisations, around
+// normalisation plus cross, around all three axes or around each normalisation alone;
+// rotation declared first in an axes block; position or axisX at function top or in a
+// block (position in a block 378); one local reused for axisX and position (457); and
+// every move of one to three lines among the body statements (179 variants, 468..476).
 void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 {
     Matrix4 pose;

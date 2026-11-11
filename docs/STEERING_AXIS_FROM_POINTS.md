@@ -1,12 +1,11 @@
 # Steering axis from scene points
 
-`SteeringControl::SetAxisFromPoints` is a missing `Bike::LoadBike` dependency. The
-standalone candidate in `samples/physics/motion/SteeringAxisFromPoints.cpp` retains
-the existing readable body unchanged. It obtains both nodes' world positions,
+`SteeringControl::SetAxisFromPoints` is a `Bike::LoadBike` dependency. It is
+strict exact (234/234) in the canonical `src/krusty2/motion/SteeringControl.cpp`,
+between SetAxisFromDirection and SetAngle. It obtains both nodes' world positions,
 normalizes their difference and, for a nonnull frame, transforms and stores the
 axis. A null frame returns zero **after** both position/cache operations and the
-normalization arithmetic. This is a finite native behavior review, not an exact
-match or an original translation-unit ownership claim.
+normalization arithmetic.
 
 ## Retail identity and complete extent
 
@@ -27,17 +26,20 @@ The regression preserves the caller's complete existing partial body and all
 `SteeringControl` has no RTTI/vptr. Its existing layout is 24 bytes: node at zero,
 angle at four, maximum angle at eight and the three-float axis at twelve. The
 strict constructor's literal `D:\aardvark\VC\krusty2\SteeringControl.cpp` at
-`0x5745ac` supports source context. Names and the new standalone grouping retain
+`0x5745ac` supports source ownership of the canonical unit. Names retain
 their reconstruction status. Raw primary `SoultreeObject` COL/type evidence and
 layout are checked separately; no adjustment to its secondary GameObject view
 is introduced.
 
-## Source, helper and aggregate evidence
+## Source, helper and object evidence
 
-Authentic VC6 SP3 `vc6_o2_mt`, without additional flags, emits the complete
-230-byte candidate: 145 matching positions against all 234 retail bytes.
-The historical x87 scheduling difference remains. No tolerance comparison,
-matching-only rewrite or behavioral correction was needed for the tested cases.
+Authentic VC6 SP3 `vc6_o2_mt`, without additional flags, emits all 234 bytes
+exactly. The source builds the difference per component and reads y and z through
+copies taken after the inverse length; retail keeps d.x on the x87 stack across
+the scale (`fld st(0); fmul st(3)`) and reloads y and z from their frame slots.
+The former sample form (`Vec3 d = fromPos - toPos` read directly) gave 145/234
+with a 230-byte body; copies before the length give 137, only y 145, only z 226,
+all three components 145, and a direct-initialised `dir` 109.
 
 The source and reference each execute their own real scene/cache math:
 
@@ -54,31 +56,25 @@ both the complete canonical object and retail before linking. There are **no ref
 scripted callbacks** in this fixture. The reference runs its complete retail
 helpers. Production never maps or dispatches to retail code.
 
-Before extraction, the aggregate was compiled at its actual existing pathname.
-All 32 nondebug sections and 90 relocations, including every other function,
-initializer, storage payload/flag and destination/addend, remain identical after
-replacing only this body with the standalone include. Private same-path proof:
-`work/connections43/aggregate-proof.json`, reproduced by `prove.py` from
-`before.obj` and `after.obj`, with no exceptions. The retained regression pins the
-same complete object, normalizing only the known canonical `__FILE__` checkout
-prefix for portability. The full candidate body/relocations also equal those in
-the aggregate and the actual `tools.build_game.compile_source` command.
-
-The ordinary Math3D header emits eight private vector initializer functions in
-the new standalone. Their full bodies/relocations equal the corresponding
-aggregate initializers. They do not establish original TU ownership; the
-candidate's only external dependencies are the two existing scene methods and
-VC6's `__fltused`. The retained checks preserve all 21 existing strict steering
-functions/initializers in both canonical and aggregate objects (42 checks), plus
-the three dual-checked scene helpers (six checks).
+The regression pins the complete canonical object (32 nondebug sections, 90
+relocations), normalizing only the known canonical `__FILE__` checkout prefix for
+portability, and requires the actual `tools.build_game.compile_source` command to
+produce the same object. Against the former sample aggregate (canonical unit plus
+the included candidate) the promotion changes only the SetAxisFromPoints section
+(230 -> 234 bytes, its WorldToLocalDirection relocation 186 -> 190); every other
+section, relocation and payload is unchanged. The fixture links the canonical body
+extracted into a validation-only TU, whose bytes and relocations equal the
+canonical object's and whose only external dependencies are the two scene methods
+and VC6's `__fltused`. The checks cover all 22 strict steering functions and
+initializers plus the four dual-checked scene helpers.
 
 ## Native validation
 
 `tests/test_steering_axis_from_points.py` and
-`tests/fixtures/steering_axis_from_points_compare.cpp` pass **48 strict checks and
+`tests/fixtures/steering_axis_from_points_compare.cpp` pass **30 strict checks and
 100,852 native scenarios**. The private reference is pinned to SHA-256
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
-The actual separately compiled candidate executes at ordinary source addresses;
+The separately compiled source body executes at ordinary source addresses;
 only the validation executable reserves space for the reference image.
 
 The matrix contains:
@@ -119,12 +115,9 @@ input-device integration claim.
 
 ## Functional build review
 
-The unchanged standalone is explicitly admitted as a reviewed nonexact source
-build candidate. It supplies the missing steering operation using existing
-source providers; it remains in `samples/`. The final real link in
-`work/game-build/build-55x25rcs/report.json` compiles 245 translation units and removes exactly this dependency, **272 -> 271**,
-with no new unresolved names. A successful native slice does not establish a
-linked or playable game.
+The canonical SteeringControl unit, already part of the game build, now provides
+the operation; the reviewed nonexact sample candidate and its game-build entry are
+gone. A successful native slice does not establish a playable game.
 
 Reproduce on Windows with authentic VC6 SP3 and the private retail executable:
 

@@ -73,9 +73,9 @@ read/seek calls now use the supplied implementations directly.
   eight `$E` pairs. Retail has two sets of the four `Vec3` constants here; `Math3D.h` supplies the first and
   `SteeringControl.cpp` declares the second locally (`kSecondVec3*`).
 - SteeringControl has no RTTI (no virtuals). Layout: `node` +0 (SoultreeObject*), `angle` +4, `field_0x08`, `axis` +0xc.
-- Promoted to `src/krusty2/motion/SteeringControl.cpp` with `SteeringControl.bindings.json`: 21 strict exact
-  (5 methods + 16 `$E`). SetAxisFromPoints `0x00504d30` stays a near miss in
-  `samples/physics/motion/SteeringControl.cpp` (y spilled to a stack slot in retail).
+- Promoted to `src/krusty2/motion/SteeringControl.cpp` with `SteeringControl.bindings.json`: 22 strict exact
+  (6 methods + 16 `$E`). SetAxisFromPoints `0x00504d30` reads y and z through copies taken after the
+  inverse length, which keeps d.x on the x87 stack across the scale like retail.
 - Vehicle's provisional `VehicleSteerState` is now an alias of this 24-byte
   class. Its constructor and four other supplied bodies satisfy the existing
   vehicle/bike calls directly. The cleanup at `0x00504c50` is a destructor:

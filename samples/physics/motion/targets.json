@@ -60,16 +60,6 @@
     "bindings": "../../../src/reconstructed/SurfaceMap.bindings.json"
   },
   {
-    "class": "SteeringControl",
-    "source": "SteeringControl.cpp",
-    "candidate_symbol_contains": "?SetAxisFromPoints@SteeringControl@@QAEHPAVSoultreeObject@@00@Z",
-    "target_va": "0x00504d30",
-    "target_size": 234,
-    "expect": "partial",
-    "notes": "145/234 strict. Complete axis-from-points operation; no _finite guard in this body; retail keeps y in a stack slot where VC6 keeps it in a register, so register allocation and FPU ordering diverge.",
-    "bindings": "SteeringControl.bindings.json"
-  },
-  {
     "class": "MotionManager",
     "source": "Motnctrl.cpp",
     "candidate_symbol_contains": "?LoadVue@MotionManager@@",

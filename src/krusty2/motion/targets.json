@@ -172,6 +172,16 @@
   {
     "class": "SteeringControl",
     "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?SetAxisFromPoints@SteeringControl@@QAEHPAVSoultreeObject@@00@Z",
+    "target_va": "0x00504d30",
+    "target_size": 234,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp; called by Bike::LoadBike 0x408b6b",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
     "candidate_symbol_contains": "?SetAngle@SteeringControl@@QAEXMPAVSoultreeObject@@@Z",
     "target_va": "0x00504e20",
     "target_size": 150,

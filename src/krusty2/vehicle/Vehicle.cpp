@@ -2304,6 +2304,12 @@ void Vehicle::PlaceWheels()
 // a helper that copies the vector and stores the magnitude (3/4), a zero-copy helper, a
 // reference to the destination and the inverted branch (25).  SoulTreePhysics 0x00501e90
 // has the same store written before its copy and misses the same way.
+// Session 20, also no gain: a by-value VehCopyBits (568), a pointer-destination helper,
+// `load * 0.0f`, `-0.0f`, VehicleWheel& and Vec3& aliases, a store between member
+// initialisers (all 840-841), long* writes with the store before the z word (846, still
+// one moved store), long locals with the store at each of positions 0-6 (833/835), a
+// named zero built by constructor, members, chain or copy-init with the store first, in
+// the middle or last (837-841) and a function-scope zero Vec3 (537).
 // Wheel drive and contact impulse pass (tier 3 reading).  Counts the in-contact
 // wheels with a nonzero +0x2a0 and, unless crashed, lets each wheel apply its share of the
 // drive (0x00514170).  Then for every wheel in contact: the load pushing into the ground

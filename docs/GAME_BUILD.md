@@ -122,7 +122,7 @@ views still describe only the offsets each caller uses; their consolidation
 does not establish complete class layouts. Vehicle's steering state now uses
 the existing `SteeringControl` class and its five supplied bodies, including
 the destructor confirmed by Vehicle's delete sequence. `SetAxisFromPoints`
-is supplied by the separately reviewed [nonexact candidate](STEERING_AXIS_FROM_POINTS.md). Six [network GUIDs](NET.md#network-identifiers)
+is now [strict exact](STEERING_AXIS_FROM_POINTS.md) in the same canonical unit. Six [network GUIDs](NET.md#network-identifiers)
 also have verified source definitions. These three integrations remove 21
 unresolved symbols from the preceding 811-symbol build.
 

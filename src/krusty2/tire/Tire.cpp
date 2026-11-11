@@ -357,6 +357,7 @@ static inline Vec3 TireCrossCtor(const CollisionVec3& a, const CollisionVec3& b)
 // parenthesisation of the six products of either cross (64 forms each through a local
 // helper; only the unparenthesised form kept 1588). With the Vec3 crosses, the 64
 // groupings, an unnamed or Vec3-view copy and a Vec3 projection stay at 1623..1630.
+// Session 20: moving any body statement by one to three lines keeps 1630 at best.
 void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, CollisionVec3 ref,
                               float minLength, float* outValue, int* outSign)
 {
