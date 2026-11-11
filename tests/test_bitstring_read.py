@@ -101,13 +101,13 @@ class BitStringReadTests(unittest.TestCase):
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)
                 paths[source]=obj;objects[source]=CoffObject(obj)
             candidate=objects[SOURCE];entry=candidate.find_symbol(SYMBOL)
-            self.assertEqual((entry.function_size,entry.extent_source),(157,'coff_function_aux'))
+            self.assertEqual((entry.function_size,entry.extent_source),(150,'coff_function_aux'))
             body,size,relocs=candidate.symbol_extent(entry)
-            self.assertEqual(size,157)
+            self.assertEqual(size,150)
             self.assertEqual({candidate.symbol_by_index[r.symbol_index].name for r in relocs},GLOBALS)
             report=compare(retail,candidate,SYMBOL,0x423ef0,125,(ROOT/SOURCE).with_suffix('.bindings.json'))
             self.assertFalse(report['strict_exact'])
-            self.assertEqual(report['strict_match']['matching_positions'],8)
+            self.assertEqual(report['strict_match']['matching_positions'],1)
             self.assertFalse(any(s.name.startswith('.CRT') for s in candidate.sections))
             strict=0
             for source in (CANONICAL,'src/reconstructed/Lzw.cpp','src/reconstructed/MemTag.cpp'):

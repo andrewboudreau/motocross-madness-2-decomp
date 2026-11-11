@@ -175,7 +175,7 @@
     {
       "path": "samples/render/BitStringRead.cpp",
       "status": "reviewed-nonexact",
-      "reason": "Complete 157-byte reader against 125 retail bytes, with 8 resolved matching positions. Preserves canonical constructor and shared storage; 205632 native reader cases and 2051 source-only LZW streams pass using the actual decoder and allocation helpers. Finite valid-count and padded-stream limits are explicit.",
+      "reason": "Complete 150-byte reader against 125 retail bytes, with 1 resolved matching position (linked masked score ~0.42). Preserves canonical constructor and shared storage; 205632 native reader cases and 2051 source-only LZW streams pass using the actual decoder and allocation helpers. Finite valid-count and padded-stream limits are explicit.",
       "evidence": "docs/BITSTRING_READ.md#functional-build-review"
     },
     {

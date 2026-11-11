@@ -4,11 +4,22 @@
 [`samples/render/BitStringRead.cpp`](../samples/render/BitStringRead.cpp).
 The complete retail body is **125 bytes**, `0x00423ef0..0x00423f6c`, including
 `RET 4`; the following three NOP bytes precede the next function. VC6 SP3
-emits **157 bytes**, with **8 relocation-resolved matching positions**. This
+emits **150 bytes**, with **1 relocation-resolved matching position**. This
 is a nonexact candidate, not a matching source promotion or recovered original
 translation unit. Its retail frame, BSWAP and local-return sequence suggest
 original inline assembly, but that attribution is inference. The reconstruction
 uses neither assembly nor copied code, and production never maps retail code.
+
+The 2026-11-11 linked-game audit found no behavioural difference. It dropped
+the candidate's `& 31` shift masks and accumulates into one `result` local
+like retail's `esi`. The masks were never reached: every shift count is 0..31,
+except a zero-count read at used 0, whose mask is 0 anyway. VC6 emits plain
+`shr`/`shl reg, cl`, so x86 semantics apply as in retail. The 205,632-case
+native comparison below still passes. Positional strict matching fell from
+8/157 to 1/150, but the instruction stream is closer to retail. The linked
+masked score rose from 0.218 to about 0.42, with 50 built instructions
+against retail's 45. The remaining gap is retail's ebp frame and single
+exit, a `bswap` C cannot express, and its `cmp eax, 0`.
 
 ## Identity and complete behavior
 
