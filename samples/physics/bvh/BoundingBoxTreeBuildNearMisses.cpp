@@ -21,6 +21,11 @@
 // matter.  Both spots look like register-allocation choices with no source lever found.
 // Session 15: walking the corners with a pointer local (`int* corner = corners; ...
 // keep[*corner]`) in the remap pass keeps [offset + keep] and reshapes the pass (1370/1623).
+// Session 22: `numCorners = numTris * 3` moved after the corners, remap or positions allocation or
+// after `n = 0` is worse (1591, 1568, 1523, 401).
+// Remap-pass index casts ((unsigned), (unsigned long), (long), (int)) and keep/remap declared as
+// unsigned int*, long* or unsigned long* are inert (1622); (unsigned short) is 1467.  An inline
+// remap helper is 1622 as a for loop, 1470 with a corner local and 1370 as a pointer walk.
 void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* triCount,
                           int* vertCount, int** indices, TreeVec3** verts)
 {
