@@ -886,6 +886,9 @@ def claim_bindings(pe: PEImage, cov: Coverage, bindings: dict, report: dict,
         sym = rows[0]['symbol']
         kinds = Counter(symbol_kind(r['symbol']) for r in rows)
         kind = kinds.most_common(1)[0][0]
+        # Name the address by a symbol of the dominant kind: a C global
+        # (`_kbSecondsPerMillisecond`) can share it with `__real@` spellings.
+        sym = next(r['symbol'] for r in rows if symbol_kind(r['symbol']) == kind)
         origin = 'game'
         starts.append(va)
         if kind == 'real':
