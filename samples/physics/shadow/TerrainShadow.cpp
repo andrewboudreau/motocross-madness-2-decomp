@@ -1,4 +1,5 @@
-// TerrainShadow.cpp -- the TerrainShadow (vtable 0x005582d4) near misses: slots 27, 28 and 30.
+// TerrainShadow.cpp -- the TerrainShadow (vtable 0x005582d4) slots 27, 28 and 30 (27 and 30 near
+// misses, 28 strict exact).
 // The constructor, Attach, slot 29, the slot 14 render and the ~ShadowReceiver COMDAT are strict
 // exact in src/reconstructed/TerrainShadow.cpp, which also declares the class (TerrainShadow.h).
 // Ownership is uncertain: no __FILE__ xref lies in 0x00508ae0..0x0050a58f (Terrain.cpp's last is
@@ -17,9 +18,12 @@
 // orthographic scale by lensScale.  Returns 0 when the rectangle does not fit the texture.
 // Each branch owns its matrix: with one shared `projection` VC6 cross-jumps the whole Multiply argument
 // copy, retail only merges from the final push.  The chained stores give retail's fst order.
-// Larger-extent dead end (about 18 forms): retail's else arm stores the extent back over
-// itself (`mov edx, [S]; fstp st0; mov [S], edx`) and reloads texture; if/else, ternary,
-// max-by-reference helpers and pointer-select forms all drop the self-copy.
+// The larger extent is an if/else over two named extents: retail's else arm copies extentZ
+// into extent through edx (`mov edx, [S]; fstp st0; mov [S], edx`, both at [esp+0xc]) and
+// reloads texture.  Strict exact; an inline max(extentX, extentZ) by value matches too.  One
+// variable updated in place (`if (extentX > extent) extent = extentX;`, 121/486), `extent =
+// extentZ; if (extentX > extentZ) extent = extentX;` (113) and max() over the two differences
+// unnamed (104) drop the copy (Session 22; the Session 14 scores predate the `* extent` fix).
 // The orthographic arm scales by the larger extent: retail's `fmul [esp+0x4c]` at 0x00509949
 // sits under the identity call's pushed destination and the 0x3c-byte argument block (0x40),
 // so it reads [esp+0xc], the extent stored at 0x0050981b.  An earlier reading counted only
@@ -41,9 +45,12 @@ int TerrainShadow::UnknownVirtualSlot28()
         texelScale = 1.0f;
     field_0x677c = texelScale / shadow->texture->size;
     float extentX = field_0x666c - field_0x6668;
-    float extent = field_0x6674 - field_0x6670;
-    if (extentX > extent)
+    float extentZ = field_0x6674 - field_0x6670;
+    float extent;
+    if (extentX > extentZ)
         extent = extentX;
+    else
+        extent = extentZ;
     if (shadow->texture->size > extent) {
         float fov;
         if (shadow->mode == 1) {

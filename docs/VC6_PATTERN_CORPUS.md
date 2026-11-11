@@ -129,11 +129,13 @@ Exact examples:
 
 In both, the copy it passes writes a member or a global. Camera::UpdateMatrices
 `0x0042ee30` (camera) needs the same move over a copy whose destination is
-a stack argument slot (`mov edi, esp`). No exact function in the corpus has
-that case, so the corpus does not decide it.
+a stack argument slot (`mov edi, esp`). TerrainShadow slot 28 `0x005097d0`
+(exact) has that case: in both matrix arms the `sub esp, 0x40` for
+MatrixMultiply's first matrix (0x005098f2) sits above the `rep movsd` of the
+camera matrix into the second argument's slot, set up by `mov edi, esp` at
+0x005098d3. The source passes both matrices by value in one call.
 
 Other near misses with the retail shape:
-- TerrainShadow `0x005097d0`;
 - CollisionObject `0x00437ef0`;
 - SoultreeMatrix `0x004fc050`;
 - ProjectedShadow `0x004db0d0`.
