@@ -37,16 +37,26 @@ struct Group3FollowRaceView {
     KbScoreBoard* scoreBoard;    // +0xbc
 };
 
+// Retail reads the race view from +0x34 afresh at every use (0x4a9f0d,
+// 0x4a9f1f, 0x4a9f46, 0x4a9f68) rather than caching it across the calls.
+// With that and the best-run locals the body is 272/272 bytes, 78/78
+// instructions (linked masked score 0.735 -> 0.974); what remains is the
+// fstp-after-first-push scheduling difference recorded in the sample.
+#define RACE_VIEW() (*(Group3FollowRaceView**)((char*)this + 0x34))
+
 void KbPlayer::Fn_004A9E80(Vehicle* a, Vehicle* b, int c)
 {
     KrustyBike* racer = (KrustyBike*)a;
     KrustyBike* previous = (KrustyBike*)b;
-    Group3FollowRaceView* view = *(Group3FollowRaceView**)((char*)this + 0x34);
 
     if (previous) {
         previous->totalTagRun += previous->tagRun;
-        previous->bestTagRun = previous->tagRun < previous->bestTagRun
-                                   ? previous->bestTagRun : previous->tagRun;
+        // Compared through locals, as the TrackGameViewOwner near miss in
+        // samples/race/FollowRacerNearMisses.cpp (retail fld best; fld run;
+        // fcompp at 0x4a9e9f).
+        float best = previous->bestTagRun;
+        float run = previous->tagRun;
+        previous->bestTagRun = best > run ? previous->bestTagRun : previous->tagRun;
         previous->tagRun = 0.0f;
         previous->SetSpawnProtection(1, 5.0f, 0);
         if (ball)
@@ -54,18 +64,19 @@ void KbPlayer::Fn_004A9E80(Vehicle* a, Vehicle* b, int c)
     }
     *(float*)((char*)this + 0xac) = 5.0f;
     if (c)
-        view->localRacer->Fn_004925A0(racer, false);
+        RACE_VIEW()->localRacer->Fn_004925A0(racer, false);
     if (racer) {
-        view->raceSound->PlayItSound();
+        RACE_VIEW()->raceSound->PlayItSound();
         racer->SetSpawnProtection(1, 5.0f, 0);
     }
     ((TrackGameViewOwner*)this)->AnnounceFollowedRacer((UnknownEventRacer*)racer,
                                                        (UnknownEventRacer*)previous);
-    view = *(Group3FollowRaceView**)((char*)this + 0x34);
-    if (racer == view->localRacer && previous && previous != racer) {
+    if (racer == RACE_VIEW()->localRacer && previous && previous != racer) {
         racer->score += 2500.0f;
-        if (view->scoreBoard)
-            view->scoreBoard->ShowValue(2500.0f, 1.0f);
+        if (RACE_VIEW()->scoreBoard)
+            RACE_VIEW()->scoreBoard->ShowValue(2500.0f, 1.0f);
     }
     followedRacer = racer;
 }
+
+#undef RACE_VIEW
