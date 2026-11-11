@@ -31,6 +31,12 @@ class LinkedAccuracyTest(unittest.TestCase):
         # a compare and branch make it an implementation, not a forwarder
         real = disassemble(bytes.fromhex('85c07405' 'e8f70f0000' 'c3'), 0x1000)
         self.assertIsNone(forward_target(real))
+        # a constructor: base call plus a vptr store through esi is not a forwarder
+        ctor = disassemble(bytes.fromhex('56' '8bf1' 'e8f80f0000' 'c70600305000' '8bc6' '5e' 'c3'), 0x1000)
+        self.assertIsNone(forward_target(ctor))
+        # a by-value argument copied through `mov ecx, esp` still forwards
+        byval = disassemble(bytes.fromhex('83ec0c' '8bcc' '8b442410' '8901' 'e8f00f0000' 'c3'), 0x1000)
+        self.assertEqual(forward_target(byval), 0x2000)
 
     def test_similarity_masks_frame_registers_and_ebp_frames(self):
         esp_frame = disassemble(bytes.fromhex('8b442404' 'c3'), 0)          # mov eax,[esp+4]; ret

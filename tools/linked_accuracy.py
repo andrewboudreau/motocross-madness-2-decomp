@@ -110,19 +110,35 @@ def similarity(a, b, strict: bool) -> float:
     return 2 * sum(t.size for t in sm.get_matching_blocks()) / (len(na) + len(nb))
 
 
+REGS32 = ('eax', 'ebx', 'ecx', 'edx', 'esi', 'edi', 'ebp')
 FORWARD_OPS = ('mov', 'push', 'lea', 'add', 'sub', 'ret', 'pop', 'xor')
 
 
 def forward_target(insns) -> int | None:
     """Callee of a forwarder: argument moves/pushes around exactly one direct call or jmp."""
     calls = [x for x in insns if x.mnemonic in ('call', 'jmp')]
+    # A store through anything but the outgoing argument area (a vptr write in a
+    # constructor, say) is work, not forwarding. By-value arguments are copied
+    # through a register loaded from esp (`mov ecx, esp; mov [ecx], eax`).
+    stack_regs = {'esp'}
+    for x in insns:
+        dest = x.op_str.split(',')[0]
+        if x.mnemonic == 'mov' and dest.strip() in REGS32:
+            src = x.op_str.split(',')[1].strip()
+            stack_regs.discard(dest.strip())
+            if src == 'esp':
+                stack_regs.add(dest.strip())
+        m = re.match(r'\w+ ptr \[(\w+)', dest)
+        if x.mnemonic == 'mov' and m and m.group(1) not in stack_regs:
+            return None
     if (len(insns) > 200 or len(calls) != 1 or not calls[0].op_str.startswith('0x')
             or any(x.mnemonic not in FORWARD_OPS + ('call', 'jmp') for x in insns)):
         return None
     return int(calls[0].op_str, 16)
 
 
-def score_build(build: Path, retail: Path, min_size: int, strict: bool) -> list[dict]:
+def score_build(build: Path, retail: Path, min_size: int, strict: bool,
+                libraries: bool = False) -> list[dict]:
     from tools.audit_game_vtables import function_size
     funcs = parse_functions((build / 'mcm2.map').read_text(encoding='latin-1'))
     built = PEImage(build / 'mcm2.exe')
@@ -140,7 +156,7 @@ def score_build(build: Path, retail: Path, min_size: int, strict: bool) -> list[
     seen = set()
     for i, (va, symbol, obj) in enumerate(funcs):
         vas = bindings.get(symbol, set())
-        if len(vas) != 1 or va in seen:
+        if len(vas) != 1 or va in seen or (':' in obj and not libraries):
             continue
         seen.add(va)
         rva = next(iter(vas))
@@ -194,12 +210,13 @@ def main(argv=None) -> int:
     ap.add_argument('--min-size', type=int, default=32)
     ap.add_argument('--top', type=int, default=60)
     ap.add_argument('--strict', action='store_true', help='keep registers and stack displacements')
+    ap.add_argument('--libraries', action='store_true', help='include library members (LIBCMT:x.obj)')
     args = ap.parse_args(argv)
     build = args.build or latest_build()
     if build is None or not (build / 'mcm2.map').is_file():
         print('no linked build; run tools/build_game.py first', file=sys.stderr)
         return 2
-    rows = score_build(build, args.retail, args.min_size, args.strict)
+    rows = score_build(build, args.retail, args.min_size, args.strict, args.libraries)
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / 'report.json').write_text(json.dumps(rows, indent=1) + '\n', encoding='utf-8')
     (args.out / 'report.md').write_text(render(rows, args.top), encoding='utf-8')

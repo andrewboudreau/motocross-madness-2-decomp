@@ -431,8 +431,9 @@ python tools/build_game.py --vc6-root "$VC6_ROOT"
 python tools/linked_accuracy.py --top 60
 ```
 
-The first run on 2026-11-10 scored 2,711 bound retail functions (1,119,499
-bytes); 678,063 of those bytes score 1.000. It showed bring-up bodies that
+The first run on 2026-11-10 scored 2,659 bound retail functions (1,111,710
+bytes, library members excluded); 676,545 of those bytes score 1.000. It
+showed bring-up bodies that
 are well below the near-miss sample for the same function:
 
 - BVH `BoxTriangleQuery` 0.16 against the sample's 0.97, `TreeTreeQueryNodes`
