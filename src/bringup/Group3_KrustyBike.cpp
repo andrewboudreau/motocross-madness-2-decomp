@@ -119,7 +119,8 @@ int KrustyBike::IsSpeedGainBelowLimit(float dt)
 // Slot 11 (0x00491d10): tier 3 -- respawn placement.  Fills outPosition and outForward
 // (unit direction) according to the game mode (g->0x2d74: 0..5), then issues the same
 // collision query as the base class with per-mode ranges.  The two "copy the stored
-// vectors" paths fall off the end without setting a result (retail leaves eax as is).
+// vectors" paths fall off the end without setting a result; the returns below give the
+// value retail leaves in eax (a fall-off-the-end spelling loses bytes and keeps other eax).
 // Near miss (523/1296 strict, 1300 bytes): flag and lim are assigned in both arms (an
 // initialiser plus a conditional store keeps 0 in edi and spills lim), and the mode 2/3
 // copy path ends with `break` (retail returns there; it does not fall into case 0) and
@@ -158,8 +159,10 @@ int KrustyBike::FindPlacement(int respawn, Vec3* outPosition, Vec3* outForward, 
             *outPosition = respawnPosition;
             *outForward = respawnHeading;
             position = *outPosition;
-            // Retail returns here with eax still holding outPosition (nonzero).
-            return (int)outPosition;
+            // Retail returns no value here: eax keeps the last word of that copy, the
+            // bits of outPosition->z (zero when the stored position has z == +0.0).
+            // The reconstructed callers ignore it; tools/emu_cases/kb_find_placement.py.
+            return *(int*)&outPosition->z;
         } else {
             Vec3 target = respawnPosition;
             *outPosition = position;
