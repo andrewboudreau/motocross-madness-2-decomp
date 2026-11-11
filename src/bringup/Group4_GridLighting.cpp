@@ -10,12 +10,22 @@
 //
 // Retail rounds light terms with an inlined x87 `fistp` (current rounding
 // mode, round-to-nearest-even) and converts the light colours with _ftol
-// (truncation). X87FloatToInt stands in for the fistp without inline
-// assembly; the `- 0.5f` sites are retail's own.
+// (truncation); the `- 0.5f` sites are retail's own. The game build compiles
+// this unit with /QIfist (config/game_build.json bringup_flags), so
+// FistpFloatToInt's cast is a FISTP under the current rounding mode. The
+// truncating light-colour casts live in Group4_GridLightColor.cpp, compiled
+// without the flag, so every float-to-int conversion left here is a fistp site.
+// Range: each term is a colour byte (a light colour times 255, truncated) times
+// a facing value, the dot product of a vertex normal with a unit light vector
+// (point and positional lights normalise it; a directional light uses its
+// direction rotated by the rigid inverse) or a per-vertex sum / 256 times a
+// colour byte, so the values stay far inside int for any light colour near the
+// 0..1 range (inference from the data flow; colours far outside it would be
+// needed to leave int).
 #include "LightEmitter.h"
 #include "core/DebugAlloc.h"
 #include "math/FastMath.h"
-#include "X87FloatToInt.h"
+#include "../../samples/common/FistpFloatToInt.h"
 
 // Griddraw.h's boundary declaration (same class key and signature, so the
 // definition mangles as ?LightVertices@GridVertexSink@@QAEXPAXH00HH@Z). The
@@ -71,12 +81,17 @@ static inline float Group4Vis_Dot(const float* a, const float* b) {
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
-// A light's colour scaled to 0..255 (retail: _ftol of colour * 255).
-static void Group4Vis_LightColor(const LightEmitter* light, int* r, int* g, int* b) {
-    *r = (int)(light->ambientRGBA[0] * 255.0f);
-    *g = (int)(light->ambientRGBA[1] * 255.0f);
-    *b = (int)(light->ambientRGBA[2] * 255.0f);
+// Retail's inline fistp helper (FISTP under the current rounding mode).
+static inline int Group4Vis_Round(float value) {
+    int result;
+    FistpFloatToInt(&result, value);
+    return result;
 }
+
+// A light's colour scaled to 0..255 (retail: _ftol of colour * 255). Defined in
+// Group4_GridLightColor.cpp, which is compiled without /QIfist so these casts keep
+// retail's truncation.
+void Group4Vis_LightColor(const LightEmitter* light, int* r, int* g, int* b);
 
 // Inverse of the rigid object transform (row-major 4x4, row vector times
 // matrix): the transposed rotation and the translation rotated back.
@@ -190,9 +205,9 @@ void GridVertexSink::LightAny(const float* matrix, int count, void* normals, voi
             }
             float facing = Group4Vis_Dot(Group4Vis_VertexNormal(normals, stride, i), lightVector);
             if (facing > 0.0f) {
-                manager->vertexRed[i] += X87FloatToInt((float)r * facing);
-                manager->vertexGreen[i] += X87FloatToInt((float)g * facing);
-                manager->vertexBlue[i] += X87FloatToInt((float)b * facing);
+                manager->vertexRed[i] += Group4Vis_Round((float)r * facing);
+                manager->vertexGreen[i] += Group4Vis_Round((float)g * facing);
+                manager->vertexBlue[i] += Group4Vis_Round((float)b * facing);
             }
         }
     }
@@ -227,9 +242,9 @@ void GridVertexSink::LightOne(const float* matrix, int count, void* normals, voi
             float facing = Group4Vis_Dot(direction, Group4Vis_VertexNormal(normals, stride, i));
             if (facing > 0.0f) {
                 *Group4Vis_VertexDiffuse(buffer, i) =
-                    Group4Vis_PackOpaque(X87FloatToInt((float)r * facing - 0.5f),
-                                         X87FloatToInt((float)g * facing - 0.5f),
-                                         X87FloatToInt((float)b * facing - 0.5f));
+                    Group4Vis_PackOpaque(Group4Vis_Round((float)r * facing - 0.5f),
+                                         Group4Vis_Round((float)g * facing - 0.5f),
+                                         Group4Vis_Round((float)b * facing - 0.5f));
             }
         }
         break;
@@ -241,9 +256,9 @@ void GridVertexSink::LightOne(const float* matrix, int count, void* normals, voi
             float facing = Group4Vis_Dot(toLight, Group4Vis_VertexNormal(normals, stride, i));
             if (facing > 0.0f) {
                 *Group4Vis_VertexDiffuse(buffer, i) =
-                    Group4Vis_PackOpaque(X87FloatToInt((float)r * facing - 0.5f),
-                                         X87FloatToInt((float)g * facing - 0.5f),
-                                         X87FloatToInt((float)b * facing - 0.5f));
+                    Group4Vis_PackOpaque(Group4Vis_Round((float)r * facing - 0.5f),
+                                         Group4Vis_Round((float)g * facing - 0.5f),
+                                         Group4Vis_Round((float)b * facing - 0.5f));
             }
         }
         break;
@@ -253,9 +268,9 @@ void GridVertexSink::LightOne(const float* matrix, int count, void* normals, voi
         for (i = 0; i < count; i++) {
             float facing = Group4Vis_Dot(Group4Vis_VertexNormal(normals, stride, i), toLight);
             *Group4Vis_VertexDiffuse(buffer, i) =
-                Group4Vis_PackOpaque(X87FloatToInt((float)r * facing - 0.5f),
-                                     X87FloatToInt((float)g * facing - 0.5f),
-                                     X87FloatToInt((float)b * facing - 0.5f));
+                Group4Vis_PackOpaque(Group4Vis_Round((float)r * facing - 0.5f),
+                                     Group4Vis_Round((float)g * facing - 0.5f),
+                                     Group4Vis_Round((float)b * facing - 0.5f));
         }
         break;
     case kGroup4LightAmbient: {
@@ -320,9 +335,9 @@ void GridVertexSink::LightAmbientPlusOne(const float* matrix, int count, void* n
         }
         float facing = Group4Vis_Dot(lightVector, Group4Vis_VertexNormal(normals, stride, i));
         if (facing > 0.0f) {
-            int red = X87FloatToInt((float)r * facing) + ambientR;
-            int green = X87FloatToInt((float)g * facing) + ambientG;
-            int blue = X87FloatToInt((float)b * facing) + ambientB;
+            int red = Group4Vis_Round((float)r * facing) + ambientR;
+            int green = Group4Vis_Round((float)g * facing) + ambientG;
+            int blue = Group4Vis_Round((float)b * facing) + ambientB;
             *Group4Vis_VertexDiffuse(buffer, i) = Group4Vis_PackOpaque(
                 Group4Vis_Clamp255(red), Group4Vis_Clamp255(green), Group4Vis_Clamp255(blue));
             if (manager->field_0x114) {
@@ -355,10 +370,11 @@ void GridVertexSink::LightAmbientPlusOne(const float* matrix, int count, void* n
 // converts the colour bytes as unsigned (dead high-dword zero store, fimul) and
 // scales red/256 before the byte multiply (unparenthesised, VC6 multiplies the
 // byte first; exact either way since 1/256 is a power of two; the parentheses
-// raise match_one 58 -> 60 aligned but the linked difflib score, dominated by
-// the X87FloatToInt expansions, reads 0.458 vs 0.477 without). The remaining
-// size gap (370 built vs 167 retail instructions) is the three X87FloatToInt
-// expansions and retail's ebp frame, which comes from the inline-asm fistp.
+// raise match_one 58 -> 60 aligned but the linked difflib score, then dominated by
+// the old X87FloatToInt emulation, read 0.458 vs 0.477 without). With the
+// Group4Vis_Round FISTP roundings (/QIfist) the body is 163 built vs 167 retail
+// instructions (masked 0.721); the rest is retail's ebp frame and its
+// fstp/fld/fistp-dword helper sequence, which comes from the inline-asm fistp.
 // Ruled out: `/ 256.0f`, `0.00390625f` (same code as `* (1.0f / 256.0f)`);
 // re-reading the colour through a pointer per channel (worse).
 void GridVertexSink::LightVertices(void* matrix, int count, void* vertices, void* buffer, int stride,
@@ -396,11 +412,11 @@ void GridVertexSink::LightVertices(void* matrix, int count, void* vertices, void
     if (colors) {
         for (int i = 0; i < count; i++) {
             unsigned int color = *Group4Vis_VertexDiffuse(colors, i);
-            int r = X87FloatToInt(((float)manager->vertexRed[i] * (1.0f / 256.0f)) *
+            int r = Group4Vis_Round(((float)manager->vertexRed[i] * (1.0f / 256.0f)) *
                                       (float)((color >> 16) & 0xff) - 0.5f);
-            int g = X87FloatToInt(((float)manager->vertexGreen[i] * (1.0f / 256.0f)) *
+            int g = Group4Vis_Round(((float)manager->vertexGreen[i] * (1.0f / 256.0f)) *
                                       (float)((color >> 8) & 0xff) - 0.5f);
-            int b = X87FloatToInt(((float)manager->vertexBlue[i] * (1.0f / 256.0f)) *
+            int b = Group4Vis_Round(((float)manager->vertexBlue[i] * (1.0f / 256.0f)) *
                                       (float)(color & 0xff) - 0.5f);
             *Group4Vis_VertexDiffuse(buffer, i) = ((r << 8 | g) << 8) | b;
         }

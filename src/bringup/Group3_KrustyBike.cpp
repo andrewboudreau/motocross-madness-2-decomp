@@ -9,8 +9,8 @@
 // TU-local helpers of KrustyBike.cpp that these bodies use are repeated here as statics.
 // Fn_00493660 and UpdateRiderPose now make the sample's calls: OrientationAxesFromAngles
 // (Group4_OrientationAxes.cpp), KbWheel::SetRollDistance, KbTrack::SelectLapGates (aliased
-// to TrackGameViewOwner's) and the four-pose blend, defined below as
-// Character::Method_0x004a9050. The former private copies were cdecl statics (linked 0.987
+// to TrackGameViewOwner's) and the four-pose blend Character::Method_0x004a9050
+// (Group3_CharacterPoseBlend.cpp). The former private copies were cdecl statics (linked 0.987
 // and 0.958; the sample scores 0.989 and 0.971). The sample is not linked as a whole: it
 // includes the canonical KrustyBike.cpp, and its slot 11 FindPlacement scores below this
 // copy (0.869 against 0.947).
@@ -40,7 +40,6 @@
 #include "../reconstructed/MorphBastardModifierCore.h"
 #include "motion/MotionPose.h"
 #include <float.h>
-#include "X87FloatToInt.h"
 
 // Same as KrustyBike.cpp's TU-local KbLength (square root with an exact-one shortcut).
 static inline float KbLength(const Vec3& v)
@@ -87,80 +86,9 @@ static inline int G3SelectedSeries()
 int PointInPlacementSquare(const CollisionVec3* point, float x, float z, float size, float scale,
                            float* minX, float* maxX, float* minZ, float* maxZ);
 
-// ---- 0x004a9050, Character four-pose blend (thiscall ret 0x1c) ----
-// Defined as D3DIMSoultreeCharacter.h's Character::Method_0x004a9050 so that
-// UpdateRiderPose calls it as retail does (thiscall on the rider and on the bike).
-// Per node: motions a and b are sampled with the clamped-phase blend that 0x004a8c50 uses
-// for its first motion (the inline axis interpolation, re-orthogonalised), c and d with
-// InterpolatePose; then (a,b) and (c,d) are mixed by 1 - weight and the two results by
-// 1 - lean, and the pose goes to CharacterVirtualSlot4 (vtable +0x10).  Motion layout:
-// +0xa4 frames (0xc-byte {index, poses, count}), +0xa8 frameCount, +0xac poses per frame.
-void InterpolatePose(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t);
-
-struct G3MotionView {
-    char pad_0x00[0xa4];
-    MotionPoseList* frames;   // +0xa4
-    int frameCount;           // +0xa8
-    int posesPerFrame;        // +0xac
-};
-
-static void G3SampleMotion(G3MotionView* m, float phase, MotionPoseList** frame,
-                           MotionPoseList** next, float* fraction)
-{
-    float position = (float)(m->frameCount - 1) * phase;
-    // Retail's fistp helper (0x004a9092): floor(position) except at exact ties.
-    int index = X87FloatToInt(position - 0.5f);
-    *fraction = position - (float)index;
-    *frame = &m->frames[index];
-    *next = index + 1 == m->frameCount ? *frame : &m->frames[index + 1];
-}
-
-static void G3BlendFirst(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t)
-{
-    if (t < 0.0f) t = 0.0f;
-    else if (t > 1.0f) t = 1.0f;
-    out->nodeIndex = a->nodeIndex;
-    out->hasPose = a->hasPose;
-    Vec3 d, s, r;
-    out->axisZ = Vec3Normalize(*Vec3AddCall(&r, &a->axisZ,
-        Vec3ScaleCall(&s, Vec3SubtractCall(&d, &b->axisZ, &a->axisZ), t)));
-    out->axisY = Vec3Normalize(*Vec3AddCall(&r, &a->axisY,
-        Vec3ScaleCall(&s, Vec3SubtractCall(&d, &b->axisY, &a->axisY), t)));
-    out->position = *Vec3AddCall(&r, &a->position,
-        Vec3ScaleCall(&s, Vec3SubtractCall(&d, &b->position, &a->position), t));
-    Vec3 axisX = CrossProductCall(out->axisZ, out->axisY);
-    out->axisY = CrossProductCall(axisX, out->axisZ);
-}
-
-void Character::Method_0x004a9050(int a, int b, int c, int d, float phase, float weight,
-                                  float lean)
-{
-    G3MotionView* ma = reinterpret_cast<G3MotionView*>(a);
-    G3MotionView* mb = reinterpret_cast<G3MotionView*>(b);
-    G3MotionView* mc = reinterpret_cast<G3MotionView*>(c);
-    G3MotionView* md = reinterpret_cast<G3MotionView*>(d);
-    MotionPoseList *fa, *na, *fb, *nb, *fc, *nc, *fd, *nd;
-    float ta, tb, tc, td;
-    G3SampleMotion(ma, phase, &fa, &na, &ta);
-    this->currentMotion = reinterpret_cast<Motion*>(ma);
-    this->currentFrame = fa;
-    G3SampleMotion(mb, phase, &fb, &nb, &tb);
-    G3SampleMotion(mc, phase, &fc, &nc, &tc);
-    G3SampleMotion(md, phase, &fd, &nd, &td);
-    float pairWeight = 1.0f - weight;
-    float leanWeight = 1.0f - lean;
-    for (int i = 0; i < reinterpret_cast<G3MotionView*>(this->currentMotion)->posesPerFrame; ++i) {
-        CharacterPose pa, pb, pc, pd, ab, cd, result;
-        G3BlendFirst(&fa->poses[i], &na->poses[i], &pa, ta);
-        G3BlendFirst(&fb->poses[i], &nb->poses[i], &pb, tb);
-        InterpolatePose(&fc->poses[i], &nc->poses[i], &pc, tc);
-        InterpolatePose(&fd->poses[i], &nd->poses[i], &pd, td);
-        InterpolatePose(&pa, &pb, &ab, pairWeight);
-        InterpolatePose(&pc, &pd, &cd, pairWeight);
-        InterpolatePose(&ab, &cd, &result, leanWeight);
-        this->CharacterVirtualSlot4((int)&result, 0);
-    }
-}
+// 0x004a9050, Character::Method_0x004a9050 (the four-pose blend UpdateRiderPose calls),
+// lives in Group3_CharacterPoseBlend.cpp: it is compiled with /QIfist for its fistp
+// rounding, which this unit cannot take (0x00492ad0 and 0x00493660 truncate through __ftol).
 
 // Slot 70: threshold test against a per-mode table; a[] and b[][] are static-init'd locals.
 // Same bytes (151/230): level/row int locals, a flat

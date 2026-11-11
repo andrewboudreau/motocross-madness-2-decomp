@@ -3,14 +3,18 @@
 //
 //  * VisibilityClipper::TestBox (0x0052f570, ret 0x1c) written from the
 //    decoded retail function. Retail rounds the screen rectangle with an
-//    inline x87 fistp helper (current rounding mode, round-to-nearest-even);
-//    X87FloatToInt reproduces it without inline assembly.
+//    inline x87 fistp helper (current rounding mode, round-to-nearest-even;
+//    0x0052f92a .. 0x0052fa17).  The game build compiles this unit with
+//    /QIfist (config/game_build.json bringup_flags), so
+//    FistpFloatToIntChecked's cast is a FISTP under the current rounding mode;
+//    the six roundings are the unit's only float-to-int conversions.  The
+//    range check stays: a box corner near or behind the eye plane (small or
+//    negative w) projects outside int, or to an infinity or NaN when w is 0,
+//    where retail's 32-bit store gives 0x80000000 and a bare 64-bit store
+//    would keep a different low dword.
 //    Compared with retail instruction by instruction: the outcodes, the
 //    trivial accepts, the shared-bit reject, the projection, the clamp and
-//    the viewport offset agree.  The linked body is 836 instructions against
-//    retail's 464 because each of the six roundings inlines X87FloatToInt
-//    (about 62 instructions) where retail has four; with the rounding out of
-//    line the body is 442.  Griddraw.h's and D3DIMSoultreeShadow.cpp's views
+//    the viewport offset agree.  Griddraw.h's and D3DIMSoultreeShadow.cpp's views
 //    of the clipper forward here (Group2_GridVisibilityTestBox.cpp,
 //    Group1_ShadowClipper.cpp), as retail has a single function.
 //  * UnknownEcoVisibilityClipper::SphereInFrustum (0x0052fbb0) is
@@ -20,7 +24,7 @@
 #include <math.h>
 
 #include "visibility/VisibilityQuadTree.h"
-#include "X87FloatToInt.h"
+#include "../../samples/common/FistpFloatToInt.h"
 
 // The eight clip-space box corners (0x0068abc8, 8 x 0x20 bytes). TestBox
 // writes them and then turns the first two floats of each into screen
@@ -162,8 +166,8 @@ int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, co
         float inverse = 1.0f / corner->w;
         corner->x = (float)width * inverse * corner->x;
         corner->y = (float)height * inverse * corner->y;
-        screenRect[0] = X87FloatToInt(corner->x);
-        screenRect[1] = X87FloatToInt(corner->y);
+        FistpFloatToIntChecked(&screenRect[0], corner->x);
+        FistpFloatToIntChecked(&screenRect[1], corner->y);
         screenRect[3] = screenRect[1];
         screenRect[2] = screenRect[0];
         for (i = 1; i < 8; i++) {
@@ -172,13 +176,13 @@ int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, co
             corner->x = (float)width * inverse * corner->x;
             corner->y = (float)height * corner->y * inverse;
             if ((float)screenRect[0] > corner->x)
-                screenRect[0] = X87FloatToInt(corner->x);
+                FistpFloatToIntChecked(&screenRect[0], corner->x);
             else if ((float)screenRect[2] < corner->x)
-                screenRect[2] = X87FloatToInt(corner->x);
+                FistpFloatToIntChecked(&screenRect[2], corner->x);
             if ((float)screenRect[1] > corner->y)
-                screenRect[1] = X87FloatToInt(corner->y);
+                FistpFloatToIntChecked(&screenRect[1], corner->y);
             else if ((float)screenRect[3] < corner->y)
-                screenRect[3] = X87FloatToInt(corner->y);
+                FistpFloatToIntChecked(&screenRect[3], corner->y);
         }
         // Clamp to the viewport (signed compares, as retail) and offset by
         // its origin.

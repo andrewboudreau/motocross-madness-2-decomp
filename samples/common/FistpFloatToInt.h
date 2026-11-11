@@ -13,10 +13,11 @@
 // does.  Under /QIfist the cast is a FISTP under the current rounding mode.  VC6 /QIfist always
 // stores 64 bits (`fistp qword ptr [t]`, low dword kept), which equals retail's 32-bit store for
 // every result inside int; every caller documents why its values stay in range.  Outside int it
-// would keep the low dword where retail stores 0x80000000 (ProjectedShadowNearMisses.cpp's
-// ProjectedShadowFloatToInt reproduces that with a range check, about ten more instructions per
-// site).  Exception flags are not reproduced.  Without /QIfist (calibration and the physics
-// runner, which score shape only) the cast truncates through __ftol.
+// would keep the low dword where retail stores 0x80000000.  FistpFloatToIntChecked reproduces
+// that with a range check (as ProjectedShadowNearMisses.cpp's ProjectedShadowFloatToInt does,
+// about ten more instructions per site) for callers whose values can leave int, including
+// infinities and NaNs.  Exception flags are not reproduced.  Without /QIfist (calibration and
+// the physics runner, which score shape only) the casts truncate through __ftol.
 #ifndef FISTP_FLOAT_TO_INT_H
 #define FISTP_FLOAT_TO_INT_H
 
@@ -27,6 +28,17 @@ static inline void FistpFloatToInt(int* out, float value)
     float stored;
     memcpy(&stored, &value, sizeof(stored));
     *out = (int)stored;
+}
+
+// The same conversion for values that can fall outside int: the 64-bit FISTP result is kept
+// when it fits and replaced by the integer indefinite 0x80000000 otherwise (the 64-bit
+// indefinite of an infinity or NaN included), as retail's 32-bit store gives.
+static inline void FistpFloatToIntChecked(int* out, float value)
+{
+    float stored;
+    memcpy(&stored, &value, sizeof(stored));
+    __int64 wide = (__int64)stored;
+    *out = wide == (int)wide ? (int)wide : (int)0x80000000;
 }
 
 #endif

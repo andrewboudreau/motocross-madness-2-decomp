@@ -30,7 +30,15 @@
 //     restored to 2 afterwards.
 //
 // Retail rounds the fog and fade alpha with an inline x87 fistp (0x004bb271,
-// 0x004bb2ab); X87FloatToInt reproduces it (ties to even, not up).
+// 0x004bb2ab).  The game build compiles this unit with /QIfist (config/game_build.json
+// bringup_flags), so FistpFloatToInt's cast is a FISTP under the current rounding mode
+// (ties to even, not up); the two are the unit's only float-to-int conversions.  Only
+// the low byte of either result is kept (`<< 24`): the fog is clamped to [0, 1]; the
+// fade lies in [-0.5, 127] while age <= lifetime (ParticleManager::Tick retires a
+// particle once its age passes its lifetime), and leaving int would take an age of
+// over 1.6e7 lifetimes; an infinity or NaN (lifetime 0) leaves a zero low byte in both
+// retail's 32-bit indefinite and the 64-bit one.  So the 64-bit store gives retail's
+// colours.
 // Faithful retail quirk kept: when no particle is visible the function returns with
 // the transformed buffer (+0x1f84) still locked.
 
@@ -41,7 +49,7 @@
 #include "Camera.h"
 #include "PCRenderTarget.h"
 #include "TextureMap.h"
-#include "X87FloatToInt.h"
+#include "../../samples/common/FistpFloatToInt.h"
 
 extern "C" void qsort(void* base, unsigned int num, unsigned int width,
                       int (*compare)(const void*, const void*));
@@ -271,13 +279,16 @@ int ParticleManager::Render3D()
                 fog = 0.0f;
             else if (fog > 1.0f)
                 fog = 1.0f;
-            specular = (unsigned int)X87FloatToInt(fog * 255.0f) << 24;
+            int fogLevel;
+            FistpFloatToInt(&fogLevel, fog * 255.0f);
+            specular = (unsigned int)fogLevel << 24;
         }
         unsigned int flags = particle->flags;
         if (flags & 2) {
             if (!(flags & 1)) {
-                alpha = (unsigned int)X87FloatToInt(
-                            (1.0f - particle->age / particle->lifetime) * 127.5f - 0.5f) << 24;
+                int fade;
+                FistpFloatToInt(&fade, (1.0f - particle->age / particle->lifetime) * 127.5f - 0.5f);
+                alpha = (unsigned int)fade << 24;
                 color = particle->color | alpha;
             }
         } else if (!(flags & 1)) {

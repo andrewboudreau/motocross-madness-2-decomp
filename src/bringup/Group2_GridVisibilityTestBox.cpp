@@ -11,9 +11,9 @@
 // object (matrix at +0xec, viewport at +0x1a0..+0x1ac).  The seventh argument is unused
 // by the body; Griddraw.h declares it as a pointer, VisibilityClipper.h as an int.
 //
-// The linked body's size against retail (836 against 464 instructions) is the rounding
-// shape only: retail's inline fistp helper is four instructions a site, X87FloatToInt
-// inlines to about 62, and TestBox rounds six times.
+// The linked body rounds its six screen-rectangle values through FistpFloatToIntChecked
+// compiled with /QIfist (Group4_Visibility.cpp; 505 against retail's 464 instructions,
+// down from 836 with the former X87FloatToInt emulation).
 #include "../reconstructed/Griddraw.h"
 #include "visibility/VisibilityClipper.h"
 

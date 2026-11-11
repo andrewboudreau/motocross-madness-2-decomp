@@ -21,10 +21,12 @@
 // Those counts were measured with FloatToInt as a plain `(int)` cast: with /QIfist it is
 // `fistp qword` plus a dword move (8 bytes shorter, one frame slot lower for the shared
 // t/stale/dirty slot), without it `__ftol` (truncation).  The game build compiles this
-// file without /QIfist, so FloatToInt now rounds through X87FloatToInt as retail's fistp
-// does (the focal length rounds to nearest instead of truncating).  The `push ebp; mov
-// ebp,esp` frame is the asm helper's doing as well: every other Terrain.cpp body matches
-// without /Oy-.
+// file with /QIfist (config/game_build.json bringup_flags; no /Oy-), so FloatToInt rounds
+// through FistpFloatToInt's FISTP under the current rounding mode as retail's helper does
+// (the focal length rounds to nearest instead of truncating).  It is the unit's only
+// float-to-int conversion, and a focal length in pixels stays far inside int.  The
+// `push ebp; mov ebp,esp` frame is the asm helper's doing as well: every other
+// Terrain.cpp body matches without /Oy-.
 // The rest of the body is exact: start/last clock locals (`last` first), block-scoped
 // stale/t locals, dirty flag before the texture peak-hold, member re-reads of
 // visibilityCamera and heightField at each use, the 12-byte viewer copy as a struct
@@ -34,7 +36,7 @@
 #include "AgeManager.h"
 #include "Griddraw.h"
 #include "Grid1.h"
-#include "X87FloatToInt.h"
+#include "../../samples/common/FistpFloatToInt.h"
 
 unsigned int ReadClock();   // 0x004bfa80
 
@@ -69,13 +71,12 @@ struct TerrainVisibilityCamera {
 // at every call, so this is a macro rather than a cached local.
 #define GridRoot() (reinterpret_cast<DrawableGridNode*>(heightField))
 
-// Stand-in for retail's inline-asm FLD/FISTP helper (see the header comment).  The
-// pointer copy kept the surrounding store order (focal length before the draw-distance
-// copy) that retail has.
+// Retail's inline-asm FLD/FISTP helper (see the header comment).  Calling
+// FistpFloatToInt through this inline wrapper rather than directly schedules the
+// conversion closer to retail's (masked 0.828 against 0.782).
 static inline void FloatToInt(int* destination, float value)
 {
-    int* p = destination;
-    *p = X87FloatToInt(value);
+    FistpFloatToInt(destination, value);
 }
 
 int Terrain::PrepareGeometry()

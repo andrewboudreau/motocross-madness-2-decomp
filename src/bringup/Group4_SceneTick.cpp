@@ -13,14 +13,18 @@
 // fistp pick all agree). The gap is code shape: retail re-reads the entry as
 // animationTable->entries + i * 0x44 after every store (it does not cache the
 // pointer), keeps sequenceLength in a stack byte, and its inline-assembly fistp
-// gives the body an EBP frame (X87FloatToInt emulates that fistp here).
+// gives the body an EBP frame.
+// Rounding: the game build compiles this unit with /QIfist (config/game_build.json
+// bringup_flags), so FistpFloatToInt's cast is a FISTP under the current rounding
+// mode, as retail's helper at 0x004eadf1; the pick is the unit's only float-to-int
+// conversion and lies in [-0.5, count - 0.5), inside int.
 #include <stdlib.h>
 
 #include "../reconstructed/TrackGame.h"
 #include "../reconstructed/SceneManager.h"
 #include "../krusty2/motion/D3DIMSoultreeCharacter.h"
 #include "../krusty2/motion/Motnctrl.h"
-#include "X87FloatToInt.h"
+#include "../../samples/common/FistpFloatToInt.h"
 
 // Advances an entry's character by dt; "UseBlendedKeys" entries go through
 // Character slot 7 (0x004a70c0), the others through AdvanceMotion (0x004a6bb0).
@@ -116,7 +120,8 @@ int Scene::Tick(float frameTime)
                 // Swap in a random member of the set.
                 gameObject->Disable();
                 // Retail's fistp helper (0x004eadf1): floor() of the scaled rand except at ties.
-                int pick = X87FloatToInt(rand() * (1.0f / 32768.0f) * count - 0.5f);
+                int pick;
+                FistpFloatToInt(&pick, rand() * (1.0f / 32768.0f) * count - 0.5f);
                 entry = &animationTable->entries[set->animationIndices[pick]];
                 entry->currentMotion = set->motionIndices[pick];
                 object = entry->character;

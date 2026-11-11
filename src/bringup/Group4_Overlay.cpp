@@ -24,7 +24,7 @@
 #include "../reconstructed/ControlInterface.h"
 #include "../reconstructed/D3DConstants.h"
 #include "../reconstructed/PCRenderTarget.h"
-#include "X87FloatToInt.h"
+#include "../../samples/common/FistpFloatToInt.h"
 // GDI32 imports, as in TrackOverlay.cpp.
 struct UnknownLogFont {
     long lfHeight;
@@ -57,7 +57,12 @@ extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* t
 // Retail rounds these screen coordinates with a project `fld; fistp`
 // helper applied to (value - 0.5) (0x0051b0c3 here):
 // floor(value) except that exact integers round to the even neighbour.
-// X87FloatToInt reproduces it.
+// The game build compiles this unit with /QIfist (config/game_build.json
+// bringup_flags), so FistpFloatToIntChecked's cast is a FISTP under the current
+// rounding mode; the drop is the unit's only float-to-int conversion
+// (ChatOverlay::Setup has none). The range check stays because dropSeconds near
+// zero can push the drop outside int (or to an infinity or NaN at zero), where
+// retail's 32-bit store gives 0x80000000.
 
 // 0x0051b070 (slot 10, ret 4): runs the base update with the game's frame
 // time (TrackGame +0x2f0, not the argument), then while shown drops the
@@ -68,8 +73,9 @@ int DropTextOverlay::Tick(float frameTime)
     GameObject::Tick(g_TrackGame->frameTime);
     if (visible) {
         elapsedTime += g_TrackGame->frameTime;
-        int drop = X87FloatToInt(elapsedTime / this->dropSeconds
-                                 * ((PCRenderTarget*)renderContext)->targetHeight - 0.5f);
+        int drop;
+        FistpFloatToIntChecked(&drop, elapsedTime / this->dropSeconds
+                                      * ((PCRenderTarget*)renderContext)->targetHeight - 0.5f);
         int y = textYOffset + drop;
         if (y > ((PCRenderTarget*)renderContext)->targetHeight)
             visible = 0;

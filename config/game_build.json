@@ -602,6 +602,72 @@
       "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
     }
   ],
+  "bringup_flags": [
+    {
+      "path": "src/bringup/Group1_ParticleRender.cpp",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "Particle render 0x004bac60: the fog byte and the age fade go through retail's inline fistp helper. Only the low byte of each result is kept and fog is clamped to 0..1, so the 64-bit FISTP store cannot change a kept bit. No other float-to-int conversion in the unit.",
+      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
+    },
+    {
+      "path": "src/bringup/Group3_CharacterPoseBlend.cpp",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "Character::Method_0x004a9050: the frame index is retail's fistp(position - 0.5) at 0x004a9092 and addresses the frame array, so it stays in [0, frameCount). No other float-to-int conversion in the unit; the truncating casts of Group3_KrustyBike.cpp stay there without the flag.",
+      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
+    },
+    {
+      "path": "src/bringup/Group3_TerrainPrepareGeometry.cpp",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "Terrain::PrepareGeometry 0x00507610: the focal length (pixels) goes through retail's inline fistp helper. It is the unit's only float-to-int conversion.",
+      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
+    },
+    {
+      "path": "src/bringup/Group4_GridLighting.cpp",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "LightVertices 0x0049e4a0 and its three workers round light terms with retail's inline fistp helper. The truncating light-colour casts live in Group4_GridLightColor.cpp, compiled without the flag; the terms are colour bytes times facing values and stay in int range.",
+      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
+    },
+    {
+      "path": "src/bringup/Group4_Overlay.cpp",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "DropTextOverlay::Tick 0x0051b070 rounds the drop height with retail's inline fistp helper, through FistpFloatToIntChecked because dropSeconds may be near zero. ChatOverlay::Setup has no float-to-int conversion.",
+      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
+    },
+    {
+      "path": "src/bringup/Group4_SceneTick.cpp",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "Scene::Tick 0x004eab00 rounds the random pick with retail's inline fistp helper at 0x004eadf1; the value stays in [-0.5, count - 0.5). No other float-to-int conversion in the unit.",
+      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
+    },
+    {
+      "path": "src/bringup/Group4_ScoreBoard.cpp",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "ScoreBoard 0x0048d1e0 rounds the points and the multiplier tenths with retail's inline fistp helper (0x0048d221, 0x0048d33a); both are small scores. No other float-to-int conversion in the unit.",
+      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
+    },
+    {
+      "path": "src/bringup/Group4_Visibility.cpp",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "TestBox 0x0052f570 rounds the projected screen rectangle with retail's inline fistp helper, through FistpFloatToIntChecked because a corner near the eye plane can project outside int. No other float-to-int conversion in the unit.",
+      "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
+    }
+  ],
   "includes": [
     "src/krusty2",
     "src/reconstructed"

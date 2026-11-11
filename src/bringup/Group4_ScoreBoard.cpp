@@ -4,16 +4,22 @@
 // BonusObjectManager (Krusty3DObjects.h declares the same address as
 // BonusObjectManager::ShowValue). The body is written from the decoded
 // retail function against BonusObjectManager's layout; not a byte match
-// (retail rounds with a `fld; fistp` helper, see docs/KRUSTY3DOBJECTS.md;
-// X87FloatToInt stands in for it).
+// (retail rounds with a `fld; fistp` helper at 0x0048d221 and 0x0048d33a, see
+// docs/KRUSTY3DOBJECTS.md).
 // Audited against the retail disassembly on 2026-11-11 for the linked game: no
 // behavioural difference (places, the -1 sentinels, the hundred rounding, the
 // digit-model indexing, the 1.05 threshold, the multiplier*10 conversion, the
 // fraction digits, NextKey, the eye distance through FastSqrt and the scaling).
-// The gap is shape only: the two X87FloatToInt expansions (about 76 more
-// instructions than retail's fistp) and retail's EBP frame from the asm helper.
+// Rounding: the game build compiles this unit with /QIfist (config/game_build.json
+// bringup_flags), so FistpFloatToInt's cast is a FISTP under the current rounding
+// mode, as retail's helper; these two are the unit's only float-to-int conversions.
+// Range (inference from the callers): `points` is one trick sequence's score, which
+// the caller (KrustyBike 0x00495ff0) converts to int itself after multiplying it by
+// the multiplier (>= 1), and the multiplier is a trick count plus 0.5, so both
+// results stay inside int, where the 64-bit store equals retail's 32-bit one.
+// The rest of the gap is retail's EBP frame from the asm helper.
 #include "../reconstructed/Krusty3DObjects.h"
-#include "X87FloatToInt.h"
+#include "../../samples/common/FistpFloatToInt.h"
 
 float FastSqrt(float x); // 0x00460b50
 
@@ -45,7 +51,9 @@ void KbScoreBoard::ShowValue(float points, float multiplier)
     self->HideDigits();
     int places = points < 10000.0f ? 4 : 5;
     self->shownDigits[4] = -1;
-    int remaining = X87FloatToInt(points) / 100;
+    int remaining;
+    FistpFloatToInt(&remaining, points);
+    remaining /= 100;
     self->shownDigits[0] = 0;
     Group4Ovl_ShowModel(self, self->digitModels[0][0]);
     self->shownDigits[1] = 0;
@@ -58,7 +66,8 @@ void KbScoreBoard::ShowValue(float points, float multiplier)
     }
     int resize = 0;
     if (multiplier >= 1.05f) {
-        int tenths = X87FloatToInt(multiplier * 10.0f);
+        int tenths;
+        FistpFloatToInt(&tenths, multiplier * 10.0f);
         for (place = 0; place < 2; place++) {
             int digit = tenths % 10;
             Group4Ovl_ShowModel(self, self->fractionDigitModels[digit][place]);
