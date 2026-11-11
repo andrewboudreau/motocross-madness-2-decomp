@@ -8,15 +8,23 @@ from compiled source plus the original libraries:
   exact_src / exact_samples   strict VC6 matches (calibration cases and every
                               ``*targets.json`` entry), split by source tree
   library_crt_atlas           VC6 LIBCMT bodies admitted by the CRT atlas
-  library_import_thunk        ``jmp [IAT]`` thunks (import libraries)
+  library_span_tier1/2/3      whole LIBCMT code sections the atlas's span
+                              attribution places in the gaps between atlas
+                              rows, by evidence tier (see docs/VC6_CRT_ATLAS.md)
+  library_import_thunk        ``jmp [IAT]`` thunks (import libraries); a
+                              ``jmp [IAT]`` inside a placed library section is
+                              that section's tail call, not a thunk
   library_data                library objects matched by bytes (DINPUT.LIB)
   compiler_eh_text_x          ``$ehhandler`` stubs and unwind funclets at the end
-                              of .text (emitted with the owning game functions)
+                              of .text (emitted with the owning game functions);
+                              the tail starts at the first funclet the stubs'
+                              FuncInfo unwind maps name
   inline_asm_excluded         functions whose retail body needs ``__asm``
                               (binary scan + documented cases), not exact
   near_miss                   registered partials / near misses
-  library_span_unlabeled      bytes inside the LIBCMT span the atlas leaves out
-  library_unknown             bytes between the CRT span and the EH tail
+  library_span_unlabeled      bytes inside the LIBCMT span nothing explains
+  library_unknown             bytes between the CRT span and the EH tail (the
+                              x87 span loops; no VC6 library provides them)
   padding                     int3/nop alignment runs
   unattributed                everything else
 
@@ -50,10 +58,14 @@ DEFAULT_OUT = ROOT / 'work' / 'rebuild-coverage'
 
 # Highest priority first: a byte keeps the first category that claims it.
 CATEGORIES = [
-    'exact_src', 'exact_samples', 'library_crt_atlas', 'library_import_thunk',
+    'exact_src', 'exact_samples', 'library_crt_atlas', 'library_span_tier1',
+    'library_span_tier2', 'library_span_tier3', 'library_import_thunk',
     'library_data', 'compiler_eh_text_x', 'inline_asm_excluded', 'near_miss',
     'library_span_unlabeled', 'library_unknown', 'padding', 'unattributed',
 ]
+LIBRARY_CODE = ('library_crt_atlas', 'library_span_tier1', 'library_span_tier2',
+                'library_span_tier3', 'library_span_unlabeled')
+EH_MAGIC = 0x19930520
 PRIORITY = {name: index for index, name in enumerate(CATEGORIES)}
 PAD_BYTES = {0xCC, 0x90}
 ASM_KEYWORDS = re.compile(r'inline.?asm|inline assembly|__asm', re.I)
@@ -390,6 +402,34 @@ def find_eh_stubs(data: bytes, base: int, handler_va: int | None) -> tuple[list[
     return hits, handler_va
 
 
+def unwind_funclets(stubs: list[int], data: bytes, base: int, read_u32) -> list[int]:
+    """Unwind actions named by the FuncInfo of ``mov eax, FuncInfo`` stubs.
+
+    ``read_u32(va)`` reads the image (None when unmapped). Only FuncInfo with
+    the VC6 magic 0x19930520 is decoded; an entry's action is kept when it
+    points into ``data``.
+    """
+    out = set()
+    for stub in stubs:
+        info = struct.unpack_from('<I', data, stub - base + 1)[0]
+        if read_u32(info) != EH_MAGIC:
+            continue
+        states, table = read_u32(info + 4), read_u32(info + 8)
+        if not states or table is None or states > 0x1000:
+            continue
+        for state in range(states):
+            action = read_u32(table + 8 * state + 4)
+            if action and base <= action < base + len(data):
+                out.add(action)
+    return sorted(out)
+
+
+def load_span_attribution(atlas_path: Path) -> dict | None:
+    if not atlas_path.is_file():
+        return None
+    return json.loads(atlas_path.read_text()).get('span_attribution')
+
+
 def scan_library_data(lib: Path, data: bytes, base: int) -> list[dict]:
     """Single-hit byte matches of any defined symbol of ``lib`` inside .text."""
     from mcm2tool.coff import CoffObject, relocation_mask
@@ -546,7 +586,17 @@ def build(args) -> dict:
     crt_span = (min(r['target_va'] for r in atlas), max(r['target_va'] + r['size'] for r in atlas)) if atlas else None
     handler = next((r['target_va'] for r in atlas if r['symbol'] == '___CxxFrameHandler'), None)
 
-    thunks = find_import_thunks(pe, data, t_start)
+    span = load_span_attribution(args.crt_atlas)
+    if atlas and span is None:
+        warnings.append(f'{args.crt_atlas} has no span_attribution; rerun make vc6-crt-atlas')
+    span_rows = span['placements'] if span else []
+    for r in span_rows:
+        cov.paint(r['start'], r['end'], f"library_span_tier{r['tier']}")
+
+    in_section = lambda va: any(r['start'] <= va < r['end'] for r in span_rows)
+    found = find_import_thunks(pe, data, t_start)
+    thunks = [th for th in found if not in_section(th['va'])]
+    tail_calls = [th for th in found if in_section(th['va'])]
     for th in thunks:
         cov.paint(th['va'], th['va'] + 6, 'library_import_thunk')
     stubs, handler = find_eh_stubs(data, t_start, handler)
@@ -555,7 +605,16 @@ def build(args) -> dict:
     after_game = [th['va'] for th in thunks if th['va'] >= game_max]
     game_end = min(after_game) if after_game else game_max
     tail_stubs = [s for s in stubs if s >= (crt_span[1] if crt_span else game_end)]
-    eh_start = min(tail_stubs) if tail_stubs else t_end
+
+    def read_u32(va):
+        try:
+            return struct.unpack('<I', pe.bytes_at_va(va, 4))[0]
+        except Exception:
+            return None
+
+    funclets = [va for va in unwind_funclets(tail_stubs, data, t_start, read_u32)
+                if crt_span is None or va >= crt_span[1]]
+    eh_start = min(tail_stubs + funclets) if tail_stubs else t_end
     cov.paint(eh_start, t_end, 'compiler_eh_text_x')
 
     lib_data = []
@@ -570,8 +629,14 @@ def build(args) -> dict:
         warnings.append('VC6_ROOT not set: library data objects (DINPUT.LIB) not scanned')
     for r in lib_data:
         cov.paint(r['va'], r['va'] + r['size'], 'library_data')
+    if span:
+        for r in span['padding']:
+            cov.paint(r['start'], r['end'], 'padding')
     if crt_span:
-        cov.paint(crt_span[0], crt_span[1], 'library_span_unlabeled')
+        unlabeled = ([(r['start'], r['end']) for r in span['unexplained']] if span
+                     else [crt_span])
+        for lo, hi in unlabeled:
+            cov.paint(lo, hi, 'library_span_unlabeled')
         cov.paint(crt_span[1], eh_start, 'library_unknown')
 
     # --- registered functions
@@ -650,6 +715,10 @@ def build(args) -> dict:
         counts[CATEGORIES[cov.codes[va - t_start]]] += 1
     counts['padding'] = 0
     counts['library_crt_atlas'] = len(atlas)
+    for r in span_rows:  # sections that keep at least one byte (not inside atlas rows)
+        cat = f"library_span_tier{r['tier']}"
+        if any(cov.codes[va - t_start] == PRIORITY[cat] for va in range(r['start'], r['end'])):
+            counts[cat] += 1
     counts['library_import_thunk'] = len(thunks)
     counts['library_data'] = len(lib_data)
     counts['compiler_eh_text_x'] = len(tail_stubs)
@@ -673,6 +742,7 @@ def build(args) -> dict:
                       'rule': 'end = first jmp [IAT] thunk at or after the highest registered game extent'},
         'library_layout': library_layout(thunks, lib_data, atlas, crt_span, eh_start, t_end, tail_stubs,
                                          stubs, handler, game_end),
+        'library_span_attribution': span_attribution_report(span, tail_calls, funclets),
         'verdict_sources': {'calibration': str(args.calibration_json) if cal_rows is not None else 'declared',
                             'targets': str(args.physics_json) if phys_rows is not None else 'declared'},
         'warnings': warnings,
@@ -685,6 +755,29 @@ def build(args) -> dict:
         'classes': classes_report(exact_starts, category_at),
     }
     return report
+
+
+def span_attribution_report(span, tail_calls, funclets) -> dict | None:
+    """Every placed section and padding run with its tier, VAs in hex."""
+    if not span:
+        return None
+    ranges = [{'start': hx(r['start']), 'end': hx(r['end']), 'size': r['end'] - r['start'],
+               'tier': r['tier'], 'kind': r['kind'], 'library': r['library'],
+               'member': basename(r['member']), 'symbol': r['symbol'], 'evidence': r['evidence'],
+               'alternatives': r['alternatives']}
+              for r in span['placements']]
+    return {
+        'libraries': span.get('libraries', []),
+        'summary_in_atlas_gaps': span.get('summary_in_atlas_gaps'),
+        'ranges': ranges,
+        'padding': [{'start': hx(r['start']), 'end': hx(r['end']), 'tier': r['tier'],
+                     'evidence': r['evidence']} for r in span['padding']],
+        'unexplained': [{'start': hx(r['start']), 'end': hx(r['end']), 'size': r['size']}
+                        for r in span['unexplained']],
+        'iat_tail_calls_in_sections': [{'va': hx(th['va']), 'module': th['module'], 'name': th['name']}
+                                       for th in tail_calls],
+        'eh_unwind_funclets': [hx(va) for va in funclets],
+    }
 
 
 def library_layout(thunks, lib_data, atlas, crt_span, eh_start, t_end, tail_stubs, stubs, handler, game_end):
@@ -831,7 +924,7 @@ def classes_report(exact_starts, category_at):
     for path in sorted((ROOT / 'src').rglob('*.h')):
         for m in re.finditer(r'RTTI\s+`?(\w+)', path.read_text(encoding='utf-8', errors='replace')):
             rtti_mentions[m[1]].append(path.relative_to(ROOT).as_posix())
-    library = ('library_crt_atlas', 'library_span_unlabeled')
+    library = LIBRARY_CODE
     rows = []
     for name in names:
         bare = re.sub(r'<.*', '', name).split('::')[-1]
@@ -845,7 +938,7 @@ def classes_report(exact_starts, category_at):
         for v in by_class.get(name, []):
             slots = [parse_va(e) for e in v['entries']]
             missing = [i for i, va in enumerate(slots) if va not in exact_starts
-                       and category_at(va) not in ('library_crt_atlas', 'library_span_unlabeled')]
+                       and category_at(va) not in LIBRARY_CODE]
             tables.append({'vtable_va': v['vtable_va'], 'object_offset': v['object_offset'],
                            'slots': len(slots), 'missing_slots': len(missing),
                            'missing': [{'slot': i, 'va': hx(slots[i]), 'category': category_at(slots[i])}

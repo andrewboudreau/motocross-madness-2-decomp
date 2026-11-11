@@ -116,5 +116,44 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(MODULE.source_tree('src/krusty2/core/A.cpp'), 'src')
 
 
+class EhTailTests(unittest.TestCase):
+    def test_unwind_funclets_come_from_funcinfo_with_the_vc6_magic(self):
+        base = 0x5000
+        # funclets at 0x5000 and 0x5008, stubs at 0x5010 and 0x501a
+        data = (b'\x90' * 0x10
+                + b'\xb8' + struct.pack('<I', 0x9000) + b'\xe9' + struct.pack('<i', 0)
+                + b'\xb8' + struct.pack('<I', 0x9100) + b'\xe9' + struct.pack('<i', 0))
+        image = {
+            0x9000: MODULE.EH_MAGIC, 0x9004: 3, 0x9008: 0x9200,
+            0x9200: 0xFFFFFFFF, 0x9204: 0x5008,
+            0x9208: 0, 0x920C: 0x5000,
+            0x9210: 1, 0x9214: 0,          # state without an unwind action
+            0x9100: 0x12345678, 0x9104: 1, 0x9108: 0x9300,  # not a FuncInfo
+            0x9300: 0xFFFFFFFF, 0x9304: 0x5004,
+        }
+        funclets = MODULE.unwind_funclets([0x5010, 0x501A], data, base, image.get)
+        self.assertEqual(funclets, [0x5000, 0x5008])
+
+    def test_span_report_keeps_the_tier_of_every_range(self):
+        span = {
+            'libraries': ['LIBCMT.LIB'],
+            'summary_in_atlas_gaps': None,
+            'placements': [{'start': 0x1000, 'end': 0x1010, 'tier': 1, 'kind': 'relocation_named',
+                            'library': 'LIBCMT.LIB', 'member': 'build\\intel\\mt_obj\\memcpy.obj',
+                            'symbol': '_memcpy', 'evidence': 'e', 'alternatives': []}],
+            'padding': [{'start': 0x1010, 'end': 0x1014, 'tier': 2, 'evidence': 'p'}],
+            'unexplained': [{'start': 0x1014, 'end': 0x1015, 'size': 1}],
+        }
+        tail_call = {'va': 0x1008, 'module': 'KERNEL32.dll', 'name': 'GetACP'}
+        report = MODULE.span_attribution_report(span, [tail_call], [0x2000])
+        self.assertEqual(report['ranges'][0]['member'], 'memcpy.obj')
+        self.assertEqual((report['ranges'][0]['start'], report['ranges'][0]['tier']), ('0x00001000', 1))
+        self.assertEqual(report['iat_tail_calls_in_sections'][0]['va'], '0x00001008')
+        self.assertEqual(report['eh_unwind_funclets'], ['0x00002000'])
+        self.assertIsNone(MODULE.span_attribution_report(None, [], []))
+        self.assertIn('library_span_tier3', MODULE.LIBRARY_CODE)
+        self.assertLess(MODULE.PRIORITY['library_span_tier1'], MODULE.PRIORITY['library_import_thunk'])
+
+
 if __name__ == '__main__':
     unittest.main()

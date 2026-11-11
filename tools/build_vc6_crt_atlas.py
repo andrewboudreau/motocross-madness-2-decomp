@@ -11,7 +11,14 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from mcm2tool.crt_atlas import group_by_address, scan_library, summarize
+from mcm2tool.crt_atlas import (
+    attribute_span,
+    group_by_address,
+    library_sections,
+    scan_library,
+    summarize,
+    summarize_span,
+)
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, infer_vc98_root
 
@@ -91,11 +98,11 @@ def render(report: dict) -> str:
         "## Scope",
         "",
         (
-            "The atlas labels only individually matched function bodies. "
-            "It does **not** label every gap in the surrounding address span "
-            "as CRT. Gaps can contain alignment, import thunks, short or "
-            "ambiguous runtime functions, or unrelated code and remain "
-            "unclassified until separately proven."
+            "The atlas rows label only individually matched function bodies. "
+            "They do **not** label every gap in the surrounding address span "
+            "as CRT. The span attribution below places whole library "
+            "sections in those gaps, each with its evidence tier; a byte it "
+            "cannot explain stays unexplained."
         ),
         "",
         (
@@ -105,6 +112,46 @@ def render(report: dict) -> str:
         ),
         "",
     ]
+    span = report.get("span_attribution")
+    if span:
+        gaps = span["summary_in_atlas_gaps"]
+        lines += [
+            "## Span attribution",
+            "",
+            (
+                "Whole COFF code sections of "
+                f"{', '.join(span['libraries'])} placed over the span, "
+                "relocation-masked. Tier 1: the section holds an atlas row, "
+                "or a relocation in already placed library code decodes to "
+                "its symbol. Tier 2: the section matches inside a gap without "
+                "a naming reference, or int3 fill reaches the next section's "
+                "COFF alignment. Tier 3: a short section accepted only because "
+                "it fills a gap exactly."
+            ),
+            "",
+            f"Bytes inside the {gaps['gap_bytes']:,} gap bytes between atlas "
+            "rows:",
+            "",
+            "| Kind | Tier | Ranges | Bytes |",
+            "|---|---:|---:|---:|",
+        ]
+        for kind, row in sorted(
+            gaps["by_kind"].items(), key=lambda item: item[1]["tier"]
+        ):
+            lines.append(
+                f"| `{kind}` | {row['tier']} | {row['ranges']} | "
+                f"{row['bytes']:,} |"
+            )
+        lines += [
+            "",
+            (
+                f"Unexplained bytes: **{gaps['unexplained_bytes']}**, ranges: "
+                f"{gaps['unexplained_ranges']}"
+            ),
+        ]
+        for row in span["unexplained"]:
+            lines.append(f"- `0x{row['start']:08x}` .. `0x{row['end']:08x}`")
+        lines.append("")
     return "\n".join(lines)
 
 
@@ -128,6 +175,15 @@ def main():
     )
     parser.add_argument("--minimum-anchor", type=int, default=12)
     parser.add_argument("--minimum-compared", type=int, default=20)
+    parser.add_argument(
+        "--span-libs",
+        nargs="*",
+        default=["LIBCMT.LIB"],
+        help=(
+            "libraries whose whole code sections may fill the gaps of the "
+            "LIBCMT span, in priority order"
+        ),
+    )
     args = parser.parse_args()
 
     if not args.vc6_root:
@@ -176,6 +232,52 @@ def main():
             args.minimum_compared,
         )
     )
+    span_result = None
+    if multithread:
+        text = next(s for s in pe.sections if s.name == ".text")
+        text_base = pe.image_base + text.virtual_address
+        text_data = pe.data[
+            text.raw_offset : text.raw_offset + text.virtual_size
+        ]
+        summary = summarize(multithread)
+        span = (int(summary["span_start"], 16), int(summary["span_end"], 16))
+        candidates = []
+        for name in args.span_libs:
+            path = find_child_ci(lib_dir, name)
+            if path:
+                candidates += library_sections(path, name)
+        span_result = attribute_span(
+            text_data,
+            text_base,
+            span[0],
+            span[1],
+            candidates,
+            multithread,
+        )
+        atlas_bytes = bytearray(span[1] - span[0])
+        for row in multithread:
+            lo = max(row["target_va"], span[0]) - span[0]
+            hi = min(row["target_va"] + row["size"], span[1]) - span[0]
+            atlas_bytes[lo:hi] = b"\x01" * (hi - lo)
+        gaps = []
+        index = 0
+        while index < len(atlas_bytes):
+            if atlas_bytes[index]:
+                index += 1
+                continue
+            stop = index
+            while stop < len(atlas_bytes) and not atlas_bytes[stop]:
+                stop += 1
+            gaps.append((span[0] + index, span[0] + stop))
+            index = stop
+        span_result["libraries"] = list(args.span_libs)
+        span_result["summary_in_atlas_gaps"] = summarize_span(
+            span_result, gaps
+        )
+        span_result["summary_in_atlas_gaps"]["gap_bytes"] = sum(
+            hi - lo for lo, hi in gaps
+        )
+
     multithread_addresses = {row["target_va"] for row in multithread}
     single_thread_addresses = {row["target_va"] for row in single_thread}
     common_addresses = multithread_addresses & single_thread_addresses
@@ -201,9 +303,12 @@ def main():
                 len(multithread_addresses) - len(common_addresses)
             ),
         },
+        "span_attribution": span_result,
         "claims": {
             "whole_span_is_crt": False,
-            "remaining_gaps_classified": False,
+            "remaining_gaps_classified": bool(
+                span_result and not span_result["unexplained"]
+            ),
             "compiler_flags_recovered": False,
         },
     }
