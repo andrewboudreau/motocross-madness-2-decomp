@@ -148,7 +148,7 @@ linkage so the standalone uses the same mutable DWORD as `RenderPre3D`.
   calibration target. `0x0051af00` is linked from
   `samples/track/DropTextOverlaySetup.cpp` with `/QIfist`
   ([GAME_BUILD.md](GAME_BUILD.md#inline-fistp-rounding-samples)); `0x0051b070`
-  has a bring-up body in `src/bringup/Group4_Overlay.cpp`.
+  has a bring-up body in `src/bringup/Group4_DropTextOverlayTick.cpp`.
 - `0x00518c20` is not a function start (inside the InstrumentOverlay
   destructor `0x00518c00`).
 - `0x0051eae0` is a 3-byte `mov eax, ecx; ret`: UnknownChatInput's line

@@ -407,7 +407,7 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 | `0x00509aa0` | 6 | `samples/physics/shadow/TerrainShadow.cpp` (`/QIfist`) | `FistpFloatToInt` |
 | `0x00518f30` | 1 | `src/reconstructed/TrackOverlay.cpp` (`NameOverlay::Tick`) | `X87FloatToInt`; the canonical unit has 18 retail-truncating `__ftol` casts, so it cannot take `/QIfist` |
 | `0x0051af00` | 2 | `samples/track/DropTextOverlaySetup.cpp` (`/QIfist`) | `FistpFloatToInt` |
-| `0x0051b070` | 1 | `src/bringup/Group4_Overlay.cpp` (`/QIfist` bring-up) | `FistpFloatToIntChecked` (`dropSeconds` may be near zero) |
+| `0x0051b070` | 1 | `src/bringup/Group4_DropTextOverlayTick.cpp` (`/QIfist /Oy-` bring-up) | `FistpFloatToIntChecked` (`dropSeconds` may be near zero) |
 | `0x0052f570` | 6 | `src/bringup/Group4_Visibility.cpp` and `Group2_GridVisibilityTestBox.cpp` (`D3DIMShadowClipper::TestBox` forwards; `/QIfist` bring-up) | `FistpFloatToIntChecked` (a corner near the eye plane can project outside `int`) |
 
 `BikeFloatToInt` corrects an `__ftol` truncation to nearest-even. It ignores

@@ -22,10 +22,12 @@
 //    53- and 24-bit precision.  Griddraw.h's and D3DIMSoultreeShadow.cpp's views
 //    of the clipper forward here (Group2_GridVisibilityTestBox.cpp,
 //    Group1_ShadowClipper.cpp), as retail has a single function.
-//  * UnknownEcoVisibilityClipper::SphereInFrustum (0x0052fbb0) is
-//    EcoSystem.h's boundary view of VisibilityClipper::SphereInFrustum,
-//    which src/krusty2/visibility/VisibilityQuadTree.cpp already defines; the
-//    view forwards to it.
+//    TestBox is the unit's only function: retail's body has the EBP frame of
+//    its inline-asm helper, so the unit is also compiled with /Oy-
+//    (docs/GAME_BUILD.md#frame-pointer-units).  EcoSystem.h's view of
+//    VisibilityClipper::SphereInFrustum (0x0052fbb0, frameless in retail and
+//    defined by src/krusty2/visibility/VisibilityQuadTree.cpp) used to forward
+//    from here; it is a link_alias now.
 #include <math.h>
 
 #include "visibility/VisibilityQuadTree.h"
@@ -208,24 +210,4 @@ int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, co
     if (cornersInside)
         *cornersInside = inside;
     return 1;
-}
-
-// EcoSystem.h's boundary view of the same clipper (class keyword and
-// parameter types as declared there, so the mangled name matches its calls).
-class UnknownEcoCamera;
-struct Vector3;
-class UnknownEcoVisibilityClipper {
-public:
-    int SphereInFrustum(const UnknownEcoCamera* camera, const void* matrix, const Vector3* center,
-                        float radius, int* fullyInside);
-};
-
-// 0x0052fbb0: the EcoSystem's camera is the view's Camera record that
-// VisibilityCamera describes; the matrix and centre have the same layouts.
-int UnknownEcoVisibilityClipper::SphereInFrustum(const UnknownEcoCamera* camera, const void* matrix,
-                                                 const Vector3* center, float radius,
-                                                 int* fullyInside) {
-    return reinterpret_cast<VisibilityClipper*>(this)->SphereInFrustum(
-        reinterpret_cast<const VisibilityCamera*>(camera), static_cast<const VisibilityMatrix*>(matrix),
-        reinterpret_cast<const VisibilityBoxVec*>(center), radius, fullyInside);
 }

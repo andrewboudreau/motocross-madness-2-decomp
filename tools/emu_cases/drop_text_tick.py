@@ -9,7 +9,7 @@ included. Writes compared: elapsed (+0x30), visible (+0x34) and textY (+0x44).
 
 RETAIL_VA = 0x0051b070
 SYMBOL = '?Tick@DropTextOverlay@@UAEHM@Z'
-SOURCE = 'src/bringup/Group4_Overlay.cpp'
+SOURCE = 'src/bringup/Group4_DropTextOverlayTick.cpp'
 PROBES = {0x0051b0c3: 'drop fistp'}
 
 

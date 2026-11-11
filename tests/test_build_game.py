@@ -107,7 +107,13 @@ class GameBuildTests(unittest.TestCase):
             self.assertEqual(source_files(root, spec), [root / candidate['path']])
             candidate['extra_flags'] = ['/QIfist', '/Op']
             self.assertEqual(source_files(root, spec), [root / candidate['path']])
-            for flags in ('/QIfist', ['/FIreplacement.h'], ['/Od'], [None]):
+            candidate['extra_flags'] = ['/QIfist', '/Op', '/Oy-']
+            self.assertEqual(source_files(root, spec), [root / candidate['path']])
+            # /Oy- stands for the frame of the inline fistp helper: never alone,
+            # never repeated.
+            for flags in ('/QIfist', ['/FIreplacement.h'], ['/Od'], [None], ['/Oy-'],
+                          ['/Op', '/Oy-'], ['/QIfist', '/QIfist'], ['/QIfist', '/Oy'],
+                          ['/QIfist', '/Oy-', '/Oy-']):
                 candidate['extra_flags'] = flags
                 with self.assertRaisesRegex(ValueError, 'compiler flags'):
                     source_files(root, spec)
@@ -138,7 +144,11 @@ class GameBuildTests(unittest.TestCase):
                              {(root / 'samples/s.cpp').resolve(): ('/QIfist',),
                               (root / 'src/bringup/Unit.cpp').resolve(): ('/QIfist',)})
             self.assertEqual(compile_flags(root, {'candidate_sources': []}), {})
-            for flags in ('/QIfist', [], ['/Oy-'], None):
+            entry['extra_flags'] = ['/QIfist', '/Oy-']
+            self.assertEqual(compile_flags(root, spec)[(root / 'src/bringup/Unit.cpp').resolve()],
+                             ('/QIfist', '/Oy-'))
+            for flags in ('/QIfist', [], ['/Oy-'], None, ['/QIfist', '/Op'],
+                          ['/QIfist', '/Oy-', '/Oy-'], ['/Oy-', '/Oy-']):
                 entry['extra_flags'] = flags
                 with self.assertRaisesRegex(ValueError, 'compiler flags'):
                     compile_flags(root, spec)

@@ -27,6 +27,21 @@ from mcm2tool.toolchain import (find_child_ci, find_vc6_bin, infer_vc98_root,
 from mcm2tool.vc6_runtime import executable_command, runner_kind, windows_path
 
 
+# Unit-wide flags a reviewed unit may add. `/QIfist` stands for retail's inline
+# fistp helper; `/Op` for a binary32 spill that helper forces. `/Oy-` stands for
+# the EBP frame the helper's `__asm` gives each function that contains it, so it
+# is accepted only together with `/QIfist`, and only for a unit whose every
+# function is framed in retail (docs/GAME_BUILD.md#frame-pointer-units).
+CANDIDATE_FLAGS = ('/QIfist', '/Op', '/Oy-')
+BRINGUP_FLAGS = ('/QIfist', '/Oy-')
+
+
+def valid_unit_flags(flags, allowed: tuple[str, ...]) -> bool:
+    return (isinstance(flags, list) and all(flag in allowed for flag in flags)
+            and len(set(flags)) == len(flags)
+            and ('/Oy-' not in flags or '/QIfist' in flags))
+
+
 def source_files(root: Path, spec: dict) -> list[Path]:
     sources = {p.resolve() for name in spec['source_roots']
                for p in (root / name).rglob('*.cpp')}
@@ -42,8 +57,7 @@ def source_files(root: Path, spec: dict) -> list[Path]:
         if (candidate.get('status') not in ('reviewed-nonexact', 'best-guess-unreviewed')
                 or not candidate.get('reason') or not candidate.get('evidence')):
             raise ValueError(f'candidate lacks nonexact review evidence: {relative}')
-        flags = candidate.get('extra_flags', [])
-        if not isinstance(flags, list) or any(flag not in ('/QIfist', '/Op') for flag in flags):
+        if not valid_unit_flags(candidate.get('extra_flags', []), CANDIDATE_FLAGS):
             raise ValueError(f'unsupported candidate compiler flags: {relative}')
         sources.add(path)
     # A source file that another compiled source #includes is part of that
@@ -88,8 +102,7 @@ def compile_flags(root: Path, spec: dict) -> dict[Path, tuple[str, ...]]:
                 or not path.is_file()):
             raise ValueError(f'bring-up flags must name an existing src/bringup C++ file: {relative}')
         unit_flags = entry.get('extra_flags')
-        if (not isinstance(unit_flags, list) or not unit_flags
-                or any(flag != '/QIfist' for flag in unit_flags)):
+        if not unit_flags or not valid_unit_flags(unit_flags, BRINGUP_FLAGS):
             raise ValueError(f'unsupported bring-up compiler flags: {relative}')
         if not entry.get('reason'):
             raise ValueError(f'bring-up flags lack a reason: {relative}')

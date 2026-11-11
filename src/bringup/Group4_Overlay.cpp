@@ -1,12 +1,13 @@
-// Bring-up definitions (best-guess-unreviewed) for TrackOverlay.cpp methods
+// Bring-up definition (best-guess-unreviewed) for a TrackOverlay.cpp method
 // the linked game references but src/reconstructed/TrackOverlay.cpp does not
 // provide yet (DropTextOverlay::Setup 0x0051af00 is linked from
-// samples/track/DropTextOverlaySetup.cpp):
-//   0x0051b070 DropTextOverlay::Tick   (vtable 0x005586f0 slot 10; decoded)
+// samples/track/DropTextOverlaySetup.cpp, DropTextOverlay::Tick 0x0051b070
+// from Group4_DropTextOverlayTick.cpp):
 //   0x0051cf80 ChatOverlay::Setup      (taken unchanged from the near miss in
 //                                       samples/track/TrackOverlayNearMisses.cpp,
 //                                       1768 of 1785 non-relocation bytes)
-// Not byte matches.
+// Not a byte match. It has no float-to-int conversion and is frameless in
+// retail, so this unit is compiled without extra flags.
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,7 +25,6 @@
 #include "../reconstructed/ControlInterface.h"
 #include "../reconstructed/D3DConstants.h"
 #include "../reconstructed/PCRenderTarget.h"
-#include "../../samples/common/FistpFloatToInt.h"
 // GDI32 imports, as in TrackOverlay.cpp.
 struct UnknownLogFont {
     long lfHeight;
@@ -53,36 +53,6 @@ extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* t
                                                          UnknownOverlayRect* rect, unsigned int format);
 
 // TrackOverlay.cpp statics: the radar zoom (0x0057513c) and the ChatOverlay
-
-// Retail rounds these screen coordinates with a project `fld; fistp`
-// helper applied to (value - 0.5) (0x0051b0c3 here):
-// floor(value) except that exact integers round to the even neighbour.
-// The game build compiles this unit with /QIfist (config/game_build.json
-// bringup_flags), so FistpFloatToIntChecked's cast is a FISTP under the current
-// rounding mode; the drop is the unit's only float-to-int conversion
-// (ChatOverlay::Setup has none). The range check stays because dropSeconds near
-// zero can push the drop outside int (or to an infinity or NaN at zero), where
-// retail's 32-bit store gives 0x80000000.
-
-// 0x0051b070 (slot 10, ret 4): runs the base update with the game's frame
-// time (TrackGame +0x2f0, not the argument), then while shown drops the
-// text by elapsedTime / dropSeconds screen heights and hides it once it
-// passes the bottom.
-int DropTextOverlay::Tick(float frameTime)
-{
-    GameObject::Tick(g_TrackGame->frameTime);
-    if (visible) {
-        elapsedTime += g_TrackGame->frameTime;
-        int drop;
-        FistpFloatToIntChecked(&drop, elapsedTime / this->dropSeconds
-                                      * ((PCRenderTarget*)renderContext)->targetHeight - 0.5f);
-        int y = textYOffset + drop;
-        if (y > ((PCRenderTarget*)renderContext)->targetHeight)
-            visible = 0;
-        textY = y;
-    }
-    return 1;
-}
 
 extern "C" __declspec(dllimport) void* __stdcall CreatePen(int style, int width, unsigned long color);
 
