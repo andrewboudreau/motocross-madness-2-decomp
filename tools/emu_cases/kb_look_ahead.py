@@ -1,11 +1,11 @@
 """SimulateLookAhead 0x0040eca0, the AI bike's two-wheel look-ahead physics (tools/emu_diff.py
 case, call-record/replay mode).
 
-``kb_simulate_look_ahead`` runs the same body with its callees as retail code, at 53-bit only:
-there the path predictor and obstacle query feed 24-bit rounding back into the body. Here
-every non-math callee is replayed, so the body alone is compared at both control words, and
-the replayed callees also cover what that case cannot steer (a failed PredictPathMotion,
-path braking to a stop, both steering signs).
+``kb_simulate_look_ahead`` runs the same body with its callees as retail code. Here every
+non-math callee is replayed, so the body alone is compared, and the replayed callees also
+cover what that case cannot steer (a failed PredictPathMotion, path braking to a stop, both
+steering signs). Both control words must agree exactly: at 24-bit every intermediate rounds,
+so this case sees the grouping of each sum (the dot products' (x + y) + z).
 
 The linked body is the Group 3 bring-up copy (src/bringup/Group3_KrustyBikeAI.cpp). Pure math
 helpers run as retail code (SafeNormalize, the Vec3 constructor, the dot call, CrossProduct,
@@ -47,11 +47,6 @@ PROBES = {0x0040f834: 'probe contact (front)', 0x00410a53: 'obstacle hit',
           0x00410d71: 'event 1/5 aim blend', 0x004112e4: 'path brake stops the wheels',
           0x004115ca: 'steer sign > 0 (rear drive)', 0x00411696: 'steer sign < 0 (brakes)',
           0x0040f2d5: 'PredictPathMotion failed (returns 0)'}
-# 53-bit runs must agree exactly. At 24-bit the linked body's inline three-term dots sum in
-# another order than retail's (see kb_simulate_look_ahead), which drifts by float32 ulps over
-# the steps; a logic difference moves values far more.
-FLOAT_ULPS = {0x007f: 256}
-FLOAT_ABS = 1e-5
 
 
 def height(x, z):

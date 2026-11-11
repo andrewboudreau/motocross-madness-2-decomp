@@ -29,10 +29,9 @@ One run in the first 300 (index 130: path mode, maxTime 0.170, dt 0.033) steps p
 instructions in both retail and the candidate (QueryGround over 20k times); CLEAN_CASES
 stays below it.
 
-Only the 53-bit control word runs. At 0x007f (24-bit) retail and the candidate differ by an
-ulp in most runs: VC6 reassociates the inlined three-term dot products (retail sums the
-share-step dots x, y, z at 0x00411a44; the candidate's DotProduct expansion sums z, y, x and
-a written-out sum z, x, y), which only rounds differently when every add rounds to 24 bits.
+Both control words run. At 0x007f (24-bit) every add rounds, so the dot products' grouping
+shows: retail sums (x + y) + z (0x0040fc3f, the share-step dots at 0x00411a44), which the
+source's BikeAILookDot reproduces; Math3D's DotProduct comes out (x + z) + y.
 """
 import math
 import struct
@@ -41,7 +40,6 @@ RETAIL_VA = 0x0040eca0
 SYMBOL = '?SimulateLookAhead@@YAHPAUVec3@@000PAM000MMPAVTerrain@@PAE1PAVCollisionObject@@11PAH5PAUUnknownBikeAIPath@@1MH@Z'
 SOURCE = 'src/bringup/Group3_KrustyBikeAI.cpp'
 TRACK_GAME = 0x0056e26c
-FPCWS = (0x027f,)
 PROBES = {0x0040f78a: 'terrain', 0x0040f7ac: 'no terrain', 0x0040f834: 'probe contact', 0x00410a43: 'obstacles',
           0x00410a53: 'obstacle hit', 0x00412c57: 'final ground'}
 

@@ -163,7 +163,7 @@ CLEAN_CASES = {
     'bikerace_write_relative_positions': 150,
     'visual_cue_tick': 100,
     'kb_simulate_look_ahead': 20,
-    # Replay sweep: exact at 53-bit, FLOAT_ULPS/FLOAT_ABS at 24-bit (inline-dot grouping).
+    # Replay sweep (exact at both control words).
     'kb_look_ahead': 40,
     'morph_controller_angles': 40,
     'morph_modify_mesh': 40,
@@ -225,6 +225,13 @@ PRE_FIX_SHAPES = [
     # CreateAddress tagged the modem name DPAID_Phone and the phone number DPAID_Modem.
     ('net_create_address', [('elements[1].type = DPAID_Modem;', 'elements[1].type = DPAID_Phone;'),
                             ('elements[count].type = DPAID_Phone;', 'elements[count].type = DPAID_Modem;')], 60),
+    # SimulateLookAhead's dots summed flat ((x + z) + y; retail (x + y) + z) and the lateral
+    # acceleration's dot merged into the outer sum: both differ only at 24-bit.
+    ('kb_look_ahead', [('return a.z * b.z + (a.x * b.x + a.y * b.y);',
+                        'return a.x * b.x + a.y * b.y + a.z * b.z;')], 20),
+    ('kb_simulate_look_ahead', [('return a.z * b.z + (a.x * b.x + a.y * b.y);',
+                                 'return a.x * b.x + a.y * b.y + a.z * b.z;')], 20),
+    ('kb_look_ahead', [('* invDt + (BikeAILookDot(accR, right));', '* invDt + BikeAILookDot(accR, right);')], 40),
 ]
 
 

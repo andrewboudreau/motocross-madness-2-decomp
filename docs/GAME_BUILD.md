@@ -1252,7 +1252,7 @@ nothing about the callees.
 | 0x00413200 | `KrustyBike::Fn_00413200` (AI physics step) | `kb_ai_step` | 300 | 0 after the fix below (20 of 100 at 53-bit before) |
 | 0x00493660 | `KrustyBike::Fn_00493660` (remote state interpolation) | `kb_net_interpolate` | 200 | 0 |
 | 0x004685d0 | `Game::Tick` (samples/game/GameTick.cpp, read-only) | `game_tick` | 200 | 0 |
-| 0x0040eca0 | `SimulateLookAhead` (AI two-wheel look-ahead) | `kb_look_ahead` | 200 | 0 at 53-bit; 0 at 24-bit within 256 ulps or 1e-5 (139 of 200 inexact, worst 142 ulps) |
+| 0x0040eca0 | `SimulateLookAhead` (AI two-wheel look-ahead) | `kb_look_ahead` | 200 | 0, exact at both control words after the fixes below (139 of 200 at 24-bit before) |
 | 0x004a3c80 | `MorphBastardModifier::ControllerAngles` | `morph_controller_angles` | 500 | 0 after the two fixes below (1 and 8 of 40 at 53/24-bit before) |
 | 0x004a4c60 | `MorphBastardModifier::ModifyMesh` (slot 27) | `morph_modify_mesh` | 200 | 0 |
 
@@ -1276,11 +1276,24 @@ source. All three pre-fix shapes differ here at n = 30: the side axis in 6 of
 30 runs per control word, the ground sample in 27 of 30, and the lean blend
 (0x00412aa1) in 13 of 30 at 53-bit only.
 
-At 24-bit the inlined three-term dots sum in another order than retail's, so
-the case declares `FLOAT_ULPS = {0x007f: 256}` and `FLOAT_ABS = 1e-5`. With
-those bounds, `run_diff` counts an outcome as `within_ulps` when its only
-differences are whole float32 words within bound; the 53-bit runs must still
-match exactly.
+At 24-bit every add rounds, so the grouping of a sum shows. Two groupings
+differed, and both are fixed without a tolerance:
+- Retail sums every three-term dot as `(x + y) + z`, for example the side dot
+  at 0x0040fc3f, the penetration at 0x0040fcf0 and `vn` at 0x0040fd22. Math3D's
+  flat `DotProduct` comes out `(x + z) + y`, and the former `BikeAIDotYZ` came
+  out `x + (y + z)`. Every site now calls `BikeAILookDot`
+  (`a.z*b.z + (a.x*b.x + a.y*b.y)`). This took the 24-bit result from 139 of
+  200 differing runs to 10. Its out-of-line COMDAT is byte-identical to
+  retail's dot 0x0040ae30, which retail also calls eight times from this
+  body.
+- `lateralAccel` (0x0041116c..0x004111ad) adds the rear dot as one finished
+  term. VC6 merges an inlined dot's top-level add into the outer sum, so the
+  call site parenthesises it. This took the remaining 10 runs to 0.
+
+The case no longer declares `FLOAT_ULPS`/`FLOAT_ABS`. It runs 0 of 1000
+differing at both control words (seed 7), and both pre-fix shapes are
+negative controls in `tests/test_emu_diff.py`. The linked masked score rose
+from 0.954 to 0.957 (3931 of 3966 instructions).
 
 Replay extensions used here (generic, unit-tested):
 - `inout` lists pointees that are logged on entry and left out of the
@@ -1486,11 +1499,22 @@ differed from retail and are fixed:
 | 0x0040eca0 | `SimulateLookAhead` | 100 (53-bit) | 77 -> 0 | three causes: with no side axis retail crosses the up-cross with `fwd` again before `SafeNormalize` (0x0040ee7c); the final rear ground query starts from the last step's point and keeps the last step's normals, where the source read an unset local; the lean blend scales each component by the unrounded reciprocal (0x00412aa1) | 0.954 -> 0.954 |
 
 `SimulateLookAhead`'s `match_one` alignment fell from 3739 to 3672 of 3966
-instructions with these fixes. Its case runs at 53-bit only: at 24-bit 41 of
-60 runs differ by one ulp because VC6 reorders the inlined three-term dot
-products (retail sums x, y, z at 0x00411a44). One generated input (index 130)
-does not return within 200M instructions in either image; the clean count
-stays below it. `BikeRace::AimCamera` 0x0041eb20 and `NextCameraTarget`
+instructions with these fixes. Since the dot grouping fix
+([above](#call-recordreplay-cases)) the case runs at both control words; 41 of 60
+runs differed at 24-bit before it.
+
+One generated input (index 130) does not return at 53-bit in either image, and
+the clean count stays below it. This is retail's own loop, not the harness. At
+0x00412b79 the time step is `t + dt` in a register. The register value is
+stored to the float `t`, but the loop test (0x00412bf3) and `remaining =
+maxTime - t` use the unrounded register value. With `maxTime` 0.17011885 the
+sixth step leaves the float `t` one ulp below `maxTime` and `dt` 7.45e-9, which
+is half an ulp. Each later step's sum is the exact midpoint. It compares below
+`maxTime`, rounds back to the same even `t` and leaves `dt` unchanged, so the
+loop never ends: 311 identical steps in 3M instructions. At 24-bit the sum
+rounds before the test and the input returns. The game probably runs at
+Direct3D's default 24-bit control word, where this cannot happen; that is
+inference, not checked in a trace. `BikeRace::AimCamera` 0x0041eb20 and `NextCameraTarget`
 0x0041f1d0 (200 each), `VisualCue::Tick` 0x0048b100 (600) and
 `EcoSystem::GenerateObjects` 0x00459ce0 (30) agreed in every run.
 

@@ -131,8 +131,9 @@
 // points too early).  The loop's `right` cross is built in the named copy `rearCross`
 // and assigned whole (aligned 3737 -> 3760 of 3966 retail instructions); `right = Vec3(...)`
 // (3723), a constructed named copy (3722) and `right = CrossProduct(fwd, normalR)`
-// (3686) do not.  Replacing any DotProduct site with another inline dot helper drops
-// to ~3671 (inline budget), and swapping its arguments is inert at every site.  The same
+// (3686) do not.  Every dot product is BikeAILookDot, retail's (x + y) + z grouping
+// (behaviour at 24-bit; it also raised the linked masked score 0.954 -> 0.957); swapping
+// its arguments is inert at every site.  The same
 // named copy at dir2's double cross, the loop's flat right, both dir2 rebuilds and sideV's
 // inner cross loses (3485..3728).  Written-out dots at sideDotF: 3737 (inline budget).  Remaining differences: the start-up `up` vector and the
 // loop-head drag vectors keep their zero components in memory in retail (the
@@ -147,7 +148,7 @@
 // The game reads (race kind, tree collision, object root, difficulty, race mode) go
 // through the complete TrackGame class, with no view cast: aligned 3731 of 3966, frame
 // 0x968 vs 0x93c (the cast views gave 3402); 3740 with dir2's double cross in the
-// BikeAICrossCtor form, 3739 (1542 strict) with the BikeAIDotYZ penetration dots.  The read's member-path depth moves the
+// BikeAICrossCtor form, 3739 (1542 strict) with x + (y + z) penetration dots.  The read's member-path depth moves the
 // inline switch-over although the global loads are identical: a flat member of a plain
 // struct pointer gives 3760, a one-level nested member 3402 (frame 0x978), the complete
 // two-level TrackGame path 3731 (the 0x00410d00 `aim = fwd +- right` site inlines one more
@@ -784,13 +785,16 @@ static inline Vec3 BikeAICrossPlain(const Vec3& a, const Vec3& b)
     return Vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 }
 
-// The wheel penetration dots with y + z grouped (provisional spelling): 1542 strict
-// against 1479 for Math3D DotProduct at both wheels (front alone 1481, rear alone 1540);
-// the grouping, not the parentheses on the products, moves the code, and `y + z + x`
-// is inert.
-static inline float BikeAIDotYZ(const Vec3& a, const Vec3& b)
+// SimulateLookAhead's dot products.  Retail sums x*x' + y*y' first and then adds z*z'
+// (sideDotF 0x0040fc3f, the penetration 0x0040fcf0, vn 0x0040fd22, the lateral dots
+// 0x0041116c).  Math3D's flat DotProduct comes out (x + z) + y and the former
+// BikeAIDotYZ x + (y + z); both round differently when every add rounds to 24 bits
+// (tools/emu_cases/kb_look_ahead.py at 0x007f: 139 of 200 runs differed).  Where a dot
+// is itself a term of a sum, VC6 merges the helper's top-level add into that sum; the
+// call site parenthesises the dot (lateralAccel).
+static inline float BikeAILookDot(const Vec3& a, const Vec3& b)
 {
-    return a.x * b.x + (a.y * b.y + a.z * b.z);
+    return a.z * b.z + (a.x * b.x + a.y * b.y);
 }
 
 // dir2's double cross in the Vec3(x, y, z) constructor form with every product
@@ -898,8 +902,8 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
         if (!PredictPathMotion(front, vF, path, &aim, 0.5f, 0.05f, terrain, sideOffset, &takeoffTime,
                                    &takeoffVel))
             return 0;
-        if (DotProduct(aim, fwd) < 0.70755f) {
-            if (DotProduct(aim, right) < 0.0f)
+        if (BikeAILookDot(aim, fwd) < 0.70755f) {
+            if (BikeAILookDot(aim, right) < 0.0f)
                 aim = SafeNormalize(fwd - right);
             else
                 aim = SafeNormalize(fwd + right);
@@ -1008,13 +1012,13 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 
             // Front wheel.
             float kF = frontS * frontK;
-            float sideDotF = DotProduct(sideF, normalF);
+            float sideDotF = BikeAILookDot(sideF, normalF);
             Vec3 contactF = front + sideF * frontS;
-            float pen = BikeAIDotYZ(contactF - groundF, normalF);
+            float pen = BikeAILookDot(contactF - groundF, normalF);
             float dampF;
             float rollF;
             if (pen <= 0.5f) {
-                float vn = DotProduct(vF, normalF);
+                float vn = BikeAILookDot(vF, normalF);
                 dampF = vn * sideDotF * frontC;
                 if (vn < 0.0f) {
                     impact = vn;
@@ -1027,7 +1031,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                 }
                 if (pen < 0.0f)
                     front -= normalF * pen;
-                float an = DotProduct(accF, normalF);
+                float an = BikeAILookDot(accF, normalF);
                 rollF = an * sideDotF;
                 if (an < 0.0f) {
                     frontBrake = an * -8.0f;
@@ -1051,13 +1055,13 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 
             // Rear wheel.
             float kR = rearS * rearK;
-            float sideDotR = DotProduct(normalR, sideR);
+            float sideDotR = BikeAILookDot(normalR, sideR);
             Vec3 contactR = back + sideR * rearS;
-            pen = BikeAIDotYZ(contactR - groundR, normalR);
+            pen = BikeAILookDot(contactR - groundR, normalR);
             float dampR;
             float rollR;
             if (pen <= 0.5f) {
-                float vn = DotProduct(vR, normalR);
+                float vn = BikeAILookDot(vR, normalR);
                 dampR = vn * sideDotR * rearC;
                 if (vn < 0.0f) {
                     impact += vn;
@@ -1070,7 +1074,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                 }
                 if (pen < 0.0f)
                     back -= normalR * pen;
-                float an = DotProduct(accR, normalR);
+                float an = BikeAILookDot(accR, normalR);
                 rollR = an * sideDotR;
                 if (an < 0.0f) {
                     rearBrake = an * -100.0f;
@@ -1117,7 +1121,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                     FastSqrt(vF.x * vF.x + vF.z * vF.z);
                     push.y = 0.0f;
                     push = SafeNormalize(push);
-                    float pushSpeed = DotProduct(vF, push);
+                    float pushSpeed = BikeAILookDot(vF, push);
                     if (pushSpeed > 0.0f) {
                         aim = vF - push * pushSpeed;
                         aim.y = 0.0f;
@@ -1127,8 +1131,8 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                 Vec3 flatFwd = fwd;
                 flatFwd.y = 0.0f;
                 flatFwd = SafeNormalize(flatFwd);
-                if (DotProduct(flatFwd, aim) < 0.70755f) {
-                    if (DotProduct(aim, right) > 0.0f)
+                if (BikeAILookDot(flatFwd, aim) < 0.70755f) {
+                    if (BikeAILookDot(aim, right) > 0.0f)
                         aim = (fwd + right);
                     else
                         aim = (fwd - right);
@@ -1161,7 +1165,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                 accF += dv;
             }
 
-            float lateralAccel = DotProduct(vR, right) * invDt + DotProduct(accR, right);
+            float lateralAccel = BikeAILookDot(vR, right) * invDt + (BikeAILookDot(accR, right));
             if (frontContact || rearContact) {
                 accR -= right * lateralAccel;
                 if (rearContact) {
@@ -1222,14 +1226,14 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                 *outImpact = impact;
 
             // Share the longitudinal acceleration and speed between the wheels.
-            float aF = DotProduct(accF, fwd);
-            float aR = DotProduct(accR, fwd);
+            float aF = BikeAILookDot(accF, fwd);
+            float aR = BikeAILookDot(accR, fwd);
             float mix = aR * 0.65f + aF * 0.35f;
             Vec3 shared = fwd * mix;
             accF += shared - fwd * aF;
             accR += shared - fwd * aR;
-            aF = DotProduct(vF, fwd);
-            aR = DotProduct(vR, fwd);
+            aF = BikeAILookDot(vF, fwd);
+            aR = BikeAILookDot(vR, fwd);
             mix = aR * 0.65f + aF * 0.35f;
             shared = fwd * mix;
             vF = vF + (shared - fwd * aF);
@@ -1260,8 +1264,8 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
                 if (!PredictPathMotion(front, vF, path, &aim, 0.5f, 0.05f, terrain, sideOffset, &takeoffTime,
                                            &takeoffVel))
                     return 0;
-                if (DotProduct(aim, fwd) < 0.70755f) {
-                    if (DotProduct(aim, right) < 0.0f)
+                if (BikeAILookDot(aim, fwd) < 0.70755f) {
+                    if (BikeAILookDot(aim, right) < 0.0f)
                         aim = SafeNormalize((fwd - right));
                     else
                         aim = SafeNormalize((fwd + right));
@@ -1280,7 +1284,7 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 
             // Turn the side axis towards the lateral acceleration.
             Vec3 acc = accF + accR;
-            acc = right * DotProduct(acc, right);
+            acc = right * BikeAILookDot(acc, right);
             acc.y += 512.0;
             acc = SafeNormalize(acc);
             acc = acc * dt;
@@ -1343,10 +1347,10 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
         }
     }
     Vec3 contact = sideF * frontS + front;
-    float pen = DotProduct(contact - groundF, normalF);
+    float pen = BikeAILookDot(contact - groundF, normalF);
     if (pen < 0.0f)
         front -= pen * normalF;
-    pen = DotProduct(back + frontS * sideR - groundR, normalR);
+    pen = BikeAILookDot(back + frontS * sideR - groundR, normalR);
     if (pen < 0.0f)
         back -= pen * normalR;
     *center = (front + back) * 0.5f;
