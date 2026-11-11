@@ -1682,23 +1682,35 @@ configured flags.
 |---|---|---|---|---|---|
 | `Group1_ParticleRender.cpp` | Render3D 0x004bac60 | pragma (was `/Oy-`, same bytes) | 0.675 -> 0.712 | 0.413 -> 0.446 | 0 / 2000 |
 | `Group3_TerrainPrepareGeometry.cpp` | PrepareGeometry 0x00507610 | pragma (was `/Oy-`) | 0.929 -> 0.979 | 0.777 -> 0.925 | 56 / 2000, all out of `int` (below) |
-| `Group4_GridLighting.cpp` | LightVertices 0x0049e4a0, LightAny 0x0049e6b0, LightOne 0x0049f1c0, LightAmbientPlusOne 0x0049f8d0 (one region) | pragma (was `/Oy-`) | 0.745 -> 0.752, 0.774 -> 0.823, 0.705 -> 0.719, 0.714 -> 0.718 | 0.497 -> 0.639, 0.345 -> 0.590, 0.302 -> 0.367, 0.293 -> 0.353 | 0 / 600 (third sweep) |
+| `Group4_GridLighting.cpp` | LightVertices 0x0049e4a0, LightAny 0x0049e6b0, LightOne 0x0049f1c0, LightAmbientPlusOne 0x0049f8d0 (one region) | pragma (was `/Oy-`) | 0.745 -> 0.752 -> 0.754, 0.774 -> 0.823, 0.705 -> 0.719, 0.714 -> 0.718 | 0.497 -> 0.639 -> 0.677, 0.345 -> 0.590, 0.302 -> 0.367, 0.293 -> 0.353 | 0 / 600 (third sweep) |
 | `Group4_DropTextOverlayTick.cpp` | DropTextOverlay::Tick 0x0051b070 | pragma (was `/Oy-`) | 0.607 -> 0.674 | 0.517 -> 0.587 | 0 / 2000 |
-| `Group4_ScoreBoard.cpp` | ShowValue 0x0048d1e0, with `Group4Ovl_ShowModel` (no retail body) | pragma (was `/Oy-`) | 0.681 -> 0.715 | 0.334 -> 0.455 | 0 / 2000 |
-| `Group4_Visibility.cpp` | TestBox 0x0052f570 | pragma (was `/Oy-`) | 0.689 -> 0.697 | 0.342 -> 0.443 | 0 / 2000 |
+| `Group4_ScoreBoard.cpp` | ShowValue 0x0048d1e0, with `Group4Ovl_ShowModel` (no retail body) | pragma (was `/Oy-`); then the show helper inline by reference and Normalize's length order | 0.681 -> 0.715 -> 0.867 | 0.334 -> 0.455 -> 0.608 | 0 / 4000 |
+| `Group4_Visibility.cpp` | TestBox 0x0052f570 | pragma (was `/Oy-`); then the outcode in the corner loop and per-use corner/viewport reads | 0.689 -> 0.697 -> 0.796 | 0.342 -> 0.443 -> 0.669 | 0 / 2000 |
 | `DropTextOverlaySetup.cpp` (sample) | Setup 0x0051af00 | pragma (was `/Oy-`) | 0.632 -> 0.853 | 0.272 -> 0.701 | 0 / 2000 |
 | `CharacterMotionFourPose.cpp` (sample) | Method_0x004a9050 | pragma (was `/Oy-`) | 0.727 -> 0.758 | 0.168 -> 0.414 | 0 / 3000 |
-| `Group4_SceneTick.cpp` | Scene::Tick 0x004eab00 | pragma | 0.686 -> 0.701 | 0.334 -> 0.363 | 0 / 2000 |
+| `Group4_SceneTick.cpp` | Scene::Tick 0x004eab00 | pragma; then per-use entry reads and the advance written out | 0.686 -> 0.701 -> 0.941 | 0.334 -> 0.363 -> 0.725 | 0 / 2000 |
 | `KrustyBikeTrickPick.cpp` (sample) | Fn_0048D780 0x0048d780 | pragma | 0.773 -> 0.804 | 0.599 -> 0.776 | 0 / 2000 |
-| `KrustyBikeSelectRiderPose.cpp` (sample) | SelectRiderPose 0x0048e3e0 | pragma | 0.682 -> 0.729 | 0.652 -> 0.686 | 0 / 600 (third sweep) |
+| `KrustyBikeSelectRiderPose.cpp` (sample) | SelectRiderPose 0x0048e3e0 | pragma; then clamp polarity, folded product, per-arm stores | 0.682 -> 0.729 -> 0.789 | 0.652 -> 0.686 -> 0.744 | 0 / 600 (third sweep) |
 | `CharacterMotionStart.cpp` (sample) | Method_0x004a8bf0 | pragma | 0.633 -> 0.667 | 0.200 -> 0.381 | 0 / 2000 |
 | `CharacterMotionBlend.cpp` (sample) | Method_0x004a8c50 | pragma | 0.793 -> 0.879 | 0.348 -> 0.618 | 0 / 2000 |
-| `TerrainShadow.cpp` (sample) | slot 30 0x00509aa0 | pragma | 0.718 -> 0.736 | 0.442 -> 0.450 | 0 / 2000 |
+| `TerrainShadow.cpp` (sample) | slot 30 0x00509aa0 | pragma; then per-use reloads instead of cached locals | 0.718 -> 0.736 -> 0.875 | 0.442 -> 0.450 -> 0.702 | 0 / 2000 |
 | `D3DIMSoultreeShadowNearMisses.cpp` (sample) | slot 30 0x00446f40 | pragma | 0.862 -> 0.891 | 0.598 -> 0.665 | 0 / 2000 |
 | `ProjectedShadowNearMisses.cpp` (sample) | TintCasterVertices 0x004dc2b0 | pragma | 0.759 -> 0.774 | 0.330 -> 0.346 | 0 / 2000 |
 | `GridNodeNearMisses.cpp` (sample) | GridNode::IntersectSegment 0x00483d40 (no `/QIfist`: retail keeps four truncating `__ftol` casts) | pragma; then the leaf cell as an index and out->y stored before out->z | 0.832 -> 0.903 -> 0.916 | 0.449 -> 0.493 -> 0.520 | 0 / 3000 (three round-to-nearest control words; at -n 2000 one input faults in both bodies, as before) |
 | `ProjectedShadowNearMisses.cpp` (sample) | RenderShadow 0x004db8c0 (framed in retail) | none: the pragma lowers both scores | 0.738 (0.733 with it) | 0.452 (0.340 with it) | 0 / 2000 |
 | `Group4_Overlay.cpp` | ChatOverlay::Setup 0x0051cf80 (frameless) | no flags, no pragma | 1.000 | 0.964 | n/a |
+
+The third column of masked/strict scores comes from source shapes, not flags.
+Retail re-reads `obj->array[i].field` after every store, because a char store may
+alias, so writing each access per use gives its reloads where a cached pointer
+local does not (TerrainShadow, Scene::Tick, TestBox). Helpers that retail
+expands must be written in place or marked `inline`: under /Ob1 a plain `static`
+stays out of line. A reference parameter (`D3DIMSoultreeObject*&`) reproduces
+ShowValue's "slot address once, value reloaded after each call". Per-use member
+reads let VC6 reassociate `a * b * c`, so parenthesise retail's order where
+precision matters: TestBox's y scale differed in 86 of 1000 runs at 24 bits
+until it was written as `(h * y) * inverse`. Each unit's header lists the
+forms that were ruled out.
 
 The functions of these units that are frameless in retail keep their bytes,
 for example `TerrainShadow` slots 27 and 28 (0.984 / 0.979, 0.986 / 0.950),
