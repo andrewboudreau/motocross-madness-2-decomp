@@ -433,13 +433,19 @@ python tools/linked_accuracy.py --top 60
 
 The first run on 2026-11-10 scored 2,659 bound retail functions (1,111,710
 bytes, library members excluded); 676,545 of those bytes score 1.000. It
-showed bring-up bodies that
-are well below the near-miss sample for the same function:
+showed bring-up bodies well below the near-miss sample for the same function.
+The game now links the sample bodies instead (docs/GAME_BUILD.md, collision and
+contact near-miss bodies). Linked scores, before and after:
 
-- BVH `BoxTriangleQuery` 0.16 against the sample's 0.97, `TreeTreeQueryNodes`
-  0.23 against 0.92, and `SegmentSegmentDistance` 0.43 against 0.94;
-- `ConstraintMethodCollisionModel::ApplyContactImpulse` 0.50 against 0.98;
-- `ContactSolveImpulse` 0.58 against 0.96.
+| Function | Stand-in | Now |
+|---|---:|---:|
+| BVH `BoxTriangleQuery` `0x00426be0` | 0.16 | 0.97 |
+| BVH `TreeTreeQueryNodes` `0x004280e0` | 0.23 | 0.91 |
+| BVH `SegmentSegmentDistance` `0x0042a640` | 0.43 | 0.94 |
+| BVH `SegmentTriangleQuery` `0x00427c10` | 0.70 | 0.95 |
+| BVH `BoxCapsuleOverlap` `0x00425900` | 0.70 | 0.82 |
+| `ConstraintMethodCollisionModel::ApplyContactImpulse` `0x0043bdb0` | 0.50 | 0.98 |
+| `ContactSolveImpulse` `0x005004a0` | 0.58 | 0.96 |
 
 It also flagged stand-ins with no sample: MorphBastard `ControllerAngles`
 (0.29) and Visibility `TestBox` (0.27). The ProjectedShadow bodies sit below
