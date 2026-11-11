@@ -239,9 +239,11 @@ python -m unittest discover -s tests -p test_wrecker_model_connections.py -v
 
 Field names of the collaborator views follow the canonical krusty2 layouts:
 `CollisionObject.h` and `ConstraintMethodCollisionModel.h` (collision model,
-probe record), `src/krusty2/rigidbody/PhysicsBody.h` (rigid body),
+probe record),
 `SoultreeObject.h` (`firstChild`, `subtreeDirty`) and `ParticleManager.h`
-(particle manager and particle). Wrecker's own fields are named from the
+(particle manager and particle). The gravity model (`+0x3c`) and rigid body
+(`+0x40`) are the canonical `SelectiveGravityModel` and `PhysicsRigidBody`
+classes themselves. Wrecker's own fields are named from the
 data flow in the layout table: the three `int` arrays hold values passed to
 the rider's animation calls `0x004a8b40`/`0x004a8b80` (`indexedAnimations`
 by the index `0x00530630` returns, `randomAnimations` by `RANDOM_UNIT()`,
@@ -262,8 +264,8 @@ near miss `0x00531740` `SprayContactParticles`. The list appenders
 
 Model and motion calls now use the shared declarations listed above.
 Complete caller and provider comparisons establish their retail destinations;
-semantic method names remain provisional. The remaining rigid-body, gravity,
-collision-model and particle views are outside this declaration consolidation.
+semantic method names remain provisional. The remaining collision-model and
+particle views are outside this declaration consolidation.
 
 ## Remaining uncertainty
 
