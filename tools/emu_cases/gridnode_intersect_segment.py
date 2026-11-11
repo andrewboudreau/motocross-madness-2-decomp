@@ -17,7 +17,9 @@ memory around them. Only round-to-nearest control words are compared by default.
 round down, up or chop, the midpoint fistp (0x004844aa, 0x00484670) can round a cell index
 out of range. Both bodies then index past the row tables and fault on the same input; only
 EAX/ESP at the fault differ. On 500 seeds per mode (``--fpcw 0x67f,0xa7f,0xe7f``), the
-status, calls and writes agree in every run.
+status, calls and writes agree in every run. Round to nearest can fault too, rarely:
+case 1886 at -n 2000 faults in both bodies the same way at each default control word
+(1 of 2000 each, also with the pre-pragma object).
 """
 import random
 import struct

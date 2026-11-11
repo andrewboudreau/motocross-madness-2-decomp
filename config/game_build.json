@@ -568,7 +568,7 @@
     {
       "path": "samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp",
       "status": "best-guess-unreviewed",
-      "reason": "BoxCapsuleOverlap 0x00425900, BoxTriangleQuery 0x00426be0, SegmentTriangleQuery 0x00427c10, TreeTreeQueryNodes 0x004280e0 and SegmentSegmentDistance 0x0042a640 replace the Group0_BvhQuery bring-up copies of the same bodies; the file includes the canonical BoundingBoxTreeQuery.cpp (included_sources) for the unit's file statics and defines the never-written 0x00579668 flag. The out-of-line vector call views resolve through link_aliases. Not differentially tested.",
+      "reason": "BoxCapsuleOverlap 0x00425900, BoxTriangleQuery 0x00426be0, SegmentTriangleQuery 0x00427c10, TreeTreeQueryNodes 0x004280e0 and SegmentSegmentDistance 0x0042a640 replace the Group0_BvhQuery bring-up copies of the same bodies; the file includes the canonical BoundingBoxTreeQuery.cpp (included_sources) for the unit's file statics and defines the never-written 0x00579668 flag. The out-of-line vector call views resolve through link_aliases. All five agree with retail under tools/emu_diff.py (docs/GAME_BUILD.md, second differential sweep).",
       "evidence": "docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies"
     },
     {
