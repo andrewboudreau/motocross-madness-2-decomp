@@ -105,7 +105,7 @@ The five production QueryGround view names now use the canonical declaration;
 see [the caller connection proof](TERRAIN_QUERY_CONNECTIONS.md). That change
 preserves caller bytes and does not accept the provider's behavior.
 The existing provider at 0x00507c10 is registered as partial. Its current native
-COFF extent is **3587 bytes**, against the complete **2963-byte** retail body,
+COFF extent is **3544 bytes**, against the complete **2963-byte** retail body,
 with a separate 370-byte local conversion helper. Unresolved helper bindings
 still prevent a complete strict comparison.
 
@@ -114,5 +114,7 @@ truncation defect: a scaled coordinate of 1.25 now selects cell one under
 nearest rounding. It passes 278,411 native comparisons through the first
 GetCellCorners request, with masked exceptions. The complete QueryGround
 fingerprint was intentionally refreshed for that repair; it is not preserved
-from the earlier connection-only slice. Full interpolation, normals, material
-selection and unmasked exception behavior still need independent validation.
+from the earlier connection-only slice. A later differential run over the whole
+body repaired the smooth normal of triangle (0, 1, 3) and the height addition
+order; see [the cell conversion notes](TERRAIN_CELL_CONVERSION.md). Unmasked
+exception behavior still needs independent validation.

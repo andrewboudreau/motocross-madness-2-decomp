@@ -852,6 +852,13 @@ static inline TerrainVec3 TerrainNormalize(const TerrainVec3& v)
 // checkerboard ((ix ^ iz) & 1), the nearer-corner test picks the triangle, and the height is
 // linear over it.  The normal is either the triangle's face normal (flatShaded) or the
 // inverse-squared-distance weighted blend of the three corner normals.
+// Retail quirk (tier 1, decoded at 0x0050848c..0x00508512): the smooth normal of triangle
+// (0, 1, 3) blends corners 0, 1 and 2 -- not 3 -- while the dead flat-shaded blend of the same
+// triangle uses 0, 1, 3.  The height is (base + slope_x) + slope_z in that order (retail adds
+// the base right after the first product); VC6 reassociates a single `a + b + c` expression to
+// (b + c) + a, which changes the rounding, so each branch names the partial sum `h`.  Both
+// were found by differential emulation against retail (unicorn, retail helpers, 6000 cases
+// over all x87 rounding and precision modes, bit-identical afterwards).
 void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
                           unsigned char* surface)
 {
@@ -927,7 +934,8 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
     if ((iz ^ ix) & 1) {
         if (w[0] < w[3]) {
             // triangle (0, 1, 2)
-            pos->y = y0 + (y1 - y0) * (fx - ix) + (y2 - y0) * (fz - iz);
+            float h = y0 + (y1 - y0) * (fx - ix);
+            pos->y = h + (y2 - y0) * (fz - iz);
             if (!normal)
                 return;
             if (flatShaded) {
@@ -943,7 +951,8 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
             *normal = TerrainNormalize(n[0] / w[0] + n[1] / w[1] + n[2] / w[2]);
         } else {
             // triangle (1, 3, 2)
-            pos->y = y2 + (y3 - y2) * (fx - ix) + (y1 - y3) * (1.0f - (fz - iz));
+            float h = y2 + (y3 - y2) * (fx - ix);
+            pos->y = h + (y1 - y3) * (1.0f - (fz - iz));
             if (!normal)
                 return;
             if (flatShaded) {
@@ -961,7 +970,8 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
     } else {
         if (w[1] < w[2]) {
             // triangle (0, 1, 3)
-            pos->y = y0 + (y1 - y0) * (fx - ix) + (y3 - y1) * (fz - iz);
+            float h = y0 + (y1 - y0) * (fx - ix);
+            pos->y = h + (y3 - y1) * (fz - iz);
             if (!normal)
                 return;
             if (flatShaded) {
@@ -978,10 +988,12 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
                     *normal = face;
                 return;
             }
-            *normal = TerrainNormalize(n[0] / w[0] + n[1] / w[1] + n[3] / w[3]);
+            // Corner 2, not 3: retail 0x0050848c reads n[2] (ebp-0x98) with w[2] (ebp-0x50).
+            *normal = TerrainNormalize(n[0] / w[0] + n[1] / w[1] + n[2] / w[2]);
         } else {
             // triangle (0, 3, 2)
-            pos->y = y2 + (y3 - y2) * (fx - ix) + (y0 - y2) * (1.0f - (fz - iz));
+            float h = y2 + (y3 - y2) * (fx - ix);
+            pos->y = h + (y0 - y2) * (1.0f - (fz - iz));
             if (!normal)
                 return;
             if (flatShaded) {

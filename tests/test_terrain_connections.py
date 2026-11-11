@@ -51,14 +51,19 @@ PARTIAL = (
     # ($L6173 -> $L6423, still .text$x+0xb6); the body bytes are identical.
     # QueryGround's retail dead smooth-normal store renumbers it once more;
     # Load's bytes and relocation types/targets are otherwise unchanged.
-    ('?Load@Terrain@@', 2117, '6537190b68defcf5b15b670922d3562cf24b1ac868fb0885b6ad8a1af80f5493'),
+    # QueryGround's named partial heights renumber it again ($L6429 -> $L6433);
+    # Load's 2117 bytes and other 64 relocation records are identical.
+    ('?Load@Terrain@@', 2117, '8f69769d788fbc2be9b28129feb3c34e918023819e6ec5927041fd2f682044b9'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with
     # complete bytes/relocations preserved under those explicit substitutions.
     # Re-pinned for the retail smooth-normal dead store in the even/(0,1,3)
     # flat branch (0x005082f6..0x0050843a): 3255 -> 3587 bytes.
-    ('QueryGround', 3587, '53c96a94e7710e55f4b01e0e72d892d4535b68ec4a28c86b4015e5c26e41ddb9'),
+    # Re-pinned for two behaviour repairs found by differential emulation: the
+    # (0, 1, 3) smooth normal blends corners 0, 1, 2 (0x0050848c) and the height
+    # keeps retail's (base + slope_x) + slope_z order: 3587 -> 3544 bytes.
+    ('QueryGround', 3544, '6afd82c44b51bcd4b9cdd548a1bc7f48268306699cf52251a63f3437a6df2213'),
 )
 
 

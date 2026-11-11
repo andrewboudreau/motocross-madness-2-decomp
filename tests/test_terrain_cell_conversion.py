@@ -66,7 +66,7 @@ class TerrainCellConversionTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 objects.append(obj)
             production, candidate = (CoffObject(path) for path in objects[:2])
-            for symbol, size in (('?QueryGround@Terrain@@', 3587), ('?FloatToInt@@', 370)):
+            for symbol, size in (('?QueryGround@Terrain@@', 3544), ('?FloatToInt@@', 370)):
                 records = []
                 for obj in (production, candidate):
                     entry = obj.find_symbol(symbol)

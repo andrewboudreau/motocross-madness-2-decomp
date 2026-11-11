@@ -35,15 +35,36 @@ bodies, requiring their bytes and named relocations to equal those extracted
 from the production object. It compares state, the requested cell indices,
 normal request, floating-point status and control word. Its first
 GetCellCorners callback stops execution before interpolation. Later helpers
-fail immediately if reached. Thus height interpolation, normal/material
-selection and complete QueryGround behavior remain unverified.
+fail immediately if reached.
 
-QueryGround remains nonexact: **3587 emitted bytes** against **2963 retail
+The rest of the body was then checked by a separate differential run (unicorn,
+in a local `work/` harness; not a committed fixture). It runs retail 0x00507c10
+and the compiled candidate inside the retail image. GetCellCorners is the same
+deterministic stub in both runs; TriangleNormal, the dot helper, FastInvSqrt and
+`__ftol` are retail's, with the fast-math tables built by retail's
+initializers. 6000 cases cover ties, diagonals, huge and special coordinates,
+optional outputs and every x87 rounding and precision mode. It found two
+behavior differences, both now repaired:
+
+- In the smooth-shaded even triangle (0, 1, 3), retail blends the normals of
+  corners 0, 1 and **2** (0x0050848c reads `n[2]` at ebp-0x98 with `w[2]` at
+  ebp-0x50). The dead flat-shaded blend of the same triangle keeps 0, 1, 3.
+- Retail computes each height as `(base + slope_x) + slope_z`. VC6 compiles
+  one `a + b + c` expression to `(b + c) + a`, so the candidate's heights
+  could differ in the last bit. Each branch now names the partial sum.
+
+Before the repairs 431 of the 6000 cases differed. Afterwards position,
+normal, surface byte, GetCellCorners arguments, stack,
+callee-saved registers, x87 status flags and control word are bit-identical
+in all 6000 cases. Unmasked exceptions remain unverified.
+
+QueryGround remains nonexact: **3544 emitted bytes** against **2963 retail
 bytes**, plus a **370-byte** local conversion helper without a claimed retail
-identity. The former candidates were 3321 and 3255 bytes; the 3587-byte body
-adds retail's dead smooth-normal store in the even (0,1,3) flat-shaded branch
+identity. The former candidates were 3321, 3255 and 3587 bytes. The body keeps
+retail's dead smooth-normal store in the even (0,1,3) flat-shaded branch
 (0x005082f6..0x0050843a), which retail computes and then overwrites with the
-face normal. Unresolved helper bindings
+face normal. The linked score is 0.899 (995/970 instructions; it was 0.864
+before the two repairs). Unresolved helper bindings
 prevent a complete strict comparison. Its non-gating relocation-masked score
 changes from 65/2711 to 54/2707 matching positions; this is an intentional
 behavior repair, not a byte-preservation claim for that partial function.
