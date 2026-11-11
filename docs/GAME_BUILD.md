@@ -1167,6 +1167,72 @@ exceptions, so only masked control words were compared.
 `tests/test_emu_diff.py` repeats the clean runs and the negative controls when
 unicorn, `VC6_ROOT` and `MCM2_EXE` are available.
 
+#### Second sweep: non-exact linked bodies
+
+The same harness was then pointed at linked bodies that are not byte-exact
+(physics-runner rows whose linked source is the sample or `src` body, and
+linked calibration near misses), with pure computation first. Retail helpers
+run as retail code; only calls with side effects outside the function
+(rendering, `rand`, allocation) are stubbed. These differed from retail:
+
+| VA | Function | Runs | Differed before | Cause and fix | Now linked |
+|---|---|---|---|---|---|
+| 0x0051c4f0 | `RadarOverlay::IntersectLineCircle` | 800 | 131 of 800 | the two-hit choice measured against the output buffer (uninitialised in `DrawTrackOutline`) instead of the fourth argument | 0.939 |
+| 0x0040a520 | `Bike::Method_0x0040a520` (steer torque) | 600 | 140 of 600 | both left-bar arms stored the subtraction into `torque` and dotted it, where retail stores `offset` and dots `base` | 0.989 |
+| 0x00436720 | `CollisionObject::HullVsHull` | 600 | 29 of 600 (24-bit) | second contact-normal rotation grouped `(y + z) + x` in place as retail | 0.978 |
+| 0x00427c10 | `SegmentTriangleQuery` (sample) | 800 | 32 of 800 | end point's y row grouped `(y + z) + x` (`TransformPointYZX`) | 0.955 |
+| 0x00517340 | `Track::PlaceNear` (sample, via `KbRaceSub::PlaceNear`) | 600 | 44 of 600 | path loop's second `DistanceAlong` took (candidate, start); retail passes (start, from) | 0.842 (0.868 before) |
+| 0x00491d10 | `KrustyBike::FindPlacement` | 600 | 112 of 600 | stored-vector path returned the pointer; retail leaves the bits of `outPosition->z` in eax | 0.947 |
+| 0x00414370 | `KrustyBike::Fn_00414370` (AI racing line) | 1000 | 114 of 1000 | outside free roam retail reads the trick delay from the difficulty's frame slot; an anonymous union says so | 0.899 |
+| 0x005097d0 | `TerrainShadow` slot 28 | 600 | 0 | latent: the orthographic scale read an unset `fov` that VC6 happened to place in `extent`'s slot; it now reads `extent` (retail `fmul [esp+0x4c]` at 0x00509949) | 0.986 |
+
+These agreed with retail in every run at both control words (runs in
+brackets): `SegmentSegmentDistance` 0x0042a640, `BoxCapsuleOverlap`
+0x00425900 (888), `TreeTreeQueryNodes` 0x004280e0 (504), `QuadTree::Insert`
+0x004dcac0 and `Remove` 0x004dcf20 (800 each),
+`VisibilityQuadTreeNode::Traverse` 0x0052d610 (1200), the CollisionObject
+hull/model pairs and their swept forms 0x00436af0..0x00438550,
+`CollisionRelativeFrame` 0x00432260, `UpdateModelBounds` 0x00434eb0 and
+`SegmentTouchesObject` 0x00439820 (600 each), the vehicle constructor
+0x005257a0, wheel impulse 0x00527a20, lean 0x005286a0 and body contact impulse
+0x005265d0, `ResolveContactImpulse` 0x00500220, `ContactSolveImpulse`
+0x005004a0, `ConstraintMethodCollisionModel::ApplyContactImpulse` 0x0043bdb0,
+`SoultreeObject::SetMatrixIn`/`SetAxesIn` 0x004fb8c0/0x004fc050 (600 each),
+`RotatePose` 0x004a7dc0, `PoseRotation` 0x004a7fd0, Character slot 7
+0x004a70c0, `TransformPoints` 0x004a1b00, `Halve555`/`Halve565`/`Halve8888`,
+`Convert555To8Fast` 0x004d0d40, `GR_BitString::ReadBits` and both shifts,
+`MeanTextureChannelDifference` 0x004cb330 (600), `TextureHasColor` 0x0047b490
+(400), `ShadowFillTriangle` 0x00461e60 (400), `CarProcedural::PositionAtTime`
+0x00430b10 (800), `DrawableGridNode::ComputeViewerDetail` 0x004815e0 (1000),
+`UIButton`/`UIMultiState::ContainsPoint` 0x004734c0/0x00478e10 (600 each),
+`D3DIMSoultreeObject::Scale` 0x004fd340 (800),
+`ProjectedShadow::ComputeBounds` 0x004db0d0 (600),
+`KrustyBike::IsSpeedGainBelowLimit` 0x004919a0, `UpdateRiderPose` 0x0048eea0
+(21 probes), `Fn_00492AD0` and `Vegetation::GetCollisionObject` 0x004570a0
+(1000 each).
+
+Open: `BoxTriangleQuery` 0x00426be0 flips one contact in about 300 boundary
+cases at 53-bit only (none at 24-bit). Retail keeps `p0 - Dot(e1)` on the x87
+stack where VC6 here stores and rounds it; that this causes the flip is
+inference. `UpdateRiderPose` indexes `s_kbTrickFrame` (0x0056d060) without a
+bound; chained tricks (16..31) read the globals after the table, whose
+neighbours differ in the build, so the case keeps trick indices below 16.
+
+Negative controls: the pre-fix shapes of the radar, `PlaceNear`, `FindPlacement`,
+`HullVsHull` (29 of 600), `SegmentTriangleQuery` (20 of 600) and the bike
+steer (50 of 200) all differ; so do a `ModelVsModel` reciprocal for its divide
+(13 of 600), `>=` and dropped-clear variants of the quadtree and visibility
+traversal, and `extentX` in TerrainShadow slot 28 (8 of 200).
+
+Not emulated: `Vehicle::SimulateFrame` (3254 bytes, about 45 virtual slots and
+20 callees), `KrustyBike::Fn_00493660` (8545 bytes, 25 direct and 16 virtual
+callees), `Fn_00413200` (4112 bytes, 15 direct callees including
+`SimulateLookAhead` and `PredictLanding`, about 21 virtual slots),
+`ProjectedShadow::Present` (Direct3D calls), `Game::Tick` and
+`MorphBastardModifier::ControllerAngles` (orchestration). Each would need
+stubs whose outputs feed the compared state, so a mismatch would test the
+stubs as much as the body.
+
 ### Grid lighting workers
 
 The three workers in `Group4_GridLighting.cpp` were rewritten from the
