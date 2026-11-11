@@ -1,8 +1,6 @@
 // CubeDraw.cpp -- reconstruction of D:\aardvark\VC\krusty2\cubedraw.cpp.
 // See CubeDraw.h for the TU extent and the class. The geometry builder
-// 0x0043dc60, 0x0043e0b0 and slot 14 0x0043e4c0 (with its static matrix and
-// atexit thunk 0x0043e840) are near misses in
-// samples/render/CubeDrawNearMisses.cpp.
+// 0x0043dc60 is a near miss in samples/render/CubeDrawNearMisses.cpp.
 
 #include <string.h>
 
@@ -19,6 +17,7 @@
 #include "Quantize.h"
 #include "RenderTarget.h"
 #include "TextureMap.h"
+#include "Tgafile.h"
 
 // The four vector constants that open many retail files. Strong inference:
 // this file's copies are 0x00579920, 0x00579a60, 0x0057a200 and 0x005798a8,
@@ -118,6 +117,60 @@ DrawableCube* DrawableCube::Load(void* value, UnknownTextureStream* stream,
 fail:
     Release();
     return 0;
+}
+
+// 0x0043e0b0: loads the cube's textures and sets each cell's texture
+// coordinates, inset half a texel (1/32 for mipmapped files, else by the
+// cell's decoded texture size).
+int DrawableCube::LoadTexturesAndCoords(Cube* cube, UnknownCubeTextureContext* context)
+{
+    cubeObject = cube;
+    cube->LoadMissingTextures((UnknownTexturePalette*)loadPalette, context);
+    if (HasMipLevels(cubeObject->fileFormat)) {
+        for (int face = 0; face < 6; face++) {
+            int index = 0;
+            for (int row = 0; row < 4; row++) {
+                for (int column = 0; column < 4; column++, index++) {
+                    s_cellVertices[face][index][0].tu = 0.03125f;
+                    s_cellVertices[face][index][0].tv = 0.03125f;
+                    s_cellVertices[face][index][1].tu = 0.96875f;
+                    s_cellVertices[face][index][1].tv = 0.03125f;
+                    s_cellVertices[face][index][2].tu = 0.96875f;
+                    s_cellVertices[face][index][2].tv = 0.96875f;
+                    s_cellVertices[face][index][3].tu = 0.03125f;
+                    s_cellVertices[face][index][3].tv = 0.03125f;
+                    s_cellVertices[face][index][4].tu = 0.96875f;
+                    s_cellVertices[face][index][4].tv = 0.96875f;
+                    s_cellVertices[face][index][5].tu = 0.03125f;
+                    s_cellVertices[face][index][5].tv = 0.96875f;
+                }
+            }
+        }
+        return 1;
+    }
+    for (int face = 0; face < 6; face++) {
+        int index = 0;
+        for (int row = 0; row < 4; row++) {
+            for (int column = 0; column < 4; column++, index++) {
+                int size = DecodeTextureSize(cubeObject->faces[face].sizeCodes, column, row);
+                float low = 1.0f / (float)size;
+                s_cellVertices[face][index][0].tu = low;
+                s_cellVertices[face][index][0].tv = low;
+                float high = 1.0f - low;
+                s_cellVertices[face][index][1].tu = high;
+                s_cellVertices[face][index][1].tv = low;
+                s_cellVertices[face][index][2].tu = high;
+                s_cellVertices[face][index][2].tv = high;
+                s_cellVertices[face][index][3].tu = low;
+                s_cellVertices[face][index][3].tv = low;
+                s_cellVertices[face][index][4].tu = high;
+                s_cellVertices[face][index][4].tv = high;
+                s_cellVertices[face][index][5].tu = low;
+                s_cellVertices[face][index][5].tv = high;
+            }
+        }
+    }
+    return 1;
 }
 
 // 0x0043e210

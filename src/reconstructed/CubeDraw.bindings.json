@@ -75,5 +75,9 @@
   "?s_cellVertices@@3PAY1BA@5UUnknownCubeVertex@@A": "0x0057a210",
   "?s_faceNormals@@3PAUVector3@@A": "0x00579a70",
   "?s_facePoints@@3PAY0BJ@UVector3@@A": "0x00579af8",
-  "?s_viewPoints@@3PAUVector3@@A": "0x00579930"
+  "?s_viewPoints@@3PAUVector3@@A": "0x00579930",
+  "?DecodeTextureSize@@YAHHHH@Z": "0x0043d080",
+  "?LoadMissingTextures@Cube@@QAEHPAUUnknownTexturePalette@@PAUUnknownCubeTextureContext@@@Z": "0x0043d630",
+  "?HasMipLevels@@YAHH@Z": "0x00511850",
+  "__real@4@3fff8000000000000000": "0x00550748"
 }

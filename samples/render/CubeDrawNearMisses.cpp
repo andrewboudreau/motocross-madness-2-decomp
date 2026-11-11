@@ -1,43 +1,44 @@
-// Near-miss cubedraw.cpp candidates, kept out of src/reconstructed until
-// they match. See src/reconstructed/CubeDraw.h.
+// Near-miss cubedraw.cpp candidate, kept out of src/reconstructed until it
+// matches. See src/reconstructed/CubeDraw.h.
 //
-// 0x0043dc60 (895 bytes): the switch, the normal stores (chained
-// assignments give retail's y/x/z order) and the cell copies are in place.
-// VC6 here keeps 25600.0f in a register where retail stores immediates, and
-// the stack slots of the five loop variables and the grid pointer's anchor
-// (x here, y in retail) differ. Retail's grid walk runs one pointer through
-// all 25 points (biased by +4, x at -4); its cell copy resets the vertex
-// pointer from a row pointer (+0x300 per row) and advances the grid pointer
-// by 0x80 per row plus 0x20 after it (as if indexed `cell + cellRow`), and
-// writes each vertex's position, diffuse, specular, tu and tv in source
-// order where VC6 here hoists the constant stores. Tried in session 10: a
-// single grid pointer for the face (81-82 of 1052), `&grid[row][column]`
-// or `grid[0][row * 5 + column]` per point (64), the grid index as
-// `cell + cellRow` with the vertex pointer from `cell` (137 of 1068 bytes
-// but 152 instruction diffs against 148; the row reset still folds), slot
-// 14's flat `first = cell * 6` vertex form and
-// `grid[0][cellRow * 5 + cellColumn]` (121).
-// Session 15 reference diff: the three 100.0f loads retail has and this lacks are
-// the case tails VC6 cross-jumps here (fild; fmul 100.0f; fstp [eax+8] shared by
-// cases 1, 3 and 4), and 0x0057a220 against 0x0057a224 is the +4 pointer bias.
+// 0x0043dc60 (1078 bytes plus its 26-byte switch table): 1100 of 1104 strict,
+// 259 of 261 instructions aligned. The only difference left is the order of
+// two column-loop spills at +0x228: retail stores the `256 - column * 128`
+// induction value ([esp+0x28]) before `column * 128 - 256` ([esp+0x18])
+// around the last grid store; VC6 here the other way. Swapping case blocks
+// or the tu/tv stores is worse, and `-column * 128 + 256` is the same.
+// What moved VC6 to retail's shape:
+// - a flat 25-point grid written through one running `point` index
+//   (retail's single biased pointer through all 25 points);
+// - a separate running corner index `first`, stepped per cell and once more
+//   per row (retail's +0x80 at the row top and +0x20 at the bottom), and a
+//   running cell index `index` that is not reset per row (the row-exit
+//   `mov eax, edi; add edi, 0x300`);
+// - direct `s_cellVertices[face][index][k]` stores, which keep each vertex's
+//   position, diffuse, specular, tu and tv in source order;
+// - case 5's normal stores after its position stores: otherwise VC6
+//   cross-jumps the `fmul 100.0f; fstp z` tails of cases 1, 3 and 4 into it
+//   (only case 5's placement matters);
+// - `first` declared before `index` and the increments written
+//   `cellColumn++, first++, index++`.
+// Ruled out (equal or worse): `default: break;` at either end of the switch;
+// the coordinate spelled (X) * 100.0f, 100.0f * (float)X, (column - 2) * 128
+// or -256 + column * 128 (all equal), (float)((X) * 100) (worse); every
+// position-store order in each arm and every diffuse/tu/tv order; normals
+// first in cases 0-4 (neutral); `point` declared in the for-init or stepped
+// in the body; `grid[5][5]` indexed `grid[0][point]` (same); declaration
+// orders of face/row/column/point; reusing row/column for the cell loops; a
+// running grid pointer (86) or corner pointer (121); a local cell pointer
+// with direct corner indexing (worse); and from earlier sessions
+// `&grid[row][column]`, `grid[row * 5 + column]` (64), `cell + cellRow`
+// (137) and slot 14's flat `first = cell * 6` form (121).
 // Behaviour audit 2026-11-11 (linked game): every case's coordinates, normal
-// stores and constants, the diffuse/tu/tv grid stores, the six vertices of each
-// cell (corner 0/1/6/0/6/5 with their tu/tv) and the 25 face points agree with
-// retail; nothing writes `reserved` or the grid's specular in either. The low
-// linked score is the shape described above.
+// stores and constants, the diffuse/tu/tv grid stores, the six vertices of
+// each cell (corner 0/1/6/0/6/5 with their tu/tv) and the 25 face points agree
+// with retail; nothing writes `reserved` or the grid's specular in either.
 //
-// 0x0043e0b0 (352 bytes): the texture-coordinate arithmetic matches once the
-// low value is stored before the high one is computed. Retail keeps a row
-// pointer (+0x300 per row) and ends the face loop on it; VC6 here folds the
-// row into a single cell pointer (index, pointer, 3-D cast and explicit row
-// pointer forms all fold, or keep the face counter). Also tried: a rowStart
-// index, a 4-D array cast, a loop bounded by the row pointer and a
-// post-incremented vertex pointer (39 of 352 at best). Session 10 also
-// tried slot 14's flat form (cell = face * 16 + row * 4 + column, first =
-// cell * 6 on the global array), a per-row first-vertex index, the cell
-// index in the innermost loop, a down-counting column loop, rows stepped
-// by 4 cells, a byte-offset cell address and a column-offset cell pointer:
-// all compile to the same 30 of 352 (the row reset still folds away).
+// 0x0043e0b0 matched with the same per-face running cell index and is in
+// src/reconstructed/CubeDraw.cpp.
 
 #include <string.h>
 
@@ -49,7 +50,6 @@
 #include "../../src/reconstructed/Quantize.h"
 #include "../../src/reconstructed/RenderTarget.h"
 #include "../../src/reconstructed/TextureMap.h"
-#include "../../src/reconstructed/Tgafile.h"
 
 // CubeDraw.cpp's tables (same names and addresses); one storage shared with CubeDraw.cpp.
 extern Vector3 s_viewPoints[25];
@@ -61,150 +61,99 @@ extern UnknownCubeTextureMapping s_cellMappings[6][16];
 // 0x0043dc60
 int DrawableCube::BuildFaceGeometry()
 {
-    UnknownCubeVertex grid[5][5];
+    UnknownCubeVertex grid[25];
     for (int face = 0; face < 6; face++) {
+        int point = 0;
         for (int row = 0; row < 5; row++) {
-            UnknownCubeVertex* point = grid[row];
             for (int column = 0; column < 5; column++, point++) {
                 switch (face) {
                 case 0:
+                    grid[point].position.x = (float)(column * 128 - 256) * 100.0f;
+                    grid[point].position.y = (float)(256 - row * 128) * 100.0f;
+                    grid[point].position.z = 25600.0f;
                     s_faceNormals[0].x = s_faceNormals[0].y = 0.0f;
                     s_faceNormals[0].z = -1.0f;
-                    point->position.x = (float)(column * 128 - 256) * 100.0f;
-                    point->position.y = (float)(256 - row * 128) * 100.0f;
-                    point->position.z = 25600.0f;
                     break;
                 case 1:
-                    point->position.x = -25600.0f;
+                    grid[point].position.x = -25600.0f;
+                    grid[point].position.y = (float)(256 - row * 128) * 100.0f;
+                    grid[point].position.z = (float)(column * 128 - 256) * 100.0f;
                     s_faceNormals[1].z = s_faceNormals[1].y = 0.0f;
                     s_faceNormals[1].x = 1.0f;
-                    point->position.y = (float)(256 - row * 128) * 100.0f;
-                    point->position.z = (float)(column * 128 - 256) * 100.0f;
                     break;
                 case 2:
+                    grid[point].position.x = (float)(256 - column * 128) * 100.0f;
+                    grid[point].position.y = (float)(256 - row * 128) * 100.0f;
+                    grid[point].position.z = -25600.0f;
                     s_faceNormals[2].x = s_faceNormals[2].y = 0.0f;
                     s_faceNormals[2].z = 1.0f;
-                    point->position.x = (float)(256 - column * 128) * 100.0f;
-                    point->position.y = (float)(256 - row * 128) * 100.0f;
-                    point->position.z = -25600.0f;
                     break;
                 case 3:
-                    point->position.x = 25600.0f;
+                    grid[point].position.x = 25600.0f;
+                    grid[point].position.y = (float)(256 - row * 128) * 100.0f;
+                    grid[point].position.z = (float)(256 - column * 128) * 100.0f;
                     s_faceNormals[3].z = s_faceNormals[3].y = 0.0f;
                     s_faceNormals[3].x = -1.0f;
-                    point->position.y = (float)(256 - row * 128) * 100.0f;
-                    point->position.z = (float)(256 - column * 128) * 100.0f;
                     break;
                 case 4:
+                    grid[point].position.x = (float)(column * 128 - 256) * 100.0f;
+                    grid[point].position.y = 25600.0f;
+                    grid[point].position.z = (float)(row * 128 - 256) * 100.0f;
                     s_faceNormals[4].x = s_faceNormals[4].z = 0.0f;
                     s_faceNormals[4].y = -1.0f;
-                    point->position.x = (float)(column * 128 - 256) * 100.0f;
-                    point->position.y = 25600.0f;
-                    point->position.z = (float)(row * 128 - 256) * 100.0f;
                     break;
                 case 5:
+                    grid[point].position.x = (float)(column * 128 - 256) * 100.0f;
+                    grid[point].position.y = -25600.0f;
+                    grid[point].position.z = (float)(256 - row * 128) * 100.0f;
                     s_faceNormals[5].x = s_faceNormals[5].z = 0.0f;
                     s_faceNormals[5].y = 1.0f;
-                    point->position.x = (float)(column * 128 - 256) * 100.0f;
-                    point->position.y = -25600.0f;
-                    point->position.z = (float)(256 - row * 128) * 100.0f;
                     break;
                 }
-                point->diffuse = 0xffffffff;
-                point->tu = (float)column * 0.25f;
-                point->tv = (float)row * 0.25f;
+                grid[point].diffuse = 0xffffffff;
+                grid[point].tu = (float)column * 0.25f;
+                grid[point].tv = (float)row * 0.25f;
             }
         }
-        for (int cellRow = 0; cellRow < 4; cellRow++) {
-            for (int cellColumn = 0; cellColumn < 4; cellColumn++) {
-                UnknownCubeVertex* cell = s_cellVertices[face][cellRow * 4 + cellColumn];
-                UnknownCubeVertex* corner = &grid[cellRow][cellColumn];
-                cell[0].position = corner[0].position;
-                cell[0].diffuse = 0xffffffff;
-                cell[0].specular = 0;
-                cell[0].tu = 0.0f;
-                cell[0].tv = 0.0f;
-                cell[1].position = corner[1].position;
-                cell[1].diffuse = 0xffffffff;
-                cell[1].specular = 0;
-                cell[1].tu = 1.0f;
-                cell[1].tv = 0.0f;
-                cell[2].position = corner[6].position;
-                cell[2].diffuse = 0xffffffff;
-                cell[2].specular = 0;
-                cell[2].tu = 1.0f;
-                cell[2].tv = 1.0f;
-                cell[3].position = corner[0].position;
-                cell[3].diffuse = 0xffffffff;
-                cell[3].specular = 0;
-                cell[3].tu = 0.0f;
-                cell[3].tv = 0.0f;
-                cell[4].position = corner[6].position;
-                cell[4].diffuse = 0xffffffff;
-                cell[4].specular = 0;
-                cell[4].tu = 1.0f;
-                cell[4].tv = 1.0f;
-                cell[5].position = corner[5].position;
-                cell[5].diffuse = 0xffffffff;
-                cell[5].specular = 0;
-                cell[5].tu = 0.0f;
-                cell[5].tv = 1.0f;
+        int first = 0;
+        int index = 0;
+        for (int cellRow = 0; cellRow < 4; cellRow++, first++) {
+            for (int cellColumn = 0; cellColumn < 4; cellColumn++, first++, index++) {
+                UnknownCubeVertex* corner = &grid[first];
+                s_cellVertices[face][index][0].position = corner[0].position;
+                s_cellVertices[face][index][0].diffuse = 0xffffffff;
+                s_cellVertices[face][index][0].specular = 0;
+                s_cellVertices[face][index][0].tu = 0.0f;
+                s_cellVertices[face][index][0].tv = 0.0f;
+                s_cellVertices[face][index][1].position = corner[1].position;
+                s_cellVertices[face][index][1].diffuse = 0xffffffff;
+                s_cellVertices[face][index][1].specular = 0;
+                s_cellVertices[face][index][1].tu = 1.0f;
+                s_cellVertices[face][index][1].tv = 0.0f;
+                s_cellVertices[face][index][2].position = corner[6].position;
+                s_cellVertices[face][index][2].diffuse = 0xffffffff;
+                s_cellVertices[face][index][2].specular = 0;
+                s_cellVertices[face][index][2].tu = 1.0f;
+                s_cellVertices[face][index][2].tv = 1.0f;
+                s_cellVertices[face][index][3].position = corner[0].position;
+                s_cellVertices[face][index][3].diffuse = 0xffffffff;
+                s_cellVertices[face][index][3].specular = 0;
+                s_cellVertices[face][index][3].tu = 0.0f;
+                s_cellVertices[face][index][3].tv = 0.0f;
+                s_cellVertices[face][index][4].position = corner[6].position;
+                s_cellVertices[face][index][4].diffuse = 0xffffffff;
+                s_cellVertices[face][index][4].specular = 0;
+                s_cellVertices[face][index][4].tu = 1.0f;
+                s_cellVertices[face][index][4].tv = 1.0f;
+                s_cellVertices[face][index][5].position = corner[5].position;
+                s_cellVertices[face][index][5].diffuse = 0xffffffff;
+                s_cellVertices[face][index][5].specular = 0;
+                s_cellVertices[face][index][5].tu = 0.0f;
+                s_cellVertices[face][index][5].tv = 1.0f;
             }
         }
         for (int i = 0; i < 25; i++)
-            s_facePoints[face][i] = grid[0][i].position;
-    }
-    return 1;
-}
-
-// 0x0043e0b0
-int DrawableCube::LoadTexturesAndCoords(Cube* cube, UnknownCubeTextureContext* context)
-{
-    cubeObject = cube;
-    cube->LoadMissingTextures((UnknownTexturePalette*)loadPalette, context);
-    if (HasMipLevels(cubeObject->fileFormat)) {
-        for (int face = 0; face < 6; face++) {
-            for (int row = 0; row < 4; row++) {
-                UnknownCubeVertex* cell = s_cellVertices[face][row * 4];
-                for (int column = 0; column < 4; column++, cell += 6) {
-                    cell[0].tu = 0.03125f;
-                    cell[0].tv = 0.03125f;
-                    cell[1].tu = 0.96875f;
-                    cell[1].tv = 0.03125f;
-                    cell[2].tu = 0.96875f;
-                    cell[2].tv = 0.96875f;
-                    cell[3].tu = 0.03125f;
-                    cell[3].tv = 0.03125f;
-                    cell[4].tu = 0.96875f;
-                    cell[4].tv = 0.96875f;
-                    cell[5].tu = 0.03125f;
-                    cell[5].tv = 0.96875f;
-                }
-            }
-        }
-        return 1;
-    }
-    for (int face = 0; face < 6; face++) {
-        for (int row = 0; row < 4; row++) {
-            UnknownCubeVertex* cell = s_cellVertices[face][row * 4];
-            for (int column = 0; column < 4; column++, cell += 6) {
-                int size = DecodeTextureSize(cubeObject->faces[face].sizeCodes, column, row);
-                float low = 1.0f / (float)size;
-                cell[0].tu = low;
-                cell[0].tv = low;
-                float high = 1.0f - low;
-                cell[1].tu = high;
-                cell[1].tv = low;
-                cell[2].tu = high;
-                cell[2].tv = high;
-                cell[3].tu = low;
-                cell[3].tv = low;
-                cell[4].tu = high;
-                cell[4].tv = high;
-                cell[5].tu = low;
-                cell[5].tv = high;
-            }
-        }
+            s_facePoints[face][i] = grid[i].position;
     }
     return 1;
 }

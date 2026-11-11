@@ -489,7 +489,7 @@
     {
       "path": "samples/render/CubeDrawNearMisses.cpp",
       "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines DrawableCube::BuildFaceGeometry, DrawableCube::LoadTexturesAndCoords. Behavior unverified against retail; bytes nonexact.",
+      "reason": "Near-miss body admitted so the source build can link and run; defines DrawableCube::BuildFaceGeometry. Behavior unverified against retail; bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
     },
     {

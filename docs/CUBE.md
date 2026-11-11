@@ -52,8 +52,14 @@ Exact:
 
 Near misses:
 - `samples/render/CubeDrawNearMisses.cpp`: the geometry builder
-  `0x0043dc60` and the texture coordinates `0x0043e0b0`. They differ in
-  register use, strength reduction and constant materialisation.
+  `0x0043dc60`, 1100 of 1104 bytes; two column-loop spills are stored in
+  the other order.
+
+The texture coordinates `0x0043e0b0` match in CubeDraw.cpp. Both functions
+walk the cells with a running index that is not reset per row
+(`s_cellVertices[face][index][k]`), which gives retail's row-exit pointer;
+the geometry builder also keeps a running grid index and a separate corner
+index.
 
 ## Function names
 

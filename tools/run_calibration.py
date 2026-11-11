@@ -11101,6 +11101,15 @@ CASES = [
         'reason': 'cubedraw.cpp __FILE__ 0x5688cc lines 0x5f/0x6d',
     },
     {
+        'name': 'cubedraw.cpp DrawableCube 0x43e0b0 texture coordinates',
+        'bindings': 'src/reconstructed/CubeDraw.bindings.json',
+        'source': 'src/reconstructed/CubeDraw.cpp',
+        'symbol': '?LoadTexturesAndCoords@DrawableCube@@QAEHPAVCube@@PAUUnknownCubeTextureContext@@@Z',
+        'target_va': '0x0043e0b0',
+        'target_size': 352,
+        'reason': 'called by the 0x43d980 loader (0x43dc1d) after 0x43dc60; between it and 0x43e210 in cubedraw.cpp',
+    },
+    {
         'name': 'cubedraw.cpp DrawableCube 0x43e210 texture use',
         'bindings': 'src/reconstructed/CubeDraw.bindings.json',
         'source': 'src/reconstructed/CubeDraw.cpp',

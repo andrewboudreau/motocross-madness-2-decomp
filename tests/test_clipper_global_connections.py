@@ -187,7 +187,9 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
             # QueryGround's emulation-found normal/height repairs drop one Terrain relocation.
             # The D3DIMSoultreeShadow slot 30 frame pragma takes ebp, so the shadow-point
             # pointer is reloaded at two more sites, as retail does.
-            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4725)
+            # LoadTexturesAndCoords' promotion moves its COMDAT from the sample to CubeDraw.cpp
+            # and the rewritten BuildFaceGeometry differs: three more relocations.
+            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4728)
         print('Clipper global:', strict, 'strict checks; 15 whole objects; 46 retail pointer loads; storage remains unresolved')
 
 

@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 112, c 79, total 193. The three class (a) functions of the
+Counts: a 2, b 111, c 79, total 192. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -146,6 +146,12 @@ nextLapGate) reproduces retail; the earlier attempts kept them next to the copy.
 move takes Vehicle's constructor `0x005257a0` from 693 to 734/745. When a constructor
 hoists the wrong stores into a copy, move retail's pair to the position VC6 picks from.
 
+DrawableCube::LoadTexturesAndCoords `0x0043e0b0` (class c, 30/352) is exact too, in
+CubeDraw.cpp: a per-face running cell index (`int index = 0` per face, `index++` with
+the column) and direct `s_cellVertices[face][index][k]` stores give retail's row-exit
+pointer; every cell-pointer form folded the row away. The same counters take
+BuildFaceGeometry `0x0043dc60` from 121/1064 to 1100/1104.
+
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
 | audio/PCAudio | `0x004bdc00` | 91/483 | b | retail extent 483; `while (1)` gives retail's top-tested queue loop (155 insns); left: retail ebp=audio, ebx=&cs then loaded, edi=&sound cs, ready/bytes spilled (frame 0xc vs 8) |
@@ -267,8 +273,7 @@ hoists the wrong stores into a copy, move retail's pair to the position VC6 pick
 | race/Wrecker | `0x005329e0` | 1200/1312 (inside Wrecker.cpp) | a | every instruction equal; slot order only (retail keeps `push` nearest esp, then the y/x extent copies, `p`) |
 | render/BackgroundImage | `0x004049d0` | 108/606 (masked) | c | block layout as retail; VC6 caches 0 in edi (`xor edi, edi`, `mov [esp + N], edi`) where retail stores immediates, which moves the region loop's registers; two counted zero stores (`surface`'s home, `copyDcNext`) with `edi` already pushed meet the cache threshold ([VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md)) |
 | render/CacheTexture | `0x005102d0` | 330/558 (masked) | b | 5 differing instructions (569 bytes; the extra spill shifts the rest); both failures as one `if (result) return 0;` after the loops place the shared `return 0` after the second loop as retail does (`jle; jmp top`); VC6 keeps `result` in a frame slot and tests it again at the loop's normal exit |
-| render/CubeDraw | `0x0043dc60` | 121/1064 | b | 53 code diffs: `xor ebp, ebp` vs `xor edx, edx`; `mov [esp + N], ebp ; mov edi, 0x100 ; o~` vs `mov [esp + N], edx ; mov ebx, 0x100 ; o~`; slots differ |
-| render/CubeDraw | `0x0043e0b0` | 30/352 | c | 22 code diffs: retail adds `push ebx`; retail adds `mov ecx, [esp + N]` |
+| render/CubeDraw | `0x0043dc60` | 1100/1104 | c | 2 code diffs: retail spills the `256 - column * 128` induction value before `column * 128 - 256` at +0x228 |
 | render/D3DIMSoulTree | `0x00440f30` | 714/7851 | b | DrawCurrentLod: all relocations bound and linked from the same body (Group5 bring-up, Vector3Call aliased to Vec3Call); every float-constant operation in retail's order (mode 2 half as two float locals, the scroll step added after lastScrollPosition is stored, mode 3 light position copied by value); 317 differing insns in the linked metric (was 342); frame (0x9b4 vs 0x9e8), `this` in ebx for esi, x87-held vector temporaries (retail pops 21 stack values, here 11) and register allocation left |
 | render/D3DIMSoulTree | `0x00443aa0` | 799/832 | c | 11 code diffs: retail lacks `fmul [eax + 0x10] ; fld [esp + N]`; retail lacks `faddp st(1)` |
 | render/DebugOverlay | `0x00447a00` | 460/999 | b | body matches; VC6 copies the epilogue into the failure and success returns (retail: one shared epilogue) |

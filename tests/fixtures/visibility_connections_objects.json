@@ -9,9 +9,9 @@
   },
   "objects": {
     "src/reconstructed/CubeDraw.cpp": {
-      "sections": 47,
-      "relocations": 174,
-      "sha256": "6d684b2b13b985a3cd681841a776ec0ba314c17afd536829982690a130af62e9"
+      "sections": 49,
+      "relocations": 183,
+      "sha256": "a54e67df46af05f2016112f6302e6fc4b6f419bf9a60aa2c146d3ec821ffded5"
     },
     "src/reconstructed/FollowCamera.cpp": {
       "sections": 98,
@@ -24,9 +24,9 @@
       "sha256": "e567b73a97f37d256a57ab75190b86ce987243026df0be23f6ccf66bf324ef67"
     },
     "samples/render/CubeDrawNearMisses.cpp": {
-      "sections": 7,
-      "relocations": 47,
-      "sha256": "3b747d1c8b05975861366dbdf9f4ffc878f0f64258ea5838fa115683e6c5c9a3"
+      "sections": 5,
+      "relocations": 41,
+      "sha256": "5871c6589c88aeb178cc85cc1c1053b87176a26f5a4438f43f7f4d5cade30b5c"
     },
     "samples/camera/FollowCameraNearMisses.cpp": {
       "sections": 66,
