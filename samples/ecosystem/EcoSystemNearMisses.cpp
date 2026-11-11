@@ -73,6 +73,17 @@
 //               15, also 457: the discarded RadiusForParameter call (or
 //               both discarded calls) as a bare statement instead of a
 //               named local, and `i` declared in the for statement
+//               Session 18: the toggle is per function, not per TU
+//               (one to three variable-index byte stores in a function
+//               placed before this one: 457). A variable-index byte read
+//               that is used (`if (name[length]) return;`) flips the
+//               order like a store; discarded reads (`(void)name[length]`,
+//               a dead char local, `if (0) name[length] = 1;`) are
+//               optimized away and stay 457, as do an `unsigned char`/
+//               `signed char` cast on the store, an unsigned `length`, a
+//               dead `name[length] = 1;` before the store and an
+//               end-pointer spelling. `name[0x103] = 0;` after the
+//               extension copy (73-129) and memcpy for strncpy (41) lose.
 //   0x00459ce0  the frame slots: same size, the locals and temporaries
 //               are assigned in a different order (323/3300); retail
 //               keeps the first sample's TGA in ebx and reloads
