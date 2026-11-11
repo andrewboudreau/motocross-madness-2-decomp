@@ -1,19 +1,18 @@
 // Group 3 bring-up: providers that BikeAI.cpp's KrustyBike steps (0x00413200, 0x00414370 in
 // Group3_KrustyBikeAI.cpp) and the look-ahead simulation 0x0040eca0 call through tier-3
-// views (KbRaceSub, KbWheel, BikeQ, KrustyBike::Fn_0048D780) that no src/ file defines.
+// views (KbRaceSub, KbWheel, BikeQ) that no src/ file defines.  KrustyBike::Fn_0048D780 is
+// linked from samples/physics/bikeai/KrustyBikeTrickPick.cpp.
 //
 // Status: best-guess-unreviewed.  Each body was read from the retail disassembly at the
 // noted address; byte matching is not attempted here.  The view methods forward to the
 // canonical provider for the same retail entry when one is already built (Track.cpp,
 // soultree.cpp); otherwise the retail body is written out against the view's offsets.
 #include <float.h>
-#include <stdlib.h>
 
 #include "math/Math3D.h"
 #include "core/SoultreeObject.h"
 #include "vehicle/KrustyBike.h"
 #include "Track.h"
-#include "X87FloatToInt.h"
 
 // ---------------------------------------------------------------------------------------
 // KbRaceSub: the race's Track (BikeRace+0x48).  Every method is the Track entry of the same
@@ -202,90 +201,4 @@ void BikeQ::ClampAndStep(float maxDelta, float dt)
         s->sceneNode->Rotate(s->rotationAxis, s->angle);
     }
     G3ShockStepTail(s, maxDelta, dt);
-}
-
-// ---------------------------------------------------------------------------------------
-// KrustyBike::Fn_0048D780 (0x0048d780, ret 0xc): picks a trick that fits in `t` seconds.
-// The trick table 0x0056cca0 holds 12 rows of 0x50 bytes in decreasing clip length:
-// {minimum time, all count, first-group count, second-group count, 16 trick ids}.  The first
-// row whose time is below t is used; `group` 0 draws from all its tricks, 1 from the first
-// group, 2 from the second group (the first when the second is empty).  An AI bike also
-// sets its trick hold time from the slack left after the clip (0x0056cc60 clip lengths);
-// it fails when that slack is under 0.1 s.  Returns 1 with *out the trick id, else 0.
-// Audited against retail for the linked game (2026-11-11): the row search (t > minTime), the
-// group switch, the index scaling, the aiKind byte, the slack test and the hold-time product
-// agree, and both tables below equal retail's 0x0056cc60..0x0056d060 bytes.  The size gap
-// (173 built vs 97 retail instructions) is the X87FloatToInt expansion and retail's ebp frame.
-// ---------------------------------------------------------------------------------------
-struct G3TrickRow {
-    float minTime;
-    int allCount;
-    int firstCount;
-    int secondCount;
-    int tricks[16];
-};
-
-static const G3TrickRow s_g3AiTrickRows[12] = {   // 0x0056cca0
-    {2.4000001f, 16, 8, 8, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}},
-    {2.3333001f, 15, 7, 8, {0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 0}},
-    {2.2665999f, 12, 5, 7, {0, 1, 2, 4, 5, 8, 9, 10, 12, 13, 14, 15, 0, 0, 0, 0}},
-    {2.1333001f, 11, 4, 7, {0, 1, 4, 5, 8, 9, 10, 12, 13, 14, 15, 0, 0, 0, 0, 0}},
-    {1.9375f, 8, 4, 4, {0, 1, 4, 5, 8, 9, 10, 14, 15, 0, 0, 0, 0, 0, 0, 0}},
-    {1.8f, 9, 4, 5, {0, 1, 4, 5, 8, 9, 10, 15, 0, 0, 0, 0, 0, 0, 0, 0}},
-    {1.7647001f, 7, 4, 3, {0, 1, 4, 5, 8, 10, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
-    {1.7222000f, 6, 4, 2, {0, 1, 4, 5, 8, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
-    {1.6667000f, 4, 4, 0, {0, 1, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
-    {1.6111000f, 3, 3, 0, {0, 1, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
-    {1.5f, 2, 2, 0, {1, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
-    {1.3f, 1, 1, 0, {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
-};
-
-static const float s_g3AiTrickLength[16] = {      // 0x0056cc60 clip lengths (s)
-    1.6111f, 1.3f, 2.2666f, 2.3333f, 1.6667f, 1.5f, 2.3333f, 2.4f,
-    1.7222f, 1.8f, 1.7647f, 2.3333f, 2.1333f, 2.1333f, 1.9375f, 1.7222f,
-};
-
-int KrustyBike::Fn_0048D780(int* out, float t, int group)
-{
-    int row;
-    for (row = 0; row < 12; row++) {
-        if (t > s_g3AiTrickRows[row].minTime)
-            break;
-    }
-    if (row >= 12)
-        return 0;
-    const G3TrickRow& r = s_g3AiTrickRows[row];
-    int first = 0;
-    int count;
-    switch (group) {
-    case 0:
-        count = r.allCount;
-        break;
-    case 1:
-        count = r.firstCount;
-        break;
-    case 2:
-        if (r.secondCount) {
-            first = r.firstCount;
-            count = r.secondCount;
-        } else {
-            count = r.firstCount;
-        }
-        break;
-    default:
-        return 0;
-    }
-    // Retail rounds rand/32768 * count - 0.5 with its fistp helper (0x0048d834): floor()
-    // of the product, except that an exact integer product m rounds to the even of m - 1
-    // and m (truncation picked m there).
-    int index = X87FloatToInt(rand() * (1.0f / 32768.0f) * (float)count - 0.5f);
-    int trick = r.tricks[index + first];
-    *out = trick;
-    if (aiKind) {
-        float slack = t - s_g3AiTrickLength[trick];
-        if (slack < 0.1f)
-            return 0;
-        aiTrickHoldLeft = rand() * (1.0f / 32768.0f) * slack * 0.8f;
-    }
-    return 1;
 }

@@ -394,7 +394,7 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 | `0x00446f40` | 6 | `samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp` (`/QIfist`) | `FistpFloatToInt` (`samples/common/FistpFloatToInt.h`) |
 | `0x00483d40` | 4 | `samples/render/GridNodeNearMisses.cpp` (`GridMidCell`) | `X87FloatToInt`; its 4 other casts are retail `__ftol` calls |
 | `0x0048d1e0` | 2 | `src/bringup/Group4_ScoreBoard.cpp` | `X87FloatToInt` |
-| `0x0048d780` | 1 | `src/bringup/Group3_KrustyBikeAISupport.cpp` | `X87FloatToInt` |
+| `0x0048d780` | 1 | `samples/physics/bikeai/KrustyBikeTrickPick.cpp` (`/QIfist`) | `FistpFloatToInt` |
 | `0x0048e3e0` | 3 | `src/krusty2/vehicle/KrustyBike.cpp` (`SelectRiderPose`) | `KbFloatToInt` |
 | `0x0049e4a0`, `0x0049e6b0`, `0x0049f1c0`, `0x0049f8d0` | 3, 9, 9, 9 | `src/bringup/Group4_GridLighting.cpp` | `X87FloatToInt`; the light colours stay casts, as retail's `__ftol` |
 | `0x004a8bf0`, `0x004a8c50` | 1, 2 | `samples/physics/motion/CharacterMotionStart.cpp`, `CharacterMotionBlend.cpp` | `FloatToInt` (`CharacterMotionFloatToInt.h`) |
@@ -406,7 +406,8 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 | `0x00507c10` | 2 | `src/krusty2/broadphase/Terrain.cpp` (`QueryGround`; the `QueryGround` views forward to it) | `FloatToInt` |
 | `0x00509aa0` | 6 | `samples/physics/shadow/TerrainShadow.cpp` (`/QIfist`) | `FistpFloatToInt` |
 | `0x00518f30` | 1 | `src/reconstructed/TrackOverlay.cpp` (`NameOverlay::Tick`) | `X87FloatToInt` |
-| `0x0051af00`, `0x0051b070` | 2, 1 | `src/bringup/Group4_Overlay.cpp` | `X87FloatToInt` |
+| `0x0051af00` | 2 | `samples/track/DropTextOverlaySetup.cpp` (`/QIfist`) | `FistpFloatToInt` |
+| `0x0051b070` | 1 | `src/bringup/Group4_Overlay.cpp` | `X87FloatToInt` |
 | `0x0052f570` | 6 | `src/bringup/Group4_Visibility.cpp` and `Group2_GridVisibilityTestBox.cpp` (`D3DIMShadowClipper::TestBox` forwards) | `X87FloatToInt` |
 
 `BikeFloatToInt` and `KbFloatToInt` correct an

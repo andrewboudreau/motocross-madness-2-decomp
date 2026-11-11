@@ -582,6 +582,24 @@
       ],
       "reason": "D3DIMSoultreeShadow slots 29 (0x00446c30) and 30 (0x00446f40) replace the Group5_D3DIMSoultreeShadow bring-up stand-ins. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper; the outcode array is sized to the 3000-entry vertex limit. Checked against the retail disassembly, not differentially tested.",
       "evidence": "docs/GAME_BUILD.md#shadow-slot-30-rounding"
+    },
+    {
+      "path": "samples/physics/bikeai/KrustyBikeTrickPick.cpp",
+      "status": "best-guess-unreviewed",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "KrustyBike::Fn_0048D780 0x0048d780 (the AI trick pick) replaces the Group3_KrustyBikeAISupport bring-up copy. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x0048d834; the index stays in [-0.5, 15.5). Checked against the retail disassembly, not differentially tested.",
+      "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
+    },
+    {
+      "path": "samples/track/DropTextOverlaySetup.cpp",
+      "status": "best-guess-unreviewed",
+      "extra_flags": [
+        "/QIfist"
+      ],
+      "reason": "DropTextOverlay::Setup 0x0051af00 replaces the Group4_Overlay bring-up copy (Tick and ChatOverlay::Setup stay there). /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x0051af3e and 0x0051af64; screen coordinates stay in int range. Checked against the retail disassembly, not differentially tested.",
+      "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
     }
   ],
   "includes": [

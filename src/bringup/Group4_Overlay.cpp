@@ -1,7 +1,7 @@
 // Bring-up definitions (best-guess-unreviewed) for TrackOverlay.cpp methods
 // the linked game references but src/reconstructed/TrackOverlay.cpp does not
-// provide yet:
-//   0x0051af00 DropTextOverlay::Setup  (decoded from retail, written here)
+// provide yet (DropTextOverlay::Setup 0x0051af00 is linked from
+// samples/track/DropTextOverlaySetup.cpp):
 //   0x0051b070 DropTextOverlay::Tick   (vtable 0x005586f0 slot 10; decoded)
 //   0x0051cf80 ChatOverlay::Setup      (taken unchanged from the near miss in
 //                                       samples/track/TrackOverlayNearMisses.cpp,
@@ -55,61 +55,9 @@ extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* t
 // TrackOverlay.cpp statics: the radar zoom (0x0057513c) and the ChatOverlay
 
 // Retail rounds these screen coordinates with a project `fld; fistp`
-// helper applied to (value - 0.5) (0x0051af3e, 0x0051af64, 0x0051b0c3):
+// helper applied to (value - 0.5) (0x0051b0c3 here):
 // floor(value) except that exact integers round to the even neighbour.
 // X87FloatToInt reproduces it.
-
-// 0x0051af00 (ret 0x18): GameObject slot 8 (SetRenderContext) on `value`;
-// keeps dropSeconds; places the text given on a 640x480 screen; copies the
-// text; creates the 28-high font (the localized tooltip face, else bold
-// italic "Arial"). `textures` is not read. Returns this, or 0 after slot 2
-// when the font fails.
-// Audited against retail for the linked game (2026-11-11): the call, every
-// field offset (+0x2c..+0x48), both scale constants (1/640, 1/480) and their
-// order, the LOGFONT bytes, the face and weight choice and the failure path
-// agree. The size gap (249 built vs 126 retail instructions) is the two
-// X87FloatToInt expansions, where retail has a 4-instruction inline-asm fistp,
-// and retail's ebp frame; there is no behavioural difference.
-DropTextOverlay* DropTextOverlay::Setup(void* value, TextureMapManager* textures, float dropSeconds,
-                                        int x, int y, const char* text)
-{
-    UnknownLogFont logFont;
-    GameObject::SetRenderContext(value);
-    this->dropSeconds = dropSeconds;
-    PCRenderTarget* target = (PCRenderTarget*)renderContext;
-    textX = X87FloatToInt(target->targetWidth * (1.0f / 640.0f) * x - 0.5f);
-    textYOffset = X87FloatToInt(target->targetHeight * (1.0f / 480.0f) * y - 0.5f);
-    textY = textYOffset;
-    strcpy(caption, text);
-    logFont.lfHeight = 28;
-    logFont.lfCharSet = 1;
-    logFont.lfItalic = 1;
-    logFont.lfWidth = 0;
-    logFont.lfEscapement = 0;
-    logFont.lfOrientation = 0;
-    logFont.lfUnderline = 0;
-    logFont.lfStrikeOut = 0;
-    logFont.lfOutPrecision = 0;
-    logFont.lfClipPrecision = 0;
-    logFont.lfQuality = 2;
-    logFont.lfPitchAndFamily = 2;
-    UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
-    const char* face = gui ? gui->toolTipFontFace : "";
-    if (*face != '\0') {
-        logFont.lfWeight = gui->toolTipBold ? 700 : 500;
-        logFont.lfItalic = (unsigned char)gui->toolTipItalic;
-    } else {
-        logFont.lfWeight = 700;
-        face = "Arial";
-    }
-    strcpy(logFont.lfFaceName, face);
-    textFont = CreateFontIndirectA(&logFont);
-    if (!textFont) {
-        Release();
-        return 0;
-    }
-    return this;
-}
 
 // 0x0051b070 (slot 10, ret 4): runs the base update with the game's frame
 // time (TrackGame +0x2f0, not the argument), then while shown drops the

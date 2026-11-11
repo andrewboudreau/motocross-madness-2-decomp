@@ -957,6 +957,40 @@ mode 3 transform 0x004a1b00, the cull at `<= 0`, the minDepth test, the
 ShadowFillTriangle arguments, vertex store order, the 3000 limit and the loop
 bounds.
 
+## Inline fistp rounding samples
+
+Two more bring-up bodies that rounded with `X87FloatToInt` moved into
+`/QIfist` candidate samples that call `FistpFloatToInt`, as in
+[Shadow slot 30 rounding](#shadow-slot-30-rounding):
+
+| VA | Function | Sample | Before | Now linked |
+|---|---|---|---|---|
+| 0x0048d780 | `KrustyBike::Fn_0048D780` (AI trick pick) | `samples/physics/bikeai/KrustyBikeTrickPick.cpp` | 0.474 | 0.773 |
+| 0x0051af00 | `DropTextOverlay::Setup` | `samples/track/DropTextOverlaySetup.cpp` | 0.501 | 0.624 |
+
+The bodies were removed from `src/bringup/Group3_KrustyBikeAISupport.cpp`
+and `src/bringup/Group4_Overlay.cpp`; `DropTextOverlay::Tick` (0x0051b070)
+stays in the bring-up file, because `dropSeconds` near zero could push its
+drop outside `int`, where the 64-bit store would differ from retail's.
+
+Both were checked against the retail disassembly. The trick pick keeps the
+row search (`t > minTime`), the group switch and second-group fallback, the
+aiKind byte, the `slack < 0.1` failure and the tables at
+0x0056cc60..0x0056d060. Its index lies in [-0.5, 15.5). Named `pick` and
+`hold` locals keep retail's product order (rand times 1/32768 first). As one
+expression, VC6 folds 1/32768 * 0.8 into a single constant, so the old body's
+hold time could differ from retail's in its last bit; that was the only
+behaviour difference found. Setup's offsets, scale constants, LOGFONT bytes,
+face and weight choice and failure path agree; reading
+`g_TrackGame->ui->gui` at each use follows retail's reload. Neither body was
+differentially tested.
+
+Ruled out (masked): `rand() / 32768.0f` and an inline `Random01` helper
+compile like the single expression (0.757); a `gui` local in Setup scores
+0.613. The rest of each gap is retail's ebp frame, its shared failure
+epilogue and the inline helper's pointer spill, which come from the inline
+asm.
+
 ## Source-built run status
 
 The source-built `mcm2.exe` (391/391 translation units, zero unresolved

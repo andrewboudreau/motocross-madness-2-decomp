@@ -112,7 +112,7 @@ public:
     // 0x00413200 (in BikeAI.cpp; called by slot 49 for AI bikes): one physics step of the
     // two-point look-ahead model 0x0040eca0 instead of the Vehicle step; returns 1.
     int Fn_00413200(float dt);
-    // 0x0048d780 (inline-asm rounding, not reconstructed): called by 0x00414370.
+    // 0x0048d780 (samples/physics/bikeai/KrustyBikeTrickPick.cpp): called by 0x00414370.
     int Fn_0048D780(int* out, float t, int a);
     // 0x00493660 (8.5 KB) and 0x00492ad0: per-frame steps GameObject slot 10 runs (ret 8;
     // tier 3 roles: the local/replayed update and the network update).
