@@ -33,7 +33,10 @@ The default profile is `vc6_o2_mt`. A reviewed candidate may explicitly request
 `/QIfist` through `extra_flags`. Two candidates use it: the motion-start
 conversion helper, which preserves the incoming rounding mode on a
 floating-point trap, and the ProjectedShadow near-miss file
-([below](#projectedshadow-near-miss-bodies)). Every actual per-source command is recorded in the report. Other source
+([below](#projectedshadow-near-miss-bodies)), plus the fistp samples further
+down. Bring-up units under `src/bringup/` may take `/QIfist` (and only that
+flag) through a `bringup_flags` entry with a reason; see
+[Bring-up fistp units](#bring-up-fistp-units). Every actual per-source command is recorded in the report. Other source
 files retain the default flags. Objects are ordered by source basename,
 then path. This is a reproducible working order, not proof that reconstructed
 files recover original translation units. Ordinary import libraries supply
@@ -969,9 +972,10 @@ Two more bring-up bodies that rounded with `X87FloatToInt` moved into
 | 0x0051af00 | `DropTextOverlay::Setup` | `samples/track/DropTextOverlaySetup.cpp` | 0.501 | 0.624 |
 
 The bodies were removed from `src/bringup/Group3_KrustyBikeAISupport.cpp`
-and `src/bringup/Group4_Overlay.cpp`; `DropTextOverlay::Tick` (0x0051b070)
+and `src/bringup/Group4_Overlay.cpp`. `DropTextOverlay::Tick` (0x0051b070)
 stays in the bring-up file, because `dropSeconds` near zero could push its
-drop outside `int`, where the 64-bit store would differ from retail's.
+drop outside `int`, where the 64-bit store would differ from retail's. It now
+rounds through the range-checked helper ([below](#bring-up-fistp-units)).
 
 Both were checked against the retail disassembly. The trick pick keeps the
 row search (`t > minTime`), the group switch and second-group fallback, the
@@ -990,6 +994,83 @@ compile like the single expression (0.757); a `gui` local in Setup scores
 0.613. The rest of each gap is retail's ebp frame, its shared failure
 epilogue and the inline helper's pointer spill, which come from the inline
 asm.
+
+## Bring-up fistp units
+
+Bring-up bodies that are not candidate samples round through
+`FistpFloatToInt` too. Their units are compiled with `/QIfist` through
+`bringup_flags` in `config/game_build.json`. Each entry names one existing
+`src/bringup/*.cpp` file, gives only `/QIfist`, and has a reason;
+`tools/build_game.py` rejects anything else. Bring-up units are compiled only
+by the game build (calibration and the physics runner do not see them), so
+the flag changes no scored calibration object. `src/bringup/X87FloatToInt.h`
+stays for the canonical and sample callers listed below.
+
+`/QIfist` applies to a whole translation unit, so each flagged unit was
+compiled without the flag and its `__ftol` calls were listed. In the flagged
+units, every `__ftol` call comes from a fistp site. Retail-truncating casts
+were moved out, not converted:
+
+- `Group4_GridLighting.cpp` light colours (`(int)(colour * 255)`, retail
+  `__ftol` at 0x0049e7b1 and the other worker sites) now live in
+  `Group4_GridLightColor.cpp`, which is compiled without the flag. They were
+  already called out of line before the split.
+- `Character::Method_0x004a9050` moved from `Group3_KrustyBike.cpp` to
+  `Group3_CharacterPoseBlend.cpp`. `Group3_KrustyBike.cpp` keeps the 15 and 3
+  `__ftol` truncations of 0x00492ad0 and 0x00493660, which retail also makes.
+
+`/QIfist` stores 64 bits, so a site is safe when its value stays inside `int`
+or when only its low bits are kept. `FistpFloatToIntChecked` casts to
+`__int64` and stores 0x80000000 (the 32-bit integer indefinite) outside
+`int`. It is used where no range argument holds. The range arguments
+(inference from the data flow) are written in each file's header comment.
+
+| VA | Function | Unit | Helper and range | Before | Now linked |
+|---|---|---|---|---|---|
+| 0x0048d1e0 | `KbScoreBoard::ShowValue` | `Group4_ScoreBoard.cpp` | plain; small scores | 0.485 | 0.615 |
+| 0x0049e4a0 | `GridVertexSink::LightVertices` | `Group4_GridLighting.cpp` | plain; colour bytes times facing values | 0.458 | 0.745 |
+| 0x0049e6b0 | `LightAny` worker | same | same | 0.209 | 0.236 |
+| 0x0049f1c0 | `LightOne` worker | same | same | 0.168 | 0.240 |
+| 0x0049f8d0 | `LightAmbientPlusOne` worker | same | same | 0.206 | 0.213 |
+| 0x004a9050 | `Character::Method_0x004a9050` | `Group3_CharacterPoseBlend.cpp` | plain; frame index | 0.103 | 0.312 |
+| 0x004bac60 | `ParticleManager::Render3D` | `Group1_ParticleRender.cpp` | plain; only the low byte is kept | 0.608 | 0.655 |
+| 0x004eab00 | `Scene::Tick` | `Group4_SceneTick.cpp` | plain; [-0.5, count - 0.5) | 0.637 | 0.686 |
+| 0x00507610 | `Terrain::PrepareGeometry` | `Group3_TerrainPrepareGeometry.cpp` | plain; focal length in pixels | 0.781 | 0.929 |
+| 0x0051b070 | `DropTextOverlay::Tick` | `Group4_Overlay.cpp` | checked; `dropSeconds` may be near zero | 0.315 | 0.607 |
+| 0x0052f570 | `VisibilityClipper::TestBox` | `Group4_Visibility.cpp` | checked; a corner near the eye plane | 0.485 | 0.685 |
+
+Scores are masked linked-body scores. Bound functions come from
+`tools/linked_accuracy.py`. The unbound workers, Render3D, PrepareGeometry
+and DropTextOverlay::Tick were scored the same way against their retail VAs.
+
+The 0x004a9050 gain is mostly from inlining the motion sampling
+(`G3SampleMotion` is now `static inline`, as retail's 677-instruction body
+implies; with the old emulation, inlined, it was 0.269). No other bound score
+changed.
+
+Left alone:
+
+- `NameOverlay::Tick` (0x00518f30) is in canonical `TrackOverlay.cpp`. That
+  file has 18 truncating `__ftol` casts in other functions, and calibration
+  compiles it without `/QIfist`. Its `fadeTime` could be zero, so it would
+  need the checked helper. It keeps `X87FloatToInt`.
+- `GridNode::IntersectSegment` (0x00483d40, `GridNodeNearMisses.cpp`) calls
+  `__ftol` four times next to its four fistp sites, as retail does. The
+  sample would need the rounding moved to another unit, for little gain
+  (0.832). It keeps `X87FloatToInt`.
+- `KrustyBike::SelectRiderPose` (0x0048e3e0) is the one linked body that
+  calls `__ftol` (0x00534a88) where retail does not. The calls come from
+  `KbFloatToInt`'s round-to-nearest emulation in canonical
+  `src/krusty2/vehicle/KrustyBike.cpp`. That unit truncates through `__ftol`
+  in five other functions, as retail does (0x00492670, 0x00495c00,
+  0x00495ff0, InitForceFeedback, UpdateForceFeedback), and calibration
+  compiles it without `/QIfist`. Matching it needs either a split of the
+  canonical unit or a candidate sample, so it was not changed here.
+
+Behaviour: each site now rounds under the current x87 control word, as
+retail's helper does. `X87FloatToInt` read the same mode through `_control87`,
+so results are unchanged for values inside `int`. No site was differentially
+tested.
 
 ## Source-built run status
 

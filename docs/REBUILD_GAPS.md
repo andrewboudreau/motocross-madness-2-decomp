@@ -393,26 +393,28 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 | `0x00406ae0`, `0x0040c000` | 3, 1 | `src/krusty2/vehicle/Bike.cpp` (`SelectRiderPose`, `ComputeSlideAngle`) | `BikeFloatToInt` |
 | `0x00446f40` | 6 | `samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp` (`/QIfist`) | `FistpFloatToInt` (`samples/common/FistpFloatToInt.h`) |
 | `0x00483d40` | 4 | `samples/render/GridNodeNearMisses.cpp` (`GridMidCell`) | `X87FloatToInt`; its 4 other casts are retail `__ftol` calls |
-| `0x0048d1e0` | 2 | `src/bringup/Group4_ScoreBoard.cpp` | `X87FloatToInt` |
+| `0x0048d1e0` | 2 | `src/bringup/Group4_ScoreBoard.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
 | `0x0048d780` | 1 | `samples/physics/bikeai/KrustyBikeTrickPick.cpp` (`/QIfist`) | `FistpFloatToInt` |
 | `0x0048e3e0` | 3 | `src/krusty2/vehicle/KrustyBike.cpp` (`SelectRiderPose`) | `KbFloatToInt` |
-| `0x0049e4a0`, `0x0049e6b0`, `0x0049f1c0`, `0x0049f8d0` | 3, 9, 9, 9 | `src/bringup/Group4_GridLighting.cpp` | `X87FloatToInt`; the light colours stay casts, as retail's `__ftol` |
+| `0x0049e4a0`, `0x0049e6b0`, `0x0049f1c0`, `0x0049f8d0` | 3, 9, 9, 9 | `src/bringup/Group4_GridLighting.cpp` (`/QIfist` bring-up) | `FistpFloatToInt`; the light colours stay truncating casts, as retail's `__ftol`, in `Group4_GridLightColor.cpp` (no `/QIfist`) |
 | `0x004a8bf0`, `0x004a8c50` | 1, 2 | `samples/physics/motion/CharacterMotionStart.cpp`, `CharacterMotionBlend.cpp` | `FloatToInt` (`CharacterMotionFloatToInt.h`) |
-| `0x004a9050` | 4 | `src/bringup/Group3_KrustyBike.cpp` (`G3SampleMotion`) | `X87FloatToInt` |
-| `0x004bac60` | 2 | `src/bringup/Group1_ParticleRender.cpp` | `X87FloatToInt` |
+| `0x004a9050` | 4 | `src/bringup/Group3_CharacterPoseBlend.cpp` (`G3SampleMotion`, `/QIfist` bring-up) | `FistpFloatToInt` |
+| `0x004bac60` | 2 | `src/bringup/Group1_ParticleRender.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
 | `0x004db8c0`, `0x004dc2b0` | 2, 2 | `samples/physics/shadow/ProjectedShadowNearMisses.cpp` (`/QIfist`) | `ProjectedShadowFloatToInt` |
-| `0x004eab00` | 1 | `src/bringup/Group4_SceneTick.cpp` | `X87FloatToInt` |
-| `0x00507610` | 1 | `src/bringup/Group3_TerrainPrepareGeometry.cpp` | `X87FloatToInt` |
+| `0x004eab00` | 1 | `src/bringup/Group4_SceneTick.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
+| `0x00507610` | 1 | `src/bringup/Group3_TerrainPrepareGeometry.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
 | `0x00507c10` | 2 | `src/krusty2/broadphase/Terrain.cpp` (`QueryGround`; the `QueryGround` views forward to it) | `FloatToInt` |
 | `0x00509aa0` | 6 | `samples/physics/shadow/TerrainShadow.cpp` (`/QIfist`) | `FistpFloatToInt` |
-| `0x00518f30` | 1 | `src/reconstructed/TrackOverlay.cpp` (`NameOverlay::Tick`) | `X87FloatToInt` |
+| `0x00518f30` | 1 | `src/reconstructed/TrackOverlay.cpp` (`NameOverlay::Tick`) | `X87FloatToInt`; the canonical unit has 18 retail-truncating `__ftol` casts, so it cannot take `/QIfist` |
 | `0x0051af00` | 2 | `samples/track/DropTextOverlaySetup.cpp` (`/QIfist`) | `FistpFloatToInt` |
-| `0x0051b070` | 1 | `src/bringup/Group4_Overlay.cpp` | `X87FloatToInt` |
-| `0x0052f570` | 6 | `src/bringup/Group4_Visibility.cpp` and `Group2_GridVisibilityTestBox.cpp` (`D3DIMShadowClipper::TestBox` forwards) | `X87FloatToInt` |
+| `0x0051b070` | 1 | `src/bringup/Group4_Overlay.cpp` (`/QIfist` bring-up) | `FistpFloatToIntChecked` (`dropSeconds` may be near zero) |
+| `0x0052f570` | 6 | `src/bringup/Group4_Visibility.cpp` and `Group2_GridVisibilityTestBox.cpp` (`D3DIMShadowClipper::TestBox` forwards; `/QIfist` bring-up) | `FistpFloatToIntChecked` (a corner near the eye plane can project outside `int`) |
 
 `BikeFloatToInt` and `KbFloatToInt` correct an
 `__ftol` truncation to nearest-even. They ignore the x87 rounding mode.
-`X87FloatToInt`, `FistpFloatToInt` and the two `FloatToInt` helpers read it. No game code loads
+`X87FloatToInt`, `FistpFloatToInt` (and its range-checked variant) and the two `FloatToInt` helpers read it.
+The `/QIfist` bring-up units and the truncating casts moved out of them are
+listed in [GAME_BUILD.md](GAME_BUILD.md#bring-up-fistp-units). No game code loads
 the control word: every `fldcw` in .text is in LIBCMT or in the uncalled
 `0x00548b60` span, which restores the word it saved. Round-to-nearest-even
 therefore stays the assumed mode, which is inference.
