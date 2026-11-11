@@ -36,6 +36,11 @@
 // weights the index above the message web, where retail weights it below.
 // Pointer scope, `register`, const, a reference, per-use MessageAt and a
 // pointer shared with the 0x40 block do not change the weights.
+// Session 21: tools/decl_shift_scan.py on that 197 form (test through
+// MessageAt, `&MessageAt(messages, offset)` taken inside the `if`) is 197 at
+// every k = 0..63, so the ebx/ebp swap is not the symbol-arena tie-break;
+// retail keeps index in ebp and gives ebx to `last`'s loop-top reload, the
+// vtable and the message pointer. /ML keeps 361; /G6 gives 72.
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>

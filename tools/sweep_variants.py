@@ -44,6 +44,9 @@ its own directory under the template's file name (or --source-name, e.g. the
 real TU name when the template is a renamed copy) so __FILE__ literals keep
 their '__FILE__:<basename>' binding; the template's directory is on the
 include path so its quoted includes resolve.
+--extra passes one compiler flag; spell it with a dash (--extra=-Oa) under Git
+Bash, whose path conversion turns --extra=/Oa into a file path, so the flag
+never reaches CL.EXE as an option (the variant scores as the profile alone).
 --dry-run lists the choice points and the variant count; --render N writes
 variant N without compiling. Results go to results.jsonl; the best variants
 are re-rendered as best_<rank>.cpp.

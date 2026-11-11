@@ -31,6 +31,8 @@
 //   strlen through `p` (225) are worse. Session 17: the seed at every statement
 //   position with `unsigned char`, a for-init seed and a SetTextMode-style helper
 //   stay at 257 or below; VC6 keeps the store out of the rep movsd/movsb pair.
+//   Session 21: the seed between strcat and strlen lands after strlen's
+//   `or ecx, -1` (257, lea esi hoisted with it); /ML keeps 255.
 // - 0x004618e0: retail loads buffer/size/count into registers before the pushes;
 //   VC6 here pushes them from the stack. Register locals, a helper for the fseek
 //   block and an unsigned count do not change it.

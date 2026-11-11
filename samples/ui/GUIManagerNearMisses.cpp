@@ -44,6 +44,7 @@
 //   Also <= 89 (48 forms): a `GUIUser* user` local, x and y as if/else
 //   assignments of locals (with a `half` local), a text local, a `tip = this`
 //   alias and an `int* p = position` local.
+//   Session 21: /ML, /Oa, /Ow, /Op, /GB and /G5 keep 89; /G6 gives 81.
 // 0x00488120 (52 bytes, 46/52): retail keeps the `device ? owner : 0` branch
 //   (jmp + xor) and tests the owner for zero before comparing it with
 //   `this`. VC6 threads the xor arm into the next test whenever that test is
@@ -65,6 +66,18 @@
 //   if (owner != this) return 0;`, a `result` local over if/else, and
 //   `owner && owner != this` followed by a second `if (!owner)` store block
 //   (the duplicated test that matches 0x004705d0 does not help here).
+//   Session 21, all threaded (6-25/52): a `__forceinline` or early-return
+//   static OwnerOf helper, the ternary repeated in both tests, the ternary
+//   as the `if` condition with `device->ownerUser != this` inside, an
+//   `int busy` flag, a `(int)owner` test, `owner != 0 ? owner != this : 0`,
+//   a goto to a shared `return 1`, dead `previous`/`old` locals, a copied
+//   owner local and `return owner == this ? 1 : 0` after the store block;
+//   /G6 and /ML keep 46, /O1 gives 36. Retail evidence: the unthreaded
+//   `jmp +2 ; xor r, r ; test r, r` occurs 31 times in .text; at the 13
+//   other sites inspected the merge also holds a memory store (the value
+//   stored to a member, as CollisionPoint's `inContact = cond ? 1 : 0`, or
+//   an inlined `new`'s EH state), where this function merges into a bare
+//   test, so no matched idiom carries over.
 
 #include "../../src/reconstructed/GUIManager.cpp"
 

@@ -39,6 +39,7 @@
 // here: a returning setter for the distance, a void setter then a reread, a
 // float& setter, a sizeFactor setter and a length local plus setter all
 // give the same 1299.
+// Session 21: /ML keeps 1299; /G6 gives 382.
 //
 // VisualCue::Tick (0x0048b100, 2796 bytes, jump table at
 // 0x0048bbec): places the cue in front of the camera by camera mode

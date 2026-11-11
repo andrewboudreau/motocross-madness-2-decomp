@@ -27,6 +27,8 @@
 // as a running pointer like retail ([esp+0x10]/[esp+0x14] set before the
 // clear), so the loop shape is not the difference; only the size store's
 // scheduling relative to the 0x005119c0 pushes is.
+// Session 21, flags: /ML, /Op, /GB and /G5 keep 1776; /Oa (674), /Ow (677)
+// and /G6 (1288) are worse.
 #include <stdio.h>
 #include <string.h>
 

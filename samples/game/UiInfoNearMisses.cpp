@@ -17,6 +17,11 @@
 // field_0x27f8 for the stores and the memcpy sources (32 combinations).
 // An inline settings-reset helper over the 13 stores (720 variants) turns
 // them into [eax + N] stores (174, 394 bytes).
+// Session 21 (60 forms, best 383): chained stores for the three 1s
+// (`gateSeed = treeCollision = riderCollision = 1`, or two of them),
+// `races = savedDifficulty = difficulty = 2`, the four detail levels chained
+// in either direction, through a `level` local or a countdown loop, and
+// `savedDifficulty = difficulty = 2` in either order.
 //
 // TrackGameMode::FindDataFile (0x005238f0, 355 bytes): candidate 357 bytes.
 // The old 353-byte extent cut off the final ret 8 operand; see docs/UIINFO.md.
@@ -31,6 +36,10 @@
 // 190; an `int found` flag scores 191 but grows the function to 387 bytes).
 // The found block written out in both fopen branches is not merged by VC6
 // (193 of 422).
+// Session 21 (48 forms, best 190): an inline UseFile(path, buffer, file)
+// found helper returned from every exit and an inline OpenIn(buffer, dir,
+// name) sprintf+fopen helper, in the early-return, nested and combined-retry
+// layouts, with `file` declared at the top or at the first fopen.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
