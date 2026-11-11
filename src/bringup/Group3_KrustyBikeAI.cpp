@@ -849,7 +849,11 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
     Vec3 up;
     up = Vec3(0.0f, 0.0f, 0.0f);
     up.y = 1.0f;
-    sideV = side ? *side : SafeNormalize(Vec3(up.y * fwd.z - up.z * fwd.y, up.z * fwd.x - up.x * fwd.z, up.x * fwd.y - up.y * fwd.x));
+    // With no side axis given, the up vector made perpendicular to fwd (0x0040ee7c: a
+    // second cross product with fwd before the SafeNormalize call).
+    sideV = side ? *side
+                 : SafeNormalize(BikeAICrossCtor(fwd, Vec3(up.y * fwd.z - up.z * fwd.y, up.z * fwd.x - up.x * fwd.z,
+                                                           up.x * fwd.y - up.y * fwd.x)));
     Vec3 front = *center + fwd * 3.5f;
     Vec3 vF = *frontVel;
     Vec3 right;
@@ -922,6 +926,12 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
     }
 
     int airborne;
+    // One rear ground point and both normals for the steps and the final placement:
+    // the final rear query starts from the last step's point (QueryGround sets only y)
+    // and an empty terrain leaves the last step's normals, as in retail.
+    Vec3 groundR;
+    Vec3 normalF;
+    Vec3 normalR;
     float t = 0.0f;
     if (0.0f < maxTime) {
         Vec3 rearForce = Vec3(0.0f, 0.0f, 0.0f);
@@ -937,13 +947,11 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
             Vec3 frontDrag = Vec3(0.0f, 0.0f, 0.0f);
             accF.y = -32.0f;
             accF -= frontDrag;
-            Vec3 groundR = back;
+            groundR = back;
             Vec3 groundF = front;
             float frontBrake = 0.0f;
             float impact = 0.0f;
             float rearBrake = 0.0f;
-            Vec3 normalF;
-            Vec3 normalR;
             if (terrain) {
                 terrain->QueryGround((TerrainVec3*)&groundF, (TerrainVec3*)&normalF, 0, 0);
                 terrain->QueryGround((TerrainVec3*)&groundR, (TerrainVec3*)&normalR, 0, 0);
@@ -1276,7 +1284,10 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
             acc.y += 512.0;
             acc = SafeNormalize(acc);
             acc = acc * dt;
-            sideV = (acc + sideV * 4.0f * maxTime) * (1.0f / (maxTime * 4.0f + dt));
+            // Retail scales component-wise with the unrounded reciprocal (0x00412aa1).
+            Vec3 lean = acc + sideV * 4.0f * maxTime;
+            float k = 1.0f / (maxTime * 4.0f + dt);
+            sideV = Vec3(lean.x * k, lean.y * k, lean.z * k);
             sideV = SafeNormalize(CrossProduct(fwd, CrossProduct(sideV, fwd)));
 
             t += dt;
@@ -1290,9 +1301,6 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
     }
 
     Vec3 groundF = front;
-    Vec3 groundR;
-    Vec3 normalF;
-    Vec3 normalR;
     if (terrain) {
         terrain->QueryGround((TerrainVec3*)&groundF, (TerrainVec3*)&normalF, 0, 0);
         terrain->QueryGround((TerrainVec3*)&groundR, (TerrainVec3*)&normalR, 0, 0);

@@ -8,6 +8,8 @@
     "?Print@UnknownEcoDebugOverlay@@QAAXHPBDZZ": "?Print@DebugOverlay@@QAAXHPBDZZ",
     "?Title@UnknownEcoDebugOverlay@@QAAXHPBDZZ": "?Title@DebugOverlay@@QAAXHPBDZZ",
     "??0Vector3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",
+    "?BikeRaceAddCall@@YA?AUVector3@@ABU1@0@Z": "?Vec3AddCall@@YAPAUVec3@@PAU1@PBU1@1@Z",
+    "?BikeRaceSubtractCall@@YA?AUVector3@@ABU1@0@Z": "?Vec3SubtractCall@@YAPAUVec3@@PAU1@PBU1@1@Z",
     "?AttachRenderContext@D3DIMSoultreeObject@@UAEHPAX@Z": "?AttachRenderContext@SoultreeObject@@UAEHPAX@Z",
     "?BoxCapsuleOverlap@@YAHPBUCollisionVec3@@00MMPBUMatrix4@@@Z": "?BoxCapsuleOverlap@@YAHPBUVec3@@00MMPBUMatrix4@@@Z",
     "?Vec3Dot@@YAMABUVec3@@0@Z": "?Vec3DotCall@@YAMPBUVec3@@0@Z",

@@ -308,16 +308,47 @@ static inline Vector3 Scale(const Vector3& v, float s) {
     return Vector3(s * v.x, s * v.y, s * v.z);
 }
 
-float Vec3Dot(const Vector3* a, const Vector3* b); // 0x0040ae30: a.b
+float Vec3Dot(const Vector3* a, const Vector3* b); // 0x0040ae30: (a.y*b.y + a.x*b.x) + a.z*b.z
+// 0x005015b0 (cdecl, hidden result pointer): v * s; linked to Vec3ScaleCall.
+Vector3 Vec3ScaleCall(const Vector3& v, float s);
 
+// Retail calls the out-of-line dot 0x0040ae30 and scale 0x005015b0 here: the length is
+// summed (y + x) + z, and the inverse square root is rounded to float as the scale's
+// argument. The TU-local DotProduct sums (z + y) + x, and an inline Scale multiplies by
+// the unrounded FastInvSqrt result (emu_diff case bikerace_write_relative_positions).
 static inline Vector3 Normalize(const Vector3& v) {
-    float length = SquareMagnitude(v);
+    float length = Vec3Dot(&v, &v);
     if (length == 1.0f) {
         return v;
     }
-    float scale = FastInvSqrt(length);
-    return Scale(v, scale);
+    return Vec3ScaleCall(v, FastInvSqrt(length));
 }
+
+// Vector3::Vector3(float, float, float), 0x00404e60: the out-of-line copy retail
+// calls at most grid sites below (its float arguments round each component);
+// linked to Vec3Call's constructor (the same body).
+struct Vector3Call : Vector3 {
+    Vector3Call(float x_, float y_, float z_);
+};
+
+// The helpers at the sites where retail constructs through 0x00404e60. The
+// inline forms let VC6 keep a product in a register where retail rounds it.
+static inline Vector3 ScaleCall(const Vector3& v, float s) {
+    return Vector3Call(s * v.x, s * v.y, s * v.z);
+}
+
+static inline Vector3 AddCall(const Vector3& a, const Vector3& b) {
+    return Vector3Call(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+static inline Vector3 SubCall(const Vector3& a, const Vector3& b) {
+    return Vector3Call(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+// 0x00421cb0 / 0x00421d00 (cdecl, hidden result pointer): the out-of-line Vector3
+// operator+ and operator- event 4 calls; linked to Vec3AddCall / Vec3SubtractCall.
+Vector3 BikeRaceAddCall(const Vector3& a, const Vector3& b);
+Vector3 BikeRaceSubtractCall(const Vector3& a, const Vector3& b);
 
 // 0x004210f0
 void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, int count) {
@@ -372,7 +403,7 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
             slotStep.y *= step;
             slotStep.z *= step;
         }
-        *a = Scale(gridSlotStep, (float)count) + gridFirstSlot;
+        *a = AddCall(ScaleCall(gridSlotStep, (float)count), gridFirstSlot);
         break;
     }
     case 0:
@@ -382,11 +413,11 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
             return;
         }
         gridDirection = *b;
-        *a -= Scale(*b, 4.66f);
+        *a -= ScaleCall(*b, 4.66f);
         gridSlotStep = Vector3(b->z, 0.0f, -b->x);
-        gridFirstSlot = *a - Scale(gridSlotStep, 20.0f);
-        gridSlotStep = Scale(Vector3(b->z, 0.0f, -b->x), 20.0f);
-        *a = Scale(gridSlotStep, (float)count) + gridFirstSlot;
+        gridFirstSlot = SubCall(*a, ScaleCall(gridSlotStep, 20.0f));
+        gridSlotStep = ScaleCall(Vector3(b->z, 0.0f, -b->x), 20.0f);
+        *a = AddCall(ScaleCall(gridSlotStep, (float)count), gridFirstSlot);
         break;
     case 1:
     case 5: {
@@ -395,7 +426,7 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
         direction.y = 0.0f;
         *b = Normalize(direction);
         *a = owner->gateSources[owner->gateCount - 1].center;
-        *a += Scale(*b, 8.0f);
+        *a += ScaleCall(*b, 8.0f);
         a->y = 0.0f;
         if (count <= 0) {
             return;
@@ -407,9 +438,9 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
         }
         gridDirection = *b;
         gridSlotStep = Vector3(b->z, 0.0f, -b->x);
-        gridFirstSlot = *a - Scale(gridSlotStep, width * 0.48f);
-        gridSlotStep = Scale(Vector3(b->z, 0.0f, -b->x), spacing);
-        *a = Scale(gridSlotStep, (float)count) + gridFirstSlot;
+        gridFirstSlot = SubCall(*a, ScaleCall(gridSlotStep, width * 0.48f));
+        gridSlotStep = ScaleCall(Vector3(b->z, 0.0f, -b->x), spacing);
+        *a = AddCall(ScaleCall(gridSlotStep, (float)count), gridFirstSlot);
         break;
     }
     case 4:
@@ -419,11 +450,11 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
             return;
         }
         gridDirection = *b;
-        *a -= Scale(*b, 4.66f);
+        *a -= ScaleCall(*b, 4.66f);
         gridSlotStep = Vector3(b->z, 0.0f, -b->x);
-        gridFirstSlot = *a - Scale(gridSlotStep, 20.0f);
-        gridSlotStep = Scale(Vector3(b->z, 0.0f, -b->x), 20.0f);
-        *a = gridFirstSlot + Scale(gridSlotStep, (float)count);
+        gridFirstSlot = BikeRaceSubtractCall(*a, ScaleCall(gridSlotStep, 20.0f));
+        gridSlotStep = Vec3ScaleCall(Vector3Call(b->z, 0.0f, -b->x), 20.0f);
+        *a = BikeRaceAddCall(gridFirstSlot, Vec3ScaleCall(gridSlotStep, (float)count));
         break;
     default:
         return;

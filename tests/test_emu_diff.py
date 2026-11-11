@@ -156,6 +156,13 @@ CLEAN_CASES = {
     'track_game_mode_reset_defaults': 10,
     'pick_followed_racer': 100,
     'kb_select_rider_pose': 200,
+    # Third sweep, bodies the replay cases also cover.
+    'eco_generate_objects': 15,
+    'bikerace_aim_camera': 100,
+    'bikerace_next_camera_target': 100,
+    'bikerace_write_relative_positions': 150,
+    'visual_cue_tick': 100,
+    'kb_simulate_look_ahead': 20,
 }
 
 # Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).
@@ -176,6 +183,14 @@ PRE_FIX_SHAPES = [
                      '    s->blendFactor = step / s->timeConstant;\n'
                      '    s->smoothedValue = (target - s->smoothedValue) * s->blendFactor + s->smoothedValue;\n'
                      '    return s->smoothedValue;')], 100),
+    ('bikerace_write_relative_positions', [('float length = Vec3Dot(&v, &v);', 'float length = SquareMagnitude(v);'),
+                                           ('return Vec3ScaleCall(v, FastInvSqrt(length));',
+                                            'float scale = FastInvSqrt(length);\n    return Scale(v, scale);')], 200),
+    ('bikerace_write_relative_positions', [('*a = AddCall(ScaleCall(gridSlotStep, (float)count), gridFirstSlot);',
+                                           '*a = Scale(gridSlotStep, (float)count) + gridFirstSlot;')], 200),
+    ('kb_simulate_look_ahead', [('SafeNormalize(BikeAICrossCtor(fwd, ', 'SafeNormalize((')], 60),
+    ('kb_simulate_look_ahead', [('            groundR = back;', '            Vec3 groundR = back;')], 20),
+    ('kb_simulate_look_ahead', [('sideV = Vec3(lean.x * k, lean.y * k, lean.z * k);', 'sideV = lean * k;')], 20),
 ]
 
 
