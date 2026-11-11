@@ -9,15 +9,14 @@
 //     (Bike.cpp builds them, Vehicle.cpp retracts and damps them) name the same retail
 //     functions. Each forwards to the canonical member at the same address; the
 //     constructors build the canonical object, with its real vtable, in the storage Bike's
-//     loader allocated (0xd8 / 0xe4 bytes). tools/linked_accuracy.py scores the
-//     placement-new wrapper here (EH frame, null test) against 0x004fa700, not the exact
-//     RotatingShock constructor it calls; the low score is that wrapper, not missing fields.
+//     loader allocated (0xd8 / 0xe4 bytes). They call the canonical constructor explicitly
+//     (an MSVC extension) rather than through placement new: placement new added an EH
+//     frame and a null test, so tools/linked_accuracy.py scored that wrapper (0.25 / 0.49)
+//     instead of following the plain forwarder to the exact constructor it calls.
 //   * Tire.cpp reaches the wheel's shocks through TireAttachA/B (TireAttachmentViews.h).
 //   * Shock.cpp calls its callees through Suspension.h's provisional ShockNode and
 //     Shock*Call names; each is forwarded to the existing provider at the address its
 //     binding names (Shock.bindings.json).
-#include <new.h>
-
 #include "vehicle/Vehicle.h"
 #include "Suspension.h"
 #include "TireAttachmentViews.h"
@@ -130,8 +129,9 @@ VehicleInlineShock::VehicleInlineShock(const char* name, SoultreeObject* root, S
                                        float minLength, float stiffnessMin, float stiffnessMax,
                                        float dampingRatio, float speedThreshold, float retractScale)  // 0x004f9ee0
 {
-    ::new ((void*)this) InlineShock((void*)name, (int)root, (ShockNode*)anchor, minLength, stiffnessMin,
-                                    stiffnessMax, dampingRatio, speedThreshold, retractScale);
+    ((InlineShock*)this)->InlineShock::InlineShock((void*)name, (int)root, (ShockNode*)anchor, minLength,
+                                                   stiffnessMin, stiffnessMax, dampingRatio,
+                                                   speedThreshold, retractScale);
 }
 
 void VehicleInlineShock::Retract(float amount, const VehicleWheel* carrier)    // 0x004fa310
@@ -144,9 +144,10 @@ VehicleRotatingShock::VehicleRotatingShock(const char* name, SoultreeObject* roo
                                            float dampingRatio, float speedThreshold, float retractScale,
                                            int axisId, const Vec3* axisOverride)  // 0x004fa700
 {
-    ::new ((void*)this) RotatingShock((void*)name, (int)root, swingAngle, armLength, stiffnessMin,
-                                      stiffnessMax, dampingRatio, speedThreshold, retractScale, axisId,
-                                      (const ShockVec3*)axisOverride);
+    ((RotatingShock*)this)->RotatingShock::RotatingShock((void*)name, (int)root, swingAngle, armLength,
+                                                         stiffnessMin, stiffnessMax, dampingRatio,
+                                                         speedThreshold, retractScale, axisId,
+                                                         (const ShockVec3*)axisOverride);
 }
 
 void VehicleRotatingShock::Retract(float amount, const VehicleWheel* carrier)  // 0x004fab60
