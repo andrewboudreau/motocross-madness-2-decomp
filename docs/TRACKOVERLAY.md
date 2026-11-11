@@ -59,7 +59,7 @@ compiled layouts and imports against the real provider object.
 
 ## Status
 
-92 functions are exact under `vc6_o2_mt`, with every relocation bound:
+93 functions are exact under `vc6_o2_mt`, with every relocation bound:
 
 - InstrumentOverlay: `0x00518720`..`0x00518cc0`, 7 functions.
 - The overlay rectangle constructors `0x00518d50` and `0x00518d60`.
@@ -85,8 +85,13 @@ compiled layouts and imports against the real provider object.
   functions.
 - RadarOverlay's gate drawing `0x0051cb20` (the current and next gate as
   a line between their posts).
-- ChatOverlay: `0x0051cda0`..`0x0051e800`, 16 functions, among them the
-  typed-key handler `0x0051da30` and the input/history redraw `0x0051de10`.
+- ChatOverlay: `0x0051cda0`..`0x0051e800`, 17 functions, among them the
+  typed-key handler `0x0051da30`, the input/history redraw `0x0051de10`
+  and the loader `0x0051cf80`. The loader's side panels write the source
+  bottom as `source.top + (largeLayout ? 68 : 34)`. With the literal
+  `largeLayout ? 137 : 103` VC6 loaded largeLayout into ecx and formed the
+  right panel's width in eax, where retail has eax and ecx. No statement
+  order, ternary spelling or width local changed that.
 - UnknownChatInput: `0x0051ea50`..`0x0051eb40`, 7 functions.
 
 Their calibration cases are under `# TrackOverlay.cpp` in
@@ -131,12 +136,6 @@ linkage so the standalone uses the same mutable DWORD as `RenderPre3D`.
   reference to the list entry, an if/else for visited nodes and a
   `do ... while` segment walk; the frame (0x8c in retail, 0x74 here) and
   two store/reload orders differ.
-- `0x0051cf80` (ChatOverlay loader, 1953 bytes; candidate 1953, 1768 of
-  1785 non-relocation bytes): frame, calls and stores match with the
-  side-panel rectangle declared inside the wide-screen block, the left
-  panel's source rectangle written before its screen rectangle and the
-  LOGFONT's lfItalic and lfHeight stored last. Only the right panel's
-  block swaps eax and ecx (largeLayout and the panel width).
 
 ### Not reconstructed
 

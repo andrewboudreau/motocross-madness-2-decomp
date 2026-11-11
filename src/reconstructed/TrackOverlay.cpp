@@ -64,6 +64,7 @@ extern "C" __declspec(dllimport) int __stdcall GetTextExtentPoint32A(void* dc, c
                                                                      UnknownTextExtent* size);
 extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* text, int length,
                                                          UnknownOverlayRect* rect, unsigned int format);
+extern "C" __declspec(dllimport) void* __stdcall CreatePen(int style, int width, unsigned long color);
 
 // 0x0057513c: the radar zoom level, 1..5.
 static int s_UnknownGlobal57513c = 2;
@@ -1479,6 +1480,108 @@ ChatOverlay::~ChatOverlay()
         overlayTexture->Release();
     if (backingTexture)
         backingTexture->Release();
+}
+
+
+// 0x0051cf80: sets the chat overlay up: the chat and cue rectangles, the
+// texture, the side panels on wide screens, the pen, two fonts and the
+// thirteen name-tag rectangles.
+ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager, void* camera,
+                                                UnknownOverlayRect screen, UnknownOverlayRect cue)
+{
+    const char* font;
+    UnknownOverlayRect source;
+    UnknownLogFont logFont;
+    char name[260];
+    char path[260];
+
+    largeLayout = 1;
+    chatRect.left = screen.right / 2 - 128;
+    chatRect.top = 0;
+    chatRect.right = chatRect.left + 256;
+    chatRect.bottom = 68;
+    strcpy(name, "chat256.tga");
+    chatCamera = (UnknownChatCamera*)camera;
+    cueRect = cue;
+    timeSum = 0.08f;
+    backingTexture = TerrainLoadTexture(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
+    if (!backingTexture) {
+        Release();
+        return 0;
+    }
+    overlayTexture = backingTexture->Clone();
+    if (overlayTexture->mapFormat == 4444)
+        overlayTexture->SetAddressModes(5, 6);
+    overlayTexture->CreateTextureSurface(1, 0, 0);
+    source.left = 0;
+    source.right = largeLayout ? 256 : 128;
+    source.top = 0;
+    source.bottom = largeLayout ? 68 : 37;
+    font = "arialsm";
+    sprintf(path, "%s\\%s", "Res", "Fonts.res");
+    Attach(target, overlayTexture, &chatRect, 0, &source, 0.00001f, 1, path, &font, 1, 4444, 0);
+    if (screen.right - screen.left > 512) {
+        UnknownOverlayRect rect = chatRect;
+        source.left = 3;
+        source.top = 69;
+        source.right = largeLayout ? 38 : 19;
+        source.bottom = source.top + (largeLayout ? 68 : 34);
+        rect.left = chatRect.left - (largeLayout ? 38 : 19);
+        rect.right = chatRect.left;
+        leftPanel = new (__FILE__, 2284) Overlay(0, 1);
+        leftPanel->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
+        AppendChild(leftPanel, -1);
+        source.left += largeLayout ? 38 : 19;
+        source.top = 69;
+        source.right += largeLayout ? 38 : 19;
+        source.bottom = source.top + (largeLayout ? 68 : 34);
+        rect.left = chatRect.right;
+        rect.right = chatRect.right + (largeLayout ? 38 : 19);
+        rightPanel = new (__FILE__, 2294) Overlay(0, 1);
+        rightPanel->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
+        AppendChild(rightPanel, -1);
+    }
+    pen = CreatePen(0, 3, 0xc0c0c0);
+    logFont.lfWidth = 0;
+    logFont.lfEscapement = 0;
+    logFont.lfOrientation = 0;
+    logFont.lfUnderline = 0;
+    logFont.lfStrikeOut = 0;
+    logFont.lfCharSet = 1;
+    logFont.lfOutPrecision = 0;
+    logFont.lfClipPrecision = 0;
+    logFont.lfQuality = 2;
+    logFont.lfPitchAndFamily = 2;
+    logFont.lfItalic = 0;
+    logFont.lfHeight = 9;
+    UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
+    const char* face = gui ? gui->toolTipFontFace : "";
+    if (*face != '\0') {
+        logFont.lfWeight = gui->toolTipBold ? 700 : 500;
+        strcpy(logFont.lfFaceName, face);
+    } else {
+        logFont.lfWeight = 400;
+        strcpy(logFont.lfFaceName, "Lucida Console");
+    }
+    chatFont = CreateFontIndirectA(&logFont);
+    if (*face == '\0')
+        strcpy(logFont.lfFaceName, "Small Fonts");
+    logFont.lfHeight = 10;
+    nameTagFont = CreateFontIndirectA(&logFont);
+    nameTagRects[0] = UnknownTrackOverlayRect(0, 0x80, 0x89, 0x93);
+    nameTagRects[1] = UnknownTrackOverlayRect(0x81, 0xff, 0x89, 0x93);
+    nameTagRects[2] = UnknownTrackOverlayRect(0, 0x80, 0x94, 0x9e);
+    nameTagRects[3] = UnknownTrackOverlayRect(0x81, 0xff, 0x94, 0x9e);
+    nameTagRects[4] = UnknownTrackOverlayRect(0, 0x80, 0x9f, 0xa9);
+    nameTagRects[5] = UnknownTrackOverlayRect(0x81, 0xff, 0x9f, 0xa9);
+    nameTagRects[6] = UnknownTrackOverlayRect(0, 0x80, 0xaa, 0xb4);
+    nameTagRects[7] = UnknownTrackOverlayRect(0x81, 0xff, 0xaa, 0xb4);
+    nameTagRects[8] = UnknownTrackOverlayRect(0, 0x80, 0xb5, 0xbf);
+    nameTagRects[9] = UnknownTrackOverlayRect(0x81, 0xff, 0xb5, 0xbf);
+    nameTagRects[10] = UnknownTrackOverlayRect(0, 0x80, 0xc0, 0xca);
+    nameTagRects[11] = UnknownTrackOverlayRect(0x81, 0xff, 0xc0, 0xca);
+    nameTagRects[12] = UnknownTrackOverlayRect(0, 0x80, 0xcb, 0xd5);
+    return this;
 }
 
 // 0x0051d980

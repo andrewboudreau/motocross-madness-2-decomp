@@ -2,7 +2,7 @@
 // D:\aardvark\VC\krusty2\TrackOverlay.cpp (canonical source src/reconstructed/TrackOverlay.cpp,
 // which does not define it).  Status: best-guess-unreviewed.  The game build links it with
 // /QIfist (config/game_build.json candidate_sources) in place of the
-// src/bringup/Group4_Overlay.cpp copy; Tick (0x0051b070) stays there.
+// former src/bringup/Group4_Overlay.cpp copy; Tick (0x0051b070) is in Group4_DropTextOverlayTick.cpp.
 //
 // GameObject slot 8 (SetRenderContext, 0x004692f0) on `value`; keeps dropSeconds (+0x38);
 // places the text given on a 640x480 screen (textX +0x3c, textYOffset +0x40, textY +0x44);

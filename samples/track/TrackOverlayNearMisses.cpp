@@ -44,21 +44,6 @@
 // entering clip's hit point, and the child loop, where retail reloads the
 // node from edi in the body instead of reusing the loop test's eax.
 
-// ChatOverlay::Setup (0x0051cf80, 1953 bytes; candidate 1953, 1768 of the
-// 1785 non-relocation bytes): the loader. Frame layout, calls, the font
-// set-up and the rectangles match once the side-panel rectangle is declared
-// inside the wide-screen block. The left panel's source rectangle is written
-// before its screen rectangle (left edge first, from chatRect), and the
-// LOGFONT stores lfItalic and lfHeight last, as in StatsOverlay::LoadPanel.
-// Left: in the right panel's block retail loads largeLayout into eax and
-// forms the panel width in ecx; VC6 here swaps the two registers. All 720
-// orders of that block's six statements, the four spellings of each
-// ternary, a width local, `rect.right = rect.left + ...` and
-// `rect.left = rect.right + 256` leave the swap (or are worse).
-// Inline width/bottom helpers (by value or const&, in any of 15
-// placements) compile identically.
-
-
 // RadarOverlay::DrawRacers (0x0051bed0, 1160 bytes; 1129 match):
 // the map update. Every call, loop and store matches with the racer read
 // through `field_0x134[i]` each time, the own position through a reference,
@@ -334,109 +319,6 @@ void RadarOverlay::DrawTrackOutline(int mode)
         }
         }
     }
-}
-
-extern "C" __declspec(dllimport) void* __stdcall CreatePen(int style, int width, unsigned long color);
-
-// 0x0051cf80: sets the chat overlay up: the chat and cue rectangles, the
-// texture, the side panels on wide screens, the pen, two fonts and the
-// thirteen name-tag rectangles.
-ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager, void* camera,
-                                                UnknownOverlayRect screen, UnknownOverlayRect cue)
-{
-    const char* font;
-    UnknownOverlayRect source;
-    UnknownLogFont logFont;
-    char name[260];
-    char path[260];
-
-    largeLayout = 1;
-    chatRect.left = screen.right / 2 - 128;
-    chatRect.top = 0;
-    chatRect.right = chatRect.left + 256;
-    chatRect.bottom = 68;
-    strcpy(name, "chat256.tga");
-    chatCamera = (UnknownChatCamera*)camera;
-    cueRect = cue;
-    timeSum = 0.08f;
-    backingTexture = TerrainLoadTexture(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
-    if (!backingTexture) {
-        Release();
-        return 0;
-    }
-    overlayTexture = backingTexture->Clone();
-    if (overlayTexture->mapFormat == 4444)
-        overlayTexture->SetAddressModes(5, 6);
-    overlayTexture->CreateTextureSurface(1, 0, 0);
-    source.left = 0;
-    source.right = largeLayout ? 256 : 128;
-    source.top = 0;
-    source.bottom = largeLayout ? 68 : 37;
-    font = "arialsm";
-    sprintf(path, "%s\\%s", "Res", "Fonts.res");
-    Attach(target, overlayTexture, &chatRect, 0, &source, 0.00001f, 1, path, &font, 1, 4444, 0);
-    if (screen.right - screen.left > 512) {
-        UnknownOverlayRect rect = chatRect;
-        source.left = 3;
-        source.top = 69;
-        source.right = largeLayout ? 38 : 19;
-        source.bottom = largeLayout ? 137 : 103;
-        rect.left = chatRect.left - (largeLayout ? 38 : 19);
-        rect.right = chatRect.left;
-        leftPanel = new (__FILE__, 2284) Overlay(0, 1);
-        leftPanel->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
-        AppendChild(leftPanel, -1);
-        source.left += largeLayout ? 38 : 19;
-        source.top = 69;
-        source.right += largeLayout ? 38 : 19;
-        source.bottom = largeLayout ? 137 : 103;
-        rect.left = chatRect.right;
-        rect.right = chatRect.right + (largeLayout ? 38 : 19);
-        rightPanel = new (__FILE__, 2294) Overlay(0, 1);
-        rightPanel->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
-        AppendChild(rightPanel, -1);
-    }
-    pen = CreatePen(0, 3, 0xc0c0c0);
-    logFont.lfWidth = 0;
-    logFont.lfEscapement = 0;
-    logFont.lfOrientation = 0;
-    logFont.lfUnderline = 0;
-    logFont.lfStrikeOut = 0;
-    logFont.lfCharSet = 1;
-    logFont.lfOutPrecision = 0;
-    logFont.lfClipPrecision = 0;
-    logFont.lfQuality = 2;
-    logFont.lfPitchAndFamily = 2;
-    logFont.lfItalic = 0;
-    logFont.lfHeight = 9;
-    UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
-    const char* face = gui ? gui->toolTipFontFace : "";
-    if (*face != '\0') {
-        logFont.lfWeight = gui->toolTipBold ? 700 : 500;
-        strcpy(logFont.lfFaceName, face);
-    } else {
-        logFont.lfWeight = 400;
-        strcpy(logFont.lfFaceName, "Lucida Console");
-    }
-    chatFont = CreateFontIndirectA(&logFont);
-    if (*face == '\0')
-        strcpy(logFont.lfFaceName, "Small Fonts");
-    logFont.lfHeight = 10;
-    nameTagFont = CreateFontIndirectA(&logFont);
-    nameTagRects[0] = UnknownTrackOverlayRect(0, 0x80, 0x89, 0x93);
-    nameTagRects[1] = UnknownTrackOverlayRect(0x81, 0xff, 0x89, 0x93);
-    nameTagRects[2] = UnknownTrackOverlayRect(0, 0x80, 0x94, 0x9e);
-    nameTagRects[3] = UnknownTrackOverlayRect(0x81, 0xff, 0x94, 0x9e);
-    nameTagRects[4] = UnknownTrackOverlayRect(0, 0x80, 0x9f, 0xa9);
-    nameTagRects[5] = UnknownTrackOverlayRect(0x81, 0xff, 0x9f, 0xa9);
-    nameTagRects[6] = UnknownTrackOverlayRect(0, 0x80, 0xaa, 0xb4);
-    nameTagRects[7] = UnknownTrackOverlayRect(0x81, 0xff, 0xaa, 0xb4);
-    nameTagRects[8] = UnknownTrackOverlayRect(0, 0x80, 0xb5, 0xbf);
-    nameTagRects[9] = UnknownTrackOverlayRect(0x81, 0xff, 0xb5, 0xbf);
-    nameTagRects[10] = UnknownTrackOverlayRect(0, 0x80, 0xc0, 0xca);
-    nameTagRects[11] = UnknownTrackOverlayRect(0x81, 0xff, 0xc0, 0xca);
-    nameTagRects[12] = UnknownTrackOverlayRect(0, 0x80, 0xcb, 0xd5);
-    return this;
 }
 
 // 0x0051bed0: places the name tags and draws the map dots (see the note at

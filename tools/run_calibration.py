@@ -24079,6 +24079,15 @@ CASES = [
         'target_size': 145,
     },
     {
+        'name': 'TrackOverlay.cpp 0x51cf80 ChatOverlay loader',
+        'bindings': 'src/reconstructed/TrackOverlay.bindings.json',
+        'source': 'src/reconstructed/TrackOverlay.cpp',
+        'symbol': '?Setup@ChatOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@PAXUUnknownOverlayRect@@3@Z',
+        'target_va': '0x0051cf80',
+        'target_size': 1953,
+        'reason': 'side-panel bottom written source.top + height; the literal 137/103 ternary swaps eax/ecx in the right panel',
+    },
+    {
         'name': 'TrackOverlay.cpp 0x51d980 ChatOverlay shows the current name tag',
         'bindings': 'src/reconstructed/TrackOverlay.bindings.json',
         'source': 'src/reconstructed/TrackOverlay.cpp',

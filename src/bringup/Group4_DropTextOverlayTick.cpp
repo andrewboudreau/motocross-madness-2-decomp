@@ -2,7 +2,7 @@
 // linked game references but src/reconstructed/TrackOverlay.cpp does not
 // provide yet:
 //   0x0051b070 DropTextOverlay::Tick   (vtable 0x005586f0 slot 10; decoded)
-// Not a byte match. It was split out of Group4_Overlay.cpp so that the game
+// Not a byte match. It was split out of the former Group4_Overlay.cpp so that the game
 // build can compile it with /QIfist (config/game_build.json bringup_flags);
 // retail's body has the EBP frame of its inline-asm rounding helper, which a
 // pragma keeps for Tick alone (docs/GAME_BUILD.md#frame-pointer-units).

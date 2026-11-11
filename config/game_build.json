@@ -661,7 +661,7 @@
       "extra_flags": [
         "/QIfist"
       ],
-      "reason": "DropTextOverlay::Tick 0x0051b070 rounds the drop height with retail's inline fistp helper, through FistpFloatToIntChecked because dropSeconds may be near zero. The EBP frame retail's inline asm gives Tick comes from a #pragma optimize(\"y\", off) region in the source. ChatOverlay::Setup, frameless in retail and without a float-to-int conversion, stays in Group4_Overlay.cpp without extra flags.",
+      "reason": "DropTextOverlay::Tick 0x0051b070 rounds the drop height with retail's inline fistp helper, through FistpFloatToIntChecked because dropSeconds may be near zero. The EBP frame retail's inline asm gives Tick comes from a #pragma optimize(\"y\", off) region in the source. ChatOverlay::Setup, frameless in retail and without a float-to-int conversion, matches in src/reconstructed/TrackOverlay.cpp without extra flags.",
       "evidence": "docs/GAME_BUILD.md#bring-up-fistp-units"
     },
     {

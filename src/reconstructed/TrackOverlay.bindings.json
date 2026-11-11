@@ -223,5 +223,10 @@
   "_strncat": "0x00536b60",
   "_strncpy": "0x00534b10",
   "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x0050a590",
-  "?s_UnknownGlobal68a444@@3HA": "0x0068a444"
+  "?s_UnknownGlobal68a444@@3HA": "0x0068a444",
+  "??_C@_0M@DBJE@chat256?4tga?$AA@": "0x00575334",
+  "??_C@_0P@DMMM@Lucida?5Console?$AA@": "0x00575324",
+  "?Setup@ChatOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@PAXUUnknownOverlayRect@@3@Z": "0x0051cf80",
+  "?Setup@ChatOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@PAXUUnknownOverlayRect@@3@Z$ehhandler": "0x0054ed34",
+  "__imp__CreatePen@12": "0x00550044"
 }

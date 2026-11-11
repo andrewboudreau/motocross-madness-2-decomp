@@ -1061,7 +1061,7 @@ Two more bring-up bodies that rounded with `X87FloatToInt` moved into
 | 0x0051af00 | `DropTextOverlay::Setup` | `samples/track/DropTextOverlaySetup.cpp` | 0.501 | 0.632 |
 
 The bodies were removed from `src/bringup/Group3_KrustyBikeAISupport.cpp`
-and `src/bringup/Group4_Overlay.cpp`. `DropTextOverlay::Tick` (0x0051b070)
+and the former `src/bringup/Group4_Overlay.cpp`. `DropTextOverlay::Tick` (0x0051b070)
 stays a bring-up body, because `dropSeconds` near zero could push its
 drop outside `int`, where the 64-bit store would differ from retail's. It now
 rounds through the range-checked helper ([below](#bring-up-fistp-units)) and
@@ -1800,7 +1800,7 @@ configured flags.
 | `ProjectedShadowNearMisses.cpp` (sample) | TintCasterVertices 0x004dc2b0 | pragma | 0.759 -> 0.774 | 0.330 -> 0.346 | 0 / 2000 |
 | `GridNodeNearMisses.cpp` (sample) | GridNode::IntersectSegment 0x00483d40 (no `/QIfist`: retail keeps four truncating `__ftol` casts) | pragma; then the leaf cell as an index and out->y stored before out->z | 0.832 -> 0.903 -> 0.916 | 0.449 -> 0.493 -> 0.520 | 0 / 3000 (three round-to-nearest control words; at -n 2000 one input faults in both bodies, as before) |
 | `ProjectedShadowNearMisses.cpp` (sample) | RenderShadow 0x004db8c0 (framed in retail) | none: the pragma lowers both scores | 0.738 (0.733 with it) | 0.452 (0.340 with it) | 0 / 2000 |
-| `Group4_Overlay.cpp` | ChatOverlay::Setup 0x0051cf80 (frameless) | no flags, no pragma | 1.000 | 0.964 | n/a |
+| `TrackOverlay.cpp` (was `Group4_Overlay.cpp`) | ChatOverlay::Setup 0x0051cf80 (frameless) | no flags, no pragma; then the panel bottom as `source.top + height` | 1.000 | 0.964 -> 1.000 | n/a |
 
 The third column of masked/strict scores comes from source shapes, not flags.
 Retail re-reads `obj->array[i].field` after every store, because a char store may
@@ -1819,8 +1819,8 @@ for example `TerrainShadow` slots 27 and 28 (0.984 / 0.979, 0.986 / 0.950),
 `D3DIMSoultreeShadow` slot 29 (0.945 / 0.936) and ProjectedShadow `Present`,
 `ComputeBounds` and `Init` (0.837 / 0.438, 0.985 / 0.689, 0.992 / 0.841).
 `DropTextOverlay::Tick` was split from `Group4_Overlay.cpp` for its unit-wide
-flags; with the frame in the source it could move back, which has not been
-done.
+flags. ChatOverlay::Setup, the other function in that unit, now matches in
+`src/reconstructed/TrackOverlay.cpp`, so the unit was removed.
 
 terrain_prepare_geometry differs in 0 runs with in-range focal lengths only.
 With its out-of-`int` values (every 25th case) it differs in 56 of 2000 runs,
