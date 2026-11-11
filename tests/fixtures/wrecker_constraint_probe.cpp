@@ -10,7 +10,7 @@
 
 extern int g_UnclaimedBytes;
 typedef char Layout[(sizeof(Wrecker)==0x53c && sizeof(ConstraintMethodCollisionModel)==0x10c &&
-    sizeof(UnknownWreckerCollisionModel)==0x10c && sizeof(ConstraintProbe)==32 &&
+    sizeof(ConstraintProbe)==32 &&
     sizeof(Vector3)==12 && sizeof(ConVec3)==12 &&
     offsetof(Wrecker,collisionModel)==0x38 && offsetof(Wrecker,probePositions)==0x104 &&
     offsetof(Wrecker,probeHits)==0x108 && offsetof(ConstraintMethodCollisionModel,body)==0xc4 &&
@@ -70,7 +70,7 @@ static void ExpectedRecord(ConstraintProbe* p,const DWORD* xyz,DWORD node){
 }
 static void Normal(int count,DWORD seed,int fromProbe,int tagged){
     Begin();Wrecker* w=(Wrecker*)(receiver+32);ConstraintMethodCollisionModel* m=(ConstraintMethodCollisionModel*)(model+32);
-    w->collisionModel=(UnknownWreckerCollisionModel*)m;m->probeCount=count;
+    w->collisionModel=m;m->probeCount=count;
     m->probes=(ConstraintProbe*)Initial(count*32,0x61);w->probePositions=(Vector3*)Initial(count*12,0x72);w->probeHits=(int*)Initial(count*4,0x83);
     DWORD xyz[3]={Next(seed),Next(seed),Next(seed)},node=Next(seed);Vector3 local;memcpy(&local,xyz,12);
     if(fromProbe&&count)memcpy(&m->probes[count-1].localPoint,xyz,12);
@@ -109,7 +109,7 @@ static void Fault(int mode){
     if(mode<3){wbytes=mode==0?0x38:mode==1?0x104:0x108;w=(Wrecker*)(page+4096-wbytes);memset(w,0xa5,wbytes);completed=mode;address=(DWORD)(page+4096);}
     else if(mode<5){mbytes=mode==3?0x100:0x104;m=(ConstraintMethodCollisionModel*)(page+4096-mbytes);memset(m,0xa5,mbytes);address=(DWORD)(page+4096);}
     else {failAt=mode-5;completed=failAt;address=failAt==0?12:0;access=1;}
-    if(wbytes>=0x3c)w->collisionModel=(UnknownWreckerCollisionModel*)m;
+    if(wbytes>=0x3c)w->collisionModel=m;
     if(wbytes>=0x108)w->probePositions=0;
     if(wbytes>=0x10c)w->probeHits=0;
     if(mbytes>=0x104)m->probeCount=0;

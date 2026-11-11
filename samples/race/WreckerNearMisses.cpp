@@ -141,7 +141,7 @@ void Wrecker::PushProbesOutOfBox(float frameTime) {
     Vector3 sum = Vector3(0.0f, 0.0f, 0.0f);
     int hits = 0;
     for (int i = 0; i < collisionModel->probeCount; i++) {
-        Vector3 point = reinterpret_cast<const Vector3&>(collisionModel->probes[i].node->LocalToWorldPoint(
+        Vector3 point = reinterpret_cast<const Vector3&>(reinterpret_cast<SoultreeObject*>(collisionModel->probes[i].node)->LocalToWorldPoint(
             reinterpret_cast<const Vec3&>(collisionModel->probes[i].localPoint)));
         probePositions[i] = point;
         point = reinterpret_cast<const Vector3&>(

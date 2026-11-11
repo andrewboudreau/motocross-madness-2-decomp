@@ -70,9 +70,9 @@ void CollisionObject::SyncTransformFromNode() { Observe(this,1); }
 void CollisionObject::UpdateQuadtreeCell() { Observe(this,2); }
 
 int main() {
-    if(sizeof(CollisionObject)!=0xb8 || sizeof(UnknownWreckerCollisionModel)!=0x10c)return 2;
+    if(sizeof(CollisionObject)!=0xb8 || sizeof(ConstraintMethodCollisionModel)!=0x10c)return 2;
     unsigned char* primary=actual.object;
-    UnknownWreckerCollisionModel* model=(UnknownWreckerCollisionModel*)primary;
+    ConstraintMethodCollisionModel* model=(ConstraintMethodCollisionModel*)primary;
     if((unsigned char*)(CollisionObject*)model!=primary || (unsigned char*)(GameObject*)model!=primary+12)return 3;
     unsigned long cases=0;
     for(seed=0;seed<2048;++seed)for(stopAt=0;stopAt<=4;++stopAt) {

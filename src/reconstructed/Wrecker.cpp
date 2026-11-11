@@ -3,7 +3,6 @@
 
 #include "Wrecker.h"
 #include "../krusty2/core/SoultreeObject.h"
-#include "../krusty2/constraint/ConstraintMethodCollisionModel.h"
 
 #include <stdlib.h>
 
@@ -80,11 +79,9 @@ void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
     AppendChild(rigidBody, -1);
     rigidBody->SetNode(character->modelNode);
     gravityModel->AddBody(reinterpret_cast<GravityBody*>(rigidBody));
-    collisionModel = reinterpret_cast<UnknownWreckerCollisionModel*>(
-        new (__FILE__, 0x68) ConstraintMethodCollisionModel(1));
+    collisionModel = new (__FILE__, 0x68) ConstraintMethodCollisionModel(1);
     collisionModel->SetRenderContext(renderContext);
-    reinterpret_cast<ConstraintMethodCollisionModel*>(collisionModel)->SetBody(
-        reinterpret_cast<ConBody*>(rigidBody), 1, name);
+    collisionModel->SetBody(reinterpret_cast<ConBody*>(rigidBody), 1, name);
     AppendChild(collisionModel, -1);
     collisionModel->shapeCollisionEnabled = 0;
     collisionModel->collisionEnabled = 0;
@@ -135,8 +132,8 @@ int Wrecker::AddIndexedAnimation(int value) {
     return indexedAnimationCount - 1;
 }
 
-void Wrecker::AddIgnoredObject(UnknownWreckerCollisionObject* object) {
-    ignoreObjects = (UnknownWreckerCollisionObject**)DebugRealloc(ignoreObjects, ignoreObjectCount * 4 + 4, __FILE__, 0xb4);
+void Wrecker::AddIgnoredObject(CollisionObject* object) {
+    ignoreObjects = (CollisionObject**)DebugRealloc(ignoreObjects, ignoreObjectCount * 4 + 4, __FILE__, 0xb4);
     ignoreObjects[ignoreObjectCount] = object;
     ignoreObjectCount++;
     collisionModel->AddIgnoredOwner(object);
@@ -178,18 +175,26 @@ static inline Vector3& operator*=(Vector3& v, float s) {
     return v;
 }
 
-// Per-step update of a GameObject (slot 11) through the float view. The
-// named view pointer (one more local symbol in each of the two expansions)
-// is what gives the first carry-over product retail's term order in
-// relative._23 (a._23 * b._22 before a._33 * b._23): with the cast written
-// inline that element sums the other way (4174/4178). VC6 SP3 orders equal
+// Per-step update of a GameObject (slot 11, Step). The named pointer (one
+// more local symbol in each of the two expansions) is what gives the first
+// carry-over product retail's term order in relative._23 (a._23 * b._22
+// before a._33 * b._23): written as `object->Step(step)` that element sums
+// the other way (4174/4178 with the old view cast inline). VC6 SP3 orders equal
 // candidates there by the count of referenced local symbols created before
 // the product, modulo 8: two to seven more give retail's order, one more
 // is worse, eight more is back to the old order (dead initialised ints
 // probe the same window; the uninitialised ones are not counted).
 static inline void WreckerStep(GameObject* object, float step) {
-    UnknownWreckerSteppable* steppable = (UnknownWreckerSteppable*)object;
-    steppable->Step(step);
+    GameObject* stepped = object;
+    stepped->Step(step);
+}
+
+// Slot 11 of the collision model, called on its GameObject subobject at +0xc
+// (`lea ecx,[eax+0xc]`, no null check). An inline call, like WreckerStep: its
+// two parameters are local symbols of slot 10 that WreckerStep's comment
+// counts (written as a direct call, relative._23 sums the other way).
+static inline void WreckerStepModel(ConstraintMethodCollisionModel* model, float step) {
+    model->Step(step);
 }
 
 // In-place inverse of a rigid transform (the InvertRigid helper of
@@ -266,7 +271,7 @@ static inline void WreckerMatrixProduct(UnknownWreckerMatrix* out, UnknownWrecke
 int Wrecker::Tick(float frameTime) {
     GameObject::Tick(frameTime);
     if (wreckState == 0) {
-        collisionModel->UnknownFunctionStep(frameTime);
+        WreckerStepModel(collisionModel, frameTime);
         if (skipProbeEffects)
             skipProbeEffects = 0;
         else
@@ -328,7 +333,7 @@ int Wrecker::Tick(float frameTime) {
                 position += pushImpulse;
                 rigidBody->node->SetPositionInFrame(0, reinterpret_cast<const Vec3*>(&position));
             }
-            collisionModel->UnknownFunctionStep(step);
+            WreckerStepModel(collisionModel, step);
             remaining -= step;
         }
         if (collisionModel->hasContact) {
@@ -442,9 +447,10 @@ void Wrecker::EmitProbeTrail(Vector3 from, Vector3 to, float frameTime) {
 void Wrecker::EmitProbeEffects(float frameTime) {
     for (int i = 0; i < collisionModel->probeCount; i++) {
         if (collisionModel->probes[i].hit) {
-            Vector3 point = reinterpret_cast<const Vector3&>(collisionModel->probes[i].node->LocalToWorldPoint(reinterpret_cast<const Vec3&>(collisionModel->probes[i].localPoint)));
+            Vector3 point = reinterpret_cast<const Vector3&>(reinterpret_cast<SoultreeObject*>(collisionModel->probes[i].node)->LocalToWorldPoint(
+                reinterpret_cast<const Vec3&>(collisionModel->probes[i].localPoint)));
             EmitProbeTrail(probePositions[i], point, frameTime);
-            SprayContactParticles(probePositions[i], point, collisionModel->probes[i].normal, frameTime);
+            SprayContactParticles(probePositions[i], point, reinterpret_cast<const Vector3&>(collisionModel->probes[i].normal), frameTime);
         }
     }
 }
@@ -603,8 +609,7 @@ void Wrecker::SetPushBox(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 
 }
 
 void Wrecker::AddProbe(Vector3 offset, int bone) {
-    reinterpret_cast<ConstraintMethodCollisionModel*>(collisionModel)->AddProbePoint(
-        reinterpret_cast<const ConVec3&>(offset), reinterpret_cast<ConNode*>(bone));
+    collisionModel->AddProbePoint(reinterpret_cast<const ConVec3&>(offset), reinterpret_cast<ConNode*>(bone));
     probePositions = (Vector3*)DebugRealloc(probePositions, collisionModel->probeCount * sizeof(Vector3), __FILE__, 0x308);
     probePositions[collisionModel->probeCount - 1] = Vector3(0.0f, 0.0f, 0.0f);
     probeHits = (int*)DebugRealloc(probeHits, collisionModel->probeCount * 4, __FILE__, 0x30b);

@@ -16,72 +16,17 @@
 // the fields following it belong to each derived object.
 #include "../krusty2/collision/CollisionObject.h"
 
-// Object at Wrecker+0x38, RTTI ConstraintMethodCollisionModel (constructor
-// 0x0043b8d0 writes vtables 0x00551260 at +0 and 0x005511f0 (a GameObject-shaped
-// table) at +0xc; new size 0x10c at wrecker.cpp line 0x68). The secondary
-// GameObject subobject at +0xc is what UnknownVirtualSlot8/10 dispatch on.
-
-// GameObject slot 11 as the physics objects implement it: the per-step
-// update with the step length (src/krusty2/core/GameObject.h declares it
-// with `float dt`). Slot 10 of Wrecker calls it through this view of the same
-// vtable on its gravity model, rigid body and collision model.
-class UnknownWreckerSteppable {
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7();
-    virtual void UnknownVirtualSlot8();
-    virtual void UnknownVirtualSlot9();
-    virtual void UnknownVirtualSlot10();
-    virtual int Step(float step);
-};
-
 class SoultreeObject;
 typedef SoultreeObject UnknownWreckerSkeleton;
 
-// 32-byte probe record of the collision model (+0x104, count +0x100). Field
-// names follow ConstraintProbe in src/krusty2/constraint/ConstraintMethodCollisionModel.h.
-struct UnknownWreckerProbe {
-    Vector3 localPoint;        // +0x00 point in the node's space
-    UnknownWreckerSkeleton* node; // +0x0c
-    int hit;                   // +0x10 nonzero while the probe touches something
-    Vector3 normal;            // +0x14 contact normal
-};
-
-// Same complete CollisionObject, with GraphicsTest/GameObject at +0xc.
-typedef CollisionObject UnknownWreckerCollisionObject;
-
-class PhysicsRigidBody;
-
-class UnknownWreckerCollisionModel : public UnknownWreckerCollisionObject {
-public:
-    // Dispatch through the secondary GameObject base without a null conversion.
-    void UnknownFunctionStep(float step) {
-        ((UnknownWreckerSteppable*)((char*)this + 0xc))->Step(step);
-    }
-    explicit UnknownWreckerCollisionModel(int flags);              // 0x0043b8d0
-    // 0x0043b9e0 (thiscall, ret 0xc): binds the model to `body`; `name`
-    // is the collision file Bike passes ("rider.col").
-    void SetBody(PhysicsRigidBody* body, int value, const char* name);
-    // 0x0043c7f0 (thiscall, ret 0x10): adds a probe at `offset` on `bone`.
-    void AddProbePoint(Vector3 offset, int bone);
-
-    unsigned char field_0xb8[0xe8 - 0xb8];
-    int manualStep;            // +0xe8
-    int shapeCollisionEnabled; // +0xec
-    float damping;             // +0xf0
-    float impulseLoss;         // +0xf4
-    float maxImpulse;          // +0xf8
-    unsigned char field_0xfc[0x100 - 0xfc];
-    int probeCount;            // +0x100 probe count
-    UnknownWreckerProbe* probes; // +0x104
-    int applyImpulses;         // +0x108
-};
+// Object at Wrecker+0x38: RTTI ConstraintMethodCollisionModel (new 0x10c at
+// line 0x68, constructor 0x0043b8d0 writes vtables 0x00551260 at +0 and
+// 0x005511f0 at +0xc, COLs 0x0055b0f8 and 0x0055b098). Its CollisionObject
+// base keeps GraphicsTest/GameObject at +0xc, so Wrecker's GameObject calls
+// (slot 8, slot 11, AppendChild) go through that subobject. Wrecker reads
+// manualStep (+0xe8), the probes (+0x100/+0x104, 32-byte ConstraintProbe
+// records) and sets the damping and impulse limits (+0xf0..+0xf8).
+#include "../krusty2/constraint/ConstraintMethodCollisionModel.h"
 
 // Global collision quadtree (0x0068aba4, VisibilityQuadTree's constructor
 // installs it). 0x004dcf20 (thiscall, ret 8) removes an object from a cell.
@@ -204,7 +149,7 @@ public:
     void AddContactAnimation(int value);             // appends to contactAnimations
     void AddRandomAnimation(int value);             // appends to randomAnimations
     int AddIndexedAnimation(int value);              // appends to indexedAnimations, returns its index
-    void AddIgnoredObject(UnknownWreckerCollisionObject* object); // appends to ignoreObjects
+    void AddIgnoredObject(CollisionObject* object); // appends to ignoreObjects
     void EndWreck();                  // 0x005327c0: back to state 0, the pose reset
     void SetPushBox(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 halfExtents); // 0x005328b0: boxFrame/boxCenter/boxHalfExtents
     void PushProbesOutOfBox(float frameTime); // 0x005329e0: pushImpulse (samples/race/WreckerNearMisses.cpp)
@@ -219,7 +164,7 @@ public:
     void RebuildPoseSteps();
 
     UnknownWreckerCharacter* character; // +0x34
-    UnknownWreckerCollisionModel* collisionModel; // +0x38
+    ConstraintMethodCollisionModel* collisionModel; // +0x38
     SelectiveGravityModel* gravityModel; // +0x3c
     PhysicsRigidBody* rigidBody; // +0x40
     int wreckState;            // +0x44 wreck state (0 idle, 1..3)
@@ -229,7 +174,7 @@ public:
     int randomAnimationCount;  // +0x54
     int* contactAnimations;    // +0x58
     int contactAnimationCount; // +0x5c
-    UnknownWreckerCollisionObject** ignoreObjects; // +0x60
+    CollisionObject** ignoreObjects; // +0x60
     int ignoreObjectCount;     // +0x64
     float inertiaFactor;       // +0x68
     UnknownWreckerFrame lastPose; // +0x6c last pose of poseNode

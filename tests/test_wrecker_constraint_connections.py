@@ -25,13 +25,13 @@ ROOT = Path(__file__).resolve().parents[1]
 CALLER = 'src/reconstructed/Wrecker.cpp'
 SAMPLE = 'samples/race/WreckerNearMisses.cpp'
 PROVIDER = 'src/krusty2/constraint/ConstraintMethodCollisionModel.cpp'
-RENAMES = {
-    '??0UnknownWreckerCollisionModel@@QAE@H@Z': '??0ConstraintMethodCollisionModel@@QAE@H@Z',
-    '?SetBody@UnknownWreckerCollisionModel@@QAEXPAVPhysicsRigidBody@@HPBD@Z':
-        '?SetBody@ConstraintMethodCollisionModel@@QAEXPAVConBody@@HPBD@Z',
-    '?AddProbePoint@UnknownWreckerCollisionModel@@QAEXUVector3@@H@Z':
-        '?AddProbePoint@ConstraintMethodCollisionModel@@QAEXUConVec3@@PAVConNode@@@Z',
-}
+# The canonical ConstraintMethodCollisionModel calls Wrecker.cpp makes; each
+# must be imported once by the caller and the sample and defined by PROVIDER.
+CONSTRAINT_CALLS = (
+    '??0ConstraintMethodCollisionModel@@QAE@H@Z',
+    '?SetBody@ConstraintMethodCollisionModel@@QAEXPAVConBody@@HPBD@Z',
+    '?AddProbePoint@ConstraintMethodCollisionModel@@QAEXUConVec3@@PAVConNode@@@Z',
+)
 FILENAMES = (CALLER, SAMPLE, 'samples/race/../../src/reconstructed/Wrecker.cpp')
 CRT_NAMES = {'_FixtureMalloc': '_malloc', '_FixtureFree': '_free', '_FixtureMsize': '__msize'}
 
@@ -182,12 +182,10 @@ class WreckerConstraintConnections(unittest.TestCase):
                 ('scene','?FindByName@SoultreeObject@@',0x4fdae0,84,'src/krusty2/soultree/soultree.bindings.json'),
                 ('body','?SetNode@PhysicsBody@@',0x4cbdf0,17,'src/krusty2/rigidbody/PhysicsBody.bindings.json')):
                 self.assertTrue(compare(image,objects[label],symbol,va,size,ROOT/binding_path)['strict_exact'],symbol);strict+=1
-            targets=set(RENAMES.values())
             for label in ('caller','sample'):
                 imports=[objects[label].symbol_by_index[r.symbol_index].name for r in objects[label].relocations]
-                self.assertTrue(set(RENAMES).isdisjoint(imports))
-                for target in targets:self.assertEqual(imports.count(target),1)
-            for target in targets:self.assertGreater(objects['provider'].find_symbol(target).section_number,0)
+                for target in CONSTRAINT_CALLS:self.assertEqual(imports.count(target),1)
+            for target in CONSTRAINT_CALLS:self.assertGreater(objects['provider'].find_symbol(target).section_number,0)
             for source,label,signature,symbol,va,size,file_va in (
                 (CALLER,'append','void Wrecker::AddProbe(', '?AddProbe@Wrecker@@',0x532900,210,0x575ab8),
                 (PROVIDER,'probe','void ConstraintMethodCollisionModel::AddProbePoint(', '?AddProbePoint@ConstraintMethodCollisionModel@@',0x43c7f0,139,0x568818)):

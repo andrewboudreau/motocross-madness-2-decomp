@@ -14,9 +14,9 @@ CHECK_LAYOUT(collision_shape, offsetof(CollisionObject, shape) == 0x54);
 CHECK_LAYOUT(collision_contact, offsetof(CollisionObject, contactRecord) == 0x5c);
 CHECK_LAYOUT(collision_ignore, offsetof(CollisionObject, ignoreVegetation) == 0x68);
 CHECK_LAYOUT(collision_callback, offsetof(CollisionObject, onHitCallback) == 0x88);
-CHECK_LAYOUT(wrecker_model_extent, sizeof(UnknownWreckerCollisionModel) == 0x10c);
-CHECK_LAYOUT(wrecker_model_manual, offsetof(UnknownWreckerCollisionModel, manualStep) == 0xe8);
-CHECK_LAYOUT(wrecker_model_probes, offsetof(UnknownWreckerCollisionModel, probes) == 0x104);
+CHECK_LAYOUT(wrecker_model_extent, sizeof(ConstraintMethodCollisionModel) == 0x10c);
+CHECK_LAYOUT(wrecker_model_manual, offsetof(ConstraintMethodCollisionModel, manualStep) == 0xe8);
+CHECK_LAYOUT(wrecker_model_probes, offsetof(ConstraintMethodCollisionModel, probes) == 0x104);
 CHECK_LAYOUT(wrecker_field, offsetof(Wrecker, character) == 0x34);
 CHECK_LAYOUT(car_field, offsetof(CarProcedural, carModel) == 0x34);
 
