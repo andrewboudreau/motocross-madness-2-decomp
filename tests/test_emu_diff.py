@@ -195,6 +195,20 @@ CLEAN_CASES = {
     'projected_shadow_init': 100,
     'terrain_load': 100,
     'bike_race_create': 60,
+    # Render/texture/text/UI sweep: pixel conversion, texture building, text layout and UI layout.
+    'halve1555': 60,
+    'dither_convert': 60,
+    'grid_build_node_texture': 60,
+    'grid_build_block_texture': 60,
+    'grid_rebuild_block_buffers': 60,
+    'overlay_draw_text': 30,
+    'overlay_draw_text_1555': 40,
+    'overlay_draw_text_4444': 40,
+    'overlay_layout_text': 60,
+    'dropdown_layout_parts': 60,
+    'graphics_test_draw_circle': 60,
+    'eco_render3d': 30,
+    'soultree_prepare_geometry': 20,
 }
 
 # Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).
@@ -267,6 +281,15 @@ PRE_FIX_SHAPES = [
      [('    float zz = v.z * v.z;\n    float lengthSquared = v.x * v.x + v.y * v.y + zz;\n',
        '    float xx = v.x * v.x;\n    float yy = v.y * v.y;\n    float lengthSquared = xx + yy + v.z * v.z;\n')],
      400),
+    # PrepareGeometry summed row 1 of the tree's view product flat; retail groups _21, _23 and
+    # _24 (24-bit only).
+    ('soultree_prepare_geometry',
+     [('view._21 = ((world.m[1][2] * projection.m[2][0] + world.m[1][3] * projection.m[3][0]) + world.m[1][0] * projection.m[0][0]) + world.m[1][1] * projection.m[1][0];',
+       'view._21 = world.m[1][0] * projection.m[0][0] + world.m[1][1] * projection.m[1][0] + world.m[1][2] * projection.m[2][0] + world.m[1][3] * projection.m[3][0];'),
+      ('view._23 = ((world.m[1][0] * projection.m[0][2] + world.m[1][1] * projection.m[1][2]) + world.m[1][3] * projection.m[3][2]) + world.m[1][2] * projection.m[2][2];',
+       'view._23 = world.m[1][0] * projection.m[0][2] + world.m[1][1] * projection.m[1][2] + world.m[1][2] * projection.m[2][2] + world.m[1][3] * projection.m[3][2];'),
+      ('view._24 = ((world.m[1][2] * projection.m[2][3] + world.m[1][3] * projection.m[3][3]) + world.m[1][1] * projection.m[1][3]) + world.m[1][0] * projection.m[0][3];',
+       'view._24 = world.m[1][0] * projection.m[0][3] + world.m[1][1] * projection.m[1][3] + world.m[1][2] * projection.m[2][3] + world.m[1][3] * projection.m[3][3];')], 20),
 ]
 
 

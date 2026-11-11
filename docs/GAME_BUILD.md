@@ -1597,6 +1597,46 @@ Its arch model width is a synthetic arena value, so the offsets it measures are 
 Every string and format constant the linked bodies reference equals retail's. The only differing
 data references are the units' own `__FILE__` tags and vtable or loop-end addresses.
 
+A render, texture, text and UI sweep covered the linked bodies below 1.000 that no case covered.
+It fed synthetic surfaces and buffers with packed, padded and odd pitches, 1x1 and odd sizes, and
+empty and wrapping text. New cases, each agreeing at its control words:
+- Pixel conversion: `halve1555` (0x004ce420) and `dither_convert` (`DitherConvert` 0x004cf2a0).
+  The dither case covers all three source formats, every output mix, the palette snap and the
+  error-row grow path.
+- Grid texture building: `grid_build_node_texture` (0x0047d470), `grid_build_block_texture`
+  (0x0047d780) and `grid_rebuild_block_buffers` (0x0047f210).
+- Text: `overlay_draw_text` (`DrawTextInto` 0x0050b080, which blends the texels natively),
+  `overlay_draw_text_1555`/`_4444` (0x0050b700/0x0050b400) and `overlay_layout_text` (0x0050ba00).
+- UI and debug drawing: `dropdown_layout_parts` (0x0047a400) and `graphics_test_draw_circle`
+  (0x0047bd10).
+- Scene: `eco_render3d` (`EcoSystem::Render3D` 0x0045b060) and `soultree_prepare_geometry`
+  (0x00443aa0).
+
+Each case's source mutations (a wrap test, a rounding bias, a pitch factor, an index count)
+differ from retail.
+
+One bug was fixed. `D3DIMSoultreeObject::PrepareGeometry` summed row 1 of the world * camera
+product left to right. Retail (0x00443bac..0x00443c3a) groups `_21`, `_23` and `_24` differently.
+At 24-bit precision the matrix handed to the clipper's box test differed by an ulp in those
+elements, which can flip tree culling at the view edge. The bracketed source raises the body from
+0.941 to 0.988 masked.
+
+Bodies with existing native retail differential tests compiled from the linked source; each test
+passes:
+- `PCTextureMap::CreateSurface`, `CopyRectTo` and `Clone`.
+- `CacheTexture::CopyMipLevels`.
+- `UIEditBox::Draw` and `OnChar`, `UIMultiState::Draw` and `UIListBox::ButtonDown`.
+- `BackgroundImage::GetDc`, `MediaControl::Open`, `UnknownResourceManager::AddArchive` and
+  `PCVideoCard::ProbeNonLocalTextureMemory`.
+
+Bodies reviewed by disassembly, showing register, frame-slot, block-order or scheduling
+differences only:
+- `ManagedTextureGroup::RepackWholePages` and `RepackWithPartialBlits`.
+- `BaseQuarryEvent::PrepareGeometry`.
+- The three bike-rider dialog `Tick` bodies.
+- `PCVideoCard::CreateModeSurfaces`, which keeps retail's signed vidmem comparison.
+- `CopyMipLevels`, which re-tests the loop result where retail jumps straight on.
+
 ### Grid lighting workers
 
 The three workers in `Group4_GridLighting.cpp` were rewritten from the
