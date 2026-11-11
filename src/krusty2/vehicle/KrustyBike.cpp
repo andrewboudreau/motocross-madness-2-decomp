@@ -1418,7 +1418,7 @@ void KrustyBike::Fn_0048E280()
 }
 
 // ---- slot 89: rider pose selection (0x0048e3e0, overrides Bike 0x00406ae0) ----
-// Decoded from retail (tier 2 shape; names tier 3).  Bike's version with three differences:
+// Decoded from retail (tier 2 shape; names tier 3).  Bike's version with four differences:
 //  - pad_0x5B8 set (Vehicle.cpp clears it; slot 102 tests it with crashState): fixed steer
 //    pose (poseIndex 3, poseState 4, poseBlend 1, poseLeanBlend 0) and the state-1 mapping
 //    of controlInput.x to poseParam, without touching steerPoseState;
@@ -1426,10 +1426,20 @@ void KrustyBike::Fn_0048E280()
 //    than 2.5 clear of the ground starts the head turn 0x0048e280 (control 9 while the
 //    crossover pose runs) or the knocked-off animation 0x0048d910 picked by controls 6/7
 //    and the stick sector (slot 88), and returns;
-//  - no lean pose (leanPoseMin/leanPoseMax): backingUp selects pose 16 (BackUp) instead.
+//  - no lean pose (leanPoseMin/leanPoseMax): backingUp selects pose 16 (BackUp) instead;
+//  - the crossover smoother chases crossupScale * controlInput.x clamped to [-1, 1]
+//    (0x48e828..0x48e85f: `fld [esi+0x63c] ; fmul [esi+0x504]`, then the -1/1 clamp),
+//    not controlInput.x itself (fixed in session 25; the source used controlInput.x).
 // The rest (crossover pose, slip/steer pose, both steerPoseState machines) is Bike's.
 // Retail rounds the pose index with the same inlined fistp helper as Bike; KbFloatToInt
 // gives the round-to-nearest-even result in ordinary C++ (see Bike.cpp BikeFloatToInt).
+// Retail's helper is three instructions at each site; the inlined emulation (three copies
+// of a __ftol round trip) adds ~30 instructions (733 vs 703, masked 0.591 in session 25).
+// An out-of-line KbFloatToInt scores higher (masked 0.638, 654 insns) but emits a call
+// retail does not have to a function with no retail address, so it is ruled out. Retail's
+// ebp frame (from the __asm helper) also moves the shared clamp exits (`jne` to one
+// `fld lo ; fstp [poseParam] ; ret` block instead of an inline copy), which the esp frame
+// here does not reproduce.
 // Before this override the source build ran Bike's slot 89 for KrustyBike, so player bikes
 // took Bike's lean poses and never started the in-air head turn or knocked-off animation
 // from here.
@@ -1551,8 +1561,9 @@ void KrustyBike::SelectRiderPose(float t)
 
     if (crossoverPose) {
         // advance the smoothed value toward controlInput.x, limited by its rate
+        float target = KbRange(crossupScale * controlInput.x, -1.0f, 1.0f);
         BikeA644* smoother = poseSmoother;
-        float change = controlInput.x - *(float*)&smoother->smoothedValue;
+        float change = target - *(float*)&smoother->smoothedValue;
         if (change < 0.0f)
             change = KbAtLeast(change, smoother->maxFall);
         else

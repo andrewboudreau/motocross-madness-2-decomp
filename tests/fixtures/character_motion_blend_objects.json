@@ -13,8 +13,8 @@
     },
     "samples/physics/krustybike/KrustyBikeNearMisses.cpp": {
       "sections": 288,
-      "relocations": 1564,
-      "sha256": "a8c7ce189d5793d630d19cc8e88d126198f1c99cf8ad83aaa7b05538fbb5ef61"
+      "relocations": 1568,
+      "sha256": "4b3e8dd195152ffc4dea5939f2b5d250d930f4db79a78272414194fbc097929c"
     },
     "samples/physics/motion/Motnctrl.cpp": {
       "sections": 36,
