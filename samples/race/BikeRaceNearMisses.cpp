@@ -150,7 +150,9 @@
 // the second rand() and adds base to it; with a returned value VC6 homes the
 // pro circuit's offset in the riders/circuit slot, which then ranks too
 // high). That puts every scalar and bikeTexture/riderTexture at retail's
-// offset, so 13396 of 13428 bytes match. Left: the three register choices
+// offset, so 13390 of 13428 bytes match (13396 with one more inline-bearing
+// class declared in the TU: XOR EDI/MOV EBX at +538 swap; see
+// BIKE_RACE_STATE_CONNECTIONS.md). Left: the three register choices
 // near the start (0x419b0d, 0x419b39, 0x419bf0), the first two stores of
 // the prologue in the other order (0x4199ad), the SIB order of one curve
 // copy (0x41b124), and two 0x40-byte pairs swapped in the frame:
@@ -551,15 +553,7 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
     gridReady = true;
 }
 
-// DlgProcs.h's DemoDlg (vtable 0x00550e18, 0x7f58 bytes) with the inline
-// constructor the setup's `new` expands (UIDialog(1, "credits.dtm"), then
-// the vtable); DlgProcs.h declares no constructor for it.
-class UnknownBikeRaceDemoDlg : public UIDialog {
-public:
-    UnknownBikeRaceDemoDlg(int flags, const char* resource) : UIDialog(flags, resource) {}
-    virtual int Tick(float frameTime);                    // 0x00455b20
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00455ae0
-};
+#include "../../src/reconstructed/DemoDlg.h"
 
 // The length of `v` (1 without a square root for unit vectors); the setup
 // restores the lengths D3DRMVectorRotate's unit results lose.
@@ -884,7 +878,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     if (g_TrackGame->playingReplay && g_TrackGame->mode.raceSettings.raceMode != 4 &&
         g_TrackGame->useReplayTape) {
         if (g_TrackGame->ui->playingDemo) {
-            UnknownBikeRaceDemoDlg* dialog = new(__FILE__, 0x2fb) UnknownBikeRaceDemoDlg(1, "credits.dtm");
+            DemoDlg* dialog = new(__FILE__, 0x2fb) DemoDlg;
             g_TrackGame->ui->gui->ShowDialog(dialog, 0, 1, 0, 0, 0, 0, 1);
         } else {
             g_TrackGame->ui->gui->ShowCursors(1);

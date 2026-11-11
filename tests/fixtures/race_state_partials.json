@@ -35,7 +35,7 @@
       6745,
       6760,
       2821,
-      "bed27c4eec8b564466334fd6dff8c214d126142fcab5d149c884da44cbd5487f"
+      "06d0192bea16653a870c64c3ef978b2f5d2fdc3dce244ce3132bd2b9d00e5b2e"
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",
@@ -43,8 +43,8 @@
       4299120,
       13428,
       13428,
-      13396,
-      "466585fe01c0807835ba2ba10dea83649cbb54151c52c18fa36d055935053282"
+      13390,
+      "2e01aa42972e9d2abca94ce35551d26c1cb16a6e157472611b0e2ab2dfeb22b5"
     ],
     [
       "src/krusty2/vehicle/KrustyBike.cpp",

@@ -71,6 +71,11 @@ branch entry, label or relocation. All other body bytes and all 1,929 aggregate
 relocation destinations are preserved; 205 of 206 nondebug sections are
 unchanged. Its strict matching-position count changes from 13,396 to 13,390;
 it remains a nonexact, unadmitted candidate.
+The schedule depends only on how many inline-bearing classes the TU declares:
+replacing the sample's own `UnknownBikeRaceDemoDlg` stand-in with the canonical
+`DemoDlg` (`DemoDlg.h`) gives the 13,390 order, and any extra class with an inline
+constructor restores 13,396. CreateRacers never uses that class, so the sample
+keeps the canonical class rather than a matching-only declaration.
 
 | Complete CreateRacers fingerprint | Before | After |
 |---|---|---|
