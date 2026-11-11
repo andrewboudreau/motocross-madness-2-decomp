@@ -94,6 +94,13 @@ static inline void TerrainShadowFloatToInt(int* out, float value)
 // and texture coordinates scaled by field_0x677c.  Cells that were drawn into are marked used.
 // Tier 3 semantics; the retail body converts with an inline __asm fistp helper, so this stays a
 // documented partial (see targets.json); TerrainShadowFloatToInt reproduces its rounding.
+// The section records are reached through the mesh's pointer at +0x17c (retail `mov edx,
+// [mesh + 0x17c]; movsx edx, word ptr [edx + 2]`).  An earlier Terrain.h laid them out inline
+// at +0x17c, so sectioned meshes read the pointer and the following bytes as index ranges and
+// produced indices past the transformed array; the bounds guard added for that is gone, as
+// retail has none.  Checked against retail and equal apart from the rounding helper: the
+// clip-rectangle doubling, the outcode tests, the cull sign, the minDepth test, the 0x300
+// vertex limit, the colour constants and the MarkUsed address (mesh + 0x144).
 void TerrainShadow::UnknownVirtualSlot30()
 {
     enum { kMaxMeshVertices = 867 };
@@ -195,11 +202,6 @@ void TerrainShadow::UnknownVirtualSlot30()
                 int i0 = (unsigned short)corner[0] + vertexBase;
                 int i1 = (unsigned short)corner[1] + vertexBase;
                 int i2 = (unsigned short)corner[2] + vertexBase;
-                // Bring-up guard (not in retail): a section/index mismatch in this near-miss body
-                // can yield indices past the transformed vertex array; skip such triangles.
-                if ((unsigned)i0 >= (unsigned)mesh->vertexCount || (unsigned)i1 >= (unsigned)mesh->vertexCount ||
-                    (unsigned)i2 >= (unsigned)mesh->vertexCount)
-                    continue;
                 if (outcodes[i0] & outcodes[i1] & outcodes[i2])
                     continue;
                 tri[0] = *(ClipPoint*)&transformed[i0];

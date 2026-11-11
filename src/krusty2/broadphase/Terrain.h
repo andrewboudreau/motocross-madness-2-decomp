@@ -106,6 +106,8 @@ struct TerrainVec3;
 // 16-bit cell coordinates compared with the lookup arguments, +0x08 is a pointer returned as the
 // key, +0x38 the cell's mesh (TerrainShadow slot 30 reads its lit vertices, index list and
 // 16 section records; +0x121 bit 3 selects the sectioned layout).  Tier 2 offsets, tier 3 names.
+// The mesh is the node draw data Griddraw.h declares as GridNodeDrawData and a section the
+// head of its twelve-byte GridBlockRange (strong inference: every offset used here agrees).
 struct TerrainCellSection {
     short vertexBase;                                          // +0x00 vertex base of the following section
     short indexEnd;                                            // +0x02 cumulative index count
@@ -121,7 +123,8 @@ struct TerrainCellOwner {
     short indexCount;                                          // +0x13e
     char pad_0x140[0x144 - 0x140];
     char ageEntry[0x17c - 0x144];                              // +0x144 passed to AgeManager::MarkUsed
-    TerrainCellSection sections[0x10];                         // +0x17c
+    TerrainCellSection* sections;                              // +0x17c sixteen records, or null when unsectioned
+                                                               // (retail slot 30 loads the pointer, then reads [p + 2])
 };
 struct TerrainCell {
     char pad_0x00[8];
