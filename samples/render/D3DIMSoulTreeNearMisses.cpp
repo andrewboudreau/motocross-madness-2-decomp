@@ -19,8 +19,12 @@
 // parentheses (docs/VC6_OPERAND_ORDER.md section 3): one bracketing for the
 // whole row gives 806; a different one per element of row 1 reaches 826
 // (_21..._23 retail's order, _24 still t1, t3, t2, t0 where retail sums t3,
-// t2, t1, t0, unchanged by its 264 orders); not kept, since nothing ties
-// those per-element forms to the source. Any extra local, even an unused
+// t2, t1, t0, unchanged by its 264 orders); not kept here, since nothing ties
+// those per-element forms to the source. The linked copy
+// (src/bringup/Group5_D3DIMSoulTreeDraw.cpp) does bracket _21, _23 and _24:
+// there every row 1 sum gets retail's grouping (_22 differs only by
+// commutation), which tools/emu_cases/soultree_prepare_geometry.py shows
+// at 24-bit precision. Any extra local, even an unused
 // `const Matrix4& p = projection;` or `Matrix4* w = &world;`, reorders the
 // sums globally (737); reference aliases of world/projection on one or all
 // row 1 leaves score the same as the bare declaration (references to locals

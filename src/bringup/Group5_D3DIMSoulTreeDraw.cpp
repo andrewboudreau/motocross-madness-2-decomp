@@ -118,10 +118,12 @@ int D3DIMSoultreeObject::PrepareGeometry()
         view._12 = world.m[0][0] * projection.m[0][1] + world.m[0][1] * projection.m[1][1] + world.m[0][2] * projection.m[2][1] + world.m[0][3] * projection.m[3][1];
         view._13 = world.m[0][0] * projection.m[0][2] + world.m[0][1] * projection.m[1][2] + world.m[0][2] * projection.m[2][2] + world.m[0][3] * projection.m[3][2];
         view._14 = world.m[0][0] * projection.m[0][3] + world.m[0][1] * projection.m[1][3] + world.m[0][2] * projection.m[2][3] + world.m[0][3] * projection.m[3][3];
-        view._21 = world.m[1][0] * projection.m[0][0] + world.m[1][1] * projection.m[1][0] + world.m[1][2] * projection.m[2][0] + world.m[1][3] * projection.m[3][0];
+        // Row 1 sums in retail's order (0x00443bac..0x00443c3a): the grouping shows at 24-bit
+        // precision, so _21, _23 and _24 are bracketed as retail adds them.
+        view._21 = ((world.m[1][2] * projection.m[2][0] + world.m[1][3] * projection.m[3][0]) + world.m[1][0] * projection.m[0][0]) + world.m[1][1] * projection.m[1][0];
         view._22 = world.m[1][0] * projection.m[0][1] + world.m[1][1] * projection.m[1][1] + world.m[1][2] * projection.m[2][1] + world.m[1][3] * projection.m[3][1];
-        view._23 = world.m[1][0] * projection.m[0][2] + world.m[1][1] * projection.m[1][2] + world.m[1][2] * projection.m[2][2] + world.m[1][3] * projection.m[3][2];
-        view._24 = world.m[1][0] * projection.m[0][3] + world.m[1][1] * projection.m[1][3] + world.m[1][2] * projection.m[2][3] + world.m[1][3] * projection.m[3][3];
+        view._23 = ((world.m[1][0] * projection.m[0][2] + world.m[1][1] * projection.m[1][2]) + world.m[1][3] * projection.m[3][2]) + world.m[1][2] * projection.m[2][2];
+        view._24 = ((world.m[1][2] * projection.m[2][3] + world.m[1][3] * projection.m[3][3]) + world.m[1][1] * projection.m[1][3]) + world.m[1][0] * projection.m[0][3];
         view._31 = world.m[2][0] * projection.m[0][0] + world.m[2][1] * projection.m[1][0] + world.m[2][2] * projection.m[2][0] + world.m[2][3] * projection.m[3][0];
         view._32 = world.m[2][0] * projection.m[0][1] + world.m[2][1] * projection.m[1][1] + world.m[2][2] * projection.m[2][1] + world.m[2][3] * projection.m[3][1];
         view._33 = world.m[2][0] * projection.m[0][2] + world.m[2][1] * projection.m[1][2] + world.m[2][2] * projection.m[2][2] + world.m[2][3] * projection.m[3][2];
