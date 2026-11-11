@@ -1691,7 +1691,15 @@ int KrustyBike::Fn_00414370(float dt)
     float right, left;
     float gateAhead, bikeAhead;
     float speed, t, divisor, lenSq, dx, dz;
-    float trickDelay;
+    // Only the free-roam branch sets the trick delay (for difficulty 1..3). Elsewhere retail
+    // reads it from the frame slot that holds the game difficulty (fld [esp+0x20]), so the
+    // delay is that int's bits: 0.0 for difficulty 0, else a denormal just above 0, which
+    // keeps a trick timer of exactly 0 counting up for a frame. The union spells that out;
+    // tools/emu_cases/kb_ai_racing_line.py.
+    union {
+        int difficulty;
+        float trickDelay;
+    };
     int dummy;
     int count;
     int i;
@@ -1699,7 +1707,7 @@ int KrustyBike::Fn_00414370(float dt)
     memset(&aiPath, 0, sizeof(aiPath));
     list = 0;
     dummy = 0;
-    int difficulty = g_TrackGame->mode.difficulty;
+    difficulty = g_TrackGame->mode.difficulty;
     int kind = g_TrackGame->mode.raceSettings.eventType;
     if (kind != 3 && kind != 2) {
         if (kind != 1 && kind != 5) {
