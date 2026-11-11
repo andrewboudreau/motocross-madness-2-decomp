@@ -285,6 +285,9 @@ merged into, or renamed to, the retail unit that owns their address range.
 
 ## Classes
 
+> Refreshed **2026-11-10** at tree `3dd5f6a7` (with fresh VC6 verdicts and the
+> CRT atlas); the rest of this page is still the 2026-10-30 snapshot.
+
 From `analysis/rtti_classes.json` (249 classes with a complete object locator;
 of the 252 RTTI type descriptors, `GR_PixelString`, `GroundFogableObject` and
 `MovingPart` have none, so they have no vtable here) and
@@ -292,37 +295,30 @@ of the 252 RTTI type descriptors, `GR_PixelString`, `GroundFogableObject` and
 
 | C++ definition | Classes |
 |---|---:|
-| `class`/`struct` body under `src/` | 231 |
-| under `src/` with a stand-in name (`PCVideoCard`, RTTI noted in `Display.h`) | 1 |
-| only under `samples/` | 12 |
+| `class`/`struct` body under `src/` with the RTTI name | 244 |
 | CRT (`type_info`, `exception`, `bad_cast`, `bad_typeid`, `__non_rtti_object`; all slots in LIBCMT) | 5 |
-| nowhere | 0 |
-
-Samples-only: DirtChunk/DirtSpray/Dust/Spark/SteamParticleEmitter, InlineShock,
-PhysicsBody, PhysicsRigidBody, RotatingShock, Shock, TerrainShadow, Tire.
+| only under `samples/`, under a stand-in name, or nowhere | 0 |
 
 A slot counts as reconstructed when its function start is strict exact (CRT
-slots such as `__purecall` are library). **90 classes have every slot
-reconstructed; 159 have 433 non-exact slot entries, which are 122 distinct
-functions** (105 near miss, 13 inline asm, 4 unattributed; 63 are used by
-only one vtable). The most shared:
+slots such as `__purecall` are library). **122 classes have every slot
+reconstructed; 127 have 206 non-exact slot entries, which are 65 distinct
+functions** (52 near miss, 13 inline asm; 37 are used by only one vtable).
+The most shared:
 
 | Function | vtables | Category | Used by |
 |---|---:|---|---|
-| `0x0046e8c0` | 71 | near miss | UIDialog family (ChoiceDlg, ...) |
-| `0x0046ef00` | 53 | near miss | UIDialog family |
-| `0x00470f10` | 17 | near miss | UIControl family |
+| `0x0046ef00` | 53 | near miss | UIDialog family (ChoiceDlg, ...) |
 | `0x00470410`, `0x00470420` | 16 each | near miss (relocation-masked exact) | UIControl slots 61/62 |
 | `0x00405170` | 15 | near miss (relocation-masked exact) | BaseObject::Release |
-| `0x004705d0` | 14 | near miss | UIControl family |
-| `0x004dc610` | 7 | unattributed | CollisionObject, ConstraintMethodCollisionModel, D3DIMSoultreeObject, ... |
+| `0x004a70c0` | 7 | near miss | Character family (Bike, CollisionCharacter, ...) |
+| `0x0042ee30` | 7 | near miss | Camera family (BikeCamera, FollowCamera, ...) |
+| `0x00501e90` | 6 | near miss | SoultreePhysics family, Bike, KrustyBike |
+| `0x00463a30` | 4 | near miss | BikeCamera, FollowCamera, KrustyBikeCamera, VehicleCamera |
 
-Per class (non-exact slot entries): KrustyBike 23, Bike 21, Vehicle 18,
-UIMultiState 10, UIRadioButton 10, BikeCamera 9, KrustyBikeCamera 9,
-SoultreePhysicsObject 9, VehicleCamera 9, SoultreePhysicsCharacter 8,
-FollowCamera 7, UIEditBox 6, then 11 classes with 5, 5 with 4, 17 with 3,
-54 with 2 (mostly the two UIDialog functions above) and 60 with 1. The full
-per-vtable list (with `object_offset`) is `classes[].vtables[].missing`.
+Per class (non-exact slot entries): KrustyBike 9, Bike 8, UIMultiState 8,
+UIRadioButton 8, Vehicle 5, UIEditBox 4, then 13 classes with 3, 17 with 2
+(mostly the UIDialog function above) and 91 with 1. The full per-vtable list
+(with `object_offset`) is `classes[].vtables[].missing`.
 
 ## Inline-asm functions
 
