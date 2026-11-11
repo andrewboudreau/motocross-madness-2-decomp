@@ -25,6 +25,9 @@
 // GridRoundToInt rounds them with src/bringup/X87FloatToInt.h (fistp's ties-to-even).
 // Retail has no range test on the rounded cell indices (only the child loop's
 // `== 16 -> 15` clamp, 0x4844c3/0x4844d3).
+// Differential emulation against retail (unicorn: random 1- to 3-level grid trees, lattice,
+// tie and axis-aligned segments, every x87 rounding and precision mode) finds no behaviour
+// difference in 6000 cases; see docs/GAME_BUILD.md (bodies checked by emulation).
 //
 // Logic fixes from the retail branches (session 25):
 // - merge dedupe: after taking an x crossing, retail drops the next y crossing when

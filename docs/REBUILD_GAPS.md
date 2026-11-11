@@ -392,7 +392,7 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 |---|---:|---|---|
 | `0x00406ae0`, `0x0040c000` | 3, 1 | `src/krusty2/vehicle/Bike.cpp` (`SelectRiderPose`, `ComputeSlideAngle`) | `BikeFloatToInt` |
 | `0x00446f40` | 6 | `samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp` (`/QIfist`) | `FistpFloatToInt` (`samples/common/FistpFloatToInt.h`) |
-| `0x00483d40` | 4 | `samples/render/GridNodeNearMisses.cpp` (`GridMidCell`) | `X87FloatToInt`; its 4 other casts are retail `__ftol` calls |
+| `0x00483d40` | 4 | `samples/render/GridNodeNearMisses.cpp` (`GridRoundToInt`) | `X87FloatToInt`; its 4 other casts are retail `__ftol` calls; the whole body matches retail in 6000 emulated cases ([GAME_BUILD](GAME_BUILD.md#collision-and-terrain-bodies-checked-by-emulation)) |
 | `0x0048d1e0` | 2 | `src/bringup/Group4_ScoreBoard.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
 | `0x0048d780` | 1 | `samples/physics/bikeai/KrustyBikeTrickPick.cpp` (`/QIfist`) | `FistpFloatToInt` |
 | `0x0048e3e0` | 3 | `samples/physics/krustybike/KrustyBikeSelectRiderPose.cpp` (`/QIfist`) | `FistpFloatToIntChecked` (the steer value is unbounded) |
@@ -403,7 +403,7 @@ that `tools/build_game.py` links. This was checked on 2026-11-10 against
 | `0x004db8c0`, `0x004dc2b0` | 2, 2 | `samples/physics/shadow/ProjectedShadowNearMisses.cpp` (`/QIfist`) | `ProjectedShadowFloatToInt` |
 | `0x004eab00` | 1 | `src/bringup/Group4_SceneTick.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
 | `0x00507610` | 1 | `src/bringup/Group3_TerrainPrepareGeometry.cpp` (`/QIfist` bring-up) | `FistpFloatToInt` |
-| `0x00507c10` | 2 | `src/krusty2/broadphase/Terrain.cpp` (`QueryGround`; the `QueryGround` views forward to it) | `FloatToInt` |
+| `0x00507c10` | 2 | `src/krusty2/broadphase/Terrain.cpp` (`QueryGround`; the `QueryGround` views forward to it) | `FloatToInt`; the whole body matches retail in 6000 emulated cases after two repairs ([GAME_BUILD](GAME_BUILD.md#collision-and-terrain-bodies-checked-by-emulation)) |
 | `0x00509aa0` | 6 | `samples/physics/shadow/TerrainShadow.cpp` (`/QIfist`) | `FistpFloatToInt` |
 | `0x00518f30` | 1 | `src/reconstructed/TrackOverlay.cpp` (`NameOverlay::Tick`) | `X87FloatToInt`; the canonical unit has 18 retail-truncating `__ftol` casts, so it cannot take `/QIfist` |
 | `0x0051af00` | 2 | `samples/track/DropTextOverlaySetup.cpp` (`/QIfist`) | `FistpFloatToInt` |

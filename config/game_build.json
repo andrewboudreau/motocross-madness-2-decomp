@@ -497,9 +497,9 @@
     },
     {
       "path": "samples/render/GridNodeNearMisses.cpp",
-      "status": "best-guess-unreviewed",
-      "reason": "Near-miss body admitted so the source build can link and run; defines GridNode::IntersectSegment. Behavior unverified against retail; bytes nonexact.",
-      "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+      "status": "reviewed-nonexact",
+      "reason": "Defines GridNode::IntersectSegment (0x00483d40, 4140 retail bytes). Differential emulation (unicorn, retail LinePlaneIntersection and __ftol, recursion through a stub vtable slot) over random 1- to 3-level grid trees, lattice and tie segments and all x87 rounding/precision modes found no difference in 6000 cases (return, out point, node, rounded hit, FPU status). Directed rounding can index past the row tables; retail and the candidate then both fault (505 cases, none under round-to-nearest). Bytes nonexact: retail's ebp frame comes from its inline-asm fistp helper.",
+      "evidence": "docs/GAME_BUILD.md#collision-and-terrain-bodies-checked-by-emulation"
     },
     {
       "path": "samples/render/GriddrawNearMisses.cpp",

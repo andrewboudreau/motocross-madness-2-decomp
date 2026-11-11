@@ -1098,7 +1098,9 @@ Left alone:
 - `GridNode::IntersectSegment` (0x00483d40, `GridNodeNearMisses.cpp`) calls
   `__ftol` four times next to its four fistp sites, as retail does. The
   sample would need the rounding moved to another unit, for little gain
-  (0.832). It keeps `X87FloatToInt`.
+  (0.832). It keeps `X87FloatToInt`; differential emulation later found it
+  behaves as retail (see
+  [bodies checked by emulation](#collision-and-terrain-bodies-checked-by-emulation)).
 - `KrustyBike::SelectRiderPose` (0x0048e3e0) was left here at first. It has
   since moved to a candidate sample; see
   [Rider pose selection rounding](#rider-pose-selection-rounding).
@@ -1357,6 +1359,57 @@ Strong inference: the inline declares four pose locals, and the first
 expansion inlined its first constructor.
 
 Ruled-out forms are listed in `samples/physics/motion/targets.json`.
+
+## Collision and terrain bodies checked by emulation
+
+Three gameplay-critical linked bodies were run against retail under unicorn.
+Each harness places the compiled candidate function in the retail image,
+binds its calls to retail's helpers and runs both bodies on the same random
+inputs. The fast-math tables (.bss) come from retail's own initializers. The
+harnesses live in the ignored `work/` tree. Each one first caught a known-bad
+candidate (the old QueryGround, or one altered association or comparison)
+before its result was trusted.
+
+| VA | Function | Cases | Behavior found | Linked before | After | Built/retail insns |
+|---|---|---|---|---|---|---|
+| 0x00507c10 | `Terrain::QueryGround` (via the `TireWorld` view) | 6000 | two bugs, fixed | 0.864 | 0.899 | 1009 → 995 / 970 |
+| 0x00435830 | `CollisionObject::SetTransform` | 3000 | none | 0.833 | 0.833 | 513 / 512 |
+| 0x00483d40 | `GridNode::IntersectSegment` | 6000 | none | 0.832 | 0.832 | 1349 / 1387 |
+
+Coverage and results:
+
+- **QueryGround.** GetCellCorners (0x00483910) is the same deterministic
+  stub in both runs. Inputs: cell ties, diagonals, huge, NaN and infinite
+  coordinates, optional outputs, and every x87 rounding and precision mode.
+  The [two repairs](TERRAIN_CELL_CONVERSION.md) are the corner set of the
+  smooth (0, 1, 3) normal and the height addition order. 431 cases differed
+  before them and none after. That includes the x87 status flags, control
+  word and callee-saved registers.
+- **SetTransform.** All five shape types run. The hull, model and mesh
+  payloads are random, and model elements number 0 to 5, some disabled. The
+  shape's scene-node `GetMatrixIn` (0x004fca80) is a deterministic stub.
+  Everything the call writes into the object and shape memory matched,
+  bit for bit. The decoded addition order of the hull product, recorded in
+  the source, is right.
+
+  The codegen gap is the operand order inside each product (`fld a ; fmul b`
+  against `fld b ; fmul a`). VC6 picks that order itself. Swapping the
+  operands in the source, reordering the sum terms or swapping the inline
+  helper's parameters changed no byte.
+- **IntersectSegment.** Inputs are random 1- to 3-level grid trees, with
+  child pointers both shared and null. Segments are lattice, tie and
+  axis-aligned, and run in every x87 rounding and precision mode. Children
+  recurse through a stub vtable slot back into the body under test. The
+  return value, out point, node, rounded hit and x87 status all match.
+
+  Under directed rounding, some cell indices round out of range and index past
+  the row tables. Retail and the candidate then both fault: 505 cases, none
+  under round-to-nearest. The sample is now `reviewed-nonexact`.
+
+  The codegen gap is retail's EBP frame and its four inline `fistp`
+  sequences. Both come from the inline-asm helper, which the rules exclude.
+  Moving `GridRoundToInt` into a `/QIfist` unit would leave the call in
+  this body unchanged.
 
 ## Source-built run status
 
