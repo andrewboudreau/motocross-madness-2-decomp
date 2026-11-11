@@ -72,14 +72,14 @@ Wrecker* Wrecker::SetupWrecker(void* owner, UnknownWreckerCharacter* rider, cons
 void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
     character = rider;
     rider->modelNode->TranslateIn(0, Vec3(0.0f, 120.0f, 0.0f));
-    gravityModel = new (__FILE__, 0x5b) UnknownWreckerGravityModel(1);
+    gravityModel = new (__FILE__, 0x5b) SelectiveGravityModel(1);
     gravityModel->SetRenderContext(renderContext);
     AppendChild(gravityModel, -1);
     rigidBody = new (__FILE__, 0x5f) UnknownWreckerRigidBody(1);
     rigidBody->SetRenderContext(renderContext);
     AppendChild(rigidBody, -1);
     rigidBody->SetNode(character->modelNode);
-    gravityModel->AddBody(rigidBody);
+    gravityModel->AddBody(reinterpret_cast<GravityBody*>(rigidBody));
     collisionModel = reinterpret_cast<UnknownWreckerCollisionModel*>(
         new (__FILE__, 0x68) ConstraintMethodCollisionModel(1));
     collisionModel->SetRenderContext(renderContext);

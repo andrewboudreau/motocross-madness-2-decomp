@@ -174,14 +174,9 @@ public:
 };
 
 // Object at Wrecker+0x3c: RTTI SelectiveGravityModel (new 0x3c at line
-// 0x5b, constructor 0x004f9760).
-class UnknownWreckerGravityModel : public GameObject {
-public:
-    explicit UnknownWreckerGravityModel(int flags);                // 0x004f9760
-    virtual void AddBody(UnknownWreckerRigidBody* body);
-    unsigned char field_0x02c[0x38 - 0x2c];
-    int manualStep;                           // +0x38  SelectiveGravityModel slot 10 0x004f9860 calls slot 11 itself only while this is 0; Wrecker sets it like the collision model's manualStep
-};
+// 0x5b, constructor 0x004f9760). Wrecker adds the rigid body through slot 27
+// and sets manualStep (+0x38) so slot 10 leaves the stepping to Wrecker.
+#include "../krusty2/gravity/SelectiveGravityModel.h"
 
 // One particle of the manager below (the layout src/krusty2/effects/
 // ParticleManager.h documents; 0x00531740 fills position, frame, age,
@@ -262,7 +257,7 @@ public:
 
     UnknownWreckerCharacter* character; // +0x34
     UnknownWreckerCollisionModel* collisionModel; // +0x38
-    UnknownWreckerGravityModel* gravityModel; // +0x3c
+    SelectiveGravityModel* gravityModel; // +0x3c
     UnknownWreckerRigidBody* rigidBody; // +0x40
     int wreckState;            // +0x44 wreck state (0 idle, 1..3)
     int* indexedAnimations;    // +0x48
