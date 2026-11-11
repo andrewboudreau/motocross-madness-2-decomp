@@ -108,6 +108,7 @@ CLEAN_CASES = {
     'kb_ai_racing_line': 150,
     'vegetation_collision_object': 200,
     'track_place_near': 200,
+    'car_procedural_tick': 200,
 }
 
 # Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).

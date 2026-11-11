@@ -1592,6 +1592,57 @@ Coverage and results:
   Moving `GridRoundToInt` into a `/QIfist` unit would leave the call in
   this body unchanged.
 
+## Game and race bodies checked against retail
+
+These linked bodies were compared with retail over their full extents. The
+scores are masked `linked_accuracy.py` scores. No source changed, so each
+score is the same before and after. "Static" means every differing
+instruction was classified by hand: calls, call arguments, constants,
+branches, field offsets and every x87 store that rounds. "Emulation" means
+the body was run with `tools/emu_diff.py` under control words 0x027f and
+0x007f.
+
+| VA | Function | Method | Behaviour difference | Linked score |
+|---|---|---|---|---|
+| 0x004685d0 | `Game::Tick` | static | only the documented QPC counter in place of RDTSC | 0.749 |
+| 0x0041f1d0 | `BikeRace::NextCameraTarget` | static, all paths | none | 0.829 |
+| 0x004650e0 | `FollowCamera::LoadCameraFile` | static (see FOLLOW_CAMERA_LOAD_FILE.md) | none | 0.842 |
+| 0x00459ce0 | `EcoSystem::GenerateObjects` | static | none | 0.918 |
+| 0x0048b100 | `VisualCue::Tick` | static | none | 0.932 |
+| 0x0042fd80 | `CarProcedural::Tick` | emulation, 400 cases (`car_procedural_tick`) | none | 0.941 |
+| 0x004cab00 | `PCVideoCard::ProbePartialTextureUploads` | static | none | 0.786 |
+
+- **CarProcedural::Tick.** Retail rounds the steering angle to a float slot
+  (`fst [esp+0x28]`) and then compares that copy with ±π/6. The candidate
+  compares the unrounded x87 value. Both bounds are floats and rounding is
+  monotonic, so the stored angle is the same either way. Emulation agrees:
+  0 of 800 runs differ, with the clamp reached in 176 runs and the low
+  clamp in 80.
+
+  Every stub sink logs the exact bits it receives: the sensor frame, the
+  wheel and body axes, the placement and the push-out. Changing the upper
+  clamp bound by one ulp made 34 of 400 runs differ.
+
+  The code-shape gaps are the clamp spill and the order of the inline axis
+  cross. Its operands are the constant axes, so every product is exact. A
+  `const float&` clamp parameter gives the spill on the member rather than a
+  local. That raises `match_one.py` from 506 to 573 of 2599 masked bytes,
+  but it is not adopted because it is still not retail's shape. Six other
+  spellings, using a float local, a chained assignment or `const&` bounds,
+  changed no byte.
+- **VisualCue::Tick.** `0.5f - screenY` is computed as `fld y; fsubr 0.5`
+  rather than `fld 0.5; fsub y`, which is the same value. The z component of
+  each placement is accumulated on the x87 stack in both bodies. The x and
+  y products are rounded through the same stack slots in both.
+- **ProbePartialTextureUploads.** Retail shares one release-and-delete tail
+  between the success path and the failure paths, and the candidate
+  duplicates the epilogue. The release order (image, rendered, expected),
+  the `-2`/`-3`/`-4` results and the `CreateSurface` arguments agree.
+- **Track::PlaceNear** (0x00517340) was dropped from this pass. Another
+  audit found and fixed its second `DistanceAlong` argument order by
+  emulation. A static diff hides an argument swap like that one when the
+  pushes come from equal-looking stack slots, so such bodies need emulation.
+
 ## Source-built run status
 
 The source-built `mcm2.exe` (391/391 translation units, zero unresolved
