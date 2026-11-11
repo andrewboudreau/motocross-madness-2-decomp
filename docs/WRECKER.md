@@ -24,9 +24,12 @@ relocation resolved by the bindings. Two near misses are parked in
 - Slot 10 (`0x005306e0`) calls slot 11 of the gravity model, the rigid body
   and the collision model's GraphicsTest subobject (`lea ecx,[eax+0xc]`
   without a null check) with the sub-step length: the per-step update
-  `Step(float dt)` of the shared GameObject declaration.
-  The `UnknownWreckerSteppable` view preserves the explicit secondary-base
-  dispatch used by these callers.
+  `Step(float dt)` of the shared GameObject declaration. Wrecker.cpp calls it
+  through two inline helpers, `WreckerStep` (a `GameObject*`) and
+  `WreckerStepModel` (the collision model, whose `Step` resolves to the `+0xc`
+  subobject without a null check); their parameters and `WreckerStep`'s named
+  pointer are part of the local-symbol count that orders slot 10's last
+  carry-over product (see below), so neither is written as a direct call.
 - Confirmed: Bike slot 97 (`0x00409420`) allocates 0x53c bytes and calls the
   constructor `0x0052ff90` with 1, then `0x00530190` with "rider.col"
   (`src/krusty2/vehicle/Bike.cpp`, now using the canonical Wrecker class;
@@ -216,9 +219,9 @@ python -m unittest discover -s tests -p test_wrecker_model_connections.py -v
   forward x right), the old position copied through `WreckerCopy` from a
   pointer to `lastPose` and the subtract called by value. The last term
   pair (`relative._23` adds `a._23 * b._22` before `a._33 * b._23`) needs the
-  named view pointer in `WreckerStep`: VC6 orders those equal terms by the
+  named pointer in `WreckerStep`: VC6 orders those equal terms by the
   count of referenced local symbols created before the product, modulo 8
-  (two to seven more than the cast written inline give retail's order).
+  (two to seven more than a direct `object->Step(step)` give retail's order).
 - `0x00530190` is `SetupWrecker`. The krusty2 names `SetBody` (`0x0043b9e0`),
   `AddProbePoint` (`0x0043c7f0`), `FindMotion`/`SetMotion`/`AdvanceMotion`/
   `SetMotionByName` (`0x004a6b30`/`0x004a8b40`/`0x004a6bb0`/`0x004a8b10`)
@@ -238,12 +241,16 @@ python -m unittest discover -s tests -p test_wrecker_model_connections.py -v
 ## Naming
 
 Field names of the collaborator views follow the canonical krusty2 layouts:
-`CollisionObject.h` and `ConstraintMethodCollisionModel.h` (collision model,
-probe record),
 `SoultreeObject.h` (`firstChild`, `subtreeDirty`) and `ParticleManager.h`
-(particle manager and particle). The gravity model (`+0x3c`) and rigid body
-(`+0x40`) are the canonical `SelectiveGravityModel` and `PhysicsRigidBody`
-classes themselves. Wrecker's own fields are named from the
+(particle manager and particle). The collision model (`+0x38`), gravity model
+(`+0x3c`) and rigid body (`+0x40`) are the canonical
+`ConstraintMethodCollisionModel`, `SelectiveGravityModel` and
+`PhysicsRigidBody` classes themselves, and the ignore list holds
+`CollisionObject` pointers. The collision model's interface keeps its own
+views (`ConBody`, `ConVec3`, `ConNode` in `constraint/ConstraintTypes.h`), so
+Wrecker passes its rigid body, probe offset and probe node through
+`reinterpret_cast` and calls `SoultreeObject` methods on a probe's `ConNode`.
+Wrecker's own fields are named from the
 data flow in the layout table: the three `int` arrays hold values passed to
 the rider's animation calls `0x004a8b40`/`0x004a8b80` (`indexedAnimations`
 by the index `0x00530630` returns, `randomAnimations` by `RANDOM_UNIT()`,
@@ -264,8 +271,8 @@ near miss `0x00531740` `SprayContactParticles`. The list appenders
 
 Model and motion calls now use the shared declarations listed above.
 Complete caller and provider comparisons establish their retail destinations;
-semantic method names remain provisional. The remaining collision-model and
-particle views are outside this declaration consolidation.
+semantic method names remain provisional. The remaining particle views are
+outside this declaration consolidation.
 
 ## Remaining uncertainty
 
