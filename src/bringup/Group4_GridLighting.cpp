@@ -546,8 +546,11 @@ void GridVertexSink::LightAmbientPlusOne(const Matrix4* matrix, int count, void*
 // Group4Vis_Round FISTP roundings (/QIfist) the body is 163 built vs 167 retail
 // instructions (masked 0.721); the rest is retail's ebp frame and its
 // fstp/fld/fistp-dword helper sequence, which comes from the inline-asm fistp.
-// Ruled out: `/ 256.0f`, `0.00390625f` (same code as `* (1.0f / 256.0f)`);
-// re-reading the colour through a pointer per channel (worse).
+// Ruled out: `/ 256.0f`, `0.00390625f` (same code as `* (1.0f / 256.0f)`); a
+// separate colour pointer local (worse). Session 23: the colour read per channel and
+// each channel rounded into its variable makes the colour array the loop's induction
+// pointer, as retail (0.728 -> 0.731 masked); VC6 still CSEs the three colour loads
+// that retail's asm fistp stores keep apart.
 void GridVertexSink::LightVertices(void* matrix, int count, void* vertices, void* buffer, int stride,
                                    int flags) {
     LightManager* manager = reinterpret_cast<LightManager*>(this);
@@ -582,13 +585,15 @@ void GridVertexSink::LightVertices(void* matrix, int count, void* vertices, void
 
     if (colors) {
         for (int i = 0; i < count; i++) {
-            unsigned int color = *Group4Vis_VertexDiffuse(colors, i);
-            int r = Group4Vis_Round(((float)manager->vertexRed[i] * (1.0f / 256.0f)) *
-                                      (float)((color >> 16) & 0xff) - 0.5f);
-            int g = Group4Vis_Round(((float)manager->vertexGreen[i] * (1.0f / 256.0f)) *
-                                      (float)((color >> 8) & 0xff) - 0.5f);
-            int b = Group4Vis_Round(((float)manager->vertexBlue[i] * (1.0f / 256.0f)) *
-                                      (float)(color & 0xff) - 0.5f);
+            // Retail reads the colour per channel and rounds each channel into its
+            // variable before the next (the colour array is the loop's pointer).
+            int r, g, b;
+            FistpFloatToInt(&r, ((float)manager->vertexRed[i] * (1.0f / 256.0f)) *
+                                    (float)((*Group4Vis_VertexDiffuse(colors, i) >> 16) & 0xff) - 0.5f);
+            FistpFloatToInt(&g, ((float)manager->vertexGreen[i] * (1.0f / 256.0f)) *
+                                    (float)((*Group4Vis_VertexDiffuse(colors, i) >> 8) & 0xff) - 0.5f);
+            FistpFloatToInt(&b, ((float)manager->vertexBlue[i] * (1.0f / 256.0f)) *
+                                    (float)(*Group4Vis_VertexDiffuse(colors, i) & 0xff) - 0.5f);
             *Group4Vis_VertexDiffuse(buffer, i) = ((r << 8 | g) << 8) | b;
         }
     }
