@@ -1187,6 +1187,7 @@ run as retail code; only calls with side effects outside the function
 | 0x00517340 | `Track::PlaceNear` (sample, via `KbRaceSub::PlaceNear`) | 600 | 44 of 600 | path loop's second `DistanceAlong` took (candidate, start); retail passes (start, from) | 0.842 (0.868 before) |
 | 0x00491d10 | `KrustyBike::FindPlacement` | 600 | 112 of 600 | stored-vector path returned the pointer; retail leaves the bits of `outPosition->z` in eax | 0.947 |
 | 0x00414370 | `KrustyBike::Fn_00414370` (AI racing line) | 1000 | 114 of 1000 | outside free roam retail reads the trick delay from the difficulty's frame slot; an anonymous union says so | 0.899 |
+| 0x0048eea0 | `KrustyBike::UpdateRiderPose` | 1500 | 28 of 1500 | retail indexes the 16-entry `s_kbTrickFrame` (0x0056d060) with chained tricks (16..31) too and reads the next 16 words of `.data`; the bring-up copy now has 32 entries holding those words ([below](#chained-trick-frame-overread)) | 0.955 |
 | 0x005097d0 | `TerrainShadow` slot 28 | 600 | 0 | latent: the orthographic scale read an unset `fov` that VC6 happened to place in `extent`'s slot; it now reads `extent` (retail `fmul [esp+0x4c]` at 0x00509949) | 0.986 |
 
 These agreed with retail in every run at both control words (runs in
@@ -1210,16 +1211,13 @@ hull/model pairs and their swept forms 0x00436af0..0x00438550,
 `UIButton`/`UIMultiState::ContainsPoint` 0x004734c0/0x00478e10 (600 each),
 `D3DIMSoultreeObject::Scale` 0x004fd340 (800),
 `ProjectedShadow::ComputeBounds` 0x004db0d0 (600),
-`KrustyBike::IsSpeedGainBelowLimit` 0x004919a0, `UpdateRiderPose` 0x0048eea0
-(21 probes), `Fn_00492AD0` and `Vegetation::GetCollisionObject` 0x004570a0
+`KrustyBike::IsSpeedGainBelowLimit` 0x004919a0, `Fn_00492AD0` and `Vegetation::GetCollisionObject` 0x004570a0
 (1000 each).
 
 Open: `BoxTriangleQuery` 0x00426be0 flips one contact in about 300 boundary
 cases at 53-bit only (none at 24-bit). Retail keeps `p0 - Dot(e1)` on the x87
 stack where VC6 here stores and rounds it; that this causes the flip is
-inference. `UpdateRiderPose` indexes `s_kbTrickFrame` (0x0056d060) without a
-bound; chained tricks (16..31) read the globals after the table, whose
-neighbours differ in the build, so the case keeps trick indices below 16.
+inference.
 
 Negative controls: the pre-fix shapes of the radar, `PlaceNear`, `FindPlacement`,
 `HullVsHull` (29 of 600), `SegmentTriangleQuery` (20 of 600) and the bike
@@ -1235,6 +1233,61 @@ callees), `Fn_00413200` (4112 bytes, 15 direct callees including
 `MorphBastardModifier::ControllerAngles` (orchestration). Each would need
 stubs whose outputs feed the compared state, so a mismatch would test the
 stubs as much as the body.
+
+The candidate-sample twins follow the linked fixes where the score allows:
+`samples/physics/bikeai/BikeAINearMisses.cpp` takes the trick-delay union
+(588 -> 589 bytes); `samples/physics/krustybike/KrustyBikeNearMisses.cpp` keeps
+`FindPlacement`'s fall-off-the-end copy path, because the explicit
+`return *(int*)&outPosition->z` reloads z there (451 -> 435).
+
+#### Chained-trick frame overread
+
+`UpdateRiderPose` 0x0048eea0 reads `s_kbTrickFrame` as
+`mov ecx, [ecx*4 + 0x0056d060]` from the sign-extended `+0x433` byte, in the
+hold-window arm, which only checks `motionIndex >= 0` (the clip-length clamp
+above it checks `< 16`). Writers of `+0x433` (confirmed by decoding): 0 and -1
+(head turn), `Fn_0048D910(idx)` with idx 0..15 (0 or 8 plus
+`ClassifyInputDirection()`, 0..7, at 0x0048e584, message code - 1 for codes 1..16 at
+0x00495276/0x004955f8), and `Fn_0048D990(idx)`, which stores `idx + 16`. Its
+callers pass `motionIndex` when it is below 16, `motionIndex - 16` when it is
+above 15, or (0x0049562c) `motionIndex` when it equals message code - 17;
+senders encode `motionIndex + 1`, and the head turn as 17 (0x004927b9,
+0x004930f1). So retail peers
+keep the index in 0..31, and chained tricks 16..31 read the 64 bytes at
+0x0056d0a0..0x0056d0e0 (tier 1 bytes; owners tier 2):
+
+| Index | VA | Word | Owner |
+|---|---|---|---|
+| 16 | 0x0056d0a0 | 1 | `s_kbTimeTo60Armed` (KrustyBike Tick, xrefs 0x00497b59/9f/bf) |
+| 17 | 0x0056d0a4 | 0 | no code reference; probably alignment before the TypeDescriptor |
+| 18-23 | 0x0056d0a8 | 0x00558f4c, 0, ".?AVKrustyBike@@" | KrustyBike TypeDescriptor (`rtti_classes.json`) |
+| 24 | 0x0056d0c0 | 0 | name NUL and pad |
+| 25-28 | 0x0056d0c4 | "RiderMorph.mfb" | `??_C` literal (xref 0x00491109) |
+| 29-31 | 0x0056d0d4 | "Interpolate" (first 12 bytes) | `??_C` literal (xref 0x00490b57) |
+
+The window `frame > t && frame < t + 3` therefore opens for chained tricks 0
+(frames 2-3), 1, 3 and 8 (frames 1-2) and never for the others. The table
+before it is the trick pick's (clip lengths 0x0056cc60 and 12 rows of 0x50
+bytes 0x0056cca0..0x0056d060), not a second frame group, and the word after it
+is a variable that `Tick` writes, so the original is most plausibly a 16-entry
+table read out of bounds (inference). The linked build's bring-up copy
+`s_g3TrickFrame` has 32 entries, the last 16 being those retail words; its
+128 bytes equal retail's 0x0056d060..0x0056d0e0 in the linked `.rdata`
+(0x00558cd8 in the current build). Only the debug overlay's TimeTo60
+stopwatch clears `s_kbTimeTo60Armed`, which would move chained trick 0's
+window to frames 1-2 in retail; the copy keeps the initial 1.
+`tools/emu_cases/kb_update_rider_pose.py` now draws indices 0..31 and forces
+the hold window for chained tricks in about 30 % of trick cases: 0 of 1500
+differ at both control words; the 16-entry object differs in 28 of 1500.
+
+No other KrustyBike table is indexed this way: the clip-length clamp is
+bounded, the trick pick's row and trick indices stay inside its rows by
+construction, and the member handle tables `animSetA..D` (+0x1420..+0x1520,
+16 each) see only 0..15 under the invariants above. A peer that sent a code
+above 32 could push `motionIndex` past 31 and `animSetC`/`animSetD` out of
+bounds; retail peers do not. Chained trick 0 is sent as code 17, the head-turn
+code, so receivers never chain it (their chain test needs a code above 17), a
+retail protocol quirk.
 
 ### Grid lighting workers
 

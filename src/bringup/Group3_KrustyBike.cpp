@@ -63,8 +63,24 @@ static float s_g3StallHoldSec = 3.0f;                            // 0x0056cb68
 static const float s_g3TrickLength[16] = {                       // 0x0056cc60 clip lengths (s)
     1.6111f, 1.3f, 2.2666f, 2.3333f, 1.6667f, 1.5f, 2.3333f, 2.4f,
     1.7222f, 1.8f, 1.7647f, 2.3333f, 2.1333f, 2.1333f, 1.9375f, 1.7222f };
-static const int s_g3TrickFrame[16] = {                          // 0x0056d060 hold-window frames
-    14, 16, 17, 18, 11, 14, 17, 18, 15, 17, 15, 18, 15, 15, 17, 16 };
+// 0x0056d060 hold-window frames.  Retail's table has 16 entries, but UpdateRiderPose also
+// indexes it with a chained trick (+0x433 = 16 + trick, 16..31) and has no bound there, so
+// retail reads the 16 words that follow it in .data (tier 1 bytes, tier 2 owners):
+// s_kbTimeTo60Armed 0x0056d0a0 (initially 1), a zero pad word, the KrustyBike TypeDescriptor
+// 0x0056d0a8 (type_info vftable 0x00558f4c, spare 0, ".?AVKrustyBike@@" and its NUL) and the
+// "RiderMorph.mfb" / "Interpolate" literals.  Entries 16..31 copy those words so chained
+// tricks hold as in retail: the window opens for chained tricks 0 (frames 2-3), 1, 3 and 8
+// (frames 1-2) and never for the others.  Only the debug overlay's stopwatch rewrites
+// s_kbTimeTo60Armed (0 moves chained trick 0's window to frames 1-2); the copy keeps the 1.
+static const int s_g3TrickFrame[32] = {
+    14, 16, 17, 18, 11, 14, 17, 18, 15, 17, 15, 18, 15, 15, 17, 16,
+    1,                                                  // 0x0056d0a0 s_kbTimeTo60Armed
+    0,                                                  // 0x0056d0a4 pad
+    0x00558f4c, 0,                                      // 0x0056d0a8 TypeDescriptor vftable, spare
+    0x56413f2e, 0x7375724b, 0x69427974, 0x4040656b,     // ".?AVKrustyBike@@"
+    0,                                                  // NUL and pad
+    0x65646952, 0x726f4d72, 0x6d2e6870, 0x00006662,     // 0x0056d0c4 "RiderMorph.mfb"
+    0x65746e49, 0x6c6f7072, 0x00657461 };               // 0x0056d0d4 "Interpolate"
 #define g_kbZeroVec s_g3ZeroVec
 #define g_kbStallThreshold s_g3StallThreshold
 #define g_kbStallHoldSec s_g3StallHoldSec
@@ -1096,7 +1112,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
 // lean-pose blend with the KrustyBike extras (poses 16/17 and the four-pose blend 0x004a9050).
 // Tables (tier 1 data, tier 3 names): 0x0056cc60 the trick clip lengths in seconds (the clip
 // time +0x1520 is clamped to them), 0x0056d060 the frame after which a trick's landing window
-// (three frames) opens.
+// (two frames, t + 1 and t + 2) opens.
 
 // Whether trick `trick` may chain from the current input direction (0..7): not when the
 // input is the trick's own direction or one of its two neighbours in the table.

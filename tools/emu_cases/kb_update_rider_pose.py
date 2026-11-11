@@ -10,9 +10,11 @@ its arguments: the Character pose setters 0x004a8bf0 / 0x004a8c50 / 0x004a9050 /
 it is handed), and the virtual slots: this 84 (QueryControlInput), 88 (ClassifyInputDirection),
 41 (EndMotion), and slot 7 on the rider and on the character subobject at +0x21c.
 
-Trick indices stay below 16 in the hold-window arm: there retail indexes s_kbTrickFrame
-(0x0056d060) without a bound, and a chained trick (16..31) reads the globals after the table
-(0x0056d0a0 s_kbTimeTo60Armed, ...), which the bring-up's own copy of the table cannot share.
+Trick indices cover chained tricks (16..31) too. Retail indexes s_kbTrickFrame (0x0056d060,
+16 entries) without a bound in the hold-window arm, so a chained trick reads the 16 words after
+the table in the retail image (s_kbTimeTo60Armed, the KrustyBike TypeDescriptor and two string
+literals); the bring-up's 32-entry copy repeats those words, and the candidate reads its own
+copy (a file-local static, not bound to retail).
 """
 import math
 import struct
@@ -29,7 +31,10 @@ PROBES = {0x0048f968: 'crash steer pose', 0x0048eee9: 'trick start', 0x0048efda:
           0x0048f723: 'pose 16', 0x0048f799: 'back-up wrap', 0x0048f822: 'rider blend',
           0x0048f856: 'crossover bike pose', 0x0048f8dc: 'bike blend', 0x0048f91e: 'matrix copy'}
 
-TRICK_FRAME = [14, 16, 17, 18, 11, 14, 17, 18, 15, 17, 15, 18, 15, 15, 17, 16]
+TRICK_FRAME = [14, 16, 17, 18, 11, 14, 17, 18, 15, 17, 15, 18, 15, 15, 17, 16,
+               # retail's .data after the table (0x0056d0a0..0x0056d0e0)
+               1, 0, 0x00558f4c, 0, 0x56413f2e, 0x7375724b, 0x69427974, 0x4040656b,
+               0, 0x65646952, 0x726f4d72, 0x6d2e6870, 0x00006662, 0x65746e49, 0x6c6f7072, 0x00657461]
 
 
 def _f(rng, lo, hi):
@@ -39,7 +44,7 @@ def _f(rng, lo, hi):
 def cases(rng, n):
     for _ in range(n):
         state = rng.choice(['crash', 'trick', 'trick', 'head', 'head', 'head', 'finish', 'pose', 'pose'])
-        idx = rng.randrange(16)
+        idx = rng.randrange(32)
         c = dict(
             state=state,
             dt=rng.choice([1 / 60.0, 1 / 30.0, _f(rng, 0.0, 0.2)]),
@@ -70,6 +75,15 @@ def cases(rng, n):
         if state == 'trick' and rng.random() < 0.5:
             # The local release with a chain test: no input, no AI hold, pose held.
             c.update(remote=0, replay=0, input=[0, 0], ai_hold=0.0, held=1, anim_c=1)
+        if state == 'trick' and rng.random() < 0.3:
+            # The hold window of a chained trick, where retail reads past its 16-entry table.
+            idx = 16 + rng.randrange(16)
+            c.update(motion_index=idx, just_started=False,
+                     frame=rng.choice([TRICK_FRAME[idx] + k for k in (-1, 0, 1, 2, 3, 4)] + [rng.randrange(40)]))
+            if rng.random() < 0.5:
+                c.update(ai=0, remote=0, replay=0, input=[1, rng.choice([0, 1])])
+            else:
+                c.update(ai_hold=rng.choice([_f(rng, 0, 0.05), _f(rng, 0.05, 0.5)]))
         if state == 'head':
             # The rival's bearing relative to the heading, often beyond the +-2.7 clamp.
             angle = rng.choice([_f(rng, -3.1, 3.1), _f(rng, 2.7, 3.14), _f(rng, -3.14, -2.7)])

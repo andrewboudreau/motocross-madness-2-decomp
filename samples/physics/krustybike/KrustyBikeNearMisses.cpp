@@ -43,7 +43,9 @@ int KrustyBike::IsSpeedGainBelowLimit(float dt)
 // Slot 11 (0x00491d10): tier 3 -- respawn placement.  Fills outPosition and outForward
 // (unit direction) according to the game mode (g->0x2d74: 0..5), then issues the same
 // collision query as the base class with per-mode ranges.  The two "copy the stored
-// vectors" paths fall off the end without setting a result (retail leaves eax as is).
+// vectors" paths fall off the end without setting a result (retail leaves eax as is: on the
+// mode 2/3 path the bits of outPosition->z, which the linked Group3 body returns explicitly;
+// that `return *(int*)&outPosition->z` here reloads z and scores 435 against 451 bytes).
 // Near miss (523/1296 strict, 1300 bytes): flag and lim are assigned in both arms (an
 // initialiser plus a conditional store keeps 0 in edi and spills lim), and the mode 2/3
 // copy path ends with `break` (retail returns there; it does not fall into case 0) and
@@ -1014,9 +1016,10 @@ void KrustyBike::Fn_00493660(float dt, int a)
 // lean-pose blend with the KrustyBike extras (poses 16/17 and the four-pose blend 0x004a9050).
 // Tables (tier 1 data, tier 3 names): 0x0056cc60 the trick clip lengths in seconds (the clip
 // time +0x1520 is clamped to them), 0x0056d060 the frame after which a trick's landing window
-// (three frames) opens.
+// (two frames, t + 1 and t + 2) opens.
 extern float s_kbTrickLength[16];   // 0x0056cc60
-extern int s_kbTrickFrame[16];      // 0x0056d060
+extern int s_kbTrickFrame[16];      // 0x0056d060; chained tricks (16..31) read past it, see
+                                    // src/bringup/Group3_KrustyBike.cpp s_g3TrickFrame
 
 // Whether trick `trick` may chain from the current input direction (0..7): not when the
 // input is the trick's own direction or one of its two neighbours in the table.
