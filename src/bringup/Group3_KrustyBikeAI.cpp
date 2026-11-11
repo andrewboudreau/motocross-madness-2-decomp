@@ -1411,44 +1411,50 @@ int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, 
 // Not kept: `Vec3(0.0f)` zero temporaries (2033 strict but 27 differing instructions
 // against 17).
 //
-// 0x00414370 (4802 bytes): block order, calls and constants match (1291 vs 1302
-// instructions linked; strict 644/4802, aligned 1094 of 1302).  Retail's race-kind test lays out the default (free-roam) block first,
-// then kinds 1/5, then 2/3, which the nested `kind != 3 && kind != 2` form reproduces (a
-// switch builds a jump table).  Differences: frame 0x74 vs 0x78 (retail keeps the
-// difficulty in a stack slot, which the uninitialised trick delay of the other kinds
-// shares; the candidate gives it edi); in the kind 1/5 branch retail emits the gate
-// distance test right after the track loop and jumps back to it from the single-point and
-// no-track paths (the candidate places it after them); the random free-roam target scales
-// through a stored temporary.  The trick search needs the `for` form (a do/while is
-// rotated with the first division folded to * 0.2).  Declaring difficulty with the
-// other locals, or kind as well, or splitting kind's declaration leaves edi and 394
-// strict; reading difficulty after kind gives 237; a switch for the free-roam trick delay
-// loses 2 aligned instructions and the edi piece stays.  roamTarget is a Vec3: retail copies it
-// into the racing line with one struct copy and builds `roamTarget - position` as a vector
-// temporary (component-wise floats: 1052 aligned, Vec3: 1076).  The random roam target is written x, z,
-// then y (retail's zero store follows the second rand call; 1049 -> 1052 aligned of 1302).
-// The roam offset is the function-scope `dir` that the finished-bike branch later fills
-// through SegmentDirection: retail keeps the offset's stores because that slot (esp+0x34)
-// is address-taken (505 -> 662 strict, 1076 -> 1082 aligned; a separate roamOffset at
-// function scope 505, reusing a 629, c 624).  Retail keeps `invLen * dir.y` in the
-// inline normalize (dir.y is the zero register's value) while VC6 folds it here;
-// by-value, `v * invLen` and operand-order helper forms do not change that.
-// The off-track (kinds 2/3) loop measures aiPath.points[0], not points[i] (retail reads
-// the fixed +0x844/+0x848/+0x84c fields; the loop runs once, so behaviour is the same),
-// with BikeAISquareMagnitude's (x + y) + z, and is written `i = 0; while (1)` like the
-// other two loops (a `for (i = 0;;)` lets VC6 drop the first count test): 662 -> 644
-// strict (frame-slot shift), 1082 -> 1094 aligned.  Its body now matches retail; left
-// there: retail holds the count constant 1 in ebp (`mov ebp, 1; push ebp; mov [count],
-// ebp`) and 40.0f in ebx, the candidate uses immediates and another register for i.
-// Ruled out: do/while loops with the t test as the condition (rotated, the count test
-// moves to the bottom: 691 strict but 1078 aligned), swapping or replacing the gate-tail
-// dot helper (inert or 223 strict), and declaring difficulty/kind elsewhere (inert).
-// The local declaration order is inert.  Writing the gate tail after the loop with gotos
-// compiles to identical code: the block order comes from the flow graph, and retail's has
-// an extra `xor ebp, ebp` re-zero edge after the loop (its tail stores avoidNearOnly from
-// the zero register, the candidate an immediate). Both builds give the loop
-// counter ebp (`xor ebp, ebp ; ... inc ebp`); retail then restores the zero web
-// in ebp for the tail, the candidate ends the zero web at the loop.
+// 0x00414370 (4802 bytes): block order, calls and constants match (linked 1294 vs 1302
+// instructions; masked 0.962, strict 0.914; match_one masked 725/4486, aligned 1181 of
+// 1302).  Retail's race-kind test lays out the default (free-roam) block first, then kinds
+// 1/5, then 2/3, which the nested `kind != 3 && kind != 2` form reproduces (a switch builds
+// a jump table).  Levers, in order of size:
+//  * the point loops are `for (t = T0, i = 0; t <= T1; t += 0.1f)` whose body starts with
+//    `if (i >= aiPath.count) break;`: the count test heads the loop and `t <= T1` is the
+//    back edge (`test ah, 0x41; jne top`) as in retail.  The former `t = T0; i = 0;
+//    while (1) { ...; i++; t += 0.1f; if (t > T1) break; }` gave 589 masked, 1092 aligned;
+//    the `for` gives 679, 1157.  `i = 0; for (t = T0; ...)` is identical;
+//  * the finished bike's PlaceNear result is an if/else whose else frees the work list and
+//    returns 1 (behaviour of the former `goto done`, which also skipped the trick block):
+//    VC6 defers that else past the next jump, which is retail's placement (1159 -> 1181
+//    aligned, though masked 732 -> 725; `if (!onTrack) { ...; goto done; }` 1159,
+//    if/else with the goto 1162);
+//  * difficulty and the trick delay are separate locals: the uninitialised delay shares
+//    the difficulty's slot (fld [esp+0x20]) exactly as the former anonymous union did,
+//    and the masked score is 7 higher (declaration order of the two is inert).
+// Differences left: register allocation (retail keeps difficulty in memory, ebp zero and
+// edi as a temporary; in the kind 2/3 off-track path retail holds the count constant 1 in
+// ebp and 40.0f in ebx); in the 3-point gate line retail treats the count store as
+// aliasing statusNode (reloads it after `mov [count], 3`, takes `&statusNode->nextGate`
+// once and reloads nextGate through it) and cross-jumps the points[1] copy into the
+// single-point arm's points[0] copy, the candidate keeps statusNode in edx; the random
+// free-roam target scales through a stored temporary; the gate dot's x product operands
+// are swapped.  Ruled out: reloading statusNode->nextGate per use in the gate-distance
+// tail as retail does (G=0: 1151 aligned against 1181, difficulty moves into ebp); a
+// do/while with the t test as the condition (rotated, the count test moves to the bottom:
+// 1078 aligned); swapping or replacing the gate-tail dot helper (inert or 223 strict);
+// declaring difficulty/kind elsewhere (inert).  The trick search needs the `for` form (a
+// do/while is rotated with the first division folded to * 0.2).  roamTarget is a Vec3:
+// retail copies it into the racing line with one struct copy and builds `roamTarget -
+// position` as a vector temporary (component-wise floats: 1052 aligned, Vec3: 1076).  The
+// random roam target is written x, z, then y (retail's zero store follows the second rand
+// call).  The roam offset is the function-scope `dir` that the finished-bike branch later
+// fills through SegmentDirection: retail keeps the offset's stores because that slot is
+// address-taken (a separate roamOffset at function scope 505 strict, reusing a 629).
+// Retail keeps `invLen * dir.y` in the inline normalize (dir.y is the zero register's
+// value) while VC6 folds it here; by-value, `v * invLen` and operand-order helper forms
+// do not change that.  The off-track (kinds 2/3) loop measures aiPath.points[0], not
+// points[i] (retail reads the fixed +0x844/+0x848/+0x84c fields; the loop runs once, so
+// behaviour is the same), with BikeAISquareMagnitude's (x + y) + z.  Writing the gate tail
+// after the loop with gotos compiles to identical code: the block order comes from the
+// flow graph.
 // 0x00572988: look-ahead distance of the race-kind 2/3 path samples (100.0f).  The same
 // .data float is RaceStatus.cpp's g_TrackSearchAhead (Track::PlaceNear's ahead distance).
 extern float g_TrackSearchAhead;
@@ -1888,8 +1894,8 @@ inline Vec3 BikeAINormalizeInline(const Vec3& v)
 // The racing line's target speed (40 near a gate, else 1000) and the AI class's speed scale
 // (+0x7c4..+0x7cc by game difficulty +0x60c) follow; a local bike may then start a trick
 // while airborne (0x0048d780 picks it, 0x0048d910 plays it).  Names tier 3.
-// The point loops test the count at the top (retail `cmp ebp, count; jge exit` heads and a
-// `t` test as the back edge), so they are written with a leading break rather than `for`.
+// The point loops are `for (t = T0, i = 0; t <= T1; t += 0.1f)` with a leading count break
+// (retail `cmp ebp, count; jge exit` heads and the `t` test as the back edge).
 int KrustyBike::Fn_00414370(float dt)
 {
     KbTrackItem* list;
@@ -1903,15 +1909,13 @@ int KrustyBike::Fn_00414370(float dt)
     float right, left;
     float gateAhead, bikeAhead;
     float speed, t, divisor, lenSq, dx, dz;
-    // Only the free-roam branch sets the trick delay (for difficulty 1..3). Elsewhere retail
-    // reads it from the frame slot that holds the game difficulty (fld [esp+0x20]), so the
-    // delay is that int's bits: 0.0 for difficulty 0, else a denormal just above 0, which
-    // keeps a trick timer of exactly 0 counting up for a frame. The union spells that out;
-    // tools/emu_cases/kb_ai_racing_line.py.
-    union {
-        int difficulty;
-        float trickDelay;
-    };
+    // Only the free-roam branch sets the trick delay (for difficulty 1..3); the other kinds
+    // leave it uninitialised.  VC6 gives it the frame slot of the game difficulty, so retail
+    // reads that int's bits (fld [esp+0x20]): 0.0 for difficulty 0, else a denormal just
+    // above 0, which keeps a trick timer of exactly 0 counting up for a frame.  The
+    // rebuilt code shares the slot the same way; tools/emu_cases/kb_ai_racing_line.py.
+    int difficulty;
+    float trickDelay;
     int dummy;
     int count;
     int i;
@@ -1994,9 +1998,8 @@ int KrustyBike::Fn_00414370(float dt)
                 list->next->node = race->raceTrack->startNode;
                 if (list && bikeAhead < gateAhead) {
                     aiPath.count = 100;
-                    t = 0.0f;
-                    i = 0;
-                    while (1) {
+                    
+                    for (t = 0.0f, i = 0; t <= 10.0f; t += 0.1f) {
                         if (i >= aiPath.count)
                             break;
                         if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &pathPos, &list,
@@ -2006,9 +2009,6 @@ int KrustyBike::Fn_00414370(float dt)
                             return 0;
                         aiPath.points[i].y = position.y + 2.0f;
                         i++;
-                        t += 0.1f;
-                        if (t > 10.0f)
-                            break;
                     }
                 } else {
                     aiPath.count = 1;
@@ -2071,9 +2071,8 @@ int KrustyBike::Fn_00414370(float dt)
         if (onTrack) {
             if (list) {
                 aiPath.count = 100;
-                t = 0.0f;
-                i = 0;
-                while (1) {
+                
+                for (t = 0.0f, i = 0; t <= 10.0f; t += 0.1f) {
                     if (i >= aiPath.count)
                         break;
                     if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &pathPos, &list,
@@ -2083,9 +2082,6 @@ int KrustyBike::Fn_00414370(float dt)
                         return 0;
                     aiPath.points[i].y = position.y + 2.0f;
                     i++;
-                    t += 0.1f;
-                    if (t > 10.0f)
-                        break;
                 }
             } else {
                 aiPath.count = 1;
@@ -2105,9 +2101,8 @@ int KrustyBike::Fn_00414370(float dt)
             }
             aiPath.count = count;
             if (list) {
-                t = 1.0f;
-                i = 0;
-                while (1) {
+                
+                for (t = 1.0f, i = 0; t <= 1.0f; t += 0.1f) {
                     if (i >= aiPath.count)
                         break;
                     if (!race->raceTrack->MoveAlongPath(statusNode->progressPos, &pathPos, &list,
@@ -2120,9 +2115,6 @@ int KrustyBike::Fn_00414370(float dt)
                     if (lenSq == 1.0f || FastSqrt(lenSq) < 100.0f)
                         aiPath.targetSpeed = 40.0f;
                     i++;
-                    t += 0.1f;
-                    if (t > 1.0f)
-                        break;
                 }
             } else {
                 pathPos = statusNode->progressPos;
@@ -2142,28 +2134,31 @@ int KrustyBike::Fn_00414370(float dt)
         if (hasFinished) {
             onTrack = race->raceTrack->PlaceNear(position, statusNode->progressPos,
                                                                         -1.0f, -1.0f, 0, 0);
-            if (!onTrack) {
-                aiPath.targetSpeed = 0.0f;
-                goto done;
-            }
-            aiPath.targetSpeed = 40.0f;
-            if (!race->raceTrack->SegmentDirection(statusNode->progressPos.b, &dir))
-                return 0;
-            race->raceTrack->DistanceToStripEdge(position, statusNode->progressPos.b, &right, 10);
-            race->raceTrack->DistanceToStripEdge(position, statusNode->progressPos.b, &left, 11);
-            if (BikeAIDot(dir, bodyForward) < 0.0f)
-                dir = -dir;
-            if (left < right) {
-                dir.x = dir.z;
-                dir.z = -dir.x;
+            if (onTrack) {
+                aiPath.targetSpeed = 40.0f;
+                if (!race->raceTrack->SegmentDirection(statusNode->progressPos.b, &dir))
+                    return 0;
+                race->raceTrack->DistanceToStripEdge(position, statusNode->progressPos.b, &right, 10);
+                race->raceTrack->DistanceToStripEdge(position, statusNode->progressPos.b, &left, 11);
+                if (BikeAIDot(dir, bodyForward) < 0.0f)
+                    dir = -dir;
+                if (left < right) {
+                    dir.x = dir.z;
+                    dir.z = -dir.x;
+                } else {
+                    dir.x = -dir.z;
+                    dir.z = dir.x;
+                }
+                dir.y = 0.0f;
+                dir = SafeNormalize(dir);
+                aiPath.count = 1;
+                aiPath.points[0] = aiPath.targetSpeed * dir + position;
             } else {
-                dir.x = -dir.z;
-                dir.z = dir.x;
+                aiPath.targetSpeed = 0.0f;
+                if (list)
+                    race->raceTrack->FreeWorkList(&list, 0);
+                return 1;
             }
-            dir.y = 0.0f;
-            dir = SafeNormalize(dir);
-            aiPath.count = 1;
-            aiPath.points[0] = aiPath.targetSpeed * dir + position;
         }
         if (onTrack)
             avoidNearOnly = 1;
@@ -2187,7 +2182,6 @@ int KrustyBike::Fn_00414370(float dt)
     } else {
         trickTimer += dt;
     }
-done:
     if (list)
         race->raceTrack->FreeWorkList(&list, 0);
     return 1;
