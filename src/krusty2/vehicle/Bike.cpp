@@ -106,6 +106,10 @@ static inline float BikeDotZ(const Vec3& a, const Vec3& b)
 // a temporary before the adds); `(len * stepTime) * sign` keeps retail's left-to-right
 // product. 1671 -> 2080 and retail's 2272 bytes. In the left-contact-only arm `driven = 1`
 // comes before the subtraction (retail sets ebx ahead of the call), 2112.
+// Behaviour (tools/emu_cases/bike_steer_torque.py): both left-contact arms store
+// point - nodePosition into `offset` (frame +0x20) and dot `base` (+0x38), like the right
+// arms; the earlier `torque = ...; dot(torque)` reading differed in 140/600 runs. The row goes
+// 92.50% -> 91.15% (match_one 2084/2272): the push/offset frame slots swap (declaration order inert).
 // Left: the return temporary of the out-of-line operators and base swap slots (retail base
 // 0x38, temporary 0x44), every cross product loads the multiplicand stored first (spin.x,
 // push.x) second where VC6 loads it first (all 64 operand orders and all 64
@@ -146,10 +150,10 @@ float Bike::Method_0x0040a520()
             if (leftBarContact->active) {
                 {
                     Vec3 callResult;
-                    torque = *Vec3SubtractCall(&callResult, &leftBarContact->point, &frontWheel->nodePosition);
+                    offset = *Vec3SubtractCall(&callResult, &leftBarContact->point, &frontWheel->nodePosition);
                 }
                 const Vec3& axis = leftBarContact->axis;
-                float d = Vec3DotCall(&torque, &axis);
+                float d = Vec3DotCall(&base, &axis);
                 if (d >= 0.0f)
                     push = Vec3(0.0f, 0.0f, 0.0f);
                 else {
@@ -178,10 +182,10 @@ float Bike::Method_0x0040a520()
             driven = 1;
             {
                 Vec3 callResult;
-                torque = *Vec3SubtractCall(&callResult, &leftBarContact->point, &frontWheel->nodePosition);
+                offset = *Vec3SubtractCall(&callResult, &leftBarContact->point, &frontWheel->nodePosition);
             }
             const Vec3& axis = leftBarContact->axis;
-            float d = Vec3DotCall(&torque, &axis);
+            float d = Vec3DotCall(&base, &axis);
             if (d >= 0.0f)
                 push = BikeVec3Call(0.0f, 0.0f, 0.0f);
             else {
