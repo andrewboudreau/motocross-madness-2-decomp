@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from tools.frame_layout import disassemble
-from tools.linked_accuracy import compared_body, drop_tables, forward_target, parse_functions, similarity, target_symbols
+from tools.linked_accuracy import callee_mismatch, compared_body, drop_tables, forward_target, parse_functions, similarity, target_symbols
 
 
 MAP = """\

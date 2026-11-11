@@ -201,6 +201,31 @@ def compared_body(i: int, retail_insns, index: dict, linked_body, funcs):
     return b, via
 
 
+def call_targets(insns) -> list[int]:
+    """Direct call targets of a body, in order."""
+    return [int(x.op_str, 16) for x in insns if x.mnemonic == 'call' and x.op_str.startswith('0x')]
+
+
+def callee_mismatch(built_calls, retail_calls, to_retail) -> tuple[list[int], list[int]]:
+    """Retail VAs the built body calls that retail's body never calls, and the reverse.
+
+    ``to_retail`` maps a built call target to the set of retail VAs it may stand
+    for (every symbol the linker put at that address, since aliases and folded
+    functions share one; empty when none is bound). A built call counts as
+    expected when any of its candidates is a retail callee. A missing callee is
+    often an inlining difference; an unexpected one usually means a wrong call
+    target, which the masked score cannot see because call displacements are masked.
+    """
+    want = set(retail_calls)
+    mapped = [frozenset(to_retail(t)) for t in built_calls]
+    unexpected = sorted({min(c) for c in mapped if c and not (c & want)})
+    if any(not c for c in mapped):
+        return unexpected, []
+    covered = set().union(*mapped) if mapped else set()
+    missing = sorted(want - covered)
+    return unexpected, missing
+
+
 def score_build(build: Path, retail: Path, min_size: int, strict: bool,
                 libraries: bool = False) -> list[dict]:
     from tools.audit_game_vtables import function_size
@@ -212,11 +237,26 @@ def score_build(build: Path, retail: Path, min_size: int, strict: bool,
         bindings.setdefault(symbol, set()).add(va)
     sizes = retail_sizes()
     index = {va: k for k, (va, _, _) in enumerate(funcs)}
+    at_va: dict[int, list[int]] = {}
+    for k, (va, _, _) in enumerate(funcs):
+        at_va.setdefault(va, []).append(k)
 
     def linked_body(k: int):
         va = funcs[k][0]
         end = next((v for v, _, _ in funcs[k + 1:] if v > va), va + 0x4000)
         return body(built, va, end - va)
+
+    def to_retail(target: int, hops: int = 3) -> set[int]:
+        """Retail VAs a built call target may stand for: the bindings of every symbol at
+        that address, else a forwarder's callee's."""
+        ks = at_va.get(target, [])
+        vas = set()
+        for k in ks:
+            vas |= bindings.get(funcs[k][1], set())
+        if vas or not ks:
+            return vas
+        nxt = forward_target(linked_body(ks[0])) if hops else None
+        return to_retail(nxt, hops - 1) if nxt is not None else set()
 
     best: dict[int, dict] = {}
     seen = set()
@@ -232,9 +272,12 @@ def score_build(build: Path, retail: Path, min_size: int, strict: bool,
         r = body(ret, rva, rsize)
         b, via = compared_body(i, r, index, linked_body, funcs)
         s = similarity(b, r, strict)
+        unexpected, missing = callee_mismatch(call_targets(b), call_targets(r), to_retail)
         row = dict(symbol=symbol, object=obj, retail_va=f'0x{rva:08x}', retail_bytes=rsize,
                    built_insns=len(b), retail_insns=len(r), score=round(s, 3),
-                   weight=round(rsize * (1 - s), 1), via=via, other_bodies=[])
+                   weight=round(rsize * (1 - s), 1), via=via, other_bodies=[],
+                   unexpected_calls=[f'0x{v:08x}' for v in unexpected],
+                   missing_calls=[f'0x{v:08x}' for v in missing])
         # Several linked symbols can claim one retail VA (forwarders, renamed
         # stand-ins); the best-scoring body is taken as the implementation.
         prev = best.get(rva)
@@ -258,6 +301,16 @@ def render(rows: list[dict], top: int) -> str:
         via = f" via `{r['via'][-1]}`" if r['via'] else ''
         lines.append(f"| {r['retail_va']} | {r['retail_bytes']} | {r['score']:.3f} | "
                      f"{r['built_insns']}/{r['retail_insns']} | {r['object']} | `{r['symbol']}`{via} |")
+    odd = [r for r in rows if r.get('unexpected_calls')]
+    if odd:
+        lines += ['', '## Calls retail does not make', '',
+                  f"{len(odd)} linked bodies call a bound function that retail's body never calls "
+                  '(a wrong call target, or a helper retail inlines).', '',
+                  '| retail VA | score | object | symbol | unexpected callees | retail callees not called |',
+                  '|---|---:|---|---|---|---|']
+        for r in sorted(odd, key=lambda r: r['retail_va']):
+            lines.append(f"| {r['retail_va']} | {r['score']:.3f} | {r['object']} | `{r['symbol']}` | "
+                         f"{', '.join(r['unexpected_calls'])} | {', '.join(r['missing_calls'])} |")
     return '\n'.join(lines) + '\n'
 
 
@@ -282,6 +335,7 @@ def main(argv=None) -> int:
     total = sum(r['retail_bytes'] for r in rows)
     exactish = sum(r['retail_bytes'] for r in rows if r['score'] == 1.0)
     print(f'{len(rows)} bound retail functions, {total} retail bytes; {exactish} bytes at masked score 1.000')
+    print(f"{sum(1 for r in rows if r['unexpected_calls'])} bodies call a bound function retail's body does not call")
     print(f"Report: {args.out / 'report.md'}")
     return 0
 
