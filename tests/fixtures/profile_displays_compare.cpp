@@ -150,11 +150,12 @@ void PCVideoCard::RefreshDriverCaps() {
 int PCVideoCard::ProbeNonLocalTextureMemory(int* value,RenderTarget* target) {
     int n=Index(this); Event(12,n,(int)target); *value=321+n; return scenario.seed+n-1;
 }
-void PCVideoCard::ProbePartialTextureUploads(RenderTarget* target) {
+int PCVideoCard::ProbePartialTextureUploads(RenderTarget* target) {
     int n=Index(this); Event(13,n,(int)target);
     if (Game()->display!=this || Game()->renderTarget!=target) Fail(87);
     partialTextureUploadResult=scenario.seed*17+n;
     if (scenario.throwKind==4) throw 74;
+    return partialTextureUploadResult;
 }
 void FillPixelFormat(int format,void* pixelFormat) {
     Event(14,format); unsigned char* p=(unsigned char*)pixelFormat;

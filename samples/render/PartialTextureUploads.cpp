@@ -1,6 +1,28 @@
 // Complete behavioral candidate for 0x004cab00 (1129 retail bytes).
 // Original translation-unit ownership is not established by this grouping.
 // See docs/PARTIAL_TEXTURE_UPLOADS.md for validation and remaining differences.
+//
+// Standalone VC6 SP3 vc6_o2_mt: 423 of 1129 strict positions (candidate 1120
+// bytes; was 140 of 1145). Matches retail instruction for instruction up to
+// 0x004cac5c. What moved codegen:
+// - The method returns `result`. Retail leaves it in eax at the single
+//   `ret 4` (`mov eax, [esp+0x10]` before the +0x5bc store). As `void`,
+//   VC6 duplicated the epilogue for each jump to the final store.
+// - `render = 0` with the supplied target taken in the then-arm, and the
+//   created target assigned straight to `render`. The created target, `render`
+//   and the mode index then share esi as in retail, and the exhausted loop
+//   jumps directly to the final store.
+// - The temporary-target cleanup sits after the `if (render)` block.
+// Left: retail keeps `this` at [esp+0x14] and `image` only in memory at
+// [esp+0x18], with ebx as the zero register throughout. Ours swaps the two
+// slots and caches `image` in ebx. Retail also places the CreateTextureSurface
+// success arm after the `ret`.
+// Ruled out on this form (s21): permuting the image/expected/rendered
+// declarations, or declaring `image` at its assignment (both unchanged);
+// swapped CreateTextureSurface arms (150, size 1129); FreeFile once after a
+// named CreateTextureSurface result (397); braces on the -2 arm (unchanged).
+// Earlier: `render = 0` inside `if (!render)` (unchanged); an early store and
+// return on exhaustion (324, adds a return retail lacks).
 #include <windows.h>
 #include <math.h>
 #include <stdio.h>
@@ -19,7 +41,7 @@
 // partblt.tga through a texture and compares the drawn result. 1: works;
 // 0: wrong; -1: the full upload failed; -2: no image or texture; -3: no
 // 640 x 480 x 16 target; -4: no texture surface.
-void PCVideoCard::ProbePartialTextureUploads(RenderTarget* target) {
+int PCVideoCard::ProbePartialTextureUploads(RenderTarget* target) {
     int result = 1;
     UnknownRect area;
     UnknownRect tile;
@@ -34,17 +56,18 @@ void PCVideoCard::ProbePartialTextureUploads(RenderTarget* target) {
     rendered = 0;
     expected = 0;
     UnknownTgaFile* file = LoadFile("partblt.tga", 0, 0);
-    RenderTarget* render = target;
-    if (!render) {
+    RenderTarget* render = 0;
+    if (target)
+        render = target;
+    else {
         for (int i = 0; i < displayModeCount; i++) {
             if (displayModes[i].width == 640 && displayModes[i].height == 480 && displayModes[i].bitDepth == 16) {
                 if (!SetFullscreenDisplayMode(i, 1)) {
                     result = -3;
                 } else {
-                    RenderTarget* created = (new (__FILE__, 2053) PCRenderTarget)
+                    render = (new (__FILE__, 2053) PCRenderTarget)
                                  ->InitializeRenderTarget(this, &IID_IDirect3DHALDevice, backBuffer, 1, frameBufferCount);
-                    if (created) {
-                        render = created;
+                    if (render) {
                         result = 1;
                         g_TrackGame->renderTarget = render;
                         g_TrackGame->display = this;
@@ -102,11 +125,12 @@ void PCVideoCard::ProbePartialTextureUploads(RenderTarget* target) {
                 expected->Release();
         } else
             result = -2;
-        if (!target && render) {
-            delete render;
-            g_TrackGame->renderTarget = 0;
-            g_TrackGame->display = 0;
-        }
+    }
+    if (!target && render) {
+        delete render;
+        g_TrackGame->renderTarget = 0;
+        g_TrackGame->display = 0;
     }
     partialTextureUploadResult = result;
+    return result;
 }

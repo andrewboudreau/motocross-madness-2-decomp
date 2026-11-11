@@ -62,7 +62,7 @@ public:
     int CreateFlipChain(int backBuffers);               // 0x004c9f30: flipping chain
     int CreateSystemRenderSurface(int backBuffers);     // 0x004ca130
     int CreateModeSurfaces(int windowed);               // 0x004ca520
-    void ProbePartialTextureUploads(RenderTarget* target); // 0x004cab00: blit timing
+    int ProbePartialTextureUploads(RenderTarget* target);  // 0x004cab00: also stores +0x5bc
     int SetGDISurfaceVisible(int enable);               // 0x004cb5b0 (GUIManager.cpp 0x004868b0)
 
     UnknownDirectDrawInterface* directDraw;    // +0x190: IDirectDraw7 (DirectDrawCreateEx)

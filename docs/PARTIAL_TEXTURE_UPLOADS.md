@@ -1,7 +1,9 @@
 # Partial texture upload probe
 
 `samples/render/PartialTextureUploads.cpp` contains the complete provisional
-`void PCVideoCard::ProbePartialTextureUploads(RenderTarget*)` body. The
+`int PCVideoCard::ProbePartialTextureUploads(RenderTarget*)` body. The `int`
+return is confirmed by the epilogue: retail loads `result` into eax before the
+`+0x5bc` store and the single `ret 4`. The
 declaration in `PCVideoCard.h` and its caller in `PCGame::ProfileDisplays` use the
 same thiscall symbol. Retail starts at `0x004cab00`; the extent is **1129 bytes**.
 The only `ret 4` is at `0x004caeae`, followed by a reachable upload-success block
@@ -15,21 +17,26 @@ references retail `PCVideoCard.cpp`, but this standalone grouping does not claim
 to reconstruct the original translation unit. The original aggregate sample
 includes this file so the body has one maintained source. Header declaration
 order is retained. The extracted standalone VC6 SP3 `/O2 /GR /GX /MT` object
-contains one public function, **1145 bytes with 140 matching positions** against
-the complete retail extent. In the original aggregate context it remains
-1113 bytes with 144 matching positions. Extraction preserves the aggregate
-instruction bytes after relocation operands are normalized; the diagnostic
-source path and compiler-generated exception-label numbering change. Neither
-form is a strict match, and no extent is shortened to accommodate either one.
+contains one public function, **1120 bytes with 423 matching positions** against
+the complete retail extent (linked masked score 0.826). The aggregate context
+gives the same 423. Neither form is a strict match, and no extent is shortened
+to accommodate either one.
 
-Retail keeps the two `result = -3` stores of the mode search separate (the
-second one after reloading the loop counter, because `created` occupies ESI)
-and retests the render target after the loop's `break`; the candidate merges
-the stores. Tried without gain (s20): `continue` after the first `-3` (140,
-unchanged); assigning the created target straight to `render` (171 of 1170
-bytes, and the loop-exhausted path no longer skips to the final store); the
-temporary-target cleanup moved outside `if (render)` (143 of 1157, registers
-rotate).
+The candidate matches retail instruction for instruction through the mode
+search, up to `0x004cac5c`. Three source changes moved it there from 140 (s21):
+returning `result` (as `void`, VC6 duplicated the epilogue for every jump to
+the final store); starting `render` at 0, taking a supplied target in the
+then-arm and assigning the created target straight to `render`, so the mode
+index, the created target and `render` share ESI and the exhausted loop jumps
+to the final store; and placing the temporary-target cleanup after the
+`if (render)` block. Remaining: retail homes `this` at `[esp+0x14]` and the
+first texture at `[esp+0x18]` and keeps EBX as the zero register throughout;
+the candidate swaps those slots and caches the texture in EBX. Retail also
+places the `CreateTextureSurface` success arm after the `ret`. Tried without
+gain on this form: permuted texture declarations or the first texture declared
+at its assignment (unchanged), swapped `CreateTextureSurface` arms (150), one
+`FreeFile` after a named `CreateTextureSurface` result (397), an early store
+and return on exhaustion (324, adds a return retail lacks).
 
 ## Functional build review
 

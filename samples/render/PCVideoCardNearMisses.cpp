@@ -55,14 +55,11 @@
 //   the three channel sums (retail keeps the green difference on the stack
 //   and stores the blue one) differ; the expansion and loop shapes match.
 // PCVideoCard::ProbePartialTextureUploads (0x004cab00, 1129 bytes; ours
-//   1113): the PartialTexBlt driver. Retail sets tile.top/bottom in the row
-//   loop, threads the loop exit straight to the result store (the created
-//   target is copied into `render` only on success, so `render` keeps its
-//   tested-null entry value) and places the `!file` (-2) arm after the
-//   epilogue (`if (file) ... else`). Left: retail keeps the mode index in
-//   esi shared with the created target (reloaded on failure, two separate
-//   -3 stores; VC6 here merges them), tests `render` again after the found
-//   path, and places the Slot8-success path after the epilogue.
+//   1120, 423 positions): the PartialTexBlt driver, defined in
+//   PartialTextureUploads.cpp (included below). Retail matches it up to
+//   0x004cac5c. Left: the `this` and first-texture frame slots are swapped,
+//   the texture is cached in ebx instead of keeping ebx as the zero register,
+//   and retail places the CreateTextureSurface success arm after the `ret`.
 #include "../../src/reconstructed/PCVideoCard.cpp"
 
 #include <string.h>

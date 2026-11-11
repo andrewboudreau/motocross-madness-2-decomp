@@ -35,7 +35,7 @@ struct EventRecord {
     void* gameDisplay; void* gameTarget;
 };
 struct Observation {
-    int exception,fault,faultOperation,faultAddress,events,blocks,fileAlive;
+    int exception,fault,faultOperation,faultAddress,events,blocks,fileAlive,returned;
     EventRecord trace[80];Block heap[8];
     unsigned char display[sizeof(PCVideoCard)],game[sizeof(TrackGame)],provided[sizeof(PCRenderTarget)];
     UnknownTgaFile file;UnknownDisplayMode modes[4];
@@ -187,9 +187,9 @@ static int MapReference(const char* path,const char* patches){
     fclose(f);return FlushInstructionCache(GetCurrentProcess(),0,0)!=0;
 }
 static void Invoke(int retail){
-    union{void(PCVideoCard::*method)(RenderTarget*);DWORD address;}call;
+    union{int(PCVideoCard::*method)(RenderTarget*);DWORD address;}call;
     call.method=&PCVideoCard::ProbePartialTextureUploads;if(retail)call.address=0x4cab00;
-    try{(Display()->*call.method)(scenario.provided?Provided():0);}catch(int e){observed.exception=e;}
+    try{observed.returned=(Display()->*call.method)(scenario.provided?Provided():0);}catch(int e){observed.exception=e;}
 }
 static int FaultFilter(EXCEPTION_POINTERS* e){
     if(e->ExceptionRecord->ExceptionCode!=EXCEPTION_ACCESS_VIOLATION)return EXCEPTION_CONTINUE_SEARCH;

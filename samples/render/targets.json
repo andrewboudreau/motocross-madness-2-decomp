@@ -19,7 +19,7 @@
   },
   {
     "source": "PartialTextureUploads.cpp",
-    "candidate_symbol_contains": "?ProbePartialTextureUploads@PCVideoCard@@QAEXPAVRenderTarget@@@Z",
+    "candidate_symbol_contains": "?ProbePartialTextureUploads@PCVideoCard@@QAEHPAVRenderTarget@@@Z",
     "target_va": "0x004cab00",
     "target_size": 1129,
     "expect": "partial",

@@ -15,7 +15,7 @@ from tools.eh_funcinfo import candidate, retail, shape
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-SYMBOL = '?ProbePartialTextureUploads@PCVideoCard@@QAEXPAVRenderTarget@@@Z'
+SYMBOL = '?ProbePartialTextureUploads@PCVideoCard@@QAEHPAVRenderTarget@@@Z'
 RANGES = {0x4cab00: 1129, 0x54cdd0: 23, 0x54cde7: 23, 0x54cdfe: 23, 0x54ce15: 23, 0x54ce2c: 10}
 DEPENDENCIES = {0x5125c0, 0x4ca900, 0x4a3010, 0x4c4ee0, 0x4c4f80,
                 0x4c5f00, 0x512dd0, 0x4caf70, 0x4a3060, 0x53471a}
@@ -84,13 +84,13 @@ class PartialTextureUploadsTests(unittest.TestCase):
                     self.assertEqual(methods, {SYMBOL})
                     entry = compiled.find_symbol(SYMBOL)
                     self.assertEqual(entry.extent_source, 'coff_function_aux')
-                    self.assertEqual(entry.function_size, 1145)
+                    self.assertEqual(entry.function_size, 1120)
                     eh = shape(retail(0x4cab00, image))
                     self.assertEqual(eh['max_state'], 4)
                     self.assertEqual(shape(candidate(obj, SYMBOL)), eh)
                     report = compare(image, compiled, SYMBOL, 0x4cab00, 1129,
                                      ROOT / 'samples/render/PartialTextureUploads.bindings.json')
-                    self.assertEqual(report['strict_match']['matching_positions'], 140)
+                    self.assertEqual(report['strict_match']['matching_positions'], 423)
             patch_file = output / 'calls.bin'
             patch_file.write_bytes(b''.join(patches))
             executable = output / 'partial.exe'

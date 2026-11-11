@@ -102,7 +102,7 @@ or a reconstruction of the complete original translation unit.
 
 The functional build explicitly admits this candidate. Its initial admission
 supplied `ProfileDisplays` but exposed a previously unlinked dependency,
-`void PCVideoCard::ProbePartialTextureUploads(RenderTarget*)`
+`int PCVideoCard::ProbePartialTextureUploads(RenderTarget*)`
 (`0x004cab00`, 1129 retail bytes). Its complete body is now independently
 reviewed and admitted from [PartialTextureUploads.cpp](PARTIAL_TEXTURE_UPLOADS.md),
 along with the [non-local memory probe](NONLOCAL_TEXTURE_MEMORY.md).

@@ -833,10 +833,10 @@ Not switched, and why:
   static, where retail's 0x0067c3e8 is (0, 1, 0).
 - `KrustyBike::FindPlacement` (0x00491d10) and the Recorder worker
   (0x004e6f80): the samples score below the linked bodies.
-- `FollowCamera`'s constructor (0x00462ee0, 0.932 against 0.955) and
-  `ProbePartialTextureUploads` (0x004cab00, 0.786 against 0.801): the
-  linked bodies are reviewed candidates that correct observable behaviour,
-  and they are kept.
+- `FollowCamera`'s constructor (0x00462ee0, 0.932 against 0.955): the
+  linked body is a reviewed candidate that corrects observable behaviour,
+  and it is kept. `ProbePartialTextureUploads` (0x004cab00) was listed here
+  at 0.786 against 0.801; its linked body now scores 0.826.
 - Owned by other work and left alone: `CarProcedural::Tick` and
   `BaseQuarryEvent::LoadEventObjects`.
 
@@ -1880,7 +1880,7 @@ the body was run with `tools/emu_diff.py` under control words 0x027f and
 | 0x00459ce0 | `EcoSystem::GenerateObjects` | static | none | 0.918 |
 | 0x0048b100 | `VisualCue::Tick` | static | none | 0.932 |
 | 0x0042fd80 | `CarProcedural::Tick` | emulation, 400 cases (`car_procedural_tick`) | none | 0.941 |
-| 0x004cab00 | `PCVideoCard::ProbePartialTextureUploads` | static | none | 0.786 |
+| 0x004cab00 | `PCVideoCard::ProbePartialTextureUploads` | static | none | 0.786 (0.826 after s21) |
 
 - **CarProcedural::Tick.** Retail rounds the steering angle to a float slot
   (`fst [esp+0x28]`) and then compares that copy with ±π/6. The candidate
@@ -1905,8 +1905,9 @@ the body was run with `tools/emu_diff.py` under control words 0x027f and
   each placement is accumulated on the x87 stack in both bodies. The x and
   y products are rounded through the same stack slots in both.
 - **ProbePartialTextureUploads.** Retail shares one release-and-delete tail
-  between the success path and the failure paths, and the candidate
-  duplicates the epilogue. The release order (image, rendered, expected),
+  between the success path and the failure paths. The audited candidate
+  duplicated the epilogue; since s21 it returns `result` (as retail's eax
+  does) and has retail's single epilogue. The release order (image, rendered, expected),
   the `-2`/`-3`/`-4` results and the `CreateSurface` arguments agree.
 - **Track::PlaceNear** (0x00517340) was dropped from this pass. Another
   audit found and fixed its second `DistanceAlong` argument order by
