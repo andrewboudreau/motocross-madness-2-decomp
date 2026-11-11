@@ -99,7 +99,9 @@ No helper implementation is replaced by a mock.
 The native checks cover these helpers and call boundaries, not recursive tree
 traversal, complete collision behavior or gameplay. Other dependencies, including
 `TreeTreeQueryNodes`, `BoxCapsuleOverlap` and provisional shared-global views,
-remain unresolved. Query TU attribution remains the documented inference in
+remain unresolved as matches (the game build links their near-miss bodies; see
+`docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies`).
+Query TU attribution remains the documented inference in
 `BoundingBoxTreeQuery.cpp`.
 
 ```powershell

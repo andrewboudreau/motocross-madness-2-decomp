@@ -5,7 +5,30 @@
   ],
   "link_aliases": {
     "?g_CollisionScratchPoints@@3PAUCollisionVec3@@A": "?g_CollisionScratchPoints@@3PAUVec3@@A",
-    "?AttachRenderContext@D3DIMSoultreeObject@@UAEHPAX@Z": "?AttachRenderContext@SoultreeObject@@UAEHPAX@Z"
+    "?AttachRenderContext@D3DIMSoultreeObject@@UAEHPAX@Z": "?AttachRenderContext@SoultreeObject@@UAEHPAX@Z",
+    "?BoxCapsuleOverlap@@YAHPBUCollisionVec3@@00MMPBUMatrix4@@@Z": "?BoxCapsuleOverlap@@YAHPBUVec3@@00MMPBUMatrix4@@@Z",
+    "?Vec3Dot@@YAMABUVec3@@0@Z":"?Vec3DotCall@@YAMPBUVec3@@0@Z",
+    "?Vec3Sub@@YA?AUVec3@@ABU1@0@Z": "?Vec3SubtractCall@@YAPAUVec3@@PAU1@PBU1@1@Z",
+    "?Vec3Add@@YA?AUVec3@@ABU1@0@Z": "?Vec3AddCall@@YAPAUVec3@@PAU1@PBU1@1@Z",
+    "?Vec3Scale@@YA?AUVec3@@ABU1@M@Z": "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z",
+    "?Vec3LengthRef@@YAMABUVec3@@@Z": "?CollisionLength@@YAMPBUCollisionVec3@@@Z",
+    "?Vec3Equal@@YAHPBUVec3@@0@Z": "?VehVec3Equal@@YAHPBUVec3@@0@Z",
+    "??0ContactVec3@@QAE@MMM@Z": "??0CollisionVec3@@QAE@MMM@Z",
+    "??YContactVec3@@QAEAAU0@ABU0@@Z": "??YVec3AddAssignCall@@QAEAAU0@ABUVec3@@@Z",
+    "?ContactScaleCall@@YA?AUContactVec3@@ABUVec3@@M@Z": "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z",
+    "??0ConVec3@@QAE@MMM@Z": "??0CollisionVec3@@QAE@MMM@Z",
+    "??YConVec3@@QAEAAU0@ABU0@@Z": "??YVec3AddAssignCall@@QAEAAU0@ABUVec3@@@Z",
+    "??H@YA?AUConVec3@@ABU0@0@Z": "?Vec3AddCall@@YAPAUVec3@@PAU1@PBU1@1@Z",
+    "??D@YA?AUConVec3@@ABU0@M@Z": "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z",
+    "??D@YA?AUConVec3@@MABU0@@Z": "?Vec3ScaleLeft@@YA?AUVec3@@MABU1@@Z",
+    "??K@YA?AUConVec3@@ABU0@M@Z": "?CollisionDivide@@YAPAUCollisionVec3@@PAU1@PBU1@M@Z",
+    "?CrossProduct@@YA?AUConVec3@@ABU1@0@Z": "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z",
+    "?Magnitude@@YAMABUConVec3@@@Z": "?CollisionLength@@YAMPBUCollisionVec3@@@Z",
+    "?Normalize@@YA?AUConVec3@@ABU1@@Z": "?Vec3Normalize@@YA?AUVec3@@ABU1@@Z",
+    "?RotateVector@@YA?AUConVec3@@ABU1@ABUConMatrix@@@Z": "?CollisionRotateVector@@YAPAUCollisionVec3@@PAU1@PBU1@PBUMatrix4@@@Z",
+    "?LocalToWorldPoint@ConNode@@QAE?AUConVec3@@ABU2@@Z": "?LocalToWorldPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
+    "?WorldToLocalDirection@ConNode@@QAE?AUConVec3@@ABU2@@Z": "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
+    "?GetPositionIn@ConNode@@QAEXPAV1@PAUConVec3@@@Z": "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z"
   },
   "included_sources": [
     {
@@ -17,6 +40,16 @@
       "path": "src/reconstructed/UIDialogTick.cpp",
       "included_by": "src/reconstructed/GameUi.cpp",
       "reason": "UIDialog::Tick 0x0046ef00 (strict exact) belongs to GameUi.cpp; GameUi.cpp includes the body, which also stays a standalone calibration case and native-test provider (docs/GAMEUI.md)."
+    },
+    {
+      "path": "src/krusty2/bvh/BoundingBoxTreeQuery.cpp",
+      "included_by": "src/bringup/Group0_BvhQuery.cpp",
+      "reason": "BoxCapsuleOverlap, BoxTriangleQuery, SegmentTriangleQuery, TreeTreeQueryNodes and SegmentSegmentDistance read the unit's file statics (vertex array, relative frames, motion matrix, axis scratch); the bring-up file includes the canonical unit and appends the near-miss bodies of samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp beside them. The canonical file stays a standalone calibration case (docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies)."
+    },
+    {
+      "path": "src/krusty2/constraint/ConstraintMethodCollisionModel.cpp",
+      "included_by": "samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp",
+      "reason": "The near-miss file includes the canonical unit (TU-local zero vector and helpers) and adds ApplyContactImpulse 0x0043bdb0; the canonical file stays a standalone calibration case (docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies)."
     }
   ],
   "candidate_sources": [
@@ -415,6 +448,18 @@
       "status": "best-guess-unreviewed",
       "reason": "Near-miss bodies admitted so the source build can link and run; defines TerrainShadow slots 27, 28 and 30, which the vtable emitted by src/reconstructed/TerrainShadow.cpp (the exact constructor, Attach, slot 29 and Render3D) references. Behavior unverified against retail; bytes nonexact.",
       "evidence": "docs/GAME_BUILD.md#best-guess-admissions"
+    },
+    {
+      "path": "samples/physics/contact/ContactImpulse.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "ContactSolveImpulse 0x005004a0: 1062-byte near miss (size exact, 940/1062 strict, retail's out-of-line call sequence) replacing the inline-arithmetic bring-up stand-in. Same formula and update order; not differentially tested.",
+      "evidence": "docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies"
+    },
+    {
+      "path": "samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp",
+      "status": "best-guess-unreviewed",
+      "reason": "ConstraintMethodCollisionModel::ApplyContactImpulse 0x0043bdb0: 2619-byte near miss (size exact, 2515/2619 strict, call sequence and operands as retail) replacing the inline-arithmetic bring-up stand-in; includes the canonical unit (included_sources). Same formula; not differentially tested.",
+      "evidence": "docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies"
     }
   ],
   "includes": [

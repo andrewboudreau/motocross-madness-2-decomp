@@ -49,6 +49,9 @@ def source_files(root: Path, spec: dict) -> list[Path]:
     # A source file that another compiled source #includes is part of that
     # translation unit (e.g. a method body shared by a calibration case and its
     # owning unit); compiling it on its own as well would define it twice.
+    # Quoted includes resolve against the owner's directory, then the
+    # configured include paths, as CL.EXE does.
+    include_dirs = [(root / name).resolve() for name in spec.get('includes', [])]
     for fragment in spec.get('included_sources', []):
         path = (root / fragment['path']).resolve()
         owner = (root / fragment.get('included_by', '')).resolve()
@@ -57,7 +60,8 @@ def source_files(root: Path, spec: dict) -> list[Path]:
         if not fragment.get('reason'):
             raise ValueError(f"included source lacks a reason: {fragment['path']}")
         includes = re.findall(r'^\s*#\s*include\s+"([^"]+)"', owner.read_text(encoding='latin1'), re.M)
-        if not any((owner.parent / name).resolve() == path for name in includes):
+        if not any((base / name).resolve() == path
+                   for name in includes for base in [owner.parent] + include_dirs):
             raise ValueError(f"{fragment['included_by']} does not #include {fragment['path']}")
         sources.discard(path)
     if not sources:

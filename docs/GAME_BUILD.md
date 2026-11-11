@@ -603,6 +603,99 @@ exposes new dependencies: all 44 files together raise the count from 175 to
 249, the 13 chosen files lower it from **175 to 152** with no strict match
 changed (separate objects; `src/` is untouched).
 
+## Collision and contact near-miss bodies
+
+Seven collision and contact functions had been linked from bring-up
+stand-ins. These were inline-arithmetic rewrites that compiled, but their
+linked bodies scored poorly against retail. The game build now links the
+near-miss bodies from `samples/` instead:
+
+- `src/bringup/Group0_BvhQuery.cpp` includes the canonical
+  `src/krusty2/bvh/BoundingBoxTreeQuery.cpp` (an `included_sources` entry) for
+  its file statics: the vertex array, relative frames, motion matrix and axis
+  scratch. It then carries the near-miss bodies of
+  `samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp`. The sample file is
+  unchanged and keeps its pinned object.
+- `samples/physics/contact/ContactImpulse.cpp` and
+  `samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp`
+  are `best-guess-unreviewed` candidate sources. The second file includes
+  `ConstraintMethodCollisionModel.cpp` (an `included_sources` entry).
+- `Group0_ContactImpulse.cpp` and `Group3_ConstraintCollision.cpp` were
+  deleted.
+- The bodies call retail's out-of-line vector helpers under view-specific
+  names. `link_aliases` binds each name to the exact provider at the same
+  retail address:
+
+  | Address | Provider |
+  |---|---|
+  | 0x0040ae30 | `Vec3DotCall` |
+  | 0x00421d00 | `Vec3SubtractCall` |
+  | 0x00421cb0 | `Vec3AddCall` |
+  | 0x005015b0 | `Vec3ScaleCall` |
+  | 0x00428090 | `Vec3ScaleLeft` |
+  | 0x00428060 | `Vec3AddAssignCall` |
+  | 0x00404e60 | `CollisionVec3` constructor |
+  | 0x00435ec0 | `CollisionLength` |
+  | 0x005299e0 | `VehVec3Equal` |
+  | 0x0043c890 | `CollisionDivide` |
+  | 0x0043ca20 | `CollisionRotateVector` |
+  | 0x00515600 | `CrossProductCall` |
+  | 0x005087b0 | `Vec3Normalize` |
+
+  The `SoultreeObject` methods `LocalToWorldPoint`, `WorldToLocalDirection`
+  and `GetPositionIn` are bound the same way. `CollisionObject.cpp` uses a
+  `CollisionVec3` overload of `BoxCapsuleOverlap`, which is aliased to the
+  `Vec3` definition.
+- `included_sources` validation now resolves a quoted include against the
+  owner's directory and then the configured include paths, as CL.EXE does.
+
+The table gives each linked-body score (`work/s20/linked_vs_sample.py`
+metric) before and after the change. The extent runs to the next map
+symbol with a higher address.
+
+| VA | Function | Stand-in | Now linked | Sample object |
+|---|---|---|---|---|
+| 0x00426be0 | `BoxTriangleQuery` | 0.157 | 0.960 | 0.967 |
+| 0x004280e0 | `TreeTreeQueryNodes` | 0.165 | 0.902 | 0.916 |
+| 0x0042a640 | `SegmentSegmentDistance` | 0.432 | 0.943 | 0.943 |
+| 0x00427c10 | `SegmentTriangleQuery` | 0.697 | 0.946 | 0.946 |
+| 0x00425900 | `BoxCapsuleOverlap` | 0.697 | 0.821 | 0.821 |
+| 0x0043bdb0 | `ApplyContactImpulse` | 0.497 | 0.984 | 0.984 |
+| 0x005004a0 | `ContactSolveImpulse` | 0.584 | 0.960 | 0.960 |
+
+`BoxTriangleQuery` and `TreeTreeQueryNodes` score a little lower linked than
+as an object. Their switch jump tables sit inside the linked extent and decode
+as unmatched instructions. The link still covers every translation unit with
+no unresolved symbols. The vtable audit is unchanged (extra_override 2,
+ok 7315).
+
+How the new bodies behave differently from the stand-ins (from reading the
+source; not differentially tested):
+
+- `ContactSolveImpulse` and `ApplyContactImpulse` use the same formulas and
+  update order. They now call retail's out-of-line helpers instead of inline
+  arithmetic, so only x87 rounding can differ.
+- The `BoxTriangleQuery` stand-in could not reach the shared vertex array, so
+  it tested only the triangle face axis. It over-reported overlap, which
+  weakened pruning but did not change collision results, because
+  `LeafPairQuery` still decided each hit. The new body runs the full 13-axis
+  separating-axis test: the same hits with fewer leaf queries.
+- The `TreeTreeQueryNodes` stand-in probed through `LeafNodeQuery`,
+  `MoveBox` and `BoxOverlap`. `MoveBox` builds the same swept union as
+  `SweptBoxOverlap`, so the stand-in was equivalent apart from rounding. The
+  new body calls `SweptBoxOverlap` or the inline box-overlap test directly on
+  the relative frame and motion statics.
+- `SegmentTriangleQuery`, `SegmentSegmentDistance` and `BoxCapsuleOverlap`
+  differ only in floating-point summation order. For example, the push dot
+  product now adds z first, and the length is taken through 0x00435ec0.
+  Duplicate points are still removed by exact equality, now through
+  `VehVec3Equal`.
+
+The existing native tests (`test_bvh_vector_connections`,
+`test_collision_query_connections`, `test_constraint_scene_connections`,
+`test_collision_helper_providers`) compile and check the unchanged sample and
+`src/` objects. No test runs the game-linked bodies.
+
 ## Source-built run status
 
 The source-built `mcm2.exe` (391/391 translation units, zero unresolved

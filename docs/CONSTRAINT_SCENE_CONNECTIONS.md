@@ -44,7 +44,8 @@ near-miss aggregate preserve **89 nondebug sections and 271 relocations**:
 all bytes, section properties, and relocation destinations match under the
 three documented external symbol substitutions. No initializer or storage
 section is added. In particular, the full 829-byte solver remains strict.
-The aggregate's unadmitted `ApplyContactImpulse` still calls provisional node
+The aggregate's `ApplyContactImpulse` (now linked as a best-guess body, see
+`docs/GAME_BUILD.md#collision-and-contact-near-miss-bodies`) still calls provisional node
 methods of its own, so its bindings retain those mappings alongside the new
 canonical names. Its complete 2619-byte body and resolved fingerprint remain
 unchanged, with 2515 matching positions; it is not promoted.

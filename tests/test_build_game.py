@@ -78,6 +78,14 @@ class GameBuildTests(unittest.TestCase):
             fragment['reason'] = ''
             with self.assertRaisesRegex(ValueError, 'lacks a reason'):
                 source_files(root, spec)
+            # A quoted include also resolves through the configured include paths.
+            fragment['reason'] = 'test'
+            (root / 'src/b/Owner.cpp').write_text('#include "a/Body.cpp"\n')
+            with self.assertRaisesRegex(ValueError, 'does not #include'):
+                source_files(root, spec)
+            spec['includes'] = ['src']
+            self.assertEqual([p.relative_to(root).as_posix() for p in source_files(root, spec)],
+                             ['src/b/Other.cpp', 'src/b/Owner.cpp'])
 
     def test_missing_sources_fail(self):
         with tempfile.TemporaryDirectory() as tmp:
