@@ -34,5 +34,14 @@
     "expect": "partial",
     "bindings": "NonLocalTextureMemory.bindings.json",
     "status": "Complete reachable CFG including final ret8; reviewed in 12912 native scenarios, remains nonexact."
+  },
+  {
+    "source": "BitStringRead.cpp",
+    "candidate_symbol_contains": "?ReadBits@GR_BitString@@QAEIH@Z",
+    "target_va": "0x00423ef0",
+    "target_size": 125,
+    "expect": "partial",
+    "bindings": "BitStringRead.bindings.json",
+    "status": "Complete nonexact candidate (8/157 strict, docs/BITSTRING_READ.md). Retail's ebp frame, bswap and store-then-reload local return look like inline assembly (inference), so an exact C++ form is unlikely."
   }
 ]
