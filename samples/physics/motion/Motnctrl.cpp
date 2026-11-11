@@ -243,45 +243,9 @@ void PoseRotation(CharacterPose* a, CharacterPose* b, Vec3* axis, float* angle)
     *angle = 0.0f;
 }
 
-// owner: bracket only
-// 0x004a8470 (cdecl, called by slot 7 and 0x004a9050): *out = the blend of poses a and b at t,
-// clamped to [0, 1]: the axes and the position are interpolated linearly (the axes renormalised),
-// then axisY is made orthogonal to axisZ again.  The three weighted sums at the end are
-// computed into a temporary and never used (retail calls operator* and operator+ for them).
-// Two unused pose locals reproduce the inline budget of this candidate. The complete retail
-// body has no CharacterPose constructor calls; their original declaration is unproven.
-inline float InterpolatedLengthSquared(const Vec3& v)
-{
-    return Vec3DotCall(&v, &v);
-}
-inline Vec3 InterpolatedUnitVector(const Vec3& v)
-{
-    float lengthSquared = InterpolatedLengthSquared(v);
-    if (lengthSquared == 1.0f)
-        return v;
-    else {
-        float inverseLength = FastInvSqrt(lengthSquared);
-        return v * inverseLength;
-    }
-}
-
-void InterpolatePose(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t)
-{
-    ClampFloat(0.0f, 1.0f, &t);
-    float s = 1.0f - t;
-    out->nodeIndex = a->nodeIndex;
-    out->hasPose = a->hasPose;
-    CharacterPose unused1, unused2;
-    out->axisZ = InterpolatedUnitVector(a->axisZ + (b->axisZ - a->axisZ) * t);
-    out->axisY = InterpolatedUnitVector(a->axisY + (b->axisY - a->axisY) * t);
-    out->position = a->position + (b->position - a->position) * t;
-    Vec3 axisX = CrossProduct(out->axisZ, out->axisY);
-    out->axisY = CrossProduct(axisX, out->axisZ);
-    Vec3 unused;
-    unused = a->axisZ * s + b->axisZ * t;
-    unused = a->axisY * s + b->axisY * t;
-    unused = a->position * s + b->position * t;
-}
+// 0x004a8470 InterpolatePose (cdecl, called by slot 7 and 0x004a9050) is strict exact in
+// src/krusty2/motion/Motnctrl.cpp; declared here for slot 7.
+void InterpolatePose(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t);
 
 // The cubic ease of the blend weight, as in src/krusty2/motion/Motnctrl.cpp (AdvanceMotion): the
 // float copy through a folded double expression reproduces retail's FPU shape (slot 7 at

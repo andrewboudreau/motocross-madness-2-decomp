@@ -17,7 +17,7 @@ names and reconstructed types remain provisional.
 | RotatePose | `0x004a7dc0` | 523 | 523 | Nonexact |
 | PoseRotation | `0x004a7fd0` | 1121 | 1121 | Nonexact |
 | ClampFloat | `0x004a8440` | 44 | 44 | Strict exact |
-| InterpolatePose | `0x004a8470` | 1205 | 1205 | Strict exact |
+| InterpolatePose | `0x004a8470` | 1205 | 1205 | Strict exact (canonical `src/krusty2/motion/Motnctrl.cpp`) |
 | CharacterPose constructor | `0x004a8930` | 3 | 3 | Strict exact |
 
 Slot 7 advances the current motion, interpolates or extrapolates its poses,

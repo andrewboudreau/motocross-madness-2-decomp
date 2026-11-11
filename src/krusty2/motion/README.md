@@ -148,7 +148,8 @@ stay in `samples/physics/motion/Motnctrl.cpp`.
 
     The paths are at `+0x3c/+0x8c/+0xdc/+0x12c`. `motions` is at `+0x180`, the `MotionPoseList` is at `+0x190` and
     `vutLoaded` is at `+0x19c`. These fields are named in `src/krusty2/motion/D3DIMSoultreeCharacter.h`.
-- **Coverage**: 41 strict exact in `src/krusty2/motion/Motnctrl.cpp`, plus ClampFloat and 5 partials in the sample.
+- **Coverage**: 42 strict exact in `src/krusty2/motion/Motnctrl.cpp`, plus ClampFloat, the CharacterPose constructor and 4
+  partials in the sample.
   - The exact targets are:
     - two `$E` initialisers
     - the pose comparator and the two frame-advance helpers
@@ -167,13 +168,14 @@ stay in `samples/physics/motion/Motnctrl.cpp`.
       through a double expression VC6 folds away, `float t = (float)(x * 1.0);` (also `(float)(x + 0.0)`), in
       `SmoothStep`.
     - the `.CRT$XCU` 188-191 `Vec3` set (`0x4a8940..0x4a8a7b`, 8 functions)
-    - ClampFloat `0x4a8440` (sample; an out-of-line copy of an inline)
+    - InterpolatePose `0x4a8470` (cdecl; called by slot 7 and `0x4a9050`): length and unit helpers call the strict
+      `Vec3DotCall`, and the first CrossProduct calls `0x515600` as retail does
+    - ClampFloat `0x4a8440` (sample; an out-of-line copy of an inline only PoseRotation calls)
   - The partial targets are:
     - **LoadVue `0x4a5e40`, 48.08%**: the structure and calls are identical, but the registers are permuted (ebx/ebp and
       esi/edi).
     - **RotatePose `0x4a7dc0`, 90.66%**: the Vec3Normalize temporaries use a different stack slot.
     - **PoseRotation `0x4a7fd0`, 55.70%**: the inline budget differs.
-    - **InterpolatePose `0x4a8470`, 19.40%**: VC6 inlines the first CrossProduct, where retail calls `0x515600`.
     - **Slot 7 `0x4a70c0`** (candidate 3376 vs 3327 bytes; aligned instructions 675 of 958): the frame-accurate
       advance with pose extrapolation and blending. The call sequence is retail's and the clamp/smoothstep region
       matches byte for byte. One blend inline expanded in both loops always calls `CharacterPose::CharacterPose`

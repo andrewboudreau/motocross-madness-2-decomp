@@ -12,6 +12,7 @@ import unittest
 from mcm2tool.coff import CoffObject
 from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
+from test_character_motion_blend import pose_helper_source
 
 ROOT = Path(__file__).resolve().parents[1]
 HELPERS = (
@@ -57,7 +58,10 @@ class CharacterPoseHelperTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='mcm2-character-poses-') as directory:
             output = Path(directory)
             objects = []
-            for source in ('samples/physics/motion/Motnctrl.cpp', 'src/reconstructed/VectorCalls.cpp', 'tests/fixtures/character_pose_compare.cpp'):
+            # InterpolatePose is in the canonical unit, which cannot link here on its own.
+            pose = output / 'InterpolatePose.cpp'
+            pose.write_text(pose_helper_source())
+            for source in ('samples/physics/motion/Motnctrl.cpp', pose, 'src/reconstructed/VectorCalls.cpp', 'tests/fixtures/character_pose_compare.cpp'):
                 obj = output / (Path(source).stem + '.obj')
                 result = subprocess.run([sys.executable, str(ROOT / 'tools/compile.py'), str(ROOT / source),
                     '-o', str(obj), '--vc6-root', str(compiler), '--profile', 'vc6_o2_mt',
@@ -65,9 +69,11 @@ class CharacterPoseHelperTests(unittest.TestCase):
                     text=True, encoding='latin-1', env={**os.environ, 'PYTHONPATH': str(ROOT)})
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 objects.append(str(obj))
-                if source.startswith('samples/'):
+                if source == pose or str(source).startswith('samples/'):
                     candidate = CoffObject(obj)
                     for symbol, _, size in HELPERS:
+                        if (source == pose) != ('InterpolatePose' in symbol):
+                            continue
                         entry = candidate.find_symbol(symbol)
                         self.assertEqual(entry.extent_source, 'coff_function_aux')
                         self.assertEqual(entry.function_size, size)

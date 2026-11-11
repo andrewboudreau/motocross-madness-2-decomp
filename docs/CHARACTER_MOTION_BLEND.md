@@ -62,7 +62,7 @@ Three current-harness negative controls must fail at known comparisons: replace 
 
 ## Whole objects and portable pins
 
-Bike's full 242-section/1,089-relocation object and the KrustyBike sample's 271/1,443 object are preserved under the rider-call name alone. The Motion sample's 37/249 object changes only two InterpolatePose callee relocations. The start object's 14/24 contents remain identical. Data, CRT, EH and other methods remain intact; no extent is shortened.
+Bike's full 242-section/1,089-relocation object and the KrustyBike sample's 271/1,443 object are preserved under the rider-call name alone. The Motion sample's 37/249 object changes only two InterpolatePose callee relocations. InterpolatePose has since moved to the canonical `src/krusty2/motion/Motnctrl.cpp`; the sample object is now 36/218, the same sections less InterpolatePose, with slot 7's three calls to it external. The start object's 14/24 contents remain identical. Data, CRT, EH and other methods remain intact; no extent is shortened.
 
 Filename normalization enumerates only Bike.cpp, the actually emitted KrustyBike.cpp spelling and the Motion sample. Fresh actual-checkout baseline objects equal their private baseline views under those strings. All four changed objects plus the new candidate also compare completely across two independently compiled private roots. No arbitrary path collapsing, header wildcard, payload exclusion or discarded relocation is used.
 

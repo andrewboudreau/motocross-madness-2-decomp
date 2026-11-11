@@ -20,9 +20,19 @@ import test_eco_quadtree_connections as views
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'samples/physics/motion/CharacterMotionBlend.cpp'
 AGGREGATE = 'samples/physics/motion/Motnctrl.cpp'
+CANONICAL = 'src/krusty2/motion/Motnctrl.cpp'
+POSE_MARKERS = ('inline void ClampFloat(', 'inline float InterpolatedLengthSquared(',
+                'inline Vec3 InterpolatedUnitVector(', 'void InterpolatePose(')
 SYMBOL = '?Method_0x004a8c50@Character@@QAEXHHMM@Z'
 INTERPOLATE = '?InterpolatePose@@YAXPAUCharacterPose@@00M@Z'
 FILENAMES = ('src/krusty2/vehicle/Bike.cpp', 'src/krusty2/vehicle/KrustyBike.cpp', AGGREGATE)
+
+
+def pose_helper_source():
+    """InterpolatePose (0x4a8470) and its inline helpers, extracted from the canonical unit for
+    console harnesses: the whole unit cannot link there (its initialisers need the game allocator)."""
+    text = (ROOT/CANONICAL).read_text()
+    return '#include "motion/Motnctrl.h"\n'+'\n'.join(extract(text, marker) for marker in POSE_MARKERS)+'\n'
 
 
 def complete(obj, name):
@@ -113,12 +123,10 @@ class CharacterMotionBlendTests(unittest.TestCase):
                 self.assertEqual(dict(sections=len(rows), relocations=sum(len(row[-1]) for row in rows),
                     sha256=hashlib.sha256(json.dumps(rows, separators=(',', ':')).encode()).hexdigest()), pin, source)
             candidate = compile_file(SOURCE, 'candidate', ('/QIfist',))
-            text = (ROOT/AGGREGATE).read_text()
             helper = output/'pose.cpp'
-            helper.write_text('#include "motion/Motnctrl.h"\n'+'\n'.join(extract(text, marker) for marker in (
-                'inline void ClampFloat(', 'inline float InterpolatedLengthSquared(',
-                'inline Vec3 InterpolatedUnitVector(', 'void InterpolatePose('))+'\n')
+            helper.write_text(pose_helper_source())
             compile_file(helper, 'pose')
+            compile_file(CANONICAL, 'canonical')
             compile_file('src/reconstructed/FastMath.cpp', 'fast')
             compile_file('src/reconstructed/VectorCalls.cpp', 'vectors')
             compile_file('src/reconstructed/Math3D.cpp', 'math')
@@ -140,11 +148,11 @@ class CharacterMotionBlendTests(unittest.TestCase):
             self.assertEqual({symbol.name: symbol.value for symbol in candidate.symbols if symbol.name.startswith('_kVec3')},
                              {'_kVec3Zero': 0, '_kVec3XAxis': 32, '_kVec3YAxis': 48, '_kVec3ZAxis': 16})
 
-            self.assertEqual(complete(objects['pose'], INTERPOLATE), complete(objects['old2'], INTERPOLATE))
+            self.assertEqual(complete(objects['pose'], INTERPOLATE), complete(objects['canonical'], INTERPOLATE))
             strict = 0
             for name, symbol, va, extent, binding in (
-                ('pose', INTERPOLATE, 0x4a8470, 1205, 'samples/physics/motion/Motnctrl.bindings.json'),
-                ('old2', INTERPOLATE, 0x4a8470, 1205, 'samples/physics/motion/Motnctrl.bindings.json'),
+                ('pose', INTERPOLATE, 0x4a8470, 1205, 'src/krusty2/motion/Motnctrl.bindings.json'),
+                ('canonical', INTERPOLATE, 0x4a8470, 1205, 'src/krusty2/motion/Motnctrl.bindings.json'),
                 ('pose', '??0Vec3@@QAE@MMM@Z', 0x404e60, 25, None),
                 ('pose', '??H@YA?AUVec3@@ABU0@0@Z', 0x421cb0, 69, None),
                 ('pose', '??D@YA?AUVec3@@ABU0@M@Z', 0x5015b0, 69, None),

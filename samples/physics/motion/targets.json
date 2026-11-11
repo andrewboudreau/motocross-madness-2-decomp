@@ -119,16 +119,6 @@
     "bindings": "Motnctrl.bindings.json"
   },
   {
-    "class": "CharacterPose",
-    "source": "Motnctrl.cpp",
-    "candidate_symbol_contains": "?InterpolatePose@@",
-    "target_va": "0x004a8470",
-    "target_size": 1205,
-    "expect": "exact",
-    "notes": "cdecl; slot 7 / 0x4a9050 helper. Exact: the two unused CharacterPose locals (constructor calls 0x004a8930) give retail's frame and inline budget.",
-    "bindings": "Motnctrl.bindings.json"
-  },
-  {
     "class": "Character",
     "source": "Motnctrl.cpp",
     "candidate_symbol_contains": "?CharacterVirtualSlot7@Character@@UAEHMHH@Z",

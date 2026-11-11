@@ -28,8 +28,10 @@ int AdvanceClamped(Motion*,MotionPoseList**,MotionPoseList**,MotionPoseList**,fl
 Vec3* Vec3SubtractCall(Vec3*,const Vec3*,const Vec3*) { ExitProcess(118);return 0; }
 Vec3* Vec3ScaleCall(Vec3*,const Vec3*,float) { ExitProcess(119);return 0; }
 Vec3* Vec3AddCall(Vec3*,const Vec3*,const Vec3*) { ExitProcess(120);return 0; }
-// Imported by the aggregate's InterpolatePose, outside the LoadVue call graph.
+// Imported by the aggregate's slot 7, outside the LoadVue call graph; the canonical
+// InterpolatePose (src/krusty2/motion/Motnctrl.cpp) owns the retail body.
 float Vec3DotCall(const Vec3*,const Vec3*) { ExitProcess(121);return 0; }
+void InterpolatePose(CharacterPose*,CharacterPose*,CharacterPose*,float) { ExitProcess(122); }
 struct Scenario { int frames, transforms, requested, mask, format, mode, truncate; };
 struct Block { int size, alive; unsigned char bytes[4096]; };
 struct Observation {

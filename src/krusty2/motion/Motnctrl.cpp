@@ -11,8 +11,10 @@
 // Math3D.h vector set (.CRT$XCU 188-191, 0x004a8940..0x004a8a7b, globals 0x00685120..0x00685158)
 // mid-file and FreeMotion (line 0x5a7) last.  Every function here is strict exact with all
 // relocations resolved (Motnctrl.bindings.json).  Not here: the text .VUE loader 0x004a5e40,
-// the slot 7 helpers 0x004a7dc0, 0x004a7fd0, 0x004a8440 (an out-of-line copy of an inline) and
-// 0x004a8470, and slot 7 0x004a70c0 itself (near misses, samples/physics/motion/Motnctrl.cpp),
+// the slot 7 helpers 0x004a7dc0, 0x004a7fd0 and slot 7 0x004a70c0 itself (near misses,
+// samples/physics/motion/Motnctrl.cpp), with the exact 0x004a8440 (an out-of-line copy of an
+// inline only PoseRotation calls) and the CharacterPose constructor 0x004a8930 (called only
+// from slot 7 and the missing methods) kept beside their callers,
 // and the direct-FISTP methods: 0x004a8bf0 has a reviewed nonexact ordinary-C++ candidate
 // in samples/physics/motion/CharacterMotionStart.cpp; 0x004a8c50 and 0x004a9050 remain missing.
 #include <stdio.h>
@@ -542,6 +544,49 @@ int Character::AdvanceMotion(float dt, int mirror, int mask)
             blendActive = 0;
     }
     return currentFrame->frameIndex;
+}
+
+// owner: bracket only
+// 0x004a8470 (cdecl, called by slot 7 and 0x004a9050): *out = the blend of poses a and b at t,
+// clamped to [0, 1]: the axes and the position are interpolated linearly (the axes renormalised),
+// then axisY is made orthogonal to axisZ again.  The three weighted sums at the end are
+// computed into a temporary and never used (retail calls operator* and operator+ for them).
+// This is the out-of-line copy of the blend that AdvanceMotion expands as BlendPose above; the
+// two spellings are separate reconstructions of one retail operation (tier 3), not yet one
+// inline.  The two unused pose locals reproduce the inline budget of this body (retail emits no
+// CharacterPose constructor calls here); their original declaration is unproven.
+inline float InterpolatedLengthSquared(const Vec3& v)
+{
+    return Vec3DotCall(&v, &v);
+}
+
+inline Vec3 InterpolatedUnitVector(const Vec3& v)
+{
+    float lengthSquared = InterpolatedLengthSquared(v);
+    if (lengthSquared == 1.0f)
+        return v;
+    else {
+        float inverseLength = FastInvSqrt(lengthSquared);
+        return v * inverseLength;
+    }
+}
+
+void InterpolatePose(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t)
+{
+    ClampFloat(0.0f, 1.0f, &t);
+    float s = 1.0f - t;
+    out->nodeIndex = a->nodeIndex;
+    out->hasPose = a->hasPose;
+    CharacterPose unused1, unused2;
+    out->axisZ = InterpolatedUnitVector(a->axisZ + (b->axisZ - a->axisZ) * t);
+    out->axisY = InterpolatedUnitVector(a->axisY + (b->axisY - a->axisY) * t);
+    out->position = a->position + (b->position - a->position) * t;
+    Vec3 axisX = CrossProduct(out->axisZ, out->axisY);
+    out->axisY = CrossProduct(axisX, out->axisZ);
+    Vec3 unused;
+    unused = a->axisZ * s + b->axisZ * t;
+    unused = a->axisY * s + b->axisY * t;
+    unused = a->position * s + b->position * t;
 }
 
 // owner: bracket only

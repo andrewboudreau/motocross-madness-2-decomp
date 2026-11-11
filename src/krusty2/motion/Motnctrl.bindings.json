@@ -147,5 +147,11 @@
   "_qsort": "0x00534426",
   "_sprintf": "0x00534aaf",
   "_strncpy": "0x00534b10",
-  "_strtok": "0x00536397"
+  "_strtok": "0x00536397",
+  "?Vec3DotCall@@YAMPBUVec3@@0@Z": "0x0040ae30",
+  "?InterpolatePose@@YAXPAUCharacterPose@@00M@Z": "0x004a8470",
+  "?FastInvSqrt@@YAMM@Z": "0x00460c00",
+  "??H@YA?AUVec3@@ABU0@0@Z": "0x00421cb0",
+  "??D@YA?AUVec3@@ABU0@M@Z": "0x005015b0",
+  "?CrossProduct@@YA?AUVec3@@ABU1@0@Z": "0x00515600"
 }
