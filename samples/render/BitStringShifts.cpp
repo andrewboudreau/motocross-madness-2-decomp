@@ -65,7 +65,10 @@ void GR_BitString::ShiftBitsTowardFront(int count) {
 // statements or a comma expression, `*--src` in the zero test, while(--i)
 // and a split `*--dst` in the 0xffffffff arm. Worse: `src = dst - 1` after
 // the store (83), src assigned from `data` (59), while(--words) (154),
-// swapped fill arms (367), the first word read through `src[1]` (45).
+// swapped fill arms (367), the first word read through `src[1]` (45),
+// a mask local in the 0xffffffff arm (204), a count-up loop (155),
+// `32 - count` in place of carryShift (15) and `src` re-derived from
+// `data` (17); `&data[words - 1]` and a separate `>>= count` stay 387.
 void GR_BitString::ShiftBitsTowardBack(int count) {
     int words = (bitCount + 31) / 32;
     unsigned int* dst = (unsigned int*)data + words - 1;
