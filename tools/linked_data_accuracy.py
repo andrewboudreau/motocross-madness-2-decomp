@@ -450,7 +450,8 @@ def load_retail_names(root: Path, retail_pe=None) -> dict[str, tuple[set[int], s
         for td in json.loads(tds.read_text()):
             decorated = td.get('decorated', '')
             if decorated.startswith('.?A'):
-                names.setdefault('??_R0' + decorated + '@8', ({int(td['va'], 16)}, 'rtti'))
+                # `.?AVArcadeObject@@` -> `??_R0?AVArcadeObject@@@8` (the symbol drops the '.').
+                names.setdefault('??_R0' + decorated[1:] + '@8', ({int(td['va'], 16)}, 'rtti'))
     vts = analysis / 'vtables.json'
     if vts.is_file():
         per_class: dict[str, set[int]] = defaultdict(set)

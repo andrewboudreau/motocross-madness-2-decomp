@@ -217,6 +217,19 @@ class RetailGapTests(unittest.TestCase):
                          [(0x566014, 0x566024)])
 
 
+class RetailNameTests(unittest.TestCase):
+    def test_type_descriptor_symbol_drops_the_dot(self):
+        import json
+        from tools.linked_data_accuracy import load_retail_names
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / 'analysis').mkdir()
+            (Path(d) / 'analysis' / 'rtti_type_descriptors.json').write_text(json.dumps(
+                [{'decorated': '.?AVArcadeObject@@', 'va': '0x00570abc'}]))
+            names = load_retail_names(Path(d))
+        self.assertEqual(names.get('??_R0?AVArcadeObject@@@8'), ({0x570abc}, 'rtti'))
+        self.assertNotIn('??_R0.?AVArcadeObject@@@8', names)
+
+
 @unittest.skipUnless(os.environ.get('MCM2_EXE') and Path(os.environ['MCM2_EXE']).is_file(),
                      'MCM2_EXE (retail image) not set')
 class IntegrationTests(unittest.TestCase):
