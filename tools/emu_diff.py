@@ -27,6 +27,12 @@ A case module (``tools/emu_cases/<name>.py`` or any path) supplies:
     PREFER_OBJECT = set()            # optional, defined symbols to keep from the object
     PROBES = {0x4a91d5: 'fistp'}     # optional retail VAs whose hit counts are reported
     FPCWS = (0x027f, 0x007f)         # optional control words
+    FLOAT_ULPS = 0                   # optional: outcomes whose only differences are float32
+                                     # words (writes, logged call arguments) within this many
+                                     # ulps count as ``within_ulps``, not as mismatches; a dict
+                                     # {fpcw: ulps} keeps the other control words exact
+    FLOAT_ABS = 0.0                  # optional, with FLOAT_ULPS: words this close in value also
+                                     # agree (cancellation near zero, where ulps mean little)
     def cases(rng, n): ...           # yields picklable case descriptions
     def setup(ctx, case): ...        # builds memory and stubs, returns Call(...)
 
@@ -665,7 +671,11 @@ class Replay:
       log_pointees bool (default True): log the pointee bytes of const pointer/reference args
                    (and of non-const ones outside the stack) whose size is known
       pointees     VA -> stack-word indexes whose pointees are logged even when non-const and
-                   on the stack (in/out locals the body fills before the call)
+                   on the stack (in/out locals the body fills before the call); an entry may
+                   be (index, bytes) to log a size the signature does not give (arrays)
+      inout        VA -> stack-word indexes (or (index, bytes)) of in/out pointees: logged as
+                   ``pointees`` and left out of the synthetic out-writes, so an effect reads
+                   what the body passed (a ground query that keeps x and z and writes y)
       out_writes   bool (default True): fill non-const stack pointees of known size with
                    synthetic values, so out-parameters the body reads back are deterministic
     """
@@ -986,14 +996,19 @@ class ReplayRun:
                     break
                 params.append((k, p))
                 k += p.words
+        inout = _index_sizes(replay.spec.get('inout', {}).get(target, ()))
         if replay.log_pointees:
-            forced = replay.spec.get('pointees', {}).get(target, ())
-            for k, p in params:
-                if p.kind != 'ptr' or p.pointee is None or not p.pointee.size or k >= len(args):
+            forced = {**_index_sizes(replay.spec.get('pointees', {}).get(target, ())), **inout}
+            typed = dict(params)
+            for k in sorted(set(typed) | set(forced)):
+                p = typed.get(k)
+                nbytes = forced.get(k) or (p.pointee.size if p is not None and p.kind == 'ptr'
+                                           and p.pointee is not None else None)
+                if not nbytes or k >= len(args):
                     continue
-                if p.const or not _in_stack(args[k]) or k in forced:
+                if k in forced or p.const or not _in_stack(args[k]):
                     try:
-                        extra.append(('*arg%d' % k, ctx.read(args[k], p.pointee.size).hex()))
+                        extra.append(('*arg%d' % k, ctx.read(args[k], nbytes).hex()))
                     except Exception:
                         extra.append(('*arg%d' % k, 'unmapped'))
         logged = [_frame_token(a) for a in args]
@@ -1019,7 +1034,7 @@ class ReplayRun:
         if replay.out_writes:
             for k, p in params:
                 if (p.kind == 'ptr' and not p.const and p.pointee is not None and k < len(args)
-                        and _in_stack(args[k])):
+                        and _in_stack(args[k]) and k not in inout):
                     data = synthetic_bytes(rng, p.pointee)
                     if data:
                         ctx.write(args[k], data)
@@ -1037,6 +1052,15 @@ class ReplayRun:
             uc.reg_write(_reg('EIP'), self.tramp)
         else:
             uc.reg_write(_reg('EIP'), address + size)
+
+
+def _index_sizes(entries) -> dict:
+    """``pointees``/``inout`` entries (index or (index, bytes)) -> {index: bytes or None}."""
+    out = {}
+    for e in entries:
+        k, size = e if isinstance(e, tuple) else (e, None)
+        out[k] = size
+    return out
 
 
 def _reg(name: str) -> int:
@@ -1219,6 +1243,118 @@ def describe_difference(a: tuple, b: tuple) -> list[str]:
     return out
 
 
+def _f32_order(word: int) -> int:
+    """float32 bits -> an integer that orders like the value (adjacent floats differ by 1)."""
+    return word if word < 0x80000000 else 0x80000000 - word
+
+
+def ulp_distance(a: int, b: int) -> int | None:
+    """Distance in float32 ulps between two 32-bit words, None if either is NaN or infinite."""
+    if (a & 0x7f800000) == 0x7f800000 or (b & 0x7f800000) == 0x7f800000:
+        return None
+    return abs(_f32_order(a) - _f32_order(b))
+
+
+def _bytes_by_address(runs) -> dict:
+    return {s + i: int(h[2 * i:2 * i + 2], 16) for s, h in runs for i in range(len(h) // 2)}
+
+
+def _word_close(a: int, b: int, tol: tuple, worst: list) -> bool:
+    """Two float32 words within ``tol`` = (ulps, absolute); ``worst`` keeps the largest ulp distance."""
+    d = ulp_distance(a, b)
+    if d is None:
+        return False
+    if d <= tol[0]:
+        worst[0] = max(worst[0], d)
+        return True
+    fa, fb = struct.unpack('<2f', struct.pack('<2I', a, b))
+    return abs(fa - fb) <= tol[1]
+
+
+def _words_close(ba: dict, bb: dict, tol: tuple, worst: list) -> bool:
+    """Every 4-aligned word with a differing byte is written whole on both sides and is close."""
+    for word in sorted({x & ~3 for x in set(ba) | set(bb) if ba.get(x) != bb.get(x)}):
+        span = range(word, word + 4)
+        if not all(x in ba and x in bb for x in span):
+            return False
+        if not _word_close(int.from_bytes(bytes(ba[x] for x in span), 'little'),
+                           int.from_bytes(bytes(bb[x] for x in span), 'little'), tol, worst):
+            return False
+    return True
+
+
+def _hexwords_close(x, y, tol: tuple, worst: list) -> bool:
+    if x == y:
+        return True
+    if not (isinstance(x, str) and isinstance(y, str)) or len(x) != len(y) or len(x) % 8:
+        return False
+    try:
+        ba = dict(enumerate(bytes.fromhex(x)))
+        bb = dict(enumerate(bytes.fromhex(y)))
+    except ValueError:
+        return False
+    return _words_close(ba, bb, tol, worst)
+
+
+def _calls_close(ca, cb, tol: tuple, worst: list) -> bool:
+    if len(ca) != len(cb):
+        return False
+    for x, y in zip(ca, cb):
+        if x == y:
+            continue
+        if x[0] == 'note' or y[0] == 'note' or len(x) != len(y) or x[:2] != y[:2] or len(x[2]) != len(y[2]):
+            return False
+        for u, v in zip(x[2], y[2]):
+            if u == v:
+                continue
+            if not (isinstance(u, int) and isinstance(v, int)
+                    and _word_close(u & 0xffffffff, v & 0xffffffff, tol, worst)):
+                return False
+        ex, ey = (x[3], y[3]) if len(x) > 3 else ((), ())
+        if len(ex) != len(ey):
+            return False
+        for (kx, vx), (ky, vy) in zip(ex, ey):
+            if kx != ky or not _hexwords_close(vx, vy, tol, worst):
+                return False
+    return True
+
+
+def tolerance_for(module, fpcw: int) -> tuple:
+    """(ulps, absolute) a case allows at one control word; FLOAT_ULPS may map fpcw -> ulps."""
+    ulps = getattr(module, 'FLOAT_ULPS', 0)
+    if isinstance(ulps, dict):
+        ulps = ulps.get(fpcw, 0)
+    return ulps, (getattr(module, 'FLOAT_ABS', 0.0) if ulps else 0.0)
+
+
+def outcomes_within_ulps(a: tuple, b: tuple, ulps: int, absolute: float = 0.0) -> int | None:
+    """The largest float32 ulp distance between two outcomes that differ only in float words
+    (written memory, logged call arguments and pointees) by at most ``ulps`` (or by at most
+    ``absolute`` in value); None otherwise.
+
+    A differing word must be written whole by both runs; status, registers, the call targets
+    and every other field must be equal. Words that hold integers or pointers are compared the
+    same way, so a tolerance only suits cases whose differing words are floats."""
+    if ulps <= 0 or len(a) != len(b):
+        return None
+    worst = [0]
+    tol = (ulps, absolute)
+    for x, y in zip(a, b):
+        if x == y:
+            continue
+        if not (isinstance(x, tuple) and isinstance(y, tuple) and len(x) == 2 and x[0] == y[0]):
+            return None
+        if x[0] == 'writes':
+            if not _words_close(_bytes_by_address(x[1]), _bytes_by_address(y[1]), tol, worst):
+                return None
+        elif x[0] == 'calls':
+            if not _calls_close(x[1], y[1], tol, worst):
+                return None
+        else:
+            return None
+    return worst[0]
+
+
 def _fmt_call(c):
     if c[0] == 'note':
         return repr(c)
@@ -1287,6 +1423,8 @@ class Summary:
     case: str
     runs: int = 0
     mismatches: int = 0
+    within_ulps: int = 0
+    worst_ulps: int = 0
     retail_faults: int = 0
     examples: list = field(default_factory=list)
     probes: dict = field(default_factory=dict)
@@ -1294,6 +1432,7 @@ class Summary:
 
     def as_dict(self):
         return {'case': self.case, 'runs': self.runs, 'mismatches': self.mismatches,
+                'within_ulps': self.within_ulps, 'worst_ulps': self.worst_ulps,
                 'retail_faults': self.retail_faults, 'by_fpcw': {hex(k): v for k, v in self.by_fpcw.items()},
                 'probes': {hex(k): v for k, v in self.probes.items()}, 'examples': self.examples}
 
@@ -1394,6 +1533,7 @@ def run_diff(module, obj_path: Path, n: int = 200, seed: int = 1, fpcws=None, re
     case_list = list(module.cases(rng, n))
     for fpcw in fpcws:
         bad = 0
+        ulps, absolute = tolerance_for(module, fpcw)
         for index, case in enumerate(case_list):
             r = emu.run(retail_va, module.setup, case, fpcw, (seed, index), probes, replay)
             c = emu.run(placement.entry, module.setup, case, fpcw, (seed, index), (), replay)
@@ -1403,6 +1543,11 @@ def run_diff(module, obj_path: Path, n: int = 200, seed: int = 1, fpcws=None, re
             if r.faulted:
                 summary.retail_faults += 1
             if r.outcome != c.outcome:
+                close = outcomes_within_ulps(r.outcome, c.outcome, ulps, absolute)
+                if close is not None:
+                    summary.within_ulps += 1
+                    summary.worst_ulps = max(summary.worst_ulps, close)
+                    continue
                 bad += 1
                 summary.mismatches += 1
                 if len(summary.examples) < show:
@@ -1451,11 +1596,14 @@ def main(argv=None) -> int:
     parser.add_argument('--atlas', type=Path, help='VC6 CRT atlas.json (default work/vc6-crt-atlas)')
     parser.add_argument('--fpcw', help='comma-separated control words (default 0x27f,0x7f)')
     parser.add_argument('--show', type=int, default=5)
+    parser.add_argument('--ulps', type=int, help="override the case's FLOAT_ULPS tolerance (0 = exact)")
     parser.add_argument('--json-out', type=Path)
     parser.add_argument('--explain', action='store_true',
                         help='list how relocations resolved and the retail direct calls, then exit')
     args = parser.parse_args(argv)
     module = load_case(args.case)
+    if args.ulps is not None:
+        module.FLOAT_ULPS = args.ulps
     fpcws = tuple(int(x, 0) for x in args.fpcw.split(',')) if args.fpcw else None
     with tempfile.TemporaryDirectory(prefix='emu-diff-') as tmp:
         if args.object:
@@ -1481,6 +1629,9 @@ def main(argv=None) -> int:
         print(f'fpcw {fpcw:#06x}: {row["mismatches"]} of {row["runs"]} differ')
     for va, hits in summary.probes.items():
         print(f'probe {va:#x} {getattr(module, "PROBES")[va]}: reached in {hits} retail runs')
+    if summary.within_ulps:
+        print(f'within FLOAT_ULPS {getattr(module, "FLOAT_ULPS", 0)}: {summary.within_ulps} runs '
+              f'(worst {summary.worst_ulps})')
     print(f'{summary.case}: runs {summary.runs}, mismatches {summary.mismatches}, '
           f'retail faults {summary.retail_faults}')
     if args.json_out:
