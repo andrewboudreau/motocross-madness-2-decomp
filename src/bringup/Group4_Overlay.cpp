@@ -64,6 +64,12 @@ extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* t
 // text; creates the 28-high font (the localized tooltip face, else bold
 // italic "Arial"). `textures` is not read. Returns this, or 0 after slot 2
 // when the font fails.
+// Audited against retail for the linked game (2026-11-11): the call, every
+// field offset (+0x2c..+0x48), both scale constants (1/640, 1/480) and their
+// order, the LOGFONT bytes, the face and weight choice and the failure path
+// agree. The size gap (249 built vs 126 retail instructions) is the two
+// X87FloatToInt expansions, where retail has a 4-instruction inline-asm fistp,
+// and retail's ebp frame; there is no behavioural difference.
 DropTextOverlay* DropTextOverlay::Setup(void* value, TextureMapManager* textures, float dropSeconds,
                                         int x, int y, const char* text)
 {

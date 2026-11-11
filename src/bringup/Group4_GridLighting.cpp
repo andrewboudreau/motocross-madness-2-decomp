@@ -333,6 +333,12 @@ static void Group4Vis_LightAmbientPlusOne(LightManager* manager, const float* ma
 // per-vertex colour sums first. With a colour array (`flags`, the same
 // 0x20-byte vertex layout) each vertex's diffuse becomes that colour scaled
 // by the per-vertex sums / 256.
+// Audited against retail for the linked game (2026-11-11): the +0x114 flag, the
+// buffer growth (free/alloc lines 0x13c/0x143, capacity cleared on failure), the
+// worker dispatch (0x0049f1c0 for one light, 0x0049f8d0 for two with an ambient
+// one, else 0x0049e6b0, each called out of line as here) and the modulation loop
+// (no alpha) agree. The size gap (366 built vs 167 retail instructions) is the
+// three X87FloatToInt expansions and retail's ebp frame.
 void GridVertexSink::LightVertices(void* matrix, int count, void* vertices, void* buffer, int stride,
                                    int flags) {
     LightManager* manager = reinterpret_cast<LightManager*>(this);

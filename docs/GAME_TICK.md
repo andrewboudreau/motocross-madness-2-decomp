@@ -3,7 +3,7 @@
 `samples/game/GameTick.cpp` supplies complete functional candidates for
 `Game::Tick` (0x004685d0, 683 retail bytes) and
 `HiResMeter::SetRenderContext` (0x00488440, 196 retail bytes). Authentic VC6 SP3
-with `vc6_o2_mt` emits 716 and 204 bytes respectively. Neither is a strict match.
+with `vc6_o2_mt` emits 720 and 204 bytes respectively. Neither is a strict match.
 
 ## Evidence and behavior
 

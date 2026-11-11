@@ -212,6 +212,10 @@ void BikeQ::ClampAndStep(float maxDelta, float dt)
 // group, 2 from the second group (the first when the second is empty).  An AI bike also
 // sets its trick hold time from the slack left after the clip (0x0056cc60 clip lengths);
 // it fails when that slack is under 0.1 s.  Returns 1 with *out the trick id, else 0.
+// Audited against retail for the linked game (2026-11-11): the row search (t > minTime), the
+// group switch, the index scaling, the aiKind byte, the slack test and the hold-time product
+// agree, and both tables below equal retail's 0x0056cc60..0x0056d060 bytes.  The size gap
+// (173 built vs 97 retail instructions) is the X87FloatToInt expansion and retail's ebp frame.
 // ---------------------------------------------------------------------------------------
 struct G3TrickRow {
     float minTime;

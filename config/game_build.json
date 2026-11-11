@@ -347,7 +347,7 @@
     {
       "path": "samples/game/GameTick.cpp",
       "status": "reviewed-nonexact",
-      "reason": "Complete Tick and profiler calibration checked in 39376 native differential scenarios; QPC replaces the four retail RDTSC boundaries consistently. Gameplay retains ReadClock. VC6 emits 716/204 bytes versus 683/196 retail bytes.",
+      "reason": "Complete Tick and profiler calibration checked in 39376 native differential scenarios; QPC replaces the four retail RDTSC boundaries consistently. Gameplay retains ReadClock. VC6 emits 720/204 bytes versus 683/196 retail bytes.",
       "evidence": "docs/GAME_TICK.md#functional-build-review"
     },
     {

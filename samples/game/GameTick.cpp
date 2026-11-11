@@ -1,6 +1,12 @@
 // Complete functional candidates for 0x004685d0/683 and 0x00488440/196.
 // The profiling counter is QPC instead of retail's RDTSC. Simulation still uses
 // ReadClock, including unsigned wraparound and the retail 0.2-second clamp.
+// Audited for the linked game 2026-11-11: apart from the counter, every call,
+// field, constant and branch agrees with retail. The timer registration now
+// follows retail's static-initialiser shape (guard bit test, one value store),
+// 93 -> 98 of 208 aligned instructions; the rest of the gap is the RDTSC
+// inline assembly (an ebp frame, stamps through [ebp-0xc]/[ebp-8]) against a
+// ReadProfilingCounter call and 64-bit composition here.
 #include <windows.h>
 #include <string.h>
 #include "../../src/reconstructed/Game.h"
@@ -10,28 +16,35 @@
 
 extern int g_TickTime, g_PrepFrameTime, g_UpdateScreenTime, g_NetTime;
 
-static int gameTickTimerRegistered;
+// Retail registers the profiling timer through what is a function-local static
+// with a dynamic initialiser in VC6's expansion: guard byte 0x0065b488 (bit 0
+// tested, then or-ed in) and value 0x0065b4b0. The value is the first timer
+// with the name, else a new entry, else 49 once all 50 are taken; a found or
+// new timer becomes the meter's selected one (+0x38). The guard and value are
+// written out as file statics so tests/fixtures/game_tick_compare.cpp can
+// reset them between scenarios.
+static unsigned char gameTickTimerRegistered;
 static int gameTickTimer;
+
+static inline int RegisterHiResTimer(HiResMeter* meter, const char* name) {
+    int i;
+    for (i = 0; i < meter->timerCount; ++i)
+        if (!strcmp(meter->timers[i].name, name)) {
+            meter->field_0x38 = i;
+            return i;
+        }
+    if (meter->timerCount >= 50)
+        return 49;
+    strncpy(meter->timers[meter->timerCount].name, name, 31);
+    meter->field_0x38 = meter->timerCount;
+    return meter->timerCount++;
+}
 
 int Game::Tick() {
     HiResMeter* meter;
-    if (!gameTickTimerRegistered) {
-        gameTickTimerRegistered = 1;
-        meter = (HiResMeter*)g_HiResMeter;
-        int i;
-        for (i = 0; i < meter->timerCount; ++i)
-            if (!strcmp(meter->timers[i].name, "Game::Tick"))
-                break;
-        if (i < meter->timerCount) {
-            meter->field_0x38 = i;
-            gameTickTimer = i;
-        } else if (meter->timerCount >= 50) {
-            gameTickTimer = 49;
-        } else {
-            strncpy(meter->timers[meter->timerCount].name, "Game::Tick", 31);
-            meter->field_0x38 = meter->timerCount;
-            gameTickTimer = meter->timerCount++;
-        }
+    if (!(gameTickTimerRegistered & 1)) {
+        gameTickTimerRegistered |= 1;
+        gameTickTimer = RegisterHiResTimer((HiResMeter*)g_HiResMeter, "Game::Tick");
     }
 
     meter = (HiResMeter*)g_HiResMeter;

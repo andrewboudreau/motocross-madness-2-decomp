@@ -31,6 +31,10 @@ struct ShadowConstVec3 : ShadowVec3 {
 
 // 0x004dc2b0 (352 B): paints shadowColor into the colour word (+0x10 of 0x20-byte vertices) of
 // every caster vertex whose projected position lands on a height-map cell equal to colorKeyLow.
+// Audited against retail for the linked game (2026-11-11): PartCount/GetPart arguments, the
+// running vertex offset, the bounds (inclusive of texture->size, as retail), the signed height
+// cell against the zero-extended key and the colour store agree. The size gap (255 built vs 121
+// retail instructions) is the two X87FloatToInt expansions and retail's ebp frame.
 void ProjectedShadow::TintCasterVertices()
 {
     int totalVertices = 0;

@@ -17,6 +17,12 @@
 // candidates gets ebp in the strip loop, a slot at +0x20 and is reloaded
 // around the path loop, where ebp holds start.t. Dropping the dead
 // `list = 0` removes its store (1525 bytes) but retail has it.
+// Audited again as the linked body (KbRaceSub::PlaceNear forwards to it) on
+// 2026-11-11: a masked instruction diff against retail shows only the frame
+// size, register choice, load scheduling and the placement of the out-of-memory
+// FreeWorkList exit (inside the walk loop here, after it in retail); calls,
+// constants, branches and field offsets agree, so the 0.868 linked score is
+// code shape, not behaviour.
 //
 #include <math.h>
 #include <stdio.h>

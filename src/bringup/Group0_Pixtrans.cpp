@@ -235,6 +235,15 @@ int Halve565(void* destination, void* source, int width, int height, int destina
 // width and the width is a multiple of eight); only the destination has a
 // stride. best guess: retail's counted loops never test for a zero count
 // (width < 8 or height 0 would run away); this version simply does nothing.
+// Audited for the linked game 2026-11-11: no behavioural difference. Retail
+// is unrolled inline assembly that reads a dword (two pixels) at a time,
+// builds each four-index dword in ebx (bh/bl take the high/low pixel's index,
+// `shl ebx, 16` moves the pair up) and stores two dwords a step, so the bytes
+// land in source order as here. It preloads the next step's third and fourth
+// pixels and so reads 4 bytes past the source; that read is not reproduced.
+// The size gap (47 built vs 83 retail instructions) is that assembly: a C
+// version with the same dword reads and packed stores was tried and scored no
+// better (16 vs 15 of 83 aligned instructions) and reads worse.
 void Convert555To8Fast(void* source, void* destination, int destinationStride, int width, int height,
                        unsigned char* table)
 {
