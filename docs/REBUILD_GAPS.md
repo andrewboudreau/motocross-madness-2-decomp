@@ -461,11 +461,11 @@ the game link the sample
 
 Targets named only by `candidate_symbol_contains` in a `targets.json` are bound
 too when exactly one otherwise unbound linked symbol contains the substring.
-On main f1912bdd plus the Pixtrans sample (2026-11-11) the tool scores 2,694
-functions (1,126,523 bytes); 796,463 of those bytes score 1.000. It also lists
-linked bodies that call a function retail's body never calls (call targets are
-masked in the score); two remain, both `__ftol` calls where retail converts
-with inline `fistp`.
+On main c6568f54 (2026-11-11) the tool scores 2,694 functions (1,126,523
+bytes); 797,771 of those bytes score 1.000. It also lists linked bodies that
+call a function retail's body never calls (call targets are masked in the
+score); one remains, `KrustyBike::SelectRiderPose` calling `__ftol` where
+retail converts with inline `fistp`.
 
 ## What is needed next
 
