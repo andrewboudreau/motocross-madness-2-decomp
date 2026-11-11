@@ -53,7 +53,8 @@
 // touches, and with 8 entries circle, ring, identity and line all sit
 // 0x40 below their retail slots (tools/frame_layout.py). Sweeping 13
 // choice points (8192 forms; insn diffs 507 to 495, aligned 1386 to 1398)
-// kept identity(r, c) stores, a reference to the light position and a
+// kept identity(r, c) stores, a reference to the light position (since
+// replaced by retail's by-value copy, see below) and a
 // separate normalisation in mode 3. Accumulating the squared lengths and
 // the mode 5 and 6 dot products one term per statement (512 forms; the
 // MPBikeRiderDlg lever in docs/VC6_OPERAND_ORDER.md) gives 484 differing
@@ -66,12 +67,20 @@
 // alone or with x read in place, are folded away (744)), `this` is in esi where ours is in
 // ebx, and the identity diagonal is stored from m[3][3] down (every order
 // and spelling of the four stores is emitted from m[0][0] up).
-// Mode 2 halves the reflection as a vector before adding 0.5 (written
-// `x * 0.5f + 0.5f`, VC6 factors it to `(x + 1) * 0.5`; retail multiplies,
-// then adds, through 0x005507f4 both times; 7848 bytes as retail). Mode 3
-// copies the light position by value in retail (add edi, 0x64, then three
-// dword stores to the frame); that copy here is worse (695 vs 719 bytes,
-// 733 vs 706 differing instructions), so the reference stays.
+// Session 16 (masked linked metric 0.8842 -> 0.8911, 342 -> 317 differing
+// instructions; every float-constant operation is now retail's, in
+// retail's order, checked by value): mode 2 halves the reflection into
+// two float locals before adding 0.5 (a Vector3 half multiplies both
+// components before either add; `x * 0.5f + 0.5f` is factored by VC6
+// to `(x + 1) * 0.5`, not retail's code), and the scroll step is a named
+// `moved` added after lastScrollPosition is stored, which gives retail's
+// `fcom 100; fst textureScroll` (the in-place `+=` before the store
+// reloads it). Mode 3 copies the light position by value, as retail
+// does (add edi, 0x64, then three dword stores to the frame); it costs
+// strict bytes but removes differing instructions. No change: every order
+// of the mode 2 and mode 3/4 dot-product terms, the third world-normal
+// row's order, by-value operator- operands (worse), scale-first or
+// mixed operand order in the normalisations (identical code).
 // The mode 5 source keeps two retail bugs: `circle[i + 1]` reads past the
 // 16 points, and the group loop indexes with the restore loop's `k`.
 //
@@ -355,7 +364,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 LightEmitter* light = FindLight(lights);
                 if (!light)
                     break;
-                const Vector3& lightPosition = light->lightPosition;
+                Vector3 lightPosition = light->lightPosition;
                 for (int j = 0; j < surface->groupCount; j++) {
                     UnknownSoultreeFaceGroup* group = &surface->groups[j];
                     int vertices = group->vertexCount;
@@ -445,8 +454,9 @@ void D3DIMSoultreeObject::DrawCurrentLod()
             }
             case 2: {
                 Vector3 position = *(Vector3*)&worldMatrix.m[3][0];
-                textureScroll += Length(lastScrollPosition - position) * 0.0075f;
+                float moved = Length(lastScrollPosition - position) * 0.0075f;
                 lastScrollPosition = position;
+                textureScroll += moved;
                 if (textureScroll > 100.0f)
                     textureScroll -= 100.0f;
                 float scroll = textureScroll;
@@ -469,9 +479,10 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         float facing = direction.x * worldNormal.x + direction.y * worldNormal.y
                                        + direction.z * worldNormal.z;
                         Vector3 reflected = twice * facing - direction;
-                        Vector3 half = reflected * 0.5f;
-                        group->sourceVertices[v].tu = half.x + 0.5f;
-                        group->sourceVertices[v].tv = half.y + 0.5f - scroll;
+                        float halfX = reflected.x * 0.5f;
+                        float halfY = reflected.y * 0.5f;
+                        group->sourceVertices[v].tu = halfX + 0.5f;
+                        group->sourceVertices[v].tv = halfY + 0.5f - scroll;
                     }
                 }
                 restore = 1;

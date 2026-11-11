@@ -170,6 +170,14 @@ static inline Vector3 NormalizedByCall(const Vector3& v)
     return Vector3(v.x * scale, v.y * scale, v.z * scale);
 }
 
+// Vector3::Vector3(float, float, float), 0x00404e60: the out-of-line copy
+// retail calls in the mode 8 and mode 2 normalisations. Declared only;
+// config/game_build.json links it to Vec3Call's constructor
+// (src/krusty2/bvh/BoundingBoxTreeQuery.cpp), the same body.
+struct Vector3Call : Vector3 {
+    Vector3Call(float x_, float y_, float z_);
+};
+
 static inline Vector3 NormalizedCallingConstructor(const Vector3& v)
 {
     float squared = v.x * v.x;
@@ -178,7 +186,7 @@ static inline Vector3 NormalizedCallingConstructor(const Vector3& v)
     if (squared == 1.0f)
         return v;
     float scale = FastInvSqrt(squared);
-    return Vector3(v.x * scale, v.y * scale, v.z * scale);  // retail: out-of-line 0x00404e60
+    return Vector3Call(v.x * scale, v.y * scale, v.z * scale);
 }
 
 static inline Vector3 Normalized(const Vector3& v)
@@ -288,7 +296,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 LightEmitter* light = FindLight(lights);
                 if (!light)
                     break;
-                const Vector3& lightPosition = light->lightPosition;
+                Vector3 lightPosition = light->lightPosition;
                 for (int j = 0; j < surface->groupCount; j++) {
                     UnknownSoultreeFaceGroup* group = &surface->groups[j];
                     int vertices = group->vertexCount;
@@ -378,8 +386,9 @@ void D3DIMSoultreeObject::DrawCurrentLod()
             }
             case 2: {
                 Vector3 position = *(Vector3*)&worldMatrix.m[3][0];
-                textureScroll += Length(lastScrollPosition - position) * 0.0075f;
+                float moved = Length(lastScrollPosition - position) * 0.0075f;
                 lastScrollPosition = position;
+                textureScroll += moved;
                 if (textureScroll > 100.0f)
                     textureScroll -= 100.0f;
                 float scroll = textureScroll;
@@ -402,9 +411,10 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         float facing = direction.x * worldNormal.x + direction.y * worldNormal.y
                                        + direction.z * worldNormal.z;
                         Vector3 reflected = twice * facing - direction;
-                        Vector3 half = reflected * 0.5f;
-                        group->sourceVertices[v].tu = half.x + 0.5f;
-                        group->sourceVertices[v].tv = half.y + 0.5f - scroll;
+                        float halfX = reflected.x * 0.5f;
+                        float halfY = reflected.y * 0.5f;
+                        group->sourceVertices[v].tu = halfX + 0.5f;
+                        group->sourceVertices[v].tv = halfY + 0.5f - scroll;
                     }
                 }
                 restore = 1;

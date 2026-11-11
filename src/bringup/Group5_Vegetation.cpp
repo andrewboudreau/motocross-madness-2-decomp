@@ -12,7 +12,7 @@
 
 float FastSqrt(float value);  // 0x00460b50
 
-// EcoSystem.cpp's 0x0059af14 is file-static there: it points at one of the
+// EcoSystem.cpp's 0x0059af14 (external there) points at one of the
 // two detail band tables (0x0056a600 for the "Blade" software renderer,
 // 0x0056a740 otherwise), chosen when the ecosystem loads (EcoSystem.cpp:801).
 // best guess: recompute the same choice from local copies of the two tables.

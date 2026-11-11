@@ -38,7 +38,7 @@ PARTIALS = (
     ('?PrepareGeometry@D3DIMSoultreeObject@@UAEHXZ', 0x443aa0, 832,
      '5ea97b888c0f3af61fdbaac2464fe3c4b06d884438864907303f96c1f90161a0'),
     ('?DrawCurrentLod@D3DIMSoultreeObject@@QAEXXZ', 0x440f30, 7848,
-     'e713ca27d59df9f4ed4c24700c77830bc75bfc652734a4d8298b403ffa42ad6e'),
+     'c6d8f90b9582c299cd1ad8d0a85412eb8a43e51ba3ce56d0423bf8bfdc9e1820'),
 )
 
 

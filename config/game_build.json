@@ -7,6 +7,7 @@
     "?g_CollisionScratchPoints@@3PAUCollisionVec3@@A": "?g_CollisionScratchPoints@@3PAUVec3@@A",
     "?Print@UnknownEcoDebugOverlay@@QAAXHPBDZZ": "?Print@DebugOverlay@@QAAXHPBDZZ",
     "?Title@UnknownEcoDebugOverlay@@QAAXHPBDZZ": "?Title@DebugOverlay@@QAAXHPBDZZ",
+    "??0Vector3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z",
     "?AttachRenderContext@D3DIMSoultreeObject@@UAEHPAX@Z": "?AttachRenderContext@SoultreeObject@@UAEHPAX@Z",
     "?BoxCapsuleOverlap@@YAHPBUCollisionVec3@@00MMPBUMatrix4@@@Z": "?BoxCapsuleOverlap@@YAHPBUVec3@@00MMPBUMatrix4@@@Z",
     "?Vec3Dot@@YAMABUVec3@@0@Z":"?Vec3DotCall@@YAMPBUVec3@@0@Z",
