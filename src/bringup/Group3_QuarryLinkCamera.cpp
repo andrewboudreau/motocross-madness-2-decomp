@@ -2,14 +2,7 @@
 // BaseQuarryEvent::LoadEventObjects (0x004de590).
 #include "../reconstructed/KrustyBikeCamera.h"
 #include "../reconstructed/FollowCamera.h"
-#include "../reconstructed/DebugAlloc.h"
 #include "Group3_QuarryLoadLinks.h"
-
-// 0x00497cb0 (0x3bc bytes).
-void* G3Q_NewBikeCamera(const char* file, int line, int flags)
-{
-    return new(file, line) KrustyBikeCamera(flags);
-}
 
 // 0x00497d90.
 void* G3Q_BikeCameraSetupFlyby(void* camera, void* target, float a, float b, float c,

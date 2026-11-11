@@ -38,7 +38,7 @@ static Matrix4* g_UnknownGlobal59af00;        // 0x0059af00: the view matrix
 static int s_geometryDrawn;                  // 0x0059af04: geometry objects drawn ("Rendered ... 3D %d")
 static int s_billboardsDrawn;                // 0x0059af08: billboards drawn ("Rendered 2D %d")
 static int g_UnknownGlobal59af0c;             // 0x0059af0c: geometry blocks alive
-static int g_UnknownGlobal59af10;             // 0x0059af10: textures preloaded
+int g_UnknownGlobal59af10;                    // 0x0059af10: textures preloaded (BaseQuarryEvent::LoadEventObjects reads it)
 UnknownEcoDetailBand* g_UnknownGlobal59af14; // 0x0059af14: the detail band table (external: the Group4 bring-up Render3D reads it)
 
 // The detail bands, by level: 0x0056a600 for the 1555 (software) path,

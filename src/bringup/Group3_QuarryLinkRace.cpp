@@ -3,14 +3,7 @@
 #include "../reconstructed/BikeRaceCore.h"
 #include "../reconstructed/TrackOverlay.h"
 #include "../reconstructed/Krusty3DObjects.h"
-#include "../reconstructed/DebugAlloc.h"
 #include "Group3_QuarryLoadLinks.h"
-
-// 0x00417c30 (0x400 bytes).
-void* G3Q_NewBikeRace(const char* file, int line, int flags)
-{
-    return new(file, line) BikeRace(flags);
-}
 
 // 0x00417ed0: returns the race, or 0 after Release.
 void* G3Q_BikeRaceCreate(void* race, void* target, void* particles, void* lights,

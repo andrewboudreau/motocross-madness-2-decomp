@@ -10,9 +10,17 @@
 //     because the canonical headers cannot share one);
 //   * VisibilityQuadTree::Setup gets the six arguments retail pushes (the near miss
 //     passed the scene as a seventh argument to a `ret 0x18` callee);
+//   * the objects are allocated inline through the canonical constructors, as retail does
+//     (new, EH state, null test, constructor), declared over the views' storage;
 //   * the fog objects use Fog.h's Fog/FogOff/FogOn directly; FogOn's folded Create
-//     (0x00486a10) is written out;
-//   * g_UnknownGlobal59af10 is a static of EcoSystem.cpp: see the best guess below.
+//     (0x00486a10) is defined at the end of this file and called, as retail calls it;
+//   * the memory estimate reads EcoSystem.cpp's preloaded-texture count (0x0059af10).
+// Linked score 0.985, 2208 instructions against retail's 2208 (was 0.908 at 2101: the
+// out-of-line G3Q_New* allocation helpers dropped retail's inline new/EH/null-test/
+// constructor sequences, about 100 instructions). Left, all scheduling: the small slots below
+// 0x1c, register choices in the decision tree and around the fog/sky block, the collision
+// loop's head (retail enters a rotated loop with a jmp and indexes the entry table with
+// [ecx + edx + 4]) and the racer loop's register choice (esi/edi swapped).
 // Move into src/reconstructed/QuarryStuntEvent.cpp once it matches.
 #include <math.h>
 #include <stdio.h>
@@ -38,12 +46,9 @@
 #include "Group3_QuarryLoadLinks.h"
 
 // 0x0059af10: the count of ecosystem textures PreloadEcosystem preloaded, which the memory
-// estimate weighs at 0x2aaaa bytes. It is a file static of src/reconstructed/EcoSystem.cpp
-// (cleared at 0x00457250/0x0045c040, incremented per preloaded texture) and cannot be read
-// from here.
-// best guess: 0, so the estimate leaves the preloaded ecosystem textures out; this can only
-// choose a finer texture detail level than retail on a card short of video memory.
-static int g_UnknownGlobal59af10 = 0;
+// estimate weighs at 0x2aaaa bytes (defined in src/reconstructed/EcoSystem.cpp; cleared at
+// 0x00457250/0x0045c040, incremented per preloaded texture).
+extern int g_UnknownGlobal59af10;
 
 // 0x0045c040 (cdecl): preloads the ecosystem `path` from `stream`.
 int PreloadEcosystem(TextureMapManager* manager, char* path, UnknownTextureStream* stream,
@@ -274,6 +279,47 @@ public:
     void InsertNodesInQuadtree();                              // 0x005046e0
 
     unsigned char field_0x2c[0x48 - 0x2c];
+};
+
+// Retail allocates each object inline (operator new, EH state, null test, then the (int)
+// constructor). These declare the canonical constructors (??0X@@QAE@H@Z) over the views,
+// whose storage gives retail's allocation sizes; they add no members. EcoSystem's
+// constructor is declared in QuarryEvent.h.
+class KrustyBikeCamera : public UnknownQuarryBikeCamera {
+public:
+    explicit KrustyBikeCamera(int flags);                      // 0x00497cb0
+};
+class ParticleManager : public UnknownQuarryParticles {
+public:
+    explicit ParticleManager(int flags);                       // 0x004ba390
+};
+class VisibilityQuadTree : public UnknownQuarryVisibility {
+public:
+    explicit VisibilityQuadTree(int flags);                    // 0x0052d340
+};
+class ProjectedShadow : public UnknownQuarryShadow {
+public:
+    explicit ProjectedShadow(int flags);                       // 0x004da570
+};
+class TerrainShadow : public UnknownQuarryTerrainShadow {
+public:
+    explicit TerrainShadow(int flags);                         // 0x00508ae0
+};
+class SkyCube : public UnknownQuarrySkyCube {
+public:
+    explicit SkyCube(int flags);                               // 0x004fb1e0
+};
+class Terrain : public UnknownQuarryTerrainObject {
+public:
+    explicit Terrain(int flags);                               // 0x00505830
+};
+class BikeRace : public UnknownQuarryRace {
+public:
+    explicit BikeRace(int flags);                              // 0x00417c30
+};
+class SoultreeQuadTreeRenderer : public UnknownQuarryRaceObject {
+public:
+    explicit SoultreeQuadTreeRenderer(int flags);              // 0x00504490
 };
 
 // The overlays' race hooks.
@@ -512,7 +558,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     presets[5] = 5;
     presets[6] = 6;
     presets[7] = 7;
-    raceCamera = (UnknownQuarryCamera*)(((UnknownQuarryBikeCamera*)G3Q_NewBikeCamera(__FILE__, 585, 1)))
+    raceCamera = (UnknownQuarryCamera*)(new(__FILE__, 585) KrustyBikeCamera(1))
                      ->Create(renderContext, 0.55f, 0.3f, 27.0f, 7.0f, 1.048f, 2, 8, presets);
     if (!AppendChild((GameObject*)raceCamera, -1)) {
         sprintf(text, "KrustyBikeCamera not created.\n");
@@ -523,7 +569,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     CreateOverlays();
 
     g_MemTagStack->Push("Particles");
-    particleManager = ((UnknownQuarryParticles*)G3Q_NewParticleManager(__FILE__, 613, g_TrackGame->mode.particlesOn));
+    particleManager = new(__FILE__, 613) ParticleManager(g_TrackGame->mode.particlesOn);
     g_MemTagStack->Push("Scene");
     eventScene = (new(__FILE__, 624) Scene(isEnabled))
                      ->UnknownFunction4ea7e0(g_TrackGame->sceneObject, (int)auralScape, (int)&modelTextures, 8);
@@ -539,7 +585,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         progress(0);
 
     g_MemTagStack->Push("QuadTree");
-    UnknownQuarryVisibility* visibility = (UnknownQuarryVisibility*)(((UnknownQuarryVisibility*)G3Q_NewVisibilityQuadTree(__FILE__, 659, 1)))
+    UnknownQuarryVisibility* visibility = (UnknownQuarryVisibility*)(new(__FILE__, 659) VisibilityQuadTree(1))
         ->Setup(renderContext, 0.0f, 0.0f,
                                 eventScene->environment->terrainWidth * eventScene->environment->terrainWidthScale * 256.0f,
                                 eventScene->environment->terrainBreadth * eventScene->environment->terrainBreadthScale * 256.0f,
@@ -565,7 +611,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         }
     }
     if (shadowLight) {
-        projectedShadow = ((UnknownQuarryShadow*)G3Q_NewProjectedShadow(__FILE__, 698, g_TrackGame->mode.shadowsOn));
+        projectedShadow = new(__FILE__, 698) ProjectedShadow(g_TrackGame->mode.shadowsOn);
         projectedShadow = ((UnknownQuarryShadow*)projectedShadow)->Init(renderContext, g_TrackGame->textureManager);
     }
     if (!preloaded)
@@ -588,18 +634,11 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                 delete stream;
             return 0;
         }
-        skyCube = (((UnknownQuarrySkyCube*)G3Q_NewSkyCube(__FILE__, 744, g_TrackGame->mode.skyCubeOn)))
+        skyCube = (new(__FILE__, 744) SkyCube(g_TrackGame->mode.skyCubeOn))
                          ->Create(renderContext, stream, &skyTextures, 1024.0f);
         if (!AppendChild((GameObject*)skyCube, -1))
             sprintf(text, "SkyCube not created.\n");
-        // 0x00486a10 (FogOn's Create, a folded body): GameObject::SetRenderContext called
-        // directly (0x004692f0), then the fog at +0x2c; returns the object.
-        FogOn* fogLink = new(__FILE__, 750) FogOn(1);
-        if (fogLink) {
-            fogLink->GameObject::SetRenderContext(renderContext);
-            fogLink->fog = eventFog;
-        }
-        AppendChild(fogLink, -1);
+        AppendChild((new(__FILE__, 750) FogOn(1))->Create(renderContext, eventFog), -1);
         eventFog->SetParameters(eventScene->fog->color, eventFog->fogVisibility, eventFog->fogHaziness);
     }
     if (progress)
@@ -611,7 +650,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         sprintf(text, "No Terrain found in env file.  Terrain not created.\n");
         return 0;
     }
-    eventTerrain = (((UnknownQuarryTerrainObject*)G3Q_NewTerrain(__FILE__, 799, 1)))
+    eventTerrain = (new(__FILE__, 799) Terrain(1))
                      ->Load(renderContext, terrainStream, 1, &terrainTextures,
                                              g_TrackGame->mode.videoSettings[3], 0,
                                              eventScene->environment->detailTexture, 0);
@@ -624,7 +663,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
 
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
-        terrainShadow = (((UnknownQuarryTerrainShadow*)G3Q_NewTerrainShadow(__FILE__, 822, g_TrackGame->mode.shadowsOn)))
+        terrainShadow = (new(__FILE__, 822) TerrainShadow(g_TrackGame->mode.shadowsOn))
                          ->Attach(renderContext, eventTerrain, (UnknownQuarryShadow*)projectedShadow);
         AppendChild((GameObject*)terrainShadow, -1);
     }
@@ -639,7 +678,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                                                                            "rb", 0)) {
         sprintf(text, "No Ecosystem found in env file.  Ecosystem not created.\n");
     } else {
-        ecoSystem = (((UnknownQuarryEcoSystem*)G3Q_NewEcoSystem(__FILE__, 870, 1)))
+        ecoSystem = ((UnknownQuarryEcoSystem*)new(__FILE__, 870) EcoSystem(1))
                          ->Create(renderContext, g_TrackGame->textureManager, eventTerrain, lightManager,
                                                  eventScene->environment, stream, 0x115c,
                                                  g_TrackGame->mode.raceSettings.treeCollision,
@@ -654,7 +693,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     if (!PrepareEvent3DObjects())
         return 0;
     g_MemTagStack->Push("BikeRace");
-    raceView = (UnknownKrustyBikeView*)((UnknownQuarryRace*)G3Q_NewBikeRace(__FILE__, 898, 0));
+    raceView = (UnknownKrustyBikeView*)new(__FILE__, 898) BikeRace(0);
     g_MemTagStack->Push("Particles");
     if (particleManager)
         particleManager = ((UnknownQuarryParticles*)particleManager)
@@ -875,11 +914,21 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     G3Q_BikeRaceSetDetailLevel(raceView, g_TrackGame->mode.videoSettings[2]);
     if (progress)
         progress(0);
-    UnknownQuarryRaceObject* last = ((UnknownQuarryRaceObject*)G3Q_NewQuadTreeRenderer(__FILE__, 1251, 1));
+    UnknownQuarryRaceObject* last = new(__FILE__, 1251) SoultreeQuadTreeRenderer(1);
     last->SetRenderContext(renderContext);
     AppendChild(last, -1);
     last->InsertNodesInQuadtree();
     return 1;
+}
+
+// 0x00486a10: FogOn::Create (Fog.h). Retail folds it with ToolTip::Create
+// (src/reconstructed/GUIManager.cpp, the same body); the build has no FogOn definition, so
+// the loader's call is given one here.
+GameObject* FogOn::Create(void* target, Fog* fog)
+{
+    GameObject::SetRenderContext(target);
+    this->fog = fog;
+    return this;
 }
 
 // ---------------------------------------------------------------------------------------

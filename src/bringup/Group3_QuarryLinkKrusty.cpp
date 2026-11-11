@@ -30,27 +30,12 @@ private:
     char storage[0x6780];
 };
 
-void* G3Q_NewParticleManager(const char* file, int line, int flags)
-{
-    return new(file, line) ParticleManager(flags);
-}
-
-void* G3Q_NewVisibilityQuadTree(const char* file, int line, int flags)
-{
-    return new(file, line) VisibilityQuadTree(flags);
-}
-
 // Retail pushes six arguments (target, 0, 0, width, breadth, 96.0f) and receives the
 // GameObject part (+0x874), or 0.
 void* G3Q_VisibilitySetup(void* tree, void* target, float x0, float z0, float x1, float z1,
                           float minCell)
 {
     return ((VisibilityQuadTree*)tree)->Setup((int)target, x0, z0, x1, z1, minCell);
-}
-
-void* G3Q_NewProjectedShadow(const char* file, int line, int flags)
-{
-    return new(file, line) ProjectedShadow(flags);
 }
 
 void* G3Q_ProjectedShadowInit(void* shadow, void* target, void* textureManager)
@@ -78,19 +63,9 @@ void G3Q_ProjectedShadowSetLight(void* shadow, const void* position, const void*
     ((ProjectedShadow*)shadow)->SetLight((const ShadowVec3*)position, (const ShadowVec3*)direction, mode);
 }
 
-void* G3Q_NewTerrainShadow(const char* file, int line, int flags)
-{
-    return new(file, line) TerrainShadow(flags);
-}
-
 void* G3Q_TerrainShadowAttach(void* terrainShadow, void* target, void* terrain, void* shadow)
 {
     return ((TerrainShadow*)terrainShadow)->Attach((int)target, (Terrain*)terrain, (ProjectedShadow*)shadow);
-}
-
-void* G3Q_NewTerrain(const char* file, int line, int flags)
-{
-    return new(file, line) Terrain(flags);
 }
 
 void* G3Q_TerrainLoad(void* terrain, void* target, void* stream, int unused, void* textures,
@@ -99,11 +74,6 @@ void* G3Q_TerrainLoad(void* terrain, void* target, void* stream, int unused, voi
     return ((Terrain*)terrain)->Load((int)target, (TerrainStream*)stream, unused,
                                      (TerrainSurfaceDesc*)textures, quality, field0xc40,
                                      detailTexture, halfFormat);
-}
-
-void* G3Q_NewQuadTreeRenderer(const char* file, int line, int flags)
-{
-    return new(file, line) SoultreeQuadTreeRenderer(flags);
 }
 
 void G3Q_QuadTreeRendererInsertNodes(void* renderer)

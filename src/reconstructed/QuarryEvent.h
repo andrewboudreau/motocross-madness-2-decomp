@@ -62,11 +62,15 @@ public:
 };
 
 // RTTI: EcoSystem (vtable 0x00552508); constructed by 0x004de590 with
-// 0x00457250. Only the methods this file calls.
+// 0x00457250 (0x5c4 bytes). Only the methods this file calls; the storage only
+// fixes the allocation size (the full class is EcoSystem.h).
 class EcoSystem {
 public:
+    explicit EcoSystem(int flags);      // 0x00457250
     void SetDetailLevel(int level);    // 0x004594c0: detail level
     void LightingChanged();             // 0x0045a9a0: lighting changed
+private:
+    unsigned char storage[0x5c4];
 };
 
 // Fog (vtable 0x005526dc, 0x5c bytes; constructed by 0x004de590 with
