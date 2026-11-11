@@ -17,15 +17,14 @@
 #include "../reconstructed/KrustyBikeCamera.h"
 #include "../reconstructed/TrackGame.h"
 
-namespace {
-
+// File statics (internal linkage, as retail's file-scope data; `static` rather than an
+// unnamed namespace keeps their symbol names independent of the source path, so the
+// emu_diff case krusty_bike_camera_tick can bind them to the retail addresses).
 // 0x0067c3f4 (.bss byte): set while the network start view is active.
-bool s_networkStartViewActive;
+static bool s_networkStartViewActive;
 
 // 0x0067c3e8 is KrustyBikeCamera.cpp's file-static kVec3YAxis; this unit keeps its own copy.
-Vector3 s_upAxis(0.0f, 1.0f, 0.0f);
-
-} // namespace
+static Vector3 s_upAxis(0.0f, 1.0f, 0.0f);
 
 // Picks the view by the global event type on first use. While the view has its network
 // start pending it drives FollowCamera slots 46 (once) and 47 from it; otherwise it leaves
