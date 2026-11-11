@@ -21,12 +21,12 @@
 // Those counts were measured with FloatToInt as a plain `(int)` cast: with /QIfist it is
 // `fistp qword` plus a dword move (8 bytes shorter, one frame slot lower for the shared
 // t/stale/dirty slot), without it `__ftol` (truncation).  The game build compiles this
-// file with /QIfist (config/game_build.json bringup_flags; no /Oy-), so FloatToInt rounds
+// file with /QIfist (config/game_build.json bringup_flags), so FloatToInt rounds
 // through FistpFloatToInt's FISTP under the current rounding mode as retail's helper does
 // (the focal length rounds to nearest instead of truncating).  It is the unit's only
 // float-to-int conversion, and a focal length in pixels stays far inside int.  The
 // `push ebp; mov ebp,esp` frame is the asm helper's doing as well: every other
-// Terrain.cpp body matches without /Oy-.
+// Terrain.cpp body matches without a frame pointer.  A pragma keeps it for this body.
 // The rest of the body is exact: start/last clock locals (`last` first), block-scoped
 // stale/t locals, dirty flag before the texture peak-hold, member re-reads of
 // visibilityCamera and heightField at each use, the 12-byte viewer copy as a struct
@@ -79,6 +79,9 @@ static inline void FloatToInt(int* destination, float value)
     FistpFloatToInt(destination, value);
 }
 
+// Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 int Terrain::PrepareGeometry()
 {
     if (!g_terrainToggle718)
@@ -184,3 +187,4 @@ int Terrain::PrepareGeometry()
     g_MemTagStack->Pop(previousTag);
     return 1;
 }
+#pragma optimize("", on)

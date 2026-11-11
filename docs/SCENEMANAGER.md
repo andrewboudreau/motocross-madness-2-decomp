@@ -161,7 +161,9 @@ member lookup resolving to the virtual base's protected `field_0x10`.
 ## Not reconstructed
 
 - `0x004eab00` (slot 10, 958 bytes): its ebp frame and `fld; fistp` through
-  a pointer are an inlined `__asm` float-to-int helper.
+  a pointer are an inlined `__asm` float-to-int helper. The bring-up body
+  (`src/bringup/Group4_SceneTick.cpp`) keeps the frame with a per-function
+  pragma (docs/GAME_BUILD.md#frame-pointer-units).
 - `0x004ecd60` (4543 bytes) is a near miss in
   `samples/track/SceneManagerNearMisses.cpp` (4534 of 4536 compared
   positions): the "StaticModels" reader, which builds each model's physics

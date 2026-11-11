@@ -121,6 +121,9 @@ static inline void ProjectedShadowFloatToInt(int* out, float value)
 // 0x507c10.
 // Verified exclusion: retail 0x004dc351 and 0x004dc36c are bare `fistp dword ptr [eax]` in an
 // ebp frame (docs/REBUILD_GAPS.md inline-asm table).
+// Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 void ProjectedShadow::TintCasterVertices()
 {
     int totalVertices = 0;
@@ -145,6 +148,7 @@ void ProjectedShadow::TintCasterVertices()
         }
     }
 }
+#pragma optimize("", on)
 
 static inline float ShadowMagnitude(const ShadowVec3& v)
 {
@@ -286,6 +290,8 @@ int ProjectedShadow::ComputeBounds()
 // PARTIAL: the 16-bit clear goes through FillShortsUnrolled (retail's 15-entry jump table) and
 // the size matches; the vertex helpers are inlined differently.  Verified exclusion: retail 0x004dbb5c and
 // 0x004dbb8b are bare `fistp dword ptr [eax]` in an ebp frame (inline-asm rounding).
+// No frame pragma here: keeping the frame pointer lowers the linked score (masked 0.738 ->
+// 0.733, strict 0.452 -> 0.340; docs/GAME_BUILD.md#frame-pointer-units).
 // s15 reference diff: the two extra __ftol calls are those roundings; the missing immediates
 // (0xb980004d ...) are the jump table after the ret at 0x004dbcf1 read as code (false positive).
 // Fills count shorts at p with value: one short to reach dword alignment, then dword pairs

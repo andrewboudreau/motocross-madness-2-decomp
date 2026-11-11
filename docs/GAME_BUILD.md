@@ -30,16 +30,16 @@ are in the build directory. Failed compilation or linking returns nonzero;
 an old executable cannot satisfy a subsequent build.
 
 The default profile is `vc6_o2_mt`. A reviewed candidate may explicitly request
-`/QIfist`, `/Op` and `/Oy-` through `extra_flags` (`/Op` only for the
+`/QIfist` and `/Op` through `extra_flags` (`/Op` only for the
 [four-pose blend](#four-pose-motion-blend)). The first `/QIfist` users were the motion-start
 conversion helper, which preserves the incoming rounding mode on a
 floating-point trap, and the ProjectedShadow near-miss file
 ([below](#projectedshadow-near-miss-bodies)), plus the fistp samples further
-down. Bring-up units under `src/bringup/` may take `/QIfist` and `/Oy-` (and
+down. Bring-up units under `src/bringup/` may take `/QIfist` (and
 no other flag) through a `bringup_flags` entry with a reason; see
-[Bring-up fistp units](#bring-up-fistp-units). `/Oy-` is accepted only next to
-`/QIfist`, and only for units whose every function has an EBP frame in retail;
-see [Frame-pointer units](#frame-pointer-units). Every actual per-source command is recorded in the report. Other source
+[Bring-up fistp units](#bring-up-fistp-units). The EBP frame of retail's
+fistp helper comes from a per-function pragma in the source, not a flag; see
+[Frame-pointer units](#frame-pointer-units). Every actual per-source command is recorded in the report. Other source
 files retain the default flags. Objects are ordered by source basename,
 then path. This is a reproducible working order, not proof that reconstructed
 files recover original translation units. Ordinary import libraries supply
@@ -938,7 +938,9 @@ Linked-body scores (`tools/linked_accuracy.py`, masked):
 | 0x004dc2b0 | `TintCasterVertices` | 0.511 | 0.759 |
 
 RenderShadow and TintCasterVertices are capped mainly by retail's ebp frame,
-which comes from the inline asm and changes register allocation. Present
+which comes from the inline asm and changes register allocation. The
+[frame pragma](#frame-pointer-units) gives TintCasterVertices the frame (0.774); it lowers
+RenderShadow (0.733), which stays frameless. Present
 differs in how retail loads the 16-bit colour key and shadow pixel, and in
 the byte operations it uses to derive the format-9 nibbles. The canonical
 exact functions are unchanged, and the bytes at score 1.000 are unchanged
@@ -1036,17 +1038,17 @@ run then found Setup's text position one pixel off under 24-bit precision
 
 Ruled out (masked): `rand() / 32768.0f` and an inline `Random01` helper
 compile like the single expression (0.757); a `gui` local in Setup scores
-0.613. The rest of each gap is retail's ebp frame, its shared failure
-epilogue and the inline helper's pointer spill, which come from the inline
-asm.
+0.613. Retail's ebp frame, its shared failure epilogue and the inline
+helper's pointer spill come from the inline asm. The
+[frame pragma](#frame-pointer-units) now supplies the frame (Setup 0.853, the
+trick pick 0.804); the epilogue and the spill remain.
 
 ## Bring-up fistp units
 
 Bring-up bodies that are not candidate samples round through
 `FistpFloatToInt` too. Their units are compiled with `/QIfist` through
 `bringup_flags` in `config/game_build.json`. Each entry names one existing
-`src/bringup/*.cpp` file, gives `/QIfist` (with `/Oy-` where
-[every function is framed in retail](#frame-pointer-units)), and has a reason;
+`src/bringup/*.cpp` file, gives `/QIfist`, and has a reason;
 `tools/build_game.py` rejects anything else. Bring-up units are compiled only
 by the game build (calibration and the physics runner do not see them), so
 the flag changes no scored calibration object. `src/bringup/X87FloatToInt.h`
@@ -1086,7 +1088,8 @@ or when only its low bits are kept. `FistpFloatToIntChecked` casts to
 | 0x0052f570 | `VisibilityClipper::TestBox` | `Group4_Visibility.cpp` | checked; a corner near the eye plane | 0.485 | 0.689 |
 
 Scores are masked linked-body scores with `/QIfist` alone; the
-[Frame-pointer units](#frame-pointer-units) table gives them after `/Oy-`.
+[Frame-pointer units](#frame-pointer-units) table gives them with the frame
+pragma.
 Bound functions come from
 `tools/linked_accuracy.py`. The unbound workers, Render3D, PrepareGeometry
 and DropTextOverlay::Tick were scored the same way against their retail VAs.
@@ -1278,12 +1281,12 @@ the intermediates of `LightVertices`' modulation, which retail keeps in
 registers.
 
 Much of the remaining codegen gap was the frame. Retail's asm blocks force an
-EBP frame, and `/QIfist` code uses ESP addressing. With `/Oy-` added,
+EBP frame, and `/QIfist` code uses ESP addressing. Keeping the frame pointer,
 `match_one` aligned instructions for `LightAny`, `LightOne`,
 `LightAmbientPlusOne` and `LightVertices` rise from 252, 166, 188 and 80 to
 512, 368, 405 and 113 (of 728, 581, 697 and 167). All four are framed in
-retail and they are the unit's only functions, so the unit now takes `/Oy-`
-([Frame-pointer units](#frame-pointer-units)).
+retail and they are the unit's only functions, so one frame pragma region
+covers all four ([Frame-pointer units](#frame-pointer-units)).
 
 ## Frame-pointer units
 
@@ -1291,61 +1294,74 @@ Retail's inline-asm fistp helper gives every function that contains it an EBP
 frame (`push ebp; mov ebp, esp`). This is inference from VC6's handling of
 `__asm`, consistent with the retail prologues below: the helper's callers are
 framed, their neighbours are not. Plain C++ under `/QIfist` addresses locals
-through ESP. `/Oy-` keeps the frame pointer for the whole translation unit, so
-a unit takes it only when that does not move any function away from retail:
+through ESP. The source keeps the frame pointer for those functions alone:
 
-1. Compile the unit with and without `/Oy-` and compare every function's
-   COFF bytes. Functions that never touch the stack (register-only `$E`
-   initializers, an empty atexit stub) come out byte-identical and are
-   unaffected.
-2. Every function that `/Oy-` changes must start with `push ebp; mov ebp, esp`
-   at its retail VA, or have no retail body of its own (a static helper that
-   retail expands inside a framed caller).
-3. Otherwise split the framed functions into their own unit, as was done
-   before for `Group4_GridLightColor.cpp`, or leave the unit alone.
+```cpp
+// Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
+int DropTextOverlay::Tick(float frameTime) { ... }
+#pragma optimize("", on)
+```
 
-`tools/build_game.py` accepts `/Oy-` in `extra_flags` and `bringup_flags`
-only next to `/QIfist`. Scores are masked / strict linked-body scores
-(`tools/linked_accuracy.py`; unbound bodies scored the same way at their
-retail VAs) before and after `/Oy-`.
+With authentic VC6 SP3 the pragma applies per function: functions outside the
+region compile to the same bytes as without it. That includes the Math3D.h
+`$E` initializers, which blocked unit-wide `/Oy-` for the units that include
+the header. A function takes the pragma when:
 
-| Unit | Functions `/Oy-` changes (retail prologue) | Unchanged | Decision | Masked | Strict |
+1. it is framed at its retail VA and contains the fistp helper (a static
+   helper with no retail body, which retail expands inside such a function,
+   may share the region);
+2. a COFF comparison with and without the pragma shows that no other function
+   in the object changes (relocations masked, `$L` labels normalized);
+3. its masked and strict linked scores (`tools/linked_accuracy.py`; unbound
+   bodies scored the same way at their retail VAs) do not drop, and its
+   `tools/emu_diff.py` case, where there is one, differs in no more runs.
+
+Start the region at the function, after the inline helpers it calls: a static
+inline helper takes the optimization state of its definition. With the region
+starting before `KbAtLeast`/`KbAtMost`/`KbRange`, `SelectRiderPose` scores
+0.725 / 0.682 (as with `/Oy-`); starting at the function, 0.729 / 0.686.
+`tools/build_game.py` still accepts `/Oy-` next to `/QIfist`, but no unit
+uses it: the eight units that took it give the same bytes with the pragma.
+
+Scores are masked / strict, before (`/QIfist` alone) and after the pragma.
+Emu counts the `tools/emu_diff.py -n 1000` runs that differ (control words
+0x027f and 0x007f; the four-pose case runs 3000), each case compiled with the
+configured flags.
+
+| Unit | Function (retail VA) | Decision | Masked | Strict | Emu |
 |---|---|---|---|---|---|
-| `Group1_ParticleRender.cpp` | Render3D 0x004bac60 (framed) | static-local atexit stub (retail 0x004bb620 is the same bare `ret`) | `/Oy-` | 0.675 -> 0.712 | 0.413 -> 0.446 |
-| `Group3_TerrainPrepareGeometry.cpp` | PrepareGeometry 0x00507610 (framed) | none | `/Oy-` | 0.929 -> 0.979 | 0.777 -> 0.925 |
-| `Group4_GridLighting.cpp` | LightVertices 0x0049e4a0, LightAny 0x0049e6b0, LightOne 0x0049f1c0, LightAmbientPlusOne 0x0049f8d0 (all framed) | none | `/Oy-` | 0.745 -> 0.752, 0.774 -> 0.823, 0.705 -> 0.719, 0.714 -> 0.718 | 0.497 -> 0.639, 0.345 -> 0.590, 0.302 -> 0.367, 0.293 -> 0.353 |
-| `Group4_DropTextOverlayTick.cpp` (split from `Group4_Overlay.cpp`) | DropTextOverlay::Tick 0x0051b070 (framed) | none | `/Oy-` | 0.607 -> 0.674 | 0.517 -> 0.587 |
-| `Group4_Overlay.cpp` | ChatOverlay::Setup 0x0051cf80 (frameless: `mov eax, fs:[0]; push -1`) | none | no flags (it has no float-to-int conversion; bytes unchanged without `/QIfist`) | 1.000 (0.868 with `/Oy-`) | 0.964 (0.604 with `/Oy-`) |
-| `Group4_ScoreBoard.cpp` | ShowValue 0x0048d1e0 (framed); `Group4Ovl_ShowModel` (no retail body: retail calls 0x004fdb50 and 0x004fd910 inside ShowValue) | none | `/Oy-` | 0.681 -> 0.715 | 0.334 -> 0.455 |
-| `Group4_Visibility.cpp` | TestBox 0x0052f570 (framed) | none | `/Oy-`; its forwarder for EcoSystem's view of SphereInFrustum (0x0052fbb0, frameless) became a `link_aliases` entry | 0.689 -> 0.697 | 0.342 -> 0.443 |
-| `DropTextOverlaySetup.cpp` (sample) | Setup 0x0051af00 (framed) | none | `/Oy-` | 0.632 -> 0.853 | 0.272 -> 0.701 |
-| `CharacterMotionFourPose.cpp` (sample) | Method_0x004a9050 (framed) | the eight Math3D.h `$E` functions (register-only under `/Op`) | `/Oy-` | 0.727 -> 0.758 | 0.168 -> 0.414 |
-| `Group4_SceneTick.cpp` | Scene::Tick 0x004eab00 (framed); `Group4Scene_AdvanceEntry` (no retail body); four Math3D.h `$E` initializers | their four `$E` registration stubs | left | 0.686 (0.701 with `/Oy-`) | 0.334 (0.363) |
-| `KrustyBikeTrickPick.cpp` (sample) | Fn_0048D780 0x0048d780 (framed); four `$E` initializers | as above | left | 0.773 (0.804) | 0.599 (0.776) |
-| `KrustyBikeSelectRiderPose.cpp` (sample) | SelectRiderPose 0x0048e3e0 (framed); four `$E` initializers | as above | left | 0.682 (0.725) | 0.652 (0.682) |
-| `CharacterMotionStart.cpp` (sample) | Method_0x004a8bf0 (framed); `FloatToInt` (no retail body); four `$E` initializers | as above | left | 0.633 (0.667) | 0.200 (0.381) |
-| `CharacterMotionBlend.cpp` (sample) | Method_0x004a8c50 (framed); `FloatToInt`; four `$E` initializers | as above | left | 0.793 (0.879) | 0.348 (0.618) |
-| `ProjectedShadowNearMisses.cpp` (sample) | RenderShadow 0x004db8c0 and TintCasterVertices 0x004dc2b0 (framed); the canonical unit's constructor 0x004da570, destructor 0x004da6e0, Init 0x004da7b0, AddCaster, AddReceiver, SetShadowStrength, SetShadowGrey, SetLight, ComputeBounds 0x004db0d0 and Present 0x004dbd30 (all frameless), plus Tick, RenderPre3D and the deleting destructor (unbound); four `$E` initializers | ClearCasters, ResizeVertexBuffer, PrepareGeometry, OnControlPress, `$E` stubs | left | e.g. Present 0.837 (0.625), RenderShadow 0.738 (0.733) | Present 0.438 (0.387) |
-| `TerrainShadow.cpp` (sample) | slot 30 0x00509aa0 (framed); slots 27 0x00508bc0 and 28 0x005097d0 (frameless); the compiler's vector constructor iterator `??_H` | none | left | slot 30 0.718 (0.736); slot 27 0.984 (0.931) | slot 30 0.442 (0.450); slot 27 0.979 (0.234) |
-| `D3DIMSoultreeShadowNearMisses.cpp` (sample) | slot 30 0x00446f40 (framed); slot 29 0x00446c30 (frameless) | none | left | slot 30 0.862 (0.891); slot 29 0.945 (0.935) | slot 30 0.598 (0.665); slot 29 0.936 (0.375) |
+| `Group1_ParticleRender.cpp` | Render3D 0x004bac60 | pragma (was `/Oy-`, same bytes) | 0.675 -> 0.712 | 0.413 -> 0.446 | 0 / 2000 |
+| `Group3_TerrainPrepareGeometry.cpp` | PrepareGeometry 0x00507610 | pragma (was `/Oy-`) | 0.929 -> 0.979 | 0.777 -> 0.925 | 56 / 2000, all out of `int` (below) |
+| `Group4_GridLighting.cpp` | LightVertices 0x0049e4a0, LightAny 0x0049e6b0, LightOne 0x0049f1c0, LightAmbientPlusOne 0x0049f8d0 (one region) | pragma (was `/Oy-`) | 0.745 -> 0.752, 0.774 -> 0.823, 0.705 -> 0.719, 0.714 -> 0.718 | 0.497 -> 0.639, 0.345 -> 0.590, 0.302 -> 0.367, 0.293 -> 0.353 | no case |
+| `Group4_DropTextOverlayTick.cpp` | DropTextOverlay::Tick 0x0051b070 | pragma (was `/Oy-`) | 0.607 -> 0.674 | 0.517 -> 0.587 | 0 / 2000 |
+| `Group4_ScoreBoard.cpp` | ShowValue 0x0048d1e0, with `Group4Ovl_ShowModel` (no retail body) | pragma (was `/Oy-`) | 0.681 -> 0.715 | 0.334 -> 0.455 | 0 / 2000 |
+| `Group4_Visibility.cpp` | TestBox 0x0052f570 | pragma (was `/Oy-`) | 0.689 -> 0.697 | 0.342 -> 0.443 | 0 / 2000 |
+| `DropTextOverlaySetup.cpp` (sample) | Setup 0x0051af00 | pragma (was `/Oy-`) | 0.632 -> 0.853 | 0.272 -> 0.701 | 0 / 2000 |
+| `CharacterMotionFourPose.cpp` (sample) | Method_0x004a9050 | pragma (was `/Oy-`) | 0.727 -> 0.758 | 0.168 -> 0.414 | 0 / 3000 |
+| `Group4_SceneTick.cpp` | Scene::Tick 0x004eab00 | pragma | 0.686 -> 0.701 | 0.334 -> 0.363 | 0 / 2000 |
+| `KrustyBikeTrickPick.cpp` (sample) | Fn_0048D780 0x0048d780 | pragma | 0.773 -> 0.804 | 0.599 -> 0.776 | 0 / 2000 |
+| `KrustyBikeSelectRiderPose.cpp` (sample) | SelectRiderPose 0x0048e3e0 | pragma | 0.682 -> 0.729 | 0.652 -> 0.686 | no case |
+| `CharacterMotionStart.cpp` (sample) | Method_0x004a8bf0 | pragma | 0.633 -> 0.667 | 0.200 -> 0.381 | 0 / 2000 |
+| `CharacterMotionBlend.cpp` (sample) | Method_0x004a8c50 | pragma | 0.793 -> 0.879 | 0.348 -> 0.618 | 0 / 2000 |
+| `TerrainShadow.cpp` (sample) | slot 30 0x00509aa0 | pragma | 0.718 -> 0.736 | 0.442 -> 0.450 | 0 / 2000 |
+| `D3DIMSoultreeShadowNearMisses.cpp` (sample) | slot 30 0x00446f40 | pragma | 0.862 -> 0.891 | 0.598 -> 0.665 | 0 / 2000 |
+| `ProjectedShadowNearMisses.cpp` (sample) | TintCasterVertices 0x004dc2b0 | pragma | 0.759 -> 0.774 | 0.330 -> 0.346 | 0 / 2000 |
+| `ProjectedShadowNearMisses.cpp` (sample) | RenderShadow 0x004db8c0 (framed in retail) | none: the pragma lowers both scores | 0.738 (0.733 with it) | 0.452 (0.340 with it) | 0 / 2000 |
+| `Group4_Overlay.cpp` | ChatOverlay::Setup 0x0051cf80 (frameless) | no flags, no pragma | 1.000 | 0.964 | n/a |
 
-The Math3D.h `$E` initializers are the blocker for five units. Each copy-initializes
-a header-local `static const Vec3` through a 12-byte stack temporary
-(`sub esp, 0xc`), so `/Oy-` frames it. Retail's copies of the same
-initializers are frameless (for example 0x00407890), because they contain no
-asm. Splitting cannot help, because every unit that includes the header gets
-its own copies. The two shadow samples could each split slot 30 into its own
-sample, but the `TerrainShadow` gain is small; the `D3DIMSoultreeShadow` split
-(0.862 -> 0.891 masked) is left for whoever next works on that file.
+The functions of these units that are frameless in retail keep their bytes,
+for example `TerrainShadow` slots 27 and 28 (0.984 / 0.979, 0.986 / 0.950),
+`D3DIMSoultreeShadow` slot 29 (0.945 / 0.936) and ProjectedShadow `Present`,
+`ComputeBounds` and `Init` (0.837 / 0.438, 0.985 / 0.689, 0.992 / 0.841).
+`DropTextOverlay::Tick` was split from `Group4_Overlay.cpp` for its unit-wide
+flags; with the frame in the source it could move back, which has not been
+done.
 
-Behaviour, with `tools/emu_diff.py` and each case compiled with the configured
-flags (`/Oy-` included) at 1000 cases per control word (0x027f and 0x007f):
-particle_render3d, drop_text_tick, scoreboard_show_value, visibility_testbox
-and drop_text_setup differ in 0 of 2000 runs, and four_pose differs in 0 of
-3000. terrain_prepare_geometry differs in 0 of 2000 runs with in-range focal
-lengths only. With its out-of-`int` values (every 25th case) it differs in 56
-of 2000 runs, the same 56 as with `/QIfist` alone (see above). The grid
-lighting workers have no `emu_diff` case.
+terrain_prepare_geometry differs in 0 runs with in-range focal lengths only.
+With its out-of-`int` values (every 25th case) it differs in 56 of 2000 runs,
+the same 56 as with `/QIfist` alone (see above).
 
 ## Rider pose selection rounding
 
@@ -1426,7 +1442,8 @@ Code shape (`tools/match_one.py`):
 
 The plain helper keeps the low dword outside `int`, so it was not adopted.
 The rest of the gap is retail's ebp frame from the inline asm, which also
-moves the shared clamp exits. An `int` return with `return 0` was ruled out:
+moves the shared clamp exits. The [frame pragma](#frame-pointer-units) now supplies the frame
+(0.729 masked, 0.686 strict, linked). An `int` return with `return 0` was ruled out:
 about 101 strict masked, 2880 bytes, `xor eax,eax` on every exit, and the
 0x5b8 branch no longer shares the switch tails.
 
@@ -1484,8 +1501,9 @@ and `currentFrame` fields.
 |---|---|---|---|
 | 0x004a9050 | `Character::Method_0x004a9050` | 0.103 | 0.727 |
 
-Retail's ebp frame and pointer `fistp` come from the inline asm. The other
-known differences are dead code:
+Retail's ebp frame and pointer `fistp` come from the inline asm; the
+[frame pragma](#frame-pointer-units) supplies the frame (0.758). The other known differences
+are dead code:
 
 - Retail calls CharacterPose's generated constructor (0x004a8930) three
   times in the first interpolation expansion and four times in the second.

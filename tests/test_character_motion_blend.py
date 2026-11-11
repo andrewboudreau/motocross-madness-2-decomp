@@ -133,7 +133,7 @@ class CharacterMotionBlendTests(unittest.TestCase):
             compile_file('src/reconstructed/CrossProduct.cpp', 'cross')
             compile_file('tests/fixtures/character_motion_blend_compare.cpp', 'fixture', ('/Od', '/Op'))
             # BlendFirst is inlined into the method, as retail expands the first interpolation in place.
-            self.assertEqual(complete(candidate, SYMBOL)[1], 1136)
+            self.assertEqual(complete(candidate, SYMBOL)[1], 976)
             self.assertFalse([symbol for symbol in candidate.symbols if symbol.name.startswith('?BlendFirst@@')])
             self.assertEqual(complete(candidate, '?FloatToInt@@')[1], 368)
             # Retail 0x4a8c50 makes the same 22 vector calls and two InterpolatePose calls; its two

@@ -157,6 +157,9 @@ static inline Vector3 Group1Cross(const Vector3& a, const Vector3& b)
 }
 
 // 0x004bac60
+// Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 int ParticleManager::Render3D()
 {
     int i;
@@ -400,3 +403,4 @@ int ParticleManager::Render3D()
     target->SetTextureBlend(2, 0);
     return 1;
 }
+#pragma optimize("", on)

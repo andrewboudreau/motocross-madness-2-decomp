@@ -39,6 +39,9 @@ static void Group4Scene_AdvanceEntry(UnknownSceneEntry* entry, float dt)
 }
 
 // 0x004eab00
+// Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 int Scene::Tick(float frameTime)
 {
     if (g_TrackGame->paused) {
@@ -135,3 +138,4 @@ int Scene::Tick(float frameTime)
     }
     return GameObject::Tick(dt);
 }
+#pragma optimize("", on)

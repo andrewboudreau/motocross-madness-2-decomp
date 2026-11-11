@@ -249,6 +249,9 @@ static inline Vector3 Group4Vis_NormalizedByConstructor(const Vector3& v) {
 // per-vertex sums (zero without one); point, positional and directional
 // lights add their rounded diffuse terms where they face the vertex; the sums
 // are clamped and packed.
+// Retail's inline-asm fistp helper gives each function below an EBP frame; the
+// pragma keeps the frame pointer for them (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 void GridVertexSink::LightAny(const Matrix4* matrix, int count, void* normals, void* buffer,
                               int stride) {
     LightManager* manager = reinterpret_cast<LightManager*>(this);
@@ -590,3 +593,4 @@ void GridVertexSink::LightVertices(void* matrix, int count, void* vertices, void
         }
     }
 }
+#pragma optimize("", on)

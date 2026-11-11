@@ -185,7 +185,9 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
             self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 1031)
             # The corrected camera loader adds its explicit first-cross call relocation.
             # QueryGround's emulation-found normal/height repairs drop one Terrain relocation.
-            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4723)
+            # The D3DIMSoultreeShadow slot 30 frame pragma takes ebp, so the shadow-point
+            # pointer is reloaded at two more sites, as retail does.
+            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4725)
         print('Clipper global:', strict, 'strict checks; 15 whole objects; 46 retail pointer loads; storage remains unresolved')
 
 

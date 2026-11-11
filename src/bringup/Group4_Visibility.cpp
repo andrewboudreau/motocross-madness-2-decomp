@@ -22,9 +22,8 @@
 //    53- and 24-bit precision.  Griddraw.h's and D3DIMSoultreeShadow.cpp's views
 //    of the clipper forward here (Group2_GridVisibilityTestBox.cpp,
 //    Group1_ShadowClipper.cpp), as retail has a single function.
-//    TestBox is the unit's only function: retail's body has the EBP frame of
-//    its inline-asm helper, so the unit is also compiled with /Oy-
-//    (docs/GAME_BUILD.md#frame-pointer-units).  EcoSystem.h's view of
+//    Retail's body has the EBP frame of its inline-asm helper, which a
+//    pragma keeps for TestBox (docs/GAME_BUILD.md#frame-pointer-units).  EcoSystem.h's view of
 //    VisibilityClipper::SphereInFrustum (0x0052fbb0, frameless in retail and
 //    defined by src/krusty2/visibility/VisibilityQuadTree.cpp) used to forward
 //    from here; it is a link_alias now.
@@ -74,6 +73,9 @@ static inline int Group4Vis_ViewportY(const VisibilityCamera* camera) {
 // accepts at once. Otherwise `screenRect` receives the clamped screen
 // bounds {left, top, right, bottom} and `cornersInside` the number of
 // corners inside the frustum. The last argument is unused.
+// Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, const float* center,
                                const float* extent, int* screenRect, int* cornersInside, int unused) {
     const float* m = matrix;
@@ -211,3 +213,4 @@ int VisibilityClipper::TestBox(VisibilityCamera* camera, const float* matrix, co
         *cornersInside = inside;
     return 1;
 }
+#pragma optimize("", on)

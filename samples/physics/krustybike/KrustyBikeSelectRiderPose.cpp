@@ -32,8 +32,9 @@
 // retail does not make) and ignored the rounding mode.  Without /QIfist (the physics
 // runner, which scores shape only) the casts truncate through __ftol.
 //
-// Shape: what remains is retail's ebp frame (from the inline asm), which also moves the
-// shared clamp exits, and the range check's extra instructions per site.
+// Shape: retail's ebp frame comes from the inline asm; the frame pragma below keeps it
+// (linked 0.682 -> 0.729).  What remains is the shared clamp exits and the range check's extra
+// instructions per site.
 #include <float.h>
 
 #include "vehicle/KrustyBike.h"
@@ -54,6 +55,9 @@ static inline float KbRange(float x, float lo, float hi)
     return KbAtMost(KbAtLeast(x, lo), hi);
 }
 
+// Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 void KrustyBike::SelectRiderPose(float t)
 {
     if (IsRiderPoseLocked())
@@ -262,3 +266,4 @@ void KrustyBike::SelectRiderPose(float t)
         }
     }
 }
+#pragma optimize("", on)

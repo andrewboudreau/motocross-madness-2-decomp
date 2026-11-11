@@ -25,8 +25,9 @@
 // `pick` and `hold` locals keep retail's product order (rand * 1/32768 first); written as one
 // expression VC6 multiplies by count first and folds 1/32768 * 0.8 into one constant (0.757,
 // and the hold time then rounds differently in its last bit).  `rand() / 32768.0f` and an
-// inline Random01 helper compile the same as the single expression.  What remains is retail's
-// ebp frame and shared failure epilogue, which come from its inline asm.
+// inline Random01 helper compile the same as the single expression.  Retail's ebp frame comes
+// from its inline asm; the frame pragma below keeps it (0.804).  What remains is the shared
+// failure epilogue.
 #include <stdlib.h>
 
 #include "vehicle/KrustyBike.h"
@@ -60,6 +61,9 @@ static const float s_kbAiTrickLength[16] = {      // 0x0056cc60 clip lengths (s)
     1.7222f, 1.8f, 1.7647f, 2.3333f, 2.1333f, 2.1333f, 1.9375f, 1.7222f,
 };
 
+// Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 int KrustyBike::Fn_0048D780(int* out, float t, int group)
 {
     int row = -1;
@@ -106,3 +110,4 @@ int KrustyBike::Fn_0048D780(int* out, float t, int group)
     }
     return 1;
 }
+#pragma optimize("", on)

@@ -3,11 +3,9 @@
 // provide yet:
 //   0x0051b070 DropTextOverlay::Tick   (vtable 0x005586f0 slot 10; decoded)
 // Not a byte match. It was split out of Group4_Overlay.cpp so that the game
-// build can compile it with /QIfist /Oy- (config/game_build.json bringup_flags):
-// retail's body has the EBP frame of its inline-asm rounding helper, while
-// ChatOverlay::Setup (0x0051cf80, still in Group4_Overlay.cpp) is frameless in
-// retail and would lose its frame-pointer omission under /Oy-
-// (docs/GAME_BUILD.md#frame-pointer-units).
+// build can compile it with /QIfist (config/game_build.json bringup_flags);
+// retail's body has the EBP frame of its inline-asm rounding helper, which a
+// pragma keeps for Tick alone (docs/GAME_BUILD.md#frame-pointer-units).
 //
 // Retail rounds the drop with a project `fld; fistp` helper applied to
 // (value - 0.5) (0x0051b0c3): floor(value) except that exact integers round to
@@ -25,6 +23,9 @@
 // time (TrackGame +0x2f0, not the argument), then while shown drops the
 // text by elapsedTime / dropSeconds screen heights and hides it once it
 // passes the bottom.
+// Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 int DropTextOverlay::Tick(float frameTime)
 {
     GameObject::Tick(g_TrackGame->frameTime);
@@ -40,3 +41,4 @@ int DropTextOverlay::Tick(float frameTime)
     }
     return 1;
 }
+#pragma optimize("", on)

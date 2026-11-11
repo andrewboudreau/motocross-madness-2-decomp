@@ -9,7 +9,7 @@ void InterpolatePose(CharacterPose*, CharacterPose*, CharacterPose*, float);
 // inline in the method body (retail has no out-of-line copy; `inline` gives the
 // same 22 calls in place). Audited 2026-11-11: no behavioural difference. Left:
 // retail's two CharacterPose constructor calls (0x004a8930) and its inline-asm
-// fistp (EBP frame) where this calls FloatToInt.
+// fistp where this calls FloatToInt (its EBP frame comes from the pragma below).
 static inline void BlendFirst(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t)
 {
     if (t < 0.0f) t = 0.0f;
@@ -32,6 +32,9 @@ static inline void BlendFirst(CharacterPose* a, CharacterPose* b, CharacterPose*
     Vec3AddCall(&sum, Vec3ScaleCall(&wa, &a->position, s), Vec3ScaleCall(&wb, &b->position, t));
 }
 
+// Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 void Character::Method_0x004a8c50(int firstHandle, int secondHandle, float phase, float weight)
 {
     Motion* first = reinterpret_cast<Motion*>(firstHandle);
@@ -65,3 +68,4 @@ void Character::Method_0x004a8c50(int firstHandle, int secondHandle, float phase
         CharacterVirtualSlot4((int)&result, 0);
     }
 }
+#pragma optimize("", on)

@@ -86,6 +86,9 @@ int TerrainShadow::UnknownVirtualSlot28()
 // retail has none.  Checked against retail and equal apart from the rounding helper: the
 // clip-rectangle doubling, the outcode tests, the cull sign, the minDepth test, the 0x300
 // vertex limit, the colour constants and the MarkUsed address (mesh + 0x144).
+// Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 void TerrainShadow::UnknownVirtualSlot30()
 {
     enum { kMaxMeshVertices = 867 };
@@ -239,6 +242,7 @@ full:
     }
     shadow->texture->UnlockPixels(0);
 }
+#pragma optimize("", on)
 
 // ---------------------------------------------------------------------------------------------
 // 0x00508bc0 (slot 27, 3087 bytes): the shadow's footprint on the terrain.  Casts the light

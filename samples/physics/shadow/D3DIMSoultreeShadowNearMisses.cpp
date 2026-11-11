@@ -43,8 +43,9 @@
 // __ftol, so only code shape is comparable there.  Ruled out: ProjectedShadowFloatToInt's
 // range-checked __int64 form (0.807 linked-style score: ten more instructions per site for
 // values ClipPolygon never produces).
-// The same frame explains the two s_shadowPoints loads the s15 reference diff misses: with
-// ebp taken retail reloads the pointer per triangle copy, where VC6 here keeps it in ebp.
+// The same frame explains the two s_shadowPoints loads the s15 reference diff missed: with
+// ebp taken retail reloads the pointer per triangle copy.  The frame pragma on slot 30 keeps
+// the frame, and VC6 then reloads it as retail does (linked 0.891).
 #include "shadow/D3DIMSoultreeShadow.h"
 #include "math/Vec3.h"
 #include "../../../src/reconstructed/Matrix4.h"
@@ -193,6 +194,9 @@ extern D3DIMShadowVertexView g_d3dimShadowVertexArray[3000];   // 0x00581eb8
 // triangles that lie in front of the shadow's depth into the shadow texture (update frames
 // only) and turns the others, when inCameraView is set, into textured vertices of the receiver
 // (vertexCount of at most 3000).
+// Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 void D3DIMSoultreeShadow::UnknownVirtualSlot30()
 {
     if (!inShadowView)
@@ -309,3 +313,4 @@ void D3DIMSoultreeShadow::UnknownVirtualSlot30()
 done:
     shadow->texture->UnlockPixels(0);
 }
+#pragma optimize("", on)

@@ -37,8 +37,8 @@ INLINE = ('static inline void SetIdentity(', 'static inline void MatrixProduct('
 PARTIALS = (
     ('?UnknownVirtualSlot29@D3DIMSoultreeShadow@@UAEHXZ', 0x446c30, 771, 771, 730,
      '4cfddc481899ea9c02093fb09b3035df78ca2734ee7453dcab19a90dabaf5cc9'),
-    ('?UnknownVirtualSlot30@D3DIMSoultreeShadow@@UAEXXZ', 0x446f40, 1524, 1612, 55,
-     'e8527e8be583e7b54a1321a4a0e802c2573efdea86f9528566c064f9d01e74d8'))
+    ('?UnknownVirtualSlot30@D3DIMSoultreeShadow@@UAEXXZ', 0x446f40, 1524, 1533, 122,
+     '523d4a407e85a5f28f6dc44dd282fec8adc903e3b7c0328761f94e02228a1563'))
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),

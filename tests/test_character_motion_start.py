@@ -107,7 +107,7 @@ class CharacterMotionStartTests(unittest.TestCase):
                                         ROOT/'src/krusty2/motion/Motnctrl.bindings.json')['strict_exact'])
             self.assertEqual(complete(objects['canonical'], HELPER), complete(objects['helper'], HELPER))
             candidate = objects['candidate']
-            self.assertEqual(complete(candidate, SYMBOL)[1], 93)
+            self.assertEqual(complete(candidate, SYMBOL)[1], 91)
             self.assertEqual(complete(candidate, CONVERSION)[1], 368)
             self.assertEqual({s.name for s in candidate.symbols if s.section_number == 0 and s.storage_class == 2},
                              {'__fltused', '__control87', HELPER})

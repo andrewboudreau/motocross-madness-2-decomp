@@ -51,6 +51,9 @@ struct UnknownLogFont {
 };
 extern "C" __declspec(dllimport) void* __stdcall CreateFontIndirectA(const UnknownLogFont* font);
 
+// Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 DropTextOverlay* DropTextOverlay::Setup(void* value, TextureMapManager* textures, float dropSeconds,
                                         int x, int y, const char* text)
 {
@@ -93,3 +96,4 @@ DropTextOverlay* DropTextOverlay::Setup(void* value, TextureMapManager* textures
     }
     return this;
 }
+#pragma optimize("", on)

@@ -63,6 +63,9 @@ static __forceinline void BlendFirst(CharacterPose* a, CharacterPose* b, Charact
     linear.position = *Vec3AddCall(&sum, Vec3ScaleCall(&wa, &a->position, s), Vec3ScaleCall(&wb, &b->position, t));
 }
 
+// Retail's inline-asm fistp helper gives this function an EBP frame; the
+// pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 void Character::Method_0x004a9050(int aHandle, int bHandle, int cHandle, int dHandle,
                                   float phase, float weight, float lean)
 {
@@ -116,3 +119,4 @@ void Character::Method_0x004a9050(int aHandle, int bHandle, int cHandle, int dHa
         CharacterVirtualSlot4((int)&result, 0);
     }
 }
+#pragma optimize("", on)

@@ -1,5 +1,5 @@
 {
-  "baseline": "Published a81fb378 with accepted emitter composition; unpublished at private capture. Complete before/after proof retains all sections except two explicit InterpolatePose callee names, and rider call joins. The Motnctrl.cpp aggregate pin was re-taken when InterpolatePose moved to src/krusty2/motion/Motnctrl.cpp: its section left and slot 7's three calls became external relocations, every other section unchanged.",
+  "baseline": "Published a81fb378 with accepted emitter composition; unpublished at private capture. Complete before/after proof retains all sections except two explicit InterpolatePose callee names, and rider call joins. The Motnctrl.cpp aggregate pin was re-taken when InterpolatePose moved to src/krusty2/motion/Motnctrl.cpp: its section left and slot 7's three calls became external relocations, every other section unchanged. The CharacterMotionStart.cpp pin was re-taken when its method gained the frame-pointer pragma: only the method section changed.",
   "filenames": [
     "src/krusty2/vehicle/Bike.cpp",
     "src/krusty2/vehicle/KrustyBike.cpp",
@@ -24,7 +24,7 @@
     "samples/physics/motion/CharacterMotionStart.cpp": {
       "sections": 14,
       "relocations": 24,
-      "sha256": "8f31bf78249ffdbb74c253989372942a6eaa44ac918db1d7da25fc5b72e4f784"
+      "sha256": "247a44d3b5a26d74594881dd2de76cfc63b6f7e3894fdb37d25f13514e6161c0"
     }
   },
   "before": {

@@ -35,6 +35,10 @@ struct KbScoreBoard {
 
 // Shows a model under the base frame (0x004fdb50, mark the subtree dirty,
 // 0x004fd910 AddChild).
+// Retail's inline-asm fistp helper gives ShowValue an EBP frame; the pragma keeps the
+// frame pointer for it and its helper, which retail expands inside it
+// (docs/GAME_BUILD.md#frame-pointer-units).
+#pragma optimize("y", off)
 static void Group4Ovl_ShowModel(BonusObjectManager* self, D3DIMSoultreeObject* model)
 {
     model->ClearFlag14c();
@@ -117,3 +121,4 @@ void KbScoreBoard::ShowValue(float points, float multiplier)
     self->eyeToFrame.y = inverse * self->eyeToFrame.y;
     self->eyeToFrame.z = inverse * self->eyeToFrame.z;
 }
+#pragma optimize("", on)
