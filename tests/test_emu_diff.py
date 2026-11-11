@@ -183,6 +183,18 @@ CLEAN_CASES = {
     'game_object_release_detached': 100,
     'render_target_advance_frame': 100,
     'loading_dlg_handle_event': 100,
+    # Loader sweep: file loaders and parsers fed synthetic contents (edge lengths, unknown tokens).
+    'eco_read_est': 60,
+    'tga_write': 100,
+    'grid_read_node': 60,
+    'morph_load_parameter_file': 40,
+    'bike_load_bike': 40,
+    'overlay_load_font': 100,
+    'mp_fill_bike_rider_lists': 100,
+    'dlg_read_resource': 100,
+    'projected_shadow_init': 100,
+    'terrain_load': 100,
+    'bike_race_create': 60,
 }
 
 # Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).
@@ -240,6 +252,15 @@ PRE_FIX_SHAPES = [
     ('kb_simulate_look_ahead', [('return a.z * b.z + (a.x * b.x + a.y * b.y);',
                                  'return a.x * b.x + a.y * b.y + a.z * b.z;')], 20),
     ('kb_look_ahead', [('* invDt + (BikeAILookDot(accR, right));', '* invDt + BikeAILookDot(accR, right);')], 40),
+    # LoadParameterFile's channel inverse summed the y translation's x product first (24-bit only).
+    ('morph_load_parameter_file',
+     [('-((m->m[3][1] * m->m[1][1] + m->m[3][2] * m->m[2][1]) + m->m[3][0] * m->m[0][1]),',
+       '-(m->m[3][0] * m->m[0][1] + m->m[3][1] * m->m[1][1] + m->m[3][2] * m->m[2][1]),')], 40),
+    # ReadDialogResource read a Set_Default section's FontName into the control's own name.
+    ('dlg_read_resource', [('GetString("FontName", defaultFontName, isDefault ? defaultFontName : fontName, -1);',
+                            'GetString("FontName", defaultFontName, fontName, -1);')], 40),
+    # Terrain::Load gave the height field its host pointer instead of the load-children flag.
+    ('terrain_load', [('(this->stream), loadChildren,', '(this->stream), host,')], 60),
 ]
 
 

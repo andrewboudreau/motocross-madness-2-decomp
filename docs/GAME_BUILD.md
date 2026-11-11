@@ -1555,6 +1555,32 @@ to x*x + y*y; the linked build sums (x*x + z*z) + y*y at extended precision. The
 effect is ulp-level, on podium and flag-girl placement. Eight source variants did
 not reproduce retail's order.
 
+A loader sweep fed synthetic file contents to the linked file loaders and parsers below 1.000
+that no case covered (empty and over-long strings, unknown tokens, negative and huge numbers,
+truncated streams, NULL results): `eco_read_est` (`EcoSystem::ReadEst` 0x00457480), `tga_write`
+(`WriteTga` 0x00512990), `grid_read_node` (`DrawableGridNode::ReadNode` 0x0047e600),
+`morph_load_parameter_file` (0x004a33b0), `bike_load_bike` (`LoadBike` behind the KbBikeLoader
+forward 0x004079c0), `overlay_load_font` (0x00447a00), `mp_fill_bike_rider_lists` (0x004f8220),
+`dlg_read_resource` (`UIDialog::ReadDialogResource` 0x0046a920, every control type),
+`projected_shadow_init` (0x004da7b0), `terrain_load` (`Terrain::Load` 0x005059d0) and
+`bike_race_create` (0x00417ed0). Each now agrees at both precisions. Three bugs were fixed:
+- **ReadDialogResource** read a `Set_Default` section's `FontName` into the control's own
+  name. Retail (0x0046d77e..0x0046d79c) reads it into the dialog default, so controls without
+  their own font drew in the dialog font instead (0.959 to 0.967 masked).
+- **Terrain::Load** gave the height field constructor (0x0047c880) its `host` pointer where
+  retail passes the third argument, the load-children flag that `ReadNode` tests (0x0050614c).
+  This was latent, because the only caller passes 1.
+- **LoadParameterFile's channel inverse** summed the y translation's x product first. Retail
+  (0x004a3846..0x004a3859) sums it last, which differs by 1 or 2 ulp at 24-bit only; the unlinked
+  copy in `MorphBastardModifierNearMisses.cpp` now matches it.
+
+`Scene::ReadAnimations` and `LoadEventObjects` were reviewed by disassembly, which showed register
+and scheduling differences only. `GetDXVersion` is covered by `test_device_setup_behavior.py`.
+`bike_race_create` reaches the flag-girl placement but does not show the open z*z rounding above.
+Its arch model width is a synthetic arena value, so the offsets it measures are likely degenerate.
+Every string and format constant the linked bodies reference equals retail's. The only differing
+data references are the units' own `__FILE__` tags and vtable or loop-end addresses.
+
 ### Grid lighting workers
 
 The three workers in `Group4_GridLighting.cpp` were rewritten from the
