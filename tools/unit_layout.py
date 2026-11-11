@@ -20,7 +20,8 @@ A ``.text`` section whose function is bound (see below) outside the span this
 object can occupy is skipped as kept elsewhere: a pick-any COMDAT (inline
 function, deleting destructor) is kept only by the first object that defines
 it, and identical-COMDAT folding (/OPT:ICF) keeps one copy of equal bodies.
-Associative sections follow their parent. ``--drop`` skips sections by
+A section bound to the same VA as an earlier section of the object is skipped
+as folded into it (ICF inside the unit). Associative sections follow their parent. ``--drop`` skips sections by
 function symbol by hand (for example a body folded into an unbound survivor).
 
 Relocations resolve to the laid-out address when their symbol is defined in a
@@ -190,6 +191,19 @@ def registered_addresses(source: Path, obj: CoffObject) -> dict[str, int]:
     return out
 
 
+def source_bindings(source: Path | None, obj: CoffObject, extra: list[Path] = ()) -> tuple[dict[str, int], list[Path], list[str]]:
+    """The default bindings files for ``source`` (none when it is None) plus
+    ``extra``, then the registered case/target addresses of ``obj``'s symbols."""
+    files = (default_binding_files(source) if source else []) + list(extra)
+    bindings, conflicts = load_bindings(files)
+    if source:
+        for name, va in registered_addresses(source, obj).items():
+            if name in bindings and bindings[name] != va:
+                conflicts.append(f'{name}: binding {hx(bindings[name])} vs registered case {hx(va)}')
+            bindings.setdefault(name, va)
+    return bindings, files, conflicts
+
+
 def compile_source(source: Path, out: Path, vc6_root: str) -> list[str]:
     """Compile with the game-build profile and includes; returns the command."""
     spec = json.loads((ROOT / 'config/game_build.json').read_text())
@@ -237,6 +251,7 @@ class Layout:
         sections = self.group(name)
         span_end = start + sum(aligned_size(s.size, s.align) for s in sections)
         cursor = start
+        kept_at: dict[int, Placed] = {}
         for sec in sections:
             parent = self.by_index.get(sec.associated) if sec.associated else None
             if parent is not None and parent.status not in ('placed', 'pending'):
@@ -252,6 +267,13 @@ class Layout:
                               + ('pick-any COMDAT kept by another object' if sec.selection == COMDAT_PICK_ANY
                                  else 'folded (ICF) or misbound'))
                 continue
+            if name == '.text' and bound is not None and bound in kept_at:
+                sec.status = 'folded'
+                sec.reason = (f'bound to {hx(bound)} like {kept_at[bound].functions[0][0]}: '
+                              'identical COMDATs folded (ICF), one copy kept')
+                continue
+            if name == '.text' and bound is not None:
+                kept_at[bound] = sec
             sec.va = -(-cursor // sec.align) * sec.align
             sec.status = 'placed'
             cursor = sec.va + sec.size
@@ -488,16 +510,9 @@ def main(argv=None) -> int:
             ap.error('compiling needs VC6_ROOT or --vc6-root (or pass --obj)')
         obj_path = Path(tempfile.mkdtemp(prefix='unit-layout-')) / (args.source.stem + '.obj')
         command = compile_source(args.source, obj_path, args.vc6_root)
-    files = list(args.bindings)
-    if args.source and not args.no_default_bindings:
-        files = default_binding_files(args.source) + files
-    bindings, conflicts = load_bindings(files)
     obj = CoffObject(obj_path)
-    if args.source and not args.no_default_bindings:
-        for name, va in registered_addresses(args.source, obj).items():
-            if name in bindings and bindings[name] != va:
-                conflicts.append(f'{name}: binding {hx(bindings[name])} vs registered case {hx(va)}')
-            bindings.setdefault(name, va)
+    bindings, files, conflicts = source_bindings(args.source if not args.no_default_bindings else None,
+                                                 obj, args.bindings)
     parse = lambda v: v if v in (None, 'auto') else int(v, 0)
     try:
         report = run(obj, bindings, pe.bytes_at_va, parse(args.start),
