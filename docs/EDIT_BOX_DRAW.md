@@ -6,9 +6,13 @@ image, positions text and the caret, requests redraws, and updates the IME
 composition position when the display's freeze-frame flag is set. The existing
 `GameUiNearMisses.cpp` aggregate includes this one definition.
 
-The method remains **nonexact: 975 candidate bytes versus 973 retail bytes,
-206 matching positions after relocation resolution**. This extraction changes
-no statements or behavior. The standalone grouping does not establish original
+The method remains **nonexact: 968 candidate bytes versus 973 retail bytes,
+76 matching positions after relocation resolution**. The texture block stores
+`redrawFrames = redraw` once after the block (retail duplicates that store per
+path, which VC6 cross-jumps from one statement): the linked masked score rises
+from 0.830 to 0.873 (aligned 215 of 310 against 199 with the old per-arm
+stores, 975 bytes and 206 positions). Behavior is unchanged: every path
+restores the saved count. The standalone grouping does not establish original
 translation-unit ownership.
 
 ## Identity and complete extent
@@ -25,7 +29,7 @@ The decoded body ends with the return at **0x473c6c**; its other return is at
 The retained test decodes all 973 bytes, checks every branch destination, all
 ten direct call sites and all six indirect call sites, and checks the GDI and
 IME import identities. There is no SEH frame in this method. The extent is the
-complete retail body, not the candidate's 975-byte denominator or a trimmed
+complete retail body, not the candidate's 968-byte denominator or a trimmed
 matching prefix.
 
 The six direct game helpers are existing canonical providers:
@@ -77,7 +81,7 @@ agree. It does not relax any previous strict or partial function comparison.
 The standalone's complete Draw bytes and relocations equal its definition in
 the aggregate and its emission through the actual game compile command. Its
 nondebug sections are `.drectve` (82 bytes), `.text` (976 bytes, including the
-975-byte function and alignment), and `.bss` (one byte for VC6's empty string
+968-byte function and alignment), and `.bss` (one byte for VC6's empty string
 literal). There is no CRT initializer or additional recovered function. Relative
 project includes allow both aggregate and standalone compilation without the
 game build's additional include directories.

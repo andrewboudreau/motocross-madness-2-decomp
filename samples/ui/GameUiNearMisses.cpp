@@ -55,13 +55,17 @@
 //   pointer (256, same code: the Lock-failure return still folds to 0).
 //   A further 28 tail forms (result copies, every if-Unlock variant, an
 //   else-if body) all compile to the same 256-position object.
-// 0x004738a0 UIEditBox slot 40 (206/975): retail keeps the width and the
+// 0x004738a0 UIEditBox slot 40 (76/968): retail keeps the width and the
 //   redraw count in memory. Retail reloads width into edi at the loop top
 //   (0x47396d) and consumes that copy in the scroll arms (`sub edi, ebx`),
 //   reading [esp+0x14] for the caret limit; the Blit and no-texture arms
 //   share one `redrawFrames = redraw` store. With the caret store fixed (see
 //   the FIXME below), one `redrawFrames = redraw` after the texture block
-//   gives aligned 214 (from 198) but 968 bytes (strict 76).
+//   gives aligned 215 (from 199) and 968 bytes (strict 76, from 206); kept
+//   since the linked masked score rises 0.830 -> 0.873. Swept with it
+//   (work/tpl EditBoxDraw): width/frames/redraw and dc/more/rect declaration
+//   orders, an inverted `if (!dialogBackground)` arm order and per-field
+//   caret stores; none beat aligned 215.
 // 0x00474150 UIEditBox slot 20 (1018/1044): Backspace reads the length and
 //   the cursor into locals after the lead-byte test (retail loads both before
 //   the branch and keeps them in ecx/eax across it). Retail gives the cursor

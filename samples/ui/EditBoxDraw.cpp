@@ -47,15 +47,12 @@ int UIEditBox::Draw() {
                                                            drawnTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
-            redrawFrames = redraw;
         } else {
             ((RenderTarget*)renderContext)->Blit(screenArea, drawnTexture, visibleArea,
                                                             drawnTexture->usesColorKey ? 0x1008000 : 0x1000000);
-            redrawFrames = redraw;
         }
-    } else {
-        redrawFrames = redraw;
     }
+    redrawFrames = redraw;
     void* dc;
     int more;
     CameraRect rect;
@@ -106,7 +103,7 @@ int UIEditBox::Draw() {
                 rect.bottom = rect.top + height + 1;
                 // Retail stores to the member (`lea ebx, [esi + 0x214]`). The
                 // member layout is preserved; this complete candidate remains
-                // nonexact (975 source bytes versus 973 retail bytes).
+                // nonexact (968 source bytes versus 973 retail bytes).
                 *(CameraRect*)caretRect = rect;
                 if (backgroundBrush)
                     FrameRect((HDC)dc, (RECT*)&rect, (HBRUSH)backgroundBrush);

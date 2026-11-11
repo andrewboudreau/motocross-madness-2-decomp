@@ -165,8 +165,8 @@ class EditBoxDrawTests(unittest.TestCase):
             _,aggregate=compile_source(ROOT/'samples/ui/GameUiNearMisses.cpp','aggregate')
             self.assertEqual(signature(candidate,SYMBOL),signature(aggregate,SYMBOL))
             report=compare(image,candidate,SYMBOL,0x4738a0,973,(ROOT/SOURCE).with_suffix('.bindings.json'))
-            self.assertEqual(report['candidate_size'],975);self.assertFalse(report['strict_exact'])
-            self.assertEqual(report['strict_match']['matching_positions'],206)
+            self.assertEqual(report['candidate_size'],968);self.assertFalse(report['strict_exact'])
+            self.assertEqual(report['strict_match']['matching_positions'],76)
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class==2 and s.section_number>0 and s.type==32},{SYMBOL})
             self.assertEqual([(s.name,s.raw_size) for s in candidate.sections if not s.name.startswith('.debug')],
                              [('.drectve',82),('.text',976),('.bss',1)])

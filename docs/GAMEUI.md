@@ -318,7 +318,7 @@ in the dedicated evidence page.
 [Edit-box drawing](EDIT_BOX_DRAW.md#functional-build-review) is maintained in
 `samples/ui/EditBoxDraw.cpp`, included by the aggregate and individually admitted
 as a nonexact source-game candidate. The complete retail extent is 973 bytes;
-the unchanged candidate emits 975 bytes with 206 matching positions. Its
+the candidate emits 968 bytes with 76 matching positions (aligned 215 of 310). Its
 27 strict helper/constructor checks, complete aggregate preservation and
 14,793 native scenarios exercise the actual six direct game helpers while
 keeping explicit scripted DC, surface, GDI and IME boundaries.
