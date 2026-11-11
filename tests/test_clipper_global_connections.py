@@ -184,7 +184,8 @@ class ClipperGlobalConnectionsTests(unittest.TestCase):
             # and twelve relocations.
             self.assertEqual(sum(row['sections'] for row in pins['objects'].values()), 1031)
             # The corrected camera loader adds its explicit first-cross call relocation.
-            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4724)
+            # QueryGround's emulation-found normal/height repairs drop one Terrain relocation.
+            self.assertEqual(sum(row['relocations'] for row in pins['objects'].values()), 4723)
         print('Clipper global:', strict, 'strict checks; 15 whole objects; 46 retail pointer loads; storage remains unresolved')
 
 
