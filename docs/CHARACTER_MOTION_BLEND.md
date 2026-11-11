@@ -4,6 +4,8 @@
 
 Authentic VC6 emits a 1,136-byte method (the private first-interpolation helper `BlendFirst` is `inline` and expands in place, as retail's does) and the existing 368-byte conversion helper. The conversion helper call, the missing CharacterPose constructor calls (retail calls 0x004a8930 twice) and retail's inline-assembly FISTP with its EBP frame change code layout and stack allocation. Before the helper was inlined, the method was 441 bytes plus a 652-byte out-of-line helper; inlining raised match_one's aligned instructions from 34 to 128 of 341 without changing any harness result. No production source contains copied retail instructions or retail dispatch.
 
+Retail's two 0x004a8930 calls sit right after the hasPose store at the top of the pose loop, the same shape as Motnctrl.cpp's BlendPose7 unused locals. Tried and rejected (linked masked score 0.793 unchanged unless noted): one to four unused CharacterPose locals in the call-form `BlendFirst` (VC6 still emits no constructor call) and `BlendFirst` rewritten in BlendPose7's operator form (0.575, 390 instructions).
+
 ## Receiver and call boundary
 
 The genuine Character declaration retains its virtual GameObject base. Raw D3DIMSoultreeCharacter primary COL/type descriptors place Character at nonvirtual offset zero; GameObject is a separate virtual-base view. Bike's rider producer calls the actual D3DIM constructor at 0x00407c6c and stores its returned pointer at Bike +0x5c4 at 0x00407c84. Calls at 0x004075b7 and 0x004075da pass that retained rider pointer and the embedded Character/D3DIM view at Bike +0x21c, respectively.

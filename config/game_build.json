@@ -82,7 +82,12 @@
     "?SetPositionInFrame@CarProceduralNode@@QAEXPAV1@PAUVector3@@@Z": "?SetPositionInFrame@SoultreeObject@@QAEXPAV1@PBUVec3@@@Z",
     "?WorldToLocalDirection@CarProceduralNode@@QAE?AUVector3@@ABU2@@Z": "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
     "?LocalToWorldDirection@CarProceduralNode@@QAE?AUVector3@@ABU2@@Z": "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
-    "?SetAxesPtr@CarProceduralNode@@QAEXPBUVector3@@0HH@Z": "?SetAxesPtr@SoultreeObject@@QAEXPBUVec3@@0HH@Z"
+    "?SetAxesPtr@CarProceduralNode@@QAEXPBUVector3@@0HH@Z": "?SetAxesPtr@SoultreeObject@@QAEXPBUVec3@@0HH@Z",
+    "?UnknownFunction464e80@MorphBastardModifier@@QAEXH@Z": "?UnknownFunction464e80@StatsOverlay@@QAEXH@Z",
+    "?Vec3Dot@@YAMPBUVector3@@0@Z": "?Vec3DotCall@@YAMPBUVec3@@0@Z",
+    "?CrossProduct@@YA?AUVector3@@PBU1@0@Z": "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z",
+    "?AxisAngleMatrix@@YAXPAUMatrix4@@MMMM@Z": "?AxisAngleMatrix@@YAXPAUTreeMatrix4@@MMMM@Z",
+    "??0MbVector3Call@@QAE@MMM@Z": "??0Vec3Call@@QAE@MMM@Z"
   },
   "included_sources": [
     {

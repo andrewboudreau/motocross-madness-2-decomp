@@ -6,9 +6,10 @@
 // codegen differences) and checked against the retail disassembly for control flow,
 // field offsets and stores.  They are not byte matches; see that sample for the matching
 // work.  The out-of-line helpers retail calls from ControllerAngles (0x0040ae30 dot,
-// 0x00515600 cross, 0x004a2350 row, 0x0042de90 axis-angle, 0x00436500 multiply) are
-// written here as TU-local statics with the same arithmetic so this file adds no new
-// external dependency.
+// 0x00515600 cross, 0x004a2350 row, 0x0042de90 axis-angle, 0x00436500 multiply, 0x00404e60
+// Vector3 ctor) and ModifyMesh's 0x00464e80 stub are declared below and bound to their
+// existing src/ providers through link_aliases in config/game_build.json, so the linked
+// bodies have retail's callee set (TU-local copies got inlined: linked 0.932 -> 0.942).
 #include <math.h>
 #include <string.h>
 
@@ -32,10 +33,12 @@ void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultr
     float value;
     for (int i = 0; i < objectCount; i++) {
         UpdateChannels(&morphObjects[i]);
-        // Retail calls the shared empty `ret 4` stub 0x00464e80 here with i
-        // (MorphBastardModifier::UnknownFunction464e80); it has no effect and no
-        // definition in src/, so the call is omitted.
-        MorphBastardMeshGroup* group = 0;  // best guess: retail leaves it uninitialised if no group matches
+        // The shared empty `ret 4` stub 0x00464e80, called with i (retail 0x004a4ce9);
+        // link_aliases bind it to the defined copy of that stub.
+        UnknownFunction464e80(i);
+        // As in retail, group is not initialised: a mesh without this object's node
+        // leaves it undefined (retail then reads whatever its stack slot holds).
+        MorphBastardMeshGroup* group;
         for (int g = 0; g < mesh->groupCount; g++) {
             if (mesh->groups[g].node == morphObjects[i].node)
                 group = &mesh->groups[g];
@@ -139,28 +142,26 @@ void MorphBastardModifier::ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultr
 }
 
 // ---------------------------------------------------------------------------
-// ControllerAngles helpers: TU-local copies of the out-of-line helpers retail calls
-// from its second and third axis blocks, with retail's pointer signatures and
-// arithmetic.  (Their first uses, in the x axis block, are expanded inline in retail;
-// ControllerAngles writes that block out the same way.)
+// ControllerAngles helpers: the out-of-line helpers retail calls from its second and
+// third axis blocks, declared with retail's pointer signatures (as the sample does).
+// (Their first uses, in the x axis block, are expanded inline in retail;
+// ControllerAngles writes that block out the same way.)  The defined providers are
+// VectorCalls.cpp's Vec3DotCall, CrossProduct.cpp's CrossProductCall,
+// MovingPart.cpp's GetMatrixRow, BoundingBoxTreeBuild.cpp's AxisAngleMatrix (a
+// TreeMatrix4, the same 64 bytes) and CollisionObject.cpp's CollisionMatrixMultiply;
+// config/game_build.json's link_aliases bind the names whose types differ (same cdecl
+// ABI: a reference and a pointer are both one address, and the Vector3/Vec3 views are
+// both three floats returned through a hidden pointer).
+float Vec3Dot(const Vector3* a, const Vector3* b);                   // 0x0040ae30: a.b
+Vector3 CrossProduct(const Vector3* a, const Vector3* b);            // 0x00515600: a x b
+Vector3 GetMatrixRow(const Matrix4* m, int row);                     // 0x004a2350: row of m
+void AxisAngleMatrix(Matrix4* out, float x, float y, float z, float angle); // 0x0042de90
+void CollisionMatrixMultiply(Matrix4* out, const Matrix4* a, const Matrix4* b); // 0x00436500
 
-// 0x0040ae30: a.b
-static float MbDot(const Vector3* a, const Vector3* b)
-{
-    return a->x * b->x + a->y * b->y + a->z * b->z;
-}
-
-// 0x00515600: a x b
-static Vector3 MbCross(const Vector3* a, const Vector3* b)
-{
-    return Vector3(a->y * b->z - a->z * b->y, a->z * b->x - a->x * b->z, a->x * b->y - a->y * b->x);
-}
-
-// 0x004a2350: row `row` of m as a vector.
-static Vector3 MbRow(const Matrix4* m, int row)
-{
-    return Vector3(m->m[row][0], m->m[row][1], m->m[row][2]);
-}
+// 0x00404e60: the out-of-line Vector3 constructor.
+struct MbVector3Call : Vector3 {
+    MbVector3Call(float x, float y, float z);
+};
 
 // 0x006850f0: the shared zero vector the normalisation falls back to.
 static const Vector3 kMbZero = Vector3(0.0f, 0.0f, 0.0f);
@@ -169,7 +170,7 @@ static const Vector3 kMbZero = Vector3(0.0f, 0.0f, 0.0f);
 // 0x0040ae30 and 0x00460c00).
 static inline void MbNormalizeOrZero(Vector3& v)
 {
-    float squared = MbDot(&v, &v);
+    float squared = Vec3Dot(&v, &v);
     if (squared == 0.0f) {
         v = kMbZero;
     } else {
@@ -178,44 +179,6 @@ static inline void MbNormalizeOrZero(Vector3& v)
         v.y *= scale;
         v.z *= scale;
     }
-}
-
-// 0x0042de90: rotation of `angle` radians about (x, y, z) (normalised here), row-vector
-// convention, no translation (the text of BoundingBoxTreeBuild.cpp's AxisAngleMatrix).
-static void MbAxisAngle(Matrix4* m, float x, float y, float z, float angle)
-{
-    m->m[0][3] = 0.0f;
-    m->m[1][3] = 0.0f;
-    m->m[2][3] = 0.0f;
-    m->m[3][0] = 0.0f;
-    m->m[3][1] = 0.0f;
-    m->m[3][2] = 0.0f;
-    float length = (float)sqrt(x * x + y * y + z * z);
-    x /= length;
-    y /= length;
-    z /= length;
-    float c = (float)cos(angle);
-    float s = (float)sin(angle);
-    float t = 1.0f - c;
-    m->m[0][0] = t * x * x + c;
-    m->m[0][1] = t * x * y + s * z;
-    m->m[0][2] = t * x * z - s * y;
-    m->m[1][0] = t * x * y - s * z;
-    m->m[1][1] = t * y * y + c;
-    m->m[1][2] = t * y * z + s * x;
-    m->m[2][0] = t * x * z + s * y;
-    m->m[2][1] = t * y * z - s * x;
-    m->m[2][2] = t * z * z + c;
-    m->m[3][3] = 1.0f;
-}
-
-// 0x00436500: out = b * a (row-vector convention): out[i][j] = sum_k b[i][k] * a[k][j].
-static void MbMultiply(Matrix4* out, const Matrix4* a, const Matrix4* b)
-{
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
-            out->m[i][j] = b->m[i][0] * a->m[0][j] + b->m[i][1] * a->m[1][j] +
-                           b->m[i][2] * a->m[2][j] + b->m[i][3] * a->m[3][j];
 }
 
 // 0x004a3c80 (ret 0x44): the rotation of the channel's controller relative to its rest
@@ -308,7 +271,7 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
     rotation.m[3][2] = 0.0f;
     rotation.m[3][3] = 1.0f;
     Matrix4 aligned;
-    MbMultiply(&aligned, &identity, &rotation);
+    CollisionMatrixMultiply(&aligned, &identity, &rotation);
     Vector3 alignedY = *(Vector3*)&aligned.m[1][0];
     Vector3 controllerY = *(Vector3*)&controller.m[1][0];
     Vector3 cross(alignedY.y * controllerY.z - alignedY.z * controllerY.y,
@@ -321,34 +284,34 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
     // The y axes.
     from = *(Vector3*)&identity.m[1][0];
     to = *(Vector3*)&controller.m[1][0];
-    axis = MbCross(&from, &to);
+    axis = CrossProduct(&from, &to);
     angle = AngleBetween(from, to);
     if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
         axis = Vector3(0.0f, 1.0f, 0.0f);
     else
         MbNormalizeOrZero(axis);
-    MbAxisAngle(&rotation, axis.x, axis.y, axis.z, angle);
-    MbMultiply(&aligned, &identity, &rotation);
-    cross = MbCross(&MbRow(&aligned, 2), &MbRow(&controller, 2));
-    float angleY = AngleBetween(MbRow(&aligned, 2), MbRow(&controller, 2)) * 57.2957764f;
-    if (MbDot(&to, &cross) < 0.0f)
+    AxisAngleMatrix(&rotation, axis.x, axis.y, axis.z, angle);
+    CollisionMatrixMultiply(&aligned, &identity, &rotation);
+    cross = CrossProduct(&GetMatrixRow(&aligned, 2), &GetMatrixRow(&controller, 2));
+    float angleY = AngleBetween(GetMatrixRow(&aligned, 2), GetMatrixRow(&controller, 2)) * 57.2957764f;
+    if (Vec3Dot(&to, &cross) < 0.0f)
         angleY = -angleY;
 
     // The z axes.
-    from = MbRow(&identity, 2);
-    to = MbRow(&controller, 2);
-    axis = MbCross(&from, &to);
+    from = GetMatrixRow(&identity, 2);
+    to = GetMatrixRow(&controller, 2);
+    axis = CrossProduct(&from, &to);
     angle = AngleBetween(from, to);
     if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
-        axis = Vector3(0.0f, 0.0f, 1.0f);
+        axis = MbVector3Call(0.0f, 0.0f, 1.0f);
     else
         MbNormalizeOrZero(axis);
-    MbAxisAngle(&rotation, axis.x, axis.y, axis.z, angle);
-    MbMultiply(&aligned, &identity, &rotation);
-    cross = MbCross(&MbRow(&aligned, 0), &MbRow(&controller, 0));
-    MbDot(&MbRow(&aligned, 0), &MbRow(&controller, 0));
-    float angleZ = AngleBetween(MbRow(&aligned, 0), MbRow(&controller, 0)) * 57.2957764f;
-    if (MbDot(&to, &cross) < 0.0f)
+    AxisAngleMatrix(&rotation, axis.x, axis.y, axis.z, angle);
+    CollisionMatrixMultiply(&aligned, &identity, &rotation);
+    cross = CrossProduct(&GetMatrixRow(&aligned, 0), &GetMatrixRow(&controller, 0));
+    Vec3Dot(&GetMatrixRow(&aligned, 0), &GetMatrixRow(&controller, 0));
+    float angleZ = AngleBetween(GetMatrixRow(&aligned, 0), GetMatrixRow(&controller, 0)) * 57.2957764f;
+    if (Vec3Dot(&to, &cross) < 0.0f)
         angleZ = -angleZ;
 
     channel->currentValue = -angleX;

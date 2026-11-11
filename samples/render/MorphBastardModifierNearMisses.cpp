@@ -76,6 +76,19 @@
 // matrix, cross product and rows are called; masked ratio 0.67-0.69) and
 // everything when the product is written in the body (0.63). Retail's
 // caller lies between the two, so the hand split below (0.885) is kept.
+// The linked bring-up (src/bringup/Group3_MorphBastard.cpp) keeps the hand
+// split but declares the called helpers out of line (no inline bodies) and
+// binds them with link_aliases, the z fallback through a declared-only
+// MbVector3Call stand-in for 0x00404e60: retail's exact callee multiset,
+// linked masked 0.932 -> 0.942 (strict 0.333 -> 0.357). Tried there and
+// no better: the x block's rotation stores in AxisAngleMatrix's order
+// (0.942), an inline axis-angle helper for the x block (0.936, either
+// sqrt sum order), `t*y*x` product spellings (0.942). Left: channel in
+// ebx, frame 0x1b4 vs 0x1fc, retail's t*y/t*z CSE in the x block.
+// ModifyMesh there now calls the 0x00464e80 stub with i (retail
+// 0x004a4ce9) and leaves group uninitialised like retail: the missing
+// callee is gone, masked 0.909 -> 0.908; group at function scope is the
+// same score.
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

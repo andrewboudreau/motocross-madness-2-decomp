@@ -115,7 +115,7 @@
     "target_va": "0x004a70c0",
     "target_size": 3327,
     "expect": "partial",
-    "notes": "Complete nonexact functional candidate: 3333 emitted bytes versus 3327 retail. Playback/interpolation/extrapolation, transition and slot4/5 application match 835584 native complete-state and pose scenarios. Explicit vector call views preserve float rounding between blend extrapolation operations; playback rotation retains the integer fps in x87 while translation receives float fps. Blend rotation preserves its separate multiply order. All three existing strict helper cases remain exact. Original constructor-local counts remain inferred; register allocation and some inline decisions differ. See docs/MOTION_PLAYBACK.md for evidence and unresolved external provider boundaries.",
+    "notes": "Complete nonexact functional candidate: 3333 emitted bytes versus 3327 retail. Playback/interpolation/extrapolation, transition and slot4/5 application match 835584 native complete-state and pose scenarios. Explicit vector call views preserve float rounding between blend extrapolation operations; playback rotation retains the integer fps in x87 while translation receives float fps. Blend rotation preserves its separate multiply order. All three existing strict helper cases remain exact. Original constructor-local counts remain inferred; register allocation and some inline decisions differ. See docs/MOTION_PLAYBACK.md for evidence and unresolved external provider boundaries. Unused CharacterPose counts in BlendPose7/BlendPose7B swept (linked masked score, 0x004a8930 ctor calls; retail calls it 6 times; current 3/5: 0.905, 5 calls): 4/5 0.904 (6 calls), 4/6 0.905 (8), 2/any 0.878-0.881, 4-5/4 0.480; 3/5 kept.",
     "bindings": "Motnctrl.bindings.json"
   }
 ]
