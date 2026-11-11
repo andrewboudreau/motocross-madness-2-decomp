@@ -12,6 +12,7 @@
 // PhysicsRigidBody.cpp). Neighbouring source strings are PCVideoCard.cpp (before)
 // and Pixtrans.cpp (after), which fits alphabetical link order.
 #include "PhysicsBody.h"
+#include "math/Math3D.h"   // Vec3 operators, Quat/matrix helpers and the per-TU constant vectors
 
 // 0x004cbc50.
 PhysicsBody::PhysicsBody(int flags)

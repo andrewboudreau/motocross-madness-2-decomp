@@ -122,7 +122,7 @@ class QuaternionStorageTests(unittest.TestCase):
                 self.assertEqual(fingerprint(whole(obj)),pin,source)
             full=objects['PhysicsRigidBody']
             original=(ROOT/RIGID).read_text();reset_source=out/'ResetState.cpp'
-            reset_source.write_text('#include <string.h>\n#include "'+str(ROOT/'src/krusty2/rigidbody/PhysicsBody.h').replace('\\','/')+'"\n'+extract(original,'void PhysicsRigidBody::ResetState()')+'\n')
+            reset_source.write_text('#include <string.h>\n#include "'+str(ROOT/'src/krusty2/rigidbody/PhysicsBody.h').replace('\\','/')+'"\n#include "'+str(ROOT/'src/krusty2/math/Math3D.h').replace('\\','/')+'"\n'+extract(original,'void PhysicsRigidBody::ResetState()')+'\n')
             reset=compile_source(reset_source,'reset')
             self.assertEqual(function(reset,RESET),function(full,RESET))
             self.assertTrue(compare(pe,reset,RESET,0x4cc500,256,ROOT/'src/krusty2/rigidbody/PhysicsRigidBody.bindings.json')['strict_exact'])

@@ -1,6 +1,6 @@
 // PhysicsBody.h -- PhysicsBody / PhysicsRigidBody layout (MCM2 retail, VC6 SP3).
 //
-// Owner: opus_rigidbody. Uses the shared math in ../common/Math3D.h.
+// Owner: opus_rigidbody. Uses the shared math in ../math/Math3D.h (from the .cpp files).
 //
 // Class evidence:
 //  * RTTI .?AVPhysicsBody@@ and .?AVPhysicsRigidBody@@ (tier 1). Complete-object
@@ -17,8 +17,22 @@
 #ifndef MCM2_PHYSICS_RIGIDBODY_PHYSICSBODY_H
 #define MCM2_PHYSICS_RIGIDBODY_PHYSICSBODY_H
 
-#include "math/Math3D.h"
-#include "core/GraphicsTest.h"
+// Relative includes: Wrecker.h (src/reconstructed) includes this header for the body
+// Wrecker creates at +0x40, and Wrecker.cpp is compiled without src/krusty2 on the path.
+// math/Math3D.h is included by PhysicsBody.cpp and PhysicsRigidBody.cpp, not here: its
+// per-TU constant vectors would clash with the Vector3 set wrecker.cpp defines for itself.
+#include "../math/Vec3.h"
+#include "../math/Quat.h"
+#include "../../reconstructed/Matrix4.h"
+#include "../core/GraphicsTest.h"
+
+class SoultreeObject;
+
+// State integrator callback, as stored in PhysicsBody (+0x238) and called by
+// PhysicsRigidBody's step (__cdecl, 4 args, caller cleans 0x10). 'deriv' points at
+// TWO consecutive n-float derivative blocks: deriv[0..n-1] (current) and
+// deriv[n..2n-1] (previous step).
+typedef void (*IntegrateFn)(float dt, int n, float* state, float* deriv);
 
 // GameObject and GraphicsTest are the canonical classes (core/GraphicsTest.h).
 // GameObject slot 14 returns int there (0x00469360; PhysicsBody's 0x004cbf10 returns 1).

@@ -80,13 +80,8 @@ inline Vec3 CrossProduct(const Vec3& a, const Vec3& b)
 // argument (caller cleans), so e.g. QuatNormalize is called as push q; push &ret.
 // ---------------------------------------------------------------------------
 
-// Quaternion {w, x, y, z}: scalar part FIRST. Tier 2: QuatDerivative (0x004a1f90)
-// computes result[+0] = -0.5 * (q[+4]*w.x + q[+8]*w.y + q[+12]*w.z), which is the
-// scalar part of 0.5 * q (x) (0, w) only when +0 is the scalar and +4..+12 the vector.
-// The same order is the one QuatToMatrix (0x004a1e10) needs to produce a rotation.
-struct Quat {
-    float w, x, y, z;
-};
+// Quaternion {w, x, y, z}, scalar part first (Quat.h).
+#include "Quat.h"
 
 // 0x004a13e0, 41 bytes: returns an all-zero matrix (rep stosd into a local, copied
 // out). This is NOT an identity matrix. Tier 1 behavior, tier 3 name.
@@ -114,13 +109,7 @@ Quat QuatNormalize(const Quat& q);
 // angular velocity w, dq/dt = 0.5 * q (x) (0, w). Tier 2 (decoded arithmetic).
 Quat QuatDerivative(const Quat& q, const Vec3& w);
 
-// State integrator callback, as stored in PhysicsBody (+0x238) and called by
-// PhysicsRigidBody's step (__cdecl, 4 args, caller cleans 0x10). 'deriv' points at
-// TWO consecutive n-float derivative blocks: deriv[0..n-1] (current) and
-// deriv[n..2n-1] (previous step).
-typedef void (*IntegrateFn)(float dt, int n, float* state, float* deriv);
-
-// 0x004a1d10, 71 bytes: the default IntegrateFn installed by the PhysicsBody
+// 0x004a1d10, 71 bytes: the default IntegrateFn (rigidbody/PhysicsBody.h) installed by the PhysicsBody
 // constructor. It is a two-step Adams-Bashforth step:
 //   state[i] += (3*deriv[i] - deriv[n+i]) * dt * 0.5f;  deriv[n+i] = deriv[i];
 // Tier 1 for the arithmetic (decoded), tier 3 for the name.

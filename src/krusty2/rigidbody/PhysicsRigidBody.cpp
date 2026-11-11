@@ -13,6 +13,7 @@
 // link order.
 #include <string.h>
 #include "PhysicsBody.h"
+#include "math/Math3D.h"   // Vec3 operators, Quat/matrix helpers and the per-TU constant vectors
 
 // ---------------------------------------------------------------------------
 // PhysicsBody members placed in this TU
