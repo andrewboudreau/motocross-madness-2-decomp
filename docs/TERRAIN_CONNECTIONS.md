@@ -105,7 +105,7 @@ The five production QueryGround view names now use the canonical declaration;
 see [the caller connection proof](TERRAIN_QUERY_CONNECTIONS.md). That change
 preserves caller bytes and does not accept the provider's behavior.
 The existing provider at 0x00507c10 is registered as partial. Its current native
-COFF extent is **3255 bytes**, against the complete **2963-byte** retail body,
+COFF extent is **3587 bytes**, against the complete **2963-byte** retail body,
 with a separate 370-byte local conversion helper. Unresolved helper bindings
 still prevent a complete strict comparison.
 

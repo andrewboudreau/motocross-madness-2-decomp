@@ -2,9 +2,9 @@
   "baseline": "Current published ae991302 plus reviewed quaternion/Wrecker composition; only exact Terrain.cpp filename root normalization. No consumer changes.",
   "objects": {
     "src/krusty2/broadphase/Terrain.cpp": {
-      "sections": 86,
-      "relocations": 517,
-      "sha256": "5cd9b2cdac23d022eff1b6a568dfafe6ef4b0900c4de0317624c38da611bcdd0"
+      "sections": 87,
+      "relocations": 529,
+      "sha256": "1208648982367eebd35ef8e514bf27984a95c514113b281fc6abcd4195dbdcd8"
     }
   }
 }

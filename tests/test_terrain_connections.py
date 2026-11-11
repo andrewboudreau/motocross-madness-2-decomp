@@ -49,12 +49,16 @@ PARTIAL = (
     # and fresh test objects remain identical by resolved destination.
     # Including PCVideoCard.h for the +0xc display renumbers it again
     # ($L6173 -> $L6423, still .text$x+0xb6); the body bytes are identical.
-    ('?Load@Terrain@@', 2117, '90f8b0156be8e7e164122b2a123eafa6e63d31f69d0fc5cfbbade355e34504dc'),
+    # QueryGround's retail dead smooth-normal store renumbers it once more;
+    # Load's bytes and relocation types/targets are otherwise unchanged.
+    ('?Load@Terrain@@', 2117, '6537190b68defcf5b15b670922d3562cf24b1ac868fb0885b6ad8a1af80f5493'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with
     # complete bytes/relocations preserved under those explicit substitutions.
-    ('QueryGround', 3255, '6962fa1f6369f5d34b4feb6fe57de2354071bb9dee7893f5a30e008bd10d652c'),
+    # Re-pinned for the retail smooth-normal dead store in the even/(0,1,3)
+    # flat branch (0x005082f6..0x0050843a): 3255 -> 3587 bytes.
+    ('QueryGround', 3587, '53c96a94e7710e55f4b01e0e72d892d4535b68ec4a28c86b4015e5c26e41ddb9'),
 )
 
 

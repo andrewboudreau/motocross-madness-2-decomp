@@ -85,9 +85,9 @@
       "sha256": "128c7efffa87aff26cfb4d6f575ea209c535e1eb0c55c5d8609cf1128d99e823"
     },
     "src/krusty2/broadphase/Terrain.cpp": {
-      "sections": 86,
-      "relocations": 517,
-      "sha256": "1d5811387cecf7ffa949153435fa0fdd0316492175046769c67d7b331bf2cc19"
+      "sections": 87,
+      "relocations": 529,
+      "sha256": "45a29ace54d5270f713a7229de05dcf46cb5f128f0d95b9fecf3fe77f9e61eb8"
     }
   },
   "pointer_imports": {

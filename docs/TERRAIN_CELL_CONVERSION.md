@@ -38,9 +38,12 @@ GetCellCorners callback stops execution before interpolation. Later helpers
 fail immediately if reached. Thus height interpolation, normal/material
 selection and complete QueryGround behavior remain unverified.
 
-QueryGround remains nonexact: **3255 emitted bytes** against **2963 retail
+QueryGround remains nonexact: **3587 emitted bytes** against **2963 retail
 bytes**, plus a **370-byte** local conversion helper without a claimed retail
-identity. The former candidate was 3321 bytes. Unresolved helper bindings
+identity. The former candidates were 3321 and 3255 bytes; the 3587-byte body
+adds retail's dead smooth-normal store in the even (0,1,3) flat-shaded branch
+(0x005082f6..0x0050843a), which retail computes and then overwrites with the
+face normal. Unresolved helper bindings
 prevent a complete strict comparison. Its non-gating relocation-masked score
 changes from 65/2711 to 54/2707 matching positions; this is an intentional
 behavior repair, not a byte-preservation claim for that partial function.

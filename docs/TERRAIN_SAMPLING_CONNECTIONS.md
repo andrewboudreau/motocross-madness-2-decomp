@@ -28,7 +28,7 @@ The private `terrain-math-round21-preservation.json` report preserves **125
 complete nondebug sections and 785 relocations** across Terrain.cpp and
 BoundingBoxTreeBuild.cpp under the four external-name substitutions. Local
 targets retain their section identity and offset. This includes the entire
-**3255-byte nonexact QueryGround** and **2117-byte nonexact Load**. Load's EH
+**3587-byte nonexact QueryGround** and **2117-byte nonexact Load**. Load's EH
 label changes from `$L4924` to `$L5863`, both section 29 at offset 182; named
 fingerprints are refreshed only after verifying that identity.
 

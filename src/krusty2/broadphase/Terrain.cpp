@@ -968,6 +968,10 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
                 TerrainVec3 face;
                 TriangleNormal(reinterpret_cast<const Vector3*>(&v[0]), reinterpret_cast<const Vector3*>(&v[1]),
                                reinterpret_cast<const Vector3*>(&v[3]), reinterpret_cast<Vector3*>(&face), 0);
+                // Retail (0x005082f6..0x0050843a) also blends and stores the smooth normal
+                // here, then overwrites it with the face normal below: a dead store in the
+                // original, kept because it is retail's code (no other side effects).
+                *normal = TerrainNormalize(n[0] / w[0] + n[1] / w[1] + n[3] / w[3]);
                 if (TerrainDotInline(face, kVec3YAxis) < 0.0f)
                     *normal = -face;
                 else
