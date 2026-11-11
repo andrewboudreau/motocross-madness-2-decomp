@@ -3,7 +3,8 @@
 The behavioural tests compile each case's SOURCE with authentic VC6 and its configured flags
 (config/game_build.json), run retail and the candidate under unicorn at 53- and 24-bit precision
 and require identical outcomes. Negative controls show that the cases see the rounding: the
-four-pose blend without /Op and the trick pick without /QIfist must differ.
+four-pose blend without /Op, the trick pick without /QIfist and the radar clip with its old
+two-hit reference must differ.
 """
 from __future__ import annotations
 
@@ -40,12 +41,26 @@ CLEAN_CASES = {
     'd3dim_shadow_slot30': 200,
     # Out-of-int focal lengths differ by design (plain helper, see the case docstring).
     'terrain_prepare_geometry': (400, {'EXTREME_EVERY': 0}),
+<<<<<<< HEAD
     # Small counts that still catch, with the default seed: the corner-3 normal and height
     # add order before d3c99491 (QueryGround), a reassociated transform-point row
     # (SetTransform) and round-half-up at the midpoint fistp ties (IntersectSegment).
     'terrain_query_ground': 40,
     'collision_set_transform': 40,
     'gridnode_intersect_segment': 80,
+=======
+    # Second differential sweep (docs/GAME_BUILD.md): non-exact linked bodies that agree.
+    'segment_segment_distance': 100,
+    'rotate_pose': 100,
+    'pose_rotation': 100,
+    'character_slot7': 100,
+    'transform_points': 100,
+    'halve555': 60,
+    'halve565': 60,
+    'convert555_to8': 40,
+    'bitstring_read': 200,
+    'radar_line_circle': 200,
+>>>>>>> d9eae4bf (emu_diff: cases for nine more non-exact linked bodies, radar negative control)
 }
 
 
@@ -121,6 +136,20 @@ class DifferentialTests(unittest.TestCase):
     def test_trick_pick_without_qifist_differs(self):
         # __ftol truncates where retail's fistp rounds to nearest.
         summary = self.run_case('krusty_trick_pick', 200, [])
+        self.assertGreater(summary.mismatches, 0)
+
+    def test_radar_reference_from_hit_buffer_differs(self):
+        # The pre-fix shape measured the two hits against the output buffer, not the fourth argument.
+        module = emu_diff.load_case('radar_line_circle')
+        text = (ROOT / module.SOURCE).read_text(encoding='latin-1')
+        old = text.replace('reference[1] - y', 'point[1] - y').replace('reference[0] - x', 'point[0] - x')
+        self.assertNotEqual(old, text)
+        with tempfile.TemporaryDirectory(prefix='emu-diff-test-') as tmp:
+            source = Path(tmp) / 'radar_old.cpp'
+            source.write_text(old, encoding='latin-1')
+            obj = emu_diff.compile_source(str(source), Path(tmp) / 'candidate.obj',
+                                          ['/I' + str(ROOT / 'src' / 'bringup')])
+            summary = emu_diff.run_diff(module, obj, n=60, retail=Path(os.environ['MCM2_EXE']), show=1)
         self.assertGreater(summary.mismatches, 0)
 
 
