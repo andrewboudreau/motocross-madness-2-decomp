@@ -24,6 +24,16 @@ class GridVertexSink {
 public:
     void LightVertices(void* matrix, int count, void* vertices, void* buffer,
                        int stride, int flags);  // 0x0049e4a0
+
+private:
+    // Retail calls the workers as thiscall on the LightManager with the five
+    // leading arguments (`mov ecx, esi` before each call).
+    void LightAny(const float* matrix, int count, void* normals, void* buffer,
+                  int stride);  // 0x0049e6b0
+    void LightOne(const float* matrix, int count, void* normals, void* buffer,
+                  int stride);  // 0x0049f1c0
+    void LightAmbientPlusOne(const float* matrix, int count, void* normals, void* buffer,
+                             int stride);  // 0x0049f8d0
 };
 
 // LightEmitter.h's lightType values the workers distinguish.
@@ -126,8 +136,9 @@ static void Group4Vis_PointLightVector(const float* lightPosition, const float* 
 // per-vertex sums; point, positional and directional lights add their
 // rounded diffuse terms where they face the vertex; the sums are clamped
 // and packed.
-static void Group4Vis_LightAny(LightManager* manager, const float* matrix, int count, void* normals,
-                               void* buffer, int stride) {
+void GridVertexSink::LightAny(const float* matrix, int count, void* normals, void* buffer,
+                              int stride) {
+    LightManager* manager = reinterpret_cast<LightManager*>(this);
     float inverse[16];
     int i;
     int light;
@@ -197,8 +208,9 @@ static void Group4Vis_LightAny(LightManager* manager, const float* matrix, int c
 // per-vertex sums are left alone). Point and positional lights leave
 // back-facing vertices unwritten; a directional light writes every vertex,
 // back-facing ones with negative terms (retail does not clamp them).
-static void Group4Vis_LightOne(LightManager* manager, const float* matrix, int count, void* normals,
-                               void* buffer, int stride) {
+void GridVertexSink::LightOne(const float* matrix, int count, void* normals, void* buffer,
+                              int stride) {
+    LightManager* manager = reinterpret_cast<LightManager*>(this);
     LightEmitter* emitter = manager->lights[0];
     float inverse[16];
     float toLight[3];
@@ -261,8 +273,9 @@ static void Group4Vis_LightOne(LightManager* manager, const float* matrix, int c
 // Each vertex gets ambient plus the other light's rounded term where it
 // faces the light, otherwise the ambient colour alone. When a colour array
 // is pending (field_0x114) the clamped sums are kept per vertex too.
-static void Group4Vis_LightAmbientPlusOne(LightManager* manager, const float* matrix, int count,
-                                          void* normals, void* buffer, int stride) {
+void GridVertexSink::LightAmbientPlusOne(const float* matrix, int count, void* normals,
+                                         void* buffer, int stride) {
+    LightManager* manager = reinterpret_cast<LightManager*>(this);
     float inverse[16];
     int ambientIndex;
     Group4Vis_InvertRigid(matrix, inverse);
@@ -337,13 +350,25 @@ static void Group4Vis_LightAmbientPlusOne(LightManager* manager, const float* ma
 // buffer growth (free/alloc lines 0x13c/0x143, capacity cleared on failure), the
 // worker dispatch (0x0049f1c0 for one light, 0x0049f8d0 for two with an ambient
 // one, else 0x0049e6b0, each called out of line as here) and the modulation loop
-// (no alpha) agree. The size gap (366 built vs 167 retail instructions) is the
-// three X87FloatToInt expansions and retail's ebp frame.
+// (no alpha) agree. Shape: retail stores the flag with a branch (if/else, not a
+// select), calls the workers thiscall on `this` with the five leading arguments,
+// converts the colour bytes as unsigned (dead high-dword zero store, fimul) and
+// scales red/256 before the byte multiply (unparenthesised, VC6 multiplies the
+// byte first; exact either way since 1/256 is a power of two; the parentheses
+// raise match_one 58 -> 60 aligned but the linked difflib score, dominated by
+// the X87FloatToInt expansions, reads 0.458 vs 0.477 without). The remaining
+// size gap (370 built vs 167 retail instructions) is the three X87FloatToInt
+// expansions and retail's ebp frame, which comes from the inline-asm fistp.
+// Ruled out: `/ 256.0f`, `0.00390625f` (same code as `* (1.0f / 256.0f)`);
+// re-reading the colour through a pointer per channel (worse).
 void GridVertexSink::LightVertices(void* matrix, int count, void* vertices, void* buffer, int stride,
                                    int flags) {
     LightManager* manager = reinterpret_cast<LightManager*>(this);
     void* colors = (void*)flags;
-    manager->field_0x114 = colors != 0 ? 1 : 0;
+    if (colors)
+        manager->field_0x114 = 1;
+    else
+        manager->field_0x114 = 0;
 
     if (count > manager->vertexCapacity) {
         if (manager->vertexRed)
@@ -361,22 +386,22 @@ void GridVertexSink::LightVertices(void* matrix, int count, void* vertices, void
 
     const float* m = (const float*)matrix;
     if (manager->lightCount == 1)
-        Group4Vis_LightOne(manager, m, count, vertices, buffer, stride);
+        LightOne(m, count, vertices, buffer, stride);
     else if (manager->lightCount == 2 && (manager->lights[0]->lightType == kGroup4LightAmbient ||
                                           manager->lights[1]->lightType == kGroup4LightAmbient))
-        Group4Vis_LightAmbientPlusOne(manager, m, count, vertices, buffer, stride);
+        LightAmbientPlusOne(m, count, vertices, buffer, stride);
     else
-        Group4Vis_LightAny(manager, m, count, vertices, buffer, stride);
+        LightAny(m, count, vertices, buffer, stride);
 
     if (colors) {
         for (int i = 0; i < count; i++) {
             unsigned int color = *Group4Vis_VertexDiffuse(colors, i);
-            int r = X87FloatToInt((float)manager->vertexRed[i] * (1.0f / 256.0f) *
-                                      (float)(int)((color >> 16) & 0xff) - 0.5f);
-            int g = X87FloatToInt((float)manager->vertexGreen[i] * (1.0f / 256.0f) *
-                                      (float)(int)((color >> 8) & 0xff) - 0.5f);
-            int b = X87FloatToInt((float)manager->vertexBlue[i] * (1.0f / 256.0f) *
-                                      (float)(int)(color & 0xff) - 0.5f);
+            int r = X87FloatToInt(((float)manager->vertexRed[i] * (1.0f / 256.0f)) *
+                                      (float)((color >> 16) & 0xff) - 0.5f);
+            int g = X87FloatToInt(((float)manager->vertexGreen[i] * (1.0f / 256.0f)) *
+                                      (float)((color >> 8) & 0xff) - 0.5f);
+            int b = X87FloatToInt(((float)manager->vertexBlue[i] * (1.0f / 256.0f)) *
+                                      (float)(color & 0xff) - 0.5f);
             *Group4Vis_VertexDiffuse(buffer, i) = ((r << 8 | g) << 8) | b;
         }
     }

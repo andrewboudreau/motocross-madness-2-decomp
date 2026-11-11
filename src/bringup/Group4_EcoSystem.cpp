@@ -351,6 +351,15 @@ static inline int UnknownEcoTgaIsSet(UnknownTgaFile* tga, float x, float z) {
 // A draw picks a definition from the PercentBias table and must pass the
 // probability TGAs, the slope and altitude bell curves and, with
 // `checkCodes`, the QuadTree code test.
+// Audited against retail (2026-11-11): rings, cluster pick, ComputeCode
+// argument order, threshold, TGA clamps, slope/altitude terms, placement and
+// free loops agree. Retail weights the definition TGA as
+// (channel * probability) * 1/255 inside each format branch; this source does
+// (channel * 1/255) * probability. The first product is exact either way
+// (8-bit channel times a 24-bit float), so both round the same exact triple
+// product once and give identical floats. Spelling it in retail's order (an
+// inline `scale` helper, by value or by reference) reallocates ebx/ebp across
+// the whole body and lowers the linked score (0.918 -> 0.914), so it is not used.
 int EcoSystem::GenerateObjects(int checkCodes) {
     UnknownTgaFile* tgas[256];
     float definitionIndex[256];
