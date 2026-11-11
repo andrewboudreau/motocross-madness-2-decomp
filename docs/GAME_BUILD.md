@@ -1964,6 +1964,82 @@ the body was run with `tools/emu_diff.py` under control words 0x027f and
   emulation. A static diff hides an argument swap like that one when the
   pushes come from equal-looking stack slots, so such bodies need emulation.
 
+## Loading dialog close path
+
+A live run of the source build on 2026-10-30 showed the following. The loading
+dialog's timer fired, and `EndDialog` ran after about 1.2 s
+(`g_LoadingTimerTicks` reached 11). Even so, the loading backdrop stayed on
+screen behind the live race HUD for minutes. The close path was traced in
+retail and in the build. No step of it differs.
+
+- **Timer.** `LoadingDlg::HandleEvent` 0x00451020 handles kind 7 (the timer).
+  Once the tick count reaches 10, it calls `EndDialog` on the event's dialog
+  (+0xc), at 0x00451078 and 0x004510ac. `UIDialog::Tick` 0x0046ef00 builds
+  that event with +0xc set to the dialog. It stops raising timer events once
+  isClosing (+0x7f50) is set (0x0046ef79).
+- **EndDialog.** `EndDialog` 0x0046ff30 stores the result (+0x17c), sets
+  isClosing and copies the render context's (+0x18) frameCount (+0x1c) into
+  closeFrame (+0x7f54).
+- **Marking.** `UIDialog::RenderPost3D` 0x0046f320 calls slot 26 (+0x68)
+  once closeFrame differs from frameCount (0x0046f38d-0x0046f3a9). Slot 26
+  is `MarkPendingRelease` 0x004692c0, which sets bit 3 of +0x25 on the
+  dialog and all its children.
+- **Removal.** `Game::Tick` calls the root's (+0x2f4) `ReleaseDetached` at
+  0x0046883c. `ReleaseDetached` 0x00469c80 unlinks each marked child
+  (`Unlink` 0x004691f0) and releases it through slot 2.
+- **Frame counter.** Right after the removal, `Game::Tick` calls
+  `RenderTarget::AdvanceFrame` 0x004e8cc0 on its render target (+0x10), at
+  0x00468844. `AdvanceFrame` always increments frameCount. Its other retail
+  callers, 0x00486202, 0x00486535 and 0x004cb62d, are linked too.
+
+What was ruled out:
+
+- **Linked bodies.** Every body above scores 1.000 masked in the current
+  build. `Game::Tick` scores 0.749 and differs only by its QPC clock. The
+  same holds for the 2026-10-30 tree (7d8fe635), rebuilt and scored with
+  today's tools. Its `UIDialog::Tick` scored 0.865 and differed only in
+  block layout.
+- **Vtables.** The vtable audit is `ok` for `LoadingDlg` and `UIDialog` in
+  both builds.
+- **Emulation.** These cases agree with retail:
+  - `ui_dialog_end_dialog`
+  - `ui_dialog_render_post3d`
+  - `game_object_mark_pending_release`
+  - `game_object_release_detached` (real `Unlink`, a recursive self-call
+    and the iterator lock)
+  - `render_target_advance_frame`
+  - `loading_dlg_handle_event`
+
+  All are integer bodies run at 0x027f. They do see a bug in this path.
+  Each of three source mutations differs from retail:
+
+  | Mutation | Differing runs |
+  |---|---|
+  | `closeFrame ==` in place of `!=` | 44 of 60 |
+  | closeFrame + 1 | 29 of 60 |
+  | `Unlink` in place of `Release` | 28 of 60 |
+
+Next suspect: the backdrop is a stale colour buffer, not a live dialog
+(inference, not confirmed).
+
+- **No colour clear.** The race loaders set
+  `clearTarget = !(skyCube && skyCubeOn)`, in QuarryStuntEvent.cpp and
+  Group3_QuarryLoad.cpp. During a race with the sky on,
+  `PCRenderTarget::Clear` 0x004c5510 therefore clears only Z. The last 2D
+  loading frame stays in the flip chain wherever the 3D scene draws nothing.
+- **3D gaps in the 2026-10-30 build.** The vtable audit of that tree finds
+  render slots falling back to `GameObject`'s empty ones:
+  - D3DIMSoultreeObject (+12) and SoultreePhysicsObject (+552), slots 12,
+    14 and 25 (`PrepareGeometry`, `Render3D` and `AttachRenderContext`).
+    36ac96be fixed this.
+  - 21 other missing overrides.
+
+  The terrain visibility walk was fixed later, in 943ffd05 and 56d9ba86.
+
+To check this, run the current build live. Turn the sky cube off, or force
+`clearTarget`. If the backdrop is then cleared, the cause is the uncleared
+buffer under an incomplete 3D scene. It is not the dialog close.
+
 ## Source-built run status
 
 The source-built `mcm2.exe` (391/391 translation units, zero unresolved

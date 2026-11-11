@@ -175,6 +175,14 @@ CLEAN_CASES = {
     'bailout_dlg_handle_event': 100,
     'bunny_dlg_handle_event': 100,
     'sp_race_info_handle_event': 100,
+    # Loading-dialog close path (EndDialog -> RenderPost3D -> MarkPendingRelease ->
+    # ReleaseDetached, AdvanceFrame): the backdrop-stays-up report of 2026-10-30.
+    'ui_dialog_end_dialog': 100,
+    'ui_dialog_render_post3d': 100,
+    'game_object_mark_pending_release': 100,
+    'game_object_release_detached': 100,
+    'render_target_advance_frame': 100,
+    'loading_dlg_handle_event': 100,
 }
 
 # Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).
