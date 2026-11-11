@@ -846,6 +846,44 @@ differences are:
 - `Vegetation::TestDistance`, which reads the shared detail band pointer
   that `EcoSystem.cpp` sets instead of recomputing it.
 
+## Low-scoring linked bodies audited against retail
+
+Each body was checked against the full retail extent. The scores are linked
+masked scores from `linked_accuracy.py`, before and after.
+
+| VA | Function | Provider | Before | After | Built/retail insns |
+|---|---|---|---|---|---|
+| 0x00481de0 | `DrawableGridNode::WalkVisibilityQuadrants` | GriddrawNearMisses | 0.725 | 0.733 | 499/500 |
+| 0x004a9e80 | `KbPlayer::Fn_004A9E80` | Group3_FollowedRacer | 0.735 | 0.987 | 78/78 |
+| 0x00423ef0 | `GR_BitString::ReadBits` | BitStringRead | 0.218 | 0.505 | 50/45 |
+| 0x004a1b00 | `TransformPoints` | Group0_Math | 0.275 | 0.336 | 67/76 |
+| 0x004d0d40 | `Convert555To8Fast` | Group0_Pixtrans | 0.369 | 0.418 | 51/83 |
+| 0x0043dc60 | `DrawableCube::BuildFaceGeometry` | CubeDrawNearMisses | 0.622 | 0.622 | 240/252 |
+| 0x004f3720 | `MultiPlayerDlg::AddChatLine` | Group5_MultiPlayerDlg | 0.804 | 0.804 | 110/114 |
+
+- **Behaviour fix, WalkVisibilityQuadrants.** After the four quadrant calls
+  the count test compared `depth + 1 == 8`. Retail reloads `esi` from the
+  halved `size` slot at 0x4820fe and tests `cmp esi, 8` at 0x482370, so the
+  condition is `size == 8 || size == 16`. Child blocks are walked with size
+  16 at depth 0, so the old test skipped the first subdivision, the halved
+  size 8. There, an empty count did not clear the mask, and a new count did
+  not set `changed`.
+- **Fn_004A9E80.** The race view at +0x34 is reread at every use, as retail
+  does, and the best run is compared through locals. Only the known
+  `fstp` scheduling difference is left (samples/race/FollowRacerNearMisses.cpp).
+- **ReadBits, TransformPoints, Convert555To8Fast.** No behaviour difference
+  was found. The source now has retail's shape where C++ can express it:
+  - ReadBits uses one result accumulator and no unreachable shift masks;
+  - TransformPoints uses end-biased pointers and negated offsets;
+  - Convert555To8Fast reads two pixels per dword.
+
+  Retail's `bswap`, its ebp frames and its packed stores look hand-written
+  (inference), so these scores are capped.
+- **BuildFaceGeometry and AddChatLine.** Every switch case, call, string and
+  format was checked; they agree with retail. What remains is block layout.
+- **Halve555/Halve565** (0.715/0.709) were not changed. An earlier audit
+  found no behaviour difference; the gap is the packed path.
+
 ## ProjectedShadow near-miss bodies
 
 `src/bringup/Group5_ProjectedShadow.cpp` used to provide ComputeBounds, RenderShadow,

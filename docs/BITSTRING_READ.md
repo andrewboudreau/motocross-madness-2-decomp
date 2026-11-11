@@ -17,7 +17,7 @@ except a zero-count read at used 0, whose mask is 0 anyway. VC6 emits plain
 `shr`/`shl reg, cl`, so x86 semantics apply as in retail. The 205,632-case
 native comparison below still passes. Positional strict matching fell from
 8/157 to 1/150, but the instruction stream is closer to retail. The linked
-masked score rose from 0.218 to about 0.42, with 50 built instructions
+masked score rose from 0.218 to 0.505, with 50 built instructions
 against retail's 45. The remaining gap is retail's ebp frame and single
 exit, a `bswap` C cannot express, and its `cmp eax, 0`.
 

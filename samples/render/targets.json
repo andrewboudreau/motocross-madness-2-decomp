@@ -42,6 +42,6 @@
     "target_size": 125,
     "expect": "partial",
     "bindings": "BitStringRead.bindings.json",
-    "status": "Complete nonexact candidate (1/150 strict, linked masked score ~0.42, docs/BITSTRING_READ.md). Retail's ebp frame, bswap and store-then-reload local return look like inline assembly (inference), so an exact C++ form is unlikely."
+    "status": "Complete nonexact candidate (1/150 strict, linked masked score 0.505, docs/BITSTRING_READ.md). Retail's ebp frame, bswap and store-then-reload local return look like inline assembly (inference), so an exact C++ form is unlikely."
   }
 ]
