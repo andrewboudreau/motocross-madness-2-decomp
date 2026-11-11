@@ -34,7 +34,7 @@
 //   contributes to the denominator and to the relative velocity (null -> zero vector 0x579830).
 //   Other content of this TU: the contact callback 0x43b800 and the four kVec3 initializer pairs
 //   0x43c8e0..0x43ca1b.  The pixel blend helpers just before it (0x43b320..0x43b7f9,
-//   samples/physics/constraint/PixelBlend.cpp) have no literal tying them to this unit.
+//   src/reconstructed/PixelBlend.cpp; 0x43b660 in its sample) have no literal tying them here.
 //
 #include "ConstraintMethodCollisionModel.h"
 #include "math/Vec3.h"
