@@ -151,16 +151,17 @@ int BikeRace::AimCamera(int caster) {
 }
 
 // Inline: racer `index` in camera order (own racer first, then the AI or
-// remote racers).
+// remote racers). The player count is read at each test: retail re-tests
+// `playerCount > 1` after the `index == 0` miss (`cmp ecx, 1` twice at
+// 0x0041f2f6/0x0041f304), which a `players` local lets VC6 thread away.
 inline UnknownBikeRaceRacer* BikeRace::UnknownFunctionRacerAt(int index) {
-    int players = g_TrackGame->playerCount;
-    if (players == 1 && index == 0) {
+    if (g_TrackGame->playerCount == 1 && index == 0) {
         return localRacer;
     }
-    if (players > 1 || index < players) {
+    if (g_TrackGame->playerCount > 1 || index < g_TrackGame->playerCount) {
         return racerSlots[index];
     }
-    return aiRacers[index - players];
+    return aiRacers[index - g_TrackGame->playerCount];
 }
 
 // 0x0041f1d0
@@ -362,7 +363,15 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
         *a -= Scale(*b, 4.66f);
         gridSlotStep = Vector3(b->z, 0.0f, -b->x);
         gridFirstSlot = *a - Scale(Scale(Scale(gridSlotStep, 6.75f), raceTerrain->gridCellSize), side);
-        gridSlotStep = Scale(gridSlotStep, raceTerrain->gridCellSize * 15.5f / (racerCount + 1) * side);
+        {
+            // Scaled in place through a reference: retail multiplies each
+            // component at [eax], [eax + 4], [eax + 8] (0x00421453).
+            float step = raceTerrain->gridCellSize * 15.5f / (racerCount + 1) * side;
+            Vector3& slotStep = gridSlotStep;
+            slotStep.x *= step;
+            slotStep.y *= step;
+            slotStep.z *= step;
+        }
         *a = Scale(gridSlotStep, (float)count) + gridFirstSlot;
         break;
     }

@@ -15,18 +15,18 @@
       "?NextCameraTarget@BikeRace@@",
       4321744,
       881,
-      881,
-      266,
-      "42791867fd4e02d2037db3c5b8b7b510e8e2abdab85c7bee4ca296a2efe4c49d"
+      887,
+      313,
+      "f54896a0a560c6bb8a14d38abcca9710bcf5716193e6e49104d9d12feb47a0df"
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",
       "?WriteRelativePositions@BikeRace@@",
       4329712,
       2940,
-      2964,
-      1017,
-      "7cfed9416fc9c408ed45bf304f5993adf1c2e64b3b9868554479fb39ef1203a9"
+      2996,
+      464,
+      "b7285998a66f6b49e9c113d529f7ccb51da4aa8863315fbb170e501fbe091ea9"
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",

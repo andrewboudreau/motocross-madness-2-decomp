@@ -64,14 +64,16 @@ Near misses (`samples/race/BikeRaceNearMisses.cpp`):
 - `0x0041eb20` (camera target), 1699 of 1710 bytes: register swap in the
   scene-object branch (retail loads the index before the table; no
   index/entry spelling or flag changes it).
-- `0x0041f1d0`, 266 of 881 bytes (same size): retail keeps 0 in edx from
-  the first instruction (re-zeroed after calls); the candidate does not.
-  Retail repeats the `0x0041eb20(caster)` tail call; the objects scan's
-  found path calls it and returns as retail does.
-- `0x004210f0` (start grid), 975 of 2940 bytes: VC6's inline budget
-  places the out-of-line `Vector3` constructor/scale calls differently
-  (see the comment in the sample); every frame slot is at retail's
-  offset. The side test is `p1.x * p0.z - p0.x * p1.z` (retail's load
+- `0x0041f1d0`, 313 of 881 bytes (887-byte candidate, masked 0.829):
+  retail keeps 0 in edx from the first instruction (re-zeroed after
+  calls); the candidate does not. Retail repeats the `0x0041eb20(caster)`
+  tail call; the objects scan's found path calls it and returns as retail
+  does, and the racer-slot helper re-reads the player count as retail does.
+- `0x004210f0` (start grid), masked 0.958 (465 of 2981 strict; the
+  candidate is 15 bytes longer): VC6's inline budget still places the
+  out-of-line `Vector3` constructor calls of the mode 2/3 case differently
+  (see the comment in the sample); the other cases call what retail calls
+  and every frame slot is at retail's offset. The side test is `p1.x * p0.z - p0.x * p1.z` (retail's load
   order and p0/p1 slots).
 - `0x00417ed0` (setup, 6745 bytes with the jump table at `0x0041992c`;
   ret 0x24; QuarryStuntEvent.cpp's loader calls it after the

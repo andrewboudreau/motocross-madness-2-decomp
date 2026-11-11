@@ -32,10 +32,16 @@
 // with `test reg, reg` until the first call. Retail has three copies of the
 // 0x0041eb20 call, each reloading the caster slot; the found path of the
 // objects scan calling it and returning (instead of `break`) gives the
-// second copy (230 -> 266 of 881). A third explicit call after the racers
-// loop makes VC6 push a constant 0 (worse); explicit `!= 0` tests, an
-// `int caster = 0` at the top, a function-scope `old` and the `objects`
-// parameter for the caster flag leave the zero register unchanged.
+// second copy (230 -> 266 of 881). The racer-slot helper reads the player
+// count at each test instead of through a `players` local: retail re-tests
+// `playerCount > 1` after the `index == 0` miss (266 -> 313, 887 bytes;
+// masked 0.818 -> 0.829). A third explicit call after the racers loop
+// makes VC6 push a constant 0 (worse; `while (1)` with the call and return
+// 114-149, the found path as keyFramed call / object break 228); explicit
+// `!= 0` tests, nested-if or `!(a && b)` heads, no `camera` local, an
+// `int caster = 0` or `= objects == 0` at the top, a function-scope `old`,
+// a `for (;;)` racers loop, a const-int& alias of the caster and the
+// `objects` parameter for the caster flag leave the zero register unchanged.
 //
 // 0x004210f0 (2981 bytes with its jump table; the start grid): every case
 // is decoded and the arithmetic matches where VC6 makes the same inlining
@@ -44,10 +50,16 @@
 // Scale(field_0x170, 20.0f) in the mode 4 case; this candidate does the
 // opposite (VC6's inline budget). Call sequence (D dot, I FastInvSqrt,
 // S scale, C constructor): retail DIS..CCDISCCCCCCDISCCCCCCDISCC-CSS+,
-// candidate DIS..DISCCCCCCDISCCCCCCDISCS-CSS+ (the mode 2/3 slot step
-// scaled with `gridSlotStep = Scale(...)` instead of an inline `*=`
-// gives mode 4's middle constructor call, 975 -> 1018 of 3008; spelling
-// the 4.66 offset `*a = *a - Scale(...)` in any case is worse).
+// candidate differs only in the mode 2/3 case (retail D I S, two
+// 0x00518130 calls, C C; candidate D I C, two 0x00518130 calls). The slot step
+// is scaled in place through a `Vector3&` (retail's `fmul [eax]` / `fstp
+// [eax]` per component): strict 1018 -> 465 because the code grows by 15
+// bytes, but the aligned stream improves (instruction diffs 115 -> 76,
+// masked 0.936 -> 0.958) and modes 0, 1/5 and 4 now call what retail calls.
+// `gridSlotStep = Scale(...)` gave 1018 strict / masked 0.936; member-wise
+// `gridSlotStep.x *= step` 0.954; an inline `operator*=` and `v.x = s * v.x`
+// are worse; spelling the 4.66 offset `*a = *a - Scale(...)` in any case
+// and function-scope p0/p1 are worse.
 // Statement-count and helper
 // spelling variations moved either end but never both: Normalize written
 // `return Scale(v, FastInvSqrt(length))` gives retail's mode 4 sequence
@@ -282,16 +294,17 @@ int BikeRace::AimCamera(int caster) {
 }
 
 // Inline: racer `index` in camera order (own racer first, then the AI or
-// remote racers).
+// remote racers). The player count is read at each test: retail re-tests
+// `playerCount > 1` after the `index == 0` miss (`cmp ecx, 1` twice at
+// 0x0041f2f6/0x0041f304), which a `players` local lets VC6 thread away.
 inline UnknownBikeRaceRacer* BikeRace::UnknownFunctionRacerAt(int index) {
-    int players = g_TrackGame->playerCount;
-    if (players == 1 && index == 0) {
+    if (g_TrackGame->playerCount == 1 && index == 0) {
         return localRacer;
     }
-    if (players > 1 || index < players) {
+    if (g_TrackGame->playerCount > 1 || index < g_TrackGame->playerCount) {
         return racerSlots[index];
     }
-    return aiRacers[index - players];
+    return aiRacers[index - g_TrackGame->playerCount];
 }
 
 // 0x0041f1d0
@@ -493,7 +506,15 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
         *a -= Scale(*b, 4.66f);
         gridSlotStep = Vector3(b->z, 0.0f, -b->x);
         gridFirstSlot = *a - Scale(Scale(Scale(gridSlotStep, 6.75f), raceTerrain->gridCellSize), side);
-        gridSlotStep = Scale(gridSlotStep, raceTerrain->gridCellSize * 15.5f / (racerCount + 1) * side);
+        {
+            // Scaled in place through a reference: retail multiplies each
+            // component at [eax], [eax + 4], [eax + 8] (0x00421453).
+            float step = raceTerrain->gridCellSize * 15.5f / (racerCount + 1) * side;
+            Vector3& slotStep = gridSlotStep;
+            slotStep.x *= step;
+            slotStep.y *= step;
+            slotStep.z *= step;
+        }
         *a = Scale(gridSlotStep, (float)count) + gridFirstSlot;
         break;
     }

@@ -18,8 +18,8 @@
     },
     "samples/race/BikeRaceNearMisses.cpp": {
       "sections": 206,
-      "relocations": 1929,
-      "sha256": "13fadf7c00d9e8b44205cf4df628697fcb296beeff8447f208c691efcfa54275"
+      "relocations": 1932,
+      "sha256": "71310437db883f3c9f4571f6035690cbbcaf101f8c9896af2a0550f639b88f1f"
     },
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
