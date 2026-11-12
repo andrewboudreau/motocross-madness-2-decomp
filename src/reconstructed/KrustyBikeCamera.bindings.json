@@ -46,5 +46,6 @@
   "_kVec3YAxis": "0x0067c3e8",
   "_kVec3ZAxis": "0x0067c3b8",
   "_kVec3Zero": "0x0067c3c8",
-  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10"
+  "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10",
+  "?IsSubjectCrashed@VehicleCamera@@UAE_NXZ": "0x00417490"
 }

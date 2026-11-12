@@ -33,5 +33,6 @@
   "_kVec3XAxis": "0x00578e30",
   "_kVec3YAxis": "0x00578e40",
   "_kVec3ZAxis": "0x00578e10",
-  "_kVec3Zero": "0x00578e20"
+  "_kVec3Zero": "0x00578e20",
+  "?IsSubjectCrashed@VehicleCamera@@UAE_NXZ": "0x00417490"
 }

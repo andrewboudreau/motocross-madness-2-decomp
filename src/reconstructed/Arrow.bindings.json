@@ -13,5 +13,6 @@
   "_$E1": "0x00401960",
   "_$E1$ehhandler": "0x00549664",
   "_$E2": "0x00401950",
-  "__FILE__:arrow.cpp": "0x00566684"
+  "__FILE__:arrow.cpp": "0x00566684",
+  "?SetRenderContext@ArrowManager@@UAEPAVGameObject@@PAX@Z": "0x00462e30"
 }

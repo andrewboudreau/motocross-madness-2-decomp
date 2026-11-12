@@ -26,5 +26,10 @@
   "_kVec3XAxis": "0x57efb8",
   "_kVec3YAxis": "0x57efc8",
   "_kVec3ZAxis": "0x57ef98",
-  "_kVec3Zero": "0x57efa8"
+  "_kVec3Zero": "0x57efa8",
+  "?Render3D@ShadowReceiver@@UAEHXZ": "0x00468c90",
+  "?UnknownVirtualSlot27@ShadowReceiver@@UAEHXZ": "0x00468c90",
+  "?UnknownVirtualSlot28@ShadowReceiver@@UAEHXZ": "0x004aa190",
+  "?UnknownVirtualSlot29@ShadowReceiver@@UAEHXZ": "0x00468c90",
+  "?UnknownVirtualSlot30@ShadowReceiver@@UAEXXZ": "0x0044d710"
 }

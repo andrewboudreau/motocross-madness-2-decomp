@@ -10,15 +10,15 @@ addresses, and compares the result with the retail range, fill bytes included.
 export VC6_ROOT=... MCM2_EXE=work/game/mcm2.exe PYTHONPATH=.
 python tools/unit_layout.py --source src/reconstructed/ArcadeObject.cpp \
     --start auto --text-x-start auto --xdata-start auto
-python tools/unit_layout.py --source src/reconstructed/Arrow.cpp --start auto \
-    --text-x-start auto --xdata-start auto \
-    --drop '?SetRenderContext@ArrowManager@@UAEPAVGameObject@@PAX@Z'
 python -m unittest discover -s tests -p test_unit_layout.py
 ```
 
 `--obj` reuses an object, for example from `build_game.py --compile-only`.
 Addresses come from the file's `*.bindings.json`, the calibration cases and
-`targets.json`. Names that every bindings file agrees on, such as
+`targets.json`. A case or target symbol matches like the matchers do: the
+exact name, else a unique substring (`'??_GBaseObject'`). A
+`<Stem>.targets.json` entry without `source` registers `<Stem>.cpp` next to
+it, the pairing `run_samples.py` compiles. Names that every bindings file agrees on, such as
 `___CxxFrameHandler`, fill in the rest. The `auto` anchors work like this:
 `.text` starts at the first bound function that is not pick-any. `.text$x`
 starts from a `<fn>$ehhandler` binding. `.xdata$x` starts from the `$T`
@@ -67,8 +67,17 @@ Confirmed by strict byte comparison of the units below:
   `Arrow` at `0x0055fd68`.
 - `/OPT:ICF` moves folded functions out of their unit. For example,
   `ArrowManager::SetRenderContext` (vtable `0x00550490`, slot 8) resolves to
-  `0x00462e30`, which lies outside `Arrow.cpp`. Without that section,
-  `Arrow.cpp` is byte-identical.
+  `0x00462e30`, which lies outside `Arrow.cpp`. `Arrow.bindings.json` binds it
+  there, the tool skips the section as `elsewhere`, and `Arrow.cpp` is
+  byte-identical.
+- `??_H@YGXPAXIHP6EX0@Z@Z` (the vector constructor iterator) is a pick-any
+  COMDAT in 31 of the laid-out objects. A static array of a type with a trivial
+  constructor leaves it behind (for example `AuralScape`'s
+  `s_UnknownListenerPositions5776f8[2]`, whose `_$E13` is a bare `ret` in
+  both builds). Nothing outside `.debug` references it, and its bytes occur
+  nowhere in retail `.text`. Unbound pick-any sections like that are skipped
+  as `removed`. That `/OPT:REF` removed them is strong inference: no retail
+  copy exists, and LINK drops unreferenced COMDATs.
 
 Inference, not yet proven:
 
@@ -88,15 +97,14 @@ Each of these was laid out strictly, with all relocations resolved:
 |---|---|---|---|
 | `AgeManager.cpp` | `0x00401000..0x00401260` | none | none |
 | `ArcadeObject.cpp` | `0x00401260..0x00401940` (plus the open `0x00401940`) | `0x005495d0..0x0054964e` | `0x0055fd08..0x0055fd68` |
-| `Arrow.cpp` | `0x00401950..0x00401a30` (ICF section dropped) | from `0x00549650` | from `0x0055fd68` |
+| `Arrow.cpp` | `0x00401950..0x00401a30` (ICF section bound elsewhere) | from `0x00549650` | from `0x0055fd68` |
 | `SoultreeMaterial.cpp` | `0x004fefe0..0x00500220` | `0x0054e280..0x0054e2f8` | from `0x00563930` |
 | `cursor.cpp` (`GameCursor.cpp`) | `0x0043ea00..0x0043f160` (the whole doc extent) | from `0x00549ff0` | from `0x00560478` |
 
 `tests/test_unit_layout.py` checks `AgeManager` and `ArcadeObject` when
 `VC6_ROOT` and `MCM2_EXE` are set.
 
-The sweep below finds 101 identical units. They include these units except
-`Arrow`, which needs its `--drop`. A strict object proves its own span. It
+The sweep below finds 129 identical units, these five among them. A strict object proves its own span. It
 does not prove that the object covers its whole retail unit: compare the
 span with the unit's
 extent in [REBUILD_GAPS.md](REBUILD_GAPS.md#translation-units-and-link-order)
@@ -119,15 +127,71 @@ python tools/unit_layout_sweep.py --source src/reconstructed/KeyboardHook.cpp
 python -m unittest discover -s tests -p "test_unit_layout*.py"
 ```
 
-There are 225 units (`src/bringup` excluded). 43 are not laid out: 35 have no
-registered function, and 8 `src/krusty2` units have registered functions
+There are 225 units (`src/bringup` excluded). 42 are not laid out: 35 have no
+registered function, and 7 `src/krusty2` units have registered functions
 that are not strict.
 
 | Verdict | Units |
 |---|---|
-| identical (every group strict, every bound function at its VA) | 101 |
-| identical, with functions that have no retail address | 2 (`BikeAI`, `BikeCamera`) |
-| differs | 79 |
+| identical (every group strict, every bound function at its VA) | 129 |
+| identical, with functions that have no retail address | 0 |
+| differs | 54 |
+
+28 units moved to identical through registration and the `/OPT:REF` rule,
+without source changes. Every newly bound function compares strict exact
+(relocations resolved) at its VA. The evidence for each VA is a vtable slot,
+or a call from a function that is already bound:
+
+- Registration fixes. Calibration symbols now match by unique substring, and
+  `<Stem>.targets.json` pairs with `<Stem>.cpp`. This moved `BaseObject` and
+  `PCCamera`, and bound `BikeAI`'s last function.
+- Shared dialog bodies. The deleting destructor of every dialog class in
+  `KrustyUI`, `ProCircuitProcs` and `SelectGamePicProcs` is vtable slot 0, at
+  `0x0049bdb0`. Its `call` at `0x0049bdb3` binds each `??1<Dlg>` to
+  `0x00450fc0` (`jmp 0x0046a070`, `??1UIDialog`). One retail copy serves all of
+  them.
+- Single folds and pick-any copies, each bound from a vtable slot:
+  - `ShadowReceiver` slots 14 and 27-30: `0x00468c90`, `0x004aa190` and
+    `0x0044d710`.
+  - `ProjectedShadow::OnControlPress`: `0x004dc4c0`.
+  - `QuadTreeObject::ComputeQuadTreeCode` (`soultree.cpp`): `0x00434ce0`.
+  - `SoultreeQuadTreeRenderer::SetRenderContext`: `0x004452e0`.
+  - `ArrowManager::SetRenderContext`: `0x00462e30`.
+  - `VehicleCamera::IsSubjectCrashed`: `0x00417490`. This is
+    `BikeCamera.cpp`'s copy; `KrustyBikeCamera` binds it as kept elsewhere.
+  - `PCCentralBikeRiderDlg` and `MPBikeRiderDlg` control handlers.
+  - `InfoType`, at `0x0044d710` and `0x0044d720`.
+  - `MPOptionsDlg::SyncValues`: `0x00464e80`.
+  - `??_GD3DIMSoultreeCharacter`: `0x00446680`, the target of the vtordisp
+    thunk at `0x00446670`.
+- `/OPT:REF`. Skipping the unreferenced `??_H` is part of the move for 16
+  units: `ObjectPlacement`, `GraphicsTest`, `PhysicsRigidBody`,
+  `D3DIMSoultreeShadow`, `AuralScape`, `CarProcedural`, `DirectoryList`,
+  `EventManager`, `FollowRacer`, `GameUiHelpers`, `KrustyUI`, `KrustyVCR`,
+  `ObjectPicker`, `RaceStatus`, `MorphBastardModifier` and `TrackRecord`.
+  `D3DIMSoultreeShadow` and `KrustyUI` also needed the bindings above.
+
+For several of these units, the identical span is only part of the retail
+unit. Most of their functions are bound outside it (`icf_elsewhere`):
+
+- `AuralScape` anchors on `_$E2` at `0x00403c10` and keeps 57 functions
+  elsewhere.
+- `D3DIMSoultreeMotnctrl` anchors on `_$E2` at `0x004466e0`; its constructor
+  is elsewhere.
+- `KrustyUI`'s shared `??_G` (`0x0049bdb0`) lies before its anchor
+  (`0x0049bdd0`).
+
+Compare the span with the unit extent before counting such a unit as
+covered.
+
+Three fragment files have no retail counterpart for their unbound
+functions. They are `SoultreePositionValue.cpp` (inside retail `soultree.cpp`),
+`VehicleDefaults.cpp` (in the FollowCam range) and `VehicleWheelAttachment.cpp`
+(in the `Track.cpp` range). Each one includes `Math3D.h`, so it emits its own
+eight file-static vector initializers (`_$E1`..`_$E11`). Retail has other
+functions at the laid-out positions. Those initializers belong to the full
+retail objects that the fragments were split from. The fragments stay
+`differs`.
 
 Eight units became identical through source order alone, without changing
 any function bytes. `BackgroundImage`, `CacheTexture`, `ControlInterface`,
@@ -136,18 +200,30 @@ their functions in retail address order. `KeyboardHook`'s hook procedure is
 extern. `CollisionPoint` is in retail order too, initializers included. Only
 its deleting destructor is still misplaced (see below).
 
-The 79 units that differ carry these finding kinds. A unit can carry several,
-and folds or pick-any COMDATs kept elsewhere are not counted:
+The 54 units that differ carry these finding kinds. A unit can carry several.
+Folds, pick-any COMDATs kept elsewhere and `/OPT:REF` removals are not
+counted:
 
 | Kind | Units | Only kind |
 |---|---|---|
-| `unregistered` (a function without a retail address) | 65 | 26 |
-| `gap_missing` (retail has code our object lacks) | 31 | 5 |
-| `order` | 27 | 1 |
-| `gap_extra` (more bytes than retail between two bound functions) | 23 | 0 |
-| `bytes` (at its VA, bytes differ) | 21 | 0 |
+| `unregistered` (a function without a retail address) | 32 | 2 |
+| `gap_missing` (retail has code our object lacks) | 30 | 6 |
+| `order` | 30 | 4 |
+| `bytes` (at its VA, bytes differ) | 20 | 0 |
+| `gap_extra` (more bytes than retail between two bound functions) | 17 | 0 |
 | `static_deferred` | 2 | 0 |
 | `icf_duplicate` | 2 | 0 |
+
+The two units with only `unregistered` are the fragments
+`SoultreePositionValue` and `VehicleWheelAttachment`. Four units have only
+`order`:
+
+- `CollisionPoint`: its `??_G`, see below.
+- `BlockAllocator`: retail has `??1BlockAllocator` at `0x00423fb0`, before
+  `Alloc`.
+- `Particles`: retail has `ParticleManager::Create` at `0x004ba4d0`, before
+  `AddParticle`.
+- `CubeDraw`.
 
 Most `order` findings are in units that hold functions from several retail
 units, or only part of one, such as `FastMath`, `DebugOverlay`, `Bike` and
@@ -240,8 +316,9 @@ Two blockers cut across these groups:
   right earlier units include, so that the first object that keeps each helper
   is the retail one.
 - **ICF survivors:** we cannot yet predict where a folded function survives.
-  For now, `--drop` the folded section with evidence, such as a vtable slot
-  that points outside the unit.
+  For now, bind the folded function to its survivor when there is evidence,
+  such as a vtable slot that points outside the unit. The tool then skips it
+  as `elsewhere`.
 
 The tool does not lay out `.data`, `.rdata` strings or `.bss`. Those need the
 same treatment once the code layout is settled.

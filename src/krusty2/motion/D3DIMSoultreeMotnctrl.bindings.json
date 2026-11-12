@@ -78,5 +78,6 @@
   "_kVec3ZAxis": "0x0057ef58",
   "_kVec3Zero": "0x0057ef68",
   "_sprintf": "0x00534aaf",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "??_GD3DIMSoultreeCharacter@@UAEPAXI@Z": "0x00446680"
 }
