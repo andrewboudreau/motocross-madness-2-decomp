@@ -92,7 +92,7 @@ public:
     // 0x0049bf10: opens `name` in `file` through `callback` for recording
     // (mode 0) or playback (mode 1); 0 on failure.
     int OpenRecording(UnknownRecorderCallback callback, int mode, char* name,
-                              UnknownVcrFile* file);
+                              VCRFile* file);
     float RecordedLength();            // 0x0049c000: the recorded length
     void SetReplayLength(float time, int flag); // 0x0049bff0
     // 0x0049c010: saves the recording with its length and description.

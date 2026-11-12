@@ -16,7 +16,7 @@
 unsigned __stdcall UnknownRecorderThread(void* parameters) {
     UnknownRecorderThreadParameters* params = (UnknownRecorderThreadParameters*)parameters;
     VCRInterface* vcr;
-    UnknownVcrFile* file;
+    VCRFile* file;
     void* header;
     int headerSize;
     char* name;
@@ -30,7 +30,7 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
     headerSize = params->headerSize;
     name = (char*)params->fileName;
     vcr = params->owner;
-    file = (UnknownVcrFile*)vcr->vcrFile;
+    file = (VCRFile*)vcr->vcrFile;
     events[0] = vcr->writeEvent;
     events[1] = vcr->createFileEvent;
     events[2] = vcr->reopenFileEvent;

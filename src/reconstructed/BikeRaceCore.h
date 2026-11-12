@@ -10,7 +10,7 @@ class Scene;
 class ObjectPicker;
 class ChatOverlay;
 class KrustyVCR;
-class UnknownVcrFile;
+class VCRFile;
 class UnknownBikeRaceRacer;
 class UnknownBikeRaceProjector;
 class UnknownBikeRaceShadow;
@@ -161,7 +161,7 @@ public:
     ChatOverlay* chatOverlay;   // +0x19c
     KrustyVCR* replayVcr;                   // replay being recorded or played
     KrustyVCR* ghostVcr;                   // ghost
-    UnknownVcrFile* vcrFile;                  // +0x1a8 VCR file the replay and ghost recordings open
+    VCRFile* vcrFile;                  // +0x1a8 VCR file the replay and ghost recordings open
     float recordTickTime;                     // +0x1ac the tick record slot 10 queues (+0x1ac..+0x1b7): replay length
     int recordTickCount;                      // +0x1b0 ticks queued since the replay restarted
     int recordTickRecordCount;  // +0x1B4  tick record's 3rd dword: records per tick (racers, +1 tag ball, x2 with score records)

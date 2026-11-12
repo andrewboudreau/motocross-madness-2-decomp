@@ -4,7 +4,7 @@
 
 // recorder.cpp passes the slot payload size; each slot gets four extra bytes
 // for the size header written by 0x00524220.
-UnknownVcr::UnknownVcr(unsigned int size) {
+VCR::VCR(unsigned int size) {
     for (int i = 0; i < 256; i++) {
         void* data = DebugMalloc(size + 4, __FILE__, 29);
         if (data) {
@@ -18,22 +18,22 @@ UnknownVcr::UnknownVcr(unsigned int size) {
     writeCursor = -1;
     playCursor = -1;
     fillCursor = -1;
-    positionBlocks = (UnknownVcrBlock*)DebugMalloc(sizeof(UnknownVcrBlock), __FILE__, 44);
+    positionBlocks = (VCRPositionBlock*)DebugMalloc(sizeof(VCRPositionBlock), __FILE__, 44);
     positionBlocks->next = 0;
     positionIndex = 0;
     positionBlock = 0;
 }
 
 // Frees positionBlock blocks of the chain, as 0x00524640 does.
-UnknownVcr::~UnknownVcr() {
+VCR::~VCR() {
     for (int i = 0; i < 256; i++) {
         if (slots[i].data) DebugFree(slots[i].data, __FILE__, 54);
     }
     if (positionBlocks) {
-        UnknownVcrBlock* block = positionBlocks;
+        VCRPositionBlock* block = positionBlocks;
         int count = positionBlock;
         while (count--) {
-            UnknownVcrBlock* old = block;
+            VCRPositionBlock* old = block;
             block = block->next;
             DebugFree(old, __FILE__, 62);
         }
@@ -42,7 +42,7 @@ UnknownVcr::~UnknownVcr() {
 
 // Claims the slot after the write cursor for a `size`-byte payload behind a
 // size header, unless that slot is still in state 1.
-int UnknownVcr::ClaimRecordSlot(unsigned int size, int* index, void** data) {
+int VCR::ClaimRecordSlot(unsigned int size, int* index, void** data) {
     if (slots[NextSlot(fillCursor)].state == 1) return 0;
     AdvanceFillCursor();
     unsigned int needed = size + 4;
@@ -61,13 +61,13 @@ int UnknownVcr::ClaimRecordSlot(unsigned int size, int* index, void** data) {
     return 1;
 }
 
-void UnknownVcr::CommitRecordSlot(int index) {
+void VCR::CommitRecordSlot(int index) {
     slots[index].inUse = 0;
     slots[index].state = 1;
 }
 
 // The size written back includes the four-byte header.
-void UnknownVcr::TakeSlotToWrite(void** data, int* size, int* index) {
+void VCR::TakeSlotToWrite(void** data, int* size, int* index) {
     AdvanceWriteCursor();
     slots[writeCursor].inUse = 1;
     *data = slots[writeCursor].data;
@@ -75,12 +75,12 @@ void UnknownVcr::TakeSlotToWrite(void** data, int* size, int* index) {
     *index = writeCursor;
 }
 
-int UnknownVcr::HasSlotToWrite() {
+int VCR::HasSlotToWrite() {
     if (writeCursor != fillCursor) return slots[NextSlot(writeCursor)].state == 1;
     return 0;
 }
 
-int UnknownVcr::ClaimReadSlot(unsigned int size, int* index, void** data) {
+int VCR::ClaimReadSlot(unsigned int size, int* index, void** data) {
     AdvanceFillCursor();
     if (size > slots[fillCursor].size || !slots[fillCursor].size) {
         if (slots[fillCursor].data) DebugFree(slots[fillCursor].data, __FILE__, 149);
@@ -94,13 +94,13 @@ int UnknownVcr::ClaimReadSlot(unsigned int size, int* index, void** data) {
     return 1;
 }
 
-void UnknownVcr::CommitReadSlot(int position, int index) {
+void VCR::CommitReadSlot(int position, int index) {
     slots[index].inUse = 0;
     slots[index].filePosition = position;
     slots[index].state = 1;
 }
 
-int UnknownVcr::TakePlaybackSlot(void** data, unsigned int* size, int* position, int* index) {
+int VCR::TakePlaybackSlot(void** data, unsigned int* size, int* position, int* index) {
     if (playCursor >= 0) {
         if (slots[playCursor].state == 2) return 1;
         if (slots[playCursor].state == 3) return 2;
@@ -118,16 +118,16 @@ int UnknownVcr::TakePlaybackSlot(void** data, unsigned int* size, int* position,
     return 0;
 }
 
-void UnknownVcr::ReleaseSlot(int index) {
+void VCR::ReleaseSlot(int index) {
     slots[index].state = slots[index].inUse = 0;
 }
 
-int UnknownVcr::HasRoomToRead() {
+int VCR::HasRoomToRead() {
     return slots[NextSlot(NextSlot(fillCursor))].state != 1;
 }
 
-void UnknownVcr::AppendPosition(int position, int timeMs) {
-    UnknownVcrBlock* block = positionBlocks;
+void VCR::AppendPosition(int position, int timeMs) {
+    VCRPositionBlock* block = positionBlocks;
     int count = positionBlock;
     if (!block) return;
     while (count--) {
@@ -135,7 +135,7 @@ void UnknownVcr::AppendPosition(int position, int timeMs) {
         if (!block) return;
     }
     if (positionIndex > 255) {
-        block->next = (UnknownVcrBlock*)DebugMalloc(sizeof(UnknownVcrBlock), __FILE__, 237);
+        block->next = (VCRPositionBlock*)DebugMalloc(sizeof(VCRPositionBlock), __FILE__, 237);
         if (!block->next) return;
         block = block->next;
         block->next = 0;
@@ -147,17 +147,17 @@ void UnknownVcr::AppendPosition(int position, int timeMs) {
     positionIndex++;
 }
 
-void UnknownVcr::ClearPositions() {
-    UnknownVcrBlock* block = positionBlocks;
+void VCR::ClearPositions() {
+    VCRPositionBlock* block = positionBlocks;
     if (block) {
         int count = positionBlock;
         while (count--) {
-            UnknownVcrBlock* old = block;
+            VCRPositionBlock* old = block;
             block = block->next;
             DebugFree(old, __FILE__, 258);
         }
     }
-    positionBlocks = (UnknownVcrBlock*)DebugMalloc(sizeof(UnknownVcrBlock), __FILE__, 261);
+    positionBlocks = (VCRPositionBlock*)DebugMalloc(sizeof(VCRPositionBlock), __FILE__, 261);
     positionBlocks->next = 0;
     positionIndex = 0;
     positionBlock = 0;
@@ -166,9 +166,9 @@ void UnknownVcr::ClearPositions() {
 // Steps the pair cursor back one pair and returns its position (the time
 // through `timeMs`). The null-chain case is the else branch so that its store shares
 // the final return.
-int UnknownVcr::StepPositionBack(int* timeMs) {
-    UnknownVcrBlock* block = positionBlocks;
-    UnknownVcrBlock* previous;
+int VCR::StepPositionBack(int* timeMs) {
+    VCRPositionBlock* block = positionBlocks;
+    VCRPositionBlock* previous;
     int count = positionBlock;
     if (block) {
         if (count || positionIndex) {
@@ -203,8 +203,8 @@ int UnknownVcr::StepPositionBack(int* timeMs) {
 
 // Returns the pair at the cursor, skipping one -1 marker. The tail is written
 // out in each branch; retail keeps three copies (one with index 0 folded).
-int UnknownVcr::PeekPosition(int* timeMs) {
-    UnknownVcrBlock* block = positionBlocks;
+int VCR::PeekPosition(int* timeMs) {
+    VCRPositionBlock* block = positionBlocks;
     int count = positionBlock;
     if (block) {
         while (count--) {
@@ -235,8 +235,8 @@ int UnknownVcr::PeekPosition(int* timeMs) {
 }
 
 // Advances the pair cursor until a pair's position equals `position`.
-void UnknownVcr::SeekPosition(int position) {
-    UnknownVcrBlock* block = positionBlocks;
+void VCR::SeekPosition(int position) {
+    VCRPositionBlock* block = positionBlocks;
     int count = positionBlock;
     if (!block) return;
     while (count--) {
@@ -254,15 +254,15 @@ void UnknownVcr::SeekPosition(int position) {
     } while (block->pairs[positionIndex][0] != position);
 }
 
-void UnknownVcr::SetFirstPosition(int position) {
+void VCR::SetFirstPosition(int position) {
     firstPosition = position;
 }
 
-int UnknownVcr::GetFirstPosition() {
+int VCR::GetFirstPosition() {
     return firstPosition;
 }
 
-void UnknownVcr::ResetSlots() {
+void VCR::ResetSlots() {
     for (int i = 0; i < 256; i++) {
         slots[i].inUse = 0;
         slots[i].state = 0;
@@ -272,36 +272,36 @@ void UnknownVcr::ResetSlots() {
     fillCursor = -1;
 }
 
-void UnknownVcr::MarkForwardEnd() {
+void VCR::MarkForwardEnd() {
     AdvanceFillCursor();
     if (slots[fillCursor].state != 2) slots[fillCursor].state = 2;
 }
 
-void UnknownVcr::MarkReverseEnd() {
+void VCR::MarkReverseEnd() {
     AdvanceFillCursor();
     if (slots[fillCursor].state != 3) slots[fillCursor].state = 3;
 }
 
-int UnknownVcr::AdvanceWriteCursor() {
+int VCR::AdvanceWriteCursor() {
     writeCursor++;
     if (writeCursor == 256) writeCursor = 0;
     return 1;
 }
 
-int UnknownVcr::AdvancePlayCursor() {
+int VCR::AdvancePlayCursor() {
     playCursor++;
     if (playCursor == 256) playCursor = 0;
     return 1;
 }
 
-int UnknownVcr::AdvanceFillCursor() {
+int VCR::AdvanceFillCursor() {
     fillCursor++;
     if (fillCursor == 256) fillCursor = 0;
     return 1;
 }
 
 // The ring successor of `index`.
-int UnknownVcr::NextSlot(int index) {
+int VCR::NextSlot(int index) {
     index++;
     if (index == 256) index = 0;
     return index;

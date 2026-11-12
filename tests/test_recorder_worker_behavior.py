@@ -17,26 +17,26 @@ from tools.match import compare
 ROOT = Path(__file__).resolve().parents[1]
 SYMBOL = '?UnknownRecorderThread@@YGIPAX@Z'
 HELPERS = {
-    '?HasSlotToWrite@UnknownVcr@@QAEHXZ': 0x524350,
-    '?TakeSlotToWrite@UnknownVcr@@QAEXPAPAXPAH1@Z': 0x524300,
-    '?ReleaseSlot@UnknownVcr@@QAEXH@Z': 0x524540,
-    '?HasRoomToRead@UnknownVcr@@QAEHXZ': 0x524560,
-    '?ClaimReadSlot@UnknownVcr@@QAEHIPAHPAPAX@Z': 0x524390,
-    '?CommitReadSlot@UnknownVcr@@QAEXHH@Z': 0x524440,
-    '?MarkForwardEnd@UnknownVcr@@QAEXXZ': 0x524940,
-    '?MarkReverseEnd@UnknownVcr@@QAEXXZ': 0x524970,
-    '?StepPositionBack@UnknownVcr@@QAEHPAH@Z': 0x5246c0,
-    '?PeekPosition@UnknownVcr@@QAEHPAH@Z': 0x5247c0,
-    '?SetFirstPosition@UnknownVcr@@QAEXH@Z': 0x5248f0,
-    '?GetFirstPosition@UnknownVcr@@QAEHXZ': 0x524900,
-    '?ResetSlots@UnknownVcr@@QAEXXZ': 0x524910,
-    '?Open@UnknownVcrFile@@QAEHPAD0@Z': 0x524dd0,
-    '?Close@UnknownVcrFile@@QAEXH@Z': 0x525000,
-    '?Read@UnknownVcrFile@@QAEHPAXHHH@Z': 0x525070,
-    '?Write@UnknownVcrFile@@QAEHPBXHHH@Z': 0x5251f0,
-    '?Seek@UnknownVcrFile@@QAEHHHH@Z': 0x5253d0,
-    '?Tell@UnknownVcrFile@@QAEHH@Z': 0x525440,
-    '?IsEndOfFile@UnknownVcrFile@@QAEHH@Z': 0x5254a0,
+    '?HasSlotToWrite@VCR@@QAEHXZ': 0x524350,
+    '?TakeSlotToWrite@VCR@@QAEXPAPAXPAH1@Z': 0x524300,
+    '?ReleaseSlot@VCR@@QAEXH@Z': 0x524540,
+    '?HasRoomToRead@VCR@@QAEHXZ': 0x524560,
+    '?ClaimReadSlot@VCR@@QAEHIPAHPAPAX@Z': 0x524390,
+    '?CommitReadSlot@VCR@@QAEXHH@Z': 0x524440,
+    '?MarkForwardEnd@VCR@@QAEXXZ': 0x524940,
+    '?MarkReverseEnd@VCR@@QAEXXZ': 0x524970,
+    '?StepPositionBack@VCR@@QAEHPAH@Z': 0x5246c0,
+    '?PeekPosition@VCR@@QAEHPAH@Z': 0x5247c0,
+    '?SetFirstPosition@VCR@@QAEXH@Z': 0x5248f0,
+    '?GetFirstPosition@VCR@@QAEHXZ': 0x524900,
+    '?ResetSlots@VCR@@QAEXXZ': 0x524910,
+    '?Open@VCRFile@@QAEHPAD0@Z': 0x524dd0,
+    '?Close@VCRFile@@QAEXH@Z': 0x525000,
+    '?Read@VCRFile@@QAEHPAXHHH@Z': 0x525070,
+    '?Write@VCRFile@@QAEHPBXHHH@Z': 0x5251f0,
+    '?Seek@VCRFile@@QAEHHHH@Z': 0x5253d0,
+    '?Tell@VCRFile@@QAEHH@Z': 0x525440,
+    '?IsEndOfFile@VCRFile@@QAEHH@Z': 0x5254a0,
 }
 IMPORTS = {'__imp__WaitForMultipleObjects@16': 0, '__imp__EnterCriticalSection@4': 1,
            '__imp__LeaveCriticalSection@4': 2, '__imp__SetEvent@4': 3, '__imp__ResetEvent@4': 4}
@@ -178,7 +178,7 @@ class RecorderWorkerBehaviorTests(unittest.TestCase):
                 _, provider = compile_source(source)
                 provider_bindings = json.loads((ROOT / source).with_suffix('.bindings.json').read_text())
                 for name, address in HELPERS.items():
-                    if ('@UnknownVcr@@' in name) == source.endswith('/VCR.cpp'):
+                    if ('@VCR@@' in name) == source.endswith('/VCR.cpp'):
                         self.assertGreater(provider.find_symbol(name).function_size, 0)
                         self.assertEqual(int(provider_bindings[name], 0), address)
                         proof = compare(image, provider, name, address, provider.find_symbol(name).function_size,

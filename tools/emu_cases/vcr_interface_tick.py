@@ -91,6 +91,6 @@ def setup(ctx, c):
     ctx.stub_at(0x004e89c0, 'VCRInterface::RestartReverseRead', pop=0)
     ctx.stub_at(0x004e8a20, 'VCRInterface::Seek', pop=4)
     ctx.stub_at(0x004e8a70, 'VCRInterface::Rewind', pop=0)
-    ctx.stub_at(0x00524590, 'UnknownVcr::AppendPosition', pop=8)
-    ctx.stub_at(0x00524870, 'UnknownVcr::SeekPosition', pop=4)
+    ctx.stub_at(0x00524590, 'VCR::AppendPosition', pop=8)
+    ctx.stub_at(0x00524870, 'VCR::SeekPosition', pop=4)
     return dict(ecx=vcr, args=[r.uniform(0, 0.1)], ret_eax=True)

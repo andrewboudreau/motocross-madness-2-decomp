@@ -2,7 +2,7 @@
 
 Two adjacent translation units, both strictly exact under the default VC6
 profile (36 calibration cases). Neither class has a vtable or RTTI, so the
-class names `UnknownVcr` and `UnknownVcrFile` and all member names are
+class names `VCR` and `VCRFile` and all member names are
 provisional. The ring members are named after their use by recorder.cpp's
 worker thread (VCR.h).
 
@@ -36,7 +36,7 @@ worker thread (VCR.h).
   `_ftell_lk`, unlock). `strlen`, `strcmp` and `memcpy` are VC6 intrinsics;
   "rb" (`0x0056666c`) and "wb" (`0x005682b4`) are pooled literals.
 
-## UnknownVcr (VCR.cpp, 0x101c bytes)
+## VCR (VCR.cpp, 0x101c bytes)
 
 A ring of 256 16-byte slots (`+0x0000`: data, capacity, a value, an in-use
 byte and a state byte 0..3), three ring cursors (`+0x1000`, `+0x1004`,
@@ -84,7 +84,7 @@ Retail details the source keeps:
   index folded to 0 after the block change. Writing the tail once makes VC6
   reload the index at the join.
 
-## UnknownVcrFile (VCRfile.cpp, 0x248 bytes)
+## VCRFile (VCRfile.cpp, 0x248 bytes)
 
 Up to two handles (`+0x000` count), each either an in-memory file or a
 stdio `FILE*` (`+0x240`), chosen by the constructor's first argument

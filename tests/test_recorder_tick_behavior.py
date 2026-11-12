@@ -21,8 +21,8 @@ HELPERS = {
     '?RestartReverseRead@VCRInterface@@QAEXXZ': 0x4e89c0,
     '?Seek@VCRInterface@@QAEXI@Z': 0x4e8a20,
     '?Rewind@VCRInterface@@QAEXXZ': 0x4e8a70,
-    '?AppendPosition@UnknownVcr@@QAEXHH@Z': 0x524590,
-    '?SeekPosition@UnknownVcr@@QAEXH@Z': 0x524870,
+    '?AppendPosition@VCR@@QAEXHH@Z': 0x524590,
+    '?SeekPosition@VCR@@QAEXH@Z': 0x524870,
 }
 IMPORTS = {'__imp__EnterCriticalSection@4': 0, '__imp__LeaveCriticalSection@4': 1}
 
@@ -152,7 +152,7 @@ class RecorderTickBehaviorTests(unittest.TestCase):
                 _, provider = compile_source(source)
                 bindings = json.loads((ROOT / source).with_suffix('.bindings.json').read_text())
                 for name, address in HELPERS.items():
-                    if ('@UnknownVcr@@' in name) == source.endswith('/VCR.cpp'):
+                    if ('@VCR@@' in name) == source.endswith('/VCR.cpp'):
                         self.assertGreater(provider.find_symbol(name).function_size, 0)
                         self.assertEqual(int(bindings[name], 0), address)
             fixture_path, _ = compile_source('tests/fixtures/recorder_tick_compare.cpp')

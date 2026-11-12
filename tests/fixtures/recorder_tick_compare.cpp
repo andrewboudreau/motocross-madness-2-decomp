@@ -27,7 +27,7 @@ static void EventAt(int kind,int a=0,int b=0,int c=0,int d=0,int e=0){
         VCRInterface* v=Vcr();
         switch(scenario.mutation){
         case 0:v->recordPending=!v->recordPending;v->readingReverse=!v->readingReverse;v->readsReset=!v->readsReset;v->reverseReadRestarted=!v->reverseReadRestarted;v->recordTimeMs^=0x12345678;v->recordId^=0x7654;v->recordType=-1;break;
-        case 1:v->recordBuffer=world.buffers[1];v->frameRing=(UnknownVcr*)world.rings[1];break;
+        case 1:v->recordBuffer=world.buffers[1];v->frameRing=(VCR*)world.rings[1];break;
         case 2:((UnknownRecorderRecord*)v->recordBuffer)->count=2;((UnknownRecorderRecord*)v->recordBuffer)->time=-.0009999f;break;
         case 3:v->recordCallback=0;break;
         }
@@ -53,8 +53,8 @@ void VCRInterface::StopReading(){if(this!=Vcr())ExitProcess(87);EventAt(4);reads
 void VCRInterface::RestartReverseRead(){if(this!=Vcr())ExitProcess(87);EventAt(5);isBusy^=0x83;}
 void VCRInterface::Seek(unsigned time){if(this!=Vcr())ExitProcess(87);EventAt(6,time);sceneTimePending=1;pendingSceneTime=time*.001f;}
 void VCRInterface::Rewind(){if(this!=Vcr())ExitProcess(87);EventAt(7);sceneTimePending=1;pendingSceneTime=0;fileReady=0;}
-void UnknownVcr::AppendPosition(int position,int time){int n=Ring(this);EventAt(8,n,position,time);positionIndex++;firstPosition=position;}
-void UnknownVcr::SeekPosition(int position){int n=Ring(this);EventAt(9,n,position);positionIndex=position;}
+void VCR::AppendPosition(int position,int time){int n=Ring(this);EventAt(8,n,position,time);positionIndex++;firstPosition=position;}
+void VCR::SeekPosition(int position){int n=Ring(this);EventAt(9,n,position);positionIndex=position;}
 static int Callback(int type,void* data,int flag,int id,int* keep,int time,int* milliseconds){
     if(!keep || !milliseconds || keep==milliseconds)ExitProcess(88);
     int index=observed.callbacks++;
@@ -69,8 +69,8 @@ case 0x4e8990:return Address(&VCRInterface::StopReading);
 case 0x4e89c0:return Address(&VCRInterface::RestartReverseRead);
 case 0x4e8a20:return Address(&VCRInterface::Seek);
 case 0x4e8a70:return Address(&VCRInterface::Rewind);
-case 0x524590:return Address(&UnknownVcr::AppendPosition);
-case 0x524870:return Address(&UnknownVcr::SeekPosition);
+case 0x524590:return Address(&VCR::AppendPosition);
+case 0x524870:return Address(&VCR::SeekPosition);
 case 0x534a88:return (DWORD)_ftol;
 }ExitProcess(89);return 0;}
 static DWORD imports[]={(DWORD)Enter,(DWORD)Leave};
@@ -107,7 +107,7 @@ static void Run(int retail){
     memset(&observed,0,sizeof(observed));observed.result=-501;unsigned seed=scenario.seed;
     for(unsigned n=0;n<sizeof(world);++n)((BYTE*)&world)[n]=(BYTE)(Random(seed)>>24);
     VCRInterface* v=Vcr();v->recordMode=scenario.mode;v->fileReady=scenario.ready;v->readingReverse=scenario.reverse;v->readsReset=scenario.reset;v->reverseReadRestarted=scenario.restarted;v->recordPending=scenario.pending;
-    v->recordBuffer=world.buffers[0];v->frameRing=(UnknownVcr*)world.rings[0];v->recordCallback=Callback;v->recordType=scenario.recordType;v->recordId=0x123;v->recordTimeMs=-234;v->recordPosition=0x8192;
+    v->recordBuffer=world.buffers[0];v->frameRing=(VCR*)world.rings[0];v->recordCallback=Callback;v->recordType=scenario.recordType;v->recordId=0x123;v->recordTimeMs=-234;v->recordPosition=0x8192;
     for(int i=0;i<2;++i){((UnknownRecorderRecord*)world.buffers[i])->time=scenario.time;((UnknownRecorderRecord*)world.buffers[i])->count=scenario.count;}
     if(scenario.invalid==1)v->recordCallback=0;
     if(scenario.invalid==2)v->recordBuffer=0;

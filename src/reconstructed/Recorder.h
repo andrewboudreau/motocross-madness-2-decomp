@@ -12,10 +12,10 @@
 // slot 0, deleting destructor 0x004e7890, and slot 10 0x004e7d60) and
 // KrustyVCR : VCRInterface (vtable 0x00550e9c). The recorder runs a worker
 // thread (0x004e6f80) that the game drives through eleven events and a
-// critical section; recorded frames pass through an UnknownVcr ring
+// critical section; recorded frames pass through a VCR ring
 // (VCR.h). Names other than the RTTI classes are provisional.
 
-class UnknownVcr;
+class VCR;
 
 // The record buffer at VCRInterface+0x7c (0x400 bytes): slot 10 reads a time
 // in seconds and a count from its head.
@@ -39,12 +39,12 @@ struct UnknownRecorderThreadParameters {
 };
 
 // The object at VCRInterface+0xac: its +0x23c selects a 10 ms (else 200 ms)
-// poll interval. The worker thread calls UnknownVcrFile (VCRfile.h) methods on
+// poll interval. The worker thread calls VCRFile (VCRfile.h) methods on
 // it and +0x23c is that class's memory flag, so it is the VCR file object; the
 // type is kept for the 0x004e7a90 symbol.
 struct UnknownRecorderOwner {
     unsigned char field_0x000[0x23c];
-    int memory;                           // +0x23c UnknownVcrFile's memory flag (VCRfile.h)
+    int memory;                           // +0x23c VCRFile's memory flag (VCRfile.h)
 };
 
 class VCRInterface : public GameObject {
@@ -99,7 +99,7 @@ public:
     int recordId;                             // +0xA4  the last taken record's second header word (the sender's network id)
     int recordPosition;                       // +0xA8  ring position of the last taken tick record (AppendPosition)
     UnknownRecorderOwner* vcrFile;
-    UnknownVcr* frameRing;
+    VCR* frameRing;
     int isStopped;                       // stopped
     int isBusy;                       // busy
     int fileReady;                        // +0xbc set by the worker once the file is open (events 1, 2, 6..8); slot 10 waits for it

@@ -13,7 +13,7 @@
 // writes to the VCRtape file; playback has the thread read records from the
 // file into slots that the game takes. Slot states: 0 free, 1 filled, 2 end
 // of the file reached forward, 3 no earlier position (reverse playback).
-struct UnknownVcrSlot {
+struct VCRSlot {
     void* data;                 // +0x00, DebugMalloc'd buffer
     unsigned int size;          // +0x04, capacity recorded for data
     int filePosition;           // +0x08: file offset of a record read back (-1: marker)
@@ -21,15 +21,15 @@ struct UnknownVcrSlot {
     char state;                 // +0x0d: 0 free, 1 filled, 2/3 end markers
 };
 
-struct UnknownVcrBlock {
+struct VCRPositionBlock {
     int pairs[256][2];          // +0x000: (file position, time in ms); -1 positions are markers
-    UnknownVcrBlock* next;      // +0x800
+    VCRPositionBlock* next;      // +0x800
 };
 
-class UnknownVcr {
+class VCR {
 public:
-    UnknownVcr(unsigned int size);                                           // 0x00524110
-    ~UnknownVcr();                                                           // 0x005241b0
+    VCR(unsigned int size);                                           // 0x00524110
+    ~VCR();                                                           // 0x005241b0
     int ClaimRecordSlot(unsigned int size, int* index, void** data);        // 0x00524220: next fill slot, behind a size header
     void CommitRecordSlot(int index);                                        // 0x005242e0: state 1
     void TakeSlotToWrite(void** data, int* size, int* index);                // 0x00524300: advances the write cursor
@@ -54,11 +54,11 @@ public:
     int AdvanceFillCursor();                                                 // 0x00524a00
     int NextSlot(int index);                                                 // 0x00524a30: ring successor
 
-    UnknownVcrSlot slots[256];          // +0x0000
+    VCRSlot slots[256];          // +0x0000
     int writeCursor;                    // +0x1000: last slot handed to the file writer
     int playCursor;                     // +0x1004: last slot handed to playback
     int fillCursor;                     // +0x1008: last slot claimed for filling
-    UnknownVcrBlock* positionBlocks;    // +0x100c: first pair block
+    VCRPositionBlock* positionBlocks;    // +0x100c: first pair block
     int positionIndex;                  // +0x1010: pair index in the current block
     int positionBlock;                  // +0x1014: current block number
     int firstPosition;                  // +0x1018

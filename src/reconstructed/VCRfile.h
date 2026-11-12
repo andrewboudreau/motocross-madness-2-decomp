@@ -12,12 +12,12 @@
 //
 // Each handle is either an in-memory file (a chain of 0x19000-byte blocks)
 // or a stdio FILE, chosen by the constructor's first argument.
-struct UnknownVcrFileBlock {
+struct VCRFileBlock {
     char data[0x19000];
-    UnknownVcrFileBlock* next;          // +0x19000
+    VCRFileBlock* next;          // +0x19000
 };
 
-struct UnknownVcrFileEntry {
+struct VCRFileEntry {
     int field_0x00;                     // tested and cleared by 0x00525000
     char name[0x104];                   // +0x004
     char mode[8];                       // +0x108, fopen-style mode string
@@ -25,10 +25,10 @@ struct UnknownVcrFileEntry {
     int size;                           // +0x114
 };
 
-class UnknownVcrFile {
+class VCRFile {
 public:
-    UnknownVcrFile(int memory, int count);                                  // 0x00524a50
-    ~UnknownVcrFile();                                                      // 0x00524b10
+    VCRFile(int memory, int count);                                  // 0x00524a50
+    ~VCRFile();                                                      // 0x00524b10
     void Load(char* path, char* name);                     // 0x00524b80: loads `path`
     void Save(char* path);                                 // 0x00524d00: saves to `path`
     int Open(char* name, char* mode);                      // 0x00524dd0: open
@@ -40,8 +40,8 @@ public:
     int IsEndOfFile(int handle);                                  // 0x005254a0: end of file
 
     int count;                          // +0x000, at most 2
-    UnknownVcrFileEntry entries[2];     // +0x004
-    UnknownVcrFileBlock* blocks[2];     // +0x234
+    VCRFileEntry entries[2];     // +0x004
+    VCRFileBlock* blocks[2];     // +0x234
     int memory;                         // +0x23c
     FILE* files[2];                     // +0x240
 };

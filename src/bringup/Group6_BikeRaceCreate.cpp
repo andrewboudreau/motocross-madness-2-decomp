@@ -386,7 +386,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         ((ArcadeObject*)youIndicator)->arcadeModel->Scale(0.6f, 0.6f, 0.6f);
     }
     if (g_TrackGame->mode.raceSettings.raceMode == 4) {
-        vcrFile = new(__FILE__, 0x2b6) UnknownVcrFile(1, 2);
+        vcrFile = new(__FILE__, 0x2b6) VCRFile(1, 2);
         if (g_TrackGame->mode.ghostFile[0]) {
             vcrFile->Load(g_TrackGame->mode.ghostFile, "VCRgtemp.dat");
             ghostVcr = new(__FILE__, 0x2b9) KrustyVCR;
@@ -394,7 +394,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         replayVcr = new(__FILE__, 0x2bd) KrustyVCR;
         ghostLap = 0;
     } else if (g_TrackGame->useReplayTape) {
-        vcrFile = new(__FILE__, 0x2c2) UnknownVcrFile(0, 1);
+        vcrFile = new(__FILE__, 0x2c2) VCRFile(0, 1);
         replayVcr = new(__FILE__, 0x2c3) KrustyVCR;
         if (g_TrackGame->playingReplay) {
             if (g_TrackGame->ui->playingDemo) {

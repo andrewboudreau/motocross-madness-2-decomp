@@ -12,7 +12,7 @@ than the RTTI classes are provisional.
 
 VCRInterface records and plays back replays on a worker thread
 (`0x004e6f80`, started with `_beginthreadex`): `0x004e7a90` creates the
-UnknownVcr ring (VCR.h), eleven auto-reset events and a critical section,
+VCR ring (VCR.h), eleven auto-reset events and a critical section,
 then starts mode 0, 1 or 2; the game queues and takes records
 (`0x004e8720`, `0x004e8810`), seeks, rewinds and flushes by signalling the
 events, and `0x004e7a00` waits for the worker's acknowledgement. The event

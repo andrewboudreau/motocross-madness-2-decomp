@@ -28,7 +28,7 @@ static int Buffer(const void* p){if(!p)return -1;for(int n=0;n<4;++n)if(p==world
 static void Finish(){
     if(scenario.mutateAt==observed.count){VCRInterface* v=Vcr();switch(scenario.mutation){
     case 0:v->isBusy=!v->isBusy;v->fileReady=!v->fileReady;v->isStopped^=17;v->workerAcknowledged^=7;v->recordTimeMs^=0x345678;break;
-    case 1:v->frameRing=(UnknownVcr*)world.rings[1];v->vcrFile=(UnknownRecorderOwner*)world.files[1];break;
+    case 1:v->frameRing=(VCR*)world.rings[1];v->vcrFile=(UnknownRecorderOwner*)world.files[1];break;
     case 2:v->threadParameters.header=(int)world.headers[1];v->threadParameters.headerSize=33;v->threadParameters.fileName=(int)world.names[1];break;
     case 3:v->writeEvent=(HANDLE)0x2100;v->readForwardEvent=(HANDLE)0x2103;v->readReverseEvent=(HANDLE)0x2105;break;
     }}
@@ -51,44 +51,44 @@ static DWORD __stdcall Wait(DWORD count,const HANDLE* events,BOOL all,DWORD time
 static BOOL __stdcall Set(HANDLE event){Begin(4,0,(int)event);Finish();return scenario.seed&1?0:1;}
 static BOOL __stdcall Reset(HANDLE event){Begin(5,0,(int)event);Finish();return scenario.seed&1?0:1;}
 static void __cdecl End(unsigned code){if(code || observed.held)Fail(86);Begin(6);Finish();++observed.ended;if(!scenario.exitReturns)RaiseException(0xe0410001,0,0,0);}
-int UnknownVcr::HasSlotToWrite(){int n=Ring(this);int result=(scenario.writeMask>>(observed.writeChecks++&1))&1;Begin(10,n,result);Finish();return result;}
-void UnknownVcr::TakeSlotToWrite(void** data,int* size,int* index){int n=Ring(this);if(!data || !size || !index || *data)Fail(87);Begin(11,n);Finish();*data=world.buffers[n];*size=scenario.size<=1024?scenario.size:17;*index=27+n;}
-void UnknownVcr::ReleaseSlot(int index){int n=Ring(this);Begin(12,n,index);Finish();slots[index&255].state=0;}
-int UnknownVcr::HasRoomToRead(){int n=Ring(this);int result=(scenario.roomMask>>(observed.roomChecks++&1))&1;Begin(13,n,result);Finish();return result;}
-int UnknownVcr::ClaimReadSlot(unsigned size,int* index,void** data){int n=Ring(this);if(!index || !data || *data)Fail(88);Begin(14,n,size);Finish();int which=observed.claims++&3;if(scenario.fail&32)return 0;*index=43+which;*data=world.buffers[which];return scenario.seed&1?-7:1;}
-void UnknownVcr::CommitReadSlot(int position,int index){int n=Ring(this);Begin(15,n,position,index);Finish();slots[index&255].state=1;slots[index&255].filePosition=position;}
-void UnknownVcr::MarkForwardEnd(){int n=Ring(this);Begin(16,n);Finish();slots[0].state=2;}
-void UnknownVcr::MarkReverseEnd(){int n=Ring(this);Begin(17,n);Finish();slots[0].state=3;}
-int UnknownVcr::StepPositionBack(int* extra){int n=Ring(this);if(!extra)Fail(89);Begin(18,n,scenario.position);Finish();*extra=0x82345678;return scenario.position;}
-int UnknownVcr::PeekPosition(int* extra){int n=Ring(this);if(!extra)Fail(89);int position=observed.peeks++?scenario.peekAgain:scenario.position;Begin(19,n,position);Finish();*extra=0x72345678;return position;}
-void UnknownVcr::SetFirstPosition(int position){int n=Ring(this);Begin(20,n,position);Finish();firstPosition=position;}
-int UnknownVcr::GetFirstPosition(){int n=Ring(this);Begin(21,n,firstPosition);Finish();return firstPosition;}
-void UnknownVcr::ResetSlots(){int n=Ring(this);Begin(22,n);Finish();writeCursor=playCursor=fillCursor=0;slots[0].state=0;}
-int UnknownVcrFile::Open(char* name,char* mode){int n=File(this);int which=Which(name,world.names[0],world.names[1]);int kind=!strcmp(mode,"wb")?0:!strcmp(mode,"rb+")?1:!strcmp(mode,"rb")?2:-1;if(kind<0)Fail(90);Event& e=Begin(30,n,which,kind);if(name){e.size=strlen(name)+1;if(e.size>512)Fail(91);memcpy(e.bytes,name,e.size);}Finish();return scenario.fail&1?-1:scenario.handle;}
-void UnknownVcrFile::Close(int handle){int n=File(this);Begin(31,n,handle);Finish();entries[0].field_0x00=0;}
-int UnknownVcrFile::Read(void* buffer,int size,int count,int handle){int n=File(this);int role=Buffer(buffer);if(count!=1 || size<0 || size>1024)Fail(92);Begin(32,n,role,size,count,handle);Finish();++observed.reads;
+int VCR::HasSlotToWrite(){int n=Ring(this);int result=(scenario.writeMask>>(observed.writeChecks++&1))&1;Begin(10,n,result);Finish();return result;}
+void VCR::TakeSlotToWrite(void** data,int* size,int* index){int n=Ring(this);if(!data || !size || !index || *data)Fail(87);Begin(11,n);Finish();*data=world.buffers[n];*size=scenario.size<=1024?scenario.size:17;*index=27+n;}
+void VCR::ReleaseSlot(int index){int n=Ring(this);Begin(12,n,index);Finish();slots[index&255].state=0;}
+int VCR::HasRoomToRead(){int n=Ring(this);int result=(scenario.roomMask>>(observed.roomChecks++&1))&1;Begin(13,n,result);Finish();return result;}
+int VCR::ClaimReadSlot(unsigned size,int* index,void** data){int n=Ring(this);if(!index || !data || *data)Fail(88);Begin(14,n,size);Finish();int which=observed.claims++&3;if(scenario.fail&32)return 0;*index=43+which;*data=world.buffers[which];return scenario.seed&1?-7:1;}
+void VCR::CommitReadSlot(int position,int index){int n=Ring(this);Begin(15,n,position,index);Finish();slots[index&255].state=1;slots[index&255].filePosition=position;}
+void VCR::MarkForwardEnd(){int n=Ring(this);Begin(16,n);Finish();slots[0].state=2;}
+void VCR::MarkReverseEnd(){int n=Ring(this);Begin(17,n);Finish();slots[0].state=3;}
+int VCR::StepPositionBack(int* extra){int n=Ring(this);if(!extra)Fail(89);Begin(18,n,scenario.position);Finish();*extra=0x82345678;return scenario.position;}
+int VCR::PeekPosition(int* extra){int n=Ring(this);if(!extra)Fail(89);int position=observed.peeks++?scenario.peekAgain:scenario.position;Begin(19,n,position);Finish();*extra=0x72345678;return position;}
+void VCR::SetFirstPosition(int position){int n=Ring(this);Begin(20,n,position);Finish();firstPosition=position;}
+int VCR::GetFirstPosition(){int n=Ring(this);Begin(21,n,firstPosition);Finish();return firstPosition;}
+void VCR::ResetSlots(){int n=Ring(this);Begin(22,n);Finish();writeCursor=playCursor=fillCursor=0;slots[0].state=0;}
+int VCRFile::Open(char* name,char* mode){int n=File(this);int which=Which(name,world.names[0],world.names[1]);int kind=!strcmp(mode,"wb")?0:!strcmp(mode,"rb+")?1:!strcmp(mode,"rb")?2:-1;if(kind<0)Fail(90);Event& e=Begin(30,n,which,kind);if(name){e.size=strlen(name)+1;if(e.size>512)Fail(91);memcpy(e.bytes,name,e.size);}Finish();return scenario.fail&1?-1:scenario.handle;}
+void VCRFile::Close(int handle){int n=File(this);Begin(31,n,handle);Finish();entries[0].field_0x00=0;}
+int VCRFile::Read(void* buffer,int size,int count,int handle){int n=File(this);int role=Buffer(buffer);if(count!=1 || size<0 || size>1024)Fail(92);Begin(32,n,role,size,count,handle);Finish();++observed.reads;
     if(!size)return 0;
     if((role==20 && (scenario.fail&4)) || (role>=10 && role<12 && (scenario.fail&16)) || ((role<4 || role==-1) && (scenario.fail&8)))return 0;
     if(role==20){if(size!=4)Fail(93);*(unsigned*)buffer=scenario.size;}
     else{for(int i=0;i<size;++i)((BYTE*)buffer)[i]=(BYTE)(scenario.seed+i*17+observed.reads*31);}
     entries[0].position+=size;return scenario.seed&1?-7:1;
 }
-int UnknownVcrFile::Write(const void* buffer,int size,int count,int handle){int n=File(this);int role=Buffer(buffer);if(role==20 || size<0 || size>1024 || count!=1)Fail(94);Event& e=Begin(33,n,role,size,count,handle);e.size=size;if(size)memcpy(e.bytes,buffer,size);Finish();++observed.writes;if(scenario.fail&2)return 0;entries[0].position+=size;return scenario.seed&1?-7:1;}
-int UnknownVcrFile::Seek(int handle,int offset,int origin){int n=File(this);Begin(34,n,handle,offset,origin);if(origin)Fail(95);Finish();entries[0].position=offset;return scenario.seed&1?-1:0;}
-int UnknownVcrFile::Tell(int handle){int n=File(this);Begin(35,n,handle,entries[0].position);Finish();return entries[0].position;}
-int UnknownVcrFile::IsEndOfFile(int handle){int n=File(this);Begin(36,n,handle,scenario.eof);Finish();return scenario.eof;}
+int VCRFile::Write(const void* buffer,int size,int count,int handle){int n=File(this);int role=Buffer(buffer);if(role==20 || size<0 || size>1024 || count!=1)Fail(94);Event& e=Begin(33,n,role,size,count,handle);e.size=size;if(size)memcpy(e.bytes,buffer,size);Finish();++observed.writes;if(scenario.fail&2)return 0;entries[0].position+=size;return scenario.seed&1?-7:1;}
+int VCRFile::Seek(int handle,int offset,int origin){int n=File(this);Begin(34,n,handle,offset,origin);if(origin)Fail(95);Finish();entries[0].position=offset;return scenario.seed&1?-1:0;}
+int VCRFile::Tell(int handle){int n=File(this);Begin(35,n,handle,entries[0].position);Finish();return entries[0].position;}
+int VCRFile::IsEndOfFile(int handle){int n=File(this);Begin(36,n,handle,scenario.eof);Finish();return scenario.eof;}
 template<class T>static DWORD Address(T method){union{T method;DWORD address;}u;u.method=method;return u.address;}
 static DWORD Hook(DWORD address){switch(address){
-case 0x524350:return Address(&UnknownVcr::HasSlotToWrite);case 0x524300:return Address(&UnknownVcr::TakeSlotToWrite);
-case 0x524540:return Address(&UnknownVcr::ReleaseSlot);case 0x524560:return Address(&UnknownVcr::HasRoomToRead);
-case 0x524390:return Address(&UnknownVcr::ClaimReadSlot);case 0x524440:return Address(&UnknownVcr::CommitReadSlot);
-case 0x524940:return Address(&UnknownVcr::MarkForwardEnd);case 0x524970:return Address(&UnknownVcr::MarkReverseEnd);
-case 0x5246c0:return Address(&UnknownVcr::StepPositionBack);case 0x5247c0:return Address(&UnknownVcr::PeekPosition);
-case 0x5248f0:return Address(&UnknownVcr::SetFirstPosition);case 0x524900:return Address(&UnknownVcr::GetFirstPosition);
-case 0x524910:return Address(&UnknownVcr::ResetSlots);case 0x524dd0:return Address(&UnknownVcrFile::Open);
-case 0x525000:return Address(&UnknownVcrFile::Close);case 0x525070:return Address(&UnknownVcrFile::Read);
-case 0x5251f0:return Address(&UnknownVcrFile::Write);case 0x5253d0:return Address(&UnknownVcrFile::Seek);
-case 0x525440:return Address(&UnknownVcrFile::Tell);case 0x5254a0:return Address(&UnknownVcrFile::IsEndOfFile);
+case 0x524350:return Address(&VCR::HasSlotToWrite);case 0x524300:return Address(&VCR::TakeSlotToWrite);
+case 0x524540:return Address(&VCR::ReleaseSlot);case 0x524560:return Address(&VCR::HasRoomToRead);
+case 0x524390:return Address(&VCR::ClaimReadSlot);case 0x524440:return Address(&VCR::CommitReadSlot);
+case 0x524940:return Address(&VCR::MarkForwardEnd);case 0x524970:return Address(&VCR::MarkReverseEnd);
+case 0x5246c0:return Address(&VCR::StepPositionBack);case 0x5247c0:return Address(&VCR::PeekPosition);
+case 0x5248f0:return Address(&VCR::SetFirstPosition);case 0x524900:return Address(&VCR::GetFirstPosition);
+case 0x524910:return Address(&VCR::ResetSlots);case 0x524dd0:return Address(&VCRFile::Open);
+case 0x525000:return Address(&VCRFile::Close);case 0x525070:return Address(&VCRFile::Read);
+case 0x5251f0:return Address(&VCRFile::Write);case 0x5253d0:return Address(&VCRFile::Seek);
+case 0x525440:return Address(&VCRFile::Tell);case 0x5254a0:return Address(&VCRFile::IsEndOfFile);
 case 0x537c9f:return (DWORD)End;
 }Fail(96);return 0;}
 static DWORD imports[]={(DWORD)Wait,(DWORD)Enter,(DWORD)Leave,(DWORD)Set,(DWORD)Reset};
@@ -129,10 +129,10 @@ static void Run(int retail){
     retailActive=retail;memset(&observed,0,sizeof(observed));observed.result=-501;memset(&world,0x53+(scenario.seed%19),sizeof(world));VCRInterface* v=Vcr();
     HANDLE* handles[]={&v->writeEvent,&v->createFileEvent,&v->reopenFileEvent,&v->readForwardEvent,&v->openPlaybackEvent,&v->readReverseEvent,&v->seekEvent,&v->rewindEvent,&v->stopReadingEvent,&v->closeFileEvent,&v->stopEvent};
     for(int n=0;n<11;++n)*handles[n]=(HANDLE)(0x1100+n);
-    v->frameRing=(UnknownVcr*)world.rings[0];v->vcrFile=(UnknownRecorderOwner*)world.files[0];v->isBusy=scenario.busy;v->isStopped=-7;v->fileReady=0;v->workerAcknowledged=0;v->readsReset=0;v->recordTimeMs=-19;
+    v->frameRing=(VCR*)world.rings[0];v->vcrFile=(UnknownRecorderOwner*)world.files[0];v->isBusy=scenario.busy;v->isStopped=-7;v->fileReady=0;v->workerAcknowledged=0;v->readsReset=0;v->recordTimeMs=-19;
     v->threadParameters.owner=scenario.invalid==2?0:v;v->threadParameters.header=(int)world.headers[0];v->threadParameters.headerSize=scenario.headerSize;v->threadParameters.fileName=scenario.invalid==3?0:(int)world.names[0];
     if(scenario.invalid==4)v->frameRing=0;
-    for(n=0;n<2;++n){((UnknownVcr*)world.rings[n])->firstPosition=83+n*17;((UnknownVcrFile*)world.files[n])->entries[0].position=123+n*19;for(int i=0;i<128;++i)world.headers[n][i]=(BYTE)(scenario.seed+i*13+n*37);for(i=0;i<scenario.nameLength;++i)world.names[n][i]='A'+(i+n)%26;world.names[n][scenario.nameLength]=0;}
+    for(n=0;n<2;++n){((VCR*)world.rings[n])->firstPosition=83+n*17;((VCRFile*)world.files[n])->entries[0].position=123+n*19;for(int i=0;i<128;++i)world.headers[n][i]=(BYTE)(scenario.seed+i*13+n*37);for(i=0;i<scenario.nameLength;++i)world.names[n][i]='A'+(i+n)%26;world.names[n][scenario.nameLength]=0;}
     for(n=0;n<4;++n)for(int i=0;i<1024;++i)world.buffers[n][i]=(BYTE)(scenario.seed+i*11+n*43);
     try{Invoke();}catch(int code){observed.exception=code;}observed.state=world;
 }
@@ -142,7 +142,7 @@ static void Compare(){Run(1);expected=observed;Run(0);++checks;if(memcmp(&observ
 }
 static void Base(){memset(&scenario,0,sizeof(scenario));scenario.seed=19;scenario.prefix=1;scenario.first=0;scenario.second=10;scenario.size=17;scenario.headerSize=16;scenario.nameLength=31;scenario.position=123;scenario.peekAgain=71;scenario.handle=1;scenario.writeMask=3;scenario.roomMask=3;scenario.exitReturns=1;}
 static int Count(int kind){int count=0;for(int n=0;n<observed.count;++n)if(observed.events[n].kind==kind)++count;return count;}
-int main(int argc,char** argv){if(argc!=3 || !MapReference(argv[1],argv[2]))return 3;if(sizeof(VCRInterface)!=0xd8 || sizeof(UnknownVcr)!=0x101c || sizeof(UnknownVcrFile)!=0x248)return 4;
+int main(int argc,char** argv){if(argc!=3 || !MapReference(argv[1],argv[2]))return 3;if(sizeof(VCRInterface)!=0xd8 || sizeof(VCR)!=0x101c || sizeof(VCRFile)!=0x248)return 4;
     Base();Compare();if(observed.result || observed.writes!=2 || Count(12)!=1 || Count(31)!=1 || !Vcr()->workerAcknowledged || !Vcr()->fileReady || Count(4)!=1)return 5;
     Base();scenario.prefix=4;scenario.first=3;Compare();if(observed.reads!=3 || Count(15)!=1 || Count(20)!=1 || Count(4)!=2 || !Vcr()->workerAcknowledged)return 6;
     Base();scenario.prefix=0;scenario.first=12;Compare();if(observed.waits!=1 || Count(31) || !observed.ended)return 7;

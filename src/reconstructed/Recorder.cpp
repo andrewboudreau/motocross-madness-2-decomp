@@ -98,7 +98,7 @@ int VCRInterface::Start(int callback, int header, int headerSize, int mode, int 
                         unsigned int size, UnknownRecorderOwner* owner) {
     DWORD interval;
 
-    frameRing = new (__FILE__, 477) UnknownVcr(size);
+    frameRing = new (__FILE__, 477) VCR(size);
     if (!frameRing)
         return 0;
     vcrFile = owner;

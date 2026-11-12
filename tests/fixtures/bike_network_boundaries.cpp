@@ -75,9 +75,9 @@ void DebugFree(void* p,const char* file,int line) {
     frees++;
 }
 static void TestQueue() {
-    DWORD object[sizeof(VCRInterface)/4],ringWords[sizeof(UnknownVcr)/4],expectedRing[sizeof(UnknownVcr)/4];
-    VCRInterface* recorder=(VCRInterface*)object;UnknownVcr* ring=(UnknownVcr*)ringWords;
-    UnknownVcr* expected=(UnknownVcr*)expectedRing;
+    DWORD object[sizeof(VCRInterface)/4],ringWords[sizeof(VCR)/4],expectedRing[sizeof(VCR)/4];
+    VCRInterface* recorder=(VCRInterface*)object;VCR* ring=(VCR*)ringWords;
+    VCR* expected=(VCR*)expectedRing;
     memset(object,0,sizeof(object));InitializeCriticalSection(&recorder->lock);
     recorder->writeEvent=CreateEventA(0,FALSE,FALSE,0);if(!recorder->writeEvent) ExitProcess(94);
     const unsigned sizes[]={0,1,4,12,32,128};const int cursors[]={-1,0,254,255};

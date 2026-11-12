@@ -27,7 +27,7 @@
 // A new recording first stamps the "MCMVCR" signature, the version string and
 // the current race settings into the block it hands over.
 int KrustyVCR::OpenRecording(UnknownRecorderCallback callback, int mode, char* name,
-                                     UnknownVcrFile* file)
+                                     VCRFile* file)
 {
     replayLength = 0;
     if (mode == 0) {

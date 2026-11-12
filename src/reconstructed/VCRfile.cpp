@@ -5,7 +5,7 @@
 #include "DebugAlloc.h"
 
 // bikerace.cpp passes (1, 2): two in-memory handles.
-UnknownVcrFile::UnknownVcrFile(int memory, int count) {
+VCRFile::VCRFile(int memory, int count) {
     this->memory = memory;
     if (count > 2)
         this->count = 2;
@@ -18,7 +18,7 @@ UnknownVcrFile::UnknownVcrFile(int memory, int count) {
             entries[i].mode[0] = 0;
             entries[i].position = 0;
             entries[i].size = 0;
-            blocks[i] = (UnknownVcrFileBlock*)DebugMalloc(sizeof(UnknownVcrFileBlock), __FILE__, 33);
+            blocks[i] = (VCRFileBlock*)DebugMalloc(sizeof(VCRFileBlock), __FILE__, 33);
             blocks[i]->next = 0;
         }
     } else {
@@ -26,13 +26,13 @@ UnknownVcrFile::UnknownVcrFile(int memory, int count) {
     }
 }
 
-UnknownVcrFile::~UnknownVcrFile() {
+VCRFile::~VCRFile() {
     if (memory) {
         for (int i = 0; i < count; i++) {
-            UnknownVcrFileBlock* next = blocks[i]->next;
+            VCRFileBlock* next = blocks[i]->next;
             DebugFree(blocks[i], __FILE__, 50);
             while (next) {
-                UnknownVcrFileBlock* block = next;
+                VCRFileBlock* block = next;
                 next = next->next;
                 DebugFree(block, __FILE__, 54);
             }
@@ -43,7 +43,7 @@ UnknownVcrFile::~UnknownVcrFile() {
 // Loads `path` into the first unused in-memory handle, naming it `name`
 // with mode "rb". The read loop ends inside the found path; a loop with the
 // tail after it compiles to a second epilogue (see docs/VCR.md).
-void UnknownVcrFile::Load(char* path, char* name) {
+void VCRFile::Load(char* path, char* name) {
     if (!memory) return;
     for (int i = 0; i < count; i++) {
         if (!entries[i].field_0x00 && !entries[i].size) {
@@ -58,14 +58,14 @@ void UnknownVcrFile::Load(char* path, char* name) {
             entries[i].position = 0;
             FILE* file = fopen(path, "rb");
             if (file) {
-                UnknownVcrFileBlock* block = blocks[i];
+                VCRFileBlock* block = blocks[i];
                 while (1) {
                     if (!fread(block, 0x19000, 1, file)) {
                         entries[i].size = ftell(file);
                         fclose(file);
                         return;
                     }
-                    block->next = (UnknownVcrFileBlock*)DebugMalloc(sizeof(UnknownVcrFileBlock), __FILE__, 81);
+                    block->next = (VCRFileBlock*)DebugMalloc(sizeof(VCRFileBlock), __FILE__, 81);
                     block->next->next = 0;
                     block = block->next;
                 }
@@ -75,13 +75,13 @@ void UnknownVcrFile::Load(char* path, char* name) {
 }
 
 // Writes the first in-memory handle whose mode starts with 'r' to `path`.
-void UnknownVcrFile::Save(char* path) {
+void VCRFile::Save(char* path) {
     if (memory) {
         for (int i = 0; i < count; i++) {
             FILE* file;
             if (entries[i].mode[0] == 'r' && (file = fopen(path, "wb")) != 0) {
                 int size = entries[i].size;
-                UnknownVcrFileBlock* block = blocks[i];
+                VCRFileBlock* block = blocks[i];
                 while (size >= 0x19000) {
                     fwrite(block, 0x19000, 1, file);
                     size -= 0x19000;
@@ -99,7 +99,7 @@ void UnknownVcrFile::Save(char* path) {
 // fopen-like: returns a handle index or -1. In memory mode an existing name
 // is reopened with the new mode ("w..." truncates it); otherwise the first
 // unused entry is claimed. Nothing in this file sets field_0x00.
-int UnknownVcrFile::Open(char* name, char* mode) {
+int VCRFile::Open(char* name, char* mode) {
     int i;
     if (memory) {
         for (i = 0; i < count; i++) {
@@ -143,7 +143,7 @@ int UnknownVcrFile::Open(char* name, char* mode) {
 }
 
 // fclose-like.
-void UnknownVcrFile::Close(int handle) {
+void VCRFile::Close(int handle) {
     if (memory) {
         if (handle >= 0 && entries[handle].field_0x00) {
             entries[handle].field_0x00 = 0;
@@ -158,13 +158,13 @@ void UnknownVcrFile::Close(int handle) {
 // fread-like: returns the bytes copied (size * count) in memory mode, or 0
 // at or past the end. VC6 turns the block-skipping loop into a division by
 // 0x19000 (the 0x51eb851f multiply in retail).
-int UnknownVcrFile::Read(void* buffer, int size, int count, int handle) {
+int VCRFile::Read(void* buffer, int size, int count, int handle) {
     if (memory) {
         for (int i = 0; i < this->count; i++) {
             if (i == handle) {
                 int position = entries[i].position;
                 if (position >= entries[i].size) return 0;
-                UnknownVcrFileBlock* block = blocks[i];
+                VCRFileBlock* block = blocks[i];
                 while (position >= 0x19000) {
                     position -= 0x19000;
                     block = block->next;
@@ -195,16 +195,16 @@ int UnknownVcrFile::Read(void* buffer, int size, int count, int handle) {
 }
 
 // fwrite-like: grows the block chain as needed and extends the size.
-int UnknownVcrFile::Write(const void* buffer, int size, int count, int handle) {
+int VCRFile::Write(const void* buffer, int size, int count, int handle) {
     if (memory) {
         for (int i = 0; i < this->count; i++) {
             if (i == handle) {
-                UnknownVcrFileBlock* block = blocks[i];
+                VCRFileBlock* block = blocks[i];
                 int position = entries[i].position;
                 while (position >= 0x19000) {
                     position -= 0x19000;
                     if (!block->next) {
-                        block->next = (UnknownVcrFileBlock*)DebugMalloc(sizeof(UnknownVcrFileBlock), __FILE__, 240);
+                        block->next = (VCRFileBlock*)DebugMalloc(sizeof(VCRFileBlock), __FILE__, 240);
                         block->next->next = 0;
                     }
                     block = block->next;
@@ -218,7 +218,7 @@ int UnknownVcrFile::Write(const void* buffer, int size, int count, int handle) {
                         in += 0x19000 - position;
                         remaining = remaining + position - 0x19000;
                         position = 0;
-                        block->next = (UnknownVcrFileBlock*)DebugMalloc(sizeof(UnknownVcrFileBlock), __FILE__, 264);
+                        block->next = (VCRFileBlock*)DebugMalloc(sizeof(VCRFileBlock), __FILE__, 264);
                         block->next->next = 0;
                         block = block->next;
                     } else {
@@ -238,7 +238,7 @@ int UnknownVcrFile::Write(const void* buffer, int size, int count, int handle) {
 
 // fseek-like. In memory mode `origin` is ignored and the new position is
 // returned (retail leaves `offset` in eax).
-int UnknownVcrFile::Seek(int handle, int offset, int origin) {
+int VCRFile::Seek(int handle, int offset, int origin) {
     if (memory) {
         for (int i = 0; i < count; i++) {
             if (i == handle) return entries[i].position = offset;
@@ -250,7 +250,7 @@ int UnknownVcrFile::Seek(int handle, int offset, int origin) {
 }
 
 // ftell-like.
-int UnknownVcrFile::Tell(int handle) {
+int VCRFile::Tell(int handle) {
     if (memory) {
         for (int i = 0; i < count; i++) {
             if (i == handle) return entries[i].position;
@@ -262,7 +262,7 @@ int UnknownVcrFile::Tell(int handle) {
 }
 
 // feof-like; VC6's feof is the `_flag & _IOEOF` macro.
-int UnknownVcrFile::IsEndOfFile(int handle) {
+int VCRFile::IsEndOfFile(int handle) {
     if (memory) {
         for (int i = 0; i < count; i++) {
             if (i == handle) return entries[i].size <= entries[i].position;

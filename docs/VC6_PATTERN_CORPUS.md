@@ -78,7 +78,7 @@ comes in the middle or at the end of the body:
 - Sound::SetPan, SetVolume and SetFrequency `0x004bcca0`, `0x004bcbe0`, `0x004bcb30`: `if (n > 0) do { if (... < 0) goto failed; i++; } while (i < n);`.
 - BackgroundImage::ClearRegionDepth `0x004043c0`: `return 0` as the last test of a guarded do-while.
 - PCVideoCard::SetGDISurfaceVisible `0x004cb5b0`: three `return 0` tests after the body's first statement.
-- UnknownVcrFile Read and Write `0x00525070`, `0x005251f0`, and CacheTexture::ReserveRegions `0x0050f9b0`: a `for` whose `if` block holds the rest of the function.
+- VCRFile Read and Write `0x00525070`, `0x005251f0`, and CacheTexture::ReserveRegions `0x0050f9b0`: a `for` whose `if` block holds the rest of the function.
 
 **Probe (confirmed):** in a guarded do-while whose *first* statement is a
 conditional exit (`if (d->Blt(...)) return 0;`, `if (n == k) return 0;`), VC6
