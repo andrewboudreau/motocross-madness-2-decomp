@@ -23,14 +23,6 @@ void* G3Q_TerrainShadowAttach(void* terrainShadow, void* target, void* terrain, 
     return ((TerrainShadow*)terrainShadow)->Attach((int)target, (Terrain*)terrain, (ProjectedShadow*)shadow);
 }
 
-void* G3Q_TerrainLoad(void* terrain, void* target, void* stream, int unused, void* textures,
-                      int quality, int field0xc40, const char* detailTexture, int halfFormat)
-{
-    return ((Terrain*)terrain)->Load((int)target, (TerrainStream*)stream, unused,
-                                     (TerrainSurfaceDesc*)textures, quality, field0xc40,
-                                     detailTexture, halfFormat);
-}
-
 void G3Q_QuadTreeRendererInsertNodes(void* renderer)
 {
     ((SoultreeQuadTreeRenderer*)renderer)->InsertNodesInQuadtree();

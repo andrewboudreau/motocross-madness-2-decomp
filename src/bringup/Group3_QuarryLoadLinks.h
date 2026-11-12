@@ -20,9 +20,6 @@ void G3Q_BikeCameraSetSubject(void* camera, void* subject);                     
 // Group3_QuarryLinkKrusty.cpp
 void* G3Q_TerrainShadowAttach(void* terrainShadow, void* target, void* terrain,
                               void* shadow);                                     // 0x00508b80
-void* G3Q_TerrainLoad(void* terrain, void* target, void* stream, int unused, void* textures,
-                      int quality, int field0xc40, const char* detailTexture,
-                      int halfFormat);                                           // 0x005059d0
 void G3Q_QuadTreeRendererInsertNodes(void* renderer);                            // 0x005046e0
 
 // Group3_QuarryLinkRace.cpp

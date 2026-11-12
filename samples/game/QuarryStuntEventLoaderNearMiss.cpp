@@ -56,6 +56,7 @@
 #include "../../src/krusty2/shadow/ProjectedShadow.h"
 #include "../../src/krusty2/collision/CollisionObject.h"
 #include "../../src/krusty2/effects/ParticleManager.h"
+#include "../../src/krusty2/broadphase/Terrain.h"
 #include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/TextureMapManager.h"
 #include "../../src/reconstructed/TrackGame.h"
@@ -218,18 +219,6 @@ public:
     GameObject* Create(void* target, Fog* fog);  // 0x00486a10
 
     unsigned char field_0x2c[0x30 - 0x2c];
-};
-
-// Terrain (0xcc4 bytes) and EcoSystem (0x5c4 bytes).
-class UnknownQuarryTerrainObject : public GameObject {
-public:
-    explicit UnknownQuarryTerrainObject(int flags);            // 0x00505830
-    // 0x005059d0: Terrain::Load (src/krusty2/broadphase/Terrain.h).
-    UnknownTerrain* Load(void* target, FileStream* stream, int a,
-                         UnknownTextureFormatChoice* textures, int level, int b,
-                         const char* detailTexture, int c);
-
-    unsigned char field_0x2c[0xcc4 - 0x2c];
 };
 
 // The last race object (0x48 bytes).
@@ -569,8 +558,9 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         sprintf(text, "No Terrain found in env file.  Terrain not created.\n");
         return 0;
     }
-    eventTerrain = (new(__FILE__, 799) UnknownQuarryTerrainObject(1))
-                     ->Load(renderContext, terrainStream, 1, &terrainTextures,
+    eventTerrain = (UnknownTerrain*)(new(__FILE__, 799) Terrain(1))
+                     ->Load((int)renderContext, (TerrainStream*)terrainStream, 1,
+                                             (TerrainSurfaceDesc*)&terrainTextures,
                                              g_TrackGame->mode.videoSettings[3], 0,
                                              eventScene->environment->detailTexture, 0);
     if (!AppendChild((GameObject*)eventTerrain, -1)) {

@@ -14,10 +14,10 @@
 //     (new, EH state, null test, constructor), declared over the views' storage;
 //   * the fog objects use Fog.h's Fog/FogOff/FogOn directly; FogOn's folded Create
 //     (0x00486a10) is defined at the end of this file and called, as retail calls it;
-//   * SkyCube.h and krusty2's ProjectedShadow.h, CollisionObject.h and ParticleManager.h can
-//     share this unit and QuarryEvent.h declares EcoSystem::Create, so the sky cube, the
-//     projected shadow, the ecosystem, the collision objects and the particle manager are
-//     created and called through their own classes;
+//   * SkyCube.h and krusty2's ProjectedShadow.h, CollisionObject.h, ParticleManager.h,
+//     VisibilityQuadTree.h and Terrain.h can share this unit and QuarryEvent.h declares
+//     EcoSystem::Create, so those objects and the ecosystem are created and called through
+//     their own classes;
 //   * the memory estimate reads EcoSystem.cpp's preloaded-texture count (0x0059af10).
 // Linked score 0.985, 2208 instructions against retail's 2208 (was 0.908 at 2101: the
 // out-of-line G3Q_New* allocation helpers dropped retail's inline new/EH/null-test/
@@ -48,6 +48,7 @@
 #include "collision/CollisionObject.h"
 #include "effects/ParticleManager.h"
 #include "visibility/VisibilityQuadTree.h"
+#include "broadphase/Terrain.h"
 #include "../reconstructed/TextureMap.h"
 #include "../reconstructed/TextureMapManager.h"
 #include "../reconstructed/TrackGame.h"
@@ -200,18 +201,6 @@ public:
     unsigned char field_0x2c[0x30 - 0x2c];
 };
 
-// Terrain (0xcc4 bytes) and EcoSystem (0x5c4 bytes).
-class UnknownQuarryTerrainObject : public GameObject {
-public:
-    explicit UnknownQuarryTerrainObject(int flags);            // 0x00505830
-    // 0x005059d0: Terrain::Load (src/krusty2/broadphase/Terrain.h).
-    UnknownTerrain* Load(void* target, FileStream* stream, int a,
-                         UnknownTextureFormatChoice* textures, int level, int b,
-                         const char* detailTexture, int c);
-
-    unsigned char field_0x2c[0xcc4 - 0x2c];
-};
-
 // The last race object (0x48 bytes).
 class UnknownQuarryRaceObject : public GameObject {
 public:
@@ -232,10 +221,6 @@ public:
 class TerrainShadow : public UnknownQuarryTerrainShadow {
 public:
     explicit TerrainShadow(int flags);                         // 0x00508ae0
-};
-class Terrain : public UnknownQuarryTerrainObject {
-public:
-    explicit Terrain(int flags);                               // 0x00505830
 };
 class BikeRace : public UnknownQuarryRace {
 public:
@@ -574,8 +559,9 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         sprintf(text, "No Terrain found in env file.  Terrain not created.\n");
         return 0;
     }
-    eventTerrain = (new(__FILE__, 799) Terrain(1))
-                     ->Load(renderContext, terrainStream, 1, &terrainTextures,
+    eventTerrain = (UnknownTerrain*)(new(__FILE__, 799) Terrain(1))
+                     ->Load((int)renderContext, (TerrainStream*)terrainStream, 1,
+                                             (TerrainSurfaceDesc*)&terrainTextures,
                                              g_TrackGame->mode.videoSettings[3], 0,
                                              eventScene->environment->detailTexture, 0);
     if (!AppendChild((GameObject*)eventTerrain, -1)) {
@@ -885,13 +871,6 @@ void UnknownQuarryBikeCamera::SetSubject(UnknownTerrain* terrain) { G3Q_BikeCame
 GameObject* UnknownQuarryTerrainShadow::Attach(void* target, UnknownTerrain* terrain, ProjectedShadow* shadow)
 {
     return (GameObject*)G3Q_TerrainShadowAttach(this, target, terrain, shadow);
-}
-
-UnknownTerrain* UnknownQuarryTerrainObject::Load(void* target, FileStream* stream, int a,
-                                                 UnknownTextureFormatChoice* textures, int level, int b,
-                                                 const char* detailTexture, int c)
-{
-    return (UnknownTerrain*)G3Q_TerrainLoad(this, target, stream, a, textures, level, b, detailTexture, c);
 }
 
 void UnknownQuarryRaceObject::InsertNodesInQuadtree() { G3Q_QuadTreeRendererInsertNodes(this); }
