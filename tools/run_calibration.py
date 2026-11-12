@@ -27243,6 +27243,43 @@ CASES += [
         'target_va': '0x0050a1a0', 'target_size': 498,
         'reason': 'RTTI TerrainShadow (vtable 0x005582d4); owner TU unknown (bracket only). slot 14 render: texture bind, saved address mode / render state 4, format 0x613 branch, indexed draw of the inline +0x34 vertices with indexTable; same statement order as D3DIMSoultreeShadow slot 14 minus the world matrix',
     },
+    # atexit destructor stubs of function-local statics whose type has an empty
+    # destructor: a bare `ret`.  Each is pushed to atexit (0x00535430) by its
+    # function's guarded first-use block; the guard bit identifies the static.
+    {
+        'name': 'D3DIMSoultreeObject::DrawCurrentLod eye atexit stub',
+        'bindings': 'samples/render/D3DIMSoulTreeNearMisses.bindings.json',
+        'source': 'samples/render/D3DIMSoulTreeNearMisses.cpp',
+        'symbol': '_$E2',
+        'target_va': '0x00442f60', 'target_size': 1,
+        'reason': 'static eye (0x0057eef8, guard 0x0057ef24 bit 1): DrawCurrentLod pushes 0x00442f60 at 0x00441642',
+    },
+    {
+        'name': 'D3DIMSoultreeObject::DrawCurrentLod viewDirection atexit stub',
+        'bindings': 'samples/render/D3DIMSoulTreeNearMisses.bindings.json',
+        'source': 'samples/render/D3DIMSoulTreeNearMisses.cpp',
+        'symbol': '_$E3',
+        'target_va': '0x00442f50', 'target_size': 1,
+        'reason': 'static viewDirection (0x0057ef38, guard bit 2): DrawCurrentLod pushes 0x00442f50 at 0x00441f0a',
+    },
+    {
+        'name': 'D3DIMSoultreeObject::DrawCurrentLod viewPosition atexit stub',
+        'bindings': 'samples/render/D3DIMSoulTreeNearMisses.bindings.json',
+        'source': 'samples/render/D3DIMSoulTreeNearMisses.cpp',
+        'symbol': '_$E4',
+        'target_va': '0x00442f40', 'target_size': 1,
+        'reason': 'static viewPosition (0x0057eee8, guard bit 4): DrawCurrentLod pushes 0x00442f40 at 0x00441f2b',
+    },
+    {
+        'name': 'ParticleManager::Render3D s_particleWorld atexit stub',
+        'bindings': 'src/bringup/Group1_ParticleRender.bindings.json',
+        'source': 'src/bringup/Group1_ParticleRender.cpp',
+        'symbol': '_$E2',
+        'target_va': '0x004bb620', 'target_size': 1,
+        'includes': ['src/krusty2', 'src/reconstructed'],
+        'reason': 'static s_particleWorld (Matrix4 0x006898f8, guard 0x00689154 bit 1): Render3D (0x004bac60, linked from '
+                  'this bring-up file) pushes 0x004bb620 at 0x004bacbb',
+    },
 ]
 
 

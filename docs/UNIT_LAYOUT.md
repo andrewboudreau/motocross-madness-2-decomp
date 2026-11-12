@@ -270,6 +270,25 @@ None of them was moved; the reasons are below.
 `FileStream`'s `CheckHeader` in `samples/io/FileStream.cpp` and the vector
 helpers of `BikeRace` in `samples/physics/helpers/VectorOps.cpp`.
 
+Six units differ only through `gap_missing`. None can move to identical by
+moving a strict body, because every gap holds a function that is not strict
+exact (2026-11-12 sweep):
+
+| Unit | Missing retail range | What is there |
+|---|---|---|
+| `BoundingBoxTreeBuild.cpp` | `0x0042c260..0x0042c8c0` | `GatherModelTriangles`, near miss (`samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp`) |
+| `D3DIMSoulTree.cpp` | `0x00440f30..0x00442e00`, `0x00442f40..0x00442f70` | `DrawCurrentLod`, near miss (`samples/render/D3DIMSoulTreeNearMisses.cpp`), and the atexit `ret` stubs of its three function-local statics. The stubs are strict exact in that sample, but they are emitted with `DrawCurrentLod` and cannot move without it |
+| `DebugOverlay.cpp` | `0x00447a00..0x00447de0` | `LoadFont`, near miss (`samples/render/DebugOverlayNearMisses.cpp`) |
+| `FileStream.cpp` | `0x00460db0..0x00460e70` | `CheckHeader`, partial target (`samples/io/FileStream.cpp`) |
+| `MSZoneInterface.cpp` | `0x004aa150..0x004aa350` | the seven `SoultreePhysicsBaseObject` methods, left for the reason above |
+| `ResourceManager.cpp` | `0x004e9030..0x004e9360` | `AddArchive`, near miss (`samples/render/ResourceManagerNearMisses.cpp`) |
+
+In the other 24 units with `gap_missing`, the only strict-exact owners in a
+gap are the `BikeRace` vector helpers and `Vehicle` slots 78 and 79
+(`src/reconstructed/VehicleMethods.cpp`, at `0x00492220`/`0x00492270` inside
+`KrustyBike.cpp`). `KrustyBike.cpp` also has near-miss gaps, `order` and
+`unregistered` findings, so moving the two slots would not make it identical.
+
 Deleting-destructor placement. These points are confirmed with VC6 SP3 `/O2`
 probes using the `config/game_build.json` profile:
 

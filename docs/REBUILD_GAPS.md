@@ -28,8 +28,8 @@ extent (1,253,440 bytes); everything after it is library or compiler tail.
 
 | Category | Bytes | % `.text` | % game code | Count | Evidence |
 |---|---:|---:|---:|---:|---|
-| `exact_src`: strict VC6 match, source under `src/` | 833,459 | 60.90 | 66.49 | 3,992 | 1: rerun verdicts, relocations resolved |
-| `exact_samples`: strict match, source only under `samples/` | 2,027 | 0.15 | 0.16 | 59 | 1 (not canonical source) |
+| `exact_src`: strict VC6 match, source under `src/` | 838,328 | 61.26 | 66.88 | 4,000 | 1: rerun verdicts, relocations resolved |
+| `exact_samples`: strict match, source only under `samples/` | 2,242 | 0.16 | 0.18 | 62 | 1 (not canonical source) |
 | `library_crt_atlas`: LIBCMT bodies | 77,929 | 5.69 | - | 443 | 1 masked match, [VC6_CRT_ATLAS](VC6_CRT_ATLAS.md) |
 | `library_span_tier1`: LIBCMT sections, atlas row or named by a decoded relocation | 4,696 | 0.34 | - | 86 | 1 whole-section masked match, [span attribution](VC6_CRT_ATLAS.md#span-attribution) |
 | `library_span_tier2`: LIBCMT sections matched in a gap | 860 | 0.06 | - | 35 | 2 |
@@ -38,36 +38,48 @@ extent (1,253,440 bytes); everything after it is library or compiler tail.
 | `library_data`: DINPUT.LIB tables | 4,912 | 0.36 | - | 3 | 1 byte match against VC6 `DINPUT.LIB` |
 | `compiler_eh_text_x`: `$ehhandler` stubs + unwind funclets | 23,542 | 1.72 | - | 394 | 1 decoded `mov eax, FuncInfo; jmp ___CxxFrameHandler` |
 | `inline_asm_excluded` | 42,650 | 3.12 | 3.40 | 33 | 1 instruction (`fistp`/`rdtsc`/`fs:[4]`); 3 for the 4 docs-only rows |
-| `near_miss`: registered partials / near misses | 343,763 | 25.12 | 27.43 | 199 | 1 verdict; extent 2 where padding-delimited |
+| `near_miss`: registered partials / near misses | 338,808 | 24.76 | 27.03 | 193 | 1 verdict; extent 2 where padding-delimited |
 | `library_span_unlabeled`: LIBCMT span bytes nothing explains | 1 | 0.00 | - | - | - |
 | `library_unknown`: x87 span loops after LIBCMT, before the EH tail | 2,682 | 0.20 | - | - | 3 provider |
 | `padding`: int3/nop alignment | 31,668 | 2.31 | 2.51 | - | 2 decoder rule; 254 B span attribution |
-| `unattributed` | 129 | 0.01 | 0.01 | 5 | - |
+| `unattributed` | 0 | 0.00 | 0.00 | 0 | - |
 
 Counts are unique registered start addresses (by the category of their first
 byte). For libraries they count objects, thunks and stubs; for the
 `library_span_tier*` rows they count sections that keep bytes outside atlas
 rows. For `unattributed` they count the padding-delimited ranges. The library
 rows and `padding` were recounted on 2026-11-11 after the span attribution was
-added. The game rows are unchanged from the snapshot.
+added. The game rows (`exact_src`, `exact_samples`, `near_miss`,
+`unattributed`) were rerun on 2026-11-12 (main `adf12997` plus the four
+`ret` stubs below); `inline_asm_excluded` is unchanged.
 
-Headline: **66.7% of game-code bytes (835,486) are strict exact**, 0.2% of it
-(2,027 bytes, inline COMDAT helpers and layout probes) only from `samples/`.
-27.4% is registered but not exact, 3.4% needs inline assembly and 0.01% has no
-registration at all (5 ranges, 129 bytes; only `0x00423ef0..0x00423f6d` in
-BlockAllocator.cpp exceeds 16 bytes). No game function is a complete original
+Headline: **67.1% of game-code bytes (840,570) are strict exact**, 0.2% of it
+(2,242 bytes, inline COMDAT helpers, layout probes and the three
+`DrawCurrentLod` atexit stubs) only from `samples/`. 27.0% is registered but
+not exact, 3.4% needs inline assembly and no game byte is left without a
+registration. The last five ranges (129 bytes) were:
+
+| Range | Content | Registration |
+|---|---|---|
+| `0x00423ef0..0x00423f6d` | `GR_BitString::ReadBits`, called from the LZW decoder at `0x004a041a`, `0x004a043b`, `0x004a0461`, `0x004a05a3` ([BITSTRING_READ](BITSTRING_READ.md)) | partial `samples/render/targets.json` entry (`BitStringRead.cpp`), registered after the snapshot |
+| `0x00442f40`, `0x00442f50`, `0x00442f60` | a bare `ret` each: the atexit destructors of `DrawCurrentLod`'s function-local statics `viewPosition`, `viewDirection` and `eye`, whose type has an empty destructor. `DrawCurrentLod` pushes them to `atexit` (`0x00535430`) at `0x00441f2b`, `0x00441f0a` and `0x00441642` under guard `0x0057ef24` bits 4, 2 and 1 | calibration `_$E4`, `_$E3`, `_$E2` of `samples/render/D3DIMSoulTreeNearMisses.cpp`, strict exact. The sample's object pushes the same symbols under the same guard bits |
+| `0x004bb620` | a bare `ret`: the atexit destructor of `ParticleManager::Render3D`'s `static Matrix4 s_particleWorld` (`0x006898f8`, guard `0x00689154` bit 1), pushed at `0x004bacbb` | calibration `_$E2` of `src/bringup/Group1_ParticleRender.cpp` (the linked `Render3D`, inline asm), strict exact; `Group1_ParticleRender.bindings.json` is new |
+
+None of the four stubs is padding: each is the target of a `push imm32`
+before a call to `atexit`, and each starts on a 16-byte boundary after
+`nop` fill. No game function is a complete original
 translation unit yet. All translation units compile and link into a runnable
 `mcm2.exe` (`tools/build_game.py`, [GAME_BUILD](GAME_BUILD.md)); the
 near-miss and unregistered bodies in that build are best-effort stand-ins, so
 the build races but is not byte-identical to retail.
 
-Verdicts were rerun for this snapshot (main 38c69460, 2026-11-11):
-`tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt` gives 2997 of
-3006 unique address/extent pairs strict exact (the nine others are recorded in
-[DECOMPILATION_PROGRESS](DECOMPILATION_PROGRESS.md)), and
-`tools/run_physics_samples.py --strict --profile vc6_o2_mt` 1,082 of 1,151
+Verdicts were rerun for the game rows (main adf12997 plus the four stubs,
+2026-11-12): `tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt`
+gives 3005 of 3014 unique address/extent pairs strict exact (3058 cases; the
+nine others are recorded in [DECOMPILATION_PROGRESS](DECOMPILATION_PROGRESS.md)),
+and `tools/run_physics_samples.py --strict --profile vc6_o2_mt` 1,085 of 1,152
 `targets.json` entries under `samples/physics`, `src/krusty2` and the manual
-suite. Terrain slot 14 (0x00506220) is one of the 69 others since the bring-up
+suite. Terrain slot 14 (0x00506220) is one of the 67 others since the bring-up
 slot-12 override (issue #32).
 
 ## .text coverage
@@ -336,13 +348,13 @@ intrinsic) or a `mov eax, fs:[4]` stack-top read. "to padding" extents can
 span more than one function. Instruction presence is confirmed by a
 linear decode of the extent; that it needs `__asm` is strong inference. Four
 rows have no such instruction and rest on documented shapes only (tier 3).
-None is strict exact. 22 are unregistered; 9 are registered near misses.
+None is strict exact. 21 are unregistered; 10 are registered near misses.
 
 | Function | Bytes (extent) | Instructions | Evidence | Registration | Nearest `__FILE__` |
 |---|---:|---|---|---|---|
 | `0x00406ae0` | 2359 (registered) | fistp x3 | scan | registered near miss | Bike.cpp |
 | `0x0040c000` | 1015 (registered) | fistp x1 | scan | registered near miss | Bike.cpp |
-| `0x00423ef0` | 125 (to padding) | - | docs only (`docs/BOUNDINGBOXTREE.md:41`) | unregistered | BlockAllocator.cpp |
+| `0x00423ef0` | 125 (to padding) | - | docs only (`docs/BOUNDINGBOXTREE.md:41`) | registered near miss | BlockAllocator.cpp |
 | `0x00446f40` | 1524 (registered) | fistp x6 | scan + docs (`docs/NEAR_MISS_INDEX.md:195`) | registered near miss | D3DIMSoultreeShadow.cpp |
 | `0x0045ff80` | 1290 (to padding) | mov fs:[4] x1 | scan | unregistered | EventManager.cpp |
 | `0x00461d60` | 251 (to padding) | - | docs only (`docs/FILESTREAM.md:12`) | unregistered | FollowCam.cpp |
@@ -473,15 +485,16 @@ sample ([GAME_BUILD.md](GAME_BUILD.md#rider-pose-selection-rounding)).
 
 ## What is needed next
 
-1. **Code that exists but does not match**: 343,763 near-miss bytes in 199
+1. **Code that exists but does not match**: 338,808 near-miss bytes in 193
    registered functions (summary table; largest BikeAI `0x0040eca0`, 17.6 KB,
    and BikeRace `0x00419970`, 13 KB). See [NEAR_MISS_INDEX](NEAR_MISS_INDEX.md).
    The linked bodies of these functions are what the game runs; the accuracy
    audit above ranks the ones whose code differs most from retail.
-2. **No registration**: 5 ranges, 129 bytes; only `0x00423ef0..0x00423f6d` in
-   BlockAllocator.cpp exceeds 16 bytes.
-3. **Promotion**: 2,027 strict-exact bytes (inline COMDAT helpers and layout
-   probes) live only in `samples/`.
+2. **No registration**: none. The last five ranges (129 bytes) are
+   registered; see the [summary](#summary).
+3. **Promotion**: 2,242 strict-exact bytes (inline COMDAT helpers, layout
+   probes, and the three `DrawCurrentLod` atexit stubs, which can only move
+   with that near miss) live only in `samples/`.
 4. **Unit layout**: whole-object matching per retail unit (function order,
    COMDAT and `.text$x` placement), merging the `src/` files that do not fit
    the alphabetical link order into their owning units, and naming the units
