@@ -5,9 +5,9 @@
 lines 22 and 113), the inline EArray.h constructor (line 53), and the
 callers in Overlay (`0x004b5f0a`, `0x004b6046`) and TrackOverlay. The TU
 runs from `0x0050ac30` to `0x0050bec9`; ManagedTextureGroup's constructor
-follows at `0x0050bed0`. The class has no RTTI, so it keeps the
-`UnknownOverlayText` name TrackOverlay's mangled names use; all names are
-provisional.
+follows at `0x0050bed0`. The class has no RTTI; it is named after the
+unit, whose constructor pushes the literal and which holds every method
+(tier 2, docs/NAMING.md wave 7). Member names are provisional.
 
 The object (0x122c bytes) draws bitmap-font text: the selected
 FontTexture (+0), an `EArray<FontTexture*>` (+4), a vertex depth
@@ -42,4 +42,4 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x0050bd30` `DrawVertices`
 - `0x0050b080` `DrawTextInto` (dispatches to the 16-bit versions), `0x0050b400`
   `DrawText4444`, `0x0050b700` `DrawText1555` (near-miss sample)
-- `0x0050ba00` `UnknownOverlayText::LayoutText`
+- `0x0050ba00` `TextService::LayoutText`

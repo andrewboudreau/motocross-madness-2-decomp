@@ -25,18 +25,18 @@
     }
 
 // 0x0050ac30
-UnknownOverlayText::UnknownOverlayText(unsigned int count, float x, float y, float width, float height)
+TextService::TextService(unsigned int count, float x, float y, float width, float height)
     : currentFont(0), fonts(new(__FILE__, 22) EArray<FontTexture*>(count)), field_0x08(0.2f),
-      vertexDepth(0.001f), field_0x10(0, 0, 0, 0) {
+      vertexDepth(0.001f), bounds(0, 0, 0, 0) {
     unsigned int i;
 
-    field_0x10.UnknownSet(x, y, x + width, y + height);
+    bounds.SetCorners(x, y, x + width, y + height);
     for (i = 0; i < count; i++)
         (*fonts)[i] = 0;
 }
 
 // 0x0050ad30
-UnknownOverlayText::~UnknownOverlayText() {
+TextService::~TextService() {
     unsigned int count;
     unsigned int i;
 
@@ -53,7 +53,7 @@ UnknownOverlayText::~UnknownOverlayText() {
 
 // 0x0050ade0: the count test and the match leave the loop by `return` and
 // `break` (a `for` or `while (i < count)` loop is rotated).
-void UnknownOverlayText::SelectFont(const char* font) {
+void TextService::SelectFont(const char* font) {
     unsigned int count;
     unsigned int i;
 
@@ -70,20 +70,20 @@ void UnknownOverlayText::SelectFont(const char* font) {
 }
 
 // 0x0050ae60
-void UnknownOverlayText::SetFont(unsigned int index, FontTexture* font) {
+void TextService::SetFont(unsigned int index, FontTexture* font) {
     (*fonts)[index] = font;
 }
 
 // 0x0050ae80
-UnknownOverlayText* UnknownOverlayText::Create(const char* archive, const char** names, int count,
+TextService* TextService::Create(const char* archive, const char** names, int count,
                                                               int format, TextureMapManager* manager, float x,
                                                               float y, float width, float height, int a10) {
-    UnknownOverlayText* text;
+    TextService* text;
     char path[80];
     char textureName[80];
     int i;
 
-    text = new(__FILE__, 113) UnknownOverlayText(count, x, y, width, height);
+    text = new(__FILE__, 113) TextService(count, x, y, width, height);
     g_ResourceManager->AddArchive(archive, 0);
     path[0] = 0;
     textureName[0] = 0;
@@ -102,7 +102,7 @@ UnknownOverlayText* UnknownOverlayText::Create(const char* archive, const char**
 
 // 0x0050bd30: texture stage 0 colour (state 0xc, restored afterwards) and
 // alpha blending per texture format: 4444 and 8888 also modulate alpha.
-void UnknownOverlayText::DrawVertices(RenderTarget* target, void* vertices, int count) {
+void TextService::DrawVertices(RenderTarget* target, void* vertices, int count) {
     if (!currentFont || !vertices)
         return;
 

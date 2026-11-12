@@ -1,4 +1,4 @@
-"""UnknownOverlayText::DrawText1555 0x0050b700, the 16-bit (1555) font blitter (tools/emu_diff.py
+"""TextService::DrawText1555 0x0050b700, the 16-bit (1555) font blitter (tools/emu_diff.py
 case, call-record/replay mode).
 
 The inputs of ``overlay_draw_text`` (fonts with missing characters, glyph rectangles on and
@@ -8,7 +8,7 @@ with 16-bit texels and the real BlendFontTexel1555 0x0043b440; the colour is a 1
 from tools.emu_cases import overlay_draw_text as base
 
 RETAIL_VA = 0x0050b700
-SYMBOL = '?DrawText1555@UnknownOverlayText@@QAEHPAVTextureMap@@HHPBDG@Z'
+SYMBOL = '?DrawText1555@TextService@@QAEHPAVTextureMap@@HHPBDG@Z'
 SOURCE = base.SOURCE
 PROBES = {0x0050b8b3: 'wrap', 0x0050b937: 'blend'}
 REPLAY = base.REPLAY

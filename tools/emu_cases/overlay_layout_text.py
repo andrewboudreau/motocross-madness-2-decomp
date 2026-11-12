@@ -1,4 +1,4 @@
-"""UnknownOverlayText::LayoutText 0x0050ba00, the textured-quad text layout (tools/emu_diff.py
+"""TextService::LayoutText 0x0050ba00, the textured-quad text layout (tools/emu_diff.py
 case, call-record/replay mode).
 
 The linked body is src/bringup/Group2_OverlayText.cpp. The font (+0x00) answers FindCell
@@ -14,7 +14,7 @@ import random
 import struct
 
 RETAIL_VA = 0x0050ba00
-SYMBOL = '?LayoutText@UnknownOverlayText@@QAEPAXPBUUnknownOverlayRect@@PBDIPAH@Z'
+SYMBOL = '?LayoutText@TextService@@QAEPAXPBUUnknownOverlayRect@@PBDIPAH@Z'
 SOURCE = 'src/bringup/Group2_OverlayText.cpp'
 PROBES = {0x0050ba67: 'left clamp', 0x0050baeb: 'cell'}
 

@@ -177,7 +177,7 @@ InstrumentOverlay::~InstrumentOverlay()
 }
 
 // 0x00518c60: the needle from its tip to the dial centre.
-void InstrumentOverlay::PlaceNeedle(UnknownGauge* gauge, UnknownOverlayVertex* vertices)
+void InstrumentOverlay::PlaceNeedle(UnknownGauge* gauge, TLVertex* vertices)
 {
     vertices[0].sz = 0.00001f;
     vertices[0].rhw = 1.0f;
@@ -197,7 +197,7 @@ void InstrumentOverlay::PlaceNeedle(UnknownGauge* gauge, UnknownOverlayVertex* v
 }
 
 // 0x00518cc0: the needle tip for the clamped value.
-void InstrumentOverlay::PlaceNeedleTip(UnknownGauge* gauge, UnknownOverlayVertex* vertex)
+void InstrumentOverlay::PlaceNeedleTip(UnknownGauge* gauge, TLVertex* vertex)
 {
     if (gauge->value > gauge->maximum)
         gauge->value = gauge->maximum;

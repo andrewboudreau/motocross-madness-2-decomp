@@ -72,7 +72,7 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
     LayOutQuad();
 
     if (withText)
-        textService = UnknownOverlayText::Create(
+        textService = TextService::Create(
             textArchive, fontNames, fontCount, textFormat, g_TrackGame->textureManager, quadVertices[0].sx, quadVertices[0].sy,
             quadVertices[2].sx - quadVertices[0].sx, quadVertices[2].sy - quadVertices[0].sy, a12);
     else

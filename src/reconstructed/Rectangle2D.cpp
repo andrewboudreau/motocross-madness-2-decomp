@@ -7,12 +7,12 @@
 #include "Rectangle2D.h"
 
 // 0x004e8ad0
-Rectangle2D::Rectangle2D(float x1, float y1, float x2, float y2) : field_0x04(x1, y1), field_0x10(x2, y2)
+Rectangle2D::Rectangle2D(float x1, float y1, float x2, float y2) : topLeft(x1, y1), bottomRight(x2, y2)
 {
 }
 
 // 0x004e8b60
-Rectangle2D::Rectangle2D(const Rectangle2D& other) : field_0x04(other.field_0x04), field_0x10(other.field_0x10)
+Rectangle2D::Rectangle2D(const Rectangle2D& other) : topLeft(other.topLeft), bottomRight(other.bottomRight)
 {
 }
 
@@ -25,8 +25,8 @@ Rectangle2D::~Rectangle2D()
 Rectangle2D& Rectangle2D::operator=(const Rectangle2D& other)
 {
     if (this != &other) {
-        field_0x04 = other.field_0x04;
-        field_0x10 = other.field_0x10;
+        topLeft = other.topLeft;
+        bottomRight = other.bottomRight;
     }
     return *this;
 }

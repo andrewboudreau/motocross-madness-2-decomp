@@ -1,4 +1,4 @@
-"""UnknownOverlayText::DrawTextInto 0x0050b080, the font blitter into a locked texture
+"""TextService::DrawTextInto 0x0050b080, the font blitter into a locked texture
 (tools/emu_diff.py case, call-record/replay mode).
 
 The linked body is src/bringup/Group2_OverlayText.cpp. The overlay's font (+0x00) answers
@@ -18,7 +18,7 @@ import random
 import struct
 
 RETAIL_VA = 0x0050b080
-SYMBOL = '?DrawTextInto@UnknownOverlayText@@QAEHPAVTextureMap@@HHPBDH@Z'
+SYMBOL = '?DrawTextInto@TextService@@QAEHPAVTextureMap@@HHPBDH@Z'
 SOURCE = 'src/bringup/Group2_OverlayText.cpp'
 PROBES = {0x0050b0bd: '1555', 0x0050b0fb: '4444', 0x0050b2b6: 'wrap', 0x0050b338: 'blend',
           0x0050b395: 'next char'}

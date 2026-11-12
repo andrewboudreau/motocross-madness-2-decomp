@@ -28,15 +28,15 @@ public:
     Rectangle2D& operator=(const Rectangle2D& other); // 0x004e8c20
 
     // Inline (TextService.cpp's constructor addresses the rectangle once).
-    void UnknownSet(float x1, float y1, float x2, float y2) {
-        field_0x04.x = x1;
-        field_0x04.y = y1;
-        field_0x10.x = x2;
-        field_0x10.y = y2;
+    void SetCorners(float x1, float y1, float x2, float y2) {
+        topLeft.x = x1;
+        topLeft.y = y1;
+        bottomRight.x = x2;
+        bottomRight.y = y2;
     }
 
-    Point2D field_0x04;                          // (x1, y1)
-    Point2D field_0x10;                          // (x2, y2)
+    Point2D topLeft;                             // +0x04 (x1, y1): the glyph origin TextService scales
+    Point2D bottomRight;                         // +0x10 (x2, y2): minus topLeft, the extent
 };
 
 // Globals holding 0 (0x0057972c, .bss), 1 (0x00568468), 2 (0x0056846c) and

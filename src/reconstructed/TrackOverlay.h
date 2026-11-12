@@ -72,11 +72,11 @@ public:
     virtual int Render3D();       // 0x00518940
 
     InstrumentOverlay* Setup(RenderTarget* target, TextureMapManager* manager, UnknownInstrumentSource* source); // 0x00518770
-    void PlaceNeedle(UnknownGauge* gauge, UnknownOverlayVertex* vertices);           // 0x00518c60
-    void PlaceNeedleTip(UnknownGauge* gauge, UnknownOverlayVertex* vertex);          // 0x00518cc0
+    void PlaceNeedle(UnknownGauge* gauge, TLVertex* vertices);           // 0x00518c60
+    void PlaceNeedleTip(UnknownGauge* gauge, TLVertex* vertex);          // 0x00518cc0
 
     UnknownGauge dial;
-    UnknownOverlayVertex dialNeedle[2];       // the needle, a line from tip to centre
+    TLVertex dialNeedle[2];       // the needle, a line from tip to centre
     UnknownInstrumentSource* instrumentSource;
 };
 
@@ -310,8 +310,8 @@ public:
     int mapCenterX;                           // map centre
     int mapCenterY;
     UnknownOverlayRect frameRateRect;         // frame-rate text rectangle
-    UnknownOverlayVertex lineStart;           // +0x1b8
-    UnknownOverlayVertex lineEnd;             // +0x1d8
+    TLVertex lineStart;           // +0x1b8
+    TLVertex lineEnd;             // +0x1d8
     UnknownOverlayRect mapRect;               // map rectangle
 };
 

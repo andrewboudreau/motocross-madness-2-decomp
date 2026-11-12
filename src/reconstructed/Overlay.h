@@ -13,8 +13,8 @@
 // provisional. Overlay introduces no slots: it
 // overrides the destructor, slot 10 (0x00499ae0) and slot 14 (0x004b61a0).
 
-// UnknownOverlayVertex and the text renderer at Overlay+0x38
-// (UnknownOverlayText) are declared in TextService.h.
+// TLVertex and the text renderer at Overlay+0x38
+// (TextService) are declared in TextService.h.
 
 class Overlay : public GameObject {
 public:
@@ -51,10 +51,10 @@ public:
     TextureMap* overlayTexture;               // released by derived destructors
     TextureMap* backingTexture;               // copied back by 0x004b6710; RadarOverlay: the map
     TextureMap* sharedTexture;                // shared 256x256 texture (0x00689110)
-    UnknownOverlayText* textService;          // +0x38 fonts for the overlay (0x0050ae80), or 0
+    TextService* textService;          // +0x38 fonts for the overlay (0x0050ae80), or 0
     OverlayIconService* iconService;          // +0x3c
     int field_0x40;
-    UnknownOverlayVertex quadVertices[5];     // cleared by the constructor
+    TLVertex quadVertices[5];     // cleared by the constructor
     int scaleRect;                            // +0xe4 ctor 1, Attach's argument: LayOutQuad scales screenRect from 640x480 to the viewport
     UnknownOverlayRect screenRect;            // screen rectangle
     UnknownOverlayRect sourceRect;            // source rectangle

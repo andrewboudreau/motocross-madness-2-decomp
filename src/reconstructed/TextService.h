@@ -11,7 +11,7 @@ class TextureMapManager;
 
 // A pre-transformed, lit vertex (D3DTLVERTEX, 0x20 bytes) as passed to
 // RenderTarget slot 16 with vertex format 0x1c4.
-struct UnknownOverlayVertex {
+struct TLVertex {
     float sx;
     float sy;
     float sz;
@@ -33,22 +33,22 @@ unsigned short BlendFontTexel4444(unsigned short texel, unsigned short dest, uns
 unsigned short BlendFontTexel1555(unsigned short texel, unsigned short dest, unsigned short color);
 
 // TextService.cpp (literal __FILE__ "D:\aardvark\VC\krusty2\TextService.cpp"
-// at 0x00574b30; code 0x0050ac30-0x0050bed0). No vtable or RTTI, so the
-// class name is not established: Overlay keeps one at +0x38 and
-// TrackOverlay.cpp calls it by this name. 0x122c bytes (0x0050ae80
+// at 0x00574b30; code 0x0050ac30-0x0050bed0). No vtable or RTTI: named
+// after the unit, whose constructor pushes the literal and which holds
+// every method. Overlay keeps one at +0x38. 0x122c bytes (0x0050ae80
 // allocates it): a list of fonts, the selected one and room for 24
 // characters of laid-out quads. Names are provisional.
-class UnknownOverlayText {
+class TextService {
 public:
     // 0x0050ac30: room for `count` fonts; the rectangle (x, y)-(x + width,
     // y + height).
-    UnknownOverlayText(unsigned int count, float x, float y, float width, float height);
-    ~UnknownOverlayText();                    // 0x0050ad30: releases the fonts
+    TextService(unsigned int count, float x, float y, float width, float height);
+    ~TextService();                    // 0x0050ad30: releases the fonts
 
     // 0x0050ae80 (cdecl): adds the archive `archive`, then loads the
     // `count` fonts `names` (cell file "<name>.cell", texture
     // "<name>.tga") and selects the first.
-    static UnknownOverlayText* Create(const char* archive, const char** names, int count,
+    static TextService* Create(const char* archive, const char** names, int count,
                                                      int format, TextureMapManager* manager, float x,
                                                      float y, float width, float height, int a10);
 
@@ -74,6 +74,6 @@ public:
     EArray<FontTexture*>* fonts;              // fonts
     float field_0x08;                         // 0.2
     float vertexDepth;                        // 0.001: vertex depth
-    Rectangle2D field_0x10;
-    UnknownOverlayVertex field_0x2c[24 * 6];
+    Rectangle2D bounds;                       // +0x10 (x, y)-(x + width, y + height) from the constructor
+    TLVertex vertices[24 * 6];                // +0x2c LayoutText fills and returns them
 };
