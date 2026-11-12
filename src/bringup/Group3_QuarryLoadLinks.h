@@ -26,11 +26,6 @@ void* G3Q_TerrainLoad(void* terrain, void* target, void* stream, int unused, voi
                       int quality, int field0xc40, const char* detailTexture,
                       int halfFormat);                                           // 0x005059d0
 void G3Q_QuadTreeRendererInsertNodes(void* renderer);                            // 0x005046e0
-void G3Q_CollisionSnapPlacement(void* collision);                                // 0x00435fe0
-void G3Q_CollisionSetUseBroadphase(void* collision, int enable);                 // 0x00432120
-void G3Q_CollisionSetIgnoreListMode(void* collision, int mode);                  // 0x00439400
-void G3Q_CollisionAddIgnoredOwner(void* collision, void* owner);                 // 0x00439410
-void G3Q_CollisionSetOwner(void* collision, void* owner, int tag);               // 0x004394d0
 
 // Group3_QuarryLinkRace.cpp
 void* G3Q_BikeRaceCreate(void* race, void* target, void* particles, void* lights,

@@ -1,12 +1,11 @@
-// Bring-up glue (see Group3_QuarryLoadLinks.h): the krusty2 particle, visibility, shadow,
-// terrain, quadtree-renderer and collision calls made by
+// Bring-up glue (see Group3_QuarryLoadLinks.h): the krusty2 particle, visibility,
+// terrain-shadow, terrain and quadtree-renderer calls made by
 // BaseQuarryEvent::LoadEventObjects (0x004de590).
 #include "effects/ParticleManager.h"
 #include "visibility/VisibilityQuadTree.h"
 #include "shadow/ProjectedShadow.h"
 #include "broadphase/Terrain.h"
 #include "soultree/SoultreeQuadTreeRenderer.h"
-#include "collision/CollisionObject.h"
 #include "Group3_QuarryLoadLinks.h"
 
 // TerrainShadow (vtable 0x005582d4, 0x6780 bytes). A local view: these are the names
@@ -44,29 +43,4 @@ void* G3Q_TerrainLoad(void* terrain, void* target, void* stream, int unused, voi
 void G3Q_QuadTreeRendererInsertNodes(void* renderer)
 {
     ((SoultreeQuadTreeRenderer*)renderer)->InsertNodesInQuadtree();
-}
-
-void G3Q_CollisionSnapPlacement(void* collision)
-{
-    ((CollisionObject*)collision)->SnapPlacement();
-}
-
-void G3Q_CollisionSetUseBroadphase(void* collision, int enable)
-{
-    ((CollisionObject*)collision)->SetUseBroadphase(enable);
-}
-
-void G3Q_CollisionSetIgnoreListMode(void* collision, int mode)
-{
-    ((CollisionObject*)collision)->SetIgnoreListMode(mode);
-}
-
-void G3Q_CollisionAddIgnoredOwner(void* collision, void* owner)
-{
-    ((CollisionObject*)collision)->AddIgnoredOwner(owner);
-}
-
-void G3Q_CollisionSetOwner(void* collision, void* owner, int tag)
-{
-    ((CollisionObject*)collision)->SetOwner(owner, tag);
 }
