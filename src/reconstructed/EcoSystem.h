@@ -423,18 +423,18 @@ public:
 
     // 0x00457480: reads the .est file (or a .esb through 0x00458f70);
     // `path` is rewritten to the .esb name when one exists.
-    int ReadEst(char* path, UnknownTextureStream* stream);
+    int ReadEst(char* path, FileStream* stream);
     // 0x00457ed0: builds the collision objects of a definition.
     void BuildCollisionObjects(UnknownEcoDefinition* definition);
     // 0x00458360: reads a definition's "CollisionObject%i" entries.
     void ReadCollisionObjects(const char* path, int index, UnknownEcoDefinition* definition);
     int WriteEsb(const char* path);              // 0x004587b0: writes the .esb
     void WriteListing(const char* path);          // 0x00458da0: writes the .txt listing
-    int ReadEsb(const char* path, UnknownTextureStream* stream);               // 0x00458f70: reads the .esb
+    int ReadEsb(const char* path, FileStream* stream);               // 0x00458f70: reads the .esb
     void SetDetailLevel(int level);    // 0x004594c0: detail level
     // 0x004594d0: creates the ecosystem.
     EcoSystem* Create(void* view, TextureMapManager* textures, UnknownEcoTerrain* terrain,
-                                     LightManager* lights, char* path, UnknownTextureStream* stream,
+                                     LightManager* lights, char* path, FileStream* stream,
                                      int textureFormat, int collisions, int level);
     int PlaceStoredObjects();                 // 0x004598d0: places the objects read from the .esb
     int PlaceAuthoredObjects();               // 0x00459b40: places the authored objects
@@ -462,7 +462,7 @@ public:
     Vector3 ambientLight;                     // ambient colour
     Vector3 lightDirection;                   // light direction
     unsigned char field_0x588[8];
-    UnknownTextureStream* esbStream;          // the .esb stream
+    FileStream* esbStream;          // the .esb stream
     int esbStreamInArchive;                   // nonzero: esbStream belongs to the archive
     unsigned char field_0x598;
     char vegetationTypeId;                    // the Vegetation type id (TypeRegistry)
@@ -494,7 +494,7 @@ extern NormalDistribution* g_SharedNormalDistribution;
 
 // 0x0045c040 (cdecl): loads every texture a .esb names ahead of the
 // ecosystem itself.
-int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStream* stream, int modelFlags);
+int PreloadEcosystem(TextureMapManager* textures, char* path, FileStream* stream, int modelFlags);
 
 // Helpers reconstructed elsewhere.
 // 0x0047b8a0 (gameui.cpp tail): a float profile value, `defaultValue` when the key is "NONE".

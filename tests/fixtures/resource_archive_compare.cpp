@@ -125,22 +125,22 @@ ResourceItem::~ResourceItem() {
     Event(9, Identity(this), Identity(name));
     Retire(name);
 }
-UnknownTextureStream::UnknownTextureStream(UnknownResourceManager* owner) {
+FileStream::FileStream(UnknownResourceManager* owner) {
     Event(10, Identity(this), Identity(owner));
     if (scenario.throwKind == 2) throw 72;
     memset(this, 0, sizeof(*this));
     archives = owner;
 }
-UnknownTextureStream::~UnknownTextureStream() { Event(11, Identity(this)); }
-int UnknownTextureStream::IsValidFile(const char* path) {
+FileStream::~FileStream() { Event(11, Identity(this)); }
+int FileStream::IsValidFile(const char* path) {
     Event(12, Identity(this), Hash(path, strlen(path)), scenario.valid);
     return scenario.valid;
 }
-int UnknownTextureStream::Open(const char* path, const char* mode, int flag) {
+int FileStream::Open(const char* path, const char* mode, int flag) {
     Event(13, Identity(this), Hash(path, strlen(path)), Hash(mode, strlen(mode)), flag);
     return scenario.opens;
 }
-int UnknownTextureStream::Read(void* buffer, int size, int count) {
+int FileStream::Read(void* buffer, int size, int count) {
     int number = ++reads, total = size * count;
     if (total < 0 || total > 64) ExitProcess(95);
     unsigned char data[64]; memset(data, 0, sizeof(data));
@@ -181,8 +181,8 @@ int UnknownResourceManager::MergeWithExisting(ResourceItem* item) {
 // Constructors cannot be addressed in C++; these test-only thiscall entry
 // points call the identical scripted constructors at the supplied address.
 struct ConstructorCalls {
-    UnknownTextureStream* Stream(UnknownResourceManager* owner) {
-        return ::new(this) UnknownTextureStream(owner);
+    FileStream* Stream(UnknownResourceManager* owner) {
+        return ::new(this) FileStream(owner);
     }
     ResourceItem* Item() { return ::new(this) ResourceItem; }
 };
@@ -190,7 +190,7 @@ template<class T> static DWORD Address(T method) {
     union { T method; DWORD address; } value;
     value.method = method; return value.address;
 }
-struct DestructorCall { void Stream() { ((UnknownTextureStream*)this)->~UnknownTextureStream(); } };
+struct DestructorCall { void Stream() { ((FileStream*)this)->~FileStream(); } };
 static DWORD Replacement(DWORD target) {
     switch (target) {
     case 0x4a3010: return (DWORD)(void* (__cdecl*)(unsigned int, const char*, int))operator new;
@@ -199,9 +199,9 @@ static DWORD Replacement(DWORD target) {
     case 0x460d10: return Address(&ConstructorCalls::Stream);
     case 0x460d60: return Address(&DestructorCall::Stream);
     case 0x4e8d70: return Address(&ConstructorCalls::Item);
-    case 0x460e70: return Address(&UnknownTextureStream::IsValidFile);
-    case 0x460f50: return Address(&UnknownTextureStream::Open);
-    case 0x461640: return Address(&UnknownTextureStream::Read);
+    case 0x460e70: return Address(&FileStream::IsValidFile);
+    case 0x460f50: return Address(&FileStream::Open);
+    case 0x461640: return Address(&FileStream::Read);
     case 0x4a2ec0: return (DWORD)DebugRealloc;
     case 0x4e8f40: return Address(&UnknownResourceManager::MergeWithExisting);
     case 0x536070: return (DWORD)_stricmp;
@@ -272,13 +272,13 @@ static void Run(int reference) {
         }
     }
     if (scenario.archiveCapacity) {
-        manager->archives = (UnknownTextureStream**)Allocate(scenario.archiveCapacity * 4);
+        manager->archives = (FileStream**)Allocate(scenario.archiveCapacity * 4);
         memset(manager->archives, 0, scenario.archiveCapacity * 4);
         for (int j = 0; j < scenario.archives; ++j)
-            manager->archives[j] = ::new(Allocate(sizeof(UnknownTextureStream))) UnknownTextureStream(manager);
+            manager->archives[j] = ::new(Allocate(sizeof(FileStream))) FileStream(manager);
     }
     observed.events = 0; constructors = allocations = 0;
-    union { UnknownTextureStream* (UnknownResourceManager::*method)(const char*, int); DWORD address; } call;
+    union { FileStream* (UnknownResourceManager::*method)(const char*, int); DWORD address; } call;
     call.method = &UnknownResourceManager::AddArchive;
     if (reference) call.address = 0x4e9030;
     try {

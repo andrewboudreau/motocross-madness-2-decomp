@@ -7,7 +7,7 @@ the `__FILE__` literal `D:\aardvark\VC\krusty2\ResourceManager.cpp`
 "RS2" archive tag (`0x00572b90`). The file runs from `0x004e8d30` (the
 initializers of the global manager at `0x00689c78`, which `0x00572b44`
 points to) to `0x004e9960`, an out-of-line copy of an inline
-`UnknownTextureStream` method; SceneManager.cpp starts at `0x004e9980`.
+`FileStream` method; SceneManager.cpp starts at `0x004e9980`.
 Names other than ResourceItem are provisional.
 
 The manager keeps named items (ResourceItem: a name, the archive stream

@@ -30,7 +30,7 @@ Palette8* Palette8::LoadShared(const char* name) {
 // name (length first) and 256 RGB entries. With a first entry of 10 the
 // palette keeps the system's 20 static colours; otherwise unused entries
 // are white.
-Palette8::Palette8(UnknownTextureStream* stream) {
+Palette8::Palette8(FileStream* stream) {
     int length;
     char* name;
     int i;

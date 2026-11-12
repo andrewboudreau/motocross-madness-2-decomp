@@ -233,7 +233,7 @@ static inline int GridExtentBelow(const GridVec3& v, float limit)
 // data (with per-block records when any of the 16 header words is not an
 // 0xfffe/0xffff marker), computes the bounding box and, when asked, creates
 // the child nodes through virtual slot 2.
-DrawableGridNode* DrawableGridNode::ReadNode(UnknownTextureStream* stream, int a1,
+DrawableGridNode* DrawableGridNode::ReadNode(FileStream* stream, int a1,
                                              DrawableGridNode* parent, int level, int shift,
                                              int x, int z, int index, float* boundsMin,
                                              float* boundsMax)
@@ -607,7 +607,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* cen
             corners = 0;
         if (size == 16) {
             if (visible) {
-                UpdateLevelOfDetail((UnknownTextureStream*)stream, a1, 0, coarse);
+                UpdateLevelOfDetail((FileStream*)stream, a1, 0, coarse);
                 if (data->b0) {
                     coarse = 1;
                     count = 1;
@@ -638,7 +638,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* cen
                             if (child->children)
                                 child->data->b1 = 1;
                         }
-                        child->UpdateLevelOfDetail((UnknownTextureStream*)stream, a1, 1, coarse);
+                        child->UpdateLevelOfDetail((FileStream*)stream, a1, 1, coarse);
                         count++;
                     }
                 }
@@ -678,7 +678,7 @@ int DrawableGridNode::WalkVisibilityQuadrants(void* stream, void* a1, float* cen
                                 child->childMask = 0x1fffff;
                                 changed = 1;
                             }
-                            child->UpdateLevelOfDetail((UnknownTextureStream*)stream, a1, 0, coarse);
+                            child->UpdateLevelOfDetail((FileStream*)stream, a1, 0, coarse);
                             count++;
                         } else if (child->childMask) {
                             child->childMask = 0;

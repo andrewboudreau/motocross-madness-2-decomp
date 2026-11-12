@@ -23,7 +23,7 @@ static int g_gridRow17[18] = {
 float g_grid1DetailDistance = 256.0f;
 
 // 0x0047c880
-DrawableGridNodeSharedTextures::DrawableGridNodeSharedTextures(UnknownTextureStream* stream, int a1,
+DrawableGridNodeSharedTextures::DrawableGridNodeSharedTextures(FileStream* stream, int a1,
                                                                GridNode* parent, GridTerrain* terrain,
                                                                int level, int shift, int x, int z,
                                                                int index, float* boundsMin,
@@ -36,7 +36,7 @@ DrawableGridNodeSharedTextures::DrawableGridNodeSharedTextures(UnknownTextureStr
 }
 
 // 0x0047c960
-GridNode* DrawableGridNodeSharedTextures::CreateChildNode(UnknownTextureStream* stream, int a1,
+GridNode* DrawableGridNodeSharedTextures::CreateChildNode(FileStream* stream, int a1,
                                                           DrawableGridNode* parent, int level,
                                                           int shift, int x, int z, int index,
                                                           void* boundsMin, void* boundsMax)

@@ -19,7 +19,7 @@ static BYTE referenceSpace[0x800000];
 UnknownResourceManager* g_ResourceManager=0;
 struct CameraAccess:FollowCamera{using FollowCamera::frames;using FollowCamera::field_0x33c;using FollowCamera::frameCount;};
 typedef char CameraLayout[(sizeof(FollowCamera)==0x384 && sizeof(Matrix4)==64 && sizeof(Vec3)==12 && sizeof(Vector3)==12 && sizeof(void(FollowCamera::*)(const char*))==4 && offsetof(CameraAccess,frameCount)==0x334 && offsetof(CameraAccess,frames)==0x338 && offsetof(CameraAccess,field_0x33c)==0x33c)?1:-1];
-typedef char StreamLayout[(sizeof(UnknownTextureStream)==0x134 && offsetof(UnknownTextureStream,fileHandle)==0x14 && offsetof(UnknownTextureStream,sliceOffset)==0x130 && offsetof(UnknownTextureStream,archives)==0x12c)?1:-1];
+typedef char StreamLayout[(sizeof(FileStream)==0x134 && offsetof(FileStream,fileHandle)==0x14 && offsetof(FileStream,sliceOffset)==0x130 && offsetof(FileStream,archives)==0x12c)?1:-1];
 typedef char VectorLayout[(offsetof(Vec3,x)==0 && offsetof(Vec3,y)==4 && offsetof(Vec3,z)==8 && offsetof(Vector3,x)==0 && offsetof(Vector3,y)==4 && offsetof(Vector3,z)==8)?1:-1];
 struct Block{int size,alive;BYTE data[8192];};
 struct Event{int kind,size,line,frameCount;void*pointer;void*frames;void*values;};
@@ -50,10 +50,10 @@ void operator delete(void*p,const char*file,int line){CheckFile(file);if(line!=0
 
 
 
-UnknownTextureStream* UnknownResourceManager::AddArchive(const char*,int){ExitProcess(201);return 0;}
-int UnknownTextureStream::WriteHeader(const char*){ExitProcess(202);return 0;}
-struct ConstructorCall{UnknownTextureStream* Stream(UnknownResourceManager*m){return ::new(this)UnknownTextureStream(m);}};
-struct DestructorCall{void Stream(){((UnknownTextureStream*)this)->~UnknownTextureStream();}};
+FileStream* UnknownResourceManager::AddArchive(const char*,int){ExitProcess(201);return 0;}
+int FileStream::WriteHeader(const char*){ExitProcess(202);return 0;}
+struct ConstructorCall{FileStream* Stream(UnknownResourceManager*m){return ::new(this)FileStream(m);}};
+struct DestructorCall{void Stream(){((FileStream*)this)->~FileStream();}};
 template<class T>static DWORD Address(T m){if(sizeof(m)!=4)ExitProcess(93);DWORD p;memcpy(&p,&m,4);return p;}
 static int MapReference(const char*path){
     BYTE*mapped=(BYTE*)0x400000;DWORD old;
@@ -80,7 +80,7 @@ static void Run(int reference){
  got.blocks=blocks;got.cursor=cursor;got.reads=reads;got.seeks=seeks;got.fp=_statusfp();got.fpControl=_controlfp(0,0);memcpy(got.camera,camera,sizeof(camera));memcpy(got.heap,heap,sizeof(heap));memcpy(got.guarded,guardPage,4096);got.diagnosticDeletes=diagnosticDeletes;memcpy(got.events,events,sizeof(events));got.eventCount=eventCount;memcpy(got.previousFrames,previousFrames,sizeof(previousFrames));memcpy(got.previousValues,previousValues,sizeof(previousValues));
  // Fault/throw paths intentionally leave the opened stream alive in retail.
  // Record that state before closing its real FILE solely for test isolation.
- if(blocks&&heap[0].alive&&(guardAllocation!=0||guardBytes>=0x134)){UnknownTextureStream*stream=(UnknownTextureStream*)allocated[0];if(stream->fileHandle)fclose(stream->fileHandle);}
+ if(blocks&&heap[0].alive&&(guardAllocation!=0||guardBytes>=0x134)){FileStream*stream=(FileStream*)allocated[0];if(stream->fileHandle)fclose(stream->fileHandle);}
 }
 static int checks;
 static void Check(){Run(1);want=got;Run(0);checks++;if(memcmp(&want,&got,sizeof(got))){int at=0;while(((BYTE*)&want)[at]==((BYTE*)&got)[at])at++;printf("GuardAllocation%d bytes%d\n",guardAllocation,guardBytes);printf("Mismatch seed%d line%d at%d values%02x/%02x fail%d throw%d path%d FP%x fullbits%08x/%08x\n%s\n%s\n",seed,lineCount,at,((BYTE*)&want)[at],((BYTE*)&got)[at],failAllocation,throwAllocation,pathMode,control,*(DWORD*)((BYTE*)&want+(at&~3)),*(DWORD*)((BYTE*)&got+(at&~3)),lines[0],lines[1]);ExitProcess(3);}}
@@ -113,7 +113,7 @@ static void Ownership(){CameraAccess*c=(CameraAccess*)camera;int count=expectedF
 static unsigned random=0x4597;static float F(){random=random*1664525u+1013904223u;return ((int)(random%200001)-100000)*0.003271f;}
 int main(int argc,char**argv){setvbuf(stdout,0,_IONBF,0);if(argc!=3||!MapReference(argv[1]))return 1;sourcePath=argv[2];guardPage=(BYTE*)VirtualAlloc(0,8192,MEM_RESERVE|MEM_COMMIT,PAGE_READWRITE);DWORD guardOld;if(!guardPage||!VirtualProtect(guardPage+4096,4096,PAGE_NOACCESS,&guardOld))return 25;InitFastInvSqrtTable();*(void**)0x572b44=0;
 DWORD constructor=Address(&ConstructorCall::Stream),destructor=Address(&DestructorCall::Stream),alloc=(DWORD)(void*(__cdecl*)(unsigned int,const char*,int))operator new,del=(DWORD)(void(__cdecl*)(void*))operator delete;
-Patch(0x46510f,0x4a3010,alloc);Patch(0x465131,0x460d10,constructor);Patch(0x46515f,0x460f50,Address(&UnknownTextureStream::Open));Patch(0x46518a,0x461aa0,Address(&UnknownTextureStream::ReadLine));Patch(0x4651a2,0x5476f0,(DWORD)_strnicmp);Patch(0x4651c3,0x461aa0,Address(&UnknownTextureStream::ReadLine));Patch(0x4651e3,0x4a3010,alloc);Patch(0x465212,0x4a3010,alloc);Patch(0x46522c,0x461340,Address(&UnknownTextureStream::Seek));Patch(0x465240,0x461aa0,Address(&UnknownTextureStream::ReadLine));Patch(0x46525e,0x5476f0,(DWORD)_strnicmp);Patch(0x4652b3,0x53530b,(DWORD)sscanf);Patch(0x4653b6,0x5087b0,(DWORD)Vec3Normalize);Patch(0x4653dc,0x5087b0,(DWORD)Vec3Normalize);Patch(0x46540a,0x515600,(DWORD)CrossProductCall);Patch(0x465498,0x461aa0,Address(&UnknownTextureStream::ReadLine));Patch(0x4654ae,0x460d60,destructor);Patch(0x4654b4,0x4a30c0,del);Patch(0x54abb1,0x4a3060,(DWORD)(void(__cdecl*)(void*,const char*,int))operator delete);if(*(BYTE*)0x54abbf!=0xe9||0x54abc4+*(DWORD*)0x54abc0!=0x53471a) return 2;*(DWORD*)0x54abc0=(DWORD)__CxxFrameHandler-0x54abc4;FlushInstructionCache(GetCurrentProcess(),(void*)0x400000,0x290000);if((FollowCamera*)(KrustyBikeCamera*)camera!=(FollowCamera*)camera)return 34;
+Patch(0x46510f,0x4a3010,alloc);Patch(0x465131,0x460d10,constructor);Patch(0x46515f,0x460f50,Address(&FileStream::Open));Patch(0x46518a,0x461aa0,Address(&FileStream::ReadLine));Patch(0x4651a2,0x5476f0,(DWORD)_strnicmp);Patch(0x4651c3,0x461aa0,Address(&FileStream::ReadLine));Patch(0x4651e3,0x4a3010,alloc);Patch(0x465212,0x4a3010,alloc);Patch(0x46522c,0x461340,Address(&FileStream::Seek));Patch(0x465240,0x461aa0,Address(&FileStream::ReadLine));Patch(0x46525e,0x5476f0,(DWORD)_strnicmp);Patch(0x4652b3,0x53530b,(DWORD)sscanf);Patch(0x4653b6,0x5087b0,(DWORD)Vec3Normalize);Patch(0x4653dc,0x5087b0,(DWORD)Vec3Normalize);Patch(0x46540a,0x515600,(DWORD)CrossProductCall);Patch(0x465498,0x461aa0,Address(&FileStream::ReadLine));Patch(0x4654ae,0x460d60,destructor);Patch(0x4654b4,0x4a30c0,del);Patch(0x54abb1,0x4a3060,(DWORD)(void(__cdecl*)(void*,const char*,int))operator delete);if(*(BYTE*)0x54abbf!=0xe9||0x54abc4+*(DWORD*)0x54abc0!=0x53471a) return 2;*(DWORD*)0x54abc0=(DWORD)__CxxFrameHandler-0x54abc4;FlushInstructionCache(GetCurrentProcess(),(void*)0x400000,0x290000);if((FollowCamera*)(KrustyBikeCamera*)camera!=(FollowCamera*)camera)return 34;
 for(seed=0;seed<1000;seed++){lineCount=seed%5;for(int i=0;i<lineCount;i++)sprintf(lines[i],"CAMERA C 0 0 0 %.9g %.9g %.9g %.9g %.9g %.9g %.9g %.9g %.9g %.9g",F(),F(),F(),F(),F(),F(),F(),F(),F(),F());Check();Success();Ownership();}
 // Independent exact unit-axis, position and trailing-value oracle across FP modes.
 lineCount=1;strcpy(lines[0],"CAMERA C 0 0 0 0 1 0 0 0 1 1.25 -3.5 2.75 4.5");

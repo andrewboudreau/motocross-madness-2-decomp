@@ -28,8 +28,8 @@
 #define MCM2_PHYSICS_COMMON_SOULTREEOBJECT_H
 
 class UnknownParameterBlock;
-class UnknownTextureStream;
-typedef UnknownTextureStream UnknownParameterStream;
+class FileStream;
+typedef FileStream UnknownParameterStream;
 
 #ifdef SOULTREE_OBJECT_WITH_BASES
 #include "collision/CollisionObject.h"   // QuadTreeObject, GameObject
@@ -300,7 +300,7 @@ public:
     // Primary vtable 0x00557c18 (QuadTreeObject's): slots 0/1 inherited, 2..8 introduced.
     // Names tier 3 from the decoded bodies below; D3DIMSoultreeObject's overrides are its
     // corresponding primary virtual methods (slots 2..8).
-    virtual void LoadHierarchy(UnknownTextureStream* stream);   // slot 2, 0x004fdc00, ret 4: node count, names, matrices, parent indices
+    virtual void LoadHierarchy(FileStream* stream);   // slot 2, 0x004fdc00, ret 4: node count, names, matrices, parent indices
     virtual void LoadHierarchyFromParameters();               // slot 3, 0x004fddc0: the "Object Hierarchy" rows of parameterBlock
     virtual void CreateNode(SoultreeObject** out);            // slot 4, 0x004fe020, ret 4: *out = new node (the loaders' and clone's factory)
     virtual void UpdateLocalBounds();                         // slot 5, 0x00464e90 (shared empty body); GetLocalBounds calls it while localBoundsValid is 0

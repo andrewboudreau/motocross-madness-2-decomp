@@ -15,7 +15,7 @@ extern "C" void DISPATCH(void* owner, int slot, void* first, void* second)
     D3DIMSoultreeObject* object = static_cast<D3DIMSoultreeObject*>(owner);
 #endif
     switch (slot) {
-    case 2: object->LoadHierarchy(static_cast<UnknownTextureStream*>(first)); break;
+    case 2: object->LoadHierarchy(static_cast<FileStream*>(first)); break;
     case 3: object->LoadHierarchyFromParameters(); break;
     case 4: object->SoultreeVirtualSlot4(static_cast<SoultreeObject**>(first)); break;
     case 5: object->SoultreeVirtualSlot5(); break;

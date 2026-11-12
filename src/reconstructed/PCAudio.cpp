@@ -301,7 +301,7 @@ int Sound::ApplyCachedSettings() {
 // copies of a one-shot static sound. Streamed sounds (flag 2) get a buffer
 // of `streamBytes` (default 128000); deferred ones (flag 4) stop after the
 // header.
-int Sound::LoadWave(UnknownTextureStream* stream, unsigned long flags, unsigned long controls,
+int Sound::LoadWave(FileStream* stream, unsigned long flags, unsigned long controls,
     int duplicates, int streamBytes) {
     if (!stream || !SoundSystem() || !SoundSystem()->audioStarted)
         return 0;
@@ -383,14 +383,14 @@ failed:
 // 0x004bc320: loads the sound from `stream`, or from the file `name`.
 // Static sounds (flags 1 and 4) are read completely; streamed sounds
 // (flag 2) keep the stream.
-int Sound::Load(const char* name, UnknownTextureStream* stream, int flags, int controls, int duplicates,
+int Sound::Load(const char* name, FileStream* stream, int flags, int controls, int duplicates,
                 int streamBytes) {
-    UnknownTextureStream* file;
+    FileStream* file;
 
     if (!SoundSystem() || !SoundSystem()->audioStarted)
         return 0;
     if (!stream) {
-        file = new (__FILE__, 544) UnknownTextureStream(g_ResourceManager);
+        file = new (__FILE__, 544) FileStream(g_ResourceManager);
         if (!file->Open(name, "rb", 0)) {
             delete file;
             return 0;
@@ -844,7 +844,7 @@ int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
         if (!FillBufferFromStream(buffer, entry->archive, 0, bufferBytes))
             return 0;
     } else {
-        UnknownTextureStream* file = new (__FILE__, 1368) UnknownTextureStream(g_ResourceManager);
+        FileStream* file = new (__FILE__, 1368) FileStream(g_ResourceManager);
         if (!file->Open(soundName, "rb", 0)) {
             delete file;
             return 0;
@@ -868,7 +868,7 @@ int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
 // 0x004bd260: copies `bytes` of the stream into `buffer` at `offset`. At the
 // end of the data a looping sound rewinds to the data start; any other is
 // silenced and stopped.
-int Sound::FillBufferFromStream(UnknownSoundBuffer** buffer, UnknownTextureStream* stream, unsigned long offset,
+int Sound::FillBufferFromStream(UnknownSoundBuffer** buffer, FileStream* stream, unsigned long offset,
     unsigned long bytes) {
     void* first;
     unsigned long firstBytes;

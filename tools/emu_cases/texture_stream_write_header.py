@@ -1,4 +1,4 @@
-"""UnknownTextureStream::WriteHeader 0x00461b90, the "FAOE" header and the name key
+"""FileStream::WriteHeader 0x00461b90, the "FAOE" header and the name key
 (tools/emu_diff.py case).
 
 The linked body is samples/io/FileStream.cpp. The stream follows 0..2 inner streams (+0x1c) to
@@ -10,7 +10,7 @@ names with high-bit characters and up to 200 characters. The key and fields are 
 memory.
 """
 RETAIL_VA = 0x00461b90
-SYMBOL = '?WriteHeader@UnknownTextureStream@@QAEHPBD@Z'
+SYMBOL = '?WriteHeader@FileStream@@QAEHPBD@Z'
 SOURCE = 'samples/io/FileStream.cpp'
 PROBES = {0x00461bf8: 'header written', 0x00461c67: 'key loop'}
 
@@ -48,6 +48,6 @@ def setup(ctx, c):
         written.append(a[0])
         return 0xffffffff if len(written) - 1 == c['fail'] else a[0] & 0xff
 
-    ctx.stub_at(0x00461a60, 'UnknownTextureStream::WriteByte', pop=4, ret=write_byte)
+    ctx.stub_at(0x00461a60, 'FileStream::WriteByte', pop=4, ret=write_byte)
     path = ctx.alloc(len(c['path']) + 8, c['path'] + bytes(8))
     return dict(ecx=streams[0], args=[path])

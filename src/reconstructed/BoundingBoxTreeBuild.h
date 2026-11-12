@@ -114,7 +114,7 @@ struct TreeBuildTriangle {
 
 // The resource stream (TextureMap.h); ReadTriangleMesh/ReadTriangleNode/ReadPointNode read
 // through 0x00461640 (buffer, size, count), the fread order.
-class UnknownTextureStream;
+class FileStream;
 
 // 0x004a11e0 (cdecl, outside this file): unit normal of the triangle (a, b, c); the fifth
 // argument receives the plane offset (same declaration as broadphase/Terrain.h's

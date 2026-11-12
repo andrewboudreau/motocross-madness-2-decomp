@@ -1,7 +1,7 @@
 [
   {
     "source": "FileStream.cpp",
-    "candidate_symbol_contains": "?CheckHeader@UnknownTextureStream@@QAEHXZ",
+    "candidate_symbol_contains": "?CheckHeader@FileStream@@QAEHXZ",
     "target_va": "0x00460db0",
     "target_size": 186,
     "expect": "partial",
@@ -10,7 +10,7 @@
   },
   {
     "source": "FileStream.cpp",
-    "candidate_symbol_contains": "?Seek@UnknownTextureStream@@QAEHHHH@Z",
+    "candidate_symbol_contains": "?Seek@FileStream@@QAEHHHH@Z",
     "target_va": "0x00461340",
     "target_size": 702,
     "expect": "partial",
@@ -19,7 +19,7 @@
   },
   {
     "source": "FileStream.cpp",
-    "candidate_symbol_contains": "?Read@UnknownTextureStream@@QAEHPAXHH@Z",
+    "candidate_symbol_contains": "?Read@FileStream@@QAEHPAXHH@Z",
     "target_va": "0x00461640",
     "target_size": 663,
     "expect": "partial",
@@ -28,7 +28,7 @@
   },
   {
     "source": "FileStream.cpp",
-    "candidate_symbol_contains": "?Write@UnknownTextureStream@@QAEHPBXHH@Z",
+    "candidate_symbol_contains": "?Write@FileStream@@QAEHPBXHH@Z",
     "target_va": "0x004618e0",
     "target_size": 152,
     "expect": "partial",
@@ -37,7 +37,7 @@
   },
   {
     "source": "FileStream.cpp",
-    "candidate_symbol_contains": "?WriteHeader@UnknownTextureStream@@QAEHPBD@Z",
+    "candidate_symbol_contains": "?WriteHeader@FileStream@@QAEHPBD@Z",
     "target_va": "0x00461b90",
     "target_size": 282,
     "expect": "partial",

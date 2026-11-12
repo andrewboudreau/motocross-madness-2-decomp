@@ -23,7 +23,7 @@ PROVIDERS = {
     '?AddLooseFile@UnknownResourceManager@@QAEHPBD0@Z': (0x4e9430, 640),
     '?AddObject@UnknownResourceManager@@QAEHPBDPAX@Z': (0x4e96b0, 383),
     '?SetItemObject@UnknownResourceManager@@QAEXPAX0@Z': (0x4e9010, 31),
-    '?RemoveArchiveItems@UnknownResourceManager@@QAEHPAVUnknownTextureStream@@@Z': (0x4e9830, 194),
+    '?RemoveArchiveItems@UnknownResourceManager@@QAEHPAVFileStream@@@Z': (0x4e9830, 194),
 }
 
 

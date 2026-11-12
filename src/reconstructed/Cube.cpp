@@ -17,7 +17,7 @@ static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // 0x0043d0d0: skips `stream` forward to the next 0x800 boundary past `base`.
-static void SkipToSector(UnknownTextureStream* stream, int base)
+static void SkipToSector(FileStream* stream, int base)
 {
     int padding = 0x800 - (stream->Tell() - base) % 0x800;
     if (padding != 0x800)
@@ -67,7 +67,7 @@ Cube::Cube()
 // the arguments' first use, and that order homes `flags` in the group slot, the
 // face pointer in the stream slot and the face counter in the baseOffset slot
 // (docs/VC6_FRAME_LAYOUT.md).
-Cube* Cube::Load(UnknownTextureStream* stream, int a, ManagedTextureGroup* group,
+Cube* Cube::Load(FileStream* stream, int a, ManagedTextureGroup* group,
                                   int baseOffset)
 {
     short flags;

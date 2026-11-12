@@ -34,7 +34,7 @@ class RenderTarget;
 class SoultreeMaterial;
 class TextureMapManager;
 class UnknownParameterBlock;
-class UnknownTextureStream;
+class FileStream;
 
 // RTTI QuadTreeObject (vtable 0x005511c4: 0x004dc610 `or ax, 0xffff; ret`,
 // 0x00434ce0 `mov eax, 0xf; ret 4`). The return types and the one stack
@@ -57,7 +57,7 @@ class SoultreeObject : public UnknownSoultreeQuadTreeObject, public GameObject {
 public:
     explicit SoultreeObject(int flags);
     virtual ~SoultreeObject();
-    virtual void LoadHierarchy(UnknownTextureStream* stream);   // 0x004fdc00 (ret 4): reads a saved node
+    virtual void LoadHierarchy(FileStream* stream);   // 0x004fdc00 (ret 4): reads a saved node
     virtual void LoadHierarchyFromParameters();                                  // 0x004fddc0: reads the .slt keys
     virtual void SoultreeVirtualSlot4(SoultreeObject** out);              // 0x004fe020 (ret 4): clone
     virtual void SoultreeVirtualSlot5();                                  // 0x00464e90 (shared `ret`)
@@ -88,7 +88,7 @@ public:
     void CollectDescendants(int* index, SoultreeObject** nodes);    // 0x004fda60: collects the subtree
     void SetFlag14c();                                  // 0x004fdb40
     void ClearFlag14c();                                  // 0x004fdb50
-    void LoadFromParameters(UnknownTextureStream* stream, int offset); // 0x004fdb60: reads a .slt stream
+    void LoadFromParameters(FileStream* stream, int offset); // 0x004fdb60: reads a .slt stream
     void GetLocalBounds(Vec3* center, Vec3* halfExtent);            // 0x004fe0a0
     void UpdateSubtreeBounds();                                  // 0x004fe0f0
     void InvalidateWorldMatrix();                                 // 0x004fb850: invalidate dependent caches
@@ -215,7 +215,7 @@ class D3DIMSoultreeObject : public SoultreeObject {
 public:
     explicit D3DIMSoultreeObject(int flags);       // 0x0043f160 (ret 4)
     virtual ~D3DIMSoultreeObject();                // 0x0043f2b0 (deleting wrapper 0x0043f280)
-    virtual void LoadHierarchy(UnknownTextureStream* stream); // 0x0043f950
+    virtual void LoadHierarchy(FileStream* stream); // 0x0043f950
     virtual void LoadHierarchyFromParameters();                               // 0x0043fe40
     virtual void SoultreeVirtualSlot4(SoultreeObject** out);           // 0x004440a0
     virtual void SoultreeVirtualSlot5();                               // 0x00444140

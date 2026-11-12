@@ -2,7 +2,7 @@
 
 Source: `src/reconstructed/FileStream.cpp` (the exact methods) and
 `samples/io/FileStream.cpp` (the near misses), each with its bindings. The
-class is `UnknownTextureStream`, declared in `src/reconstructed/FileStream.h`
+class is `FileStream`, declared in `src/reconstructed/FileStream.h`
 and included by `TextureMap.h`.
 
 ## Evidence

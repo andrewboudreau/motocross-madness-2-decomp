@@ -118,7 +118,7 @@ static inline void ScaleTrackVec3(TrackVec3* v, float scale)
     v->z *= scale;
 }
 
-int Track::LoadTrack(UnknownTextureStream* stream, void* start, void* finish, int* hasStart,
+int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStart,
                      int* hasFinish)
 {
     int count = 0;

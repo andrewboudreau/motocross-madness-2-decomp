@@ -74,7 +74,7 @@ struct TrackCandidate {
 };
 
 class UnknownStream;
-class UnknownTextureStream;
+class FileStream;
 
 class Track {
 public:
@@ -84,7 +84,7 @@ public:
     // 0x00515ed0 (ret 0x14): loads the track file from `stream`, with the
     // start and finish probes (bikerace.cpp's 0x3c-byte gates) and whether
     // the file has them; 1 on success.
-    int LoadTrack(UnknownTextureStream* stream, void* start, void* finish, int* hasStart,
+    int LoadTrack(FileStream* stream, void* start, void* finish, int* hasStart,
                   int* hasFinish);
     int FreeNodeArray(UnknownStream* stream, TrackNode** nodes, int count);
     int FreeNode(TrackNode* node);

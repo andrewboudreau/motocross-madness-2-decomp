@@ -12,7 +12,7 @@
 // s21 (all 120 strict unless noted; the copy is propagated into EBX):
 // `archive = result = new`, `result = archive = new`, `result = new;
 // archive = result`, `result = 0` or `archive = 0` first, a reference
-// `UnknownTextureStream*& result = archive`, an inline NewArchive helper
+// `FileStream*& result = archive`, an inline NewArchive helper
 // (two forms) and a cast return. `if ((archive = new ...) != 0) result =
 // archive; else result = 0;` is worse (131/820); a dead `slot = &result`
 // is eliminated. Retail homes the ResourceItem temporary in the dead
@@ -25,13 +25,13 @@
 #include "../../src/reconstructed/FileStream.h"
 
 // 0x004e9030
-UnknownTextureStream* UnknownResourceManager::AddArchive(const char* path, int flags)
+FileStream* UnknownResourceManager::AddArchive(const char* path, int flags)
 {
     int count;
     char magic[4];
     int i;
 
-    UnknownTextureStream* archive = new(__FILE__, 212) UnknownTextureStream(this);
+    FileStream* archive = new(__FILE__, 212) FileStream(this);
     if (archive->Open(path, "rb", flags || archive->IsValidFile(path))) {
         if (archive->Read(magic, 4, 1) == 1 && !_stricmp(magic, "RS2")
             && archive->Read(&count, 4, 1) == 1) {
@@ -44,7 +44,7 @@ UnknownTextureStream* UnknownResourceManager::AddArchive(const char* path, int f
                 }
             }
             if (archiveCount + 1 > archiveCapacity) {
-                archives = (UnknownTextureStream**)DebugRealloc(archives, (archiveCount + 8) * 4, __FILE__, 246);
+                archives = (FileStream**)DebugRealloc(archives, (archiveCount + 8) * 4, __FILE__, 246);
                 if (archives) {
                     archiveCapacity = archiveCount + 8;
                     archives[archiveCount++] = archive;

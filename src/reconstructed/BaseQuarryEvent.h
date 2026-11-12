@@ -14,7 +14,7 @@ class Scene;
 class StatsOverlay;
 class TextQueueOverlay;
 class UnknownTerrain;
-class UnknownTextureStream;
+class FileStream;
 class VisualCue;
 class Fog;
 struct UnknownKrustyBikeView;
@@ -89,7 +89,7 @@ public:
     VisualCue* visualCue;
     UnknownQuarryCamera* raceCamera;
     UnknownTerrain* eventTerrain;               // Terrain (src/krusty2/broadphase/Terrain.h)
-    UnknownTextureStream* terrainStream;        // +0x44 opened on the env's terrain file and handed to the terrain loader; the destructor deletes it
+    FileStream* terrainStream;        // +0x44 opened on the env's terrain file and handed to the terrain loader; the destructor deletes it
     EcoSystem* ecoSystem;
     void* field_0x4c;
     int loaded;                                 // +0x50 0 in the constructor, 1 when LoadEventObjects completes (no reader found here)

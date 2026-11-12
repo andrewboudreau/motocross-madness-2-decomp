@@ -13,7 +13,7 @@
 #include "TrackGameGlobal.h"
 #include "Gridbase.h"
 
-class UnknownTextureStream;
+class FileStream;
 struct GridVertex;
 struct GridCamera;
 
@@ -298,15 +298,15 @@ public:
     DrawableGridNode(int stream, int a1, GridNode* parent, GridTerrain* terrain, int level, int shift,
                      int x, int z, int index, int boundsMin, int boundsMax);  // 0x0047e540 (ret 0x2c)
     virtual ~DrawableGridNode();                                // 0x0047ec60 (slot 0 0x0047e5e0)
-    DrawableGridNode* ReadNode(UnknownTextureStream* stream, int a1, DrawableGridNode* parent,
+    DrawableGridNode* ReadNode(FileStream* stream, int a1, DrawableGridNode* parent,
                                int level, int shift, int x, int z, int index,
                                float* boundsMin, float* boundsMax); // 0x0047e600 (ret 0x28)
-    virtual GridNode* CreateChildNode(UnknownTextureStream* stream, int a1, DrawableGridNode* parent,
+    virtual GridNode* CreateChildNode(FileStream* stream, int a1, DrawableGridNode* parent,
                                       int level, int shift, int x, int z, int index,
                                       void* boundsMin, void* boundsMax) { return 0; }   // 0x004806e0
     virtual void SelectTexture(float a) {}                // 0x004806f0 (shared)
     virtual void RequestTextureSize(int a) {}                  // 0x004806f0 (shared)
-    virtual void UnknownVirtualSlot5(UnknownTextureStream* stream) {} // 0x004806f0 (shared)
+    virtual void UnknownVirtualSlot5(FileStream* stream) {} // 0x004806f0 (shared)
     virtual void BindNodeTexture() {}                       // 0x0044d710 (shared)
     virtual void BindBlockTexture(int a) {}                  // 0x004806f0 (shared)
     virtual int GetBlockTextureSize(int a) { return 0; }        // 0x004da550 (shared)
@@ -345,7 +345,7 @@ public:
     // down to the child blocks, updating childMask; returns the visible count.
     int WalkVisibilityQuadrants(void* stream, void* a1, float* center, float* extent, int x, int z,
                                 int size, int depth, int path, int coarse);
-    void UpdateLevelOfDetail(UnknownTextureStream* stream, void* a1, int recurse,
+    void UpdateLevelOfDetail(FileStream* stream, void* a1, int recurse,
                                int coarse);                     // 0x004824c0 (ret 0x10)
     void PropagateFullMask();                               // 0x004826d0
     void RetestChangedVertices();                               // 0x00482760

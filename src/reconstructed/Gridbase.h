@@ -3,7 +3,7 @@
 // Gridbase.h -- the part of D:\aardvark\VC\krusty2\Gridbase.cpp that is
 // reconstructed (0x0047db60..0x0047dd9b). See docs/GRIDDRAW.md.
 
-class UnknownTextureStream;
+class FileStream;
 
 // One eight-byte height-field sample. Tier 2: Griddraw's vertex cache
 // 0x0047de90 reads the halfword at +2 and the signed bytes at +4..+6 of
@@ -23,7 +23,7 @@ struct GridBaseCell {
 // Terrain+0xc14[]. The three arrays are loaded raw or LZW-compressed.
 class GridBaseBlock {
 public:
-    GridBaseBlock(UnknownTextureStream* stream);   // 0x0047dc20 (ret 4)
+    GridBaseBlock(FileStream* stream);   // 0x0047dc20 (ret 4)
 
     GridBaseCell cells[17 * 17];             // +0x000 (0x908 bytes)
     short firstVertexByError[0x100];  // +0x908  first verticesByError position per curve value (0x00482760 walks the bands)

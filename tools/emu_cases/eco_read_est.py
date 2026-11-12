@@ -9,7 +9,7 @@ values up to 127 characters, every float key or its default, the key colours, ne
 huge numbers), PlacementBmp and ProbabilityTga up to 127 characters, NorthAngle. The stubs
 return the value or the default, truncated to the buffer size, and note (section, key) so the
 order and the keys are compared. The path ends in .est, .esb, both or neither; without a stream
-an .esb probe (UnknownTextureStream ctor 0x00460d10, Open 0x00460f50 answering the case's
+an .esb probe (FileStream ctor 0x00460d10, Open 0x00460f50 answering the case's
 flag, dtor and delete) may rename the path in place. The EcoSystem (0x600 bytes) starts with
 an empty definition table except for a few prior definitions (slot 0 among them), so the
 Auto-only loop and the percent-bias normalisation run over both kinds. sprintf is modelled
@@ -20,7 +20,7 @@ import random
 import struct
 
 RETAIL_VA = 0x00457480
-SYMBOL = '?ReadEst@EcoSystem@@QAEHPADPAVUnknownTextureStream@@@Z'
+SYMBOL = '?ReadEst@EcoSystem@@QAEHPADPAVFileStream@@@Z'
 SOURCE = 'src/bringup/Group4_EcoSystem.cpp'
 PROBES = {0x00457605: 'est', 0x00457762: 'definition', 0x00457a84: 'normalise', 0x00457b85: 'auto',
           0x00457e82: 'esb', 0x0045759c: 'probe'}

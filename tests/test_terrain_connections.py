@@ -22,10 +22,10 @@ SOURCES = ('src/reconstructed/Grid1.cpp', 'src/reconstructed/QuarryStuntEvent.cp
            'src/reconstructed/TerrainSupport.cpp', 'src/reconstructed/FileStream.cpp')
 CONSTRUCTION_PROVIDERS = (
     ('MatrixUtil', '?IdentityMatrix@@YA?AUMatrix4@@XZ', 0x4a1410, 71, '??0Terrain@@', 0x505830, 370, 1),
-    ('Quantize', '??0ColorMapper@@QAE@PAVUnknownTextureStream@@@Z', 0x4ddf40, 689, '?Load@Terrain@@', 0x5059d0, 2116, 1),
+    ('Quantize', '??0ColorMapper@@QAE@PAVFileStream@@@Z', 0x4ddf40, 689, '?Load@Terrain@@', 0x5059d0, 2116, 1),
     ('Quantize', '?GetColors@ColorMapper@@QAEPAEXZ', 0x4de270, 4, '?Load@Terrain@@', 0x5059d0, 2116, 1),
-    ('Gridbase', '??0GridBaseBlock@@QAE@PAVUnknownTextureStream@@@Z', 0x47dc20, 382, '?Load@Terrain@@', 0x5059d0, 2116, 1),
-    ('Grid1', '??0DrawableGridNodeSharedTextures@@QAE@PAVUnknownTextureStream@@HPAVGridNode@@PAUGridTerrain@@HHHHHPAM3@Z',
+    ('Gridbase', '??0GridBaseBlock@@QAE@PAVFileStream@@@Z', 0x47dc20, 382, '?Load@Terrain@@', 0x5059d0, 2116, 1),
+    ('Grid1', '??0DrawableGridNodeSharedTextures@@QAE@PAVFileStream@@HPAVGridNode@@PAUGridTerrain@@HHHHHPAM3@Z',
      0x47c880, 176, '?Load@Terrain@@', 0x5059d0, 2116, 1),
     ('Griddraw', '?DrawVisible@DrawableGridNode@@QAEHPAX@Z', 0x480900, 23, '?Render3D@Terrain@@', 0x506220, 3173, 2),
     ('Griddraw', '?DrawVisibleWithDetail@DrawableGridNode@@QAEHPAXH@Z', 0x480920, 26, '?Render3D@Terrain@@', 0x506220, 3173, 2),
@@ -171,14 +171,14 @@ class TerrainConnectionsTests(unittest.TestCase):
             self.assertEqual(size, 2117)
             self.assertEqual(hashlib.sha256(body).hexdigest(),
                              'f3030667d51c69b26e4c62732b2f44b8ec88dc4170252f9e8b4adaca72ef4ac2')
-            stream_calls = {'?Read@UnknownTextureStream@@QAEHPAXHH@Z': (0x461640, 14),
-                            '?Seek@UnknownTextureStream@@QAEHHHH@Z': (0x461340, 3),
-                            '?Tell@UnknownTextureStream@@QAEHXZ': (0x461600, 1)}
+            stream_calls = {'?Read@FileStream@@QAEHPAXHH@Z': (0x461640, 14),
+                            '?Seek@FileStream@@QAEHHHH@Z': (0x461340, 3),
+                            '?Tell@FileStream@@QAEHXZ': (0x461600, 1)}
             calls = Counter(provider.symbol_by_index[r.symbol_index].name
                             for r in relocations if r.type == 0x14)
             for symbol, (va, count) in stream_calls.items():
                 self.assertEqual(calls[symbol], count)
-                self.assertNotIn(symbol.replace('@UnknownTextureStream@@', '@TerrainStream@@'), calls)
+                self.assertNotIn(symbol.replace('@FileStream@@', '@TerrainStream@@'), calls)
             import capstone
             decoder = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
             decoder.detail = True

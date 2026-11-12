@@ -284,7 +284,7 @@ int PCRenderTarget::DrawIndexedPrimitiveVB(int,int,int,int,int,int,int){Fail(86)
 void PCRenderTarget::SetAlphaTest(int){Fail(86);}
 void PCRenderTarget::DisableAlphaTest(){Fail(86);}
 
-int PCTextureMap::LoadSurface(UnknownTextureStream*,int,int,int,int,int,int,UnknownTexturePalette*,int,void*,int,int,UnknownTextureFormatChoice*,int,unsigned int){Fail(86);return 0;}
+int PCTextureMap::LoadSurface(FileStream*,int,int,int,int,int,int,UnknownTexturePalette*,int,void*,int,int,UnknownTextureFormatChoice*,int,unsigned int){Fail(86);return 0;}
 TextureMap* PCTextureMap::Clone(){Fail(86);return 0;}
 int PCTextureMap::IsResident(){Fail(86);return 0;}
 int PCTextureMap::Upload(UnknownRect*,int){Fail(86);return 0;}

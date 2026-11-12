@@ -123,11 +123,11 @@ def setup(ctx, c):
         return block
 
     ctx.stub_at(0x004a3010, 'new', nargs=3, ret=new, log=False)
-    ctx.stub_at(0x00460d10, 'UnknownTextureStream::UnknownTextureStream', pop=4, ret=lambda cx, e, a: e)
-    ctx.stub_at(0x00460f50, 'UnknownTextureStream::Open', pop=12, ret=int(c['opened']))
-    ctx.stub_at(0x00461aa0, 'UnknownTextureStream::ReadLine', pop=8, ret=read_line, log=False)
-    ctx.stub_at(0x00461340, 'UnknownTextureStream::Seek', pop=12, ret=seek)
-    ctx.stub_at(0x00460d60, 'UnknownTextureStream::~UnknownTextureStream', pop=0)
+    ctx.stub_at(0x00460d10, 'FileStream::FileStream', pop=4, ret=lambda cx, e, a: e)
+    ctx.stub_at(0x00460f50, 'FileStream::Open', pop=12, ret=int(c['opened']))
+    ctx.stub_at(0x00461aa0, 'FileStream::ReadLine', pop=8, ret=read_line, log=False)
+    ctx.stub_at(0x00461340, 'FileStream::Seek', pop=12, ret=seek)
+    ctx.stub_at(0x00460d60, 'FileStream::~FileStream', pop=0)
     ctx.stub_at(0x004a30c0, 'delete', nargs=1, ret=lambda cx, e, a: cx.note('delete', a[0]), log=False)
     ctx.stub_at(0x00534aaf, 'sprintf', nargs=3, ret=lambda cx, e, a: cx.note('sprintf', _cstr(cx, a[2])),
                 log=False)

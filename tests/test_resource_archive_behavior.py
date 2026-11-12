@@ -17,7 +17,7 @@ from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.eh_funcinfo import candidate, retail, shape
 
 ROOT = Path(__file__).resolve().parents[1]
-SYMBOL = '?AddArchive@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z'
+SYMBOL = '?AddArchive@UnknownResourceManager@@QAEPAVFileStream@@PBDH@Z'
 RANGES = {0x4E9030: 804, 0x54DAA0: 23, 0x54DAB7: 23, 0x54DACE: 10}
 DEPENDENCIES = {0x4A3010, 0x4A3060, 0x4A30C0, 0x460D10, 0x460D60,
                 0x4E8D70, 0x460E70, 0x460F50, 0x461640, 0x4A2EC0,

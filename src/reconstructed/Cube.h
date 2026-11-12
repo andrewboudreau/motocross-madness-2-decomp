@@ -28,7 +28,7 @@
 class TextureMap;
 class TextureMapManager;
 class ManagedTextureGroup;
-class UnknownTextureStream;
+class FileStream;
 struct UnknownTexturePalette;
 
 // cdecl 0x0043d080 (ControlInterface.h declares the same function): maps
@@ -70,7 +70,7 @@ public:
     void Reset();                               // 0x0043d110: resets every member
     // 0x0043d230: reads the header from `stream`; releases itself and
     // returns 0 on a short read (or when `a` is nonzero).
-    Cube* Load(UnknownTextureStream* stream, int a, ManagedTextureGroup* group,
+    Cube* Load(FileStream* stream, int a, ManagedTextureGroup* group,
                                 int baseOffset);
     // 0x0043d400: copies whichever of the three vectors are given.
     int SetVectors(const Vector3* a, const Vector3* b, const Vector3* c);
@@ -80,7 +80,7 @@ public:
     // 0x0043d630: seeks to the texture data and reads every missing texture.
     int LoadMissingTextures(UnknownTexturePalette* palette, UnknownCubeTextureContext* context);
 
-    UnknownTextureStream* textureStream;        // +0x08 the stream Load read the header from
+    FileStream* textureStream;        // +0x08 the stream Load read the header from
     int fileFormat;                             // file format (Tgafile.h)
     short field_0x10;                           // bit 1: textures are 0x800-aligned
     unsigned short field_0x12;

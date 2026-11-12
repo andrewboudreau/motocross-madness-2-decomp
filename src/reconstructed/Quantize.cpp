@@ -35,7 +35,7 @@ void ColorMapper::Build16BitTables() {
 // 0x004ddf40: reads the palette and the two lookup tables, each stored raw
 // or LZW-compressed, then reserves one more entry for magenta (the colour
 // key) when the palette is not full.
-ColorMapper::ColorMapper(UnknownTextureStream* stream) {
+ColorMapper::ColorMapper(FileStream* stream) {
     int compressed;
 
     if (stream->Read(&firstIndex, 4, 1) != 1)

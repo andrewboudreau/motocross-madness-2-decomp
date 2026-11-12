@@ -1,4 +1,4 @@
-"""UnknownTextureStream::CheckHeader 0x00460db0, the "FAOE" header test (tools/emu_diff.py case).
+"""FileStream::CheckHeader 0x00460db0, the "FAOE" header test (tools/emu_diff.py case).
 
 The linked body is samples/io/FileStream.cpp. Field offsets are in src/reconstructed/FileStream.h
 (header bytes +0x02/+0x00/+0x20/+0x18, fileEncoded +0x08, fileHandle +0x14, bufferPos/bufferEnd
@@ -8,7 +8,7 @@ changed (also by sign: 0xc6 against a (char)0xc6 header byte), or -1. The fields
 writes (fileEncoded restored or not, fileHandle cleared, bufferPos) are compared as memory.
 """
 RETAIL_VA = 0x00460db0
-SYMBOL = '?CheckHeader@UnknownTextureStream@@QAEHXZ'
+SYMBOL = '?CheckHeader@FileStream@@QAEHXZ'
 SOURCE = 'samples/io/FileStream.cpp'
 PROBES = {0x00460dc8: 'first seek ok', 0x00460e27: 'header matched'}
 
@@ -44,5 +44,5 @@ def setup(ctx, c):
 
     ctx.stub_at(0x00534eac, 'fseek', nargs=3, ret=fseek, log=False)
     ctx.stub_at(0x00534c3d, 'fclose', nargs=1, ret=lambda cx, e, a: cx.note('fclose', *a), log=False)
-    ctx.stub_at(0x00461980, 'UnknownTextureStream::ReadByte', pop=0, ret=read_byte)
+    ctx.stub_at(0x00461980, 'FileStream::ReadByte', pop=0, ret=read_byte)
     return dict(ecx=stream, args=[])

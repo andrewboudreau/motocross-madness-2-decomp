@@ -95,7 +95,7 @@ TextureMap* FontTexture::GetTexture() {
 FontTexture* FontTexture::Load(const char* name, const char* path, const char* textureName,
                                                 int format, TextureMapManager* manager, int a5) {
     UnknownFontTextureNode* node;
-    UnknownTextureStream* stream;
+    FileStream* stream;
     unsigned int count;
     FontTexture* font;
     unsigned int i;
@@ -106,7 +106,7 @@ FontTexture* FontTexture::Load(const char* name, const char* path, const char* t
         font = node->font;
     } else {
         count = 0;
-        stream = new(__FILE__, 138) UnknownTextureStream(g_ResourceManager);
+        stream = new(__FILE__, 138) FileStream(g_ResourceManager);
         stream->Open(path, "rb", 0);
         stream->Read(&count, 4, 1);
         font = new(__FILE__, 152) FontTexture(count, name);

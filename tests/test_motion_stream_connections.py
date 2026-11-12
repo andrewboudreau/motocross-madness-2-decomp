@@ -46,12 +46,12 @@ class MotionStreamConnectionTests(unittest.TestCase):
                         if obj.symbol_by_index[r.symbol_index].section_number == 0}
 
             stream_calls = {
-                '??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z',
-                '??1UnknownTextureStream@@QAE@XZ',
-                '?Open@UnknownTextureStream@@QAEHPBD0H@Z',
-                '?SetBufferSize@UnknownTextureStream@@QAEHH@Z',
-                '?Read@UnknownTextureStream@@QAEHPAXHH@Z',
-                '?ReadLine@UnknownTextureStream@@QAEHPADH@Z',
+                '??0FileStream@@QAE@PAVUnknownResourceManager@@@Z',
+                '??1FileStream@@QAE@XZ',
+                '?Open@FileStream@@QAEHPBD0H@Z',
+                '?SetBufferSize@FileStream@@QAEHH@Z',
+                '?Read@FileStream@@QAEHPAXHH@Z',
+                '?ReadLine@FileStream@@QAEHPADH@Z',
             }
             resource_calls = {
                 '?g_ResourceManager@@3PAVUnknownResourceManager@@A',
@@ -63,7 +63,7 @@ class MotionStreamConnectionTests(unittest.TestCase):
             parameter_calls = {
                 '??0UnknownParameterBlock@@QAE@XZ',
                 '??1UnknownParameterBlock@@QAE@XZ',
-                '?Attach@UnknownParameterBlock@@QAEXPAVUnknownTextureStream@@HH@Z',
+                '?Attach@UnknownParameterBlock@@QAEXPAVFileStream@@HH@Z',
                 '?SelectSection@UnknownParameterBlock@@QAEHPBD@Z',
                 '?ReadString@UnknownParameterBlock@@QAEHPBDPADH@Z',
                 '?GetString@UnknownParameterBlock@@QAEHPBD0PADH@Z',
@@ -77,15 +77,15 @@ class MotionStreamConnectionTests(unittest.TestCase):
                         for s in objects[name].symbols
                         if s.storage_class == 2 and s.section_number > 0}
             self.assertTrue(stream_calls | resource_calls | parameter_calls <= supplied)
-            seek = '?Seek@UnknownTextureStream@@QAEHHHH@Z'
+            seek = '?Seek@FileStream@@QAEHHHH@Z'
             self.assertIn(seek, imports(objects['partial_motion']))
             self.assertIn(seek, supplied)
             parameter_dependencies = {
                 seek,
-                '?Tell@UnknownTextureStream@@QAEHXZ',
-                '?ReadLine@UnknownTextureStream@@QAEHPADH@Z',
+                '?Tell@FileStream@@QAEHXZ',
+                '?ReadLine@FileStream@@QAEHPADH@Z',
                 '?FindItem@UnknownResourceManager@@QAEPAVResourceItem@@PBDH@Z',
-                '?AddArchive@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z',
+                '?AddArchive@UnknownResourceManager@@QAEPAVFileStream@@PBDH@Z',
                 '?AddLooseFile@UnknownResourceManager@@QAEHPBD0@Z',
             }
             self.assertTrue(parameter_dependencies <= imports(objects['parameters']))
@@ -94,7 +94,7 @@ class MotionStreamConnectionTests(unittest.TestCase):
             self.assertTrue(parameter_dependencies <= supplied)
             # SelectSection naturally emits the recursive accessor's shared
             # out-of-line copy, in addition to inlining its outer steps.
-            reset = '?ResetTextMode@UnknownTextureStream@@QAEXXZ'
+            reset = '?ResetTextMode@FileStream@@QAEXXZ'
             self.assertTrue(any(s.name == reset and s.section_number > 0
                                 for s in objects['parameters'].symbols))
             self.assertFalse(any('UnknownParameterStream' in s.name or

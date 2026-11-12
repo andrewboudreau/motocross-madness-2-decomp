@@ -143,7 +143,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
     Vector3 up(0.0f, 1.0f, 0.0f);
     empty[0] = 0;
 
-    UnknownTextureStream* stream = new(__FILE__, 0x3b6) UnknownTextureStream(g_ResourceManager);
+    FileStream* stream = new(__FILE__, 0x3b6) FileStream(g_ResourceManager);
     sprintf(path, "%s\\rider.mcf", "Res");
     if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)riderFile)) {
         sprintf(message, "No Rider MCF found in resources.  Aborting.\n");

@@ -290,7 +290,7 @@ int FormatFromPixelFormat(UnknownPixelFormat* pixelFormat) {
 
 // 0x00511b40: reads the header field by field. Only 16, 24 and 32-bit
 // files of image type 2 (raw) or 10 (run-length) are accepted.
-UnknownTgaFile* ReadTgaHeader(UnknownTextureStream* stream, UnknownTgaFile* file, int offset) {
+UnknownTgaFile* ReadTgaHeader(FileStream* stream, UnknownTgaFile* file, int offset) {
     if (!file) {
         file = (UnknownTgaFile*)DebugMalloc(sizeof(UnknownTgaFile), __FILE__, 354);
         if (!file)
@@ -334,8 +334,8 @@ failed:
 // 0x00511d00: opens `path` "rb" in a new stream (Tgafile.cpp line 494) and
 // reads its header; 0 when it cannot be opened.
 UnknownTgaFile* OpenAndReadHeader(const char* path, UnknownTgaFile* file, int resources) {
-    UnknownTextureStream* stream =
-        new(__FILE__, 494) UnknownTextureStream((UnknownResourceManager*)resources);
+    FileStream* stream =
+        new(__FILE__, 494) FileStream((UnknownResourceManager*)resources);
     if (!stream->Open(path, "rb", 0)) {
         delete stream;
         return 0;
@@ -347,7 +347,7 @@ UnknownTgaFile* OpenAndReadHeader(const char* path, UnknownTgaFile* file, int re
 
 // 0x00511dd0: reads the header and then the pixels for its depth; frees
 // the file when the pixels cannot be read.
-UnknownTgaFile* ReadWholeFile(UnknownTextureStream* stream, UnknownTgaFile* file, int offset) {
+UnknownTgaFile* ReadWholeFile(FileStream* stream, UnknownTgaFile* file, int offset) {
     file = ReadTgaHeader(stream, file, offset);
     if (!file)
         return 0;
@@ -380,7 +380,7 @@ static inline void SwapBytes(unsigned char& a, unsigned char& b) {
 // 0x00511e80: reads 24-bit pixels, raw (image type 2) or run-length coded,
 // swapping red and blue, then flips bottom-up images through the scratch
 // row and marks them top-down.
-int ReadTgaPixels24(UnknownTgaFile* file, UnknownTextureStream* stream) {
+int ReadTgaPixels24(UnknownTgaFile* file, FileStream* stream) {
     int count = file->height * file->width;
     unsigned int size = count * 3;
     if (size > file->bitsSize) {
@@ -453,7 +453,7 @@ int ReadTgaPixels24(UnknownTgaFile* file, UnknownTextureStream* stream) {
 
 // 0x00512100: reads 32-bit pixels like 0x00511e80; literal run-length
 // pixels are read one at a time.
-int ReadTgaPixels32(UnknownTgaFile* file, UnknownTextureStream* stream) {
+int ReadTgaPixels32(UnknownTgaFile* file, FileStream* stream) {
     int count = file->height * file->width;
     unsigned int size = count * 4;
     if (size > file->bitsSize) {
@@ -529,7 +529,7 @@ int ReadTgaPixels32(UnknownTgaFile* file, UnknownTextureStream* stream) {
 
 // 0x00512370: reads 16-bit pixels like 0x00511e80, without the colour
 // swap; raw images are read row by row.
-int ReadTgaPixels16(UnknownTgaFile* file, UnknownTextureStream* stream) {
+int ReadTgaPixels16(UnknownTgaFile* file, FileStream* stream) {
     int count = file->height * file->width;
     unsigned int size = count * 2;
     if (size > file->bitsSize) {
@@ -603,8 +603,8 @@ int ReadTgaPixels16(UnknownTgaFile* file, UnknownTextureStream* stream) {
 // file when the pixels cannot be read. Each failure deletes the stream on
 // its own path.
 UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* file, int resources) {
-    UnknownTextureStream* stream =
-        new(__FILE__, 567) UnknownTextureStream((UnknownResourceManager*)resources);
+    FileStream* stream =
+        new(__FILE__, 567) FileStream((UnknownResourceManager*)resources);
     if (!stream->Open(path, "rb", 0)) {
         delete stream;
         return 0;

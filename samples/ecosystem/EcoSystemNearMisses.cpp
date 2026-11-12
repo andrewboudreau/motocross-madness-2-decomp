@@ -221,7 +221,7 @@ void Vegetation::TestDistance(int* billboard, int* fade) {
 #include "VegetationCollisionObject.cpp"
 
 // 0x00457480
-int EcoSystem::ReadEst(char* path, UnknownTextureStream* stream) {
+int EcoSystem::ReadEst(char* path, FileStream* stream) {
     char name[0x104];
     char value[0x80];
     char section[0x80];
@@ -232,7 +232,7 @@ int EcoSystem::ReadEst(char* path, UnknownTextureStream* stream) {
         strncpy(name, path, length);
         name[length] = 0;
         strcpy(strstr(name, ".est"), ".esb");
-        UnknownTextureStream* probe = new(__FILE__, 0x2eb) UnknownTextureStream(g_ResourceManager);
+        FileStream* probe = new(__FILE__, 0x2eb) FileStream(g_ResourceManager);
         if (probe->Open(name, "rb", 0))
             strcpy(strstr(path, ".est"), ".esb");
         delete probe;

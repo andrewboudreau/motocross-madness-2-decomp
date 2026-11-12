@@ -189,7 +189,7 @@ SoundEmitter* SoundEmitter::Create(void* target, const char* name, UnknownSound3
                                                   unsigned long flags, float oneShotDistance,
                                                   float randomTriggerPercent, int is2D, int force2D) {
     char path[0x104];
-    UnknownTextureStream* stream = new (__FILE__, 130) UnknownTextureStream(g_ResourceManager);
+    FileStream* stream = new (__FILE__, 130) FileStream(g_ResourceManager);
     int found = 0;
 
     if (GameObject::SetRenderContext(target) && ownerScape) {

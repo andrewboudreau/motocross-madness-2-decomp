@@ -48,7 +48,7 @@ static inline int LargerPixelSize(int first, int second) {
 }
 
 // Reads `rows` rows of `rowSize` bytes; whether they were all read.
-static inline int ReadRows(UnknownTextureStream* stream, void* bits, int rowSize, int rows) {
+static inline int ReadRows(FileStream* stream, void* bits, int rowSize, int rows) {
     return stream->Read(bits, rowSize, rows) == rows;
 }
 
@@ -59,7 +59,7 @@ static inline int ReadRows(UnknownTextureStream* stream, void* bits, int rowSize
 // surfaces slot 4 creates, larger levels than the choice allows are
 // skipped. Other files hold one image, which is halved as the choice asks
 // and handed to slot 4.
-int PCTextureMap::LoadSurface(UnknownTextureStream* stream, int width, int height, int minimumSize,
+int PCTextureMap::LoadSurface(FileStream* stream, int width, int height, int minimumSize,
                               int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
                               int flags, void* surfacePalette, int addressU, int addressV,
                               UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key) {

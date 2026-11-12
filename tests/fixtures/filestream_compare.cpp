@@ -15,7 +15,7 @@ struct Scenario {
 struct Observation {
     int result, position, closed, fileFlags[3], eventCount, written;
     int events[2048][5];
-    unsigned char streamBytes[3 * sizeof(UnknownTextureStream)];
+    unsigned char streamBytes[3 * sizeof(FileStream)];
     unsigned char output[4096];
     unsigned char writtenBytes[4096];
 };
@@ -23,12 +23,12 @@ static Scenario scenario;
 static Observation observed;
 static FILE mockFiles[3];
 static int position, reads, seeks, bytes;
-static union { double alignment; unsigned char bytes[3 * sizeof(UnknownTextureStream)]; } storage;
+static union { double alignment; unsigned char bytes[3 * sizeof(FileStream)]; } storage;
 static unsigned char output[4096];
 static unsigned char referenceSpace[0x200000];
 
-static UnknownTextureStream* Stream(int index) {
-    return (UnknownTextureStream*)(storage.bytes + index * sizeof(UnknownTextureStream));
+static FileStream* Stream(int index) {
+    return (FileStream*)(storage.bytes + index * sizeof(FileStream));
 }
 static void Record(int operation, int a, int b, int c, int d = 0) {
     if (observed.eventCount >= 2048) ExitProcess(90);
@@ -111,34 +111,34 @@ int ReadXorDecoded(unsigned char* buffer, int size, int count, FILE* file, unsig
     position += size * count;
     return 1;
 }
-int UnknownTextureStream::Tell() {
+int FileStream::Tell() {
     Record(9, (char*)this - (char*)Stream(0), 0, 0); return scenario.position;
 }
 
-int UnknownTextureStream::ReadByte() {
+int FileStream::ReadByte() {
     Record(11, (char*)this - (char*)Stream(0), 0, 0);
     int value = "FAOE"[bytes++ % 4];
     if (bytes == scenario.headerMismatch) value = -1;
     bufferPos++;
     return value;
 }
-int UnknownTextureStream::WriteByte(int value) {
+int FileStream::WriteByte(int value) {
     Record(12, value, (char*)this - (char*)Stream(0), 0);
     unsigned char byte = value;
     RecordWritten(&byte, 1);
     return ++bytes == scenario.failure ? -1 : value;
 }
 
-static DWORD Address(int (UnknownTextureStream::*method)()) {
-    union { int (UnknownTextureStream::*method)(); DWORD address; } value;
+static DWORD Address(int (FileStream::*method)()) {
+    union { int (FileStream::*method)(); DWORD address; } value;
     value.method = method; return value.address;
 }
-static DWORD Address(void (UnknownTextureStream::*method)()) {
-    union { void (UnknownTextureStream::*method)(); DWORD address; } value;
+static DWORD Address(void (FileStream::*method)()) {
+    union { void (FileStream::*method)(); DWORD address; } value;
     value.method = method; return value.address;
 }
-static DWORD Address(int (UnknownTextureStream::*method)(int)) {
-    union { int (UnknownTextureStream::*method)(int); DWORD address; } value;
+static DWORD Address(int (FileStream::*method)(int)) {
+    union { int (FileStream::*method)(int); DWORD address; } value;
     value.method = method; return value.address;
 }
 static DWORD Replacement(DWORD target) {
@@ -151,10 +151,10 @@ static DWORD Replacement(DWORD target) {
     case 0x5359d2: return (DWORD)ProbeSplit;
     case 0x45c6a0: return (DWORD)WriteXorEncoded;
     case 0x45c7b0: return (DWORD)ReadXorDecoded;
-    case 0x461600: return Address(&UnknownTextureStream::Tell);
-    case 0x461d20: return Address(&UnknownTextureStream::ResetTextMode);
-    case 0x461980: return Address(&UnknownTextureStream::ReadByte);
-    case 0x461a60: return Address(&UnknownTextureStream::WriteByte);
+    case 0x461600: return Address(&FileStream::Tell);
+    case 0x461d20: return Address(&FileStream::ResetTextMode);
+    case 0x461980: return Address(&FileStream::ReadByte);
+    case 0x461a60: return Address(&FileStream::WriteByte);
     }
     return 0;
 }
@@ -212,7 +212,7 @@ static void Run(int reference) {
     for (int n = 0; n < sizeof(output); ++n) output[n] = (unsigned char)(n * 23 + n / 7 + 17);
     position = scenario.position; reads = seeks = bytes = 0;
     for (int i = 0; i < 3; ++i) {
-        UnknownTextureStream* stream = Stream(i);
+        FileStream* stream = Stream(i);
         stream->headerByte0 = 'F'; stream->headerByte1 = 'A';
         stream->headerByte2 = 'O'; stream->headerByte3 = 'E';
         stream->textMode = 73 + i; stream->nameKey = 19 + i;
@@ -227,14 +227,14 @@ static void Run(int reference) {
         stream->bufferPos = stream->readBuffer;
         stream->bufferEnd = stream->readBuffer + scenario.available;
     }
-    union { int (UnknownTextureStream::*method)(void*, int, int); DWORD address; } read;
-    union { int (UnknownTextureStream::*method)(int, int, int); DWORD address; } seek;
-    union { int (UnknownTextureStream::*method)(); DWORD address; } check;
-    union { int (UnknownTextureStream::*method)(const void*, int, int); DWORD address; } write;
-    union { int (UnknownTextureStream::*method)(const char*); DWORD address; } header;
-    read.method = &UnknownTextureStream::Read; seek.method = &UnknownTextureStream::Seek;
-    check.method = &UnknownTextureStream::CheckHeader; write.method = &UnknownTextureStream::Write;
-    header.method = &UnknownTextureStream::WriteHeader;
+    union { int (FileStream::*method)(void*, int, int); DWORD address; } read;
+    union { int (FileStream::*method)(int, int, int); DWORD address; } seek;
+    union { int (FileStream::*method)(); DWORD address; } check;
+    union { int (FileStream::*method)(const void*, int, int); DWORD address; } write;
+    union { int (FileStream::*method)(const char*); DWORD address; } header;
+    read.method = &FileStream::Read; seek.method = &FileStream::Seek;
+    check.method = &FileStream::CheckHeader; write.method = &FileStream::Write;
+    header.method = &FileStream::WriteHeader;
     if (reference) {
         read.address = 0x461640; seek.address = 0x461340; check.address = 0x460db0;
         write.address = 0x4618e0; header.address = 0x461b90;

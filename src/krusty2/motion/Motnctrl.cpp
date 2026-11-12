@@ -189,7 +189,7 @@ Motion* MotionManager::Load(Character* character, const char* section)
 // the two axes and the position (0x24 bytes).
 int MotionManager::LoadMot(Character* character, const char* path, Motion* motion)
 {
-    UnknownTextureStream* file = new(__FILE__, 0x19e) UnknownTextureStream(g_ResourceManager);
+    FileStream* file = new(__FILE__, 0x19e) FileStream(g_ResourceManager);
     if (!file->Open(path, "rb", 0)) {
         char message[0x80];
         sprintf(message, "Unable to open %s\n", path);
@@ -239,7 +239,7 @@ void Character::LoadVut()
     char line[0x100];
     if (vutLoaded)
         return;
-    UnknownTextureStream* file = new(__FILE__, 0x26b) UnknownTextureStream(g_ResourceManager);
+    FileStream* file = new(__FILE__, 0x26b) FileStream(g_ResourceManager);
     int len = strlen(contentDirectory);
     int copyLength = len > 0xff ? 0xff : len;
     strncpy(line, contentDirectory, copyLength);
@@ -275,7 +275,7 @@ void Character::LoadVut()
 void Character::LoadMir()
 {
     char line[0x100];
-    UnknownTextureStream* file = new(__FILE__, 0x29d) UnknownTextureStream(g_ResourceManager);
+    FileStream* file = new(__FILE__, 0x29d) FileStream(g_ResourceManager);
     int len = strlen(contentDirectory);
     int copyLength = len > 0xff ? 0xff : len;
     strncpy(line, contentDirectory, copyLength);

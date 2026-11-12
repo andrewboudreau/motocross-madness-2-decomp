@@ -1,6 +1,6 @@
 #pragma once
 
-class UnknownTextureStream;
+class FileStream;
 
 // Object at TrackGame+0x574, deleted by slot 15. Its destructor is
 // out-of-line and empty (the shared body 0x00464e90).
@@ -13,10 +13,10 @@ public:
     int CountSceneObjects(int* count);
     int CountSceneTextures(unsigned long* counts, char* width, char* hasCube, int ecosystem);
     // 0x004e9ba0: opens the scene archive `name` (default sceneFile).
-    UnknownTextureStream* OpenSceneArchive(const char* name);
+    FileStream* OpenSceneArchive(const char* name);
     // 0x004e9cd0: opens `name` from the archive in `stream` (racesnd.cpp
     // reads Audio.res samples through it); 0 when not found.
-    int OpenArchiveFile(UnknownTextureStream* stream, const char* name, const char* mode, int a);
+    int OpenArchiveFile(FileStream* stream, const char* name, const char* mode, int a);
     void SetSceneFileNames(const char* name); // 0x004e9f70: derived file names
     void SetSceneDirectory(char* path);   // 0x004e9b80 (EventManager 0x0045cb70)
     void SelectScene(char* name, const char* kind, int value); // 0x004e9e30
@@ -28,7 +28,7 @@ public:
 
     // Layout from the constructor's stores; array lengths are inferred
     // from the gaps between them (and the 0x103-byte copy into +0x44).
-    UnknownTextureStream* sceneArchive;       // +0x00 open scene archive
+    FileStream* sceneArchive;       // +0x00 open scene archive
     char sceneArchiveName[0x40];              // +0x04 its name
     char sceneDirectory[0x104];               // +0x44 scene directory (SetSceneDirectory)
     char waypointPath[0x104];                 // +0x148 directory\waypoint file

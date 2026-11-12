@@ -675,7 +675,7 @@ void KrustyUI::OpenExitDialog() {
 void KrustyUI::LoadGarageTables() {
     char key[128];
     UnknownParameterBlock block;
-    UnknownTextureStream* stream = new(__FILE__, 851) UnknownTextureStream(g_ResourceManager);
+    FileStream* stream = new(__FILE__, 851) FileStream(g_ResourceManager);
     if (stream->Open("presets.pb", "r", 0)) {
         block.Attach((UnknownParameterStream*)stream, 0, 1);
         for (int i = 0; i < 5; i++) {
@@ -730,7 +730,7 @@ void KrustyUI::LoadGarageTables() {
 void KrustyUI::LoadBikesAndRiders() {
     char key[256];
     UnknownParameterBlock block;
-    UnknownTextureStream* stream = new(__FILE__, 913) UnknownTextureStream(g_ResourceManager);
+    FileStream* stream = new(__FILE__, 913) FileStream(g_ResourceManager);
     if (manufacturers)
         DebugFree(manufacturers, __FILE__, 918);
     if (bikes)
@@ -854,7 +854,7 @@ int KrustyUI::ResolveBikeFile(const char* name, char* text, int size) {
         strncpy(path, name, count);
         path[count] = 0;
     }
-    UnknownTextureStream* stream = new(__FILE__, 1369) UnknownTextureStream(g_ResourceManager);
+    FileStream* stream = new(__FILE__, 1369) FileStream(g_ResourceManager);
     if (stream->Open(path, "r", 0)) {
         delete stream;
         UNKNOWN_COPY_SIZED(text, path, size);
@@ -884,7 +884,7 @@ int KrustyUI::ResolveRiderFile(const char* name, char* text, int size) {
         strncpy(path, name, count);
         path[count] = 0;
     }
-    UnknownTextureStream* stream = new(__FILE__, 1411) UnknownTextureStream(g_ResourceManager);
+    FileStream* stream = new(__FILE__, 1411) FileStream(g_ResourceManager);
     if (stream->Open(path, "r", 0)) {
         delete stream;
         UNKNOWN_COPY_SIZED(text, path, size);

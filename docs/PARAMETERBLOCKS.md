@@ -59,7 +59,7 @@ the game's file stream, and archives can redirect that stream.
     `0x0043e9e0` (get the mode byte), `0x0043e9b0` (set it) and `0x00461d20`
     (reset it).
   - `UnknownParameterStream` is now an alias of the shared
-    `UnknownTextureStream` in `FileStream.h`. The parameter implementation
+    `FileStream` in `FileStream.h`. The parameter implementation
     uses `ResourceManager.h`'s resource manager and `ResourceItem` declarations.
     `AddArchive` returns the stream pointer tested by this caller;
     `FindItem` supplies the archive at `+0x14` and offset at `+0x18`.

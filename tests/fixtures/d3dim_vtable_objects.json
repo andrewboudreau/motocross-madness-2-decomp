@@ -8,7 +8,7 @@
     "src/krusty2/vehicle/Vehicle.cpp"
   ],
   "renames": {
-    "?D3DIMObjectVirtualSlot2@D3DIMSoultreeObject@@UAEXXZ": "?LoadHierarchy@D3DIMSoultreeObject@@UAEXPAVUnknownTextureStream@@@Z",
+    "?D3DIMObjectVirtualSlot2@D3DIMSoultreeObject@@UAEXXZ": "?LoadHierarchy@D3DIMSoultreeObject@@UAEXPAVFileStream@@@Z",
     "?D3DIMObjectVirtualSlot3@D3DIMSoultreeObject@@UAEXXZ": "?LoadHierarchyFromParameters@D3DIMSoultreeObject@@UAEXXZ",
     "?D3DIMObjectVirtualSlot4@D3DIMSoultreeObject@@UAEXXZ": "?SoultreeVirtualSlot4@D3DIMSoultreeObject@@UAEXPAPAVSoultreeObject@@@Z",
     "?D3DIMObjectVirtualSlot5@D3DIMSoultreeObject@@UAEXXZ": "?SoultreeVirtualSlot5@D3DIMSoultreeObject@@UAEXXZ",
@@ -63,7 +63,7 @@
     },
     {
       "source": "src/reconstructed/D3DIMSoulTree.cpp",
-      "symbol": "?LoadHierarchy@D3DIMSoultreeObject@@UAEXPAVUnknownTextureStream@@@Z",
+      "symbol": "?LoadHierarchy@D3DIMSoultreeObject@@UAEXPAVFileStream@@@Z",
       "target_va": "0x0043f950",
       "target_size": 1257,
       "bindings": "src/reconstructed/D3DIMSoulTree.bindings.json"

@@ -902,7 +902,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?LoadFromParameters@SoultreeObject@@QAEXPAVUnknownTextureStream@@H@Z",
+    "candidate_symbol_contains": "?LoadFromParameters@SoultreeObject@@QAEXPAVFileStream@@H@Z",
     "target_va": "0x004fdb60",
     "target_size": 159,
     "expect": "exact",
@@ -912,7 +912,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?LoadHierarchy@SoultreeObject@@UAEXPAVUnknownTextureStream@@@Z",
+    "candidate_symbol_contains": "?LoadHierarchy@SoultreeObject@@UAEXPAVFileStream@@@Z",
     "target_va": "0x004fdc00",
     "target_size": 433,
     "expect": "exact",

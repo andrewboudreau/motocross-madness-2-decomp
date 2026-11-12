@@ -31,7 +31,7 @@ remaining scene-node and constraint-model boundary view.
 
 ## Collision resource and quadtree boundaries
 
-The `.col` loader uses the shared `UnknownTextureStream` declaration: its
+The `.col` loader uses the shared `FileStream` declaration: its
 `0x134`-byte allocation, constructor at `0x00460d10`, destructor at
 `0x00460d60`, `Open` and `Read` calls identify the same archive-capable stream.
 The constructor stores the resource-manager pointer at `+0x12c`; both this

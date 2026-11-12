@@ -21,8 +21,8 @@
 #include "../core/GraphicsTest.h"   // canonical BaseObject, GameObject, GraphicsTest
 
 class QuadTree;               // broadphase/Quadtree.h
-class UnknownTextureStream;
-typedef UnknownTextureStream CollisionFileStream; // shared .col/archive stream
+class FileStream;
+typedef FileStream CollisionFileStream; // shared .col/archive stream
 class CollisionModelSource;   // scene-graph node source used by shape setup 0x004324b0
 struct CollisionHullBody;      // CollisionShapeTests.h
 struct CollisionModelBody;

@@ -99,3 +99,25 @@ Left as placeholders in wave 2:
 - `Scene::UnknownFunction4de580`, `UnknownFunction464e80`/`464e90` views and `BaseQuarryEvent::UnknownVirtualSlot34`: they share tiny `ret`/`ret N` bodies with named methods. A shared address does not prove the same method.
 - `UnknownQuarryOverlayHooks::UnknownFunction51d730` (`ChatOverlay::CollectRacers`): it stays address-named because VisualCue's `CollectRacers` has the same view signature (docs/TRACKOVERLAY.md).
 - Tire `field_0x` members: the constructor arguments are literals in `Bike::LoadBike`, not parameter-file keys, so there is no loader-key evidence.
+
+## Wave 3
+
+Wave 3 names types: the most-used `Unknown*` classes and structs. A type name
+changes the mangled name of every method and of every function that takes the
+type, so the bindings, calibration cases and fixture keys were updated with
+it. Every affected translation unit (each `.cpp` under `src/`, `samples/` and
+`tests/fixtures/` that includes a changed file) was compiled with VC6 from the
+base commit and from the renamed tree, from the tree root with relative paths
+so that `__FILE__` is the same. With sections matched by name and COMDAT
+symbol, all non-debug section bytes, relocations and symbol values compare
+equal once the old names are mapped to the new ones. In some units VC6 emits
+the COMDAT sections (RTTI records, vtables) or the symbol table in another
+order after a rename; their contents do not change.
+
+A view type that mirrors a named class keeps its placeholder: merging views is
+a type change, not a rename. A unit's file name names the unit, not the class
+in it, so a name taken from a `__FILE__` path is tier 2 at most.
+
+| Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- |
+| `UnknownTextureStream` | `FileStream` | 2 | The 0x134-byte stream at `0x00460d10..0x00461d57` (src/reconstructed/FileStream.cpp, [FILESTREAM](FILESTREAM.md)). `Open` calls `fopen`; `Read`, `Write` and `Seek` go through `fread`, `fwrite` and `fseek`; `GetFileTimes` calls `_fstat`. Archive slices and "FAOE"-encoded files are read through the same object. It loads textures, scenes, terrain, motions, sounds and parameter files, not only textures. No RTTI or `__FILE__` names it, so the name is descriptive. The `UnknownParameterStream` and `CollisionFileStream` typedefs still alias it. |

@@ -1,4 +1,4 @@
-// FileStream.cpp -- near misses of the buffered file stream (UnknownTextureStream,
+// FileStream.cpp -- near misses of the buffered file stream (FileStream,
 // declared in src/reconstructed/TextureMap.h), 0x00460d10..0x00461d57. The thirteen
 // methods that match retail are in src/reconstructed/FileStream.cpp; these five
 // (header check, seek, read, write, write-header) stay here with
@@ -78,7 +78,7 @@ int WriteXorEncoded(const unsigned char* buffer, int size, int count, FILE* file
 int ReadXorDecoded(unsigned char* buffer, int size, int count, FILE* file, unsigned char* key);
 
 // The stream that holds the file: the innermost one.
-static inline UnknownTextureStream* InnermostStream(UnknownTextureStream* stream)
+static inline FileStream* InnermostStream(FileStream* stream)
 {
     while (stream->innerStream) {
         stream = stream->innerStream;
@@ -88,7 +88,7 @@ static inline UnknownTextureStream* InnermostStream(UnknownTextureStream* stream
 
 // Whether the next four bytes are the "FAOE" header. As an inline helper the
 // failure path of the four tests falls through, as in retail.
-static inline int HeaderMatches(UnknownTextureStream* stream)
+static inline int HeaderMatches(FileStream* stream)
 {
     if (stream->ReadByte() != stream->headerByte0
         || stream->ReadByte() != stream->headerByte1
@@ -115,7 +115,7 @@ static inline int HeaderMatches(UnknownTextureStream* stream)
 // first seek as `if (fseek(...) == 0) {} else { fclose ... }` keeps the two
 // fclose blocks apart and gives retail's registers from bufferEnd through the
 // four header compares, but places the first block after the function (26/204).
-int UnknownTextureStream::CheckHeader()
+int FileStream::CheckHeader()
 {
     if (fseek(fileHandle, 0, SEEK_SET)) {
         fclose(fileHandle);
@@ -176,9 +176,9 @@ int UnknownTextureStream::CheckHeader()
 // ternary (201), an if/else on the position, a `decoded` local (194), a
 // `next` pointer for the chain walk (194), if/else-if origin checks (196 to
 // 208) and a goto past the decoded read (206) are worse.
-int UnknownTextureStream::Seek(int offset, int origin, int flag)
+int FileStream::Seek(int offset, int origin, int flag)
 {
-    UnknownTextureStream* stream = this;
+    FileStream* stream = this;
     unsigned char buffer[0x418];
     int result = 0;
     while (stream->innerStream) {
@@ -247,7 +247,7 @@ int UnknownTextureStream::Seek(int offset, int origin, int flag)
 }
 
 // The running-key decode used by 0x00461640 (the 0x00461980 shape).
-static inline void DecodeBytes(UnknownTextureStream* stream, char* p, int count)
+static inline void DecodeBytes(FileStream* stream, char* p, int count)
 {
     for (int i = 0; i < count; i++) {
         char c = *p;
@@ -271,9 +271,9 @@ static inline void DecodeBytes(UnknownTextureStream* stream, char* p, int count)
 // unsigned `read`, `(read + done)`, `done += read` first and a `goto
 // failed` for the block loop do not change that). A key pointer local (24)
 // and `left` computed before the encoded test (372) are worse.
-int UnknownTextureStream::Read(void* buffer, int size, int count)
+int FileStream::Read(void* buffer, int size, int count)
 {
-    UnknownTextureStream* stream = InnermostStream(this);
+    FileStream* stream = InnermostStream(this);
     char* p = stream->bufferPos;
     if (p != stream->bufferEnd) {
         int available = stream->bufferEnd - p;
@@ -352,9 +352,9 @@ int UnknownTextureStream::Read(void* buffer, int size, int count)
 // 2026-11-11: the fwrite through a FILE* local, an explicit else arm, a named result and
 // size_t casts keep 136 (same register rotation: retail's handle/size/textMode go to
 // edx/eax/ecx, here ecx/edx/eax); testing !fileEncoded first gives 29.
-int UnknownTextureStream::Write(const void* buffer, int size, int count)
+int FileStream::Write(const void* buffer, int size, int count)
 {
-    UnknownTextureStream* stream = InnermostStream(this);
+    FileStream* stream = InnermostStream(this);
     if (stream->fileEncoded) {
         long position = ftell(stream->fileHandle);
         if (fseek(stream->fileHandle, position, SEEK_SET)) {
@@ -372,7 +372,7 @@ int UnknownTextureStream::Write(const void* buffer, int size, int count)
 
 // Writes the "FAOE" header; 0 when a write fails. As an inline helper the failure
 // path falls through, as in retail.
-static inline int PutHeader(UnknownTextureStream* stream)
+static inline int PutHeader(FileStream* stream)
 {
     if (stream->WriteByte(stream->headerByte0) == -1
         || stream->WriteByte(stream->headerByte1) == -1
@@ -391,14 +391,14 @@ static inline int PutHeader(UnknownTextureStream* stream)
 // where VC6 here stores it before the loop. Seeding before strcat or before
 // _splitpath moves the store to the start of the strcat or ahead of the call;
 // `name[i]`, a count-down loop and `length` in the for-init are no closer.
-int UnknownTextureStream::WriteHeader(const char* path)
+int FileStream::WriteHeader(const char* path)
 {
     char drive[_MAX_DRIVE];
     char directory[_MAX_DIR];
     char name[_MAX_PATH];
     char extension[_MAX_EXT];
 
-    UnknownTextureStream* stream = InnermostStream(this);
+    FileStream* stream = InnermostStream(this);
     if (!PutHeader(stream)) {
         return 0;
     }

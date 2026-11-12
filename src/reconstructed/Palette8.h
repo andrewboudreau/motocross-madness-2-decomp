@@ -3,7 +3,7 @@
 #include "BaseObject.h"
 
 class ColorMapper;
-class UnknownTextureStream;
+class FileStream;
 struct UnknownPaletteInterface;
 
 // PALETTEENTRY-shaped (red, green, blue, flags); passed to
@@ -22,7 +22,7 @@ struct UnknownPaletteEntry {
 // ColorMapper of the same name. Member names are provisional.
 class Palette8 : public BaseObject {
 public:
-    explicit Palette8(UnknownTextureStream* stream); // 0x004b6c00 (ret 4)
+    explicit Palette8(FileStream* stream); // 0x004b6c00 (ret 4)
     virtual ~Palette8();                             // 0x004b6ea0 (deleting wrapper 0x004b6e80)
 
     // 0x004b6b30 (cdecl): the palette loaded from resource `name`, shared

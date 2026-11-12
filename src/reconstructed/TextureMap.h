@@ -58,7 +58,7 @@ public:
                               int flags, void* surfacePalette, int checkMemory, int unused,
                               int addressU, int addressV, UnknownTextureFormatChoice* choice,
                               int alphaThreshold, unsigned int key) = 0;
-    virtual int LoadSurface(UnknownTextureStream* stream, int width, int height, int minimumSize,
+    virtual int LoadSurface(FileStream* stream, int width, int height, int minimumSize,
                             int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
                             int flags, void* surfacePalette, int addressU, int addressV,
                             UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key) = 0;

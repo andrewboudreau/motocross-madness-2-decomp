@@ -7,10 +7,10 @@
 // read. Both follow +0x1c to the innermost stream first.
 class UnknownResourceManager;
 
-class UnknownTextureStream {
+class FileStream {
 public:
-    UnknownTextureStream(UnknownResourceManager* manager);              // 0x00460d10
-    ~UnknownTextureStream();                  // 0x00460d60
+    FileStream(UnknownResourceManager* manager);              // 0x00460d10
+    ~FileStream();                  // 0x00460d60
     int Open(const char* path, const char* mode, int encoded); // 0x00460f50: opens `path`
     int Seek(int offset, int origin, int flag); // 0x00461340: seeks
     int Tell();
@@ -23,7 +23,7 @@ public:
     int IsValidFile(const char* path);
     // 0x00460d70: the archive holding `name` (its offset and length go to
     // +0x130 and +0x04), or 0 (FileStream.cpp).
-    UnknownTextureStream* FindArchive(const char* name);
+    FileStream* FindArchive(const char* name);
     int CheckHeader();              // 0x00460db0: checks the "FAOE" header
     int SetBufferSize(int unused);    // 0x00461310: binary mode
     int Write(const void* buffer, int size, int count); // 0x004618e0: writes
@@ -86,7 +86,7 @@ public:
     FILE* fileHandle;                         // +0x14 the open file
     char headerByte3;                         // +0x18 'E', fourth header byte
     unsigned char field_0x019[0x1c - 0x19];
-    UnknownTextureStream* innerStream;        // +0x1c inner stream
+    FileStream* innerStream;        // +0x1c inner stream
     char headerByte2;                         // +0x20 'O', third header byte
     char readBuffer[0x124 - 0x21];            // +0x21 read buffer
     char* bufferPos;                          // +0x124 buffer position
@@ -96,4 +96,4 @@ public:
 };
 
 // Parameter readers use the same 0x134-byte archive stream.
-typedef UnknownTextureStream UnknownParameterStream;
+typedef FileStream UnknownParameterStream;

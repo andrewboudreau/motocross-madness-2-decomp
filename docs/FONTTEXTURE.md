@@ -41,7 +41,7 @@ aggregate membership and translation-unit ownership remain unknown.
 An exhaustive scan for each encoded absolute DWORD finds exactly one load:
 `0x00467547`, `0x00467540`, `0x00467532` and `0x0046752c`, respectively.
 The loader uses those values to select four floats from the record read by
-`UnknownTextureStream::Read`, then passes them to the actual Rectangle2D
+`FileStream::Read`, then passes them to the actual Rectangle2D
 constructor at `0x004e8ad0`. This proves these direct references, not absence
 of arbitrary indirect writes. It does not justify changing the cells to
 read-only constants or inlining their values into callers.

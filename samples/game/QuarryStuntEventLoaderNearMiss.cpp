@@ -61,7 +61,7 @@
 extern int g_UnknownGlobal59af10;
 
 // 0x0045c040 (cdecl): preloads the ecosystem `path` from `stream`.
-void PreloadEcosystem(TextureMapManager* manager, const char* path, UnknownTextureStream* stream,
+void PreloadEcosystem(TextureMapManager* manager, const char* path, FileStream* stream,
                            int format);
 
 // A CollisionObject (QuadTree object at +0, GameObject at +0xc).
@@ -255,7 +255,7 @@ public:
 class UnknownQuarrySkyCube : public GameObject {
 public:
     explicit UnknownQuarrySkyCube(int flags);                  // 0x004fb1e0
-    GameObject* Create(void* target, UnknownTextureStream* stream,
+    GameObject* Create(void* target, FileStream* stream,
                                       UnknownTextureFormatChoice* textures, float size);
 
     unsigned char field_0x2c[0x48 - 0x2c];
@@ -266,7 +266,7 @@ class UnknownQuarryTerrainObject : public GameObject {
 public:
     explicit UnknownQuarryTerrainObject(int flags);            // 0x00505830
     // 0x005059d0: Terrain::Load (src/krusty2/broadphase/Terrain.h).
-    UnknownTerrain* Load(void* target, UnknownTextureStream* stream, int a,
+    UnknownTerrain* Load(void* target, FileStream* stream, int a,
                          UnknownTextureFormatChoice* textures, int level, int b,
                          const char* detailTexture, int c);
 
@@ -277,7 +277,7 @@ public:
     explicit UnknownQuarryEcoSystem(int flags);                // 0x00457250
     EcoSystem* Create(void* target, TextureMapManager* manager, UnknownTerrain* terrain,
                                      LightManager* lights, UnknownSceneEnvironment* environment,
-                                     UnknownTextureStream* stream, int format, int a, int level);
+                                     FileStream* stream, int format, int a, int level);
 
     unsigned char field_0x2c[0x5c4 - 0x2c];
 };
@@ -338,8 +338,8 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         if (progress)
             progress(&step);
     }
-    UnknownTextureStream* stream = new(__FILE__, 252) UnknownTextureStream(g_ResourceManager);
-    UnknownTextureStream* preloaded = stream;
+    FileStream* stream = new(__FILE__, 252) FileStream(g_ResourceManager);
+    FileStream* preloaded = stream;
     if (ecosystem[0]) {
         if (strstr(ecosystem, ".est"))
             strcpy(strstr(ecosystem, ".est"), ".esb");
@@ -584,7 +584,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         projectedShadow = ((UnknownQuarryShadow*)projectedShadow)->Init(renderContext, g_TrackGame->textureManager);
     }
     if (!preloaded)
-        stream = new(__FILE__, 713) UnknownTextureStream(g_ResourceManager);
+        stream = new(__FILE__, 713) FileStream(g_ResourceManager);
 
     g_MemTagStack->Push("Sky");
     char* cubeFile = eventScene->environment->cubeFile;
@@ -640,7 +640,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
 
     g_MemTagStack->Push("EcoSystem");
     if (!stream)
-        stream = new(__FILE__, 848) UnknownTextureStream(g_ResourceManager);
+        stream = new(__FILE__, 848) FileStream(g_ResourceManager);
     if (strstr(eventScene->environment->ecosystemFile, ".est"))
         strcpy(strstr(eventScene->environment->ecosystemFile, ".est"), ".esb");
     if (stream && !g_TrackGame->sceneObject->OpenArchiveFile(stream, eventScene->environment->ecosystemFile,

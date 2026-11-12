@@ -87,14 +87,14 @@ int UnknownResourceManager::MergeWithExisting(ResourceItem* item)
 {
     for (int i = 0; i < itemCount; i++) {
         if (!_stricmp(item->name, items[i]->name)) {
-            UnknownTextureStream* archive = items[i]->archive;
+            FileStream* archive = items[i]->archive;
             if (archive && archive->IsEncoded())
                 return 0;
 
             items[i]->offset = item->offset;
             items[i]->size = item->size;
             ResourceItem* existing = items[i];
-            UnknownTextureStream* old = existing->archive;
+            FileStream* old = existing->archive;
             existing->archive = item->archive;
             if (old != item->archive) {
                 if (!UnknownInlineArchiveUsed(old) && old)
@@ -124,7 +124,7 @@ ResourceItem* UnknownResourceManager::FindItem(const char* name, int seek)
 {
     for (int i = 0; i < itemCount; i++) {
         if (!_stricmp(items[i]->name, name)) {
-            UnknownTextureStream* archive = items[i]->archive;
+            FileStream* archive = items[i]->archive;
             if (archive && (seek || archive->IsEncoded()))
                 items[i]->archive->Seek(items[i]->offset, 0, 0);
             return items[i];
@@ -153,7 +153,7 @@ int UnknownResourceManager::AddLooseFile(const char* name, const char* path)
     else
         strncpy(buffer, name, sizeof(buffer));
 
-    UnknownTextureStream* archive = new(__FILE__, 387) UnknownTextureStream(this);
+    FileStream* archive = new(__FILE__, 387) FileStream(this);
     if (archive->Open(buffer, "rb", archive->IsValidFile(buffer))) {
         if (itemCount + 1 > itemCapacity) {
             items = (ResourceItem**)DebugRealloc(items, (itemCount + 1) * 4, __FILE__, 393);
@@ -163,7 +163,7 @@ int UnknownResourceManager::AddLooseFile(const char* name, const char* path)
             }
         }
         if (archiveCount + 1 > archiveCapacity) {
-            archives = (UnknownTextureStream**)DebugRealloc(archives, (archiveCount + 8) * 4, __FILE__, 405);
+            archives = (FileStream**)DebugRealloc(archives, (archiveCount + 8) * 4, __FILE__, 405);
             if (archives) {
                 archiveCapacity = archiveCount + 8;
                 archives[archiveCount++] = archive;
@@ -223,7 +223,7 @@ int UnknownResourceManager::AddObject(const char* name, void* object)
 
 // 0x004e9830: refuses (0) while another holder references one of the
 // archive's items; the archive itself is not deleted here.
-int UnknownResourceManager::RemoveArchiveItems(UnknownTextureStream* archive)
+int UnknownResourceManager::RemoveArchiveItems(FileStream* archive)
 {
     int used = 0;
     int i;

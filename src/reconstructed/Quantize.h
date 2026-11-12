@@ -2,7 +2,7 @@
 
 #include "BaseObject.h"
 
-class UnknownTextureStream;
+class FileStream;
 
 // Quantize.cpp (literal __FILE__ at 0x00572084, xrefs 0x004dde47..0x004de12e).
 // RTTI: ColorMapper : BaseObject (vtable 0x00557658, four slots; slot 0 is
@@ -11,7 +11,7 @@ class UnknownTextureStream;
 // same object as UnknownTexturePalette. Member names are provisional.
 class ColorMapper : public BaseObject {
 public:
-    explicit ColorMapper(UnknownTextureStream* stream); // 0x004ddf40 (ret 4)
+    explicit ColorMapper(FileStream* stream); // 0x004ddf40 (ret 4)
     virtual ~ColorMapper();                              // 0x004de200 (deleting wrapper 0x004ddea0)
 
     // 0x004dddd0 (cdecl): the mapper loaded from resource `name`, shared

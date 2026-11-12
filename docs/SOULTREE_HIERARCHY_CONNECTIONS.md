@@ -23,7 +23,7 @@ these hierarchy operations. No adjustor thunk or forwarding wrapper is added.
 
 ## Stream boundary and retained behavior
 
-LoadHierarchy now accepts the existing UnknownTextureStream declaration and
+LoadHierarchy now accepts the existing FileStream declaration and
 its eleven Read sites call the supplied provider at `0x461640`. The stream
 pointer, destination buffers, item sizes and counts remain unchanged. The
 private SoultreeFileStream stand-in is removed. This does not make Read exact:

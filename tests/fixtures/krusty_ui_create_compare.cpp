@@ -114,7 +114,7 @@ GUIUser* GUIManager::GetUser(int index){int n=GuiIndex(this);EventAt(11,n,index)
 void GUIUser::ForgetDevices(){EventAt(12,Which(this,User(0),User(1)));acceptedDevices.m_count=0;}
 int GUIUser::AcceptDevice(GUIInputDevice* device){EventAt(13,Which(this,User(0),User(1)),(int)device);acceptedDevices.m_count++;return -3;}
 void GUIManager::ShowCursors(int value){EventAt(14,GuiIndex(this),value);}
-UnknownTextureStream* UnknownResourceManager::AddArchive(const char* path,int flags){EventAt(15,Which(this,world.managers[0],world.managers[1]),flags,0,0,0,path);return 0;}
+FileStream* UnknownResourceManager::AddArchive(const char* path,int flags){EventAt(15,Which(this,world.managers[0],world.managers[1]),flags,0,0,0,path);return 0;}
 void TrackGameMode::LoadBonusTrackNames(){EventAt(16,Which(this,&GameAt(0)->mode,&GameAt(1)->mode));}
 int TrackGameMode::LoadProfile(){EventAt(17,Which(this,&GameAt(0)->mode,&GameAt(1)->mode));return scenario.mask&1;}
 void PCJoystickDevice::UnknownMethod4c3ae0(unsigned char value){EventAt(18,this?Which(this,world.joysticks[0],world.joysticks[1]):-1,value);field_0x5d5=value;}

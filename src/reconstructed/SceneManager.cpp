@@ -80,7 +80,7 @@ void UnknownTrackGameObject574::SetSceneDirectory(char* path)
 }
 
 // 0x004e9ba0: keeps the open archive when it already is `name`.
-UnknownTextureStream* UnknownTrackGameObject574::OpenSceneArchive(const char* name)
+FileStream* UnknownTrackGameObject574::OpenSceneArchive(const char* name)
 {
     char scene[0x40];
     char path[0x104];
@@ -113,7 +113,7 @@ UnknownTextureStream* UnknownTrackGameObject574::OpenSceneArchive(const char* na
 // succeeds only inside an archive (an inner stream at +0x1c), then copies the
 // opened name to `a` (a char buffer) when given. Otherwise it frees `stream`
 // and allocates a replacement that nothing keeps.
-int UnknownTrackGameObject574::OpenArchiveFile(UnknownTextureStream* stream, const char* name,
+int UnknownTrackGameObject574::OpenArchiveFile(FileStream* stream, const char* name,
                                                      const char* mode, int a)
 {
     char drive[_MAX_DRIVE];
@@ -131,7 +131,7 @@ int UnknownTrackGameObject574::OpenArchiveFile(UnknownTextureStream* stream, con
             return 1;
         }
         delete stream;
-        stream = new(__FILE__, 268) UnknownTextureStream(g_ResourceManager);
+        stream = new(__FILE__, 268) FileStream(g_ResourceManager);
         if (out)
             *out = 0;
     } else {
@@ -151,8 +151,8 @@ void UnknownTrackGameObject574::SelectScene(char* name, const char* kind, int va
     strncpy(sceneFile, buffer, 0x3f);
     SetSceneFileNames(name);
     OpenSceneArchive(0);
-    UnknownTextureStream* stream =
-        new(__FILE__, 297) UnknownTextureStream(g_ResourceManager);
+    FileStream* stream =
+        new(__FILE__, 297) FileStream(g_ResourceManager);
     if (stream->Open(sceneFile, "r", 0)) {
         ReadCurrentSceneName(sceneName, sceneFile, value);
         if (value && !_stricmp(sceneName, "NO NAME"))
@@ -199,7 +199,7 @@ void UnknownTrackGameObject574::ReadSceneName(char* out, char* name, int index,
             strncpy(scene, name, 0x3f);
         sprintf(path, "%s\\%s", sceneDirectory, scene);
         UnknownParameterBlock block;
-        UnknownTextureStream* archive = OpenSceneArchive(scene);
+        FileStream* archive = OpenSceneArchive(scene);
         if (archive) {
             archive->GetFileTimes(a, b);
             block.OpenFromArchives((UnknownParameterStream*)archive, scene, path, 0);
@@ -207,8 +207,8 @@ void UnknownTrackGameObject574::ReadSceneName(char* out, char* name, int index,
             block.GetInt("NumberOfWaypointRaces", 0, &waypointRaceCount);
             if (index) {
                 if (waypointRaceCount) {
-                    UnknownTextureStream* stream = new(__FILE__, 401)
-                        UnknownTextureStream(g_ResourceManager);
+                    FileStream* stream = new(__FILE__, 401)
+                        FileStream(g_ResourceManager);
                     strcpy(base, scene);
                     strcpy(strrchr(base, '.'), "");
                     sprintf(path, "%s%02d.wpt", base, index);
@@ -255,8 +255,8 @@ void UnknownTrackGameObject574::ReadCurrentSceneName(char* name, char* scene, in
         block.GetInt("NumberOfWaypointRaces", 0, &waypointRaceCount);
         if (value) {
             if (waypointRaceCount) {
-                UnknownTextureStream* stream =
-                    new(__FILE__, 471) UnknownTextureStream(g_ResourceManager);
+                FileStream* stream =
+                    new(__FILE__, 471) FileStream(g_ResourceManager);
                 strcpy(base, scene);
                 strcpy(strrchr(base, '.'), "");
                 sprintf(path, "%s%02d.wpt", base, value);
@@ -1123,7 +1123,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
     int logProgress;
     char path[0x104];
 
-    UnknownTextureStream* archive = sceneManager->OpenSceneArchive(0);
+    FileStream* archive = sceneManager->OpenSceneArchive(0);
     if (!archive)
         return 0;
     sprintf(scenePath, "%s\\%s", sceneManager->sceneDirectory, sceneManager->sceneFile);
@@ -1399,7 +1399,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
         if (!g_ResourceManager->FindItem(name, 0))
             return 1;
     }
-    UnknownTextureStream* stream = new(__FILE__, 3622) UnknownTextureStream(g_ResourceManager);
+    FileStream* stream = new(__FILE__, 3622) FileStream(g_ResourceManager);
     stream->Open(name, "rb", 0);
     UnknownParameterBlock block;
     block.Attach((UnknownParameterStream*)stream, 0, 1);
@@ -1428,7 +1428,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
 // static model plus animation count (at least 1).
 int Scene::CountObjects(int* count)
 {
-    UnknownTextureStream* archive = sceneManager->OpenSceneArchive(0);
+    FileStream* archive = sceneManager->OpenSceneArchive(0);
     if (!archive)
         return 0;
     int animations;
@@ -1470,8 +1470,8 @@ int Scene::ResolveSltPath(char* path)
     char ext[_MAX_EXT];
     char content[0x108];
 
-    UnknownTextureStream* stream =
-        new(__FILE__, 3727) UnknownTextureStream(g_ResourceManager);
+    FileStream* stream =
+        new(__FILE__, 3727) FileStream(g_ResourceManager);
     char dir[_MAX_DIR];
     _splitpath(path, drive, dir, name, ext);
     strcat(name, ext);
@@ -1514,7 +1514,7 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
     char modelPath[0x108];
     char modelMessage[0x204];
 
-    UnknownTextureStream* archive = sceneManager->OpenSceneArchive(0);
+    FileStream* archive = sceneManager->OpenSceneArchive(0);
     if (!archive)
         return 0;
     UnknownSceneResourceManager resources;

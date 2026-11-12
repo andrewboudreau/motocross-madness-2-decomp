@@ -45,7 +45,7 @@ public:
                               int addressU, int addressV, UnknownTextureFormatChoice* choice,
                               int alphaThreshold, unsigned int key);
     // 0x004c6080: reads the texture from `stream`, then creates it through slot 4.
-    virtual int LoadSurface(UnknownTextureStream* stream, int width, int height, int minimumSize,
+    virtual int LoadSurface(FileStream* stream, int width, int height, int minimumSize,
                             int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
                             int flags, void* surfacePalette, int addressU, int addressV,
                             UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key);

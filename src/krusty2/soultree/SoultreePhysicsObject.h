@@ -39,7 +39,7 @@
 #include "collision/CollisionObject.h"       // QuadTreeObject, GameObject
 #include "soultree/SoultreePhysicsBaseObject.h"
 
-class UnknownTextureStream;
+class FileStream;
 
 class D3DIMSoultreeObject : public QuadTreeObject, public GameObject {
 public:
@@ -55,7 +55,7 @@ public:
     // SoultreeObject level folded into this view the build links this name to it
     // through config/game_build.json link_aliases.
     virtual int AttachRenderContext(void* context);
-    virtual void LoadHierarchy(UnknownTextureStream* stream); // 0x0043f950, ret 4
+    virtual void LoadHierarchy(FileStream* stream); // 0x0043f950, ret 4
     virtual void LoadHierarchyFromParameters();       // 0x0043fe40
     virtual void SoultreeVirtualSlot4(SoultreeObject** out); // 0x004440a0, ret 4
     virtual void SoultreeVirtualSlot5();       // 0x00444140

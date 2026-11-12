@@ -252,8 +252,8 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             return 0;
         }
         if (models > 0) {
-    UnknownTextureStream* stream =
-        new(__FILE__, 1749) UnknownTextureStream(g_ResourceManager);
+    FileStream* stream =
+        new(__FILE__, 1749) FileStream(g_ResourceManager);
     staticModels = new(__FILE__, 1751) UnknownSceneBuffer;
     staticModels->casterCount = models;
     staticModels->casters = new(__FILE__, 1753) UnknownSceneCaster[staticModels->casterCount];
@@ -529,8 +529,8 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                 return 0;
             }
             sprintf(text, "%s\\%s", "Res", vue);
-            UnknownTextureStream* stream =
-                new(__FILE__, 2216) UnknownTextureStream(g_ResourceManager);
+            FileStream* stream =
+                new(__FILE__, 2216) FileStream(g_ResourceManager);
             if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, text, "rb", (int)vuePath)) {
                 sprintf(sound, "No procedural vue file found in resources.  Aborting.\n");
                 delete stream;
@@ -585,8 +585,8 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         strncpy(colPath, file, size);
         colPath[size] = 0;
         strcpy(strrchr(colPath, '.'), ".col");
-        UnknownTextureStream* stream =
-            new(__FILE__, 2281) UnknownTextureStream(g_ResourceManager);
+        FileStream* stream =
+            new(__FILE__, 2281) FileStream(g_ResourceManager);
         sprintf(text, "%s\\%s", "Res", colPath);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, text, "rb", (int)colPath))
             colPath[0] = 0;

@@ -97,7 +97,7 @@ class SoultreeHierarchyConnectionsTests(unittest.TestCase):
             loader = objects[NODE].find_symbol('?LoadHierarchy@SoultreeObject@@')
             _, _, relocs = objects[NODE].symbol_extent(loader)
             calls = Counter(objects[NODE].symbol_by_index[r.symbol_index].name for r in relocs if r.type == 0x14)
-            self.assertEqual(calls['?Read@UnknownTextureStream@@QAEHPAXHH@Z'], 11)
+            self.assertEqual(calls['?Read@FileStream@@QAEHPAXHH@Z'], 11)
             self.assertFalse(any('SoultreeFileStream' in s.name for s in objects[NODE].symbols))
             # Independent compiler views must dispatch through the same primary
             # slots without applying the secondary GameObject adjustment.

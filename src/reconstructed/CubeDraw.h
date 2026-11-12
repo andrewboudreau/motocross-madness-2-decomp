@@ -32,7 +32,7 @@ class ColorMapper;
 class Cube;
 class ManagedTextureGroup;
 class RenderTarget;
-class UnknownTextureStream;
+class FileStream;
 struct UnknownCubeTextureContext;
 
 // 0x20-byte lit vertex (FVF 0x1e2: position, reserved, diffuse, specular,
@@ -85,7 +85,7 @@ public:
     virtual int Render3D();       // 0x0043e4c0: draws the visible cells
 
     // 0x0043d980: reads the palettes and cubes listed in `stream`.
-    DrawableCube* Load(void* value, UnknownTextureStream* stream,
+    DrawableCube* Load(void* value, FileStream* stream,
                                         UnknownCubeTextureContext* context);
     int BuildFaceGeometry();              // 0x0043dc60: builds the face geometry
     // 0x0043e0b0: loads the cube's textures and sets the cells' texture coordinates.

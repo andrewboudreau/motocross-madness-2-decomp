@@ -166,11 +166,11 @@ class FollowCameraLoadFileTests(unittest.TestCase):
                        for unit in ('FileStream','ResourceManager','EcoSystem','Math3D','CrossProduct','FastMath','KrustyBikeCamera')}
             stream=(ROOT/'src/reconstructed/FileStream.cpp').read_text()
             head=stream[stream.index('#include'):stream.index('// The stream that holds')]
-            prefixes=['UnknownTextureStream::UnknownTextureStream(','UnknownTextureStream::~UnknownTextureStream(',
-                      'UnknownTextureStream* UnknownTextureStream::FindArchive(','int UnknownTextureStream::IsValidFile(',
-                      'int UnknownTextureStream::Open(','int UnknownTextureStream::SetBufferSize(','int UnknownTextureStream::Tell(']
-            parts=[extract(stream,'static inline UnknownTextureStream* InnermostStream(')]+[extract(stream,p)for p in prefixes]
-            for prefix in ['int UnknownTextureStream::ReadByte(','int UnknownTextureStream::ReadLine(']:
+            prefixes=['FileStream::FileStream(','FileStream::~FileStream(',
+                      'FileStream* FileStream::FindArchive(','int FileStream::IsValidFile(',
+                      'int FileStream::Open(','int FileStream::SetBufferSize(','int FileStream::Tell(']
+            parts=[extract(stream,'static inline FileStream* InnermostStream(')]+[extract(stream,p)for p in prefixes]
+            for prefix in ['int FileStream::ReadByte(','int FileStream::ReadLine(']:
                 # Validation extraction only; each full emitted body is dual-strict.
                 parts.append('#pragma inline_depth(0)\n'+extract(stream,prefix)+'\n#pragma inline_depth()')
             helper_sources={'stream':head+'\n'.join(parts),
@@ -179,7 +179,7 @@ class FollowCameraLoadFileTests(unittest.TestCase):
                 'finditem':'#include <string.h>\n#include "TextureMap.h"\n#include "ResourceManager.h"\n'+extract((ROOT/'src/reconstructed/ResourceManager.cpp').read_text(),'ResourceItem* UnknownResourceManager::FindItem('),
                 'readxor':'#include <stdio.h>\n'+extract((ROOT/'src/reconstructed/EcoSystem.cpp').read_text(),'int ReadXorDecoded(')}
             sample=(TOOL_ROOT/'samples/io/FileStream.cpp').read_text()
-            helper_sources['stream_candidates']='#include <stdio.h>\n#include "FileStream.h"\nint ReadXorDecoded(unsigned char*,int,int,FILE*,unsigned char*);\n'+'\n'.join(extract(sample,p)for p in ['static inline int HeaderMatches(','int UnknownTextureStream::CheckHeader(','int UnknownTextureStream::Seek('])
+            helper_sources['stream_candidates']='#include <stdio.h>\n#include "FileStream.h"\nint ReadXorDecoded(unsigned char*,int,int,FILE*,unsigned char*);\n'+'\n'.join(extract(sample,p)for p in ['static inline int HeaderMatches(','int FileStream::CheckHeader(','int FileStream::Seek('])
             helpers={};helper_paths=[]
             for name,text in helper_sources.items():
                 path=out/(name+'.cpp');path.write_text(text+'\n');obj,o=compile_source(path,name);helpers[name]=o;helper_paths.append(obj)

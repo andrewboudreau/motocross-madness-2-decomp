@@ -26,7 +26,7 @@ struct Vector3;
 struct TerrainVec3;
 struct UnknownEventRacer;
 class UnknownBikeRaceRacer;
-class UnknownTextureStream;
+class FileStream;
 class GameObject;
 class SoundGroup;
 
@@ -63,7 +63,7 @@ public:
 class Sound {
 public:
     Sound(SoundGroup* group, int type);
-    int Load(const char* name, UnknownTextureStream* stream, int flags, int a, int b, int c);
+    int Load(const char* name, FileStream* stream, int flags, int a, int b, int c);
     int PlayWithOptions(int restart, unsigned long playFlags, int preferHardware);
 };
 
@@ -98,7 +98,7 @@ struct UnknownPodiumSoultree {
 class UnknownPodiumSound {
 public:
     UnknownPodiumSound(GameObject* group, int type);
-    int Load(const char* name, UnknownTextureStream* stream, int flags, int a, int b, int c);
+    int Load(const char* name, FileStream* stream, int flags, int a, int b, int c);
     int PlayWithOptions(int restart, unsigned long playFlags, int preferHardware);
 };
 
@@ -166,7 +166,7 @@ UnknownPodiumSound::UnknownPodiumSound(GameObject* group, int type)
     new (this) Sound(reinterpret_cast<SoundGroup*>(group), type);
 }
 
-int UnknownPodiumSound::Load(const char* name, UnknownTextureStream* stream, int flags, int a,
+int UnknownPodiumSound::Load(const char* name, FileStream* stream, int flags, int a,
                              int b, int c)
 {
     return reinterpret_cast<Sound*>(this)->Load(name, stream, flags, a, b, c);

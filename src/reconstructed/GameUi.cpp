@@ -2930,8 +2930,8 @@ int UIListBox::AddImageFileRow(const char* file, int data, int loadImage, int ro
         return 0;
     UnknownGameUiListRow row;
     if (loadImage) {
-        UnknownTextureStream* stream =
-            new(__FILE__, 0x1e20) UnknownTextureStream(g_ResourceManager);
+        FileStream* stream =
+            new(__FILE__, 0x1e20) FileStream(g_ResourceManager);
         if (stream->Open(file, "r", 0)) {
             row.kind = 2;
             row.text = 0;
@@ -4146,7 +4146,7 @@ UIDialog* UIDialog::Create(void* target, CameraRect* area, int menu, int flags,
         }
         resourceArchive = g_ResourceManager->AddArchive(path, 0);
         sprintf(path, "%s%s", directory ? directory : "", resourceName);
-        UnknownTextureStream* stream = new(__FILE__, 0x194) UnknownTextureStream(g_ResourceManager);
+        FileStream* stream = new(__FILE__, 0x194) FileStream(g_ResourceManager);
         if (stream->Open(path, "r", 0)) {
             if (!ReadDialogResource(stream, 0)) {
                 delete stream;
@@ -5340,7 +5340,7 @@ void UIDDLListBox::ReportClick(int* handled) {
 // 0x00472bc0
 int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
     if (stream) {
-        UnknownTgaFile* image = ReadWholeFile((UnknownTextureStream*)stream, 0, offset);
+        UnknownTgaFile* image = ReadWholeFile((FileStream*)stream, 0, offset);
         if (image) {
             int format = g_TrackGame->renderTarget->surfacePixelFormat;
             frameWidth = image->width;

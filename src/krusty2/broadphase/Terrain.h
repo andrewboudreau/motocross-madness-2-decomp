@@ -35,7 +35,7 @@ public:
 // layout, so the fields use the shared declaration.
 class AgeManager;
 
-// PROVISIONAL view of the file stream at Terrain+0x3c (UnknownTextureStream in
+// PROVISIONAL view of the file stream at Terrain+0x3c (FileStream in
 // src/reconstructed/TextureMap.h; tier 1 call targets, tier 3 names).
 class TerrainStream {
 public:

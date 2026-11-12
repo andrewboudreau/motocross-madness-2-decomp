@@ -2,7 +2,7 @@
 call-record/replay mode).
 
 The linked body is src/krusty2/broadphase/Terrain.cpp (the quarry loader's
-UnknownQuarryTerrainObject::Load forward reaches it). The stream (UnknownTextureStream Read
+UnknownQuarryTerrainObject::Load forward reaches it). The stream (FileStream Read
 0x00461640, Seek 0x00461340, Tell 0x00461600) is modelled over a synthetic file: the tag
 ("TRN", other tags, truncated), the version (5 or not), the palette flag, the header words
 (field 0xbe8, the cell size as a float, the grid size, an unused word, the block count and

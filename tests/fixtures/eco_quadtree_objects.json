@@ -40,7 +40,7 @@
     ],
     [
       "src/reconstructed/EcoSystem.cpp",
-      "?Create@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVUnknownEcoTerrain@@PAVLightManager@@PADPAVUnknownTextureStream@@HHH@Z",
+      "?Create@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVUnknownEcoTerrain@@PAVLightManager@@PADPAVFileStream@@HHH@Z",
       "?g_collisionQuadTree@@3PAVQuadTree@@A",
       119,
       6

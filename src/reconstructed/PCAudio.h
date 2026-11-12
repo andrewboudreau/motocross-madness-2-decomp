@@ -9,7 +9,7 @@
 #include "SoundInterface.h"
 
 class Sound;
-class UnknownTextureStream;
+class FileStream;
 
 // DirectSound objects reached through Sound (`this` on the stack). The
 // IIDs Sound queries are the bytes of IID_IDirectSound3DBuffer
@@ -173,9 +173,9 @@ public:
 
     int Play();                                         // 0x004bbcd0: plays
     int ApplyCachedSettings();                          // 0x004bbdc0: reapplies the cached settings
-    int LoadWave(UnknownTextureStream* stream, unsigned long flags, unsigned long controls,
+    int LoadWave(FileStream* stream, unsigned long flags, unsigned long controls,
         int duplicates, int streamBytes); // 0x004bbef0: loads a .wav
-    int Load(const char* name, UnknownTextureStream* stream, int flags, int controls, int duplicates,
+    int Load(const char* name, FileStream* stream, int flags, int controls, int duplicates,
              int streamBytes);
     unsigned long GetBufferControlFlags(unsigned long flags); // 0x004bc490: control flags
     int DuplicateFrom(Sound* source);                   // 0x004bc4c0: duplicates `source`
@@ -198,7 +198,7 @@ public:
         void** second, unsigned long* secondBytes, unsigned long flags);
     int UnlockBuffer(void* first, unsigned long firstBytes, void* second, unsigned long secondBytes);
     int FillBufferFromFile(UnknownSoundBuffer** buffer); // 0x004bd0c0: fills from the file
-    int FillBufferFromStream(UnknownSoundBuffer** buffer, UnknownTextureStream* stream, unsigned long offset,
+    int FillBufferFromStream(UnknownSoundBuffer** buffer, FileStream* stream, unsigned long offset,
         unsigned long bytes);
     int CreatePendingBuffer();                          // 0x004bd4b0: creates the pending buffer
     int CreateBuffer(UnknownSoundBuffer** buffer, unsigned long bytes, unsigned long rate,
@@ -228,7 +228,7 @@ public:
     UnknownSoundFade fade;                   // +0x2c
     int fadeVolume;                          // +0x38
     UnknownSoundNotifier* notifier;          // +0x3c
-    UnknownTextureStream* sourceStream;           // +0x40: stream of a streamed sound
+    FileStream* sourceStream;           // +0x40: stream of a streamed sound
     unsigned long filledHalf;                // +0x44: offset of the half last refilled
     CRITICAL_SECTION bufferLock;                  // +0x48
     char soundName[0x104];                       // +0x60

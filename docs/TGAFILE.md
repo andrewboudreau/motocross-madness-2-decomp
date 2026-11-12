@@ -61,7 +61,7 @@ by field and the pixels: 24-bit one by one with red and blue swapped,
 failures return without closing the file. The frame and branches line up;
 the loop variables land in different dead argument slots.
 
-The stream is TextureMap.h's `UnknownTextureStream` (0x134 bytes; the
+The stream is TextureMap.h's `FileStream` (0x134 bytes; the
 constructor `0x00460d10`, destructor `0x00460d60` and `0x00460f50`, which
 opens a path, sit with its read helpers). src/krusty2's collision code
 calls the same `0x00460f50` as `CollisionFileStream::Open`.

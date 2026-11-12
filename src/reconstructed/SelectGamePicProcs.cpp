@@ -215,7 +215,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
         g_TrackGame->FindDataFile(path, fallback);
     }
     int more = directories->CurrentName(entry);
-    UnknownTextureStream* stream = new(__FILE__, 180) UnknownTextureStream(g_ResourceManager);
+    FileStream* stream = new(__FILE__, 180) FileStream(g_ResourceManager);
     if (more) {
         do {
             int i;
@@ -1794,7 +1794,7 @@ void MPEventDlg::LoadTrackPicture(UIControl* picture, const char* directory, con
         static_cast<UIListBox*>(picture)->AddImageFileRow(file, 0, 1, 0);
         return;
     }
-    UnknownTextureStream* stream = new(__FILE__, 0xa72) UnknownTextureStream(g_ResourceManager);
+    FileStream* stream = new(__FILE__, 0xa72) FileStream(g_ResourceManager);
     if (g_TrackGame->mode.raceSettings.eventType == 1 || g_TrackGame->mode.raceSettings.eventType == 5)
         sprintf(file, "%s%02ds.tga", name, g_TrackGame->mode.raceSettings.trackNumber);
     else if (g_TrackGame->mode.GetSelectedSeries() == 1 || g_TrackGame->mode.GetSelectedSeries() == 5)

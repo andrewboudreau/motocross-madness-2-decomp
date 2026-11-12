@@ -1014,7 +1014,7 @@ void DrawableGridNode::TestDroppableVertices()
 // 0x004824c0: updates the node's level of detail; nodes that stay coarse
 // release their children's buffers, finer ones load their child nodes from
 // the stream on first use (the same layout 0x0047e600 reads).
-void DrawableGridNode::UpdateLevelOfDetail(UnknownTextureStream* stream, void* a1, int recurse, int coarse)
+void DrawableGridNode::UpdateLevelOfDetail(FileStream* stream, void* a1, int recurse, int coarse)
 {
     float detail = ComputeViewerDetail(coarse);
     SelectTexture(detail);

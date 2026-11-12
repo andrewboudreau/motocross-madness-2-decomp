@@ -58,7 +58,7 @@ DrawableCube::DrawableCube(int flags) : GameObject(flags)
 }
 
 // 0x0043d980
-DrawableCube* DrawableCube::Load(void* value, UnknownTextureStream* stream,
+DrawableCube* DrawableCube::Load(void* value, FileStream* stream,
                                                   UnknownCubeTextureContext* context)
 {
     int offset;

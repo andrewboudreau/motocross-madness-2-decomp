@@ -1,4 +1,4 @@
-"""UnknownTextureStream::Write 0x004618e0, the stream write (tools/emu_diff.py case).
+"""FileStream::Write 0x004618e0, the stream write (tools/emu_diff.py case).
 
 The linked body is samples/io/FileStream.cpp. The stream follows 0..2 inner streams (+0x1c) to
 the innermost one; an encoded file (+0x08) resynchronises with ftell 0x005365d6 / fseek
@@ -8,7 +8,7 @@ Every callee is a stub that notes its arguments; the answers (seek result, encod
 fwrite count) are drawn per case.
 """
 RETAIL_VA = 0x004618e0
-SYMBOL = '?Write@UnknownTextureStream@@QAEHPBXHH@Z'
+SYMBOL = '?Write@FileStream@@QAEHPBXHH@Z'
 SOURCE = 'samples/io/FileStream.cpp'
 PROBES = {0x00461903: 'seek failed', 0x00461959: 'plain write'}
 

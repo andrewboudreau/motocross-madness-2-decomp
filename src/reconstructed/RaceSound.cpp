@@ -141,7 +141,7 @@ RaceSound::~RaceSound() {
 RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
                                             UnknownRaceSoundCamera* camera, int racers) {
     int count;
-    UnknownTextureStream* stream;
+    FileStream* stream;
     int iterator;
     char sample[0x50];
     char key[0x50];
@@ -152,7 +152,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     int i;
     int k;
 
-    stream = new (__FILE__, 203) UnknownTextureStream(g_ResourceManager);
+    stream = new (__FILE__, 203) FileStream(g_ResourceManager);
     GameObject::SetRenderContext(owner);
     raceView = view;
     listenerCamera = camera;
@@ -1021,7 +1021,7 @@ static const Vector3 s_UnknownVector689bc0 = Vector3(0.0f, 0.0f, 1.0f);
 // 0x004e5500
 void RaceSound::ReadSample(const char* name, void** data, int* size) {
     char message[0x184];
-    UnknownTextureStream* stream = new (__FILE__, 1630) UnknownTextureStream(g_ResourceManager);
+    FileStream* stream = new (__FILE__, 1630) FileStream(g_ResourceManager);
     int bytes;
     void* buffer;
 
@@ -1051,11 +1051,11 @@ void RaceSound::ReadSample(const char* name, void** data, int* size) {
 // 0x004e5660
 int RaceSound::LoadSound(Sound* sound, const char* name, int flags, int controls) {
     char message[0x184];
-    UnknownTextureStream* stream;
+    FileStream* stream;
 
     if (!sound)
         return 0;
-    stream = new (__FILE__, 1678) UnknownTextureStream(g_ResourceManager);
+    stream = new (__FILE__, 1678) FileStream(g_ResourceManager);
     if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, name, "rb", 0)) {
         sprintf(message, "%s not found in Audio.res.\n", name);
         if (stream)

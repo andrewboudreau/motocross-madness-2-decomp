@@ -1702,9 +1702,9 @@ table shows the run counts from the sweep, at both control words (0x027f and 0x0
 | 0x004f3720 | `MultiPlayerDlg::AddChatLine` | `mp_add_chat_line` | replay | 200 | 0 |
 | 0x004f2340 | `MultiPlayerDlg::SendStartMessage` | `mp_send_start_message` | integer | 300 | 0 |
 | 0x0051d730 | `ChatOverlay::CollectRacers` | `chat_overlay_collect_racers` | replay | 200 | 0 |
-| 0x00460db0 | `UnknownTextureStream::CheckHeader` | `texture_stream_check_header` | integer | 300 | 0 |
-| 0x004618e0 | `UnknownTextureStream::Write` | `texture_stream_write` | integer | 300 | 0 |
-| 0x00461b90 | `UnknownTextureStream::WriteHeader` | `texture_stream_write_header` | integer | 200 | 0 |
+| 0x00460db0 | `FileStream::CheckHeader` | `texture_stream_check_header` | integer | 300 | 0 |
+| 0x004618e0 | `FileStream::Write` | `texture_stream_write` | integer | 300 | 0 |
+| 0x00461b90 | `FileStream::WriteHeader` | `texture_stream_write_header` | integer | 200 | 0 |
 | 0x005238f0 | `TrackGameMode::FindDataFile` | `find_data_file` | integer | 300 | 0 |
 | 0x004a5e40 | `MotionManager::LoadVue` | `motion_load_vue` | integer | 200 | 0 |
 | 0x004bdc00 | audio loader thread | `audio_loader_thread` | integer | 200 | 0 |

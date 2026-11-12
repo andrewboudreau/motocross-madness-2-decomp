@@ -37,7 +37,7 @@ void BuildCurveTables()
 
 // 0x0047dc20: each array is stored as (packed size, unpacked size); a packed
 // size smaller than the unpacked one means LZW data.
-GridBaseBlock::GridBaseBlock(UnknownTextureStream* stream)
+GridBaseBlock::GridBaseBlock(FileStream* stream)
 {
     int packed;
     int size;

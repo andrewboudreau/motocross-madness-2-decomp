@@ -172,8 +172,8 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     case 3: {
         COPY_TEXT(path, raceScene->environment->terrainFile, 0x104);
         strcpy(strrchr(path, '.'), ".tdf");
-        UnknownTextureStream* stream =
-            new(__FILE__, 0x193) UnknownTextureStream(g_ResourceManager);
+        FileStream* stream =
+            new(__FILE__, 0x193) FileStream(g_ResourceManager);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)modelName)) {
             sprintf(message, "No Track file found in env file.  Abort.\n");
             delete stream;
@@ -200,8 +200,8 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             sprintf(path, "%s\\%s%02d.tdf", g_TrackGame->sceneObject->sceneDirectory,
                     g_TrackGame->mode.raceSettings.trackName,
                     g_TrackGame->mode.raceSettings.trackNumber);
-            UnknownTextureStream* stream =
-                new(__FILE__, 0x1be) UnknownTextureStream(g_ResourceManager);
+            FileStream* stream =
+                new(__FILE__, 0x1be) FileStream(g_ResourceManager);
             if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)modelName)) {
                 delete stream;
             } else if (stream) {

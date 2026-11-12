@@ -113,18 +113,18 @@ void* DebugRealloc(void* p,unsigned int size,const char* file,int line) {
     }
     Event(8,Identity(out));return out;
 }
-UnknownTextureStream::UnknownTextureStream(UnknownResourceManager* owner) {
+FileStream::FileStream(UnknownResourceManager* owner) {
     Event(9,Identity(this),Identity(owner));if (scenario.mode==2) throw 72;
     memset(this,0,sizeof(*this));archives=owner;sliceOffset=37;
 }
-UnknownTextureStream::~UnknownTextureStream() { Event(10,Identity(this)); }
-int UnknownTextureStream::Open(const char* path,const char* mode,int flags) {
+FileStream::~FileStream() { Event(10,Identity(this)); }
+int FileStream::Open(const char* path,const char* mode,int flags) {
     Event(11,Identity(this),Hash(path),Hash(mode),flags);return scenario.mode!=3;
 }
-int UnknownTextureStream::Seek(int offset,int origin,int flag) {
+int FileStream::Seek(int offset,int origin,int flag) {
     Event(12,Identity(this),offset,origin,flag);cursor=0;return scenario.mode==10?-1:0;
 }
-int UnknownTextureStream::ReadLine(char* out,int size) {
+int FileStream::ReadLine(char* out,int size) {
     Event(13,Identity(this),size,cursor,++reads);
     if (scenario.mode==6 && reads==3) throw 76;
     if (cursor>=lineCount) { Event(14,0);return 0; }
@@ -138,10 +138,10 @@ unsigned char Character::FindNode(const char* name) {
     int node=name[0]=='N'||name[0]=='n'?atoi(name+1):-1;
     return node>=0 && node<4 && (scenario.mask&(1<<node))?(unsigned char)(node*3+2):0xff;
 }
-struct ConstructorCall { UnknownTextureStream* Stream(UnknownResourceManager* owner) {
-    return ::new(this) UnknownTextureStream(owner);
+struct ConstructorCall { FileStream* Stream(UnknownResourceManager* owner) {
+    return ::new(this) FileStream(owner);
 } };
-struct DestructorCall { void Stream() { ((UnknownTextureStream*)this)->~UnknownTextureStream(); } };
+struct DestructorCall { void Stream() { ((FileStream*)this)->~FileStream(); } };
 struct NodeLookupCall { unsigned char Find(const char* name) {
     return ((Character*)this)->FindNode(name);
 } };
@@ -157,9 +157,9 @@ static DWORD Replacement(DWORD target) {
     case 0x4a2ec0:return (DWORD)DebugRealloc;
     case 0x460d10:return Address(&ConstructorCall::Stream);
     case 0x460d60:return Address(&DestructorCall::Stream);
-    case 0x460f50:return Address(&UnknownTextureStream::Open);
-    case 0x461aa0:return Address(&UnknownTextureStream::ReadLine);
-    case 0x461340:return Address(&UnknownTextureStream::Seek);
+    case 0x460f50:return Address(&FileStream::Open);
+    case 0x461aa0:return Address(&FileStream::ReadLine);
+    case 0x461340:return Address(&FileStream::Seek);
     case 0x4a6b50:return Address(&NodeLookupCall::Find);
     case 0x534aaf:return (DWORD)sprintf;
     case 0x535d3d:return (DWORD)_strupr;

@@ -16,7 +16,7 @@ CHECK(parameter_block, offsetof(SoultreeObject, parameterBlock) == 0x1a0);
 extern "C" int HierarchyGameBase() {
     return (int)static_cast<GameObject*>(reinterpret_cast<SoultreeObject*>(0x1000)) - 0x1000;
 }
-extern "C" void DispatchHierarchyLoad(SoultreeObject* node, UnknownTextureStream* stream) {
+extern "C" void DispatchHierarchyLoad(SoultreeObject* node, FileStream* stream) {
     node->LoadHierarchy(stream);
 }
 extern "C" void DispatchHierarchyParameters(SoultreeObject* node) {

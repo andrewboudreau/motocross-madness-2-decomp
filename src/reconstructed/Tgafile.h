@@ -60,7 +60,7 @@ struct UnknownTgaFile {
 // is 0x3e0, else 565.
 int WriteTga(UnknownTgaFile* file, unsigned int stride, int greenMask, int descriptor);
 
-class UnknownTextureStream;
+class FileStream;
 
 // 0x00577738, the shared "" literal (??_C@_00A@?$AA@ elsewhere); a loaded
 // file's name is cleared by copying it.  Writing strcpy(name, "") changes
@@ -69,18 +69,18 @@ class UnknownTextureStream;
 
 // 0x00511b40: reads a header from `stream` (after seeking by `offset`) into
 // `file`, or a new UnknownTgaFile when it is 0; frees the file on failure.
-UnknownTgaFile* ReadTgaHeader(UnknownTextureStream* stream, UnknownTgaFile* file, int offset);
+UnknownTgaFile* ReadTgaHeader(FileStream* stream, UnknownTgaFile* file, int offset);
 
 // Pixel readers for a loaded header (24-bit, 32-bit, 16-bit); 0 on failure.
-int ReadTgaPixels24(UnknownTgaFile* file, UnknownTextureStream* stream);
-int ReadTgaPixels32(UnknownTgaFile* file, UnknownTextureStream* stream);
-int ReadTgaPixels16(UnknownTgaFile* file, UnknownTextureStream* stream);
+int ReadTgaPixels24(UnknownTgaFile* file, FileStream* stream);
+int ReadTgaPixels32(UnknownTgaFile* file, FileStream* stream);
+int ReadTgaPixels16(UnknownTgaFile* file, FileStream* stream);
 
 // 0x00511d00: opens `path` and reads its header (0x00511b40).
 UnknownTgaFile* OpenAndReadHeader(const char* path, UnknownTgaFile* file, int resources);
 
 // 0x00511dd0: reads a whole file from `stream`; 0 on failure.
-UnknownTgaFile* ReadWholeFile(UnknownTextureStream* stream, UnknownTgaFile* file, int offset);
+UnknownTgaFile* ReadWholeFile(FileStream* stream, UnknownTgaFile* file, int offset);
 
 // 0x005125c0: loads the whole file at `path`, named after it; 0 on failure.
 UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* file, int resources);

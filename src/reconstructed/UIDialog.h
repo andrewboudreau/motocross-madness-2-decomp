@@ -19,7 +19,7 @@ class GUIManager;
 class GUIUser;
 class BackgroundImage;
 class PCTextureMap;
-class UnknownTextureStream;
+class FileStream;
 struct UnknownCursorAnimation;
 struct UnknownDialogEvent;
 
@@ -125,7 +125,7 @@ public:
     GUIManager* guiManager;                   // +0x30
     GUIUser* guiUser;                         // +0x34
     char resourceName[0x80];                  // +0x38: the dialog resource's name
-    UnknownTextureStream* resourceArchive;    // +0xb8: its archive (slot 27)
+    FileStream* resourceArchive;    // +0xb8: its archive (slot 27)
     int isShown;                              // +0xbc
     int field_0xc0;
     int openingMenu;                          // +0xc4: the menu id it was shown for (GUIManager::ShowDialog's `menu`)

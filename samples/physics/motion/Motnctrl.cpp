@@ -19,7 +19,7 @@ extern "C" char* _strupr(char*);   // 0x00535d3d
 int MotionManager::LoadVue(Character* character, const char* path, Motion* motion)
 {
     char line[0x100];
-    UnknownTextureStream* file = new(__FILE__, 0x1c9) UnknownTextureStream(g_ResourceManager);
+    FileStream* file = new(__FILE__, 0x1c9) FileStream(g_ResourceManager);
     if (!file->Open(path, "r", 0)) {
         char message[0x80];
         sprintf(message, "Unable to open %s\n", path);

@@ -151,8 +151,8 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int loadChildren, Terrai
     }
     this->stream = stream;
     if (stream->inner)
-        reinterpret_cast<UnknownTextureStream*>(stream)->Seek(stream->innerStart, 0, 0);
-    fileStartOffset = reinterpret_cast<UnknownTextureStream*>(this->stream)->Tell();
+        reinterpret_cast<FileStream*>(stream)->Seek(stream->innerStart, 0, 0);
+    fileStartOffset = reinterpret_cast<FileStream*>(this->stream)->Tell();
     surfaceRegistry = surfaceDesc.registry;
     lightManager = field0xc40;
     textureAgeManager = new(__FILE__, 0x11c) AgeManager;
@@ -161,8 +161,8 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int loadChildren, Terrai
 
     char tag[4];
     int version;
-    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(tag, 4, 1);
-    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&version, 4, 1);
+    reinterpret_cast<FileStream*>(this->stream)->Read(tag, 4, 1);
+    reinterpret_cast<FileStream*>(this->stream)->Read(&version, 4, 1);
     if (strcmp(tag, "TRN") != 0 || version != 5)
         goto fail;
     field_0xc94 = 5;
@@ -191,9 +191,9 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int loadChildren, Terrai
     qualityParamA = 0x100;
 
     int hasPalette;
-    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&hasPalette, 4, 1);
+    reinterpret_cast<FileStream*>(this->stream)->Read(&hasPalette, 4, 1);
     if (hasPalette) {
-        ColorMapper* mapper = new(__FILE__, 0x167) ColorMapper(reinterpret_cast<UnknownTextureStream*>(this->stream));
+        ColorMapper* mapper = new(__FILE__, 0x167) ColorMapper(reinterpret_cast<FileStream*>(this->stream));
         colorMapper = mapper;
         unsigned char* colors = mapper->GetColors();
         TerrainPaletteEntry entries[256];
@@ -214,21 +214,21 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int loadChildren, Terrai
     int unusedHeader;
     int blockRecords;
     int surfaceRecords;
-    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&field_0xbe8, 4, 1);
-    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&gridCellSize, 4, 1);
-    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&gridSize, 4, 1);
-    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&unusedHeader, 4, 1);
-    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&blockCount, 4, 1);
-    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&blockRecords, 4, 1);
+    reinterpret_cast<FileStream*>(this->stream)->Read(&field_0xbe8, 4, 1);
+    reinterpret_cast<FileStream*>(this->stream)->Read(&gridCellSize, 4, 1);
+    reinterpret_cast<FileStream*>(this->stream)->Read(&gridSize, 4, 1);
+    reinterpret_cast<FileStream*>(this->stream)->Read(&unusedHeader, 4, 1);
+    reinterpret_cast<FileStream*>(this->stream)->Read(&blockCount, 4, 1);
+    reinterpret_cast<FileStream*>(this->stream)->Read(&blockRecords, 4, 1);
     blocks = (void**)DebugMalloc(blockCount * 4, __FILE__, 0x197);
-    reinterpret_cast<UnknownTextureStream*>(this->stream)->Seek(blockCount * 4, 1, 1);
-    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&ownedObjectCount, 4, 1);
-    reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&surfaceRecords, 4, 1);
-    reinterpret_cast<UnknownTextureStream*>(this->stream)->Seek(ownedObjectCount * 4, 1, 1);
+    reinterpret_cast<FileStream*>(this->stream)->Seek(blockCount * 4, 1, 1);
+    reinterpret_cast<FileStream*>(this->stream)->Read(&ownedObjectCount, 4, 1);
+    reinterpret_cast<FileStream*>(this->stream)->Read(&surfaceRecords, 4, 1);
+    reinterpret_cast<FileStream*>(this->stream)->Seek(ownedObjectCount * 4, 1, 1);
     int blockIndex;
     for (blockIndex = 0; blockIndex < blockRecords; blockIndex++)
         blocks[blockIndex] = new(__FILE__, 0x1ab)
-            GridBaseBlock(reinterpret_cast<UnknownTextureStream*>(this->stream));
+            GridBaseBlock(reinterpret_cast<FileStream*>(this->stream));
 
     if (surfaceRecords) {
         int width;
@@ -236,9 +236,9 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int loadChildren, Terrai
         for (int i = 0; i < surfaceRecords; i++) {
             int height;
             int format;
-            reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&width, 4, 1);
-            reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&height, 4, 1);
-            reinterpret_cast<UnknownTextureStream*>(this->stream)->Read(&format, 4, 1);
+            reinterpret_cast<FileStream*>(this->stream)->Read(&width, 4, 1);
+            reinterpret_cast<FileStream*>(this->stream)->Read(&height, 4, 1);
+            reinterpret_cast<FileStream*>(this->stream)->Read(&format, 4, 1);
             TerrainSurfaceBase* surface;
             if (surfaceRegistry && width == 0x100) {
                 ManagedTexture* managed = new(__FILE__, 0x1bb) ManagedTexture(surfaceDesc.manager);
@@ -264,7 +264,7 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int loadChildren, Terrai
     boundsMin = TerrainVec3(FLT_MAX, FLT_MAX, FLT_MAX);
     boundsMax = TerrainVec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
     heightField = reinterpret_cast<TerrainShutdownObject*>(new(__FILE__, 0x1e6)
-        DrawableGridNodeSharedTextures(reinterpret_cast<UnknownTextureStream*>(this->stream), loadChildren,
+        DrawableGridNodeSharedTextures(reinterpret_cast<FileStream*>(this->stream), loadChildren,
                                       0, reinterpret_cast<GridTerrain*>(this), gridSize,
                                       gridSize * 4, 0, 0, 0, &boundsMin.x, &boundsMax.x));
     boundsMax.x += 16.0f;

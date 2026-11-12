@@ -2,7 +2,7 @@
 
 The candidate is samples/camera/FollowCameraLoadFile.cpp. File I/O is stubbed with a
 case-generated file: the stream (0x134 bytes from operator new 0x004a3010, FollowCam.cpp line
-0x3c7) is built by a logged stub of UnknownTextureStream's constructor 0x00460d10 that sets
+0x3c7) is built by a logged stub of FileStream's constructor 0x00460d10 that sets
 sliceOffset +0x130; Open 0x00460f50 answers the case's flag; ReadLine 0x00461aa0 copies the
 next line (up to its size argument) and returns 0 at the end; Seek 0x00461340 rewinds; the
 destructor 0x00460d60 and operator delete 0x004a30c0 are logged. sscanf 0x0053530b is a stub
@@ -66,13 +66,13 @@ def setup(ctx, c):
     def construct(cx, e, a):
         cx.pack(e + 0x130, 'i', c['slice'])
         return e
-    ctx.stub_at(0x00460d10, 'UnknownTextureStream::UnknownTextureStream', pop=4, ret=construct)
-    ctx.stub_at(0x00460d60, 'UnknownTextureStream::~UnknownTextureStream', pop=0)
+    ctx.stub_at(0x00460d10, 'FileStream::FileStream', pop=4, ret=construct)
+    ctx.stub_at(0x00460d60, 'FileStream::~FileStream', pop=0)
 
     def open_(cx, e, a):
         cx.note('Open', cx.read(a[1], 8).split(b'\0')[0])
         return int(c['open'])
-    ctx.stub_at(0x00460f50, 'UnknownTextureStream::Open', pop=12, ret=open_)
+    ctx.stub_at(0x00460f50, 'FileStream::Open', pop=12, ret=open_)
 
     def read_line(cx, e, a):
         if pos[0] >= len(c['lines']):
@@ -81,12 +81,12 @@ def setup(ctx, c):
         pos[0] += 1
         cx.write(a[0], text + b'\0')
         return 1
-    ctx.stub_at(0x00461aa0, 'UnknownTextureStream::ReadLine', pop=8, ret=read_line)
+    ctx.stub_at(0x00461aa0, 'FileStream::ReadLine', pop=8, ret=read_line)
 
     def seek(cx, e, a):
         pos[0] = 0
         return 1
-    ctx.stub_at(0x00461340, 'UnknownTextureStream::Seek', pop=12, ret=seek)
+    ctx.stub_at(0x00461340, 'FileStream::Seek', pop=12, ret=seek)
 
     def sscanf(cx, e, a):
         line = cx.read(a[0], 256).split(b'\0')[0].decode()

@@ -20,7 +20,7 @@ void CheckResourceTypes(UnknownSceneResourceManager* manager)
     UnknownResourceManager* same = manager;
     ResourceItem* (UnknownResourceManager::*find)(const char*, int) =
         &UnknownResourceManager::FindItem;
-    int (UnknownResourceManager::*remove)(UnknownTextureStream*) =
+    int (UnknownResourceManager::*remove)(FileStream*) =
         &UnknownResourceManager::RemoveArchiveItems;
     int (UnknownResourceManager::*add)(const char*, void*) =
         &UnknownResourceManager::AddObject;

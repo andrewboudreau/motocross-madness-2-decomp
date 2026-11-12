@@ -132,8 +132,8 @@ GameObject* D3DIMSoultreeObject::LoadModel(void* owner, const char* path, int li
                 RegisterNode();
                 return this;
             }
-            ((UnknownTextureStream*)item->archive)->Seek(item->offset, 0, 0);
-            LoadHierarchy((UnknownTextureStream*)item->archive);
+            ((FileStream*)item->archive)->Seek(item->offset, 0, 0);
+            LoadHierarchy((FileStream*)item->archive);
         } else {
             fnameLength = strlen(fname);
             length = fnameLength > 0x103 ? 0x103 : fnameLength;
@@ -162,7 +162,7 @@ GameObject* D3DIMSoultreeObject::LoadModel(void* owner, const char* path, int li
                 RegisterNode();
                 return this;
             }
-            UnknownTextureStream* stream = new (__FILE__, 0xe1) UnknownTextureStream(g_ResourceManager);
+            FileStream* stream = new (__FILE__, 0xe1) FileStream(g_ResourceManager);
             stream->Open(name, "rb", 0);
             LoadFromParameters(stream, 0);
             delete stream;
@@ -175,7 +175,7 @@ GameObject* D3DIMSoultreeObject::LoadModel(void* owner, const char* path, int li
 }
 
 // 0x0043f950
-void D3DIMSoultreeObject::LoadHierarchy(UnknownTextureStream* stream)
+void D3DIMSoultreeObject::LoadHierarchy(FileStream* stream)
 {
     SoultreeObject::LoadHierarchy(stream);
     int count = CountNodes();

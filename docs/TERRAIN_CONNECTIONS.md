@@ -74,7 +74,7 @@ reconstruction. No terrain runtime integration or completed game is claimed.
 
 ## Terrain stream calls
 
-Terrain::Load now calls the existing UnknownTextureStream `Read`, `Seek` and
+Terrain::Load now calls the existing FileStream `Read`, `Seek` and
 `Tell` methods at its stream boundary. The provisional TerrainStream layout
 and Load signature remain unchanged. Both stream views are 0x134 bytes, with
 their nested stream at +0x1c and slice offset at +0x130. Load's existing

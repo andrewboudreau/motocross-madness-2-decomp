@@ -9,7 +9,7 @@ and box node and tree builders, BuildModelPointTree `0x0042d390`, AxisAngleMatri
 the eight `$E`. Its bindings were read back from the retail relocation
 sites after a masked match. Each float constant was checked against its
 stored value, and the kVec3 addresses against the `$E` bodies. The stream
-stand-in is now the shared `UnknownTextureStream`. BuildModelPointTree
+stand-in is now the shared `FileStream`. BuildModelPointTree
 needs a `TreeVec3* p = &points[count]` local in both vertex loops for
 retail's operand order. Near miss
 (`samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp`):

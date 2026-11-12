@@ -78,9 +78,9 @@ class CollisionLinkTests(unittest.TestCase):
                                      for s in objects[caller].symbols))
 
             stream_calls = {
-                '??0UnknownTextureStream@@QAE@PAVUnknownResourceManager@@@Z',
-                '??1UnknownTextureStream@@QAE@XZ',
-                '?Open@UnknownTextureStream@@QAEHPBD0H@Z',
+                '??0FileStream@@QAE@PAVUnknownResourceManager@@@Z',
+                '??1FileStream@@QAE@XZ',
+                '?Open@FileStream@@QAEHPBD0H@Z',
             }
             source_definitions = {
                 name: {s.name for s in obj.symbols
@@ -89,17 +89,17 @@ class CollisionLinkTests(unittest.TestCase):
             }
             self.assertTrue(stream_calls <= imports(objects['CollisionObject']))
             self.assertTrue(stream_calls <= source_definitions['FileStream'])
-            self.assertTrue((stream_calls - {'?Open@UnknownTextureStream@@QAEHPBD0H@Z'})
+            self.assertTrue((stream_calls - {'?Open@FileStream@@QAEHPBD0H@Z'})
                             <= imports(objects['SoulTreePhysics']))
             self.assertFalse(any('SoultreeFile@@' in symbol.name or
                                  'SoultreeFileFinder@@' in symbol.name
                                  for symbol in objects['SoulTreePhysics'].symbols))
             for caller, provider, symbol in (
-                ('CollisionObject', 'BoundingBoxTreeBuild', '?ReadPointNode@@YAXPAPAUBoxTreeNode@@PAVUnknownTextureStream@@@Z'),
-                ('CollisionObject', 'BoundingBoxTreeBuild', '?ReadTriangleMesh@@YAXPAPAUBoxTreeNode@@PAPAUTreeVec3@@PAVUnknownTextureStream@@@Z'),
-                ('SoulTreePhysics', 'SceneManager', '?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVUnknownTextureStream@@PBD1H@Z'),
+                ('CollisionObject', 'BoundingBoxTreeBuild', '?ReadPointNode@@YAXPAPAUBoxTreeNode@@PAVFileStream@@@Z'),
+                ('CollisionObject', 'BoundingBoxTreeBuild', '?ReadTriangleMesh@@YAXPAPAUBoxTreeNode@@PAPAUTreeVec3@@PAVFileStream@@@Z'),
+                ('SoulTreePhysics', 'SceneManager', '?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVFileStream@@PBD1H@Z'),
                 ('SoulTreePhysics', 'ResourceManager', '?g_ResourceManager@@3PAVUnknownResourceManager@@A'),
-                ('CollisionObject', 'StreamCandidate', '?Read@UnknownTextureStream@@QAEHPAXHH@Z'),
+                ('CollisionObject', 'StreamCandidate', '?Read@FileStream@@QAEHPAXHH@Z'),
                 ('CollisionObject', 'ResourceManager', '?g_ResourceManager@@3PAVUnknownResourceManager@@A'),
                 ('Wrecker', 'Quadtree', '?Remove@QuadTree@@QAEXPAVQuadTreeObject@@I@Z'),
                 ('Wrecker', 'VisibilityQuadTree', '?g_collisionQuadTree@@3PAVQuadTree@@A'),

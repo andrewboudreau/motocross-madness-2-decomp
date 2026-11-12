@@ -7,7 +7,7 @@
 
 #include "BaseObject.h"
 
-class UnknownTextureStream;
+class FileStream;
 
 // RTTI: ResourceItem : BaseObject (vtable 0x00557858, COL 0x0055ec78), 0x20
 // bytes (operator new(0x20) at 0x004e91e1, 0x004e957f, 0x004e9718). One
@@ -23,7 +23,7 @@ public:
     char* name;                           // +0x08 name (DebugMalloc'd)
     int nameSize;                         // +0x0c name size including the NUL
     void* object;                         // +0x10 object loaded from the entry
-    UnknownTextureStream* archive;            // +0x14 archive holding the file
+    FileStream* archive;            // +0x14 archive holding the file
     int offset;                               // +0x18 offset of the file in it
     int size;                                 // +0x1c size of the file (FileStream copies it to the stream's end limit)
 };
@@ -46,18 +46,18 @@ public:
     // the object and its archive are gone.
     void SetItemObject(void* entry, void* object);
     // 0x004e9030: opens the "RS2" archive `path` and adds its items.
-    UnknownTextureStream* AddArchive(const char* path, int flags);
+    FileStream* AddArchive(const char* path, int flags);
     ResourceItem* FindItem(const char* name, int seek); // finds `name`
     void* FindItemByObject(void* object);       // the item recording `object`
     int AddLooseFile(const char* name, const char* path); // adds a loose file
     int AddObject(const char* name, void* object);     // adds an object
-    int RemoveArchiveItems(UnknownTextureStream* archive);     // removes an archive's items
+    int RemoveArchiveItems(FileStream* archive);     // removes an archive's items
     void ReleaseItem(ResourceItem* item);               // releases `item`
 
     // Inline (no out-of-line copy): whether an item still comes from
     // `archive`. Written inline, 0x004e8f40 saves ebp only on the path that
     // uses it, as retail does; open-coded, VC6 saves it in the prologue.
-    int UnknownInlineArchiveUsed(UnknownTextureStream* archive)
+    int UnknownInlineArchiveUsed(FileStream* archive)
     {
         for (int i = 0; i < itemCount; i++) {
             if (archive == items[i]->archive)
@@ -70,7 +70,7 @@ public:
     int archiveCapacity;                  // +0x04 archives capacity
     int itemCount;                        // +0x08 items count
     int archiveCount;                     // +0x0c archives count
-    UnknownTextureStream** archives;      // +0x10 archives
+    FileStream** archives;      // +0x10 archives
     ResourceItem** items;                 // +0x14 items
 };
 

@@ -840,7 +840,7 @@ void AxisAngleMatrix(TreeMatrix4* m, float x, float y, float z, float angle)
 // followed by their two subtrees.
 
 // 0x0042dfa0.  Reads a triangle-tree node and its subtrees.
-void ReadTriangleNode(BoxTreeNode** out, UnknownTextureStream* file)
+void ReadTriangleNode(BoxTreeNode** out, FileStream* file)
 {
     float flag;
 
@@ -873,7 +873,7 @@ void ReadTriangleNode(BoxTreeNode** out, UnknownTextureStream* file)
 }
 
 // 0x0042e0f0.  Reads a vertex count, the vertices and then the triangle tree over them.
-void ReadTriangleMesh(BoxTreeNode** tree, TreeVec3** verts, UnknownTextureStream* file)
+void ReadTriangleMesh(BoxTreeNode** tree, TreeVec3** verts, FileStream* file)
 {
     int count;
     TreeVec3* v;
@@ -891,7 +891,7 @@ void ReadTriangleMesh(BoxTreeNode** tree, TreeVec3** verts, UnknownTextureStream
 }
 
 // 0x0042e190.  Reads a point-tree node and its subtrees.
-void ReadPointNode(BoxTreeNode** out, UnknownTextureStream* file)
+void ReadPointNode(BoxTreeNode** out, FileStream* file)
 {
     float flag;
 

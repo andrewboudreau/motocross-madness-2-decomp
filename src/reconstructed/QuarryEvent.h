@@ -16,7 +16,7 @@ class Scene;
 class StatsOverlay;
 class TextQueueOverlay;
 class UnknownTerrain;
-class UnknownTextureStream;
+class FileStream;
 struct UnknownKrustyBikeView;
 
 // The race camera at BaseQuarryEvent+0x3c (a KrustyBikeCamera: 0x004de590

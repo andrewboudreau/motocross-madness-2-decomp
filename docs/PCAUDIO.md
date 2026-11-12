@@ -123,7 +123,7 @@ Source shapes:
 - The notifier thread dispatches on the wait result with a `switch`.
 - In the buffer creator the flags are or-ed before the algorithm GUID is
   copied.
-- The streaming copy inlines UnknownTextureStream's end-of-stream test
+- The streaming copy inlines FileStream's end-of-stream test
   (out-of-line copy `0x00430ff0`, now an inline member in TextureMap.h),
   tests the locked sizes as `> 0` (unsigned, `jbe`) and jumps into the
   silence block from the first half.
@@ -151,7 +151,7 @@ Their source shapes:
   layout.
 
 Exact (1 more): the refill `0x004bd0c0` (412 bytes, with the EH frame of
-`new UnknownTextureStream`). The archive and file branches are an if/else
+`new FileStream`). The archive and file branches are an if/else
 with one `return 1` after it; the file branch deletes the stream in each
 failure's own block and once more before falling out. Retail places that
 `return 1` after the file branch's delete, and the archive branch's success

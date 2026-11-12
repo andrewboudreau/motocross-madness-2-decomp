@@ -1,4 +1,4 @@
-// FileStream.cpp -- the buffered file stream (UnknownTextureStream, declared in
+// FileStream.cpp -- the buffered file stream (FileStream, declared in
 // TextureMap.h), 0x00460d10..0x00461d57, after the FastMath helpers
 // (src/reconstructed/FastMath.cpp) and before the shadow fill code 0x00461d60.
 // No __FILE__ literal or RTTI: the file name is ours (tier 3), as are the names.
@@ -26,7 +26,7 @@
 #include "ResourceManager.h"
 
 // The stream that holds the file: the innermost one.
-static inline UnknownTextureStream* InnermostStream(UnknownTextureStream* stream)
+static inline FileStream* InnermostStream(FileStream* stream)
 {
     while (stream->innerStream) {
         stream = stream->innerStream;
@@ -37,7 +37,7 @@ static inline UnknownTextureStream* InnermostStream(UnknownTextureStream* stream
 // 0x00460d10. The buffer pointer is named before the argument store: only then does VC6
 // load the argument at entry (edx) and keep the buffer address in ecx for both pointer
 // stores, as retail does.
-UnknownTextureStream::UnknownTextureStream(UnknownResourceManager* manager)
+FileStream::FileStream(UnknownResourceManager* manager)
 {
     fileEncoded = 0;
     headerSize = 0;
@@ -59,7 +59,7 @@ UnknownTextureStream::UnknownTextureStream(UnknownResourceManager* manager)
 }
 
 // 0x00460d60
-UnknownTextureStream::~UnknownTextureStream()
+FileStream::~FileStream()
 {
     if (fileHandle) {
         fclose(fileHandle);
@@ -67,7 +67,7 @@ UnknownTextureStream::~UnknownTextureStream()
 }
 
 // 0x00460d70
-UnknownTextureStream* UnknownTextureStream::FindArchive(const char* name)
+FileStream* FileStream::FindArchive(const char* name)
 {
     if (archives) {
         ResourceItem* item = archives->FindItem(name, 0);
@@ -81,7 +81,7 @@ UnknownTextureStream* UnknownTextureStream::FindArchive(const char* name)
 }
 
 // 0x00460e70. The NULL test guards the rest, so its message comes last.
-int UnknownTextureStream::IsValidFile(const char* path)
+int FileStream::IsValidFile(const char* path)
 {
     char message[0x184];
 
@@ -117,7 +117,7 @@ int UnknownTextureStream::IsValidFile(const char* path)
 // "filename is NULL!" blocks into their read-branch twins. The key loop reads
 // the byte into a `char` first (as 0x00461b90 does). Retail never stores
 // access[0], which strncpy overwrites: only bytes 1..7 are cleared.
-int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
+int FileStream::Open(const char* path, const char* mode, int encoded)
 {
     char drive[4];
     char extension[0x100];
@@ -224,16 +224,16 @@ int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
 }
 
 // 0x00461310
-int UnknownTextureStream::SetBufferSize(int unused)
+int FileStream::SetBufferSize(int unused)
 {
     FILE* file = InnermostStream(this)->fileHandle;
     return _setmode(file->_file, _O_BINARY);
 }
 
 // 0x00461600
-int UnknownTextureStream::Tell()
+int FileStream::Tell()
 {
-    UnknownTextureStream* stream = InnermostStream(this);
+    FileStream* stream = InnermostStream(this);
     int position = ftell(stream->fileHandle) + (stream->bufferPos - stream->bufferEnd);
     if (position >= stream->headerSize) {
         return position - stream->headerSize;
@@ -247,7 +247,7 @@ int UnknownTextureStream::Tell()
 // first and copies it, as retail does; naming the key makes it copy the byte instead.
 // inline_depth(0) keeps the AtEnd call out of line, as retail has it.
 #pragma inline_depth(0)
-int UnknownTextureStream::ReadByte()
+int FileStream::ReadByte()
 {
     if (innerStream) {
         if (sliceLength > 0 && Tell() >= sliceOffset + sliceLength) {
@@ -282,9 +282,9 @@ int UnknownTextureStream::ReadByte()
 #pragma inline_depth()
 
 // 0x00461a60
-int UnknownTextureStream::WriteByte(int c)
+int FileStream::WriteByte(int c)
 {
-    UnknownTextureStream* stream = InnermostStream(this);
+    FileStream* stream = InnermostStream(this);
     char byte = (char)c;
     if (!stream->Write(&byte, 1, 1)) {
         return -1;
@@ -294,7 +294,7 @@ int UnknownTextureStream::WriteByte(int c)
 
 // 0x00461aa0: reads a line of at most size - 1 characters; "\r\n" ends it as "\n".
 #pragma inline_depth(0)
-int UnknownTextureStream::ReadLine(char* buffer, int size)
+int FileStream::ReadLine(char* buffer, int size)
 {
     if (innerStream) {
         if (sliceLength > 0 && Tell() >= sliceOffset + sliceLength) {
@@ -342,7 +342,7 @@ int UnknownTextureStream::ReadLine(char* buffer, int size)
 #pragma inline_depth()
 
 // The modification time and size of the stream's file; _fstat's result.
-static inline int FileTimes(UnknownTextureStream* stream, int* time, int* size)
+static inline int FileTimes(FileStream* stream, int* time, int* size)
 {
     struct _stat status;
     int result = _fstat(stream->fileHandle->_file, &status);
@@ -358,7 +358,7 @@ static inline int FileTimes(UnknownTextureStream* stream, int* time, int* size)
 
 // 0x00461cb0. Writing the _fstat call inline keeps the recursion a call;
 // through FileTimes VC6 turns it into the loop retail has.
-int UnknownTextureStream::GetFileTimes(int* time, int* size)
+int FileStream::GetFileTimes(int* time, int* size)
 {
     if (!time || !size) {
         return -1;

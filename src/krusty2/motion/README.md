@@ -14,7 +14,7 @@ groupings; adjacency alone does not assign their original translation units.
 
 ## Shared streams and resource entries
 
-Motnctrl and D3DIMSoultreeMotnctrl now use `UnknownTextureStream` from the
+Motnctrl and D3DIMSoultreeMotnctrl now use `FileStream` from the
 focused `src/reconstructed/FileStream.h`. It is the same declaration formerly
 inside TextureMap.h, which still includes it at that position. No renderer or
 additional math declarations are needed by the motion loaders.
@@ -52,7 +52,7 @@ unknown. Eight formerly missing constructor/destructor/reader symbols now
 resolve to the existing implementation. Getter return values remain unused
 where the former view declared them void.
 
-`UnknownParameterStream` is now an alias of the shared `UnknownTextureStream`.
+`UnknownParameterStream` is now an alias of the shared `FileStream`.
 Its recursive ResetTextMode is inline in `FileStream.h`, preserving
 SelectSection's complete 573-byte strict match and naturally emitting the
 exact 30-byte accessor in the Parameterblocks object. Attach and the stream

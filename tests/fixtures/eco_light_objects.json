@@ -349,7 +349,7 @@
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?ReadEsb@EcoSystem@@QAEHPBDPAVUnknownTextureStream@@@Z",
+      "symbol": "?ReadEsb@EcoSystem@@QAEHPBDPAVFileStream@@@Z",
       "va": "0x00458f70",
       "size": 1351
     },
@@ -361,7 +361,7 @@
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?Create@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVUnknownEcoTerrain@@PAVLightManager@@PADPAVUnknownTextureStream@@HHH@Z",
+      "symbol": "?Create@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVUnknownEcoTerrain@@PAVLightManager@@PADPAVFileStream@@HHH@Z",
       "va": "0x004594d0",
       "size": 859
     },
@@ -397,7 +397,7 @@
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?PreloadEcosystem@@YAHPAVTextureMapManager@@PADPAVUnknownTextureStream@@H@Z",
+      "symbol": "?PreloadEcosystem@@YAHPAVTextureMapManager@@PADPAVFileStream@@H@Z",
       "va": "0x0045c040",
       "size": 1619
     },

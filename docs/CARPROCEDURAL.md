@@ -82,7 +82,7 @@ retail's control flow and calls and differ in register allocation. Slot 3
 gets retail's ebp arrangement only when `block` is left uninitialised;
 that source is rejected.
 
-TextureMap.h gained `UnknownTextureStream::ReadLine`, which
+TextureMap.h gained `FileStream::ReadLine`, which
 reads a line.
 
 The path-file parser `0x0042fa00` is named `ReadPath` and the bisection

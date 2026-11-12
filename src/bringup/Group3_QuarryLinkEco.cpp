@@ -12,13 +12,13 @@ void* G3Q_EcoSystemCreate(void* eco, void* target, void* textureManager, void* t
 {
     return ((EcoSystem*)eco)->Create(target, (TextureMapManager*)textureManager,
                                      (UnknownEcoTerrain*)terrain, (LightManager*)lights,
-                                     (char*)environment, (UnknownTextureStream*)stream, format,
+                                     (char*)environment, (FileStream*)stream, format,
                                      collisions, level);
 }
 
 // 0x004fb230.
 void* G3Q_SkyCubeCreate(void* sky, void* target, void* stream, void* textures, float size)
 {
-    return ((SkyCube*)sky)->Create(target, (UnknownTextureStream*)stream,
+    return ((SkyCube*)sky)->Create(target, (FileStream*)stream,
                                    (UnknownCubeTextureContext*)textures, size);
 }

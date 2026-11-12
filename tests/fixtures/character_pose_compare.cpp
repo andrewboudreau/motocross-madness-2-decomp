@@ -31,11 +31,11 @@ void* DebugMalloc(unsigned int,const char*,int) { ExitProcess(90); return 0; }
 void* DebugRealloc(void*,unsigned int,const char*,int) { ExitProcess(90); return 0; }
 void* operator new(unsigned int,const char*,int) { ExitProcess(90); return 0; }
 void operator delete(void*,const char*,int) { ExitProcess(90); }
-UnknownTextureStream::UnknownTextureStream(UnknownResourceManager*) { ExitProcess(90); }
-UnknownTextureStream::~UnknownTextureStream() { ExitProcess(90); }
-int UnknownTextureStream::Seek(int,int,int) { ExitProcess(90); return 0; }
-int UnknownTextureStream::Open(const char*,const char*,int) { ExitProcess(90); return 0; }
-int UnknownTextureStream::ReadLine(char*,int) { ExitProcess(90); return 0; }
+FileStream::FileStream(UnknownResourceManager*) { ExitProcess(90); }
+FileStream::~FileStream() { ExitProcess(90); }
+int FileStream::Seek(int,int,int) { ExitProcess(90); return 0; }
+int FileStream::Open(const char*,const char*,int) { ExitProcess(90); return 0; }
+int FileStream::ReadLine(char*,int) { ExitProcess(90); return 0; }
 unsigned char Character::FindNode(const char*) { ExitProcess(90); return 0; }
 
 static int MapReference(const char* path,const char* patches) {

@@ -1148,7 +1148,7 @@ GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const cha
     name[copyLength] = 0;
     strcpy(strrchr(name, '.'), ".col");
 
-    UnknownTextureStream* file = new(SP_FILE, 0x84e) UnknownTextureStream(g_ResourceManager);
+    FileStream* file = new(SP_FILE, 0x84e) FileStream(g_ResourceManager);
     if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->field_0x574->OpenArchiveFile(file, name, "rb", (int)colPath)) {
         colPath[0] = 0;
     }
@@ -1219,7 +1219,7 @@ GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int cr
     name[copyLength] = 0;
     strcpy(strrchr(name, '.'), ".col");
 
-    UnknownTextureStream* file = new(SP_FILE, 0x8cd) UnknownTextureStream(g_ResourceManager);
+    FileStream* file = new(SP_FILE, 0x8cd) FileStream(g_ResourceManager);
     if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->field_0x574->OpenArchiveFile(file, name, "rb", (int)colPath)) {
         colPath[0] = 0;
     }

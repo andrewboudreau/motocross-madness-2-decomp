@@ -44,7 +44,7 @@
   "?Bind@PCTextureMap@@UAEXXZ": "0x004c79a0",
   "?DumpAllLevels@PCTextureMap@@UAEHXZ": "0x004c8430",
   "?CreateSurface@PCTextureMap@@UAEHPAXHHHHHHPAUUnknownTexturePalette@@H0HHHHPAUUnknownTextureFormatChoice@@HI@Z": "0x004c69c0",
-  "?LoadSurface@PCTextureMap@@UAEHPAVUnknownTextureStream@@HHHHHHPAUUnknownTexturePalette@@HPAXHHPAUUnknownTextureFormatChoice@@HI@Z": "0x004c6080",
+  "?LoadSurface@PCTextureMap@@UAEHPAVFileStream@@HHHHHHPAUUnknownTexturePalette@@HPAXHHPAUUnknownTextureFormatChoice@@HI@Z": "0x004c6080",
   "?Clone@PCTextureMap@@UAEPAVTextureMap@@XZ": "0x004c71c0",
   "?CreateTextureSurface@PCTextureMap@@UAEHHHH@Z": "0x004c7480",
   "?Upload@PCTextureMap@@UAEHPAUUnknownRect@@H@Z": "0x004c7640",

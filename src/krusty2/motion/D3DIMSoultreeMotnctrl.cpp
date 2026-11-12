@@ -401,7 +401,7 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int context, const char* 
         *(LoadDescCopy**)(d3d_field_0x1a4 + 0x64) = copy;
         *copy = *(LoadDescCopy*)loadInfo;
     }
-    UnknownTextureStream* file = new(__FILE__, 0x68) UnknownTextureStream(g_ResourceManager);
+    FileStream* file = new(__FILE__, 0x68) FileStream(g_ResourceManager);
     _splitpath(path, drive, dir, fname, ext);
     strcat(fname, ext);
     ResourceItem* entry = g_ResourceManager->FindItem(fname, 0);
