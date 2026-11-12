@@ -28,17 +28,17 @@ public:
 // IID_IDirectSound3DListener ({279AFA84-4981-11CE-A521-0020AF0BE560}); the
 // method names follow the DirectSound interfaces, which is inference from
 // that IID, the buffer description and the call shapes.
-struct UnknownSoundCaps;
-struct UnknownSoundBufferDesc;
+struct DirectSoundCaps;
+struct DirectSoundBufferDesc;
 struct DirectSoundBuffer;
 
 struct DirectSound {
     virtual long __stdcall QueryInterface(const Guid& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
-    virtual long __stdcall CreateSoundBuffer(const UnknownSoundBufferDesc* desc, DirectSoundBuffer** buffer,
+    virtual long __stdcall CreateSoundBuffer(const DirectSoundBufferDesc* desc, DirectSoundBuffer** buffer,
                                              void* outer);
-    virtual long __stdcall GetCaps(UnknownSoundCaps* caps);
+    virtual long __stdcall GetCaps(DirectSoundCaps* caps);
     virtual long __stdcall DuplicateSoundBuffer(DirectSoundBuffer* original, DirectSoundBuffer** duplicate);
     virtual long __stdcall SetCooperativeLevel(void* window, unsigned long level);
 };
@@ -92,7 +92,7 @@ struct DirectSound3DListener {
 
 // 0x60-byte device capabilities (DSCAPS layout; GetCaps is passed size 0x60,
 // and the field names follow the debug report's format string at 0x0056fac8).
-struct UnknownSoundCaps {
+struct DirectSoundCaps {
     unsigned long size;
     unsigned long flags;
     unsigned long minSecondarySampleRate;
@@ -120,7 +120,7 @@ struct UnknownSoundCaps {
 };
 
 // 0x24-byte buffer description (the DirectX 7 DSBUFFERDESC size).
-struct UnknownSoundBufferDesc {
+struct DirectSoundBufferDesc {
     unsigned long size;
     unsigned long flags;
     unsigned long bufferBytes;
@@ -159,7 +159,7 @@ struct SoundDeviceRecord {
 
     Guid guid;
     char description[0x80];
-    UnknownSoundCaps caps;
+    DirectSoundCaps caps;
 };
 
 // Defined in PCAudio.h.
@@ -179,7 +179,7 @@ public:
         void* context);
     DirectSound3DListener* QueryListener();              // 0x004be800: queries a new listener
     int RefreshSoundCaps();                             // 0x004be850: refreshes soundCaps
-    int GetSoundCaps(UnknownSoundCaps* caps);           // 0x004be860
+    int GetSoundCaps(DirectSoundCaps* caps);           // 0x004be860
     void FormatSoundCapsReport();                       // 0x004be8b0: formats a caps report
     int SetPrimaryFormat(int rate, int stereo, int bits); // 0x004be910: primary format
     int SetPrimaryVolume(long volume);                  // 0x004be9b0: primary volume
@@ -202,7 +202,7 @@ public:
     SoundDeviceRecord* selectedSoundDevice;   // +0x34: chosen device
     SoundDeviceRecord soundDevices[4];        // +0x38
     long startupPrimaryVolume;                 // +0x3f8: primary volume at start-up
-    UnknownSoundCaps soundCaps;                // +0x3fc
+    DirectSoundCaps soundCaps;                // +0x3fc
     unsigned char allowSoundHardware : 1;      // +0x45c bit 0: "AllowSoundHardware"
     unsigned char allowSoundEnumeration : 1;   // +0x45c bit 1: "AllowSoundEnumeration"
     unsigned char eaxAvailable : 1;            // +0x45c bit 2: EAX listener available

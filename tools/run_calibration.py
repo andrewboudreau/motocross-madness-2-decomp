@@ -5164,7 +5164,7 @@ CASES = [
         'name': 'PCAudio PCSoundInterface caps 0x4be860',
         'bindings': 'src/reconstructed/PCAudio.bindings.json',
         'source': 'src/reconstructed/PCAudio.cpp',
-        'symbol': '?GetSoundCaps@PCSoundInterface@@QAEHPAUUnknownSoundCaps@@@Z',
+        'symbol': '?GetSoundCaps@PCSoundInterface@@QAEHPAUDirectSoundCaps@@@Z',
         'target_va': '0x004be860',
         'target_size': 65,
         'reason': 'GetCaps with size 0x60',

@@ -934,7 +934,7 @@ int Sound::CreateBuffer(DirectSoundBuffer** buffer, unsigned long bytes, unsigne
     int bits, int blockAlign, int stereo, int is3D,
     int isStatic, unsigned long flags, int hardware) {
     UnknownPcmFormat format;
-    UnknownSoundBufferDesc desc;
+    DirectSoundBufferDesc desc;
 
     memset(&format, 0, sizeof(format));
     format.formatTag = 1;
@@ -1364,7 +1364,7 @@ int PCSoundInterface::RefreshSoundCaps() {
 }
 
 // 0x004be860: fills `caps` from DirectSound.
-int PCSoundInterface::GetSoundCaps(UnknownSoundCaps* caps) {
+int PCSoundInterface::GetSoundCaps(DirectSoundCaps* caps) {
     if (!audioStarted)
         return 0;
     if (caps && directSound) {
@@ -1378,7 +1378,7 @@ int PCSoundInterface::GetSoundCaps(UnknownSoundCaps* caps) {
 // 0x004be8b0: formats the free hardware resources into a local buffer that
 // is never output.
 void PCSoundInterface::FormatSoundCapsReport() {
-    UnknownSoundCaps caps;
+    DirectSoundCaps caps;
     char text[512];
 
     if (audioStarted) {
@@ -1420,7 +1420,7 @@ void PCSoundInterface::ProbeEAXSupport() {
 // 0x004beb10: creates the primary buffer (3D and volume control), or 0.
 DirectSoundBuffer* PCSoundInterface::CreatePrimaryBuffer() {
     DirectSoundBuffer* buffer = 0;
-    UnknownSoundBufferDesc desc = {0};
+    DirectSoundBufferDesc desc = {0};
 
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);

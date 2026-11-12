@@ -95,7 +95,7 @@
   "?ProbeSoundDevice@SoundDeviceRecord@@QAEHPAUGuid@@PBD@Z": "0x004be2d0",
   "?InitializeSound@PCSoundInterface@@QAEJHHHHH@Z": "0x004be5a0",
   "?RefreshSoundCaps@PCSoundInterface@@QAEHXZ": "0x004be850",
-  "?GetSoundCaps@PCSoundInterface@@QAEHPAUUnknownSoundCaps@@@Z": "0x004be860",
+  "?GetSoundCaps@PCSoundInterface@@QAEHPAUDirectSoundCaps@@@Z": "0x004be860",
   "?SetPrimaryFormat@PCSoundInterface@@QAEHHHH@Z": "0x004be910",
   "?SetPrimaryVolume@PCSoundInterface@@QAEHJ@Z": "0x004be9b0",
   "?ProbeEAXSupport@PCSoundInterface@@QAEXXZ": "0x004be9e0",
