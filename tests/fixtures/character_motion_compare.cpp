@@ -139,7 +139,7 @@ static void Reset(int seed,int count,int mode,int stopped,int looping,int flagMa
     Character* c=Actor(); c->nodeNames=nodes; c->nodeCount=3;
     c->motionStopped=stopped; c->currentMotion=&motions[0]; c->currentFrame=&frames[0][seed%4];
     c->blendFromMotion=&motions[1]; c->lastFrame=&frames[1][(seed/4)%4];
-    c->chr_field_0x10=0.025f*(seed%3); c->lastFrameTime=0.03f*(seed%4);
+    c->motionTime=0.025f*(seed%3); c->lastFrameTime=0.03f*(seed%4);
     c->blendDuration=0.5f; c->blendFromTime=mode==1?-0.75f:mode==2?0.0f:mode==3?0.5f:0.75f;
     c->blendActive=mode!=0;
 }
@@ -173,7 +173,7 @@ static void Vary(int seed) {
     }
     Actor()->blendDuration=(Next()%1000+1)/997.0f;
     Actor()->blendFromTime=Coordinate();
-    Actor()->chr_field_0x10=(Next()%1000)/997.0f;
+    Actor()->motionTime=(Next()%1000)/997.0f;
     Actor()->lastFrameTime=(Next()%1000)/997.0f;
 }
 int main(int argc,char** argv) {

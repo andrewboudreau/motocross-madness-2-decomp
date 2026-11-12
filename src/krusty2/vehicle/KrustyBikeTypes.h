@@ -79,7 +79,8 @@ struct KbNetBike {
 // 12-byte message built by KrustyBike::SendFollowedRacer (tier 3: the leading dword is never written).
 // Network message 13 (bikerace.cpp's 0x0041fb.. handlers pass it to 0x004933e0):
 // signed byte deltas of the four state vectors plus two raw ints at the unaligned
-// offsets +0x0e/+0x12 (tier 2 layout, tier 3 names).
+// offsets +0x0e/+0x12 (tier 2 layout, tier 3 names; the raw ints are
+// KbBikeDeltaMessage's motion/flag and pose bytes).
 #pragma pack(push, 1)
 struct KbNetDelta {
     char field_0x00;
@@ -88,8 +89,8 @@ struct KbNetDelta {
     signed char delta3[3];       // +0x05 x pi/64 -> +0x137c..+0x1384
     signed char delta2[3];       // +0x08 x pi/64 -> +0x1370
     signed char delta0[3];       // +0x0b x 15/64 -> +0x1358
-    int field_0x0e;
-    int field_0x12;
+    int motionFlags;             // +0x0e motion, crash and flag bits (KbBikeDeltaMessage +0x0e..+0x11)
+    int poseBytes;               // +0x12 pose index/state, param, blend, lean blend (+0x12..+0x15)
 };
 #pragma pack(pop)
 
@@ -106,9 +107,9 @@ struct KbNetState {
     char pad_0x20[0x10];
     Vec3 angularVelocity;        // +0x30 +0x1370 deltaBaseAngularVelocity
     Vec3 velocity;               // +0x3c +0x1358 deltaBaseVelocity
-    int field_0x48;
+    int poseBytes;               // +0x48 KbBikeMessage +0x48 pose bytes (KbNetDelta::poseBytes)
     int time;                    // +0x4c running step total (+0x1388 deltaBaseTime)
-    int field_0x50;
+    int motionFlags;             // +0x50 KbBikeMessage +0x50 motion/flag bits (KbNetDelta::motionFlags)
 };
 
 // Message type 1 (0x58 bytes) that 0x00492670 sends or records: this bike's motion state,
@@ -157,7 +158,9 @@ struct KbBikeDeltaMessage {
 };
 #pragma pack(pop)
 
-struct KbNetPacket { int field_0x0; char field_0x4; char pad_0x5[3]; int field_0x8; };
+// request: 1 for message 0x13 (this bike touched the followed racer), 0 for 0x87;
+// followedRacerId: the racer's netId (BikeRace.h's view names +0x8 followedRacerId).
+struct KbNetPacket { int field_0x0; char request; char pad_0x5[3]; int followedRacerId; };
 // On-screen message object (0x8C bytes; ctor 0x0051B200 takes the text and a display time).
 struct KbMessage { char data[0x8C]; KbMessage(const char* text, float seconds); };
 // The debug overlay at KbGame+0x38 (src/reconstructed DebugOverlay: 0x00447fa0 names a page
@@ -168,12 +171,14 @@ struct KbOverlay {
     char pad_0x0000[0x26c0];
     int lineCount;   // 0x26C0: next free line block
 };
-// 0x70-byte records behind KbGame+0x33fc; the first record's leading int selects the current one
-// (0x0048fc80 reads records[records[0].field_0x0].field_0x28; tier 3).
+// 0x70-byte records behind KbGame+0x33fc (TrackGame.h UnknownTrackGameObject33fc: currentDevice
+// at +0, then assignments[8][14] of 8 bytes, one 0x70-byte row per device).  0x0048fc80 reads
+// records[records[0].currentDevice].throttleCode = assignments[currentDevice][4].code, the
+// row DeviceSetup.cpp binds to the throttle axis (tier 2 offsets, view names).
 struct KbTrackEntry {
-    int field_0x0;
+    int currentDevice;           // +0x00 (meaningful in records[0] only)
     char pad_0x04[0x24];
-    int field_0x28;
+    int throttleCode;            // +0x28 assignments[this row][4].code
     char pad_0x2C[0x70 - 0x2c];
 };
 struct KbGame {
@@ -308,7 +313,7 @@ struct KbSensor {
 
 struct KbRacer {
     char pad_0x0000[0xA8];
-    void* field_0xa8; // 0xA8
+    void* tagFollowedRacer; // +0xA8  tagEvent's TrackGameViewOwner::followedRacer, the racer who is IT (KbRacer also views the race camera)
     char pad_0x00AC[0x198];
     int cameraState;  // +0x244  BikeRace raceCamera +0x244 cameraState (BikeRace.h)
     char pad_0x0248[0x168];
@@ -477,7 +482,7 @@ extern int g_kbPadActive;   // 0x0067C3AC
 struct KbAnim;
 struct KbA5C4 {
     char pad_0x00[0x10];
-    int field_0x10; // 0x10
+    int motionTime; // +0x10  Character/D3DIMSoultreeCharacter motionTime (the motion clock)
     KbAnim* FindMotion(const char* name, int unused);
     void SetMotion(int a);
     void ApplyMotionAtPhase(int handle, float phase); // 0x004A8BF0 (ret 8): Character::ApplyMotionAtPhase

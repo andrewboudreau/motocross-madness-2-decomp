@@ -16,7 +16,7 @@ typedef char EntryLayout[(sizeof(UnknownSceneEntry)==0x44 && offsetof(UnknownSce
 typedef char MotionLayout[(sizeof(Motion)==0xcc && offsetof(Motion,frames)==0xa4 &&
     offsetof(Motion,frameCount)==0xa8 && sizeof(MotionPoseList)==12)?1:-1];
 typedef char CharacterLayout[(offsetof(Character,motionStopped)==0xc &&
-    offsetof(Character,chr_field_0x10)==0x10 && offsetof(Character,currentMotion)==0x18)?1:-1];
+    offsetof(Character,motionTime)==0x10 && offsetof(Character,currentMotion)==0x18)?1:-1];
 
 struct World {
     BYTE scene[0x8cc+32], actor[0x294+32], car[0x22c+32];
@@ -74,7 +74,7 @@ static void Setup(int seed,int index,int sequenceLength,int scenario) {
     state.table.entries=state.entries;state.table.entryCount=3;
     *(DWORD*)actor=(DWORD)characterTable;*(DWORD*)Car()=(DWORD)carTable;
     actor->motionStopped=scenario==2;actor->blendActive=1;
-    actor->chr_field_0x10=123.0f;actor->chr_field_0x38=0;
+    actor->motionTime=123.0f;actor->chr_field_0x38=0;
     actor->lastFrame=&state.frames[0][0];actor->lastFrameTime=-1;
     actor->currentMotion=&state.motions[0];actor->currentFrame=&state.frames[0][0];
     for(int entry=0;entry<3;entry++) {
@@ -186,10 +186,10 @@ int main(int argc,char** argv) {
     if(!Check(0,0.05f,1,0,_RC_NEAR,_PC_64) || observed.result!=1 || observed.count!=1 ||
        observed.exception || Actor()->currentMotion!=&state.motions[0] ||
        Actor()->currentFrame!=&state.frames[0][0] || Actor()->blendActive ||
-       Actor()->chr_field_0x10!=0.05f || state.entries[0].motionFrame!=0)return 11;
+       Actor()->motionTime!=0.05f || state.entries[0].motionFrame!=0)return 11;
     Setup(0,0,3,2);
     if(!Check(0,4,1,0,_RC_NEAR,_PC_64) || observed.result!=1 || observed.count ||
-       observed.exception || Actor()->motionStopped!=1 || Actor()->chr_field_0x10!=0 ||
+       observed.exception || Actor()->motionStopped!=1 || Actor()->motionTime!=0 ||
        state.entries[0].motionFrame!=0)return 12;
     Setup(1,0,3,3);
     if(!Check(0,0,1,0,_RC_NEAR,_PC_64) || observed.result || observed.count ||

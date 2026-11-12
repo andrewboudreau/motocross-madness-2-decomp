@@ -154,7 +154,7 @@ public:
     float offTrackTime;  // +0x76C  RaceStatus time off the track (RaceView +0x76c); slot 39 respawns past 6 s when raceMode is set
     float timeBehindLeader;  // +0x770  RaceView +0x770 time behind the leader (RaceStatus 0x004e6210)
     float lapStartTime;  // +0x774  RaceView +0x774 lap start time; CountLap (0x004e58c0) subtracts it with fsub dword
-    float field_0x778; // 0x778  100.0f from the loader
+    float aiCrashImpactLimit; // 0x778  100.0f from the loader; the AI step 0x00413200 crashes the bike when |impact| exceeds it (fcomp 0x00413f3a)
     void* heapBufferA; // 0x77C  heap buffer released in the destructor (tier 3: type unknown)
     void* heapBufferB; // 0x780  heap buffer released in the destructor
     int finishPosition;  // +0x784  RaceView +0x784 finishing position (1-based)
@@ -255,7 +255,7 @@ public:
     int field_0x15cc; // 0x15CC
     float shortMessageTimer;  // +0x15D0  seconds since the last short message (0x00492ad0); starts at shortNetPacketIntervalSec
     int aiTrickId; // 0x15D4  trick id PickTrick chose for the AI (UpdateAIRacingLine 0x00414370), then passed to StartTrick
-    void* field_0x15d8; // 0x15D8  loader argument 30
+    void* aiSkill; // 0x15D8  loader argument 30: BikeRace passes the racer's skill (0 for players); never read
     float aiStuntChance;  // +0x15DC KbRace aiStuntChance1/2/3 by difficulty (2.0 outside event type 0) for an AI bike; BikeAI tricks when rand*100 <= it
     CollisionObject* probeSegment;  // +0x15E0  AI bike's vertical probe segment (0,4,0)-(0,-1,0)
     char aiTricksEnabled;  // +0x15E4 the loader sets it for an AI bike (aiKind) and clears it otherwise; gates BikeAI's trick roll

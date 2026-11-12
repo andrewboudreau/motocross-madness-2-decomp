@@ -224,7 +224,7 @@ void KrustyBike::RemoveFromRace()
 float KrustyBike::GetSpawnProtectionDuration()
 {
     KbRacer* tagRacer = reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent;
-    if (tagRacer && tagRacer->field_0xa8 == this)
+    if (tagRacer && tagRacer->tagFollowedRacer == this)
         return 0.0f;
     return 3.0f;
 }
@@ -357,8 +357,8 @@ void KrustyBike::SendFollowedRacer(Vehicle* racer, bool request)
 {
     if (reinterpret_cast<KbGame*>(g_TrackGame)->network && !isRemote) {
         KbNetPacket pkt;
-        pkt.field_0x8 = racer ? ((KbNetBike*)racer)->netId : 0;
-        pkt.field_0x4 = request;
+        pkt.followedRacerId = racer ? ((KbNetBike*)racer)->netId : 0;
+        pkt.request = request;
         reinterpret_cast<NetworkInterface*>(reinterpret_cast<KbGame*>(g_TrackGame)->network)->Send((unsigned char)(request ? 0x13 : 0x87), &pkt, 12, ((KbNetBike*)this)->netId, 0);
         if (!request && netRecorder && reinterpret_cast<KbGame*>(g_TrackGame)->saveReplay && !reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay)
             reinterpret_cast<VCRInterface*>(netRecorder)->QueueRecord(0x87, racer ? ((KbNetBike*)racer)->netId : 0, &pkt, 1);
@@ -940,7 +940,7 @@ void KrustyBike::SimulateFrame(float dt)
                     EndMotion();
                     motionCompleted = 0;
                     reinterpret_cast<Character*>(riderCharacter)->SetMotion(reinterpret_cast<Motion*>(riderPoseHandles[RiderPose_Victory]));
-                    ((KbA5C4*)riderCharacter)->field_0x10 = 0;
+                    ((KbA5C4*)riderCharacter)->motionTime = 0;
                     hasFinished = 3;
                 } else {
                     hasFinished = 3;
@@ -989,7 +989,7 @@ float KrustyBike::AwardTrickScore()
     if (race->localRacer == this && race->handler)
         race->handler->ReportTrickScore(this, score);
     if (!reinterpret_cast<KbGame*>(g_TrackGame)->eventType ||
-        (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4 && reinterpret_cast<KbGame*>(g_TrackGame)->stuntMode && reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent->field_0xa8 == this)) {
+        (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4 && reinterpret_cast<KbGame*>(g_TrackGame)->stuntMode && reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent->tagFollowedRacer == this)) {
         if (race->localRacer == this) {
             if (race->scoreBoard)
                 race->scoreBoard->ShowValue(trickPoints, trickMultiplier);
@@ -1174,7 +1174,7 @@ void KrustyBike::IgnoreCollisionsWith(KrustyBike* other)
 void KrustyBike::RestoreCollisionsWith(KrustyBike* other)
 {
     if (reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent) {
-        void* current = reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent->field_0xa8;
+        void* current = reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent->tagFollowedRacer;
         if (other == current || this == current)
             return;
     }
@@ -1268,9 +1268,9 @@ void KrustyBike::StartTrick(int idx)
     trickHoldTime = 0;
     motionIndex = (char)idx;
     reinterpret_cast<Character*>(riderCharacter)->SetMotion(reinterpret_cast<Motion*>(riderTrickMotions[idx]));
-    ((KbA5C4*)riderCharacter)->field_0x10 = 0;
+    ((KbA5C4*)riderCharacter)->motionTime = 0;
     D3DIMSoultreeCharacter::SetMotion((Motion*)bikeTrickMotions[idx]);
-    chr_field_0x10 = 0;
+    motionTime = 0;
 }
 
 // owner: bracket only (0x48d990; callers 0x48eff2, 0x48f115, 0x49562c are KrustyBike methods)
@@ -1450,8 +1450,8 @@ void KrustyBike::ApplyStateDelta(const KbNetDelta* delta, KbNetState* state)
     state->roll = deltaBaseRoll;
     state->pitch = deltaBasePitch;
     state->yaw = deltaBaseYaw;
-    state->field_0x50 = delta->field_0x0e;
-    state->field_0x48 = delta->field_0x12;
+    state->motionFlags = delta->motionFlags;
+    state->poseBytes = delta->poseBytes;
 }
 
 // 0x004977a0 (GameObject slot 10, reached through the virtual base): the per-frame update.
@@ -1601,7 +1601,7 @@ void KrustyBike::SendFullState(KbBikeState* state, float dt, int record)
     else
         message.lapGate = lapGate;
     message.time = ReadClock();
-    message.field_0x02 = (short)message.time - (short)state->time;
+    message.elapsedMs = (short)message.time - (short)state->time;
     if (!record) {
         if (reinterpret_cast<KbGame*>(g_TrackGame)->network)
             reinterpret_cast<NetworkInterface*>(reinterpret_cast<KbGame*>(g_TrackGame)->network)->Send(1, &message, sizeof(message), netId, 0);
@@ -1749,14 +1749,14 @@ GameObject* KrustyBike::Load(int context, int a2, const char* modelPath, const S
     shortMessageTimer = reinterpret_cast<KbGame*>(g_TrackGame)->shortNetPacketIntervalSec;
     this->race = race;
     netRecorder = recorder;
-    field_0x15d8 = a24;
+    aiSkill = a24;
     memset(&recordState, 0, sizeof(recordState));
     recordState.timer = 1.7014117e38f;
 
     int localFlag;
     Vec3 points[2];
     if (!aiKind && !isRemote && !isGhost) {
-        int type = reinterpret_cast<KbGame*>(g_TrackGame)->controlSetup[reinterpret_cast<KbGame*>(g_TrackGame)->controlSetup->field_0x0].field_0x28;
+        int type = reinterpret_cast<KbGame*>(g_TrackGame)->controlSetup[reinterpret_cast<KbGame*>(g_TrackGame)->controlSetup->currentDevice].throttleCode;
         if (type == -6 || type == -7 || type == -12 || type == -13)
             localFlag = 1;
         else
@@ -2051,9 +2051,9 @@ GameObject* KrustyBike::Load(int context, int a2, const char* modelPath, const S
     // Retail keeps a dead `cmp g_kbGame->field_0x2d74, 0` here: two arms that store the
     // same constant, tail-merged by VC6 (the original values were presumably tuned equal).
     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 0)
-        field_0x778 = 100.0f;
+        aiCrashImpactLimit = 100.0f;
     else
-        field_0x778 = 100.0f;
+        aiCrashImpactLimit = 100.0f;
     lookAheadFrontVelocity = Vec3(0.0f, 0.0f, 0.0f);
     lookAheadRearVelocity = Vec3(0.0f, 0.0f, 0.0f);
     lookAheadFrontTravel = 0;

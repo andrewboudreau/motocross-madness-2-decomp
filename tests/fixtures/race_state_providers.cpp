@@ -11,8 +11,8 @@ CHECK(position,offsetof(KrustyBike,deltaBasePosition)==0x1364);
 CHECK(angular,offsetof(KrustyBike,deltaBaseAngularVelocity)==0x1370);
 CHECK(time,offsetof(KrustyBike,deltaBaseTime)==0x1388);
 CHECK(recorder,offsetof(KrustyBike,netRecorder)==0x13fc);
-CHECK(packet,sizeof(KbNetDelta)==0x16 && offsetof(KbNetDelta,field_0x0e)==0xe && offsetof(KbNetDelta,field_0x12)==0x12);
-CHECK(state,sizeof(KbNetState)==0x54 && offsetof(KbNetState,step)==2 && offsetof(KbNetState,field_0x50)==0x50);
+CHECK(packet,sizeof(KbNetDelta)==0x16 && offsetof(KbNetDelta,motionFlags)==0xe && offsetof(KbNetDelta,poseBytes)==0x12);
+CHECK(state,sizeof(KbNetState)==0x54 && offsetof(KbNetState,step)==2 && offsetof(KbNetState,motionFlags)==0x50);
 union Storage { double align; unsigned char bytes[0x1638+32]; };
 static Storage actual, expected;
 static unsigned char output[0x60+32], wanted[0x60+32];
@@ -67,7 +67,7 @@ int main() {
             d->delta2[i]=(signed char)deltas[(seed+6+i)%10];
             d->delta3[i]=(signed char)deltas[(seed+8+i)%10];
         }
-        d->field_0x0e=seed^0x7f032211;d->field_0x12=step^0x81002041;
+        d->motionFlags=seed^0x7f032211;d->poseBytes=step^0x81002041;
         for(i=0;i<12;++i)Put(bike,0x1358+i*4,(float)(seed-32)*(i+1)*0.125f);
         bike->deltaBaseTime=seed*1000+17;
         expected=actual;memcpy(wanted,output,sizeof(output));unsigned char packetBefore[32];memcpy(packetBefore,packet,32);
@@ -90,7 +90,7 @@ int main() {
         memcpy(expectState+2,&elapsed,2);
         int time=bike->deltaBaseTime+elapsed;
         memcpy(expectBike+0x1388,&time,4);memcpy(expectState+0x4c,&time,4);
-        memcpy(expectState+0x50,&d->field_0x0e,4);memcpy(expectState+0x48,&d->field_0x12,4);
+        memcpy(expectState+0x50,&d->motionFlags,4);memcpy(expectState+0x48,&d->poseBytes,4);
         bike->ApplyStateDelta(d,(KbNetState*)state);
         if(memcmp(&actual,&expected,sizeof(actual)) || memcmp(output,wanted,sizeof(output)) || memcmp(packet,packetBefore,32)) {
             for(int q=0;q<(int)sizeof(actual);++q)if(actual.bytes[q]!=expected.bytes[q])printf("receiver %x %02x %02x\n",q-16,actual.bytes[q],expected.bytes[q]);

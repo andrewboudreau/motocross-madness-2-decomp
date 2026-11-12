@@ -1259,7 +1259,7 @@ void KrustyBike::UpdateRiderPose(float dt)
         // The end pose (riderPoseHandles[RiderPose_Victory]) once the rider character is ready.
         if (riderCharacter->c_0xc) {
             reinterpret_cast<Character*>(riderCharacter)->SetMotion(reinterpret_cast<Motion*>(riderPoseHandles[RiderPose_Victory]));
-            ((KbA5C4*)riderCharacter)->field_0x10 = 0;
+            ((KbA5C4*)riderCharacter)->motionTime = 0;
             hasFinished++;
         } else {
             ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);

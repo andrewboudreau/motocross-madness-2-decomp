@@ -333,7 +333,7 @@ int EventManager::CreatePodiumScene() {
             PODIUM_MODEL(character)->SetPosition(&position);
             PODIUM_MODEL(character)->SetAxesPtr(&facings[place - 1], &kVec3YAxis, 1, 1);
             character->SetMotion(podiumMotions[place - 1]);
-            character->chr_field_0x10 = 0.0f;
+            character->motionTime = 0.0f;
             if (racer) {
                 UnknownPodiumTextureEntry** texture = ((UnknownPodiumRacer*)racer)->riderCharacter->modelNode->field_0x290;
                 if (texture)

@@ -1613,7 +1613,7 @@ int KrustyBike::SimulateAIFrame(float dt)
         contactTime += dt;
     else
         contactTime = 0;
-    if (BIKEAI_ABS(impact) > field_0x778 || BIKEAI_ABS(linearSpeed - prevSpeed) > 44.0f ||
+    if (BIKEAI_ABS(impact) > aiCrashImpactLimit || BIKEAI_ABS(linearSpeed - prevSpeed) > 44.0f ||
         bodyUp.y <= 0.0f || contactTime > 0.5f) {
         crashState = 1;
         crashDirection = 1;

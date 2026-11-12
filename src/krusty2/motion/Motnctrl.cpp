@@ -329,7 +329,7 @@ Character::Character(int flags)
     motionCount = 0;
     currentMotion = 0;
     currentFrame = 0;
-    chr_field_0x10 = 0.0f;
+    motionTime = 0.0f;
     blendFromMotion = 0;
     lastFrameTime = 0.0f;
     lastFrame = 0;
@@ -509,15 +509,15 @@ int Character::AdvanceMotion(float dt, int mirror, int mask)
 {
     if (motionStopped)
         return 0;
-    chr_field_0x10 += dt;
-    if (!AdvanceLooping(currentMotion, &currentFrame, &chr_field_0x10) && currentMotion->looping == 0) {
-        chr_field_0x10 = 0.0f;
+    motionTime += dt;
+    if (!AdvanceLooping(currentMotion, &currentFrame, &motionTime) && currentMotion->looping == 0) {
+        motionTime = 0.0f;
         motionStopped = 1;
         return 0;
     }
     if (blendActive == 0) {
         lastFrame = currentFrame;
-        lastFrameTime = chr_field_0x10;
+        lastFrameTime = motionTime;
         for (int i = 0; i < currentFrame->count; i++) {
             if (mirror == 0)
                 CharacterVirtualSlot4((int)&currentFrame->poses[i], mask);
@@ -645,7 +645,7 @@ void Character::BlendToMotion(Motion* motion, float time)
     if (time != 0.0f && lastFrame &&
         motion->frames->count == currentMotion->frames->count) {
         Motion* from = currentMotion;
-        blendFromTime = chr_field_0x10;
+        blendFromTime = motionTime;
         blendDuration = time;
         blendFromMotion = from;
         SetMotion(motion);
@@ -662,7 +662,7 @@ void Character::CharacterVirtualSlot8(int other)
 {
     Character* source = (Character*)other;
     motionStopped = source->motionStopped;
-    chr_field_0x10 = source->chr_field_0x10;
+    motionTime = source->motionTime;
     motionCount = source->motionCount;
     currentMotion = source->currentMotion;
     currentFrame = source->currentFrame;

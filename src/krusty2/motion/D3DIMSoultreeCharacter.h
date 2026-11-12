@@ -111,14 +111,14 @@ public:
     // names are tier 3.  See src/krusty2/motion/Motnctrl.cpp.
     UnknownParameterBlock* sltFile;               // +0x008 set by D3DIM slot 11 around the slot 1 call; slot 1 reads the "General info" keys through it
     int motionStopped;              // +0x00c ctor 1; AdvanceMotion sets it when a non-looping motion ends (and then returns 0); SetMotion (0x004a8b40) clears it
-    float chr_field_0x10;           // +0x010 the motion clock (src/krusty2/vehicle reads it under this name): AdvanceMotion adds dt and steps the frames by it; slot 7 adds its time argument; copied to blendFromTime by BlendToMotion (0x004a8b80)
+    float motionTime;           // +0x010 the motion clock (src/krusty2/vehicle reads it under this name): AdvanceMotion adds dt and steps the frames by it; slot 7 adds its time argument; copied to blendFromTime by BlendToMotion (0x004a8b80)
     int motionCount;                // +0x014 "NumberOfMotions" (slot 1); loop bound of LoadMotions and the dtor
     Motion* currentMotion;          // +0x018 SetMotion stores the motion; cleared by LoadMotions and the dtor
     MotionPoseList* currentFrame;   // +0x01c SetMotion stores the motion's first frame; cleared by the dtor
     Motion* blendFromMotion;        // +0x020 BlendToMotion saves currentMotion here before switching
     MotionPoseList* lastFrame;      // +0x024 AdvanceMotion (0x004a6bb0): the frame applied last; a blend interpolates from it
-    float lastFrameTime;            // +0x028 AdvanceMotion: chr_field_0x10 when lastFrame was applied; not copied by slot 8
-    float blendFromTime;            // +0x02c BlendToMotion: chr_field_0x10 at the switch
+    float lastFrameTime;            // +0x028 AdvanceMotion: motionTime when lastFrame was applied; not copied by slot 8
+    float blendFromTime;            // +0x02c BlendToMotion: motionTime at the switch
     float blendDuration;            // +0x030 BlendToMotion: the transition time argument
     int blendActive;                // +0x034 BlendToMotion sets 1; SetMotion clears it
     int chr_field_0x38;             // +0x038 ctor 0; copied by slot 8

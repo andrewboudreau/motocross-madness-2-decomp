@@ -16,7 +16,7 @@ struct UnknownBikeAIPath {
 struct KbBikeMessage {
     char field_0x00;
     unsigned char finishPosition;  // +0x1  KrustyBike+0x784 finishPosition (0x0049276c)
-    short field_0x02;                    // ms since the state's last send
+    short elapsedMs;                     // +0x02 ms since the state's last send (time - state->time)
     short lapCount;  // +0x4  KrustyBike+0x7a0 lapCount (0x004926f5)
     short gatesPassed;  // +0x6  KrustyBike+0x790 gatesPassed (0x00492700)
     Vec3 position;                       // +0x08

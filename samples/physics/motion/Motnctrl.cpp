@@ -385,8 +385,8 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
     if (motionStopped)
         return 0;
     finished = 0;
-    chr_field_0x10 += time;
-    if (AdvanceClamped(currentMotion, &currentFrame, &from, &to, &chr_field_0x10, &weight)) {
+    motionTime += time;
+    if (AdvanceClamped(currentMotion, &currentFrame, &from, &to, &motionTime, &weight)) {
         ok = 1;
     } else {
         ok = 0;
@@ -394,7 +394,7 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
     }
     if (blendActive == 0) {
         lastFrame = currentFrame;
-        lastFrameTime = chr_field_0x10;
+        lastFrameTime = motionTime;
         if (ok) {
             for (int i = 0; i < from->count; i++) {
                 CharacterPose pose;
@@ -408,7 +408,7 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
             for (int i = 0; i < from->count; i++) {
                 CharacterPose* fromPose = &from->poses[i];
                 int flag = nodeNames[fromPose->nodeIndex].applyTranslation;
-                float frameTime = chr_field_0x10;
+                float frameTime = motionTime;
                 int fps = currentMotion->fps;
                 CharacterPose* toPose = &to->poses[i];
                 CharacterPose out;
@@ -495,7 +495,7 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
             return 0;
         }
         motionStopped = 1;
-        chr_field_0x10 = 0.0f;
+        motionTime = 0.0f;
         lastFrameTime = 0.0f;
         return 0;
     }
