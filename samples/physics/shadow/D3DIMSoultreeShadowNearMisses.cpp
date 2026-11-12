@@ -4,7 +4,7 @@
 // calibration; the game build links slots 29 and 30 from here with /QIfist
 // (config/game_build.json candidate_sources).
 //
-// Slot 29 (0x00446c30, 771 B, 730/771) is slot 27's visibility test (slot 27 0x004468f0 is exact
+// Slot 29 (0x00446c30, 771 B, 721/771) is slot 27's visibility test (slot 27 0x004468f0 is exact
 // in src/krusty2/shadow/D3DIMSoultreeShadow.cpp) with the render target's camera: the caster's
 // matrix (0x004fca80 with a null frame) times the camera matrix at camera+0xec, written out as 16
 // four-term sums into a local, then the visibility clipper's box test (0x0052f570) with the
@@ -12,7 +12,7 @@
 // retail; VC6 reassociates each four-term sum by leaf age, and retail's term orders differ
 // between the two slots (for _11 slot 27 sums 12,14,13,11 and slot 29 11,12,14,13).  The shared
 // helper below is slot 27's exact form (b read through `right` in _24 only: 712 -> 724 here);
-// the camera local gives 730.  Left: one term pair in each of _11, _21, _31, _41 and the a._2k
+// the camera local gave 730 (721 since _22/_23 sum as retail).  Left: one term pair in each of _11, _21, _31, _41 and the a._2k
 // placement in _22.._24.  No single per-element or per-term alias of a or b (128 toggles from
 // slot 27's form) improves slot 29 without breaking slot 27; aliases of the view (pointer,
 // host local, inline argument) stay at 724..730.  Earlier forms, for slot 27 (elements whose

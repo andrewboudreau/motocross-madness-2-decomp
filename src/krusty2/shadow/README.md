@@ -54,7 +54,7 @@ Slot 14 (0x447540, 574 bytes) is exact too; it fills the file's vertex array g_d
 (0x581eb8, 3000 32-byte vertices). Slot 27 0x4468f0 (767 B) is exact: the caster-bounds box test
 (0x52f570) against the shadow camera after an inlined 4x4 product, whose helper reads b through a
 second reference in _24 so that VC6 orders the row-2 sums as retail. Near misses
-(samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp): slot 29 0x446c30 (771 B, 730/771), the same
+(samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp): slot 29 0x446c30 (771 B, 721/771), the same
 test against the render target's camera; only the product's x87 term order differs. Slot 30 0x446f40 (1524 B; the
 1612 B sample keeps 55 strict bytes) builds the receiver vertices from the caster's current LOD meshes; retail rounds the clipped points
 with an inline __asm fld/fistp helper (ebp frame), so it stays partial under the no-asm rule. The game build

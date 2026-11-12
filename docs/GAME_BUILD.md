@@ -1036,7 +1036,7 @@ default rounding mode, so its behaviour does not change; the shape does
 
 | VA | Function | Before | Now linked |
 |---|---|---|---|
-| 0x00446c30 | `D3DIMSoultreeShadow` slot 29 | 0.945 | 0.945 |
+| 0x00446c30 | `D3DIMSoultreeShadow` slot 29 | 0.945 | 0.958 (sum-order fix, coverage sweep) |
 | 0x00446f40 | `D3DIMSoultreeShadow` slot 30 | 0.571 | 0.862 |
 | 0x00509aa0 | `TerrainShadow` slot 30 | 0.595 | 0.718 |
 
