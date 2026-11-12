@@ -95,16 +95,16 @@ public:
     TrackRecordDlg() : UIDialog(1, "HiScores.dtm") {} // inline (KrustyUI 0x00499b20)
     // 0x0051f600: the dialog's procedure; its +0x08 is the type (1..6) and
     // +0x0c the dialog whose controls the list helpers fill.
-    virtual void HandleEvent(UnknownDialogEvent* event);
+    virtual void HandleEvent(DialogEvent* event);
     void LabelTabs(int series);                                 // 0x0051fc40: labels the tabs
-    void ShowTab(UnknownDialogEvent* event, int series); // 0x0051fe80: shows a tab
+    void ShowTab(DialogEvent* event, int series); // 0x0051fe80: shows a tab
     void FreeRows();                                            // 0x0051ff40: frees the rows
     void ListHighScoreTracks(UIControl* list, DirectoryList* directory, int series); // 0x0051ffe0
-    void FillLists(UnknownDialogEvent* event, int series); // 0x00520390: fills the lists
-    void AddStatsRow(UnknownDialogEvent* event, const char* name, float value,
+    void FillLists(DialogEvent* event, int series); // 0x00520390: fills the lists
+    void AddStatsRow(DialogEvent* event, const char* name, float value,
                                const char* text);                           // 0x00520480
     // 0x005204e0: the high scores of `name` (points for series 0, else lap times).
-    void ShowTrackScores(UnknownDialogEvent* event, int times, const char* name);
+    void ShowTrackScores(DialogEvent* event, int times, const char* name);
 
     int selectedSeries;                       // +0x7f58 selected series (0..5)
     int selectedSubTab;                       // +0x7f5c TabLeft/TabMiddle/TabRight (0..2); mirrors highScores->extensionIndex, LabelTabs selects it

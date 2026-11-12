@@ -48,9 +48,9 @@ public:
     void ReleaseCursor();             // 0x004880c0: releases the cursor
     int SetPointerDevice(GUIInputDevice* device); // 0x00488120: sets the pointer device
     int UsesDevice(InputDevice* device);      // 0x00488160: pointer or accepted device (1 without a pointer)
-    int UsesEventDevice(UnknownControlEvent* event); // 0x004881d0: UsesDevice for the event's device
+    int UsesEventDevice(ControlEvent* event); // 0x004881d0: UsesDevice for the event's device
     GUIInputDevice* FindDevice(InputDevice* device); // 0x00488240: its GUIInputDevice
-    GUIInputDevice* FindEventDevice(UnknownControlEvent* event); // 0x004882a0: FindDevice for the event's device
+    GUIInputDevice* FindEventDevice(ControlEvent* event); // 0x004882a0: FindDevice for the event's device
     GUIInputDevice* GetAcceptedDevice(int index);
 
     GUIInputDevice* pointerDevice;            // +0x2c: pointer device
@@ -81,8 +81,8 @@ public:
     virtual int Tick(float frameTime);                 // 0x00485870
     virtual int RenderPre3D();                // 0x004858d0
     virtual int RenderPost3D();               // 0x00485970
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x00485830
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004857f0
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);     // 0x00485830
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x004857f0
 
     // 0x004853b0: sets the GUI up (KrustyUI 0x004988a0 passes its target,
     // Display+0x64 palette, the textures, 0, 0, 0, "Arial", 15, "ui\\cursor.tga"

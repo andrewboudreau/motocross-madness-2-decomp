@@ -199,7 +199,7 @@ int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
 
 // 0x0051f600: the dialog's messages: 5 sets it up, 1 handles the buttons
 // and tabs, 2 a track chosen in the list, 6 frees the rows.
-void TrackRecordDlg::HandleEvent(UnknownDialogEvent* event)
+void TrackRecordDlg::HandleEvent(DialogEvent* event)
 {
     char name[128];
     char path[260];
@@ -344,7 +344,7 @@ void TrackRecordDlg::LabelTabs(int series)
     }
 }
 
-void TrackRecordDlg::ShowTab(UnknownDialogEvent* event, int series)
+void TrackRecordDlg::ShowTab(DialogEvent* event, int series)
 {
     switch (series) {
     case 0:
@@ -465,7 +465,7 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
 
 // 0x00520390: selects the series, then fills the track list; `event` is
 // unused.
-void TrackRecordDlg::FillLists(UnknownDialogEvent* event, int series)
+void TrackRecordDlg::FillLists(DialogEvent* event, int series)
 {
     char text[128];
     g_TrackGame->mode.SelectSeries(selectedSeries);
@@ -485,7 +485,7 @@ void TrackRecordDlg::FillLists(UnknownDialogEvent* event, int series)
     ((UnknownTrackRecordListBox*)control)->ReportClick(0);
 }
 
-void TrackRecordDlg::AddStatsRow(UnknownDialogEvent* event, const char* name, float value,
+void TrackRecordDlg::AddStatsRow(DialogEvent* event, const char* name, float value,
                                            const char* text)
 {
     UIListBox* list;
@@ -499,7 +499,7 @@ void TrackRecordDlg::AddStatsRow(UnknownDialogEvent* event, const char* name, fl
     }
 }
 
-void TrackRecordDlg::ShowTrackScores(UnknownDialogEvent* event, int times, const char* name)
+void TrackRecordDlg::ShowTrackScores(DialogEvent* event, int times, const char* name)
 {
     char text[128];
     UIListBox* control = static_cast<UIListBox*>(FindControl("TxtStats1", 12));

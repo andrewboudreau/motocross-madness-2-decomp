@@ -173,7 +173,7 @@ public:
     virtual int RenderPre3D();                // 0x00519940
     virtual int Render3D();       // 0x00519980
     // Slot 23: 0x004dc4c0, the shared "return 0" body.
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);
 
     // 0x005194b0 (QuarryStuntEvent.cpp 0x004e0a9c): loads the panel for the
     // screen rectangle `screen`; returns this, or 0.
@@ -251,7 +251,7 @@ public:
     virtual ~RadarOverlay();                  // 0x0051b7d0 (deleting wrapper 0x0051b7b0)
     virtual int Tick(float frameTime);                 // 0x0051bcd0
     virtual int Render3D();       // 0x0051bd20
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x0051bb60
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x0051bb60
 
     // 0x0051b840: loads the map for the screen rectangle `screen` (only its
     // top and right edges are read).
@@ -432,7 +432,7 @@ public:
     int HandleChatKey(int key, int* result);
     void SetCueRacer(float squaredDistance, const char* name); // 0x0051d9c0
     // 0x0051dce0: called before GameObject slot 23 with the same event.
-    int HandleChatInput(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
+    int HandleChatInput(ControlEvent* event, InputButtonState* entry, int* result);
     void ShowInputLine();             // 0x0051dd10: shows the input line
     void HideInputLine();             // 0x0051dd40: hides it
     void AddMessage(const char* name, int text, int value); // 0x0051dd70: text is a string (0x0051eb40)

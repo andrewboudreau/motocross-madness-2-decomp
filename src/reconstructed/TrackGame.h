@@ -11,7 +11,7 @@ class EventManager;  // EventManager.h; files that use its members include it
 #include "RaceView.h"
 #include "TrackRecord.h"
 
-struct UnknownInputEntry;
+struct InputButtonState;
 class FollowCamera;
 
 // RTTI: TrackGame : PCGame (vtable 0x00558938; trkgame.cpp). The global
@@ -505,7 +505,7 @@ public:
     void LoadAssignment(int device, int row, const char* path);
     void SaveAssignment(int device, int row, const char* path);
     // 0x00448d30: binds an axis binding to the device of `kind`.
-    int BindAxis(UnknownControlBinding* binding, int kind, int code, int code2);
+    int BindAxis(ControlBinding* binding, int kind, int code, int code2);
     // 0x00448df0: enters `code` for `control` in TrackGame's control mapping.
     int BindButton(int control, int code, int kind);
 
@@ -621,8 +621,8 @@ public:
     virtual int CreateGameObjects();          // 0x00521050: creates the game objects
     virtual int OnActivate();                 // 0x00521a50
     virtual int Tick();                       // 0x00521660: Game's slot 10 as a flag
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x00521840
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00521670
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);     // 0x00521840
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x00521670
     virtual int Shutdown();                   // 0x00521a70: shutdown
     virtual int FindDataFile(const char* name, char* path);         // 0x00521cb0
 
@@ -652,10 +652,10 @@ public:
     DirectoryList* profileDirectory;
     int menuIsOpen;
     CDAudio* cdAudio;                         // +0x3340
-    UnknownControlBinding steerBinding;  // +0x3344  axis of control rows 0/1 (dead zone 0.04); LoadBike's steer -> Vehicle steerAxis
-    UnknownControlBinding leanBinding;  // +0x3380  axis of control rows 2/3; LoadBike's lean -> Vehicle leanAxis (controlInput.y)
-    UnknownControlBinding throttleBinding;  // +0x33BC  optional 0..1 axis of row 4; LoadBike's throttle -> Vehicle throttleAxis
-    UnknownControlMapping* controlMapping;
+    ControlBinding steerBinding;  // +0x3344  axis of control rows 0/1 (dead zone 0.04); LoadBike's steer -> Vehicle steerAxis
+    ControlBinding leanBinding;  // +0x3380  axis of control rows 2/3; LoadBike's lean -> Vehicle leanAxis (controlInput.y)
+    ControlBinding throttleBinding;  // +0x33BC  optional 0..1 axis of row 4; LoadBike's throttle -> Vehicle throttleAxis
+    ControlMapping* controlMapping;
     UnknownTrackGameObject33fc* controlSetup; // +0x33fc control assignments: the profile's "control.ctl", OptControlsDlg InputDeviceDDL
     UnknownTrackGameObject3400* highScores;   // +0x3400 the high-score table (TrackRecord.cpp)
     char savedDecimalSeparator[8];

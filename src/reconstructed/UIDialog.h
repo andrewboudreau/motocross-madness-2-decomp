@@ -21,7 +21,7 @@ class BackgroundImage;
 class PCTextureMap;
 class FileStream;
 struct UnknownCursorAnimation;
-struct UnknownDialogEvent;
+struct DialogEvent;
 
 // One .dtm section of a dialog (0x3c bytes; the table is at UIDialog+0x9cc):
 // its name and the control, image or sound built for it
@@ -47,8 +47,8 @@ public:
     virtual int RenderPre3D();                // 0x0046f1c0 (dlgprocs.cpp)
     virtual int Render3D();       // 0x0046f300 (gameui.cpp)
     virtual int RenderPost3D();               // 0x0046f320 (gameui.cpp)
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x0046a7d0 (dlgprocs.cpp)
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x0046a780 (SelectGamePicProcs.cpp)
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);     // 0x0046a7d0 (dlgprocs.cpp)
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x0046a780 (SelectGamePicProcs.cpp)
 
     // The dialog's own slots (gameui.cpp).
     // 0x0046a300: creates the controls from the resource; this, or 0 when it fails.
@@ -58,7 +58,7 @@ public:
                                            const char* font, int fontSize, GUIManager* gui,
                                            GUIUser* user, const char* name);
     virtual void SendInitEvent(int initParam); // 0x0046e8c0: a kDialogInit event carrying it
-    virtual void HandleEvent(UnknownDialogEvent* event); // slot 29, 0x00470020: the dialog's procedure (controls report events here)
+    virtual void HandleEvent(DialogEvent* event); // slot 29, 0x00470020: the dialog's procedure (controls report events here)
     virtual void UnknownVirtualSlot30();      // 0x00470040
     // Slot 31, 0x00470050: UpdateBoundValues calls it after the controls'
     // SyncBoundValue; 1 stores the dialog's settings, 0 shows them.
@@ -130,7 +130,7 @@ public:
     int field_0xc0;
     int openingMenu;                          // +0xc4: the menu id it was shown for (GUIManager::ShowDialog's `menu`)
     int animatesControls;                     // +0xc8: animates its controls
-    void (*eventProc)(UnknownDialogEvent* event); // +0xcc: the procedure HandleEvent calls
+    void (*eventProc)(DialogEvent* event); // +0xcc: the procedure HandleEvent calls
     void (*syncProc)(UIDialog* dialog, int value); // +0xd0: called by SyncValues
     void (*field_0xd4)();                     // slot 30
     void* dialogFont;                         // +0xd8
@@ -195,7 +195,7 @@ class TransDlg : public UIDialog {
 public:
     TransDlg() : UIDialog(1, "Trans.dtm") {}
     void SetNextMenu(int menu);                   // 0x00455c40: stores +0x7f60
-    void HandleEvent(UnknownDialogEvent* event); // 0x00455b60 (dlgprocs.cpp)
+    void HandleEvent(DialogEvent* event); // 0x00455b60 (dlgprocs.cpp)
     virtual int Tick(float frameTime);                    // 0x00455bd0 (dlgprocs.cpp)
 
     int framesShown;                          // +0x7f58: frames shown (dlgprocs.cpp)
@@ -208,9 +208,9 @@ public:
 class Intro1Dlg : public UIDialog {
 public:
     Intro1Dlg() : UIDialog(1, "intro1.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x004532c0 (dlgprocs.cpp)
+    void HandleEvent(DialogEvent* event); // 0x004532c0 (dlgprocs.cpp)
     virtual int Tick(float frameTime);                    // 0x004533d0 (dlgprocs.cpp)
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00453420 (dlgprocs.cpp)
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x00453420 (dlgprocs.cpp)
 
     int framesShown;                          // +0x7f58: frames shown (dlgprocs.cpp)
 };
@@ -220,9 +220,9 @@ public:
 class Exit1Dlg : public UIDialog {
 public:
     Exit1Dlg() : UIDialog(1, "Exit1.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x00455c50 (dlgprocs.cpp)
+    void HandleEvent(DialogEvent* event); // 0x00455c50 (dlgprocs.cpp)
     virtual int Tick(float frameTime);                    // 0x00455d00 (dlgprocs.cpp)
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00455d70 (dlgprocs.cpp)
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x00455d70 (dlgprocs.cpp)
 
     int framesShown;                          // +0x7f58: frames shown (dlgprocs.cpp)
     float secondsShown;                       // +0x7f5c: seconds shown (dlgprocs.cpp)

@@ -243,8 +243,8 @@ public:
     virtual void OnEnable();                         // 0x004eaab0
     virtual int Tick(float frameTime);                 // 0x004eab00, not reconstructed
     virtual int Render3D();              // 0x004f0040
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);
 
     // 0x004ea7e0: stores the owner and settings, adds the sound group child.
     Scene* UnknownFunction4ea7e0(UnknownTrackGameObject574* manager, int value, int unused,

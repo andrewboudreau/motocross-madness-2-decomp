@@ -62,7 +62,7 @@ zero-initialized storage.
   one-value property through method 6 with a DIPROPDWORD-shaped block.
 - **KeyboardDevice** (`0x00489e30`): `PCInputDevice(0)`, 256 20-byte input
   entries stamped from cdecl `0x004bfa80`, six binding lists
-  `ContainerList<UnknownControlBinding*>` at +0x1660 (each `Init(1, 1)`),
+  `ContainerList<ControlBinding*>` at +0x1660 (each `Init(1, 1)`),
   and a modifier state at +0x16d8. Its other functions:
   - Slot 0 (`0x0048a030`) drops bindings by id, like the joystick's.
   - `0x0048a0c0` steps bindings while their keys are held, using float
@@ -99,7 +99,7 @@ zero-initialized storage.
   | 6 | `0x004c4cf0` | Reads buffered button events (offsets 12–15), then the movement; x and y feed the bindings through MouseDevice `0x0048a550`, scaled by maximum / 375 |
 - **JoystickDevice** (`0x00489800`): `PCInputDevice(2)` and the index at
   +0x260, 32 button entries at +0x264, six axis values (floats) at +0x4e4,
-  six binding lists `ContainerList<UnknownControlBinding*>` at +0x4fc, and
+  six binding lists `ContainerList<ControlBinding*>` at +0x4fc, and
   bit 0 of +0x574 from the global object's virtual slot 22 with
   `"JoyDirectionFlipped"`. Its other functions:
   - Slot 0 (`0x00489b70`) drops bindings by id.
@@ -240,7 +240,7 @@ control and device kind (with a keyboard modifier test), and `0x0043d080`
 (`DecodeTextureSize`, used by cube.cpp and cubedraw.cpp) maps a 2-bit field
 to a texture size of 0x200/0x40/0x80/0x100. All of these are strict exact.
 
-The 0x3c-byte, non-polymorphic `UnknownControlBinding` helpers sit just
+The 0x3c-byte, non-polymorphic `ControlBinding` helpers sit just
 before it (`0x0043cc40`–`0x0043cde0`). They cover the default and full
 constructors, reset, and a value mapper with a dead zone and min/max clamp.
 The clamp matches only as inline helper functions, and the mapper unbinds

@@ -33,8 +33,8 @@ failed:
 }
 
 // 0x004c4520: `control` through the mapping table, then slot 5.
-int PCKeyboardDevice::IsControlDown(int control, int modifier, UnknownInputEntry* entry) {
-    UnknownControlMapping* mapping = g_TrackGame->controlInterface->mapping;
+int PCKeyboardDevice::IsControlDown(int control, int modifier, InputButtonState* entry) {
+    ControlMapping* mapping = g_TrackGame->controlInterface->mapping;
     if (!mapping)
         return 0;
     mapping->GetKey(control, &control);
@@ -44,7 +44,7 @@ int PCKeyboardDevice::IsControlDown(int control, int modifier, UnknownInputEntry
 }
 
 // 0x004c4570: whether `key` is down with `modifier` held; copies its entry.
-int PCKeyboardDevice::IsButtonDown(int key, int modifier, UnknownInputEntry* entry) {
+int PCKeyboardDevice::IsButtonDown(int key, int modifier, InputButtonState* entry) {
     if (ModifierHolds(modifier) && keyStates[key].state == 1) {
         if (entry) {
             entry->state = 1;

@@ -15,7 +15,7 @@ class BackgroundImage;
 class Palette8;
 class PCTextureMap;
 class TextureMapManager;
-struct UnknownControlBinding;
+struct ControlBinding;
 
 // Cursor position in pixels (0x0043f100's result).
 struct UnknownCursorPosition {
@@ -33,7 +33,7 @@ public:
     // position and draws it.
     virtual int RenderPost3D();
     // 0x0043ea70: an input-driven cursor following the two bindings.
-    GameObject* CreateBound(void* target, UnknownControlBinding* x, UnknownControlBinding* y,
+    GameObject* CreateBound(void* target, ControlBinding* x, ControlBinding* y,
                                       const char* image, TextureMapManager* textures,
                                       BackgroundImage* background, void* palette, Palette8* palette8);
     // 0x0043eaf0: a cursor without bindings.
@@ -50,8 +50,8 @@ public:
     int hotSpotY;                             // +0x30
     PCTextureMap* cursorTexture;              // +0x34 image
     int currentFrame;                         // +0x38 current frame (a PCTextureMap*), 0: the image
-    UnknownControlBinding* bindingX;          // +0x3c x
-    UnknownControlBinding* bindingY;          // +0x40 y
+    ControlBinding* bindingX;          // +0x3c x
+    ControlBinding* bindingY;          // +0x40 y
     BackgroundImage* backgroundImage;         // +0x44
     int backgroundRegion;                     // +0x48 background region, -1 when none
     int field_0x4c;

@@ -37,7 +37,7 @@ static GUIUser* User(World& w, int n) { return reinterpret_cast<GUIUser*>(w.user
 static void Fail(int n) { printf("UI edit invariant %d\n", n); ExitProcess(n); }
 
 struct Observer {
-    void Handle(UnknownDialogEvent* event) {
+    void Handle(DialogEvent* event) {
         ++calls[0];
         if ((void*)this != Dialog(world, 0) || event->handled || event->kind != kDialogCommand ||
             event->code != 0x12345678 || event->controlName != Edit(world)->controlName ||

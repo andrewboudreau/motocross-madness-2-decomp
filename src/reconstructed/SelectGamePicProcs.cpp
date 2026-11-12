@@ -872,7 +872,7 @@ int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int
 int g_UnknownGlobal689e04;
 
 // 0x004f4520: the lobby's dialog procedure.
-void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
+void MultiPlayerDlg::HandleEvent(DialogEvent* event) {
     char name[0x10];
     char text[0x80];
     UnknownPlayerStateMessage state;
@@ -1449,7 +1449,7 @@ void MPEventDlg::ShowHostSettings() {
 }
 
 // 0x004f6370
-void MPEventDlg::HandleEvent(UnknownDialogEvent* event) {
+void MPEventDlg::HandleEvent(DialogEvent* event) {
     char text[0x80];
     char number[0x80];
     switch (event->kind) {
@@ -1816,7 +1816,7 @@ void MPEventDlg::LoadTrackPicture(UIControl* picture, const char* directory, con
 }
 
 // 0x004f78a0
-void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
+void MPBikeRiderDlg::HandleEvent(DialogEvent* event) {
     char plate[12];
     char typed[12];
     char text[0x80];
@@ -2008,7 +2008,7 @@ void MPBikeRiderDlg::EnableLargestOpponent() {
 }
 
 // 0x004f8780
-int MPBikeRiderDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int MPBikeRiderDlg::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (event->kind == 1 && event->control == 0) {
         RECT area = previewArea;
         area.left += 0x32;
@@ -2131,7 +2131,7 @@ void MPBikeRiderDlg::SyncValues(int apply) {
 }
 
 // 0x004f93c0
-void MPOptionsDlg::HandleEvent(UnknownDialogEvent* event) {
+void MPOptionsDlg::HandleEvent(DialogEvent* event) {
     char text[0x80];
     switch (event->kind) {
     case kDialogCommand:
@@ -2193,7 +2193,7 @@ void MPOptionsDlg::EnableHostOptions() {
 // (see SelectGamePicProcs.h). The source is the same as theirs.
 
 // 0x0044fab0 (folded with SPBikeRiderDlg::OnControlRelease)
-int MPBikeRiderDlg::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int MPBikeRiderDlg::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
     if (event->kind == 1 && event->control == 0)
         previewDragging = 0;
     return UIDialog::OnControlRelease(event, entry);

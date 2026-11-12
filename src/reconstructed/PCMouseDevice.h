@@ -11,8 +11,8 @@ public:
 
     virtual int CreateDevice();
     virtual void DetectSubtype();
-    virtual int IsControlDown(int control, int modifier, UnknownInputEntry* entry);
-    virtual int IsButtonDown(int button, int modifier, UnknownInputEntry* entry);
+    virtual int IsControlDown(int control, int modifier, InputButtonState* entry);
+    virtual int IsButtonDown(int button, int modifier, InputButtonState* entry);
     virtual int Update(int value);
 
 protected:

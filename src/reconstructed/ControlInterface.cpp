@@ -16,7 +16,7 @@ static inline float BindingMin(float a, float b) {
 }
 
 // 0x0043caa0
-int TestInputEvent(int control, int kind, const UnknownControlEvent* event, int modifier) {
+int TestInputEvent(int control, int kind, const ControlEvent* event, int modifier) {
     if (event->control == control && event->kind == kind &&
         (!g_TrackGame->controlInterface->keyboard ||
          g_TrackGame->controlInterface->keyboard->ModifierHolds(modifier)))
@@ -25,12 +25,12 @@ int TestInputEvent(int control, int kind, const UnknownControlEvent* event, int 
 }
 
 // 0x0043cae0
-UnknownControlMapping::UnknownControlMapping() {
+ControlMapping::ControlMapping() {
     Clear();
 }
 
 // 0x0043caf0
-void UnknownControlMapping::Clear() {
+void ControlMapping::Clear() {
     for (int i = 0; i < 50; i++) {
         keys[i] = -1;
         for (int j = 0; j < 8; j++)
@@ -40,25 +40,25 @@ void UnknownControlMapping::Clear() {
 }
 
 // 0x0043cb30
-void UnknownControlMapping::SetKey(int control, int key) {
+void ControlMapping::SetKey(int control, int key) {
     if (control >= 0 && control < 50)
         keys[control] = key;
 }
 
 // 0x0043cb50
-void UnknownControlMapping::SetJoystickButton(int control, int button, int device) {
+void ControlMapping::SetJoystickButton(int control, int button, int device) {
     if (control >= 0 && control < 50 && device < 8)
         joystickButtons[device][control] = button;
 }
 
 // 0x0043cb80
-void UnknownControlMapping::SetMouseButton(int control, int button) {
+void ControlMapping::SetMouseButton(int control, int button) {
     if (control >= 0 && control < 50)
         mouseButtons[control] = button;
 }
 
 // 0x0043cba0
-void UnknownControlMapping::GetKey(int control, int* result) {
+void ControlMapping::GetKey(int control, int* result) {
     if (control >= 0 && control < 50)
         *result = keys[control];
     else
@@ -66,7 +66,7 @@ void UnknownControlMapping::GetKey(int control, int* result) {
 }
 
 // 0x0043cbd0
-void UnknownControlMapping::GetJoystickButton(int control, int* result, int device) {
+void ControlMapping::GetJoystickButton(int control, int* result, int device) {
     if (control >= 0 && control < 50 && device < 8)
         *result = joystickButtons[device][control];
     else
@@ -74,7 +74,7 @@ void UnknownControlMapping::GetJoystickButton(int control, int* result, int devi
 }
 
 // 0x0043cc10
-void UnknownControlMapping::GetMouseButton(int control, int* result) {
+void ControlMapping::GetMouseButton(int control, int* result) {
     if (control >= 0 && control < 50)
         *result = mouseButtons[control];
     else
@@ -82,12 +82,12 @@ void UnknownControlMapping::GetMouseButton(int control, int* result) {
 }
 
 // 0x0043cc40
-UnknownControlBinding::UnknownControlBinding() {
+ControlBinding::ControlBinding() {
     Reset();
 }
 
 // 0x0043cc50
-UnknownControlBinding::UnknownControlBinding(float minimum, float maximum, float center,
+ControlBinding::ControlBinding(float minimum, float maximum, float center,
                                              int id, int axis, float deadZone) {
     Reset();
     minValue = minimum;
@@ -101,7 +101,7 @@ UnknownControlBinding::UnknownControlBinding(float minimum, float maximum, float
 }
 
 // 0x0043cca0
-void UnknownControlBinding::Reset() {
+void ControlBinding::Reset() {
     currentValue = 0;
     centerValue = 0;
     minValue = 0;
@@ -120,24 +120,24 @@ void UnknownControlBinding::Reset() {
 }
 
 // 0x0043cce0
-void UnknownControlBinding::SetKeys(int first, int second) {
+void ControlBinding::SetKeys(int first, int second) {
     firstKey = first;
     secondKey = second;
 }
 
 // 0x0043cd00
-UnknownControlBinding::~UnknownControlBinding() {
+ControlBinding::~ControlBinding() {
     Unbind();
 }
 
 // 0x0043cd10
-void UnknownControlBinding::Recenter() {
+void ControlBinding::Recenter() {
     currentValue = centerValue;
 }
 
 // 0x0043cd20: maps value/range onto [min, max]; inside the dead zone the
 // value snaps to the centre.
-void UnknownControlBinding::SetFromAxis(float value, float range) {
+void ControlBinding::SetFromAxis(float value, float range) {
     float mapped = (maxValue - minValue) * (value / range) + minValue;
     if (mapped < deadZoneHigh && mapped > deadZoneLow)
         mapped = centerValue;
@@ -145,13 +145,13 @@ void UnknownControlBinding::SetFromAxis(float value, float range) {
 }
 
 // 0x0043cd90
-void UnknownControlBinding::Adjust(float delta) {
+void ControlBinding::Adjust(float delta) {
     currentValue += delta;
     currentValue = BindingMin(BindingMax(currentValue, minValue), maxValue);
 }
 
 // 0x0043cde0: asks the owning device to drop bindings with this id.
-void UnknownControlBinding::Unbind() {
+void ControlBinding::Unbind() {
     if (g_TrackGame->controlInterface && owner)
         owner->RemoveBindings(bindingId);
 }
@@ -173,7 +173,7 @@ ControlInterface::ControlInterface() {
 ControlInterface::~ControlInterface() {}
 
 // 0x0043ce70
-int ControlInterface::SetMapping(UnknownControlMapping* newMapping) {
+int ControlInterface::SetMapping(ControlMapping* newMapping) {
     if (!newMapping)
         return 0;
     mapping = newMapping;
@@ -215,7 +215,7 @@ int ControlInterface::DispatchInput(int value) {
             joysticks[i]->Update(value);
     }
     for (int j = 0; j < queuedEventCount; j++) {
-        UnknownControlEvent* event = &events[j];
+        ControlEvent* event = &events[j];
         // Retail stores the null keyboard pointer itself as the modifier
         // state: the pointer is tested as the int that then receives the
         // state. `keyboard ? keyboard->modifierState : 0` and every other

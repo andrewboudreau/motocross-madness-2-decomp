@@ -55,7 +55,7 @@ struct UnknownReplayTapeHeader {
 
 // 0x004507a0: fills the result lists (by event type) when the page opens;
 // "ButViewReplay" plays the last race's tape.
-void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
+void SPRaceInfoDlg::HandleEvent(DialogEvent* event) {
     char position[128];
     char score[128];
     char points[128];

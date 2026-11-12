@@ -13,7 +13,7 @@
 
 class GameCursor;
 class TextureMapManager;
-struct UnknownControlBinding;
+struct ControlBinding;
 
 // The camera fields the pick ray reads (RenderTarget+0x08): the
 // camera-to-world rows of the matrix at +0xac, the position, the image
@@ -60,6 +60,6 @@ public:
     GameCursor* pickCursor;                   // +0x34  the caller's cursor or the bound cursor.tga GameCursor; PickAtCursor reads its CursorPosition
     int lastPickX;                            // +0x38 last picked x
     int lastPickY;                            // +0x3c last picked y
-    UnknownControlBinding* cursorBindingX;    // +0x40 cursor x binding
-    UnknownControlBinding* cursorBindingY;    // +0x44 cursor y binding
+    ControlBinding* cursorBindingX;    // +0x40 cursor x binding
+    ControlBinding* cursorBindingY;    // +0x44 cursor y binding
 };

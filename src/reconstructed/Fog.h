@@ -18,8 +18,8 @@
 
 #include "GameObject.h"
 
-struct UnknownControlEvent;
-struct UnknownInputEntry;
+struct ControlEvent;
+struct InputButtonState;
 
 class Fog : public GameObject {
 public:
@@ -30,7 +30,7 @@ public:
     virtual int Render3D();       // 0x00462850: backdrop and device fog
     // 0x00462c20: key 0x57 toggles "DriverInfo\<driver>\RenderFog", keys 0x21 / 0x22
     // move the fog in and out.
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);
 
     // 0x00462680 (ret 0x1c): slot 8 with `target`, the device fog mode, then the
     // colour, visibility and haziness. `farScale`, `nearScale` and `minimum` scale the

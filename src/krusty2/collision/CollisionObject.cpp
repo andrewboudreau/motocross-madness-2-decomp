@@ -645,7 +645,7 @@ void CollisionObject::SyncTransformFromNode()
 }
 
 // 0x00434970: debug-key handling for the collision-tree overlay, then the GameObject base.
-int CollisionObject::OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b)
+int CollisionObject::OnControlPress(ControlEvent* a, InputButtonState* b)
 {
     if (TestInputEvent(10, 0, a, 0x80)) {
         debugTreeDepth--;

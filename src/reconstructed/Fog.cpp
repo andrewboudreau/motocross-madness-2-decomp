@@ -187,7 +187,7 @@ failed:
 }
 
 // 0x00462c20
-int Fog::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry)
+int Fog::OnControlRelease(ControlEvent* event, InputButtonState* entry)
 {
     char name[256];
 

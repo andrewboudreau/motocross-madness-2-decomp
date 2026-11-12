@@ -9,10 +9,10 @@
 #include "../../src/reconstructed/EventManager.h"
 #include "../../src/reconstructed/DebugAlloc.h"
 #define CHECK(n,x) typedef char n[(x)?1:-1]
-CHECK(message_size,sizeof(UnknownMessage)==0x8c);
-CHECK(message_time,offsetof(UnknownMessage,showSeconds)==0x80);
-CHECK(message_age,offsetof(UnknownMessage,shownSeconds)==0x84);
-CHECK(message_next,offsetof(UnknownMessage,next)==0x88);
+CHECK(message_size,sizeof(TextQueueMessage)==0x8c);
+CHECK(message_time,offsetof(TextQueueMessage,showSeconds)==0x80);
+CHECK(message_age,offsetof(TextQueueMessage,shownSeconds)==0x84);
+CHECK(message_next,offsetof(TextQueueMessage,next)==0x88);
 CHECK(queue_size,sizeof(TextQueueOverlay)==0x58);
 CHECK(queue_head,offsetof(TextQueueOverlay,queueHead)==0x50);
 CHECK(owner_queue,offsetof(TrackGameViewOwner,textQueue)==0x6c);
@@ -37,7 +37,7 @@ static int Fault(EXCEPTION_POINTERS* p) {
     faultAddress=p->ExceptionRecord->ExceptionInformation[1];
     return EXCEPTION_EXECUTE_HANDLER;
 }
-static int Replace(TextQueueOverlay* queue,UnknownMessage* message) {
+static int Replace(TextQueueOverlay* queue,TextQueueMessage* message) {
     __try {queue->ReplaceHeadMessage(message);return 1;}
     __except(Fault(GetExceptionInformation())) {return 0;}
 }
@@ -55,9 +55,9 @@ static void TestConstructor() {
         ((DWORD*)e)[0x80/4]=durations[duration];((DWORD*)e)[0x84/4]=0;((DWORD*)e)[0x88/4]=0;
         // Invoke the actual constructor through a fixture helper using placement
         // new, so it receives precisely this guarded storage and float bit pattern.
-        extern UnknownMessage* ConstructMessage(void*,const char*,float);
-        UnknownMessage* answer=ConstructMessage(object+4,input,*(float*)&durations[duration]);
-        if(answer!=(UnknownMessage*)(object+4) || memcmp(object,expected,sizeof(object)) ||
+        extern TextQueueMessage* ConstructMessage(void*,const char*,float);
+        TextQueueMessage* answer=ConstructMessage(object+4,input,*(float*)&durations[duration]);
+        if(answer!=(TextQueueMessage*)(object+4) || memcmp(object,expected,sizeof(object)) ||
            memcmp(input,beforeInput,sizeof(input))) ExitProcess(1);
         checks++;
     }
@@ -67,9 +67,9 @@ static void TestReplace() {
     DWORD queueWords[sizeof(TextQueueOverlay)/4],expectedQueue[sizeof(TextQueueOverlay)/4];
     DWORD inputWords[35],headWords[35],tailWords[35],beforeInput[35],beforeHead[35],beforeTail[35];
     TextQueueOverlay* queue=(TextQueueOverlay*)queueWords;
-    UnknownMessage* input=(UnknownMessage*)inputWords;
-    UnknownMessage* head=(UnknownMessage*)headWords;
-    UnknownMessage* tail=(UnknownMessage*)tailWords;
+    TextQueueMessage* input=(TextQueueMessage*)inputWords;
+    TextQueueMessage* head=(TextQueueMessage*)headWords;
+    TextQueueMessage* tail=(TextQueueMessage*)tailWords;
     for(int seed=0;seed<64;seed++) for(int l=0;l<4;l++) for(int mode=0;mode<4;mode++) for(int fail=0;fail<2;fail++) {
         memset(queueWords,0x58,sizeof(queueWords));memset(pool,0xa6,sizeof(pool));
         memset(inputWords,0x21,sizeof(inputWords));memset(headWords,0x32,sizeof(headWords));memset(tailWords,0x43,sizeof(tailWords));
@@ -78,14 +78,14 @@ static void TestReplace() {
         input->shownSeconds=19;head->shownSeconds=29;tail->shownSeconds=39;
         input->next=tail;head->next=tail;tail->next=0;
         queue->queueHead=mode?head:0;
-        UnknownMessage* source=mode==2?head:mode==3?tail:input;
+        TextQueueMessage* source=mode==2?head:mode==3?tail:input;
         memcpy(expectedQueue,queueWords,sizeof(queueWords));memcpy(expectedPool,pool,sizeof(pool));
         memcpy(beforeInput,inputWords,sizeof(inputWords));memcpy(beforeHead,headWords,sizeof(headWords));memcpy(beforeTail,tailWords,sizeof(tailWords));
         allocations=releases=unwinds=0;released=0;allocationFails=fail;lastLine=0;faultCode=faultAddress=faultKind=0;
         if(!fail) {
-            UnknownMessage* e=(UnknownMessage*)(expectedPool+4);
+            TextQueueMessage* e=(TextQueueMessage*)(expectedPool+4);
             strcpy(e->line,source->line);e->showSeconds=source->showSeconds;e->shownSeconds=0;e->next=mode?tail:0;
-            ((TextQueueOverlay*)expectedQueue)->queueHead=(UnknownMessage*)(pool+4);
+            ((TextQueueOverlay*)expectedQueue)->queueHead=(TextQueueMessage*)(pool+4);
         }
         int answer=Replace(queue,source);
         if(answer!=(fail && mode?0:1) || allocations!=1 || lastLine!=(mode?1453:1451) || unwinds ||

@@ -34,7 +34,7 @@ static inline void UnknownSetText(UIControl* control, int id)
 }
 
 // 0x004d8fc0
-void PCBailoutDlg::HandleEvent(UnknownDialogEvent* event)
+void PCBailoutDlg::HandleEvent(DialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     UIControl* label;

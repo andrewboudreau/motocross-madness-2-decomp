@@ -134,7 +134,7 @@ int CompareRowNumbersDescending(const void* a, const void* b) {
 }
 
 // 0x0044b120
-int UseSelectedProfile(UnknownDialogEvent* event) {
+int UseSelectedProfile(DialogEvent* event) {
     UIListBox* list = static_cast<UIListBox*>(event->dialog->FindControl("LstProfiles", 0));
     short selection = list->GetSelectedRow();
     if (selection != -1) {
@@ -205,7 +205,7 @@ void MainDlg::ShowCurrentProfile() {
 }
 
 // 0x0044c930
-void SetStatsButtonResources(UnknownDialogEvent* event, int resource1, int resource2, int resource3,
+void SetStatsButtonResources(DialogEvent* event, int resource1, int resource2, int resource3,
                              int resource4) {
     UIControl* button;
     if (resource1) {
@@ -227,7 +227,7 @@ void SetStatsButtonResources(UnknownDialogEvent* event, int resource1, int resou
 }
 
 // 0x0044c9f0
-void SetStatsButtonTexts(UnknownDialogEvent* event, const char* text1, const char* text2, const char* text3,
+void SetStatsButtonTexts(DialogEvent* event, const char* text1, const char* text2, const char* text3,
                          const char* text4) {
     UIControl* button;
     if (text1) {
@@ -249,7 +249,7 @@ void SetStatsButtonTexts(UnknownDialogEvent* event, const char* text1, const cha
 }
 
 // 0x0044ca80
-void ClearStatsLists(UnknownDialogEvent* event) {
+void ClearStatsLists(DialogEvent* event) {
     static_cast<UIListBox*>(event->dialog->FindControl("LstStats1", 0))->RemoveAllRows();
     static_cast<UIListBox*>(event->dialog->FindControl("LstStats2", 0))->RemoveAllRows();
     static_cast<UIListBox*>(event->dialog->FindControl("LstStats3", 0))->RemoveAllRows();
@@ -257,7 +257,7 @@ void ClearStatsLists(UnknownDialogEvent* event) {
 }
 
 // 0x0044cae0
-void AddStatsRows(UnknownDialogEvent* event, const char* row1, const char* row2, const char* row3,
+void AddStatsRows(DialogEvent* event, const char* row1, const char* row2, const char* row3,
                   const char* row4) {
     UIListBox* list;
     if (row1) {
@@ -279,7 +279,7 @@ void AddStatsRows(UnknownDialogEvent* event, const char* row1, const char* row2,
 }
 
 // 0x0044cb80
-void ChooseTCPMethodDlg::HandleEvent(UnknownDialogEvent* event) {
+void ChooseTCPMethodDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         UIControl* control = FindControl("ButLeft", 1);
@@ -311,7 +311,7 @@ void ChooseTCPMethodDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x0044ccf0
-void NewbieDlg::HandleEvent(UnknownDialogEvent* event) {
+void NewbieDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         UIControl* control = FindControl("ButLeft", 1);
@@ -338,7 +338,7 @@ void NewbieDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x0044ce10
-void NoDelCurProfileDlg::HandleEvent(UnknownDialogEvent* event) {
+void NoDelCurProfileDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         UIControl* control = FindControl("ButLeft", 1);
@@ -363,7 +363,7 @@ void NoDelCurProfileDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x0044cf20
-void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
+void SinglePlayerDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         eventPage = 0;
@@ -551,7 +551,7 @@ void SinglePlayerDlg::OpenPage(int page) {
 }
 
 // 0x0044d950
-void SPEventDlg::HandleEvent(UnknownDialogEvent* event) {
+void SPEventDlg::HandleEvent(DialogEvent* event) {
     char text[128];
     switch (event->kind) {
     case kDialogInit: {
@@ -958,7 +958,7 @@ void SPEventDlg::ForgetGhosts() {
 }
 
 // 0x0044ef70
-void SPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
+void SPBikeRiderDlg::HandleEvent(DialogEvent* event) {
     char plate[12];
     char typed[12];
     switch (event->kind) {
@@ -1130,7 +1130,7 @@ void SPBikeRiderDlg::PaintPlateNumber(int number) {
 
 // 0x0044fa00: a click inside the bike preview (inset by 50 and 30 pixels)
 // starts dragging it and turns automatic rotation off.
-int SPBikeRiderDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int SPBikeRiderDlg::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (event->kind == 1 && event->control == 0) {
         CameraRect area = previewArea;
         area.left += 50;
@@ -1147,7 +1147,7 @@ int SPBikeRiderDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry
 }
 
 // 0x0044fab0
-int SPBikeRiderDlg::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int SPBikeRiderDlg::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
     if (event->kind == 1 && event->control == 0)
         previewDragging = 0;
     return UIDialog::OnControlRelease(event, entry);
@@ -1318,7 +1318,7 @@ LoadBajaDlg::LoadBajaDlg(int flags) : LoadingDlg(flags) {
 }
 
 // 0x00451020
-void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
+void LoadingDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogTimer:
         if (g_TrackGame->network) {
@@ -1410,7 +1410,7 @@ void FormatDecimal(int value, char* text) {
 }
 
 // 0x00451b80
-void CreateProfile(UnknownDialogEvent* event) {
+void CreateProfile(DialogEvent* event) {
     char name[128];
     char preset[260];
     char control[260];
@@ -1471,7 +1471,7 @@ void CreateProfile(UnknownDialogEvent* event) {
 }
 
 // 0x00451ff0
-void UserNameDlg::HandleEvent(UnknownDialogEvent* event) {
+void UserNameDlg::HandleEvent(DialogEvent* event) {
     char playerName[16];
     char text[128];
     switch (event->kind) {
@@ -1541,7 +1541,7 @@ void UserNameDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x00452370
-void ProfileExistsDlg::HandleEvent(UnknownDialogEvent* event) {
+void ProfileExistsDlg::HandleEvent(DialogEvent* event) {
     char label[128];
     char text[256];
     switch (event->kind) {
@@ -1576,7 +1576,7 @@ void ProfileExistsDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x004524f0
-void RemoveProfileDlg::HandleEvent(UnknownDialogEvent* event) {
+void RemoveProfileDlg::HandleEvent(DialogEvent* event) {
     char text[128];
     switch (event->kind) {
     case 11:
@@ -1613,7 +1613,7 @@ void RemoveProfileDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x004526b0
-void HandleMenuCancel(int menu, UnknownDialogEvent* event) {
+void HandleMenuCancel(int menu, DialogEvent* event) {
     switch (menu) {
     case 0xc9:
         g_TrackGame->ui->OpenMenu(kMenuOptions);
@@ -1701,7 +1701,7 @@ void HandleMenuCancel(int menu, UnknownDialogEvent* event) {
 }
 
 // 0x00452930
-void HandleMenuOk(int menu, UnknownDialogEvent* event) {
+void HandleMenuOk(int menu, DialogEvent* event) {
     void* address;
     unsigned long size;
     char text[128];
@@ -1844,7 +1844,7 @@ void HandleMenuOk(int menu, UnknownDialogEvent* event) {
 }
 
 // 0x00453090
-void HandleMenuMiddle(int menu, UnknownDialogEvent* event) {
+void HandleMenuMiddle(int menu, DialogEvent* event) {
     switch (menu) {
     case kMenuWaitOrCall:
         event->dialog->EndDialog(0xe);
@@ -1887,7 +1887,7 @@ void HandleMenuMiddle(int menu, UnknownDialogEvent* event) {
 }
 
 // 0x00453170
-void CreditsVidDlg::HandleEvent(UnknownDialogEvent* event) {
+void CreditsVidDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->shuttingDown)
@@ -1915,7 +1915,7 @@ void CreditsVidDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x004532c0
-void Intro1Dlg::HandleEvent(UnknownDialogEvent* event) {
+void Intro1Dlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->shuttingDown) {
@@ -1941,12 +1941,12 @@ int Intro1Dlg::Tick(float frameTime) {
 }
 
 // 0x00453420
-int Intro1Dlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int Intro1Dlg::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     return g_IntroSkipped = 1;
 }
 
 // 0x00453430
-void Intro2Dlg::HandleEvent(UnknownDialogEvent* event) {
+void Intro2Dlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->shuttingDown) {
@@ -1980,14 +1980,14 @@ int Intro2Dlg::Tick(float frameTime) {
 }
 
 // 0x004535f0
-int Intro2Dlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int Intro2Dlg::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (frameRan == 1)
         g_IntroSkipped = 1;
     return 1;
 }
 
 // 0x00453610
-void Intro3Dlg::HandleEvent(UnknownDialogEvent* event) {
+void Intro3Dlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->shuttingDown) {
@@ -2013,7 +2013,7 @@ int Intro3Dlg::Tick(float frameTime) {
 }
 
 // 0x004536c0
-int Intro3Dlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int Intro3Dlg::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (frameRan == 1)
         g_IntroSkipped = 1;
     return 1;
@@ -2087,7 +2087,7 @@ void LeaveMenusForRace() {
 }
 
 // 0x00453b20
-void GhostReplayDlg::HandleEvent(UnknownDialogEvent* event) {
+void GhostReplayDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         ghostPage = 0;
@@ -2166,7 +2166,7 @@ void GhostReplayDlg::OpenPage(int page) {
 }
 
 // 0x00454030
-void GhostFilesDlg::HandleEvent(UnknownDialogEvent* event) {
+void GhostFilesDlg::HandleEvent(DialogEvent* event) {
     char text[256];
     switch (event->kind) {
     case kDialogInit:
@@ -2321,7 +2321,7 @@ void GhostFilesDlg::RaceSelectedGhost() {
 }
 
 // 0x00454a50
-void ReplayFilesDlg::HandleEvent(UnknownDialogEvent* event) {
+void ReplayFilesDlg::HandleEvent(DialogEvent* event) {
     char text[256];
     switch (event->kind) {
     case kDialogInit:
@@ -2502,7 +2502,7 @@ void ReplayFilesDlg::PlaySelectedReplay() {
 }
 
 // 0x004555b0
-void ChoiceDlg::HandleEvent(UnknownDialogEvent* event) {
+void ChoiceDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("ButLeft", event->controlName))
@@ -2562,7 +2562,7 @@ void ChoiceDlg::SetTextsOrResources(const char* title, int titleId, const char* 
 }
 
 // 0x00455840
-void EditBoxDlg::HandleEvent(UnknownDialogEvent* event) {
+void EditBoxDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogInit:
         editBuffer = 0;
@@ -2604,7 +2604,7 @@ void EditBoxDlg::EditWithResources(const char* title, int titleId, const char* p
 }
 
 // 0x00455a10
-void DemoDlg::HandleEvent(UnknownDialogEvent* event) {
+void DemoDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->shuttingDown) {
@@ -2627,7 +2627,7 @@ void DemoDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x00455ae0
-int DemoDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int DemoDlg::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
     if (view && view->isRacing)
         EndDialog(0);
@@ -2646,7 +2646,7 @@ int DemoDlg::Tick(float frameTime) {
 }
 
 // 0x00455b60
-void TransDlg::HandleEvent(UnknownDialogEvent* event) {
+void TransDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->shuttingDown) {
@@ -2680,7 +2680,7 @@ void TransDlg::SetNextMenu(int menu) {
 }
 
 // 0x00455c50
-void Exit1Dlg::HandleEvent(UnknownDialogEvent* event) {
+void Exit1Dlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->shuttingDown)
@@ -2714,7 +2714,7 @@ int Exit1Dlg::Tick(float frameTime) {
 }
 
 // 0x00455d70
-int Exit1Dlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int Exit1Dlg::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (frameRan == 1 && !event->kind)
         closeRequested = 1;
     return UIDialog::OnControlPress(event, entry);

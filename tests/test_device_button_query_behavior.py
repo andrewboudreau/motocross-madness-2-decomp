@@ -95,15 +95,15 @@ class DeviceButtonQueryTests(unittest.TestCase):
             providers=[('PCKeyboardDevice','ActualKeyboard',0x4c4570,110),
                        ('PCMouseDevice','ActualMouse',0x4c4a90,125),('JoystickDevice','ActualJoystick',0x489980,145)]
             for owner,actual,_,_ in providers:
-                helper_source+=f'class {actual}:public {owner} {{public:int Query(int,int,UnknownInputEntry*);}};\n'
+                helper_source+=f'class {actual}:public {owner} {{public:int Query(int,int,InputButtonState*);}};\n'
                 text=(ROOT/f'src/reconstructed/{owner}.cpp').read_text()
                 helper_source+=extract(text,f'int {owner}::IsButtonDown(').replace(f'{owner}::IsButtonDown',f'{actual}::Query')+'\n'
             helper_source+=extract((ROOT/'src/reconstructed/KeyboardDevice.cpp').read_text(),'int KeyboardDevice::ModifierHolds(')+'\n'
             helper_file.write_text(helper_source)
             helper_path,helper=compile_source(helper_file,'helpers')
             for owner,actual,va,size in providers:
-                name=f'?IsButtonDown@{owner}@@UAEHHHPAUUnknownInputEntry@@@Z'
-                actual_name=f'?Query@{actual}@@QAEHHHPAUUnknownInputEntry@@@Z'
+                name=f'?IsButtonDown@{owner}@@UAEHHHPAUInputButtonState@@@Z'
+                actual_name=f'?Query@{actual}@@QAEHHHPAUInputButtonState@@@Z'
                 _,canonical=compile_source(ROOT/f'src/reconstructed/{owner}.cpp',owner)
                 vtable=canonical.find_symbol('??_7'+owner+'@@6B@')
                 slot=2 if owner=='JoystickDevice' else 5

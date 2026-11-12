@@ -35,13 +35,13 @@ PROVIDERS = {
 # with ONLY that required UIDialog* correction, before changing race calls.
 # They are not a claim that the unmodified old aggregate compiled.
 PARTIAL = (
-    ('?HandleEvent@MainDlg@@UAEXPAUUnknownDialogEvent@@@Z', 0x44b200, 5232, 5292, 962,
+    ('?HandleEvent@MainDlg@@UAEXPAUDialogEvent@@@Z', 0x44b200, 5232, 5292, 962,
      '4f2334f0bd2edbfafdf8407310fa2ce13d0bb565421560f8fd89870f0ad5f509'),
     ('?Tick@SPBikeRiderDlg@@UAEHM@Z', 0x44fae0, 1235, 1235, 1181,
      '029e1fc3e324db9c22cefe24cd69e7331f5b04d4f90ea443f4fb607d6d10edc7'),
-    ('?HandleEvent@SPRaceInfoDlg@@UAEXPAUUnknownDialogEvent@@@Z', 0x4507a0, 1652, 1652, 589,
+    ('?HandleEvent@SPRaceInfoDlg@@UAEXPAUDialogEvent@@@Z', 0x4507a0, 1652, 1652, 589,
      'febd987a86806c1f4273fcf7ecee9ac54bd1b30f8702a3b5052c685f7ba21745'),
-    ('?HandleEvent@MPRaceInfoDlg@@UAEXPAUUnknownDialogEvent@@@Z', 0x4513a0, 2004, 2004, 595,
+    ('?HandleEvent@MPRaceInfoDlg@@UAEXPAUDialogEvent@@@Z', 0x4513a0, 2004, 2004, 595,
      'f3657ad6a9b0e4f2b3eb5cc2e1e6142e27325af8b7f4f7f342c906df043dcfe6'),
 )
 

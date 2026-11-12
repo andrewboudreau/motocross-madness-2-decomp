@@ -15,19 +15,19 @@ public:
     virtual void RemoveBindings(int id); // 0x0048a4c0
     virtual int CreateDevice() = 0;
     virtual void DetectSubtype() = 0;
-    virtual int IsControlDown(int control, int modifier, UnknownInputEntry* entry) = 0;
-    virtual int IsButtonDown(int button, int modifier, UnknownInputEntry* entry) = 0;
+    virtual int IsControlDown(int control, int modifier, InputButtonState* entry) = 0;
+    virtual int IsButtonDown(int button, int modifier, InputButtonState* entry) = 0;
     virtual int Update(int value) = 0;
 
     // 0x0048a550: moves every binding on `axis` by `amount` scaled to its
     // maximum.
     void MoveAxis(int axis, float amount);
     // 0x0048a420: attaches `binding` to the list for its axis (GUIManager.cpp).
-    int AttachBinding(UnknownControlBinding* binding);
+    int AttachBinding(ControlBinding* binding);
 
     friend class ControlInterface; // reads the input entries
 
 protected:
-    UnknownInputEntry buttonStates[4];
-    ContainerList<UnknownControlBinding*> axisBindings[2]; // bindings per axis
+    InputButtonState buttonStates[4];
+    ContainerList<ControlBinding*> axisBindings[2]; // bindings per axis
 };

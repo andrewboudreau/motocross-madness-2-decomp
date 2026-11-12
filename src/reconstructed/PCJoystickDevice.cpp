@@ -156,7 +156,7 @@ int __stdcall PCJoystickDevice::EnumAxisObjectsCallback(const UnknownObjectInsta
 // stepping the bindings down and above 49152 stepping them up.
 void PCJoystickDevice::UpdateAxisRepeat(int axis, int value) {
     for (int i = 0; i < axisBindings[axis].m_count; i++) {
-        UnknownControlBinding* binding = axisBindings[axis].Get(i);
+        ControlBinding* binding = axisBindings[axis].Get(i);
         binding->secondKeyTimer += g_TrackGame->frameTime;
         binding->firstKeyTimer += g_TrackGame->frameTime;
         if (axisValues[axis] < 16384.0f) {

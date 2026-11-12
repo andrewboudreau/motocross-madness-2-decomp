@@ -179,7 +179,7 @@ public:
     virtual int PrepareGeometry();            // 0x0052ef50 (secondary vtable)
     virtual int Render3D();    // 0x0052e3b0
     virtual int RenderPost3D();               // 0x0052f050
-    virtual int OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b);            // 0x0052eec0
+    virtual int OnControlPress(ControlEvent* a, InputButtonState* b);            // 0x0052eec0
 };
 
 #endif

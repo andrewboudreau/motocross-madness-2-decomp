@@ -101,7 +101,7 @@ int VisibilityQuadTree::RenderPost3D()
     return 1;
 }
 
-int VisibilityQuadTree::OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b)
+int VisibilityQuadTree::OnControlPress(ControlEvent* a, InputButtonState* b)
 {
     if (TestInputEvent(0x44, 0, a, 0x80)) {
         g_visibilityDebugDraw = 1 - g_visibilityDebugDraw;

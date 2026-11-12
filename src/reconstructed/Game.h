@@ -10,8 +10,8 @@ class ControlInterface;
 class DebugOverlay;
 class SoundInterface;
 class TextureMapManager;
-struct UnknownControlEvent;
-struct UnknownInputEntry;
+struct ControlEvent;
+struct InputButtonState;
 
 // Global at 0x0056c470: initialised .data pointing at the HiResMeter
 // 0x0067b468 (GUIManager.h; g_HiResMeterInstance). Game's initialiser adds
@@ -58,8 +58,8 @@ public:
     virtual int Tick();                       // 0x004685d0; functional QPC candidate in samples/game
     virtual int SetInputSuspended(int value);                                             // 0x004688a0
     virtual int UnknownVirtualSlot12(int value);                                          // 0x004688e0
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x00468900
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00468930
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);     // 0x00468900
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x00468930
     virtual int Shutdown();                   // 0x00468a30: shutdown
     virtual int CreateNetworkInterface(int value); // 0x00468ae0: news the NetworkInterface into +0x08
     // 0x00468ba0: network messages; NetworkInterface 0x004aced0 passes a

@@ -37,7 +37,7 @@ static inline UIListBox* UnknownDropDownList(UIControl* dropDown)
 
 
 // 0x004b2000
-void OptGameSettingsDlg::HandleEvent(UnknownDialogEvent* event)
+void OptGameSettingsDlg::HandleEvent(DialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit: {
@@ -119,7 +119,7 @@ void OptGameSettingsDlg::SyncValues(int save)
 }
 
 // 0x004b23b0
-void OptGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
+void OptGraphicsDlg::HandleEvent(DialogEvent* event)
 {
     char text[128];
     switch (event->kind) {
@@ -194,7 +194,7 @@ void OptGraphicsDlg::SyncValues(int save)
 }
 
 // 0x004b26c0
-void OptAdvancedGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
+void OptAdvancedGraphicsDlg::HandleEvent(DialogEvent* event)
 {
     int* settings = g_TrackGame->mode.videoSettings;
     char key[1024];
@@ -269,7 +269,7 @@ void OptAdvancedGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
 }
 
 // 0x004b2b20
-void OptSoundDlg::HandleEvent(UnknownDialogEvent* event)
+void OptSoundDlg::HandleEvent(DialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit:
@@ -331,7 +331,7 @@ void OptSoundDlg::ApplySoundSettings()
 
 
 // 0x004b2e00
-void OptControlsDlg::HandleEvent(UnknownDialogEvent* event)
+void OptControlsDlg::HandleEvent(DialogEvent* event)
 {
     char text[128];
     char path[260];
@@ -497,7 +497,7 @@ int GetInputText(int row, int kind, int code, char* text)
 }
 
 // 0x004b55d0
-int OptControlsDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry)
+int OptControlsDlg::OnControlPress(ControlEvent* event, InputButtonState* entry)
 {
     if (!waitingForInput)
         return GameObject::OnControlPress(event, entry);
@@ -505,7 +505,7 @@ int OptControlsDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry
 }
 
 // 0x004b5600
-int OptControlsDlg::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry)
+int OptControlsDlg::OnControlRelease(ControlEvent* event, InputButtonState* entry)
 {
     int other;
     char text[128];
@@ -621,7 +621,7 @@ void OptControlsDlg::EndInputWait()
 }
 
 // 0x004b40a0
-void OptMessagesDlg::HandleEvent(UnknownDialogEvent* event)
+void OptMessagesDlg::HandleEvent(DialogEvent* event)
 {
     if (event->kind == kDialogInit) {
         static_cast<UIEditBox*>(FindControl("Message1", 11))->BindTextBuffer(g_EditedMessages[1], 128);
@@ -674,7 +674,7 @@ static inline char (*UnknownMessagesOf(TrackGame* game))[128]
 }
 
 // 0x004b4280
-void OptionsDlg::HandleEvent(UnknownDialogEvent* event)
+void OptionsDlg::HandleEvent(DialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit: {
@@ -910,7 +910,7 @@ void OptionsDlg::OpenPage(int page)
 extern "C" __declspec(dllimport) int __stdcall CopyFileA(const char* from, const char* to, int failIfExists);
 
 // 0x004b4e70
-void GlobalSettingsDlg::HandleEvent(UnknownDialogEvent* event)
+void GlobalSettingsDlg::HandleEvent(DialogEvent* event)
 {
     switch (event->kind) {
     case 9:
@@ -995,7 +995,7 @@ void GlobalSettingsDlg::ListOtherProfiles()
 }
 
 // 0x004b5380
-void ConfirmRestoreDlg::HandleEvent(UnknownDialogEvent* event)
+void ConfirmRestoreDlg::HandleEvent(DialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit: {
@@ -1025,7 +1025,7 @@ void ConfirmRestoreDlg::HandleEvent(UnknownDialogEvent* event)
 }
 
 // 0x004b3500
-void OptGarageDlg::HandleEvent(UnknownDialogEvent* event)
+void OptGarageDlg::HandleEvent(DialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit: {

@@ -391,7 +391,7 @@
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?OnControlPress@EcoSystem@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+      "symbol": "?OnControlPress@EcoSystem@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
       "va": "0x0045bfe0",
       "size": 84
     },

@@ -1,7 +1,7 @@
 #pragma once
 
-struct UnknownControlEvent;
-struct UnknownInputEntry;
+struct ControlEvent;
+struct InputButtonState;
 
 #include "BaseObject.h"
 
@@ -68,8 +68,8 @@ public:
     virtual int OnChar(int value);
     virtual int OnKeyDown(int value);
     // Input events from Game slots 13 and 14, passed down the children.
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);
     // Network messages (Game slot 17 forwards NetworkInterface 0x004aced0's).
     virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);
     virtual int AttachRenderContext(void* context);

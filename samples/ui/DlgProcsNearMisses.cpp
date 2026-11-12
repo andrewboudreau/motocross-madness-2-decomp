@@ -109,7 +109,7 @@
 #include "../../src/reconstructed/DlgProcs.cpp"
 
 // 0x0044b200
-void MainDlg::HandleEvent(UnknownDialogEvent* event) {
+void MainDlg::HandleEvent(DialogEvent* event) {
     char name[16];
     char path[260];
     int count;
@@ -484,7 +484,7 @@ struct UnknownReplayTapeHeader {
 
 // 0x004507a0: fills the result lists (by event type) when the page opens;
 // "ButViewReplay" plays the last race's tape.
-void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
+void SPRaceInfoDlg::HandleEvent(DialogEvent* event) {
     char position[128];
     char score[128];
     char points[128];
@@ -606,7 +606,7 @@ void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x004513a0: fills the result lists (by event type) when the page opens.
-void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
+void MPRaceInfoDlg::HandleEvent(DialogEvent* event) {
     char position[128];
     char score[128];
     char points[128];

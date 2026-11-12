@@ -330,7 +330,7 @@ int Camera::OnActivate() {
 
 // 0x0042f090: only when no child handled the GameObject search does it
 // consult 0x0043caa0; a nonzero answer runs slot 27.
-int Camera::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int Camera::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (!GameObject::OnControlPress(event, entry)) {
         if (TestInputEvent(0xB7, 0, event, 0x80000000)) {
             TakeScreenshot();

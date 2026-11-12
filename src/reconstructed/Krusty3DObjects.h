@@ -26,8 +26,8 @@
 // same function).
 float FastSqrt(float value);
 
-struct UnknownControlEvent;
-struct UnknownInputEntry;
+struct ControlEvent;
+struct InputButtonState;
 
 // A racer as VisualCue sees it (the objects 0x004204e0 returns; RaceView.h's
 // UnknownEventRacer): a vfptr at +0, GameObject reached through the vbptr at
@@ -161,7 +161,7 @@ public:
     explicit VisualCue(int flags);             // 0x0048ad60
     virtual int Tick(float frameTime);                 // 0x0048b100
     virtual int Render3D();        // 0x0048bc10
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x0048afa0
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x0048afa0
 
     // 0x0048adf0 (ret 0x34): loads "viscue.slt"; returns this, or 0.
     VisualCue* LoadVisualCue(void* context, int lights, int options, UnknownRunwayTerrain* terrain,

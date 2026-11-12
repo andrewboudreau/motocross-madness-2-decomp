@@ -281,7 +281,7 @@ public:
     virtual int Tick(float dt);                     // 0x004dafc0
     virtual int PrepareGeometry();                  // 0x004db000
     virtual int RenderPre3D();                      // 0x004dc410
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);  // 0x004dc4c0: returns 0
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);  // 0x004dc4c0: returns 0
 
     ProjectedShadow* Init(ShadowRenderTarget* target, void* textureOwner);  // 0x004da7b0
     ShadowRenderTarget* Host() const { return (ShadowRenderTarget*)renderContext; }  // GameObject::renderContext set by Init

@@ -18,7 +18,7 @@ import random
 from tools.emu_cases.kb_simulate_frame import install_seh_segment
 
 RETAIL_VA = 0x00451020
-SYMBOL = '?HandleEvent@LoadingDlg@@UAEXPAUUnknownDialogEvent@@@Z'
+SYMBOL = '?HandleEvent@LoadingDlg@@UAEXPAUDialogEvent@@@Z'
 SOURCE = 'src/reconstructed/DlgProcs.cpp'
 FPCWS = (0x027f,)
 TRACK_GAME, TICKS = 0x0056e26c, 0x0059adfc

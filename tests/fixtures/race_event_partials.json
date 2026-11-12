@@ -51,7 +51,7 @@
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",
-      "?OnControlPress@BikeRace@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+      "?OnControlPress@BikeRace@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
       2644,
       "c3a7afae1982a40a0177b2f8dedf8052c04748c8195acbc1e38be70d078b0a38"
     ],
@@ -105,7 +105,7 @@
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
-      "?CreateProfile@@YAXPAUUnknownDialogEvent@@@Z",
+      "?CreateProfile@@YAXPAUDialogEvent@@@Z",
       1130,
       "06cbf92f95f76e3109412b9183f5d045957f30ea0784e10e9078999faadb1f17"
     ],
@@ -117,7 +117,7 @@
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
-      "?HandleEvent@MainDlg@@UAEXPAUUnknownDialogEvent@@@Z",
+      "?HandleEvent@MainDlg@@UAEXPAUDialogEvent@@@Z",
       5292,
       "8bd0a24e6e373073f822a04a905e972bd8986812f3ebcdeccb358c9f5c5edbb4"
     ],
@@ -129,13 +129,13 @@
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
-      "?HandleEvent@SPRaceInfoDlg@@UAEXPAUUnknownDialogEvent@@@Z",
+      "?HandleEvent@SPRaceInfoDlg@@UAEXPAUDialogEvent@@@Z",
       1652,
       "631722bee7b25ac5e38fa67d9d9e63bb94265402a5151d138e0fe285b454c7ed"
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
-      "?HandleEvent@MPRaceInfoDlg@@UAEXPAUUnknownDialogEvent@@@Z",
+      "?HandleEvent@MPRaceInfoDlg@@UAEXPAUDialogEvent@@@Z",
       2004,
       "60e8b7061e1b67b637184034d1431c1162e7ecfe95c3d360a8e0e4e63c32eaaf"
     ],

@@ -221,7 +221,7 @@ int EventManager::HasRaceMode() {
 }
 
 // 0x0045f3a0
-int EventManager::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int EventManager::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
     if (GameObject::OnControlRelease(event, entry))
         return 1;
     if (g_TrackGame->uiInteractionBlocked && !g_TrackGame->network &&
@@ -238,7 +238,7 @@ int EventManager::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry
 }
 
 // 0x0045f440
-int EventManager::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int EventManager::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (GameObject::OnControlPress(event, entry))
         return 1;
     if (g_TrackGame->uiInteractionBlocked)
@@ -474,7 +474,7 @@ int EventManager::OnNetworkMessage(int type, void* data, int from, int to, int f
                 g_TrackGame->LoadResourceString(0x13d7, text, sizeof(text));
                 if (g_TrackGame->network->GetPlayerName(message->player, name)) {
                     sprintf(line, "%s %s", name, text);
-                    UnknownMessage notice(line, 3.25f);
+                    TextQueueMessage notice(line, 3.25f);
                     target->ReplaceHeadMessage(&notice);
                 }
             }
@@ -498,7 +498,7 @@ int EventManager::OnNetworkMessage(int type, void* data, int from, int to, int f
                     TextQueueOverlay* target = FindTextQueue();
                     if (target) {
                         g_TrackGame->LoadResourceString(0x13d1, line, 128); // capped like `text`
-                        UnknownMessage notice(line, 3.25f);
+                        TextQueueMessage notice(line, 3.25f);
                         target->ReplaceHeadMessage(&notice);
                     }
                 } else {

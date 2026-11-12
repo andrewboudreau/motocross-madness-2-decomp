@@ -19,7 +19,7 @@ import random
 from tools.emu_cases.kb_simulate_frame import install_seh_segment
 
 RETAIL_VA = 0x004d8fc0
-SYMBOL = '?HandleEvent@PCBailoutDlg@@UAEXPAUUnknownDialogEvent@@@Z'
+SYMBOL = '?HandleEvent@PCBailoutDlg@@UAEXPAUDialogEvent@@@Z'
 SOURCE = 'src/bringup/Group5_PCBailoutDlg.cpp'
 TRACK_GAME = 0x0056e26c
 FIND_CONTROL, SPRINTF, STRICMP, NEW = 0x0046ebf0, 0x00534aaf, 0x00536070, 0x004a3010

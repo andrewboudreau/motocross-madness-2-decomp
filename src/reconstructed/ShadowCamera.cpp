@@ -14,6 +14,6 @@ int ShadowCamera::UnknownVirtualSlot19(int) {
 }
 
 // 0x004da560
-int ShadowCamera::OnControlRelease(UnknownControlEvent*, UnknownInputEntry*) {
+int ShadowCamera::OnControlRelease(ControlEvent*, InputButtonState*) {
     return 0;
 }

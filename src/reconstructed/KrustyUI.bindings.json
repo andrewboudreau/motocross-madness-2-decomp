@@ -156,7 +156,7 @@
   "?GetSelectedSeries@TrackGameMode@@QAEHXZ": "0x00524100",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "?OnActivate@GameObject@@UAEHXZ": "0x004694d0",
-  "?OnControlPress@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x004695d0",
+  "?OnControlPress@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z": "0x004695d0",
   "?OnNetworkMessage@GameObject@@UAEHHPAXHHH@Z": "0x00469620",
   "?AttachRenderContext@GameObject@@UAEHPAX@Z": "0x00469720",
   "?Disable@GameObject@@UAEXXZ": "0x004690a0",

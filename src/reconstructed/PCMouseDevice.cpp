@@ -51,7 +51,7 @@ void PCMouseDevice::DetectSubtype() {
 
 // 0x004c4a90: whether `button` is down (with `modifier` held, when there is
 // a keyboard); copies its entry.
-int PCMouseDevice::IsButtonDown(int button, int modifier, UnknownInputEntry* entry) {
+int PCMouseDevice::IsButtonDown(int button, int modifier, InputButtonState* entry) {
     KeyboardDevice* keyboard = g_TrackGame->controlInterface->keyboard;
     if ((!keyboard || keyboard->ModifierHolds(modifier)) &&
         buttonStates[button].state == 1) {
@@ -71,7 +71,7 @@ int PCMouseDevice::IsButtonDown(int button, int modifier, UnknownInputEntry* ent
 // -14 and -15 a double click of buttons 0 and 1 (presses under 175 apart),
 // and -16 to -19 a direction while button 0 is down; others go through the
 // mapping table to slot 5.
-int PCMouseDevice::IsControlDown(int control, int modifier, UnknownInputEntry* entry) {
+int PCMouseDevice::IsControlDown(int control, int modifier, InputButtonState* entry) {
     if (control < 0) {
         switch (control) {
         case -2:
@@ -121,7 +121,7 @@ int PCMouseDevice::IsControlDown(int control, int modifier, UnknownInputEntry* e
         }
         return 0;
     }
-    UnknownControlMapping* mapping = g_TrackGame->controlInterface->mapping;
+    ControlMapping* mapping = g_TrackGame->controlInterface->mapping;
     if (!mapping)
         return 0;
     mapping->GetMouseButton(control, &control);

@@ -396,7 +396,7 @@ public:
     int mipFilter;                            // +0x554  PCGame mipFilter
 };
 unsigned int ReadClock();                     // 0x004bfa80
-int TestInputEvent(int control, int kind, const UnknownControlEvent* event, int modifier); // 0x0043caa0
+int TestInputEvent(int control, int kind, const ControlEvent* event, int modifier); // 0x0043caa0
 
 // A detail band (0x20 bytes) of the two tables 0x0056a600 / 0x0056a740.
 struct UnknownEcoDetailBand {
@@ -419,7 +419,7 @@ public:
     // 0x0045b060 (3967 bytes, one function; 0x0045b136 is not a start):
     // draws the geometry list, then the billboards 120 at a time.
     virtual int Render3D();
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x0045bfe0
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x0045bfe0
 
     // 0x00457480: reads the .est file (or a .esb through 0x00458f70);
     // `path` is rewritten to the .esb name when one exists.

@@ -13,8 +13,8 @@ public:
     virtual int CreateDevice();
     // Slot 3 is the shared empty body at 0x00464e90 (see samples/pccontrol).
     virtual void DetectSubtype() {}
-    virtual int IsControlDown(int control, int modifier, UnknownInputEntry* entry);
-    virtual int IsButtonDown(int key, int modifier, UnknownInputEntry* entry);
+    virtual int IsControlDown(int control, int modifier, InputButtonState* entry);
+    virtual int IsButtonDown(int key, int modifier, InputButtonState* entry);
     virtual int Update(int value);
 
     // 0x004c4830: rebuilds the modifier state at +0x16d8 from the keys.

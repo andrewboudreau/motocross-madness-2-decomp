@@ -4,7 +4,7 @@ The literal `__FILE__` `D:\aardvark\VC\krusty2\TrackOverlay.cpp`
 (`0x00575290`) is referenced from `0x0051b550`..`0x0051d850` and from the
 unwind funclets at `0x0054ecbe`..`0x0054ed5d`. The reconstructed source is
 `src/reconstructed/TrackOverlay.h`, `TrackOverlay.cpp` and
-`TrackOverlay.bindings.json`. TextQueueOverlay and UnknownMessage are
+`TrackOverlay.bindings.json`. TextQueueOverlay and TextQueueMessage are
 declared in `RaceView.h`, and the Overlay base is in `Overlay.h` and
 `OverlayRect.h`. Class names come from RTTI. Every member and function name
 is provisional.
@@ -75,7 +75,7 @@ compiled layouts and imports against the real provider object.
   lfItalic and lfHeight after the other fields and the source rectangle's
   top/bottom before left/right; the source writes them in that order.
 - DropTextOverlay: `0x0051ae80`..`0x0051b1f0`, 5 functions.
-- UnknownMessage and TextQueueOverlay: `0x0051b200`..`0x0051b670`, 11
+- TextQueueMessage and TextQueueOverlay: `0x0051b200`..`0x0051b670`, 11
   functions.
 - RadarOverlay: `0x0051b690`..`0x0051c460`, 12 functions, among them the
   zoom keys (slot 23, `0x0051bb60`): the dead `largeMap` test stays only with

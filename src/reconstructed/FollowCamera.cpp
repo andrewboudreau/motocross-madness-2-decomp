@@ -670,7 +670,7 @@ bool FollowCamera::PlayRecordedFrame(float dt, const Vector3* offset) {
 // 0x10 flips +0x26c and calls slot 69. Outside states 6 and 7 the raw keys
 // 0x52 and 0x4c leave or enter state 5 (0x4c otherwise advances, slot 72) and
 // 0x37 calls slot 59 below state 5.
-int FollowCamera::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int FollowCamera::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (Camera::OnControlPress(event, entry) || event->kind)
         return 0;
     if (g_TrackGame->allowFreezeCamera) {

@@ -631,7 +631,7 @@ int Terrain::UnknownVirtualSlot19(int)
     return 0;
 }
 
-int Terrain::OnControlRelease(UnknownControlEvent*, UnknownInputEntry*)
+int Terrain::OnControlRelease(ControlEvent*, InputButtonState*)
 {
     return 0;
 }
@@ -710,7 +710,7 @@ int g_terrainToggle718 = 1;
 
 // Slot 23 (0x00508850): debug key handler.  The three TestInputEvent kinds 0x43, 2 and 3
 // each flip one toggle and return 1 (tier 3 semantics).
-int Terrain::OnControlPress(UnknownControlEvent* event, UnknownInputEntry*)
+int Terrain::OnControlPress(ControlEvent* event, InputButtonState*)
 {
     if (TestInputEvent(0x43, 0, event, 0x80)) {
         g_terrainToggle314 = 1 - g_terrainToggle314;

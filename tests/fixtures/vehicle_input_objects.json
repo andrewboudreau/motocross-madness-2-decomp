@@ -1657,28 +1657,28 @@
     },
     {
       "source": "src/reconstructed/JoystickDevice.cpp",
-      "symbol": "?AttachAxisBinding@JoystickDevice@@QAEHPAUUnknownControlBinding@@MM@Z",
+      "symbol": "?AttachAxisBinding@JoystickDevice@@QAEHPAUControlBinding@@MM@Z",
       "va": "0x00489a20",
       "extent": 324,
       "bindings": "src/reconstructed/JoystickDevice.bindings.json"
     },
     {
       "source": "src/reconstructed/KeyboardDevice.cpp",
-      "symbol": "?BindKeys@KeyboardDevice@@QAEHPAUUnknownControlBinding@@HHMM@Z",
+      "symbol": "?BindKeys@KeyboardDevice@@QAEHPAUControlBinding@@HHMM@Z",
       "va": "0x00489f80",
       "extent": 176,
       "bindings": "src/reconstructed/KeyboardDevice.bindings.json"
     },
     {
       "source": "src/reconstructed/MouseDevice.cpp",
-      "symbol": "?AttachBinding@MouseDevice@@QAEHPAUUnknownControlBinding@@@Z",
+      "symbol": "?AttachBinding@MouseDevice@@QAEHPAUControlBinding@@@Z",
       "va": "0x0048a420",
       "extent": 145,
       "bindings": "src/reconstructed/MouseDevice.bindings.json"
     },
     {
       "source": "src/reconstructed/DeviceSetup.cpp",
-      "symbol": "?BindAxis@UnknownTrackGameObject33fc@@QAEHPAUUnknownControlBinding@@HHH@Z",
+      "symbol": "?BindAxis@UnknownTrackGameObject33fc@@QAEHPAUControlBinding@@HHH@Z",
       "va": "0x00448d30",
       "extent": 186,
       "bindings": "src/reconstructed/DeviceSetup.bindings.json"

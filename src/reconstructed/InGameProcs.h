@@ -14,14 +14,14 @@ void FormatTime(char* text, float seconds);
 class ExitDlg : public UIDialog {
 public:
     ExitDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
-    void HandleEvent(UnknownDialogEvent* event); // 0x004886e0
+    void HandleEvent(DialogEvent* event); // 0x004886e0
 };
 
 // RTTI: ContinueDlg : UIDialog (vtable 0x00554d24).
 class ContinueDlg : public UIDialog {
 public:
     ContinueDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
-    void HandleEvent(UnknownDialogEvent* event); // 0x00488ad0
+    void HandleEvent(DialogEvent* event); // 0x00488ad0
 };
 
 // RTTI: VCRDlg : UIDialog (vtable 0x00550d94): the replay controls.
@@ -32,8 +32,8 @@ public:
     virtual int Tick(float frameTime);                    // 0x004893c0
     // Slot 23: 0x00532890, folded with Wrecker::OnControlPress. It skips
     // UIDialog's version and goes straight to GameObject's.
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
-    void HandleEvent(UnknownDialogEvent* event); // 0x00488c90
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);
+    void HandleEvent(DialogEvent* event); // 0x00488c90
     void ShowReplayMode();             // 0x004894c0: shows the replay mode on the toggles
 
     int field_0x7f58;                         // set once the replay is left

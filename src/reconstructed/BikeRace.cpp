@@ -325,7 +325,7 @@ int BikeRace::Tick(float frameTime) {
                         TextQueueOverlay* overlay = g_TrackGame->eventManager->FindTextQueue();
                         char text[0x100];
                         g_TrackGame->LoadResourceString(0x14de, text, 0x80);
-                        UnknownMessage* message = new (__FILE__, 0x8bf) UnknownMessage(text, 3.25f);
+                        TextQueueMessage* message = new (__FILE__, 0x8bf) TextQueueMessage(text, 3.25f);
                         if (message != 0) {
                             overlay->ReplaceHeadMessage(message);
                             delete message;
@@ -406,7 +406,7 @@ int BikeRace::Tick(float frameTime) {
                         TextQueueOverlay* overlay = g_TrackGame->eventManager->FindTextQueue();
                         char text[0x100];
                         g_TrackGame->LoadResourceString(0x14dd, text, 0x80);
-                        UnknownMessage* message = new (__FILE__, 0x912) UnknownMessage(text, 3.25f);
+                        TextQueueMessage* message = new (__FILE__, 0x912) TextQueueMessage(text, 3.25f);
                         if (message != 0) {
                             overlay->ReplaceHeadMessage(message);
                             delete message;
@@ -836,7 +836,7 @@ int BikeRace::OnChar(int value) {
 }
 
 // 0x0041f5e0
-int BikeRace::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int BikeRace::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     int result;
     if (g_TrackGame->network != 0 && event->kind == 0) {
         g_TrackGame->controlInterface->keyboard->ModifierHolds(0xc);
@@ -897,7 +897,7 @@ int BikeRace::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entr
                     g_TrackGame->LoadResourceString(0x140c, value, 0x80);
                 }
                 sprintf(text, "%s : %s", title, value);
-                UnknownMessage* message = new (__FILE__, 0xcdd) UnknownMessage(text, 3.25f);
+                TextQueueMessage* message = new (__FILE__, 0xcdd) TextQueueMessage(text, 3.25f);
                 TextQueueOverlay* overlay;
                 switch (g_TrackGame->mode.raceSettings.eventType) {
                 case 2:
@@ -982,7 +982,7 @@ int BikeRace::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entr
                     g_TrackGame->LoadResourceString(0x1408, value, 0x80);
                 }
                 sprintf(text, "%s %s", title, value);
-                UnknownMessage message(text, 1.5f);
+                TextQueueMessage message(text, 1.5f);
                 overlay->ReplaceHeadMessage(&message);
                 return 1;
             }
@@ -1005,7 +1005,7 @@ int BikeRace::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entr
                     g_TrackGame->LoadResourceString(0x1408, value, 0x80);
                 }
                 sprintf(text, "%s %s", title, value);
-                UnknownMessage message(text, 1.5f);
+                TextQueueMessage message(text, 1.5f);
                 overlay->ReplaceHeadMessage(&message);
                 return 1;
             }
@@ -2052,7 +2052,7 @@ void BikeRace::SetDetailLevel(int level) {
 }
 
 // 0x00423880
-int BikeRace::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int BikeRace::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
     if (TestInputEvent(6, 0, event, 0x80)) {
         drawChildren = 1 - drawChildren;
         return 1;

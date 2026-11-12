@@ -32,8 +32,8 @@ public:
     virtual int OnActivate();                 // 0x004c0250: restores lost surfaces, then the root's slot 18
     virtual int OnDeactivate();               // 0x004c0310
     virtual int SetRenderStates();            // 0x004c07d0: sets the render states
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x004c03a0
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004c0400
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);     // 0x004c03a0
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x004c0400
     virtual int Shutdown();                   // 0x004c0230: shutdown, then shows the cursor
     virtual int SwitchDisplayMode(int mode);    // 0x004c04a0: changes the display mode
     // Settings under HKEY_LOCAL_MACHINE\<+0x4b8>; "Sub\\Value" names a subkey.

@@ -15,7 +15,7 @@ public:
     virtual void RemoveBindings(int id); // 0x00489b70
     virtual ~JoystickDevice();          // 0x00489920 (deleting wrapper 0x00489900)
     // 0x00489980: copies the state of a pressed button into `entry`.
-    virtual int IsButtonDown(int button, int modifier, UnknownInputEntry* entry);
+    virtual int IsButtonDown(int button, int modifier, InputButtonState* entry);
     virtual int GetPovAngle(int index, float* angle) = 0;
     virtual int GetPovDirection(int index, float* x, float* y) = 0;
     virtual int SetAutoCenter(int enable) = 0;
@@ -42,19 +42,19 @@ public:
     virtual int Update(int value) = 0;
 
     // 0x00489a20: attaches `binding` to the list for its axis.
-    int AttachAxisBinding(UnknownControlBinding* binding, float step, float interval);
+    int AttachAxisBinding(ControlBinding* binding, float step, float interval);
     // 0x00489c00: feeds an axis value to every binding on that axis.
     void FeedAxis(int axis, float value, float range);
     // 0x00489c60: state of `control` (negative: an axis direction).
-    int GetControlState(int control, int modifier, UnknownInputEntry* entry);
+    int GetControlState(int control, int modifier, InputButtonState* entry);
     float GetAxisValue(int axis);    // 0x00489e20: axis value (OptionProcs.cpp)
 
     friend class ControlInterface; // reads the input entries
 
 protected:
     int joystickIndex;                     // constructor argument
-    UnknownInputEntry buttonStates[32];
+    InputButtonState buttonStates[32];
     float axisValues[6];                // axis values
-    ContainerList<UnknownControlBinding*> axisBindings[6]; // bindings per axis
+    ContainerList<ControlBinding*> axisBindings[6]; // bindings per axis
     unsigned char directionFlipped : 1;  // "JoyDirectionFlipped" setting
 };

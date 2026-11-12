@@ -119,7 +119,7 @@ void PCLastRaceDlg::PayOutRace()
 }
 
 // 0x004d8fc0
-void PCBailoutDlg::HandleEvent(UnknownDialogEvent* event)
+void PCBailoutDlg::HandleEvent(DialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     UIControl* label;
@@ -173,7 +173,7 @@ void PCBailoutDlg::HandleEvent(UnknownDialogEvent* event)
 }
 
 // 0x004d9860
-void PCBunnyDlg::HandleEvent(UnknownDialogEvent* event)
+void PCBunnyDlg::HandleEvent(DialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     char text[128];

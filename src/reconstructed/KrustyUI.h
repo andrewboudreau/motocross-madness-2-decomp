@@ -55,7 +55,7 @@ public:
     virtual void Enable();                    // 0x00499ac0
     virtual int Tick(float frameTime);                 // 0x00499ae0
     virtual int OnActivate();                 // 0x00499af0
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00499a40
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x00499a40
     virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);     // 0x00499a70
     virtual int AttachRenderContext(void* context);  // 0x00499980
     void ShowScene(GameObject* parent); // 0x004999f0: shows the +0x464 scene

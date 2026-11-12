@@ -22,7 +22,7 @@ struct UnknownPlayerLeftMessage {
 };
 
 // 0x004886e0
-void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
+void ExitDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("ButMiddle", event->controlName)) {
@@ -97,7 +97,7 @@ void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x00488ad0
-void ContinueDlg::HandleEvent(UnknownDialogEvent* event) {
+void ContinueDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("ButMiddle", event->controlName)) {
@@ -133,7 +133,7 @@ void FormatTime(char* text, float seconds) {
 }
 
 // 0x00488c90
-void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
+void VCRDlg::HandleEvent(DialogEvent* event) {
     UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
     switch (event->kind) {
     case kDialogInit:
@@ -276,7 +276,7 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x00532890 (folded with Wrecker::OnControlPress)
-int VCRDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int VCRDlg::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     return GameObject::OnControlPress(event, entry);
 }
 

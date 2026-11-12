@@ -277,7 +277,7 @@ void BaseQuarryEvent::CreateOverlays() {
         else
             g_TrackGame->sceneObject->ReadCurrentSceneName(
                 name, g_TrackGame->sceneObject->sceneFile, 0);
-        UnknownMessage line(name, 3.25f);
+        TextQueueMessage line(name, 3.25f);
         textQueue->ReplaceHeadMessage(&line);
     }
 }
@@ -303,12 +303,12 @@ void BaseQuarryEvent::ShowOnOffMessage(int id, int on) {
     else
         g_TrackGame->LoadResourceString(0x1408, state, 0x80);
     sprintf(buffer, "%s %s", name, state);
-    UnknownMessage message(buffer, 1.5f);
+    TextQueueMessage message(buffer, 1.5f);
     textQueue->ReplaceHeadMessage(&message);
 }
 
 // 0x004e0ce0
-int BaseQuarryEvent::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int BaseQuarryEvent::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (GameObject::OnControlPress(event, entry))
         return 1;
     if (TestInputEvent(0x31, 0, event, 0xc)) {
@@ -432,7 +432,7 @@ int BaseQuarryEvent::OnControlPress(UnknownControlEvent* event, UnknownInputEntr
             char buffer[0x100];
             g_TrackGame->LoadResourceString(0x14c4, text, 0x80);
             sprintf(buffer, "%s = %d", text, level + 1);
-            UnknownMessage message(buffer, 1.5f);
+            TextQueueMessage message(buffer, 1.5f);
             textQueue->ReplaceHeadMessage(&message);
         }
         return 1;
@@ -458,7 +458,7 @@ int BaseQuarryEvent::OnControlPress(UnknownControlEvent* event, UnknownInputEntr
             char buffer[0x100];
             g_TrackGame->LoadResourceString(0x14c4, text, 0x80);
             sprintf(buffer, "%s = %d", text, level + 1);
-            UnknownMessage message(buffer, 1.5f);
+            TextQueueMessage message(buffer, 1.5f);
             textQueue->ReplaceHeadMessage(&message);
         }
         return 1;
@@ -516,7 +516,7 @@ int BaseQuarryEvent::OnNetworkMessage(int type, void* data, int from, int to, in
         }
         g_TrackGame->LoadResourceString(0xbd6, text, 0x80);
         sprintf(buffer, "%s %s", name, text);
-        UnknownMessage message(buffer, 3.25f);
+        TextQueueMessage message(buffer, 3.25f);
         textQueue->AppendMessage(&message);
         reinterpret_cast<BikeRace*>(raceView)->HandlePlayerLeft(leave->playerId);
         if (g_TrackGame->mode.raceSettings.raceMode == 2)
@@ -526,7 +526,7 @@ int BaseQuarryEvent::OnNetworkMessage(int type, void* data, int from, int to, in
         char buffer[0x80];
         g_TrackGame->LoadResourceString(0xbd5, text, 0x80);
         sprintf(buffer, "%s %s", (char*)data + 4, text);
-        UnknownMessage message(buffer, 3.25f);
+        TextQueueMessage message(buffer, 3.25f);
         textQueue->AppendMessage(&message);
         reinterpret_cast<BikeRace*>(raceView)->HandlePlayerLeft(from);
         if (g_TrackGame->mode.raceSettings.raceMode == 2)

@@ -598,7 +598,7 @@ int Wrecker::Render3D() {
     return GameObject::Render3D();
 }
 
-int Wrecker::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int Wrecker::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     return GameObject::OnControlPress(event, entry);
 }
 

@@ -31,7 +31,7 @@ before it. `0x005206a0` writes another class's vtable (`0x005588c4`) and
 - **TrackRecordDlg** : UIDialog (RTTI), 0x7f68 bytes (the allocation size
   at `0x0044c27b` and `0x0049a2e6`; four own members after UIDialog's
   0x7f58). Its inline constructor passes `UIDialog(1, ...)`. Its slot 29
-  overrides UIDialog's with the shared `UnknownDialogEvent` (DialogProc.h);
+  overrides UIDialog's with the shared `DialogEvent` (DialogProc.h);
   the former `UnknownTrackRecordEvent` had the same layout.
 - `0x0051f3c0` reads the racer entries in EventManager+0x50, at +0x08,
   +0x0c (an int), +0x14, +0x18, +0x1c, +0x2c and the name at +0x40.
@@ -42,7 +42,7 @@ before it. `0x005206a0` writes another class's vtable (`0x005588c4`) and
   (+0x7f5c), and a realloc'd array of 8-byte track rows (+0x7f60, count
   +0x7f64). Each row is a strdup'd file name and an int. The event argument
   of slot 29 and of `0x0051fe80`, `0x00520390`, `0x00520480` and
-  `0x005204e0` has UnknownDialogEvent's layout: the control name (+0x04),
+  `0x005204e0` has DialogEvent's layout: the control name (+0x04),
   the kind (+0x08: 5 set-up, 1 button or tab, 2 list selection, 6 close),
   the dialog (+0x0c), the control (+0x14) and the handled flag (+0x20).
 - `UIDialog::FindControl` (`0x0046ebf0`) looks a control up by name.

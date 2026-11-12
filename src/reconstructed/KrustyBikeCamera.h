@@ -43,7 +43,7 @@ public:
 
     virtual int Tick(float frameTime);                 // 0x00497e20 (near miss: samples/camera)
 
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);
     virtual Vector3 GetStateFiveFollowPoint(float dt);
     virtual void UpdateTurnYaw(bool flag);
     virtual Vector3 SelectFollowPoint(int a, bool flag, float dt);

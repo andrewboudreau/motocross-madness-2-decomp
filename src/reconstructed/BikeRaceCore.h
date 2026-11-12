@@ -40,9 +40,9 @@ public:
     virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);
     // 0x0041f5e0: keys: chat, camera targets, debug toggles and the debug
     // object picker.
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);
     // 0x00423880: control 6 (modifier 0x80) toggles drawChildren (+0x3fd).
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);
 
     UnknownBikeRaceCameraView* UnknownFunctionCameraView() {
         return (UnknownBikeRaceCameraView*)raceCamera;

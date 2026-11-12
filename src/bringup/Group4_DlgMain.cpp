@@ -52,7 +52,7 @@ extern "C" const GUID DPSPGUID_SERIAL;                  // 0x005567f0
 extern "C" const GUID DPSPGUID_MODEM;                   // 0x00556800
 
 // 0x0044b200
-void MainDlg::HandleEvent(UnknownDialogEvent* event) {
+void MainDlg::HandleEvent(DialogEvent* event) {
     char name[16];
     char path[260];
     int count;

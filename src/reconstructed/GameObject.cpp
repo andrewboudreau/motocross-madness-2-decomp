@@ -217,7 +217,7 @@ int GameObject::UnknownVirtualSlot19(int value) {
 }
 
 // 0x00469580
-int GameObject::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int GameObject::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
     if (childFlags & 0x200) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->isEnabled && !child->pendingRelease) {
@@ -230,7 +230,7 @@ int GameObject::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* 
 }
 
 // 0x004695d0
-int GameObject::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int GameObject::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (childFlags & 0x400) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->isEnabled && !child->pendingRelease) {

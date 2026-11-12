@@ -73,7 +73,7 @@ public:
     explicit RaceSound(int flags);        // 0x004e1fb0
     virtual ~RaceSound();                 // 0x004e21b0 (deleting wrapper 0x004e2190)
     virtual int Tick(float frameTime);                                                    // 0x004e3730
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004e44e0
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x004e44e0
     virtual int OnActivate();                 // 0x00499af0 (folded with KrustyUI's)
 
     // 0x004e23f0 (thiscall, ret 0x10; bikerace.cpp 0x00419628 passes its

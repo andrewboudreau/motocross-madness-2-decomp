@@ -125,8 +125,8 @@ class UICtlContainer : public GameObject {
 public:
     UICtlContainer() : GameObject(1) {}
     virtual ~UICtlContainer();                // 0x0046e860 (deleting wrapper 0x0046e840)
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x0047b440
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x0047b3f0
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);     // 0x0047b440
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x0047b3f0
 };
 
 // One state of a UIMultiState (32 bytes; the slots 34-37 overrides read
@@ -156,8 +156,8 @@ public:
     virtual int RenderPost3D();               // 0x004711a0
     virtual int OnChar(int value);               // 0x00472320
     virtual int OnKeyDown(int value);            // 0x004723d0
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x00472130
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00471fd0
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);     // 0x00472130
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x00471fd0
 
     virtual void AdvanceImages(); // slot 27, 0x00471070: advances the state image and the FX animation
     virtual int ContainsPoint(tagPOINT point, int state); // slot 28, 0x00470990: whether `point` is inside

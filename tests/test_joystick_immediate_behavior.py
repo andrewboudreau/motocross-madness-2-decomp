@@ -107,14 +107,14 @@ class JoystickImmediateBehaviorTests(unittest.TestCase):
                 'class ActualJoystickDevice:public JoystickDevice {public:void FeedAxis(int,float,float);};\n'
                 'class ActualControlInterface:public ControlInterface {public:void QueueEvent(int,int,int,int);};\n' +
                 extract(control, 'static inline float BindingMax(') + '\n' + extract(control, 'static inline float BindingMin(') + '\n' +
-                extract(control, 'void UnknownControlBinding::SetFromAxis(') + '\n' +
+                extract(control, 'void ControlBinding::SetFromAxis(') + '\n' +
                 extract(joystick, 'void JoystickDevice::FeedAxis(').replace('JoystickDevice::FeedAxis', 'ActualJoystickDevice::FeedAxis') + '\n' +
                 extract(control, 'void ControlInterface::QueueEvent(').replace('ControlInterface::QueueEvent', 'ActualControlInterface::QueueEvent') + '\n')
             helper_path, helper = compile_source(helper_file, 'helpers')
             for owner, name, actual, va, size in [
                 ('JoystickDevice', '?FeedAxis@JoystickDevice@@QAEXHMM@Z', '?FeedAxis@ActualJoystickDevice@@QAEXHMM@Z', 0x489c00, 84),
                 ('ControlInterface', '?QueueEvent@ControlInterface@@QAEXHHHH@Z', '?QueueEvent@ActualControlInterface@@QAEXHHHH@Z', 0x43cea0, 82),
-                ('ControlInterface', '?SetFromAxis@UnknownControlBinding@@QAEXMM@Z', '?SetFromAxis@UnknownControlBinding@@QAEXMM@Z', 0x43cd20, 104),
+                ('ControlInterface', '?SetFromAxis@ControlBinding@@QAEXMM@Z', '?SetFromAxis@ControlBinding@@QAEXMM@Z', 0x43cd20, 104),
             ]:
                 _, provider = compile_source(ROOT / f'src/reconstructed/{owner}.cpp', owner)
                 for obj, symbol in ((provider, name), (helper, actual)):
@@ -130,9 +130,9 @@ class JoystickImmediateBehaviorTests(unittest.TestCase):
                 'offsetof(LayoutProbe,buttonStates)==0x264 && offsetof(LayoutProbe,axisValues)==0x4e4 && '
                 'offsetof(LayoutProbe,axisBindings)==0x4fc && offsetof(LayoutProbe,axisMaximums)==0x58c && '
                 'offsetof(LayoutProbe,povValues)==0x5d8)?1:-1];}\n'
-                'typedef char Other[(sizeof(UnknownJoystickState)==80 && sizeof(UnknownControlBinding)==0x3c && '
+                'typedef char Other[(sizeof(UnknownJoystickState)==80 && sizeof(ControlBinding)==0x3c && '
                 'offsetof(ControlInterface,queuedEventCount)==0x38 && offsetof(ControlInterface,events)==0x3c && '
-                'sizeof(UnknownControlEvent)==20 && offsetof(TrackGame,controlInterface)==0x14)?1:-1];\n')
+                'sizeof(ControlEvent)==20 && offsetof(TrackGame,controlInterface)==0x14)?1:-1];\n')
             compile_source(layout, 'layout')
             patch_file = output / 'calls.bin'
             patch_file.write_bytes(b''.join(patches))

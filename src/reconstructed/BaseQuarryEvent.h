@@ -41,7 +41,7 @@ public:
     // body of other classes).
     virtual int Render3D();
     virtual int OnActivate();                 // 0x00499af0 (folded with KrustyUI's)
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004e0ce0
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x004e0ce0
     virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);       // 0x004e1cc0
     // Slots 27-35 are introduced here (NationalRace overrides 27, 29 and 30).
     virtual int Create3DObjects(int value);    // 0x004e06a0: creates the visual cue

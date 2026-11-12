@@ -111,7 +111,7 @@ void OpenCareerDialog()
 }
 
 // 0x004d4d20
-void PCStartupDlg::HandleEvent(UnknownDialogEvent* event)
+void PCStartupDlg::HandleEvent(DialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit:
@@ -352,7 +352,7 @@ void PCStartupDlg::FreeFileNames()
 }
 
 // 0x004d5d20
-void PCNewDlg::HandleEvent(UnknownDialogEvent* event)
+void PCNewDlg::HandleEvent(DialogEvent* event)
 {
     char number[32];
     char text[128];
@@ -405,7 +405,7 @@ void PCNewDlg::SetAnswerTargets(char* name, int* difficulty, int* bikeClass, int
 }
 
 // 0x004d5f70
-void PCCentralDlg::HandleEvent(UnknownDialogEvent* event)
+void PCCentralDlg::HandleEvent(DialogEvent* event)
 {
     switch (event->kind) {
     case kDialogClose:
@@ -539,7 +539,7 @@ void PCCentralDlg::OpenPage(int page)
 }
 
 // 0x004d7f40
-void PCCentralNextDlg::HandleEvent(UnknownDialogEvent* event)
+void PCCentralNextDlg::HandleEvent(DialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     if (event->kind != kDialogInit)
@@ -620,7 +620,7 @@ void PCCentralNextDlg::HandleEvent(UnknownDialogEvent* event)
 }
 
 // 0x004d8380
-void PCCentralStandingsDlg::HandleEvent(UnknownDialogEvent* event)
+void PCCentralStandingsDlg::HandleEvent(DialogEvent* event)
 {
     if (event->kind != kDialogInit)
         return;
@@ -664,7 +664,7 @@ void PCCentralStandingsDlg::HandleEvent(UnknownDialogEvent* event)
 }
 
 // 0x004d8660
-void PCLastRaceDlg::HandleEvent(UnknownDialogEvent* event)
+void PCLastRaceDlg::HandleEvent(DialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     switch (event->kind) {
@@ -750,7 +750,7 @@ int CompareRankPoints(const void* a, const void* b)
 }
 
 // 0x004d9340
-void PCFailedDlg::HandleEvent(UnknownDialogEvent* event)
+void PCFailedDlg::HandleEvent(DialogEvent* event)
 {
     UIControl* label;
     switch (event->kind) {
@@ -779,7 +779,7 @@ void PCFailedDlg::HandleEvent(UnknownDialogEvent* event)
 }
 
 // 0x004d94e0
-void PCFinishedDlg::HandleEvent(UnknownDialogEvent* event)
+void PCFinishedDlg::HandleEvent(DialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     switch (event->kind) {
@@ -836,7 +836,7 @@ void PCFinishedDlg::HandleEvent(UnknownDialogEvent* event)
 // next track. The text buffer is declared in each case where it is used;
 // declared at the top of the function VC6 gives it another slot and picks
 // other registers (48 of 755 bytes).
-void PCBonusTrackDlg::HandleEvent(UnknownDialogEvent* event)
+void PCBonusTrackDlg::HandleEvent(DialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     switch (event->kind) {
@@ -902,7 +902,7 @@ void PCBonusTrackDlg::HandleEvent(UnknownDialogEvent* event)
 }
 
 // 0x004d9fd0
-void PCNewEventDlg::HandleEvent(UnknownDialogEvent* event)
+void PCNewEventDlg::HandleEvent(DialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     switch (event->kind) {
@@ -948,7 +948,7 @@ void PCNewEventDlg::HandleEvent(UnknownDialogEvent* event)
 }
 
 // 0x004da1b0
-void PCCompleteDlg::HandleEvent(UnknownDialogEvent* event)
+void PCCompleteDlg::HandleEvent(DialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     switch (event->kind) {
@@ -1001,7 +1001,7 @@ void PCCentralBikeRiderDlg::MarkPendingRelease()
 // 0x0044fa00 (folded with SPBikeRiderDlg::OnControlPress): a click inside
 // the bike preview (inset by 50 and 30 pixels) starts dragging it and turns
 // automatic rotation off.
-int PCCentralBikeRiderDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int PCCentralBikeRiderDlg::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (event->kind == 1 && event->control == 0) {
         RECT area = previewArea;
         area.left += 50;
@@ -1018,7 +1018,7 @@ int PCCentralBikeRiderDlg::OnControlPress(UnknownControlEvent* event, UnknownInp
 }
 
 // 0x0044fab0 (folded with SPBikeRiderDlg::OnControlRelease)
-int PCCentralBikeRiderDlg::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int PCCentralBikeRiderDlg::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
     if (event->kind == 1 && event->control == 0)
         previewDragging = 0;
     return UIDialog::OnControlRelease(event, entry);
@@ -1112,7 +1112,7 @@ void PCCentralBikeRiderDlg::SyncValues(int apply)
 
 // 0x004d6770: as SPBikeRiderDlg slot 29 (dlgprocs.cpp 0x0044ef70); the
 // engine sizes offered follow the circuit's bike class rule.
-void PCCentralBikeRiderDlg::HandleEvent(UnknownDialogEvent* event)
+void PCCentralBikeRiderDlg::HandleEvent(DialogEvent* event)
 {
     char plate[12];
     char typed[12];

@@ -30,7 +30,7 @@ GameCursor::GameCursor(int flags) : GameObject(flags) {
 }
 
 // 0x0043ea70
-GameObject* GameCursor::CreateBound(void* target, UnknownControlBinding* x, UnknownControlBinding* y,
+GameObject* GameCursor::CreateBound(void* target, ControlBinding* x, ControlBinding* y,
                                               const char* image, TextureMapManager* textures,
                                               BackgroundImage* background, void* palette, Palette8* palette8) {
     GameObject::SetRenderContext(target);

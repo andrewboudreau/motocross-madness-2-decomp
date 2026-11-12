@@ -178,7 +178,7 @@ class UIAnimConnectionsTests(unittest.TestCase):
                 imports = {s.name for s in obj.symbols if s.storage_class == 2 and s.section_number == 0}
                 self.assertIn(wanted, imports)
                 self.assertFalse(imports & set(RENAMES))
-                caller = '?RenderPost3D@GUICursor@@UAEHXZ' if n in (0, 2) else '?HandleEvent@LoadingDlg@@UAEXPAUUnknownDialogEvent@@@Z'
+                caller = '?RenderPost3D@GUICursor@@UAEHXZ' if n in (0, 2) else '?HandleEvent@LoadingDlg@@UAEXPAUDialogEvent@@@Z'
                 entry = obj.find_symbol(caller)
                 _, _, calls = obj.symbol_extent(entry)
                 self.assertEqual([(r.virtual_address-entry.value, r.type) for r in calls

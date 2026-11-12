@@ -20,9 +20,9 @@ from test_vehicle_gearbox_connections import cases as gearbox_cases, fingerprint
 ROOT = Path(__file__).resolve().parents[1]
 CALLERS = ('src/krusty2/vehicle/KrustyBike.cpp', 'samples/physics/krustybike/KrustyBikeNearMisses.cpp')
 PROVIDERS = (
-    ('TrackOverlay', 'UnknownMessage::UnknownMessage(const char* text, float duration)', '??0UnknownMessage@@QAE@PBDM@Z', 0x51b200, 68),
-    ('TrackOverlay', 'UnknownMessage::UnknownMessage(const UnknownMessage& other)', '??0UnknownMessage@@QAE@ABV0@@Z', 0x51b250, 74),
-    ('TrackOverlay', 'void TextQueueOverlay::ReplaceHeadMessage(UnknownMessage* message)', '?ReplaceHeadMessage@TextQueueOverlay@@', 0x51b540, 146),
+    ('TrackOverlay', 'TextQueueMessage::TextQueueMessage(const char* text, float duration)', '??0TextQueueMessage@@QAE@PBDM@Z', 0x51b200, 68),
+    ('TrackOverlay', 'TextQueueMessage::TextQueueMessage(const TextQueueMessage& other)', '??0TextQueueMessage@@QAE@ABV0@@Z', 0x51b250, 74),
+    ('TrackOverlay', 'void TextQueueOverlay::ReplaceHeadMessage(TextQueueMessage* message)', '?ReplaceHeadMessage@TextQueueOverlay@@', 0x51b540, 146),
     ('EventManager', 'TextQueueOverlay* EventManager::FindTextQueue()', '?FindTextQueue@EventManager@@', 0x45d340, 78),
     ('TrackGame', 'int TrackGame::LoadResourceString(int id, char* buffer, int size)', '?LoadResourceString@TrackGame@@', 0x521970, 189))
 

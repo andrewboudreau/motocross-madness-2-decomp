@@ -212,7 +212,7 @@ void VisualCue::CollectRacers(UnknownVisualCueView* view) {
 }
 
 // 0x0048afa0
-int VisualCue::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int VisualCue::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     int active = 0;
     for (int i = 0; i < cueRacerCount; i++)
         if (cueRacers[i]->UnknownIsEnabled())

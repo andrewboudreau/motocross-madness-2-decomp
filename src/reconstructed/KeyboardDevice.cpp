@@ -20,7 +20,7 @@ KeyboardDevice::KeyboardDevice() : PCInputDevice(0) {
 
 // 0x00489f80: attaches `binding` to this device's list for its axis and
 // gives it the keys that step it down and up.
-int KeyboardDevice::BindKeys(UnknownControlBinding* binding, int key, int key2,
+int KeyboardDevice::BindKeys(ControlBinding* binding, int key, int key2,
                                           float step, float interval) {
     binding->owner = this;
     binding->repeatStep = step;
@@ -34,7 +34,7 @@ int KeyboardDevice::BindKeys(UnknownControlBinding* binding, int key, int key2,
 void KeyboardDevice::RemoveBindings(int id) {
     for (int list = 0; list < 6; list++) {
         for (int i = 0; i < axisBindings[list].m_count; i++) {
-            UnknownControlBinding* binding = axisBindings[list].Get(i);
+            ControlBinding* binding = axisBindings[list].Get(i);
             if (binding->bindingId == id)
                 axisBindings[list].Remove(binding);
         }
@@ -46,7 +46,7 @@ void KeyboardDevice::RemoveBindings(int id) {
 // with neither key held the binding recentres.
 void KeyboardDevice::RepeatKeys(int list, int value) {
     for (int i = 0; i < axisBindings[list].m_count; i++) {
-        UnknownControlBinding* binding = axisBindings[list].Get(i);
+        ControlBinding* binding = axisBindings[list].Get(i);
         binding->secondKeyTimer += g_TrackGame->frameTime;
         binding->firstKeyTimer += g_TrackGame->frameTime;
         if (IsButtonDown(binding->firstKey, 0x3f, 0)) {

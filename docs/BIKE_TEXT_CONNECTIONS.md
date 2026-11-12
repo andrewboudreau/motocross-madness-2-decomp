@@ -9,8 +9,8 @@ does not establish a working game or visible race notices.
 
 | Old view | Existing definition | Retail VA / complete bytes |
 |---|---|---|
-| `KbMessage` constructor | `UnknownMessage(const char*, float)` | `0x0051b200` / 68 |
-| `KbMsgSink::ReplaceHeadMessage` | `TextQueueOverlay::ReplaceHeadMessage(UnknownMessage*)` | `0x0051b540` / 146 |
+| `KbMessage` constructor | `TextQueueMessage(const char*, float)` | `0x0051b200` / 68 |
+| `KbMsgSink::ReplaceHeadMessage` | `TextQueueOverlay::ReplaceHeadMessage(TextQueueMessage*)` | `0x0051b540` / 146 |
 | `KbSession::FindTextQueue` | `EventManager::FindTextQueue()` | `0x0045d340` / 78 |
 | `KbGame::GetStringText` | `TrackGame::LoadResourceString(int, char*, int)` | `0x00521970` / 189 |
 
@@ -39,7 +39,7 @@ offset zero. The connection does not establish complete identity of all
 provisional owner or sink declarations.
 
 Each temporary message is independently heap allocated with the same `0x8c`
-size and original source/line arguments. UnknownMessage has a 128-byte text
+size and original source/line arguments. TextQueueMessage has a 128-byte text
 array, duration at `+0x80`, elapsed duration at `+0x84`, and next pointer at
 `+0x88`; it has no virtual destructor. The old KbMessage declaration was opaque
 byte storage. No equivalence of embedded-object alignment is asserted: these

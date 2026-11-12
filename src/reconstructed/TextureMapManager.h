@@ -12,17 +12,17 @@ class TextureMapManager;
 // Intrusive list of TextureMaps through their +0x08 (next) and +0x0c
 // (previous) links, with a cursor. Its methods are out of line among
 // TextureMapManager.cpp's code; the original name is unknown.
-class UnknownTextureMapList {
+class TextureMapList {
 public:
-    UnknownTextureMapList();                  // 0x00510a50
-    ~UnknownTextureMapList();                 // 0x00510a60: unlinks every texture
+    TextureMapList();                  // 0x00510a50
+    ~TextureMapList();                 // 0x00510a60: unlinks every texture
     TextureMap* First();                      // 0x00510a90
     TextureMap* Last();                       // 0x00510aa0
     TextureMap* Next();                       // 0x00510ab0
     TextureMap* Previous();                   // 0x00510ad0
     void Append(TextureMap* texture);         // 0x00510af0
     void Remove(TextureMap* texture);         // 0x00510b30
-    void AppendList(UnknownTextureMapList* other); // 0x00510b70: moves `other`'s textures here
+    void AppendList(TextureMapList* other); // 0x00510b70: moves `other`'s textures here
 
     TextureMap* m_head;
     TextureMap* m_tail;
@@ -85,9 +85,9 @@ public:
     int pagesByLevel[9];                      // +0x18 region slots per size level kept by the last partial-blit repack
     int pageMemory;                           // +0x3c pages' memory
     TextureMapManager* groupManager;          // +0x40
-    UnknownTextureMapList managedTextures;    // +0x44 ManagedTextures, stepped through by +0x1c8
-    UnknownTextureMapList cachePages;         // +0x54 CacheTexture pages, stepped through by +0x1c4
-    UnknownTextureMapList field_0x64;
+    TextureMapList managedTextures;    // +0x44 ManagedTextures, stepped through by +0x1c8
+    TextureMapList cachePages;         // +0x54 CacheTexture pages, stepped through by +0x1c4
+    TextureMapList field_0x64;
     int blitBudget;                           // +0x74 ctor 0x10000; the partial-blit repack lowers mip levels while more texels than this are queued
     int maxEmptiedPages;                      // +0x78 6 / bytes per pixel; the whole-page repack empties at most this many pages once every unplaced texture fits
     ContainerList<ManagedTexture*> usedTextures;     // +0x7c textures used since the last repack, at their planned level
@@ -130,7 +130,7 @@ public:
     virtual int RenderPost3D();               // 0x00510e90
     virtual int OnActivate();                 // 0x00511290: restores every texture
     // 0x00510ee0: debug keys stepping through the texture caches.
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);
 
     // 0x00511180: creates and registers a texture group with `pages` pages.
     ManagedTextureGroup* CreateGroup(int format, int pages, int addressU, int addressV);
@@ -145,7 +145,7 @@ public:
     void* GrowScratchBuffer(unsigned int bytes);
     void* GrowSecondScratchBuffer(unsigned int bytes);
 
-    UnknownTextureMapList allTextures;        // +0x2c every registered texture
+    TextureMapList allTextures;        // +0x2c every registered texture
     ManagedTextureGroup* debugGroup;          // +0x3c cache selected by the debug keys
     int debugGroupIndex;                      // +0x40 its index in +0x44
     ContainerList<ManagedTextureGroup*> groups; // +0x44  ManagedTextureGroups: CreateGroup adds, the group destructor removes, ShareCacheLimit and the debug keys walk them

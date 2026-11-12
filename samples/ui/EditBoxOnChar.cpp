@@ -10,7 +10,7 @@
 #include "../../src/reconstructed/RenderInterfaces.h"
 
 int UIEditBox::OnChar(int value) {
-    UnknownDialogEvent event;
+    DialogEvent event;
     char c = (char)value;
     int result = 0;
     event.handled = 0;

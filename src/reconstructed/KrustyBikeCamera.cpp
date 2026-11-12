@@ -50,7 +50,7 @@ KrustyBikeCamera* KrustyBikeCamera::SetupFlyby(void* value, float rate294, float
 }
 
 // 0x00497df0: the FollowCamera search, unless the global +0x3430 blocks it.
-int KrustyBikeCamera::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int KrustyBikeCamera::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (g_TrackGame->uiInteractionBlocked)
         return 0;
     return BikeCamera::OnControlPress(event, entry);
@@ -148,7 +148,7 @@ void KrustyBikeCamera::ShowCameraStateName() {
     if (target && cameraState != 6) {
         char text[260];
         g_TrackGame->LoadResourceString(cameraState + 0x13B9, text, 0x80);
-        UnknownMessage message(text, 1.5f);
+        TextQueueMessage message(text, 1.5f);
         target->ReplaceHeadMessage(&message);
     }
 }

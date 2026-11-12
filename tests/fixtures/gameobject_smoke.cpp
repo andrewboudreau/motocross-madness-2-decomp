@@ -10,7 +10,7 @@ class PhysicsObject : public GameObject {
 public:
     PhysicsObject() : GameObject(1), timeStep(0), event(0), entry(0) {}
     virtual int Step(float step) { timeStep = step; return 7; }
-    virtual int OnControlPress(UnknownControlEvent* value, UnknownInputEntry* owner) {
+    virtual int OnControlPress(ControlEvent* value, InputButtonState* owner) {
         event = value;
         entry = owner;
         return 1;
@@ -19,8 +19,8 @@ public:
     void DisableNamed(const char* name) { DisableByClassName(name); }
     void EnableNamed(const char* name) { EnableByClassName(name); }
     float timeStep;
-    UnknownControlEvent* event;
-    UnknownInputEntry* entry;
+    ControlEvent* event;
+    InputButtonState* entry;
 };
 
 int main() {
@@ -34,8 +34,8 @@ int main() {
     int context, event, entry;
     if (object->SetRenderContext(&context) != object || child.Context() != &context) return 4;
     if (root.AppendChild(object, -1) != (int)object) return 5;
-    if (!root.OnControlPress((UnknownControlEvent*)&event, (UnknownInputEntry*)&entry) ||
-        child.event != (UnknownControlEvent*)&event || child.entry != (UnknownInputEntry*)&entry) return 6;
+    if (!root.OnControlPress((ControlEvent*)&event, (InputButtonState*)&entry) ||
+        child.event != (ControlEvent*)&event || child.entry != (InputButtonState*)&entry) return 6;
     if (!root.AttachRenderContext(&root) || child.Context() != &root) return 7;
     {
         GameObjectIterator iterator(&root, 0, 0);

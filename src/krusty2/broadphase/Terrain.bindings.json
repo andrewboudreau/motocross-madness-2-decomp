@@ -54,7 +54,7 @@
   "?SelectQuality@Terrain@@QAEXH@Z": "0x00507960",
   "?SetField0xbec@Terrain@@QAEXH@Z": "0x00507930",
   "?Tell@FileStream@@QAEHXZ": "0x00461600",
-  "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
+  "?TestInputEvent@@YAHHHPBUControlEvent@@H@Z": "0x0043caa0",
   "?Print@DebugOverlay@@QAAXHPBDZZ": "0x00447f40",
   "?Title@DebugOverlay@@QAAXHPBDZZ": "0x00447fa0",
   "?GetBytes@MemTagStack@@QAEHPBD@Z": "0x004a2d20",

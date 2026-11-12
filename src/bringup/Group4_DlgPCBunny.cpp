@@ -32,7 +32,7 @@ static inline void UnknownSetText(UIControl* control, int id)
 }
 
 // 0x004d9860
-void PCBunnyDlg::HandleEvent(UnknownDialogEvent* event)
+void PCBunnyDlg::HandleEvent(DialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     char text[128];

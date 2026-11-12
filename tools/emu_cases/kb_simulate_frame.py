@@ -75,7 +75,7 @@ def setup(ctx, c):
 
     def message(cx, ecx, a):
         text = cx.read(a[0], 0x20).split(b'\0')[0]
-        cx.note('UnknownMessage', text, a[1])
+        cx.note('TextQueueMessage', text, a[1])
         return ecx
 
     ctx.stub_at(0x004fc660, 'SetPosition', pop=4, ret=note_vec, log=False)
@@ -83,7 +83,7 @@ def setup(ctx, c):
     ctx.stub_at(0x0045d340, 'FindTextQueue', ret=sink)
     ctx.stub_at(0x00521970, 'LoadResourceString', pop=12, ret=load_string)
     ctx.stub_at(0x004a3010, 'operator new', nargs=3, ret=op_new, log=False)
-    ctx.stub_at(0x0051b200, 'UnknownMessage', pop=8, ret=message, log=False)
+    ctx.stub_at(0x0051b200, 'TextQueueMessage', pop=8, ret=message, log=False)
     ctx.stub_at(0x0051b540, 'ReplaceHeadMessage', pop=4)
     ctx.stub_at(0x004a30c0, 'operator delete', nargs=1, ret=lambda cx, ecx, a: cx.note('delete', a[0]), log=False)
     ctx.stub_at(0x004a8b40, 'SetMotion', pop=4)

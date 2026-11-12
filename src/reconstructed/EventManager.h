@@ -115,8 +115,8 @@ public:
     virtual int Tick(float frameTime);                     // 0x0045f200: per-frame update
     // 0x0045f3a0: while UI interaction is blocked (TrackGame+0x3430), control 1,
     // 0x1c or 0x39 (keyboard) or any joystick press resumes it.
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x0045f440
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x0045f440
     // 0x0045f490: network messages. NetworkInterface 0x004aced0 (through Game
     // slot 17) passes a NetMessage's +0x00, data (+0x14), +0x04, +0x08 and
     // +0x0c, which 0x004aacc0 stores from its `from`, `to` and `flags`.

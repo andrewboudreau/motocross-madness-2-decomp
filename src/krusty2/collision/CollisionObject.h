@@ -91,7 +91,7 @@ public:
     virtual ~CollisionObject();                 // slot 0 @12: 0x00431fd0 -> core 0x00432000
     virtual int Tick(float dt);    // 0x00499ae0
     virtual int Render3D();            // 0x00434540 (draw, then returns GameObject slot 14; ConstraintMethodCollisionModel overrides it again)
-    virtual int OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b);  // 0x00434970 (ret 8, returns GameObject slot 23)
+    virtual int OnControlPress(ControlEvent* a, InputButtonState* b);  // 0x00434970 (ret 8, returns GameObject slot 23)
 
     // Non-virtual members (this == complete object).
     void FreeShape();                                        // 0x00432430

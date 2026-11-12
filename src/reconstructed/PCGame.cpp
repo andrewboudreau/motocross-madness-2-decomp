@@ -282,7 +282,7 @@ int PCGame::OnKeyDown(int value) {
 }
 
 // 0x004c03a0: control 0xb7 released (kind 0) triggers the +0x10 object.
-int PCGame::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int PCGame::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
     if (Game::OnControlRelease(event, entry))
         return 1;
     if (event->kind == 0 && event->control == 0xb7) {
@@ -295,7 +295,7 @@ int PCGame::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entr
 
 // 0x004c0400: with the debug bit, control 0x41 toggles the render target's
 // fill mode between solid and wireframe.
-int PCGame::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int PCGame::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (Game::OnControlPress(event, entry))
         return 1;
     if (testKey && TestInputEvent(0x41, 0, event, 3)) {

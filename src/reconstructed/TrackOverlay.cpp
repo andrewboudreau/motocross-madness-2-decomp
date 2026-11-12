@@ -591,7 +591,7 @@ int StatsOverlay::RenderPre3D()
 }
 
 // 0x004dc4c0 (folded with ProjectedShadow's slot 23 and Terrain's slot 22)
-int StatsOverlay::OnControlPress(UnknownControlEvent*, UnknownInputEntry*)
+int StatsOverlay::OnControlPress(ControlEvent*, InputButtonState*)
 {
     return 0;
 }
@@ -991,7 +991,7 @@ void DropTextOverlay::ReshowText()
 }
 
 // 0x0051b200
-UnknownMessage::UnknownMessage(const char* text, float duration)
+TextQueueMessage::TextQueueMessage(const char* text, float duration)
 {
     strcpy(line, text);
     shownSeconds = 0.0f;
@@ -1000,7 +1000,7 @@ UnknownMessage::UnknownMessage(const char* text, float duration)
 }
 
 // 0x0051b250
-UnknownMessage::UnknownMessage(const UnknownMessage& other)
+TextQueueMessage::TextQueueMessage(const TextQueueMessage& other)
 {
     strcpy(line, other.line);
     showSeconds = other.showSeconds;
@@ -1089,38 +1089,38 @@ int TextQueueOverlay::RenderPost3D()
 }
 
 // 0x0051b540: replaces the head line with a copy of `message`.
-void TextQueueOverlay::ReplaceHeadMessage(UnknownMessage* message)
+void TextQueueOverlay::ReplaceHeadMessage(TextQueueMessage* message)
 {
     if (!queueHead) {
-        queueHead = new(__FILE__, 1451) UnknownMessage(*message);
+        queueHead = new(__FILE__, 1451) TextQueueMessage(*message);
         return;
     }
-    UnknownMessage* copy = new(__FILE__, 1453) UnknownMessage(*message);
+    TextQueueMessage* copy = new(__FILE__, 1453) TextQueueMessage(*message);
     copy->next = queueHead->next;
     delete queueHead;
     queueHead = copy;
 }
 
 // 0x0051b5e0: appends a copy of `message`.
-void TextQueueOverlay::AppendMessage(UnknownMessage* message)
+void TextQueueOverlay::AppendMessage(TextQueueMessage* message)
 {
     if (!queueHead) {
-        queueHead = new(__FILE__, 1469) UnknownMessage(*message);
+        queueHead = new(__FILE__, 1469) TextQueueMessage(*message);
         return;
     }
-    UnknownMessage* last;
-    UnknownMessage* entry = queueHead;
+    TextQueueMessage* last;
+    TextQueueMessage* entry = queueHead;
     while (entry) {
         last = entry;
         entry = entry->next;
     }
-    last->next = new(__FILE__, 1476) UnknownMessage(*message);
+    last->next = new(__FILE__, 1476) TextQueueMessage(*message);
 }
 
 // 0x0051b670
 void TextQueueOverlay::DropHeadMessage()
 {
-    UnknownMessage* head = queueHead;
+    TextQueueMessage* head = queueHead;
     if (head) {
         queueHead = head->next;
         delete head;
@@ -1253,7 +1253,7 @@ int RadarOverlay::TakeRacers(UnknownKrustyBikeView* view, int a2)
 // the same value; the identical if/else keeps that test. The parenthesised
 // first quotient schedules fld/fmul/fidiv before that dead test, as retail
 // does (docs/VC6_OPERAND_ORDER.md section 3).
-int RadarOverlay::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry)
+int RadarOverlay::OnControlPress(ControlEvent* event, InputButtonState* entry)
 {
     if (TestInputEvent(0x21, 0, event, 0x80000000)) {
         showFrameRate = 1 - showFrameRate;
@@ -1648,7 +1648,7 @@ int ChatOverlay::HandleChatKey(int key, int* result)
 }
 
 // 0x0051dce0
-int ChatOverlay::HandleChatInput(UnknownControlEvent* event, UnknownInputEntry* entry, int* result)
+int ChatOverlay::HandleChatInput(ControlEvent* event, InputButtonState* entry, int* result)
 {
     if (inputShown && typingEnabled && !event->kind)
         return 1;

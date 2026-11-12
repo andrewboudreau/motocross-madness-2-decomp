@@ -18,7 +18,7 @@ _stricmp compares for real; strncpy 0x00534b10 runs natively.
 import random
 
 RETAIL_VA = 0x004507a0
-SYMBOL = '?HandleEvent@SPRaceInfoDlg@@UAEXPAUUnknownDialogEvent@@@Z'
+SYMBOL = '?HandleEvent@SPRaceInfoDlg@@UAEXPAUDialogEvent@@@Z'
 SOURCE = 'src/bringup/Group2_SPRaceInfoDlg.cpp'
 TRACK_GAME = 0x0056e26c
 SPRINTF, STRICMP, LOAD_STRING, FORMAT_LAP = 0x00534aaf, 0x00536070, 0x00521970, 0x00518690

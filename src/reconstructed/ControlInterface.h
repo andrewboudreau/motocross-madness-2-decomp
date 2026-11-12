@@ -26,12 +26,12 @@ public:
 // joystick lists at JoystickDevice+0x4fc hold pointers to these, and
 // JoystickDevice::0x00489a20 stores the device at +0x00. Its helpers sit
 // just before ControlInterface's constructor; the TU is not established.
-struct UnknownControlBinding {
-    UnknownControlBinding();                                  // 0x0043cc40
-    UnknownControlBinding(float minimum, float maximum, float center, int id,
+struct ControlBinding {
+    ControlBinding();                                  // 0x0043cc40
+    ControlBinding(float minimum, float maximum, float center, int id,
                           int axis, float deadZone);         // 0x0043cc50
 
-    ~UnknownControlBinding();                                 // 0x0043cd00: unbinds
+    ~ControlBinding();                                 // 0x0043cd00: unbinds
 
     void Reset();                                             // 0x0043cca0: clears everything, ids -1
     void SetKeys(int first, int second);                      // 0x0043cce0: +0x0c and +0x10 (the keyboard's keys)
@@ -58,7 +58,7 @@ struct UnknownControlBinding {
 };
 
 // 20-byte input event queued by 0x0043cea0.
-struct UnknownControlEvent {
+struct ControlEvent {
     int control;
     int kind;
     int device;
@@ -69,9 +69,9 @@ struct UnknownControlEvent {
 // Mapping table at ControlInterface+0xcbc (installed by 0x0043ce70): the
 // keyboard key, joystick button (per joystick) and mouse button for each of
 // 50 controls, -1 when unmapped.
-class UnknownControlMapping {
+class ControlMapping {
 public:
-    UnknownControlMapping();                                       // 0x0043cae0
+    ControlMapping();                                       // 0x0043cae0
     void Clear();                                             // 0x0043caf0: unmaps every control
     void SetKey(int control, int key);                        // 0x0043cb30
     void SetJoystickButton(int control, int button, int device); // 0x0043cb50
@@ -87,7 +87,7 @@ public:
 
 // cdecl 0x0043caa0: whether `event` is control `control` of device kind
 // `kind` with `modifier` held (when there is a keyboard).
-int TestInputEvent(int control, int kind, const UnknownControlEvent* event, int modifier);
+int TestInputEvent(int control, int kind, const ControlEvent* event, int modifier);
 
 // cdecl 0x0043d080: maps the 2-bit field `index` of byte `byteIndex` of
 // `bits` to 0x200, 0x40, 0x80 or 0x100, a texture size: Cube 0x0043d460
@@ -108,11 +108,11 @@ public:
     virtual int IsDeviceButtonDown(int control, int kind, int modifier, int device) = 0;
     virtual int ModifierHolds(int modifier) = 0;                 // modifier test
 
-    int SetMapping(UnknownControlMapping* newMapping);        // 0x0043ce70: 0 for a null mapping
+    int SetMapping(ControlMapping* newMapping);        // 0x0043ce70: 0 for a null mapping
     void QueueEvent(int control, int kind, int pressed, int device); // 0x0043cea0: the device readers call it
     int DispatchInput(int value);                             // 0x0043cf00: reads the devices, dispatches the events
     // 0x0043ce90: ++0x0057985c (g_LastBindingId); the id each new
-    // UnknownControlBinding gets (GUIManager, DeviceSetup, ObjectPicker).
+    // ControlBinding gets (GUIManager, DeviceSetup, ObjectPicker).
     int NextBindingId();
 
     int joystickCount;                        // joystick count
@@ -122,7 +122,7 @@ public:
     MouseDevice* mouse;
     KeyboardDevice* keyboard;    // keyboard (see above)
     int queuedEventCount;                        // queued events
-    UnknownControlEvent events[160];
-    UnknownControlMapping* mapping;
+    ControlEvent events[160];
+    ControlMapping* mapping;
     struct UnknownDirectInput* directInput;
 };

@@ -82,7 +82,7 @@ public:
     virtual int Tick(float dt);                                       // 0x00504690
     virtual int PrepareGeometry();                                    // 0x00504620
     virtual int Render3D();                            // 0x00504570
-    virtual int OnControlPress(UnknownControlEvent* a, UnknownInputEntry* b);                         // 0x005048d0
+    virtual int OnControlPress(ControlEvent* a, InputButtonState* b);                         // 0x005048d0
 
     void InsertNodesInQuadtree();    // owner: SoultreeQuadTreeRenderer.cpp (__FILE__ line 0x63)
     void RemoveNodesFromQuadtree();    // owner: SoultreeQuadTreeRenderer.cpp (__FILE__ line 0x7f)

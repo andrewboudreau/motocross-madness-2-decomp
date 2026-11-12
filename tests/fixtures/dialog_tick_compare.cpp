@@ -95,7 +95,7 @@ static void Mutate(int operation) {
 struct DirectCall {
     int Tick(float);
     int BaseTick(float time) { return ((GameObject*)this)->GameObject::Tick(time); }
-    void EventCall(UnknownDialogEvent* event) {
+    void EventCall(DialogEvent* event) {
         if ((void*)this!=Dialog()) ExitProcess(84);
         int timer=event->kind==kDialogTimer;
         if (!timer && event->kind!=kDialogFrame) ExitProcess(85);

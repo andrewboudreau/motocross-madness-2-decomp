@@ -15,5 +15,5 @@ public:
     virtual int Tick(float frameTime);
 
     virtual int UnknownVirtualSlot19(int value);
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);
 };

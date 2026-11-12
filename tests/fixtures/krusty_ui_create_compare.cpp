@@ -79,26 +79,26 @@ FAIL_INT(GameObject,Step,(float)) FAIL_INT(GameObject,PrepareGeometry,())
 FAIL_INT(GameObject,RenderPre3D,()) FAIL_INT(GameObject,Render3D,()) FAIL_INT(GameObject,RenderPost3D,())
 FAIL_INT(GameObject,SetPaused,(int)) FAIL_INT(GameObject,OnDeactivate,()) FAIL_INT(GameObject,OnActivate,())
 FAIL_INT(GameObject,UnknownVirtualSlot19,(int)) FAIL_INT(GameObject,OnChar,(int)) FAIL_INT(GameObject,OnKeyDown,(int))
-FAIL_INT(GameObject,OnControlRelease,(UnknownControlEvent*,UnknownInputEntry*))
-FAIL_INT(GameObject,OnControlPress,(UnknownControlEvent*,UnknownInputEntry*))
+FAIL_INT(GameObject,OnControlRelease,(ControlEvent*,InputButtonState*))
+FAIL_INT(GameObject,OnControlPress,(ControlEvent*,InputButtonState*))
 FAIL_INT(GameObject,OnNetworkMessage,(int,void*,int,int,int)) FAIL_INT(GameObject,AttachRenderContext,(void*))
 FAIL_VOID(GameObject,MarkPendingRelease,())
 GUIManager::GUIManager(int flags):GameObject(flags){EventAt(4,Which(this,Gui(0),Gui(1)),flags);}
 GUIManager::~GUIManager(){Fail(88);}
 FAIL_INT(GUIManager,Tick,(float)) FAIL_INT(GUIManager,RenderPre3D,()) FAIL_INT(GUIManager,RenderPost3D,())
-FAIL_INT(GUIManager,OnControlRelease,(UnknownControlEvent*,UnknownInputEntry*))
-FAIL_INT(GUIManager,OnControlPress,(UnknownControlEvent*,UnknownInputEntry*))
+FAIL_INT(GUIManager,OnControlRelease,(ControlEvent*,InputButtonState*))
+FAIL_INT(GUIManager,OnControlPress,(ControlEvent*,InputButtonState*))
 UIDialog::UIDialog(int flags,const char* resource):GameObject(flags){if((void*)this!=world.intro)Fail(90);EventAt(21,0,flags,0,0,0,resource);strcpy(resourceName,resource);}
 UIDialog::~UIDialog(){}
 FAIL_INT(UIDialog,Release,()) FAIL_INT(UIDialog,Tick,(float)) FAIL_INT(UIDialog,RenderPre3D,())
 FAIL_INT(UIDialog,Render3D,()) FAIL_INT(UIDialog,RenderPost3D,())
-FAIL_INT(UIDialog,OnControlRelease,(UnknownControlEvent*,UnknownInputEntry*))
-FAIL_INT(UIDialog,OnControlPress,(UnknownControlEvent*,UnknownInputEntry*))
+FAIL_INT(UIDialog,OnControlRelease,(ControlEvent*,InputButtonState*))
+FAIL_INT(UIDialog,OnControlPress,(ControlEvent*,InputButtonState*))
 UIDialog* UIDialog::Create(void*,CameraRect*,int,int,SoundGroup*,void*,const char*,UIDialog*,BackgroundImage*,const char*,int,GUIManager*,GUIUser*,const char*){Fail(88);return 0;}
-FAIL_VOID(UIDialog,SendInitEvent,(int)) FAIL_VOID(UIDialog,HandleEvent,(UnknownDialogEvent*))
+FAIL_VOID(UIDialog,SendInitEvent,(int)) FAIL_VOID(UIDialog,HandleEvent,(DialogEvent*))
 FAIL_VOID(UIDialog,UnknownVirtualSlot30,()) FAIL_VOID(UIDialog,SyncValues,(int))
-FAIL_VOID(Intro1Dlg,HandleEvent,(UnknownDialogEvent*)) FAIL_INT(Intro1Dlg,Tick,(float))
-FAIL_INT(Intro1Dlg,OnControlPress,(UnknownControlEvent*,UnknownInputEntry*))
+FAIL_VOID(Intro1Dlg,HandleEvent,(DialogEvent*)) FAIL_INT(Intro1Dlg,Tick,(float))
+FAIL_INT(Intro1Dlg,OnControlPress,(ControlEvent*,InputButtonState*))
 struct Constructors {GameObject* Context(void* p){return ((GameObject*)this)->GameObject::SetRenderContext(p);}GUIManager* Gui(int flags){return ::new(this) GUIManager(flags);}UIDialog* Dialog(int flags,const char* name){return ::new(this) UIDialog(flags,name);}};
 void GuiProgressCallback(){Fail(91);}
 static int GuiIndex(const void* p){return Which(p,Gui(0),Gui(1));}

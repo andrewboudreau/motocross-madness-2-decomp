@@ -13,7 +13,7 @@ from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-PREDICATE = '?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z'
+PREDICATE = '?TestInputEvent@@YAHHHPBUControlEvent@@H@Z'
 CASES = (
     ('src/krusty2/collision/CollisionObject.cpp', '?OnControlPress@CollisionObject@@', 0x434970, 153, 3),
     ('src/krusty2/broadphase/Terrain.cpp', '?OnControlPress@Terrain@@', 0x508850, 276, 3),

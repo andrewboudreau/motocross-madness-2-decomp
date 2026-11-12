@@ -28,7 +28,7 @@ void ReportDirectPlayError(long result, const char* file, int line);  // 0x004ad
 
 // cdecl 0x004ae460: joins the session selected in "LstSessions" (the
 // HostJoinDlg procedure calls it for a kind 13 message).
-void JoinSelectedSession(UnknownDialogEvent* event);  // 0x004ae460
+void JoinSelectedSession(DialogEvent* event);  // 0x004ae460
 
 // cdecl 0x004aefa0: 1 when the network object exists or Game slot 16
 // creates it; otherwise drops it (0x004aef40) and returns 0.
@@ -39,40 +39,40 @@ int EnsureNetworkInterface();  // 0x004aefa0
 class HostJoinDlg : public UIDialog {
 public:
     HostJoinDlg() : UIDialog(1, "HostJoin.dtm") {} // inline (KrustyUI 0x00499b20)
-    void HandleEvent(UnknownDialogEvent* event); // 0x004ae500
+    void HandleEvent(DialogEvent* event); // 0x004ae500
 };
 
 // RTTI: SerialPopupDlg : UIDialog (vtable 0x00554eb0).
 class SerialPopupDlg : public UIDialog {
 public:
     SerialPopupDlg() : UIDialog(1, "SerPopup.dtm") {} // inline (KrustyUI 0x00499b20)
-    void HandleEvent(UnknownDialogEvent* event); // 0x004aea60
+    void HandleEvent(DialogEvent* event); // 0x004aea60
 };
 
 // RTTI: TCPAddressDlg : UIDialog (vtable 0x00554e2c).
 class TCPAddressDlg : public UIDialog {
 public:
     TCPAddressDlg() : UIDialog(1, "messbox1.dtm") {} // inline (KrustyUI 0x00499b20)
-    void HandleEvent(UnknownDialogEvent* event); // 0x004aee10
+    void HandleEvent(DialogEvent* event); // 0x004aee10
 };
 
 // RTTI: WaitOrCallDlg : UIDialog (vtable 0x00554da8).
 class WaitOrCallDlg : public UIDialog {
 public:
     WaitOrCallDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
-    void HandleEvent(UnknownDialogEvent* event); // 0x004af100
+    void HandleEvent(DialogEvent* event); // 0x004af100
 };
 
 // RTTI: ConnectErrorDlg : UIDialog (vtable 0x00554c1c).
 class ConnectErrorDlg : public UIDialog {
 public:
     ConnectErrorDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
-    void HandleEvent(UnknownDialogEvent* event); // 0x004af470
+    void HandleEvent(DialogEvent* event); // 0x004af470
 };
 
 // RTTI: PlayerRemovedDlg : UIDialog (vtable 0x00551b9c).
 class PlayerRemovedDlg : public UIDialog {
 public:
     PlayerRemovedDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
-    void HandleEvent(UnknownDialogEvent* event); // 0x004af590
+    void HandleEvent(DialogEvent* event); // 0x004af590
 };

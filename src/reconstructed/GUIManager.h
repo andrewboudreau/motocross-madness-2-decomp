@@ -238,8 +238,8 @@ public:
                          float minY, float maxY);
     void Rebind();             // 0x00487150: rebinds at the current position
 
-    UnknownControlBinding bindingX;           // +0x2c: x
-    UnknownControlBinding bindingY;           // +0x68: y
+    ControlBinding bindingX;           // +0x2c: x
+    ControlBinding bindingY;           // +0x68: y
     POINT pointerPosition;                    // +0xa4: position
     InputDevice* inputDevice;                 // +0xac
     float rangeMinX;                          // +0xb0: minimum x

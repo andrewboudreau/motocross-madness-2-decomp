@@ -1122,7 +1122,7 @@ void EcoSystem::SetRenderStates(int format) {
 }
 
 // 0x0045bfe0: the key toggling the drawing.
-int EcoSystem::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int EcoSystem::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (GameObject::OnControlPress(event, entry))
         return 1;
     if (TestInputEvent(4, 0, event, 0x80)) {

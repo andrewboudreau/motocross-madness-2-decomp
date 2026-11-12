@@ -35,7 +35,7 @@ int UIDialog::Tick(float frameTime) {
     else
         lastFrameTime = 0.001f;
     if (sendFrameEvent) {
-        UnknownDialogEvent event;
+        DialogEvent event;
         event.gui = guiManager;
         event.handled = 0;
         event.kind = kDialogFrame;
@@ -53,7 +53,7 @@ int UIDialog::Tick(float frameTime) {
                 if ((control = timer->targetControl) != 0) {
                     control->HandleTimer((int)timer);
                 } else {
-                    UnknownDialogEvent event;
+                    DialogEvent event;
                     event.code = timer->timerId;
                     event.gui = guiManager;
                     event.handled = 0;

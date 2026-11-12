@@ -103,10 +103,10 @@ ObjectPicker* ObjectPicker::Create(void* target, TextureMapManager* textures,
         pickCursor = cursor;
     } else {
         cursorBindingX = new(__FILE__, 59)
-            UnknownControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)renderContext)->currentCamera)->cursorRangeX,
+            ControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)renderContext)->currentCamera)->cursorRangeX,
                                   0.0f, g_TrackGame->controlInterface->NextBindingId(), 0, 0.1f);
         cursorBindingY = new(__FILE__, 60)
-            UnknownControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)renderContext)->currentCamera)->cursorRangeY,
+            ControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)renderContext)->currentCamera)->cursorRangeY,
                                   0.0f, g_TrackGame->controlInterface->NextBindingId(), 1, 0.1f);
         if (g_TrackGame->controlInterface->mouse) {
             g_TrackGame->controlInterface->mouse->AttachBinding(cursorBindingX);

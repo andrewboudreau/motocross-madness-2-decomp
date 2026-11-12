@@ -9,7 +9,7 @@
 #include "TrackGame.h"
 
 // 0x00510a50
-UnknownTextureMapList::UnknownTextureMapList() {
+TextureMapList::TextureMapList() {
     m_cursor = 0;
     m_tail = 0;
     m_head = 0;
@@ -17,7 +17,7 @@ UnknownTextureMapList::UnknownTextureMapList() {
 }
 
 // 0x00510a60
-UnknownTextureMapList::~UnknownTextureMapList() {
+TextureMapList::~TextureMapList() {
     for (m_cursor = m_head; m_cursor;) {
         TextureMap* next = m_cursor->nextTexture;
         m_cursor->nextTexture = 0;
@@ -27,31 +27,31 @@ UnknownTextureMapList::~UnknownTextureMapList() {
 }
 
 // 0x00510a90
-TextureMap* UnknownTextureMapList::First() {
+TextureMap* TextureMapList::First() {
     return m_cursor = m_head;
 }
 
 // 0x00510aa0
-TextureMap* UnknownTextureMapList::Last() {
+TextureMap* TextureMapList::Last() {
     return m_cursor = m_tail;
 }
 
 // 0x00510ab0
-TextureMap* UnknownTextureMapList::Next() {
+TextureMap* TextureMapList::Next() {
     if (m_cursor)
         m_cursor = m_cursor->nextTexture;
     return m_cursor;
 }
 
 // 0x00510ad0
-TextureMap* UnknownTextureMapList::Previous() {
+TextureMap* TextureMapList::Previous() {
     if (m_cursor)
         m_cursor = m_cursor->previousTexture;
     return m_cursor;
 }
 
 // 0x00510af0
-void UnknownTextureMapList::Append(TextureMap* texture) {
+void TextureMapList::Append(TextureMap* texture) {
     if (!m_head) {
         m_tail = texture;
         m_head = texture;
@@ -68,7 +68,7 @@ void UnknownTextureMapList::Append(TextureMap* texture) {
 }
 
 // 0x00510b30
-void UnknownTextureMapList::Remove(TextureMap* texture) {
+void TextureMapList::Remove(TextureMap* texture) {
     if (texture->previousTexture)
         texture->previousTexture->nextTexture = texture->nextTexture;
     if (texture->nextTexture)
@@ -81,7 +81,7 @@ void UnknownTextureMapList::Remove(TextureMap* texture) {
 }
 
 // 0x00510b70
-void UnknownTextureMapList::AppendList(UnknownTextureMapList* other) {
+void TextureMapList::AppendList(TextureMapList* other) {
     TextureMap* head = other->First();
     if (head) {
         TextureMap* tail = other->Last();
@@ -179,7 +179,7 @@ int TextureMapManager::RenderPost3D() {
 // 0x21 toggles the selected cache's +0x08, 0x1b / 0x1a step forwards /
 // backwards (through the cache's +0x1c8 or +0x1c4 entries, or through the
 // caches) and 0x15 runs the cache's 0x0050c7e0.
-int TextureMapManager::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int TextureMapManager::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     int handled = 0;
     if (GameObject::OnControlPress(event, entry))
         return 1;
@@ -267,7 +267,7 @@ int TextureMapManager::ShareCacheLimit() {
     }
     if (g_TrackGame->display->isAGP) {
         for (i = 0; i < count; i++) {
-            UnknownTextureMapList* textures = &groups.Get(i)->managedTextures;
+            TextureMapList* textures = &groups.Get(i)->managedTextures;
             for (TextureMap* texture = textures->First(); texture; texture = textures->Next())
                 static_cast<ManagedTexture*>(texture)->CreateOwnSurface(1, 0, 0);
         }

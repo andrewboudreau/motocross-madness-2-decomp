@@ -877,7 +877,7 @@ void KrustyBike::SimulateFrame(float dt)
     }
     if (race->localRacer == this && reinterpret_cast<KbGame*>(g_TrackGame)->raceMode == 4) {
         TextQueueOverlay* sink = reinterpret_cast<EventManager*>(reinterpret_cast<KbGame*>(g_TrackGame)->eventManager)->FindTextQueue();
-        UnknownMessage* msg = 0;
+        TextQueueMessage* msg = 0;
         if (sink) {
             char text[0x100];
             if (totalRunningTime == 0) {
@@ -885,14 +885,14 @@ void KrustyBike::SimulateFrame(float dt)
                     g_TrackGame->LoadResourceString(0x14d6, text, 0x80);
                 else
                     g_TrackGame->LoadResourceString(0x14d7, text, 0x80);
-                msg = new(__FILE__, 0x11c6) UnknownMessage(text, 3.25f);
+                msg = new(__FILE__, 0x11c6) TextQueueMessage(text, 3.25f);
                 if (msg) {
                     sink->ReplaceHeadMessage(msg);
                     delete msg;
                 }
             } else if (lapCount != prevLapCount && lapCount == 1 && race->startBeforeFinish) {
                 g_TrackGame->LoadResourceString(0x14d7, text, 0x80);
-                msg = new(__FILE__, 0x11d0) UnknownMessage(text, 3.25f);
+                msg = new(__FILE__, 0x11d0) TextQueueMessage(text, 3.25f);
                 if (msg) {
                     sink->ReplaceHeadMessage(msg);
                     delete msg;
@@ -905,7 +905,7 @@ void KrustyBike::SimulateFrame(float dt)
             TextQueueOverlay* sink = reinterpret_cast<EventManager*>(reinterpret_cast<KbGame*>(g_TrackGame)->eventManager)->FindTextQueue();
             if (race->localRacer == this && sink) {
                 char text[0x100];
-                UnknownMessage* msg = 0;
+                TextQueueMessage* msg = 0;
                 if (reinterpret_cast<KbGame*>(g_TrackGame)->playerCount == 1) {
                     switch (finishPosition) {
                     case 1: g_TrackGame->LoadResourceString(0x1481, text, 0x80); break;
@@ -921,14 +921,14 @@ void KrustyBike::SimulateFrame(float dt)
                     case 11: g_TrackGame->LoadResourceString(0x148b, text, 0x80); break;
                     default: g_TrackGame->LoadResourceString(0x148c, text, 0x80); break;
                     }
-                    msg = new(__FILE__, 0x1206) UnknownMessage(text, 3.25f);
+                    msg = new(__FILE__, 0x1206) TextQueueMessage(text, 3.25f);
                     if (msg) {
                         sink->ReplaceHeadMessage(msg);
                         delete msg;
                     }
                 } else {
                     g_TrackGame->LoadResourceString(0x14e1, text, 0x80);
-                    msg = new(__FILE__, 0x120d) UnknownMessage(text, 3.25f);
+                    msg = new(__FILE__, 0x120d) TextQueueMessage(text, 3.25f);
                     if (msg) {
                         sink->ReplaceHeadMessage(msg);
                         delete msg;
@@ -1026,7 +1026,7 @@ float KrustyBike::AwardTrickScore()
             if (gain > 0.0f) {
                 g_TrackGame->LoadResourceString(0x14d8, text, 0x80);
                 sprintf(line, "%s %.0f.00", text, gain);
-                UnknownMessage* message = new(__FILE__, 0xa14) UnknownMessage(line, 3.25f);
+                TextQueueMessage* message = new(__FILE__, 0xa14) TextQueueMessage(line, 3.25f);
                 if (message) {
                     sink->ReplaceHeadMessage(message);
                     delete message;
@@ -1034,7 +1034,7 @@ float KrustyBike::AwardTrickScore()
             } else {
                 g_TrackGame->LoadResourceString(0x14d9, text, 0x80);
                 sprintf(line, "%s %.0f.00)", text, points * rules->limitScale);
-                UnknownMessage* message = new(__FILE__, 0xa1d) UnknownMessage(line, 3.25f);
+                TextQueueMessage* message = new(__FILE__, 0xa1d) TextQueueMessage(line, 3.25f);
                 if (message) {
                     sink->ReplaceHeadMessage(message);
                     delete message;

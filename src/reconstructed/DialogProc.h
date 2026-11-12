@@ -10,10 +10,10 @@
 
 // The message a dialog procedure receives. Kind 9 is a notification whose
 // code is +0x00 (UIDialog::NotifyParent).
-struct UnknownDialogEvent {
+struct DialogEvent {
     int code;                                 // +0x00 notification code
     const char* controlName;                  // +0x04 the control a command comes from
-    int kind;                                 // +0x08 (UnknownDialogEventKind)
+    int kind;                                 // +0x08 (DialogEventKind)
     UIDialog* dialog;                         // +0x0c the dialog the message is for
     GUIManager* gui;                          // +0x10 (OptionsDlg opens its sub-dialogs on it)
     UIControl* control;            // +0x14 the sending control (VCRDlg)
@@ -55,9 +55,9 @@ struct UnknownDialogEvent {
 // cdecl entry points in dlgprocs.cpp's code that the procedures pass a menu
 // id and their message to (0x004526b0 near dlgprocs.cpp's line references at
 // 0x00452b8e; 0x00453090 near 0x004531dc).
-void HandleMenuCancel(int menu, UnknownDialogEvent* event); // 0x004526b0: Cancel button / Esc for `menu`
-void HandleMenuOk(int menu, UnknownDialogEvent* event);     // 0x00452930: OK button / Enter for `menu`
-void HandleMenuMiddle(int menu, UnknownDialogEvent* event); // 0x00453090: ContinueDlg's "ButMiddle" for `menu` (its only caller)
+void HandleMenuCancel(int menu, DialogEvent* event); // 0x004526b0: Cancel button / Esc for `menu`
+void HandleMenuOk(int menu, DialogEvent* event);     // 0x00452930: OK button / Enter for `menu`
+void HandleMenuMiddle(int menu, DialogEvent* event); // 0x00453090: ContinueDlg's "ButMiddle" for `menu` (its only caller)
 
 // RTTI: ChoiceDlg : UIDialog (vtable 0x00551cb0; slot 29 is 0x004555b0 in
 // dlgprocs.cpp). ExitDlg's procedure allocates 0x7f58 bytes for it and
@@ -75,7 +75,7 @@ public:
     // button text hides the button).
     void SetTexts(const char* title, const char* prompt, const char* left,
                   const char* middle, const char* right);
-    void HandleEvent(UnknownDialogEvent* event); // 0x004555b0
+    void HandleEvent(DialogEvent* event); // 0x004555b0
 };
 
 // RTTI: SessionDlg : UIDialog (vtable 0x00555408; type descriptor 0x0056eb10
@@ -84,5 +84,5 @@ public:
 class SessionDlg : public UIDialog {
 public:
     SessionDlg() : UIDialog(1, "messbox1.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x004aefd0
+    void HandleEvent(DialogEvent* event); // 0x004aefd0
 };

@@ -20,7 +20,7 @@ public:
   ((KeyboardProbe*)p)->keyStates[0x29].state=key;
  }
 };
-typedef char EventLayout[sizeof(UnknownControlEvent)==20 && offsetof(UnknownControlEvent,kind)==4 ? 1:-1];
+typedef char EventLayout[sizeof(ControlEvent)==20 && offsetof(ControlEvent,kind)==4 ? 1:-1];
 static int Map(const char* path){
     BYTE* mapped=(BYTE*)0x400000;DWORD old;
     if((DWORD)referenceSpace>0x400000 || (DWORD)referenceSpace+sizeof(referenceSpace)<0x690000 || !VirtualProtect(mapped,0x290000,PAGE_EXECUTE_READWRITE,&old))return 0;
@@ -48,10 +48,10 @@ static void Check(int control,int kind,int modifier,int eventControl,int eventKi
  g_TrackGame->controlInterface->keyboard=keyboard?(KeyboardDevice*)keyboardWords:0;
  KeyboardProbe::Seed((KeyboardDevice*)keyboardWords,state,key);
  *(TrackGame**)0x56e26c=g_TrackGame;
- UnknownControlEvent event={eventControl,eventKind,0x12345678,-1,0x87654321};
+ ControlEvent event={eventControl,eventKind,0x12345678,-1,0x87654321};
  DWORD gameBefore[sizeof(gameWords)/4],controlBefore[sizeof(controlWords)/4],keyBefore[sizeof(keyboardWords)/4];
  memcpy(gameBefore,gameWords,sizeof(gameWords));memcpy(controlBefore,controlWords,sizeof(controlWords));memcpy(keyBefore,keyboardWords,sizeof(keyboardWords));
- typedef int (__cdecl* Predicate)(int,int,const UnknownControlEvent*,int);
+ typedef int (__cdecl* Predicate)(int,int,const ControlEvent*,int);
  int expected=((Predicate)0x43caa0)(control,kind,&event,modifier);
  int actual=TestInputEvent(control,kind,&event,modifier);
  if(actual!=expected || memcmp(gameBefore,gameWords,sizeof(gameWords)) || memcmp(controlBefore,controlWords,sizeof(controlWords)) || memcmp(keyBefore,keyboardWords,sizeof(keyboardWords))) {printf("input mismatch %u\n",checks);exit(4);}
@@ -65,7 +65,7 @@ int main(int argc,char** argv) {
  for(int debug=0;debug<2;++debug)for(int key=0;key<3;++key)for(int match=0;match<4;++match)
   Check(0x57,0,masks[m],(match&1)?0x57:0x43,(match&2)?0:1,keyboard,states[s],debug,key);
  // Independent ordinary outcomes, including short circuit before global use.
- UnknownControlEvent event={0x57,0,0,0,0};g_TrackGame=0;
+ ControlEvent event={0x57,0,0,0,0};g_TrackGame=0;
  if(TestInputEvent(0x43,0,&event,0x80) || TestInputEvent(0x57,1,&event,0x80))return 5;
  g_TrackGame=(TrackGame*)gameWords;g_TrackGame->controlInterface=(ControlInterface*)controlWords;
  g_TrackGame->controlInterface->keyboard=0;

@@ -1122,7 +1122,7 @@
         },
         {
           "slot": 22,
-          "symbol": "?OnControlRelease@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "symbol": "?OnControlRelease@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x469580",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 76,
@@ -1130,7 +1130,7 @@
         },
         {
           "slot": 23,
-          "symbol": "?OnControlPress@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "symbol": "?OnControlPress@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x4695d0",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 76,
@@ -1327,7 +1327,7 @@
         },
         {
           "slot": 22,
-          "symbol": "?OnControlRelease@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "symbol": "?OnControlRelease@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x469580",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 76,
@@ -1335,7 +1335,7 @@
         },
         {
           "slot": 23,
-          "symbol": "?OnControlPress@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "symbol": "?OnControlPress@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x4695d0",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 76,
@@ -1532,7 +1532,7 @@
         },
         {
           "slot": 22,
-          "symbol": "?OnControlRelease@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "symbol": "?OnControlRelease@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x469580",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 76,
@@ -1540,7 +1540,7 @@
         },
         {
           "slot": 23,
-          "symbol": "?OnControlPress@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "symbol": "?OnControlPress@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x4695d0",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 76,
@@ -1737,7 +1737,7 @@
         },
         {
           "slot": 22,
-          "symbol": "?OnControlRelease@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "symbol": "?OnControlRelease@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x469580",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 76,
@@ -1745,7 +1745,7 @@
         },
         {
           "slot": 23,
-          "symbol": "?OnControlPress@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z",
+          "symbol": "?OnControlPress@GameObject@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
           "va": "0x4695d0",
           "source": "src/reconstructed/GameObject.cpp",
           "extent": 76,

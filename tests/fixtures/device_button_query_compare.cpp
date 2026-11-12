@@ -4,12 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 class TrackGame;
-struct UnknownInputEntry;
+struct InputButtonState;
 class PCControlInterface{public:virtual int IsDeviceButtonDown(int,int,int,int);};
-class ActualKeyboard{public:int Query(int,int,UnknownInputEntry*);};
-class ActualMouse{public:int Query(int,int,UnknownInputEntry*);};
-class ActualJoystick{public:int Query(int,int,UnknownInputEntry*);};
-class Probe{public:int Slot2(int,int,UnknownInputEntry*);int Slot5(int,int,UnknownInputEntry*);};
+class ActualKeyboard{public:int Query(int,int,InputButtonState*);};
+class ActualMouse{public:int Query(int,int,InputButtonState*);};
+class ActualJoystick{public:int Query(int,int,InputButtonState*);};
+class Probe{public:int Slot2(int,int,InputButtonState*);int Slot5(int,int,InputButtonState*);};
 static BYTE referenceSpace[0x800000]={1};
 struct World{BYTE control[0xcd0],keyboard[0x16dc],mouse[0x2e8],joysticks[8][0x600],game[0x3500];};
 static World world;TrackGame* g_TrackGame;
@@ -22,7 +22,7 @@ static DWORD& At(void* p,int offset){return *(DWORD*)((BYTE*)p+offset);}
 static void Fail(int code){printf("Invariant%d case%d retail%d\n",code,checks,retailActive);fflush(stdout);ExitProcess(code);}
 template<class T>static DWORD Address(T p){if(sizeof(p)!=4)Fail(80);union{T p;DWORD a;}u;u.p=p;return u.a;}
 static int Identity(void* p){if(p==world.keyboard)return 1;if(p==world.mouse)return 2;for(int i=0;i<8;++i)if(p==world.joysticks[i])return 10+i;return(int)p;}
-static int Callback(void* who,int slot,int control,int modifier,UnknownInputEntry* entry){if(observed.count++)Fail(81);Event& e=observed.event;e.slot=slot;e.who=Identity(who);e.control=control;e.modifier=modifier;e.entry=(int)entry;e.before=world;
+static int Callback(void* who,int slot,int control,int modifier,InputButtonState* entry){if(observed.count++)Fail(81);Event& e=observed.event;e.slot=slot;e.who=Identity(who);e.control=control;e.modifier=modifier;e.entry=(int)entry;e.before=world;
  switch(scenario.mutation){case 1:{At(world.control,0x34)=0;At(world.control,0x30)=0;for(int j=0;j<8;++j)At(world.control,0x10+j*4)=0;break;}
  case 2:At(world.control,0x34)=(DWORD)world.mouse;At(world.control,0x30)=(DWORD)world.keyboard;break;
  case 3:memset((BYTE*)who+4,0x95,32);break;
@@ -34,8 +34,8 @@ static int Callback(void* who,int slot,int control,int modifier,UnknownInputEntr
  int result=scenario.result;
  if(scenario.real){if(e.who==1)result=((ActualKeyboard*)who)->Query(control,modifier,entry);else if(e.who==2)result=((ActualMouse*)who)->Query(control,modifier,entry);else result=((ActualJoystick*)who)->Query(control,modifier,entry);}
  e.after=world;return result;}
-int Probe::Slot2(int control,int modifier,UnknownInputEntry* entry){return Callback(this,2,control,modifier,entry);}
-int Probe::Slot5(int control,int modifier,UnknownInputEntry* entry){return Callback(this,5,control,modifier,entry);}
+int Probe::Slot2(int control,int modifier,InputButtonState* entry){return Callback(this,2,control,modifier,entry);}
+int Probe::Slot5(int control,int modifier,InputButtonState* entry){return Callback(this,5,control,modifier,entry);}
 static int MapReference(const char* path){
  BYTE* mapped=(BYTE*)0x400000;DWORD old;if((DWORD)referenceSpace>0x400000||(DWORD)referenceSpace+sizeof(referenceSpace)<0x690000||!VirtualProtect(mapped,0x290000,PAGE_EXECUTE_READWRITE,&old))return 0;
  FILE* f=fopen(path,"rb");if(!f)return 0;fseek(f,0,SEEK_END);long size=ftell(f);rewind(f);BYTE* raw=(BYTE*)malloc(size);if(!raw||fread(raw,1,size,f)!=(size_t)size)return 0;fclose(f);if(size<(long)sizeof(IMAGE_DOS_HEADER))return 0;IMAGE_DOS_HEADER* dos=(IMAGE_DOS_HEADER*)raw;

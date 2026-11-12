@@ -808,7 +808,7 @@ int RaceSound::OnActivate() {
 
 // 0x004e44e0: Ctrl+V toggles the EAX environment, Ctrl+C cycles the music
 // volume (race mode 3 only) and Ctrl+S turns all sound on or off.
-int RaceSound::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int RaceSound::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     UnknownEaxListenerParameters environment;
     char text[0x80];
     TrackGameViewOwner* owner;
@@ -858,7 +858,7 @@ int RaceSound::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* ent
                 break;
             }
             {
-                UnknownMessage message(text, 1.5f);
+                TextQueueMessage message(text, 1.5f);
                 if (owner)
                     owner->textQueue->ReplaceHeadMessage(&message);
             }

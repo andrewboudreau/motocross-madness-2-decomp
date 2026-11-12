@@ -8,7 +8,7 @@
 // control, then retain the base release behavior unless the event was handled.
 int UIEditBox::ButtonUp(int button, int* position) {
     if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && currentState == 2) {
-        UnknownDialogEvent event;
+        DialogEvent event;
         event.handled = button;
         event.kind = kDialogCommand;
         event.code = eventCode;

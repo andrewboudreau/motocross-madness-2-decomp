@@ -68,7 +68,7 @@ unsigned int ReadClock();
 
 // 20-byte input entry (keys at KeyboardDevice+0x260, buttons at
 // MouseDevice+0x260): a state and four stamped values.
-struct UnknownInputEntry {
+struct InputButtonState {
     int state;
     unsigned int releaseTime;
     unsigned int pressTime;

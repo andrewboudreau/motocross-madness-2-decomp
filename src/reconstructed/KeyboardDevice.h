@@ -15,13 +15,13 @@ public:
     virtual void RemoveBindings(int id); // 0x0048a030
     virtual int CreateDevice() = 0;
     virtual void DetectSubtype() = 0;
-    virtual int IsControlDown(int control, int modifier, UnknownInputEntry* entry) = 0;
-    virtual int IsButtonDown(int key, int modifier, UnknownInputEntry* entry) = 0;
+    virtual int IsControlDown(int control, int modifier, InputButtonState* entry) = 0;
+    virtual int IsButtonDown(int key, int modifier, InputButtonState* entry) = 0;
     virtual int Update(int value) = 0;
 
     // 0x00489f80: attaches `binding` to the keys `key` and `key2` with a
     // repeat step and interval (DeviceSetup.cpp 0x00448d30).
-    int BindKeys(UnknownControlBinding* binding, int key, int key2, float step,
+    int BindKeys(ControlBinding* binding, int key, int key2, float step,
                               float interval);
     // 0x0048a0c0: key-repeat stepping for the bindings in list `list`.
     void RepeatKeys(int list, int value);
@@ -31,7 +31,7 @@ public:
     friend class ControlInterface; // reads the input entries
 
 protected:
-    UnknownInputEntry keyStates[256];
-    ContainerList<UnknownControlBinding*> axisBindings[6];
+    InputButtonState keyStates[256];
+    ContainerList<ControlBinding*> axisBindings[6];
     int modifierState;             // current modifier state
 };

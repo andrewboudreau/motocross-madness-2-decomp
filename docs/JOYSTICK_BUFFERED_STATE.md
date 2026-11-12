@@ -61,7 +61,7 @@ complete canonical and validation-helper bodies independently:
 | ApplyAxisDeadZone | 0x004c3090 | 102 |
 | UnknownReportError | 0x004bf6a0 | 978 |
 | JoystickDevice::FeedAxis | 0x00489c00 | 84 |
-| UnknownControlBinding::SetFromAxis | 0x0043cd20 | 104 |
+| ControlBinding::SetFromAxis | 0x0043cd20 | 104 |
 | ControlInterface::QueueEvent | 0x0043cea0 | 82 |
 | PCJoystickDevice::Update caller | 0x004c3960 | 172 |
 

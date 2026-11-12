@@ -23,7 +23,7 @@ JoystickDevice::~JoystickDevice() {}
 // has no retail body of its own.
 // 0x00489980: with a keyboard, `modifier` must hold on it; without one,
 // only "none" (0, 0x80000000 or 0x3f) is accepted.
-int JoystickDevice::IsButtonDown(int button, int modifier, UnknownInputEntry* entry) {
+int JoystickDevice::IsButtonDown(int button, int modifier, InputButtonState* entry) {
     KeyboardDevice* keyboard = g_TrackGame->controlInterface->keyboard;
     if (((keyboard && keyboard->ModifierHolds(modifier)) ||
          (!keyboard && (modifier == 0 || modifier == (int)0x80000000 || modifier == 0x3f))) &&
@@ -42,7 +42,7 @@ int JoystickDevice::IsButtonDown(int button, int modifier, UnknownInputEntry* en
 
 // 0x00489a20: axis n's binding reports controls -(2n + 2) (low) and
 // -(2n + 3) (high).
-int JoystickDevice::AttachAxisBinding(UnknownControlBinding* binding, float step,
+int JoystickDevice::AttachAxisBinding(ControlBinding* binding, float step,
                                           float interval) {
     binding->owner = this;
     binding->repeatStep = step;
@@ -75,7 +75,7 @@ int JoystickDevice::AttachAxisBinding(UnknownControlBinding* binding, float step
 void JoystickDevice::RemoveBindings(int id) {
     for (int axis = 0; axis < 6; axis++) {
         for (int i = 0; i < axisBindings[axis].m_count; i++) {
-            UnknownControlBinding* binding = axisBindings[axis].Get(i);
+            ControlBinding* binding = axisBindings[axis].Get(i);
             if (binding->bindingId == id)
                 axisBindings[axis].Remove(binding);
         }
@@ -90,7 +90,7 @@ void JoystickDevice::FeedAxis(int axis, float value, float range) {
 
 // 0x00489c60: controls -2 to -13 are axis directions (below 16384 or above
 // 49152, for enabled axes); others go through the control mapping to slot 2.
-int JoystickDevice::GetControlState(int control, int modifier, UnknownInputEntry* entry) {
+int JoystickDevice::GetControlState(int control, int modifier, InputButtonState* entry) {
     if (control < 0) {
         switch (control) {
         case -2:
@@ -144,7 +144,7 @@ int JoystickDevice::GetControlState(int control, int modifier, UnknownInputEntry
         }
         return 0;
     }
-    UnknownControlMapping* mapping = g_TrackGame->controlInterface->mapping;
+    ControlMapping* mapping = g_TrackGame->controlInterface->mapping;
     if (!mapping)
         return 0;
     mapping->GetJoystickButton(control, &control, joystickIndex);

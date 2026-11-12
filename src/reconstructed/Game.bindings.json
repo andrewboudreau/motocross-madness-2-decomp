@@ -55,7 +55,7 @@
   "??_C@_0O@HAKH@VideoMemoryMB?$AA@": "0x0056b3f4",
   "?Pop@MemTagStack@@QAEXH@Z": "0x004a2d90",
   "?Push@MemTagStack@@QAEHPBD@Z": "0x004a2d00",
-  "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
+  "?TestInputEvent@@YAHHHPBUControlEvent@@H@Z": "0x0043caa0",
   "?Setup@DebugOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@HHH@Z": "0x00447de0",
   "?Print@DebugOverlay@@QAAXHPBDZZ": "0x00447f40",
   "?Title@DebugOverlay@@QAAXHPBDZZ": "0x00447fa0",

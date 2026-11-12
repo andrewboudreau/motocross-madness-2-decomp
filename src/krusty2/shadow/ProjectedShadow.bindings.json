@@ -51,5 +51,5 @@
   "_kVec3ZAxis": "0x00689b38",
   "_kVec3Zero": "0x00689b48",
   "_sprintf": "0x00534aaf",
-  "?OnControlPress@ProjectedShadow@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x004dc4c0"
+  "?OnControlPress@ProjectedShadow@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z": "0x004dc4c0"
 }

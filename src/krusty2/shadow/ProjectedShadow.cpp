@@ -253,7 +253,7 @@ int ProjectedShadow::PrepareGeometry()
 }
 
 // 0x004dc4c0 (slot 23, folded with Terrain's slot 22 and StatsOverlay's slot 23).
-int ProjectedShadow::OnControlPress(UnknownControlEvent*, UnknownInputEntry*)
+int ProjectedShadow::OnControlPress(ControlEvent*, InputButtonState*)
 {
     return 0;
 }

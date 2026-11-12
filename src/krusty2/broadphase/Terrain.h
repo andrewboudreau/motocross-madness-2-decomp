@@ -294,10 +294,10 @@ public:
     virtual int Render3D();
     virtual int UnknownVirtualSlot19(int a);                 // 0x00507920 returns 0
     void GetHeightRange(float* outMin, float* outMax);          // 0x00508970
-    virtual int OnControlRelease(UnknownControlEvent* a, UnknownInputEntry* b);                 // 0x004dc4c0 returns 0 (shared stub)
+    virtual int OnControlRelease(ControlEvent* a, InputButtonState* b);                 // 0x004dc4c0 returns 0 (shared stub)
     // Slot 23 (0x00508850, ret 8): debug key handler; tier 3 name kept in the comment only
     // so the override has the base's name.  First argument is the input event.
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* unused);
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* unused);
     // 0x00507bb0 (plain thiscall, no args): derives four floats from the ints at 0x6c / 0x70
     // (tier 3: a = appliedDrawDistance, b = cameraFocalLength): 0x74 = a/b, 0x78 = (a*a)/(b*b), 0x7c = 1/0x78,
     // 0x80 = 1/0x74.

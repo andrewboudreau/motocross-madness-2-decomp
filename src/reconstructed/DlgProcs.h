@@ -14,21 +14,21 @@ int CompareRowNumbersDescending(const void* a, const void* b);
 
 // 0x0044b120: makes the profile selected in "LstProfiles" current; 0 when
 // none is selected.
-int UseSelectedProfile(UnknownDialogEvent* event);
+int UseSelectedProfile(DialogEvent* event);
 
 // 0x0044b1f0: closes `dialog` (CreditsVidDlg passes it as a callback).
 void CloseDialogCallback(UIDialog* dialog);
 
 // 0x0044c930 / 0x0044c9f0: label the four "ButStats" buttons from string
 // ids / with texts (a zero argument leaves the button).
-void SetStatsButtonResources(UnknownDialogEvent* event, int resource1, int resource2, int resource3,
+void SetStatsButtonResources(DialogEvent* event, int resource1, int resource2, int resource3,
                              int resource4);
-void SetStatsButtonTexts(UnknownDialogEvent* event, const char* text1, const char* text2, const char* text3,
+void SetStatsButtonTexts(DialogEvent* event, const char* text1, const char* text2, const char* text3,
                          const char* text4);
 // 0x0044ca80: empties the four "LstStats" lists; 0x0044cae0 adds a row to
 // each (a zero argument skips the list).
-void ClearStatsLists(UnknownDialogEvent* event);
-void AddStatsRows(UnknownDialogEvent* event, const char* row1, const char* row2, const char* row3,
+void ClearStatsLists(DialogEvent* event);
+void AddStatsRows(DialogEvent* event, const char* row1, const char* row2, const char* row3,
                   const char* row4);
 
 // RTTI: MainDlg : UIDialog (vtable 0x00554fb8; 0x7f80 bytes, the size
@@ -36,7 +36,7 @@ void AddStatsRows(UnknownDialogEvent* event, const char* row1, const char* row2,
 class MainDlg : public UIDialog {
 public:
     MainDlg() : UIDialog(1, "mainmenu.dtm") {} // inline (KrustyUI 0x00499b20)
-    void HandleEvent(UnknownDialogEvent* event); // 0x0044b200
+    void HandleEvent(DialogEvent* event); // 0x0044b200
     virtual int Tick(float frameTime);                 // 0x0044c6b0
     void FillProfileList();             // 0x0044c7a0: fills "LstProfiles"
     void ShowCurrentProfile();             // 0x0044c8c0: shows the current profile
@@ -57,21 +57,21 @@ public:
 class ChooseTCPMethodDlg : public UIDialog {
 public:
     ChooseTCPMethodDlg() : UIDialog(1, "messbox2.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x0044cb80
+    void HandleEvent(DialogEvent* event); // 0x0044cb80
 };
 
 // RTTI: NewbieDlg : UIDialog (vtable 0x00551c2c; 0x7f58 bytes).
 class NewbieDlg : public UIDialog {
 public:
     NewbieDlg() : UIDialog(1, "messbox2.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x0044ccf0
+    void HandleEvent(DialogEvent* event); // 0x0044ccf0
 };
 
 // RTTI: NoDelCurProfileDlg : UIDialog (vtable 0x0055198c).
 class NoDelCurProfileDlg : public UIDialog {
 public:
     NoDelCurProfileDlg() : UIDialog(1, "messbox2.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x0044ce10
+    void HandleEvent(DialogEvent* event); // 0x0044ce10
 };
 
 class BackgroundImage;
@@ -91,7 +91,7 @@ public:
 class SinglePlayerDlg : public UIDialog {
 public:
     SinglePlayerDlg() : UIDialog(1, "SPBase.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x0044cf20
+    void HandleEvent(DialogEvent* event); // 0x0044cf20
     void OpenPage(int page);     // 0x0044d740: opens page `page` (0..2)
 
     SPEventDlg* eventPage;                    // +0x7f58: SPEventDlg page
@@ -105,7 +105,7 @@ struct UnknownRecordFileHeader;
 class SPEventDlg : public UIDialog {
 public:
     SPEventDlg() : UIDialog(1, "SPEvent.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x0044d950
+    void HandleEvent(DialogEvent* event); // 0x0044d950
     void ShowRaceModeControls();             // 0x0044dfc0: shows the controls for the race mode
     void ApplyEventType();             // 0x0044e3e0: applies the chosen event type
     void SyncValues(int apply);     // 0x0044e6c0: stores (or shows) the event settings
@@ -123,12 +123,12 @@ public:
 class SPBikeRiderDlg : public UIDialog {
 public:
     SPBikeRiderDlg() : UIDialog(1, "SPBikeR.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x0044ef70
+    void HandleEvent(DialogEvent* event); // 0x0044ef70
     // 0x0044fab0 / 0x0044fa00 (a near miss): MPBikeRiderDlg's and
     // PCCentralBikeRiderDlg's slot 22 and PCCentralBikeRiderDlg's slot 23
     // share these bodies.
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);
     virtual int Tick(float frameTime);                 // 0x0044fae0: turns the bike view
     virtual int RenderPre3D();                // 0x0044ffc0: names the chosen bike's and rider's textures
     // Slot 26: 0x004d72a0, folded with PCCentralBikeRiderDlg::MarkPendingRelease.
@@ -156,14 +156,14 @@ public:
 class SPRaceInfoDlg : public UIDialog {
 public:
     SPRaceInfoDlg() : UIDialog(1, "SPRInfo.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x004507a0
+    void HandleEvent(DialogEvent* event); // 0x004507a0
 };
 
 // RTTI: CreditsVidDlg : UIDialog (vtable 0x005516f8).
 class CreditsVidDlg : public UIDialog {
 public:
     CreditsVidDlg() : UIDialog(1, "credits.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x00453170
+    void HandleEvent(DialogEvent* event); // 0x00453170
 
     UIVideoStatic* movieControl;              // +0x7f58: the credits movie
 };
@@ -178,9 +178,9 @@ extern int g_IntroSkipped;
 class Intro2Dlg : public UIDialog {
 public:
     Intro2Dlg() : UIDialog(1, "intro2.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x00453430
+    void HandleEvent(DialogEvent* event); // 0x00453430
     virtual int Tick(float frameTime);                    // 0x00453570
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004535f0
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x004535f0
 
     int framesShown;                          // +0x7f58: frames shown
     float secondsShown;                       // +0x7f5c: seconds shown
@@ -191,9 +191,9 @@ public:
 class Intro3Dlg : public UIDialog {
 public:
     Intro3Dlg() : UIDialog(1, "intro3.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x00453610
+    void HandleEvent(DialogEvent* event); // 0x00453610
     virtual int Tick(float frameTime);                    // 0x00453670
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004536c0
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x004536c0
 
     float secondsShown;                       // +0x7f58: seconds shown
     int frameRan;                             // +0x7f5c: set once a frame has run
@@ -203,7 +203,7 @@ public:
 class EditBoxDlg : public UIDialog {
 public:
     EditBoxDlg() : UIDialog(1, "messbox1.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x00455840
+    void HandleEvent(DialogEvent* event); // 0x00455840
     // 0x004558f0: sets the title and prompt and edits `buffer` (`size` bytes).
     void Edit(const char* title, const char* prompt, char* buffer, int size);
     // 0x00455970: the same with string resource ids (used when nonzero).
@@ -226,9 +226,9 @@ public:
     // changes VC6's code for FillFileList 0x004f17a0 (SelectGamePicProcs.cpp
     // includes this header); a declaration does not.
     inline DemoDlg();
-    void HandleEvent(UnknownDialogEvent* event); // 0x00455a10
+    void HandleEvent(DialogEvent* event); // 0x00455a10
     virtual int Tick(float frameTime);                    // 0x00455b20
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00455ae0
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x00455ae0
 };
 
 // The image a dialog resource names (UIDialog 0x0046e9a0 returns its entry).
@@ -258,7 +258,7 @@ struct UnknownLoadFailedMessage {
 class LoadingDlg : public UIDialog {
 public:
     explicit LoadingDlg(int flags) : UIDialog(flags, "loading.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x00451020
+    void HandleEvent(DialogEvent* event); // 0x00451020
     virtual int Tick(float frameTime);                    // 0x00451270
 
     int framesShown;                          // +0x7f58: frames shown
@@ -306,27 +306,27 @@ void BuildComPortAddress(struct SerialSettings* settings, NetComPortAddress* add
 
 // 0x00451b80: creates the profile named in "EditBox" (or reports that it
 // exists).
-void CreateProfile(UnknownDialogEvent* event);
+void CreateProfile(DialogEvent* event);
 
 // RTTI: UserNameDlg : UIDialog (vtable 0x00554988): asks for the profile name.
 class UserNameDlg : public UIDialog {
 public:
     UserNameDlg() : UIDialog(1, "messbox1.dtm") {} // inline (KrustyUI 0x00499b20)
-    void HandleEvent(UnknownDialogEvent* event); // 0x00451ff0
+    void HandleEvent(DialogEvent* event); // 0x00451ff0
 };
 
 // RTTI: ProfileExistsDlg : UIDialog (vtable 0x005521dc; 0x7f58 bytes).
 class ProfileExistsDlg : public UIDialog {
 public:
     ProfileExistsDlg() : UIDialog(1, "messbox2.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x00452370
+    void HandleEvent(DialogEvent* event); // 0x00452370
 };
 
 // RTTI: RemoveProfileDlg : UIDialog (vtable 0x00551908).
 class RemoveProfileDlg : public UIDialog {
 public:
     RemoveProfileDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
-    void HandleEvent(UnknownDialogEvent* event); // 0x004524f0
+    void HandleEvent(DialogEvent* event); // 0x004524f0
 };
 
 // cdecl 0x0047b570 (gameui.cpp): resizes a DebugMalloc'd block (also
@@ -369,7 +369,7 @@ class ReplayFilesDlg;
 class GhostReplayDlg : public UIDialog {
 public:
     GhostReplayDlg() : UIDialog(1, "GRBase.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x00453b20
+    void HandleEvent(DialogEvent* event); // 0x00453b20
     void OpenPage(int page);     // 0x00453e90: opens page `page` (0 ghosts, 1 replays)
 
     GhostFilesDlg* ghostPage;                 // +0x7f58: GhostFilesDlg page
@@ -380,7 +380,7 @@ public:
 class GhostFilesDlg : public UIDialog {
 public:
     GhostFilesDlg() : UIDialog(1, "GhostFil.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x00454030
+    void HandleEvent(DialogEvent* event); // 0x00454030
     void ListGhostFiles();             // 0x00454470: lists the ghost files
     int AddGhostFile(const char* path); // 0x00454640: adds a ghost file; 0 when unusable
     void RaceSelectedGhost();             // 0x00454970: races the selected ghost
@@ -396,7 +396,7 @@ public:
 class ReplayFilesDlg : public UIDialog {
 public:
     ReplayFilesDlg() : UIDialog(1, "ReplyFil.dtm") {}
-    void HandleEvent(UnknownDialogEvent* event); // 0x00454a50
+    void HandleEvent(DialogEvent* event); // 0x00454a50
     void ListReplayFiles();             // 0x00454e60: lists the replay files
     int AddReplayFile(const char* path); // 0x00455040: adds a replay file; 0 when unusable
     void PlaySelectedReplay();             // 0x00455490: plays the selected replay

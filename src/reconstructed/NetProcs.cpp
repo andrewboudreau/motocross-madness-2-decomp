@@ -34,7 +34,7 @@ static const char kSessionNameCharacters[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-()$#";
 
 // 0x004ae460
-void JoinSelectedSession(UnknownDialogEvent* event) {
+void JoinSelectedSession(DialogEvent* event) {
     int selection = static_cast<UIListBox*>(event->dialog->FindControl("LstSessions", 0))->GetSelectedRow();
     g_TrackGame->mode.selectedSession = selection;
     if (selection != -1 && event->dialog &&
@@ -50,7 +50,7 @@ void JoinSelectedSession(UnknownDialogEvent* event) {
 }
 
 // 0x004ae500
-void HostJoinDlg::HandleEvent(UnknownDialogEvent* event) {
+void HostJoinDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         UIListBox* control = static_cast<UIListBox*>(FindControl("ButJoin", 0));
@@ -173,7 +173,7 @@ void HostJoinDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x004aea60
-void SerialPopupDlg::HandleEvent(UnknownDialogEvent* event) {
+void SerialPopupDlg::HandleEvent(DialogEvent* event) {
     char text[128];
     switch (event->kind) {
     case kDialogCommand:
@@ -246,7 +246,7 @@ void SerialPopupDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x004aee10
-void TCPAddressDlg::HandleEvent(UnknownDialogEvent* event) {
+void TCPAddressDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("CancelButton", event->controlName))
@@ -293,7 +293,7 @@ int EnsureNetworkInterface() {
 }
 
 // 0x004aefd0
-void SessionDlg::HandleEvent(UnknownDialogEvent* event) {
+void SessionDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("CancelButton", event->controlName))
@@ -318,7 +318,7 @@ void SessionDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x004af100
-void WaitOrCallDlg::HandleEvent(UnknownDialogEvent* event) {
+void WaitOrCallDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("ButRight", event->controlName)) {
@@ -382,7 +382,7 @@ void WaitOrCallDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x004af470
-void ConnectErrorDlg::HandleEvent(UnknownDialogEvent* event) {
+void ConnectErrorDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("ButMiddle", event->controlName))
@@ -409,7 +409,7 @@ void ConnectErrorDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x004af590
-void PlayerRemovedDlg::HandleEvent(UnknownDialogEvent* event) {
+void PlayerRemovedDlg::HandleEvent(DialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("ButRight", event->controlName)) {

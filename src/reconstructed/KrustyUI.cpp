@@ -500,7 +500,7 @@ int KrustyUI::OnActivate() {
 }
 
 // 0x00499a40
-int KrustyUI::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int KrustyUI::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     field_0x4a4 = 0;
     return GameObject::OnControlPress(event, entry) != 0;
 }

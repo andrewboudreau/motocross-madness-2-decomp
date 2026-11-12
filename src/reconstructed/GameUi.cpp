@@ -459,7 +459,7 @@ int UIStatic::IsInteractive() {
 // A click on a hovered static control sends a kDialogCommand to the dialog.
 int UIStatic::ButtonDown(int button, int position) {
     if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
-        UnknownDialogEvent event;
+        DialogEvent event;
         event.handled = button;
         event.kind = kDialogCommand;
         event.code = eventCode;
@@ -666,7 +666,7 @@ UIButton::UIButton(int id, CameraRect* area, UIDialog* owner)
 // 0x00473410
 int UIButton::ButtonUp(int button, int* position) {
     if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && currentState == 2) {
-        UnknownDialogEvent event;
+        DialogEvent event;
         event.handled = button;
         if (sortList)
             sortList->Sort(1);
@@ -781,7 +781,7 @@ void UIEditBox::SetBackgroundColor(unsigned long color) {
 
 // 0x004740b0
 void UIEditBox::KillFocus(int value) {
-    UnknownDialogEvent event;
+    DialogEvent event;
     event.handled = 0;
     event.kind = kDialogEditDone;
     event.code = eventCode;
@@ -817,7 +817,7 @@ UIScrollCtl::~UIScrollCtl() {
 // 0x00474880: a click scrolls the arrow's lists by a row, then repeats on a timer.
 int UIScrollCtl::ButtonDown(int button, int position) {
     if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
-        UnknownDialogEvent event;
+        DialogEvent event;
         event.handled = 0;
         GameObjectIterator* iterator;
         UIControl* control;
@@ -873,7 +873,7 @@ int UIScrollCtl::ButtonDown(int button, int position) {
 // tail; VC6 cross-jumps case 9's copy into case 10's.
 void UIScrollCtl::HandleTimer(int value) {
     UITimer* timer = (UITimer*)value;
-    UnknownDialogEvent event;
+    DialogEvent event;
     event.handled = 0;
     GameObjectIterator* iterator;
     UIControl* control;
@@ -922,7 +922,7 @@ void UIScrollCtl::HandleTimer(int value) {
 // 0x00474b10
 int UIScrollCtl::ButtonUp(int button, int* position) {
     if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button && currentState == 2) {
-        UnknownDialogEvent event;
+        DialogEvent event;
         event.handled = button;
         event.kind = kDialogCommand;
         event.code = eventCode;
@@ -1568,7 +1568,7 @@ int UIStaticText::Draw() {
 // 0x00479190
 int UIStaticText::ButtonDown(int button, int position) {
     if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
-        UnknownDialogEvent event;
+        DialogEvent event;
         event.handled = button;
         event.kind = kDialogCommand;
         event.code = eventCode;
@@ -1799,7 +1799,7 @@ int UIDropDownList::ButtonDown(int button, int position) {
 // UIProgressBar's slot 48 and UICtlContainer's input slots
 
 // 0x0047b3f0
-int UICtlContainer::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int UICtlContainer::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     GameObject* child = firstChild;
     if (child) {
         while (child->nextSibling)
@@ -1813,7 +1813,7 @@ int UICtlContainer::OnControlPress(UnknownControlEvent* event, UnknownInputEntry
 }
 
 // 0x0047b440
-int UICtlContainer::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int UICtlContainer::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
     GameObject* child = firstChild;
     if (child) {
         while (child->nextSibling)
@@ -1957,7 +1957,7 @@ UIDialog::~UIDialog() {
 
 // 0x0046a010
 int UIDialog::Release() {
-    UnknownDialogEvent event;
+    DialogEvent event;
     event.handled = 0;
     UpdateBoundValues(1);
     SyncValues(1);
@@ -1972,7 +1972,7 @@ int UIDialog::Release() {
 }
 
 // 0x0046a780
-int UIDialog::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int UIDialog::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (event->kind && (unsigned int)event->control < 0x20)
         guiUser->controlDown[event->control] = 1;
     if (!isPaused) {
@@ -1984,7 +1984,7 @@ int UIDialog::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entr
 }
 
 // 0x0046a7d0
-int UIDialog::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int UIDialog::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
     if (event->kind && (unsigned int)event->control < 0x20)
         guiUser->controlDown[event->control] = 0;
     if (!isPaused) {
@@ -2026,7 +2026,7 @@ GameObject* UIDialog::AddControl(GameObject* control, int group, int region) {
 
 // 0x0046e8c0
 void UIDialog::SendInitEvent(int initParam) {
-    UnknownDialogEvent event;
+    DialogEvent event;
     event.handled = 0;
     event.kind = kDialogInit;
     event.code = 0;
@@ -2184,7 +2184,7 @@ void UIDialog::RemoveTimer(void* timer) {
 // parent read goes through the member (a local copy hoists the vtable load).
 void UIDialog::NotifyParent(int code, int kind) {
     if (parentDialog) {
-        UnknownDialogEvent event;
+        DialogEvent event;
         event.kind = kind;
         event.handled = 0;
         event.code = code;
@@ -2232,7 +2232,7 @@ int UIDialog::RequestHover(UIControl* control, int previous, int update) {
 }
 
 // 0x00470020
-void UIDialog::HandleEvent(UnknownDialogEvent* event) {
+void UIDialog::HandleEvent(DialogEvent* event) {
     if (eventProc)
         eventProc(event);
 }
@@ -2630,7 +2630,7 @@ int UIControl::ButtonDown(int button, int position) {
 
 // 0x00472320
 int UIControl::OnChar(int value) {
-    UnknownDialogEvent event;
+    DialogEvent event;
     event.handled = 0;
     if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
         event.kind = 0xb;
@@ -2652,7 +2652,7 @@ int UIControl::OnChar(int value) {
 
 // 0x004723d0
 int UIControl::OnKeyDown(int value) {
-    UnknownDialogEvent event;
+    DialogEvent event;
     event.handled = 0;
     if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
         event.kind = 0xc;
@@ -3099,7 +3099,7 @@ void UIMultiState::SetStateText(int index, const char* text) {
 // 0x00478d70
 int UIMultiState::ButtonDown(int button, int position) {
     if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
-        UnknownDialogEvent event;
+        DialogEvent event;
         event.handled = button;
         SelectNextState();
         event.kind = kDialogCommand;
@@ -3157,7 +3157,7 @@ int UIRadioButton::GetGroupSelection() {
 // 0x004794c0
 int UIRadioButton::ButtonDown(int button, int position) {
     if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !button) {
-        UnknownDialogEvent event;
+        DialogEvent event;
         event.handled = button;
         if (!GetSelectedState()) {
             SetCurrentState(1);
@@ -3942,7 +3942,7 @@ int UIControl::SlideBottomStep() {
 
 // 0x00475880
 int UIScrollBar::ButtonUp(int button, int* position) {
-    UnknownDialogEvent event;
+    DialogEvent event;
     event.handled = 0;
     if (dragging) {
         event.kind = 0x10;
@@ -3975,7 +3975,7 @@ unsigned int g_ListBoxClickTime;              // 0x0065b59c: time of the last li
 
 // 0x00477d30
 void UIListBox::ReportClick(int* handled) {
-    UnknownDialogEvent event;
+    DialogEvent event;
     event.handled = 0;
     event.kind = kDialogListSelect;
     event.code = eventCode;
@@ -4119,7 +4119,7 @@ UIDialog* UIDialog::Create(void* target, CameraRect* area, int menu, int flags,
     dialogFontBold = 0;
     dialogFontItalic = 0;
     controlContainer = (GameObject*)AppendChild(new(__FILE__, 0x16e) UICtlContainer, -1);
-    UnknownDialogEvent event;
+    DialogEvent event;
     event.handled = 0;
     event.kind = kDialogCreate;
     event.code = 0;
@@ -4594,7 +4594,7 @@ int UIScrollBar::ButtonDown(int button, int position) {
 // 0x00475970: dragging the thumb; holding it still repeats kind 0x11.
 void UIScrollBar::ButtonHeld(int button, int* position) {
     UIControl::ButtonHeld(button, position);
-    UnknownDialogEvent event;
+    DialogEvent event;
     event.handled = 0;
     if (!button && position) {
         int width = GetWidth();
@@ -4872,7 +4872,7 @@ failed:
 // 0x00479710: dragging the thumb; holding it still repeats kind 0x11.
 void UIDDLScrollBar::ButtonHeld(int button, int* position) {
     UIControl::ButtonHeld(button, position);
-    UnknownDialogEvent event;
+    DialogEvent event;
     event.handled = 0;
     if (!button && position) {
         int width = GetWidth();
@@ -5184,7 +5184,7 @@ int UIControl::GrowStep() {
 }
 
 // 0x00472130
-int UIControl::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int UIControl::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
     int handled = 0;
     GUIInputDevice* device = ownerDialog->guiUser->FindEventDevice(event);
     if (device) {
@@ -5324,7 +5324,7 @@ TextureMap* UIMultiState::GetStateTexture(int state) {
 
 // 0x00479df0
 void UIDDLListBox::ReportClick(int* handled) {
-    UnknownDialogEvent event;
+    DialogEvent event;
     event.handled = 0;
     ownerList->SetText(GetRowText(GetSelectedRow()));
     ownerList->SetOpen(0);
@@ -5363,7 +5363,7 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
 // 0x00471fd0: a key or button press. A keyboard press of this control's
 // "KeyBind" without Shift focuses it and presses it (slots 55 and 56);
 // other presses go to slot 55 with the pointer position.
-int UIControl::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int UIControl::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     int handled = 0;
     if (ownerDialog->guiUser->UsesEventDevice(event)) {
         if (event->kind == 0) {

@@ -357,7 +357,7 @@ int Game::UnknownVirtualSlot12(int value) {
 }
 
 // 0x00468900: releases go to the interface unless inputSuspended is set.
-int Game::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int Game::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
     if (inputSuspended)
         return 1;
     return rootObject->OnControlRelease(event, entry) != 0;
@@ -367,7 +367,7 @@ int Game::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry)
 // Control 0x20 also drives the +0x38 object; with bit 0 of +0x2d4, Ctrl+F
 // (key 0x21 with modifier 0xc) toggles +0x1c4 and E (0x12) clears it,
 // setting +0x1c8.
-int Game::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int Game::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (inputSuspended)
         return 1;
     if (testKey && debugOverlay && TestInputEvent(0x20, 0, event, 0x80)) {

@@ -266,7 +266,7 @@ GUIManager::~GUIManager() {
 }
 
 // 0x004857f0
-int GUIManager::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int GUIManager::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     int previous = g_MemTagStack->Push("UI");
     int result = GameObject::OnControlPress(event, entry);
     g_MemTagStack->Pop(previous);
@@ -274,7 +274,7 @@ int GUIManager::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* en
 }
 
 // 0x00485830
-int GUIManager::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int GUIManager::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
     int previous = g_MemTagStack->Push("UI");
     int result = GameObject::OnControlRelease(event, entry);
     g_MemTagStack->Pop(previous);
@@ -844,9 +844,9 @@ GUIInputDevice* GUIInputDevice::Bind(void* target, InputDevice* device, float mi
         rangeX = (float)(((RenderTarget*)renderContext)->targetWidth - 1);
         rangeY = (float)(((RenderTarget*)renderContext)->targetHeight - 1);
     }
-    bindingX = UnknownControlBinding(rangeMinX, rangeX, 0.0f,
+    bindingX = ControlBinding(rangeMinX, rangeX, 0.0f,
                                        g_TrackGame->controlInterface->NextBindingId(), 0, 0.0f);
-    bindingY = UnknownControlBinding(rangeMinY, rangeY, 0.0f,
+    bindingY = ControlBinding(rangeMinY, rangeY, 0.0f,
                                        g_TrackGame->controlInterface->NextBindingId(), 1, 0.0f);
     if (inputDevice->deviceKind == 2) {
         ((JoystickDevice*)inputDevice)->AttachAxisBinding(&bindingX, 0.01f, 0.01f);
@@ -877,9 +877,9 @@ void GUIInputDevice::Rebind() {
         rangeX = (float)(((RenderTarget*)renderContext)->targetWidth - 1);
         rangeY = (float)(((RenderTarget*)renderContext)->targetHeight - 1);
     }
-    bindingX = UnknownControlBinding(rangeMinX, rangeX, (float)cursorX,
+    bindingX = ControlBinding(rangeMinX, rangeX, (float)cursorX,
                                        g_TrackGame->controlInterface->NextBindingId(), 0, 0.0f);
-    bindingY = UnknownControlBinding(rangeMinY, rangeY, (float)cursorY,
+    bindingY = ControlBinding(rangeMinY, rangeY, (float)cursorY,
                                        g_TrackGame->controlInterface->NextBindingId(), 1, 0.0f);
     if (inputDevice->deviceKind == 2) {
         ((JoystickDevice*)inputDevice)->AttachAxisBinding(&bindingX, 0.01f, 0.01f);
@@ -1272,7 +1272,7 @@ int GUIUser::UsesDevice(InputDevice* device) {
 }
 
 // 0x004881d0
-int GUIUser::UsesEventDevice(UnknownControlEvent* event) {
+int GUIUser::UsesEventDevice(ControlEvent* event) {
     if (event->kind == 0)
         return UsesDevice((InputDevice*)g_TrackGame->controlInterface->keyboard);
     if (event->kind == 1)
@@ -1298,7 +1298,7 @@ GUIInputDevice* GUIUser::FindDevice(InputDevice* device) {
 }
 
 // 0x004882a0
-GUIInputDevice* GUIUser::FindEventDevice(UnknownControlEvent* event) {
+GUIInputDevice* GUIUser::FindEventDevice(ControlEvent* event) {
     if (event->kind == 0)
         return FindDevice((InputDevice*)g_TrackGame->controlInterface->keyboard);
     if (event->kind == 1)

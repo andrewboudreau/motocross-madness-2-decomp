@@ -4,7 +4,7 @@
 
 // OptionProcs.cpp (__FILE__ 0x0056f57c, line references 0x004b4734..
 // 0x004b5119): the options dialogs' message procedures (vtable slot 29,
-// one UnknownDialogEvent) and their slot 31 (one flag: 1 reads the controls
+// one DialogEvent) and their slot 31 (one flag: 1 reads the controls
 // back into the settings, 0 shows the settings). The classes are RTTI names;
 // every one derives directly from UIDialog. Member names are provisional.
 
@@ -125,7 +125,7 @@ inline int BikeClassOf(int cc)
 class OptGameSettingsDlg : public UIDialog {
 public:
     OptGameSettingsDlg() : UIDialog(1, "OptGame.dtm") {}
-    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b2000
+    virtual void HandleEvent(DialogEvent* event);   // 0x004b2000
     virtual void SyncValues(int save);                    // 0x004b22d0
 };
 
@@ -133,7 +133,7 @@ public:
 class OptGraphicsDlg : public UIDialog {
 public:
     OptGraphicsDlg() : UIDialog(1, "OptGraph.dtm") {}
-    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b23b0
+    virtual void HandleEvent(DialogEvent* event);   // 0x004b23b0
     virtual void SyncValues(int save);                    // 0x004b2670
 };
 
@@ -142,7 +142,7 @@ public:
 class OptAdvancedGraphicsDlg : public UIDialog {
 public:
     OptAdvancedGraphicsDlg() : UIDialog(1, "OptAdvG.dtm") {}
-    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b26c0
+    virtual void HandleEvent(DialogEvent* event);   // 0x004b26c0
     // Slot 31 inherits UIDialog::SyncValues (0x00470050).
 };
 
@@ -150,7 +150,7 @@ public:
 class OptSoundDlg : public UIDialog {
 public:
     OptSoundDlg() : UIDialog(1, "OptSound.dtm") {}
-    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b2b20
+    virtual void HandleEvent(DialogEvent* event);   // 0x004b2b20
     virtual void SyncValues(int save);                    // 0x004b2ce0
     void ApplySoundSettings();             // 0x004b2d40: applies the sound settings
 };
@@ -165,9 +165,9 @@ int GetInputText(int row, int kind, int code, char* text);
 class OptControlsDlg : public UIDialog {
 public:
     OptControlsDlg() : UIDialog(1, "OptCont.dtm") {}
-    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x004b5600
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004b55d0
-    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b2e00
+    virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);     // 0x004b5600
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x004b55d0
+    virtual void HandleEvent(DialogEvent* event);   // 0x004b2e00
     virtual void SyncValues(int save);                    // 0x004b3470
     void ListMappedKeys();             // 0x004b3410: lists the mapped keys
     void ColorListRows();             // 0x004b54c0: colours the list rows
@@ -184,7 +184,7 @@ public:
 class OptGarageDlg : public UIDialog {
 public:
     OptGarageDlg() : UIDialog(1, "OptGar.dtm") {}
-    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b3500
+    virtual void HandleEvent(DialogEvent* event);   // 0x004b3500
     virtual void SyncValues(int save);                    // 0x004b3e70
     void FillCurveList();             // 0x004b38f0: fills DDLCurves
     void EqSliderMoved(UIControl* slider); // 0x004b3aa0: an SldEQ slider moved
@@ -198,7 +198,7 @@ public:
 class OptMessagesDlg : public UIDialog {
 public:
     OptMessagesDlg() : UIDialog(1, "OptMess.dtm") {}
-    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b40a0
+    virtual void HandleEvent(DialogEvent* event);   // 0x004b40a0
     // Slot 31 inherits UIDialog::SyncValues (0x00470050).
 };
 
@@ -215,7 +215,7 @@ struct UnknownOptKrustyUIRecord {
 class OptionsDlg : public UIDialog {
 public:
     OptionsDlg() : UIDialog(1, "OptBase.dtm") {} // SelectGamePicProcs.cpp 0x004f8047 allocates 0x7f70 bytes
-    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b4280
+    virtual void HandleEvent(DialogEvent* event);   // 0x004b4280
     // Slot 31 inherits UIDialog::SyncValues (0x00470050).
     void OpenPage(int page);     // 0x004b4ab0: opens page `page` (0..5)
 
@@ -232,7 +232,7 @@ public:
 class GlobalSettingsDlg : public UIDialog {
 public:
     GlobalSettingsDlg() : UIDialog(1, "GlobSet.dtm") {}
-    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b4e70
+    virtual void HandleEvent(DialogEvent* event);   // 0x004b4e70
     // Slot 31 inherits UIDialog::SyncValues (0x00470050).
     void ListOtherProfiles();             // 0x004b51a0: lists the other profiles
 };
@@ -241,6 +241,6 @@ public:
 class ConfirmRestoreDlg : public UIDialog {
 public:
     ConfirmRestoreDlg() : UIDialog(1, "messbox2.dtm") {}
-    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b5380
+    virtual void HandleEvent(DialogEvent* event);   // 0x004b5380
     // Slot 31 inherits UIDialog::SyncValues (0x00470050).
 };

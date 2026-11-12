@@ -255,7 +255,7 @@ int TrackGame::CreateGameObjects() {
     cdAudio = new(__FILE__, 343) CDAudio;
     cdAudio->Initialize();
     g_MemTagStack->Push("Startup");
-    controlMapping = new(__FILE__, 350) UnknownControlMapping;
+    controlMapping = new(__FILE__, 350) ControlMapping;
     if (!controlMapping)
         return 0;
     controlInterface->SetMapping(controlMapping);
@@ -317,7 +317,7 @@ int TrackGame::Tick() {
 // 0x00521670: input presses. With an IME open nothing happens. Control 0x1d
 // with modifier 0x45 or control 0x3d/0xc5 toggles menu 0x190, and control 1
 // opens menu 0x191 (in-game).
-int TrackGame::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int TrackGame::OnControlPress(ControlEvent* event, InputButtonState* entry) {
     if (event->kind == 0) {
         void* context = ImmGetContext(windowHandle);
         if (context) {
@@ -373,7 +373,7 @@ handled:
 }
 
 // 0x00521840
-int TrackGame::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int TrackGame::OnControlRelease(ControlEvent* event, InputButtonState* entry) {
     return PCGame::OnControlRelease(event, entry);
 }
 

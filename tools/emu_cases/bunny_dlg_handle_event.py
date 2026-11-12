@@ -9,6 +9,6 @@ less the debts to the money and clears the debts; ButDecline sets career flag 4.
 from tools.emu_cases.bailout_dlg_handle_event import REPLAY, cases, setup  # noqa: F401
 
 RETAIL_VA = 0x004d9860
-SYMBOL = '?HandleEvent@PCBunnyDlg@@UAEXPAUUnknownDialogEvent@@@Z'
+SYMBOL = '?HandleEvent@PCBunnyDlg@@UAEXPAUDialogEvent@@@Z'
 SOURCE = 'src/bringup/Group4_DlgPCBunny.cpp'
 PROBES = {0x004d98a6: 'init', 0x004d9b77: 'accept', 0x004d9c2a: 'decline'}

@@ -77,7 +77,7 @@ static inline float TexelMegabytes(ManagedTextureGroup* group, const int& texels
     return (float)PixelFormatBytesPerPixel(group->groupFormat) * texels * 1.2715658e-06f;
 }
 
-static inline CacheTexture* LeastWantedPage(UnknownTextureMapList* pages, int* lowest) {
+static inline CacheTexture* LeastWantedPage(TextureMapList* pages, int* lowest) {
     CacheTexture* best = 0;
     *lowest = 0x7fffffff;
     for (TextureMap* texture = pages->First(); texture; texture = pages->Next()) {
@@ -108,7 +108,7 @@ void ManagedTextureGroup::RepackWholePages() {
     texelsRequested = 0;
     texelsGranted = 0;
     texelsManaged = 0;
-    UnknownTextureMapList emptied;
+    TextureMapList emptied;
     int unused[9];
     memset(unused, 0, sizeof(unused));
     int texels = 0; // requested, then needed, texels
@@ -466,7 +466,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
     }
     memcpy(pagesByLevel, pages, sizeof(pages));
 
-    UnknownTextureMapList emptied;
+    TextureMapList emptied;
     TextureMap* texture;
     texture = cachePages.First();
     int whole = pages[8];

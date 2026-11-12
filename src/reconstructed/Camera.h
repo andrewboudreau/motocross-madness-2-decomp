@@ -33,7 +33,7 @@ public:
     virtual int RenderPre3D();
     virtual int Render3D();
     virtual int OnActivate();
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);
 
     // Pure: Camera's vtable holds LIBCMT _purecall (0x00534cfe) in slot 27.
     virtual void TakeScreenshot() = 0;

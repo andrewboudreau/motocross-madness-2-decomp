@@ -130,7 +130,7 @@ public:
     virtual ~FollowCamera();          // destructor core 0x00463350
 
     virtual int Tick(float frameTime);                 // 0x00465c20 (near miss: samples/camera)
-    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00466ad0, not reconstructed
+    virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);       // 0x00466ad0, not reconstructed
 
     virtual Vector3 GetTargetVelocity() = 0;
     // Slots 34, 35 and 48 take the frame time as a float: slot 10 pushes its

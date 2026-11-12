@@ -73,7 +73,7 @@ ChatOverlay* RaceChat(BikeRace* race) { return race->chatOverlay; }
                          if s.storage_class == 2 and s.section_number > 0}
             methods = {
                 '?HandleChatKey@ChatOverlay@@QAEHHPAH@Z',
-                '?HandleChatInput@ChatOverlay@@QAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@PAH@Z',
+                '?HandleChatInput@ChatOverlay@@QAEHPAUControlEvent@@PAUInputButtonState@@PAH@Z',
                 '?ShowInputLine@ChatOverlay@@QAEXXZ',
                 '?HideInputLine@ChatOverlay@@QAEXXZ',
                 '?AddMessage@ChatOverlay@@QAEXPBDHH@Z',

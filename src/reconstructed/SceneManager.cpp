@@ -1097,7 +1097,7 @@ int Scene::Render3D()
 }
 
 // 0x004f0060: control 5 toggles field_0x7bc; other events go to GameObject.
-int Scene::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry)
+int Scene::OnControlRelease(ControlEvent* event, InputButtonState* entry)
 {
     if (TestInputEvent(5, 0, event, 0x80)) {
         visible = 1 - visible;
@@ -1107,7 +1107,7 @@ int Scene::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry
 }
 
 // 0x004f00c0
-int Scene::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry)
+int Scene::OnControlPress(ControlEvent* event, InputButtonState* entry)
 {
     return GameObject::OnControlPress(event, entry) != 0;
 }

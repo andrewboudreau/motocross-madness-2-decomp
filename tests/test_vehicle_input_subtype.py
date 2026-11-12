@@ -143,8 +143,8 @@ class VehicleInputSubtypeTests(unittest.TestCase):
             layout.write_text('#include "vehicle/Vehicle.h"\n#include "InputDevice.h"\n'
                 '#include "ControlInterface.h"\n#include <stddef.h>\n'
                 'typedef char L[(offsetof(VehicleAxis,axisSource)==0 && '
-                'offsetof(UnknownControlBinding,owner)==0 && offsetof(VehicleAxis,axisValue)==0x24 && '
-                'offsetof(UnknownControlBinding,currentValue)==0x24 && offsetof(VehicleAxisSource,kindCode)==0xc && '
+                'offsetof(ControlBinding,owner)==0 && offsetof(VehicleAxis,axisValue)==0x24 && '
+                'offsetof(ControlBinding,currentValue)==0x24 && offsetof(VehicleAxisSource,kindCode)==0xc && '
                 'offsetof(Vehicle,steerAxis)==0x4f8 && offsetof(Vehicle,leanAxis)==0x4fc && '
                 'offsetof(Vehicle,throttleAxis)==0x500)?1:-1];\n')
             compile_source(str(layout))

@@ -65,7 +65,7 @@ are copied without interpretation. The argument is unused.
 | Dependency | Retail VA | Complete strict extent |
 | --- | --- | --- |
 | JoystickDevice::FeedAxis | 0x00489c00 | 84 bytes |
-| UnknownControlBinding::SetFromAxis | 0x0043cd20 | 104 bytes |
+| ControlBinding::SetFromAxis | 0x0043cd20 | 104 bytes |
 | ControlInterface::QueueEvent | 0x0043cea0 | 82 bytes |
 | PCJoystickDevice::Update caller | 0x004c3960 | 172 bytes |
 

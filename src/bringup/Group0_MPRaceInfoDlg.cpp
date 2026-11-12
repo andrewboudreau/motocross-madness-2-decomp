@@ -34,7 +34,7 @@
 #include "Track.h"
 
 // 0x004513a0: fills the result lists (by event type) when the page opens.
-void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
+void MPRaceInfoDlg::HandleEvent(DialogEvent* event) {
     char position[128];
     char score[128];
     char points[128];
