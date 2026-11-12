@@ -558,3 +558,59 @@ Blocked merges:
     view where UIControl takes `int`, and GUIUser's API uses the view.
   - `UnknownBikeRaceModel` to `D3DIMSoultreeObject`. It lives in BikeRace.h,
     which is scheduling-sensitive as shown above.
+
+## Wave 9: view merges
+
+Wave 9 folds the remaining Group3 quarry-loader views with the Wave 8
+method and comparer. Each merge was compared against the commit before it.
+A cumulative run from 96b4bcc8 to the final tree applies the full name map
+to all six affected units: the sample is NAME-ONLY, Group3_QuarryLoad and
+Group3_QuarryLinkKrusty are NAME-ONLY+DROPPED, and Group3_QuarryLinkCamera,
+Group3_QuarryLinkRace and KrustyUI are IDENTICAL. Group3_QuarryLinkKrusty
+loses its `__fltused` reference together with its last float forwarder
+(`G3Q_VisibilitySetup`). The eco-light whole-object pin for the sample was
+repinned after each NAME-ONLY result (still 50 sections and 435
+relocations). Calibration was unchanged (3058 cases, 3005/3014 strict
+pairs, no per-case difference).
+
+| View | Canonical | Files | Proof |
+| --- | --- | --- | --- |
+| `UnknownQuarryParticles` | `ParticleManager` (krusty2 effects/ParticleManager.h) | sample (+ bindings), Group3_QuarryLoad.cpp | Constructor 0x004ba390, slot 27 Create 0x004ba4d0 (ret 0x10), 0x2058 bytes. Loader IDENTICAL, sample NAME-ONLY. |
+| `UnknownQuarryVisibility` (bring-up only) | `VisibilityQuadTree` (krusty2 visibility/VisibilityQuadTree.h: QuadTree at +0, GameObject at +0x874) | Group3_QuarryLoad.cpp, Group3_QuarryLinkKrusty.cpp, Group3_QuarryLoadLinks.h, tools/emu_cases/quarry_load_event_objects.py, GAME_BUILD.md | Constructor 0x0052d340, Setup 0x0052d460 (ret 0x18, returns the GameObject part). Loader and link unit NAME-ONLY+DROPPED (Setup forwarder, `G3Q_VisibilitySetup`). |
+| `UnknownQuarryTerrainObject` | `Terrain` (krusty2 broadphase/Terrain.h) | sample (+ bindings), Group3_QuarryLoad.cpp, Group3_QuarryLinkKrusty.cpp, Group3_QuarryLoadLinks.h, tools/emu_cases/terrain_load.py (docstring) | Constructor 0x00505830, Load 0x005059d0, 0xcc4 bytes. Sample NAME-ONLY; loader and link unit NAME-ONLY+DROPPED (Load forwarder, `G3Q_TerrainLoad`). |
+| `UnknownQuarryTerrainShadow` | `TerrainShadow` (src/reconstructed/TerrainShadow.h) | sample (+ bindings), Group3_QuarryLoad.cpp, Group3_QuarryLinkKrusty.cpp (its local TerrainShadow view too), Group3_QuarryLoadLinks.h | Constructor 0x00508ae0, Attach 0x00508b80, 0x6780 bytes. Sample NAME-ONLY; loader and link unit NAME-ONLY+DROPPED (Attach forwarder, `G3Q_TerrainShadowAttach`). |
+
+Blocked merges:
+
+- The sample's `UnknownQuarryVisibility`. The near miss passes the scene
+  as a seventh argument to the `ret 0x18` Setup. Calling the canonical
+  six-argument Setup changes `LoadEventObjects`' bytes and relocations.
+  The bring-up already corrects this.
+- `UnknownQuarryRaceObject` to `SoultreeQuadTreeRenderer`.
+  - SoultreeQuadTreeRenderer.h declares its own TU-local `SoultreeObject`
+    and `D3DIMSoultreeObject`.
+  - The loader and the sample include EventManager.h, LightEmitter.h and
+    SceneManager.h, which reach D3DIMSoulTree.h's definitions of the same
+    classes, so the compiler reports C2011.
+  - `G3Q_QuadTreeRendererInsertNodes` therefore keeps
+    Group3_QuarryLinkKrusty.cpp alive.
+- `UnknownQuarryBikeCamera` to `KrustyBikeCamera`.
+  - KrustyBikeCamera.h itself shares the loader unit without errors.
+  - The loader writes nine VehicleCamera, BikeCamera and KrustyBikeCamera
+    members directly: `vehicle`, the two cached flags, `vehicleMode`, the
+    three targets, `bike` and `krustyBike`, plus FollowCamera's
+    `isSettled`. The canonical headers declare these members `protected`.
+  - The loader stores one racer view where the canonical headers declare
+    three pointer types (`UnknownCameraVehicle*`, `UnknownCameraBike*`,
+    `UnknownKrustyBike*`). It reads `bike->modelNode` and
+    `bike->riderCharacter` through the racer view's types.
+  - The merge needs an access decision or a recovered inline setter chain
+    (the store order looks like inlined VehicleCamera, BikeCamera and
+    KrustyBikeCamera setters). It is not a name-only change.
+- KrustyUI.cpp's `UnknownKrustyUIShadow` to `ProjectedShadow`. The
+  function-local static `shadow` is mangled with its pointee type. Renaming
+  that type moves the static within `.bss` (0x2ec to 0x44; `.bss` shrinks
+  from 0x2f0 to 0x2ec), which changes `BuildGarageScene`'s relocation
+  addends. Neither layout follows retail's order (0x0067c3f8..0x0067c4a4).
+  The view and the `config/game_build.json` Init link alias therefore stay.
+- `UnknownQuarryRace` to `BikeRace` was not retried (Wave 8 blocker).
