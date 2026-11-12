@@ -311,7 +311,7 @@ message.
 | `UnknownPlayerStateMessage` | +0x00 | `field_0x00` | `type` | 2 | Message 2 (`0x004f5703`). |
 | `UnknownQuarryLeaveMessage` | +0x00 | `field_0x00` | `type` | 2 | Message 5 is a system message, so the first dword is its type. |
 | `UnknownPlayerLeftMessage` (SelectGamePicProcs.cpp) | +0x00 | `header` | `type` | 2 | Correction: the same message 5, which `SendRaw` never writes. |
-| `UnknownQuarryQuadTreeNode` (two views) | +0x04, +0x06, +0x08 | `int field_0x04`, `int field_0x08` | `queryStamp`, `sortKey`, `objectTypeId` | 2 | The `CollisionObject` base (`QuadTreeObject` in CollisionObject.h); the derived view's methods are `CollisionObject`'s. |
+| `UnknownQuarryQuadTreeNode` (two views) | +0x04, +0x06, +0x08 | `int field_0x04`, `int field_0x08` | `queryStamp`, `sortKey`, `objectTypeId` | 2 | The `CollisionObject` base (`QuadTreeObject` in CollisionObject.h); the derived view's methods are `CollisionObject`'s. Merged into `CollisionObject` in wave 8. |
 | `UnknownSoundCaps` | (type) | `UnknownSoundCaps` | `DirectSoundCaps` | 2 | `GetCaps` is passed size 0x60. The 24 dwords are DSCAPS in order. |
 | `UnknownSoundBufferDesc` | (type) | `UnknownSoundBufferDesc` | `DirectSoundBufferDesc` | 2 | Size 0x24: the DirectX 7 DSBUFFERDESC fields in order. |
 
@@ -495,5 +495,66 @@ Left as placeholders in wave 7:
   not UI, and no role was proven.
 - KrustyUI.cpp's `UnknownKrustyUIModelEntry`/`UnknownKrustyUIBikeEntry` and
   QuarryStuntEvent.cpp's `UnknownQuarryBikeModel`/`UnknownQuarryBikeChoice`
-  are views of the two KrustyUI records; merging them is a type change.
+  were views of the two KrustyUI records (merged in wave 8).
   `ProCircuitRank`, `ProCircuitResult` and `ProCircuitSkinned` stay views.
+
+## Wave 8: view merges
+
+Wave 8 folds per-unit views into the class they mirror where the merge is
+provably codegen-neutral. Each merge was checked with a before/after VC6
+SP3 `/O2` object comparison (`work/naming/objcmp.py`, ignored) of every
+unit whose include closure reaches a changed file, against 029dd2a8. It
+compares all non-debug section bytes, relocations and symbols. It
+normalises the `__FILE__` tree root, anonymous-namespace stamps and the
+compiler's local label counters (`$T`, `$L`, `$SG`, ...), and applies an
+explicit old-to-new mangled-name map to the base side. A unit passes when
+it is identical, or identical apart from the mapped names and possibly
+COMDAT order. Where a merge deletes a bring-up forwarder, the forwarder's
+COMDAT is named with `--drop` and must be the only other difference
+(NAME-ONLY+DROPPED). Negative controls: changing one float constant in
+the loader (`1024.0f` to `1023.0f`) and leaving out the name map both
+report DIFF. Calibration was unchanged (3058 cases, 3005/3014 strict
+pairs, no per-case difference).
+The whole-object pin for QuarryStuntEventLoaderNearMiss.cpp in
+tests/fixtures/eco_light_objects.json hashes symbol names, so it was
+repinned (same 50 sections and 435 relocations; the comparer reports
+NAME-ONLY).
+
+| View | Canonical | Files | Evidence |
+| --- | --- | --- | --- |
+| `UnknownKrustyUIModelEntry`, `UnknownKrustyUIBikeEntry` (KrustyUI.cpp), `UnknownQuarryBikeModel`, `UnknownQuarryBikeChoice` (QuarryStuntEvent.cpp) | `KrustyUIModelRecord`, `KrustyUIBikeRecord` (SelectGamePicProcs.h) | KrustyUI.cpp, QuarryStuntEvent.cpp, SelectGamePicProcs.h, BikeRace.h (comment) | Same offsets (+0x00 name, +0x40 model file, +0x80 UI model file, +0x48 texture, +0x8c engine size, +0x90 four-stroke). 38 units: 26 identical, 12 identical apart from COMDAT order. `uiModelFile` became `char[0x40]` because a rider's file may run past `modelFile` into it. |
+| `UnknownQuarrySkyCube` | `SkyCube` (SkyCube.h) | QuarryStuntEventLoaderNearMiss.cpp (+ bindings), Group3_QuarryLoad.cpp, Group3_QuarryLinkEco.cpp, Group3_QuarryLoadLinks.h | Constructor 0x004fb1e0 and Create 0x004fb230, 0x48 bytes. Sample NAME-ONLY; loader and link unit NAME-ONLY+DROPPED (the view forwarder and `G3Q_SkyCubeCreate`). |
+| `UnknownQuarryEcoSystem` | `EcoSystem` (QuarryEvent.h now declares `Create`, 0x004594d0, with EcoSystem.h's signature) | as above, QuarryEvent.h; Group3_QuarryLinkEco.cpp deleted | Constructor 0x00457250, 0x5c4 bytes. All ten units that include QuarryEvent.h or the link header: seven identical, sample NAME-ONLY, loader NAME-ONLY+DROPPED. |
+| `UnknownQuarryShadow` | `ProjectedShadow` (krusty2 shadow/ProjectedShadow.h) | sample (+ bindings), Group3_QuarryLoad.cpp, Group3_QuarryLinkKrusty.cpp, Group3_QuarryLoadLinks.h, tools/emu_cases/projected_shadow_init.py (docstring) | Constructor 0x004da570, Init 0x004da7b0, AddCaster 0x004dab00, SetShadowStrength 0x004dace0, SetShadowGrey 0x004dae30, SetLight 0x004dae50; 0x134 bytes. Arguments are cast to the canonical parameter types. Sample NAME-ONLY; loader and link unit NAME-ONLY+DROPPED (five forwarders, five `G3Q_ProjectedShadow*` helpers). |
+| `UnknownQuarryQuadTreeNode`, `UnknownQuarryCollision` | `CollisionObject` (krusty2 collision/CollisionObject.h: `QuadTreeObject` at +0, `GraphicsTest : GameObject` at +0xc) | sample (+ bindings), Group3_QuarryLoad.cpp, Group3_QuarryLinkKrusty.cpp, Group3_QuarryLoadLinks.h | SetUseBroadphase 0x00432120, SnapPlacement 0x00435fe0, SetIgnoreListMode 0x00439400, AddIgnoredOwner 0x00439410 (takes `void*`, as canonical), SetOwner 0x004394d0; `Release` goes through the +0xc GameObject as before. Sample NAME-ONLY; loader and link unit NAME-ONLY+DROPPED. |
+
+Blocked merges:
+
+- BikeRace.h's `UnknownBikeRaceUiModel` and `UnknownBikeRaceUiChoice` (to
+  `KrustyUIModelRecord`/`KrustyUIBikeRecord`). Removing the two structs from
+  BikeRace.h changes `BikeRace::CreateRacers` in
+  Group6_BikeRaceCreateRacers.cpp: `xor edi, edi` and `mov ebx, 1` at +0x21a
+  swap. Keeping them declared and switching only the uses moves the same
+  swap to samples/race/BikeRaceNearMisses.cpp instead. VC6's scheduling
+  there depends on the set of declared types, so no neutral form was found.
+- `UnknownPodiumSound` (Group1_PodiumScene.cpp, Group1_PodiumViews.cpp,
+  EventManagerNearMisses.cpp) to `Sound`. Sound is declared only in
+  PCAudio.h, which includes `<windows.h>`. Group1_PodiumScene's code bytes
+  stayed identical, but its `.drectve` gains `-defaultlib:uuid.lib` twice.
+  In the sample, IMM32's prototype clashes with the local
+  `ImmAssociateContext(void*, void*)` declaration (C2733, through
+  LeaveRaceForMenu.cpp).
+- `UnknownQuarryRace` to `BikeRace`. Including BikeRace.h in the loader
+  sample adds an `eh vector constructor iterator` (`??_H`) COMDAT to the
+  object. The view's racer and character types also differ from
+  BikeRace's.
+- Not attempted:
+  - `UnknownTexturePalette` to `ColorMapper`. About 40 consumers, including
+    the TextureMap/PCTextureMap slot signatures, calibration and emulator
+    case symbols and the whole-object palette fixtures.
+    [PALETTE_GETTER_CONNECTIONS](PALETTE_GETTER_CONNECTIONS.md) keeps the
+    prefix view on purpose.
+  - `UnknownGuiControl` to `UIControl`. `LeaveHover`/`KillFocus` take the
+    view where UIControl takes `int`, and GUIUser's API uses the view.
+  - `UnknownBikeRaceModel` to `D3DIMSoultreeObject`. It lives in BikeRace.h,
+    which is scheduling-sensitive as shown above.
