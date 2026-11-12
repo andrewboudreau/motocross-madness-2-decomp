@@ -7,7 +7,7 @@
 
 #include "DebugAlloc.h"
 
-UnknownParserNode::UnknownParserNode(const char* key, const char* value)
+ParserNode::ParserNode(const char* key, const char* value)
 {
     Clear();
     if (key && value) {
@@ -17,65 +17,65 @@ UnknownParserNode::UnknownParserNode(const char* key, const char* value)
     }
 }
 
-UnknownParserNode::~UnknownParserNode()
+ParserNode::~ParserNode()
 {
     Clear();
 }
 
-BOOL UnknownParserNode::MatchesKey(const char* key)
+BOOL ParserNode::MatchesKey(const char* key)
 {
     if (!key)
         return FALSE;
     return lstrcmpi(tagText, key) == 0;
 }
 
-void UnknownParserNode::Clear()
+void ParserNode::Clear()
 {
     tagText[0] = 0;
     valueText[0] = 0;
     next = 0;
 }
 
-HRESULT UnknownParserList::Append(const char* key, const char* value)
+HRESULT ParserList::Append(const char* key, const char* value)
 {
-    UnknownParserNode* node;
+    ParserNode* node;
 
     if (!head) {
-        node = head = new (__FILE__, 73) UnknownParserNode(key, value);
+        node = head = new (__FILE__, 73) ParserNode(key, value);
     } else {
-        UnknownParserNode* last = head;
+        ParserNode* last = head;
         while (last->next)
             last = last->next;
-        node = last->next = new (__FILE__, 86) UnknownParserNode(key, value);
+        node = last->next = new (__FILE__, 86) ParserNode(key, value);
     }
     return node ? S_OK : E_OUTOFMEMORY;
 }
 
-UnknownParserNode* UnknownParserList::Find(const char* key)
+ParserNode* ParserList::Find(const char* key)
 {
-    for (UnknownParserNode* node = head; node; node = node->next) {
+    for (ParserNode* node = head; node; node = node->next) {
         if (node->MatchesKey(key))
             return node;
     }
     return 0;
 }
 
-HRESULT UnknownParserList::GetNumber(const char* key, unsigned long* out)
+HRESULT ParserList::GetNumber(const char* key, unsigned long* out)
 {
     if (!key || !out)
         return E_FAIL;
-    UnknownParserNode* node = Find(key);
+    ParserNode* node = Find(key);
     if (!node)
         return E_ACCESSDENIED;
     *out = strtoul(node->valueText, 0, 10);
     return S_OK;
 }
 
-HRESULT UnknownParserList::GetText(const char* key, char* out, unsigned int size)
+HRESULT ParserList::GetText(const char* key, char* out, unsigned int size)
 {
     if (!key || !out || !size)
         return E_FAIL;
-    UnknownParserNode* node = Find(key);
+    ParserNode* node = Find(key);
     if (!node)
         return E_ACCESSDENIED;
     if ((unsigned int)lstrlen(node->valueText) < size) {
@@ -85,17 +85,17 @@ HRESULT UnknownParserList::GetText(const char* key, char* out, unsigned int size
     return E_OUTOFMEMORY;
 }
 
-UnknownParserList::~UnknownParserList()
+ParserList::~ParserList()
 {
     while (head) {
-        UnknownParserNode* node = head;
+        ParserNode* node = head;
         head = node->next;
         delete node;
     }
     head = 0;
 }
 
-char* UnknownParser::SkipBlanks(char* text, char* end)
+char* Parser::SkipBlanks(char* text, char* end)
 {
     char* start = text;
 
@@ -115,7 +115,7 @@ char* UnknownParser::SkipBlanks(char* text, char* end)
     return text;
 }
 
-char* UnknownParser::FindChar(char* text, char c, char* end)
+char* Parser::FindChar(char* text, char c, char* end)
 {
     if (!end)
         end = text + lstrlen(text);
@@ -129,7 +129,7 @@ char* UnknownParser::FindChar(char* text, char c, char* end)
 // Each failed search returns S_OK from inside the loop. With `break` to one exit
 // after the loop, VC6 pushes ebx/ebp only after the E_FAIL return; retail saves
 // all four registers first (docs/VC6_SHRINK_WRAP.md).
-HRESULT UnknownParser::Parse(char* text, int length)
+HRESULT Parser::Parse(char* text, int length)
 {
     char tag[0x200];
     char endTag[0x200];
@@ -174,14 +174,14 @@ HRESULT UnknownParser::Parse(char* text, int length)
     }
 }
 
-HRESULT UnknownParser::GetText(const char* key, char* out, unsigned int size)
+HRESULT Parser::GetText(const char* key, char* out, unsigned int size)
 {
     if (!key || !out || !size)
         return E_FAIL;
     return pairs.GetText(key, out, size);
 }
 
-HRESULT UnknownParser::GetNumber(const char* key, unsigned long* out)
+HRESULT Parser::GetNumber(const char* key, unsigned long* out)
 {
     if (!key || !out)
         return E_FAIL;

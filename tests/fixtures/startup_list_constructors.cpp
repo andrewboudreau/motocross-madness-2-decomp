@@ -6,8 +6,8 @@
 #include <new>
 #include "Parser.h"
 #include "DirectoryList.h"
-typedef char Layout[(sizeof(UnknownParserList)==4 && offsetof(UnknownParserList,head)==0 &&
-    sizeof(UnknownParser)==8 && offsetof(UnknownParser,pairs)==4 &&
+typedef char Layout[(sizeof(ParserList)==4 && offsetof(ParserList,head)==0 &&
+    sizeof(Parser)==8 && offsetof(Parser,pairs)==4 &&
     sizeof(UnknownDriveList)==8 && offsetof(UnknownDriveList,drives)==0 &&
     offsetof(UnknownDriveList,count)==4) ? 1 : -1];
 static BYTE* page;
@@ -25,7 +25,7 @@ static int Filter(EXCEPTION_POINTERS* p) {
 }
 static void* Construct(int drive,void* storage) {
     if(drive)return new(storage) UnknownDriveList;
-    return new(storage) UnknownParserList;
+    return new(storage) ParserList;
 }
 static void Run(int drive,void* storage) {
     memset(&result,0,sizeof(result));

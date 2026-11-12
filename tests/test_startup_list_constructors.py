@@ -22,7 +22,7 @@ SOURCE = 'src/reconstructed/StartupListConstructors.cpp'
 SOURCES = ('src/reconstructed/TrackGame.cpp', 'src/reconstructed/ZoneReport.cpp',
            'src/reconstructed/Parser.cpp', 'src/reconstructed/DirectoryList.cpp',
            'src/reconstructed/UiInfo.cpp')
-PROVIDERS = (('??0UnknownParserList@@QAE@XZ', 0x4aae20, 9),
+PROVIDERS = (('??0ParserList@@QAE@XZ', 0x4aae20, 9),
              ('??0UnknownDriveList@@QAE@XZ', 0x4676a0, 16))
 
 

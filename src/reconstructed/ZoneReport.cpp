@@ -26,7 +26,7 @@ int UnknownTrackGameObject3410::ReadLobbyPreset(int* flags)
     unsigned long value;
     *flags = 0;
     if (GetLobbyPreset(response, 0x800)) {
-        UnknownParser parser;
+        Parser parser;
         parser.Parse(response, lstrlen(response));
         if (parser.GetNumber("EventTypeIndex", &value) != 0x80070005) {
             eventTypeIndex = value - 1;
@@ -104,7 +104,7 @@ int UnknownTrackGameObject3410::WaitForLobbyRank()
     unsigned int start = ReadClock();
     while (ReadClock() - start < 20000) {
         if (GetLobbyRank(response, 0x800)) {
-            UnknownParser parser;
+            Parser parser;
             parser.Parse(response, lstrlen(response));
             parser.GetText(g_TrackGame->mode.profileName, text, 0x800);
             sscanf(text, "%d,%d,%d,%d", &value, &b, &c, &d);

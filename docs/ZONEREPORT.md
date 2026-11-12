@@ -16,8 +16,8 @@ MSZoneInterface.cpp (`0x004aa350..`).
   `*flags` gets bits 1/2/4/8. It then calls `0x0049ca60(1)` and copies the
   result into the race settings (`TrackGameMode+0x27f8`) and the player's
   bike choice. SelectGamePicProcs.cpp passes `TrackGameMode+0x1bd4`.
-- `0x0049c5f0` (8 bytes) is the implicit `UnknownParser` destructor
-  (`add ecx, 4; jmp ~UnknownParserList`). The unwind funclets
+- `0x0049c5f0` (8 bytes) is the implicit `Parser` destructor
+  (`add ecx, 4; jmp ~ParserList`). The unwind funclets
   `0x0054c2d0`/`0x0054c2f0` reach it, and the normal paths inline it.
 - `0x0049c600` (355 bytes). Polls the lobby rank property (`0x004aa4e0`)
   for up to 20 s with `Sleep(1000)`. It reads the value keyed by the
@@ -56,7 +56,7 @@ Source forms that mattered:
   branches and adding 1 after the join increments after the join; adding
   the 1 to `index` inside the else branch spills it (frame 0x5ac).
 
-Header changes: `UnknownParserList` gains its constructor (the shared
+Header changes: `ParserList` gains its constructor (the shared
 one-dword-zero body `0x004aae20`). `UnknownTrackGameObject3410Base` gains
 the preset fields and `UnknownZoneRaceStatus`. The three methods return
 `int`, so the SelectGamePicProcs and EventManager bindings were renamed.

@@ -4,7 +4,7 @@
 #include "DirectoryList.h"
 
 // 0x004aae20: the parser member at +4; no arguments.
-UnknownParserList::UnknownParserList() {
+ParserList::ParserList() {
     head = 0;
 }
 

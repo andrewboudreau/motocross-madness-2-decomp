@@ -6,7 +6,7 @@ VC6 SP3 `vc6_o2_mt` reproduces their complete retail bodies:
 
 | Existing source view | Retail address | Complete bytes | Behavior |
 | --- | --- | ---: | --- |
-| `UnknownParserList` | `0x004aae20` | 9 | Zero the head pointer; return the receiver in EAX |
+| `ParserList` | `0x004aae20` | 9 | Zero the head pointer; return the receiver in EAX |
 | `UnknownDriveList` | `0x004676a0` | 16 | Zero drives, then count; return the receiver in EAX |
 
 The names and original translation unit remain provisional. Shared small code
@@ -26,7 +26,7 @@ The complete `ReadLobbyPreset` body at `0x0049c2f0` (763 bytes) calls the parser
 list constructor at `0x0049c338`. `WaitForLobbyRank` at `0x0049c600` (355 bytes)
 calls it at `0x0049c66a`. Both pass a stack address at current ESP+0x14. After
 the intervening `lstrlenA@4` call consumes its one argument, each pushes two
-arguments for `UnknownParser::Parse` and computes its receiver at new ESP+0x18.
+arguments for `Parser::Parse` and computes its receiver at new ESP+0x18.
 That is original ESP+0x10: the list receiver is precisely parser+4. The retained
 check decodes these instructions, verifies the imported function and Parse's
 RET 8, and checks the list destructor receivers on normal cleanup paths. Actual
