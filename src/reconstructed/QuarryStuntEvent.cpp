@@ -488,7 +488,7 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // The data of network message 5 (a player left): the player's id at +0x08.
 struct UnknownQuarryLeaveMessage {
-    int field_0x00;
+    int type;                                 // +0x00 5: a DirectPlay system message (no Send passes 5; NetMessage::Set 0x004aacc0 reads the whole dword when from == 0)
     int field_0x04;
     int playerId;                             // +0x08 matched against racers' networkPlayerId
 };

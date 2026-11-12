@@ -106,7 +106,7 @@ struct UnknownChatMessage {
 
 // A player's state (type 2).
 struct UnknownPlayerStateMessage {
-    unsigned char field_0x00;
+    unsigned char type;                       // +0x00 SendRaw (0x004ad280) writes the type byte here
     unsigned char ready;                      // +0x01: ready
     char bikeName[0x40];                      // +0x02: bike name (racer slot +0x40)
     char bikeModelName[0x40];                 // +0x42: bike model name (racer slot +0x00)
@@ -135,7 +135,7 @@ struct UnknownGridDraw {
 
 // The player left message (type 5).
 struct UnknownPlayerLeftMessage {
-    int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
+    int type;                                 // +0x00 5: a DirectPlay system message (no Send passes 5; NetMessage::Set 0x004aacc0 reads the whole dword when from == 0)
     int field_0x04;
     int playerId;                             // +0x08: player id
 };
