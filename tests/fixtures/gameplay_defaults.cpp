@@ -14,7 +14,7 @@ static int Invoke(int kind,void* receiver,void* who,float value,int code) {
     __try {
         if(kind==0)((BikeA60C*)receiver)->~BikeA60C();
         else if(kind==1)((VehicleSpeedState*)receiver)->~VehicleSpeedState();
-        else ((KbRaceHandler*)receiver)->Fn_004DE580(who,value,code);
+        else ((KbRaceHandler*)receiver)->NotifyContactImpulse(who,value,code);
     } __except(EXCEPTION_EXECUTE_HANDLER) { return 0; }
     return 1;
 }

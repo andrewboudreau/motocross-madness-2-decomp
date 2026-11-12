@@ -82,7 +82,7 @@ struct BikeWheelFrame {
     char pad_0x00[0xc];
     Vec3 axis;
 };
-// Objects at Bike+0x5f8 / +0x5fc (provisional, Method_0x0040a520): a point, an axis, an
+// Objects at Bike+0x5f8 / +0x5fc (provisional, IntegrateSteerTorque): a point, an axis, an
 // active flag and a state code that the method sets to 2.
 struct BikeA5F8 {
     char pad_0x00[0x14];
@@ -104,7 +104,7 @@ struct BikeWheel {
     Vec3 appliedShare;
     Vec3 frictionDirection;  // +0x108 CollisionPoint+0x50 frictionDirection (VehicleWheel name)
     char pad_0x114[12];
-    Vec3 normalLoadVector;                    // VehicleWheel +0x120 normalLoadVector; Method_0x0040a520 crosses the wheel offset with it while in contact
+    Vec3 normalLoadVector;                    // VehicleWheel +0x120 normalLoadVector; IntegrateSteerTorque crosses the wheel offset with it while in contact
     char pad_0x12c[24];
     float contactLoad;
     float tangentSpeed;  // +0x148 CollisionPoint+0x90 tangentSpeed (VehicleWheel name)
@@ -113,13 +113,13 @@ struct BikeWheel {
     char pad_0x154[4];
     float loadWeight;
     char pad_0x15c[16];
-    int w_0x16c;              // Method_0x0040a520 sets it to 2 while the wheel is in contact
+    int w_0x16c;              // IntegrateSteerTorque sets it to 2 while the wheel is in contact
     char pad_0x170[76];
     SoultreeObject* sceneNode;  // +0x1bc wheel scene node (VehicleWheel name)
-    BikeWheelFrame* ownerRef;  // +0x1c0 MovingPart+0x44 ownerRef (Tire ctor arg c; sceneNode +0x1bc is MovingPart+0x40); Method_0x0040a520 projects on its +0xc axis
+    BikeWheelFrame* ownerRef;  // +0x1c0 MovingPart+0x44 ownerRef (Tire ctor arg c; sceneNode +0x1bc is MovingPart+0x40); IntegrateSteerTorque projects on its +0xc axis
     char pad_0x1c4[60];
     Vec3 nodePosition;        // +0x200 (VehicleWheel name)
-    Vec3 wheelUpAxis;  // +0x20c Tire.h wheelUpAxis; scaled by wheelRadius while airborne (Method_0x0040a520)
+    Vec3 wheelUpAxis;  // +0x20c Tire.h wheelUpAxis; scaled by wheelRadius while airborne (IntegrateSteerTorque)
     char pad_0x218[24];
     Vec3 rollDirection;  // +0x230 Tire.h/VehicleWheel rollDirection
     Vec3 sideAxis;  // +0x23c Tire.h/VehicleWheel sideAxis (wheel axle direction)
@@ -253,7 +253,7 @@ struct BikeA38 {
     int n_0x64;
     char pad_0x068[124];
     BikeA1F4* n_0xe4;
-    void Method_0x00435fe0();
+    void SnapPlacement();  // 0x00435fe0: unused view of CollisionObject::SnapPlacement (docs/NAMING.md)
 };
 
 // The scene node (d3d_field_0x1a0, field_0x42c, BikeA1A0::d_0x140) is SoultreeObject

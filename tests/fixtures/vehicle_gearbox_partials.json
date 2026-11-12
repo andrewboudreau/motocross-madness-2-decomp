@@ -93,7 +93,7 @@
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",
-      "Method_0x0040a520@Bike",
+      "IntegrateSteerTorque@Bike",
       4236576,
       2272,
       2272,
@@ -138,7 +138,7 @@
     ],
     [
       "samples/physics/bikeai/BikeAINearMisses.cpp",
-      "?Fn_00413200@KrustyBike@@",
+      "?SimulateAIFrame@KrustyBike@@",
       4272640,
       4112,
       4114,
@@ -147,7 +147,7 @@
     ],
     [
       "samples/physics/bikeai/BikeAINearMisses.cpp",
-      "?Fn_00414370@KrustyBike@@",
+      "?UpdateAIRacingLine@KrustyBike@@",
       4277104,
       4802,
       4735,

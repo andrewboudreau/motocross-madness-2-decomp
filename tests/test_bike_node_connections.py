@@ -30,7 +30,7 @@ PARTIAL = [
     ('src/krusty2/vehicle/Bike.cpp', 'SelectRiderPose@Bike', 4221664, 2396, 2436, 107, '9c789409acc4b118c57a6525880b37415b923e4aeb0cc833584955a14ffab1c7'),
     ('src/krusty2/vehicle/Bike.cpp', 'UpdateRiderPose@Bike', 4224064, 485, 474, 188, 'b54d0bbdb1c68a8d8c58a2368d2f31f5f0df23c1f6d12380fa84191bd009289e'),
     ('src/krusty2/vehicle/Bike.cpp', 'ComputeSlideAngle@Bike', 4243456, 1015, 1069, 154, 'c219454774f219d02b41449ceb143d1e05c68b7487c52611b82aee0a712ad48b'),
-    ('src/krusty2/vehicle/Bike.cpp', 'Method_0x0040a520@Bike', 4236576, 2272, 2272, 2084, '3cf3ebbf965fecf2b9f005b5b4d620860be4b78c96f426345cc8b16ef5bb5036'),
+    ('src/krusty2/vehicle/Bike.cpp', 'IntegrateSteerTorque@Bike', 4236576, 2272, 2272, 2084, '3cf3ebbf965fecf2b9f005b5b4d620860be4b78c96f426345cc8b16ef5bb5036'),
     ('src/krusty2/vehicle/Bike.cpp', 'LoadBike@Bike', 4225472, 6745, 6745, 6428, '9bcbfd9d8f540b6e0d5940830d4fc4450dd15d499a5018587c34c76ff10e393e'),
     ('samples/physics/helpers/SoultreeMatrix.cpp', 'SetAxesIn', 5226576, 1171, 1171, 1137, '38091e34c86106b38f4d932e661d248cb46eae64419bc394554958ccaa7d31aa'),
     ('samples/physics/helpers/SoultreeMatrix.cpp', 'SetMatrixIn', 5224640, 1096, 1134, 262, '21bd27d95aad6a35851bd016a070df65b6d2ad9cbd4acf8205d6fba7d06e08b3'),

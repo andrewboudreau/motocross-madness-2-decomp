@@ -397,7 +397,7 @@ Large functions of the two units (all registered in `src/krusty2/vehicle/targets
   `maxLeanAngle`/`maxLeanRate` are
   `40.0f * 0.01745329f` / `120.0f * 0.01745329f` (the `(float)(deg * pi / 180)` forms are
   one ulp off).
-- `Bike::Method_0x0040a520` `0x0040a520` (2272 bytes) is a partial (2265 bytes, same calls
+- `Bike::IntegrateSteerTorque` `0x0040a520` (2272 bytes) is a partial (2265 bytes, same calls
   and flow): a steering torque from a quarter of `weightForce`, the front wheel's contact
   offset x `w_0x120`, the active `+0x5f8`/`+0x5fc` contacts (offset x axis scaled by the
   negative projection) or `w_0x274 * w_0x20c` while airborne, normalised and projected on

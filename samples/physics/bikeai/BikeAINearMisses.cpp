@@ -301,7 +301,7 @@ public:
 // src/krusty2/collision/CollisionObject.cpp.
 int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, CollisionVec3* outPoint,
                          CollisionVec3* outNormal);
-int Fn_00439600(CollisionVec3* ends, float radius, float radiusSq, CollisionObject* object);
+int CapsuleTouchesObject(CollisionVec3* ends, float radius, float radiusSq, CollisionObject* object);
 
 // Length / normalize shapes of 0x00415640 and 0x0040eca0 (see the file header): the dot
 // product 0x0040ae30 and, in the normalizes, the constructor 0x00404e60 are out-of-line.
@@ -537,7 +537,7 @@ int QuerySegmentObstacles(Vec3* seg, float radius, int skipVegetation, int ignor
                         else
                             acc -= d * push;
                     }
-                } else if (Fn_00439600((CollisionVec3*)seg, radius, radiusSq, obj)) {
+                } else if (CapsuleTouchesObject((CollisionVec3*)seg, radius, radiusSq, obj)) {
                     if (SegmentTouchesObject((CollisionVec3*)up, obj, (CollisionVec3*)&pt, (CollisionVec3*)&normal)) {
                         float len = BikeAILength(pt - seg[0]);
                         if (!(len > 10.0f && nearOnly)) {
@@ -607,7 +607,7 @@ int QuerySegmentObstacles(Vec3* seg, float radius, int skipVegetation, int ignor
                 BikeAIVegetation* veg = (BikeAIVegetation*)o;
                 for (int i = 0; i < veg->GetObjectCount(); i++) {
                     CollisionObject* obj = veg->GetObject(i);
-                    if (Fn_00439600((CollisionVec3*)seg, radius, radiusSq, obj)) {
+                    if (CapsuleTouchesObject((CollisionVec3*)seg, radius, radiusSq, obj)) {
                         hit = 1;
                         if (outPush) {
                             if (minDist < 10.0f) {
@@ -637,7 +637,7 @@ int QuerySegmentObstacles(Vec3* seg, float radius, int skipVegetation, int ignor
                     ignored = 1;
             if (ignored)
                 continue;
-            if (Fn_00439600((CollisionVec3*)seg, radius, radiusSq, obj))
+            if (CapsuleTouchesObject((CollisionVec3*)seg, radius, radiusSq, obj))
                 hit = 1;
         }
         delete it;
@@ -659,7 +659,7 @@ int QuerySegmentObstacles(Vec3* seg, float radius, int skipVegetation, int ignor
 }
 
 
-// Fn_00413200's rear look-ahead cross in the Vec3(x, y, z) constructor form with no
+// SimulateAIFrame's rear look-ahead cross in the Vec3(x, y, z) constructor form with no
 // parentheses (provisional spelling): 2044 strict, aligned 1104 of 1120, against
 // 2026/1105 for Math3D CrossProduct; best of the 64 product groupings at each of the
 // function's four crosses, and no other site or combination gains.
@@ -1413,7 +1413,7 @@ inline void BikeAIClampUnit(float& v)
 // size changed); the smoother with step read before the time constant, a named target
 // local, `+=`, a copied target or blend * difference (2024..2026); `Vec3 a, b, c` at the
 // top, all three in the hit block, or `dummy` at the top (227..462).
-int KrustyBike::Fn_00413200(float dt)
+int KrustyBike::SimulateAIFrame(float dt)
 {
     Vec3 a, c;
     float impact = 0.0f;
@@ -1678,7 +1678,7 @@ inline Vec3 BikeAINormalizeInline(const Vec3& v)
 // while airborne (0x0048d780 picks it, 0x0048d910 plays it).  Names tier 3.
 // The point loops test the count at the top (retail `cmp ebp, count; jge exit` heads and a
 // `t` test as the back edge), so they are written with a leading break rather than `for`.
-int KrustyBike::Fn_00414370(float dt)
+int KrustyBike::UpdateAIRacingLine(float dt)
 {
     KbTrackItem* list;
     KbTrackItem** tail;

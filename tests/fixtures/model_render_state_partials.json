@@ -111,7 +111,7 @@
     ],
     [
       "src/krusty2/vehicle/Bike.cpp",
-      "Method_0x0040a520@Bike",
+      "IntegrateSteerTorque@Bike",
       4236576,
       2272,
       2272,

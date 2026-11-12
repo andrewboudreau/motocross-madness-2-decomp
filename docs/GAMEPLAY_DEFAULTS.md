@@ -7,7 +7,7 @@ their genuine declarations. Each complete body matches authentic VC6 SP3 output:
 | --- | --- | --- |
 | `BikeA60C::~BikeA60C()` | `0x00464e90` | 1-byte RET |
 | `VehicleSpeedState::~VehicleSpeedState()` | `0x00464e90` | 1-byte RET |
-| `KbRaceHandler::Fn_004DE580(void*, float, int)` | `0x004de580` | 3-byte RET 12 |
+| `KbRaceHandler::NotifyContactImpulse(void*, float, int)` | `0x004de580` | 3-byte RET 12 |
 
 These are separate ordinary definitions, not aliases to another class with the
 same small body. Semantic names and original translation-unit ownership remain

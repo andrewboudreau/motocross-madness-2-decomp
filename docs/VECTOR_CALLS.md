@@ -108,7 +108,7 @@ substituting an inline constructor with different code generation.
 
 ## Bike steering-torque subtraction and scaling
 
-`Bike::Method_0x0040a520` now joins five subtraction calls and four scale calls
+`Bike::IntegrateSteerTorque` now joins five subtraction calls and four scale calls
 to `Vec3SubtractCall` and `Vec3ScaleCall`. Each scoped `Vec3 callResult` retains
 the former returned temporary's lifetime. The provider receives that output
 address first and returns it in EAX; the caller then copies its three words

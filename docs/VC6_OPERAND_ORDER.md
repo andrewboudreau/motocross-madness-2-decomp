@@ -1026,7 +1026,7 @@ try on similar code. None is a rule.
   pixels and camera successes as `if (ok) { ... return this; }` with one trailing
   `BaseObjectVirtualSlot2(); return 0;` gives retail's two blocks in retail's order. Nesting
   only the camera test changes nothing.
-- **Gotos do not move blocks; the flow graph does.** KrustyBike Fn_00414370
+- **Gotos do not move blocks; the flow graph does.** KrustyBike UpdateAIRacingLine
   (`0x00414370`): retail places a shared tail right after a loop and the other branches
   jump back to it. Rewriting the source with labels so that the tail follows the loop
   textually compiles to the same bytes as the structured if/else. Retail's layout comes
@@ -1050,7 +1050,7 @@ try on similar code. None is a rule.
   product of each cross row, and the second of the x and y rows, then moves an
   interleaved struct copy ahead of the subtractions (2471 to 2499).
 - **A reused member address in a register is a reference local; the branch sense picks the
-  fall-through arm.** Bike Method_0x0040a520 (`0x0040a520`, 447 to 1667 of 2272): retail
+  fall-through arm.** Bike IntegrateSteerTorque (`0x0040a520`, 447 to 1667 of 2272): retail
   computes `&contact->axis` once into `edi` for both the dot and the scale call. A
   `const Vec3& axis = contact->axis;` gives that; reading the member twice reloads it.
   Retail also falls through into the zero vector after `test ah, 1; jne <scale>`, which

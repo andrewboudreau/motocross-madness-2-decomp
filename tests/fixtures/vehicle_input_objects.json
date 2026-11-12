@@ -1767,7 +1767,7 @@
     },
     {
       "source": "src/krusty2/vehicle/Bike.cpp",
-      "symbol": "Method_0x0040a520@Bike",
+      "symbol": "IntegrateSteerTorque@Bike",
       "va": "0x40a520",
       "extent": 2272,
       "candidate": 2272,
@@ -1807,7 +1807,7 @@
     },
     {
       "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
-      "symbol": "?Fn_00413200@KrustyBike@@",
+      "symbol": "?SimulateAIFrame@KrustyBike@@",
       "va": "0x413200",
       "extent": 4112,
       "candidate": 4114,
@@ -1815,7 +1815,7 @@
     },
     {
       "source": "samples/physics/bikeai/BikeAINearMisses.cpp",
-      "symbol": "?Fn_00414370@KrustyBike@@",
+      "symbol": "?UpdateAIRacingLine@KrustyBike@@",
       "va": "0x414370",
       "extent": 4802,
       "candidate": 4735,

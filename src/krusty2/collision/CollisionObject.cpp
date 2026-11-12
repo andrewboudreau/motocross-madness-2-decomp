@@ -2467,7 +2467,7 @@ int SphereTouchesObject(const CollisionVec3* center, float radius, float radiusS
 // the x87 stack and pops it after the divide (four bytes longer); the flat sum in any order,
 // CollisionDot and by-value helpers emit v.z*d.z first.  The denominator must stay written out
 // as (d.y*d.y + d.x*d.x) + d.z*d.z: the helper with d twice is 2 bytes shorter.
-// Dot product grouped (x + y) + z, by reference (see Fn_00439600 below).
+// Dot product grouped (x + y) + z, by reference (see CapsuleTouchesObject below).
 inline float CapsuleSegmentDot(const CollisionVec3& a, const CollisionVec3& b)
 {
     return (a.x * b.x + a.y * b.y) + a.z * b.z;
@@ -2476,7 +2476,7 @@ inline float CapsuleSegmentDot(const CollisionVec3& a, const CollisionVec3& b)
 // 0x00439600 (cdecl; BikeAI.cpp 0x00416105, 0x00416a9c, 0x00416ccf): the capsule version of
 // 0x004394f0.  The point of the segment closest to the object's bounding-sphere centre
 // (+0x40) must lie within radius + boundRadius before the hull / model tests run.
-int Fn_00439600(CollisionVec3* ends, float radius, float radiusSq, CollisionObject* object)
+int CapsuleTouchesObject(CollisionVec3* ends, float radius, float radiusSq, CollisionObject* object)
 {
     if (object->isEnabled) {
         const CollisionVec3* center = (const CollisionVec3*)&object->boundCenter;

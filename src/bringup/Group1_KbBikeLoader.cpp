@@ -1,6 +1,6 @@
 // Group1_KbBikeLoader.cpp -- bring-up body for KrustyBikeTypes.h's KbBikeLoader view.
 //
-// KbBikeLoader::Fn_004079C0 is retail 0x004079c0 (thiscall, `ret 0xa0` = 40 argument
+// KbBikeLoader::LoadBike is retail 0x004079c0 (thiscall, `ret 0xa0` = 40 argument
 // dwords), Bike's own loader, reconstructed as Bike::LoadBike in
 // src/krusty2/vehicle/Bike.cpp (BikeCore.h).  KrustyBike's loader (0x0048fc80) reaches
 // it through this view with its own `this` (Bike is KrustyBike's primary base at
@@ -11,12 +11,12 @@
 //
 // KrustyBikeTypes.h is not included (it redeclares types BikeCore.h also brings in); the
 // view is redeclared with the same key and signature, so the mangled name stays
-// ?Fn_004079C0@KbBikeLoader@@QAEPAVGameObject@@HHPBDPBUSoultreeLoadDesc@@HHUVec3@@22HPAUVehicleInputMap@@HHHPAXHHHMMMMMMHHHH444HMH@Z.
+// ?LoadBike@KbBikeLoader@@QAEPAVGameObject@@HHPBDPBUSoultreeLoadDesc@@HHUVec3@@22HPAUVehicleInputMap@@HHHPAXHHHMMMMMMHHHH444HMH@Z.
 
 #include "vehicle/Bike.h"
 
 struct KbBikeLoader {
-    GameObject* Fn_004079C0(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc, int a5, int a6,
+    GameObject* LoadBike(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc, int a5, int a6,
                             Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe, VehicleInputMap* map, int a12, int a13,
                             int noSetup, void* setupName, int s50, int s54, int s58, float s0c, float s10,
                             float s14, float s18, float s1c, float s20, int gasGyro, int brakeGyro, int linkedObject, int device,
@@ -24,7 +24,7 @@ struct KbBikeLoader {
 };
 
 // 0x004079c0
-GameObject* KbBikeLoader::Fn_004079C0(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc,
+GameObject* KbBikeLoader::LoadBike(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc,
                                       int a5, int a6, Vec3 startPosition, Vec3 forward, Vec3 up,
                                       int terrainProbe, VehicleInputMap* map, int a12, int a13, int noSetup,
                                       void* setupName, int s50, int s54, int s58, float s0c, float s10,

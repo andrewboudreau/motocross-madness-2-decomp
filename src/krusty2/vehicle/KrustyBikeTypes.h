@@ -534,7 +534,7 @@ struct KbMorphMod {
 // Bike's own loader 0x004079c0 (`ret 0xa0`, 40 argument dwords; not a vtable entry).  It is a
 // Bike member in truth; vehicle/Bike.h is canonical, so it is reached through this view.
 struct KbBikeLoader {
-    GameObject* Fn_004079C0(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc, int a5, int a6,
+    GameObject* LoadBike(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc, int a5, int a6,
                             Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe, VehicleInputMap* map, int a12, int a13,
                             int noSetup, void* setupName, int s50, int s54, int s58, float s0c, float s10,
                             float s14, float s18, float s1c, float s20, int gasGyro, int brakeGyro, int linkedObject, int device,

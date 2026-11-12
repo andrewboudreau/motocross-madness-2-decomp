@@ -99,12 +99,12 @@ void KrustyBike::ApplyStaticContactImpulse(const Vec3* normal, const Vec3* relVe
                                      const Vec3* angScale, int eventKind, int scaleBits, float* impulseOut)
 {
     if (eventKind == 1000) {
-        race->handler->Fn_004DE580(this, 0, eventKind);
+        race->handler->NotifyContactImpulse(this, 0, eventKind);
         return;
     }
     Bike::ApplyStaticContactImpulse(normal, relVel, arm, angScale, eventKind, scaleBits, impulseOut);
     if (eventKind != 0x67)
-        race->handler->Fn_004DE580(this, *impulseOut, eventKind);
+        race->handler->NotifyContactImpulse(this, *impulseOut, eventKind);
 }
 
 void KrustyBike::ApplyBodyContactImpulse(const Vec3* normal, Vec3* velA, const Vec3* worldAngVelA,
@@ -115,7 +115,7 @@ void KrustyBike::ApplyBodyContactImpulse(const Vec3* normal, Vec3* velA, const V
 {
     Bike::ApplyBodyContactImpulse(normal, velA, worldAngVelA, armA, eventKind, invMassB, nodeB, velB,
                               worldAngVelB, armB, invInertiaB, angVelB, velBOrNull, impulseOut, scale);
-    race->handler->Fn_004DE580(this, *impulseOut, eventKind);
+    race->handler->NotifyContactImpulse(this, *impulseOut, eventKind);
 }
 
 void KrustyBike::UpdateLocalCenterOfMass()
@@ -239,7 +239,7 @@ int KrustyBike::UnknownVirtualSlot52()
 void KrustyBike::ReadControlAxes(float dt)
 {
     if (aiKind) {
-        Fn_00414370(dt);
+        UpdateAIRacingLine(dt);
         return;
     }
     aiThrottleRequest = 0;
@@ -956,7 +956,7 @@ void KrustyBike::SimulateFrame(float dt)
     }
     if (!crashState && (aiKind || race->forceAiStep)) {
         if (race->isRacing)
-            Fn_00413200(dt);
+            SimulateAIFrame(dt);
     } else {
         Bike::SimulateFrame(dt);
     }
@@ -1780,7 +1780,7 @@ GameObject* KrustyBike::Load(int context, int a2, const char* modelPath, const S
         GameObject::AppendChild((GameObject*)ghostMod, -1);
     }
     statusNode = 0;
-    ((KbBikeLoader*)this)->Fn_004079C0(context, a2, modelPath, desc, a5, a6, startPosition, forward, up, terrainProbe, map, a15, a16,
+    ((KbBikeLoader*)this)->LoadBike(context, a2, modelPath, desc, a5, a6, startPosition, forward, up, terrainProbe, map, a15, a16,
                                        setup == 0,
                                        setup ? (void*)setup->setupName : 0,
                                        setup ? setup->field_0x50 : 0,

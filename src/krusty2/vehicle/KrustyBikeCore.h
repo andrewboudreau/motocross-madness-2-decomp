@@ -92,7 +92,7 @@ public:
 
     // 0x00414370 (in BikeAI.cpp; called by slot 63 0x004924c0, which ignores the result):
     // rebuilds the AI racing line aiPath for this frame; 0 when a track query fails.
-    int Fn_00414370(float dt);
+    int UpdateAIRacingLine(float dt);
     void ResetTrickState();
     void StartTrick(int trick);      // 0x0048d910: riderTrickMotions/bikeTrickMotions[trick]
     void StartAltTrick(int trick);   // 0x0048d990: the Alt clips, chained (motionIndex trick + 16)
@@ -111,7 +111,7 @@ public:
     void ApplySpawnCollisionIgnores(int protect);
     // 0x00413200 (in BikeAI.cpp; called by slot 49 for AI bikes): one physics step of the
     // two-point look-ahead model 0x0040eca0 instead of the Vehicle step; returns 1.
-    int Fn_00413200(float dt);
+    int SimulateAIFrame(float dt);
     // 0x0048d780 (samples/physics/bikeai/KrustyBikeTrickPick.cpp): called by 0x00414370.
     int PickTrick(int* outTrick, float maxTime, int group);
     // 0x00493660 (8.5 KB): interpolates the received/recorded states (slot 10 for remote, replay
@@ -254,7 +254,7 @@ public:
     KbBikeState netState; // 0x1560  last state sent to the peers (0x00492ad0)
     int field_0x15cc; // 0x15CC
     float shortMessageTimer;  // +0x15D0  seconds since the last short message (0x00492ad0); starts at shortNetPacketIntervalSec
-    int aiTrickId; // 0x15D4  trick id PickTrick chose for the AI (BikeAI racing line 0x00414370), then passed to StartTrick
+    int aiTrickId; // 0x15D4  trick id PickTrick chose for the AI (UpdateAIRacingLine 0x00414370), then passed to StartTrick
     void* field_0x15d8; // 0x15D8  loader argument 30
     float aiStuntChance;  // +0x15DC KbRace aiStuntChance1/2/3 by difficulty (2.0 outside event type 0) for an AI bike; BikeAI tricks when rand*100 <= it
     CollisionObject* probeSegment;  // +0x15E0  AI bike's vertical probe segment (0,4,0)-(0,-1,0)

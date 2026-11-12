@@ -1,4 +1,4 @@
-"""KrustyBike::Fn_00414370 0x00414370, the AI racing line (tools/emu_diff.py case).
+"""KrustyBike::UpdateAIRacingLine 0x00414370, the AI racing line (tools/emu_diff.py case).
 
 The linked body is the Group 3 bring-up copy (src/bringup/Group3_KrustyBikeAI.cpp). The bike,
 race, status node, gate and terrain are filled with random floats (so every comparison of
@@ -22,7 +22,7 @@ import random
 import struct
 
 RETAIL_VA = 0x00414370
-SYMBOL = '?Fn_00414370@KrustyBike@@QAEHM@Z'
+SYMBOL = '?UpdateAIRacingLine@KrustyBike@@QAEHM@Z'
 SOURCE = 'src/bringup/Group3_KrustyBikeAI.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x00414439: 'roam re-pick', 0x00414580: 'roam keep', 0x004146e9: 'gate track',

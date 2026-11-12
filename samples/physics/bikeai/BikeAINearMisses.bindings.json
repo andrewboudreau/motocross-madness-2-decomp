@@ -21,7 +21,7 @@
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?FindTypeId@TypeRegistry@@QAEDPBD@Z": "0x00521ea0",
-  "?Fn_00439600@@YAHPAUCollisionVec3@@MMPAVCollisionObject@@@Z": "0x00439600",
+  "?CapsuleTouchesObject@@YAHPAUCollisionVec3@@MMPAVCollisionObject@@@Z": "0x00439600",
   "?GetObject@BikeAIVegetation@@QAEPAVCollisionObject@@H@Z": "0x004570a0",
   "?GetObjectCount@BikeAIVegetation@@QAEHXZ": "0x00457080",
   "?GetShapePosition@CollisionObject@@QAEXPAUCollisionVec3@@@Z": "0x00436000",

@@ -781,7 +781,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
             this->CollisionPoint::surfaceNormal = bounds->normal;
             *TireSurfaceByte(this) = 7;
             TireTransformDirection(&this->CollisionPoint::worldPosition, (const CollisionVec3*)bounds->box->max, &frame);
-            rollDirection = *Fn_00515c90(&rolled, &this->CollisionPoint::surfaceNormal, &sideAxis, &wheelUpAxis);
+            rollDirection = *NormalizedCross(&rolled, &this->CollisionPoint::surfaceNormal, &sideAxis, &wheelUpAxis);
         }
     }
 
@@ -938,7 +938,7 @@ void Tire::UpdateAttachment()
 // so it loads the component first (`fld c.x; fmul st(1)`) like retail; every
 // spelling of `n.x * inv`, inline float helpers by value or reference and
 // helper-based zero tests kept `fld st(0); fmul c.x` (287).
-CollisionVec3* Tire::Fn_00515c90(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b,
+CollisionVec3* Tire::NormalizedCross(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b,
                                  const CollisionVec3* fallback)
 {
     const CollisionVec3& av = *a;

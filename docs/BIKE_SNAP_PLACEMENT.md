@@ -2,7 +2,7 @@
 
 Bike primary slot 33 (`0x00406a50`, 135 bytes) now calls the existing
 `CollisionObject::SnapPlacement` instead of the provisional
-`BikeA38::Method_0x00435fe0` declaration. The receiving expression uses the
+`BikeA38::SnapPlacement` declaration. The receiving expression uses the
 already shared collision base of `Wrecker::collisionModel`; no wrapper,
 class layout change, or new provider is introduced. Other BikeA38 fields and
 the old declaration remain to avoid unrelated header changes.

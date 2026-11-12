@@ -62,7 +62,7 @@ float Bike::ComputeWheelForwardAlignment()
     return alignment;
 }
 
-// Out-of-line call views for Method_0x0040a520 (see math/Math3D.h): the Vec3 constructor
+// Out-of-line call views for IntegrateSteerTorque (see math/Math3D.h): the Vec3 constructor
 // 0x00404e60 and operator*= 0x0040ae00 (Bike.cpp's own COMDAT copy) are called at the
 // marked sites.
 struct BikeVec3Call : Vec3 {
@@ -118,7 +118,7 @@ static inline float BikeDotZ(const Vec3& a, const Vec3& b)
 // torque.y, so only spin.x acts like a directly stored frame word (rule 6). A
 // component-wise or constructed spin gives 269, `torque = weightForce * 0.25f` 238, and
 // `axis * radius` the base bytes.
-float Bike::Method_0x0040a520()
+float Bike::IntegrateSteerTorque()
 {
     Vec3 push;
     Vec3 torque;
@@ -268,7 +268,7 @@ float Bike::ApplySteerRate()
         steerState->AddAngle(angle, poseNode);
         return 1.0f;
     }
-    return 1.0f - Method_0x0040a520();
+    return 1.0f - IntegrateSteerTorque();
 }
 
 // Slot 93: 0x00464e90, the shared empty body.

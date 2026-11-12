@@ -1,4 +1,4 @@
-"""Bike::Method_0x0040a520, the steering-torque integrator (tools/emu_diff.py case).
+"""Bike::IntegrateSteerTorque, the steering-torque integrator (tools/emu_diff.py case).
 
 Offsets from the retail body (tier 1): Bike +0x108 airborne byte, +0x188 force accumulator,
 +0x5f0 front wheel, +0x5f8/+0x5fc the two bar contacts, +0x610 gains, +0x61c steer torque,
@@ -16,7 +16,7 @@ about a third of the cases so every arm is reached.
 from tools.emu_cases.resolve_contact_impulse import build_node, node_case, normal, vec
 
 RETAIL_VA = 0x0040a520
-SYMBOL = '?Method_0x0040a520@Bike@@QAEMXZ'
+SYMBOL = '?IntegrateSteerTorque@Bike@@QAEMXZ'
 SOURCE = 'src/krusty2/vehicle/Bike.cpp'
 PROBES = {0x0040a586: 'airborne', 0x0040a683: 'wheel contact', 0x0040a740: 'wheel + left bar',
           0x0040a986: 'left bar only', 0x0040aa8a: 'right bar test', 0x0040ac02: 'local torque',

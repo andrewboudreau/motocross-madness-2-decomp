@@ -202,7 +202,7 @@ public:
                      const CollisionVec3* velocity, const CollisionVec3* axisB);
 
     // 0x00515c90 (thiscall, three vector pointers and a hidden result pointer first).
-    CollisionVec3* Fn_00515c90(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b,
+    CollisionVec3* NormalizedCross(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b,
                                const CollisionVec3* c);
     // 0x005135f0 (thiscall, ret 0x28), tier 3 name: contact-patch update.  Recomputes the
     // relative position/lever vectors and the tangent direction, length and slip-like scalar

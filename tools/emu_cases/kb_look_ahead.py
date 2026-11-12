@@ -21,7 +21,7 @@ real. Every other call is recorded and replayed (``REPLAY``):
 - QuerySegmentObstacles logs both segment ends and returns a hit 50% of the time with a
   horizontal push, an avoid point near the front wheel and a distance.
 
-Inputs follow the one caller (KrustyBike::Fn_00413200 0x00413a0c: maxTime = dt, side =
+Inputs follow the one caller (KrustyBike::SimulateAIFrame 0x00413a0c: maxTime = dt, side =
 bodyUp, a path and the class's speed-table row) with variations the body tests: no path
 (steering input, the three steer signs), no side vector, no suspension pointers, no terrain,
 maxTime spanning a few steps, the event type (1 and 5 blend the velocity into the aim) and the

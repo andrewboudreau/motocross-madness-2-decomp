@@ -1632,7 +1632,7 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
-    "candidate_symbol_contains": "Method_0x0040a520@Bike",
+    "candidate_symbol_contains": "IntegrateSteerTorque@Bike",
     "target_va": "0x0040a520",
     "target_size": 2272,
     "expect": "partial",
@@ -1696,7 +1696,7 @@
     "target_va": "0x0048dc60",
     "target_size": 112,
     "expect": "exact",
-    "notes": "vtable slot 4 override of Bike (base 0x005265d0). Exact: forwards float a4 unchanged to the handler (Fn_004DE580 float overload).",
+    "notes": "vtable slot 4 override of Bike (base 0x005265d0). Exact: forwards float a4 unchanged to the handler (NotifyContactImpulse float overload).",
     "bindings": "KrustyBike.bindings.json"
   },
   {

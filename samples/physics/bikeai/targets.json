@@ -42,7 +42,7 @@
   {
     "class": "KrustyBike",
     "source": "BikeAINearMisses.cpp",
-    "candidate_symbol_contains": "?Fn_00413200@KrustyBike@@",
+    "candidate_symbol_contains": "?SimulateAIFrame@KrustyBike@@",
     "target_va": "0x00413200",
     "target_size": 4112,
     "expect": "partial",
@@ -52,7 +52,7 @@
   {
     "class": "KrustyBike",
     "source": "BikeAINearMisses.cpp",
-    "candidate_symbol_contains": "?Fn_00414370@KrustyBike@@",
+    "candidate_symbol_contains": "?UpdateAIRacingLine@KrustyBike@@",
     "target_va": "0x00414370",
     "target_size": 4802,
     "expect": "partial",

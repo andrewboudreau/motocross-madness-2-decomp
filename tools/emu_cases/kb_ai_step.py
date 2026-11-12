@@ -1,4 +1,4 @@
-"""KrustyBike::Fn_00413200 0x00413200, the AI bike's physics step (tools/emu_diff.py case,
+"""KrustyBike::SimulateAIFrame 0x00413200, the AI bike's physics step (tools/emu_diff.py case,
 call-record/replay mode).
 
 The linked body is the Group 3 bring-up copy (src/bringup/Group3_KrustyBikeAI.cpp). Every call
@@ -22,7 +22,7 @@ Declared callee behaviour (the rest is the generic model):
 import struct
 
 RETAIL_VA = 0x00413200
-SYMBOL = '?Fn_00413200@KrustyBike@@QAEHM@Z'
+SYMBOL = '?SimulateAIFrame@KrustyBike@@QAEHM@Z'
 SOURCE = 'src/bringup/Group3_KrustyBikeAI.cpp'
 KB_VT = 0x00554548
 KB_VT2 = 0x00554514

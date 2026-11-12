@@ -92,7 +92,7 @@ public:
     // 0x0040a520 (2272 bytes): integrates a steering torque from the angular velocity, the
     // front wheel's contact and the two +0x5f8/+0x5fc contacts, turns it by the steer state
     // and returns the normalised projection (0 when nothing drives it).
-    float Method_0x0040a520();
+    float IntegrateSteerTorque();
 
     // Inherited members whose canonical types are still generic are viewed through
     // casts at the use site (MIGRATION.md rule 6): field_0x12c as BikeElem**, field_0x1f4
@@ -107,14 +107,14 @@ public:
     char riderName[16];           // +0x5e0 ctor strcpy from global 0x00577738 (empty string in the image); tier 3 name
     BikeWheel* frontWheel;       // +0x5f0 front wheel (largest config z, see 0x4079c0 loop at 0x408705); tier 3
     BikeWheel* rearWheel;       // +0x5f4 rear wheel (smallest config z, 0x408728); tier 3
-    BikeA5F8* leftBarContact;      // +0x5f8 cleared in the ctor (0x00407700); LoadBike adds it at (-1.305, 0.225, -0.228) on the "Handlebars" node; Method_0x0040a520 reads it
+    BikeA5F8* leftBarContact;      // +0x5f8 cleared in the ctor (0x00407700); LoadBike adds it at (-1.305, 0.225, -0.228) on the "Handlebars" node; IntegrateSteerTorque reads it
     BikeA5F8* rightBarContact;     // +0x5fc cleared in the ctor; the mirror point (+1.305, 0.225, -0.228) on the "Handlebars" node
     int tailContact;                          // +0x600  the loader's contact point at the tail (0, 3.345, -3.206) on modelNode, beside the handlebar contacts
     Wrecker* wrecker;  // +0x604  Wrecker (SetupWrecker with rider.col, StartAnimatedWreck); RaceView/BikeRace +0x604 wrecker
     Vehicle* linkedVehicle;  // +0x608 cleared in ctor and reset (lines near linkedVehicle = 0), set reciprocally in the slot 38 pairing code: linkedVehicle = other; ((Bike*)other)->linkedVehicle = this
     BikeA60C* handlebars;          // +0x60c BikeA60C("Handlebars", model, steerState); the steer axis runs from the front wheel to its node; cleared in the ctor; ~Bike calls 0x00464e90 on it, then operator delete
-    Vec3 steerTorqueGains;  // +0x610  per-axis gains of the steering torque integrator (Method_0x0040a520)
-    Vec3 steerTorque;  // +0x61C  integrated steering torque (Method_0x0040a520); decays by 0.99 (or -0.02/-0.1 at the limit) per step
+    Vec3 steerTorqueGains;  // +0x610  per-axis gains of the steering torque integrator (IntegrateSteerTorque)
+    Vec3 steerTorque;  // +0x61C  integrated steering torque (IntegrateSteerTorque); decays by 0.99 (or -0.02/-0.1 at the limit) per step
     float driveSlideAngle;                    // +0x628  slot 61: rear-wheel drive term while all wheels touch and the bike leans, decayed to 0 over 0.75 s; returned to slot 49, which hands it to slot 46 (provisional)
     float driveSlideAngleStep;                // +0x62C  slot 61: per-step decay of driveSlideAngle (-1.333 * fixedStepTime * angle)
     int driveSlideStepsLeft;                  // +0x630  slot 61: steps left in the 0.75 s decay ((int)(0.75 / fixedStepTime - 0.5))

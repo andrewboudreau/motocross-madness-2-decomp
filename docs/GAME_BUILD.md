@@ -1227,12 +1227,12 @@ run as retail code; only calls with side effects outside the function
 | VA | Function | Runs | Differed before | Cause and fix | Now linked |
 |---|---|---|---|---|---|
 | 0x0051c4f0 | `RadarOverlay::IntersectLineCircle` | 800 | 131 of 800 | the two-hit choice measured against the output buffer (uninitialised in `DrawTrackOutline`) instead of the fourth argument | 0.939 |
-| 0x0040a520 | `Bike::Method_0x0040a520` (steer torque) | 600 | 140 of 600 | both left-bar arms stored the subtraction into `torque` and dotted it, where retail stores `offset` and dots `base` | 0.989 |
+| 0x0040a520 | `Bike::IntegrateSteerTorque` (steer torque) | 600 | 140 of 600 | both left-bar arms stored the subtraction into `torque` and dotted it, where retail stores `offset` and dots `base` | 0.989 |
 | 0x00436720 | `CollisionObject::HullVsHull` | 600 | 29 of 600 (24-bit) | second contact-normal rotation grouped `(y + z) + x` in place as retail | 0.978 |
 | 0x00427c10 | `SegmentTriangleQuery` (sample) | 800 | 32 of 800 | end point's y row grouped `(y + z) + x` (`TransformPointYZX`) | 0.955 |
 | 0x00517340 | `Track::PlaceNear` (sample, via `KbRaceSub::PlaceNear`) | 600 | 44 of 600 | path loop's second `DistanceAlong` took (candidate, start); retail passes (start, from) | 0.842 (0.868 before) |
 | 0x00491d10 | `KrustyBike::FindPlacement` | 600 | 112 of 600 | stored-vector path returned the pointer; retail leaves the bits of `outPosition->z` in eax | 0.947 |
-| 0x00414370 | `KrustyBike::Fn_00414370` (AI racing line) | 1000 | 114 of 1000 | outside free roam retail reads the trick delay from the difficulty's frame slot (an uninitialised local that VC6 gives that slot). Later source shapes, 0 of 1000 at both control words after each: `for (t = T0, i = 0; t <= T1; t += 0.1f)` point loops with a leading count break, the finished bike's off-track exit as an else that frees the list and returns, and the kinds 1/5 count stores through an `&aiPath` pointer (aligned 1092 -> 1188 of 1302) | 0.899 -> 0.951 (strict 0.805 -> 0.921) |
+| 0x00414370 | `KrustyBike::UpdateAIRacingLine` (AI racing line) | 1000 | 114 of 1000 | outside free roam retail reads the trick delay from the difficulty's frame slot (an uninitialised local that VC6 gives that slot). Later source shapes, 0 of 1000 at both control words after each: `for (t = T0, i = 0; t <= T1; t += 0.1f)` point loops with a leading count break, the finished bike's off-track exit as an else that frees the list and returns, and the kinds 1/5 count stores through an `&aiPath` pointer (aligned 1092 -> 1188 of 1302) | 0.899 -> 0.951 (strict 0.805 -> 0.921) |
 | 0x0048eea0 | `KrustyBike::UpdateRiderPose` | 1500 | 28 of 1500 | retail indexes the 16-entry `s_kbTrickFrame` (0x0056d060) with chained tricks (16..31) too and reads the next 16 words of `.data`; the bring-up copy now has 32 entries holding those words ([below](#chained-trick-frame-overread)) | 0.955 |
 | 0x005097d0 | `TerrainShadow` slot 28 | 600 | 0 | latent: the orthographic scale read an unset `fov` that VC6 happened to place in `extent`'s slot; it now reads `extent` (retail `fmul [esp+0x4c]` at 0x00509949) | 0.986 |
 | 0x00426be0 | `BoxTriangleQuery` (sample) | 4500 | 2 of 2250 at 53-bit (0 at 24-bit) | retail keeps `p2 = p0 - Dot(e1)` on the x87 stack (`fsubr ; fst`) and compares p1 against it unrounded; the named `float p2` was stored and rounded to binary32. `QueryMinBFirst`/`QueryMaxBFirst` on `(p0 - d2, p0 - d1)` evaluate and compare in retail's order | 1.000 (0.979 before) |
@@ -1296,14 +1296,14 @@ nothing about the callees.
 | VA | Function | Case | Cases per control word | Differ |
 |---|---|---|---|---|
 | 0x0052a940 | `Vehicle::SimulateFrame` (slot 49) | `vehicle_simulate_frame` | 100 | 0 |
-| 0x00413200 | `KrustyBike::Fn_00413200` (AI physics step) | `kb_ai_step` | 300 | 0 after the fix below (20 of 100 at 53-bit before) |
+| 0x00413200 | `KrustyBike::SimulateAIFrame` (AI physics step) | `kb_ai_step` | 300 | 0 after the fix below (20 of 100 at 53-bit before) |
 | 0x00493660 | `KrustyBike::InterpolateNetworkState` (remote state interpolation) | `kb_net_interpolate` | 200 | 0 |
 | 0x004685d0 | `Game::Tick` (samples/game/GameTick.cpp, read-only) | `game_tick` | 200 | 0 |
 | 0x0040eca0 | `SimulateLookAhead` (AI two-wheel look-ahead) | `kb_look_ahead` | 200 | 0, exact at both control words after the fixes below (139 of 200 at 24-bit before) |
 | 0x004a3c80 | `MorphBastardModifier::ControllerAngles` | `morph_controller_angles` | 500 | 0 after the two fixes below (1 and 8 of 40 at 53/24-bit before) |
 | 0x004a4c60 | `MorphBastardModifier::ModifyMesh` (slot 27) | `morph_modify_mesh` | 200 | 0 |
 
-`Fn_00413200` smoothed the forward acceleration with `(dt, target)` and
+`SimulateAIFrame` smoothed the forward acceleration with `(dt, target)` and
 kept the target in an 80-bit register. Retail loads `dt` first and spills the
 target to a float slot, so at 53-bit precision the target is rounded to binary32.
 The old shape put `smoothedForwardAccel` (bike+0x590) and the smoother's
@@ -1416,7 +1416,7 @@ the counter-derived timer words out of the write comparison.
 Perturbation controls all differ:
 - a `SimulateFrame` constant 0.85 to 0.86 (22 of 120);
 - the `InterpolateNetworkState` replay lag 0.27 to 0.28 (4 of 400);
-- the `Fn_00413200` steer division turned into a multiplication (12);
+- the `SimulateAIFrame` steer division turned into a multiplication (12);
 - the `Game::Tick` frame clamp 0.2 to 0.25 (96).
 
 The candidate-sample twins follow the linked fixes where the score allows:

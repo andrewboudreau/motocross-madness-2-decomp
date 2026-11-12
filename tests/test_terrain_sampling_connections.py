@@ -81,7 +81,7 @@ class TerrainSamplingConnectionsTests(unittest.TestCase):
                 (TREE, '?BuildTriangleMeshTree@@', 0x42cc60, 831, {TRIANGLE: (0x4a11e0, 1)}),
                 (TERRAIN, '?CastSegment@Terrain@@', 0x506e90, 1654,
                  {'??XTerrainVec3@@QAEAAU0@M@Z': (0x40ae00, 1)}),
-                (BIKE, '?Method_0x0040a520@Bike@@', 0x40a520, 2272,
+                (BIKE, '?IntegrateSteerTorque@Bike@@', 0x40a520, 2272,
                  {'??XBikeVec3ScaleAssign@@QAEAAU0@M@Z': (0x40ae00, 3)}),
             ):
                 obj = objects[source]

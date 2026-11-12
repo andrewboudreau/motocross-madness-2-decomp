@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'src/reconstructed/GameplayDefaults.cpp'
 PROVIDERS = (('??1BikeA60C@@QAE@XZ', 0x464e90, 1),
              ('??1VehicleSpeedState@@QAE@XZ', 0x464e90, 1),
-             ('?Fn_004DE580@KbRaceHandler@@QAEXPAXMH@Z', 0x4de580, 3))
+             ('?NotifyContactImpulse@KbRaceHandler@@QAEXPAXMH@Z', 0x4de580, 3))
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),

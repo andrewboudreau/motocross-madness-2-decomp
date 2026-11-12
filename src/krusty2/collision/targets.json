@@ -1002,7 +1002,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00439600",
+    "candidate_symbol_contains": "CapsuleTouchesObject",
     "target_va": "0x00439600",
     "target_size": 532,
     "expect": "exact",

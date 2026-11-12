@@ -33,7 +33,7 @@ PARTIAL = [
     ('src/krusty2/vehicle/Bike.cpp', 'SelectRiderPose@Bike', 4221664, 2396, 2436, 107, '9c789409acc4b118c57a6525880b37415b923e4aeb0cc833584955a14ffab1c7'),
     ('src/krusty2/vehicle/Bike.cpp', 'UpdateRiderPose@Bike', 4224064, 485, 474, 188, 'b54d0bbdb1c68a8d8c58a2368d2f31f5f0df23c1f6d12380fa84191bd009289e'),
     ('src/krusty2/vehicle/Bike.cpp', 'ComputeSlideAngle@Bike', 4243456, 1015, 1069, 154, 'c219454774f219d02b41449ceb143d1e05c68b7487c52611b82aee0a712ad48b'),
-    ('src/krusty2/vehicle/Bike.cpp', 'Method_0x0040a520@Bike', 4236576, 2272, 2272, 2084, '3cf3ebbf965fecf2b9f005b5b4d620860be4b78c96f426345cc8b16ef5bb5036'),
+    ('src/krusty2/vehicle/Bike.cpp', 'IntegrateSteerTorque@Bike', 4236576, 2272, 2272, 2084, '3cf3ebbf965fecf2b9f005b5b4d620860be4b78c96f426345cc8b16ef5bb5036'),
     ('src/krusty2/vehicle/Bike.cpp', 'LoadBike@Bike', 4225472, 6745, 6745, 6428, '9bcbfd9d8f540b6e0d5940830d4fc4450dd15d499a5018587c34c76ff10e393e'),
     ('samples/race/WreckerNearMisses.cpp', '?PushProbesOutOfBox@Wrecker@@', 5450208, 1312, 1312, 1200, 'ee990cbeffbb403f2238ce88038c256717237b874c57444ad28b5ed7ff53e2cb'),
     ('samples/race/WreckerNearMisses.cpp', '?SprayContactParticles@Wrecker@@', 5445440, 1624, 1624, 1606, '439fd80876fa804dde2e6522a6deaae3048455a89c2d1074ae21263310e408d6'),
@@ -100,7 +100,7 @@ class MathCallConnectionsTests(unittest.TestCase):
             # partial below. Its existing resolved fingerprint also preserves
             # the result-buffer addresses, cleanup and post-call vector copies.
             bike = objects[SOURCES[4]]
-            _, _, relocs = bike.symbol_extent(bike.find_symbol('Method_0x0040a520@Bike'))
+            _, _, relocs = bike.symbol_extent(bike.find_symbol('IntegrateSteerTorque@Bike'))
             calls = Counter(bike.symbol_by_index[r.symbol_index].name for r in relocs
                             if r.type == 0x14 and bike.symbol_by_index[r.symbol_index].name in (SCALE, SUBTRACT))
             self.assertEqual(calls, Counter({SUBTRACT: 5, SCALE: 4}))

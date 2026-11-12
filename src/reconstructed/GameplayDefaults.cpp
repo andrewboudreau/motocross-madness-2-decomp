@@ -10,5 +10,5 @@ BikeA60C::~BikeA60C() {
 VehicleSpeedState::~VehicleSpeedState() {
 }
 
-void KbRaceHandler::Fn_004DE580(void*, float, int) {
+void KbRaceHandler::NotifyContactImpulse(void*, float, int) {
 }

@@ -24,7 +24,7 @@
   "?Configure@CollisionObject@@QAEXPAXHHH@Z": "0x004320f0",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
-  "?Fn_00515c90@Tire@@QAEPAUCollisionVec3@@PAU2@PBU2@11@Z": "0x00515c90",
+  "?NormalizedCross@Tire@@QAEPAUCollisionVec3@@PAU2@PBU2@11@Z": "0x00515c90",
   "?GetLocalBounds@TireNode@@QAEXPAUCollisionVec3@@0@Z": "0x004fe0a0",
   "?GetPositionIn@TireNode@@QAEXPAV1@PAUCollisionVec3@@@Z": "0x004fc9a0",
   "?HandleContact@Tire@@QAEXHHPAVCollisionObject@@@Z": "0x00512e80",
