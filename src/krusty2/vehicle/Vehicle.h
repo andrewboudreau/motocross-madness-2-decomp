@@ -295,9 +295,9 @@ struct VehicleWheel {
     // twelve tuning values, the steer state of a steered wheel (else 0) and the track
     // (0x2c0 bytes, `new(__FILE__, 0x6b8)` in Bike's loader).
     VehicleWheel(const char* name, SoultreeObject* root, float rollFriction_, float sideFriction_,
-                 int field_0x298_, VehicleSteerState* steer, float field_0x2b4_,
-                 float rollFrictionScale_, float sideFrictionScale_, float field_0x2a0_,
-                 float field_0x1d8_, float field_0x1dc_, float field_0x1e0_, float blendWeight_,
+                 int field_0x298_, VehicleSteerState* steer, float slipThreshold_,
+                 float rollFrictionScale_, float sideFrictionScale_, float driveStrength_,
+                 float driveTorqueScale_, float levelRiseRate_, float levelFallRate_, float blendWeight_,
                  SoultreeSlot1f0* track);
     char pad_0x00[0xB8];
     VehicleContactPoint contactPoint;  // +0xb8 AddWheel registers it in collisionPoints
@@ -351,7 +351,7 @@ struct VehicleWheel {
     char pad_0x270[8];
     int rollAngle;  // +0x278 Tire.h rollAngle (float there; only cleared here)
     int slipSpeed;  // +0x27C Tire.h slipSpeed (float there; only cleared here)
-    float driveMagnitude;          // +0x280 DriveForce's magnitude output (slot 86; Tire.h: drive factor)
+    float driveMagnitude;          // +0x280 DriveForce's magnitude output (slot 86; Tire.h driveMagnitude)
     float surfaceScaleB;           // +0x284 Tire.h surfaceScaleB
     float tangentSin;              // +0x288 Tire.h: sqrt(1 - tangentCos^2); slots 19/20 scale the slide vector by it
     float tangentCos;              // +0x28c Tire.h: |tangent . rollDirection| clamped to 1
@@ -361,7 +361,7 @@ struct VehicleWheel {
     float rampLevel;               // +0x29c 0 selects a flag passed to slot 77 (slot 83)
     float driveStrength;           // +0x2a0 Tire.h ctor arg a10, read by 0x00514170; Method_00527A20 counts the in-contact wheels where it is nonzero
     float field_0x2a4;
-    VehicleWheelAux* aux;          // +0x2a8 Tire.h TireAux
+    VehicleWheelAux* aux;          // +0x2a8 Tire.h engine (TireAux)
     int secondaryAux;  // +0x2ac same use as primaryAux, the fallback when it is null (UpdateWheelsInContact, Method_005293E0)
     int primaryAux;  // +0x2b0 AddWheel stores an attachment here; UpdateWheelsInContact treats it as an object whose +0x8c is reset from +0x90
     char pad_0x2B4[0x4];
@@ -376,7 +376,7 @@ struct VehicleWheel {
     // 0x00514170 (ret 0x1c): per-wheel drive/brake step called by Method_00527A20 with the
     // reciprocal of the driven-wheel count, the body's step time, direction flag and mass.
     void ApplyDrive(float share, float stepTime, int movingForward, float bodyMass,
-                         float* speed, Vec3* force, Vec3* torque);
+                         float* speed, Vec3* torque, Vec3* force);
     // 0x00514550 (ret 0x20): places the wheel on the ground (src/krusty2/tire/Tire.h
     // UpdateSuspensionProbe); PlaceWheels passes the body's probe, position, saved
     // pitch/sin-roll/yaw, saved forward/up and the pose node.

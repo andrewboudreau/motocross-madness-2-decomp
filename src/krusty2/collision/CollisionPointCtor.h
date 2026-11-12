@@ -15,7 +15,7 @@ inline CollisionPoint::CollisionPoint(float force, int owner)
     relativePosition = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
     appliedShare = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
     frictionDirection = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
-    field_0x5c = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+    rotationalVelocity = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
     tangentSpeed = 0;
     spinSpeed = 0;
     field_0xb8 = 1.0f;
@@ -23,16 +23,16 @@ inline CollisionPoint::CollisionPoint(float force, int owner)
     penetration = -999.0f;               // 0xc479c000 at 0x0043a48c
     penetrationThreshold = 0;
     inContact = 0;
-    field_0xa8 = 0;
-    field_0xac = 0;
-    field_0xb0 = 0;
-    field_0xb4 = 0;
+    impactPosted = 0;
+    slidePosted = 0;
+    scrapePosted = 0;
+    contactState = 0;
     blendWeight = 0.5f;
     surfaceType = 0;
     frictionMagnitude = 0;
     frictionForce = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
     frictionCoefficient = 0;
-    field_0x68 = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
+    normalLoadVector = (*reinterpret_cast<const CollisionVec3*>(&kCollisionPointZero));
 }
 
 #endif

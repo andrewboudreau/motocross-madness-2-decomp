@@ -19,7 +19,7 @@ typedef char Vectors[sizeof(Vec3) == 12 && sizeof(CollisionVec3) == 12 &&
 typedef char BikeFields[offsetof(BikeA5F8,point) == offsetof(CollisionPoint,worldPosition) &&
     offsetof(BikeA5F8,axis) == offsetof(CollisionPoint,surfaceNormal) &&
     offsetof(BikeA5F8,active) == offsetof(CollisionPoint,inContact) &&
-    offsetof(BikeA5F8,state) == offsetof(CollisionPoint,field_0xb4) ? 1 : -1];
+    offsetof(BikeA5F8,state) == offsetof(CollisionPoint,contactState) ? 1 : -1];
 typedef char ListView[offsetof(SoultreeContact,ownerNode) == offsetof(CollisionPoint,ownerNode) &&
     offsetof(SoultreeContact,worldPosition) == offsetof(CollisionPoint,worldPosition) &&
     offsetof(SoultreeContact,contactNormal) == offsetof(CollisionPoint,surfaceNormal) &&

@@ -90,7 +90,7 @@ static inline float BikeDotZ(const Vec3& a, const Vec3& b)
 // 0x0040a520 (tier 3 reading).  Builds a world-space steering torque `torque`: a quarter of
 // the force accumulator weightForce, turned by the front wheel's contact (offset x normalLoadVector) and by each
 // active +0x5f8/+0x5fc contact (offset x the contact's axis scaled by the negative
-// projection), or by wheelRadius * wheelUpAxis while airborne.  Its body-space direction
+// projection), or by wheelRadius * wheelForwardAxis while airborne.  Its body-space direction
 // (projected on the wheel frame's axis, normalised) scales the per-axis gains into the
 // integrator steerTorque; the integrator's length, signed by that axis, is the angle fed to
 // the steer state unless the limit (0.785 rad) is reached, in which case the angle is
@@ -132,7 +132,7 @@ float Bike::IntegrateSteerTorque()
     int driven = 0;
 
     if (airborne) {
-        Vec3 spin = frontWheel->wheelRadius * frontWheel->wheelUpAxis;
+        Vec3 spin = frontWheel->wheelRadius * frontWheel->wheelForwardAxis;
         torque = CrossProduct(spin, torque);
         result = 0.0f;
     } else {
@@ -690,13 +690,13 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
             Release();
             return 0;
         }
-        float roll[2] = { 0.1f, 1.0f };
-        float grip[2] = { 0.5f, 1.0f };
-        float a12 = controlResponse[4] * 10.0f;
-        float a13 = controlResponse[5] * 25.0f;
+        float sideFrictionScale[2] = { 0.1f, 1.0f };
+        float driveTorqueScale[2] = { 0.5f, 1.0f };
+        float levelRiseRate = controlResponse[4] * 10.0f;
+        float levelFallRate = controlResponse[5] * 25.0f;
         VehicleWheel* wheel = new(__FILE__, 0x6b8) VehicleWheel(partName, modelNode, 0.15f, 2.0f, kind5[i],
                                                                 steered[i] ? steerState : 0, 45.0f, 1.0f,
-                                                                roll[i], 255.0f, grip[i], a12, a13, 0.5f, trackObject);
+                                                                sideFrictionScale[i], 255.0f, driveTorqueScale[i], levelRiseRate, levelFallRate, 0.5f, trackObject);
         BikeTireObject* tire = (BikeTireObject*)wheel;
         tire->SetRenderContext((void*)GameObject::renderContext);
         GameObject::AppendChild((GameObject*)tire, -1);

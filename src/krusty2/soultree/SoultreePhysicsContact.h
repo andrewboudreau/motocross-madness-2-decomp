@@ -18,7 +18,7 @@ public:
     void* ownerNode;  // +0x04 slot 31 skips points whose ownerNode is null (contactState = 0); the destructor 0x00501260 deletes only points with a non-null ownerNode
     char field_0x08[0x0c];
     Vec3 worldPosition;  // +0x14 slot 7 weights each touching point by |centerOfMass - worldPosition|; 0x0043a640 recomputes the lever arm from it
-    Vec3 field_0x20;
+    Vec3 surfacePosition;  // +0x20 CollisionPoint surfacePosition (same object, the view of CollisionPoint); slot 18 places the contact effect there
     Vec3 contactNormal;  // +0x2c slot 13: d = dot(loadShare * force, contactNormal); normalForce = contactNormal * -d when d < 0
     Vec3 leverArm;  // +0x38 0x0043a640 (slot 31 passes &leverArm) sets it relative to centerOfMass; slot 13 adds cross(leverArm, frictionForce) to the torque
     Vec3 forceShare;  // +0x44 slot 7: forceShare = force * loadShare for touching points (the whole force for a lone point), zero otherwise
@@ -27,13 +27,13 @@ public:
     float normalForceMagnitude;  // +0x74 slot 13: normalForceMagnitude = -d (or 0); read by the point's slot 1 friction update
     Vec3 frictionForce;  // +0x78 produced by the point's slot 1 (called from slot 13); slot 13 adds it to the force and cross(leverArm, frictionForce) to the torque
     char field_0x84[0x14];
-    float field_0x98;
+    float penetration;  // +0x98 CollisionPoint penetration; slot 31 updates only points with penetration >= 0
     char field_0x9c[4];
     float loadShare;  // +0xa0 slot 7: 1 - dist/sumDist per touching point (1.0 for a lone point, 0 when not touching); slot 13 scales the body force by it
     int touching;  // +0xa4 slots 7 and 18 only use points with touching set; set by the Vehicle contact query
     int effectSpawned;  // +0xa8 slot 18 sets it when it places the type-1 attachment at this point and skips points already set; slot 30 clears it every step
-    int field_0xac;
-    int field_0xb0;
+    int slidePosted;  // +0xac CollisionPoint slidePosted (Vehicle slot 19 sets it); slot 30 clears it every step
+    int scrapePosted;  // +0xb0 CollisionPoint scrapePosted (Vehicle slot 20 sets it); slot 30 clears it every step
     int contactState;  // +0xb4 slot 31: 0 = no contact, 1 = in contact (left at 2 when already 2); slot 13 skips 0 and, for 2, scales the torque by a3 and resets it to 0
     char field_0xb8[4];
     char materialId;  // +0xbc slot 18 indexes the track's per-material byte table (+0x400) with (unsigned char)materialId

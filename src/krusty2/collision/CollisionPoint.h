@@ -41,8 +41,8 @@ public:
     CollisionVec3 relativePosition;  // +0x38 UpdateRelativeMotion: = worldPosition - a1 (position relative to the body); Tire computes the same
     CollisionVec3 appliedShare;  // +0x44 Vehicle/Bike view (VehicleContact, VehicleWheel +0xfc): per-point share of the applied vector; zeroed by the ctor
     CollisionVec3 frictionDirection;                // +0x50 scaled by frictionMagnitude into frictionForce (slot 1)
-    CollisionVec3 field_0x5c;
-    CollisionVec3 field_0x68;
+    CollisionVec3 rotationalVelocity;  // +0x5c Tire 0x005135f0: = angularVelocity x relativePosition (the caller passes worldAngularVelocity); Tire::UpdateShock hands it to the shock solve
+    CollisionVec3 normalLoadVector;  // +0x68 Vehicle view name; Vehicle 0x00527a20: = surfaceNormal * normalLoad (SoultreeContact view: normalForce)
     float frictionCoefficient;  // +0x74 slot 1: frictionMagnitude = -normalForce * surfaceGrip * frictionCoefficient; Tire overrides the same expression with its own coefficients
     CollisionVec3 frictionForce;  // +0x78 slot 1: = frictionDirection * frictionMagnitude (zero when both slip terms are below 0.001)
     float frictionMagnitude;  // +0x84 slot 1: = -normalForce*surfaceGrip*coefficient, then made non-negative
@@ -54,10 +54,10 @@ public:
     float penetrationThreshold;  // +0x9c AddCollisionPoint threshold; 0x0043ad80: inContact = (penetration >= penetrationThreshold)
     float blendWeight;  // +0xa0 Vehicle/Bike view (VehicleContact, VehicleWheel::loadWeight +0x158): per-point blend weight; ctor 0.5f, Tire ctor a14
     int inContact;  // +0xa4 0x0043ad80 stores the integer 1/0 (mov eax, 1 / xor eax, eax) from the penetration test and counts it; 0x0043aa30 only merges points with it set; Tire 0x00513c70 stores 1/0 the same way
-    float field_0xa8;
-    float field_0xac;
-    float field_0xb0;
-    float field_0xb4;
+    float impactPosted;  // +0xa8 int flag in the Vehicle/Soultree views: slot 18 sets it when it posts the contact effect, slot 30 clears it
+    float slidePosted;  // +0xac int flag: Vehicle slot 19 sets it when it posts the slide effect, slot 30 clears it
+    float scrapePosted;  // +0xb0 int flag: Vehicle slot 20 sets it when it posts the scrape effect, slot 30 clears it
+    float contactState;  // +0xb4 int in the SoultreeContact view: slot 31 stores 0/1 (keeps 2), slot 13 reads it
     float field_0xb8;
     char surfaceType;  // +0xbc low three bits of the flag byte written by the ground query (&= 7 in 0x0043ad80); indexes the per-surface grip table
     int surfaceOwner;  // +0xc0 inlined ctor argument owner (AddCollisionPoint surfaceOwner); 0x0043ad80 reads the surface table from [this+0xa4]+0x3a0 when nonzero

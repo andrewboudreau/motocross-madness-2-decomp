@@ -119,7 +119,7 @@ struct BikeWheel {
     BikeWheelFrame* ownerRef;  // +0x1c0 MovingPart+0x44 ownerRef (Tire ctor arg c; sceneNode +0x1bc is MovingPart+0x40); IntegrateSteerTorque projects on its +0xc axis
     char pad_0x1c4[60];
     Vec3 nodePosition;        // +0x200 (VehicleWheel name)
-    Vec3 wheelUpAxis;  // +0x20c Tire.h wheelUpAxis; scaled by wheelRadius while airborne (IntegrateSteerTorque)
+    Vec3 wheelForwardAxis;  // +0x20c Tire.h wheelForwardAxis; scaled by wheelRadius while airborne (IntegrateSteerTorque)
     char pad_0x218[24];
     Vec3 rollDirection;  // +0x230 Tire.h/VehicleWheel rollDirection
     Vec3 sideAxis;  // +0x23c Tire.h/VehicleWheel sideAxis (wheel axle direction)

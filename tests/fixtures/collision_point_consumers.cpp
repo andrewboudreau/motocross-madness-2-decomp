@@ -24,8 +24,8 @@ void UpdateCollisionPointWorldPositions(int,CollisionPoint**);
 #define SAME_FIELD(a,b) typedef char Layout_##a[offsetof(SoultreeContact,a)==offsetof(CollisionPoint,b)?1:-1]
 SAME_FIELD(ownerNode,ownerNode); SAME_FIELD(worldPosition,worldPosition);
 SAME_FIELD(contactNormal,surfaceNormal); SAME_FIELD(leverArm,relativePosition);
-SAME_FIELD(frictionForce,frictionForce); SAME_FIELD(field_0x98,penetration);
-SAME_FIELD(touching,inContact); SAME_FIELD(contactState,field_0xb4); SAME_FIELD(materialId,surfaceType);
+SAME_FIELD(frictionForce,frictionForce); SAME_FIELD(penetration,penetration);
+SAME_FIELD(touching,inContact); SAME_FIELD(contactState,contactState); SAME_FIELD(materialId,surfaceType);
 typedef char VectorLayout[sizeof(Vec3)==12&&sizeof(CollisionVec3)==12&&offsetof(Vec3,x)==0&&offsetof(Vec3,y)==4&&offsetof(Vec3,z)==8&&offsetof(CollisionVec3,x)==0&&offsetof(CollisionVec3,y)==4&&offsetof(CollisionVec3,z)==8?1:-1];
 typedef char BodyLayout[offsetof(SoultreePhysicsBaseObject,collisionPoints)==0x12c&&offsetof(SoultreePhysicsBaseObject,collisionPointCount)==0x130?1:-1];
 static BYTE referenceSpace[0x800000]={1};
@@ -109,7 +109,7 @@ static void Run(int retail) {
         Vector(p->relativePosition,3,4,5);
         p->penetration=((scenario.mode+i)%3==0)?-1:0;
         if(scenario.mode==15)p->penetration=Bits(0x7fc12345);
-        p->inContact=(scenario.mode+i)%3;*(int*)&p->field_0xb4=(scenario.mode+i)%4;
+        p->inContact=(scenario.mode+i)%3;*(int*)&p->contactState=(scenario.mode+i)%4;
         world.list[i]=p;
     }
     world.list[6]=world.list[7]=0;
@@ -167,7 +167,7 @@ int main(int argc,char** argv) {
     // Independent consumer outcomes: inactive contacts reset; active state 2 survives;
     // lever arm is recomputed before the provider consumes its aliased fourth input.
     Base();scenario.seed=1;scenario.mode=1;Compare();
-    if(observed.exception||*(int*)&Point(0)->field_0xb4!=1||*(int*)&Point(1)->field_0xb4!=2||*(int*)&Point(2)->field_0xb4!=0||Point(0)->relativePosition.x!=0||Point(0)->relativePosition.y!=-5||Point(0)->relativePosition.z!=2)Fail(90);
+    if(observed.exception||*(int*)&Point(0)->contactState!=1||*(int*)&Point(1)->contactState!=2||*(int*)&Point(2)->contactState!=0||Point(0)->relativePosition.x!=0||Point(0)->relativePosition.y!=-5||Point(0)->relativePosition.z!=2)Fail(90);
     Base();scenario.count=0;scenario.fault=2;Compare();if(observed.exception)Fail(91);
     Base();scenario.count=1;scenario.fault=3;Compare();if(observed.exception!=EXCEPTION_ACCESS_VIOLATION||observed.address!=4||observed.kind!=0)Fail(92);
     Base();scenario.task=1;scenario.count=1;scenario.seed=0;scenario.mode=0;Compare();

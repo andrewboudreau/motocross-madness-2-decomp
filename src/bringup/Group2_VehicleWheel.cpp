@@ -14,7 +14,7 @@
 //     address its binding names (Tire.bindings.json). The shock views TireAttachA/B
 //     are forwarded to the canonical Shock family in Group4_VehicleShock.cpp.
 // Arguments are passed through positionally, so the retail argument order is kept
-// even where two views name a parameter differently (ApplyDrive's last two).
+// even where two views name a parameter differently.
 #include <new.h>
 
 #include "tire/Tire.h"
@@ -126,9 +126,9 @@ MovingPart::~MovingPart()
 // member forwards to the Tire member at the same retail address.
 struct VehicleWheel {
     VehicleWheel(const char* name, SoultreeObject* root, float rollFriction_, float sideFriction_,
-                 int field_0x298_, SteeringControl* steer, float field_0x2b4_,
-                 float rollFrictionScale_, float sideFrictionScale_, float field_0x2a0_,
-                 float field_0x1d8_, float field_0x1dc_, float field_0x1e0_, float blendWeight_,
+                 int field_0x298_, SteeringControl* steer, float slipThreshold_,
+                 float rollFrictionScale_, float sideFrictionScale_, float driveStrength_,
+                 float driveTorqueScale_, float levelRiseRate_, float levelFallRate_, float blendWeight_,
                  SoultreeSlot1f0* track);
     void UpdateRoll(float dt, float distanceScale, int locked, int driven, int crashState,
                     float driveScale);
@@ -137,8 +137,8 @@ struct VehicleWheel {
     void UpdateShock(float dt, int pointsTouching, int crashed, float unused, Vec3* velocity,
                      Vec3* axisB);
     void UpdateDriveShare(Vehicle* owner);
-    void ApplyDrive(float share, float stepTime, int forward, float mass, float* speed, Vec3* a6,
-                    Vec3* a7);
+    void ApplyDrive(float share, float stepTime, int forward, float mass, float* speed, Vec3* torque,
+                    Vec3* force);
     void UpdateSuspensionProbe(SoultreeProbe* world, const Vec3* velocity, float angle,
                                float radiusScale, float yaw, const Vec3* forward, const Vec3* up,
                                SoultreeObject* node);
@@ -152,13 +152,13 @@ static inline Tire* AsTire(VehicleWheel* wheel) { return (Tire*)wheel; }
 // 0x00512f10: Bike's loader allocates 0x2c0 bytes and constructs the wheel in them.
 VehicleWheel::VehicleWheel(const char* name, SoultreeObject* root, float rollFriction_,
                            float sideFriction_, int field_0x298_, SteeringControl* steer,
-                           float field_0x2b4_, float rollFrictionScale_, float sideFrictionScale_,
-                           float field_0x2a0_, float field_0x1d8_, float field_0x1dc_,
-                           float field_0x1e0_, float blendWeight_, SoultreeSlot1f0* track)
+                           float slipThreshold_, float rollFrictionScale_, float sideFrictionScale_,
+                           float driveStrength_, float driveTorqueScale_, float levelRiseRate_,
+                           float levelFallRate_, float blendWeight_, SoultreeSlot1f0* track)
 {
     ::new ((void*)this) Tire((void*)name, (int)root, rollFriction_, sideFriction_, field_0x298_,
-                             (int)steer, field_0x2b4_, rollFrictionScale_, sideFrictionScale_,
-                             field_0x2a0_, field_0x1d8_, field_0x1dc_, field_0x1e0_, blendWeight_,
+                             (int)steer, slipThreshold_, rollFrictionScale_, sideFrictionScale_,
+                             driveStrength_, driveTorqueScale_, levelRiseRate_, levelFallRate_, blendWeight_,
                              (int)track);
 }
 
@@ -189,10 +189,10 @@ void VehicleWheel::UpdateDriveShare(Vehicle* owner)                             
 }
 
 void VehicleWheel::ApplyDrive(float share, float stepTime, int forward, float mass, float* speed,
-                              Vec3* a6, Vec3* a7)                                // 0x00514170
+                              Vec3* torque, Vec3* force)                         // 0x00514170
 {
-    AsTire(this)->ApplyDrive(share, stepTime, forward, mass, speed, (CollisionVec3*)a6,
-                             (CollisionVec3*)a7);
+    AsTire(this)->ApplyDrive(share, stepTime, forward, mass, speed, (CollisionVec3*)torque,
+                             (CollisionVec3*)force);
 }
 
 void VehicleWheel::UpdateSuspensionProbe(SoultreeProbe* world, const Vec3* velocity, float angle,

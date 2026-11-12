@@ -21,7 +21,7 @@ function's bytes. Measured with small probe units under `vc6_o2_mt`.
   One int test after the call (`if (active) ...` or `if (crashed) ...`)
   is enough to lose it. A float test there (`if (dt != 0.0f)`) is not.
 - **The count is taken before tail merging.** VC6 merges identical tails
-  (`field_0x26c = 0; inContact = 0; return;` written on two failure paths)
+  (`shockExtending = 0; inContact = 0; return;` written on two failure paths)
   into one block after it has decided on the zero register, so retail's
   single clear block can come from two written copies. Tire::UpdateShock
   `0x00513c70` went from 96 to 769 of 797 bytes this way (zero register,

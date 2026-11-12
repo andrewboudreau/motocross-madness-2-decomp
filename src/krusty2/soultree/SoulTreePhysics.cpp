@@ -264,7 +264,7 @@ void SoultreePhysicsBaseObject::UpdateContactEffect(SoultreeAttachment* attachme
             track->trackData->materialEffectFlags[(unsigned char)contact->materialId] != 0) {
             contact->effectSpawned = 1;
             reinterpret_cast<DustParticleEmitter*>(attachment->contactEmitter)->SetPosition(
-                reinterpret_cast<const ParticleVec3&>(contact->field_0x20), 0.0f);
+                reinterpret_cast<const ParticleVec3&>(contact->surfacePosition), 0.0f);
             if (attachment->resetTrail)
                 attachment->contactEmitter->previousPosition = attachment->contactEmitter->currentPosition;
             attachment->contactEmitter->activeThisFrame = 1;
@@ -310,8 +310,8 @@ void SoultreePhysicsBaseObject::ClearContactEffectFlags()
 {
     for (int i = 0; i < collisionPointCount; i++) {
         collisionPoints[i]->effectSpawned = 0;
-        collisionPoints[i]->field_0xac = 0;
-        collisionPoints[i]->field_0xb0 = 0;
+        collisionPoints[i]->slidePosted = 0;
+        collisionPoints[i]->scrapePosted = 0;
     }
 }
 
@@ -320,7 +320,7 @@ void SoultreePhysicsBaseObject::UpdateContactStates()
 {
     for (int i = 0; i < collisionPointCount; i++) {
         SoultreeContact* contact = collisionPoints[i];
-        if (contact->ownerNode && contact->field_0x98 >= 0.0f) {
+        if (contact->ownerNode && contact->penetration >= 0.0f) {
             if (contact->contactState != 2)
                 contact->contactState = 1;
             reinterpret_cast<CollisionPoint*>(contact)->UpdateRelativeMotion(
