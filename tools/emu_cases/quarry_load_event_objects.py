@@ -52,19 +52,17 @@ COUNT_NODES = 0x004fda30
 CTORS = (0x00401260, 0x00402da0, 0x00417c30, 0x00457250, 0x00460d10, 0x00462620, 0x00462e10,
          0x00462e90, 0x00497cb0, 0x0049e390, 0x004ba390, 0x004da570, 0x004ea660, 0x004fb1e0,
          0x00504490, 0x00505830, 0x00508ae0, 0x0052d340)
-# The canonical constructors the body allocates inline, and the quadtree view's Setup (named by
-# the retail callee, 0x0052d460). The two link forwards (Group3_QuarryLink*.cpp, cdecl, `this`
-# first) stand in for retail's thiscalls: the Setup forward is only reached through the view, so
-# it gets an unused address. The body calls the BikeRace::SetDetailLevel forward itself, so it is
-# placed at a separate address (0x00423791, never executed) and both shapes are compared as one
-# note (race, level).
+# The canonical constructors the body allocates inline, and VisibilityQuadTree::Setup
+# (0x0052d460), which the body calls itself. The BikeRace::SetDetailLevel link forward
+# (Group3_QuarryLinkRace.cpp, cdecl, `this` first) stands in for retail's thiscall; the body calls
+# it itself, so it is placed at a separate address (0x00423791, never executed) and both shapes
+# are compared as one note (race, level).
 SETUP = 0x0052d460
 SET_DETAIL, SET_DETAIL_FORWARD = 0x00423790, 0x00423791
 BINDINGS = {'??0ParticleManager@@QAE@H@Z': 0x004ba390, '??0SoultreeQuadTreeRenderer@@QAE@H@Z': 0x00504490,
             '??0Terrain@@QAE@H@Z': 0x00505830, '??0TerrainShadow@@QAE@H@Z': 0x00508ae0,
             '??0VisibilityQuadTree@@QAE@H@Z': 0x0052d340,
-            '?Setup@UnknownQuarryVisibility@@QAEPAVGameObject@@PAXMMMMM@Z': SETUP,
-            '?G3Q_VisibilitySetup@@YAPAXPAX0MMMMM@Z': SETUP + 1,
+            '?Setup@VisibilityQuadTree@@QAEPAVGameObject@@HMMMMM@Z': SETUP,
             '?Create@FogOn@@QAEPAVGameObject@@PAXPAVFog@@@Z': 0x00486a10,
             '?G3Q_BikeRaceSetDetailLevel@@YAXPAXH@Z': SET_DETAIL_FORWARD}
 # Callee-popped bytes of the virtual slots (from the retail call sites). The generic objects:

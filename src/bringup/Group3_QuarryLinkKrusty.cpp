@@ -1,8 +1,7 @@
-// Bring-up glue (see Group3_QuarryLoadLinks.h): the krusty2 particle, visibility,
+// Bring-up glue (see Group3_QuarryLoadLinks.h): the krusty2 particle,
 // terrain-shadow, terrain and quadtree-renderer calls made by
 // BaseQuarryEvent::LoadEventObjects (0x004de590).
 #include "effects/ParticleManager.h"
-#include "visibility/VisibilityQuadTree.h"
 #include "shadow/ProjectedShadow.h"
 #include "broadphase/Terrain.h"
 #include "soultree/SoultreeQuadTreeRenderer.h"
@@ -18,14 +17,6 @@ public:
 private:
     char storage[0x6780];
 };
-
-// Retail pushes six arguments (target, 0, 0, width, breadth, 96.0f) and receives the
-// GameObject part (+0x874), or 0.
-void* G3Q_VisibilitySetup(void* tree, void* target, float x0, float z0, float x1, float z1,
-                          float minCell)
-{
-    return ((VisibilityQuadTree*)tree)->Setup((int)target, x0, z0, x1, z1, minCell);
-}
 
 void* G3Q_TerrainShadowAttach(void* terrainShadow, void* target, void* terrain, void* shadow)
 {

@@ -1711,8 +1711,8 @@ table shows the run counts from the sweep, at both control words (0x027f and 0x0
 
 These cases replace the earlier disassembly-only reviews of `LoadEventObjects`, `SendStartMessage`,
 the audio loader thread, `LoadVue`, `CheckHeader` and TerrainShadow slot 27. Unbound in-unit
-wrappers would run the candidate's own copy, so the quarry case binds
-`UnknownQuarryVisibility::Setup` (0x0052d460) and `FogOn::Create` (0x00486a10) to retail.
+definitions would run the candidate's own copy, so the quarry case binds `FogOn::Create`
+(0x00486a10) to retail; it also binds `VisibilityQuadTree::Setup` (0x0052d460).
 
 Each control below is a one-line change to the source. Each changed result differs from retail:
 - `LoadEventObjects` without `!shadowLight &&`: 2 of 120.

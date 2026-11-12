@@ -18,8 +18,6 @@ void* G3Q_BikeCameraSetupFlyby(void* camera, void* target, float a, float b, flo
 void G3Q_BikeCameraSetSubject(void* camera, void* subject);                      // 0x00463600
 
 // Group3_QuarryLinkKrusty.cpp
-void* G3Q_VisibilitySetup(void* tree, void* target, float x0, float z0, float x1, float z1,
-                          float minCell);                                        // 0x0052d460 (GameObject part)
 void* G3Q_TerrainShadowAttach(void* terrainShadow, void* target, void* terrain,
                               void* shadow);                                     // 0x00508b80
 void* G3Q_TerrainLoad(void* terrain, void* target, void* stream, int unused, void* textures,

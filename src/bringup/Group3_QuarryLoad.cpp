@@ -47,6 +47,7 @@
 #include "shadow/ProjectedShadow.h"
 #include "collision/CollisionObject.h"
 #include "effects/ParticleManager.h"
+#include "visibility/VisibilityQuadTree.h"
 #include "../reconstructed/TextureMap.h"
 #include "../reconstructed/TextureMapManager.h"
 #include "../reconstructed/TrackGame.h"
@@ -168,21 +169,6 @@ public:
     unsigned char field_0x3b8[0x3bc - 0x3b8];
 };
 
-// The visibility quadtree (0x8a0 bytes); 0x0052d460 returns its GameObject
-// base at +0x874.
-class UnknownQuarryQuadTreeHead {
-public:
-    virtual void UnknownVirtualSlot0();
-    unsigned char field_0x004[0x874 - 0x04];
-};
-class UnknownQuarryVisibility : public UnknownQuarryQuadTreeHead, public GameObject {
-public:
-    explicit UnknownQuarryVisibility(int flags);               // 0x0052d340
-    // 0x0052d460: VisibilityQuadTree::Setup (src/krusty2/visibility).
-    // Retail pushes six arguments (ret 0x18); the near miss passed the scene as a seventh.
-    GameObject* Setup(void* target, float x0, float z0, float width, float breadth, float minCell);
-};
-
 // ProjectedShadow (0x134 bytes) and TerrainShadow (0x6780 bytes).
 class UnknownQuarryTerrainShadow : public GameObject {
 public:
@@ -242,10 +228,6 @@ public:
 class KrustyBikeCamera : public UnknownQuarryBikeCamera {
 public:
     explicit KrustyBikeCamera(int flags);                      // 0x00497cb0
-};
-class VisibilityQuadTree : public UnknownQuarryVisibility {
-public:
-    explicit VisibilityQuadTree(int flags);                    // 0x0052d340
 };
 class TerrainShadow : public UnknownQuarryTerrainShadow {
 public:
@@ -527,8 +509,8 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         progress(0);
 
     g_MemTagStack->Push("QuadTree");
-    UnknownQuarryVisibility* visibility = (UnknownQuarryVisibility*)(new(__FILE__, 659) VisibilityQuadTree(1))
-        ->Setup(renderContext, 0.0f, 0.0f,
+    VisibilityQuadTree* visibility = (VisibilityQuadTree*)(new(__FILE__, 659) VisibilityQuadTree(1))
+        ->Setup((int)renderContext, 0.0f, 0.0f,
                                 eventScene->environment->terrainWidth * eventScene->environment->terrainWidthScale * 256.0f,
                                 eventScene->environment->terrainBreadth * eventScene->environment->terrainBreadthScale * 256.0f,
                                 96.0f);
@@ -899,11 +881,6 @@ UnknownQuarryBikeCamera* UnknownQuarryBikeCamera::Create(void* target, float a, 
     return (UnknownQuarryBikeCamera*)G3Q_BikeCameraSetupFlyby(this, target, a, b, c, d, e, f, count, presets);
 }
 void UnknownQuarryBikeCamera::SetSubject(UnknownTerrain* terrain) { G3Q_BikeCameraSetSubject(this, terrain); }
-
-GameObject* UnknownQuarryVisibility::Setup(void* target, float x0, float z0, float width, float breadth, float minCell)
-{
-    return (GameObject*)G3Q_VisibilitySetup(this, target, x0, z0, width, breadth, minCell);
-}
 
 GameObject* UnknownQuarryTerrainShadow::Attach(void* target, UnknownTerrain* terrain, ProjectedShadow* shadow)
 {
