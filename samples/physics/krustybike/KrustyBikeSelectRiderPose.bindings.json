@@ -1,6 +1,6 @@
 {
-  "?Fn_0048D910@KrustyBike@@QAEXH@Z": "0x0048d910",
-  "?Fn_0048E280@KrustyBike@@QAEXXZ": "0x0048e280",
+  "?StartTrick@KrustyBike@@QAEXH@Z": "0x0048d910",
+  "?LookBackAtNearestRival@KrustyBike@@QAEXXZ": "0x0048e280",
   "?SelectRiderPose@KrustyBike@@UAEXM@Z": "0x0048e3e0",
   "__real@4@00000000000000000000": "0x00550484",
   "__real@4@3ffa83126f0000000000": "0x00550818",

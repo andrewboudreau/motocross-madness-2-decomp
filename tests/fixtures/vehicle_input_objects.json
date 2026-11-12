@@ -1244,7 +1244,7 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "Fn_0048D8B0@KrustyBike",
+      "symbol": "ResetTrickState@KrustyBike",
       "va": "0x48d8b0",
       "extent": 85,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1286,7 +1286,7 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "Fn_00495FF0@KrustyBike",
+      "symbol": "AwardTrickScore@KrustyBike",
       "va": "0x495ff0",
       "extent": 895,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1398,14 +1398,14 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "Fn_0048D910",
+      "symbol": "StartTrick",
       "va": "0x48d910",
       "extent": 123,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "Fn_0048D990",
+      "symbol": "StartAltTrick",
       "va": "0x48d990",
       "extent": 98,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1531,7 +1531,7 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "Fn_0048E280",
+      "symbol": "LookBackAtNearestRival",
       "va": "0x48e280",
       "extent": 339,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"

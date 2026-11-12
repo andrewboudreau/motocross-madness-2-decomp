@@ -962,14 +962,14 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 char motion = states[0]->motion;
                 if (motion) {
                     if (motion < 0x11)
-                        Fn_0048D910(motion - 1);
+                        StartTrick(motion - 1);
                     else if (motion == 0x11)
-                        Fn_0048E280();
+                        LookBackAtNearestRival();
                 }
             } else if (!trickChained) {
                 char motion = interpSource->motion;
                 if (motion > 0x11 && motion - 0x11 == motionIndex)
-                    Fn_0048D990(motionIndex);
+                    StartAltTrick(motionIndex);
             }
         } else {
             int lean;
@@ -1060,14 +1060,14 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 char motion = interpSource->motion;
                 if (motion) {
                     if (motion < 0x11)
-                        Fn_0048D910(motion - 1);
+                        StartTrick(motion - 1);
                     else if (motion == 0x11)
-                        Fn_0048E280();
+                        LookBackAtNearestRival();
                 }
             } else if (!trickChained) {
                 char motion = interpSource->motion;
                 if (motion > 0x11 && motion - 0x11 == motionIndex)
-                    Fn_0048D990(motionIndex);
+                    StartAltTrick(motionIndex);
             }
         }
 
@@ -1193,16 +1193,16 @@ void KrustyBike::UpdateRiderPose(float dt)
                     if (remote) {
                         if (!trickPoseHeld) {
                             if (trickPoseHeldPrev && motionIndex > 15)
-                                Fn_0048D990(motionIndex - 16);
+                                StartAltTrick(motionIndex - 16);
                             ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);
                             CharacterVirtualSlot7(dt, 0, 0);
                         }
                     } else {
-                        if (trickPoseHeld && motionIndex < 16 && animSetC[motionIndex]) {
+                        if (trickPoseHeld && motionIndex < 16 && riderAltTrickMotions[motionIndex]) {
                             trickPoseHeld = 0;
                             int input = ClassifyInputDirection();
                             if (input != -1 && KbTrickChains(motionIndex, input))
-                                Fn_0048D990(motionIndex);
+                                StartAltTrick(motionIndex);
                         } else {
                             trickPoseHeld = 0;
                         }

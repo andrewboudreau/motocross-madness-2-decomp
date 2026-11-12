@@ -93,11 +93,11 @@ public:
     // 0x00414370 (in BikeAI.cpp; called by slot 63 0x004924c0, which ignores the result):
     // rebuilds the AI racing line aiPath for this frame; 0 when a track query fails.
     int Fn_00414370(float dt);
-    void Fn_0048D8B0();
-    void Fn_0048D910(int idx);
-    void Fn_0048D990(int idx);
+    void ResetTrickState();
+    void StartTrick(int trick);      // 0x0048d910: riderTrickMotions/bikeTrickMotions[trick]
+    void StartAltTrick(int trick);   // 0x0048d990: the Alt clips, chained (motionIndex trick + 16)
     KrustyBike* FindNearestRival(float* outDistance);
-    void Fn_0048E280();
+    void LookBackAtNearestRival();
     void Fn_004925A0(Vehicle* who, bool flag);
     void Fn_00496E20(KbRecorder* recorder);
     int Fn_00495C00();
@@ -105,7 +105,7 @@ public:
     void Fn_00496D20();
     void Fn_00496F90(KrustyBike* other);
     void Fn_00497370(KrustyBike* other);
-    float Fn_00495FF0();
+    float AwardTrickScore();
     // 0x004933e0: adds message 13's deltas to the decoded network state and copies it out.
     void Fn_004933E0(const KbNetDelta* delta, KbNetState* state);
     void Fn_00496E30(int protect);
@@ -113,7 +113,7 @@ public:
     // two-point look-ahead model 0x0040eca0 instead of the Vehicle step; returns 1.
     int Fn_00413200(float dt);
     // 0x0048d780 (samples/physics/bikeai/KrustyBikeTrickPick.cpp): called by 0x00414370.
-    int Fn_0048D780(int* out, float t, int a);
+    int PickTrick(int* outTrick, float maxTime, int group);
     // 0x00493660 (8.5 KB) and 0x00492ad0: per-frame steps GameObject slot 10 runs (ret 8;
     // tier 3 roles: the local/replayed update and the network update).
     void Fn_00493660(float dt, int a);
@@ -227,10 +227,10 @@ public:
     CollisionObject* bikeAndRiderCollision;  // +0x1414  Load: CollisionObject(1) with "BikeAndRider.col"; the default collisionObject (Fn_00496DA0 swaps back to it)
     CollisionObject* bikeCollision;          // +0x1418  Load: CollisionObject(1) with "Bike.col", disabled at load; Fn_00496D20 swaps collisionObject to it
     float trickLandTimer;                     // +0x141C  slot 71 sets 0.3 on landing with a trick pending; slot 29 scores via 0x00495ff0 when it runs out (tier 3)
-    int animSetA[16]; // 0x1420  Fn_0048D910 indexes it with the argument (rider handle for riderCharacter); tier 3 name
-    int animSetB[16]; // 0x1460  Fn_0048D910: same index, handle for the D3DIMSoultreeCharacter base
-    int animSetC[16]; // 0x14A0  Fn_0048D990: handle for riderCharacter
-    int animSetD[16]; // 0x14E0  Fn_0048D990: handle for the base character
+    int riderTrickMotions[16]; // 0x1420  Load: riderCharacter->FindMotion("BarKneel", "SplitX" .. "DCanCan"); StartTrick indexes it (tier 1 strings)
+    int bikeTrickMotions[16]; // 0x1460  Load: FindMotion("bBarKneel" .. "bDCanCan") on the D3DIMSoultreeCharacter base; StartTrick
+    int riderAltTrickMotions[16]; // 0x14A0  Load: "BarKneelAlt", "HeelClickerAlt" ... (0 where a trick has no Alt clip); StartAltTrick
+    int bikeAltTrickMotions[16]; // 0x14E0  Load: "bBarKneelAlt", "bHeelClickerAlt" ... (0 where none); StartAltTrick
     float trickClipTime;                      // +0x1520  seconds into the trick clip; slot 102 adds dt up to s_kbTrickLength[trick]; summed by slot 42 (tier 3)
     float chainedTrickTime;                   // +0x1524  clip time banked by the chain start 0x0048d990; summed by slot 42 (tier 3)
     float trickHoldTime;                      // +0x1528  seconds the player holds the pose in the s_kbTrickFrame window; summed by slot 42 (tier 3)
@@ -247,14 +247,14 @@ public:
     char headTurningToRival;                  // +0x154D  set by 0x0048e280; slot 102 turns headTurnAngle towards the rival and clears it on arrival (tier 3)
     char headTurningBack;                     // +0x154E  set when the head-turn hold runs out; cleared back at 0 (tier 3)
     char pad_0x154F[0x1];
-    float rivalBearingScaled;  // +0x1550  Fn_0048E280 stores a clamped, scaled bearing to the nearest rival
-    float headTurnAngle;  // +0x1554  head angle of the turn towards the rival (slot 102); Fn_0048E280 clears it
-    float rivalBearing;  // +0x1558  Fn_0048E280: wrapped bearing to the rival relative to heading +0x50, clamped to +-2.7
+    float rivalBearingScaled;  // +0x1550  LookBackAtNearestRival stores a clamped, scaled bearing to the nearest rival
+    float headTurnAngle;  // +0x1554  head angle of the turn towards the rival (slot 102); LookBackAtNearestRival clears it
+    float rivalBearing;  // +0x1558  LookBackAtNearestRival: wrapped bearing to the rival relative to heading +0x50, clamped to +-2.7
     KrustyBike* nearestRival; // 0x155C  FindNearestRival result (closest other bike of the race; tier 3 name)
     KbBikeState netState; // 0x1560  last state sent to the peers (0x00492ad0)
     int field_0x15cc; // 0x15CC
     float shortMessageTimer;  // +0x15D0  seconds since the last short message (0x00492ad0); starts at shortNetPacketIntervalSec
-    int field_0x15d4; // 0x15D4
+    int aiTrickId; // 0x15D4  trick id PickTrick chose for the AI (BikeAI racing line 0x00414370), then passed to StartTrick
     void* field_0x15d8; // 0x15D8  loader argument 30
     float aiStuntChance;  // +0x15DC KbRace aiStuntChance1/2/3 by difficulty (2.0 outside event type 0) for an AI bike; BikeAI tricks when rand*100 <= it
     CollisionObject* probeSegment;  // +0x15E0  AI bike's vertical probe segment (0,4,0)-(0,-1,0)

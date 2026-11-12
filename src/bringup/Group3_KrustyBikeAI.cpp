@@ -11,7 +11,7 @@
 // look-ahead read through RaceStatus.cpp's g_TrackSearchAhead, the 0x00566f74 speed table
 // defined from retail .data, and bodies for the sample-local call views (BikeAIVec3Call,
 // BikeAIVec3Scale, BikeAIVegetation).  The view methods used here (KbRaceSub, KbWheel,
-// BikeQ, KrustyBike::Fn_0048D780) are in Group3_KrustyBikeAISupport.cpp; the capsule
+// BikeQ, KrustyBike::PickTrick) are in Group3_KrustyBikeAISupport.cpp; the capsule
 // test 0x00439600 is strict exact in src/krusty2/collision/CollisionObject.cpp.  The
 // per-function notes below are the sample's matching notes (scores against retail);
 // behaviour follows retail.
@@ -2179,11 +2179,11 @@ int KrustyBike::Fn_00414370(float dt)
             PredictLanding(position, velocity, &predictedLandingTime, 0, 0, (Terrain*)terrain);
             if (BikeAIRandUnit() * 100.0f <= aiStuntChance) {
                 for (divisor = 5.0f; divisor >= 1.0f; divisor -= 1.0f) {
-                    if (Fn_0048D780(&field_0x15d4, predictedLandingTime / divisor - 0.5f, 0))
+                    if (PickTrick(&aiTrickId, predictedLandingTime / divisor - 0.5f, 0))
                         break;
                 }
                 if (divisor > 0.0f) {
-                    Fn_0048D910(field_0x15d4);
+                    StartTrick(aiTrickId);
                     trickTimer = 0;
                 }
             }

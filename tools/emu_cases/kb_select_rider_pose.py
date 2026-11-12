@@ -65,8 +65,8 @@ def setup(ctx, c):
                                 (0x160, 'ClassifyInputDirection', 0, c['direction'] & 0xffffffff),
                                 (0xa4, 'EndMotion', 0, 0)]:
         ctx.pack(vt + off, 'I', ctx.stub(name, pop=pop, ret=ret))
-    ctx.stub_at(0x0048e280, 'KrustyBike::Fn_0048E280')
-    ctx.stub_at(0x0048d910, 'KrustyBike::Fn_0048D910', pop=4)
+    ctx.stub_at(0x0048e280, 'KrustyBike::LookBackAtNearestRival')
+    ctx.stub_at(0x0048d910, 'KrustyBike::StartTrick', pop=4)
     ctx.pack(bike + 0x108, 'B', c['airborne'])
     ctx.pack(bike + 0x444, 'i', c['crash'])
     ctx.pack(bike + 0x47a, 'B', c['backing'])

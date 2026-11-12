@@ -6,7 +6,7 @@ switch for every trick % 8 and input), the head turn towards the nearest rival (
 turning towards it on both sides with the re-aim near the target, holding), the finish pose,
 and the riding pose blend (crossover, lean, pose 16 back-up). Every callee is a stub that logs
 its arguments: the Character pose setters 0x004a8bf0 / 0x004a8c50 / 0x004a9050 / SetMotion
-0x004a8b40, Fn_0048D990, Get/SetMatrixIn (0x004fca80 writes a matrix, 0x004fb8c0 logs the one
+0x004a8b40, StartAltTrick, Get/SetMatrixIn (0x004fca80 writes a matrix, 0x004fb8c0 logs the one
 it is handed), and the virtual slots: this 84 (QueryControlInput), 88 (ClassifyInputDirection),
 41 (EndMotion), and slot 7 on the rider and on the character subobject at +0x21c.
 
@@ -103,7 +103,7 @@ def setup(ctx, c):
     def get_matrix(cx, ecx, a):
         cx.pack(a[1], '16f', *[float(k) + 0.25 for k in range(16)])
 
-    ctx.stub_at(0x0048d990, 'Fn_0048D990', pop=4)
+    ctx.stub_at(0x0048d990, 'StartAltTrick', pop=4)
     ctx.stub_at(0x004a8b40, 'Character::SetMotion', pop=4)
     ctx.stub_at(0x004a8bf0, 'Character::ApplyMotionAtPhase', pop=8)
     ctx.stub_at(0x004a8c50, 'Character::ApplyMotionBlendAtPhase', pop=16)

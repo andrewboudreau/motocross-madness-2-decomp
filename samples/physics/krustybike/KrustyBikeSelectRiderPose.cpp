@@ -95,7 +95,7 @@ void KrustyBike::SelectRiderPose(float t)
     if (!aiKind && !isRemote && !isGhost && airborne && !crashState
         && frontWheel->penetration < -2.5f && rearWheel->penetration < -2.5f) {
         if (QueryControlInput(9, 0x3f) && crossoverPose) {
-            Fn_0048E280();
+            LookBackAtNearestRival();
             return;
         }
         int first = QueryControlInput(6, 0x3f);
@@ -103,7 +103,7 @@ void KrustyBike::SelectRiderPose(float t)
         if (first || second) {
             int direction = ClassifyInputDirection();
             if (direction != -1) {
-                Fn_0048D910(direction + (first ? 0 : 8));
+                StartTrick(direction + (first ? 0 : 8));
                 return;
             }
         }

@@ -1963,11 +1963,11 @@ int KrustyBike::Fn_00414370(float dt)
             PredictLanding(position, velocity, &predictedLandingTime, 0, 0, (Terrain*)terrain);
             if (BikeAIRandUnit() * 100.0f <= aiStuntChance) {
                 for (divisor = 5.0f; divisor >= 1.0f; divisor -= 1.0f) {
-                    if (Fn_0048D780(&field_0x15d4, predictedLandingTime / divisor - 0.5f, 0))
+                    if (PickTrick(&aiTrickId, predictedLandingTime / divisor - 0.5f, 0))
                         break;
                 }
                 if (divisor > 0.0f) {
-                    Fn_0048D910(field_0x15d4);
+                    StartTrick(aiTrickId);
                     trickTimer = 0;
                 }
             }

@@ -16,7 +16,7 @@ does not establish a working game or visible race notices.
 
 These complete provider bodies match strictly, with relocations resolved.
 The complete production callers are KrustyBike slot 49 at `0x00496790`
-(1,400 bytes, 12 sites) and `Fn_00495FF0` (895 bytes, six sites). The included
+(1,400 bytes, 12 sites) and `AwardTrickScore` (895 bytes, six sites). The included
 near-miss aggregate uses the same connections; its existing partial status
 and full fingerprints are retained. No method implementation, thunk, wrapper
 or alternate storage was added.

@@ -1,6 +1,6 @@
 // Group 3 bring-up: providers that BikeAI.cpp's KrustyBike steps (0x00413200, 0x00414370 in
 // Group3_KrustyBikeAI.cpp) and the look-ahead simulation 0x0040eca0 call through tier-3
-// views (KbRaceSub, KbWheel, BikeQ) that no src/ file defines.  KrustyBike::Fn_0048D780 is
+// views (KbRaceSub, KbWheel, BikeQ) that no src/ file defines.  KrustyBike::PickTrick is
 // linked from samples/physics/bikeai/KrustyBikeTrickPick.cpp.
 //
 // Status: best-guess-unreviewed.  Each body was read from the retail disassembly at the

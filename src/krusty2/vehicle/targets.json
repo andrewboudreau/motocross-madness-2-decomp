@@ -2002,7 +2002,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_0048D8B0@KrustyBike",
+    "candidate_symbol_contains": "ResetTrickState@KrustyBike",
     "target_va": "0x0048d8b0",
     "target_size": 85,
     "expect": "exact",
@@ -2062,7 +2062,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_00495FF0@KrustyBike",
+    "candidate_symbol_contains": "AwardTrickScore@KrustyBike",
     "target_va": "0x00495ff0",
     "target_size": 895,
     "expect": "exact",
@@ -2222,21 +2222,21 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_0048D910",
+    "candidate_symbol_contains": "StartTrick",
     "target_va": "0x0048d910",
     "target_size": 123,
     "expect": "exact",
-    "notes": "Rider knock-off animation start (animSetA/B).",
+    "notes": "Trick motion start (riderTrickMotions/bikeTrickMotions).",
     "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_0048D990",
+    "candidate_symbol_contains": "StartAltTrick",
     "target_va": "0x0048d990",
     "target_size": 98,
     "expect": "exact",
-    "notes": "Rider animation start variant (animSetC/D).",
+    "notes": "Alternate trick motion start (riderAltTrickMotions/bikeAltTrickMotions).",
     "bindings": "KrustyBike.bindings.json"
   },
   {
@@ -2422,7 +2422,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_0048E280",
+    "candidate_symbol_contains": "LookBackAtNearestRival",
     "target_va": "0x0048e280",
     "target_size": 339,
     "expect": "exact",

@@ -20,8 +20,8 @@ one ApplyRestPose call. Their complete callers also match strictly:
 | Slot 97 | `0x004912d0` / 624 | 15 |
 | Load | `0x0048fc80` / 5,384 | 23 |
 | Slot 49 | `0x00496790` / 1,400 | 1 |
-| Fn_0048D910 | `0x0048d910` / 123 | 1 |
-| Fn_0048D990 | `0x0048d990` / 98 | 1 |
+| StartTrick | `0x0048d910` / 123 | 1 |
+| StartAltTrick | `0x0048d990` / 98 | 1 |
 
 There were already 24 calls to these canonical methods in the same object;
 the current total is 65. The included sample aggregate has one additional

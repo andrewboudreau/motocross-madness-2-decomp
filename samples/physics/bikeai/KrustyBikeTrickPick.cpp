@@ -1,4 +1,4 @@
-// KrustyBikeTrickPick.cpp -- KrustyBike::Fn_0048D780 (0x0048d780, 291 B, ret 0xc), the AI
+// KrustyBikeTrickPick.cpp -- KrustyBike::PickTrick (0x0048d780, 291 B, ret 0xc), the AI
 // trick pick that BikeAI's racing line 0x00414370 calls.  Status: best-guess-unreviewed.  The
 // game build links it with /QIfist (config/game_build.json candidate_sources) in place of the
 // src/bringup/Group3_KrustyBikeAISupport.cpp copy; the owning translation unit is not known
@@ -64,7 +64,7 @@ static const float s_kbAiTrickLength[16] = {      // 0x0056cc60 clip lengths (s)
 // Retail's inline-asm fistp helper gives this function an EBP frame; the
 // pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
 #pragma optimize("y", off)
-int KrustyBike::Fn_0048D780(int* out, float t, int group)
+int KrustyBike::PickTrick(int* out, float t, int group)
 {
     int row = -1;
     int i;

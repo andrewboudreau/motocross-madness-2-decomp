@@ -609,7 +609,7 @@
       "extra_flags": [
         "/QIfist"
       ],
-      "reason": "KrustyBike::Fn_0048D780 0x0048d780 (the AI trick pick) replaces the Group3_KrustyBikeAISupport bring-up copy. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x0048d834; the index stays in [-0.5, 15.5). Checked against the retail disassembly and differentially (tools/emu_cases/krusty_trick_pick.py: 0 of 6000 runs differ at 53- and 24-bit precision).",
+      "reason": "KrustyBike::PickTrick 0x0048d780 (the AI trick pick) replaces the Group3_KrustyBikeAISupport bring-up copy. /QIfist turns FistpFloatToInt's cast into a FISTP under the current rounding mode, as retail's inline fistp helper at 0x0048d834; the index stays in [-0.5, 15.5). Checked against the retail disassembly and differentially (tools/emu_cases/krusty_trick_pick.py: 0 of 6000 runs differ at 53- and 24-bit precision).",
       "evidence": "docs/GAME_BUILD.md#inline-fistp-rounding-samples"
     },
     {

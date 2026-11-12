@@ -84,7 +84,7 @@ void KrustyBike::UnknownVirtualSlot27()
 void KrustyBike::ResetDynamicState(float extraWeight)
 {
     Bike::ResetDynamicState(extraWeight);
-    Fn_0048D8B0();
+    ResetTrickState();
     aiTrickHoldLeft = 0;
     headTurningToRival = 0;
     headTurningBack = 0;
@@ -389,7 +389,7 @@ void KrustyBike::Fn_00496E20(KbRecorder* recorder)
 }
 
 // ---- non-virtual state reset (0x0048D8B0) ----
-void KrustyBike::Fn_0048D8B0()
+void KrustyBike::ResetTrickState()
 {
     trickMultiplier = 1.0f;
     trickPoints = 0;
@@ -632,7 +632,7 @@ int KrustyBike::EvaluateCrash(float dt, float noseOverLimit, int impact, float i
             else crashDirection = 5;
         } else crashDirection = 3;
         crashReason = 9;
-        Fn_0048D8B0();
+        ResetTrickState();
         return 1;
     }
     if (IsSpawnProtected()) return 0;
@@ -714,7 +714,7 @@ void KrustyBike::SaveBodyOrientation(int lastStep)
     }
     if (motionCompleted && !hasFinished && landingLatched) {
         if (trickLandTimer < 0.0f) {
-            score += Fn_00495FF0();
+            score += AwardTrickScore();
             return;
         }
         trickLandTimer -= stepTime;
@@ -980,7 +980,7 @@ void KrustyBike::SimulateFrame(float dt)
 // The redundant parentheses around the (float) fmod term are significant: VC6 keeps them
 // as an IL node, which schedules retail's `mov al, [+0x153f]` before the fsubr
 // (docs/VC6_OPERAND_ORDER.md section 3); without them the load follows it.
-float KrustyBike::Fn_00495FF0()
+float KrustyBike::AwardTrickScore()
 {
     trickPoints -= ((float)fmod(trickPoints, 100.0));
     if (trickChained)
@@ -998,7 +998,7 @@ float KrustyBike::Fn_00495FF0()
                 points = largestStuntPoints;
             largestStuntPoints = points;
         }
-        Fn_0048D8B0();
+        ResetTrickState();
         return score;
     }
     KbBonusTable* rules = reinterpret_cast<KbGame*>(g_TrackGame)->proCircuit;
@@ -1042,7 +1042,7 @@ float KrustyBike::Fn_00495FF0()
             }
         }
     }
-    Fn_0048D8B0();
+    ResetTrickState();
     return 0.0f;
 }
 
@@ -1255,9 +1255,9 @@ void KrustyBike::Fn_00496E30(int protect)
 // ==== wave 6 ====
 
 // owner: bracket only (0x48d910; callers 0x48e584, 0x495276, 0x4955f8 are KrustyBike methods)
-// Start the "knocked off" rider animation number idx: resets the stunt latches and switches both
-// characters (rider and bike body) to the idx-th handle of the animSetA/animSetB tables.
-void KrustyBike::Fn_0048D910(int idx)
+// Start trick clip idx: resets the stunt latches and switches both characters (rider and bike
+// body) to the idx-th handle of the riderTrickMotions/bikeTrickMotions tables ("BarKneel" ...).
+void KrustyBike::StartTrick(int idx)
 {
     EndMotion();
     motionActive = 1;
@@ -1267,22 +1267,22 @@ void KrustyBike::Fn_0048D910(int idx)
     chainedTrickTime = 0;
     trickHoldTime = 0;
     motionIndex = (char)idx;
-    reinterpret_cast<Character*>(riderCharacter)->SetMotion(reinterpret_cast<Motion*>(animSetA[idx]));
+    reinterpret_cast<Character*>(riderCharacter)->SetMotion(reinterpret_cast<Motion*>(riderTrickMotions[idx]));
     ((KbA5C4*)riderCharacter)->field_0x10 = 0;
-    D3DIMSoultreeCharacter::SetMotion((Motion*)animSetB[idx]);
+    D3DIMSoultreeCharacter::SetMotion((Motion*)bikeTrickMotions[idx]);
     chr_field_0x10 = 0;
 }
 
 // owner: bracket only (0x48d990; callers 0x48eff2, 0x48f115, 0x49562c are KrustyBike methods)
-// Variant of Fn_0048D910 that banks trickClipTime in chainedTrickTime and uses animSetC/animSetD.
-void KrustyBike::Fn_0048D990(int idx)
+// Variant of StartTrick that banks trickClipTime in chainedTrickTime and uses riderAltTrickMotions/bikeAltTrickMotions.
+void KrustyBike::StartAltTrick(int idx)
 {
     motionActive = 1;
     chainedTrickTime = trickClipTime;
     trickClipTime = 0;
     motionIndex = (char)(idx + 0x10);
-    reinterpret_cast<Character*>(riderCharacter)->SetMotion(reinterpret_cast<Motion*>(animSetC[idx]));
-    D3DIMSoultreeCharacter::SetMotion((Motion*)animSetD[idx]);
+    reinterpret_cast<Character*>(riderCharacter)->SetMotion(reinterpret_cast<Motion*>(riderAltTrickMotions[idx]));
+    D3DIMSoultreeCharacter::SetMotion((Motion*)bikeAltTrickMotions[idx]);
     trickChained = 1;
 }
 
@@ -1381,7 +1381,7 @@ KrustyBike* KrustyBike::FindNearestRival(float* outDistance)
 // The bearing is `(float)(atan2(...))` minus the yaw: the parenthesised operand of the cast
 // keeps the dead duplicate of the x argument around fpatan and pops it before the yaw fsub,
 // as retail does (see docs/VC6_OPERAND_ORDER.md).
-void KrustyBike::Fn_0048E280()
+void KrustyBike::LookBackAtNearestRival()
 {
     nearestRival = FindNearestRival(0);
     if (!nearestRival)
@@ -1695,7 +1695,7 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     deltaBaseYaw = 0;
     deltaBaseTime = 0;
     rivalBearing = 0;
-    field_0x15d4 = 0;
+    aiTrickId = 0;
     lastCollisionType = 0;
     bikeCollision = 0;
     bikeAndRiderCollision = 0;
@@ -1857,70 +1857,70 @@ GameObject* KrustyBike::Load(int context, int a2, const char* modelPath, const S
     savedSinPitch = bodySinPitch;
     crashHeading = Vec3(bodyForward.x, 0.0f, bodyForward.z);
 
-    animSetB[0] = (int)FindMotion("bBarKneel", 1);
-    animSetB[1] = (int)FindMotion("bSplitX", 1);
-    animSetB[2] = (int)FindMotion("bBKahuna", 1);
-    animSetB[3] = (int)FindMotion("bCordova", 1);
-    animSetB[4] = (int)FindMotion("bHeelClicker", 1);
-    animSetB[5] = (int)FindMotion("bNacNac", 1);
-    animSetB[6] = (int)FindMotion("bSuperMan", 1);
-    animSetB[7] = (int)FindMotion("bAirWalk", 1);
-    animSetB[8] = (int)FindMotion("bBarHop", 1);
-    animSetB[9] = (int)FindMotion("bSeatGrab", 1);
-    animSetB[10] = (int)FindMotion("bSaranWrap", 1);
-    animSetB[11] = (int)FindMotion("bCliffHanger", 1);
-    animSetB[12] = (int)FindMotion("bHeartAttack", 1);
-    animSetB[13] = (int)FindMotion("bTailGrab", 1);
-    animSetB[14] = (int)FindMotion("bLazyBoy", 1);
-    animSetB[15] = (int)FindMotion("bDCanCan", 1);
-    animSetD[0] = (int)FindMotion("bBarKneelAlt", 1);
-    animSetD[1] = 0;
-    animSetD[2] = 0;
-    animSetD[3] = 0;
-    animSetD[4] = (int)FindMotion("bHeelClickerAlt", 1);
-    animSetD[5] = (int)FindMotion("bNacNacAlt", 1);
-    animSetD[6] = (int)FindMotion("bSuperManAlt", 1);
-    animSetD[7] = 0;
-    animSetD[8] = 0;
-    animSetD[9] = 0;
-    animSetD[10] = (int)FindMotion("bSaranWrapAlt", 1);
-    animSetD[11] = 0;
-    animSetD[12] = 0;
-    animSetD[13] = 0;
-    animSetD[14] = 0;
-    animSetD[15] = (int)FindMotion("bDCanCanAlt", 1);
-    animSetA[0] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BarKneel", 1);
-    animSetA[1] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SplitX", 1);
-    animSetA[2] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BKahuna", 1);
-    animSetA[3] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Cordova", 1);
-    animSetA[4] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("HeelClicker", 1);
-    animSetA[5] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("NacNac", 1);
-    animSetA[6] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SuperMan", 1);
-    animSetA[7] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("AirWalk", 1);
-    animSetA[8] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BarHop", 1);
-    animSetA[9] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SeatGrab", 1);
-    animSetA[10] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SaranWrap", 1);
-    animSetA[11] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("CliffHanger", 1);
-    animSetA[12] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("HeartAttack", 1);
-    animSetA[13] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("TailGrab", 1);
-    animSetA[14] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LazyBoy", 1);
-    animSetA[15] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("DCanCan", 1);
-    animSetC[0] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BarKneelAlt", 1);
-    animSetC[1] = 0;
-    animSetC[2] = 0;
-    animSetC[3] = 0;
-    animSetC[4] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("HeelClickerAlt", 1);
-    animSetC[5] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("NacNacAlt", 1);
-    animSetC[6] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SuperManAlt", 1);
-    animSetC[7] = 0;
-    animSetC[8] = 0;
-    animSetC[9] = 0;
-    animSetC[10] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SaranWrapAlt", 1);
-    animSetC[11] = 0;
-    animSetC[12] = 0;
-    animSetC[13] = 0;
-    animSetC[14] = 0;
-    animSetC[15] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("DCanCanAlt", 1);
+    bikeTrickMotions[0] = (int)FindMotion("bBarKneel", 1);
+    bikeTrickMotions[1] = (int)FindMotion("bSplitX", 1);
+    bikeTrickMotions[2] = (int)FindMotion("bBKahuna", 1);
+    bikeTrickMotions[3] = (int)FindMotion("bCordova", 1);
+    bikeTrickMotions[4] = (int)FindMotion("bHeelClicker", 1);
+    bikeTrickMotions[5] = (int)FindMotion("bNacNac", 1);
+    bikeTrickMotions[6] = (int)FindMotion("bSuperMan", 1);
+    bikeTrickMotions[7] = (int)FindMotion("bAirWalk", 1);
+    bikeTrickMotions[8] = (int)FindMotion("bBarHop", 1);
+    bikeTrickMotions[9] = (int)FindMotion("bSeatGrab", 1);
+    bikeTrickMotions[10] = (int)FindMotion("bSaranWrap", 1);
+    bikeTrickMotions[11] = (int)FindMotion("bCliffHanger", 1);
+    bikeTrickMotions[12] = (int)FindMotion("bHeartAttack", 1);
+    bikeTrickMotions[13] = (int)FindMotion("bTailGrab", 1);
+    bikeTrickMotions[14] = (int)FindMotion("bLazyBoy", 1);
+    bikeTrickMotions[15] = (int)FindMotion("bDCanCan", 1);
+    bikeAltTrickMotions[0] = (int)FindMotion("bBarKneelAlt", 1);
+    bikeAltTrickMotions[1] = 0;
+    bikeAltTrickMotions[2] = 0;
+    bikeAltTrickMotions[3] = 0;
+    bikeAltTrickMotions[4] = (int)FindMotion("bHeelClickerAlt", 1);
+    bikeAltTrickMotions[5] = (int)FindMotion("bNacNacAlt", 1);
+    bikeAltTrickMotions[6] = (int)FindMotion("bSuperManAlt", 1);
+    bikeAltTrickMotions[7] = 0;
+    bikeAltTrickMotions[8] = 0;
+    bikeAltTrickMotions[9] = 0;
+    bikeAltTrickMotions[10] = (int)FindMotion("bSaranWrapAlt", 1);
+    bikeAltTrickMotions[11] = 0;
+    bikeAltTrickMotions[12] = 0;
+    bikeAltTrickMotions[13] = 0;
+    bikeAltTrickMotions[14] = 0;
+    bikeAltTrickMotions[15] = (int)FindMotion("bDCanCanAlt", 1);
+    riderTrickMotions[0] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BarKneel", 1);
+    riderTrickMotions[1] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SplitX", 1);
+    riderTrickMotions[2] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BKahuna", 1);
+    riderTrickMotions[3] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Cordova", 1);
+    riderTrickMotions[4] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("HeelClicker", 1);
+    riderTrickMotions[5] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("NacNac", 1);
+    riderTrickMotions[6] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SuperMan", 1);
+    riderTrickMotions[7] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("AirWalk", 1);
+    riderTrickMotions[8] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BarHop", 1);
+    riderTrickMotions[9] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SeatGrab", 1);
+    riderTrickMotions[10] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SaranWrap", 1);
+    riderTrickMotions[11] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("CliffHanger", 1);
+    riderTrickMotions[12] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("HeartAttack", 1);
+    riderTrickMotions[13] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("TailGrab", 1);
+    riderTrickMotions[14] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LazyBoy", 1);
+    riderTrickMotions[15] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("DCanCan", 1);
+    riderAltTrickMotions[0] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BarKneelAlt", 1);
+    riderAltTrickMotions[1] = 0;
+    riderAltTrickMotions[2] = 0;
+    riderAltTrickMotions[3] = 0;
+    riderAltTrickMotions[4] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("HeelClickerAlt", 1);
+    riderAltTrickMotions[5] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("NacNacAlt", 1);
+    riderAltTrickMotions[6] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SuperManAlt", 1);
+    riderAltTrickMotions[7] = 0;
+    riderAltTrickMotions[8] = 0;
+    riderAltTrickMotions[9] = 0;
+    riderAltTrickMotions[10] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("SaranWrapAlt", 1);
+    riderAltTrickMotions[11] = 0;
+    riderAltTrickMotions[12] = 0;
+    riderAltTrickMotions[13] = 0;
+    riderAltTrickMotions[14] = 0;
+    riderAltTrickMotions[15] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("DCanCanAlt", 1);
 
     bikeAndRiderCollision = new(__FILE__, 0x77e) CollisionObject(1);
     bikeAndRiderCollision->Configure((void*)context, 1, 1, 1);

@@ -1,4 +1,4 @@
-"""KrustyBike::Fn_0048D780 0x0048d780, the AI trick pick (tools/emu_diff.py case).
+"""KrustyBike::PickTrick 0x0048d780, the AI trick pick (tools/emu_diff.py case).
 
 rand (0x00534c1b) is stubbed to return the case's draws, so both bodies see the same values.
 Draws include products that land exactly on .5 after the `- 0.5` (ties to even) and values
@@ -7,7 +7,7 @@ next to them. The function writes *out and, for an AI bike (byte +0x734), the ho
 """
 
 RETAIL_VA = 0x0048d780
-SYMBOL = '?Fn_0048D780@KrustyBike@@QAEHPAHMH@Z'
+SYMBOL = '?PickTrick@KrustyBike@@QAEHPAHMH@Z'
 SOURCE = 'samples/physics/bikeai/KrustyBikeTrickPick.cpp'
 PROBES = {0x0048d834: 'index fistp helper'}
 

@@ -13,7 +13,7 @@ ClosestPointOnNode 0x00516ca0, DistanceAlong 0x00517da0 (ST0), ShortestPath 0x00
 heap work-list items), MoveAlongPath 0x00517ea0, PointAt 0x00518080, PlaceNear 0x00517340,
 SegmentDirection 0x00518130, DistanceToStripEdge 0x00518230 and FreeWorkList 0x00517930.
 Also stubbed: DebugCalloc (cdecl, noted without __FILE__), PredictLanding 0x0040e370 (cdecl,
-writes the landing time), Fn_0048D780 / Fn_0048D910 (the trick pick and start) and the virtual
+writes the landing time), PickTrick / StartTrick (the trick pick and start) and the virtual
 slots 11 (FindPlacement, writes its outputs), 32 (EffectiveLoadWeight, ST0) and 33
 (ResetToPlacement, notes the vectors). rand 0x00534c1b is a stub too (the MT CRT's per-thread
 seed needs TLS); FastSqrt, FastInvSqrt and SafeNormalize run as retail code.
@@ -151,8 +151,8 @@ def setup(ctx, c):
     ctx.stub_at(0x004a2fc0, 'DebugCalloc', nargs=4, ret=calloc, log=False)
     ctx.stub_at(0x0040e370, 'PredictLanding', nargs=10, ret=landing, log=False)
     ctx.stub_at(0x00534c1b, 'rand', ret=lambda cx, e, a: cx.rng.randrange(0x8000), log=False)
-    ctx.stub_at(0x0048d780, 'Fn_0048D780', pop=12, ret=pick)
-    ctx.stub_at(0x0048d910, 'Fn_0048D910', pop=4)
+    ctx.stub_at(0x0048d780, 'PickTrick', pop=12, ret=pick)
+    ctx.stub_at(0x0048d910, 'StartTrick', pop=4)
     slots = [ctx.stub('KrustyBike slot %d' % k) for k in range(64)]
     slots[11] = ctx.stub('KrustyBike::FindPlacement', pop=20, ret=find_placement)
     slots[32] = ctx.stub('KrustyBike::EffectiveLoadWeight', ret=(0, 1.75), ret_float='f')

@@ -128,7 +128,7 @@ class RiderMotionStartConnectionsTests(unittest.TestCase):
                        and obj.symbol_by_index[r.symbol_index].name==START]
                 self.assertEqual(len(calls),expected[2]);self.assertTrue(all(r.type==20 for r in calls))
                 if source!='src/krusty2/vehicle/Bike.cpp':
-                    self.assertTrue(compare(retail,obj,'Fn_0048E280',0x48e280,339,
+                    self.assertTrue(compare(retail,obj,'LookBackAtNearestRival',0x48e280,339,
                         ROOT/Path(source).with_suffix('.bindings.json'))['strict_exact'])
             print('Two strict339-byte callers; three complete objects,756 sections3586 relocations; primary rider imports preserved')
 

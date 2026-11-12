@@ -1057,7 +1057,7 @@ Two more bring-up bodies that rounded with `X87FloatToInt` moved into
 
 | VA | Function | Sample | Before | Now linked |
 |---|---|---|---|---|
-| 0x0048d780 | `KrustyBike::Fn_0048D780` (AI trick pick) | `samples/physics/bikeai/KrustyBikeTrickPick.cpp` | 0.474 | 0.773 |
+| 0x0048d780 | `KrustyBike::PickTrick` (AI trick pick) | `samples/physics/bikeai/KrustyBikeTrickPick.cpp` | 0.474 | 0.773 |
 | 0x0051af00 | `DropTextOverlay::Setup` | `samples/track/DropTextOverlaySetup.cpp` | 0.501 | 0.632 |
 
 The bodies were removed from `src/bringup/Group3_KrustyBikeAISupport.cpp`
@@ -1431,9 +1431,9 @@ The candidate-sample twins follow the linked fixes where the score allows:
 `mov ecx, [ecx*4 + 0x0056d060]` from the sign-extended `+0x433` byte, in the
 hold-window arm, which only checks `motionIndex >= 0` (the clip-length clamp
 above it checks `< 16`). Writers of `+0x433` (confirmed by decoding): 0 and -1
-(head turn), `Fn_0048D910(idx)` with idx 0..15 (0 or 8 plus
+(head turn), `StartTrick(idx)` with idx 0..15 (0 or 8 plus
 `ClassifyInputDirection()`, 0..7, at 0x0048e584, message code - 1 for codes 1..16 at
-0x00495276/0x004955f8), and `Fn_0048D990(idx)`, which stores `idx + 16`. Its
+0x00495276/0x004955f8), and `StartAltTrick(idx)`, which stores `idx + 16`. Its
 callers pass `motionIndex` when it is below 16, `motionIndex - 16` when it is
 above 15, or (0x0049562c) `motionIndex` when it equals message code - 17;
 senders encode `motionIndex + 1`, and the head turn as 17 (0x004927b9,
@@ -1467,9 +1467,10 @@ differ at both control words; the 16-entry object differs in 28 of 1500.
 
 No other KrustyBike table is indexed this way: the clip-length clamp is
 bounded, the trick pick's row and trick indices stay inside its rows by
-construction, and the member handle tables `animSetA..D` (+0x1420..+0x1520,
+construction, and the member handle tables `riderTrickMotions`, `bikeTrickMotions`, `riderAltTrickMotions` and
+`bikeAltTrickMotions` (+0x1420..+0x1520,
 16 each) see only 0..15 under the invariants above. A peer that sent a code
-above 32 could push `motionIndex` past 31 and `animSetC`/`animSetD` out of
+above 32 could push `motionIndex` past 31 and `riderAltTrickMotions`/`bikeAltTrickMotions` out of
 bounds; retail peers do not. Chained trick 0 is sent as code 17, the head-turn
 code, so receivers never chain it (their chain test needs a code above 17), a
 retail protocol quirk.
@@ -1954,7 +1955,7 @@ configured flags.
 | `DropTextOverlaySetup.cpp` (sample) | Setup 0x0051af00 | pragma (was `/Oy-`) | 0.632 -> 0.853 | 0.272 -> 0.701 | 0 / 2000 |
 | `CharacterMotionFourPose.cpp` (sample) | ApplyFourMotionBlendAtPhase | pragma (was `/Oy-`) | 0.727 -> 0.758 | 0.168 -> 0.414 | 0 / 3000 |
 | `Group4_SceneTick.cpp` | Scene::Tick 0x004eab00 | pragma; then per-use entry reads and the advance written out | 0.686 -> 0.701 -> 0.941 | 0.334 -> 0.363 -> 0.725 | 0 / 2000 |
-| `KrustyBikeTrickPick.cpp` (sample) | Fn_0048D780 0x0048d780 | pragma | 0.773 -> 0.804 | 0.599 -> 0.776 | 0 / 2000 |
+| `KrustyBikeTrickPick.cpp` (sample) | PickTrick 0x0048d780 | pragma | 0.773 -> 0.804 | 0.599 -> 0.776 | 0 / 2000 |
 | `KrustyBikeSelectRiderPose.cpp` (sample) | SelectRiderPose 0x0048e3e0 | pragma; then clamp polarity, folded product, per-arm stores | 0.682 -> 0.729 -> 0.789 | 0.652 -> 0.686 -> 0.744 | 0 / 600 (third sweep) |
 | `CharacterMotionStart.cpp` (sample) | ApplyMotionAtPhase | pragma | 0.633 -> 0.667 | 0.200 -> 0.381 | 0 / 2000 |
 | `CharacterMotionBlend.cpp` (sample) | ApplyMotionBlendAtPhase | pragma | 0.793 -> 0.879 | 0.348 -> 0.618 | 0 / 2000 |
