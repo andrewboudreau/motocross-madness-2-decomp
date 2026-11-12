@@ -210,6 +210,22 @@ CLEAN_CASES = {
     'eco_render3d': 30,
     'soultree_prepare_geometry': 20,
     'soultree_draw_current_lod': 80,
+    # Coverage sweep: linked bodies that differed from retail with no case or native test.
+    'projected_shadow_present': 100,
+    'd3dim_shadow_slot29': 100,
+    'terrain_shadow_slot27': 100,
+    'grid_select_texture': 100,
+    'podium_create_scene': 60,
+    'quarry_load_event_objects': 60,
+    'mp_add_chat_line': 100,
+    'mp_send_start_message': 100,
+    'chat_overlay_collect_racers': 100,
+    'texture_stream_check_header': 100,
+    'texture_stream_write': 100,
+    'texture_stream_write_header': 100,
+    'find_data_file': 100,
+    'motion_load_vue': 100,
+    'audio_loader_thread': 100,
 }
 
 # Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).
@@ -323,6 +339,13 @@ PRE_FIX_SHAPES = [
      [('float dz = target.z - position.z;\n', 'float dy = target.y - position.y;\n'
        '                        float dz = target.z - position.z;\n'),
       ('hit = position + (target - position) * t;', 'hit = position + Vector3(dx * t, dy * t, dz * t);')], 30),
+    # The shadow's matrix product (slot 29) summed _22 and _23 flat; retail groups them
+    # (0x00446d43..0x00446d8f). 24-bit only.
+    ('d3dim_shadow_slot29',
+     [('out->_22 = ((a._24 * b._42 + a._23 * b._32) + a._22 * b._22) + a._21 * b._12;',
+       'out->_22 = a._21 * b._12 + a._22 * b._22 + a._23 * b._32 + a._24 * b._42;'),
+      ('out->_23 = ((a._22 * b._23 + a._21 * b._13) + a._24 * b._43) + a._23 * b._33;',
+       'out->_23 = a._21 * b._13 + a._22 * b._23 + a._23 * b._33 + a._24 * b._43;')], 30),
 ]
 
 

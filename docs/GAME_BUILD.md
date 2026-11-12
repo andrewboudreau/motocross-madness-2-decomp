@@ -1276,8 +1276,9 @@ steer (50 of 200) all differ; so do a `ModelVsModel` reciprocal for its divide
 (13 of 600), `>=` and dropped-clear variants of the quadtree and visibility
 traversal, and `extentX` in TerrainShadow slot 28 (8 of 200).
 
-`ProjectedShadow::Present` (Direct3D calls) and
-`MorphBastardModifier::ControllerAngles` (orchestration) are not emulated.
+`ProjectedShadow::Present` is now emulated with its Direct3D calls as stubs
+(`projected_shadow_present`, see the coverage sweep below).
+`MorphBastardModifier::ControllerAngles` has its own case (`morph_controller_angles`).
 
 #### Call-record/replay cases
 
@@ -1682,6 +1683,69 @@ differences only:
 - The three bike-rider dialog `Tick` bodies.
 - `PCVideoCard::CreateModeSurfaces`, which keeps retail's signed vidmem comparison.
 - `CopyMipLevels`, which re-tests the loop result where retail jumps straight on.
+
+#### Coverage sweep
+
+This sweep covered linked bodies below 1.000 that had no case and no native retail test. The
+table shows the run counts from the sweep, at both control words (0x027f and 0x007f).
+`CLEAN_CASES` keeps each case at 60 or 100 runs.
+
+| VA | Function | Case | Mode | Runs | Differed |
+|---|---|---|---|---|---|
+| 0x004dbd30 | `ProjectedShadow::Present` | `projected_shadow_present` | integer | 300 | 0 |
+| 0x00446c30 | `D3DIMSoultreeShadow` slot 29 | `d3dim_shadow_slot29` | replay | 200 | 83 -> 0 (24-bit) |
+| 0x00508bc0 | `TerrainShadow` slot 27 | `terrain_shadow_slot27` | replay | 200 | 0 |
+| 0x0047caa0 | `SelectTexture` | `grid_select_texture` | replay | 300 | 0 |
+| 0x0045d480 | `CreatePodiumScene` | `podium_create_scene` | replay | 150 | 0 |
+| 0x004de590 | `BaseQuarryEvent::LoadEventObjects` | `quarry_load_event_objects` | replay | 300 | 0 |
+| 0x004f3720 | `MultiPlayerDlg::AddChatLine` | `mp_add_chat_line` | replay | 200 | 0 |
+| 0x004f2340 | `MultiPlayerDlg::SendStartMessage` | `mp_send_start_message` | integer | 300 | 0 |
+| 0x0051d730 | `ChatOverlay::CollectRacers` | `chat_overlay_collect_racers` | replay | 200 | 0 |
+| 0x00460db0 | `UnknownTextureStream::CheckHeader` | `texture_stream_check_header` | integer | 300 | 0 |
+| 0x004618e0 | `UnknownTextureStream::Write` | `texture_stream_write` | integer | 300 | 0 |
+| 0x00461b90 | `UnknownTextureStream::WriteHeader` | `texture_stream_write_header` | integer | 200 | 0 |
+| 0x005238f0 | `TrackGameMode::FindDataFile` | `find_data_file` | integer | 300 | 0 |
+| 0x004a5e40 | `MotionManager::LoadVue` | `motion_load_vue` | integer | 200 | 0 |
+| 0x004bdc00 | audio loader thread | `audio_loader_thread` | integer | 200 | 0 |
+
+These cases replace the earlier disassembly-only reviews of `LoadEventObjects`, `SendStartMessage`,
+the audio loader thread, `LoadVue`, `CheckHeader` and TerrainShadow slot 27. Unbound in-unit
+wrappers would run the candidate's own copy, so the quarry case binds
+`UnknownQuarryVisibility::Setup` (0x0052d460) and `FogOn::Create` (0x00486a10) to retail.
+
+Each control below is a one-line change to the source. Each changed result differs from retail:
+- `LoadEventObjects` without `!shadowLight &&`: 2 of 120.
+- `AddChatLine` with `rows` for `(short)rows`: 46.
+- `SendStartMessage` reading `results[i+1]`: 58.
+- `CollectRacers` with `.left` for `.right`: 80.
+- `CheckHeader` without the `fileEncoded` restore: 66.
+- `WriteHeader` without its `strcat`: 84.
+- `FindDataFile` without `skip &&`: 22.
+- `LoadVue` with position y and z swapped: 64.
+- The loader thread with `isStopped` inverted: 102 of 200.
+- The loader thread with the buffer unlock moved after `if (loaded)`: 120.
+- The loader thread stopping on any non-zero wait result: 88.
+
+One bug was fixed. `D3DIMShadowMatrixProduct`, used by slot 29, summed `_22` and `_23` of the
+shadow matrix left to right. Retail (0x00446d43..0x00446d8f) groups them as
+`((a._24*b._42 + a._23*b._32) + a._22*b._22) + a._21*b._12` and
+`((a._22*b._23 + a._21*b._13) + a._24*b._43) + a._23*b._33`. At 24-bit precision, the game's D3D
+setting, the projected shadow matrix differed by an ulp in those elements in 83 of 200 runs.
+The body rose from 0.945 to 0.958 masked. `PRE_FIX_SHAPES` keeps the flat shape at 30 runs, where
+it differs in 10.
+
+Reviewed by disassembly only:
+- `HiResMeter::SetRenderContext` 0x00488440. Retail reads the CPU's RDTSC around a one-second
+  QPC busy wait, where the linked body uses `ReadProfilingCounter`. That is a documented
+  substitution and Unicorn's RDTSC is host time, so a case could only compare the substitution.
+  The rest agrees with retail:
+  - the base `SetRenderContext` is called first;
+  - it returns 0 when `QueryPerformanceFrequency` fails;
+  - the 64-bit accumulated-ticks loop compares signed and is skipped for a frequency <= 0;
+  - `1000 / delta` is stored at +0x30;
+  - it returns `this`.
+- `GetDXVersion` 0x00448560 was skipped: `test_device_setup_behavior.py` already runs it against
+  retail.
 
 ### Grid lighting workers
 
