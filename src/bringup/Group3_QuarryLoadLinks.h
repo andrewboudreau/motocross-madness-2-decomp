@@ -42,8 +42,6 @@ void G3Q_CollisionSetOwner(void* collision, void* owner, int tag);              
 void* G3Q_EcoSystemCreate(void* eco, void* target, void* textureManager, void* terrain,
                           void* lights, void* environment, void* stream, int format,
                           int collisions, int level);                            // 0x004594d0
-void* G3Q_SkyCubeCreate(void* sky, void* target, void* stream, void* textures,
-                        float size);                                             // 0x004fb230
 
 // Group3_QuarryLinkRace.cpp
 void* G3Q_BikeRaceCreate(void* race, void* target, void* particles, void* lights,

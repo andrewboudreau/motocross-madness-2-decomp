@@ -52,6 +52,7 @@
 #include "../../src/reconstructed/PCGame.h"
 #include "../../src/reconstructed/PCRenderTarget.h"
 #include "../../src/reconstructed/SceneManager.h"
+#include "../../src/reconstructed/SkyCube.h"
 #include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/TextureMapManager.h"
 #include "../../src/reconstructed/TrackGame.h"
@@ -251,14 +252,6 @@ public:
     GameObject* Create(void* target, Fog* fog);  // 0x00486a10
 
     unsigned char field_0x2c[0x30 - 0x2c];
-};
-class UnknownQuarrySkyCube : public GameObject {
-public:
-    explicit UnknownQuarrySkyCube(int flags);                  // 0x004fb1e0
-    GameObject* Create(void* target, FileStream* stream,
-                                      UnknownTextureFormatChoice* textures, float size);
-
-    unsigned char field_0x2c[0x48 - 0x2c];
 };
 
 // Terrain (0xcc4 bytes) and EcoSystem (0x5c4 bytes).
@@ -603,8 +596,8 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                 delete stream;
             return 0;
         }
-        skyCube = (new(__FILE__, 744) UnknownQuarrySkyCube(g_TrackGame->mode.skyCubeOn))
-                         ->Create(renderContext, stream, &skyTextures, 1024.0f);
+        skyCube = (new(__FILE__, 744) SkyCube(g_TrackGame->mode.skyCubeOn))
+                         ->Create(renderContext, stream, (UnknownCubeTextureContext*)&skyTextures, 1024.0f);
         if (!AppendChild((GameObject*)skyCube, -1))
             sprintf(text, "SkyCube not created.\n");
         AppendChild((new(__FILE__, 750) UnknownQuarryFogLink(1))->Create(renderContext, eventFog), -1);

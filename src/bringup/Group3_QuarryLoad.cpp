@@ -14,6 +14,8 @@
 //     (new, EH state, null test, constructor), declared over the views' storage;
 //   * the fog objects use Fog.h's Fog/FogOff/FogOn directly; FogOn's folded Create
 //     (0x00486a10) is defined at the end of this file and called, as retail calls it;
+//   * SkyCube.h can share this unit, so the sky cube is created and loaded through
+//     SkyCube itself;
 //   * the memory estimate reads EcoSystem.cpp's preloaded-texture count (0x0059af10).
 // Linked score 0.985, 2208 instructions against retail's 2208 (was 0.908 at 2101: the
 // out-of-line G3Q_New* allocation helpers dropped retail's inline new/EH/null-test/
@@ -39,6 +41,7 @@
 #include "../reconstructed/PCGame.h"
 #include "../reconstructed/PCRenderTarget.h"
 #include "../reconstructed/SceneManager.h"
+#include "../reconstructed/SkyCube.h"
 #include "../reconstructed/TextureMap.h"
 #include "../reconstructed/TextureMapManager.h"
 #include "../reconstructed/TrackGame.h"
@@ -242,14 +245,6 @@ public:
 
     unsigned char field_0x2c[0x30 - 0x2c];
 };
-class UnknownQuarrySkyCube : public GameObject {
-public:
-    explicit UnknownQuarrySkyCube(int flags);                  // 0x004fb1e0
-    GameObject* Create(void* target, FileStream* stream,
-                                      UnknownTextureFormatChoice* textures, float size);
-
-    unsigned char field_0x2c[0x48 - 0x2c];
-};
 
 // Terrain (0xcc4 bytes) and EcoSystem (0x5c4 bytes).
 class UnknownQuarryTerrainObject : public GameObject {
@@ -304,10 +299,6 @@ public:
 class TerrainShadow : public UnknownQuarryTerrainShadow {
 public:
     explicit TerrainShadow(int flags);                         // 0x00508ae0
-};
-class SkyCube : public UnknownQuarrySkyCube {
-public:
-    explicit SkyCube(int flags);                               // 0x004fb1e0
 };
 class Terrain : public UnknownQuarryTerrainObject {
 public:
@@ -635,7 +626,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
             return 0;
         }
         skyCube = (new(__FILE__, 744) SkyCube(g_TrackGame->mode.skyCubeOn))
-                         ->Create(renderContext, stream, &skyTextures, 1024.0f);
+                         ->Create(renderContext, stream, (UnknownCubeTextureContext*)&skyTextures, 1024.0f);
         if (!AppendChild((GameObject*)skyCube, -1))
             sprintf(text, "SkyCube not created.\n");
         AppendChild((new(__FILE__, 750) FogOn(1))->Create(renderContext, eventFog), -1);
@@ -981,12 +972,6 @@ void UnknownQuarryShadow::SetLight(const Vector3* position, const Vector3* direc
 GameObject* UnknownQuarryTerrainShadow::Attach(void* target, UnknownTerrain* terrain, UnknownQuarryShadow* shadow)
 {
     return (GameObject*)G3Q_TerrainShadowAttach(this, target, terrain, shadow);
-}
-
-GameObject* UnknownQuarrySkyCube::Create(void* target, FileStream* stream,
-                                         UnknownTextureFormatChoice* textures, float size)
-{
-    return (GameObject*)G3Q_SkyCubeCreate(this, target, stream, textures, size);
 }
 
 UnknownTerrain* UnknownQuarryTerrainObject::Load(void* target, FileStream* stream, int a,
