@@ -12,7 +12,7 @@
 #include "ControlInterface.h"
 #include "DebugAlloc.h"
 #include "TextureMap.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 
 // Per-TU vector constants: Krusty3DObjects.cpp's four dynamic initializers
 // (.CRT$XCU 0x00566260..0x0056626c, code 0x0048d640..0x0048d77b) build

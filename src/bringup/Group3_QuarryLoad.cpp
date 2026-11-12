@@ -42,7 +42,7 @@
 #include "../reconstructed/TextureMap.h"
 #include "../reconstructed/TextureMapManager.h"
 #include "../reconstructed/TrackGame.h"
-#include "../reconstructed/UnknownResourceManager.h"
+#include "../reconstructed/ResourceEntry.h"
 #include "Group3_QuarryLoadLinks.h"
 
 // 0x0059af10: the count of ecosystem textures PreloadEcosystem preloaded, which the memory

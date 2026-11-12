@@ -16,8 +16,8 @@
 #include "TextureMap.h"
 
 // 0x00689c78; constructed by 0x004e8d40, destroyed by 0x004e8d60.
-UnknownResourceManager g_GlobalResourceManager;
-UnknownResourceManager* g_ResourceManager = &g_GlobalResourceManager;
+ResourceManager g_GlobalResourceManager;
+ResourceManager* g_ResourceManager = &g_GlobalResourceManager;
 
 // 0x004e8d70
 ResourceItem::ResourceItem()
@@ -45,7 +45,7 @@ ResourceItem::~ResourceItem()
 }
 
 // 0x004e8e80
-UnknownResourceManager::UnknownResourceManager()
+ResourceManager::ResourceManager()
 {
     itemCount = 0;
     items = 0;
@@ -56,7 +56,7 @@ UnknownResourceManager::UnknownResourceManager()
 }
 
 // 0x004e8ea0
-UnknownResourceManager::~UnknownResourceManager()
+ResourceManager::~ResourceManager()
 {
     int i;
 
@@ -83,7 +83,7 @@ UnknownResourceManager::~UnknownResourceManager()
 }
 
 // 0x004e8f40
-int UnknownResourceManager::MergeWithExisting(ResourceItem* item)
+int ResourceManager::MergeWithExisting(ResourceItem* item)
 {
     for (int i = 0; i < itemCount; i++) {
         if (!_stricmp(item->name, items[i]->name)) {
@@ -107,7 +107,7 @@ int UnknownResourceManager::MergeWithExisting(ResourceItem* item)
 }
 
 // 0x004e9010
-void UnknownResourceManager::SetItemObject(void* entry, void* object)
+void ResourceManager::SetItemObject(void* entry, void* object)
 {
     ResourceItem* item = (ResourceItem*)entry;
 
@@ -120,7 +120,7 @@ void UnknownResourceManager::SetItemObject(void* entry, void* object)
 // samples/render/ResourceManagerNearMisses.cpp.
 
 // 0x004e9360
-ResourceItem* UnknownResourceManager::FindItem(const char* name, int seek)
+ResourceItem* ResourceManager::FindItem(const char* name, int seek)
 {
     for (int i = 0; i < itemCount; i++) {
         if (!_stricmp(items[i]->name, name)) {
@@ -134,7 +134,7 @@ ResourceItem* UnknownResourceManager::FindItem(const char* name, int seek)
 }
 
 // 0x004e93f0
-void* UnknownResourceManager::FindItemByObject(void* object)
+void* ResourceManager::FindItemByObject(void* object)
 {
     for (int i = 0; i < itemCount; i++) {
         if (items[i]->object == object)
@@ -144,7 +144,7 @@ void* UnknownResourceManager::FindItemByObject(void* object)
 }
 
 // 0x004e9430
-int UnknownResourceManager::AddLooseFile(const char* name, const char* path)
+int ResourceManager::AddLooseFile(const char* name, const char* path)
 {
     char buffer[0x104];
 
@@ -193,7 +193,7 @@ int UnknownResourceManager::AddLooseFile(const char* name, const char* path)
 }
 
 // 0x004e96b0
-int UnknownResourceManager::AddObject(const char* name, void* object)
+int ResourceManager::AddObject(const char* name, void* object)
 {
     if (itemCount + 1 > itemCapacity) {
         items = (ResourceItem**)DebugRealloc(items, (itemCount + 1) * 4, __FILE__, 464);
@@ -223,7 +223,7 @@ int UnknownResourceManager::AddObject(const char* name, void* object)
 
 // 0x004e9830: refuses (0) while another holder references one of the
 // archive's items; the archive itself is not deleted here.
-int UnknownResourceManager::RemoveArchiveItems(FileStream* archive)
+int ResourceManager::RemoveArchiveItems(FileStream* archive)
 {
     int used = 0;
     int i;
@@ -257,7 +257,7 @@ int UnknownResourceManager::RemoveArchiveItems(FileStream* archive)
 }
 
 // 0x004e9900
-void UnknownResourceManager::ReleaseItem(ResourceItem* item)
+void ResourceManager::ReleaseItem(ResourceItem* item)
 {
     for (int i = 0; i < itemCount; i++) {
         if (items[i] == item && !items[i]->Release()) {

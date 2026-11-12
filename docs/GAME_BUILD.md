@@ -1674,7 +1674,7 @@ passes:
 - `PCTextureMap::CreateSurface`, `CopyRectTo` and `Clone`.
 - `CacheTexture::CopyMipLevels`.
 - `UIEditBox::Draw` and `OnChar`, `UIMultiState::Draw` and `UIListBox::ButtonDown`.
-- `BackgroundImage::GetDc`, `MediaControl::Open`, `UnknownResourceManager::AddArchive` and
+- `BackgroundImage::GetDc`, `MediaControl::Open`, `ResourceManager::AddArchive` and
   `PCVideoCard::ProbeNonLocalTextureMemory`.
 
 Bodies reviewed by disassembly, showing register, frame-slot, block-order or scheduling

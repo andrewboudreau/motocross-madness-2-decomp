@@ -32,7 +32,7 @@
 #include "Tgafile.h"
 #include "TrackGame.h"
 #include "UIDialog.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 
 #include <imm.h>
 

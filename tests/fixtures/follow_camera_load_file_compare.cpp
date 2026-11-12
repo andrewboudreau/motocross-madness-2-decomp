@@ -16,7 +16,7 @@ Vec3 Vec3Normalize(const Vec3&);
 Vec3 CrossProductCall(const Vec3&,const Vec3&);
 void InitFastInvSqrtTable();
 static BYTE referenceSpace[0x800000];
-UnknownResourceManager* g_ResourceManager=0;
+ResourceManager* g_ResourceManager=0;
 struct CameraAccess:FollowCamera{using FollowCamera::frames;using FollowCamera::field_0x33c;using FollowCamera::frameCount;};
 typedef char CameraLayout[(sizeof(FollowCamera)==0x384 && sizeof(Matrix4)==64 && sizeof(Vec3)==12 && sizeof(Vector3)==12 && sizeof(void(FollowCamera::*)(const char*))==4 && offsetof(CameraAccess,frameCount)==0x334 && offsetof(CameraAccess,frames)==0x338 && offsetof(CameraAccess,field_0x33c)==0x33c)?1:-1];
 typedef char StreamLayout[(sizeof(FileStream)==0x134 && offsetof(FileStream,fileHandle)==0x14 && offsetof(FileStream,sliceOffset)==0x130 && offsetof(FileStream,archives)==0x12c)?1:-1];
@@ -50,9 +50,9 @@ void operator delete(void*p,const char*file,int line){CheckFile(file);if(line!=0
 
 
 
-FileStream* UnknownResourceManager::AddArchive(const char*,int){ExitProcess(201);return 0;}
+FileStream* ResourceManager::AddArchive(const char*,int){ExitProcess(201);return 0;}
 int FileStream::WriteHeader(const char*){ExitProcess(202);return 0;}
-struct ConstructorCall{FileStream* Stream(UnknownResourceManager*m){return ::new(this)FileStream(m);}};
+struct ConstructorCall{FileStream* Stream(ResourceManager*m){return ::new(this)FileStream(m);}};
 struct DestructorCall{void Stream(){((FileStream*)this)->~FileStream();}};
 template<class T>static DWORD Address(T m){if(sizeof(m)!=4)ExitProcess(93);DWORD p;memcpy(&p,&m,4);return p;}
 static int MapReference(const char*path){

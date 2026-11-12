@@ -1,5 +1,5 @@
 {
-  "??0FileStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
+  "??0FileStream@@QAE@PAVResourceManager@@@Z": "0x00460d10",
   "??1FileStream@@QAE@XZ": "0x00460d60",
   "??_C@_02JKAF@rb?$AA@": "0x0056666c",
   "??_C@_0BD@BMLN@Error?5opening?5?$CFs?4?6?$AA@": "0x0056b018",
@@ -26,8 +26,8 @@
   "?GetFileTimes@FileStream@@QAEHPAH0@Z": "0x00461cb0",
   "?ResetTextMode@FileStream@@QAEXXZ": "0x00461d20",
   "?FilePrintf@@YAHPAU_iobuf@@PBDZZ": "0x00461d40",
-  "?AddArchive@UnknownResourceManager@@QAEPAVFileStream@@PBDH@Z": "0x004e9030",
-  "?FindItem@UnknownResourceManager@@QAEPAVResourceItem@@PBDH@Z": "0x004e9360",
+  "?AddArchive@ResourceManager@@QAEPAVFileStream@@PBDH@Z": "0x004e9030",
+  "?FindItem@ResourceManager@@QAEPAVResourceItem@@PBDH@Z": "0x004e9360",
   "__fstat": "0x00536890",
   "__setmode": "0x0053651c",
   "__splitpath": "0x005359d2",

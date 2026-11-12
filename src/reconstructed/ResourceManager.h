@@ -12,7 +12,7 @@ class FileStream;
 // RTTI: ResourceItem : BaseObject (vtable 0x00557858, COL 0x0055ec78), 0x20
 // bytes (operator new(0x20) at 0x004e91e1, 0x004e957f, 0x004e9718). One
 // named file: the archive holding it and where, or the object it was
-// loaded as. UnknownResourceEntry (UnknownResourceManager.h) is a legacy
+// loaded as. UnknownResourceEntry (ResourceEntry.h) is a legacy
 // alias of this same declaration.
 class ResourceItem : public BaseObject {
 public:
@@ -32,10 +32,10 @@ public:
 // g_ResourceManager at 0x00572b44, which every other TU reads, is
 // initialised to it in .data); SceneManager 0x004f0d20 also keeps one on its stack. Two grown
 // arrays: the items and the archives they come from.
-class UnknownResourceManager {
+class ResourceManager {
 public:
-    UnknownResourceManager();             // 0x004e8e80
-    ~UnknownResourceManager();            // 0x004e8ea0
+    ResourceManager();             // 0x004e8e80
+    ~ResourceManager();            // 0x004e8ea0
 
     // 0x004e8f40: when an item named like `item` exists, moves `item`'s
     // location onto it (deleting the old archive when unused) and returns
@@ -74,5 +74,5 @@ public:
     ResourceItem** items;                 // +0x14 items
 };
 
-extern UnknownResourceManager g_GlobalResourceManager;  // 0x00689c78
-extern UnknownResourceManager* g_ResourceManager;       // 0x00572b44
+extern ResourceManager g_GlobalResourceManager;  // 0x00689c78
+extern ResourceManager* g_ResourceManager;       // 0x00572b44

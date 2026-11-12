@@ -13,7 +13,7 @@
 #include "../../src/reconstructed/UIDialog.h"
 #include "../../src/reconstructed/PCCamera.h"
 #include "../../src/reconstructed/TextureMap.h"
-#include "../../src/reconstructed/UnknownResourceManager.h"
+#include "../../src/reconstructed/ResourceEntry.h"
 
 extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
 

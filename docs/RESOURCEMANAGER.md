@@ -14,7 +14,7 @@ The manager keeps named items (ResourceItem: a name, the archive stream
 holding the file and its offset, or the object loaded from it), opens
 "RS2" archives and adds their items, finds items by name or object, and
 releases archives. `ResourceManager.h` provides the shared full declaration;
-`UnknownResourceManager.h` includes it and retains `UnknownResourceEntry` as
+`ResourceEntry.h` includes it and retains `UnknownResourceEntry` as
 an alias of ResourceItem. SceneManager's `UnknownSceneResourceManager` is
 likewise an alias of the same manager. Both include paths can be used together.
 

@@ -11,7 +11,7 @@
 
 extern "C" void __cdecl __CxxFrameHandler();
 static unsigned char referenceSpace[0x800000];
-UnknownResourceManager* g_ResourceManager = (UnknownResourceManager*)0x12345000;
+ResourceManager* g_ResourceManager = (ResourceManager*)0x12345000;
 // VC6 requires the other functions in the full sample object to resolve too.
 // Those functions are outside this test. Any accidental traversal fails, rather
 // than substituting an arithmetic or animation result and concealing coverage.
@@ -113,7 +113,7 @@ void* DebugRealloc(void* p,unsigned int size,const char* file,int line) {
     }
     Event(8,Identity(out));return out;
 }
-FileStream::FileStream(UnknownResourceManager* owner) {
+FileStream::FileStream(ResourceManager* owner) {
     Event(9,Identity(this),Identity(owner));if (scenario.mode==2) throw 72;
     memset(this,0,sizeof(*this));archives=owner;sliceOffset=37;
 }
@@ -138,7 +138,7 @@ unsigned char Character::FindNode(const char* name) {
     int node=name[0]=='N'||name[0]=='n'?atoi(name+1):-1;
     return node>=0 && node<4 && (scenario.mask&(1<<node))?(unsigned char)(node*3+2):0xff;
 }
-struct ConstructorCall { FileStream* Stream(UnknownResourceManager* owner) {
+struct ConstructorCall { FileStream* Stream(ResourceManager* owner) {
     return ::new(this) FileStream(owner);
 } };
 struct DestructorCall { void Stream() { ((FileStream*)this)->~FileStream(); } };
@@ -184,7 +184,7 @@ static int MapReference(const char* path,const char* patches) {
            section[i].VirtualAddress+section[i].SizeOfRawData>pe->OptionalHeader.SizeOfImage)return 0;
         memcpy(mapped+section[i].VirtualAddress,raw+section[i].PointerToRawData,section[i].SizeOfRawData);
     }free(raw);
-    *(UnknownResourceManager**)0x572b44=g_ResourceManager;
+    *(ResourceManager**)0x572b44=g_ResourceManager;
     f=fopen(patches,"rb");if(!f)return 0;DWORD patch[3];
     while(fread(patch,sizeof(patch),1,f)==1) {
         DWORD at=patch[0],dest=Replacement(patch[1]);

@@ -7,7 +7,7 @@
 #include "Quantize.h"
 #include "TextureMap.h"
 #include "TrackGame.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 
 // 0x004b6b30
 Palette8* Palette8::LoadShared(const char* name) {

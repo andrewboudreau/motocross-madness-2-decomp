@@ -37,7 +37,7 @@ static inline FileStream* InnermostStream(FileStream* stream)
 // 0x00460d10. The buffer pointer is named before the argument store: only then does VC6
 // load the argument at entry (edx) and keep the buffer address in ecx for both pointer
 // stores, as retail does.
-FileStream::FileStream(UnknownResourceManager* manager)
+FileStream::FileStream(ResourceManager* manager)
 {
     fileEncoded = 0;
     headerSize = 0;

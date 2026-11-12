@@ -18,7 +18,7 @@
 #include "Parameterblocks.h"
 #include "SoundInterface.h"
 #include "TextureMap.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 
 // USER32 and SHELL32 imports.
 extern "C" __declspec(dllimport) long __stdcall SendMessageA(void* window, unsigned int message,

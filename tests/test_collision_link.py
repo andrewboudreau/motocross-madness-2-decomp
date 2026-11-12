@@ -78,7 +78,7 @@ class CollisionLinkTests(unittest.TestCase):
                                      for s in objects[caller].symbols))
 
             stream_calls = {
-                '??0FileStream@@QAE@PAVUnknownResourceManager@@@Z',
+                '??0FileStream@@QAE@PAVResourceManager@@@Z',
                 '??1FileStream@@QAE@XZ',
                 '?Open@FileStream@@QAEHPBD0H@Z',
             }
@@ -98,9 +98,9 @@ class CollisionLinkTests(unittest.TestCase):
                 ('CollisionObject', 'BoundingBoxTreeBuild', '?ReadPointNode@@YAXPAPAUBoxTreeNode@@PAVFileStream@@@Z'),
                 ('CollisionObject', 'BoundingBoxTreeBuild', '?ReadTriangleMesh@@YAXPAPAUBoxTreeNode@@PAPAUTreeVec3@@PAVFileStream@@@Z'),
                 ('SoulTreePhysics', 'SceneManager', '?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVFileStream@@PBD1H@Z'),
-                ('SoulTreePhysics', 'ResourceManager', '?g_ResourceManager@@3PAVUnknownResourceManager@@A'),
+                ('SoulTreePhysics', 'ResourceManager', '?g_ResourceManager@@3PAVResourceManager@@A'),
                 ('CollisionObject', 'StreamCandidate', '?Read@FileStream@@QAEHPAXHH@Z'),
-                ('CollisionObject', 'ResourceManager', '?g_ResourceManager@@3PAVUnknownResourceManager@@A'),
+                ('CollisionObject', 'ResourceManager', '?g_ResourceManager@@3PAVResourceManager@@A'),
                 ('Wrecker', 'Quadtree', '?Remove@QuadTree@@QAEXPAVQuadTreeObject@@I@Z'),
                 ('Wrecker', 'VisibilityQuadTree', '?g_collisionQuadTree@@3PAVQuadTree@@A'),
             ):

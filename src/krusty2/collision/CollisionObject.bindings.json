@@ -1,5 +1,5 @@
 {
-  "??0FileStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
+  "??0FileStream@@QAE@PAVResourceManager@@@Z": "0x00460d10",
   "??0CollisionObject@@QAE@H@Z$ehhandler": "0x00549e7b",
   "??0CollisionVec3@@QAE@MMM@Z": "0x00404e60",
   "??0CollisionVec3Call@@QAE@MMM@Z": "0x00404e60",
@@ -150,7 +150,7 @@
   "?Vec3TransformNormal@@YAXPAUVec3@@U1@PBUMatrix4@@@Z": "0x0042a450",
   "?Vec3TransformNormalTranspose@@YAXPAUCollisionVec3@@U1@PBUMatrix4@@@Z": "0x0042a4b0",
   "?Vec3TransformPoint@@YAXPAUVec3@@U1@PBUMatrix4@@@Z": "0x0042a510",
-  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVResourceManager@@A": "0x00572b44",
   "?g_CollisionBoxResult@@3PAUQueryHit@@A": "0x00579058",
   "?g_CollisionScratchCount@@3HA": "0x00579014",
   "?g_CollisionScratchHits@@3HA": "0x00579060",

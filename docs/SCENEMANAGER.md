@@ -101,7 +101,7 @@ type, member and function names are provisional.
 - `TrackGame.h`: `UnknownTrackGameObject574` gets its constructor layout
   and the methods above. `0x004ea010` takes `int*` outputs (TrackRecord
   bindings renamed).
-- `UnknownResourceManager.h` includes the canonical ResourceManager declaration.
+- `ResourceEntry.h` includes the canonical ResourceManager declaration.
   Scene's `UnknownSceneResourceManager` is a type alias, preserving its
   `0x18`-byte stack objects while connecting the existing constructor and
   destructor. FindItem returns ResourceItem; the other resource method

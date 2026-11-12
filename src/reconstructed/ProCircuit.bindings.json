@@ -1,6 +1,6 @@
 {
   "??0UnknownParameterBlock@@QAE@XZ": "0x004b7130",
-  "??0FileStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
+  "??0FileStream@@QAE@PAVResourceManager@@@Z": "0x00460d10",
   "??0UnknownTrackGameObject3444@@QAE@XZ": "0x004d3480",
   "??0UnknownTrackGameObject3444@@QAE@XZ$ehhandler": "0x0054cea2",
   "??1UnknownParameterBlock@@QAE@XZ": "0x004b7190",
@@ -68,7 +68,7 @@
   "?FindFileDirectory@TrackGameMode@@QAEHHPADPBD0@Z": "0x00523a60",
   "?g_BikeClassEngineSizes@@3PAHA": "0x0056cb6c",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
-  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVResourceManager@@A": "0x00572b44",
   "_$E1": "0x004d49f0",
   "_$E10": "0x004d4ae0",
   "_$E11": "0x004d4ad0",

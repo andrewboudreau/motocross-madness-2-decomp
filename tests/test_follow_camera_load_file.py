@@ -176,7 +176,7 @@ class FollowCameraLoadFileTests(unittest.TestCase):
             helper_sources={'stream':head+'\n'.join(parts),
                 'normalize':'#include "math/Vec3.h"\nfloat FastInvSqrt(float);\n'+extract((ROOT/'src/reconstructed/Math3D.cpp').read_text(),'Vec3 Vec3Normalize('),
                 'cross':'#include "math/Vec3.h"\n'+extract((ROOT/'src/reconstructed/CrossProduct.cpp').read_text(),'Vec3 CrossProductCall('),
-                'finditem':'#include <string.h>\n#include "TextureMap.h"\n#include "ResourceManager.h"\n'+extract((ROOT/'src/reconstructed/ResourceManager.cpp').read_text(),'ResourceItem* UnknownResourceManager::FindItem('),
+                'finditem':'#include <string.h>\n#include "TextureMap.h"\n#include "ResourceManager.h"\n'+extract((ROOT/'src/reconstructed/ResourceManager.cpp').read_text(),'ResourceItem* ResourceManager::FindItem('),
                 'readxor':'#include <stdio.h>\n'+extract((ROOT/'src/reconstructed/EcoSystem.cpp').read_text(),'int ReadXorDecoded(')}
             sample=(TOOL_ROOT/'samples/io/FileStream.cpp').read_text()
             helper_sources['stream_candidates']='#include <stdio.h>\n#include "FileStream.h"\nint ReadXorDecoded(unsigned char*,int,int,FILE*,unsigned char*);\n'+'\n'.join(extract(sample,p)for p in ['static inline int HeaderMatches(','int FileStream::CheckHeader(','int FileStream::Seek('])

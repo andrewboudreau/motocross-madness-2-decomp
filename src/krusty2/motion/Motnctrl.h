@@ -9,7 +9,7 @@
 
 // Shared archive stream and section/key reader; original class names are provisional.
 #include "../../reconstructed/FileStream.h"
-extern UnknownResourceManager* g_ResourceManager; // 0x00572b44
+extern ResourceManager* g_ResourceManager; // 0x00572b44
 #include "../../reconstructed/Parameterblocks.h"
 
 // One motion (0xcc bytes, allocated by MotionManager::Load at line 0x159).  Offsets tier 1 (Load,

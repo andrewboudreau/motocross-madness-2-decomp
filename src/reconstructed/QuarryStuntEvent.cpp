@@ -18,7 +18,7 @@
 #include "TrackGame.h"
 #include "EventManager.h"
 #include "TrackOverlay.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 
 // Reconstruction of D:\aardvark\VC\krusty2\QuarryStuntEvent.cpp (literal
 // __FILE__ at 0x00572154): BaseQuarryEvent, 0x004de2a0..0x004e1fa7, between

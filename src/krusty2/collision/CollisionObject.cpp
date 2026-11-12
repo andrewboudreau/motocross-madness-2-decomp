@@ -249,7 +249,7 @@ void CollisionObject::SetTriangleMeshHullShape(const CollisionVec3* verts, const
 // 0x00460d10 stores this resource-manager pointer at +0x12c, Open returns
 // an int at 0x00460f50 (ignored here), and Read uses fread argument order.
 #include "../../reconstructed/FileStream.h"
-extern UnknownResourceManager* g_ResourceManager; // 0x00572b44
+extern ResourceManager* g_ResourceManager; // 0x00572b44
 
 // 0x00439e10 (ret 8): reads the shape type from the stream and builds that payload
 // (0: hull 0x198 bytes, 1: model 0x120 bytes), then lets the matching loader fill it.

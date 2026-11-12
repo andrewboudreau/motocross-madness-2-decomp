@@ -6,7 +6,7 @@
 #include "Palette8.h"
 #include "Pixtrans.h"
 #include "Tgafile.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 
 // The four vector constants that open about 73 retail files (see
 // src/krusty2/math/Math3D.h): 0x0068a340, 0x0068a350, 0x0068a360 and

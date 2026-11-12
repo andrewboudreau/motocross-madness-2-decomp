@@ -7,7 +7,7 @@ class EventManager;  // EventManager.h; files that use its members include it
 #include "KrustyUI.h"
 #include "MemTag.h"
 #include "PCGame.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 #include "RaceView.h"
 #include "TrackRecord.h"
 

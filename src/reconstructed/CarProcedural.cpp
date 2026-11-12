@@ -10,7 +10,7 @@
 #include "DebugAlloc.h"
 #include "MemTag.h"
 #include "TextureMap.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 #include "D3DIMSoulTree.h"
 
 // Per-TU vector constants (the shape documented in docs/LZW.md): four

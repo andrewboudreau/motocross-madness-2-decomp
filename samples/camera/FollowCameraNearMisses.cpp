@@ -73,7 +73,7 @@
 
 #include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/TextureMap.h"
-#include "../../src/reconstructed/UnknownResourceManager.h"
+#include "../../src/reconstructed/ResourceEntry.h"
 
 #include <stdio.h>
 #include <string.h>

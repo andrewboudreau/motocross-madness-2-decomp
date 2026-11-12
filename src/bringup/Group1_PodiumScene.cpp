@@ -18,7 +18,7 @@
 #include "UIDialog.h"
 #include "PCCamera.h"
 #include "TextureMap.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 
 // EventManager.cpp's per-file vectors (0x0059af48, 0x0059af18).
 static Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);

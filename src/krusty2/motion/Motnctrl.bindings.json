@@ -1,5 +1,5 @@
 {
-  "??0FileStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
+  "??0FileStream@@QAE@PAVResourceManager@@@Z": "0x00460d10",
   "??0Character@@QAE@H@Z": "0x004a6780",
   "??0GameObject@@QAE@H@Z": "0x00468ca0",
   "??0MotionManager@@QAE@XZ": "0x004a5840",
@@ -117,7 +117,7 @@
   "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z": "0x00515600",
   "??0Vec3@@QAE@MMM@Z": "0x00404e60",
   "?g_pMotionManager@@3PAVMotionManager@@A": "0x0068512c",
-  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVResourceManager@@A": "0x00572b44",
   "_$E1": "0x004a8950",
   "_$E10": "0x004a8a40",
   "_$E11": "0x004a8a30",

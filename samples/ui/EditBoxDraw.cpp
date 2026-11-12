@@ -28,7 +28,7 @@
 #include "../../src/reconstructed/Tgafile.h"
 #include "../../src/reconstructed/TrackGame.h"
 #include "../../src/reconstructed/UIDialog.h"
-#include "../../src/reconstructed/UnknownResourceManager.h"
+#include "../../src/reconstructed/ResourceEntry.h"
 
 
 #include <imm.h>

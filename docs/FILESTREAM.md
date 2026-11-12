@@ -148,7 +148,7 @@ RTTI. Other named stream views remain separate reconstruction work.
 
 The shared declaration in `FileStream.h` (included by `TextureMap.h` and
 `EcoSystem.h`) takes
-`UnknownResourceManager*`. This is a type inference supported by the constructor
+`ResourceManager*`. This is a type inference supported by the constructor
 storing its argument at `+0x12c`, `FindArchive` calling `FindItem` through that
 field, and callers supplying `g_ResourceManager` or the resource manager's
 `this` pointer. It connects EcoSystem's existing constructor calls to the

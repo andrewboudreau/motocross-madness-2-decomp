@@ -622,7 +622,7 @@ the JSON of `tools/rank_near_misses.py` and checks every EH-bearing row. On
 none of them is missing or adding a try block or a destructible local:
 
 ```powershell
-python tools/eh_funcinfo.py 0x004e9030 --obj X.obj --symbol '?AddArchive@UnknownResourceManager@@QAEPAVFileStream@@PBDH@Z'
+python tools/eh_funcinfo.py 0x004e9030 --obj X.obj --symbol '?AddArchive@ResourceManager@@QAEPAVFileStream@@PBDH@Z'
 python tools/eh_funcinfo.py --scan work/rank.json
 ```
 

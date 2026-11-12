@@ -17,13 +17,13 @@ from tools.match import compare
 ROOT = Path(__file__).resolve().parents[1]
 EXE = Path(os.environ.get('MCM2_EXE', ROOT / 'work/game/mcm2.exe'))
 PROVIDERS = {
-    '??0UnknownResourceManager@@QAE@XZ': (0x4e8e80, 22),
-    '??1UnknownResourceManager@@QAE@XZ': (0x4e8ea0, 159),
-    '?FindItem@UnknownResourceManager@@QAEPAVResourceItem@@PBDH@Z': (0x4e9360, 133),
-    '?AddLooseFile@UnknownResourceManager@@QAEHPBD0@Z': (0x4e9430, 640),
-    '?AddObject@UnknownResourceManager@@QAEHPBDPAX@Z': (0x4e96b0, 383),
-    '?SetItemObject@UnknownResourceManager@@QAEXPAX0@Z': (0x4e9010, 31),
-    '?RemoveArchiveItems@UnknownResourceManager@@QAEHPAVFileStream@@@Z': (0x4e9830, 194),
+    '??0ResourceManager@@QAE@XZ': (0x4e8e80, 22),
+    '??1ResourceManager@@QAE@XZ': (0x4e8ea0, 159),
+    '?FindItem@ResourceManager@@QAEPAVResourceItem@@PBDH@Z': (0x4e9360, 133),
+    '?AddLooseFile@ResourceManager@@QAEHPBD0@Z': (0x4e9430, 640),
+    '?AddObject@ResourceManager@@QAEHPBDPAX@Z': (0x4e96b0, 383),
+    '?SetItemObject@ResourceManager@@QAEXPAX0@Z': (0x4e9010, 31),
+    '?RemoveArchiveItems@ResourceManager@@QAEHPAVFileStream@@@Z': (0x4e9830, 194),
 }
 
 
@@ -66,8 +66,8 @@ class ResourceConnectionTests(unittest.TestCase):
             for name, obj in objects.items():
                 self.assertFalse(any('UnknownSceneResourceManager' in s.name or
                                      'UnknownResourceEntry@@' in s.name for s in obj.symbols), name)
-                self.assertNotIn('?SetItemObject@UnknownResourceManager@@QAEXPAXH@Z', imports(obj))
-                self.assertNotIn('?AddObject@UnknownResourceManager@@QAEXPBDH@Z', imports(obj))
+                self.assertNotIn('?SetItemObject@ResourceManager@@QAEXPAXH@Z', imports(obj))
+                self.assertNotIn('?AddObject@ResourceManager@@QAEXPBDH@Z', imports(obj))
 
 
 if __name__ == '__main__':

@@ -16,7 +16,7 @@
 #include "Parameterblocks.h"
 #include "PeakHold.h"
 #include "TypeRegistry.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 #include "bmpfile.h"
 #include "D3DConstants.h"
 

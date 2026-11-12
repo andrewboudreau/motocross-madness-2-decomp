@@ -13,7 +13,7 @@
 #include "PCTextureMap.h"
 #include "Tgafile.h"
 #include "TrackGame.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 
 // 0x0043ea00
 GameCursor::GameCursor(int flags) : GameObject(flags) {

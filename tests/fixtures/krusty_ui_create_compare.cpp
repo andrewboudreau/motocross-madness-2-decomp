@@ -19,11 +19,11 @@ static BYTE referenceSpace[0x800000]={1};
 struct World {
     BYTE games[2][sizeof(TrackGame)],ui[sizeof(KrustyUI)],guis[2][sizeof(GUIManager)],intro[sizeof(Intro1Dlg)];
     BYTE users[2][sizeof(GUIUser)],tips[2][sizeof(UnknownKrustyUIToolTipView)];
-    BYTE displays[2][0x70],controls[2][0x20],networks[2][sizeof(NetworkInterface)],joysticks[2][sizeof(PCJoystickDevice)],managers[2][sizeof(UnknownResourceManager)];
+    BYTE displays[2][0x70],controls[2][0x20],networks[2][sizeof(NetworkInterface)],joysticks[2][sizeof(PCJoystickDevice)],managers[2][sizeof(ResourceManager)];
 };
 static World world;
 TrackGame* g_TrackGame;
-UnknownResourceManager* g_ResourceManager;
+ResourceManager* g_ResourceManager;
 char g_ResourceNames[36][16];
 static DWORD uiTable[27],gameTable[30],sourceIntroTable;
 struct State {World world;char names[36][16];int game,manager;};
@@ -50,7 +50,7 @@ static void EventAt(int kind,int who=0,int a=0,int b=0,int c=0,int d=0,const cha
     case 0:g_TrackGame=GameAt(1-GameIndex());*(TrackGame**)0x56e26c=g_TrackGame;break;
     case 1:g_TrackGame->mode.uiSounds=!g_TrackGame->mode.uiSounds;g_TrackGame->mode.uiVolume^=123;g_TrackGame->mode.toolTips=!g_TrackGame->mode.toolTips;g_TrackGame->mode.uiAnimations^=15;break;
     case 2:UI()->gui=Gui(1);break;
-    case 3:g_ResourceManager=(UnknownResourceManager*)world.managers[1];*(UnknownResourceManager**)0x572b44=g_ResourceManager;g_TrackGame->network=0;g_TrackGame->controlInterface->activeJoystick=0;break;
+    case 3:g_ResourceManager=(ResourceManager*)world.managers[1];*(ResourceManager**)0x572b44=g_ResourceManager;g_TrackGame->network=0;g_TrackGame->controlInterface->activeJoystick=0;break;
     }}
     if(scenario.throwAt==observed.count)throw 0x721;
 }
@@ -114,7 +114,7 @@ GUIUser* GUIManager::GetUser(int index){int n=GuiIndex(this);EventAt(11,n,index)
 void GUIUser::ForgetDevices(){EventAt(12,Which(this,User(0),User(1)));acceptedDevices.m_count=0;}
 int GUIUser::AcceptDevice(GUIInputDevice* device){EventAt(13,Which(this,User(0),User(1)),(int)device);acceptedDevices.m_count++;return -3;}
 void GUIManager::ShowCursors(int value){EventAt(14,GuiIndex(this),value);}
-FileStream* UnknownResourceManager::AddArchive(const char* path,int flags){EventAt(15,Which(this,world.managers[0],world.managers[1]),flags,0,0,0,path);return 0;}
+FileStream* ResourceManager::AddArchive(const char* path,int flags){EventAt(15,Which(this,world.managers[0],world.managers[1]),flags,0,0,0,path);return 0;}
 void TrackGameMode::LoadBonusTrackNames(){EventAt(16,Which(this,&GameAt(0)->mode,&GameAt(1)->mode));}
 int TrackGameMode::LoadProfile(){EventAt(17,Which(this,&GameAt(0)->mode,&GameAt(1)->mode));return scenario.mask&1;}
 void PCJoystickDevice::UnknownMethod4c3ae0(unsigned char value){EventAt(18,this?Which(this,world.joysticks[0],world.joysticks[1]):-1,value);field_0x5d5=value;}
@@ -147,7 +147,7 @@ case 0x4853b0:return Address(&GUIManager::SetUp);case 0x469130:return Address((i
 case 0x4866c0:return Address(&GUIManager::SetToolTipFont);case 0x485ef0:return Address(&GUIManager::CreateBackground);
 case 0x485d70:return Address(&GUIManager::SetDialogDirectory);case 0x486560:return Address(&GUIManager::SetWaitCursorImage);
 case 0x486540:return Address(&GUIManager::GetUser);case 0x487d60:return Address(&GUIUser::ForgetDevices);case 0x487c30:return Address(&GUIUser::AcceptDevice);
-case 0x486630:return Address(&GUIManager::ShowCursors);case 0x4e9030:return Address(&UnknownResourceManager::AddArchive);
+case 0x486630:return Address(&GUIManager::ShowCursors);case 0x4e9030:return Address(&ResourceManager::AddArchive);
 case 0x523e50:return Address(&TrackGameMode::LoadBonusTrackNames);case 0x5231f0:return Address(&TrackGameMode::LoadProfile);
 case 0x4c3ae0:return Address(&PCJoystickDevice::UnknownMethod4c3ae0);case 0x49a8b0:return Address(&KrustyUI::LoadBikesAndRiders);
 case 0x49a540:return Address(&KrustyUI::LoadGarageTables);case 0x485a70:return Address(&GUIManager::ShowDialog);
@@ -186,7 +186,7 @@ static void Invoke(){union{GameObject*(KrustyUI::*method)(RenderTarget*,int);DWO
 }
 static void Run(int retail){
     retailActive=retail;memset(&observed,0,sizeof(observed));observed.result=-501;memset(&world,0x53+(scenario.seed%17),sizeof(world));memset(g_ResourceNames,0x72,sizeof(g_ResourceNames));memcpy((void*)0x68a498,g_ResourceNames,sizeof(g_ResourceNames));
-    *(DWORD*)UI()=(DWORD)uiTable;UI()->gui=Gui(0);g_TrackGame=GameAt(0);g_ResourceManager=(UnknownResourceManager*)world.managers[0];*(TrackGame**)0x56e26c=g_TrackGame;*(UnknownResourceManager**)0x572b44=g_ResourceManager;
+    *(DWORD*)UI()=(DWORD)uiTable;UI()->gui=Gui(0);g_TrackGame=GameAt(0);g_ResourceManager=(ResourceManager*)world.managers[0];*(TrackGame**)0x56e26c=g_TrackGame;*(ResourceManager**)0x572b44=g_ResourceManager;
     for(int n=0;n<2;++n){TrackGame* g=GameAt(n);*(DWORD*)g=(DWORD)gameTable;g->display=(PCVideoCard*)world.displays[n];g->controlInterface=(ControlInterface*)world.controls[n];g->controlInterface->activeJoystick=scenario.mask&16?(JoystickDevice*)world.joysticks[n]:0;g->textureManager=(TextureMapManager*)(0x34560000+n*16);g->network=scenario.network?(NetworkInterface*)world.networks[n]:0;if(g->network)g->network->lobbyConnected=scenario.network==2;*(DWORD*)(world.displays[n]+0x64)=0x45670000+n*16;
         g->mode.uiAnimations=(scenario.mask&32)?-7:0;g->mode.toolTips=scenario.mask&64;g->mode.uiSounds=scenario.mask&128;g->mode.uiVolume=scenario.volume;
         Gui(n)->keyboardDevice=(GUIInputDevice*)(0x56780000+n*16);Gui(n)->toolTipBold=123;Gui(n)->fontSizeOffset=0x3e800000;User(n)->userToolTip=(ToolTip*)world.tips[n];

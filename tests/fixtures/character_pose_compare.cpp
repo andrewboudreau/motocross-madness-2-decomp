@@ -26,12 +26,12 @@ float FastInvSqrt(float v) { return ((float(__cdecl*)(float))0x460c00)(v); }
 
 // The standalone TU also contains LoadVue, validated by a separate fixture.
 // Any accidental use of that unrelated path fails this playback test.
-UnknownResourceManager* g_ResourceManager;
+ResourceManager* g_ResourceManager;
 void* DebugMalloc(unsigned int,const char*,int) { ExitProcess(90); return 0; }
 void* DebugRealloc(void*,unsigned int,const char*,int) { ExitProcess(90); return 0; }
 void* operator new(unsigned int,const char*,int) { ExitProcess(90); return 0; }
 void operator delete(void*,const char*,int) { ExitProcess(90); }
-FileStream::FileStream(UnknownResourceManager*) { ExitProcess(90); }
+FileStream::FileStream(ResourceManager*) { ExitProcess(90); }
 FileStream::~FileStream() { ExitProcess(90); }
 int FileStream::Seek(int,int,int) { ExitProcess(90); return 0; }
 int FileStream::Open(const char*,const char*,int) { ExitProcess(90); return 0; }

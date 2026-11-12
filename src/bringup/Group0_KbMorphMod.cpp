@@ -21,7 +21,7 @@
 #include "DebugAlloc.h"
 #include "Parameterblocks.h"
 #include "TextureMap.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 
 static const char kMorphBastardModifierFile[] = "D:\\aardvark\\VC\\krusty2\\MorphBastardModifier.cpp";
 

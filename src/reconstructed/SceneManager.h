@@ -223,7 +223,7 @@ struct UnknownSceneFog {
 };
 
 // Scene's local manager has the same 0x18-byte layout and lifecycle.
-typedef UnknownResourceManager UnknownSceneResourceManager;
+typedef ResourceManager UnknownSceneResourceManager;
 
 // Name/value pair scanned by 0x004e9980.
 struct UnknownSceneKeyword {
@@ -346,7 +346,7 @@ public:
 
 
 // 0x004f0310: registers texture `name` with `manager` (see the definition).
-int AddResource(UnknownResourceManager* manager, const char* name, const char* path);
+int AddResource(ResourceManager* manager, const char* name, const char* path);
 // 0x004f0390: counts the textures of the model file `path` into counts[0..3]
 // (0x004f00e0), loading them through `resources`; not reconstructed.
 int CountModelTextures(const char* path, UnknownSceneResourceManager* resources, unsigned long* counts);

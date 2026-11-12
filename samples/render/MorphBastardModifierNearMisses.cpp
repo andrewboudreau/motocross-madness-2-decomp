@@ -99,7 +99,7 @@
 #include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/Parameterblocks.h"
 #include "../../src/reconstructed/TextureMap.h"
-#include "../../src/reconstructed/UnknownResourceManager.h"
+#include "../../src/reconstructed/ResourceEntry.h"
 
 // The channel's rigid inverse (0x004a33b0's second expansion): the same
 // transpose and negated translation as MorphBastardInvertRigid, through a

@@ -10,7 +10,7 @@
 #include "MemTag.h"
 #include "TextureMap.h"
 #include "TrackGame.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 
 // PCAudio.cpp: the DirectSound sound interface. Names are provisional; the
 // literal option names, the listener IID and the caps report's format string

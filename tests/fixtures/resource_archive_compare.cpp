@@ -20,15 +20,15 @@ struct Block { int size, alive; unsigned char bytes[1024]; };
 struct Observation {
     int result, exception, events, blocks;
     int trace[512][6];
-    unsigned char manager[sizeof(UnknownResourceManager)];
+    unsigned char manager[sizeof(ResourceManager)];
     Block heap[48];
 };
 static Scenario scenario;
 static Observation observed, referenceResult;
 static Block heap[48];
 static int blocks, reads, reallocs, entries, constructors, allocations;
-static UnknownResourceManager* manager;
-static union { double alignment; unsigned char bytes[sizeof(UnknownResourceManager)]; } managerStorage;
+static ResourceManager* manager;
+static union { double alignment; unsigned char bytes[sizeof(ResourceManager)]; } managerStorage;
 static unsigned char referenceSpace[0x200000];
 
 static void Event(int op, int a = 0, int b = 0, int c = 0, int d = 0, int e = 0) {
@@ -125,7 +125,7 @@ ResourceItem::~ResourceItem() {
     Event(9, Identity(this), Identity(name));
     Retire(name);
 }
-FileStream::FileStream(UnknownResourceManager* owner) {
+FileStream::FileStream(ResourceManager* owner) {
     Event(10, Identity(this), Identity(owner));
     if (scenario.throwKind == 2) throw 72;
     memset(this, 0, sizeof(*this));
@@ -164,7 +164,7 @@ int FileStream::Read(void* buffer, int size, int count) {
     Event(15, count, Hash(data, total));
     return count;
 }
-int UnknownResourceManager::MergeWithExisting(ResourceItem* item) {
+int ResourceManager::MergeWithExisting(ResourceItem* item) {
     int ordinal = entries++;
     Event(16, Identity(this), Identity(item), (item->name ? Hash(item->name, item->nameSize) : 0), item->offset, item->size);
     int merged = (scenario.mergeMask >> ordinal) & 1;
@@ -181,7 +181,7 @@ int UnknownResourceManager::MergeWithExisting(ResourceItem* item) {
 // Constructors cannot be addressed in C++; these test-only thiscall entry
 // points call the identical scripted constructors at the supplied address.
 struct ConstructorCalls {
-    FileStream* Stream(UnknownResourceManager* owner) {
+    FileStream* Stream(ResourceManager* owner) {
         return ::new(this) FileStream(owner);
     }
     ResourceItem* Item() { return ::new(this) ResourceItem; }
@@ -203,7 +203,7 @@ static DWORD Replacement(DWORD target) {
     case 0x460f50: return Address(&FileStream::Open);
     case 0x461640: return Address(&FileStream::Read);
     case 0x4a2ec0: return (DWORD)DebugRealloc;
-    case 0x4e8f40: return Address(&UnknownResourceManager::MergeWithExisting);
+    case 0x4e8f40: return Address(&ResourceManager::MergeWithExisting);
     case 0x536070: return (DWORD)_stricmp;
     case 0x53471a: return (DWORD)__CxxFrameHandler;
     }
@@ -259,7 +259,7 @@ static int MapReference(const char* path, const char* patchPath) {
 static void Run(int reference) {
     memset(&observed, 0, sizeof(observed)); memset(heap, 0, sizeof(heap));
     memset(managerStorage.bytes, 0, sizeof(managerStorage.bytes));
-    manager = (UnknownResourceManager*)managerStorage.bytes;
+    manager = (ResourceManager*)managerStorage.bytes;
     blocks = reads = reallocs = entries = constructors = allocations = 0;
     manager->itemCount = scenario.items; manager->itemCapacity = scenario.itemCapacity;
     manager->archiveCount = scenario.archives; manager->archiveCapacity = scenario.archiveCapacity;
@@ -278,8 +278,8 @@ static void Run(int reference) {
             manager->archives[j] = ::new(Allocate(sizeof(FileStream))) FileStream(manager);
     }
     observed.events = 0; constructors = allocations = 0;
-    union { FileStream* (UnknownResourceManager::*method)(const char*, int); DWORD address; } call;
-    call.method = &UnknownResourceManager::AddArchive;
+    union { FileStream* (ResourceManager::*method)(const char*, int); DWORD address; } call;
+    call.method = &ResourceManager::AddArchive;
     if (reference) call.address = 0x4e9030;
     try {
         observed.result = Identity((manager->*call.method)("C:\\game\\test.rs2", scenario.flags));

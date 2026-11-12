@@ -335,7 +335,7 @@ failed:
 // reads its header; 0 when it cannot be opened.
 UnknownTgaFile* OpenAndReadHeader(const char* path, UnknownTgaFile* file, int resources) {
     FileStream* stream =
-        new(__FILE__, 494) FileStream((UnknownResourceManager*)resources);
+        new(__FILE__, 494) FileStream((ResourceManager*)resources);
     if (!stream->Open(path, "rb", 0)) {
         delete stream;
         return 0;
@@ -604,7 +604,7 @@ int ReadTgaPixels16(UnknownTgaFile* file, FileStream* stream) {
 // its own path.
 UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* file, int resources) {
     FileStream* stream =
-        new(__FILE__, 567) FileStream((UnknownResourceManager*)resources);
+        new(__FILE__, 567) FileStream((ResourceManager*)resources);
     if (!stream->Open(path, "rb", 0)) {
         delete stream;
         return 0;

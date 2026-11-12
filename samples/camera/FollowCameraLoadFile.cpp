@@ -3,7 +3,7 @@
 #include "../../src/reconstructed/FollowCamera.h"
 #include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/TextureMap.h"
-#include "../../src/reconstructed/UnknownResourceManager.h"
+#include "../../src/reconstructed/ResourceEntry.h"
 #include "../../src/krusty2/math/Vec3.h"
 #include <stdio.h>
 #include <string.h>

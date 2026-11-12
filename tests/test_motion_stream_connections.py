@@ -46,7 +46,7 @@ class MotionStreamConnectionTests(unittest.TestCase):
                         if obj.symbol_by_index[r.symbol_index].section_number == 0}
 
             stream_calls = {
-                '??0FileStream@@QAE@PAVUnknownResourceManager@@@Z',
+                '??0FileStream@@QAE@PAVResourceManager@@@Z',
                 '??1FileStream@@QAE@XZ',
                 '?Open@FileStream@@QAEHPBD0H@Z',
                 '?SetBufferSize@FileStream@@QAEHH@Z',
@@ -54,11 +54,11 @@ class MotionStreamConnectionTests(unittest.TestCase):
                 '?ReadLine@FileStream@@QAEHPADH@Z',
             }
             resource_calls = {
-                '?g_ResourceManager@@3PAVUnknownResourceManager@@A',
-                '?FindItem@UnknownResourceManager@@QAEPAVResourceItem@@PBDH@Z',
-                '?FindItemByObject@UnknownResourceManager@@QAEPAXPAX@Z',
-                '?SetItemObject@UnknownResourceManager@@QAEXPAX0@Z',
-                '?AddLooseFile@UnknownResourceManager@@QAEHPBD0@Z',
+                '?g_ResourceManager@@3PAVResourceManager@@A',
+                '?FindItem@ResourceManager@@QAEPAVResourceItem@@PBDH@Z',
+                '?FindItemByObject@ResourceManager@@QAEPAXPAX@Z',
+                '?SetItemObject@ResourceManager@@QAEXPAX0@Z',
+                '?AddLooseFile@ResourceManager@@QAEHPBD0@Z',
             }
             parameter_calls = {
                 '??0UnknownParameterBlock@@QAE@XZ',
@@ -84,9 +84,9 @@ class MotionStreamConnectionTests(unittest.TestCase):
                 seek,
                 '?Tell@FileStream@@QAEHXZ',
                 '?ReadLine@FileStream@@QAEHPADH@Z',
-                '?FindItem@UnknownResourceManager@@QAEPAVResourceItem@@PBDH@Z',
-                '?AddArchive@UnknownResourceManager@@QAEPAVFileStream@@PBDH@Z',
-                '?AddLooseFile@UnknownResourceManager@@QAEHPBD0@Z',
+                '?FindItem@ResourceManager@@QAEPAVResourceItem@@PBDH@Z',
+                '?AddArchive@ResourceManager@@QAEPAVFileStream@@PBDH@Z',
+                '?AddLooseFile@ResourceManager@@QAEHPBD0@Z',
             }
             self.assertTrue(parameter_dependencies <= imports(objects['parameters']))
             # AddArchive is supplied by the explicitly reviewed nonexact

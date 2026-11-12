@@ -42,7 +42,7 @@
 #include "../../src/reconstructed/MemTag.h"
 #include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/TrackGame.h"
-#include "../../src/reconstructed/UnknownResourceManager.h"
+#include "../../src/reconstructed/ResourceEntry.h"
 
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 

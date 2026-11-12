@@ -1266,7 +1266,7 @@ int CountTexture(UnknownSceneTextureInfo* texture, int* counts)
 // 0x004f0310: registers `name` with `manager`, taking it over from the
 // global manager when that has it, else loading it from `path`; 0 when
 // `manager` already has it.
-int AddResource(UnknownResourceManager* manager, const char* name, const char* path)
+int AddResource(ResourceManager* manager, const char* name, const char* path)
 {
     UnknownResourceEntry* global = g_ResourceManager->FindItem(name, 0);
     if (!manager->FindItem(name, 0)) {

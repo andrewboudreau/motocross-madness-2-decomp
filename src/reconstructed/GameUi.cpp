@@ -28,7 +28,7 @@
 #include "Tgafile.h"
 #include "TrackGame.h"
 #include "UIDialog.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 
 // The four vector constants that open many retail files (see
 // src/krusty2/math/Math3D.h): 0x0065b568, 0x0065b578, 0x0065b590 and
@@ -1091,7 +1091,7 @@ UIFrame::UIFrame(void* module, int id, void* textures, int soundGroup, int skip,
         frameSound = 0;
         frameTextures = (int)textures;
         UnknownResourceEntry* entry =
-            ((UnknownResourceManager*)id)->FindItem((const char*)module, 1);
+            ((ResourceManager*)id)->FindItem((const char*)module, 1);
         if (!LoadFromStream(entry->archive, entry->offset, palette) && soundGroup) {
             LoadEntrySound((SoundGroup*)soundGroup, (const char*)module, 1, 3, duplicates, -1);
             ownsSound = 1;

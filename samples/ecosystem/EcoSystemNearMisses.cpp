@@ -134,7 +134,7 @@
 #include "../../src/reconstructed/D3DConstants.h"
 #include "../../src/reconstructed/Parameterblocks.h"
 #include "../../src/reconstructed/TypeRegistry.h"
-#include "../../src/reconstructed/UnknownResourceManager.h"
+#include "../../src/reconstructed/ResourceEntry.h"
 #include "../../src/reconstructed/bmpfile.h"
 #include "../../src/reconstructed/Tgafile.h"
 

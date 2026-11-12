@@ -55,7 +55,7 @@
 #include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/TextureMapManager.h"
 #include "../../src/reconstructed/TrackGame.h"
-#include "../../src/reconstructed/UnknownResourceManager.h"
+#include "../../src/reconstructed/ResourceEntry.h"
 
 // 0x0059af10: an object count the memory estimate weighs at 0x2aaaa bytes.
 extern int g_UnknownGlobal59af10;

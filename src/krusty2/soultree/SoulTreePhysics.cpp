@@ -1113,8 +1113,8 @@ struct SoultreeGlobals {
     char field_0x000[0x574];
     UnknownTrackGameObject574* field_0x574;
 };
-class UnknownResourceManager;
-extern UnknownResourceManager* g_ResourceManager; // pointer stored at 0x00572b44
+class ResourceManager;
+extern ResourceManager* g_ResourceManager; // pointer stored at 0x00572b44
 
 // SoultreePhysicsObject slot 40 (0x00503970, `ret 0x70`).  Loads the model through the
 // D3DIM object base (slot 9) and runs the physics setup (slot 2).  If the ".col" file is

@@ -1,5 +1,5 @@
 {
-  "??0FileStream@@QAE@PAVUnknownResourceManager@@@Z": "0x00460d10",
+  "??0FileStream@@QAE@PAVResourceManager@@@Z": "0x00460d10",
   "??1FileStream@@QAE@XZ": "0x00460d60",
   "??2@YAPAXIPBDH@Z": "0x004a3010",
   "??3@YAXPAX@Z": "0x004a30c0",
@@ -11,7 +11,7 @@
   "?Seek@FileStream@@QAEHHHH@Z": "0x00461340",
   "?ReadLine@FileStream@@QAEHPADH@Z": "0x00461aa0",
   "?LoadCameraFile@FollowCamera@@QAEXPBD@Z$ehhandler": "0x0054abba",
-  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVResourceManager@@A": "0x00572b44",
   "__FILE__": "0x0056b220",
   "__FILE__:followcameranearmisses.cpp": "0x0056b220",
   "__strnicmp": "0x005476f0",

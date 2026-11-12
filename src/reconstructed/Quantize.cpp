@@ -3,7 +3,7 @@
 #include "DebugAlloc.h"
 #include "Lzw.h"
 #include "TextureMap.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 
 // 0x004dddd0
 ColorMapper* ColorMapper::LoadShared(const char* name) {

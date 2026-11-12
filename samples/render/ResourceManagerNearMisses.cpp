@@ -25,7 +25,7 @@
 #include "../../src/reconstructed/FileStream.h"
 
 // 0x004e9030
-FileStream* UnknownResourceManager::AddArchive(const char* path, int flags)
+FileStream* ResourceManager::AddArchive(const char* path, int flags)
 {
     int count;
     char magic[4];

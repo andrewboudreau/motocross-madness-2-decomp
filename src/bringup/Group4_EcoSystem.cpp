@@ -32,7 +32,7 @@
 #include "../reconstructed/D3DConstants.h"
 #include "../reconstructed/Parameterblocks.h"
 #include "../reconstructed/TypeRegistry.h"
-#include "../reconstructed/UnknownResourceManager.h"
+#include "../reconstructed/ResourceEntry.h"
 #include "../reconstructed/bmpfile.h"
 #include "../reconstructed/Tgafile.h"
 

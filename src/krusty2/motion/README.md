@@ -29,7 +29,7 @@ Open and SetBufferSize return integers; their results remain unused where
 the motion loaders originally declared them void.
 
 D3DIMSoultreeMotnctrl's former `OwnerRegistry` and `OwnerEntry` views are
-replaced by `UnknownResourceManager` and `ResourceItem` from ResourceManager.h:
+replaced by `ResourceManager` and `ResourceItem` from ResourceManager.h:
 the same pointer at `0x00572b44`, object field at entry `+0x10`, and
 BaseObject subobject at offset zero. FindItem (`0x004e9360`),
 FindItemByObject (`0x004e93f0`), SetItemObject (`0x004e9010`) and

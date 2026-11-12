@@ -5,11 +5,11 @@
 // The stream textures load from: 0x00461600 returns the read position,
 // 0x00461640 reads `count` items of `size` bytes and returns how many it
 // read. Both follow +0x1c to the innermost stream first.
-class UnknownResourceManager;
+class ResourceManager;
 
 class FileStream {
 public:
-    FileStream(UnknownResourceManager* manager);              // 0x00460d10
+    FileStream(ResourceManager* manager);              // 0x00460d10
     ~FileStream();                  // 0x00460d60
     int Open(const char* path, const char* mode, int encoded); // 0x00460f50: opens `path`
     int Seek(int offset, int origin, int flag); // 0x00461340: seeks
@@ -91,7 +91,7 @@ public:
     char readBuffer[0x124 - 0x21];            // +0x21 read buffer
     char* bufferPos;                          // +0x124 buffer position
     char* bufferEnd;                          // +0x128 buffer end
-    UnknownResourceManager* archives;         // +0x12c the archives (constructor argument)
+    ResourceManager* archives;         // +0x12c the archives (constructor argument)
     int sliceOffset;                          // +0x130 start offset in the inner stream
 };
 

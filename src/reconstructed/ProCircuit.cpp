@@ -7,7 +7,7 @@
 #include "SelectGamePicProcs.h"
 #include "TextureMap.h"
 #include "TrackGame.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 #include "MatrixUtil.h"
 #include "DebugAlloc.h"
 

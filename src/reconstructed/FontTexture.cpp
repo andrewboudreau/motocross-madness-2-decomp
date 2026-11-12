@@ -5,7 +5,7 @@
 #include "DebugAlloc.h"
 #include "TextureMap.h"
 #include "TrackOverlay.h"
-#include "UnknownResourceManager.h"
+#include "ResourceEntry.h"
 
 UnknownFontTextureManager FontTexture::s_UnknownManager65b478;
 
