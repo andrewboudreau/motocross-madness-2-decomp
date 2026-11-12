@@ -265,15 +265,6 @@ public:
 
     unsigned char field_0x2c[0xcc4 - 0x2c];
 };
-class UnknownQuarryEcoSystem : public GameObject {
-public:
-    explicit UnknownQuarryEcoSystem(int flags);                // 0x00457250
-    EcoSystem* Create(void* target, TextureMapManager* manager, UnknownTerrain* terrain,
-                                     LightManager* lights, UnknownSceneEnvironment* environment,
-                                     FileStream* stream, int format, int a, int level);
-
-    unsigned char field_0x2c[0x5c4 - 0x2c];
-};
 
 // The last race object (0x48 bytes).
 class UnknownQuarryRaceObject : public GameObject {
@@ -640,9 +631,10 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                                                                            "rb", 0)) {
         sprintf(text, "No Ecosystem found in env file.  Ecosystem not created.\n");
     } else {
-        ecoSystem = (new(__FILE__, 870) UnknownQuarryEcoSystem(1))
-                         ->Create(renderContext, g_TrackGame->textureManager, eventTerrain, lightManager,
-                                                 eventScene->environment, stream, 0x115c,
+        ecoSystem = (new(__FILE__, 870) EcoSystem(1))
+                         ->Create(renderContext, g_TrackGame->textureManager,
+                                                 (UnknownEcoTerrain*)eventTerrain, lightManager,
+                                                 (char*)eventScene->environment, stream, 0x115c,
                                                  g_TrackGame->mode.raceSettings.treeCollision,
                                                  g_TrackGame->mode.videoSettings[1]);
         if (!ecoSystem)

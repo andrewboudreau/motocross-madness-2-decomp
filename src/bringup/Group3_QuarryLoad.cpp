@@ -14,8 +14,8 @@
 //     (new, EH state, null test, constructor), declared over the views' storage;
 //   * the fog objects use Fog.h's Fog/FogOff/FogOn directly; FogOn's folded Create
 //     (0x00486a10) is defined at the end of this file and called, as retail calls it;
-//   * SkyCube.h can share this unit, so the sky cube is created and loaded through
-//     SkyCube itself;
+//   * SkyCube.h can share this unit and QuarryEvent.h declares EcoSystem::Create, so the
+//     sky cube and the ecosystem are created and loaded through their own classes;
 //   * the memory estimate reads EcoSystem.cpp's preloaded-texture count (0x0059af10).
 // Linked score 0.985, 2208 instructions against retail's 2208 (was 0.908 at 2101: the
 // out-of-line G3Q_New* allocation helpers dropped retail's inline new/EH/null-test/
@@ -256,15 +256,6 @@ public:
                          const char* detailTexture, int c);
 
     unsigned char field_0x2c[0xcc4 - 0x2c];
-};
-class UnknownQuarryEcoSystem : public GameObject {
-public:
-    explicit UnknownQuarryEcoSystem(int flags);                // 0x00457250
-    EcoSystem* Create(void* target, TextureMapManager* manager, UnknownTerrain* terrain,
-                                     LightManager* lights, UnknownSceneEnvironment* environment,
-                                     FileStream* stream, int format, int a, int level);
-
-    unsigned char field_0x2c[0x5c4 - 0x2c];
 };
 
 // The last race object (0x48 bytes).
@@ -669,9 +660,10 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                                                                            "rb", 0)) {
         sprintf(text, "No Ecosystem found in env file.  Ecosystem not created.\n");
     } else {
-        ecoSystem = ((UnknownQuarryEcoSystem*)new(__FILE__, 870) EcoSystem(1))
-                         ->Create(renderContext, g_TrackGame->textureManager, eventTerrain, lightManager,
-                                                 eventScene->environment, stream, 0x115c,
+        ecoSystem = (new(__FILE__, 870) EcoSystem(1))
+                         ->Create(renderContext, g_TrackGame->textureManager,
+                                                 (UnknownEcoTerrain*)eventTerrain, lightManager,
+                                                 (char*)eventScene->environment, stream, 0x115c,
                                                  g_TrackGame->mode.raceSettings.treeCollision,
                                                  g_TrackGame->mode.videoSettings[1]);
         if (!ecoSystem)
@@ -979,14 +971,6 @@ UnknownTerrain* UnknownQuarryTerrainObject::Load(void* target, FileStream* strea
                                                  const char* detailTexture, int c)
 {
     return (UnknownTerrain*)G3Q_TerrainLoad(this, target, stream, a, textures, level, b, detailTexture, c);
-}
-
-EcoSystem* UnknownQuarryEcoSystem::Create(void* target, TextureMapManager* manager, UnknownTerrain* terrain,
-                                          LightManager* lights, UnknownSceneEnvironment* environment,
-                                          FileStream* stream, int format, int a, int level)
-{
-    return (EcoSystem*)G3Q_EcoSystemCreate(this, target, manager, terrain, lights, environment, stream, format,
-                                           a, level);
 }
 
 void UnknownQuarryRaceObject::InsertNodesInQuadtree() { G3Q_QuadTreeRendererInsertNodes(this); }

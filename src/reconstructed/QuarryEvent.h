@@ -14,7 +14,9 @@ class RadarOverlay;
 class RenderTarget;
 class Scene;
 class StatsOverlay;
+class TextureMapManager;
 class TextQueueOverlay;
+class UnknownEcoTerrain;
 class UnknownTerrain;
 class FileStream;
 struct UnknownKrustyBikeView;
@@ -67,6 +69,9 @@ public:
 class EcoSystem {
 public:
     explicit EcoSystem(int flags);      // 0x00457250
+    EcoSystem* Create(void* view, TextureMapManager* textures, UnknownEcoTerrain* terrain,
+                      LightManager* lights, char* environment, FileStream* stream, int format,
+                      int collisions, int level); // 0x004594d0
     void SetDetailLevel(int level);    // 0x004594c0: detail level
     void LightingChanged();             // 0x0045a9a0: lighting changed
 private:

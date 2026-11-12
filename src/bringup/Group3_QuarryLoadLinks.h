@@ -38,11 +38,6 @@ void G3Q_CollisionSetIgnoreListMode(void* collision, int mode);                 
 void G3Q_CollisionAddIgnoredOwner(void* collision, void* owner);                 // 0x00439410
 void G3Q_CollisionSetOwner(void* collision, void* owner, int tag);               // 0x004394d0
 
-// Group3_QuarryLinkEco.cpp
-void* G3Q_EcoSystemCreate(void* eco, void* target, void* textureManager, void* terrain,
-                          void* lights, void* environment, void* stream, int format,
-                          int collisions, int level);                            // 0x004594d0
-
 // Group3_QuarryLinkRace.cpp
 void* G3Q_BikeRaceCreate(void* race, void* target, void* particles, void* lights,
                          void* textures, void* terrain, void* camera, void* scene,
