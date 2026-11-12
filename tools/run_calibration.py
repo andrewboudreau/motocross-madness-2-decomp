@@ -5497,7 +5497,7 @@ CASES = [
         'name': 'PCAudio Sound query 3D buffer 0x4bd6e0',
         'bindings': 'src/reconstructed/PCAudio.bindings.json',
         'source': 'src/reconstructed/PCAudio.cpp',
-        'symbol': '?Query3DBuffer@Sound@@QAEHPAUDirectSoundBuffer@@PAPAUUnknownS',
+        'symbol': '?Query3DBuffer@Sound@@QAEHPAUDirectSoundBuffer@@PAPAUDirectS',
         'target_va': '0x004bd6e0',
         'target_size': 40,
         'reason': 'goto failed shares the failure exit',
