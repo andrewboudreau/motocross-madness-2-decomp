@@ -180,7 +180,7 @@ with `tools/frame_layout.py OBJ --dump`. "Nearest esp" is the lowest address
   can make the instruction order differ from it.
 - For a `struct` local whose inlined methods read many fields through
   `this`, the measured instruction count (124 for the resource parser's
-  `UnknownParameterBlock parameters`) is far above what its slot implies
+  `ParameterBlock parameters`) is far above what its slot implies
   (between 7 and 16 uses of a 0x80 buffer at 0x5c4 bytes); the compiler's
   count for such members is not pinned down.
 - Small-frame ordering (fact 5) and the exact tie rule among more than two

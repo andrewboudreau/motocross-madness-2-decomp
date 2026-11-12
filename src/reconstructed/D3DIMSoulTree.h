@@ -33,7 +33,7 @@ class LightManager;
 class RenderTarget;
 class SoultreeMaterial;
 class TextureMapManager;
-class UnknownParameterBlock;
+class ParameterBlock;
 class FileStream;
 
 // RTTI QuadTreeObject (vtable 0x005511c4: 0x004dc610 `or ax, 0xffff; ret`,
@@ -124,7 +124,7 @@ public:
     int subtreeDirty;                          // +0x18c subtree bounds dirty (set up the parent chain by 0x004fdab0)
     int field_0x190;                           // slot 12 tests it before the visibility test
     unsigned char field_0x194[0x1a0 - 0x194];
-    UnknownParameterBlock* parameterBlock;     // .slt reader
+    ParameterBlock* parameterBlock;     // .slt reader
 };
 
 // One 0x20-byte vertex in the D3DLVERTEX layout (drawn with FVF 0x1e2):

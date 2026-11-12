@@ -38,10 +38,10 @@ void ParameterValueToString(UnknownParameterValue value, char* out);
 
 // 0x5c4 bytes (operator new(0x5c4) at 0x004458b5). No vtable; callers
 // `delete` it through 0x004b7190 and the plain operator delete.
-class UnknownParameterBlock {
+class ParameterBlock {
 public:
-    UnknownParameterBlock();                         // 0x004b7130
-    ~UnknownParameterBlock();                        // 0x004b7190
+    ParameterBlock();                         // 0x004b7130
+    ~ParameterBlock();                        // 0x004b7190
     // 0x004b7220: opens `name` through the stream's archives, else the stream itself.
     void OpenFromArchives(UnknownParameterStream* stream, const char* name,
                                const char* path, int index);

@@ -43,7 +43,7 @@ seven partial-sample checks also remain exact. The COFF regression
 `tests/test_motion_stream_connections.py` verifies that the real callers
 reference symbols supplied by the stream and resource objects.
 
-The former `SltFile` view now uses `UnknownParameterBlock` from
+The former `SltFile` view now uses `ParameterBlock` from
 `Parameterblocks.h`. The loader allocates the same `0x5c4` bytes, calls its
 constructor at `0x004b7130`, attaches the stream at `0x004b77a0`, reads the
 same section/key strings and destroys it through `0x004b7190`. These lifecycle

@@ -2,7 +2,7 @@
 (tools/emu_diff.py case, call-record/replay mode).
 
 The linked body is src/bringup/Group0_KbMorphMod.cpp. The .mbf file is a parameter-block file
-read through UnknownParameterBlock: SelectSection 0x004b78f0, GetInt 0x004b7f10, ReadString
+read through ParameterBlock: SelectSection 0x004b78f0, GetInt 0x004b7f10, ReadString
 0x004b7b30, ReadFloat 0x004b7e70 (answers whether the key exists), BeginRows 0x004b7f70,
 ReadRow 0x004b8010, GetRowInt 0x004b8180 and GetRowFloat 0x004b81c0. Each run builds a synthetic
 file: NumberOfMorphBastards (0..3, negative, missing), per object an ObjectName (known, unknown

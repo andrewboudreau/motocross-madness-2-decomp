@@ -245,7 +245,7 @@ void SoultreeMaterial::LoadTexture()
 }
 
 // 0x004ff9e0
-void SoultreeMaterial::ReadKeys(UnknownParameterBlock* block, int load)
+void SoultreeMaterial::ReadKeys(ParameterBlock* block, int load)
 {
     char value[128];
     textureName[0] = 0;

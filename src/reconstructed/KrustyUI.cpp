@@ -674,7 +674,7 @@ void KrustyUI::OpenExitDialog() {
 // 0x0049a540: reads presets.pb's garage tables, or sets the defaults.
 void KrustyUI::LoadGarageTables() {
     char key[128];
-    UnknownParameterBlock block;
+    ParameterBlock block;
     FileStream* stream = new(__FILE__, 851) FileStream(g_ResourceManager);
     if (stream->Open("presets.pb", "r", 0)) {
         block.Attach((UnknownParameterStream*)stream, 0, 1);
@@ -729,7 +729,7 @@ void KrustyUI::LoadGarageTables() {
 // that puts the manufacturer index below the bike count, as retail has it.
 void KrustyUI::LoadBikesAndRiders() {
     char key[256];
-    UnknownParameterBlock block;
+    ParameterBlock block;
     FileStream* stream = new(__FILE__, 913) FileStream(g_ResourceManager);
     if (manufacturers)
         DebugFree(manufacturers, __FILE__, 918);

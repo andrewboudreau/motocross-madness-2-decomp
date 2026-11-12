@@ -147,7 +147,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     char key[0x50];
     char section[0x50];
     char file[0x50];
-    UnknownParameterBlock parameters;
+    ParameterBlock parameters;
     UnknownEventRacer* racer;
     int i;
     int k;

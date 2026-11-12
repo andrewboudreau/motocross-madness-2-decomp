@@ -61,14 +61,14 @@ class MotionStreamConnectionTests(unittest.TestCase):
                 '?AddLooseFile@ResourceManager@@QAEHPBD0@Z',
             }
             parameter_calls = {
-                '??0UnknownParameterBlock@@QAE@XZ',
-                '??1UnknownParameterBlock@@QAE@XZ',
-                '?Attach@UnknownParameterBlock@@QAEXPAVFileStream@@HH@Z',
-                '?SelectSection@UnknownParameterBlock@@QAEHPBD@Z',
-                '?ReadString@UnknownParameterBlock@@QAEHPBDPADH@Z',
-                '?GetString@UnknownParameterBlock@@QAEHPBD0PADH@Z',
-                '?GetInt@UnknownParameterBlock@@QAEHPBDHPAH@Z',
-                '?GetFloat@UnknownParameterBlock@@QAEHPBDMPAM@Z',
+                '??0ParameterBlock@@QAE@XZ',
+                '??1ParameterBlock@@QAE@XZ',
+                '?Attach@ParameterBlock@@QAEXPAVFileStream@@HH@Z',
+                '?SelectSection@ParameterBlock@@QAEHPBD@Z',
+                '?ReadString@ParameterBlock@@QAEHPBDPADH@Z',
+                '?GetString@ParameterBlock@@QAEHPBD0PADH@Z',
+                '?GetInt@ParameterBlock@@QAEHPBDHPAH@Z',
+                '?GetFloat@ParameterBlock@@QAEHPBDMPAM@Z',
             }
             motion_imports = imports(objects['motion']) | imports(objects['d3d'])
             self.assertTrue(stream_calls | resource_calls | parameter_calls <= motion_imports)

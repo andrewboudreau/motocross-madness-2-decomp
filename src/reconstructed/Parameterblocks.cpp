@@ -108,7 +108,7 @@ void ParameterValueToString(UnknownParameterValue value, char* out)
     }
 }
 
-UnknownParameterBlock::UnknownParameterBlock()
+ParameterBlock::ParameterBlock()
 {
     blockStream = 0;
     field_0x004 = 0;
@@ -131,7 +131,7 @@ UnknownParameterBlock::UnknownParameterBlock()
 
 // Tier 2: callers `delete` the block by calling this and then the plain
 // operator delete (for example 0x00445931).
-UnknownParameterBlock::~UnknownParameterBlock()
+ParameterBlock::~ParameterBlock()
 {
     FreeLines();
     if (sectionTable) {
@@ -153,7 +153,7 @@ UnknownParameterBlock::~UnknownParameterBlock()
 // The found call is written out in both branches: VC6 cross-jumps the two
 // copies into retail's single block, and the extra source reference of `this`
 // is what gives it ebx and `path` ebp (one copy swaps the two registers).
-void UnknownParameterBlock::OpenFromArchives(UnknownParameterStream* stream,
+void ParameterBlock::OpenFromArchives(UnknownParameterStream* stream,
                                                   const char* name, const char* path,
                                                   int index)
 {
@@ -180,7 +180,7 @@ void UnknownParameterBlock::OpenFromArchives(UnknownParameterStream* stream,
 // Scans forward for `[name]` and loads the section's non-empty,
 // non-comment lines. `lines` must be cleared before the line count and
 // capacity: other orders let VC6 keep a zero register for the whole function.
-int UnknownParameterBlock::ScanSection(const char* name)
+int ParameterBlock::ScanSection(const char* name)
 {
     char stripped[PB_LINE_SIZE];
     char line[PB_LINE_SIZE];
@@ -238,7 +238,7 @@ int UnknownParameterBlock::ScanSection(const char* name)
 
 // Records every new `[header]`: its stream position, mode byte and, once the
 // next header (or the end) is seen, its line count.
-void UnknownParameterBlock::IndexSections(UnknownParameterStream* stream)
+void ParameterBlock::IndexSections(UnknownParameterStream* stream)
 {
     char header[PB_LINE_SIZE];
     char stripped[PB_LINE_SIZE];
@@ -281,7 +281,7 @@ void UnknownParameterBlock::IndexSections(UnknownParameterStream* stream)
             lineIndex - sectionTable[sectionCount - 1].lineCount - 1;
 }
 
-void UnknownParameterBlock::Attach(UnknownParameterStream* stream, int offset,
+void ParameterBlock::Attach(UnknownParameterStream* stream, int offset,
                                                   int index)
 {
     fileOffset = offset;
@@ -300,7 +300,7 @@ void UnknownParameterBlock::Attach(UnknownParameterStream* stream, int offset,
     readingRows = 0;
 }
 
-int UnknownParameterBlock::FindSection(const char* name)
+int ParameterBlock::FindSection(const char* name)
 {
     for (int i = 0; i < sectionCount; i++) {
         if (_stricmp(name, sectionTable[i].name) == 0)
@@ -309,7 +309,7 @@ int UnknownParameterBlock::FindSection(const char* name)
     return -1;
 }
 
-void UnknownParameterBlock::FreeLines()
+void ParameterBlock::FreeLines()
 {
     for (int i = 0; i < loadedLineCount; i++)
         delete loadedLines[i];
@@ -320,7 +320,7 @@ void UnknownParameterBlock::FreeLines()
 
 // Without an index it rewinds and scans; with one it seeks to the section
 // and reads its recorded line count.
-int UnknownParameterBlock::SelectSection(const char* name)
+int ParameterBlock::SelectSection(const char* name)
 {
     char stripped[PB_LINE_SIZE];
     char line[PB_LINE_SIZE];
@@ -362,7 +362,7 @@ int UnknownParameterBlock::SelectSection(const char* name)
 // Looks `key` up among the loaded `key=value` lines, strips one pair of
 // quotes and copies at most `size` characters (-1: unbounded). The clamps
 // need the length in its own local and the limit first in the min.
-int UnknownParameterBlock::ReadString(const char* key, char* out, int size)
+int ParameterBlock::ReadString(const char* key, char* out, int size)
 {
     char text[PB_LINE_SIZE];
     char name[PB_LINE_SIZE];
@@ -399,7 +399,7 @@ int UnknownParameterBlock::ReadString(const char* key, char* out, int size)
     return 0;
 }
 
-int UnknownParameterBlock::ReadInt(const char* key, int* out)
+int ParameterBlock::ReadInt(const char* key, int* out)
 {
     char* end;
     char text[PB_LINE_SIZE];
@@ -435,7 +435,7 @@ int UnknownParameterBlock::ReadInt(const char* key, int* out)
     return 0;
 }
 
-int UnknownParameterBlock::ReadFloat(const char* key, float* out)
+int ParameterBlock::ReadFloat(const char* key, float* out)
 {
     char text[PB_LINE_SIZE];
 
@@ -446,7 +446,7 @@ int UnknownParameterBlock::ReadFloat(const char* key, float* out)
     return 0;
 }
 
-int UnknownParameterBlock::GetString(const char* key, const char* def, char* out,
+int ParameterBlock::GetString(const char* key, const char* def, char* out,
                                                  int size)
 {
     if (ReadString(key, out, size))
@@ -455,7 +455,7 @@ int UnknownParameterBlock::GetString(const char* key, const char* def, char* out
     return 0;
 }
 
-int UnknownParameterBlock::GetInt(const char* key, int def, int* out)
+int ParameterBlock::GetInt(const char* key, int def, int* out)
 {
     if (ReadInt(key, out))
         return 1;
@@ -463,7 +463,7 @@ int UnknownParameterBlock::GetInt(const char* key, int def, int* out)
     return 0;
 }
 
-int UnknownParameterBlock::GetFloat(const char* key, float def, float* out)
+int ParameterBlock::GetFloat(const char* key, float def, float* out)
 {
     if (ReadFloat(key, out))
         return 1;
@@ -472,7 +472,7 @@ int UnknownParameterBlock::GetFloat(const char* key, float def, float* out)
 }
 
 // Retail looks the section up twice and uses the first result.
-int UnknownParameterBlock::BeginRows(const char* name)
+int ParameterBlock::BeginRows(const char* name)
 {
     int index = FindSection(name);
     if (FindSection(name) != -1) {
@@ -485,7 +485,7 @@ int UnknownParameterBlock::BeginRows(const char* name)
     return 0;
 }
 
-int UnknownParameterBlock::ReadRow(char* raw)
+int ParameterBlock::ReadRow(char* raw)
 {
     char line[PB_LINE_SIZE];
     char stripped[PB_LINE_SIZE];
@@ -519,7 +519,7 @@ int UnknownParameterBlock::ReadRow(char* raw)
 
 // The int and float getters accept index == count; the string getter does
 // not (retail's `jle` and `jl`).
-int UnknownParameterBlock::GetRowInt(int index, int* out)
+int ParameterBlock::GetRowInt(int index, int* out)
 {
     if (index > valueCount)
         return 0;
@@ -527,7 +527,7 @@ int UnknownParameterBlock::GetRowInt(int index, int* out)
     return 1;
 }
 
-int UnknownParameterBlock::GetRowFloat(int index, float* out)
+int ParameterBlock::GetRowFloat(int index, float* out)
 {
     if (index > valueCount)
         return 0;
@@ -535,7 +535,7 @@ int UnknownParameterBlock::GetRowFloat(int index, float* out)
     return 1;
 }
 
-int UnknownParameterBlock::GetRowString(int index, char* out)
+int ParameterBlock::GetRowString(int index, char* out)
 {
     if (index >= valueCount)
         return 0;
@@ -543,7 +543,7 @@ int UnknownParameterBlock::GetRowString(int index, char* out)
     return 1;
 }
 
-int UnknownParameterBlock::GetSectionNames(char* out, int size)
+int ParameterBlock::GetSectionNames(char* out, int size)
 {
     int total = 0;
     char* cursor = out;
@@ -563,7 +563,7 @@ int UnknownParameterBlock::GetSectionNames(char* out, int size)
 
 // Drops blanks outside brackets and quotes. The declaration order puts
 // `length` in the dead `in` slot, as retail does.
-void UnknownParameterBlock::StripBlanks(const char* in, char* out)
+void ParameterBlock::StripBlanks(const char* in, char* out)
 {
     int count = 0;
     int quoted = 0;

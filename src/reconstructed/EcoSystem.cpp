@@ -168,7 +168,7 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
         FileStream* stream = new(__FILE__, 0xc0) FileStream(g_ResourceManager);
         if (stream->Open(path, "r", 0)) {
             int lod;
-            UnknownParameterBlock* block = new(__FILE__, 0xc2) UnknownParameterBlock;
+            ParameterBlock* block = new(__FILE__, 0xc2) ParameterBlock;
             block->Attach((UnknownParameterStream*)stream, 0, 1);
             block->SelectSection("Material - 0");
             block->ReadString("TextureMap", path, -1);
@@ -1224,7 +1224,7 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, FileStream* stream
                 strcat(sltName, ".slt");
                 FileStream* sltStream = new(__FILE__, 0xb50) FileStream(g_ResourceManager);
                 if (sltStream->Open(sltName, "r", 0)) {
-                    UnknownParameterBlock* block = new(__FILE__, 0xb52) UnknownParameterBlock;
+                    ParameterBlock* block = new(__FILE__, 0xb52) ParameterBlock;
                     block->Attach((UnknownParameterStream*)sltStream, 0, 1);
                     block->SelectSection("Material - 0");
                     block->ReadString("TextureMap", sltName, -1);

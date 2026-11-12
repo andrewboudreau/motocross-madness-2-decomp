@@ -198,7 +198,7 @@ void UnknownTrackGameObject574::ReadSceneName(char* out, char* name, int index,
         else
             strncpy(scene, name, 0x3f);
         sprintf(path, "%s\\%s", sceneDirectory, scene);
-        UnknownParameterBlock block;
+        ParameterBlock block;
         FileStream* archive = OpenSceneArchive(scene);
         if (archive) {
             archive->GetFileTimes(a, b);
@@ -249,7 +249,7 @@ void UnknownTrackGameObject574::ReadCurrentSceneName(char* name, char* scene, in
 
     if (sceneDirectory[0]) {
         sprintf(path, "%s\\%s", sceneDirectory, scene);
-        UnknownParameterBlock block;
+        ParameterBlock block;
         block.OpenFromArchives((UnknownParameterStream*)OpenSceneArchive(0), scene, path, 1);
         block.SelectSection("SceneInfo");
         block.GetInt("NumberOfWaypointRaces", 0, &waypointRaceCount);
@@ -468,7 +468,7 @@ int Scene::RestartEntry(int index, float time, int force, int motion)
 
 // 0x004eb160
 int Scene::ReadVector(Vector3* out, const char* section, const char* key,
-                                 const char* def, int useDefault, UnknownParameterBlock* block)
+                                 const char* def, int useDefault, ParameterBlock* block)
 {
     char value[0x184];
 
@@ -502,7 +502,7 @@ int Scene::ReadVector(Vector3* out, const char* section, const char* key,
 
 // 0x004eb300
 int Scene::ReadColor(unsigned long* out, const char* section, const char* key,
-                                 const char* def, int, UnknownParameterBlock* block)
+                                 const char* def, int, ParameterBlock* block)
 {
     char value[0x184];
 
@@ -532,7 +532,7 @@ int Scene::ReadColor(unsigned long* out, const char* section, const char* key,
 
 // 0x004eb480
 int Scene::ReadFlags(char* out, int count, const char* section, const char* key,
-                                 const char* def, int, UnknownParameterBlock* block)
+                                 const char* def, int, ParameterBlock* block)
 {
     char value[0x184];
 
@@ -1401,7 +1401,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
     }
     FileStream* stream = new(__FILE__, 3622) FileStream(g_ResourceManager);
     stream->Open(name, "rb", 0);
-    UnknownParameterBlock block;
+    ParameterBlock block;
     block.Attach((UnknownParameterStream*)stream, 0, 1);
     block.SelectSection("Materials");
     block.GetInt("NumberOfMaterials", 0, &materials);
@@ -1483,7 +1483,7 @@ int Scene::ResolveSltPath(char* path)
         }
     }
     stream->Open(name, "rb", 0);
-    UnknownParameterBlock block;
+    ParameterBlock block;
     block.Attach((UnknownParameterStream*)stream, 0, 1);
     block.SelectSection("General info");
     if (!block.ReadString("SLTFile", sltFile, -1)) {

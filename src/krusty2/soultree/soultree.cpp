@@ -789,7 +789,7 @@ void SoultreeObject::ClearFlag14c()
 // 0x004fdb60.
 void SoultreeObject::LoadFromParameters(UnknownParameterStream* stream, int offset)
 {
-    parameterBlock = new(__FILE__, 0x346) UnknownParameterBlock;
+    parameterBlock = new(__FILE__, 0x346) ParameterBlock;
     parameterBlock->Attach(stream, offset, 1);
     LoadHierarchyFromParameters();
     if (parameterBlock)

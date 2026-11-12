@@ -258,11 +258,11 @@ public:
     // 0x004eb160/0x004eb300/0x004eb480: read "x,y,z", "r,g,b" and a Y/T/1
     // flag list from `block` (default: the scene file, parameters). Parameter names provisional.
     int ReadVector(Vector3* out, const char* section, const char* key,
-                              const char* def, int useDefault, UnknownParameterBlock* block);
+                              const char* def, int useDefault, ParameterBlock* block);
     int ReadColor(unsigned long* out, const char* section, const char* key,
-                              const char* def, int unused, UnknownParameterBlock* block);
+                              const char* def, int unused, ParameterBlock* block);
     int ReadFlags(char* out, int count, const char* section, const char* key,
-                              const char* def, int unused, UnknownParameterBlock* block);
+                              const char* def, int unused, ParameterBlock* block);
     int ReadFog();                        // 0x004ebdb0: the "Fog" section
     int OpenResourceFiles();              // 0x004eca20: opens the "ResourceFiles" archives
     void AttachCasterShadows(ProjectedShadow* shadow, int flags); // shadows for the casters
@@ -330,7 +330,7 @@ public:
     int auralScape;                       // the AuralScape the sound emitters use
     SoundGroup* soundGroup;
     ContainerList<Sound*> sounds;
-    UnknownParameterBlock parameters;     // the scene file
+    ParameterBlock parameters;     // the scene file
     unsigned char hasStadium : 1;                    // "Stadium" section present
     unsigned char field_0x6a1[3];
     float stadiumTop;                                // Stadium "Top"

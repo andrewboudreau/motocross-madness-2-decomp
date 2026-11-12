@@ -27,7 +27,7 @@
 #ifndef MCM2_PHYSICS_COMMON_SOULTREEOBJECT_H
 #define MCM2_PHYSICS_COMMON_SOULTREEOBJECT_H
 
-class UnknownParameterBlock;
+class ParameterBlock;
 class FileStream;
 typedef FileStream UnknownParameterStream;
 
@@ -38,10 +38,10 @@ typedef FileStream UnknownParameterStream;
 
 // src/reconstructed/Parameterblocks.h declares the full class; only the members
 // soultree.cpp calls are listed (same mangled names).
-class UnknownParameterBlock {
+class ParameterBlock {
 public:
-    UnknownParameterBlock();                                                     // 0x004b7130
-    ~UnknownParameterBlock();                                                    // 0x004b7190
+    ParameterBlock();                                                     // 0x004b7130
+    ~ParameterBlock();                                                    // 0x004b7190
     void Attach(UnknownParameterStream* stream, int offset, int index); // 0x004b77a0
     int BeginRows(const char* name);                                 // 0x004b7f70
     int ReadRow(char* raw);                                        // 0x004b8010
@@ -341,7 +341,7 @@ public:
     int inQuadtree;                // 0x194, nonzero while inserted in the quadtree (0x004fed70 tests and clears it)
     int quadtreeCell;              // 0x198, quadtree cell code (15 = none) passed to Remove/UpdateRange
     int loadedNodeCount;           // 0x19c, node count of a loaded hierarchy (slot 2 reads it, slot 3 stores the "Object Hierarchy" count)
-    UnknownParameterBlock* parameterBlock; // 0x1a0, parameter block used by 0x004fdb60/slot 3;
+    ParameterBlock* parameterBlock; // 0x1a0, parameter block used by 0x004fdb60/slot 3;
                                    // sizeof 0x1a4 from the operator new in
                                    // SoultreePhysicsBaseObject slot 2 (tier 1)
 };

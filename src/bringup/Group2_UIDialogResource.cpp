@@ -56,7 +56,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
     int depth = g_TrackGame->renderTarget->surfacePixelFormat;
     memset(sectionTable, 0, sizeof(sectionTable));
     int setType = 1;
-    UnknownParameterBlock parameters;
+    ParameterBlock parameters;
     parameters.Attach((UnknownParameterStream*)stream, offset, 1);
     char buffer[0x2800];
     parameters.GetSectionNames(buffer, sizeof(buffer));

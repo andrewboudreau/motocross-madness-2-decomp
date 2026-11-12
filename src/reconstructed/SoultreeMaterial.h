@@ -50,7 +50,7 @@ public:
     void ReadSaved(UnknownParameterStream* stream);             // 0x004ff450: reads a saved material
     void LoadTexture();                       // 0x004ff620: (re)loads the texture
     // 0x004ff9e0: reads the material keys; loads the texture when `load`.
-    void ReadKeys(UnknownParameterBlock* block, int load);
+    void ReadKeys(ParameterBlock* block, int load);
     void MakeUntextured();                    // 0x005000b0: an untextured "NONE" material
     void CopyFrom(const SoultreeMaterial* other);              // 0x005000f0: copies `other`
 

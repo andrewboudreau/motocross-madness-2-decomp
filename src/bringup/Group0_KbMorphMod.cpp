@@ -60,7 +60,7 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
     FileStream* stream =
         new (kMorphBastardModifierFile, 73) FileStream(g_ResourceManager);
     stream->Open(path, "r", 0);
-    UnknownParameterBlock* block = new (kMorphBastardModifierFile, 77) UnknownParameterBlock;
+    ParameterBlock* block = new (kMorphBastardModifierFile, 77) ParameterBlock;
     block->Attach((UnknownParameterStream*)stream, 0, 1);
     sprintf(section, "MorphBastard Information");
     block->SelectSection(section);

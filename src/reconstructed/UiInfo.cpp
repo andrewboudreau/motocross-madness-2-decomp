@@ -621,7 +621,7 @@ int TrackGameMode::OpenHelp(const char* topic, const char* parameters) {
 
 // 0x00523e50 (KrustyUI 0x004988a0): the bonus track names from PCSched.pb.
 void TrackGameMode::LoadBonusTrackNames() {
-    UnknownParameterBlock block;
+    ParameterBlock block;
     char key[0x100];
     FileStream* stream = new(__FILE__, 873) FileStream(g_ResourceManager);
     int i;

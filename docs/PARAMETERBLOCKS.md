@@ -124,6 +124,6 @@ python tools/compile.py src/reconstructed/Parameterblocks.cpp -o work/pb.obj \
   --vc6-root "$VC6_ROOT" --profile vc6_o2_mt
 python tools/match.py --exe work/game/mcm2.exe --target-va 0x004b7b30 \
   --target-size 437 --obj work/pb.obj \
-  --symbol '?ReadString@UnknownParameterBlock@@QAEHPBDPADH@Z' \
+  --symbol '?ReadString@ParameterBlock@@QAEHPBDPADH@Z' \
   --bindings src/reconstructed/Parameterblocks.bindings.json --json
 ```

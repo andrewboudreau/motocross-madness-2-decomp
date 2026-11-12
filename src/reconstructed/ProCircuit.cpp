@@ -38,7 +38,7 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 UnknownTrackGameObject3444::UnknownTrackGameObject3444()
 {
     FileStream* stream = new(__FILE__, 19) FileStream(g_ResourceManager);
-    UnknownParameterBlock block;
+    ParameterBlock block;
     char key[128];
     char line[64];
     float defaults[9];
@@ -345,7 +345,7 @@ int UnknownTrackGameObject3444::AdvanceAfterRace()
 }
 
 // 0x004d4420
-int UnknownTrackGameObject3444::ReadSchedule(UnknownParameterBlock* block,
+int UnknownTrackGameObject3444::ReadSchedule(ParameterBlock* block,
                                                       UnknownProCircuitSchedule* schedule,
                                                       const char* directory)
 {

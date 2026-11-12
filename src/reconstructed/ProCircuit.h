@@ -8,7 +8,7 @@
 // reads them, 0x004d4150 writes them); the rest come from PCTables.pb,
 // PCSched.pb and ui\PCNames.txt. Names are provisional.
 
-class UnknownParameterBlock;
+class ParameterBlock;
 
 #pragma pack(push, 1)
 
@@ -68,7 +68,7 @@ public:
     int Save(const char* path); // 0x004d4150: saves it
     int AdvanceAfterRace();              // 0x004d41a0: advances after a race
     // 0x004d4420: reads the selected PCSched.pb section into `schedule`.
-    int ReadSchedule(UnknownParameterBlock* block, UnknownProCircuitSchedule* schedule,
+    int ReadSchedule(ParameterBlock* block, UnknownProCircuitSchedule* schedule,
                               const char* directory);
     void PickComputerRacers();             // 0x004d4670: picks the computer racers
 
