@@ -1721,11 +1721,11 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 //  * a local `BikeA640* axis` keeps the steer axis in one register for its three stores and
 //    0.42210004f is needed for retail's 0x3ed81d7f (0.4221f rounds to 0x3ed81d7e);
 //  * 0.001f comes from the TU-local kbSecondsPerMillisecond, not the shared pool.
-GameObject* KrustyBike::Load(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc, int a5, int a6,
+GameObject* KrustyBike::Load(int context, int engineName, const char* modelPath, const SoultreeLoadDesc* riderModel, int desc, int info,
                              Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe, VehicleInputMap* map, unsigned char kind,
-                             unsigned char remote, KbRace* race, int a15, int a16, int netId,
+                             unsigned char remote, KbRace* race, int riderName, int a16, int netId,
                              const KbBikeSetup* setup, int gasGyroOption, int brakeGyroOption, int linkedObject, int trackObject,
-                             KbRecorder* recorder, void* a24, int withRider)
+                             KbRecorder* recorder, void* aiSkill, int withRider)
 {
     aiAccelScale1 = 1.1f;
     aiAccelScale2 = 1.3f;
@@ -1749,7 +1749,7 @@ GameObject* KrustyBike::Load(int context, int a2, const char* modelPath, const S
     shortMessageTimer = reinterpret_cast<KbGame*>(g_TrackGame)->shortNetPacketIntervalSec;
     this->race = race;
     netRecorder = recorder;
-    aiSkill = a24;
+    this->aiSkill = aiSkill;
     memset(&recordState, 0, sizeof(recordState));
     recordState.timer = 1.7014117e38f;
 
@@ -1771,7 +1771,7 @@ GameObject* KrustyBike::Load(int context, int a2, const char* modelPath, const S
     fourStroke = 0;
     if (setup) {
         KbBikeSetup copy = *setup;
-        setupFloat = (float)copy.field_0x8;
+        setupFloat = (float)copy.weight;
         engineSize = copy.engineSize;
         fourStroke = copy.fourStroke;
     }
@@ -1780,18 +1780,18 @@ GameObject* KrustyBike::Load(int context, int a2, const char* modelPath, const S
         GameObject::AppendChild((GameObject*)ghostMod, -1);
     }
     statusNode = 0;
-    ((KbBikeLoader*)this)->LoadBike(context, a2, modelPath, desc, a5, a6, startPosition, forward, up, terrainProbe, map, a15, a16,
+    ((KbBikeLoader*)this)->LoadBike(context, engineName, modelPath, riderModel, desc, info, startPosition, forward, up, terrainProbe, map, riderName, a16,
                                        setup == 0,
-                                       setup ? (void*)setup->setupName : 0,
-                                       setup ? setup->field_0x50 : 0,
-                                       setup ? setup->field_0x54 : 0,
-                                       setup ? setup->field_0x58 : 0,
-                                       setup ? setup->field_0xc : 0,
-                                       setup ? setup->field_0x10 : 0,
-                                       setup ? setup->field_0x14 : 0,
-                                       setup ? setup->field_0x18 : 0,
-                                       setup ? setup->field_0x1c : 0,
-                                       setup ? setup->field_0x20 : 0,
+                                       setup ? (void*)setup->eqBands : 0,
+                                       setup ? setup->firstBand : 0,
+                                       setup ? setup->lastBand : 0,
+                                       setup ? setup->bandStep : 0,
+                                       setup ? setup->frontComp : 0,
+                                       setup ? setup->frontDecomp : 0,
+                                       setup ? setup->rearComp : 0,
+                                       setup ? setup->rearDecomp : 0,
+                                       setup ? setup->frontDamp : 0,
+                                       setup ? setup->rearDamp : 0,
                                        gasGyroOption, brakeGyroOption, linkedObject, localFlag,
                                        reinterpret_cast<KbGame*>(g_TrackGame)->steerBinding, reinterpret_cast<KbGame*>(g_TrackGame)->leanBinding, reinterpret_cast<KbGame*>(g_TrackGame)->throttleBinding,
                                        trackObject, setupFloat, 0);

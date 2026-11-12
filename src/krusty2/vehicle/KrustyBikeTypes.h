@@ -510,26 +510,27 @@ struct KbPlayer {
 struct KbBody { int TestMeshBounds(KbBody* other); };
 
 // ---- loader (0x0048fc80) support ----
-// 0x5c-byte setup record the loader copies and forwards field by field (tier 2 layout, tier 3
-// names): +0 -> KrustyBike+0x738, +4 -> +0x737, +8 is converted to float, +0x24 is passed by
-// address, the rest by value.
+// 0x5c-byte setup record the loader copies and forwards field by field: +0 -> KrustyBike+0x738,
+// +4 -> +0x737, +8 is converted to float, +0x24 is passed by address, the rest by value.  The
+// layout is the garage settings record (OptionProcs.h UnknownOptGarageSettings, 0x5c bytes,
+// TrackGame+0x1550) and the names follow it (tier 2; the slider literals are tier 1 there).
 struct KbBikeSetup {
     int engineSize;              // +0x00 -> KrustyBike::engineSize
     char fourStroke;             // +0x04 -> KrustyBike::fourStroke
     char pad_0x05[0x3];
-    int field_0x8;
+    int weight;                  // +0x08 KrustyUI "Weight"; LoadBike's weight (as float)
     // Floats: the loader's `setup ? setup->f : 0` arguments zero their temporaries with
     // immediates (not the zero register) and VC6 threads their branches as one group.
-    float field_0xc;
-    float field_0x10;
-    float field_0x14;
-    float field_0x18;
-    float field_0x1c;
-    float field_0x20;
-    char setupName[0x2c];        // +0x24 passed by address as the loader's setupName
-    int field_0x50;
-    int field_0x54;
-    int field_0x58;
+    float frontComp;             // +0x0c SldFrontComp   -> LoadBike frontSpring
+    float frontDecomp;           // +0x10 SldFrontDecomp -> frontDamper
+    float rearComp;              // +0x14 SldRearComp    -> rearSpring
+    float rearDecomp;            // +0x18 SldRearDecomp  -> rearDamper
+    float frontDamp;             // +0x1c SldFrontDamp   -> frontRatio
+    float rearDamp;              // +0x20 SldRearDamp    -> rearRatio
+    int eqBands[11];             // +0x24 SldEQ1..11; passed by address as LoadBike's torqueTable
+    int firstBand;               // +0x50 -> LoadBike rpmLow
+    int lastBand;                // +0x54 KrustyUI "RPMUpperLimit" -> rpmHigh
+    int bandStep;                // +0x58 -> rpmStep
 };
 // 0x58-byte rider morph (src/reconstructed MorphBastardModifier: ctor 0x004a3150, loader 0x004a33b0).
 struct KbMorphMod {
@@ -539,10 +540,10 @@ struct KbMorphMod {
 // Bike's own loader 0x004079c0 (`ret 0xa0`, 40 argument dwords; not a vtable entry).  It is a
 // Bike member in truth; vehicle/Bike.h is canonical, so it is reached through this view.
 struct KbBikeLoader {
-    GameObject* LoadBike(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc, int a5, int a6,
-                            Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe, VehicleInputMap* map, int a12, int a13,
-                            int noSetup, void* setupName, int s50, int s54, int s58, float s0c, float s10,
-                            float s14, float s18, float s1c, float s20, int gasGyro, int brakeGyro, int linkedObject, int device,
+    GameObject* LoadBike(int context, int engineName, const char* modelPath, const SoultreeLoadDesc* riderModel, int desc, int info,
+                            Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe, VehicleInputMap* map, int name, int a13,
+                            int defaultEngine, void* torqueTable, int rpmLow, int rpmHigh, int rpmStep, float frontSpring, float frontDamper,
+                            float rearSpring, float rearDamper, float frontRatio, float rearRatio, int gasGyroOption, int brakeGyroOption, int linkedObject, int device,
                             void* steer, void* lean, void* throttle, int trackObject, float weight, int createCollision);
 };
 // 0x004a2fc0 (cdecl): zeroed debug-heap allocation of count x size bytes tagged with the source line.

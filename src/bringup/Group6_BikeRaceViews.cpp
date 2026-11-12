@@ -58,12 +58,12 @@ public:
 class KrustyBike {
 public:
     void SetNetRecorder(KbRecorder* recorder);
-    GameObject* Load(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc, int a5,
-                     int a6, Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe,
+    GameObject* Load(int context, int engineName, const char* modelPath, const SoultreeLoadDesc* riderModel, int desc,
+                     int info, Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe,
                      VehicleInputMap* map, unsigned char kind, unsigned char remote, KbRace* race,
-                     int a15, int a16, int netId, const KbBikeSetup* setup, int gasGyroOption,
+                     int riderName, int a16, int netId, const KbBikeSetup* setup, int gasGyroOption,
                      int brakeGyroOption, int linkedObject, int trackObject, KbRecorder* recorder,
-                     void* a24, int withRider);
+                     void* aiSkill, int withRider);
 };
 
 // ---- the views (same keys and signatures as BikeRace.h / Group6_BikeRaceCreate.cpp)

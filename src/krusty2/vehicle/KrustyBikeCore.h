@@ -125,13 +125,13 @@ public:
     // the bike loader.  Runs Bike's loader 0x004079c0, then builds the collision bodies, the
     // trick animation tables, the network settings and the optional rider morph.  Returns the
     // GameObject base.  Parameter names are tier 3; `kind` 0xff marks a ghost bike.  The
-    // forwarded ones follow Bike::LoadBike's parameter in the same position (desc sits in
-    // its riderModel slot and a5 in its desc slot; the types are this view's).
-    GameObject* Load(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc, int a5, int a6,
+    // forwarded ones take Bike::LoadBike's name in the same position (riderName is its
+    // `name`, copied to Bike::riderName; a16 is its unused a19; the types are this view's).
+    GameObject* Load(int context, int engineName, const char* modelPath, const SoultreeLoadDesc* riderModel, int desc, int info,
                      Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe, VehicleInputMap* map, unsigned char kind,
-                     unsigned char remote, KbRace* race, int a15, int a16, int netId,
+                     unsigned char remote, KbRace* race, int riderName, int a16, int netId,
                      const KbBikeSetup* setup, int gasGyroOption, int brakeGyroOption, int linkedObject, int trackObject,
-                     KbRecorder* recorder, void* a24, int withRider);
+                     KbRecorder* recorder, void* aiSkill, int withRider);
 
 public:
     char aiKind;  // +0x734  loader kind (0 for a ghost); nonzero bikes take the BikeAI step 0x00413200 and racing line 0x00414370
