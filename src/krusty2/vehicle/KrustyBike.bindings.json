@@ -156,7 +156,7 @@
   "?LoadShape@CollisionObject@@QAEXPAXPBD@Z": "0x00432800",
   "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd5c0",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
-  "?Method_0x004a8bf0@Character@@QAEXHM@Z": "0x004a8bf0",
+  "?ApplyMotionAtPhase@Character@@QAEXHM@Z": "0x004a8bf0",
   "?StartAnimatedWreck@Wrecker@@QAEXH@Z": "0x00532220",
   "?StartTumble@Wrecker@@QAEXXZ": "0x00532310",
   "?EndWreck@Wrecker@@QAEXXZ": "0x005327c0",

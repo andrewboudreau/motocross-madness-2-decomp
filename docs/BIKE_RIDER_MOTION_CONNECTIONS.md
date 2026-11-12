@@ -26,7 +26,7 @@ one ApplyRestPose call. Their complete callers also match strictly:
 There were already 24 calls to these canonical methods in the same object;
 the current total is 65. The included sample aggregate has one additional
 SetMotion call in its partial slot 102, for a total of 66. No partial method
-was promoted. The genuinely missing `KbA5C4::Fn_004A8BF0` and the provisional
+was promoted. The genuinely missing `KbA5C4::ApplyMotionAtPhase` and the provisional
 field view remain unchanged.
 
 ## Receiver and handle boundaries

@@ -23,7 +23,7 @@ AGGREGATE = 'samples/physics/motion/Motnctrl.cpp'
 CANONICAL = 'src/krusty2/motion/Motnctrl.cpp'
 POSE_MARKERS = ('inline void ClampFloat(', 'inline float InterpolatedLengthSquared(',
                 'inline Vec3 InterpolatedUnitVector(', 'void InterpolatePose(')
-SYMBOL = '?Method_0x004a8c50@Character@@QAEXHHMM@Z'
+SYMBOL = '?ApplyMotionBlendAtPhase@Character@@QAEXHHMM@Z'
 INTERPOLATE = '?InterpolatePose@@YAXPAUCharacterPose@@00M@Z'
 FILENAMES = ('src/krusty2/vehicle/Bike.cpp', 'src/krusty2/vehicle/KrustyBike.cpp', AGGREGATE)
 

@@ -1,7 +1,7 @@
 # Rider motion-start connections
 
 Bike's initial rider pose and KrustyBike's head-turn pose now call the existing
-`Character::Method_0x004a8bf0(int, float)` implementation. Three related calls
+`Character::ApplyMotionAtPhase(int, float)` implementation. Three related calls
 in the KrustyBike near-miss sample use the same boundary. The provisional
 `BikeA5C4` and `KbA5C4` views retain their declarations and layouts; only these
 five calls cross explicitly to the primary Character receiver.

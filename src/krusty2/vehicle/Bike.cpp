@@ -879,8 +879,8 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
         collisionObject->onHitByCallback = BikeStaticCollisionCallback;
     }
     wrecker->EndWreck();
-    D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[1], 0.5f);
-    reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8bf0(riderPoseHandles[1], 0.5f);
+    D3DIMSoultreeCharacter::ApplyMotionAtPhase(bikePoseHandles[1], 0.5f);
+    reinterpret_cast<Character*>(riderCharacter)->ApplyMotionAtPhase(riderPoseHandles[1], 0.5f);
     verticalAccelSmoother->Reset(fixedStepTime * 7.0f);
     forwardAccelSmoother->Reset(0.5f);
     steerAxis = new(__FILE__, 0x7df) BikeA640(frontWheel->restLoadWeight, fixedStepTime * 6.3f);
@@ -1146,7 +1146,7 @@ void Bike::UpdateRiderPose(float)
         steerPose += 0.25f;
         steerPose = BikeMin(BikeMaxF(steerPose, 0.25f), 0.75f);
         poseParam = steerPose;
-        D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[1], steerPose);
+        D3DIMSoultreeCharacter::ApplyMotionAtPhase(bikePoseHandles[1], steerPose);
         return;
     }
     if (motionActive)
@@ -1172,9 +1172,9 @@ void Bike::UpdateRiderPose(float)
         cnt += 2;
     }
     float blend = 1.0f - poseBlend;
-    reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8c50(riderPoseHandles[idx],
+    reinterpret_cast<Character*>(riderCharacter)->ApplyMotionBlendAtPhase(riderPoseHandles[idx],
                                                                     riderPoseHandles[next], poseParam, blend);
-    D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, blend);
+    D3DIMSoultreeCharacter::ApplyMotionBlendAtPhase(bikePoseHandles[idx], bikePoseHandles[next], poseParam, blend);
     int mode = wrecker->wreckState;
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;

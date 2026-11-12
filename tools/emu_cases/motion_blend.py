@@ -1,4 +1,4 @@
-"""Character::Method_0x004a8c50, the two-motion pose blend (tools/emu_diff.py case).
+"""Character::ApplyMotionBlendAtPhase, the two-motion pose blend (tools/emu_diff.py case).
 
 Two motions with random frame counts and poses. The vector helpers, the pose constructor and
 InterpolatePose run as retail code in both bodies. The pose sink (virtual slot 4) is stubbed
@@ -11,7 +11,7 @@ from tools.emu_cases.four_pose import POSE
 from tools.emu_cases.motion_start import f32, next32
 
 RETAIL_VA = 0x004a8c50
-SYMBOL = '?Method_0x004a8c50@Character@@QAEXHHMM@Z'
+SYMBOL = '?ApplyMotionBlendAtPhase@Character@@QAEXHHMM@Z'
 SOURCE = 'samples/physics/motion/CharacterMotionBlend.cpp'
 PROBES = {0x004a8c50: 'entry'}
 

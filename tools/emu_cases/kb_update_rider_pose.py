@@ -105,9 +105,9 @@ def setup(ctx, c):
 
     ctx.stub_at(0x0048d990, 'Fn_0048D990', pop=4)
     ctx.stub_at(0x004a8b40, 'Character::SetMotion', pop=4)
-    ctx.stub_at(0x004a8bf0, 'Character::Method_0x004a8bf0', pop=8)
-    ctx.stub_at(0x004a8c50, 'Character::Method_0x004a8c50', pop=16)
-    ctx.stub_at(0x004a9050, 'Character::Method_0x004a9050', pop=28)
+    ctx.stub_at(0x004a8bf0, 'Character::ApplyMotionAtPhase', pop=8)
+    ctx.stub_at(0x004a8c50, 'Character::ApplyMotionBlendAtPhase', pop=16)
+    ctx.stub_at(0x004a9050, 'Character::ApplyFourMotionBlendAtPhase', pop=28)
     ctx.stub_at(0x004fca80, 'SoultreeObject::GetMatrixIn', pop=8, ret=get_matrix)
     ctx.stub_at(0x004fb8c0, 'SoultreeObject::SetMatrixIn', pop=8, ret=note_matrix)
 

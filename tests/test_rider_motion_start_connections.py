@@ -14,8 +14,8 @@ from mcm2tool.rtti import parse_rtti
 from tools.match import compare
 
 ROOT=Path(__file__).resolve().parents[1]
-START='?Method_0x004a8bf0@Character@@QAEXHM@Z'
-RETIRED={'?Method_0x004a8bf0@BikeA5C4@@QAEXHM@Z','?Fn_004A8BF0@KbA5C4@@QAEXHM@Z'}
+START='?ApplyMotionAtPhase@Character@@QAEXHM@Z'
+RETIRED={'?ApplyMotionAtPhase@BikeA5C4@@QAEXHM@Z','?ApplyMotionAtPhase@KbA5C4@@QAEXHM@Z'}
 # Both blend-call views preserve the complete objects under the proven Character destination.
 SOURCES={
  # Emitter joins preserve every prior byte/target under the verified constructor and Spark setter names.

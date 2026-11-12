@@ -76,7 +76,7 @@ static void Run(int retail,float phase,float weight) {
  memcpy(&world,&initial,sizeof(world));for(int m=0;m<2;m++)memcpy(framePage[m],frameInitial[m],4096);memcpy(actorPage,actorInitial,4096);memset(&result,0,sizeof(result));_fpreset();_control87(mode|exceptionMask,_MCW_PC|_MCW_RC|_MCW_EM);
  __try {
   if(retail){union{void(Entry::*fn)(int,int,float,float);DWORD address;}u;typedef char Abi[sizeof(u.fn)==4?1:-1];u.address=0x4a8c50;(((Entry*)Actor())->*u.fn)((int)&world.motion[0],(int)&world.motion[aliasMode==1?0:1],phase,weight);}
-  else Actor()->Method_0x004a8c50((int)&world.motion[0],(int)&world.motion[aliasMode==1?0:1],phase,weight);
+  else Actor()->ApplyMotionBlendAtPhase((int)&world.motion[0],(int)&world.motion[aliasMode==1?0:1],phase,weight);
  }__except(Filter(GetExceptionInformation())){}
  memcpy(result.actorPage,actorPage,4096);result.fp=_status87()&~0x3800;memcpy(&result.after,&world,sizeof(world));for(m=0;m<2;m++)memcpy(result.frames[m],framePage[m],4096);_fpreset();
 }

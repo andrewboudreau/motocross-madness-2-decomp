@@ -1,4 +1,4 @@
-"""Character::Method_0x004a8bf0, start a motion at a phase (tools/emu_diff.py case).
+"""Character::ApplyMotionAtPhase, start a motion at a phase (tools/emu_diff.py case).
 
 ApplyPoseListSlot4 (0x004a8a80) is stubbed and logs the frame pointer it receives, so the
 rounded `(frameCount - 1) * phase - 0.5f` index is compared with the current motion and frame
@@ -8,7 +8,7 @@ out-of-range values (retail's masked invalid store gives 0x80000000).
 import struct
 
 RETAIL_VA = 0x004a8bf0
-SYMBOL = '?Method_0x004a8bf0@Character@@QAEXHM@Z'
+SYMBOL = '?ApplyMotionAtPhase@Character@@QAEXHM@Z'
 SOURCE = 'samples/physics/motion/CharacterMotionStart.cpp'
 PROBES = {0x004a8c1c: 'frame fistp'}
 

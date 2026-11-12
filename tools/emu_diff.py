@@ -21,7 +21,7 @@ mean the case built incomplete inputs.
 A case module (``tools/emu_cases/<name>.py`` or any path) supplies:
 
     RETAIL_VA = 0x004a9050           # retail entry
-    SYMBOL = '?Method_0x004a9050@Character@@QAEXHHHHMMM@Z'
+    SYMBOL = '?ApplyFourMotionBlendAtPhase@Character@@QAEXHHHHMMM@Z'
     SOURCE = 'samples/physics/motion/CharacterMotionFourPose.cpp'   # default object lookup
     BINDINGS = {'?Helper@@YAXXZ': 0x4a8470}   # optional, name -> retail VA
     PREFER_OBJECT = set()            # optional, defined symbols to keep from the object

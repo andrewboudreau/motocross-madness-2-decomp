@@ -237,7 +237,7 @@
         "/QIfist",
         "/Op"
       ],
-      "reason": "Complete 2138-byte retail four-motion pose blend Character::Method_0x004a9050 as an ordinary method; replaces the Group3_KrustyBike bring-up reimplementation. /QIfist gives FistpFloatToInt retail's current-rounding fistp; /Op rounds the sampled frame position to binary32 as retail's asm-induced stack slot does (without it the fractions differ in the last bits). Bit-identical to retail in 3400 emulated cases (unicorn, retail helpers, 53- and 24-bit precision control). The EBP frame retail's inline asm gives the method comes from a #pragma optimize(\"y\", off) region in the source (docs/GAME_BUILD.md#frame-pointer-units).",
+      "reason": "Complete 2138-byte retail four-motion pose blend Character::ApplyFourMotionBlendAtPhase as an ordinary method; replaces the Group3_KrustyBike bring-up reimplementation. /QIfist gives FistpFloatToInt retail's current-rounding fistp; /Op rounds the sampled frame position to binary32 as retail's asm-induced stack slot does (without it the fractions differ in the last bits). Bit-identical to retail in 3400 emulated cases (unicorn, retail helpers, 53- and 24-bit precision control). The EBP frame retail's inline asm gives the method comes from a #pragma optimize(\"y\", off) region in the source (docs/GAME_BUILD.md#frame-pointer-units).",
       "evidence": "docs/GAME_BUILD.md#four-pose-motion-blend"
     },
     {

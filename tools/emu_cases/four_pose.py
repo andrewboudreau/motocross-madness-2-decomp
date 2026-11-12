@@ -1,4 +1,4 @@
-"""Character::Method_0x004a9050, the four-motion pose blend (tools/emu_diff.py case).
+"""Character::ApplyFourMotionBlendAtPhase, the four-motion pose blend (tools/emu_diff.py case).
 
 Four motions with random frame counts and poses; the blend phase sweeps [0, 1] so the
 `frameCount * phase - 0.5f` fistp sites land on both sides of each frame boundary. Every
@@ -7,7 +7,7 @@ virtual call on the character (the pose sink) is logged with the 0x2c-byte pose 
 import struct
 
 RETAIL_VA = 0x004a9050
-SYMBOL = '?Method_0x004a9050@Character@@QAEXHHHHMMM@Z'
+SYMBOL = '?ApplyFourMotionBlendAtPhase@Character@@QAEXHHHHMMM@Z'
 SOURCE = 'samples/physics/motion/CharacterMotionFourPose.cpp'
 POSE = 0x2c
 

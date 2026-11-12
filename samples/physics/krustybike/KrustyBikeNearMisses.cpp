@@ -1076,7 +1076,7 @@ void KrustyBike::UpdateRiderPose(float dt)
             t += 0.25f;
             poseParam = (t > 0.25f) ? KbMinF(t, 0.75f) : 0.25f;
         }
-        D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[1], poseParam);
+        D3DIMSoultreeCharacter::ApplyMotionAtPhase(bikePoseHandles[1], poseParam);
         return;
     }
     if (motionActive) {
@@ -1252,8 +1252,8 @@ void KrustyBike::UpdateRiderPose(float dt)
                 }
             }
             float pose = look + 0.5f;
-            reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8bf0(riderPoseHandles[14], pose);
-            D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[14], pose);
+            reinterpret_cast<Character*>(riderCharacter)->ApplyMotionAtPhase(riderPoseHandles[14], pose);
+            D3DIMSoultreeCharacter::ApplyMotionAtPhase(bikePoseHandles[14], pose);
         }
     } else if (hasFinished == 2) {
         // The end pose (riderPoseHandles[15]) once the rider character is ready.
@@ -1313,23 +1313,23 @@ void KrustyBike::UpdateRiderPose(float dt)
             backUpPhase += backUpPhaseRate;
             if (backUpPhase > 1.0f)
                 backUpPhase -= 1.0f;
-            reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8bf0(riderPoseHandles[16], poseParam);
-            reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8bf0(riderPoseHandles[17], backUpPhase);
+            reinterpret_cast<Character*>(riderCharacter)->ApplyMotionAtPhase(riderPoseHandles[16], poseParam);
+            reinterpret_cast<Character*>(riderCharacter)->ApplyMotionAtPhase(riderPoseHandles[17], backUpPhase);
         } else if (blend) {
-            ((Character*)riderCharacter)->Method_0x004a9050(riderPoseHandles[idx], riderPoseHandles[next],
+            ((Character*)riderCharacter)->ApplyFourMotionBlendAtPhase(riderPoseHandles[idx], riderPoseHandles[next],
                 riderPoseHandles[cnt], riderPoseHandles[other], poseParam, inverseBlend, poseLeanBlend);
         } else {
-            reinterpret_cast<Character*>(riderCharacter)->Method_0x004a8c50(riderPoseHandles[idx], riderPoseHandles[next], poseParam, inverseBlend);
+            reinterpret_cast<Character*>(riderCharacter)->ApplyMotionBlendAtPhase(riderPoseHandles[idx], riderPoseHandles[next], poseParam, inverseBlend);
         }
         if (idx >= 11 && idx <= 13) {
-            D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, inverseBlend);
+            D3DIMSoultreeCharacter::ApplyMotionBlendAtPhase(bikePoseHandles[idx], bikePoseHandles[next], poseParam, inverseBlend);
         } else if (poseIndex == 16) {
-            D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[16], poseParam);
+            D3DIMSoultreeCharacter::ApplyMotionAtPhase(bikePoseHandles[16], poseParam);
         } else if (blend) {
-            D3DIMSoultreeCharacter::Method_0x004a9050(bikePoseHandles[idx], bikePoseHandles[next],
+            D3DIMSoultreeCharacter::ApplyFourMotionBlendAtPhase(bikePoseHandles[idx], bikePoseHandles[next],
                 bikePoseHandles[cnt], bikePoseHandles[other], poseParam, inverseBlend, poseLeanBlend);
         } else {
-            D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, inverseBlend);
+            D3DIMSoultreeCharacter::ApplyMotionBlendAtPhase(bikePoseHandles[idx], bikePoseHandles[next], poseParam, inverseBlend);
         }
     }
     int mode = wrecker->wreckState;

@@ -66,7 +66,7 @@ static __forceinline void BlendFirst(CharacterPose* a, CharacterPose* b, Charact
 // Retail's inline-asm fistp helper gives this function an EBP frame; the
 // pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
 #pragma optimize("y", off)
-void Character::Method_0x004a9050(int aHandle, int bHandle, int cHandle, int dHandle,
+void Character::ApplyFourMotionBlendAtPhase(int aHandle, int bHandle, int cHandle, int dHandle,
                                   float phase, float weight, float lean)
 {
     Motion* a = reinterpret_cast<Motion*>(aHandle);

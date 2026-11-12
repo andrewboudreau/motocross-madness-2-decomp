@@ -102,9 +102,9 @@ public:
     void BlendToMotion(Motion* motion);                     // 0x004a8b60, ret 4
     void BlendToMotion(Motion* motion, float time);         // 0x004a8b80, ret 8
     int AdvanceMotion(float dt, int mirror, int mask);      // 0x004a6bb0, ret 0xc: per-frame playback, returns the frame number
-    void Method_0x004a8bf0(int handle, float phase);        // ret 8
-    void Method_0x004a8c50(int firstHandle, int secondHandle, float phase, float weight); // ret 0x10
-    void Method_0x004a9050(int a, int b, int c, int d, float e, float f, float g); // ret 0x1c: four-pose blend (KrustyBike slot 102)
+    void ApplyMotionAtPhase(int motion, float phase);       // 0x004a8bf0, ret 8: current motion and frame at phase (docs/NAMING.md)
+    void ApplyMotionBlendAtPhase(int firstHandle, int secondHandle, float phase, float weight); // 0x004a8c50, ret 0x10
+    void ApplyFourMotionBlendAtPhase(int aHandle, int bHandle, int cHandle, int dHandle, float phase, float weight, float lean); // 0x004a9050, ret 0x1c (KrustyBike slot 102)
 
     // vfptr +0, vbptr +4 (compiler generated); Character's own data up to 0x1a0.
     // Offsets are tier 1 (ctor 0x004a6780 stores, slot 8 0x004a98b0 copies, Motnctrl.cpp users);

@@ -102,7 +102,7 @@ public:
 
     int gasGyro;  // +0x5BC  0 from the constructor, LoadBike's gasGyroOption: TrackGameMode gasGyro (key 0x22, reset 0)
     int brakeGyro;  // +0x5C0  1 from the constructor, LoadBike's brakeGyroOption: TrackGameMode brakeGyro (key 0x30, reset 1)
-    BikeA5C4* riderCharacter;  // +0x5c4 slot 8/89 (0x406ae0): calls Method_0x004a8c50(poseA, poseB, poseParam, w) on it and riderCharacter->c_0x1a0 scene node; slot 97 passes it with "rider.col" to the 0x604 object
+    BikeA5C4* riderCharacter;  // +0x5c4 slot 8/89 (0x406ae0): calls ApplyMotionBlendAtPhase(poseA, poseB, poseParam, w) on it and riderCharacter->c_0x1a0 scene node; slot 97 passes it with "rider.col" to the 0x604 object
     BikeA5C8 field_0x5c8;         // +0x5c8 copy of the loader's info block (when given)
     char riderName[16];           // +0x5e0 ctor strcpy from global 0x00577738 (empty string in the image); tier 3 name
     BikeWheel* frontWheel;       // +0x5f0 front wheel (largest config z, see 0x4079c0 loop at 0x408705); tier 3
@@ -128,12 +128,12 @@ public:
     int poseIndex;  // +0x650 slot 89/61: current pose index (set to 10/11+idx, used to index riderPoseHandles[] and bikePoseHandles[], clamped to 13)
     float poseBlend;  // +0x654 slot 89: fractional part of the pose parameter ((0.75-l)*3.99 - idx); slot 61 weight w = 1 - poseBlend
     int poseState;  // +0x658 slot 89/61: paired with poseIndex (10 = lean pose); compared against 10 in slot 61 and set to idx*2+4
-    float poseParam;  // +0x65c slot 61: passed as time/weight arg to Method_0x004a8c50 and Method_0x004a8bf0; slot 89 state machine writes it from the smoothed value (x = t * -0.25)
+    float poseParam;  // +0x65c slot 61: passed as time/weight arg to ApplyMotionBlendAtPhase and ApplyMotionAtPhase; slot 89 state machine writes it from the smoothed value (x = t * -0.25)
     float poseLeanBlend;  // +0x660 slot 89: (lean - min)/(max - min) pose lean blend; slot 61: (speed*0.0310559+1)*0.5
     float backUpPhase;                        // +0x664  KrustyBike slot 102 advances it mod 1 as the BackUpBottom pose time (riderPoseHandles[17]); slot 86 ramps the back-up push off it
     float backUpPhaseRate;                    // +0x668  KrustyBike slot 102: per-frame advance of backUpPhase, max(|forwardSpeed|, 1) * dt * 0.55371
-    int riderPoseHandles[18];  // +0x66c slot 61: riderPoseHandles[idx], riderPoseHandles[next] passed to riderCharacter->Method_0x004a8c50 (rider-side pose ids, 18 entries)
-    int bikePoseHandles[18];  // +0x6b4 slot 61: bikePoseHandles[idx], [next] passed to D3DIMSoultreeCharacter::Method_0x004a8c50 (bike-side pose ids, 18 entries)
+    int riderPoseHandles[18];  // +0x66c slot 61: riderPoseHandles[idx], riderPoseHandles[next] passed to riderCharacter->ApplyMotionBlendAtPhase (rider-side pose ids, 18 entries)
+    int bikePoseHandles[18];  // +0x6b4 slot 61: bikePoseHandles[idx], [next] passed to D3DIMSoultreeCharacter::ApplyMotionBlendAtPhase (bike-side pose ids, 18 entries)
     int crossoverPose;                        // +0x6FC  slot 89 sets it while airborne with both wheels clear and picks poses 11..13 (CrosOv1..3); slot 41 clears it when slot 89 leaves that branch (tier 2)
     int frontWheelLifted;                     // +0x700  = wheelsInContact > 0 and frontWheel->penetration < -2.5 (front wheel clear while another touches); slot 62 returns 2 on it
     float poseSmoothTime;                     // +0x704  0.55; the poseSmoother's smoothing time (constructor argument, reloaded when the crossover pose starts)

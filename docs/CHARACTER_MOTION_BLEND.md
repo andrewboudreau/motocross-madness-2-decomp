@@ -1,6 +1,6 @@
 # Character two-motion pose blending
 
-`Character::Method_0x004a8c50(int, int, float, float)` is a reviewed-nonexact source implementation. The complete retail body is 1,011 bytes, ending with RET 16 at 0x004a9040..0x004a9042. The following 13 NOPs precede the next function at 0x004a9050. Every decoded branch stays inside that extent. Method naming and original translation-unit ownership remain provisional.
+`Character::ApplyMotionBlendAtPhase(int, int, float, float)` is a reviewed-nonexact source implementation. The complete retail body is 1,011 bytes, ending with RET 16 at 0x004a9040..0x004a9042. The following 13 NOPs precede the next function at 0x004a9050. Every decoded branch stays inside that extent. Method naming and original translation-unit ownership remain provisional.
 
 Authentic VC6 emits a 1,136-byte method (the private first-interpolation helper `BlendFirst` is `inline` and expands in place, as retail's does) and the existing 368-byte conversion helper. The conversion helper call, the missing CharacterPose constructor calls (retail calls 0x004a8930 twice) and retail's inline-assembly FISTP with its EBP frame change code layout and stack allocation. Before the helper was inlined, the method was 441 bytes plus a 652-byte out-of-line helper; inlining raised match_one's aligned instructions from 34 to 128 of 341 without changing any harness result. No production source contains copied retail instructions or retail dispatch.
 

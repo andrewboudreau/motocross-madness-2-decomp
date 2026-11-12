@@ -747,7 +747,7 @@ clearly more faithful, the game now links the sample's text:
   `src/reconstructed/OrientationAxes.cpp`; the Scene readers and `KrustyBike`
   link it in place of private copies. Which unit owns it is still unsettled
   (tier 3); the file is named for the function.
-- `Character::Method_0x004a9050`, the four-pose blend that `UpdateRiderPose`
+- `Character::ApplyFourMotionBlendAtPhase`, the four-pose blend that `UpdateRiderPose`
   calls on the rider and the bike, is a candidate sample
   ([below](#four-pose-motion-blend)); the bring-up reimplementation in
   `Group3_KrustyBike.cpp` was removed.
@@ -1109,7 +1109,7 @@ were moved out, not converted:
   `__ftol` at 0x0049e7b1 and the other worker sites) now live in
   `Group4_GridLightColor.cpp`, which is compiled without the flag. They were
   already called out of line before the split.
-- `Character::Method_0x004a9050` left `Group3_KrustyBike.cpp` (it is now the
+- `Character::ApplyFourMotionBlendAtPhase` left `Group3_KrustyBike.cpp` (it is now the
   candidate sample described under [Four-pose motion blend](#four-pose-motion-blend)).
   `Group3_KrustyBike.cpp` keeps the 15 and 3 `__ftol` truncations of 0x00492ad0 and 0x00493660, which retail also makes.
 
@@ -1126,7 +1126,7 @@ or when only its low bits are kept. `FistpFloatToIntChecked` casts to
 | 0x0049e6b0 | `LightAny` worker | same | same | 0.209 | 0.774 |
 | 0x0049f1c0 | `LightOne` worker | same | same | 0.168 | 0.705 |
 | 0x0049f8d0 | `LightAmbientPlusOne` worker | same | same | 0.206 | 0.714 |
-| 0x004a9050 | `Character::Method_0x004a9050` | `CharacterMotionFourPose.cpp` (sample, `/QIfist /Op`) | plain; frame index | 0.103 | 0.727 |
+| 0x004a9050 | `Character::ApplyFourMotionBlendAtPhase` | `CharacterMotionFourPose.cpp` (sample, `/QIfist /Op`) | plain; frame index | 0.103 | 0.727 |
 | 0x004bac60 | `ParticleManager::Render3D` | `Group1_ParticleRender.cpp` | plain; only the low byte is kept | 0.608 | 0.675 |
 | 0x004eab00 | `Scene::Tick` | `Group4_SceneTick.cpp` | plain; [-0.5, count - 0.5) | 0.637 | 0.686 |
 | 0x00507610 | `Terrain::PrepareGeometry` | `Group3_TerrainPrepareGeometry.cpp` | plain; focal length in pixels | 0.781 | 0.929 |
@@ -1183,8 +1183,8 @@ semantics: the game creates DirectDraw with `DDSCL_FPUSETUP`
 |---|---|---|---|---|---|
 | 0x0048d1e0 | `KbScoreBoard::ShowValue` | 6000 | 18 of 2000 (53-bit) | eye vector built in a local, then copied | 0.681 |
 | 0x0048d780 | trick pick (sample) | 6000 | 0 | none | 0.773 |
-| 0x004a8bf0 | `Character::Method_0x004a8bf0` (motion start) | 6000 | 0 | none | unchanged |
-| 0x004a8c50 | `Character::Method_0x004a8c50` (motion blend) | 3000 | 0 | none | unchanged |
+| 0x004a8bf0 | `Character::ApplyMotionAtPhase` (motion start) | 6000 | 0 | none | unchanged |
+| 0x004a8c50 | `Character::ApplyMotionBlendAtPhase` (motion blend) | 3000 | 0 | none | unchanged |
 | 0x004a9050 | four-pose blend (sample, `/Op`) | 600 | 0 (204 of 600 without `/Op`) | none here | 0.727 |
 | 0x004bac60 | `ParticleManager::Render3D` | 1000 | 234 of 300 (53-bit), 63 of 300 (24-bit) | light-frame grouping (cross, normalize, length) | 0.675 |
 | 0x004db8c0 | ProjectedShadow `RenderShadow` | 3000 | 0 | none | 0.738 |
@@ -1952,12 +1952,12 @@ configured flags.
 | `Group4_ScoreBoard.cpp` | ShowValue 0x0048d1e0, with `Group4Ovl_ShowModel` (no retail body) | pragma (was `/Oy-`); then the show helper inline by reference and Normalize's length order | 0.681 -> 0.715 -> 0.867 | 0.334 -> 0.455 -> 0.608 | 0 / 4000 |
 | `Group4_Visibility.cpp` | TestBox 0x0052f570 | pragma (was `/Oy-`); then the outcode in the corner loop and per-use corner/viewport reads | 0.689 -> 0.697 -> 0.796 | 0.342 -> 0.443 -> 0.669 | 0 / 2000 |
 | `DropTextOverlaySetup.cpp` (sample) | Setup 0x0051af00 | pragma (was `/Oy-`) | 0.632 -> 0.853 | 0.272 -> 0.701 | 0 / 2000 |
-| `CharacterMotionFourPose.cpp` (sample) | Method_0x004a9050 | pragma (was `/Oy-`) | 0.727 -> 0.758 | 0.168 -> 0.414 | 0 / 3000 |
+| `CharacterMotionFourPose.cpp` (sample) | ApplyFourMotionBlendAtPhase | pragma (was `/Oy-`) | 0.727 -> 0.758 | 0.168 -> 0.414 | 0 / 3000 |
 | `Group4_SceneTick.cpp` | Scene::Tick 0x004eab00 | pragma; then per-use entry reads and the advance written out | 0.686 -> 0.701 -> 0.941 | 0.334 -> 0.363 -> 0.725 | 0 / 2000 |
 | `KrustyBikeTrickPick.cpp` (sample) | Fn_0048D780 0x0048d780 | pragma | 0.773 -> 0.804 | 0.599 -> 0.776 | 0 / 2000 |
 | `KrustyBikeSelectRiderPose.cpp` (sample) | SelectRiderPose 0x0048e3e0 | pragma; then clamp polarity, folded product, per-arm stores | 0.682 -> 0.729 -> 0.789 | 0.652 -> 0.686 -> 0.744 | 0 / 600 (third sweep) |
-| `CharacterMotionStart.cpp` (sample) | Method_0x004a8bf0 | pragma | 0.633 -> 0.667 | 0.200 -> 0.381 | 0 / 2000 |
-| `CharacterMotionBlend.cpp` (sample) | Method_0x004a8c50 | pragma | 0.793 -> 0.879 | 0.348 -> 0.618 | 0 / 2000 |
+| `CharacterMotionStart.cpp` (sample) | ApplyMotionAtPhase | pragma | 0.633 -> 0.667 | 0.200 -> 0.381 | 0 / 2000 |
+| `CharacterMotionBlend.cpp` (sample) | ApplyMotionBlendAtPhase | pragma | 0.793 -> 0.879 | 0.348 -> 0.618 | 0 / 2000 |
 | `TerrainShadow.cpp` (sample) | slot 30 0x00509aa0 | pragma; then per-use reloads instead of cached locals | 0.718 -> 0.736 -> 0.875 | 0.442 -> 0.450 -> 0.702 | 0 / 2000 |
 | `D3DIMSoultreeShadowNearMisses.cpp` (sample) | slot 30 0x00446f40 | pragma | 0.862 -> 0.891 | 0.598 -> 0.665 | 0 / 2000 |
 | `ProjectedShadowNearMisses.cpp` (sample) | TintCasterVertices 0x004dc2b0 | pragma | 0.759 -> 0.774 | 0.330 -> 0.346 | 0 / 2000 |
@@ -2078,7 +2078,7 @@ shape there (`expect: partial`).
 
 ## Four-pose motion blend
 
-`Character::Method_0x004a9050` (thiscall, `ret 0x1c`, 2138 bytes) is the
+`Character::ApplyFourMotionBlendAtPhase` (thiscall, `ret 0x1c`, 2138 bytes) is the
 blend that `KrustyBike::UpdateRiderPose` (0x0048eea0) calls on the rider and
 on the bike. It is now `samples/physics/motion/CharacterMotionFourPose.cpp`, a
 `reviewed-nonexact` candidate compiled with `/QIfist /Op`. The
@@ -2125,7 +2125,7 @@ and `currentFrame` fields.
 
 | VA | Function | Bring-up | Now linked |
 |---|---|---|---|
-| 0x004a9050 | `Character::Method_0x004a9050` | 0.103 | 0.727 |
+| 0x004a9050 | `Character::ApplyFourMotionBlendAtPhase` | 0.103 | 0.727 |
 
 Retail's ebp frame and pointer `fistp` come from the inline asm; the
 [frame pragma](#frame-pointer-units) supplies the frame (0.758). The other known differences

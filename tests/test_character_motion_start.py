@@ -20,7 +20,7 @@ from test_bike_text_connections import extract
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'samples/physics/motion/CharacterMotionStart.cpp'
 CANONICAL = 'src/krusty2/motion/Motnctrl.cpp'
-SYMBOL = '?Method_0x004a8bf0@Character@@QAEXHM@Z'
+SYMBOL = '?ApplyMotionAtPhase@Character@@QAEXHM@Z'
 HELPER = '?ApplyPoseListSlot4@Character@@QAEXPAUMotionPoseList@@H@Z'
 CONVERSION = '?FloatToInt@@YAXPAHM@Z'
 

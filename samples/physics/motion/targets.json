@@ -121,7 +121,7 @@
   {
     "class": "Character",
     "source": "CharacterMotionFourPose.cpp",
-    "candidate_symbol_contains": "?Method_0x004a9050@Character@@QAEXHHHHMMM@Z",
+    "candidate_symbol_contains": "?ApplyFourMotionBlendAtPhase@Character@@QAEXHHHHMMM@Z",
     "target_va": "0x004a9050",
     "target_size": 2138,
     "expect": "partial",

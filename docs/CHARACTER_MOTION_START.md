@@ -1,7 +1,7 @@
 # Character motion start and current-rounding conversion
 
 `samples/physics/motion/CharacterMotionStart.cpp` reconstructs the complete
-`Character::Method_0x004a8bf0(int, float)` body at `0x004a8bf0`. The retail
+`Character::ApplyMotionAtPhase(int, float)` body at `0x004a8bf0`. The retail
 extent is **81 bytes**, ending with `ret 8` at `0x4a8c3e`; fifteen NOPs separate
 it from the next method at `0x4a8c50`. The method name remains provisional.
 The source is a reviewed **nonexact** candidate: authentic VC6 SP3 emits a
