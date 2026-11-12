@@ -290,9 +290,9 @@ int FormatFromPixelFormat(UnknownPixelFormat* pixelFormat) {
 
 // 0x00511b40: reads the header field by field. Only 16, 24 and 32-bit
 // files of image type 2 (raw) or 10 (run-length) are accepted.
-UnknownTgaFile* ReadTgaHeader(FileStream* stream, UnknownTgaFile* file, int offset) {
+TgaFile* ReadTgaHeader(FileStream* stream, TgaFile* file, int offset) {
     if (!file) {
-        file = (UnknownTgaFile*)DebugMalloc(sizeof(UnknownTgaFile), __FILE__, 354);
+        file = (TgaFile*)DebugMalloc(sizeof(TgaFile), __FILE__, 354);
         if (!file)
             return 0;
         file->bits = 0;
@@ -333,7 +333,7 @@ failed:
 
 // 0x00511d00: opens `path` "rb" in a new stream (Tgafile.cpp line 494) and
 // reads its header; 0 when it cannot be opened.
-UnknownTgaFile* OpenAndReadHeader(const char* path, UnknownTgaFile* file, int resources) {
+TgaFile* OpenAndReadHeader(const char* path, TgaFile* file, int resources) {
     FileStream* stream =
         new(__FILE__, 494) FileStream((ResourceManager*)resources);
     if (!stream->Open(path, "rb", 0)) {
@@ -347,7 +347,7 @@ UnknownTgaFile* OpenAndReadHeader(const char* path, UnknownTgaFile* file, int re
 
 // 0x00511dd0: reads the header and then the pixels for its depth; frees
 // the file when the pixels cannot be read.
-UnknownTgaFile* ReadWholeFile(FileStream* stream, UnknownTgaFile* file, int offset) {
+TgaFile* ReadWholeFile(FileStream* stream, TgaFile* file, int offset) {
     file = ReadTgaHeader(stream, file, offset);
     if (!file)
         return 0;
@@ -380,7 +380,7 @@ static inline void SwapBytes(unsigned char& a, unsigned char& b) {
 // 0x00511e80: reads 24-bit pixels, raw (image type 2) or run-length coded,
 // swapping red and blue, then flips bottom-up images through the scratch
 // row and marks them top-down.
-int ReadTgaPixels24(UnknownTgaFile* file, FileStream* stream) {
+int ReadTgaPixels24(TgaFile* file, FileStream* stream) {
     int count = file->height * file->width;
     unsigned int size = count * 3;
     if (size > file->bitsSize) {
@@ -453,7 +453,7 @@ int ReadTgaPixels24(UnknownTgaFile* file, FileStream* stream) {
 
 // 0x00512100: reads 32-bit pixels like 0x00511e80; literal run-length
 // pixels are read one at a time.
-int ReadTgaPixels32(UnknownTgaFile* file, FileStream* stream) {
+int ReadTgaPixels32(TgaFile* file, FileStream* stream) {
     int count = file->height * file->width;
     unsigned int size = count * 4;
     if (size > file->bitsSize) {
@@ -529,7 +529,7 @@ int ReadTgaPixels32(UnknownTgaFile* file, FileStream* stream) {
 
 // 0x00512370: reads 16-bit pixels like 0x00511e80, without the colour
 // swap; raw images are read row by row.
-int ReadTgaPixels16(UnknownTgaFile* file, FileStream* stream) {
+int ReadTgaPixels16(TgaFile* file, FileStream* stream) {
     int count = file->height * file->width;
     unsigned int size = count * 2;
     if (size > file->bitsSize) {
@@ -602,7 +602,7 @@ int ReadTgaPixels16(UnknownTgaFile* file, FileStream* stream) {
 // and the pixels for its depth and names the file after the path; frees the
 // file when the pixels cannot be read. Each failure deletes the stream on
 // its own path.
-UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* file, int resources) {
+TgaFile* LoadFile(const char* path, TgaFile* file, int resources) {
     FileStream* stream =
         new(__FILE__, 567) FileStream((ResourceManager*)resources);
     if (!stream->Open(path, "rb", 0)) {
@@ -636,14 +636,14 @@ failed:
 
 // 0x00512720: writes 24-bit `bits` to the TGA file `path`.
 int WriteTga24(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor) {
-    UnknownTgaFile file;
+    TgaFile file;
     FillTgaHeader24(&file, bits, width, height);
     strcpy(file.name, path);
     return WriteTga(&file, stride, 0, descriptor);
 }
 
 // 0x005127a0: fills a 24-bit uncompressed true-colour header for `bits`.
-void FillTgaHeader24(UnknownTgaFile* file, void* bits, int width, int height) {
+void FillTgaHeader24(TgaFile* file, void* bits, int width, int height) {
     file->idLength = 0;
     file->colorMapType = 0;
     file->imageType = 2;
@@ -661,14 +661,14 @@ void FillTgaHeader24(UnknownTgaFile* file, void* bits, int width, int height) {
 
 // 0x005127f0: writes 32-bit `bits` to the TGA file `path`.
 int WriteTga32(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor) {
-    UnknownTgaFile file;
+    TgaFile file;
     FillTgaHeader32(&file, bits, width, height);
     strcpy(file.name, path);
     return WriteTga(&file, stride, 0, descriptor);
 }
 
 // 0x00512870: fills a 32-bit uncompressed true-colour header for `bits`.
-void FillTgaHeader32(UnknownTgaFile* file, void* bits, int width, int height) {
+void FillTgaHeader32(TgaFile* file, void* bits, int width, int height) {
     file->idLength = 0;
     file->colorMapType = 0;
     file->imageType = 2;
@@ -687,14 +687,14 @@ void FillTgaHeader32(UnknownTgaFile* file, void* bits, int width, int height) {
 // 0x005128c0: writes 16-bit `bits` to the TGA file `path`.
 int WriteTga16(void* bits, int width, int height, unsigned int stride, int greenMask, const char* path,
                           int descriptor) {
-    UnknownTgaFile file;
+    TgaFile file;
     FillTgaHeader16(&file, bits, width, height);
     strcpy(file.name, path);
     return WriteTga(&file, stride, greenMask, descriptor);
 }
 
 // 0x00512940: fills a 16-bit uncompressed true-colour header for `bits`.
-void FillTgaHeader16(UnknownTgaFile* file, void* bits, int width, int height) {
+void FillTgaHeader16(TgaFile* file, void* bits, int width, int height) {
     file->idLength = 0;
     file->colorMapType = 0;
     file->imageType = 2;
@@ -711,7 +711,7 @@ void FillTgaHeader16(UnknownTgaFile* file, void* bits, int width, int height) {
 }
 
 // 0x00512dd0: frees a loaded file, its pixels and +0x120.
-void FreeFile(UnknownTgaFile* file) {
+void FreeFile(TgaFile* file) {
     if (file) {
         if (file->bits)
             DebugFree(file->bits, __FILE__, 865);

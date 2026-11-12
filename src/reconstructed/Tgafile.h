@@ -33,7 +33,7 @@ int FormatFromPixelFormat(UnknownPixelFormat* pixelFormat);
 
 // A TGA file being read or written: the header fields (unpacked; 0x00512990 writes
 // them one by one), the pixels and the file name.
-struct UnknownTgaFile {
+struct TgaFile {
     unsigned char idLength;
     unsigned char colorMapType;
     unsigned char imageType;                  // 2: uncompressed true colour
@@ -58,7 +58,7 @@ struct UnknownTgaFile {
 // 0x00512990: writes `file` with descriptor byte `descriptor`; rows lie
 // `stride` bytes apart (0: packed). 16-bit pixels are 555 when `greenMask`
 // is 0x3e0, else 565.
-int WriteTga(UnknownTgaFile* file, unsigned int stride, int greenMask, int descriptor);
+int WriteTga(TgaFile* file, unsigned int stride, int greenMask, int descriptor);
 
 class FileStream;
 
@@ -68,32 +68,32 @@ class FileStream;
 
 
 // 0x00511b40: reads a header from `stream` (after seeking by `offset`) into
-// `file`, or a new UnknownTgaFile when it is 0; frees the file on failure.
-UnknownTgaFile* ReadTgaHeader(FileStream* stream, UnknownTgaFile* file, int offset);
+// `file`, or a new TgaFile when it is 0; frees the file on failure.
+TgaFile* ReadTgaHeader(FileStream* stream, TgaFile* file, int offset);
 
 // Pixel readers for a loaded header (24-bit, 32-bit, 16-bit); 0 on failure.
-int ReadTgaPixels24(UnknownTgaFile* file, FileStream* stream);
-int ReadTgaPixels32(UnknownTgaFile* file, FileStream* stream);
-int ReadTgaPixels16(UnknownTgaFile* file, FileStream* stream);
+int ReadTgaPixels24(TgaFile* file, FileStream* stream);
+int ReadTgaPixels32(TgaFile* file, FileStream* stream);
+int ReadTgaPixels16(TgaFile* file, FileStream* stream);
 
 // 0x00511d00: opens `path` and reads its header (0x00511b40).
-UnknownTgaFile* OpenAndReadHeader(const char* path, UnknownTgaFile* file, int resources);
+TgaFile* OpenAndReadHeader(const char* path, TgaFile* file, int resources);
 
 // 0x00511dd0: reads a whole file from `stream`; 0 on failure.
-UnknownTgaFile* ReadWholeFile(FileStream* stream, UnknownTgaFile* file, int offset);
+TgaFile* ReadWholeFile(FileStream* stream, TgaFile* file, int offset);
 
 // 0x005125c0: loads the whole file at `path`, named after it; 0 on failure.
-UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* file, int resources);
+TgaFile* LoadFile(const char* path, TgaFile* file, int resources);
 
 // 0x00512dd0: frees a loaded file.
-void FreeFile(UnknownTgaFile* file);
+void FreeFile(TgaFile* file);
 
 // Writers: fill a 24-bit (0x005127a0), 32-bit (0x00512870) or 16-bit
 // (0x00512940) header for `bits`, name it `path` and write it.
 int WriteTga24(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor);
-void FillTgaHeader24(UnknownTgaFile* file, void* bits, int width, int height);
+void FillTgaHeader24(TgaFile* file, void* bits, int width, int height);
 int WriteTga32(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor);
-void FillTgaHeader32(UnknownTgaFile* file, void* bits, int width, int height);
+void FillTgaHeader32(TgaFile* file, void* bits, int width, int height);
 int WriteTga16(void* bits, int width, int height, unsigned int stride, int greenMask, const char* path,
                           int descriptor);
-void FillTgaHeader16(UnknownTgaFile* file, void* bits, int width, int height);
+void FillTgaHeader16(TgaFile* file, void* bits, int width, int height);

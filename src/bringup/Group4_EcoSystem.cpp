@@ -306,7 +306,7 @@ static inline float UnknownEcoRandom() {
 // the green channel of a 32- or 24-bit image, the green field of a 16-bit
 // one, scaled to 0..1. Inline shape only (the three branches are expanded
 // at every sample site of the generator).
-static inline float UnknownEcoSampleTga(UnknownTgaFile* tga, float x, float z) {
+static inline float UnknownEcoSampleTga(TgaFile* tga, float x, float z) {
     float worldX = g_collisionQuadTree->extentX;
     int width = tga->width;
     int column = (int)(x / worldX * width);
@@ -328,7 +328,7 @@ static inline float UnknownEcoSampleTga(UnknownTgaFile* tga, float x, float z) {
 // UnknownEcoSampleTga times `weight`, multiplied in retail's order: the
 // channel times the weight first, then the 1/255 (1/31) scale. At 24-bit
 // precision this rounds differently from scaling the channel first.
-static inline float UnknownEcoSampleTgaWeighted(UnknownTgaFile* tga, float x, float z, float weight) {
+static inline float UnknownEcoSampleTgaWeighted(TgaFile* tga, float x, float z, float weight) {
     float worldX = g_collisionQuadTree->extentX;
     int width = tga->width;
     int column = (int)(x / worldX * width);
@@ -348,7 +348,7 @@ static inline float UnknownEcoSampleTgaWeighted(UnknownTgaFile* tga, float x, fl
 }
 
 // Whether the probability TGA is nonzero at the terrain position.
-static inline int UnknownEcoTgaIsSet(UnknownTgaFile* tga, float x, float z) {
+static inline int UnknownEcoTgaIsSet(TgaFile* tga, float x, float z) {
     float worldX = g_collisionQuadTree->extentX;
     int width = tga->width;
     int column = (int)(x / worldX * width);
@@ -386,7 +386,7 @@ static inline int UnknownEcoTgaIsSet(UnknownTgaFile* tga, float x, float z) {
 // order (UnknownEcoSampleTgaWeighted), at a small cost in linked score (VC6
 // reallocates ebx/ebp across the body): behaviour over code shape.
 int EcoSystem::GenerateObjects(int checkCodes) {
-    UnknownTgaFile* tgas[256];
+    TgaFile* tgas[256];
     float definitionIndex[256];
     float cumulative[256];
     Vector3 outerRing[20];
@@ -400,7 +400,7 @@ int EcoSystem::GenerateObjects(int checkCodes) {
     int i;
     int j;
     PlaceAuthoredObjects();
-    UnknownTgaFile* tga = 0;
+    TgaFile* tga = 0;
     memset(tgas, 0, sizeof(tgas));
     if (probabilityTga[0])
         tga = LoadFile(probabilityTga, 0, (int)g_ResourceManager);

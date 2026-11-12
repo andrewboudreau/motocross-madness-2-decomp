@@ -341,8 +341,8 @@
   "?AddArchive@ResourceManager@@QAEPAVFileStream@@PBDH@Z": "0x004e9030",
   "?FindItem@ResourceManager@@QAEPAVResourceItem@@PBDH@Z": "0x004e9360",
   "?RemoveArchiveItems@ResourceManager@@QAEHPAVFileStream@@@Z": "0x004e9830",
-  "?ReadWholeFile@@YAPAUUnknownTgaFile@@PAVFileStream@@PAU1@H@Z": "0x00511dd0",
-  "?FreeFile@@YAXPAUUnknownTgaFile@@@Z": "0x00512dd0",
+  "?ReadWholeFile@@YAPAUTgaFile@@PAVFileStream@@PAU1@H@Z": "0x00511dd0",
+  "?FreeFile@@YAXPAUTgaFile@@@Z": "0x00512dd0",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "?Tick@UIControl@@UAEHM@Z": "0x00470e00",
   "?Tick@UIListBox@@UAEHM@Z": "0x00476020",
@@ -574,10 +574,10 @@
   "??_C@_0CN@FCNK@UIFrame?$CI?$CJ?3?5Warning?$CB?5Error?5loadin@": "0x0056bd18",
   "??0Sound@@QAE@PAVSoundGroup@@H@Z": "0x004bba10",
   "?Load@Sound@@QAEHPBDPAVFileStream@@HHHH@Z": "0x004bc320",
-  "?LoadFile@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x005125c0",
+  "?LoadFile@@YAPAUTgaFile@@PBDPAU1@H@Z": "0x005125c0",
   "?AddImageFileRow@UIListBox@@QAEHPBDHHH@Z": "0x00477110",
   "?AddImageFileRow@UIListBox@@QAEHPBDHHH@Z$ehhandler": "0x0054b39e",
-  "?OpenAndReadHeader@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x00511d00",
+  "?OpenAndReadHeader@@YAPAUTgaFile@@PBDPAU1@H@Z": "0x00511d00",
   "?SetCursorAnimation@GUIUser@@QAEXPAUUnknownCursorAnimation@@@Z": "0x00487fb0",
   "?Tick@UIDialog@@UAEHM@Z": "0x0046ef00"
 }

@@ -77,7 +77,7 @@ GameCursor::~GameCursor() {
 // 0x0043ebd0
 int GameCursor::LoadCursorTexture(const char* image, TextureMapManager* textures, void* palette,
                                       Palette8* palette8) {
-    UnknownTgaFile* file = LoadFile(image, 0, (int)g_ResourceManager);
+    TgaFile* file = LoadFile(image, 0, (int)g_ResourceManager);
     if (!file)
         return 0;
 

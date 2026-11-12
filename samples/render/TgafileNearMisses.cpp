@@ -28,7 +28,7 @@
 // pixels are swapped in place and written in blocks; 16-bit rows go as
 // they are for 555 and pixel by pixel as 555 for 565. The 16-bit failures
 // return without closing the file, as in retail.
-int WriteTga(UnknownTgaFile* file, unsigned int stride, int greenMask, int descriptor) {
+int WriteTga(TgaFile* file, unsigned int stride, int greenMask, int descriptor) {
     int row;
     int column;
     unsigned int pitch;

@@ -21,7 +21,7 @@ static PCVideoCard* Display(){return (PCVideoCard*)displayStorage;}
 static PCRenderTarget* Provided(){return (PCRenderTarget*)providedStorage;}
 struct Block { int size,alive; unsigned char bytes[sizeof(PCRenderTarget)]; };
 static Block heap[8];
-static UnknownTgaFile file;
+static TgaFile file;
 static unsigned char pixels[256];
 static UnknownDisplayMode modes[4];
 struct Scenario {
@@ -38,7 +38,7 @@ struct Observation {
     int exception,fault,faultOperation,faultAddress,events,blocks,fileAlive,returned;
     EventRecord trace[80];Block heap[8];
     unsigned char display[sizeof(PCVideoCard)],game[sizeof(TrackGame)],provided[sizeof(PCRenderTarget)];
-    UnknownTgaFile file;UnknownDisplayMode modes[4];
+    TgaFile file;UnknownDisplayMode modes[4];
 };
 static Observation observed,referenceResult;
 static int blocks,allocations,constructors,modeIndex,textureCalls,passes;
@@ -124,11 +124,11 @@ int PCTextureMap::CreateTextureSurface(int a,int b,int c){
     Event(11,Identity(this),a,b,c);if(scenario.throwOperation==3)throw 74;
     return !scenario.failTexture;
 }
-UnknownTgaFile* LoadFile(const char* name,UnknownTgaFile* output,int flags){
+TgaFile* LoadFile(const char* name,TgaFile* output,int flags){
     if(strcmp(name,"partblt.tga"))Fail(87);Event(12,Identity(output),flags);
     observed.fileAlive=scenario.fileExists;return scenario.fileExists?&file:0;
 }
-void FreeFile(UnknownTgaFile* p){
+void FreeFile(TgaFile* p){
     Event(13,Identity(p));if(p!=&file||!observed.fileAlive)Fail(88);observed.fileAlive=0;
 }
 int PCVideoCard::SetFullscreenDisplayMode(int mode,int windowed){

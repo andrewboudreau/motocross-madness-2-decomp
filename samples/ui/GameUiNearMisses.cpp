@@ -465,7 +465,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                         cursorAnimation = (UnknownCursorAnimation*)FindSectionObject(buffer);
                     parameters.GetString("BackgroundFile", "", buffer, -1);
                     if (buffer[0] && dialogBackground) {
-                        UnknownTgaFile* file = LoadFile(buffer, 0, (int)g_ResourceManager);
+                        TgaFile* file = LoadFile(buffer, 0, (int)g_ResourceManager);
                         if (file) {
                             ownsBackground = 1;
                             if (parentDialog)

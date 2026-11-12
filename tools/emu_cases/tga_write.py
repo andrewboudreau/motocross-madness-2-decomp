@@ -11,7 +11,7 @@ red and blue in place, which the write comparison covers.
 import random
 
 RETAIL_VA = 0x00512990
-SYMBOL = '?WriteTga@@YAHPAUUnknownTgaFile@@IHH@Z'
+SYMBOL = '?WriteTga@@YAHPAUTgaFile@@IHH@Z'
 SOURCE = 'samples/render/TgafileNearMisses.cpp'
 PROBES = {0x00512af0: '24', 0x00512bb6: '32', 0x00512cab: '555', 0x00512d1c: '565', 0x00512dba: 'fail'}
 

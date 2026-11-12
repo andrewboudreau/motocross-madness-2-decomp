@@ -1239,7 +1239,7 @@ int CountTexture(UnknownSceneTextureInfo* texture, int* counts)
             || entry->archive->Read(&width, 4, 1) != 1)
             return 0;
     } else {
-        UnknownTgaFile* file = OpenAndReadHeader(texture->textureName, 0,
+        TgaFile* file = OpenAndReadHeader(texture->textureName, 0,
                                                      (int)g_ResourceManager);
         if (!file)
             return 0;

@@ -45,7 +45,7 @@ TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int
     UnknownTexturePalette* texturePalette = 0;
     int fromFile = 1;
     void* surfacePalette = 0;
-    UnknownTgaFile* file = 0;
+    TgaFile* file = 0;
     int width;
     int height;
     int fileFormat;

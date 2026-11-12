@@ -55,7 +55,7 @@ int PCVideoCard::ProbePartialTextureUploads(RenderTarget* target) {
     area.bottom = 256;
     rendered = 0;
     expected = 0;
-    UnknownTgaFile* file = LoadFile("partblt.tga", 0, 0);
+    TgaFile* file = LoadFile("partblt.tga", 0, 0);
     RenderTarget* render = 0;
     if (target)
         render = target;

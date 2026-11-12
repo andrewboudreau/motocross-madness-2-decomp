@@ -27,7 +27,7 @@ class TextureMapManager;
 #include "FileStream.h"
 
 struct UnknownBitmapFile;
-struct UnknownTgaFile;
+struct TgaFile;
 
 #include "GroundFogableObject.h"
 
@@ -502,6 +502,6 @@ float ReadIniFloat(const char* section, const char* key, double defaultValue, co
 #include "FilePrintf.h"
 UnknownBitmapFile* ReadBitmap(const char* path, UnknownBitmapFile* into); // 0x00424140
 void FreeBitmap(UnknownBitmapFile* bitmap);                  // 0x004245b0
-UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* into, int resources); // 0x005125c0
-void FreeFile(UnknownTgaFile* tga);                        // 0x00512dd0
+TgaFile* LoadFile(const char* path, TgaFile* into, int resources); // 0x005125c0
+void FreeFile(TgaFile* tga);                        // 0x00512dd0
 int IsFormat4444Or8888(int format);                                  // 0x00511ad0

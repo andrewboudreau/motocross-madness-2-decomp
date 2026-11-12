@@ -1043,7 +1043,7 @@ void UIListBox::SyncBoundValue(int value) {
 // which retail tests once after the whole if/else; the missing-image warning
 // is formatted but never shown.
 UIFrame::UIFrame(const char* file, void* textures, int soundGroup, int duplicates, void* palette) {
-    UnknownTgaFile* image = 0;
+    TgaFile* image = 0;
     if (_stricmp(".wav", file + strlen(file) - 4)) {
         int format = g_TrackGame->renderTarget->surfacePixelFormat;
         ownsSound = 0;
@@ -2960,7 +2960,7 @@ int UIListBox::AddImageFileRow(const char* file, int data, int loadImage, int ro
         strcpy(name, file);
         row.textLines = 0;
         row.field_0x30 = 0;
-        UnknownTgaFile* header = OpenAndReadHeader(file, 0, (int)g_ResourceManager);
+        TgaFile* header = OpenAndReadHeader(file, 0, (int)g_ResourceManager);
         if (header) {
             row.width = header->width;
             row.height = header->height;
@@ -5340,7 +5340,7 @@ void UIDDLListBox::ReportClick(int* handled) {
 // 0x00472bc0
 int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
     if (stream) {
-        UnknownTgaFile* image = ReadWholeFile((FileStream*)stream, 0, offset);
+        TgaFile* image = ReadWholeFile((FileStream*)stream, 0, offset);
         if (image) {
             int format = g_TrackGame->renderTarget->surfacePixelFormat;
             frameWidth = image->width;

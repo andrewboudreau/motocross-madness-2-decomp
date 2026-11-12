@@ -48,7 +48,7 @@ Retail details the source keeps:
   parameter slot as retail does. Formats other than 16, 24 and 32 bits
   become 8.
 
-The writers build an `UnknownTgaFile` on the stack (the TGA header fields
+The writers build an `TgaFile` on the stack (the TGA header fields
 unpacked, the pixels at +0x14 and the name at +0x1c), copy the path in and
 return the result of `0x00512990`. The value PCTextureMap's level dump
 passes as 32 is the header's descriptor byte (top-left origin).
