@@ -57,6 +57,7 @@
 #include "../../src/krusty2/collision/CollisionObject.h"
 #include "../../src/krusty2/effects/ParticleManager.h"
 #include "../../src/krusty2/broadphase/Terrain.h"
+#include "../../src/reconstructed/TerrainShadow.h"
 #include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/TextureMapManager.h"
 #include "../../src/reconstructed/TrackGame.h"
@@ -188,16 +189,6 @@ public:
     // 0x0052d460: VisibilityQuadTree::Setup (src/krusty2/visibility).
     GameObject* Setup(void* target, int a, int b, float width, float breadth, Scene* scene,
                       float height);
-};
-
-// ProjectedShadow (0x134 bytes) and TerrainShadow (0x6780 bytes).
-class UnknownQuarryTerrainShadow : public GameObject {
-public:
-    explicit UnknownQuarryTerrainShadow(int flags);            // 0x00508ae0
-    // 0x00508b80: TerrainShadow::Attach (samples/physics/shadow).
-    GameObject* Attach(void* target, UnknownTerrain* terrain, ProjectedShadow* shadow);
-
-    unsigned char field_0x2c[0x6780 - 0x2c];
 };
 
 // Fog (0x5c bytes, QuarryEvent.h's Fog) and the objects the sky adds.
@@ -572,8 +563,9 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
 
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
-        terrainShadow = (new(__FILE__, 822) UnknownQuarryTerrainShadow(g_TrackGame->mode.shadowsOn))
-                         ->Attach(renderContext, eventTerrain, (ProjectedShadow*)projectedShadow);
+        terrainShadow = (new(__FILE__, 822) TerrainShadow(g_TrackGame->mode.shadowsOn))
+                         ->Attach((int)renderContext, (Terrain*)eventTerrain,
+                                  (ProjectedShadow*)projectedShadow);
         AppendChild((GameObject*)terrainShadow, -1);
     }
     AppendChild(visibility, -1);

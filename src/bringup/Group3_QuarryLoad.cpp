@@ -14,10 +14,10 @@
 //     (new, EH state, null test, constructor), declared over the views' storage;
 //   * the fog objects use Fog.h's Fog/FogOff/FogOn directly; FogOn's folded Create
 //     (0x00486a10) is defined at the end of this file and called, as retail calls it;
-//   * SkyCube.h and krusty2's ProjectedShadow.h, CollisionObject.h, ParticleManager.h,
-//     VisibilityQuadTree.h and Terrain.h can share this unit and QuarryEvent.h declares
-//     EcoSystem::Create, so those objects and the ecosystem are created and called through
-//     their own classes;
+//   * SkyCube.h, TerrainShadow.h and krusty2's ProjectedShadow.h, CollisionObject.h,
+//     ParticleManager.h, VisibilityQuadTree.h and Terrain.h can share this unit and
+//     QuarryEvent.h declares EcoSystem::Create, so those objects and the ecosystem are
+//     created and called through their own classes;
 //   * the memory estimate reads EcoSystem.cpp's preloaded-texture count (0x0059af10).
 // Linked score 0.985, 2208 instructions against retail's 2208 (was 0.908 at 2101: the
 // out-of-line G3Q_New* allocation helpers dropped retail's inline new/EH/null-test/
@@ -49,6 +49,7 @@
 #include "effects/ParticleManager.h"
 #include "visibility/VisibilityQuadTree.h"
 #include "broadphase/Terrain.h"
+#include "../reconstructed/TerrainShadow.h"
 #include "../reconstructed/TextureMap.h"
 #include "../reconstructed/TextureMapManager.h"
 #include "../reconstructed/TrackGame.h"
@@ -170,16 +171,6 @@ public:
     unsigned char field_0x3b8[0x3bc - 0x3b8];
 };
 
-// ProjectedShadow (0x134 bytes) and TerrainShadow (0x6780 bytes).
-class UnknownQuarryTerrainShadow : public GameObject {
-public:
-    explicit UnknownQuarryTerrainShadow(int flags);            // 0x00508ae0
-    // 0x00508b80: TerrainShadow::Attach (samples/physics/shadow).
-    GameObject* Attach(void* target, UnknownTerrain* terrain, ProjectedShadow* shadow);
-
-    unsigned char field_0x2c[0x6780 - 0x2c];
-};
-
 // Fog (0x5c bytes, QuarryEvent.h's Fog) and the objects the sky adds.
 class UnknownQuarryFog : public GameObject {
 public:
@@ -217,10 +208,6 @@ public:
 class KrustyBikeCamera : public UnknownQuarryBikeCamera {
 public:
     explicit KrustyBikeCamera(int flags);                      // 0x00497cb0
-};
-class TerrainShadow : public UnknownQuarryTerrainShadow {
-public:
-    explicit TerrainShadow(int flags);                         // 0x00508ae0
 };
 class BikeRace : public UnknownQuarryRace {
 public:
@@ -574,7 +561,8 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         terrainShadow = (new(__FILE__, 822) TerrainShadow(g_TrackGame->mode.shadowsOn))
-                         ->Attach(renderContext, eventTerrain, (ProjectedShadow*)projectedShadow);
+                         ->Attach((int)renderContext, (Terrain*)eventTerrain,
+                                  (ProjectedShadow*)projectedShadow);
         AppendChild((GameObject*)terrainShadow, -1);
     }
     AppendChild(visibility, -1);
@@ -867,11 +855,6 @@ UnknownQuarryBikeCamera* UnknownQuarryBikeCamera::Create(void* target, float a, 
     return (UnknownQuarryBikeCamera*)G3Q_BikeCameraSetupFlyby(this, target, a, b, c, d, e, f, count, presets);
 }
 void UnknownQuarryBikeCamera::SetSubject(UnknownTerrain* terrain) { G3Q_BikeCameraSetSubject(this, terrain); }
-
-GameObject* UnknownQuarryTerrainShadow::Attach(void* target, UnknownTerrain* terrain, ProjectedShadow* shadow)
-{
-    return (GameObject*)G3Q_TerrainShadowAttach(this, target, terrain, shadow);
-}
 
 void UnknownQuarryRaceObject::InsertNodesInQuadtree() { G3Q_QuadTreeRendererInsertNodes(this); }
 
