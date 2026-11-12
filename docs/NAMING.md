@@ -441,3 +441,59 @@ Left as placeholders in wave 6:
   waits.
 - `aN` mentions inside comments that map argument positions (the
   `LoadPhysicsModel` grouping notes): they number the stack dwords.
+
+## Wave 7: UI, text and front-end types
+
+Wave 7 names the text service, the pro circuit career, the KrustyUI
+records and the TrackGame objects behind the menus. Type renames change
+mangled names, so the bindings, calibration cases, emulator cases and
+fixture keys were updated with them. Each affected unit was compiled with
+VC6 before and after (057d2c9e): every one is identical, or differs only
+in the renamed symbols (some with COMDAT sections in a different order);
+four test fixtures that need their own flags or generated headers fail to
+compile the same way on both sides.
+No line moved.
+
+| Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- |
+| `UnknownOverlayText` | `TextService` | 2 | The constructor `0x0050ac30` pushes the TextService.cpp `__FILE__` literal (`0x00574b30`, line 22) and `Create` `0x0050ae80` uses it at line 113. The unit holds every method, as for `VCR` and `ResourceManager` in wave 3 ([TEXTSERVICE](TEXTSERVICE.md)). |
+| `UnknownOverlayVertex` | `TLVertex` | 2 | The pre-transformed, lit vertex drawn with FVF `0x1c4` (D3DTLVERTEX: x, y, z, rhw, color, specular, tu, tv). |
+| `TextService` +0x10, +0x2c | `bounds`, `vertices` | 2 | The constructor stores `(x, y)-(x + width, y + height)` in the +0x10 rectangle; `LayoutText` fills and returns the +0x2c quads. |
+| `Rectangle2D` +0x04, +0x10, `UnknownSet` | `topLeft`, `bottomRight`, `SetCorners` | 2 | The text blitters use +0x04 as the glyph origin and `+0x10 - +0x04` as its extent; the inline setter stores both corners. |
+| `UnknownTrackGameObject3444` | `ProCircuit` | 2 | The constructor `0x004d3480` pushes the ProCircuit.cpp `__FILE__` literal (`0x005718ac`, xref `0x004d34a1`); the unit `0x004d3480..0x004d4b1f` holds only its methods ([PROCIRCUIT](PROCIRCUIT.md)). |
+| `UnknownProCircuitStats`, `...Racer`, `...Track`, `...Schedule` | `ProCircuitStats`, `ProCircuitRacer`, `ProCircuitTrack`, `ProCircuitSchedule` | 2 | The career records `ProCircuit` reads from PCTables.pb/PCSched.pb and saves. |
+| `UnknownSetText` (ProCircuitProcs.cpp) | `SetResourceText` | 2 | Its body is `SetTextFromResource(g_TrackGame->resourceInstance, id)`. |
+| `UnknownKrustyUIModel` (SelectGamePicProcs.h) | `KrustyUIModelRecord` | 1 | One `KrustyUI::LoadBikesAndRiders` record of bikes.pb `"Manufacturer_%02d"` or riders.pb `"Rider_%02d"`. |
+| `KrustyUIModelRecord` +0x40, +0x80, +0xc4 | `modelFile`, `uiModelFile`, `availability` (were `modelName`, `field_0x80`, `modelKind`) | 1 | The keys `"ModelFile"` (a rider's `"File"`), `"UIModelFile"` and `"Availability"` stored there (KrustyUI.cpp). |
+| `UnknownKrustyUIBike` (SelectGamePicProcs.h) | `KrustyUIBikeRecord` | 1 | The `"BikeName/BikeTexture/BikeEngineSize/BikeFourStroke_%02d"` record. |
+| `KrustyUIBikeRecord` +0x00 | `manufacturer` (was `model`) | 2 | Index into KrustyUI+0x48 (the manufacturers); KrustyUI.cpp's and QuarryStuntEvent.cpp's views already call it that. |
+| `ProCircuit` +0x48 | `maxAvailability` (was `maxModelKind`) | 2 | Compared with `availability` when the racers' bikes and riders are picked (and by QuarryStuntEvent). |
+| `UnknownTrackGameObject33fc` | `ControlSetup` | 3 | TrackGame+0x33fc (`controlSetup`). It loads and saves control.ctl under `"Setup"`/`"CurrentInputDevice"` and `"Controller%d"`/`"Key%d"`. No RTTI or `__FILE__` names it, so the name is descriptive ([DEVICESETUP](DEVICESETUP.md)). |
+| `UnknownControlAssignment` | `ControlAssignment` | 2 | The `"%d,%d"` kind and code of one `ControlSetup` entry. |
+| `UnknownTrackGameObject574` | `SceneArchiveFinder` | 3 | TrackGame+0x574 (`sceneObject`): opens the scene archive and finds files in it. The name its header (SceneArchiveFinder.h) and the collision notes already used; no RTTI or `__FILE__` names the class. |
+| `UnknownEventRacerPart` | `RaceStatusNode` | 2 | The 0x54-byte node RaceStatus.cpp allocates with DebugCalloc under its `__FILE__` literal (`0x00572990`, lines 214/235/257) and frees; the unit's list helpers build, order and free it ([RACESTATUS](RACESTATUS.md)). |
+| `BikeRace::UnknownFunctionCameraView` | `RaceCameraView` | 2 | Inline accessor: returns `raceCamera` as the camera view. |
+
+Left as placeholders in wave 7:
+
+- `TextService::field_0x08` (0.2): only the constructor writes it.
+- `EventManager` +0x43c: a sweep of the unit (`0x0045b000..0x0045f800`)
+  finds no access.
+- `UnknownEventStanding` +0x04/+0x08: only `CompareStandings`
+  (`0x0045d3d0`) compares them, and `RankRacers` never writes them.
+- `GUIUser` +0xc4 and +0x1dc, `GUIManager` +0x1f8 and +0x304 (and
+  `UnknownFunction4864f0`, which returns +0x1f8): the constructors clear
+  them and one site reads or compares each; no writer of a value was found.
+- `KrustyUI` +0x38 (OpenMenu's argument when the 0x911 track record closes;
+  no writer found), +0x49c, +0x4a0, +0x4a4 (cleared on a control press),
+  +0x4ac (set when leaving the menus for a race) and the +0x634 slots.
+- `GameUi.h`: `UnknownGameUiListRow` +0x2c/+0x30, `UIControl` +0x1c8 and
+  the edit box's +0x1f4/+0x1f8 are only cleared. The int members of the
+  unions (`field_0x1ec`, `field_0x204`, `field_0x208`, `field_0x218`) are
+  the views the code reads; merging them is a type change.
+- Griddraw.h's terrain views (`GridGameSettings` +0x94 and the padding):
+  not UI, and no role was proven.
+- KrustyUI.cpp's `UnknownKrustyUIModelEntry`/`UnknownKrustyUIBikeEntry` and
+  QuarryStuntEvent.cpp's `UnknownQuarryBikeModel`/`UnknownQuarryBikeChoice`
+  are views of the two KrustyUI records; merging them is a type change.
+  `ProCircuitRank`, `ProCircuitResult` and `ProCircuitSkinned` stay views.
