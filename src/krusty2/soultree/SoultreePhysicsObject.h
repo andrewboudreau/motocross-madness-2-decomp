@@ -63,9 +63,9 @@ public:
     virtual void CloneFrom(SoultreeObject* source); // 0x00444560, ret 4
     virtual void CopySubtree(SoultreeObject* source, SoultreeObject* target); // 0x00444b60, ret 8
     // 0x0043f4b0, `ret 0x14`.  SoultreePhysicsObject slot 40 passes (a1, name, desc, a4, 1);
-    // the argument types follow that caller (tier 2).
-    virtual void D3DIMObjectVirtualSlot9(int a1, const char* a2, const SoultreeLoadDesc* a3,
-                                         int a4, int a5);
+    // the argument types follow that caller, the names D3DIMSoultreeObject::LoadModel (tier 2).
+    virtual void D3DIMObjectVirtualSlot9(int owner, const char* name, const SoultreeLoadDesc* lights,
+                                         int options, int useOptions);
 
     // Existing D3DIMSoulTree.cpp helpers; the receiver is the primary model pointer.
     void AddModifier(GameObject* modifier);          // 0x00444d80
@@ -93,7 +93,7 @@ public:
     virtual ~SoultreePhysicsObject();             // core 0x005038d0, deleting 0x00503890
     virtual int Tick(float dt);                    // 0x00503c50 (vbase thunk 0x00504270)
     // Slot 40 (0x00503970, `ret 0x70` = 28 argument dwords, tier 1).  Grouping (tier 2):
-    //  * renderContext, modelPath, desc and a4 (a1..a4) go to D3DIMObjectVirtualSlot9 as
+    //  * renderContext, modelPath, desc and options (a1..a4) go to D3DIMObjectVirtualSlot9 as
     //    (a1, a2, a3, a4, 1); modelPath is also the name the ".col" path is built from, desc
     //    is tested at +0x25.
     //  * a5..a7 are three Vec3 by value (struct-copy shape) and a8..a22 are forwarded
@@ -103,7 +103,7 @@ public:
     //  * Returns the D3DIMSoultreeObject GameObject (+0x228), not the virtual one: the tail
     //    0x00503c16 null-checks `this`, then this+0x21c, then adds 12.
     virtual GameObject* LoadPhysicsModel(int renderContext, const char* modelPath,
-                                             const SoultreeLoadDesc* desc, int a4,
+                                             const SoultreeLoadDesc* desc, int options,
                                              Vec3 startPosition, Vec3 startForward,
                                              Vec3 startUp, void* terrainProbe,
                                              void* linkedObject, float weight,

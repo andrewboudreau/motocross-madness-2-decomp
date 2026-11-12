@@ -737,7 +737,7 @@ void SoultreePhysicsBaseObject::UpdateAttachmentEffects()
                     AttachmentSink(attachment)->previousPosition = AttachmentSink(attachment)->currentPosition;
                     attachment->resetTrail = 0;
                 }
-                if (settled && !field_0x20e)
+                if (settled && !settledLastFrame)
                     reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(attachment))->Restart();
                 else if (ShouldBurstSteamEffect())
                     reinterpret_cast<SteamParticleEmitter*>(AttachmentSink(attachment))->Burst();
@@ -745,7 +745,7 @@ void SoultreePhysicsBaseObject::UpdateAttachmentEffects()
             break;
         }
     }
-    field_0x20e = (char)settled;
+    settledLastFrame = (char)settled;
     if (attachmentResetPending) {
         attachmentResetPending = 0;
         for (int i = 0; i < attachmentCount; i++) {
@@ -964,7 +964,7 @@ SoultreePhysicsBaseObject::SoultreePhysicsBaseObject(int flags)
     collisionPointCapacity = 0;
     collisionPointCount = 0;
     touchingPointCount = 0;
-    field_0x20e = 0;
+    settledLastFrame = 0;
     justReset = 0;
     groundProbeMask = 0;
     ResetDynamicState(0.0f);
@@ -1111,7 +1111,7 @@ int SoultreePhysicsObject::Tick(float dt)
 
 struct SoultreeGlobals {
     char field_0x000[0x574];
-    UnknownTrackGameObject574* field_0x574;
+    UnknownTrackGameObject574* sceneObject;   // TrackGame::sceneObject (+0x574)
 };
 class ResourceManager;
 extern ResourceManager* g_ResourceManager; // pointer stored at 0x00572b44
@@ -1122,7 +1122,7 @@ extern ResourceManager* g_ResourceManager; // pointer stored at 0x00572b44
 // SoultreePhysicsObject has two GameObjects, so field_0x08 and the GameObject call are
 // qualified.
 GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const char* modelPath,
-                                                        const SoultreeLoadDesc* desc, int a4,
+                                                        const SoultreeLoadDesc* desc, int options,
                                                         Vec3 startPosition, Vec3 startForward,
                                                         Vec3 startUp, void* terrainProbe, void* linkedObject,
                                                         float weight, int contactCapacity, int attachmentSlots,
@@ -1134,7 +1134,7 @@ GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const cha
     char name[0x104];
     char colPath[0x104];
 
-    D3DIMSoultreeObject::D3DIMObjectVirtualSlot9(renderContext, modelPath, desc, a4, 1);
+    D3DIMSoultreeObject::D3DIMObjectVirtualSlot9(renderContext, modelPath, desc, options, 1);
     SoultreePhysicsBaseObject::InitializePhysics(renderContext, 1, startPosition, startForward, startUp, terrainProbe, linkedObject, weight, contactCapacity, attachmentSlots,
                                                    trackObject, fixedStep, maxSteps, drag, elasticity, radius, shapeMode, restThreshold,
                                                    probeMask, createCollision);
@@ -1149,7 +1149,7 @@ GameObject* SoultreePhysicsObject::LoadPhysicsModel(int renderContext, const cha
     strcpy(strrchr(name, '.'), ".col");
 
     FileStream* file = new(SP_FILE, 0x84e) FileStream(g_ResourceManager);
-    if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->field_0x574->OpenArchiveFile(file, name, "rb", (int)colPath)) {
+    if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->sceneObject->OpenArchiveFile(file, name, "rb", (int)colPath)) {
         colPath[0] = 0;
     }
     delete file;
@@ -1193,7 +1193,7 @@ SoultreePhysicsCharacter::~SoultreePhysicsCharacter()
 // character: D3DIM character slot 11 instead of the object's slot 9, line 0x8cd, the pose
 // node set from the model node, and shape setup 0x004324b0 when no ".col" file exists.
 GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int createCenterNode, const char* modelPath,
-                                                           const SoultreeLoadDesc* desc, int a5,
+                                                           const SoultreeLoadDesc* desc, int loadInfo,
                                                            Vec3 startPosition, Vec3 startForward,
                                                            Vec3 startUp, void* terrainProbe, void* linkedObject,
                                                            float weight, int contactCapacity, int attachmentSlots,
@@ -1204,7 +1204,7 @@ GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int cr
     char name[0x104];
     char colPath[0x104];
 
-    D3DIMSoultreeCharacter::D3DIMVirtualSlot11(renderContext, modelPath, desc, a5, 1, 1);
+    D3DIMSoultreeCharacter::D3DIMVirtualSlot11(renderContext, modelPath, desc, loadInfo, 1, 1);
     poseNode = sceneNode = modelNode;
     SoultreePhysicsBaseObject::InitializePhysics(renderContext, createCenterNode, startPosition, startForward, startUp, terrainProbe, linkedObject, weight, contactCapacity, attachmentSlots,
                                                    trackObject, fixedStep, maxSteps, drag, elasticity, 0.0f, 0, restThreshold, probeMask,
@@ -1220,7 +1220,7 @@ GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int cr
     strcpy(strrchr(name, '.'), ".col");
 
     FileStream* file = new(SP_FILE, 0x8cd) FileStream(g_ResourceManager);
-    if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->field_0x574->OpenArchiveFile(file, name, "rb", (int)colPath)) {
+    if (!reinterpret_cast<SoultreeGlobals*>(g_TrackGame)->sceneObject->OpenArchiveFile(file, name, "rb", (int)colPath)) {
         colPath[0] = 0;
     }
     delete file;

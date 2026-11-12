@@ -255,7 +255,7 @@ public:
     int staggerCounter;  // +0x208 slot 21: ++staggerCounter, wraps to 0 after 5; slot 2 clears it; compared with staggerPhase by slot 22
     char attachmentResetPending;  // +0x20c set on (re)initialisation; slot 21 clears it and resets every attachment target (+0x60 = 0, type 4 -> 0x004ba340)
     char justReset;  // +0x20d set on (re)initialisation, cleared by the Vehicle step; slot 21 ORs it into each attachment's trail-reset flag (+0x24) and skips moving type-4 emitters while set
-    char field_0x20e;
+    char settledLastFrame;  // +0x20e slot 21 stores (char)settled at the end; the type-4 Restart runs only on the rise (settled && !settledLastFrame); ctor 0
     unsigned char groundProbeMask;  // +0x20f slot 2's a19 (byte); slot 11 passes it as the probe-result AND mask of the placement search 0x004b0df0 (contact/ObjectPlacement.cpp parameter j)
     int restContactThreshold;  // +0x210 slot 2's a18 (ctor default 1); UpdateRestState runs the rest timer only with at least restContactThreshold - 1 active contacts (touchingPointCount) and sleeps the body when touchingPointCount reaches it
     float restTimer;                  // +0x214 float timer: UpdateRestState adds stepTime and compares with 0.5/3.0 (tier 1)
