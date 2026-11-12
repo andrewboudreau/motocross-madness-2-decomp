@@ -69,7 +69,7 @@ static inline int UnknownFileExists(const char* path)
 }
 
 // Sets `control`'s text from string resource `id`.
-static inline void UnknownSetText(UIControl* control, int id)
+static inline void SetResourceText(UIControl* control, int id)
 {
     control->SetTextFromResource(g_TrackGame->resourceInstance, id);
 }
@@ -97,7 +97,7 @@ int CompareCashDescending(const void* a, const void* b)
 // 0x004d4ba0
 void OpenCareerDialog()
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    ProCircuit* circuit = g_TrackGame->proCircuit;
     if (circuit->careerFlags & 8) {
         PCCompleteDlg* dialog = new(__FILE__, 78) PCCompleteDlg;
         g_TrackGame->ui->gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
@@ -148,7 +148,7 @@ void PCStartupDlg::HandleEvent(DialogEvent* event)
             dialog->SetAnswerTargets(newCareerName, &chosenDifficulty, &chosenBikeClass, &chosenOpponentsRow);
         } else if (_stricmp("ButContinue", event->controlName) == 0) {
             int row = static_cast<UIListBox*>(FindControl("LstRank", 3))->GetRowData(-1);
-            g_TrackGame->proCircuit = new(__FILE__, 142) UnknownTrackGameObject3444;
+            g_TrackGame->proCircuit = new(__FILE__, 142) ProCircuit;
             strcpy(g_TrackGame->careerFile, careerFiles[row]);
             if (g_TrackGame->proCircuit->LoadSaved(g_TrackGame->careerFile)) {
                 PCCentralDlg* dialog = new(__FILE__, 146) PCCentralDlg;
@@ -172,7 +172,7 @@ void PCStartupDlg::HandleEvent(DialogEvent* event)
         break;
     case 9:
         if (event->code == 0x3e9) {
-            g_TrackGame->proCircuit = new(__FILE__, 182) UnknownTrackGameObject3444;
+            g_TrackGame->proCircuit = new(__FILE__, 182) ProCircuit;
             int difficulty;
             switch (chosenDifficulty) {
             case 1:
@@ -237,7 +237,7 @@ void PCStartupDlg::EnableButtons()
 // 0x004d56c0
 void PCStartupDlg::FillLists()
 {
-    UnknownTrackGameObject3444 circuit;
+    ProCircuit circuit;
     static_cast<UIListBox*>(FindControl("LstName", 3))->RemoveAllRows();
     static_cast<UIListBox*>(FindControl("LstRank", 3))->RemoveAllRows();
     static_cast<UIListBox*>(FindControl("LstClass", 3))->RemoveAllRows();
@@ -275,7 +275,7 @@ void PCStartupDlg::FillLists()
 }
 
 // 0x004d59a0
-void PCStartupDlg::AddCircuitRow(UnknownTrackGameObject3444* circuit, int row)
+void PCStartupDlg::AddCircuitRow(ProCircuit* circuit, int row)
 {
     char name[64];
     char text[128];
@@ -441,7 +441,7 @@ void PCCentralDlg::HandleEvent(DialogEvent* event)
             event->dialog->EndDialog(0);
             event->handled = 1;
         } else if (_stricmp("Start", event->controlName) == 0 || _stricmp("Practice", event->controlName) == 0) {
-            UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+            ProCircuit* circuit = g_TrackGame->proCircuit;
             g_TrackGame->ui->HideScene();
             g_TrackGame->mode.ghostFile[0] = 0;
             g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = 0;
@@ -541,7 +541,7 @@ void PCCentralDlg::OpenPage(int page)
 // 0x004d7f40
 void PCCentralNextDlg::HandleEvent(DialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    ProCircuit* circuit = g_TrackGame->proCircuit;
     if (event->kind != kDialogInit)
         return;
     const char* directory;
@@ -624,7 +624,7 @@ void PCCentralStandingsDlg::HandleEvent(DialogEvent* event)
 {
     if (event->kind != kDialogInit)
         return;
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    ProCircuit* circuit = g_TrackGame->proCircuit;
     UIListBox* rank = static_cast<UIListBox*>(FindControl("LstRank", 3));
     UIListBox* name = static_cast<UIListBox*>(FindControl("LstName", 3));
     UIListBox* points = static_cast<UIListBox*>(FindControl("LstPoints", 3));
@@ -666,7 +666,7 @@ void PCCentralStandingsDlg::HandleEvent(DialogEvent* event)
 // 0x004d8660
 void PCLastRaceDlg::HandleEvent(DialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    ProCircuit* circuit = g_TrackGame->proCircuit;
     switch (event->kind) {
     case kDialogInit: {
         UIListBox* rank = static_cast<UIListBox*>(FindControl("LstRank", 3));
@@ -781,7 +781,7 @@ void PCFailedDlg::HandleEvent(DialogEvent* event)
 // 0x004d94e0
 void PCFinishedDlg::HandleEvent(DialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    ProCircuit* circuit = g_TrackGame->proCircuit;
     switch (event->kind) {
     case kDialogInit: {
         UIListBox* rank = static_cast<UIListBox*>(FindControl("LstRank", 3));
@@ -838,10 +838,10 @@ void PCFinishedDlg::HandleEvent(DialogEvent* event)
 // other registers (48 of 755 bytes).
 void PCBonusTrackDlg::HandleEvent(DialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    ProCircuit* circuit = g_TrackGame->proCircuit;
     switch (event->kind) {
     case kDialogInit: {
-        UnknownTrackGameObject3444* current = g_TrackGame->proCircuit;
+        ProCircuit* current = g_TrackGame->proCircuit;
         // TrackGame+0x18fc: an int per series (the bonus track was offered).
         ((int*)g_TrackGame->mode.bonusTrackUnlocked)[current->series] = 1;
         int title;
@@ -856,11 +856,11 @@ void PCBonusTrackDlg::HandleEvent(DialogEvent* event)
             description = 0x145a;
             break;
         }
-        UnknownSetText(FindControl("TitleText", 12), title);
+        SetResourceText(FindControl("TitleText", 12), title);
         UIControl* control = FindControl("TxtDescription", 12);
         control->wordWrap = 1;
-        UnknownSetText(control, description);
-        UnknownSetText(FindControl("TxtItem1", 12), 0x145b);
+        SetResourceText(control, description);
+        SetResourceText(FindControl("TxtItem1", 12), 0x145b);
         UIControl* item = FindControl("Item1", 12);
         char text[128];
         sprintf(text, "$%d", 3000);
@@ -904,7 +904,7 @@ void PCBonusTrackDlg::HandleEvent(DialogEvent* event)
 // 0x004d9fd0
 void PCNewEventDlg::HandleEvent(DialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    ProCircuit* circuit = g_TrackGame->proCircuit;
     switch (event->kind) {
     case kDialogInit: {
         int description;
@@ -929,11 +929,11 @@ void PCNewEventDlg::HandleEvent(DialogEvent* event)
         }
         UIControl* control = FindControl("TxtDescription", 12);
         control->wordWrap = 1;
-        UnknownSetText(control, description);
-        UnknownSetText(FindControl("TitleText", 12), 0x1467);
+        SetResourceText(control, description);
+        SetResourceText(FindControl("TitleText", 12), 0x1467);
         control = FindControl("ButDecline", 1);
         control->Show(0, 1);
-        UnknownSetText(FindControl("ButAccept", 1), 0x916);
+        SetResourceText(FindControl("ButAccept", 1), 0x916);
         control = FindControl("Pic", 5);
         control->SetImage(0, FindSectionObject(image));
         break;
@@ -950,14 +950,14 @@ void PCNewEventDlg::HandleEvent(DialogEvent* event)
 // 0x004da1b0
 void PCCompleteDlg::HandleEvent(DialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    ProCircuit* circuit = g_TrackGame->proCircuit;
     switch (event->kind) {
     case kDialogInit: {
         char rank[1024];
         char text[1024];
         char message[2048];
         g_TrackGame->proCircuit->Save(g_TrackGame->careerFile);
-        UnknownSetText(FindControl("TitleText", 12), 0x145d);
+        SetResourceText(FindControl("TitleText", 12), 0x145d);
         UIControl* description = FindControl("TxtDescription", 12);
         g_TrackGame->LoadResourceString(0x145e, text, 1023);
         strcpy(rank, "");
@@ -968,7 +968,7 @@ void PCCompleteDlg::HandleEvent(DialogEvent* event)
         description->SetText(message);
         UIControl* control = FindControl("ButDecline", 1);
         control->Show(0, 1);
-        UnknownSetText(FindControl("ButAccept", 1), 0x144e);
+        SetResourceText(FindControl("ButAccept", 1), 0x144e);
         control = FindControl("Pic", 5);
         control->SetImage(0, FindSectionObject("WinScreen"));
         break;

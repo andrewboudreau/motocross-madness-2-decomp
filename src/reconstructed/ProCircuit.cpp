@@ -35,7 +35,7 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
     }
 
 // 0x004d3480
-UnknownTrackGameObject3444::UnknownTrackGameObject3444()
+ProCircuit::ProCircuit()
 {
     FileStream* stream = new(__FILE__, 19) FileStream(g_ResourceManager);
     ParameterBlock block;
@@ -131,7 +131,7 @@ UnknownTrackGameObject3444::UnknownTrackGameObject3444()
 }
 
 // 0x004d39f0
-UnknownTrackGameObject3444::~UnknownTrackGameObject3444()
+ProCircuit::~ProCircuit()
 {
     for (int i = 0; i < racerNameCount; i++)
         DebugFree(racerNames[i], __FILE__, 139);
@@ -141,7 +141,7 @@ UnknownTrackGameObject3444::~UnknownTrackGameObject3444()
 }
 
 // 0x004d3a60
-void UnknownTrackGameObject3444::FreeSchedule(UnknownProCircuitSchedule* schedule)
+void ProCircuit::FreeSchedule(ProCircuitSchedule* schedule)
 {
     if (schedule->tracks) {
         for (int i = 0; i < schedule->trackCount; i++) {
@@ -157,7 +157,7 @@ void UnknownTrackGameObject3444::FreeSchedule(UnknownProCircuitSchedule* schedul
 }
 
 // 0x004d3b00
-void UnknownTrackGameObject3444::StartCareer(const char* name, int level, int classRule, int count)
+void ProCircuit::StartCareer(const char* name, int level, int classRule, int count)
 {
     racerCount = count;
     difficulty = level;
@@ -182,7 +182,7 @@ void UnknownTrackGameObject3444::StartCareer(const char* name, int level, int cl
     strcat(messageText, text);
     careerFlags = 0;
 
-    UnknownProCircuitStats zero;
+    ProCircuitStats zero;
     zero.medicalCost = 0;
     zero.rank = 0;
     zero.repairCost = 0;
@@ -249,7 +249,7 @@ found:
 }
 
 // 0x004d4100
-int UnknownTrackGameObject3444::LoadSaved(const char* path)
+int ProCircuit::LoadSaved(const char* path)
 {
     FILE* file = fopen(path, "rb");
     if (file) {
@@ -261,7 +261,7 @@ int UnknownTrackGameObject3444::LoadSaved(const char* path)
 }
 
 // 0x004d4150
-int UnknownTrackGameObject3444::Save(const char* path)
+int ProCircuit::Save(const char* path)
 {
     FILE* file = fopen(path, "wb");
     if (file) {
@@ -273,7 +273,7 @@ int UnknownTrackGameObject3444::Save(const char* path)
 }
 
 // 0x004d41a0
-int UnknownTrackGameObject3444::AdvanceAfterRace()
+int ProCircuit::AdvanceAfterRace()
 {
     int id;
     char text[1024];
@@ -345,15 +345,15 @@ int UnknownTrackGameObject3444::AdvanceAfterRace()
 }
 
 // 0x004d4420
-int UnknownTrackGameObject3444::ReadSchedule(ParameterBlock* block,
-                                                      UnknownProCircuitSchedule* schedule,
+int ProCircuit::ReadSchedule(ParameterBlock* block,
+                                                      ProCircuitSchedule* schedule,
                                                       const char* directory)
 {
     block->GetInt("NumberOfTracks", 0, &schedule->trackCount);
     block->GetInt("Laps", 3, &schedule->laps);
     if (schedule->trackCount) {
         schedule->tracks =
-            (UnknownProCircuitTrack*)DebugMalloc(schedule->trackCount * sizeof(UnknownProCircuitTrack), __FILE__, 433);
+            (ProCircuitTrack*)DebugMalloc(schedule->trackCount * sizeof(ProCircuitTrack), __FILE__, 433);
         for (int i = 0; i < schedule->trackCount; i++) {
             char key[64];
             char value[64];
@@ -381,7 +381,7 @@ int UnknownTrackGameObject3444::ReadSchedule(ParameterBlock* block,
 }
 
 // 0x004d4670
-void UnknownTrackGameObject3444::PickComputerRacers()
+void ProCircuit::PickComputerRacers()
 {
     KrustyUI* ui = g_TrackGame->ui;
     int bikeKind = 0;

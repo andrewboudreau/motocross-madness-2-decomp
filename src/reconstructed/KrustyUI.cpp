@@ -603,7 +603,7 @@ void KrustyUI::OpenMenu(int menu) {
         }
         break;
     case kMenu88e: {
-        UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+        ProCircuit* circuit = g_TrackGame->proCircuit;
         if (circuit) {
             if (circuit->schedules[circuit->series].bonusTrack == circuit->raceIndex) {
                 circuit->AdvanceAfterRace();

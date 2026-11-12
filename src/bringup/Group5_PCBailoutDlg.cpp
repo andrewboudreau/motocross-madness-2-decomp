@@ -3,7 +3,7 @@
 // PCBailoutDlg::HandleEvent (0x004d8fc0), extracted from
 // samples/ui/ProCircuitProcsNearMisses.cpp (836 of 882 bytes match: same
 // calls, strings and flow; register choices differ). The includes and the
-// file-local UnknownSetText helper are those of
+// file-local SetResourceText helper are those of
 // src/reconstructed/ProCircuitProcs.cpp; __FILE__ is the retail path.
 #include <windows.h>
 #include <stdio.h>
@@ -28,7 +28,7 @@
 
 #define PRO_CIRCUIT_PROCS_FILE "D:\\aardvark\\VC\\krusty2\\ProCircuitProcs.cpp"
 
-static inline void UnknownSetText(UIControl* control, int id)
+static inline void SetResourceText(UIControl* control, int id)
 {
     control->SetTextFromResource(g_TrackGame->resourceInstance, id);
 }
@@ -36,7 +36,7 @@ static inline void UnknownSetText(UIControl* control, int id)
 // 0x004d8fc0
 void PCBailoutDlg::HandleEvent(DialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    ProCircuit* circuit = g_TrackGame->proCircuit;
     UIControl* label;
     char text[128];
     switch (event->kind) {
@@ -46,22 +46,22 @@ void PCBailoutDlg::HandleEvent(DialogEvent* event)
         playerCash = cash;
         cashShortfall = fee - cash;
         entryFee = fee;
-        UnknownSetText(FindControl("TitleText", 12), 0x144a);
+        SetResourceText(FindControl("TitleText", 12), 0x144a);
         UIControl* description = FindControl("TxtDescription", 12);
         description->wordWrap = 1;
-        UnknownSetText(description, 0x1449);
+        SetResourceText(description, 0x1449);
         unsigned int color = circuit->racers[0].money < 0 ? 0xff : 0xff00;
-        UnknownSetText(FindControl("TxtItem1", 12), 0x144b);
+        SetResourceText(FindControl("TxtItem1", 12), 0x144b);
         UIControl* item = FindControl("Item1", 12);
         sprintf(text, "$%d", playerCash);
         item->SetText(text);
         item->SetFontColor(color);
-        UnknownSetText(FindControl("TxtItem2", 12), 0x144d);
+        SetResourceText(FindControl("TxtItem2", 12), 0x144d);
         item = FindControl("Item2", 12);
         sprintf(text, "$%d", entryFee);
         item->SetText(text);
         item->SetFontColor(0xff);
-        UnknownSetText(FindControl("TxtItem4", 12), 0x144c);
+        SetResourceText(FindControl("TxtItem4", 12), 0x144c);
         item = FindControl("Item4", 12);
         sprintf(text, "$%d", cashShortfall);
         item->SetText(text);

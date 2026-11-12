@@ -9,8 +9,8 @@ and `ProCircuitProcs.*`. Helper names follow their bodies (`FreeSchedule`,
 literal at `0x005718ac` (xrefs `0x004d34a1..0x004d45c2`); the unit closes
 with its kVec3 `$E` set `0x004d49e0..0x004d4b1b` (vectors
 `0x00689ab8..0x00689af7`, which no ProCircuit code reads). The object is the career at TrackGame+0x3444
-(0x12e5 bytes; ProCircuitProcs allocates that size). It keeps the existing
-name `UnknownTrackGameObject3444`, and TrackGame.h now includes
+(0x12e5 bytes; ProCircuitProcs allocates that size). It is named `ProCircuit` after the unit (its constructor pushes that
+`__FILE__` literal), and TrackGame.h now includes
 ProCircuit.h. Its fields sit at odd offsets, so it is byte-packed. The
 first 0x1225 bytes are what the load and save functions read and write.
 Before it:

@@ -1093,7 +1093,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         // The pro circuit: the player's racer, then the computer racers of
         // the career.
         TrackGame* game = g_TrackGame;
-        UnknownTrackGameObject3444* circuit = game->proCircuit;
+        ProCircuit* circuit = game->proCircuit;
         setup = *(UnknownBikeRaceBikeSetup*)game->mode.garageOptions;
         setup.engineSize = circuit->racers[0].engineSize;
         setup.fourStroke = circuit->racers[0].fourStroke;
@@ -1147,7 +1147,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             for (int i = 0; i < g_TrackGame->proCircuit->racerCount - 1; i++)
                 aiRacers[i] = 0;
             for (int n = 1; n < g_TrackGame->proCircuit->racerCount; n++) {
-                UnknownProCircuitRacer* racer = &circuit->racers[n];
+                ProCircuitRacer* racer = &circuit->racers[n];
                 WriteRelativePositions(&position, &direction, event, order[n]);
                 sprintf(path, "%s\\%s", "Res", racer->bikeModel);
                 if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)bikeFile)) {

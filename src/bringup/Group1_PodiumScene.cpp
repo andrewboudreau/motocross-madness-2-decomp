@@ -145,7 +145,7 @@ static inline int PodiumIsZero(const Vector3& v) {
 
 // Whether the career's current race is its series' last (the bonus track
 // is the last when there is one).
-static inline int PodiumIsLastRace(UnknownTrackGameObject3444* circuit) {
+static inline int PodiumIsLastRace(ProCircuit* circuit) {
     int last;
     if (circuit->schedules[circuit->series].bonusTrack)
         last = circuit->schedules[circuit->series].bonusTrack - 1;
@@ -159,7 +159,7 @@ int EventManager::CreatePodiumScene() {
     char name[0x80];
     char path[0x104];
     char message[0x184];
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    ProCircuit* circuit = g_TrackGame->proCircuit;
     TrackGameViewOwner* owner = FindRaceMode();
     UnknownKrustyBikeView* view = FindRaceView();
     int iterator = 0;

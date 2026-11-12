@@ -13,7 +13,7 @@
 //   helper (pointer or reference), a by-value net helper or a stats pointer
 //   are worse. The stats field types do not matter: unsigned int or long
 //   for +0x04, +0x08, +0x0c or +0x14 alone, or for every field of
-//   UnknownProCircuitStats (ProCircuit.h), all give 427. Retail keeps stunt
+//   ProCircuitStats (ProCircuit.h), all give 427. Retail keeps stunt
 //   (ecx) and repairs (edx) and reloads medical for the +0x24 update; VC6
 //   here keeps medical and repairs and reloads stunt. A `const int&` alias
 //   of medical, repairs, stunt or winnings used in the money expression,
@@ -66,7 +66,7 @@
 // 0x004d8c40
 void PCLastRaceDlg::PayOutRace()
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    ProCircuit* circuit = g_TrackGame->proCircuit;
     int fee = circuit->entryFees[circuit->series];
     int purse = (int)(fee * circuit->purseMultiplier);
     float* shares = (float*)DebugMalloc(circuit->racerCount * 4, __FILE__, 1420);
@@ -81,7 +81,7 @@ void PCLastRaceDlg::PayOutRace()
     int paid = 0;
     for (int j = 0; j < g_TrackGame->eventManager->resultCount; j++) {
         UnknownProCircuitResult* result = &((UnknownProCircuitResult*)g_TrackGame->eventManager->results)[j];
-        UnknownProCircuitRacer* racer = &circuit->racers[result->racer];
+        ProCircuitRacer* racer = &circuit->racers[result->racer];
         racer->raceStats.medicalCost = (int)__min(purse * circuit->medicalCapPct, result->medical * 250.0f);
         racer->raceStats.repairCost = (int)__min(purse * circuit->repairCapPct, result->repairs * 500.0f);
         racer->raceStats.stuntWinnings = (int)__min(purse * circuit->stuntCapPct, result->stunts * 400.0f);
@@ -121,7 +121,7 @@ void PCLastRaceDlg::PayOutRace()
 // 0x004d8fc0
 void PCBailoutDlg::HandleEvent(DialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    ProCircuit* circuit = g_TrackGame->proCircuit;
     UIControl* label;
     char text[128];
     switch (event->kind) {
@@ -131,22 +131,22 @@ void PCBailoutDlg::HandleEvent(DialogEvent* event)
         playerCash = cash;
         cashShortfall = fee - cash;
         entryFee = fee;
-        UnknownSetText(FindControl("TitleText", 12), 0x144a);
+        SetResourceText(FindControl("TitleText", 12), 0x144a);
         UIControl* description = FindControl("TxtDescription", 12);
         description->wordWrap = 1;
-        UnknownSetText(description, 0x1449);
+        SetResourceText(description, 0x1449);
         unsigned int color = circuit->racers[0].money < 0 ? 0xff : 0xff00;
-        UnknownSetText(FindControl("TxtItem1", 12), 0x144b);
+        SetResourceText(FindControl("TxtItem1", 12), 0x144b);
         UIControl* item = FindControl("Item1", 12);
         sprintf(text, "$%d", playerCash);
         item->SetText(text);
         item->SetFontColor(color);
-        UnknownSetText(FindControl("TxtItem2", 12), 0x144d);
+        SetResourceText(FindControl("TxtItem2", 12), 0x144d);
         item = FindControl("Item2", 12);
         sprintf(text, "$%d", entryFee);
         item->SetText(text);
         item->SetFontColor(0xff);
-        UnknownSetText(FindControl("TxtItem4", 12), 0x144c);
+        SetResourceText(FindControl("TxtItem4", 12), 0x144c);
         item = FindControl("Item4", 12);
         sprintf(text, "$%d", cashShortfall);
         item->SetText(text);
@@ -175,7 +175,7 @@ void PCBailoutDlg::HandleEvent(DialogEvent* event)
 // 0x004d9860
 void PCBunnyDlg::HandleEvent(DialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    ProCircuit* circuit = g_TrackGame->proCircuit;
     char text[128];
     switch (event->kind) {
     case kDialogInit: {
@@ -185,32 +185,32 @@ void PCBunnyDlg::HandleEvent(DialogEvent* event)
         playerCash = cash;
         loanAmount = fee - cash + debt;
         entryFee = fee;
-        UnknownSetText(FindControl("TitleText", 12), 0x1452);
+        SetResourceText(FindControl("TitleText", 12), 0x1452);
         UIControl* description = FindControl("TxtDescription", 12);
         description->wordWrap = 1;
-        UnknownSetText(description, 0x1451);
+        SetResourceText(description, 0x1451);
         unsigned int color = circuit->racers[0].money < 0 ? 0xff : 0xff00;
-        UnknownSetText(FindControl("TxtItem1", 12), 0x144b);
+        SetResourceText(FindControl("TxtItem1", 12), 0x144b);
         UIControl* item = FindControl("Item1", 12);
         sprintf(text, "$%d", playerCash);
         item->SetText(text);
         item->SetFontColor(color);
-        UnknownSetText(FindControl("TxtItem2", 12), 0x144d);
+        SetResourceText(FindControl("TxtItem2", 12), 0x144d);
         item = FindControl("Item2", 12);
         sprintf(text, "$%d", entryFee);
         item->SetText(text);
         item->SetFontColor(0xff);
-        UnknownSetText(FindControl("TxtItem3", 12), 0x1453);
+        SetResourceText(FindControl("TxtItem3", 12), 0x1453);
         item = FindControl("Item3", 12);
         sprintf(text, "$%d", debt);
         item->SetText(text);
         item->SetFontColor(0xff);
-        UnknownSetText(FindControl("TxtItem4", 12), 0x144f);
+        SetResourceText(FindControl("TxtItem4", 12), 0x144f);
         item = FindControl("Item4", 12);
         sprintf(text, "$%d", loanAmount);
         item->SetText(text);
         item->SetFontColor(0xff00);
-        UnknownSetText(FindControl("TxtItem5", 12), 0x1450);
+        SetResourceText(FindControl("TxtItem5", 12), 0x1450);
         item = FindControl("Item5", 12);
         sprintf(text, "$%d", 1000);
         item->SetText(text);

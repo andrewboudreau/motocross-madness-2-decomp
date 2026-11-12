@@ -219,7 +219,7 @@ public:
     void EnableButtons();             // 0x004d5600: enables the buttons
     void FillLists();             // 0x004d56c0: fills the lists
     // 0x004d59a0: adds `circuit` as row `row` of the lists.
-    void AddCircuitRow(UnknownTrackGameObject3444* circuit, int row);
+    void AddCircuitRow(ProCircuit* circuit, int row);
     void FreeFileNames();             // 0x004d5ca0: frees the file names
 
     char** careerFiles;                       // +0x7f58: career file names

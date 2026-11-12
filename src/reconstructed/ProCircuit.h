@@ -17,7 +17,7 @@ class ParameterBlock;
 // LstWinnings = purse + stunts, LstExpenses = repairs + medical + fees) and
 // the status page (TxtRepairs, TxtMedical); the race payout (0x004d8c40)
 // fills the race block and adds it into the totals.
-struct UnknownProCircuitStats {
+struct ProCircuitStats {
     int points;                               // +0x00 points (LstPoints, "Points")
     int purseWinnings;                        // +0x04 share of the purse by finishing position
     int repairCost;                           // +0x08 TxtRepairs
@@ -27,9 +27,9 @@ struct UnknownProCircuitStats {
 };
 
 // One racer of the career (0x140 bytes; record 0 is the player).
-struct UnknownProCircuitRacer {
-    UnknownProCircuitStats raceStats;         // +0x00 the last race
-    UnknownProCircuitStats totalStats;        // +0x18 career totals; rank compared with 1 and 3 when a series ends
+struct ProCircuitRacer {
+    ProCircuitStats raceStats;         // +0x00 the last race
+    ProCircuitStats totalStats;        // +0x18 career totals; rank compared with 1 and 3 when a series ends
     int money;                                // +0x30 money (starts at StartingCapital)
     int debts;                                // +0x34 the "Debts" row (string 0x1453) of the advertising offer (0x004d9860); repaid with 10% at the series end
     char bikeModel[0x40];                     // +0x38 bike model name
@@ -42,7 +42,7 @@ struct UnknownProCircuitRacer {
 };
 
 // One PCSched.pb track (12 bytes; strings are DebugMalloc'd).
-struct UnknownProCircuitTrack {
+struct ProCircuitTrack {
     char* trackKey;                           // +0x00 the "Track_%d" value
     char* displayName;                        // +0x04 its display name
     char* keyCopy;                            // +0x08 a copy of field_0x00
@@ -50,25 +50,25 @@ struct UnknownProCircuitTrack {
 
 // One PCSched.pb section (16 bytes). ProCircuit.cpp fills Baja (1),
 // Nationals (2), Supercross (3) and Enduro (5).
-struct UnknownProCircuitSchedule {
-    UnknownProCircuitTrack* tracks;           // +0x00 tracks
+struct ProCircuitSchedule {
+    ProCircuitTrack* tracks;           // +0x00 tracks
     int trackCount;                           // +0x04 "NumberOfTracks"
     int bonusTrack;                           // +0x08 "BonusTrack"
     int laps;                                 // +0x0c "Laps"
 };
 
-class UnknownTrackGameObject3444 {
+class ProCircuit {
 public:
-    UnknownTrackGameObject3444();             // 0x004d3480: reads PCTables.pb, PCNames.txt and PCSched.pb
-    ~UnknownTrackGameObject3444();            // 0x004d39f0
-    void FreeSchedule(UnknownProCircuitSchedule* schedule); // 0x004d3a60: frees a schedule
+    ProCircuit();             // 0x004d3480: reads PCTables.pb, PCNames.txt and PCSched.pb
+    ~ProCircuit();            // 0x004d39f0
+    void FreeSchedule(ProCircuitSchedule* schedule); // 0x004d3a60: frees a schedule
     // 0x004d3b00: starts a career for `name` with `count` racers.
     void StartCareer(const char* name, int level, int classRule, int count);
     int LoadSaved(const char* path); // 0x004d4100: loads the saved part
     int Save(const char* path); // 0x004d4150: saves it
     int AdvanceAfterRace();              // 0x004d41a0: advances after a race
     // 0x004d4420: reads the selected PCSched.pb section into `schedule`.
-    int ReadSchedule(ParameterBlock* block, UnknownProCircuitSchedule* schedule,
+    int ReadSchedule(ParameterBlock* block, ProCircuitSchedule* schedule,
                               const char* directory);
     void PickComputerRacers();             // 0x004d4670: picks the computer racers
 
@@ -84,7 +84,7 @@ public:
     int bikeRow;                              // +0x45c chosen bike row
     int racerCount;                           // +0x460 racer count
     unsigned char careerFlags;                // +0x464 flags
-    UnknownProCircuitRacer racers[11];        // +0x465 record 0 is the player
+    ProCircuitRacer racers[11];        // +0x465 record 0 is the player
     int startingCapital;                      // +0x1225 "StartingCapital"
     int entryFees[6];                         // +0x1229 entry fees by series ("BajaFee" is [1])
     float purseMultiplier;                    // +0x1241 "PurseMultiplier"
@@ -94,7 +94,7 @@ public:
     float placePct[11];                       // +0x1251 "%d_PlacePct"
     char** racerNames;                        // +0x127d racer names (ui\PCNames.txt)
     int racerNameCount;                       // +0x1281 their count
-    UnknownProCircuitSchedule schedules[6];   // +0x1285 by series
+    ProCircuitSchedule schedules[6];   // +0x1285 by series
 };
 
 #pragma pack(pop)

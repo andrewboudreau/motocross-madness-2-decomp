@@ -30,7 +30,7 @@ static const char kProCircuitProcsFile[] = "D:\\aardvark\\VC\\krusty2\\ProCircui
 // share buffer (line 1420) is never freed.
 void PCLastRaceDlg::PayOutRace()
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    ProCircuit* circuit = g_TrackGame->proCircuit;
     int fee = circuit->entryFees[circuit->series];
     int purse = (int)(fee * circuit->purseMultiplier);
     float* shares = (float*)DebugMalloc(circuit->racerCount * 4, kProCircuitProcsFile, 1420);
@@ -45,7 +45,7 @@ void PCLastRaceDlg::PayOutRace()
     int paid = 0;
     for (int j = 0; j < g_TrackGame->eventManager->resultCount; j++) {
         UnknownProCircuitResult* result = &((UnknownProCircuitResult*)g_TrackGame->eventManager->results)[j];
-        UnknownProCircuitRacer* racer = &circuit->racers[result->racer];
+        ProCircuitRacer* racer = &circuit->racers[result->racer];
         racer->raceStats.medicalCost = (int)__min(purse * circuit->medicalCapPct, result->medical * 250.0f);
         racer->raceStats.repairCost = (int)__min(purse * circuit->repairCapPct, result->repairs * 500.0f);
         racer->raceStats.stuntWinnings = (int)__min(purse * circuit->stuntCapPct, result->stunts * 400.0f);

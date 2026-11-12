@@ -673,7 +673,7 @@ public:
     int podiumFinished;                       // +0x3438 set when the podium ends, is skipped or fails to load; the next EndRace closes the race and clears it
     int openLocalizedWebPageOnExit;
     int openStorePageOnExit;
-    UnknownTrackGameObject3444* proCircuit;   // +0x3444 the pro circuit career (ProCircuit.h)
+    ProCircuit* proCircuit;   // +0x3444 the pro circuit career (ProCircuit.h)
     char careerFile[0x34c8 - 0x3448];         // +0x3448: the pro circuit career file loaded/saved (ProCircuitProcs.cpp)
     int screenSaverWasActive;
 };
