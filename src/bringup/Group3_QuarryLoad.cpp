@@ -14,10 +14,10 @@
 //     (new, EH state, null test, constructor), declared over the views' storage;
 //   * the fog objects use Fog.h's Fog/FogOff/FogOn directly; FogOn's folded Create
 //     (0x00486a10) is defined at the end of this file and called, as retail calls it;
-//   * SkyCube.h and krusty2's ProjectedShadow.h and CollisionObject.h can share this unit
-//     and QuarryEvent.h declares EcoSystem::Create, so the sky cube, the projected shadow,
-//     the ecosystem and the collision objects are created and called through their own
-//     classes;
+//   * SkyCube.h and krusty2's ProjectedShadow.h, CollisionObject.h and ParticleManager.h can
+//     share this unit and QuarryEvent.h declares EcoSystem::Create, so the sky cube, the
+//     projected shadow, the ecosystem, the collision objects and the particle manager are
+//     created and called through their own classes;
 //   * the memory estimate reads EcoSystem.cpp's preloaded-texture count (0x0059af10).
 // Linked score 0.985, 2208 instructions against retail's 2208 (was 0.908 at 2101: the
 // out-of-line G3Q_New* allocation helpers dropped retail's inline new/EH/null-test/
@@ -46,6 +46,7 @@
 #include "../reconstructed/SkyCube.h"
 #include "shadow/ProjectedShadow.h"
 #include "collision/CollisionObject.h"
+#include "effects/ParticleManager.h"
 #include "../reconstructed/TextureMap.h"
 #include "../reconstructed/TextureMapManager.h"
 #include "../reconstructed/TrackGame.h"
@@ -167,16 +168,6 @@ public:
     unsigned char field_0x3b8[0x3bc - 0x3b8];
 };
 
-// ParticleManager (0x2058 bytes); slot 27 loads it.
-class UnknownQuarryParticles : public GameObject {
-public:
-    explicit UnknownQuarryParticles(int flags);                // 0x004ba390
-    virtual UnknownQuarryParticles* Create(void* target, TextureMapManager* manager,
-                                           const char* texture, LightManager* lights);
-
-    unsigned char field_0x2c[0x2058 - 0x2c];
-};
-
 // The visibility quadtree (0x8a0 bytes); 0x0052d460 returns its GameObject
 // base at +0x874.
 class UnknownQuarryQuadTreeHead {
@@ -251,10 +242,6 @@ public:
 class KrustyBikeCamera : public UnknownQuarryBikeCamera {
 public:
     explicit KrustyBikeCamera(int flags);                      // 0x00497cb0
-};
-class ParticleManager : public UnknownQuarryParticles {
-public:
-    explicit ParticleManager(int flags);                       // 0x004ba390
 };
 class VisibilityQuadTree : public UnknownQuarryVisibility {
 public:
@@ -652,9 +639,9 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     raceView = (UnknownKrustyBikeView*)new(__FILE__, 898) BikeRace(0);
     g_MemTagStack->Push("Particles");
     if (particleManager)
-        particleManager = ((UnknownQuarryParticles*)particleManager)
-                         ->Create(renderContext, g_TrackGame->textureManager,
-                                  eventScene->environment->particleTexture, lightManager);
+        particleManager = ((ParticleManager*)particleManager)
+                         ->Create((int)renderContext, g_TrackGame->textureManager,
+                                  eventScene->environment->particleTexture, (int)lightManager);
     g_MemTagStack->Push("3DObjects");
     if (!Create3DObjects((int)&modelTextures))
         return 0;

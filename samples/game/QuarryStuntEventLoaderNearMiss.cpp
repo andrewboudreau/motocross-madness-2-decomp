@@ -55,6 +55,7 @@
 #include "../../src/reconstructed/SkyCube.h"
 #include "../../src/krusty2/shadow/ProjectedShadow.h"
 #include "../../src/krusty2/collision/CollisionObject.h"
+#include "../../src/krusty2/effects/ParticleManager.h"
 #include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/TextureMapManager.h"
 #include "../../src/reconstructed/TrackGame.h"
@@ -171,16 +172,6 @@ public:
     UnknownQuarryRacer* bike;  // +0x3B0 BikeCamera bike
     UnknownQuarryRacer* krustyBike;  // +0x3B4 KrustyBikeCamera krustyBike
     unsigned char field_0x3b8[0x3bc - 0x3b8];
-};
-
-// ParticleManager (0x2058 bytes); slot 27 loads it.
-class UnknownQuarryParticles : public GameObject {
-public:
-    explicit UnknownQuarryParticles(int flags);                // 0x004ba390
-    virtual UnknownQuarryParticles* Create(void* target, TextureMapManager* manager,
-                                           const char* texture, LightManager* lights);
-
-    unsigned char field_0x2c[0x2058 - 0x2c];
 };
 
 // The visibility quadtree (0x8a0 bytes); 0x0052d460 returns its GameObject
@@ -497,7 +488,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     CreateOverlays();
 
     g_MemTagStack->Push("Particles");
-    particleManager = new(__FILE__, 613) UnknownQuarryParticles(g_TrackGame->mode.particlesOn);
+    particleManager = new(__FILE__, 613) ParticleManager(g_TrackGame->mode.particlesOn);
     g_MemTagStack->Push("Scene");
     eventScene = (new(__FILE__, 624) Scene(isEnabled))
                      ->UnknownFunction4ea7e0(g_TrackGame->sceneObject, (int)auralScape, (int)&modelTextures, 8);
@@ -625,9 +616,9 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     raceView = (UnknownKrustyBikeView*)new(__FILE__, 898) UnknownQuarryRace(0);
     g_MemTagStack->Push("Particles");
     if (particleManager)
-        particleManager = ((UnknownQuarryParticles*)particleManager)
-                         ->Create(renderContext, g_TrackGame->textureManager,
-                                  eventScene->environment->particleTexture, lightManager);
+        particleManager = ((ParticleManager*)particleManager)
+                         ->Create((int)renderContext, g_TrackGame->textureManager,
+                                  eventScene->environment->particleTexture, (int)lightManager);
     g_MemTagStack->Push("3DObjects");
     if (!Create3DObjects((int)&modelTextures))
         return 0;

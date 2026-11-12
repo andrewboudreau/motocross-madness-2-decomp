@@ -67,7 +67,7 @@
     "samples/game/QuarryStuntEventLoaderNearMiss.cpp": {
       "sections": 50,
       "relocations": 435,
-      "sha256": "f705ef6f94fc2f2bb1f211eef97bcb62aa3d8f0d06d9498e81dc9e8c50f7704d"
+      "sha256": "8355061fe8ce4420d7b0f9c2161458d94d9d8aacfddfea6d804ec7a28aff08e7"
     }
   },
   "strict_cases": [

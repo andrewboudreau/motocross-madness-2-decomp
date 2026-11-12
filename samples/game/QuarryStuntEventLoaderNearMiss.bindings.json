@@ -8,7 +8,7 @@
   "??0UnknownQuarryFog@@QAE@H@Z": "0x00462620",
   "??0UnknownQuarryFogLink@@QAE@H@Z": "0x00462e90",
   "??0UnknownQuarryFogObject@@QAE@H@Z": "0x00462e10",
-  "??0UnknownQuarryParticles@@QAE@H@Z": "0x004ba390",
+  "??0ParticleManager@@QAE@H@Z": "0x004ba390",
   "??0UnknownQuarryRace@@QAE@H@Z": "0x00417c30",
   "??0UnknownQuarryRaceObject@@QAE@H@Z": "0x00504490",
   "??0ProjectedShadow@@QAE@H@Z": "0x004da570",
