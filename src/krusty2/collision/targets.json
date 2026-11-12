@@ -256,7 +256,7 @@
     "target_va": "0x00434970",
     "target_size": 153,
     "expect": "exact",
-    "notes": "debug-key handler: three Fn_0043caa0 tests then the GameObject base slot; natural source shape",
+    "notes": "debug-key handler: three TestInputEvent (0x0043caa0) tests then the GameObject base slot; natural source shape",
     "bindings": "CollisionObject.bindings.json"
   },
   {
