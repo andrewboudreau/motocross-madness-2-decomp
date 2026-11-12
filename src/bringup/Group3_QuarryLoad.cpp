@@ -58,8 +58,8 @@ int PreloadEcosystem(TextureMapManager* manager, char* path, FileStream* stream,
 class UnknownQuarryQuadTreeNode {
 public:
     virtual void UnknownVirtualSlot0();
-    int field_0x04;
-    int field_0x08;
+    short queryStamp, sortKey;                // +0x04/+0x06 QuadTreeObject (CollisionObject.h)
+    char objectTypeId;                        // +0x08 QuadTreeObject::objectTypeId
 };
 class UnknownQuarryCollision : public UnknownQuarryQuadTreeNode, public GameObject {
 public:
