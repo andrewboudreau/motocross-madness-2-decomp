@@ -352,3 +352,92 @@ Left as placeholders in wave 5:
 - `DebugSocket::field_0x08`: the constructor sets it to 1000, and nothing reads it.
 - Padding (`UnknownZone*::field_0x03`, the quarry camera's +0x393) and the
   padding arrays in RaceView.h and Krusty3DObjects.h.
+
+## Wave 6
+
+Wave 6 names the `Tire` members by physics role, the `CollisionPoint` fields
+that `Tire` and `SoulTreePhysics.cpp` use, and parameters whose callee already
+names them. The 70 affected translation units (`src/`, `src/bringup/` and
+`tests/fixtures/`) were compiled with VC6 from the base commit and from the
+renamed tree in the same directory. All 70 are IDENTICAL: the renamed members,
+parameters and locals appear only in debug sections. The 71st unit
+(`tests/fixtures/bvh_vector_compare.cpp`) needs a header that its test
+generates; the suite builds it. No line moved, so `__LINE__` values are
+unchanged.
+
+The constructor arguments come from `Bike::LoadBike` and the `VehicleWheel`
+view (the same constructor, `0x00512f10`). The `aN` numbers follow that
+constructor's argument order. `VehicleWheel` (Vehicle.h) and `BikeWheel`
+(Bike.h) are views of `Tire`. `TireVehicle` is a view of `Vehicle` at offset 0,
+and `SoultreeContact` is a view of `CollisionPoint`.
+
+| class | offset or param | old | new | tier | evidence |
+| --- | --- | --- | --- | --- | --- |
+| `Tire` | +0x1d8 | `field_0x1d8` | `driveTorqueScale` | 2 | Constructor argument a11 (Bike passes 0.5/1.0). ApplyDrive `0x00514170` adds `cross(relativePosition, push) * it` to the torque. |
+| `Tire` | +0x1dc | `field_0x1dc` | `levelRiseRate` | 2 | Constructor argument a12. Vehicle `0x00529280`: `rampLevel += stepTime * it`, clamped. |
+| `Tire` | +0x1e0 | `field_0x1e0` | `levelFallRate` | 2 | Constructor argument a13. Vehicle `0x00529280`: `rampLevel -= stepTime * it`, clamped. |
+| `Tire` | +0x20c | `wheelUpAxis` | `wheelForwardAxis` | 2 | Correction. UpdateSuspensionProbe stores the node-rotated `kVec3ZAxis`, else the caller's `savedForward` (body +0xa0). It is the `rollDirection` fallback. |
+| `Tire` | +0x224 | `wheelVelocity` | `bodyPosition` | 2 | Correction. UpdateSuspensionProbe copies its position argument here. Both callers (`0x00528f65`, `0x00528fd8`) pass body +0x0c, `position`. |
+| `Tire` | +0x248 | `field_0x248` | `driveForce` | 2 | Force output of the engine's `DriveForce` (Vehicle). UpdateDriveShare scales it by `driveShare`. |
+| `Tire` | +0x268 | `field_0x268` | `shockEngaged` | 2 | UpdateShock sets it after a shock solve. UpdateSuspensionProbe clears it. |
+| `Tire` | +0x26c | `field_0x26c` | `shockExtending` | 2 | UpdateShock copies the shock's flag (+0x54) here. |
+| `Tire` | +0x280 | `field_0x280` | `driveMagnitude` | 2 | Magnitude output of `DriveForce`. UpdateDriveShare: `driveMagnitude * invMass - abs(acceleration)`. |
+| `Tire` | +0x290 | `field_0x290` | `driveDistance` | 2 | UpdateRoll: `driveShareComplement * driveMagnitude * dt * driveScale`. |
+| `Tire` | +0x294 | `field_0x294` | `restLoadWeight` | 2 | Same field as `VehicleWheel::restLoadWeight`. Constructor argument a14. |
+| `Tire` | +0x2a0 | `field_0x2a0` | `driveStrength` | 2 | Constructor argument a10. ApplyDrive scales the push by it (`surfaceGrip * driveStrength * rampLevel`). |
+| `Tire` | +0x2a8 | `field_0x2a8` | `engine` | 2 | Vehicle calls `UnknownEngineGearbox::DriveForce` on it. Bike's loader stores `engineState` there. |
+| `Tire` | +0x2ac | `field_0x2ac` | `rotatingShock` | 2 | Its shock solve is RotatingShock `0x004fac60`. The destructor releases it when `inlineShock` is null. |
+| `Tire` | +0x2b0 | `field_0x2b0` | `inlineShock` | 2 | Its shock solve is InlineShock `0x004fa400`. Released first by the destructor `0x004f9f80`. |
+| `Tire` | +0x2b4 | `field_0x2b4` | `slipThreshold` | 2 | Constructor argument a7 (Bike passes 45.0f). UpdateDriveShare `0x00513f90` compares `slipSpeed` with it. |
+| `Tire` | +0x2b8 | `field_0x2b8` | `driveShare` | 2 | UpdateDriveShare `0x00513f90` sets it; 1.0 otherwise. |
+| `Tire` | +0x2bc | `field_0x2bc` | `driveShareComplement` | 2 | UpdateDriveShare: `1 - driveShare`. |
+| `Tire` | ctor | `field_0x2b4_`, `field_0x2a0_`, `field_0x1d8_`, `field_0x1dc_`, `field_0x1e0_` | `slipThreshold_`, `driveStrength_`, `driveTorqueScale_`, `levelRiseRate_`, `levelFallRate_` | 2 | The fields they are stored into. Also in `VehicleWheel` (Vehicle.h, Group2_VehicleWheel.cpp). |
+| `Tire` | UpdateSuspensionProbe | `velocity`, `angle`, `radiusScale`, `a5`, `a6`, `a7`, `a8` | `position`, `pitch`, `sinRoll`, `yaw`, `forward`, `up`, `node` | 2 | Callers `0x00528f65`/`0x00528fd8` pass body +0x0c, +0x4c, +0x54, +0x50, +0xa0, +0xac and +0x42c, whose `SoultreePhysicsBaseObject`/`Vehicle` names these are. `velocity` was a misreading of `position`. |
+| `Tire` | UpdateContactPatch | `pos`, `axis`, `ref`, `minLength`, `outValue`, `outSign` | `center`, `angularVelocity`, `velocity`, `speed`, `outSpeed`, `outForward` | 2 | Single caller `0x00529aa7` passes `centerOfMass`, `worldAngularVelocity`, `velocity`, `linearSpeed`. |
+| `TireAux` | +0x00 | `value` | `throttleFraction` | 2 | Tire+0x2a8 is the engine gearbox, and its +0x00 is `UnknownEngineGearbox::throttleFraction` (GearRatios.h). |
+| `TireVehicle` | +0x24 | `field_0x24` | `invMass` | 2 | View of `SoultreePhysicsBaseObject` at offset 0. |
+| `TireVehicle` | +0x60 | `field_0x60` | `savedCosPitch` | 2 | Same view. |
+| `TireVehicle` | +0x70 | `field_0x70` | `acceleration` | 2 | Same view. |
+| `TireVehicle` | +0xa4 | `field_0xa4` | `savedForwardY` | 2 | y of `savedForward` (+0xa0). |
+| `TireVehicle` | +0x444 | `field_0x444` | `crashState` | 2 | `Vehicle::crashState`. |
+| `VehicleWheel` | ApplyDrive | `force`, `torque` | `torque`, `force` | 2 | Correction: the last two names were swapped. `Tire::ApplyDrive` adds the moment to its sixth argument and the push to its seventh, and Vehicle passes `(..., worldTorque, force)`. |
+| `BikeWheel` | +0x20c | `wheelUpAxis` | `wheelForwardAxis` | 2 | View of `Tire`. |
+| `Bike` | LoadBike locals | `roll`, `grip`, `a12`, `a13` | `sideFrictionScale`, `driveTorqueScale`, `levelRiseRate`, `levelFallRate` | 2 | The constructor parameters they are passed to. |
+| `CollisionPoint` | +0x5c | `field_0x5c` | `rotationalVelocity` | 2 | Tire `0x005135f0`: `angularVelocity x relativePosition`, where the caller passes `worldAngularVelocity`. |
+| `CollisionPoint` | +0x68 | `field_0x68` | `normalLoadVector` | 2 | Vehicle `0x00527a20`: `surfaceNormal * normalLoad`. |
+| `CollisionPoint` | +0xa8 | `field_0xa8` | `impactPosted` | 2 | Vehicle slot 18 sets it when it posts the contact effect (wheel +0x160), and slot 30 clears it. |
+| `CollisionPoint` | +0xac | `field_0xac` | `slidePosted` | 2 | Vehicle slot 19 sets it when it posts the slide effect (`0x0052a07e`, wheel +0x164), and slot 30 clears it. |
+| `CollisionPoint` | +0xb0 | `field_0xb0` | `scrapePosted` | 2 | Vehicle slot 20 sets it when it posts the scrape effect (`0x0052a33f`, wheel +0x168), and slot 30 clears it. |
+| `CollisionPoint` | +0xb4 | `field_0xb4` | `contactState` | 2 | `SoultreeContact` view: slot 31 stores 0 or 1 (it keeps 2), and slot 13 reads it. Stays `float`-typed (no type changes). |
+| `SoultreeContact` | +0x20 | `field_0x20` | `surfacePosition` | 2 | `CollisionPoint::surfacePosition`. Slot 18 places the contact effect there. |
+| `SoultreeContact` | +0x98 | `field_0x98` | `penetration` | 2 | `CollisionPoint::penetration`. |
+| `SoultreeContact` | +0xac/+0xb0 | `field_0xac`, `field_0xb0` | `slidePosted`, `scrapePosted` | 2 | As `CollisionPoint`. |
+| `SoultreePhysicsBaseObject` | +0x20e | `field_0x20e` | `settledLastFrame` | 2 | Slot 21 stores `(char)settled` at the end. The type-4 Restart runs only on the rise (`settled && !settledLastFrame`). The constructor clears it. |
+| `SoultreeGlobals` | +0x574 | `field_0x574` | `sceneObject` | 2 | View of `TrackGame`, whose +0x574 is `sceneObject` (TrackGame.h). |
+| `SoultreePhysicsObject` | LoadPhysicsModel | `a4` | `options` | 2 | Forwarded to slot 9 (`0x0043f4b0`) as its fourth argument. |
+| `D3DIMSoultreeObject` | slot 9 | `a1`..`a5` | `owner`, `name`, `lights`, `options`, `useOptions` | 2 | Names of `D3DIMSoultreeObject::LoadModel` (tier 2). Also the views in Group5_D3DIMForwarders.cpp, D3DIMSoultreeMotnctrl.cpp (`Load`) and CarProcedural.h (`LoadModel`, whose `carModel` is `new D3DIMSoultreeObject(1)`). |
+| `CarProcedural` | Create | `a3`, `a4` | `lights`, `options` | 2 | Forwarded to `carModel->LoadModel` (slot 9) unchanged. |
+| `SoultreePhysicsCharacter` | LoadPhysicsModel | `a5` | `loadInfo` | 2 | Forwarded to `D3DIMVirtualSlot11`. Bike passes its info record. |
+| `Vehicle` | LoadVehicle | `a5` | `loadInfo` | 2 | Forwarded unchanged to `SoultreePhysicsCharacter::LoadPhysicsModel`. |
+| (free) | SoultreeRefreshContacts | `a1` | `enabled` | 2 | The SoulTreePhysics.cpp declaration names it `int enabled`. The caller passes `ShouldRefreshContacts()`. |
+
+Left as placeholders in wave 6:
+
+- `Tire` +0x254, +0x2a4 and +0x298 (with the constructor parameter
+  `field_0x298_`): they are only written.
+- `TireContactOwner` +0x40, +0x64 and +0x224, `MovingPart` +0x00 and +0x48,
+  and `CollisionObject::field_0x5c` as `Tire` uses it: no role was proven.
+- `CollisionPoint` +0xb8: only the constructor writes it (1.0).
+- `SoultreePhysicsBaseObject` +0x28 and `field_0x164[9]`: only the
+  constructor writes them.
+- `SoultreeLoadDesc` +0x25: only the bit test `& 1` is known.
+- `D3DIMVirtualSlot11`'s fifth argument and `CollisionCharacter`'s `a6`: they
+  are stored at +0x68, and nothing shows what reads them.
+- The `aN` parameters of `Scene::Load`/`ReadStaticModels` (a3 to a5) and
+  `Grid` a1, and the chain `KrustyBike` a16 to `Bike` a19 to `KbBikeLoader`
+  a13: no callee or arithmetic names them.
+- `Tire::UpdateShock`'s `offset`: the caller passes a float (`linearSpeed`)
+  through a pointer-typed parameter. A name would need a type change, so it
+  waits.
+- `aN` mentions inside comments that map argument positions (the
+  `LoadPhysicsModel` grouping notes): they number the stack dwords.
