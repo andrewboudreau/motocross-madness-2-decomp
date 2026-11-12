@@ -127,14 +127,18 @@ static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIM
     // Reading b through a second name in _24 only makes VC6 order the row-2 sums as retail
     // does in slot 27 (docs/VC6_OPERAND_ORDER.md section 1.2: the alias gives b's row-2
     // column leaves a different age).
+    // _22 and _23 are bracketed in retail's sum order (0x00446d43..0x00446d8f in slot 29); the
+    // flat sums gave VC6's own order, which rounds differently at 24-bit precision
+    // (tools/emu_cases/d3dim_shadow_slot29.py). Bracketing the other elements costs more code
+    // shape than it fixes: their flat orders differ from retail only by commuting one addition.
     const D3DIMShadowMatrix4& right = b;
     out->_11 = a._11 * b._11 + a._12 * b._21 + a._13 * b._31 + a._14 * b._41;
     out->_12 = a._11 * b._12 + a._12 * b._22 + a._13 * b._32 + a._14 * b._42;
     out->_13 = a._11 * b._13 + a._12 * b._23 + a._13 * b._33 + a._14 * b._43;
     out->_14 = a._11 * b._14 + a._12 * b._24 + a._13 * b._34 + a._14 * b._44;
     out->_21 = a._21 * b._11 + a._22 * b._21 + a._23 * b._31 + a._24 * b._41;
-    out->_22 = a._21 * b._12 + a._22 * b._22 + a._23 * b._32 + a._24 * b._42;
-    out->_23 = a._21 * b._13 + a._22 * b._23 + a._23 * b._33 + a._24 * b._43;
+    out->_22 = ((a._24 * b._42 + a._23 * b._32) + a._22 * b._22) + a._21 * b._12;
+    out->_23 = ((a._22 * b._23 + a._21 * b._13) + a._24 * b._43) + a._23 * b._33;
     out->_24 = a._21 * right._14 + a._22 * right._24 + a._23 * right._34 + a._24 * right._44;
     out->_31 = a._31 * b._11 + a._32 * b._21 + a._33 * b._31 + a._34 * b._41;
     out->_32 = a._31 * b._12 + a._32 * b._22 + a._33 * b._32 + a._34 * b._42;
