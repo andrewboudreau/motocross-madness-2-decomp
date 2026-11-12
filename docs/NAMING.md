@@ -272,3 +272,83 @@ Left as placeholders in wave 4:
   `CollisionPoint`, whose slot 1 is a placeholder.
 - `UnknownSceneBuffer`: not an interface, only a count and an array of
   `UnknownSceneCaster` at Scene+0xb8.
+
+## Wave 5
+
+Wave 5 names fields of the race and network views and two DirectSound
+structures. The 99 affected translation units (`src/`, `samples/` and
+`tests/fixtures/`) were compiled with VC6 from the base commit and from the
+renamed tree in the same directory: 95 are NAME-ONLY and 4 (`DlgProcs.cpp`,
+`DlgProcsNearMisses.cpp`, `Group4_DlgMain.cpp`, `Group6_BikeRaceCreate.cpp`)
+are NAME-ONLY-COMDAT-ORDER. Every non-debug section, relocation and symbol
+value is equal.
+
+`SendRaw` (`0x004ad280`) stores the type byte at +0x00 of every message it
+sends, and the sequence at +0x02 when the type has bit 0x80. `NetMessage::Set`
+(`0x004aacc0`) hands the receiver the same bytes. Its type is the first byte,
+or the whole first dword when the sender is 0 (a DirectPlay system message).
+No `Send` call in the retail image passes type 5, so message 5 is a system
+message.
+
+| class | offset | old | new | tier | evidence |
+| --- | --- | --- | --- | --- | --- |
+| `UnknownKrustyVcrRecord` | +0x04 | `field_0x04` | `points` | 2 | Same 8-byte grid entry as `UnknownTrackGameModeEntry` (`KrustyVCR::gridEntries` copies race settings +0x14c), whose +0x04 is `points`. |
+| `UnknownBikeRaceNetPlayer` | +0x04 | `field_0x04` | `points` | 2 | View of the same grid entry (TrackGame+0x2ebc). |
+| `UnknownBikeRaceNetState` | +0x00 | `field_0x00` | `type` | 2 | Message 1: `SendRaw` writes the type byte. |
+| `UnknownBikeRaceNetState` | +0x01 | `field_0x01` | `finishPosition` | 2 | The sender's message 1 layout (`KbBikeMessage::finishPosition`). |
+| `UnknownBikeRaceNetScore` | +0x00 | `field_0x00` | `type` | 2 | Message 10, as `KbBikePing`. |
+| `UnknownBikeRaceNetStamp` | +0x00 | `field_0x00` | `header` | 2 | Messages 0x84/0x85: type byte and sequence (`SelectGamePicProcs` convention). |
+| `UnknownBikeRaceVcrFollow` | +0x00 | `field_0x00` | `header` | 2 | Message 0x87, sent by `0x004a9d20`. |
+| `UnknownBikeRaceVcrFollow` | +0x04 | `field_0x04` | `request` | 2 | `KbNetPacket::request`: `SendFollowedRacer` sends 0x13 or 0x87 with this layout; `0x004a9d20` stores 0. |
+| `KbNetPacket` | +0x00 | `field_0x0` | `header` | 2 | Messages 0x13/0x87 (`SendFollowedRacer` `0x004925a0`). |
+| `KbBikeMessage` | +0x00 | `field_0x00` | `type` | 2 | Message 1 (`0x004928e8` sends it). |
+| `KbBikePing` | +0x00 | `field_0x00` | `type` | 2 | Message 10. |
+| `KbBikeDeltaMessage` | +0x00 | `field_0x00` | `type` | 2 | Message 13. |
+| `KbNetDelta` | +0x00 | `field_0x00` | `type` | 2 | Received message 13; `BikeRace` passes the message itself to `ApplyStateDelta`. |
+| `KbTrack` | +0xac | `field_0xac` | `gateCount` | 2 | Modulus of the lap gates (`nextLapGate = (lapGate + 1) % gateCount`). `UnknownRadarGateOwner` and `UnknownBikeRaceNodeOwner` name +0xac `gateCount`. |
+| `UnknownChatMessage` (TrackOverlay.h) | +0x00 | `field_0x00` | `header` | 2 | Message 0x85 (`0x0051db4b`), as `SelectGamePicProcs`' `UnknownChatMessage`. |
+| `UnknownLoadFailedMessage` | +0x00 | `field_0x00` | `header` | 2 | Message 0xcc (`LoadingDlg::Tick`). |
+| `UnknownPlayerStateMessage` | +0x00 | `field_0x00` | `type` | 2 | Message 2 (`0x004f5703`). |
+| `UnknownQuarryLeaveMessage` | +0x00 | `field_0x00` | `type` | 2 | Message 5 is a system message, so the first dword is its type. |
+| `UnknownPlayerLeftMessage` (SelectGamePicProcs.cpp) | +0x00 | `header` | `type` | 2 | Correction: the same message 5, which `SendRaw` never writes. |
+| `UnknownQuarryQuadTreeNode` (two views) | +0x04, +0x06, +0x08 | `int field_0x04`, `int field_0x08` | `queryStamp`, `sortKey`, `objectTypeId` | 2 | The `CollisionObject` base (`QuadTreeObject` in CollisionObject.h); the derived view's methods are `CollisionObject`'s. |
+| `UnknownSoundCaps` | (type) | `UnknownSoundCaps` | `DirectSoundCaps` | 2 | `GetCaps` is passed size 0x60. The 24 dwords are DSCAPS in order. |
+| `UnknownSoundBufferDesc` | (type) | `UnknownSoundBufferDesc` | `DirectSoundBufferDesc` | 2 | Size 0x24: the DirectX 7 DSBUFFERDESC fields in order. |
+
+Left as placeholders in wave 5:
+
+- `UnknownWaveFormat`: its `sizeof` is 20, while the SDK's packed WAVEFORMATEX
+  is 18, so it is not the SDK layout.
+- `TrackGameViewOwner::field_0xac`: one struct stands in for three owners.
+  +0xac is a gate count in two of them, and the tag owner stores 5.0f there
+  (`0x004a9f01`).
+- `TrackGameMode::field_0xa20` (and `UnknownTrackGameModeOptionsA20::field_0x00`,
+  `UnknownOptSoundSettings::field_0x00`):
+  - EventManager `0x0045e7b6` calls `StopCDAudio` (`0x00521a40`) when it is 0.
+  - `ResetSoundOptions` (`0x005227d0`) clears it.
+  - No dialog control or INI key is bound to it, so "CD music on" is only tier 3.
+- `TrackGameMode` fields:
+  - +0x6a4 and +0x1bdc are only written.
+  - +0x25e8 is only created and destroyed.
+  - +0xa2c, +0xa44, +0xa58 and +0xa60 are never addressed; only bulk copies touch them.
+- `UnknownTrackGameViewOwnerDc::field_0x10a`: `0x004a9ef0` clears it on the tag
+  ball. It may be the `SoultreePhysicsBaseObject` asleep flag, but the class
+  is not established.
+- `UnknownBikeRaceColliderBase` (+0x04/+0x08): its shape is a `CollisionObject`
+  base, but the object (30SecMan +0x210) is not established as one.
+- Ghost records (`UnknownBikeRaceGhostRecord::field_0x00`,
+  `UnknownBikeRaceGhostDelta::field_0x00`): replay kinds 0x11/0x10 are not
+  network messages, so the `SendRaw` evidence does not apply.
+- `KbNetState::field_0x00` is a decoded state, not a message.
+- `UnknownQuarryLeaveMessage::field_0x04` and
+  `UnknownPlayerLeftMessage::field_0x04`: the SDK's DPMSG_DESTROYPLAYERORGROUP
+  puts dwPlayerType there. That is external context only.
+- `UIDialog` +0x180/+0x184/+0x188: loader `0x0046a920` fills them from
+  section lookups whose defaults are the `MouseAnim`, `FXAnimIn` and
+  `FXAnimOut` buffers. The buffer flow is not proven.
+- `UIEditBox` +0x1f4/+0x1f8: no access in the edit box methods.
+- `UIControl` +0x1c8: the writers found (`0x00467990`, `0x004685d0`) use
+  offsets beyond `UIControl`, so they belong to another class.
+- `DebugSocket::field_0x08`: the constructor sets it to 1000, and nothing reads it.
+- Padding (`UnknownZone*::field_0x03`, the quarry camera's +0x393) and the
+  padding arrays in RaceView.h and Krusty3DObjects.h.
