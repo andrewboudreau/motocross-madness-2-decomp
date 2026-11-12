@@ -32,6 +32,9 @@ findings, one per ``.text`` section that keeps the unit from being identical:
                     (misbinding)
   icf_duplicate     bound to the same VA as an earlier function of the object:
                     folded by /OPT:ICF, one copy kept
+  opt_ref_removed   an unbound pick-any COMDAT nothing in the object references
+                    and whose bytes retail .text does not contain: removed by
+                    /OPT:REF, not laid out (unit_layout.unreferenced_absent)
   bytes             at its bound VA but the laid-out bytes differ (EH/fill
                     groups differ, or a relocation resolves differently; with
                     ``after_placement_findings`` possibly only a consequence)
@@ -72,7 +75,7 @@ def rel(path: Path) -> str:
 def registered_rows(root: Path = ROOT) -> dict[str, list[dict]]:
     """src source -> [{symbol, va, size, bindings, origin}] from calibration
     cases and src targets.json entries."""
-    from tools.rebuild_coverage import load_calibration_cases, load_targets
+    from tools.rebuild_coverage import default_target_source, load_calibration_cases
     rows: dict[str, list[dict]] = {}
     for case in load_calibration_cases(root):
         rows.setdefault(case['source'], []).append({
@@ -81,10 +84,15 @@ def registered_rows(root: Path = ROOT) -> dict[str, list[dict]]:
     for manifest in sorted((root / 'src').rglob('*targets.json')):
         data = json.loads(manifest.read_text(encoding='utf-8'))
         for entry in (data.get('targets', []) if isinstance(data, dict) else data):
-            if 'target_va' not in entry or 'source' not in entry:
+            name = entry.get('source') or default_target_source(manifest)
+            if 'target_va' not in entry or not name:
                 continue
-            source = os.path.normpath(manifest.parent.relative_to(root) / entry['source']).replace(os.sep, '/')
+            source = os.path.normpath(manifest.parent.relative_to(root) / name).replace(os.sep, '/')
             bindings = entry.get('bindings')
+            if not bindings and not entry.get('source'):
+                # <Stem>.targets.json: the paired source's <Stem>.bindings.json
+                paired = (manifest.parent / name).with_suffix('.bindings.json')
+                bindings = paired.name if paired.is_file() else None
             rows.setdefault(source, []).append({
                 'symbol': entry['candidate_symbol_contains'], 'va': int(str(entry['target_va']), 0),
                 'size': int(entry['target_size']),
@@ -151,6 +159,9 @@ def diagnose(layout: unit_layout.Layout, report: dict, obj: CoffObject,
         elif sec.status == 'folded':
             findings.append({'kind': 'icf_duplicate', 'functions': [f[0] for f in sec.functions],
                              'bound_va': hx(layout.bound_va(sec)), 'detail': sec.reason})
+        elif sec.status == 'removed':
+            findings.append({'kind': 'opt_ref_removed', 'functions': [f[0] for f in sec.functions],
+                             'detail': sec.reason})
     placed = [s for s in text if s.status == 'placed']
     position = {id(s): i for i, s in enumerate(placed)}
     bound = [(s, layout.bound_va(s)) for s in placed]
@@ -205,7 +216,8 @@ def diagnose(layout: unit_layout.Layout, report: dict, obj: CoffObject,
                              'unbound_between': [x.functions[0][0] for x in between]})
     # Byte differences of functions at their bound VA. With any placement
     # finding they may only follow from it (a relocation to a moved function).
-    placement = any(f['kind'] not in ('pick_any_elsewhere', 'icf_elsewhere', 'icf_duplicate') for f in findings)
+    placement = any(f['kind'] not in ('pick_any_elsewhere', 'icf_elsewhere', 'icf_duplicate', 'opt_ref_removed')
+                    for f in findings)
     flagged = {f for item in findings for f in item.get('functions', [])}
     for row in report['sections']:
         if row['status'] != 'placed':
@@ -235,10 +247,13 @@ def unit_verdict(report: dict, findings: list[dict]) -> str:
     return 'differs'
 
 
-def lay_out(obj: CoffObject, bindings: dict[str, int], fallback: dict[str, int], retail_bytes):
+def lay_out(obj: CoffObject, bindings: dict[str, int], fallback: dict[str, int], retail_bytes,
+            retail_text: bytes | None = None):
     """The --start/--text-x-start/--xdata-start auto layout and its comparison;
-    None when no bound function anchors .text."""
-    layout = unit_layout.Layout(obj, bindings, fallback)
+    None when no bound function anchors .text. With ``retail_text`` /OPT:REF
+    removals are modelled (unit_layout.unreferenced_absent)."""
+    removed = unit_layout.unreferenced_absent(obj, bindings, retail_text) if retail_text is not None else set()
+    layout = unit_layout.Layout(obj, bindings, fallback, removed)
     start = layout.auto_text_start()
     if start is None:
         return None
@@ -267,7 +282,7 @@ def analyse(source: Path, obj_path: Path, pe, owners, rows: list[dict], fallback
                      f"{len(failing)} registered function(s) not strict exact", failing=failing[:10])
         return entry
     bindings, files, conflicts = unit_layout.source_bindings(source, obj)
-    laid = lay_out(obj, bindings, fallback, pe.bytes_at_va)
+    laid = lay_out(obj, bindings, fallback, pe.bytes_at_va, unit_layout.retail_code(pe))
     if laid is None:
         entry.update(status='skipped', reason='no bound non-pick-any function to anchor .text')
         return entry

@@ -85,6 +85,17 @@ class SweepDiagnosisTest(unittest.TestCase):
         self.assertEqual([f['functions'] for f in icf], [['fC']])
         self.assertNotIn('order', self.kinds(findings))
 
+    def test_opt_ref_removed_is_not_blocking(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'unit.obj'
+            build_object(path, unreferenced=True)
+            obj = CoffObject(path)
+            layout, report = sweep.lay_out(obj, dict(BINDINGS, fC=0x401010), {}, reader(retail_image()),
+                                           b'\xcc' * 64)
+            findings = sweep.diagnose(layout, report, obj, [], 'src/unit.cpp')
+        self.assertEqual(self.kinds(findings), ['opt_ref_removed', 'pick_any_elsewhere'])
+        self.assertEqual(sweep.unit_verdict(report, findings), 'identical')
+
     def test_heaviest_increasing_subsequence(self):
         self.assertEqual(sweep.increasing_subsequence([3, 1, 2]), {1, 2})
         self.assertEqual(sweep.increasing_subsequence([5, 1, 2], [3, 1, 1]), {0})

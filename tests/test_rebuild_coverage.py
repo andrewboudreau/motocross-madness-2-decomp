@@ -115,6 +115,21 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(MODULE.source_tree('samples/y/A.cpp'), 'samples')
         self.assertEqual(MODULE.source_tree('src/krusty2/core/A.cpp'), 'src')
 
+    def test_stem_targets_register_the_paired_source(self):
+        # <Stem>.targets.json without 'source' registers <Stem>.cpp next to it
+        # (the pairing run_samples.py compiles); without the .cpp it stays the directory.
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            folder = root / 'src' / 'r'
+            folder.mkdir(parents=True)
+            (folder / 'Base.cpp').write_text('')
+            entry = lambda va: [{'candidate_symbol_contains': 'F', 'target_va': va, 'target_size': 4}]
+            (folder / 'Base.targets.json').write_text(json.dumps(entry('0x401000')))
+            (folder / 'Lone.targets.json').write_text(json.dumps(entry('0x401010')))
+            rows = MODULE.load_targets(root)
+        self.assertEqual(sorted((r['va'], r['source']) for r in rows),
+                         [(0x401000, 'src/r/Base.cpp'), (0x401010, 'src/r')])
+
 
 class EhTailTests(unittest.TestCase):
     def test_unwind_funclets_come_from_funcinfo_with_the_vc6_magic(self):

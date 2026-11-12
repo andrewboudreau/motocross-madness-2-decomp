@@ -16,6 +16,7 @@ import struct
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -29,9 +30,13 @@ DATA8 = 0x40401040      # initialized data, COMDAT, align 8, read
 DIR32, REL32 = 0x0006, 0x0014
 
 
-def build_object(path: Path) -> None:
+UNREFERENCED = bytes.fromhex('33c0c3') + b'\x90' * 13     # fD: xor eax, eax; ret
+
+
+def build_object(path: Path, unreferenced: bool = False) -> None:
     """Sections: 1 fA (nodup), 2 fB (pick-any), 3 .text$x(1), 4 .xdata$x(1),
-    5 fC (nodup, calls fA and fB), 6 .text$x(5), 7 .xdata$x(5)."""
+    5 fC (nodup, calls fA and fB), 6 .text$x(5), 7 .xdata$x(5); with
+    ``unreferenced`` also 8 fD (pick-any, referenced by nothing)."""
     strings = bytearray(4)
 
     def name8(name: str) -> bytes:
@@ -56,6 +61,9 @@ def build_object(path: Path) -> None:
         ('.xdata$x', DATA8, bytes.fromhex('20059319') + b'\0' * 4, 5, 5, [(4, 'LC', DIR32)]),
     ]
     defined = {'fA': (1, 2), 'fB': (2, 2), 'LA': (3, 6), 'TA': (4, 6), 'fC': (5, 2), 'LC': (6, 6), 'TC': (7, 6)}
+    if unreferenced:
+        sections.append(('.text', TEXT, UNREFERENCED, 2, 0, []))
+        defined['fD'] = (8, 2)
     symbols, index = bytearray(), {}
     for number, (name, _, data, selection, associated, relocs) in enumerate(sections, 1):
         symbols += name8(name) + struct.pack('<IhHBB', 0, number, 0, 3, 1)
@@ -173,6 +181,51 @@ class SyntheticLayoutTest(unittest.TestCase):
         dropped = {r['section'] for r in report['sections'] if r['status'] == 'dropped'}
         self.assertEqual(dropped, {5, 6, 7})
         self.assertEqual(report['groups']['.text$x']['sections'], 1)
+
+    def test_registered_addresses_match_exact_else_unique_substring(self):
+        cases = [{'source': 'src/unit.cpp', 'symbol': 'fA', 'target_va': '0x401000'},
+                 {'source': 'src/unit.cpp', 'symbol': 'C', 'target_va': '0x401010'},   # fC only
+                 {'source': 'src/unit.cpp', 'symbol': 'f', 'target_va': '0x409000'},   # ambiguous
+                 {'source': 'src/other.cpp', 'symbol': 'fB', 'target_va': '0x409000'}]
+        targets = [{'source': 'src/unit.cpp', 'symbol': 'B', 'va': 0x402000}]
+        with mock.patch('tools.rebuild_coverage.load_calibration_cases', return_value=cases), \
+                mock.patch('tools.rebuild_coverage.load_targets', return_value=targets):
+            found = unit_layout.registered_addresses(ROOT / 'src/unit.cpp', self.obj)
+        self.assertEqual(found, {'fA': 0x401000, 'fC': 0x401010, 'fB': 0x402000})
+
+
+class OptRefTest(unittest.TestCase):
+    """/OPT:REF: an unbound pick-any COMDAT nothing references and retail lacks."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        path = Path(cls.tmp.name) / 'unit.obj'
+        build_object(path, unreferenced=True)
+        cls.obj = CoffObject(path)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def test_removed_only_when_unbound_unreferenced_and_absent(self):
+        absent, present = b'\xcc' * 64, b'\xcc' * 8 + UNREFERENCED + b'\xcc' * 8
+        unbound_fb = {k: v for k, v in BINDINGS.items() if k != 'fB'}
+        self.assertEqual(unit_layout.unreferenced_absent(self.obj, BINDINGS, absent), {'fD'})
+        self.assertEqual(unit_layout.unreferenced_absent(self.obj, unbound_fb, absent), {'fD'})  # fC calls fB
+        self.assertEqual(unit_layout.unreferenced_absent(self.obj, BINDINGS, present), set())
+        self.assertEqual(unit_layout.unreferenced_absent(self.obj, dict(BINDINGS, fD=0x401020), absent), set())
+
+    def test_removed_section_is_not_laid_out(self):
+        report = unit_layout.run(self.obj, dict(BINDINGS, fC=0x401010), reader(retail_image()),
+                                 'auto', 'auto', 'auto', fallback={}, retail_text=b'\xcc' * 64)
+        removed = [r for r in report['sections'] if r['status'] == 'removed']
+        self.assertEqual([r['functions'] for r in removed], [['fD']])
+        self.assertEqual(report['groups']['.text']['verdict'], 'strict_identical')
+        self.assertEqual(report['groups']['.text']['end'], '0x00401020')
+        kept = unit_layout.run(self.obj, dict(BINDINGS, fC=0x401010), reader(retail_image()),
+                               'auto', fallback={})
+        self.assertEqual(kept['groups']['.text']['verdict'], 'differs')    # fD laid out at 0x401020
 
 
 VC6_ROOT = os.environ.get('VC6_ROOT')

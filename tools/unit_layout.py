@@ -21,7 +21,12 @@ object can occupy is skipped as kept elsewhere: a pick-any COMDAT (inline
 function, deleting destructor) is kept only by the first object that defines
 it, and identical-COMDAT folding (/OPT:ICF) keeps one copy of equal bodies.
 A section bound to the same VA as an earlier section of the object is skipped
-as folded into it (ICF inside the unit). Associative sections follow their parent. ``--drop`` skips sections by
+as folded into it (ICF inside the unit). An unbound pick-any section that
+nothing in the object references (``.debug`` aside) and whose bytes, relocation
+fields as wildcards, occur nowhere in retail ``.text`` is skipped as removed by
+/OPT:REF: no object's copy survived (``unreferenced_absent``; for example the
+``??_H`` vector constructor iterator a trivially constructed static array
+leaves). Associative sections follow their parent. ``--drop`` skips sections by
 function symbol by hand (for example a body folded into an unbound survivor).
 
 Relocations resolve to the laid-out address when their symbol is defined in a
@@ -49,6 +54,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import struct
 import subprocess
 import sys
@@ -173,21 +179,27 @@ def default_binding_files(source: Path) -> list[Path]:
 
 def registered_addresses(source: Path, obj: CoffObject) -> dict[str, int]:
     """Function symbol -> retail VA from the calibration cases and targets.json
-    entries registered for this source (targets match by unique substring)."""
+    entries registered for this source. Both match like ``CoffObject.find_symbol``
+    and the matchers: the exact name, else a unique substring."""
     from tools.rebuild_coverage import load_calibration_cases, load_targets
     try:
         rel = source.resolve().relative_to(ROOT).as_posix()
     except ValueError:
         rel = source.as_posix()
     names = {s.name for s in obj.symbols if s.section_number > 0 and s.type == 0x20}
-    out = {case['symbol']: int(case['target_va'], 16) for case in load_calibration_cases()
-           if case.get('source') == rel and case['symbol'] in names}
+    def match(query: str) -> str | None:
+        hits = [query] if query in names else [n for n in names if query in n]
+        return hits[0] if len(hits) == 1 else None
+
+    out = {}
+    for case in load_calibration_cases():
+        name = match(case['symbol']) if case.get('source') == rel else None
+        if name:
+            out.setdefault(name, int(case['target_va'], 16))
     for target in load_targets():
-        if target['source'] != rel or not target['symbol']:
-            continue
-        hits = [n for n in names if target['symbol'] in n]
-        if len(hits) == 1:
-            out.setdefault(hits[0], target['va'])
+        name = match(target['symbol']) if target['source'] == rel and target['symbol'] else None
+        if name:
+            out.setdefault(name, target['va'])
     return out
 
 
@@ -226,9 +238,45 @@ def containing_function(section: Placed, offset: int) -> str | None:
     return best
 
 
+def retail_code(pe) -> bytes:
+    """The retail executable's .text bytes, for unreferenced_absent."""
+    text = next(s for s in pe.sections if s.name.startswith('.text'))
+    return pe.data[text.raw_offset:text.raw_offset + text.virtual_size]
+
+
+def unreferenced_absent(obj: CoffObject, bindings: dict[str, int], code: bytes) -> set[str]:
+    """/OPT:REF: function symbols of unbound pick-any ``.text`` COMDATs that no
+    relocation of the object names outside ``.debug`` sections and the section
+    itself, and whose bytes (relocation fields as wildcards) occur nowhere in
+    retail ``code``. No object's copy survived, so LINK removed this one."""
+    removed = set()
+    for sec in layout_sections(obj):
+        if sec.name != '.text' or sec.selection != COMDAT_PICK_ANY or not sec.functions:
+            continue
+        if any(name in bindings for name, _, _ in sec.functions):
+            continue
+        own = {i for i, s in obj.symbol_by_index.items() if s.section_number == sec.index}
+        if any(r.symbol_index in own and r.section_number != sec.index
+               and not obj.section(r.section_number).name.startswith('.debug') for r in obj.relocations):
+            continue
+        raw = obj.section(sec.index)
+        data = obj.data[raw.raw_ptr:raw.raw_ptr + raw.raw_size]
+        mask = bytearray(len(data))
+        for r in obj.relocations:
+            if r.section_number == sec.index and r.type:
+                field = slice(r.virtual_address, r.virtual_address + 4)
+                mask[field] = b'\1' * len(mask[field])
+        pattern = b''.join(b'.' if m else re.escape(bytes([b])) for b, m in zip(data, mask))
+        if re.search(pattern, code, re.S) is None:
+            removed.update(name for name, _, _ in sec.functions)
+    return removed
+
+
 class Layout:
-    def __init__(self, obj: CoffObject, bindings: dict[str, int], fallback: dict[str, int] | None = None):
+    def __init__(self, obj: CoffObject, bindings: dict[str, int], fallback: dict[str, int] | None = None,
+                 removed: set[str] = frozenset()):
         self.obj, self.bindings, self.fallback = obj, bindings, fallback or {}
+        self.removed = set(removed)   # /OPT:REF, see unreferenced_absent
         self.sections = layout_sections(obj)
         self.by_index = {s.index: s for s in self.sections}
         self.starts: dict[str, int] = {}
@@ -259,6 +307,10 @@ class Layout:
                 continue
             if any(fn in drop for fn, _, _ in sec.functions):
                 sec.status, sec.reason = 'dropped', '--drop'
+                continue
+            if name == '.text' and any(fn in self.removed for fn, _, _ in sec.functions):
+                sec.status = 'removed'
+                sec.reason = '/OPT:REF: unreferenced pick-any COMDAT, its bytes absent from retail .text'
                 continue
             bound = self.bound_va(sec)
             if name == '.text' and bound is not None and not start <= bound < span_end:
@@ -338,7 +390,7 @@ class Layout:
 
     # -- auto anchors
     def auto_text_start(self) -> int | None:
-        secs = self.group('.text')
+        secs = [s for s in self.group('.text') if not any(f[0] in self.removed for f in s.functions)]
         for i, sec in enumerate(secs):
             bound = self.bound_va(sec)
             if bound is not None and sec.selection != COMDAT_PICK_ANY:
@@ -444,9 +496,11 @@ def compare_layout(layout: Layout, retail_bytes) -> dict:
 
 
 def run(obj: CoffObject, bindings: dict[str, int], retail_bytes, start, text_x_start=None,
-        xdata_start=None, drop=frozenset(), fallback=None) -> dict:
-    """Place and compare. Starts are ints, 'auto' or None (group not laid out)."""
-    layout = Layout(obj, bindings, fallback)
+        xdata_start=None, drop=frozenset(), fallback=None, retail_text: bytes | None = None) -> dict:
+    """Place and compare. Starts are ints, 'auto' or None (group not laid out).
+    With ``retail_text`` (retail_code), /OPT:REF-removed COMDATs are not placed."""
+    removed = unreferenced_absent(obj, bindings, retail_text) if retail_text is not None else set()
+    layout = Layout(obj, bindings, fallback, removed)
     if start == 'auto':
         start = layout.auto_text_start()
         if start is None:
@@ -517,7 +571,7 @@ def main(argv=None) -> int:
     try:
         report = run(obj, bindings, pe.bytes_at_va, parse(args.start),
                      parse(args.text_x_start), parse(args.xdata_start), set(args.drop),
-                     None if args.no_repository_bindings else repository_bindings())
+                     None if args.no_repository_bindings else repository_bindings(), retail_code(pe))
     except ValueError as exc:
         raise SystemExit(str(exc))
     report.update({'object': str(obj_path), 'compile_command': command,

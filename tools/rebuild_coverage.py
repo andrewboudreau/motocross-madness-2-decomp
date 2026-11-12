@@ -105,6 +105,13 @@ def source_tree(path: str) -> str:
     return 'src' if parts and parts[0] == 'src' else 'samples'
 
 
+def default_target_source(manifest: Path) -> str | None:
+    """``<Stem>.targets.json`` registers ``<Stem>.cpp`` next to it (the pairing
+    tools/run_samples.py compiles); a plain ``targets.json`` names no source."""
+    stem = manifest.name[:-len('.targets.json')] if manifest.name.endswith('.targets.json') else ''
+    return f'{stem}.cpp' if stem and manifest.with_name(f'{stem}.cpp').is_file() else None
+
+
 def load_targets(root: Path = ROOT) -> list[dict]:
     """Every *targets.json entry under src/ and samples/ with its manifest."""
     rows = []
@@ -120,7 +127,7 @@ def load_targets(root: Path = ROOT) -> list[dict]:
                 expect = entry.get('expect')
                 if expect is None:
                     expect = 'exact' if 'exact' in str(entry.get('status', 'exact')) else 'partial'
-                source = entry.get('source')
+                source = entry.get('source') or default_target_source(manifest)
                 source_path = os.path.normpath(rel_dir / source).replace(os.sep, '/') if source else rel_dir.as_posix()
                 rows.append({
                     'manifest': manifest.relative_to(root).as_posix(),
