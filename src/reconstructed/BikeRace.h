@@ -784,7 +784,7 @@ public:
 // bytes) whose +0 indexes them.
 struct UnknownBikeRaceUiModel {
     unsigned char field_0x00[0x40];
-    char modelFile[0xc8 - 0x40];  // +0x40  KrustyUI entry "ModelFile"/"File" (UnknownKrustyUIModelEntry::modelFile)
+    char modelFile[0xc8 - 0x40];  // +0x40  KrustyUI entry "ModelFile"/"File" (KrustyUIModelRecord::modelFile)
 };
 
 struct UnknownBikeRaceUiChoice {

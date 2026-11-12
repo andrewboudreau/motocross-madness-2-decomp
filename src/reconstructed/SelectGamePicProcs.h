@@ -83,7 +83,7 @@ struct UnknownKrustyUIModelObject : virtual public GameObject {
 struct KrustyUIModelRecord {                // a KrustyUI manufacturer or rider (bikes.pb/riders.pb)
     char displayName[0x40];                   // +0x00: "Name"
     char modelFile[0x40];                     // +0x40: "ModelFile" (a rider's "File")
-    unsigned char uiModelFile[0xc0 - 0x80];   // +0x80: "UIModelFile"
+    char uiModelFile[0x40];                   // +0x80: "UIModelFile"
     UnknownKrustyUIModelObject* uiModel;      // +0xc0
     int availability;                         // +0xc4: "Availability"
 };

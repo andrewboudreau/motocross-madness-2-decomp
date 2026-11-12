@@ -14,6 +14,7 @@
 #include "RaceView.h"
 #include "RenderTarget.h"
 #include "SceneManager.h"
+#include "SelectGamePicProcs.h"
 #include "TextureMap.h"
 #include "TrackGame.h"
 #include "EventManager.h"
@@ -141,18 +142,6 @@ int BaseQuarryEvent::EstimateModelTextureBytes(int* counts) {
     return counts[0] * 0x80000 / 3 + counts[1] * 0x20000 / 3 + counts[2] * 0x8000 / 3 + counts[3] * 0x2000 / 3;
 }
 
-// KrustyUI's manufacturers (+0x48) and riders (+0x58), 0xc8-byte records,
-// and its bikes (+0x50, 0x94 bytes, the manufacturer index first).
-struct UnknownQuarryBikeModel {
-    unsigned char field_0x00[0xc4];
-    int availability;                         // +0xc4 KrustyUI.cpp's UnknownKrustyUIModelEntry: "Availability"
-};
-
-struct UnknownQuarryBikeChoice {
-    int manufacturer;                         // +0x00 KrustyUI.cpp's UnknownKrustyUIBikeEntry: index into +0x48
-    unsigned char field_0x04[0x94 - 0x04];
-};
-
 // 0x004e0560: the race memory estimate (counts of eligible bikes and
 // opponents, capped by the circuit's +0x460). The sum is a local and the
 // field_0x560 constant an if/else assignment: VC6 still emits the branchless
@@ -164,11 +153,11 @@ int BaseQuarryEvent::EstimateRaceBytes() {
     if (g_TrackGame->InProCircuitCareer()) {
         int i;
         for (i = 0; i < g_TrackGame->ui->bikeCount; i++) {
-            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->manufacturers)[((UnknownQuarryBikeChoice*)g_TrackGame->ui->bikes)[i].manufacturer].availability <= g_TrackGame->proCircuit->maxAvailability)
+            if (((KrustyUIModelRecord*)g_TrackGame->ui->manufacturers)[((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[i].manufacturer].availability <= g_TrackGame->proCircuit->maxAvailability)
                 players++;
         }
         for (i = 0; i < g_TrackGame->ui->riderCount; i++) {
-            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->riders)[i].availability <= g_TrackGame->proCircuit->maxAvailability)
+            if (((KrustyUIModelRecord*)g_TrackGame->ui->riders)[i].availability <= g_TrackGame->proCircuit->maxAvailability)
                 opponents++;
         }
         if (players >= g_TrackGame->proCircuit->racerCount)
