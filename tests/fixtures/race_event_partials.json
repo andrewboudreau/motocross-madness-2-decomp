@@ -41,7 +41,7 @@
       "samples/race/BikeRaceNearMisses.cpp",
       "?Tick@BikeRace@@UAEHM@Z",
       5980,
-      "10cef7fd08a0f78ab389ea3da7e491ae88d0de4a6c0dc39f82d44ccb19ced97f"
+      "4675445fb3058ee5fde344b967820932be85d119c9859d111971901452976add"
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",
@@ -53,7 +53,7 @@
       "samples/race/BikeRaceNearMisses.cpp",
       "?OnControlPress@BikeRace@@UAEHPAUControlEvent@@PAUInputButtonState@@@Z",
       2644,
-      "c3a7afae1982a40a0177b2f8dedf8052c04748c8195acbc1e38be70d078b0a38"
+      "7d640f04f6294c801d066d8ef9e9207ce37058296050616ecb5c7a2a2a1bce4f"
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",
@@ -89,13 +89,13 @@
       "samples/race/BikeRaceNearMisses.cpp",
       "?Create@BikeRace@@QAEPAV1@PAX0PAVLightManager@@PAUUnknownTextureFormatChoice@@PAVUnknownBikeRaceProjector@@PAVKrustyBikeCamera@@PAVScene@@PAUUnknownBikeRaceNodeOwner@@PAVUnknownBikeRaceShadow@@@Z",
       6760,
-      "2e5e8f87295b228ed73345a6c65a24e78a053cec2b7475b35c82f1795ff053f1"
+      "61726c02b3d1058bd9bbf770f20ed491b595967822c66da4374c98940b864134"
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",
       "?CreateRacers@BikeRace@@QAEHPAXPAVLightManager@@PAUUnknownTextureFormatChoice@@PAVUnknownBikeRaceProjector@@PAUUnknownBikeRaceNodeOwner@@@Z",
       13428,
-      "2e01aa42972e9d2abca94ce35551d26c1cb16a6e157472611b0e2ab2dfeb22b5"
+      "2b8f0a5a732b47beeef874f57420cb3b88eb528e5fc4e907b632dc36084321fa"
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
@@ -119,7 +119,7 @@
       "samples/ui/DlgProcsNearMisses.cpp",
       "?HandleEvent@MainDlg@@UAEXPAUDialogEvent@@@Z",
       5292,
-      "8bd0a24e6e373073f822a04a905e972bd8986812f3ebcdeccb358c9f5c5edbb4"
+      "e899fe621f798f2082f90f2c3119b864a44710711049743fba31436c56183de8"
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
@@ -131,19 +131,19 @@
       "samples/ui/DlgProcsNearMisses.cpp",
       "?HandleEvent@SPRaceInfoDlg@@UAEXPAUDialogEvent@@@Z",
       1652,
-      "631722bee7b25ac5e38fa67d9d9e63bb94265402a5151d138e0fe285b454c7ed"
+      "3309a49ba34ddfdcb432a387e2990fe2f567babf6d13f675e0f54f21dd4543c2"
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
       "?HandleEvent@MPRaceInfoDlg@@UAEXPAUDialogEvent@@@Z",
       2004,
-      "60e8b7061e1b67b637184034d1431c1162e7ecfe95c3d360a8e0e4e63c32eaaf"
+      "1255a529c7833d95e0bc5d30ea2d1ff7e8717ccab713ccbd5adb4c469205801e"
     ],
     [
       "samples/race/RaceSoundNearMisses.cpp",
       "?Create@RaceSound@@QAEPAV1@PAXPAUUnknownKrustyBikeView@@PAUUnknownRaceSoundCamera@@H@Z",
       4153,
-      "e343986449e446424b473ae1aa0a71c46f1251ce1c14436cf2682864542a7eea"
+      "7e91dabbfe70a2681700a449a689af6bee110699a41a1b2f96000ee052e7493c"
     ],
     [
       "samples/race/RaceSoundNearMisses.cpp",

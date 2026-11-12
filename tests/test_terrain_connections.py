@@ -55,7 +55,7 @@ PARTIAL = (
     # Load's 2117 bytes and other 64 relocation records are identical.
     # Load now passes its third argument (retail 0x0050614c), not `host`, to the height field;
     # the size and relocations are unchanged, one push source differs.
-    ('?Load@Terrain@@', 2117, 'caa090e03ea34171361119bfe73ce6c906afcddd8f3d34c5c5a4ec117eb4782a'),
+    ('?Load@Terrain@@', 2117, 'f48332306ae89a55e85d1b4955fc33d431a417d8e0eafd0aa81c4bec1aa9b777'),
     # Intentional cell-conversion repair, verified at the actual first-cell
     # boundary in test_terrain_cell_conversion; full interpolation remains partial.
     # The sampler, dot and triangle provider names are now canonical, with

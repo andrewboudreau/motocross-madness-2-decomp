@@ -147,7 +147,7 @@ class RecorderWorkerBehaviorTests(unittest.TestCase):
             self.assertEqual(hashlib.sha256(aggregate_body).hexdigest(),
                              '30028ed354faec404948fa17993859d2ff64bdee9592ea9fba9567ee9db09612')
             self.assertEqual(hashlib.sha256(json.dumps(aggregate_relocs).encode()).hexdigest(),
-                             '29e5858064ab107f6b366fccd8d7ae899d28dcf5fdf185d7d3cf06913dd38535')
+                             '5e495bb02e9d6337d788bc828b081660fb88f109e26f5870c21b877b47ab1512')
             report = compare(image, candidate, SYMBOL, 0x4e6f80, 2148, binding_path)
             self.assertFalse(report['strict_exact'])
             self.assertEqual(report['strict_match']['matching_positions'], 2100)

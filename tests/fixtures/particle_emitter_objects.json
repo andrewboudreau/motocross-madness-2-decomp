@@ -3,37 +3,37 @@
     "src/krusty2/vehicle/Bike.cpp": {
       "sections": 243,
       "relocations": 1105,
-      "sha256": "4e113b63843a5170c67fa064745835602c885bb2d7c3af0daf5a0aa2f24c888a"
+      "sha256": "21812eedea40cf3a7c9ac70e7f5a6c7f35d2842900d0c07870626db72d9cecf3"
     },
     "src/krusty2/vehicle/Vehicle.cpp": {
       "sections": 151,
       "relocations": 720,
-      "sha256": "216a85af156a419c8d9b842c228d0bf68bead7d25f18e4dd837262c80771c91e"
+      "sha256": "72a2886aa53661e851e9c3d051ae10323f8b40fb838ebc551399d2f27f860e18"
     },
     "src/reconstructed/DustParticleEmitter.cpp": {
       "sections": 28,
       "relocations": 65,
-      "sha256": "2b986f1abb012a463db8a6c285784920e12dd192e8a69971d80162c7a2c64b40"
+      "sha256": "9520278028224cc8a7054a411bf1c1d5083a6570007375616c944481dd797c32"
     },
     "src/reconstructed/DirtChunkParticleEmitter.cpp": {
       "sections": 22,
       "relocations": 63,
-      "sha256": "bd1697686918f8306cffda7df9c279a1cdfa451e9adae6da93ee68ad41d00767"
+      "sha256": "de1f02efc665e14c27f7f2c6a687fd178cdb458dcff02dce4f44acf145bd6f15"
     },
     "src/reconstructed/SteamParticleEmitter.cpp": {
       "sections": 26,
       "relocations": 61,
-      "sha256": "cb14fcd9a3d28f9d3402e981eaa8feb1261d390398a16ab9b66734e6b239cd95"
+      "sha256": "46693bdf38a3832d7bf28efbfabb9c3dca40335475b7b93dad354abe3fa8d75f"
     },
     "src/reconstructed/SparkParticleEmitter.cpp": {
       "sections": 25,
       "relocations": 67,
-      "sha256": "801cf70cf624ac0b41d5bd4803e8f8ef1ede51fd96bb0430c33bc931a0ac7002"
+      "sha256": "7376a298764a1db62810de8ae5acdbe492578b8d78494a1b2863e925d4543963"
     },
     "src/reconstructed/DirtSprayParticleEmitter.cpp": {
       "sections": 23,
       "relocations": 59,
-      "sha256": "63aa30892949897fb55702b4948e24cca456ba6586a4d2f41ac401908a67f4db"
+      "sha256": "5add6250f6a52b65cf8d4789543f02f4a888e9f69aa525a2b4453e85cff114f4"
     }
   },
   "renames": {

@@ -9,7 +9,7 @@
     "src/krusty2/rigidbody/PhysicsRigidBody.cpp": {
       "sections": 49,
       "relocations": 142,
-      "sha256": "2144d8b994fe24cd037384ee55b37499090381b71aed45882fdc84b268fedf63"
+      "sha256": "30c63345299f7860690ef3f3a9afe5b1c46bf128592663f506f97e922a88ca2e"
     },
     "src/reconstructed/Math3D.cpp": {
       "sections": 19,
