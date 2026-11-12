@@ -57,10 +57,10 @@ struct UnknownBikeRaceView6c;
 struct UnknownKrustyVcrRecord {
     UnknownKrustyVcrRecord() {
         networkPlayerId = 0;
-        field_0x04 = 0;
+        points = 0;
     }
     int networkPlayerId;  // +0x0  same 8-byte grid entry as UnknownBikeRaceNetPlayer (+0 compared with racers' networkPlayerId)
-    char field_0x04;
+    char points;  // +0x4  same grid entry: TrackGame.h UnknownTrackGameModeEntry::points (championship points)
 };
 
 // One racer of a recording (KrustyVCR+0x300, 0x124 bytes; 0x0049c070 writes
@@ -261,7 +261,7 @@ struct UnknownBikeRaceEventAi {
 // +5 byte, set for the AI racers a host runs.
 struct UnknownBikeRaceNetPlayer {
     int networkPlayerId;  // +0x0  compared with localPlayer and slots[j].networkPlayerId (loader, grid order)
-    char field_0x04;
+    char points;  // +0x4  TrackGame.h UnknownTrackGameModeEntry::points (championship points, the grid sort key)
     char isAi;  // +0x5  set for a grid slot holding an AI racer of that player's host (racerIndex != 0)
     unsigned char field_0x06[2];
 };
@@ -471,8 +471,8 @@ public:
 
 // A racer's network state (0x58 bytes, network message 1).
 struct UnknownBikeRaceNetState {
-    char field_0x00;
-    char field_0x01;
+    char type;                                // +0x00 SendRaw (0x004ad280) writes the type byte here
+    char finishPosition;  // +0x1  KbBikeMessage+0x01 finishPosition (the sender's message 1 layout)
     unsigned char field_0x02[0x04 - 0x02];
     int field_0x04;
     Vector3 position;  // +0x8  KbBikeMessage+0x08 position; copied to racer deltaBasePosition (+0x1364)
@@ -499,7 +499,7 @@ struct UnknownBikeRaceNetMessage13 {
 
 // Network message 10: a racer's score.
 struct UnknownBikeRaceNetScore {
-    char field_0x00;
+    char type;                                // +0x00 SendRaw (0x004ad280) writes the type byte here
     char racerIndex;                          // +0x01 racer index
     unsigned char field_0x02[0x04 - 0x02];
     float racerScore;  // +0x4  message 10 (KbBikePing+0x04 = KrustyBike+0x768 score); copied to racer score
@@ -507,7 +507,7 @@ struct UnknownBikeRaceNetScore {
 
 // Network messages 0x84 (a time stamp at +4) and 0x85 (text at +4).
 struct UnknownBikeRaceNetStamp {
-    int field_0x00;
+    int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     unsigned int timeStamp;                   // +0x04 sender's time stamp
 };
 
@@ -752,8 +752,8 @@ struct UnknownBikeRaceGhostPart {
 
 // Record kind 0x87: the racer the ghost follows (by its +0x11bc id).
 struct UnknownBikeRaceVcrFollow {
-    int field_0x00;                           // not written by 0x004a9d20
-    char field_0x04;                          // 0x004a9d20 clears the byte
+    int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
+    char request;                             // +0x04 KbNetPacket::request: 0 for message 0x87 (0x004a9d20 clears it)
     unsigned char field_0x05[0x08 - 0x05];
     int followedRacerId;  // +0x8  FollowRacer sends followedRacer->networkPlayerId; RecordFrame matches it to racer recorderId
 };

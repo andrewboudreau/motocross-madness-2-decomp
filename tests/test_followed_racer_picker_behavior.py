@@ -120,7 +120,7 @@ class FollowedRacerPickerBehaviorTests(unittest.TestCase):
             layout = output / 'layout.cpp'
             layout.write_text('#include "BikeRace.h"\n#include "TrackGame.h"\n#include <stddef.h>\n'
                 'typedef char Layout[(sizeof(UnknownBikeRaceVcrFollow)==12 && '
-                'offsetof(UnknownBikeRaceVcrFollow,field_0x04)==4 && offsetof(UnknownBikeRaceVcrFollow,followedRacerId)==8 && '
+                'offsetof(UnknownBikeRaceVcrFollow,request)==4 && offsetof(UnknownBikeRaceVcrFollow,followedRacerId)==8 && '
                 'offsetof(TrackGameViewOwner,raceView)==0x34 && offsetof(TrackGameViewOwner,followedRacer)==0xa8 && '
                 'offsetof(UnknownEventRacer,outOfRace)==0x4a0 && offsetof(UnknownEventRacer,networkPlayerId)==0x11bc && '
                 'offsetof(BikeRace,racerSlots)==0x3c && offsetof(BikeRace,replayVcr)==0x1a0 && '

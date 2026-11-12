@@ -47,7 +47,7 @@ void TrackGameViewOwner::PickFollowedRacer()
         followedRacer = selectionView->racerSlots[index];
     }
     UnknownBikeRaceVcrFollow follow;
-    follow.field_0x04 = 0;
+    follow.request = 0;
     follow.followedRacerId = followedRacer->networkPlayerId;
     g_TrackGame->network->Send(0x87, &follow, sizeof(follow), g_TrackGame->network->localPlayer, 0);
     if (raceView->replayVcr && g_TrackGame->mode.saveReplay && !g_TrackGame->playingReplay)
