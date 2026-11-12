@@ -209,6 +209,7 @@ CLEAN_CASES = {
     'graphics_test_draw_circle': 60,
     'eco_render3d': 30,
     'soultree_prepare_geometry': 20,
+    'soultree_draw_current_lod': 80,
 }
 
 # Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).
@@ -290,6 +291,38 @@ PRE_FIX_SHAPES = [
        'view._23 = world.m[1][0] * projection.m[0][2] + world.m[1][1] * projection.m[1][2] + world.m[1][2] * projection.m[2][2] + world.m[1][3] * projection.m[3][2];'),
       ('view._24 = ((world.m[1][2] * projection.m[2][3] + world.m[1][3] * projection.m[3][3]) + world.m[1][1] * projection.m[1][3]) + world.m[1][0] * projection.m[0][3];',
        'view._24 = world.m[1][0] * projection.m[0][3] + world.m[1][1] * projection.m[1][3] + world.m[1][2] * projection.m[2][3] + world.m[1][3] * projection.m[3][3];')], 20),
+    # DrawCurrentLod's sum orders at 24 bits: modes 3/4 tu, mode 2's world normal and facing,
+    # mode 5's world normal; and mode 5's ray, whose dx/dz retail keeps on the x87 stack (53-bit).
+    ('soultree_draw_current_lod',
+     [('                        const Vector3& normal = group->normals[v];\n'
+       '                        group->sourceVertices[v].tu =\n'
+       '                            1.0f - ((direction.y * normal.y + direction.x * normal.x) +\n'
+       '                                    direction.z * normal.z + 1.0f) * 0.5f;\n',
+       '                        group->sourceVertices[v].tu =\n'
+       '                            1.0f - (direction.y * group->normals[v].y + direction.x * group->normals[v].x +\n'
+       '                                    direction.z * group->normals[v].z + 1.0f) * 0.5f;\n')], 30),
+    ('soultree_draw_current_lod',
+     [('                        Vector3 worldNormal;\n'
+       '                        worldNormal.x = normal.x * world->m[0][0] + normal.y * world->m[1][0] + normal.z * world->m[2][0];\n'
+       '                        worldNormal.y = normal.x * world->m[0][1] + normal.y * world->m[1][1] + normal.z * world->m[2][1];\n'
+       '                        worldNormal.z = normal.x * world->m[0][2] + normal.y * world->m[1][2] + normal.z * world->m[2][2];\n',
+       '                        Vector3 worldNormal(\n'
+       '                            normal.x * world->m[0][0] + normal.y * world->m[1][0] + normal.z * world->m[2][0],\n'
+       '                            normal.x * world->m[0][1] + normal.y * world->m[1][1] + normal.z * world->m[2][1],\n'
+       '                            normal.x * world->m[0][2] + normal.y * world->m[1][2] + normal.z * world->m[2][2]);\n'),
+      ('float facing = (direction.x * worldNormal.x + direction.y * worldNormal.y)\n',
+       'float facing = direction.x * worldNormal.x + direction.y * worldNormal.y\n')], 30),
+    ('soultree_draw_current_lod',
+     [('(normal.x * world->m[0][0] + normal.z * world->m[2][0]) + normal.y * world->m[1][0],\n'
+       '                            (normal.y * world->m[1][1] + normal.z * world->m[2][1]) + normal.x * world->m[0][1],\n'
+       '                            (normal.y * world->m[1][2] + normal.z * world->m[2][2]) + normal.x * world->m[0][2]);\n',
+       'normal.x * world->m[0][0] + normal.z * world->m[2][0] + normal.y * world->m[1][0],\n'
+       '                            normal.x * world->m[0][1] + normal.y * world->m[1][1] + normal.z * world->m[2][1],\n'
+       '                            normal.x * world->m[0][2] + normal.y * world->m[1][2] + normal.z * world->m[2][2]);\n')], 80),
+    ('soultree_draw_current_lod',
+     [('float dz = target.z - position.z;\n', 'float dy = target.y - position.y;\n'
+       '                        float dz = target.z - position.z;\n'),
+      ('hit = position + (target - position) * t;', 'hit = position + Vector3(dx * t, dy * t, dz * t);')], 30),
 ]
 
 

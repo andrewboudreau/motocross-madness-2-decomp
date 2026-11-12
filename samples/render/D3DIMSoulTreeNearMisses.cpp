@@ -87,6 +87,13 @@
 // mixed operand order in the normalisations (identical code).
 // The mode 5 source keeps two retail bugs: `circle[i + 1]` reads past the
 // 16 points, and the group loop indexes with the restore loop's `k`.
+// Behaviour (tools/emu_cases/soultree_draw_current_lod.py, 2026-11-11): several
+// sums were added in a different order from retail's, an ulp off at 24 bits:
+// the mode 3/4 tu dot products, mode 2's world normal and facing, and mode 5's
+// world normal. Mode 5's ray also stored dx to a float where retail keeps
+// dx/dz on the x87 stack (an ulp at 53 bits). The forms here follow retail;
+// together they raise the linked masked metric from 0.891 to 0.898 (this copy:
+// 473 differing, 1422 aligned).
 //
 #include "../../src/reconstructed/D3DIMSoulTree.h"
 #include "../../src/reconstructed/Camera.h"
@@ -378,9 +385,10 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     direction = NormalizedByCall(direction);
                     direction = ((UnknownSoultreeNodeView*)group->node)->WorldToLocalDirection(&direction);
                     for (int v = 0; v < vertices; v++) {
+                        const Vector3& normal = group->normals[v];
                         group->sourceVertices[v].tu =
-                            1.0f - (direction.y * group->normals[v].y + direction.x * group->normals[v].x +
-                                    direction.z * group->normals[v].z + 1.0f) * 0.5f;
+                            1.0f - ((direction.y * normal.y + direction.x * normal.x) +
+                                    direction.z * normal.z + 1.0f) * 0.5f;
                         group->sourceVertices[v].tv = 0;
                     }
                 }
@@ -398,9 +406,10 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     Vector3 direction = NormalizedByCall(position - eye);
                     direction = ((UnknownSoultreeNodeView*)group->node)->WorldToLocalDirection(&direction);
                     for (int v = 0; v < vertices; v++) {
+                        const Vector3& normal = group->normals[v];
                         group->sourceVertices[v].tu =
-                            1.0f - (direction.y * group->normals[v].y + direction.x * group->normals[v].x +
-                                    direction.z * group->normals[v].z + 1.0f) * 0.5f;
+                            1.0f - ((direction.y * normal.y + direction.x * normal.x) +
+                                    direction.z * normal.z + 1.0f) * 0.5f;
                         group->sourceVertices[v].tv = 0;
                     }
                 }
@@ -475,12 +484,16 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     for (int v = 0; v < count; v++) {
                         Vector3 direction = NormalizedCallingConstructor(group->sourceVertices[v].position - eye);
                         Vector3 normal = group->normals[v];
-                        Vector3 worldNormal(
-                            normal.x * world->m[0][0] + normal.y * world->m[1][0] + normal.z * world->m[2][0],
-                            normal.x * world->m[0][1] + normal.y * world->m[1][1] + normal.z * world->m[2][1],
-                            normal.x * world->m[0][2] + normal.y * world->m[1][2] + normal.z * world->m[2][2]);
+                        // One statement per component: VC6 then adds the y row as retail does,
+                        // (x m01 + z m21) + y m11 (0x00441cf8..0x00441d18); the constructor
+                        // form groups it (z m21 + y m11) + x m01, an ulp off at 24 bits.
+                        Vector3 worldNormal;
+                        worldNormal.x = normal.x * world->m[0][0] + normal.y * world->m[1][0] + normal.z * world->m[2][0];
+                        worldNormal.y = normal.x * world->m[0][1] + normal.y * world->m[1][1] + normal.z * world->m[2][1];
+                        worldNormal.z = normal.x * world->m[0][2] + normal.y * world->m[1][2] + normal.z * world->m[2][2];
                         Vector3 twice = worldNormal + worldNormal;
-                        float facing = direction.x * worldNormal.x + direction.y * worldNormal.y
+                        // (y + x) + z as retail sums it (0x00441d52..0x00441d6f).
+                        float facing = (direction.x * worldNormal.x + direction.y * worldNormal.y)
                                        + direction.z * worldNormal.z;
                         Vector3 reflected = twice * facing - direction;
                         float halfX = reflected.x * 0.5f;
@@ -547,10 +560,12 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         segment[0] = position;
                         Vector3 direction = Normalized(position - viewPosition);
                         Vector3 normal = group->normals[v];
+                        // Retail adds (x m00 + z m20) + y m10, then (z m21 + y m11) + x m01
+                        // and (z m22 + y m12) + x m02 (0x004421b3..0x0044221c).
                         Vector3 worldNormal(
-                            normal.x * world->m[0][0] + normal.z * world->m[2][0] + normal.y * world->m[1][0],
-                            normal.x * world->m[0][1] + normal.y * world->m[1][1] + normal.z * world->m[2][1],
-                            normal.x * world->m[0][2] + normal.y * world->m[1][2] + normal.z * world->m[2][2]);
+                            (normal.x * world->m[0][0] + normal.z * world->m[2][0]) + normal.y * world->m[1][0],
+                            (normal.y * world->m[1][1] + normal.z * world->m[2][1]) + normal.x * world->m[0][1],
+                            (normal.y * world->m[1][2] + normal.z * world->m[2][2]) + normal.x * world->m[0][2]);
                         float facing = direction.x * worldNormal.x;
                         facing += direction.y * worldNormal.y;
                         facing += direction.z * worldNormal.z;
@@ -559,8 +574,9 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         Vector3 target = position + reflected;
                         // Where the reflected ray meets the vertical cylinder of
                         // radius 128 about `center`.
+                        // No dy: retail forms target.y - position.y only inside the hit
+                        // branch (0x004423d2) and keeps dx/dz on the x87 stack until then.
                         float dx = target.x - position.x;
-                        float dy = target.y - position.y;
                         float dz = target.z - position.z;
                         float a = dx * dx + dz * dz;
                         float b = ((position.x - center.x) * dx + (position.z - center.z) * dz) * 2.0f;
@@ -573,9 +589,9 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                             float root = (float)sqrt(discriminant);
                             float t = (root - b) / (a + a);
                             if (t > 0.0f)
-                                hit = position + Vector3(dx * t, dy * t, dz * t);
+                                hit = position + (target - position) * t;
                             else if ((-b - root) / (a + a) > 0.0f)
-                                hit = position + Vector3(dx * t, dy * t, dz * t);
+                                hit = position + (target - position) * t;
                         }
                         float fresnel = 1.0f - (float)fabs(facing);
                         segment[1] = hit;

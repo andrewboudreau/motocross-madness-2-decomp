@@ -57,7 +57,7 @@
     "samples/render/D3DIMSoulTreeNearMisses.cpp": {
       "sections": 29,
       "relocations": 148,
-      "sha256": "edd409fed532bd34e9d691861bc7aeb8d846b75cbc64294d91d736a7568c52ed"
+      "sha256": "d466d09f8c2991042e2031b330835d026f2e2dbf7c25d5cc9f3880d21070ee85"
     },
     "samples/game/QuarryStuntEventNearMisses.cpp": {
       "sections": 23,
