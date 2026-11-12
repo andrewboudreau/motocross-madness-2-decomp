@@ -405,7 +405,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                                                    vcrFile);
                 AppendChild(replayVcr, -1);
             }
-            savedCameraState = UnknownFunctionCameraView()->cameraState;
+            savedCameraState = RaceCameraView()->cameraState;
             raceCamera->SetCameraState(1);
         }
     }

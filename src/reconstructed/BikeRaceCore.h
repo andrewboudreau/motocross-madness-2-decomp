@@ -21,7 +21,7 @@ struct UnknownBikeRaceNodeOwner;
 struct UnknownBikeRaceNodeSource;
 struct UnknownBikeRaceViews;
 struct UnknownBikeRaceView6c;
-struct UnknownEventRacerPart;
+struct RaceStatusNode;
 
 class BikeRace : public GraphicsTest {
 public:
@@ -44,7 +44,7 @@ public:
     // 0x00423880: control 6 (modifier 0x80) toggles drawChildren (+0x3fd).
     virtual int OnControlRelease(ControlEvent* event, InputButtonState* entry);
 
-    UnknownBikeRaceCameraView* UnknownFunctionCameraView() {
+    UnknownBikeRaceCameraView* RaceCameraView() {
         return (UnknownBikeRaceCameraView*)raceCamera;
     }
 
@@ -131,7 +131,7 @@ public:
     int forceAiStep;  // +0xB8  KrustyBike slot 49 takes the BikeAI step 0x00413200 when aiKind or this is set; Create clears it
     int scoreBoard;                           // +0xbc score board: BonusObjectManager::SetupCounter's object
     int digitCounter;                         // +0xc0 NumberObjectManager::SetupDigits's object
-    UnknownEventRacerPart* statusList;  // +0xC4  race status list: BuildStatusList/FreeStatusList/UpdateLapRace/UpdateGateRace operand
+    RaceStatusNode* statusList;  // +0xC4  race status list: BuildStatusList/FreeStatusList/UpdateLapRace/UpdateGateRace operand
     UnknownBikeRaceNode* gateList;            // +0xc8 gate nodes linked through nextGate
     UnknownBikeRaceNode startProbe;          // start probe
     UnknownBikeRaceNode finishProbe;          // finish probe

@@ -88,7 +88,7 @@ struct UnknownRunwayView {
     UnknownRunwayTrack* raceTrack;            // +0x48 BikeRace's raceTrack
 };
 
-// The racer's race status node (RaceView.h's UnknownEventRacerPart).
+// The racer's race status node (RaceView.h's RaceStatusNode).
 struct UnknownRunwayRacerPart {
     unsigned char field_0x00[0x38];
     UnknownRunwayTrackPos placedPos;          // +0x38 (RaceView.h)

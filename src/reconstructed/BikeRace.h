@@ -430,7 +430,7 @@ public:
     int engineSize;                           // +0x738 engine size
     int plateNumber;                          // +0x73c plate number (the setup paints it)
     UnknownBikeRaceRacerInfo* bikeView;       // +0x740 the racer's view (RaceView.h)
-    UnknownEventRacerPart* statusNode;        // +0x744 race status node (RaceView.h)
+    RaceStatusNode* statusNode;        // +0x744 race status node (RaceView.h)
     unsigned char field_0x748[0x74c - 0x748];
     float lastLapTime;                        // +0x74c (UnknownEventRacer's last lap time)
     float fastestLap;                         // +0x750 (0x0045c8b0 copies it to the entry's ZoneReport "FastestLap")

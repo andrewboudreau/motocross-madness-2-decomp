@@ -24,9 +24,9 @@
 #include "../../src/reconstructed/TrackGame.h"
 
 // 0x004e5d00
-int BuildStatusList(UnknownEventRacerPart** list, UnknownKrustyBikeView* view) {
-    UnknownEventRacerPart* status;
-    UnknownEventRacerPart** tail;
+int BuildStatusList(RaceStatusNode** list, UnknownKrustyBikeView* view) {
+    RaceStatusNode* status;
+    RaceStatusNode** tail;
     int index;
     int i;
 
@@ -34,7 +34,7 @@ int BuildStatusList(UnknownEventRacerPart** list, UnknownKrustyBikeView* view) {
     if (!list)
         return 0;
     index = 1;
-    status = (UnknownEventRacerPart*)DebugCalloc(1, sizeof(UnknownEventRacerPart), __FILE__, 214);
+    status = (RaceStatusNode*)DebugCalloc(1, sizeof(RaceStatusNode), __FILE__, 214);
     if (!status)
         return 0;
     status->racer = view->localRacer;
@@ -47,7 +47,7 @@ int BuildStatusList(UnknownEventRacerPart** list, UnknownKrustyBikeView* view) {
     if (g_TrackGame->playerCount == 1 && g_TrackGame->mode.raceSettings.raceMode != 4) {
         for (i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
             if (!HasStatusNode(*list, view->aiRacers[i])) {
-                status = (UnknownEventRacerPart*)DebugCalloc(1, sizeof(UnknownEventRacerPart), __FILE__, 235);
+                status = (RaceStatusNode*)DebugCalloc(1, sizeof(RaceStatusNode), __FILE__, 235);
                 if (!status)
                     return 0;
                 index++;
@@ -64,7 +64,7 @@ int BuildStatusList(UnknownEventRacerPart** list, UnknownKrustyBikeView* view) {
     if (view->racerSlots) {
         for (i = 0; i < view->racerCount; i++) {
             if (!HasStatusNode(*list, view->racerSlots[i]) && view->racerSlots[i] != view->localRacer) {
-                status = (UnknownEventRacerPart*)DebugCalloc(1, sizeof(UnknownEventRacerPart), __FILE__, 257);
+                status = (RaceStatusNode*)DebugCalloc(1, sizeof(RaceStatusNode), __FILE__, 257);
                 if (!status)
                     return 0;
                 index++;

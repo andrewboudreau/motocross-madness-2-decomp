@@ -6,7 +6,7 @@ per-racer status list a race view builds. Evidence: the `__FILE__` literal
 DebugCalloc (lines 214, 235, 257) and the matching delete (lines 193, 285)
 from `0x004e5cd1`–`0x004e5f24`. Names are provisional.
 
-The nodes are `UnknownEventRacerPart` (RaceView.h, 0x54 bytes): the
+The nodes are `RaceStatusNode` (RaceView.h, 0x54 bytes): the
 1-based creation order (+0x00), the racer (+0x04), the float EventManager
 sorts by (+0x0c), the racer's position when created (+0x28, copied from the
 racer's +0x0c), the view's +0xc8 (+0x34) and the next node (+0x50). Each

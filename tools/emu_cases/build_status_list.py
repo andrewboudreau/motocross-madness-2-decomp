@@ -13,7 +13,7 @@ null slot array are included.
 import struct
 
 RETAIL_VA = 0x004e5d00
-SYMBOL = '?BuildStatusList@@YAHPAPAUUnknownEventRacerPart@@PAUUnknownKrustyBikeView@@@Z'
+SYMBOL = '?BuildStatusList@@YAHPAPAURaceStatusNode@@PAUUnknownKrustyBikeView@@@Z'
 SOURCE = 'src/bringup/Group6_BuildStatusList.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x004e5d9e: 'AI loop', 0x004e5dd3: 'AI node', 0x004e5e5e: 'slot loop', 0x004e5e90: 'slot node',

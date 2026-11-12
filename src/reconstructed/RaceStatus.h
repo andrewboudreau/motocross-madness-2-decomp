@@ -3,7 +3,7 @@
 #include "RaceView.h"
 
 // RaceStatus.cpp (literal __FILE__ at 0x00572990): the per-racer status list
-// (UnknownEventRacerPart nodes, 0x54 bytes, DebugCalloc'd) that a race view
+// (RaceStatusNode nodes, 0x54 bytes, DebugCalloc'd) that a race view
 // builds for its racers, the gate and lap counting behind it, and the race
 // order. All cdecl; names are provisional. See docs/RACESTATUS.md.
 
@@ -38,24 +38,24 @@ int AdvanceGate(Vector3* from, Vector3* to, UnknownBikeRaceNode** current, Unkno
                           unsigned short* laps, float* lapTime, float* bestLap, float* lapStart, char* finished,
                           int lapLimit, int unlimited, int skipTest, int forced);
 // 0x004e5c70: whether `list` has a node for `racer`.
-int HasStatusNode(UnknownEventRacerPart* list, UnknownEventRacer* racer);  // 0x004e5c70
+int HasStatusNode(RaceStatusNode* list, UnknownEventRacer* racer);  // 0x004e5c70
 // 0x004e5ca0: frees the nodes of racers whose GameObject +0x25 bit 0 is
 // clear, detaching them from their racers.
-int PruneStatusList(UnknownEventRacerPart** list);  // 0x004e5ca0
+int PruneStatusList(RaceStatusNode** list);  // 0x004e5ca0
 // 0x004e5d00: builds `*list` for `view`: its own racer, then (in some race
 // modes) the AI racers, then the other racers.
-int BuildStatusList(UnknownEventRacerPart** list, UnknownKrustyBikeView* view);  // 0x004e5d00
+int BuildStatusList(RaceStatusNode** list, UnknownKrustyBikeView* view);  // 0x004e5d00
 // 0x004e5f10: frees every node of `list`.
-int FreeStatusList(UnknownEventRacerPart* list);  // 0x004e5f10
+int FreeStatusList(RaceStatusNode* list);  // 0x004e5f10
 // 0x004e5f40: track distances to `probe`, then orders `*list` by laps and
 // distance and numbers the racers' positions.
-int OrderByLapDistance(UnknownEventRacerPart** list, Track* track, UnknownBikeRaceNode* probe);  // 0x004e5f40
+int OrderByLapDistance(RaceStatusNode** list, Track* track, UnknownBikeRaceNode* probe);  // 0x004e5f40
 // 0x004e6120: orders `*list` by gates passed and distance to the next gate
 // and numbers the racers' positions.
-int OrderByGates(UnknownEventRacerPart** list);  // 0x004e6120
+int OrderByGates(RaceStatusNode** list);  // 0x004e6120
 // 0x004e6210: each racer's time behind the leader, from gate times (`mode`
 // 1) or lap times.
-int ComputeTimeBehind(UnknownEventRacerPart* list, int mode);  // 0x004e6210
+int ComputeTimeBehind(RaceStatusNode* list, int mode);  // 0x004e6210
 // 0x004e62d0: ranks the view's racers by score (+0x768) and, unless
 // `keepRacing`, finishes them all when the time limit is up.
 int RankByScore(int keepRacing);  // 0x004e62d0
@@ -63,11 +63,11 @@ int RankByScore(int keepRacing);  // 0x004e62d0
 // track (leading by 3.5 times its velocity), counts laps at `finish`, fills
 // in the other racers' results once the view's racer has finished, and
 // orders the list.
-int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, UnknownBikeRaceNode* start,  // 0x004e63e0
+int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, UnknownBikeRaceNode* start,  // 0x004e63e0
                           UnknownBikeRaceNode* finish, int lapLimit, int unlimited);
 // 0x004e6a50: per frame for a gate race: counts each unfinished racer's
 // gates from `firstGate`, reports a changed gate of the followed racer to
 // the view owner, fills in the other racers' results once the view's racer
 // has finished, and orders the list.
-int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate, float frameTime, int lapLimit,  // 0x004e6a50
+int UpdateGateRace(RaceStatusNode** list, UnknownBikeRaceNode* firstGate, float frameTime, int lapLimit,  // 0x004e6a50
                           int unlimited);

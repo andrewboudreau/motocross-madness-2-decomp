@@ -67,7 +67,7 @@ typedef SoultreeObject UnknownVehiclePart;
 // +0x1c/+0x28 are the racer's previous and current (leading) positions and
 // +0x34 the next gate (a view's +0xc8 list, BikeRace.h) they are tested
 // against; +0x38/+0x44 are track positions.
-struct UnknownEventRacerPart {
+struct RaceStatusNode {
     int creationOrder;                        // +0x00 1-based order of creation
     UnknownEventRacer* racer;                 // +0x04 racer
     float goalDistance;                       // +0x08 progressPos to the finish probe (track races) or to the next gate's centre (gate races), 0x004e6a50
@@ -80,7 +80,7 @@ struct UnknownEventRacerPart {
     UnknownBikeRaceNode* nextGate;            // +0x34 next gate
     TrackPos placedPos;                       // +0x38 Track::PlaceNear's (or ClosestPointOnTrack's) placement of previousPosition
     TrackPos progressPos;                     // +0x44 PlaceNear's search start; advances only forward to placedPos (0x004e6a50)
-    UnknownEventRacerPart* next;              // +0x50 next
+    RaceStatusNode* next;              // +0x50 next
 };
 
 // A racer: a view's +0x38 (its own) and +0x3c (all, by racer slot), and the
@@ -142,7 +142,7 @@ struct UnknownEventRacer : virtual public GameObject {
     int engineSize;                           // +0x738 engine size; below 250 uses engine 0
     unsigned char field_0x73c[0x740 - 0x73c];
     UnknownKrustyBikeView* bikeView;          // +0x740 the view (RaceStatus.cpp compares its +0x38 and +0x50)
-    UnknownEventRacerPart* statusNode;        // +0x744 race status node (UnknownBikeRaceRacer)
+    RaceStatusNode* statusNode;        // +0x744 race status node (UnknownBikeRaceRacer)
     int finishTimeStamp;                      // +0x748 time stamp; 0x7ffffffe until finished
     float lastLapTime;                        // +0x74c last lap time (RaceStatus.cpp)
     float fastestLap;                         // +0x750 EventManager 0x0045c8b0 copies it to ZoneReport's "FastestLap" (TrackRecord reads it)

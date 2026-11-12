@@ -196,7 +196,7 @@ BikeRace::~BikeRace() {
         delete vcrFile;
         vcrFile = 0;
         if (g_TrackGame->playingReplay) {
-            UnknownFunctionCameraView()->cameraState = savedCameraState;
+            RaceCameraView()->cameraState = savedCameraState;
             raceCamera->SaveCameraState();
         }
         g_TrackGame->playingReplay = 0;
@@ -292,8 +292,8 @@ static inline float UnknownFunctionMax(float a, float b) {
 // 0x0041d2b0
 int BikeRace::Tick(float frameTime) {
     if (!g_TrackGame->uiInteractionBlocked) {
-        if (UnknownFunctionCameraView()->followingRacer &&
-            UnknownFunctionCameraView()->followedBike->outOfRace != 0) {
+        if (RaceCameraView()->followingRacer &&
+            RaceCameraView()->followedBike->outOfRace != 0) {
             NextCameraTarget(0, 1, 0);
         }
         if (!g_TrackGame->paused) {
@@ -501,7 +501,7 @@ int BikeRace::Tick(float frameTime) {
                             startGateTimer = 0;
                             raceScene->RestartEntry(startGateEntry, 0.0f, 0, 0);
                             startGate->Disable();
-                            if (!UnknownFunctionCameraView()->followingRacer && targetEntry == startGateEntry) {
+                            if (!RaceCameraView()->followingRacer && targetEntry == startGateEntry) {
                                 NextCameraTarget(1, 1, 0);
                             }
                             if (startGate->collisionObject != 0) {
@@ -537,7 +537,7 @@ int BikeRace::Tick(float frameTime) {
                         if (thirtySecondMan != 0) {
                             raceScene->RestartEntry(thirtySecondManEntry, 0.0f, 0, 0);
                             thirtySecondMan->Disable();
-                            if (!UnknownFunctionCameraView()->followingRacer && targetEntry == thirtySecondManEntry) {
+                            if (!RaceCameraView()->followingRacer && targetEntry == thirtySecondManEntry) {
                                 NextCameraTarget(1, 1, 0);
                             }
                             if (thirtySecondMan->collisionObject != 0) {
@@ -1066,13 +1066,13 @@ int BikeRace::OnControlPress(ControlEvent* event, InputButtonState* entry) {
                                 &((UnknownBikeRacePickCaster*)raceScene->staticModels->casters)[i];
                             if (caster->flags & 1) {
                                 if (picked == caster->physicsObject->collisionObject) {
-                                    UnknownFunctionCameraView()->followingRacer = 1;
+                                    RaceCameraView()->followingRacer = 1;
                                     targetCaster = i;
                                     NextCameraTarget(1, 0, 0);
                                     return 1;
                                 }
                             } else if (picked == caster->collisionObject) {
-                                UnknownFunctionCameraView()->followingRacer = 1;
+                                RaceCameraView()->followingRacer = 1;
                                 targetCaster = i;
                                 NextCameraTarget(1, 0, 0);
                                 return 1;
@@ -1084,13 +1084,13 @@ int BikeRace::OnControlPress(ControlEvent* event, InputButtonState* entry) {
                             UnknownSceneEntry* entry = &raceScene->animationTable->entries[i];
                             if (entry->keyFramed) {
                                 if (picked == ((UnknownBikeRacePickCharacter*)entry->character)->collisionObject) {
-                                    UnknownFunctionCameraView()->followingRacer = 1;
+                                    RaceCameraView()->followingRacer = 1;
                                     targetEntry = i;
                                     NextCameraTarget(1, 0, 1);
                                     return 1;
                                 }
                             } else if (picked == ((UnknownBikeRacePickObject*)entry->proceduralObject)->collisionObject) {
-                                UnknownFunctionCameraView()->followingRacer = 1;
+                                RaceCameraView()->followingRacer = 1;
                                 targetEntry = i;
                                 NextCameraTarget(1, 0, 1);
                                 return 1;
@@ -1370,7 +1370,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         reinterpret_cast<BaseQuarryEvent*>(g_TrackGame->tagEvent)->ResetClock();
     }
     if (g_TrackGame->bajaEnduroEvent != 0) {
-        g_TrackGame->bajaEnduroEvent->SelectLapGates(0, 1, UnknownFunctionCameraView()->followedRacer);
+        g_TrackGame->bajaEnduroEvent->SelectLapGates(0, 1, RaceCameraView()->followedRacer);
     }
 }
 

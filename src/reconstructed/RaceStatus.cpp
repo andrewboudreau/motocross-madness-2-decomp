@@ -120,7 +120,7 @@ int AdvanceGate(Vector3* from, Vector3* to, UnknownBikeRaceNode** current, Unkno
 }
 
 // 0x004e5c70
-int HasStatusNode(UnknownEventRacerPart* list, UnknownEventRacer* racer) {
+int HasStatusNode(RaceStatusNode* list, UnknownEventRacer* racer) {
     for (; list; list = list->next) {
         if (list->racer == racer)
             return 1;
@@ -129,11 +129,11 @@ int HasStatusNode(UnknownEventRacerPart* list, UnknownEventRacer* racer) {
 }
 
 // 0x004e5ca0
-int PruneStatusList(UnknownEventRacerPart** list) {
+int PruneStatusList(RaceStatusNode** list) {
     while (list && *list) {
         if (!(*list)->racer->isEnabled) {
             (*list)->racer->statusNode = 0;
-            UnknownEventRacerPart* status = *list;
+            RaceStatusNode* status = *list;
             *list = status->next;
             DebugFree(status, __FILE__, 193);
         } else {
@@ -144,9 +144,9 @@ int PruneStatusList(UnknownEventRacerPart** list) {
 }
 
 // 0x004e5f10
-int FreeStatusList(UnknownEventRacerPart* list) {
+int FreeStatusList(RaceStatusNode* list) {
     while (list) {
-        UnknownEventRacerPart* status = list;
+        RaceStatusNode* status = list;
         list = list->next;
         DebugFree(status, __FILE__, 285);
     }
@@ -154,10 +154,10 @@ int FreeStatusList(UnknownEventRacerPart* list) {
 }
 
 // 0x004e5f40
-int OrderByLapDistance(UnknownEventRacerPart** list, Track* track, UnknownBikeRaceNode* probe) {
-    UnknownEventRacerPart* status;
-    UnknownEventRacerPart** at;
-    UnknownEventRacerPart** next;
+int OrderByLapDistance(RaceStatusNode** list, Track* track, UnknownBikeRaceNode* probe) {
+    RaceStatusNode* status;
+    RaceStatusNode** at;
+    RaceStatusNode** next;
     int key;
     int i;
 
@@ -200,10 +200,10 @@ int OrderByLapDistance(UnknownEventRacerPart** list, Track* track, UnknownBikeRa
 }
 
 // 0x004e6120
-int OrderByGates(UnknownEventRacerPart** list) {
-    UnknownEventRacerPart* status;
-    UnknownEventRacerPart** at;
-    UnknownEventRacerPart** next;
+int OrderByGates(RaceStatusNode** list) {
+    RaceStatusNode* status;
+    RaceStatusNode** at;
+    RaceStatusNode** next;
     int key;
     int i;
 
@@ -242,8 +242,8 @@ int OrderByGates(UnknownEventRacerPart** list) {
 }
 
 // 0x004e6210
-int ComputeTimeBehind(UnknownEventRacerPart* list, int mode) {
-    UnknownEventRacerPart* status;
+int ComputeTimeBehind(RaceStatusNode* list, int mode) {
+    RaceStatusNode* status;
 
     for (status = list; status; status = status->next) {
         UnknownEventRacer* racer = status->racer;
@@ -297,10 +297,10 @@ int RankByScore(int keepRacing) {
 }
 
 // 0x004e63e0
-int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, UnknownBikeRaceNode* start,
+int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, UnknownBikeRaceNode* start,
                           UnknownBikeRaceNode* finish, int lapLimit, int unlimited) {
-    UnknownEventRacerPart* previous = 0;
-    UnknownEventRacerPart* status;
+    RaceStatusNode* previous = 0;
+    RaceStatusNode* status;
     UnknownEventRacer* racer;
 
     if (!list || !track)
@@ -415,10 +415,10 @@ static inline float Length(Vector3 v) {
 // leaves that block with `goto next` (retail's block layout and registers
 // for the `remaining >= 1` test; a `continue` there lays the lap-time
 // product out of line), the estimated one with `continue`.
-int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate, float frameTime, int lapLimit,
+int UpdateGateRace(RaceStatusNode** list, UnknownBikeRaceNode* firstGate, float frameTime, int lapLimit,
                           int unlimited) {
-    UnknownEventRacerPart* previous = 0;
-    UnknownEventRacerPart* status;
+    RaceStatusNode* previous = 0;
+    RaceStatusNode* status;
     UnknownEventRacer* racer;
 
     if (!list || !firstGate)

@@ -197,13 +197,13 @@
 // entry arm then matches, the caster arm does not); splitting one arm,
 // `!caster` tests, ternary stores or one store per split leave it or worse.
 int BikeRace::AimCamera(int caster) {
-    if (UnknownFunctionCameraView()->followingRacer) {
+    if (RaceCameraView()->followingRacer) {
         targetKind = 0xff;
         targetIndex = 0;
         if (g_TrackGame->playerCount > 1) {
-            UnknownFunctionCameraView()->followedBike->modelNode->ClearFlag14c();
-            UnknownFunctionCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
-            UnknownFunctionCameraView()->UnknownFunctionFollow(racerSlots[targetRacer]);
+            RaceCameraView()->followedBike->modelNode->ClearFlag14c();
+            RaceCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
+            RaceCameraView()->UnknownFunctionFollow(racerSlots[targetRacer]);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
                 raceShadow->AddCaster(racerSlots[targetRacer]->modelNode);
@@ -215,9 +215,9 @@ int BikeRace::AimCamera(int caster) {
                                                                           racer->nextLapGate, racer);
             }
         } else if (targetRacer == 0) {
-            UnknownFunctionCameraView()->followedBike->modelNode->ClearFlag14c();
-            UnknownFunctionCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
-            UnknownFunctionCameraView()->UnknownFunctionFollow(localRacer);
+            RaceCameraView()->followedBike->modelNode->ClearFlag14c();
+            RaceCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
+            RaceCameraView()->UnknownFunctionFollow(localRacer);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
                 raceShadow->AddCaster(localRacer->modelNode);
@@ -229,10 +229,10 @@ int BikeRace::AimCamera(int caster) {
                                                                           racer->nextLapGate, racer);
             }
         } else {
-            UnknownFunctionCameraView()->followedBike->modelNode->ClearFlag14c();
-            UnknownFunctionCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
+            RaceCameraView()->followedBike->modelNode->ClearFlag14c();
+            RaceCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
             int index = targetRacer - 1;
-            UnknownFunctionCameraView()->UnknownFunctionFollow(aiRacers[index]);
+            RaceCameraView()->UnknownFunctionFollow(aiRacers[index]);
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
                 raceShadow->AddCaster(aiRacers[index]->modelNode);
@@ -252,10 +252,10 @@ int BikeRace::AimCamera(int caster) {
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
             }
-            UnknownFunctionCameraView()->UnknownFunctionTargetCaster(
+            RaceCameraView()->UnknownFunctionTargetCaster(
                 raceScene->staticModels->casters[targetCaster].model);
         } else {
-            UnknownFunctionCameraView()->followingRacer = 1;
+            RaceCameraView()->followingRacer = 1;
         }
     } else {
         targetKind = 1;
@@ -269,23 +269,23 @@ int BikeRace::AimCamera(int caster) {
                 UnknownBikeRaceSceneCharacter* character =
                     (UnknownBikeRaceSceneCharacter*)entry->character;
                 if (character->isEnabled) {
-                    UnknownFunctionCameraView()->UnknownFunctionTargetCharacter(character);
+                    RaceCameraView()->UnknownFunctionTargetCharacter(character);
                 } else {
                     return 0;
                 }
             } else {
                 GameObject* object = (GameObject*)entry->proceduralObject;
                 if (((UnknownBikeRaceObjectFlags*)object)->isEnabled) {
-                    UnknownFunctionCameraView()->UnknownFunctionTargetObject(object);
+                    RaceCameraView()->UnknownFunctionTargetObject(object);
                 } else {
                     return 0;
                 }
             }
         } else {
-            UnknownFunctionCameraView()->followingRacer = 1;
+            RaceCameraView()->followingRacer = 1;
         }
     }
-    if (UnknownFunctionCameraView()->followingRacer) {
+    if (RaceCameraView()->followingRacer) {
         targetKind = 0xff;
         targetIndex = 0;
     }
@@ -313,7 +313,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
     if (g_TrackGame->uiInteractionBlocked) {
         return;
     }
-    UnknownBikeRaceCameraView* camera = UnknownFunctionCameraView();
+    UnknownBikeRaceCameraView* camera = RaceCameraView();
     if ((camera->overrideActive || camera->cameraState == 7) &&
         (camera->cameraState != 7 || racers || objects)) {
         return;
@@ -351,7 +351,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
                 targetRacer = 0;
             }
             if (old == targetRacer) {
-                UnknownFunctionCameraView()->followingRacer = 1;
+                RaceCameraView()->followingRacer = 1;
                 return;
             }
         } while (UnknownFunctionRacerAt(targetRacer)->outOfRace != 0);
@@ -359,7 +359,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
         caster = 0;
         Scene* scene = raceScene;
         if (scene->animationTable == 0 || scene->animationTable->entryCount <= 0) {
-            UnknownFunctionCameraView()->followingRacer = 1;
+            RaceCameraView()->followingRacer = 1;
             return;
         }
         int hidden = 1;
@@ -389,7 +389,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
                 hidden = 1;
             }
             if (old == targetEntry) {
-                UnknownBikeRaceCameraView* view = UnknownFunctionCameraView();
+                UnknownBikeRaceCameraView* view = RaceCameraView();
                 if (view->targetCharacter != 0 || view->targetCar != 0) {
                     return;
                 }
@@ -411,7 +411,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
         caster = 1;
         UnknownSceneBuffer* casters = raceScene->staticModels;
         if (casters == 0 || casters->casterCount <= 0) {
-            UnknownFunctionCameraView()->followingRacer = 1;
+            RaceCameraView()->followingRacer = 1;
             return;
         }
         int old = targetCaster;
@@ -422,7 +422,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
         if (targetCaster >= raceScene->staticModels->casterCount) {
             targetCaster = 0;
         }
-        if (old == targetCaster && UnknownFunctionCameraView()->shadowCaster != 0) {
+        if (old == targetCaster && RaceCameraView()->shadowCaster != 0) {
             return;
         }
     }
@@ -877,7 +877,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                                                    vcrFile);
                 AppendChild(replayVcr, -1);
             }
-            savedCameraState = UnknownFunctionCameraView()->cameraState;
+            savedCameraState = RaceCameraView()->cameraState;
             raceCamera->SetCameraState(1);
         }
     }

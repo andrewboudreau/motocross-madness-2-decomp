@@ -411,7 +411,7 @@ struct KbRace {
 };
 // Record at KrustyBike+0x744 (tier 3): per-bike state block reset by slot 43.
 // The race status node at KrustyBike+0x744; member names follow the canonical view
-// UnknownEventRacerPart (src/reconstructed/RaceView.h).  The four dwords +0x0c..+0x18 stay
+// RaceStatusNode (src/reconstructed/RaceView.h).  The four dwords +0x0c..+0x18 stay
 // ints here (the loader only zeroes them), although the canonical +0x0c..+0x14 are floats.
 struct KbGhost {
     char pad_0x00[0x8];
