@@ -939,7 +939,7 @@ void KrustyBike::SimulateFrame(float dt)
                 if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType) {
                     EndMotion();
                     motionCompleted = 0;
-                    reinterpret_cast<Character*>(riderCharacter)->SetMotion(reinterpret_cast<Motion*>(riderPoseHandles[15]));
+                    reinterpret_cast<Character*>(riderCharacter)->SetMotion(reinterpret_cast<Motion*>(riderPoseHandles[RiderPose_Victory]));
                     ((KbA5C4*)riderCharacter)->field_0x10 = 0;
                     hasFinished = 3;
                 } else {
@@ -1413,8 +1413,8 @@ void KrustyBike::LookBackAtNearestRival()
         rivalBearingScaled = (rivalBearing * 0.36963f) * 0.7f;
     }
     headTurnAngle = 0;
-    reinterpret_cast<Character*>(riderCharacter)->ApplyMotionAtPhase(riderPoseHandles[14], 0.5f);
-    D3DIMSoultreeCharacter::ApplyMotionAtPhase(bikePoseHandles[14], 0.5f);
+    reinterpret_cast<Character*>(riderCharacter)->ApplyMotionAtPhase(riderPoseHandles[RiderPose_LookBack], 0.5f);
+    D3DIMSoultreeCharacter::ApplyMotionAtPhase(bikePoseHandles[RiderPose_LookBack], 0.5f);
 }
 
 // ---- slot 89: rider pose selection (0x0048e3e0, overrides Bike 0x00406ae0) ----

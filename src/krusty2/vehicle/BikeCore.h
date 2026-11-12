@@ -15,6 +15,32 @@ struct BikeSteamEmitter;
 struct BikeWheel;
 class Wrecker;
 
+// Indices into riderPoseHandles[] and bikePoseHandles[] (and the values of poseIndex and
+// poseState).  Bike::LoadBike fills each slot from FindMotion; the names are the rider clip
+// names it looks up (tier 1).  The bike side uses the same index with its own clips:
+// "BLeanR02" for 0..2, "BTurn2D"/"BTurn2U" for the turns, "BWheelie", "CrosBik1".."CrosBik3",
+// "bLookBack" and "bBackUpTop" (it loads nothing for 15 and 17).  Slot 9 is never loaded.
+enum RiderPose {
+    RiderPose_LeanR01 = 0,
+    RiderPose_LeanR02 = 1,
+    RiderPose_LeanR03 = 2,
+    RiderPose_Turn1D = 3,
+    RiderPose_Turn1U = 4,
+    RiderPose_Turn2D = 5,
+    RiderPose_Turn2U = 6,
+    RiderPose_Turn3D = 7,
+    RiderPose_Turn3U = 8,
+    RiderPose_Wheelie = 10,
+    RiderPose_CrosOv1 = 11,
+    RiderPose_CrosOv2 = 12,
+    RiderPose_CrosOv3 = 13,
+    RiderPose_LookBack = 14,
+    RiderPose_Victory = 15,
+    RiderPose_BackUpTop = 16,
+    RiderPose_BackUpBottom = 17,
+    RiderPose_Count = 18
+};
+
 class Bike : public Vehicle {
 public:
     explicit Bike(int flags);       // 0x00407700, ret 8 = flags + hidden most-derived flag
@@ -125,15 +151,15 @@ public:
     BikeA644* poseSmoother;  // +0x644 slot 1 and slot 89: object with value/rate/ratio/limits that is advanced toward field_0x504 each frame with rate limiting (see BikeA644)
     float leanPoseMin;  // +0x648 slot 89: lean > leanPoseMin selects pose; poseLeanBlend = (lean - leanPoseMin) / (leanPoseMax - leanPoseMin)
     float leanPoseMax;  // +0x64c slot 89: upper lean bound; divisor (leanPoseMax - leanPoseMin) of the pose lean blend
-    int poseIndex;  // +0x650 slot 89/61: current pose index (set to 10/11+idx, used to index riderPoseHandles[] and bikePoseHandles[], clamped to 13)
+    int poseIndex;  // +0x650 slot 89/61: current RiderPose (RiderPose_Wheelie, RiderPose_CrosOv1 + idx, ...); indexes the pose handles, the crossover blend stops at RiderPose_CrosOv3
     float poseBlend;  // +0x654 slot 89: fractional part of the pose parameter ((0.75-l)*3.99 - idx); slot 61 weight w = 1 - poseBlend
-    int poseState;  // +0x658 slot 89/61: paired with poseIndex (10 = lean pose); compared against 10 in slot 61 and set to idx*2+4
+    int poseState;  // +0x658 slot 89/61: the RiderPose blended with poseIndex by poseLeanBlend (RiderPose_Wheelie on a wheelie, else a Turn pose: idx*2 + RiderPose_Turn1D/Turn1U)
     float poseParam;  // +0x65c slot 61: passed as time/weight arg to ApplyMotionBlendAtPhase and ApplyMotionAtPhase; slot 89 state machine writes it from the smoothed value (x = t * -0.25)
     float poseLeanBlend;  // +0x660 slot 89: (lean - min)/(max - min) pose lean blend; slot 61: (speed*0.0310559+1)*0.5
-    float backUpPhase;                        // +0x664  KrustyBike slot 102 advances it mod 1 as the BackUpBottom pose time (riderPoseHandles[17]); slot 86 ramps the back-up push off it
+    float backUpPhase;                        // +0x664  KrustyBike slot 102 advances it mod 1 as the BackUpBottom pose time (riderPoseHandles[RiderPose_BackUpBottom]); slot 86 ramps the back-up push off it
     float backUpPhaseRate;                    // +0x668  KrustyBike slot 102: per-frame advance of backUpPhase, max(|forwardSpeed|, 1) * dt * 0.55371
-    int riderPoseHandles[18];  // +0x66c slot 61: riderPoseHandles[idx], riderPoseHandles[next] passed to riderCharacter->ApplyMotionBlendAtPhase (rider-side pose ids, 18 entries)
-    int bikePoseHandles[18];  // +0x6b4 slot 61: bikePoseHandles[idx], [next] passed to D3DIMSoultreeCharacter::ApplyMotionBlendAtPhase (bike-side pose ids, 18 entries)
+    int riderPoseHandles[RiderPose_Count];  // +0x66c rider Motion handles by RiderPose; slot 61 blends riderPoseHandles[idx] and [next] with riderCharacter->ApplyMotionBlendAtPhase
+    int bikePoseHandles[RiderPose_Count];  // +0x6b4 bike Motion handles by RiderPose; slot 61 blends [idx] and [next] with D3DIMSoultreeCharacter::ApplyMotionBlendAtPhase
     int crossoverPose;                        // +0x6FC  slot 89 sets it while airborne with both wheels clear and picks poses 11..13 (CrosOv1..3); slot 41 clears it when slot 89 leaves that branch (tier 2)
     int frontWheelLifted;                     // +0x700  = wheelsInContact > 0 and frontWheel->penetration < -2.5 (front wheel clear while another touches); slot 62 returns 2 on it
     float poseSmoothTime;                     // +0x704  0.55; the poseSmoother's smoothing time (constructor argument, reloaded when the crossover pose starts)

@@ -440,7 +440,7 @@ void Bike::ResetDynamicState(float extraWeight)
     driveSlideAngle = 0;
     driveSlideAngleStep = 0;
     driveSlideStepsLeft = 0;
-    poseIndex = 1;
+    poseIndex = RiderPose_LeanR02;
     poseParam = 0.5f;
     poseBlend = 0;
     poseLeanBlend = 0;
@@ -845,42 +845,42 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
     ResetToPlacement(&position, &bodyForward, &bodyUp, &kVec3YAxis, 0, loadWeight);
     crashHeading = Vec3(bodyForward.x, 0.0f, bodyForward.z);
 
-    riderPoseHandles[0] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LeanR01", 1);
-    riderPoseHandles[1] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LeanR02", 1);
-    riderPoseHandles[2] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LeanR03", 1);
-    riderPoseHandles[3] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn1D", 1);
-    riderPoseHandles[4] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn1U", 1);
-    riderPoseHandles[5] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn2D", 1);
-    riderPoseHandles[6] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn2U", 1);
-    riderPoseHandles[7] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn3D", 1);
-    riderPoseHandles[8] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn3U", 1);
-    riderPoseHandles[10] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Wheelie", 1);
-    riderPoseHandles[11] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("CrosOv1", 1);
-    riderPoseHandles[12] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("CrosOv2", 1);
-    riderPoseHandles[13] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("CrosOv3", 1);
-    riderPoseHandles[14] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LookBack", 1);
-    riderPoseHandles[15] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Victory", 1);
-    riderPoseHandles[16] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BackUpTop", 1);
-    riderPoseHandles[17] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BackUpBottom", 1);
-    bikePoseHandles[0] = bikePoseHandles[1] = (int)D3DIMSoultreeCharacter::FindMotion("BLeanR02", 1);
-    bikePoseHandles[2] = bikePoseHandles[1];
-    bikePoseHandles[3] = bikePoseHandles[5] = (int)D3DIMSoultreeCharacter::FindMotion("BTurn2D", 1);
-    bikePoseHandles[7] = bikePoseHandles[5];
-    bikePoseHandles[4] = bikePoseHandles[6] = (int)D3DIMSoultreeCharacter::FindMotion("BTurn2U", 1);
-    bikePoseHandles[8] = bikePoseHandles[6];
-    bikePoseHandles[10] = (int)D3DIMSoultreeCharacter::FindMotion("BWheelie", 1);
-    bikePoseHandles[11] = (int)D3DIMSoultreeCharacter::FindMotion("CrosBik1", 1);
-    bikePoseHandles[12] = (int)D3DIMSoultreeCharacter::FindMotion("CrosBik2", 1);
-    bikePoseHandles[13] = (int)D3DIMSoultreeCharacter::FindMotion("CrosBik3", 1);
-    bikePoseHandles[14] = (int)D3DIMSoultreeCharacter::FindMotion("bLookBack", 1);
-    bikePoseHandles[16] = (int)D3DIMSoultreeCharacter::FindMotion("bBackUpTop", 1);
+    riderPoseHandles[RiderPose_LeanR01] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LeanR01", 1);
+    riderPoseHandles[RiderPose_LeanR02] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LeanR02", 1);
+    riderPoseHandles[RiderPose_LeanR03] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LeanR03", 1);
+    riderPoseHandles[RiderPose_Turn1D] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn1D", 1);
+    riderPoseHandles[RiderPose_Turn1U] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn1U", 1);
+    riderPoseHandles[RiderPose_Turn2D] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn2D", 1);
+    riderPoseHandles[RiderPose_Turn2U] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn2U", 1);
+    riderPoseHandles[RiderPose_Turn3D] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn3D", 1);
+    riderPoseHandles[RiderPose_Turn3U] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Turn3U", 1);
+    riderPoseHandles[RiderPose_Wheelie] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Wheelie", 1);
+    riderPoseHandles[RiderPose_CrosOv1] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("CrosOv1", 1);
+    riderPoseHandles[RiderPose_CrosOv2] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("CrosOv2", 1);
+    riderPoseHandles[RiderPose_CrosOv3] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("CrosOv3", 1);
+    riderPoseHandles[RiderPose_LookBack] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("LookBack", 1);
+    riderPoseHandles[RiderPose_Victory] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("Victory", 1);
+    riderPoseHandles[RiderPose_BackUpTop] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BackUpTop", 1);
+    riderPoseHandles[RiderPose_BackUpBottom] = (int)reinterpret_cast<Character*>(riderCharacter)->FindMotion("BackUpBottom", 1);
+    bikePoseHandles[RiderPose_LeanR01] = bikePoseHandles[RiderPose_LeanR02] = (int)D3DIMSoultreeCharacter::FindMotion("BLeanR02", 1);
+    bikePoseHandles[RiderPose_LeanR03] = bikePoseHandles[RiderPose_LeanR02];
+    bikePoseHandles[RiderPose_Turn1D] = bikePoseHandles[RiderPose_Turn2D] = (int)D3DIMSoultreeCharacter::FindMotion("BTurn2D", 1);
+    bikePoseHandles[RiderPose_Turn3D] = bikePoseHandles[RiderPose_Turn2D];
+    bikePoseHandles[RiderPose_Turn1U] = bikePoseHandles[RiderPose_Turn2U] = (int)D3DIMSoultreeCharacter::FindMotion("BTurn2U", 1);
+    bikePoseHandles[RiderPose_Turn3U] = bikePoseHandles[RiderPose_Turn2U];
+    bikePoseHandles[RiderPose_Wheelie] = (int)D3DIMSoultreeCharacter::FindMotion("BWheelie", 1);
+    bikePoseHandles[RiderPose_CrosOv1] = (int)D3DIMSoultreeCharacter::FindMotion("CrosBik1", 1);
+    bikePoseHandles[RiderPose_CrosOv2] = (int)D3DIMSoultreeCharacter::FindMotion("CrosBik2", 1);
+    bikePoseHandles[RiderPose_CrosOv3] = (int)D3DIMSoultreeCharacter::FindMotion("CrosBik3", 1);
+    bikePoseHandles[RiderPose_LookBack] = (int)D3DIMSoultreeCharacter::FindMotion("bLookBack", 1);
+    bikePoseHandles[RiderPose_BackUpTop] = (int)D3DIMSoultreeCharacter::FindMotion("bBackUpTop", 1);
     if (collisionObject) {
         collisionObject->onHitCallback = BikeCollisionCallback;
         collisionObject->onHitByCallback = BikeStaticCollisionCallback;
     }
     wrecker->EndWreck();
-    D3DIMSoultreeCharacter::ApplyMotionAtPhase(bikePoseHandles[1], 0.5f);
-    reinterpret_cast<Character*>(riderCharacter)->ApplyMotionAtPhase(riderPoseHandles[1], 0.5f);
+    D3DIMSoultreeCharacter::ApplyMotionAtPhase(bikePoseHandles[RiderPose_LeanR02], 0.5f);
+    reinterpret_cast<Character*>(riderCharacter)->ApplyMotionAtPhase(riderPoseHandles[RiderPose_LeanR02], 0.5f);
     verticalAccelSmoother->Reset(fixedStepTime * 7.0f);
     forwardAccelSmoother->Reset(0.5f);
     steerAxis = new(__FILE__, 0x7df) BikeA640(frontWheel->restLoadWeight, fixedStepTime * 6.3f);
@@ -1146,7 +1146,7 @@ void Bike::UpdateRiderPose(float)
         steerPose += 0.25f;
         steerPose = BikeMin(BikeMaxF(steerPose, 0.25f), 0.75f);
         poseParam = steerPose;
-        D3DIMSoultreeCharacter::ApplyMotionAtPhase(bikePoseHandles[1], steerPose);
+        D3DIMSoultreeCharacter::ApplyMotionAtPhase(bikePoseHandles[RiderPose_LeanR02], steerPose);
         return;
     }
     if (motionActive)
@@ -1157,15 +1157,15 @@ void Bike::UpdateRiderPose(float)
     int next;
     if (step) {
         next = idx + 1;
-        if (next > 13)
-            next = 13;
-    } else if (idx > 2) {
-        if (!(cnt == 10 && idx == 5)) {
+        if (next > RiderPose_CrosOv3)
+            next = RiderPose_CrosOv3;
+    } else if (idx > RiderPose_LeanR03) {
+        if (!(cnt == RiderPose_Wheelie && idx == RiderPose_Turn2D)) {
             float verticalAccel = BikeMaxF(BikeMin(smoothedVerticalAccel, 32.2f), -32.2f);
             poseLeanBlend = (verticalAccel * 0.0310559f + 1.0f) * 0.5f;
         }
         next = idx + 2;
-        if (idx == 10)
+        if (idx == RiderPose_Wheelie)
             next = idx;
     } else {
         next = idx + 1;
@@ -2152,7 +2152,7 @@ void Bike::SelectRiderPose(float t)
         float posePosition = (0.75f - steerAxis->steerValue) * 3.99f;
         BikeFloatToInt(&poseIndex, posePosition - 0.5f);
         int idx = poseIndex;
-        poseIndex = idx + 11;
+        poseIndex = idx + RiderPose_CrosOv1;
         poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
         if (crossoverPose == 0) {
             BikeA644* smoother = poseSmoother;
@@ -2171,11 +2171,11 @@ void Bike::SelectRiderPose(float t)
         EndMotion();
         if (!airborne && lean > leanPoseMax) {
             poseBlend = 1.0f;
-            poseIndex = 10;
-            poseState = 10;
+            poseIndex = RiderPose_Wheelie;
+            poseState = RiderPose_Wheelie;
         } else if (!airborne && lean > leanPoseMin) {
-            poseIndex = 5;
-            poseState = 10;
+            poseIndex = RiderPose_Turn2D;
+            poseState = RiderPose_Wheelie;
             poseBlend = (controlInput.y + 1.0f) * 0.5f;
             poseLeanBlend = (lean - leanPoseMin) / (leanPoseMax - leanPoseMin);
         } else if (rearWheel->slipSpeed > 14.0f) {
@@ -2189,12 +2189,12 @@ void Bike::SelectRiderPose(float t)
             } else {
                 poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
             }
-            poseState = idx * 2 + 4;
+            poseState = idx * 2 + RiderPose_Turn1U;
             poseIndex = poseState - 1;
         } else {
             BikeFloatToInt(&poseIndex, (0.75f - steerAxis->steerValue) * 3.99f - 0.5f);
             int idx = poseIndex;
-            poseState = idx * 2 + 3;
+            poseState = idx * 2 + RiderPose_Turn1D;
             poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
             poseLeanBlend = (14.0f - rearWheel->slipSpeed) * 0.0714285746f;
         }

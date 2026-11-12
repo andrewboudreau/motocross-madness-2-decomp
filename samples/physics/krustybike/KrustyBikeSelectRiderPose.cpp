@@ -79,8 +79,8 @@ void KrustyBike::SelectRiderPose(float t)
     float x;
     if (*(int*)pad_0x5B8) {
         poseBlend = 1.0f;
-        poseState = 4;
-        poseIndex = 3;
+        poseState = RiderPose_Turn1U;
+        poseIndex = RiderPose_Turn1D;
         poseLeanBlend = 0.0f;
         if (controlInput.x < 0.0f) {
             x = controlInput.x * -0.25f;
@@ -118,7 +118,7 @@ void KrustyBike::SelectRiderPose(float t)
     if (airborne && lean > 2.0f && rearWheel->penetration < -1.0f) {
         FistpFloatToIntChecked(&poseIndex, (0.75f - steerAxis->steerValue) * 3.99f - 0.5f);
         int idx = poseIndex;
-        poseIndex = idx + 11;
+        poseIndex = idx + RiderPose_CrosOv1;
         poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
         if (crossoverPose == 0) {
             BikeA644* smoother = poseSmoother;
@@ -146,15 +146,15 @@ void KrustyBike::SelectRiderPose(float t)
             } else {
                 poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
             }
-            poseState = idx * 2 + 4;
+            poseState = idx * 2 + RiderPose_Turn1U;
             poseIndex = poseState - 1;
         } else if (backingUp) {
-            poseIndex = 16;
+            poseIndex = RiderPose_BackUpTop;
             poseState = 5;
         } else {
             FistpFloatToIntChecked(&poseIndex, (0.75f - steerAxis->steerValue) * 3.99f - 0.5f);
             int idx = poseIndex;
-            poseState = idx * 2 + 3;
+            poseState = idx * 2 + RiderPose_Turn1D;
             poseBlend = (0.75f - steerAxis->steerValue) * 3.99f - idx;
             poseLeanBlend = (14.0f - rearWheel->slipSpeed) * 0.0714285746f;
         }
