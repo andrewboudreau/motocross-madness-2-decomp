@@ -7,9 +7,9 @@
       "sha256": "0f9dfa4e271008d076b6a7f393e1548a00ce775b7a955b2f1a2244b63dd1da65"
     },
     "src/krusty2/bvh/BoundingBoxTreeQuery.cpp": {
-      "sections": 53,
+      "sections": 52,
       "relocations": 491,
-      "sha256": "bfd9992cc869601d16a69ddf51bdeb5c766912f8ebcadb3cc9f7fdd7224be185"
+      "sha256": "001fd5330da4dd6a12e2feff1adbf63085a1c935b2ad645dd35ba431fc282773"
     },
     "src/reconstructed/CollisionTransforms.cpp": {
       "sections": 16,
@@ -17,9 +17,9 @@
       "sha256": "c1b65da4e3f8856d13897e2a42f3695929a3a917665792aefdcfbd7077f4547c"
     },
     "samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp": {
-      "sections": 65,
-      "relocations": 929,
-      "sha256": "433b195ac5e0cb52293793731ea02a3a99377787b121ec60e7865622cc15fb4a"
+      "sections": 64,
+      "relocations": 930,
+      "sha256": "50958de7585358ae09a8ed67be0805d3113b28d760dd79ddc3f0a252be5d1d1a"
     }
   }
 }

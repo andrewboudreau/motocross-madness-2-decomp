@@ -111,9 +111,16 @@ inline void ClampFloat(float low, float high, float* value)
 // an else block set VC6's inline budget like retail in 0x004a7fd0: in the axisY path DotProduct is
 // called and operator* expanded (calling the constructor) for the first two unit vectors, the outer
 // DotProduct and ClampFloat are expanded; in the axisZ path all of them are called.
+// The called dots go to retail's 0x0040ae30 ((y + x) + z) through Vec3DotCall: DotProduct's own
+// out-of-line COMDAT copy sums (z + y) + x, which rounds differently at 24-bit precision.
+inline float PoseDot(const Vec3& a, const Vec3& b)
+{
+    return Vec3DotCall(&a, &b);
+}
+
 inline float PoseLengthSquared(const Vec3& v)
 {
-    return DotProduct(v, v);
+    return PoseDot(v, v);
 }
 
 inline Vec3 UnitVector(const Vec3& v)
@@ -239,7 +246,7 @@ void PoseRotation(CharacterPose* a, CharacterPose* b, Vec3* axis, float* angle)
     }
     if (a->axisZ.x != b->axisZ.x || a->axisZ.y != b->axisZ.y || a->axisZ.z != b->axisZ.z) {
         *axis = UnitVector(CrossProduct(a->axisZ, b->axisZ));
-        *angle = DotProduct(UnitVector(a->axisZ), UnitVector(b->axisZ));
+        *angle = PoseDot(UnitVector(a->axisZ), UnitVector(b->axisZ));
         ClampFloat(-1.0f, 1.0f, angle);
         *angle = (float)acos(*angle);
         return;

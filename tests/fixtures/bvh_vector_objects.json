@@ -2,14 +2,14 @@
   "baseline": "291e16b5; canonical build-3jal2tv5 plus unchanged same-path sample object. Complete nondebug bytes/flags and all relocation destinations preserved under only four external names; separate aggregate old calls remain unchanged.",
   "objects": {
     "src/krusty2/bvh/BoundingBoxTreeQuery.cpp": {
-      "sections": 53,
+      "sections": 52,
       "relocations": 491,
-      "sha256": "bfd9992cc869601d16a69ddf51bdeb5c766912f8ebcadb3cc9f7fdd7224be185"
+      "sha256": "001fd5330da4dd6a12e2feff1adbf63085a1c935b2ad645dd35ba431fc282773"
     },
     "samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp": {
-      "sections": 65,
-      "relocations": 929,
-      "sha256": "433b195ac5e0cb52293793731ea02a3a99377787b121ec60e7865622cc15fb4a"
+      "sections": 64,
+      "relocations": 930,
+      "sha256": "50958de7585358ae09a8ed67be0805d3113b28d760dd79ddc3f0a252be5d1d1a"
     }
   }
 }

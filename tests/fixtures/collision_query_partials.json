@@ -114,9 +114,9 @@
       "?SegmentTriangleQuery@@",
       4357136,
       1101,
-      1110,
-      374,
-      "a0b67546126953024140e17d87bc4d2c13a7e0877f3dcc51e5b050c6d59e8ff1"
+      1112,
+      424,
+      "7db6301754d0b32e848240b0bf7f169bc3a81f6d1ec44a35917d1718fc5ef453"
     ],
     [
       "samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp",
@@ -143,16 +143,16 @@
       2160,
       2228,
       450,
-      "5fabc50a3c7c7812ec6075b74ec6c12edc96f8a01d0ccb74c2906c2c039e80e7"
+      "1e26dd53e8df823a4b811c57c97481bbf3c2f78ba973203b7d34b391b672fcbc"
     ],
     [
       "samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp",
       "?SegmentSegmentDistance@@",
       4367936,
       1471,
-      1456,
-      48,
-      "351df85d1c004a7ad6d2741b4bcbdea5cd5262b6d1a5fa7636f7ed6b884b1609"
+      1458,
+      73,
+      "f107e0b347373cf9b8e5ae6a8b97938d41b7a4bba291ae0adef3ffdf90302820"
     ]
   ],
   "renames": {

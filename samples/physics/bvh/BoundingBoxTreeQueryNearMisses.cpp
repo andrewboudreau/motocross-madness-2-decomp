@@ -46,7 +46,9 @@
 //   explicit call views.  Retail homes the plane parameters, clamps and the first length in
 //   the dead d0/d1 argument slots (frame 0x60); VC6 here keeps them in a 0x80 frame, and the
 //   inline cross products load a's components first in the x term.  The natural operator
-//   form expands more helpers than retail (see the notes at the function).
+//   form expands more helpers than retail (see the notes at the function).  The t1
+//   numerator sums (off + xy) + z as retail does (z product computed first and kept);
+//   the flat form compiled to ((x + y) + z) + off (48 -> 73 strict, 432 -> 434 aligned).
 //
 // - SegmentTriangleQuery 0x00427c10 (1101 bytes, 1110 here): the natural operator form gives
 //   retail's exact sequence of inline and out-of-line helpers (five constructor calls,
@@ -59,7 +61,8 @@
 //   the constant 1 in ebp (count, scratch count and result), so its register plan and the
 //   copy of segment[1] at entry differ.  A z-first push dot in the clear-flag arm
 //   (QueryDotZFirst) gives 374 (349 with DotProduct in both arms); the same helper in the
-//   set-flag arm loses (332 alone, 357 in both).
+//   set-flag arm loses (332 alone, 357 in both).  The set-flag arm's dot keeps z*z on the
+//   x87 stack and adds it last (QueryDotZKept): 424, and retail's (x + y) + z sum.
 //
 // - BoxCapsuleOverlap 0x00425900 (4314 bytes, 4321 here, 2450 strict, 1283/1300 aligned):
 //   the decoded structure (box axes, axes crossed with the segment direction, three corner
@@ -76,6 +79,13 @@
 //     z-first half-segment projection: retail's fadd st(1)/faddp st(2)/fstp st(0) sum, the
 //     (0 + 0) + z*hz order and the out-of-line DotProduct in the sixth normalisation.
 //   * the box tests read a named |halfSegment| extent first (separate floats per axis).
+//   * the first six normalisations take |v|^2 from retail's dot (0x0040ae30, (y + x) + z)
+//     through Vec3Dot; with DotProduct they linked Math3D.h's out-of-line COMDAT copy, which
+//     sums (z + y) + x (same instructions, a different result at 24-bit precision).  The
+//     seventh keeps the inline DotProduct (Vec3NormalizeDotInline): its x is 0, so the
+//     expanded y*y + z*z equals retail's call.  Vec3Dot there too makes all seven calls as in
+//     retail but leaves that site's v * inv inline (2432 strict, 1293 aligned), scaling by
+//     the unrounded inverse: 6 of 500 emu runs differ at 53-bit precision.
 //   Left (17 instructions): the seventh normalisation's DotProduct stays inline (retail calls
 //   it), two fxch in the fifth/sixth tests, c1z's slot (retail 0x48 beside c1x/c1y) and a
 //   permuted frame.  Ruled out (equal instructions of 1300): QueryDot for only boxAxes[2]
@@ -92,8 +102,23 @@
 
 // v / |v| (returns v when |v|^2 == 1): the result of Math3D.h's Vec3Normalize
 // (0x005087b0), written with a named result (BoxCapsuleOverlap is closer to retail with
-// it; see the file header).
+// it; see the file header).  |v|^2 calls retail's dot through Vec3Dot.
 inline Vec3 Vec3NormalizeInline(const Vec3& v)
+{
+    Vec3 r;
+    float sq = Vec3Dot(v, v);
+    if (sq == 1.0f) {
+        r = v;
+    } else {
+        float inv = FastInvSqrt(sq);
+        r = v * inv;
+    }
+    return r;
+}
+
+// The same with the inline DotProduct, for BoxCapsuleOverlap's last axis (x == 0, so the
+// expanded sum equals retail's call; see the file header).
+inline Vec3 Vec3NormalizeDotInline(const Vec3& v)
 {
     Vec3 r;
     float sq = DotProduct(v, v);
@@ -215,7 +240,7 @@ int BoxCapsuleOverlap(const Vec3* center, const Vec3* halfExtents, const Vec3* e
         axis.z = QuerySigned(s1.z, p1.z);
     }
     axis.x = 0.0f;
-    axis = Vec3NormalizeInline(axis);
+    axis = Vec3NormalizeDotInline(axis);
     dist = QueryAbs(QueryDot(axis, mid));
     ra = QueryAbs(QueryDot(axis, boxAxes[0])) + QueryAbs(QueryDot(axis, boxAxes[1]))
             + QueryAbs(QueryDot(axis, boxAxes[2]));
@@ -269,18 +294,19 @@ int BoxTriangleQuery(const Vec3* center, const Vec3* halfExtents, const QueryTri
         case 11: s_axes[11] = CrossProduct(s_axes[2], e2); break;
         case 12: s_axes[12] = CrossProduct(s_axes[3], e2); break;
         }
-        float boxRadius = QueryAbs(DotProduct(boxAxes[0], s_axes[i]))
-                          + QueryAbs(DotProduct(boxAxes[1], s_axes[i]))
-                          + QueryAbs(DotProduct(boxAxes[2], s_axes[i]));
+        // The seven dots call retail's 0x0040ae30 through Vec3Dot (see BoxOverlap).
+        float boxRadius = QueryAbs(Vec3Dot(boxAxes[0], s_axes[i]))
+                          + QueryAbs(Vec3Dot(boxAxes[1], s_axes[i]))
+                          + QueryAbs(Vec3Dot(boxAxes[2], s_axes[i]));
         if (i == 0) {
-            if (QueryAbs(DotProduct(offset, s_axes[0])) > boxRadius)
+            if (QueryAbs(Vec3Dot(offset, s_axes[0])) > boxRadius)
                 return 0;
             e0 = v[0] - v[1];
             e1 = v[0] - v[2];
         } else {
-            float p0 = DotProduct(offset, s_axes[i]);
-            float d1 = DotProduct(e0, s_axes[i]);
-            float d2 = DotProduct(e1, s_axes[i]);
+            float p0 = Vec3Dot(offset, s_axes[i]);
+            float d1 = Vec3Dot(e0, s_axes[i]);
+            float d2 = Vec3Dot(e1, s_axes[i]);
             float mn = QueryMin(QueryMinBFirst(p0 - d2, p0 - d1), p0);
             float mx = QueryMax(QueryMaxBFirst(p0 - d2, p0 - d1), p0);
             if (-boxRadius > mx || boxRadius < mn)
@@ -292,6 +318,9 @@ int BoxTriangleQuery(const Vec3* center, const Vec3* halfExtents, const QueryTri
 
 // The box/box test as TreeTreeQueryNodes expands it: the BoxOverlap body (with the arrays
 // declared first, which keeps their constructors expanded at the low budget left there).
+// The dots call retail's 0x0040ae30 through Vec3Dot (see BoxOverlap).  A's radius is
+// grouped |a0| + (|a1| + |a2|): retail adds |a2| + |a1| first (0x004287c1..0x004287cb),
+// where the flat sum here came out (|a2| + |a0|) + |a1| (2 of 371 runs at 24-bit, seed 7).
 inline int BoxOverlapInline(const Vec3* aCenter, const Vec3* aHalfExtents, Vec3 bCenter,
                             Vec3 bHalfExtents, const Matrix4* bToA)
 {
@@ -326,9 +355,9 @@ inline int BoxOverlapInline(const Vec3* aCenter, const Vec3* aHalfExtents, Vec3 
         case 13: s_axes[13] = CrossProduct(s_axes[2], s_axes[4]); break;
         case 14: s_axes[14] = CrossProduct(s_axes[2], s_axes[5]); break;
         }
-        float dist = QueryAbs(DotProduct(t, s_axes[i]));
-        float ra = QueryAbs(DotProduct(a[0], s_axes[i])) + QueryAbs(DotProduct(a[1], s_axes[i])) + QueryAbs(DotProduct(a[2], s_axes[i]));
-        if (dist > ra + QueryAbs(DotProduct(b[0], s_axes[i])) + QueryAbs(DotProduct(b[1], s_axes[i])) + QueryAbs(DotProduct(b[2], s_axes[i])))
+        float dist = QueryAbs(Vec3Dot(t, s_axes[i]));
+        float ra = QueryAbs(Vec3Dot(a[0], s_axes[i])) + (QueryAbs(Vec3Dot(a[1], s_axes[i])) + QueryAbs(Vec3Dot(a[2], s_axes[i])));
+        if (dist > ra + QueryAbs(Vec3Dot(b[0], s_axes[i])) + QueryAbs(Vec3Dot(b[1], s_axes[i])) + QueryAbs(Vec3Dot(b[2], s_axes[i])))
             return 0;
     }
     return 1;
@@ -429,11 +458,18 @@ float SegmentSegmentDistance(const Vec3* p0, const Vec3* d0, const Vec3* p1, con
     Vec3 c = SegCross(*d0, n);
     Vec3 m0 = SegNormalize(c);
     float off = -DotProduct(m0, *p1);
-    float t0 = -((off + (m0.x * p0->x + m0.y * p0->y) + m0.z * p0->z) / DotProduct(m0, *d0));
+    // The denominator is spelled out: with DotProduct VC6 sums it (y + z) + x once t1 below
+    // takes retail's shape; retail sums (x + y) + z (0x0042a7db..0x0042a7f2).
+    float t0 = -((off + (m0.x * p0->x + m0.y * p0->y) + m0.z * p0->z)
+                 / ((m0.x * d0->x + m0.y * d0->y) + m0.z * d0->z));
     c = SegCross(*d1, n);
     Vec3 m1 = SegNormalize(c);
+    // Retail adds the plane offset to x + y and the z product last ((off + xy) + z,
+    // 0x0042a8ed..0x0042a914); without the z temporary VC6 moves off to the end of the sum
+    // ((x + y + z) + off), which rounds differently at 24-bit precision.
+    float az = m1.z * p1->z;
     off = -DotProduct(m1, *p0);
-    float t1 = -((off + (m1.x * p1->x + m1.y * p1->y) + m1.z * p1->z) / Vec3Dot(m1, *d1));
+    float t1 = -(((off + (m1.x * p1->x + m1.y * p1->y)) + az) / Vec3Dot(m1, *d1));
     if (t0 >= 0.0f && t0 <= 1.0f && t1 >= 0.0f && t1 <= 1.0f)
         return SegLength(Vec3Sub(Vec3Add(Vec3ScaleLeft(t0, *d0), *p0), Vec3Add(Vec3ScaleLeft(t1, *d1), *p1)));
     Vec3 c0 = Vec3Add(Vec3ScaleLeft(t0, *d0), *p0);
@@ -470,6 +506,15 @@ static inline float QueryDotZFirst(const Vec3& a, const Vec3& b)
     return a.z * b.z + (a.x * b.x + a.y * b.y);
 }
 
+// The set-flag arm's push dot: retail computes the z product first, keeps it on the x87
+// stack and adds it to x + y last (0x00427f0d..0x00427f23, popped at 0x00427f2b).  The
+// flat DotProduct gave (z + y) + x, an ulp apart at 24-bit precision.
+static inline float QueryDotZKept(const Vec3& a, const Vec3& b)
+{
+    float z = a.z * b.z;
+    return (a.y * b.y + a.x * b.x) + z;
+}
+
 // The segment's second point is transformed with its y row summed (y + z) + x, as retail
 // does (retail copies segment[1] at entry; the natural TransformPointInline gives (x + z) + y
 // here, which rounds differently at 24-bit precision: tools/emu_cases/segment_triangle_query.py).
@@ -499,7 +544,7 @@ int SegmentTriangleQuery(const QueryTriangle* tri, const Vec3* segment, const Ma
     if (!g_unknown579668)
         push = -QueryDotZFirst(dir * t, tri->normal) * tri->normal;
     else
-        push = -DotProduct(dir * t, tri->normal) * tri->normal;
+        push = -QueryDotZKept(dir * t, tri->normal) * tri->normal;
     if (!PointInTriangle(&hit, tri))
         return 0;
     g_SweepRecord->offset += push;

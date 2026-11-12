@@ -163,16 +163,15 @@ class KrustyBikeCollisionOverlayTests(unittest.TestCase):
                         self.assertTrue(report['strict_exact'], report); strict += 1
                     self.assertEqual(signature(obj, symbol), signature(objects[source], symbol))
                 if name == 'query':
-                    # These are real header-emitted helpers, not substituted test implementations.
-                    for helper in ('?CrossProduct@@', '?DotProduct@@'):
-                        self.assertEqual(signature(obj, helper), signature(objects[QUERY], helper))
+                    # A real header-emitted helper, not a substituted test implementation.
+                    self.assertEqual(signature(obj, '?CrossProduct@@'), signature(objects[QUERY], '?CrossProduct@@'))
                     for tested in (obj, objects[QUERY]):
                         report = compare(pe, tested, '?CrossProduct@@', 0x515600, 91,
                                          (ROOT/QUERY).with_suffix('.bindings.json'))
                         self.assertTrue(report['strict_exact'], report); strict += 1
-                    # DotProduct's existing z+y+x order differs from retail y+x+z.
-                    # The native collision matrix intentionally uses bounded binary fractions;
-                    # this connection does not admit a general floating-point helper correction.
+                    # BoxOverlap's dots call retail's (y + x) + z dot through Vec3DotCall, whose
+                    # retail-identical provider is VectorCalls.cpp (no DotProduct COMDAT any more).
+                    links.append(compile_source(ROOT/'src/reconstructed/VectorCalls.cpp', 'vectorcalls')[0])
             fixture, _ = compile_source(ROOT/'tests/fixtures/krustybike_collision_overlay.cpp', 'fixture')
             exe = out/'boundaries.exe'
             result = subprocess.run([str(linker), '/nologo', '/subsystem:console', '/base:0x100000',

@@ -231,10 +231,13 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
                        (world(2, 1) * inverse(1, 3) + (world(2, 2) * inverse(2, 3) + world(2, 3) * inverse(3, 3)));
     controller(3, 0) = world(3, 0) * inverse(0, 0) +
                        (world(3, 1) * inverse(1, 0) + (world(3, 2) * inverse(2, 0) + world(3, 3) * inverse(3, 0)));
-    controller(3, 1) = world(3, 0) * inverse(0, 1) +
-                       (world(3, 1) * inverse(1, 1) + (world(3, 2) * inverse(2, 1) + world(3, 3) * inverse(3, 1)));
-    controller(3, 2) = world(3, 0) * inverse(0, 2) +
-                       (world(3, 1) * inverse(1, 2) + (world(3, 2) * inverse(2, 2) + world(3, 3) * inverse(3, 2)));
+    // Retail sums the next two in another order: ((w32*i21 + w31*i11) + w30*i01) + w33*i31
+    // (0x004a408c..0x004a40c8) and ((w30*i02 + w33*i32) + w32*i22) + w31*i12
+    // (0x004a40d1..0x004a410d).
+    controller(3, 1) = ((world(3, 2) * inverse(2, 1) + world(3, 1) * inverse(1, 1)) + world(3, 0) * inverse(0, 1)) +
+                       world(3, 3) * inverse(3, 1);
+    controller(3, 2) = ((world(3, 0) * inverse(0, 2) + world(3, 3) * inverse(3, 2)) + world(3, 2) * inverse(2, 2)) +
+                       world(3, 1) * inverse(1, 2);
     controller(3, 3) = world(3, 0) * inverse(0, 3) +
                        (world(3, 1) * inverse(1, 3) + (world(3, 2) * inverse(2, 3) + world(3, 3) * inverse(3, 3)));
 
@@ -285,7 +288,11 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
                   alignedY.z * controllerY.x - alignedY.x * controllerY.z,
                   alignedY.x * controllerY.y - alignedY.y * controllerY.x);
     float angleX = AngleBetween(alignedY, controllerY) * 57.2957764f;
-    if (cross.y * to.y + cross.x * to.x + cross.z * to.z < 0.0f)
+    // Retail adds the z product to y + x last ((cy*ty + cx*tx) + cz*tz, 0x004a4573..0x004a4596);
+    // the flat sum compiled to (cz*tz + cx*tx) + cy*ty, so the sign test could differ at
+    // 24-bit precision.  The named partial sum also matches retail's matrix-product operands.
+    float crossDotXY = cross.y * to.y + cross.x * to.x;
+    if (crossDotXY + cross.z * to.z < 0.0f)
         angleX = -angleX;
 
     // The y axes.

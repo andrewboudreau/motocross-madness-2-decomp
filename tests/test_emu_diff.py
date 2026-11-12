@@ -74,7 +74,8 @@ CLEAN_CASES = {
     # Fixed by the second sweep: sized to show the old difference with the default seed.
     'bike_steer_torque': 100,
     'collision_hull_vs_hull': 300,
-    'segment_triangle_query': 300,
+    # SET_FLAG: the unreachable set-flag arm too (its push dot order was fixed 2026-11-12).
+    'segment_triangle_query': (300, {'SET_FLAG': True}),
     'soultree_set_matrix_in': 60,
     'soultree_set_axes_in': 60,
     'resolve_contact_impulse': 60,
@@ -228,7 +229,8 @@ CLEAN_CASES = {
     'audio_loader_thread': 100,
 }
 
-# Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs).
+# Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs[,
+# module attribute overrides; the key 'seed' picks run_diff's seed instead]).
 # Each must still differ from retail, so the case keeps its power to see the bug.
 PRE_FIX_SHAPES = [
     ('radar_line_circle', [('reference[1] - y', 'point[1] - y'), ('reference[0] - x', 'point[0] - x')], 60),
@@ -346,6 +348,17 @@ PRE_FIX_SHAPES = [
        'out->_22 = a._21 * b._12 + a._22 * b._22 + a._23 * b._32 + a._24 * b._42;'),
       ('out->_23 = ((a._22 * b._23 + a._21 * b._13) + a._24 * b._43) + a._23 * b._33;',
        'out->_23 = a._21 * b._13 + a._22 * b._23 + a._23 * b._33 + a._24 * b._43;')], 30),
+    # SegmentTriangleQuery's set-flag arm summed its push dot (z + y) + x; retail adds the
+    # kept z product last, (x + y) + z (0x00427f0d..0x00427f23). 24-bit only.
+    ('segment_triangle_query', [('push = -QueryDotZKept(dir * t, tri->normal) * tri->normal;',
+                                 'push = -DotProduct(dir * t, tri->normal) * tri->normal;')], 600,
+     {'SET_FLAG': True}),
+    # TreeTreeQueryNodes' inline box test summed A's radius (|a2| + |a0|) + |a1|; retail adds
+    # |a2| + |a1| first (0x004287c1..0x004287cb). 24-bit only, on the bisected pairs.
+    ('tree_tree_query', [('QueryAbs(Vec3Dot(a[0], s_axes[i])) + (QueryAbs(Vec3Dot(a[1], s_axes[i])) + '
+                          'QueryAbs(Vec3Dot(a[2], s_axes[i])));',
+                          'QueryAbs(Vec3Dot(a[0], s_axes[i])) + QueryAbs(Vec3Dot(a[1], s_axes[i])) + '
+                          'QueryAbs(Vec3Dot(a[2], s_axes[i]));')], 300, {'seed': 7}),
 ]
 
 
@@ -513,9 +526,13 @@ class DifferentialTests(unittest.TestCase):
         self.assertGreater(summary.mismatches, 0)
 
     def test_pre_fix_shapes_differ(self):
-        for name, edits, n in PRE_FIX_SHAPES:
+        for name, edits, n, *rest in PRE_FIX_SHAPES:
             with self.subTest(case=name):
                 module = emu_diff.load_case(name)
+                overrides = dict(rest[0]) if rest else {}
+                seed = overrides.pop('seed', 1)
+                for key, value in overrides.items():
+                    setattr(module, key, value)
                 path = ROOT / module.SOURCE
                 text = path.read_text(encoding='latin-1')
                 for current, previous in edits:
@@ -527,8 +544,8 @@ class DifferentialTests(unittest.TestCase):
                     # The copy keeps its directory's headers and its configured flags (/QIfist ...).
                     flags = ['/I' + str(path.parent)] + emu_diff.configured_flags(module.SOURCE)
                     obj = emu_diff.compile_source(str(source), Path(tmp) / 'candidate.obj', flags)
-                    summary = emu_diff.run_diff(module, obj, n=n, retail=Path(os.environ['MCM2_EXE']),
-                                                show=1)
+                    summary = emu_diff.run_diff(module, obj, n=n, seed=seed,
+                                                retail=Path(os.environ['MCM2_EXE']), show=1)
                 self.assertGreater(summary.mismatches, 0)
 
 

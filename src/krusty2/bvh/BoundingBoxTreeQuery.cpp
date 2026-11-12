@@ -109,9 +109,11 @@ int SweptBoxOverlap(Vec3 aCenter, Vec3 aHalf, const Vec3* bCenter, const Vec3* b
 
 // 0x00424ab0.  Box A (aCenter, aHalfExtents) against box B (bCenter, bHalfExtents, given in
 // A's frame through bToA): the separating-axis test on A's three axes, B's three axes and
-// their nine cross products.  Naming `dist` and `ra` but not `rb` sets the inline budget
-// that calls all seven dot products out of line, as retail does; the inline cross products
-// need Math3D.h's parenthesised CrossProduct (docs/VC6_OPERAND_ORDER.md section 3).
+// their nine cross products.  The seven dot products call retail's dot (0x0040ae30, summed
+// (y + x) + z) through Vec3DotCall: Math3D.h's DotProduct, left out of line by the
+// inline budget, linked a COMDAT copy summing (z + y) + x (same bytes here, different
+// result at 24-bit precision).  The inline cross products need Math3D.h's parenthesised
+// CrossProduct (docs/VC6_OPERAND_ORDER.md section 3).
 int BoxOverlap(const Vec3* aCenter, const Vec3* aHalfExtents, Vec3 bCenter, Vec3 bHalfExtents,
                const Matrix4* bToA)
 {
@@ -146,9 +148,9 @@ int BoxOverlap(const Vec3* aCenter, const Vec3* aHalfExtents, Vec3 bCenter, Vec3
         case 13: s_axes[13] = CrossProduct(s_axes[2], s_axes[4]); break;
         case 14: s_axes[14] = CrossProduct(s_axes[2], s_axes[5]); break;
         }
-        float dist = QueryAbs(DotProduct(t, s_axes[i]));
-        float ra = QueryAbs(DotProduct(a[0], s_axes[i])) + QueryAbs(DotProduct(a[1], s_axes[i])) + QueryAbs(DotProduct(a[2], s_axes[i]));
-        if (dist > ra + QueryAbs(DotProduct(b[0], s_axes[i])) + QueryAbs(DotProduct(b[1], s_axes[i])) + QueryAbs(DotProduct(b[2], s_axes[i])))
+        float dist = QueryAbs(Vec3DotCall(&t, &s_axes[i]));
+        float ra = QueryAbs(Vec3DotCall(&a[0], &s_axes[i])) + QueryAbs(Vec3DotCall(&a[1], &s_axes[i])) + QueryAbs(Vec3DotCall(&a[2], &s_axes[i]));
+        if (dist > ra + QueryAbs(Vec3DotCall(&b[0], &s_axes[i])) + QueryAbs(Vec3DotCall(&b[1], &s_axes[i])) + QueryAbs(Vec3DotCall(&b[2], &s_axes[i])))
             return 0;
     }
     return 1;

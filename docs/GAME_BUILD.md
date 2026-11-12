@@ -1747,6 +1747,71 @@ Reviewed by disassembly only:
 - `GetDXVersion` 0x00448560 was skipped: `test_device_setup_behavior.py` already runs it against
   retail.
 
+#### x87 sum-order sweep
+
+The game runs the x87 at 24-bit precision (control word 0x007f, set by D3D), where float sums are
+not associative. VC6 /O2 regroups flat sums, so a body can take retail's instructions but add in
+another order. The sweep combined three checks:
+- every case that only ran at 0x027f was run at 0x007f too;
+- all float cases were run at 0x007f, 300 runs, seed 7;
+- a throwaway scanner (`work/fp/fpscan.py`, not kept) ran the x87 stack symbolically over each
+  linked body and its retail body. It compared each stored or compared expression twice: once
+  exactly, and once flattened through `+` and `*`. A tree that matched only when flattened was a
+  candidate.
+
+Emulation alone misses one class. A case binds out-of-line helpers such as `?DotProduct` to
+retail's body, so it cannot see a linked COMDAT copy that rounds differently. Each linked COMDAT
+was therefore also compared with its bound retail body.
+
+Fixes, each with retail's order:
+
+| VA | Function | Retail order | Result |
+|---|---|---|---|
+| 0x00427c10 | `SegmentTriangleQuery`, set-flag arm | dot summed (x + y) + z, z product kept on the stack (`QueryDotZKept`) | strict 374 -> 424, linked 0.955 -> 0.959; `PRE_FIX_SHAPES`: 5 of 600 differ |
+| 0x0042a640 | `SegmentSegmentDistance` | t1 numerator (off + xy) + z (0x0042a8ed..0x0042a914); t0 denominator (x + y) + z (0x0042a7db..0x0042a7f2) | strict 48 -> 73, aligned 432 -> 434, linked 0.943 -> 0.948; 1 of 4000 runs differed, 0 of 8000 after |
+| 0x004280e0 | `TreeTreeQueryNodes`, inline box test | A's radius \|a2\| + \|a1\| first (0x004287c1..0x004287cb) | scores unchanged; 2 of 371 differed at seed 7, 0 after; `PRE_FIX_SHAPES` at seed 7 |
+| 0x004a3c80 | `ControllerAngles`, x-axis sign test | (cy\*ty + cx\*tx) + cz\*tz (0x004a4573..0x004a4596) | masked 241 -> 252 (the named partial sum also gives retail's product operands), linked 0.914 unchanged |
+| 0x004a3c80 | `ControllerAngles`, `controller(3, 1)` and `(3, 2)` | grouped as commented at 0x004a408c and 0x004a40d1 | unchanged; row 3 is not read afterwards |
+
+`ControllerAngles` has no failing case before the sign-test fix (0 of 2000 runs). The sign only
+flips when the product is within rounding of zero. Retail's disassembly is the evidence.
+
+The `DotProduct` COMDAT was a separate bug:
+- Math3D.h's inline `DotProduct` left one out-of-line COMDAT copy in the game. It sums
+  (z + y) + x. Retail's out-of-line dot, 0x0040ae30, sums (y + x) + z.
+- Five linked bodies called the copy: `BoxOverlap` (7 calls), `BoxCapsuleOverlap` (6),
+  `BoxTriangleQuery` (7), `TreeTreeQueryNodes` (7) and `PoseRotation` (7).
+- Each called dot now reaches `Vec3DotCall` (VectorCalls.cpp, retail-identical). `BoxOverlap`
+  calls it directly. `PoseRotation` calls it through an inline `PoseDot` that takes references.
+  The bvh sample uses the `Vec3Dot(const Vec3&, const Vec3&)` view, which `link_aliases` points
+  at `Vec3DotCall`. The linked game now has no `?DotProduct` copy.
+- The object fixtures for `BoundingBoxTreeQuery.cpp`, the bvh sample and `Motnctrl.cpp` were
+  repinned, along with the five bvh partials in `collision_query_partials.json`.
+  `test_krustybike_collision_overlay` now links VectorCalls.cpp in place of the old copy.
+- `BoxCapsuleOverlap`'s last normalisation keeps the inline `DotProduct`. Its x is 0, so the
+  expanded sum equals retail's call. Routing it through `Vec3Dot` as well would leave
+  `v * inv` inline (2432 strict instead of 2450). At 53-bit precision that differs in 6 of 500
+  runs.
+- All scores are unchanged, and `BoxOverlap` is still exact.
+
+Checked and found clean:
+- `EcoSystem::GenerateObjects` 0x00459ce0. The scanner still flags its 8 regroupings, but
+  they only scale by powers of two, which is exact.
+- The `Vec3NormalizeInline` copy bound to 0x005087b0. It differs only in scheduling: the same
+  sum, kept on the stack.
+- The other 18 bound COMDATs are byte-identical to retail.
+- The 0x007f sweep found only retail faults and `terrain_prepare_geometry`, the documented
+  `EXTREME_EVERY` fistp case, which differs at both control words.
+
+Not checked: bodies where retail calls a helper the build expands inline, or the reverse. The
+scanner could not pair those trees:
+- `TireNode::LocalToWorldDirection` 0x0047aff0;
+- the `SoultreeObject` and `UnknownSoultreeNodeView` transforms;
+- `KbXform::WorldToLocalDirection`, `ShadowCameraProxy::SetLookAt`, `TransformPoints` and
+  `ShadowTransformPointsOrtho`;
+- `ComputeViewerDetail`, `SelectRiderPose`, `PositionAtTime` and `BonusObjectManager::Tick`;
+- the `QueryGround` variants and `SimulateLookAhead`.
+
 ### Grid lighting workers
 
 The three workers in `Group4_GridLighting.cpp` were rewritten from the

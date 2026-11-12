@@ -17,9 +17,9 @@
       "sha256": "fd65e047b4b090c51c31558e2245db1fa6d0dd94ef3fd654b06d0065f544f4cb"
     },
     "samples/physics/motion/Motnctrl.cpp": {
-      "sections": 36,
+      "sections": 35,
       "relocations": 218,
-      "sha256": "3b23b14270e39f29cdbe4f51e67d50bdba527e1306ddbd9217f45266c2b0914d"
+      "sha256": "b2ebcc18710a726b98f9c403bff6b538f173d45d8beb6935af0830aca1e91f59"
     },
     "samples/physics/motion/CharacterMotionStart.cpp": {
       "sections": 14,

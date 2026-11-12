@@ -12,10 +12,10 @@ row (x + z) + y where retail sums (y + z) + x; at 24-bit precision 26 of 400 cas
 in the hit fraction (TransformPointYZX in the sample now gives retail's order).
 
 0x00579668 is never written in retail (.bss, so always 0), so by default only its clear arm
-runs. With SET_FLAG = True a quarter of the cases take the set-flag arm, whose push dot VC6
-sums (z + y) + x where retail sums (x + y) + z: about 1 in 300 cases then differ at 24-bit
-precision. The sample keeps DotProduct there (QueryDot or a grouped dot fixes it but costs
-17 strict bytes) because the arm is unreachable.
+runs. With SET_FLAG = True a quarter of the cases take the set-flag arm. Its push dot summed
+(z + y) + x where retail sums (x + y) + z (DotProduct, before 2026-11-12): 15 of 2400 runs
+differed at 24-bit precision. QueryDotZKept now gives retail's order and stack shape (strict
+374 -> 424), and the test runs the case with SET_FLAG = True.
 
 The module also holds the input builders the other box-tree query cases import.
 """
