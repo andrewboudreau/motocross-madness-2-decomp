@@ -29,7 +29,7 @@ type, member and function names are provisional.
 - Function starts in the extent (call targets, data references and
   post-padding starts, minus jump-table targets): 54. Matched: 51; two
   near misses, one not reconstructed.
-- `UnknownTrackGameObject574` (TrackGame+0x574) has its constructor and
+- `SceneArchiveFinder` (TrackGame+0x574) has its constructor and
   scene-file helpers here: `0x004e99d0`..`0x004ea390`.
 - `0x004de580` (`ret 0xc`) and `0x00464e80` (`ret 4`) are shared empty
   bodies. The readers call them directly with what they read, so they are
@@ -51,7 +51,7 @@ type, member and function names are provisional.
     (SLT path).
 - `0x004edf20` (shadow receivers), `0x004f00e0` (texture-width histogram, 549
   bytes including its jump and byte tables) and `0x004f0310`.
-- UnknownTrackGameObject574: `0x004e99d0`, `0x004e9a10`, `0x004e9ac0`,
+- SceneArchiveFinder: `0x004e99d0`, `0x004e9a10`, `0x004e9ac0`,
   `0x004e9b80`, `0x004e9ba0`, `0x004e9cd0`, `0x004e9e30`, `0x004e9f70`,
   `0x004ea010` and `0x004ea390`.
 - The large readers and loaders:
@@ -67,7 +67,7 @@ type, member and function names are provisional.
   - `0x004f0390` (2442, cdecl): counts a model's textures from its `.slb`
     or `.slt` file (SoultreeObject line 3447, SoultreeMaterial 3472);
   - `0x004f1130` (1541): the texture count pass over models and animations
-    (`UnknownTrackGameObject574` `0x004e9ac0` calls it).
+    (`SceneArchiveFinder` `0x004e9ac0` calls it).
 - Static initializers: `_$E1`/`_$E2`, `_$E4`/`_$E5`, `_$E7`/`_$E8` and
   `_$E10`/`_$E11`.
 
@@ -98,7 +98,7 @@ type, member and function names are provisional.
 
 ## Shared changes
 
-- `TrackGame.h`: `UnknownTrackGameObject574` gets its constructor layout
+- `TrackGame.h`: `SceneArchiveFinder` gets its constructor layout
   and the methods above. `0x004ea010` takes `int*` outputs (TrackRecord
   bindings renamed).
 - `ResourceEntry.h` includes the canonical ResourceManager declaration.

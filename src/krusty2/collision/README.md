@@ -38,7 +38,7 @@ The constructor stores the resource-manager pointer at `+0x12c`; both this
 loader and SoulTreePhysics now read the existing `g_ResourceManager` pointer
 at `0x00572b44`. SoulTreePhysics now also constructs and destroys the shared stream directly.
 Its two `.col` lookup paths read the scene finder at TrackGame `+0x574` and
-call the existing `UnknownTrackGameObject574::OpenArchiveFile` at `0x004e9cd0`.
+call the existing `SceneArchiveFinder::OpenArchiveFile` at `0x004e9cd0`.
 The unchanged finder declaration is shared through `SceneArchiveFinder.h`;
 its inferred extent is `0x394`. The output path is passed with an explicit
 pointer-to-int cast at the provider's existing provisional argument boundary.

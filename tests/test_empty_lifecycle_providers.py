@@ -15,7 +15,7 @@ from tools.run_calibration import CASES
 
 ROOT = Path(__file__).resolve().parents[1]
 GUI = '?UnknownFunction464e90@GUIManager@@QAEXXZ'
-FINDER = '??1UnknownTrackGameObject574@@QAE@XZ'
+FINDER = '??1SceneArchiveFinder@@QAE@XZ'
 PROVIDERS = {'GUIManagerHooks': GUI, 'SceneArchiveFinderLifetime': FINDER}
 CALLERS = ('GUIManager', 'GameUi', 'TrackGame', 'SceneManager')
 
@@ -87,7 +87,7 @@ class EmptyLifecycleProviderTests(unittest.TestCase):
                 self.assertIn(symbol, {obj.symbol_by_index[r.symbol_index].name for r in obj.relocations if r.type == 0x14})
             probe = objects[fixture]
             for name, target in (('?InvokeGuiEmptyHook@@YAXPAVGUIManager@@@Z', GUI),
-                                 ('?DestroySceneFinder@@YAXPAVUnknownTrackGameObject574@@@Z', FINDER)):
+                                 ('?DestroySceneFinder@@YAXPAVSceneArchiveFinder@@@Z', FINDER)):
                 entry = probe.find_symbol(name)
                 body, extent, relocations = probe.symbol_extent(entry)
                 self.assertEqual(body, bytes.fromhex('8b4c2404e900000000'))
@@ -103,7 +103,7 @@ class EmptyLifecycleProviderTests(unittest.TestCase):
                 self.assertTrue(proof['strict_exact'], (case['source'], case['symbol'], proof))
                 checked.append(case)
             self.assertEqual(len(checked), 501)
-            self.assertTrue(any(c['symbol'] == '??0UnknownTrackGameObject574@@QAE@XZ' for c in checked))
+            self.assertTrue(any(c['symbol'] == '??0SceneArchiveFinder@@QAE@XZ' for c in checked))
 
 
 if __name__ == '__main__':

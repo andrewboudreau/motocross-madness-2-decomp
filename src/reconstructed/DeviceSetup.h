@@ -1,7 +1,7 @@
 #pragma once
 
 // DeviceSetup.cpp (provisional name): the control-layout unit
-// 0x00448960..0x00449e60 (UnknownTrackGameObject33fc's methods, declared in
+// 0x00448960..0x00449e60 (ControlSetup's methods, declared in
 // TrackGame.h, and the key-name helpers after them). See docs/DEVICESETUP.md.
 
 // 0x00448560: the DirectX SDK GetDXVersion sample with a "Blade.dll" probe

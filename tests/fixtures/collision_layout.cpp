@@ -25,6 +25,6 @@ CHECK_LAYOUT(stream_manager, offsetof(CollisionFileStream, archives) == 0x12c);
 CHECK_LAYOUT(quadtree_xextent, offsetof(QuadTree, extentX) == 0x50);
 CHECK_LAYOUT(quadtree_zextent, offsetof(QuadTree, extentZ) == 0x54);
 
-CHECK_LAYOUT(finder_extent, sizeof(UnknownTrackGameObject574) == 0x394);
-CHECK_LAYOUT(finder_archive, offsetof(UnknownTrackGameObject574, sceneArchive) == 0);
-CHECK_LAYOUT(finder_directory, offsetof(UnknownTrackGameObject574, sceneDirectory) == 0x44);
+CHECK_LAYOUT(finder_extent, sizeof(SceneArchiveFinder) == 0x394);
+CHECK_LAYOUT(finder_archive, offsetof(SceneArchiveFinder, sceneArchive) == 0);
+CHECK_LAYOUT(finder_directory, offsetof(SceneArchiveFinder, sceneDirectory) == 0x44);

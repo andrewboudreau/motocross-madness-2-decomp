@@ -48,7 +48,7 @@
   "?SetMotion@Character@@QAEXPAUMotion@@@Z": "0x004a8b40",
   "?Load@UnknownPodiumSound@@QAEHPBDPAVFileStream@@HHHH@Z": "0x004bc320",
   "?SetCamera@RenderTarget@@QAEXPAVCamera@@@Z": "0x004e8cf0",
-  "?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVFileStream@@PBD1H@Z": "0x004e9cd0",
+  "?OpenArchiveFile@SceneArchiveFinder@@QAEHPAVFileStream@@PBD1H@Z": "0x004e9cd0",
   "?SetAxesPtr@UnknownPodiumSoultree@@QAEXPBUVector3@@0HH@Z": "0x004fbd70",
   "?GetAxes@UnknownPodiumNode@@QAEXPAUVector3@@0@Z": "0x004fc4f0",
   "?SetPosition@UnknownPodiumSoultree@@QAEXPBUVector3@@@Z": "0x004fc660",

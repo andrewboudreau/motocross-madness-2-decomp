@@ -97,7 +97,7 @@ class CollisionLinkTests(unittest.TestCase):
             for caller, provider, symbol in (
                 ('CollisionObject', 'BoundingBoxTreeBuild', '?ReadPointNode@@YAXPAPAUBoxTreeNode@@PAVFileStream@@@Z'),
                 ('CollisionObject', 'BoundingBoxTreeBuild', '?ReadTriangleMesh@@YAXPAPAUBoxTreeNode@@PAPAUTreeVec3@@PAVFileStream@@@Z'),
-                ('SoulTreePhysics', 'SceneManager', '?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVFileStream@@PBD1H@Z'),
+                ('SoulTreePhysics', 'SceneManager', '?OpenArchiveFile@SceneArchiveFinder@@QAEHPAVFileStream@@PBD1H@Z'),
                 ('SoulTreePhysics', 'ResourceManager', '?g_ResourceManager@@3PAVResourceManager@@A'),
                 ('CollisionObject', 'StreamCandidate', '?Read@FileStream@@QAEHPAXHH@Z'),
                 ('CollisionObject', 'ResourceManager', '?g_ResourceManager@@3PAVResourceManager@@A'),

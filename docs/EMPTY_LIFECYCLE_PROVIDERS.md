@@ -3,7 +3,7 @@
 Two missing providers now have their complete readable definitions in separate
 source files: `GUIManagerHooks.cpp` defines
 `GUIManager::UnknownFunction464e90()`, and `SceneArchiveFinderLifetime.cpp`
-defines `UnknownTrackGameObject574::~UnknownTrackGameObject574()`.
+defines `SceneArchiveFinder::~SceneArchiveFinder()`.
 Both bodies are empty because that is the complete observed retail behavior.
 They are separate C++ definitions, not aliases, wrappers or fallback dispatch.
 The GUI hook's original method name, the finder's original class name and their

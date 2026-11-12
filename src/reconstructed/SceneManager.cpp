@@ -32,7 +32,7 @@ int FindKeyword(int* out, const char* name, const UnknownSceneKeyword* table)
 }
 
 // 0x004e99d0
-UnknownTrackGameObject574::UnknownTrackGameObject574()
+SceneArchiveFinder::SceneArchiveFinder()
 {
     sceneDirectory[0] = 0;
     sceneFile[0] = 0;
@@ -47,7 +47,7 @@ UnknownTrackGameObject574::UnknownTrackGameObject574()
 }
 
 // 0x004e9a10
-int UnknownTrackGameObject574::CountSceneObjects(int* count)
+int SceneArchiveFinder::CountSceneObjects(int* count)
 {
     Scene* scene = (new(__FILE__, 115) Scene(0))->UnknownFunction4ea7e0(this, 0, 0, 0);
     if (!scene)
@@ -58,7 +58,7 @@ int UnknownTrackGameObject574::CountSceneObjects(int* count)
 }
 
 // 0x004e9ac0
-int UnknownTrackGameObject574::CountSceneTextures(unsigned long* counts, char* width, char* hasCube,
+int SceneArchiveFinder::CountSceneTextures(unsigned long* counts, char* width, char* hasCube,
                                                   int ecosystem)
 {
     counts[0] = 0;
@@ -74,13 +74,13 @@ int UnknownTrackGameObject574::CountSceneTextures(unsigned long* counts, char* w
 }
 
 // 0x004e9b80
-void UnknownTrackGameObject574::SetSceneDirectory(char* path)
+void SceneArchiveFinder::SetSceneDirectory(char* path)
 {
     strncpy(sceneDirectory, path, 0x103);
 }
 
 // 0x004e9ba0: keeps the open archive when it already is `name`.
-FileStream* UnknownTrackGameObject574::OpenSceneArchive(const char* name)
+FileStream* SceneArchiveFinder::OpenSceneArchive(const char* name)
 {
     char scene[0x40];
     char path[0x104];
@@ -113,7 +113,7 @@ FileStream* UnknownTrackGameObject574::OpenSceneArchive(const char* name)
 // succeeds only inside an archive (an inner stream at +0x1c), then copies the
 // opened name to `a` (a char buffer) when given. Otherwise it frees `stream`
 // and allocates a replacement that nothing keeps.
-int UnknownTrackGameObject574::OpenArchiveFile(FileStream* stream, const char* name,
+int SceneArchiveFinder::OpenArchiveFile(FileStream* stream, const char* name,
                                                      const char* mode, int a)
 {
     char drive[_MAX_DRIVE];
@@ -142,7 +142,7 @@ int UnknownTrackGameObject574::OpenArchiveFile(FileStream* stream, const char* n
 }
 
 // 0x004e9e30: selects scene `name`.`kind` and reads whether it is named.
-void UnknownTrackGameObject574::SelectScene(char* name, const char* kind, int value)
+void SceneArchiveFinder::SelectScene(char* name, const char* kind, int value)
 {
     char sceneName[0x40];
     char buffer[0x104];
@@ -166,7 +166,7 @@ void UnknownTrackGameObject574::SelectScene(char* name, const char* kind, int va
 }
 
 // 0x004e9f70
-void UnknownTrackGameObject574::SetSceneFileNames(const char* name)
+void SceneArchiveFinder::SetSceneFileNames(const char* name)
 {
     char buffer[0x104];
 
@@ -181,7 +181,7 @@ void UnknownTrackGameObject574::SetSceneFileNames(const char* name)
 
 // 0x004ea010: as 0x004ea390 for scene `name` (with extension `kind` when
 // it has none), opened through 0x004e9ba0.
-void UnknownTrackGameObject574::ReadSceneName(char* out, char* name, int index,
+void SceneArchiveFinder::ReadSceneName(char* out, char* name, int index,
                                                       const char* kind, int* a, int* b)
 {
     char path[0x104];
@@ -242,7 +242,7 @@ void UnknownTrackGameObject574::ReadSceneName(char* out, char* name, int index,
 // 0x004ea390: reads the scene name (value 0) or waypoint race `value`'s
 // name from the scene's SceneInfo section; "NO NAME" when missing. The
 // archive is passed through Parameterblocks.h's view of the stream class.
-void UnknownTrackGameObject574::ReadCurrentSceneName(char* name, char* scene, int value)
+void SceneArchiveFinder::ReadCurrentSceneName(char* name, char* scene, int value)
 {
     char path[0x104];
     char base[0x104];
@@ -309,7 +309,7 @@ Scene::Scene(int flags) : GameObject(flags)
 }
 
 // 0x004ea7e0
-Scene* Scene::UnknownFunction4ea7e0(UnknownTrackGameObject574* manager, int value, int,
+Scene* Scene::UnknownFunction4ea7e0(SceneArchiveFinder* manager, int value, int,
                                     char flag)
 {
     sceneManager = manager;

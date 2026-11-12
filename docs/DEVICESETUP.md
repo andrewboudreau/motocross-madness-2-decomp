@@ -6,7 +6,7 @@ is in `samples/game/DeviceSetupNearMisses.*`.
 The unit has no RTTI and no `__FILE__` literal, so the following names are
 all ours (tier 3):
 - the file name `DeviceSetup.cpp`;
-- the object `UnknownTrackGameObject33fc` (declared in `TrackGame.h`);
+- the object `ControlSetup` (declared in `TrackGame.h`);
 - every function name.
 
 ## Extent

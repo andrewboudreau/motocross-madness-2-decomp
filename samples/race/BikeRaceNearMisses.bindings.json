@@ -219,7 +219,7 @@
   "?UpdateLapRace@@YAHPAPAUUnknownEventRacerPart@@PAVTrack@@MPAUUnknownBikeRaceNode@@2HH@Z": "0x004e63e0",
   "?UpdateGateRace@@YAHPAPAUUnknownEventRacerPart@@PAUUnknownBikeRaceNode@@MHH@Z": "0x004e6a50",
   "?QueueRecord@VCRInterface@@QAEHHHPBXI@Z": "0x004e8720",
-  "?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVFileStream@@PBD1H@Z": "0x004e9cd0",
+  "?OpenArchiveFile@SceneArchiveFinder@@QAEHPAVFileStream@@PBD1H@Z": "0x004e9cd0",
   "?FindEntryByFileName@Scene@@QAEPAUUnknownSceneObject@@PBDPAH@Z": "0x004eaec0",
   "?EnableAutomaticSequence@Scene@@QAEXH@Z": "0x004eafd0",
   "?RestartAllEntries@Scene@@QAEXM@Z": "0x004eb000",

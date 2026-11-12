@@ -231,7 +231,7 @@ int TrackGame::OpenResources() {
 // debug connection and the race set-up.
 int TrackGame::CreateGameObjects() {
     int category = g_MemTagStack->Push("Scene");
-    sceneObject = new(__FILE__, 305) UnknownTrackGameObject574;
+    sceneObject = new(__FILE__, 305) SceneArchiveFinder;
     g_MemTagStack->Push("UI");
     profileDirectory = new(__FILE__, 309) DirectoryList;
     profileDirectory->SetDirectory("ui\\profile");
@@ -259,7 +259,7 @@ int TrackGame::CreateGameObjects() {
     if (!controlMapping)
         return 0;
     controlInterface->SetMapping(controlMapping);
-    controlSetup = new(__FILE__, 360) UnknownTrackGameObject33fc;
+    controlSetup = new(__FILE__, 360) ControlSetup;
     if (!controlSetup)
         return 0;
     g_MemTagStack->Push("UI");

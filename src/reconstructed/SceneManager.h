@@ -247,7 +247,7 @@ public:
     virtual int OnControlPress(ControlEvent* event, InputButtonState* entry);
 
     // 0x004ea7e0: stores the owner and settings, adds the sound group child.
-    Scene* UnknownFunction4ea7e0(UnknownTrackGameObject574* manager, int value, int unused,
+    Scene* UnknownFunction4ea7e0(SceneArchiveFinder* manager, int value, int unused,
                                  char flag);
     // 0x004eaec0: the entry object named like `path`'s file name.
     UnknownSceneObject* FindEntryByFileName(const char* path, int* index);
@@ -311,7 +311,7 @@ public:
     // is set and the ecosystem file path, without building anything.
     int CountTextures(unsigned long* counts, float* width, int* hasCube, char* ecosystem);
 
-    UnknownTrackGameObject574* sceneManager; // the owner 0x004ea7e0 stores
+    SceneArchiveFinder* sceneManager; // the owner 0x004ea7e0 stores
     char sceneName[0x40];                 // "SceneInfo" "SceneName"
     Vector3 defaultStartPosition;             // +0x70 "SceneInfo" "DefaultStartPosition"
     Vector3 defaultStartDirection;            // +0x7c "SceneInfo" "DefaultStartDirection"

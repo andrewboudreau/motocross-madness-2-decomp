@@ -119,7 +119,7 @@
   "?UnknownFunction4de580@Scene@@QAEXPBD00@Z": "0x004de580",
   "?UnknownFunction4de580@Scene@@QAEXPBD0H@Z": "0x004de580",
   "?UnknownFunction4de580@Scene@@QAEXPBD0M@Z": "0x004de580",
-  "?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVFileStream@@PBD1H@Z": "0x004e9cd0",
+  "?OpenArchiveFile@SceneArchiveFinder@@QAEHPAVFileStream@@PBD1H@Z": "0x004e9cd0",
   "?RestartEntry@Scene@@QAEHHMHH@Z": "0x004eb040",
   "?ReadVector@Scene@@QAEHPAUVector3@@PBD11HPAVParameterBlock@@@Z": "0x004eb160",
   "?ReadStaticModels@Scene@@QAEHPAVLightManager@@HHHP6AXH@ZH@Z": "0x004ecd60",

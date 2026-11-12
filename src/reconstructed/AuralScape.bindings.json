@@ -114,7 +114,7 @@
   "?Set3DDistanceRange@Sound@@QAEHMMH@Z": "0x004bd960",
   "?QueryListener@PCSoundInterface@@QAEPAUDirectSound3DListener@@XZ": "0x004be800",
   "?SetEAXEnvironment@PCSoundInterface@@QAEHK@Z": "0x004bed00",
-  "?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVFileStream@@PBD1H@Z": "0x004e9cd0",
+  "?OpenArchiveFile@SceneArchiveFinder@@QAEHPAVFileStream@@PBD1H@Z": "0x004e9cd0",
   "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
   "?FindByName@SoultreeObject@@QAEPAV1@PBD@Z": "0x004fdae0",
   "?Tick@AuralScape@@UAEHM@Z": "0x00403710",

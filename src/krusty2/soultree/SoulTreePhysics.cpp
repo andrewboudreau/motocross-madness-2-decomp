@@ -1111,7 +1111,7 @@ int SoultreePhysicsObject::Tick(float dt)
 
 struct SoultreeGlobals {
     char field_0x000[0x574];
-    UnknownTrackGameObject574* sceneObject;   // TrackGame::sceneObject (+0x574)
+    SceneArchiveFinder* sceneObject;   // TrackGame::sceneObject (+0x574)
 };
 class ResourceManager;
 extern ResourceManager* g_ResourceManager; // pointer stored at 0x00572b44

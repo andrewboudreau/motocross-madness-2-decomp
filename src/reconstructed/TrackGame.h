@@ -478,19 +478,19 @@ public:
 
 // UnknownTrackGameObject3400, the object at TrackGame+0x3400, is in TrackRecord.h.
 
-// One control assignment of UnknownTrackGameObject33fc: the device kind
+// One control assignment of ControlSetup: the device kind
 // (0 keyboard, 1 mouse, 2 joystick; -1 unassigned) and the key, button or
 // negative axis direction code. Saved as "kind,code" (DeviceSetup.cpp).
-struct UnknownControlAssignment {
+struct ControlAssignment {
     int kind;
     int code;
 };
 
 // Object at TrackGame+0x33fc (constructor near DebugOverlay.cpp's literals;
-// no destructor). Its methods are in DeviceSetup.cpp (provisional name).
-class UnknownTrackGameObject33fc {
+// no destructor). Methods in DeviceSetup.cpp; descriptive name (control.ctl "Setup").
+class ControlSetup {
 public:
-    UnknownTrackGameObject33fc();             // 0x00448960
+    ControlSetup();             // 0x00448960
     // OptionProcs.cpp's control mapping dialog (provisional roles).
     void SetAssignment(int device, int row, int kind, int code); // 0x00448c90
     int FindDuplicateAssignment(int row, int kind, int code, int* other);  // 0x00448cc0
@@ -510,7 +510,7 @@ public:
     int BindButton(int control, int code, int kind);
 
     int currentDevice;                        // +0x00: input device (OptionProcs.cpp "InputDeviceDDL")
-    UnknownControlAssignment assignments[8][14]; // +0x04: per input device, per control row
+    ControlAssignment assignments[8][14]; // +0x04: per input device, per control row
 };
 
 // One player reported by 0x004aa670 (0x48 bytes).
@@ -647,7 +647,7 @@ public:
     TrackGameViewOwner* tagEvent;             // +0x568 event type 4 (Tag)
     KrustyUI* ui;
     EventManager* eventManager;
-    UnknownTrackGameObject574* sceneObject;
+    SceneArchiveFinder* sceneObject;
     TrackGameMode mode;                       // +0x578..+0x3337
     DirectoryList* profileDirectory;
     int menuIsOpen;
@@ -656,7 +656,7 @@ public:
     ControlBinding leanBinding;  // +0x3380  axis of control rows 2/3; LoadBike's lean -> Vehicle leanAxis (controlInput.y)
     ControlBinding throttleBinding;  // +0x33BC  optional 0..1 axis of row 4; LoadBike's throttle -> Vehicle throttleAxis
     ControlMapping* controlMapping;
-    UnknownTrackGameObject33fc* controlSetup; // +0x33fc control assignments: the profile's "control.ctl", OptControlsDlg InputDeviceDDL
+    ControlSetup* controlSetup; // +0x33fc control assignments: the profile's "control.ctl", OptControlsDlg InputDeviceDDL
     UnknownTrackGameObject3400* highScores;   // +0x3400 the high-score table (TrackRecord.cpp)
     char savedDecimalSeparator[8];
     void* languageModule;

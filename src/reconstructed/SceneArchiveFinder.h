@@ -2,12 +2,12 @@
 
 class FileStream;
 
-// Object at TrackGame+0x574, deleted by slot 15. Its destructor is
-// out-of-line and empty (the shared body 0x00464e90).
-class UnknownTrackGameObject574 {
+// Object at TrackGame+0x574, deleted by slot 15; named for its role. Its destructor
+// is out-of-line and empty (the shared body 0x00464e90).
+class SceneArchiveFinder {
 public:
-    UnknownTrackGameObject574();              // 0x004e99d0 (defined in SceneManager.cpp)
-    ~UnknownTrackGameObject574();             // 0x00464e90
+    SceneArchiveFinder();              // 0x004e99d0 (defined in SceneManager.cpp)
+    ~SceneArchiveFinder();             // 0x00464e90
     // 0x004e9a10 / 0x004e9ac0 (SceneManager.cpp): run a temporary Scene's
     // CountObjects / CountTextures (the quarry loader's estimates).
     int CountSceneObjects(int* count);

@@ -171,7 +171,7 @@ struct KbOverlay {
     char pad_0x0000[0x26c0];
     int lineCount;   // 0x26C0: next free line block
 };
-// 0x70-byte records behind KbGame+0x33fc (TrackGame.h UnknownTrackGameObject33fc: currentDevice
+// 0x70-byte records behind KbGame+0x33fc (TrackGame.h ControlSetup: currentDevice
 // at +0, then assignments[8][14] of 8 bytes, one 0x70-byte row per device).  0x0048fc80 reads
 // records[records[0].currentDevice].throttleCode = assignments[currentDevice][4].code, the
 // row DeviceSetup.cpp binds to the throttle axis (tier 2 offsets, view names).

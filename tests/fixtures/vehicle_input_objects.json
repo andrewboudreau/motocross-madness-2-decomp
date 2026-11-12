@@ -1678,7 +1678,7 @@
     },
     {
       "source": "src/reconstructed/DeviceSetup.cpp",
-      "symbol": "?BindAxis@UnknownTrackGameObject33fc@@QAEHPAUControlBinding@@HHH@Z",
+      "symbol": "?BindAxis@ControlSetup@@QAEHPAUControlBinding@@HHH@Z",
       "va": "0x00448d30",
       "extent": 186,
       "bindings": "src/reconstructed/DeviceSetup.bindings.json"

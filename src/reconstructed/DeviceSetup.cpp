@@ -2,7 +2,7 @@
 // 0x00448960..0x00449e60, after the DirectX probe 0x00448560 and before
 // dirlist.cpp (0x00449ea6). No __FILE__ or RTTI: the file name and the
 // function names are ours. The object is TrackGame+0x33fc
-// (UnknownTrackGameObject33fc, TrackGame.h); its control file is the
+// (ControlSetup, TrackGame.h); its control file is the
 // profile's "control.ctl" (UiInfo.cpp).
 
 #include <windows.h>
@@ -19,7 +19,7 @@
 #include "TrackGame.h"
 
 // 0x00448960
-UnknownTrackGameObject33fc::UnknownTrackGameObject33fc()
+ControlSetup::ControlSetup()
 {
     for (int device = 0; device < 8; device++) {
         for (int row = 0; row < 14; row++) {
@@ -30,7 +30,7 @@ UnknownTrackGameObject33fc::UnknownTrackGameObject33fc()
 }
 
 // 0x00448990: reads the current device and every assignment.
-void UnknownTrackGameObject33fc::LoadControlFile(const char* path)
+void ControlSetup::LoadControlFile(const char* path)
 {
     currentDevice = ReadIniInt("Setup", "CurrentInputDevice", 0, path);
     for (int device = 0; device < 8; device++)
@@ -39,7 +39,7 @@ void UnknownTrackGameObject33fc::LoadControlFile(const char* path)
 }
 
 // 0x004489e0: writes the current device and every assignment.
-void UnknownTrackGameObject33fc::SaveControlFile(const char* path)
+void ControlSetup::SaveControlFile(const char* path)
 {
     char value[0x80];
 
@@ -52,7 +52,7 @@ void UnknownTrackGameObject33fc::SaveControlFile(const char* path)
 
 // 0x00448a50: an assignment is "<kind digit>,<code>"; "NONE" or empty
 // leaves it unassigned.
-void UnknownTrackGameObject33fc::LoadAssignment(int device, int row, const char* path)
+void ControlSetup::LoadAssignment(int device, int row, const char* path)
 {
     char value[0x80];
     char key[0x80];
@@ -73,7 +73,7 @@ void UnknownTrackGameObject33fc::LoadAssignment(int device, int row, const char*
 }
 
 // 0x00448bc0
-void UnknownTrackGameObject33fc::SaveAssignment(int device, int row, const char* path)
+void ControlSetup::SaveAssignment(int device, int row, const char* path)
 {
     char value[0x80];
     char key[0x80];
@@ -89,7 +89,7 @@ void UnknownTrackGameObject33fc::SaveAssignment(int device, int row, const char*
 }
 
 // 0x00448c90
-void UnknownTrackGameObject33fc::SetAssignment(int device, int row, int kind, int code)
+void ControlSetup::SetAssignment(int device, int row, int kind, int code)
 {
     assignments[device][row].kind = kind;
     assignments[device][row].code = code;
@@ -97,7 +97,7 @@ void UnknownTrackGameObject33fc::SetAssignment(int device, int row, int kind, in
 
 // 0x00448cc0: whether another row of the current device already has this
 // assignment (its row in `other`).
-int UnknownTrackGameObject33fc::FindDuplicateAssignment(int row, int kind, int code, int* other)
+int ControlSetup::FindDuplicateAssignment(int row, int kind, int code, int* other)
 {
     if (assignments[currentDevice][row].kind == kind && assignments[currentDevice][row].code == code)
         return 0;
@@ -111,7 +111,7 @@ int UnknownTrackGameObject33fc::FindDuplicateAssignment(int row, int kind, int c
 }
 
 // 0x00448d30
-int UnknownTrackGameObject33fc::BindAxis(ControlBinding* binding, int kind,
+int ControlSetup::BindAxis(ControlBinding* binding, int kind,
                                                       int code, int code2)
 {
     if (code == -1)
@@ -146,7 +146,7 @@ int UnknownTrackGameObject33fc::BindAxis(ControlBinding* binding, int kind,
 }
 
 // 0x00448df0
-int UnknownTrackGameObject33fc::BindButton(int control, int code, int kind)
+int ControlSetup::BindButton(int control, int code, int kind)
 {
     if (code == -1 || code < 0)
         return 0;
@@ -192,7 +192,7 @@ static inline int AxisOfCode(int code)
 // 0x00448e90: installs the assignments of device `device` (the current one
 // when -1): the steering and throttle bindings, an optional third axis and
 // the button mapping of rows 4-13.
-void UnknownTrackGameObject33fc::ApplyDevice(const char* path, int device)
+void ControlSetup::ApplyDevice(const char* path, int device)
 {
     if (g_TrackGame->controlMapping)
         g_TrackGame->controlMapping->Clear();
@@ -233,7 +233,7 @@ void UnknownTrackGameObject33fc::ApplyDevice(const char* path, int device)
 
 // 0x00449220: picks the default device for the active joystick (3 or 4 by
 // its subtype, else 1 with at least four buttons, else 0); 6 without one.
-int UnknownTrackGameObject33fc::ChooseDefaultDevice()
+int ControlSetup::ChooseDefaultDevice()
 {
     ControlInterface* controls = g_TrackGame->controlInterface;
     if (controls->joystickCount && controls->activeJoystick) {
@@ -271,13 +271,13 @@ int FormatKeyName(int code, char* text)
 }
 
 // 0x00449350
-void UnknownTrackGameObject33fc::GetAssignmentName(int device, int row, char* text)
+void ControlSetup::GetAssignmentName(int device, int row, char* text)
 {
     FormatAssignmentName(assignments[device][row].kind, assignments[device][row].code, text);
 }
 
 // 0x00449380: the display name of an assignment.
-int UnknownTrackGameObject33fc::FormatAssignmentName(int kind, int code, char* text)
+int ControlSetup::FormatAssignmentName(int kind, int code, char* text)
 {
     char name[0x80];
 
