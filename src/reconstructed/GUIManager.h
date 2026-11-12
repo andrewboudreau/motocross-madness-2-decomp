@@ -162,13 +162,13 @@ public:
 // A dialog control as GUIUser and ToolTip see it. Never constructed as such.
 class UnknownGuiControl : public GameObject {
 public:
-    virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28();
-    virtual void UnknownVirtualSlot29();
-    virtual void UnknownVirtualSlot30();
-    virtual int UnknownVirtualSlot31();       // takes the focus; 0 refuses it
-    virtual void UnknownVirtualSlot32(UnknownGuiControl* next);
-    virtual void UnknownVirtualSlot33(UnknownGuiControl* next);
+    virtual void AdvanceImages();
+    virtual void ContainsPoint();
+    virtual void SetState();
+    virtual void IsInteractive();
+    virtual int EnterHover();       // takes the focus; 0 refuses it
+    virtual void LeaveHover(UnknownGuiControl* next);
+    virtual void KillFocus(UnknownGuiControl* next);
 
     unsigned char field_0x2c[0x3c - 0x2c];
     CameraRect area;                          // +0x3c: area

@@ -389,7 +389,7 @@ CASES = [
     {
         'name': 'UIStatic::slot30 return zero',
         'source': 'samples/calibration/CompilerShapeProbe.cpp',
-        'symbol': 'UnknownVirtualSlot30@UIStatic',
+        'symbol': 'IsInteractive@UIStatic',
         'target_va': '0x00478fe0',
         'target_size': 3,
         'reason': 'retail uses 33 C0; clang uses equivalent 31 C0, making this a tiny encoder fingerprint',
@@ -397,7 +397,7 @@ CASES = [
     {
         'name': 'UIMultiState::slot34 indexed field +8',
         'source': 'samples/calibration/CompilerShapeProbe.cpp',
-        'symbol': 'UnknownVirtualSlot34@UIMultiState',
+        'symbol': 'GetControlText@UIMultiState',
         'target_va': '0x00478260',
         'target_size': 20,
         'reason': 'retail and clang agree on semantics/size but choose opposite equivalent SIB base/index ordering',
@@ -405,7 +405,7 @@ CASES = [
     {
         'name': 'UIMultiState::slot35 indexed field +12',
         'source': 'samples/calibration/CompilerShapeProbe.cpp',
-        'symbol': 'UnknownVirtualSlot35@UIMultiState',
+        'symbol': 'GetTextLength@UIMultiState',
         'target_va': '0x00478280',
         'target_size': 20,
         'reason': 'same VC6-vs-clang SIB discriminator; exposes 32-byte element stride',
@@ -413,7 +413,7 @@ CASES = [
     {
         'name': 'UIMultiState::slot36 indexed field +28',
         'source': 'samples/calibration/CompilerShapeProbe.cpp',
-        'symbol': 'UnknownVirtualSlot36@UIMultiState',
+        'symbol': 'GetTextLines@UIMultiState',
         'target_va': '0x004782a0',
         'target_size': 20,
         'reason': 'same VC6-vs-clang SIB discriminator with a third element field',
@@ -421,7 +421,7 @@ CASES = [
     {
         'name': 'UIMultiState::slot37 indexed address +20',
         'source': 'samples/calibration/CompilerShapeProbe.cpp',
-        'symbol': 'UnknownVirtualSlot37@UIMultiState',
+        'symbol': 'GetTextExtent@UIMultiState',
         'target_va': '0x004782c0',
         'target_size': 20,
         'reason': 'retail VC6 uses LEA [eax+ecx+20], while clang separates add/add-immediate',

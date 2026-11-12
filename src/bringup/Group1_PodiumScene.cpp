@@ -100,11 +100,11 @@ public:
 class UnknownPodiumArcade {                         // ArcadeObject (+0x3d0)
 public:
     virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
+    virtual void AddRef();
+    virtual void Release();
+    virtual void GetRefCount();
+    virtual void Disable();
+    virtual void Enable();
     void SetPosition(const Vector3* position);                // 0x004014f0
     void SetAxes(const Vector3* a, const Vector3* b, int c, int d); // 0x00401520
     unsigned char field_0x04[0x2c - 0x4];
@@ -254,7 +254,7 @@ int EventManager::CreatePodiumScene() {
     context.opaqueFormat = ((RenderTarget*)renderContext)->surfacePixelFormat;
     context.alphaFormat = 0x115c;
     context.halvings = 0;
-    PODIUM_ARCADE->UnknownVirtualSlot5();
+    PODIUM_ARCADE->Enable();
     PODIUM_ARCADE->SetPosition(&podiumPosition);
     PODIUM_ARCADE->SetAxes(&direction, &up, 0, 1);
     if (PODIUM_OWNER(owner)->lights && PODIUM_OWNER(owner)->lights->isEnabled)

@@ -14,12 +14,12 @@ class MouseDevice;
 // reads the member through this view.
 class UnknownKeyboardBoolView {
 public:
-    virtual void UnknownVirtualSlot0();
+    virtual void RemoveBindings();
     virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual bool UnknownVirtualSlot5(int key, int modifier, void* entry);
+    virtual void CreateDevice();
+    virtual void DetectSubtype();
+    virtual void IsControlDown();
+    virtual bool IsButtonDown(int key, int modifier, void* entry);
 };
 
 // 0x3c-byte binding of a control to an input device (not polymorphic). The

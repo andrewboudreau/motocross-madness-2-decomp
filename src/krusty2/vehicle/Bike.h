@@ -50,15 +50,15 @@ struct BikeA38;
 // Dust 0x80 bytes, DirtChunk 0x608, Steam 0x47c).  Provisional views: the constructor, the
 // GameObject-shaped virtual slot 27 that returns the child to register, and Steam's +0x60 flag.
 struct BikeParticleEmitterView {
-    virtual void UnknownVirtualSlot0(); virtual void UnknownVirtualSlot1(); virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3(); virtual void UnknownVirtualSlot4(); virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6(); virtual void UnknownVirtualSlot7(); virtual void UnknownVirtualSlot8();
-    virtual void UnknownVirtualSlot9(); virtual void UnknownVirtualSlot10(); virtual void UnknownVirtualSlot11();
-    virtual void UnknownVirtualSlot12(); virtual void UnknownVirtualSlot13(); virtual void UnknownVirtualSlot14();
-    virtual void UnknownVirtualSlot15(); virtual void UnknownVirtualSlot16(); virtual void UnknownVirtualSlot17();
-    virtual void UnknownVirtualSlot18(); virtual void UnknownVirtualSlot19(); virtual void UnknownVirtualSlot20();
-    virtual void UnknownVirtualSlot21(); virtual void UnknownVirtualSlot22(); virtual void UnknownVirtualSlot23();
-    virtual void UnknownVirtualSlot24(); virtual void UnknownVirtualSlot25(); virtual void UnknownVirtualSlot26();
+    virtual void UnknownVirtualSlot0(); virtual void AddRef(); virtual void Release();
+    virtual void GetRefCount(); virtual void Disable(); virtual void Enable();
+    virtual void OnDisable(); virtual void OnEnable(); virtual void SetRenderContext();
+    virtual void UnknownVirtualSlot9(); virtual void Tick(); virtual void Step();
+    virtual void PrepareGeometry(); virtual void RenderPre3D(); virtual void Render3D();
+    virtual void RenderPost3D(); virtual void SetPaused(); virtual void OnDeactivate();
+    virtual void OnActivate(); virtual void UnknownVirtualSlot19(); virtual void OnChar();
+    virtual void OnKeyDown(); virtual void OnControlRelease(); virtual void OnControlPress();
+    virtual void OnNetworkMessage(); virtual void AttachRenderContext(); virtual void MarkPendingRelease();
     virtual void* Create(void* a, GameObject* manager);
 };
 struct BikeDustEmitter : BikeParticleEmitterView {

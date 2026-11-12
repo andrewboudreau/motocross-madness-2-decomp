@@ -93,47 +93,47 @@ public:
 // emitter, slot 40 loads the model and returns the GameObject to add.
 class UnknownScenePhysicsBody {
 public:
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7();
-    virtual void UnknownVirtualSlot8();
-    virtual void UnknownVirtualSlot9();
-    virtual void UnknownVirtualSlot10();
-    virtual void UnknownVirtualSlot11();
-    virtual void UnknownVirtualSlot12();
-    virtual void UnknownVirtualSlot13();
-    virtual void UnknownVirtualSlot14();
-    virtual void UnknownVirtualSlot15();
-    virtual void UnknownVirtualSlot16();
-    virtual void UnknownVirtualSlot17();
-    virtual void UnknownVirtualSlot18();
-    virtual void UnknownVirtualSlot19();
-    virtual void UnknownVirtualSlot20();
-    virtual void UnknownVirtualSlot21();
-    virtual void UnknownVirtualSlot22();
-    virtual void UnknownVirtualSlot23();
-    virtual void UnknownVirtualSlot24();
-    virtual void UnknownVirtualSlot25();
+    virtual void UpdateMass();
+    virtual void ResetDynamicState();
+    virtual void InitializePhysics();
+    virtual void ApplyStaticContactImpulse();
+    virtual void ApplyBodyContactImpulse();
+    virtual void ShouldRefreshContacts();
+    virtual void ApplyDrag();
+    virtual void DistributeContactForce();
+    virtual void UpdateLocalCenterOfMass();
+    virtual void ComputeFrameSteps();
+    virtual void IsAtBaseWeight();
+    virtual void FindPlacement();
+    virtual void ClassifyOutOfBounds();
+    virtual void AccumulateContactForces();
+    virtual void IntegrateMotion();
+    virtual void ApplyWorldTorque();
+    virtual void LocalTorqueToAngularAcceleration();
+    virtual void AverageAttachmentPosition();
+    virtual void UpdateContactEffect();
+    virtual void UpdateSlideEffect();
+    virtual void UpdateScrapeEffect();
+    virtual void UpdateAttachmentEffects();
+    virtual void ShouldUpdateShadowLight();
+    virtual void ShouldEmitMovingEffects();
+    virtual void ShouldRestartSteamEffect();
+    virtual void ShouldBurstSteamEffect();
     virtual void UnknownVirtualSlot26();
     virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28();
-    virtual void UnknownVirtualSlot29();
-    virtual void UnknownVirtualSlot30();
-    virtual void UnknownVirtualSlot31();
-    virtual void UnknownVirtualSlot32();
-    virtual void UnknownVirtualSlot33();
-    virtual void UnknownVirtualSlot34();
-    virtual void UnknownVirtualSlot35();
-    virtual void UnknownVirtualSlot36();
-    virtual void UnknownVirtualSlot37(int type, GameObject* emitter, void* point, int a);
-    virtual void UnknownVirtualSlot38();
-    virtual void UnknownVirtualSlot39();
-    virtual GameObject* UnknownVirtualSlot40(void* owner, const char* name, LightManager* lights, int a4,
+    virtual void ResolveSubstepCollisions();
+    virtual void SaveBodyOrientation();
+    virtual void ClearContactEffectFlags();
+    virtual void UpdateContactStates();
+    virtual void EffectiveLoadWeight();
+    virtual void ResetToPlacement();
+    virtual void LoadBodyAxes();
+    virtual void StoreBodyAxes();
+    virtual void ResetBodyOrientation();
+    virtual void AddAttachment(int type, GameObject* emitter, void* point, int a);
+    virtual void ApplyCollisionEvent();
+    virtual void ApplyPendingRespawn();
+    virtual GameObject* LoadPhysicsModel(void* owner, const char* name, LightManager* lights, int a4,
                                              Vector3 position, Vector3 look, Vector3 up, int a8, int a9,
                                              float a10, int points, int emitters, Scene* scene, float a14,
                                              int a15, float a16, float a17, float radius, int shape,
@@ -301,7 +301,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             if (minPoints >= points - 1)
                 minPoints = points - 1;
             UnknownScenePhysicsObject* object = new(__FILE__, 1845) UnknownScenePhysicsObject(1, 1);
-            AppendChild(object->UnknownVirtualSlot40(renderContext, sltPath, lights, a4, position, look, up,
+            AppendChild(object->LoadPhysicsModel(renderContext, sltPath, lights, a4, position, look, up,
                                                                0, a2, 5.0f, points, emitters, this,
                                                                0.033333f, 10, 0.025f, 0.05f, radius, shape,
                                                                minPoints, field_0x88, 1),
@@ -342,7 +342,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                             UnknownSceneDustEmitter* emitter = new(__FILE__, 1917) UnknownSceneDustEmitter(1);
                             D3DIMSoultreeObject* node = object;
                             node->AppendChild(emitter->Create(renderContext, a2), -1);
-                            object->UnknownVirtualSlot37(1, emitter, *object->collisionPoints, 0);
+                            object->AddAttachment(1, emitter, *object->collisionPoints, 0);
                             dust = 1;
                         }
                         break;
@@ -354,7 +354,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                             UnknownSceneChunkEmitter* emitter = new(__FILE__, 1927) UnknownSceneChunkEmitter(1);
                             D3DIMSoultreeObject* node = object;
                             node->AppendChild(emitter->Create(renderContext, a2), -1);
-                            object->UnknownVirtualSlot37(2, emitter, *object->collisionPoints, 0);
+                            object->AddAttachment(2, emitter, *object->collisionPoints, 0);
                             chunk = 1;
                         }
                         break;
@@ -366,7 +366,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                             UnknownSceneSprayEmitter* emitter = new(__FILE__, 1937) UnknownSceneSprayEmitter(1);
                             D3DIMSoultreeObject* node = object;
                             node->AppendChild(emitter->Create(renderContext, a2), -1);
-                            object->UnknownVirtualSlot37(3, emitter, *object->collisionPoints, 0);
+                            object->AddAttachment(3, emitter, *object->collisionPoints, 0);
                             spray = 1;
                         }
                         break;

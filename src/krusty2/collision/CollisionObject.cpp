@@ -1164,16 +1164,16 @@ inline CollisionVec3 DebugNormalized(const CollisionVec3& v)
 class CollisionDebugDevice {
 public:
     virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7(int stage, int type, int value);   // +0x1c
-    virtual void UnknownVirtualSlot8(int state, int value, int force);  // +0x20
-    virtual void UnknownVirtualSlot9();
-    virtual void UnknownVirtualSlot10(int mode, int flag);              // +0x28
+    virtual void BeginScene();
+    virtual void EndScene();
+    virtual void Blit();
+    virtual void LockSurface();
+    virtual void UnlockSurface();
+    virtual void GetTextureStageState();
+    virtual void SetTextureStageState(int stage, int type, int value);   // +0x1c
+    virtual void SetRenderState(int state, int value, int force);  // +0x20
+    virtual void GetRenderState();
+    virtual void SetTextureBlend(int mode, int flag);              // +0x28
 };
 
 // Math3D views of the sphere / capsule payloads (same layouts as CollisionSphereShape and
@@ -1206,9 +1206,9 @@ struct CollisionCapsuleView {
 // 0x005511cc, a separate pool entry from the literal 0.1f at 0x005507d0.
 int CollisionObject::Render3D()
 {
-    ((CollisionDebugDevice*)renderContext)->UnknownVirtualSlot8(0x1b, 0, 0);
-    ((CollisionDebugDevice*)renderContext)->UnknownVirtualSlot10(7, 0);
-    ((CollisionDebugDevice*)renderContext)->UnknownVirtualSlot7(0, 1, 1);
+    ((CollisionDebugDevice*)renderContext)->SetRenderState(0x1b, 0, 0);
+    ((CollisionDebugDevice*)renderContext)->SetTextureBlend(7, 0);
+    ((CollisionDebugDevice*)renderContext)->SetTextureStageState(0, 1, 1);
     Vec3 center;
     if (shape && debugDrawMode) {
         if (debugDrawMode == 5) {

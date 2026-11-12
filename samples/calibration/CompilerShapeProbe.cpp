@@ -17,9 +17,9 @@ int UIControl::GetHeight() {
 
 class UIStatic {
 public:
-    virtual int UnknownVirtualSlot30();
+    virtual int IsInteractive();
 };
-int UIStatic::UnknownVirtualSlot30() {
+int UIStatic::IsInteractive() {
     return 0;
 }
 
@@ -29,30 +29,30 @@ int UIStatic::UnknownVirtualSlot30() {
 // object-layout fields (+0x1F0 index, +0x1F4 base pointer).
 class UIMultiState {
 public:
-    virtual int UnknownVirtualSlot34();
-    virtual int UnknownVirtualSlot35();
-    virtual int UnknownVirtualSlot36();
-    virtual void* UnknownVirtualSlot37();
+    virtual int GetControlText();
+    virtual int GetTextLength();
+    virtual int GetTextLines();
+    virtual void* GetTextExtent();
 };
-int UIMultiState::UnknownVirtualSlot34() {
+int UIMultiState::GetControlText() {
     char* p = reinterpret_cast<char*>(this);
     int i = *reinterpret_cast<int*>(p + 0x1F0);
     char* q = *reinterpret_cast<char**>(p + 0x1F4);
     return *reinterpret_cast<int*>(q + i * 32 + 8);
 }
-int UIMultiState::UnknownVirtualSlot35() {
+int UIMultiState::GetTextLength() {
     char* p = reinterpret_cast<char*>(this);
     int i = *reinterpret_cast<int*>(p + 0x1F0);
     char* q = *reinterpret_cast<char**>(p + 0x1F4);
     return *reinterpret_cast<int*>(q + i * 32 + 12);
 }
-int UIMultiState::UnknownVirtualSlot36() {
+int UIMultiState::GetTextLines() {
     char* p = reinterpret_cast<char*>(this);
     int i = *reinterpret_cast<int*>(p + 0x1F0);
     char* q = *reinterpret_cast<char**>(p + 0x1F4);
     return *reinterpret_cast<int*>(q + i * 32 + 28);
 }
-void* UIMultiState::UnknownVirtualSlot37() {
+void* UIMultiState::GetTextExtent() {
     char* p = reinterpret_cast<char*>(this);
     int i = *reinterpret_cast<int*>(p + 0x1F0);
     char* q = *reinterpret_cast<char**>(p + 0x1F4);

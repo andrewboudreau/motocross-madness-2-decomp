@@ -38,7 +38,7 @@ bool FollowCamera::ProcessCameraInput(bool active, float dt) {
             cachedTarget -= speed * viewDirection;
         if (FOLLOWCAMERA_CONTROLS()->activeJoystick) {
             if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
-                    ->UnknownVirtualSlot4(0, &x, &y)) {
+                    ->GetPovDirection(0, &x, &y)) {
                 if (targetDistance > 0.0f)
                     cachedTarget.y += y * speed;
                 Vector3 side(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0));
@@ -84,7 +84,7 @@ bool FollowCamera::ProcessCameraInput(bool active, float dt) {
         }
         if (FOLLOWCAMERA_CONTROLS()->activeJoystick) {
             if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
-                    ->UnknownVirtualSlot4(0, &x, &y)) {
+                    ->GetPovDirection(0, &x, &y)) {
                 if (targetDistance > 6.5f)
                     eyePosition.y += y * speed;
                 Vector3 side(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0));
@@ -148,7 +148,7 @@ bool FollowCamera::ProcessCameraInput(bool active, float dt) {
     }
     if (FOLLOWCAMERA_CONTROLS()->activeJoystick) {
         if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
-                ->UnknownVirtualSlot4(0, &x, &y)) {
+                ->GetPovDirection(0, &x, &y)) {
             if (followDistance < 50.0)
                 FollowCameraTilt(followPitch, (3.0f - followDistance * 0.04f) * y * turn * 0.01745329f);
             else

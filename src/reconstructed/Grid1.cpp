@@ -134,8 +134,8 @@ void DrawableGridNodeSharedTextures::BindNodeTexture()
         if (Extra()->ageEntry.size)
             Terrain()->textureAgeManager->MarkUsed(&Extra()->ageEntry);
     } else {
-        Terrain()->renderer->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-        Terrain()->renderer->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+        Terrain()->renderer->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+        Terrain()->renderer->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     }
 }
 
@@ -158,8 +158,8 @@ void DrawableGridNodeSharedTextures::BindBlockTexture(int block)
     if (Extra()->texture) {
         Extra()->texture->Bind();
     } else {
-        Terrain()->renderer->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-        Terrain()->renderer->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+        Terrain()->renderer->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+        Terrain()->renderer->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     }
 }
 

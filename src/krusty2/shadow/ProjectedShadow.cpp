@@ -269,7 +269,7 @@ int ProjectedShadow::RenderPre3D()
         rect[2] = prevMaxX + 1 > clipRect.right ? prevMaxX + 1 : clipRect.right;
         rect[1] = prevMinY < clipRect.top ? prevMinY : clipRect.top;
         rect[3] = prevMaxY + 1 > clipRect.bottom ? prevMaxY + 1 : clipRect.bottom;
-        texture->UnknownVirtualSlot9(rect, -1);
+        texture->Upload(rect, -1);
         prevMinX = clipRect.left;
         prevMaxX = clipRect.right;
         prevMinY = clipRect.top;

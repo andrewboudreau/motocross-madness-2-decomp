@@ -185,26 +185,26 @@ struct KbGame {
     // The game object is polymorphic: 0x0048fc80 calls slot 20 (vtable +0x50) with a setting
     // name and a default and stores the int result (tier 1 slot, tier 3 names).
     virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7();
-    virtual void UnknownVirtualSlot8();
-    virtual void UnknownVirtualSlot9();
-    virtual void UnknownVirtualSlot10();
-    virtual void UnknownVirtualSlot11();
+    virtual void Startup();
+    virtual void Initialize();
+    virtual void OpenResources();
+    virtual void CreateGameObjects();
+    virtual void OnActivate();
+    virtual void OnDeactivate();
+    virtual void SetRenderStates();
+    virtual void RenderFrame();
+    virtual void PresentFrame();
+    virtual void Tick();
+    virtual void SetInputSuspended();
     virtual void UnknownVirtualSlot12();
-    virtual void UnknownVirtualSlot13();
-    virtual void UnknownVirtualSlot14();
-    virtual void UnknownVirtualSlot15();
-    virtual void UnknownVirtualSlot16();
-    virtual void UnknownVirtualSlot17();
-    virtual void UnknownVirtualSlot18();
-    virtual void UnknownVirtualSlot19();
-    virtual int UnknownVirtualSlot20(const char* name, int defaultValue);
+    virtual void OnControlRelease();
+    virtual void OnControlPress();
+    virtual void Shutdown();
+    virtual void CreateNetworkInterface();
+    virtual void OnNetworkMessage();
+    virtual void FindDataFile();
+    virtual void SwitchDisplayMode();
+    virtual int GetRegistryInt(const char* name, int defaultValue);
     void GetStringText(int id, char* buffer, int size);   // 0x00521970: fetch text for a string id
     char pad_0x0004[0x4];
     KbGameCfg* network;  // +0x8  Game +0x8 network (NetworkInterface); set in network games, KrustyBike sends its packets through it
@@ -460,19 +460,19 @@ struct KbObj128 {
 // (0x4650 = 180 degrees in DirectInput hundredths).
 struct KbEffectParams { int field_0x0; int field_0x4; };
 struct KbPad {
-    virtual void UnknownVirtualSlot0();
+    virtual void RemoveBindings();
     virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6(int effect, int magnitude, int duration);
-    virtual void UnknownVirtualSlot7(int effect, KbEffectParams* direction, int magnitude);
-    virtual void UnknownVirtualSlot8();
-    virtual void UnknownVirtualSlot9();
-    virtual void UnknownVirtualSlot10();
-    virtual void UnknownVirtualSlot11(int effect);
-    virtual void UnknownVirtualSlot12(int effect, int iterations, int flags);
+    virtual void IsButtonDown();
+    virtual void GetPovAngle();
+    virtual void GetPovDirection();
+    virtual void SetAutoCenter();
+    virtual void CreateConstantForce(int effect, int magnitude, int duration);
+    virtual void SetConstantForce(int effect, KbEffectParams* direction, int magnitude);
+    virtual void SetDirection();
+    virtual void CreateEnvelopedForce();
+    virtual void CreateSquareWave();
+    virtual void StopEffect(int effect);
+    virtual void StartEffect(int effect, int iterations, int flags);
     char pad_0x04[0x8];
     int deviceKind;  // +0x0c; 3 when force feedback is driven
 };

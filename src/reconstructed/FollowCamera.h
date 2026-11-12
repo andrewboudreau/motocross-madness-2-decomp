@@ -100,11 +100,11 @@ struct UnknownFollowCameraSubject {
 // as with UnknownKeyboardBoolView. Slot 4 reads stick `index` into *x/*y.
 class UnknownJoystickBoolView {
 public:
-    virtual void UnknownVirtualSlot0();
+    virtual void RemoveBindings();
     virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual bool UnknownVirtualSlot4(int index, float* x, float* y);
+    virtual void IsButtonDown();
+    virtual void GetPovAngle();
+    virtual bool GetPovDirection(int index, float* x, float* y);
 };
 
 // The object at 0x00575a98 (TrackOverlay.h's UnknownProjector views the same

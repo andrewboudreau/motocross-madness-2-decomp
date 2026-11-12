@@ -51,12 +51,12 @@ struct VisibilityCamera {
 class VisibilityView {
 public:
     virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
+    virtual void BeginScene();
+    virtual void EndScene();
+    virtual void Blit();
+    virtual void LockSurface();
+    virtual void UnlockSurface();
+    virtual void GetTextureStageState();
     // +0x1c: RenderTarget slot 7; the debug draw (0x0052e3b0) passes (0, D3DTSS_COLOROP/ALPHAOP, D3DTOP_DISABLE).
     virtual void SetTextureStageState(int stage, int type, int value);
     char field_0x04[4];
@@ -108,21 +108,21 @@ struct VisibilityVertex {
 class VisibilityRenderer {
 public:
     virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7();
-    virtual void UnknownVirtualSlot8();
-    virtual void UnknownVirtualSlot9();
-    virtual void UnknownVirtualSlot10();
-    virtual void UnknownVirtualSlot11();
-    virtual void UnknownVirtualSlot12();
-    virtual void UnknownVirtualSlot13();
-    virtual void UnknownVirtualSlot14();
-    virtual void UnknownVirtualSlot15();
+    virtual void BeginScene();
+    virtual void EndScene();
+    virtual void Blit();
+    virtual void LockSurface();
+    virtual void UnlockSurface();
+    virtual void GetTextureStageState();
+    virtual void SetTextureStageState();
+    virtual void SetRenderState();
+    virtual void GetRenderState();
+    virtual void SetTextureBlend();
+    virtual void ClearTexture();
+    virtual void Clear();
+    virtual void SupportsTextureFormat();
+    virtual void SetViewport();
+    virtual void DrawIndexedPrimitive();
     virtual void DrawLineStrip(int primitiveType, int vertexFormat, void* vertices, int count, int flags);   // +0x40
 };
 

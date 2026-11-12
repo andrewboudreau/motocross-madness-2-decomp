@@ -56,7 +56,7 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
     if (texture
         && texture->Create(0, 0x80, 0x80, 0x80, 0x80, surfaceFormat, surfaceFormat, 0, 8, 0, 0, 0,
                            formatA, formatB, 0, 0x80, 0xff00ff)) {
-        texture->UnknownVirtualSlot8(1, 0, 1);
+        texture->CreateTextureSurface(1, 0, 1);
         field_0x60 = texture->pixels;
         if (field_0x60) {
             texture->surface->PageLock(0);
@@ -251,8 +251,8 @@ int ProjectedShadow::ComputeBounds()
         projection.m[3][1] = half;
         ShadowVec3 eye = ShadowDifference(center, ShadowScale(lightDir, 1000.0f));
         camera->SetLookAt(&eye, 0, 0, 0, 0);
-        camera->UnknownVirtualSlot29(center);
-        camera->UnknownVirtualSlot28();
+        camera->LookAt(center);
+        camera->UpdateMatrices();
         lightMatrix = *ShadowMatrixMultiplyInto(&product, projection, camera->matrix_0xac);
         return 1;
     } else if (mode == 1) {
@@ -271,8 +271,8 @@ int ProjectedShadow::ComputeBounds()
             unitDir = ShadowVec3Call(dir.x * inv, dir.y * inv, dir.z * inv);
         }
         dir = unitDir;
-        camera->UnknownVirtualSlot29(center);
-        camera->UnknownVirtualSlot28();
+        camera->LookAt(center);
+        camera->UpdateMatrices();
         ShadowMatrix projection = ShadowMatrixIdentity();
         projection.m[0][0] = (float)texture->size;
         projection.m[1][1] = (float)texture->size;

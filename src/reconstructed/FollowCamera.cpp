@@ -499,12 +499,12 @@ void FollowCamera::RestoreCameraState() {}
 // object, with codes 0x38 and 0x2a.
 unsigned char FollowCamera::UnknownVirtualSlot55() {
     return ((UnknownKeyboardBoolView*)g_TrackGame->controlInterface->keyboard)
-        ->UnknownVirtualSlot5(0x38, 0x3F, 0);
+        ->IsButtonDown(0x38, 0x3F, 0);
 }
 
 bool FollowCamera::UnknownVirtualSlot56() {
     return ((UnknownKeyboardBoolView*)g_TrackGame->controlInterface->keyboard)
-        ->UnknownVirtualSlot5(0x2A, 0x3F, 0);
+        ->IsButtonDown(0x2A, 0x3F, 0);
 }
 
 // 0x00465000: when enabled and not forced, a point the +0x288..+0x290 values

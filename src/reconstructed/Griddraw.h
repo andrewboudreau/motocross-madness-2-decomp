@@ -31,21 +31,21 @@ struct GridCamera;
 class GridRenderDevice {
 public:
     virtual void UnknownVirtualSlot0() = 0;
-    virtual void UnknownVirtualSlot1() = 0;
-    virtual void UnknownVirtualSlot2() = 0;
-    virtual void UnknownVirtualSlot3() = 0;
-    virtual void UnknownVirtualSlot4() = 0;
-    virtual void UnknownVirtualSlot5() = 0;
-    virtual void UnknownVirtualSlot6() = 0;
-    virtual void UnknownVirtualSlot7(int stage, int state, int value) = 0;
-    virtual void UnknownVirtualSlot8(int state, int value, int force) = 0;
-    virtual void UnknownVirtualSlot9() = 0;
-    virtual void UnknownVirtualSlot10() = 0;
-    virtual void UnknownVirtualSlot11() = 0;
-    virtual void UnknownVirtualSlot12() = 0;
-    virtual void UnknownVirtualSlot13() = 0;
-    virtual void UnknownVirtualSlot14() = 0;
-    virtual int UnknownVirtualSlot15(int primitive, int format, void* vertices, int vertexCount,
+    virtual void BeginScene() = 0;
+    virtual void EndScene() = 0;
+    virtual void Blit() = 0;
+    virtual void LockSurface() = 0;
+    virtual void UnlockSurface() = 0;
+    virtual void GetTextureStageState() = 0;
+    virtual void SetTextureStageState(int stage, int state, int value) = 0;
+    virtual void SetRenderState(int state, int value, int force) = 0;
+    virtual void GetRenderState() = 0;
+    virtual void SetTextureBlend() = 0;
+    virtual void ClearTexture() = 0;
+    virtual void Clear() = 0;
+    virtual void SupportsTextureFormat() = 0;
+    virtual void SetViewport() = 0;
+    virtual int DrawIndexedPrimitive(int primitive, int format, void* vertices, int vertexCount,
                                      unsigned short* indices, int indexCount, int flags) = 0;
 
     void* field_0x04;

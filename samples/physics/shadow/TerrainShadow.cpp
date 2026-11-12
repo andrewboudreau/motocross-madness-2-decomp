@@ -58,7 +58,7 @@ int TerrainShadow::UnknownVirtualSlot28()
             fov = (float)atan2((float)(shadow->texture->size * shadow->texture->size) / extent * 0.5,
                                shadow->camera->field_0x198) * 114.59156f;
             shadow->camera->SetLookAt(&shadow->camera->eyePosition, 0, 0, 0, &fov);
-            shadow->camera->UnknownVirtualSlot28();
+            shadow->camera->UpdateMatrices();
             projection = *TerrainMatrixIdentityInto(&projection);
             projection.m[0][0] = projection.m[1][1] = (float)shadow->texture->size;
             shadow->lightMatrix = *TerrainMatrixMultiplyInto(&projection, projection,

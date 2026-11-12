@@ -1039,7 +1039,7 @@ void Tire::UpdateDriveShare(TireVehicle* vehicle)
         } else {
             boost = 1.0f;
         }
-        float grip = vehicle->UnknownVirtualSlot47(this);
+        float grip = vehicle->GetDriveShareScale(this);
         float excess = field_0x280 * vehicle->field_0x24 - TireLength(vehicle->field_0x70);
         float share;
         if (excess < 1.01f) {

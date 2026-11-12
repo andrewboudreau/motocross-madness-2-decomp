@@ -76,17 +76,17 @@ void Vehicle::UpdateAttachmentEffects()
 
 int Vehicle::IsReverseRequested()
 {
-    return inputMap->UnknownVirtualSlot3(0xe, 0, 0x3f, 0) != 0;
+    return inputMap->IsDeviceButtonDown(0xe, 0, 0x3f, 0) != 0;
 }
 
 int Vehicle::IsClutchRequested()
 {
-    return inputMap->UnknownVirtualSlot3(0x1d, 0, 0x3f, 0) != 0;
+    return inputMap->IsDeviceButtonDown(0x1d, 0, 0x3f, 0) != 0;
 }
 
 int Vehicle::QueryControlInput(int control, int modifier)
 {
-    return inputMap->UnknownVirtualSlot2(control, modifier);
+    return inputMap->IsControlDown(control, modifier);
 }
 
 // True when the speed change this step (linearSpeed - prevSpeed) is below dt * speedGainLimit;
@@ -130,7 +130,7 @@ void Vehicle::ClearCrashState()
 int Vehicle::UnknownVirtualSlot77(int arg)
 {
     if (arg && inputMap->valueSource
-        && inputMap->valueSource->UnknownVirtualSlot3(0, (float*)&arg)
+        && inputMap->valueSource->GetPovAngle(0, (float*)&arg)
         && *(float*)&arg != -1.0f)
         return 1;
     return 0;
@@ -1314,18 +1314,18 @@ void Vehicle::RemoveFromRace()
 int Vehicle::IsThrottleRequested()
 {
     if ((inputDevice && throttleInput > 0.33f)
-        || (inputMap->UnknownVirtualSlot3(0, 2, 0x3f, 0)
+        || (inputMap->IsDeviceButtonDown(0, 2, 0x3f, 0)
             && !UnknownVirtualSlot77(engineState->throttleFraction == 0.0f)))
         return 1;
-    return inputMap->UnknownVirtualSlot3(200, 0, 0x3f, 0) != 0;
+    return inputMap->IsDeviceButtonDown(200, 0, 0x3f, 0) != 0;
 }
 
 int Vehicle::IsBrakeRequested(VehicleWheel* wheel)
 {
-    if (inputMap->UnknownVirtualSlot3(1, 2, 0x3f, 0)
+    if (inputMap->IsDeviceButtonDown(1, 2, 0x3f, 0)
         && !UnknownVirtualSlot77(wheel->rampLevel == 0.0f))
         return 1;
-    return inputMap->UnknownVirtualSlot3(0xd0, 0, 0x3f, 0) != 0;
+    return inputMap->IsDeviceButtonDown(0xd0, 0, 0x3f, 0) != 0;
 }
 
 // Tier 3 reading: re-seats the collision object (0x00435fb0 before and after), removes the
@@ -1364,7 +1364,7 @@ int Vehicle::ApplyPendingRespawn(float dt)
         return 1;
     }
     if (GetRespawnKey(&code) && inputMap
-        && inputMap->keyTable->UnknownVirtualSlot5(code, 0x3f, 0)) {
+        && inputMap->keyTable->IsButtonDown(code, 0x3f, 0)) {
         ClearCrashState();
         return 2;
     }
@@ -2219,8 +2219,8 @@ Vehicle::~Vehicle()
         earlyTickers = 0;
     }
     if (inputMap && inputMap->valueSource) {
-        inputMap->valueSource->UnknownVirtualSlot15();
-        inputMap->valueSource->UnknownVirtualSlot16();
+        inputMap->valueSource->ReleaseEffects();
+        inputMap->valueSource->ResetForceFeedback();
     }
 }
 

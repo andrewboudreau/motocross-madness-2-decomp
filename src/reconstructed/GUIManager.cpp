@@ -1029,10 +1029,10 @@ int GUIUser::SetHoverControl(UnknownGuiControl* control, UnknownGuiControl** pre
     int result = 1;
 
     if (control && control != hoverControl)
-        result = control->UnknownVirtualSlot31();
+        result = control->EnterHover();
     if (result) {
         if (hoverControl && !hoverControl->pendingRelease && hoverControl != control)
-            hoverControl->UnknownVirtualSlot32(control);
+            hoverControl->LeaveHover(control);
         if (previous)
             *previous = hoverControl;
         hoverControl = control;
@@ -1046,12 +1046,12 @@ int GUIUser::MoveFocus(UnknownGuiControl* control, UnknownGuiControl** previous)
     int result = 1;
 
     if (control && control != hoverControl)
-        result = control->UnknownVirtualSlot31();
+        result = control->EnterHover();
     if (result) {
         if (hoverControl && !hoverControl->pendingRelease && hoverControl != control)
-            hoverControl->UnknownVirtualSlot32(control);
+            hoverControl->LeaveHover(control);
         if (focusControl && !focusControl->pendingRelease && focusControl != control)
-            focusControl->UnknownVirtualSlot33(control);
+            focusControl->KillFocus(control);
         if (previous)
             *previous = focusControl;
         hoverControl = control;
@@ -1134,7 +1134,7 @@ void GUIUser::EnableImeInput(int enable) {
 // 0x00487bf0
 int GUIUser::ClearFocus(UnknownGuiControl** previous) {
     if (focusControl && !focusControl->pendingRelease)
-        focusControl->UnknownVirtualSlot33(0);
+        focusControl->KillFocus(0);
     if (previous)
         *previous = focusControl;
     focusControl = 0;

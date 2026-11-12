@@ -55,16 +55,16 @@ int Vehicle::ShouldBurstSteamEffect()
 
 int Vehicle::UnknownVirtualSlot78()
 {
-    if (inputMap->UnknownVirtualSlot3(3, 2, 0x3f, 0) && !UnknownVirtualSlot77(1))
+    if (inputMap->IsDeviceButtonDown(3, 2, 0x3f, 0) && !UnknownVirtualSlot77(1))
         return 1;
-    return inputMap->UnknownVirtualSlot3(0x1f, 0, 0x3f, 0) != 0;
+    return inputMap->IsDeviceButtonDown(0x1f, 0, 0x3f, 0) != 0;
 }
 
 int Vehicle::UnknownVirtualSlot79()
 {
-    if (inputMap->UnknownVirtualSlot3(4, 2, 0x3f, 0) && !UnknownVirtualSlot77(1))
+    if (inputMap->IsDeviceButtonDown(4, 2, 0x3f, 0) && !UnknownVirtualSlot77(1))
         return 1;
-    return inputMap->UnknownVirtualSlot3(0x2d, 0, 0x3f, 0) != 0;
+    return inputMap->IsDeviceButtonDown(0x2d, 0, 0x3f, 0) != 0;
 }
 
 void Vehicle::ApplyLeanCorrection(const Vec3*, const Vec3*) {}

@@ -63,37 +63,37 @@ extern void __cdecl VehContactsC(int n, VehicleContact** arr);
 // below are views of those classes; argument names follow JoystickDevice / KeyboardDevice /
 // ControlInterface.
 struct VehicleValueSource {          // VehicleInputMap+0x0c: the active JoystickDevice
-    virtual void UnknownVirtualSlot0();
+    virtual void RemoveBindings();
     virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual int  UnknownVirtualSlot3(int index, float* angle);  // GetPovAngle
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7();
-    virtual void UnknownVirtualSlot8();
-    virtual void UnknownVirtualSlot9();
-    virtual void UnknownVirtualSlot10();
-    virtual void UnknownVirtualSlot11();
-    virtual void UnknownVirtualSlot12();
-    virtual void UnknownVirtualSlot13();
-    virtual void UnknownVirtualSlot14();
-    virtual void UnknownVirtualSlot15();   // ReleaseEffects: ~Vehicle (0x00526380) calls slots
-    virtual void UnknownVirtualSlot16();   // 15 and 16 (ResetForceFeedback) on it
+    virtual void IsButtonDown();
+    virtual int  GetPovAngle(int index, float* angle);  // GetPovAngle
+    virtual void GetPovDirection();
+    virtual void SetAutoCenter();
+    virtual void CreateConstantForce();
+    virtual void SetConstantForce();
+    virtual void SetDirection();
+    virtual void CreateEnvelopedForce();
+    virtual void CreateSquareWave();
+    virtual void StopEffect();
+    virtual void StartEffect();
+    virtual void IsEffectPlaying();
+    virtual void EnumEffects();
+    virtual void ReleaseEffects();   // ReleaseEffects: ~Vehicle (0x00526380) calls slots
+    virtual void ResetForceFeedback();   // 15 and 16 (ResetForceFeedback) on it
 };
 struct VehicleKeyTable {             // VehicleInputMap+0x34: the KeyboardDevice
-    virtual void UnknownVirtualSlot0();
+    virtual void RemoveBindings();
     virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual int  UnknownVirtualSlot5(int key, int modifier, int entry);  // IsButtonDown
+    virtual void CreateDevice();
+    virtual void DetectSubtype();
+    virtual void IsControlDown();
+    virtual int  IsButtonDown(int key, int modifier, int entry);  // IsButtonDown
 };
 struct VehicleInputMap {             // ControlInterface
     virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual int  UnknownVirtualSlot2(int control, int modifier);  // IsControlDown
-    virtual int  UnknownVirtualSlot3(int control, int kind, int modifier, int device);  // IsDeviceButtonDown
+    virtual void CreateDevices();
+    virtual int  IsControlDown(int control, int modifier);  // IsControlDown
+    virtual int  IsDeviceButtonDown(int control, int kind, int modifier, int device);  // IsDeviceButtonDown
     char pad_0x04[0x8];
     VehicleValueSource* valueSource;  // +0x0c float query used by slot 77
     char pad_0x10[0x24];
@@ -198,15 +198,15 @@ struct VehicleAxis {                 // objects at Vehicle+0x4f8/0x4fc/0x500 (pr
 // set +0x60 after SetPosition, matching SparkParticleEmitter::launchVelocity / field_0x60.
 struct VehicleSparkEmitter {
     explicit VehicleSparkEmitter(int flags);
-    virtual void UnknownVirtualSlot0(); virtual void UnknownVirtualSlot1(); virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3(); virtual void UnknownVirtualSlot4(); virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6(); virtual void UnknownVirtualSlot7(); virtual void UnknownVirtualSlot8();
-    virtual void UnknownVirtualSlot9(); virtual void UnknownVirtualSlot10(); virtual void UnknownVirtualSlot11();
-    virtual void UnknownVirtualSlot12(); virtual void UnknownVirtualSlot13(); virtual void UnknownVirtualSlot14();
-    virtual void UnknownVirtualSlot15(); virtual void UnknownVirtualSlot16(); virtual void UnknownVirtualSlot17();
-    virtual void UnknownVirtualSlot18(); virtual void UnknownVirtualSlot19(); virtual void UnknownVirtualSlot20();
-    virtual void UnknownVirtualSlot21(); virtual void UnknownVirtualSlot22(); virtual void UnknownVirtualSlot23();
-    virtual void UnknownVirtualSlot24(); virtual void UnknownVirtualSlot25(); virtual void UnknownVirtualSlot26();
+    virtual void UnknownVirtualSlot0(); virtual void AddRef(); virtual void Release();
+    virtual void GetRefCount(); virtual void Disable(); virtual void Enable();
+    virtual void OnDisable(); virtual void OnEnable(); virtual void SetRenderContext();
+    virtual void UnknownVirtualSlot9(); virtual void Tick(); virtual void Step();
+    virtual void PrepareGeometry(); virtual void RenderPre3D(); virtual void Render3D();
+    virtual void RenderPost3D(); virtual void SetPaused(); virtual void OnDeactivate();
+    virtual void OnActivate(); virtual void UnknownVirtualSlot19(); virtual void OnChar();
+    virtual void OnKeyDown(); virtual void OnControlRelease(); virtual void OnControlPress();
+    virtual void OnNetworkMessage(); virtual void AttachRenderContext(); virtual void MarkPendingRelease();
     virtual void* Create(void* a, GameObject* manager);
     void SetPosition(Vec3 p);        // 0x004b9dc0 (SparkParticleEmitter::SetPosition)
     char pad_0x04[0x5c];

@@ -94,15 +94,15 @@ public:
                        int sourceFormat, int format, int palette, int flags, int surfacePalette,
                        int checkMemory, int unused, int addressU, int addressV, int choice,
                        int alphaThreshold, int key);
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7();
+    virtual void LoadSurface();
+    virtual void Clone();
+    virtual void IsResident();
     // 0x20 (CreateTextureSurface): (1, 0, 1) in Init
-    virtual int UnknownVirtualSlot8(int upload, int asRenderTarget, int localVideo);
-    virtual int UnknownVirtualSlot9(int* rect, int mode);          // 0x24 (Upload): (rect, -1) in slot 13
-    virtual void UnknownVirtualSlot10();
-    virtual void UnknownVirtualSlot11();
-    virtual void UnknownVirtualSlot12();
+    virtual int CreateTextureSurface(int upload, int asRenderTarget, int localVideo);
+    virtual int Upload(int* rect, int mode);          // 0x24 (Upload): (rect, -1) in slot 13
+    virtual void ReleaseTextureSurface();
+    virtual void SetAsTexture();
+    virtual void RecreateIfLost();
     // 0x34 (slot 13, LockSurface): (0,0,0) in 0x004db8c0, result stored at +0x64; TerrainShadow
     // slot 30 passes a local for the pitch.
     virtual short* LockPixels(int rect, int* pitch, int flags);
@@ -123,9 +123,9 @@ public:
     ShadowCameraProxy(int flags);                         // 0x004da520
     void SetLensScale(float scale);                       // 0x0042e930
     void SetLookAt(const ShadowVec3* eye, int a, int b, int c, float* fov);  // 0x0042e9b0 (tier 3)
-    virtual int UnknownVirtualSlot27();                   // vtable +0x6c (placeholder, not called here)
-    virtual void UnknownVirtualSlot28();                  // vtable +0x70 called by 0x004db0d0 after slot 29
-    virtual void UnknownVirtualSlot29(ShadowVec3 center); // vtable +0x74 called by 0x004db0d0 with the bounds centre
+    virtual int TakeScreenshot();                   // vtable +0x6c (placeholder, not called here)
+    virtual void UpdateMatrices();                  // vtable +0x70 called by 0x004db0d0 after slot 29
+    virtual void LookAt(ShadowVec3 center); // vtable +0x74 called by 0x004db0d0 with the bounds centre
     char pad_0x2c[0xac - 0x2c];
     ShadowMatrix matrix_0xac;                             // +0xac pushed by value by 0x004db0d0 in mode 3
     ShadowMatrix matrix_0xec;                             // +0xec pushed by value by 0x004db0d0 in mode 1

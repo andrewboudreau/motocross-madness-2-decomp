@@ -42,8 +42,8 @@ struct ParticleVertexBufferDesc {
 // IDirect3D7-shaped: slot 27 calls slot 5 (CreateVertexBuffer(desc, &buffer, 0)) three times.
 class ParticleDirect3D : public ParticleComObject {
 public:
-    virtual long __stdcall UnknownVirtualSlot3();
-    virtual long __stdcall UnknownVirtualSlot4();
+    virtual long __stdcall EnumDevices();
+    virtual long __stdcall CreateDevice();
     virtual long __stdcall CreateVertexBuffer(ParticleVertexBufferDesc* desc,
                                               ParticleVertexBuffer** buffer, unsigned long flags);
 };
@@ -63,11 +63,11 @@ struct ParticleRenderContext {
 // LoadSurface, Clone, IsResident and CreateTextureSurface (argument names from there).
 class ParticleTexture : public BaseObject {
 public:
-    virtual int UnknownVirtualSlot4();
-    virtual int UnknownVirtualSlot5();
-    virtual ParticleTexture* UnknownVirtualSlot6();
-    virtual int UnknownVirtualSlot7();
-    virtual int UnknownVirtualSlot8(int upload, int asRenderTarget, int localVideo);
+    virtual int CreateSurface();
+    virtual int LoadSurface();
+    virtual ParticleTexture* Clone();
+    virtual int IsResident();
+    virtual int CreateTextureSurface(int upload, int asRenderTarget, int localVideo);
 };
 class TextureMapManager;
 // 0x0050a590 (cdecl; src/reconstructed/TextureMap.h TerrainLoadTexture): the texture

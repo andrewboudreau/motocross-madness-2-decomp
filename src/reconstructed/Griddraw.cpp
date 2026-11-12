@@ -751,9 +751,9 @@ void DrawableGridNode::SubmitUnlitRange(int detailPass, GridVertex* vertices, in
         detail = extra->blockRecords[block].detail;
     if (reinterpret_cast<GridGameSettings*>(g_TrackGame)->softwareRenderer) {
         if (terrain->qualityParamB < detail)
-            terrain->renderer->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 1, 0);
+            terrain->renderer->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 1, 0);
         else
-            terrain->renderer->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
+            terrain->renderer->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
     }
     if (terrain->detailTexture) {
         if (detailPass) {
@@ -767,7 +767,7 @@ void DrawableGridNode::SubmitUnlitRange(int detailPass, GridVertex* vertices, in
                     uv[0] = (packed >> 16) * scale;
                     uv[1] = (packed & 0xffff) * scale;
                 }
-                if (!terrain->renderer->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, 0x222, vertices, vertexCount, indices, indexCount, 0))
+                if (!terrain->renderer->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0x222, vertices, vertexCount, indices, indexCount, 0))
                     return;
             }
         } else {
@@ -793,7 +793,7 @@ void DrawableGridNode::SubmitUnlitRange(int detailPass, GridVertex* vertices, in
                     vertices[i].color = -1;
                     vertices[i].specular = 0;
                 }
-                if (!terrain->renderer->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, vertices, vertexCount, indices, indexCount, 0))
+                if (!terrain->renderer->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, vertices, vertexCount, indices, indexCount, 0))
                     return;
             } else {
                 int color = terrain->unlitColor;
@@ -802,7 +802,7 @@ void DrawableGridNode::SubmitUnlitRange(int detailPass, GridVertex* vertices, in
                     vertices[i].color = color;
                     vertices[i].specular = specular;
                 }
-                if (!terrain->renderer->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, vertices, vertexCount, indices, indexCount, 0))
+                if (!terrain->renderer->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, vertices, vertexCount, indices, indexCount, 0))
                     return;
             }
         }
@@ -824,7 +824,7 @@ void DrawableGridNode::SubmitUnlitRange(int detailPass, GridVertex* vertices, in
             }
         }
         terrain->ageManager->MarkUsed(&data->ageEntry);
-        if (!terrain->renderer->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, vertices, vertexCount, indices, indexCount, 0))
+        if (!terrain->renderer->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, vertices, vertexCount, indices, indexCount, 0))
             return;
     }
     terrain->indicesDrawn += indexCount;
@@ -862,17 +862,17 @@ void DrawableGridNode::SubmitLitRange(int detailPass, GridVertex* vertices, int 
     }
     if (terrain->qualityParamA < detail) {
         if (terrain->closeUpStateSet == 0) {
-            terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MINFILTER, D3DTFN_LINEAR);
-            terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MIPFILTER, D3DTFP_NONE);
+            terrain->renderer->SetTextureStageState(1, D3DTSS_MINFILTER, D3DTFN_LINEAR);
+            terrain->renderer->SetTextureStageState(1, D3DTSS_MIPFILTER, D3DTFP_NONE);
             terrain->closeUpStateSet = 1;
         }
     } else if (terrain->closeUpStateSet != 0) {
-        terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MINFILTER, reinterpret_cast<GridGameSettings*>(g_TrackGame)->minFilter);
-        terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MIPFILTER, reinterpret_cast<GridGameSettings*>(g_TrackGame)->mipFilter);
+        terrain->renderer->SetTextureStageState(1, D3DTSS_MINFILTER, reinterpret_cast<GridGameSettings*>(g_TrackGame)->minFilter);
+        terrain->renderer->SetTextureStageState(1, D3DTSS_MIPFILTER, reinterpret_cast<GridGameSettings*>(g_TrackGame)->mipFilter);
         terrain->closeUpStateSet = 0;
     }
     terrain->ageManager->MarkUsed(&data->ageEntry);
-    if (terrain->renderer->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, 0x222, vertices, vertexCount, indices, indexCount, 0)) {
+    if (terrain->renderer->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0x222, vertices, vertexCount, indices, indexCount, 0)) {
         terrain->indicesDrawn += indexCount;
         terrain->verticesDrawn += vertexCount;
     }

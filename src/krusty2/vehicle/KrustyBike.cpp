@@ -346,7 +346,7 @@ int KrustyBike::QueryControlInput(int control, int modifier)
         KbSensor* chat = race->chatOverlay;
         if (!chat || !chat->typing) {
             Bike::QueryControlInput(control, modifier);
-            return inputMap->UnknownVirtualSlot2(control, modifier);
+            return inputMap->IsControlDown(control, modifier);
         }
     }
     return 0;
@@ -618,7 +618,7 @@ int KrustyBike::EvaluateCrash(float dt, float noseOverLimit, int impact, float i
         crashReason = 12;
         return 1;
     }
-    if (!motionActive && inputMap && inputMap->UnknownVirtualSlot2(8, 0x3f)) {
+    if (!motionActive && inputMap && inputMap->IsControlDown(8, 0x3f)) {
         if (airborne && !crashState && frontWheel->penetration < -3.5f && rearWheel->penetration < -3.5f) {
             crashDirection = 2;
             crashReason = 1;
@@ -646,9 +646,9 @@ void KrustyBike::InitForceFeedback()
 {
     KbPad* pad = (KbPad*)inputMap->valueSource;
     if (pad && pad->deviceKind == 3) {
-        pad->UnknownVirtualSlot6(1, 10000, -1);
+        pad->CreateConstantForce(1, 10000, -1);
         pad = (KbPad*)inputMap->valueSource;
-        pad->UnknownVirtualSlot6(0, (int)(reinterpret_cast<KbGame*>(g_TrackGame)->feedbackSlider * 83.333336f), 70000);
+        pad->CreateConstantForce(0, (int)(reinterpret_cast<KbGame*>(g_TrackGame)->feedbackSlider * 83.333336f), 70000);
         forceFeedbackGain = reinterpret_cast<KbGame*>(g_TrackGame)->feedbackSlider * 0.04f;
     }
 }
@@ -668,18 +668,18 @@ void KrustyBike::UpdateForceFeedback()
             else if (force >= 10000)
                 force = 10000;
             pad = (KbPad*)inputMap->valueSource;
-            pad->UnknownVirtualSlot7(1, &params, force);
+            pad->SetConstantForce(1, &params, force);
             if (IsThrottleRequested())
-                ((KbPad*)inputMap->valueSource)->UnknownVirtualSlot12(1, 1, 0);
+                ((KbPad*)inputMap->valueSource)->StartEffect(1, 1, 0);
             else
-                ((KbPad*)inputMap->valueSource)->UnknownVirtualSlot11(1);
+                ((KbPad*)inputMap->valueSource)->StopEffect(1);
         }
         if (airborne) {
             g_kbPadActive = 1;
             return;
         }
         if (g_kbPadActive) {
-            ((KbPad*)inputMap->valueSource)->UnknownVirtualSlot12(0, 1, 0);
+            ((KbPad*)inputMap->valueSource)->StartEffect(0, 1, 0);
             g_kbPadActive = 0;
         }
     }
@@ -1976,17 +1976,17 @@ GameObject* KrustyBike::Load(int context, int engineName, const char* modelPath,
     field_0x15cc = 0;
     clockOffset = 0;
 
-    g_kbLatencyHiding = reinterpret_cast<KbGame*>(g_TrackGame)->UnknownVirtualSlot20("LatencyHiding", 1);
-    g_kbRateLimiting = reinterpret_cast<KbGame*>(g_TrackGame)->UnknownVirtualSlot20("RateLimiting", 1);
-    g_kbAllowWarping = reinterpret_cast<KbGame*>(g_TrackGame)->UnknownVirtualSlot20("AllowWarping", 1);
-    g_kbUseLatencyThreshold = reinterpret_cast<KbGame*>(g_TrackGame)->UnknownVirtualSlot20("UseLatencyThreshold", 0);
-    g_kbUseExtrapLimit = reinterpret_cast<KbGame*>(g_TrackGame)->UnknownVirtualSlot20("UseExtrapLimit", 1);
-    g_kbExtrapLimit = (float)reinterpret_cast<KbGame*>(g_TrackGame)->UnknownVirtualSlot20("ExtrapLimit", 100) * kbSecondsPerMillisecond;
-    g_kbLatencyThreshold = (float)reinterpret_cast<KbGame*>(g_TrackGame)->UnknownVirtualSlot20("LatencyThreshold", 500) * kbSecondsPerMillisecond;
-    g_kbWarpThreshold = (float)reinterpret_cast<KbGame*>(g_TrackGame)->UnknownVirtualSlot20("WarpThreshold", 200) * kbSecondsPerMillisecond;
-    g_kbUseTimeReceived = reinterpret_cast<KbGame*>(g_TrackGame)->UnknownVirtualSlot20("UseTimeReceived", 1);
-    g_kbAllowNegative = reinterpret_cast<KbGame*>(g_TrackGame)->UnknownVirtualSlot20("AllowNegative", 1);
-    g_kbInterpolate = reinterpret_cast<KbGame*>(g_TrackGame)->UnknownVirtualSlot20("Interpolate", 1);
+    g_kbLatencyHiding = reinterpret_cast<KbGame*>(g_TrackGame)->GetRegistryInt("LatencyHiding", 1);
+    g_kbRateLimiting = reinterpret_cast<KbGame*>(g_TrackGame)->GetRegistryInt("RateLimiting", 1);
+    g_kbAllowWarping = reinterpret_cast<KbGame*>(g_TrackGame)->GetRegistryInt("AllowWarping", 1);
+    g_kbUseLatencyThreshold = reinterpret_cast<KbGame*>(g_TrackGame)->GetRegistryInt("UseLatencyThreshold", 0);
+    g_kbUseExtrapLimit = reinterpret_cast<KbGame*>(g_TrackGame)->GetRegistryInt("UseExtrapLimit", 1);
+    g_kbExtrapLimit = (float)reinterpret_cast<KbGame*>(g_TrackGame)->GetRegistryInt("ExtrapLimit", 100) * kbSecondsPerMillisecond;
+    g_kbLatencyThreshold = (float)reinterpret_cast<KbGame*>(g_TrackGame)->GetRegistryInt("LatencyThreshold", 500) * kbSecondsPerMillisecond;
+    g_kbWarpThreshold = (float)reinterpret_cast<KbGame*>(g_TrackGame)->GetRegistryInt("WarpThreshold", 200) * kbSecondsPerMillisecond;
+    g_kbUseTimeReceived = reinterpret_cast<KbGame*>(g_TrackGame)->GetRegistryInt("UseTimeReceived", 1);
+    g_kbAllowNegative = reinterpret_cast<KbGame*>(g_TrackGame)->GetRegistryInt("AllowNegative", 1);
+    g_kbInterpolate = reinterpret_cast<KbGame*>(g_TrackGame)->GetRegistryInt("Interpolate", 1);
     stateIntervalElapsed = 0;
     stateIntervalLength = 0;
     firstPacketLatch = 1;
