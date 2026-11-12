@@ -158,3 +158,117 @@ Left as placeholders in wave 3:
 - `UnknownTextureFormatChoice`: only a forward declaration and a pointer use.
 - `UnknownParameterStream` stays a typedef of `FileStream`. Removing it moves
   lines, so it waits for a pass that checks the `__LINE__` users.
+
+## Wave 4
+
+Wave 4 names virtual slots of views and the COM interface types. The proof is
+the one wave 3 used: every affected translation unit was compiled with VC6
+from the base commit and from the renamed tree, and the objects compare equal
+once the old names are mapped to the new ones (IDENTICAL, NAME-ONLY, or
+NAME-ONLY-COMDAT-ORDER where VC6 emits the RTTI COMDATs in another order).
+
+### View slots
+
+A view is a stand-in declaration of a class that a caller reaches through a
+pointer; its padding slots exist only to number the one slot it calls. Where
+the object behind the view is established (RTTI, a vptr write, the
+constructor that builds it, or a retail VA already bound to a named method),
+slot N takes the canonical class's slot-N name. Every view is a single
+primary vtable at object_offset 0, and the canonical names are those of the
+class's own header. A slot that is itself a placeholder in the canonical
+class (GameObject 9 and 19, Game 12, SoultreePhysicsBaseObject 26 and 27)
+and every destructor slot keep their placeholder. Only the names change; the
+views stay separate types (merging them is a type change).
+
+| Old name | New name | Class / slot / object_offset | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| `UnknownTrackRecordListBox::UnknownVirtualSlotN` (TrackRecordDlg.h) | UIListBox's names for slots 1-65 (63 slots, e.g. 1 `AddRef`, 65 `SetSelectedRow`) | `UnknownTrackRecordListBox` primary vtable (object_offset 0) as `UIListBox` | 2 | slot 66 is UIListBox::ReportClick; only UIListBox/UIDDLListBox have a slot 66 |
+| `TireVehicle::UnknownVirtualSlotN` (Tire.h) | Vehicle's names for slots 0-47 (46 slots, e.g. 0 `UpdateMass`, 47 `GetDriveShareScale`) | `TireVehicle` primary vtable (object_offset 0) as `Vehicle` | 2 | Vehicle.cpp passes this to 0x00513f90; slot 47 is Vehicle's pure GetDriveShareScale |
+| `KbGame::UnknownVirtualSlotN` (KrustyBikeTypes.h) | Game's names for slots 1-20 (19 slots, e.g. 1 `Startup`, 20 `GetRegistryInt`) | `KbGame` primary vtable (object_offset 0) as `Game` | 2 | slot 20 takes (setting name, default) like Game::GetRegistryInt |
+| `KbPad::UnknownVirtualSlotN` (KrustyBikeTypes.h) | JoystickDevice's names for slots 0-12 (12 slots, e.g. 0 `RemoveBindings`, 12 `StartEffect`) | `KbPad` primary vtable (object_offset 0) as `JoystickDevice` | 2 | ControlInterface activeJoystick (+0x0c); force-feedback slots 6/7/11/12 |
+| `VehicleValueSource::UnknownVirtualSlotN` (Vehicle.h) | JoystickDevice's names for slots 0-16 (16 slots, e.g. 0 `RemoveBindings`, 16 `ResetForceFeedback`) | `VehicleValueSource` primary vtable (object_offset 0) as `JoystickDevice` | 2 | ControlInterface activeJoystick (+0x0c) |
+| `VehicleKeyTable::UnknownVirtualSlotN` (Vehicle.h) | 0 `RemoveBindings`, 2 `CreateDevice`, 3 `DetectSubtype`, 4 `IsControlDown`, 5 `IsButtonDown` | `VehicleKeyTable` primary vtable (object_offset 0) as `KeyboardDevice` | 2 | ControlInterface keyboard (+0x34) |
+| `VehicleInputMap::UnknownVirtualSlotN` (Vehicle.h) | 1 `CreateDevices`, 2 `IsControlDown`, 3 `IsDeviceButtonDown` | `VehicleInputMap` primary vtable (object_offset 0) as `ControlInterface` | 2 | Vehicle+0x468 is the ControlInterface |
+| `VehicleSparkEmitter::UnknownVirtualSlotN` (Vehicle.h) | SparkParticleEmitter's names for slots 1-26 (24 slots, e.g. 1 `AddRef`, 26 `MarkPendingRelease`) | `VehicleSparkEmitter` primary vtable (object_offset 0) as `SparkParticleEmitter` | 2 | SparkParticleEmitter (vtable 0x00555c1c, ctor 0x004b9830) |
+| `BikeParticleEmitterView::UnknownVirtualSlotN` (Bike.h) | DustParticleEmitter's names for slots 1-26 (24 slots, e.g. 1 `AddRef`, 26 `MarkPendingRelease`) | `BikeParticleEmitterView` primary vtable (object_offset 0) as `DustParticleEmitter` | 2 | Dust/DirtChunk/Steam particle emitters (ParticleEmitters.h, GameObject slots) |
+| `UnknownEcoCamera::UnknownVirtualSlotN` (EcoSystem.h) | Camera's names for slots 1-26 (24 slots, e.g. 1 `AddRef`, 26 `MarkPendingRelease`) | `UnknownEcoCamera` primary vtable (object_offset 0) as `Camera` | 2 | Camera at renderContext+0x08; slots 27-32 already Camera's |
+| `UnknownEcoTrackGame::UnknownVirtualSlotN` (EcoSystem.h) | Game's names for slots 1-19 (18 slots, e.g. 1 `Startup`, 19 `SwitchDisplayMode`) | `UnknownEcoTrackGame` primary vtable (object_offset 0) as `Game` | 2 | slots 20-22 already Game's GetRegistryInt/Float/Flag |
+| `UnknownKeyboardBoolView::UnknownVirtualSlotN` (ControlInterface.h) | 0 `RemoveBindings`, 2 `CreateDevice`, 3 `DetectSubtype`, 4 `IsControlDown`, 5 `IsButtonDown` | `UnknownKeyboardBoolView` primary vtable (object_offset 0) as `KeyboardDevice` | 2 | ControlInterface keyboard (+0x34); slot 5 IsButtonDown(DIK code) |
+| `UnknownJoystickBoolView::UnknownVirtualSlotN` (FollowCamera.h) | 0 `RemoveBindings`, 2 `IsButtonDown`, 3 `GetPovAngle`, 4 `GetPovDirection` | `UnknownJoystickBoolView` primary vtable (object_offset 0) as `JoystickDevice` | 2 | ControlInterface activeJoystick (+0x0c); slot 4 (index, *x, *y) = GetPovDirection |
+| `UnknownPodiumArcade::UnknownVirtualSlotN` (Group1_PodiumScene.cpp) | 1 `AddRef`, 2 `Release`, 3 `GetRefCount`, 4 `Disable`, 5 `Enable` | `UnknownPodiumArcade` primary vtable (object_offset 0) as `GameObject` | 2 | ArcadeObject : GameObject (RTTI) |
+| `UnknownPodiumArcade::UnknownVirtualSlotN` (EventManagerNearMisses.cpp) | 1 `AddRef`, 2 `Release`, 3 `GetRefCount`, 4 `Disable`, 5 `Enable` | `UnknownPodiumArcade` primary vtable (object_offset 0) as `GameObject` | 2 | ArcadeObject : GameObject (RTTI) |
+| `UnknownGuiControl::UnknownVirtualSlotN` (GUIManager.h) | UIControl's names for slots 27-33 (7 slots, e.g. 27 `AdvanceImages`, 33 `KillFocus`) | `UnknownGuiControl` primary vtable (object_offset 0) as `UIControl` | 2 | dialog control; 31 int (focus), 32/33 take a control like EnterHover/LeaveHover/KillFocus |
+| `ShadowTexture::UnknownVirtualSlotN` (ProjectedShadow.h) | PCTextureMap's names for slots 5-12 (8 slots, e.g. 5 `LoadSurface`, 12 `RecreateIfLost`) | `ShadowTexture` primary vtable (object_offset 0) as `PCTextureMap` | 2 | built by PCTextureMap's constructor 0x004c5f00 |
+| `ParticleTexture::UnknownVirtualSlotN` (ParticleManager.h) | 4 `CreateSurface`, 5 `LoadSurface`, 6 `Clone`, 7 `IsResident`, 8 `CreateTextureSurface` | `ParticleTexture` primary vtable (object_offset 0) as `TextureMap` | 2 | TextureMap returned by 0x0050a590 |
+| `ShadowCameraProxy::UnknownVirtualSlotN` (ProjectedShadow.h) | 27 `TakeScreenshot`, 28 `UpdateMatrices`, 29 `LookAt` | `ShadowCameraProxy` primary vtable (object_offset 0) as `Camera` | 2 | ShadowCamera ctor 0x004da520 (ShadowCamera : PCCamera : Camera) |
+| `VisibilityView::UnknownVirtualSlotN` (VisibilityQuadTree.h) | RenderTarget's names for slots 1-6 (6 slots, e.g. 1 `BeginScene`, 6 `GetTextureStageState`) | `VisibilityView` primary vtable (object_offset 0) as `RenderTarget` | 2 | renderer at camera+0x18; slot 7 SetTextureStageState |
+| `VisibilityRenderer::UnknownVirtualSlotN` (VisibilityQuadTree.h) | RenderTarget's names for slots 1-15 (15 slots, e.g. 1 `BeginScene`, 15 `DrawIndexedPrimitive`) | `VisibilityRenderer` primary vtable (object_offset 0) as `RenderTarget` | 2 | renderer at camera+0x18; slot 16 draws a primitive |
+| `GridRenderDevice::UnknownVirtualSlotN` (Griddraw.h) | RenderTarget's names for slots 1-15 (15 slots, e.g. 1 `BeginScene`, 15 `DrawIndexedPrimitive`) | `GridRenderDevice` primary vtable (object_offset 0) as `RenderTarget` | 2 | renderer at Terrain+0x18; slots 7/8/15 match RenderTarget |
+| `CollisionDebugDevice::UnknownVirtualSlotN` (CollisionObject.cpp) | RenderTarget's names for slots 1-10 (10 slots, e.g. 1 `BeginScene`, 10 `SetTextureBlend`) | `CollisionDebugDevice` primary vtable (object_offset 0) as `RenderTarget` | 2 | renderer at renderContext; slots 7/8/10 match RenderTarget |
+| `UnknownScenePhysicsBody::UnknownVirtualSlotN` (SceneManagerNearMisses.cpp) | SoultreePhysicsObject's names for slots 0-40 (39 slots, e.g. 0 `UpdateMass`, 40 `LoadPhysicsModel`) | `UnknownScenePhysicsBody` primary vtable (object_offset 0) as `SoultreePhysicsObject` | 2 | ctor 0x005037c0 writes the SoultreePhysicsObject vtables (object_offset 0) |
+| `UnknownTrackGameObject56cItem::UnknownVirtualSlotN` (TrackGame.h) | UIDialog's names for slots 1-26 (24 slots, e.g. 1 `AddRef`, 26 `MarkPendingRelease`) | `UnknownTrackGameObject56cItem` primary vtable (object_offset 0) as `UIDialog` | 2 | its EndDialog is UIDialog::EndDialog 0x0046ff30 |
+| `UIStatic::UnknownVirtualSlotN` (CompilerShapeProbe.cpp) | 30 `IsInteractive` | `UIStatic` primary vtable (object_offset 0) as `UIControl` | 2 | same retail VA 0x00478fe0 as UIStatic::IsInteractive (GameUi.h) |
+| `UIMultiState::UnknownVirtualSlotN` (CompilerShapeProbe.cpp) | 34 `GetControlText`, 35 `GetTextLength`, 36 `GetTextLines`, 37 `GetTextExtent` | `UIMultiState` primary vtable (object_offset 0) as `UIControl` | 2 | same retail VAs 0x00478260..0x004782c0 as UIMultiState slots 34-37 (GameUi.h) |
+| `ParticleDirect3D::UnknownVirtualSlotN` (ParticleManager.h) | 3 `EnumDevices`, 4 `CreateDevice` | `ParticleDirect3D` primary vtable (object_offset 0) as `IDirect3D7` | 2 | slot 5 is CreateVertexBuffer(desc, &vb, flags): only IDirect3D7 puts it at 5; its 3/4 are EnumDevices/CreateDevice |
+
+### COM interface types
+
+Each type is a slot-ordered view of a COM interface (`this` on the stack,
+`__stdcall`). Every decoded slot index and argument count matches the
+DirectX 7 / DirectShow SDK interface named, and the IID the game passes (in
+`.rdata`; DirectXGuids.cpp holds the ones the bundled DXGUID.LIB lacks) or
+the creating call identifies the interface. The names drop the SDK's `I`
+prefix, as `DirectDrawSurface` did, so no SDK type is used and the mangled
+names stay ours. Uncalled slots keep `UnknownMethodN`.
+
+| Old name | New name | Interface | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| `UnknownDirectSound` | `DirectSound` | IDirectSound | 2 | Result of the `DirectSoundCreate` import (thunk `0x005330a0`); slot 3 CreateSoundBuffer(desc, &buffer, outer), 4 GetCaps (DSCAPS size 0x60), 5 DuplicateSoundBuffer, 6 SetCooperativeLevel |
+| `UnknownSoundBuffer` | `DirectSoundBuffer` | IDirectSoundBuffer | 2 | Created by `DirectSound` slot 3 with a 0x24-byte DSBUFFERDESC; GetCurrentPosition 4, GetStatus 9, Lock 11 (7 arguments), Play 12, SetCurrentPosition 13, SetVolume 15, SetFrequency 17, Stop 18, Unlock 19, Restore 20 |
+| `UnknownSound3DBuffer` | `DirectSound3DBuffer` | IDirectSound3DBuffer | 2 | Queried from a buffer with the bytes of IID_IDirectSound3DBuffer (`0x00556ca0`); SetAllParameters 12 through SetVelocity 20 in SDK order |
+| `UnknownSoundListener` | `DirectSound3DListener` | IDirectSound3DListener | 2 | Queried from the primary buffer with IID_IDirectSound3DListener (`0x00556c90`); SetDistanceFactor 11 through CommitDeferredSettings 17 |
+| `UnknownSoundNotify` | `DirectSoundNotify` | IDirectSoundNotify | 2 | Queried with IID_IDirectSoundNotify (`0x00556cd0`); slot 3 SetNotificationPositions(count, positions) |
+| `UnknownPropertySet` | `KsPropertySet` | IKsPropertySet | 2 | Queried with IID_IKsPropertySet (`0x00556ce0`); Set 4 and QuerySupport 5 with the EAX listener property set (`0x00556d20`) |
+| `UnknownSoundDevice` | `SoundDeviceRecord` | (not COM) | 2 | The 0xf0-byte record (GUID, 0x80-byte description, DSCAPS) that the `DirectSoundEnumerateA` callback `0x004be7b0` fills for up to four devices through `ProbeSoundDevice` (`0x004be2d0`) |
+| `UnknownDirectDrawInterface` | `DirectDraw` | IDirectDraw7 | 2 | IID_IDirectDraw7 (`0x005560b0`) with the `DirectDrawCreateEx` import; CreateClipper 4, CreatePalette 5, CreateSurface 6, EnumDisplayModes 8, GetCaps 11, GetDisplayMode 12, GetGDISurface 14, SetCooperativeLevel 20, SetDisplayMode 21 (5 arguments), WaitForVerticalBlank 22, GetAvailableVidMem 23, GetDeviceIdentifier 27 |
+| `UnknownDirect3DInterface` | `Direct3D` | IDirect3D7 | 2 | Queried from `DirectDraw` with IID_IDirect3D7 (`0x00556180`); CreateDevice 4 (GUID, surface, &device), EnumZBufferFormats 6 |
+| `UnknownRenderInterface` | `Direct3DDevice` | IDirect3DDevice7 | 2 | Created by `Direct3D` slot 4; BeginScene 5, EndScene 6, Clear 10 (6 arguments), SetTransform 11, SetViewport 13, SetMaterial 16, SetRenderState 20, DrawPrimitive 25, DrawIndexedPrimitive 26, DrawIndexedPrimitiveVB 32, SetTexture 35, SetTextureStageState 37, Load 43 |
+| `UnknownClipperInterface` | `DirectDrawClipper` | IDirectDrawClipper | 2 | Created by `DirectDraw` slot 4 CreateClipper; slot 8 SetHWnd(flags, window) |
+| `UnknownPaletteInterface` | `DirectDrawPalette` | IDirectDrawPalette | 2 | Created by `DirectDraw` slot 5 CreatePalette; released through slot 2 |
+| `UnknownGammaControlInterface` | `DirectDrawGammaControl` | IDirectDrawGammaControl | 2 | Queried from the primary surface with IID_IDirectDrawGammaControl (`0x00556140`); slot 4 SetGammaRamp(flags, ramp) |
+| `UnknownInputInterface` | `DirectInputDevice` | IDirectInputDevice7A | 2 | Created by IDirectInput7A::CreateDeviceEx (the `DirectInputCreateEx` import with IID_IDirectInput7A `0x005569e0`; IID_IDirectInputDevice7A at `0x00556a50`); Unacquire 8 before Release, CreateEffect 18, SendForceFeedbackCommand 22 |
+| `UnknownEffectInterface` | `DirectInputEffect` | IDirectInputEffect | 2 | Created by `DirectInputDevice` slot 18 CreateEffect; Start 7, Stop 8, GetEffectStatus 9 |
+| `UnknownMultiMediaStreamInterface` | `AMMultiMediaStream` | IAMMultiMediaStream | 2 | Created with CLSID_AMMultiMediaStream / IID_IAMMultiMediaStream (`0x00558ec0`/`0x00558ed0`); GetMediaStream 4, GetState 6, SetState 7, GetTime 8, GetDuration 9, Seek 10, Initialize 12, AddMediaStream 15, OpenFile 16 |
+| `UnknownMediaStreamInterface` | `DirectDrawMediaStream` | IDirectDrawMediaStream | 2 | Queried with IID_IDirectDrawMediaStream (`0x00558e90`); GetFormat 9, CreateSample 13 |
+| `UnknownStreamSampleInterface` | `DirectDrawStreamSample` | IDirectDrawStreamSample | 2 | Created by `DirectDrawMediaStream` slot 13 CreateSample; Update 6 (4 arguments), CompletionStatus 7 |
+
+Left as placeholders in wave 4:
+
+- `GameObject` slots 9 (`0x00469430`) and 19 (`0x00469530`) and `Game` slot 12
+  (`0x004688e0`, which returns the root object's slot 19): child-walking
+  dispatchers (child flags 0x01 and 0x100) whose event is not identified by a
+  literal, caller or override.
+- `FollowCamera` slots 55 and 56: the base bodies test DirectInput left Alt
+  and left Shift, but `KrustyBikeCamera` tests controls 0x0b and 0x0a, whose
+  names are not established; slot 56 enters camera state 7. Slot 50 returns a
+  point on the subject (the rider's head, or the vehicle raised by 5).
+- `Vehicle` slots 52, 77, 78 and 79, `KrustyBike` slot 27 (starts the tumble
+  or the animated wreck) and `SoultreePhysicsBaseObject` 26/27: roles come
+  only from call sites, and the base bodies are not known well enough.
+- `PhysicsBody` slots 31/32: setters of the unnamed fields +0x180 and +0x184.
+- `UIDialog` slot 30 (`0x00470040`): calls the optional callback at +0xd4,
+  whose role is unknown.
+- Shared stubs: `ShadowReceiver`, `D3DIMSoultreeShadow` and `TerrainShadow`
+  slots 27-30, `BackgroundImage` 27, `BaseQuarryEvent` 28/32/34,
+  `ConnectionInfoType` 1 (`ret`), `ShadowCamera` 19, `Terrain` 19,
+  `ConstraintMethodCollisionModel` 2, and `CollisionPoint`/`SoultreeContact`
+  slot 1.
+- Views whose object is not established: `KbSink`, `UnknownGameObjectOwnerPart`,
+  `UnknownFollowedRacerSlots` and the vbase racer views (`UnknownEventRacer`,
+  `UnknownVisualCueRacer`, `UnknownBikeRaceView6c`, `UnknownSceneObject`),
+  `VehicleTicker`, `BikeBodyObj` and the quadtree-head views.
+  `UnknownBikeRaceCharacter` is a `D3DIMSoultreeCharacter`, whose own slots are
+  still placeholders (`CharacterVirtualSlotN`), and `VehicleContactPoint` is a
+  `CollisionPoint`, whose slot 1 is a placeholder.
+- `UnknownSceneBuffer`: not an interface, only a count and an array of
+  `UnknownSceneCaster` at Scene+0xb8.
