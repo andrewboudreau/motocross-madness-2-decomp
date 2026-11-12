@@ -888,7 +888,7 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
             crossoverPose = lean;
             poseState = states[0]->poseState;
             if (reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent) {
-                if (lapGate == states[0]->lapGate - 1 || (lapGate == ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->field_0xac - 1 && states[0]->lapGate == 0))
+                if (lapGate == states[0]->lapGate - 1 || (lapGate == ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->gateCount - 1 && states[0]->lapGate == 0))
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
@@ -898,7 +898,7 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
                     if (prev != lapGate) {
                         if (lapGate == 0)
                             lapCount++;
-                        nextLapGate = (lapGate + 1) % ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->field_0xac;
+                        nextLapGate = (lapGate + 1) % ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->gateCount;
                         if (this == this->race->raceCamera->followedRacer)
                             ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->SelectLapGates(lapGate, nextLapGate, this);
                     }
@@ -983,7 +983,7 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
             crossoverPose = lean;
             poseState = interpSource->poseState;
             if (reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent) {
-                if (lapGate == interpSource->lapGate - 1 || (lapGate == ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->field_0xac - 1 && interpSource->lapGate == 0))
+                if (lapGate == interpSource->lapGate - 1 || (lapGate == ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->gateCount - 1 && interpSource->lapGate == 0))
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
@@ -993,7 +993,7 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
                     if (prev != lapGate) {
                         if (lapGate == 0)
                             lapCount++;
-                        nextLapGate = (lapGate + 1) % ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->field_0xac;
+                        nextLapGate = (lapGate + 1) % ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->gateCount;
                         if (this == this->race->raceCamera->followedRacer)
                             ((KbTrack*)reinterpret_cast<KbGame*>(g_TrackGame)->bajaEnduroEvent)->SelectLapGates(lapGate, nextLapGate, this);
                     }

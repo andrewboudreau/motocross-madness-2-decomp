@@ -14,7 +14,7 @@ struct UnknownBikeAIPath {
 };
 
 struct KbBikeMessage {
-    char field_0x00;
+    char type;                           // +0x00 SendRaw (0x004ad280) writes the type byte here
     unsigned char finishPosition;  // +0x1  KrustyBike+0x784 finishPosition (0x0049276c)
     short elapsedMs;                     // +0x02 ms since the state's last send (time - state->time)
     short lapCount;  // +0x4  KrustyBike+0x7a0 lapCount (0x004926f5)

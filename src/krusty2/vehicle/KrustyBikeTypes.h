@@ -83,7 +83,7 @@ struct KbNetBike {
 // KbBikeDeltaMessage's motion/flag and pose bytes).
 #pragma pack(push, 1)
 struct KbNetDelta {
-    char field_0x00;
+    char type;                   // +0x00 the message type byte (SendRaw 0x004ad280 writes it)
     signed char delta1[3];       // +0x01 x 15/64 -> KrustyBike+0x1364
     unsigned char step;          // +0x04 bit 0: units of 8, bits 1-7: count
     signed char delta3[3];       // +0x05 x pi/64 -> +0x137c..+0x1384
@@ -119,7 +119,7 @@ struct KbNetState {
 
 // Message type 10 (8 bytes): the bike's +0x11c0 flag and +0x768.
 struct KbBikePing {
-    char field_0x00;
+    char type;                   // +0x00 SendRaw (0x004ad280) writes the type byte here
     unsigned char loaderKind;    // +0x01 KrustyBike::loaderKind (+0x11c0)
     char pad_0x02[2];
     float score;                 // +0x04 KrustyBike::score (+0x768)
@@ -131,7 +131,7 @@ struct KbBikePing {
 // and message 1's pose and flag bytes.
 #pragma pack(push, 1)
 struct KbBikeDeltaMessage {
-    char field_0x00;
+    char type;                           // +0x00 SendRaw (0x004ad280) writes the type byte here
     signed char position[3];             // +0x01 x 64/15
     unsigned char coarse : 1;            // +0x04 the count is in units of 8 ms
     unsigned char count : 7;             //       ms since the last state
@@ -160,7 +160,7 @@ struct KbBikeDeltaMessage {
 
 // request: 1 for message 0x13 (this bike touched the followed racer), 0 for 0x87;
 // followedRacerId: the racer's netId (BikeRace.h's view names +0x8 followedRacerId).
-struct KbNetPacket { int field_0x0; char request; char pad_0x5[3]; int followedRacerId; };
+struct KbNetPacket { int header; char request; char pad_0x5[3]; int followedRacerId; };
 // On-screen message object (0x8C bytes; ctor 0x0051B200 takes the text and a display time).
 struct KbMessage { char data[0x8C]; KbMessage(const char* text, float seconds); };
 // The debug overlay at KbGame+0x38 (src/reconstructed DebugOverlay: 0x00447fa0 names a page
@@ -282,7 +282,7 @@ extern float g_kbStallHoldSec;       // 0x0056CB68  length of that hold
 // Track view behind KbGame+0x560 (tier 3): checkpoint count at +0xac.
 struct KbTrack {
     char pad_0x00[0xac];
-    int field_0xac;
+    int gateCount;  // +0xac the lap-gate modulus (nextLapGate = (lapGate + 1) % gateCount); RadarGateOwner names +0xac gateCount
     void SelectLapGates(int gate, int nextGate, KrustyBike* bike); // 0x00404DF0 (TrackGameViewOwner)
 };
 // BikeWheel view for 0x00513560 (tier 3 name).
