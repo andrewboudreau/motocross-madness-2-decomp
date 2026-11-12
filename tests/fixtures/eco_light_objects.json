@@ -17,22 +17,22 @@
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
       "relocations": 1273,
-      "sha256": "cb728b32aded0e614afa3935b7cc905effeedf8e451f992cc561570ea801de43"
+      "sha256": "1d131cc1daeaad58a5e094ec72ee690b89717548013429f687578b7a733b6d98"
     },
     "src/reconstructed/KrustyUI.cpp": {
       "sections": 317,
       "relocations": 1847,
-      "sha256": "7c73d545e52047e6a44f371a092ed84655a3728e2cc7f81df9a66527008805ec"
+      "sha256": "72aaccb30b3b8e010eff9c292bc6b66069dc636baa70fda1b38170635bc0e916"
     },
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 86,
       "relocations": 393,
-      "sha256": "c9a2c24aa7d6b19c19bc5b67c17de910c5e0158dcffe7024f5901aae7d4a3fc8"
+      "sha256": "6e23bd28160d4d28efe2895aec7a3c1de2da13a72bd809d94139008bc0642ee7"
     },
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,
       "relocations": 127,
-      "sha256": "11d88611c2cf4148d57b3e4ab78ede23fdca1d47117667cbb6734c8a3dd8de05"
+      "sha256": "021762947a883d3b0a6da8a100f2d13a379163e4520304d46c992a835dd3856c"
     },
     "src/reconstructed/D3DIMSoultreeModifier.cpp": {
       "sections": 23,
@@ -52,7 +52,7 @@
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,
       "relocations": 484,
-      "sha256": "bde786f0c576d9fe7e37272ff2e9a4f9952a9ee86c933d9a8c2286e69eaaf908"
+      "sha256": "d556f808c5647fbc0d57129258dece7612c9e8800ff6102207356d95d1c27f35"
     },
     "samples/render/D3DIMSoulTreeNearMisses.cpp": {
       "sections": 29,
@@ -67,7 +67,7 @@
     "samples/game/QuarryStuntEventLoaderNearMiss.cpp": {
       "sections": 50,
       "relocations": 435,
-      "sha256": "007c3d3b50139a8013e9a4bf80cbbd7af43e9aa47d8bc0cd838b4ee504b1d578"
+      "sha256": "33ae09de3a5ff69ae0a6aa233d5d636cb476e99192ebee1951c3879d25fb4378"
     }
   },
   "strict_cases": [

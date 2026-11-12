@@ -21,7 +21,7 @@
     "src/reconstructed/TrackOverlay.cpp": {
       "sections": 215,
       "relocations": 920,
-      "sha256": "26e6b5560443b6d837253cf1de59acbede995939a59b20f81ea0f952182ecb95"
+      "sha256": "6ad5278c80372dd85f4123a188812948667534949ecd598d859ae910b465c1e6"
     },
     "samples/render/CubeDrawNearMisses.cpp": {
       "sections": 5,
