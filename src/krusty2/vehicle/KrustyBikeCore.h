@@ -98,29 +98,29 @@ public:
     void StartAltTrick(int trick);   // 0x0048d990: the Alt clips, chained (motionIndex trick + 16)
     KrustyBike* FindNearestRival(float* outDistance);
     void LookBackAtNearestRival();
-    void Fn_004925A0(Vehicle* who, bool flag);
-    void Fn_00496E20(KbRecorder* recorder);
-    int Fn_00495C00();
+    void SendFollowedRacer(Vehicle* racer, bool request);   // 0x004925a0: message 0x13 (request) or 0x87
+    void SetNetRecorder(KbRecorder* recorder);              // 0x00496e20: stores netRecorder
+    int ReceivedPositionChanged();                          // 0x00495c00: remote; newest two states differ in (int)x or z
     void Fn_00496DA0();
     void Fn_00496D20();
     void Fn_00496F90(KrustyBike* other);
     void Fn_00497370(KrustyBike* other);
     float AwardTrickScore();
     // 0x004933e0: adds message 13's deltas to the decoded network state and copies it out.
-    void Fn_004933E0(const KbNetDelta* delta, KbNetState* state);
+    void ApplyStateDelta(const KbNetDelta* delta, KbNetState* state);
     void Fn_00496E30(int protect);
     // 0x00413200 (in BikeAI.cpp; called by slot 49 for AI bikes): one physics step of the
     // two-point look-ahead model 0x0040eca0 instead of the Vehicle step; returns 1.
     int Fn_00413200(float dt);
     // 0x0048d780 (samples/physics/bikeai/KrustyBikeTrickPick.cpp): called by 0x00414370.
     int PickTrick(int* outTrick, float maxTime, int group);
-    // 0x00493660 (8.5 KB) and 0x00492ad0: per-frame steps GameObject slot 10 runs (ret 8;
-    // tier 3 roles: the local/replayed update and the network update).
-    void Fn_00493660(float dt, int a);
-    void Fn_00492AD0(float dt, int a);
+    // 0x00493660 (8.5 KB): interpolates the received/recorded states (slot 10 for remote, replay
+    // and ghost bikes); 0x00492ad0: sends message 13 deltas or the full message 1 (ret 8 each).
+    void InterpolateNetworkState(float dt, int copyRaceProgress);
+    void SendStateDelta(float dt, int record);
     // 0x00492670 (ret 0xc; called three times by 0x00492ad0): sends (or records) message 1
     // with this bike's state and keeps a copy in `state`; `dt` is unused.
-    void Fn_00492670(KbBikeState* state, float dt, int record);
+    void SendFullState(KbBikeState* state, float dt, int record);
     // 0x0048fc80 (ret 0x7c = 31 argument dwords; not a vtable entry, like Vehicle::LoadVehicle):
     // the bike loader.  Runs Bike's loader 0x004079c0, then builds the collision bodies, the
     // trick animation tables, the network settings and the optional rider morph.  Returns the

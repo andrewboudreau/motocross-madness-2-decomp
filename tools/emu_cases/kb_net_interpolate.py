@@ -1,4 +1,4 @@
-"""KrustyBike::Fn_00493660 0x00493660, the remote/replay bike's state interpolation
+"""KrustyBike::InterpolateNetworkState 0x00493660, the remote/replay bike's state interpolation
 (tools/emu_diff.py case, call-record/replay mode).
 
 The linked body is the Group 3 bring-up copy (src/bringup/Group3_KrustyBike.cpp). Every call
@@ -17,7 +17,7 @@ enduro track.
 import struct
 
 RETAIL_VA = 0x00493660
-SYMBOL = '?Fn_00493660@KrustyBike@@QAEXMH@Z'
+SYMBOL = '?InterpolateNetworkState@KrustyBike@@QAEXMH@Z'
 SOURCE = 'src/bringup/Group3_KrustyBike.cpp'
 KB_VT = 0x00554548
 KB_VT2 = 0x00554514

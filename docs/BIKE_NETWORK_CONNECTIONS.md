@@ -32,7 +32,7 @@ KrustyBike `+0x13fc`. Retail RTTI places VCRInterface and GameObject at offset
 zero in KrustyVCR. QueueRecord's final argument is an unsigned byte count;
 changing the declaration from signed int and mutable data to unsigned int and
 const data retains the existing 32-bit argument representation and `RET 16`.
-In particular, `Fn_004925A0` continues to send a twelve-byte packet and queue
+In particular, `SendFollowedRacer` continues to send a twelve-byte packet and queue
 only **one byte** when its recorder branch executes. This observed behavior is
 preserved, not reinterpreted as a flag or repaired speculatively.
 

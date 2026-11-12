@@ -76,7 +76,7 @@ struct KbNetBike {
     char pad_0x0000[0x11bc];
     int netId;  // +0x11BC  KrustyBike::netId seen through the entity view
 };
-// 12-byte message built by KrustyBike::Fn_004925A0 (tier 3: the leading dword is never written).
+// 12-byte message built by KrustyBike::SendFollowedRacer (tier 3: the leading dword is never written).
 // Network message 13 (bikerace.cpp's 0x0041fb.. handlers pass it to 0x004933e0):
 // signed byte deltas of the four state vectors plus two raw ints at the unaligned
 // offsets +0x0e/+0x12 (tier 2 layout, tier 3 names).
@@ -497,9 +497,9 @@ struct KbPlayer {
     Vehicle* followedRacer;  // +0xa8 TrackGameViewOwner::followedRacer
     char pad_0x00AC[0x30];
     Vehicle* ball;           // +0xdc TrackGameViewOwner::ball (a ghost bike; "FREE BALL!" while set)
-    // 0x004A9E80 (TrackGameViewOwner::SetFollowedRacer): follows a after b; b is a vehicle
-    // (tested and read at +0x75c).
-    void Fn_004A9E80(Vehicle* a, Vehicle* b, int c);
+    // 0x004A9E80 (TrackGameViewOwner::SetFollowedRacer): follows racer after previous; previous
+    // is a vehicle (tested and read at +0x75c); tell sends message 0x87 through SendFollowedRacer.
+    void SetFollowedRacer(Vehicle* racer, Vehicle* previous, int tell);
 };
 // Bounds/collision body at Vehicle::field_0x128 (canonical: CollisionObject::TestMeshBounds).
 struct KbBody { int TestMeshBounds(KbBody* other); };

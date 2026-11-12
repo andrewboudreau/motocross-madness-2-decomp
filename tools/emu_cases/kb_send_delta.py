@@ -1,4 +1,4 @@
-"""KrustyBike::Fn_00492AD0 0x00492ad0, the message 13 delta sender (tools/emu_diff.py case).
+"""KrustyBike::SendStateDelta 0x00492ad0, the message 13 delta sender (tools/emu_diff.py case).
 
 The linked body is the Group 3 bring-up copy. The bike is filled with small random floats
 (so every byte-coded delta, pose byte and flag bit takes random values and the deltas fall on
@@ -6,14 +6,14 @@ both sides of the +-30 / +-2 pi limits), then the pointers and the tested values
 network and recorder present or not, record or network mode, the short / full interval
 timers, the clock gap (< 0x80, < 1000, >= 1000 ms), the event type, stunt mode and the ping
 timer. Stubs: ReadClock 0x004bfa80 (returns the state's time plus the chosen gap),
-Fn_00492670 (the full message), NetworkInterface::Send 0x004ac830, VCRInterface::QueueRecord
+SendFullState (the full message), NetworkInterface::Send 0x004ac830, VCRInterface::QueueRecord
 0x004e8720 (both note the message bytes they are handed) and virtual slot 51 (IsSpawnProtected).
 __ftol runs as retail code.
 """
 import struct
 
 RETAIL_VA = 0x00492ad0
-SYMBOL = '?Fn_00492AD0@KrustyBike@@QAEXMH@Z'
+SYMBOL = '?SendStateDelta@KrustyBike@@QAEXMH@Z'
 SOURCE = 'src/bringup/Group3_KrustyBike.cpp'
 TRACK_GAME = 0x0056e26c
 PROBES = {0x00492b03: 'record', 0x00492b74: 'short interval due', 0x00492c54: 'velocity fits',
@@ -56,7 +56,7 @@ def setup(ctx, c):
     def queue(cx, ecx, a):
         cx.note('message', cx.read(a[2], a[3]).hex())
     ctx.stub_at(0x004bfa80, 'ReadClock', ret=clock)
-    ctx.stub_at(0x00492670, 'Fn_00492670', pop=12)
+    ctx.stub_at(0x00492670, 'SendFullState', pop=12)
     ctx.stub_at(0x004ac830, 'NetworkInterface::Send', pop=20, ret=send)
     ctx.stub_at(0x004e8720, 'VCRInterface::QueueRecord', pop=16, ret=queue)
     slots = [ctx.stub('KrustyBike slot %d' % k) for k in range(64)]

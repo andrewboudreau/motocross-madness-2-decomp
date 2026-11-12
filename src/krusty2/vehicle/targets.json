@@ -2162,7 +2162,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_004925A0",
+    "candidate_symbol_contains": "SendFollowedRacer",
     "target_va": "0x004925a0",
     "target_size": 197,
     "expect": "exact",
@@ -2172,7 +2172,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_00496E20",
+    "candidate_symbol_contains": "SetNetRecorder",
     "target_va": "0x00496e20",
     "target_size": 13,
     "expect": "exact",
@@ -2182,7 +2182,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_00495C00",
+    "candidate_symbol_contains": "ReceivedPositionChanged",
     "target_va": "0x00495c00",
     "target_size": 151,
     "expect": "exact",
@@ -2292,7 +2292,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "?Fn_004933E0@KrustyBike@@",
+    "candidate_symbol_contains": "?ApplyStateDelta@KrustyBike@@",
     "target_va": "0x004933e0",
     "target_size": 634,
     "expect": "exact",
@@ -2392,7 +2392,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_00492670@KrustyBike",
+    "candidate_symbol_contains": "SendFullState@KrustyBike",
     "target_va": "0x00492670",
     "target_size": 1106,
     "expect": "exact",

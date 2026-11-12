@@ -33,7 +33,7 @@ int main() {
             Pattern(&actual,sizeof(actual),seed);expected=actual;
             KbRecorder* ptr=which==0?0:(KbRecorder*)(output+which*4);
             memcpy(expected.bytes+16+0x13fc,&ptr,4);
-            bike->Fn_00496E20(ptr);
+            bike->SetNetRecorder(ptr);
             if(memcmp(&actual,&expected,sizeof(actual)))return Fail("recorder",seed);
             ++count;
         }
@@ -49,7 +49,7 @@ int main() {
         bike->states[0]=&first;bike->states[1]=&second;
         expected=actual;KbBikeNetState firstBefore=first,secondBefore=second;
         int want=remote && cells[a]!=0 && cells[b]!=0 && (int)cells[a]!=(int)cells[b];
-        if(bike->Fn_00495C00()!=want || memcmp(&actual,&expected,sizeof(actual)) || memcmp(&first,&firstBefore,sizeof(first)) || memcmp(&second,&secondBefore,sizeof(second)))return Fail("cells",a*12+b);
+        if(bike->ReceivedPositionChanged()!=want || memcmp(&actual,&expected,sizeof(actual)) || memcmp(&first,&firstBefore,sizeof(first)) || memcmp(&second,&secondBefore,sizeof(second)))return Fail("cells",a*12+b);
         ++count;
     }
     const int deltas[]={-128,-127,-65,-1,0,1,63,64,126,127};
@@ -91,7 +91,7 @@ int main() {
         int time=bike->deltaBaseTime+elapsed;
         memcpy(expectBike+0x1388,&time,4);memcpy(expectState+0x4c,&time,4);
         memcpy(expectState+0x50,&d->field_0x0e,4);memcpy(expectState+0x48,&d->field_0x12,4);
-        bike->Fn_004933E0(d,(KbNetState*)state);
+        bike->ApplyStateDelta(d,(KbNetState*)state);
         if(memcmp(&actual,&expected,sizeof(actual)) || memcmp(output,wanted,sizeof(output)) || memcmp(packet,packetBefore,32)) {
             for(int q=0;q<(int)sizeof(actual);++q)if(actual.bytes[q]!=expected.bytes[q])printf("receiver %x %02x %02x\n",q-16,actual.bytes[q],expected.bytes[q]);
             return Fail("delta",seed*256+step);

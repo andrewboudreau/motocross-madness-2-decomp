@@ -352,22 +352,22 @@ int KrustyBike::QueryControlInput(int control, int modifier)
     return 0;
 }
 
-// 0x004925A0: tell the other peers (and the recorder) that this bike was hit by `who`.
-void KrustyBike::Fn_004925A0(Vehicle* who, bool flag)
+// 0x004925A0: message 0x13 (request: this bike touched the followed racer or ball) or 0x87 (the new followed racer, also recorded; BikeRace sets tagEvent->followedRacer from it).
+void KrustyBike::SendFollowedRacer(Vehicle* racer, bool request)
 {
     if (reinterpret_cast<KbGame*>(g_TrackGame)->network && !isRemote) {
         KbNetPacket pkt;
-        pkt.field_0x8 = who ? ((KbNetBike*)who)->netId : 0;
-        pkt.field_0x4 = flag;
-        reinterpret_cast<NetworkInterface*>(reinterpret_cast<KbGame*>(g_TrackGame)->network)->Send((unsigned char)(flag ? 0x13 : 0x87), &pkt, 12, ((KbNetBike*)this)->netId, 0);
-        if (!flag && netRecorder && reinterpret_cast<KbGame*>(g_TrackGame)->saveReplay && !reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay)
-            reinterpret_cast<VCRInterface*>(netRecorder)->QueueRecord(0x87, who ? ((KbNetBike*)who)->netId : 0, &pkt, 1);
+        pkt.field_0x8 = racer ? ((KbNetBike*)racer)->netId : 0;
+        pkt.field_0x4 = request;
+        reinterpret_cast<NetworkInterface*>(reinterpret_cast<KbGame*>(g_TrackGame)->network)->Send((unsigned char)(request ? 0x13 : 0x87), &pkt, 12, ((KbNetBike*)this)->netId, 0);
+        if (!request && netRecorder && reinterpret_cast<KbGame*>(g_TrackGame)->saveReplay && !reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay)
+            reinterpret_cast<VCRInterface*>(netRecorder)->QueueRecord(0x87, racer ? ((KbNetBike*)racer)->netId : 0, &pkt, 1);
     }
 }
 
 // 0x00495C00: true when the two newest received states (+0x11c8/+0x11cc), both with a
 // nonzero position x and z, differ in their integer x or z (tier 3 semantics).
-int KrustyBike::Fn_00495C00()
+int KrustyBike::ReceivedPositionChanged()
 {
     if (isRemote) {
         KbBikeNetState* newest = states[0];
@@ -383,7 +383,7 @@ int KrustyBike::Fn_00495C00()
     return 0;
 }
 
-void KrustyBike::Fn_00496E20(KbRecorder* recorder)
+void KrustyBike::SetNetRecorder(KbRecorder* recorder)
 {
     netRecorder = recorder;
 }
@@ -570,13 +570,13 @@ int KrustyBike::ResolveSubstepCollisions(int steps)
             Vehicle* followed = raceMode->followedRacer;
             if (followed) {
                 if (collisionObject->TestMeshBounds(followed->collisionObject))
-                    Fn_004925A0(this, 1);
+                    SendFollowedRacer(this, 1);
             } else if (raceMode->ball) {
                 if (collisionObject->TestMeshBounds(raceMode->ball->collisionObject)) {
                     if (reinterpret_cast<KbGame*>(g_TrackGame)->network->isHost)
-                        raceMode->Fn_004A9E80(this, 0, 1);
+                        raceMode->SetFollowedRacer(this, 0, 1);
                     else
-                        Fn_004925A0(this, 1);
+                        SendFollowedRacer(this, 1);
                 }
             }
         }
@@ -1425,7 +1425,7 @@ void KrustyBike::LookBackAtNearestRival()
 
 // 0x004933e0: the decoded network state (+0x1358..+0x1388) accumulates message 13's
 // byte deltas; the result is copied into *state.
-void KrustyBike::Fn_004933E0(const KbNetDelta* delta, KbNetState* state)
+void KrustyBike::ApplyStateDelta(const KbNetDelta* delta, KbNetState* state)
 {
     Vec3 d0(delta->delta0[0] * 0.234375f, delta->delta0[1] * 0.234375f, delta->delta0[2] * 0.234375f);
     Vec3 d1(delta->delta1[0] * 0.234375f, delta->delta1[1] * 0.234375f, delta->delta1[2] * 0.234375f);
@@ -1468,40 +1468,40 @@ int KrustyBike::Tick(float dt)
         return 1;
     if (reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay) {
         if (race->isRacing) {
-            Fn_00493660(dt, 1);
+            InterpolateNetworkState(dt, 1);
             if (race->replayMode == 4 && race->appliedReplayMode == 4)
                 GameObject::Tick(dt);
         }
     } else if (isRemote) {
-        Fn_00493660(dt, 0);
+        InterpolateNetworkState(dt, 0);
         if (race->recorderTickDue)
-            Fn_00492AD0(dt, 1);
+            SendStateDelta(dt, 1);
         GameObject::Tick(dt);
     } else if (reinterpret_cast<KbGame*>(g_TrackGame)->raceMode == 4) {
         if (isGhost) {
-            Fn_00493660(dt, 1);
-            if (Fn_00495C00())
+            InterpolateNetworkState(dt, 1);
+            if (ReceivedPositionChanged())
                 GameObject::Tick(dt);
         } else {
             Vehicle::Tick(dt);
             if (race->recorderTickDue)
-                Fn_00492AD0(dt, 1);
+                SendStateDelta(dt, 1);
         }
     } else {
         Vehicle::Tick(dt);
         if (race->recorderTickDue)
-            Fn_00492AD0(dt, 1);
+            SendStateDelta(dt, 1);
         if (reinterpret_cast<KbGame*>(g_TrackGame)->playerCount > 1)
-            Fn_00492AD0(dt, 0);
+            SendStateDelta(dt, 0);
     }
     if (reinterpret_cast<KbGame*>(g_TrackGame)->eventType == 4) {
         KbPlayer* raceMode = reinterpret_cast<KbPlayer*>(reinterpret_cast<EventManager*>(
             reinterpret_cast<KbGame*>(g_TrackGame)->eventManager)->FindRaceMode());
         if (raceMode->ball && raceMode->followedRacer == this && crashState) {
             if (reinterpret_cast<KbGame*>(g_TrackGame)->network->isHost)
-                raceMode->Fn_004A9E80(0, this, 1);
+                raceMode->SetFollowedRacer(0, this, 1);
             else
-                Fn_004925A0(0, 1);
+                SendFollowedRacer(0, 1);
         }
     }
     if (spawnProtectEndPending && !isRemote && race->isRacing) {
@@ -1556,7 +1556,7 @@ int KrustyBike::Tick(float dt)
 // 0x00492670: sends this bike's state as message 1 (to every peer, or into the recorder when
 // `record` is set) and keeps what was sent in `state`; without a recorder, peers also get
 // message 10 every two seconds in modes 0 and 4.
-void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
+void KrustyBike::SendFullState(KbBikeState* state, float dt, int record)
 {
     if (!reinterpret_cast<KbGame*>(g_TrackGame)->network && (!record || !netRecorder))
         return;

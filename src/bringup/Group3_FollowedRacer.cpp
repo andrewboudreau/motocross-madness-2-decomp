@@ -1,5 +1,5 @@
 // Link bring-up definition (best-guess admission, see docs/GAME_BUILD.md):
-// KbPlayer::Fn_004A9E80 = TrackGameViewOwner::SetFollowedRacer (0x004a9e80, 0x110
+// KbPlayer::SetFollowedRacer = TrackGameViewOwner::SetFollowedRacer (0x004a9e80, 0x110
 // bytes, ret 0xc), FollowRacer.cpp's code.  KrustyBike.cpp reaches it through its
 // KbPlayer view (src/krusty2/vehicle/KrustyBikeTypes.h); the near-miss body for the
 // TrackGameViewOwner view is in samples/race/FollowRacerNearMisses.cpp.
@@ -44,10 +44,10 @@ struct Group3FollowRaceView {
 // fstp-after-first-push scheduling difference recorded in the sample.
 #define RACE_VIEW() (*(Group3FollowRaceView**)((char*)this + 0x34))
 
-void KbPlayer::Fn_004A9E80(Vehicle* a, Vehicle* b, int c)
+void KbPlayer::SetFollowedRacer(Vehicle* racerVehicle, Vehicle* previousVehicle, int tell)
 {
-    KrustyBike* racer = (KrustyBike*)a;
-    KrustyBike* previous = (KrustyBike*)b;
+    KrustyBike* racer = (KrustyBike*)racerVehicle;
+    KrustyBike* previous = (KrustyBike*)previousVehicle;
 
     if (previous) {
         previous->totalTagRun += previous->tagRun;
@@ -63,8 +63,8 @@ void KbPlayer::Fn_004A9E80(Vehicle* a, Vehicle* b, int c)
             ball->asleep = 0;
     }
     *(float*)((char*)this + 0xac) = 5.0f;
-    if (c)
-        RACE_VIEW()->localRacer->Fn_004925A0(racer, false);
+    if (tell)
+        RACE_VIEW()->localRacer->SendFollowedRacer(racer, false);
     if (racer) {
         RACE_VIEW()->raceSound->PlayItSound();
         racer->SetSpawnProtection(1, 5.0f, 0);

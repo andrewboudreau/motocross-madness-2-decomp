@@ -22,7 +22,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBikeNearMisses.cpp",
-    "candidate_symbol_contains": "Fn_00492AD0@KrustyBike",
+    "candidate_symbol_contains": "SendStateDelta@KrustyBike",
     "target_va": "0x00492ad0",
     "target_size": 2315,
     "expect": "partial",
@@ -32,7 +32,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBikeNearMisses.cpp",
-    "candidate_symbol_contains": "Fn_00493660@KrustyBike",
+    "candidate_symbol_contains": "InterpolateNetworkState@KrustyBike",
     "target_va": "0x00493660",
     "target_size": 8545,
     "expect": "partial",

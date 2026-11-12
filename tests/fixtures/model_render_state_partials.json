@@ -147,7 +147,7 @@
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "Fn_00492AD0@KrustyBike",
+      "SendStateDelta@KrustyBike",
       4795088,
       2315,
       2312,
@@ -156,7 +156,7 @@
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "Fn_00493660@KrustyBike",
+      "InterpolateNetworkState@KrustyBike",
       4798048,
       8545,
       8558,

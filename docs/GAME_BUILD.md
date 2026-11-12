@@ -808,7 +808,7 @@ The sample column is the standalone object's score.
 | 0x00456890 | `Vegetation::TestDistance` | 0.953 | 0.991 | 0.991 | bring-up copy |
 | 0x00497e20 | `KrustyBikeCamera::Tick` | 0.938 | 0.979 | 0.979 | bring-up copy |
 | 0x0048eea0 | `KrustyBike::UpdateRiderPose` | 0.958 | 0.971 | 0.971 | bring-up copy |
-| 0x00493660 | `KrustyBike::Fn_00493660` | 0.987 | 0.989 | 0.989 | bring-up copy |
+| 0x00493660 | `KrustyBike::InterpolateNetworkState` | 0.987 | 0.989 | 0.989 | bring-up copy |
 | 0x004da7b0 | `ProjectedShadow::Init` | 0.892 | 0.992 | 0.992 | bring-up copy (sample file since) |
 | 0x004db0d0 | `ProjectedShadow::ComputeBounds` | 0.924 | 0.985 | 0.985 | bring-up copy (sample file since) |
 
@@ -903,7 +903,7 @@ masked scores from `linked_accuracy.py`, before and after.
 | VA | Function | Provider | Before | After | Built/retail insns |
 |---|---|---|---|---|---|
 | 0x00481de0 | `DrawableGridNode::WalkVisibilityQuadrants` | GriddrawNearMisses | 0.725 | 0.733 | 499/500 |
-| 0x004a9e80 | `KbPlayer::Fn_004A9E80` | Group3_FollowedRacer | 0.735 | 0.987 | 78/78 |
+| 0x004a9e80 | `KbPlayer::SetFollowedRacer` | Group3_FollowedRacer | 0.735 | 0.987 | 78/78 |
 | 0x00423ef0 | `GR_BitString::ReadBits` | BitStringRead | 0.218 | 0.505 | 50/45 |
 | 0x004a1b00 | `TransformPoints` | Group0_Math | 0.275 | 0.336 | 67/76 |
 | 0x004d0d40 | `Convert555To8Fast` | Group0_Pixtrans | 0.369 | 0.418 | 51/83 |
@@ -917,7 +917,7 @@ masked scores from `linked_accuracy.py`, before and after.
   16 at depth 0, so the old test skipped the first subdivision, the halved
   size 8. There, an empty count did not clear the mask, and a new count did
   not set `changed`.
-- **Fn_004A9E80.** The race view at +0x34 is reread at every use, as retail
+- **SetFollowedRacer.** The race view at +0x34 is reread at every use, as retail
   does, and the best run is compared through locals. Only the known
   `fstp` scheduling difference is left (samples/race/FollowRacerNearMisses.cpp).
 - **ReadBits, TransformPoints, Convert555To8Fast.** No behaviour difference
@@ -1258,7 +1258,7 @@ hull/model pairs and their swept forms 0x00436af0..0x00438550,
 `UIButton`/`UIMultiState::ContainsPoint` 0x004734c0/0x00478e10 (600 each),
 `D3DIMSoultreeObject::Scale` 0x004fd340 (800),
 `ProjectedShadow::ComputeBounds` 0x004db0d0 (600),
-`KrustyBike::IsSpeedGainBelowLimit` 0x004919a0, `Fn_00492AD0` and `Vegetation::GetCollisionObject` 0x004570a0
+`KrustyBike::IsSpeedGainBelowLimit` 0x004919a0, `SendStateDelta` and `Vegetation::GetCollisionObject` 0x004570a0
 (1000 each).
 
 `BoxTriangleQuery` 0x00426be0 differed only at 53-bit precision, and only in
@@ -1297,7 +1297,7 @@ nothing about the callees.
 |---|---|---|---|---|
 | 0x0052a940 | `Vehicle::SimulateFrame` (slot 49) | `vehicle_simulate_frame` | 100 | 0 |
 | 0x00413200 | `KrustyBike::Fn_00413200` (AI physics step) | `kb_ai_step` | 300 | 0 after the fix below (20 of 100 at 53-bit before) |
-| 0x00493660 | `KrustyBike::Fn_00493660` (remote state interpolation) | `kb_net_interpolate` | 200 | 0 |
+| 0x00493660 | `KrustyBike::InterpolateNetworkState` (remote state interpolation) | `kb_net_interpolate` | 200 | 0 |
 | 0x004685d0 | `Game::Tick` (samples/game/GameTick.cpp, read-only) | `game_tick` | 200 | 0 |
 | 0x0040eca0 | `SimulateLookAhead` (AI two-wheel look-ahead) | `kb_look_ahead` | 200 | 0, exact at both control words after the fixes below (139 of 200 at 24-bit before) |
 | 0x004a3c80 | `MorphBastardModifier::ControllerAngles` | `morph_controller_angles` | 500 | 0 after the two fixes below (1 and 8 of 40 at 53/24-bit before) |
@@ -1415,7 +1415,7 @@ the counter-derived timer words out of the write comparison.
 
 Perturbation controls all differ:
 - a `SimulateFrame` constant 0.85 to 0.86 (22 of 120);
-- the `Fn_00493660` replay lag 0.27 to 0.28 (4 of 400);
+- the `InterpolateNetworkState` replay lag 0.27 to 0.28 (4 of 400);
 - the `Fn_00413200` steer division turned into a multiplication (12);
 - the `Game::Tick` frame clamp 0.2 to 0.25 (96).
 
@@ -1496,7 +1496,7 @@ both control words. These agreed with retail in every run (runs in brackets):
   0x00415640, `BuildStatusList` 0x004e5d00, `PCLastRaceDlg::PayOutRace`
   0x004d8c40, `TrackGameViewOwner::PickFollowedRacer` 0x004a9d20 and
   `KrustyBike::SelectRiderPose` 0x0048e3e0 (600 each),
-  `TrackGameMode::ResetDefaults` 0x00522440 (200), `KbPlayer::Fn_004A9E80`
+  `TrackGameMode::ResetDefaults` 0x00522440 (200), `KbPlayer::SetFollowedRacer`
   0x004a9e80 (100).
 - Cameras and input: `Camera::UpdateMatrices` 0x0042ee30 (120),
   `FollowCamera::Tick` 0x00465c20 (160), `ProcessCameraInput` 0x00463a30

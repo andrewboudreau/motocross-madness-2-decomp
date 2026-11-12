@@ -1356,21 +1356,21 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "Fn_004925A0",
+      "symbol": "SendFollowedRacer",
       "va": "0x4925a0",
       "extent": 197,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "Fn_00496E20",
+      "symbol": "SetNetRecorder",
       "va": "0x496e20",
       "extent": 13,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "Fn_00495C00",
+      "symbol": "ReceivedPositionChanged",
       "va": "0x495c00",
       "extent": 151,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1447,7 +1447,7 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "?Fn_004933E0@KrustyBike@@",
+      "symbol": "?ApplyStateDelta@KrustyBike@@",
       "va": "0x4933e0",
       "extent": 634,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1517,7 +1517,7 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "Fn_00492670@KrustyBike",
+      "symbol": "SendFullState@KrustyBike",
       "va": "0x492670",
       "extent": 1106,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1839,7 +1839,7 @@
     },
     {
       "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "symbol": "Fn_00492AD0@KrustyBike",
+      "symbol": "SendStateDelta@KrustyBike",
       "va": "0x492ad0",
       "extent": 2315,
       "candidate": 2312,
@@ -1847,7 +1847,7 @@
     },
     {
       "source": "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "symbol": "Fn_00493660@KrustyBike",
+      "symbol": "InterpolateNetworkState@KrustyBike",
       "va": "0x493660",
       "extent": 8545,
       "candidate": 8558,

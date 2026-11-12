@@ -7,7 +7,7 @@
 //   UnknownBikeRaceMesh::SetPositionVec3   0x004fc630 = D3DIMSoultreeObject::SetPositionVec3
 //   UnknownBikeRaceModel::GetPosition      0x004fc970 = SoultreeObject::GetPosition
 //   UnknownBikeRaceProjector::QueryGround  0x00507c10 = Terrain::QueryGround
-//   UnknownBikeRaceRacer::UnknownFunction496e20 0x00496e20 = KrustyBike::Fn_00496E20
+//   UnknownBikeRaceRacer::UnknownFunction496e20 0x00496e20 = KrustyBike::SetNetRecorder
 //     (the racer pointer is KrustyBike's primary pointer; docs/BIKE_RACE_STATE_CONNECTIONS.md)
 //   UnknownBikeRaceModel::ReplaceMaterialTexture 0x00444c70 = D3DIMSoultreeObject::ReplaceMaterialTexture
 //   UnknownBikeRaceRacer::Load             0x0048fc80 = KrustyBike::Load (ret 0x7c both)
@@ -57,7 +57,7 @@ public:
 
 class KrustyBike {
 public:
-    void Fn_00496E20(KbRecorder* recorder);
+    void SetNetRecorder(KbRecorder* recorder);
     GameObject* Load(int context, int a2, const char* modelPath, const SoultreeLoadDesc* desc, int a5,
                      int a6, Vec3 startPosition, Vec3 forward, Vec3 up, int terrainProbe,
                      VehicleInputMap* map, unsigned char kind, unsigned char remote, KbRace* race,
@@ -131,7 +131,7 @@ void UnknownBikeRaceProjector::QueryGround(Vector3* point, Vector3* normal, int 
 // netRecorder (KbRecorder is KrustyBike.h's view of the same object).
 void UnknownBikeRaceRacer::UnknownFunction496e20(KrustyVCR* vcr)
 {
-    reinterpret_cast<KrustyBike*>(this)->Fn_00496E20(reinterpret_cast<KbRecorder*>(vcr));
+    reinterpret_cast<KrustyBike*>(this)->SetNetRecorder(reinterpret_cast<KbRecorder*>(vcr));
 }
 
 int UnknownBikeRaceModel::ReplaceMaterialTexture(int index, const char* name, int textures)

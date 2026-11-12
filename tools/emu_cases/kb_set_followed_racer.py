@@ -1,4 +1,4 @@
-"""KbPlayer::Fn_004A9E80 0x004a9e80 = TrackGameViewOwner::SetFollowedRacer(racer, previous, tell) (emu_diff case).
+"""KbPlayer::SetFollowedRacer 0x004a9e80 = TrackGameViewOwner::SetFollowedRacer(racer, previous, tell) (emu_diff case).
 
 The linked body is the bring-up copy (src/bringup/Group3_FollowedRacer.cpp). Offsets from the
 retail body: the owner's race view +0x34 (re-read at every use; its localRacer +0x38,
@@ -17,7 +17,7 @@ import math
 import random
 
 RETAIL_VA = 0x004a9e80
-SYMBOL = '?Fn_004A9E80@KbPlayer@@QAEXPAVVehicle@@0H@Z'
+SYMBOL = '?SetFollowedRacer@KbPlayer@@QAEXPAVVehicle@@0H@Z'
 SOURCE = 'src/bringup/Group3_FollowedRacer.cpp'
 PROBES = {0x004a9e8d: 'previous', 0x004a9ebc: 'run is best', 0x004a9ef0: 'ball', 0x004a9f0d: 'tell',
           0x004a9f1f: 'racer', 0x004a9f56: 'score bonus', 0x004a9f75: 'scoreboard'}
@@ -61,7 +61,7 @@ def setup(ctx, c):
     ball = ctx.alloc(0x200, fill=0x77)
     ctx.pack(owner + 0xdc, 'I', ball if c['ball'] else 0)
 
-    ctx.stub_at(0x004925a0, 'KrustyBike::Fn_004925A0', pop=8)
+    ctx.stub_at(0x004925a0, 'KrustyBike::SendFollowedRacer', pop=8)
     ctx.stub_at(0x004e5860, 'RaceSound::PlayItSound', pop=0)
     ctx.stub_at(0x004a9f90, 'TrackGameViewOwner::AnnounceFollowedRacer', pop=8)
     ctx.stub_at(0x0048d1e0, 'KbScoreBoard::ShowValue', pop=8)

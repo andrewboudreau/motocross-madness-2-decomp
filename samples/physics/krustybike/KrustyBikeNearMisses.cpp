@@ -162,7 +162,7 @@ static inline void KbSub(Vec3* out, const Vec3& a, const Vec3& b)
 // a literal 0, a boolean flag, explicit gotos to `deltas`, swapped branches, an inverted
 // test with an empty then-block and an explicit final return were tried.  Retail has three
 // physical full-send copies (two early ones with their own epilogues, the end block the
-// `je` early returns use); a physical `{ Fn_00492670(..); return; }` in both branches gives
+// `je` early returns use); a physical `{ SendFullState(..); return; }` in both branches gives
 // VC6's cross-jumping retail's local shape (`jne deltas` and `push 0; jmp home+1`) but it
 // keeps the first copy (record branch, inline) as the home and drops the end block
 // (2295 B, 78 differing instructions); `goto deltas` + inline calls move the block inline
@@ -182,7 +182,7 @@ static inline void KbSub(Vec3* out, const Vec3& a, const Vec3& b)
 // `scratchVector[1] += turnRate` and `KbCopy` before `state->angularVelocity.y += turnRate`
 // make VC6 load turnRate first (a plain aggregate copy before `.y +=` yields the
 // read-modify-write order instead).
-void KrustyBike::Fn_00492AD0(float dt, int record)
+void KrustyBike::SendStateDelta(float dt, int record)
 {
     if (!reinterpret_cast<KbGame*>(g_TrackGame)->network && (!record || !netRecorder))
         return;
@@ -323,15 +323,15 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                         }
                     }
                 }
-                Fn_00492670(state, reinterpret_cast<KbGame*>(g_TrackGame)->frameTime, record);
+                SendFullState(state, reinterpret_cast<KbGame*>(g_TrackGame)->frameTime, record);
                 return;
             }
-            Fn_00492670(state, reinterpret_cast<KbGame*>(g_TrackGame)->frameTime, record);
+            SendFullState(state, reinterpret_cast<KbGame*>(g_TrackGame)->frameTime, record);
             return;
         }
     }
 sendFull:
-    Fn_00492670(state, reinterpret_cast<KbGame*>(g_TrackGame)->frameTime, record);
+    SendFullState(state, reinterpret_cast<KbGame*>(g_TrackGame)->frameTime, record);
 }
 
 // Byte-coded pose values of message 1 are 0..255 (tier 3: 1/255 constant at 0x005511e4).
@@ -406,7 +406,7 @@ static inline int KbWithinWarpBandOf(float dist2, float limitSq, float frame, fl
 // for the pose lerps while the candidate reuses `d`. The 100.0f here is 0x5505ec;
 // 0x492670/0x492ad0 scale the message-1 pose bytes by 255.0f (0x551420), which the
 // bindings used to give the 100.0f key.
-void KrustyBike::Fn_00493660(float dt, int a)
+void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
 {
     Vec3 step;
     Vec3 delta;
@@ -796,7 +796,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
-                if (a) {
+                if (copyRaceProgress) {
                     int prev = lapGate;
                     lapGate = states[0]->lapGate;
                     if (prev != lapGate) {
@@ -814,13 +814,13 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
-                if (a)
+                if (copyRaceProgress)
                     lapCount = states[0]->lapCount;
             }
             if (states[0]->field_0x5c) {
                 lastLapTime = states[0]->lastLapTime;
                 fastestLap = states[0]->fastestLap;
-                if (a) {
+                if (copyRaceProgress) {
                     timeBehindLeader = states[0]->timeBehindLeader;
                     finishPosition = states[0]->finishPosition;
                 }
@@ -891,7 +891,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
-                if (a) {
+                if (copyRaceProgress) {
                     int prev = lapGate;
                     lapGate = interpSource->lapGate;
                     if (prev != lapGate) {
@@ -909,13 +909,13 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
-                if (a)
+                if (copyRaceProgress)
                     lapCount = interpSource->lapCount;
             }
             if (interpSource->field_0x5c) {
                 lastLapTime = interpSource->lastLapTime;
                 fastestLap = interpSource->fastestLap;
-                if (a) {
+                if (copyRaceProgress) {
                     timeBehindLeader = interpSource->timeBehindLeader;
                     finishPosition = interpSource->finishPosition;
                 }
@@ -987,7 +987,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
 
     if (g_kbInterpolate)
         stateIntervalElapsed = reinterpret_cast<KbGame*>(g_TrackGame)->frameTime + stateIntervalElapsed;
-    if (!a && !hasFinished) {
+    if (!copyRaceProgress && !hasFinished) {
         if (stateIntervalElapsed >= g_kbStallThreshold) {
             stallHoldTimer = g_kbStallHoldSec;
             SetSpawnProtection(1, 0.0f, 0);

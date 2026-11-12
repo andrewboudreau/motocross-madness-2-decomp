@@ -24,9 +24,9 @@ CALLER = 'src/reconstructed/BikeRace.cpp'
 SAMPLE = 'samples/race/BikeRaceNearMisses.cpp'
 PROVIDER = 'src/krusty2/vehicle/KrustyBike.cpp'
 BODIES = (
-    ('int KrustyBike::Fn_00495C00()', '?Fn_00495C00@KrustyBike@@QAEHXZ', 0x495c00, 151),
-    ('void KrustyBike::Fn_004933E0(', '?Fn_004933E0@KrustyBike@@QAEXPBUKbNetDelta@@PAUKbNetState@@@Z', 0x4933e0, 634),
-    ('void KrustyBike::Fn_00496E20(', '?Fn_00496E20@KrustyBike@@QAEXPAUKbRecorder@@@Z', 0x496e20, 13))
+    ('int KrustyBike::ReceivedPositionChanged()', '?ReceivedPositionChanged@KrustyBike@@QAEHXZ', 0x495c00, 151),
+    ('void KrustyBike::ApplyStateDelta(', '?ApplyStateDelta@KrustyBike@@QAEXPBUKbNetDelta@@PAUKbNetState@@@Z', 0x4933e0, 634),
+    ('void KrustyBike::SetNetRecorder(', '?SetNetRecorder@KrustyBike@@QAEXPAUKbRecorder@@@Z', 0x496e20, 13))
 
 
 def cases():

@@ -6,9 +6,9 @@ is introduced.
 
 | Previous BikeRace view method | Existing provider | Retail extent | Sites |
 |---|---|---|---:|
-| `UnknownFunction495c00()` | `KrustyBike::Fn_00495C00()` | `0x00495c00`, 151 bytes | 1 |
-| `UnknownFunction4933e0(message, state)` | `KrustyBike::Fn_004933E0(const KbNetDelta*, KbNetState*)` | `0x004933e0`, 634 bytes | 3 |
-| `UnknownFunction496e20(recorder)` | `KrustyBike::Fn_00496E20(KbRecorder*)` | `0x00496e20`, 13 bytes | 3 |
+| `UnknownFunction495c00()` | `KrustyBike::ReceivedPositionChanged()` | `0x00495c00`, 151 bytes | 1 |
+| `UnknownFunction4933e0(message, state)` | `KrustyBike::ApplyStateDelta(const KbNetDelta*, KbNetState*)` | `0x004933e0`, 634 bytes | 3 |
+| `UnknownFunction496e20(recorder)` | `KrustyBike::SetNetRecorder(KbRecorder*)` | `0x00496e20`, 13 bytes | 3 |
 
 The calls serve AnyRacerRemote, incoming network messages, race/replay restart
 and recorded frames. Each provider is present in the actual production COFF
