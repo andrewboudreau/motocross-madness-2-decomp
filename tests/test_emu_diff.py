@@ -227,6 +227,9 @@ CLEAN_CASES = {
     'find_data_file': 100,
     'motion_load_vue': 100,
     'audio_loader_thread': 100,
+    # x87 sum-order sweep: Camera::SetFrame's inline normalise ((x*x + y*y) + z*z). The
+    # reassociated x*x + (y*y + z*z) differs in 112 of 1500 runs at 0x7f (seed 11).
+    'shadow_camera_set_look_at': 100,
 }
 
 # Pre-fix source shapes the differential cases caught: (case, [(text, pre-fix text)], runs[,

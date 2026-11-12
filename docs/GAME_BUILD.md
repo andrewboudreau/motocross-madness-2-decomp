@@ -1803,14 +1803,48 @@ Checked and found clean:
 - The 0x007f sweep found only retail faults and `terrain_prepare_geometry`, the documented
   `EXTREME_EVERY` fistp case, which differs at both control words.
 
-Not checked: bodies where retail calls a helper the build expands inline, or the reverse. The
-scanner could not pair those trees:
-- `TireNode::LocalToWorldDirection` 0x0047aff0;
-- the `SoultreeObject` and `UnknownSoultreeNodeView` transforms;
-- `KbXform::WorldToLocalDirection`, `ShadowCameraProxy::SetLookAt`, `TransformPoints` and
-  `ShadowTransformPointsOrtho`;
-- `ComputeViewerDetail`, `SelectRiderPose`, `PositionAtTime` and `BonusObjectManager::Tick`;
-- the `QueryGround` variants and `SimulateLookAhead`.
+The scanner could not pair the trees of bodies where retail calls a helper the build expands
+inline, or the reverse. Those were then checked by hand: every sum of products, retail against
+the source, including inline header helpers and the bound COMDATs. All are clean and none
+needed a fix. The emu counts below are at 0x007f with seed 11.
+- Forwarders to the soultree.obj transforms, which are strict-exact: CarProceduralNode
+  0x004fd5c0 and 0x004fd710, ConNode 0x004fd660, SoultreeObject 0x004fd7f0. The forwarders are
+  `TireNode::LocalToWorldDirection`, `KbXform::WorldToLocalDirection`, the
+  `UnknownSoultreeNodeView` views, Group4_SoultreeBridge and `Group4Veh_LocalToWorldPoint`. They
+  call those bodies and copy the result back, with no arithmetic of their own.
+- `ShadowCameraProxy::SetLookAt` 0x0042e9b0 (retail `Camera::SetFrame`). The inline normalise
+  at 0x0042e9e1..0x0042ea03 sums (x\*x + y\*y) + z\*z and compares the unrounded sum with 1.0,
+  the same as the file-local `StoreNormalised`. `FastInvSqrt` is bound to 0x00460c00. New case
+  `shadow_camera_set_look_at`: 0 of 1500 differ. A reassociated x\*x + (y\*y + z\*z) differs in
+  112 of 1500, so the case sees the order.
+- `TransformPoints` 0x004a1b00: every row is ((x + y) + z) + t (0x004a1b43..0x004a1bb0).
+  `ShadowTransformPointsOrtho` forwards to it. `transform_points`: 0 of 1500 differ.
+- `ComputeViewerDetail` 0x004815e0: the same near/far sums and ratio, with `FastSqrt` bound to
+  0x00460b50. `grid_viewer_detail`: 0 of 1500 differ.
+- `PositionAtTime` 0x00430b10: the Hermite sum has the same association, with operands only
+  commuted. `HermiteWeights` is bound to 0x00430e60. `car_position_at_time`: 0 of 1500 differ.
+- `SelectRiderPose` 0x0048e3e0: it has no sum of three or more terms, and its two callees are
+  exact. `kb_select_rider_pose`: 0 of 1500 differ.
+- `BonusObjectManager::Tick` 0x0048ccc0: strict-exact. Its position read forwards to
+  `SoultreeObject::GetPosition`.
+- The `QueryGround` variants: `CollisionFrameHelper`, `TireWorld` and `ConGroundQuery` forward
+  to `Terrain::QueryGround` 0x00507c10.
+  - The height interpolations match.
+  - The `operator/`, `operator*` and `operator+` COMDATs are byte-identical to retail's
+    0x0043c890, 0x005015b0 and 0x00421cb0.
+  - `TerrainNormalize` calls `Vec3Dot`, which sums (y + x) + z. Retail 0x005087b0 inlines
+    (x + y) + z. The two orders are the same association with the first two operands swapped,
+    so they round identically.
+  - `terrain_query_ground`: 0 of 1500 differ.
+- `SimulateLookAhead` 0x0040eca0.
+  - Both bodies call the same bound helpers in the same order.
+  - The `CrossProduct` COMDAT is byte-identical to retail 0x00515600.
+  - Every three-term dot groups (a + b) + c in both bodies. The trace counts 42 in retail and
+    44 in the build, because the build's stack reuse makes the tracer read two dots twice.
+  - The remaining trace differences are scheduling only: retail reloads values that the build
+    keeps on the stack, in the 0.65/0.35 blend projections and in the clamped
+    `halfDtSq = dt * dt * 0.5f`.
+  - `kb_simulate_look_ahead`: 0 of 300 differ.
 
 ### Grid lighting workers
 
