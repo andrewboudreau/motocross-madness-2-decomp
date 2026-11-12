@@ -104,7 +104,7 @@ Each of these was laid out strictly, with all relocations resolved:
 `tests/test_unit_layout.py` checks `AgeManager` and `ArcadeObject` when
 `VC6_ROOT` and `MCM2_EXE` are set.
 
-The sweep below finds 129 identical units, these five among them. A strict object proves its own span. It
+The sweep below finds 130 identical units, these five among them. A strict object proves its own span. It
 does not prove that the object covers its whole retail unit: compare the
 span with the unit's
 extent in [REBUILD_GAPS.md](REBUILD_GAPS.md#translation-units-and-link-order)
@@ -127,17 +127,17 @@ python tools/unit_layout_sweep.py --source src/reconstructed/KeyboardHook.cpp
 python -m unittest discover -s tests -p "test_unit_layout*.py"
 ```
 
-There are 225 units (`src/bringup` excluded). 42 are not laid out: 35 have no
+There are 226 units (`src/bringup` excluded). 42 are not laid out: 35 have no
 registered function, and 7 `src/krusty2` units have registered functions
 that are not strict.
 
 | Verdict | Units |
 |---|---|
-| identical (every group strict, every bound function at its VA) | 129 |
+| identical (every group strict, every bound function at its VA) | 130 |
 | identical, with functions that have no retail address | 0 |
 | differs | 54 |
 
-28 units moved to identical through registration and the `/OPT:REF` rule,
+OrientationAxes.cpp, promoted from samples/, is identical on its own. 28 units moved to identical through registration and the `/OPT:REF` rule,
 without source changes. Every newly bound function compares strict exact
 (relocations resolved) at its VA. The evidence for each VA is a vtable slot,
 or a call from a function that is already bound:
