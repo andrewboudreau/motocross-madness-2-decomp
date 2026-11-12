@@ -87,7 +87,7 @@ PYTHONPATH=. python tools/run_calibration.py --exe work/game/mcm2.exe --compiler
 
 The five cases are the `FollowRacer.cpp` and `FollowRacerNearMisses.cpp`
 entries. Shared headers touched for this unit: `RaceView.h`
-(`UnknownFunction4925a0`/`UnknownFunction496f90`, `UnknownScoreBoard`, race
+(`SendFollowedRacer`/`IgnoreCollisionsWith`, `UnknownScoreBoard`, race
 view +0xbc), `TrackGame.h` (ghost fields +0x10a/+0x708, the method
 declarations, view owner +0xac as an int/float union) and `BikeRace.h`
 (`UnknownBikeRaceGhostDelta`, `UnknownBikeRaceVcrFollow`, the ghost record's

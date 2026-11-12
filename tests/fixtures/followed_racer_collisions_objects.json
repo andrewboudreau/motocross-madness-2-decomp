@@ -1,6 +1,6 @@
 {
   "renames": {
-    "?UnknownFunction496f90@UnknownEventRacer@@QAEXPAU1@@Z": "?IgnoreCollisionsWith@KrustyBike@@QAEXPAV1@@Z"
+    "?IgnoreCollisionsWith@UnknownEventRacer@@QAEXPAU1@@Z": "?IgnoreCollisionsWith@KrustyBike@@QAEXPAV1@@Z"
   },
   "objects": {
     "src/reconstructed/FollowRacer.cpp": {
@@ -11,7 +11,7 @@
     "samples/race/FollowRacerNearMisses.cpp": {
       "sections": 11,
       "relocations": 32,
-      "sha256": "5204739a0fe7e5c6eacc75f41da19cae3c71397edf41d9c9a19e04e7aaa0d547"
+      "sha256": "0d991a0a1473ea9d75017aed20b3935c3368d375261771d3e9d46448b62add3f"
     },
     "samples/race/FollowedRacerPicker.cpp": {
       "sections": 4,

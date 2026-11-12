@@ -95,9 +95,9 @@ struct UnknownEventRacer : virtual public GameObject {
 
     // 0x004925a0 (KrustyBike.cpp's code): the view's own racer hears that
     // `racer` is followed (FollowRacer.cpp passes 0 as the flag).
-    void UnknownFunction4925a0(UnknownEventRacer* racer, bool flag);
+    void SendFollowedRacer(UnknownEventRacer* racer, bool flag);
     // 0x00496f90 (KrustyBike.cpp's code): this racer hears about `other`.
-    void UnknownFunction496f90(UnknownEventRacer* other);
+    void IgnoreCollisionsWith(UnknownEventRacer* other);
 
     unsigned char field_0x008[0x0c - 0x08];
     Vector3 position;                         // +0x00c position (KrustyBikeCamera slot 10 adds 2 to y)

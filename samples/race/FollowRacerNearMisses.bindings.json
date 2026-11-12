@@ -1,6 +1,6 @@
 {
   "?NextBike@UnknownKrustyBikeView@@QAEPAUUnknownEventRacer@@PAH@Z": "0x004204e0",
-  "?UnknownFunction4925a0@UnknownEventRacer@@QAEXPAU1@_N@Z": "0x004925a0",
+  "?SendFollowedRacer@UnknownEventRacer@@QAEXPAU1@_N@Z": "0x004925a0",
   "?IgnoreCollisionsWith@KrustyBike@@QAEXPAV1@@Z": "0x00496f90",
   "?ShowValue@UnknownScoreBoard@@QAEXMM@Z": "0x0048d1e0",
   "?AnnounceFollowedRacer@TrackGameViewOwner@@QAEXPAUUnknownEventRacer@@0@Z": "0x004a9f90",

@@ -444,7 +444,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 COPY_TEXT(ghostFilePlayed, "VCRgtemp.dat", 0x104);
                 ghostVcr->OpenRecording(RecorderCallback, 1, ghostFilePlayed, vcrFile);
                 bestGhostLength = ghostVcr->RecordedLength();
-                aiRacers[0]->UnknownFunction496e20(ghostVcr);
+                aiRacers[0]->SetNetRecorder(ghostVcr);
                 if (startBeforeFinish)
                     aiRacers[0]->Disable();
                 else

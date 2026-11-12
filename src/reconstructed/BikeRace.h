@@ -378,21 +378,21 @@ public:
     virtual void UnknownRacerVirtualSlot93();
     virtual void UnknownRacerVirtualSlot94(); // slot 10 calls it while TrackGameMode+0xa88 is set
 
-    int UnknownFunction495c00();              // 0x00495c00 (KrustyBike.cpp's code)
+    int ReceivedPositionChanged();              // 0x00495c00 (KrustyBike.cpp's code)
     // 0x0048fc80 (KrustyBike::Load in src/krusty2/vehicle, ret 0x7c): loads the bike and
     // rider models and sets the racer up; returns the GameObject to add.
-    GameObject* Load(void* owner, const char* a, const char* bikeFile, const char* riderFile,
+    GameObject* Load(void* owner, const char* engineName, const char* bikeFile, const char* riderFile,
                                       LightManager* lights, UnknownTextureFormatChoice* textures,
                                       Vector3 position, Vector3 direction, Vector3 up,
                                       UnknownBikeRaceProjector* terrain, ControlInterface* control, char ai,
                                       int remote, BikeRace* race, const char* name, int b, int id,
-                                      UnknownBikeRaceBikeSetup* setup, int c, int d, int particles,
-                                      Scene* scene, KrustyVCR* vcr, float skill, int e);
+                                      UnknownBikeRaceBikeSetup* setup, int gasGyroOption, int brakeGyroOption, int particles,
+                                      Scene* scene, KrustyVCR* vcr, float skill, int withRider);
 
     // Its own slot 43 (0x00420650 calls it on each racer on a restart).
-    void UnknownFunction496e20(KrustyVCR* vcr); // 0x00496e20 (KrustyBike.cpp's code)
+    void SetNetRecorder(KrustyVCR* vcr); // 0x00496e20 (KrustyBike.cpp's code)
     // 0x004933e0 (KrustyBike.cpp's code): applies message 13 to a state.
-    void UnknownFunction4933e0(UnknownBikeRaceNetMessage13* message, UnknownBikeRaceRacerPart* part);
+    void ApplyStateDelta(UnknownBikeRaceNetMessage13* message, UnknownBikeRaceRacerPart* part);
 
     unsigned char field_0x008[0x18 - 0x08];
     Vector3 carriedFlagPosition;              // +0x018 the flag carried above it (slot 10)

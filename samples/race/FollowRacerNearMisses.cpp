@@ -76,7 +76,7 @@ void TrackGameViewOwner::SetFollowedRacer(UnknownEventRacer* racer, UnknownEvent
     }
     *(float*)&field_0xac = 5.0f;
     if (tell)
-        raceView->localRacer->UnknownFunction4925a0(racer, false);
+        raceView->localRacer->SendFollowedRacer(racer, false);
     if (racer) {
         ((RaceSound*)raceView->raceSound)->PlayItSound();
         FOLLOWED_RACER_SLOTS(racer)->SetSpawnProtection(1, 5.0f, 0);

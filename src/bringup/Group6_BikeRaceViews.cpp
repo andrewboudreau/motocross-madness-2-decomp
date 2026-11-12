@@ -7,7 +7,7 @@
 //   UnknownBikeRaceMesh::SetPositionVec3   0x004fc630 = D3DIMSoultreeObject::SetPositionVec3
 //   UnknownBikeRaceModel::GetPosition      0x004fc970 = SoultreeObject::GetPosition
 //   UnknownBikeRaceProjector::QueryGround  0x00507c10 = Terrain::QueryGround
-//   UnknownBikeRaceRacer::UnknownFunction496e20 0x00496e20 = KrustyBike::SetNetRecorder
+//   UnknownBikeRaceRacer::SetNetRecorder 0x00496e20 = KrustyBike::SetNetRecorder
 //     (the racer pointer is KrustyBike's primary pointer; docs/BIKE_RACE_STATE_CONNECTIONS.md)
 //   UnknownBikeRaceModel::ReplaceMaterialTexture 0x00444c70 = D3DIMSoultreeObject::ReplaceMaterialTexture
 //   UnknownBikeRaceRacer::Load             0x0048fc80 = KrustyBike::Load (ret 0x7c both)
@@ -87,13 +87,13 @@ public:
 
 class UnknownBikeRaceRacer {
 public:
-    void UnknownFunction496e20(KrustyVCR* vcr);
-    GameObject* Load(void* owner, const char* a, const char* bikeFile, const char* riderFile,
+    void SetNetRecorder(KrustyVCR* vcr);
+    GameObject* Load(void* owner, const char* engineName, const char* bikeFile, const char* riderFile,
                      LightManager* lights, UnknownTextureFormatChoice* textures, Vector3 position,
                      Vector3 direction, Vector3 up, UnknownBikeRaceProjector* terrain,
                      ControlInterface* control, char ai, int remote, BikeRace* race,
-                     const char* name, int b, int id, UnknownBikeRaceBikeSetup* setup, int c, int d,
-                     int particles, Scene* scene, KrustyVCR* vcr, float skill, int e);
+                     const char* name, int b, int id, UnknownBikeRaceBikeSetup* setup, int gasGyroOption, int brakeGyroOption,
+                     int particles, Scene* scene, KrustyVCR* vcr, float skill, int withRider);
 };
 
 void UnknownBikeRaceMesh::SetUseLighting(int value)
@@ -129,7 +129,7 @@ void UnknownBikeRaceProjector::QueryGround(Vector3* point, Vector3* normal, int 
 
 // best guess: the KrustyVCR passed here is the recorder KrustyBike keeps as
 // netRecorder (KbRecorder is KrustyBike.h's view of the same object).
-void UnknownBikeRaceRacer::UnknownFunction496e20(KrustyVCR* vcr)
+void UnknownBikeRaceRacer::SetNetRecorder(KrustyVCR* vcr)
 {
     reinterpret_cast<KrustyBike*>(this)->SetNetRecorder(reinterpret_cast<KbRecorder*>(vcr));
 }
@@ -151,23 +151,23 @@ static inline Vec3 UnknownAsVec3(const Vector3& v)
 // best guess: the two views pass the same 25 stack words to 0x0048fc80; each view
 // argument goes to the canonical parameter in the same position.  The skill float is
 // the word KrustyBike::Load keeps as `a24` (+0x15d8), so its bits are passed unchanged.
-GameObject* UnknownBikeRaceRacer::Load(void* owner, const char* a, const char* bikeFile,
+GameObject* UnknownBikeRaceRacer::Load(void* owner, const char* engineName, const char* bikeFile,
                                        const char* riderFile, LightManager* lights,
                                        UnknownTextureFormatChoice* textures, Vector3 position,
                                        Vector3 direction, Vector3 up,
                                        UnknownBikeRaceProjector* terrain,
                                        ControlInterface* control, char ai, int remote,
                                        BikeRace* race, const char* name, int b, int id,
-                                       UnknownBikeRaceBikeSetup* setup, int c, int d,
+                                       UnknownBikeRaceBikeSetup* setup, int gasGyroOption, int brakeGyroOption,
                                        int particles, Scene* scene, KrustyVCR* vcr, float skill,
-                                       int e)
+                                       int withRider)
 {
     void* skillWord = *reinterpret_cast<void**>(&skill);
     return reinterpret_cast<KrustyBike*>(this)->Load(
-        (int)owner, (int)a, bikeFile, reinterpret_cast<const SoultreeLoadDesc*>(riderFile),
+        (int)owner, (int)engineName, bikeFile, reinterpret_cast<const SoultreeLoadDesc*>(riderFile),
         (int)lights, (int)textures, UnknownAsVec3(position), UnknownAsVec3(direction),
         UnknownAsVec3(up), (int)terrain, reinterpret_cast<VehicleInputMap*>(control),
         (unsigned char)ai, (unsigned char)remote, reinterpret_cast<KbRace*>(race), (int)name, b,
-        id, reinterpret_cast<const KbBikeSetup*>(setup), c, d, particles, (int)scene,
-        reinterpret_cast<KbRecorder*>(vcr), skillWord, e);
+        id, reinterpret_cast<const KbBikeSetup*>(setup), gasGyroOption, brakeGyroOption, particles, (int)scene,
+        reinterpret_cast<KbRecorder*>(vcr), skillWord, withRider);
 }

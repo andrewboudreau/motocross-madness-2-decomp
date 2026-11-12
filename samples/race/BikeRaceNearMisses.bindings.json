@@ -185,7 +185,7 @@
   "?ApplyStateDelta@KrustyBike@@QAEXPBUKbNetDelta@@PAUKbNetState@@@Z": "0x004933e0",
   "?ReceivedPositionChanged@KrustyBike@@QAEHXZ": "0x00495c00",
   "?SetNetRecorder@KrustyBike@@QAEXPAUKbRecorder@@@Z": "0x00496e20",
-  "?UnknownFunction496e20@UnknownBikeRaceRacer@@QAEXPAVKrustyVCR@@@Z": "0x00496e20",
+  "?SetNetRecorder@UnknownBikeRaceRacer@@QAEXPAVKrustyVCR@@@Z": "0x00496e20",
   "?ShowCursors@KrustyUI@@QAEXXZ": "0x00499b00",
   "?MakeRandomNames@KrustyUI@@QAEXPAPBDH@Z": "0x0049b020",
   "?PickRandomRacers@KrustyUI@@QAEXPAHH0@Z": "0x0049b0d0",

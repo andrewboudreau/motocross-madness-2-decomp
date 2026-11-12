@@ -1,14 +1,14 @@
 # BikeRace received-state and recorder connections
 
 Seven production calls now use three existing KrustyBike implementations. The
-methods retain their provisional names; no new implementation, thunk or alias
-is introduced.
+BikeRace view declarations now carry the provider names (docs/NAMING.md, wave 2);
+no new implementation, thunk or alias is introduced.
 
-| Previous BikeRace view method | Existing provider | Retail extent | Sites |
+| BikeRace view method | Existing provider | Retail extent | Sites |
 |---|---|---|---:|
-| `UnknownFunction495c00()` | `KrustyBike::ReceivedPositionChanged()` | `0x00495c00`, 151 bytes | 1 |
-| `UnknownFunction4933e0(message, state)` | `KrustyBike::ApplyStateDelta(const KbNetDelta*, KbNetState*)` | `0x004933e0`, 634 bytes | 3 |
-| `UnknownFunction496e20(recorder)` | `KrustyBike::SetNetRecorder(KbRecorder*)` | `0x00496e20`, 13 bytes | 3 |
+| `ReceivedPositionChanged()` | `KrustyBike::ReceivedPositionChanged()` | `0x00495c00`, 151 bytes | 1 |
+| `ApplyStateDelta(message, state)` | `KrustyBike::ApplyStateDelta(const KbNetDelta*, KbNetState*)` | `0x004933e0`, 634 bytes | 3 |
+| `SetNetRecorder(recorder)` | `KrustyBike::SetNetRecorder(KbRecorder*)` | `0x00496e20`, 13 bytes | 3 |
 
 The calls serve AnyRacerRemote, incoming network messages, race/replay restart
 and recorded frames. Each provider is present in the actual production COFF
