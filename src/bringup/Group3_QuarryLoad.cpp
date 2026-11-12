@@ -14,8 +14,9 @@
 //     (new, EH state, null test, constructor), declared over the views' storage;
 //   * the fog objects use Fog.h's Fog/FogOff/FogOn directly; FogOn's folded Create
 //     (0x00486a10) is defined at the end of this file and called, as retail calls it;
-//   * SkyCube.h can share this unit and QuarryEvent.h declares EcoSystem::Create, so the
-//     sky cube and the ecosystem are created and loaded through their own classes;
+//   * SkyCube.h and krusty2's ProjectedShadow.h can share this unit and QuarryEvent.h
+//     declares EcoSystem::Create, so the sky cube, the projected shadow and the ecosystem
+//     are created and called through their own classes;
 //   * the memory estimate reads EcoSystem.cpp's preloaded-texture count (0x0059af10).
 // Linked score 0.985, 2208 instructions against retail's 2208 (was 0.908 at 2101: the
 // out-of-line G3Q_New* allocation helpers dropped retail's inline new/EH/null-test/
@@ -42,6 +43,7 @@
 #include "../reconstructed/PCRenderTarget.h"
 #include "../reconstructed/SceneManager.h"
 #include "../reconstructed/SkyCube.h"
+#include "shadow/ProjectedShadow.h"
 #include "../reconstructed/TextureMap.h"
 #include "../reconstructed/TextureMapManager.h"
 #include "../reconstructed/TrackGame.h"
@@ -205,22 +207,11 @@ public:
 };
 
 // ProjectedShadow (0x134 bytes) and TerrainShadow (0x6780 bytes).
-class UnknownQuarryShadow : public GameObject {
-public:
-    explicit UnknownQuarryShadow(int flags);                   // 0x004da570
-    UnknownQuarryShadow* Init(void* target, TextureMapManager* manager);
-    void AddCaster(D3DIMSoultreeObject* model);    // 0x004dab00: casts a shadow
-    void SetShadowStrength(int value);                     // 0x004dace0
-    void SetShadowGrey(int value);                     // 0x004dae30
-    void SetLight(const Vector3* position, const Vector3* direction, int mode); // 0x004dae50 (ProjectedShadow::SetLight)
-
-    unsigned char field_0x2c[0x134 - 0x2c];
-};
 class UnknownQuarryTerrainShadow : public GameObject {
 public:
     explicit UnknownQuarryTerrainShadow(int flags);            // 0x00508ae0
     // 0x00508b80: TerrainShadow::Attach (samples/physics/shadow).
-    GameObject* Attach(void* target, UnknownTerrain* terrain, UnknownQuarryShadow* shadow);
+    GameObject* Attach(void* target, UnknownTerrain* terrain, ProjectedShadow* shadow);
 
     unsigned char field_0x2c[0x6780 - 0x2c];
 };
@@ -282,10 +273,6 @@ public:
 class VisibilityQuadTree : public UnknownQuarryVisibility {
 public:
     explicit VisibilityQuadTree(int flags);                    // 0x0052d340
-};
-class ProjectedShadow : public UnknownQuarryShadow {
-public:
-    explicit ProjectedShadow(int flags);                       // 0x004da570
 };
 class TerrainShadow : public UnknownQuarryTerrainShadow {
 public:
@@ -594,7 +581,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     }
     if (shadowLight) {
         projectedShadow = new(__FILE__, 698) ProjectedShadow(g_TrackGame->mode.shadowsOn);
-        projectedShadow = ((UnknownQuarryShadow*)projectedShadow)->Init(renderContext, g_TrackGame->textureManager);
+        projectedShadow = ((ProjectedShadow*)projectedShadow)->Init((ShadowRenderTarget*)renderContext, g_TrackGame->textureManager);
     }
     if (!preloaded)
         stream = new(__FILE__, 713) FileStream(g_ResourceManager);
@@ -646,7 +633,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         terrainShadow = (new(__FILE__, 822) TerrainShadow(g_TrackGame->mode.shadowsOn))
-                         ->Attach(renderContext, eventTerrain, (UnknownQuarryShadow*)projectedShadow);
+                         ->Attach(renderContext, eventTerrain, (ProjectedShadow*)projectedShadow);
         AppendChild((GameObject*)terrainShadow, -1);
     }
     AppendChild(visibility, -1);
@@ -816,17 +803,18 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         AppendChild((GameObject*)projectedShadow, -1);
-        ((UnknownQuarryShadow*)projectedShadow)->AddCaster(((UnknownQuarryRace*)raceView)->localRacer->modelNode);
-        ((UnknownQuarryShadow*)projectedShadow)
-            ->AddCaster(((UnknownQuarryRace*)raceView)->localRacer->riderCharacter->modelNode);
-        ((UnknownQuarryShadow*)projectedShadow)->SetLight(&shadowLight->position, &shadowLight->look, 3);
-        ((UnknownQuarryShadow*)projectedShadow)->SetShadowStrength(0x80);
+        ((ProjectedShadow*)projectedShadow)->AddCaster((ShadowCaster*)((UnknownQuarryRace*)raceView)->localRacer->modelNode);
+        ((ProjectedShadow*)projectedShadow)
+            ->AddCaster((ShadowCaster*)((UnknownQuarryRace*)raceView)->localRacer->riderCharacter->modelNode);
+        ((ProjectedShadow*)projectedShadow)->SetLight((const ShadowVec3*)&shadowLight->position,
+                                                (const ShadowVec3*)&shadowLight->look, 3);
+        ((ProjectedShadow*)projectedShadow)->SetShadowStrength(0x80);
         int ambient = (int)(ambientLight->ambientRGBA[1] * 255.0f);
         if (!ambientLight)
             ambientLight = lightManager->FindLightOfType(6);
         if (ambientLight)
             ambient = (int)(ambientLight->ambientRGBA[1] * 255.0f);
-        ((UnknownQuarryShadow*)projectedShadow)->SetShadowGrey(ambient);
+        ((ProjectedShadow*)projectedShadow)->SetShadowGrey(ambient);
     }
     if (progress)
         progress(0);
@@ -949,19 +937,7 @@ GameObject* UnknownQuarryVisibility::Setup(void* target, float x0, float z0, flo
     return (GameObject*)G3Q_VisibilitySetup(this, target, x0, z0, width, breadth, minCell);
 }
 
-UnknownQuarryShadow* UnknownQuarryShadow::Init(void* target, TextureMapManager* manager)
-{
-    return (UnknownQuarryShadow*)G3Q_ProjectedShadowInit(this, target, manager);
-}
-void UnknownQuarryShadow::AddCaster(D3DIMSoultreeObject* model) { G3Q_ProjectedShadowAddCaster(this, model); }
-void UnknownQuarryShadow::SetShadowStrength(int value) { G3Q_ProjectedShadowSetStrength(this, value); }
-void UnknownQuarryShadow::SetShadowGrey(int value) { G3Q_ProjectedShadowSetGrey(this, value); }
-void UnknownQuarryShadow::SetLight(const Vector3* position, const Vector3* direction, int mode)
-{
-    G3Q_ProjectedShadowSetLight(this, position, direction, mode);
-}
-
-GameObject* UnknownQuarryTerrainShadow::Attach(void* target, UnknownTerrain* terrain, UnknownQuarryShadow* shadow)
+GameObject* UnknownQuarryTerrainShadow::Attach(void* target, UnknownTerrain* terrain, ProjectedShadow* shadow)
 {
     return (GameObject*)G3Q_TerrainShadowAttach(this, target, terrain, shadow);
 }

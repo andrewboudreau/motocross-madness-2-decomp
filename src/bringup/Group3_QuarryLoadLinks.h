@@ -20,12 +20,6 @@ void G3Q_BikeCameraSetSubject(void* camera, void* subject);                     
 // Group3_QuarryLinkKrusty.cpp
 void* G3Q_VisibilitySetup(void* tree, void* target, float x0, float z0, float x1, float z1,
                           float minCell);                                        // 0x0052d460 (GameObject part)
-void* G3Q_ProjectedShadowInit(void* shadow, void* target, void* textureManager); // 0x004da7b0
-void G3Q_ProjectedShadowAddCaster(void* shadow, void* caster);                   // 0x004dab00
-void G3Q_ProjectedShadowSetStrength(void* shadow, int strength);                 // 0x004dace0
-void G3Q_ProjectedShadowSetGrey(void* shadow, int level);                        // 0x004dae30
-void G3Q_ProjectedShadowSetLight(void* shadow, const void* position, const void* direction,
-                                 int mode);                                      // 0x004dae50
 void* G3Q_TerrainShadowAttach(void* terrainShadow, void* target, void* terrain,
                               void* shadow);                                     // 0x00508b80
 void* G3Q_TerrainLoad(void* terrain, void* target, void* stream, int unused, void* textures,

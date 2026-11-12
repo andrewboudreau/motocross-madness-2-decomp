@@ -53,6 +53,7 @@
 #include "../../src/reconstructed/PCRenderTarget.h"
 #include "../../src/reconstructed/SceneManager.h"
 #include "../../src/reconstructed/SkyCube.h"
+#include "../../src/krusty2/shadow/ProjectedShadow.h"
 #include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/TextureMapManager.h"
 #include "../../src/reconstructed/TrackGame.h"
@@ -213,22 +214,11 @@ public:
 };
 
 // ProjectedShadow (0x134 bytes) and TerrainShadow (0x6780 bytes).
-class UnknownQuarryShadow : public GameObject {
-public:
-    explicit UnknownQuarryShadow(int flags);                   // 0x004da570
-    UnknownQuarryShadow* Init(void* target, TextureMapManager* manager);
-    void AddCaster(D3DIMSoultreeObject* model);    // 0x004dab00: casts a shadow
-    void SetShadowStrength(int value);                     // 0x004dace0
-    void SetShadowGrey(int value);                     // 0x004dae30
-    void SetLight(const Vector3* position, const Vector3* direction, int mode); // 0x004dae50 (ProjectedShadow::SetLight)
-
-    unsigned char field_0x2c[0x134 - 0x2c];
-};
 class UnknownQuarryTerrainShadow : public GameObject {
 public:
     explicit UnknownQuarryTerrainShadow(int flags);            // 0x00508ae0
     // 0x00508b80: TerrainShadow::Attach (samples/physics/shadow).
-    GameObject* Attach(void* target, UnknownTerrain* terrain, UnknownQuarryShadow* shadow);
+    GameObject* Attach(void* target, UnknownTerrain* terrain, ProjectedShadow* shadow);
 
     unsigned char field_0x2c[0x6780 - 0x2c];
 };
@@ -564,8 +554,8 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         }
     }
     if (shadowLight) {
-        projectedShadow = new(__FILE__, 698) UnknownQuarryShadow(g_TrackGame->mode.shadowsOn);
-        projectedShadow = ((UnknownQuarryShadow*)projectedShadow)->Init(renderContext, g_TrackGame->textureManager);
+        projectedShadow = new(__FILE__, 698) ProjectedShadow(g_TrackGame->mode.shadowsOn);
+        projectedShadow = ((ProjectedShadow*)projectedShadow)->Init((ShadowRenderTarget*)renderContext, g_TrackGame->textureManager);
     }
     if (!preloaded)
         stream = new(__FILE__, 713) FileStream(g_ResourceManager);
@@ -617,7 +607,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         terrainShadow = (new(__FILE__, 822) UnknownQuarryTerrainShadow(g_TrackGame->mode.shadowsOn))
-                         ->Attach(renderContext, eventTerrain, (UnknownQuarryShadow*)projectedShadow);
+                         ->Attach(renderContext, eventTerrain, (ProjectedShadow*)projectedShadow);
         AppendChild((GameObject*)terrainShadow, -1);
     }
     AppendChild(visibility, -1);
@@ -787,17 +777,18 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         AppendChild((GameObject*)projectedShadow, -1);
-        ((UnknownQuarryShadow*)projectedShadow)->AddCaster(((UnknownQuarryRace*)raceView)->localRacer->modelNode);
-        ((UnknownQuarryShadow*)projectedShadow)
-            ->AddCaster(((UnknownQuarryRace*)raceView)->localRacer->riderCharacter->modelNode);
-        ((UnknownQuarryShadow*)projectedShadow)->SetLight(&shadowLight->position, &shadowLight->look, 3);
-        ((UnknownQuarryShadow*)projectedShadow)->SetShadowStrength(0x80);
+        ((ProjectedShadow*)projectedShadow)->AddCaster((ShadowCaster*)((UnknownQuarryRace*)raceView)->localRacer->modelNode);
+        ((ProjectedShadow*)projectedShadow)
+            ->AddCaster((ShadowCaster*)((UnknownQuarryRace*)raceView)->localRacer->riderCharacter->modelNode);
+        ((ProjectedShadow*)projectedShadow)->SetLight((const ShadowVec3*)&shadowLight->position,
+                                                (const ShadowVec3*)&shadowLight->look, 3);
+        ((ProjectedShadow*)projectedShadow)->SetShadowStrength(0x80);
         int ambient = (int)(ambientLight->ambientRGBA[1] * 255.0f);
         if (!ambientLight)
             ambientLight = lightManager->FindLightOfType(6);
         if (ambientLight)
             ambient = (int)(ambientLight->ambientRGBA[1] * 255.0f);
-        ((UnknownQuarryShadow*)projectedShadow)->SetShadowGrey(ambient);
+        ((ProjectedShadow*)projectedShadow)->SetShadowGrey(ambient);
     }
     if (progress)
         progress(0);

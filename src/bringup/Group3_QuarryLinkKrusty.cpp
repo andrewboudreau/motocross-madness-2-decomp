@@ -9,16 +9,6 @@
 #include "collision/CollisionObject.h"
 #include "Group3_QuarryLoadLinks.h"
 
-class TextureMapManager;
-
-// 0x004da7b0: ProjectedShadow::Init. The build names this retail function
-// UnknownKrustyUIShadow::Init (KrustyUI.cpp's view of ProjectedShadow); only that name is
-// linked, so the call goes through it.
-class UnknownKrustyUIShadow {
-public:
-    UnknownKrustyUIShadow* Init(void* target, TextureMapManager* manager);
-};
-
 // TerrainShadow (vtable 0x005582d4, 0x6780 bytes). A local view: these are the names
 // src/reconstructed/TerrainShadow.h gives the constructor and Attach, so the exact
 // src/reconstructed/TerrainShadow.cpp resolves them. The storage only fixes the size.
@@ -36,31 +26,6 @@ void* G3Q_VisibilitySetup(void* tree, void* target, float x0, float z0, float x1
                           float minCell)
 {
     return ((VisibilityQuadTree*)tree)->Setup((int)target, x0, z0, x1, z1, minCell);
-}
-
-void* G3Q_ProjectedShadowInit(void* shadow, void* target, void* textureManager)
-{
-    return ((UnknownKrustyUIShadow*)shadow)->Init(target, (TextureMapManager*)textureManager);
-}
-
-void G3Q_ProjectedShadowAddCaster(void* shadow, void* caster)
-{
-    ((ProjectedShadow*)shadow)->AddCaster((ShadowCaster*)caster);
-}
-
-void G3Q_ProjectedShadowSetStrength(void* shadow, int strength)
-{
-    ((ProjectedShadow*)shadow)->SetShadowStrength(strength);
-}
-
-void G3Q_ProjectedShadowSetGrey(void* shadow, int level)
-{
-    ((ProjectedShadow*)shadow)->SetShadowGrey(level);
-}
-
-void G3Q_ProjectedShadowSetLight(void* shadow, const void* position, const void* direction, int mode)
-{
-    ((ProjectedShadow*)shadow)->SetLight((const ShadowVec3*)position, (const ShadowVec3*)direction, mode);
 }
 
 void* G3Q_TerrainShadowAttach(void* terrainShadow, void* target, void* terrain, void* shadow)

@@ -2,7 +2,7 @@
 (tools/emu_diff.py case, call-record/replay mode).
 
 The linked body is samples/physics/shadow/ProjectedShadowNearMisses.cpp (reached from the
-quarry loader's UnknownQuarryShadow::Init forward). The render target (this+0x18, set before
+quarry loader's direct ProjectedShadow::Init call). The render target (this+0x18, set before
 the call; GameObject::SetRenderContext is logged) carries the capability words +0x1b0/+0x1b4/
 +0x1bc, a display whose driver name (+0x4bc, up to 0xe0 characters, the query buffer being 0x100) feeds the
 "DriverInfo\\%s\\DestColorShadow" query (g_TrackGame slot 22, answering the case's flag), the
