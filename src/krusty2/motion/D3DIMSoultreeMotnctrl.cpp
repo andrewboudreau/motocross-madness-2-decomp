@@ -282,7 +282,7 @@ public:
     virtual void CopyFrom(ModelObject* source);  // 0x00444560, ret 4: copies the node tree of 'source'
     virtual void ModelSlot8();                   // 0x00444b60
     // 0x0043f4b0, ret 0x14: loads the model; slot 0 passes (field_0x18, name, descriptor words, 1).
-    virtual void Load(void* a1, const char* a2, int a3, int a4, int a5);
+    virtual void Load(void* owner, const char* name, int lights, int options, int useOptions);
     char pad_0x38[0x240 - 0x38];
     int textureManager;                          // +0x240 D3DIMSoulTree.h names: copied by CopyFrom, passed to SoultreeMaterial::Attach
     int textureFormat;                           // +0x244 copied by CopyFrom, passed to SoultreeMaterial::Attach

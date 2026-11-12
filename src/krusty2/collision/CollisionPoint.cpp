@@ -335,7 +335,7 @@ static inline void CollisionRefreshContact(CollisionPoint* p, CollisionFrameHelp
 // surface position (a single contact in mode 1 is placed at offset - k * normal instead) and
 // its penetration, flag and grip.  The two paths are an if/else with one trailing
 // `return 1`: with a return inside the single-contact path VC6 pushes ebx/ebp/esi/edi at
-// entry, with a single exit after the null-a1 return it delays them past it as retail does.
+// entry, with a single exit after the null-enabled return it delays them past it as retail does.
 // The loop walks a pointer local `pp` copied from points after an `if (count > 0)` guard:
 // then VC6 loads points before frame and homes the loop counter in points' dead argument
 // slot, as retail does.  The single contact's position is summed through InlineSum (the
@@ -343,10 +343,10 @@ static inline void CollisionRefreshContact(CollisionPoint* p, CollisionFrameHelp
 // stores its y before the fstp of z, retail after.  The owner's transform is the canonical
 // SoultreeObject::LocalToWorldPoint, its returned temporary bound to a const reference, so
 // both copies read the result through the returned pointer as in retail.
-int SoultreeRefreshContacts(void* a1, int* penetrating, int count, CollisionPoint** points,
+int SoultreeRefreshContacts(void* enabled, int* penetrating, int count, CollisionPoint** points,
                             CollisionFrameHelper* frame, CollisionVec3* offset, int mode, float k)
 {
-    if (!a1)
+    if (!enabled)
         return 0;
     *penetrating = 0;
     if (mode == 1 && count == 1) {

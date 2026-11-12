@@ -38,7 +38,7 @@ public:
     virtual void UnknownNodeVirtualSlot8();
     // Slot 9 (+0x24): loads the model (CarProcedural passes its slot 27
     // arguments 0, 1, 3 and 4, then 1).
-    virtual void LoadModel(void* a0, const char* name, int a3, int a4, int a5);
+    virtual void LoadModel(void* owner, const char* name, int lights, int options, int useOptions);
 
     // Frame-relative helpers slot 10 uses (src/krusty2/core/SoultreeObject.h
     // documents them): position in `frame` space, placement there, the
@@ -104,7 +104,7 @@ public:
     virtual int Tick(float frameTime);                               // 0x0042fd80
     // Slot 27 (0x0042f600, ret 0x40): sets the car up; returns this.
     virtual CarProcedural* Create(void* renderContext, const char* name, const char* collisionFile,
-                                  int a3, int a4, void* ground, const char* pathFile,
+                                  int lights, int options, void* ground, const char* pathFile,
                                   const Vector3* offset, float speed, int steerFront, float trail,
                                   int a11, unsigned int wheelCount, float a13, float a14,
                                   float a15);

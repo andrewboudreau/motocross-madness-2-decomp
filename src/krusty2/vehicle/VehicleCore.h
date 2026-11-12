@@ -142,11 +142,11 @@ public:
     int CheckCrash();
     // 0x00525e20 (`ret 0x94` = 37 argument dwords; not in any vtable: Bike's loader 0x004079c0
     // calls it directly).  Forwards the arguments named after slot 40's parameters (context is
-    // its renderContext; a5 is Bike's info record) to SoultreePhysicsCharacter slot 40 with
+    // its renderContext; loadInfo is Bike's info record) to SoultreePhysicsCharacter slot 40 with
     // (0.02f, 100, 0.001f, 0.1f, 3) and the track byte; the other arguments configure the
     // vehicle (names tier 3).
     GameObject* LoadVehicle(int context, const char* engineName, const char* modelPath,
-                            const SoultreeLoadDesc* desc, int a5, Vec3 startPosition, Vec3 startForward,
+                            const SoultreeLoadDesc* desc, int loadInfo, Vec3 startPosition, Vec3 startForward,
                             Vec3 startUp, void* terrainProbe, VehicleInputMap* map, void* linkedObject,
                             float weight, float arg18, float steerScale, void* device, int wheelCap,
                             int extraContacts, int attachmentSlots, int earlyCap, int lateCap, int defaultEngine,

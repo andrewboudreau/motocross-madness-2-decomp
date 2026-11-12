@@ -41,7 +41,7 @@ void CollisionFrameHelper::QueryGround(CollisionVec3* v, const CollisionVec3* n,
 // The exact bodies (src/krusty2/collision/CollisionPoint.cpp, strict exact in calibration).
 // The views below forward to them, so the game links retail's logic once instead of a
 // bring-up paraphrase. Both signatures are provisional (cdecl, tier 3 names).
-int SoultreeRefreshContacts(void* a1, int* penetrating, int count, CollisionPoint** points,
+int SoultreeRefreshContacts(void* enabled, int* penetrating, int count, CollisionPoint** points,
                             CollisionFrameHelper* frame, CollisionVec3* offset, int mode, float k);
 int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec3* scaleA,
                           const CollisionVec3* scaleB, const CollisionVec3* bias, CollisionVec3* origin,
