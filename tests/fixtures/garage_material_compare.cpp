@@ -14,7 +14,7 @@ typedef char Layout[(sizeof(D3DIMSoultreeObject) == 0x2d8 &&
                      offsetof(SoultreeMaterial, textureName) == 0x2c &&
                      offsetof(SoultreeMaterial, hasTextureName) == 0x9c &&
                      offsetof(UnknownKrustyUIModelObject, plateTexture) == 0x1a0 &&
-                     offsetof(UnknownKrustyUIModel, uiModel) == 0xc0)
+                     offsetof(KrustyUIModelRecord, uiModel) == 0xc0)
                         ? 1
                         : -1];
 static BYTE referenceSpace[0x800000] = {1};

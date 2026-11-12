@@ -164,11 +164,11 @@ int BaseQuarryEvent::EstimateRaceBytes() {
     if (g_TrackGame->InProCircuitCareer()) {
         int i;
         for (i = 0; i < g_TrackGame->ui->bikeCount; i++) {
-            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->manufacturers)[((UnknownQuarryBikeChoice*)g_TrackGame->ui->bikes)[i].manufacturer].availability <= g_TrackGame->proCircuit->maxModelKind)
+            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->manufacturers)[((UnknownQuarryBikeChoice*)g_TrackGame->ui->bikes)[i].manufacturer].availability <= g_TrackGame->proCircuit->maxAvailability)
                 players++;
         }
         for (i = 0; i < g_TrackGame->ui->riderCount; i++) {
-            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->riders)[i].availability <= g_TrackGame->proCircuit->maxModelKind)
+            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->riders)[i].availability <= g_TrackGame->proCircuit->maxAvailability)
                 opponents++;
         }
         if (players >= g_TrackGame->proCircuit->racerCount)

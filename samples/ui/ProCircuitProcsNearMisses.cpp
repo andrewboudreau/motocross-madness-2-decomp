@@ -286,8 +286,8 @@ int PCCentralBikeRiderDlg::Tick(float frameTime)
     if (!idleMotionPlaying && g_TrackGame->ui->riderPreview->motionFinished) {
         UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
-        UnknownKrustyUIModel* model =
-            &((UnknownKrustyUIModel*)ui->manufacturers)[((UnknownKrustyUIBike*)ui->bikes)[bikes->GetRowData(-1)].model];
+        KrustyUIModelRecord* model =
+            &((KrustyUIModelRecord*)ui->manufacturers)[((KrustyUIBikeRecord*)ui->bikes)[bikes->GetRowData(-1)].manufacturer];
         model->uiModel->SetMotionByName("WaitB");
         g_TrackGame->ui->riderPreview->SetMotionByName("WaitR");
         idleMotionPlaying = 1;

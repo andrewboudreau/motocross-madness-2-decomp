@@ -75,7 +75,7 @@ public:
     char careerName[0x40];                    // +0x00 career name
     int series;                               // +0x40 series (1 Baja, 2 Nationals, 3 Supercross, 5 Enduro)
     int raceIndex;                            // +0x44 race in the series
-    int maxModelKind;                         // +0x48 highest model kind the racers may use
+    int maxAvailability;                      // +0x48 highest "Availability" the racers may use
     int bikeClassRule;                        // +0x4c bike class rule (1..3)
     int difficulty;                           // +0x50 StartCareer argument 2 (PCNewDlg "RadLODEasy"); copied to TrackGameMode+0x94
     char messageText[0x400];                  // +0x54 message text

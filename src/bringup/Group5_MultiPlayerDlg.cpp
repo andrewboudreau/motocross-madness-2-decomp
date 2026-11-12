@@ -152,18 +152,18 @@ void MultiPlayerDlg::SendStartMessage(short start) {
                 COPY_TEXT(g_TrackGame->mode.racers[racer].playerName, names[racer], 0x10);
                 g_TrackGame->mode.racers[racer].plateNumber = 100 - (int)(RandomUnit() * -899.0f);
                 COPY_TEXT(g_TrackGame->mode.racers[racer].bikeModelName,
-                          ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)
-                              [((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].model]
-                                  .modelName,
+                          ((KrustyUIModelRecord*)g_TrackGame->ui->manufacturers)
+                              [((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bikes[racer]].manufacturer]
+                                  .modelFile,
                           0x40);
                 COPY_TEXT(g_TrackGame->mode.racers[racer].bikeName,
-                          ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].texture, 0x40);
+                          ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bikes[racer]].texture, 0x40);
                 COPY_TEXT(g_TrackGame->mode.racers[racer].riderName,
-                          ((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[riders[racer]].modelName, 0x40);
+                          ((KrustyUIModelRecord*)g_TrackGame->ui->riders)[riders[racer]].modelFile, 0x40);
                 g_TrackGame->mode.racers[racer].engineSize =
-                    ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].engineSize;
+                    ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bikes[racer]].engineSize;
                 g_TrackGame->mode.racers[racer].fourStroke =
-                    ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].fourStroke;
+                    ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bikes[racer]].fourStroke;
                 racer++;
             }
         }

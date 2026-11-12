@@ -164,7 +164,7 @@ void ProCircuit::StartCareer(const char* name, int level, int classRule, int cou
     bikeClassRule = classRule;
     series = 5;
     raceIndex = 1;
-    maxModelKind = 1;
+    maxAvailability = 1;
     feesPaid = 0;
     strncpy(careerName, name, 64);
     careerName[strlen(name) > 63 ? 63 : strlen(name)] = 0;
@@ -212,16 +212,16 @@ void ProCircuit::StartCareer(const char* name, int level, int classRule, int cou
     KrustyUI* ui = g_TrackGame->ui;
     int rider;
     for (rider = 0; rider < ui->riderCount; rider++) {
-        if (((UnknownKrustyUIModel*)ui->riders)[rider].modelKind == 1)
+        if (((KrustyUIModelRecord*)ui->riders)[rider].availability == 1)
             break;
     }
-    UNKNOWN_COPY_TEXT(racers[0].riderModel, ((UnknownKrustyUIModel*)ui->riders)[rider].modelName)
+    UNKNOWN_COPY_TEXT(racers[0].riderModel, ((KrustyUIModelRecord*)ui->riders)[rider].modelFile)
 
     ui = g_TrackGame->ui;
     int bike;
     for (bike = 0; bike < ui->bikeCount; bike++) {
-        if (((UnknownKrustyUIModel*)ui->manufacturers)[((UnknownKrustyUIBike*)ui->bikes)[bike].model].modelKind == 1) {
-            int bikeClass = BikeClassOf(((UnknownKrustyUIBike*)ui->bikes)[bike].engineSize);
+        if (((KrustyUIModelRecord*)ui->manufacturers)[((KrustyUIBikeRecord*)ui->bikes)[bike].manufacturer].availability == 1) {
+            int bikeClass = BikeClassOf(((KrustyUIBikeRecord*)ui->bikes)[bike].engineSize);
             switch (bikeClassRule) {
             case 1:
                 if (bikeClass == 0)
@@ -238,13 +238,13 @@ void ProCircuit::StartCareer(const char* name, int level, int classRule, int cou
     }
 found:
     UNKNOWN_COPY_TEXT(racers[0].bikeModel,
-                      ((UnknownKrustyUIModel*)ui->manufacturers)[((UnknownKrustyUIBike*)ui->bikes)[bike].model].modelName)
+                      ((KrustyUIModelRecord*)ui->manufacturers)[((KrustyUIBikeRecord*)ui->bikes)[bike].manufacturer].modelFile)
     UNKNOWN_COPY_TEXT(racers[0].bikeName,
-                    ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].texture)
+                    ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].texture)
     UNKNOWN_COPY_TEXT(racers[0].bikeDisplayName,
-                    ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].displayName)
-    racers[0].engineSize = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].engineSize;
-    racers[0].fourStroke = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].fourStroke;
+                    ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].displayName)
+    racers[0].engineSize = ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].engineSize;
+    racers[0].fourStroke = ((KrustyUIBikeRecord*)g_TrackGame->ui->bikes)[bike].fourStroke;
     DebugFree(used, __FILE__, 273);
 }
 
@@ -288,7 +288,7 @@ int ProCircuit::AdvanceAfterRace()
         if (done || (bonus && !placed)) {
             series = 2;
             raceIndex = 1;
-            maxModelKind = 3;
+            maxAvailability = 3;
             PickComputerRacers();
             g_TrackGame->LoadResourceString(0x145c, title, 128);
         }
@@ -312,7 +312,7 @@ int ProCircuit::AdvanceAfterRace()
         break;
     default:
         if (done || (bonus && !placed)) {
-            maxModelKind = 2;
+            maxAvailability = 2;
             series = 1;
             raceIndex = 1;
             PickComputerRacers();
@@ -388,31 +388,31 @@ void ProCircuit::PickComputerRacers()
     int riderKind = 0;
     int i;
     for (i = 0; i < ui->bikeCount; i++) {
-        int kind = ((UnknownKrustyUIModel*)ui->manufacturers)[((UnknownKrustyUIBike*)ui->bikes)[i].model].modelKind;
-        if (kind <= maxModelKind && kind > bikeKind)
+        int kind = ((KrustyUIModelRecord*)ui->manufacturers)[((KrustyUIBikeRecord*)ui->bikes)[i].manufacturer].availability;
+        if (kind <= maxAvailability && kind > bikeKind)
             bikeKind = kind;
     }
     for (i = 0; i < ui->riderCount; i++) {
-        int kind = ((UnknownKrustyUIModel*)ui->riders)[i].modelKind;
-        if (kind <= maxModelKind && kind > riderKind)
+        int kind = ((KrustyUIModelRecord*)ui->riders)[i].availability;
+        if (kind <= maxAvailability && kind > riderKind)
             riderKind = kind;
     }
 
     for (int racer = 1; racer < racerCount; racer++) {
-        UnknownKrustyUIModel* rider;
+        KrustyUIModelRecord* rider;
         do {
             ui = g_TrackGame->ui;
-            rider = &((UnknownKrustyUIModel*)ui->riders)[(int)(UNKNOWN_RANDOM_UNIT() * (ui->riderCount - 1))];
-        } while (rider->uiModel || rider->modelKind != riderKind);
-        UNKNOWN_COPY_TEXT(racers[racer].riderModel, rider->modelName)
+            rider = &((KrustyUIModelRecord*)ui->riders)[(int)(UNKNOWN_RANDOM_UNIT() * (ui->riderCount - 1))];
+        } while (rider->uiModel || rider->availability != riderKind);
+        UNKNOWN_COPY_TEXT(racers[racer].riderModel, rider->modelFile)
 
-        UnknownKrustyUIBike* bike;
+        KrustyUIBikeRecord* bike;
         for (;;) {
             ui = g_TrackGame->ui;
-            bike = &((UnknownKrustyUIBike*)ui->bikes)[(int)(UNKNOWN_RANDOM_UNIT() * (ui->bikeCount - 1))];
+            bike = &((KrustyUIBikeRecord*)ui->bikes)[(int)(UNKNOWN_RANDOM_UNIT() * (ui->bikeCount - 1))];
             if (bike->engineSizeSelectable)
                 continue;
-            if (((UnknownKrustyUIModel*)ui->manufacturers)[bike->model].modelKind != bikeKind)
+            if (((KrustyUIModelRecord*)ui->manufacturers)[bike->manufacturer].availability != bikeKind)
                 continue;
             int bikeClass = BikeClassOf(bike->engineSize);
             float roll = UNKNOWN_RANDOM_UNIT();
@@ -438,7 +438,7 @@ void ProCircuit::PickComputerRacers()
         }
     found:
         UNKNOWN_COPY_TEXT(racers[racer].bikeModel,
-                        ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[bike->model].modelName)
+                        ((KrustyUIModelRecord*)g_TrackGame->ui->manufacturers)[bike->manufacturer].modelFile)
         UNKNOWN_COPY_TEXT(racers[racer].bikeName, bike->texture)
         UNKNOWN_COPY_TEXT(racers[racer].bikeDisplayName, bike->displayName)
         racers[racer].engineSize = bike->engineSize;
