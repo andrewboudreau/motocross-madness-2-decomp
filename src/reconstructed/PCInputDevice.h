@@ -26,7 +26,7 @@ enum DIKeyCode {
 // IDirectInputDevice::Unacquire, and PCJoystickDevice uses method 22 like
 // IDirectInputDevice2::SendForceFeedbackCommand; the identity is inference.
 // Uncalled slots carry the IDirectInputDevice2A names for that order.
-struct UnknownInputInterface {
+struct DirectInputDevice {
     virtual long __stdcall QueryInterface(const struct Guid& iid, void** object);
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
@@ -50,7 +50,7 @@ struct UnknownInputInterface {
     virtual long __stdcall Initialize(void* instance, unsigned long version, const struct Guid& guid);
     virtual long __stdcall CreateEffect(const struct Guid& type,
                                            const struct UnknownEffectParams* params,
-                                           struct UnknownEffectInterface** effect,
+                                           struct DirectInputEffect** effect,
                                            void* outer); // CreateEffect
     virtual long __stdcall EnumEffects(int (__stdcall* callback)(const struct UnknownEffectInfo*, void*),
                                            void* context, unsigned long type); // EnumEffects
@@ -152,7 +152,7 @@ struct UnknownDirectInput {
     virtual long __stdcall UnknownMethod7();
     virtual long __stdcall UnknownMethod8();
     virtual long __stdcall CreateDeviceEx(const Guid& device, const Guid& iid,
-                                          UnknownInputInterface** result, void* outer);
+                                          DirectInputDevice** result, void* outer);
 };
 
 // 24-byte data format descriptor (DIDATAFORMAT layout).
@@ -251,5 +251,5 @@ public:
 
 protected:
     UnknownDeviceInstance deviceInfo;          // +0x18; cleared by the constructor
-    UnknownInputInterface* device;             // +0x25c
+    DirectInputDevice* device;             // +0x25c
 };

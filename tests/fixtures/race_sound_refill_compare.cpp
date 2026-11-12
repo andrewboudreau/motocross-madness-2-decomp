@@ -134,7 +134,7 @@ static void Prepare(){
     for(i=0;i<GUARD;++i)guard[i]=(BYTE)(i*7+scenario.seed);
     g_TrackGame=(TrackGame*)world.game;*(SoundInterface**)(world.game+4)=(PCSoundInterface*)world.audio;
     ((PCSoundInterface*)world.audio)->audioStarted=1;
-    for(int n=0;n<2;++n){world.com[n][0]=(DWORD)vtable;SoundAt(n)->dsBuffer=(UnknownSoundBuffer*)world.com[n];}
+    for(int n=0;n<2;++n){world.com[n][0]=(DWORD)vtable;SoundAt(n)->dsBuffer=(DirectSoundBuffer*)world.com[n];}
     Race()->bytesPerSample=scenario.width;Race()->streamChannel=Channel(0);
     for(n=0;n<3;++n){Race()->idleCount[n]=Race()->powerBandCount[n]=Race()->sputterCount[n]=scenario.count;
         for(int j=0;j<10;++j){Race()->idleSamples[n][j]=world.source[(n+j)%3];Race()->idleSampleBytes[n][j]=40000+j;

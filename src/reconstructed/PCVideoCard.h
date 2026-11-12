@@ -65,14 +65,14 @@ public:
     int ProbePartialTextureUploads(RenderTarget* target);  // 0x004cab00: also stores +0x5bc
     int SetGDISurfaceVisible(int enable);               // 0x004cb5b0 (GUIManager.cpp 0x004868b0)
 
-    UnknownDirectDrawInterface* directDraw;    // +0x190: IDirectDraw7 (DirectDrawCreateEx)
-    UnknownDirect3DInterface* direct3D;        // +0x194: IDirect3D7 (QueryInterface)
+    DirectDraw* directDraw;    // +0x190: IDirectDraw7 (DirectDrawCreateEx)
+    Direct3D* direct3D;        // +0x194: IDirect3D7 (QueryInterface)
     void* field_0x198;
     DirectDrawSurface* primarySurface;   // +0x19c: primary; PCGame slot 5: IsLost/Restore
     DirectDrawSurface* backBuffer;       // +0x1a0: back buffer; PCGame slot 31's surface without +0x1a8
-    UnknownGammaControlInterface* gammaControl; // +0x1a4
+    DirectDrawGammaControl* gammaControl; // +0x1a4
     DirectDrawSurface* renderSurface;    // +0x1a8: windowed render surface
-    UnknownClipperInterface* clipper;          // +0x1ac
+    DirectDrawClipper* clipper;          // +0x1ac
     void* windowHandle;                        // +0x1b0: window handle
     // Hardware caps (0x17c bytes, the DDCAPS layout; GetCaps).
     unsigned int driverCapsSize;               // +0x1b4: size

@@ -15,7 +15,7 @@ class FileStream;
 // IIDs Sound queries are the bytes of IID_IDirectSound3DBuffer
 // (0x00556ca0), IID_IDirectSoundNotify (0x00556cd0) and IID_IKsPropertySet
 // (0x00556ce0); the method names follow those interfaces (inference).
-struct UnknownSound3DBuffer {
+struct DirectSound3DBuffer {
     virtual long __stdcall QueryInterface(const Guid& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
@@ -40,14 +40,14 @@ struct UnknownSound3DBuffer {
     virtual long __stdcall SetVelocity(float x, float y, float z, unsigned long apply);
 };
 
-struct UnknownSoundNotify {
+struct DirectSoundNotify {
     virtual long __stdcall QueryInterface(const Guid& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
     virtual long __stdcall SetNotificationPositions(unsigned long count, const struct UnknownNotifyPosition* positions);
 };
 
-struct UnknownPropertySet {
+struct KsPropertySet {
     virtual long __stdcall QueryInterface(const Guid& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
@@ -148,7 +148,7 @@ public:
     static unsigned __stdcall UnknownThreadProc(void* context); // 0x004bb630
 
     Sound* ownerSound;                 // +0x00
-    UnknownSoundNotify* notify;        // +0x04
+    DirectSoundNotify* notify;        // +0x04
     HANDLE firstHalfEvent;             // +0x08: first half played
     HANDLE secondHalfEvent;            // +0x0c: second half played
     HANDLE stopEvent;                  // +0x10
@@ -197,15 +197,15 @@ public:
     int LockBuffer(unsigned long offset, unsigned long bytes, void** first, unsigned long* firstBytes,
         void** second, unsigned long* secondBytes, unsigned long flags);
     int UnlockBuffer(void* first, unsigned long firstBytes, void* second, unsigned long secondBytes);
-    int FillBufferFromFile(UnknownSoundBuffer** buffer); // 0x004bd0c0: fills from the file
-    int FillBufferFromStream(UnknownSoundBuffer** buffer, FileStream* stream, unsigned long offset,
+    int FillBufferFromFile(DirectSoundBuffer** buffer); // 0x004bd0c0: fills from the file
+    int FillBufferFromStream(DirectSoundBuffer** buffer, FileStream* stream, unsigned long offset,
         unsigned long bytes);
     int CreatePendingBuffer();                          // 0x004bd4b0: creates the pending buffer
-    int CreateBuffer(UnknownSoundBuffer** buffer, unsigned long bytes, unsigned long rate,
+    int CreateBuffer(DirectSoundBuffer** buffer, unsigned long bytes, unsigned long rate,
         int bits, int blockAlign, int stereo, int is3D, int isStatic,
         unsigned long flags, int hardware);
-    int DuplicateBuffer(UnknownSoundBuffer** duplicate, Sound* source);
-    int Query3DBuffer(UnknownSoundBuffer* buffer, UnknownSound3DBuffer** buffer3D);
+    int DuplicateBuffer(DirectSoundBuffer** duplicate, Sound* source);
+    int Query3DBuffer(DirectSoundBuffer* buffer, DirectSound3DBuffer** buffer3D);
     int QueryPropertySet();                             // 0x004bd710: queries the property set
     int Set3DParameters(UnknownSound3DParameters* parameters);
     int Set3DMode(unsigned long mode);
@@ -217,12 +217,12 @@ public:
     int Set3DConeOutsideVolume(long volume, int force);
 
     SoundGroup* soundGroup;                      // +0x08
-    UnknownSoundBuffer* dsBuffer;             // +0x0c
-    UnknownSound3DBuffer* dsBuffer3D;         // +0x10: the buffer's 3D interface
-    UnknownPropertySet* propertySet;         // +0x14
-    UnknownSoundBuffer* pendingBuffer;       // +0x18: buffer being loaded (streaming)
-    UnknownSound3DBuffer* pendingBuffer3D;   // +0x1c
-    UnknownSoundBuffer** duplicateBuffers;        // +0x20
+    DirectSoundBuffer* dsBuffer;             // +0x0c
+    DirectSound3DBuffer* dsBuffer3D;         // +0x10: the buffer's 3D interface
+    KsPropertySet* propertySet;         // +0x14
+    DirectSoundBuffer* pendingBuffer;       // +0x18: buffer being loaded (streaming)
+    DirectSound3DBuffer* pendingBuffer3D;   // +0x1c
+    DirectSoundBuffer** duplicateBuffers;        // +0x20
     int duplicateCount;                      // +0x24
     Sound* duplicateSource;                  // +0x28: source of a duplicate
     UnknownSoundFade fade;                   // +0x2c

@@ -50,7 +50,7 @@ struct UnknownJoystickState {
 // like IDirectInputEffect::Start, Stop and GetEffectStatus; the identity is
 // inference.
 // Uncalled slots carry the IDirectInputEffect names for that order.
-struct UnknownEffectInterface {
+struct DirectInputEffect {
     virtual long __stdcall QueryInterface(const struct Guid& iid, void** object);
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
@@ -120,7 +120,7 @@ public:
     void UnknownMethod4c3ae0(unsigned char value);
 
 protected:
-    UnknownEffectInterface* effects[5];        // +0x578: released by slot 15
+    DirectInputEffect* effects[5];        // +0x578: released by slot 15
     float axisMaximums[6];                     // +0x58c: axis ranges (flip base for axes 1, 2)
     float previousRawAxes[6];                  // +0x5a4: previous raw axis values
     float deadZoneScales[6];                   // +0x5bc: dead-zone scale per axis

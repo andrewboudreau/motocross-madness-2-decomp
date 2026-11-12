@@ -37,7 +37,7 @@ struct UnknownMediaSurfaceDesc {
 };
 
 // IStreamSample / IDirectDrawStreamSample.
-struct UnknownStreamSampleInterface {
+struct DirectDrawStreamSample {
     virtual long __stdcall QueryInterface(const Guid* iid, void** object);
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
@@ -49,7 +49,7 @@ struct UnknownStreamSampleInterface {
 };
 
 // IMediaStream / IDirectDrawMediaStream.
-struct UnknownMediaStreamInterface {
+struct DirectDrawMediaStream {
     virtual long __stdcall QueryInterface(const Guid* iid, void** object);
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
@@ -65,16 +65,16 @@ struct UnknownMediaStreamInterface {
     virtual long __stdcall UnknownMethod11();
     virtual long __stdcall UnknownMethod12();
     virtual long __stdcall CreateSample(DirectDrawSurface* surface, const void* rect,
-                                        unsigned long flags, UnknownStreamSampleInterface** sample);
+                                        unsigned long flags, DirectDrawStreamSample** sample);
 };
 
 // IMultiMediaStream / IAMMultiMediaStream.
-struct UnknownMultiMediaStreamInterface {
+struct AMMultiMediaStream {
     virtual long __stdcall QueryInterface(const Guid* iid, void** object);
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
     virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall GetMediaStream(const Guid* purpose, UnknownMediaStreamInterface** stream);
+    virtual long __stdcall GetMediaStream(const Guid* purpose, DirectDrawMediaStream** stream);
     virtual long __stdcall UnknownMethod5();
     virtual long __stdcall GetState(int* state);
     virtual long __stdcall SetState(int state);
@@ -86,7 +86,7 @@ struct UnknownMultiMediaStreamInterface {
     virtual long __stdcall UnknownMethod13();
     virtual long __stdcall UnknownMethod14();
     virtual long __stdcall AddMediaStream(void* object, const Guid* purpose, unsigned long flags,
-                                          UnknownMediaStreamInterface** stream);
+                                          DirectDrawMediaStream** stream);
     virtual long __stdcall OpenFile(const unsigned short* file, unsigned long flags);
 };
 
@@ -128,12 +128,12 @@ public:
     DirectDrawSurface* sampleSurface;   // +0x38: the sample's surface (IDirectDrawSurface4)
     int frameRect[4];                         // +0x3c: the frame rectangle
     DirectDrawSurface* field_0x4c;      // released by the destructor only
-    UnknownMultiMediaStreamInterface* multiMediaStream; // +0x50: IAMMultiMediaStream
-    UnknownDirectDrawInterface* directDraw;   // +0x54: IDirectDraw of the display's DirectDraw
-    UnknownDirectDrawInterface* displayDirectDraw; // +0x58: the display's DirectDraw (not released)
-    UnknownMediaStreamInterface* videoStream; // +0x5c: the primary video stream
-    UnknownMediaStreamInterface* videoDrawStream; // +0x60: its IDirectDrawMediaStream
-    UnknownStreamSampleInterface* videoSample; // +0x64: the stream sample
+    AMMultiMediaStream* multiMediaStream; // +0x50: IAMMultiMediaStream
+    DirectDraw* directDraw;   // +0x54: IDirectDraw of the display's DirectDraw
+    DirectDraw* displayDirectDraw; // +0x58: the display's DirectDraw (not released)
+    DirectDrawMediaStream* videoStream; // +0x5c: the primary video stream
+    DirectDrawMediaStream* videoDrawStream; // +0x60: its IDirectDrawMediaStream
+    DirectDrawStreamSample* videoSample; // +0x64: the stream sample
     union {
         __int64 pausedTime;                   // +0x68: time saved by slot 16
         struct {

@@ -18,7 +18,7 @@ SYMBOL = '?UnknownThreadProc@UnknownPCAudioObject@@SGIPAX@Z'
 HELPERS = {
     '?MakeRoomForSound@UnknownPCAudioObject@@QAEXH@Z': 0x4be130,
     '?CreatePendingBuffer@Sound@@QAEHXZ': 0x4bd4b0,
-    '?FillBufferFromFile@Sound@@QAEHPAPAUUnknownSoundBuffer@@@Z': 0x4bd0c0,
+    '?FillBufferFromFile@Sound@@QAEHPAPAUDirectSoundBuffer@@@Z': 0x4bd0c0,
     '?Play@Sound@@QAEHXZ': 0x4bbcd0,
     '?RecordLoadedSound@UnknownPCAudioObject@@QAEXPAVSound@@H@Z': 0x4be0a0,
 }

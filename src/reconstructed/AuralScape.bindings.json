@@ -112,7 +112,7 @@
   "?Set3DPosition@Sound@@QAEHUVector3@@H@Z": "0x004bd7e0",
   "?Set3DVelocity@Sound@@QAEHUVector3@@H@Z": "0x004bd8a0",
   "?Set3DDistanceRange@Sound@@QAEHMMH@Z": "0x004bd960",
-  "?QueryListener@PCSoundInterface@@QAEPAUUnknownSoundListener@@XZ": "0x004be800",
+  "?QueryListener@PCSoundInterface@@QAEPAUDirectSound3DListener@@XZ": "0x004be800",
   "?SetEAXEnvironment@PCSoundInterface@@QAEHK@Z": "0x004bed00",
   "?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVFileStream@@PBD1H@Z": "0x004e9cd0",
   "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",

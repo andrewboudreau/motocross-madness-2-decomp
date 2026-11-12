@@ -48,7 +48,7 @@ static int Invoke(int retail,int rate,int stereo,int bits){
 }
 static void Run(int retail,int rate,int stereo,int bits){
     memset(&observed,0,sizeof(observed));memset(&world,0x53,sizeof(world));world.audio[0x2c]=(BYTE)active;
-    world.buffer[0]=(DWORD)table;Object()->primaryBuffer=mode==2?0:(UnknownSoundBuffer*)world.buffer;
+    world.buffer[0]=(DWORD)table;Object()->primaryBuffer=mode==2?0:(DirectSoundBuffer*)world.buffer;
     observed.result=-501;try{observed.result=Invoke(retail,rate,stereo,bits);}catch(int e){observed.exception=e;}
     observed.after=world;
 }

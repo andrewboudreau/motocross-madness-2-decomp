@@ -12,14 +12,14 @@
 struct Matrix4;
 struct SurfaceMaterial;
 struct Guid;
-struct UnknownClipperInterface;
+struct DirectDrawClipper;
 struct DDSurfaceDesc2;
 struct DDSCaps2;
 struct DDPixelFormat;
 
 // Device at PCRenderTarget+0x50 (IDirect3DDevice7, created by IDirect3D7's
 // CreateDevice).
-struct UnknownRenderInterface {
+struct Direct3DDevice {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
     virtual long __stdcall Release();                                           // 2
@@ -108,7 +108,7 @@ struct DirectDrawSurface {
     virtual long __stdcall Lock(void* rect, DDSurfaceDesc2* desc, int flags, void* event); // 25
     virtual long __stdcall ReleaseDC(void* dc);                                   // 26
     virtual long __stdcall Restore();                                             // 27
-    virtual long __stdcall SetClipper(UnknownClipperInterface* clipper);          // 28
+    virtual long __stdcall SetClipper(DirectDrawClipper* clipper);          // 28
     virtual long __stdcall SetColorKey(int flags, void* key);                     // 29
     virtual long __stdcall UnknownMethod30();
     virtual long __stdcall SetPalette(void* palette);                             // 31
@@ -172,21 +172,21 @@ struct DDSurfaceDesc2 {
 
 // A palette Display+0x190's slot 5 creates (IDirectDrawPalette-shaped;
 // Palette8 releases it through slot 2).
-struct UnknownPaletteInterface {
+struct DirectDrawPalette {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
     virtual long __stdcall Release();                                           // 2
 };
 
 // Interface at Display+0x190 (IDirectDraw7-shaped).
-struct UnknownDirectDrawInterface {
+struct DirectDraw {
     virtual long __stdcall QueryInterface(const Guid* iid, void** object); // 0
     virtual long __stdcall UnknownMethod1();
     virtual long __stdcall Release();                                           // 2
     virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall CreateClipper(unsigned long flags, UnknownClipperInterface** clipper,
+    virtual long __stdcall CreateClipper(unsigned long flags, DirectDrawClipper** clipper,
                                           void* outer);                         // 4
-    virtual long __stdcall CreatePalette(unsigned long flags, void* entries, UnknownPaletteInterface** palette,
+    virtual long __stdcall CreatePalette(unsigned long flags, void* entries, DirectDrawPalette** palette,
                                           void* outer);                         // 5
     virtual long __stdcall CreateSurface(DDSurfaceDesc2* desc, DirectDrawSurface** surface,
                                           void* outer);                         // 6
@@ -218,13 +218,13 @@ struct UnknownDirectDrawInterface {
 };
 
 // Interface at Display+0x194 (IDirect3D7, from QueryInterface).
-struct UnknownDirect3DInterface {
+struct Direct3D {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
     virtual long __stdcall Release();                                           // 2
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall CreateDevice(const Guid* device, DirectDrawSurface* surface,
-                                          UnknownRenderInterface** result);     // 4
+                                          Direct3DDevice** result);     // 4
     virtual long __stdcall UnknownMethod5();
     virtual long __stdcall EnumZBufferFormats(const Guid* device,
                                           long(__stdcall* callback)(DDPixelFormat*, void*),
@@ -232,7 +232,7 @@ struct UnknownDirect3DInterface {
 };
 
 // Clipper at Display+0x1ac (IDirectDrawClipper-shaped).
-struct UnknownClipperInterface {
+struct DirectDrawClipper {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
     virtual long __stdcall Release();                                           // 2
@@ -246,7 +246,7 @@ struct UnknownClipperInterface {
 
 // Gamma control at Display+0x1a4 (IDirectDrawGammaControl-shaped, queried
 // from the primary surface).
-struct UnknownGammaControlInterface {
+struct DirectDrawGammaControl {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
     virtual long __stdcall Release();                                           // 2

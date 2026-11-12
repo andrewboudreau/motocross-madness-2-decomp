@@ -12,7 +12,7 @@ PCCamera::PCCamera(int flags) : Camera(flags) {}
 // 0x004bedc0: stores and submits the world transform.
 int PCCamera::SetWorldMatrix(const Matrix4* world) {
     Camera::SetWorldMatrix(world);
-    UnknownRenderInterface* device = PCOwner()->device;
+    Direct3DDevice* device = PCOwner()->device;
     if (device && device->SetTransform(D3DTRANSFORMSTATE_WORLD, world))
         return 0;
     return 1;
@@ -21,7 +21,7 @@ int PCCamera::SetWorldMatrix(const Matrix4* world) {
 // 0x004bee00: stores and submits the view transform.
 int PCCamera::SetViewMatrix(const Matrix4* view) {
     Camera::SetViewMatrix(view);
-    UnknownRenderInterface* device = PCOwner()->device;
+    Direct3DDevice* device = PCOwner()->device;
     if (device && device->SetTransform(D3DTRANSFORMSTATE_VIEW, view))
         return 0;
     return 1;
@@ -30,7 +30,7 @@ int PCCamera::SetViewMatrix(const Matrix4* view) {
 // 0x004bee40: stores and submits the projection transform.
 int PCCamera::SetProjectionMatrix(const Matrix4* projection) {
     Camera::SetProjectionMatrix(projection);
-    UnknownRenderInterface* device = PCOwner()->device;
+    Direct3DDevice* device = PCOwner()->device;
     if (device && device->SetTransform(D3DTRANSFORMSTATE_PROJECTION, projection))
         return 0;
     return 1;

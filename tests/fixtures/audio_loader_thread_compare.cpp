@@ -63,8 +63,8 @@ static void EventAt(int kind,int receiver,int arg,int extra){
         int n=receiver>0?receiver-1:0;Sound* sound=Item(n);
         sound->bufferReady=!sound->bufferReady;sound->isStopped=!sound->isStopped;
         sound->bufferBytes^=0x81fedcba;sound->soundFlags^=4;
-        sound->pendingBuffer=(UnknownSoundBuffer*)(0x12340000+n*16);
-        sound->pendingBuffer3D=(UnknownSound3DBuffer*)(0x23450000+n*16);
+        sound->pendingBuffer=(DirectSoundBuffer*)(0x12340000+n*16);
+        sound->pendingBuffer3D=(DirectSound3DBuffer*)(0x23450000+n*16);
         Audio()->queuedEvent=(HANDLE)0x76543210;Audio()->stopEvent=(HANDLE)0x76543211;
         }
     }
@@ -107,15 +107,15 @@ void UnknownPCAudioObject::MakeRoomForSound(int bytes){
 int Sound::CreatePendingBuffer(){
     int n=SoundIndex(this);if(observed.held[n+1]!=1)ExitProcess(87);
     EventAt(5,n+1,0,0);++observed.creates[n];
-    pendingBuffer=(UnknownSoundBuffer*)(0x34560000+n*16);
-    pendingBuffer3D=(UnknownSound3DBuffer*)(0x45670000+n*16);
+    pendingBuffer=(DirectSoundBuffer*)(0x34560000+n*16);
+    pendingBuffer3D=(DirectSound3DBuffer*)(0x45670000+n*16);
     return scenario.failMask&(1<<n)?0:(scenario.seed&1?-3:1);
 }
-int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer){
+int Sound::FillBufferFromFile(DirectSoundBuffer** buffer){
     int n=SoundIndex(this);if(buffer!=&pendingBuffer || observed.held[n+1]!=1)ExitProcess(88);
     EventAt(6,n+1,(int)*buffer,(int)pendingBuffer3D);++observed.fills[n];
-    pendingBuffer=(UnknownSoundBuffer*)(0x56780000+n*16);
-    pendingBuffer3D=(UnknownSound3DBuffer*)(0x67890000+n*16);
+    pendingBuffer=(DirectSoundBuffer*)(0x56780000+n*16);
+    pendingBuffer3D=(DirectSound3DBuffer*)(0x67890000+n*16);
     return scenario.seed&2?0:-1; // The loader ignores this result, even failure.
 }
 int Sound::Play(){

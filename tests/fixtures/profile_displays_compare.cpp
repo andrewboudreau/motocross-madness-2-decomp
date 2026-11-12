@@ -281,7 +281,7 @@ static void Run(int retail) {
     g_DisplayCount=scenario.count;activeDisplay=0;
     for (int n=0;n<4;++n) {
         g_Displays[n]=Display(n);*(DWORD*)Display(n)=(DWORD)displayTable;
-        Display(n)->directDraw=(UnknownDirectDrawInterface*)&drawObjects[n];
+        Display(n)->directDraw=(DirectDraw*)&drawObjects[n];
         Display(n)->backBuffer=(DirectDrawSurface*)&surfaceObjects[n][10];
         Display(n)->frameBufferCount=1+n;Display(n)->displayModes=modes[n];
         Display(n)->displayModeCount=scenario.modeCount;Display(n)->driverCaps=0;

@@ -43,7 +43,7 @@ public:
     int SetVelocity(Vector3 velocity);
 
     AuralScape* ownerScape;                   // +0x00
-    UnknownSoundListener* soundListener;      // +0x04
+    DirectSound3DListener* soundListener;      // +0x04
 };
 
 // RTTI: SoundEmitter : GameObject (0x1a4 bytes). A named sound placed in

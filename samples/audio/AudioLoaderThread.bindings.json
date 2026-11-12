@@ -1,6 +1,6 @@
 {
   "?CreatePendingBuffer@Sound@@QAEHXZ": "0x004bd4b0",
-  "?FillBufferFromFile@Sound@@QAEHPAPAUUnknownSoundBuffer@@@Z": "0x004bd0c0",
+  "?FillBufferFromFile@Sound@@QAEHPAPAUDirectSoundBuffer@@@Z": "0x004bd0c0",
   "?MakeRoomForSound@UnknownPCAudioObject@@QAEXH@Z": "0x004be130",
   "?Play@Sound@@QAEHXZ": "0x004bbcd0",
   "?RecordLoadedSound@UnknownPCAudioObject@@QAEXPAVSound@@H@Z": "0x004be0a0",

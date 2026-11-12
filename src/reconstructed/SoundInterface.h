@@ -30,20 +30,20 @@ public:
 // that IID, the buffer description and the call shapes.
 struct UnknownSoundCaps;
 struct UnknownSoundBufferDesc;
-struct UnknownSoundBuffer;
+struct DirectSoundBuffer;
 
-struct UnknownDirectSound {
+struct DirectSound {
     virtual long __stdcall QueryInterface(const Guid& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
-    virtual long __stdcall CreateSoundBuffer(const UnknownSoundBufferDesc* desc, UnknownSoundBuffer** buffer,
+    virtual long __stdcall CreateSoundBuffer(const UnknownSoundBufferDesc* desc, DirectSoundBuffer** buffer,
                                              void* outer);
     virtual long __stdcall GetCaps(UnknownSoundCaps* caps);
-    virtual long __stdcall DuplicateSoundBuffer(UnknownSoundBuffer* original, UnknownSoundBuffer** duplicate);
+    virtual long __stdcall DuplicateSoundBuffer(DirectSoundBuffer* original, DirectSoundBuffer** duplicate);
     virtual long __stdcall SetCooperativeLevel(void* window, unsigned long level);
 };
 
-struct UnknownSoundBuffer {
+struct DirectSoundBuffer {
     virtual long __stdcall QueryInterface(const Guid& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
@@ -68,7 +68,7 @@ struct UnknownSoundBuffer {
     virtual long __stdcall Restore();
 };
 
-struct UnknownSoundListener {
+struct DirectSound3DListener {
     virtual long __stdcall QueryInterface(const Guid& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
@@ -141,7 +141,7 @@ struct UnknownWaveFormat {
 };
 
 // dsound.dll imports (thunks 0x005330a0 and 0x005330a6).
-extern "C" long __stdcall DirectSoundCreate(const Guid* device, UnknownDirectSound** result, void* outer);
+extern "C" long __stdcall DirectSoundCreate(const Guid* device, DirectSound** result, void* outer);
 extern "C" long __stdcall DirectSoundEnumerateA(int(__stdcall* callback)(Guid*, const char*, const char*,
                                                                          void*),
                                                 void* context);
@@ -151,8 +151,8 @@ extern "C" const Guid IID_IDirectSound3DListener; // 0x00556c90
 extern "C" const Guid DSPROPSETID_EAX_ListenerProperties;
 
 // 0xf0-byte record of one enumerated sound device.
-struct UnknownSoundDevice {
-    UnknownSoundDevice(); // 0x004be280
+struct SoundDeviceRecord {
+    SoundDeviceRecord(); // 0x004be280
     // 0x004be2d0: records `guid` and `description` and the device's caps;
     // 0 when `guid` is null or the device cannot be created.
     int ProbeSoundDevice(Guid* guid, const char* description);
@@ -177,14 +177,14 @@ public:
     // 0x004be7b0: device enumeration callback; records up to four devices.
     static int __stdcall EnumSoundDeviceCallback(Guid* guid, const char* description, const char* module,
         void* context);
-    UnknownSoundListener* QueryListener();              // 0x004be800: queries a new listener
+    DirectSound3DListener* QueryListener();              // 0x004be800: queries a new listener
     int RefreshSoundCaps();                             // 0x004be850: refreshes soundCaps
     int GetSoundCaps(UnknownSoundCaps* caps);           // 0x004be860
     void FormatSoundCapsReport();                       // 0x004be8b0: formats a caps report
     int SetPrimaryFormat(int rate, int stereo, int bits); // 0x004be910: primary format
     int SetPrimaryVolume(long volume);                  // 0x004be9b0: primary volume
     void ProbeEAXSupport();                             // 0x004be9e0: EAX probe
-    UnknownSoundBuffer* CreatePrimaryBuffer();          // 0x004beb10: creates the primary buffer
+    DirectSoundBuffer* CreatePrimaryBuffer();          // 0x004beb10: creates the primary buffer
     // 0x004beb80-0x004becd0: the listener's deferred settings.
     int CommitListenerSettings();
     int SetListenerDistanceFactor(float factor);
@@ -199,17 +199,17 @@ public:
     int SetEAXListenerParameters(void* parameters);
 
     int soundDeviceCount;                      // +0x30: enumerated device count
-    UnknownSoundDevice* selectedSoundDevice;   // +0x34: chosen device
-    UnknownSoundDevice soundDevices[4];        // +0x38
+    SoundDeviceRecord* selectedSoundDevice;   // +0x34: chosen device
+    SoundDeviceRecord soundDevices[4];        // +0x38
     long startupPrimaryVolume;                 // +0x3f8: primary volume at start-up
     UnknownSoundCaps soundCaps;                // +0x3fc
     unsigned char allowSoundHardware : 1;      // +0x45c bit 0: "AllowSoundHardware"
     unsigned char allowSoundEnumeration : 1;   // +0x45c bit 1: "AllowSoundEnumeration"
     unsigned char eaxAvailable : 1;            // +0x45c bit 2: EAX listener available
     unsigned char allowEAXExtension : 1;       // +0x45c bit 3: "AllowEAXExtension"
-    UnknownDirectSound* directSound;           // +0x460
-    UnknownSoundListener* listener;            // +0x464
-    UnknownSoundBuffer* primaryBuffer;         // +0x468: primary buffer
+    DirectSound* directSound;           // +0x460
+    DirectSound3DListener* listener;            // +0x464
+    DirectSoundBuffer* primaryBuffer;         // +0x468: primary buffer
     UnknownPCAudioObject* soundMemoryManager;  // +0x46c
     SoundGroup* eaxProbeGroup;                 // +0x470
     Sound* eaxProbeSound;                      // +0x474: EAX probe sound

@@ -354,7 +354,7 @@ int Sound::LoadWave(FileStream* stream, unsigned long flags, unsigned long contr
         bufferReady = 1;
     }
     if ((soundFlags & 1) && duplicates > 0) {
-        duplicateBuffers = new (__FILE__, 496) UnknownSoundBuffer*[duplicates];
+        duplicateBuffers = new (__FILE__, 496) DirectSoundBuffer*[duplicates];
         duplicateCount = duplicates;
         for (int i = 0; i < duplicateCount; i++) {
             if (SoundSystem()->directSound->DuplicateSoundBuffer(dsBuffer, &duplicateBuffers[i]) != 0)
@@ -436,7 +436,7 @@ int Sound::DuplicateFrom(Sound* source) {
         return 0;
     ReleaseBuffers();
     strcpy(soundName, "");
-    UnknownSoundBuffer* duplicate = 0;
+    DirectSoundBuffer* duplicate = 0;
     if (!DuplicateBuffer(&duplicate, source))
         return 0;
     dsBuffer = duplicate;
@@ -830,7 +830,7 @@ int Sound::UnlockBuffer(void* first, unsigned long firstBytes, void* second, uns
 // skipping the 44-byte header. Both branches end at one `return 1`, which
 // retail places after the file branch's delete, so the archive branch's
 // success jumps there; each file failure deletes the stream on its own path.
-int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
+int Sound::FillBufferFromFile(DirectSoundBuffer** buffer) {
     if (!buffer)
         return 0;
     if (isPacked) {
@@ -868,7 +868,7 @@ int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
 // 0x004bd260: copies `bytes` of the stream into `buffer` at `offset`. At the
 // end of the data a looping sound rewinds to the data start; any other is
 // silenced and stopped.
-int Sound::FillBufferFromStream(UnknownSoundBuffer** buffer, FileStream* stream, unsigned long offset,
+int Sound::FillBufferFromStream(DirectSoundBuffer** buffer, FileStream* stream, unsigned long offset,
     unsigned long bytes) {
     void* first;
     unsigned long firstBytes;
@@ -930,7 +930,7 @@ failed:
 
 // 0x004bd540: creates a PCM buffer: static ones in software, others in
 // hardware or deferred, 3D ones with the 3D algorithm.
-int Sound::CreateBuffer(UnknownSoundBuffer** buffer, unsigned long bytes, unsigned long rate,
+int Sound::CreateBuffer(DirectSoundBuffer** buffer, unsigned long bytes, unsigned long rate,
     int bits, int blockAlign, int stereo, int is3D,
     int isStatic, unsigned long flags, int hardware) {
     UnknownPcmFormat format;
@@ -969,14 +969,14 @@ int Sound::CreateBuffer(UnknownSoundBuffer** buffer, unsigned long bytes, unsign
 }
 
 // 0x004bd6a0
-int Sound::DuplicateBuffer(UnknownSoundBuffer** duplicate, Sound* source) {
+int Sound::DuplicateBuffer(DirectSoundBuffer** duplicate, Sound* source) {
     if (!source || !source->dsBuffer)
         return 0;
     return SoundSystem()->directSound->DuplicateSoundBuffer(source->dsBuffer, duplicate) >= 0;
 }
 
 // 0x004bd6e0
-int Sound::Query3DBuffer(UnknownSoundBuffer* buffer, UnknownSound3DBuffer** buffer3D) {
+int Sound::Query3DBuffer(DirectSoundBuffer* buffer, DirectSound3DBuffer** buffer3D) {
     if (!buffer)
         goto failed;
     if (buffer->QueryInterface(IID_IDirectSound3DBuffer, (void**)buffer3D) < 0)
@@ -1212,7 +1212,7 @@ void UnknownPCAudioObject::UnloadSound(Sound* sound) {
 }
 
 // 0x004be280: an empty device record.
-UnknownSoundDevice::UnknownSoundDevice() {
+SoundDeviceRecord::SoundDeviceRecord() {
     memset(&guid, 0, sizeof(guid));
     strcpy(description, "");
     memset(&caps, 0, sizeof(caps));
@@ -1220,12 +1220,12 @@ UnknownSoundDevice::UnknownSoundDevice() {
 
 // 0x004be2d0: records the device and its caps. The probe object is only
 // released on success (retail behaviour).
-int UnknownSoundDevice::ProbeSoundDevice(Guid* deviceGuid, const char* text) {
+int SoundDeviceRecord::ProbeSoundDevice(Guid* deviceGuid, const char* text) {
     if (!deviceGuid)
         return 0;
     guid = *deviceGuid;
     strncpy(description, text, 0x7f);
-    UnknownDirectSound* sound = 0;
+    DirectSound* sound = 0;
     if (DirectSoundCreate(deviceGuid, &sound, 0) < 0)
         goto failed;
     caps.size = sizeof(caps);
@@ -1350,10 +1350,10 @@ int __stdcall PCSoundInterface::EnumSoundDeviceCallback(Guid* guid, const char* 
 }
 
 // 0x004be800: a new listener interface from the primary buffer, or 0.
-UnknownSoundListener* PCSoundInterface::QueryListener() {
+DirectSound3DListener* PCSoundInterface::QueryListener() {
     if (!audioStarted && !primaryBuffer)
         return 0;
-    UnknownSoundListener* listener = 0;
+    DirectSound3DListener* listener = 0;
     long result = primaryBuffer->QueryInterface(IID_IDirectSound3DListener, (void**)&listener);
     return result < 0 ? 0 : listener;
 }
@@ -1418,8 +1418,8 @@ void PCSoundInterface::ProbeEAXSupport() {
 }
 
 // 0x004beb10: creates the primary buffer (3D and volume control), or 0.
-UnknownSoundBuffer* PCSoundInterface::CreatePrimaryBuffer() {
-    UnknownSoundBuffer* buffer = 0;
+DirectSoundBuffer* PCSoundInterface::CreatePrimaryBuffer() {
+    DirectSoundBuffer* buffer = 0;
     UnknownSoundBufferDesc desc = {0};
 
     memset(&desc, 0, sizeof(desc));

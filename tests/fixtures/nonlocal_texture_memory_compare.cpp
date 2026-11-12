@@ -48,7 +48,7 @@ static EventRecord& Event(int op,int a=0,int b=0,int c=0,int d=0,int e=0,int f=0
 static void Callback(int op){
     if(silent)return;
     if(scenario.mutation==1 && valuePointer)*valuePointer=scenario.seed*100+op;
-    if(scenario.mutation==2 && op==5)Display()->directDraw=(UnknownDirectDrawInterface*)world.drawObjects[1];
+    if(scenario.mutation==2 && op==5)Display()->directDraw=(DirectDraw*)world.drawObjects[1];
     if(scenario.mutation==3 && op==1){
         Display()->backBuffer=(DirectDrawSurface*)world.surfaceObjects[1];Display()->frameBufferCount=-scenario.seed;
     }
@@ -215,7 +215,7 @@ static void Run(int retail){
     memset(&observed,0,sizeof(observed));memset(&world,0x63+scenario.seed%19,sizeof(world));
     for(int i=0;i<2;++i){*(DWORD*)Target(i)=targetVptr;world.drawObjects[i][0]=(DWORD)drawTable;
         world.surfaceObjects[i][0]=(DWORD)surfaceTable;Target(i)->surfacePixelFormat=0x22b8+i+scenario.seed;}
-    Display()->directDraw=scenario.fail==7?0:(UnknownDirectDrawInterface*)world.drawObjects[0];
+    Display()->directDraw=scenario.fail==7?0:(DirectDraw*)world.drawObjects[0];
     Display()->backBuffer=(DirectDrawSurface*)world.surfaceObjects[0];Display()->frameBufferCount=2+scenario.seed;
     Display()->displayModes=world.modes;Display()->displayModeCount=scenario.modes<2?scenario.modes-1:5;
     for(i=0;i<5;++i){world.modes[i].width=640;world.modes[i].height=480;world.modes[i].bitDepth=16;}

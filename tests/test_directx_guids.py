@@ -22,7 +22,7 @@ CONSUMERS = (
      '_IID_IDirectPlayLobby3A', 0x556870, ((0x4ab9ee, 0),)),
     ('Net', '?CreateAddress@NetworkInterface@@QAEHU_GUID@@PAD1PAXPAPAXPAK@Z', 0x4abf10, 948,
      '_DPAID_INetPort', 0x556960, ((0x4ac044, 0), (0x4ac049, 4), (0x4ac04f, 8), (0x4ac059, 12))),
-    ('PCAudio', '?CreateBuffer@Sound@@QAEHPAPAUUnknownSoundBuffer@@KKHHHHHKH@Z', 0x4bd540, 342,
+    ('PCAudio', '?CreateBuffer@Sound@@QAEHPAPAUDirectSoundBuffer@@KKHHHHHKH@Z', 0x4bd540, 342,
      '_DS3DALG_NO_VIRTUALIZATION', 0x556cf0,
      ((0x4bd5ec, 0), (0x4bd5f2, 4), (0x4bd5fc, 8), (0x4bd606, 12))),
     ('PCAudio', '?ProbeEAXSupport@PCSoundInterface@@QAEXXZ', 0x4be9e0, 301,

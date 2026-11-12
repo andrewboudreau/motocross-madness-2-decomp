@@ -4,7 +4,7 @@
 
 class ColorMapper;
 class FileStream;
-struct UnknownPaletteInterface;
+struct DirectDrawPalette;
 
 // PALETTEENTRY-shaped (red, green, blue, flags); passed to
 // GetSystemPaletteEntries and DirectDraw's CreatePalette.
@@ -32,7 +32,7 @@ public:
     unsigned char rgbEntries[256][3];         // +0x008 RGB entries from the stream
     UnknownPaletteEntry paletteEntries[256];  // +0x308 the DirectDraw palette's entries
     ColorMapper* colorMapper;                 // +0x708 the mapper named in the stream
-    UnknownPaletteInterface* ddPalette;       // +0x70c from DirectDraw CreatePalette
+    DirectDrawPalette* ddPalette;       // +0x70c from DirectDraw CreatePalette
     int firstEntry;                           // +0x710 first entry; 10 keeps the system colours
     int entryCount;                           // +0x714 number of entries
 };

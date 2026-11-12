@@ -67,7 +67,7 @@ public:
     // PCVideoCard.cpp use it under this provisional name).
     DirectDrawSurface* renderSurface;    // +0x48
     DirectDrawSurface* zbuffer;    // created with DDSCAPS_ZBUFFER and attached to the surface
-    UnknownRenderInterface* device;      // created by the Direct3D object's method 4 (CreateDevice)
+    Direct3DDevice* device;      // created by the Direct3D object's method 4 (CreateDevice)
     Guid deviceGuid;             // Direct3D device GUID (PCGame +0x2f8); cleared by the constructor
     unsigned char field_0x64[0x164 - 0x64];
     // 0x164..0x250: the device description GetCaps fills (D3DDEVICEDESC7
