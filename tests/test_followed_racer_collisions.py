@@ -15,7 +15,7 @@ ROOT=Path(__file__).resolve().parents[1]
 SOURCES=('src/reconstructed/FollowRacer.cpp','samples/race/FollowRacerNearMisses.cpp','samples/race/FollowedRacerPicker.cpp')
 GROUPS={
  'bike':('src/krusty2/vehicle/KrustyBike.cpp','#include "vehicle/KrustyBikeCore.h"\n#include "collision/CollisionObject.h"\n#include "Wrecker.h"\n',
-         [('KrustyBike::Fn_00496F90','?Fn_00496F90@KrustyBike',0x496f90,981)]),
+         [('KrustyBike::IgnoreCollisionsWith','?IgnoreCollisionsWith@KrustyBike',0x496f90,981)]),
  'collision':('src/krusty2/collision/CollisionObject.cpp','#include "collision/CollisionObject.h"\n#include "core/DebugAlloc.h"\n',
               [('CollisionObject::AddIgnoredOwner','?AddIgnoredOwner@CollisionObject',0x439410,118)]),
  'allocator':('src/reconstructed/MemTag.cpp','#include <malloc.h>\n#include <stdlib.h>\n#include <string.h>\n#include "MemTag.h"\n#include "DebugAlloc.h"\nextern int g_UnclaimedBytes;\nvoid* DebugMemcpy(void*,const void*,unsigned int,const char*,int);\n',

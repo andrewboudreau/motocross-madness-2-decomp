@@ -101,14 +101,14 @@ public:
     void SendFollowedRacer(Vehicle* racer, bool request);   // 0x004925a0: message 0x13 (request) or 0x87
     void SetNetRecorder(KbRecorder* recorder);              // 0x00496e20: stores netRecorder
     int ReceivedPositionChanged();                          // 0x00495c00: remote; newest two states differ in (int)x or z
-    void Fn_00496DA0();
-    void Fn_00496D20();
-    void Fn_00496F90(KrustyBike* other);
-    void Fn_00497370(KrustyBike* other);
+    void UseBikeAndRiderCollision();
+    void UseBikeCollision();
+    void IgnoreCollisionsWith(KrustyBike* other);
+    void RestoreCollisionsWith(KrustyBike* other);
     float AwardTrickScore();
     // 0x004933e0: adds message 13's deltas to the decoded network state and copies it out.
     void ApplyStateDelta(const KbNetDelta* delta, KbNetState* state);
-    void Fn_00496E30(int protect);
+    void ApplySpawnCollisionIgnores(int protect);
     // 0x00413200 (in BikeAI.cpp; called by slot 49 for AI bikes): one physics step of the
     // two-point look-ahead model 0x0040eca0 instead of the Vehicle step; returns 1.
     int Fn_00413200(float dt);
@@ -167,7 +167,7 @@ public:
     short lapCount;  // +0x7A0  RaceView/BikeRace +0x7a0 laps
     short prevLapCount;                       // +0x7A2  lapCount of the previous frame (slot 49); compared for the first-lap check (tier 3)
     char hasFinished;  // +0x7A4  RaceView +0x7a4 finished (BikeRace racer +0x7a4 finished)
-    char spawnProtectEndPending;              // +0x7A5  slot 50 sets it on an off request while spawnProtected; cleared with Fn_00496E30(0) once the bike is clear (tier 3)
+    char spawnProtectEndPending;              // +0x7A5  slot 50 sets it on an off request while spawnProtected; cleared with ApplySpawnCollisionIgnores(0) once the bike is clear (tier 3)
     char pad_0x07A6[0x2];
     float airCrashTimerReload;  // +0x7A8  the loader sets 3.5; slot 69 reloads crashTimer from it for crashDirection 2 (input action 8 with both wheels > 3.5 off the ground) (tier 3)
     float repairDamage;                       // +0x7AC  slot 28 adds rand x 0.667 (AI 0.15) per new crash; PayOutRace reads it via the result +0x34 as repairs x 500 (tier 3)
@@ -224,8 +224,8 @@ public:
     int latchedPoseParam;                     // +0x1408  poseParam byte frozen by poseParamLatched; retail also stores the lean byte here (tier 3)
     int latchedPoseLeanBlend;                 // +0x140C  read as the frozen poseLeanBlend byte; retail stores that byte at +0x1408, so only the reset writes it (tier 3)
     int debugPage; // 0x1410  -1 from the constructor; the "KrustyBike" debug-overlay page (Tick 0x004977a0 takes the next line)
-    CollisionObject* bikeAndRiderCollision;  // +0x1414  Load: CollisionObject(1) with "BikeAndRider.col"; the default collisionObject (Fn_00496DA0 swaps back to it)
-    CollisionObject* bikeCollision;          // +0x1418  Load: CollisionObject(1) with "Bike.col", disabled at load; Fn_00496D20 swaps collisionObject to it
+    CollisionObject* bikeAndRiderCollision;  // +0x1414  Load: CollisionObject(1) with "BikeAndRider.col"; the default collisionObject (UseBikeAndRiderCollision swaps back to it)
+    CollisionObject* bikeCollision;          // +0x1418  Load: CollisionObject(1) with "Bike.col", disabled at load; UseBikeCollision swaps collisionObject to it
     float trickLandTimer;                     // +0x141C  slot 71 sets 0.3 on landing with a trick pending; slot 29 scores via 0x00495ff0 when it runs out (tier 3)
     int riderTrickMotions[16]; // 0x1420  Load: riderCharacter->FindMotion("BarKneel", "SplitX" .. "DCanCan"); StartTrick indexes it (tier 1 strings)
     int bikeTrickMotions[16]; // 0x1460  Load: FindMotion("bBarKneel" .. "bDCanCan") on the D3DIMSoultreeCharacter base; StartTrick

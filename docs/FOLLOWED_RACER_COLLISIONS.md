@@ -1,7 +1,7 @@
 # Followed-racer collision notifications
 
 `TrackGameViewOwner::AnnounceFollowedRacer` now calls the existing
-`KrustyBike::Fn_00496F90(KrustyBike*)` provider through explicit primary-pointer
+`KrustyBike::IgnoreCollisionsWith(KrustyBike*)` provider through explicit primary-pointer
 casts. Three sites retire one provisional method spelling. There is no new
 provider, storage, header declaration, wrapper, or type-wide alias.
 
@@ -61,7 +61,7 @@ object and each unchanged function extracted for execution:
 | --- | --- | --- |
 | AnnounceFollowedRacer | `0x4a9f90` | 113 |
 | BikeRace::NextBike | `0x4204e0` | 162 |
-| KrustyBike::Fn_00496F90 | `0x496f90` | 981 |
+| KrustyBike::IgnoreCollisionsWith | `0x496f90` | 981 |
 | CollisionObject::AddIgnoredOwner | `0x439410` | 118 |
 | DebugRealloc | `0x4a2ec0` | 256 |
 | DebugMemcpy | `0x4a3120` | 35 |

@@ -63,10 +63,10 @@ void TrackGameViewOwner::AnnounceFollowedRacer(UnknownEventRacer* racer, Unknown
         if (other == racer)
             continue;
         if (racer)
-            reinterpret_cast<KrustyBike*>(racer)->Fn_00496F90(reinterpret_cast<KrustyBike*>(other));
+            reinterpret_cast<KrustyBike*>(racer)->IgnoreCollisionsWith(reinterpret_cast<KrustyBike*>(other));
         if (previous && previous != other)
-            reinterpret_cast<KrustyBike*>(other)->Fn_00496F90(reinterpret_cast<KrustyBike*>(previous));
+            reinterpret_cast<KrustyBike*>(other)->IgnoreCollisionsWith(reinterpret_cast<KrustyBike*>(previous));
         if (racer)
-            reinterpret_cast<KrustyBike*>(other)->Fn_00496F90(reinterpret_cast<KrustyBike*>(racer));
+            reinterpret_cast<KrustyBike*>(other)->IgnoreCollisionsWith(reinterpret_cast<KrustyBike*>(racer));
     }
 }

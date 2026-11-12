@@ -219,7 +219,7 @@
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "Fn_00496D20@KrustyBike",
+      "UseBikeCollision@KrustyBike",
       4812064,
       119,
       119,
@@ -228,7 +228,7 @@
     ],
     [
       "samples/physics/krustybike/KrustyBikeNearMisses.cpp",
-      "Fn_00496DA0@KrustyBike",
+      "UseBikeAndRiderCollision@KrustyBike",
       4812192,
       119,
       119,

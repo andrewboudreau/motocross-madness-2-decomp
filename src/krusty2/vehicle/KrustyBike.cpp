@@ -408,7 +408,7 @@ void KrustyBike::ResetTrickState()
 
 void KrustyBike::ClearCrashState()
 {
-    Fn_00496DA0();
+    UseBikeAndRiderCollision();
     for (int i = 0; i < collisionPointCount; i++) {
         KbChild* point = ((KbChild**)collisionPoints)[i];
         if (point->field_0x4)
@@ -736,7 +736,7 @@ void KrustyBike::SetSpawnProtection(int protect, float duration, int forced)
                     ((D3DIMSoultreeObject*)riderCharacter->c_0x1a0)->AddModifier((GameObject*)ghostMod);
                     ((GhostMod1*)ghostMod)->StartFade(0);
                 }
-                Fn_00496E30(1);
+                ApplySpawnCollisionIgnores(1);
             }
             spawnProtectForced = 1;
             spawnProtected = 1;
@@ -758,7 +758,7 @@ void KrustyBike::SetSpawnProtection(int protect, float duration, int forced)
                 ((D3DIMSoultreeObject*)riderCharacter->c_0x1a0)->AddModifier((GameObject*)ghostMod);
                 ((GhostMod1*)ghostMod)->StartFade(duration);
             }
-            Fn_00496E30(1);
+            ApplySpawnCollisionIgnores(1);
         }
         spawnProtected = 1;
         spawnProtectTimer = duration;
@@ -1072,16 +1072,16 @@ void KrustyBike::IntegrateMotion(Vec3* force, const Vec3* localTorque, const Vec
 // `jmp 0x496d20`, followed by the usual nop alignment padding.
 void KrustyBike::SwitchToBikeCollision()
 {
-    Fn_00496D20();
+    UseBikeCollision();
 }
 
-// owner: bracket only (0x496d20 sits between slot 101 and Fn_00496DA0)
+// owner: bracket only (0x496d20 sits between slot 101 and UseBikeAndRiderCollision)
 // 0x00496d20 (exact): the real body of slot 101, switching collisionObject from
 // bikeAndRiderCollision to bikeCollision.  The mode test is a nested if with the 0x2d84 test written
 // positively: VC6 then computes the GraphicsTest base (+0xc) in the second test block, calls through ecx
 // and cross-jumps the outer else into the inner slot-5 tail as retail does (the flat
 // `x18 > 1 && !x2d84` form and the nested `!x2d84` form do not).
-void KrustyBike::Fn_00496D20()
+void KrustyBike::UseBikeCollision()
 {
     bikeAndRiderCollision->Disable();
     g_collisionQuadTree->Remove(bikeAndRiderCollision, bikeAndRiderCollision->quadtreeCell);
@@ -1096,9 +1096,9 @@ void KrustyBike::Fn_00496D20()
     collisionObject->SnapPlacement();
 }
 
-// owner: bracket only (0x496da0, directly after Fn_00496D20)
-// 0x00496da0 (exact): back-camera swap, Fn_00496D20 with the two scene objects exchanged.
-void KrustyBike::Fn_00496DA0()
+// owner: bracket only (0x496da0, directly after UseBikeCollision)
+// 0x00496da0 (exact): back-camera swap, UseBikeCollision with the two scene objects exchanged.
+void KrustyBike::UseBikeAndRiderCollision()
 {
     bikeCollision->Disable();
     g_collisionQuadTree->Remove(bikeCollision, bikeCollision->quadtreeCell);
@@ -1114,7 +1114,7 @@ void KrustyBike::Fn_00496DA0()
 }
 
 // 0x00496F90: both bikes' collision objects ignore each other (AddIgnoredOwner = 0x00439410).
-void KrustyBike::Fn_00496F90(KrustyBike* other)
+void KrustyBike::IgnoreCollisionsWith(KrustyBike* other)
 {
     if (bikeCollision) {
         other->bikeCollision->AddIgnoredOwner(bikeCollision);
@@ -1171,7 +1171,7 @@ void KrustyBike::Fn_00496F90(KrustyBike* other)
 }
 
 // 0x00497370: undo the mutual ignore unless one of them is the camera-followed racer.
-void KrustyBike::Fn_00497370(KrustyBike* other)
+void KrustyBike::RestoreCollisionsWith(KrustyBike* other)
 {
     if (reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent) {
         void* current = reinterpret_cast<KbGame*>(g_TrackGame)->tagEvent->field_0xa8;
@@ -1218,14 +1218,14 @@ void KrustyBike::Fn_00497370(KrustyBike* other)
 // every other bike (0x00496F90) and stops the part collision objects ignoring its main body;
 // without it, the reverse (0x00497370), and the part collision objects ignore both of its
 // scene bodies.
-void KrustyBike::Fn_00496E30(int protect)
+void KrustyBike::ApplySpawnCollisionIgnores(int protect)
 {
     int cursor = 0;
     KrustyBike* other;
     if (protect) {
         for (other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor)); other; other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor))) {
             if (other != this)
-                Fn_00496F90(other);
+                IgnoreCollisionsWith(other);
         }
         if (((KbTrackA*)track)->partList && !isRemote) {
             for (int i = 0; i < ((KbTrackA*)track)->partList->count; i++) {
@@ -1237,7 +1237,7 @@ void KrustyBike::Fn_00496E30(int protect)
     } else {
         for (other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor)); other; other = reinterpret_cast<KrustyBike*>(reinterpret_cast<BikeRace*>(race)->NextBike(&cursor))) {
             if (other != this && (!isRemote || !other->isRemote))
-                Fn_00497370(other);
+                RestoreCollisionsWith(other);
         }
         if (((KbTrackA*)track)->partList && !isRemote) {
             for (int i = 0; i < ((KbTrackA*)track)->partList->count; i++) {
@@ -1522,7 +1522,7 @@ int KrustyBike::Tick(float dt)
                 ((D3DIMSoultreeObject*)modelNode)->RemoveModifier((GameObject*)ghostMod);
                 ((D3DIMSoultreeObject*)riderCharacter->c_0x1a0)->RemoveModifier((GameObject*)ghostMod);
             }
-            Fn_00496E30(0);
+            ApplySpawnCollisionIgnores(0);
         }
     }
     if (reinterpret_cast<KbGame*>(g_TrackGame)->debugOverlay && race->localRacer == this) {

@@ -86,7 +86,7 @@ static void ProviderCases(){
   if(role==8)a->wrecker=0;if(role==9)b->wrecker=0;
   if(role>=10){int index=role-10;Collider(index)->ignoreList=0;}
   expected=world;NotifyExpected(a,b);
-  __try{a->Fn_00496F90(b);}__except(Filter(GetExceptionInformation())){}
+  __try{a->IgnoreCollisionsWith(b);}__except(Filter(GetExceptionInformation())){}
   Finish();
  }
 }

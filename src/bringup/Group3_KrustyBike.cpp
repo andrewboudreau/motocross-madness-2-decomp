@@ -924,7 +924,7 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
             if (!isGhost) {
                 SetSpawnProtection(states[0]->flag4, 5.0f, 0);
                 if (spawnProtectEndPending) {
-                    Fn_00496E30(0);
+                    ApplySpawnCollisionIgnores(0);
                     spawnProtectEndPending = 0;
                 }
             }
@@ -948,10 +948,10 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
                 motionIndex = 0;
                 EndMotion();
                 motionCompleted = 0;
-                Fn_00496D20();
+                UseBikeCollision();
             } else if (!crashState && prevCrash) {
                 wrecker->EndWreck();
-                Fn_00496DA0();
+                UseBikeAndRiderCollision();
                 motionActive = 0;
                 motionIndex = 0;
                 reset = 1;
@@ -1019,7 +1019,7 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
             if (!isGhost) {
                 SetSpawnProtection(interpSource->flag4, 5.0f, 0);
                 if (spawnProtectEndPending) {
-                    Fn_00496E30(0);
+                    ApplySpawnCollisionIgnores(0);
                     spawnProtectEndPending = 0;
                 }
             }
@@ -1046,10 +1046,10 @@ void KrustyBike::InterpolateNetworkState(float dt, int copyRaceProgress)
                 motionIndex = 0;
                 EndMotion();
                 motionCompleted = 0;
-                Fn_00496D20();
+                UseBikeCollision();
             } else if (!crashState && prevCrash) {
                 wrecker->EndWreck();
-                Fn_00496DA0();
+                UseBikeAndRiderCollision();
                 motionActive = 0;
                 motionIndex = 0;
                 reset = 1;

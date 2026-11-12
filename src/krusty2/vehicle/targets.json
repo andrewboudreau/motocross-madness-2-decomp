@@ -2082,7 +2082,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_00496D20@KrustyBike",
+    "candidate_symbol_contains": "UseBikeCollision@KrustyBike",
     "target_va": "0x00496d20",
     "target_size": 119,
     "expect": "exact",
@@ -2092,11 +2092,11 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_00496DA0@KrustyBike",
+    "candidate_symbol_contains": "UseBikeAndRiderCollision@KrustyBike",
     "target_va": "0x00496da0",
     "target_size": 119,
     "expect": "exact",
-    "notes": "back-camera swap (Fn_00496D20 with the scene objects exchanged); exact with the same nested-if mode test.",
+    "notes": "back-camera swap (UseBikeCollision with the scene objects exchanged); exact with the same nested-if mode test.",
     "bindings": "KrustyBike.bindings.json"
   },
   {
@@ -2192,7 +2192,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_00496F90",
+    "candidate_symbol_contains": "IgnoreCollisionsWith",
     "target_va": "0x00496f90",
     "target_size": 981,
     "expect": "exact",
@@ -2202,7 +2202,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_00497370",
+    "candidate_symbol_contains": "RestoreCollisionsWith",
     "target_va": "0x00497370",
     "target_size": 692,
     "expect": "exact",
@@ -2212,7 +2212,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_00496E30",
+    "candidate_symbol_contains": "ApplySpawnCollisionIgnores",
     "target_va": "0x00496e30",
     "target_size": 350,
     "expect": "exact",
@@ -2436,7 +2436,7 @@
     "target_va": "0x00496d10",
     "target_size": 5,
     "expect": "exact",
-    "notes": "slot 101: a tail call compiled as jmp 0x496d20 (Fn_00496D20); the 11 nops after it are alignment padding",
+    "notes": "slot 101: a tail call compiled as jmp 0x496d20 (UseBikeCollision); the 11 nops after it are alignment padding",
     "bindings": "KrustyBike.bindings.json"
   }
 ]

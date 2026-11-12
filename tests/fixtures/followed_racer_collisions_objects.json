@@ -1,6 +1,6 @@
 {
   "renames": {
-    "?UnknownFunction496f90@UnknownEventRacer@@QAEXPAU1@@Z": "?Fn_00496F90@KrustyBike@@QAEXPAV1@@Z"
+    "?UnknownFunction496f90@UnknownEventRacer@@QAEXPAU1@@Z": "?IgnoreCollisionsWith@KrustyBike@@QAEXPAV1@@Z"
   },
   "objects": {
     "src/reconstructed/FollowRacer.cpp": {

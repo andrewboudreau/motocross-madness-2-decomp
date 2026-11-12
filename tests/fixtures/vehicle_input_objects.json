@@ -1300,14 +1300,14 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "Fn_00496D20@KrustyBike",
+      "symbol": "UseBikeCollision@KrustyBike",
       "va": "0x496d20",
       "extent": 119,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "Fn_00496DA0@KrustyBike",
+      "symbol": "UseBikeAndRiderCollision@KrustyBike",
       "va": "0x496da0",
       "extent": 119,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
@@ -1377,21 +1377,21 @@
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "Fn_00496F90",
+      "symbol": "IgnoreCollisionsWith",
       "va": "0x496f90",
       "extent": 981,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "Fn_00497370",
+      "symbol": "RestoreCollisionsWith",
       "va": "0x497370",
       "extent": 692,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
     },
     {
       "source": "src/krusty2/vehicle/KrustyBike.cpp",
-      "symbol": "Fn_00496E30",
+      "symbol": "ApplySpawnCollisionIgnores",
       "va": "0x496e30",
       "extent": 350,
       "bindings": "src/krusty2/vehicle/KrustyBike.bindings.json"
