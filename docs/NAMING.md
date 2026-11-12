@@ -143,3 +143,18 @@ in it, so a name taken from a `__FILE__` path is tier 2 at most.
 | `UnknownMessage` | `TextQueueMessage` | 2 | The 0x8c-byte text line (text, show time, elapsed time, next) queued on `TextQueueOverlay` (RTTI). Callers build one on the stack (constructor `0x0051b200`), and the overlay keeps heap copies (copy constructor `0x0051b250`) in the list at +0x50. |
 | `UnknownTextureMapList` | `TextureMapList` | 2 | The intrusive list of `TextureMap`s (RTTI) through their +0x08/+0x0c links, with a cursor and a count. Its methods (`0x00510a50..0x00510b70`) lie among TextureMapManager.cpp's code. |
 | `UnknownParser`, `UnknownParserList`, `UnknownParserNode` | `Parser`, `ParserList`, `ParserNode` | 2 | Unit name: the literal `__FILE__` "D:\aardvark\VC\krusty2\Parser.cpp" (`0x0056f864`) is referenced inside `0x004b8510` (the list append), so the code `0x004b8470..0x004b89d0` is Parser.cpp. The parser reads `<Tag>value</Tag>` pairs (`0x004b87f0`) into a singly linked list (head at parser +0x04) of 0x404-byte tag/value nodes linked at +0x400. |
+
+Left as placeholders in wave 3:
+
+- Views of named classes: `UnknownTexturePalette` (`ColorMapper`, Quantize.h),
+  `UnknownGuiControl` (`UIControl` as GUIUser and ToolTip see it),
+  `UnknownQuarryRace` (`BikeRace` as the quarry loader sees it), and the bringup
+  views `UnknownBikeRaceModel`, `UnknownBikeRaceRacer`, `UnknownEventRacer` and
+  `UnknownKrustyBikeView` (RaceView.h and EventManager.h types). Naming them
+  means merging them into the canonical class, which is a type change.
+- `UnknownOverlayRect`, `UnknownMakeOverlayRect` and `UnknownTrackOverlayRect`:
+  a RECT-shaped left/top/right/bottom quad, but nothing ties it to an API call,
+  and `OverlayRect.h` is a repository file name, not a retail one.
+- `UnknownTextureFormatChoice`: only a forward declaration and a pointer use.
+- `UnknownParameterStream` stays a typedef of `FileStream`. Removing it moves
+  lines, so it waits for a pass that checks the `__LINE__` users.
