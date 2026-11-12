@@ -6,12 +6,12 @@
     "src/reconstructed/FollowRacer.cpp": {
       "sections": 7,
       "relocations": 17,
-      "sha256": "8a13a364930424dc3fbc0c2adb2035ebc8a2e5646f7d5405019aaf0936acd93e"
+      "sha256": "08f01d89ceb78ecd96f3935ca93443f1c691ec265bf508b03dcfb3157bf49dc0"
     },
     "samples/race/FollowRacerNearMisses.cpp": {
       "sections": 11,
       "relocations": 32,
-      "sha256": "30a40a15314bfe841a59e7b9de1f60a41f8b0ffb7653a37556863165b011ed7a"
+      "sha256": "5204739a0fe7e5c6eacc75f41da19cae3c71397edf41d9c9a19e04e7aaa0d547"
     },
     "samples/race/FollowedRacerPicker.cpp": {
       "sections": 4,

@@ -2,11 +2,11 @@
   "src/krusty2/tire/Tire.cpp": {
     "sections": 82,
     "relocations": 441,
-    "sha256": "159d6d2421b9d4849119fb8e36cdb932d1bfafe5ea9482a44dbf44aeae5d9cfc"
+    "sha256": "34724ea22b08ba72223027868e96a34165f959a4cce4e3439738e92d7fedcf18"
   },
   "src/krusty2/vehicle/Bike.cpp": {
     "sections": 243,
     "relocations": 1105,
-    "sha256": "df417edfc27e04632ec074fb7c13a9da742234224ba16b18063eae85f11007f7"
+    "sha256": "eff8590461016c3c8f88a62565cdff1b0300056819b28433257ecb961fe4ddfc"
   }
 }
