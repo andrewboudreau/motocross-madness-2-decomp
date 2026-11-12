@@ -150,7 +150,7 @@ static inline Vec3 UnknownAsVec3(const Vector3& v)
 
 // best guess: the two views pass the same 25 stack words to 0x0048fc80; each view
 // argument goes to the canonical parameter in the same position.  The skill float is
-// the word KrustyBike::Load keeps as `a24` (+0x15d8), so its bits are passed unchanged.
+// the word KrustyBike::Load keeps as `aiSkill` (+0x15d8), so its bits are passed unchanged.
 GameObject* UnknownBikeRaceRacer::Load(void* owner, const char* engineName, const char* bikeFile,
                                        const char* riderFile, LightManager* lights,
                                        UnknownTextureFormatChoice* textures, Vector3 position,
