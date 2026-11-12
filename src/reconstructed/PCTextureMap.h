@@ -20,8 +20,8 @@ extern int g_DebugCountTextureMemory;
 // Shared texture surfaces reused across textures, indexed by mip count: 0x0068a36c
 // for mipmapped, 0x0068a394 for single-level 555/565 textures (CreateSurface reuses
 // and AddRefs them; TextureMapManager clears and releases them).
-extern UnknownSurfaceInterface* g_SharedMipTextureSurfaces[10];
-extern UnknownSurfaceInterface* g_SharedTextureSurfaces[10];
+extern DirectDrawSurface* g_SharedMipTextureSurfaces[10];
+extern DirectDrawSurface* g_SharedTextureSurfaces[10];
 
 // 0x00689968 (writable loader-zero storage, DWORD read at 0x004c7096):
 // when set, CreateSurface dumps the first level with DumpLevel (0x004c84e0).
@@ -70,23 +70,23 @@ public:
     int RestoreTextureSurface();              // 0x004c7420: recreates a lost texture surface
     // 0x004c7b40: copies `rect` of +0x70 to (x, y) in `destination`,
     // blending through `table` when given.
-    int CopyRectTo(unsigned long x, unsigned long y, UnknownSurfaceInterface* destination,
+    int CopyRectTo(unsigned long x, unsigned long y, DirectDrawSurface* destination,
                               struct UnknownRect* rect, int flags, unsigned char* table);
     // 0x004c7b00: blits +0x70 into `destination` unless `skip`.
-    int BlitTo(void* destinationRect, UnknownSurfaceInterface* destination,
+    int BlitTo(void* destinationRect, DirectDrawSurface* destination,
                               void* sourceRect, int flags, int skip);
     // 0x004c83a0: the mip level whose width is `width`, or 0.
-    UnknownSurfaceInterface* FindMipLevel(int width);
-    int DumpLevel(UnknownSurfaceInterface* surface, const char* name);             // 0x004c84e0: dumps a level
+    DirectDrawSurface* FindMipLevel(int width);
+    int DumpLevel(DirectDrawSurface* surface, const char* name);             // 0x004c84e0: dumps a level
     void SetColorKey(unsigned int color);           // 0x004c7e30: sets the colour key
-    int ColorKeyLevel(UnknownSurfaceInterface* surface, unsigned int color);         // 0x004c7ef0: keys a level
+    int ColorKeyLevel(DirectDrawSurface* surface, unsigned int color);         // 0x004c7ef0: keys a level
     // 0x004c68e0: creates +0x70 with the first of `formats` (0-terminated)
     // the device accepts.
-    int CreateSystemSurface(UnknownSurfaceDesc* desc, int flags, int* formats);
-    void WriteLevel(UnknownSurfaceDesc* desc, const char* name);            // 0x004c8550: writes a level
+    int CreateSystemSurface(DDSurfaceDesc2* desc, int flags, int* formats);
+    void WriteLevel(DDSurfaceDesc2* desc, const char* name);            // 0x004c8550: writes a level
 
-    UnknownSurfaceInterface* systemSurface;    // +0x70: system-memory surface (counted in DirectX memory)
-    UnknownSurfaceInterface* textureSurface;   // +0x74: texture surface
+    DirectDrawSurface* systemSurface;    // +0x70: system-memory surface (counted in DirectX memory)
+    DirectDrawSurface* textureSurface;   // +0x74: texture surface
     void* texturePalette;                      // +0x78: palette for 8-bit textures
     UnknownVideoDecoder* videoDecoder;
 };

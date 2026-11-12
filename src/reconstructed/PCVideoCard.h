@@ -50,7 +50,7 @@ public:
     // 0x004c9830: creates the DirectDraw object for `guid` (0: the primary
     // display) and reads its identity, caps and modes; deletes itself and
     // returns 0 on failure.
-    PCVideoCard* InitializeDisplay(UnknownGuid* guid, char* description, char* name,
+    PCVideoCard* InitializeDisplay(Guid* guid, char* description, char* name,
         void* window);
     int SetFullscreenCooperativeLevel();                // 0x004c9c90: full-screen setup
     int SetWindowedCooperativeLevel(int x, int y, int width, int height); // 0x004c9d20: windowed
@@ -68,10 +68,10 @@ public:
     UnknownDirectDrawInterface* directDraw;    // +0x190: IDirectDraw7 (DirectDrawCreateEx)
     UnknownDirect3DInterface* direct3D;        // +0x194: IDirect3D7 (QueryInterface)
     void* field_0x198;
-    UnknownSurfaceInterface* primarySurface;   // +0x19c: primary; PCGame slot 5: IsLost/Restore
-    UnknownSurfaceInterface* backBuffer;       // +0x1a0: back buffer; PCGame slot 31's surface without +0x1a8
+    DirectDrawSurface* primarySurface;   // +0x19c: primary; PCGame slot 5: IsLost/Restore
+    DirectDrawSurface* backBuffer;       // +0x1a0: back buffer; PCGame slot 31's surface without +0x1a8
     UnknownGammaControlInterface* gammaControl; // +0x1a4
-    UnknownSurfaceInterface* renderSurface;    // +0x1a8: windowed render surface
+    DirectDrawSurface* renderSurface;    // +0x1a8: windowed render surface
     UnknownClipperInterface* clipper;          // +0x1ac
     void* windowHandle;                        // +0x1b0: window handle
     // Hardware caps (0x17c bytes, the DDCAPS layout; GetCaps).
@@ -83,7 +83,7 @@ public:
     unsigned char field_0x1f4[0x330 - 0x1f4];
     unsigned int emulationCapsSize;            // +0x330: emulation caps (DDCAPS) from here
     unsigned char field_0x334[0x4ac - 0x334];
-    UnknownGuid driverGuid;                    // +0x4ac: DirectDraw driver GUID (0: primary)
+    Guid driverGuid;                    // +0x4ac: DirectDraw driver GUID (0: primary)
     char driverGuidText[0x100];                // +0x4bc: driver name: the GUID text (PCGame 0x004c1610)
     int partialTextureUploadResult;            // +0x5bc: "PartialTexBlt"
     UnknownDeviceIdentifier deviceIdentifier;  // +0x5c0
@@ -106,18 +106,18 @@ extern PCVideoCard* g_Displays[4];
 extern int g_DisplayCount;
 
 // DirectX GUIDs (dxguid; the retail bytes are these interface IDs).
-extern "C" const UnknownGuid IID_IDirectDraw7;               // 0x005560b0
-extern "C" const UnknownGuid IID_IDirect3D7;                 // 0x00556180
-extern "C" const UnknownGuid IID_IDirectDrawGammaControl;    // 0x00556140
-extern "C" const UnknownGuid IID_IDirect3DHALDevice;         // 0x005561b0
+extern "C" const Guid IID_IDirectDraw7;               // 0x005560b0
+extern "C" const Guid IID_IDirect3D7;                 // 0x00556180
+extern "C" const Guid IID_IDirectDrawGammaControl;    // 0x00556140
+extern "C" const Guid IID_IDirect3DHALDevice;         // 0x005561b0
 
-typedef int(__stdcall* UnknownEnumCallback)(UnknownGuid* guid, char* description, char* name,
+typedef int(__stdcall* UnknownEnumCallback)(Guid* guid, char* description, char* name,
                                             void* context);
 
 // ddraw.dll entry points, called through the import thunks 0x00533040 and
 // 0x00533046 (DirectDrawEnumerateExA is looked up with GetProcAddress).
 extern "C" long __stdcall DirectDrawEnumerateA(UnknownEnumCallback callback, void* context);
-extern "C" long __stdcall DirectDrawCreateEx(UnknownGuid* guid, void** object, const UnknownGuid& iid,
+extern "C" long __stdcall DirectDrawCreateEx(Guid* guid, void** object, const Guid& iid,
                                              void* outer);
 
 // 0x64-byte blit effects (the DDBLTFX layout).

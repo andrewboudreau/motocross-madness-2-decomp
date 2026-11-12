@@ -101,12 +101,12 @@
 // third one's alpha, as in retail.)
 int Halve8888(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
-    UnknownPixel32* sourceRow = (UnknownPixel32*)source;
-    UnknownPixel32* row = (UnknownPixel32*)destination;
+    RgbaPixel* sourceRow = (RgbaPixel*)source;
+    RgbaPixel* row = (RgbaPixel*)destination;
     for (int y = 0; y < height; y++) {
-        UnknownPixel32* to = row;
+        RgbaPixel* to = row;
         for (int x = 0; x < width; x++, to++) {
-            UnknownPixel32* top = sourceRow + x * 2;
+            RgbaPixel* top = sourceRow + x * 2;
             int red = 0;
             int green = 0;
             int blue = 0;
@@ -250,9 +250,9 @@ int Halve8(void* destination, void* source, int width, int height, int destinati
     if (palette) {
         unsigned char* indices = reinterpret_cast<ColorMapper*>(palette)->GetIndexFrom555();
         if (indices) {
-            UnknownPixel24* entries = (UnknownPixel24*)palette->GetColors();
+            RgbPixel* entries = (RgbPixel*)palette->GetColors();
             if (entries) {
-                UnknownPixel24 a, b, c, d;
+                RgbPixel a, b, c, d;
                 int key = -1;
                 for (int i = 0; i < 256; i++) {
                     if (entries[i].red == 0xff && entries[i].green == 0 && entries[i].blue == 0xff) {
@@ -366,7 +366,7 @@ static inline void ReadRow(int format, void* source, int* channels, int width)
     else if (format == 565)
         ReadRow565((unsigned short*)source, channels, width);
     else
-        ReadRow24((UnknownPixel24*)source, channels, width);
+        ReadRow24((RgbPixel*)source, channels, width);
 }
 
 int DitherConvert(void* source, int format, int width, int height, int sourceStride,

@@ -4,6 +4,6 @@
 // This reconstructed grouping does not establish original TU ownership.
 #include "BackgroundImage.h"
 
-int BackgroundImage::UnknownVirtualSlot27(UnknownSurfaceInterface* surface) {
+int BackgroundImage::UnknownVirtualSlot27(DirectDrawSurface* surface) {
     return 1;
 }

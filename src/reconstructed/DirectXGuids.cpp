@@ -4,59 +4,59 @@
 // absent from the bundled VC6-era DXGUID.LIB. Values and readonly storage are
 // confirmed from retail .rdata; address bindings identify each caller use.
 // This file is a source provider, not a claim about original TU ownership.
-// UnknownGuid has the Win32 GUID layout and C linkage used by the SDK.
-typedef char DirectXGuidSizeMustBe16[(sizeof(UnknownGuid) == 16) ? 1 : -1];
+// Guid has the Win32 GUID layout and C linkage used by the SDK.
+typedef char DirectXGuidSizeMustBe16[(sizeof(Guid) == 16) ? 1 : -1];
 
 // 0x005560b0
-extern "C" const UnknownGuid IID_IDirectDraw7 = {
+extern "C" const Guid IID_IDirectDraw7 = {
     0x15e65ec0, 0x3b9c, 0x11d2, {0xb9, 0x2f, 0x00, 0x60, 0x97, 0x97, 0xea, 0x5b}
 };
 // 0x005560f0
-extern "C" const UnknownGuid IID_IDirectDrawSurface4 = {
+extern "C" const Guid IID_IDirectDrawSurface4 = {
     0x0b2b8630, 0xad35, 0x11d0, {0x8e, 0xa6, 0x00, 0x60, 0x97, 0x97, 0xea, 0x5b}
 };
 // 0x00556140
-extern "C" const UnknownGuid IID_IDirectDrawGammaControl = {
+extern "C" const Guid IID_IDirectDrawGammaControl = {
     0x69c11c3e, 0xb46b, 0x11d1, {0xad, 0x7a, 0x00, 0xc0, 0x4f, 0xc2, 0x9b, 0x4e}
 };
 // 0x00556180
-extern "C" const UnknownGuid IID_IDirect3D7 = {
+extern "C" const Guid IID_IDirect3D7 = {
     0xf5049e77, 0x4861, 0x11d2, {0xa4, 0x07, 0x00, 0xa0, 0xc9, 0x06, 0x29, 0xa8}
 };
 // 0x005561d0
-extern "C" const UnknownGuid IID_IDirect3DRefDevice = {
+extern "C" const Guid IID_IDirect3DRefDevice = {
     0x50936643, 0x13e9, 0x11d1, {0x89, 0xaa, 0x00, 0xa0, 0xc9, 0x05, 0x41, 0x29}
 };
 // 0x005561e0
-extern "C" const UnknownGuid IID_IDirect3DNullDevice = {
+extern "C" const Guid IID_IDirect3DNullDevice = {
     0x8767df22, 0xbacc, 0x11d1, {0x89, 0x69, 0x00, 0xa0, 0xc9, 0x06, 0x29, 0xa8}
 };
 // 0x005567b0
-extern "C" const UnknownGuid IID_IDirectPlay4A = {
+extern "C" const Guid IID_IDirectPlay4A = {
     0x0ab1c531, 0x4745, 0x11d1, {0xa7, 0xa1, 0x00, 0x00, 0xf8, 0x03, 0xab, 0xfc}
 };
 // 0x005569e0
-extern "C" const UnknownGuid IID_IDirectInput7A = {
+extern "C" const Guid IID_IDirectInput7A = {
     0x9a4cb684, 0x236d, 0x11d3, {0x8e, 0x9d, 0x00, 0xc0, 0x4f, 0x68, 0x44, 0xae}
 };
 // 0x00556a50
-extern "C" const UnknownGuid IID_IDirectInputDevice7A = {
+extern "C" const Guid IID_IDirectInputDevice7A = {
     0x57d7c6bc, 0x2356, 0x11d3, {0x8e, 0x9d, 0x00, 0xc0, 0x4f, 0x68, 0x44, 0xae}
 };
 
 // 0x00556870: Net.cpp requests this interface from the created lobby object.
-extern "C" const UnknownGuid IID_IDirectPlayLobby3A = {
+extern "C" const Guid IID_IDirectPlayLobby3A = {
     0x2db72491, 0x652c, 0x11d1, {0xa7, 0xa8, 0x00, 0x00, 0xf8, 0x03, 0xab, 0xfc}
 };
 // 0x00556960: Net.cpp's optional two-byte TCP/IP port address element.
-extern "C" const UnknownGuid DPAID_INetPort = {
+extern "C" const Guid DPAID_INetPort = {
     0xe4524541, 0x8ea5, 0x11d1, {0x8a, 0x96, 0x00, 0x60, 0x97, 0xb0, 0x14, 0x11}
 };
 // 0x00556cf0: PCAudio.cpp selects this algorithm when creating a 3D buffer.
-extern "C" const UnknownGuid DS3DALG_NO_VIRTUALIZATION = {
+extern "C" const Guid DS3DALG_NO_VIRTUALIZATION = {
     0xc241333f, 0x1c1b, 0x11d2, {0x94, 0xf5, 0x00, 0xc0, 0x4f, 0xc2, 0x8a, 0xca}
 };
 // 0x00556d20: property set used by the EAX listener probe and setters.
-extern "C" const UnknownGuid DSPROPSETID_EAX_ListenerProperties = {
+extern "C" const Guid DSPROPSETID_EAX_ListenerProperties = {
     0x4a4e6fc1, 0xc341, 0x11d1, {0xb7, 0x3a, 0x44, 0x45, 0x53, 0x54, 0x00, 0x00}
 };

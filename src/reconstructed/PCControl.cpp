@@ -11,7 +11,7 @@
 
 // 0x004beef0: the effect GUID's name in `name` (empty and 0 when unknown).
 // Placed here by address only: it directly precedes PCControlInterface.
-int GetForceFeedbackEffectName(UnknownGuid guid, char* name) {
+int GetForceFeedbackEffectName(Guid guid, char* name) {
     strcpy(name, "");
     if (!memcmp(&GUID_ConstantForce, &guid, sizeof(guid))) {
         strcpy(name, "GUID_ConstantForce");

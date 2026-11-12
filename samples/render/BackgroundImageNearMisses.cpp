@@ -28,7 +28,7 @@ CameraRect g_GetDcClipRect;
 // to the next dirty region in `clip`.
 int BackgroundImage::GetDc(void** dc, CameraRect* rect, int index, int dirty, int* frames, int* a,
                                            CameraRect* clip) {
-    UnknownSurfaceInterface* surface;
+    DirectDrawSurface* surface;
     *dc = 0;
     *a = 0;
     surface = 0;

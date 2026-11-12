@@ -72,7 +72,7 @@ public:
     int DeleteDisplayProfiles();                         // 0x004c1a00: deletes the profiles
     int LoadDisplayProfile(PCVideoCard* display);     // 0x004c16f0: loads its profile
 
-    UnknownGuid deviceGuid;                   // Direct3D device GUID ("Renderer" setting)
+    Guid deviceGuid;                   // Direct3D device GUID ("Renderer" setting)
     UnknownRect windowRect;                    // +0x308: window rectangle (slot 32)
     void* instanceHandle;                      // +0x318: instance handle
     void* windowHandle;                        // +0x31c: window handle

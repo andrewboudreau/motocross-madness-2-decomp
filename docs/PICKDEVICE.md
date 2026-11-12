@@ -46,7 +46,7 @@ Source forms that mattered:
 - Retail pushes the `LB_GETITEMDATA` constants after the `LB_GETCURSEL`
   call. A local `int index = SendMessage(...)` reproduces that. Nesting the
   call as an argument pushes the constants first.
-- The builders format the GUID with an inline helper taking `UnknownGuid`
+- The builders format the GUID with an inline helper taking `Guid`
   by value (retail copies the GUID into a 16-byte temporary first).
 - In `0x004ccd60`, `usable = 0` is declared before the `"UseVideoCardIdx"`
   read, and the two `LB_SETCURSEL` calls are written out in both branches

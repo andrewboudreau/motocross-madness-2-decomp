@@ -93,7 +93,7 @@ Each copies rows for 0 levels, halves once through a per-format halver
 first level's size (Pixtrans.cpp lines 1329/1350 in the 24-bit one).
 
 The downsamplers' plain-copy path and `0x004cfda0` address each row from
-the row index (`(UnknownPixel32*)source + y * sourceStride`); VC6 then
+the row index (`(RgbaPixel*)source + y * sourceStride`); VC6 then
 strength-reduces the row offsets and keeps the hoisted steps in the dead
 argument slots exactly as retail does. Walking row pointers advanced by the
 stride put the steps in other slots. The downsamplers' halvers are declared

@@ -28,10 +28,10 @@ PCRenderTarget::PCRenderTarget() {
 // reads the surface size and pixel format, attaches a Z buffer of the same
 // depth when `zbuffer` is set, then creates the device and collects its caps
 // and texture formats. On any failure the target deletes itself.
-RenderTarget* PCRenderTarget::InitializeRenderTarget(PCVideoCard* display, const UnknownGuid* deviceId,
-    UnknownSurfaceInterface* surface, int wantZBuffer, int frames) {
-    UnknownPixelFormat format;
-    UnknownSurfaceDesc desc;
+RenderTarget* PCRenderTarget::InitializeRenderTarget(PCVideoCard* display, const Guid* deviceId,
+    DirectDrawSurface* surface, int wantZBuffer, int frames) {
+    DDPixelFormat format;
+    DDSurfaceDesc2 desc;
     SetDisplay(display);
     renderSurface = surface;
     frameModulus = frames;
@@ -75,7 +75,7 @@ RenderTarget* PCRenderTarget::InitializeRenderTarget(PCVideoCard* display, const
             desc.flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
             desc.height = targetHeight;
             desc.pixelFormat = zbufferFormats[i];
-            desc.pixelFormat.size = sizeof(UnknownPixelFormat);
+            desc.pixelFormat.size = sizeof(DDPixelFormat);
             long result = targetDisplay->directDraw->CreateSurface(&desc, &zbuffer, 0);
             if (result == DDERR_OUTOFVIDEOMEMORY || result != 0)
                 goto fail;
@@ -103,10 +103,10 @@ RenderTarget* PCRenderTarget::InitializeRenderTarget(PCVideoCard* display, const
 }
 
 // 0x004c5230: appends a texture format the device enumerates.
-long __stdcall PCRenderTarget::EnumTextureFormatCallback(UnknownPixelFormat* format, void* context) {
+long __stdcall PCRenderTarget::EnumTextureFormatCallback(DDPixelFormat* format, void* context) {
     PCRenderTarget* target = static_cast<PCRenderTarget*>(context);
-    target->textureFormats = static_cast<UnknownPixelFormat*>(
-        DebugRealloc(target->textureFormats, (target->textureFormatCount + 1) * sizeof(UnknownPixelFormat), __FILE__, 20));
+    target->textureFormats = static_cast<DDPixelFormat*>(
+        DebugRealloc(target->textureFormats, (target->textureFormatCount + 1) * sizeof(DDPixelFormat), __FILE__, 20));
     if (target->textureFormats) {
         target->textureFormats[target->textureFormatCount] = *format;
         target->textureFormatCount++;
@@ -116,11 +116,11 @@ long __stdcall PCRenderTarget::EnumTextureFormatCallback(UnknownPixelFormat* for
 }
 
 // 0x004c52a0: appends an enumerated Z-buffer format (flag 0x400).
-long __stdcall PCRenderTarget::EnumZBufferFormatCallback(UnknownPixelFormat* format, void* context) {
+long __stdcall PCRenderTarget::EnumZBufferFormatCallback(DDPixelFormat* format, void* context) {
     if (format->flags & DDPF_ZBUFFER) {
         PCRenderTarget* target = static_cast<PCRenderTarget*>(context);
-        target->zbufferFormats = static_cast<UnknownPixelFormat*>(
-            DebugRealloc(target->zbufferFormats, (target->zbufferFormatCount + 1) * sizeof(UnknownPixelFormat), __FILE__, 39));
+        target->zbufferFormats = static_cast<DDPixelFormat*>(
+            DebugRealloc(target->zbufferFormats, (target->zbufferFormatCount + 1) * sizeof(DDPixelFormat), __FILE__, 39));
         if (target->zbufferFormats) {
             target->zbufferFormats[target->zbufferFormatCount] = *format;
             target->zbufferFormatCount++;
@@ -167,7 +167,7 @@ int PCRenderTarget::Blit(void* destination, void* source, void* sourceRect, int 
 
 // 0x004c5420: locks the surface; returns the bits (0 on failure) and the pitch.
 void* PCRenderTarget::LockSurface(void* rect, long* pitch, int flags) {
-    UnknownSurfaceDesc desc;
+    DDSurfaceDesc2 desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     if (renderSurface->Lock(rect, &desc, flags, 0) != 0)
@@ -246,10 +246,10 @@ failed:
 
 // 0x004c5640: whether the device enumerated a texture format matching `format`.
 int PCRenderTarget::SupportsTextureFormat(int format) {
-    UnknownPixelFormat wanted;
+    DDPixelFormat wanted;
     FillPixelFormat(format, &wanted);
     for (int i = 0; i < textureFormatCount; i++) {
-        UnknownPixelFormat entry = textureFormats[i];
+        DDPixelFormat entry = textureFormats[i];
         if (entry.flags == wanted.flags && entry.fourCC == wanted.fourCC && entry.bitCount == wanted.bitCount &&
             entry.masks[1] == wanted.masks[1] && entry.masks[3] == wanted.masks[3])
             return 1;
@@ -328,9 +328,9 @@ long PCRenderTarget::ClearTexture(int stage) {
 // textures that fit in video memory (surface caps 0x10000000) until creation
 // fails or a surface lands in system memory (0x20000000), then frees them.
 int PCRenderTarget::MeasureTextureMemory(int* value) {
-    UnknownSurfaceInterface* surfaces[0x4000];
-    UnknownSurfaceDesc desc;
-    UnknownSurfaceCaps caps;
+    DirectDrawSurface* surfaces[0x4000];
+    DDSurfaceDesc2 desc;
+    DDSCaps2 caps;
     int count = 0;
     int found = 0;
     for (; count < 0x4000; count++) {
@@ -440,7 +440,7 @@ void PCRenderTarget::SaveScreenshot() {
     char computer[16];
     unsigned long size = sizeof(computer);
     char path[MAX_PATH];
-    UnknownSurfaceDesc desc;
+    DDSurfaceDesc2 desc;
     GetComputerNameA(computer, &size);
     sprintf(path, "%s%05d.TGA", computer, s_screenshotIndex);
     while (FileExists(path)) {

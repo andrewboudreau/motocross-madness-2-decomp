@@ -459,7 +459,7 @@ int Sound::DuplicateFrom(Sound* source) {
 
 // 0x004bc5f0: whether the buffer's property set supports `support` for
 // property `id` of `set`.
-int Sound::SupportsProperty(const UnknownGuid* set, unsigned long id, unsigned long support) {
+int Sound::SupportsProperty(const Guid* set, unsigned long id, unsigned long support) {
     unsigned long supported;
     if ((propertySet || QueryPropertySet()) && propertySet->QuerySupport(set, id, &supported) >= 0 &&
         (supported & support) == support)
@@ -468,7 +468,7 @@ int Sound::SupportsProperty(const UnknownGuid* set, unsigned long id, unsigned l
 }
 
 // 0x004bc640: sets a property through the buffer's property set.
-int Sound::SetProperty(const UnknownGuid* set, unsigned long id, void* instance,
+int Sound::SetProperty(const Guid* set, unsigned long id, void* instance,
     unsigned long instanceSize, void* data, unsigned long dataSize) {
     if (!SoundSystem() || !SoundSystem()->audioStarted)
         return 0;
@@ -1220,7 +1220,7 @@ UnknownSoundDevice::UnknownSoundDevice() {
 
 // 0x004be2d0: records the device and its caps. The probe object is only
 // released on success (retail behaviour).
-int UnknownSoundDevice::ProbeSoundDevice(UnknownGuid* deviceGuid, const char* text) {
+int UnknownSoundDevice::ProbeSoundDevice(Guid* deviceGuid, const char* text) {
     if (!deviceGuid)
         return 0;
     guid = *deviceGuid;
@@ -1339,7 +1339,7 @@ done:
 }
 
 // 0x004be7b0: DirectSoundEnumerate callback; `context` is the interface.
-int __stdcall PCSoundInterface::EnumSoundDeviceCallback(UnknownGuid* guid, const char* description,
+int __stdcall PCSoundInterface::EnumSoundDeviceCallback(Guid* guid, const char* description,
     const char* module, void* context) {
     if (g_EnumeratedSoundDeviceCount >= 4)
         return 0;

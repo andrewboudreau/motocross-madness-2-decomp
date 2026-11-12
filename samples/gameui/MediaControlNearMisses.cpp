@@ -10,7 +10,7 @@
 // holds &videoStream and then videoStream itself (the QueryInterface `this`)
 // before the zero; VC6 here reloads it into eax.
 //
-// The zero register itself is reachable: `UnknownSurfaceInterface* surface
+// The zero register itself is reachable: `DirectDrawSurface* surface
 // = 0;` as a declaration initialiser (with the later `surface = 0` kept)
 // makes VC6 keep the zero in a register and reproduces retail's frame (637
 // bytes). But retail births the `xor ebx, ebx` inside the inlined memset
@@ -36,13 +36,13 @@
 #include "../../src/reconstructed/PCVideoCard.h"
 #include "../../src/reconstructed/PCRenderTarget.h"
 
-extern "C" const UnknownGuid CLSID_AMMultiMediaStream;    // 0x00558ec0
-extern "C" const UnknownGuid IID_IAMMultiMediaStream;     // 0x00558ed0
-extern "C" const UnknownGuid MSPID_PrimaryVideo;          // 0x00558eb0
-extern "C" const UnknownGuid MSPID_PrimaryAudio;          // 0x00558ea0
-extern "C" const UnknownGuid IID_IDirectDrawMediaStream;  // 0x00558e90
-extern "C" const UnknownGuid IID_IDirectDraw;             // 0x00556080
-extern "C" const UnknownGuid IID_IDirectDrawSurface4;     // 0x005560f0
+extern "C" const Guid CLSID_AMMultiMediaStream;    // 0x00558ec0
+extern "C" const Guid IID_IAMMultiMediaStream;     // 0x00558ed0
+extern "C" const Guid MSPID_PrimaryVideo;          // 0x00558eb0
+extern "C" const Guid MSPID_PrimaryAudio;          // 0x00558ea0
+extern "C" const Guid IID_IDirectDrawMediaStream;  // 0x00558e90
+extern "C" const Guid IID_IDirectDraw;             // 0x00556080
+extern "C" const Guid IID_IDirectDrawSurface4;     // 0x005560f0
 
 #define TARGET() ((PCRenderTarget*)renderContext)
 
@@ -50,8 +50,8 @@ extern "C" const UnknownGuid IID_IDirectDrawSurface4;     // 0x005560f0
 MediaControl* MediaControl::Open(void* target, const char* file,
                                                   void (*done)(UIDialog* dialog), UIDialog* owner)
 {
-    UnknownSurfaceInterface* surface;
-    UnknownSurfaceDesc frameDesc;
+    DirectDrawSurface* surface;
+    DDSurfaceDesc2 frameDesc;
     UnknownMediaSurfaceDesc format;
     unsigned short path[MAX_PATH];
     long result;
@@ -99,7 +99,7 @@ MediaControl* MediaControl::Open(void* target, const char* file,
     if (TARGET()->targetDisplay->directDraw->QueryInterface(&IID_IDirectDraw, (void**)&directDraw)) {
         goto failed;
     }
-    if (directDraw->CreateSurface((UnknownSurfaceDesc*)&format, &surface, 0)) {
+    if (directDraw->CreateSurface((DDSurfaceDesc2*)&format, &surface, 0)) {
         goto failed;
     }
     if (videoDrawStream->CreateSample(surface, 0, 1, &videoSample) < 0) {

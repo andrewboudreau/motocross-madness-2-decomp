@@ -20,7 +20,7 @@ static int Index(void*p){for(int i=0;i<2;i++)if(p==&w.surfaces[i])return i;ExitP
 static void Capture(){for(int i=0;i<2;i++)memcpy(w.guard[i],guard[i],4096);}
 static Event& Begin(int kind,int who){if(got.count>=8)ExitProcess(82);Capture();Event&e=got.events[got.count++];e.kind=kind;e.who=who;e.before=w;return e;}
 static void Finish(Event&e){Capture();e.after=w;}
-static void Boundary(UnknownSurfaceDesc*desc){
+static void Boundary(DDSurfaceDesc2*desc){
  if(sc.mutateAt==got.count){switch(sc.mutation){
  case 0:w.rect.top=1;break;case 1:w.rect.left=2;break;
  case 2:w.rect.right+=3;w.rect.bottom+=2;break;
@@ -35,7 +35,7 @@ static void Boundary(UnknownSurfaceDesc*desc){
  }}
  if(sc.throwAt==got.count){Finish(got.events[got.count-1]);RaiseException(0xe048ab12,0,0,0);}
 }
-static long __stdcall Lock(void*self,void*rect,UnknownSurfaceDesc*desc,int flags,void*event){int i=Index(self);if(rect||event)ExitProcess(82);BYTE expected[124]={0};*(DWORD*)expected=124;if(memcmp(desc,expected,124))ExitProcess(93);Event&e=Begin(1,i);e.flags=flags;memcpy(e.desc,desc,124);w.surfaces[i].locks++;
+static long __stdcall Lock(void*self,void*rect,DDSurfaceDesc2*desc,int flags,void*event){int i=Index(self);if(rect||event)ExitProcess(82);BYTE expected[124]={0};*(DWORD*)expected=124;if(memcmp(desc,expected,124))ExitProcess(93);Event&e=Begin(1,i);e.flags=flags;memcpy(e.desc,desc,124);w.surfaces[i].locks++;
  desc->pitch=sc.pitch[i];
  if(sc.nullMask&(1<<i))desc->surface=0;
  else if(sc.guarded==1)desc->surface=guard[i]+4096-(i?128:sc.available);

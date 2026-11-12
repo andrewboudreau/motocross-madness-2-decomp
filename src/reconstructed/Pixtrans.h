@@ -26,8 +26,8 @@ inline unsigned short Pack565(unsigned int color) {
 // 0x004d1970, 0x004d1a20, 0x004d1ac0, 0x004d1b40: every `from` pixel in
 // the width x height `bits` becomes `to` (32, 24, 16 and 8-bit). Except in
 // 8-bit, pixels already equal to `to` are first nudged off it. Return 1.
-int ReplaceColor32(void* bits, UnknownPixel32 from, UnknownPixel32 to, int width, int height, int stride);
-int ReplaceColor24(void* bits, UnknownPixel24 from, UnknownPixel24 to, int width, int height, int stride);
+int ReplaceColor32(void* bits, RgbaPixel from, RgbaPixel to, int width, int height, int stride);
+int ReplaceColor24(void* bits, RgbPixel from, RgbPixel to, int width, int height, int stride);
 int ReplaceColor16(void* bits, unsigned short from, unsigned short to, int width, int height, int stride);
 int ReplaceColor8(void* bits, unsigned char from, unsigned char to, int width, int height, int stride);
 
@@ -164,7 +164,7 @@ int Downsample8(void* destination, void* source, int width, int height, int dest
 // 0x004cf980, 0x004cf9c0, 0x004cfa10: the ditherer's row readers. Each
 // spreads `count` 24-bit, 565 or 555 pixels into 16.16 fixed-point channel
 // triples.
-void ReadRow24(UnknownPixel24* source, int* channels, int count);
+void ReadRow24(RgbPixel* source, int* channels, int count);
 void ReadRow565(unsigned short* source, int* channels, int count);
 void ReadRow555(unsigned short* source, int* channels, int count);
 // 0x004cfa60: 565 to 24-bit.

@@ -11,7 +11,7 @@ from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-SYMBOL = '?CopyRectTo@PCTextureMap@@QAEHKKPAUUnknownSurfaceInterface@@PAUUnknownRect@@HPAE@Z'
+SYMBOL = '?CopyRectTo@PCTextureMap@@QAEHKKPAUDirectDrawSurface@@PAUUnknownRect@@HPAE@Z'
 INDIRECT = {0x4c7b87: 'dword ptr [ecx + 0x1c]', 0x4c7bd5: 'dword ptr [ecx + 0x64]',
             0x4c7c07: 'dword ptr [ecx + 0x64]', 0x4c7dfb: 'dword ptr [ecx + 0x80]',
             0x4c7e13: 'dword ptr [ecx + 0x80]'}
@@ -86,9 +86,9 @@ class TextureRectCopyBehaviorTests(unittest.TestCase):
                 ROOT / 'src/reconstructed/BackgroundImage.bindings.json')['strict_exact'])
             layout = output / 'layout.cpp'
             layout.write_text('#include "PCTextureMap.h"\n#include "RenderInterfaces.h"\n#include <stddef.h>\n'
-                'typedef char Layout[(sizeof(UnknownSurfaceDesc)==124 && offsetof(UnknownSurfaceDesc,pitch)==0x10 && '
-                'offsetof(UnknownSurfaceDesc,surface)==0x24 && offsetof(UnknownSurfaceDesc,pixelFormat)==0x48 && '
-                'offsetof(UnknownPixelFormat,bitCount)==0xc && offsetof(PCTextureMap,systemSurface)==0x70) ? 1 : -1];\n')
+                'typedef char Layout[(sizeof(DDSurfaceDesc2)==124 && offsetof(DDSurfaceDesc2,pitch)==0x10 && '
+                'offsetof(DDSurfaceDesc2,surface)==0x24 && offsetof(DDSurfaceDesc2,pixelFormat)==0x48 && '
+                'offsetof(DDPixelFormat,bitCount)==0xc && offsetof(PCTextureMap,systemSurface)==0x70) ? 1 : -1];\n')
             compile_source(layout, 'layout')
             executable = output / 'copy.exe'
             result = subprocess.run([str(linker), '/nologo', '/subsystem:console', '/base:0x100000', '/fixed', '/opt:ref',

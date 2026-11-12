@@ -44,8 +44,8 @@ static void Boundary(RECT*rect){
  case 1:OverlayObject()->largeFont=(void*)0x7777;break;
  case 2:OverlayObject()->sharedTexture=Texture(0);break;
  case 3:OverlayObject()->overlayTexture=Texture(0);break;
- case 4:Texture(1)->systemSurface=(UnknownSurfaceInterface*)&w.surfaces[0];break;
- case 5:Texture(2)->systemSurface=(UnknownSurfaceInterface*)&w.surfaces[1];break;
+ case 4:Texture(1)->systemSurface=(DirectDrawSurface*)&w.surfaces[0];break;
+ case 5:Texture(2)->systemSurface=(DirectDrawSurface*)&w.surfaces[1];break;
  case 6:OverlayObject()->rowRects[0].left=-77;OverlayObject()->rowRects[0].right=111;break;
  case 7:memcpy(OverlayObject()->rowText[0],"changed row",12);break;
  case 8:OverlayObject()->sourceRect.top=1;break;
@@ -61,7 +61,7 @@ static void Boundary(RECT*rect){
 static int Index(void*p){for(int i=0;i<6;i++)if(p==&w.surfaces[i])return i;ExitProcess(82);return 0;}
 static void Text(Event&e,const char*p,int n){if(n<0||n>=128)ExitProcess(83);e.n=n;memcpy(e.text,p,n);e.text[n]=0;}
 static BYTE* Pixels(int i){if(sc.alias&&i==1)return w.pixels[0]+1024;if(sc.alias==2&&i==2)return w.pixels[1]+1024;return w.pixels[i]+1024;}
-static long __stdcall Lock(void*self,void*rect,UnknownSurfaceDesc*desc,int flags,void*event){
+static long __stdcall Lock(void*self,void*rect,DDSurfaceDesc2*desc,int flags,void*event){
  int i=Index(self);BYTE expected[124]={0};*(DWORD*)expected=124;if(rect||event||memcmp(expected,desc,124))ExitProcess(84);
  if(flags!=(w.locks?0x801:0x811))ExitProcess(113);Event&e=Begin(2,i);e.a=flags;w.surfaces[i].locks++;int fail=(sc.lockFail&(1<<w.locks++))!=0;e.status=fail?(int)0x80004005:0;
  desc->pitch=sc.pitch;desc->surface=Pixels(i);if(sc.fault==7&&i==1)desc->surface=guard[0]+4096-sc.available;if(sc.fault==8&&i==0)desc->surface=guard[0]+4096-sc.available;
@@ -75,7 +75,7 @@ static long __stdcall Blt(void*self,long x,long y,void*source,void*rect,int flag
  if(!e.status)for(int row=0;row<r->bottom-r->top;row++)for(int col=0;col<(r->right-r->left)*2;col++)Pixels(i)[(y+row)*sc.pitch+x*2+col]=Pixels(j)[(r->top+row)*sc.pitch+r->left*2+col];
  Boundary(r);Finish(e);return e.status;
 }
-static long __stdcall Attached(void*self,UnknownSurfaceCaps*c,void**out){int i=Index(self);if(c->caps!=0x401000||c->caps2||c->caps3||c->caps4)ExitProcess(87);Event&e=Begin(13,i);e.a=c->caps;int next=i==1?4:i==3?5:-1;e.status=(!sc.levels||next<0)?1:0;*out=e.status?0:&w.surfaces[next];Boundary(0);Finish(e);return e.status;}
+static long __stdcall Attached(void*self,DDSCaps2*c,void**out){int i=Index(self);if(c->caps!=0x401000||c->caps2||c->caps3||c->caps4)ExitProcess(87);Event&e=Begin(13,i);e.a=c->caps;int next=i==1?4:i==3?5:-1;e.status=(!sc.levels||next<0)?1:0;*out=e.status?0:&w.surfaces[next];Boundary(0);Finish(e);return e.status;}
 static long __stdcall Key(void*self,int flags,void*key){int i=Index(self);Event&e=Begin(14,i);e.a=flags;e.b=*(DWORD*)key;e.status=sc.keyFail;Boundary(0);Finish(e);return e.status;}
 static COLORREF WINAPI Bk(HDC dc,COLORREF color){if(color!=1)ExitProcess(114);Event&e=Begin(5,-1);e.a=(DWORD)dc;e.b=color;e.status=sc.status;Boundary(0);Finish(e);return e.status;}
 static int WINAPI Mode(HDC dc,int mode){if(mode!=1)ExitProcess(115);Event&e=Begin(6,-1);e.a=(DWORD)dc;e.b=mode;e.status=sc.status;Boundary(0);Finish(e);return e.status;}
@@ -100,7 +100,7 @@ static void Setup(){
  for(int row=first;row<rows;row++){int rank=row-first;if(row==rows-1&&ownRank>=rank)rank=ownRank;Line(o->drawnRowText[row],rank+1,order[rank]);}
  if(!sc.cached)memset(o->drawnRowText,0,sizeof(o->drawnRowText));
  for(int rr=0;rr<8;rr++){o->rowRects[rr].left=rr*3-17;o->rowRects[rr].right=180-rr*2;o->rowRects[rr].top=rr*13-21;o->rowRects[rr].bottom=rr*13-8;}
- for(int t=0;t<3;t++){PCTextureMap*map=Texture(t);At(map,0)=(DWORD)textureTable;map->textureWidth=sc.width;map->textureHeight=128;map->mapFormat=sc.format;map->systemSurface=(UnknownSurfaceInterface*)&w.surfaces[t];map->textureSurface=(UnknownSurfaceInterface*)&w.surfaces[3];map->usesColorKey=sc.key;map->colorKeyValue=0x1234;}
+ for(int t=0;t<3;t++){PCTextureMap*map=Texture(t);At(map,0)=(DWORD)textureTable;map->textureWidth=sc.width;map->textureHeight=128;map->mapFormat=sc.format;map->systemSurface=(DirectDrawSurface*)&w.surfaces[t];map->textureSurface=(DirectDrawSurface*)&w.surfaces[3];map->usesColorKey=sc.key;map->colorKeyValue=0x1234;}
  for(int n=0;n<6;n++){w.surfaces[n].table=(DWORD)surfaceTable;for(int k=0;k<4096;k++)w.pixels[n][k]=(BYTE)(17*k+29*n);}
  for(int g=0;g<2;g++)for(int k=0;k<4096;k++)guard[g][k]=(BYTE)(k*11+g*17);w.font=0x4444;memcpy(w.game[1],w.game[0],sizeof(TrackGame));((TrackGame*)w.game[1])->mode.raceSettings.raceMode=0;((TrackGame*)w.game[1])->mode.raceSettings.timeLimitMinutes=4.5f;
  switch(sc.fault){case 1:receiver=(StatsOverlay*)1;break;case 2:g_TrackGame=(TrackGame*)1;break;case 3:g_TrackGame->quarryEvent=(TrackGameViewOwner*)1;break;case 4:At(w.racers[0],4)=1;break;case 5:o->sharedTexture=(TextureMap*)1;break;case 6:o->overlayTexture=(TextureMap*)1;break;case 9:receiver=(StatsOverlay*)(guard[1]+4096-(0x5b0+sc.available));break;}

@@ -23,7 +23,7 @@
   "?Adjust@UnknownControlBinding@@QAEXM@Z": "0x0043cd90",
   "?QueueEvent@ControlInterface@@QAEXHHHH@Z": "0x0043cea0",
   "?FeedAxis@JoystickDevice@@QAEXHMM@Z": "0x00489c00",
-  "?GetForceFeedbackEffectName@@YAHUUnknownGuid@@PAD@Z": "0x004beef0",
+  "?GetForceFeedbackEffectName@@YAHUGuid@@PAD@Z": "0x004beef0",
   "?ReadClock@@YAIXZ": "0x004bfa80",
   "?ButtonIndexFromOffset@PCJoystickDevice@@QAEHH@Z": "0x004c2ef0",
   "?ApplyAxisDeadZone@PCJoystickDevice@@QAEHHH@Z": "0x004c3090",

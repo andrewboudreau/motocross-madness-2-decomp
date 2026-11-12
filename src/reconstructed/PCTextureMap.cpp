@@ -64,8 +64,8 @@ int PCTextureMap::LoadSurface(FileStream* stream, int width, int height, int min
                               int flags, void* surfacePalette, int addressU, int addressV,
                               UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key) {
     int offsets[12];
-    UnknownSurfaceCaps caps;
-    UnknownSurfaceDesc desc;
+    DDSCaps2 caps;
+    DDSurfaceDesc2 desc;
     int sourceFormat = DecodedFormat(fileFormat);
     if (choice) {
         format = IsFormat4444Or8888(format) ? choice->alphaFormat : choice->opaqueFormat;
@@ -142,9 +142,9 @@ int PCTextureMap::LoadSurface(FileStream* stream, int width, int height, int min
                 memset(&caps, 0, sizeof(caps));
                 caps.caps = 0x401000;
                 int surfaceSide = levelWidth;
-                UnknownSurfaceInterface* surface = systemSurface;
+                DirectDrawSurface* surface = systemSurface;
                 for (; surfaceSide > levelSide; surfaceSide /= 2) {
-                    UnknownSurfaceInterface* next;
+                    DirectDrawSurface* next;
                     long result = surface->GetAttachedSurface(&caps, &next);
                     if (result && result != (long)DDERR_NOTFOUND)
                         return 0;
@@ -232,7 +232,7 @@ int PCTextureMap::LoadSurface(FileStream* stream, int width, int height, int min
 // creates +0x70 from `desc` in one the render target accepts (flag 4 skips
 // that check), then counts the surface (4/3 more with mip levels) in DirectX
 // memory.
-int PCTextureMap::CreateSystemSurface(UnknownSurfaceDesc* desc, int flags, int* formats) {
+int PCTextureMap::CreateSystemSurface(DDSurfaceDesc2* desc, int flags, int* formats) {
     for (; *formats; formats++) {
         mapFormat = *formats;
         if (desc->flags & 0x1000)
@@ -292,7 +292,7 @@ void PCTextureMap::Bind() {
 
 // 0x004c79e0
 void* PCTextureMap::LockSurface(void* rect, long* pitch, int flags) {
-    UnknownSurfaceDesc desc;
+    DDSurfaceDesc2 desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     if (systemSurface->Lock(rect, &desc, flags, 0))
@@ -309,9 +309,9 @@ int PCTextureMap::UnlockSurface(void* rect) {
 
 // 0x004c7a70
 void* PCTextureMap::LockLevel(int level) {
-    UnknownSurfaceInterface* surface = FindMipLevel(level);
+    DirectDrawSurface* surface = FindMipLevel(level);
     if (surface) {
-        UnknownSurfaceDesc desc;
+        DDSurfaceDesc2 desc;
         memset(&desc, 0, sizeof(desc));
         desc.size = sizeof(desc);
         if (!surface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
@@ -322,7 +322,7 @@ void* PCTextureMap::LockLevel(int level) {
 
 // 0x004c7ad0
 int PCTextureMap::UnlockLevel(int level) {
-    UnknownSurfaceInterface* surface = FindMipLevel(level);
+    DirectDrawSurface* surface = FindMipLevel(level);
     if (surface && !surface->Unlock(0))
         return 1;
     return 0;
@@ -341,7 +341,7 @@ int PCTextureMap::RestoreTextureSurface() {
 }
 
 // 0x004c7b00
-int PCTextureMap::BlitTo(void* destinationRect, UnknownSurfaceInterface* destination,
+int PCTextureMap::BlitTo(void* destinationRect, DirectDrawSurface* destination,
                                         void* sourceRect, int flags, int skip) {
     if (!skip)
         return !destination->Blt(destinationRect, systemSurface, sourceRect, flags, 0);
@@ -351,15 +351,15 @@ int PCTextureMap::BlitTo(void* destinationRect, UnknownSurfaceInterface* destina
 // 0x004c83a0: follows the attached mip surfaces, halving the width, until it
 // reaches `width`. (`next` shares the dead parameter's stack slot, as in
 // retail.)
-UnknownSurfaceInterface* PCTextureMap::FindMipLevel(int width) {
-    UnknownSurfaceCaps caps;
+DirectDrawSurface* PCTextureMap::FindMipLevel(int width) {
+    DDSCaps2 caps;
     memset(&caps, 0, sizeof(caps));
     int size = textureWidth;
-    UnknownSurfaceInterface* surface = systemSurface;
+    DirectDrawSurface* surface = systemSurface;
     caps.caps = 0x401000;
     long result = 0;
     while (size != width) {
-        UnknownSurfaceInterface* next;
+        DirectDrawSurface* next;
         result = surface->GetAttachedSurface(&caps, &next);
         if (result)
             break;
@@ -378,9 +378,9 @@ int PCTextureMap::DumpAllLevels() {
     if (systemSurface) {
         DumpLevel(systemSurface, 0);
         if (mipCount > 1) {
-            UnknownSurfaceInterface* surface;
-            UnknownSurfaceCaps caps;
-            UnknownSurfaceInterface* top = systemSurface;
+            DirectDrawSurface* surface;
+            DDSCaps2 caps;
+            DirectDrawSurface* top = systemSurface;
             memset(&caps, 0, sizeof(caps));
             caps.caps = 0x401000;
             long result = top->GetAttachedSurface(&caps, &surface);
@@ -398,8 +398,8 @@ int PCTextureMap::DumpAllLevels() {
 }
 
 // 0x004c84e0: locks a level and writes it to a file (0x004c8550).
-int PCTextureMap::DumpLevel(UnknownSurfaceInterface* surface, const char* name) {
-    UnknownSurfaceDesc desc;
+int PCTextureMap::DumpLevel(DirectDrawSurface* surface, const char* name) {
+    DDSurfaceDesc2 desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     surface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0);
@@ -411,7 +411,7 @@ int PCTextureMap::DumpLevel(UnknownSurfaceInterface* surface, const char* name) 
 // 0x004c8550: writes a locked level to C:\temp\<name><nnn>.bmp (8-bit) or
 // .tga (anything else, converted to 32-bit first), taking the first number
 // with no existing file. `name` defaults to "tex".
-void PCTextureMap::WriteLevel(UnknownSurfaceDesc* desc, const char* name) {
+void PCTextureMap::WriteLevel(DDSurfaceDesc2* desc, const char* name) {
     char path[260];
     UnknownBitmapFile bitmap;
     const char* extension = desc->pixelFormat.bitCount == 8 ? ".bmp" : ".tga";
@@ -429,7 +429,7 @@ void PCTextureMap::WriteLevel(UnknownSurfaceDesc* desc, const char* name) {
     if (desc->pixelFormat.bitCount == 8) {
         // Reading the description through a second name here makes VC6 load the height before
         // the width in the .tga branch's buffer size, as retail does.
-        const UnknownSurfaceDesc& level = *desc;
+        const DDSurfaceDesc2& level = *desc;
         DescribeBitmap8(&bitmap, level.surface, colorMapper->entries, level.width, level.height);
         int length = strlen(path);
         int count = length > 0x7f ? 0x7f : length;
@@ -454,14 +454,14 @@ int PCTextureMap::CreateTextureSurface(int upload, int asRenderTarget, int local
     if (textureSurface)
         goto done;
     if (systemSurface) {
-        UnknownSurfaceCaps caps;
+        DDSCaps2 caps;
         if (systemSurface->GetCaps(&caps))
             goto failed;
         if (caps.caps & DDSCAPS_NONLOCALVIDMEM && !localVideo || g_TrackGame->bladeRenderer) {
             textureSurface = systemSurface;
             systemSurface->AddRef();
         } else {
-            UnknownSurfaceDesc desc;
+            DDSurfaceDesc2 desc;
             memset(&desc, 0, sizeof(desc));
             desc.size = sizeof(desc);
             if (systemSurface->GetSurfaceDesc(&desc))
@@ -499,8 +499,8 @@ failed:
 int PCTextureMap::Upload(UnknownRect* rect, int mode) {
     if (!systemSurface || !textureSurface)
         return 0;
-    UnknownSurfaceInterface* source = systemSurface;
-    UnknownSurfaceInterface* destination = textureSurface;
+    DirectDrawSurface* source = systemSurface;
+    DirectDrawSurface* destination = textureSurface;
     if (mode > 0 || mode == -1 && g_TrackGame->display->partialTextureUploadResult > 0 ||
         g_TrackGame->display->partialTextureUploadResult <= 0) {
         UnknownRect area;
@@ -512,7 +512,7 @@ int PCTextureMap::Upload(UnknownRect* rect, int mode) {
             area.right = textureWidth;
             area.bottom = textureHeight;
         }
-        UnknownSurfaceCaps caps;
+        DDSCaps2 caps;
         memset(&caps, 0, sizeof(caps));
         caps.caps = 0x401000;
         while (1) {
@@ -522,8 +522,8 @@ int PCTextureMap::Upload(UnknownRect* rect, int mode) {
                 break;
             if (destination->BltFast(area.left, area.top, source, &area, 0x10))
                 return 0;
-            UnknownSurfaceInterface* nextSource;
-            UnknownSurfaceInterface* nextDestination;
+            DirectDrawSurface* nextSource;
+            DirectDrawSurface* nextDestination;
             long sourceResult = source->GetAttachedSurface(&caps, &nextSource);
             long destinationResult = destination->GetAttachedSurface(&caps, &nextDestination);
             if (sourceResult || destinationResult)
@@ -547,17 +547,17 @@ int PCTextureMap::Upload(UnknownRect* rect, int mode) {
 
 // 0x004c77d0: fills each mip level by downsampling the level above it.
 int PCTextureMap::BuildMipLevels(int filter) {
-    UnknownSurfaceInterface* level;
+    DirectDrawSurface* level;
     void* sourceBits;
     int bytesPerPixel;
     int stride;
     long result;
-    UnknownSurfaceCaps caps;
-    UnknownSurfaceDesc desc;
+    DDSCaps2 caps;
+    DDSurfaceDesc2 desc;
     memset(&caps, 0, sizeof(caps));
     caps.caps = 0x401000;
     bytesPerPixel = PixelFormatBytesPerPixel(mapFormat);
-    UnknownSurfaceInterface* parent = systemSurface;
+    DirectDrawSurface* parent = systemSurface;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     if (parent->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
@@ -627,19 +627,19 @@ void PCTextureMap::SetColorKey(unsigned int color) {
 // (converted to the texture's format) the colour key. Magenta itself only
 // sets the key, except in format 8888, where the key pixels also lose
 // their alpha.
-int PCTextureMap::ColorKeyLevel(UnknownSurfaceInterface* surface, unsigned int color) {
+int PCTextureMap::ColorKeyLevel(DirectDrawSurface* surface, unsigned int color) {
     if (color == 0xff00ff && mapFormat != 8888) {
         SetColorKey(color);
         return 1;
     }
-    UnknownSurfaceDesc desc;
+    DDSurfaceDesc2 desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     if (surface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
         goto failed;
     if (mapFormat == 8888) {
-        UnknownPixel32 from;
-        UnknownPixel32 to;
+        RgbaPixel from;
+        RgbaPixel to;
         colorKeyValue = field_0x38 = color;
         from.red = 0xff;
         from.green = 0;
@@ -653,8 +653,8 @@ int PCTextureMap::ColorKeyLevel(UnknownSurfaceInterface* surface, unsigned int c
                               desc.pitch / PixelFormatBytesPerPixel(8888));
     }
     if (mapFormat == 888) {
-        UnknownPixel24 from;
-        UnknownPixel24 to;
+        RgbPixel from;
+        RgbPixel to;
         colorKeyValue = field_0x38 = color;
         from.red = 0xff;
         from.green = 0;
@@ -694,9 +694,9 @@ int PCTextureMap::ApplyColorKey(unsigned int color) {
     if (systemSurface) {
         ColorKeyLevel(systemSurface, color);
         if (mipCount > 1) {
-            UnknownSurfaceInterface* surface;
-            UnknownSurfaceCaps caps;
-            UnknownSurfaceInterface* top = systemSurface;
+            DirectDrawSurface* surface;
+            DDSCaps2 caps;
+            DirectDrawSurface* top = systemSurface;
             memset(&caps, 0, sizeof(caps));
             caps.caps = 0x401000;
             long result = top->GetAttachedSurface(&caps, &surface);

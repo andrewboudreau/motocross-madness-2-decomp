@@ -1,6 +1,6 @@
 #pragma once
 
-struct UnknownPixelFormat;
+struct DDPixelFormat;
 
 // Tgafile.cpp format helpers (all cdecl; Tgafile.cpp's literals follow
 // them). File formats are the loader's 1..34 codes; pixel formats are the
@@ -29,7 +29,7 @@ void FillPixelFormat(int format, void* pixelFormat);
 int IsFormat4444Or8888(int format);
 
 // 0x00511af0: the pixel format a DirectDraw pixel format describes.
-int FormatFromPixelFormat(UnknownPixelFormat* pixelFormat);
+int FormatFromPixelFormat(DDPixelFormat* pixelFormat);
 
 // A TGA file being read or written: the header fields (unpacked; 0x00512990 writes
 // them one by one), the pixels and the file name.

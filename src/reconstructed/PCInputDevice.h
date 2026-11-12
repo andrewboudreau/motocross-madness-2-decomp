@@ -27,7 +27,7 @@ enum DIKeyCode {
 // IDirectInputDevice2::SendForceFeedbackCommand; the identity is inference.
 // Uncalled slots carry the IDirectInputDevice2A names for that order.
 struct UnknownInputInterface {
-    virtual long __stdcall QueryInterface(const struct UnknownGuid& iid, void** object);
+    virtual long __stdcall QueryInterface(const struct Guid& iid, void** object);
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
     virtual long __stdcall GetCapabilities(struct UnknownDeviceCaps* caps);
@@ -47,14 +47,14 @@ struct UnknownInputInterface {
                                            unsigned long how); // GetObjectInfo
     virtual long __stdcall GetDeviceInfo(struct UnknownDeviceInstance* info);
     virtual long __stdcall RunControlPanel(void* owner, unsigned long flags);
-    virtual long __stdcall Initialize(void* instance, unsigned long version, const struct UnknownGuid& guid);
-    virtual long __stdcall CreateEffect(const struct UnknownGuid& type,
+    virtual long __stdcall Initialize(void* instance, unsigned long version, const struct Guid& guid);
+    virtual long __stdcall CreateEffect(const struct Guid& type,
                                            const struct UnknownEffectParams* params,
                                            struct UnknownEffectInterface** effect,
                                            void* outer); // CreateEffect
     virtual long __stdcall EnumEffects(int (__stdcall* callback)(const struct UnknownEffectInfo*, void*),
                                            void* context, unsigned long type); // EnumEffects
-    virtual long __stdcall GetEffectInfo(struct UnknownEffectInfo* info, const struct UnknownGuid& guid);
+    virtual long __stdcall GetEffectInfo(struct UnknownEffectInfo* info, const struct Guid& guid);
     virtual long __stdcall GetForceFeedbackState(unsigned long* state);
     virtual long __stdcall SendForceFeedbackCommand(int command);
     virtual long __stdcall EnumCreatedEffectObjects(void* callback, void* context, unsigned long flags);
@@ -90,12 +90,12 @@ struct UnknownInputProperty {
 // offsets used (type at +0x24, product name at +0x12c) match DIDEVICEINSTANCEA.
 struct UnknownDeviceInstance {
     unsigned long size;
-    UnknownGuid instanceGuid;
-    UnknownGuid productGuid;
+    Guid instanceGuid;
+    Guid productGuid;
     unsigned long deviceType;      // subtype in bits 8-15
     char instanceName[260];
     char productName[260];
-    UnknownGuid driverGuid;
+    Guid driverGuid;
     unsigned short usagePage;
     unsigned short usage;
 };
@@ -109,7 +109,7 @@ struct UnknownDeviceInstance {
 // layout matches DIEFFECTINFOA.
 struct UnknownEffectInfo {
     unsigned long size;
-    UnknownGuid guid;
+    Guid guid;
     unsigned long effectType;
     unsigned long staticParams;
     unsigned long dynamicParams;
@@ -117,21 +117,21 @@ struct UnknownEffectInfo {
 };
 
 // Effect type GUIDs; the names are the literals 0x004beef0 reports for them.
-extern "C" const UnknownGuid GUID_ConstantForce;  // 0x00556b90
-extern "C" const UnknownGuid GUID_RampForce;      // 0x00556ba0
-extern "C" const UnknownGuid GUID_Square;         // 0x00556bb0
-extern "C" const UnknownGuid GUID_Sine;           // 0x00556bc0
-extern "C" const UnknownGuid GUID_Triangle;       // 0x00556bd0
-extern "C" const UnknownGuid GUID_SawtoothUp;     // 0x00556be0
-extern "C" const UnknownGuid GUID_SawtoothDown;   // 0x00556bf0
-extern "C" const UnknownGuid GUID_Spring;         // 0x00556c00
-extern "C" const UnknownGuid GUID_Damper;         // 0x00556c10
-extern "C" const UnknownGuid GUID_Inertia;        // 0x00556c20
-extern "C" const UnknownGuid GUID_Friction;       // 0x00556c30
-extern "C" const UnknownGuid GUID_CustomForce;    // 0x00556c40
+extern "C" const Guid GUID_ConstantForce;  // 0x00556b90
+extern "C" const Guid GUID_RampForce;      // 0x00556ba0
+extern "C" const Guid GUID_Square;         // 0x00556bb0
+extern "C" const Guid GUID_Sine;           // 0x00556bc0
+extern "C" const Guid GUID_Triangle;       // 0x00556bd0
+extern "C" const Guid GUID_SawtoothUp;     // 0x00556be0
+extern "C" const Guid GUID_SawtoothDown;   // 0x00556bf0
+extern "C" const Guid GUID_Spring;         // 0x00556c00
+extern "C" const Guid GUID_Damper;         // 0x00556c10
+extern "C" const Guid GUID_Inertia;        // 0x00556c20
+extern "C" const Guid GUID_Friction;       // 0x00556c30
+extern "C" const Guid GUID_CustomForce;    // 0x00556c40
 
 // cdecl 0x004beef0: writes a name for a known effect GUID; nonzero if known.
-int GetForceFeedbackEffectName(UnknownGuid guid, char* name);
+int GetForceFeedbackEffectName(Guid guid, char* name);
 
 // cdecl 0x004bf6a0: reports a failed result with the caller's __FILE__ and
 // __LINE__ (it maps DirectX error codes to text).
@@ -147,11 +147,11 @@ struct UnknownDirectInput {
     virtual long __stdcall EnumDevices(unsigned long type,
                                           int (__stdcall* callback)(const struct UnknownDeviceInstance*, void*),
                                           void* context, unsigned long flags); // EnumDevices
-    virtual long __stdcall GetDeviceStatus(const UnknownGuid& device);
+    virtual long __stdcall GetDeviceStatus(const Guid& device);
     virtual long __stdcall UnknownMethod6();
     virtual long __stdcall UnknownMethod7();
     virtual long __stdcall UnknownMethod8();
-    virtual long __stdcall CreateDeviceEx(const UnknownGuid& device, const UnknownGuid& iid,
+    virtual long __stdcall CreateDeviceEx(const Guid& device, const Guid& iid,
                                           UnknownInputInterface** result, void* outer);
 };
 
@@ -181,14 +181,14 @@ struct UnknownDeviceCaps {
 // GUID_SysKeyboard (...2B61...) and IID_IDirectInputDevice7A
 // ({57D7C6BC-2356-11D3-8E9D-00C04F6844AE}); the data formats have the sizes
 // of c_dfDIKeyboard (256 objects, 256 bytes) and c_dfDIMouse (7, 16).
-extern "C" const UnknownGuid GUID_SysMouse;              // 0x00556b20
-extern "C" const UnknownGuid GUID_SysKeyboard;           // 0x00556b30
-extern "C" const UnknownGuid IID_IDirectInputDevice7A;   // 0x00556a50
-extern "C" const UnknownGuid IID_IDirectInput7A;         // 0x005569e0 ({9A4CB684-236D-11D3-8E9D-00C04F6844AE})
+extern "C" const Guid GUID_SysMouse;              // 0x00556b20
+extern "C" const Guid GUID_SysKeyboard;           // 0x00556b30
+extern "C" const Guid IID_IDirectInputDevice7A;   // 0x00556a50
+extern "C" const Guid IID_IDirectInput7A;         // 0x005569e0 ({9A4CB684-236D-11D3-8E9D-00C04F6844AE})
 
 // dinput.dll import (thunk 0x005330e8).
 extern "C" long __stdcall DirectInputCreateEx(void* instance, unsigned long version,
-                                              const UnknownGuid& iid, void** result,
+                                              const Guid& iid, void** result,
                                               void* outer);
 extern "C" const UnknownDataFormat c_dfDIKeyboard;       // 0x00558f18
 extern "C" const UnknownDataFormat c_dfDIMouse;          // 0x00558f30
@@ -204,7 +204,7 @@ struct UnknownDeviceObjectData {
 // 0x13c-byte object description (DIDEVICEOBJECTINSTANCEA layout).
 struct UnknownObjectInstance {
     unsigned long size;
-    UnknownGuid guidType;
+    Guid guidType;
     unsigned long offset;
     unsigned long type;
     unsigned long flags;
@@ -225,12 +225,12 @@ struct UnknownInputPropertyRange {
 // Axis GUIDs, decoded from retail as the standard GUID_XAxis, GUID_YAxis,
 // GUID_ZAxis, GUID_RxAxis, GUID_RyAxis and GUID_RzAxis; the joystick data
 // format has the layout of c_dfDIJoystick (44 objects, 80 bytes).
-extern "C" const UnknownGuid GUID_XAxis;                 // 0x00556a70
-extern "C" const UnknownGuid GUID_YAxis;                 // 0x00556a80
-extern "C" const UnknownGuid GUID_ZAxis;                 // 0x00556a90
-extern "C" const UnknownGuid GUID_RxAxis;                // 0x00556aa0
-extern "C" const UnknownGuid GUID_RyAxis;                // 0x00556ab0
-extern "C" const UnknownGuid GUID_RzAxis;                // 0x00556ac0
+extern "C" const Guid GUID_XAxis;                 // 0x00556a70
+extern "C" const Guid GUID_YAxis;                 // 0x00556a80
+extern "C" const Guid GUID_ZAxis;                 // 0x00556a90
+extern "C" const Guid GUID_RxAxis;                // 0x00556aa0
+extern "C" const Guid GUID_RyAxis;                // 0x00556ab0
+extern "C" const Guid GUID_RzAxis;                // 0x00556ac0
 extern "C" const UnknownDataFormat c_dfDIJoystick;       // 0x00558f00
 
 // RTTI: PCInputDevice : InputDevice. PCInputDeviceType.cpp is the nearest

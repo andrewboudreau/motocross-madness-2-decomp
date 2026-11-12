@@ -159,7 +159,7 @@ def symbol_kind(symbol: str) -> str:
     if '$E' in symbol or symbol.startswith('??__E'):
         return 'initializer'
     base = symbol[1:] if symbol.startswith('_') else symbol
-    if base.startswith(GUID_PREFIXES) or 'U_GUID@@' in symbol or 'UUnknownGuid@@' in symbol:
+    if base.startswith(GUID_PREFIXES) or 'U_GUID@@' in symbol or 'UGuid@@' in symbol:
         return 'guid'
     if base.startswith(LIB_DATA_NAMES):
         return 'library-data'

@@ -329,7 +329,7 @@ void TrackGameMode::ChooseDisplayMode(const void* guid, int* mode) {
     if (!game->display)
         return;
     if (game->displayProfilesStale || !guid ||
-        memcmp(guid, &game->display->driverGuid, sizeof(UnknownGuid)) ||
+        memcmp(guid, &game->display->driverGuid, sizeof(Guid)) ||
         !game->display->displayModes[*mode].hardwareUsable) {
         *mode = 0;
         if (g_TrackGame->bladeRenderer) {

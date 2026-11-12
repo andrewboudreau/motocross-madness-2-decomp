@@ -35,7 +35,7 @@
 #include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/PCGame.h"
 
-extern "C" const UnknownGuid IID_IDirect3DHALDevice;
+extern "C" const Guid IID_IDirect3DHALDevice;
 void FillPixelFormat(int format, void* pixelFormat);
 
 // 0x004c0d10: unless all cached profiles load, profiles every display: its mode
@@ -75,7 +75,7 @@ int PCGame::ProfileDisplays() {
         SetRegistryFlag(name, 1);
         if (g_Displays[i]->SetFullscreenCooperativeLevel() &&
             g_Displays[i]->directDraw->SetDisplayMode(640, 480, 16, 0, 0) == 0) {
-            UnknownSurfaceCaps caps;
+            DDSCaps2 caps;
             unsigned long total;
             unsigned long free;
             memset(&caps, 0, sizeof(caps));
@@ -124,10 +124,10 @@ int PCGame::ProfileDisplays() {
                                 g_Displays[i]->ProbeNonLocalTextureMemory(&value, target);
                             sprintf(name, "DriverInfo\\%s\\IsAGP", g_Displays[i]->driverGuidText);
                             SetRegistryFlag(name, g_Displays[i]->isAGP);
-                            UnknownSurfaceInterface* surfaces[10];
+                            DirectDrawSurface* surfaces[10];
                             int count;
                             for (count = 0; count < 10; count++) {
-                                UnknownSurfaceDesc desc;
+                                DDSurfaceDesc2 desc;
                                 memset(&desc, 0, sizeof(desc));
                                 desc.size = sizeof(desc);
                                 FillPixelFormat(target->surfacePixelFormat, &desc.pixelFormat);

@@ -11,11 +11,11 @@
 
 struct Matrix4;
 struct SurfaceMaterial;
-struct UnknownGuid;
+struct Guid;
 struct UnknownClipperInterface;
-struct UnknownSurfaceDesc;
-struct UnknownSurfaceCaps;
-struct UnknownPixelFormat;
+struct DDSurfaceDesc2;
+struct DDSCaps2;
+struct DDPixelFormat;
 
 // Device at PCRenderTarget+0x50 (IDirect3DDevice7, created by IDirect3D7's
 // CreateDevice).
@@ -24,7 +24,7 @@ struct UnknownRenderInterface {
     virtual long __stdcall UnknownMethod1();
     virtual long __stdcall Release();                                           // 2
     virtual long __stdcall GetCaps(void* caps);                                   // 3
-    virtual long __stdcall EnumTextureFormats(long(__stdcall* callback)(UnknownPixelFormat*, void*),
+    virtual long __stdcall EnumTextureFormats(long(__stdcall* callback)(DDPixelFormat*, void*),
                                               void* context);                     // 4
     virtual long __stdcall BeginScene();                                          // 5
     virtual long __stdcall EndScene();                                            // 6
@@ -70,42 +70,42 @@ struct UnknownRenderInterface {
     virtual long __stdcall UnknownMethod40();
     virtual long __stdcall UnknownMethod41();
     virtual long __stdcall UnknownMethod42();
-    virtual long __stdcall Load(struct UnknownSurfaceInterface* destination, void* point,
-                                struct UnknownSurfaceInterface* source, void* rect,
+    virtual long __stdcall Load(struct DirectDrawSurface* destination, void* point,
+                                struct DirectDrawSurface* source, void* rect,
                                 int flags);                                       // 43
 };
 
 // Surface at PCRenderTarget+0x48 (IDirectDrawSurface7).
-struct UnknownSurfaceInterface {
-    virtual long __stdcall QueryInterface(const UnknownGuid* iid, void** object);  // 0
+struct DirectDrawSurface {
+    virtual long __stdcall QueryInterface(const Guid* iid, void** object);  // 0
     virtual long __stdcall AddRef();                                              // 1
     virtual long __stdcall Release();                                           // 2
-    virtual long __stdcall AddAttachedSurface(UnknownSurfaceInterface* surface);   // 3
+    virtual long __stdcall AddAttachedSurface(DirectDrawSurface* surface);   // 3
     virtual long __stdcall UnknownMethod4();
-    virtual long __stdcall Blt(void* destination, UnknownSurfaceInterface* source,
+    virtual long __stdcall Blt(void* destination, DirectDrawSurface* source,
                                void* sourceRect, int flags, void* effects);       // 5
     virtual long __stdcall UnknownMethod6();
-    virtual long __stdcall BltFast(long x, long y, UnknownSurfaceInterface* source, void* rect,
+    virtual long __stdcall BltFast(long x, long y, DirectDrawSurface* source, void* rect,
                                    int flags);                                    // 7
     virtual long __stdcall UnknownMethod8();
     virtual long __stdcall UnknownMethod9();
     virtual long __stdcall UnknownMethod10();
-    virtual long __stdcall Flip(UnknownSurfaceInterface* target, unsigned long flags); // 11
-    virtual long __stdcall GetAttachedSurface(UnknownSurfaceCaps* caps,
-                                              UnknownSurfaceInterface** surface); // 12
+    virtual long __stdcall Flip(DirectDrawSurface* target, unsigned long flags); // 11
+    virtual long __stdcall GetAttachedSurface(DDSCaps2* caps,
+                                              DirectDrawSurface** surface); // 12
     virtual long __stdcall GetBltStatus(unsigned long flags);                     // 13
-    virtual long __stdcall GetCaps(UnknownSurfaceCaps* caps);                     // 14
+    virtual long __stdcall GetCaps(DDSCaps2* caps);                     // 14
     virtual long __stdcall UnknownMethod15();
     virtual long __stdcall UnknownMethod16();
     virtual long __stdcall GetDC(void** dc);                                      // 17
     virtual long __stdcall UnknownMethod18();
     virtual long __stdcall UnknownMethod19();
     virtual long __stdcall UnknownMethod20();
-    virtual long __stdcall GetPixelFormat(UnknownPixelFormat* format);            // 21
-    virtual long __stdcall GetSurfaceDesc(UnknownSurfaceDesc* desc);              // 22
+    virtual long __stdcall GetPixelFormat(DDPixelFormat* format);            // 21
+    virtual long __stdcall GetSurfaceDesc(DDSurfaceDesc2* desc);              // 22
     virtual long __stdcall UnknownMethod23();
     virtual long __stdcall IsLost();                                              // 24
-    virtual long __stdcall Lock(void* rect, UnknownSurfaceDesc* desc, int flags, void* event); // 25
+    virtual long __stdcall Lock(void* rect, DDSurfaceDesc2* desc, int flags, void* event); // 25
     virtual long __stdcall ReleaseDC(void* dc);                                   // 26
     virtual long __stdcall Restore();                                             // 27
     virtual long __stdcall SetClipper(UnknownClipperInterface* clipper);          // 28
@@ -116,7 +116,7 @@ struct UnknownSurfaceInterface {
 };
 
 // 16-byte surface capabilities (the DDSCAPS2 layout).
-struct UnknownSurfaceCaps {
+struct DDSCaps2 {
     unsigned long caps;
     unsigned long caps2;
     unsigned long caps3;
@@ -124,7 +124,7 @@ struct UnknownSurfaceCaps {
 };
 
 // 0x20-byte pixel format (the DDPIXELFORMAT layout).
-struct UnknownPixelFormat {
+struct DDPixelFormat {
     unsigned long size;
     unsigned long flags;
     unsigned long fourCC;
@@ -134,21 +134,21 @@ struct UnknownPixelFormat {
 
 // 32-bit RGBA (format 0x22b8) and 24-bit RGB (0x378) pixels, red first in
 // memory (Pixtrans.cpp takes them by value; Tgafile.cpp swaps red and blue).
-struct UnknownPixel32 {
+struct RgbaPixel {
     unsigned char red;
     unsigned char green;
     unsigned char blue;
     unsigned char alpha;
 };
 
-struct UnknownPixel24 {
+struct RgbPixel {
     unsigned char red;
     unsigned char green;
     unsigned char blue;
 };
 
 // 0x7c-byte surface description (the DDSURFACEDESC2 layout).
-struct UnknownSurfaceDesc {
+struct DDSurfaceDesc2 {
     unsigned long size;
     unsigned long flags;
     unsigned long height;
@@ -165,7 +165,7 @@ struct UnknownSurfaceDesc {
     unsigned char field_0x1c[0x24 - 0x1c];
     void* surface;                                // the locked bits
     unsigned char field_0x28[0x48 - 0x28];
-    UnknownPixelFormat pixelFormat;
+    DDPixelFormat pixelFormat;
     unsigned long caps[4];
     unsigned long textureStage;
 };
@@ -180,7 +180,7 @@ struct UnknownPaletteInterface {
 
 // Interface at Display+0x190 (IDirectDraw7-shaped).
 struct UnknownDirectDrawInterface {
-    virtual long __stdcall QueryInterface(const UnknownGuid* iid, void** object); // 0
+    virtual long __stdcall QueryInterface(const Guid* iid, void** object); // 0
     virtual long __stdcall UnknownMethod1();
     virtual long __stdcall Release();                                           // 2
     virtual long __stdcall UnknownMethod3();
@@ -188,17 +188,17 @@ struct UnknownDirectDrawInterface {
                                           void* outer);                         // 4
     virtual long __stdcall CreatePalette(unsigned long flags, void* entries, UnknownPaletteInterface** palette,
                                           void* outer);                         // 5
-    virtual long __stdcall CreateSurface(UnknownSurfaceDesc* desc, UnknownSurfaceInterface** surface,
+    virtual long __stdcall CreateSurface(DDSurfaceDesc2* desc, DirectDrawSurface** surface,
                                           void* outer);                         // 6
     virtual long __stdcall UnknownMethod7();
-    virtual long __stdcall EnumDisplayModes(unsigned long flags, UnknownSurfaceDesc* desc, void* context,
-                                          long(__stdcall* callback)(UnknownSurfaceDesc*, void*)); // 8
+    virtual long __stdcall EnumDisplayModes(unsigned long flags, DDSurfaceDesc2* desc, void* context,
+                                          long(__stdcall* callback)(DDSurfaceDesc2*, void*)); // 8
     virtual long __stdcall UnknownMethod9();
     virtual long __stdcall UnknownMethod10();
     virtual long __stdcall GetCaps(void* driverCaps, void* emulationCaps);      // 11
-    virtual long __stdcall GetDisplayMode(UnknownSurfaceDesc* desc);            // 12
+    virtual long __stdcall GetDisplayMode(DDSurfaceDesc2* desc);            // 12
     virtual long __stdcall UnknownMethod13();
-    virtual long __stdcall GetGDISurface(UnknownSurfaceInterface** surface);    // 14
+    virtual long __stdcall GetGDISurface(DirectDrawSurface** surface);    // 14
     virtual long __stdcall UnknownMethod15();
     virtual long __stdcall UnknownMethod16();
     virtual long __stdcall UnknownMethod17();
@@ -209,7 +209,7 @@ struct UnknownDirectDrawInterface {
                                            unsigned long bitDepth, unsigned long refreshRate,
                                            unsigned long flags);                // 21
     virtual long __stdcall WaitForVerticalBlank(unsigned long flags, void* event); // 22
-    virtual long __stdcall GetAvailableVidMem(UnknownSurfaceCaps* caps, unsigned long* total,
+    virtual long __stdcall GetAvailableVidMem(DDSCaps2* caps, unsigned long* total,
                                            unsigned long* free);                // 23
     virtual long __stdcall UnknownMethod24();
     virtual long __stdcall UnknownMethod25();
@@ -223,11 +223,11 @@ struct UnknownDirect3DInterface {
     virtual long __stdcall UnknownMethod1();
     virtual long __stdcall Release();                                           // 2
     virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall CreateDevice(const UnknownGuid* device, UnknownSurfaceInterface* surface,
+    virtual long __stdcall CreateDevice(const Guid* device, DirectDrawSurface* surface,
                                           UnknownRenderInterface** result);     // 4
     virtual long __stdcall UnknownMethod5();
-    virtual long __stdcall EnumZBufferFormats(const UnknownGuid* device,
-                                          long(__stdcall* callback)(UnknownPixelFormat*, void*),
+    virtual long __stdcall EnumZBufferFormats(const Guid* device,
+                                          long(__stdcall* callback)(DDPixelFormat*, void*),
                                           void* context);                       // 6
 };
 

@@ -71,13 +71,13 @@ extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
 
 // Direct3D device GUIDs (their values are the DirectX IIDs of the same
 // names); 0x00556040 is the "Blade" renderer's, which is not a DirectX one.
-extern "C" const UnknownGuid IID_IDirect3DRampDevice;   // 0x00556190
-extern "C" const UnknownGuid IID_IDirect3DRGBDevice;    // 0x005561a0
-extern "C" const UnknownGuid IID_IDirect3DHALDevice;    // 0x005561b0
-extern "C" const UnknownGuid IID_IDirect3DMMXDevice;    // 0x005561c0
-extern "C" const UnknownGuid IID_IDirect3DRefDevice;    // 0x005561d0
-extern "C" const UnknownGuid IID_IDirect3DNullDevice;   // 0x005561e0
-extern const UnknownGuid g_BladeDeviceGuid;   // 0x00556040: storage in GraphicsState.cpp
+extern "C" const Guid IID_IDirect3DRampDevice;   // 0x00556190
+extern "C" const Guid IID_IDirect3DRGBDevice;    // 0x005561a0
+extern "C" const Guid IID_IDirect3DHALDevice;    // 0x005561b0
+extern "C" const Guid IID_IDirect3DMMXDevice;    // 0x005561c0
+extern "C" const Guid IID_IDirect3DRefDevice;    // 0x005561d0
+extern "C" const Guid IID_IDirect3DNullDevice;   // 0x005561e0
+extern const Guid g_BladeDeviceGuid;   // 0x00556040: storage in GraphicsState.cpp
 
 // Display set-up outside PCGame (cdecl; names provisional).
 int EnumerateDisplays(void* window);                // 0x004c9600: enumerates the displays
@@ -462,7 +462,7 @@ int PCGame::LimitDisplayModes(PCVideoCard* display, int width, int height) {
 // records the display's two mode values (+0x58, +0x5c).
 RenderTarget* PCGame::CreateRenderTarget() {
     int frames = display->renderSurface ? 1 : display->frameBufferCount;
-    UnknownSurfaceInterface* surface =
+    DirectDrawSurface* surface =
         display->renderSurface ? display->renderSurface : display->backBuffer;
     RenderTarget* target = (new(__FILE__, 984) PCRenderTarget)
         ->InitializeRenderTarget(display, &deviceGuid, surface, useZBuffer, frames);

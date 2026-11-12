@@ -47,9 +47,9 @@ int WriteTga(TgaFile* file, unsigned int stride, int greenMask, int descriptor) 
     if (file->bitsPerPixel == 24) {
         pitch = (stride ? stride : file->width * 3) / 3;
         for (row = 0; row < file->height; row++) {
-            UnknownPixel24* source = (UnknownPixel24*)file->bits + row * pitch;
+            RgbPixel* source = (RgbPixel*)file->bits + row * pitch;
             for (column = 0; column < file->width; column++, source++) {
-                UnknownPixel24 pixel = *source;
+                RgbPixel pixel = *source;
                 unsigned char red = pixel.red;
                 pixel.red = pixel.blue;
                 pixel.blue = red;
@@ -63,9 +63,9 @@ int WriteTga(TgaFile* file, unsigned int stride, int greenMask, int descriptor) 
     if (file->bitsPerPixel == 32) {
         pitch = (stride ? stride : file->width * 4) / 4;
         for (row = 0; row < file->height; row++) {
-            UnknownPixel32* pixel = (UnknownPixel32*)file->bits + row * pitch;
+            RgbaPixel* pixel = (RgbaPixel*)file->bits + row * pitch;
             for (column = 0; column < file->width; column++, pixel++) {
-                UnknownPixel32 swapped = *pixel;
+                RgbaPixel swapped = *pixel;
                 unsigned char red = swapped.red;
                 swapped.red = swapped.blue;
                 swapped.blue = red;
@@ -74,7 +74,7 @@ int WriteTga(TgaFile* file, unsigned int stride, int greenMask, int descriptor) 
         }
         int count = file->height * file->width;
         int block = file->width * pitch;
-        UnknownPixel32* pixels = (UnknownPixel32*)file->bits;
+        RgbaPixel* pixels = (RgbaPixel*)file->bits;
         for (int written = 0; written < count; written += block) {
             if ((int)fwrite(pixels, 4, block, stream) != block)
                 goto failed;

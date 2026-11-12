@@ -43,7 +43,7 @@ public:
     virtual int OnActivate();             // 0x00404de0
     // Slot 27 (shared `return 1` body 0x004627f0): called with the surface
     // the background is restored into.
-    virtual int UnknownVirtualSlot27(UnknownSurfaceInterface* surface);
+    virtual int UnknownVirtualSlot27(DirectDrawSurface* surface);
 
     void SetImage(PCTextureMap* image);                // 0x004040b0: sets the image
     int AllocRegion(int owner);               // 0x004040f0: allocates a region
@@ -74,7 +74,7 @@ public:
     int imageVisible;                      // +0x30 visible
     int imageRegion;                       // the image's region
     int fullRedrawsOwed;                   // full redraws the image still owes
-    UnknownSurfaceInterface* offscreenCopy; // off-screen copy
+    DirectDrawSurface* offscreenCopy; // off-screen copy
     int copyValid;                         // the copy holds the background
     int field_0x44;
     int regionCapacity;                    // regions allocated
@@ -86,6 +86,6 @@ public:
     int copyDcNext;                           // +0x60  GetDc with the copy current alternates: set, the next DC is the off-screen copy's, else the back buffer's
     int lastDcRegion;                         // +0x64  GetDc's last dirty region handed out (-1 after the last)
     int lastDcRegionCopied;                   // +0x68  GetDc: lastDcRegion's copy DC was handed out after its back-buffer DC
-    UnknownSurfaceInterface* heldDcSurface; // surface whose DC is held
+    DirectDrawSurface* heldDcSurface; // surface whose DC is held
     void* heldDc;                          // the DC
 };

@@ -833,7 +833,7 @@ void D3DIMSoultreeObject::DrawBoxOutline(Vector3 center, Vector3 extents, int fl
 // 0x004439c0
 void D3DIMSoultreeObject::DrawScreenRect(UnknownSoultreeScreenRect* rect)
 {
-    UnknownSurfaceDesc desc;
+    DDSurfaceDesc2 desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     ((PCRenderTarget*)renderContext)->renderSurface->Lock(0, &desc, 1, 0);

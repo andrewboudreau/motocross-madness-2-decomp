@@ -19,7 +19,7 @@
   "?IsRunning@MediaControl@@QAEHXZ": "0x004a2a20",
   "?GetPosition@MediaControl@@QAEHPA_J@Z": "0x004a2a50",
   "?GetDuration@MediaControl@@QAEHPA_J@Z": "0x004a2a70",
-  "?BlitFrame@MediaControl@@QAEJPAUUnknownSurfaceInterface@@PAX1H@Z": "0x004a2a90",
+  "?BlitFrame@MediaControl@@QAEJPAUDirectDrawSurface@@PAX1H@Z": "0x004a2a90",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "?Tick@MediaControl@@UAEHM@Z": "0x004a27f0",
   "?Step@GameObject@@UAEHM@Z": "0x004da540",

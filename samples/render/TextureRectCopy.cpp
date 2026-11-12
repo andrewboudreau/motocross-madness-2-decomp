@@ -15,10 +15,10 @@
 // destination pixel becomes table[source << 8 | destination], clipped to
 // the destination. Every non-8-bit format follows the WORD path and reads
 // a byte through the destination WORD value, including its low-address fault.
-int PCTextureMap::CopyRectTo(unsigned long x, unsigned long y, UnknownSurfaceInterface* destination,
+int PCTextureMap::CopyRectTo(unsigned long x, unsigned long y, DirectDrawSurface* destination,
                                         UnknownRect* rect, int flags, unsigned char* table) {
-    UnknownSurfaceDesc source;
-    UnknownSurfaceDesc target;
+    DDSurfaceDesc2 source;
+    DDSurfaceDesc2 target;
     long left, top, right, bottom;
     if (!table) {
         if (destination->BltFast(x, y, systemSurface, rect, flags))

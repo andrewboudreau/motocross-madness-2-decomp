@@ -43,7 +43,7 @@ int PCJoystickDevice::OpenDevice(const UnknownDeviceInstance* instance) {
     UnknownInputPropertyRange range;
     UnknownDeviceCaps caps;
     int half;
-    const UnknownGuid& guid = instance->instanceGuid;
+    const Guid& guid = instance->instanceGuid;
     if (g_TrackGame->controlInterface->directInput->CreateDeviceEx(
             guid, IID_IDirectInputDevice7A, &device, 0) < 0)
         goto failed;
@@ -136,17 +136,17 @@ int __stdcall PCJoystickDevice::EnumAxisObjectsCallback(const UnknownObjectInsta
     UnknownObjectInstance info;
     info.size = sizeof(info);
     if (device->device->GetObjectInfo(&info, object->type, DIPH_BYID) >= 0) {
-        if (!memcmp(&object->guidType, &GUID_XAxis, sizeof(UnknownGuid)))
+        if (!memcmp(&object->guidType, &GUID_XAxis, sizeof(Guid)))
             device->field_0x14_axis0 = 1;
-        if (!memcmp(&object->guidType, &GUID_YAxis, sizeof(UnknownGuid)))
+        if (!memcmp(&object->guidType, &GUID_YAxis, sizeof(Guid)))
             device->field_0x14_axis1 = 1;
-        if (!memcmp(&object->guidType, &GUID_ZAxis, sizeof(UnknownGuid)))
+        if (!memcmp(&object->guidType, &GUID_ZAxis, sizeof(Guid)))
             device->field_0x14_axis2 = 1;
-        if (!memcmp(&object->guidType, &GUID_RxAxis, sizeof(UnknownGuid)))
+        if (!memcmp(&object->guidType, &GUID_RxAxis, sizeof(Guid)))
             device->field_0x14_axis3 = 1;
-        if (!memcmp(&object->guidType, &GUID_RyAxis, sizeof(UnknownGuid)))
+        if (!memcmp(&object->guidType, &GUID_RyAxis, sizeof(Guid)))
             device->field_0x14_axis4 = 1;
-        if (!memcmp(&object->guidType, &GUID_RzAxis, sizeof(UnknownGuid)))
+        if (!memcmp(&object->guidType, &GUID_RzAxis, sizeof(Guid)))
             device->field_0x14_axis5 = 1;
     }
     return 1;

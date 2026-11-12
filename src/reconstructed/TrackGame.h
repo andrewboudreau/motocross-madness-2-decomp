@@ -415,7 +415,7 @@ public:
     int racerCount;                           // +0x1be0 racer count (EventManager 0x0045e550)
     UnknownTrackGameRacerSlot racers[8];      // +0x1be4 the race's racer slots
     int networkGame;                          // +0x23a4 network game (racesnd.cpp 0x004e5780)
-    UnknownGuid displayAdapterGuid;       // +0x23a8: display adapter GUID (TrackGameMode 0x00522e20)
+    Guid displayAdapterGuid;       // +0x23a8: display adapter GUID (TrackGameMode 0x00522e20)
     int savedCameraState;                     // +0x23b8 KrustyBikeCamera state (slots 61, 62); saved in uiinfo
     float savedCameraDistance;                // +0x23bc KrustyBikeCamera presets (slots 59, 60): follow distance (10.3)
     float savedCameraPitch;                   // +0x23c0 follow pitch (0.471)

@@ -5,7 +5,7 @@
 // than per-TU constants, so all existing callers retain the same relocations.
 const float g_DefaultNearPlane = 1.0f;
 const float g_DefaultFarPlane = 100000.0f;
-const UnknownGuid g_BladeDeviceGuid = {
+const Guid g_BladeDeviceGuid = {
     0x706e9520, 0x6db1, 0x11d2, {0xb9, 0x01, 0x00, 0x10, 0x4b, 0x36, 0xae, 0x4b}
 };
 
@@ -72,8 +72,8 @@ unsigned short g_GammaRamp[3][256] = {
 // The PE loader zero-fills these addresses. Enumeration permits four displays;
 // TextureMapManager clears and releases ten entries in each shared cache.
 int g_DebugCountTextureMemory;
-UnknownSurfaceInterface* g_SharedMipTextureSurfaces[10];
-UnknownSurfaceInterface* g_SharedTextureSurfaces[10];
+DirectDrawSurface* g_SharedMipTextureSurfaces[10];
+DirectDrawSurface* g_SharedTextureSurfaces[10];
 PCVideoCard* g_Displays[4];
 int g_DisplayCount;
 

@@ -140,7 +140,7 @@ class OverlayRestoreTests(unittest.TestCase):
                 'sizeof(int(Overlay::*)(const UnknownOverlayRect*))==4 && '
                 'offsetof(Overlay,overlayTexture)==0x2c && offsetof(Overlay,backingTexture)==0x30 && '
                 'offsetof(TextureMap,textureWidth)==0x14 && offsetof(TextureMap,mapFormat)==0x20 && '
-                'offsetof(PCTextureMap,systemSurface)==0x70 && sizeof(UnknownSurfaceDesc)==124)?1:-1];\n')
+                'offsetof(PCTextureMap,systemSurface)==0x70 && sizeof(DDSurfaceDesc2)==124)?1:-1];\n')
             compile_source(layout,'layout')
             spec=json.loads((ROOT/'config/game_build.json').read_text())
             built=game_compile(SOURCE,output/'game-command',compiler,[ROOT/p for p in spec['includes']],spec['profile'],{**os.environ,'PYTHONPATH':str(ROOT)})

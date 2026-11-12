@@ -21,8 +21,8 @@
 
 // 0x00486170
 PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
-    UnknownSurfaceDesc desc;
-    UnknownSurfaceInterface* surface;
+    DDSurfaceDesc2 desc;
+    DirectDrawSurface* surface;
     PCVideoCard* display;
     PCTextureMap* texture = 0;
     unsigned char* bits;

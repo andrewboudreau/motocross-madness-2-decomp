@@ -24,7 +24,7 @@ TextureMap* PCTextureMap::Clone() {
         copy = new(__FILE__, 986) PCTextureMap(manager, 1);
     }
     if (systemSurface) {
-        UnknownSurfaceDesc desc;
+        DDSurfaceDesc2 desc;
         memset(&desc, 0, sizeof(desc));
         desc.size = sizeof(desc);
         if (!systemSurface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0)) {

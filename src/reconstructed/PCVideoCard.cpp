@@ -15,7 +15,7 @@
 #include "TrackGame.h"
 
 // 0x004c94a0: DirectDrawEnumerateA callback; `context` points at the window.
-static int __stdcall EnumDisplayCallback(UnknownGuid* guid, char* description, char* name,
+static int __stdcall EnumDisplayCallback(Guid* guid, char* description, char* name,
     void* context) {
     if (g_DisplayCount < 4) {
         PCVideoCard* display = new (__FILE__, 280) PCVideoCard;
@@ -28,7 +28,7 @@ static int __stdcall EnumDisplayCallback(UnknownGuid* guid, char* description, c
 }
 
 // 0x004c9550: DirectDrawEnumerateExA callback (the monitor is not used).
-static int __stdcall EnumDisplayExCallback(UnknownGuid* guid, char* description, char* name,
+static int __stdcall EnumDisplayExCallback(Guid* guid, char* description, char* name,
     void* context, void* monitor) {
     if (g_DisplayCount < 4) {
         PCVideoCard* display = new (__FILE__, 307) PCVideoCard;
@@ -41,7 +41,7 @@ static int __stdcall EnumDisplayExCallback(UnknownGuid* guid, char* description,
 }
 
 typedef long(__stdcall* UnknownEnumerateEx)(
-    int(__stdcall* callback)(UnknownGuid*, char*, char*, void*, void*), void* context,
+    int(__stdcall* callback)(Guid*, char*, char*, void*, void*), void* context,
     unsigned long flags);
 
 // 0x004c9600
@@ -63,7 +63,7 @@ int EnumerateDisplays(void* window) {
 
 // 0x004c9660: EnumDisplayModes callback; appends the mode, growing the
 // table by 20 entries.
-static long __stdcall EnumDisplayModeCallback(UnknownSurfaceDesc* desc, void* context) {
+static long __stdcall EnumDisplayModeCallback(DDSurfaceDesc2* desc, void* context) {
     PCVideoCard* display = (PCVideoCard*)context;
     if (display->displayModeCount >= display->displayModeCapacity - 1) {
         display->displayModeCapacity += 20;
@@ -112,13 +112,13 @@ PCVideoCard::PCVideoCard() {
 }
 
 // 0x004c9830
-PCVideoCard* PCVideoCard::InitializeDisplay(UnknownGuid* guid, char* description, char* name,
+PCVideoCard* PCVideoCard::InitializeDisplay(Guid* guid, char* description, char* name,
     void* window) {
-    UnknownSurfaceCaps caps;
+    DDSCaps2 caps;
     unsigned long total;
     unsigned long free;
-    UnknownSurfaceDesc desc;
-    UnknownSurfaceDesc mode;
+    DDSurfaceDesc2 desc;
+    DDSurfaceDesc2 mode;
     char key[256];
 
     windowHandle = window;
@@ -278,9 +278,9 @@ int PCVideoCard::SetDisplayMode(int width, int height, int bitDepth, int a, int 
 // 0x004c9f30: creates the full-screen flipping chain with `backBuffers`
 // back buffers, clears and flips every buffer, then times ten flips.
 int PCVideoCard::CreateFlipChain(int backBuffers) {
-    UnknownSurfaceCaps caps;
+    DDSCaps2 caps;
     RECT rect;
-    UnknownSurfaceDesc desc;
+    DDSurfaceDesc2 desc;
     UnknownBltFx fx;
 
     memset(&desc, 0, sizeof(desc));
@@ -337,8 +337,8 @@ failed:
 // 0x004ca130: the primary surface (with `backBuffers` back buffers, if any)
 // and a system-memory render surface of the current mode's size.
 int PCVideoCard::CreateSystemRenderSurface(int backBuffers) {
-    UnknownSurfaceCaps caps;
-    UnknownSurfaceDesc desc;
+    DDSCaps2 caps;
+    DDSurfaceDesc2 desc;
 
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
@@ -377,7 +377,7 @@ failed:
 // primary, and records the frame time.
 int PCVideoCard::Present() {
     RECT rect;
-    UnknownSurfaceInterface* source;
+    DirectDrawSurface* source;
     unsigned int now;
 
     if (useFlipChain && !freezeFrameIndex) {
@@ -435,7 +435,7 @@ void PCVideoCard::RetryFlip(int value) {
 // 0x004ca790: windowed surfaces: a primary clipped to the window and a
 // `width` x `height` render surface (video memory when `windowed`).
 int PCVideoCard::CreateWindowedSurfaces(int width, int height, int windowed) {
-    UnknownSurfaceDesc desc;
+    DDSurfaceDesc2 desc;
 
     ReleasePrimarySurface();
     if (renderSurface) {
@@ -477,7 +477,7 @@ failed:
 // 0x004ca900: switches to display mode `mode` (retrying without the
 // refresh rate) and creates its surfaces.
 int PCVideoCard::SetFullscreenDisplayMode(int mode, int windowed) {
-    UnknownSurfaceDesc desc;
+    DDSurfaceDesc2 desc;
 
     if (mode < 0 || mode >= displayModeCount)
         return 0;
@@ -502,7 +502,7 @@ int PCVideoCard::SetFullscreenDisplayMode(int mode, int windowed) {
 
 // 0x004ca9f0
 int CopyRenderSurfaceToTexture(PCRenderTarget* target, TextureMap* texture) {
-    UnknownSurfaceDesc desc;
+    DDSurfaceDesc2 desc;
     long pitch;
 
     memset(&desc, 0, sizeof(desc));
@@ -652,7 +652,7 @@ int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextur
 // surface query or the flip budget fails.
 int PCVideoCard::SetGDISurfaceVisible(int enable) {
     if (enable) {
-        UnknownSurfaceInterface* gdi = 0;
+        DirectDrawSurface* gdi = 0;
         directDraw->GetGDISurface(&gdi);
         int i = 0;
         if (primarySurface != gdi) do {

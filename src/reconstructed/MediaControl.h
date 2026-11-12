@@ -38,7 +38,7 @@ struct UnknownMediaSurfaceDesc {
 
 // IStreamSample / IDirectDrawStreamSample.
 struct UnknownStreamSampleInterface {
-    virtual long __stdcall QueryInterface(const UnknownGuid* iid, void** object);
+    virtual long __stdcall QueryInterface(const Guid* iid, void** object);
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
     virtual long __stdcall UnknownMethod3();
@@ -50,7 +50,7 @@ struct UnknownStreamSampleInterface {
 
 // IMediaStream / IDirectDrawMediaStream.
 struct UnknownMediaStreamInterface {
-    virtual long __stdcall QueryInterface(const UnknownGuid* iid, void** object);
+    virtual long __stdcall QueryInterface(const Guid* iid, void** object);
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
     virtual long __stdcall UnknownMethod3();
@@ -64,17 +64,17 @@ struct UnknownMediaStreamInterface {
     virtual long __stdcall UnknownMethod10();
     virtual long __stdcall UnknownMethod11();
     virtual long __stdcall UnknownMethod12();
-    virtual long __stdcall CreateSample(UnknownSurfaceInterface* surface, const void* rect,
+    virtual long __stdcall CreateSample(DirectDrawSurface* surface, const void* rect,
                                         unsigned long flags, UnknownStreamSampleInterface** sample);
 };
 
 // IMultiMediaStream / IAMMultiMediaStream.
 struct UnknownMultiMediaStreamInterface {
-    virtual long __stdcall QueryInterface(const UnknownGuid* iid, void** object);
+    virtual long __stdcall QueryInterface(const Guid* iid, void** object);
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
     virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall GetMediaStream(const UnknownGuid* purpose, UnknownMediaStreamInterface** stream);
+    virtual long __stdcall GetMediaStream(const Guid* purpose, UnknownMediaStreamInterface** stream);
     virtual long __stdcall UnknownMethod5();
     virtual long __stdcall GetState(int* state);
     virtual long __stdcall SetState(int state);
@@ -85,7 +85,7 @@ struct UnknownMultiMediaStreamInterface {
     virtual long __stdcall Initialize(int type, unsigned long flags, void* graph);
     virtual long __stdcall UnknownMethod13();
     virtual long __stdcall UnknownMethod14();
-    virtual long __stdcall AddMediaStream(void* object, const UnknownGuid* purpose, unsigned long flags,
+    virtual long __stdcall AddMediaStream(void* object, const Guid* purpose, unsigned long flags,
                                           UnknownMediaStreamInterface** stream);
     virtual long __stdcall OpenFile(const unsigned short* file, unsigned long flags);
 };
@@ -120,14 +120,14 @@ public:
     int GetPosition(__int64* time); // 0x004a2a50
     int GetDuration(__int64* duration); // 0x004a2a70
     // 0x004a2a90: blits the frame into `destination`.
-    long BlitFrame(UnknownSurfaceInterface* destination, void* destinationRect, void* sourceRect, int flags);
+    long BlitFrame(DirectDrawSurface* destination, void* destinationRect, void* sourceRect, int flags);
 
-    UnknownSurfaceInterface* frameSurface;    // +0x2c: the frame's surface (the display's DirectDraw)
+    DirectDrawSurface* frameSurface;    // +0x2c: the frame's surface (the display's DirectDraw)
     int frameWidth;                           // +0x30: the video format's width
     int frameHeight;                          // +0x34: and height
-    UnknownSurfaceInterface* sampleSurface;   // +0x38: the sample's surface (IDirectDrawSurface4)
+    DirectDrawSurface* sampleSurface;   // +0x38: the sample's surface (IDirectDrawSurface4)
     int frameRect[4];                         // +0x3c: the frame rectangle
-    UnknownSurfaceInterface* field_0x4c;      // released by the destructor only
+    DirectDrawSurface* field_0x4c;      // released by the destructor only
     UnknownMultiMediaStreamInterface* multiMediaStream; // +0x50: IAMMultiMediaStream
     UnknownDirectDrawInterface* directDraw;   // +0x54: IDirectDraw of the display's DirectDraw
     UnknownDirectDrawInterface* displayDirectDraw; // +0x58: the display's DirectDraw (not released)

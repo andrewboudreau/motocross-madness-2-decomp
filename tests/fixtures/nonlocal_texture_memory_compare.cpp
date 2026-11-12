@@ -11,7 +11,7 @@
 #include "../../src/reconstructed/PCRenderTarget.h"
 #include "../../src/reconstructed/DebugAlloc.h"
 extern "C" void __cdecl __CxxFrameHandler();
-extern "C" const UnknownGuid IID_IDirect3DHALDevice =
+extern "C" const Guid IID_IDirect3DHALDevice =
     {0x84e63de0,0x46aa,0x11cf,{0x81,0x6f,0,0,0xc0,0x20,0x15,0x6e}};
 static unsigned char referenceSpace[0x800000];
 struct World {
@@ -50,7 +50,7 @@ static void Callback(int op){
     if(scenario.mutation==1 && valuePointer)*valuePointer=scenario.seed*100+op;
     if(scenario.mutation==2 && op==5)Display()->directDraw=(UnknownDirectDrawInterface*)world.drawObjects[1];
     if(scenario.mutation==3 && op==1){
-        Display()->backBuffer=(UnknownSurfaceInterface*)world.surfaceObjects[1];Display()->frameBufferCount=-scenario.seed;
+        Display()->backBuffer=(DirectDrawSurface*)world.surfaceObjects[1];Display()->frameBufferCount=-scenario.seed;
     }
     if(scenario.mutation==4 && op==7){if(valuePointer)*valuePointer=0x76543210;Target(0)->surfacePixelFormat^=0x314;}
     if(scenario.mutation==5 && op==8){if(valuePointer)*valuePointer=0x12345678;Target(0)->deviceCaps=17;}
@@ -115,8 +115,8 @@ int PCRenderTarget::DrawIndexedPrimitiveVB(int,int,int,int,int,int,int){Fail(86)
 void PCRenderTarget::SetAlphaTest(int){Fail(86);}
 void PCRenderTarget::DisableAlphaTest(){Fail(86);}
 
-RenderTarget* PCRenderTarget::InitializeRenderTarget(PCVideoCard* display,const UnknownGuid* id,
-    UnknownSurfaceInterface* surface,int wantZ,int frames){
+RenderTarget* PCRenderTarget::InitializeRenderTarget(PCVideoCard* display,const Guid* id,
+    DirectDrawSurface* surface,int wantZ,int frames){
     if(display!=Display() ||(this &&this!=Target(0)))Fail(89);
     EventRecord& r=Event(4,this==(void*)Target(0),this==0,(int)surface,wantZ,frames);
     memcpy(r.data,id,sizeof(*id));Callback(4);
@@ -133,19 +133,19 @@ void FillPixelFormat(int format,void* pixelFormat){
     EventRecord& r=Event(5,format);
     // The whole descriptor is initialized before this boundary, including its
     // size; checking it here catches early-field stores as well as final values.
-    memcpy(r.data,(char*)pixelFormat-0x48,sizeof(UnknownSurfaceDesc));Callback(5);
+    memcpy(r.data,(char*)pixelFormat-0x48,sizeof(DDSurfaceDesc2));Callback(5);
     for(int i=0;i<32;++i)((BYTE*)pixelFormat)[i]=(BYTE)(format*7+i+scenario.seed);
 }
 static int DrawIndex(void* p){for(int i=0;i<2;++i)if(p==world.drawObjects[i])return i;Fail(90);return -1;}
 static int SurfaceIndex(void* p){for(int i=0;i<2;++i)if(p==world.surfaceObjects[i])return i;Fail(91);return -1;}
-static long __stdcall CreateSurface(void* self,UnknownSurfaceDesc* desc,UnknownSurfaceInterface** out,void* outer){
+static long __stdcall CreateSurface(void* self,DDSurfaceDesc2* desc,DirectDrawSurface** out,void* outer){
     int index=DrawIndex(self);EventRecord& r=Event(6,index,(int)outer);memcpy(r.data,desc,sizeof(*desc));Callback(6);
     if(scenario.fail==4)return -1;
-    if(scenario.fail==11){*out=(UnknownSurfaceInterface*)world.surfaceObjects[index];observed.surfaceAlive[index]=1;return 1;}
+    if(scenario.fail==11){*out=(DirectDrawSurface*)world.surfaceObjects[index];observed.surfaceAlive[index]=1;return 1;}
     if(scenario.fail==6){*out=0;return 0;}
-    *out=(UnknownSurfaceInterface*)world.surfaceObjects[index];observed.surfaceAlive[index]=1;return 0;
+    *out=(DirectDrawSurface*)world.surfaceObjects[index];observed.surfaceAlive[index]=1;return 0;
 }
-static long __stdcall GetCaps(void* self,UnknownSurfaceCaps* caps){
+static long __stdcall GetCaps(void* self,DDSCaps2* caps){
     int index=SurfaceIndex(self);EventRecord& r=Event(7,index);Callback(7);
     caps->caps=(scenario.seed*0x124421)&~0x20000000;
     if(scenario.caps&1)caps->caps|=0x20000000;
@@ -216,7 +216,7 @@ static void Run(int retail){
     for(int i=0;i<2;++i){*(DWORD*)Target(i)=targetVptr;world.drawObjects[i][0]=(DWORD)drawTable;
         world.surfaceObjects[i][0]=(DWORD)surfaceTable;Target(i)->surfacePixelFormat=0x22b8+i+scenario.seed;}
     Display()->directDraw=scenario.fail==7?0:(UnknownDirectDrawInterface*)world.drawObjects[0];
-    Display()->backBuffer=(UnknownSurfaceInterface*)world.surfaceObjects[0];Display()->frameBufferCount=2+scenario.seed;
+    Display()->backBuffer=(DirectDrawSurface*)world.surfaceObjects[0];Display()->frameBufferCount=2+scenario.seed;
     Display()->displayModes=world.modes;Display()->displayModeCount=scenario.modes<2?scenario.modes-1:5;
     for(i=0;i<5;++i){world.modes[i].width=640;world.modes[i].height=480;world.modes[i].bitDepth=16;}
     // 0: negative count; 1: zero; 2: all nonmatching; 3: first; 4: middle; 5: last.
@@ -254,11 +254,11 @@ static void Compare(){
     for(int i=0;i<observed.events;++i){
         EventRecord& r=observed.trace[i];coverage[r.op]++;
         if(r.op==5){
-            UnknownSurfaceDesc expected;memset(&expected,0,sizeof(expected));expected.size=sizeof(expected);
+            DDSurfaceDesc2 expected;memset(&expected,0,sizeof(expected));expected.size=sizeof(expected);
             if(memcmp(r.data,&expected,sizeof(expected)))Fail(104);
         }
         if(r.op==6){
-            const UnknownSurfaceDesc* desc=(const UnknownSurfaceDesc*)r.data;
+            const DDSurfaceDesc2* desc=(const DDSurfaceDesc2*)r.data;
             if(desc->size!=0x7c||desc->width!=128||desc->height!=128||desc->flags!=0x1007||
                desc->caps[0]!=0x20005000||desc->caps[1]||desc->caps[2]||desc->caps[3]||desc->textureStage)Fail(105);
         }
@@ -288,7 +288,7 @@ static void Compare(){
 int main(int argc,char**argv){
     if(argc!=3||!MapReference(argv[1],argv[2]))return 3;
     if(sizeof(PCVideoCard)!=0xb78||sizeof(PCRenderTarget)!=0xbc4||sizeof(UnknownDisplayMode)!=0x24||
-       sizeof(UnknownSurfaceDesc)!=0x7c||sizeof(UnknownSurfaceCaps)!=0x10||
+       sizeof(DDSurfaceDesc2)!=0x7c||sizeof(DDSCaps2)!=0x10||
        offsetof(RenderTarget,surfacePixelFormat)!=0x28||offsetof(PCVideoCard,directDraw)!=0x190||
        offsetof(PCVideoCard,backBuffer)!=0x1a0||offsetof(PCVideoCard,frameBufferCount)!=0x78||
        offsetof(PCVideoCard,displayModeCount)!=8||offsetof(PCVideoCard,displayModes)!=0x10)Fail(100);

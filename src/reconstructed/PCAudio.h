@@ -16,7 +16,7 @@ class FileStream;
 // (0x00556ca0), IID_IDirectSoundNotify (0x00556cd0) and IID_IKsPropertySet
 // (0x00556ce0); the method names follow those interfaces (inference).
 struct UnknownSound3DBuffer {
-    virtual long __stdcall QueryInterface(const UnknownGuid& iid, void** result);
+    virtual long __stdcall QueryInterface(const Guid& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
     virtual long __stdcall GetAllParameters();
@@ -41,20 +41,20 @@ struct UnknownSound3DBuffer {
 };
 
 struct UnknownSoundNotify {
-    virtual long __stdcall QueryInterface(const UnknownGuid& iid, void** result);
+    virtual long __stdcall QueryInterface(const Guid& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
     virtual long __stdcall SetNotificationPositions(unsigned long count, const struct UnknownNotifyPosition* positions);
 };
 
 struct UnknownPropertySet {
-    virtual long __stdcall QueryInterface(const UnknownGuid& iid, void** result);
+    virtual long __stdcall QueryInterface(const Guid& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
     virtual long __stdcall Get();
-    virtual long __stdcall Set(const UnknownGuid* set, unsigned long id, void* instance, unsigned long instanceSize,
+    virtual long __stdcall Set(const Guid* set, unsigned long id, void* instance, unsigned long instanceSize,
                                void* data, unsigned long dataSize);
-    virtual long __stdcall QuerySupport(const UnknownGuid* set, unsigned long id, unsigned long* support);
+    virtual long __stdcall QuerySupport(const Guid* set, unsigned long id, unsigned long* support);
 };
 
 // DSBPOSITIONNOTIFY layout.
@@ -107,12 +107,12 @@ struct UnknownWaveHeader {
 };
 #pragma pack(pop)
 
-extern "C" const UnknownGuid IID_IDirectSound3DBuffer; // 0x00556ca0
-extern "C" const UnknownGuid IID_IDirectSoundNotify;   // 0x00556cd0
-extern "C" const UnknownGuid IID_IKsPropertySet;       // 0x00556ce0
+extern "C" const Guid IID_IDirectSound3DBuffer; // 0x00556ca0
+extern "C" const Guid IID_IDirectSoundNotify;   // 0x00556cd0
+extern "C" const Guid IID_IKsPropertySet;       // 0x00556ce0
 // 0x00556cf0: the 3D algorithm GUID new 3D buffers request; its value
 // {C241333F-1C1B-11D2-94F5-00C04FC28ACA} is dsound.h's DS3DALG_NO_VIRTUALIZATION.
-extern "C" const UnknownGuid DS3DALG_NO_VIRTUALIZATION;
+extern "C" const Guid DS3DALG_NO_VIRTUALIZATION;
 
 // RTTI: SoundGroup : GameObject (vtable 0x00550500, 27 slots). Its code is
 // at 0x00401a30..0x00401f74, reconstructed in AuralScape.cpp.
@@ -179,8 +179,8 @@ public:
              int streamBytes);
     unsigned long GetBufferControlFlags(unsigned long flags); // 0x004bc490: control flags
     int DuplicateFrom(Sound* source);                   // 0x004bc4c0: duplicates `source`
-    int SupportsProperty(const UnknownGuid* set, unsigned long id, unsigned long support);
-    int SetProperty(const UnknownGuid* set, unsigned long id, void* instance,
+    int SupportsProperty(const Guid* set, unsigned long id, unsigned long support);
+    int SetProperty(const Guid* set, unsigned long id, void* instance,
         unsigned long instanceSize, void* data, unsigned long dataSize);
     int PlayWithOptions(int restart, unsigned long playFlags, int preferHardware);
     int Stop(int rewind);                               // 0x004bc940: stops

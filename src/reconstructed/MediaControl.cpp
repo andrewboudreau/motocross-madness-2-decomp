@@ -6,15 +6,15 @@
 
 #include "DebugAlloc.h"
 
-extern "C" const UnknownGuid CLSID_FilterGraph;           // 0x00558ee0
-extern "C" const UnknownGuid IID_IGraphBuilder;           // 0x00558ef0
+extern "C" const Guid CLSID_FilterGraph;           // 0x00558ee0
+extern "C" const Guid IID_IGraphBuilder;           // 0x00558ef0
 
 // 0x004a2560 (open) is a near miss: samples/gameui/MediaControlNearMisses.cpp.
 
 // 0x004a23d0
 int MediaControl::IsDirectShowInstalled()
 {
-    UnknownSurfaceInterface* graph;
+    DirectDrawSurface* graph;
     if (CoCreateInstance(*(const GUID*)&CLSID_FilterGraph, 0, CLSCTX_INPROC_SERVER,
                          *(const GUID*)&IID_IGraphBuilder, (void**)&graph) >= 0) {
         graph->Release();
@@ -229,7 +229,7 @@ int MediaControl::GetDuration(__int64* duration)
 }
 
 // 0x004a2a90
-long MediaControl::BlitFrame(UnknownSurfaceInterface* destination, void* destinationRect,
+long MediaControl::BlitFrame(DirectDrawSurface* destination, void* destinationRect,
                                          void* sourceRect, int flags)
 {
     if (!sampleSurface) {

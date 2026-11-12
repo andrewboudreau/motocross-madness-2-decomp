@@ -8,7 +8,7 @@
 // +0x70.
 struct UnknownBlitSource {
     unsigned char field_0x00[0x70];
-    UnknownSurfaceInterface* field_0x70;
+    DirectDrawSurface* field_0x70;
 };
 
 // One cached render state (PCRenderTarget+0x264, 300 entries).
@@ -53,22 +53,22 @@ public:
     void SaveScreenshot();
     // 0x004c4f80: attaches the display (+0x04), the device GUID (+0x54), the
     // surface (+0x48) and the frame modulus (+0x14); returns the target or 0.
-    RenderTarget* InitializeRenderTarget(PCVideoCard* display, const UnknownGuid* deviceId,
-        UnknownSurfaceInterface* surface, int wantZBuffer, int frames);
+    RenderTarget* InitializeRenderTarget(PCVideoCard* display, const Guid* deviceId,
+        DirectDrawSurface* surface, int wantZBuffer, int frames);
     // 0x004c5950 (PCGame slot 31): measures texture memory by creating 256x256,
     // then 32x32 surfaces until creation fails; *value gets the bytes.
     int MeasureTextureMemory(int* value);
     // 0x004c5230 / 0x004c52a0: the device's texture-format and the Z-buffer
     // format enumeration callbacks; each appends the format to its list.
-    static long __stdcall EnumTextureFormatCallback(UnknownPixelFormat* format, void* context);
-    static long __stdcall EnumZBufferFormatCallback(UnknownPixelFormat* format, void* context);
+    static long __stdcall EnumTextureFormatCallback(DDPixelFormat* format, void* context);
+    static long __stdcall EnumZBufferFormatCallback(DDPixelFormat* format, void* context);
 
     // The surface: Blt, Lock, GetSurfaceDesc and GetDC go to it (GameUi.cpp and
     // PCVideoCard.cpp use it under this provisional name).
-    UnknownSurfaceInterface* renderSurface;    // +0x48
-    UnknownSurfaceInterface* zbuffer;    // created with DDSCAPS_ZBUFFER and attached to the surface
+    DirectDrawSurface* renderSurface;    // +0x48
+    DirectDrawSurface* zbuffer;    // created with DDSCAPS_ZBUFFER and attached to the surface
     UnknownRenderInterface* device;      // created by the Direct3D object's method 4 (CreateDevice)
-    UnknownGuid deviceGuid;             // Direct3D device GUID (PCGame +0x2f8); cleared by the constructor
+    Guid deviceGuid;             // Direct3D device GUID (PCGame +0x2f8); cleared by the constructor
     unsigned char field_0x64[0x164 - 0x64];
     // 0x164..0x250: the device description GetCaps fills (D3DDEVICEDESC7
     // layout: dwDevCaps, dpcLineCaps at +0x04, dpcTriCaps at +0x3c).
@@ -84,8 +84,8 @@ public:
     unsigned char field_0x1c8[0x250 - 0x1c8];
     int fillMode;                        // D3DRENDERSTATE_FILLMODE value: 3 solid, 2 wireframe (PCGame key toggles)
     int textureFormatCount;
-    UnknownPixelFormat* textureFormats;  // EnumTextureFormats results (DebugRealloc'd; freed by the destructor)
+    DDPixelFormat* textureFormats;  // EnumTextureFormats results (DebugRealloc'd; freed by the destructor)
     int zbufferFormatCount;
-    UnknownPixelFormat* zbufferFormats;  // EnumZBufferFormats results (DebugRealloc'd; freed by the destructor)
+    DDPixelFormat* zbufferFormats;  // EnumZBufferFormats results (DebugRealloc'd; freed by the destructor)
     UnknownRenderStateEntry renderStates[300]; // SetRenderState cache (slot 8)
 };

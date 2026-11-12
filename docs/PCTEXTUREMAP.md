@@ -7,7 +7,7 @@ literals; TextureMap's sits among `Texmap.cpp`'s. Canonical source:
 `src/reconstructed/PCTextureMap.h` / `PCTextureMap.cpp`. Names are
 provisional.
 
-The texture wraps two DirectDraw 7-style surfaces (`UnknownSurfaceInterface`,
+The texture wraps two DirectDraw 7-style surfaces (`DirectDrawSurface`,
 see `RenderInterfaces.h`): `systemSurface` at +0x70 and `textureSurface`
 at +0x74, with `texturePalette` at +0x78. These are provisional role names;
 their offsets and declaration order are preserved. An object at +0x7c is

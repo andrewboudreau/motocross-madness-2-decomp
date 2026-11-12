@@ -4,7 +4,7 @@
   "??2@YAPAXIPBDH@Z": "0x004a3010",
   "??3@YAXPAXPBDH@Z": "0x004a3060",
   "??_C@_0M@DKPE@partblt?4tga?$AA@": "0x005715d0",
-  "?InitializeRenderTarget@PCRenderTarget@@QAEPAVRenderTarget@@PAVPCVideoCard@@PBUUnknownGuid@@PAUUnknownSurfaceInterface@@HH@Z": "0x004c4f80",
+  "?InitializeRenderTarget@PCRenderTarget@@QAEPAVRenderTarget@@PAVPCVideoCard@@PBUGuid@@PAUDirectDrawSurface@@HH@Z": "0x004c4f80",
   "?SetFullscreenDisplayMode@PCVideoCard@@QAEHHH@Z": "0x004ca900",
   "?ProbePartialTextureUploads@PCVideoCard@@QAEHPAVRenderTarget@@@Z": "0x004cab00",
   "?ProbePartialTextureUploads@PCVideoCard@@QAEHPAVRenderTarget@@@Z$ehhandler": "0x0054ce2c",

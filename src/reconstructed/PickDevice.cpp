@@ -38,7 +38,7 @@ int g_ControllerDone;          // 0x00689a64
 int g_ControllerCancelled;     // 0x00689a68
 
 // Formats a GUID the way the registry "UseControllerId" value stores it.
-inline void FormatGuid(char* text, UnknownGuid guid)
+inline void FormatGuid(char* text, Guid guid)
 {
     sprintf(text, "{%08lX-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}", guid.data1, guid.data2,
             guid.data3, guid.data4[0], guid.data4[1], guid.data4[2], guid.data4[3], guid.data4[4],

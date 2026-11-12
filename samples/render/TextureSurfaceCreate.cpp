@@ -26,9 +26,9 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
                                 int alphaThreshold, unsigned int key) {
     int formats[5];
     int mipmapped;
-    UnknownSurfaceDesc desc;
+    DDSurfaceDesc2 desc;
     unsigned char pixelFormat[0x20];
-    UnknownSurfaceCaps caps;
+    DDSCaps2 caps;
     int shared;
     textureWidth = width;
     textureHeight = height;

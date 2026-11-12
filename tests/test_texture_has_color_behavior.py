@@ -92,7 +92,7 @@ class TextureHasColorBehaviorTests(unittest.TestCase):
             layout=output/'layout.cpp'
             layout.write_text('#include "PCTextureMap.h"\n#include <stddef.h>\n'
                 'typedef char Layout[(offsetof(TextureMap,textureWidth)==0x14 && offsetof(TextureMap,textureHeight)==0x18 && '
-                'offsetof(TextureMap,mapFormat)==0x20 && offsetof(PCTextureMap,systemSurface)==0x70 && sizeof(UnknownSurfaceDesc)==124)?1:-1];\n')
+                'offsetof(TextureMap,mapFormat)==0x20 && offsetof(PCTextureMap,systemSurface)==0x70 && sizeof(DDSurfaceDesc2)==124)?1:-1];\n')
             compile_source(layout,'layout')
             executable=output/'color.exe'
             result=subprocess.run([str(linker),'/nologo','/subsystem:console','/base:0x100000','/fixed','/opt:ref',f'/out:{executable}',f'/libpath:{libraries}',

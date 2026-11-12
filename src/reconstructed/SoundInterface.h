@@ -33,7 +33,7 @@ struct UnknownSoundBufferDesc;
 struct UnknownSoundBuffer;
 
 struct UnknownDirectSound {
-    virtual long __stdcall QueryInterface(const UnknownGuid& iid, void** result);
+    virtual long __stdcall QueryInterface(const Guid& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
     virtual long __stdcall CreateSoundBuffer(const UnknownSoundBufferDesc* desc, UnknownSoundBuffer** buffer,
@@ -44,7 +44,7 @@ struct UnknownDirectSound {
 };
 
 struct UnknownSoundBuffer {
-    virtual long __stdcall QueryInterface(const UnknownGuid& iid, void** result);
+    virtual long __stdcall QueryInterface(const Guid& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
     virtual long __stdcall GetCaps();
@@ -69,7 +69,7 @@ struct UnknownSoundBuffer {
 };
 
 struct UnknownSoundListener {
-    virtual long __stdcall QueryInterface(const UnknownGuid& iid, void** result);
+    virtual long __stdcall QueryInterface(const Guid& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
     virtual long __stdcall GetAllParameters();
@@ -126,7 +126,7 @@ struct UnknownSoundBufferDesc {
     unsigned long bufferBytes;
     unsigned long reserved;
     struct UnknownWaveFormat* format;
-    UnknownGuid algorithm3D;
+    Guid algorithm3D;
 };
 
 // Sample format (WAVEFORMATEX layout; the first 16 bytes are PCMWAVEFORMAT).
@@ -141,23 +141,23 @@ struct UnknownWaveFormat {
 };
 
 // dsound.dll imports (thunks 0x005330a0 and 0x005330a6).
-extern "C" long __stdcall DirectSoundCreate(const UnknownGuid* device, UnknownDirectSound** result, void* outer);
-extern "C" long __stdcall DirectSoundEnumerateA(int(__stdcall* callback)(UnknownGuid*, const char*, const char*,
+extern "C" long __stdcall DirectSoundCreate(const Guid* device, UnknownDirectSound** result, void* outer);
+extern "C" long __stdcall DirectSoundEnumerateA(int(__stdcall* callback)(Guid*, const char*, const char*,
                                                                          void*),
                                                 void* context);
-extern "C" const UnknownGuid IID_IDirectSound3DListener; // 0x00556c90
+extern "C" const Guid IID_IDirectSound3DListener; // 0x00556c90
 // 0x00556d20: {4A4E6FC1-C341-11D1-B73A-444553540000}, the EAX 1.0 listener
 // property set.
-extern "C" const UnknownGuid DSPROPSETID_EAX_ListenerProperties;
+extern "C" const Guid DSPROPSETID_EAX_ListenerProperties;
 
 // 0xf0-byte record of one enumerated sound device.
 struct UnknownSoundDevice {
     UnknownSoundDevice(); // 0x004be280
     // 0x004be2d0: records `guid` and `description` and the device's caps;
     // 0 when `guid` is null or the device cannot be created.
-    int ProbeSoundDevice(UnknownGuid* guid, const char* description);
+    int ProbeSoundDevice(Guid* guid, const char* description);
 
-    UnknownGuid guid;
+    Guid guid;
     char description[0x80];
     UnknownSoundCaps caps;
 };
@@ -175,7 +175,7 @@ public:
     // 16, 4000000 and a mode value); 0 or a DirectSound-style error.
     long InitializeSound(int rate, int stereo, int bits, int value, int allowEax);
     // 0x004be7b0: device enumeration callback; records up to four devices.
-    static int __stdcall EnumSoundDeviceCallback(UnknownGuid* guid, const char* description, const char* module,
+    static int __stdcall EnumSoundDeviceCallback(Guid* guid, const char* description, const char* module,
         void* context);
     UnknownSoundListener* QueryListener();              // 0x004be800: queries a new listener
     int RefreshSoundCaps();                             // 0x004be850: refreshes soundCaps

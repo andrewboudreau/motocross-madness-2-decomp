@@ -303,7 +303,7 @@ int TextureMapManager::ShareCacheLimit() {
 // them and the card's reported texture memory (the text is not output).
 void TextureMapManager::CountTextureMemory() {
     char text[128];
-    UnknownSurfaceCaps caps;
+    DDSCaps2 caps;
     unsigned long totalMemory;
     unsigned long freeMemory;
     TextureMap* texture = allTextures.First();

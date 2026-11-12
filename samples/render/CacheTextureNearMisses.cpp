@@ -82,12 +82,12 @@ int CacheTexture::CopyMipLevels(UnknownTextureRegion* region, int level) {
     int side = rect.right - rect.left;
     int levelWidth = width;
     UnknownRect whole = rect;
-    UnknownSurfaceInterface* source = region->occupant->systemSurface;
-    UnknownSurfaceInterface* destination = systemSurface;
-    UnknownSurfaceInterface* nextSource = 0;
-    UnknownSurfaceInterface* nextDestination = 0;
+    DirectDrawSurface* source = region->occupant->systemSurface;
+    DirectDrawSurface* destination = systemSurface;
+    DirectDrawSurface* nextSource = 0;
+    DirectDrawSurface* nextDestination = 0;
     int sourceSide = region->occupant->textureWidth;
-    UnknownSurfaceCaps caps;
+    DDSCaps2 caps;
     memset(&caps, 0, sizeof(caps));
     caps.caps = 0x401000;   // DDSCAPS bits; reference_diff reads them as ??0AgeManager (false positive)
     long result = 0;

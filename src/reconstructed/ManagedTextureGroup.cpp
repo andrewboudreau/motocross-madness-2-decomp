@@ -261,7 +261,7 @@ struct UnknownBltEffects {
 // local is the newer x87 leaf, so `width * u` loads `u` and multiplies by
 // st(1), and `uScale + pageOffsetU` loads the scale first.
 int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
-    UnknownSurfaceInterface* surface = target->renderSurface;
+    DirectDrawSurface* surface = target->renderSurface;
     if (groupManager->debugGroup != this)
         return 0;
     if (reinterpret_cast<Game*>(g_TrackGame)->testKey) {
@@ -344,18 +344,18 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
                     int top = (int)(page->textureHeight * region->top) + 20;
                     int side = (int)(managed->pageScale * 256.0f);
                     int levelSide = managed->textureWidth;
-                    UnknownSurfaceInterface* level = managed->systemSurface;
-                    UnknownSurfaceDesc desc;
+                    DirectDrawSurface* level = managed->systemSurface;
+                    DDSurfaceDesc2 desc;
                     memset(&desc, 0, sizeof(desc));
                     desc.size = sizeof(desc);
                     level->GetSurfaceDesc(&desc);
                     while (side < levelSide) {
                         levelSide >>= 1;
-                        level->GetAttachedSurface((UnknownSurfaceCaps*)desc.caps, &level);
+                        level->GetAttachedSurface((DDSCaps2*)desc.caps, &level);
                         level->GetSurfaceDesc(&desc);
                     }
                     if (desc.height == side && desc.width == side) {
-                        UnknownSurfaceDesc locked;
+                        DDSurfaceDesc2 locked;
                         memset(&locked, 0, sizeof(locked));
                         locked.size = sizeof(locked);
                         if (!level->Lock(0, &locked, 0x811, 0)) {

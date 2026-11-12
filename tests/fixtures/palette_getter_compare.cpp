@@ -9,7 +9,7 @@
 #include "Quantize.h"
 typedef char PaletteLayout[sizeof(ColorMapper)==0x18b10 && offsetof(ColorMapper,indexFrom555)==0x710 && offsetof(ColorMapper,indexFrom565)==0x8710 ? 1:-1];
 typedef char PrefixLayout[sizeof(UnknownTexturePalette)==0x8710 && offsetof(UnknownTexturePalette,indexFrom555)==0x710 ? 1:-1];
-typedef char PixelLayout[sizeof(UnknownPixel24)==3 && offsetof(UnknownPixel24,red)==0 && offsetof(UnknownPixel24,green)==1 && offsetof(UnknownPixel24,blue)==2 ? 1:-1];
+typedef char PixelLayout[sizeof(RgbPixel)==3 && offsetof(RgbPixel,red)==0 && offsetof(RgbPixel,green)==1 && offsetof(RgbPixel,blue)==2 ? 1:-1];
 static BYTE referenceSpace[0x800000]={1};
 static BYTE initial[0x1d000],storage[0x1d000],oracle[0x1d000];
 static BYTE* page;

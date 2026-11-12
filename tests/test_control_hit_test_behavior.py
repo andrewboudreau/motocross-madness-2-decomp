@@ -126,7 +126,7 @@ class ControlHitTestBehaviorTests(unittest.TestCase):
             self.assertIn((0x470a50,'dword ptr [edx + 0x70]'),calls)
             layout=output/'layout.cpp'
             layout.write_text('#include "GameUi.h"\n#include "UIDialog.h"\n#include "PCTextureMap.h"\n#include "TrackGame.h"\n#include <stddef.h>\n'
-                'typedef char Layout[(sizeof(UIButton)==0x1f0 && sizeof(UIMultiState)==0x1f8 && sizeof(UnknownSurfaceDesc)==124 && '
+                'typedef char Layout[(sizeof(UIButton)==0x1f0 && sizeof(UIMultiState)==0x1f8 && sizeof(DDSurfaceDesc2)==124 && '
                 'offsetof(UIControl,screenArea)==0x2c && offsetof(UIControl,ownerDialog)==0xb8 && offsetof(UIControl,stateImages)==0x16c && '
                 'offsetof(UIDialog,scaleX)==0x9c4 && offsetof(UIDialog,scaleY)==0x9c8 && offsetof(PCTextureMap,systemSurface)==0x70 && '
                 'offsetof(Game,renderTarget)==0x10 && offsetof(RenderTarget,surfacePixelFormat)==0x28)?1:-1];\n')

@@ -115,7 +115,7 @@ class NonLocalTextureMemoryBehaviorTests(unittest.TestCase):
                                if symbol.storage_class == 2 and symbol.section_number == 0}
                     self.assertEqual(imports, {
                         '??3@YAXPAXPBDH@Z', '?FillPixelFormat@@YAXHPAX@Z',
-                        '?InitializeRenderTarget@PCRenderTarget@@QAEPAVRenderTarget@@PAVPCVideoCard@@PBUUnknownGuid@@PAUUnknownSurfaceInterface@@HH@Z',
+                        '?InitializeRenderTarget@PCRenderTarget@@QAEPAVRenderTarget@@PAVPCVideoCard@@PBUGuid@@PAUDirectDrawSurface@@HH@Z',
                         '_IID_IDirect3DHALDevice', '??0PCRenderTarget@@QAE@XZ',
                         '??2@YAPAXIPBDH@Z', '?SetFullscreenDisplayMode@PCVideoCard@@QAEHHH@Z',
                         '___CxxFrameHandler', '__except_list'})

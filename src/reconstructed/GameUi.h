@@ -9,7 +9,7 @@
 #include "MediaControl.h"
 
 class GUIManager;
-struct UnknownSurfaceInterface;
+struct DirectDrawSurface;
 class Sound;
 class GameObjectIterator;
 struct CameraRect;

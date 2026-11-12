@@ -12,11 +12,11 @@
 int Convert565To8888(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, unsigned int key) {
     unsigned short* sourceRow = (unsigned short*)source;
-    UnknownPixel32* row = (UnknownPixel32*)destination;
+    RgbaPixel* row = (RgbaPixel*)destination;
     unsigned short transparent = Pack565(key);
     for (int y = 0; y < height; y++) {
         unsigned short* from = sourceRow;
-        UnknownPixel32* to = row;
+        RgbaPixel* to = row;
         for (int x = 0; x < width; x++, to++, from++) {
             if (*from == transparent) {
                 to->red = 0xff;
@@ -40,10 +40,10 @@ int Convert565To8888(void* destination, void* source, int width, int height, int
 int Convert1555To8888(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
     unsigned short* sourceRow = (unsigned short*)source;
-    UnknownPixel32* row = (UnknownPixel32*)destination;
+    RgbaPixel* row = (RgbaPixel*)destination;
     for (int y = 0; y < height; y++) {
         unsigned short* from = sourceRow;
-        UnknownPixel32* to = row;
+        RgbaPixel* to = row;
         for (int x = 0; x < width; x++, to++, from++) {
             to->red = (*from >> 7) & 0xf8;
             to->green = (*from >> 2) & 0xf8;
@@ -63,10 +63,10 @@ int Convert1555To8888(void* destination, void* source, int width, int height, in
 int Convert4444To8888(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
     unsigned short* sourceRow = (unsigned short*)source;
-    UnknownPixel32* row = (UnknownPixel32*)destination;
+    RgbaPixel* row = (RgbaPixel*)destination;
     for (int y = 0; y < height; y++) {
         unsigned short* from = sourceRow;
-        UnknownPixel32* to = row;
+        RgbaPixel* to = row;
         for (int x = 0; x < width; x++, to++, from++) {
             to->alpha = (*from >> 8) & 0xf0;
             to->red = (*from >> 4) & 0xf0;
@@ -82,11 +82,11 @@ int Convert4444To8888(void* destination, void* source, int width, int height, in
 // 0x004cde20: halves 24-bit pixels, averaging each 2x2 block.
 int Halve24(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
-    UnknownPixel24* sourceRow = (UnknownPixel24*)source;
-    UnknownPixel24* row = (UnknownPixel24*)destination;
+    RgbPixel* sourceRow = (RgbPixel*)source;
+    RgbPixel* row = (RgbPixel*)destination;
     for (int y = 0; y < height; y++) {
-        UnknownPixel24* top = sourceRow;
-        UnknownPixel24* to = row;
+        RgbPixel* top = sourceRow;
+        RgbPixel* to = row;
         for (int x = 0; x < width; x++, to++, top += 2) {
             to->red = (top[0].red + top[1].red + top[sourceStride].red + top[sourceStride + 1].red) >> 2;
             to->green = (top[0].green + top[1].green + top[sourceStride].green + top[sourceStride + 1].green) >> 2;
@@ -154,10 +154,10 @@ int Convert24To565(void* destination, void* source, int width, int height, int d
         DitherConvert(source, 888, width, height, sourceStride, destinationStride, 0, destination,
                               0, 0, 0);
     } else {
-        UnknownPixel24* sourceRow = (UnknownPixel24*)source;
+        RgbPixel* sourceRow = (RgbPixel*)source;
         unsigned short* row = (unsigned short*)destination;
         for (int y = 0; y < height; y++) {
-            UnknownPixel24* from = sourceRow;
+            RgbPixel* from = sourceRow;
             unsigned short* to = row;
             for (int x = 0; x < width; x++, to++, from++)
                 *to = (from->red >> 3) << 11 | (from->green >> 2) << 5 | from->blue >> 3;
@@ -175,10 +175,10 @@ int Convert24To555(void* destination, void* source, int width, int height, int d
         DitherConvert(source, 888, width, height, sourceStride, destinationStride, 0, 0,
                               destination, 0, 0);
     } else {
-        UnknownPixel24* sourceRow = (UnknownPixel24*)source;
+        RgbPixel* sourceRow = (RgbPixel*)source;
         unsigned short* row = (unsigned short*)destination;
         for (int y = 0; y < height; y++) {
-            UnknownPixel24* from = sourceRow;
+            RgbPixel* from = sourceRow;
             unsigned short* to = row;
             for (int x = 0; x < width; x++, to++, from++)
                 *to = (from->red >> 3) << 10 | (from->green >> 3) << 5 | from->blue >> 3;
@@ -193,11 +193,11 @@ int Convert24To555(void* destination, void* source, int width, int height, int d
 int Convert555To8888(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, unsigned int key) {
     unsigned short* sourceRow = (unsigned short*)source;
-    UnknownPixel32* row = (UnknownPixel32*)destination;
+    RgbaPixel* row = (RgbaPixel*)destination;
     unsigned short transparent = Pack555(key);
     for (int y = 0; y < height; y++) {
         unsigned short* from = sourceRow;
-        UnknownPixel32* to = row;
+        RgbaPixel* to = row;
         for (int x = 0; x < width; x++, to++, from++) {
             if (*from == transparent) {
                 to->red = 0xff;
@@ -220,10 +220,10 @@ int Convert555To8888(void* destination, void* source, int width, int height, int
 int Convert555To24(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
     unsigned short* sourceRow = (unsigned short*)source;
-    UnknownPixel24* row = (UnknownPixel24*)destination;
+    RgbPixel* row = (RgbPixel*)destination;
     for (int y = 0; y < height; y++) {
         unsigned short* from = sourceRow;
-        UnknownPixel24* to = row;
+        RgbPixel* to = row;
         for (int x = 0; x < width; x++, to++, from++) {
             if (*from == 0x7c1f) {
                 to->red = 0xff;
@@ -278,10 +278,10 @@ int Convert565To555(void* destination, void* source, int width, int height, int 
 int Convert8To24(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, UnknownTexturePalette* palette) {
     unsigned char* sourceRow = (unsigned char*)source;
-    UnknownPixel24* row = (UnknownPixel24*)destination;
+    RgbPixel* row = (RgbPixel*)destination;
     for (int y = 0; y < height; y++) {
         unsigned char* from = sourceRow;
-        UnknownPixel24* to = row;
+        RgbPixel* to = row;
         for (int x = 0; x < width; x++, to++, from++) {
             to->red = palette->entries[*from][0];
             to->green = palette->entries[*from][1];
@@ -328,11 +328,11 @@ int Convert8To555(void* destination, void* source, int width, int height, int de
 // 0x004d1230: converts 8888 to 4444.
 int Convert8888To4444(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
-    UnknownPixel32* sourceRow = (UnknownPixel32*)source;
+    RgbaPixel* sourceRow = (RgbaPixel*)source;
     unsigned short* row = (unsigned short*)destination;
     for (int y = 0; y < height; y++) {
         unsigned short* to = row;
-        UnknownPixel32* from = sourceRow;
+        RgbaPixel* from = sourceRow;
         for (int x = 0; x < width; x++, from++, to++) {
             *to = (from->alpha >> 4) << 12 | (from->red >> 4) << 8 | (from->green >> 4) << 4 | from->blue >> 4;
         }
@@ -345,10 +345,10 @@ int Convert8888To4444(void* destination, void* source, int width, int height, in
 // 0x004d12d0: converts 8888 to 1555, opaque where alpha reaches the threshold.
 int Convert8888To1555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int alphaThreshold) {
-    UnknownPixel32* sourceRow = (UnknownPixel32*)source;
+    RgbaPixel* sourceRow = (RgbaPixel*)source;
     unsigned short* row = (unsigned short*)destination;
     for (int y = 0; y < height; y++) {
-        UnknownPixel32* from = sourceRow;
+        RgbaPixel* from = sourceRow;
         unsigned short* to = row;
         for (int x = 0; x < width; x++, to++, from++) {
             unsigned short pixel = (from->red >> 3) << 10 | (from->green >> 3) << 5 | from->blue >> 3;
@@ -365,13 +365,13 @@ int Convert8888To1555(void* destination, void* source, int width, int height, in
 // 0x004d1370: converts 24-bit to 1555; the key colour becomes transparent 0.
 int Convert24To1555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int key) {
-    UnknownPixel24* sourceRow = (UnknownPixel24*)source;
+    RgbPixel* sourceRow = (RgbPixel*)source;
     unsigned short* row = (unsigned short*)destination;
     unsigned char keyRed = key >> 16;
     unsigned char keyGreen = key >> 8;
     for (int y = 0; y < height; y++) {
         unsigned short* to = row;
-        UnknownPixel24* from = sourceRow;
+        RgbPixel* from = sourceRow;
         for (int x = 0; x < width; x++, to++, from++) {
             if (from->red == keyRed && from->green == keyGreen && from->blue == (unsigned char)key)
                 *to = 0;
@@ -562,10 +562,10 @@ int Downsample(void* destination, void* source, int width, int height, int desti
 
 // 0x004d1970: replaces 32-bit `from` pixels with `to`; pixels already equal
 // to `to` get their blue byte nudged (255 down, otherwise up) first.
-int ReplaceColor32(void* bits, UnknownPixel32 from, UnknownPixel32 to, int width, int height, int stride) {
-    UnknownPixel32* row = (UnknownPixel32*)bits;
+int ReplaceColor32(void* bits, RgbaPixel from, RgbaPixel to, int width, int height, int stride) {
+    RgbaPixel* row = (RgbaPixel*)bits;
     for (int y = 0; y < height; y++) {
-        UnknownPixel32* pixel = row;
+        RgbaPixel* pixel = row;
         for (int x = 0; x < width; x++, pixel++) {
             if (pixel->red == to.red && pixel->green == to.green && pixel->blue == to.blue &&
                 pixel->alpha == to.alpha) {
@@ -588,10 +588,10 @@ int ReplaceColor32(void* bits, UnknownPixel32 from, UnknownPixel32 to, int width
 }
 
 // 0x004d1a20: the 24-bit replacer.
-int ReplaceColor24(void* bits, UnknownPixel24 from, UnknownPixel24 to, int width, int height, int stride) {
-    UnknownPixel24* row = (UnknownPixel24*)bits;
+int ReplaceColor24(void* bits, RgbPixel from, RgbPixel to, int width, int height, int stride) {
+    RgbPixel* row = (RgbPixel*)bits;
     for (int y = 0; y < height; y++) {
-        UnknownPixel24* pixel = row;
+        RgbPixel* pixel = row;
         for (int x = 0; x < width; x++, pixel++) {
             if (pixel->red == to.red && pixel->green == to.green && pixel->blue == to.blue) {
                 if (pixel->blue == 0xff)
@@ -652,11 +652,11 @@ int Convert24To8(void* destination, void* source, int width, int height, int des
         DitherConvert(source, 888, width, height, sourceStride, destinationStride, 0, 0, 0,
                               destination, palette);
     } else {
-        UnknownPixel24* sourceRow = (UnknownPixel24*)source;
+        RgbPixel* sourceRow = (RgbPixel*)source;
         unsigned char* row = (unsigned char*)destination;
         unsigned char* indices = reinterpret_cast<ColorMapper*>(palette)->GetIndexFrom555();
         for (int y = 0; y < height; y++) {
-            UnknownPixel24* from = sourceRow;
+            RgbPixel* from = sourceRow;
             unsigned char* to = row;
             for (int x = 0; x < width; x++, to++, from++)
                 *to = indices[(unsigned short)((from->red >> 3) << 10 | (from->green >> 3) << 5) | from->blue >> 3];
@@ -691,7 +691,7 @@ int Convert565To8(void* destination, void* source, int width, int height, int de
 
 // 0x004cf980: spreads 24-bit pixels into 16.16 channel triples (the
 // ditherer's row reader).
-void ReadRow24(UnknownPixel24* source, int* channels, int count) {
+void ReadRow24(RgbPixel* source, int* channels, int count) {
     do {
         channels[0] = source->red << 16;
         channels[1] = source->green << 16;
@@ -727,10 +727,10 @@ void ReadRow555(unsigned short* source, int* channels, int count) {
 int Convert565To24(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
     unsigned short* sourceRow = (unsigned short*)source;
-    UnknownPixel24* row = (UnknownPixel24*)destination;
+    RgbPixel* row = (RgbPixel*)destination;
     for (int y = 0; y < height; y++) {
         unsigned short* from = sourceRow;
-        UnknownPixel24* to = row;
+        RgbPixel* to = row;
         for (int x = 0; x < width; x++, to++, from++) {
             to->red = (*from >> 8) & 0xf8;
             to->green = (*from >> 3) & 0xfc;
@@ -749,7 +749,7 @@ int Downsample24(void* destination, void* source, int width, int height, int des
                           int sourceStride, int levels) {
     if (levels == 0) {
         for (int y = 0; y < height; y++)
-            memcpy((UnknownPixel24*)destination + y * destinationStride, (UnknownPixel24*)source + y * sourceStride,
+            memcpy((RgbPixel*)destination + y * destinationStride, (RgbPixel*)source + y * sourceStride,
                    width * 3);
         return 1;
     }
@@ -777,7 +777,7 @@ int Downsample8888(void* destination, void* source, int width, int height, int d
                           int sourceStride, int levels) {
     if (levels == 0) {
         for (int y = 0; y < height; y++)
-            memcpy((UnknownPixel32*)destination + y * destinationStride, (UnknownPixel32*)source + y * sourceStride,
+            memcpy((RgbaPixel*)destination + y * destinationStride, (RgbaPixel*)source + y * sourceStride,
                    width * 4);
         return 1;
     }
@@ -1206,9 +1206,9 @@ int AverageColor(void* bits, int width, int height, int stride, int format,
         return UNKNOWN_ARGB(0xff, red / count, green / count, blue / count);
     }
     case 888: {
-        UnknownPixel24* row = (UnknownPixel24*)bits;
+        RgbPixel* row = (RgbPixel*)bits;
         for (y = 0; y < height; y++) {
-            UnknownPixel24* pixel = row;
+            RgbPixel* pixel = row;
             for (x = 0; x < width; x++, pixel++) {
                 red += pixel->red;
                 green += pixel->green;
@@ -1219,9 +1219,9 @@ int AverageColor(void* bits, int width, int height, int stride, int format,
         return UNKNOWN_ARGB(0xff, red / count, green / count, blue / count);
     }
     case 8888: {
-        UnknownPixel32* row = (UnknownPixel32*)bits;
+        RgbaPixel* row = (RgbaPixel*)bits;
         for (y = 0; y < height; y++) {
-            UnknownPixel32* pixel = row;
+            RgbaPixel* pixel = row;
             for (x = 0; x < width; x++, pixel++) {
                 alpha += pixel->alpha;
                 red += pixel->red;

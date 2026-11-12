@@ -3,15 +3,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-class TrackGame;struct UnknownSurfaceInterface;struct UnknownSurfaceDesc;struct UnknownTexturePalette;struct UnknownTextureFormatChoice;
+class TrackGame;struct DirectDrawSurface;struct DDSurfaceDesc2;struct UnknownTexturePalette;struct UnknownTextureFormatChoice;
 class TextureMapManager {public:void* GrowSecondScratchBuffer(unsigned);};
-class PCTextureMap {public:virtual int CreateSurface(void*,int,int,int,int,int,int,UnknownTexturePalette*,int,void*,int,int,int,int,UnknownTextureFormatChoice*,int,unsigned);int CreateSystemSurface(UnknownSurfaceDesc*,int,int*);int DumpLevel(UnknownSurfaceInterface*,const char*);};
+class PCTextureMap {public:virtual int CreateSurface(void*,int,int,int,int,int,int,UnknownTexturePalette*,int,void*,int,int,int,int,UnknownTextureFormatChoice*,int,unsigned);int CreateSystemSurface(DDSurfaceDesc2*,int,int*);int DumpLevel(DirectDrawSurface*,const char*);};
 int ActualPixelFormatBytesPerPixel(int);void ActualFillPixelFormat(int,void*);int ActualIsFormat4444Or8888(int);
 static BYTE referenceSpace[0x800000]={1};
 struct Surface {DWORD table;int refs,locks,palettes;BYTE tail[48];};
 struct World {BYTE texture[0x100],games[2][0x300],displays[2][0x1b0],managers[2][64],choice[24],palette[128],surfacePalette[64],source[512],destination[2][512],scratch[512];Surface surfaces[4];};
 static World world;
-TrackGame* g_TrackGame;UnknownSurfaceInterface* g_SharedMipTextureSurfaces[10];UnknownSurfaceInterface* g_SharedTextureSurfaces[10];int g_DebugDumpTextureLevels;
+TrackGame* g_TrackGame;DirectDrawSurface* g_SharedMipTextureSurfaces[10];DirectDrawSurface* g_SharedTextureSurfaces[10];int g_DebugDumpTextureLevels;
 struct Scenario {int seed,width,height,minimum,stride,sourceFormat,format,flags,choice,opaqueFormat,alphaFormat,bits,palette,surfacePalette,existing,shared,blade,cached,checkMemory,dump,fallback,failAt,status,writeOnFailure,outputMode,nullScratch,pitch,stateCount,throwAt,mutateAt,mutation,invalid;};
 static Scenario scenario;
 struct State {World world;DWORD shared[20];int game,dump;};
@@ -32,7 +32,7 @@ static void Finish(){Event& e=observed.events[observed.count-1];Snapshot(e.state
  case 0:g_TrackGame=(TrackGame*)world.games[1];g_DebugDumpTextureLevels=!g_DebugDumpTextureLevels;break;
  case 1:At(world.texture,0x70)=(DWORD)&world.surfaces[2];At(world.texture,0x10)=(DWORD)world.managers[1];At(world.texture,0x78)=(DWORD)world.surfacePalette;break;
  case 2:At(world.texture,0x20)=565;At(world.texture,0x24)=2;At(world.texture,0x14)=9;At(world.texture,0x18)=7;At(world.choice,0xc)=8;At(world.choice,0x10)=8888;break;
- case 3:for(int j=0;j<10;++j){g_SharedTextureSurfaces[j]=(UnknownSurfaceInterface*)&world.surfaces[3];g_SharedMipTextureSurfaces[j]=(UnknownSurfaceInterface*)&world.surfaces[3];}At(world.games[0],0x2d0)=1;At(world.games[0],0x2d4)^=0x400;break;
+ case 3:for(int j=0;j<10;++j){g_SharedTextureSurfaces[j]=(DirectDrawSurface*)&world.surfaces[3];g_SharedMipTextureSurfaces[j]=(DirectDrawSurface*)&world.surfaces[3];}At(world.games[0],0x2d0)=1;At(world.games[0],0x2d4)^=0x400;break;
  }}ToReference();if(scenario.throwAt==observed.count)throw 0x781;
 }
 static int Result(int stage,int normal=0){return scenario.failAt==stage?scenario.status:normal;}
@@ -41,8 +41,8 @@ void FillPixelFormat(int format,void* out){Begin(2,0,format);Finish();ActualFill
 int PixelFormatBytesPerPixel(int format){Begin(3,0,format);Finish();return ActualPixelFormatBytesPerPixel(format);}
 void* TextureMapManager::GrowSecondScratchBuffer(unsigned size){Begin(4,this,size);Finish();return scenario.nullScratch?0:world.scratch;}
 static void WriteSurface(void** out,int status,int boolean){if(scenario.outputMode==2)return;if((boolean?!status:status!=0)&&!scenario.writeOnFailure)return;Surface* surface=scenario.outputMode==1?0:&world.surfaces[scenario.outputMode==3?1:(scenario.outputMode==4?2:0)];*out=surface;if(surface)++surface->refs;}
-int PCTextureMap::CreateSystemSurface(UnknownSurfaceDesc* desc,int flags,int* formats){Event& e=Begin(5,this,flags);memcpy(e.payload,desc,124);for(int i=0;i<5;++i){e.formats[i]=formats[i];++e.formatCount;if(!formats[i])break;}if(i==5)Fail(82);Finish();int selected=scenario.fallback%(e.formatCount-1);int result=Result(5,1);WriteSurface((void**)((BYTE*)this+0x70),result,1);if(result)At(this,0x20)=e.formats[selected];return result;}
-int PCTextureMap::DumpLevel(UnknownSurfaceInterface* surface,const char* name){Begin(15,this,Identity(surface),Identity(name));Finish();return Result(15,-7);}
+int PCTextureMap::CreateSystemSurface(DDSurfaceDesc2* desc,int flags,int* formats){Event& e=Begin(5,this,flags);memcpy(e.payload,desc,124);for(int i=0;i<5;++i){e.formats[i]=formats[i];++e.formatCount;if(!formats[i])break;}if(i==5)Fail(82);Finish();int selected=scenario.fallback%(e.formatCount-1);int result=Result(5,1);WriteSurface((void**)((BYTE*)this+0x70),result,1);if(result)At(this,0x20)=e.formats[selected];return result;}
+int PCTextureMap::DumpLevel(DirectDrawSurface* surface,const char* name){Begin(15,this,Identity(surface),Identity(name));Finish();return Result(15,-7);}
 int ConvertPixels(void* destination,void* source,int width,int height,int destinationStride,int sourceStride,int destinationFormat,int sourceFormat,int dither,UnknownTexturePalette* palette,int alpha,unsigned key){Event& e=Begin(11,destination,Identity(source),width,height,destinationStride);int args[]={sourceStride,destinationFormat,sourceFormat,dither,Identity(palette),alpha,(int)key};memcpy(e.args+4,args,sizeof(args));memcpy(e.payload,source,64);Finish();for(int i=0;i<64;++i)((BYTE*)destination)[i]=(BYTE)(((BYTE*)source)[i]^destinationFormat^i);return Result(11,-7);}
 int AverageColor(void* bits,int width,int height,int stride,int format,UnknownTexturePalette* palette){Event& e=Begin(12,bits,width,height,stride,format);e.args[4]=Identity(palette);memcpy(e.payload,bits,64);Finish();return Result(12,0x12345678);}
 struct Hooks {
@@ -91,7 +91,7 @@ static void Invoke(){union{int(Hooks::*method)(void*,int,int,int,int,int,int,Unk
 static void Run(int retail){retailActive=retail;memset(&observed,0,sizeof(observed));observed.result=-999;memset(&world,0x65+scenario.seed%15,sizeof(world));
  for(int n=0;n<2;++n){At(world.games[n],0xc)=(DWORD)world.displays[n];At(world.games[n],0x2d0)=scenario.blade;At(world.games[n],0x2d4)=scenario.cached?0x400:0;At(world.displays[n],0x190)=(DWORD)world.managers[n];At(world.managers[n],0)=(DWORD)drawTable;}
  for(n=0;n<4;++n){world.surfaces[n].table=(DWORD)surfaceTable;world.surfaces[n].refs=10+n;world.surfaces[n].locks=0;world.surfaces[n].palettes=0;}
- for(n=0;n<10;++n){g_SharedMipTextureSurfaces[n]=scenario.shared?(UnknownSurfaceInterface*)&world.surfaces[1]:0;g_SharedTextureSurfaces[n]=scenario.shared?(UnknownSurfaceInterface*)&world.surfaces[1]:0;}
+ for(n=0;n<10;++n){g_SharedMipTextureSurfaces[n]=scenario.shared?(DirectDrawSurface*)&world.surfaces[1]:0;g_SharedTextureSurfaces[n]=scenario.shared?(DirectDrawSurface*)&world.surfaces[1]:0;}
  At(world.texture,0)=(DWORD)textureTable;At(world.texture,0x10)=(DWORD)world.managers[0];At(world.texture,0x70)=scenario.existing?(DWORD)&world.surfaces[2]:0;At(world.texture,0x44)=scenario.stateCount;At(world.choice,0xc)=scenario.opaqueFormat;At(world.choice,0x10)=scenario.alphaFormat;
  for(n=0;n<512;++n){world.source[n]=(BYTE)(n*37+scenario.seed);world.destination[0][n]=(BYTE)(n*17+41);world.destination[1][n]=(BYTE)(n*11+43);}
  g_TrackGame=(TrackGame*)world.games[0];g_DebugDumpTextureLevels=scenario.dump;if(scenario.invalid==1)g_TrackGame=0;if(scenario.invalid==2)At(world.games[0],0xc)=0;if(scenario.invalid==3)At(world.displays[0],0x190)=0;ToReference();
@@ -108,11 +108,11 @@ static void CheckDescriptor(const Event& e){BYTE wanted[124];memset(wanted,0,124
  if(e.kind==5){int want[5]={0,0,0,0,0},n=0;want[n++]=format;if(format==4444)want[n++]=1555;if(format!=555&&format!=565)want[n++]=555;want[n++]=format==565?555:565;want[n++]=0;if(e.formatCount!=n||memcmp(want,e.formats,n*4))Fail(91);}
 }
 int main(int argc,char** argv){if(argc!=3||!MapReference(argv[1],argv[2]))return 3;textureTable[15]=Address(&Hooks::Build);textureTable[18]=Address(&Hooks::Key);surfaceTable[1]=(DWORD)AddRef;surfaceTable[14]=(DWORD)GetCaps;surfaceTable[25]=(DWORD)Lock;surfaceTable[31]=(DWORD)SetPalette;surfaceTable[32]=(DWORD)Unlock;drawTable[6]=(DWORD)CreateSurface;
- Base();Compare();if(!observed.completed||observed.result!=1||At(world.texture,0x24)!=1||At(world.texture,0x1c)!=8||world.surfaces[0].refs!=12||world.surfaces[0].locks||g_SharedTextureSurfaces[1]!=(UnknownSurfaceInterface*)&world.surfaces[0]||At(world.texture,0x3c)!=0x12345678||At(world.texture,0x44)!=2)return 4;
+ Base();Compare();if(!observed.completed||observed.result!=1||At(world.texture,0x24)!=1||At(world.texture,0x1c)!=8||world.surfaces[0].refs!=12||world.surfaces[0].locks||g_SharedTextureSurfaces[1]!=(DirectDrawSurface*)&world.surfaces[0]||At(world.texture,0x3c)!=0x12345678||At(world.texture,0x44)!=2)return 4;
  int convertAt=0;for(int i=0;i<observed.count;++i){Event& e=observed.events[i];if(e.kind==5||e.kind==6)CheckDescriptor(e);if(e.kind==11){convertAt=i+1;if(e.args[0]!=4||e.args[1]!=8||e.args[2]!=4||e.args[3]!=17||e.args[4]!=11||e.args[5]!=555||e.args[6]!=555||e.args[7]||e.args[8]!=2||e.args[9]!=0x80||e.args[10]!=0xff00ff)return 5;}}
  for(i=0;i<64;++i)if(world.destination[0][i]!=(BYTE)(world.source[i]^555^i))return 6;
  Base();scenario.shared=1;Compare();if(Count(5)||Count(6)||Count(7)!=2||world.surfaces[1].refs!=13)return 7;
- Base();scenario.flags=2;Compare();if(At(world.texture,0x24)!=4||Count(14)!=1||g_SharedMipTextureSurfaces[4]!=(UnknownSurfaceInterface*)&world.surfaces[0])return 8;
+ Base();scenario.flags=2;Compare();if(At(world.texture,0x24)!=4||Count(14)!=1||g_SharedMipTextureSurfaces[4]!=(DirectDrawSurface*)&world.surfaces[0])return 8;
  Base();scenario.failAt=10;scenario.status=1;Compare();if(observed.result||world.surfaces[0].refs!=12||Count(13)||Count(11))return 9;
  Base();scenario.throwAt=convertAt;Compare();if(observed.exception!=0x781||world.surfaces[0].locks!=1||Count(13))return 10;
  const int formats[]={8,555,565,888,1555,4444,8888,0,999};const int sources[]={8,555,8888};

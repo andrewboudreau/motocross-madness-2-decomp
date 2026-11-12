@@ -219,7 +219,7 @@ int PixelFormatBytesPerPixel(int format) {
 // alpha, 0x60 palettised). 8888 falls into the 24-bit case, so it reports
 // 24 bits, and 1555 into 555, as in retail.
 void FillPixelFormat(int format, void* pixelFormat) {
-    UnknownPixelFormat* description = (UnknownPixelFormat*)pixelFormat;
+    DDPixelFormat* description = (DDPixelFormat*)pixelFormat;
     memset(description, 0, sizeof(*description));
     description->size = sizeof(*description);
     description->flags = 0x40;
@@ -273,7 +273,7 @@ int IsFormat4444Or8888(int format) {
 // 0x00511af0: the pixel format a DirectDraw pixel format describes: 555 or
 // 565 by green mask, 24-bit, 8888 for 32 bits, palettised otherwise. Other
 // 16-bit masks leave `format` unset (retail returns the argument's slot).
-int FormatFromPixelFormat(UnknownPixelFormat* pixelFormat) {
+int FormatFromPixelFormat(DDPixelFormat* pixelFormat) {
     int format;
     if (pixelFormat->bitCount == 16) {
         if (pixelFormat->masks[1] == 0x3e0)
@@ -395,15 +395,15 @@ int ReadTgaPixels24(TgaFile* file, FileStream* stream) {
             return 0;
         file->bitsSize = size;
     }
-    UnknownPixel24* pixel = (UnknownPixel24*)file->bits;
-    UnknownPixel24* end = (UnknownPixel24*)((unsigned char*)pixel + size);
+    RgbPixel* pixel = (RgbPixel*)file->bits;
+    RgbPixel* end = (RgbPixel*)((unsigned char*)pixel + size);
     if (file->imageType == 2) {
         if (stream->Read(pixel, 3, count) != count)
             return 0;
         for (int i = 0; i < count; i++, pixel++)
             SwapBytes(pixel->red, pixel->blue);
     } else {
-        UnknownPixel24 color;
+        RgbPixel color;
         while (pixel < end) {
             int packet = stream->ReadByte();
             if (packet & 0x80) {
@@ -468,15 +468,15 @@ int ReadTgaPixels32(TgaFile* file, FileStream* stream) {
             return 0;
         file->bitsSize = size;
     }
-    UnknownPixel32* pixel = (UnknownPixel32*)file->bits;
-    UnknownPixel32* end = (UnknownPixel32*)((unsigned char*)pixel + size);
+    RgbaPixel* pixel = (RgbaPixel*)file->bits;
+    RgbaPixel* end = (RgbaPixel*)((unsigned char*)pixel + size);
     if (file->imageType == 2) {
         if (stream->Read(pixel, 4, count) != count)
             return 0;
         for (int i = 0; i < count; i++, pixel++)
             SwapBytes(pixel->red, pixel->blue);
     } else {
-        UnknownPixel32 color;
+        RgbaPixel color;
         while (pixel < end) {
             int packet = stream->ReadByte();
             if (packet & 0x80) {

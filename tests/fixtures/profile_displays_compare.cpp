@@ -10,7 +10,7 @@
 #include "../../src/reconstructed/DebugAlloc.h"
 
 extern "C" void __cdecl __CxxFrameHandler();
-extern "C" const UnknownGuid IID_IDirect3DHALDevice =
+extern "C" const Guid IID_IDirect3DHALDevice =
     {0x84e63de0,0x46aa,0x11cf,{0x81,0x6f,0,0,0xc0,0x20,0x15,0x6e}};
 PCVideoCard* g_Displays[4];
 int g_DisplayCount;
@@ -116,8 +116,8 @@ int PCRenderTarget::DrawPrimitive(int,int,int,int,int){Fail(86);return 0;}
 int PCRenderTarget::DrawIndexedPrimitiveVB(int,int,int,int,int,int,int){Fail(86);return 0;}
 void PCRenderTarget::SetAlphaTest(int){Fail(86);}
 void PCRenderTarget::DisableAlphaTest(){Fail(86);}
-RenderTarget* PCRenderTarget::InitializeRenderTarget(PCVideoCard* display,const UnknownGuid* id,
-        UnknownSurfaceInterface* surface,int wantZ,int frames) {
+RenderTarget* PCRenderTarget::InitializeRenderTarget(PCVideoCard* display,const Guid* id,
+        DirectDrawSurface* surface,int wantZ,int frames) {
     int n=Index(display);
     EventRecord& r=Event(6,n,this==(void*)Target(n),this==0,wantZ,frames,(int)surface);
     memcpy(r.data,id,sizeof(*id));
@@ -203,17 +203,17 @@ static int DrawIndex(void* self) {
 static long __stdcall SetMode(void* self,DWORD w,DWORD h,DWORD depth,DWORD rate,DWORD flags) {
     Event(22,DrawIndex(self),w,h,depth,rate,flags); return scenario.fail==3?-1:0;
 }
-static long __stdcall VidMem(void* self,UnknownSurfaceCaps* caps,DWORD* total,DWORD* available) {
+static long __stdcall VidMem(void* self,DDSCaps2* caps,DWORD* total,DWORD* available) {
     int n=DrawIndex(self); EventRecord& r=Event(23,n);
     memcpy(r.data,caps,sizeof(*caps)); *total=0x1000000+scenario.seed*256+n; *available=*total-4096;
     return scenario.seed&1?-1:0; // Writes are retained even if the HRESULT fails.
 }
-static long __stdcall CreateSurface(void* self,UnknownSurfaceDesc* desc,UnknownSurfaceInterface** out,void* outer) {
+static long __stdcall CreateSurface(void* self,DDSurfaceDesc2* desc,DirectDrawSurface** out,void* outer) {
     int n=DrawIndex(self),at=created[n]++;
     EventRecord& r=Event(24,n,at,(int)outer); memcpy(r.data,desc,sizeof(*desc));
     if (at==scenario.surfaceLimit) return -1;
     if (at>=10) Fail(91);
-    *out=(UnknownSurfaceInterface*)&surfaceObjects[n][at]; observed.surfaceAlive[n][at]=1;
+    *out=(DirectDrawSurface*)&surfaceObjects[n][at]; observed.surfaceAlive[n][at]=1;
     return 0;
 }
 static long __stdcall Release(void* self) {
@@ -282,7 +282,7 @@ static void Run(int retail) {
     for (int n=0;n<4;++n) {
         g_Displays[n]=Display(n);*(DWORD*)Display(n)=(DWORD)displayTable;
         Display(n)->directDraw=(UnknownDirectDrawInterface*)&drawObjects[n];
-        Display(n)->backBuffer=(UnknownSurfaceInterface*)&surfaceObjects[n][10];
+        Display(n)->backBuffer=(DirectDrawSurface*)&surfaceObjects[n][10];
         Display(n)->frameBufferCount=1+n;Display(n)->displayModes=modes[n];
         Display(n)->displayModeCount=scenario.modeCount;Display(n)->driverCaps=0;
         sprintf(Display(n)->driverGuidText,"driver-%d-%d",scenario.seed,n);

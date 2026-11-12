@@ -12,9 +12,9 @@ void FillPixelFormat(int format, void* pixelFormat);
 // created (with a temporary 640 x 480 x 16 target when `target` is 0).
 int PCVideoCard::ProbeNonLocalTextureMemory(int* value, RenderTarget* target) {
     RenderTarget* render = 0;
-    UnknownSurfaceInterface* surface;
-    UnknownSurfaceCaps caps;
-    UnknownSurfaceDesc desc;
+    DirectDrawSurface* surface;
+    DDSCaps2 caps;
+    DDSurfaceDesc2 desc;
     int result;
 
     *value = 0;

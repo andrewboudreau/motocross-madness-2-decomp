@@ -24,7 +24,7 @@ int UIButton::ContainsPoint(POINT point, int state) {
         point.y -= rect.top;
         int x = (int)(point.x / ownerDialog->scaleX);
         int y = (int)(point.y / ownerDialog->scaleY);
-        UnknownSurfaceDesc desc;
+        DDSurfaceDesc2 desc;
         desc.size = sizeof(desc);
         PCTextureMap* texture = (PCTextureMap*)GetStateTexture(-1);
         if (!texture->systemSurface->Lock(0, &desc, 1, 0)) {
@@ -54,7 +54,7 @@ int UIMultiState::ContainsPoint(POINT point, int state) {
         point.y -= ((RECT*)screenArea)->top;
         int x = (int)(point.x / ownerDialog->scaleX);
         int y = (int)(point.y / ownerDialog->scaleY);
-        UnknownSurfaceDesc desc;
+        DDSurfaceDesc2 desc;
         desc.size = sizeof(desc);
         PCTextureMap* texture = (PCTextureMap*)GetStateTexture(-1);
         if (!texture->systemSurface->Lock(0, &desc, 1, 0)) {

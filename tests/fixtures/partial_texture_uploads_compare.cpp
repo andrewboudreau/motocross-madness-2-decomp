@@ -11,7 +11,7 @@
 #include "../../src/reconstructed/TrackGame.h"
 #include "../../src/reconstructed/DebugAlloc.h"
 extern "C" void __cdecl __CxxFrameHandler();
-extern "C" const UnknownGuid IID_IDirect3DHALDevice =
+extern "C" const Guid IID_IDirect3DHALDevice =
     {0x84e63de0,0x46aa,0x11cf,{0x81,0x6f,0,0,0xc0,0x20,0x15,0x6e}};
 static unsigned char referenceSpace[0x800000];
 static unsigned char gameStorage[sizeof(TrackGame)], displayStorage[sizeof(PCVideoCard)];
@@ -87,8 +87,8 @@ PCRenderTarget::PCRenderTarget(){
     targetDisplay=Display();surfacePixelFormat=565;deviceCaps=0x1234;
 }
 PCRenderTarget::~PCRenderTarget(){Event(5,Identity(this));}
-RenderTarget* PCRenderTarget::InitializeRenderTarget(PCVideoCard* d,const UnknownGuid* id,
-        UnknownSurfaceInterface* surface,int wantZ,int frames) {
+RenderTarget* PCRenderTarget::InitializeRenderTarget(PCVideoCard* d,const Guid* id,
+        DirectDrawSurface* surface,int wantZ,int frames) {
     EventRecord& r=Event(6,Identity(this),Identity(d),(int)surface,wantZ,frames);
     memcpy(r.args+5,id,sizeof(*id));
     if(scenario.throwOperation==1)throw 73;
@@ -209,7 +209,7 @@ static void Run(int retail){
     g_TrackGame=(TrackGame*)gameStorage;*(TrackGame**)0x56e26c=g_TrackGame;
     g_TrackGame->display=(PCVideoCard*)0x12345678;g_TrackGame->renderTarget=(RenderTarget*)0x23456789;
     Display()->displayModeCount=scenario.modeCount;Display()->displayModes=modes;Display()->field_0x198=(void*)0x89abcdef;
-    Display()->backBuffer=(UnknownSurfaceInterface*)0x13572468;Display()->frameBufferCount=3;
+    Display()->backBuffer=(DirectDrawSurface*)0x13572468;Display()->frameBufferCount=3;
     for(int i=0;i<4;++i){modes[i].width=(scenario.matchMask&(1<<i))?640:800;modes[i].height=480;modes[i].bitDepth=16;}
     // Existing target is not constructed or owned by this method. Give it the
     // scripted class vtable without adding fixture events to the scenario.

@@ -42,7 +42,7 @@ void Probe::Redraw(){Log(2,this);Boundary();((UIControl*)this)->UIControl::Reque
 int Probe::Blit(void*rect,void*texture,void*source,int flags){Event&e=Log(3,this);e.rect=*(RECT*)rect;e.args[0]=(DWORD)texture;e.args[1]=(DWORD)source;e.args[2]=flags;Boundary();return 1;}
 // GetDc is the sole scripted lower-level game operation. It always writes its
 // documented outputs; the actual Begin/End/Release ownership logic runs above it.
-int BackgroundImage::GetDc(void**dc,CameraRect*rect,int index,int dirty,int*frames,int*more,CameraRect*clip){Event&e=Log(6,this);e.rect=*(RECT*)rect;e.args[0]=index;e.args[1]=dirty;e.args[2]=*frames;Boundary();*dc=sc.dcNull?0:(void*)0x5555;*more=(++pass<sc.passes);heldDcSurface=(UnknownSurfaceInterface*)w.surface[1];heldDc=*dc;if(*dc)w.held[1]++;Finish();return !sc.beginFail;}
+int BackgroundImage::GetDc(void**dc,CameraRect*rect,int index,int dirty,int*frames,int*more,CameraRect*clip){Event&e=Log(6,this);e.rect=*(RECT*)rect;e.args[0]=index;e.args[1]=dirty;e.args[2]=*frames;Boundary();*dc=sc.dcNull?0:(void*)0x5555;*more=(++pass<sc.passes);heldDcSurface=(DirectDrawSurface*)w.surface[1];heldDc=*dc;if(*dc)w.held[1]++;Finish();return !sc.beginFail;}
 void UIDialog::DrawTextRuns(void*,int,int,const char*,int,UnknownGameUiTextRun*,unsigned int,int,unsigned int){ExitProcess(83);}
 static int SurfaceIndex(void*p){for(int i=0;i<3;i++)if(p==w.surface[i])return i;ExitProcess(84);return 0;}
 static long __stdcall GetDc(void*self,void**out){Event&e=Log(16,self);int i=SurfaceIndex(self);Boundary();*out=sc.dcNull?0:(void*)(0x5555+i);w.gets[i]++;if(*out)w.held[i]++;Finish();return sc.dcStatus;}
