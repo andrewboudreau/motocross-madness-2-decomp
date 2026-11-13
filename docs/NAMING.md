@@ -1159,3 +1159,100 @@ Left as placeholders (views of a named class, so merging them changes types):
   `UnknownSoultreeCameraView`, `UnknownPodium*`, `UnknownStatic65b478`, the
   shared stubs `UnknownFunction4de580/464e80/464e90` and
   `UnknownVirtualSlotN`.
+
+## Wave 15: racer view slots, error reporters and scene records
+
+Wave 15 names the virtual slots of the racer views and a few placeholder
+functions and types with literal or vtable evidence. The views stay
+separate types. `git grep -ohE '\bUnknown[A-Z][A-Za-z0-9_]*' -- src samples`
+fell from 626 unique names and 3841 uses to 504 and 3610.
+`UnknownRacerVirtualSlotN` fell from 95 names and 112 uses to 6 and 6, and
+`UnknownVirtualSlotN` from 58 names and 374 uses to 33 and 325.
+`field_0x` lines fell from 1880 to 1879 (one comment).
+
+Method: as in Wave 14. work/naming/rename.py renamed the unique
+identifiers in every tracked text file except this one. The view slots
+named `UnknownVirtualSlotN`, which other classes share, were renamed line by
+line with work/naming/sub.py (work/naming/w15_views.py). The comparer built
+every unit in src, samples and tests/fixtures whose include closure reaches a
+changed file (227 units), once from an archive of e983d669 and once from the
+final tree, with the map work/naming/map-wave15.json (146 entries, the
+shared slot names scoped by class).
+
+Result: 227 units, 214 IDENTICAL, 4 IDENTICAL-COMDAT-ORDER
+(samples/ui/DlgProcsNearMisses.cpp, src/bringup/Group4_DlgMain.cpp,
+src/bringup/Group6_BikeRaceCreate.cpp, src/reconstructed/KrustyUI.cpp) and 9
+NAME-ONLY (the units that define or reach `ReportDirectInputError` or the
+scene records: JoystickBufferedState.cpp, PCJoystickDeviceNearMisses.cpp,
+PCControl.cpp, PCJoystickDevice.cpp, PCKeyboardDevice.cpp, PCMouseDevice.cpp,
+PCTextureMap.cpp, tests/fixtures/joystick_buffered_compare.cpp and
+tests/fixtures/scene_motion_compare.cpp). There was no DIFF and no compile
+failure, and no .bss or .data offset moved.
+
+Negative controls:
+
+- Without the map, PCControl.obj gives DIFF (the `.text` COMDAT
+  `?UnknownReportError@@YAXJPBDH@Z` exists only in the old object).
+- A live change (`char name[256]` to `[260]` in the new tree's
+  PCControl.cpp) gives DIFF in the bytes of `?ReportDirectInputError@@YAXJPBDH@Z`.
+
+Fixture pins: one digest, the PCTextureMap.cpp entry of
+tests/fixtures/texture_lzw_objects.json (aa90ac201d76 to 0239eba56a15). It is
+NAME-ONLY; its 157 sections and 462 relocations are unchanged.
+
+### Racer view slots
+
+The racer views are KrustyBike as BikeRace and EventManager see it.
+`UnknownBikeRaceRacer` is built by KrustyBike's constructor 0x0048fa60, and
+`UnknownEventRacer`'s methods are KrustyBike.cpp code (0x004925a0,
+0x00496f90). Both have their own vfptr at +0 and reach the virtual GameObject
+base through a vbptr at +4, as KrustyBike's RTTI shows, so their own slot N is
+KrustyBike's primary-vtable slot N (vtable 0x00554548, object_offset 0, 103
+slots). The canonical names were read from the linked build: work/naming/w15_slots.py
+lists, for each slot, the retail entry and the symbol the build puts there
+(the vtable audit reports every slot ok). The retail call sites agree with the
+names: BikeRace 0x004205e7 calls +0xb0 (slot 44, `RemoveFromRace`) for a
+player who left, 0x004209d9 calls +0xac (43, `SnapshotRespawnPose`) on a
+restart, 0x0041dcb7/0x0041dcc9 pass +0xb4's float (45,
+`GetSpawnProtectionDuration`) to +0xc8 (50, `SetSpawnProtection`), and
+0x0041d32c calls +0x178 (94, `UpdateForceFeedback`) each frame.
+
+The slots keep their placeholder where KrustyBike's slot is itself a
+placeholder: 26 and 27 (SoultreePhysicsBaseObject), 52 and 77-79 (Vehicle).
+Slot 87's built and retail entries are the folded empty stub 0x00464e90,
+which many names share, so its name comes from VehicleCore.h's declaration
+order (`ApplyCrashedControl`). The views keep their own signatures.
+
+| Old name | New name | Class / slot / object_offset | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| `UnknownBikeRaceRacer::UnknownRacerVirtualSlotN` (BikeRace.h) | KrustyBike's names for slots 0-94 (89 slots): 0 `UpdateMass`, 1 `ResetDynamicState`, 2 `InitializePhysics`, 3 `ApplyStaticContactImpulse`, 4 `ApplyBodyContactImpulse`, 5 `ShouldRefreshContacts`, 6 `ApplyDrag`, 7 `DistributeContactForce`, 8 `UpdateLocalCenterOfMass`, 9 `ComputeFrameSteps`, 10 `IsAtBaseWeight`, 11 `FindPlacement`, 12 `ClassifyOutOfBounds`, 13 `AccumulateContactForces`, 14 `IntegrateMotion`, 15 `ApplyWorldTorque`, 16 `LocalTorqueToAngularAcceleration`, 17 `AverageAttachmentPosition`, 18 `UpdateContactEffect`, 19 `UpdateSlideEffect`, 20 `UpdateScrapeEffect`, 21 `UpdateAttachmentEffects`, 22 `ShouldUpdateShadowLight`, 23 `ShouldEmitMovingEffects`, 24 `ShouldRestartSteamEffect`, 25 `ShouldBurstSteamEffect`, 28 `ResolveSubstepCollisions`, 29 `SaveBodyOrientation`, 30 `ClearContactEffectFlags`, 31 `UpdateContactStates`, 32 `EffectiveLoadWeight`, 33 `ResetToPlacement`, 34 `LoadBodyAxes`, 35 `StoreBodyAxes`, 36 `ResetBodyOrientation`, 37 `AddAttachment`, 38 `ApplyCollisionEvent`, 39 `ApplyPendingRespawn`, 40 `LoadPhysicsModel`, 41 `EndMotion`, 42 `CheckMotionComplete`, 43 `SnapshotRespawnPose`, 44 `RemoveFromRace`, 45 `GetSpawnProtectionDuration`, 46 `ComputeRotationPivot`, 47 `GetDriveShareScale`, 48 `AdvancePosition`, 49 `SimulateFrame`, 50 `SetSpawnProtection`, 51 `IsSpawnProtected`, 53 `ApplySteerRate`, 54 `GetContactGroundNormal`, 55 `GetPivotAndForwardAxis`, 56 `UpdateLeanFromNormal`, 57 `GetLeanAngle`, 58 `SettleBodyToWheels`, 59 `GetMaxSteerAngle`, 60 `ComputeSteerRate`, 61 `ComputeSlideAngle`, 62 `ClassifyGroundContact`, 63 `ReadControlAxes`, 64 `UpdateControlInput`, 65 `ApplyLaunchImpulse`, 66 `IsRiderPoseLocked`, 67 `ClearCrashState`, 68 `GetRespawnKey`, 69 `ResetCrashTimer`, 70 `IsSpeedGainBelowLimit`, 71 `UpdateAirborneState`, 72 `ComputeGroundNormalAndTurn`, 73 `GetTurnRadius`, 74 `DeflectVelocity`, 75 `ComputeWheelForwardAlignment`, 76 `ComputeDriveTorque`, 80 `IsThrottleRequested`, 81 `IsClutchRequested`, 82 `IsReverseRequested`, 83 `IsBrakeRequested`, 84 `QueryControlInput`, 85 `UpdateWheelRolls`, 86 `UpdateWheelDriveForces`, 87 `ApplyCrashedControl`, 88 `ClassifyInputDirection`, 89 `SelectRiderPose`, 90 `ClampSubStepsOnCrash`, 91 `ApplyAirControl`, 92 `ApplyLeanCorrection`, 93 `InitForceFeedback`, 94 `UpdateForceFeedback` | `UnknownBikeRaceRacer` own vtable (object_offset 0) as `KrustyBike` | 2; 3 for 47, 65, 66, 81, 87, 89, 90 and 91 | constructor 0x0048fa60 is KrustyBike's; the call sites above. The tier-3 slots are the ones VehicleCore.h marks as provisional names. |
+| `UnknownEventRacer::UnknownVirtualSlot0` (RaceView.h) | `UpdateMass` | `UnknownEventRacer` own vtable (object_offset 0) as `KrustyBike` | 2 | its methods are KrustyBike.cpp code (0x004925a0, 0x00496f90); FollowRacer.cpp 0x004a9e80 calls its slot 50 with (1, 5.0f, 0) like `SetSpawnProtection` |
+| `UnknownFollowedRacerSlots::UnknownVirtualSlotN` (FollowRacerNearMisses.cpp) | KrustyBike's names for slots 0-49 (48 slots, the same names as above) | `UnknownFollowedRacerSlots` (the `UnknownEventRacer` vtable) as `KrustyBike` | 2; 3 for 47 | its slot 50 is already `SetSpawnProtection` |
+
+### Functions and types
+
+| Old name | New name | VA | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| `UnknownReportError` | `ReportDirectInputError` | `0x004bf6a0` | 1 | formats "DirectInput Error %s in file %s at line %d\n" (0x0056fc84, pushed at 0x004bf975) with the DIERR_* name of the result and the caller's `__FILE__` and line |
+| `UnknownReportDirectDrawError` | `ReportDirectDrawError` | `0x004c86e0` | 2 | the same (result, `__FILE__`, line) arguments; formats the DDERR_* name of a DirectDraw result (literals such as 0x00571270 "DDERR_NOGDI"). No format string survives, so the "Report" part is by analogy with 0x004bf6a0. |
+| `UnknownEnumEffectsCallback` | `EnumEffectsCallback` | `0x004c4260` | 2 | `PCJoystickDevice::EnumEffects` (0x004c4190) passes it to IDirectInputDevice2::EnumEffects (method 19); it copies each effect into the caller's array |
+| `UIDialog::UnknownInlineField18` | `UIDialog::GetRenderContext` | inline | 2 | returns GameObject+0x18 `renderContext`; every caller casts the result to RenderTarget or PCRenderTarget |
+| `UnknownTrackGameModeEntry` | `GridEntry` | | 3 | the 8-byte record of `RaceSettings::gridOrder[8]` (+0x14c): player id and championship points. `CompareGridEntries` (0x004f2080) sorts them by points, and the BikeRace loader seats the racers from them. No string names it. |
+| `UnknownSceneTable` | `SceneAnimationTable` | | 2 | Scene+0xb4 `animationTable`. Scene::ReadAnimations (0x004edfe0) fills it from the "Animations" section: "NumberOfAnimations" (0x00573954) and "NumberOfRandomSets" (0x0057374c). |
+| `UnknownSceneEntry` | `SceneAnimation` | | 2 | the table's 0x44-byte records, one per "Animation%d" section (0x00573910, pushed at 0x004ee153) |
+| `UnknownSceneEntry2` | `SceneRandomSet` | | 2 | the table's 0x10-byte records, one per "RandomSet%d" section (0x00573740, pushed at 0x004eeff0) |
+
+Left as placeholders:
+
+- `UnknownRacerVirtualSlot26`, `27`, `52`, `77`, `78`, `79` and the matching
+  `UnknownFollowedRacerSlots` slots 26 and 27: KrustyBike's slots are
+  placeholders.
+- The racer views themselves (`UnknownBikeRaceRacer`, `UnknownEventRacer`,
+  `UnknownFollowedRacerSlots`): merging them into KrustyBike is a type change.
+- `UnknownInlineSetField18` (GameUi.h) stores `renderContext`. The natural
+  name, `SetRenderContext`, is GameObject's slot 8 and would hide it.
+- `Scene::UnknownFunction4ea7e0`, `GUIManager::UnknownFunction4864f0`,
+  `UnknownRecorderThread` and `UnknownSoundNotifier::UnknownThreadProc`: no
+  string names them.
+- `UnknownEffectInfo` (the DIEFFECTINFO layout) and the statics
+  `s_UnknownEffectCount`: out of this wave's scope (a type, and a static).
