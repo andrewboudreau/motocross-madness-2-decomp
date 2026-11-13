@@ -692,3 +692,93 @@ Left as placeholders:
   `UnknownQuarryRace`, `UnknownTexturePalette`) and the shared stubs
   `UnknownFunction4de580`, `UnknownFunction464e80` and
   `UnknownFunction464e90`.
+
+## Wave 11: hotspot fields and the gate event records
+
+Wave 11 targets the headers with the most `field_0x` placeholders (BikeRace.h,
+TrackGame.h, Krusty3DObjects.h, RaceView.h, TrackOverlay.h, Griddraw.h) and
+the event-side gate records left in Wave 10. Most hotspot hits are padding
+arrays (`unsigned char field_0xNN[...]`) between named members, not fields.
+Krusty3DObjects.h and RaceView.h hold only padding. Of the typed
+placeholders, only the ones below have a reader that gives them a role. The
+rest are listed under "Left as placeholders". `git grep -c field_0x -- src
+samples` fell from 2034 to 2016 lines.
+
+Method: a new before/after comparer compiles every unit in src, samples and
+tests/fixtures whose include closure reaches a changed file. It compiles
+each unit twice, from an archive of b991bf7c and from a copy of the renamed
+tree. The two roots have equal length, so `__FILE__` literals keep their
+size. The comparer compares non-debug section bytes, relocations and
+symbols, applying the old-to-new map
+(`UnknownBikeRaceNode{Owner,Source,Entry}` to `RaceGate{Event,Pose,Object}`).
+It normalises the tree root inside literals and the string-literal name
+hash that covers it, anonymous-namespace stamps and `$T`/`$L`/`$SG`
+counters. Units under `src/` use the game build's include directories.
+Samples and fixtures compile as their tests do. Three fixtures stop VC6
+`/O2` with C1001 (follow_camera_controls_compare.cpp,
+follow_camera_tick_compare.cpp and profile_displays_compare.cpp), so they
+are compiled with `/Od`, as their tests do.
+
+Result: 237 units. 226 are IDENTICAL. 6 are IDENTICAL-COMDAT-ORDER: the RTTI
+`.rdata$r`/`??_R0` COMDATs of the dialog units (DlgProcs.cpp, KrustyUI.cpp,
+Group4_DlgMain.cpp and three UI near-miss samples) move, as in earlier
+waves. 5 are NAME-ONLY: BikeRace.cpp, BikeRaceNearMisses.cpp,
+Group3_QuarryLinkRace.cpp, Group6_BikeRaceCreate.cpp and
+Group6_BikeRaceCreateRacers.cpp, whose symbols mangle the gate types.
+
+Negative controls:
+
+- Without the map, BikeRace.cpp reports DIFF (`AppendNode`'s section, whose
+  mangled name holds `UnknownBikeRaceNodeSource`, is only in the old object).
+- Swapping CompareDisplayModes' subtraction in VideoCard.cpp
+  (`a->bufferCount - b->bufferCount` to `b->bufferCount - a->bufferCount`)
+  reports DIFF: the bytes of `?CompareDisplayModes@@YAHPBX0@Z` change.
+
+| Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- |
+| `UnknownTrackGameModeOptions6ac360::field_0x00`..`field_0x10` | `curve125cc`, `curve250cc`, `curve400cc`, `curve500cc`, `curve600cc` | 2 | The five ints at Options6ac+0x360 (TrackGameMode+0xa0c, `garageCurveChoice[5]`), which OptionProcs.h reads as `curveRows[BikeClassOf(cc)]`. Class i is `g_BikeClassEngineSizes[i]`, read from retail .data at 0x0056cb6c as 125, 250, 400, 500, 600. |
+| `UnknownDisplayMode::field_0x10` | `bufferCount` | 2 | `CreateModeSurfaces` (0x004ca520) budgets `w*h*bpp/8*buffers` and passes `buffers - 1` to `CreateFlipChain`, which sets `backBufferCount` with DDSD_BACKBUFFERCOUNT. Enumeration stores 2. `CompareDisplayModes`, `FindDisplayMode` and PCGame's duplicate filter compare it. |
+| `UnknownBikeRaceNodeOwner` | `RaceGateEvent` | 3 | The event as `BuildNodeList` (0x0041d170) reads it. `BikeRace::Create` (0x00417ed0) receives the race's event (`BaseQuarryEvent::LoadEventObjects` 0x004de590 pushes `this`) and appends one `RaceGate` per gate: `gateCount` at +0xac, placements at +0xd8, gate objects at +0x420. "Gate" is the game's term ("LstNumGates", "ChkRandomGates", "StartGate.slb"). It is a view: BaseQuarryEvent is 0xa4 bytes and NationalRace's +0xac is `finishTextShown`, and no retail allocation of an event with gates was found. |
+| `UnknownBikeRaceNodeSource` | `RaceGatePose` | 3 | The 0x18-byte record at RaceGateEvent+0xd8 + 0x18*i. `AppendNode` (0x0041d0d0) copies its center and direction into the new RaceGate. RadarOverlay reads the same records as `UnknownRadarGate` {position, direction}. |
+| `UnknownBikeRaceNodeEntry` | `RaceGateObject` | 3 | The per-gate object at RaceGateEvent+0x420. `BuildNodeList` passes its +0x50 width to `AppendNode`. SelectLapGates (0x00404df0) flags the object at its +0x58. |
+
+The gate types remain distinct from `RaceGate` (the 0x3c-byte box chained from
+BikeRace+0xc8) and from the other views of the same records
+(`UnknownRadarGateOwner`/`UnknownRadarGateEntry` in TrackOverlay.h,
+`TrackGameViewOwner`/`UnknownTrackGameViewEntry` in TrackGame.h). Merging
+them would be a type change, not a rename.
+
+Left as placeholders:
+
+- Padding arrays in all six hotspot headers. Krusty3DObjects.h and RaceView.h
+  contain nothing else.
+- RaceGateObject `field_0x54`. It goes to AppendNode's last argument and
+  then to `RaceGate::field_0x28`, and no reader was found.
+- TrackGameViewOwner `field_0xac`. It is a gate count in the gated owners,
+  but the tag owner stores a float there (Wave 5). UnknownTrackGameViewEntry
+  `field_0x58` and its target's `field_0x44`. SelectLapGates writes 1 to the
+  +0x44 flag for the two gates it leaves and 0 for the two it picks. No
+  reader of the flag was found, so "hidden" or "inactive" is a guess.
+- UnknownTrackGameViewOwnerDc `field_0x10a`. It may be the physics `asleep`
+  byte, but the ball's class is unproven.
+- TrackGameMode `field_0x6a4`, `field_0xa20`, `field_0xa2c`, `field_0x1bdc`
+  and `field_0x25e8`. Options6ac `field_0x34`..`field_0x44`, OptionsA20
+  `field_0x00`/`0x0c`/`0x24` and OptionsA4c `field_0x0c`/`0x14`. Each is
+  only cleared, bulk-copied, or has an unexplained single test.
+- `UnknownEventStanding::field_0x04`/`field_0x08` (EventManager.h).
+  `CompareStandings` breaks ties on them, but the reconstructed `RankRacers`
+  (0x0045e9d0) fills only `points` and `racer` of its stack array.
+- BikeRace.h `UnknownBikeRaceViews::field_0x40` and RaceSound's matching
+  `field_0x40`/`field_0x48`. The group is created or zeroed, then only
+  paused and unpaused. `UnknownBikeRaceNetState::field_0x04` spans
+  KbBikeMessage's two shorts (`lapCount`, `gatesPassed`), so naming it would
+  need a type split. Ghost `field_0x5e0` and the ghost record's
+  `field_0x04`: delta1 feeds +0x5e0, the slot KrustyBike calls
+  `deltaBasePosition`, which may mean the existing ghost names are swapped.
+- Griddraw.h. `field_0x2d54` (GridVertexCache), GridNodeExtra `field_0x10`,
+  GridBlockRecord `field_0x04`, `field_0x12e`, `field_0x17a`, `field_0x2b`
+  and `field_0x94` are only written. Terrain `field_0xc9c`/`field_0xca0`
+  are the float views of the `unlitColor`/`unlitSpecular` unions.
+- TrackOverlay.h `field_0x170` is only written.
+- VCRfile.h `field_0x00`. Open/Load claim an entry when it and `size` are 0,
+  and Close clears it, but nothing sets it.
