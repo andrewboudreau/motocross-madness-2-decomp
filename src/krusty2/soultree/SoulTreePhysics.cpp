@@ -105,7 +105,7 @@ void SoultreePhysicsBaseObject::ApplyBodyContactImpulse(const Vec3* normal, Vec3
     worldAngularVelocity = sceneNode->LocalToWorldDirection(angularVelocity);
 }
 
-// slot 0 (0x005008d0): stores value + field_0x150 and derived quantities.
+// slot 0 (0x005008d0): totalWeight = extraWeight + baseWeight (+0x150), then the weight force and mass.
 void SoultreePhysicsBaseObject::UpdateMass(float extraWeight)
 {
     totalWeight = extraWeight + baseWeight;
@@ -157,7 +157,7 @@ void SoultreePhysicsBaseObject::UpdateLocalCenterOfMass()
 // field_0x1e4 is the fixed step, field_0x1e0 the carried remainder, field_0x1ec the cap on
 // steps per frame.  steps = floor((dt + remainder) / step), remainder' = leftover time; when
 // less than one step has elapsed the frame runs as a single variable-length step of dt (or
-// of one nominal step when dt is 0).  field_0x13c = step length used, field_0x140 = 1/step.
+// of one nominal step when dt is 0).  stepTime = step length used, invStepTime = 1/step.
 void SoultreePhysicsBaseObject::ComputeFrameSteps(float dt, int* steps)
 {
     frameTime = dt + stepRemainder;
@@ -646,7 +646,7 @@ static inline SoultreeSinkObject* AttachmentSink(const SoultreeAttachment* a)
     return (SoultreeSinkObject*)a->pointEmitter;
 }
 
-// Per-frame refresh of the attachment records (field_0x1d4, field_0x1dc of them).  Tier 3
+// Per-frame refresh of the attachment records (attachments, attachmentCount of them).  Tier 3
 // reading: (1) pick a tracked object from the node's list (kind 2 or 4); (2) on the
 // slot 22 cadence, probe from the body position (+1.5 up) along the tracked object's
 // velocity * -3000 (kind 2) or its own position, and when the probe result flips relative to
@@ -654,7 +654,7 @@ static inline SoultreeSinkObject* AttachmentSink(const SoultreeAttachment* a)
 // (3) advance the field_0x208 cadence counter (wraps after 5); (4) reset each attachment,
 // re-running the slot 18/19/20 updaters, or for type 4 moving the sink to the node-local
 // point and calling its 4ba300/4ba320 depending on slots 24/25; (5) finally clear field_0x60
-// of every attachment when field_0x20c was set.
+// of every attachment when attachmentResetPending was set.
 void SoultreePhysicsBaseObject::UpdateAttachmentEffects()
 {
     if (!attachmentCount)
@@ -908,7 +908,7 @@ GameObject* SoultreePhysicsBaseObject::InitializePhysics(int renderContext, int 
 // ==== wave 3 (fork B): constructor, destructor, collision callbacks, frame step ====
 
 // ---- collision callbacks (0x00500c00, 0x00500c30) ----------------------------------------
-// Installed into the CollisionObject at field_0x128 by InstallCollisionCallbacks (+0x88 / +0x8c).  The
+// Installed into the CollisionObject at collisionObject (+0x128) by InstallCollisionCallbacks (+0x88 / +0x8c).  The
 // collision object's field_0x60 is its owner (this body) and the other object's field_0x64
 // its type tag (0x68 = another physics body).  The tag is recorded in field_0x134 and
 // forwarded to slot 38 together with the other collision object (tier 1 data flow).
@@ -988,8 +988,8 @@ SoultreePhysicsBaseObject::~SoultreePhysicsBaseObject()
 
 // ---- rest / settle check (0x00502c40) ------------------------------------------------------
 // Called once per frame by RunSteps.  Tier 3 reading: when the body is slow (speed
-// field_0xbc < 2) and its angular velocity field_0xd8 is small on every axis, with at least
-// field_0x210 - 1 active contacts (field_0x1cc), the timer field_0x214 runs; after 0.5 s,
+// linearSpeed < 2) and its angularVelocity is small on every axis, with at least
+// restContactThreshold - 1 active contacts (touchingPointCount), the timer restTimer runs; after 0.5 s,
 // on more than one contact or on a single near-flat one (normal y > 0.95), the body is put
 // to sleep: velocities zeroed and field_0x10a set (GameObject slot 10 then skips the step).
 // A body slower than 5 with enough contacts is damped instead (angular 0.95 per frame, and
@@ -1240,7 +1240,7 @@ GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int cr
     return this;
 }
 
-// SoultreePhysicsCharacter small virtuals.  SoultreePhysicsBaseObject::field_0x128 is the
+// SoultreePhysicsCharacter small virtuals.  SoultreePhysicsBaseObject::collisionObject is the
 // CollisionObject that slot 2 creates (`new` of 0xb8 bytes, ctor 0x00431e70, tier 1).
 
 // slot 1 (0x005040c0): base slot 1 then clears four flag bytes.
@@ -1493,8 +1493,8 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int respawn, int refreshed)
 // (invMass + n . ((I^-1 (arm x n)) x arm)) is written to *impulseOut, the linear velocity
 // gains n * j * invMass (j scaled first when the scale argument is non-zero), and the
 // body-space angular velocity gains I^-1 (arm x n) * j, scaled per axis by *angScale.
-// Slot 3 passes field_0x14c, field_0x24, field_0x08, &field_0xe4 (body-space inverse
-// inertia diagonal), &field_0xd8 and &field_0x64.
+// Slot 3 passes restitution, invMass, sceneNode, &invInertia (body-space inverse
+// inertia diagonal), &angularVelocity and &velocity.
 // Matching levers (578/639, size exact): the denominator dot is SoultreeDot (retail sums
 // (x + y) + z), `scaled` is assigned member-wise (the constructor form costs 4 bytes), and
 // the axis is SoultreeCrossCtorYZ (570 with Math3D's CrossProduct).  Left: the axis cross
