@@ -6,7 +6,7 @@
 #include "DebugAlloc.h"
 
 // 0x00424140
-UnknownBitmapFile* ReadBitmap(const char* name, UnknownBitmapFile* bitmap) {
+BitmapFile* ReadBitmap(const char* name, BitmapFile* bitmap) {
     FILE* file;
     int stride;
     unsigned char* bits;
@@ -17,7 +17,7 @@ UnknownBitmapFile* ReadBitmap(const char* name, UnknownBitmapFile* bitmap) {
     file = fopen(name, "rb");
     if (file) {
         if (!bitmap) {
-            bitmap = (UnknownBitmapFile*)DebugMalloc(sizeof(UnknownBitmapFile), __FILE__, 35);
+            bitmap = (BitmapFile*)DebugMalloc(sizeof(BitmapFile), __FILE__, 35);
             if (!bitmap)
                 goto close;
             bitmap->bits = 0;
@@ -75,7 +75,7 @@ UnknownBitmapFile* ReadBitmap(const char* name, UnknownBitmapFile* bitmap) {
 }
 
 // 0x00424380
-int WriteBitmap(UnknownBitmapFile* bitmap) {
+int WriteBitmap(BitmapFile* bitmap) {
     FILE* file;
     int stride;
     int x;
@@ -125,7 +125,7 @@ int WriteBitmap(UnknownBitmapFile* bitmap) {
 }
 
 // 0x004245b0
-void FreeBitmap(UnknownBitmapFile* bitmap) {
+void FreeBitmap(BitmapFile* bitmap) {
     if (bitmap) {
         if (bitmap->bits)
             DebugFree(bitmap->bits, __FILE__, 200);
@@ -134,7 +134,7 @@ void FreeBitmap(UnknownBitmapFile* bitmap) {
 }
 
 // 0x004245f0
-void DescribeBitmap8(UnknownBitmapFile* bitmap, void* bits, unsigned char (*palette)[3], int width,
+void DescribeBitmap8(BitmapFile* bitmap, void* bits, unsigned char (*palette)[3], int width,
                      int height) {
     int i;
 

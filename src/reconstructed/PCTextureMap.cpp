@@ -413,7 +413,7 @@ int PCTextureMap::DumpLevel(DirectDrawSurface* surface, const char* name) {
 // with no existing file. `name` defaults to "tex".
 void PCTextureMap::WriteLevel(DDSurfaceDesc2* desc, const char* name) {
     char path[260];
-    UnknownBitmapFile bitmap;
+    BitmapFile bitmap;
     const char* extension = desc->pixelFormat.bitCount == 8 ? ".bmp" : ".tga";
     int number = 0;
     if (!name)

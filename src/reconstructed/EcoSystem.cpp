@@ -907,7 +907,7 @@ int EcoSystem::PlaceStoredObjects() {
 int EcoSystem::PlaceAuthoredObjects() {
     if (!placementBmp[0])
         return 0;
-    UnknownBitmapFile* bitmap = ReadBitmap(placementBmp, 0);
+    BitmapFile* bitmap = ReadBitmap(placementBmp, 0);
     if (!bitmap)
         return 0;
     int row;

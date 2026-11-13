@@ -26,7 +26,7 @@ class EcoSystem;
 class TextureMapManager;
 #include "FileStream.h"
 
-struct UnknownBitmapFile;
+struct BitmapFile;
 struct TgaFile;
 
 #include "GroundFogableObject.h"
@@ -500,8 +500,8 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, FileStream* stream
 // 0x0047b8a0 (gameui.cpp tail): a float profile value, `defaultValue` when the key is "NONE".
 float ReadIniFloat(const char* section, const char* key, double defaultValue, const char* path);
 #include "FilePrintf.h"
-UnknownBitmapFile* ReadBitmap(const char* path, UnknownBitmapFile* into); // 0x00424140
-void FreeBitmap(UnknownBitmapFile* bitmap);                  // 0x004245b0
+BitmapFile* ReadBitmap(const char* path, BitmapFile* into); // 0x00424140
+void FreeBitmap(BitmapFile* bitmap);                  // 0x004245b0
 TgaFile* LoadFile(const char* path, TgaFile* into, int resources); // 0x005125c0
 void FreeFile(TgaFile* tga);                        // 0x00512dd0
 int IsFormat4444Or8888(int format);                                  // 0x00511ad0

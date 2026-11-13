@@ -10,7 +10,7 @@
 
 #pragma pack(push, 2)
 // BITMAPFILEHEADER-shaped (14 bytes).
-struct UnknownBitmapFileHeader {
+struct BitmapFileHeader {
     unsigned short type;                      // "BM"
     unsigned long size;
     unsigned short reserved1;
@@ -20,7 +20,7 @@ struct UnknownBitmapFileHeader {
 #pragma pack(pop)
 
 // BITMAPINFOHEADER-shaped (0x28 bytes).
-struct UnknownBitmapInfoHeader {
+struct BitmapInfoHeader {
     unsigned long size;
     long width;
     long height;
@@ -34,9 +34,9 @@ struct UnknownBitmapInfoHeader {
     unsigned long clrImportant;
 };
 
-struct UnknownBitmapFile {
-    UnknownBitmapFileHeader fileHeader;       // +0x000
-    UnknownBitmapInfoHeader infoHeader;       // +0x010
+struct BitmapFile {
+    BitmapFileHeader fileHeader;       // +0x000
+    BitmapInfoHeader infoHeader;       // +0x010
     unsigned char palette[256][4];            // +0x038, blue/green/red/0
     void* bits;                               // +0x438, width x height bytes
     char name[0x80];                          // +0x43c, the file it was read from
@@ -44,13 +44,13 @@ struct UnknownBitmapFile {
 
 // 0x00424140: reads the 8-bit bitmap `name` into `bitmap` (a new record when
 // 0); 0 on failure, when the record is freed.
-UnknownBitmapFile* ReadBitmap(const char* name, UnknownBitmapFile* bitmap);
+BitmapFile* ReadBitmap(const char* name, BitmapFile* bitmap);
 // 0x00424380: writes `bitmap` (8-bit, or 24-bit from 16.16 components) to
 // its `name`; 1 on success.
-int WriteBitmap(UnknownBitmapFile* bitmap);
+int WriteBitmap(BitmapFile* bitmap);
 // 0x004245b0: frees a record and its pixels.
-void FreeBitmap(UnknownBitmapFile* bitmap);
+void FreeBitmap(BitmapFile* bitmap);
 // 0x004245f0: describes an 8-bit width x height bitmap of `bits` with a
 // 256-entry RGB palette.
-void DescribeBitmap8(UnknownBitmapFile* bitmap, void* bits, unsigned char (*palette)[3], int width,
+void DescribeBitmap8(BitmapFile* bitmap, void* bits, unsigned char (*palette)[3], int width,
                      int height);
