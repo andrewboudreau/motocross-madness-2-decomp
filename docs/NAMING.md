@@ -1031,3 +1031,131 @@ Left as placeholders:
 whose behaviour is the same in every override. 57 distinct `UnknownVirtualSlotN`
 identifiers remain (slot 30 survives on UIDialog and other classes), and the
 bindings hold 17 distinct `?UnknownVirtualSlotN@Class@@` symbols (20 before).
+
+## Wave 14: the most-used placeholder types
+
+Wave 14 takes the most-used remaining `Unknown*` types and sorts them into
+local views of an already-named class, which stay (merging them is a type
+change), and distinct types, which are renamed. Members keep their names
+unless noted. `git grep -ohE '\bUnknown[A-Z][A-Za-z0-9_]*' -- src samples`
+fell from 661 unique names and 4427 uses to 626 and
+3841. `field_0x` lines fell from 1881 to 1880 (one comment).
+
+Method: as in Wave 13. work/naming/rename.py rewrites a whole identifier,
+and an identifier inside a decorated name, in every tracked text file except
+this one. That covers source, bindings keys, calibration and emulator case
+symbols, tests and docs. The comparer built every unit in src, samples and
+tests/fixtures whose include closure reaches a changed file (408 units),
+once from an archive of 48df4fbc and once from the renamed tree, with the
+cumulative map work/naming/map-wave14.json.
+
+Result: of the 408 units, 330 are IDENTICAL, 2 IDENTICAL-COMDAT-ORDER
+(Group4_DlgMain.cpp, surface_map_smoke.cpp), 71 NAME-ONLY and 4
+NAME-ONLY+COMDAT-ORDER (BikeRaceNearMisses.cpp, DlgProcsNearMisses.cpp,
+ProCircuitProcsNearMisses.cpp, KrustyUI.cpp). tests/fixtures/bvh_vector_compare.cpp
+fails to compile in both trees on its own: it includes a header its test
+generates (bvh_vector_patches.h), so the suite covers it. The final tree was
+proved after it was split into one commit per family, and it equals the tree
+proved in two earlier batches (404 and 243 units).
+
+`UnknownParameterStream` is a typedef of `FileStream`, so every declaration
+now spells `FileStream`. The typedef lines stay in SoultreeObject.h and
+FileStream.h, because the first proof run removed them and reported 39 DIFF
+units. 37 differed only in VC6's internal `$label$N` and `$TN` numbers (one
+fewer symbol). Two, tests/fixtures/character_motion_routes.cpp and
+bike_motion_routes.cpp, swapped the order of two loads in `_main` /
+`CharacterMotionCases` (`mov eax, [ebp-0x2cc]` and `mov edx, [ebp-0x790]`).
+With the typedefs kept, all 40 of those units are IDENTICAL or NAME-ONLY.
+An unused typedef is therefore not codegen-neutral under VC6 SP3 `/O2`.
+
+Statics: `g_DrawImageRectSourceRect` (BackgroundImage.cpp, now `Win32Rect`)
+keeps `.bss` offset 0x40 in the object, and the fixtures' `static DisplayMode
+modes[...]` arrays (mode_surfaces_compare.cpp, partial_texture_uploads_compare.cpp,
+profile_displays_compare.cpp) are IDENTICAL or NAME-ONLY. No renamed type
+moved a `.bss` or `.data` symbol.
+
+Negative controls:
+
+- Without the map, BackgroundImage.cpp reports DIFF: its `.bss` section key
+  holds `?g_DrawImageRectSourceRect@@3UUnknownRect@@A` only in the old object.
+- A live change reports DIFF: `regionCapacity = 5` (was 4) in
+  `BackgroundImage::SetRenderContext` changes that function's section.
+- The typedef removal above.
+
+Fixture pins: 52 digest lines were repinned: 51 in 23 files under
+tests/fixtures, plus the `Terrain::Load` partial row in
+tests/test_terrain_connections.py. Every changed digest belongs to a NAME-ONLY unit, and its section,
+relocation, size and matching-position counts did not change. The units
+are EcoSystem.cpp, KrustyUI.cpp, TrackOverlay.cpp, DlgProcs.cpp,
+ProCircuitProcs.cpp, QuarryStuntEvent.cpp, SceneManager.cpp, TrackGame.cpp,
+ZoneReport.cpp, DirectoryList.cpp, UiInfo.cpp, PCTextureMap.cpp, Terrain.cpp,
+and the samples DlgProcsNearMisses.cpp, ProCircuitProcsNearMisses.cpp,
+SceneManagerNearMisses.cpp, BikeRaceNearMisses.cpp, TrackOverlayNearMisses.cpp,
+QuarryStuntEventLoaderNearMiss.cpp, PCTextureMapNearMisses.cpp,
+StatsStandingsDraw.cpp and GameUiNearMisses.cpp. Some units are pinned in several files, and those
+copies were repinned together.
+
+work/naming/repin.py now accepts a digest pinned under the same unit in
+several fixtures. The new work/naming/repin2.py repins the forms repin.py
+does not parse: aggregate pins (`"source"`), partial rows (unit, symbol,
+size, digest) and tuple diffs whose other elements must be equal.
+tests/test_motion_stream_connections.py asserts that no Parameterblocks
+symbol contains `UnknownParameterStream`, so the rename skips it.
+
+| Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- |
+| `UnknownOverlayRect`, `UnknownMakeOverlayRect` | `OverlayRect`, `MakeOverlayRect` | 3 | The RECT-shaped int quad that Overlay keeps at +0xe8/+0xf8 and TextQueueOverlay at +0x30/+0x40. ChatOverlay::Setup and `Overlay::RestoreRect` take it. No string names it. |
+| `UnknownTrackOverlayRect` | `TrackOverlayRect` | 3 | TrackOverlay.h's 16-byte rectangle with constructors 0x00518d50/0x00518d60. |
+| `UnknownChatInput`, `UnknownChatEntry` | `ChatInput`, `ChatHistoryEntry` | 3 | ChatOverlay+0x13c (field `chatInput`; 0x0051ea50..0x0051eb40) holds the typed line, and its 0x5c-byte history lines. |
+| `UnknownTextureFormatChoice` | `TextureContext` | 3 | The six-field block (manager, opaque/alpha groups and formats, halvings) at Game+0x1c..+0x30, whose field is `textureContext`. The texture loader 0x0050a590 reads it. `UnknownKrustyUIContext` (KrustyUI.cpp) is a same-layout view and stays. |
+| `UnknownTrackGameObject3410` | `MSZoneInterface` | 2 | TrackGame+0x3410 (field `networkGameObject`). Its methods push the MSZoneInterface.cpp `__FILE__` literal (0x0056e1b4; xrefs 0x004aa36c..0x004aa64d in GetLobbyPreset, GetLobbyRank and SubmitScores). ZoneReport.cpp (0x0049c2f0..) drives it. |
+| `UnknownTrackGameObject3410Base` | `MSZoneInterfaceBase` | 3 | Its base, whose constructor body 0x004676a0 is shared by identical code folding. |
+| `UnknownBikeNumberPainter` | `BikeNumberPainter` | 2 | Constructor 0x00417500 loads the "BikeNumbers128.tga" literal. The painter draws the plate digits into the "PROCEDURAL" textures. |
+| `UnknownRect`, `UnknownOSVersionInfo` | `Win32Rect`, `OSVersionInfo` | 2 | The Win32 RECT layout PCGame passes to GetWindowRect (`windowRect`, +0x308), and the 0x94-byte OSVERSIONINFOA. |
+| `UnknownDisplayMode` | `DisplayMode` | 2 | The 36-byte record EnumDisplayModes fills and the "%d x %d %d bit" page lists. |
+| `UnknownVectorDifference`, `UnknownVectorSum`, `UnknownVectorLength` | `VectorDifference`, `VectorSum`, `VectorLength` | 2 | The static inline helpers of DlgProcs.cpp, ProCircuitProcs.cpp, SelectGamePicProcs.cpp and the bike-rider dialogs. The names state their decoded bodies. |
+| `UnknownRecordFileHeader` | `KrustyVCRHeader` | 2 | The 0xeb0-byte header (`push 0xeb0` at 0x0044ec50, 0x004507a0, 0x00454030, 0x00454640, 0x00454a50, 0x00455040) that GhostFilesDlg, ReplayFilesDlg and SPEventDlg read. It is KrustyVCR+0xdc's block: magic "MCMVCR" (0x0056da6c) and version at +0x00, description +0x10, length +0x30, race settings +0x34. KrustyVCR (0x0049bf10, 0x0049c010) hands it to VCRInterface::Start. `field_0x00[0x10]` stays one array (splitting it is a shape change). |
+| `UnknownDriveList`, `UnknownDriveEntry`, `UnknownDirectoryEntry` | `DriveList`, `DriveEntry`, `DirectoryEntry` | 2 | The dirlist.cpp unit (literal 0x00569204). TrackGame's `driveList` walks GetLogicalDriveStrings, GetDriveTypeA and GetVolumeInformationA to find the "MCM2" CD. |
+| `UnknownTokenizer` | `Tokenizer` | 3 | The strtok-style splitter 0x00515dc0/0x00515df0. Its header moved to src/reconstructed/Tokenizer.h. |
+| `UnknownSound3DParameters`, `UnknownNotifyPosition`, `UnknownPcmFormat`, `UnknownWaveHeader` | `DS3DBuffer`, `DSBPositionNotify`, `PcmWaveFormat`, `WaveFileHeader` | 2 | The DS3DBUFFER passed to IDirectSound3DBuffer::SetAllParameters, the DSBPOSITIONNOTIFY and PCMWAVEFORMAT layouts, and the 44-byte RIFF/WAVE header. |
+| `UnknownFollowCameraValue` | `FollowCameraEase` | 3 | A value FollowCamera eases toward a target. Its owners are `fieldOfViewEase`, `distanceEase`, `targetEaseX/Y/Z` and `positionEaseX/Y/Z`. |
+| `UnknownParameterStream` (uses) | `FileStream` | 1 | A typedef of `FileStream`. The two typedef lines stay (see above). |
+| `UnknownBitmapFile`, `UnknownBitmapFileHeader`, `UnknownBitmapInfoHeader` | `BitmapFile`, `BitmapFileHeader`, `BitmapInfoHeader` | 2 | bmpfile.cpp (`__FILE__` 0x00568290) reads and writes 0x4bc-byte records. 0x004245f0 stores "BM", 0x28 and 0x436, which fit the BITMAPFILEHEADER/BITMAPINFOHEADER layout. |
+| `UnknownFontTextureNode` | `FontTextureNode` | 2 | The 8-byte list node FontTextureManager.cpp (`__FILE__` 0x0056b2fc) allocates at lines 25 and 29. The list itself (`UnknownStatic65b478`) stays. |
+| `UnknownLobbySlotTable`, `UnknownLobbySlot` | `LobbySlotTable`, `LobbySlot` | 3 | MultiPlayerDlg+0x7f68 (constructor 0x004f2f00) and its eight player/requested/granted slots, which the lobby settings message carries at +0x54. |
+| `UnknownGameUiTextRun` | `UITextRun` | 3 | The 0x18-byte colored run that `UIDialog::DrawTextRuns` (0x0046f420) draws. GameUi.cpp splits "~N" and "\|x" text into these runs. |
+| `UnknownTrackGameModeSettings` | `RaceSettings` | 3 | The 0x1ec-byte block TrackGameMode keeps as `raceSettings` (+0x27f8) and two saved copies. |
+| `UnknownTrackGameRacerSlot`, `UnknownTrackGameRacerChoice` | `RacerSlot`, `RacerChoice` | 3 | TrackGameMode's `racers[8]` entry (0xf8 bytes, constructor 0x00521f30) and the player's bike and rider choice (`racerChoice`, +0x1974). |
+
+Left as placeholders (views of a named class, so merging them changes types):
+
+- `UnknownEventRacer` (RaceView.h) and `UnknownBikeRaceRacer` (BikeRace.h)
+  are KrustyBike as EventManager and BikeRace see it. Both have a virtual
+  GameObject base at vbptr +4, as KrustyBike's RTTI shows.
+  `UnknownBikeRaceRacer` declares 95 `UnknownRacerVirtualSlotN`.
+- `UnknownGuiControl` (GUIManager.h) is a UIControl as GUIUser and ToolTip
+  see it, and it is never constructed.
+- `UnknownTexturePalette` is TextureMap+0x2c's palette. It is a view of
+  ColorMapper (Quantize.h): the getters 0x004de270..0x004de290 and the
+  members already carry ColorMapper's names and offsets.
+- `UnknownEcoTrackGame` (EcoSystem.h) is TrackGame as EcoSystem reads it.
+- `UnknownSoultreeNodeView` is a SoultreeObject view. It is kept out of
+  D3DIMSoulTree.h because more declarations there change SceneManager.cpp's
+  0x004eb570.
+- `UnknownBikeRaceModel` is the D3DIMSoultreeModifier detail-level view at
+  the racer's +0x3bc and the rider's +0x1a0.
+- `UnknownTimer` (PeakHold), `UnknownCursorAnimation` (UIAnim), `UnknownStream`
+  (FileStream), `UnknownKrustyUIContext` (TextureContext),
+  `UnknownKrustyUIModelObject` (a model object), and `UnknownRunwayTerrain`
+  and `UnknownBikeRaceProjector` (Terrain::QueryGround 0x00507c10).
+- `UnknownSceneEntry`, `UnknownSceneEntry2` and `UnknownSceneTable`
+  (SceneManager.h). These are distinct, but "Animation<n>" and
+  "RandomSet<n>" alone do not settle the names.
+- Typedef aliases (`UnknownParameterStream`, ResourceEntry.h's
+  `UnknownResourceEntry`). Removing the typedef line is not neutral (see
+  above).
+- Skipped by request: `UnknownKrustyBikeView`, `UnknownQuarryRace`,
+  `UnknownBikeRaceBikeSetup`, `UnknownSoultreeMesh`,
+  `UnknownSoultreeCameraView`, `UnknownPodium*`, `UnknownStatic65b478`, the
+  shared stubs `UnknownFunction4de580/464e80/464e90` and
+  `UnknownVirtualSlotN`.
