@@ -782,3 +782,123 @@ Left as placeholders:
 - TrackOverlay.h `field_0x170` is only written.
 - VCRfile.h `field_0x00`. Open/Load claim an entry when it and `size` are 0,
   and Close clears it, but nothing sets it.
+
+## Wave 12: read-backed placeholder fields
+
+Wave 12 names scalar `field_0xNN` members that retail code reads, instead of
+the members of the densest headers. Leads came from three places: the
+readers left open in Wave 11, a scan of each class's bound methods for
+non-store reads of `[reg + 0xNN]` at the placeholder's offset, and members
+next to literals (registry keys, `.dtm` section markers). A scan hit is only a
+lead, because the register can hold another object. Each name below was
+checked against the decoded readers. `git grep -c field_0x -- src samples`
+fell from 2016 to 1907 lines. No `UnknownVirtualSlotN` was renamed (see the
+end of this section).
+
+Method: as in Wave 11. The comparer built every unit in src, samples and
+tests/fixtures whose include closure reaches a changed file (359 units, plus
+57 for the last three families), once from an archive of b6adb807 and once
+from a copy of the renamed tree. The map holds the one mangled rename,
+`UnknownMethod4c3ae0` to `SetJoystickFilter`. Two changes to the comparer:
+
+- VC6 also names anonymous namespaces `?%<source path><path hash>@`. The path
+  holds the tree root, so Group2_ShadowCameraLookAt.cpp first reported DIFF
+  on `StoreNormalised`. The comparer now normalises that form too, and the
+  unit compares IDENTICAL.
+- bvh_vector_compare.cpp includes `bvh_vector_patches.h`, which its test
+  writes from the retail image. Both trees were compiled with the same stub
+  header (`static void InstallPatches() {}`), and the objects are IDENTICAL.
+
+Result: of the 359 units, 348 are IDENTICAL (with the two above). 6 are
+IDENTICAL-COMDAT-ORDER: the RTTI COMDATs of the dialog and race units move
+(DlgProcsNearMisses.cpp, SelectGamePicProcsNearMisses.cpp,
+Group4_DlgMain.cpp, Group6_BikeRaceCreate.cpp, BikeRace.cpp,
+ProCircuitProcs.cpp), as in earlier waves. 4 are NAME-ONLY:
+PCJoystickDevice.cpp, OptionProcs.cpp and the fixture
+krusty_ui_create_compare.cpp, plus KrustyUI.cpp, which is NAME-ONLY with the
+same COMDAT move.
+The 57 units that reach the last three families (BackgroundImage,
+D3DIMSoultreeModifier, MorphBastardModifier) were compiled again after them:
+51 IDENTICAL and the same 6 IDENTICAL-COMDAT-ORDER.
+
+Negative controls:
+
+- Without the map, PCJoystickDevice.cpp and krusty_ui_create_compare.cpp
+  report DIFF (`?UnknownMethod4c3ae0@PCJoystickDevice@@QAEXE@Z` is only in the
+  old object). OptionProcs.cpp and KrustyUI.cpp report DIFF on the
+  relocations of the callers (`OptAdvancedGraphicsDlg::HandleEvent`,
+  `KrustyUI::Create`).
+- Live changes report DIFF. `joystickFilter = !value` in SetJoystickFilter
+  changes the bytes of `?SetJoystickFilter@PCJoystickDevice@@QAEXE@Z`, and
+  `texelSize = 0.015625f` in TerrainShadow's constructor changes the bytes
+  of `??0TerrainShadow@@QAE@H@Z`.
+
+tests/fixtures/eco_light_objects.json pins a digest of the whole
+KrustyUI.cpp object. After the NAME-ONLY result it was repinned: the section
+and relocation counts (317, 1847) are unchanged and only the digest moves. The
+calibration case for 0x004c3ae0 (tools/run_calibration.py), the bindings in
+KrustyUI.bindings.json and OptionProcs.bindings.json, the fixture
+krusty_ui_create_compare.cpp and test_joystick_buffered_behavior.py's layout
+probe use the new names.
+
+| Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- |
+| `PCJoystickDevice::field_0x5d5` | `joystickFilter` | 1 | KrustyUI.cpp and OptionProcs.cpp pass the registry flag `"JoystickFilter"` to 0x004c3ae0, which stores it here. FilterAxisSpike (inline in ReadBufferedState) keeps the previous axis value when the jump exceeds 10000 only when it is set. |
+| `PCJoystickDevice::UnknownMethod4c3ae0` | `SetJoystickFilter` | 1 | The same: its only callers pass the `"JoystickFilter"` registry flag, and its body stores the byte at +0x5d5. |
+| `UnknownGameUiSection::field_0x38` | `sectionKind` | 2 | ReadDialogResource stores 0 for `"Set_Info"`, 3 for `"Set_Default"`, and otherwise the kind of the last marker section (`"Set_Anim"` 1, `"Set_Sound"` 2, `"Set_Control"` 4). Each pass switches on it. |
+| `KrustyUI::field_0x38` | `trackRecordReturnMenu` | 3 | Its only reader, DlgProcs at 0x0045314d, reopens it with `OpenMenu` when the 0x911 track-record dialog closes. Only the constructor (0x00498824) writes it, with 0. |
+| `VCRDlg::field_0x7f58` | `leftForMenu` | 2 | HandleEvent sets it after `LeaveRaceForMenu(kMenuMain)` and `ShowCursors(1)`. On kDialogClose, `ShowCursors(0)` is skipped when it is set. |
+| `Overlay::field_0x118` | `layOutOnRender` | 3 | The constructor's second argument. Every reconstructed caller passes 1. Render3D (0x004b61a0) calls LayOutQuad before drawing when it is set. The constructor parameter has the same name. |
+| `GUIUser::field_0xc4` | `keepAnimationPhase` | 3 | SetCursorAnimation (0x00487fb0) copies `currentFrame`, `playForwards` and `lastStepTime` from the current animation to the new one when it is set. The constructor clears it; no other writer is known. |
+| `BackgroundImage::field_0x5c` | `drawnBefore` | 3 | The constructor clears it. RenderPost3D (0x00403ec0) passes it as DrawImage's `dirty` argument and then sets it, so the first draw skips the region restore. |
+| `UnknownBikeRaceGhost::position` (+0x5d4) | `velocity` | 3 | ApplyReplayDelta (0x004a9aa0) adds delta0 here. KrustyBike's ApplyStateDelta (0x004933e0) adds the same message field to `deltaBaseVelocity`, and SendStateDelta encodes `message.velocity` there. |
+| `UnknownBikeRaceGhost::field_0x5e0` | `position` | 3 | delta1 goes here, the field KrustyBike adds to `deltaBasePosition` and SendStateDelta encodes from the position. This resolves the swap noted in Wave 11. |
+| `UnknownBikeRaceGhostRecord::position` (+0x28), `field_0x04` | `velocity`, `position` | 3 | The record fields that the ghost's +0x5d4 and +0x5e0 are copied from (RecordFrame 0x00421d50) and into (0x004a9aa0). |
+| `TerrainShadow::field_0x6668`..`field_0x6674` | `screenMinX`, `screenMaxX`, `screenMinY`, `screenMaxY` | 2 | Slot 27 resets them to FLT_MAX/-FLT_MAX and keeps the min/max of each projected hit's screen x and y. The visibility test compares them with the viewer's width and height and requires a 10 x 5 extent. |
+| `TerrainShadow::field_0x677c` | `texelSize` | 2 | Slot 28 sets it to 0.5 or 1.0 over the texture size, the value D3DIMSoultreeShadow's slot 28 keeps in `g_d3dimShadowTexel`. Slot 30 scales tu and tv by it. |
+| `ProjectedShadow::field_0x98` | `downsampleOnPresent` | 2 | The constructor sets 1 and Init clears it for surface format 0x613. Present (0x004dbd30) returns unless it is set, then halves the clip rectangle and box-filters 2x2 texels. The receivers' slot 28 uses 0.5 / size when it is set. |
+| `ShadowCaster::field_0x27c` | `currentLod` | 2 | ShadowCaster is a D3DIMSoultreeObject view: its methods are 0x00444fe0 and 0x00445030 (`GetVertexCount`, `GetSurfaceCount`), and D3DIMSoulTree.h names +0x27c `currentLod`. 0x004db8c0 calls ReleaseParts unless it is -1. |
+| `SoultreeObject::field_0x150` (core view) | `boundsFound` | 2 | D3DIMSoulTree.h's name at +0x150. UpdateSubtreeBounds (0x004fe0f0) and AccumulateBounds (0x004fe2e0) include the local bounds only when it is set. |
+| `SoultreeObject::field_0x190` (core and quadtree views), `D3DIMSoultreeObject::field_0x190` | `drawsItself` | 3 | 1 after construction. InsertNodesInQuadtree (0x005046e0) clears it and RemoveNodesFromQuadtree (0x005047f0) sets it again. D3DIMSoultreeObject's slot 12 (PrepareGeometry) does its work only when it is set. |
+| `D3DIMSoultreeObject::field_0x28c`, `field_0x2d4` (quadtree view) | `lodTable`, `visible` | 2 | D3DIMSoulTree.h's names at the same offsets of the same class. The view keeps its `int` types. |
+| `D3DIMSoultreeModifier::field_0x3c` | `onFirstModifierList` | 2 | The constructor sets 1 and MorphBastardModifier clears it. MorphBastardModifier is added with AddSecondModifier (KrustyBike.cpp). DetachFromAll removes the modifier from the first list (+0x264) when it is set and from the second (+0x26c) otherwise. |
+| `ParticleManager::field_0x2054` | `lightManager` | 2 | Slot 27 stores its last argument here. The render slot passes it to LightManager::LightVertices for the corner normals. The argument is renamed `lights`. |
+| `ParticleManager::field_0x1f8c` | `quadVertexBuffer` | 2 | An FVF 0x1c4 vertex buffer of 4000 vertices. The render slot locks it, writes four transformed vertices per visible particle and draws it with DrawIndexedPrimitiveVB. |
+| `PCGame::field_0x544` | `bladeLoaded` | 2 | Main passes it as GetDXVersion's third output, which is 1 when `LoadLibrary("Blade.dll")` succeeds. PCGame and PickDevice skip the z-buffer and pick devices differently when it is set. |
+
+Left as placeholders:
+
+- HiResMeter `field_0x38` (GameTick). Registration and resets write it
+  (0x00468668, 0x00468687, 0x00488576, 0x004885b1, 0x00467de4). The reads at
+  +0x38 in Tick are of another object (0x0056e26c), so no reader is known.
+- Recorder.h `UnknownRecorderRecord::field_0x04` and TrackRecordDlg.h
+  `UnknownTrackRecordRow::field_0x04`. No reader. 0x0051fbe7 reads only the
+  row's +0x00.
+- UnknownTrackGameViewEntry +0x58, its target's +0x44 flag and RaceGateObject
+  `field_0x54` (and so `RaceGate::field_0x28`). A search along the pointer
+  chain found no reader.
+- FollowCamera `field_0x33c`. It is the tenth `CAMERA` float of a `sscanf`
+  and is never read.
+- UIScrollBar and UIEditBox `int` aliases of named unions. They are
+  intentional views.
+- ConstraintMethodCollisionModel +0xbc, +0xd8, +0xdc and +0xe0. The scan hits
+  are reads through `this` adjusted by `lea ecx, [esi - 0xc]`, so they belong
+  to other offsets.
+- Particle emitter `field_0x38`/`field_0x3c`. +0x3c is copied to +0x5c every
+  tick, but the role is unclear.
+- Tire `field_0x2a4` (a 1.0 divisor in the shock retraction), UIDialog
+  `field_0x180` (passed to PlayControlSound's unused parameter), GUIManager
+  `field_0x1f8` (only read by the getter 0x004864f0, no writer known), Scene
+  `field_0x88` (a flag passed to LoadPhysicsModel), PCVideoCard
+  `field_0x198` (only cleared, then passed as CreateSurface's palette).
+- SoultreeMaterial `field_0xb8`, LightEmitter `field_0xa8`, ObjectPicker
+  `field_0x2c`, CarProcedural `field_0x58`, Terrain `field_0x94` and
+  TrackGameMode `field_0x25e8`. Each is only cleared or has one unexplained
+  test.
+
+`UnknownVirtualSlotN`: of the 58 remaining names, none sits at a vtable index
+and `object_offset` whose canonical class already names the slot. The game
+views' slot 0 is Game's destructor (a different kind of member) and the
+canonical Game and GameObject slots 9, 12 and 19 are themselves unnamed. The
+shadow receivers' slots 27-30 and the physics slots 26/27 would need
+behavioural names, which this wave's rule excludes.
