@@ -62,10 +62,10 @@ int main() {
         KbNetDelta* d=(KbNetDelta*)(packet+1);
         d->step=(unsigned char)step;
         for(i=0;i<3;++i) {
-            d->delta0[i]=(signed char)deltas[(seed+i)%10];
-            d->delta1[i]=(signed char)deltas[(seed+3+i)%10];
-            d->delta2[i]=(signed char)deltas[(seed+6+i)%10];
-            d->delta3[i]=(signed char)deltas[(seed+8+i)%10];
+            d->velocity[i]=(signed char)deltas[(seed+i)%10];
+            d->position[i]=(signed char)deltas[(seed+3+i)%10];
+            d->angularVelocity[i]=(signed char)deltas[(seed+6+i)%10];
+            d->angles[i]=(signed char)deltas[(seed+8+i)%10];
         }
         d->motionFlags=seed^0x7f032211;d->poseBytes=step^0x81002041;
         for(i=0;i<12;++i)Put(bike,0x1358+i*4,(float)(seed-32)*(i+1)*0.125f);
@@ -75,7 +75,7 @@ int main() {
         unsigned char* expectBike=expected.bytes+16;
         for(i=0;i<12;++i) {
             int component=i%3,group=i/3;
-            int delta=group==0?d->delta0[component]:group==1?d->delta1[component]:group==2?d->delta2[component]:d->delta3[component];
+            int delta=group==0?d->velocity[component]:group==1?d->position[component]:group==2?d->angularVelocity[component]:d->angles[component];
             float scale=group<2?0.234375f:0.049087387f;
             // The first three vectors are materialized as float temporaries in
             // production; the last three scalar products remain on x87 until add.

@@ -78,17 +78,18 @@ struct KbNetBike {
 };
 // 12-byte message built by KrustyBike::SendFollowedRacer (tier 3: the leading dword is never written).
 // Network message 13 (bikerace.cpp's 0x0041fb.. handlers pass it to 0x004933e0):
-// signed byte deltas of the four state vectors plus two raw ints at the unaligned
+// signed byte deltas of the velocity, position, angular velocity and angles (the
+// fields KbBikeDeltaMessage encodes at the same offsets) plus two raw ints at the unaligned
 // offsets +0x0e/+0x12 (tier 2 layout, tier 3 names; the raw ints are
 // KbBikeDeltaMessage's motion/flag and pose bytes).
 #pragma pack(push, 1)
 struct KbNetDelta {
     char type;                   // +0x00 the message type byte (SendRaw 0x004ad280 writes it)
-    signed char delta1[3];       // +0x01 x 15/64 -> KrustyBike+0x1364
+    signed char position[3];     // +0x01 x 15/64 -> KrustyBike+0x1364 deltaBasePosition
     unsigned char step;          // +0x04 bit 0: units of 8, bits 1-7: count
-    signed char delta3[3];       // +0x05 x pi/64 -> +0x137c..+0x1384
-    signed char delta2[3];       // +0x08 x pi/64 -> +0x1370
-    signed char delta0[3];       // +0x0b x 15/64 -> +0x1358
+    signed char angles[3];       // +0x05 roll, pitch, yaw x pi/64 -> +0x137c..+0x1384
+    signed char angularVelocity[3];  // +0x08 x pi/64 -> +0x1370 deltaBaseAngularVelocity
+    signed char velocity[3];     // +0x0b x 15/64 -> +0x1358 deltaBaseVelocity
     int motionFlags;             // +0x0e motion, crash and flag bits (KbBikeDeltaMessage +0x0e..+0x11)
     int poseBytes;               // +0x12 pose index/state, param, blend, lean blend (+0x12..+0x15)
 };
@@ -501,7 +502,7 @@ struct KbPlayer {
     char pad_0x0000[0xA8];
     Vehicle* followedRacer;  // +0xa8 TrackGameViewOwner::followedRacer
     char pad_0x00AC[0x30];
-    Vehicle* ball;           // +0xdc TrackGameViewOwner::ball (a ghost bike; "FREE BALL!" while set)
+    Vehicle* ball;           // +0xdc TrackGameViewOwner::ball (the tag ball; "FREE BALL!" while set)
     // 0x004A9E80 (TrackGameViewOwner::SetFollowedRacer): follows racer after previous; previous
     // is a vehicle (tested and read at +0x75c); tell sends message 0x87 through SendFollowedRacer.
     void SetFollowedRacer(Vehicle* racer, Vehicle* previous, int tell);

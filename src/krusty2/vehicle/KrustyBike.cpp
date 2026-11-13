@@ -1427,15 +1427,15 @@ void KrustyBike::LookBackAtNearestRival()
 // byte deltas; the result is copied into *state.
 void KrustyBike::ApplyStateDelta(const KbNetDelta* delta, KbNetState* state)
 {
-    Vec3 d0(delta->delta0[0] * 0.234375f, delta->delta0[1] * 0.234375f, delta->delta0[2] * 0.234375f);
-    Vec3 d1(delta->delta1[0] * 0.234375f, delta->delta1[1] * 0.234375f, delta->delta1[2] * 0.234375f);
-    Vec3 d2(delta->delta2[0] * 0.049087387f, delta->delta2[1] * 0.049087387f, delta->delta2[2] * 0.049087387f);
+    Vec3 d0(delta->velocity[0] * 0.234375f, delta->velocity[1] * 0.234375f, delta->velocity[2] * 0.234375f);
+    Vec3 d1(delta->position[0] * 0.234375f, delta->position[1] * 0.234375f, delta->position[2] * 0.234375f);
+    Vec3 d2(delta->angularVelocity[0] * 0.049087387f, delta->angularVelocity[1] * 0.049087387f, delta->angularVelocity[2] * 0.049087387f);
     deltaBaseVelocity += d0;
     deltaBasePosition += d1;
     deltaBaseAngularVelocity += d2;
-    deltaBaseRoll += delta->delta3[0] * 0.049087387f;
-    deltaBasePitch += delta->delta3[1] * 0.049087387f;
-    deltaBaseYaw += delta->delta3[2] * 0.049087387f;
+    deltaBaseRoll += delta->angles[0] * 0.049087387f;
+    deltaBasePitch += delta->angles[1] * 0.049087387f;
+    deltaBaseYaw += delta->angles[2] * 0.049087387f;
     int step;
     if (delta->step & 1)
         step = (delta->step >> 1) * 8;
