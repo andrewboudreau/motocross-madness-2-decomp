@@ -83,7 +83,7 @@ class StatsOverlayDefaultTests(unittest.TestCase):
                     ('?CreateOverlays@BaseQuarryEvent@@UAEXXZ', 0x4e07c0, 1049))),
                 ('src/reconstructed/TrackOverlay', (
                     ('??0StatsOverlay@@QAE@H@Z', 0x519370, 133),
-                    ('?LoadPanel@StatsOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@PAXUUnknownOverlayRect@@@Z',
+                    ('?LoadPanel@StatsOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@PAXUOverlayRect@@@Z',
                      0x5194b0, 976))))
             for index, (source, cases) in enumerate(targets):
                 obj = compile_source(ROOT/(source+'.cpp'), str(index))

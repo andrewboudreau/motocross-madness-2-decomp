@@ -20,7 +20,7 @@ from test_edit_box_draw import complete_object, signature
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT/'samples/render/OverlayNearMisses.cpp'
-SYMBOL = '?RestoreRect@Overlay@@QAEHPBUUnknownOverlayRect@@@Z'
+SYMBOL = '?RestoreRect@Overlay@@QAEHPBUOverlayRect@@@Z'
 HELPERS = [('PCTextureMap','void* PCTextureMap::LockSurface(',0x4c79e0,99),
            ('PCTextureMap','int PCTextureMap::UnlockSurface(',0x4c7a50,25),
            ('Tgafile','int PixelFormatBytesPerPixel(',0x511970,78)]
@@ -107,7 +107,7 @@ class OverlayRestoreTests(unittest.TestCase):
             self.assertEqual([s.name for s in candidate.symbols if s.storage_class==2 and s.section_number>0],[SYMBOL])
             # Ordinary sequenced locals are optimized back into the old fault order.
             ordinary=output/'ordinary.cpp'
-            ordinary.write_text(SOURCE.read_text().replace('const volatile UnknownOverlayRect* view','const UnknownOverlayRect* view').replace('../../src/reconstructed/',''))
+            ordinary.write_text(SOURCE.read_text().replace('const volatile OverlayRect* view','const OverlayRect* view').replace('../../src/reconstructed/',''))
             old_path,old=compile_source(ordinary,'ordinary')
             old_result=compare(image,old,SYMBOL,0x4b6710,365,SOURCE.with_suffix('.bindings.json'))
             self.assertEqual((old_result['candidate_size'],old_result['strict_match']['matching_positions']),(350,58))
@@ -136,8 +136,8 @@ class OverlayRestoreTests(unittest.TestCase):
                 self.assertEqual([va+r.virtual_address-entry.value-1 for r in relocs if obj.symbol_by_index[r.symbol_index].name==SYMBOL],calls)
             layout=output/'layout.cpp'
             layout.write_text('#include "Overlay.h"\n#include "PCTextureMap.h"\n#include <stddef.h>\n'
-                'typedef char Layout[(sizeof(Overlay)==0x11c && sizeof(PCTextureMap)==0x80 && sizeof(UnknownOverlayRect)==16 && '
-                'sizeof(int(Overlay::*)(const UnknownOverlayRect*))==4 && '
+                'typedef char Layout[(sizeof(Overlay)==0x11c && sizeof(PCTextureMap)==0x80 && sizeof(OverlayRect)==16 && '
+                'sizeof(int(Overlay::*)(const OverlayRect*))==4 && '
                 'offsetof(Overlay,overlayTexture)==0x2c && offsetof(Overlay,backingTexture)==0x30 && '
                 'offsetof(TextureMap,textureWidth)==0x14 && offsetof(TextureMap,mapFormat)==0x20 && '
                 'offsetof(PCTextureMap,systemSurface)==0x70 && sizeof(DDSurfaceDesc2)==124)?1:-1];\n')

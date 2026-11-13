@@ -54,8 +54,8 @@ Overlay::~Overlay() {
 
 // 0x004b5f50
 Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
-                                        const UnknownOverlayRect* rect, int scaleRect,
-                                        const UnknownOverlayRect* source, float depth,
+                                        const OverlayRect* rect, int scaleRect,
+                                        const OverlayRect* source, float depth,
                                         char withText, const char* textArchive, const char** fontNames,
                                         int fontCount, int textFormat, int a12) {
     GameObject::SetRenderContext(target);

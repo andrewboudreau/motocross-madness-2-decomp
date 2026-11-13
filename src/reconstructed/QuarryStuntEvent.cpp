@@ -201,9 +201,9 @@ int BaseQuarryEvent::Create3DObjects(int value) {
 void BaseQuarryEvent::CreateOverlays() {
     char message[388];
     char name[0x40];
-    UnknownOverlayRect screen;
-    UnknownOverlayRect cue;
-    UnknownOverlayRect text;
+    OverlayRect screen;
+    OverlayRect cue;
+    OverlayRect text;
     int width;
     int height;
 

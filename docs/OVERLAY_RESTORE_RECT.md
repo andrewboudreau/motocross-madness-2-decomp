@@ -183,7 +183,7 @@ No floating-point arithmetic occurs in this method.
 The candidate remains explicitly reviewed nonexact source. The isolated build
 `work/game-build/build-jd7lf5es` compiled **254/254** translation units and
 changed **244 to 243** unresolved names, removing only
-`?RestoreRect@Overlay@@QAEHPBUUnknownOverlayRect@@@Z`, with no new names. The
+`?RestoreRect@Overlay@@QAEHPBUOverlayRect@@@Z`, with no new names. The
 independent recompilation confirms that the actual candidate object's two
 sections and three relocations match the retained compile. This supplies the missing method;
 the game still does not link, and this is not a working-menu or runtime claim.

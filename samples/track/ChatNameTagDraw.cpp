@@ -14,7 +14,7 @@
 // existing local view; standalone builds import the canonical storage.
 extern int s_UnknownGlobal68a444;
 extern "C" __declspec(dllimport) void* __stdcall SelectObject(void*,void*);
-extern "C" __declspec(dllimport) int __stdcall DrawTextA(void*,const char*,int,UnknownOverlayRect*,unsigned int);
+extern "C" __declspec(dllimport) int __stdcall DrawTextA(void*,const char*,int,OverlayRect*,unsigned int);
 extern "C" __declspec(dllimport) int __stdcall GetTextExtentPoint32A(void*,const char*,int,UnknownTextExtent*);
 
 // 0x0051e3f0: draw one racer/cue name and update the tag rectangle.
@@ -28,7 +28,7 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
     if (index == racerCount) {
         sprintf(text, "%s", cueRacerName);
         length = strlen(text);
-        UnknownOverlayRect rect = nameTagRects[index];
+        OverlayRect rect = nameTagRects[index];
         rect.left += nameTags[index]->drawWidth;
         DrawTextA(dc, text, length, &rect, 0x8124);
         UnknownTextExtent size;

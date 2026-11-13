@@ -17,7 +17,7 @@ extern "C" __declspec(dllimport) unsigned long __stdcall SetTextColor(void* dc, 
 extern "C" __declspec(dllimport) int __stdcall GetTextExtentPoint32A(void* dc, const char* text, int length,
                                                                      UnknownTextExtent* size);
 extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* text, int length,
-                                                         UnknownOverlayRect* rect, unsigned int format);
+                                                         OverlayRect* rect, unsigned int format);
 
 int StatsOverlay::DrawStandings()
 {

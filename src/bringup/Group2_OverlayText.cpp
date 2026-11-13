@@ -176,7 +176,7 @@ int TextService::DrawText1555(TextureMap* texture, int x, int y, const char* tex
 
 // 0x0050ba00: cell rectangles are in texture coordinates of a 255-texel
 // font texture.
-void* TextService::LayoutText(const UnknownOverlayRect* rect, const char* text,
+void* TextService::LayoutText(const OverlayRect* rect, const char* text,
                                      unsigned int color, int* count) {
     Rectangle2D cell(0, 0, 0, 0);
     Rectangle2D size(0, 0, 0, 0);

@@ -1,4 +1,4 @@
 {
-  "?RestoreRect@Overlay@@QAEHPBUUnknownOverlayRect@@@Z": "0x004b6710",
+  "?RestoreRect@Overlay@@QAEHPBUOverlayRect@@@Z": "0x004b6710",
   "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970"
 }

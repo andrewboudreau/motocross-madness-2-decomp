@@ -27,15 +27,15 @@ public:
     // 0x004b5f50: binds the render target (slot 8), the texture (+0x2c), the
     // screen rectangle (+0xe8) and an optional source rectangle (+0xf8).
     Overlay* Attach(RenderTarget* target, TextureMap* texture,
-                                   const UnknownOverlayRect* rect, int scaleRect,
-                                   const UnknownOverlayRect* source, float depth,
+                                   const OverlayRect* rect, int scaleRect,
+                                   const OverlayRect* source, float depth,
                                    char withText, const char* textArchive, const char** fontNames,
                                    int fontCount, int textFormat, int a12);
 
     // 0x004b6710: copies `rect` of the backing texture (+0x30) into the
     // overlay texture (ChatOverlay calls it before redrawing a line); 0 when
     // either texture does not lock.
-    int RestoreRect(const UnknownOverlayRect* rect);
+    int RestoreRect(const OverlayRect* rect);
 
     // 0x004b6380: lays the four vertices of the overlay quad out from the
     // screen and source rectangles, clipped to the camera viewport.
@@ -56,8 +56,8 @@ public:
     int field_0x40;
     TLVertex quadVertices[5];     // cleared by the constructor
     int scaleRect;                            // +0xe4 ctor 1, Attach's argument: LayOutQuad scales screenRect from 640x480 to the viewport
-    UnknownOverlayRect screenRect;            // screen rectangle
-    UnknownOverlayRect sourceRect;            // source rectangle
+    OverlayRect screenRect;            // screen rectangle
+    OverlayRect sourceRect;            // source rectangle
     int hasSourceRect;                        // has a source rectangle
     int overlayAlpha;                         // alpha, 0xff
     int alphaBlended;                         // alpha-blended

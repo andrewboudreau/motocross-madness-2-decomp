@@ -7,11 +7,11 @@
 #include "../../src/reconstructed/Tgafile.h"
 
 // 0x004b6710. A rectangle as wide as the texture is copied in one block.
-int Overlay::RestoreRect(const UnknownOverlayRect* rect) {
+int Overlay::RestoreRect(const OverlayRect* rect) {
     // Model the decoded left/top/right/bottom access order, including faults,
     // and the two rereads after the lock callbacks. This qualification
     // describes reconstructed behavior, not an original type.
-    const volatile UnknownOverlayRect* view = rect;
+    const volatile OverlayRect* view = rect;
     int left = view->left;
     int initialTop = view->top;
     int width = view->right - left;

@@ -231,7 +231,7 @@ class ChatNameTagTests(unittest.TestCase):
                     'UnknownChatRacer':{'driveForceScale':0x4a4,'name':0x5e0,'position':0x784}}
             for cls,members in fields.items():
                 for member,value in members.items():text+=f'typedef char Offset_{cls}_{member}[offsetof({cls},{member})=={value}?1:-1];\n'
-            for cls,n in [('ChatOverlay',0x3e0),('NameOverlay',0x174),('UnknownChatRacer',0x788),('UnknownTrackOverlayRect',16)]:text+=f'typedef char Size_{cls}[sizeof({cls})=={n}?1:-1];\n'
+            for cls,n in [('ChatOverlay',0x3e0),('NameOverlay',0x174),('UnknownChatRacer',0x788),('TrackOverlayRect',16)]:text+=f'typedef char Size_{cls}[sizeof({cls})=={n}?1:-1];\n'
             text+='typedef char GameNames[offsetof(TrackGame,mode)+offsetof(TrackGameMode,showRiderNames)==0xc34?1:-1];\n'
             text+='typedef char GamePositions[offsetof(TrackGame,mode)+offsetof(TrackGameMode,showRiderPositions)==0xc38?1:-1];\n'
             text+='typedef char Method[sizeof(void(ChatOverlay::*)(void*,int))==4?1:-1];\n'

@@ -33,14 +33,14 @@ public:
 
     // 0x0051b320: binds the render target and the text rectangle and creates
     // the font from the GUI's face name (Arial when it has none).
-    TextQueueOverlay* Setup(void* target, UnknownOverlayRect rect);
+    TextQueueOverlay* Setup(void* target, OverlayRect rect);
     void ReplaceHeadMessage(TextQueueMessage* message); // 0x0051b540: replaces the head
     void AppendMessage(TextQueueMessage* message); // 0x0051b5e0: appends
     void DropHeadMessage();             // 0x0051b670: drops the head
 
     void* textFont;                           // +0x2c font (DeleteObject)
-    UnknownOverlayRect textRect;              // +0x30 text rectangle (+0x40 less one)
-    UnknownOverlayRect shadowRect;            // +0x40 shadow rectangle
+    OverlayRect textRect;              // +0x30 text rectangle (+0x40 less one)
+    OverlayRect shadowRect;            // +0x40 shadow rectangle
     TextQueueMessage* queueHead;                // +0x50 queue head
     unsigned int textColor;                   // +0x54 text colour, 0xff00
 };

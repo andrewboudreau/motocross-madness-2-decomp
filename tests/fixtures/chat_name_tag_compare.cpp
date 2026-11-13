@@ -213,7 +213,7 @@ int main(int argc,char**argv){
     }
     for(int q=-100;q<=100;q++){Defaults();sc.debug=1;sc.quarter=q;Check();Oracle();}
     for(cue=0;cue<2;cue++){Defaults();sc.cue=cue;sc.index=cue?sc.count:1;sc.drawMutate=1;Check();Oracle();
-        UnknownOverlayRect&rect=((ChatOverlay*)w.object)->nameTagRects[sc.index];
+        OverlayRect&rect=((ChatOverlay*)w.object)->nameTagRects[sc.index];
         if(rect.left!=sc.left+(cue?0:7)||rect.right!=sc.right-(cue?0:3)||rect.bottom!=sc.bottom+(cue?0:2))ExitProcess(15);
     }
     const unsigned pcs[]={_PC_24,_PC_53,_PC_64};const unsigned rcs[]={_RC_NEAR,_RC_DOWN,_RC_UP,_RC_CHOP};

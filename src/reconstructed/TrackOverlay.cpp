@@ -63,7 +63,7 @@ extern "C" __declspec(dllimport) int __stdcall TextOutA(void* dc, int x, int y, 
 extern "C" __declspec(dllimport) int __stdcall GetTextExtentPoint32A(void* dc, const char* text, int length,
                                                                      UnknownTextExtent* size);
 extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* text, int length,
-                                                         UnknownOverlayRect* rect, unsigned int format);
+                                                         OverlayRect* rect, unsigned int format);
 extern "C" __declspec(dllimport) void* __stdcall CreatePen(int style, int width, unsigned long color);
 
 // 0x0057513c: the radar zoom level, 1..5.
@@ -90,7 +90,7 @@ InstrumentOverlay::InstrumentOverlay(int flags) : Overlay(flags, 1)
 // render target's size (the layout is for 640x480).
 InstrumentOverlay* InstrumentOverlay::Setup(RenderTarget* target, TextureMapManager* manager, UnknownInstrumentSource* source)
 {
-    UnknownOverlayRect rect;
+    OverlayRect rect;
     char name[260];
     instrumentSource = source;
     strcpy(name, "instr1.tga");
@@ -214,7 +214,7 @@ void InstrumentOverlay::PlaceNeedleTip(UnknownGauge* gauge, TLVertex* vertex)
 }
 
 // 0x00518d50
-UnknownTrackOverlayRect::UnknownTrackOverlayRect()
+TrackOverlayRect::TrackOverlayRect()
 {
     left = 0;
     right = 0;
@@ -223,7 +223,7 @@ UnknownTrackOverlayRect::UnknownTrackOverlayRect()
 }
 
 // 0x00518d60
-UnknownTrackOverlayRect::UnknownTrackOverlayRect(int left, int right, int top, int bottom)
+TrackOverlayRect::TrackOverlayRect(int left, int right, int top, int bottom)
 {
     this->left = left;
     this->right = right;
@@ -263,8 +263,8 @@ NameOverlay::~NameOverlay()
 
 // 0x00518e30
 NameOverlay* NameOverlay::Create(RenderTarget* target, TextureMap* texture,
-                                                const UnknownOverlayRect* rect, int scaleRect,
-                                                const UnknownOverlayRect* source, UnknownEventRacer* racer,
+                                                const OverlayRect* rect, int scaleRect,
+                                                const OverlayRect* source, UnknownEventRacer* racer,
                                                 UnknownNameOverlayWorld* nameWorld, int phase)
 {
     if (!Attach(target, texture, rect, scaleRect, source, 0.00001f, 0, 0, 0, 0, 1555, 0)) {
@@ -349,7 +349,7 @@ int NameOverlay::Render3D()
     if (!trackedRacer) {
         int x = (int)fixedPosition.x;
         int y = (int)fixedPosition.y;
-        screenRect = UnknownMakeOverlayRect(x, y, drawWidth + x - 1, sourceHeight + y);
+        screenRect = MakeOverlayRect(x, y, drawWidth + x - 1, sourceHeight + y);
         Target()->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
         Target()->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         Overlay::Render3D();
@@ -370,7 +370,7 @@ int NameOverlay::Render3D()
             right = drawWidth + left;
         }
         int top = (int)radarAnchor.y;
-        screenRect = UnknownMakeOverlayRect(left, top, right, sourceHeight + top);
+        screenRect = MakeOverlayRect(left, top, right, sourceHeight + top);
         Target()->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
         Target()->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         int alpha = overlayAlpha;
@@ -404,7 +404,7 @@ int NameOverlay::Render3D()
                 &outCode)) {
             int x = (int)screen.x;
             int y = (int)screen.y;
-            screenRect = UnknownMakeOverlayRect(x, y, drawWidth + x, sourceHeight + y);
+            screenRect = MakeOverlayRect(x, y, drawWidth + x, sourceHeight + y);
             Target()->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
             Target()->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
             Overlay::Render3D();
@@ -450,12 +450,12 @@ StatsOverlay::~StatsOverlay()
 // written last, as retail stores them. The source rectangle is written
 // top/bottom first.
 StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* manager, void* camera,
-                                                  UnknownOverlayRect screen)
+                                                  OverlayRect screen)
 {
     const char* font;
     UnknownLogFont logFont;
-    UnknownOverlayRect rect;
-    UnknownOverlayRect source;
+    OverlayRect rect;
+    OverlayRect source;
     char name[260];
     char path[260];
     instrumentSource = (UnknownInstrumentSource*)camera;
@@ -526,13 +526,13 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
     largeFont = CreateFontIndirectA(&logFont);
     logFont.lfHeight = 12;
     smallFont = CreateFontIndirectA(&logFont);
-    rowRects[0] = UnknownTrackOverlayRect(14, 128, 20, 30);
-    rowRects[1] = UnknownTrackOverlayRect(14, 128, 36, 46);
-    rowRects[2] = UnknownTrackOverlayRect(14, 128, 53, 63);
-    rowRects[3] = UnknownTrackOverlayRect(14, 128, 69, 79);
-    rowRects[4] = UnknownTrackOverlayRect(14, 128, 87, 97);
-    rowRects[5] = UnknownTrackOverlayRect(14, 100, 105, 115);
-    rowRects[6] = UnknownTrackOverlayRect(5, 86, 34, 49);
+    rowRects[0] = TrackOverlayRect(14, 128, 20, 30);
+    rowRects[1] = TrackOverlayRect(14, 128, 36, 46);
+    rowRects[2] = TrackOverlayRect(14, 128, 53, 63);
+    rowRects[3] = TrackOverlayRect(14, 128, 69, 79);
+    rowRects[4] = TrackOverlayRect(14, 128, 87, 97);
+    rowRects[5] = TrackOverlayRect(14, 100, 105, 115);
+    rowRects[6] = TrackOverlayRect(5, 86, 34, 49);
     return this;
 }
 
@@ -620,7 +620,7 @@ int StatsOverlay::Render3D()
 void StatsOverlay::DrawTimeLeft()
 {
     char text[0x80];
-    UnknownOverlayRect rect;
+    OverlayRect rect;
     int count;
     TrackGame* game = g_TrackGame;
     if (game->mode.raceSettings.raceMode != 0 && game->mode.raceSettings.raceMode != 4) {
@@ -736,7 +736,7 @@ fail:
 void StatsOverlay::DrawLapTime()
 {
     char text[0x80];
-    UnknownOverlayRect rect;
+    OverlayRect rect;
     int count;
     if (g_TrackGame->playingReplay)
         FormatLapTime(text, statsSource->replayTime);
@@ -1028,7 +1028,7 @@ TextQueueOverlay::~TextQueueOverlay()
 }
 
 // 0x0051b320
-TextQueueOverlay* TextQueueOverlay::Setup(void* target, UnknownOverlayRect rect)
+TextQueueOverlay* TextQueueOverlay::Setup(void* target, OverlayRect rect)
 {
     GameObject::SetRenderContext(target);
     UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
@@ -1176,10 +1176,10 @@ RadarOverlay::~RadarOverlay()
 
 // 0x0051b840
 RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* manager,
-                                                  int a3, UnknownOverlayRect screen)
+                                                  int a3, OverlayRect screen)
 {
     const char* font;
-    UnknownOverlayRect source;
+    OverlayRect source;
     char name[260];
     char path[260];
     largeMap = screen.right > 800;
@@ -1487,10 +1487,10 @@ ChatOverlay::~ChatOverlay()
 // texture, the side panels on wide screens, the pen, two fonts and the
 // thirteen name-tag rectangles.
 ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager, void* camera,
-                                                UnknownOverlayRect screen, UnknownOverlayRect cue)
+                                                OverlayRect screen, OverlayRect cue)
 {
     const char* font;
-    UnknownOverlayRect source;
+    OverlayRect source;
     UnknownLogFont logFont;
     char name[260];
     char path[260];
@@ -1521,7 +1521,7 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
     sprintf(path, "%s\\%s", "Res", "Fonts.res");
     Attach(target, overlayTexture, &chatRect, 0, &source, 0.00001f, 1, path, &font, 1, 4444, 0);
     if (screen.right - screen.left > 512) {
-        UnknownOverlayRect rect = chatRect;
+        OverlayRect rect = chatRect;
         source.left = 3;
         source.top = 69;
         source.right = largeLayout ? 38 : 19;
@@ -1568,19 +1568,19 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
         strcpy(logFont.lfFaceName, "Small Fonts");
     logFont.lfHeight = 10;
     nameTagFont = CreateFontIndirectA(&logFont);
-    nameTagRects[0] = UnknownTrackOverlayRect(0, 0x80, 0x89, 0x93);
-    nameTagRects[1] = UnknownTrackOverlayRect(0x81, 0xff, 0x89, 0x93);
-    nameTagRects[2] = UnknownTrackOverlayRect(0, 0x80, 0x94, 0x9e);
-    nameTagRects[3] = UnknownTrackOverlayRect(0x81, 0xff, 0x94, 0x9e);
-    nameTagRects[4] = UnknownTrackOverlayRect(0, 0x80, 0x9f, 0xa9);
-    nameTagRects[5] = UnknownTrackOverlayRect(0x81, 0xff, 0x9f, 0xa9);
-    nameTagRects[6] = UnknownTrackOverlayRect(0, 0x80, 0xaa, 0xb4);
-    nameTagRects[7] = UnknownTrackOverlayRect(0x81, 0xff, 0xaa, 0xb4);
-    nameTagRects[8] = UnknownTrackOverlayRect(0, 0x80, 0xb5, 0xbf);
-    nameTagRects[9] = UnknownTrackOverlayRect(0x81, 0xff, 0xb5, 0xbf);
-    nameTagRects[10] = UnknownTrackOverlayRect(0, 0x80, 0xc0, 0xca);
-    nameTagRects[11] = UnknownTrackOverlayRect(0x81, 0xff, 0xc0, 0xca);
-    nameTagRects[12] = UnknownTrackOverlayRect(0, 0x80, 0xcb, 0xd5);
+    nameTagRects[0] = TrackOverlayRect(0, 0x80, 0x89, 0x93);
+    nameTagRects[1] = TrackOverlayRect(0x81, 0xff, 0x89, 0x93);
+    nameTagRects[2] = TrackOverlayRect(0, 0x80, 0x94, 0x9e);
+    nameTagRects[3] = TrackOverlayRect(0x81, 0xff, 0x94, 0x9e);
+    nameTagRects[4] = TrackOverlayRect(0, 0x80, 0x9f, 0xa9);
+    nameTagRects[5] = TrackOverlayRect(0x81, 0xff, 0x9f, 0xa9);
+    nameTagRects[6] = TrackOverlayRect(0, 0x80, 0xaa, 0xb4);
+    nameTagRects[7] = TrackOverlayRect(0x81, 0xff, 0xaa, 0xb4);
+    nameTagRects[8] = TrackOverlayRect(0, 0x80, 0xb5, 0xbf);
+    nameTagRects[9] = TrackOverlayRect(0x81, 0xff, 0xb5, 0xbf);
+    nameTagRects[10] = TrackOverlayRect(0, 0x80, 0xc0, 0xca);
+    nameTagRects[11] = TrackOverlayRect(0x81, 0xff, 0xc0, 0xca);
+    nameTagRects[12] = TrackOverlayRect(0, 0x80, 0xcb, 0xd5);
     return this;
 }
 
@@ -1700,7 +1700,7 @@ int ChatOverlay::Tick(float frameTime)
 // 0x0051e240
 int ChatOverlay::RenderPre3D()
 {
-    UnknownOverlayRect rect;
+    OverlayRect rect;
     if (timeSum >= 0.1f) {
         if (inputShown)
             RedrawChat();
@@ -1753,7 +1753,7 @@ int ChatOverlay::RedrawChat()
     int value;
     void* font;
     int rows;
-    UnknownOverlayRect rect;
+    OverlayRect rect;
     char text[0x80];
     RestoreRect(&sourceRect);
     PCTextureMap* texture = (PCTextureMap*)sharedTexture;
@@ -1831,7 +1831,7 @@ void ChatOverlay::CycleNameTagShade()
 // 0x0051e800
 void ChatOverlay::RedrawNameLine()
 {
-    UnknownOverlayRect rect;
+    OverlayRect rect;
     char text[128];
     rect = nameTagRects[racerCount];
     rect.right = nameLineRight;

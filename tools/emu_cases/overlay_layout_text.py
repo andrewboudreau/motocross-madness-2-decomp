@@ -14,7 +14,7 @@ import random
 import struct
 
 RETAIL_VA = 0x0050ba00
-SYMBOL = '?LayoutText@TextService@@QAEPAXPBUUnknownOverlayRect@@PBDIPAH@Z'
+SYMBOL = '?LayoutText@TextService@@QAEPAXPBUOverlayRect@@PBDIPAH@Z'
 SOURCE = 'src/bringup/Group2_OverlayText.cpp'
 PROBES = {0x0050ba67: 'left clamp', 0x0050baeb: 'cell'}
 

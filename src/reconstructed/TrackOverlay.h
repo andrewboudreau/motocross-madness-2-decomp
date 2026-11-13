@@ -14,10 +14,10 @@ class TextureMapManager;
 #include "TextureLoader.h"
 
 // A rectangle built from its two horizontal and two vertical edges
-// (0x00518d50, 0x00518d60). It has the same layout as UnknownOverlayRect.
-struct UnknownTrackOverlayRect : public UnknownOverlayRect {
-    UnknownTrackOverlayRect();                                    // 0x00518d50
-    UnknownTrackOverlayRect(int left, int right, int top, int bottom); // 0x00518d60
+// (0x00518d50, 0x00518d60). It has the same layout as OverlayRect.
+struct TrackOverlayRect : public OverlayRect {
+    TrackOverlayRect();                                    // 0x00518d50
+    TrackOverlayRect(int left, int right, int top, int bottom); // 0x00518d60
 };
 
 // The object InstrumentOverlay+0x184 points to (its +0x3b4 is read the same
@@ -118,8 +118,8 @@ public:
     virtual int Render3D();       // 0x005190e0
 
     NameOverlay* Create(RenderTarget* target, TextureMap* texture,
-                                       const UnknownOverlayRect* rect, int scaleRect,
-                                       const UnknownOverlayRect* source, UnknownEventRacer* racer,
+                                       const OverlayRect* rect, int scaleRect,
+                                       const OverlayRect* source, UnknownEventRacer* racer,
                                        UnknownNameOverlayWorld* nameWorld, int phase); // 0x00518e30
     int IsPointVisible(const Vector3* point);                           // 0x00519000
     void SetFixedPosition(Vector3 point);                // 0x00519080
@@ -178,7 +178,7 @@ public:
     // 0x005194b0 (QuarryStuntEvent.cpp 0x004e0a9c): loads the panel for the
     // screen rectangle `screen`; returns this, or 0.
     StatsOverlay* LoadPanel(RenderTarget* target, TextureMapManager* manager, void* camera,
-                                        UnknownOverlayRect screen);
+                                        OverlayRect screen);
     // 0x00464e80: the shared empty `ret 4` body (QuarryStuntEvent.cpp
     // 0x004de4a3 passes the visual cue index).
     void UnknownFunction464e80(int index);
@@ -196,7 +196,7 @@ public:
     UnknownStatsSource* statsSource;          // SetStatsSource (0x00519880); read when TrackGame+0x3428 is set
     UnknownInstrumentSource* instrumentSource;
     float timeSinceRedraw;                    // seconds since the last redraw
-    UnknownTrackOverlayRect rowRects[8];
+    TrackOverlayRect rowRects[8];
     char drawnRowText[8][0x80];               // +0x1b0 the rows last drawn; a row is redrawn when its text changes
     char rowText[8][0x80];                    // the text drawn into field_0x130[i]
     UnknownTextExtent rowExtent;              // extent of the first row (GetTextExtentPoint32A)
@@ -256,7 +256,7 @@ public:
     // 0x0051b840: loads the map for the screen rectangle `screen` (only its
     // top and right edges are read).
     RadarOverlay* LoadMap(RenderTarget* target, TextureMapManager* manager, int a3,
-                                        UnknownOverlayRect screen);
+                                        OverlayRect screen);
     int TakeRacers(UnknownKrustyBikeView* view, int a2); // 0x0051baf0: collects the racers
     int DrawForViewMode();                    // 0x0051bc60: draws for the view mode
     void DrawFrameRate();                     // 0x0051bdc0: frame-rate readout
@@ -309,10 +309,10 @@ public:
     float mapRadius;                          // map radius, pixels
     int mapCenterX;                           // map centre
     int mapCenterY;
-    UnknownOverlayRect frameRateRect;         // frame-rate text rectangle
+    OverlayRect frameRateRect;         // frame-rate text rectangle
     TLVertex lineStart;           // +0x1b8
     TLVertex lineEnd;             // +0x1d8
-    UnknownOverlayRect mapRect;               // map rectangle
+    OverlayRect mapRect;               // map rectangle
 };
 
 // The race object at TrackGame+0x560 as RadarOverlay's gate drawing reads
@@ -422,7 +422,7 @@ public:
     // 0x0051cf80 (QuarryStuntEvent.cpp 0x004e0965): sets the overlay up for
     // the screen and the cue rectangle; returns this, or 0.
     ChatOverlay* Setup(RenderTarget* target, TextureMapManager* manager, void* camera,
-                                       UnknownOverlayRect screen, UnknownOverlayRect cue);
+                                       OverlayRect screen, OverlayRect cue);
     // 0x0051d730 (QuarryStuntEvent.cpp 0x004e02c7): collects the racers of
     // `view` and gives each a name tag; in view mode 0 one more.
     int CollectRacers(UnknownChatView* view);
@@ -453,8 +453,8 @@ public:
     int largeLayout;                          // the large layout (set by 0x0051cf80)
     int inputShown;                           // input line shown
     UnknownChatInput* chatInput;
-    UnknownOverlayRect chatRect;              // chat rectangle (set by 0x0051cf80)
-    UnknownOverlayRect cueRect;               // cue rectangle; left/top place the extra name tag (0x0051d730)
+    OverlayRect chatRect;              // chat rectangle (set by 0x0051cf80)
+    OverlayRect cueRect;               // cue rectangle; left/top place the extra name tag (0x0051d730)
     int nameLineRight;                        // +0x160 right edge of the drawn cue line (0x0051e800)
     int cueTagShown;                          // +0x164 ShowCueTag's flag
     int nameChanged;                          // name changed
@@ -466,6 +466,6 @@ public:
     float cueSquaredDistance;                 // +0x1d0 drawn as its square root (0x0051e800)
     char cueRacerName[0x104];                 // +0x1d4 SetCueRacer's name
     NameOverlay* nameTags[13];
-    UnknownTrackOverlayRect nameTagRects[13];
+    TrackOverlayRect nameTagRects[13];
     int typingEnabled;                        // +0x3dc typed keys go to the input line; Enter clears it
 };

@@ -8,7 +8,7 @@
 #include "Tgafile.h"
 static BYTE referenceSpace[0x800000]={1};
 struct Surface{DWORD table;int locks,unlocks,held;};
-struct World{BYTE object[0x120],texture[2][0x90],buffers[2][4096],guard[2][4096];Surface surfaces[2];UnknownOverlayRect rect;};
+struct World{BYTE object[0x120],texture[2][0x90],buffers[2][4096],guard[2][4096];Surface surfaces[2];OverlayRect rect;};
 struct Event{int kind,who,flags;BYTE desc[124],out[124];World before,after;};
 struct Result{World state;int result,complete,count;DWORD exception,kind,address;Event events[8];};
 struct Scenario{int format,width,left,top,rows,whole,pitch[2],failMask,nullMask,alias,invalid,guarded,available,mutateAt,mutation,throwAt,unlockStatus;};
@@ -53,7 +53,7 @@ static int MapReference(const char* path){BYTE* mapped=(BYTE*)0x400000;DWORD old
 static int Filter(EXCEPTION_POINTERS*e){if(e->ExceptionRecord->ExceptionCode!=EXCEPTION_ACCESS_VIOLATION&&e->ExceptionRecord->ExceptionCode!=0xe048ab12)return EXCEPTION_CONTINUE_SEARCH;got.exception=e->ExceptionRecord->ExceptionCode;if(got.exception==EXCEPTION_ACCESS_VIOLATION){got.kind=e->ExceptionRecord->ExceptionInformation[0];got.address=e->ExceptionRecord->ExceptionInformation[1];}return EXCEPTION_EXECUTE_HANDLER;}
 static void Setup(){memset(&w,0,sizeof(w));memset(&got,0,sizeof(got));for(int i=0;i<2;i++){At(w.texture[i],0)=(DWORD)textureTable;At(w.texture[i],0x14)=sc.width;At(w.texture[i],0x20)=sc.format;At(w.texture[i],0x70)=(DWORD)&w.surfaces[i];w.surfaces[i].table=(DWORD)surfaceTable;for(int j=0;j<4096;j++){w.buffers[i][j]=(BYTE)(j*13+i*37);guard[i][j]=(BYTE)(j*17+i*29);}}
  At(w.object,0x2c)=(DWORD)w.texture[1];At(w.object,0x30)=(DWORD)w.texture[0];w.rect.left=sc.left;w.rect.top=sc.top;w.rect.right=sc.left+sc.width-(sc.whole?0:1);w.rect.bottom=sc.top+sc.rows;}
-static void Run(int retail){Setup();const UnknownOverlayRect*rect=sc.invalid?(UnknownOverlayRect*)1:&w.rect;if(sc.invalid>=2){rect=(UnknownOverlayRect*)(guard[0]+4096-(sc.invalid-1)*4);memcpy((void*)rect,&w.rect,(sc.invalid-1)*4);}__try{union{int(Overlay::*p)(const UnknownOverlayRect*);DWORD n;}u;if(sizeof(u.p)!=4)ExitProcess(92);u.n=0x4b6710;got.result=retail?(((Overlay*)w.object)->*u.p)(rect):((Overlay*)w.object)->RestoreRect(rect);got.complete=1;}__except(Filter(GetExceptionInformation())){}for(int i=0;i<2;i++)memcpy(w.guard[i],guard[i],4096);got.state=w;}
+static void Run(int retail){Setup();const OverlayRect*rect=sc.invalid?(OverlayRect*)1:&w.rect;if(sc.invalid>=2){rect=(OverlayRect*)(guard[0]+4096-(sc.invalid-1)*4);memcpy((void*)rect,&w.rect,(sc.invalid-1)*4);}__try{union{int(Overlay::*p)(const OverlayRect*);DWORD n;}u;if(sizeof(u.p)!=4)ExitProcess(92);u.n=0x4b6710;got.result=retail?(((Overlay*)w.object)->*u.p)(rect):((Overlay*)w.object)->RestoreRect(rect);got.complete=1;}__except(Filter(GetExceptionInformation())){}for(int i=0;i<2;i++)memcpy(w.guard[i],guard[i],4096);got.state=w;}
 static void Oracle(){
  int bpp=0;switch(sc.format){case 8:bpp=1;break;case 555:case 565:case 1555:case 4444:bpp=2;break;case 888:bpp=3;break;case 8888:bpp=4;break;}
  BYTE expected[4096];for(int i=0;i<4096;i++)expected[i]=(BYTE)(i*13+37);
