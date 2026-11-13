@@ -392,7 +392,7 @@ void KrustyUI::BuildGarageScene(int value) {
         done = 0;
     }
     if (pending && !done && (value == 2 || value == -1)) {
-        UnknownBikeNumberPainter painter(g_TrackGame->textureContext);
+        BikeNumberPainter painter(g_TrackGame->textureContext);
         for (int i = 0; i < manufacturerCount; i++) {
             sprintf(text, "Animations\\UIbike\\%s", KRUSTYUI_MODELS[i].uiModelFile);
             KRUSTYUI_MODELS[i].uiModel = reinterpret_cast<UnknownKrustyUIModelObject*>(new(__FILE__, 0x1b4) D3DIMSoultreeCharacter(0));

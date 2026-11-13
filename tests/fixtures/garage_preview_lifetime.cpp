@@ -9,9 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef char PainterSize[sizeof(UnknownBikeNumberPainter) == 0x2c ? 1 : -1];
-typedef char SheetOffset[offsetof(UnknownBikeNumberPainter, sheet) == 0 ? 1 : -1];
-typedef char WidthOffset[offsetof(UnknownBikeNumberPainter, digitWidths) == 4 ? 1 : -1];
+typedef char PainterSize[sizeof(BikeNumberPainter) == 0x2c ? 1 : -1];
+typedef char SheetOffset[offsetof(BikeNumberPainter, sheet) == 0 ? 1 : -1];
+typedef char WidthOffset[offsetof(BikeNumberPainter, digitWidths) == 4 ? 1 : -1];
 typedef char CharacterSize[sizeof(D3DIMSoultreeCharacter) == 0x240 ? 1 : -1];
 typedef char ModelOffset[offsetof(D3DIMSoultreeCharacter, modelNode) == 0x1a0 ? 1 : -1];
 
@@ -48,7 +48,7 @@ TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int
 void ManagedTexture::Reregister() { exit(12); }
 
 static void ScopedPainter(int unwind) {
-    UnknownBikeNumberPainter painter(expectedManager);
+    BikeNumberPainter painter(expectedManager);
     unsigned expected[11];
     expected[0] = (unsigned)expectedTexture;
     for (int i = 0; i < 10; ++i) expected[i + 1] = i == 1 ? 13 : 19;

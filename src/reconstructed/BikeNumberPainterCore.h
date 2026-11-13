@@ -12,10 +12,10 @@ class D3DIMSoultreeObject;
 //
 // Layout (tier 1 from the constructor 0x00417500): the digit sheet at +0x00
 // and ten digit widths at +0x04 (19 pixels, 13 for the digit 1).
-class UnknownBikeNumberPainter {
+class BikeNumberPainter {
 public:
-    UnknownBikeNumberPainter(TextureMapManager* textures); // 0x00417500
-    ~UnknownBikeNumberPainter();                            // 0x00417570
+    BikeNumberPainter(TextureMapManager* textures); // 0x00417500
+    ~BikeNumberPainter();                            // 0x00417570
     // 0x00417580: copies the digit's 32x32 cell (a 4x3 grid, width from
     // digitWidths) onto `target` at x + 4, y 4.
     void PaintDigit(int digit, int x, PCTextureMap* target);

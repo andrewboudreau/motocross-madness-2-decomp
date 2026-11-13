@@ -7,7 +7,7 @@
 #include "SoultreeMaterial.h" // also declares the loader 0x0050a590
 
 // 0x00417500. Retail stores the widths in this order (+0x08 last).
-UnknownBikeNumberPainter::UnknownBikeNumberPainter(TextureMapManager* textures) {
+BikeNumberPainter::BikeNumberPainter(TextureMapManager* textures) {
     sheet = (PCTextureMap*)TerrainLoadTexture(textures, "BikeNumbers128.tga", 0x115c, 0, 0, 5, 6,
                                                  0, 0x80, 0xff00ff, 1, 1);
     digitWidths[0] = 19;
@@ -23,12 +23,12 @@ UnknownBikeNumberPainter::UnknownBikeNumberPainter(TextureMapManager* textures) 
 }
 
 // 0x00417570
-UnknownBikeNumberPainter::~UnknownBikeNumberPainter() {
+BikeNumberPainter::~BikeNumberPainter() {
     sheet->Release();
 }
 
 // 0x00417580
-void UnknownBikeNumberPainter::PaintDigit(int digit, int x, PCTextureMap* target) {
+void BikeNumberPainter::PaintDigit(int digit, int x, PCTextureMap* target) {
     int row;
     if (digit < 4)
         row = 0;
@@ -67,7 +67,7 @@ void UnknownBikeNumberPainter::PaintDigit(int digit, int x, PCTextureMap* target
 // plate), scales and offsets the texture coordinates of the plate surfaces'
 // vertices with z >= -0.5 to fit them. `number` itself loses its hundreds
 // and tens as they are painted.
-void UnknownBikeNumberPainter::PaintNumber(D3DIMSoultreeObject* model, int number) {
+void BikeNumberPainter::PaintNumber(D3DIMSoultreeObject* model, int number) {
     int digits = 0;
     int plate = 0;
     int hundreds = 0;

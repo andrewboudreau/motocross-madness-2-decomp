@@ -985,7 +985,7 @@ void PCCompleteDlg::HandleEvent(DialogEvent* event)
 // 0x004d71f0
 void PCCentralBikeRiderDlg::PaintPlateNumber(int number)
 {
-    UnknownBikeNumberPainter painter(g_TrackGame->textureContext);
+    BikeNumberPainter painter(g_TrackGame->textureContext);
     for (int i = 0; i < g_TrackGame->ui->manufacturerCount; i++)
         painter.PaintNumber(
             reinterpret_cast<D3DIMSoultreeObject*>(((KrustyUIModelRecord*)g_TrackGame->ui->manufacturers)[i].uiModel->plateTexture), number);

@@ -10,9 +10,9 @@ same declaration and model boundary.
 |---|---:|---:|
 | D3DIMSoultreeCharacter constructor | `0x004455b0` | 195 |
 | Character::AdvanceMotion | `0x004a6bb0` | 1293 |
-| UnknownBikeNumberPainter constructor | `0x00417500` | 97 |
-| UnknownBikeNumberPainter destructor | `0x00417570` | 7 |
-| UnknownBikeNumberPainter::PaintNumber | `0x00417670` | 1157 |
+| BikeNumberPainter constructor | `0x00417500` | 97 |
+| BikeNumberPainter destructor | `0x00417570` | 7 |
+| BikeNumberPainter::PaintNumber | `0x00417670` | 1157 |
 
 No provider body changes. Six unresolved call-view names are replaced by these
 existing definitions; the void-pointer PaintNumber name was shared by three

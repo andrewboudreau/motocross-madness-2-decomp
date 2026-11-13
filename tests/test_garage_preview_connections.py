@@ -24,9 +24,9 @@ SOURCES = tuple('src/reconstructed/' + name + '.cpp' for name in (
     'src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp', 'src/krusty2/motion/Motnctrl.cpp')
 CHARACTER = '??0D3DIMSoultreeCharacter@@QAE@H@Z'
 ADVANCE = '?AdvanceMotion@Character@@QAEHMHH@Z'
-PAINTER = '??0UnknownBikeNumberPainter@@QAE@PAVTextureMapManager@@@Z'
-DESTROY = '??1UnknownBikeNumberPainter@@QAE@XZ'
-PAINT = '?PaintNumber@UnknownBikeNumberPainter@@QAEXPAVD3DIMSoultreeObject@@H@Z'
+PAINTER = '??0BikeNumberPainter@@QAE@PAVTextureMapManager@@@Z'
+DESTROY = '??1BikeNumberPainter@@QAE@XZ'
+PAINT = '?PaintNumber@BikeNumberPainter@@QAEXPAVD3DIMSoultreeObject@@H@Z'
 PROVIDERS = ((CHARACTER, 0x4455b0, 195, SOURCES[7]), (ADVANCE, 0x4a6bb0, 1293, SOURCES[8]),
              (PAINTER, 0x417500, 97, SOURCES[5]), (DESTROY, 0x417570, 7, SOURCES[5]),
              (PAINT, 0x417670, 1157, SOURCES[5]))
@@ -131,7 +131,7 @@ class GaragePreviewConnectionsTests(unittest.TestCase):
                     required |= {CHARACTER, ADVANCE}
                 self.assertTrue(required <= imports, (source, required - imports))
                 self.assertFalse(any('UnknownKrustyUIPlatePainter' in s or 'AdvanceMotion@UnknownKrustyUICharacter' in s
-                                     or '??0UnknownKrustyUICharacter' in s or s == '?PaintNumber@UnknownBikeNumberPainter@@QAEXPAXH@Z'
+                                     or '??0UnknownKrustyUICharacter' in s or s == '?PaintNumber@BikeNumberPainter@@QAEXPAXH@Z'
                                      for s in imports), source)
             cases = [(c['source'], c['symbol'], int(c['target_va'], 0), c['target_size'], ROOT / c['bindings'])
                      for c in CASES if c['source'] in SOURCES]
