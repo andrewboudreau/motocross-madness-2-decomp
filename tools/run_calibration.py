@@ -26029,13 +26029,13 @@ CASES = [
         'reason': 'window procedure: two byte-indexed jump tables (messages, SC_* commands) inside the extent',
     },
     {
-        'name': 'FollowRacer.cpp 0x4a9aa0 UnknownBikeRaceGhost::ApplyReplayDelta',
+        'name': 'FollowRacer.cpp 0x4a9aa0 TagBall::ApplyReplayDelta',
         'bindings': 'src/reconstructed/FollowRacer.bindings.json',
         'source': 'src/reconstructed/FollowRacer.cpp',
-        'symbol': '?ApplyReplayDelta@UnknownBikeRaceGhost@@QAEXPBUUnknownBikeRaceGhostDelta@@PAUUnknownBikeRaceGhostPart@@@Z',
+        'symbol': '?ApplyReplayDelta@TagBall@@QAEXPBUTagBallStateDelta@@PAUTagBallReceivedState@@@Z',
         'target_va': '0x004a9aa0',
         'target_size': 617,
-        'reason': 'applies a kind-0x10 replay delta (scaled byte triples, halved step) to the ghost and copies its state into the part',
+        'reason': 'applies a kind-0x10 replay delta (scaled byte triples, halved step) to the tag ball and copies its state into the part',
     },
     {
         'name': 'FollowRacer.cpp 0x4a9d10 UnknownTrackGameViewOwnerDc::SetRecorder',

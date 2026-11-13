@@ -1492,9 +1492,9 @@ void BikeRace::ResetStartCountdown() {
     }
 }
 
-// Inline: TrackGame+0x568's ghost bike, reloaded at each use.
-static inline UnknownBikeRaceGhost* GhostBike() {
-    return (UnknownBikeRaceGhost*)g_TrackGame->tagEvent->ball;
+// Inline: TrackGame+0x568's tag ball, reloaded at each use.
+static inline TagBall* Ball() {
+    return (TagBall*)g_TrackGame->tagEvent->ball;
 }
 
 // 0x00421d50
@@ -1790,36 +1790,36 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
             }
         }
     } else if (kind == 0x11) {
-        UnknownBikeRaceGhostRecord* record = (UnknownBikeRaceGhostRecord*)data;
+        TagBallState* record = (TagBallState*)data;
         if (g_TrackGame->tagEvent != 0 && g_TrackGame->tagEvent->ball != 0) {
-            GhostBike()->hasState = 1;
-            UnknownBikeRaceGhostPart* oldest = GhostBike()->receivedStates[3];
-            GhostBike()->receivedStates[3] = GhostBike()->receivedStates[2];
-            GhostBike()->receivedStates[2] = GhostBike()->receivedStates[1];
-            GhostBike()->receivedStates[1] = GhostBike()->receivedStates[0];
-            GhostBike()->receivedStates[0] = oldest;
-            GhostBike()->receivedStates[0]->recordTime = time;
-            GhostBike()->receivedStates[0]->record = *record;
-            GhostBike()->receivedStates[0]->record.runningTime = (int)(s_UnknownStatic578e8c * 1000.0f);
-            GhostBike()->receivedStates[0]->fresh = 1;
-            GhostBike()->velocity = record->velocity;
-            GhostBike()->position = record->position;
-            GhostBike()->angularVelocity = record->angularVelocity;
-            GhostBike()->roll = record->roll;
-            GhostBike()->pitch = record->pitch;
-            GhostBike()->yaw = record->yaw;
-            GhostBike()->runningTime = replayMode == 11 ? time : record->runningTime;
+            Ball()->hasState = 1;
+            TagBallReceivedState* oldest = Ball()->receivedStates[3];
+            Ball()->receivedStates[3] = Ball()->receivedStates[2];
+            Ball()->receivedStates[2] = Ball()->receivedStates[1];
+            Ball()->receivedStates[1] = Ball()->receivedStates[0];
+            Ball()->receivedStates[0] = oldest;
+            Ball()->receivedStates[0]->recordTime = time;
+            Ball()->receivedStates[0]->record = *record;
+            Ball()->receivedStates[0]->record.runningTime = (int)(s_UnknownStatic578e8c * 1000.0f);
+            Ball()->receivedStates[0]->fresh = 1;
+            Ball()->velocity = record->velocity;
+            Ball()->position = record->position;
+            Ball()->angularVelocity = record->angularVelocity;
+            Ball()->roll = record->roll;
+            Ball()->pitch = record->pitch;
+            Ball()->yaw = record->yaw;
+            Ball()->runningTime = replayMode == 11 ? time : record->runningTime;
             *keep = 1;
             if (replayMode == 11) {
-                GhostBike()->receivedStates[1]->record = GhostBike()->receivedStates[0]->record;
-                GhostBike()->receivedStates[2]->record = GhostBike()->receivedStates[1]->record;
-                GhostBike()->receivedStates[3]->record = GhostBike()->receivedStates[2]->record;
-                GhostBike()->receivedStates[1]->recordTime = GhostBike()->receivedStates[0]->recordTime;
-                GhostBike()->receivedStates[2]->recordTime = GhostBike()->receivedStates[1]->recordTime;
-                GhostBike()->receivedStates[3]->recordTime = GhostBike()->receivedStates[2]->recordTime;
-                GhostBike()->receivedStates[1]->fresh = 1;
-                GhostBike()->receivedStates[2]->fresh = 1;
-                GhostBike()->receivedStates[3]->fresh = 1;
+                Ball()->receivedStates[1]->record = Ball()->receivedStates[0]->record;
+                Ball()->receivedStates[2]->record = Ball()->receivedStates[1]->record;
+                Ball()->receivedStates[3]->record = Ball()->receivedStates[2]->record;
+                Ball()->receivedStates[1]->recordTime = Ball()->receivedStates[0]->recordTime;
+                Ball()->receivedStates[2]->recordTime = Ball()->receivedStates[1]->recordTime;
+                Ball()->receivedStates[3]->recordTime = Ball()->receivedStates[2]->recordTime;
+                Ball()->receivedStates[1]->fresh = 1;
+                Ball()->receivedStates[2]->fresh = 1;
+                Ball()->receivedStates[3]->fresh = 1;
                 return 11;
             }
             return 1;
@@ -1829,17 +1829,17 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
             return 1;
         }
         if (g_TrackGame->tagEvent != 0 && g_TrackGame->tagEvent->ball != 0 &&
-            GhostBike()->hasState) {
-            UnknownBikeRaceGhostPart* oldest = GhostBike()->receivedStates[3];
-            GhostBike()->receivedStates[3] = GhostBike()->receivedStates[2];
-            GhostBike()->receivedStates[2] = GhostBike()->receivedStates[1];
-            GhostBike()->receivedStates[1] = GhostBike()->receivedStates[0];
-            GhostBike()->receivedStates[0] = oldest;
-            GhostBike()->receivedStates[0]->recordTime = time;
-            GhostBike()->ApplyReplayDelta((UnknownBikeRaceGhostDelta*)data,
-                                                          GhostBike()->receivedStates[0]);
-            GhostBike()->receivedStates[0]->record.runningTime = (int)(s_UnknownStatic578e8c * 1000.0f);
-            GhostBike()->receivedStates[0]->fresh = 0;
+            Ball()->hasState) {
+            TagBallReceivedState* oldest = Ball()->receivedStates[3];
+            Ball()->receivedStates[3] = Ball()->receivedStates[2];
+            Ball()->receivedStates[2] = Ball()->receivedStates[1];
+            Ball()->receivedStates[1] = Ball()->receivedStates[0];
+            Ball()->receivedStates[0] = oldest;
+            Ball()->receivedStates[0]->recordTime = time;
+            Ball()->ApplyReplayDelta((TagBallStateDelta*)data,
+                                                          Ball()->receivedStates[0]);
+            Ball()->receivedStates[0]->record.runningTime = (int)(s_UnknownStatic578e8c * 1000.0f);
+            Ball()->receivedStates[0]->fresh = 0;
             return 1;
         }
     } else if (kind == 0x87) {

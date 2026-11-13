@@ -135,12 +135,13 @@ Facts the two functions establish:
 Field names in `BikeRace.h` come from the evidence each declaration's
 comment records (literal keys such as "RPMLowerLimit" and "Weight", the
 callers' data flow, network message fields); every renamed field keeps its
-`// +0xNN` offset. The renames changed no calibration bytes. The ghost
-record and ghost fields FollowRacer.cpp (race lane) shares (`timeStep`,
+`// +0xNN` offset. The renames changed no calibration bytes. The tag ball's
+state record and fields FollowRacer.cpp (race lane) shares (`timeStep`,
 `position`, `runningTime`), the racer's `startPosition` and
-`receivedStates` (+0x11c8, each a received `state`) and the ghost's
+`receivedStates` (+0x11c8, each a received `state`) and the ball's
 `receivedStates` (+0x4fc, each holding a `record`) were renamed with it;
-the inline accessor for TrackGame+0x568's ghost is `GhostBike()`.
+the inline accessor for the Tag event's ball (TrackGame+0x568, then +0xdc) is
+`Ball()`; Wave 13 in NAMING.md renamed the type from UnknownBikeRaceGhost to `TagBall`.
 BikeRace's `lodDebugPage` (+0x0a8) is the debug overlay page the
 "Soultree LOD" readout gets from `NewPage`, and `chatOverlay` (+0x19c) the
 mode's chat overlay (its methods are ChatOverlay's `0x0051dce0`..`0x0051dd70`).

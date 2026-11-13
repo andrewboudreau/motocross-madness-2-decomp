@@ -1,4 +1,4 @@
-# FollowRacer (followed-racer and ghost helpers)
+# FollowRacer (followed-racer and tag ball helpers)
 
 Canonical reconstruction: `src/reconstructed/FollowRacer.*` (3 exact). The
 two remaining functions are near misses in
@@ -13,8 +13,8 @@ functions, all `thiscall`:
 
 | VA | Size | Owner (object) | State |
 | --- | --- | --- | --- |
-| `0x004a9aa0` | 617 | ghost bike (TrackGameViewOwner+0xdc) | exact |
-| `0x004a9d10` | 13 | ghost bike | exact |
+| `0x004a9aa0` | 617 | tag ball (TrackGameViewOwner+0xdc) | exact |
+| `0x004a9d10` | 13 | tag ball | exact |
 | `0x004a9d20` | 340 | TrackGameViewOwner | near miss, 20% |
 | `0x004a9e80` | 272 | TrackGameViewOwner | near miss, 95% |
 | `0x004a9f90` | 113 | TrackGameViewOwner | exact |
@@ -28,14 +28,14 @@ provisional (proximity only).
 
 ## Behaviour (decoded)
 
-- `0x004a9aa0` (`ApplyReplayDelta`, provisional name) takes a kind-0x10 replay delta (`UnknownBikeRaceGhostDelta`:
-  a kind byte, four signed byte triples and a step byte) and a ghost part.
-  Two triples scale by 0.234375 (`0x00554714`) into the position-like
-  vectors at +0x5d4/+0x5e0, two by 3.14159f / 64 = 0.0490873456 (`0x0055534c`,
+- `0x004a9aa0` (`ApplyReplayDelta`, provisional name) takes a kind-0x10 replay delta (`TagBallStateDelta`:
+  a kind byte, four signed byte triples and a step byte) and a received state.
+  Two triples scale by 0.234375 (`0x00554714`) into the velocity and
+  position at +0x5d4/+0x5e0, two by 3.14159f / 64 = 0.0490873456 (`0x0055534c`,
   slightly below the correctly rounded pi/64 KrustyBike uses) into
   +0x5ec and the three scalars +0x5f8/+0x5fc/+0x600. The step byte is
   halved; an odd step byte means the half is in units of eight. The step is
-  stored in the part's `field_0x02`, accumulated into +0x604, and the whole
+  stored in the part's `timeStep`, accumulated into +0x604, and the whole
   state is copied into the part. It has the shape of KrustyBike.cpp
   `0x004933e0`.
 - `0x004a9d10` stores the `KrustyVCR*` at +0x708.
@@ -48,7 +48,7 @@ provisional (proximity only).
 - `0x004a9e80` switches the followed racer: the previous racer banks its
   run (+0x75c into +0x764, the best of +0x75c/+0x760 into +0x760), both
   racers receive their own virtual slot 50 call `(1, 5.0f, 0)`, every other
-  racer hears about the change (`0x004a9f90`), the ghost's +0x10a flag is
+  racer hears about the change (`0x004a9f90`), the ball's +0x10a flag is
   cleared, +0xac restarts at 5.0 and the view's own racer taking over from
   someone else scores 2500 through the score board at race view +0xbc.
 - `0x004a9f90` loops the race view's racer iterator (`0x004204e0`) and
@@ -88,9 +88,9 @@ PYTHONPATH=. python tools/run_calibration.py --exe work/game/mcm2.exe --compiler
 The five cases are the `FollowRacer.cpp` and `FollowRacerNearMisses.cpp`
 entries. Shared headers touched for this unit: `RaceView.h`
 (`SendFollowedRacer`/`IgnoreCollisionsWith`, `UnknownScoreBoard`, race
-view +0xbc), `TrackGame.h` (ghost fields +0x10a/+0x708, the method
+view +0xbc), `TrackGame.h` (ball fields +0x10a/+0x708, the method
 declarations, view owner +0xac as an int/float union) and `BikeRace.h`
-(`UnknownBikeRaceGhostDelta`, `UnknownBikeRaceVcrFollow`, the ghost record's
+(`TagBallStateDelta`, `UnknownBikeRaceVcrFollow`, the ball state's
 float fields). The racer's slot 50 is viewed by a struct local to the
 near-miss sample: 50 placeholder slots in `RaceView.h` flipped a register
 choice in TrackGame slot 1 (`0x00520ab0`, header-content chaos; removing

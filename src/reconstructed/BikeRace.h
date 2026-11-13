@@ -728,36 +728,36 @@ struct UnknownBikeRaceVcrTick {
     int tickCount;                            // +0x04 ticks recorded so far
 };
 
-// Record kind 0x11: the ghost's state (0x3c bytes). Kind 0x10's deltas
-// (UnknownBikeRaceGhostDelta) accumulate into the ghost's copy of it.
-struct UnknownBikeRaceGhostRecord {
-    short field_0x00;
+// Record kind 0x11: the tag ball's state (0x3c bytes). Kind 0x10's deltas
+// (TagBallStateDelta) accumulate into the ball's copy of it.
+struct TagBallState {
+    short header;                             // +0x00 the message header: SendRaw (0x004ad280) writes the type byte here
     unsigned short timeStep;                  // +0x02 time step (0x004a9aa0)
-    Vector3 position;                         // +0x04  ghost +0x5e0; delta1, which KrustyBike 0x004933e0 adds to deltaBasePosition. Tier 3
-    float roll;                               // +0x10  ghost +0x5f8; delta3[0] x pi/64, as KrustyBike's deltaBaseRoll (0x004933e0). Tier 3
-    float pitch;                              // +0x14  ghost +0x5fc; delta3[1], as KrustyBike's deltaBasePitch. Tier 3
-    float yaw;                                // +0x18  ghost +0x600; delta3[2], as KrustyBike's deltaBaseYaw. Tier 3
-    Vector3 angularVelocity;                  // +0x1C  ghost +0x5ec; delta2 x pi/64, as KrustyBike's deltaBaseAngularVelocity. Tier 3
-    Vector3 velocity;                         // +0x28  ghost +0x5d4; delta0, which KrustyBike 0x004933e0 adds to deltaBaseVelocity. Tier 3
-    int runningTime;                          // +0x34 ghost +0x604
+    Vector3 position;                         // +0x04  ball +0x5e0; the delta's position, which KrustyBike 0x004933e0 adds to deltaBasePosition. Tier 3
+    float roll;                               // +0x10  ball +0x5f8; angles[0] x pi/64, as KrustyBike's deltaBaseRoll (0x004933e0). Tier 3
+    float pitch;                              // +0x14  ball +0x5fc; angles[1], as KrustyBike's deltaBasePitch. Tier 3
+    float yaw;                                // +0x18  ball +0x600; angles[2], as KrustyBike's deltaBaseYaw. Tier 3
+    Vector3 angularVelocity;                  // +0x1C  ball +0x5ec; angularVelocity x pi/64, as KrustyBike's deltaBaseAngularVelocity. Tier 3
+    Vector3 velocity;                         // +0x28  ball +0x5d4; the delta's velocity, which KrustyBike 0x004933e0 adds to deltaBaseVelocity. Tier 3
+    int runningTime;                          // +0x34 ball +0x604
     int field_0x38;
 };
 
 // Record kind 0x10: byte deltas of the ghost's state, 15/64 per unit for the
 // vectors at +0x01 and +0x0b and pi/64 for the rest (the same layout as the
 // network message 13 that KrustyBike.cpp's 0x004933e0 applies).
-struct UnknownBikeRaceGhostDelta {
-    char field_0x00;
-    signed char delta1[3];                    // +0x01 x 15/64 -> ghost +0x5e0
+struct TagBallStateDelta {
+    char type;                                // +0x00 the message type byte (as KbNetDelta::type)
+    signed char position[3];                  // +0x01 x 15/64 -> ball +0x5e0
     unsigned char step;                       // +0x04 bit 0: units of 8, bits 1-7: count
-    signed char delta3[3];                    // +0x05 x pi/64 -> ghost +0x5f8..+0x600
-    signed char delta2[3];                    // +0x08 x pi/64 -> ghost +0x5ec
-    signed char delta0[3];                    // +0x0b x 15/64 -> ghost +0x5d4
+    signed char angles[3];                    // +0x05 roll, pitch, yaw x pi/64 -> ball +0x5f8..+0x600
+    signed char angularVelocity[3];           // +0x08 x pi/64 -> ball +0x5ec
+    signed char velocity[3];                  // +0x0b x 15/64 -> ball +0x5d4
 };
 
-// One of the ghost's four received states (newest first).
-struct UnknownBikeRaceGhostPart {
-    UnknownBikeRaceGhostRecord record;        // +0x00 the kind 0x11 record
+// One of the ball's four received states (newest first).
+struct TagBallReceivedState {
+    TagBallState record;                      // +0x00 the kind 0x11 record
     int recordTime;                           // +0x3c the record's time
     int fresh;                                // +0x40 fresh
 };
@@ -772,19 +772,19 @@ struct UnknownBikeRaceVcrFollow {
 
 // TrackGame+0x568's +0xdc object as the replay recorder callback reaches it
 // (TrackGame.h keeps the type for 0x004a9d10's symbol): the ghost bike.
-class UnknownBikeRaceGhost {
+class TagBall {
 public:
     // 0x004a9aa0 (FollowRacer.cpp): applies record kind 0x10 to a state (as
     // 0x004933e0).
-    void ApplyReplayDelta(const UnknownBikeRaceGhostDelta* delta, UnknownBikeRaceGhostPart* part);
+    void ApplyReplayDelta(const TagBallStateDelta* delta, TagBallReceivedState* part);
 
     unsigned char field_0x000[0x4f8];
     int hasState;                             // +0x4f8 has a state
-    UnknownBikeRaceGhostPart* receivedStates[4]; // +0x4fc newest first (0x00421d50 rotates them)
+    TagBallReceivedState* receivedStates[4];  // +0x4fc newest first (0x00421d50 rotates them)
     unsigned char field_0x50c[0x5d4 - 0x50c];
-    Vector3 velocity;                         // +0x5D4  record +0x28 (see UnknownBikeRaceGhostRecord). Tier 3
+    Vector3 velocity;                         // +0x5D4  record +0x28 (see TagBallState). Tier 3
     Vector3 position;                         // +0x5E0  record +0x04. Tier 3
-    Vector3 angularVelocity;                  // +0x5EC  record +0x1c (see UnknownBikeRaceGhostRecord). Tier 3
+    Vector3 angularVelocity;                  // +0x5EC  record +0x1c (see TagBallState). Tier 3
     float roll;                               // +0x5F8  record +0x10. Tier 3
     float pitch;                              // +0x5FC  record +0x14. Tier 3
     float yaw;                                // +0x600  record +0x18. Tier 3

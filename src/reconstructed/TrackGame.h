@@ -32,8 +32,8 @@ struct UnknownTrackGameViewPart {
 };
 
 // The object at TrackGameViewOwner+0xdc: bikerace.cpp 0x00420650 passes it
-// the new replay recorder (0x004a9d10). It is the ghost bike BikeRace.h
-// declares as UnknownBikeRaceGhost (FollowRacer.cpp implements both views).
+// the new replay recorder (0x004a9d10). It is the tag ball BikeRace.h
+// declares as TagBall (FollowRacer.cpp implements both views).
 class KrustyVCR;
 class UnknownTrackGameViewOwnerDc {
 public:
@@ -103,7 +103,7 @@ struct TrackGameViewOwner : public GameObject {
     int lapGate;  // +0xB0  picked gate: bikerace/KrustyBike pass the racer's lapGate (0x00404df0)
     int nextLapGate;  // +0xB4  picked gate: the racer's nextLapGate = (lapGate + 1) % count (0x00404df0)
     unsigned char field_0xb8[0xdc - 0xb8];
-    UnknownTrackGameViewOwnerDc* ball;        // +0xdc string 0x14b7 "FREE BALL!" while set and no racer "is IT!" (StatsOverlay 0x0051aa40); BikeRace.cpp reads it as a ghost bike
+    UnknownTrackGameViewOwnerDc* ball;        // +0xdc string 0x14b7 "FREE BALL!" while set and no racer "is IT!" (StatsOverlay 0x0051aa40); BikeRace.cpp reads it as TagBall
     unsigned char field_0xe0[0x420 - 0xe0];
     UnknownTrackGameViewEntry* gates[1];  // +0x420  BikeRace 0x0041d170 builds gateList from the first +0xac entries
 };

@@ -1,7 +1,7 @@
-// Followed-racer and ghost helpers, 0x004a9aa0..0x004aa001 (provisional file
+// Followed-racer and tag ball helpers, 0x004a9aa0..0x004aa001 (provisional file
 // name; no __FILE__ or RTTI). The run sits between Motnctrl.cpp (last xref
 // 0x004a9a87) and MSZoneInterface.cpp (first xref 0x004aa36c). Two views of
-// the race view owner's objects are implemented here: the ghost bike at
+// the race view owner's objects are implemented here: the tag ball at
 // TrackGameViewOwner+0xdc (BikeRace.cpp 0x00422dec applies replay deltas
 // through 0x004a9aa0; 0x00420a91 hands it the recorder) and the owner itself
 // (DlgProcs.cpp 0x0042062a/0x004527ef pick the followed racer; KrustyBike.cpp
@@ -17,20 +17,20 @@
 // 0x004933e0 uses; the spelling is inferred from the bits.
 #define GHOST_ANGLE_STEP (3.14159f / 64.0f)
 
-// 0x004a9aa0: applies a kind-0x10 replay delta to the ghost's state and
+// 0x004a9aa0: applies a kind-0x10 replay delta to the ball's state and
 // copies the state into `part` (the same shape as KrustyBike.cpp 0x004933e0).
-void UnknownBikeRaceGhost::ApplyReplayDelta(const UnknownBikeRaceGhostDelta* delta,
-                                                 UnknownBikeRaceGhostPart* part)
+void TagBall::ApplyReplayDelta(const TagBallStateDelta* delta,
+                               TagBallReceivedState* part)
 {
-    Vector3 d0(delta->delta0[0] * 0.234375f, delta->delta0[1] * 0.234375f, delta->delta0[2] * 0.234375f);
-    Vector3 d1(delta->delta1[0] * 0.234375f, delta->delta1[1] * 0.234375f, delta->delta1[2] * 0.234375f);
-    Vector3 d2(delta->delta2[0] * GHOST_ANGLE_STEP, delta->delta2[1] * GHOST_ANGLE_STEP, delta->delta2[2] * GHOST_ANGLE_STEP);
+    Vector3 d0(delta->velocity[0] * 0.234375f, delta->velocity[1] * 0.234375f, delta->velocity[2] * 0.234375f);
+    Vector3 d1(delta->position[0] * 0.234375f, delta->position[1] * 0.234375f, delta->position[2] * 0.234375f);
+    Vector3 d2(delta->angularVelocity[0] * GHOST_ANGLE_STEP, delta->angularVelocity[1] * GHOST_ANGLE_STEP, delta->angularVelocity[2] * GHOST_ANGLE_STEP);
     velocity += d0;
     position += d1;
     angularVelocity += d2;
-    roll += delta->delta3[0] * GHOST_ANGLE_STEP;
-    pitch += delta->delta3[1] * GHOST_ANGLE_STEP;
-    yaw += delta->delta3[2] * GHOST_ANGLE_STEP;
+    roll += delta->angles[0] * GHOST_ANGLE_STEP;
+    pitch += delta->angles[1] * GHOST_ANGLE_STEP;
+    yaw += delta->angles[2] * GHOST_ANGLE_STEP;
     int step;
     if (delta->step & 1)
         step = (delta->step >> 1) * 8;
