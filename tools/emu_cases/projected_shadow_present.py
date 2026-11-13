@@ -9,7 +9,7 @@ edges, so the halved rectangle and the cleared tail (oldRight - right) and rows 
 bottom) vary. The map starts on 4- or 2-byte alignment, which picks the leading short of the
 Duff's-device fill. For formatA 9 the texels are drawn from colorKeyLow, shadowPixel and random
 values, so every one of the five sum compares (key*4, alpha*4, the two mixes, else) is taken.
-The early returns (surfaceFormat 0x613, field_0x98 zero) are covered too. Compared: every byte
+The early returns (surfaceFormat 0x613, downsampleOnPresent zero) are covered too. Compared: every byte
 of the map and the clip rectangle, heightMap and the lock/unlock calls.
 """
 import struct

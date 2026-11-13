@@ -148,7 +148,7 @@ int D3DIMSoultreeShadow::UnknownVirtualSlot28()
 {
     ProjectedShadow* projected = shadow;
     float numerator;
-    if (projected->field_0x98)
+    if (projected->downsampleOnPresent)
         numerator = 0.5f;
     else
         numerator = 1.0f;

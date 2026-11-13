@@ -46,7 +46,7 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
         surfaceFormat = 0x115c;
     } else if (Host()->IsFormatSupported(0x613) && (Host()->capsC & 0x2000)) {
         surfaceFormat = 0x613;
-        field_0x98 = 0;
+        downsampleOnPresent = 0;
     } else {
         Release();
         return 0;
@@ -410,7 +410,7 @@ void ProjectedShadow::RenderShadow()
             }
             vertexBase += count;
         }
-        if (casters[c]->field_0x27c != -1)
+        if (casters[c]->currentLod != -1)
             casters[c]->ReleaseParts();
     }
     texture->UnlockPixels(0);
@@ -432,7 +432,7 @@ void ProjectedShadow::Present()
 {
     if (surfaceFormat == 0x613)
         return;
-    if (!field_0x98)
+    if (!downsampleOnPresent)
         return;
 
     heightMap = texture->LockPixels(0, 0, 0);

@@ -35,7 +35,7 @@ void* DebugRealloc(void* old, unsigned int size, const char* file, int line) {
     CHECK(file && *file); reallocations++; lastSize = size; lastLine = line;
     void* p = realloc(old, size ? size : 1); CHECK(p != 0); return p;
 }
-int ShadowCaster::GetVertexCount() { vertexCalls++; return field_0x27c; }
+int ShadowCaster::GetVertexCount() { vertexCalls++; return currentLod; }
 void ShadowCameraProxy::SetLookAt(const ShadowVec3* position, int a, int b, int c, float* fov) {
     CHECK(a == 0 && b == 0 && c == 0 && fov == 0);
     lookCalls++; lookPosition = position; lookReceiver = this;
@@ -129,7 +129,7 @@ int main() {
         int total = 0;
         for (int k = 0; k < 3; k++) {
             ShadowCaster* c = reinterpret_cast<ShadowCaster*>(casterWords[k]);
-            c->field_0x27c = seed % 7 + k; total += c->field_0x27c;
+            c->currentLod = seed % 7 + k; total += c->currentLod;
             memcpy(expected, s, sizeof(*s));
             s->AddCaster(c);
             CHECK(s->casterCount == k + 1 && s->casterCapacity == k + 1);

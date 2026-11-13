@@ -241,7 +241,7 @@ public:
     char pad_0x138[0x1a4 - 0x138];
     void* mesh;                                  // +0x1a4 tested non-null by 0x004dc2b0 before the part loop
     char pad_0x1a8[0x27c - 0x1a8];
-    int field_0x27c;                             // +0x27c compared with -1 by 0x004db8c0 before calling 0x004fdab0
+    int currentLod;                              // +0x27c D3DIMSoulTree.h's name at this offset; compared with -1 by 0x004db8c0 before calling 0x004fdab0. Tier 2
     void ReleaseParts();                         // 0x004fdab0 (tier 3 name)
 };
 
@@ -320,7 +320,7 @@ public:
     float minDepth;               // +0x90 0x004db8c0 resets it to FLT_MAX, then keeps the smallest projected z
     short shadowPixel;            // +0x94 texel value RenderShadow rasterises the casters with: SetShadowStrength's quantised alpha (0x8000 outside 4444)
     char pad_0x96[2];
-    int field_0x98;               // +0x98 ctor 1
+    int downsampleOnPresent;      // +0x98 ctor 1, Init clears it for format 0x613; Present (0x004dbd30) only box-filters 2x2 when set, and the receivers then use 0.5 / size texels. Tier 2
     int formatA;                  // +0x9c Init selects 9/5/1/0xc from the device caps
     int formatB;                  // +0xa0
     int vertexCapacity;           // +0xa4 allocated vertex count of the buffer at +0xa8

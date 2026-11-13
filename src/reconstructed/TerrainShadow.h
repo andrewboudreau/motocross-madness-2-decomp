@@ -45,13 +45,13 @@ public:
     int maxX;                      // +0x665c ctor 0x80000000
     int minZ;                      // +0x6660 ctor 0x7fffffff
     int maxZ;                      // +0x6664 ctor 0x80000000
-    float field_0x6668;            // +0x6668 ctor FLT_MAX
-    float field_0x666c;            // +0x666c ctor -FLT_MAX
-    float field_0x6670;            // +0x6670 ctor FLT_MAX
-    float field_0x6674;            // +0x6674 ctor -FLT_MAX
+    float screenMinX;              // +0x6668 ctor FLT_MAX; slot 27 keeps the smallest projected hit x. Tier 2
+    float screenMaxX;              // +0x666c ctor -FLT_MAX; largest projected x (compared with the viewer width)
+    float screenMinY;              // +0x6670 ctor FLT_MAX; smallest projected y
+    float screenMaxY;              // +0x6674 ctor -FLT_MAX; largest projected y (compared with the viewer height)
     int cellCount;                 // +0x6678 ctor 0; slot 29 count of keys in cellKeys
     void* cellKeys[0x40];          // +0x667c slot 29 de-duplicated cell keys (0x40 entries to +0x677c)
-    float field_0x677c;            // +0x677c ctor 0.0078125 (1/128)
+    float texelSize;               // +0x677c ctor 0.0078125 (1/128); slot 28 sets texelScale / texture size (as D3DIMSoultreeShadow's g_d3dimShadowTexel), slot 30 scales tu/tv by it. Tier 2
 };
 
 #endif

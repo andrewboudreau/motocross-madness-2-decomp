@@ -47,7 +47,7 @@ ProjectedShadow::ProjectedShadow(int flags)
     field_0x5c = 0;
     memset(&clipRect, 0, sizeof(clipRect));
     mode = 1;
-    field_0x98 = 1;
+    downsampleOnPresent = 1;
     updateThisFrame = 1;
     updatePeriod = 1;
     sizeShift = 0;

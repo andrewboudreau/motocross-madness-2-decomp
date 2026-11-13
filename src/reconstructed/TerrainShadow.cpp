@@ -21,12 +21,12 @@ TerrainShadow::TerrainShadow(int flags)
     maxX = 0x80000000;
     minZ = 0x7fffffff;
     maxZ = 0x80000000;
-    field_0x6668 = 3.4028235e38f;
-    field_0x666c = -3.4028235e38f;
-    field_0x6670 = 3.4028235e38f;
-    field_0x6674 = -3.4028235e38f;
+    screenMinX = 3.4028235e38f;
+    screenMaxX = -3.4028235e38f;
+    screenMinY = 3.4028235e38f;
+    screenMaxY = -3.4028235e38f;
     cellCount = 0;
-    field_0x677c = 0.0078125f;
+    texelSize = 0.0078125f;
 }
 
 // 0x00508b80 (ret 0xc).

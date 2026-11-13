@@ -39,13 +39,13 @@ ShadowMatrix* TerrainMatrixMultiplyInto(ShadowMatrix* out, ShadowMatrix a, Shado
 int TerrainShadow::UnknownVirtualSlot28()
 {
     float texelScale;
-    if (shadow->field_0x98)
+    if (shadow->downsampleOnPresent)
         texelScale = 0.5f;
     else
         texelScale = 1.0f;
-    field_0x677c = texelScale / shadow->texture->size;
-    float extentX = field_0x666c - field_0x6668;
-    float extentZ = field_0x6674 - field_0x6670;
+    texelSize = texelScale / shadow->texture->size;
+    float extentX = screenMaxX - screenMinX;
+    float extentZ = screenMaxY - screenMinY;
     float extent;
     if (extentX > extentZ)
         extent = extentX;
@@ -83,7 +83,7 @@ int TerrainShadow::UnknownVirtualSlot28()
 // outcode-rejected against the clip rectangle (doubled while the shadow is not being updated),
 // back-face culled, clipped, and then either rasterised into the shadow texture's height map
 // (all three corners nearer than minDepth) or copied into the vertex array with the shadow colour
-// and texture coordinates scaled by field_0x677c.  Cells that were drawn into are marked used.
+// and texture coordinates scaled by texelSize.  Cells that were drawn into are marked used.
 // Tier 3 semantics; the retail body converts with an inline __asm fistp helper, so this stays a
 // documented partial (see targets.json); FistpFloatToInt (samples/common/FistpFloatToInt.h) gives its rounding.
 // The section records are reached through the mesh's pointer at +0x17c (retail `mov edx,
@@ -240,8 +240,8 @@ void TerrainShadow::UnknownVirtualSlot30()
                             vertices[vertexCount].diffuse = color;
                             vertices[vertexCount].reserved = 0;
                             vertices[vertexCount].specular = 0;
-                            vertices[vertexCount].tu = transformed[idx].x * field_0x677c;
-                            vertices[vertexCount].tv = transformed[idx].y * field_0x677c;
+                            vertices[vertexCount].tu = transformed[idx].x * texelSize;
+                            vertices[vertexCount].tv = transformed[idx].y * texelSize;
                             vertexCount++;
                             if (vertexCount == 0x300)
                                 goto full;
@@ -265,7 +265,7 @@ void TerrainShadow::UnknownVirtualSlot30()
 // ---------------------------------------------------------------------------------------------
 // 0x00508bc0 (slot 27, 3087 bytes): the shadow's footprint on the terrain.  Casts the light
 // frustum's corner rays at the height field and accumulates the hit cells' grid rectangle
-// (minX..maxZ) and the hits' screen rectangle (field_0x6668..field_0x6674); returns whether
+// (minX..maxZ) and the hits' screen rectangle (screenMinX..screenMaxY); returns whether
 // the footprint is on screen and large enough (tier 3 semantics).
 // The accumulate macro is braced under each CastSegment test: unbraced, only its first
 // statement was conditional.  hit, cell, right and up are declared once at function scope and
@@ -389,19 +389,19 @@ static inline TerrainShadowVec TerrainShadowAddCtorCall(const TerrainShadowVec& 
     g_terrainShadowClipper->ProjectVertices(TERRAIN_SHADOW_VIEWER()->camera,                   \
                                                   (char*)TERRAIN_SHADOW_VIEWER()->camera + 0xec, 1,  \
                                                   &(hit), &screen, &code);                           \
-    field_0x6668 = TERRAIN_SHADOW_MIN(field_0x6668, screen.x);                                       \
-    field_0x666c = TERRAIN_SHADOW_MAX(field_0x666c, screen.x);                                       \
-    field_0x6670 = TERRAIN_SHADOW_MIN(field_0x6670, screen.y);                                       \
-    field_0x6674 = TERRAIN_SHADOW_MAX(field_0x6674, screen.y)
+    screenMinX = TERRAIN_SHADOW_MIN(screenMinX, screen.x);                                           \
+    screenMaxX = TERRAIN_SHADOW_MAX(screenMaxX, screen.x);                                           \
+    screenMinY = TERRAIN_SHADOW_MIN(screenMinY, screen.y);                                           \
+    screenMaxY = TERRAIN_SHADOW_MAX(screenMaxY, screen.y)
 #define TERRAIN_SHADOW_VIEWER() ((TerrainShadowViewer*)renderContext)
 
 // The footprint is usable when its screen rectangle overlaps the viewport and is at least
 // 10 x 5 pixels.  Each mode repeats the test (the inline budget needs both copies); both fall
 // through to one shared exit that drops the cell list and the vertices.
 #define TERRAIN_SHADOW_RETURN_IF_VISIBLE()                                                                      \
-    if ((float)TERRAIN_SHADOW_VIEWER()->width > field_0x6668 && field_0x666c > 0.0f                   \
-        && (float)TERRAIN_SHADOW_VIEWER()->height > field_0x6670 && field_0x6674 > 0.0f               \
-        && field_0x666c - field_0x6668 > 10.0f && field_0x6674 - field_0x6670 > 5.0f)                \
+    if ((float)TERRAIN_SHADOW_VIEWER()->width > screenMinX && screenMaxX > 0.0f                       \
+        && (float)TERRAIN_SHADOW_VIEWER()->height > screenMinY && screenMaxY > 0.0f                   \
+        && screenMaxX - screenMinX > 10.0f && screenMaxY - screenMinY > 5.0f)                        \
         return 1
 
 int TerrainShadow::UnknownVirtualSlot27()
@@ -410,10 +410,10 @@ int TerrainShadow::UnknownVirtualSlot27()
     maxX = 0x80000000;
     minZ = 0x7fffffff;
     maxZ = 0x80000000;
-    field_0x6668 = 3.4028235e38f;
-    field_0x666c = -3.4028235e38f;
-    field_0x6670 = 3.4028235e38f;
-    field_0x6674 = -3.4028235e38f;
+    screenMinX = 3.4028235e38f;
+    screenMaxX = -3.4028235e38f;
+    screenMinY = 3.4028235e38f;
+    screenMaxY = -3.4028235e38f;
     TerrainShadowVec eye = TERRAIN_SHADOW_CAMERA()->eye;
     TerrainShadowVec hit;
     TerrainShadowVec screen;
