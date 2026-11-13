@@ -6,15 +6,15 @@
 #include "../../src/reconstructed/GearRatios.h"
 
 #define CHECK(name, condition) typedef char name[(condition) ? 1 : -1]
-CHECK(engine_size, sizeof(UnknownEngineGearbox) == 0x1e4);
+CHECK(engine_size, sizeof(EngineGearbox) == 0x1e4);
 CHECK(view_size, sizeof(VehicleSpeedState) == 0x1e4);
-#define FIELD(view, provider) CHECK(offset_##view, offsetof(VehicleSpeedState, view) == offsetof(UnknownEngineGearbox, provider))
+#define FIELD(view, provider) CHECK(offset_##view, offsetof(VehicleSpeedState, view) == offsetof(EngineGearbox, provider))
 FIELD(throttleFraction, throttleFraction); FIELD(currentRpm, currentRpm);
 FIELD(driveCut, driveCut); FIELD(gearTimer, shiftTimer); FIELD(gear, currentGear);
 FIELD(shiftRanges, shiftRanges); FIELD(shiftWindowWidths, shiftWindowWidths);
 FIELD(randomStart, upShiftRpm); FIELD(lastUpdateRpm, lastUpdateRpm);
-CHECK(aux_field8c, offsetof(VehicleWheelAux, field_0x8c) == offsetof(UnknownEngineGearbox, throttleTimeScale));
-CHECK(aux_field90, offsetof(VehicleWheelAux, field_0x90) == offsetof(UnknownEngineGearbox, gearCount));
+CHECK(aux_field8c, offsetof(VehicleWheelAux, field_0x8c) == offsetof(EngineGearbox, throttleTimeScale));
+CHECK(aux_field90, offsetof(VehicleWheelAux, field_0x90) == offsetof(EngineGearbox, gearCount));
 CHECK(vehicle_aux, offsetof(VehicleWheel, aux) == 0x2a8);
 CHECK(bike_aux, offsetof(BikeWheel, aux) == 0x2a8);
 CHECK(vehicle_magnitude, offsetof(VehicleWheel, driveMagnitude) == 0x280);
@@ -31,14 +31,14 @@ int main() {
     for (int b = 0; b < 6; ++b) {
         float gearArg;
         memcpy(&gearArg, &bits[b], 4);
-        UnknownEngineGearbox engine("fixture", 0.02f, 0, 0, 0, 0,
+        EngineGearbox engine("fixture", 0.02f, 0, 0, 0, 0,
             reinterpret_cast<const int&>(gearArg), 2.0f, 3.0f);
         if ((unsigned)engine.field_0x1d8 != bits[b]) return 1;
         VehicleSpeedState* view = reinterpret_cast<VehicleSpeedState*>(&engine);
         for (int c = 0; c < 6; ++c) {
             engine.throttleFraction = 0.0f;
             engine.shiftTimer = 0.0f;
-            reinterpret_cast<UnknownEngineGearbox*>(view)->UpdateThrottle(0.25f, 1, cuts[c]);
+            reinterpret_cast<EngineGearbox*>(view)->UpdateThrottle(0.25f, 1, cuts[c]);
             if (engine.driveCut != cuts[c] || engine.throttleFraction != 0.5f) return 2;
             ++count;
         }
@@ -49,7 +49,7 @@ int main() {
         wheel->rollDirection.x = 1.0f; wheel->rollDirection.y = -2.0f; wheel->rollDirection.z = 3.0f;
         engine.driveCut = 1;
         for (int reverse = 0; reverse < 2; ++reverse) {
-            reinterpret_cast<UnknownEngineGearbox*>(wheel->aux)->DriveForce(1.0f,
+            reinterpret_cast<EngineGearbox*>(wheel->aux)->DriveForce(1.0f,
                 reinterpret_cast<const Vector3*>(&wheel->rollDirection), 0.5f, (char)reverse, 100.0f,
                 reinterpret_cast<Vector3*>(&wheel->driveForce), &wheel->driveMagnitude);
             if (wheel->driveMagnitude != (reverse ? 100.0f : 0.0f)) return 3;

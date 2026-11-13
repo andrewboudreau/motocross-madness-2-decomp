@@ -142,7 +142,7 @@ struct VehicleImpactEvent {          // argument of slots 18..20 (provisional)
     char resetTrail;                // +0x24 SoultreeAttachment::resetTrail: VehCommitImpact latches the vector, then clears it
 };
 // Object at Vehicle+0x480: the engine gearbox (ctor 0x004d2940, 0x1e4 bytes), the same object as
-// src/reconstructed/GearRatios.h's UnknownEngineGearbox; slots 42/57 read throttleFraction.
+// src/reconstructed/GearRatios.h's EngineGearbox; slots 42/57 read throttleFraction.
 // Keep this provisional field view; construction/throttle/shift calls use the
 // canonical provider. The destructor is separately identified through the owning
 // delete path; this does not establish complete equivalence of the two views.

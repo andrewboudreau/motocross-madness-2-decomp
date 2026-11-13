@@ -151,7 +151,7 @@ struct BikeWheel {
 };
 
 // Object at BikeWheel+0x2a8: the gearbox (engineState) for driven wheels (Bike's loader).
-// Opaque provisional view; force calls use UnknownEngineGearbox directly.
+// Opaque provisional view; force calls use EngineGearbox directly.
 struct BikeWheelQ {};
 
 

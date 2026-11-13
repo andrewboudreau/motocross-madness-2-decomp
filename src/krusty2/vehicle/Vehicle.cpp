@@ -206,7 +206,7 @@ void Vehicle::UpdateWheelDriveForces()
             if (wheel->aux) {
                 float speed = linearSpeed;
                 float scale = driveForceScale;
-                reinterpret_cast<UnknownEngineGearbox*>(wheel->aux)->DriveForce(
+                reinterpret_cast<EngineGearbox*>(wheel->aux)->DriveForce(
                     speed, reinterpret_cast<const Vector3*>(&wheel->rollDirection), scale, backingUp, 100.0f,
                     reinterpret_cast<Vector3*>(&wheel->driveForce), &wheel->driveMagnitude);
             }
@@ -1002,8 +1002,8 @@ void Vehicle::SimulateFrame(float frame)
         backingUp = IsReverseRequested();
         driveDisengaged = crashState == 0 && (backingUp || IsClutchRequested());
         throttleOn = crashState == 0 && IsThrottleRequested();
-        reinterpret_cast<UnknownEngineGearbox*>(engineState)->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
-        reinterpret_cast<UnknownEngineGearbox*>(engineState)->AutoShift(throttleOn, linearSpeed);
+        reinterpret_cast<EngineGearbox*>(engineState)->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
+        reinterpret_cast<EngineGearbox*>(engineState)->AutoShift(throttleOn, linearSpeed);
         if (respawn) {
             Vec3 placedPosition, placedForward, placedUp;
             int keepPlacement = 0;
@@ -2078,11 +2078,11 @@ GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char
     // The provisional float gearArg is passed as an unchanged DWORD in retail;
     // the canonical constructor stores it at +0x1d8 without numeric conversion.
     if (defaultEngine)
-        engineState = reinterpret_cast<VehicleSpeedState*>(new(__FILE__, 0x1aa) UnknownEngineGearbox(
+        engineState = reinterpret_cast<VehicleSpeedState*>(new(__FILE__, 0x1aa) EngineGearbox(
             engineName, 0.02f, 0, 0, 0, 0, reinterpret_cast<const int&>(gearArg),
             controlResponse[2], controlResponse[3]));
     else
-        engineState = reinterpret_cast<VehicleSpeedState*>(new(__FILE__, 0x1b5) UnknownEngineGearbox(
+        engineState = reinterpret_cast<VehicleSpeedState*>(new(__FILE__, 0x1b5) EngineGearbox(
             engineName, 0.02f, torqueTable, rpmLow, rpmHigh, rpmStep, reinterpret_cast<const int&>(gearArg),
             controlResponse[2], controlResponse[3]));
     SoultreePhysicsCharacter::LoadPhysicsModel(context, 0, modelPath, desc, loadInfo, startPosition,

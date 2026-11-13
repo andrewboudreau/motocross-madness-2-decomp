@@ -1,7 +1,7 @@
 # Vehicle gearbox implementation connections
 
 Vehicle, KrustyBike and the BikeAI candidate now call the existing
-`UnknownEngineGearbox` implementations directly. Five obsolete external names
+`EngineGearbox` implementations directly. Five obsolete external names
 resolve to four supplied methods; the two wheel views shared DriveForce.
 The authentic source link changes from **383 to 378 unresolved names**, with
 **215/215 translation units** compiled and no new missing symbols.

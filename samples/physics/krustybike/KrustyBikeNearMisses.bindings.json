@@ -134,7 +134,7 @@
   "?IgnoreCollisionsWith@KrustyBike@@QAEXPAV1@@Z": "0x00496f90",
   "?RestoreCollisionsWith@KrustyBike@@QAEXPAV1@@Z": "0x00497370",
   "?SetFollowedRacer@KbPlayer@@QAEXPAVVehicle@@0H@Z": "0x004a9e80",
-  "?DriveForce@UnknownEngineGearbox@@QAEXMPBUVector3@@MDMPAU2@PAM@Z": "0x004d31b0",
+  "?DriveForce@EngineGearbox@@QAEXMPBUVector3@@MDMPAU2@PAM@Z": "0x004d31b0",
   "?NotifyContactImpulse@KbRaceHandler@@QAEXPAXMH@Z": "0x004de580",
   "?ReplaceHeadMessage@TextQueueOverlay@@QAEXPAVTextQueueMessage@@@Z": "0x0051b540",
   "?GetSelectedSeries@KbMode@@QAEHXZ": "0x00524100",

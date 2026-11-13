@@ -149,7 +149,7 @@ public:
 
 // Object at Tire+0x2a8 (Vehicle.h's VehicleWheelAux): the engine gearbox; only its first float is read here.
 struct TireAux {
-    float throttleFraction;  // +0x00 UnknownEngineGearbox throttleFraction (GearRatios.h)
+    float throttleFraction;  // +0x00 EngineGearbox throttleFraction (GearRatios.h)
 };
 
 class Tire : public CollisionObject, public MovingPart, public CollisionPoint {
@@ -247,7 +247,7 @@ public:
     float rampLevel;  // +0x29c 0x005143d0 unwinds the roll angle by (1 - rampLevel) while set
     float driveStrength;  // +0x2a0 ctor arg a10; ApplyDrive 0x00514170 scales the push by it
     float field_0x2a4;
-    TireAux* engine;  // +0x2a8 Vehicle calls UnknownEngineGearbox::DriveForce on it, Bike's loader stores engineState; UpdateRoll scales the roll angle by its throttle in (0, 1)
+    TireAux* engine;  // +0x2a8 Vehicle calls EngineGearbox::DriveForce on it, Bike's loader stores engineState; UpdateRoll scales the roll angle by its throttle in (0, 1)
     TireAttachB* rotatingShock;             // +0x2ac RotatingShock (SolveContact 0x004fac60); released by the dtor when inlineShock is null
     TireAttachA* inlineShock;               // +0x2b0 InlineShock (SolveContact 0x004fa400); released first (dtor 0x004f9f80)
     float slipThreshold;  // +0x2b4 ctor arg a7; UpdateDriveShare 0x00513f90 compares slipSpeed with it

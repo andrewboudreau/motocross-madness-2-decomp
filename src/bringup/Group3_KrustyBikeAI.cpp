@@ -1657,8 +1657,8 @@ int KrustyBike::SimulateAIFrame(float dt)
     else
         throttleOn = 0;
     driveDisengaged = crashState == 0 && IsClutchRequested();
-    reinterpret_cast<UnknownEngineGearbox*>(engineState)->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
-    reinterpret_cast<UnknownEngineGearbox*>(engineState)->AutoShift(throttleOn, linearSpeed);
+    reinterpret_cast<EngineGearbox*>(engineState)->UpdateThrottle(stepTime, throttleOn, driveDisengaged);
+    reinterpret_cast<EngineGearbox*>(engineState)->AutoShift(throttleOn, linearSpeed);
     if (hit) {
         Vec3 b;
         int dummy = 0;

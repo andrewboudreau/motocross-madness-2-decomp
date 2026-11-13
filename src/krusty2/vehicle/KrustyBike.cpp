@@ -489,7 +489,7 @@ void KrustyBike::UpdateWheelDriveForces()
         else
             ramp = 0;
         if (wheel->aux)
-            reinterpret_cast<UnknownEngineGearbox*>(wheel->aux)->DriveForce(
+            reinterpret_cast<EngineGearbox*>(wheel->aux)->DriveForce(
                 KbFloat(linearSpeed), reinterpret_cast<const Vector3*>(&wheel->rollDirection),
                 KbFloat(driveForceScale), backingUp, ramp, reinterpret_cast<Vector3*>(&wheel->driveForce),
                 &wheel->driveForceMagnitude);

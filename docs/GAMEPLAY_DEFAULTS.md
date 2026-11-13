@@ -12,7 +12,7 @@ their genuine declarations. Each complete body matches authentic VC6 SP3 output:
 These are separate ordinary definitions, not aliases to another class with the
 same small body. Semantic names and original translation-unit ownership remain
 provisional. The direct calls establish the individual boundaries below; they do
-not establish complete identity with MovingPart, UnknownEngineGearbox, RaceSound
+not establish complete identity with MovingPart, EngineGearbox, RaceSound
 or any other source view.
 
 ## Destruction and receiver evidence

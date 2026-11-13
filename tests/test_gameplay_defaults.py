@@ -122,7 +122,7 @@ class GameplayDefaultTests(unittest.TestCase):
                 self.assertTrue(proof['strict_exact'],(source,target,proof));strict+=1
             for source,symbol,address,size in (
                 ('src/reconstructed/MovingPart.cpp','??0MovingPart@@',0x4a23a0,48),
-                ('src/reconstructed/GearRatios.cpp','??0UnknownEngineGearbox@@',0x4d2940,1542)):
+                ('src/reconstructed/GearRatios.cpp','??0EngineGearbox@@',0x4d2940,1542)):
                 provider=compile_source(source,ROOT/source)
                 self.assertTrue(compare(pe,provider,symbol,address,size,(ROOT/source).with_suffix('.bindings.json'))['strict_exact'])
                 strict+=1

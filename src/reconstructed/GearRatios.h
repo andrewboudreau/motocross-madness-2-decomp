@@ -6,21 +6,21 @@
 // 0x004d2940..0x004d333f, followed by its kVec3 `$E` set
 // 0x004d3340..0x004d347b). No source string names the unit; GearRatios.cpp
 // is a descriptive file name, not an attested TU name. Vehicle.cpp allocates
-// 0x1e4 bytes and constructs it (0x005260df). All names are provisional.
+// 0x1e4 bytes and constructs it (0x005260df). Names are descriptive.
 
 // Shift window for one gear (+0x30 + 8 * gear).
-struct UnknownGearShiftRange {
+struct GearShiftRange {
     float lowerRpm;                           // +0x00 lower rpm
     float upperRpm;                           // +0x04 upper rpm
 };
 
-class UnknownEngineGearbox {
+class EngineGearbox {
 public:
     // 0x004d2940: builds the curve from `rpmTable` between `rpmLow` and
     // `rpmHigh` (or a built-in curve when `rpmHigh` <= 0) and picks the shift
     // windows. `name` is only used by the debug messages.
-    UnknownEngineGearbox(const char* name, float unused, int* torqueTable, int rpmLow, int rpmHigh,
-                         int rpmStep, int arg6, float riseRate, float fallRate);
+    EngineGearbox(const char* name, float unused, int* torqueTable, int rpmLow, int rpmHigh,
+                  int rpmStep, int arg6, float riseRate, float fallRate);
 
     void UpdateThrottle(float dt, int engaged, unsigned char disengaged);   // 0x004d2f50
     void AutoShift(int throttleOn, float speed);                 // 0x004d3030
@@ -28,15 +28,15 @@ public:
     void DriveForce(float speedRatio, const Vector3* direction, float scale, char reversing,
                                float reverseForce, Vector3* force, float* magnitude);
 
-    // Curve lookups at the current rpm (field_0x04); inline in retail.
-    float UnknownTorque() const {
+    // Curve lookups at currentRpm (+0x04); inline in retail.
+    float TorqueAtCurrentRpm() const {
         int i = 0;
         while (i < curvePointCount && curveRpm[i] < currentRpm) {
             i++;
         }
         return (currentRpm - curveRpm[i]) * torqueSlope[i] + curveTorque[i];
     }
-    float UnknownPower() const {
+    float PowerAtCurrentRpm() const {
         int i = 0;
         while (i < curvePointCount && curveRpm[i] < currentRpm) {
             i++;
@@ -51,7 +51,7 @@ public:
     unsigned char currentGear;                // +0x10 current gear
     char pad_0x11[3];
     float gearRatios[7];                      // +0x14 gear ratios; a negative entry ends the list
-    UnknownGearShiftRange shiftRanges[6];     // +0x30
+    GearShiftRange shiftRanges[6];            // +0x30
     float shiftWindowWidths[5];               // +0x60 shift window widths
     int field_0x74;
     float upShiftRpm;                         // +0x78 randomised up-shift rpm

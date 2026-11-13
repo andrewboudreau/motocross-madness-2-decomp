@@ -1,5 +1,5 @@
 // Engine gearbox and RPM curve (0x004d2940..0x004d347f). The TU name is
-// unattested; see GearRatios.h. Names are provisional.
+// unattested; see GearRatios.h. The class name is descriptive.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,8 +28,8 @@ static inline float UnknownMax(float a, float b)
 #define UNKNOWN_RANDOM_UNIT() (rand() * (1.0f / 32768.0f))
 
 // 0x004d2940
-UnknownEngineGearbox::UnknownEngineGearbox(const char* name, float unused, int* torqueTable, int rpmLow,
-                                           int rpmHigh, int rpmStep, int arg6, float riseRate, float fallRate)
+EngineGearbox::EngineGearbox(const char* name, float unused, int* torqueTable, int rpmLow,
+                             int rpmHigh, int rpmStep, int arg6, float riseRate, float fallRate)
 {
     char message[256];
     float rpm[20];
@@ -151,7 +151,7 @@ UnknownEngineGearbox::UnknownEngineGearbox(const char* name, float unused, int* 
         float bestRpm;
         for (int j = peakPowerPoint + 1; j < curvePointCount; j++) {
             currentRpm = UnknownMin(step * curveRpm[j], curveRpm[peakPowerPoint]);
-            float difference = curvePower[j] - UnknownPower();
+            float difference = curvePower[j] - PowerAtCurrentRpm();
             if (difference < 0) {
                 difference = -difference;
             }
@@ -183,7 +183,7 @@ UnknownEngineGearbox::UnknownEngineGearbox(const char* name, float unused, int* 
 }
 
 // 0x004d2f50
-void UnknownEngineGearbox::UpdateThrottle(float dt, int engaged, unsigned char disengaged)
+void EngineGearbox::UpdateThrottle(float dt, int engaged, unsigned char disengaged)
 {
     if (engaged && shiftTimer == 0.0f) {
         driveCut = disengaged;
@@ -203,7 +203,7 @@ void UnknownEngineGearbox::UpdateThrottle(float dt, int engaged, unsigned char d
 
 // 0x004d3030: shifts up past the randomised shift rpm and down below
 // field_0x7c.  Vehicle passes (throttleOn, linearSpeed); neither is read.
-void UnknownEngineGearbox::AutoShift(int throttleOn, float speed)
+void EngineGearbox::AutoShift(int throttleOn, float speed)
 {
     if (shiftTimer != 0.0f) {
         return;
@@ -232,9 +232,9 @@ void UnknownEngineGearbox::AutoShift(int throttleOn, float speed)
 }
 
 // 0x004d31b0
-void UnknownEngineGearbox::DriveForce(float speedRatio, const Vector3* direction, float scale,
-                                                 char reversing, float reverseForce, Vector3* force,
-                                                 float* magnitude)
+void EngineGearbox::DriveForce(float speedRatio, const Vector3* direction, float scale,
+                               char reversing, float reverseForce, Vector3* force,
+                               float* magnitude)
 {
     if (driveCut) {
         if (reversing) {
@@ -247,9 +247,9 @@ void UnknownEngineGearbox::DriveForce(float speedRatio, const Vector3* direction
         return;
     }
     if (speedRatio < 1.01f) {
-        *magnitude = UnknownTorque() * gearRatios[currentGear] * 341.62f;
+        *magnitude = TorqueAtCurrentRpm() * gearRatios[currentGear] * 341.62f;
     } else {
-        *magnitude = UnknownTorque() * gearRatios[currentGear] * 341.62f / speedRatio;
+        *magnitude = TorqueAtCurrentRpm() * gearRatios[currentGear] * 341.62f / speedRatio;
     }
     *force = scale * *magnitude * *direction;
 }
