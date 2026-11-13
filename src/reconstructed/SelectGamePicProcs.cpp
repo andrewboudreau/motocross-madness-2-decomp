@@ -156,7 +156,7 @@ struct UnknownLobbyStartMessage {
 };
 
 // A grid entry at race settings +0x14c (TrackGame.h's
-// UnknownTrackGameModeEntry) with the racer index at +5.
+// GridEntry) with the racer index at +5.
 struct UnknownGridEntry {
     UnknownGridEntry() {
         playerId = 0;
@@ -320,8 +320,8 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
 // 0x004f2080: qsort order of the grid entries, by +0x04, largest first
 // (0x004f2340, in the near-miss sample, sorts with it and 0x004f20a0).
 int CompareGridEntries(const void* a, const void* b) {
-    unsigned char x = ((const UnknownTrackGameModeEntry*)a)->points;
-    unsigned char y = ((const UnknownTrackGameModeEntry*)b)->points;
+    unsigned char x = ((const GridEntry*)a)->points;
+    unsigned char y = ((const GridEntry*)b)->points;
     if (x > y)
         return -1;
     return x != y;

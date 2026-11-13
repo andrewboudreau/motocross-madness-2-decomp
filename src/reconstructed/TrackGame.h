@@ -204,8 +204,8 @@ struct UnknownTrackGameModeOptionsFd8 {
 // Eight of these at +0x14c in each RaceSettings. TrackGameMode's
 // constructor (0x00522060) clears all three arrays with inline loops, which
 // gives this record an inline constructor.
-struct UnknownTrackGameModeEntry {
-    UnknownTrackGameModeEntry() {
+struct GridEntry {
+    GridEntry() {
         playerId = 0;
         points = 0;
     }
@@ -242,7 +242,7 @@ struct RaceSettings {
     float timeLimitMinutes;                   // +0x140 "%dm" rows 2..5 (DlgProcs 0x0044e3e0), SelectGamePicProcs.cpp's minutes
     int tagBall;                              // +0x144 tag ball (SelectGamePicProcs.cpp)
     int stuntMode;                            // +0x148 ChkStuntMode (MPEventDlg 0x004f6370); mode 4 ranks by score, else by tag run (EventManager 0x0045e9d0)
-    UnknownTrackGameModeEntry gridOrder[8];  // +0x14C  start grid entries, qsorted by championship points (SelectGamePicProcs); reset by 0x00522cd0
+    GridEntry gridOrder[8];  // +0x14C  start grid entries, qsorted by championship points (SelectGamePicProcs); reset by 0x00522cd0
     unsigned char field_0x18c[0x1ec - 0x18c];
 };
 

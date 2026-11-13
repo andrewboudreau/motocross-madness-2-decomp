@@ -60,7 +60,7 @@ struct UnknownKrustyVcrRecord {
         points = 0;
     }
     int networkPlayerId;  // +0x0  same 8-byte grid entry as UnknownBikeRaceNetPlayer (+0 compared with racers' networkPlayerId)
-    char points;  // +0x4  same grid entry: TrackGame.h UnknownTrackGameModeEntry::points (championship points)
+    char points;  // +0x4  same grid entry: TrackGame.h GridEntry::points (championship points)
 };
 
 // One racer of a recording (KrustyVCR+0x300, 0x124 bytes; 0x0049c070 writes
@@ -261,7 +261,7 @@ struct UnknownBikeRaceEventAi {
 // +5 byte, set for the AI racers a host runs.
 struct UnknownBikeRaceNetPlayer {
     int networkPlayerId;  // +0x0  compared with localPlayer and slots[j].networkPlayerId (loader, grid order)
-    char points;  // +0x4  TrackGame.h UnknownTrackGameModeEntry::points (championship points, the grid sort key)
+    char points;  // +0x4  TrackGame.h GridEntry::points (championship points, the grid sort key)
     char isAi;  // +0x5  set for a grid slot holding an AI racer of that player's host (racerIndex != 0)
     unsigned char field_0x06[2];
 };

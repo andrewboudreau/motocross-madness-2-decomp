@@ -155,7 +155,7 @@ int TrackGameMode::ResetNetworkRace() {
             racers[i] = RacerSlot();
     }
     for (i = 0; i < 8; i++)
-        raceSettings.gridOrder[i] = UnknownTrackGameModeEntry();
+        raceSettings.gridOrder[i] = GridEntry();
     raceSettings.networkPlayerCount = 0;
     return 1;
 }
@@ -301,7 +301,7 @@ void TrackGameMode::ResetSettingsEntries() {
     int i;
 
     for (i = 0; i < 8; i++) {
-        UnknownTrackGameModeEntry entry;
+        GridEntry entry;
         entry.playerId = 0;
         entry.points = 0;
         raceSettings.gridOrder[i] = entry;
