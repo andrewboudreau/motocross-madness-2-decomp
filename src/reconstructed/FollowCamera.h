@@ -19,7 +19,7 @@
 // exponent-halving table approximation (square-root-like). Name provisional.
 float FastSqrt(float value);
 
-// Inline minimum; slot 73 and UnknownFollowCameraValue::Update need the
+// Inline minimum; slot 73 and FollowCameraEase::Update need the
 // function form (a ternary reloads the chosen operand).
 inline float FollowCameraMin(float a, float b) {
     return (a < b) ? a : b;
@@ -35,10 +35,10 @@ inline float FollowCameraAbs(float value) {
 // 20-byte object allocated by 0x00463140 (FollowCam.cpp lines 0x78 onward).
 // Set() is inlined by slots 43 and 44: the value always changes, the rate (and
 // a 1.0 scale) only when one is given.
-struct UnknownFollowCameraValue {
+struct FollowCameraEase {
     // Inlined by 0x00463140 and slot 10: scale 1, open [-FLT_MAX, FLT_MAX]
     // limits. Slot 10 stores the members in this order.
-    UnknownFollowCameraValue(float initialValue, float initialRate) {
+    FollowCameraEase(float initialValue, float initialRate) {
         value = initialValue;
         rate = initialRate;
         maximum = FLT_MAX;
@@ -257,14 +257,14 @@ protected:
     unsigned char wasWide;  // +0x278  slot 10 stores `wide` (
     unsigned char isBlending;  // +0x279  set when the yaw turns wide; slot 10 blends position by blendClock until done, then clears it
     // Owned easing values (allocated by 0x00463140 and slot 10, deleted by the destructor).
-    UnknownFollowCameraValue* targetEaseX;    // +0x27c target x
-    UnknownFollowCameraValue* targetEaseY;    // +0x280 target y
-    UnknownFollowCameraValue* targetEaseZ;    // +0x284 target z
-    UnknownFollowCameraValue* positionEaseX;  // +0x288 position x
-    UnknownFollowCameraValue* positionEaseY;  // +0x28c position y
-    UnknownFollowCameraValue* positionEaseZ;  // +0x290 position z
-    UnknownFollowCameraValue* fieldOfViewEase; // +0x294 targetFieldOfView
-    UnknownFollowCameraValue* distanceEase;   // +0x298 followDistance
+    FollowCameraEase* targetEaseX;    // +0x27c target x
+    FollowCameraEase* targetEaseY;    // +0x280 target y
+    FollowCameraEase* targetEaseZ;    // +0x284 target z
+    FollowCameraEase* positionEaseX;  // +0x288 position x
+    FollowCameraEase* positionEaseY;  // +0x28c position y
+    FollowCameraEase* positionEaseZ;  // +0x290 position z
+    FollowCameraEase* fieldOfViewEase; // +0x294 targetFieldOfView
+    FollowCameraEase* distanceEase;   // +0x298 followDistance
     Vector3 followHeading;  // +0x29C  slot 10 stores slot 41's result ('the heading the camera follows', VehicleCamera.cpp)
     Vector3 cachedTarget;             // +0x2a8, cached slot 57 result (slot 69)
     Vector3 targetPoint;              // +0x2b4, target point (slots 34, 37, 68)

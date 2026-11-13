@@ -110,8 +110,8 @@ FollowCamera* FollowCamera::SetupFollowCamera(void* context, float rate294, floa
                                                   int capacity, int count, const int* list) {
     if (!Camera::SetRenderContext(context))
         return 0;
-    fieldOfViewEase = new(__FILE__, 0x78) UnknownFollowCameraValue(fieldOfView, rate294);
-    distanceEase = new(__FILE__, 0x79) UnknownFollowCameraValue(followDistance, rate298);
+    fieldOfViewEase = new(__FILE__, 0x78) FollowCameraEase(fieldOfView, rate294);
+    distanceEase = new(__FILE__, 0x79) FollowCameraEase(followDistance, rate298);
     lookAheadDistance = value228;
     defaultFollowHeight = value2d0;
     followHeight = value2d0;

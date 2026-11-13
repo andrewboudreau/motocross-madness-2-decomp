@@ -67,13 +67,13 @@ int FollowCamera::Tick(float dt) {
     target = SelectFollowPoint(wide || isSettled, following, dt);
     position = ComputeCameraPosition(following, target, dt);
     if (!positionEaseX) {
-        targetEaseZ = new(__FILE__, 0x4b0) UnknownFollowCameraValue(target.z, 0.3f);
-        targetEaseX = new(__FILE__, 0x4b1) UnknownFollowCameraValue(target.x, 0.3f);
-        targetEaseY = new(__FILE__, 0x4b2) UnknownFollowCameraValue(target.y, 0.3f);
+        targetEaseZ = new(__FILE__, 0x4b0) FollowCameraEase(target.z, 0.3f);
+        targetEaseX = new(__FILE__, 0x4b1) FollowCameraEase(target.x, 0.3f);
+        targetEaseY = new(__FILE__, 0x4b2) FollowCameraEase(target.y, 0.3f);
         EaseTargetToward(target);
-        positionEaseX = new(__FILE__, 0x4b4) UnknownFollowCameraValue(position.x, 0.3f);
-        positionEaseY = new(__FILE__, 0x4b5) UnknownFollowCameraValue(position.y, 0.3f);
-        positionEaseZ = new(__FILE__, 0x4b6) UnknownFollowCameraValue(position.z, 0.3f);
+        positionEaseX = new(__FILE__, 0x4b4) FollowCameraEase(position.x, 0.3f);
+        positionEaseY = new(__FILE__, 0x4b5) FollowCameraEase(position.y, 0.3f);
+        positionEaseZ = new(__FILE__, 0x4b6) FollowCameraEase(position.z, 0.3f);
         EasePositionToward(position);
     }
     if (cameraState == 5) {

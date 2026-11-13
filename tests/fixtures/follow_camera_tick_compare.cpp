@@ -206,7 +206,7 @@ static unsigned Random(){randomState=randomState*1664525u+1013904223u;return ran
 static float Finite(){union {unsigned bits;float value;}u;unsigned r=Random();u.bits=(r&0x807fffff)|(((r>>24)%40+107)<<23);return u.value;}
 int main(int argc,char**argv){
     if(argc!=3 || !MapReference(argv[1],argv[2]))return 3;
-    if(sizeof(FollowCamera)!=0x384 || sizeof(UnknownFollowCameraValue)!=20)return 4;
+    if(sizeof(FollowCamera)!=0x384 || sizeof(FollowCameraEase)!=20)return 4;
     for(int n=0;n<76;++n)cameraTable[n]=(DWORD)abort;for(n=0;n<4;++n)controlTable[n]=(DWORD)abort;
     cameraTable[41]=Address(&Hooks::Heading);cameraTable[57]=Address(&Hooks::Target);cameraTable[33]=Address(&Hooks::Blend);
     cameraTable[45]=Address(&Hooks::Moving);cameraTable[42]=Address(&Hooks::Turn);cameraTable[75]=Address(&Hooks::Following);cameraTable[74]=Address(&Hooks::Crash);

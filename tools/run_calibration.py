@@ -802,7 +802,7 @@ CASES = [
         'symbol': '?EaseTargetToward@FollowCamera@@UAEXABUVector3@@@Z',
         'target_va': '0x00464ee0',
         'target_size': 144,
-        'reason': 'inlined UnknownFollowCameraValue::Set with FLT_MAX sentinel',
+        'reason': 'inlined FollowCameraEase::Set with FLT_MAX sentinel',
     },
     {
         'name': 'FollowCamera slot44 value feed',
