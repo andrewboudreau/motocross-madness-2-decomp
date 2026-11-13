@@ -22,7 +22,7 @@
     "src/reconstructed/FollowCamera.cpp": {
       "sections": 98,
       "relocations": 250,
-      "sha256": "3e6fca4631c872d715c89a555b49cf0c83fe856567101660520b1c37482e360a"
+      "sha256": "516d75b02aec9956bf297c5efd62d79d6184376ae9b4ca3d703cb84b854a6bd7"
     },
     "src/reconstructed/TrackOverlay.cpp": {
       "sections": 215,
@@ -42,7 +42,7 @@
     "src/krusty2/shadow/D3DIMSoultreeShadow.cpp": {
       "sections": 47,
       "relocations": 132,
-      "sha256": "bda149143c478c3cd2ddcd9cdc2878075ad4bedbdc0ac1c3cd5a3480f8825a06"
+      "sha256": "0f0e30e3dbad7404c422462a6f340c29f96146c88c13559e8ed4fb21f1865b85"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
       "sections": 88,
@@ -57,7 +57,7 @@
     "samples/camera/FollowCameraNearMisses.cpp": {
       "sections": 66,
       "relocations": 337,
-      "sha256": "1787b4dd8d8202d97ef4a4ba47bf78e6665241bab74bedff7815c0d1ff08de49"
+      "sha256": "f3a01832801fbc1c642a9839aab778b6ef928707f7bc2aacaafbff1f28111187"
     },
     "samples/track/TrackOverlayNearMisses.cpp": {
       "sections": 27,
@@ -77,7 +77,7 @@
     "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp": {
       "sections": 7,
       "relocations": 53,
-      "sha256": "0ae22dbaf07b32d110d87fdeb1f9c9fb93bb0729949a9c100c460a1002a99c37"
+      "sha256": "c5516906f60954f4c65ad9364b677f612bf7dc1c8cf081b0d59409280b27c7b5"
     },
     "samples/physics/visibility/VisibilityQuadTreeTraversal.cpp": {
       "sections": 2,

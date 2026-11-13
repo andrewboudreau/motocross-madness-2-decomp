@@ -9,11 +9,11 @@
   "aggregate": {
     "sections": 66,
     "relocations": 337,
-    "sha256": "1a6c2915e7511b8e0855e924d209f17aa7e5789357235c6086c61637fbf333ba"
+    "sha256": "8559fd094fe81193b4853b2e64ca55840a9b262470471dfbff4d731c8ae53261"
   },
   "candidate": {
     "sections": 31,
     "relocations": 139,
-    "sha256": "0c0b5d98e241dbaa5dd92049112dfa8392b832bfdf4991fac2451fbfc45c64cc"
+    "sha256": "a33d4fa159738747615de9d5285397860d3b34fa8e0e9563c5030f9d54f80ec6"
   }
 }
