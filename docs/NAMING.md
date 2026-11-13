@@ -1256,3 +1256,111 @@ Left as placeholders:
   string names them.
 - `UnknownEffectInfo` (the DIEFFECTINFO layout) and the statics
   `s_UnknownEffectCount`: out of this wave's scope (a type, and a static).
+
+## Wave 16: crash, shadow-receiver and camera slots
+
+Wave 16 names the canonical virtual slots whose retail overrides and call
+sites agree on a role, and carries the names to the views that share the
+slot index and object_offset. `git grep -ohE '\bUnknown[A-Z][A-Za-z0-9_]*' --
+src samples` fell from 504 unique names and 3610 uses to 496 and 3526.
+Counted with the same command, `UnknownVirtualSlotN` fell from 32 names and
+322 uses to 27 and 241, and `UnknownRacerVirtualSlotN` from 6 to 3.
+`field_0x` lines stay at 1879.
+
+Method: the overrides of each slot were listed across every class that
+contains the base, from analysis/vtables.json and the RTTI base offsets, with
+the symbol the linked build puts at the same (class, object_offset, slot)
+(work/naming/w16_overrides.py); the retail call sites of the slot's vtable
+offset were listed with the bound name of the calling function
+(work/naming/w16_callers.py). A slot was named only when its overrides and
+callers agree on one role. The shared names were renamed per class with
+work/naming/w16_scoped.py: `Class::Old` and the decorated `Old@Class`
+everywhere, the unqualified declarations and calls as count-checked edits
+(spec files work/naming/w16_spec[ABC].json); the unique names with
+work/naming/rename.py. The comparer built every unit in src, samples and
+tests/fixtures whose include closure reaches a changed file (104 units), once
+from an archive of 5b987282 and once from the final tree, with the map
+work/naming/map-wave16.json (24 entries, every one scoped by class).
+
+Result: 104 units, 85 IDENTICAL, 2 IDENTICAL-COMDAT-ORDER
+(src/bringup/Group6_BikeRaceCreate.cpp, src/reconstructed/KrustyUI.cpp) and 17
+NAME-ONLY (the units that define or call a renamed slot:
+FollowCameraConstructor.cpp, FollowCameraNearMisses.cpp, LayoutProbe.cpp,
+KrustyBikeNearMisses.cpp, D3DIMSoultreeShadowNearMisses.cpp,
+samples/physics/shadow/TerrainShadow.cpp, D3DIMSoultreeShadow.cpp,
+SoulTreePhysics.cpp, Bike.cpp, KrustyBike.cpp, Vehicle.cpp, BikeCamera.cpp,
+FollowCamera.cpp, KrustyBikeCamera.cpp, src/reconstructed/TerrainShadow.cpp,
+VehicleCamera.cpp and VehicleMethods.cpp). There was no DIFF and no compile
+failure, and no .bss or .data offset moved.
+
+Negative controls:
+
+- Without the map, VehicleMethods.obj gives DIFF (the `.text` COMDAT
+  `?UnknownVirtualSlot52@Vehicle@@UAEHXZ` exists only in the old object), and
+  D3DIMSoultreeShadow.obj gives DIFF in the relocations of its vtable
+  `??_7D3DIMSoultreeShadow@@6B@`.
+- A live change (`crashState == 0` to `== 1` in the new tree's
+  `Vehicle::CanCrash`) gives DIFF in the bytes of `?CanCrash@Vehicle@@UAEHXZ`.
+
+Fixture pins: whole-object and aggregate digests of NAME-ONLY units only, each
+with unchanged section and relocation counts: Bike.cpp (two compile forms),
+KrustyBike.cpp (two), Vehicle.cpp (two), SoulTreePhysics.cpp, FollowCamera.cpp,
+VehicleMethods.cpp, D3DIMSoultreeShadow.cpp, KrustyBikeNearMisses.cpp (two),
+FollowCameraNearMisses.cpp (two), FollowCameraConstructor.cpp and
+D3DIMSoultreeShadowNearMisses.cpp, in 13 fixture files and in
+tests/test_rider_motion_start_connections.py. Every occurrence of each old
+digest was replaced (work/naming/repin.py, then work/naming/w16_repin3.py for
+the pins repin.py cannot attribute: aggregate keys and digests inside test
+modules).
+
+### Slots
+
+| Old name | New name | Class / slot / object_offset | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| `SoultreePhysicsBaseObject::UnknownVirtualSlot27`, `KrustyBike::UnknownVirtualSlot27` | `StartWreck` | SoultreePhysicsBaseObject slot 27, object_offset 0 (KrustyBike 0x0048da00; the base entry is the folded empty stub 0x00464e90) | 2 | KrustyBike is the only override: it starts the wrecker's tumble (crash reason 9 or a running motion) or its animated wreck in the crash direction, then switches to the bike collision. Slot 28 (base and Vehicle) calls it once when the +0x138 flag is set and clears the flag; Bike's UpdateCrashState and Vehicle::CheckCrash set the flag on a crash. |
+| `slot27Pending` (+0x138) | `wreckPending` | SoultreePhysicsBaseObject field | 2 | the flag above |
+| `Vehicle::UnknownVirtualSlot52`, `KrustyBike::UnknownVirtualSlot52` | `CanCrash` | Vehicle slot 52, object_offset 0 (0x0040c8a0, KrustyBike 0x00495800) | 2 | Vehicle returns `crashState == 0`, KrustyBike also 0 for a remote bike. Its callers (Bike's collision callbacks 0x00500c00/0x00500c30 and Bike::ApplyCollisionEvent, KrustyBike's callback) use it to decide whether the hit runs UpdateCrashState. |
+| `Vehicle::UnknownVirtualSlot77` | `IsPovHatPressed` | Vehicle slot 77, object_offset 0 (0x00529200, not overridden) | 2 | true when the argument is set and the active joystick's POV hat 0 angle is not -1 (centred); the throttle, brake and slot 78/79 input checks skip their joystick buttons while it holds |
+| `ShadowReceiver::UnknownVirtualSlot27` and the D3DIMSoultreeShadow / TerrainShadow overrides | `IsShadowVisible` | ShadowReceiver slot 27, object_offset 0 (base 0x00468c90 return 1; 0x004468f0; 0x00508bc0) | 3 | ProjectedShadow::PrepareGeometry (0x004db000) asks each receiver first and skips it on 0. D3DIMSoultreeShadow tests the caster's bounds against the shadow camera's box (inShadowView); TerrainShadow tests the footprint's screen rectangle against the viewer (at least 10 x 5 pixels). |
+| `ShadowReceiver::UnknownVirtualSlot28` and overrides | `UpdateTexelSize` | ShadowReceiver slot 28, object_offset 0 (base 0x004aa190 return 0; 0x00446bf0; 0x005097d0) | 3 | called next, result ignored; both overrides compute the shadow texture's texel size (g_d3dimShadowTexel, TerrainShadow::texelSize) |
+| `ShadowReceiver::UnknownVirtualSlot29` and overrides | `NeedsShadowRender` | ShadowReceiver slot 29, object_offset 0 (base 0x00468c90 return 1; 0x00446c30; 0x005099c0) | 3 | its result is OR'd into dirtyFlags, which makes PrepareGeometry render the shadow and run slot 30 (BuildShadowVertices). D3DIMSoultreeShadow tests the render camera (inCameraView); TerrainShadow returns whether it gathered any height-field cells. |
+| `FollowCamera::UnknownVirtualSlot50` (pure), `VehicleCamera::`, `BikeCamera::` | `GetOnboardEyePosition` | FollowCamera slot 50, object_offset 0 (__purecall; 0x0052cb80; 0x00417290, which KrustyBikeCamera inherits) | 2 | ComputeCameraPosition (0x00464b30) takes it as the camera position in state 3, the state in which Tick hides the subject and applies GetRoll. BikeCamera returns the rider's "Head" node position (literal "Head"), VehicleCamera the vehicle's position raised by 5. |
+| `FollowCamera::UnknownVirtualSlot55`, `KrustyBikeCamera::` | `IsLookBackHeld` | FollowCamera slot 55, object_offset 0 (0x00464ea0, 0x00498080) | 2 | while it returns nonzero, FollowCamera::Tick (0x00465c20, call at 0x00466859) saves the view and switches to state 6 with ApplyReverseViewPreset, restoring it on release. FollowCamera reads keyboard code 0x38, KrustyBikeCamera control 0x0b. |
+| `FollowCamera::UnknownVirtualSlot56`, `KrustyBikeCamera::` | `IsTargetViewHeld` | FollowCamera slot 56, object_offset 0 (0x00464ec0, 0x004980a0) | 3 | while it returns true, Tick (call at 0x00466740) saves the view and switches to state 7 with LookAtTargetPoint, restoring it on release. FollowCamera reads keyboard code 0x2a, KrustyBikeCamera control 0x0a with extra airborne conditions. |
+
+Views (same slot index and object_offset 0, names only):
+
+| Old name | New name | Class / slot / object_offset | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| `UnknownBikeRaceRacer::UnknownRacerVirtualSlot27`, `52`, `77` (BikeRace.h) | `StartWreck`, `CanCrash`, `IsPovHatPressed` | `UnknownBikeRaceRacer` own vtable as `KrustyBike` | 2 | Wave 15's racer view rule |
+| `UnknownFollowedRacerSlots::UnknownVirtualSlot27` (FollowRacerNearMisses.cpp) | `StartWreck` | as `KrustyBike` slot 27 | 2 | Wave 15's racer view rule |
+| `UnknownScenePhysicsBody::UnknownVirtualSlot27` (SceneManagerNearMisses.cpp), `TireVehicle::UnknownVirtualSlot27` (Tire.h) | `StartWreck` | SoultreePhysicsBaseObject slot 27 views at object_offset 0 | 2 | their slots 0-25 and 28 on already carry SoultreePhysicsBaseObject's names in the same order |
+
+Left as placeholders:
+
+- GameObject slots 9 and 19 and Game slot 12: no class overrides slot 9 and
+  only GameObject's own child walk calls it; slot 19's only overrides are the
+  `return 0` bodies of Terrain (0x00507920) and ShadowCamera (0x004da550),
+  and its only caller is Game slot 12, which no retail code calls (neither
+  MainWindowProc 0x004a0d50 nor ControlInterface::DispatchInput 0x0043cf00).
+  The GameObject and game views keep them too, and slot 0 stays a placeholder
+  in the views (Waves 4 and 12).
+- SoultreePhysicsBaseObject slot 26: empty in every class (0x00464e90); its
+  two call sites (after IntegrateMotion, and after placement in the AI frame)
+  name no single role. So `UnknownRacerVirtualSlot26` and the views' slot 26.
+- Vehicle slots 78 and 79: no retail caller; they read keys 0x1f/0x2d and
+  joystick buttons 3/4, which name no action. So `UnknownRacerVirtualSlot78`
+  and `79`.
+- PhysicsBody slots 31 and 32: not overridden, no caller found; they store
+  `field_0x180` and `field_0x184`, which have no reader evidence.
+- UIDialog slot 30 (calls the +0xd4 callback), BackgroundImage slot 27 (the
+  shared `return 1` body) and BaseQuarryEvent slots 28, 32 and 34 (shared
+  empty bodies): not overridden, and the call sites name no role.
+- `UnknownBikeRaceCharacter` slots: D3DIMSoultreeCharacter's own slots are
+  still `CharacterVirtualSlotN` / `D3DIMVirtualSlot11` placeholders.
+- The GridEntry views (`UnknownKrustyVcrRecord`, `UnknownBikeRaceNetPlayer`):
+  their `networkPlayerId` already says what GridEntry's `playerId` says, and
+  `UnknownGridEntry` already uses GridEntry's names.
+- `UnknownMethodN` (COM interfaces in GUIManager.h and MSZoneInterface.cpp)
+  and the folded-stub names (`UnknownFunction4de580`, `UnknownFunction464e80`,
+  `UnknownFunction464e90`): no literal names them.
