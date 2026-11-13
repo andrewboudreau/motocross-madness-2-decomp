@@ -102,7 +102,7 @@ int ParticleManager::Tick(float dt)
 }
 
 ParticleManager* ParticleManager::Create(int parentArg, TextureMapManager* textures,
-                                         const char* textureName, int field)
+                                         const char* textureName, int lights)
 {
     GameObject::SetRenderContext((void*)parentArg);
     for (int i = 0; i < 1000; i++)
@@ -118,12 +118,12 @@ ParticleManager* ParticleManager::Create(int parentArg, TextureMapManager* textu
     ((ParticleRenderContext*)renderContext)->device->direct3D->CreateVertexBuffer(&desc, &indexBufferObject, 0);
     desc.fvf = 0x1c4;
     desc.vertexCount = 4000;
-    ((ParticleRenderContext*)renderContext)->device->direct3D->CreateVertexBuffer(&desc, &field_0x1f8c, 0);
+    ((ParticleRenderContext*)renderContext)->device->direct3D->CreateVertexBuffer(&desc, &quadVertexBuffer, 0);
 
     void* data;
-    field_0x1f8c->Lock(1, &data, 0);
+    quadVertexBuffer->Lock(1, &data, 0);
     memset(data, 0, 4000 * 0x20);
-    field_0x1f8c->Unlock();
+    quadVertexBuffer->Unlock();
 
     indices = new(__FILE__, 0x4a8) unsigned short[6000];
     if (!vertexBuffer || !indices || !indexBufferObject) {
@@ -221,7 +221,7 @@ ParticleManager* ParticleManager::Create(int parentArg, TextureMapManager* textu
     cornerNormals[1] = ParticleNormalize(ParticleVec3(-1.0f, 1.0f, 0.25f));
     cornerNormals[2] = ParticleNormalize(ParticleVec3(1.0f, -1.0f, 0.25f));
     cornerNormals[3] = ParticleNormalize(ParticleVec3(-1.0f, -1.0f, 0.25f));
-    field_0x2054 = field;
+    lightManager = lights;
     return this;
 }
 

@@ -257,7 +257,7 @@ int ParticleManager::Render3D()
     frame.m[3][1] = lightY;
     frame.m[3][2] = lightZ;
     frame.m[3][3] = 1.0f;
-    reinterpret_cast<LightManager*>(field_0x2054)->LightVertices(&frame, 4, cornerNormals,
+    reinterpret_cast<LightManager*>(lightManager)->LightVertices(&frame, 4, cornerNormals,
                                                                  corners, 0xc, 0);
     for (i = 0; i < 4; i++)
         Group1CornerColor(corners[i]) &= 0xffffff;
@@ -268,7 +268,7 @@ int ParticleManager::Render3D()
     unsigned int alpha = 0;
     unsigned int specular = 0;
     Group1ParticleTLVertex* quads;
-    ((Group1ParticleVertexBuffer*)field_0x1f8c)->Lock(1, (void**)&quads, 0);
+    ((Group1ParticleVertexBuffer*)quadVertexBuffer)->Lock(1, (void**)&quads, 0);
     for (i = 0; i < visibleCount; i++) {
         Particle* particle = visible[i];
         Group1ParticleTLVertex* vertex = (Group1ParticleTLVertex*)particle->vertex;
@@ -387,7 +387,7 @@ int ParticleManager::Render3D()
         out[3].rhw = rhw;
     }
     transformed->Unlock();
-    ((Group1ParticleVertexBuffer*)field_0x1f8c)->Unlock();
+    ((Group1ParticleVertexBuffer*)quadVertexBuffer)->Unlock();
 
     // 7. Draw.
     ((TextureMap*)texture)->Bind();
@@ -395,7 +395,7 @@ int ParticleManager::Render3D()
     if (((TextureMap*)texture)->mapFormat != 0x115c)
         target->SetRenderState(0x21, 1, 0);
     target->SetTextureBlend(4, 0);
-    target->DrawIndexedPrimitiveVB(4, (int)field_0x1f8c, 0, visibleCount * 4, (int)indices,
+    target->DrawIndexedPrimitiveVB(4, (int)quadVertexBuffer, 0, visibleCount * 4, (int)indices,
                                    visibleCount * 6, 0);
     if (((TextureMap*)texture)->mapFormat != 0x115c)
         target->SetRenderState(0x21, 0, 0);

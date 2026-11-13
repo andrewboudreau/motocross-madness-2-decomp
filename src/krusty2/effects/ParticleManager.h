@@ -148,7 +148,7 @@ public:
     // 0x004ba4d0 (ret 0x10): returns this, or 0 (after BaseObject slot 2) when a vertex buffer
     // or the index array is missing.
     virtual ParticleManager* Create(int parentArg, TextureMapManager* textures,
-                                    const char* textureName, int field);
+                                    const char* textureName, int lights);
 
     // 0x004baa50 (thiscall, ret 0x20).  Takes the next particle from the free tail of the table
     // and fills it in; returns 0 when all 1000 are in use.
@@ -163,13 +163,13 @@ public:
     ParticleTexture* texture;           // +0x1f80 slot 27 loads it (0x0050a590); released through BaseObject slot 2 by the dtor
     ParticleVertexBuffer* vertexBuffer;              // +0x1f84 FVF 0x1c4, 1500 vertices (slot 27); released by the dtor
     ParticleVertexBuffer* indexBufferObject;         // +0x1f88 FVF 0x1e2, 1500 vertices (slot 27); locked by slot 14; released by the dtor
-    ParticleVertexBuffer* field_0x1f8c;              // +0x1f8c FVF 0x1c4, 4000 vertices; slot 27 locks it and zeroes 0x1f400 bytes
+    ParticleVertexBuffer* quadVertexBuffer;          // +0x1f8c FVF 0x1c4, 4000 vertices; slot 27 locks it and zeroes 0x1f400 bytes; slot 14 writes 4 vertices per visible particle and draws it indexed. Tier 2
     int field_0x1f90;                   // +0x1f90 set to 1 by the ctor and again by slot 27
     unsigned short* indices;            // +0x1f94 delete'd by the dtor; slot 27 fills 0x2ee0 bytes of quad indices
     ParticleVec3 gravity;               // +0x1f98 ctor stores (0, -64, 0); slot 10 adds dt*gravity to flagged particle velocity
     ParticleCornerVertex corners[4];    // +0x1fa4 slot 27: (1,1,0), (-1,1,0), (1,-1,0), (-1,-1,0)
     ParticleVec3 cornerNormals[4];      // +0x2024 slot 27: (+-1, +-1, 0.25) scaled by FastInvSqrt(2.0625)
-    int field_0x2054;                   // +0x2054 slot 27's last argument
+    int lightManager;                   // +0x2054 slot 27's last argument; slot 14 lights the corner normals through it (LightManager::LightVertices). Tier 2
 };
 
 #endif
