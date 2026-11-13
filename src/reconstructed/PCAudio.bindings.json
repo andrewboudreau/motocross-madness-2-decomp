@@ -79,7 +79,7 @@
   "?DuplicateBuffer@Sound@@QAEHPAPAUDirectSoundBuffer@@PAV1@@Z": "0x004bd6a0",
   "?Query3DBuffer@Sound@@QAEHPAUDirectSoundBuffer@@PAPAUDirectSound3DBuffer@@@Z": "0x004bd6e0",
   "?QueryPropertySet@Sound@@QAEHXZ": "0x004bd710",
-  "?Set3DParameters@Sound@@QAEHPAUUnknownSound3DParameters@@@Z": "0x004bd740",
+  "?Set3DParameters@Sound@@QAEHPAUDS3DBuffer@@@Z": "0x004bd740",
   "?Set3DMode@Sound@@QAEHK@Z": "0x004bd790",
   "?Set3DPosition@Sound@@QAEHUVector3@@H@Z": "0x004bd7e0",
   "?Set3DVelocity@Sound@@QAEHUVector3@@H@Z": "0x004bd8a0",

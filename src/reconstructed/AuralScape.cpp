@@ -185,7 +185,7 @@ SoundEmitter::~SoundEmitter() {
 }
 
 // 0x00402260
-SoundEmitter* SoundEmitter::Create(void* target, const char* name, UnknownSound3DParameters params,
+SoundEmitter* SoundEmitter::Create(void* target, const char* name, DS3DBuffer params,
                                                   unsigned long flags, float oneShotDistance,
                                                   float randomTriggerPercent, int is2D, int force2D) {
     char path[0x104];
@@ -220,7 +220,7 @@ SoundEmitter* SoundEmitter::Create(void* target, const char* name, UnknownSound3
 }
 
 // 0x00402420
-void SoundEmitter::SetSoundParameters(UnknownSound3DParameters params) {
+void SoundEmitter::SetSoundParameters(DS3DBuffer params) {
     previousPosition = soundParameters.position;
     soundParameters = params;
     if (loadedSound)
@@ -386,7 +386,7 @@ SoultreeSoundEmitter::SoultreeSoundEmitter(AuralScape* scape, SoundGroup* group,
 // 0x004029f0
 SoultreeSoundEmitter* SoultreeSoundEmitter::CreateFollowing(void* target, const char* name,
                                                                   const char* partName, SoultreeObject* part,
-                                                                  UnknownSound3DParameters params,
+                                                                  DS3DBuffer params,
                                                                   unsigned long flags, float oneShotDistance,
                                                                   float randomTriggerPercent, int is2D,
                                                                   int force2D) {

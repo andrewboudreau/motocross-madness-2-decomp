@@ -13,7 +13,7 @@ class LightEmitter;
 class LightManager;
 class Sound;
 class SoundGroup;
-struct UnknownSound3DParameters;
+struct DS3DBuffer;
 
 // The Soultree object whose detail level 0x004eff30 sets (0x004451e0, the
 // D3DIMSoultreeObject methods of D3DIMSoulTree.h). A view: the scene reaches
@@ -269,7 +269,7 @@ public:
     void ReadStadium();                   // 0x004ecc10: the "Stadium" section
     // 0x004ef9c0: one sound emitter's settings from `section`.
     void ReadSoundSettings(const char* section, char* file, int is3D,
-                               UnknownSound3DParameters* params, unsigned long* flags,
+                               DS3DBuffer* params, unsigned long* flags,
                                float* oneShotDistance, float* randomTriggerPercent,
                                int* oneShot, int* force2D);
     // 0x004de580 is a shared empty `ret 0xc` body (also BaseQuarryEvent and

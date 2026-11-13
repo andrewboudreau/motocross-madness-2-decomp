@@ -998,7 +998,7 @@ int Scene::ReadSounds()
     unsigned long flags;
     float oneShotDistance;
     float randomTriggerPercent;
-    UnknownSound3DParameters params;
+    DS3DBuffer params;
     char file[0x104];
     char text[0x204];
     char position[0x80];
@@ -1064,11 +1064,11 @@ int Scene::ReadSounds()
 // 0x004ef9c0: reads a sound's settings from `section` and appends ".wav" to
 // `file` when it has no extension yet.
 void Scene::ReadSoundSettings(const char* section, char* file, int is3D,
-                                  UnknownSound3DParameters* params, unsigned long* flags,
+                                  DS3DBuffer* params, unsigned long* flags,
                                   float* oneShotDistance, float* randomTriggerPercent,
                                   int* oneShot, int* force2D)
 {
-    memset(params, 0, sizeof(UnknownSound3DParameters));
+    memset(params, 0, sizeof(DS3DBuffer));
     if (!strstr(file, ".wav"))
         strcat(file, ".wav");
     parameters.SelectSection(section);

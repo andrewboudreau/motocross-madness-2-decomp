@@ -28,7 +28,7 @@ struct DirectSound3DBuffer {
     virtual long __stdcall GetMode();
     virtual long __stdcall GetPosition();
     virtual long __stdcall GetVelocity();
-    virtual long __stdcall SetAllParameters(const struct UnknownSound3DParameters* parameters,
+    virtual long __stdcall SetAllParameters(const struct DS3DBuffer* parameters,
                                             unsigned long apply);
     virtual long __stdcall SetConeAngles(unsigned long inside, unsigned long outside, unsigned long apply);
     virtual long __stdcall SetConeOrientation(float x, float y, float z, unsigned long apply);
@@ -44,7 +44,7 @@ struct DirectSoundNotify {
     virtual long __stdcall QueryInterface(const Guid& iid, void** result);
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
-    virtual long __stdcall SetNotificationPositions(unsigned long count, const struct UnknownNotifyPosition* positions);
+    virtual long __stdcall SetNotificationPositions(unsigned long count, const struct DSBPositionNotify* positions);
 };
 
 struct KsPropertySet {
@@ -58,13 +58,13 @@ struct KsPropertySet {
 };
 
 // DSBPOSITIONNOTIFY layout.
-struct UnknownNotifyPosition {
+struct DSBPositionNotify {
     unsigned long offset;
     HANDLE event;
 };
 
 // 16-byte PCM format (PCMWAVEFORMAT layout).
-struct UnknownPcmFormat {
+struct PcmWaveFormat {
     unsigned short formatTag;
     unsigned short channels;
     unsigned long samplesPerSec;
@@ -74,7 +74,7 @@ struct UnknownPcmFormat {
 };
 
 // DS3DBUFFER layout (0x40 bytes).
-struct UnknownSound3DParameters {
+struct DS3DBuffer {
     unsigned long size;
     Vector3 position;
     Vector3 velocity;
@@ -90,7 +90,7 @@ struct UnknownSound3DParameters {
 // The 44-byte RIFF header of a PCM .wav file: "RIFF", size, "WAVE", "fmt ",
 // the format chunk's size, the PCM format and the "data" chunk header.
 #pragma pack(push, 1)
-struct UnknownWaveHeader {
+struct WaveFileHeader {
     char riff[4];
     unsigned long riffSize;
     char wave[4];
@@ -207,7 +207,7 @@ public:
     int DuplicateBuffer(DirectSoundBuffer** duplicate, Sound* source);
     int Query3DBuffer(DirectSoundBuffer* buffer, DirectSound3DBuffer** buffer3D);
     int QueryPropertySet();                             // 0x004bd710: queries the property set
-    int Set3DParameters(UnknownSound3DParameters* parameters);
+    int Set3DParameters(DS3DBuffer* parameters);
     int Set3DMode(unsigned long mode);
     int Set3DPosition(Vector3 position, int force);
     int Set3DVelocity(Vector3 velocity, int force);
@@ -234,12 +234,12 @@ public:
     char soundName[0x104];                       // +0x60
     int lastPlayTime;                        // +0x164: time last played (0x004bfa80 ms)
     short soundType;                             // +0x168
-    UnknownWaveHeader waveHeader;                 // +0x16a
+    WaveFileHeader waveHeader;                 // +0x16a
     unsigned long bufferBytes;               // +0x198
     unsigned long currentFrequency;                // +0x19c
     long currentVolume;                            // +0x1a0
     long currentPan;                               // +0x1a4
-    UnknownSound3DParameters parameters3D;   // +0x1a8
+    DS3DBuffer parameters3D;   // +0x1a8
     unsigned long soundFlags;                    // +0x1e8: 2 static, 4 streamed, 8 3D, 0x10 cone, 0x20 loop
     unsigned long controlsSet;               // +0x1ec: 0x20 frequency, 0x40 pan, 0x80 volume
     unsigned long lastPlayFlags;                // +0x1f0

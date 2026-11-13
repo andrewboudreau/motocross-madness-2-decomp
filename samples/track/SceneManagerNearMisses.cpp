@@ -230,7 +230,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
     Vector3 position;
     Vector3 look;
     Vector3 up;
-    UnknownSound3DParameters params;
+    DS3DBuffer params;
     char model[0x44];
     char key[0x40];
     char text[0x204];
@@ -487,7 +487,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
     char file[0x108];
     char vue[0x40];
     char text[0x204];
-    UnknownSound3DParameters params;
+    DS3DBuffer params;
     char colPath[0x104];
     char sound[0x184];
     char sequence[0x80];

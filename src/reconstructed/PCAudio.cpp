@@ -91,7 +91,7 @@ UnknownSoundNotifier::UnknownSoundNotifier() {
 // 0x004bb740: creates the events and thread and asks for notifications at
 // the start of each half of the buffer.
 int UnknownSoundNotifier::StartRefillThread(Sound* sound) {
-    UnknownNotifyPosition positions[2];
+    DSBPositionNotify positions[2];
     unsigned threadId;
 
     ownerSound = sound;
@@ -838,7 +838,7 @@ int Sound::FillBufferFromFile(DirectSoundBuffer** buffer) {
         if (!entry)
             return 0;
         entry->archive->Seek(entry->offset, 0, 0);
-        UnknownWaveHeader header;
+        WaveFileHeader header;
         if (entry->archive->Read(&header, 0x2c, 1) != 1)
             return 0;
         if (!FillBufferFromStream(buffer, entry->archive, 0, bufferBytes))
@@ -851,7 +851,7 @@ int Sound::FillBufferFromFile(DirectSoundBuffer** buffer) {
         }
         if (file->innerStream)
             file->Seek(file->sliceOffset, 0, 0);
-        UnknownWaveHeader header;
+        WaveFileHeader header;
         if (file->Read(&header, 0x2c, 1) != 1) {
             delete file;
             return 0;
@@ -933,7 +933,7 @@ failed:
 int Sound::CreateBuffer(DirectSoundBuffer** buffer, unsigned long bytes, unsigned long rate,
     int bits, int blockAlign, int stereo, int is3D,
     int isStatic, unsigned long flags, int hardware) {
-    UnknownPcmFormat format;
+    PcmWaveFormat format;
     DirectSoundBufferDesc desc;
 
     memset(&format, 0, sizeof(format));
@@ -996,7 +996,7 @@ int Sound::QueryPropertySet() {
 }
 
 // 0x004bd740
-int Sound::Set3DParameters(UnknownSound3DParameters* parameters) {
+int Sound::Set3DParameters(DS3DBuffer* parameters) {
     if (SoundSystem()->audioStarted && dsBuffer && dsBuffer3D && bufferReady) {
         parameters->size = sizeof(*parameters);
         if (dsBuffer3D->SetAllParameters(parameters, 1) < 0)

@@ -57,10 +57,10 @@ public:
 
     // 0x00402260: records the settings, checks `name` exists in the Res
     // archive and joins the scape; releases itself and returns 0 on failure.
-    SoundEmitter* Create(void* target, const char* name, UnknownSound3DParameters params,
+    SoundEmitter* Create(void* target, const char* name, DS3DBuffer params,
                                         unsigned long flags, float oneShotDistance,
                                         float randomTriggerPercent, int is2D, int force2D);
-    void SetSoundParameters(UnknownSound3DParameters params); // 0x00402420
+    void SetSoundParameters(DS3DBuffer params); // 0x00402420
     void SetPositionAndVelocity(Vector3* position, Vector3* velocity); // 0x00402470: either may be null
     // 0x00402530: the distance to the nearest listener; sets bit 1 when
     // the emitter can be heard.
@@ -82,7 +82,7 @@ public:
     int serialNumber;                         // +0x44 serial number (0x00577734)
     char fileName[0x104];                     // +0x48 file name
     unsigned long emitterFlags;               // +0x14c flags: 1 one-shot, 2 3D, 4, 8 loop, 0x10/0x20 buffer kind
-    UnknownSound3DParameters soundParameters; // +0x150
+    DS3DBuffer soundParameters; // +0x150
     Vector3 previousPosition;                 // +0x190 previous position
     float listenerDistance;                   // +0x19c distance to the nearest listener
     unsigned char oneShotFired : 1;           // +0x1a0 one-shot fired
@@ -104,7 +104,7 @@ public:
     // 0x004029f0: SoundEmitter's loader, then the part (and its child
     // `partName`) to follow.
     SoultreeSoundEmitter* CreateFollowing(void* target, const char* name, const char* partName,
-                                                SoultreeObject* part, UnknownSound3DParameters params,
+                                                SoultreeObject* part, DS3DBuffer params,
                                                 unsigned long flags, float oneShotDistance,
                                                 float randomTriggerPercent, int is2D, int force2D);
 

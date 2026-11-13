@@ -27,7 +27,7 @@ PROVIDERS = {
     '?ClearScreenRects@D3DIMSoultreeObject@@QAEXXZ': (0x4444e0, 55),
 }
 FOLLOWING = ('?CreateFollowing@SoultreeSoundEmitter@@QAEPAV1@PAXPBD1'
-             'PAVSoultreeObject@@UUnknownSound3DParameters@@KMMHH@Z')
+             'PAVSoultreeObject@@UDS3DBuffer@@KMMHH@Z')
 CALLERS = ('VehicleCamera', 'BikeCamera', 'KrustyBikeCamera', 'AuralScape',
            'RaceSound', 'TrackOverlay')
 

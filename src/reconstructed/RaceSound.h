@@ -122,7 +122,7 @@ public:
     int field_0x5c;
     int field_0x60;
     int field_0x64;
-    UnknownWaveHeader waveHeader;         // header read by 0x004e5500
+    WaveFileHeader waveHeader;         // header read by 0x004e5500
     int channelsInUse;                       // channels in use
     UnknownRaceSoundChannel engineChannels[11];
     UnknownRaceSoundChannel* streamChannel; // streamed channel
