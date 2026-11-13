@@ -46,7 +46,7 @@
 // at +0x34 and the garage engine size and stroke at +0x33c.
 struct UnknownReplayTapeHeader {
     unsigned char field_0x00[0x34];
-    UnknownTrackGameModeSettings raceSettings;      // +0x34
+    RaceSettings raceSettings;      // +0x34
     unsigned char field_0x220[0x33c - 0x220];
     int engineSize;
     int fourStroke;

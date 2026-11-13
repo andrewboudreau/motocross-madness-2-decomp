@@ -144,7 +144,7 @@ struct UnknownPlayerLeftMessage {
 struct UnknownLobbyStartMessage {
     int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     short start;                              // +0x04: start
-    UnknownTrackGameModeSettings raceSettings; // +0x08: TrackGame+0x2d70
+    RaceSettings raceSettings; // +0x08: TrackGame+0x2d70
     int difficulty;                           // +0x1f4: TrackGame+0x60c (mode.difficulty)
     int plateNumbers[8];                      // +0x1f8: racer slot +0xc0 (plate number)
     char playerNames[8][0x10];                // +0x218: racer slot +0xdc (name)

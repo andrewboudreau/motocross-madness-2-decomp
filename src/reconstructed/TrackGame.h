@@ -201,7 +201,7 @@ struct UnknownTrackGameModeOptionsFd8 {
     int bandStep;                             // +0x58 a tenth of their range
 };
 
-// Eight of these at +0x14c in each UnknownTrackGameModeSettings. TrackGameMode's
+// Eight of these at +0x14c in each RaceSettings. TrackGameMode's
 // constructor (0x00522060) clears all three arrays with inline loops, which
 // gives this record an inline constructor.
 struct UnknownTrackGameModeEntry {
@@ -217,7 +217,7 @@ struct UnknownTrackGameModeEntry {
 // The 0x1ec-byte race settings block. TrackGameMode holds three: the current
 // settings (+0x27f8) and two saved copies (+0x29e4, +0x2bd0). 0x005231f0 reads
 // the copies whole and assigns +0x29e4 to +0x27f8 (rep movsd, 0x7b dwords).
-struct UnknownTrackGameModeSettings {
+struct RaceSettings {
     int raceMode;                             // +0x00 EventManager 0x0045e600 compares it with 2
     int eventType;                            // +0x04 event type (SPEventDlg EventTypeDropDown; ZoneReport sends it plus one); picks the event object
     int series;                               // +0x08 series (SelectGamePicProcs.cpp; uiinfo.cpp 0x005240e0)
@@ -258,10 +258,10 @@ struct UnknownTrackGameSessionList {
 
 // The player's bike and rider choice at TrackGameMode+0x1974 and its saved
 // copy at +0x1a3c (0xc8 bytes each; 0x005231f0 copies it whole). Its layout
-// is the first 0xc8 bytes of UnknownTrackGameRacerSlot: SelectGamePicProcs.cpp
+// is the first 0xc8 bytes of RacerSlot: SelectGamePicProcs.cpp
 // passes its three names to 0x00521fb0 and copies +0xc4 into a racer slot,
 // and the constructor sets +0xc0 (strong inference).
-struct UnknownTrackGameRacerChoice {
+struct RacerChoice {
     char bikeModel[0x40];                     // +0x00 bike model name (dlgprocs.cpp SPBikeRiderDlg)
     char bikeName[0x40];                      // +0x40 bike name
     char riderName[0x40];                     // +0x80 rider name
@@ -272,8 +272,8 @@ struct UnknownTrackGameRacerChoice {
 // Per-racer record (0xf8 bytes); TrackGameMode holds eight at +0x1be4, after
 // the count at +0x1be0 (EventManager 0x0045fbd0 copies whole records).
 // TrackGameMode's constructor builds them with 0x00521f30 (no destructor).
-struct UnknownTrackGameRacerSlot {
-    UnknownTrackGameRacerSlot();              // 0x00521f30
+struct RacerSlot {
+    RacerSlot();              // 0x00521f30
     // 0x00521fb0 (SelectGamePicProcs.cpp passes TrackGameMode+0x1974, +0x19b4 and +0x19f4).
     void SetBikeAndRiderNames(void* modelText, void* bikeText, void* riderText);
     void ClearLeft();                         // 0x00522050 (dlgprocs.cpp LoadingDlg): clears +0xc8
@@ -407,8 +407,8 @@ public:
     char resourceStrings[10][0x80];           // +0x145c string resources 0x1420, 0x1417..0x141f (uiinfo.cpp 0x00522840)
     int videoSettings[5];                 // +0x195c: video settings: forced video memory, then four detail levels (OptionProcs.cpp)
     int bikeUnlockFlags;                      // +0x1970 bit 0 unlocks kind 10 bikes (SelectGamePicProcs.cpp)
-    UnknownTrackGameRacerChoice racerChoice;  // +0x1974 the player's bike and rider; restored from +0x1a3c when a replay is left (InGameProcs.cpp)
-    UnknownTrackGameRacerChoice racerChoiceBackup; // +0x1a3c
+    RacerChoice racerChoice;  // +0x1974 the player's bike and rider; restored from +0x1a3c when a replay is left (InGameProcs.cpp)
+    RacerChoice racerChoiceBackup; // +0x1a3c
     unsigned char multiplayerRacerChoice[0x1bcc - 0x1b04]; // +0x1b04 racerChoice kept for multiplayer (same paths as +0x1090)
     int plateNumber;                          // +0x1bcc SelectGamePicProcs.cpp
     int lobbyRank;                            // +0x1bd0: 0x0049c600 WaitForLobbyRank; 1..100 is copied to +0x1bcc
@@ -416,7 +416,7 @@ public:
     int maxOpponents;                         // +0x1bd8: largest opponent count (SelectGamePicProcs.cpp)
     int field_0x1bdc;                         // cleared by TrackGameMode 0x00522440
     int racerCount;                           // +0x1be0 racer count (EventManager 0x0045e550)
-    UnknownTrackGameRacerSlot racers[8];      // +0x1be4 the race's racer slots
+    RacerSlot racers[8];      // +0x1be4 the race's racer slots
     int networkGame;                          // +0x23a4 network game (racesnd.cpp 0x004e5780)
     Guid displayAdapterGuid;       // +0x23a8: display adapter GUID (TrackGameMode 0x00522e20)
     int savedCameraState;                     // +0x23b8 KrustyBikeCamera state (slots 61, 62); saved in uiinfo
@@ -435,9 +435,9 @@ public:
     char ghostFile[0x104];                // +0x25ec: the ghost file raced against (dlgprocs.cpp GhostFilesDlg)
     int saveGhost;                            // +0x26f0 mode 4 saves a ghost (EventManager 0x0045cdc0)
     char replayFile[0x104];               // +0x26f4: the replay file played (dlgprocs.cpp ReplayFilesDlg)
-    UnknownTrackGameModeSettings raceSettings; // +0x27f8 current race settings
-    UnknownTrackGameModeSettings savedSettings; // +0x29e4: saved copy, restored when a replay is left (InGameProcs.cpp)
-    UnknownTrackGameModeSettings multiplayerSettings; // +0x2bd0 race settings kept for multiplayer (same paths as +0x1090)
+    RaceSettings raceSettings; // +0x27f8 current race settings
+    RaceSettings savedSettings; // +0x29e4: saved copy, restored when a replay is left (InGameProcs.cpp)
+    RaceSettings multiplayerSettings; // +0x2bd0 race settings kept for multiplayer (same paths as +0x1090)
     int saveReplay;                           // +0x2dbc saves a replay (EventManager 0x0045cdc0)
 };
 

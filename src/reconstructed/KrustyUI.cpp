@@ -905,7 +905,7 @@ int KrustyUI::AddEntry(int directoryIndex, int scene, int series, const char* na
 
 // 0x0049bbb0
 void KrustyUI::RecordRaceResults() {
-    UnknownTrackGameModeSettings* settings = &g_TrackGame->mode.raceSettings;
+    RaceSettings* settings = &g_TrackGame->mode.raceSettings;
     if (settings->eventType == 1 && settings->randomGates)
         return;
     RecordHighScoreTable(0);

@@ -38,7 +38,7 @@ extern "C" __declspec(dllimport) void* __stdcall ShellExecuteA(void* window, con
 #define UNKNOWN_HELP_DIRECTORY ""
 
 // 0x00521f30
-UnknownTrackGameRacerSlot::UnknownTrackGameRacerSlot() {
+RacerSlot::RacerSlot() {
     int length;
     int count;
 
@@ -57,7 +57,7 @@ UnknownTrackGameRacerSlot::UnknownTrackGameRacerSlot() {
 }
 
 // 0x00521fb0
-void UnknownTrackGameRacerSlot::SetBikeAndRiderNames(void* modelText, void* bikeText, void* riderText) {
+void RacerSlot::SetBikeAndRiderNames(void* modelText, void* bikeText, void* riderText) {
     int length = strlen((char*)modelText);
     int count = length > 0x3f ? 0x3f : length;
     strncpy(bikeModelName, (char*)modelText, count);
@@ -73,7 +73,7 @@ void UnknownTrackGameRacerSlot::SetBikeAndRiderNames(void* modelText, void* bike
 }
 
 // 0x00522050
-void UnknownTrackGameRacerSlot::ClearLeft() {
+void RacerSlot::ClearLeft() {
     hasLeft = 0;
 }
 
@@ -152,7 +152,7 @@ int TrackGameMode::ResetNetworkRace() {
     racerCount = 0;
     if (raceSettings.raceMode != 2) {
         for (i = 0; i < 8; i++)
-            racers[i] = UnknownTrackGameRacerSlot();
+            racers[i] = RacerSlot();
     }
     for (i = 0; i < 8; i++)
         raceSettings.gridOrder[i] = UnknownTrackGameModeEntry();

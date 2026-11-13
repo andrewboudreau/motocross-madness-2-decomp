@@ -17,7 +17,7 @@ inheritance. The fields at TrackGame+0xfc4..+0x3337 now live in
 TrackGameMode, named by their offset there (the TrackGame offset minus
 0x578). For example, the old `field_0x2d78` is now
 `mode.field_0x27f8.field_0x08`. Inside the mode:
-- **Three settings blocks** (`UnknownTrackGameModeSettings`, 0x1ec bytes)
+- **Three settings blocks** (`RaceSettings`, 0x1ec bytes)
   at +0x27f8, +0x29e4 and +0x2bd0.
 - **A session-list wrapper** at +0xa98 holding five SessionInfoType
   records. Both constructor unwind funclets call its implicit destructor

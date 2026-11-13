@@ -51,7 +51,7 @@ struct UnknownGridDraw {
 struct UnknownLobbyStartMessage {
     int header;                               // +0x00 SendRaw writes the type byte and sequence here
     short start;                              // +0x04: start
-    UnknownTrackGameModeSettings raceSettings; // +0x08: TrackGame+0x2d70
+    RaceSettings raceSettings; // +0x08: TrackGame+0x2d70
     int difficulty;                           // +0x1f4: TrackGame+0x60c (mode.difficulty)
     int plateNumbers[8];                      // +0x1f8: racer slot +0xc0
     char playerNames[8][0x10];                // +0x218: racer slot +0xdc

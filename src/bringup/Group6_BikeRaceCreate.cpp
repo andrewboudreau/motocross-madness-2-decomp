@@ -492,7 +492,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         for (int i = 0; i < UnknownFunctionRacerCount(); i++) {
             for (int j = 0; j < UnknownFunctionRacerCount(); j++) {
                 UnknownBikeRaceRacer* racer = racerSlots[i];
-                UnknownTrackGameRacerSlot* slot = &g_TrackGame->mode.racers[j];
+                RacerSlot* slot = &g_TrackGame->mode.racers[j];
                 if (racer->recorderId == slot->networkPlayerId && racer->aiMessageIndex == slot->racerIndex)
                     painter->PaintNumber(reinterpret_cast<D3DIMSoultreeObject*>(racer->modelNode), slot->plateNumber);
             }

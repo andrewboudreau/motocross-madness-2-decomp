@@ -707,7 +707,7 @@ void SPEventDlg::ShowRaceModeControls() {
         break;
     }
     UIControl* waypoints = FindControl("WaypointBox", 5);
-    UnknownTrackGameModeSettings& settings = g_TrackGame->mode.raceSettings;
+    RaceSettings& settings = g_TrackGame->mode.raceSettings;
     if (settings.eventType == 1 && modes->GetRowData(-1) != 4) {
         waypoints->Show(1, 1);
         if (static_cast<UIMultiState*>(FindControl("ChkRandomGates", 2))->GetSelectedState()) {
@@ -763,7 +763,7 @@ void SPEventDlg::ApplyEventType() {
     char text[256];
     UIListBox* types = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
     int type = types->GetRowData(-1);
-    UnknownTrackGameModeSettings& settings = g_TrackGame->mode.raceSettings;
+    RaceSettings& settings = g_TrackGame->mode.raceSettings;
     settings.eventType = type;
     g_TrackGame->mode.SelectSeries(type);
     UIListBox* modes = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;
