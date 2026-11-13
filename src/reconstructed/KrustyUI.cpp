@@ -156,7 +156,7 @@ KrustyUI::KrustyUI(int flags) : GameObject(flags) {
     gui = 0;
     returnMenu = 0;
     previousMenu = 0;
-    field_0x38 = 0;
+    trackRecordReturnMenu = 0;
     currentMenu = 0;
     profileLoaded = 0;
     progressDialog = 0;

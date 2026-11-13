@@ -1866,7 +1866,7 @@ void HandleMenuMiddle(int menu, DialogEvent* event) {
         if (ui->currentMenu == kMenuTrackRecord910)
             ui->OpenMenu(kMenuSinglePlayer);
         else if (ui->currentMenu == kMenuTrackRecord911)
-            ui->OpenMenu(ui->field_0x38);
+            ui->OpenMenu(ui->trackRecordReturnMenu);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;

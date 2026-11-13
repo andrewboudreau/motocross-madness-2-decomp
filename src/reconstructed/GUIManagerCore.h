@@ -60,7 +60,7 @@ public:
     int controlDown[32];                      // +0x3c: UIDialog slot 23 sets a control's flag, slot 22 clears it
     GUIManager* userGui;                      // +0xbc
     ToolTip* userToolTip;                     // +0xc0
-    int field_0xc4;
+    int keepAnimationPhase;                   // +0xc4: SetCursorAnimation (0x00487fb0) carries the frame, direction and step time over to the new animation when set; the constructor clears it; no other writer is known. Tier 3
     char cursorImage[0x80];                   // +0xc8: cursor image ("cursor.tga")
     char waitImage[0x80];                     // +0x148: wait image ("wait.tga")
     UnknownCursorAnimation* cursorAnimation;  // +0x1c8

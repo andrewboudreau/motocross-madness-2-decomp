@@ -36,5 +36,5 @@ public:
     void HandleEvent(DialogEvent* event); // 0x00488c90
     void ShowReplayMode();             // 0x004894c0: shows the replay mode on the toggles
 
-    int field_0x7f58;                         // set once the replay is left
+    int leftForMenu;                          // +0x7f58  set when the replay is left for kMenuMain; kDialogClose then keeps the cursors shown. Tier 2
 };

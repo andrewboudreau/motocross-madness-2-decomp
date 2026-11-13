@@ -82,7 +82,7 @@ public:
     UnknownBackgroundRegion* regionTable;
     int field_0x54;
     int fullRestoreFrames;                 // frames left to restore fully
-    int field_0x5c;
+    int drawnBefore;                       // +0x5c  ctor 0; RenderPost3D (0x00403ec0) passes it as DrawImage's `dirty` and then sets it. Tier 3
     int copyDcNext;                           // +0x60  GetDc with the copy current alternates: set, the next DC is the off-screen copy's, else the back buffer's
     int lastDcRegion;                         // +0x64  GetDc's last dirty region handed out (-1 after the last)
     int lastDcRegionCopied;                   // +0x68  GetDc: lastDcRegion's copy DC was handed out after its back-buffer DC

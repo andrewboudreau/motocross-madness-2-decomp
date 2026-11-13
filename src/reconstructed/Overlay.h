@@ -19,7 +19,7 @@
 class Overlay : public GameObject {
 public:
     // 0x004b5e20: GameObject(flags); `value` is kept at +0x118.
-    Overlay(int flags, int value);
+    Overlay(int flags, int layOutOnRender);
     virtual ~Overlay();                       // 0x004b5ec0 (deleting wrapper 0x004b5ea0)
     virtual int Tick(float frameTime);                 // 0x00499ae0
     virtual int Render3D();       // 0x004b61a0: draws the overlay quad
@@ -62,5 +62,5 @@ public:
     int overlayAlpha;                         // alpha, 0xff
     int alphaBlended;                         // alpha-blended
     float overlayDepth;                       // depth
-    int field_0x118;                          // constructor value
+    int layOutOnRender;                       // +0x118  constructor argument; Render3D (0x004b61a0) calls LayOutQuad first when set. Tier 3
 };

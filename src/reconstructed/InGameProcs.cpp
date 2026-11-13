@@ -137,7 +137,7 @@ void VCRDlg::HandleEvent(DialogEvent* event) {
     UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
     switch (event->kind) {
     case kDialogInit:
-        field_0x7f58 = 0;
+        leftForMenu = 0;
         static_cast<UIScrollBar*>(FindControl("SliderTime", 8))->SetScrollRange(1000);
         FindControl("ButSave", 0)->Show(0, 1);
         if (!g_TrackGame->GetRegistryFlag("AllowVCRControls", 0)) {
@@ -256,7 +256,7 @@ void VCRDlg::HandleEvent(DialogEvent* event) {
             g_TrackGame->eventManager->CloseRace(2);
             g_TrackGame->eventManager->LeaveRaceForMenu(kMenuMain);
             guiManager->ShowCursors(1);
-            field_0x7f58 = 1;
+            leftForMenu = 1;
             break;
         }
         ShowReplayMode();
@@ -269,7 +269,7 @@ void VCRDlg::HandleEvent(DialogEvent* event) {
         }
         break;
     case kDialogClose:
-        if (!g_TrackGame->shuttingDown && !field_0x7f58)
+        if (!g_TrackGame->shuttingDown && !leftForMenu)
             guiManager->ShowCursors(0);
         break;
     }

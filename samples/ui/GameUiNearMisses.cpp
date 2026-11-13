@@ -273,11 +273,11 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
             strcpy(sectionTable[sectionCount].sectionName, name);
             sectionTable[sectionCount].sectionObject = 0;
             if (!_strnicmp(name, "Set_Info", strlen("Set_Info")))
-                sectionTable[sectionCount].field_0x38 = 0;
+                sectionTable[sectionCount].sectionKind = 0;
             else if (!_strnicmp(name, "Set_Default", strlen("Set_Default")))
-                sectionTable[sectionCount].field_0x38 = 3;
+                sectionTable[sectionCount].sectionKind = 3;
             else
-                sectionTable[sectionCount].field_0x38 = setType;
+                sectionTable[sectionCount].sectionKind = setType;
             sectionCount++;
         }
     }
@@ -420,7 +420,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
             control = 0;
             isDefault = 0;
             parameters.SelectSection(sectionTable[i].sectionName);
-            switch (sectionTable[i].field_0x38) {
+            switch (sectionTable[i].sectionKind) {
             case 0:
                 if (pass == 0) {
                     parameters.GetInt("ScreenWidth", g_TrackGame->renderTarget->targetWidth,

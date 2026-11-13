@@ -18,7 +18,7 @@
 static TextureMap* g_UnknownOverlayTexture689110;
 
 // 0x004b5e20
-Overlay::Overlay(int flags, int value) : GameObject(flags) {
+Overlay::Overlay(int flags, int layOutOnRender) : GameObject(flags) {
     overlayTexture = 0;
     backingTexture = 0;
     field_0x40 = 0;
@@ -31,7 +31,7 @@ Overlay::Overlay(int flags, int value) : GameObject(flags) {
     sharedTexture = 0;
     textService = 0;
     iconService = 0;
-    field_0x118 = value;
+    this->layOutOnRender = layOutOnRender;
 }
 
 // 0x004b5ec0 (scalar deleting wrapper 0x004b5ea0): the last Overlay to
@@ -106,7 +106,7 @@ int Overlay::Render3D() {
     Target()->GetTextureStageState(0, 0xc, &saved);
     Target()->SetTextureStageState(0, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);
     Target()->SetRenderState(D3DRENDERSTATE_FOGENABLE, 0, 0);
-    if (field_0x118)
+    if (layOutOnRender)
         LayOutQuad();
 
     int format = overlayTexture->mapFormat;

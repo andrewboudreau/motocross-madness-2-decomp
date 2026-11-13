@@ -928,7 +928,7 @@ GUIUser::GUIUser() : GameObject(1) {
     cursorAnimation = 0;
     cursorImage[0] = 0;
     waitImage[0] = 0;
-    field_0xc4 = 0;
+    keepAnimationPhase = 0;
     strcpy(waitImage, "wait.tga");
     strcpy(cursorImage, "cursor.tga");
     focusControl = 0;
@@ -1218,7 +1218,7 @@ void GUIUser::SetCursorAnimation(UnknownCursorAnimation* animation) {
     if (!animation && cursorAnimation)
         animation = cursorAnimation;
     current = userCursor->cursorAnimation;
-    if (current && field_0xc4 && animation != current && animation->frameCount > current->currentFrame) {
+    if (current && keepAnimationPhase && animation != current && animation->frameCount > current->currentFrame) {
         animation->currentFrame = current->currentFrame;
         animation->playForwards = current->playForwards;
         animation->lastStepTime = current->lastStepTime;

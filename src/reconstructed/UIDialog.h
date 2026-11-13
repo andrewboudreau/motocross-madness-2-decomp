@@ -29,7 +29,7 @@ struct DialogEvent;
 struct UnknownGameUiSection {
     char sectionName[0x34];                   // +0x00
     Sound* sectionObject;                     // +0x34 (typed as the sound case)
-    int field_0x38;
+    int sectionKind;                          // +0x38  0 Set_Info, 1 Set_Anim, 2 Set_Sound, 3 Set_Default, 4 Set_Control (the ReadDialogResource passes switch on it). Tier 2
 };
 
 class UIDialog : public GameObject {

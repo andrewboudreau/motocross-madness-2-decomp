@@ -33,7 +33,7 @@ BackgroundImage::BackgroundImage(int flags) : GameObject(flags) {
     fullRestoreFrames = 0;
     heldDcSurface = 0;
     heldDc = 0;
-    field_0x5c = 0;
+    drawnBefore = 0;
     imageRegion = -1;
     lastDcRegion = -1;
     copyDcNext = 1;
@@ -93,9 +93,9 @@ int BackgroundImage::RenderPost3D() {
         g_BackgroundImageRect.top = 0;
         g_BackgroundImageRect.right = currentImage->textureWidth;
         g_BackgroundImageRect.bottom = currentImage->textureHeight;
-        DrawImage(currentImage, &g_BackgroundImageRect, 0, 0x1000000, imageRegion, field_0x5c, &fullRedrawsOwed,
+        DrawImage(currentImage, &g_BackgroundImageRect, 0, 0x1000000, imageRegion, drawnBefore, &fullRedrawsOwed,
                               0);
-        field_0x5c = 1;
+        drawnBefore = 1;
     }
     return 1;
 }
