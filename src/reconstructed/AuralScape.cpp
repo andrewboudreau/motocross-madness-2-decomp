@@ -741,8 +741,8 @@ int AuralScape::Tick(float frameTime) {
         int j = 0;
         int playing = 0;
         int bytes = 0;
-        for (; j < SoundSystem()->field_0x04.m_count; j++) {
-            Sound* sound = (Sound*)SoundSystem()->field_0x04.Get(j);
+        for (; j < SoundSystem()->loadedSounds.m_count; j++) {
+            Sound* sound = (Sound*)SoundSystem()->loadedSounds.Get(j);
             if (sound) {
                 sounds++;
                 if (sound->IsPlaying())

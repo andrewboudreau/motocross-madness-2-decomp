@@ -16,10 +16,10 @@ public:
     SoundInterface();          // 0x00401f80
     virtual ~SoundInterface(); // 0x00401fe0
 
-    // Two pointer lists; PCSoundInterface's start-up Inits both to 8
-    // entries growing by 8. Element types are unknown.
-    ContainerList<void*> field_0x04;
-    ContainerList<void*> field_0x18;
+    // Two Sound lists; PCSoundInterface's start-up Inits both to 8 entries
+    // growing by 8. LoadWave adds every sound, and 3D ones to the second too.
+    ContainerList<void*> loadedSounds;
+    ContainerList<void*> loaded3DSounds;
     unsigned char audioStarted : 1; // +0x2c bit 0: set once the audio has started
 };
 

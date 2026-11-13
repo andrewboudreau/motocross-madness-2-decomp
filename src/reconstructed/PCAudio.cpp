@@ -245,8 +245,8 @@ Sound::~Sound() {
     if (entry)
         g_ResourceManager->SetItemObject(entry, 0);
     if (dsBuffer3D)
-        SoundSystem()->field_0x18.Remove(this);
-    SoundSystem()->field_0x04.Remove(this);
+        SoundSystem()->loaded3DSounds.Remove(this);
+    SoundSystem()->loadedSounds.Remove(this);
 }
 
 // 0x004bbcd0: plays the sound (with its play flags; flag 2 asks for a
@@ -343,9 +343,9 @@ int Sound::LoadWave(FileStream* stream, unsigned long flags, unsigned long contr
     if (is3D) {
         if (!Query3DBuffer(dsBuffer, &dsBuffer3D))
             goto failed;
-        SoundSystem()->field_0x18.Add(this);
+        SoundSystem()->loaded3DSounds.Add(this);
     }
-    SoundSystem()->field_0x04.Add(this);
+    SoundSystem()->loadedSounds.Add(this);
     if (!is3D)
         Set3DMode(2);
     if (soundFlags & 3) {
@@ -1327,8 +1327,8 @@ long PCSoundInterface::InitializeSound(int rate, int stereo, int bits, int value
         return 0;
     audioStarted = 1;
     RefreshSoundCaps();
-    field_0x04.Init(8, 8);
-    field_0x18.Init(8, 8);
+    loadedSounds.Init(8, 8);
+    loaded3DSounds.Init(8, 8);
     primaryBuffer->GetVolume(&startupPrimaryVolume);
     SetPrimaryFormat(rate, stereo, bits);
     result = primaryBuffer->QueryInterface(IID_IDirectSound3DListener, (void**)&listener);

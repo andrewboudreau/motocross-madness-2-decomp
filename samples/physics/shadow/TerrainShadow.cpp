@@ -56,7 +56,7 @@ int TerrainShadow::UnknownVirtualSlot28()
         if (shadow->mode == 1) {
             ShadowMatrix projection;
             fov = (float)atan2((float)(shadow->texture->size * shadow->texture->size) / extent * 0.5,
-                               shadow->camera->field_0x198) * 114.59156f;
+                               shadow->camera->focalLength) * 114.59156f;
             shadow->camera->SetLookAt(&shadow->camera->eyePosition, 0, 0, 0, &fov);
             shadow->camera->UpdateMatrices();
             projection = *TerrainMatrixIdentityInto(&projection);
@@ -310,7 +310,7 @@ struct TerrainShadowCamera {
     TerrainShadowVec look;         // +0x17c
     TerrainShadowVec up;           // +0x188
     float pad_0x194;
-    float field_0x198;             // +0x198 look distance in mode 1 (tier 3)
+    float focalLength;             // +0x198 Camera::focalLength; the look distance in mode 1
 };
 struct TerrainShadowViewer {       // GameObject::renderContext of the receiver
     char pad_0x00[8];
@@ -422,7 +422,7 @@ int TerrainShadow::UnknownVirtualSlot27()
     TerrainShadowVec right;
     TerrainShadowVec up;
     if (shadow->mode == 1) {
-        eye += TERRAIN_SHADOW_CAMERA()->look * TERRAIN_SHADOW_CAMERA()->field_0x198;
+        eye += TERRAIN_SHADOW_CAMERA()->look * TERRAIN_SHADOW_CAMERA()->focalLength;
         float half = (float)shadow->texture->size * 0.5f;
         right = TerrainShadowCross(TERRAIN_SHADOW_CAMERA()->look, TERRAIN_SHADOW_CAMERA()->up) * half;
         up = TERRAIN_SHADOW_CAMERA()->up * half;

@@ -132,7 +132,7 @@ public:
     char pad_0x12c[0x170 - 0x12c];
     ShadowVec3 eyePosition;                               // +0x170 TerrainShadow slot 28 passes its address as the first SetLookAt argument
     char pad_0x17c[0x198 - 0x17c];
-    float field_0x198;                                    // +0x198 TerrainShadow slot 28 feeds it to atan2 as x (tier 3)
+    float focalLength;                                    // +0x198 Camera::focalLength (RTTI ShadowCamera : PCCamera : Camera); TerrainShadow slot 28 feeds it to atan2 as x
     char pad_0x19c[0x220 - 0x19c];                        // allocated with operator new(0x220) in Init
 };
 
