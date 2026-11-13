@@ -578,7 +578,7 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
 
 // The length of `v` (1 without a square root for unit vectors); the setup
 // restores the lengths D3DRMVectorRotate's unit results lose.
-static inline float UnknownVectorLength(const Vector3& v) {
+static inline float VectorLength(const Vector3& v) {
     float xx = v.x * v.x;
     float yy = v.y * v.y;
     float lengthSquared = xx + yy + v.z * v.z;
@@ -790,13 +790,13 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             boxOffset = Vector3(girlOffset.x - 1.22f, 4.0f, girlOffset.z + 1.2f);
             float angle = (float)atan2(direction.x, direction.z);
             D3DRMVectorRotate(&turned, &girlOffset, (Vector3*)&kVec3YAxis, angle);
-            girlOffset = UnknownScaled(turned, UnknownVectorLength(girlOffset));
+            girlOffset = UnknownScaled(turned, VectorLength(girlOffset));
             ground = point + girlOffset;
             terrain->QueryGround(&ground, 0, 0, 0);
             float height = ground.y - point.y;
             girlPosition = point + girlOffset;
             D3DRMVectorRotate(&turned, &boxOffset, (Vector3*)&kVec3YAxis, angle);
-            boxOffset = UnknownScaled(turned, UnknownVectorLength(boxOffset));
+            boxOffset = UnknownScaled(turned, VectorLength(boxOffset));
             boxPosition = point + boxOffset;
             girlPosition.y += height;
             boxPosition.y += height;

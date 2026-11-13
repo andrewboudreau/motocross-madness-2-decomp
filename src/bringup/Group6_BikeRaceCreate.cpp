@@ -107,7 +107,7 @@ static inline Vector3 Normalize(const Vector3& v) {
 // restores the lengths D3DRMVectorRotate's unit results lose. Retail adds z*z
 // last, rounded to a float temporary (0x004188d8); this sum has its order, so
 // the two agree at 24-bit precision.
-static inline float UnknownVectorLength(const Vector3& v) {
+static inline float VectorLength(const Vector3& v) {
     float zz = v.z * v.z;
     float lengthSquared = v.x * v.x + v.y * v.y + zz;
     if (lengthSquared == 1.0f)
@@ -318,13 +318,13 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             boxOffset = Vector3(girlOffset.x - 1.22f, 4.0f, girlOffset.z + 1.2f);
             float angle = (float)atan2(direction.x, direction.z);
             D3DRMVectorRotate(&turned, &girlOffset, (Vector3*)&kVec3YAxis, angle);
-            girlOffset = UnknownScaled(turned, UnknownVectorLength(girlOffset));
+            girlOffset = UnknownScaled(turned, VectorLength(girlOffset));
             ground = point + girlOffset;
             terrain->QueryGround(&ground, 0, 0, 0);
             float height = ground.y - point.y;
             girlPosition = point + girlOffset;
             D3DRMVectorRotate(&turned, &boxOffset, (Vector3*)&kVec3YAxis, angle);
-            boxOffset = UnknownScaled(turned, UnknownVectorLength(boxOffset));
+            boxOffset = UnknownScaled(turned, VectorLength(boxOffset));
             boxPosition = point + boxOffset;
             girlPosition.y += height;
             boxPosition.y += height;

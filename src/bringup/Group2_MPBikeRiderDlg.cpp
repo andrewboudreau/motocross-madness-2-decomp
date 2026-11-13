@@ -38,11 +38,11 @@ extern "C" Vector3* __stdcall D3DRMVectorRotate(Vector3* result, Vector3* vector
                                                 float theta);
 
 // Inline vector helpers of the bike views (as in SelectGamePicProcs.cpp).
-static inline Vector3 UnknownVectorDifference(const Vector3& a, const Vector3& b) {
+static inline Vector3 VectorDifference(const Vector3& a, const Vector3& b) {
     return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
-static inline Vector3 UnknownVectorSum(const Vector3& a, const Vector3& b) {
+static inline Vector3 VectorSum(const Vector3& a, const Vector3& b) {
     return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
@@ -142,19 +142,19 @@ int MPBikeRiderDlg::Tick(float frameTime) {
         float dx = (float)(pointer->pointerPosition.x - guiUser->pointerX);
         viewEye.y += (pointer->pointerPosition.y - guiUser->pointerY) * 0.1f;
         viewEye.y = __max(1.0f, __min(viewEye.y, 10.0f));
-        offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->garageFocus);
+        offset = VectorDifference(viewEye, g_TrackGame->ui->garageFocus);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, dx * 0.015707964f);
         float distance = viewDistance;
         turned *= distance;
-        viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
+        viewEye = VectorSum(turned, g_TrackGame->ui->garageFocus);
         g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
         g_TrackGame->ui->garageCamera->LookAt(viewTarget);
         previewDragged = 1;
     } else if (!previewDragged) {
-        offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->garageFocus);
+        offset = VectorDifference(viewEye, g_TrackGame->ui->garageFocus);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
         turned *= viewDistance;
-        viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
+        viewEye = VectorSum(turned, g_TrackGame->ui->garageFocus);
         g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
         g_TrackGame->ui->garageCamera->LookAt(viewTarget);
     }

@@ -65,18 +65,18 @@ extern "C" Vector3* __stdcall D3DRMVectorRotate(Vector3* result, Vector3* vector
                                                 float theta);
 
 // Inline vector helpers of the bike views (as in DlgProcs.cpp).
-static inline Vector3 UnknownVectorDifference(const Vector3& a, const Vector3& b) {
+static inline Vector3 VectorDifference(const Vector3& a, const Vector3& b) {
     return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
-static inline Vector3 UnknownVectorSum(const Vector3& a, const Vector3& b) {
+static inline Vector3 VectorSum(const Vector3& a, const Vector3& b) {
     return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
 // The bike view's length: the squares are accumulated one statement at a
 // time (x first), and unit vectors skip the square root. A single
 // `x*x + y*y + z*z` expression squares z first (0x004f78a0).
-static inline float UnknownVectorLength(const Vector3& v) {
+static inline float VectorLength(const Vector3& v) {
     float lengthSquared = v.x * v.x;
     lengthSquared += v.y * v.y;
     lengthSquared += v.z * v.z;
@@ -1871,7 +1871,7 @@ void MPBikeRiderDlg::HandleEvent(DialogEvent* event) {
         g_TrackGame->ui->garageCamera->SetViewport(
             previewArea.left, previewArea.top, previewArea.right - previewArea.left,
             previewArea.bottom - previewArea.top);
-        viewDistance = UnknownVectorLength(UnknownVectorDifference(*eye, g_TrackGame->ui->garageFocus));
+        viewDistance = VectorLength(VectorDifference(*eye, g_TrackGame->ui->garageFocus));
         ApplyChosenRider();
         ApplyChosenBike();
         PaintPlateNumber(g_TrackGame->mode.plateNumber);
