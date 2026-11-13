@@ -264,11 +264,11 @@ Sound* LoadEntrySound(SoundGroup* group, const char* name, int flags, int contro
 // 0x54-byte sound memory manager PCSoundInterface owns at +0x46c (not
 // RTTI-typed): streamed sounds are queued for its thread, which creates and
 // fills their buffers, evicting idle sounds to stay within the budget.
-class UnknownPCAudioObject {
+class SoundMemoryManager {
 public:
-    UnknownPCAudioObject();  // 0x004bddf0
-    ~UnknownPCAudioObject(); // 0x004bde40: stops the thread, closes the handles
-    static unsigned __stdcall UnknownThreadProc(void* context); // 0x004bdc00
+    SoundMemoryManager();    // 0x004bddf0
+    ~SoundMemoryManager(); // 0x004bde40: stops the thread, closes the handles
+    static unsigned __stdcall LoaderThreadProc(void* context);  // 0x004bdc00
     int StartLoaderThread(int budget);                  // 0x004bdef0: starts the thread
     void QueueSoundLoad(Sound* sound);                  // 0x004bdfc0: queues a load
     void RecordLoadedSound(Sound* sound, int bytes);    // 0x004be0a0: records a loaded sound

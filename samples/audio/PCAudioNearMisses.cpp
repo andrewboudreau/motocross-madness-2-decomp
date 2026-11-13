@@ -18,7 +18,7 @@
 // channels = 2;` (34), an inline SetPcmFormat(format*, channels, rate, bits)
 // helper (51) and rate first with (unsigned short) casts (68) are worse.
 //
-// UnknownPCAudioObject 0x004bdc00 (the loader thread; retail extent is 483
+// SoundMemoryManager 0x004bdc00 (the loader thread; retail extent is 483
 // bytes, 0x4bdc00..0x4bdde3): spelling the inner queue loop `while (1)`
 // instead of `for (;;)` keeps it top-tested like retail (instruction count
 // 155 = retail, candidate 478 bytes; `for (;;)` is rotated, 162

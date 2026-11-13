@@ -58,7 +58,7 @@ probe `0x004be9e0`, the primary buffer `0x004beb10`, the listener setters
 Source shapes:
 
 - `0x004bddf0` must be defined in this file: with its body visible VC6 emits
-  no EH frame around `new UnknownPCAudioObject` in `0x004be5a0`, as retail.
+  no EH frame around `new SoundMemoryManager` in `0x004be5a0`, as retail.
 - `0x004be2d0` and `0x004be5a0` share failure exits through `goto`; in
   `0x004be5a0` the result stays in edi and every DirectSound failure returns
   it through one exit. The start-up clears "AllowSoundEnumeration" before

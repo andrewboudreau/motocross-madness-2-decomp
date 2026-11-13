@@ -1110,7 +1110,7 @@ static int __cdecl CompareSounds(const void* a, const void* b) {
 }
 
 // 0x004bddf0
-UnknownPCAudioObject::UnknownPCAudioObject() {
+SoundMemoryManager::SoundMemoryManager() {
     loaderThread = 0;
     stopEvent = 0;
     queuedEvent = 0;
@@ -1120,7 +1120,7 @@ UnknownPCAudioObject::UnknownPCAudioObject() {
 }
 
 // 0x004bde40: signals the thread to stop and waits for it.
-UnknownPCAudioObject::~UnknownPCAudioObject() {
+SoundMemoryManager::~SoundMemoryManager() {
     if (loaderThread) {
         SetEvent(stopEvent);
         WaitForSingleObject(loaderThread, INFINITE);
@@ -1141,13 +1141,13 @@ UnknownPCAudioObject::~UnknownPCAudioObject() {
 }
 
 // 0x004bdef0: starts the loader thread with a budget of `budget` bytes.
-int UnknownPCAudioObject::StartLoaderThread(int budget) {
+int SoundMemoryManager::StartLoaderThread(int budget) {
     unsigned threadId;
 
     byteBudget = budget;
     queuedEvent = CreateEventA(0, 0, 0, 0);
     stopEvent = CreateEventA(0, 0, 0, 0);
-    loaderThread = (HANDLE)_beginthreadex(0, 0, UnknownThreadProc, this, 0, &threadId);
+    loaderThread = (HANDLE)_beginthreadex(0, 0, LoaderThreadProc, this, 0, &threadId);
     if (!queuedEvent || !stopEvent || !loaderThread)
         return 0;
     SetThreadPriority(loaderThread, THREAD_PRIORITY_BELOW_NORMAL);
@@ -1157,7 +1157,7 @@ int UnknownPCAudioObject::StartLoaderThread(int budget) {
 }
 
 // 0x004bdfc0: queues a streamed sound whose buffer is not ready.
-void UnknownPCAudioObject::QueueSoundLoad(Sound* sound) {
+void SoundMemoryManager::QueueSoundLoad(Sound* sound) {
     if (sound && (sound->soundFlags & 4)) {
         EnterCriticalSection(&sound->bufferLock);
         int ready = sound->bufferReady;
@@ -1172,14 +1172,14 @@ void UnknownPCAudioObject::QueueSoundLoad(Sound* sound) {
 }
 
 // 0x004be0a0
-void UnknownPCAudioObject::RecordLoadedSound(Sound* sound, int bytes) {
+void SoundMemoryManager::RecordLoadedSound(Sound* sound, int bytes) {
     loadedBytes += bytes;
     loadedSounds.Add(sound);
 }
 
 // 0x004be130: unloads the least recently played idle sounds until `bytes`
 // more fit in the budget.
-void UnknownPCAudioObject::MakeRoomForSound(int bytes) {
+void SoundMemoryManager::MakeRoomForSound(int bytes) {
     unsigned long total = loadedBytes + bytes;
     if (total < byteBudget)
         return;
@@ -1204,7 +1204,7 @@ void UnknownPCAudioObject::MakeRoomForSound(int bytes) {
 }
 
 // 0x004be220: releases a sound's buffers and forgets it.
-void UnknownPCAudioObject::UnloadSound(Sound* sound) {
+void SoundMemoryManager::UnloadSound(Sound* sound) {
     sound->IsPlaying();
     sound->ReleaseBuffers();
     loadedBytes -= sound->bufferBytes;
@@ -1322,7 +1322,7 @@ long PCSoundInterface::InitializeSound(int rate, int stereo, int bits, int value
     primaryBuffer = CreatePrimaryBuffer();
     if (!primaryBuffer)
         return 0x8878000a;
-    soundMemoryManager = new (__FILE__, 2367) UnknownPCAudioObject;
+    soundMemoryManager = new (__FILE__, 2367) SoundMemoryManager;
     if (!soundMemoryManager || !soundMemoryManager->StartLoaderThread(value))
         return 0;
     audioStarted = 1;

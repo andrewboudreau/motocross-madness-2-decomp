@@ -1,7 +1,7 @@
 # Streamed audio loader thread
 
 `samples/audio/AudioLoaderThread.cpp` contains the complete existing
-`UnknownPCAudioObject::UnknownThreadProc(void*)` candidate, extracted without
+`SoundMemoryManager::LoaderThreadProc(void*)` candidate, extracted without
 body changes from `PCAudioNearMisses.cpp`. The aggregate includes the standalone
 file. This method is the callback passed by the canonical manager's
 `StartLoaderThread` to `_beginthreadex`; it is distinct from the notification
@@ -18,11 +18,11 @@ funclet.
 
 | Existing canonical dependency | Retail address |
 |---|---:|
-| `UnknownPCAudioObject::MakeRoomForSound` | `0x004be130` |
+| `SoundMemoryManager::MakeRoomForSound` | `0x004be130` |
 | `Sound::CreatePendingBuffer` | `0x004bd4b0` |
 | `Sound::FillBufferFromFile` | `0x004bd0c0` |
 | `Sound::Play` | `0x004bbcd0` |
-| `UnknownPCAudioObject::RecordLoadedSound` | `0x004be0a0` |
+| `SoundMemoryManager::RecordLoadedSound` | `0x004be0a0` |
 
 All five definitions are present in `src/reconstructed/PCAudio.cpp`. Remaining
 dependencies are the existing `WaitForMultipleObjects`, `EnterCriticalSection`,

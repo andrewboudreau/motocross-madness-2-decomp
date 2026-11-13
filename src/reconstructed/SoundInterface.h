@@ -164,7 +164,7 @@ struct SoundDeviceRecord {
 
 // Defined in PCAudio.h.
 class SoundGroup;
-class UnknownPCAudioObject;
+class SoundMemoryManager;
 
 class PCSoundInterface : public SoundInterface {
 public:
@@ -210,7 +210,7 @@ public:
     DirectSound* directSound;           // +0x460
     DirectSound3DListener* listener;            // +0x464
     DirectSoundBuffer* primaryBuffer;         // +0x468: primary buffer
-    UnknownPCAudioObject* soundMemoryManager;  // +0x46c
+    SoundMemoryManager* soundMemoryManager;    // +0x46c
     SoundGroup* eaxProbeGroup;                 // +0x470
     Sound* eaxProbeSound;                      // +0x474: EAX probe sound
 };

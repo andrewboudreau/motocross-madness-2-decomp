@@ -6,8 +6,8 @@
 // 0x004bdc00: loads queued streamed sounds until the stop event: makes room
 // within the budget, creates and fills the buffer, and plays the sound
 // unless it was stopped meanwhile.
-unsigned __stdcall UnknownPCAudioObject::UnknownThreadProc(void* context) {
-    UnknownPCAudioObject* audio = (UnknownPCAudioObject*)context;
+unsigned __stdcall SoundMemoryManager::LoaderThreadProc(void* context) {
+    SoundMemoryManager* audio = (SoundMemoryManager*)context;
     HANDLE events[2];
     unsigned long result;
 

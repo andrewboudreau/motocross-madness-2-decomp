@@ -194,7 +194,7 @@ class EditBoxOnCharBehaviorTests(unittest.TestCase):
                 'int Sound::Play(){Unexpected();return 0;}\n'
                 'void* operator new(unsigned int,const char*,int){Unexpected();return 0;}\n'
                 'void operator delete(void*,const char*,int){Unexpected();}\n'
-                'void UnknownPCAudioObject::QueueSoundLoad(Sound*){Unexpected();}\n')
+                'void SoundMemoryManager::QueueSoundLoad(Sound*){Unexpected();}\n')
             fail_path,_=compile_source(fail,'unvisited')
             layout=output/'layout.cpp'
             layout.write_text('#include "GameUi.h"\n#include "UIDialog.h"\n#include "GUIManager.h"\n#include "PCAudio.h"\n#include "PCRenderTarget.h"\n#include <stddef.h>\n'

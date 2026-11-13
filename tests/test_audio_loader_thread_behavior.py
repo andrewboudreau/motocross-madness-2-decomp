@@ -14,13 +14,13 @@ from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-SYMBOL = '?UnknownThreadProc@UnknownPCAudioObject@@SGIPAX@Z'
+SYMBOL = '?LoaderThreadProc@SoundMemoryManager@@SGIPAX@Z'
 HELPERS = {
-    '?MakeRoomForSound@UnknownPCAudioObject@@QAEXH@Z': 0x4be130,
+    '?MakeRoomForSound@SoundMemoryManager@@QAEXH@Z': 0x4be130,
     '?CreatePendingBuffer@Sound@@QAEHXZ': 0x4bd4b0,
     '?FillBufferFromFile@Sound@@QAEHPAPAUDirectSoundBuffer@@@Z': 0x4bd0c0,
     '?Play@Sound@@QAEHXZ': 0x4bbcd0,
-    '?RecordLoadedSound@UnknownPCAudioObject@@QAEXPAVSound@@H@Z': 0x4be0a0,
+    '?RecordLoadedSound@SoundMemoryManager@@QAEXPAVSound@@H@Z': 0x4be0a0,
 }
 IMPORTS = {'__imp__WaitForMultipleObjects@16': 0,
            '__imp__EnterCriticalSection@4': 1, '__imp__LeaveCriticalSection@4': 2}

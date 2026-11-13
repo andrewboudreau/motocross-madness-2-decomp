@@ -1,4 +1,4 @@
-"""UnknownPCAudioObject::UnknownThreadProc 0x004bdc00, the streamed-sound loader thread
+"""SoundMemoryManager::LoaderThreadProc 0x004bdc00, the streamed-sound loader thread
 (tools/emu_diff.py case).
 
 The linked body is samples/audio/AudioLoaderThread.cpp. Offsets from the retail body (see
@@ -13,7 +13,7 @@ compared. MakeRoomForSound, CreatePendingBuffer (answers per sound), FillBufferF
 RecordLoadedSound and _endthreadex are stubs; the sounds' fields are compared as memory.
 """
 RETAIL_VA = 0x004bdc00
-SYMBOL = '?UnknownThreadProc@UnknownPCAudioObject@@SGIPAX@Z'
+SYMBOL = '?LoaderThreadProc@SoundMemoryManager@@SGIPAX@Z'
 SOURCE = 'samples/audio/AudioLoaderThread.cpp'
 PROBES = {0x004bdcb1: 'streamed', 0x004bdcdb: 'not ready', 0x004bdd21: 'created', 0x004bdd6f: 'play',
           0x004bdd89: 'record', 0x004bddb3: 'other wait result'}
@@ -70,11 +70,11 @@ def setup(ctx, c):
     ctx.pack(WAIT, 'I', ctx.stub('WaitForMultipleObjects', pop=16, nargs=4, ret=wait, log=False))
     ctx.pack(ENTER, 'I', ctx.stub('EnterCriticalSection', pop=4, ret=lock('Enter'), log=False))
     ctx.pack(LEAVE, 'I', ctx.stub('LeaveCriticalSection', pop=4, ret=lock('Leave'), log=False))
-    ctx.stub_at(0x004be130, 'UnknownPCAudioObject::MakeRoomForSound', pop=4)
+    ctx.stub_at(0x004be130, 'SoundMemoryManager::MakeRoomForSound', pop=4)
     ctx.stub_at(0x004bd4b0, 'Sound::CreatePendingBuffer', pop=0, ret=lambda cx, e, a: created.get(e, 0))
     ctx.stub_at(0x004bd0c0, 'Sound::FillBufferFromFile', pop=4)
     ctx.stub_at(0x004bbcd0, 'Sound::Play', pop=0)
-    ctx.stub_at(0x004be0a0, 'UnknownPCAudioObject::RecordLoadedSound', pop=8)
+    ctx.stub_at(0x004be0a0, 'SoundMemoryManager::RecordLoadedSound', pop=8)
     ctx.stub_at(0x00537c9f, '_endthreadex', nargs=1, ret=lambda cx, e, a: cx.note('_endthreadex', a[0]),
                 log=False)
     return dict(args=[audio])

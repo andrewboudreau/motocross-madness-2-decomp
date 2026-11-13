@@ -11,7 +11,7 @@
 
 static unsigned char referenceSpace[0x800000];
 struct World {
-    unsigned char audio[sizeof(UnknownPCAudioObject)];
+    unsigned char audio[sizeof(SoundMemoryManager)];
     unsigned char sounds[5][sizeof(Sound)];
     Sound* queue[8];
     Sound* loaded[8];
@@ -28,7 +28,7 @@ struct Scenario { unsigned seed; int count,waitMode,failMask,readyMask,streamMas
     int duplicate,invalid,mutateAt,throwAt,exitReturns,bytesCase,queueMutation; };
 static Scenario scenario;
 static int checks;
-static UnknownPCAudioObject* Audio(){return (UnknownPCAudioObject*)world.audio;}
+static SoundMemoryManager* Audio(){return (SoundMemoryManager*)world.audio;}
 static Sound* Item(int n){return (Sound*)world.sounds[n];}
 static int SoundIndex(const Sound* sound){
     for(int n=0;n<5;++n)if(sound==Item(n))return n;
@@ -100,7 +100,7 @@ static void __cdecl End(unsigned code){
     EventAt(9,0,code,0);observed.ended++;
     if(!scenario.exitReturns)RaiseException(0xe0310001,0,0,0);
 }
-void UnknownPCAudioObject::MakeRoomForSound(int bytes){
+void SoundMemoryManager::MakeRoomForSound(int bytes){
     if(this!=Audio() || observed.held[0]!=1)ExitProcess(86);
     EventAt(4,0,bytes,0);observed.capturedBytes=bytes;loadedBytes^=(unsigned)bytes;
 }
@@ -123,7 +123,7 @@ int Sound::Play(){
     EventAt(7,n+1,0,0);++observed.plays[n];currentVolume^=0x10203040;
     return scenario.seed&4?0:-7; // Also ignored by the loader.
 }
-void UnknownPCAudioObject::RecordLoadedSound(Sound* sound,int bytes){
+void SoundMemoryManager::RecordLoadedSound(Sound* sound,int bytes){
     int n=SoundIndex(sound);if(this!=Audio() || observed.held[0]!=1)ExitProcess(90);
     if(bytes!=observed.capturedBytes)ExitProcess(95);
     EventAt(8,n+1,bytes,0);++observed.recorded[n];loadedBytes+=(unsigned)bytes;
@@ -132,11 +132,11 @@ void UnknownPCAudioObject::RecordLoadedSound(Sound* sound,int bytes){
 template<class T> static DWORD Address(T method){union {T method;DWORD address;}u;u.method=method;return u.address;}
 static DWORD Hook(DWORD target){
     switch(target){
-    case 0x4be130:return Address(&UnknownPCAudioObject::MakeRoomForSound);
+    case 0x4be130:return Address(&SoundMemoryManager::MakeRoomForSound);
     case 0x4bd4b0:return Address(&Sound::CreatePendingBuffer);
     case 0x4bd0c0:return Address(&Sound::FillBufferFromFile);
     case 0x4bbcd0:return Address(&Sound::Play);
-    case 0x4be0a0:return Address(&UnknownPCAudioObject::RecordLoadedSound);
+    case 0x4be0a0:return Address(&SoundMemoryManager::RecordLoadedSound);
     case 0x537c9f:return (DWORD)End;
     }ExitProcess(91);return 0;
 }
@@ -156,7 +156,7 @@ static int MapReference(const char* path,const char* patches){
         memcpy(mapped+section[i].VirtualAddress,raw+section[i].PointerToRawData,section[i].SizeOfRawData);
     }free(raw);
     *(DWORD*)0x5500d8=(DWORD)Wait;*(DWORD*)0x55025c=(DWORD)Enter;*(DWORD*)0x550284=(DWORD)Leave;
-    BYTE* candidate=(BYTE*)UnknownPCAudioObject::UnknownThreadProc;
+    BYTE* candidate=(BYTE*)SoundMemoryManager::LoaderThreadProc;
     if(!VirtualProtect(candidate,478,PAGE_EXECUTE_READWRITE,&old))return 0;
     // Validated Python records identify only complete-function dependency
     // relocations. Import operands point to private cells; shared CRT imports
@@ -187,7 +187,7 @@ static int Filter(EXCEPTION_POINTERS* e){
     return EXCEPTION_EXECUTE_HANDLER;
 }
 static void Invoke(int retail){
-    unsigned(__stdcall* call)(void*)=UnknownPCAudioObject::UnknownThreadProc;
+    unsigned(__stdcall* call)(void*)=SoundMemoryManager::LoaderThreadProc;
     if(retail)call=(unsigned(__stdcall*)(void*))0x4bdc00;
     __try{observed.result=call(scenario.invalid==3?0:Audio());}
     __except(Filter(GetExceptionInformation())){}
@@ -229,7 +229,7 @@ static void Compare(){
 }
 int main(int argc,char** argv){
     if(argc!=3 || !MapReference(argv[1],argv[2]))return 3;
-    if(sizeof(UnknownPCAudioObject)!=0x54 || sizeof(Sound)!=0x1f8 || offsetof(UnknownPCAudioObject,queuedSounds)!=0x2c ||
+    if(sizeof(SoundMemoryManager)!=0x54 || sizeof(Sound)!=0x1f8 || offsetof(SoundMemoryManager,queuedSounds)!=0x2c ||
        offsetof(Sound,bufferLock)!=0x48 || offsetof(Sound,bufferBytes)!=0x198)return 4;
     // Independent expected outcomes protect against an inert dispatcher or
     // two identically miswired paths agreeing without executing the operation.
