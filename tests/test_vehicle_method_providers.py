@@ -69,7 +69,7 @@ class VehicleMethodProviderTests(unittest.TestCase):
                 symbol = target['candidate_symbol_contains']
                 slot = (int(re.search(r'Slot(\d+)@', symbol)[1]) if 'Slot' in symbol
                         else {'ShouldEmitMovingEffects': 23, 'ShouldRestartSteamEffect': 24,
-                              'ShouldBurstSteamEffect': 25, 'IsSpawnProtected': 51, 'LoadBodyAxes': 34,
+                              'ShouldBurstSteamEffect': 25, 'IsSpawnProtected': 51, 'CanCrash': 52, 'LoadBodyAxes': 34,
                               'StoreBodyAxes': 35, 'ResolveSubstepCollisions': 28,
                               'SaveBodyOrientation': 29, 'ClearContactEffectFlags': 30,
                               'UpdateContactStates': 31, 'ResetToPlacement': 33,

@@ -1306,12 +1306,13 @@ Fixture pins: whole-object and aggregate digests of NAME-ONLY units only, each
 with unchanged section and relocation counts: Bike.cpp (two compile forms),
 KrustyBike.cpp (two), Vehicle.cpp (two), SoulTreePhysics.cpp, FollowCamera.cpp,
 VehicleMethods.cpp, D3DIMSoultreeShadow.cpp, KrustyBikeNearMisses.cpp (two),
-FollowCameraNearMisses.cpp (two), FollowCameraConstructor.cpp and
-D3DIMSoultreeShadowNearMisses.cpp, in 13 fixture files and in
+FollowCameraNearMisses.cpp (three), FollowCameraConstructor.cpp and
+D3DIMSoultreeShadowNearMisses.cpp, in 14 fixture files and in
 tests/test_rider_motion_start_connections.py. Every occurrence of each old
 digest was replaced (work/naming/repin.py, then work/naming/w16_repin3.py for
 the pins repin.py cannot attribute: aggregate keys and digests inside test
-modules).
+modules). tests/test_vehicle_method_providers.py maps the new slot name
+`CanCrash` to slot 52, as it does for the other named Vehicle slots.
 
 ### Slots
 
