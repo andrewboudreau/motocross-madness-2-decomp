@@ -48,6 +48,9 @@ near misses; `tools/near_miss_drops.py` lists ones whose gap is a single drop.
   `candidate_sources` entry in `config/game_build.json` before distorting the source.
 - Declaring one extra member in a class can swap two load registers in an unrelated function (Terrain issue #32):
   it is a compiler internal-ordering artifact, so probe it as a header change, not as a source-shape change.
+  The count is per function, modulo 64 typedefs: each named declaration or member is 1, a class 8 + members,
+  a redeclaration 0 (NAMING.md Wave 18). Removing a view struct is therefore a different lottery in every unit
+  that includes it; check exact neighbours (Terrain Render3D, BikeRace CreateRacers) before calling a merge neutral.
 - Index sums in strength-reduced loops: `for (j = 0; j < 64; j += 16)` lets VC6 reassociate `[i + j + t]` to
   `t + i + j`; a row counter with a named `int j = row * 16;` keeps `lea r, [i + j]` (Griddraw `0x00481300`).
   Term order and parentheses do not move it; `row << 4` is worse.
