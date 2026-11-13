@@ -114,20 +114,23 @@ struct TrackGameViewOwner : public GameObject {
 // The last 0x14 bytes of UnknownTrackGameModeOptions6ac. 0x00522720 clears
 // them through a pointer advanced to +0x360 with a fresh zero register, which
 // suggests an inline helper (provisional; that function is still a near miss).
+// One chosen garage curve row per bike class, in the order of
+// g_BikeClassEngineSizes (0x0056cb6c: 125, 250, 400, 500, 600 in retail
+// .data); OptionProcs.h indexes the same five ints as curveRows[BikeClassOf(cc)].
 struct UnknownTrackGameModeOptions6ac360 {
     void UnknownReset() {
-        field_0x00 = 0;
-        field_0x04 = 0;
-        field_0x08 = 0;
-        field_0x0c = 0;
-        field_0x10 = 0;
+        curve125cc = 0;
+        curve250cc = 0;
+        curve400cc = 0;
+        curve500cc = 0;
+        curve600cc = 0;
     }
 
-    int field_0x00;
-    int field_0x04;
-    int field_0x08;
-    int field_0x0c;
-    int field_0x10;
+    int curve125cc;                           // +0x00 bike class 0
+    int curve250cc;                           // +0x04 bike class 1
+    int curve400cc;                           // +0x08 bike class 2
+    int curve500cc;                           // +0x0c bike class 3
+    int curve600cc;                           // +0x10 bike class 4
 };
 
 struct UnknownTrackGameModeOptions6ac {       // TrackGameMode+0x6ac, 0x374 bytes
