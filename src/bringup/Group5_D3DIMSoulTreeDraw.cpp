@@ -104,7 +104,7 @@ struct UnknownSoultreeMatrix {
 int D3DIMSoultreeObject::PrepareGeometry()
 {
     visible = 0;
-    if (!hidden && field_0x190) {
+    if (!hidden && drawsItself) {
         if (subtreeDirty)
             UpdateSubtreeBounds();
         Matrix4 world;

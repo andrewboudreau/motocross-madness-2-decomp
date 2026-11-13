@@ -122,7 +122,7 @@ public:
     Vector3 subtreeBoundsCenter;               // +0x174 subtree bounds centre (0x004fe0f0; Krusty3DObjects.cpp 0x0048c8a0)
     Vector3 subtreeBoundsHalfExtent;           // +0x180 subtree bounds half extent (0x004fe0f0)
     int subtreeDirty;                          // +0x18c subtree bounds dirty (set up the parent chain by 0x004fdab0)
-    int field_0x190;                           // slot 12 tests it before the visibility test
+    int drawsItself;                           // +0x190 slot 12 tests it before the visibility test; the quadtree renderer clears it (core/SoultreeObject.h). Tier 3
     unsigned char field_0x194[0x1a0 - 0x194];
     ParameterBlock* parameterBlock;     // .slt reader
 };

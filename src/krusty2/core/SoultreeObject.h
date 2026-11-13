@@ -271,7 +271,7 @@ public:
     void GetLocalBounds(Vec3* center, Vec3* halfExtent);
 
     // 0x004fe0f0: refreshes subtreeBoundsA/B (center and half extents) from this node's
-    // local bounds (when field_0x150 is set) and every child's 0x004fe2e0.
+    // local bounds (when boundsFound is set) and every child's 0x004fe2e0.
     void UpdateSubtreeBounds();
 
     // 0x004fe2e0, ret 0x10: grows the box (*have, *lo, *hi) by this node's subtree, expressed
@@ -329,7 +329,7 @@ public:
     // copies 0x14c and clears 0x154 (tier 1 offsets, tier 3 roles).
     int hidden;                    // 0x14c, set/cleared by 0x004fdb40 / 0x004fdb50; read from
                                    // the node record; nonzero skips drawing (provisional name)
-    int field_0x150;               // 0x150
+    int boundsFound;               // 0x150, D3DIMSoulTree.h's name; 0x004fe0f0 / 0x004fe2e0 use the local bounds only when set. Tier 2
     int localBoundsValid;          // 0x154, 0 makes 0x004fe0a0 call slot 5 first
     Vec3 localBoundsCenter;        // 0x158, returned by 0x004fe0a0
     Vec3 localBoundsHalfExtent;    // 0x164, half size per axis
@@ -337,7 +337,7 @@ public:
     Vec3 subtreeBoundsA;           // 0x174, returned by 0x004fe850 (refreshed when subtreeDirty)
     Vec3 subtreeBoundsB;           // 0x180
     int subtreeDirty;              // 0x18c, set on self and all ancestors by 0x004fdab0
-    int field_0x190;               // 0x190, 1 after construction
+    int drawsItself;               // 0x190, 1 after construction; cleared while the quadtree renderer owns the node, D3DIMSoultreeObject slot 12 only prepares it when set. Tier 3
     int inQuadtree;                // 0x194, nonzero while inserted in the quadtree (0x004fed70 tests and clears it)
     int quadtreeCell;              // 0x198, quadtree cell code (15 = none) passed to Remove/UpdateRange
     int loadedNodeCount;           // 0x19c, node count of a loaded hierarchy (slot 2 reads it, slot 3 stores the "Object Hierarchy" count)

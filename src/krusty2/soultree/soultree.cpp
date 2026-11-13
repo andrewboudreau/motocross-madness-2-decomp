@@ -140,11 +140,11 @@ SoultreeObject::SoultreeObject(int flags)
     SetIdentity(&localMatrix);
     memset(&worldMatrix, 0, sizeof(worldMatrix));
     worldValid = 0;
-    field_0x190 = 1;
+    drawsItself = 1;
     quadtreeCell = 15;
     inQuadtree = 0;
     hidden = 0;
-    field_0x150 = 0;
+    boundsFound = 0;
     localBoundsValid = 0;
     localBoundsCenter.x = 0;
     localBoundsCenter.y = 0;
@@ -892,7 +892,7 @@ void SoultreeObject::GetLocalBounds(Vec3* center, Vec3* halfExtent)
 }
 
 // 0x004fe0f0. Bounding box of this node (local bounds as center +- half size, when
-// field_0x150 is set) grown by every child's subtree, stored as center and half extents.
+// boundsFound is set) grown by every child's subtree, stored as center and half extents.
 void SoultreeObject::UpdateSubtreeBounds()
 {
     UpdateWorldMatrix();
@@ -905,7 +905,7 @@ void SoultreeObject::UpdateSubtreeBounds()
     hi.y = 0.0f;
     hi.x = 0.0f;
     have = 0;
-    if (field_0x150) {
+    if (boundsFound) {
         have = 1;
         lo = localBoundsCenter - localBoundsHalfExtent;
         hi = localBoundsCenter + localBoundsHalfExtent;
@@ -963,7 +963,7 @@ static inline void FramePointTo(Vec3* r, Vec3 p, const Matrix4& m)
 // stored unconditionally) are all needed for the exact bytes.
 void SoultreeObject::AccumulateBounds(int* have, Vec3* lo, Vec3* hi, const Matrix4* frame)
 {
-    if (field_0x150) {
+    if (boundsFound) {
         Vec3 ax = Vec3(localBoundsHalfExtent.x, 0.0f, 0.0f);
         Vec3 ay = Vec3(0.0f, localBoundsHalfExtent.y, 0.0f);
         Vec3 az = Vec3(0.0f, 0.0f, localBoundsHalfExtent.z);

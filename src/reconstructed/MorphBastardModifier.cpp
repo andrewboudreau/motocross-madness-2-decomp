@@ -25,7 +25,7 @@ MorphBastardModifier::MorphBastardModifier(int flags)
     deltaSums = 0;
     deltaMinimums = 0;
     deltaMaximums = 0;
-    field_0x3c = 0;
+    onFirstModifierList = 0;
 }
 
 // 0x004a31a0

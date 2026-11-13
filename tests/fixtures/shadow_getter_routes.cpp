@@ -29,7 +29,7 @@ static void Setup(int seed,int valid,int boxes) {
     for(int i=0;i<5;i++) {
         n[i].parent=0;n[i].firstChild=0;n[i].nextSibling=0;
         n[i].worldValid=(valid>>(i%3))&1;n[i].subtreeDirty=0;
-        n[i].field_0x150=(boxes>>(i%2))&1;
+        n[i].boundsFound=(boxes>>(i%2))&1;
         n[i].localBoundsCenter=Vec3((float)(i-2),(float)(seed%5),(float)(i+seed%3));
         n[i].localBoundsHalfExtent=Vec3((float)(i+1),2.0f,3.0f);
         n[i].subtreeBoundsA=Vec3(101.0f,102.0f,103.0f);
@@ -59,7 +59,7 @@ static void World(int i) {
 }
 static void Grow(int i,int& have,double* lo,double* hi) {
     int k;
-    if(e[i].field_0x150) {
+    if(e[i].boundsFound) {
         World(i);
         for(int corner=0;corner<8;corner++) {
             double local[3],world[3],point[3];
@@ -85,7 +85,7 @@ static void Grow(int i,int& have,double* lo,double* hi) {
 static void Bounds() {
     int k;
     World(0);
-    int have=e[0].field_0x150!=0;double lo[3]={0,0,0},hi[3]={0,0,0};
+    int have=e[0].boundsFound!=0;double lo[3]={0,0,0},hi[3]={0,0,0};
     if(have)for(k=0;k<3;k++) {lo[k]=e[0].localBoundsCenter[k]-e[0].localBoundsHalfExtent[k];hi[k]=e[0].localBoundsCenter[k]+e[0].localBoundsHalfExtent[k];}
     for(SoultreeObject* child=e[0].firstChild;child;child=e[Index(child)].nextSibling)Grow(Index(child),have,lo,hi);
     for(k=0;k<3;k++) {e[0].subtreeBoundsA[k]=(float)((hi[k]+lo[k])*0.5);e[0].subtreeBoundsB[k]=(float)((hi[k]-lo[k])*0.5);}

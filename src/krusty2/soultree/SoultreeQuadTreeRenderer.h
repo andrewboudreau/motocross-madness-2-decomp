@@ -36,7 +36,7 @@ public:
     int hidden;                       // +0x14c tested by slot 12
     char pad_0x150[0x18c - 0x150];
     int subtreeDirty;                 // +0x18c (common/SoultreeObject.h); set to 1 by 0x5046e0
-    int field_0x190;                  // +0x190 cleared by InsertNodesInQuadtree, set to 1 by RemoveNodesFromQuadtree
+    int drawsItself;                  // +0x190 cleared by InsertNodesInQuadtree, set to 1 by RemoveNodesFromQuadtree (core/SoultreeObject.h). Tier 3
     int inQuadtree;                   // +0x194 set to 1 by InsertNodesInQuadtree; tested by slot 10
     int quadtreeCell;                 // +0x198 quadtree cell code (core/SoultreeObject.h)
     void UpdateQuadtreeCell();                 // thiscall, plain ret
@@ -47,9 +47,9 @@ public:
 class D3DIMSoultreeObject : public SoultreeObject {
 public:
     char pad_0x19c[0x28c - 0x19c];
-    int field_0x28c;                  // nonzero gates the work in 0x5046e0
+    int lodTable;                     // +0x28c D3DIMSoulTree.h's SoultreeLod* at this offset; nonzero gates the work in 0x5046e0. Tier 2
     char pad_0x290[0x2d4 - 0x290];
-    int field_0x2d4;                  // set to 1 by slot 12
+    int visible;                      // +0x2d4 D3DIMSoulTree.h's name; set to 1 by slot 12 before SelectLod. Tier 2
     void TransformVertexGroups(int lod);  // 0x00440d40, ret 4 (src/reconstructed D3DIMSoulTree.h)
     void SelectLod(int center, int extents);  // 0x00443de0, ret 8: null bounds pick the node's own
 };

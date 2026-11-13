@@ -64,7 +64,7 @@ int SoultreeQuadTreeRenderer::PrepareGeometry()
         if (obj->objectTypeId == nodeTypeId) {
             D3DIMSoultreeObject* node = (D3DIMSoultreeObject*)obj;
             if (node->hidden == 0) {
-                node->field_0x2d4 = 1;
+                node->visible = 1;
                 node->SelectLod(0, 0);
                 visibleCount++;
             }
@@ -93,9 +93,9 @@ void SoultreeQuadTreeRenderer::InsertNodesInQuadtree()
     GameObjectIterator* it = new(__FILE__, 0x63) GameObjectIterator(root, 1, "");
     while (GameObject* obj = it->Next()) {
         D3DIMSoultreeObject* node = dynamic_cast<D3DIMSoultreeObject*>(obj);
-        if (node && node->field_0x28c) {
+        if (node && node->lodTable) {
             sceneObjectCount++;
-            node->field_0x190 = 0;
+            node->drawsItself = 0;
             node->subtreeDirty = 1;
             node->inQuadtree = 1;
             node->UpdateQuadtreeCell();
@@ -116,7 +116,7 @@ void SoultreeQuadTreeRenderer::RemoveNodesFromQuadtree()
         SoultreeObject* node = dynamic_cast<SoultreeObject*>(obj);
         if (node) {
             node->RemoveFromQuadtree();
-            node->field_0x190 = 1;
+            node->drawsItself = 1;
         }
     }
     sceneObjectCount = 0;

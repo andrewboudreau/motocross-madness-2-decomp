@@ -8,7 +8,7 @@ D3DIMSoultreeModifier::D3DIMSoultreeModifier(int flags)
 {
     objectCount = 0;
     modifiedObjects = 0;
-    field_0x3c = 1;
+    onFirstModifierList = 1;
 }
 
 D3DIMSoultreeModifier::~D3DIMSoultreeModifier()
@@ -59,7 +59,7 @@ void D3DIMSoultreeModifier::DetachFromAll()
             objects[i] = modifiedObjects[i];
         int count = objectCount;
         for (int j = 0; j < count; j++) {
-            if (field_0x3c)
+            if (onFirstModifierList)
                 objects[j]->RemoveModifier(this);
             else
                 objects[j]->RemoveSecondModifier(this);
