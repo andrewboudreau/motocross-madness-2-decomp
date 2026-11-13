@@ -28,7 +28,7 @@
   "??_C@_0P@JHHH@Managed?5?$CF0?42fM?$AA@": "0x00574e4c",
   "?Append@TextureMapList@@QAEXPAVTextureMap@@@Z": "0x00510af0",
   "?AppendList@TextureMapList@@QAEXPAV1@@Z": "0x00510b70",
-  "?CopyMipLevels@CacheTexture@@QAEHPAUUnknownTextureRegion@@H@Z": "0x005102d0",
+  "?CopyMipLevels@CacheTexture@@QAEHPAUCacheTextureRegion@@H@Z": "0x005102d0",
   "?EmptyPage@CacheTexture@@QAEXXZ": "0x0050fc40",
   "?First@TextureMapList@@QAEPAVTextureMap@@XZ": "0x00510a90",
   "?FitTexturesToBudget@@YAHPAV?$ContainerList@PAVManagedTexture@@@@H@Z": "0x0050d800",

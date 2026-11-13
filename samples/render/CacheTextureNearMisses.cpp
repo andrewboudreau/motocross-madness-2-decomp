@@ -70,7 +70,7 @@ static inline int LevelArea(int level) {
 }
 
 // 0x005102d0
-int CacheTexture::CopyMipLevels(UnknownTextureRegion* region, int level) {
+int CacheTexture::CopyMipLevels(CacheTextureRegion* region, int level) {
     region->occupant->UpdatePageCoords(level);
     float scale = 1.0f / (1 << level);
     int width = textureWidth;

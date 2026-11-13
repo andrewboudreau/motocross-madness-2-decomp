@@ -12,7 +12,7 @@ from mcm2tool.pe import PEImage
 from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha256_file
 from tools.match import compare
 ROOT = Path(__file__).resolve().parents[1]
-SYMBOL = '?CopyMipLevels@CacheTexture@@QAEHPAUUnknownTextureRegion@@H@Z'
+SYMBOL = '?CopyMipLevels@CacheTexture@@QAEHPAUCacheTextureRegion@@H@Z'
 DIRECT = {0x5102e9: 0x510610, 0x510315: 0x534a88, 0x51032a: 0x534a88,
           0x510340: 0x534a88, 0x51035c: 0x534a88}
 INDIRECT = {0x5103c8: 'dword ptr [ecx + 0x30]', 0x5103ff: 'dword ptr [ecx + 0x14]',

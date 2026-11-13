@@ -339,7 +339,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
             if (bits) {
                 for (int j = 0; j < dumpTextures.m_count; j++) {
                     ManagedTexture* managed = dumpTextures.Get(j);
-                    UnknownTextureRegion* region = managed->region;
+                    CacheTextureRegion* region = managed->region;
                     int left = (int)(page->textureWidth * region->left);
                     int top = (int)(page->textureHeight * region->top) + 20;
                     int side = (int)(managed->pageScale * 256.0f);

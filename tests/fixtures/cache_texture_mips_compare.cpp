@@ -5,8 +5,8 @@
 #include <string.h>
 #include <float.h>
 extern "C" long __cdecl _ftol();
-class TrackGame;struct UnknownTextureRegion;
-class CacheTexture {public:int CopyMipLevels(UnknownTextureRegion*,int);};
+class TrackGame;struct CacheTextureRegion;
+class CacheTexture {public:int CopyMipLevels(CacheTextureRegion*,int);};
 class ManagedTexture {public:void UpdatePageCoords(int);};
 class ActualManagedTexture {public:void UpdatePageCoords(int);};
 static BYTE referenceSpace[0x800000]={1};
@@ -67,8 +67,8 @@ static int MapReference(const char* path,const char* patches){
  f=fopen(patches,"rb");if(!f)return 0;DWORD entry[3];int count=0;while(fread(entry,sizeof(entry),1,f)==1){BYTE* site=(BYTE*)entry[0];if(entry[0]<0x5102d0||entry[0]+5>0x5104fe||*site!=0xe8||entry[2]!=0xe8||(DWORD)(site+5)+*(DWORD*)(site+1)!=entry[1])return 0;*(DWORD*)(site+1)=Replacement(entry[1])-(DWORD)(site+5);++count;}fclose(f);return count==5&&FlushInstructionCache(GetCurrentProcess(),0,0);
 }
 static int Filter(EXCEPTION_POINTERS* e){DWORD code=e->ExceptionRecord->ExceptionCode;if(code!=EXCEPTION_ACCESS_VIOLATION)return EXCEPTION_CONTINUE_SEARCH;observed.exception=code;observed.faultKind=e->ExceptionRecord->ExceptionInformation[0];observed.faultAddress=e->ExceptionRecord->ExceptionInformation[1];return EXCEPTION_EXECUTE_HANDLER;}
-static void Invoke(){union{int(CacheTexture::*method)(UnknownTextureRegion*,int);DWORD address;}call;call.method=&CacheTexture::CopyMipLevels;if(retailActive)call.address=0x5102d0;
- __try{observed.result=(((CacheTexture*)world.cache)->*call.method)((UnknownTextureRegion*)world.regions[0],scenario.level);observed.completed=1;}__except(Filter(GetExceptionInformation())){}
+static void Invoke(){union{int(CacheTexture::*method)(CacheTextureRegion*,int);DWORD address;}call;call.method=&CacheTexture::CopyMipLevels;if(retailActive)call.address=0x5102d0;
+ __try{observed.result=(((CacheTexture*)world.cache)->*call.method)((CacheTextureRegion*)world.regions[0],scenario.level);observed.completed=1;}__except(Filter(GetExceptionInformation())){}
 }
 static void Run(int retail){retailActive=retail;memset(&observed,0,sizeof(observed));observed.result=-999;attachments=0;memset(&world,0x65+scenario.seed%15,sizeof(world));
  for(int n=0;n<2;++n){At(world.games[n],0xc)=(DWORD)world.displays[n];At(world.displays[n],0x5bc)=n?1:scenario.partial;At(world.groups[n],0x1d0)=scenario.initialTexels+n*7;At(world.textures[n],0x14)=scenario.sourceSide;At(world.textures[n],0x70)=(DWORD)&world.surfaces[0][n];At(world.textures[n],0x80)=scenario.helperPage?(DWORD)world.cache:0;At(world.textures[n],0x94)=scenario.helperRegion?(DWORD)world.regions[n]:0;At(world.regions[n],0x14)=(DWORD)world.textures[n];At(world.regions[n],0x18)=6+n;At(world.regions[n],0x1c)=scenario.left;At(world.regions[n],0x20)=scenario.top;At(world.regions[n],0x24)=scenario.right;At(world.regions[n],0x28)=scenario.bottom;

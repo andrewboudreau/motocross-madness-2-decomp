@@ -36,7 +36,7 @@ public:
     float pageOffsetU;                        // +0x88 u offset within the page
     float pageOffsetV;                        // +0x8c v offset within the page
     ManagedTextureGroup* group;               // +0x90
-    UnknownTextureRegion* region;             // +0x94
+    CacheTextureRegion* region;               // +0x94
     int copiedSkipLevels;                     // +0x98 top mip levels its last page copy left out (CopyMipLevels' level); nonzero makes the repack blit it again
     int blitSkipLevels;                       // +0x9c top mip levels the partial-blit repack leaves out to keep under blitBudget
     int useCount;                             // +0xa0 uses (0x00510820)

@@ -473,7 +473,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
     pages[8] = 0;
     while (whole && texture) {
         TextureMap* next = texture->nextTexture;
-        UnknownTextureRegion* region = static_cast<CacheTexture*>(texture)->rootRegion;
+        CacheTextureRegion* region = static_cast<CacheTexture*>(texture)->rootRegion;
         if (region && region->reserved && !region->quarters[0]) {
             cachePages.Remove(texture);
             emptied.Append(texture);

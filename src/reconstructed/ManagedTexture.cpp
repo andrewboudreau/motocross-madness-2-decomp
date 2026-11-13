@@ -31,7 +31,7 @@ ManagedTexture::~ManagedTexture() {
 
 // 0x00510610
 void ManagedTexture::UpdatePageCoords(int level) {
-    UnknownTextureRegion* placed = region;
+    CacheTextureRegion* placed = region;
     if (placed && page) {
         pageScale = (placed->right - placed->left) / (1 << level);
         pageOffsetU = placed->left;

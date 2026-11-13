@@ -25,7 +25,7 @@ CacheTexture::CacheTexture(TextureMapManager* manager, ManagedTextureGroup* grou
         freeLeafCounts[i] = reservedLeafCounts[i] = 0;
         reservedLeaves[i].Init(32, 32);
     }
-    rootRegion = (UnknownTextureRegion*)ownerManager->regionAllocator->Alloc();
+    rootRegion = (CacheTextureRegion*)ownerManager->regionAllocator->Alloc();
     rootRegion->Init(0, level);
     rootRegion->left = rootRegion->top = 0.0f;
     rootRegion->right = rootRegion->bottom = 1.0f;
@@ -42,7 +42,7 @@ int CacheTexture::ListTextures(ContainerList<ManagedTexture*>* textures) {
 }
 
 // 0x0050f8e0
-int CacheTexture::CollectOccupants(ContainerList<ManagedTexture*>* textures, UnknownTextureRegion* region) {
+int CacheTexture::CollectOccupants(ContainerList<ManagedTexture*>* textures, CacheTextureRegion* region) {
     if (region->quarters[0]) {
         int count = 0;
         for (int i = 0; i < 4; i++)
@@ -59,7 +59,7 @@ int CacheTexture::CollectOccupants(ContainerList<ManagedTexture*>* textures, Unk
 
 // A step of the depth-first walk in 0x0050f9b0.
 struct UnknownRegionStep {
-    UnknownTextureRegion* region;
+    CacheTextureRegion* region;
     int index;
 };
 
@@ -108,7 +108,7 @@ int CacheTexture::ReserveRegions(int* levels, int count) {
     UnknownRegionStep steps[10];
     int depth = -1;
     int first = 1;
-    UnknownTextureRegion* region = rootRegion;
+    CacheTextureRegion* region = rootRegion;
     for (;;) {
         level = TakeLargest(wanted);
         if (level == -1)
@@ -135,10 +135,10 @@ int CacheTexture::ReserveRegions(int* levels, int count) {
         reservedLeaves[level].Add(region);
     }
     for (; depth >= 0; depth--) {
-        UnknownTextureRegion* parent = steps[depth].region;
+        CacheTextureRegion* parent = steps[depth].region;
         int i = steps[depth].index + 1;
         for (; i < 4; i++) {
-            UnknownTextureRegion* quarter = parent->quarters[i];
+            CacheTextureRegion* quarter = parent->quarters[i];
             if (quarter->quarters[0])
                 FreeQuarters(quarter);
             else
@@ -150,7 +150,7 @@ int CacheTexture::ReserveRegions(int* levels, int count) {
 
 // 0x0050fc40
 void CacheTexture::EmptyPage() {
-    UnknownTextureRegion* root = rootRegion;
+    CacheTextureRegion* root = rootRegion;
     if (root->quarters[0])
         FreeQuarters(root);
     else
@@ -158,8 +158,8 @@ void CacheTexture::EmptyPage() {
 }
 
 // 0x0050fc60
-UnknownTextureRegion* CacheTexture::FirstQuarter(UnknownTextureRegion* region) {
-    UnknownTextureRegion* first = region->quarters[0];
+CacheTextureRegion* CacheTexture::FirstQuarter(CacheTextureRegion* region) {
+    CacheTextureRegion* first = region->quarters[0];
     if (!first) {
         EvictRegion(region);
         first = SplitRegion(region);
@@ -168,7 +168,7 @@ UnknownTextureRegion* CacheTexture::FirstQuarter(UnknownTextureRegion* region) {
 }
 
 // 0x0050fc90
-void CacheTexture::EvictRegion(UnknownTextureRegion* region) {
+void CacheTexture::EvictRegion(CacheTextureRegion* region) {
     if (region->occupant) {
         region->occupant->page = 0;
         region->occupant->region = 0;
@@ -184,11 +184,11 @@ void CacheTexture::EvictRegion(UnknownTextureRegion* region) {
 }
 
 // 0x0050fd60
-void CacheTexture::FreeQuarters(UnknownTextureRegion* region) {
+void CacheTexture::FreeQuarters(CacheTextureRegion* region) {
     if (!region->quarters[0])
         return;
     for (int i = 0; i < 4; i++) {
-        UnknownTextureRegion* quarter = region->quarters[i];
+        CacheTextureRegion* quarter = region->quarters[i];
         if (quarter) {
             if (quarter->quarters[0])
                 FreeQuarters(quarter);
@@ -207,7 +207,7 @@ int CacheTexture::PlaceTextures(ContainerList<ManagedTexture*>* textures,
         ManagedTexture* texture = textures->Get(0);
         if (reservedLeaves[texture->plannedLevel].m_count == 0)
             return 0;
-        UnknownTextureRegion* region = reservedLeaves[texture->plannedLevel].Get(0);
+        CacheTextureRegion* region = reservedLeaves[texture->plannedLevel].Get(0);
         reservedLeaves[texture->plannedLevel].RemoveOrdered(region);
         PlaceTexture(texture, region);
         textures->RemoveOrdered(texture);
@@ -222,7 +222,7 @@ int CacheTexture::PlaceTextures(ContainerList<ManagedTexture*>* textures,
 }
 
 // 0x0050ffa0
-UnknownTextureRegion* CacheTexture::SplitRegion(UnknownTextureRegion* region) {
+CacheTextureRegion* CacheTexture::SplitRegion(CacheTextureRegion* region) {
     float left = region->left;
     float right = region->right;
     float top = region->top;
@@ -230,7 +230,7 @@ UnknownTextureRegion* CacheTexture::SplitRegion(UnknownTextureRegion* region) {
     float middleU = (region->right - region->left) * 0.5f + left;
     float middleV = (region->bottom - region->top) * 0.5f + top;
     for (int i = 0; i < 4; i++) {
-        region->quarters[i] = (UnknownTextureRegion*)ownerManager->regionAllocator->Alloc();
+        region->quarters[i] = (CacheTextureRegion*)ownerManager->regionAllocator->Alloc();
         region->quarters[i]->Init(region, region->sizeLevel - 1);
     }
     region->quarters[0]->left = left;
@@ -255,7 +255,7 @@ UnknownTextureRegion* CacheTexture::SplitRegion(UnknownTextureRegion* region) {
 }
 
 // 0x00510120
-void CacheTexture::ReleaseRegion(UnknownTextureRegion* region, int merge) {
+void CacheTexture::ReleaseRegion(CacheTextureRegion* region, int merge) {
     if (region->occupant) {
         region->occupant->page = 0;
         region->occupant->region = 0;
@@ -269,7 +269,7 @@ void CacheTexture::ReleaseRegion(UnknownTextureRegion* region, int merge) {
     }
     if (!merge)
         return;
-    for (UnknownTextureRegion* parent = region->parentRegion; parent; parent = parent->parentRegion) {
+    for (CacheTextureRegion* parent = region->parentRegion; parent; parent = parent->parentRegion) {
         int i;
         for (i = 0; i < 4; i++) {
             if (parent->quarters[i]->quarters[0] || parent->quarters[i]->reserved)
@@ -285,7 +285,7 @@ void CacheTexture::ReleaseRegion(UnknownTextureRegion* region, int merge) {
 }
 
 // 0x00510250
-int CacheTexture::PlaceTexture(ManagedTexture* texture, UnknownTextureRegion* region) {
+int CacheTexture::PlaceTexture(ManagedTexture* texture, CacheTextureRegion* region) {
     region->occupant = texture;
     texture->region = region;
     region->occupant->page = this;
