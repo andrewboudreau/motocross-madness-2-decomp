@@ -7,11 +7,11 @@
 
 static unsigned char referenceSpace[0x800000];
 static unsigned char displayStorage[sizeof(PCVideoCard)];
-static UnknownDisplayMode modes[3];
+static DisplayMode modes[3];
 struct Observation {
     int result, calls, kind, argument;
     unsigned char before[sizeof(PCVideoCard)], after[sizeof(PCVideoCard)];
-    UnknownDisplayMode beforeModes[3], afterModes[3];
+    DisplayMode beforeModes[3], afterModes[3];
 };
 static Observation observed, expected;
 static int callbackResult, mutate;
@@ -76,7 +76,7 @@ static void Compare(int width,int height,int depth,int buffers,int budget,int fu
 }
 int main(int argc,char** argv) {
     if(argc!=2 || !MapReference(argv[1]))return 3;
-    if(sizeof(PCVideoCard)!=0xb78 || sizeof(UnknownDisplayMode)!=36)return 4;
+    if(sizeof(PCVideoCard)!=0xb78 || sizeof(DisplayMode)!=36)return 4;
     const int values[]={0,1,-1,2,-2,7,8,15,16,24,32,480,640,1024,0x7fffffff,(int)0x80000000};
     const int flags[]={0,1,-3}, returns[]={0,1,-1,7};unsigned int random=0x12345678;
     for(int seed=0;seed<16384;++seed) {

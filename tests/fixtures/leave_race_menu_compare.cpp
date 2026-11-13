@@ -18,7 +18,7 @@ struct World {
     BYTE users[2][sizeof(GUIUser)],tips[2][sizeof(UnknownKrustyUIToolTipView)];
     BYTE displays[2][sizeof(PCVideoCard)],sounds[2][sizeof(PCSoundInterface)];
     BYTE dialogs[2][sizeof(UIDialog)],transition[sizeof(TransDlg)];
-    UnknownDisplayMode modes[2][3];
+    DisplayMode modes[2][3];
 };
 static World world;
 TrackGame* g_TrackGame;

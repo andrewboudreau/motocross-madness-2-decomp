@@ -24,8 +24,8 @@ void DeleteDisplays() {
 
 // 0x0052d120
 int CompareDisplayModes(const void* first, const void* second) {
-    const UnknownDisplayMode* a = (const UnknownDisplayMode*)first;
-    const UnknownDisplayMode* b = (const UnknownDisplayMode*)second;
+    const DisplayMode* a = (const DisplayMode*)first;
+    const DisplayMode* b = (const DisplayMode*)second;
     if (a->bitDepth != b->bitDepth)
         return a->bitDepth - b->bitDepth;
     if (a->height != b->height)
@@ -76,9 +76,9 @@ VideoCard::~VideoCard() {
 
 // 0x0052d250
 int VideoCard::FindDisplayMode(int width, int height, int bitDepth, int a, int refreshRate) {
-    qsort(displayModes, displayModeCount, sizeof(UnknownDisplayMode), CompareDisplayModes);
+    qsort(displayModes, displayModeCount, sizeof(DisplayMode), CompareDisplayModes);
     for (int i = 0; i < displayModeCount; i++) {
-        UnknownDisplayMode* mode = &displayModes[i];
+        DisplayMode* mode = &displayModes[i];
         if (mode->bitDepth == bitDepth && mode->height == height && mode->width == width &&
             (!a || mode->bufferCount == a) && (!refreshRate || mode->refreshRate == refreshRate))
             return i;

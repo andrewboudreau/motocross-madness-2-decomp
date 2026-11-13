@@ -23,7 +23,7 @@ struct Block { int size,alive; unsigned char bytes[sizeof(PCRenderTarget)]; };
 static Block heap[8];
 static TgaFile file;
 static unsigned char pixels[256];
-static UnknownDisplayMode modes[4];
+static DisplayMode modes[4];
 struct Scenario {
     int provided,modeCount,matchMask,modeFailMask,initFailMask,fileExists,bpp,width,height;
     int failSurface,failTexture,fullResult,tileFail,tileResult;
@@ -38,7 +38,7 @@ struct Observation {
     int exception,fault,faultOperation,faultAddress,events,blocks,fileAlive,returned;
     EventRecord trace[80];Block heap[8];
     unsigned char display[sizeof(PCVideoCard)],game[sizeof(TrackGame)],provided[sizeof(PCRenderTarget)];
-    TgaFile file;UnknownDisplayMode modes[4];
+    TgaFile file;DisplayMode modes[4];
 };
 static Observation observed,referenceResult;
 static int blocks,allocations,constructors,modeIndex,textureCalls,passes;

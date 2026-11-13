@@ -67,8 +67,8 @@ static long __stdcall EnumDisplayModeCallback(DDSurfaceDesc2* desc, void* contex
     PCVideoCard* display = (PCVideoCard*)context;
     if (display->displayModeCount >= display->displayModeCapacity - 1) {
         display->displayModeCapacity += 20;
-        display->displayModes = (UnknownDisplayMode*)DebugRealloc(
-            display->displayModes, display->displayModeCapacity * sizeof(UnknownDisplayMode), __FILE__, 381);
+        display->displayModes = (DisplayMode*)DebugRealloc(
+            display->displayModes, display->displayModeCapacity * sizeof(DisplayMode), __FILE__, 381);
         if (!display->displayModes) {
             display->displayModeCount = 0;
             display->displayModeCapacity = 0;
@@ -141,7 +141,7 @@ PCVideoCard* PCVideoCard::InitializeDisplay(Guid* guid, char* description, char*
     displayModeCount = 0;
     if (directDraw->EnumDisplayModes(0, 0, this, EnumDisplayModeCallback))
         goto failed;
-    qsort(displayModes, displayModeCount, sizeof(UnknownDisplayMode), CompareDisplayModes);
+    qsort(displayModes, displayModeCount, sizeof(DisplayMode), CompareDisplayModes);
     if (guid)
         driverGuid = *guid;
     sprintf(driverGuidText, "{%08lX-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}", driverGuid.data1,

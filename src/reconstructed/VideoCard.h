@@ -39,7 +39,7 @@ public:
     int displayModeCapacity;                   // +0x04
     int displayModeCount;                      // +0x08: display mode count
     int currentDisplayMode;                    // +0x0c: current display mode (-1: none)
-    UnknownDisplayMode* displayModes;          // +0x10: DebugRealloc'd mode table
+    DisplayMode* displayModes;          // +0x10: DebugRealloc'd mode table
     int field_0x14[16];                           // per texture kind (TextureMapManager 0x00511580)
     int totalVideoMemory;                      // +0x54: "Total VidMem"
     int textureMemory;                         // +0x58: the mode's texture memory (windowed: MeasureTextureMemory)

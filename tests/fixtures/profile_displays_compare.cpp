@@ -17,7 +17,7 @@ int g_DisplayCount;
 static unsigned char referenceSpace[0x800000];
 static unsigned char gameStorage[sizeof(PCGame)], displayStorage[4][sizeof(PCVideoCard)];
 static unsigned char targetStorage[4][sizeof(PCRenderTarget)];
-static UnknownDisplayMode modes[4][4];
+static DisplayMode modes[4][4];
 static DWORD gameTable[38], displayTable[5], drawTable[30], surfaceTable[50];
 static DWORD drawObjects[4], surfaceObjects[4][11];
 static PCGame* Game() { return (PCGame*)gameStorage; }
@@ -36,7 +36,7 @@ struct Observation {
     int result, exception, events, targetAlive[4], surfaceAlive[4][11];
     EventRecord trace[320];
     unsigned char game[sizeof(PCGame)], displays[sizeof(displayStorage)], targets[sizeof(targetStorage)];
-    UnknownDisplayMode modes[4][4];
+    DisplayMode modes[4][4];
 };
 static Observation observed, referenceResult;
 static int activeDisplay, created[4];

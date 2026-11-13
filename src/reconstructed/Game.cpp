@@ -253,7 +253,7 @@ int Game::RenderFrame() {
             s_RenderPost3DPeak.Record(renderPost3D);
             s_ElapsedPeak.Record(elapsed);
             if (debugOverlay->isEnabled && debugOverlay->shownPage == profilePage) {
-                UnknownDisplayMode* mode = &display->displayModes[display->currentDisplayMode];
+                DisplayMode* mode = &display->displayModes[display->currentDisplayMode];
                 debugOverlay->Title(profilePage, "%c %d x %d %d bit(x%d)", 'R',
                                                   mode->width, mode->height, mode->bitDepth,
                                                   display->frameBufferCount);

@@ -60,7 +60,7 @@ int PCGame::ProfileDisplays() {
         SetRegistryInt(name, g_Displays[i]->displayModeCount);
         sprintf(name, "DriverInfo\\%s\\Modes", g_Displays[i]->driverGuidText);
         SetRegistryBinary(name, g_Displays[i]->displayModes,
-                             g_Displays[i]->displayModeCount * sizeof(UnknownDisplayMode));
+                             g_Displays[i]->displayModeCount * sizeof(DisplayMode));
         sprintf(name, "DriverInfo\\%s\\IsAGP", g_Displays[i]->driverGuidText);
         SetRegistryFlag(name, 0);
         sprintf(name, "DriverInfo\\%s\\DisabledWindowed", g_Displays[i]->driverGuidText);
@@ -89,7 +89,7 @@ int PCGame::ProfileDisplays() {
             FilterDisplayModes(g_Displays[i]);
             sprintf(name, "DriverInfo\\%s\\Modes", g_Displays[i]->driverGuidText);
             SetRegistryBinary(name, g_Displays[i]->displayModes,
-                                 g_Displays[i]->displayModeCount * sizeof(UnknownDisplayMode));
+                                 g_Displays[i]->displayModeCount * sizeof(DisplayMode));
             sprintf(name, "DriverInfo\\%s\\DisabledSoftware", g_Displays[i]->driverGuidText);
             if (!GetRegistryFlag(name, 0)) {
                 SetRegistryFlag(name, 1);
@@ -117,7 +117,7 @@ int PCGame::ProfileDisplays() {
                                         g_Displays[i]->driverGuidText);
                                 SetRegistryBinary(name, g_Displays[i]->displayModes,
                                                      g_Displays[i]->displayModeCount *
-                                                         sizeof(UnknownDisplayMode));
+                                                         sizeof(DisplayMode));
                             }
                             int value;
                             g_Displays[i]->isAGP =

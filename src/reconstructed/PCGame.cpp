@@ -450,7 +450,7 @@ int PCGame::SetRenderStates() {
 int PCGame::LimitDisplayModes(PCVideoCard* display, int width, int height) {
     if (fullScreen && !display->keepAllDisplayModes) {
         for (int i = 0; i < display->displayModeCount; i++) {
-            UnknownDisplayMode* mode = &display->displayModes[i];
+            DisplayMode* mode = &display->displayModes[i];
             if (mode->width > width || mode->height > height)
                 mode->hardwareUsable = 0;
         }
@@ -597,9 +597,9 @@ int PCGame::LoadDisplayProfile(PCVideoCard* display) {
     int count = GetRegistryInt(name, 0);
     if (count != display->displayModeCount)
         return 0;
-    unsigned long size = count * sizeof(UnknownDisplayMode);
+    unsigned long size = count * sizeof(DisplayMode);
     sprintf(name, "DriverInfo\\%s\\Modes", display->driverGuidText);
-    UnknownDisplayMode* saved = (UnknownDisplayMode*)DebugMalloc(size, __FILE__, 1726);
+    DisplayMode* saved = (DisplayMode*)DebugMalloc(size, __FILE__, 1726);
     if (!saved)
         return 0;
     GetRegistryBinary(name, saved, &size);

@@ -16,7 +16,7 @@ extern "C" const Guid IID_IDirect3DHALDevice =
 static unsigned char referenceSpace[0x800000];
 struct World {
     unsigned char display[sizeof(PCVideoCard)], targets[2][sizeof(PCRenderTarget)];
-    UnknownDisplayMode modes[5]; DWORD drawObjects[2][4], surfaceObjects[2][4]; int value;
+    DisplayMode modes[5]; DWORD drawObjects[2][4], surfaceObjects[2][4]; int value;
 };
 static World world;
 static PCVideoCard* Display(){return (PCVideoCard*)world.display;}
@@ -287,7 +287,7 @@ static void Compare(){
 }
 int main(int argc,char**argv){
     if(argc!=3||!MapReference(argv[1],argv[2]))return 3;
-    if(sizeof(PCVideoCard)!=0xb78||sizeof(PCRenderTarget)!=0xbc4||sizeof(UnknownDisplayMode)!=0x24||
+    if(sizeof(PCVideoCard)!=0xb78||sizeof(PCRenderTarget)!=0xbc4||sizeof(DisplayMode)!=0x24||
        sizeof(DDSurfaceDesc2)!=0x7c||sizeof(DDSCaps2)!=0x10||
        offsetof(RenderTarget,surfacePixelFormat)!=0x28||offsetof(PCVideoCard,directDraw)!=0x190||
        offsetof(PCVideoCard,backBuffer)!=0x1a0||offsetof(PCVideoCard,frameBufferCount)!=0x78||

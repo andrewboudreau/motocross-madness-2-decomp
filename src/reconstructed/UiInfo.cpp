@@ -334,7 +334,7 @@ void TrackGameMode::ChooseDisplayMode(const void* guid, int* mode) {
         *mode = 0;
         if (g_TrackGame->bladeRenderer) {
             for (i = 0; i < g_TrackGame->display->displayModeCount; i++) {
-                UnknownDisplayMode* entry = &g_TrackGame->display->displayModes[i];
+                DisplayMode* entry = &g_TrackGame->display->displayModes[i];
                 if (entry->width == 640 && entry->height == 480 && entry->bitDepth == 16 &&
                     entry->bladeUsable) {
                     *mode = i;
@@ -353,7 +353,7 @@ void TrackGameMode::ChooseDisplayMode(const void* guid, int* mode) {
             }
         } else {
             for (i = 0; i < g_TrackGame->display->displayModeCount; i++) {
-                UnknownDisplayMode* entry = &g_TrackGame->display->displayModes[i];
+                DisplayMode* entry = &g_TrackGame->display->displayModes[i];
                 if (entry->width == 640 && entry->height == 480 && entry->bitDepth == 16 &&
                     entry->hardwareUsable) {
                     *mode = i;
