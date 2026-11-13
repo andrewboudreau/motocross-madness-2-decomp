@@ -28,7 +28,7 @@ Parameterblocks.h and PCRenderTarget.h gained declarations for the calls
 and the field at +0x1c0; the layout is unchanged.
 
 The motion controller's former `SceneItem` view now names this actual class.
-Its complete `CharacterVirtualSlot0` caller at `0x00445a70` (1021 bytes)
+Its complete `BuildModel` caller at `0x00445a70` (1021 bytes)
 allocates `0xd0` bytes at `0x00445cd0`, then directly calls the material
 constructor at `0x00445cf4`, Attach at `0x00445d46`, and CopyFrom at
 `0x00445d85`. Their destinations are `0x004fefe0`, `0x004ff0b0` and

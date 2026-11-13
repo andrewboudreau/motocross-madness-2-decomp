@@ -359,15 +359,15 @@ void Character::SetCharacterRenderContext(int renderContext, int unused)
 
 // owner: bracket only (Character slot 1, contiguous with the Motnctrl.cpp methods)
 // slot 1 (0x004a6930): reads the "General info" keys, builds the node tables and loads the motions.
-void Character::CharacterVirtualSlot1()
+void Character::LoadFromSlt()
 {
     sltFile->SelectSection("General info");
     sltFile->GetString("ContentDirectory", "", contentDirectory, -1);
     sltFile->GetString("VUTFilename", "\\", vutFilename, -1);
     sltFile->GetString("MIRFilename", "\\", mirFilename, -1);
     sltFile->GetInt("NumberOfMotions", 0, &motionCount);
-    CharacterVirtualSlot0();
-    CharacterVirtualSlot2();
+    BuildModel();
+    CaptureRestPose();
     LoadMotions();
     ApplyRestPose();
 }
@@ -394,7 +394,7 @@ void Character::CaptureMotion(Motion* motion)
     ApplyRestPose();
     motion->captured = 1;
     for (int i = 0; i < motion->frameCount; i++)
-        CharacterVirtualSlot3((int)&motion->frames[i]);
+        CaptureFramePoses((int)&motion->frames[i]);
 }
 
 // owner: bracket only
@@ -434,15 +434,15 @@ unsigned char Character::FindNode(const char* name)
 
 // owner: bracket only
 // slots 4, 5 and 6 (0x004a6ba0, one body after identical-COMDAT folding): empty in Character.
-void Character::CharacterVirtualSlot4(int poseRecord, int rowMask)
+void Character::ApplyPose(int poseRecord, int rowMask)
 {
 }
 
-void Character::CharacterVirtualSlot5(int poseRecord, int rowMask)
+void Character::ApplyMirroredPose(int poseRecord, int rowMask)
 {
 }
 
-void Character::CharacterVirtualSlot6(int poseRecord, int rowMask)
+void Character::ApplyFullPose(int poseRecord, int rowMask)
 {
 }
 
@@ -520,9 +520,9 @@ int Character::AdvanceMotion(float dt, int mirror, int mask)
         lastFrameTime = motionTime;
         for (int i = 0; i < currentFrame->count; i++) {
             if (mirror == 0)
-                CharacterVirtualSlot4((int)&currentFrame->poses[i], mask);
+                ApplyPose((int)&currentFrame->poses[i], mask);
             else
-                CharacterVirtualSlot5((int)&currentFrame->poses[i], mask);
+                ApplyMirroredPose((int)&currentFrame->poses[i], mask);
         }
     } else {
         blendFromTime += dt;
@@ -537,9 +537,9 @@ int Character::AdvanceMotion(float dt, int mirror, int mask)
             CharacterPose pose;
             BlendPose(&lastFrame->poses[j], &currentFrame->poses[j], &pose, blendWeight);
             if (mirror == 0)
-                CharacterVirtualSlot4((int)&pose, mask);
+                ApplyPose((int)&pose, mask);
             else
-                CharacterVirtualSlot5((int)&pose, mask);
+                ApplyMirroredPose((int)&pose, mask);
         }
         if (blendFromTime >= blendDuration)
             blendActive = 0;
@@ -592,25 +592,25 @@ void InterpolatePose(CharacterPose* a, CharacterPose* b, CharacterPose* out, flo
 
 // owner: bracket only
 // 0x004a8a80: passes every record of 'list' to slot 4.
-void Character::ApplyPoseListSlot4(MotionPoseList* list, int mask)
+void Character::ApplyPoseList(MotionPoseList* list, int mask)
 {
     for (int i = 0; i < list->count; i++)
-        CharacterVirtualSlot4((int)&list->poses[i], mask);
+        ApplyPose((int)&list->poses[i], mask);
 }
 
 // owner: bracket only
 // 0x004a8ac0: passes every record of 'list' to slot 6.
-void Character::ApplyPoseListSlot6(MotionPoseList* list, int mask)
+void Character::ApplyFullPoseList(MotionPoseList* list, int mask)
 {
     for (int i = 0; i < list->count; i++)
-        CharacterVirtualSlot6((int)&list->poses[i], mask);
+        ApplyFullPose((int)&list->poses[i], mask);
 }
 
 // owner: bracket only
 // 0x004a8b00: applies the rest pose list.
 void Character::ApplyRestPose()
 {
-    ApplyPoseListSlot6(&poseList, 0);
+    ApplyFullPoseList(&poseList, 0);
 }
 
 // owner: bracket only
@@ -658,7 +658,7 @@ void Character::BlendToMotion(Motion* motion, float time)
 // owner: Motnctrl.cpp (__FILE__ 0x56e034, line 0x585)
 // slot 8 (0x004a98b0): copies the motion state, the file names, the node model (slot 9) and the rest
 // pose list of another character.
-void Character::CharacterVirtualSlot8(int other)
+void Character::CopyStateFrom(int other)
 {
     Character* source = (Character*)other;
     motionStopped = source->motionStopped;
@@ -675,7 +675,7 @@ void Character::CharacterVirtualSlot8(int other)
     strcpy(vutFilename, source->vutFilename);
     strcpy(mirFilename, source->mirFilename);
     strcpy(contentDirectory, source->contentDirectory);
-    CharacterVirtualSlot9(other);
+    CopyModelFrom(other);
     poseList = source->poseList;
     poseList.poses = (CharacterPose*)DebugMalloc(poseList.count * sizeof(CharacterPose), __FILE__, 0x585);
     for (int i = 0; i < poseList.count; i++)

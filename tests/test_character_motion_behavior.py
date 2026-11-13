@@ -16,7 +16,7 @@ from test_character_motion_blend import pose_helper_source
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-SYMBOL = '?CharacterVirtualSlot7@Character@@UAEHMHH@Z'
+SYMBOL = '?AdvanceMotionInterpolated@Character@@UAEHMHH@Z'
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),

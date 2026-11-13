@@ -18,11 +18,10 @@
 //  * Primary-vtable diff (Character -> D3DIM): D3DIM overrides slots 0, 2..6, 8, 9, 10
 //    and introduces slot 11; slots 1 (0x004a6930) and 7 (0x004a70c0) are inherited.
 //  * Argument byte counts below come from each implementation's `ret N` (tier 2);
-//    types are provisional (int placeholders).  Slots are named CharacterVirtualSlotN /
-//    D3DIMVirtualSlotN (not UnknownVirtualSlotN) so they cannot collide with
-//    SoultreePhysicsBaseObject::UnknownVirtualSlotN in SoultreePhysicsCharacter, where an
-//    equal parameter list would silently override both bases and any unqualified call
-//    would be an ambiguous lookup.
+//    types are provisional (int placeholders).  The slot names (docs/NAMING.md wave 17,
+//    tier 2 unless noted) are unique in the tree: SoultreePhysicsCharacter inherits from
+//    SoultreePhysicsBaseObject and this class, where a shared name with an equal parameter
+//    list would silently override both bases and any unqualified call would be ambiguous.
 //
 // Field naming: offsets are relative to the start of each class, but the member
 // names carry a chr_/d3d_ prefix because SoultreePhysicsCharacter inherits from both
@@ -62,17 +61,27 @@ public:
     explicit Character(int flags);
     virtual ~Character();                       // core 0x004a69d0, deleting 0x004a68d0
     // --- vtable 0x00555318 (offset 0), slots 0..10, all introduced here ---
-    virtual void CharacterVirtualSlot0();         // 0x00464e90 (ret; shared empty stub)
-    virtual void CharacterVirtualSlot1();         // 0x004a6930
-    virtual void CharacterVirtualSlot2();         // 0x00464e90 (ret)
-    virtual void CharacterVirtualSlot3(int records); // 0x00464e80 (ret 4; shared empty stub)
-    virtual void CharacterVirtualSlot4(int poseRecord, int rowMask);   // 0x004a6ba0 (ret 8; shared by 4..6)
-    virtual void CharacterVirtualSlot5(int poseRecord, int rowMask);   // 0x004a6ba0
-    virtual void CharacterVirtualSlot6(int poseRecord, int rowMask);   // 0x004a6ba0
-    virtual int CharacterVirtualSlot7(float time, int a, int b);  // 0x004a70c0 (ret 0xc): fld of the first argument, added to +0x10
-    virtual void CharacterVirtualSlot8(int other); // 0x004a98b0 (ret 4)
-    virtual void CharacterVirtualSlot9(int other); // 0x00464e80 (ret 4)
-    virtual void CharacterVirtualSlot10();        // 0x00464e90 (ret)
+    // slot 0: builds the node model (D3DIM loads "Base Character Frame" and the character model)
+    virtual void BuildModel();         // 0x00464e90 (ret; shared empty stub)
+    // slot 1: reads the .slt "General info" keys, then slot 0, slot 2, LoadMotions, ApplyRestPose
+    virtual void LoadFromSlt();         // 0x004a6930
+    // slot 2: stores every node's current pose in poseList (the rest pose)
+    virtual void CaptureRestPose();         // 0x00464e90 (ret)
+    // slot 3: CaptureMotion's per-frame call; D3DIM overwrites the frame's records with the live node poses
+    virtual void CaptureFramePoses(int records); // 0x00464e80 (ret 4; shared empty stub)
+    // slots 4/5/6: apply one pose record to its node (5 mirrored through mirrorMap; 6 ignores the
+    // per-row applyRotation/applyTranslation enables and is the rest-pose path)
+    virtual void ApplyPose(int poseRecord, int rowMask);   // 0x004a6ba0 (ret 8; shared by 4..6)
+    virtual void ApplyMirroredPose(int poseRecord, int rowMask);   // 0x004a6ba0
+    virtual void ApplyFullPose(int poseRecord, int rowMask);   // 0x004a6ba0
+    // slot 7: per-frame playback with sub-frame interpolation (time added to motionTime, +0x10)
+    virtual int AdvanceMotionInterpolated(float time, int a, int b);  // 0x004a70c0 (ret 0xc): fld of the first argument, added to +0x10
+    // slot 8: copies another character's motion state, names and rest pose (calls slot 9)
+    virtual void CopyStateFrom(int other); // 0x004a98b0 (ret 4)
+    // slot 9: D3DIM clones the other character's node model
+    virtual void CopyModelFrom(int other); // 0x00464e80 (ret 4)
+    // slot 10: D3DIM formats a "Position/Orientation Data" line per node (output stripped)
+    virtual void DumpNodeTransforms();        // 0x00464e90 (ret)
 
     // Non-virtual helpers.  Owner class is tier 3 (address proximity to Character's
     // code at 0x004a6930..0x004a98b0; the callers pass the 0x21c subobject pointer,
@@ -95,8 +104,8 @@ public:
     void SortMotion(Motion* motion);                        // 0x004a6ab0, ret 4
     Motion* FindMotion(const char* name, int unused);            // 0x004a6b30, ret 8
     unsigned char FindNode(const char* name);               // 0x004a6b50, ret 4
-    void ApplyPoseListSlot4(MotionPoseList* list, int mask);  // 0x004a8a80, ret 8
-    void ApplyPoseListSlot6(MotionPoseList* list, int mask);  // 0x004a8ac0, ret 8
+    void ApplyPoseList(MotionPoseList* list, int mask);  // 0x004a8a80, ret 8
+    void ApplyFullPoseList(MotionPoseList* list, int mask);  // 0x004a8ac0, ret 8
     void SetMotionByName(const char* name);                 // 0x004a8b10, ret 4
     void SetMotion(Motion* motion);                         // 0x004a8b40, ret 4
     void BlendToMotion(Motion* motion);                     // 0x004a8b60, ret 4
@@ -153,15 +162,15 @@ public:
     virtual void Disable();                     // 0x00446640 via vtordisp thunk 0x004466c0
     virtual void Enable();                      // 0x00446620 via vtordisp thunk 0x004466d0
     // --- vtable 0x00551530 (offset 0): overrides of Character slots ---
-    virtual void CharacterVirtualSlot0();         // 0x00445a70
-    virtual void CharacterVirtualSlot2();         // 0x00445fc0
-    virtual void CharacterVirtualSlot3(int records); // 0x00446110
-    virtual void CharacterVirtualSlot4(int poseRecord, int rowMask);   // 0x00446210
-    virtual void CharacterVirtualSlot5(int poseRecord, int rowMask);   // 0x00446300
-    virtual void CharacterVirtualSlot6(int poseRecord, int rowMask);   // 0x00446480
-    virtual void CharacterVirtualSlot8(int other); // 0x00445e70
-    virtual void CharacterVirtualSlot9(int other); // 0x00445ec0
-    virtual void CharacterVirtualSlot10();        // 0x00446520
+    virtual void BuildModel();         // 0x00445a70
+    virtual void CaptureRestPose();         // 0x00445fc0
+    virtual void CaptureFramePoses(int records); // 0x00446110
+    virtual void ApplyPose(int poseRecord, int rowMask);   // 0x00446210
+    virtual void ApplyMirroredPose(int poseRecord, int rowMask);   // 0x00446300
+    virtual void ApplyFullPose(int poseRecord, int rowMask);   // 0x00446480
+    virtual void CopyStateFrom(int other); // 0x00445e70
+    virtual void CopyModelFrom(int other); // 0x00445ec0
+    virtual void DumpNodeTransforms();        // 0x00446520
     // --- slot 11, introduced here ---
     // path/desc types follow SoultreePhysicsCharacter slot 40, which passes its name string and
     // descriptor here (tier 2).  context and unused go to SetCharacterRenderContext; desc is
@@ -169,7 +178,7 @@ public:
     // +0x64 and a5 at +0x68 (tier 1 decode).
     // Returns the GameObject subobject (this converted to GameObject*) on success, 0 when the
     // resource could not be found and the object released itself (tier 1 decode of 0x00445680).
-    virtual GameObject* D3DIMVirtualSlot11(int context, const char* path, const SoultreeLoadDesc* desc,
+    virtual GameObject* LoadCharacter(int context, const char* path, const SoultreeLoadDesc* desc,
                                            int loadInfo, int a5, int unused); // 0x00445680 (ret 0x18)
 
     // D3DIM's own data 0x1a0..0x210 (then vtordisp at 0x210, GameObject at 0x214).

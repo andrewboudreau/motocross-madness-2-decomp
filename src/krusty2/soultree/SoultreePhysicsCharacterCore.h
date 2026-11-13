@@ -49,7 +49,7 @@ public:
     //    mov [esp],..` struct-copy shape; the body forwards them unchanged to slot 2.
     //  * a3 is a NUL-terminated name (strlen/strncpy, then ".col" is appended).
     //  * a4 is a descriptor pointer (`test byte [a4+0x25],1`).
-    //  * a1, a3, a4, a5 go to D3DIMVirtualSlot11 as (a1, a3, a4, a5, 1, 1).
+    //  * a1, a3, a4, a5 go to LoadCharacter as (a1, a3, a4, a5, 1, 1).
     //  * Slot 2 (0x00500c50) stores the rest:
     //      a9 -> 0x1f4 (pointer; +0x40 read into field_0x1f8), a10 -> 0x124, a11 -> 0x150,
     //      a12 -> 0x1c8 (element count of the 0x12c array), a14 -> 0x1f0 (pointer),

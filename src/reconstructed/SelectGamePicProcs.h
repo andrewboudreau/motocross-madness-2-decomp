@@ -62,16 +62,16 @@ void FillTrackList(int largePictures, const char* picture, const char* listName,
 // and 5).
 struct UnknownKrustyUIModelObject : virtual public GameObject {
     // Its own vtable (the slots past GameObject's; names provisional).
-    virtual void ModelVirtualSlot0();
-    virtual void ModelVirtualSlot1();
-    virtual void ModelVirtualSlot2();
-    virtual void ModelVirtualSlot3();
-    virtual void ModelVirtualSlot4();
-    virtual void ModelVirtualSlot5();
-    virtual void ModelVirtualSlot6();
+    virtual void BuildModel();
+    virtual void LoadFromSlt();
+    virtual void CaptureRestPose();
+    virtual void CaptureFramePoses();
+    virtual void ApplyPose();
+    virtual void ApplyMirroredPose();
+    virtual void ApplyFullPose();
     // Advances the model's animation (dlgprocs.cpp SPBikeRiderDlg slot 10
     // passes the frame time and two zeros).
-    virtual void ModelVirtualSlot7(float frameTime, int a, int b);
+    virtual void AdvanceMotionInterpolated(float frameTime, int a, int b);
     void SetMotionByName(const char* motion); // 0x004a8b10: plays a motion ("WaitR")
 
     unsigned char field_0x008[0x0c - 0x08];

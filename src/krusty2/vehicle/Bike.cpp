@@ -629,7 +629,7 @@ GameObject* Bike::LoadBike(int context, const char* engineName, const char* mode
 
     riderCharacter = (BikeA5C4*)new(__FILE__, 0x583) D3DIMSoultreeCharacter(GameObject::isEnabled);
     if (!GameObject::AppendChild(
-            ((D3DIMSoultreeCharacter*)riderCharacter)->D3DIMVirtualSlot11(
+            ((D3DIMSoultreeCharacter*)riderCharacter)->LoadCharacter(
                 (int)GameObject::renderContext, riderModel, desc, (int)info, 1, 1), -1))
         riderCharacter = 0;
     if (desc && (desc->field_0x25 & 1))

@@ -1,6 +1,6 @@
 """Character::ApplyMotionAtPhase, start a motion at a phase (tools/emu_diff.py case).
 
-ApplyPoseListSlot4 (0x004a8a80) is stubbed and logs the frame pointer it receives, so the
+ApplyPoseList (0x004a8a80) is stubbed and logs the frame pointer it receives, so the
 rounded `(frameCount - 1) * phase - 0.5f` index is compared with the current motion and frame
 fields. Phases include exact ties ((k + 0.5) / (frameCount - 1)), their binary32 neighbours and
 out-of-range values (retail's masked invalid store gives 0x80000000).
@@ -44,6 +44,6 @@ def setup(ctx, case):
     frames = ctx.alloc(12 * fc + 64)
     motion = ctx.alloc(0xb0, fill=0x2d)
     ctx.pack(motion + 0xa4, 'Ii', frames, fc)
-    ctx.stub_at(0x004a8a80, 'ApplyPoseListSlot4', pop=8)
+    ctx.stub_at(0x004a8a80, 'ApplyPoseList', pop=8)
     character = ctx.alloc(0x40, fill=0x3c)
     return dict(ecx=character, args=[motion, phase], ret_eax=False)

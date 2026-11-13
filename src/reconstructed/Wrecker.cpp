@@ -369,7 +369,7 @@ int Wrecker::Tick(float frameTime) {
                 poseStepsPending = 0;
             }
             poseNode->GetMatrixIn(0, reinterpret_cast<Matrix4*>(&lastPose));
-            character->CharacterVirtualSlot7(frameTime, 0, 0);
+            character->AdvanceMotionInterpolated(frameTime, 0, 0);
         }
     }
     if (carryRiderPose) {
@@ -589,7 +589,7 @@ void Wrecker::EndWreck() {
         pendingAnimation = 0;
         skipProbeEffects = 1;
         character->modelNode->ResetMatrices();
-        character->ApplyPoseListSlot6(&character->poseList, 0);
+        character->ApplyFullPoseList(&character->poseList, 0);
         UpdateInertia();
     }
 }

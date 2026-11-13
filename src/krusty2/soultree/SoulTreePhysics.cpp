@@ -1205,7 +1205,7 @@ GameObject* SoultreePhysicsCharacter::LoadPhysicsModel(int renderContext, int cr
     char name[0x104];
     char colPath[0x104];
 
-    D3DIMSoultreeCharacter::D3DIMVirtualSlot11(renderContext, modelPath, desc, loadInfo, 1, 1);
+    D3DIMSoultreeCharacter::LoadCharacter(renderContext, modelPath, desc, loadInfo, 1, 1);
     poseNode = sceneNode = modelNode;
     SoultreePhysicsBaseObject::InitializePhysics(renderContext, createCenterNode, startPosition, startForward, startUp, terrainProbe, linkedObject, weight, contactCapacity, attachmentSlots,
                                                    trackObject, fixedStep, maxSteps, drag, elasticity, 0.0f, 0, restThreshold, probeMask,

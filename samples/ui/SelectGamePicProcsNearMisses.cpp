@@ -169,8 +169,8 @@ int MPBikeRiderDlg::Tick(float frameTime) {
         g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
         g_TrackGame->ui->garageCamera->LookAt(viewTarget);
     }
-    g_TrackGame->ui->riderPreview->ModelVirtualSlot7(frameTime, 0, 0);
-    g_TrackGame->ui->garageCharacter->ModelVirtualSlot7(frameTime, 0, 0);
+    g_TrackGame->ui->riderPreview->AdvanceMotionInterpolated(frameTime, 0, 0);
+    g_TrackGame->ui->garageCharacter->AdvanceMotionInterpolated(frameTime, 0, 0);
     if (idleMotionPlaying && rand() % 200 == 1) {
         UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         bikes->GetRowData(-1);

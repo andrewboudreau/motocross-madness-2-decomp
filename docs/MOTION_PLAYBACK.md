@@ -4,7 +4,7 @@
 
 `samples/physics/motion/Motnctrl.cpp` is explicitly included as a complete,
 reviewed nonexact candidate in `config/game_build.json`. It supplies the
-missing `Character::CharacterVirtualSlot7` and `MotionManager::LoadVue`.
+missing `Character::AdvanceMotionInterpolated` and `MotionManager::LoadVue`.
 The existing canonical motion unit remains in `src/krusty2/motion/`.
 The retail source path and loader diagnostic references support Motnctrl.cpp
 ownership; the neighboring pose helpers have bracket evidence only. Semantic

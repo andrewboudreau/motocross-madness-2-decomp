@@ -28,7 +28,7 @@ The two production call sites retain their twelve-byte by-value contract:
 
 | Caller | Complete strict extent | Retail call |
 |---|---:|---:|
-| D3DIMSoultreeCharacter::CharacterVirtualSlot4, `0x00446210` | 235 bytes | `0x00446291` |
+| D3DIMSoultreeCharacter::ApplyPose, `0x00446210` | 235 bytes | `0x00446291` |
 | LightEmitter::SetPosition, `0x0049e150` | 141 bytes | `0x0049e1a0` |
 
 The motion controller's nodeNames rows have a 64-byte stride and a primary

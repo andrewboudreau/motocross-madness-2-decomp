@@ -333,14 +333,14 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 g_TrackGame->mode.raceSettings.raceMode != 4) {
                 sprintf(modelName, "%s\\%s", "Res", "FlagGirl.mcf");
                 flagGirl = (UnknownBikeRaceCharacter*)new(__FILE__, 0x26f) D3DIMSoultreeCharacter(1);
-                AppendChild(flagGirl->UnknownVirtualSlot11(renderContext, modelName, lights, textures, 1, 1),
+                AppendChild(flagGirl->LoadCharacter(renderContext, modelName, lights, textures, 1, 1),
                                       -1);
                 ReplaceMeshId(flagGirl, 1, 2);
                 flagGirl->modelNode->SetUseLighting(1);
                 flagGirl->modelNode->SetPositionVec3(girlPosition);
                 flagGirl->modelNode->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
                 reinterpret_cast<Character*>(flagGirl)->SetMotionByName("Stand");
-                flagGirl->UnknownVirtualSlot7(0.001f, 0, 0);
+                flagGirl->AdvanceMotionInterpolated(0.001f, 0, 0);
             }
 
             sprintf(name, "%s\\%s", "Res", "GirlBox.slt");

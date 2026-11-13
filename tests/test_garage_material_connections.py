@@ -170,7 +170,7 @@ class GarageMaterialConnectionsTests(unittest.TestCase):
                 (RENDER, '??0D3DIMSoultreeObject@@QAE@H@Z', 0x43f160, 275),
                 (GARAGE, '?BuildGarageScene@KrustyUI@@QAEXH@Z', 0x498cf0, 3114),
                 (CHARACTER, '??0D3DIMSoultreeCharacter@@QAE@H@Z', 0x4455b0, 195),
-                (CHARACTER, '?CharacterVirtualSlot0@D3DIMSoultreeCharacter@@UAEXXZ', 0x445a70, 1021),
+                (CHARACTER, '?BuildModel@D3DIMSoultreeCharacter@@UAEXXZ', 0x445a70, 1021),
                 (MATERIAL, '?LoadTexture@SoultreeMaterial@@QAEXXZ', 0x4ff620, 948),
             ):
                 obj = objects[source]

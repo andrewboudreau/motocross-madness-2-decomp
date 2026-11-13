@@ -8,11 +8,11 @@ unproven. Shared return instructions alone do not establish method identity.
 
 | Primary slot | Existing source method | Retail VA | Complete bytes |
 | --- | --- | --- | --- |
-| 0 | `CharacterVirtualSlot0()` | 0x00464e90 | 1, `ret` |
-| 2 | `CharacterVirtualSlot2()` | 0x00464e90 | 1, `ret` |
-| 3 | `CharacterVirtualSlot3(int)` | 0x00464e80 | 3, `ret 4` |
-| 9 | `CharacterVirtualSlot9(int)` | 0x00464e80 | 3, `ret 4` |
-| 10 | `CharacterVirtualSlot10()` | 0x00464e90 | 1, `ret` |
+| 0 | `BuildModel()` | 0x00464e90 | 1, `ret` |
+| 2 | `CaptureRestPose()` | 0x00464e90 | 1, `ret` |
+| 3 | `CaptureFramePoses(int)` | 0x00464e80 | 3, `ret 4` |
+| 9 | `CopyModelFrom(int)` | 0x00464e80 | 3, `ret 4` |
+| 10 | `DumpNodeTransforms()` | 0x00464e90 | 1, `ret` |
 
 The one-word cleanup is decoded evidence; `int` remains the existing provisional
 argument type. No argument or receiver memory is accessed. Existing slots 4, 5

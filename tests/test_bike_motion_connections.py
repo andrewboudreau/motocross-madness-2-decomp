@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CALLERS = ('src/krusty2/vehicle/KrustyBike.cpp', 'samples/physics/krustybike/KrustyBikeNearMisses.cpp')
 MOTION = 'src/krusty2/motion/Motnctrl.cpp'
 PROVIDERS = (*OLD_PROVIDERS,
-    ('void Character::ApplyPoseListSlot6(', '?ApplyPoseListSlot6@Character@@QAEXPAUMotionPoseList@@H@Z', 0x4a8ac0, 59),
+    ('void Character::ApplyFullPoseList(', '?ApplyFullPoseList@Character@@QAEXPAUMotionPoseList@@H@Z', 0x4a8ac0, 59),
     ('void Character::ApplyRestPose(', '?ApplyRestPose@Character@@QAEXXZ', 0x4a8b00, 15))
 CONNECTED = (PROVIDERS[1], PROVIDERS[3], PROVIDERS[5])
 

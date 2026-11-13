@@ -124,7 +124,7 @@ CASES = [
     {'name': 'Character primary virtual default slot 0',
      'source': 'src/reconstructed/CharacterDefaults.cpp',
      'bindings': 'src/reconstructed/CharacterDefaults.bindings.json',
-     'symbol': '?CharacterVirtualSlot0@Character@@UAEXXZ',
+     'symbol': '?BuildModel@Character@@UAEXXZ',
      'target_va': '0x00464e90',
      'target_size': 1,
      'reason': 'individual primary RTTI/vtable slot and full RET body; virtual GameObject base remains separate, '
@@ -132,7 +132,7 @@ CASES = [
     {'name': 'Character primary virtual default slot 2',
      'source': 'src/reconstructed/CharacterDefaults.cpp',
      'bindings': 'src/reconstructed/CharacterDefaults.bindings.json',
-     'symbol': '?CharacterVirtualSlot2@Character@@UAEXXZ',
+     'symbol': '?CaptureRestPose@Character@@UAEXXZ',
      'target_va': '0x00464e90',
      'target_size': 1,
      'reason': 'individual primary RTTI/vtable slot and full RET body; virtual GameObject base remains separate, '
@@ -140,7 +140,7 @@ CASES = [
     {'name': 'Character primary virtual default slot 3',
      'source': 'src/reconstructed/CharacterDefaults.cpp',
      'bindings': 'src/reconstructed/CharacterDefaults.bindings.json',
-     'symbol': '?CharacterVirtualSlot3@Character@@UAEXH@Z',
+     'symbol': '?CaptureFramePoses@Character@@UAEXH@Z',
      'target_va': '0x00464e80',
      'target_size': 3,
      'reason': 'individual primary RTTI/vtable slot and full RET body; virtual GameObject base remains separate, '
@@ -148,7 +148,7 @@ CASES = [
     {'name': 'Character primary virtual default slot 9',
      'source': 'src/reconstructed/CharacterDefaults.cpp',
      'bindings': 'src/reconstructed/CharacterDefaults.bindings.json',
-     'symbol': '?CharacterVirtualSlot9@Character@@UAEXH@Z',
+     'symbol': '?CopyModelFrom@Character@@UAEXH@Z',
      'target_va': '0x00464e80',
      'target_size': 3,
      'reason': 'individual primary RTTI/vtable slot and full RET body; virtual GameObject base remains separate, '
@@ -156,7 +156,7 @@ CASES = [
     {'name': 'Character primary virtual default slot 10',
      'source': 'src/reconstructed/CharacterDefaults.cpp',
      'bindings': 'src/reconstructed/CharacterDefaults.bindings.json',
-     'symbol': '?CharacterVirtualSlot10@Character@@UAEXXZ',
+     'symbol': '?DumpNodeTransforms@Character@@UAEXXZ',
      'target_va': '0x00464e90',
      'target_size': 1,
      'reason': 'individual primary RTTI/vtable slot and full RET body; virtual GameObject base remains separate, '

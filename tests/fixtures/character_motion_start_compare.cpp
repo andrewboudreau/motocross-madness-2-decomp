@@ -72,7 +72,7 @@ static int MapReference(const char* path) {
  free(raw);
  BYTE* call=(BYTE*)0x4a8c36;
  if(*call!=0xe8||(DWORD)(call+5)+*(DWORD*)(call+1)!=0x4a8a80)return 0;
- *(DWORD*)(call+1)=Address(&Character::ApplyPoseListSlot4)-(DWORD)(call+5);
+ *(DWORD*)(call+1)=Address(&Character::ApplyPoseList)-(DWORD)(call+5);
  return FlushInstructionCache(GetCurrentProcess(),0,0)!=0;
 }
 static void Reset(int frameCount,int cb) {

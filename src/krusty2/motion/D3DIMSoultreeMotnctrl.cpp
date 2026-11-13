@@ -56,19 +56,19 @@ int FillNodeNames(int index, NodeNameEntry* table, SoultreeObject* node)
 // slot 8 (0x00445e70, ret 4): copies the 0x4f-char name at +0x1a4 from the argument object, then runs
 // Character's slot 8 (0x004a98b0, direct call).  The header types the argument as int; it is a pointer to
 // another D3DIMSoultreeCharacter (tier 3).
-void D3DIMSoultreeCharacter::CharacterVirtualSlot8(int other)
+void D3DIMSoultreeCharacter::CopyStateFrom(int other)
 {
     D3DIMSoultreeCharacter* src = (D3DIMSoultreeCharacter*)other;
     int len = strlen(src->d3d_field_0x1a4);
     int copyLength = len > 0x4f ? 0x4f : len;
     strncpy(d3d_field_0x1a4, src->d3d_field_0x1a4, copyLength);
     d3d_field_0x1a4[copyLength] = 0;
-    Character::CharacterVirtualSlot8(other);
+    Character::CopyStateFrom(other);
 }
 
 // slot 6 (0x00446480, ret 8): applies a pose record to its node.  'rowMask' is an optional per-row
 // enable mask indexed by the record's node index.  Argument types are tier 3 (the header uses int).
-void D3DIMSoultreeCharacter::CharacterVirtualSlot6(int poseRecord, int rowMask)
+void D3DIMSoultreeCharacter::ApplyFullPose(int poseRecord, int rowMask)
 {
     const CharacterPose* pose = (const CharacterPose*)poseRecord;
     const int* mask = (const int*)rowMask;
@@ -86,11 +86,11 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot6(int poseRecord, int rowMask)
 
 // slot 3 (0x00446110, ret 4): refreshes every record of the list from the live nodes.  The records are
 // first passed (last to first) to slot 4, then each is overwritten with its node's current pose.
-void D3DIMSoultreeCharacter::CharacterVirtualSlot3(int records)
+void D3DIMSoultreeCharacter::CaptureFramePoses(int records)
 {
     MotionPoseList* list = (MotionPoseList*)records;
     for (int i = list->count - 1; i >= 0; i--)
-        CharacterVirtualSlot4((int)&list->poses[i], 0);
+        ApplyPose((int)&list->poses[i], 0);
     for (int j = 0; j < list->count; j++) {
         SoultreeObject* node = nodeNames[list->poses[j].nodeIndex].node;
         Vec3 position;
@@ -106,7 +106,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot3(int records)
 }
 
 // slot 4 (0x00446210, ret 8): like slot 6 but honours the per-row applyRotation / applyTranslation enables.
-void D3DIMSoultreeCharacter::CharacterVirtualSlot4(int poseRecord, int rowMask)
+void D3DIMSoultreeCharacter::ApplyPose(int poseRecord, int rowMask)
 {
     const CharacterPose* pose = (const CharacterPose*)poseRecord;
     const int* mask = (const int*)rowMask;
@@ -129,7 +129,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot4(int poseRecord, int rowMask)
 // slot 5 (0x00446300, ret 8): mirrored variant of slot 4.  The target node comes from the mirror map
 // (+0x18c, indexed by the record's node index) and the x components of both axes and the position are
 // negated.  The per-row enables are still read from the unmapped row.
-void D3DIMSoultreeCharacter::CharacterVirtualSlot5(int poseRecord, int rowMask)
+void D3DIMSoultreeCharacter::ApplyMirroredPose(int poseRecord, int rowMask)
 {
     const CharacterPose* pose = (const CharacterPose*)poseRecord;
     const int* mask = (const int*)rowMask;
@@ -171,7 +171,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot5(int poseRecord, int rowMask)
 
 // slot 10 (0x00446520): formats a "Position/Orientation Data" line per node into a local buffer
 // (format string at 0x00568bbc).  The buffer is not read afterwards in retail (debug output stripped).
-void D3DIMSoultreeCharacter::CharacterVirtualSlot10()
+void D3DIMSoultreeCharacter::DumpNodeTransforms()
 {
     for (int i = 0; i < nodeCount; i++) {
         char text[0x100];
@@ -191,7 +191,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot10()
 // poseList (+0x190; poses allocated on first use, line 0x12d), in each node's parent space.
 // The node is read through a named reference to the table member (`names`); with
 // `nodeNames[i + 1]` VC6 forms the row address as `offset + table`, retail `table + offset`.
-void D3DIMSoultreeCharacter::CharacterVirtualSlot2()
+void D3DIMSoultreeCharacter::CaptureRestPose()
 {
     NodeNameEntry*& names = nodeNames;
     int count = nodeCount;
@@ -300,7 +300,7 @@ public:
 
 // slot 9 (0x00445ec0, ret 4): clones the argument character's node model, makes it a child of this object's
 // GameObject, then rebuilds the node name table (line 0x11b) and re-registers the model's nodes.
-void D3DIMSoultreeCharacter::CharacterVirtualSlot9(int other)
+void D3DIMSoultreeCharacter::CopyModelFrom(int other)
 {
     SoultreeObject* source = ((D3DIMSoultreeCharacter*)other)->modelNode;
     ModelObject* model = reinterpret_cast<ModelObject*>(new(__FILE__, 0x116) D3DIMSoultreeObject(1));
@@ -319,7 +319,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot9(int other)
 // slot 0 (0x00445a70): builds this character's node model from scratch: a model named "Base Character Frame"
 // is loaded, a second model is loaded under the character's combined name, its items are cloned onto the first
 // and its node tree is attached below it, then the node name table is rebuilt (line 0x100).
-void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
+void D3DIMSoultreeCharacter::BuildModel()
 {
     char name[0x104];
     int len = strlen(contentDirectory);
@@ -385,7 +385,7 @@ struct LoadDescCopy {                                    // 0x18-byte block copi
 // in the owner registry; a cached entry with an owner is cloned through slot 8, otherwise the .slt file is read
 // and the new object becomes the entry's owner.  Returns the GameObject subobject, or 0 when the lookup fails
 // (the object has then released itself).
-GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int context, const char* path, const SoultreeLoadDesc* desc,
+GameObject* D3DIMSoultreeCharacter::LoadCharacter(int context, const char* path, const SoultreeLoadDesc* desc,
                                                        int loadInfo, int a5, int unused)
 {
     char drive[4];
@@ -416,7 +416,7 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int context, const char* 
     }
     if (entry->object) {
         entry->AddRef();
-        CharacterVirtualSlot8((int)entry->object);
+        CopyStateFrom((int)entry->object);
         ReadClock();
         delete file;
         return this;
@@ -431,7 +431,7 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int context, const char* 
     sltFile->Attach((FileStream*)file, 0, 1);
     sltFile->SelectSection("General info");
     sltFile->ReadString("SLTFile", d3d_field_0x1a4, -1);
-    CharacterVirtualSlot1();
+    LoadFromSlt();
     delete sltFile;
     g_ResourceManager->SetItemObject(entry, this);
     delete file;

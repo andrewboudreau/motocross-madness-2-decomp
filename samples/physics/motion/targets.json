@@ -111,7 +111,7 @@
   {
     "class": "Character",
     "source": "Motnctrl.cpp",
-    "candidate_symbol_contains": "?CharacterVirtualSlot7@Character@@UAEHMHH@Z",
+    "candidate_symbol_contains": "?AdvanceMotionInterpolated@Character@@UAEHMHH@Z",
     "target_va": "0x004a70c0",
     "target_size": 3327,
     "expect": "partial",

@@ -4,10 +4,10 @@
 #include "../krusty2/motion/D3DIMSoultreeCharacter.h"
 
 // Primary slots 0, 2 and 10: complete 0x00464e90, one-byte return.
-void Character::CharacterVirtualSlot0() {}
-void Character::CharacterVirtualSlot2() {}
-void Character::CharacterVirtualSlot10() {}
+void Character::BuildModel() {}
+void Character::CaptureRestPose() {}
+void Character::DumpNodeTransforms() {}
 
 // Primary slots 3 and 9: complete 0x00464e80, return popping one argument.
-void Character::CharacterVirtualSlot3(int) {}
-void Character::CharacterVirtualSlot9(int) {}
+void Character::CaptureFramePoses(int) {}
+void Character::CopyModelFrom(int) {}

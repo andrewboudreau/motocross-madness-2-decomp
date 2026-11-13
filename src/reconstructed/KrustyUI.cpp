@@ -63,18 +63,18 @@ struct UnknownKrustyUISoultree {
 class UnknownKrustyUICharacter : public virtual GameObject {
 public:
     explicit UnknownKrustyUICharacter(int flags);
-    virtual void CharacterVirtualSlot0();
-    virtual void CharacterVirtualSlot1();
-    virtual void CharacterVirtualSlot2();
-    virtual void CharacterVirtualSlot3();
-    virtual void CharacterVirtualSlot4();
-    virtual void CharacterVirtualSlot5();
-    virtual void CharacterVirtualSlot6();
-    virtual void CharacterVirtualSlot7();
-    virtual void CharacterVirtualSlot8();
-    virtual void CharacterVirtualSlot9();
-    virtual void CharacterVirtualSlot10();
-    virtual GameObject* CharacterVirtualSlot11(void* owner, const char* name, GameObject* lights,
+    virtual void BuildModel();
+    virtual void LoadFromSlt();
+    virtual void CaptureRestPose();
+    virtual void CaptureFramePoses();
+    virtual void ApplyPose();
+    virtual void ApplyMirroredPose();
+    virtual void ApplyFullPose();
+    virtual void AdvanceMotionInterpolated();
+    virtual void CopyStateFrom();
+    virtual void CopyModelFrom();
+    virtual void DumpNodeTransforms();
+    virtual GameObject* LoadCharacter(void* owner, const char* name, GameObject* lights,
                                                void* context, int a, int b);
     void SetMotionByName(const char* motion);        // 0x004a8b10: plays a motion
     int AdvanceMotion(float time, int a, int b);   // 0x004a6bb0: advances it
@@ -365,7 +365,7 @@ void KrustyUI::BuildGarageScene(int value) {
         }
         KRUSTYUI_GARAGE = reinterpret_cast<UnknownKrustyUICharacter*>(new(__FILE__, 0x174) D3DIMSoultreeCharacter(1));
         garageScene->AppendChild(
-            KRUSTYUI_GARAGE->CharacterVirtualSlot11(renderContext, "UIgarage.mcf", lights, &context, 1, 1), -1);
+            KRUSTYUI_GARAGE->LoadCharacter(renderContext, "UIgarage.mcf", lights, &context, 1, 1), -1);
         reinterpret_cast<D3DIMSoultreeObject*>(KRUSTYUI_GARAGE->modelNode)->SetUseLighting(0);
         reinterpret_cast<SoultreeObject*>(KRUSTYUI_GARAGE->modelNode)->SetPosition(*reinterpret_cast<const Vec3*>(&garageFocus));
         reinterpret_cast<SoultreeObject*>(KRUSTYUI_GARAGE->modelNode)->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
@@ -380,7 +380,7 @@ void KrustyUI::BuildGarageScene(int value) {
             garageScene->AppendChild(shadow, -1);
         KRUSTYUI_RIDER = reinterpret_cast<UnknownKrustyUICharacter*>(new(__FILE__, 0x194) D3DIMSoultreeCharacter(1));
         garageScene->AppendChild(
-            KRUSTYUI_RIDER->CharacterVirtualSlot11(renderContext, "UIRider.mcf", lights,
+            KRUSTYUI_RIDER->LoadCharacter(renderContext, "UIRider.mcf", lights,
                                                    &g_TrackGame->textureContext, 1, 1), -1);
         reinterpret_cast<D3DIMSoultreeObject*>(KRUSTYUI_RIDER->modelNode)->SetUseLighting(1);
         reinterpret_cast<SoultreeObject*>(KRUSTYUI_RIDER->modelNode)->SetPosition(*reinterpret_cast<const Vec3*>(&KRUSTYUI_RIDER_POSITION));
@@ -397,7 +397,7 @@ void KrustyUI::BuildGarageScene(int value) {
             sprintf(text, "Animations\\UIbike\\%s", KRUSTYUI_MODELS[i].uiModelFile);
             KRUSTYUI_MODELS[i].uiModel = reinterpret_cast<UnknownKrustyUIModelObject*>(new(__FILE__, 0x1b4) D3DIMSoultreeCharacter(0));
             garageScene->AppendChild(
-                KRUSTYUI_MODEL_CHARACTER(i)->CharacterVirtualSlot11(renderContext, text, lights,
+                KRUSTYUI_MODEL_CHARACTER(i)->LoadCharacter(renderContext, text, lights,
                                                                       &g_TrackGame->textureContext,
                                                                       1, 1), -1);
             UnknownKrustyUICharacter* bike = KRUSTYUI_MODEL_CHARACTER(i);

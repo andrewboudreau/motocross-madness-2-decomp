@@ -142,22 +142,23 @@ struct UnknownBikeRaceMesh {
 
 class UnknownBikeRaceCharacter {
 public:
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
+    // D3DIMSoultreeCharacter's primary slots 0-11 (the object is one; names as there).
+    virtual void BuildModel();
+    virtual void LoadFromSlt();
+    virtual void CaptureRestPose();
+    virtual void CaptureFramePoses();
+    virtual void ApplyPose();
+    virtual void ApplyMirroredPose();
+    virtual void ApplyFullPose();
     // Slot 7: per frame (BikeRace slot 10 passes the frame time).
-    virtual int UnknownVirtualSlot7(float frameTime, int a, int b);
-    virtual void UnknownVirtualSlot8();
-    virtual void UnknownVirtualSlot9();
-    virtual void UnknownVirtualSlot10();
-    // Slot 11 (D3DIMSoultreeCharacter's CharacterVirtualSlot11): loads the
+    virtual int AdvanceMotionInterpolated(float frameTime, int a, int b);
+    virtual void CopyStateFrom();
+    virtual void CopyModelFrom();
+    virtual void DumpNodeTransforms();
+    // Slot 11 (D3DIMSoultreeCharacter's LoadCharacter): loads the
     // model file `name`; returns the GameObject to add.
-    virtual GameObject* UnknownVirtualSlot11(void* owner, const char* name, LightManager* lights,
-                                             TextureContext* textures, int a, int b);
+    virtual GameObject* LoadCharacter(void* owner, const char* name, LightManager* lights,
+                                      TextureContext* textures, int a, int b);
 
     // 0x004a8b10: plays a motion ("Stand", "FlagStart", "FlagLoop").
     void SetMotionByName(const char* motion);

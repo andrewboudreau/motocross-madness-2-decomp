@@ -20,7 +20,7 @@ value layout without introducing Math3D.h's separate per-unit vector constants.
 ## Receiver and arguments
 
 The garage's primary character slot 11 loads each model. The model creation
-path in `D3DIMSoultreeCharacter::CharacterVirtualSlot0` calls the actual
+path in `D3DIMSoultreeCharacter::BuildModel` calls the actual
 `D3DIMSoultreeObject` constructor at `0x00445b29`, then stores its returned
 primary address at character `+0x1a0` (`0x00445b45`). Only the subsequent,
 separate `GameObject` attachment adds `0x0c` (`0x00445b74`). Clone construction

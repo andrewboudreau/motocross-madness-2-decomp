@@ -16,7 +16,7 @@
 //     re-orthogonalised, lerped position, node index and flag from the first pose), c and d through
 //     InterpolatePose (0x004a8470); then ab = InterpolatePose(a, b, 1 - weight),
 //     cd = InterpolatePose(c, d, 1 - weight), result = InterpolatePose(ab, cd, 1 - lean), and
-//     CharacterVirtualSlot4 (vtable +0x10) receives (&result, 0).
+//     ApplyPose (vtable +0x10) receives (&result, 0).
 //
 // Code shape (not byte exact; linked with /QIfist /Op, config/game_build.json):
 //   - Retail's ebp frame and bare `fistp dword ptr [eax]` come from an inline-asm helper, out of
@@ -116,7 +116,7 @@ void Character::ApplyFourMotionBlendAtPhase(int aHandle, int bHandle, int cHandl
         InterpolatePose(&aPose, &bPose, &abPose, pairWeight);
         InterpolatePose(&cPose, &dPose, &cdPose, pairWeight);
         InterpolatePose(&abPose, &cdPose, &result, leanWeight);
-        CharacterVirtualSlot4((int)&result, 0);
+        ApplyPose((int)&result, 0);
     }
 }
 #pragma optimize("", on)

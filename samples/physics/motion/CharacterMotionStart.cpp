@@ -18,6 +18,6 @@ void Character::ApplyMotionAtPhase(int handle, float phase)
     FloatToInt(&frame, phase);
     currentMotion = motion;
     currentFrame = &motion->frames[frame];
-    ApplyPoseListSlot4(currentFrame, 0);
+    ApplyPoseList(currentFrame, 0);
 }
 #pragma optimize("", on)

@@ -23,8 +23,12 @@ SLOTS = (0, 2, 3, 9, 10)
 DERIVED_TARGETS = (0x445a70, 0x445fc0, 0x446110, 0x445ec0, 0x446520)
 
 
+SLOT_NAMES = {0: 'BuildModel', 2: 'CaptureRestPose', 3: 'CaptureFramePoses', 9: 'CopyModelFrom',
+              10: 'DumpNodeTransforms'}
+
+
 def symbol(slot, owner='Character'):
-    return '?CharacterVirtualSlot%d@%s@@UAEX%s' % (slot, owner, 'H@Z' if slot in (3, 9) else 'XZ')
+    return '?%s@%s@@UAEX%s' % (SLOT_NAMES[slot], owner, 'H@Z' if slot in (3, 9) else 'XZ')
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),

@@ -284,7 +284,7 @@ int EventManager::CreatePodiumScene() {
         }
         D3DIMSoultreeCharacter*& character = podiumCharacters[place - 1];
         character = new(__FILE__, 0x31d) D3DIMSoultreeCharacter(isEnabled);
-        character->D3DIMVirtualSlot11((int)renderContext, path, (const SoultreeLoadDesc*)PODIUM_OWNER(owner)->lights,
+        character->LoadCharacter((int)renderContext, path, (const SoultreeLoadDesc*)PODIUM_OWNER(owner)->lights,
                                        (int)&context, 1, 1);
         view->AppendChild(character, -1);
         if (character) {

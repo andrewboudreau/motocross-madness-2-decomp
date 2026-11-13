@@ -45,7 +45,7 @@ Motion `+0xa4`, and clears blending. Missing motions retain the observed fault
 after the first two stores; no speculative null guard was added.
 
 ApplyRestPose passes the receiver's pose list at `+0x190` and mask zero to the
-existing 59-byte ApplyPoseListSlot6 method. That method visits the 0x2c-byte
+existing 59-byte ApplyFullPoseList method. That method visits the 0x2c-byte
 records and invokes primary virtual slot 6. It does not call through the
 virtual GameObject base or substitute a guessed pose operation.
 
@@ -90,7 +90,7 @@ preservation was proved. Function extents and scores did not change.
 The native fixture extracts unchanged current source and independently requires
 strict matches for both the full production-TU and extracted bodies. It executes
 the actual MotionManager::Find, FindMotion, SetMotionByName, SetMotion,
-ApplyRestPose and ApplyPoseListSlot6 bodies. Only virtual pose application is
+ApplyRestPose and ApplyFullPoseList bodies. Only virtual pose application is
 observed through a synthetic primary vtable; no direct motion helper is mocked.
 
 The **4,928 native cases** comprise 3,840 lookup/state/missing-name cases,

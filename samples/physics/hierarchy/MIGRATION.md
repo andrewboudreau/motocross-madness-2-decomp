@@ -91,7 +91,7 @@ No generators wrote into `collision/` or `constraint/`. The scripts in `work/b2_
 4. **Slot names in the canonical hierarchy:**
    - GameObject slots use `BaseObjectVirtualSlot1..3` and `Disable..26`, plus `~GameObject` for slot 0.
    - The primary slots of SoultreePhysicsBaseObject and its descendants are `UnknownVirtualSlot0..`.
-   - Character and D3DIM slots use `CharacterVirtualSlot0..10` and `D3DIMVirtualSlot11`. The distinct prefix avoids ambiguous lookups and accidental overrides between the two bases of SoultreePhysicsCharacter.
+   - Character and D3DIM slots use `BuildModel..10` and `LoadCharacter`. The distinct prefix avoids ambiguous lookups and accidental overrides between the two bases of SoultreePhysicsCharacter.
 5. **D3DIM fields have a class prefix.** Character and D3DIM fields are named `chr_field_0xNN` and `d3d_field_0xNN`, relative to their own class start. Plain `field_0x1a0` exists in both SoultreePhysicsBaseObject and D3DIM, so an unprefixed name would be ambiguous.
    - Absolute 0x3bc = `d3d_field_0x1a0`.
 6. **The node class has three names.** `SoultreeNode` (soultree_base), `SoultreeObject` (`common/SoultreeObject.h`), `VehicleXform`, `BikeXform` and `KbXform` are one class. Their method addresses overlap: 0x4fc050, 0x4fc540, 0x4fc970, 0x4fd710 and 0x4fd7f0.

@@ -1,4 +1,4 @@
-"""Character::CharacterVirtualSlot7 0x004a70c0, non-looping playback with blending (tools/emu_diff.py case).
+"""Character::AdvanceMotionInterpolated 0x004a70c0, non-looping playback with blending (tools/emu_diff.py case).
 
 A character with a current motion and (when blending) a blend-from motion, each with random
 frame counts, fps and poses. Time steps land inside the motion (the interpolation loop), past
@@ -13,7 +13,7 @@ import struct
 from tools.emu_cases.rotate_pose import pack_pose, random_pose
 
 RETAIL_VA = 0x004a70c0
-SYMBOL = '?CharacterVirtualSlot7@Character@@UAEHMHH@Z'
+SYMBOL = '?AdvanceMotionInterpolated@Character@@UAEHMHH@Z'
 SOURCE = 'samples/physics/motion/Motnctrl.cpp'
 PROBES = {0x004a7dc0: 'RotatePose (extrapolation)', 0x004a8470: 'InterpolatePose (blend)',
           0x004a8b60: 'BlendToMotion (looping end)'}

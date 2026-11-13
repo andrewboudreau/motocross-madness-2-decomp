@@ -1084,8 +1084,8 @@ void KrustyBike::UpdateRiderPose(float dt)
             // Trick clip.
             if (motionJustStarted) {
                 motionJustStarted = 0;
-                ((Character*)riderCharacter)->CharacterVirtualSlot7(0, 0, 0);
-                CharacterVirtualSlot7(0, 0, 0);
+                ((Character*)riderCharacter)->AdvanceMotionInterpolated(0, 0, 0);
+                AdvanceMotionInterpolated(0, 0, 0);
             } else {
                 int remote = isRemote || reinterpret_cast<KbGame*>(g_TrackGame)->playingReplay;
                 int held;
@@ -1101,8 +1101,8 @@ void KrustyBike::UpdateRiderPose(float dt)
                         if (!trickPoseHeld) {
                             if (trickPoseHeldPrev && motionIndex > 15)
                                 StartAltTrick(motionIndex - 16);
-                            ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);
-                            CharacterVirtualSlot7(dt, 0, 0);
+                            ((Character*)riderCharacter)->AdvanceMotionInterpolated(dt, 0, 0);
+                            AdvanceMotionInterpolated(dt, 0, 0);
                         }
                     } else {
                         if (trickPoseHeld && motionIndex < 16 && riderAltTrickMotions[motionIndex]) {
@@ -1113,8 +1113,8 @@ void KrustyBike::UpdateRiderPose(float dt)
                         } else {
                             trickPoseHeld = 0;
                         }
-                        ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);
-                        CharacterVirtualSlot7(dt, 0, 0);
+                        ((Character*)riderCharacter)->AdvanceMotionInterpolated(dt, 0, 0);
+                        AdvanceMotionInterpolated(dt, 0, 0);
                     }
                 } else {
                     int frame = D3DIMSoultreeCharacter::currentFrame->frameIndex;
@@ -1131,8 +1131,8 @@ void KrustyBike::UpdateRiderPose(float dt)
                             trickClipTime -= dt;
                         }
                     } else {
-                        ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);
-                        CharacterVirtualSlot7(dt, 0, 0);
+                        ((Character*)riderCharacter)->AdvanceMotionInterpolated(dt, 0, 0);
+                        AdvanceMotionInterpolated(dt, 0, 0);
                     }
                 }
             }
@@ -1262,7 +1262,7 @@ void KrustyBike::UpdateRiderPose(float dt)
             ((KbA5C4*)riderCharacter)->motionTime = 0;
             hasFinished++;
         } else {
-            ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);
+            ((Character*)riderCharacter)->AdvanceMotionInterpolated(dt, 0, 0);
         }
         if (hasFinished > 2) {
             if (crossoverPose)

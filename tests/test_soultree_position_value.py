@@ -232,7 +232,7 @@ class SoultreePositionValueTests(unittest.TestCase):
                     self.assertTrue(proof['strict_exact'],proof);self.assertEqual(proof['candidate_size'],size);strict += 1
                 self.assertEqual(complete(objects[TREE],symbol),complete(objects['helpers'],symbol))
             for source,symbol,site,va,destination in ((LIGHT,'?SetPosition@LightEmitter@@',0x49e1a0,0x49e150,OLD),
-                (MOTION,'?CharacterVirtualSlot4@D3DIMSoultreeCharacter@@',0x446291,0x446210,VIEW)):
+                (MOTION,'?ApplyPose@D3DIMSoultreeCharacter@@',0x446291,0x446210,VIEW)):
                 entry=objects[source].find_symbol(symbol)
                 _,_,relocs=objects[source].symbol_extent(entry)
                 calls=[r for r in relocs if objects[source].symbol_by_index[r.symbol_index].name==destination]

@@ -512,7 +512,7 @@
   {
     "class": "Motnctrl",
     "source": "Motnctrl.cpp",
-    "candidate_symbol_contains": "CharacterVirtualSlot1@Character",
+    "candidate_symbol_contains": "LoadFromSlt@Character",
     "target_va": "0x004a6930",
     "target_size": 145,
     "expect": "exact",
@@ -582,7 +582,7 @@
   {
     "class": "Motnctrl",
     "source": "Motnctrl.cpp",
-    "candidate_symbol_contains": "CharacterVirtualSlot4@Character",
+    "candidate_symbol_contains": "ApplyPose@Character",
     "target_va": "0x004a6ba0",
     "target_size": 3,
     "expect": "exact",
@@ -602,7 +602,7 @@
   {
     "class": "Motnctrl",
     "source": "Motnctrl.cpp",
-    "candidate_symbol_contains": "?ApplyPoseListSlot4@Character@@",
+    "candidate_symbol_contains": "?ApplyPoseList@Character@@",
     "target_va": "0x004a8a80",
     "target_size": 59,
     "expect": "exact",
@@ -612,7 +612,7 @@
   {
     "class": "Motnctrl",
     "source": "Motnctrl.cpp",
-    "candidate_symbol_contains": "?ApplyPoseListSlot6@Character@@",
+    "candidate_symbol_contains": "?ApplyFullPoseList@Character@@",
     "target_va": "0x004a8ac0",
     "target_size": 59,
     "expect": "exact",
@@ -672,7 +672,7 @@
   {
     "class": "Motnctrl",
     "source": "Motnctrl.cpp",
-    "candidate_symbol_contains": "CharacterVirtualSlot8@Character",
+    "candidate_symbol_contains": "CopyStateFrom@Character",
     "target_va": "0x004a98b0",
     "target_size": 381,
     "expect": "exact",
@@ -782,7 +782,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "CharacterVirtualSlot8@D3DIMSoultreeCharacter",
+    "candidate_symbol_contains": "CopyStateFrom@D3DIMSoultreeCharacter",
     "target_va": "0x00445e70",
     "target_size": 78,
     "expect": "exact",
@@ -792,7 +792,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "CharacterVirtualSlot6@D3DIMSoultreeCharacter",
+    "candidate_symbol_contains": "ApplyFullPose@D3DIMSoultreeCharacter",
     "target_va": "0x00446480",
     "target_size": 153,
     "expect": "exact",
@@ -802,7 +802,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "CharacterVirtualSlot3@D3DIMSoultreeCharacter",
+    "candidate_symbol_contains": "CaptureFramePoses@D3DIMSoultreeCharacter",
     "target_va": "0x00446110",
     "target_size": 249,
     "expect": "exact",
@@ -812,7 +812,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "CharacterVirtualSlot5@D3DIMSoultreeCharacter",
+    "candidate_symbol_contains": "ApplyMirroredPose@D3DIMSoultreeCharacter",
     "target_va": "0x00446300",
     "target_size": 376,
     "expect": "exact",
@@ -822,7 +822,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "CharacterVirtualSlot10@D3DIMSoultreeCharacter",
+    "candidate_symbol_contains": "DumpNodeTransforms@D3DIMSoultreeCharacter",
     "target_va": "0x00446520",
     "target_size": 246,
     "expect": "exact",
@@ -832,7 +832,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "CharacterVirtualSlot4@D3DIMSoultreeCharacter",
+    "candidate_symbol_contains": "ApplyPose@D3DIMSoultreeCharacter",
     "target_va": "0x00446210",
     "target_size": 235,
     "expect": "exact",
@@ -842,7 +842,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "CharacterVirtualSlot2@D3DIMSoultreeCharacter",
+    "candidate_symbol_contains": "CaptureRestPose@D3DIMSoultreeCharacter",
     "target_va": "0x00445fc0",
     "target_size": 331,
     "expect": "exact",
@@ -922,7 +922,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "CharacterVirtualSlot9@D3DIMSoultreeCharacter",
+    "candidate_symbol_contains": "CopyModelFrom@D3DIMSoultreeCharacter",
     "target_va": "0x00445ec0",
     "target_size": 248,
     "expect": "exact",
@@ -932,7 +932,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "CharacterVirtualSlot0@D3DIMSoultreeCharacter",
+    "candidate_symbol_contains": "BuildModel@D3DIMSoultreeCharacter",
     "target_va": "0x00445a70",
     "target_size": 1021,
     "expect": "exact",
@@ -942,7 +942,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "?D3DIMVirtualSlot11@D3DIMSoultreeCharacter@@UAEPAVGameObject@@HPBDPBUSoultreeLoadDesc@@HHH@Z",
+    "candidate_symbol_contains": "?LoadCharacter@D3DIMSoultreeCharacter@@UAEPAVGameObject@@HPBDPBUSoultreeLoadDesc@@HHH@Z",
     "target_va": "0x00445680",
     "target_size": 788,
     "expect": "exact",

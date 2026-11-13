@@ -263,7 +263,7 @@ int EventManager::Tick(float frameTime) {
     if (g_TrackGame->uiInteractionBlocked) {
         g_TrackGame->uiBlockedSeconds += frameTime;
         for (int i = 0; i < podiumCharacterCount; i++)
-            podiumCharacters[i]->CharacterVirtualSlot7(frameTime, 0, 0);
+            podiumCharacters[i]->AdvanceMotionInterpolated(frameTime, 0, 0);
         podiumCameraPosition += frameTime * podiumPanSpeed * (1.0f / 7);
         podiumCamera->SetFrame(&podiumCameraPosition, 0, 0, 0, 0);
         podiumCamera->LookAt(podiumFocus);

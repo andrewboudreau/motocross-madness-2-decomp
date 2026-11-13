@@ -102,7 +102,7 @@ Twelve existing source bodies now satisfy thirteen former decorated aliases
 
 | Retail VA | Bytes | Shared provider |
 |---|---:|---|
-| `0x004a8ac0` | 59 | Character::ApplyPoseListSlot6 |
+| `0x004a8ac0` | 59 | Character::ApplyFullPoseList |
 | `0x004a8b10` | 33 | Character::SetMotionByName |
 | `0x004a8b40` | 27 | Character::SetMotion |
 | `0x004a8b80` | 107 | Character::BlendToMotion(Motion*, float) |

@@ -83,7 +83,7 @@ int CollisionCharacter::Tick(float dt)
 GameObject* CollisionCharacter::Load(int context, const char* name, const char* colPath,
                                      const SoultreeLoadDesc* desc, int loadInfo, int a6, int unused)
 {
-    D3DIMSoultreeCharacter::D3DIMVirtualSlot11(context, name, desc, loadInfo, a6, unused);
+    D3DIMSoultreeCharacter::LoadCharacter(context, name, desc, loadInfo, a6, unused);
     int prevTag = g_MemTagStack->Push("Collision");
     collisionObject = new(CC_FILE, 27) CollisionObject(1);
     collisionObject->Configure((void*)context, 1, 0, 1);

@@ -20,7 +20,7 @@ There is no clamping or null validation.
 It stores the Motion pointer to `Character::currentMotion` (`+0x18`) before
 reading the Motion frame-array pointer (`+0xa4`). The selected frame is a
 12-byte MotionPoseList. It stores that pointer in `currentFrame` (`+0x1c`)
-and invokes the existing `ApplyPoseListSlot4` at `0x4a8a80` with mask zero.
+and invokes the existing `ApplyPoseList` at `0x4a8a80` with mask zero.
 The complete 59-byte helper walks the list and calls virtual slot 4 for each
 pose. Callback changes to the list can affect subsequent iterations.
 
@@ -76,7 +76,7 @@ conversion of NaN is portable.
 ## Native and object evidence
 
 `tests/test_character_motion_start.py` executes the actual standalone candidate
-object. It extracts the unchanged ApplyPoseListSlot4 source solely to link a
+object. It extracts the unchanged ApplyPoseList source solely to link a
 small native executable, then requires both that extracted body and the full
 canonical Motnctrl TU's body to match all 59 retail bytes and relocations.
 The only scripted game dependency is virtual slot 4; no source math or frame

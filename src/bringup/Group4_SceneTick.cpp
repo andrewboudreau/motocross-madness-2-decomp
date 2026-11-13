@@ -94,7 +94,7 @@ int Scene::Tick(float frameTime)
                 character->SetMotion((Motion*)animationTable->entries[i].motions[animationTable->entries[i].currentMotion]);
             }
             if (animationTable->entries[i].useBlendedKeys) {
-                animationTable->entries[i].motionFrame = character->CharacterVirtualSlot7(dt, 0, 0);
+                animationTable->entries[i].motionFrame = character->AdvanceMotionInterpolated(dt, 0, 0);
             } else {
                 animationTable->entries[i].motionFrame = character->AdvanceMotion(dt, 0, 0);
             }
@@ -132,7 +132,7 @@ int Scene::Tick(float frameTime)
             }
             Character* character = reinterpret_cast<Character*>(object);
             if (entry->useBlendedKeys) {
-                entry->motionFrame = character->CharacterVirtualSlot7(dt, 0, 0);
+                entry->motionFrame = character->AdvanceMotionInterpolated(dt, 0, 0);
             } else {
                 entry->motionFrame = character->AdvanceMotion(dt, 0, 0);
             }

@@ -644,7 +644,7 @@ int BikeRace::Tick(float frameTime) {
                             }
                         }
                     }
-                    flagGirl->UnknownVirtualSlot7(frameTime, 0, 0);
+                    flagGirl->AdvanceMotionInterpolated(frameTime, 0, 0);
                 }
             }
         } else if (replayVcr != 0) {

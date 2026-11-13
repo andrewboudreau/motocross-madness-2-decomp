@@ -12,11 +12,11 @@ static int checks;
 static void Call(Character* object, int slot, int argument)
 {
     switch (slot) {
-    case 0: object->Character::CharacterVirtualSlot0(); break;
-    case 2: object->Character::CharacterVirtualSlot2(); break;
-    case 3: object->Character::CharacterVirtualSlot3(argument); break;
-    case 9: object->Character::CharacterVirtualSlot9(argument); break;
-    case 10: object->Character::CharacterVirtualSlot10(); break;
+    case 0: object->Character::BuildModel(); break;
+    case 2: object->Character::CaptureRestPose(); break;
+    case 3: object->Character::CaptureFramePoses(argument); break;
+    case 9: object->Character::CopyModelFrom(argument); break;
+    case 10: object->Character::DumpNodeTransforms(); break;
     }
 }
 

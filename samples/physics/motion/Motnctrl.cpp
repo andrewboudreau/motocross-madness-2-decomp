@@ -374,7 +374,7 @@ inline void ExtrapolatePose7(CharacterPose* a, CharacterPose* b, CharacterPose* 
 // `== 1`, a named copy and the time-add spellings do not change either), and the blend loop's
 // unused sums and cross/normalise calls. Its extrapolation uses the explicit vector-call
 // declarations to retain retail's rounding between subtraction, two scales and addition.
-int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
+int Character::AdvanceMotionInterpolated(float time, int mirror, int mask)
 {
     MotionPoseList* from;
     MotionPoseList* to;
@@ -400,9 +400,9 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
                 CharacterPose pose;
                 BlendPose7(&from->poses[i], &to->poses[i], &pose, weight);
                 if (mirror == 0)
-                    CharacterVirtualSlot4((int)&pose, mask);
+                    ApplyPose((int)&pose, mask);
                 else
-                    CharacterVirtualSlot5((int)&pose, mask);
+                    ApplyMirroredPose((int)&pose, mask);
             }
         } else {
             for (int i = 0; i < from->count; i++) {
@@ -414,9 +414,9 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
                 CharacterPose out;
                 ExtrapolatePose7(fromPose, toPose, &out, flag, frameTime, fps);
                 if (mirror == 0)
-                    CharacterVirtualSlot4((int)&out, mask);
+                    ApplyPose((int)&out, mask);
                 else
-                    CharacterVirtualSlot5((int)&out, mask);
+                    ApplyMirroredPose((int)&out, mask);
             }
         }
     } else {
@@ -480,9 +480,9 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
             else
                 InterpolatePose(&pose2, &out, &result, blendWeight);
             if (mirror == 0)
-                CharacterVirtualSlot4((int)&result, mask);
+                ApplyPose((int)&result, mask);
             else
-                CharacterVirtualSlot5((int)&result, mask);
+                ApplyMirroredPose((int)&result, mask);
         }
         if (blendFromTime >= blendDuration) {
             blendActive = 0;

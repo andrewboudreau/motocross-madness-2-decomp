@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'samples/physics/motion/CharacterMotionStart.cpp'
 CANONICAL = 'src/krusty2/motion/Motnctrl.cpp'
 SYMBOL = '?ApplyMotionAtPhase@Character@@QAEXHM@Z'
-HELPER = '?ApplyPoseListSlot4@Character@@QAEXPAUMotionPoseList@@H@Z'
+HELPER = '?ApplyPoseList@Character@@QAEXPAUMotionPoseList@@H@Z'
 CONVERSION = '?FloatToInt@@YAXPAHM@Z'
 
 
@@ -86,7 +86,7 @@ class CharacterMotionStartTests(unittest.TestCase):
             output = Path(directory)
             extracted = output/'pose_walker.cpp'
             extracted.write_text('#include "motion/Motnctrl.h"\n'+extract(ROOT/CANONICAL,
-                                                                         'void Character::ApplyPoseListSlot4('))
+                                                                         'void Character::ApplyPoseList('))
             paths, objects = {}, {}
             def compile(source, name, flags=()):
                 obj = output/(name+'.obj')
