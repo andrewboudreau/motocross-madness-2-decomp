@@ -28,7 +28,7 @@ float Vehicle::GetSpawnProtectionDuration() { return 3.0f; }
 
 int Vehicle::IsSpawnProtected() { return spawnProtected; }
 
-int Vehicle::UnknownVirtualSlot52() { return crashState == 0; }
+int Vehicle::CanCrash() { return crashState == 0; }
 
 int Vehicle::GetRespawnKey(int* out)
 {
@@ -55,14 +55,14 @@ int Vehicle::ShouldBurstSteamEffect()
 
 int Vehicle::UnknownVirtualSlot78()
 {
-    if (inputMap->IsDeviceButtonDown(3, 2, 0x3f, 0) && !UnknownVirtualSlot77(1))
+    if (inputMap->IsDeviceButtonDown(3, 2, 0x3f, 0) && !IsPovHatPressed(1))
         return 1;
     return inputMap->IsDeviceButtonDown(0x1f, 0, 0x3f, 0) != 0;
 }
 
 int Vehicle::UnknownVirtualSlot79()
 {
-    if (inputMap->IsDeviceButtonDown(4, 2, 0x3f, 0) && !UnknownVirtualSlot77(1))
+    if (inputMap->IsDeviceButtonDown(4, 2, 0x3f, 0) && !IsPovHatPressed(1))
         return 1;
     return inputMap->IsDeviceButtonDown(0x2d, 0, 0x3f, 0) != 0;
 }

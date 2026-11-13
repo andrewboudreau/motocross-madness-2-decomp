@@ -934,7 +934,7 @@ int Bike::UpdateCrashState(float dt, int impact, float impulse)
         int neg = savedUp.y < 0.0f;
         crashYaw = savedYaw;
         crashedUpsideDown = neg;
-        slot27Pending = 1;
+        wreckPending = 1;
         ResetCrashTimer();
         EndMotion();
         motionCompleted = 0;
@@ -2107,7 +2107,7 @@ void Bike::ApplyCollisionEvent(int notify, int eventKind, void* event)
     }
     if (notify)
         UpdateCrashState(fixedStepTime, hasBody, impulse);
-    if (notifyOther && other->UnknownVirtualSlot52())
+    if (notifyOther && other->CanCrash())
         ((Bike*)other)->UpdateCrashState(((Bike*)other)->fixedStepTime, 1, impulse);
 }
 
@@ -2337,7 +2337,7 @@ void BikeCollisionCallback(CollisionObject* self, CollisionObject* other)
         } else if (kind == 0x65) {
             return;
         }
-        vehicle->ApplyCollisionEvent(vehicle->UnknownVirtualSlot52() && kind != 0x3e8 ? 1 : 0, kind, other);
+        vehicle->ApplyCollisionEvent(vehicle->CanCrash() && kind != 0x3e8 ? 1 : 0, kind, other);
     }
 }
 

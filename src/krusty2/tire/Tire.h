@@ -113,7 +113,7 @@ public:
     virtual void ShouldRestartSteamEffect();
     virtual void ShouldBurstSteamEffect();
     virtual void UnknownVirtualSlot26();
-    virtual void UnknownVirtualSlot27();
+    virtual void StartWreck();
     virtual void ResolveSubstepCollisions();
     virtual void SaveBodyOrientation();
     virtual void ClearContactEffectFlags();

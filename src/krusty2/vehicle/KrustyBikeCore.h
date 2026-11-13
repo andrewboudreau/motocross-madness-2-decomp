@@ -50,7 +50,7 @@ public:
     virtual int ShouldEmitMovingEffects();
     virtual int ShouldRestartSteamEffect();
     virtual int ShouldBurstSteamEffect();
-    virtual void UnknownVirtualSlot27();
+    virtual void StartWreck();
     virtual void SnapshotRespawnPose();
     virtual void SaveBodyOrientation(int lastStep);
     virtual void SimulateFrame(float dt);
@@ -63,7 +63,7 @@ public:
     virtual void RemoveFromRace();
     virtual float GetSpawnProtectionDuration();
     virtual void AdvancePosition();
-    virtual int UnknownVirtualSlot52();
+    virtual int CanCrash();
     virtual void ReadControlAxes(float dt);
     virtual void UpdateControlInput(float dt);
     virtual int IsRiderPoseLocked();

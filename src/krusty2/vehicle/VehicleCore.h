@@ -71,7 +71,7 @@ public:
     virtual void SimulateFrame(float dt);
     virtual void SetSpawnProtection(int protect, float duration, int forced);
     virtual int IsSpawnProtected();
-    virtual int UnknownVirtualSlot52();
+    virtual int CanCrash();
     virtual float ApplySteerRate();
     virtual Vec3* GetContactGroundNormal(Vec3* out);
     virtual Vec3* GetPivotAndForwardAxis(Vec3* out, Vec3* pos);
@@ -103,7 +103,7 @@ public:
     // ret 0xc = hidden result pointer + two arguments; KrustyBike 0x00491ca0 byte-matches
     // as a by-value Vec3 return (tier 1 for the ABI shape, tier 2 for the Vec3 pointers).
     virtual Vec3 ComputeDriveTorque(const Vec3* arm, const Vec3* force);
-    virtual int UnknownVirtualSlot77(int arg);
+    virtual int IsPovHatPressed(int arg);
     virtual int UnknownVirtualSlot78();
     virtual int UnknownVirtualSlot79();
     virtual int IsThrottleRequested();

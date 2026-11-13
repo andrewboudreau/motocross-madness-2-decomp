@@ -42,7 +42,7 @@
  {
   "class": "Vehicle",
   "source": "../../../src/reconstructed/VehicleMethods.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot52@Vehicle",
+  "candidate_symbol_contains": "CanCrash@Vehicle",
   "target_va": "0x0040c8a0",
   "target_size": 14,
   "expect": "exact",

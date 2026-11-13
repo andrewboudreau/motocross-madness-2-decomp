@@ -277,7 +277,7 @@ struct UnknownBikeRaceRacerInfo {
 // as KrustyBike's RTTI shows, a virtual GameObject base through +4);
 // UnknownEventRacer (RaceView.h) is the same object seen from EventManager.
 // Slot N is named after KrustyBike's slot N (vtable 0x00554548, object_offset 0);
-// slots 26, 27, 52 and 77-79 are placeholders there as well.
+// slots 26, 78 and 79 are placeholders there as well.
 class UnknownBikeRaceRacer : virtual public GameObject {
 public:
     // 0x0048fa60: KrustyBike's constructor (0x1638 bytes; bikerace.cpp's
@@ -310,7 +310,7 @@ public:
     virtual void ShouldRestartSteamEffect();
     virtual void ShouldBurstSteamEffect();
     virtual void UnknownRacerVirtualSlot26();
-    virtual void UnknownRacerVirtualSlot27();
+    virtual void StartWreck();
     virtual void ResolveSubstepCollisions();
     virtual void SaveBodyOrientation();
     virtual void ClearContactEffectFlags();
@@ -336,7 +336,7 @@ public:
     virtual void SimulateFrame();
     virtual void SetSpawnProtection(int value, float time, int c); // KrustyBike's ret 0xc
     virtual void IsSpawnProtected();
-    virtual void UnknownRacerVirtualSlot52();
+    virtual void CanCrash();
     virtual void ApplySteerRate();
     virtual void GetContactGroundNormal();
     virtual void GetPivotAndForwardAxis();
@@ -361,7 +361,7 @@ public:
     virtual void DeflectVelocity();
     virtual void ComputeWheelForwardAlignment();
     virtual void ComputeDriveTorque();
-    virtual void UnknownRacerVirtualSlot77();
+    virtual void IsPovHatPressed();
     virtual void UnknownRacerVirtualSlot78();
     virtual void UnknownRacerVirtualSlot79();
     virtual void IsThrottleRequested();

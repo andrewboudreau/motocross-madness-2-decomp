@@ -27,7 +27,8 @@ int SoultreePhysicsBaseObject::ShouldBurstSteamEffect()
     return 0;
 }
 
-void SoultreePhysicsBaseObject::UnknownVirtualSlot27()
+// Slot 27 (StartWreck, tier 2 from KrustyBike, its only override): empty here.
+void SoultreePhysicsBaseObject::StartWreck()
 {
 }
 
@@ -144,7 +145,7 @@ void SoultreePhysicsBaseObject::ResetDynamicState(float extraWeight)
     savedSinPitch = 0.0f;
     airborne = 0;
     restTimer = 0;
-    slot27Pending = 0;
+    wreckPending = 0;
 }
 
 // slot 8 (0x00501bd0)
@@ -284,9 +285,9 @@ int SoultreePhysicsBaseObject::ResolveSubstepCollisions(int steps)
         sceneNode->SetPosition(position);
         collisionObject->UpdatePlacement();
     }
-    if (slot27Pending) {
-        UnknownVirtualSlot27();
-        slot27Pending = 0;
+    if (wreckPending) {
+        StartWreck();
+        wreckPending = 0;
     }
     return steps;
 }

@@ -127,7 +127,7 @@ void Vehicle::ClearCrashState()
 // that same stack slot as the float out-buffer.  Retyping it as float (tried) changes the
 // test to an FPU compare and the callers' pushes, and loses the exact match of slots
 // 77-83, so it stays int with the (float*)&arg pun.
-int Vehicle::UnknownVirtualSlot77(int arg)
+int Vehicle::IsPovHatPressed(int arg)
 {
     if (arg && inputMap->valueSource
         && inputMap->valueSource->GetPovAngle(0, (float*)&arg)
@@ -1315,7 +1315,7 @@ int Vehicle::IsThrottleRequested()
 {
     if ((inputDevice && throttleInput > 0.33f)
         || (inputMap->IsDeviceButtonDown(0, 2, 0x3f, 0)
-            && !UnknownVirtualSlot77(engineState->throttleFraction == 0.0f)))
+            && !IsPovHatPressed(engineState->throttleFraction == 0.0f)))
         return 1;
     return inputMap->IsDeviceButtonDown(200, 0, 0x3f, 0) != 0;
 }
@@ -1323,14 +1323,14 @@ int Vehicle::IsThrottleRequested()
 int Vehicle::IsBrakeRequested(VehicleWheel* wheel)
 {
     if (inputMap->IsDeviceButtonDown(1, 2, 0x3f, 0)
-        && !UnknownVirtualSlot77(wheel->rampLevel == 0.0f))
+        && !IsPovHatPressed(wheel->rampLevel == 0.0f))
         return 1;
     return inputMap->IsDeviceButtonDown(0xd0, 0, 0x3f, 0) != 0;
 }
 
 // Tier 3 reading: re-seats the collision object (0x00435fb0 before and after), removes the
 // contact offset from the position when one is recorded (a crash that starts there leaves
-// one remaining sub-step), then runs slot 27 when slot27Pending is set and clears it.
+// one remaining sub-step), then runs slot 27 when wreckPending is set and clears it.
 int Vehicle::ResolveSubstepCollisions(int steps)
 {
     collisionObject->UpdatePlacement();
@@ -1345,9 +1345,9 @@ int Vehicle::ResolveSubstepCollisions(int steps)
             stepRemainder = 0.0f;
         }
     }
-    if (slot27Pending) {
-        UnknownVirtualSlot27();
-        slot27Pending = 0;
+    if (wreckPending) {
+        StartWreck();
+        wreckPending = 0;
     }
     return steps;
 }
@@ -1709,7 +1709,7 @@ int Vehicle::CheckCrash()
         crashHeading = heading;
         crashedUpsideDown = savedUp.y < 0.0f;
         crashYaw = savedYaw;
-        slot27Pending = 1;
+        wreckPending = 1;
     }
     return crashed;
 }

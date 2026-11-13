@@ -942,7 +942,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot77@Vehicle",
+    "candidate_symbol_contains": "IsPovHatPressed@Vehicle",
     "target_va": "0x00529200",
     "target_size": 67,
     "expect": "exact",
@@ -1672,7 +1672,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot27@KrustyBike",
+    "candidate_symbol_contains": "StartWreck@KrustyBike",
     "target_va": "0x0048da00",
     "target_size": 75,
     "expect": "exact",
@@ -1862,7 +1862,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot52@KrustyBike",
+    "candidate_symbol_contains": "CanCrash@KrustyBike",
     "target_va": "0x00495800",
     "target_size": 29,
     "expect": "exact",

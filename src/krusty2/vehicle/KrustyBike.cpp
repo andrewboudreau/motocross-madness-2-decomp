@@ -71,7 +71,9 @@ KrustyBike::~KrustyBike()
         DebugFree(heapBufferB, __FILE__, 0x8be);
 }
 
-void KrustyBike::UnknownVirtualSlot27()
+// Slot 27 (StartWreck, tier 2): run once by slot 28 when a crash set wreckPending;
+// starts the wrecker's tumble or animated wreck and switches to the bike collision.
+void KrustyBike::StartWreck()
 {
     if (crashReason == 9 || motionActive) {
         wrecker->StartTumble();
@@ -229,7 +231,9 @@ float KrustyBike::GetSpawnProtectionDuration()
     return 3.0f;
 }
 
-int KrustyBike::UnknownVirtualSlot52()
+// Slot 52 (CanCrash, tier 2): gates UpdateCrashState in the collision callbacks; a
+// remote (network) bike never crashes locally.
+int KrustyBike::CanCrash()
 {
     if (crashState || isRemote)
         return 0;
@@ -305,7 +309,7 @@ int KrustyBike::IsThrottleRequested()
     if (!race->isRacing && !driveDisengaged)
         return 0;
     if (aiThrottleRequest > 0.0f || (inputDevice && throttleInput > 0.33f) ||
-        (QueryControlInput(4, 0x3f) && !UnknownVirtualSlot77(engineState->throttleFraction == 0.0f)))
+        (QueryControlInput(4, 0x3f) && !IsPovHatPressed(engineState->throttleFraction == 0.0f)))
         return 1;
     return 0;
 }
@@ -313,7 +317,7 @@ int KrustyBike::IsThrottleRequested()
 int KrustyBike::IsClutchRequested()
 {
     if (!aiKind && !isRemote && !isGhost && QueryControlInput(12, 0x3f)) {
-        if (!UnknownVirtualSlot77(!driveDisengaged))
+        if (!IsPovHatPressed(!driveDisengaged))
             return 1;
     }
     return 0;
@@ -323,7 +327,7 @@ int KrustyBike::IsReverseRequested()
 {
     if (!aiKind && !isRemote && !isGhost) {
         if (forwardSpeed < 6.0f && QueryControlInput(13, 0x3f)) {
-            if (!UnknownVirtualSlot77(engineState->throttleFraction == 0.0f))
+            if (!IsPovHatPressed(engineState->throttleFraction == 0.0f))
                 return 1;
         }
         backUpPhase = 0;
@@ -335,7 +339,7 @@ int KrustyBike::IsBrakeRequested(VehicleWheel* wheel)
 {
     BikeWheel* input = (BikeWheel*)wheel;
     if (aiBrakeRequest > 0.0f ||
-        (QueryControlInput(5, 0x3f) && !UnknownVirtualSlot77(input->rampLevel == 0.0f)))
+        (QueryControlInput(5, 0x3f) && !IsPovHatPressed(input->rampLevel == 0.0f)))
         return 1;
     return 0;
 }
@@ -1304,7 +1308,7 @@ void KrustyCollisionCallbackA(CollisionObject* self, CollisionObject* other)
     } else if (kind == 0x65) {
         return;
     }
-    bike->ApplyCollisionEvent(bike->UnknownVirtualSlot52() && kind != 0x3e8, kind, other);
+    bike->ApplyCollisionEvent(bike->CanCrash() && kind != 0x3e8, kind, other);
 }
 
 // owner: bracket only (0x48dd80; referenced by pointer from the collision setup)
