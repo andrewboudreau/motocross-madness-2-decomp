@@ -201,7 +201,7 @@ int PCGame::StartUp(char* message) {
     }
     ProfileDisplays();
     display = g_Displays[0];
-    int flag = useZBuffer && !field_0x544;
+    int flag = useZBuffer && !bladeLoaded;
     int useLast = GetRegistryFlag("UseLastVideoCard", 0);
     display = ChooseDisplay(flag, useLast, &bladeRenderer);
     if (!display) {

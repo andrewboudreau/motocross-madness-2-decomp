@@ -10,7 +10,7 @@ static inline int AxisAbs(int value) {
 }
 
 inline int PCJoystickDevice::FilterAxisSpike(int axis, unsigned long value) {
-    if (field_0x5d5) {
+    if (joystickFilter) {
         int current = (int)axisValues[axis];
         if (AxisAbs(current - (int)value) > 10000 && (int)previousRawAxes[axis] == current)
             return current;

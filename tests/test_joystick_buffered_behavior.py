@@ -161,7 +161,7 @@ class JoystickBufferedBehaviorTests(unittest.TestCase):
                 'offsetof(LayoutProbe,buttonStates)==0x264 && offsetof(LayoutProbe,axisValues)==0x4e4 && '
                 'offsetof(LayoutProbe,axisBindings)==0x4fc && offsetof(LayoutProbe,axisMaximums)==0x58c && '
                 'offsetof(LayoutProbe,previousRawAxes)==0x5a4 && offsetof(LayoutProbe,deadZoneScales)==0x5bc && '
-                'offsetof(LayoutProbe,field_0x5d5)==0x5d5 && offsetof(LayoutProbe,povValues)==0x5d8)?1:-1];}\n'
+                'offsetof(LayoutProbe,joystickFilter)==0x5d5 && offsetof(LayoutProbe,povValues)==0x5d8)?1:-1];}\n'
                 'typedef char Other[(sizeof(UnknownDeviceObjectData)==16 && sizeof(ControlBinding)==0x3c && '
                 'offsetof(ControlInterface,queuedEventCount)==0x38 && offsetof(ControlInterface,events)==0x3c && '
                 'sizeof(ControlEvent)==20 && offsetof(TrackGame,controlInterface)==0x14)?1:-1];\n')

@@ -1840,10 +1840,10 @@ CASES = [
         'reason': 'inline CheckPollResult member keeps the null return separate; shared report tail; __FILE__ is PCInputDeviceType.cpp in retail',
     },
     {
-        'name': 'PCJoystickDevice 0x4c3ae0 byte setter',
+        'name': 'PCJoystickDevice 0x4c3ae0 SetJoystickFilter',
         'bindings': 'src/reconstructed/PCJoystickDevice.bindings.json',
         'source': 'src/reconstructed/PCJoystickDevice.cpp',
-        'symbol': '?UnknownMethod4c3ae0@PCJoystickDevice@@QAEXE@Z',
+        'symbol': '?SetJoystickFilter@PCJoystickDevice@@QAEXE@Z',
         'target_va': '0x004c3ae0',
         'target_size': 13,
         'reason': 'byte argument store',

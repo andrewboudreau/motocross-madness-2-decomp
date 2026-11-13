@@ -226,7 +226,7 @@
   "?LoadProfile@TrackGameMode@@QAEHXZ": "0x005231f0",
   "?SaveProfile@TrackGameMode@@QAEXXZ": "0x00523580",
   "?OpenHelp@TrackGameMode@@QAEHPBD0@Z": "0x00523d30",
-  "?UnknownMethod4c3ae0@PCJoystickDevice@@QAEXE@Z": "0x004c3ae0",
+  "?SetJoystickFilter@PCJoystickDevice@@QAEXE@Z": "0x004c3ae0",
   "?Tick@UIDialog@@UAEHM@Z": "0x0046ef00",
   "?Step@GameObject@@UAEHM@Z": "0x004da540",
   "?PrepareGeometry@GameObject@@UAEHXZ": "0x00469300",

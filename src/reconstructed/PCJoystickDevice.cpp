@@ -25,7 +25,7 @@ PCJoystickDevice::PCJoystickDevice(int index) : JoystickDevice(index) {
     povCount = 0;
     bufferedInput = 1;
     axisRepeatEnabled = 1;
-    field_0x5d5 = 0;
+    joystickFilter = 0;
     directionFlipped = g_TrackGame->GetRegistryFlag("JoyDirectionFlipped", 0);
 }
 
@@ -592,8 +592,8 @@ failed:
 }
 
 // 0x004c3ae0
-void PCJoystickDevice::UnknownMethod4c3ae0(unsigned char value) {
-    field_0x5d5 = value;
+void PCJoystickDevice::SetJoystickFilter(unsigned char value) {
+    joystickFilter = value;
 }
 
 // 0x004c4320

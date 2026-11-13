@@ -128,7 +128,7 @@ PCVideoCard* ChooseDisplay(int flag, int useLast, int* blade)
         if (useLast && lastIndex == i)
             return g_Displays[i];
     }
-    if (usable == 1 && !g_TrackGame->field_0x544)
+    if (usable == 1 && !g_TrackGame->bladeLoaded)
         return g_Displays[usableIndex];
 
     WNDCLASS windowClass;
@@ -182,7 +182,7 @@ PCVideoCard* ChooseDisplay(int flag, int useLast, int* blade)
     int fullScreenDisabled = g_TrackGame->GetRegistryFlag(key, 0);
     sprintf(key, "DriverInfo\\%s\\DisabledSoftware", g_Displays[0]->driverGuidText);
     int softwareDisabled = g_TrackGame->GetRegistryFlag(key, 0);
-    if (g_TrackGame->field_0x544 && !fullScreenDisabled && !softwareDisabled) {
+    if (g_TrackGame->bladeLoaded && !fullScreenDisabled && !softwareDisabled) {
         char text[0x80];
         g_TrackGame->LoadResourceString(0x1463, text, sizeof(text));
         SendMessage(g_DisplayList, LB_ADDSTRING, 0, (LPARAM)text);

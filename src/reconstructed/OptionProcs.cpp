@@ -256,7 +256,7 @@ void OptAdvancedGraphicsDlg::HandleEvent(DialogEvent* event)
             int filter = static_cast<UIMultiState*>(event->control)->GetSelectedState();
             g_TrackGame->SetRegistryFlag("JoystickFilter", filter);
             if (g_TrackGame->controlInterface->activeJoystick)
-                ((PCJoystickDevice*)g_TrackGame->controlInterface->activeJoystick)->UnknownMethod4c3ae0(filter);
+                ((PCJoystickDevice*)g_TrackGame->controlInterface->activeJoystick)->SetJoystickFilter(filter);
         } else if (_stricmp("ChkShowPickController", event->controlName) == 0) {
             int useLast = static_cast<UIMultiState*>(event->control)->GetSelectedState() == 0;
             g_TrackGame->SetRegistryFlag("UseLastController", useLast);

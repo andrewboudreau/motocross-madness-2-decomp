@@ -117,7 +117,7 @@ void GUIManager::ShowCursors(int value){EventAt(14,GuiIndex(this),value);}
 FileStream* ResourceManager::AddArchive(const char* path,int flags){EventAt(15,Which(this,world.managers[0],world.managers[1]),flags,0,0,0,path);return 0;}
 void TrackGameMode::LoadBonusTrackNames(){EventAt(16,Which(this,&GameAt(0)->mode,&GameAt(1)->mode));}
 int TrackGameMode::LoadProfile(){EventAt(17,Which(this,&GameAt(0)->mode,&GameAt(1)->mode));return scenario.mask&1;}
-void PCJoystickDevice::UnknownMethod4c3ae0(unsigned char value){EventAt(18,this?Which(this,world.joysticks[0],world.joysticks[1]):-1,value);field_0x5d5=value;}
+void PCJoystickDevice::SetJoystickFilter(unsigned char value){EventAt(18,this?Which(this,world.joysticks[0],world.joysticks[1]):-1,value);joystickFilter=value;}
 void KrustyUI::LoadBikesAndRiders(){if(this!=UI() || bikes || riders || manufacturers)Fail(94);EventAt(19);bikes=(void*)0x12341111;riders=(void*)0x12342222;}
 void KrustyUI::LoadGarageTables(){if(this!=UI())Fail(94);EventAt(20);manufacturers=(void*)0x12343333;}
 UIDialog* GUIManager::ShowDialog(UIDialog* dialog,int a,int flags,int b,UIDialog* parent,int c,int d,int wait){
@@ -149,7 +149,7 @@ case 0x485d70:return Address(&GUIManager::SetDialogDirectory);case 0x486560:retu
 case 0x486540:return Address(&GUIManager::GetUser);case 0x487d60:return Address(&GUIUser::ForgetDevices);case 0x487c30:return Address(&GUIUser::AcceptDevice);
 case 0x486630:return Address(&GUIManager::ShowCursors);case 0x4e9030:return Address(&ResourceManager::AddArchive);
 case 0x523e50:return Address(&TrackGameMode::LoadBonusTrackNames);case 0x5231f0:return Address(&TrackGameMode::LoadProfile);
-case 0x4c3ae0:return Address(&PCJoystickDevice::UnknownMethod4c3ae0);case 0x49a8b0:return Address(&KrustyUI::LoadBikesAndRiders);
+case 0x4c3ae0:return Address(&PCJoystickDevice::SetJoystickFilter);case 0x49a8b0:return Address(&KrustyUI::LoadBikesAndRiders);
 case 0x49a540:return Address(&KrustyUI::LoadGarageTables);case 0x485a70:return Address(&GUIManager::ShowDialog);
 case 0x53471a:return (DWORD)__CxxFrameHandler;
 }Fail(100);return 0;}

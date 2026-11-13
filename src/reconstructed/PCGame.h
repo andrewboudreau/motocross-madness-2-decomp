@@ -84,7 +84,7 @@ public:
     void* imeLibrary;                          // +0x538: IMM32.DLL
     void* inputContext;                        // +0x53c: created input context
     void* previousInputContext;                // +0x540: previous input context (ImmAssociateContext result)
-    int field_0x544;                          // disables the 0x004ccd60 first argument
+    int bladeLoaded;                          // +0x544 GetDXVersion's third result: "Blade.dll" loaded; disables the 0x004ccd60 first argument. Tier 2
     unsigned char displayProfilesStale : 1;    // +0x548 bit 0
     int magFilter;                            // texture stage 0 D3DTSS_MAGFILTER (slot 7)
     int minFilter;                            // D3DTSS_MINFILTER

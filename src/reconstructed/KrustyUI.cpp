@@ -258,7 +258,7 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     }
     if (g_TrackGame->controlInterface->activeJoystick)
         ((PCJoystickDevice*)g_TrackGame->controlInterface->activeJoystick)
-            ->UnknownMethod4c3ae0(g_TrackGame->GetRegistryFlag("JoystickFilter", 0));
+            ->SetJoystickFilter(g_TrackGame->GetRegistryFlag("JoystickFilter", 0));
     bikes = 0;
     riders = 0;
     manufacturers = 0;

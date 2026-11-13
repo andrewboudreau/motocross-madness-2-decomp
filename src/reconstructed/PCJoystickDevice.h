@@ -117,7 +117,7 @@ public:
     int ReadImmediateState(int value);                  // near miss in samples/inputdevice
     int SetBufferedInput(int buffered);
     int CheckPollResult(long result);              // inline
-    void UnknownMethod4c3ae0(unsigned char value);
+    void SetJoystickFilter(unsigned char value);    // 0x004c3ae0: KrustyUI / OptionProcs pass the "JoystickFilter" registry flag
 
 protected:
     DirectInputEffect* effects[5];        // +0x578: released by slot 15
@@ -126,7 +126,7 @@ protected:
     float deadZoneScales[6];                   // +0x5bc: dead-zone scale per axis
     unsigned char bufferedInput : 1;           // +0x5d4 bit 0
     unsigned char axisRepeatEnabled : 1;       // +0x5d4 bit 1
-    unsigned char field_0x5d5;
+    unsigned char joystickFilter;              // +0x5d5: the "JoystickFilter" registry flag (SetJoystickFilter); FilterAxisSpike drops axis spikes when set. Tier 1
     int povValues[4];                          // +0x5d8: -1 initially
     int povCount;                              // +0x5e8
 };

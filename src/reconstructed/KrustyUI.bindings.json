@@ -246,7 +246,7 @@
   "?AddArchive@ResourceManager@@QAEPAVFileStream@@PBDH@Z": "0x004e9030",
   "?LoadProfile@TrackGameMode@@QAEHXZ": "0x005231f0",
   "?LoadBonusTrackNames@TrackGameMode@@QAEXXZ": "0x00523e50",
-  "?UnknownMethod4c3ae0@PCJoystickDevice@@QAEXE@Z": "0x004c3ae0",
+  "?SetJoystickFilter@PCJoystickDevice@@QAEXE@Z": "0x004c3ae0",
   "__real@4@00000000000000000000": "0x00550484",
   "__strnicmp": "0x005476f0",
   "_atof": "0x00536340",

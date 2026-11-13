@@ -89,7 +89,7 @@ int WINAPI WinMainBody(HINSTANCE instance, HINSTANCE previous, LPSTR commandLine
     if (!g_TrackGame->Initialize())
         exit(0);
 
-    GetDXVersion(&dxVersion, &platform, (unsigned long*)&g_TrackGame->field_0x544);
+    GetDXVersion(&dxVersion, &platform, (unsigned long*)&g_TrackGame->bladeLoaded);
     if (platform != VER_PLATFORM_WIN32_WINDOWS && platform != VER_PLATFORM_WIN32_NT) {
         if (LoadString((HINSTANCE)g_TrackGame->resourceInstance, 0xbb8, text, 0x80))
             MessageBox(0, text, g_TrackGame->applicationName, MB_ICONHAND);
