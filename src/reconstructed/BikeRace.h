@@ -743,7 +743,7 @@ struct TagBallState {
     int field_0x38;
 };
 
-// Record kind 0x10: byte deltas of the ghost's state, 15/64 per unit for the
+// Record kind 0x10: byte deltas of the ball's state, 15/64 per unit for the
 // vectors at +0x01 and +0x0b and pi/64 for the rest (the same layout as the
 // network message 13 that KrustyBike.cpp's 0x004933e0 applies).
 struct TagBallStateDelta {
@@ -762,7 +762,7 @@ struct TagBallReceivedState {
     int fresh;                                // +0x40 fresh
 };
 
-// Record kind 0x87: the racer the ghost follows (by its +0x11bc id).
+// Record kind 0x87: the racer the view follows (by its +0x11bc id).
 struct UnknownBikeRaceVcrFollow {
     int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     char request;                             // +0x04 KbNetPacket::request: 0 for message 0x87 (0x004a9d20 clears it)
@@ -771,7 +771,7 @@ struct UnknownBikeRaceVcrFollow {
 };
 
 // TrackGame+0x568's +0xdc object as the replay recorder callback reaches it
-// (TrackGame.h keeps the type for 0x004a9d10's symbol): the ghost bike.
+// (TrackGame.h keeps the type for 0x004a9d10's symbol): the Tag event's ball.
 class TagBall {
 public:
     // 0x004a9aa0 (FollowRacer.cpp): applies record kind 0x10 to a state (as
