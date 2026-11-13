@@ -101,18 +101,6 @@ public:
     unsigned char field_0x2c[0x134 - 0x2c];
 };
 
-// Game+0x1c..+0x33, copied as the garage model's resource context; 0x00498cf0
-// sets +0x14 when little video memory is free. The layout is
-// TextureContext's (TextureMap.h).
-struct UnknownKrustyUIContext {
-    TextureMapManager* manager;               // +0x00
-    int opaqueGroup;                          // +0x04
-    int alphaGroup;                           // +0x08
-    int opaqueFormat;                         // +0x0c
-    int alphaFormat;                          // +0x10
-    int halvings;                             // +0x14 halve wide textures once when video memory is short
-};
-
 // The garage scene's static vectors have an empty destructor: retail
 // registers six empty atexit handlers (0x00499920..0x00499970).
 struct UnknownKrustyUIVector : public Vector3 {
@@ -348,7 +336,9 @@ void KrustyUI::BuildGarageScene(int value) {
         light = emitter->Create(renderContext, 1, 0x8c8c8c, &s488, &s408, 0, 0, 0, 0, 0, 0);
         garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
-        UnknownKrustyUIContext context = *(UnknownKrustyUIContext*)&g_TrackGame->textureContext;
+        // Game+0x1c..+0x33 as the garage model's texture context; halvings is
+        // set to 1 below when little video memory is free.
+        TextureContext context = *(TextureContext*)&g_TrackGame->textureContext;
         context.halvings = 0;
         if (!g_TrackGame->bladeRenderer) {
             // Free video memory: total less the frame buffers, or a fixed 4 MB
