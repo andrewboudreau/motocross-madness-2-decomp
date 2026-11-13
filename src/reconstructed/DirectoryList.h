@@ -8,7 +8,7 @@
 // One logical drive (0x10c bytes): its root ("%c:\\"), GetDriveTypeA's
 // result and, for fixed (3) and CD-ROM (5) drives, GetVolumeInformationA's
 // volume name.
-struct UnknownDriveEntry {
+struct DriveEntry {
     char root[4];
     unsigned int type;
     char volumeName[0x104];
@@ -17,10 +17,10 @@ struct UnknownDriveEntry {
 // The logical drives. TrackGameMode allocates 8 bytes and calls the constructor
 // at 0x005221d2; 0x005221e7 calls Rescan. It looks for the CD-ROM whose
 // volume is "MCM2" (0x00523bf0).
-class UnknownDriveList {
+class DriveList {
 public:
-    UnknownDriveList();                                   // 0x004676a0; called at 0x005221d2
-    ~UnknownDriveList();                                  // 0x0044a000
+    DriveList();                                   // 0x004676a0; called at 0x005221d2
+    ~DriveList();                                  // 0x0044a000
     int Rescan();                          // 0x00449e60: rescans
     // 0x00449e70: lists the fixed and CD-ROM drives; 0 when out of memory.
     int ListDrives();
@@ -29,14 +29,14 @@ public:
     int FindVolume(const char* volumeName, int* index, unsigned int type);
     int GetDriveRoot(int index, char* root);     // 0x0044a0b0
 
-    UnknownDriveEntry* drives;
+    DriveEntry* drives;
     int count;
 };
 
 // One directory entry (0x10c bytes): the found file's name and attributes
 // (FILE_ATTRIBUTE_NORMAL until set) and a tag CombinedDirectoryList uses.
-struct UnknownDirectoryEntry {
-    UnknownDirectoryEntry() {
+struct DirectoryEntry {
+    DirectoryEntry() {
         name[0] = 0;
         field_0x108 = 3;
         attributes = 0x80;                                 // FILE_ATTRIBUTE_NORMAL
@@ -81,7 +81,7 @@ public:
     int current;
     char pattern[0x104];
     char directory[0x104];
-    UnknownDirectoryEntry* entries;
+    DirectoryEntry* entries;
     int includeFiles;
 };
 

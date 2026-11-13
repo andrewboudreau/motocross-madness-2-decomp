@@ -8,8 +8,8 @@
 #include "DirectoryList.h"
 typedef char Layout[(sizeof(ParserList)==4 && offsetof(ParserList,head)==0 &&
     sizeof(Parser)==8 && offsetof(Parser,pairs)==4 &&
-    sizeof(UnknownDriveList)==8 && offsetof(UnknownDriveList,drives)==0 &&
-    offsetof(UnknownDriveList,count)==4) ? 1 : -1];
+    sizeof(DriveList)==8 && offsetof(DriveList,drives)==0 &&
+    offsetof(DriveList,count)==4) ? 1 : -1];
 static BYTE* page;
 static BYTE initial[4096],expected[4096];
 static DWORD cases,faults;
@@ -24,7 +24,7 @@ static int Filter(EXCEPTION_POINTERS* p) {
     return EXCEPTION_EXECUTE_HANDLER;
 }
 static void* Construct(int drive,void* storage) {
-    if(drive)return new(storage) UnknownDriveList;
+    if(drive)return new(storage) DriveList;
     return new(storage) ParserList;
 }
 static void Run(int drive,void* storage) {

@@ -23,7 +23,7 @@ SOURCES = ('src/reconstructed/TrackGame.cpp', 'src/reconstructed/ZoneReport.cpp'
            'src/reconstructed/Parser.cpp', 'src/reconstructed/DirectoryList.cpp',
            'src/reconstructed/UiInfo.cpp')
 PROVIDERS = (('??0ParserList@@QAE@XZ', 0x4aae20, 9),
-             ('??0UnknownDriveList@@QAE@XZ', 0x4676a0, 16))
+             ('??0DriveList@@QAE@XZ', 0x4676a0, 16))
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('VC6_ROOT') and os.environ.get('MCM2_EXE'),

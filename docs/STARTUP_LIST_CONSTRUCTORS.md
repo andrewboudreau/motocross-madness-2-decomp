@@ -7,7 +7,7 @@ VC6 SP3 `vc6_o2_mt` reproduces their complete retail bodies:
 | Existing source view | Retail address | Complete bytes | Behavior |
 | --- | --- | ---: | --- |
 | `ParserList` | `0x004aae20` | 9 | Zero the head pointer; return the receiver in EAX |
-| `UnknownDriveList` | `0x004676a0` | 16 | Zero drives, then count; return the receiver in EAX |
+| `DriveList` | `0x004676a0` | 16 | Zero drives, then count; return the receiver in EAX |
 
 The names and original translation unit remain provisional. Shared small code
 addresses do not establish class identity. These definitions belong to the

@@ -18,18 +18,18 @@
     }
 
 // Inline; sets the entry's name (truncated) and attributes.
-inline void UnknownDirectoryEntry::Set(const char* fileName, unsigned int fileAttributes) {
+inline void DirectoryEntry::Set(const char* fileName, unsigned int fileAttributes) {
     COPY_NAME(name, fileName);
     attributes = fileAttributes;
 }
 
 // 0x00449e60
-int UnknownDriveList::Rescan() {
+int DriveList::Rescan() {
     return ListDrives();
 }
 
 // 0x00449e70
-int UnknownDriveList::ListDrives() {
+int DriveList::ListDrives() {
     char root[4];
     char* strings;
     int size;
@@ -48,7 +48,7 @@ int UnknownDriveList::ListDrives() {
     found = 0;
     for (length = 0; strings[length]; length += 4)
         ;
-    drives = new (__FILE__, 44) UnknownDriveEntry[length];
+    drives = new (__FILE__, 44) DriveEntry[length];
     if (!drives)
         return 0;
     for (length = 0; strings[length]; length += 4) {
@@ -67,13 +67,13 @@ int UnknownDriveList::ListDrives() {
 }
 
 // 0x0044a000
-UnknownDriveList::~UnknownDriveList() {
+DriveList::~DriveList() {
     if (drives)
         delete drives;
 }
 
 // 0x0044a010
-int UnknownDriveList::FindVolume(const char* volumeName, int* index, unsigned int type) {
+int DriveList::FindVolume(const char* volumeName, int* index, unsigned int type) {
     int i;
 
     *index = 0;
@@ -96,7 +96,7 @@ int UnknownDriveList::FindVolume(const char* volumeName, int* index, unsigned in
 }
 
 // 0x0044a0b0
-int UnknownDriveList::GetDriveRoot(int index, char* root) {
+int DriveList::GetDriveRoot(int index, char* root) {
     strcpy(root, "");
     if (!drives)
         return 0;
@@ -248,7 +248,7 @@ int DirectoryList::Scan() {
 
     found = 0;
     if (count > 0) {
-        entries = new (__FILE__, 328) UnknownDirectoryEntry[count];
+        entries = new (__FILE__, 328) DirectoryEntry[count];
         find = FindFirstFileA(search, &data);
         if (find == INVALID_HANDLE_VALUE)
             return 0;
@@ -310,7 +310,7 @@ int DirectoryList::CompareNames(const void* a, const void* b) {
 // 0x0044aab0
 void DirectoryList::SortByName() {
     if (count > 0)
-        qsort(entries, count, sizeof(UnknownDirectoryEntry), CompareNames);
+        qsort(entries, count, sizeof(DirectoryEntry), CompareNames);
 }
 
 // 0x0044aae0
@@ -343,7 +343,7 @@ void CombinedDirectoryList::SetDirectories(const char* first, const char* second
 int CombinedDirectoryList::Scan() {
     DirectoryList* first;
     DirectoryList* second;
-    UnknownDirectoryEntry* merged;
+    DirectoryEntry* merged;
     int total;
     int found;
     int i;
@@ -369,7 +369,7 @@ int CombinedDirectoryList::Scan() {
     second->SortByName();
 
     total = second->count;
-    merged = new (__FILE__, 480) UnknownDirectoryEntry[total + first->count];
+    merged = new (__FILE__, 480) DirectoryEntry[total + first->count];
     for (i = 0; i < second->count; i++) {
         merged[i].Set(second->entries[i].name, 5);
     }
@@ -388,7 +388,7 @@ int CombinedDirectoryList::Scan() {
     }
 
     count = total;
-    entries = new (__FILE__, 512) UnknownDirectoryEntry[total];
+    entries = new (__FILE__, 512) DirectoryEntry[total];
     if (!entries) {
         delete first;
         delete second;

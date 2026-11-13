@@ -98,7 +98,7 @@ TrackGameMode::TrackGameMode() {
     strcpy(cdDataDirectory, "");
     strcpy(cdDriveRoot, "");
     driveList = 0;
-    driveList = new(__FILE__, 71) UnknownDriveList;
+    driveList = new(__FILE__, 71) DriveList;
     if (!driveList->Rescan()) {
         delete driveList;
         driveList = 0;

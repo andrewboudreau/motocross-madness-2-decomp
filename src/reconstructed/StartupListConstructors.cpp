@@ -9,7 +9,7 @@ ParserList::ParserList() {
 }
 
 // 0x004676a0: the eight-byte drive-list allocation in TrackGameMode.
-UnknownDriveList::UnknownDriveList() {
+DriveList::DriveList() {
     drives = 0;
     count = 0;
 }
