@@ -4,7 +4,7 @@
   "canonical": {
     "sections": 215,
     "relocations": 920,
-    "sha256": "3db84f0ce8c80db61da5690e6951acdec081cd5fcd71f6e9893de15a0137256b"
+    "sha256": "04bebf3519fd8adc24eae694ea9717167f49ca2826394d404b4592eff1e1f242"
   },
   "aggregate_before": {
     "sections": 37,
@@ -14,11 +14,11 @@
   "aggregate": {
     "sections": 27,
     "relocations": 111,
-    "sha256": "16f95b19ea71fac97f3b44b45105f4f34b675d0a7604c85f5f822d8cb69a7072"
+    "sha256": "c3c093f2658671f41e1a8e1a972eb911cb2b6f937de18d4eb44cb7c91932e577"
   },
   "candidate": {
     "sections": 5,
     "relocations": 27,
-    "sha256": "1e81945b20cfa3e63a16a216bffbea7250816299f5d9edfb79e2f05a65b41263"
+    "sha256": "dd325c35a483b47d4bf46f4250f40b19d12f3dfff1955ca2548f1e2d5573317a"
   }
 }
