@@ -1172,7 +1172,7 @@ UIListBox::UIListBox(int id, int rows, CameraRect* area, UIDialog* owner)
     rowCapacity = rows;
     lastPageRowCount = 0;
     selectColor = 0xffffff;
-    rowTable = (UnknownGameUiListRow*)DebugMalloc(rows * sizeof(UnknownGameUiListRow), __FILE__, 0x1b50);
+    rowTable = (UIListBoxRow*)DebugMalloc(rows * sizeof(UIListBoxRow), __FILE__, 0x1b50);
     sortCompare = CompareRowText;
     field_0x218 = (int)this;
     autoSort = 0;
@@ -1187,7 +1187,7 @@ UIListBox::UIListBox(int id, int rows, CameraRect* area, UIDialog* owner)
     rowCount = 0;
     firstVisibleRow = 0;
     lastPageRowCount = 0;
-    memset(rowTable, 0, rowCapacity * sizeof(UnknownGameUiListRow));
+    memset(rowTable, 0, rowCapacity * sizeof(UIListBoxRow));
     wrapScroll = 1;
     if (!(fontHeight || (ownerDialog && ownerDialog->dialogFontHeight))) {
         visibleRowCount = 1;
@@ -1304,10 +1304,10 @@ void UIListBox::SetSortCompare(int (*compare)(const void* a, const void* b)) {
 
 // 0x00477b60
 int CompareRowText(const void* a, const void* b) {
-    const char* left = ((const UnknownGameUiListRow*)a)->text;
+    const char* left = ((const UIListBoxRow*)a)->text;
     if (!left)
         return 1;
-    const char* right = ((const UnknownGameUiListRow*)b)->text;
+    const char* right = ((const UIListBoxRow*)b)->text;
     if (!right)
         return -1;
     return _stricmp(left, right);
@@ -2862,10 +2862,10 @@ int UIListBox::CountVisibleRows() {
 // 0x00476f50
 int UIListBox::ReserveRows(int rows) {
     if (rows > rowCapacity) {
-        UnknownGameUiListRow* resized =
-            (UnknownGameUiListRow*)ResizeDebugBlock(rowTable, rows * sizeof(UnknownGameUiListRow));
+        UIListBoxRow* resized =
+            (UIListBoxRow*)ResizeDebugBlock(rowTable, rows * sizeof(UIListBoxRow));
         if (resized) {
-            memset(&resized[rowCapacity], 0, (rows - rowCapacity) * sizeof(UnknownGameUiListRow));
+            memset(&resized[rowCapacity], 0, (rows - rowCapacity) * sizeof(UIListBoxRow));
             rowCapacity = rows;
             rowTable = resized;
             return 1;
@@ -2894,7 +2894,7 @@ void UIListBox::SetRowText(int row, const char* text) {
 // 0x00476d80
 int UIListBox::AddRow(const char* text, int data, int rowFlags) {
     if (text && (rowCount < rowCapacity || ReserveRows(rowCount + 1))) {
-        UnknownGameUiListRow* row = &rowTable[rowCount];
+        UIListBoxRow* row = &rowTable[rowCount];
         row->width = strlen(text);
         int height = fontHeight;
         if (!height)
@@ -2928,7 +2928,7 @@ int UIListBox::AddRow(const char* text, int data, int rowFlags) {
 int UIListBox::AddImageFileRow(const char* file, int data, int loadImage, int rowFlags) {
     if (rowCount >= rowCapacity && !ReserveRows(rowCount + 1))
         return 0;
-    UnknownGameUiListRow row;
+    UIListBoxRow row;
     if (loadImage) {
         FileStream* stream =
             new(__FILE__, 0x1e20) FileStream(g_ResourceManager);
@@ -2983,7 +2983,7 @@ int UIListBox::AddImageFileRow(const char* file, int data, int loadImage, int ro
 int UIListBox::AddImageRow(UIAnim* image, int data, int rowFlags) {
     if (rowCount >= rowCapacity && !ReserveRows(rowCount + 1))
         return 0;
-    UnknownGameUiListRow row;
+    UIListBoxRow row;
     row.kind = 2;
     row.text = 0;
     row.image = image;
@@ -3203,7 +3203,7 @@ int UIListBox::RemoveRow(int row) {
             for (int i = row; i < rowCount; i++)
                 rowTable[i] = rowTable[i + 1];
         }
-        memset(&rowTable[rowCount - 1], 0, sizeof(UnknownGameUiListRow));
+        memset(&rowTable[rowCount - 1], 0, sizeof(UIListBoxRow));
         int count = rowCount - 1;
         rowCount = count <= 0 ? 0 : count;
         if (selectedRow == row && selectedRow == rowCount) {
@@ -3236,7 +3236,7 @@ void UIListBox::RemoveAllRows() {
     firstVisibleRow = 0;
     SelectRow(0);
     lastPageRowCount = 0;
-    memset(rowTable, 0, rowCapacity * sizeof(UnknownGameUiListRow));
+    memset(rowTable, 0, rowCapacity * sizeof(UIListBoxRow));
     UpdateScrollBars();
 }
 
@@ -3249,8 +3249,8 @@ int CompareSortedRows(const void* a, const void* b) {
         UIListBox* control = g_SortingDialog->sortingList->selfList;
         result = control->sortCompare(a, b);
         if (!result) {
-            int left = ((const UnknownGameUiListRow*)a)->sortIndex;
-            int right = ((const UnknownGameUiListRow*)b)->sortIndex;
+            int left = ((const UIListBoxRow*)a)->sortIndex;
+            int right = ((const UIListBoxRow*)b)->sortIndex;
             GameObjectIterator* iterator =
                 (GameObjectIterator*)g_SortingDialog->sortingList->selfList->CreateControlIterator();
             while (1) {
@@ -3284,7 +3284,7 @@ void UIListBox::Sort(int force) {
     for (int i = 0; i < rowCount; i++)
         rowTable[i].sortIndex = i;
     int selected = selectedRow;
-    qsort(rowTable, rowCount, sizeof(UnknownGameUiListRow), CompareSortedRows);
+    qsort(rowTable, rowCount, sizeof(UIListBoxRow), CompareSortedRows);
     RequestRedraw();
     if (attachId > 0) {
         GameObjectIterator iterator(ownerDialog->controlContainer, 1, "UIControl");
@@ -3293,8 +3293,8 @@ void UIListBox::Sort(int force) {
             UIListBox* other = static_cast<UIListBox*>(control);
             if (control->attachId == attachId && control->controlType == 3 && control != this &&
                 other->rowCount == rowCount) {
-                UnknownGameUiListRow* rows = (UnknownGameUiListRow*)DebugMalloc(
-                    other->rowCapacity * sizeof(UnknownGameUiListRow), __FILE__, 0x1f87);
+                UIListBoxRow* rows = (UIListBoxRow*)DebugMalloc(
+                    other->rowCapacity * sizeof(UIListBoxRow), __FILE__, 0x1f87);
                 for (int j = 0; j < rowCount; j++)
                     rows[j] = other->rowTable[rowTable[j].sortIndex];
                 DebugFree(other->rowTable, __FILE__, 0x1f8e);

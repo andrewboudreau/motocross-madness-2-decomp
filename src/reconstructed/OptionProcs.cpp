@@ -930,7 +930,7 @@ void GlobalSettingsDlg::HandleEvent(DialogEvent* event)
                 g_TrackGame->controlSetup->ApplyDevice(profile, -1);
             } else if (choice == 2) {
                 UIListBox* profiles = static_cast<UIListBox*>(FindControl("LstProfiles", 3));
-                UnknownGameUiListRow* entry = &profiles->rowTable[profiles->GetSelectedRow()];
+                UIListBoxRow* entry = &profiles->rowTable[profiles->GetSelectedRow()];
                 strcpy(g_TrackGame->mode.profileName, entry->text);
                 g_TrackGame->mode.LoadProfile();
             }

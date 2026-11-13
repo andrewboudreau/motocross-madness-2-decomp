@@ -117,8 +117,8 @@ static const char kProfileNameCharacters[] =
 
 // 0x0044b0a0
 int CompareRowNumbersAscending(const void* a, const void* b) {
-    int first = atoi(((const UnknownGameUiListRow*)a)->text);
-    int second = atoi(((const UnknownGameUiListRow*)b)->text);
+    int first = atoi(((const UIListBoxRow*)a)->text);
+    int second = atoi(((const UIListBoxRow*)b)->text);
     if (first < second)
         return -1;
     return first != second;
@@ -126,8 +126,8 @@ int CompareRowNumbersAscending(const void* a, const void* b) {
 
 // 0x0044b0e0
 int CompareRowNumbersDescending(const void* a, const void* b) {
-    int first = atoi(((const UnknownGameUiListRow*)a)->text);
-    int second = atoi(((const UnknownGameUiListRow*)b)->text);
+    int first = atoi(((const UIListBoxRow*)a)->text);
+    int second = atoi(((const UIListBoxRow*)b)->text);
     if (first > second)
         return -1;
     return first != second;

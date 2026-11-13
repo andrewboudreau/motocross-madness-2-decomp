@@ -77,8 +77,8 @@ static inline void SetResourceText(UIControl* control, int id)
 // 0x004d4b20
 int CompareCashAscending(const void* a, const void* b)
 {
-    int first = atoi(((const UnknownGameUiListRow*)a)->text + 1);
-    int second = atoi(((const UnknownGameUiListRow*)b)->text + 1);
+    int first = atoi(((const UIListBoxRow*)a)->text + 1);
+    int second = atoi(((const UIListBoxRow*)b)->text + 1);
     if (first < second)
         return -1;
     return first != second;
@@ -87,8 +87,8 @@ int CompareCashAscending(const void* a, const void* b)
 // 0x004d4b60
 int CompareCashDescending(const void* a, const void* b)
 {
-    int first = atoi(((const UnknownGameUiListRow*)a)->text + 1);
-    int second = atoi(((const UnknownGameUiListRow*)b)->text + 1);
+    int first = atoi(((const UIListBoxRow*)a)->text + 1);
+    int second = atoi(((const UIListBoxRow*)b)->text + 1);
     if (first > second)
         return -1;
     return first != second;

@@ -90,7 +90,7 @@ class ListBoxButtonDownBehaviorTests(unittest.TestCase):
             routes={r.virtual_address-table.value:aggregate.symbol_by_index[r.symbol_index].name for r in aggregate.relocations if r.section_number==table.section_number}
             self.assertEqual(routes[55*4],SYMBOL);self.assertEqual(routes[66*4],'?ReportClick@UIListBox@@UAEXPAH@Z')
             layout=output/'layout.cpp';layout.write_text('#include "GameUi.h"\n#include "UIDialog.h"\n#include "GUIManager.h"\n#include <stddef.h>\n'
-                'typedef char Layout[(sizeof(UIListBox)==0x250 && sizeof(UnknownGameUiListRow)==56 && '
+                'typedef char Layout[(sizeof(UIListBox)==0x250 && sizeof(UIListBoxRow)==56 && '
                 'offsetof(UIControl,ownerDialog)==0xb8 && offsetof(UIListBox,firstVisibleRow)==0x1f0 && '
                 'offsetof(UIListBox,visibleRowCount)==0x200 && offsetof(UIListBox,rowTable)==0x214 && '
                 'offsetof(UIListBox,selectable)==0x224 && offsetof(UIListBox,allowWScroll)==0x228 && '

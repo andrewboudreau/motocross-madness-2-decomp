@@ -27,7 +27,7 @@ class UIMultiState;
 class UIProgressBar;
 
 // A 0x38-byte list box row; +0x14 is its text (OptionProcs.cpp 0x004b4e70).
-struct UnknownGameUiListRow {
+struct UIListBoxRow {
     int kind;                                 // +0x00: 1 a text row, 2 an image row
     int flags;                                // +0x04
     int width;                                // +0x08
@@ -542,7 +542,7 @@ public:
     int selectColor;                          // +0x208: "SelectColor"
     void* itemBrush;                          // +0x20c: "ItemBoxColor" brush (HBRUSH)
     void* selectBrush;                        // +0x210: "SelectBoxColor" brush
-    UnknownGameUiListRow* rowTable;           // +0x214: the rows (OptionProcs.cpp)
+    UIListBoxRow* rowTable;                   // +0x214: the rows (OptionProcs.cpp)
     union {
         int field_0x218;
         UIListBox* selfList;                  // +0x218: the list itself (constructor); CompareSortedRows reads it
