@@ -59,7 +59,7 @@ complete canonical and validation-helper bodies independently:
 | --- | --- | --- |
 | ButtonIndexFromOffset | 0x004c2ef0 | 412 |
 | ApplyAxisDeadZone | 0x004c3090 | 102 |
-| UnknownReportError | 0x004bf6a0 | 978 |
+| ReportDirectInputError | 0x004bf6a0 | 978 |
 | JoystickDevice::FeedAxis | 0x00489c00 | 84 |
 | ControlBinding::SetFromAxis | 0x0043cd20 | 104 |
 | ControlInterface::QueueEvent | 0x0043cea0 | 82 |

@@ -30,7 +30,7 @@ extern int g_DebugDumpTextureLevels;
 
 // cdecl 0x004c86e0: formats a DirectDraw result with the caller's __FILE__
 // and __LINE__.
-void UnknownReportDirectDrawError(long result, const char* file, int line);
+void ReportDirectDrawError(long result, const char* file, int line);
 
 // RTTI: PCTextureMap : TextureMap (vtable 0x00555fec; its code sits among
 // PCTexMap.cpp's literals). Names are provisional.

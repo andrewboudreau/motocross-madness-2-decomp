@@ -95,7 +95,7 @@ class JoystickBufferedBehaviorTests(unittest.TestCase):
             self.assertEqual(candidate.find_symbol(SYMBOL).function_size, 1641)
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number > 0 and s.type == 0x20}, {SYMBOL})
             self.assertEqual({s.name for s in candidate.symbols if s.storage_class == 2 and s.section_number == 0},
-                {'?FeedAxis@JoystickDevice@@QAEXHMM@Z', '?QueueEvent@ControlInterface@@QAEXHHHH@Z', '?g_TrackGame@@3PAVTrackGame@@A', '__fltused', '__ftol', '?ApplyAxisDeadZone@PCJoystickDevice@@QAEHHH@Z', '?ButtonIndexFromOffset@PCJoystickDevice@@QAEHH@Z', '?UnknownReportError@@YAXJPBDH@Z'})
+                {'?FeedAxis@JoystickDevice@@QAEXHMM@Z', '?QueueEvent@ControlInterface@@QAEXHHHH@Z', '?g_TrackGame@@3PAVTrackGame@@A', '__fltused', '__ftol', '?ApplyAxisDeadZone@PCJoystickDevice@@QAEHHH@Z', '?ButtonIndexFromOffset@PCJoystickDevice@@QAEHH@Z', '?ReportDirectInputError@@YAXJPBDH@Z'})
             self.assertFalse(any(s.name.startswith(('.CRT', '.text$x', '.xdata')) for s in candidate.sections))
             report = compare(image, candidate, SYMBOL, 0x4c3100, 1665, ROOT / 'samples/inputdevice/JoystickBufferedState.bindings.json')
             self.assertFalse(report['strict_exact'])
@@ -133,7 +133,7 @@ class JoystickBufferedBehaviorTests(unittest.TestCase):
                 extract(pc_source, 'static inline float AxisMax(') + '\n' + extract(pc_source, 'static inline float AxisMin(') + '\n' +
                 extract(pc_source, 'int PCJoystickDevice::ButtonIndexFromOffset(').replace('PCJoystickDevice::ButtonIndexFromOffset','ActualPCJoystickDevice::ButtonIndexFromOffset') + '\n' +
                 extract(pc_source, 'int PCJoystickDevice::ApplyAxisDeadZone(').replace('PCJoystickDevice::ApplyAxisDeadZone','ActualPCJoystickDevice::ApplyAxisDeadZone') + '\n' +
-                extract(report_source, 'void UnknownReportError(').replace('UnknownReportError(', 'ActualReportError(') + '\n' +
+                extract(report_source, 'void ReportDirectInputError(').replace('ReportDirectInputError(', 'ActualReportError(') + '\n' +
                 extract(control, 'static inline float BindingMax(') + '\n' + extract(control, 'static inline float BindingMin(') + '\n' +
                 extract(control, 'void ControlBinding::SetFromAxis(') + '\n' +
                 extract(joystick, 'void JoystickDevice::FeedAxis(').replace('JoystickDevice::FeedAxis', 'ActualJoystickDevice::FeedAxis') + '\n' +
@@ -142,7 +142,7 @@ class JoystickBufferedBehaviorTests(unittest.TestCase):
             for owner, name, actual, va, size in [
                 ('PCJoystickDevice','?ButtonIndexFromOffset@PCJoystickDevice@@QAEHH@Z','?ButtonIndexFromOffset@ActualPCJoystickDevice@@QAEHH@Z',0x4c2ef0,412),
                 ('PCJoystickDevice','?ApplyAxisDeadZone@PCJoystickDevice@@QAEHHH@Z','?ApplyAxisDeadZone@ActualPCJoystickDevice@@QAEHHH@Z',0x4c3090,102),
-                ('PCControl','?UnknownReportError@@YAXJPBDH@Z','?ActualReportError@@YAXJPBDH@Z',0x4bf6a0,978),
+                ('PCControl','?ReportDirectInputError@@YAXJPBDH@Z','?ActualReportError@@YAXJPBDH@Z',0x4bf6a0,978),
                 ('JoystickDevice', '?FeedAxis@JoystickDevice@@QAEXHMM@Z', '?FeedAxis@ActualJoystickDevice@@QAEXHMM@Z', 0x489c00, 84),
                 ('ControlInterface', '?QueueEvent@ControlInterface@@QAEXHHHH@Z', '?QueueEvent@ActualControlInterface@@QAEXHHHH@Z', 0x43cea0, 82),
                 ('ControlInterface', '?SetFromAxis@ControlBinding@@QAEXMM@Z', '?SetFromAxis@ControlBinding@@QAEXMM@Z', 0x43cd20, 104),

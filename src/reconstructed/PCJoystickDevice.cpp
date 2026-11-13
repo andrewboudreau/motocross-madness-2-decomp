@@ -492,9 +492,9 @@ void PCJoystickDevice::DetectSubtype() {
 // 0x00689958: effects stored by the enumeration callback.
 static int s_UnknownEffectCount;
 
-// 0x004c4260: method 19 callback; copies each effect into the caller's
+// 0x004c4260: the IDirectInputDevice2::EnumEffects (method 19) callback; copies each effect into the caller's
 // array, stopping at 32. The formatted line is not used further.
-static int __stdcall UnknownEnumEffectsCallback(const UnknownEffectInfo* info, void* context) {
+static int __stdcall EnumEffectsCallback(const UnknownEffectInfo* info, void* context) {
     UnknownEffectInfo* effects = (UnknownEffectInfo*)context;
     if (!effects)
         return 0;
@@ -522,7 +522,7 @@ int PCJoystickDevice::EnumEffects(UnknownEffectInfo* effects, int* count) {
     sprintf(text, "ForceFeedback Joystick Detected\nJoystickDevice::EnumEffects ('%s')\n",
             deviceInfo.productName);
     s_UnknownEffectCount = 0;
-    if (device->EnumEffects(UnknownEnumEffectsCallback, effects, 0) < 0)
+    if (device->EnumEffects(EnumEffectsCallback, effects, 0) < 0)
         return 0;
     *count = s_UnknownEffectCount;
     return 1;
@@ -535,11 +535,11 @@ inline int PCJoystickDevice::CheckPollResult(long result) {
     if (result < 0) {
         if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED) {
             if (device->Acquire() < 0) {
-                UnknownReportError(result, __FILE__, 540);
+                ReportDirectInputError(result, __FILE__, 540);
                 return 0;
             }
         } else {
-            UnknownReportError(result, __FILE__, 544);
+            ReportDirectInputError(result, __FILE__, 544);
             return 0;
         }
     }
@@ -580,7 +580,7 @@ int PCJoystickDevice::SetBufferedInput(int buffered) {
     property.data = buffered ? 16 : 0;
     long result = device->SetProperty(DIPROP_BUFFERSIZE, &property);
     if (result < 0) {
-        UnknownReportError(result, __FILE__, 590);
+        ReportDirectInputError(result, __FILE__, 590);
         goto failed;
     }
     bufferedInput = buffered;

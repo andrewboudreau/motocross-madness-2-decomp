@@ -367,7 +367,7 @@ DirectDrawSurface* PCTextureMap::FindMipLevel(int width) {
         size /= 2;
     }
     if (result && result != (long)DDERR_NOTFOUND)
-        UnknownReportDirectDrawError(result, __FILE__, 2034);
+        ReportDirectDrawError(result, __FILE__, 2034);
     else if (size == width)
         return surface;
     return 0;
@@ -389,7 +389,7 @@ int PCTextureMap::DumpAllLevels() {
                 result = surface->GetAttachedSurface(&caps, &surface);
             }
             if (result != (long)DDERR_NOTFOUND) {
-                UnknownReportDirectDrawError(result, __FILE__, 2084);
+                ReportDirectDrawError(result, __FILE__, 2084);
                 return 0;
             }
         }
@@ -581,7 +581,7 @@ int PCTextureMap::BuildMipLevels(int filter) {
         result = parent->GetAttachedSurface(&caps, &level);
     }
     if (result != (long)DDERR_NOTFOUND) {
-        UnknownReportDirectDrawError(result, __FILE__, 1421);
+        ReportDirectDrawError(result, __FILE__, 1421);
         return 0;
     }
     if (parent->Unlock(0))
@@ -705,7 +705,7 @@ int PCTextureMap::ApplyColorKey(unsigned int color) {
                 result = surface->GetAttachedSurface(&caps, &surface);
             }
             if (result != (long)DDERR_NOTFOUND) {
-                UnknownReportDirectDrawError(result, __FILE__, 1811);
+                ReportDirectDrawError(result, __FILE__, 1811);
                 return 0;
             }
         }
@@ -726,7 +726,7 @@ int PCTextureMap::ApplyColorKey(unsigned int color) {
 // 0x004c86e0: formats the name of a DirectDraw result into a local buffer.
 // Nothing reads the text, `file` or `line` in retail (the output was
 // presumably compiled out). Cases are in retail's body order.
-void UnknownReportDirectDrawError(long result, const char* file, int line) {
+void ReportDirectDrawError(long result, const char* file, int line) {
     char text[256];
     switch (result) {
     case 0x800401f0:

@@ -34,7 +34,7 @@ int PCJoystickDevice::ReadBufferedState(int) {
     long result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), events, &count, 0);
     if (result == (long)0x8007001e || result == (long)0x8007000c) {
         if (device->Acquire() < 0) {
-            UnknownReportError(result, __FILE__, 317);
+            ReportDirectInputError(result, __FILE__, 317);
             return 0;
         }
         result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), events, &count, 0);

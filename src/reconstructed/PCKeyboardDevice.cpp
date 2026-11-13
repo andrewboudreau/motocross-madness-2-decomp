@@ -74,12 +74,12 @@ int PCKeyboardDevice::Update(int value) {
     if (result < 0) {
         if (result == DIERR_INPUTLOST) {
             if (device->Acquire() < 0) {
-                UnknownReportError(result, __FILE__, 1090);
+                ReportDirectInputError(result, __FILE__, 1090);
                 return 0;
             }
             return 1;
         }
-        UnknownReportError(result, __FILE__, 1096);
+        ReportDirectInputError(result, __FILE__, 1096);
         return 0;
     }
     if (keys[DIK_NUMLOCK] & 0x80)
@@ -89,7 +89,7 @@ int PCKeyboardDevice::Update(int value) {
     result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), 0, &count, DIGDD_PEEK);
     if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED) {
         if (device->Acquire() < 0) {
-            UnknownReportError(result, __FILE__, 1113);
+            ReportDirectInputError(result, __FILE__, 1113);
             return 0;
         }
         result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), 0, &count, DIGDD_PEEK);

@@ -175,9 +175,9 @@ PCControlInterface::~PCControlInterface() {
     }
 }
 
-// 0x004bf6a0: formats a DirectInput result with the caller's __FILE__ and
-// __LINE__ (the text is not used further). Placed in PCControl.cpp by address only.
-void UnknownReportError(long result, const char* file, int line) {
+// 0x004bf6a0: formats "DirectInput Error %s in file %s at line %d\n" (0x0056fc84) with a
+// result's name, __FILE__ and __LINE__ (the text is not used further). Placed in PCControl.cpp by address only.
+void ReportDirectInputError(long result, const char* file, int line) {
     char name[256];
     char text[1024];
     switch (result) {

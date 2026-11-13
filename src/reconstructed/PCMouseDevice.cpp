@@ -144,7 +144,7 @@ int PCMouseDevice::Update(int value) {
     result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), 0, &count, DIGDD_PEEK);
     if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED) {
         if (device->Acquire() < 0) {
-            UnknownReportError(result, __FILE__, 1316);
+            ReportDirectInputError(result, __FILE__, 1316);
             return 0;
         }
         result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), 0, &count, DIGDD_PEEK);

@@ -135,7 +135,7 @@ int GetForceFeedbackEffectName(Guid guid, char* name);
 
 // cdecl 0x004bf6a0: reports a failed result with the caller's __FILE__ and
 // __LINE__ (it maps DirectX error codes to text).
-void UnknownReportError(long result, const char* file, int line);
+void ReportDirectInputError(long result, const char* file, int line);
 
 // DirectInput object at ControlInterface+0xcc0; method 9 creates devices like
 // IDirectInput7::CreateDeviceEx.

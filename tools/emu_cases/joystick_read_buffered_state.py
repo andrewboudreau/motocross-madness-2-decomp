@@ -102,7 +102,7 @@ def setup(ctx, c):
 
     def report(cx, e, a):
         cx.note('ReportError', a[0], a[2])
-    ctx.stub_at(0x004bf6a0, 'UnknownReportError', pop=0, nargs=3, ret=report, log=False)
+    ctx.stub_at(0x004bf6a0, 'ReportDirectInputError', pop=0, nargs=3, ret=report, log=False)
     ctx.stub_at(0x0043cea0, 'ControlInterface::QueueEvent', pop=16)
     ctx.stub_at(0x00489c00, 'JoystickDevice::FeedAxis', pop=12)
     control = ctx.alloc(0x40)
