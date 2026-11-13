@@ -459,9 +459,9 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     }
     if (g_TrackGame->playerCount == 1 && g_TrackGame->mode.raceSettings.raceMode != 4) {
         int count = g_TrackGame->mode.raceSettings.aiRacerCount;
-        localRacer->UnknownRacerVirtualSlot50(1, localRacer->UnknownRacerVirtualSlot45(), 0);
+        localRacer->SetSpawnProtection(1, localRacer->GetSpawnProtectionDuration(), 0);
         for (int i = 0; i < count; i++)
-            aiRacers[i]->UnknownRacerVirtualSlot50(1, aiRacers[i]->UnknownRacerVirtualSlot45(), 0);
+            aiRacers[i]->SetSpawnProtection(1, aiRacers[i]->GetSpawnProtectionDuration(), 0);
     }
     g_TrackGame->ui->StepProgressBar();
 
@@ -474,7 +474,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     if (g_TrackGame->mode.joystickOn) {
         g_TrackGame->controlInterface->activeJoystick->SetAcquired(0);
         g_TrackGame->controlInterface->activeJoystick->SetAutoCenter(g_TrackGame->mode.joystickOn);
-        localRacer->UnknownRacerVirtualSlot93();
+        localRacer->InitForceFeedback();
         g_TrackGame->controlInterface->activeJoystick->SetAcquired(1);
     }
     if (g_TrackGame->mode.raceSettings.eventType)

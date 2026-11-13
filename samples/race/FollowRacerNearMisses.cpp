@@ -33,24 +33,24 @@
 // 0): 0x004a9e80 calls slot 50 (+0xc8) with (1, 5.0f, 0) on the racer it
 // stops and the one it starts following (tier 3 roles).
 struct UnknownFollowedRacerSlots {
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1(); virtual void UnknownVirtualSlot2(); virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4(); virtual void UnknownVirtualSlot5(); virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7(); virtual void UnknownVirtualSlot8(); virtual void UnknownVirtualSlot9();
-    virtual void UnknownVirtualSlot10(); virtual void UnknownVirtualSlot11(); virtual void UnknownVirtualSlot12();
-    virtual void UnknownVirtualSlot13(); virtual void UnknownVirtualSlot14(); virtual void UnknownVirtualSlot15();
-    virtual void UnknownVirtualSlot16(); virtual void UnknownVirtualSlot17(); virtual void UnknownVirtualSlot18();
-    virtual void UnknownVirtualSlot19(); virtual void UnknownVirtualSlot20(); virtual void UnknownVirtualSlot21();
-    virtual void UnknownVirtualSlot22(); virtual void UnknownVirtualSlot23(); virtual void UnknownVirtualSlot24();
-    virtual void UnknownVirtualSlot25(); virtual void UnknownVirtualSlot26(); virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28(); virtual void UnknownVirtualSlot29(); virtual void UnknownVirtualSlot30();
-    virtual void UnknownVirtualSlot31(); virtual void UnknownVirtualSlot32(); virtual void UnknownVirtualSlot33();
-    virtual void UnknownVirtualSlot34(); virtual void UnknownVirtualSlot35(); virtual void UnknownVirtualSlot36();
-    virtual void UnknownVirtualSlot37(); virtual void UnknownVirtualSlot38(); virtual void UnknownVirtualSlot39();
-    virtual void UnknownVirtualSlot40(); virtual void UnknownVirtualSlot41(); virtual void UnknownVirtualSlot42();
-    virtual void UnknownVirtualSlot43(); virtual void UnknownVirtualSlot44(); virtual void UnknownVirtualSlot45();
-    virtual void UnknownVirtualSlot46(); virtual void UnknownVirtualSlot47(); virtual void UnknownVirtualSlot48();
-    virtual void UnknownVirtualSlot49();
+    virtual void UpdateMass();
+    virtual void ResetDynamicState(); virtual void InitializePhysics(); virtual void ApplyStaticContactImpulse();
+    virtual void ApplyBodyContactImpulse(); virtual void ShouldRefreshContacts(); virtual void ApplyDrag();
+    virtual void DistributeContactForce(); virtual void UpdateLocalCenterOfMass(); virtual void ComputeFrameSteps();
+    virtual void IsAtBaseWeight(); virtual void FindPlacement(); virtual void ClassifyOutOfBounds();
+    virtual void AccumulateContactForces(); virtual void IntegrateMotion(); virtual void ApplyWorldTorque();
+    virtual void LocalTorqueToAngularAcceleration(); virtual void AverageAttachmentPosition(); virtual void UpdateContactEffect();
+    virtual void UpdateSlideEffect(); virtual void UpdateScrapeEffect(); virtual void UpdateAttachmentEffects();
+    virtual void ShouldUpdateShadowLight(); virtual void ShouldEmitMovingEffects(); virtual void ShouldRestartSteamEffect();
+    virtual void ShouldBurstSteamEffect(); virtual void UnknownVirtualSlot26(); virtual void UnknownVirtualSlot27();
+    virtual void ResolveSubstepCollisions(); virtual void SaveBodyOrientation(); virtual void ClearContactEffectFlags();
+    virtual void UpdateContactStates(); virtual void EffectiveLoadWeight(); virtual void ResetToPlacement();
+    virtual void LoadBodyAxes(); virtual void StoreBodyAxes(); virtual void ResetBodyOrientation();
+    virtual void AddAttachment(); virtual void ApplyCollisionEvent(); virtual void ApplyPendingRespawn();
+    virtual void LoadPhysicsModel(); virtual void EndMotion(); virtual void CheckMotionComplete();
+    virtual void SnapshotRespawnPose(); virtual void RemoveFromRace(); virtual void GetSpawnProtectionDuration();
+    virtual void ComputeRotationPivot(); virtual void GetDriveShareScale(); virtual void AdvancePosition();
+    virtual void SimulateFrame();
     virtual void SetSpawnProtection(int a, float seconds, int b);
 };
 #define FOLLOWED_RACER_SLOTS(racer) ((UnknownFollowedRacerSlots*)(racer))

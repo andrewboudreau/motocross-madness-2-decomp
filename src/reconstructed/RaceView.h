@@ -87,9 +87,9 @@ struct RaceStatusNode {
 // object EventManager ranks and updates from network messages. It reaches
 // GameObject through a vbptr at +0x04 (EventManager 0x0045cdc0 calls slot 4
 // through it), as KrustyBike's RTTI shows (virtual GameObject base, pdisp 4).
-// The class is not established; only the vbase access path is modelled.
+// Its methods here are KrustyBike.cpp code, so slot 0 takes KrustyBike's name.
 struct UnknownEventRacer : virtual public GameObject {
-    virtual void UnknownVirtualSlot0();            // gives the racer its own vfptr at +0
+    virtual void UpdateMass();            // slot 0 (KrustyBike's); gives the racer its own vfptr at +0
     // Own vtable +0xc8 (slot 50) is called by FollowRacer.cpp 0x004a9e80 with
     // (1, 5.0f, 0); samples/race/FollowRacerNearMisses.cpp views the slot.
 

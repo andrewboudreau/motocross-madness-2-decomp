@@ -298,7 +298,7 @@ int BikeRace::Tick(float frameTime) {
         }
         if (!g_TrackGame->paused) {
             if (g_TrackGame->mode.joystickOn) {
-                localRacer->UnknownRacerVirtualSlot94();
+                localRacer->UpdateForceFeedback();
             }
             if (g_TrackGame->mode.raceSettings.raceMode == 4) {
                 unsigned short lap = localRacer->lapCount;
@@ -487,7 +487,7 @@ int BikeRace::Tick(float frameTime) {
                     if (g_TrackGame->playerCount > 1) {
                         int count = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
                         for (int k = 0; k < count; k++) {
-                            racerSlots[k]->UnknownRacerVirtualSlot50(1, racerSlots[k]->UnknownRacerVirtualSlot45(), 0);
+                            racerSlots[k]->SetSpawnProtection(1, racerSlots[k]->GetSpawnProtectionDuration(), 0);
                         }
                     }
                 }
@@ -1252,7 +1252,7 @@ void BikeRace::HandlePlayerLeft(int player) {
     for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
         int id = g_TrackGame->mode.racers[i].networkPlayerId;
         if (id != self && id == player && racerSlots[i] != 0) {
-            racerSlots[i]->UnknownRacerVirtualSlot44();
+            racerSlots[i]->RemoveFromRace();
             TrackGameViewOwner* owner = g_TrackGame->tagEvent;
             if (owner != 0 && owner->followedRacer == (UnknownEventRacer*)racerSlots[i]) {
                 if (g_TrackGame->mode.raceSettings.tagBall) {
@@ -1350,7 +1350,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
     raceScene->holdAnimations = 1;
     for (UnknownBikeRaceRacer* racer = NextBike(&iterator); racer != 0;
          racer = NextBike(&iterator)) {
-        racer->UnknownRacerVirtualSlot43();
+        racer->SnapshotRespawnPose();
         racer->restarted = true;
         WriteRelativePositions(&position, &direction, g_TrackGame->bajaEnduroEvent,
                               positions[iterator - 1]);

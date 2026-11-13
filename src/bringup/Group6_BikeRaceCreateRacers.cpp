@@ -549,7 +549,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* te
                                                riderFile, bikeTexture, riderTexture, aiRacers[0]->engineSize,
                                                (unsigned char)aiRacers[0]->fourStroke,
                                                g_TrackGame->mode.plateNumber);
-            aiRacers[0]->UnknownRacerVirtualSlot50(1, 0, 1);
+            aiRacers[0]->SetSpawnProtection(1, 0, 1);
             aiRacers[0]->Disable();
         } else if (g_TrackGame->mode.raceSettings.aiRacerCount > 0) {
             // The AI racers.
