@@ -8,22 +8,22 @@
     "src/reconstructed/DlgProcs.cpp": {
       "sections": 421,
       "relocations": 3043,
-      "sha256": "e43d8a478dcb1ed8805d441ac1f4bebdc2edb34234cb07fbfaa68758440a4d47"
+      "sha256": "148ed088c8c44857bc3fb76a05757f0f5c1abbe62344177822a49bf7134ac488"
     },
     "samples/ui/DlgProcsNearMisses.cpp": {
       "sections": 558,
       "relocations": 4155,
-      "sha256": "76d8621e57f05699faca5af33c915deef17c5bad650be18f32bb9d91a251d9c7"
+      "sha256": "4fde1665a07c2f47bd4991c05fe3d2465109f3bc12ff69ca83a09e2dc1c6f984"
     },
     "src/reconstructed/ProCircuitProcs.cpp": {
       "sections": 336,
       "relocations": 2089,
-      "sha256": "24ace370082db0c63fe2a9974c20bfcab5155a3321590d810a0e4445276ae223"
+      "sha256": "4458f7bcebbdbd9fad5264fb492b954e79e7616c999efc0bd2b99846bae361f8"
     },
     "samples/ui/ProCircuitProcsNearMisses.cpp": {
       "sections": 366,
       "relocations": 2327,
-      "sha256": "6d16057bece322bdfdab7771db5bdeac137896e843a5bb7f857753cc7bb14c36"
+      "sha256": "0744e3bd82cd6c9308e8efc8cc897157e1e131337b383963583be14b78261c7f"
     }
   }
 }

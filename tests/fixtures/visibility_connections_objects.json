@@ -21,7 +21,7 @@
     "src/reconstructed/TrackOverlay.cpp": {
       "sections": 215,
       "relocations": 920,
-      "sha256": "6ad5278c80372dd85f4123a188812948667534949ecd598d859ae910b465c1e6"
+      "sha256": "b81c894be1b9e33f156153969cbd7fe6f0e73b2922c58567e850dc1e85327351"
     },
     "samples/render/CubeDrawNearMisses.cpp": {
       "sections": 5,
@@ -36,7 +36,7 @@
     "samples/track/TrackOverlayNearMisses.cpp": {
       "sections": 27,
       "relocations": 111,
-      "sha256": "817c67fac7c007e656071c77407ba7e840823a86129e999596b6a7c74671827d"
+      "sha256": "ce38d3b0530f1e3656e691fcf16e4c5a200626104b82c11b4b456c5feb1341c9"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
       "sections": 88,

@@ -7,7 +7,7 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "63d0e585bb061164b5d4cdcf20be56b79dfc793f4ae2f6bf980e76fbd366c0af"
+      "sha256": "d1f6e48f21f84ef5ea535cd623f2ad53f3c6792fb075827442f3ee67e8062112"
     },
     "src/reconstructed/LightEmitter.cpp": {
       "sections": 57,
@@ -17,17 +17,17 @@
     "src/reconstructed/SceneManager.cpp": {
       "sections": 272,
       "relocations": 1273,
-      "sha256": "1d131cc1daeaad58a5e094ec72ee690b89717548013429f687578b7a733b6d98"
+      "sha256": "210560dfc97da3d2489f077b8a994760a6cb4f7ef2afbd685758c12561a57ef2"
     },
     "src/reconstructed/KrustyUI.cpp": {
       "sections": 317,
       "relocations": 1847,
-      "sha256": "aab0b5ac84098038da44b5dda0a1af00832acbd58d4bea793a0173e7f393c137"
+      "sha256": "da88c52a48760453061aad833592dc121a42af41d17eaeb4dcbe28d6bed17b79"
     },
     "src/reconstructed/QuarryStuntEvent.cpp": {
       "sections": 86,
       "relocations": 393,
-      "sha256": "6e23bd28160d4d28efe2895aec7a3c1de2da13a72bd809d94139008bc0642ee7"
+      "sha256": "11f78821b7f2189a5b86bbeb42cbfdb1d7603f696e17c8d572a4750678387f9e"
     },
     "src/reconstructed/ArcadeObject.cpp": {
       "sections": 32,
@@ -52,7 +52,7 @@
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,
       "relocations": 484,
-      "sha256": "d556f808c5647fbc0d57129258dece7612c9e8800ff6102207356d95d1c27f35"
+      "sha256": "db56ff4808a86450c86a86356f26c9ee3ee700c01e6f23ff78a433929aeb94f7"
     },
     "samples/render/D3DIMSoulTreeNearMisses.cpp": {
       "sections": 29,
@@ -67,7 +67,7 @@
     "samples/game/QuarryStuntEventLoaderNearMiss.cpp": {
       "sections": 50,
       "relocations": 435,
-      "sha256": "742cce9e125616b6e2eae133a86edb58b5bebed734601112d0c7cffb374618bb"
+      "sha256": "eb5842a2cc485b3cf82ff000d0525742088ff835e99e9d5633fca094b336bbd3"
     }
   },
   "strict_cases": [

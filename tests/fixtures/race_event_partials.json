@@ -89,19 +89,19 @@
       "samples/race/BikeRaceNearMisses.cpp",
       "?Create@BikeRace@@QAEPAV1@PAX0PAVLightManager@@PAUTextureContext@@PAVUnknownBikeRaceProjector@@PAVKrustyBikeCamera@@PAVScene@@PAURaceGateEvent@@PAVUnknownBikeRaceShadow@@@Z",
       6760,
-      "8d40c148b58edcc6010ac84e1f52b0f8139917278f692bc93da7eff49183652e"
+      "2a6aee6124f3fa2cab2bfb2c336a36822b4a126c9c93fa75b3afc97ff70a82bc"
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",
       "?CreateRacers@BikeRace@@QAEHPAXPAVLightManager@@PAUTextureContext@@PAVUnknownBikeRaceProjector@@PAURaceGateEvent@@@Z",
       13428,
-      "37530321ff79a10c784b9f8b793ba6c0e03a4fd11f83c87f2fed9743b838d8ba"
+      "4d1e7be82923974be57f2c3ff3de8ad7bb8bd4e7591a9f21d8084e2add12e019"
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
       "?PaintPlateNumber@SPBikeRiderDlg@@QAEXH@Z",
       161,
-      "7e17d937bbf43d2d79be5f39a462b3538a3641c180f866d4a9eb1db0e6aa3f1e"
+      "e06547d7c6dee44c6042968fadcc3a58585da171ecc0595e8c995b9eb654d01c"
     ],
     [
       "samples/ui/DlgProcsNearMisses.cpp",
