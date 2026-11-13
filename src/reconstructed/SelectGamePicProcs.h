@@ -129,7 +129,7 @@ struct UnknownRaceSettings {
 };
 
 // One lobby slot (MultiPlayerDlg+0x7f68 holds eight).
-struct UnknownLobbySlot {
+struct LobbySlot {
     int playerId;                             // +0x00: player id (0 when free)
     int requestedRacers;                      // +0x04: requested racers
     int grantedRacers;                        // +0x08: granted racers
@@ -137,14 +137,14 @@ struct UnknownLobbySlot {
 
 // MultiPlayerDlg+0x7f68. Its constructor 0x004f2f00 is out-of-line
 // (KrustyUI 0x0049a0c9 and 0x0049a21e call it).
-class UnknownLobbySlotTable {
+class LobbySlotTable {
 public:
-    UnknownLobbySlotTable();                  // 0x004f2f00
+    LobbySlotTable();                  // 0x004f2f00
     void SetSlot(int id, int value); // 0x004f2f20: adds or updates `id`
     void FreeSlot(int id);       // 0x004f2f80: frees `id`'s slot
     int GrantRacers(int count, int limit); // 0x004f2fe0: grants requested racers in slot order
 
-    UnknownLobbySlot slots[8];
+    LobbySlot slots[8];
 };
 
 // The lobby settings message (type 0xf, 0xb4 bytes) the host sends.
@@ -169,7 +169,7 @@ struct UnknownLobbySettingsMessage {
     int trackFileTime;                        // +0xC  the track scene's st_mtime (TrackGame+0x2ea8 raceSettings.trackFileTime) the host sends
     int trackFileSize;                        // +0x10  the track scene's st_size (TrackGame+0x2eac raceSettings.trackFileSize)
     char trackName[0x40];                     // +0x14: track name (+0x2da6)
-    UnknownLobbySlot slots[8];                // +0x54: MultiPlayerDlg+0x7f68
+    LobbySlot slots[8];                // +0x54: MultiPlayerDlg+0x7f68
 };
 
 // RTTI: MPEventDlg : UIDialog (vtable 0x00557a88; 0x7f5c bytes).
@@ -269,7 +269,7 @@ public:
     MPBikeRiderDlg* bikeRiderPage;            // +0x7f5c: MPBikeRiderDlg page
     MPRaceInfoDlg* raceInfoPage;              // +0x7f60: MPRaceInfoDlg page
     MPOptionsDlg* optionsPage;                // +0x7f64: MPOptionsDlg page
-    UnknownLobbySlotTable lobbySlots;         // +0x7f68
+    LobbySlotTable lobbySlots;         // +0x7f68
     char builtForTrack[0x104];                // +0x7fc8: track name the page was built for
     int builtForVariant;                      // +0x80cc: track variant the page was built for
     char sceneName[0x40];                     // +0x80d0: scene name ("no name": resource 0x143b)

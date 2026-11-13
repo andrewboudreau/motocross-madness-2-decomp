@@ -8,7 +8,7 @@
   "??0BikeNumberPainter@@QAE@PAVTextureMapManager@@@Z": "0x00417500",
   "??0ProjectedShadow@@QAE@H@Z": "0x004da570",
   "??0D3DIMSoultreeShadow@@QAE@H@Z": "0x00446840",
-  "??0UnknownLobbySlotTable@@QAE@XZ": "0x004f2f00",
+  "??0LobbySlotTable@@QAE@XZ": "0x004f2f00",
   "??0ParameterBlock@@QAE@XZ": "0x004b7130",
   "??0FileStream@@QAE@PAVResourceManager@@@Z": "0x00460d10",
   "??1Exit1Dlg@@UAE@XZ": "0x00450fc0",

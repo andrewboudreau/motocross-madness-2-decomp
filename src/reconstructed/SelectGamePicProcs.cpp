@@ -398,7 +398,7 @@ static int s_UnknownStatic573c0c = 2;
 
 // 0x004f2b90
 void MultiPlayerDlg::SendSettings() {
-    UnknownLobbySlotTable* slots = &lobbySlots;
+    LobbySlotTable* slots = &lobbySlots;
     g_TrackGame->mode.maxOpponents = slots->GrantRacers(g_LobbyRemotePlayerCount + 1, g_TrackGame->mode.raceSettings.multiplayerAiRacerCount);
     if (g_TrackGame->mode.maxOpponents < g_TrackGame->mode.raceSettings.multiplayerAiRacerCount)
         g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = g_TrackGame->mode.maxOpponents;
@@ -464,7 +464,7 @@ int MultiPlayerDlg::CreateLobbyPlayer() {
 }
 
 // 0x004f2f00
-UnknownLobbySlotTable::UnknownLobbySlotTable() {
+LobbySlotTable::LobbySlotTable() {
     for (int i = 0; i < 8; i++) {
         slots[i].playerId = 0;
         slots[i].requestedRacers = 0;
@@ -473,7 +473,7 @@ UnknownLobbySlotTable::UnknownLobbySlotTable() {
 }
 
 // 0x004f2f20
-void UnknownLobbySlotTable::SetSlot(int id, int value) {
+void LobbySlotTable::SetSlot(int id, int value) {
     int i;
     for (i = 0; i < 8; i++) {
         if (slots[i].playerId == id) {
@@ -493,7 +493,7 @@ void UnknownLobbySlotTable::SetSlot(int id, int value) {
 }
 
 // 0x004f2f80
-void UnknownLobbySlotTable::FreeSlot(int id) {
+void LobbySlotTable::FreeSlot(int id) {
     for (int i = 0; i < 8; i++) {
         if (slots[i].playerId == id) {
             slots[i].playerId = 0;
@@ -506,8 +506,8 @@ void UnknownLobbySlotTable::FreeSlot(int id) {
 
 // 0x004f2fc0: qsort order, by the request, smallest first.
 static int CompareRequestedRacers(const void* a, const void* b) {
-    int x = ((const UnknownLobbySlot*)a)->requestedRacers;
-    int y = ((const UnknownLobbySlot*)b)->requestedRacers;
+    int x = ((const LobbySlot*)a)->requestedRacers;
+    int y = ((const LobbySlot*)b)->requestedRacers;
     if (x < y)
         return -1;
     return x != y;
@@ -515,10 +515,10 @@ static int CompareRequestedRacers(const void* a, const void* b) {
 
 // 0x004f2fe0: grants the first `count` slots up to `limit` racers in
 // turn; returns the requested total, at most 8 - `count`.
-int UnknownLobbySlotTable::GrantRacers(int count, int limit) {
+int LobbySlotTable::GrantRacers(int count, int limit) {
     if (count >= 8)
         return 0;
-    qsort(slots, count, sizeof(UnknownLobbySlot), CompareRequestedRacers);
+    qsort(slots, count, sizeof(LobbySlot), CompareRequestedRacers);
     int total = 0;
     for (int i = 0; i < 8; i++) {
         slots[i].grantedRacers = 0;
