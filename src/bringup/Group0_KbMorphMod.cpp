@@ -61,7 +61,7 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
         new (kMorphBastardModifierFile, 73) FileStream(g_ResourceManager);
     stream->Open(path, "r", 0);
     ParameterBlock* block = new (kMorphBastardModifierFile, 77) ParameterBlock;
-    block->Attach((UnknownParameterStream*)stream, 0, 1);
+    block->Attach((FileStream*)stream, 0, 1);
     sprintf(section, "MorphBastard Information");
     block->SelectSection(section);
     block->GetInt("NumberOfMorphBastards", 0, &objectCount);

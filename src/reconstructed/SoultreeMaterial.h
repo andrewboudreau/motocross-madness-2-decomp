@@ -47,7 +47,7 @@ public:
                                TextureMapManager* manager, int format);
     void ApplyRenderStates();                 // 0x004ff180: sets the render states
     void RestoreRenderStates();               // 0x004ff410: restores them
-    void ReadSaved(UnknownParameterStream* stream);             // 0x004ff450: reads a saved material
+    void ReadSaved(FileStream* stream);             // 0x004ff450: reads a saved material
     void LoadTexture();                       // 0x004ff620: (re)loads the texture
     // 0x004ff9e0: reads the material keys; loads the texture when `load`.
     void ReadKeys(ParameterBlock* block, int load);

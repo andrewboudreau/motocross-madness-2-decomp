@@ -428,7 +428,7 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int context, const char* 
     strncpy(sltPath, path, copyLength);
     sltPath[copyLength] = 0;
     sltFile = new(__FILE__, 0xa5) ParameterBlock();
-    sltFile->Attach((UnknownParameterStream*)file, 0, 1);
+    sltFile->Attach((FileStream*)file, 0, 1);
     sltFile->SelectSection("General info");
     sltFile->ReadString("SLTFile", d3d_field_0x1a4, -1);
     CharacterVirtualSlot1();

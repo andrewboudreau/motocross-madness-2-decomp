@@ -147,7 +147,7 @@ void SoultreeMaterial::RestoreRenderStates()
 }
 
 // 0x004ff450
-void SoultreeMaterial::ReadSaved(UnknownParameterStream* stream)
+void SoultreeMaterial::ReadSaved(FileStream* stream)
 {
     stream->Read(textureName, 0x40, 1);
     stream->Read(&textureFormat, 4, 1);

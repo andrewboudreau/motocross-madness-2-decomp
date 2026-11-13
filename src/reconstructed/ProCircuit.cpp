@@ -44,7 +44,7 @@ ProCircuit::ProCircuit()
     float defaults[9];
 
     if (stream->Open("PCTables.pb", "r", 0)) {
-        block.Attach((UnknownParameterStream*)stream, 0, 1);
+        block.Attach((FileStream*)stream, 0, 1);
         block.SelectSection("ProCircuit");
         block.GetInt("StartingCapital", 5000, &startingCapital);
         block.GetInt("EnduroFee", 300, &entryFees[5]);
@@ -107,7 +107,7 @@ ProCircuit::ProCircuit()
     }
 
     if (stream->Open("PCSched.pb", "r", 0)) {
-        block.Attach((UnknownParameterStream*)stream, 0, 1);
+        block.Attach((FileStream*)stream, 0, 1);
         schedules[0].tracks = 0;
         schedules[4].tracks = 0;
         block.SelectSection("Enduro");

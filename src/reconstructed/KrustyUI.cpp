@@ -665,7 +665,7 @@ void KrustyUI::LoadGarageTables() {
     ParameterBlock block;
     FileStream* stream = new(__FILE__, 851) FileStream(g_ResourceManager);
     if (stream->Open("presets.pb", "r", 0)) {
-        block.Attach((UnknownParameterStream*)stream, 0, 1);
+        block.Attach((FileStream*)stream, 0, 1);
         for (int i = 0; i < 5; i++) {
             sprintf(key, "Category_%d", i + 1);
             block.SelectSection(key);
@@ -731,7 +731,7 @@ void KrustyUI::LoadBikesAndRiders() {
     bikeCount = 0;
     manufacturerCount = 0;
     if (stream->Open("bikes.pb", "r", 0)) {
-        block.Attach((UnknownParameterStream*)stream, 0, 1);
+        block.Attach((FileStream*)stream, 0, 1);
         block.SelectSection("Information");
         int count;
         block.GetInt("NumberOfManufacturers", 0, &count);
@@ -796,7 +796,7 @@ void KrustyUI::LoadBikesAndRiders() {
         }
     }
     if (stream->Open("riders.pb", "r", 0)) {
-        block.Attach((UnknownParameterStream*)stream, 0, 1);
+        block.Attach((FileStream*)stream, 0, 1);
         block.SelectSection("Information");
         int count;
         block.GetInt("NumberOfRiders", 0, &count);

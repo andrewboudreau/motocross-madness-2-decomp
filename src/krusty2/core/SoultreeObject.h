@@ -42,7 +42,7 @@ class ParameterBlock {
 public:
     ParameterBlock();                                                     // 0x004b7130
     ~ParameterBlock();                                                    // 0x004b7190
-    void Attach(UnknownParameterStream* stream, int offset, int index); // 0x004b77a0
+    void Attach(FileStream* stream, int offset, int index); // 0x004b77a0
     int BeginRows(const char* name);                                 // 0x004b7f70
     int ReadRow(char* raw);                                        // 0x004b8010
     int GetRowFloat(int index, float* out);                            // 0x004b81c0
@@ -264,7 +264,7 @@ public:
     // 0x004fdb60, ret 8, EH: creates the parameter block field_0x1a0 (__FILE__ line 0x346),
     // opens it on 'stream' (0x004b77a0, index 1), loads through slot 3 and deletes the block.
     // The stream type is the one src/reconstructed/Parameterblocks.h names.
-    void LoadFromParameters(UnknownParameterStream* stream, int offset);
+    void LoadFromParameters(FileStream* stream, int offset);
 
     // 0x004fe0a0, ret 8: *center / *halfExtent = localBoundsCenter / localBoundsHalfExtent, after slot 5 when
     // localBoundsValid is 0.

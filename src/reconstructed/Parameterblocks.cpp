@@ -153,7 +153,7 @@ ParameterBlock::~ParameterBlock()
 // The found call is written out in both branches: VC6 cross-jumps the two
 // copies into retail's single block, and the extra source reference of `this`
 // is what gives it ebx and `path` ebp (one copy swaps the two registers).
-void ParameterBlock::OpenFromArchives(UnknownParameterStream* stream,
+void ParameterBlock::OpenFromArchives(FileStream* stream,
                                                   const char* name, const char* path,
                                                   int index)
 {
@@ -238,7 +238,7 @@ int ParameterBlock::ScanSection(const char* name)
 
 // Records every new `[header]`: its stream position, mode byte and, once the
 // next header (or the end) is seen, its line count.
-void ParameterBlock::IndexSections(UnknownParameterStream* stream)
+void ParameterBlock::IndexSections(FileStream* stream)
 {
     char header[PB_LINE_SIZE];
     char stripped[PB_LINE_SIZE];
@@ -281,7 +281,7 @@ void ParameterBlock::IndexSections(UnknownParameterStream* stream)
             lineIndex - sectionTable[sectionCount - 1].lineCount - 1;
 }
 
-void ParameterBlock::Attach(UnknownParameterStream* stream, int offset,
+void ParameterBlock::Attach(FileStream* stream, int offset,
                                                   int index)
 {
     fileOffset = offset;

@@ -95,5 +95,5 @@ public:
     int sliceOffset;                          // +0x130 start offset in the inner stream
 };
 
-// Parameter readers use the same 0x134-byte archive stream.
+// Unused alias of FileStream, kept: removing it changes VC6 codegen (NAMING.md).
 typedef FileStream UnknownParameterStream;

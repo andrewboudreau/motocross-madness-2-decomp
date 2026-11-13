@@ -191,7 +191,7 @@ void D3DIMSoultreeObject::LoadHierarchy(FileStream* stream)
             materialTable[i]->Attach((RenderTarget*)renderContext, (const SoultreeTextureOptions*)textureOptions,
                                                   textureManager, textureFormat);
             AppendChild(materialTable[i], -1);
-            materialTable[i]->ReadSaved((UnknownParameterStream*)stream);
+            materialTable[i]->ReadSaved((FileStream*)stream);
         }
     } else {
         materialTable = 0;

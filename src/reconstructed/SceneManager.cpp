@@ -202,7 +202,7 @@ void SceneArchiveFinder::ReadSceneName(char* out, char* name, int index,
         FileStream* archive = OpenSceneArchive(scene);
         if (archive) {
             archive->GetFileTimes(a, b);
-            block.OpenFromArchives((UnknownParameterStream*)archive, scene, path, 0);
+            block.OpenFromArchives((FileStream*)archive, scene, path, 0);
             block.SelectSection("SceneInfo");
             block.GetInt("NumberOfWaypointRaces", 0, &waypointRaceCount);
             if (index) {
@@ -250,7 +250,7 @@ void SceneArchiveFinder::ReadCurrentSceneName(char* name, char* scene, int value
     if (sceneDirectory[0]) {
         sprintf(path, "%s\\%s", sceneDirectory, scene);
         ParameterBlock block;
-        block.OpenFromArchives((UnknownParameterStream*)OpenSceneArchive(0), scene, path, 1);
+        block.OpenFromArchives((FileStream*)OpenSceneArchive(0), scene, path, 1);
         block.SelectSection("SceneInfo");
         block.GetInt("NumberOfWaypointRaces", 0, &waypointRaceCount);
         if (value) {
@@ -1127,7 +1127,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
     if (!archive)
         return 0;
     sprintf(scenePath, "%s\\%s", sceneManager->sceneDirectory, sceneManager->sceneFile);
-    parameters.OpenFromArchives((UnknownParameterStream*)archive, sceneManager->sceneFile,
+    parameters.OpenFromArchives((FileStream*)archive, sceneManager->sceneFile,
                                      scenePath, 1);
     parameters.SelectSection("SceneInfo");
     if (logFile)
@@ -1402,7 +1402,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
     FileStream* stream = new(__FILE__, 3622) FileStream(g_ResourceManager);
     stream->Open(name, "rb", 0);
     ParameterBlock block;
-    block.Attach((UnknownParameterStream*)stream, 0, 1);
+    block.Attach((FileStream*)stream, 0, 1);
     block.SelectSection("Materials");
     block.GetInt("NumberOfMaterials", 0, &materials);
     SoultreeMaterial material(0);
@@ -1435,7 +1435,7 @@ int Scene::CountObjects(int* count)
     UnknownSceneResourceManager resources;
     char message[0x204];
     sprintf(scenePath, "%s\\%s", sceneManager->sceneDirectory, sceneManager->sceneFile);
-    parameters.OpenFromArchives((UnknownParameterStream*)archive, sceneManager->sceneFile,
+    parameters.OpenFromArchives((FileStream*)archive, sceneManager->sceneFile,
                                      scenePath, 1);
     *count = 1;
     int found = parameters.SelectSection("StaticModels");
@@ -1484,7 +1484,7 @@ int Scene::ResolveSltPath(char* path)
     }
     stream->Open(name, "rb", 0);
     ParameterBlock block;
-    block.Attach((UnknownParameterStream*)stream, 0, 1);
+    block.Attach((FileStream*)stream, 0, 1);
     block.SelectSection("General info");
     if (!block.ReadString("SLTFile", sltFile, -1)) {
         delete stream;
@@ -1519,7 +1519,7 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
         return 0;
     UnknownSceneResourceManager resources;
     sprintf(scenePath, "%s\\%s", sceneManager->sceneDirectory, sceneManager->sceneFile);
-    parameters.OpenFromArchives((UnknownParameterStream*)archive, sceneManager->sceneFile,
+    parameters.OpenFromArchives((FileStream*)archive, sceneManager->sceneFile,
                                      scenePath, 1);
     OpenResourceFiles();
     int i = 0;

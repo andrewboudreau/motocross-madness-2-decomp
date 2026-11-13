@@ -280,7 +280,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
             break;
         }
         stream->Open(file, "r", 0);
-        parameters.Attach((UnknownParameterStream*)stream, 0, 1);
+        parameters.Attach((FileStream*)stream, 0, 1);
         parameters.SelectSection(section);
 
         parameters.ReadInt("TotalIdle", &idleCount[k]);

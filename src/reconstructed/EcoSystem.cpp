@@ -169,7 +169,7 @@ int VegetationDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
         if (stream->Open(path, "r", 0)) {
             int lod;
             ParameterBlock* block = new(__FILE__, 0xc2) ParameterBlock;
-            block->Attach((UnknownParameterStream*)stream, 0, 1);
+            block->Attach((FileStream*)stream, 0, 1);
             block->SelectSection("Material - 0");
             block->ReadString("TextureMap", path, -1);
             int format = 1555;
@@ -1225,7 +1225,7 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, FileStream* stream
                 FileStream* sltStream = new(__FILE__, 0xb50) FileStream(g_ResourceManager);
                 if (sltStream->Open(sltName, "r", 0)) {
                     ParameterBlock* block = new(__FILE__, 0xb52) ParameterBlock;
-                    block->Attach((UnknownParameterStream*)sltStream, 0, 1);
+                    block->Attach((FileStream*)sltStream, 0, 1);
                     block->SelectSection("Material - 0");
                     block->ReadString("TextureMap", sltName, -1);
                     int format = 1555;

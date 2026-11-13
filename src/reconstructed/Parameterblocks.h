@@ -43,11 +43,11 @@ public:
     ParameterBlock();                         // 0x004b7130
     ~ParameterBlock();                        // 0x004b7190
     // 0x004b7220: opens `name` through the stream's archives, else the stream itself.
-    void OpenFromArchives(UnknownParameterStream* stream, const char* name,
+    void OpenFromArchives(FileStream* stream, const char* name,
                                const char* path, int index);
     int ScanSection(const char* name);     // loads a section by scanning
-    void IndexSections(UnknownParameterStream* stream); // indexes the sections
-    void Attach(UnknownParameterStream* stream, int offset, int index); // opens
+    void IndexSections(FileStream* stream); // indexes the sections
+    void Attach(FileStream* stream, int offset, int index); // opens
     int FindSection(const char* name);     // section index or -1
     void FreeLines();                    // frees the loaded lines
     int SelectSection(const char* name);     // selects a section
@@ -65,7 +65,7 @@ public:
     int GetSectionNames(char* out, int size);  // section names, '?'-terminated
     void StripBlanks(const char* in, char* out); // strips blanks outside [] and ""
 
-    UnknownParameterStream* blockStream;      // +0x000 stream
+    FileStream* blockStream;      // +0x000 stream
     int field_0x004;
     int isOpen;                               // +0x008 open
     int field_0x00c;

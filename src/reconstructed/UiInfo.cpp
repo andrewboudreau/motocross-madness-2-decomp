@@ -633,7 +633,7 @@ void TrackGameMode::LoadBonusTrackNames() {
     if (stream->Open("PCSched.pb", "r", 0)) {
         int track;
 
-        block.Attach((UnknownParameterStream*)stream, 0, 1);
+        block.Attach((FileStream*)stream, 0, 1);
         block.SelectSection("Enduro");
         block.GetInt("BonusTrack", 0, &track);
         sprintf(key, "Track_%d", track);

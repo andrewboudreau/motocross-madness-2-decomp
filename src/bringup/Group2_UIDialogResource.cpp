@@ -57,7 +57,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
     memset(sectionTable, 0, sizeof(sectionTable));
     int setType = 1;
     ParameterBlock parameters;
-    parameters.Attach((UnknownParameterStream*)stream, offset, 1);
+    parameters.Attach((FileStream*)stream, offset, 1);
     char buffer[0x2800];
     parameters.GetSectionNames(buffer, sizeof(buffer));
     Tokenizer* sections = new(__FILE__, 0x273) Tokenizer(buffer);
