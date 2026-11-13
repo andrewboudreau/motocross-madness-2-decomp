@@ -614,3 +614,81 @@ Blocked merges:
   addends. Neither layout follows retail's order (0x0067c3f8..0x0067c4a4).
   The view and the `config/game_build.json` Init link alias therefore stay.
 - `UnknownQuarryRace` to `BikeRace` was not retried (Wave 8 blocker).
+
+## Wave 10: placeholder types
+
+Wave 10 names mid-tier `Unknown*` types that are not views of a named
+class. Each rename went through every tracked consumer, including source,
+bindings keys, calibration and emulator case symbols, tests and docs. It
+also covered mangled names, where the identifier follows a type code and
+ends at `@`. The proof is the Wave 8 comparer, run against a snapshot of
+09687116 with the cumulative old-to-new map. It covers every unit in src,
+samples and tests/fixtures whose include closure reaches a changed file.
+Every unit is IDENTICAL, IDENTICAL-COMDAT-ORDER, NAME-ONLY or
+NAME-ONLY-COMDAT-ORDER. Fixtures that make VC6 `/O2` fail with C1001 are
+compiled with `/Od`, as their tests do (follow_camera_tick_compare.cpp).
+
+Negative controls:
+
+- Leaving out the map reports DIFF for the nine PeakHold NAME-ONLY units.
+- Changing a live float compare in Terrain.cpp (`dir.y > 0.0f` to `0.25f`
+  in `TerrainClipRayToPlaneY`) reports DIFF: a new `__real` constant and
+  changed relocations.
+- Renaming Game.cpp's file static `s_UnknownFile65b4ac` *with* the map
+  applied still reports DIFF. VC6 places `.bss` statics by name, not by
+  declaration order, and the rename moved it from 0x2c to 0x4c. Swapping
+  the declaration order of two statics leaves every offset unchanged. This
+  is the mechanism behind the Wave 9 `UnknownKrustyUIShadow` blocker. None
+  of the Wave 10 renames moved a `.bss` symbol.
+- Rebuilding unchanged units gives IDENTICAL objects. COMDAT reorders
+  therefore come from the renamed identifiers.
+
+Whole-object and partial pins hash symbol names. After the comparer passed,
+they were repinned by rerunning their tests. Only digest lines changed;
+section and relocation counts were unchanged. Pins whose rows sort COMDATs
+did not move. Calibration was unchanged (3058 cases, 3005/3014 strict
+pairs, no per-case difference), as were the physics samples (1085/1152
+strict) and the unit layout sweep (130 identical).
+
+| Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- |
+| `UnknownPeakHold` | `PeakHold` | 3 | 12-byte value (0x004cb670..0x004cb6d8). `Record` raises the peak or restarts it once `holdTime` has passed; `Peak` returns 0 when stale. Used for Game.cpp's ten profile-page peaks and the terrain, eco and visibility cache peaks. No string names it. 50 units: 38 identical, 3 COMDAT order, 9 name-only. |
+| `UnknownEcoDefinition`, `UnknownEcoCollisionDefinition` | `VegetationDefinition`, `VegetationCollisionDefinition` | 3 | One "Vegetation_%d" section of the .est file (0x210 bytes, constructor 0x00455de0, keys "BillboardName", "MeanHeight", ...), and one of its "CollisionObject%i" entries (0x24 bytes). `Vegetation` is the placed instance. 9 units: 5 identical, 4 name-only. |
+| `UnknownEngineGearbox`, `UnknownGearShiftRange`, `UnknownTorque()`, `UnknownPower()` | `EngineGearbox`, `GearShiftRange`, `TorqueAtCurrentRpm()`, `PowerAtCurrentRpm()` | 3 | 0x1e4 bytes, 0x004d2940..0x004d333f, allocated by Vehicle.cpp. It builds the rpm/torque curve ("Rpm Limits (%d,%d) invalid in %s") and the per-gear shift windows ("Gear Ratios invalid in %s", "Unable to find optimum shift range for GEAR=%d"). The two inline lookups interpolate the torque and power curves at `currentRpm`. 38 units: 30 identical, 1 COMDAT order, 7 name-only. |
+| `UnknownSoultreeLod`, `UnknownSoultreeSurface` | `SoultreeLod`, `SoultreeSurface` | 2 | The .slt reader's section names "LOD %i" and "LOD %i - Surface %i" (with "- Vertices", "- Faces" and "- Object Pointer List") name the 8-byte LOD and the 0x38-byte surface records. |
+| `UnknownSoultreeVertex`, `UnknownSoultreeFaceGroup`, `UnknownSoultreeUV` | `SoultreeVertex`, `SoultreeVertexGroup`, `SoultreeUV` | 3 | The 0x20-byte vertex in the D3DLVERTEX layout (FVF 0x1e2). The 0x14-byte per-node vertex group transformed by `TransformVertexGroups`. The u/v pair. The soultree families together: 80 units, 65 identical, 11 COMDAT order, 4 name-only. |
+| `UnknownTextureRegion` | `CacheTextureRegion` | 3 | 0x30-byte quadtree node of a CacheTexture page (RTTI `CacheTexture`), taken from TextureMapManager+0x70's pool; a leaf holds at most one ManagedTexture. 36 units: 25 identical, 11 name-only. |
+| `UnknownGameUiListRow` | `UIListBoxRow` | 3 | 0x38-byte row of UIListBox's (RTTI) `rowTable` (+0x214). GameUi.cpp allocates, grows, sorts and clears the table in rows of this size. 70 units: 57 identical, 13 COMDAT order (the type is in no symbol). |
+| `UnknownPCAudioObject`, `UnknownPCAudioObject::UnknownThreadProc` | `SoundMemoryManager`, `SoundMemoryManager::LoaderThreadProc` | 3 | The 0x54-byte object at PCSoundInterface+0x46c (the field is already `soundMemoryManager`). Its thread (0x004bdc00, started by `StartLoaderThread`) creates and fills queued streamed sounds and evicts idle ones to stay within the byte budget. No string or RTTI names it. `UnknownSoundNotifier::UnknownThreadProc` (0x004bb630) is a different function and stays. 40 units: 32 identical, 3 COMDAT order, 5 name-only. |
+| `UnknownTrackGameObject3400` | `TrackRecord` | 2 | The 0xe8-byte high-score table at TrackGame+0x3400. Its constructor 0x0051ef30 pushes the TrackRecord.cpp `__FILE__` literal (0x0057536c), as for `ProCircuit` and `TextService`. The unit also holds `TrackRecordDlg` (RTTI), so the class name is tier 2 at most ([TRACKRECORD](TRACKRECORD.md)). |
+| `UnknownTrackRecord` | `TrackRecordEntry` | 3 | The table's 0x14-byte entry (16-byte name and a float time or score; constructor 0x0051ee90). TrackRecord.h's families: 173 units, 146 identical, 12 COMDAT order, 15 name-only (cumulative map). |
+| `UnknownBikeRaceNode` | `RaceGate` | 3 | The 0x3c-byte box chained from BikeRace+0xc8. `AppendNode` DebugCallocs one per course gate, and RaceStatus counts laps through it. "Gate" is the game's own term ("LstNumGates", "ChkRandomGates", "StartGate.slb"). The start and finish probes (+0xcc, +0x108) share the layout. 180 units: 151 identical, 10 COMDAT order, 16 name-only, 3 name-only with COMDAT order (cumulative). |
+
+Left as placeholders:
+
+- EcoSystem `field_0x588[8]` and `field_0x598`. The only write is
+  `field_0x598 = 0xcd` in the constructor, and no reader was found.
+- EngineGearbox `field_0x74`, `field_0x80`, `field_0x14c` and
+  `field_0x1d8`. A scan of retail operands finds them written only inside
+  0x004d2940..0x004d3340 (the constructor), so no consumer gives a role.
+- UIListBoxRow `field_0x2c` and `field_0x30`.
+- `UnknownSoultreeMesh` (MorphBastardModifier.h). It is a view of
+  `SoultreeSurface` with MorphBastard member types (`MorphBastardVertex*`,
+  `MorphBastardFace*`, `int* uvs`), so merging it is a type change, not a
+  rename.
+- `UnknownSoultreeScreenRect` and `UnknownSoultreeCameraView`. The first
+  holds two 16-byte blocks, and only the one at +0x298 is shown to be a
+  rectangle. The second is a partial camera view that ObjectPicker.h's
+  `UnknownPickCamera` mirrors.
+- `UnknownBikeRaceBikeSetup` (BikeRace.h). It is a view of `KbBikeSetup`
+  (krusty2 vehicle/KrustyBikeTypes.h), but `fourStroke` is `int` here and
+  `char` there. BikeRace.h is scheduling-sensitive (Wave 8), so the merge
+  needs its own byte proof.
+- `UnknownBikeRaceNodeOwner`, `UnknownBikeRaceNodeSource` and
+  `UnknownBikeRaceNodeEntry`. These are the event-side gate records that
+  `BuildNodeList` reads, which are different types from `RaceGate`.
+- Out of scope by request: the views of named classes (`UnknownEventRacer`,
+  `UnknownGuiControl`, `UnknownBikeRaceRacer`, `UnknownKrustyBikeView`,
+  `UnknownQuarryRace`, `UnknownTexturePalette`) and the shared stubs
+  `UnknownFunction4de580`, `UnknownFunction464e80` and
+  `UnknownFunction464e90`.
