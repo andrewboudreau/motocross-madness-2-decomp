@@ -22,15 +22,15 @@ UnknownStatic65b478::~UnknownStatic65b478() {
 
 // 0x004676c0
 void UnknownStatic65b478::AddFont(FontTexture* font) {
-    UnknownFontTextureNode* last = 0;
-    UnknownFontTextureNode* node;
+    FontTextureNode* last = 0;
+    FontTextureNode* node;
 
     for (node = firstNode; node; node = node->next)
         last = node;
     if (!last)
-        firstNode = new(__FILE__, 25) UnknownFontTextureNode(font);
+        firstNode = new(__FILE__, 25) FontTextureNode(font);
     else
-        last->next = new(__FILE__, 29) UnknownFontTextureNode(font);
+        last->next = new(__FILE__, 29) FontTextureNode(font);
     nodeCount++;
 }
 
@@ -39,8 +39,8 @@ void UnknownStatic65b478::AddFont(FontTexture* font) {
 // merges the two into one tail, which keeps the delete's stack cleanup
 // apart from the release call's (retail's two `add esp, 4`).
 void UnknownStatic65b478::DeleteFont(FontTexture* font) {
-    UnknownFontTextureNode* previous = 0;
-    UnknownFontTextureNode* node;
+    FontTextureNode* previous = 0;
+    FontTextureNode* node;
 
     for (node = firstNode; node; node = node->next) {
         if (font == node->font) {
@@ -61,7 +61,7 @@ void UnknownStatic65b478::DeleteFont(FontTexture* font) {
 
 // 0x004677c0
 void UnknownStatic65b478::DeleteFonts() {
-    UnknownFontTextureNode* node;
+    FontTextureNode* node;
 
     while ((node = firstNode) != 0) {
         firstNode = node->next;
@@ -74,8 +74,8 @@ void UnknownStatic65b478::DeleteFonts() {
 // 0x004677f0: the node whose font is named `name`, or 0. Written as
 // `while (1)` with breaks, the `node != 0` test stays at the top of the
 // loop as in retail; a `while (node && ...)` condition is rotated.
-UnknownFontTextureNode* UnknownStatic65b478::FindFont(const char* name) {
-    UnknownFontTextureNode* node = firstNode;
+FontTextureNode* UnknownStatic65b478::FindFont(const char* name) {
+    FontTextureNode* node = firstNode;
 
     while (1) {
         if (!node)

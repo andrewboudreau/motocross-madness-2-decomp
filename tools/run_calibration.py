@@ -22291,7 +22291,7 @@ CASES = [
         'name': 'FontTextureManager.cpp 0x4677f0 lookup by name',
         'bindings': 'src/reconstructed/FontTextureManager.bindings.json',
         'source': 'src/reconstructed/FontTextureManager.cpp',
-        'symbol': '?FindFont@UnknownStatic65b478@@QAEPAUUnknownFontTextureNode@@PBD@Z',
+        'symbol': '?FindFont@UnknownStatic65b478@@QAEPAUFontTextureNode@@PBD@Z',
         'target_va': '0x004677f0',
         'target_size': 88,
         'reason': 'inline strcmp walk; while(1)+break keeps the loop unrotated',

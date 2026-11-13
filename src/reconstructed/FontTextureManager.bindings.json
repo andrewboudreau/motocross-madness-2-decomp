@@ -9,6 +9,6 @@
   "?AddFont@UnknownStatic65b478@@QAEXPAVFontTexture@@@Z": "0x004676c0",
   "?DeleteFont@UnknownStatic65b478@@QAEXPAVFontTexture@@@Z": "0x00467760",
   "?DeleteFonts@UnknownStatic65b478@@QAEXXZ": "0x004677c0",
-  "?FindFont@UnknownStatic65b478@@QAEPAUUnknownFontTextureNode@@PBD@Z": "0x004677f0",
+  "?FindFont@UnknownStatic65b478@@QAEPAUFontTextureNode@@PBD@Z": "0x004677f0",
   "__FILE__": "0x0056b2fc"
 }

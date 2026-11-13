@@ -94,7 +94,7 @@ TextureMap* FontTexture::GetTexture() {
 // it, and a block around the cell loop's locals moves their stack slots.
 FontTexture* FontTexture::Load(const char* name, const char* path, const char* textureName,
                                                 int format, TextureMapManager* manager, int a5) {
-    UnknownFontTextureNode* node;
+    FontTextureNode* node;
     FileStream* stream;
     unsigned int count;
     FontTexture* font;

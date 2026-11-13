@@ -7,11 +7,11 @@ class FontTexture;
 // Names are provisional.
 
 // List node (8 bytes, allocated at lines 25 and 29).
-struct UnknownFontTextureNode {
-    UnknownFontTextureNode(FontTexture* font) : font(font), next(0) {}
+struct FontTextureNode {
+    FontTextureNode(FontTexture* font) : font(font), next(0) {}
 
     FontTexture* font;
-    UnknownFontTextureNode* next;
+    FontTextureNode* next;
 };
 
 // The list. Game.cpp calls 0x004677c0 on the static object at 0x0065b478
@@ -28,9 +28,9 @@ public:
     void DeleteFont(FontTexture* font);
     void DeleteFonts();             // 0x004677c0: deletes every font
     // 0x004677f0: the node of the font named `name`, or 0.
-    UnknownFontTextureNode* FindFont(const char* name);
+    FontTextureNode* FindFont(const char* name);
 
-    UnknownFontTextureNode* firstNode;        // first node
+    FontTextureNode* firstNode;        // first node
     int nodeCount;                            // node count
 };
 
