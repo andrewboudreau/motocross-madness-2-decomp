@@ -54,7 +54,7 @@ public:
     // 0x004c7480: creates the texture surface from +0x70 (or shares it).
     virtual int CreateTextureSurface(int upload, int asRenderTarget, int localVideo);
     // 0x004c7640: uploads +0x70 into +0x74, level by level.
-    virtual int Upload(struct UnknownRect* rect, int mode);
+    virtual int Upload(struct Win32Rect* rect, int mode);
     virtual void ReleaseTextureSurface();     // 0x004c7610: releases the texture surface
     virtual int SetAsTexture();               // 0x004c7970: sets it as texture stage 0
     virtual void RecreateIfLost();            // 0x004c6040: restores a lost surface
@@ -71,7 +71,7 @@ public:
     // 0x004c7b40: copies `rect` of +0x70 to (x, y) in `destination`,
     // blending through `table` when given.
     int CopyRectTo(unsigned long x, unsigned long y, DirectDrawSurface* destination,
-                              struct UnknownRect* rect, int flags, unsigned char* table);
+                              struct Win32Rect* rect, int flags, unsigned char* table);
     // 0x004c7b00: blits +0x70 into `destination` unless `skip`.
     int BlitTo(void* destinationRect, DirectDrawSurface* destination,
                               void* sourceRect, int flags, int skip);

@@ -24,7 +24,7 @@
   "?GetDXVersion@@YAXPAK00@Z": "0x00448560",
   "?Push@MemTagStack@@QAEHPBD@Z": "0x004a2d00",
   "?RecordExceptionInfo@@YAHPAU_EXCEPTION_POINTERS@@PBD@Z": "0x0045ff80",
-  "?SetWindowRect@PCGame@@QAEXPBUUnknownRect@@@Z": "0x004c0470",
+  "?SetWindowRect@PCGame@@QAEXPBUWin32Rect@@@Z": "0x004c0470",
   "?StartUp@PCGame@@QAEHPAD@Z": "0x004bfc50",
   "?StoreMainWindow@@YAXPAX@Z": "0x00447910",
   "?SetDevicesAcquired@PCControlInterface@@QAEXH@Z": "0x004bf490",

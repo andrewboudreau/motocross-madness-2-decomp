@@ -16,7 +16,7 @@
 // the destination. Every non-8-bit format follows the WORD path and reads
 // a byte through the destination WORD value, including its low-address fault.
 int PCTextureMap::CopyRectTo(unsigned long x, unsigned long y, DirectDrawSurface* destination,
-                                        UnknownRect* rect, int flags, unsigned char* table) {
+                                        Win32Rect* rect, int flags, unsigned char* table) {
     DDSurfaceDesc2 source;
     DDSurfaceDesc2 target;
     long left, top, right, bottom;

@@ -31,7 +31,7 @@ struct Scenario {
 };
 static Scenario scenario;
 struct EventRecord {
-    int op,args[20]; UnknownRect rect;
+    int op,args[20]; Win32Rect rect;
     void* gameDisplay; void* gameTarget;
 };
 struct Observation {
@@ -135,7 +135,7 @@ int PCVideoCard::SetFullscreenDisplayMode(int mode,int windowed){
     modeIndex=mode;Event(14,Identity(this),mode,windowed);currentDisplayMode=mode;
     return !(scenario.modeFailMask&(1<<mode));
 }
-int TestPartialTextureUpload(PCRenderTarget* target,UnknownRect* area,PCTextureMap* image,
+int TestPartialTextureUpload(PCRenderTarget* target,Win32Rect* area,PCTextureMap* image,
     PCTextureMap* expected,PCTextureMap* rendered,PCVideoCard* display,int present){
     EventRecord& r=Event(15,Identity(target),Identity(image),Identity(expected),Identity(rendered),Identity(display));
     r.args[5]=present;r.args[6]=passes;r.rect=*area;
@@ -287,7 +287,7 @@ void PCRenderTarget::DisableAlphaTest(){Fail(86);}
 int PCTextureMap::LoadSurface(FileStream*,int,int,int,int,int,int,UnknownTexturePalette*,int,void*,int,int,TextureContext*,int,unsigned int){Fail(86);return 0;}
 TextureMap* PCTextureMap::Clone(){Fail(86);return 0;}
 int PCTextureMap::IsResident(){Fail(86);return 0;}
-int PCTextureMap::Upload(UnknownRect*,int){Fail(86);return 0;}
+int PCTextureMap::Upload(Win32Rect*,int){Fail(86);return 0;}
 void PCTextureMap::ReleaseTextureSurface(){Fail(86);}
 int PCTextureMap::SetAsTexture(){Fail(86);return 0;}
 void PCTextureMap::RecreateIfLost(){Fail(86);}

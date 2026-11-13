@@ -4,14 +4,14 @@
 #include "PCRenderTarget.h"
 
 // Minimal Win32 shapes PCGame keeps by value.
-struct UnknownRect {
+struct Win32Rect {
     long left;
     long top;
     long right;
     long bottom;
 };
 
-struct UnknownOSVersionInfo {               // OSVERSIONINFOA (0x94 bytes)
+struct OSVersionInfo {               // OSVERSIONINFOA (0x94 bytes)
     unsigned long size;
     unsigned long majorVersion;
     unsigned long minorVersion;
@@ -58,7 +58,7 @@ public:
     // Game+0x10 is always the PCRenderTarget that slot 31 creates.
     PCRenderTarget* PCTarget() { return (PCRenderTarget*)renderTarget; }
 
-    void SetWindowRect(const UnknownRect* rect);          // 0x004c0470
+    void SetWindowRect(const Win32Rect* rect);          // 0x004c0470
     // 0x004c0760: in full screen, marks modes larger than width x height
     // unusable (unless the display keeps them).
     int LimitDisplayModes(PCVideoCard* display, int width, int height);
@@ -73,13 +73,13 @@ public:
     int LoadDisplayProfile(PCVideoCard* display);     // 0x004c16f0: loads its profile
 
     Guid deviceGuid;                   // Direct3D device GUID ("Renderer" setting)
-    UnknownRect windowRect;                    // +0x308: window rectangle (slot 32)
+    Win32Rect windowRect;                    // +0x308: window rectangle (slot 32)
     void* instanceHandle;                      // +0x318: instance handle
     void* windowHandle;                        // +0x31c: window handle
     char companyName[0x80];                   // "Rainbow Studios"
     char applicationName[0x80];                // +0x3a0: "Rainbow Demo"
     void* resourceInstance;                    // +0x420: string resource instance (defaults to +0x318)
-    UnknownOSVersionInfo osVersion;            // +0x424
+    OSVersionInfo osVersion;            // +0x424
     char registryKey[0x80];                    // +0x4b8: "SOFTWARE\\Rainbow Studios\\Demo"
     void* imeLibrary;                          // +0x538: IMM32.DLL
     void* inputContext;                        // +0x53c: created input context

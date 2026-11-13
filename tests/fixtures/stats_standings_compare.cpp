@@ -30,7 +30,7 @@ static DWORD& At(void*p,int n){return *(DWORD*)((BYTE*)p+n);}
 static StatsOverlay* OverlayObject(){return (StatsOverlay*)w.overlay;}
 static PCTextureMap* Texture(int i){return (PCTextureMap*)w.texture[i];}
 template<class T>static DWORD Address(T p){if(sizeof(p)!=4)ExitProcess(80);union{T p;DWORD n;}u;u.p=p;return u.n;}
-class TextureCalls{public:int Upload(UnknownRect*r,int n){return ((PCTextureMap*)this)->PCTextureMap::Upload(r,n);}void*Lock(void*r,long*p,int f){return ((PCTextureMap*)this)->PCTextureMap::LockSurface(r,p,f);}int Unlock(void*r){return ((PCTextureMap*)this)->PCTextureMap::UnlockSurface(r);}};
+class TextureCalls{public:int Upload(Win32Rect*r,int n){return ((PCTextureMap*)this)->PCTextureMap::Upload(r,n);}void*Lock(void*r,long*p,int f){return ((PCTextureMap*)this)->PCTextureMap::LockSurface(r,p,f);}int Unlock(void*r){return ((PCTextureMap*)this)->PCTextureMap::UnlockSurface(r);}};
 static void Number(char*&p,int v){if(v<0){*p++='-';v=-v;}char b[16];int n=0;do{b[n++]=(char)('0'+v%10);v/=10;}while(v);while(n)*p++=b[--n];}
 static int Score(int id){return sc.tie?17:(sc.reverse?id*13-50:50-id*13);}
 static void Line(char*text,int rank,int id){char*p=text;Number(p,rank);*p++=')';*p++=' ';*p++='R';Number(p,id);*p++=' ';*p++=':';*p++=' ';Number(p,Score(id));*p=0;}

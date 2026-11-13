@@ -113,7 +113,7 @@ class CacheTextureMipsBehaviorTests(unittest.TestCase):
             _, cache = compile_source(ROOT / 'src/reconstructed/CacheTexture.cpp', 'cache')
             for provider, name, va, size, owner in [
                 (managed, '?UpdatePageCoords@ManagedTexture@@QAEXH@Z', 0x510610, 85, 'ManagedTexture'),
-                (pc, '?Upload@PCTextureMap@@UAEHPAUUnknownRect@@H@Z', 0x4c7640, 385, 'PCTextureMap'),
+                (pc, '?Upload@PCTextureMap@@UAEHPAUWin32Rect@@H@Z', 0x4c7640, 385, 'PCTextureMap'),
                 (cache, '?PlaceTextures@CacheTexture@@QAEHPAV?$ContainerList@PAVManagedTexture@@@@0@Z',
                  0x50fdb0, 492, 'CacheTexture'),
             ]:

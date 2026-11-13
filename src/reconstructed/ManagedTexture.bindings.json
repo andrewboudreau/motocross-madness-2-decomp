@@ -41,7 +41,7 @@
   "?IsResident@ManagedTexture@@UAEHXZ": "0x00510980",
   "?CreateTextureSurface@ManagedTexture@@UAEHHHH@Z": "0x00510750",
   "?CreateTextureSurface@PCTextureMap@@UAEHHHH@Z": "0x004c7480",
-  "?Upload@PCTextureMap@@UAEHPAUUnknownRect@@H@Z": "0x004c7640",
+  "?Upload@PCTextureMap@@UAEHPAUWin32Rect@@H@Z": "0x004c7640",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__real@4@40029000000000000000": "0x00558484"
 }

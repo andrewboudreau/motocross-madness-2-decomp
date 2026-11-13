@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-struct DirectDrawSurface;struct UnknownRect;
-class PCTextureMap{public:int CopyRectTo(unsigned long,unsigned long,DirectDrawSurface*,UnknownRect*,int,unsigned char*);};
+struct DirectDrawSurface;struct Win32Rect;
+class PCTextureMap{public:int CopyRectTo(unsigned long,unsigned long,DirectDrawSurface*,Win32Rect*,int,unsigned char*);};
 static BYTE referenceSpace[0x800000]={1};
 struct Surface{DWORD table;int locks,unlocks;};
 struct World{BYTE texture[0xc0],buffers[2][8192],lookup[65536];Surface surfaces[3];int rect[4];};
@@ -48,8 +48,8 @@ static int MapReference(const char* path){
  return FlushInstructionCache(GetCurrentProcess(),0,0);
 }
 static int Filter(EXCEPTION_POINTERS* e){if(e->ExceptionRecord->ExceptionCode!=EXCEPTION_ACCESS_VIOLATION)return EXCEPTION_CONTINUE_SEARCH;observed.exception=e->ExceptionRecord->ExceptionCode;observed.faultKind=e->ExceptionRecord->ExceptionInformation[0];observed.faultAddress=e->ExceptionRecord->ExceptionInformation[1];return EXCEPTION_EXECUTE_HANDLER;}
-static void Invoke(){union{int(PCTextureMap::*method)(unsigned long,unsigned long,DirectDrawSurface*,UnknownRect*,int,unsigned char*);DWORD address;}call;call.method=&PCTextureMap::CopyRectTo;if(retailActive)call.address=0x4c7b40;
- __try{observed.result=(((PCTextureMap*)world.texture)->*call.method)(scenario.x,scenario.y,(DirectDrawSurface*)&world.surfaces[scenario.alias==4?0:1],scenario.invalid==4?0:(UnknownRect*)world.rect,scenario.flags,scenario.table?world.lookup:0);observed.completed=1;}__except(Filter(GetExceptionInformation())){}}
+static void Invoke(){union{int(PCTextureMap::*method)(unsigned long,unsigned long,DirectDrawSurface*,Win32Rect*,int,unsigned char*);DWORD address;}call;call.method=&PCTextureMap::CopyRectTo;if(retailActive)call.address=0x4c7b40;
+ __try{observed.result=(((PCTextureMap*)world.texture)->*call.method)(scenario.x,scenario.y,(DirectDrawSurface*)&world.surfaces[scenario.alias==4?0:1],scenario.invalid==4?0:(Win32Rect*)world.rect,scenario.flags,scenario.table?world.lookup:0);observed.completed=1;}__except(Filter(GetExceptionInformation())){}}
 static void Run(int retail){retailActive=retail;memset(&observed,0,sizeof(observed));observed.result=-999;memset(&world,0,sizeof(world));for(int i=0;i<3;++i)world.surfaces[i].table=(DWORD)surfaceTable;At(world.texture,0x70)=(DWORD)&world.surfaces[0];
  for(int k=0;k<8192;++k){world.buffers[0][k]=(BYTE)(k*19+scenario.seed);world.buffers[1][k]=(BYTE)(k*7+scenario.seed*3);}for(int n=0;n<65536;++n)world.lookup[n]=(BYTE)((n>>8)*13+(n&255)*7+scenario.seed);
  if(scenario.bits!=8)*(WORD*)(world.buffers[1]+4096)=(WORD)scenario.word;

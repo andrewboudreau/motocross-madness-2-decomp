@@ -18,7 +18,7 @@ CameraRect g_DrawImageSourceRect;
 // 0x005777d8 / 0x005777c8: the same for 0x00404700, whose source rectangle
 // goes to PCTextureMap 0x004c7b40.
 CameraRect g_DrawImageRectClipRect;
-UnknownRect g_DrawImageRectSourceRect;
+Win32Rect g_DrawImageRectSourceRect;
 // 0x005777e8: the drawn rectangle 0x00404700 records for its region.
 CameraRect g_DrawImageRectDrawnRect;
 
@@ -319,8 +319,8 @@ int BackgroundImage::DrawImageRect(PCTextureMap* image, int x, int y, CameraRect
         if (copyValid) {
             if (*frames) {
                 ReleaseDc();
-                image->CopyRectTo(x, y, offscreenCopy, (UnknownRect*)rect, flags, table);
-                image->CopyRectTo(x, y, Target()->renderSurface, (UnknownRect*)rect, flags, table);
+                image->CopyRectTo(x, y, offscreenCopy, (Win32Rect*)rect, flags, table);
+                image->CopyRectTo(x, y, Target()->renderSurface, (Win32Rect*)rect, flags, table);
                 (*frames)--;
             } else {
                 for (int i = 0; i < regionCapacity; i++) {
@@ -348,7 +348,7 @@ int BackgroundImage::DrawImageRect(PCTextureMap* image, int x, int y, CameraRect
             }
         } else {
             ReleaseDc();
-            image->CopyRectTo(x, y, Target()->renderSurface, (UnknownRect*)rect, flags, table);
+            image->CopyRectTo(x, y, Target()->renderSurface, (Win32Rect*)rect, flags, table);
             *frames = Target()->frameModulus;
         }
         if (index >= 0)
@@ -356,7 +356,7 @@ int BackgroundImage::DrawImageRect(PCTextureMap* image, int x, int y, CameraRect
         return 1;
     }
     ReleaseDc();
-    image->CopyRectTo(x, y, Target()->renderSurface, (UnknownRect*)rect, flags, table);
+    image->CopyRectTo(x, y, Target()->renderSurface, (Win32Rect*)rect, flags, table);
     if (index >= 0) {
         g_DrawImageRectDrawnRect.left = x;
         g_DrawImageRectDrawnRect.right = rect->right - rect->left + x;

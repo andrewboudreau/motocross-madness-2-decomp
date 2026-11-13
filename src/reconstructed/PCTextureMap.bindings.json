@@ -154,7 +154,7 @@
   "?BuildMipLevels@PCTextureMap@@UAEHH@Z": "0x004c77d0",
   "?ApplyColorKey@PCTextureMap@@UAEHI@Z": "0x004c81d0",
   "?Clone@PCTextureMap@@UAEPAVTextureMap@@XZ$ehhandler": "0x0054cd34",
-  "?Upload@PCTextureMap@@UAEHPAUUnknownRect@@H@Z": "0x004c7640",
+  "?Upload@PCTextureMap@@UAEHPAUWin32Rect@@H@Z": "0x004c7640",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_DebugCountTextureMemory@@3HA": "0x00689964",

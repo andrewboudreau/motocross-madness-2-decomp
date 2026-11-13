@@ -7,7 +7,7 @@
   "?Clone@PCTextureMap@@UAEPAVTextureMap@@XZ": "0x004c71c0",
   "?Clone@PCTextureMap@@UAEPAVTextureMap@@XZ$ehhandler": "0x0054cd34",
   "?ConvertPixels@@YAHPAX0HHHHHHHPAUUnknownTexturePalette@@HI@Z": "0x004d1d20",
-  "?CopyRectTo@PCTextureMap@@QAEHKKPAUDirectDrawSurface@@PAUUnknownRect@@HPAE@Z": "0x004c7b40",
+  "?CopyRectTo@PCTextureMap@@QAEHKKPAUDirectDrawSurface@@PAUWin32Rect@@HPAE@Z": "0x004c7b40",
   "?CreateSurface@PCTextureMap@@UAEHPAXHHHHHHPAUUnknownTexturePalette@@H0HHHHPAUTextureContext@@HI@Z": "0x004c69c0",
   "?CreateSystemSurface@PCTextureMap@@QAEHPAUDDSurfaceDesc2@@HPAH@Z": "0x004c68e0",
   "?DumpLevel@PCTextureMap@@QAEHPAUDirectDrawSurface@@PBD@Z": "0x004c84e0",

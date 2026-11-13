@@ -496,14 +496,14 @@ failed:
 // applies the colour key. The level loop tests its two sizes in separate
 // `break`s: a `while (a && b)` condition is rotated to the bottom, retail
 // re-runs the test at the top of every pass.
-int PCTextureMap::Upload(UnknownRect* rect, int mode) {
+int PCTextureMap::Upload(Win32Rect* rect, int mode) {
     if (!systemSurface || !textureSurface)
         return 0;
     DirectDrawSurface* source = systemSurface;
     DirectDrawSurface* destination = textureSurface;
     if (mode > 0 || mode == -1 && g_TrackGame->display->partialTextureUploadResult > 0 ||
         g_TrackGame->display->partialTextureUploadResult <= 0) {
-        UnknownRect area;
+        Win32Rect area;
         if (rect && g_TrackGame->display->partialTextureUploadResult > 0) {
             area = *rect;
         } else {

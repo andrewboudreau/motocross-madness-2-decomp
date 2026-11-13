@@ -74,14 +74,14 @@ int CacheTexture::CopyMipLevels(CacheTextureRegion* region, int level) {
     region->occupant->UpdatePageCoords(level);
     float scale = 1.0f / (1 << level);
     int width = textureWidth;
-    UnknownRect rect;
+    Win32Rect rect;
     rect.left = (long)(width * region->left);
     rect.top = (long)(textureHeight * region->top);
     rect.right = (long)(((region->right - region->left) * scale + region->left) * width);
     rect.bottom = (long)(((region->bottom - region->top) * scale + region->top) * textureHeight);
     int side = rect.right - rect.left;
     int levelWidth = width;
-    UnknownRect whole = rect;
+    Win32Rect whole = rect;
     DirectDrawSurface* source = region->occupant->systemSurface;
     DirectDrawSurface* destination = systemSurface;
     DirectDrawSurface* nextSource = 0;

@@ -11,7 +11,7 @@ from mcm2tool.toolchain import find_child_ci, find_vc6_bin, infer_vc98_root, sha
 from tools.match import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-SYMBOL = '?CopyRectTo@PCTextureMap@@QAEHKKPAUDirectDrawSurface@@PAUUnknownRect@@HPAE@Z'
+SYMBOL = '?CopyRectTo@PCTextureMap@@QAEHKKPAUDirectDrawSurface@@PAUWin32Rect@@HPAE@Z'
 INDIRECT = {0x4c7b87: 'dword ptr [ecx + 0x1c]', 0x4c7bd5: 'dword ptr [ecx + 0x64]',
             0x4c7c07: 'dword ptr [ecx + 0x64]', 0x4c7dfb: 'dword ptr [ecx + 0x80]',
             0x4c7e13: 'dword ptr [ecx + 0x80]'}

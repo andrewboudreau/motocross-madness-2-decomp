@@ -39,7 +39,7 @@
   "?SetFullscreenDisplayMode@PCVideoCard@@QAEHHH@Z": "0x004ca900",
   "?CopyRenderSurfaceToTexture@@YAHPAVPCRenderTarget@@PAVTextureMap@@@Z": "0x004ca9f0",
   "?ProbePartialTextureUploads@PCVideoCard@@QAEHPAVRenderTarget@@@Z": "0x004cab00",
-  "?TestPartialTextureUpload@@YAHPAVPCRenderTarget@@PAUUnknownRect@@PAVPCTextureMap@@22PAVPCVideoCard@@H@Z": "0x004caf70",
+  "?TestPartialTextureUpload@@YAHPAVPCRenderTarget@@PAUWin32Rect@@PAVPCTextureMap@@22PAVPCVideoCard@@H@Z": "0x004caf70",
   "?MeanTextureChannelDifference@@YAMPAVTextureMap@@0@Z": "0x004cb330",
   "?SetGDISurfaceVisible@PCVideoCard@@QAEHH@Z": "0x004cb5b0",
   "?AdvanceFrame@RenderTarget@@QAEXXZ": "0x004e8cc0",

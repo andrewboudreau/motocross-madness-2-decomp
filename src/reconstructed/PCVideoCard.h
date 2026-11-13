@@ -13,7 +13,7 @@ class PCRenderTarget;
 class PCTextureMap;
 class RenderTarget;
 class TextureMap;
-struct UnknownRect;
+struct Win32Rect;
 
 // 0x430-byte device identifier, saved whole as "DriverInfo\\<name>\\
 // DeviceIdentifier" (the DDDEVICEIDENTIFIER2 size; inference).
@@ -150,6 +150,6 @@ int CopyRenderSurfaceToTexture(PCRenderTarget* target, TextureMap* texture);
 float MeanTextureChannelDifference(TextureMap* first, TextureMap* second);
 
 // 0x004caf70: one PartialTexBlt pass over `area` (see PCVideoCard.cpp).
-int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextureMap* image,
+int TestPartialTextureUpload(PCRenderTarget* target, Win32Rect* area, PCTextureMap* image,
     PCTextureMap* expected, PCTextureMap* rendered, PCVideoCard* display,
     int present);

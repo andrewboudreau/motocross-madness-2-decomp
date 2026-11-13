@@ -43,8 +43,8 @@
 // 640 x 480 x 16 target; -4: no texture surface.
 int PCVideoCard::ProbePartialTextureUploads(RenderTarget* target) {
     int result = 1;
-    UnknownRect area;
-    UnknownRect tile;
+    Win32Rect area;
+    Win32Rect tile;
     PCTextureMap* image;
     PCTextureMap* expected;
     PCTextureMap* rendered;

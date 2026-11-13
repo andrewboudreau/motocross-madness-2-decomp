@@ -13,7 +13,7 @@
 // USER32, KERNEL32, OLE32 and WINMM imports.
 extern "C" __declspec(dllimport) long __stdcall CoInitialize(void* reserved);
 extern "C" __declspec(dllimport) void __stdcall CoUninitialize();
-extern "C" __declspec(dllimport) int __stdcall GetVersionExA(UnknownOSVersionInfo* info);
+extern "C" __declspec(dllimport) int __stdcall GetVersionExA(OSVersionInfo* info);
 extern "C" __declspec(dllimport) unsigned int __stdcall timeBeginPeriod(unsigned int period);
 extern "C" __declspec(dllimport) unsigned int __stdcall timeEndPeriod(unsigned int period);
 extern "C" __declspec(dllimport) unsigned long __stdcall timeGetTime();
@@ -22,7 +22,7 @@ extern "C" __declspec(dllimport) unsigned long __stdcall GetCurrentDirectoryA(un
 extern "C" __declspec(dllimport) void* __stdcall LoadLibraryA(const char* name);
 extern "C" __declspec(dllimport) int __stdcall ShowCursor(int show);
 extern "C" __declspec(dllimport) void* __stdcall GetActiveWindow();
-extern "C" __declspec(dllimport) int __stdcall GetWindowRect(void* window, UnknownRect* rect);
+extern "C" __declspec(dllimport) int __stdcall GetWindowRect(void* window, Win32Rect* rect);
 extern "C" __declspec(dllimport) int __stdcall LoadStringA(void* instance, unsigned int id,
                                                           char* buffer, int size);
 extern "C" __declspec(dllimport) int __stdcall MessageBoxA(void* window, const char* text,
@@ -340,7 +340,7 @@ int PCGame::SwitchDisplayMode(int mode) {
 }
 
 // 0x004c0470
-void PCGame::SetWindowRect(const UnknownRect* rect) {
+void PCGame::SetWindowRect(const Win32Rect* rect) {
     windowRect = *rect;
 }
 

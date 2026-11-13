@@ -554,11 +554,11 @@ struct UnknownViewport {
 // the same area into `expected`, draws `rendered` full screen and reads
 // the frame back into it, then compares. 0: different, 1: same, 2: a
 // device call failed, 3: a lock failed.
-int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextureMap* image,
+int TestPartialTextureUpload(PCRenderTarget* target, Win32Rect* area, PCTextureMap* image,
     PCTextureMap* expected, PCTextureMap* rendered, PCVideoCard* display,
     int present) {
     UnknownViewport viewport;
-    UnknownRect clear;
+    Win32Rect clear;
     UnknownScreenVertex vertices[4];
     UnknownBltFx fx;
 

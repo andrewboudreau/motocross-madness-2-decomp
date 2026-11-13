@@ -212,7 +212,7 @@ LRESULT CALLBACK MainWindowProc(HWND window, UINT message, WPARAM wParam,
             GetClientRect(window, &rect);
             ClientToScreen(window, (POINT*)&rect.left);
             ClientToScreen(window, (POINT*)&rect.right);
-            g_TrackGame->SetWindowRect((UnknownRect*)&rect);
+            g_TrackGame->SetWindowRect((Win32Rect*)&rect);
         }
         break;
     case WM_CLOSE:
