@@ -2132,7 +2132,7 @@ int UIDialog::RenderPre3D() {
             dialogBackground->DrawImage(screenGrab, &screenArea, 0, 0x1000000,
                                                        grabRegion, 1, &grabCopyFrames, 0);
         else
-            ((RenderTarget*)UnknownInlineField18())->Blit(&screenArea,
+            ((RenderTarget*)GetRenderContext())->Blit(&screenArea,
                                                                                  screenGrab, 0, 0x1000000);
     }
     return 1;
@@ -2154,10 +2154,10 @@ int UIDialog::RenderPost3D() {
             dialogBackground->DrawImage(screenGrab, &screenArea, 0, 0x1000000,
                                                        grabRegion, 1, &grabCopyFrames, 0);
         else
-            ((RenderTarget*)UnknownInlineField18())->Blit(&screenArea,
+            ((RenderTarget*)GetRenderContext())->Blit(&screenArea,
                                                                                  screenGrab, 0, 0x1000000);
     }
-    if (isClosing && closeFrame != ((RenderTarget*)UnknownInlineField18())->frameCount)
+    if (isClosing && closeFrame != ((RenderTarget*)GetRenderContext())->frameCount)
         MarkPendingRelease();
     return 1;
 }
@@ -2362,7 +2362,7 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
     else
         post3D = 1;
     if (owner)
-        renderContext = owner->UnknownInlineField18();
+        renderContext = owner->GetRenderContext();
     permanent = 0;
     wordWrap = 0;
 }
@@ -3502,7 +3502,7 @@ void UIDialog::EndControlDraw(void* dc) {
     if (previousFont)
         SelectObject((HDC)dc, (HGDIOBJ)previousFont);
     if (!dialogBackground && dc)
-        ((PCRenderTarget*)UnknownInlineField18())->renderSurface->ReleaseDC(dc);
+        ((PCRenderTarget*)GetRenderContext())->renderSurface->ReleaseDC(dc);
     if (drawClipRegion)
         DeleteObject((HGDIOBJ)drawClipRegion);
 }
@@ -3700,7 +3700,7 @@ int UIDialog::BeginControlDraw(void** dc, CameraRect* rect, int* a, UIControl* c
                 dialogBackground->GetDc(dc, rect, -1, 0, &frames, a, &g_ControlDrawRect);
         }
     } else {
-        ((PCRenderTarget*)UnknownInlineField18())->renderSurface->GetDC(dc);
+        ((PCRenderTarget*)GetRenderContext())->renderSurface->GetDC(dc);
         g_ControlDrawResult = 1;
     }
     if (*dc && control) {
@@ -4246,11 +4246,11 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
                 last->length = mark - start;
             else
                 last->length = run->text - start - 2;
-            if (!((PCRenderTarget*)UnknownInlineField18())->renderSurface->GetDC(&dc)) {
+            if (!((PCRenderTarget*)GetRenderContext())->renderSurface->GetDC(&dc)) {
                 HGDIOBJ old = SelectObject((HDC)dc, (HGDIOBJ)(font ? font : dialogFont));
                 GetTextExtentPoint32A((HDC)dc, last->text, last->length, &extent);
                 SelectObject((HDC)dc, old);
-                ((PCRenderTarget*)UnknownInlineField18())->renderSurface->ReleaseDC(dc);
+                ((PCRenderTarget*)GetRenderContext())->renderSurface->ReleaseDC(dc);
             }
             last->width = extent.cx;
         }
@@ -4263,11 +4263,11 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
             runs[count - 1].length = mark - runs[count - 1].text;
         else
             runs[count - 1].length = length - (runs[count - 1].text - text);
-        if (!((PCRenderTarget*)UnknownInlineField18())->renderSurface->GetDC(&dc)) {
+        if (!((PCRenderTarget*)GetRenderContext())->renderSurface->GetDC(&dc)) {
             HGDIOBJ old = SelectObject((HDC)dc, (HGDIOBJ)(font ? font : dialogFont));
             GetTextExtentPoint32A((HDC)dc, runs[count - 1].text, runs[count - 1].length, &extent);
             SelectObject((HDC)dc, old);
-            ((PCRenderTarget*)UnknownInlineField18())->renderSurface->ReleaseDC(dc);
+            ((PCRenderTarget*)GetRenderContext())->renderSurface->ReleaseDC(dc);
             runs[count - 1].width = extent.cx;
         } else {
             runs[count - 1].width = 0;
@@ -4395,7 +4395,7 @@ int UIEditBox::OnKeyDown(int value) {
         }
         controlText[controlTextLength] = 0;
         void* dc;
-        if (!((PCRenderTarget*)ownerDialog->UnknownInlineField18())->renderSurface->GetDC(&dc)) {
+        if (!((PCRenderTarget*)ownerDialog->GetRenderContext())->renderSurface->GetDC(&dc)) {
             HGDIOBJ font = SelectObject((HDC)dc, (HGDIOBJ)(fontHandle ? fontHandle : (int)ownerDialog->dialogFont));
             SIZE size;
             GetTextExtentPoint32A((HDC)dc, controlText, controlTextLength, &size);
@@ -4403,7 +4403,7 @@ int UIEditBox::OnKeyDown(int value) {
             GetTextExtentPoint32A((HDC)dc, controlText, textLength, &size);
             textWidth = size.cx;
             SelectObject((HDC)dc, font);
-            ((PCRenderTarget*)ownerDialog->UnknownInlineField18())->renderSurface->ReleaseDC(dc);
+            ((PCRenderTarget*)ownerDialog->GetRenderContext())->renderSurface->ReleaseDC(dc);
         }
         RequestRedraw();
         return 1;

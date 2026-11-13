@@ -119,7 +119,7 @@ public:
     char* SplitTextLines(char* text, unsigned int color, void* font, void* table, int* size);
 
     // The render target (GameObject +0x18) as the controls read it.
-    void* UnknownInlineField18() { return renderContext; }
+    void* GetRenderContext() { return renderContext; }
 
     UIDialog* parentDialog;                   // +0x2c: parent dialog
     GUIManager* guiManager;                   // +0x30

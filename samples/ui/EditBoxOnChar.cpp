@@ -87,7 +87,7 @@ int UIEditBox::OnChar(int value) {
         }
         controlText[controlTextLength] = 0;
         void* dc;
-        if (!((PCRenderTarget*)ownerDialog->UnknownInlineField18())->renderSurface->GetDC(&dc)) {
+        if (!((PCRenderTarget*)ownerDialog->GetRenderContext())->renderSurface->GetDC(&dc)) {
             HGDIOBJ font = SelectObject((HDC)dc, (HGDIOBJ)(fontHandle ? fontHandle : (int)ownerDialog->dialogFont));
             SIZE size;
             GetTextExtentPoint32A((HDC)dc, controlText, controlTextLength, &size);
@@ -95,7 +95,7 @@ int UIEditBox::OnChar(int value) {
             GetTextExtentPoint32A((HDC)dc, controlText, textLength, &size);
             textWidth = size.cx;
             SelectObject((HDC)dc, font);
-            ((PCRenderTarget*)ownerDialog->UnknownInlineField18())->renderSurface->ReleaseDC(dc);
+            ((PCRenderTarget*)ownerDialog->GetRenderContext())->renderSurface->ReleaseDC(dc);
         }
         RequestRedraw();
         redrawFrames++;
