@@ -7,8 +7,8 @@ class DirectoryList;
 
 // A high-score entry, 0x14 bytes: ten of them are read and written as one
 // block. 0x0051ee90 is its constructor.
-struct UnknownTrackRecord {
-    UnknownTrackRecord();                     // 0x0051ee90
+struct TrackRecordEntry {
+    TrackRecordEntry();                       // 0x0051ee90
 
     char racerName[16];                       // +0x00 racer name
     float score;                              // +0x10 time or score
@@ -21,10 +21,10 @@ int CompareRecordsDescending(const void* a, const void* b);
 
 // The high-score table at TrackGame+0x3400 (0xe8 bytes, the size TrackGame
 // slot 4 allocates); its constructor references TrackRecord.cpp's __FILE__.
-class UnknownTrackGameObject3400 {
+class TrackRecord {
 public:
-    UnknownTrackGameObject3400();             // 0x0051ef30
-    ~UnknownTrackGameObject3400();            // 0x0051efc0
+    TrackRecord();                            // 0x0051ef30
+    ~TrackRecord();                           // 0x0051efc0
     void Clear();             // 0x0051efe0: clears the table
     int ReadRecord(short directory, const char* name); // 0x0051f0b0
     int Read(const char* path);                  // 0x0051f110: reads
@@ -35,7 +35,7 @@ public:
 
     int extensionIndex;                       // +0x00 selects the file extension
     char extensions[3][5];                    // +0x04 ".hs1", ".hs2", ".hs3"
-    UnknownTrackRecord records[10];           // +0x14
+    TrackRecordEntry records[10];             // +0x14
     DirectoryList* directoryList;             // +0xdc
     int recordCount;                          // +0xe0 record count
     int series;                               // +0xE4  the file's first word; RecordHighScoreTable's Write passes GetSelectedSeries()

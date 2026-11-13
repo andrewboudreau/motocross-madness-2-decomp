@@ -21,7 +21,7 @@ before it. `0x005206a0` writes another class's vtable (`0x005588c4`) and
 
 ## Data
 
-- **High-score table** (`UnknownTrackGameObject3400`, 0xe8 bytes, at
+- **High-score table** (`TrackRecord`, 0xe8 bytes, at
   TrackGame+0x3400). It holds an extension index (+0x00) and the extensions
   `.hs1`, `.hs2` and `.hs3` (+0x04, 5 bytes each). Then come ten records
   (+0x14), a DirectoryList (+0xdc), the record count (+0xe0) and a stored

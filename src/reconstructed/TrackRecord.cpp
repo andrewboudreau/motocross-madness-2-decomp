@@ -11,7 +11,7 @@
 #include "MenuId.h"
 
 // 0x0051ee90: an empty name and no value.
-UnknownTrackRecord::UnknownTrackRecord()
+TrackRecordEntry::TrackRecordEntry()
 {
     int sourceLength = strlen("");
     int length = sourceLength > 15 ? 15 : sourceLength;
@@ -23,9 +23,9 @@ UnknownTrackRecord::UnknownTrackRecord()
 // 0x0051eed0
 int CompareRecordsAscending(const void* a, const void* b)
 {
-    if (((UnknownTrackRecord*)a)->score < ((UnknownTrackRecord*)b)->score)
+    if (((TrackRecordEntry*)a)->score < ((TrackRecordEntry*)b)->score)
         return -1;
-    if (((UnknownTrackRecord*)a)->score == ((UnknownTrackRecord*)b)->score)
+    if (((TrackRecordEntry*)a)->score == ((TrackRecordEntry*)b)->score)
         return 0;
     return 1;
 }
@@ -33,15 +33,15 @@ int CompareRecordsAscending(const void* a, const void* b)
 // 0x0051ef00
 int CompareRecordsDescending(const void* a, const void* b)
 {
-    if (((UnknownTrackRecord*)a)->score < ((UnknownTrackRecord*)b)->score)
+    if (((TrackRecordEntry*)a)->score < ((TrackRecordEntry*)b)->score)
         return 1;
-    if (((UnknownTrackRecord*)a)->score == ((UnknownTrackRecord*)b)->score)
+    if (((TrackRecordEntry*)a)->score == ((TrackRecordEntry*)b)->score)
         return 0;
     return -1;
 }
 
 // 0x0051ef30
-UnknownTrackGameObject3400::UnknownTrackGameObject3400()
+TrackRecord::TrackRecord()
 {
     directoryList = new(__FILE__, 47) DirectoryList;
     extensionIndex = 0;
@@ -49,7 +49,7 @@ UnknownTrackGameObject3400::UnknownTrackGameObject3400()
 }
 
 // 0x0051efc0
-UnknownTrackGameObject3400::~UnknownTrackGameObject3400()
+TrackRecord::~TrackRecord()
 {
     if (directoryList) {
         delete directoryList;
@@ -58,11 +58,11 @@ UnknownTrackGameObject3400::~UnknownTrackGameObject3400()
 }
 
 // 0x0051efe0: empties the table and restores the extensions.
-void UnknownTrackGameObject3400::Clear()
+void TrackRecord::Clear()
 {
     recordCount = 0;
     for (int i = 0; i < 10; i++)
-        records[i] = UnknownTrackRecord();
+        records[i] = TrackRecordEntry();
     strcpy(extensions[0], ".hs1");
     strcpy(extensions[1], ".hs2");
     strcpy(extensions[2], ".hs3");
@@ -70,7 +70,7 @@ void UnknownTrackGameObject3400::Clear()
 }
 
 // 0x0051f0b0: reads `name` from one of TrackGameMode's directories.
-int UnknownTrackGameObject3400::ReadRecord(short directory, const char* name)
+int TrackRecord::ReadRecord(short directory, const char* name)
 {
     char path[260];
     sprintf(path, "%s\\%s", g_TrackGame->mode.seriesDirectories[directory], name);
@@ -78,7 +78,7 @@ int UnknownTrackGameObject3400::ReadRecord(short directory, const char* name)
 }
 
 // 0x0051f110: reads the table from `path` plus the current extension.
-int UnknownTrackGameObject3400::Read(const char* path)
+int TrackRecord::Read(const char* path)
 {
     char name[260];
     Clear();
@@ -88,13 +88,13 @@ int UnknownTrackGameObject3400::Read(const char* path)
         return 0;
     fread(&series, 4, 1, file);
     fread(&recordCount, 4, 1, file);
-    fread(records, sizeof(UnknownTrackRecord), 10, file);
+    fread(records, sizeof(TrackRecordEntry), 10, file);
     fclose(file);
     return 1;
 }
 
 // 0x0051f1b0: writes the table to `path` plus the current extension.
-int UnknownTrackGameObject3400::Write(const char* path, int value)
+int TrackRecord::Write(const char* path, int value)
 {
     char name[260];
     series = value;
@@ -104,13 +104,13 @@ int UnknownTrackGameObject3400::Write(const char* path, int value)
         return 0;
     fwrite(&series, 4, 1, file);
     fwrite(&recordCount, 4, 1, file);
-    fwrite(records, sizeof(UnknownTrackRecord), 10, file);
+    fwrite(records, sizeof(TrackRecordEntry), 10, file);
     fclose(file);
     return 1;
 }
 
 // 0x0051f260: writes `name` into one of TrackGameMode's directories.
-int UnknownTrackGameObject3400::WriteRecord(short directory, const char* name, int value)
+int TrackRecord::WriteRecord(short directory, const char* name, int value)
 {
     char path[260];
     sprintf(path, "%s\\%s", g_TrackGame->mode.seriesDirectories[directory], name);
@@ -119,12 +119,12 @@ int UnknownTrackGameObject3400::WriteRecord(short directory, const char* name, i
 
 // 0x0051f2c0: reads `name` when the directory scan lists it; the first
 // argument is unused.
-void UnknownTrackGameObject3400::ReadListedRecord(int unused, const char* name)
+void TrackRecord::ReadListedRecord(int unused, const char* name)
 {
     char path[260];
     char file[260];
     for (int i = 0; i < 10; i++)
-        records[i] = UnknownTrackRecord();
+        records[i] = TrackRecordEntry();
     directoryList->SetDirectory((const char*)g_TrackGame->mode.currentSeriesDirectory);
     sprintf(path, "*%s", extensions[extensionIndex]);
     directoryList->SetPattern(path, 1);
@@ -138,7 +138,7 @@ void UnknownTrackGameObject3400::ReadListedRecord(int unused, const char* name)
 // 0x0051f3c0: enters `racer` as the last record and re-sorts the table;
 // 0 when the value would not place. Kinds 0 and 4 rank higher values
 // first, the rest lower times first.
-int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
+int TrackRecord::AddRacer(short kind, int racer)
 {
     char name[16];
     int sourceLength = strlen(g_TrackGame->eventManager->results[racer].name);
@@ -190,9 +190,9 @@ int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
             if (records[i].score == 0.0f)
                 records[i].score = FLT_MAX;
         }
-        qsort(records, 10, sizeof(UnknownTrackRecord), CompareRecordsAscending);
+        qsort(records, 10, sizeof(TrackRecordEntry), CompareRecordsAscending);
     } else {
-        qsort(records, 10, sizeof(UnknownTrackRecord), CompareRecordsDescending);
+        qsort(records, 10, sizeof(TrackRecordEntry), CompareRecordsDescending);
     }
     return 1;
 }
@@ -519,7 +519,7 @@ void TrackRecordDlg::ShowTrackScores(DialogEvent* event, int times, const char* 
     control->RemoveAllRows();
     control->SetSelectable(0);
     for (int i = 0; i < 10; i++) {
-        UnknownTrackGameObject3400* table = g_TrackGame->highScores;
+        TrackRecord* table = g_TrackGame->highScores;
         if (strcmp(table->records[i].racerName, "") != 0) {
             if (!times)
                 sprintf(text, "%.0f", table->records[i].score);

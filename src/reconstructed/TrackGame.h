@@ -476,7 +476,7 @@ public:
 // Object at TrackGame+0x3338, deleted through its virtual destructor.
 // The object at TrackGame+0x3340 is CDAudio (CDAudio.h).
 
-// UnknownTrackGameObject3400, the object at TrackGame+0x3400, is in TrackRecord.h.
+// TrackRecord, the object at TrackGame+0x3400, is in TrackRecord.h.
 
 // One control assignment of ControlSetup: the device kind
 // (0 keyboard, 1 mouse, 2 joystick; -1 unassigned) and the key, button or
@@ -657,7 +657,7 @@ public:
     ControlBinding throttleBinding;  // +0x33BC  optional 0..1 axis of row 4; LoadBike's throttle -> Vehicle throttleAxis
     ControlMapping* controlMapping;
     ControlSetup* controlSetup; // +0x33fc control assignments: the profile's "control.ctl", OptControlsDlg InputDeviceDDL
-    UnknownTrackGameObject3400* highScores;   // +0x3400 the high-score table (TrackRecord.cpp)
+    TrackRecord* highScores;                  // +0x3400 the high-score table (TrackRecord.cpp)
     char savedDecimalSeparator[8];
     void* languageModule;
     UnknownTrackGameObject3410* networkGameObject;

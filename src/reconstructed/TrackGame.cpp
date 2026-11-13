@@ -237,7 +237,7 @@ int TrackGame::CreateGameObjects() {
     profileDirectory->SetDirectory("ui\\profile");
     profileDirectory->SetPattern("*.*", 1);
     profileDirectory->Scan();
-    highScores = new(__FILE__, 313) UnknownTrackGameObject3400;
+    highScores = new(__FILE__, 313) TrackRecord;
     mode.CreateDirectoryLists();
     mode.ResetNetworkRace();
     g_MemTagStack->Push("Audio");
