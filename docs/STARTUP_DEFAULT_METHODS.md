@@ -7,7 +7,7 @@ addresses do not identify them with unrelated classes using the same code.
 
 | Definition | Retail body | Independent identity evidence |
 |---|---|---|
-| `UnknownTrackGameObject3410Base` constructor | `0x004676a0`, 16 bytes | `TrackGame::CreateGameObjects` allocation and constructor call, followed by storage at `TrackGame+0x3410` |
+| `MSZoneInterfaceBase` constructor | `0x004676a0`, 16 bytes | `TrackGame::CreateGameObjects` allocation and constructor call, followed by storage at `TrackGame+0x3410` |
 | `BackgroundImage::UnknownVirtualSlot27` | `0x004627f0`, 8 bytes | Primary vtable `0x005506d8`, slot 27; `RenderPre3D` passes the off-screen or render-target surface |
 
 The constructor moves `this` to its return register, clears DWORDs at offsets

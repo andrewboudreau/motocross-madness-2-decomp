@@ -297,7 +297,7 @@ int TrackGame::CreateGameObjects() {
                 if (!mode.LoadProfile())
                     ui->OpenMenu(kMenuUserNameBbb);
             }
-            networkGameObject = new(__FILE__, 430) UnknownTrackGameObject3410;
+            networkGameObject = new(__FILE__, 430) MSZoneInterface;
             if (networkGameObject)
                 networkGameObject->SetDirectPlay(network->directPlay, network->lobby);
             ui->OpenMenu(kMenuMultiPlayer866);

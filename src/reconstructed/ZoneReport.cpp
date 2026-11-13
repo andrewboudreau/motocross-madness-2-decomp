@@ -19,7 +19,7 @@ unsigned int ReadClock();   // 0x004bfa80: milliseconds
 // at 0x0049c5f0 for the unwind funclets; the normal paths inline it.
 // Writing the body inside `if (...) { ... return 1; } return 0;` gives
 // retail's explicit `xor eax, eax` on the failure path.
-int UnknownTrackGameObject3410::ReadLobbyPreset(int* flags)
+int MSZoneInterface::ReadLobbyPreset(int* flags)
 {
     char response[0x800];
     char name[0x40];
@@ -93,7 +93,7 @@ int UnknownTrackGameObject3410::ReadLobbyPreset(int* flags)
 // number is stored in TrackGameMode+0x1bd0. -1 means not ready yet; it
 // returns 0 on failure, -1 or -2. The `else return 0` inside the loop keeps
 // one shared epilogue; an early `if (!...) return 0;` duplicates it.
-int UnknownTrackGameObject3410::WaitForLobbyRank()
+int MSZoneInterface::WaitForLobbyRank()
 {
     int value;
     int b;
@@ -127,7 +127,7 @@ int UnknownTrackGameObject3410::WaitForLobbyRank()
 // event entries and sends it to the Zone (0x004aa670). Returns 1 without
 // a lobby connection. Indexing raceStatus.records[i] directly (not
 // through a record pointer) gives retail's induction register.
-int UnknownTrackGameObject3410::ReportRaceToZone()
+int MSZoneInterface::ReportRaceToZone()
 {
     int longest;
     int i;
@@ -199,7 +199,7 @@ struct UnknownTrackNameList {
 // supercross, tag, stunt; VC6's frame rule then lays them out as retail.
 // Direction 2 computes the 1-based type into its own local in each branch
 // (retail folds the +1 into the >= 30 branch as `add ebx, -0x1a`).
-void UnknownTrackGameObject3410::ConvertLobbyNumbering(int direction)
+void MSZoneInterface::ConvertLobbyNumbering(int direction)
 {
     UnknownTrackNameEntry quarry[5] = {
         {"Quarry05", 0}, {"Quarry01", 0}, {"Quarry04", 0}, {"Quarry03", 0}, {"Quarry02", 0},

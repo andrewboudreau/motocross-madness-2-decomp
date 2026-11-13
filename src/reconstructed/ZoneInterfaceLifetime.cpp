@@ -3,7 +3,7 @@
 // unrelated constructors; it does not establish a shared class or original TU.
 #include "TrackGame.h"
 
-UnknownTrackGameObject3410Base::UnknownTrackGameObject3410Base() {
+MSZoneInterfaceBase::MSZoneInterfaceBase() {
     directPlay = 0;
     lobby = 0;
 }

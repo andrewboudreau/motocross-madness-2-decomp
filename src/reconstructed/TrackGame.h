@@ -547,9 +547,9 @@ struct UnknownZoneRaceStatus {
 
 // Base of the +0x3410 object; its constructor sits among
 // FontTextureManager.cpp's literals.
-class UnknownTrackGameObject3410Base {
+class MSZoneInterfaceBase {
 public:
-    UnknownTrackGameObject3410Base();         // 0x004676a0
+    MSZoneInterfaceBase();         // 0x004676a0
 
     // The constructor clears +0 and +4; 0x004aa350 sets them
     // (MSZoneInterface.cpp).
@@ -573,7 +573,7 @@ public:
 // constructor of its own: `new` calls the base constructor directly and uses
 // the allocation (not the constructor's result), and its method sits among
 // MSZoneInterface.cpp's literals.
-class UnknownTrackGameObject3410 : public UnknownTrackGameObject3410Base {
+class MSZoneInterface : public MSZoneInterfaceBase {
 public:
     void SetDirectPlay(UnknownDirectPlay4A* a, UnknownDirectPlayLobby3A* b); // 0x004aa350
     // MSZoneInterface.cpp: 0x004aa360 / 0x004aa4e0 ask the lobby for the
@@ -663,7 +663,7 @@ public:
     TrackRecord* highScores;                  // +0x3400 the high-score table (TrackRecord.cpp)
     char savedDecimalSeparator[8];
     void* languageModule;
-    UnknownTrackGameObject3410* networkGameObject;
+    MSZoneInterface* networkGameObject;
     float fullNetPacketIntervalSeconds;
     float shortNetPacketIntervalSeconds;
     float fullRecordPacketIntervalSeconds;

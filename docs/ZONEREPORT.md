@@ -4,7 +4,7 @@ Canonical reconstruction: `src/reconstructed/ZoneReport.cpp`. The gap is
 `0x0049c2f0..0x0049dd30`, between KrustyVCR and LightEmitter.cpp. No
 `__FILE__` literal or RTTI reaches it, so the file name is ours (tier 3).
 These are methods of the TrackGame+0x3410 network object
-(`UnknownTrackGameObject3410`, `TrackGame.h`). Its lobby COM calls live in
+(`MSZoneInterface`, `TrackGame.h`). Its lobby COM calls live in
 MSZoneInterface.cpp (`0x004aa350..`).
 
 ## Matched (5 of 5 starts, strict exact)
@@ -57,7 +57,7 @@ Source forms that mattered:
   the 1 to `index` inside the else branch spills it (frame 0x5ac).
 
 Header changes: `ParserList` gains its constructor (the shared
-one-dword-zero body `0x004aae20`). `UnknownTrackGameObject3410Base` gains
+one-dword-zero body `0x004aae20`). `MSZoneInterfaceBase` gains
 the preset fields and `UnknownZoneRaceStatus`. The three methods return
 `int`, so the SelectGamePicProcs and EventManager bindings were renamed.
 

@@ -6,20 +6,20 @@
 #include "../../src/reconstructed/BackgroundImage.h"
 
 #define CHECK(name, condition) typedef char name[(condition) ? 1 : -1]
-CHECK(first_pointer, offsetof(UnknownTrackGameObject3410Base, directPlay) == 0);
-CHECK(second_pointer, offsetof(UnknownTrackGameObject3410Base, lobby) == 4);
+CHECK(first_pointer, offsetof(MSZoneInterfaceBase, directPlay) == 0);
+CHECK(second_pointer, offsetof(MSZoneInterfaceBase, lobby) == 4);
 CHECK(zone_pointer, offsetof(TrackGame, networkGameObject) == 0x3410);
-CHECK(zone_allocation, sizeof(UnknownTrackGameObject3410) == 0x32c);
+CHECK(zone_allocation, sizeof(MSZoneInterface) == 0x32c);
 
 int main() {
-    union { double align; unsigned char bytes[sizeof(UnknownTrackGameObject3410) + 32]; } zone, expected;
+    union { double align; unsigned char bytes[sizeof(MSZoneInterface) + 32]; } zone, expected;
     union { double align; unsigned char bytes[sizeof(BackgroundImage) + 32]; } image, imageExpected;
     for (int seed = 0; seed < 256; ++seed) {
         unsigned i;
         for (i = 0; i < sizeof(zone.bytes); ++i) zone.bytes[i] = (unsigned char)(seed + 37 * i);
         memcpy(expected.bytes, zone.bytes, sizeof(zone.bytes));
         memset(expected.bytes + 16, 0, 8);
-        UnknownTrackGameObject3410* created = new(zone.bytes + 16) UnknownTrackGameObject3410;
+        MSZoneInterface* created = new(zone.bytes + 16) MSZoneInterface;
         if ((void*)created != zone.bytes + 16 || memcmp(zone.bytes, expected.bytes, sizeof(zone.bytes))) return 1;
         for (i = 0; i < sizeof(image.bytes); ++i) image.bytes[i] = (unsigned char)(seed + 53 * i);
         memcpy(imageExpected.bytes, image.bytes, sizeof(image.bytes));
