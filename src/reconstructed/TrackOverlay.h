@@ -375,7 +375,7 @@ struct UnknownChatView {
 };
 
 // One chat history line (0x5c bytes).
-struct UnknownChatEntry {
+struct ChatHistoryEntry {
     int value;
     char text[0x58];
 };
@@ -389,9 +389,9 @@ struct UnknownChatMessage {
 
 // ChatOverlay+0x13c (0x1c4 bytes, no vtable): the line being typed (up to
 // 0x4a characters) and four history entries.
-class UnknownChatInput {
+class ChatInput {
 public:
-    UnknownChatInput();                       // 0x0051ea50
+    ChatInput();                       // 0x0051ea50
     void AppendChar(char c);                  // 0x0051ea80: appends c
     void Backspace();                         // 0x0051eab0: removes the last character
     void ClearLine();                         // 0x0051ead0: clears the line
@@ -404,8 +404,8 @@ public:
     void AddHistory(const char* name, const char* text, int value);
 
     char typedLine[0x4c];                     // the line being typed
-    UnknownChatEntry history[4];
-    int typedLength;                          // length of field_0x000
+    ChatHistoryEntry history[4];
+    int typedLength;                          // length of typedLine
     int historyCount;                         // +0x1c0 used history lines (0x0051eb40 adds while below 3)
 };
 
@@ -452,7 +452,7 @@ public:
     float timeSum;                            // time summed
     int largeLayout;                          // the large layout (set by 0x0051cf80)
     int inputShown;                           // input line shown
-    UnknownChatInput* chatInput;
+    ChatInput* chatInput;
     OverlayRect chatRect;              // chat rectangle (set by 0x0051cf80)
     OverlayRect cueRect;               // cue rectangle; left/top place the extra name tag (0x0051d730)
     int nameLineRight;                        // +0x160 right edge of the drawn cue line (0x0051e800)

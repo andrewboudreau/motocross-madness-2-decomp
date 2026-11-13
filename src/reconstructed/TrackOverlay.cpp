@@ -1455,7 +1455,7 @@ ChatOverlay::ChatOverlay(int flags) : Overlay(flags, 1)
     nameLineRight = 0;
     pen = 0;
     inputShown = 0;
-    chatInput = new(__FILE__, 2172) UnknownChatInput;
+    chatInput = new(__FILE__, 2172) ChatInput;
     for (i = 0; i < 11; i++)
         lastRacerValues[i] = 0;
     leftPanel = 0;
@@ -1849,7 +1849,7 @@ void ChatOverlay::RedrawNameLine()
 }
 
 // 0x0051eb40
-void UnknownChatInput::AddHistory(const char* name, const char* text, int value)
+void ChatInput::AddHistory(const char* name, const char* text, int value)
 {
     char separator[8];
     int nameLength = strlen(name);
@@ -1897,7 +1897,7 @@ void UnknownChatInput::AddHistory(const char* name, const char* text, int value)
 }
 
 // 0x0051ea50
-UnknownChatInput::UnknownChatInput()
+ChatInput::ChatInput()
 {
     typedLine[0] = '\0';
     for (int i = 0; i < 4; i++) {
@@ -1909,7 +1909,7 @@ UnknownChatInput::UnknownChatInput()
 }
 
 // 0x0051ea80
-void UnknownChatInput::AppendChar(char c)
+void ChatInput::AppendChar(char c)
 {
     if (typedLength < 0x4a) {
         typedLine[typedLength] = c;
@@ -1919,7 +1919,7 @@ void UnknownChatInput::AppendChar(char c)
 }
 
 // 0x0051eab0
-void UnknownChatInput::Backspace()
+void ChatInput::Backspace()
 {
     if (typedLength > 0) {
         typedLength--;
@@ -1928,7 +1928,7 @@ void UnknownChatInput::Backspace()
 }
 
 // 0x0051ead0
-void UnknownChatInput::ClearLine()
+void ChatInput::ClearLine()
 {
     typedLine[0] = '\0';
     typedLength = 0;
@@ -1936,13 +1936,13 @@ void UnknownChatInput::ClearLine()
 
 // 0x0051eae0: the 3-byte `mov eax, ecx; ret`. Its only callers are
 // RedrawChat's two calls (0x0051dae5, 0x0051db09).
-char* UnknownChatInput::GetLine()
+char* ChatInput::GetLine()
 {
     return typedLine;
 }
 
 // 0x0051eaf0
-char* UnknownChatInput::GetLineTail()
+char* ChatInput::GetLineTail()
 {
     if (typedLength >= 0x31)
         return typedLine + typedLength - 0x31;
@@ -1950,7 +1950,7 @@ char* UnknownChatInput::GetLineTail()
 }
 
 // 0x0051eb10
-char* UnknownChatInput::GetHistory(int index, int* value)
+char* ChatInput::GetHistory(int index, int* value)
 {
     if (index < 4) {
         *value = history[index].value;

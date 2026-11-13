@@ -21,7 +21,7 @@ The TU covers `0x00518720..0x0051ee90`. TrackRecord.cpp starts at
   (0,0,1) at `0x0068a400`. ChatOverlay methods appear on both sides of them.
 - **Strong inference.** Only TrackOverlay code reads `0x0068a410`, and the
   file statics `0x0068a444` and `0x0068a448` follow it in .bss. Together
-  these place `0x0051dce0..0x0051ee90` (ChatOverlay and UnknownChatInput) in
+  these place `0x0051dce0..0x0051ee90` (ChatOverlay and ChatInput) in
   this TU.
 
 ## Classes
@@ -36,7 +36,7 @@ The TU covers `0x00518720..0x0051ee90`. TrackRecord.cpp starts at
 | RadarOverlay | Overlay | `0x005587d0` | not recovered |
 | ChatOverlay | Overlay | `0x00558854` | 0x3e0 (the allocation at `0x004e08e4`) |
 
-UnknownChatInput (0x1c4 bytes, no vtable) lives at ChatOverlay+0x13c. It
+ChatInput (0x1c4 bytes, no vtable) lives at ChatOverlay+0x13c. It
 holds the line being typed and four history entries.
 ChatOverlay+0x140 is the chat rectangle (centred, 256 x 68), +0x150 the cue
 rectangle the loader is given, and +0x1c8/+0x1cc two plain Overlay side
@@ -92,7 +92,7 @@ compiled layouts and imports against the real provider object.
   `largeLayout ? 137 : 103` VC6 loaded largeLayout into ecx and formed the
   right panel's width in eax, where retail has eax and ecx. No statement
   order, ternary spelling or width local changed that.
-- UnknownChatInput: `0x0051ea50`..`0x0051eb40`, 7 functions.
+- ChatInput: `0x0051ea50`..`0x0051eb40`, 7 functions.
 
 Their calibration cases are under `# TrackOverlay.cpp` in
 `tools/run_calibration.py`.
@@ -150,7 +150,7 @@ linkage so the standalone uses the same mutable DWORD as `RenderPre3D`.
   has a bring-up body in `src/bringup/Group4_DropTextOverlayTick.cpp`.
 - `0x00518c20` is not a function start (inside the InstrumentOverlay
   destructor `0x00518c00`).
-- `0x0051eae0` is a 3-byte `mov eax, ecx; ret`: UnknownChatInput's line
+- `0x0051eae0` is a 3-byte `mov eax, ecx; ret`: ChatInput's line
   accessor `GetLine` (exact). Its only callers are `0x0051da30`'s two calls
   (`0x0051dae5`, `0x0051db09`), and no vtable lists it.
 - Every RadarOverlay function is now exact or a documented near miss.
