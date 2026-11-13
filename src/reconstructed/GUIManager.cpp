@@ -647,21 +647,21 @@ int GUIManager::EnableWindowClipper(int enable) {
 
     if (enable) {
         if (windowClipper) {
-            windowClipper->UnknownMethod7(0, 0);
+            windowClipper->SetClipList(0, 0);
             windowClipper->Release();
         }
         ((UnknownGuiDirectDraw*)g_TrackGame->display->directDraw)
-            ->UnknownMethod4(0, &windowClipper, 0);
-        ((UnknownGuiSurface*)g_TrackGame->display->primarySurface)->UnknownMethod28(windowClipper);
+            ->CreateClipper(0, &windowClipper, 0);
+        ((UnknownGuiSurface*)g_TrackGame->display->primarySurface)->SetClipper(windowClipper);
         if (windowClipper)
-            windowClipper->UnknownMethod8(0, g_TrackGame->windowHandle);
+            windowClipper->SetHWnd(0, g_TrackGame->windowHandle);
     } else {
         if (windowClipper) {
-            windowClipper->UnknownMethod7(0, 0);
+            windowClipper->SetClipList(0, 0);
             windowClipper->Release();
             windowClipper = 0;
         }
-        ((UnknownGuiSurface*)g_TrackGame->display->primarySurface)->UnknownMethod28(0);
+        ((UnknownGuiSurface*)g_TrackGame->display->primarySurface)->SetClipper(0);
     }
     display = g_TrackGame->display;
     display->SetGDISurfaceVisible(enable);

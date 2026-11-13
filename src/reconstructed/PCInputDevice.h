@@ -140,17 +140,17 @@ void ReportDirectInputError(long result, const char* file, int line);
 // DirectInput object at ControlInterface+0xcc0; method 9 creates devices like
 // IDirectInput7::CreateDeviceEx.
 struct UnknownDirectInput {
-    virtual long __stdcall UnknownMethod0();
-    virtual long __stdcall UnknownMethod1();
+    virtual long __stdcall QueryInterface();
+    virtual long __stdcall AddRef();
     virtual long __stdcall Release();
-    virtual long __stdcall UnknownMethod3();
+    virtual long __stdcall CreateDevice();
     virtual long __stdcall EnumDevices(unsigned long type,
                                           int (__stdcall* callback)(const struct UnknownDeviceInstance*, void*),
                                           void* context, unsigned long flags); // EnumDevices
     virtual long __stdcall GetDeviceStatus(const Guid& device);
-    virtual long __stdcall UnknownMethod6();
-    virtual long __stdcall UnknownMethod7();
-    virtual long __stdcall UnknownMethod8();
+    virtual long __stdcall RunControlPanel();
+    virtual long __stdcall Initialize();
+    virtual long __stdcall FindDevice();
     virtual long __stdcall CreateDeviceEx(const Guid& device, const Guid& iid,
                                           DirectInputDevice** result, void* outer);
 };

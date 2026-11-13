@@ -41,9 +41,9 @@ struct DirectDrawStreamSample {
     virtual long __stdcall QueryInterface(const Guid* iid, void** object);
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
-    virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall UnknownMethod4();
-    virtual long __stdcall UnknownMethod5();
+    virtual long __stdcall GetMediaStream();
+    virtual long __stdcall GetSampleTimes();
+    virtual long __stdcall SetSampleTimes();
     virtual long __stdcall Update(unsigned long flags, void* event, void* apc, unsigned long context);
     virtual long __stdcall CompletionStatus(unsigned long flags, unsigned long milliseconds);
 };
@@ -53,17 +53,17 @@ struct DirectDrawMediaStream {
     virtual long __stdcall QueryInterface(const Guid* iid, void** object);
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
-    virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall UnknownMethod4();
-    virtual long __stdcall UnknownMethod5();
-    virtual long __stdcall UnknownMethod6();
-    virtual long __stdcall UnknownMethod7();
-    virtual long __stdcall UnknownMethod8();
+    virtual long __stdcall GetMultiMediaStream();
+    virtual long __stdcall GetInformation();
+    virtual long __stdcall SetSameFormat();
+    virtual long __stdcall AllocateSample();
+    virtual long __stdcall CreateSharedSample();
+    virtual long __stdcall SendEndOfStream();
     virtual long __stdcall GetFormat(UnknownMediaSurfaceDesc* current, void* palette,
                                      UnknownMediaSurfaceDesc* desired, unsigned long* flags);
-    virtual long __stdcall UnknownMethod10();
-    virtual long __stdcall UnknownMethod11();
-    virtual long __stdcall UnknownMethod12();
+    virtual long __stdcall SetFormat();
+    virtual long __stdcall GetDirectDraw();
+    virtual long __stdcall SetDirectDraw();
     virtual long __stdcall CreateSample(DirectDrawSurface* surface, const void* rect,
                                         unsigned long flags, DirectDrawStreamSample** sample);
 };
@@ -73,18 +73,18 @@ struct AMMultiMediaStream {
     virtual long __stdcall QueryInterface(const Guid* iid, void** object);
     virtual long __stdcall AddRef();
     virtual long __stdcall Release();
-    virtual long __stdcall UnknownMethod3();
+    virtual long __stdcall GetInformation();
     virtual long __stdcall GetMediaStream(const Guid* purpose, DirectDrawMediaStream** stream);
-    virtual long __stdcall UnknownMethod5();
+    virtual long __stdcall EnumMediaStreams();
     virtual long __stdcall GetState(int* state);
     virtual long __stdcall SetState(int state);
     virtual long __stdcall GetTime(__int64* time);
     virtual long __stdcall GetDuration(__int64* duration);
     virtual long __stdcall Seek(__int64 time);
-    virtual long __stdcall UnknownMethod11();
+    virtual long __stdcall GetEndOfStreamEventHandle();
     virtual long __stdcall Initialize(int type, unsigned long flags, void* graph);
-    virtual long __stdcall UnknownMethod13();
-    virtual long __stdcall UnknownMethod14();
+    virtual long __stdcall GetFilterGraph();
+    virtual long __stdcall GetFilter();
     virtual long __stdcall AddMediaStream(void* object, const Guid* purpose, unsigned long flags,
                                           DirectDrawMediaStream** stream);
     virtual long __stdcall OpenFile(const unsigned short* file, unsigned long flags);

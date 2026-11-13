@@ -34,58 +34,58 @@ class TextureMapManager;
 // IDirectDrawClipper-shaped interface at GUIManager+0x3dc (created through
 // Display+0x190's method 4, handed to Display+0x19c's method 28).
 struct UnknownGuiClipper {
-    virtual long __stdcall UnknownMethod0();
-    virtual long __stdcall UnknownMethod1();
+    virtual long __stdcall QueryInterface();
+    virtual long __stdcall AddRef();
     virtual long __stdcall Release();                          // Release
-    virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall UnknownMethod4();
-    virtual long __stdcall UnknownMethod5();
-    virtual long __stdcall UnknownMethod6();
-    virtual long __stdcall UnknownMethod7(void* clipList, unsigned long flags); // SetClipList
-    virtual long __stdcall UnknownMethod8(unsigned long flags, void* window);   // SetHWnd
+    virtual long __stdcall GetClipList();
+    virtual long __stdcall GetHWnd();
+    virtual long __stdcall Initialize();
+    virtual long __stdcall IsClipListChanged();
+    virtual long __stdcall SetClipList(void* clipList, unsigned long flags); // SetClipList
+    virtual long __stdcall SetHWnd(unsigned long flags, void* window);   // SetHWnd
 };
 
 // The two methods 0x004868b0 calls on Display+0x190 and Display+0x19c
 // (RenderInterfaces.h keeps their slots argument-less).
 struct UnknownGuiDirectDraw {
-    virtual long __stdcall UnknownMethod0();
-    virtual long __stdcall UnknownMethod1();
+    virtual long __stdcall QueryInterface();
+    virtual long __stdcall AddRef();
     virtual long __stdcall Release();
-    virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall UnknownMethod4(unsigned long flags, UnknownGuiClipper** clipper,
+    virtual long __stdcall Compact();
+    virtual long __stdcall CreateClipper(unsigned long flags, UnknownGuiClipper** clipper,
                                           void* outer);              // CreateClipper
 };
 
 struct UnknownGuiSurface {
-    virtual long __stdcall UnknownMethod0();
-    virtual long __stdcall UnknownMethod1();
+    virtual long __stdcall QueryInterface();
+    virtual long __stdcall AddRef();
     virtual long __stdcall Release();
-    virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall UnknownMethod4();
-    virtual long __stdcall UnknownMethod5();
-    virtual long __stdcall UnknownMethod6();
-    virtual long __stdcall UnknownMethod7();
-    virtual long __stdcall UnknownMethod8();
-    virtual long __stdcall UnknownMethod9();
-    virtual long __stdcall UnknownMethod10();
-    virtual long __stdcall UnknownMethod11();
-    virtual long __stdcall UnknownMethod12();
-    virtual long __stdcall UnknownMethod13();
-    virtual long __stdcall UnknownMethod14();
-    virtual long __stdcall UnknownMethod15();
-    virtual long __stdcall UnknownMethod16();
-    virtual long __stdcall UnknownMethod17();
-    virtual long __stdcall UnknownMethod18();
-    virtual long __stdcall UnknownMethod19();
-    virtual long __stdcall UnknownMethod20();
-    virtual long __stdcall UnknownMethod21();
-    virtual long __stdcall UnknownMethod22();
-    virtual long __stdcall UnknownMethod23();
-    virtual long __stdcall UnknownMethod24();
-    virtual long __stdcall UnknownMethod25();
-    virtual long __stdcall UnknownMethod26();
-    virtual long __stdcall UnknownMethod27();
-    virtual long __stdcall UnknownMethod28(UnknownGuiClipper* clipper); // SetClipper
+    virtual long __stdcall AddAttachedSurface();
+    virtual long __stdcall AddOverlayDirtyRect();
+    virtual long __stdcall Blt();
+    virtual long __stdcall BltBatch();
+    virtual long __stdcall BltFast();
+    virtual long __stdcall DeleteAttachedSurface();
+    virtual long __stdcall EnumAttachedSurfaces();
+    virtual long __stdcall EnumOverlayZOrders();
+    virtual long __stdcall Flip();
+    virtual long __stdcall GetAttachedSurface();
+    virtual long __stdcall GetBltStatus();
+    virtual long __stdcall GetCaps();
+    virtual long __stdcall GetClipper();
+    virtual long __stdcall GetColorKey();
+    virtual long __stdcall GetDC();
+    virtual long __stdcall GetFlipStatus();
+    virtual long __stdcall GetOverlayPosition();
+    virtual long __stdcall GetPalette();
+    virtual long __stdcall GetPixelFormat();
+    virtual long __stdcall GetSurfaceDesc();
+    virtual long __stdcall Initialize();
+    virtual long __stdcall IsLost();
+    virtual long __stdcall Lock();
+    virtual long __stdcall ReleaseDC();
+    virtual long __stdcall Restore();
+    virtual long __stdcall SetClipper(UnknownGuiClipper* clipper); // SetClipper
 };
 
 // The fog object 0x00484f10 finds by name ("GroundFog") under Game+0x34.
