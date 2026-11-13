@@ -235,9 +235,9 @@ int ProjectedShadow::PrepareGeometry()
     dirtyFlags = 0;
     if (updateThisFrame) {
         for (int i = 0; i < receiverCount; i++) {
-            if (receivers[i]->UnknownVirtualSlot27()) {
-                receivers[i]->UnknownVirtualSlot28();
-                dirtyFlags |= receivers[i]->UnknownVirtualSlot29();
+            if (receivers[i]->IsShadowVisible()) {
+                receivers[i]->UpdateTexelSize();
+                dirtyFlags |= receivers[i]->NeedsShadowRender();
             }
         }
         if (dirtyFlags) {

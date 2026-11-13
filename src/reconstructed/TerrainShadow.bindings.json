@@ -31,5 +31,5 @@
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
   "?LookupCell@TerrainShutdownObject@@QAEPAUTerrainCell@@HH@Z": "0x00484d70",
-  "?UnknownVirtualSlot27@TerrainShadow@@UAEHXZ": "0x00508bc0"
+  "?IsShadowVisible@TerrainShadow@@UAEHXZ": "0x00508bc0"
 }

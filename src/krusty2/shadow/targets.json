@@ -22,7 +22,7 @@
   {
     "class": "D3DIMSoultreeShadow",
     "source": "D3DIMSoultreeShadow.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot27@D3DIM",
+    "candidate_symbol_contains": "?IsShadowVisible@D3DIM",
     "target_va": "0x4468f0",
     "target_size": 767,
     "expect": "exact",
@@ -32,7 +32,7 @@
   {
     "class": "D3DIMSoultreeShadow",
     "source": "D3DIMSoultreeShadow.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot28@D3DIM",
+    "candidate_symbol_contains": "?UpdateTexelSize@D3DIM",
     "target_va": "0x446bf0",
     "target_size": 63,
     "expect": "exact",

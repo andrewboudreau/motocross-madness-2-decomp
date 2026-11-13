@@ -10,7 +10,7 @@ code. Compared: the texel scale +0x677c, lightMatrix (+0xd8 of the shadow) and e
 import struct
 
 RETAIL_VA = 0x005097d0
-SYMBOL = '?UnknownVirtualSlot28@TerrainShadow@@UAEHXZ'
+SYMBOL = '?UpdateTexelSize@TerrainShadow@@UAEHXZ'
 SOURCE = 'samples/physics/shadow/TerrainShadow.cpp'
 PROBES = {0x0050985c: 'mode 1', 0x00509909: 'orthographic'}
 

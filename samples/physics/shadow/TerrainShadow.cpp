@@ -36,7 +36,7 @@
 ShadowMatrix* TerrainMatrixIdentityInto(ShadowMatrix* out);                       // 0x004a1410
 ShadowMatrix* TerrainMatrixMultiplyInto(ShadowMatrix* out, ShadowMatrix a, ShadowMatrix b);  // 0x004a1860
 
-int TerrainShadow::UnknownVirtualSlot28()
+int TerrainShadow::UpdateTexelSize()
 {
     float texelScale;
     if (shadow->downsampleOnPresent)
@@ -404,7 +404,7 @@ static inline TerrainShadowVec TerrainShadowAddCtorCall(const TerrainShadowVec& 
         && screenMaxX - screenMinX > 10.0f && screenMaxY - screenMinY > 5.0f)                        \
         return 1
 
-int TerrainShadow::UnknownVirtualSlot27()
+int TerrainShadow::IsShadowVisible()
 {
     minX = 0x7fffffff;
     maxX = 0x80000000;

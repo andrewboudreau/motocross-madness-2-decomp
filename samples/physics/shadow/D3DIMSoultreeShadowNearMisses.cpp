@@ -152,7 +152,7 @@ static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIM
 
 // 0x00446c30 (slot 29): with inShadowView set, the same test against the render target's camera
 // decides inCameraView (the flag slot 14 draws with); returns inCameraView.
-int D3DIMSoultreeShadow::UnknownVirtualSlot29()
+int D3DIMSoultreeShadow::NeedsShadowRender()
 {
     D3DIMShadowCasterView* casterView = (D3DIMShadowCasterView*)caster;
     inCameraView = 0;

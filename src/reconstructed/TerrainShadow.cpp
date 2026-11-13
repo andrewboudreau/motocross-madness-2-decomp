@@ -47,7 +47,7 @@ TerrainShadow* TerrainShadow::Attach(int host, Terrain* c, ProjectedShadow* s)
 // 0x005099c0 (slot 29): collects the distinct cell keys the shadow's grid rectangle
 // (minX..maxX, minZ..maxZ in steps of 16) touches in the terrain's height field.  Returns whether
 // any were found; when 0x40 are gathered it resets (tier 3 semantics).
-int TerrainShadow::UnknownVirtualSlot29()
+int TerrainShadow::NeedsShadowRender()
 {
     cellCount = 0;
     for (int z = minZ; z <= maxZ; z += 16) {

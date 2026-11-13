@@ -20,9 +20,9 @@ public:
     explicit D3DIMSoultreeShadow(int flags);                       // 0x00446840
     D3DIMSoultreeShadow* Attach(int host, ShadowCaster* caster, ProjectedShadow* shadow);  // 0x004468b0
     virtual int Render3D();                         // 0x00447540 (render)
-    virtual int UnknownVirtualSlot27();                            // 0x004468f0
-    virtual int UnknownVirtualSlot28();                            // 0x00446bf0
-    virtual int UnknownVirtualSlot29();                            // 0x00446c30
+    virtual int IsShadowVisible();                                // 0x004468f0
+    virtual int UpdateTexelSize();                                // 0x00446bf0
+    virtual int NeedsShadowRender();                              // 0x00446c30
     virtual void BuildShadowVertices();                            // 0x00446f40 slot 30 (near miss in samples/physics/shadow)
 
     ShadowCaster* caster;          // +0x2c ctor 0; Attach stores its second argument (slot 27 reads +0x14c / calls 0x004fe850 on it)

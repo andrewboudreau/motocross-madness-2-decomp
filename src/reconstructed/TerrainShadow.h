@@ -29,9 +29,9 @@ public:
     explicit TerrainShadow(int flags);                                                  // 0x00508ae0
     TerrainShadow* Attach(int host, Terrain* terrain, ProjectedShadow* shadow);     // 0x00508b80
     virtual int Render3D();                                              // 0x0050a1a0 (render)
-    virtual int UnknownVirtualSlot27();                                                 // 0x00508bc0
-    virtual int UnknownVirtualSlot28();                                                 // 0x005097d0
-    virtual int UnknownVirtualSlot29();                                                 // 0x005099c0
+    virtual int IsShadowVisible();                                                     // 0x00508bc0
+    virtual int UpdateTexelSize();                                                     // 0x005097d0
+    virtual int NeedsShadowRender();                                                   // 0x005099c0
     virtual void BuildShadowVertices();                                                 // 0x00509aa0 slot 30
 
     Terrain* caster;               // +0x2c ctor 0; Attach stores its second argument.  Tier 2: slot 28 calls

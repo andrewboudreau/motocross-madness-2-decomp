@@ -21,7 +21,7 @@ step points handed to CastSegment and the hits handed to ProjectVertices, and EA
 import random
 
 RETAIL_VA = 0x00508bc0
-SYMBOL = '?UnknownVirtualSlot27@TerrainShadow@@UAEHXZ'
+SYMBOL = '?IsShadowVisible@TerrainShadow@@UAEHXZ'
 SOURCE = 'samples/physics/shadow/TerrainShadow.cpp'
 CLIPPER = 0x00575a98
 CAST = 0x00506e90

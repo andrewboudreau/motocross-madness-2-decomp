@@ -16,7 +16,7 @@ precision each element's sum order shows in the logged product.
 import random
 
 RETAIL_VA = 0x00446c30
-SYMBOL = '?UnknownVirtualSlot29@D3DIMSoultreeShadow@@UAEHXZ'
+SYMBOL = '?NeedsShadowRender@D3DIMSoultreeShadow@@UAEHXZ'
 SOURCE = 'samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp'
 CLIPPER = 0x00575a98
 GET_MATRIX = 0x004fca80

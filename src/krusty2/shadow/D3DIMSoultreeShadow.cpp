@@ -121,7 +121,7 @@ static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIM
 // bounds pass the shadow camera's box test; returns inShadowView.  Slot 29
 // (0x00446c30, the same test with the render target's camera) is a near miss in
 // samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp.
-int D3DIMSoultreeShadow::UnknownVirtualSlot27()
+int D3DIMSoultreeShadow::IsShadowVisible()
 {
     D3DIMShadowCasterView* casterView = (D3DIMShadowCasterView*)caster;
     inCameraView = 0;
@@ -144,7 +144,7 @@ int D3DIMSoultreeShadow::UnknownVirtualSlot27()
 // 0x00446bf0: texel size of the shadow texture (0.5 / size when the +0x98 flag is set, else
 // 1.0 / size), kept in a file-scope float; returns 0.
 float g_d3dimShadowTexel;  // 0x0057efa4
-int D3DIMSoultreeShadow::UnknownVirtualSlot28()
+int D3DIMSoultreeShadow::UpdateTexelSize()
 {
     ProjectedShadow* projected = shadow;
     float numerator;
