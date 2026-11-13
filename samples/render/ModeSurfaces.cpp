@@ -12,7 +12,7 @@ int PCVideoCard::CreateModeSurfaces(int fullScreen) {
     int width = displayModes[currentDisplayMode].width;
     int height = displayModes[currentDisplayMode].height;
     int bitDepth = displayModes[currentDisplayMode].bitDepth;
-    int buffers = displayModes[currentDisplayMode].field_0x10;
+    int buffers = displayModes[currentDisplayMode].bufferCount;
     if (fullScreen) {
         if (width * height * bitDepth / 8 * buffers > videoMemoryBudget - width * height * 2)
             return 0;

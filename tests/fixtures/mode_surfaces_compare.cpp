@@ -21,7 +21,7 @@ static int Callback(PCVideoCard* self,int kind,int argument) {
     observed.kind=kind;observed.argument=argument;
     memcpy(observed.before,self,sizeof(displayStorage));
     memcpy(observed.beforeModes,modes,sizeof(modes));
-    if(mutate) { self->videoMemoryBudget^=0x12345678;self->currentDisplayMode=2;modes[1].field_0x10=-17; }
+    if(mutate) { self->videoMemoryBudget^=0x12345678;self->currentDisplayMode=2;modes[1].bufferCount=-17; }
     return callbackResult;
 }
 int PCVideoCard::CreateFlipChain(int buffers) { return Callback(this,1,buffers); }
@@ -55,7 +55,7 @@ static void Run(int retail,int width,int height,int depth,int buffers,int budget
     memset(&observed,0,sizeof(observed));memset(displayStorage,0x53,sizeof(displayStorage));
     memset(modes,0x61,sizeof(modes));Display()->displayModes=modes;Display()->currentDisplayMode=1;
     Display()->displayModeCount=3;Display()->videoMemoryBudget=budget;
-    modes[1].width=width;modes[1].height=height;modes[1].bitDepth=depth;modes[1].field_0x10=buffers;
+    modes[1].width=width;modes[1].height=height;modes[1].bitDepth=depth;modes[1].bufferCount=buffers;
     union { int(PCVideoCard::*method)(int);DWORD address; } call;
     call.method=&PCVideoCard::CreateModeSurfaces;if(retail)call.address=0x4ca520;
     observed.result=(Display()->*call.method)(full);

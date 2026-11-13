@@ -356,7 +356,7 @@ int PCGame::FilterDisplayModes(PCVideoCard* display) {
                 if (i > 0 && display->displayModes[i].width == display->displayModes[i - 1].width &&
                     display->displayModes[i].height == display->displayModes[i - 1].height &&
                     display->displayModes[i].bitDepth == display->displayModes[i - 1].bitDepth &&
-                    display->displayModes[i].field_0x10 == display->displayModes[i - 1].field_0x10) {
+                    display->displayModes[i].bufferCount == display->displayModes[i - 1].bufferCount) {
                     display->displayModes[i - 1].hardwareUsable = 0;
                     display->displayModes[i - 1].bladeUsable = 0;
                 }
@@ -366,7 +366,7 @@ int PCGame::FilterDisplayModes(PCVideoCard* display) {
                 if (i > 0 && display->displayModes[i].width == display->displayModes[i - 1].width &&
                     display->displayModes[i].height == display->displayModes[i - 1].height &&
                     display->displayModes[i].bitDepth == display->displayModes[i - 1].bitDepth &&
-                    display->displayModes[i].field_0x10 == display->displayModes[i - 1].field_0x10) {
+                    display->displayModes[i].bufferCount == display->displayModes[i - 1].bufferCount) {
                     display->displayModes[i].hardwareUsable = 0;
                     display->displayModes[i].bladeUsable = 0;
                 }

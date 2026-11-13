@@ -32,8 +32,8 @@ int CompareDisplayModes(const void* first, const void* second) {
         return a->height - b->height;
     if (a->width != b->width)
         return a->width - b->width;
-    if (a->field_0x10 != b->field_0x10)
-        return a->field_0x10 - b->field_0x10;
+    if (a->bufferCount != b->bufferCount)
+        return a->bufferCount - b->bufferCount;
     if (a->refreshRate != b->refreshRate)
         return a->refreshRate - b->refreshRate;
     return 0;
@@ -80,7 +80,7 @@ int VideoCard::FindDisplayMode(int width, int height, int bitDepth, int a, int r
     for (int i = 0; i < displayModeCount; i++) {
         UnknownDisplayMode* mode = &displayModes[i];
         if (mode->bitDepth == bitDepth && mode->height == height && mode->width == width &&
-            (!a || mode->field_0x10 == a) && (!refreshRate || mode->refreshRate == refreshRate))
+            (!a || mode->bufferCount == a) && (!refreshRate || mode->refreshRate == refreshRate))
             return i;
     }
     return -1;

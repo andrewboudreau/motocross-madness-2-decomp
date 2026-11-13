@@ -83,7 +83,7 @@ static long __stdcall EnumDisplayModeCallback(DDSurfaceDesc2* desc, void* contex
         display->displayModes[display->displayModeCount].bladeUsable = 1;
         display->displayModes[display->displayModeCount].textureMemory = 0;
         display->displayModes[display->displayModeCount].nonLocalTextureMemory = 0;
-        display->displayModes[display->displayModeCount].field_0x10 = 2;
+        display->displayModes[display->displayModeCount].bufferCount = 2;
         display->displayModeCount++;
     }
     return 1;
