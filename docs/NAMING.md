@@ -1357,11 +1357,134 @@ Left as placeholders:
 - UIDialog slot 30 (calls the +0xd4 callback), BackgroundImage slot 27 (the
   shared `return 1` body) and BaseQuarryEvent slots 28, 32 and 34 (shared
   empty bodies): not overridden, and the call sites name no role.
-- `UnknownBikeRaceCharacter` slots: D3DIMSoultreeCharacter's own slots are
-  still `CharacterVirtualSlotN` / `D3DIMVirtualSlot11` placeholders.
+- `UnknownBikeRaceCharacter` slots: D3DIMSoultreeCharacter's own slots were
+  still `CharacterVirtualSlotN` / `D3DIMVirtualSlot11` placeholders (named in
+  Wave 17).
 - The GridEntry views (`UnknownKrustyVcrRecord`, `UnknownBikeRaceNetPlayer`):
   their `networkPlayerId` already says what GridEntry's `playerId` says, and
   `UnknownGridEntry` already uses GridEntry's names.
-- `UnknownMethodN` (COM interfaces in GUIManager.h and MSZoneInterface.cpp)
+- `UnknownMethodN` (COM interfaces in GUIManager.h and MSZoneInterface.cpp;
+  all but MSZoneInterface's named in Wave 17)
   and the folded-stub names (`UnknownFunction4de580`, `UnknownFunction464e80`,
   `UnknownFunction464e90`): no literal names them.
+
+## Wave 17: Character slots, COM method names and view merges
+
+Wave 17 names D3DIMSoultreeCharacter's primary slots and carries them to the
+character views. It gives the COM interface views their SDK method names and
+tries eight view merges, smallest first. `git grep -ohE
+'\bUnknown[A-Z][A-Za-z0-9_]*' -- src samples` fell from 496 unique names and
+3526 uses to 466 and 3350. Counted the same way, `UnknownMethodN` fell from
+154 uses to 17, the MSN Zone score interface's. `CharacterVirtualSlotN`,
+`ModelVirtualSlotN`, `D3DIMVirtualSlot11` and `ApplyPoseListSlotN` fell from
+173 uses to none. `field_0x` lines stay at 1879.
+
+Method: the slot renames are scoped by class and use the Wave 16 tools
+(work/naming/w17_char.json, w17_editsA.py, w17_editsA2.py), and the COM names
+use work/naming/w17_com.py. Each merge is one script (work/naming/w17_m1.py to
+w17_m4.py) that edits the view out, drops casts made redundant and renames the
+decorated consumers. The comparer builds every unit in src, samples and
+tests/fixtures whose include closure reaches a changed file. It builds each
+unit once from the previous commit (work/naming/mkold.py, which restores the
+changed files from git with the checkout's CRLF) and once from the edited
+tree.
+
+The comparer gained one verdict, NAME-ONLY-LABELS. VC6 names a goto label
+`$<label>$<counter>` (storage class 6, no bytes), and the counter moves when a
+header declares one name more or fewer. When an object is equal only after
+these counters are renumbered by first appearance on both sides, the verdict
+is NAME-ONLY-LABELS. Every byte, section flag and relocation target still has
+to match. The whole-object test pins hash only external and section symbols,
+so these units need no repin.
+
+Result (cumulative, every unit whose closure reaches one of the 81 changed
+files, from bb33e20f to the final tree, map work/naming/map-final.json with 18
+entries): 318 units, 263 IDENTICAL, 5
+IDENTICAL-COMDAT-ORDER (DlgProcsNearMisses.cpp, Group4_DlgMain.cpp,
+Group6_BikeRaceCreate.cpp, DlgProcs.cpp, ProCircuitProcs.cpp), 15 NAME-ONLY
+(the units that define or call a renamed Character slot: LayoutProbe.cpp,
+CharacterMotionStart.cpp, samples Motnctrl.cpp, WreckerNearMisses.cpp,
+CollisionCharacter.cpp, D3DIMSoultreeMotnctrl.cpp, Motnctrl.cpp,
+SoulTreePhysics.cpp, Bike.cpp, KrustyBike.cpp, Vehicle.cpp,
+CharacterDefaults.cpp, Wrecker.cpp and the fixtures character_defaults.cpp and
+character_motion_start_compare.cpp) and 35 NAME-ONLY-LABELS (the units that
+include Track.h, and KrustyUI.cpp). There was no DIFF and no compile failure, and no .bss or
+.data offset moved.
+
+Negative controls:
+
+- Without the map, samples/physics Motnctrl.obj gives DIFF in the relocations
+  of the vtable `??_7Character@@6B0@@`, and Wrecker.obj gives DIFF in the
+  relocations of `?EndWreck`. Without the map, the Track.obj of the FileStream
+  merge gives DIFF: the COMDAT `?FreeNodeArray@...PAVUnknownStream@@...` exists
+  only in the old object.
+- A live change (`motionTime = 0.0f` to `1.0f` in the new tree's
+  Motnctrl.cpp) gives DIFF in the bytes of `??0Character@@QAE@H@Z`. The same
+  control was rerun after the label pass was added and still gives DIFF.
+
+Fixture pins: whole-object and aggregate digests of NAME-ONLY units only, each
+with unchanged section and relocation counts: Bike.cpp, KrustyBike.cpp,
+Vehicle.cpp, SoulTreePhysics.cpp, D3DIMSoultreeMotnctrl.cpp, Wrecker.cpp,
+KrustyBikeNearMisses.cpp, WreckerNearMisses.cpp, samples Motnctrl.cpp and
+CharacterMotionStart.cpp. They live in 12 fixture files and in the digest
+tuples of tests/test_rider_motion_start_connections.py (work/naming/repin.py,
+then work/naming/w17_repinA.py and w17_repinA2.py). The two merges changed no
+pinned digest.
+
+### Slots
+
+| Old name | New name | Class / slot / object_offset | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| `CharacterVirtualSlot0` | `BuildModel` | Character slot 0, object_offset 0 (0x00464e90 empty stub; D3DIM 0x00445a70) | 2 | D3DIM loads "Base Character Frame" and the character model; slot 1 calls it first |
+| `CharacterVirtualSlot1` | `LoadFromSlt` | Character slot 1 (0x004a6930, not overridden) | 2 | reads the .slt "General info" keys, then calls slot 0, slot 2, LoadMotions and ApplyRestPose |
+| `CharacterVirtualSlot2` | `CaptureRestPose` | Character slot 2 (0x00464e90; D3DIM 0x00445fc0) | 2 | D3DIM stores every node's current pose in poseList, the rest pose |
+| `CharacterVirtualSlot3` | `CaptureFramePoses` | Character slot 3 (0x00464e80; D3DIM 0x00446110) | 2 | CaptureMotion's per-frame call; D3DIM overwrites the frame's records with the live node poses |
+| `CharacterVirtualSlot4` | `ApplyPose` | Character slot 4 (0x004a6ba0; D3DIM 0x00446210) | 2 | applies one pose record to its node under the per-row enables |
+| `CharacterVirtualSlot5` | `ApplyMirroredPose` | Character slot 5 (0x004a6ba0; D3DIM 0x00446300) | 2 | the same, through mirrorMap |
+| `CharacterVirtualSlot6` | `ApplyFullPose` | Character slot 6 (0x004a6ba0; D3DIM 0x00446480) | 2 | ignores applyRotation/applyTranslation; the rest-pose path |
+| `CharacterVirtualSlot7` | `AdvanceMotionInterpolated` | Character slot 7 (0x004a70c0, not overridden) | 2 | per-frame playback; the float argument is added to motionTime (+0x10) and the frames are interpolated |
+| `CharacterVirtualSlot8` | `CopyStateFrom` | Character slot 8 (0x004a98b0; D3DIM 0x00445e70) | 2 | copies another character's motion state, names and rest pose, then calls slot 9 |
+| `CharacterVirtualSlot9` | `CopyModelFrom` | Character slot 9 (0x00464e80; D3DIM 0x00445ec0) | 2 | D3DIM clones the other character's node model |
+| `CharacterVirtualSlot10` | `DumpNodeTransforms` | Character slot 10 (0x00464e90; D3DIM 0x00446520) | 2 | D3DIM formats a "Position/Orientation Data" line per node (the output is stripped) |
+| `CharacterVirtualSlot11`, `D3DIMVirtualSlot11` | `LoadCharacter` | D3DIMSoultreeCharacter slot 11, object_offset 0 (0x00445680) | 2 | loads the character resource and returns it, or releases itself and returns 0 when the resource is missing |
+| `ApplyPoseListSlot4`, `ApplyPoseListSlot6` | `ApplyPoseList`, `ApplyFullPoseList` | non-virtual Character helpers 0x004a8a80, 0x004a8ac0 | 2 | they apply a pose list through slot 4 or slot 6 |
+
+Views (same slot index and object_offset 0, names only; the objects are
+D3DIMSoultreeCharacters): `UnknownBikeRaceCharacter` (BikeRace.h),
+`UnknownKrustyUICharacter` and KrustyUI's model view (`ModelVirtualSlotN`).
+
+### COM methods
+
+| Interface view | SDK interface | Slots declared | Tier | Evidence |
+| --- | --- | --- | --- | --- |
+| `DirectDraw` (RenderInterfaces.h) | IDirectDraw7 | 28 | 1 | IID_IDirectDraw7 and the DirectDrawCreateEx import; every decoded index and argument count agrees |
+| `Direct3D` | IDirect3D7 | 7 | 1 | IID_IDirect3D7 |
+| `UnknownDirectInput`, `DirectInputDevice` (PCInputDevice.h) | IDirectInput7A, IDirectInputDevice7A | 10, 26 | 1 | IID_IDirectInput7A 0x005569e0, IID_IDirectInputDevice7A 0x00556a50 |
+| `AMMultiMediaStream`, `DirectDrawMediaStream` (MediaControl.h) | IAMMultiMediaStream, IDirectDrawMediaStream | 26, 14 | 1 | IID_IAMMultiMediaStream 0x00558ed0, IID_IDirectDrawMediaStream 0x00558e90 |
+| `UnknownGuiDirectDraw`, `Direct3DDevice`, `DirectDrawSurface`, `UnknownGuiSurface`, `DirectDrawClipper`, `UnknownGuiClipper`, `DirectDrawPalette`, `DirectDrawGammaControl`, `DirectDrawStreamSample` | IDirectDraw7 (GUIManager's two-method view), IDirect3DDevice7, IDirectDrawSurface7, IDirectDrawClipper, IDirectDrawPalette, IDirectDrawGammaControl, IDirectDrawStreamSample | the remaining `UnknownMethodN` | 2 | created by a confirmed interface's method; there is no own IID literal, but the indices and argument counts agree with the SDK order |
+
+All 137 renamed slots keep their index. Every slot that was already named
+agrees with the same SDK tables.
+
+### Merges
+
+| View | Into | Result |
+| --- | --- | --- |
+| `UnknownKrustyUIContext` (KrustyUI.cpp) | `TextureContext` | merged (6604ab6b). It is KrustyUI's copy of Game+0x1c..+0x33, with TextureContext's six fields at the same offsets. 1 unit, NAME-ONLY: only the label `$found$` in PickRandomRacers moved. |
+| `UnknownStream` (Track.h) | `FileStream` | merged (e77fe250). Track::FreeNodeArray (0x00515e70) receives the loader's FileStream, and the forward-declared view only forced 14 casts in LoadTrack. 181 units: 143 IDENTICAL, 3 IDENTICAL-COMDAT-ORDER, 35 NAME-ONLY-LABELS. |
+| `UnknownCursorAnimation` (GUIManager.h) | `UIAnim` | blocked: samples/race/BikeRaceNearMisses.cpp gives DIFF in the bytes of `?CreateRacers@BikeRace@@...`. That sample includes GUIManagerCore.h before BikeRace.cpp, and BikeRace's register allocation is sensitive to the declarations before it (Wave 8). The other 85 units were IDENTICAL or name-only. The diff is work/naming/w17_m3_blocked.diff. |
+| `UnknownTexturePalette` (TextureMap.h) | `ColorMapper` | blocked: 148 units, 3 DIFF and 3 COMPILE-FAIL. Terrain.cpp's `Render3D` swaps the order of its `g_terrainRender3DTicks` and `g_terrainPrepareGeometryTicks` references, ManagedTextureGroup.cpp's `DrawSelection` grows 4 bytes before its `__ftol` calls, and BikeRaceNearMisses' CreateRacers changes as above. PCTextureMap.cpp, PCTextureMapNearMisses.cpp and TextureClone.cpp read `colorMapper->indexFrom555`/`entries` and would need Quantize.h. The new BikeRaceNearMisses object is identical to the one from the CursorAnimation attempt, so CreateRacers reacts to one struct fewer, not to which struct. The diff is work/naming/w17_m4_blocked.diff. |
+| `UnknownTimer` (TextureMapManager.h) | `PeakHold` | blocked: [TEXTURE_HISTORY_TIMER](TEXTURE_HISTORY_TIMER.md) records that both the alias and the moved view changed strict Scene::ReadLight from 2102 to 2065 matching positions. |
+| `UnknownGuiControl` (GUIManager.h) | `UIControl` | blocked: the view's +0x210/+0x214 (acceptedCharacters, caretRect) are UIEditBox fields, and `LeaveHover`/`KillFocus` take `int` in UIControl and its six overrides but the view in GUIUser. |
+| `UnknownEcoTrackGame` (EcoSystem.h) | `TrackGame` | blocked: TrackGame's display is a PCVideoCard. The view's +0x28 colorKeyFormat is element 5 of `VideoCard::field_0x14[16]` and +0x1c0 capabilityBits is inside `PCVideoCard::field_0x1c0[]`, so the PCVideoCard fields must be split first. The EcoSystem units would also need TrackGame.h. |
+| `UnknownSoultreeNodeView` (bringup, D3DIMSoulTreeNearMisses) | `SoultreeObject` | blocked: the view takes and returns Vector3 by pointer where SoultreeObject uses `Vec3&` and returns Vec3, so the call sites would need conversions. Its comment also records that more declarations in D3DIMSoulTree.h change SceneManager.cpp 0x004eb570. |
+| `UnknownEventRacer`, `UnknownBikeRaceRacer` | `KrustyBike` | not attempted (out of scope unless the rest was done). Both have a virtual GameObject base and BikeRace.h is scheduling-sensitive. |
+
+Left as placeholders:
+
+- PhysicsBody `field_0x180`/`field_0x184` and slots 31 and 32: still no
+  reader of the fields and no caller of the slots.
+- UIDialog slot 30: it calls the +0xd4 callback, and no caller of the slot
+  names a role.
+- MSZoneInterface's `UnknownZoneScore` methods 3 to 5: its IID
+  3FAF0AFD-B48B-11D2-8A51-00C04F8EF4E9 is not a public SDK interface.
