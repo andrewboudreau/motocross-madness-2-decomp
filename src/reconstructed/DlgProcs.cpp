@@ -862,7 +862,7 @@ void SPEventDlg::SyncValues(int apply) {
         if (settings->raceMode == 4 && ghost != -1) {
             COPY_TEXT(g_TrackGame->mode.ghostFile, ghostPaths[ghost], 0x104);
             // KrustyUI+0x4b4 holds the header of the ghost raced against.
-            *(UnknownRecordFileHeader*)((unsigned char*)g_TrackGame->ui + 0x4b4) = ghostHeaders[ghost];
+            *(KrustyVCRHeader*)((unsigned char*)g_TrackGame->ui + 0x4b4) = ghostHeaders[ghost];
         } else {
             g_TrackGame->mode.ghostFile[0] = 0;
         }
@@ -913,7 +913,7 @@ int SPEventDlg::AddGhost(const char* path) {
     char label[128];
     char text[128];
     int added = 0;
-    UnknownRecordFileHeader header;
+    KrustyVCRHeader header;
     FILE* file = fopen(path, "rb");
     if (file) {
         if (fread(&header, sizeof(header), 1, file)) {
@@ -922,8 +922,8 @@ int SPEventDlg::AddGhost(const char* path) {
             if (!_stricmp(header.trackName, g_TrackGame->ui->entries[row].fileName) &&
                 header.lengthSeconds > 0.0f &&
                 g_TrackGame->ui->entries[row].scene == header.trackIndex) {
-                ghostHeaders = (UnknownRecordFileHeader*)ResizeDebugBlock(
-                    ghostHeaders, (ghostHeaderCount + 1) * sizeof(UnknownRecordFileHeader));
+                ghostHeaders = (KrustyVCRHeader*)ResizeDebugBlock(
+                    ghostHeaders, (ghostHeaderCount + 1) * sizeof(KrustyVCRHeader));
                 ghostHeaders[ghostHeaderCount] = header;
                 ghostHeaderCount++;
                 ghostPaths = (char**)ResizeDebugBlock(ghostPaths, (ghostPathCount + 1) * sizeof(char*));
@@ -2207,13 +2207,13 @@ void GhostFilesDlg::HandleEvent(DialogEvent* event) {
             ListGhostFiles();
         } else if (code == 0xc9) {
             UIListBox* list = static_cast<UIListBox*>(FindControl("LstTrack", 3));
-            UnknownRecordFileHeader* header = &fileHeaders[list->GetRowData(-1)];
+            KrustyVCRHeader* header = &fileHeaders[list->GetRowData(-1)];
             strcpy(header->description, editedDescription);
             char* path = filePaths[list->GetRowData(-1)];
             FILE* file = fopen(path, "rb+");
             if (file) {
                 fseek(file, 0, SEEK_SET);
-                fwrite(header, sizeof(UnknownRecordFileHeader), 1, file);
+                fwrite(header, sizeof(KrustyVCRHeader), 1, file);
                 fclose(file);
             }
             ListGhostFiles();
@@ -2273,12 +2273,12 @@ int GhostFilesDlg::AddGhostFile(const char* path) {
     char text[64];
     char env[260];
     int added = 0;
-    UnknownRecordFileHeader header;
+    KrustyVCRHeader header;
     FILE* file = fopen(path, "rb");
     if (file) {
         if (fread(&header, sizeof(header), 1, file) && header.lengthSeconds > 0.0f) {
-            fileHeaders = (UnknownRecordFileHeader*)ResizeDebugBlock(
-                fileHeaders, (fileHeaderCount + 1) * sizeof(UnknownRecordFileHeader));
+            fileHeaders = (KrustyVCRHeader*)ResizeDebugBlock(
+                fileHeaders, (fileHeaderCount + 1) * sizeof(KrustyVCRHeader));
             fileHeaders[fileHeaderCount] = header;
             fileHeaderCount++;
             filePaths = (char**)ResizeDebugBlock(filePaths, (filePathCount + 1) * sizeof(char*));
@@ -2312,7 +2312,7 @@ int GhostFilesDlg::AddGhostFile(const char* path) {
 // 0x00454970
 void GhostFilesDlg::RaceSelectedGhost() {
     UIListBox* list = static_cast<UIListBox*>(FindControl("LstTrack", 3));
-    UnknownRecordFileHeader* header = &fileHeaders[list->GetRowData(-1)];
+    KrustyVCRHeader* header = &fileHeaders[list->GetRowData(-1)];
     memcpy(&g_TrackGame->mode.raceSettings, &header->raceMode, sizeof(g_TrackGame->mode.savedSettings));
     COPY_TEXT(g_TrackGame->mode.ghostFile, filePaths[list->GetRowData(-1)], 0x104);
     parentDialog->MarkPendingRelease();
@@ -2360,13 +2360,13 @@ void ReplayFilesDlg::HandleEvent(DialogEvent* event) {
             ListReplayFiles();
         } else if (code == 0xc9) {
             UIListBox* list = static_cast<UIListBox*>(FindControl("LstTrack", 3));
-            UnknownRecordFileHeader* header = &fileHeaders[list->GetRowData(-1)];
+            KrustyVCRHeader* header = &fileHeaders[list->GetRowData(-1)];
             COPY_TEXT(header->description, editedDescription, 32);
             char* path = filePaths[list->GetRowData(-1)];
             FILE* file = fopen(path, "rb+");
             if (file) {
                 fseek(file, 0, SEEK_SET);
-                fwrite(header, sizeof(UnknownRecordFileHeader), 1, file);
+                fwrite(header, sizeof(KrustyVCRHeader), 1, file);
                 fclose(file);
             }
             ListReplayFiles();
@@ -2427,12 +2427,12 @@ int ReplayFilesDlg::AddReplayFile(const char* path) {
     char text[64];
     char env[260];
     int added = 0;
-    UnknownRecordFileHeader header;
+    KrustyVCRHeader header;
     FILE* file = fopen(path, "rb");
     if (file) {
         if (fread(&header, sizeof(header), 1, file) && header.lengthSeconds > 0.0f) {
-            fileHeaders = (UnknownRecordFileHeader*)ResizeDebugBlock(
-                fileHeaders, (fileHeaderCount + 1) * sizeof(UnknownRecordFileHeader));
+            fileHeaders = (KrustyVCRHeader*)ResizeDebugBlock(
+                fileHeaders, (fileHeaderCount + 1) * sizeof(KrustyVCRHeader));
             fileHeaders[fileHeaderCount] = header;
             fileHeaderCount++;
             filePaths = (char**)ResizeDebugBlock(filePaths, (filePathCount + 1) * sizeof(char*));
@@ -2489,7 +2489,7 @@ int ReplayFilesDlg::AddReplayFile(const char* path) {
 // 0x00455490
 void ReplayFilesDlg::PlaySelectedReplay() {
     UIListBox* list = static_cast<UIListBox*>(FindControl("LstTrack", 3));
-    UnknownRecordFileHeader* header = &fileHeaders[list->GetRowData(-1)];
+    KrustyVCRHeader* header = &fileHeaders[list->GetRowData(-1)];
     memcpy(&g_TrackGame->mode.raceSettings, &header->raceMode, sizeof(g_TrackGame->mode.savedSettings));
     g_TrackGame->mode.SelectSeries(header->series);
     g_TrackGame->playingReplay = 1;

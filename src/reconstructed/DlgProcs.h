@@ -99,7 +99,7 @@ public:
     SPRaceInfoDlg* raceInfoPage;              // +0x7f60: SPRaceInfoDlg page
 };
 
-struct UnknownRecordFileHeader;
+struct KrustyVCRHeader;
 
 // RTTI: SPEventDlg : UIDialog (vtable 0x00551d34; 0x7f68 bytes).
 class SPEventDlg : public UIDialog {
@@ -113,7 +113,7 @@ public:
     int AddGhost(const char* path); // 0x0044ec50: adds a ghost; 0 when unusable
     void ForgetGhosts();             // 0x0044eed0: forgets the ghosts
 
-    UnknownRecordFileHeader* ghostHeaders;    // +0x7f58: the ghost files' headers
+    KrustyVCRHeader* ghostHeaders;    // +0x7f58: the ghost files' headers
     int ghostHeaderCount;                     // +0x7f5c: their count
     char** ghostPaths;                        // +0x7f60: the ghost files' paths
     int ghostPathCount;                       // +0x7f64: their count
@@ -337,7 +337,7 @@ void* ResizeDebugBlock(void* block, unsigned int size);
 // ReplayFilesDlg read it (0x00454640). +0x34..+0x220 is a copy of the race
 // settings at TrackGame+0x2d70 (KrustyUI+0x4e8 keeps another copy, whose
 // eight records at +0x14c are KrustyUI+0x634).
-struct UnknownRecordFileHeader {
+struct KrustyVCRHeader {
     unsigned char field_0x00[0x10];
     char description[0x20];                   // +0x10: description
     float lengthSeconds;                      // +0x30: length in seconds
@@ -385,7 +385,7 @@ public:
     int AddGhostFile(const char* path); // 0x00454640: adds a ghost file; 0 when unusable
     void RaceSelectedGhost();             // 0x00454970: races the selected ghost
 
-    UnknownRecordFileHeader* fileHeaders;     // +0x7f58: the files' headers
+    KrustyVCRHeader* fileHeaders;     // +0x7f58: the files' headers
     int fileHeaderCount;                      // +0x7f5c: their count
     char** filePaths;                         // +0x7f60: the files' paths
     int filePathCount;                        // +0x7f64: their count
@@ -401,7 +401,7 @@ public:
     int AddReplayFile(const char* path); // 0x00455040: adds a replay file; 0 when unusable
     void PlaySelectedReplay();             // 0x00455490: plays the selected replay
 
-    UnknownRecordFileHeader* fileHeaders;     // +0x7f58: the files' headers
+    KrustyVCRHeader* fileHeaders;     // +0x7f58: the files' headers
     int fileHeaderCount;                      // +0x7f5c: their count
     char** filePaths;                         // +0x7f60: the files' paths
     int filePathCount;                        // +0x7f64: their count
