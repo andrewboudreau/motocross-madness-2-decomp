@@ -4,9 +4,9 @@
 // no destructor) by gameui.cpp, Parameterblocks.cpp and others. Its bodies
 // sit directly before Track.cpp's 0x00515e70 and are reconstructed in
 // Track.cpp, by position only. Names are provisional.
-class UnknownTokenizer {
+class Tokenizer {
 public:
-    UnknownTokenizer(char* text);                          // 0x00515dc0
+    Tokenizer(char* text);                          // 0x00515dc0
     char* NextToken(const char* delimiters);   // 0x00515df0: next token
 
     char* token;        // +0x00 current token

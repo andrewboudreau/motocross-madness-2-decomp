@@ -45,7 +45,7 @@ static inline TrackVec3& operator+=(TrackVec3& a, const TrackVec3& b)
 }
 
 // 0x00515dc0: an empty string leaves nothing to split.
-UnknownTokenizer::UnknownTokenizer(char* text)
+Tokenizer::Tokenizer(char* text)
 {
     if (strlen(text) != 0)
         rest = text;
@@ -54,7 +54,7 @@ UnknownTokenizer::UnknownTokenizer(char* text)
 }
 
 // 0x00515df0: returns the next token and skips the delimiters after it.
-char* UnknownTokenizer::NextToken(const char* delimiters)
+char* Tokenizer::NextToken(const char* delimiters)
 {
     if (!rest)
         return 0;

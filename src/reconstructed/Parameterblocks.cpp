@@ -372,7 +372,7 @@ int ParameterBlock::ReadString(const char* key, char* out, int size)
         int length = PB_MIN(PB_LINE_SIZE - 1, lineLength);
         strncpy(text, loadedLines[i], length);
         text[length] = 0;
-        UnknownTokenizer tokens(text);
+        Tokenizer tokens(text);
         char* token = tokens.NextToken("=\n");
         int tokenLength = strlen(token);
         length = PB_MIN(PB_LINE_SIZE - 1, tokenLength);
@@ -505,7 +505,7 @@ int ParameterBlock::ReadRow(char* raw)
     if (raw)
         strcpy(raw, line);
     StripBlanks(line, stripped);
-    UnknownTokenizer tokens(stripped);
+    Tokenizer tokens(stripped);
     char* token = tokens.NextToken(",\n");
     valueCount = 0;
     while (token) {

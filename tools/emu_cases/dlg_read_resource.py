@@ -4,7 +4,7 @@ case, call-record/replay mode).
 The linked body is src/bringup/Group2_UIDialogResource.cpp. The resource is an INI-like
 parameter block (ParameterBlock: GetSectionNames 0x004b8240, SelectSection 0x004b78f0,
 GetString 0x004b7ec0, GetInt 0x004b7f10, GetFloat 0x004b7f40), modelled from a synthetic
-resource: section names joined by '?' and split by the real UnknownTokenizer (ctor 0x00515dc0
+resource: section names joined by '?' and split by the real Tokenizer (ctor 0x00515dc0
 and NextToken 0x00515df0 run natively), with Set_Anim/Set_Sound/Set_Control markers (and
 names that merely start with them), Set_Info and Set_Default sections, image sections
 (MSecDelay, LoopCount, Files1 lists), sound sections (Static, Copies, File) and control

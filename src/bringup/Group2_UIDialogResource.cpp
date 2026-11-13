@@ -60,7 +60,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
     parameters.Attach((UnknownParameterStream*)stream, offset, 1);
     char buffer[0x2800];
     parameters.GetSectionNames(buffer, sizeof(buffer));
-    UnknownTokenizer* sections = new(__FILE__, 0x273) UnknownTokenizer(buffer);
+    Tokenizer* sections = new(__FILE__, 0x273) Tokenizer(buffer);
     for (char* name = sections->NextToken("?"); name; name = sections->NextToken("?")) {
         if (!_strnicmp(name, "Set_Anim", strlen("Set_Anim"))) {
             setType = 1;
@@ -360,7 +360,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                     imageTable[imageCount]->SetFrameDelay(delay);
                     imageTable[imageCount]->SetFrameCount(loops);
                     parameters.GetString("Files1", "", buffer, -1);
-                    UnknownTokenizer files(buffer);
+                    Tokenizer files(buffer);
                     for (char* file = files.NextToken(","); file; file = files.NextToken(",")) {
                         if (g_ResourceManager->FindItem(sectionTable[i].sectionName, 1))
                             imageTable[imageCount]->LoadFromModule(

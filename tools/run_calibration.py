@@ -23345,18 +23345,18 @@ CASES = [
     },
     # Track.cpp
     {
-        'name': 'UnknownTokenizer constructor 0x515dc0',
+        'name': 'Tokenizer constructor 0x515dc0',
         'bindings': 'src/reconstructed/Track.bindings.json',
         'source': 'src/reconstructed/Track.cpp',
-        'symbol': '??0UnknownTokenizer@@QAE@PAD@Z',
+        'symbol': '??0Tokenizer@@QAE@PAD@Z',
         'target_va': '0x00515dc0',
         'target_size': 46,
     },
     {
-        'name': 'UnknownTokenizer 0x515df0 next token',
+        'name': 'Tokenizer 0x515df0 next token',
         'bindings': 'src/reconstructed/Track.bindings.json',
         'source': 'src/reconstructed/Track.cpp',
-        'symbol': '?NextToken@UnknownTokenizer@@QAEPADPBD@Z',
+        'symbol': '?NextToken@Tokenizer@@QAEPADPBD@Z',
         'target_va': '0x00515df0',
         'target_size': 118,
     },

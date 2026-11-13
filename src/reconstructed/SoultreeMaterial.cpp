@@ -297,7 +297,7 @@ void SoultreeMaterial::ReadKeys(ParameterBlock* block, int load)
     }
     if (block->ReadString("ColorKey", value, -1)) {
         hasColorKey = 1;
-        UnknownTokenizer tokens(value);
+        Tokenizer tokens(value);
         int red = atoi(tokens.NextToken(","));
         int green = atoi(tokens.NextToken(","));
         int blue = atoi(tokens.NextToken("\n"));
