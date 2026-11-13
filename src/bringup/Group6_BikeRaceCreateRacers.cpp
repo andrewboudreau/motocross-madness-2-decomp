@@ -119,7 +119,7 @@ static inline UnknownBikeRaceUiModel& UiRider(int i) {
 
 // 0x00419970
 int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureFormatChoice* textures,
-                                    UnknownBikeRaceProjector* terrain, UnknownBikeRaceNodeOwner* event) {
+                                    UnknownBikeRaceProjector* terrain, RaceGateEvent* event) {
     char path[0x104];
     char message[0x184];
     char bikeFile[0x104];

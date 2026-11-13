@@ -316,7 +316,7 @@ public:
 };
 
 // The race object at TrackGame+0x560 as RadarOverlay's gate drawing reads
-// it (bikerace.cpp sees the same records as UnknownBikeRaceNodeOwner in
+// it (bikerace.cpp sees the same records as RaceGateEvent in
 // BikeRace.h): +0xac gates, +0xb0/+0xb4 the current and next gate, +0xd8 the
 // gate records (position, direction) and +0x420 one entry per gate, whose
 // +0x30 enables drawing and whose first +0x50 is the half width.

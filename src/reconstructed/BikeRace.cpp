@@ -220,14 +220,14 @@ int BikeRace::SetPaused(int value) {
 }
 
 // 0x0041d0d0
-int BikeRace::AppendNode(int index, UnknownBikeRaceNodeSource* source,
+int BikeRace::AppendNode(int index, RaceGatePose* source,
                          RaceGate*** tail, float scale, int value) {
     RaceGate* node =
         (RaceGate*)DebugCalloc(1, sizeof(RaceGate), __FILE__, 0x840);
     if (node == 0) {
         return 0;
     }
-    UnknownBikeRaceNodeSource* record = &source[index];
+    RaceGatePose* record = &source[index];
     node->center.x = record->center.x;
     node->center.y = record->center.y;
     node->center.z = record->center.z;
@@ -245,12 +245,12 @@ int BikeRace::AppendNode(int index, UnknownBikeRaceNodeSource* source,
 }
 
 // 0x0041d170
-int BikeRace::BuildNodeList(UnknownBikeRaceNodeOwner* owner) {
+int BikeRace::BuildNodeList(RaceGateEvent* owner) {
     int count = owner->gateCount;
-    UnknownBikeRaceNodeSource* sources = owner->gateSources;
+    RaceGatePose* sources = owner->gateSources;
     RaceGate** tail = &gateList;
     for (int i = 0; i < count; i++) {
-        UnknownBikeRaceNodeEntry* entry = owner->gateEntries[i];
+        RaceGateObject* entry = owner->gateEntries[i];
         if (!AppendNode(i, sources, &tail, entry->width, entry->field_0x54)) {
             return 0;
         }

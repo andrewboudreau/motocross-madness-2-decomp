@@ -123,7 +123,7 @@ static inline Vector3 UnknownScaled(const Vector3& v, float scale) {
 BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                                           UnknownTextureFormatChoice* textures,
                                           UnknownBikeRaceProjector* terrain, KrustyBikeCamera* camera,
-                                          Scene* scene, UnknownBikeRaceNodeOwner* event,
+                                          Scene* scene, RaceGateEvent* event,
                                           UnknownBikeRaceShadow* shadow) {
     char name[0x104];
     char path[0x104];

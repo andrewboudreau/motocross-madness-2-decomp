@@ -13,7 +13,7 @@ void* G3Q_BikeRaceCreate(void* race, void* target, void* particles, void* lights
     return ((BikeRace*)race)->Create(target, particles, (LightManager*)lights,
                                      (UnknownTextureFormatChoice*)textures,
                                      (UnknownBikeRaceProjector*)terrain, (KrustyBikeCamera*)camera,
-                                     (Scene*)scene, (UnknownBikeRaceNodeOwner*)event,
+                                     (Scene*)scene, (RaceGateEvent*)event,
                                      (UnknownBikeRaceShadow*)shadow);
 }
 

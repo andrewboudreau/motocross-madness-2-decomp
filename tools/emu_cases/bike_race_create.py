@@ -31,7 +31,7 @@ import struct
 
 RETAIL_VA = 0x00417ed0
 SYMBOL = ('?Create@BikeRace@@QAEPAV1@PAX0PAVLightManager@@PAUUnknownTextureFormatChoice@@'
-          'PAVUnknownBikeRaceProjector@@PAVKrustyBikeCamera@@PAVScene@@PAUUnknownBikeRaceNodeOwner@@'
+          'PAVUnknownBikeRaceProjector@@PAVKrustyBikeCamera@@PAVScene@@PAURaceGateEvent@@'
           'PAVUnknownBikeRaceShadow@@@Z')
 SOURCE = 'src/bringup/Group6_BikeRaceCreate.cpp'
 PROBES = {0x0041800f: 'tdf from env', 0x004180f3: 'no track file', 0x00418338: 'after load',

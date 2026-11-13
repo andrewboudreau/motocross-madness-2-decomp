@@ -426,7 +426,7 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
         break;
     case 1:
     case 5: {
-        UnknownBikeRaceNodeOwner* owner = (UnknownBikeRaceNodeOwner*)reference;
+        RaceGateEvent* owner = (RaceGateEvent*)reference;
         Vector3 direction = owner->gateSources[owner->gateCount - 1].direction;
         direction.y = 0.0f;
         *b = Normalize(direction);

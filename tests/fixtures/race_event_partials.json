@@ -87,13 +87,13 @@
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",
-      "?Create@BikeRace@@QAEPAV1@PAX0PAVLightManager@@PAUUnknownTextureFormatChoice@@PAVUnknownBikeRaceProjector@@PAVKrustyBikeCamera@@PAVScene@@PAUUnknownBikeRaceNodeOwner@@PAVUnknownBikeRaceShadow@@@Z",
+      "?Create@BikeRace@@QAEPAV1@PAX0PAVLightManager@@PAUUnknownTextureFormatChoice@@PAVUnknownBikeRaceProjector@@PAVKrustyBikeCamera@@PAVScene@@PAURaceGateEvent@@PAVUnknownBikeRaceShadow@@@Z",
       6760,
-      "5fe947fd4857d742f08c59a8785f0ddb0173500ba4c7ac25ddbff1c530cae1aa"
+      "8d40c148b58edcc6010ac84e1f52b0f8139917278f692bc93da7eff49183652e"
     ],
     [
       "samples/race/BikeRaceNearMisses.cpp",
-      "?CreateRacers@BikeRace@@QAEHPAXPAVLightManager@@PAUUnknownTextureFormatChoice@@PAVUnknownBikeRaceProjector@@PAUUnknownBikeRaceNodeOwner@@@Z",
+      "?CreateRacers@BikeRace@@QAEHPAXPAVLightManager@@PAUUnknownTextureFormatChoice@@PAVUnknownBikeRaceProjector@@PAURaceGateEvent@@@Z",
       13428,
       "37530321ff79a10c784b9f8b793ba6c0e03a4fd11f83c87f2fed9743b838d8ba"
     ],

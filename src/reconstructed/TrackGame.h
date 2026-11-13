@@ -46,7 +46,7 @@ public:
 };
 
 // The entries at TrackGameViewOwner+0x420 (BikeRace.h walks them as
-// UnknownBikeRaceNodeEntry): +0x58 points at an object whose +0x44 flag
+// RaceGateObject): +0x58 points at an object whose +0x44 flag
 // 0x00404df0 raises for the two entries it leaves and clears for the two
 // it picks.
 struct UnknownTrackGameViewEntryTarget {

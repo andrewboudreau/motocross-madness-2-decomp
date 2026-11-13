@@ -17,8 +17,8 @@ class UnknownBikeRaceShadow;
 class UnknownBikeRaceCharacter;
 struct UnknownTextureFormatChoice;
 struct UnknownBikeRaceCameraView;
-struct UnknownBikeRaceNodeOwner;
-struct UnknownBikeRaceNodeSource;
+struct RaceGateEvent;
+struct RaceGatePose;
 struct UnknownBikeRaceViews;
 struct UnknownBikeRaceView6c;
 struct RaceStatusNode;
@@ -59,19 +59,19 @@ public:
     // the sound and the plate numbers. Returns this, or 0 after Release.
     BikeRace* Create(void* owner, void* particles, LightManager* lights,
                                     UnknownTextureFormatChoice* textures, UnknownBikeRaceProjector* terrain,
-                                    KrustyBikeCamera* camera, Scene* scene, UnknownBikeRaceNodeOwner* event,
+                                    KrustyBikeCamera* camera, Scene* scene, RaceGateEvent* event,
                                     UnknownBikeRaceShadow* shadow);
     // 0x00419970 (ret 0x14): loads the rider models and creates the racers;
     // 0 on failure.
     int CreateRacers(void* owner, LightManager* lights, UnknownTextureFormatChoice* textures,
-                              UnknownBikeRaceProjector* terrain, UnknownBikeRaceNodeOwner* event);
+                              UnknownBikeRaceProjector* terrain, RaceGateEvent* event);
     // 0x00417bc0: the racer numbers 1..+0x158 ordered by championship points.
     void RankByPoints(int* order);
     // 0x0041d0d0: appends a node for `source[index]` at `*tail`.
-    int AppendNode(int index, UnknownBikeRaceNodeSource* source,
+    int AppendNode(int index, RaceGatePose* source,
                    RaceGate*** tail, float scale, int value);
     // 0x0041d170: one node per entry of `owner`; 0 when an allocation fails.
-    int BuildNodeList(UnknownBikeRaceNodeOwner* owner);
+    int BuildNodeList(RaceGateEvent* owner);
     // 0x0041d1e0: sets +0x189 from the track distance between +0xf8 and +0x134.
     int UpdateTrackSeparation();
     void SetSceneTime(float time);   // 0x0041d2a0: the scene's time

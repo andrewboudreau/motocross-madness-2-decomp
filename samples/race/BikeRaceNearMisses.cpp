@@ -533,7 +533,7 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
         break;
     case 1:
     case 5: {
-        UnknownBikeRaceNodeOwner* owner = (UnknownBikeRaceNodeOwner*)reference;
+        RaceGateEvent* owner = (RaceGateEvent*)reference;
         Vector3 direction = owner->gateSources[owner->gateCount - 1].direction;
         direction.y = 0.0f;
         *b = Normalize(direction);
@@ -595,7 +595,7 @@ static inline Vector3 UnknownScaled(const Vector3& v, float scale) {
 BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                                           UnknownTextureFormatChoice* textures,
                                           UnknownBikeRaceProjector* terrain, KrustyBikeCamera* camera,
-                                          Scene* scene, UnknownBikeRaceNodeOwner* event,
+                                          Scene* scene, RaceGateEvent* event,
                                           UnknownBikeRaceShadow* shadow) {
     char name[0x104];
     char path[0x104];
@@ -1021,7 +1021,7 @@ static inline UnknownBikeRaceUiModel& UiRider(int i) {
 
 // 0x00419970
 int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureFormatChoice* textures,
-                                    UnknownBikeRaceProjector* terrain, UnknownBikeRaceNodeOwner* event) {
+                                    UnknownBikeRaceProjector* terrain, RaceGateEvent* event) {
     char path[0x104];
     char message[0x184];
     char bikeFile[0x104];
