@@ -243,7 +243,7 @@ int ProjectedShadow::PrepareGeometry()
         if (dirtyFlags) {
             RenderShadow();
             for (int i = 0; i < receiverCount; i++)
-                receivers[i]->UnknownVirtualSlot30();
+                receivers[i]->BuildShadowVertices();
             if (updatePeriod == 1)
                 TintCasterVertices();
             Present();

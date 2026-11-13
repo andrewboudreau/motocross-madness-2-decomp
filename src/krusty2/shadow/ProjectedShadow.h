@@ -257,7 +257,7 @@ struct ShadowRect {
 // slot 8 is 0x00447780 (calls GameObject slot 8 non-virtually, returns this).  All of that is
 // inline code, so it is written here in the header (VC6 emits a COMDAT copy per using TU).
 // Slot 28 returns int: the stub 0x004aa190 is `xor eax,eax; ret` and the D3DIM override
-// returns 0 in eax.  Names tier 3.
+// returns 0 in eax.  Names tier 3; slot 30 is named for what both overrides do (Wave 13).
 class ShadowReceiver : public GameObject {
 public:
     explicit ShadowReceiver(int flags) : GameObject(flags) {}
@@ -271,7 +271,7 @@ public:
     virtual int UnknownVirtualSlot27() { return 1; }
     virtual int UnknownVirtualSlot28() { return 0; }
     virtual int UnknownVirtualSlot29() { return 1; }
-    virtual void UnknownVirtualSlot30() {}
+    virtual void BuildShadowVertices() {}
 };
 
 class ProjectedShadow : public GameObject {

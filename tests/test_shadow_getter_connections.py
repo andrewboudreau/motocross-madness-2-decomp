@@ -37,7 +37,7 @@ INLINE = ('static inline void SetIdentity(', 'static inline void MatrixProduct('
 PARTIALS = (
     ('?UnknownVirtualSlot29@D3DIMSoultreeShadow@@UAEHXZ', 0x446c30, 771, 771, 721,
      '73e028b6fa1c1831c8fd9a78a10f9f19c00ad947cbdd8d810aabcd7bd437f5a4'),
-    ('?UnknownVirtualSlot30@D3DIMSoultreeShadow@@UAEXXZ', 0x446f40, 1524, 1533, 122,
+    ('?BuildShadowVertices@D3DIMSoultreeShadow@@UAEXXZ', 0x446f40, 1524, 1533, 122,
      '523d4a407e85a5f28f6dc44dd282fec8adc903e3b7c0328761f94e02228a1563'))
 
 

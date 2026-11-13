@@ -32,7 +32,7 @@ public:
     virtual int UnknownVirtualSlot27();                                                 // 0x00508bc0
     virtual int UnknownVirtualSlot28();                                                 // 0x005097d0
     virtual int UnknownVirtualSlot29();                                                 // 0x005099c0
-    virtual void UnknownVirtualSlot30();                                                // 0x00509aa0
+    virtual void BuildShadowVertices();                                                 // 0x00509aa0 slot 30
 
     Terrain* caster;               // +0x2c ctor 0; Attach stores its second argument.  Tier 2: slot 28 calls
                                    // 0x00484d70 on caster+0x44, which is Terrain::heightField

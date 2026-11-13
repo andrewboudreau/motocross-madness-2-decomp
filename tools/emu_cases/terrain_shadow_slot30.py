@@ -14,7 +14,7 @@ vertexCount, the clip rectangle object, and the call sequence.
 import struct
 
 RETAIL_VA = 0x00509aa0
-SYMBOL = '?UnknownVirtualSlot30@TerrainShadow@@UAEXXZ'
+SYMBOL = '?BuildShadowVertices@TerrainShadow@@UAEXXZ'
 SOURCE = 'samples/physics/shadow/TerrainShadow.cpp'
 PROBES = {0x00509fd0: 'fill triangle', 0x0050a14e: 'MarkUsed', 0x0050a134: 'vertex array full'}
 

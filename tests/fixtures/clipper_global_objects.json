@@ -42,7 +42,7 @@
     "src/krusty2/shadow/D3DIMSoultreeShadow.cpp": {
       "sections": 47,
       "relocations": 132,
-      "sha256": "98d3b4463e8a1add389e6a6cdf4fd038049dbb08dd33b09a6d1e2460245ce0a6"
+      "sha256": "bda149143c478c3cd2ddcd9cdc2878075ad4bedbdc0ac1c3cd5a3480f8825a06"
     },
     "src/krusty2/visibility/VisibilityQuadTree.cpp": {
       "sections": 88,
@@ -77,7 +77,7 @@
     "samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp": {
       "sections": 7,
       "relocations": 53,
-      "sha256": "438673e20cbe97a9cea20f700580574f1b049eb18e23cb1762e56f6a144fcaae"
+      "sha256": "0ae22dbaf07b32d110d87fdeb1f9c9fb93bb0729949a9c100c460a1002a99c37"
     },
     "samples/physics/visibility/VisibilityQuadTreeTraversal.cpp": {
       "sections": 2,

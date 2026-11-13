@@ -112,7 +112,7 @@ struct TerrainLitVertex {
 };
 
 #pragma optimize("y", off)
-void TerrainShadow::UnknownVirtualSlot30()
+void TerrainShadow::BuildShadowVertices()
 {
     enum { kMaxMeshVertices = 867 };
     ShadowVec3 transformed[kMaxMeshVertices];

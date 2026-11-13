@@ -2,7 +2,7 @@
   {
     "class": "TerrainShadow",
     "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot30@TerrainShadow",
+    "candidate_symbol_contains": "BuildShadowVertices@TerrainShadow",
     "target_va": "0x00509aa0",
     "target_size": 1788,
     "expect": "partial",

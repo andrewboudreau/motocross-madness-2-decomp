@@ -14,7 +14,7 @@ vertexCount, the outcodes (0x0057efd4), the scratch statics and the call sequenc
 import struct
 
 RETAIL_VA = 0x00446f40
-SYMBOL = '?UnknownVirtualSlot30@D3DIMSoultreeShadow@@UAEXXZ'
+SYMBOL = '?BuildShadowVertices@D3DIMSoultreeShadow@@UAEXXZ'
 SOURCE = 'samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp'
 # The candidate's file statics live at retail's addresses, so both runs share the state.
 BINDINGS = {'_s_shadowPointCapacity': 0x0059ad28, '_s_shadowPoints': 0x0059ad2c}

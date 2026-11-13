@@ -31,5 +31,5 @@
   "?UnknownVirtualSlot27@ShadowReceiver@@UAEHXZ": "0x00468c90",
   "?UnknownVirtualSlot28@ShadowReceiver@@UAEHXZ": "0x004aa190",
   "?UnknownVirtualSlot29@ShadowReceiver@@UAEHXZ": "0x00468c90",
-  "?UnknownVirtualSlot30@ShadowReceiver@@UAEXXZ": "0x0044d710"
+  "?BuildShadowVertices@ShadowReceiver@@UAEXXZ": "0x0044d710"
 }

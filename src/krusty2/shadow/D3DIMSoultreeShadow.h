@@ -23,7 +23,7 @@ public:
     virtual int UnknownVirtualSlot27();                            // 0x004468f0
     virtual int UnknownVirtualSlot28();                            // 0x00446bf0
     virtual int UnknownVirtualSlot29();                            // 0x00446c30
-    virtual void UnknownVirtualSlot30();                           // 0x00446f40 (body not reconstructed)
+    virtual void BuildShadowVertices();                            // 0x00446f40 slot 30 (near miss in samples/physics/shadow)
 
     ShadowCaster* caster;          // +0x2c ctor 0; Attach stores its second argument (slot 27 reads +0x14c / calls 0x004fe850 on it)
     ProjectedShadow* shadow;       // +0x30 ctor 0; Attach stores its third argument and registers this with it

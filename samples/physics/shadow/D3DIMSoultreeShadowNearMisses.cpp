@@ -201,7 +201,7 @@ extern D3DIMShadowVertexView g_d3dimShadowVertexArray[3000];   // 0x00581eb8
 // Retail's inline-asm fistp helper gives this function an EBP frame; the
 // pragma keeps the frame pointer for it alone (docs/GAME_BUILD.md#frame-pointer-units).
 #pragma optimize("y", off)
-void D3DIMSoultreeShadow::UnknownVirtualSlot30()
+void D3DIMSoultreeShadow::BuildShadowVertices()
 {
     if (!inShadowView)
         return;
