@@ -902,3 +902,132 @@ views' slot 0 is Game's destructor (a different kind of member) and the
 canonical Game and GameObject slots 9, 12 and 19 are themselves unnamed. The
 shadow receivers' slots 27-30 and the physics slots 26/27 would need
 behavioural names, which this wave's rule excludes.
+
+## Wave 13: replay deltas, the tag ball and shadow slot 30
+
+Wave 13 follows up the leads Wave 12 left: the byte-delta arrays shared by
+the network and replay messages, the "ghost" types in BikeRace.h, the shadow
+receivers' virtual slots 27-30 and a stale SoulTreePhysics.cpp comment. It
+also rewrote the lead finder (work/naming/classreads.py) to type registers
+from compiled layouts (see "Lead finder" below), and named the fields that
+its scan exposed. `git grep -c field_0x -- src samples` fell from 1907 to
+1881 lines. `UnknownVirtualSlot` lines fell from 352 to 342.
+
+The "ghost" was misnamed. The object at TrackGameViewOwner+0xdc, which the
+replay recorder callback reaches as TrackGame+0x568's +0xdc, is the Tag
+event's ball: StatsOverlay (0x0051aa40) shows string 0x14b7 `"FREE BALL!"`
+while it is set and no racer "is IT!". The VCR ghost
+bike is `aiRacers[0]`, a KrustyBike. The Wave 12 rows for
+`UnknownBikeRaceGhost` and `UnknownBikeRaceGhostRecord` above describe the
+same members under their new names.
+
+Method: as in Wave 12. The comparer built every unit in src, samples and
+tests/fixtures whose include closure reaches a changed file (196 units), once
+from an archive of 1fe5ed5a and once from a copy of the renamed tree. The map
+holds the four type renames (`UnknownBikeRaceGhostRecord`, `...Delta`,
+`...Part` and `UnknownBikeRaceGhost@`) and the three slot 30 symbols
+(`UnknownVirtualSlot30@ShadowReceiver@@`, `@D3DIMSoultreeShadow@@`,
+`@TerrainShadow@@`).
+
+Result: of the 196 units, 186 are IDENTICAL. 2 are IDENTICAL-COMDAT-ORDER
+(Group6_BikeRaceCreate.cpp and KrustyUI.cpp, the RTTI COMDAT move of earlier
+waves). 8 are NAME-ONLY: BikeRace.cpp, FollowRacer.cpp,
+D3DIMSoultreeShadow.cpp, src/reconstructed/TerrainShadow.cpp,
+BikeRaceNearMisses.cpp, FollowRacerNearMisses.cpp,
+D3DIMSoultreeShadowNearMisses.cpp and samples/physics/shadow/TerrainShadow.cpp.
+SoulTreePhysics.cpp, whose comments changed, is IDENTICAL. The 64 units that
+reach the last two families (the focal length and the sound lists) were
+compiled again after them, against the same archive and map: 54 IDENTICAL
+(PCAudio.cpp and AuralScape.cpp among them), the same 2
+IDENTICAL-COMDAT-ORDER and the same 8 NAME-ONLY.
+
+Negative controls:
+
+- Without the map, BikeRace.cpp reports DIFF on the relocations of
+  `?RecordFrame@BikeRace@@...`, TerrainShadow.cpp on the relocations of its
+  vtable `??_7TerrainShadow@@6B@`, and FollowRacerNearMisses.cpp has
+  `?ApplyReplayDelta@UnknownBikeRaceGhost@@...` only in the old object.
+- A live change reports DIFF: `delta->velocity[0] * 0.25f` in
+  `TagBall::ApplyReplayDelta` changes that function's section.
+
+Fixture pins: five whole-object digests of NAME-ONLY units were repinned with
+section and relocation counts unchanged. They are D3DIMSoultreeShadow.cpp and
+D3DIMSoultreeShadowNearMisses.cpp in clipper_global_objects.json,
+FollowRacer.cpp and FollowRacerNearMisses.cpp in
+followed_racer_collisions_objects.json, and BikeRaceNearMisses.cpp in
+soultree_position_objects.json. No other digest of a NAME-ONLY unit appears
+under tests/. work/naming/repin.py does this: it repins only a failure whose
+counts are unchanged and whose unit the proof report marks NAME-ONLY. The
+calibration case for 0x004a9aa0 (tools/run_calibration.py), the bindings,
+the shadow samples' targets.json, test_shadow_getter_connections.py and the
+emu cases d3dim_shadow_slot30.py and terrain_shadow_slot30.py use the new
+names.
+
+| Old name | New name | Tier | Evidence |
+| --- | --- | --- | --- |
+| `KbNetDelta::delta0`..`delta3` (+0x0b, +0x01, +0x08, +0x05) | `velocity`, `position`, `angularVelocity`, `angles` | 2 | ApplyStateDelta (0x004933e0) adds them, at 15/64 and pi/64 per unit, to KrustyBike's `deltaBaseVelocity` (+0x1358), `deltaBasePosition` (+0x1364), `deltaBaseAngularVelocity` (+0x1370) and roll/pitch/yaw (+0x137c..+0x1384). KbBikeDeltaMessage encodes the same fields at the same offsets. |
+| `UnknownBikeRaceGhostDelta::delta0`..`delta3` | the same four names | 2 | The replay record kind 0x10 has the KbNetDelta layout. ApplyReplayDelta (0x004a9aa0) applies it with the same scales into the matching ball fields. |
+| `UnknownBikeRaceGhost` | `TagBall` | 2 | TrackGameViewOwner+0xdc is the Tag event's ball (StatsOverlay 0x0051aa40 shows `"FREE BALL!"` while it is set). The VCR ghost is `aiRacers[0]`, a KrustyBike. The accessor `GhostBike()` becomes `Ball()`. |
+| `UnknownBikeRaceGhostRecord`, `...Delta`, `...Part` | `TagBallState`, `TagBallStateDelta`, `TagBallReceivedState` | 2 | The ball's record kind 0x11 state, its kind 0x10 byte deltas and the four received states the ball keeps (newest first, rotated by 0x00421d50). |
+| `TagBallState::field_0x00` (`short`) | `header` | 2 | SendRaw (0x004ad280) writes the message type byte here, as in the other kind records. |
+| `UnknownVirtualSlot30` of ShadowReceiver, D3DIMSoultreeShadow, TerrainShadow | `BuildShadowVertices` | 3 | The base (0x0044d710) is empty. Both overrides (0x00446f40, 0x00509aa0) turn the receiver geometry into the textured vertices their slot 14 draws. They map positions to the shadow texture's tu/tv, scale by `texelSize` and set `vertexCount`. ProjectedShadow's update loop calls it on every receiver. No literal names it. |
+| `ShadowCameraProxy::field_0x198`, `TerrainShadowCamera::field_0x198` | `focalLength` | 2 | The object is a ShadowCamera: its constructor 0x004da520 calls PCCamera's (0x004bed80), which calls Camera's (0x0042e340), and the vtable 0x00557540 has ShadowCamera's RTTI. Camera.h names +0x198 `focalLength`. TerrainShadow's slot 28 passes it to atan2 as x. |
+| `SoundInterface::field_0x04`, `field_0x18` (`ContainerList<void*>`) | `loadedSounds`, `loaded3DSounds` | 2 | PCSoundInterface's start-up Inits both to 8 entries growing by 8. LoadWave (0x004bbef0) adds every Sound to the first and 3D ones to the second too; ~Sound (0x004bbb60) removes them. AuralScape's debug page prints the first count as `"Sounds %d"`. |
+
+SoulTreePhysics.cpp line 108 (and nearby comments) still named `field_0x150`
+and other offsets that earlier waves had renamed. The comments now use
+`totalWeight` (+0x150), `stepTime`/`invStepTime`, `attachments`,
+`collisionObject`, `restitution`, `invMass` and the rest state fields.
+
+Lead finder: work/naming/classreads.py now compiles every src and samples
+unit with the VC6 profile vc6_o2_mt (which emits `.debug$T`) and reads the class layouts from `.debug$T` (LF_FIELDLIST
+members, base classes and nested arrays; a member of a forward-declared class
+gets its size by name). 1187 classes compile; 55 names have several layouts
+(local views that share a name across units), and each keeps every variant. A
+bound function resolves through the layout of its own bindings unit, and
+anything else through the canonical one. The scan starts `this` at the
+`object_offset` of every vtable entry and adds the adjustment of each thunk
+in vtable_thunks.json, so an MI method sees its secondary view's offsets.
+It follows registers through `mov`/`lea`/`add`/`sub`, loads of pointer
+members (pointer-chain views) and typed globals, and kills eax/ecx/edx at
+calls. It typed `this` in 2732 functions and found 372 placeholder paths
+accessed, 122 of them read. Wave 12's ConstraintMethodCollisionModel false
+positives (+0xbc, +0xd8, +0xdc, +0xe0 through `lea ecx, [esi - 0xc]`) no
+longer appear. Two units do not compile on their own
+(samples/allocation/test_accounting.cpp, samples/category_pilots/test_models.cpp).
+Usage: `python work/naming/classreads.py layouts`, then
+`python work/naming/classreads.py scan [--class C] [--field F] [--every C]`.
+
+Left as placeholders:
+
+- `TagBallState::field_0x38`. Nothing reads or writes it outside
+  whole-record copies.
+- The shadow receivers' slots 27-29. The two overrides do different work.
+  Slot 27 is a visibility test (a shadow-camera box test in
+  D3DIMSoultreeShadow, a screen footprint of at least 10 x 5 in
+  TerrainShadow). Slot 28 computes the texel size in both, but
+  TerrainShadow's also fits the shadow camera and light matrix to the screen
+  footprint and returns whether it did. Slot 29 is a camera-view test in one and collects cell keys in
+  the other.
+- UnknownBikeRaceViews (RaceSound) +0x40. Only the constructor writes it,
+  with 0.
+- UnknownFollowCameraSubject (Terrain) +0xbe8. A header flag that chooses
+  the constants at 0x005507f8 or 0x00550bac. The role is unclear.
+- UIDialog +0xd4. UIControl::SetTextDrop (0x00470d60) writes +0xd4 on
+  UIControl, so the two views disagree and the base must be settled first.
+- KbBikeNetState `field_0x5c`. The readers test it as "lap fields valid",
+  but the receive path's writer was not found.
+- UnknownAuralScapeReverbOwner +0xa4. The owner class is unknown.
+- TrackGameViewOwner +0xac. Its readers vary by event.
+- Cube +0x10, GridNodeExtra +0x10, GridTerrain +0xc9c/+0xca0, PCTextureMap
+  +0x40, UIListBox +0x218, UIListBoxRow +0x30 and GameCursor +0x50. One or
+  two reads each with no role. VCRFile `entries[].field_0x00` and the pad
+  arrays (`field_0xNN[...]` byte runs) need their structure first, which
+  this wave's rule excludes.
+- The UIScrollBar and UIEditBox `int` aliases of named unions stay as
+  intentional views (Wave 12).
+
+`UnknownVirtualSlotN`: slot 30 of the shadow receivers was the only family
+whose behaviour is the same in every override. 57 distinct `UnknownVirtualSlotN`
+identifiers remain (slot 30 survives on UIDialog and other classes), and the
+bindings hold 17 distinct `?UnknownVirtualSlotN@Class@@` symbols (20 before).
