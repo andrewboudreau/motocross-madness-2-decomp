@@ -387,7 +387,7 @@ Vector3 VehicleCamera::ComputeLookAheadPoint(unsigned char a, float dt) {
 }
 
 // 0x0052cb80: the vehicle's position 0, raised by 5.
-Vector3 VehicleCamera::UnknownVirtualSlot50() {
+Vector3 VehicleCamera::GetOnboardEyePosition() {
     Vector3 position;
     vehicle->modelNode->GetPositionIn(0, reinterpret_cast<Vec3*>(&position));
     position.y += 5.0f;

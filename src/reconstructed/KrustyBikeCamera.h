@@ -48,8 +48,8 @@ public:
     virtual void UpdateTurnYaw(bool flag);
     virtual Vector3 SelectFollowPoint(int a, bool flag, float dt);
     virtual void ClampPositionAboveGround(Vector3* point);
-    virtual unsigned char UnknownVirtualSlot55();
-    virtual bool UnknownVirtualSlot56();
+    virtual unsigned char IsLookBackHeld();
+    virtual bool IsTargetViewHeld();
     virtual void ShowCameraStateName();
     virtual void SaveCameraPreset();
     virtual void RestoreCameraPreset();

@@ -163,7 +163,9 @@ public:
     virtual Vector3 SelectFollowPoint(int a, bool flag, float dt);
     // 0x00464b30: the camera position for this frame.
     virtual Vector3 ComputeCameraPosition(bool orbit, const Vector3& base, float dt);
-    virtual Vector3 UnknownVirtualSlot50() = 0;
+    // Slot 50 (tier 2): ComputeCameraPosition's state 3 (the head view, see below) eye point;
+    // BikeCamera returns the rider's "Head" node, VehicleCamera the vehicle raised by 5.
+    virtual Vector3 GetOnboardEyePosition() = 0;
     virtual float GetRoll() = 0;
     virtual void ClampPositionAboveGround(Vector3* point);
     // provisional names: BikeCamera hides / shows the bike and rider models; the tick hides
@@ -172,9 +174,11 @@ public:
     virtual void ShowSubject();
     // A one-byte result: slot 10 tests `al`, and KrustyBikeCamera's override
     // returns ControlInterface slot 2's int with no conversion code, which a
-    // bool return would add (neg/sbb/neg).
-    virtual unsigned char UnknownVirtualSlot55();
-    virtual bool UnknownVirtualSlot56();
+    // bool return would add (neg/sbb/neg).  Slot 55 (tier 2): while held, Tick switches to
+    // state 6 and ApplyReverseViewPreset; slot 56 (tier 3): while held, state 7 and
+    // LookAtTargetPoint, restoring the saved state on release.
+    virtual unsigned char IsLookBackHeld();
+    virtual bool IsTargetViewHeld();
     // The argument is a float: FollowCamera slot 10 passes its frame time and
     // VehicleCamera's override caps it at 0.2.
     virtual Vector3 GetLeadTargetPoint(float dt) = 0;

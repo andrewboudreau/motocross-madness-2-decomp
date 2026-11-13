@@ -61,7 +61,7 @@ public:
     virtual Vector3 GetStateFiveFollowPoint(float dt);
     virtual Vector3 GetTargetPoint();
     virtual void SteerToKeepTargetOnScreen(float dt);
-    virtual Vector3 UnknownVirtualSlot50();
+    virtual Vector3 GetOnboardEyePosition();
     virtual float GetRoll();
     virtual void HideSubject();
     virtual void ShowSubject();

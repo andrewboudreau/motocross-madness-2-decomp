@@ -100,7 +100,7 @@ public:
     virtual float GetCrashYaw();
     virtual Vector3 ComputeFollowHeading();
     virtual void UpdateTurnYaw(bool flag);
-    virtual Vector3 UnknownVirtualSlot50();
+    virtual Vector3 GetOnboardEyePosition();
     virtual float GetRoll();
     virtual bool TrySettleOnPoint(const Vector3& point, bool enable, bool force);
     virtual Vector3 GetLeadTargetPoint(float dt);

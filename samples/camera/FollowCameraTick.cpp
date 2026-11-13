@@ -154,7 +154,7 @@ int FollowCamera::Tick(float dt) {
         }
         SetFrame(&smoothed, 0, 0, &roll, 0);
         LookAt(cachedTarget);
-        if (UnknownVirtualSlot56()) {
+        if (IsTargetViewHeld()) {
             if (cameraState != 7 && !isCrashView) {
                 resumeState = cameraState;
                 resumeFieldOfView = targetFieldOfView;
@@ -177,7 +177,7 @@ int FollowCamera::Tick(float dt) {
             fieldOfViewEase->Set(targetFieldOfView, FLT_MAX);
         }
         if (cameraState != 5 && cameraState != 7) {
-            if (UnknownVirtualSlot55()) {
+            if (IsLookBackHeld()) {
                 if (cameraState != 6 && !isCrashView) {
                     savedCameraState = cameraState;
                     initialPitch = followPitch;

@@ -22,7 +22,7 @@
   "?GetCrashYaw@VehicleCamera@@UAEMXZ": "0x0052cbd0",
   "?ComputeFollowHeading@VehicleCamera@@UAE?AUVector3@@XZ": "0x0052c030",
   "?UpdateTurnYaw@VehicleCamera@@UAEX_N@Z": "0x0052cc00",
-  "?UnknownVirtualSlot50@VehicleCamera@@UAE?AUVector3@@XZ": "0x0052cb80",
+  "?GetOnboardEyePosition@VehicleCamera@@UAE?AUVector3@@XZ": "0x0052cb80",
   "?GetRoll@VehicleCamera@@UAEMXZ": "0x0052cec0",
   "?GetLeadTargetPoint@VehicleCamera@@UAE?AUVector3@@M@Z": "0x0052ca10",
   "?ApplyReverseViewPreset@VehicleCamera@@UAEXXZ": "0x0052bfa0",

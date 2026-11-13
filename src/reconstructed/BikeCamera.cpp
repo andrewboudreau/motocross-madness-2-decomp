@@ -102,7 +102,7 @@ Vector3 BikeCamera::GetStateFiveFollowPoint(float dt) {
 }
 
 // 0x00417290: the rider's head position.
-Vector3 BikeCamera::UnknownVirtualSlot50() {
+Vector3 BikeCamera::GetOnboardEyePosition() {
     SoultreeObject* headPart = bike->riderCharacter->modelNode->FindByName("Head");
     Vector3 head;
     headPart->GetPositionIn(0, reinterpret_cast<Vec3*>(&head));

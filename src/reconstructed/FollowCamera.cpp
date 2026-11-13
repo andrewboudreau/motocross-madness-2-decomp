@@ -283,7 +283,7 @@ Vector3 FollowCamera::ComputeCameraPosition(bool orbit, const Vector3& base, flo
             turned *= -followDistance;
             result = turned + targetPoint;
         } else {
-            result = UnknownVirtualSlot50();
+            result = GetOnboardEyePosition();
         }
         if (!isCrashView && cameraState != 6) {
             savedDistance = followDistance;
@@ -497,12 +497,12 @@ void FollowCamera::RestoreCameraState() {}
 
 // 0x00464ea0 and 0x00464ec0: slot 5 of the interface behind the 0x0056e26c
 // object, with codes 0x38 and 0x2a.
-unsigned char FollowCamera::UnknownVirtualSlot55() {
+unsigned char FollowCamera::IsLookBackHeld() {
     return ((UnknownKeyboardBoolView*)g_TrackGame->controlInterface->keyboard)
         ->IsButtonDown(0x38, 0x3F, 0);
 }
 
-bool FollowCamera::UnknownVirtualSlot56() {
+bool FollowCamera::IsTargetViewHeld() {
     return ((UnknownKeyboardBoolView*)g_TrackGame->controlInterface->keyboard)
         ->IsButtonDown(0x2A, 0x3F, 0);
 }

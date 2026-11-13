@@ -121,8 +121,8 @@ def setup(ctx, c):
              48: ('SelectFollowPoint', 16, ret_vec, None), 49: ('ComputeCameraPosition', 16, position, None),
              51: ('GetRoll', 0, lambda cx, e, a: (0, cx.rng.uniform(-1, 1)), 'f'),
              52: ('ClampPositionAboveGround', 4, clamp, None), 53: ('HideSubject', 0, None, None),
-             54: ('ShowSubject', 0, None, None), 55: ('UnknownVirtualSlot55', 0, flag, None),
-             56: ('UnknownVirtualSlot56', 0, flag, None), 57: ('GetLeadTargetPoint', 8, ret_vec, None),
+             54: ('ShowSubject', 0, None, None), 55: ('IsLookBackHeld', 0, flag, None),
+             56: ('IsTargetViewHeld', 0, flag, None), 57: ('GetLeadTargetPoint', 8, ret_vec, None),
              59: ('SaveCameraPreset', 0, None, None), 67: ('ApplyReverseViewPreset', 0, reverse, None),
              68: ('LookAtTargetPoint', 0, None, None), 74: ('IsSubjectCrashed', 0, flag, None),
              75: ('ShouldFollowSubject', 0, flag, None)}
