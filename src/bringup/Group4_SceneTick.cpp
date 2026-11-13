@@ -109,7 +109,7 @@ int Scene::Tick(float frameTime)
             if (!count) {
                 continue;
             }
-            UnknownSceneEntry* entry = animationTable->randomSets[j].entry;
+            SceneAnimation* entry = animationTable->randomSets[j].entry;
             // best guess: retail tests the key-framed bit of entries[j] (the
             // set's index into the entry table), not of the set's entry.
             if (!animationTable->entries[j].keyFramed) {

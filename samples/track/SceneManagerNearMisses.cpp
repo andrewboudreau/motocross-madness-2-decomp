@@ -506,10 +506,10 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             return 0;
         }
         if (animations > 0) {
-    animationTable = new(__FILE__, 2178) UnknownSceneTable;
+    animationTable = new(__FILE__, 2178) SceneAnimationTable;
     animationTable->entryCount = animations;
     UnknownFunction4de580("Animations", "NumberOfAnimations", animations);
-    animationTable->entries = new(__FILE__, 2181) UnknownSceneEntry[animations];
+    animationTable->entries = new(__FILE__, 2181) SceneAnimation[animations];
     for (i = 0; i < animationTable->entryCount; i = next) {
         if (i % interval == interval - 1 && progress)
             progress(0);
@@ -640,7 +640,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             animationTable->entries[i].motions = 0;
             animationTable->entries[i].motionSequence = 0;
             if (animationTable->entries[i].motionCount > 0) {
-                UnknownSceneTable* table = animationTable;
+                SceneAnimationTable* table = animationTable;
                 animationTable->entries[i].motions = new(__FILE__, 2357) void*[table->entries[i].motionCount];
                 for (int m = 0; m < animationTable->entries[i].motionCount; m++) {
                     sprintf(key, "MotionToPlay%d", m + 1);
@@ -726,7 +726,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
     parameters.SelectSection("Animations");
     parameters.GetInt("NumberOfRandomSets", 0, &animationTable->randomSetCount);
     if (animationTable->randomSetCount > 0) {
-        animationTable->randomSets = new(__FILE__, 2466) UnknownSceneEntry2[animationTable->randomSetCount];
+        animationTable->randomSets = new(__FILE__, 2466) SceneRandomSet[animationTable->randomSetCount];
         for (i = 0; i < animationTable->randomSetCount; i++) {
             animationTable->randomSets[i].animationIndices = 0;
             animationTable->randomSets[i].motionIndices = 0;

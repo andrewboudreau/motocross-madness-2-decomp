@@ -53,7 +53,7 @@ public:
     unsigned char field_0x214[0x268 - 0x214];
 };
 
-// What UnknownSceneEntry::field_0x08 holds for procedural entries (without
+// What SceneAnimation::field_0x08 holds for procedural entries (without
 // bit 3): CarProcedural (0x22c bytes), a GameObject whose slot 10 0x004eb040
 // calls. Only what the scene uses is declared.
 class UnknownSceneAnimatedObject : public GameObject {
@@ -80,11 +80,11 @@ public:
     unsigned char field_0x198[0x22c - 0x198];
 };
 
-// 0x44-byte element of UnknownSceneTable::field_0x04 (an "Animation<n>"
+// 0x44-byte element of SceneAnimationTable::entries (an "Animation<n>"
 // section). The flag byte at +0 is read and written as single bits
 // (0x004ea880 tests bit 3, 0x004eafd0 sets bit 2). BikeRace.cpp reads
 // +0x04, +0x08 and +0x2c under their provisional names.
-struct UnknownSceneEntry {
+struct SceneAnimation {
     unsigned char inRandomSet : 1;            // +0x00 bit 0: cleared for every entry, set for each entry a RandomSet lists
     unsigned char useBlendedKeys : 1;         // +0x00 bit 1: the "UseBlendedKeys" parameter
     unsigned char automaticSequence : 1;      // +0x00 bit 2: the "AutomaticSequence" parameter; EnableAutomaticSequence sets it
@@ -106,22 +106,22 @@ struct UnknownSceneEntry {
     char fileName[0x18];                      // +0x2c the MCF or SLT file name, at most 0x14 characters
 };
 
-// 0x10-byte element of UnknownSceneTable::randomSets (a "RandomSet<n>"
+// 0x10-byte element of SceneAnimationTable::randomSets (a "RandomSet<n>"
 // section).
-struct UnknownSceneEntry2 {
+struct SceneRandomSet {
     signed char count;                    // "NumberInSequence"
     unsigned char field_0x01[3];
-    UnknownSceneEntry* entry;             // 0x004eff30 reads it as an entry
+    SceneAnimation* entry;             // 0x004eff30 reads it as an entry
     signed char* animationIndices;        // the a of each "a.m" pair
     signed char* motionIndices;           // the m of each pair
 };
 
 // Owned by Scene+0xb4; freed with its arrays by the destructor.
-struct UnknownSceneTable {
+struct SceneAnimationTable {
     int entryCount;                           // +0x00 entry count ("NumberOfAnimations")
-    UnknownSceneEntry* entries;               // +0x04
+    SceneAnimation* entries;               // +0x04
     int randomSetCount;
-    UnknownSceneEntry2* randomSets;
+    SceneRandomSet* randomSets;
 };
 
 class ShadowCaster;
@@ -324,7 +324,7 @@ public:
     int lightCount;                           // +0xa8 light count ("Lights" "NumberOfLights")
     UnknownSceneLight* sceneLights;           // +0xac "Light<n>" sections
     UnknownSceneFog* fog;                     // +0xb0 "Fog" section
-    UnknownSceneTable* animationTable;        // +0xb4 "Animations" section (BikeRace.cpp reads it)
+    SceneAnimationTable* animationTable;        // +0xb4 "Animations" section (BikeRace.cpp reads it)
     UnknownSceneBuffer* staticModels;         // +0xb8 "StaticModels" section
     int crowdPresent;                         // +0xbc "Sounds" "CrowdPresent"
     int auralScape;                       // the AuralScape the sound emitters use

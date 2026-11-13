@@ -671,7 +671,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
                 ((UnknownQuarryCar*)car)->groundProvider = eventTerrain;
                 ((CollisionObject*)car->sensorCollider)->SetIgnoreListMode(1);
                 for (int j = 0; j < eventScene->animationTable->entryCount; j++) {
-                    UnknownSceneEntry* entry = &eventScene->animationTable->entries[j];
+                    SceneAnimation* entry = &eventScene->animationTable->entries[j];
                     if (entry->keyFramed)
                         ((CollisionObject*)car->sensorCollider)
                             ->AddIgnoredOwner((CollisionObject*)entry->character->collisionObject);

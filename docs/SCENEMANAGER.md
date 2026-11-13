@@ -86,9 +86,9 @@ type, member and function names are provisional.
   `0x004fc660`.
 
   Together they are what the entry functions touch of the Soultree classes.
-- `UnknownSceneEntry` types +0x08 (the procedural object), +0x0c (a
+- `SceneAnimation` types +0x08 (the procedural object), +0x0c (a
   `Vector3`) and +0x2c (the file name) and adds bit 5.
-  `UnknownSceneEntry2` types its index arrays as `signed char*`.
+  `SceneRandomSet` types its index arrays as `signed char*`.
 - `UnknownFolded4de580`: a second declaration bound to the empty body
   `0x004de580`. In `0x004ebfc0` VC6 cross-jumps the "found" and "default"
   report calls when both call the same function; retail keeps them apart,
@@ -189,11 +189,11 @@ member lookup resolving to the virtual base's protected `field_0x10`.
   there VC6 matches retail.
 - `0x004edfe0` (5343 bytes) is a near miss in the same sample (4393 of
   5346 compared positions): the "Animations" reader. Each "Animation<n>"
-  entry (`UnknownSceneEntry`, 0x44 bytes) is either key-framed (bit 3; a
+  entry (`SceneAnimation`, 0x44 bytes) is either key-framed (bit 3; a
   `CollisionCharacter`, 0x294 bytes, constructor `0x004318d0`, loaded by
   `0x004319c0`, motions from `0x004a6b30`) or procedural (a `CarProcedural`,
   0x22c bytes, constructor `0x0042f390`, slot 27). The "RandomSet<n>"
-  sections fill `UnknownSceneEntry2`. Code, calls, EH states and the frame
+  sections fill `SceneRandomSet`. Code, calls, EH states and the frame
   size line up. What differs:
   - the frame slots of most scalars and of two buffers;
   - one count comparison (a table local for the allocation count gives

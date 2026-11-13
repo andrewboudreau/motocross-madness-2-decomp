@@ -675,7 +675,7 @@ int BikeRace::Tick(float frameTime) {
             } else {
                 strncpy(name, raceScene->animationTable->entries[targetIndex].fileName, 0x14);
                 name[0x14] = 0;
-                UnknownSceneEntry* entry = &raceScene->animationTable->entries[targetIndex];
+                SceneAnimation* entry = &raceScene->animationTable->entries[targetIndex];
                 if (entry->keyFramed) {
                     model = ((UnknownBikeRaceRider*)entry->character)->modelNode;
                 } else {
@@ -1081,7 +1081,7 @@ int BikeRace::OnControlPress(ControlEvent* event, InputButtonState* entry) {
                     }
                     if (raceScene->animationTable != 0) {
                         for (int i = 0; i < raceScene->animationTable->entryCount; i++) {
-                            UnknownSceneEntry* entry = &raceScene->animationTable->entries[i];
+                            SceneAnimation* entry = &raceScene->animationTable->entries[i];
                             if (entry->keyFramed) {
                                 if (picked == ((UnknownBikeRacePickCharacter*)entry->character)->collisionObject) {
                                     RaceCameraView()->followingRacer = 1;

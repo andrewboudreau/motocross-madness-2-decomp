@@ -121,7 +121,7 @@ int BikeRace::AimCamera(int caster) {
             if (raceShadow != 0) {
                 raceShadow->ClearCasters();
             }
-            UnknownSceneEntry* entry = &raceScene->animationTable->entries[targetEntry];
+            SceneAnimation* entry = &raceScene->animationTable->entries[targetEntry];
             if (entry->keyFramed) {
                 UnknownBikeRaceSceneCharacter* character =
                     (UnknownBikeRaceSceneCharacter*)entry->character;
@@ -238,7 +238,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
             if (targetEntry >= scene->animationTable->entryCount) {
                 targetEntry = 0;
             }
-            UnknownSceneEntry* entry = &scene->animationTable->entries[targetEntry];
+            SceneAnimation* entry = &scene->animationTable->entries[targetEntry];
             if (entry->keyFramed) {
                 if (((UnknownBikeRaceSceneCharacter*)entry->character)->isEnabled) {
                     hidden = entry->excludeFromCameraIteration;

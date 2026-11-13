@@ -438,7 +438,7 @@ int Scene::RestartEntry(int index, float time, int force, int motion)
             running = 0;
             time = 0.0001f;
         }
-        UnknownSceneEntry* entry = &animationTable->entries[index];
+        SceneAnimation* entry = &animationTable->entries[index];
         if (entry->keyFramed) {
             UnknownSceneObject* object = entry->character;
             if (object->motionStopped || force) {
@@ -1202,7 +1202,7 @@ void Scene::SetDetailLevel(int level)
                 reinterpret_cast<D3DIMSoultreeObject*>(((UnknownSceneAnimatedObject*)animationTable->entries[i].proceduralObject)->carModel)->ApplyLodSettings(level);
         }
         for (i = 0; i < animationTable->randomSetCount; i++) {
-            UnknownSceneEntry* entry = animationTable->randomSets[i].entry;
+            SceneAnimation* entry = animationTable->randomSets[i].entry;
             if (entry->keyFramed)
                 reinterpret_cast<D3DIMSoultreeObject*>(entry->character->modelNode)->ApplyLodSettings(level);
             else

@@ -11,8 +11,8 @@
 extern "C" long __cdecl _ftol();
 static BYTE referenceSpace[0x800000] = {1};
 typedef char SceneLayout[(sizeof(Scene)==0x8cc && offsetof(Scene,animationTable)==0xb4)?1:-1];
-typedef char EntryLayout[(sizeof(UnknownSceneEntry)==0x44 && offsetof(UnknownSceneEntry,character)==4 &&
-    offsetof(UnknownSceneEntry,motions)==0x20 && offsetof(UnknownSceneEntry,motionFrame)==0x18)?1:-1];
+typedef char EntryLayout[(sizeof(SceneAnimation)==0x44 && offsetof(SceneAnimation,character)==4 &&
+    offsetof(SceneAnimation,motions)==0x20 && offsetof(SceneAnimation,motionFrame)==0x18)?1:-1];
 typedef char MotionLayout[(sizeof(Motion)==0xcc && offsetof(Motion,frames)==0xa4 &&
     offsetof(Motion,frameCount)==0xa8 && sizeof(MotionPoseList)==12)?1:-1];
 typedef char CharacterLayout[(offsetof(Character,motionStopped)==0xc &&
@@ -20,8 +20,8 @@ typedef char CharacterLayout[(offsetof(Character,motionStopped)==0xc &&
 
 struct World {
     BYTE scene[0x8cc+32], actor[0x294+32], car[0x22c+32];
-    UnknownSceneTable table;
-    UnknownSceneEntry entries[3];
+    SceneAnimationTable table;
+    SceneAnimation entries[3];
     Motion motions[3];
     void* motionPointers[3][3];
     char sequences[3][3];
@@ -78,7 +78,7 @@ static void Setup(int seed,int index,int sequenceLength,int scenario) {
     actor->lastFrame=&state.frames[0][0];actor->lastFrameTime=-1;
     actor->currentMotion=&state.motions[0];actor->currentFrame=&state.frames[0][0];
     for(int entry=0;entry<3;entry++) {
-        UnknownSceneEntry& e=state.entries[entry];
+        SceneAnimation& e=state.entries[entry];
         e.keyFramed=scenario!=3;e.character=scenario==4?0:(UnknownSceneObject*)actor;
         e.proceduralObject=Car();e.motions=state.motionPointers[entry];e.motionCount=3;
         e.motionSequence=state.sequences[entry];e.sequenceLength=(signed char)sequenceLength;
