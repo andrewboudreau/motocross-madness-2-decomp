@@ -1488,3 +1488,125 @@ Left as placeholders:
   names a role.
 - MSZoneInterface's `UnknownZoneScore` methods 3 to 5: its IID
   3FAF0AFD-B48B-11D2-8A51-00C04F8EF4E9 is not a public SDK interface.
+
+## Wave 18: the declaration count behind the blocked view merges
+
+Wave 18 asked why removing one view struct changes
+`?CreateRacers@BikeRace@@...` (0x00419970) and whether a readable source form
+keeps it stable, so the three view merges blocked in Wave 17 can proceed.
+The answer is the declaration-count tie-break of
+[VC6_OPERAND_ORDER.md](VC6_OPERAND_ORDER.md) section 2, and no merge could be
+kept: every candidate also moves at least one other exact or pinned function.
+No source file changed. `git grep -ohE '\bUnknown[A-Z][A-Za-z0-9_]*' -- src
+samples` stays at 466 unique names and 3350 uses.
+
+### Characterisation
+
+Method: work/w18/probe.py compiles a wrapper that is a prefix file followed by
+`#include "<unit>"`, with the unit's own profile. work/w18/gen.py writes
+prefixes of k declarations of one kind. work/w18/bscan.py `base UNIT` keeps
+the unit's whole object for k = 0..63 typedefs. `fit UNIT MAP` then finds
+the k at which a candidate tree's object equals the base object under the
+proof map, which is the candidate's counter shift.
+
+Measured on samples/race/BikeRaceNearMisses.cpp, which includes
+GUIManagerCore.h and the canonical headers before BikeRace.cpp:
+
+- The order at body offset 0x21a is the only difference. That is
+  `xor edi,edi; mov ebx,1` (retail, 13,396 of 13,428 strict bytes) against
+  `mov ebx,1; xor edi,edi` (the current sample, 13,390). It depends only on
+  k mod 64. Over 131 typedef counts the outcome has exact period 64:
+  `MMMMMMXXXMXXMMMMMMXMMXMXXXMMMMXXXXMXMXMMMMXXMXMMMXXMMMXXMMMMMXMM`
+  (k = 0 first; M is the current order, X the retail order). The
+  whole-object scan gives the same pattern, so CreateRacers is the only
+  sensitive function in that object.
+- Weights, in typedefs:
+  - typedef, forward declaration of a new name, function declaration, extern
+    variable, class member, enumerator: 1 each;
+  - one-enumerator enum: 2;
+  - class or struct definition: 8 plus 1 per member;
+  - first class with an inline constructor: 11, later ones: 10;
+  - redeclaration of an existing name: 0.
+
+  These are the half-units of section 2.1. Name length, the environment,
+  `/Z7`, `/Zi` and no debug information do not matter, and neither does
+  anything after the function. Shifts add across header positions.
+- BIKE_RACE_STATE_CONNECTIONS.md said the order depends only on how many
+  inline-bearing classes the unit declares. That is a special case: any
+  declaration counts by its weight.
+- Wave 17's two merges shift the sample as follows:
+  - the CursorAnimation merge (`UnknownCursorAnimation` -> `UIAnim`) by -15:
+    UIDialog.h's forward declaration -1 and GUIManager.h's 6-member struct
+    -14;
+  - the TexturePalette merge by -15: the 8-member struct -16 and
+    `class ColorMapper;` +1.
+
+  Alone, either one lands k = 49, which is X. Together they land k = 34,
+  which is M.
+
+The forms tried for the CursorAnimation merge all give X, as the weights
+predict:
+
+- a `typedef UIAnim UnknownCursorAnimation;` alias;
+- a `class UIAnim;` forward declaration;
+- keeping `struct UnknownCursorAnimation;`;
+- dropping GUIManagerCore.h's forward declaration.
+
+Only keeping a struct definition gives M, even an empty
+`struct UnknownCursorAnimation {}`, and that would be a padding declaration.
+
+The counter is per unit and per function, so one edit is a different lottery
+in every unit it reaches. Base tables at 28aaba41 (whole object equal to the
+k = 0 object, `=`):
+
+| Unit (sensitive function) | k = 0..63 |
+| --- | --- |
+| BikeRaceNearMisses.cpp (CreateRacers) | `======DDD=DD======D==D=DDD====DDDD=D=D====DD=D===DD===DD=====D==` |
+| Group6_BikeRaceCreateRacers.cpp (CreateRacers) | `===DDDDDDD====DD===DDDD=DDD===D==DD==DDDD=DDDD=====DD====DDD==D=` |
+| Terrain.cpp (Render3D 0x00506220, exact) | `=DDDDD==DDDDDDD====D==DDDD==DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD=` |
+| ManagedTextureGroup.cpp (DrawSelection 0x0050ef70, exact) | `======DDD===========DDDD==========DDDDDDDDDDDDDDDDDDDDDDDDDDD===` |
+| tests/fixtures/edit_box_draw_compare.cpp (Setup) | `===================================DDDDDDDDDDDDDD=D=D==D========` |
+| GameUi.cpp, GameUiNearMisses.cpp | all `=` |
+
+Terrain's Render3D is exact only at k in {63, 0, 6, 7, 15..18, 20, 21, 26,
+27}. That set replaces the windows that VC6_OPERAND_ORDER.md section 2.3
+recorded before later header changes. Any edit before it that shifts its
+count by 1 to 5 or by -2 to -36 swaps its two tick loads.
+
+Allowed levers are the ones section 2.3 already names: function order that
+follows retail addresses, and dropping includes a unit does not use. Neither
+applies here:
+
+- Terrain.cpp's two definitions before Render3D are already in retail order.
+- Terrain.cpp reads `PCVideoCard::driverGuidText` and includes Quantize.h
+  itself.
+
+So no meaningful source form keeps every unit stable, and padding
+declarations are excluded (AGENTS.md).
+
+### Merges
+
+Proof: work/naming/proof.py over every unit whose include closure reaches a
+changed file, old tree 28aaba41 (work/w18/runproof.sh).
+
+| View | Into | Result |
+| --- | --- | --- |
+| `UnknownCursorAnimation` (GUIManager.h) | `UIAnim` | blocked. 86 units: 63 IDENTICAL, 6 IDENTICAL-COMDAT-ORDER, 4 NAME-ONLY, 12 NAME-ONLY-LABELS, 1 DIFF. The DIFF is BikeRaceNearMisses' CreateRacers (shift -15, k = 49). That DIFF is the retail order: match_one gives 13,396 strict bytes instead of 13,390. The merge improves the unadmitted sample, but it changes its pinned CreateRacers fingerprint (test_race_state_connections.py), so the strict rule keeps it out. Diff: work/naming/w17_m3_blocked.diff. |
+| `UnknownTexturePalette` (TextureMap.h) | `ColorMapper` | blocked. Alone, it fails 149 units: DIFF in the sample's CreateRacers, Terrain's Render3D relocations (shift -16, k = 48), ManagedTextureGroup's DrawSelection bytes and GameUi/GameUiNearMisses' `?Tick@UIDialog@@` relocations. Together with the CursorAnimation merge (work/w18/m3m4.diff) the sample and both GameUi units pass. 192 units: 138 IDENTICAL, 5 IDENTICAL-COMDAT-ORDER, 11 NAME-ONLY, 30 NAME-ONLY-LABELS. The combination still fails: Group6_BikeRaceCreateRacers.cpp's CreateRacers bytes (shift -30), Terrain's Render3D (still -16) and DrawSelection (-16 or -30) give DIFF, and so does edit_box_draw_compare's Setup. PCTextureMap.cpp, PCTextureMapNearMisses.cpp and TextureClone.cpp fail to compile without Quantize.h. Terrain already includes Quantize.h, so its -16 is the same whether TextureMap.h forward-declares ColorMapper or includes Quantize.h, and a typedef alias gives -15. No form reaches Terrain's window. |
+| `UnknownEcoTrackGame` (EcoSystem.h) | `TrackGame` | blocked at the prerequisite split. +0x1c0 is DDCAPS `dwCKeyCaps`: the DDCAPS block starts at +0x1b4, and the block's `dwVidMemTotal` lands on `driverVideoMemory` +0x1f0. Splitting `PCVideoCard::field_0x1c0[]` into `unsigned int driverColorKeyCaps; unsigned char field_0x1c4[...]` adds one member. 236 units: 190 IDENTICAL, 7 IDENTICAL-COMDAT-ORDER, 38 NAME-ONLY-LABELS, and DIFF in Terrain's Render3D relocations (shift +1). Diff: work/w18/b3split.diff. +0x28 cannot be split at all: it is element 5 of `VideoCard::field_0x14[16]`, which TextureMapManager.cpp indexes by texture kind. The view's `colorKeyFormat` name also conflicts with that per-kind role, so +0x28 needs its own evidence first. |
+| `UnknownEventRacer`, `UnknownBikeRaceRacer` | `KrustyBike` | not attempted (the brief's condition was not met). |
+
+Negative controls (CursorAnimation merge, old 28aaba41, units GUIManager.cpp
+and UIDialogTick.cpp):
+
+- With work/w18/map-m3.json both are NAME-ONLY.
+- Without the map, GUIManager.cpp gives DIFF: the COMDAT
+  `?SetAnimation@GUICursor@@QAEXPAUUnknownCursorAnimation@@@Z` exists only
+  in the old object. UIDialogTick.cpp gives DIFF in the relocations of
+  `?Tick@UIDialog@@UAEHM@Z`.
+- A live change in the new tree (`currentFrame = 0` to `1` in
+  GUICursor::SetAnimation) gives DIFF in the bytes of
+  `?SetAnimation@GUICursor@@QAEXPAVUIAnim@@@Z`. UIDialogTick.cpp stays
+  NAME-ONLY.
+
+No fixture was repinned.

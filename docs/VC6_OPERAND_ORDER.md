@@ -240,8 +240,10 @@ they are source-form differences under the deterministic rules of section 1.
   after it. Function definitions count too, so moving `Terrain::~Terrain`
   (`0x005079f0`) from before slot 14 to its retail position after
   SelectQuality (`0x00507960`) restored it with no other source change. The
-  new windows are `(62, 63)`, `(0, 1)` and `(4, 38)`, so it is still a narrow
-  fit. Function order that follows retail addresses is the defensible lever
+  new windows were `(62, 63)`, `(0, 1)` and `(4, 38)`. At 28aaba41 (NAMING.md
+  Wave 18) the whole Terrain object is unchanged only at 63, 0, 6, 7, 15..18,
+  20, 21, 26 and 27 typedefs, so a header edit that moves its count by +1
+  (one member) or by -16 (an eight-member struct) swaps the loads. Function order that follows retail addresses is the defensible lever
   here; padding declarations are not.
 - ManagedTextureGroup::DrawSelection (`0x0050ef70`) worked the same way. Before
   the shared GUI declaration consolidation, removing EventManager.h from
