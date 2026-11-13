@@ -9,14 +9,14 @@
 
 #include "MatrixUtil.h"
 
-struct UnknownBikeRaceNode;
+struct RaceGate;
 
 // 0x0047b670: whether moving from `from` to `to` crosses `gate` (a box of
-// BikeRace.h's UnknownBikeRaceNode kind): the x/z segment must cut the
+// BikeRace.h's RaceGate kind): the x/z segment must cut the
 // gate's across line within both, the height at the crossing must be within
 // the gate's height, and with `direction` the move must go along the gate's
 // facing. A gate at the origin never matches.
-int CrossesGate(Vector3* from, Vector3* to, UnknownBikeRaceNode* gate, int direction);
+int CrossesGate(Vector3* from, Vector3* to, RaceGate* gate, int direction);
 
 // 0x0047b800: intersects the segment p0 + t * d0 with p1 + u * d1 (2-D),
 // writing the parameters. 0 when the lines are parallel or a pointer is null.

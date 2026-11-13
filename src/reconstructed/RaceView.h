@@ -47,7 +47,7 @@ public:
 
 struct UnknownEventRacer;
 struct UnknownKrustyBikeView;
-struct UnknownBikeRaceNode;
+struct RaceGate;
 class ChatOverlay;
 
 // The object at a racer's +0x5f0; RaceStatus.cpp 0x004e6a50 reads the
@@ -77,7 +77,7 @@ struct RaceStatusNode {
     int lapOffset;                            // +0x18 added to the lap count when ordering (0x004e5f40): -1 when the placedPos..progressPos distance passes the probe gate
     Vector3 previousPosition;                 // +0x1c previous position
     Vector3 currentPosition;                  // +0x28 current position
-    UnknownBikeRaceNode* nextGate;            // +0x34 next gate
+    RaceGate* nextGate;                       // +0x34 next gate
     TrackPos placedPos;                       // +0x38 Track::PlaceNear's (or ClosestPointOnTrack's) placement of previousPosition
     TrackPos progressPos;                     // +0x44 PlaceNear's search start; advances only forward to placedPos (0x004e6a50)
     RaceStatusNode* next;              // +0x50 next
@@ -223,7 +223,7 @@ struct UnknownKrustyBikeView : public GameObject {
     unsigned char field_0x064[0xbc - 0x64];
     UnknownScoreBoard* scoreBoard;            // +0x0bc score board (FollowRacer.cpp 0x004a9e80)
     unsigned char field_0x0c0[0xc8 - 0xc0];
-    UnknownBikeRaceNode* gateList;            // +0x0c8 gate list (BikeRace.h)
+    RaceGate* gateList;                       // +0x0c8 gate list (BikeRace.h)
     unsigned char field_0x0cc[0x158 - 0xcc];
     int racerCount;                           // +0x158 entries in +0x3c
     unsigned char field_0x15c[0x18a - 0x15c];

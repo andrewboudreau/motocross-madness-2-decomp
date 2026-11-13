@@ -69,7 +69,7 @@ public:
     void RankByPoints(int* order);
     // 0x0041d0d0: appends a node for `source[index]` at `*tail`.
     int AppendNode(int index, UnknownBikeRaceNodeSource* source,
-                   UnknownBikeRaceNode*** tail, float scale, int value);
+                   RaceGate*** tail, float scale, int value);
     // 0x0041d170: one node per entry of `owner`; 0 when an allocation fails.
     int BuildNodeList(UnknownBikeRaceNodeOwner* owner);
     // 0x0041d1e0: sets +0x189 from the track distance between +0xf8 and +0x134.
@@ -132,9 +132,9 @@ public:
     int scoreBoard;                           // +0xbc score board: BonusObjectManager::SetupCounter's object
     int digitCounter;                         // +0xc0 NumberObjectManager::SetupDigits's object
     RaceStatusNode* statusList;  // +0xC4  race status list: BuildStatusList/FreeStatusList/UpdateLapRace/UpdateGateRace operand
-    UnknownBikeRaceNode* gateList;            // +0xc8 gate nodes linked through nextGate
-    UnknownBikeRaceNode startProbe;          // start probe
-    UnknownBikeRaceNode finishProbe;          // finish probe
+    RaceGate* gateList;                       // +0xc8 gate nodes linked through nextGate
+    RaceGate startProbe;                     // start probe
+    RaceGate finishProbe;                     // finish probe
     int hasStartProbe;                        // +0x144 LoadTrack found the start probe (debug draw)
     int hasFinishProbe;                       // +0x148 LoadTrack found the finish probe (debug draw)
     int targetRacer;                          // +0x14c racer the camera cycles to (0 local, then the AI racers)

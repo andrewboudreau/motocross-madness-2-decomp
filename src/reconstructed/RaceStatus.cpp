@@ -55,7 +55,7 @@ static inline Vector3& operator-=(Vector3& a, const Vector3& b) {
 }
 
 // 0x004e58c0
-int CountLap(Vector3* from, Vector3* to, unsigned short* laps, UnknownBikeRaceNode* gate,
+int CountLap(Vector3* from, Vector3* to, unsigned short* laps, RaceGate* gate,
                           char* finished, int lapLimit, float* lapTime, float* lapTimes, float now,
                           float* lapStart, float* bestLap, int direction, int unlimited, int skipTest,
                           int forced) {
@@ -83,7 +83,7 @@ int CountLap(Vector3* from, Vector3* to, unsigned short* laps, UnknownBikeRaceNo
 }
 
 // 0x004e59c0
-int AdvanceGate(Vector3* from, Vector3* to, UnknownBikeRaceNode** current, UnknownBikeRaceNode* first,
+int AdvanceGate(Vector3* from, Vector3* to, RaceGate** current, RaceGate* first,
                           int* count, int* gateIndex, float* times, float now, int direction,
                           unsigned short* laps, float* lapTime, float* bestLap, float* lapStart, char* finished,
                           int lapLimit, int unlimited, int skipTest, int forced) {
@@ -154,7 +154,7 @@ int FreeStatusList(RaceStatusNode* list) {
 }
 
 // 0x004e5f40
-int OrderByLapDistance(RaceStatusNode** list, Track* track, UnknownBikeRaceNode* probe) {
+int OrderByLapDistance(RaceStatusNode** list, Track* track, RaceGate* probe) {
     RaceStatusNode* status;
     RaceStatusNode** at;
     RaceStatusNode** next;
@@ -297,8 +297,8 @@ int RankByScore(int keepRacing) {
 }
 
 // 0x004e63e0
-int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, UnknownBikeRaceNode* start,
-                          UnknownBikeRaceNode* finish, int lapLimit, int unlimited) {
+int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, RaceGate* start,
+                          RaceGate* finish, int lapLimit, int unlimited) {
     RaceStatusNode* previous = 0;
     RaceStatusNode* status;
     UnknownEventRacer* racer;
@@ -415,7 +415,7 @@ static inline float Length(Vector3 v) {
 // leaves that block with `goto next` (retail's block layout and registers
 // for the `remaining >= 1` test; a `continue` there lays the lap-time
 // product out of line), the estimated one with `continue`.
-int UpdateGateRace(RaceStatusNode** list, UnknownBikeRaceNode* firstGate, float frameTime, int lapLimit,
+int UpdateGateRace(RaceStatusNode** list, RaceGate* firstGate, float frameTime, int lapLimit,
                           int unlimited) {
     RaceStatusNode* previous = 0;
     RaceStatusNode* status;

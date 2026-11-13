@@ -805,7 +805,7 @@ extern int g_LodDebugSelectedRow;
 inline void BikeRace::UnknownFunctionFreeNodes() {
     if (gateList != 0) {
         while (gateList != 0) {
-            UnknownBikeRaceNode* node = gateList;
+            RaceGate* node = gateList;
             gateList = node->nextGate;
             DebugFree(node, __FILE__, 0xd3);
         }

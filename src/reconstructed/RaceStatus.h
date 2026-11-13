@@ -20,20 +20,20 @@ extern int g_ViewRacerFinished;
 
 // 0x0047b670 (gameui.cpp): whether moving from `from` to `to` crosses
 // `gate`.
-int CrossesGate(Vector3* from, Vector3* to, UnknownBikeRaceNode* gate, int direction);
+int CrossesGate(Vector3* from, Vector3* to, RaceGate* gate, int direction);
 
 // 0x004e58c0: counts a lap when `from`..`to` crosses the finish `gate`
 // (or `forced` when `skipTest`): lap time, lap start times by lap % 100,
 // the best lap from the second lap on, `finished` at `lapLimit` unless
 // `unlimited`.
-int CountLap(Vector3* from, Vector3* to, unsigned short* laps, UnknownBikeRaceNode* gate,  // 0x004e58c0
+int CountLap(Vector3* from, Vector3* to, unsigned short* laps, RaceGate* gate,             // 0x004e58c0
                           char* finished, int lapLimit, float* lapTime, float* lapTimes, float now,
                           float* lapStart, float* bestLap, int direction, int unlimited, int skipTest,
                           int forced);
 // 0x004e59c0: advances `*current` through the gate list when crossed (back
 // to `first` and a lap counted after the last), records the gate time by
 // gate count % 600, and points the debug arrows at the next gate.
-int AdvanceGate(Vector3* from, Vector3* to, UnknownBikeRaceNode** current, UnknownBikeRaceNode* first,  // 0x004e59c0
+int AdvanceGate(Vector3* from, Vector3* to, RaceGate** current, RaceGate* first,                        // 0x004e59c0
                           int* count, int* gateIndex, float* times, float now, int direction,
                           unsigned short* laps, float* lapTime, float* bestLap, float* lapStart, char* finished,
                           int lapLimit, int unlimited, int skipTest, int forced);
@@ -49,7 +49,7 @@ int BuildStatusList(RaceStatusNode** list, UnknownKrustyBikeView* view);  // 0x0
 int FreeStatusList(RaceStatusNode* list);  // 0x004e5f10
 // 0x004e5f40: track distances to `probe`, then orders `*list` by laps and
 // distance and numbers the racers' positions.
-int OrderByLapDistance(RaceStatusNode** list, Track* track, UnknownBikeRaceNode* probe);  // 0x004e5f40
+int OrderByLapDistance(RaceStatusNode** list, Track* track, RaceGate* probe);             // 0x004e5f40
 // 0x004e6120: orders `*list` by gates passed and distance to the next gate
 // and numbers the racers' positions.
 int OrderByGates(RaceStatusNode** list);  // 0x004e6120
@@ -63,11 +63,11 @@ int RankByScore(int keepRacing);  // 0x004e62d0
 // track (leading by 3.5 times its velocity), counts laps at `finish`, fills
 // in the other racers' results once the view's racer has finished, and
 // orders the list.
-int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, UnknownBikeRaceNode* start,  // 0x004e63e0
-                          UnknownBikeRaceNode* finish, int lapLimit, int unlimited);
+int UpdateLapRace(RaceStatusNode** list, Track* track, float frameTime, RaceGate* start,             // 0x004e63e0
+                          RaceGate* finish, int lapLimit, int unlimited);
 // 0x004e6a50: per frame for a gate race: counts each unfinished racer's
 // gates from `firstGate`, reports a changed gate of the followed racer to
 // the view owner, fills in the other racers' results once the view's racer
 // has finished, and orders the list.
-int UpdateGateRace(RaceStatusNode** list, UnknownBikeRaceNode* firstGate, float frameTime, int lapLimit,  // 0x004e6a50
+int UpdateGateRace(RaceStatusNode** list, RaceGate* firstGate, float frameTime, int lapLimit,             // 0x004e6a50
                           int unlimited);

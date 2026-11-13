@@ -203,7 +203,7 @@ BikeRace::~BikeRace() {
         g_TrackGame->useReplayTape = 0;
     }
     while (gateList != 0) {
-        UnknownBikeRaceNode* node = gateList;
+        RaceGate* node = gateList;
         gateList = node->nextGate;
         DebugFree(node, __FILE__, 0x82e);
     }
@@ -221,9 +221,9 @@ int BikeRace::SetPaused(int value) {
 
 // 0x0041d0d0
 int BikeRace::AppendNode(int index, UnknownBikeRaceNodeSource* source,
-                         UnknownBikeRaceNode*** tail, float scale, int value) {
-    UnknownBikeRaceNode* node =
-        (UnknownBikeRaceNode*)DebugCalloc(1, sizeof(UnknownBikeRaceNode), __FILE__, 0x840);
+                         RaceGate*** tail, float scale, int value) {
+    RaceGate* node =
+        (RaceGate*)DebugCalloc(1, sizeof(RaceGate), __FILE__, 0x840);
     if (node == 0) {
         return 0;
     }
@@ -248,7 +248,7 @@ int BikeRace::AppendNode(int index, UnknownBikeRaceNodeSource* source,
 int BikeRace::BuildNodeList(UnknownBikeRaceNodeOwner* owner) {
     int count = owner->gateCount;
     UnknownBikeRaceNodeSource* sources = owner->gateSources;
-    UnknownBikeRaceNode** tail = &gateList;
+    RaceGate** tail = &gateList;
     for (int i = 0; i < count; i++) {
         UnknownBikeRaceNodeEntry* entry = owner->gateEntries[i];
         if (!AppendNode(i, sources, &tail, entry->width, entry->field_0x54)) {
