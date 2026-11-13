@@ -72,7 +72,7 @@ char* Tokenizer::NextToken(const char* delimiters)
 }
 
 // 0x00515e70: frees a node array (the loader's failure path).
-int Track::FreeNodeArray(UnknownStream* stream, TrackNode** nodes, int count)
+int Track::FreeNodeArray(FileStream* stream, TrackNode** nodes, int count)
 {
     if (!stream || !nodes)
         return 0;
@@ -153,18 +153,18 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
         } else if (chunk == 5) {
             stream->Read(&index, 4, 1);
             if (index < 0 || index >= count) {
-                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                FreeNodeArray(stream, nodes, count);
                 return 0;
             }
             nodes[index] = (TrackNode*)DebugCalloc(1, sizeof(TrackNode), __FILE__, 108);
             if (!nodes[index]) {
-                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                FreeNodeArray(stream, nodes, count);
                 return 0;
             }
             link = &nodes[index]->firstSegment;
         } else if (chunk == 6) {
             if (!nodes[index]) {
-                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                FreeNodeArray(stream, nodes, count);
                 return 0;
             }
             int flags;
@@ -172,19 +172,19 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
             nodes[index]->flags = (unsigned char)(flags | 1);
         } else if (chunk == 7) {
             if (!nodes[index]) {
-                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                FreeNodeArray(stream, nodes, count);
                 return 0;
             }
             stream->Read(&nodes[index]->pathLength, 4, 1);
             nodes[index]->pathLength *= scale;
         } else if (chunk == 8) {
             if (!nodes[index] || !link) {
-                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                FreeNodeArray(stream, nodes, count);
                 return 0;
             }
             TrackSegment* segment = (TrackSegment*)DebugCalloc(1, sizeof(TrackSegment), __FILE__, 141);
             if (!segment) {
-                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                FreeNodeArray(stream, nodes, count);
                 return 0;
             }
             segment->previous = nodes[index]->lastSegment;
@@ -193,7 +193,7 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
             nodes[index]->lastSegment = segment;
         } else if (chunk == 9) {
             if (!nodes[index] || !nodes[index]->lastSegment) {
-                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                FreeNodeArray(stream, nodes, count);
                 return 0;
             }
             stream->Read(&nodes[index]->lastSegment->pointX, 4, 1);
@@ -211,7 +211,7 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
             }
         } else if (chunk == 10) {
             if (!nodes[index] || !nodes[index]->lastSegment) {
-                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                FreeNodeArray(stream, nodes, count);
                 return 0;
             }
             stream->Read(&nodes[index]->lastSegment->edgeAX, 4, 1);
@@ -222,7 +222,7 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
             nodes[index]->lastSegment->edgeAZ = scale * nodes[index]->lastSegment->edgeAZ + offsetZ;
         } else if (chunk == 11) {
             if (!nodes[index] || !nodes[index]->lastSegment) {
-                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                FreeNodeArray(stream, nodes, count);
                 return 0;
             }
             stream->Read(&nodes[index]->lastSegment->edgeBX, 4, 1);
@@ -236,29 +236,29 @@ int Track::LoadTrack(FileStream* stream, void* start, void* finish, int* hasStar
             stream->Read(&unused, 4, 1);
         } else if (chunk == 13) {
             if (!nodes[index]) {
-                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                FreeNodeArray(stream, nodes, count);
                 return 0;
             }
             stream->Read(&linkCount, 4, 1);
             if (linkCount < 0) {
-                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                FreeNodeArray(stream, nodes, count);
                 return 0;
             }
             nodes[index]->linkCount = linkCount;
             nodes[index]->links = (TrackNode**)DebugCalloc(linkCount, 4, __FILE__, 231);
             if (!nodes[index]->links) {
-                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                FreeNodeArray(stream, nodes, count);
                 return 0;
             }
         } else if (chunk == 14) {
             if (!nodes[index] || !nodes[index]->links) {
-                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                FreeNodeArray(stream, nodes, count);
                 return 0;
             }
             stream->Read(&slot, 4, 1);
             stream->Read(&target, 4, 1);
             if (slot < 0 || slot > linkCount || target < 0 || target > count) {
-                FreeNodeArray((UnknownStream*)stream, nodes, count);
+                FreeNodeArray(stream, nodes, count);
                 return 0;
             }
             nodes[index]->links[slot] = (TrackNode*)target;

@@ -23364,7 +23364,7 @@ CASES = [
         'name': 'Track 0x515e70 free node array',
         'bindings': 'src/reconstructed/Track.bindings.json',
         'source': 'src/reconstructed/Track.cpp',
-        'symbol': '?FreeNodeArray@Track@@QAEHPAVUnknownStream@@PAPAUTrackNode@@H@Z',
+        'symbol': '?FreeNodeArray@Track@@QAEHPAVFileStream@@PAPAUTrackNode@@H@Z',
         'target_va': '0x00515e70',
         'target_size': 89,
     },

@@ -73,7 +73,6 @@ struct TrackCandidate {
     TrackCandidate* next;
 };
 
-class UnknownStream;
 class FileStream;
 
 class Track {
@@ -86,7 +85,7 @@ public:
     // the file has them; 1 on success.
     int LoadTrack(FileStream* stream, void* start, void* finish, int* hasStart,
                   int* hasFinish);
-    int FreeNodeArray(UnknownStream* stream, TrackNode** nodes, int count);
+    int FreeNodeArray(FileStream* stream, TrackNode** nodes, int count);
     int FreeNode(TrackNode* node);
     int FreeReachableNodes(TrackNode** start);
     // 0x00516980 (RaceStatus.cpp): places `p` on the track (the closest

@@ -7,7 +7,7 @@
   "?DebugCalloc@@YAPAXIIPBDH@Z": "0x004a2fc0",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?NextToken@Tokenizer@@QAEPADPBD@Z": "0x00515df0",
-  "?FreeNodeArray@Track@@QAEHPAVUnknownStream@@PAPAUTrackNode@@H@Z": "0x00515e70",
+  "?FreeNodeArray@Track@@QAEHPAVFileStream@@PAPAUTrackNode@@H@Z": "0x00515e70",
   "?FreeNode@Track@@QAEHPAUTrackNode@@@Z": "0x00516800",
   "?FreeReachableNodes@Track@@QAEHPAPAUTrackNode@@@Z": "0x00516870",
   "?NodeHasSegment@Track@@QAEHPAUTrackSegment@@PAUTrackNode@@@Z": "0x00517310",
