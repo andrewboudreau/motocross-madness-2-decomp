@@ -15,7 +15,7 @@ three existing-provider connections described here retain their original scope.
 | `g_vegetationGrid` | `g_EcoSystem` | pointer cell `0x59aebc` |
 
 `Vegetation::GetRadius` calls the complete strict 95-byte
-`UnknownEcoDefinition::RadiusForParameter` at `0x455ff0`. There is no new
+`VegetationDefinition::RadiusForParameter` at `0x455ff0`. There is no new
 implementation, forwarding method, linker alias, storage or initialization.
 
 The existing `UnknownEcoQuadTreeObject`, `UnknownEcoCoordinates` and

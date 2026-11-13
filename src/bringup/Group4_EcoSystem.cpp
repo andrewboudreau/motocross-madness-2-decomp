@@ -115,7 +115,7 @@ int EcoSystem::ReadEst(char* path, FileStream* stream) {
                 int red;
                 int green;
                 int blue;
-                definitionTable[i] = new(__FILE__, 0x31f) UnknownEcoDefinition;
+                definitionTable[i] = new(__FILE__, 0x31f) VegetationDefinition;
                 strcpy(definitionTable[i]->name, value);
                 GetPrivateProfileString(section, "BillboardName", "NONE", value, 0x80, path);
                 strcpy(definitionTable[i]->billboardName, value);
@@ -201,7 +201,7 @@ int EcoSystem::ReadEst(char* path, FileStream* stream) {
 }
 
 // 0x00457ed0: builds the definition's collision objects as children.
-void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
+void EcoSystem::BuildCollisionObjects(VegetationDefinition* definition) {
     Vector3 vertices[32];
     int indices[96];
     int i;
@@ -214,7 +214,7 @@ void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
     definition->collisionObjects = (CollisionObject**)DebugMalloc(definition->collisionCount * sizeof(CollisionObject*),
                                                              __FILE__, 0x3a5);
     for (i = 0; i < definition->collisionCount; i++) {
-        UnknownEcoCollisionDefinition* shape = &definition->collisionDefinitions[i];
+        VegetationCollisionDefinition* shape = &definition->collisionDefinitions[i];
         definition->collisionObjects[i] = new(__FILE__, 0x3ad) CollisionObject(1);
         definition->collisionObjects[i]->Configure(reinterpret_cast<UnknownEcoTrackGame*>(g_TrackGame)->display, 0, 0, 1);
         AppendChild(definition->collisionObjects[i], -1);
@@ -283,7 +283,7 @@ void EcoSystem::WriteListing(const char* path) {
         return;
     FilePrintf(file, "%i\n", placedCount);
     for (i = 0; i < placedCount; i++) {
-        UnknownEcoDefinition* definition = definitionTable[vegetation[i].definitionIndex];
+        VegetationDefinition* definition = definitionTable[vegetation[i].definitionIndex];
         float radius = definition->RadiusForParameter(vegetation[i].radiusParam);
         float height = definition->HeightForParameter(vegetation[i].heightParam);
         float z = vegetation[i].quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
@@ -729,7 +729,7 @@ int EcoSystem::Render3D() {
             int offset3 = 0x60;
             for (i = 0; i < remaining && i < 120; i++, next++) {
                 Vegetation* object = billboardList[next];
-                UnknownEcoDefinition* definition = definitionTable[object->definitionIndex];
+                VegetationDefinition* definition = definitionTable[object->definitionIndex];
                 float radius = definition->RadiusForParameter(object->radiusParam);
                 int depthKey = (unsigned short)object->sortKey;
                 float depth = depthKey * depthUnit;

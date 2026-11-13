@@ -7,7 +7,7 @@
     "src/reconstructed/EcoSystem.cpp": {
       "sections": 132,
       "relocations": 720,
-      "sha256": "4ae1a44eca0d543f736db8d60604204e5a3ada265ffd2d7c38a737ba059714f6"
+      "sha256": "63d0e585bb061164b5d4cdcf20be56b79dfc793f4ae2f6bf980e76fbd366c0af"
     },
     "src/reconstructed/LightEmitter.cpp": {
       "sections": 57,
@@ -42,12 +42,12 @@
     "samples/ecosystem/EcoSystemNearMisses.cpp": {
       "sections": 98,
       "relocations": 444,
-      "sha256": "0ae0957b8ff29dbd8fc3e902eccf7dc65841a972d1f01ee0ebe8883377c33113"
+      "sha256": "32751ae016b808ca10c259be463af85886325df6535905873c258313c955bcfe"
     },
     "samples/ecosystem/VegetationCollisionObject.cpp": {
       "sections": 2,
       "relocations": 5,
-      "sha256": "a5eb97359de774d8b615e52b3b6c62acabe1e283a0ac28058a37744b12024a84"
+      "sha256": "65d2ab2191b9b48a52c63b02ddf49b2248ce72ad52d79ece30e02a34309174b6"
     },
     "samples/track/SceneManagerNearMisses.cpp": {
       "sections": 96,
@@ -229,43 +229,43 @@
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "??0UnknownEcoDefinition@@QAE@XZ",
+      "symbol": "??0VegetationDefinition@@QAE@XZ",
       "va": "0x00455de0",
       "size": 160
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "??1UnknownEcoDefinition@@QAE@XZ",
+      "symbol": "??1VegetationDefinition@@QAE@XZ",
       "va": "0x00455e80",
       "size": 195
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?RandomParameter@UnknownEcoDefinition@@QAEHXZ",
+      "symbol": "?RandomParameter@VegetationDefinition@@QAEHXZ",
       "va": "0x00455f50",
       "size": 9
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?ParameterForHeight@UnknownEcoDefinition@@QAEHM@Z",
+      "symbol": "?ParameterForHeight@VegetationDefinition@@QAEHM@Z",
       "va": "0x00455f60",
       "size": 40
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?HeightForParameter@UnknownEcoDefinition@@QAEME@Z",
+      "symbol": "?HeightForParameter@VegetationDefinition@@QAEME@Z",
       "va": "0x00455f90",
       "size": 95
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?RadiusForParameter@UnknownEcoDefinition@@QAEME@Z",
+      "symbol": "?RadiusForParameter@VegetationDefinition@@QAEME@Z",
       "va": "0x00455ff0",
       "size": 95
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?LoadModel@UnknownEcoDefinition@@QAEHPAVTextureMapManager@@H@Z",
+      "symbol": "?LoadModel@VegetationDefinition@@QAEHPAVTextureMapManager@@H@Z",
       "va": "0x00456050",
       "size": 1522
     },
@@ -481,7 +481,7 @@
     },
     {
       "source": "src/reconstructed/EcoSystem.cpp",
-      "symbol": "?ReadCollisionObjects@EcoSystem@@QAEXPBDHPAVUnknownEcoDefinition@@@Z",
+      "symbol": "?ReadCollisionObjects@EcoSystem@@QAEXPBDHPAVVegetationDefinition@@@Z",
       "va": "0x00458360",
       "size": 1101
     },

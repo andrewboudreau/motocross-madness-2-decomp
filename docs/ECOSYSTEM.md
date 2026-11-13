@@ -52,7 +52,7 @@ That leaves 49 functions.
   +0x5a8 units), definition index (+0x12), fade (+0x13), height / radius
   parameters (+0x14/+0x15), the billboard bit (+0x16, a bitfield: the stores
   compile to VC6's xor/and/xor sequence) and the geometry block (+0x18).
-- The definition (`UnknownEcoDefinition`, no RTTI): 0x210 bytes
+- The definition (`VegetationDefinition`, no RTTI): 0x210 bytes
   (`operator new` at `0x00457771` and `0x0045908b`), constructor
   `0x00455de0`: name / BillboardName / ProbabilityTga (0x80 each), the
   height and radius triples, the Auto-method statistics, the billboard

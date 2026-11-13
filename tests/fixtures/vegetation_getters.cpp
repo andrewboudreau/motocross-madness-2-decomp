@@ -12,12 +12,12 @@ typedef char Layout[(sizeof(UnknownEcoQuadTreeObject)==0xc &&
     offsetof(Vegetation,definitionIndex)==0x12 && offsetof(Vegetation,radiusParam)==0x15 &&
     offsetof(EcoSystem,definitionTable)==0x58 && offsetof(EcoSystem,vegetationTypeId)==0x599 &&
     offsetof(EcoSystem,unitsPerCoordinate)==0x5a8 && sizeof(EcoSystem)==0x5c4 &&
-    sizeof(UnknownEcoDefinition)==0x210 && offsetof(UnknownEcoDefinition,collisionCount)==0x204 &&
-    offsetof(UnknownEcoDefinition,meanRadius)==0x18c &&
-    offsetof(UnknownEcoDefinition,minRadius)==0x190 &&
-    offsetof(UnknownEcoDefinition,maxRadius)==0x194) ? 1 : -1];
+    sizeof(VegetationDefinition)==0x210 && offsetof(VegetationDefinition,collisionCount)==0x204 &&
+    offsetof(VegetationDefinition,meanRadius)==0x18c &&
+    offsetof(VegetationDefinition,minRadius)==0x190 &&
+    offsetof(VegetationDefinition,maxRadius)==0x194) ? 1 : -1];
 static BYTE *ecoPage,*vegetationPage,*guardDefinitionPage;
-static BYTE definitions[256][sizeof(UnknownEcoDefinition)];
+static BYTE definitions[256][sizeof(VegetationDefinition)];
 static BYTE initialDefinitions[sizeof(definitions)],initialPages[12288];
 static EcoSystem* eco;
 static Vegetation* vegetation;
@@ -71,7 +71,7 @@ static void Setup() {
     memset(guardDefinitionPage,0,4096);
     eco=(EcoSystem*)(ecoPage+128);vegetation=(Vegetation*)(vegetationPage+128);
     g_EcoSystem=eco;
-    for (int i=0;i<256;++i) eco->definitionTable[i]=(UnknownEcoDefinition*)definitions[i];
+    for (int i=0;i<256;++i) eco->definitionTable[i]=(VegetationDefinition*)definitions[i];
     vegetation->definitionIndex=0;vegetation->radiusParam=0;
 }
 int main() {
@@ -85,7 +85,7 @@ int main() {
     memset(definitions,0x69,sizeof(definitions));
     const DWORD counts[]={0,1,0xffffffff,0x7fffffff,0x80000000,0x12345678,0x80000001,0x2468ace0};
     for(int i=0;i<256;++i) {
-        UnknownEcoDefinition* d=(UnknownEcoDefinition*)definitions[i];
+        VegetationDefinition* d=(VegetationDefinition*)definitions[i];
         int mean=i%31-15;
         d->meanRadius=(float)mean;
         d->minRadius=(float)(mean-(i%7+1));
@@ -118,10 +118,10 @@ int main() {
     Setup();Fault(1,(Vegetation*)(vegetationPage+4096-0x15),(DWORD)(vegetationPage+4096));
     Setup();g_EcoSystem=(EcoSystem*)(ecoPage+4096-0x58);Fault(0,vegetation,(DWORD)(ecoPage+4096));
     Setup();g_EcoSystem=(EcoSystem*)(ecoPage+4096-0x58);Fault(1,vegetation,(DWORD)(ecoPage+4096));
-    Setup();eco->definitionTable[0]=(UnknownEcoDefinition*)(guardDefinitionPage+4096-0x204);Fault(0,vegetation,(DWORD)(guardDefinitionPage+4096));
-    Setup();eco->definitionTable[0]=(UnknownEcoDefinition*)(guardDefinitionPage+4096-0x18c);Fault(1,vegetation,(DWORD)(guardDefinitionPage+4096));
-    Setup();eco->definitionTable[0]=(UnknownEcoDefinition*)(guardDefinitionPage+4096-0x194);vegetation->radiusParam=128;Fault(1,vegetation,(DWORD)(guardDefinitionPage+4096));
-    Setup();eco->definitionTable[0]=(UnknownEcoDefinition*)(guardDefinitionPage+4096-0x190);Fault(1,vegetation,(DWORD)(guardDefinitionPage+4096));
+    Setup();eco->definitionTable[0]=(VegetationDefinition*)(guardDefinitionPage+4096-0x204);Fault(0,vegetation,(DWORD)(guardDefinitionPage+4096));
+    Setup();eco->definitionTable[0]=(VegetationDefinition*)(guardDefinitionPage+4096-0x18c);Fault(1,vegetation,(DWORD)(guardDefinitionPage+4096));
+    Setup();eco->definitionTable[0]=(VegetationDefinition*)(guardDefinitionPage+4096-0x194);vegetation->radiusParam=128;Fault(1,vegetation,(DWORD)(guardDefinitionPage+4096));
+    Setup();eco->definitionTable[0]=(VegetationDefinition*)(guardDefinitionPage+4096-0x190);Fault(1,vegetation,(DWORD)(guardDefinitionPage+4096));
     if(checks!=65807 || faults!=15) return 3;
     printf("Vegetation getters: %lu cases, %lu independent read AV\n",checks,faults);
     return 0;

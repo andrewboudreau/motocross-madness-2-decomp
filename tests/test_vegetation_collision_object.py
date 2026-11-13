@@ -176,8 +176,8 @@ class VegetationCollisionTests(unittest.TestCase):
             parameters = out/'parameters.cpp'
             parameters.write_text('#include "'+str((ROOT/'src/reconstructed/EcoSystem.h').resolve()).replace('\\','/')+'"\n'
                                   'EcoSystem* g_EcoSystem; // validation-only copy of canonical pointer storage\n'+
-                                  extract(eco_text, 'float UnknownEcoDefinition::HeightForParameter')+'\n'+
-                                  extract(eco_text, 'float UnknownEcoDefinition::RadiusForParameter')+'\n')
+                                  extract(eco_text, 'float VegetationDefinition::HeightForParameter')+'\n'+
+                                  extract(eco_text, 'float VegetationDefinition::RadiusForParameter')+'\n')
             parameters_path, parameters_object = compile_source(parameters, 'parameters')
             collision_text = (ROOT/COLLISION).read_text()
             headers = []
@@ -203,8 +203,8 @@ class VegetationCollisionTests(unittest.TestCase):
                 self.assertEqual(function(transform_object, query), function(objects[COLLISION], query))
             self.assertEqual(function(transform_object, '?Vec3TransformPoint@@'), function(objects[QUERY], '?Vec3TransformPoint@@'))
             strict = 0
-            checks = [(parameters_object, ECO, '?RadiusForParameter@UnknownEcoDefinition@@', 0x455ff0, 95),
-                      (parameters_object, ECO, '?HeightForParameter@UnknownEcoDefinition@@', 0x455f90, 95)]
+            checks = [(parameters_object, ECO, '?RadiusForParameter@VegetationDefinition@@', 0x455ff0, 95),
+                      (parameters_object, ECO, '?HeightForParameter@VegetationDefinition@@', 0x455f90, 95)]
             checks += [(transform_object, COLLISION, '?CollisionRelativeTransform@@', 0x432180, 215),
                        (transform_object, COLLISION, '?CollisionMatrixMultiply@@', 0x436500, 532),
                        (transform_object, COLLISION, '?CollisionLength@@', 0x435ec0, 74),

@@ -185,7 +185,7 @@ value in one function:
   - EH does not keep `i` in memory. Retail's frame has one state region:
     state 0 is set before the probe stream constructor (`0x00460d10`) and
     -1 at `0x00457591`, before `Open`. The loop's `new
-    UnknownEcoDefinition` (constructor `0x00455de0`) changes no state.
+    VegetationDefinition` (constructor `0x00455de0`) changes no state.
   - Neither does a struct. No `lea` reaches `[esp + 0x10..0x1c]` (`total`
     at 0x10, `i` at 0x18, the `&definitionTable[i]` induction at 0x1c);
     the only address-taken slots are the section, value and name buffers

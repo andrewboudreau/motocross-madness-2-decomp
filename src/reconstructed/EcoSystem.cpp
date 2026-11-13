@@ -73,7 +73,7 @@ static inline float UnknownSquareMagnitude(const Vector3* v) {
 #define ECO_RGBA(r, g, b, a) ((unsigned int)(((a) << 24) | ((r) << 16) | ((g) << 8) | (b)))
 
 // 0x00455de0
-UnknownEcoDefinition::UnknownEcoDefinition() {
+VegetationDefinition::VegetationDefinition() {
     name[0] = 0;
     billboardName[0] = 0;
     probabilityTga[0] = 0;
@@ -102,7 +102,7 @@ UnknownEcoDefinition::UnknownEcoDefinition() {
 }
 
 // 0x00455e80
-UnknownEcoDefinition::~UnknownEcoDefinition() {
+VegetationDefinition::~VegetationDefinition() {
     int i;
     if (billboardTexture) {
         billboardTexture->Release();
@@ -126,24 +126,24 @@ UnknownEcoDefinition::~UnknownEcoDefinition() {
 }
 
 // 0x00455f50
-int UnknownEcoDefinition::RandomParameter() {
+int VegetationDefinition::RandomParameter() {
     return rand() >> 8;
 }
 
 // 0x00455f60
-int UnknownEcoDefinition::ParameterForHeight(float height) {
+int VegetationDefinition::ParameterForHeight(float height) {
     return (int)(rand() * height / maxHeight) >> 8;
 }
 
 // 0x00455f90
-float UnknownEcoDefinition::HeightForParameter(unsigned char parameter) {
+float VegetationDefinition::HeightForParameter(unsigned char parameter) {
     if (parameter < 0x80)
         return meanHeight - (meanHeight - minHeight) * parameter * (1.0f / 128.0f);
     return meanHeight + (maxHeight - meanHeight) * (255 - parameter) * (1.0f / 128.0f);
 }
 
 // 0x00455ff0
-float UnknownEcoDefinition::RadiusForParameter(unsigned char parameter) {
+float VegetationDefinition::RadiusForParameter(unsigned char parameter) {
     if (parameter < 0x80)
         return meanRadius - (meanRadius - minRadius) * parameter * (1.0f / 128.0f);
     return meanRadius + (maxRadius - meanRadius) * (255 - parameter) * (1.0f / 128.0f);
@@ -151,7 +151,7 @@ float UnknownEcoDefinition::RadiusForParameter(unsigned char parameter) {
 
 // 0x00456050: loads the billboard texture and the .slt model (vertices,
 // faces and its texture); `modelFlags` is the detail band's model flag.
-int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags) {
+int VegetationDefinition::LoadModel(TextureMapManager* textures, int modelFlags) {
     char path[0x104];
     char section[0x80];
     if (billboardName[0]) {
@@ -336,7 +336,7 @@ int EvictGeometry(void* owner, int context) {
 // 4-byte-padded indices, then the AgeEntry) is registered with the
 // AgeManager for eviction. The min/max of x are computed but unused.
 void Vegetation::SetBillboard(int billboard, int fade) {
-    UnknownEcoDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
+    VegetationDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
     UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_EcoSystem->renderContext)->camera;
     fadeLevel = (unsigned char)fade;
     if (billboard == isBillboard)
@@ -464,7 +464,7 @@ void Vegetation::SetBillboard(int billboard, int fade) {
 
 // 0x00457000
 void Vegetation::DrawGeometry(UnknownEcoRenderTarget* target) {
-    UnknownEcoDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
+    VegetationDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
     definition->modelTexture->Bind();
     int vertexCount = definition->modelVertexCount[isBillboard];
     int indexCount = definition->modelIndexCount[isBillboard];
@@ -537,7 +537,7 @@ EcoSystem::~EcoSystem() {
 // 0x00458360: reads a definition's "CollisionObject%i" entries. The keys
 // count from 1 over a zero-based loop (`i + 1`), and the profile defaults
 // are the empty string (the shared "" literal 0x00577738), not "NONE".
-void EcoSystem::ReadCollisionObjects(const char* path, int index, UnknownEcoDefinition* definition) {
+void EcoSystem::ReadCollisionObjects(const char* path, int index, VegetationDefinition* definition) {
     char key[0x80];
     char value[0x80];
     char section[0x100];
@@ -547,10 +547,10 @@ void EcoSystem::ReadCollisionObjects(const char* path, int index, UnknownEcoDefi
     int count = GetPrivateProfileInt(section, "NumCollisionObjects", 0, path);
     definition->collisionCount = count;
     if (count > 0) {
-        definition->collisionDefinitions = (UnknownEcoCollisionDefinition*)DebugMalloc(
-            count * sizeof(UnknownEcoCollisionDefinition), __FILE__, 0x40c);
+        definition->collisionDefinitions = (VegetationCollisionDefinition*)DebugMalloc(
+            count * sizeof(VegetationCollisionDefinition), __FILE__, 0x40c);
         for (i = 0; i < definition->collisionCount; i++) {
-            UnknownEcoCollisionDefinition* shape = &definition->collisionDefinitions[i];
+            VegetationCollisionDefinition* shape = &definition->collisionDefinitions[i];
             sprintf(key, "CollisionObject%i", i + 1);
             GetPrivateProfileString(section, key, "", kind, 0x80, path);
             if (!_stricmp(kind, "GEOMETRY")) {
@@ -723,7 +723,7 @@ int EcoSystem::ReadEsb(const char* path, FileStream* stream) {
         if (present) {
             int j;
             stream->Read(&length, 1, 1);
-            definitionTable[i] = new(__FILE__, 0x543) UnknownEcoDefinition;
+            definitionTable[i] = new(__FILE__, 0x543) VegetationDefinition;
             stream->Read(definitionTable[i]->name, length, 1);
             stream->Read(&length, 1, 1);
             stream->Read(definitionTable[i]->billboardName, length, 1);
@@ -758,8 +758,8 @@ int EcoSystem::ReadEsb(const char* path, FileStream* stream) {
                 }
             }
             stream->Read(&definitionTable[i]->collisionCount, 4, 1);
-            definitionTable[i]->collisionDefinitions = (UnknownEcoCollisionDefinition*)DebugMalloc(
-                definitionTable[i]->collisionCount * sizeof(UnknownEcoCollisionDefinition), __FILE__, 0x56d);
+            definitionTable[i]->collisionDefinitions = (VegetationCollisionDefinition*)DebugMalloc(
+                definitionTable[i]->collisionCount * sizeof(VegetationCollisionDefinition), __FILE__, 0x56d);
             for (j = 0; j < definitionTable[i]->collisionCount; j++) {
                 stream->Read(&definitionTable[i]->collisionDefinitions[j].type, 4, 1);
                 stream->Read(&definitionTable[i]->collisionDefinitions[j].start, 0xc, 1);
@@ -1007,7 +1007,7 @@ int EcoSystem::PrepareGeometry() {
             int billboard = object->isBillboard;
             int fade = object->fadeLevel;
             object->TestDistance(&billboard, &fade);
-            UnknownEcoDefinition* definition = definitionTable[object->definitionIndex];
+            VegetationDefinition* definition = definitionTable[object->definitionIndex];
             int visible = 1;
             if (!billboard) {
                 float radius = definition->RadiusForParameter(object->radiusParam);
@@ -1203,7 +1203,7 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, FileStream* stream
                     }
                 }
                 esb->Read(&collisionCount, 4, 1);
-                esb->Seek(collisionCount * sizeof(UnknownEcoCollisionDefinition), 1, 1);
+                esb->Seek(collisionCount * sizeof(VegetationCollisionDefinition), 1, 1);
             }
         }
         if (ownsStream) {

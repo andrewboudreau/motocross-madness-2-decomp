@@ -256,7 +256,7 @@ struct UnknownEcoVertex {
 #include "EcoCoordinates.h"
 
 // One "CollisionObject%i" entry of a definition (0x24 bytes).
-struct UnknownEcoCollisionDefinition {
+struct VegetationCollisionDefinition {
     int type;                                 // 0 GEOMETRY, 1 CYLINDER, 2 SPHERE, 3 RADIUSEDLINE
     Vector3 start;                            // centre / start
     Vector3 end;                              // end
@@ -266,12 +266,12 @@ struct UnknownEcoCollisionDefinition {
 
 // One vegetation kind ("Vegetation_%d" section of the .est file), 0x210
 // bytes (operator new at 0x00457771 and 0x0045908b); no vtable.
-class UnknownEcoDefinition {
+class VegetationDefinition {
 public:
     enum { kMaxLods = 1 };
 
-    UnknownEcoDefinition();                   // 0x00455de0
-    ~UnknownEcoDefinition();                  // 0x00455e80
+    VegetationDefinition();                   // 0x00455de0
+    ~VegetationDefinition();                  // 0x00455e80
     int RandomParameter();                    // 0x00455f50: a random parameter byte
     int ParameterForHeight(float height);     // 0x00455f60: a random parameter for `height`
     float HeightForParameter(unsigned char parameter);    // 0x00455f90: height for a parameter
@@ -316,7 +316,7 @@ public:
     int blendLods;                            // BlendLODs
     float percentBias;                        // PercentBias
     int collisionCount;                       // NumCollisionObjects
-    UnknownEcoCollisionDefinition* collisionDefinitions;
+    VegetationCollisionDefinition* collisionDefinitions;
     CollisionObject** collisionObjects;
 };
 
@@ -425,9 +425,9 @@ public:
     // `path` is rewritten to the .esb name when one exists.
     int ReadEst(char* path, FileStream* stream);
     // 0x00457ed0: builds the collision objects of a definition.
-    void BuildCollisionObjects(UnknownEcoDefinition* definition);
+    void BuildCollisionObjects(VegetationDefinition* definition);
     // 0x00458360: reads a definition's "CollisionObject%i" entries.
-    void ReadCollisionObjects(const char* path, int index, UnknownEcoDefinition* definition);
+    void ReadCollisionObjects(const char* path, int index, VegetationDefinition* definition);
     int WriteEsb(const char* path);              // 0x004587b0: writes the .esb
     void WriteListing(const char* path);          // 0x00458da0: writes the .txt listing
     int ReadEsb(const char* path, FileStream* stream);               // 0x00458f70: reads the .esb
@@ -452,7 +452,7 @@ public:
     LightManager* lightManager;
     UnknownEcoVertex* billboardVertices;      // billboard vertices (120 * 6)
     unsigned short* billboardIndices;         // billboard indices (120 * 12)
-    UnknownEcoDefinition* definitionTable[256];
+    VegetationDefinition* definitionTable[256];
     float northAngle;                         // NorthAngle
     char placementBmp[0x80];                  // PlacementBmp
     char probabilityTga[0x80];                // ProbabilityTga

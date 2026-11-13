@@ -11,7 +11,7 @@ CollisionObject* Vegetation::GetCollisionObject(int index) {
     float x = quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
     float y = quantizedPosition.y * g_EcoSystem->unitsPerCoordinate;
     float z = quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
-    UnknownEcoDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
+    VegetationDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
     float radius = definition->RadiusForParameter(radiusParam) / definition->meanRadius;
     float height = definition->HeightForParameter(heightParam)
                    / g_EcoSystem->definitionTable[definitionIndex]->meanHeight;

@@ -18,7 +18,7 @@ RENAMES={'?GetObjectCount@CollisionVegetation@@QAEHXZ':'?GetCollisionCount@Veget
          '?g_vegetationGrid@@3PAUCollisionVegetationGrid@@A':'?g_EcoSystem@@3PAVEcoSystem@@A'}
 GETTERS=(('int Vegetation::GetCollisionCount(', '?GetCollisionCount@Vegetation@@QAEHXZ',0x457080,22),
          ('float Vegetation::GetRadius(', '?GetRadius@Vegetation@@QAEMXZ',0x457230,24),
-         ('float UnknownEcoDefinition::RadiusForParameter(', '?RadiusForParameter@UnknownEcoDefinition@@QAEME@Z',0x455ff0,95))
+         ('float VegetationDefinition::RadiusForParameter(', '?RadiusForParameter@VegetationDefinition@@QAEME@Z',0x455ff0,95))
 def extract(text,prefix):
     start=text.index(prefix);pos=text.index('{',start);depth=1;end=pos+1
     while depth:

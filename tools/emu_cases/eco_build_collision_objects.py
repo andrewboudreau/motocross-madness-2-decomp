@@ -24,7 +24,7 @@ import struct
 from tools.emu_cases.kb_simulate_frame import install_seh_segment
 
 RETAIL_VA = 0x00457ed0
-SYMBOL = '?BuildCollisionObjects@EcoSystem@@QAEXPAVUnknownEcoDefinition@@@Z'
+SYMBOL = '?BuildCollisionObjects@EcoSystem@@QAEXPAVVegetationDefinition@@@Z'
 SOURCE = 'src/bringup/Group4_EcoSystem.cpp'
 TRACK_GAME = 0x0056e26c
 MEM_TAG_STACK = 0x0056df04
