@@ -48,7 +48,7 @@ A further 41 cases pass strict VC6 SP3 comparison under the same profile:
 
 These two sources have adjacent reviewed bindings. TerrainSupport is our slice
 filename, not a recovered retail TU name; the source attribution is Terrain.cpp.
-Its timers reuse the canonical UnknownPeakHold type, and the texture constructor
+Its timers reuse the canonical PeakHold type, and the texture constructor
 arguments use TextureMapManager pointers. The remaining Terrain implementation
 is unchanged in scope and is not included in this strict claim.
 

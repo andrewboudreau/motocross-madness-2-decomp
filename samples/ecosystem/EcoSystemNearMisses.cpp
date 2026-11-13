@@ -144,8 +144,8 @@ static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
 static int s_debugPage = -1;                 // 0x0056a128: the "Ecosystem:%d objects" debug-overlay page
 static int s_drawEnabled = 1;                // 0x0056a12c: drawing enabled (slot 23 toggles it)
 static int s_geometryRenderTicks;            // 0x0059aec0: slot 14 geometry draw ticks ("Render %d(3d:%d)")
-static UnknownPeakHold s_prepareGeometryPeak(5000); // 0x0059aef0: "PrepareGeometry %d %d" peak
-static UnknownPeakHold s_renderPeak(5000);   // 0x0059aec8: "Render" peak
+static PeakHold s_prepareGeometryPeak(5000); // 0x0059aef0: "PrepareGeometry %d %d" peak
+static PeakHold s_renderPeak(5000);   // 0x0059aec8: "Render" peak
 static int s_renderTicks;                    // 0x0059aee4: slot 14 draw ticks ("Render %d")
 static int s_prepareGeometryTicks;           // 0x0059aee8: classification ticks ("PrepareGeometry %d")
 static int s_geometryDrawn;                  // 0x0059af04: geometry objects drawn ("Rendered ... 3D %d")

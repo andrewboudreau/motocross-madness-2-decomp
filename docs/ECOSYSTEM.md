@@ -11,7 +11,7 @@ literal names them (the .est keys: `NumberOfLOD`, `MeanHeight`, ... ).
 ## Extent
 
 `0x00455da0..0x0045c823` (strong inference). It opens with the `$E`
-pairs of its two `UnknownPeakHold(5000)` statics (`.CRT$XCU` 103/104,
+pairs of its two `PeakHold(5000)` statics (`.CRT$XCU` 103/104,
 `0x0059aef0` and `0x0059aec8`; the vector set 99-102 sits mid-file at
 `0x00459830..0x00459b3b`, as in bikerace.cpp), and its last function is the
 xor reader `0x0045c7b0`; EventManager.cpp's constructor follows at

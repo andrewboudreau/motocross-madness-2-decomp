@@ -15,7 +15,7 @@ not been consolidated into one linked class hierarchy.
 
 The ten timer bodies each pass 5000 to `0x004cb670` on the distinct objects
 listed in TerrainSupport.bindings.json. The callee is the independently
-reconstructed UnknownPeakHold constructor; the source now uses that canonical
+reconstructed PeakHold constructor; the source now uses that canonical
 type rather than a duplicate timer class. Each thunk is bound to its own
 initializer body, and no TU-local initializer identity is inferred from its
 compiler-generated name alone.

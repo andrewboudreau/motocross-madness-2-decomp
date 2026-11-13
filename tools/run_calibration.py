@@ -2593,7 +2593,7 @@ CASES = [
         'symbol': '_$E2',
         'target_va': '0x00467860',
         'target_size': 16,
-        'reason': 'static UnknownPeakHold(5000) dynamic initializer',
+        'reason': 'static PeakHold(5000) dynamic initializer',
     },
     {
         'name': 'Game s_NetPeak initializer stub',
@@ -2611,7 +2611,7 @@ CASES = [
         'symbol': '_$E5',
         'target_va': '0x00467880',
         'target_size': 16,
-        'reason': 'static UnknownPeakHold(5000) dynamic initializer',
+        'reason': 'static PeakHold(5000) dynamic initializer',
     },
     {
         'name': 'Game s_TickPeak initializer stub',
@@ -2629,7 +2629,7 @@ CASES = [
         'symbol': '_$E8',
         'target_va': '0x004678a0',
         'target_size': 16,
-        'reason': 'static UnknownPeakHold(5000) dynamic initializer',
+        'reason': 'static PeakHold(5000) dynamic initializer',
     },
     {
         'name': 'Game s_PrepFramePeak initializer stub',
@@ -2647,7 +2647,7 @@ CASES = [
         'symbol': '_$E11',
         'target_va': '0x004678c0',
         'target_size': 16,
-        'reason': 'static UnknownPeakHold(5000) dynamic initializer',
+        'reason': 'static PeakHold(5000) dynamic initializer',
     },
     {
         'name': 'Game s_UpdateScreenPeak initializer stub',
@@ -2665,7 +2665,7 @@ CASES = [
         'symbol': '_$E14',
         'target_va': '0x004678e0',
         'target_size': 16,
-        'reason': 'static UnknownPeakHold(5000) dynamic initializer',
+        'reason': 'static PeakHold(5000) dynamic initializer',
     },
     {
         'name': 'Game s_PrepareGeometryPeak initializer stub',
@@ -2683,7 +2683,7 @@ CASES = [
         'symbol': '_$E17',
         'target_va': '0x00467900',
         'target_size': 16,
-        'reason': 'static UnknownPeakHold(5000) dynamic initializer',
+        'reason': 'static PeakHold(5000) dynamic initializer',
     },
     {
         'name': 'Game s_WaitForFlipPeak initializer stub',
@@ -2701,7 +2701,7 @@ CASES = [
         'symbol': '_$E20',
         'target_va': '0x00467920',
         'target_size': 16,
-        'reason': 'static UnknownPeakHold(5000) dynamic initializer',
+        'reason': 'static PeakHold(5000) dynamic initializer',
     },
     {
         'name': 'Game s_RenderPre3DPeak initializer stub',
@@ -2719,7 +2719,7 @@ CASES = [
         'symbol': '_$E23',
         'target_va': '0x00467940',
         'target_size': 16,
-        'reason': 'static UnknownPeakHold(5000) dynamic initializer',
+        'reason': 'static PeakHold(5000) dynamic initializer',
     },
     {
         'name': 'Game s_Render3DPeak initializer stub',
@@ -2737,7 +2737,7 @@ CASES = [
         'symbol': '_$E26',
         'target_va': '0x00467960',
         'target_size': 16,
-        'reason': 'static UnknownPeakHold(5000) dynamic initializer',
+        'reason': 'static PeakHold(5000) dynamic initializer',
     },
     {
         'name': 'Game s_RenderPost3DPeak initializer stub',
@@ -2755,7 +2755,7 @@ CASES = [
         'symbol': '_$E29',
         'target_va': '0x00467980',
         'target_size': 16,
-        'reason': 'static UnknownPeakHold(5000) dynamic initializer',
+        'reason': 'static PeakHold(5000) dynamic initializer',
     },
     {
         'name': 'Game s_ElapsedPeak initializer stub',
@@ -2770,7 +2770,7 @@ CASES = [
         'name': 'PeakHold constructor',
         'bindings': 'src/reconstructed/PeakHold.bindings.json',
         'source': 'src/reconstructed/PeakHold.cpp',
-        'symbol': '??0UnknownPeakHold@@QAE@I@Z',
+        'symbol': '??0PeakHold@@QAE@I@Z',
         'target_va': '0x004cb670',
         'target_size': 30,
         'reason': 'time stamp and hold time',
@@ -2779,7 +2779,7 @@ CASES = [
         'name': 'PeakHold peak',
         'bindings': 'src/reconstructed/PeakHold.bindings.json',
         'source': 'src/reconstructed/PeakHold.cpp',
-        'symbol': '?Peak@UnknownPeakHold@@QAEHXZ',
+        'symbol': '?Peak@PeakHold@@QAEHXZ',
         'target_va': '0x004cb690',
         'target_size': 28,
         'reason': '0 once the peak is older than the hold',
@@ -2788,7 +2788,7 @@ CASES = [
         'name': 'PeakHold add',
         'bindings': 'src/reconstructed/PeakHold.bindings.json',
         'source': 'src/reconstructed/PeakHold.cpp',
-        'symbol': '?Record@UnknownPeakHold@@QAEXH@Z',
+        'symbol': '?Record@PeakHold@@QAEXH@Z',
         'target_va': '0x004cb6b0',
         'target_size': 43,
         'reason': 'raise or restart the peak; one || condition',
@@ -22222,7 +22222,7 @@ CASES = [
         'symbol': '_$E13',
         'target_va': '0x00455db0',
         'target_size': 16,
-        'reason': 'XCU 103: UnknownPeakHold(5000) ctor 0x4cb670 on 0x59aef0',
+        'reason': 'XCU 103: PeakHold(5000) ctor 0x4cb670 on 0x59aef0',
     },
     {
         'name': 'EcoSystem.cpp EcoSystem $E peak hold 0x59aef0 thunk',
@@ -22240,7 +22240,7 @@ CASES = [
         'symbol': '_$E16',
         'target_va': '0x00455dd0',
         'target_size': 16,
-        'reason': 'XCU 104: UnknownPeakHold(5000) ctor on 0x59aec8',
+        'reason': 'XCU 104: PeakHold(5000) ctor on 0x59aec8',
     },
     {
         'name': 'EcoSystem.cpp EcoSystem $E peak hold 0x59aec8 thunk',

@@ -14,7 +14,7 @@ struct UnknownVisibilityStatic {
 };
 static UnknownVisibilityStatic s_visibilityUnknownStatic0;
 PCCamera g_frozenCamera(1);                        // 0x0068a968
-UnknownPeakHold g_visibilityTickStat(5000);        // 0x0068ab90
+PeakHold g_visibilityTickStat(5000);        // 0x0068ab90
 
 #include "math/Math3D.h"
 

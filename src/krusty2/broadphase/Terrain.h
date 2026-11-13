@@ -198,7 +198,7 @@ struct TerrainSharedState {
 
 // The timer's identity and layout are already reconstructed in PeakHold.h.
 // Keep the local alias for the unknown roles of these ten Terrain timers.
-typedef UnknownPeakHold TerrainPeakHold;
+typedef PeakHold TerrainPeakHold;
 // PROVISIONAL views for Terrain::Load's palette: PCVideoCard (src/reconstructed/PCVideoCard.h) holds
 // the IDirectDraw7-shaped interface at +0x190; slot 5 is CreatePalette (flags 0x44 =
 // DDPCAPS_8BIT | DDPCAPS_ALLOW256, 256 entries, out pointer, outer unknown).

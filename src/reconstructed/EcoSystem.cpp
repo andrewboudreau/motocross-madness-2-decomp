@@ -29,8 +29,8 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 EcoSystem* g_EcoSystem;             // 0x0059aebc
 static int s_geometryRenderTicks;            // 0x0059aec0: slot 14 geometry draw ticks ("Render %d(3d:%d)")
-static UnknownPeakHold s_prepareGeometryPeak(5000); // 0x0059aef0 ($E 0x00455db0, XCU 103): "PrepareGeometry %d %d" peak
-static UnknownPeakHold s_renderPeak(5000);   // 0x0059aec8 ($E 0x00455dd0, XCU 104): "Render" peak
+static PeakHold s_prepareGeometryPeak(5000); // 0x0059aef0 ($E 0x00455db0, XCU 103): "PrepareGeometry %d %d" peak
+static PeakHold s_renderPeak(5000);   // 0x0059aec8 ($E 0x00455dd0, XCU 104): "Render" peak
 static int s_renderTicks;                    // 0x0059aee4: slot 14 draw ticks ("Render %d")
 static int s_prepareGeometryTicks;           // 0x0059aee8: classification ticks ("PrepareGeometry %d")
 static int g_UnknownGlobal59aefc;             // 0x0059aefc: textures were preloaded

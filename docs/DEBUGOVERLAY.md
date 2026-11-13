@@ -60,7 +60,7 @@ free-function declarations with `Print` (`0x00447f40`, 94 bytes) and `Title`
 (`0x00447fa0`, 94 bytes). Both are variadic cdecl members: the receiver remains
 the first stack argument, and the caller still removes all arguments.
 
-Visibility's object at `0x0068ab90` uses `UnknownPeakHold`, the same implementation
+Visibility's object at `0x0068ab90` uses `PeakHold`, the same implementation
 as Game's profile counters. The initializer at `0x0052d330` passes 5000 to the
 constructor at `0x004cb670`; the object stores a timestamp, peak and hold interval
 at offsets 0, 4 and 8. This requires 12 bytes of writable storage. The former

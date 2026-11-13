@@ -29,9 +29,9 @@ SOURCES = {
 PROVIDERS = (
     ('overlay', '?Print@DebugOverlay@@QAAXHPBDZZ', 0x447f40, 94),
     ('overlay', '?Title@DebugOverlay@@QAAXHPBDZZ', 0x447fa0, 94),
-    ('peak', '??0UnknownPeakHold@@QAE@I@Z', 0x4cb670, 30),
-    ('peak', '?Peak@UnknownPeakHold@@QAEHXZ', 0x4cb690, 28),
-    ('peak', '?Record@UnknownPeakHold@@QAEXH@Z', 0x4cb6b0, 43),
+    ('peak', '??0PeakHold@@QAE@I@Z', 0x4cb670, 30),
+    ('peak', '?Peak@PeakHold@@QAEHXZ', 0x4cb690, 28),
+    ('peak', '?Record@PeakHold@@QAEXH@Z', 0x4cb6b0, 43),
     ('clock', '?ReadClock@@YAIXZ', 0x4bfa80, 29),
 )
 
@@ -105,7 +105,7 @@ class SceneProfilerConnectionTests(unittest.TestCase):
             # retail initializer passes 0x68ab90; its constructor writes +0,+4,+8.
             obj = objects['visibility']
             timer = next(s for s in obj.symbols
-                         if s.name == '?g_visibilityTickStat@@3VUnknownPeakHold@@A')
+                         if s.name == '?g_visibilityTickStat@@3VPeakHold@@A')
             section = obj.sections[timer.section_number - 1]
             self.assertEqual(section.name, '.bss')
             self.assertTrue(section.characteristics & 0x80000000)

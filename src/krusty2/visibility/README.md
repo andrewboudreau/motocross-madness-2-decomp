@@ -15,7 +15,7 @@ partial candidate; the separate helper samples are not covered by that claim.
 - File statics, in `.CRT$XCU` order (entries 340-347, right after the previous unit's
   vectors and before wrecker.cpp's): an empty static (0x52d2c0/0x52d2d0), the frozen camera
   0x68a968 built by the PCCamera constructor 0x4bed80(1) with atexit destructor 0x4624d0
-  (0x52d2e0..0x52d310), the query timer 0x68ab90 (`UnknownPeakHold`-shaped, 5000;
+  (0x52d2e0..0x52d310), the query timer 0x68ab90 (`PeakHold`-shaped, 5000;
   0x52d320/0x52d330), Math3D.h's four vectors (0x52fdc0..0x52fefb) and a second empty static
   (0x52f080/0x52f090). All 18 initializer functions are strict exact.
 - VisibilityClipper (the object at 0x575a98): every caller loads ecx from that pointer, so

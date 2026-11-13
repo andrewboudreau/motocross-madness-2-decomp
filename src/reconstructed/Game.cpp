@@ -52,16 +52,16 @@ extern "C" __declspec(dllimport) void __stdcall GlobalMemoryStatus(UnknownMemory
 
 // 0x0065b490..0x0065b528: peak-held frame timings for slot 8's profile page,
 // constructed in this order (0x00467860..0x00467980).
-static UnknownPeakHold s_NetPeak(5000);              // 0x0065b518
-static UnknownPeakHold s_TickPeak(5000);             // 0x0065b4c8
-static UnknownPeakHold s_PrepFramePeak(5000);        // 0x0065b528
-static UnknownPeakHold s_UpdateScreenPeak(5000);     // 0x0065b4e8
-static UnknownPeakHold s_PrepareGeometryPeak(5000);  // 0x0065b490
-static UnknownPeakHold s_WaitForFlipPeak(5000);      // 0x0065b4b8
-static UnknownPeakHold s_RenderPre3DPeak(5000);      // 0x0065b4f8
-static UnknownPeakHold s_Render3DPeak(5000);         // 0x0065b4d8
-static UnknownPeakHold s_RenderPost3DPeak(5000);     // 0x0065b4a0
-static UnknownPeakHold s_ElapsedPeak(5000);          // 0x0065b508
+static PeakHold s_NetPeak(5000);              // 0x0065b518
+static PeakHold s_TickPeak(5000);             // 0x0065b4c8
+static PeakHold s_PrepFramePeak(5000);        // 0x0065b528
+static PeakHold s_UpdateScreenPeak(5000);     // 0x0065b4e8
+static PeakHold s_PrepareGeometryPeak(5000);  // 0x0065b490
+static PeakHold s_WaitForFlipPeak(5000);      // 0x0065b4b8
+static PeakHold s_RenderPre3DPeak(5000);      // 0x0065b4f8
+static PeakHold s_Render3DPeak(5000);         // 0x0065b4d8
+static PeakHold s_RenderPost3DPeak(5000);     // 0x0065b4a0
+static PeakHold s_ElapsedPeak(5000);          // 0x0065b508
 
 // 0x0065b534..0x0065b540: phase times measured by slot 10, printed on the
 // profile page as "Tick", "PrepFrameTime:", "UpdateScrnTime:" and "Net"

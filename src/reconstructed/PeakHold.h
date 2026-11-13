@@ -2,10 +2,10 @@
 
 // Value that holds its peak for a time (0x004cb670..0x004cb6d8; the TU is
 // not established). Game.cpp constructs ten as globals with a 5000 hold for
-// the slot 8 profile page. Names are provisional.
-class UnknownPeakHold {
+// the slot 8 profile page. PeakHold is descriptive (no string names it).
+class PeakHold {
 public:
-    explicit UnknownPeakHold(unsigned int hold);  // 0x004cb670
+    explicit PeakHold(unsigned int hold);         // 0x004cb670
     int Peak();                                   // 0x004cb690: the peak, 0 once stale
     void Record(int value);                       // 0x004cb6b0: raise, or restart when stale
 

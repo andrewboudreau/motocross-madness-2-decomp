@@ -27,7 +27,7 @@ threshold. Actual owner repacking candidates use these three histories for
 texels, elapsed blit time and texture count. Those sample method imports are not
 newly supplied or admitted here.
 
-`UnknownPeakHold` already supplies matching 30/28/43-byte bodies. A private alias
+`PeakHold` already supplies matching 30/28/43-byte bodies. A private alias
 trial preserved both texture-group objects under three name mappings, but changed
 strict Scene::ReadLight from 2102 to 2065 matching positions. Moving UnknownTimer
 verbatim into a narrow header had the same regression. Both header-changing

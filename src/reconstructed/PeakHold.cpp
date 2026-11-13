@@ -4,21 +4,21 @@
 unsigned int ReadClock();
 
 // 0x004cb670
-UnknownPeakHold::UnknownPeakHold(unsigned int hold) {
+PeakHold::PeakHold(unsigned int hold) {
     peak = 0;
     peakTime = ReadClock();
     holdTime = hold;
 }
 
 // 0x004cb690
-int UnknownPeakHold::Peak() {
+int PeakHold::Peak() {
     if (ReadClock() - peakTime > holdTime)
         return 0;
     return peak;
 }
 
 // 0x004cb6b0
-void UnknownPeakHold::Record(int value) {
+void PeakHold::Record(int value) {
     unsigned int now = ReadClock();
     if (value > peak || now - peakTime > holdTime) {
         peak = value;

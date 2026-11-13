@@ -7,7 +7,7 @@
   "??0GroundFogableObject@@QAE@XZ": "0x004aae20",
   "??0UnknownEcoDefinition@@QAE@XZ": "0x00455de0",
   "??0ParameterBlock@@QAE@XZ": "0x004b7130",
-  "??0UnknownPeakHold@@QAE@I@Z": "0x004cb670",
+  "??0PeakHold@@QAE@I@Z": "0x004cb670",
   "??0FileStream@@QAE@PAVResourceManager@@@Z": "0x00460d10",
   "??0Vegetation@@QAE@XZ": "0x00456650",
   "??1AgeManager@@QAE@XZ": "0x00401020",
