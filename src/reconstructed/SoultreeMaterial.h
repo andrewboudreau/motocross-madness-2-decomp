@@ -21,7 +21,7 @@
 #include "SurfaceMap.h"
 
 // The six dwords at +0x74, handed to the texture loader as its format
-// choice (+0x80 is the format UnknownTextureFormatChoice calls field_0x0c).
+// choice (+0x80 is the format TextureContext calls field_0x0c).
 // The two ManagedTextureGroups at +0x04/+0x08 receive the procedural managed
 // textures (0x0050c6c0), by whether the format has alpha (0x00511ad0).
 struct SoultreeTextureOptions {

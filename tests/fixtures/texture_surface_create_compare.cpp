@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-class TrackGame;struct DirectDrawSurface;struct DDSurfaceDesc2;struct UnknownTexturePalette;struct UnknownTextureFormatChoice;
+class TrackGame;struct DirectDrawSurface;struct DDSurfaceDesc2;struct UnknownTexturePalette;struct TextureContext;
 class TextureMapManager {public:void* GrowSecondScratchBuffer(unsigned);};
-class PCTextureMap {public:virtual int CreateSurface(void*,int,int,int,int,int,int,UnknownTexturePalette*,int,void*,int,int,int,int,UnknownTextureFormatChoice*,int,unsigned);int CreateSystemSurface(DDSurfaceDesc2*,int,int*);int DumpLevel(DirectDrawSurface*,const char*);};
+class PCTextureMap {public:virtual int CreateSurface(void*,int,int,int,int,int,int,UnknownTexturePalette*,int,void*,int,int,int,int,TextureContext*,int,unsigned);int CreateSystemSurface(DDSurfaceDesc2*,int,int*);int DumpLevel(DirectDrawSurface*,const char*);};
 int ActualPixelFormatBytesPerPixel(int);void ActualFillPixelFormat(int,void*);int ActualIsFormat4444Or8888(int);
 static BYTE referenceSpace[0x800000]={1};
 struct Surface {DWORD table;int refs,locks,palettes;BYTE tail[48];};
@@ -46,7 +46,7 @@ int PCTextureMap::DumpLevel(DirectDrawSurface* surface,const char* name){Begin(1
 int ConvertPixels(void* destination,void* source,int width,int height,int destinationStride,int sourceStride,int destinationFormat,int sourceFormat,int dither,UnknownTexturePalette* palette,int alpha,unsigned key){Event& e=Begin(11,destination,Identity(source),width,height,destinationStride);int args[]={sourceStride,destinationFormat,sourceFormat,dither,Identity(palette),alpha,(int)key};memcpy(e.args+4,args,sizeof(args));memcpy(e.payload,source,64);Finish();for(int i=0;i<64;++i)((BYTE*)destination)[i]=(BYTE)(((BYTE*)source)[i]^destinationFormat^i);return Result(11,-7);}
 int AverageColor(void* bits,int width,int height,int stride,int format,UnknownTexturePalette* palette){Event& e=Begin(12,bits,width,height,stride,format);e.args[4]=Identity(palette);memcpy(e.payload,bits,64);Finish();return Result(12,0x12345678);}
 struct Hooks {
- int Create(void* bits,int width,int height,int stride,int minimum,int sourceFormat,int format,UnknownTexturePalette* palette,int flags,void* surfacePalette,int check,int unused,int u,int v,UnknownTextureFormatChoice* choice,int threshold,unsigned key){return((PCTextureMap*)this)->PCTextureMap::CreateSurface(bits,width,height,stride,minimum,sourceFormat,format,palette,flags,surfacePalette,check,unused,u,v,choice,threshold,key);}
+ int Create(void* bits,int width,int height,int stride,int minimum,int sourceFormat,int format,UnknownTexturePalette* palette,int flags,void* surfacePalette,int check,int unused,int u,int v,TextureContext* choice,int threshold,unsigned key){return((PCTextureMap*)this)->PCTextureMap::CreateSurface(bits,width,height,stride,minimum,sourceFormat,format,palette,flags,surfacePalette,check,unused,u,v,choice,threshold,key);}
  int Build(int filter){Begin(14,this,filter);Finish();return Result(14,1);}
  int Key(unsigned color){Begin(16,this,color);Finish();At(this,0x30)=1;At(this,0x34)=color;return Result(16,-7);}
 };
@@ -85,8 +85,8 @@ static int MapReference(const char* path,const char* patches){
     }fclose(f);return records==20 && FlushInstructionCache(GetCurrentProcess(),0,0);
 }
 static int Filter(EXCEPTION_POINTERS* e){DWORD code=e->ExceptionRecord->ExceptionCode;if(code!=EXCEPTION_ACCESS_VIOLATION&&code!=EXCEPTION_INT_DIVIDE_BY_ZERO&&code!=EXCEPTION_INT_OVERFLOW)return EXCEPTION_CONTINUE_SEARCH;observed.exception=code;if(code==EXCEPTION_ACCESS_VIOLATION){observed.faultKind=e->ExceptionRecord->ExceptionInformation[0];observed.faultAddress=e->ExceptionRecord->ExceptionInformation[1];}return EXCEPTION_EXECUTE_HANDLER;}
-static void Invoke(){union{int(Hooks::*method)(void*,int,int,int,int,int,int,UnknownTexturePalette*,int,void*,int,int,int,int,UnknownTextureFormatChoice*,int,unsigned);DWORD address;}call;call.method=&Hooks::Create;if(retailActive)call.address=0x4c69c0;
- __try{observed.result=(((Hooks*)world.texture)->*call.method)(scenario.bits?world.source:0,scenario.width,scenario.height,scenario.stride,scenario.minimum,scenario.sourceFormat,scenario.format,scenario.palette?(UnknownTexturePalette*)world.palette:0,scenario.flags,scenario.surfacePalette?world.surfacePalette:0,scenario.checkMemory,0x7788,0x1234,-7,scenario.choice?(UnknownTextureFormatChoice*)world.choice:0,0x80,0xff00ff);observed.completed=1;}__except(Filter(GetExceptionInformation())){}
+static void Invoke(){union{int(Hooks::*method)(void*,int,int,int,int,int,int,UnknownTexturePalette*,int,void*,int,int,int,int,TextureContext*,int,unsigned);DWORD address;}call;call.method=&Hooks::Create;if(retailActive)call.address=0x4c69c0;
+ __try{observed.result=(((Hooks*)world.texture)->*call.method)(scenario.bits?world.source:0,scenario.width,scenario.height,scenario.stride,scenario.minimum,scenario.sourceFormat,scenario.format,scenario.palette?(UnknownTexturePalette*)world.palette:0,scenario.flags,scenario.surfacePalette?world.surfacePalette:0,scenario.checkMemory,0x7788,0x1234,-7,scenario.choice?(TextureContext*)world.choice:0,0x80,0xff00ff);observed.completed=1;}__except(Filter(GetExceptionInformation())){}
 }
 static void Run(int retail){retailActive=retail;memset(&observed,0,sizeof(observed));observed.result=-999;memset(&world,0x65+scenario.seed%15,sizeof(world));
  for(int n=0;n<2;++n){At(world.games[n],0xc)=(DWORD)world.displays[n];At(world.games[n],0x2d0)=scenario.blade;At(world.games[n],0x2d4)=scenario.cached?0x400:0;At(world.displays[n],0x190)=(DWORD)world.managers[n];At(world.managers[n],0)=(DWORD)drawTable;}

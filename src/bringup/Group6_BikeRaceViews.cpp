@@ -31,7 +31,7 @@ struct KbBikeSetup;
 class KrustyVCR;
 class GameObject;
 class LightManager;
-struct UnknownTextureFormatChoice;
+struct TextureContext;
 class ControlInterface;
 class BikeRace;
 struct UnknownBikeRaceBikeSetup;
@@ -89,7 +89,7 @@ class UnknownBikeRaceRacer {
 public:
     void SetNetRecorder(KrustyVCR* vcr);
     GameObject* Load(void* owner, const char* engineName, const char* bikeFile, const char* riderFile,
-                     LightManager* lights, UnknownTextureFormatChoice* textures, Vector3 position,
+                     LightManager* lights, TextureContext* textures, Vector3 position,
                      Vector3 direction, Vector3 up, UnknownBikeRaceProjector* terrain,
                      ControlInterface* control, char ai, int remote, BikeRace* race,
                      const char* name, int b, int id, UnknownBikeRaceBikeSetup* setup, int gasGyroOption, int brakeGyroOption,
@@ -153,7 +153,7 @@ static inline Vec3 UnknownAsVec3(const Vector3& v)
 // the word KrustyBike::Load keeps as `aiSkill` (+0x15d8), so its bits are passed unchanged.
 GameObject* UnknownBikeRaceRacer::Load(void* owner, const char* engineName, const char* bikeFile,
                                        const char* riderFile, LightManager* lights,
-                                       UnknownTextureFormatChoice* textures, Vector3 position,
+                                       TextureContext* textures, Vector3 position,
                                        Vector3 direction, Vector3 up,
                                        UnknownBikeRaceProjector* terrain,
                                        ControlInterface* control, char ai, int remote,

@@ -30,7 +30,7 @@ import random
 import struct
 
 RETAIL_VA = 0x00417ed0
-SYMBOL = ('?Create@BikeRace@@QAEPAV1@PAX0PAVLightManager@@PAUUnknownTextureFormatChoice@@'
+SYMBOL = ('?Create@BikeRace@@QAEPAV1@PAX0PAVLightManager@@PAUTextureContext@@'
           'PAVUnknownBikeRaceProjector@@PAVKrustyBikeCamera@@PAVScene@@PAURaceGateEvent@@'
           'PAVUnknownBikeRaceShadow@@@Z')
 SOURCE = 'src/bringup/Group6_BikeRaceCreate.cpp'

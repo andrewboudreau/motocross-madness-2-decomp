@@ -15,7 +15,7 @@ from tools.match import compare
 from tools.run_calibration import CASES
 ROOT=Path(__file__).resolve().parents[1]
 EXE=Path(os.environ.get('MCM2_EXE',ROOT/'work/game/mcm2.exe'))
-LOADER='?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z'
+LOADER='?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUTextureContext@@HIHH@Z'
 MATERIAL={'??0SoultreeMaterial@@QAE@H@Z',
  '?Attach@SoultreeMaterial@@QAEPAV1@PAVRenderTarget@@PBUSoultreeTextureOptions@@PAVTextureMapManager@@H@Z',
  '?CopyFrom@SoultreeMaterial@@QAEXPBV1@@Z'}

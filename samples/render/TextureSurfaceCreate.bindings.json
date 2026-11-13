@@ -1,7 +1,7 @@
 {
   "?AverageColor@@YAHPAXHHHHPAUUnknownTexturePalette@@@Z": "0x004d24d0",
   "?ConvertPixels@@YAHPAX0HHHHHHHPAUUnknownTexturePalette@@HI@Z": "0x004d1d20",
-  "?CreateSurface@PCTextureMap@@UAEHPAXHHHHHHPAUUnknownTexturePalette@@H0HHHHPAUUnknownTextureFormatChoice@@HI@Z": "0x004c69c0",
+  "?CreateSurface@PCTextureMap@@UAEHPAXHHHHHHPAUUnknownTexturePalette@@H0HHHHPAUTextureContext@@HI@Z": "0x004c69c0",
   "?CreateSystemSurface@PCTextureMap@@QAEHPAUDDSurfaceDesc2@@HPAH@Z": "0x004c68e0",
   "?DumpLevel@PCTextureMap@@QAEHPAUDirectDrawSurface@@PBD@Z": "0x004c84e0",
   "?FillPixelFormat@@YAXHPAX@Z": "0x005119c0",

@@ -108,11 +108,11 @@ public:
     ControlInterface* controlInterface;       // a PCControlInterface (slot 2)
     int playerCount;                          // +0x18 1 initially; KrustyBikeCamera slot 42 tests > 1
     // +0x1c..+0x30: a texture context block laid out like
-    // UnknownTextureFormatChoice (TextureMap.h): the manager, two groups, two
+    // TextureContext (TextureMap.h): the manager, two groups, two
     // formats and the halvings. The UI painters and ReplaceMaterialTexture
     // take its address (KrustyUI.cpp copies all six).
     TextureMapManager* textureContext;        // +0x1c
-    int textureOpaqueGroup;                   // +0x20  texture context opaqueGroup (UnknownTextureFormatChoice +0x04); 0 after initialisation
+    int textureOpaqueGroup;                   // +0x20  texture context opaqueGroup (TextureContext +0x04); 0 after initialisation
     int textureAlphaGroup;                    // +0x24  texture context alphaGroup (+0x08); 0 after initialisation
     int textureOpaqueFormat;                  // +0x28  texture context opaqueFormat (+0x0c): the render target's pixel format
     int textureAlphaFormat;                   // +0x2C  texture context alphaFormat (+0x10): 0x115c, i.e. 4444

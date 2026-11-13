@@ -18,5 +18,5 @@
   "__real@4@3ffec000000000000000": "0x55084c",
   "__real@4@4008fa00000000000000": "0x550f44",
   "__real@4@bfff8000000000000000": "0x550810",
-  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x50a590"
+  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUTextureContext@@HIHH@Z": "0x50a590"
 }

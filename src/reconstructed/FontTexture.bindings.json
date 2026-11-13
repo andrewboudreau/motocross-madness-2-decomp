@@ -47,5 +47,5 @@
   "__FILE__:earray.h": "0x0056b294",
   "__except_list": "0x00000000",
   "_atexit": "0x00535430",
-  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x0050a590"
+  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUTextureContext@@HIHH@Z": "0x0050a590"
 }

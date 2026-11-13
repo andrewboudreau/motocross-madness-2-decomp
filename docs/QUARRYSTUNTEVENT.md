@@ -68,7 +68,7 @@ These differ:
   retail, esi here).
 
 Facts the loader establishes:
-- The three 0x18-byte `UnknownTextureFormatChoice` records hold the
+- The three 0x18-byte `TextureContext` records hold the
   terrain, model and sky texture settings: +0x14 is the halving level, set
   from total/available memory, the `DriverInfo\<driver>\VideoMemoryMB`
   registry value and the "MarginPercentage"/"MinMarginKBytes" settings.

@@ -27,7 +27,7 @@ struct UnknownTexturePalette {
 // alpha. +0x14 is how many times slot 5 halves textures wider than 32.
 // 0x0050a590 also takes the manager (+0x00) and the ManagedTextureGroups
 // for textures without (+0x04) and with (+0x08) alpha from it.
-struct UnknownTextureFormatChoice {
+struct TextureContext {
     TextureMapManager* manager;               // +0x0  the TextureMapManager 0x0050a590 loads with
     ManagedTextureGroup* opaqueGroup;         // +0x4  group taking ManagedTextures without alpha (0x0050a590)
     ManagedTextureGroup* alphaGroup;          // +0x8  group taking 4444/8888 ManagedTextures (0x0050a590)
@@ -56,12 +56,12 @@ public:
     virtual int CreateSurface(void* bits, int width, int height, int stride, int minimumSize,
                               int sourceFormat, int format, UnknownTexturePalette* palette,
                               int flags, void* surfacePalette, int checkMemory, int unused,
-                              int addressU, int addressV, UnknownTextureFormatChoice* choice,
+                              int addressU, int addressV, TextureContext* choice,
                               int alphaThreshold, unsigned int key) = 0;
     virtual int LoadSurface(FileStream* stream, int width, int height, int minimumSize,
                             int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
                             int flags, void* surfacePalette, int addressU, int addressV,
-                            UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key) = 0;
+                            TextureContext* choice, int alphaThreshold, unsigned int key) = 0;
     virtual TextureMap* Clone() = 0;
     virtual int IsResident() = 0;
     virtual int CreateTextureSurface(int upload, int asRenderTarget, int localVideo) = 0;

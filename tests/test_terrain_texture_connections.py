@@ -81,9 +81,9 @@ class TerrainTextureConnectionsTests(unittest.TestCase):
                     'sizeof(ManagedTexture) == 0xbc && sizeof(TerrainSurface) == 0xbc',
                     'offsetof(PCTextureMap, averageColor) == offsetof(TerrainSurfaceBase, averageColor)',
                     'offsetof(PCTextureMap, textureSurface) == offsetof(TerrainSurfaceBase, textureSurface)',
-                    'sizeof(UnknownTextureFormatChoice) == sizeof(TerrainSurfaceDesc)',
-                    'offsetof(UnknownTextureFormatChoice, manager) == offsetof(TerrainSurfaceDesc, manager)',
-                    'offsetof(UnknownTextureFormatChoice, opaqueGroup) == offsetof(TerrainSurfaceDesc, registry)',
+                    'sizeof(TextureContext) == sizeof(TerrainSurfaceDesc)',
+                    'offsetof(TextureContext, manager) == offsetof(TerrainSurfaceDesc, manager)',
+                    'offsetof(TextureContext, opaqueGroup) == offsetof(TerrainSurfaceDesc, registry)',
                     'offsetof(ManagedTexture, group) == 0x90',
                     'offsetof(ManagedTextureGroup, managedTextures) == 0x44',
                 ))))

@@ -62,7 +62,7 @@ static inline int ReadRows(FileStream* stream, void* bits, int rowSize, int rows
 int PCTextureMap::LoadSurface(FileStream* stream, int width, int height, int minimumSize,
                               int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
                               int flags, void* surfacePalette, int addressU, int addressV,
-                              UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key) {
+                              TextureContext* choice, int alphaThreshold, unsigned int key) {
     int offsets[12];
     DDSCaps2 caps;
     DDSurfaceDesc2 desc;

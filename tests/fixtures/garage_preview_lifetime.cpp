@@ -33,7 +33,7 @@ static int __fastcall ReleaseTexture(void* self, void*) {
 
 TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int format,
                               Palette8* palette, int a, int addressU, int addressV,
-                              UnknownTextureFormatChoice* choice, int alphaThreshold,
+                              TextureContext* choice, int alphaThreshold,
                               unsigned int key, int b, int c) {
     if (manager != expectedManager || strcmp(name, "BikeNumbers128.tga") || format != 0x115c ||
         palette || a || addressU != 5 || addressV != 6 || choice || alphaThreshold != 0x80 ||

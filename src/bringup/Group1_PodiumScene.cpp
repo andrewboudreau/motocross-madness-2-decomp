@@ -80,7 +80,7 @@ struct UnknownPodiumRacer {
     int place;                                      // +0x784
 };
 // Game+0x1c's resource context, as the podium characters' slot 11 takes it
-// (laid out like TextureMap.h's UnknownTextureFormatChoice).
+// (laid out like TextureMap.h's TextureContext).
 struct UnknownPodiumContext {
     TextureMapManager* textureManager;              // +0x00
     int opaqueGroup;                                // +0x04

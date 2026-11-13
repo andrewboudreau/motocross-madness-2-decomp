@@ -129,7 +129,7 @@ public:
     explicit UnknownQuarryRace(int flags);                     // 0x00417c30
     // 0x00417ed0: loads the race; returns this, or 0.
     UnknownQuarryRace* Create(void* target, void* particles, LightManager* lights,
-                                             UnknownTextureFormatChoice* textures, UnknownTerrain* terrain,
+                                             TextureContext* textures, UnknownTerrain* terrain,
                                              UnknownQuarryCamera* camera, Scene* scene, BaseQuarryEvent* event,
                                              void* shadow);
     UnknownQuarryRacer* NextBike(int* iterator);  // 0x004204e0: the next racer, or 0
@@ -245,9 +245,9 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     int hasCube;
     unsigned long modelCounts[4];
     int presets[8];
-    UnknownTextureFormatChoice terrainTextures;
-    UnknownTextureFormatChoice modelTextures;
-    UnknownTextureFormatChoice skyTextures;
+    TextureContext terrainTextures;
+    TextureContext modelTextures;
+    TextureContext skyTextures;
     MEMORYSTATUS memory;
     char text[0x184];
     char ecosystem[0x104];
@@ -837,7 +837,7 @@ GameObject* FogOn::Create(void* target, Fog* fog)
 
 
 UnknownQuarryRace* UnknownQuarryRace::Create(void* target, void* particles, LightManager* lights,
-                                             UnknownTextureFormatChoice* textures, UnknownTerrain* terrain,
+                                             TextureContext* textures, UnknownTerrain* terrain,
                                              UnknownQuarryCamera* camera, Scene* scene, BaseQuarryEvent* event,
                                              void* shadow)
 {

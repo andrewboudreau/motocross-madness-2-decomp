@@ -22,7 +22,7 @@ static inline void AppendRenderStatePair(TextureMap* map, int state, int value) 
 int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, int minimumSize,
                                 int sourceFormat, int format, UnknownTexturePalette* palette,
                                 int flags, void* surfacePalette, int checkMemory, int unused,
-                                int addressU, int addressV, UnknownTextureFormatChoice* choice,
+                                int addressU, int addressV, TextureContext* choice,
                                 int alphaThreshold, unsigned int key) {
     int formats[5];
     int mipmapped;

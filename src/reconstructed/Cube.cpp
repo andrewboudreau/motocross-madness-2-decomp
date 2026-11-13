@@ -155,7 +155,7 @@ int Cube::LoadTexture(int face, int index, UnknownTexturePalette* palette,
     if (faces[face].textures[index]) {
         faces[face].textures[index]->LoadSurface(
             textureStream, size, size, 1, fileFormat, dataSize, 0, palette, 2, 0, 2, 1,
-            (UnknownTextureFormatChoice*)context, 0x80, 0xff00ff);
+            (TextureContext*)context, 0x80, 0xff00ff);
         if (!textureGroup)
             faces[face].textures[index]->CreateTextureSurface(1, 0, 0);
     }

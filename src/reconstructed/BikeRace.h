@@ -42,7 +42,7 @@
 
 class CollisionObject;  // collision/CollisionObject.h (src/krusty2)
 class LightManager;
-struct UnknownTextureFormatChoice;
+struct TextureContext;
 struct UnknownBikeRaceBikeSetup;
 struct UnknownBikeRaceMeshGroup;
 struct UnknownBikeRaceRacerInfo;
@@ -157,7 +157,7 @@ public:
     // Slot 11 (D3DIMSoultreeCharacter's CharacterVirtualSlot11): loads the
     // model file `name`; returns the GameObject to add.
     virtual GameObject* UnknownVirtualSlot11(void* owner, const char* name, LightManager* lights,
-                                             UnknownTextureFormatChoice* textures, int a, int b);
+                                             TextureContext* textures, int a, int b);
 
     // 0x004a8b10: plays a motion ("Stand", "FlagStart", "FlagLoop").
     void SetMotionByName(const char* motion);
@@ -382,7 +382,7 @@ public:
     // 0x0048fc80 (KrustyBike::Load in src/krusty2/vehicle, ret 0x7c): loads the bike and
     // rider models and sets the racer up; returns the GameObject to add.
     GameObject* Load(void* owner, const char* engineName, const char* bikeFile, const char* riderFile,
-                                      LightManager* lights, UnknownTextureFormatChoice* textures,
+                                      LightManager* lights, TextureContext* textures,
                                       Vector3 position, Vector3 direction, Vector3 up,
                                       UnknownBikeRaceProjector* terrain, ControlInterface* control, char ai,
                                       int remote, BikeRace* race, const char* name, int b, int id,

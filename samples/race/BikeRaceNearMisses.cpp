@@ -593,7 +593,7 @@ static inline Vector3 UnknownScaled(const Vector3& v, float scale) {
 
 // 0x00417ed0
 BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
-                                          UnknownTextureFormatChoice* textures,
+                                          TextureContext* textures,
                                           UnknownBikeRaceProjector* terrain, KrustyBikeCamera* camera,
                                           Scene* scene, RaceGateEvent* event,
                                           UnknownBikeRaceShadow* shadow) {
@@ -1020,7 +1020,7 @@ static inline UnknownBikeRaceUiModel& UiRider(int i) {
 }
 
 // 0x00419970
-int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureFormatChoice* textures,
+int BikeRace::CreateRacers(void* owner, LightManager* lights, TextureContext* textures,
                                     UnknownBikeRaceProjector* terrain, RaceGateEvent* event) {
     char path[0x104];
     char message[0x184];

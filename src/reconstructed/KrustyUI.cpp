@@ -103,7 +103,7 @@ public:
 
 // Game+0x1c..+0x33, copied as the garage model's resource context; 0x00498cf0
 // sets +0x14 when little video memory is free. The layout is
-// UnknownTextureFormatChoice's (TextureMap.h).
+// TextureContext's (TextureMap.h).
 struct UnknownKrustyUIContext {
     TextureMapManager* manager;               // +0x00
     int opaqueGroup;                          // +0x04

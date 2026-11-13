@@ -69,7 +69,7 @@
   "?Create@AuralScape@@QAEPAV1@PAXH@Z": "0x00402f00",
   "?NextListenerNumber@AuralScape@@QAEHXZ": "0x00403000",
   "?AddListener@AuralScape@@QAEHHMM@Z": "0x00403010",
-  "?Create@UnknownQuarryRace@@QAEPAV1@PAX0PAVLightManager@@PAUUnknownTextureFormatChoice@@PAVUnknownTerrain@@PAUUnknownQuarryCamera@@PAVScene@@PAVBaseQuarryEvent@@0@Z": "0x00417ed0",
+  "?Create@UnknownQuarryRace@@QAEPAV1@PAX0PAVLightManager@@PAUTextureContext@@PAVUnknownTerrain@@PAUUnknownQuarryCamera@@PAVScene@@PAVBaseQuarryEvent@@0@Z": "0x00417ed0",
   "?NextBike@UnknownQuarryRace@@QAEPAUUnknownQuarryRacer@@PAH@Z": "0x004204e0",
   "?SetDetailLevel@UnknownKrustyBikeView@@QAEXH@Z": "0x00423790",
   "?SetUseBroadphase@CollisionObject@@QAEXH@Z": "0x00432120",

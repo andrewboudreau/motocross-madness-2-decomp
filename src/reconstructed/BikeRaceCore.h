@@ -15,7 +15,7 @@ class UnknownBikeRaceRacer;
 class UnknownBikeRaceProjector;
 class UnknownBikeRaceShadow;
 class UnknownBikeRaceCharacter;
-struct UnknownTextureFormatChoice;
+struct TextureContext;
 struct UnknownBikeRaceCameraView;
 struct RaceGateEvent;
 struct RaceGatePose;
@@ -58,12 +58,12 @@ public:
     // overlays, the replay recorder, the loader 0x00419970, the dialogs,
     // the sound and the plate numbers. Returns this, or 0 after Release.
     BikeRace* Create(void* owner, void* particles, LightManager* lights,
-                                    UnknownTextureFormatChoice* textures, UnknownBikeRaceProjector* terrain,
+                                    TextureContext* textures, UnknownBikeRaceProjector* terrain,
                                     KrustyBikeCamera* camera, Scene* scene, RaceGateEvent* event,
                                     UnknownBikeRaceShadow* shadow);
     // 0x00419970 (ret 0x14): loads the rider models and creates the racers;
     // 0 on failure.
-    int CreateRacers(void* owner, LightManager* lights, UnknownTextureFormatChoice* textures,
+    int CreateRacers(void* owner, LightManager* lights, TextureContext* textures,
                               UnknownBikeRaceProjector* terrain, RaceGateEvent* event);
     // 0x00417bc0: the racer numbers 1..+0x158 ordered by championship points.
     void RankByPoints(int* order);

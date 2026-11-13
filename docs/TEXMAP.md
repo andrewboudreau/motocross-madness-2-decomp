@@ -10,7 +10,7 @@ loader needs one `goto failed`, so that the header-read and realloc
 failures share retail's single `return 0`.
 
 TextureMap.h changes:
-- `UnknownTextureFormatChoice` holds a TextureMapManager and two
+- `TextureContext` holds a TextureMapManager and two
   ManagedTextureGroups.
 - `FileStream` gains its text-mode byte and the inline accessors
   `0x0043e9b0`/`0x0043e9e0`.

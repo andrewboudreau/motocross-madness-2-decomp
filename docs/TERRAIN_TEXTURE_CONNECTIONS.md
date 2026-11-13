@@ -34,7 +34,7 @@ receiver/texture pointer. Constructor results need no base adjustment.
 
 `TerrainSurfaceDesc` remains a partial view of the 24-byte texture choice:
 its manager and registry at offsets zero and four correspond to
-`UnknownTextureFormatChoice::manager` and `opaqueGroup`. Terrain copies that
+`TextureContext::manager` and `opaqueGroup`. Terrain copies that
 registry pointer to its `+0x38` field. ManagedTextureGroup's own RTTI
 (`0x0055f418`, vtable `0x005583c0`) identifies its BaseObject base at offset
 zero. Its actual AddTexture implementation manages the texture list, shares

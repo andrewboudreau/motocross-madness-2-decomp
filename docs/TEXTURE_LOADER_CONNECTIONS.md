@@ -11,11 +11,11 @@ BikeNumberPainter, FontTexture, TrackOverlay, EcoSystem, Particles and Terrain.
 Their previous signatures produced five unresolved decorated names despite
 calling the same retail address. Canonical and retained sample binding keys
 now use the provider's signature, including `Palette8*` and
-`UnknownTextureFormatChoice*`.
+`TextureContext*`.
 
 The six-word `SoultreeTextureOptions` view remains local to material code.
 The compile-time fixture checks its size and every corresponding field offset
-against `UnknownTextureFormatChoice`; the call explicitly converts the pointer.
+against `TextureContext`; the call explicitly converts the pointer.
 FontTexture retains its integer-valued options parameter and explicitly
 converts those bits at the boundary. EcoSystem, Particles and Terrain retain
 their provisional texture return views with explicit conversions. These

@@ -21,5 +21,5 @@
   "__imp__TextOutA@20": "0x00550088",
   "__real@4@3ff78000000000000000": "0x005516d8",
   "_strncpy": "0x00534b10",
-  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUUnknownTextureFormatChoice@@HIHH@Z": "0x0050a590"
+  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHPAVPalette8@@HHHPAUTextureContext@@HIHH@Z": "0x0050a590"
 }
