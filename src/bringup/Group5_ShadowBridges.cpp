@@ -21,12 +21,12 @@ struct Vec3;
 struct Matrix4 {
     float m[4][4];
 };
-struct UnknownSoultreeVertex;
+struct SoultreeVertex;
 
 class D3DIMSoultreeObject {
 public:
     int GetSurfaceCount(int lod);  // 0x00445030
-    void GetPart(int index, UnknownSoultreeVertex** vertices, int* vertexCount, unsigned short** indices,
+    void GetPart(int index, SoultreeVertex** vertices, int* vertexCount, unsigned short** indices,
                  int* indexCount, int c, int d);  // 0x004433f0
 };
 
@@ -50,7 +50,7 @@ void ShadowCaster::GetPart(int index, void** vertices, int* vertexCount, unsigne
                            int c, int d)
 {
     reinterpret_cast<D3DIMSoultreeObject*>(this)->GetPart(
-        index, reinterpret_cast<UnknownSoultreeVertex**>(vertices), vertexCount, indices, indexCount, c, d);
+        index, reinterpret_cast<SoultreeVertex**>(vertices), vertexCount, indices, indexCount, c, d);
 }
 
 void ShadowCaster::GetBounds(ShadowVec3* center, ShadowVec3* halfExtents)

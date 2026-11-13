@@ -204,13 +204,13 @@ void D3DIMSoultreeObject::LoadHierarchy(FileStream* stream)
             stream->Read(&autoLodDistances[i], 4, 1);
     }
     if (lodCount > 0) {
-        lodTable = (UnknownSoultreeLod*)DebugMalloc(lodCount * 8, __FILE__, 0x16f);
+        lodTable = (SoultreeLod*)DebugMalloc(lodCount * 8, __FILE__, 0x16f);
         for (int lod = 0; lod < lodCount; lod++) {
             stream->Read(&lodTable[lod].surfaceCount, 4, 1);
             lodTable[lod].surfaces =
-                (UnknownSoultreeSurface*)DebugMalloc(lodTable[lod].surfaceCount * 0x38, __FILE__, 0x173);
+                (SoultreeSurface*)DebugMalloc(lodTable[lod].surfaceCount * 0x38, __FILE__, 0x173);
             for (int i = 0; i < lodTable[lod].surfaceCount; i++) {
-                UnknownSoultreeSurface* surface = &lodTable[lod].surfaces[i];
+                SoultreeSurface* surface = &lodTable[lod].surfaces[i];
                 stream->Read(&surface->groupCount, 4, 1);
                 stream->Read(&surface->vertexCount, 4, 1);
                 stream->Read(&surface->faceCount, 4, 1);
@@ -218,19 +218,19 @@ void D3DIMSoultreeObject::LoadHierarchy(FileStream* stream)
                 surface->field_0x30 = 0;
                 surface->field_0x34 = 0;
                 surface->field_0x2c = 1.0f;
-                surface->vertices = (UnknownSoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x181);
+                surface->vertices = (SoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x181);
                 stream->Read(surface->vertices, 0x20, surface->vertexCount);
-                surface->drawnVertices = (UnknownSoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x184);
+                surface->drawnVertices = (SoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x184);
                 stream->Read(surface->drawnVertices, 0x20, surface->vertexCount);
                 surface->normals = (Vector3*)DebugMalloc(surface->vertexCount * 0xc, __FILE__, 0x187);
                 stream->Read(surface->normals, 0xc, surface->vertexCount);
                 surface->indices = (unsigned short*)DebugMalloc(surface->faceCount * 6, __FILE__, 0x18a);
                 stream->Read(surface->indices, 6, surface->faceCount);
-                surface->uvs = (UnknownSoultreeUV*)DebugMalloc(surface->vertexCount * 8, __FILE__, 0x18d);
+                surface->uvs = (SoultreeUV*)DebugMalloc(surface->vertexCount * 8, __FILE__, 0x18d);
                 stream->Read(surface->uvs, 4, surface->vertexCount * 2);
                 surface->materialIndices = (int*)DebugMalloc(surface->materialCount * 4, __FILE__, 0x191);
                 stream->Read(surface->materialIndices, 4, surface->materialCount);
-                surface->groups = (UnknownSoultreeFaceGroup*)DebugMalloc(surface->groupCount * 0x14, __FILE__, 0x194);
+                surface->groups = (SoultreeVertexGroup*)DebugMalloc(surface->groupCount * 0x14, __FILE__, 0x194);
                 stream->Read(surface->groups, 0x14, surface->groupCount);
                 for (int j = 0; j < surface->groupCount; j++) {
                     int node;
@@ -308,19 +308,19 @@ int D3DIMSoultreeObject::ReadLods()
             parameterBlock->GetFloat(section, -1.0f, &autoLodDistances[i]);
         }
     }
-    lodTable = (UnknownSoultreeLod*)DebugMalloc(lodCount * 8, __FILE__, 0x1f5);
-    UnknownSoultreeFaceGroup* groups = (UnknownSoultreeFaceGroup*)DebugMalloc(count * 0x14, __FILE__, 0x1f9);
+    lodTable = (SoultreeLod*)DebugMalloc(lodCount * 8, __FILE__, 0x1f5);
+    SoultreeVertexGroup* groups = (SoultreeVertexGroup*)DebugMalloc(count * 0x14, __FILE__, 0x1f9);
     for (i = 0; i < count; i++)
         groups[i].node = nodes[i];
     for (int lod = 0; lod < lodCount; lod++) {
-        UnknownSoultreeLod* level = &lodTable[lod];
-        UnknownSoultreeLod& levelRef = *level;
+        SoultreeLod* level = &lodTable[lod];
+        SoultreeLod& levelRef = *level;
         sprintf(section, "LOD %i", lod);
         parameterBlock->SelectSection(section);
         parameterBlock->GetInt("NumberOfSurfaces", 0, &level->surfaceCount);
-        levelRef.surfaces = (UnknownSoultreeSurface*)DebugMalloc(levelRef.surfaceCount * 0x38, __FILE__, 0x206);
+        levelRef.surfaces = (SoultreeSurface*)DebugMalloc(levelRef.surfaceCount * 0x38, __FILE__, 0x206);
         for (int s = 0; s < level->surfaceCount; s++) {
-            UnknownSoultreeSurface* surface = &level->surfaces[s];
+            SoultreeSurface* surface = &level->surfaces[s];
             surface->field_0x2c = 1.0f;
             surface->field_0x30 = 0;
             surface->field_0x34 = 0;
@@ -342,11 +342,11 @@ int D3DIMSoultreeObject::ReadLods()
                 surface->materialIndices[0] = 0;
                 surface->materialCount = 1;
             }
-            surface->vertices = (UnknownSoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x223);
-            surface->drawnVertices = (UnknownSoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x224);
+            surface->vertices = (SoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x223);
+            surface->drawnVertices = (SoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x224);
             surface->normals = (Vector3*)DebugMalloc(surface->vertexCount * 0xc, __FILE__, 0x225);
             surface->indices = (unsigned short*)DebugMalloc(surface->faceCount * 6, __FILE__, 0x226);
-            surface->uvs = (UnknownSoultreeUV*)DebugMalloc(surface->vertexCount * 8, __FILE__, 0x227);
+            surface->uvs = (SoultreeUV*)DebugMalloc(surface->vertexCount * 8, __FILE__, 0x227);
             sprintf(section, "LOD %i - Surface %i - Vertices", lod, s);
             parameterBlock->BeginRows(section);
             int v;
@@ -406,7 +406,7 @@ int D3DIMSoultreeObject::ReadLods()
                     used++;
             }
             surface->groupCount = used;
-            surface->groups = (UnknownSoultreeFaceGroup*)DebugMalloc(used * 0x14, __FILE__, 0x283);
+            surface->groups = (SoultreeVertexGroup*)DebugMalloc(used * 0x14, __FILE__, 0x283);
             int k = 0;
             for (i = 0; i < count; i++) {
                 if (groups[i].vertexCount > 0)
@@ -459,7 +459,7 @@ void D3DIMSoultreeObject::UpdateMaterialTexelRatios()
 {
     TransformVertexGroups(-1);
     for (int i = 0; i < lodTable[currentLod].surfaceCount; i++) {
-        UnknownSoultreeSurface* surface = &lodTable[currentLod].surfaces[i];
+        SoultreeSurface* surface = &lodTable[currentLod].surfaces[i];
         float best = 0.0f;
         for (int f = 0; f < surface->faceCount; f++) {
             Vector3 zero(0.0f, 0.0f, 0.0f);
@@ -528,8 +528,8 @@ void D3DIMSoultreeObject::TransformVertexGroups(int lod)
     if (lod != -1)
         currentLod = lod;
     for (int i = 0; i < lodTable[currentLod].surfaceCount; i++) {
-        UnknownSoultreeSurface* surface = &lodTable[currentLod].surfaces[i];
-        UnknownSoultreeSurface& surfaceRef = *surface;
+        SoultreeSurface* surface = &lodTable[currentLod].surfaces[i];
+        SoultreeSurface& surfaceRef = *surface;
         int colored = 0;
         int k;
         for (k = 0; k < surface->materialCount; k++) {
@@ -537,7 +537,7 @@ void D3DIMSoultreeObject::TransformVertexGroups(int lod)
             if (!material->hasTextureName || material->useVertexColor)
                 colored = 1;
         }
-        UnknownSoultreeSurface* drawn;
+        SoultreeSurface* drawn;
         if (secondModifierCount > 0) {
             for (k = 0; k < secondModifierCount; k++)
                 ((D3DIMSoultreeModifier*)secondModifierList[k])->ModifyMesh(
@@ -546,8 +546,8 @@ void D3DIMSoultreeObject::TransformVertexGroups(int lod)
             drawn = surface;
         }
         for (int j = 0; j < drawn->groupCount; j++) {
-            UnknownSoultreeFaceGroup* group = &drawn->groups[j];
-            UnknownSoultreeFaceGroup* source = &surfaceRef.groups[j];
+            SoultreeVertexGroup* group = &drawn->groups[j];
+            SoultreeVertexGroup* source = &surfaceRef.groups[j];
             int count = group->vertexCount;
             if (count) {
                 group->node->UpdateWorldMatrix();
@@ -580,7 +580,7 @@ static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // 0x00442f70
-void D3DIMSoultreeObject::DrawWireframe(UnknownSoultreeSurface* surface)
+void D3DIMSoultreeObject::DrawWireframe(SoultreeSurface* surface)
 {
     ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_WIREFRAME, 1);
     for (int i = 0; i < surface->vertexCount; i++)
@@ -597,14 +597,14 @@ void D3DIMSoultreeObject::DrawWireframe(UnknownSoultreeSurface* surface)
 // copied per component; `from` and `line` are declared at function scope
 // (inside the loops VC6 keeps the counter j in a register and spills the
 // normal offset, retail the other way round).
-void D3DIMSoultreeObject::DrawNormals(UnknownSoultreeSurface* surface)
+void D3DIMSoultreeObject::DrawNormals(SoultreeSurface* surface)
 {
     static float length = 0.5f;                    // 0x00568944
     ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
     ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     ((RenderTarget*)renderContext)->SetTextureBlend(2, 0);
     Vector3 from;
-    UnknownSoultreeVertex line[2];
+    SoultreeVertex line[2];
     for (int i = 0; i < surface->groupCount; i++) {
         for (int j = 0; j < surface->groups[i].vertexCount; j++) {
             from.x = surface->groups[i].transformedVertices[j].position.x;
@@ -639,14 +639,14 @@ void D3DIMSoultreeObject::DrawNormals(UnknownSoultreeSurface* surface)
 // `offset + groups` add, retail adds `groups + offset`) and the transformed
 // point is copied per component (a Vector3 assignment gives another frame
 // slot and register allocation).
-void D3DIMSoultreeObject::DrawVertexCrosses(UnknownSoultreeSurface* surface)
+void D3DIMSoultreeObject::DrawVertexCrosses(SoultreeSurface* surface)
 {
     static float size = 0.025f;                    // 0x00568948
     ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
     ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     ((RenderTarget*)renderContext)->SetTextureBlend(2, 0);
     Vector3 offsets[6];
-    UnknownSoultreeVertex cross[6];
+    SoultreeVertex cross[6];
     int k;
     for (k = 0; k < 6; k++) {
         offsets[k].x = 0.0f;
@@ -683,7 +683,7 @@ void D3DIMSoultreeObject::DrawVertexCrosses(UnknownSoultreeSurface* surface)
 }
 
 // 0x004433f0
-void D3DIMSoultreeObject::GetPart(int surface, UnknownSoultreeVertex** vertices,
+void D3DIMSoultreeObject::GetPart(int surface, SoultreeVertex** vertices,
                                                 int* vertexCount, unsigned short** indices, int* indexCount,
                                                 int a6, int lod)
 {
@@ -750,7 +750,7 @@ void D3DIMSoultreeObject::DrawAxisGizmo()
     points[3].x = 0.0f;
     points[3].y = 0.0f;
     points[3].z = 0.25f;
-    UnknownSoultreeVertex vertices[4];
+    SoultreeVertex vertices[4];
     for (int i = 0; i < 4; i++) {
         points[i] = LocalToWorldPoint(points[i]);
         vertices[i].position.x = points[i].x;
@@ -809,7 +809,7 @@ void D3DIMSoultreeObject::DrawBoxOutline(Vector3 center, Vector3 extents, int fl
     corners[7].x = -extents.x;
     corners[7].y = -extents.y;
     corners[7].z = -extents.z;
-    UnknownSoultreeVertex vertices[8];
+    SoultreeVertex vertices[8];
     for (int i = 0; i < 8; i++) {
         corners[i].x = center.x + corners[i].x;
         corners[i].y = center.y + corners[i].y;
@@ -971,7 +971,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot5()
         for (int i = 0; i < model->lodTable[lod].surfaceCount; i++) {
             for (int j = 0; j < model->lodTable[lod].surfaces[i].groupCount; j++) {
                 if (model->lodTable[lod].surfaces[i].groups[j].node == this) {
-                    UnknownSoultreeVertex* vertex = model->lodTable[lod].surfaces[i].groups[j].transformedVertices;
+                    SoultreeVertex* vertex = model->lodTable[lod].surfaces[i].groups[j].transformedVertices;
                     int count = model->lodTable[lod].surfaces[i].groups[j].vertexCount;
                     for (int k = 0; k < count; k++) {
                         Raise(high.x, vertex[k].position.x);
@@ -1076,15 +1076,15 @@ void D3DIMSoultreeObject::CloneFrom(SoultreeObject* sourceNode)
         index = 1;
         sourceNodes[0] = source;
         source->CollectDescendants(&index, sourceNodes);
-        lodTable = (UnknownSoultreeLod*)DebugMalloc(lodCount * 8, __FILE__, 0x8a2);
+        lodTable = (SoultreeLod*)DebugMalloc(lodCount * 8, __FILE__, 0x8a2);
         for (int lod = 0; lod < lodCount; lod++) {
-            UnknownSoultreeLod* to = &lodTable[lod];
-            UnknownSoultreeLod* from = &source->lodTable[lod];
+            SoultreeLod* to = &lodTable[lod];
+            SoultreeLod* from = &source->lodTable[lod];
             to->surfaceCount = from->surfaceCount;
-            to->surfaces = (UnknownSoultreeSurface*)DebugMalloc(to->surfaceCount * 0x38, __FILE__, 0x8aa);
+            to->surfaces = (SoultreeSurface*)DebugMalloc(to->surfaceCount * 0x38, __FILE__, 0x8aa);
             for (int i = 0; i < to->surfaceCount; i++) {
-                UnknownSoultreeSurface* toSurface = &to->surfaces[i];
-                UnknownSoultreeSurface* fromSurface = &from->surfaces[i];
+                SoultreeSurface* toSurface = &to->surfaces[i];
+                SoultreeSurface* fromSurface = &from->surfaces[i];
                 toSurface->vertexCount = fromSurface->vertexCount;
                 toSurface->faceCount = fromSurface->faceCount;
                 toSurface->materialCount = fromSurface->materialCount;
@@ -1096,12 +1096,12 @@ void D3DIMSoultreeObject::CloneFrom(SoultreeObject* sourceNode)
                 toSurface->field_0x30 = fromSurface->field_0x30;
                 toSurface->field_0x34 = fromSurface->field_0x34;
                 toSurface->vertices =
-                    (UnknownSoultreeVertex*)DebugMalloc(toSurface->vertexCount * 0x20, __FILE__, 0x8bd);
+                    (SoultreeVertex*)DebugMalloc(toSurface->vertexCount * 0x20, __FILE__, 0x8bd);
                 toSurface->drawnVertices =
-                    (UnknownSoultreeVertex*)DebugMalloc(toSurface->vertexCount * 0x20, __FILE__, 0x8be);
+                    (SoultreeVertex*)DebugMalloc(toSurface->vertexCount * 0x20, __FILE__, 0x8be);
                 toSurface->normals = (Vector3*)DebugMalloc(toSurface->vertexCount * 0xc, __FILE__, 0x8bf);
                 toSurface->indices = (unsigned short*)DebugMalloc(toSurface->faceCount * 6, __FILE__, 0x8c0);
-                toSurface->uvs = (UnknownSoultreeUV*)DebugMalloc(toSurface->vertexCount * 8, __FILE__, 0x8c1);
+                toSurface->uvs = (SoultreeUV*)DebugMalloc(toSurface->vertexCount * 8, __FILE__, 0x8c1);
                 memcpy(toSurface->vertices, fromSurface->vertices, toSurface->vertexCount * 0x20);
                 memcpy(toSurface->drawnVertices, fromSurface->drawnVertices, toSurface->vertexCount * 0x20);
                 memcpy(toSurface->normals, fromSurface->normals, toSurface->vertexCount * 0xc);
@@ -1109,7 +1109,7 @@ void D3DIMSoultreeObject::CloneFrom(SoultreeObject* sourceNode)
                 memcpy(toSurface->uvs, fromSurface->uvs, toSurface->vertexCount * 8);
                 toSurface->groupCount = fromSurface->groupCount;
                 toSurface->groups =
-                    (UnknownSoultreeFaceGroup*)DebugMalloc(toSurface->groupCount * 0x14, __FILE__, 0x8cb);
+                    (SoultreeVertexGroup*)DebugMalloc(toSurface->groupCount * 0x14, __FILE__, 0x8cb);
                 int first = 0;
                 for (int j = 0; j < toSurface->groupCount; j++) {
                     toSurface->groups[j].node = 0;
@@ -1308,7 +1308,7 @@ int D3DIMSoultreeObject::GetSurfaceCount(int lod)
 int D3DIMSoultreeObject::NodeMovesVertices(SoultreeObject* node, int lod)
 {
     for (int i = 0; i < lodTable[lod].surfaceCount; i++) {
-        UnknownSoultreeSurface* surface = &lodTable[lod].surfaces[i];
+        SoultreeSurface* surface = &lodTable[lod].surfaces[i];
         for (int j = 0; j < surface->groupCount; j++) {
             if (surface->groups[j].node == node && surface->groups[j].vertexCount > 0)
                 return 1;

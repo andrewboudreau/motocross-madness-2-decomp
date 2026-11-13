@@ -129,7 +129,7 @@ public:
 
 // One 0x20-byte vertex in the D3DLVERTEX layout (drawn with FVF 0x1e2):
 // position, reserved, colour, specular, texture coordinates.
-struct UnknownSoultreeVertex {
+struct SoultreeVertex {
     Vector3 position;
     int reserved;
     unsigned int diffuse;
@@ -140,34 +140,34 @@ struct UnknownSoultreeVertex {
 
 // One 0x14-byte vertex group of a surface: the vertices one node moves.
 // 0x00440d40 transforms field_0x04 vertices by the node's world matrix.
-struct UnknownSoultreeFaceGroup {
+struct SoultreeVertexGroup {
     SoultreeObject* node;                      // node
     int vertexCount;                           // vertex count
-    UnknownSoultreeVertex* sourceVertices;     // source vertices
-    UnknownSoultreeVertex* transformedVertices; // transformed vertices
+    SoultreeVertex* sourceVertices;            // source vertices
+    SoultreeVertex* transformedVertices;       // transformed vertices
     Vector3* normals;                          // normals
 };
 
 // The texture coordinates of one vertex.
-struct UnknownSoultreeUV {
+struct SoultreeUV {
     float u;
     float v;
 };
 
 // One 0x38-byte surface of a level of detail ("LOD %i - Surface %i").
 // The destructor frees +0x1c, +0x04, +0x10, +0x14, +0x18, +0x28 and +0x24.
-struct UnknownSoultreeSurface {
+struct SoultreeSurface {
     int groupCount;                            // face group count
-    UnknownSoultreeFaceGroup* groups;
+    SoultreeVertexGroup* groups;
     int vertexCount;                           // vertex count
     int faceCount;                             // face count
-    UnknownSoultreeVertex* vertices;           // vertices
-    UnknownSoultreeVertex* drawnVertices;      // drawn vertices
+    SoultreeVertex* vertices;                  // vertices
+    SoultreeVertex* drawnVertices;             // drawn vertices
     Vector3* normals;                          // normals
     unsigned short* indices;                   // indices, three per face
     int materialCount;                         // material count
     int* materialIndices;                      // material indices
-    UnknownSoultreeUV* uvs;                    // texture coordinates
+    SoultreeUV* uvs;                           // texture coordinates
     float field_0x2c;                          // 1.0 after loading
     int field_0x30;
     int field_0x34;
@@ -186,9 +186,9 @@ struct UnknownSoultreeScreenRect {
 };
 
 // One 8-byte level of detail at +0x28c.
-struct UnknownSoultreeLod {
+struct SoultreeLod {
     int surfaceCount;                          // surface count
-    UnknownSoultreeSurface* surfaces;
+    SoultreeSurface* surfaces;
 };
 
 // The camera fields 0x004439c0 reads (RenderTarget+0x08): the viewport
@@ -259,10 +259,10 @@ public:
     void ComputeSubtreeBounds();                   // 0x004434b0: bounding boxes of the subtree
     void DrawAxisGizmo();                  // 0x004435b0: axes of the subtree
     void DrawBoxOutline(Vector3 center, Vector3 extents, int flag); // 0x00443740 (ret 0x1c)
-    void DrawWireframe(UnknownSoultreeSurface* surface);          // 0x00442f70 (ret 4): wireframe
-    void DrawNormals(UnknownSoultreeSurface* surface);            // 0x00442fe0 (ret 4): normals
-    void DrawVertexCrosses(UnknownSoultreeSurface* surface);      // 0x004431f0 (ret 4): vertex crosses
-    void GetPart(int surface, UnknownSoultreeVertex** vertices, int* vertexCount,
+    void DrawWireframe(SoultreeSurface* surface);                 // 0x00442f70 (ret 4): wireframe
+    void DrawNormals(SoultreeSurface* surface);                   // 0x00442fe0 (ret 4): normals
+    void DrawVertexCrosses(SoultreeSurface* surface);             // 0x004431f0 (ret 4): vertex crosses
+    void GetPart(int surface, SoultreeVertex** vertices, int* vertexCount,
                                unsigned short** indices, int* indexCount, int a6, int lod); // 0x004433f0
     int ReadLods();                                // 0x00440060: reads the levels of detail
     void ComputeAllBounds();                       // 0x00444440: slot 5 (local bounds) on every node, then subtree bounds
@@ -303,7 +303,7 @@ public:
     float* autoLodDistances;                   // +0x280 "AutoLOD#%i" distances
     float inverseLodThreshold;                 // +0x284 1 / SetLodThreshold's value; SelectLod takes level i + 1 while scale * autoLodDistances[i] < threshold
     int useAutoLod;                            // +0x288 "UseAutoLOD"
-    UnknownSoultreeLod* lodTable;              // +0x28c
+    SoultreeLod* lodTable;                     // +0x28c
     SoultreeMaterial** materialTable;          // +0x290 materials
     int materialCount;                         // +0x294 material count
     UnknownSoultreeScreenRect screenRect;      // +0x298 projected bounds (SelectLod); slot 14 bumps right and bottom

@@ -124,15 +124,15 @@ struct MorphBastardMeshPair {
 // The mesh slot 27 receives and returns (0x38 bytes).
 struct UnknownSoultreeMesh {
     int groupCount;                   // group count
-    MorphBastardMeshGroup* groups;  // +0x4  UnknownSoultreeSurface+0x04 groups (D3DIMSoulTree.h)
+    MorphBastardMeshGroup* groups;  // +0x4  SoultreeSurface+0x04 groups (D3DIMSoulTree.h)
     int vertexCount;                  // vertex count
     int faceCount;                    // face count
-    MorphBastardVertex* vertices;  // +0x10  UnknownSoultreeSurface+0x10 vertices
-    MorphBastardVertex* drawnVertices;  // +0x14  UnknownSoultreeSurface+0x14 drawn vertices
-    Vector3* normals;  // +0x18  UnknownSoultreeSurface+0x18 normals
-    MorphBastardFace* indices;  // +0x1C  UnknownSoultreeSurface+0x1c indices, three per face
+    MorphBastardVertex* vertices;  // +0x10  SoultreeSurface+0x10 vertices
+    MorphBastardVertex* drawnVertices;  // +0x14  SoultreeSurface+0x14 drawn vertices
+    Vector3* normals;  // +0x18  SoultreeSurface+0x18 normals
+    MorphBastardFace* indices;  // +0x1C  SoultreeSurface+0x1c indices, three per face
     MorphBastardMeshPair field_0x20;  // copied as one 8-byte value
-    int* uvs;  // +0x28  UnknownSoultreeSurface+0x28 texture coordinates
+    int* uvs;  // +0x28  SoultreeSurface+0x28 texture coordinates
     int field_0x2c;
     int field_0x30;
     int field_0x34;

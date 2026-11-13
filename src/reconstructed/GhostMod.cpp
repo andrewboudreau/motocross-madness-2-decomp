@@ -23,8 +23,8 @@ void GhostMod1::ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mes
     if (timeRemaining > 0.0f) {
         unsigned int alpha = (unsigned char)(int)(200.0f - timeRemaining / totalDuration * 100.0f) << 24;
         for (int i = 0; i < mesh->vertexCount; i++) {
-            ((UnknownSoultreeVertex*)mesh->vertices)[i].diffuse &= 0xffffff;
-            ((UnknownSoultreeVertex*)mesh->vertices)[i].diffuse |= alpha;
+            ((SoultreeVertex*)mesh->vertices)[i].diffuse &= 0xffffff;
+            ((SoultreeVertex*)mesh->vertices)[i].diffuse |= alpha;
         }
     }
 }

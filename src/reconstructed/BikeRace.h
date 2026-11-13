@@ -180,7 +180,7 @@ struct UnknownBikeRaceViews {
 // An entry of the mesh's +0x28c table (8 bytes).
 struct UnknownBikeRaceMeshGroup {
     int itemCount;                            // +0x00 item count
-    UnknownBikeRaceMeshItem* surfaces;  // +0x4  itemCount surfaces (D3DIMSoulTree UnknownSoultreeLod::surfaces); ReplaceMeshId walks their ids
+    UnknownBikeRaceMeshItem* surfaces;  // +0x4  itemCount surfaces (D3DIMSoulTree SoultreeLod::surfaces); ReplaceMeshId walks their ids
 };
 
 // An item of a mesh group (0x38 bytes).

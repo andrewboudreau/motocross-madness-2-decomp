@@ -29,7 +29,7 @@ void TransparencyMod::ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultreeMes
         surfacesDrawn = 0;
     }
 
-    UnknownSoultreeVertex* vertices;
+    SoultreeVertex* vertices;
     unsigned int alphaBits = alpha << 24;
     int i;
     if (isTransparent) {
@@ -37,15 +37,15 @@ void TransparencyMod::ModifyMesh(D3DIMSoultreeObject* object, UnknownSoultreeMes
             object->materialTable[i]->hasAlpha = 1;
         }
         for (i = 0; i < mesh->vertexCount; i++) {
-            ((UnknownSoultreeVertex*)mesh->vertices)[i].diffuse &= 0xffffff;
-            ((UnknownSoultreeVertex*)mesh->vertices)[i].diffuse |= alphaBits;
+            ((SoultreeVertex*)mesh->vertices)[i].diffuse &= 0xffffff;
+            ((SoultreeVertex*)mesh->vertices)[i].diffuse |= alphaBits;
         }
     } else {
         for (i = 0; i < object->materialCount; i++) {
             object->materialTable[i]->hasAlpha = 0;
         }
         for (i = 0; i < mesh->vertexCount; i++) {
-            ((UnknownSoultreeVertex*)mesh->vertices)[i].diffuse |= 0xff000000;
+            ((SoultreeVertex*)mesh->vertices)[i].diffuse |= 0xff000000;
         }
     }
 }
