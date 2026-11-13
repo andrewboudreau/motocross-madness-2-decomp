@@ -42,7 +42,7 @@ int UIMultiState::Draw() {
                     rect.top += textTopMargin;
                     rect.bottom -= textTopMargin;
                     ownerDialog->DrawAlignedText(dc, &rect, controlText, controlTextLength, textColor, fontHeight,
-                                                      (UnknownGameUiTextRun*)textLines, textDrop, dropColor,
+                                                      (UITextRun*)textLines, textDrop, dropColor,
                                                       0x11, 1, 0);
                 } else {
                     ownerDialog->DrawControlText(dc, this, 1);

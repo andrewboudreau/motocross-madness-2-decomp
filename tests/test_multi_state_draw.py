@@ -61,7 +61,7 @@ LAYOUT={
                        'regionTable':0x50,'heldDcSurface':0x6c,'heldDc':0x70},
     'UIAnim':{'currentFrame':8,'frameList':0x28},'UIFrame':{'frameWidth':0xc},
     'UnknownGameUiState':{'image':0,'text':8,'textLength':0xc,'textExtent':0x14,'textLines':0x1c},
-    'UnknownGameUiTextRun':{'text':0,'kind':4,'length':8,'color':12,'width':16,'position':20},
+    'UITextRun':{'text':0,'kind':4,'length':8,'color':12,'width':16,'position':20},
     'UnknownBackgroundRegion':{'framesLeft':0,'frameRects':4,'lastFrameCount':0x38},
 }
 
@@ -131,7 +131,7 @@ class MultiStateDrawTests(unittest.TestCase):
             self.assertEqual(routes[40*4],SYMBOL)
             paths=[candidate_path];strict=0;canonical={}
             ui_source=(ROOT/'src/reconstructed/GameUi.cpp').read_text()
-            run_type=extract(ui_source,'struct UnknownGameUiTextRun {')+';\n'
+            run_type=extract(ui_source,'struct UITextRun {')+';\n'
             for name,(unit,header,functions) in GROUPS.items():
                 source=(ROOT/f'src/reconstructed/{unit}.cpp').read_text()
                 if header is None:
@@ -158,7 +158,7 @@ class MultiStateDrawTests(unittest.TestCase):
                         text+=f'class Probe_{cls}:public {cls} {{public:static void Check(){{typedef char Field[(offsetof(Probe_{cls},renderContext)=={value})?1:-1];}}}};\n'
                     else:
                         text+=f'typedef char Check_{cls}_{member}[(offsetof({cls},{member})=={value})?1:-1];\n'
-            for cls,size in [('UIMultiState',0x1f8),('UIDialog',0x7f58),('UIAnim',0xf8),('UIFrame',0x24),('UnknownGameUiState',32),('UnknownGameUiTextRun',24),('UnknownBackgroundRegion',64)]:text+=f'typedef char Size_{cls}[(sizeof({cls})=={size})?1:-1];\n'
+            for cls,size in [('UIMultiState',0x1f8),('UIDialog',0x7f58),('UIAnim',0xf8),('UIFrame',0x24),('UnknownGameUiState',32),('UITextRun',24),('UnknownBackgroundRegion',64)]:text+=f'typedef char Size_{cls}[(sizeof({cls})=={size})?1:-1];\n'
             text+='typedef char Method[(sizeof(int(UIMultiState::*)())==4)?1:-1];\n';layout.write_text(text);compile_source(layout,'layout')
             spec=json.loads((ROOT/'config/game_build.json').read_text())
             built=game_compile(SOURCE,output/'game-command',compiler,[ROOT/p for p in spec['includes']],spec['profile'],{**os.environ,'PYTHONPATH':str(ROOT)})

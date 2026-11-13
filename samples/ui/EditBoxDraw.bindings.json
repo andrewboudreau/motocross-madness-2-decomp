@@ -1,7 +1,7 @@
 {
   "??_C@_00A@?$AA@": "0x00577738",
   "?BeginControlDraw@UIDialog@@QAEHPAPAXPAUCameraRect@@PAHPAVUIControl@@@Z": "0x0046ed70",
-  "?DrawAlignedText@UIDialog@@QAEXPAXPAUCameraRect@@PBDHIHPAUUnknownGameUiTextRun@@HIHHPAVUIControl@@@Z": "0x0046f550",
+  "?DrawAlignedText@UIDialog@@QAEXPAXPAUCameraRect@@PBDHIHPAUUITextRun@@HIHHPAVUIControl@@@Z": "0x0046f550",
   "?EndControlDraw@UIDialog@@QAEXPAX@Z": "0x0046eeb0",
   "?SetEditText@UIEditBox@@QAEXPAD@Z": "0x00473da0",
   "?DrawImage@BackgroundImage@@QAEHPAVPCTextureMap@@PAUCameraRect@@PAXHHHPAHH@Z": "0x00404480",

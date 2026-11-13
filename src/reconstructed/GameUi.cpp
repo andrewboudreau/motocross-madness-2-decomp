@@ -3550,7 +3550,7 @@ void UIDialog::UpdatePointerHover() {
 }
 
 // A colored run of dialog text (0x18 bytes).
-struct UnknownGameUiTextRun {
+struct UITextRun {
     const char* text;                         // +0x00
     int kind;                                 // +0x04: 1 sets the color, 2 the position
     int length;                               // +0x08
@@ -3570,7 +3570,7 @@ int g_AlignedTextY;                           // 0x0065b584
 
 // 0x0046f420
 void UIDialog::DrawTextRuns(void* dc, int x, int y, const char* text, int length,
-                            UnknownGameUiTextRun* runs, unsigned int color, int shadow,
+                            UITextRun* runs, unsigned int color, int shadow,
                             unsigned int shadowColor) {
     g_TextRunIndex = 0;
     g_TextRunX = x;
@@ -3598,7 +3598,7 @@ void UIDialog::DrawTextRuns(void* dc, int x, int y, const char* text, int length
 
 // 0x0046f550
 void UIDialog::DrawAlignedText(void* dc, CameraRect* rect, const char* text, int length,
-                               unsigned int color, int height, UnknownGameUiTextRun* runs, int shadow,
+                               unsigned int color, int height, UITextRun* runs, int shadow,
                                unsigned int shadowColor, int flags, int transparent,
                                UIControl* control) {
     if (transparent)
@@ -3670,7 +3670,7 @@ void UIDialog::DrawControlText(void* dc, UIControl* control, int transparent) {
     if (control->GetTextLines())
         DrawTextRuns(dc, g_ControlTextX, g_ControlTextY,
                      (const char*)control->GetControlText(), control->GetTextLength(),
-                     (UnknownGameUiTextRun*)control->GetTextLines(), control->textColor,
+                     (UITextRun*)control->GetTextLines(), control->textColor,
                      control->textColor, control->dropColor);
     else
         DrawShadowText(dc, g_ControlTextX, g_ControlTextY,
@@ -4185,7 +4185,7 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
         return 0;
     void* dc;
     SIZE extent;
-    UnknownGameUiTextRun runs[100];
+    UITextRun runs[100];
     int length = strlen(text);
     int i = 0;
     int count = 0;
@@ -4211,7 +4211,7 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
             i += 2;
             continue;
         }
-        UnknownGameUiTextRun* run = &runs[count];
+        UITextRun* run = &runs[count];
         run->text = &text[i + 2];
         if (c == '~') {
             int index = text[i + 1] - '0';
@@ -4241,7 +4241,7 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
         }
         i += 2;
         if (count) {
-            UnknownGameUiTextRun* last = run - 1;
+            UITextRun* last = run - 1;
             if (mark)
                 last->length = mark - start;
             else
@@ -4282,10 +4282,10 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
     runs[count].text = 0;
     runs[count].length = 0;
     runs[count].kind = 0;
-    UnknownGameUiTextRun* result =
-        (UnknownGameUiTextRun*)DebugMalloc((count + 1) * sizeof(UnknownGameUiTextRun), __FILE__, 0xa5b);
+    UITextRun* result =
+        (UITextRun*)DebugMalloc((count + 1) * sizeof(UITextRun), __FILE__, 0xa5b);
     if (result)
-        memcpy(result, runs, (count + 1) * sizeof(UnknownGameUiTextRun));
+        memcpy(result, runs, (count + 1) * sizeof(UITextRun));
     return (char*)result;
 }
 
@@ -4336,7 +4336,7 @@ int UIControl::Draw() {
                     DrawTextA((HDC)dc, controlText, controlTextLength, (RECT*)&rect, format);
                 } else {
                     ownerDialog->DrawAlignedText(dc, &rect, controlText, controlTextLength, textColor, fontHeight,
-                                                      (UnknownGameUiTextRun*)textLines, textDrop, dropColor,
+                                                      (UITextRun*)textLines, textDrop, dropColor,
                                                       textAlign, 1, 0);
                 }
                 ownerDialog->EndControlDraw(dc);
@@ -4834,7 +4834,7 @@ int UIListBox::Draw() {
                             rect.right += dragOffsetX + scrollOffsetX;
                             ownerDialog->DrawAlignedText(dc, &rect, rowTable[row].text,
                                                               rowTable[row].width, color, fontHeight,
-                                                              (UnknownGameUiTextRun*)rowTable[row].textLines,
+                                                              (UITextRun*)rowTable[row].textLines,
                                                               textDrop, dropColor, textAlign, 1, 0);
                         }
                         if (!more)

@@ -91,11 +91,11 @@ public:
                         unsigned int color, int shadow, unsigned int shadowColor);
     // 0x0046f420: the same with colored runs (`runs` ends with a null text).
     void DrawTextRuns(void* dc, int x, int y, const char* text, int length,
-                      struct UnknownGameUiTextRun* runs, unsigned int color, int shadow,
+                      struct UITextRun* runs, unsigned int color, int shadow,
                       unsigned int shadowColor);
     // 0x0046f550: aligns the text in `rect` by `flags` and draws it.
     void DrawAlignedText(void* dc, CameraRect* rect, const char* text, int length,
-                         unsigned int color, int height, struct UnknownGameUiTextRun* runs, int shadow,
+                         unsigned int color, int height, struct UITextRun* runs, int shadow,
                          unsigned int shadowColor, int flags, int transparent,
                          UIControl* control);
     // 0x0046f6c0: draws `control`'s text inside its margins.
