@@ -733,12 +733,12 @@ struct UnknownBikeRaceVcrTick {
 struct UnknownBikeRaceGhostRecord {
     short field_0x00;
     unsigned short timeStep;                  // +0x02 time step (0x004a9aa0)
-    Vector3 field_0x04;                       // ghost +0x5e0; delta1, KrustyBike's deltaBasePosition slot (unconfirmed)
+    Vector3 position;                         // +0x04  ghost +0x5e0; delta1, which KrustyBike 0x004933e0 adds to deltaBasePosition. Tier 3
     float roll;                               // +0x10  ghost +0x5f8; delta3[0] x pi/64, as KrustyBike's deltaBaseRoll (0x004933e0). Tier 3
     float pitch;                              // +0x14  ghost +0x5fc; delta3[1], as KrustyBike's deltaBasePitch. Tier 3
     float yaw;                                // +0x18  ghost +0x600; delta3[2], as KrustyBike's deltaBaseYaw. Tier 3
     Vector3 angularVelocity;                  // +0x1C  ghost +0x5ec; delta2 x pi/64, as KrustyBike's deltaBaseAngularVelocity. Tier 3
-    Vector3 position;                         // +0x28 ghost +0x5d4; delta0 feeds it, which KrustyBike 0x004933e0 adds to deltaBaseVelocity, so the name is unconfirmed
+    Vector3 velocity;                         // +0x28  ghost +0x5d4; delta0, which KrustyBike 0x004933e0 adds to deltaBaseVelocity. Tier 3
     int runningTime;                          // +0x34 ghost +0x604
     int field_0x38;
 };
@@ -782,8 +782,8 @@ public:
     int hasState;                             // +0x4f8 has a state
     UnknownBikeRaceGhostPart* receivedStates[4]; // +0x4fc newest first (0x00421d50 rotates them)
     unsigned char field_0x50c[0x5d4 - 0x50c];
-    Vector3 position;                         // +0x5d4 position
-    Vector3 field_0x5e0;
+    Vector3 velocity;                         // +0x5D4  record +0x28 (see UnknownBikeRaceGhostRecord). Tier 3
+    Vector3 position;                         // +0x5E0  record +0x04. Tier 3
     Vector3 angularVelocity;                  // +0x5EC  record +0x1c (see UnknownBikeRaceGhostRecord). Tier 3
     float roll;                               // +0x5F8  record +0x10. Tier 3
     float pitch;                              // +0x5FC  record +0x14. Tier 3

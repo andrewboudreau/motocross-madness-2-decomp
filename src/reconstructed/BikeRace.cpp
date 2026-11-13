@@ -1802,8 +1802,8 @@ int BikeRace::RecordFrame(int kind, void* data, int flag, int recorderId, int* k
             GhostBike()->receivedStates[0]->record = *record;
             GhostBike()->receivedStates[0]->record.runningTime = (int)(s_UnknownStatic578e8c * 1000.0f);
             GhostBike()->receivedStates[0]->fresh = 1;
+            GhostBike()->velocity = record->velocity;
             GhostBike()->position = record->position;
-            GhostBike()->field_0x5e0 = record->field_0x04;
             GhostBike()->angularVelocity = record->angularVelocity;
             GhostBike()->roll = record->roll;
             GhostBike()->pitch = record->pitch;

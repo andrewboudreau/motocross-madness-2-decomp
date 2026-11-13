@@ -25,8 +25,8 @@ void UnknownBikeRaceGhost::ApplyReplayDelta(const UnknownBikeRaceGhostDelta* del
     Vector3 d0(delta->delta0[0] * 0.234375f, delta->delta0[1] * 0.234375f, delta->delta0[2] * 0.234375f);
     Vector3 d1(delta->delta1[0] * 0.234375f, delta->delta1[1] * 0.234375f, delta->delta1[2] * 0.234375f);
     Vector3 d2(delta->delta2[0] * GHOST_ANGLE_STEP, delta->delta2[1] * GHOST_ANGLE_STEP, delta->delta2[2] * GHOST_ANGLE_STEP);
-    position += d0;
-    field_0x5e0 += d1;
+    velocity += d0;
+    position += d1;
     angularVelocity += d2;
     roll += delta->delta3[0] * GHOST_ANGLE_STEP;
     pitch += delta->delta3[1] * GHOST_ANGLE_STEP;
@@ -39,8 +39,8 @@ void UnknownBikeRaceGhost::ApplyReplayDelta(const UnknownBikeRaceGhostDelta* del
     part->record.timeStep = step;
     runningTime += part->record.timeStep;
     part->record.runningTime = runningTime;
+    part->record.velocity = velocity;
     part->record.position = position;
-    part->record.field_0x04 = field_0x5e0;
     part->record.angularVelocity = angularVelocity;
     part->record.roll = roll;
     part->record.pitch = pitch;
