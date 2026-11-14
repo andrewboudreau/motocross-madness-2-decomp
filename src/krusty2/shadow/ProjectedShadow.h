@@ -233,7 +233,7 @@ public:
     int GetVertexCount();                        // 0x00444fe0 (tier 3 name)
     int PartCount(int which);                    // 0x00445030 (tier 3 name; called with -1 in 0x004dc2b0)
     // 0x004433f0: seven stack args, callee-cleaned (ret 0x1c in retail call shape).
-    void GetPart(int index, void** vertices, int* vertexCount, unsigned short** indices, int* indexCount, int c, int d);
+    void GetPart(int index, void** vertices, int* vertexCount, unsigned short** indices, int* indexCount, int unused, int lod);
     // 0x004fe850: writes the local-space bounds centre and half extents (3 floats each).
     void GetBounds(ShadowVec3* center, ShadowVec3* halfExtents);
     char pad_0x00[0xf8];

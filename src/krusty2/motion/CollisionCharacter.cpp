@@ -75,15 +75,15 @@ int CollisionCharacter::Tick(float dt)
 }
 
 // 0x004319c0 (ret 0x1c).  Loads the character through the D3DIM base (slot 11 with context, name,
-// desc, loadInfo, a6, unused), then creates the CollisionObject for it (new(0xb8, __FILE__, 27),
+// desc, loadInfo, useOptions, unused), then creates the CollisionObject for it (new(0xb8, __FILE__, 27),
 // ctor 0x00431e70 with 1) and gives it a shape: from the .col file colPath when one was
 // supplied, otherwise from the scene node.  The character becomes the object's owner with
 // tag 0x2711.  Returns the result of GameObject slot 8 (stores context in field_0x18 and returns
 // the GameObject).  The 'Collision' allocation category is selected around the new.
 GameObject* CollisionCharacter::Load(int context, const char* name, const char* colPath,
-                                     const SoultreeLoadDesc* desc, int loadInfo, int a6, int unused)
+                                     const SoultreeLoadDesc* desc, int loadInfo, int useOptions, int unused)
 {
-    D3DIMSoultreeCharacter::LoadCharacter(context, name, desc, loadInfo, a6, unused);
+    D3DIMSoultreeCharacter::LoadCharacter(context, name, desc, loadInfo, useOptions, unused);
     int prevTag = g_MemTagStack->Push("Collision");
     collisionObject = new(CC_FILE, 27) CollisionObject(1);
     collisionObject->Configure((void*)context, 1, 0, 1);

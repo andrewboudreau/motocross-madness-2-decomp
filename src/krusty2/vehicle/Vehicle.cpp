@@ -2042,7 +2042,7 @@ void VehicleHitBy(CollisionObject* self, CollisionObject* other)
 GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char* modelPath,
                                  const SoultreeLoadDesc* desc, int loadInfo, Vec3 startPosition, Vec3 startForward,
                                  Vec3 startUp, void* terrainProbe, VehicleInputMap* map, void* linkedObject,
-                                 float weight, float arg18, float steerScale, void* device, int wheelCap,
+                                 float weight, float suspensionScale, float steerScale, void* device, int wheelCap,
                                  int extraContacts, int attachmentSlots, int earlyCap, int lateCap, int defaultEngine,
                                  int* torqueTable, int rpmLow, int rpmHigh, int rpmStep, float gearArg,
                                  VehicleAxis* steer, VehicleAxis* lean, VehicleAxis* throttle,
@@ -2054,7 +2054,7 @@ GameObject* Vehicle::LoadVehicle(int context, const char* engineName, const char
     steerAxis = steer;
     leanAxis = lean;
     throttleAxis = throttle;
-    suspensionWeightScale = arg18;
+    suspensionWeightScale = suspensionScale;
     inputDevice = device;
     wheelCapacity = wheelCap;
     if (wheelCapacity > 0) {

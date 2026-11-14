@@ -27,7 +27,7 @@ class D3DIMSoultreeObject {
 public:
     int GetSurfaceCount(int lod);  // 0x00445030
     void GetPart(int index, SoultreeVertex** vertices, int* vertexCount, unsigned short** indices,
-                 int* indexCount, int c, int d);  // 0x004433f0
+                 int* indexCount, int unused, int lod);  // 0x004433f0
 };
 
 class SoultreeObject {
@@ -47,10 +47,10 @@ int ShadowCaster::PartCount(int which)
 }
 
 void ShadowCaster::GetPart(int index, void** vertices, int* vertexCount, unsigned short** indices, int* indexCount,
-                           int c, int d)
+                           int unused, int lod)
 {
     reinterpret_cast<D3DIMSoultreeObject*>(this)->GetPart(
-        index, reinterpret_cast<SoultreeVertex**>(vertices), vertexCount, indices, indexCount, c, d);
+        index, reinterpret_cast<SoultreeVertex**>(vertices), vertexCount, indices, indexCount, unused, lod);
 }
 
 void ShadowCaster::GetBounds(ShadowVec3* center, ShadowVec3* halfExtents)

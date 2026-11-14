@@ -386,7 +386,7 @@ struct LoadDescCopy {                                    // 0x18-byte block copi
 // and the new object becomes the entry's owner.  Returns the GameObject subobject, or 0 when the lookup fails
 // (the object has then released itself).
 GameObject* D3DIMSoultreeCharacter::LoadCharacter(int context, const char* path, const SoultreeLoadDesc* desc,
-                                                       int loadInfo, int a5, int unused)
+                                                       int loadInfo, int useOptions, int unused)
 {
     char drive[4];
     char fname[0x100];
@@ -395,7 +395,7 @@ GameObject* D3DIMSoultreeCharacter::LoadCharacter(int context, const char* path,
     ReadClock();
     SetCharacterRenderContext(context, unused);
     *(const SoultreeLoadDesc**)(d3d_field_0x1a4 + 0x60) = desc;
-    *(int*)(d3d_field_0x1a4 + 0x68) = a5;
+    *(int*)(d3d_field_0x1a4 + 0x68) = useOptions;
     if (loadInfo) {
         LoadDescCopy* copy = (LoadDescCopy*)DebugMalloc(0x18, __FILE__, 0x64);
         *(LoadDescCopy**)(d3d_field_0x1a4 + 0x64) = copy;

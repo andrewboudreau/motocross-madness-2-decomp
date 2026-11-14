@@ -685,7 +685,7 @@ void D3DIMSoultreeObject::DrawVertexCrosses(SoultreeSurface* surface)
 // 0x004433f0
 void D3DIMSoultreeObject::GetPart(int surface, SoultreeVertex** vertices,
                                                 int* vertexCount, unsigned short** indices, int* indexCount,
-                                                int a6, int lod)
+                                                int unused, int lod)
 {
     if (lod == -1)
         lod = currentLod;

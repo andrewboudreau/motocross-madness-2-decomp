@@ -38,7 +38,7 @@ public:
     // 0x004319c0: loads the character and returns the GameObject to add
     // (CollisionCharacter::Load, src/krusty2/motion).
     GameObject* Load(void* owner, const char* name, const char* colPath,
-                     LightManager* lights, int loadInfo, int a5, int unused);
+                     LightManager* lights, int loadInfo, int useOptions, int unused);
     void* FindMotion(const char* name, int unused); // 0x004a6b30 (FindMotion)
     void SetMotion(void* motion);          // 0x004a8b40 (SetMotion)
     int AdvanceMotion(float time, int mirror, int mask); // 0x004a6bb0: advances the motion

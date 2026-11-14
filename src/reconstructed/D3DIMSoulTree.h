@@ -263,7 +263,7 @@ public:
     void DrawNormals(SoultreeSurface* surface);                   // 0x00442fe0 (ret 4): normals
     void DrawVertexCrosses(SoultreeSurface* surface);             // 0x004431f0 (ret 4): vertex crosses
     void GetPart(int surface, SoultreeVertex** vertices, int* vertexCount,
-                               unsigned short** indices, int* indexCount, int a6, int lod); // 0x004433f0
+                               unsigned short** indices, int* indexCount, int unused, int lod); // 0x004433f0
     int ReadLods();                                // 0x00440060: reads the levels of detail
     void ComputeAllBounds();                       // 0x00444440: slot 5 (local bounds) on every node, then subtree bounds
     void SetUseLighting(int value);         // 0x004444c0: sets useLighting and the dirty flag

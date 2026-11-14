@@ -160,7 +160,7 @@ static inline float Length(const Vector3& v)
 class UnknownSoultreeClipper {
 public:
     int TestBox(UnknownSoultreeCameraView* camera, Matrix4* matrix, Vector3* center,
-                              Vector3* extents, UnknownSoultreeScreenRect* rect, int* corners, int* a7);
+                              Vector3* extents, UnknownSoultreeScreenRect* rect, int* corners, int* unused);
 };
 extern UnknownSoultreeClipper* g_visibilityClipper;   // 0x00575a98 (VisibilityClipper, src/krusty2/visibility)
 
